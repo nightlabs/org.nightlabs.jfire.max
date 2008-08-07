@@ -88,7 +88,7 @@ public class TradeConfigModule
 
 		if (this.currency == null) {
 			Query q = pm.newQuery(Currency.class);
-			q.setOrdering("this.currencyID ASCENDING"); // we sort it to ensure that it's always the same 
+			q.setOrdering("this.currencyID ASCENDING"); // we sort it to ensure that it's always the same
 			Collection<?> c = (Collection<?>) q.execute();
 			Iterator<?> it = c.iterator();
 			if (it.hasNext())

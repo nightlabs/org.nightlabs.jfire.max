@@ -323,6 +323,20 @@ implements
 	private int articleCount = 0;
 
 	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private Date expiryTimestampUnfinalized;
+
+	private boolean expiryTimestampUnfinalizedAutoManaged = true;
+
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private Date expiryTimestampFinalized;
+
+	private boolean expiryTimestampFinalizedAutoManaged = true;
+
+	/**
 	 * @deprecated This constructor exists only for JDO!
 	 */
 	@Deprecated
@@ -995,5 +1009,78 @@ implements
 			throw new IllegalArgumentException("this.order != segment.order :: " + this + " " + segment);
 
 		segments.add(segment);
+	}
+
+	/**
+	 * Get the timestamp after which this <code>Offer</code> will be released automatically when it is already finalized
+	 * but not accepted by the customer. To expire means that all articles are released and the offer's workflow
+	 * ends into the state "expired".
+	 * <p>
+	 * This timestamp should be printed on the offer document to clearly tell the customer the validity time.
+	 * </p>
+	 *
+	 * @return <code>null</code> to indicate that it never expires or the timestamp after which it expires.
+	 */
+	public Date getExpiryTimestampFinalized() {
+		return expiryTimestampFinalized;
+	}
+	/**
+	 * Set the timestamp after which this <code>Offer</code> will be released automatically, if it has already been finalized
+	 * but is not accepted by the customer.
+	 *
+	 * @param expiryTimestampFinalized the timestamp or <code>null</code>.
+	 * @see #getExpiryTimestampFinalized()
+	 */
+	public void setExpiryTimestampFinalized(Date expiryTimestampFinalized) {
+		this.expiryTimestampFinalized = expiryTimestampFinalized;
+	}
+
+	/**
+	 * Get the timestamp after which this <code>Offer</code> will be released, if it has not yet been finalized.
+	 * Expire means that all articles are released. The user can re-allocate them and continue the workflow.
+	 *
+	 * @return <code>null</code> to indicate that it never expires or the timestamp after which it expires.
+	 */
+	public Date getExpiryTimestampUnfinalized() {
+		return expiryTimestampUnfinalized;
+	}
+	/**
+	 * Set the timestamp after which this <code>Offer</code> will expire, if it has not yet been finalized.
+	 * @param expiryTimestampUnfinalized the timestamp or <code>null</code>.
+	 * @see #getExpiryTimestampUnfinalized()
+	 */
+	public void setExpiryTimestampUnfinalized(Date expiryTimestampUnfinalized) {
+		this.expiryTimestampUnfinalized = expiryTimestampUnfinalized;
+	}
+
+	/**
+	 * Is the property {@link #getExpiryTimestampUnfinalized()} managed automatically? If yes,
+	 * the timestamp is updated on every change of the <code>Offer</code>.
+	 * <p>
+	 * To manually set a timestamp, this flag must be set to <code>false</code>.
+	 * </p>
+	 *
+	 * @return whether the appropriate property is managed automatically.
+	 */
+	public boolean isExpiryTimestampUnfinalizedAutoManaged() {
+		return expiryTimestampUnfinalizedAutoManaged;
+	}
+	public void setExpiryTimestampUnfinalizedAutoManaged(boolean expiryTimestampUnfinalizedAutoManaged) {
+		this.expiryTimestampUnfinalizedAutoManaged = expiryTimestampUnfinalizedAutoManaged;
+	}
+	/**
+	 * Is the property {@link #getExpiryTimestampFinalized()} managed automatically? If yes,
+	 * the timestamp is updated when the <code>Offer</code> is finalized.
+	 * <p>
+	 * To manually set a timestamp, this flag must be set to <code>false</code>.
+	 * </p>
+	 *
+	 * @return whether the appropriate property is managed automatically.
+	 */
+	public boolean isExpiryTimestampFinalizedAutoManaged() {
+		return expiryTimestampFinalizedAutoManaged;
+	}
+	public void setExpiryTimestampFinalizedAutoManaged(boolean expiryTimestampFinalizedAutoManaged) {
+		this.expiryTimestampFinalizedAutoManaged = expiryTimestampFinalizedAutoManaged;
 	}
 }

@@ -89,6 +89,7 @@ import org.nightlabs.jfire.store.ProductTypeActionHandlerCache;
 import org.nightlabs.jfire.store.Store;
 import org.nightlabs.jfire.store.deliver.Delivery;
 import org.nightlabs.jfire.store.id.ProductID;
+import org.nightlabs.jfire.trade.config.OfferConfigModule;
 import org.nightlabs.jfire.trade.config.TradeConfigModule;
 import org.nightlabs.jfire.trade.history.ProductHistory;
 import org.nightlabs.jfire.trade.history.ProductHistoryItem;
@@ -103,6 +104,8 @@ import org.nightlabs.jfire.trade.jbpm.ActionHandlerSendOffer;
 import org.nightlabs.jfire.trade.jbpm.JbpmConstantsOffer;
 import org.nightlabs.jfire.trade.jbpm.ProcessDefinitionAssignment;
 import org.nightlabs.jfire.trade.jbpm.id.ProcessDefinitionAssignmentID;
+import org.nightlabs.jfire.workstation.Workstation;
+import org.nightlabs.jfire.workstation.WorkstationResolveStrategy;
 import org.nightlabs.l10n.NumberFormatter;
 
 /**
@@ -468,7 +471,7 @@ public class Trader
 		if (offerIDPrefix == null) {
 			TradeConfigModule tradeConfigModule;
 			try {
-				tradeConfigModule = (TradeConfigModule) Config.getConfig(
+				tradeConfigModule = Config.getConfig(
 						getPersistenceManager(), getOrganisationID(), user).createConfigModule(TradeConfigModule.class);
 			} catch (ModuleException x) {
 				throw new RuntimeException(x); // should not happen.
@@ -504,7 +507,7 @@ public class Trader
 		if (orderIDPrefix == null) {
 			TradeConfigModule tradeConfigModule;
 			try {
-				tradeConfigModule = (TradeConfigModule) Config.getConfig(
+				tradeConfigModule = Config.getConfig(
 						getPersistenceManager(), getOrganisationID(), user).createConfigModule(TradeConfigModule.class);
 			} catch (ModuleException x) {
 				throw new RuntimeException(x); // should not happen.
@@ -660,8 +663,7 @@ public class Trader
 			if (offerIDPrefix == null) {
 				TradeConfigModule tradeConfigModule;
 				try {
-					tradeConfigModule = (TradeConfigModule) Config.getConfig(
-							getPersistenceManager(), organisationID, user).createConfigModule(TradeConfigModule.class);
+					tradeConfigModule = Config.getConfig(getPersistenceManager(), organisationID, user).createConfigModule(TradeConfigModule.class);
 				} catch (ModuleException x) {
 					throw new RuntimeException(x); // should not happen.
 				}
@@ -681,6 +683,19 @@ public class Trader
 			ProcessDefinitionAssignment processDefinitionAssignment = (ProcessDefinitionAssignment) getPersistenceManager().getObjectById(
 					ProcessDefinitionAssignmentID.create(Offer.class, tradeSide));
 			processDefinitionAssignment.createProcessInstance(null, user, offer);
+
+//			Config.getConfig(pm, organisationID, configKey, configType)
+
+			Workstation workstation = Workstation.getWorkstation(getPersistenceManager(), WorkstationResolveStrategy.FALLBACK);
+
+			OfferConfigModule offerConfigModule;
+			try {
+				offerConfigModule = Config.getConfig(getPersistenceManager(), organisationID, workstation).createConfigModule(OfferConfigModule.class);
+			} catch (ModuleException x) {
+				throw new RuntimeException(x); // should not happen.
+			}
+
+			offerConfigModule.setOfferExpiry(offer);
 
 			return offer;
 		}
@@ -742,7 +757,7 @@ public class Trader
 
 		PersistenceManager pm = getPersistenceManager();
 
-		
+
 		Collection<? extends Article> articles = articleCreator.createProductTypeArticles(this, user, offer,
 				segment, productTypes);
 
@@ -763,7 +778,7 @@ public class Trader
 
 		offer.validate();
 
-		return articles;			
+		return articles;
 	}
 
 	/**
@@ -1455,7 +1470,7 @@ public class Trader
 
 //			ProductTypeActionHandler productTypeActionHandler = ProductTypeActionHandler.getProductTypeActionHandler(
 //					getPersistenceManager(), article.getProductType().getClass());
-			ProductTypeActionHandler productTypeActionHandler = (ProductTypeActionHandler) productTypeClass2ProductTypeActionHandler.get(article.getProductType().getClass());
+			ProductTypeActionHandler productTypeActionHandler = productTypeClass2ProductTypeActionHandler.get(article.getProductType().getClass());
 			List<Article> al = productTypeActionHandler2Articles.get(productTypeActionHandler);
 			if (al == null) {
 				al = new LinkedList<Article>();
@@ -1465,7 +1480,7 @@ public class Trader
 		}
 //		getPersistenceManager().flush(); // TODO is this necessary? JPOX Bug
 		for (Map.Entry<ProductTypeActionHandler, List<Article>> me : productTypeActionHandler2Articles.entrySet()) {
-			((ProductTypeActionHandler) me.getKey()).onAllocateArticlesBegin(user, this, me.getValue());
+			(me.getKey()).onAllocateArticlesBegin(user, this, me.getValue());
 		}
 	}
 
@@ -1522,7 +1537,7 @@ public class Trader
 		}
 
 		for (Map.Entry<ProductTypeActionHandler, List<Article>> me : productTypeActionHandler2Articles.entrySet()) {
-			((ProductTypeActionHandler) me.getKey()).onAllocateArticlesEnd(user, this, me.getValue());
+			(me.getKey()).onAllocateArticlesEnd(user, this, me.getValue());
 		}
 	}
 
@@ -1639,9 +1654,9 @@ public class Trader
 		offer.setFinalized(user);
 		for (OfferActionHandler offerActionHandler : offer.getOfferLocal().getOfferActionHandlers()) {
 			offerActionHandler.onFinalizeOffer(user, offer);
-		}	
+		}
 	}
-	
+
 	public void rejectOffer(User user, OfferLocal offerLocal)
 	{
 		offerLocal.reject(user);
@@ -1712,9 +1727,9 @@ public class Trader
 
 	/**
 	 * TODO: Most things done here should be configured in the process definition xml file, not in code.
-	 *       Examples: 
+	 *       Examples:
 	 *          * the action handlers on certain nodes
-	 *          * The names of the nodes/states/transitions should also be in a xml file 
+	 *          * The names of the nodes/states/transitions should also be in a xml file
 	 */
 	public ProcessDefinition storeProcessDefinitionOffer(TradeSide tradeSide, URL jbpmProcessDefinitionURL)
 	throws IOException
@@ -1918,11 +1933,11 @@ public class Trader
 
 	/**
 	 * Returns the {@link ProductHistory} for the given {@link Product}.
-	 * 
+	 *
 	 * @param product the Product to obtain an {@link ProductHistory} for
 	 * @return the {@link ProductHistory} for the given {@link Product}.
 	 */
-	public ProductHistory getProductHistory(Product product) 
+	public ProductHistory getProductHistory(Product product)
 	{
 		if (product == null)
 			return null;
@@ -1932,15 +1947,15 @@ public class Trader
 		PersistenceManager pm = getPersistenceManager();
 		// get all articles for the product
 		Set<Article> articles = Article.getArticles(pm, product);
-		if (articles != null && !articles.isEmpty()) 
+		if (articles != null && !articles.isEmpty())
 		{
 			Set<Offer> offers = new HashSet<Offer>();
 			Set<Order> orders = new HashSet<Order>();
 			Set<Invoice> invoices = new HashSet<Invoice>();
 			Set<DeliveryNote> deliveryNotes = new HashSet<DeliveryNote>();
 
-			// collect all articleContainers for all articles 
-			for (Article article : articles) 
+			// collect all articleContainers for all articles
+			for (Article article : articles)
 			{
 				if (article.getOffer() != null) {
 					offers.add(article.getOffer());
@@ -1966,52 +1981,52 @@ public class Trader
 					}
 					ProductHistoryItem productHistoryItem = new ProductHistoryItem(
 							offer.getCreateUser(),
-							state.getStateDefinition().getName().getText(), 
+							state.getStateDefinition().getName().getText(),
 							state.getStateDefinition().getDescription().getText(),
-							offer, 
-							offer.getCustomer(), 
-							null, 
-							null, 
-							offer.getCreateDT(), 
+							offer,
+							offer.getCustomer(),
+							null,
+							null,
+							offer.getCreateDT(),
 							ProductHistoryItemType.OFFER);
 					productHistory.addProductHistoryItem(productHistoryItem);
 				}
 			}
-			
+
 			// check invoices
 			for (Invoice invoice : invoices) {
 				List<State> states = invoice.getStates();
 				for (State state : states) {
 					String nodeName = state.getStateDefinition().getJbpmNodeName();
 					if (logger.isDebugEnabled()) {
-						logger.debug("NodeName = "+nodeName+" for state "+state+" of invoice "+invoice);								
+						logger.debug("NodeName = "+nodeName+" for state "+state+" of invoice "+invoice);
 					}
 					ProductHistoryItem productHistoryItem = new ProductHistoryItem(
 							invoice.getCreateUser(),
 							state.getStateDefinition().getName().getText(),
 							state.getStateDefinition().getDescription().getText(),
-							invoice, 
-							invoice.getCustomer(), 
-							null, 
-							null, 
-							invoice.getCreateDT(), 
+							invoice,
+							invoice.getCustomer(),
+							null,
+							null,
+							invoice.getCreateDT(),
 							ProductHistoryItemType.INVOICE);
 					productHistory.addProductHistoryItem(productHistoryItem);
 				}
-				
+
 				Collection<Payment> payments = Payment.getPaymentsForInvoice(pm, invoice);
 				for (Payment payment : payments) {
 					ProductHistoryItem productHistoryItem = new ProductHistoryItem(
 							payment.getUser(),
 							NumberFormatter.formatCurrency(payment.getAmount(), payment.getCurrency()),
 							payment.getReasonForPayment(),
-							invoice, 
+							invoice,
 							payment.getPartner(),
 							null,
-							payment.getModeOfPaymentFlavour(),  
+							payment.getModeOfPaymentFlavour(),
 							payment.getBeginDT(),
 							ProductHistoryItemType.PAYMENT);
-					productHistory.addProductHistoryItem(productHistoryItem);					
+					productHistory.addProductHistoryItem(productHistoryItem);
 				}
 			}
 
@@ -2022,16 +2037,16 @@ public class Trader
 					String nodeName = state.getStateDefinition().getJbpmNodeName();
 					if (logger.isDebugEnabled()) {
 						logger.debug("NodeName = "+nodeName+" for state "+state+" of deliveryNote "+deliveryNote);
-					}						
+					}
 					ProductHistoryItem productHistoryItem = new ProductHistoryItem(
 							deliveryNote.getCreateUser(),
 							state.getStateDefinition().getName().getText(),
 							state.getStateDefinition().getDescription().getText(),
-							deliveryNote, 
-							deliveryNote.getCustomer(), 
-							null, 
-							null, 
-							deliveryNote.getCreateDT(), 
+							deliveryNote,
+							deliveryNote.getCustomer(),
+							null,
+							null,
+							deliveryNote.getCreateDT(),
 							ProductHistoryItemType.DELIVERY_NOTE);
 					productHistory.addProductHistoryItem(productHistoryItem);
 				}
@@ -2041,10 +2056,10 @@ public class Trader
 							delivery.getUser(),
 							"Delivery",
 							"",
-							deliveryNote, 
-							delivery.getPartner(), 
-							delivery.getModeOfDeliveryFlavour(), 
-							null, 
+							deliveryNote,
+							delivery.getPartner(),
+							delivery.getModeOfDeliveryFlavour(),
+							null,
 							delivery.getBeginDT(),
 							ProductHistoryItemType.DELIVERY);
 					productHistory.addProductHistoryItem(productHistoryItem);
@@ -2052,9 +2067,9 @@ public class Trader
 			}
 
 		}
-		return productHistory;			
+		return productHistory;
 	}
-	
+
 //	public Collection<? extends Article> onProductAssemble_importNestedProduct(User user, Product packageProduct, String partnerOrganisationID, Collection<NestedProductTypeLocal> partnerNestedProductTypes)
 //	{
 //		try {

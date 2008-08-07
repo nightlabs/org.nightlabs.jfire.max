@@ -90,6 +90,7 @@ import org.nightlabs.jfire.store.reverse.NoArticlesFoundReverseProductError;
 import org.nightlabs.jfire.store.reverse.OfferNotAcceptedReverseProductError;
 import org.nightlabs.jfire.store.reverse.ReverseProductException;
 import org.nightlabs.jfire.trade.config.LegalEntityViewConfigModule;
+import org.nightlabs.jfire.trade.config.OfferConfigModule;
 import org.nightlabs.jfire.trade.config.TradePrintingConfigModule;
 import org.nightlabs.jfire.trade.id.ArticleContainerID;
 import org.nightlabs.jfire.trade.id.ArticleID;
@@ -410,8 +411,8 @@ implements SessionBean
 			pm.getExtent(Currency.class);
 			Currency currency = (Currency)pm.getObjectById(CurrencyID.create(currencyID), true);
 
-			// cut off the User.USERID_PREFIX_TYPE_ORGANISATION
-			String customerOrganisationID = getPrincipal().getUserID().substring(User.USERID_PREFIX_TYPE_ORGANISATION.length());
+			// cut off the User.USER_ID_PREFIX_TYPE_ORGANISATION
+			String customerOrganisationID = getPrincipal().getUserID().substring(User.USER_ID_PREFIX_TYPE_ORGANISATION.length());
 			OrganisationLegalEntity customer = trader.getOrganisationLegalEntity(customerOrganisationID);
 
 			CustomerGroup customerGroup = null;
@@ -1321,13 +1322,13 @@ implements SessionBean
 					JFireTradeEAR.MODULE_NAME, "0.9.5.0.beta", "0.9.5.0.beta");
 			pm.makePersistent(moduleMetaData);
 
-			ConfigSetup configSetup = ConfigSetup.getConfigSetup(
+			ConfigSetup userConfigSetup = ConfigSetup.getConfigSetup(
 					pm,
 					getOrganisationID(),
 					UserConfigSetup.CONFIG_SETUP_TYPE_USER
 				);
-			configSetup.getConfigModuleClasses().add(LegalEntityViewConfigModule.class.getName());
-			configSetup.getConfigModuleClasses().add(TariffOrderConfigModule.class.getName());
+			userConfigSetup.getConfigModuleClasses().add(LegalEntityViewConfigModule.class.getName());
+			userConfigSetup.getConfigModuleClasses().add(TariffOrderConfigModule.class.getName());
 
 			ConfigSetup workstationConfigSetup = ConfigSetup.getConfigSetup(
 					pm,
@@ -1335,6 +1336,7 @@ implements SessionBean
 					WorkstationConfigSetup.CONFIG_SETUP_TYPE_WORKSTATION
 			);
 			workstationConfigSetup.getConfigModuleClasses().add(TradePrintingConfigModule.class.getName());
+			workstationConfigSetup.getConfigModuleClasses().add(OfferConfigModule.class.getName());
 
 			Trader trader = Trader.getTrader(pm);
 

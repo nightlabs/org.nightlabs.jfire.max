@@ -195,8 +195,7 @@ implements SessionBean
 
 			if(recurringOffer.getRecurringOfferConfiguration().isCreateInvoice())
 			{
-				Invoice invoice = account.createInvoice(user, recurringOffer.getArticles(), null);		
-				account.addArticlesToInvoice(user, invoice,recurringOffer.getArticles());
+				account.createInvoice(user, recurringOffer.getArticles(), null);		
 			}	
 
 

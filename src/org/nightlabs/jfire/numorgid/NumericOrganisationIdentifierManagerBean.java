@@ -48,10 +48,10 @@ implements SessionBean
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			String clientOrganisationID = getUserID();
-			if (!clientOrganisationID.startsWith(User.USERID_PREFIX_TYPE_ORGANISATION))
+			if (!clientOrganisationID.startsWith(User.USER_ID_PREFIX_TYPE_ORGANISATION))
 				throw new IllegalStateException("Sorry, only organisations are allowed to call this method!");
 
-			clientOrganisationID = clientOrganisationID.substring(User.USERID_PREFIX_TYPE_ORGANISATION.length());
+			clientOrganisationID = clientOrganisationID.substring(User.USER_ID_PREFIX_TYPE_ORGANISATION.length());
 
 			if (organisationID != null && numericOrganisationID != null)
 				throw new IllegalArgumentException("At least one of the parameters must be null!");

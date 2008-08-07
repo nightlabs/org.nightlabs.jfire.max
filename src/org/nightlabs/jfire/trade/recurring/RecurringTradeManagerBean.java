@@ -197,8 +197,6 @@ implements SessionBean
 			{
 				account.createInvoice(user, recurringOffer.getArticles(), null);		
 			}	
-
-
 		} finally {
 			pm.close();
 		}

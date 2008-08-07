@@ -31,7 +31,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -437,7 +436,7 @@ implements
 		this.offerLocal = offerLocal;
 	}
 
-	public void addArticles(Collection articles)
+	public void addArticles(Collection<? extends Article> articles)
 	{
 		if (isFinalized())
 			throw new IllegalStateException("This offer is already finalized! Cannot add a new Article!");
@@ -445,11 +444,9 @@ implements
 		// Whenever an Offer is changed, it needs to be marked as not valid to force a new validation!
 		this.valid = false;
 
-		for (Iterator iter = articles.iterator(); iter.hasNext();) {
-			Article article = (Article) iter.next();
-
-			if (!this.primaryKey.equals(article.getOffer().getPrimaryKey()))
-				throw new IllegalArgumentException("offerItem.offer != this!");
+		for (Article article : articles) {
+			if (!this.equals(article.getOffer()))
+				throw new IllegalArgumentException("article.offer != this");
 
 			this.articles.add(article);
 			this.order.addArticle(article);

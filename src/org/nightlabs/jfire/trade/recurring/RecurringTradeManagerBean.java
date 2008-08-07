@@ -175,62 +175,38 @@ implements SessionBean
 		}
 	}
 
+	
 	/**
 	 * this method is an EJB Timer Interface and will be called by the timer
 	 */	
-	public void createRecurredOfferTimed(TaskID taskID)
+	public void processRecurringOfferTimed(TaskID taskID)
 	throws Exception
 	{
 		PersistenceManager pm = getPersistenceManager();
-		try {
-			
-			Task task = (Task) pm.getObjectById(taskID);
-			RecurringOffer recurringOffer =  (RecurringOffer)pm.getObjectById((OfferID) task.getParam());
-			// Create the recurred Offer
-			createRecurredOffer(recurringOffer);
-
-
-		} finally {
-			pm.close();
-		}
-	}
-
-	public RecurredOffer createRecurredOffer(RecurringOffer recurringOffer)
-	{
-
-		PersistenceManager pm = getPersistenceManager();
-		RecurredOffer offer = null;
+		RecurredOffer recurredOffer = null;
 		String invoiceIDPrefix = null;
 		User user = SecurityReflector.getUserDescriptor().getUser(pm);
 		Accounting account = Accounting.getAccounting(pm);
 
 		try {
-			RecurringTrader recurringTrader = RecurringTrader.getRecurringTrader(pm);
-			offer = recurringTrader.createRecurredOffer(recurringOffer);
+			Task task = (Task) pm.getObjectById(taskID);
+			RecurringOffer recurringOffer =  (RecurringOffer)pm.getObjectById((OfferID) task.getParam());
+			// Create the recurred Offer
 
+			RecurringTrader recurringTrader = RecurringTrader.getRecurringTrader(pm);
+			recurredOffer = recurringTrader.createRecurredOffer(recurringOffer);
+
+			invoiceIDPrefix = recurringTrader.getInvoiceIDPrefix(user,invoiceIDPrefix);
 			if(recurringOffer.getRecurringOfferConfiguration().isCreateInvoice())
 			{
-				invoiceIDPrefix = recurringTrader.getInvoiceIDPrefix(user,invoiceIDPrefix);
-
-				Invoice invoice = new Invoice(
-						user, recurringOffer.getVendor(), recurringOffer.getCustomer(),
-						invoiceIDPrefix, IDGenerator.nextID(Invoice.class, invoiceIDPrefix),
-						recurringOffer.getCurrency());
-
-				invoice = pm.makePersistent(invoice);
-
+				Invoice invoice = account.createInvoice(user, recurringOffer.getArticles(), invoiceIDPrefix);		
 				account.addArticlesToInvoice(user, invoice,recurringOffer.getArticles());
-			}
+			}	
+			
 
-		} catch (ModuleException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		finally {
+		} finally {
 			pm.close();
 		}
-		return offer;
-
 	}
 
 	/**

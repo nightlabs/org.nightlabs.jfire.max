@@ -116,7 +116,7 @@ extends Initialiser
 		priceConfig.createFormulaCell(new PriceCoordinate(customerGroupID, currencyID, tariffIDGoldCard)).setFormula(vatNet, "10000");
 
 		dataCreator.getRootDynamicProductType().setInnerPriceConfig(priceConfig);
-		
+
 		// create Accounts
 		Account accountSoftwareDevelopmentVatNet_revenue = dataCreator.createLocalRevenueAccount("software-development-vat-net.eur", "Software Development Net Revenue (EUR)");
 		Account accountSoftwareDevelopmentVatVal_revenue = dataCreator.createLocalRevenueAccount("software-development-vat-val.eur", "Software Development VAT Revenue (EUR)");
@@ -127,11 +127,11 @@ extends Initialiser
 		Account accountSoftwareDevelopmentVatVal_expense = dataCreator.createLocalExpenseAccount("software-development-vat-val.eur", "Software Development VAT Expense (EUR)");
 		Account accountServiceVatNet_expense = dataCreator.createLocalExpenseAccount("service-vat-net.eur", "Service Net Expense (EUR)");
 		Account accountServiceVatVal_expense = dataCreator.createLocalExpenseAccount("service-vat-val.eur", "Service VAT Expense (EUR)");
-		
+
 		DynamicProductType softwareDevelopment = dataCreator.createCategory(null, softwareDevelopmentID.productTypeID, null, "Software Development", "Software-Entwicklung");
 
 		LegalEntity vendor  = dataCreator.createVendor1();
-		
+
 		// FIXME
 		@SuppressWarnings("unused")
 		DynamicProductType swDevJFire = dataCreator.createLeaf(softwareDevelopment, "softwareDevelopment.jfire", null, null, "JFire");
@@ -141,11 +141,11 @@ extends Initialiser
 		DynamicProductType swDevProjectB = dataCreator.createLeaf(softwareDevelopment, "softwareDevelopment.projectB", null, null, "Project B", "Projekt B");
 		@SuppressWarnings("unused")
 		DynamicProductType swDevProjectC = dataCreator.createLeaf(softwareDevelopment, "softwareDevelopment.projectC", null, null, "Project C", "Projekt C");
-
+		@SuppressWarnings("unused")
 		DynamicProductType swDevProjectD = dataCreator.createLeaf(softwareDevelopment, "softwareDevelopment.projectD", null, vendor, "Project D", "Projekt D");
-		
+
 		DynamicProductType service = dataCreator.createCategory(null, serviceID.productTypeID, null, "Service", "Dienstleistung");
-		
+
 		// FIXME
 		@SuppressWarnings("unused")
 		DynamicProductType serviceJFire = dataCreator.createLeaf(service, "service.jfire", null, null, "JFire");
@@ -153,12 +153,12 @@ extends Initialiser
 		DynamicProductType serviceNetwork = dataCreator.createLeaf(service, "service.network", null, null, "Network", "Netzwerk");
 		@SuppressWarnings("unused")
 		DynamicProductType serviceWebserver = dataCreator.createLeaf(service, "service.webserver", null, null, "Webserver");
-		
+
 		DynamicProductType misc = dataCreator.createLeaf(null, miscID.productTypeID, null, null, "Miscellaneous", "Verschiedenes");
-		
+
 	// can not be set here because setting the vendor for an already confirmed ProductType is not possible
-//		swDevProjectD.setVendor(legalEntityVendor);		
-		
+//		swDevProjectD.setVendor(legalEntityVendor);
+
 		// configure moneyflow
 		MappingBasedAccountantDelegate swDelegate = new MappingBasedAccountantDelegate(organisationID, "softwareAccountantDelegate");
 

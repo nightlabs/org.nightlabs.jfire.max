@@ -44,6 +44,7 @@ import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.timer.Task;
 import org.nightlabs.jfire.timer.id.TaskID;
+import org.nightlabs.jfire.workstation.Workstation;
 import org.nightlabs.timepattern.TimePatternFormatException;
 import org.nightlabs.version.MalformedVersionException;
 
@@ -95,7 +96,7 @@ implements SessionBean
 	/**
 	 * There seems to be a heisenbug in JPOX which causes it to fail sometimes with a "mc closed" error. Therefore, we simply perform
 	 * the initialisation twice (if the first time succeeded, the second call is a noop anymway).
-	 * 
+	 *
 	 * @throws ModuleException
 	 *
 	 * @ejb.interface-method
@@ -113,7 +114,7 @@ implements SessionBean
 	 * It populates the datastore with the demo data.
 	 * @throws MalformedVersionException
 	 * @throws TimePatternFormatException
-	 * 
+	 *
 	 * @throws ModuleException
 	 *
 	 * @ejb.interface-method
@@ -158,6 +159,9 @@ implements SessionBean
 					"JFireChezFrancois", "0.9.5-0-beta", "0.9.5-0-beta");
 			pm.makePersistent(moduleMetaData);
 
+			Workstation ws = new Workstation(getOrganisationID(), "ws00");
+			ws.setDescription("Workstation 00");
+			ws = pm.makePersistent(ws);
 
 		} finally {
 			pm.close();
@@ -173,7 +177,7 @@ implements SessionBean
 		}
 		return displayName;
 	}
-	
+
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_System_"
@@ -199,7 +203,7 @@ implements SessionBean
 			} catch (JDOObjectNotFoundException x) {
 				Task task = new Task(
 						taskID.organisationID, taskID.taskTypeID, taskID.taskID,
-						User.getUser(pm, getOrganisationID(), User.USERID_SYSTEM),
+						User.getUser(pm, getOrganisationID(), User.USER_ID_SYSTEM),
 						ChezFrancoisDatastoreInitialiserHome.JNDI_NAME,
 						"demoTimerTask");
 

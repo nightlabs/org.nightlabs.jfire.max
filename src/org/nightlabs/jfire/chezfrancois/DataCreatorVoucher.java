@@ -26,7 +26,6 @@ import org.nightlabs.jfire.store.CannotMakeProductTypeSaleableException;
 import org.nightlabs.jfire.store.CannotPublishProductTypeException;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.ProductTypeLocal;
-import org.nightlabs.jfire.store.ProductType.FieldName;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.voucher.accounting.VoucherLocalAccountantDelegate;
@@ -42,7 +41,7 @@ public class DataCreatorVoucher
 {
 	private VoucherType rootVoucherType;
 	private List<VoucherType> createdLeafs = new ArrayList<VoucherType>();
-	
+
 	public DataCreatorVoucher(PersistenceManager pm, User user)
 	{
 		super(pm, user);
@@ -99,7 +98,7 @@ public class DataCreatorVoucher
 
 	public VoucherType createLeaf(VoucherType category, String productTypeID,
 			IPackagePriceConfig packagePriceConfig, VoucherLocalAccountantDelegate localAccountantDelegate,
-			LegalEntity vendor, String ... names) 
+			LegalEntity vendor, String ... names)
 	throws CannotPublishProductTypeException, CannotConfirmProductTypeException
 	{
 		if (category == null)
@@ -130,7 +129,7 @@ public class DataCreatorVoucher
 			pt.getFieldMetaData(ProductType.FieldName.vendor).setValueInherited(false);
 			pt.getFieldMetaData(ProductType.FieldName.owner).setValueInherited(false);
 		}
-		
+
 		store.setProductTypeStatus_published(user, pt);
 		store.setProductTypeStatus_confirmed(user, pt);
 //		store.setProductTypeStatus_saleable(user, pt, true);
@@ -139,34 +138,34 @@ public class DataCreatorVoucher
 
 		return pt;
 	}
-	
+
 	public void makeAllLeafsSaleable() throws CannotMakeProductTypeSaleableException {
 		for (ProductType pt : createdLeafs) {
 			store.setProductTypeStatus_saleable(user, pt, true);
 		}
 	}
-	
-	public VoucherLayout createVoucherLayout() 
+
+	public VoucherLayout createVoucherLayout()
 	{
 		ScriptRootDrawComponent root = null;
-		// generate demo voucherlayout 
+		// generate demo voucherlayout
 		if (root == null) {
 			// create a ScriptRootDrawComponent
 			ScriptEditor2DFactory factory = new ScriptEditor2DFactoryImpl();
-			root = factory.createScriptRootDrawComponent(true);		
+			root = factory.createScriptRootDrawComponent(true);
 			root.setResolution(new ResolutionImpl(IResolutionUnit.dpiUnit, 300));
 			Rectangle pageBounds = PredefinedPageUtil.getPageBounds(
 					root.getModelUnit(), new A4Page());
 			root.getCurrentPage().setPageBounds(pageBounds);
 			Layer layer = root.getCurrentLayer();
-			
+
 			String fontName = "Bitstream Vera Sans";
-			
+
 			TextScriptDrawComponent scriptText = factory.createTextScriptDrawComponent("Name", fontName, 24, Font.BOLD,
 					100, 100, layer);
 			scriptText.setScriptRegistryItemID(VoucherScriptingConstants.OID.SCRIPT_REGISTRY_ITEM_ID_SCRIPT_VOUCHER_NAME);
 			layer.addDrawComponent(scriptText);
-			
+
 			TextScriptDrawComponent priceText = factory.createTextScriptDrawComponent("Price", fontName, 18, Font.PLAIN,
 					100, 500, layer);
 			priceText.setScriptRegistryItemID(VoucherScriptingConstants.OID.SCRIPT_REGISTRY_ITEM_ID_SCRIPT_VOUCHER_PRICE);
@@ -178,7 +177,7 @@ public class DataCreatorVoucher
 					VoucherScriptingConstants.OID.SCRIPT_REGISTRY_ITEM_ID_SCRIPT_VOUCHER_KEY);
 			layer.addDrawComponent(barcode);
 		}
-		
+
 		try {
 			// encode it
 			File f = File.createTempFile("tmp.JFireChezFrancois.", "."+VoucherXStreamFilter.FILE_EXTENSION);

@@ -182,8 +182,6 @@ implements SessionBean
 	throws Exception
 	{
 		PersistenceManager pm = getPersistenceManager();
-		RecurredOffer recurredOffer = null;
-		String invoiceIDPrefix = null;
 		User user = SecurityReflector.getUserDescriptor().getUser(pm);
 		Accounting account = Accounting.getAccounting(pm);
 
@@ -193,12 +191,11 @@ implements SessionBean
 			// Create the recurred Offer
 
 			RecurringTrader recurringTrader = RecurringTrader.getRecurringTrader(pm);
-			recurredOffer = recurringTrader.createRecurredOffer(recurringOffer);
+			recurringTrader.createRecurredOffer(recurringOffer);
 
-			invoiceIDPrefix = recurringTrader.getInvoiceIDPrefix(user,invoiceIDPrefix);
 			if(recurringOffer.getRecurringOfferConfiguration().isCreateInvoice())
 			{
-				Invoice invoice = account.createInvoice(user, recurringOffer.getArticles(), invoiceIDPrefix);		
+				Invoice invoice = account.createInvoice(user, recurringOffer.getArticles(), null);		
 				account.addArticlesToInvoice(user, invoice,recurringOffer.getArticles());
 			}	
 

@@ -147,23 +147,6 @@ public class RecurringTrader {
 		}
 		return orderIDPrefix;
 	}
-
-	public String getInvoiceIDPrefix(User user, String invoiceIDPrefix)
-	{
-		if (invoiceIDPrefix == null) {
-			TradeConfigModule tradeConfigModule;
-			try {
-				tradeConfigModule = (TradeConfigModule) Config.getConfig(
-						getPersistenceManager(), getOrganisationID(), user).createConfigModule(TradeConfigModule.class);
-			} catch (ModuleException x) {
-				throw new RuntimeException(x); // should not happen.
-			}
-
-			invoiceIDPrefix = tradeConfigModule.getActiveIDPrefixCf(Invoice.class.getName()).getDefaultIDPrefix();
-		}
-		return invoiceIDPrefix;
-	}	
-	
 	
 	
 	/**

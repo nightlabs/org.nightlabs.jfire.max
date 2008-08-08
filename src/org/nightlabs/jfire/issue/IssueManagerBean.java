@@ -46,6 +46,7 @@ import org.nightlabs.jfire.issue.id.IssueResolutionID;
 import org.nightlabs.jfire.issue.id.IssueSeverityTypeID;
 import org.nightlabs.jfire.issue.id.IssueTypeID;
 import org.nightlabs.jfire.issue.jbpm.JbpmConstants;
+import org.nightlabs.jfire.issue.prop.IssueStruct;
 import org.nightlabs.jfire.jbpm.JbpmLookup;
 import org.nightlabs.jfire.jbpm.graph.def.State;
 import org.nightlabs.jfire.security.SecurityReflector;
@@ -838,6 +839,10 @@ implements SessionBean
 		try {
 			// WORKAROUND JPOX Bug to avoid problems with creating workflows as State.statable is defined as interface and has subclassed implementations 
 			pm.getExtent(Issue.class); 
+			
+			String organisationID = getOrganisationID();
+			
+			IssueStruct.getIssueStruct(organisationID, pm);
 			
 			// The complete method is executed in *one* transaction. So if one thing fails, all fail.
 			// => We check once at the beginning, if this module has already been initialised.

@@ -207,10 +207,10 @@ extends AbstractJFSScriptExecutorDelegate
 					elements.add(field != null ? ((DateDataField)field).getDate() : null);
 				}
 				else if (II18nTextDataField.class.isAssignableFrom(structField.getDataFieldClass())) {
-					if (field == null || field.isEmpty()) {
-						elements.add("");
-					} else {
+					if (field != null) {
 						elements.add(((II18nTextDataField) field).getText(locale));
+					} else {
+						elements.add("");
 					}
 				} else if (ImageDataField.class.isAssignableFrom(structField.getDataFieldClass())) {
 					if (field != null) {

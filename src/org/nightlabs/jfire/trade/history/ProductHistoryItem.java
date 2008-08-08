@@ -147,7 +147,7 @@ implements Serializable
 	 * Detaches all fields of this {@link ProductHistoryItem}.
 	 * @param pm the PersistenceManager used for detaching
 	 */
-	public void detachCopy(PersistenceManager pm) {
+	public void detach(PersistenceManager pm) {
 		this.articleContainer = pm.detachCopy(this.articleContainer);
 		this.customer = pm.detachCopy(this.customer);
 		this.modeOfDeliveryFlavour = pm.detachCopy(modeOfDeliveryFlavour);

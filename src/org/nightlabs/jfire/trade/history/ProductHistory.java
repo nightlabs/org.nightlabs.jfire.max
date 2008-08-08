@@ -73,10 +73,10 @@ implements Serializable
 	 * {@link ProductHistoryItem}s. 
 	 * @param pm the PersistenceManager used for detaching
 	 */
-	public void detachCopy(PersistenceManager pm) 
+	public void detach(PersistenceManager pm) 
 	{
 		for (ProductHistoryItem item : productHistoryItems) {
-			item.detachCopy(pm);
+			item.detach(pm);
 		}
 	}
 }

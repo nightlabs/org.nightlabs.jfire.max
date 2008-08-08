@@ -89,7 +89,7 @@ import org.nightlabs.jfire.transfer.id.AnchorID;
  *
  * @jdo.fetch-group name="LegalEntity.accountant" fields="accountant"
  * @jdo.fetch-group name="LegalEntity.storekeeper" fields="storekeeper"
- * @jdo.fetch-group name="LegalEntity.person" fields="person"
+ * @jdo.fetch-group name="LegalEntity.person" fields="person[-1]"
  * @jdo.fetch-group name="LegalEntity.customerGroups" fields="customerGroups"
  * @jdo.fetch-group name="LegalEntity.defaultCustomerGroup" fields="defaultCustomerGroup"
  * @jdo.fetch-group name="LegalEntity.this" fetch-groups="default" fields="person, accountant"

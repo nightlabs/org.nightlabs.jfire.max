@@ -177,6 +177,10 @@ implements SessionBean
 
 	/**
 	 * this method is an EJB Timer Interface and will be called by the timer
+	 *  
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="org.nightlabs.jfire.trade.recurring.processRecurringOfferTimed"
+	 * @ejb.transaction type="Required"
 	 */	
 	public void processRecurringOfferTimed(TaskID taskID)
 	throws Exception

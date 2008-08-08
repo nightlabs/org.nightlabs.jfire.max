@@ -12,6 +12,4 @@ Require-Bundle: org.eclipse.ui,
  org.nightlabs.jfire.base.j2ee,
  org.nightlabs.jfire.base.ui
 Eclipse-LazyStart: true
-Export-Package: org.nightlabs.jfire.reporting.oda.client.jdojs,
- org.nightlabs.jfire.reporting.oda.client.jdoql,
- org.nightlabs.jfire.reporting.oda.client.jfs
+Export-Package: org.nightlabs.jfire.reporting.oda.client.jfs

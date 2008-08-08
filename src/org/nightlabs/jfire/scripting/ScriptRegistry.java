@@ -45,6 +45,7 @@ import org.nightlabs.jfire.organisation.LocalOrganisation;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.scripting.id.ScriptRegistryID;
 import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
+import org.nightlabs.util.IOUtil;
 import org.nightlabs.util.Util;
 
 /**
@@ -90,19 +91,16 @@ implements Serializable
 
 	public static ScriptRegistry getScriptRegistry(PersistenceManager pm)
 	{
-		Iterator it = pm.getExtent(ScriptRegistry.class).iterator();
+		Iterator<ScriptRegistry> it = pm.getExtent(ScriptRegistry.class).iterator();
 		if (it.hasNext())
-			return (ScriptRegistry) it.next();
+			return it.next();
 
 		ScriptRegistry reg = new ScriptRegistry(SINGLETON_ID.scriptRegistryID);
 		reg = pm.makePersistent(reg);
 
 		try {
-			reg.registerScriptExecutorClass(
-					ScriptExecutorJavaScript.class);
-
-			reg.registerScriptExecutorClass(
-					ScriptExecutorJavaClass.class);
+			reg.registerScriptExecutorClass(ScriptExecutorJavaScript.class);
+			reg.registerScriptExecutorClass(ScriptExecutorJavaClass.class);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -211,13 +209,13 @@ implements Serializable
 			return;
 
 		// WORKAROUND: Cannot parameterize because of BCEL bug
-		Set fileExtensions = new HashSet();
-		for (Iterator it = fileExtension2Language.entrySet().iterator(); it.hasNext(); ) {
-			Map.Entry entry = (Map.Entry)it.next();
+		Set<String> fileExtensions = new HashSet<String>();
+		for (Iterator<Map.Entry<String, String>> it = fileExtension2Language.entrySet().iterator(); it.hasNext(); ) {
+			Map.Entry<String, String> entry = it.next();
 			if (entry.getValue().equals(language))
 				fileExtensions.add(entry.getKey());
 		}
-		for (Iterator it = fileExtensions.iterator(); it.hasNext();) {
+		for (Iterator<String> it = fileExtensions.iterator(); it.hasNext();) {
 			Object fileExtension = it.next();
 			fileExtension2Language.remove(fileExtension);
 		}
@@ -280,7 +278,7 @@ implements Serializable
 	{
 		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
 
-		Collection scripts = Script.getScripts(pm, scriptRegistryItemType, scriptRegistryItemID);
+		Collection<Script> scripts = Script.getScripts(pm, scriptRegistryItemType, scriptRegistryItemID);
 
 		if (scripts.isEmpty())
 			return null;
@@ -288,10 +286,9 @@ implements Serializable
 		if (scripts.size() == 1)
 			return (Script) scripts.iterator().next();
 
-		// WORKAROUND: Cannot parameterize because of BCEL bug
-		Map scriptsByOrganisationID = new HashMap();
-		for (Iterator it = scripts.iterator(); it.hasNext(); ) {
-			Script script = (Script) it.next();
+		Map<String, Script> scriptsByOrganisationID = new HashMap<String, Script>();
+		for (Iterator<Script> it = scripts.iterator(); it.hasNext(); ) {
+			Script script = it.next();
 			scriptsByOrganisationID.put(script.getOrganisationID(), script);
 		}
 
@@ -340,7 +337,7 @@ implements Serializable
 
 	public String getLanguageByFileName(String fileName, boolean throwExceptionIfNotFound)
 	{
-		String res = getLanguageByFileExtension(Util.getFileExtension(fileName), false);
+		String res = getLanguageByFileExtension(IOUtil.getFileExtension(fileName), false);
 		if (throwExceptionIfNotFound && res == null)
 			throw new IllegalArgumentException("There is no language registered for the fileExtension of the file: " + fileName);
 

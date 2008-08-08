@@ -68,19 +68,18 @@ public class Script
 	private static final long serialVersionUID = 1L;
 
 	private static final String QUERY_GET_SCRIPTS_BY_TYPE_AND_ID = "getScriptsByTypeAndID";
-	public static Collection getScripts(PersistenceManager pm, String scriptRegistryItemType, String scriptRegistryItemID)
+	public static Collection<Script> getScripts(PersistenceManager pm, String scriptRegistryItemType, String scriptRegistryItemID)
 	{
 		Query q = pm.newNamedQuery(Script.class, QUERY_GET_SCRIPTS_BY_TYPE_AND_ID);
-		return (Collection) q.execute(
-				scriptRegistryItemType, scriptRegistryItemID);
+		return (Collection<Script>) q.execute(scriptRegistryItemType, scriptRegistryItemID);
 	}
 
 	private static final String QUERY_GET_SCRIPTS_BY_TYPE_AND_RESULT_CLASS = "getScriptsByTypeAndResultClass";
-	public static Collection getScriptsByTypeAndResult(PersistenceManager pm,
+	public static Collection<Script> getScriptsByTypeAndResult(PersistenceManager pm,
 			String scriptRegistryItemType, String resultClassName)
 	{
 		Query q = pm.newNamedQuery(Script.class, QUERY_GET_SCRIPTS_BY_TYPE_AND_RESULT_CLASS);
-		return (Collection) q.execute(scriptRegistryItemType, resultClassName);
+		return (Collection<Script>) q.execute(scriptRegistryItemType, resultClassName);
 	}
 	
 	/**
@@ -197,7 +196,7 @@ public class Script
 		this.resultClassName = resultClassName;
 	}
 
-	public void setResultClass(Class resultClass)
+	public void setResultClass(Class<?> resultClass)
 	{
 		if (resultClass == null)
 			throw new IllegalArgumentException("resultClass must not be null!");
@@ -205,7 +204,7 @@ public class Script
 		this.resultClassName = resultClass.getName();
 	}
 
-	public Class getResultClass()
+	public Class<?> getResultClass()
 		throws ClassNotFoundException
 	{
 		try {

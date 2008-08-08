@@ -39,6 +39,6 @@ public interface IScriptParameter
 	String getScriptParameterClassName();
 	void setScriptParameterClassName(String scriptParameterClassName);
 	
-	Class getScriptParameterClass() throws ClassNotFoundException;
-	void setScriptParameterClass(Class scriptParameterClass);
+	Class<?> getScriptParameterClass() throws ClassNotFoundException;
+	void setScriptParameterClass(Class<?> scriptParameterClass);
 }

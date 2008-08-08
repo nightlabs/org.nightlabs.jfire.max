@@ -59,7 +59,7 @@ extends Serializable
 	 * Returns the {@link Class} for the script result.
 	 * @return the {@link Class} for the script result
 	 */
-	public Class getResultClass() throws ClassNotFoundException;
+	public Class<?> getResultClass() throws ClassNotFoundException;
 	
 	/**
 	 * Returns the class name of the result as String.

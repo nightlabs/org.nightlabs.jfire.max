@@ -39,7 +39,6 @@ import javax.ejb.CreateException;
 import javax.ejb.EJBException;
 import javax.ejb.SessionBean;
 import javax.ejb.SessionContext;
-import javax.jdo.FetchPlan;
 import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
@@ -76,14 +75,10 @@ import org.nightlabs.jfire.reporting.layout.render.ReportLayoutRendererHTML;
 import org.nightlabs.jfire.reporting.layout.render.ReportLayoutRendererPDF;
 import org.nightlabs.jfire.reporting.layout.render.ReportLayoutRendererUtil;
 import org.nightlabs.jfire.reporting.oda.JFireReportingOdaException;
-import org.nightlabs.jfire.reporting.oda.jdojs.JDOJSResultSet;
-import org.nightlabs.jfire.reporting.oda.jdojs.JDOJSResultSetMetaData;
 import org.nightlabs.jfire.reporting.oda.jdoql.JDOQLMetaDataParser;
 import org.nightlabs.jfire.reporting.oda.jdoql.JDOQLResultSetMetaData;
 import org.nightlabs.jfire.reporting.oda.jfs.JFSQueryPropertySet;
 import org.nightlabs.jfire.reporting.oda.jfs.ScriptExecutorJavaClassReporting;
-import org.nightlabs.jfire.reporting.oda.server.jdojs.ServerJDOJSProxy;
-import org.nightlabs.jfire.reporting.oda.server.jdoql.ServerJDOQLProxy;
 import org.nightlabs.jfire.reporting.oda.server.jfs.ServerJFSQueryProxy;
 import org.nightlabs.jfire.reporting.platform.ServerPlatformContext;
 import org.nightlabs.jfire.reporting.scripting.ScriptingInitialiser;
@@ -504,35 +499,6 @@ implements SessionBean
 	
 	/**
 	 * @throws ModuleException
-	 * @throws ModuleException
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Never"
-	 */
-	public IResultSet fetchJDOQLResultSet(
-			String queryText,
-			Map parameters,
-			JDOQLResultSetMetaData metaData
-		)
-	{
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			return ServerJDOQLProxy.executeQuery(
-					pm,
-					queryText,
-					parameters,
-					metaData,
-					true,
-					new String[] {FetchPlan.ALL}
-				);
-		} finally {
-			pm.close();
-		}
-	}
-	
-	/**
-	 * @throws ModuleException
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
@@ -541,47 +507,6 @@ implements SessionBean
 	public JDOQLResultSetMetaData getQueryMetaData(String organisationID, String queryText)
 	{
 		return JDOQLMetaDataParser.parseJDOQLMetaData(queryText);
-	}
-	
-	/**
-	 * TODO: This can be done in the client = speedup
-	 * 
-	 * @throws ModuleException
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Required"
-	 */
-	public JDOJSResultSetMetaData prepareJDOJSQuery(String prepareScript)
-	{
-		return ServerJDOJSProxy.prepareJDOJSQuery(prepareScript);
-	}
-	
-	
-	/**
-	 * @throws ModuleException
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Never"
-	 */
-	public JDOJSResultSet fetchJDOJSResultSet(
-			JDOJSResultSetMetaData metaData,
-			String prepareScript,
-			Map<String, Object> parameters
-		)
-	{
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			return ServerJDOJSProxy.fetchJDOJSResultSet(
-					pm,
-					metaData,
-					prepareScript,
-					parameters
-				);
-		} finally {
-			pm.close();
-		}
 	}
 	
 	/**

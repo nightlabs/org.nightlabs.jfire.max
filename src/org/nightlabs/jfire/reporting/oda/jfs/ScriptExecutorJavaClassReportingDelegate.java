@@ -17,11 +17,11 @@ public interface ScriptExecutorJavaClassReportingDelegate extends ScriptExecutor
 	
 	/**
 	 * Should return the ResultSetMetaData for this delegate.
-	 * It is recomended to inherit {@link ResultSetMetaData} for the results
+	 * It is recommended to inherit {@link ResultSetMetaData} for the results
 	 * of this method.
 	 * 
-	 * @return A ResultSetMetaData describing the colums this delegate returns on execution.
-	 * @throws ScriptException When the script fails to return the metadata
+	 * @return A ResultSetMetaData describing the columns this delegate returns on execution.
+	 * @throws ScriptException When the script fails to return the meta-data
 	 */
 	IResultSetMetaData getResultSetMetaData() throws ScriptException;
 	

@@ -60,9 +60,9 @@ implements ReportingScriptExecutor
 	/**
 	 * {@inheritDoc}
 	 * <p>
-	 * This implementation will first fake the params for the delegate, meaning it will put
+	 * This implementation will first fake the parameters for the delegate, meaning it will put
 	 * itself(this) as value for all required parameters, in order to be able to prepare
-	 * the script. The script meeds to be prepared as {@link #getDelegate()} will
+	 * the script. The script needs to be prepared as {@link #getDelegate()} will
 	 * throw an IllegalStateException if not.
 	 * <p>
 	 * After preparation the {@link ScriptExecutorJavaClassReportingDelegate#getResultSetMetaData()}

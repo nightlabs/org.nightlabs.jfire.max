@@ -20,16 +20,35 @@ import org.nightlabs.jfire.security.id.UserID;
  *
  * @author Chairat Kongarayawetchakun <!-- chairat at nightlabs dot de -->
  * @author Marius Heinzmann - marius[at]nightlabs[dot]com
+ * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
  */
 public class IssueQuery
 	extends AbstractJDOQuery
 {
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 20080811L;
 
 	private static final Logger logger = Logger.getLogger(IssueQuery.class);
 
+	private boolean issueSubjectRegex = false;
+	/**
+	 * This member is used to create the jdoql query
+	 */
+	@SuppressWarnings("unused")
+	private transient String issueSubjectExpr;
 	private String issueSubject;
+	private boolean issueCommentRegex = false;
+	/**
+	 * This member is used to create the jdoql query
+	 */
+	@SuppressWarnings("unused")
+	private transient String issueCommentExpr;
 	private String issueComment;
+	private boolean issueSubjectNCommentRegex = false;
+	/**
+	 * This member is used to create the jdoql query
+	 */
+	@SuppressWarnings("unused")
+	private transient String issueSubjectNCommentExpr;
 	private String issueSubjectNComment;
 	private IssueTypeID issueTypeID;
 	private IssueSeverityTypeID issueSeverityTypeID;
@@ -52,8 +71,11 @@ public class IssueQuery
 		public static final String issuePriorityID = "issuePriorityID";
 		public static final String issueResolutionID = "issueResolutionID";
 		public static final String issueSeverityTypeID = "issueSeverityTypeID";
+		public static final String issueSubjectRegex = "issueSubjectRegex";
 		public static final String issueSubject = "issueSubject";
+		public static final String issueSubjectNCommentRegex = "issueSubjectNCommentRegex";
 		public static final String issueSubjectNComment = "issueSubjectNComment";
+		public static final String issueCommentRegex = "issueCommentRegex";
 		public static final String issueComment = "issueComment";
 		public static final String issueLinkTypeID = "issueLinkTypeID";
 		public static final String issueLinks = "issueLinks";
@@ -64,16 +86,19 @@ public class IssueQuery
 		StringBuilder filter = new StringBuilder("true");
 
 		if (isFieldEnabled(FieldName.issueSubject) && issueSubject != null) {
-			filter.append("\n && subject.names.containsValue(varSubject) && varSubject.toLowerCase().matches(:issueSubject) ");
+			issueSubjectExpr = isIssueSubjectRegex() ? issueSubject : ".*" + issueSubject + ".*";
+			filter.append("\n && (subject.names.containsValue(varSubject) && varSubject.toLowerCase().matches(:issueSubjectExpr.toLowerCase())) ");
 		}
 
 		if (isFieldEnabled(FieldName.issueComment) && issueComment != null) {
-			filter.append("\n && comments.contains(varComment) && varComment.text.toLowerCase().matches(:issueComment) ");
+			issueCommentExpr = isIssueCommentRegex() ? issueComment : ".*" + issueComment + ".*";
+			filter.append("\n && (comments.contains(varComment) && varComment.text.toLowerCase().matches(:issueCommentExpr.toLowerCase())) ");
 		}
 
 		if (isFieldEnabled(FieldName.issueSubjectNComment) && issueSubjectNComment != null) {
-			filter.append("\n && (subject.names.containsValue(varSubject) && varSubject.toLowerCase().matches(:issueSubjectNComment))  ");
-			filter.append("\n && (comments.contains(varComment) && varComment.text.toLowerCase().matches(:issueSubjectNComment)) ");
+			issueSubjectNCommentExpr = isIssueSubjectNCommentRegex() ? issueSubjectNComment : ".*" + issueSubjectNComment + ".*";
+			filter.append("\n && ((subject.names.containsValue(varSubject) && varSubject.toLowerCase().matches(:issueSubjectNCommentExpr.toLowerCase()))  ");
+			filter.append("\n || (comments.contains(varComment) && varComment.text.toLowerCase().matches(:issueSubjectNCommentExpr.toLowerCase()))) ");
 		}
 
 		if (isFieldEnabled(FieldName.issueTypeID) && issueTypeID != null) {
@@ -192,53 +217,115 @@ public class IssueQuery
 	public void setIssueSubject(String issueSubject)
 	{
 		final String oldIssueSubject = removeRegexpSearch(this.issueSubject);
-		if (issueSubject == null || issueSubject.length() == 0)
-		{
-			this.issueSubject = null;
-		}
-		else
-		{
-			this.issueSubject = ".*" + issueSubject.toLowerCase() + ".*";
-		}
+		this.issueSubject = issueSubject;
 		notifyListeners(FieldName.issueSubject, oldIssueSubject, issueSubject);
 	}
+	
+	/**
+	 * @return Whether the value set with {@link #setIssueSubject(String)} represents a regular
+	 *         expression. If this is <code>true</code>, the value set with {@link #setIssueSubject(String)}
+	 *         will be passed directly as matching string, if it is <code>false</code> a regular expression
+	 *         will be made out of it by prefixing and suffixing the value with ".*"
+	 */
+	public boolean isIssueSubjectRegex() {
+		return issueSubjectRegex;
+	}
 
+	/**
+	 * Sets whether the value set with {@link #setIssueSubject(String)} represents a 
+	 * regular expression.
+	 * 
+	 * @param issueSubjectRegex The issueSubjectRegex to search. 
+	 */
+	public void setIssueSubjectRegex(boolean issueSubjectRegex) {
+		final boolean oldIssueSubjectRegex = this.issueSubjectRegex;
+		this.issueSubjectRegex = issueSubjectRegex;
+		notifyListeners(FieldName.issueSubjectRegex, oldIssueSubjectRegex, issueSubjectRegex);
+	}
+	
+
+	/**
+	 * Set the string to search in the issue subject and comments for. This can either be a regular expression
+	 * (set {@link #setIssueSubjectNCommentRegex(boolean)} to <code>true</code> then) or a string
+	 * that should be contained in either the subject or one of the comments of the Issues to find.
+	 *  
+	 * @param issueSubjectNComment The issueComment to set.
+	 */
 	public void setIssueSubjectNComment(String issueSubjectNComment)
 	{
 		final String oldIssueSubjectNComment = removeRegexpSearch(this.issueSubjectNComment);
-		if (issueSubjectNComment == null || issueSubjectNComment.length() == 0)
-		{
-			this.issueSubjectNComment = null;
-		}
-		else
-		{
-			this.issueSubjectNComment = ".*" + issueSubjectNComment.toLowerCase() + ".*";
-		}
+		this.issueSubjectNComment = issueSubjectNComment.toLowerCase();
 		notifyListeners(FieldName.issueSubjectNComment, oldIssueSubjectNComment, issueSubjectNComment);
 	}
 
 	public String getIssueSubjectNComment() {
 		return issueSubjectNComment;
 	}
+	
+	/**
+	 * @return Whether the value set with {@link #setIssueSubjectNComment(String)} represents a regular
+	 *         expression. If this is <code>true</code>, the value set with {@link #setIssueSubjectNComment(String)}
+	 *         will be passed directly as matching string, if it is <code>false</code> a regular expression
+	 *         will be made out of it by prefixing and suffixing the value with ".*"
+	 */
+	public boolean isIssueSubjectNCommentRegex() {
+		return issueSubjectNCommentRegex;
+	}
+
+	/**
+	 * Sets whether the value set with {@link #setIssueSubjectNComment(String)} represents a 
+	 * regular expression.
+	 * 
+	 * @param issueSubjectNCommentRegex The issueSubjectNCommentRegex to search. 
+	 */
+	public void setIssueSubjectNCommentRegex(boolean issueSubjectNCommentRegex) {
+		final boolean oldIssueSubjectNCommentRegex = this.issueSubjectNCommentRegex;
+		this.issueSubjectNCommentRegex = issueSubjectNCommentRegex;
+		notifyListeners(FieldName.issueSubjectNCommentRegex, oldIssueSubjectNCommentRegex, issueSubjectNCommentRegex);
+	}
+	
 
 	public String getIssueComment() {
 		return issueComment;
 	}
 
+	/**
+	 * Set the string to search in the issue comments for. This can either be a regular expression
+	 * (set {@link #setIssueCommentRegex(boolean)} to <code>true</code> then) or a string
+	 * that should be contained in one of the comments of the Issues to find.
+	 *  
+	 * @param issueComment The issueComment to set.
+	 */
 	public void setIssueComment(String issueComment)
 	{
 		final String oldIssueComment = removeRegexpSearch(this.issueComment);
-		if (issueComment == null || issueComment.length() == 0)
-		{
-			this.issueComment = null;
-		}
-		else
-		{
-			this.issueComment = ".*" + issueComment.toLowerCase() + ".*";
-		}
+		this.issueComment = issueComment;
 		notifyListeners(FieldName.issueComment, oldIssueComment, issueComment);
 	}
 
+	/**
+	 * @return Whether the value set with {@link #setIssueComment(String)} represents a regular
+	 *         expression. If this is <code>true</code>, the value set with {@link #setIssueComment(String)}
+	 *         will be passed directly as matching string, if it is <code>false</code> a regular expression
+	 *         will be made out of it by prefixing and suffixing the value with ".*"
+	 */
+	public boolean isIssueCommentRegex() {
+		return issueCommentRegex;
+	}
+
+	/**
+	 * Sets whether the value set with {@link #setIssueComment(String)} represents a 
+	 * regular expression.
+	 * 
+	 * @param issueCommentRegex The issueCommentRegex to search. 
+	 */
+	public void setIssueCommentRegex(boolean issueCommentRegex) {
+		final boolean oldIssueCommentRegex = this.issueCommentRegex;
+		this.issueSubjectRegex = issueCommentRegex;
+		notifyListeners(FieldName.issueSubjectNCommentRegex, oldIssueCommentRegex, issueCommentRegex);
+	}
+	
+	
 	public IssueTypeID getIssueTypeID() {
 		return issueTypeID;
 	}

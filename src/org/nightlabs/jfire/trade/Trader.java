@@ -686,19 +686,24 @@ public class Trader
 
 //			Config.getConfig(pm, organisationID, configKey, configType)
 
-			Workstation workstation = Workstation.getWorkstation(getPersistenceManager(), WorkstationResolveStrategy.FALLBACK);
-
-			OfferConfigModule offerConfigModule;
-			try {
-				offerConfigModule = Config.getConfig(getPersistenceManager(), organisationID, workstation).createConfigModule(OfferConfigModule.class);
-			} catch (ModuleException x) {
-				throw new RuntimeException(x); // should not happen.
-			}
-
-			offerConfigModule.setOfferExpiry(offer);
+			setOfferExpiry(offer);
 
 			return offer;
 		}
+	}
+
+	protected void setOfferExpiry(Offer offer)
+	{
+		Workstation workstation = Workstation.getWorkstation(getPersistenceManager(), WorkstationResolveStrategy.FALLBACK);
+
+		OfferConfigModule offerConfigModule;
+		try {
+			offerConfigModule = Config.getConfig(getPersistenceManager(), organisationID, workstation).createConfigModule(OfferConfigModule.class);
+		} catch (ModuleException x) {
+			throw new RuntimeException(x); // should not happen.
+		}
+
+		offerConfigModule.setOfferExpiry(offer);
 	}
 
 	public Set<Article> reverseArticles(User user, Offer reversingOffer, Collection<Article> reversedArticles)
@@ -778,6 +783,8 @@ public class Trader
 
 		offer.validate();
 
+		setOfferExpiry(offer);
+
 		return articles;
 	}
 
@@ -820,8 +827,7 @@ public class Trader
 		if (!segment.getOrder().equals(offer.getOrder()))
 			throw new IllegalArgumentException("segment.order != offer.order :: " + segment.getOrder().getPrimaryKey() + " != " + offer.getOrder().getPrimaryKey());
 
-		Collection<? extends Article> articles = articleCreator.createProductArticles(this, user, offer,
-				segment, products);
+		Collection<? extends Article> articles = articleCreator.createProductArticles(this, user, offer, segment, products);
 
 		createArticleLocals(user, articles);
 
@@ -830,22 +836,7 @@ public class Trader
 		articles = pm.makePersistentAll(articles);
 		// WORKAROUND end
 
-
 		offer.addArticles(articles);
-
-
-		// WORKAROUND begin
-//		pm.flush();
-//
-//		OfferID offerID = (OfferID) JDOHelper.getObjectId(offer);
-//		List articleIDs = NLJDOHelper.getObjectIDList(articles);
-//
-//		pm.evictAll();
-//
-//		offer = (Offer) pm.getObjectById(offerID);
-//		articles = NLJDOHelper.getObjectList(pm, articleIDs, Article.class);
-		// WORKAROUND end
-
 
 		if (allocate) {
 			// allocateArticle (re)creates the price already => no need to create the
@@ -862,6 +853,8 @@ public class Trader
 		}
 
 		offer.validate();
+
+		setOfferExpiry(offer);
 
 		return articles;
 	}
@@ -1635,9 +1628,7 @@ public class Trader
 		// check whether we have to finalize remote offers as well
 		OfferRequirement offerRequirement = OfferRequirement.getOfferRequirement(pm, offer, false);
 		if (offerRequirement != null) {
-			for (Iterator itO = offerRequirement.getPartnerOffers().iterator(); itO.hasNext(); ) {
-				Offer partnerOffer = (Offer) itO.next();
-
+			for (Offer partnerOffer : offerRequirement.getPartnerOffers()) {
 				LegalEntity vendor = partnerOffer.getOrder().getVendor();
 				if (!(vendor instanceof OrganisationLegalEntity))
 					throw new IllegalStateException("Vendor of Offer " + partnerOffer.getPrimaryKey() + " is not an OrganisationLegalEntity, even though this Offer is part of the OfferRequirements for Offer " + offer.getPrimaryKey());
@@ -1652,6 +1643,12 @@ public class Trader
 		} // if (offerRequirement != null) {
 
 		offer.setFinalized(user);
+
+		// set expiry timestamp
+		// important to call this *after* Offer.setFinalized(...)
+		setOfferExpiry(offer);
+
+		// trigger listeners
 		for (OfferActionHandler offerActionHandler : offer.getOfferLocal().getOfferActionHandlers()) {
 			offerActionHandler.onFinalizeOffer(user, offer);
 		}

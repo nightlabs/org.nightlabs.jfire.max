@@ -70,7 +70,7 @@ is for a new problem: http://www.jpox.org/servlet/jira/browse/NUCCORE-93
 			bean="jfire/ejb/JFireTrade/StoreManager"
 			method="initialise" />
 	</init>
-	<init bean="jfire/ejb/JFireTrade/TradeManager" method="initialise2">
+	<init bean="jfire/ejb/JFireTrade/TradeManager" method="initialise2" priority="900">
 		<depends module="JFireTrade.ear"
 			archive="JFireTrade.jar"
 			bean="jfire/ejb/JFireTrade/TradeManager"

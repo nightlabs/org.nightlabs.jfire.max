@@ -136,12 +136,12 @@ implements Serializable, AttachCallback
 		if (obj == this) return true;
 		if (!(obj instanceof IssueComment)) return false;
 		IssueComment o = (IssueComment) obj;
-		return Util.equals(o.commentID, this.commentID);
+		return Util.equals(this.organisationID, o.organisationID) && Util.equals(o.commentID, this.commentID);
 	}
 
 	@Override
 	public int hashCode()
 	{
-		return Util.hashCode(commentID);
+		return (31 * Util.hashCode(organisationID)) + Util.hashCode(commentID);
 	}
 }

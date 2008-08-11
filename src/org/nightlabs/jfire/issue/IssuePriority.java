@@ -21,27 +21,27 @@ import org.nightlabs.util.Util;
  */
 public class IssuePriority
 implements Serializable{
-	
+
 	public static final String FETCH_GROUP_NAME = "IssuePriority.name";
-	
+
 	private static final long serialVersionUID = 1L;
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
 	private String organisationID;
-	
+
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
 	private String issuePriorityID;
-	
+
 	/**
 	 * @jdo.field persistence-modifier="persistent" dependent="true" mapped-by="issuePriority"
 	 */
 	private IssuePriorityName name;
-	
+
 	/**
 	 * @deprecated Only for JDO!!!!
 	 */
@@ -57,7 +57,7 @@ implements Serializable{
 		this.issuePriorityID = issuePriorityID;
 		this.name = new IssuePriorityName(this);
 	}
-	
+
 	public String getOrganisationID() {
 		return organisationID;
 	}
@@ -81,12 +81,16 @@ implements Serializable{
 		if (obj == this) return true;
 		if (!(obj instanceof IssuePriority)) return false;
 		IssuePriority o = (IssuePriority) obj;
-		return Util.equals(o.issuePriorityID, this.issuePriorityID);
+		return 
+		Util.equals(this.organisationID, o.organisationID) &&
+		Util.equals(o.issuePriorityID, this.issuePriorityID);
 	}
 
 	@Override
 	public int hashCode()
 	{
-		return Util.hashCode(issuePriorityID);
+		return 
+		(31 * Util.hashCode(organisationID)) + 
+		Util.hashCode(issuePriorityID);
 	}
 }

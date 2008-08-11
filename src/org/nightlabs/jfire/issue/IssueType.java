@@ -67,26 +67,26 @@ implements Serializable
 	public static final String FETCH_GROUP_ISSUE_SEVERITY_TYPES = "IssueType.issueSeverityTypes";
 	public static final String FETCH_GROUP_ISSUE_RESOLUTIONS = "IssueType.issueResolutions";
 	public static final String FETCH_GROUP_PROCESS_DEFINITION = "IssueType.processDefinition";
-	
+
 	public static final String QUERY_ALL_ISSUETYPE_IDS = "getAllIssueTypeIDs";
-	
+
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
 	private String organisationID;
-	
+
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
 	private String issueTypeID;
-	
+
 	/**
 	 * @jdo.field persistence-modifier="persistent" dependent="true" mapped-by="issueType"
 	 */
 	private IssueTypeName name;
-	
+
 	/**
 	 * Instances of {@link IssueSeverityType}.
 	 *
@@ -99,7 +99,7 @@ implements Serializable
 	 * @jdo.join
 	 */
 	private List<IssueSeverityType> issueSeverityTypes;
-	
+
 	/**
 	 * Instances of {@link IssuePriority}.
 	 *
@@ -112,7 +112,7 @@ implements Serializable
 	 * @jdo.join
 	 */
 	private List<IssuePriority> issuePriorities;
-	
+
 	/**
 	 * Instances of {@link IssuePriority}.
 	 *
@@ -125,7 +125,7 @@ implements Serializable
 	 * @jdo.join
 	 */
 	private List<IssueResolution> issueResolutions;
-	
+
 	/**
 	 * Instances of {@link ProcessDefinition}.
 	 *
@@ -133,7 +133,7 @@ implements Serializable
 	 *		persistence-modifier="persistent"
 	 */
 	private ProcessDefinition processDefinition;
-	
+
 	/**
 	 * @deprecated Only for JDO!!!! 
 	 */
@@ -145,12 +145,12 @@ implements Serializable
 		ObjectIDUtil.assertValidIDString(issueTypeID, "issueTypeID");
 		this.organisationID = organisationID;
 		this.issueTypeID = issueTypeID;
-		
+
 		this.issueSeverityTypes = new ArrayList<IssueSeverityType>();
 		this.issuePriorities = new ArrayList<IssuePriority>();
 		this.issueResolutions = new ArrayList<IssueResolution>();
 		this.processDefinition = null;
-		
+
 		name = new IssueTypeName(this);
 	}
 
@@ -167,7 +167,7 @@ implements Serializable
 	public String getIssueTypeID() {
 		return issueTypeID;
 	}
-	
+
 	/**
 	 * @return The name of this {@link IssueType}.
 	 */
@@ -189,7 +189,7 @@ implements Serializable
 	public List<IssuePriority> getIssuePriorities() {
 		return issuePriorities;
 	}
-	
+
 	/**
 	 * @return The list of valid {@link IssueResolution}s a user can choose from
 	 * when editing an {@link Issue} of this {@link IssueType}.
@@ -197,7 +197,7 @@ implements Serializable
 	public List<IssueResolution> getIssueResolutions() {
 		return issueResolutions;
 	}
-	
+
 	/**
 	 * 
 	 * @return The {@link ProcessDefinition} assigned to this IssueType.
@@ -228,7 +228,7 @@ implements Serializable
 		this.processDefinition = ProcessDefinition.storeProcessDefinition(getPersistenceManager(), null, jbpmProcessDefinition, jbpmProcessDefinitionURL);
 		JbpmConstants.initStandardProcessDefinition(this.processDefinition);
 	}
-	
+
 	public ProcessInstance createProcessInstanceForIssue(Issue issue) {
 		JbpmContext jbpmContext = JbpmLookup.getJbpmConfiguration().createJbpmContext();
 		try {
@@ -242,7 +242,7 @@ implements Serializable
 			jbpmContext.close();
 		}
 	}
-	
+
 	/**
 	 * Internal method.
 	 * @return The PersistenceManager associated with this object. 
@@ -254,7 +254,7 @@ implements Serializable
 
 		return issueTypePM;
 	}	
-	
+
 	@Override
 	public boolean equals(Object obj)
 	{
@@ -262,15 +262,13 @@ implements Serializable
 		if (!(obj instanceof IssueType)) return false;
 		IssueType o = (IssueType) obj;
 		return
-			Util.equals(this.organisationID, o.organisationID) && 
-			Util.equals(this.issueTypeID, o.issueTypeID);
+		Util.equals(this.organisationID, o.organisationID) && 
+		Util.equals(this.issueTypeID, o.issueTypeID);
 	}
 
 	@Override
 	public int hashCode()
 	{
-		return 
-			Util.hashCode(organisationID) ^
-			Util.hashCode(issueTypeID);
+		return (31 * Util.hashCode(organisationID)) + Util.hashCode(issueTypeID);
 	}
 }

@@ -23,14 +23,14 @@ import org.nightlabs.util.Util;
 public class IssueSeverityType
 implements Serializable{
 	private static final long serialVersionUID = 1L;
-	
+
 	/**
 	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon! 
 	 */
 	public static final String FETCH_GROUP_THIS_ISSUE_SEVERITY_TYPE = "IssueSeverityType.this";
-	
+
 	public static final String FETCH_GROUP_NAME = "IssueSeverityType.name";
-	
+
 	public static final String ISSUE_SEVERITY_TYPE_MINOR = "Minor";
 	public static final String ISSUE_SEVERITY_TYPE_MAJOR = "Major";
 	public static final String ISSUE_SEVERITY_TYPE_CRASH = "Crash";
@@ -39,13 +39,13 @@ implements Serializable{
 	public static final String ISSUE_SEVERITY_TYPE_TRIVIAL = "Trivial";
 	public static final String ISSUE_SEVERITY_TYPE_TEXT = "Text";
 	public static final String ISSUE_SEVERITY_TYPE_TWEAK = "Tweak";
-	
+
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
 	private String organisationID;
-	
+
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
@@ -68,7 +68,7 @@ implements Serializable{
 		this.issueSeverityTypeID = issueSeverityTypeID;
 		this.name = new IssueSeverityTypeName(this);
 	}
-	
+
 	public String getOrganisationID() {
 		return organisationID;
 	}
@@ -76,11 +76,11 @@ implements Serializable{
 	public void setOrganisationID(String organisationID) {
 		this.organisationID = organisationID;
 	}
-	
+
 	public void setIssueSeverityTypeID(String issueSeverityTypeID) {
 		this.issueSeverityTypeID = issueSeverityTypeID;
 	}
-	
+
 	/**
 	 * @return Returns the issueSeverityTypeID.
 	 */
@@ -96,20 +96,22 @@ implements Serializable{
 	{
 		return name;
 	}
-	
-	
+
+
 	@Override
 	public boolean equals(Object obj)
 	{
 		if (obj == this) return true;
 		if (!(obj instanceof IssueSeverityType)) return false;
 		IssueSeverityType o = (IssueSeverityType) obj;
-		return Util.equals(o.issueSeverityTypeID, this.issueSeverityTypeID);
+		return 
+		Util.equals(o.organisationID, this.organisationID) &&
+		Util.equals(o.issueSeverityTypeID, this.issueSeverityTypeID);
 	}
 
 	@Override
 	public int hashCode()
 	{
-		return Util.hashCode(issueSeverityTypeID);
+		return (31 * Util.hashCode(organisationID)) + Util.hashCode(issueSeverityTypeID);
 	}
 }

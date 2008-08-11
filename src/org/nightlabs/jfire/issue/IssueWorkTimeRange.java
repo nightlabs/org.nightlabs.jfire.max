@@ -185,7 +185,7 @@ implements Serializable
 	public int hashCode()
 	{
 		return 
-			Util.hashCode(organisationID) ^
+			(31 * Util.hashCode(organisationID)) +
 			Util.hashCode(issueID) ^
 			Util.hashCode(issueWorkTimeRangeID);
 	}

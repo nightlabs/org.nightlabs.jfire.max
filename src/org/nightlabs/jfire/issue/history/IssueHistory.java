@@ -11,15 +11,10 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
 import org.apache.log4j.Logger;
-import org.nightlabs.j2ee.LoginData;
-import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.issue.Issue;
 import org.nightlabs.jfire.issue.id.IssueID;
 import org.nightlabs.jfire.organisation.Organisation;
-import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.security.User;
-import org.nightlabs.jfire.security.dao.UserDAO;
-import org.nightlabs.progress.NullProgressMonitor;
 import org.nightlabs.util.Util;
 
 /**
@@ -336,7 +331,7 @@ implements Serializable
 	public int hashCode()
 	{
 		return 
-			Util.hashCode(organisationID) ^
+			(31 * Util.hashCode(organisationID)) +
 			Util.hashCode(issueID) ^
 			Util.hashCode(issueHistoryID);
 	}

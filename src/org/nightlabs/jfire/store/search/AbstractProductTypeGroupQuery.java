@@ -13,6 +13,7 @@ import org.nightlabs.jfire.store.ProductTypeGroup;
  *
  * @author Daniel Mazurek - daniel [at] nightlabs [dot] de
  * @author Marius Heinzmann - marius[at]nightlabs[dot]com
+ * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
  */
 public abstract class AbstractProductTypeGroupQuery
 	extends VendorDependentQuery
@@ -20,8 +21,11 @@ public abstract class AbstractProductTypeGroupQuery
 {
 	private static final Logger logger = Logger.getLogger(AbstractProductTypeGroupQuery.class);
 
+	private static final long serialVersionUID = 20080811L;
+	
 	public static final class FieldName
 	{
+		public static final String fullTextSearchRegex = "fullTextSearchRegex";
 		public static final String fullTextLanguageID = "fullTextLanguageID";
 		public static final String fullTextSearch = "fullTextSearch";
 		public static final String closed = "closed";
@@ -36,6 +40,12 @@ public abstract class AbstractProductTypeGroupQuery
 	private Boolean saleable = null;
 	private Boolean closed = null;
 
+	private boolean fullTextSearchRegex = false;
+	/**
+	 * This member is used to create the jdoql query
+	 */
+	@SuppressWarnings("unused")
+	private transient String fullTextSearchExpr;
 	private String fullTextLanguageID = null;
 	private String fullTextSearch = null;
 
@@ -99,9 +109,10 @@ public abstract class AbstractProductTypeGroupQuery
 		String containsStr = "containsValue("+varName+")";
 		if (fullTextLanguageID != null)
 			containsStr = "containsEntry(\""+fullTextLanguageID+"\","+varName+")";
+		fullTextSearchExpr = isFullTextSearchRegex() ? fullTextSearch : ".*" + fullTextSearch + ".*";
 		filter.append("\n (\n" +
 				"  this."+member+".names."+containsStr+"\n" +
-				"  && "+varName+".toLowerCase().matches(:fullTextSearch.toLowerCase())" +
+				"  && "+varName+".toLowerCase().matches(:fullTextSearchExpr.toLowerCase())" +
 				" )");
 	}
 
@@ -159,7 +170,7 @@ public abstract class AbstractProductTypeGroupQuery
 	}
 
 	/**
-	 * @return the fullTextSearch
+	 * @return the fullTextSearch The fullTextSearch to set.
 	 */
 	public String getFullTextSearch() {
 		return fullTextSearch;
@@ -179,7 +190,29 @@ public abstract class AbstractProductTypeGroupQuery
 		this.fullTextSearch = fullTextSearch;
 		notifyListeners(FieldName.fullTextSearch, oldFullTextSearch, fullTextSearch);
 	}
+	
+	/**
+	 * @return Whether the value set with {@link #setFullTextSearch(String)} represents a regular
+	 *         expression. If this is <code>true</code>, the value set with {@link #setFullTextSearch(String)}
+	 *         will be passed directly as matching string, if it is <code>false</code> a regular expression
+	 *         will be made out of it by prefixing and suffixing the value with ".*"
+	 */
+	public boolean isFullTextSearchRegex() {
+		return fullTextSearchRegex;
+	}
 
+	/**
+	 * Sets whether the value set with {@link #setFullTextSearch(String)} represents a 
+	 * regular expression.
+	 * 
+	 * @param fullTextSearchRegex The fullTextSearchRegex to search. 
+	 */
+	public void setFullTextSearchRegex(boolean fullTextSearchRegex) {
+		final boolean oldFullTextSearchRegex = this.fullTextSearchRegex;
+		this.fullTextSearchRegex = fullTextSearchRegex;
+		notifyListeners(FieldName.fullTextSearchRegex, oldFullTextSearchRegex, fullTextSearchRegex);
+	}
+	
 	/**
 	 * @return the confirmed
 	 */

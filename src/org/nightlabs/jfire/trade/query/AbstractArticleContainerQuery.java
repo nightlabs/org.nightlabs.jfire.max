@@ -19,11 +19,12 @@ import org.nightlabs.jfire.transfer.id.AnchorID;
  *
  * @author Daniel Mazurek - daniel <at> nightlabs <dot> de
  * @author Marius Heinzmann - marius[at]nightlabs[dot]com
+ * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
  */
 public abstract class AbstractArticleContainerQuery
 	extends AbstractJDOQuery
 {
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 20080811L;
 	private static final Logger logger = Logger.getLogger(AbstractArticleContainerQuery.class);
 
 	/**
@@ -39,11 +40,14 @@ public abstract class AbstractArticleContainerQuery
 		public static final String createDTMax = "createDTMax";
 		public static final String createDTMin = "createDTMin";
 		public static final String createUserID = "createUserID";
+		public static final String creatorNameRegex = "creatorName";
 		public static final String creatorName = "creatorName";
 		public static final String customerID = "customerID";
+		public static final String customerNameRegex = "creatorName";
 		public static final String customerName = "customerName";
 		public static final String vendorID = "vendorID";
-		public static final String vendorName = "vendorName";
+		public static final String vendorNameRegex = "creatorName";
+		public static final String vendorName = "vendorName";		
 		public static final String productID = "productID";
 	}
 
@@ -107,21 +111,25 @@ public abstract class AbstractArticleContainerQuery
 
 	protected void checkVendorName(StringBuffer filter)
 	{
-		if (isFieldEnabled(FieldName.vendorName) &&	getVendorName() != null)
-			filter.append("\n && (this.vendor.person.displayName.toLowerCase().indexOf(\""+vendorName.toLowerCase()+"\") >= 0)");
+		if (isFieldEnabled(FieldName.vendorName) &&	getVendorName() != null) {
+			vendorNameExpr = isVendorNameRegex() ? vendorName : ".*" + vendorName + ".*";
+			filter.append("\n && (this.vendor.person.displayName.toLowerCase().matches(:vendorNameExpr.toLowerCase()))");
+		}
 	}
 
 	protected void checkCustomerName(StringBuffer filter)
 	{
-		if (isFieldEnabled(FieldName.customerName) && getCustomerName() != null)
-			filter.append("\n && (this.customer.person.displayName.toLowerCase().indexOf(\""+customerName.toLowerCase()+"\") >= 0)");
+		if (isFieldEnabled(FieldName.customerName) && getCustomerName() != null) {
+			customerNameExpr = isCustomerNameRegex() ? customerName : ".*" + customerName + ".*";
+			filter.append("\n && (this.customer.person.displayName.toLowerCase().matches(:customerNameExpr.toLowerCase()))");
+		}
 	}
 
 	protected void checkCreatorName(StringBuilder filter)
 	{
-		if (isFieldEnabled(FieldName.creatorName) && creatorName != null)
-		{
-			filter.append("\n && (this.createUser.person.displayName.toLowerCase().indexOf(\""+creatorName.toLowerCase()+"\") >= 0)");
+		if (isFieldEnabled(FieldName.creatorName) && creatorName != null) {
+			creatorNameExpr = isCreatorNameRegex() ? creatorName : ".*" + creatorName + ".*";
+			filter.append("\n && (this.customer.person.displayName.toLowerCase().matches(:creatorNameExpr.toLowerCase()))");
 		}
 	}
 
@@ -184,6 +192,9 @@ public abstract class AbstractArticleContainerQuery
 		}
 	}
 
+	private boolean creatorNameRegex = false;
+	@SuppressWarnings("unused")
+	private transient String creatorNameExpr;
 	private String creatorName = null;
 	/**
 	 * @return the creatorName
@@ -194,6 +205,7 @@ public abstract class AbstractArticleContainerQuery
 	}
 
 	/**
+	 * Sets the string to search in the display name of the creators person.
 	 * @param creatorName the creatorName to set
 	 */
 	public void setCreatorName(String creatorName)
@@ -202,7 +214,33 @@ public abstract class AbstractArticleContainerQuery
 		this.creatorName = creatorName;
 		notifyListeners(FieldName.creatorName, oldCreatorName, creatorName);
 	}
+	
+	/**
+	 * @return Whether the value set with {@link #setCreatorName(String)} represents a regular
+	 *         expression. If this is <code>true</code>, the value set with {@link #setCreatorName(String)}
+	 *         will be passed directly as matching string, if it is <code>false</code> a regular expression
+	 *         will be made out of it by prefixing and suffixing the value with ".*"
+	 */
+	public boolean isCreatorNameRegex() {
+		return creatorNameRegex;
+	}
 
+	/**
+	 * Sets whether the value set with {@link #setCreatorName(String)} represents a 
+	 * regular expression.
+	 * 
+	 * @param creatorNameRegex The creatorNameRegex to search. 
+	 */
+	public void setCreatorNameRegex(boolean creatorNameRegex) {
+		final boolean oldCreatorNameRegex = this.creatorNameRegex;
+		this.creatorNameRegex = creatorNameRegex;
+		notifyListeners(FieldName.creatorNameRegex, oldCreatorNameRegex, creatorNameRegex);
+	}
+	
+
+	private boolean customerNameRegex = false;
+	@SuppressWarnings("unused")
+	private transient String customerNameExpr;
 	private String customerName;
 	/**
 	 * returns the customerName
@@ -213,7 +251,7 @@ public abstract class AbstractArticleContainerQuery
 	}
 
 	/**
-	 * sets the customerName
+	 * Sets the string to search in the display name of the customers person.
 	 * @param customerName the customerName to set
 	 */
 	public void setCustomerName(String customerName)
@@ -222,7 +260,33 @@ public abstract class AbstractArticleContainerQuery
 		this.customerName = customerName;
 		notifyListeners(FieldName.customerName, oldCustomerName, customerName);
 	}
+	
+	/**
+	 * @return Whether the value set with {@link #setCustomerName(String)} represents a regular
+	 *         expression. If this is <code>true</code>, the value set with {@link #setCustomerName(String)}
+	 *         will be passed directly as matching string, if it is <code>false</code> a regular expression
+	 *         will be made out of it by prefixing and suffixing the value with ".*"
+	 */
+	public boolean isCustomerNameRegex() {
+		return customerNameRegex;
+	}
 
+	/**
+	 * Sets whether the value set with {@link #setCustomerName(String)} represents a 
+	 * regular expression.
+	 * 
+	 * @param customerNameRegex The customerNameRegex to search. 
+	 */
+	public void setCustomerNameRegex(boolean customerNameRegex) {
+		final boolean oldCustomerNameRegex = this.customerNameRegex;
+		this.customerNameRegex = customerNameRegex;
+		notifyListeners(FieldName.customerNameRegex, oldCustomerNameRegex, customerNameRegex);
+	}
+	
+
+	private boolean vendorNameRegex = false;
+	@SuppressWarnings("unused")
+	private transient String vendorNameExpr;
 	private String vendorName;
 	/**
 	 * returns the vendorName
@@ -233,7 +297,7 @@ public abstract class AbstractArticleContainerQuery
 	}
 
 	/**
-	 * sets the vendorName
+	 * Sets the string to search in the display name of the vendors person.
 	 * @param vendorName the vendorName to set
 	 */
 	public void setVendorName(String vendorName)
@@ -243,6 +307,28 @@ public abstract class AbstractArticleContainerQuery
 		notifyListeners(FieldName.vendorName, oldVendorName, vendorName);
 	}
 
+	/**
+	 * @return Whether the value set with {@link #setVendorName(String)} represents a regular
+	 *         expression. If this is <code>true</code>, the value set with {@link #setVendorName(String)}
+	 *         will be passed directly as matching string, if it is <code>false</code> a regular expression
+	 *         will be made out of it by prefixing and suffixing the value with ".*"
+	 */
+	public boolean isVendorNameRegex() {
+		return customerNameRegex;
+	}
+
+	/**
+	 * Sets whether the value set with {@link #setVendorName(String)} represents a 
+	 * regular expression.
+	 * 
+	 * @param vendorNameRegex The vendorNameRegex to search. 
+	 */
+	public void setVendorNameRegex(boolean vendorNameRegex) {
+		final boolean oldVendorNameRegex = this.vendorNameRegex;
+		this.vendorNameRegex = vendorNameRegex;
+		notifyListeners(FieldName.vendorNameRegex, oldVendorNameRegex, vendorNameRegex);
+	}
+	
 	private String articleContainerID;
 	/**
 	 * returns the articleContainerID

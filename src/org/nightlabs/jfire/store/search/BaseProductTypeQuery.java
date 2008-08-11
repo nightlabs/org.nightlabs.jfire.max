@@ -7,6 +7,7 @@ import org.nightlabs.jfire.store.ProductType;
 /**
  * Generic ProductType Query that may be used to retrieve all kinds of Product Types. 
  * @author Marius Heinzmann - marius[at]nightlabs[dot]com
+ * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
  */
 public class BaseProductTypeQuery
 	extends AbstractProductTypeQuery
@@ -14,7 +15,7 @@ public class BaseProductTypeQuery
 	/**
 	 * The serial version id.
 	 */
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 20080811L;
 
 	@Override
 	protected Class<ProductType> initCandidateClass()

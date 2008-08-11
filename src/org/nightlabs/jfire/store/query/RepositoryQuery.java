@@ -11,14 +11,22 @@ import org.nightlabs.jfire.transfer.id.AnchorID;
 
 /**
  * @author Marco Schulze - Marco at NightLabs dot de
+ * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
  */
 public class RepositoryQuery
 	extends AbstractJDOQuery
 {
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 20080811L;
 
 	private static final Logger logger = Logger.getLogger(RepositoryQuery.class);
 
+	
+	private boolean nameRegex = false;
+	/**
+	 * This member is used to create the jdoql query
+	 */
+	@SuppressWarnings("unused")
+	private transient String nameExpr;
 	/**
 	 * the name of the repository to search for
 	 */
@@ -47,6 +55,12 @@ public class RepositoryQuery
 	 */
 	private AnchorID ownerID = null;
 
+	private boolean ownerNameRegex = false;
+	/**
+	 * This member is used to create the jdoql query
+	 */
+	@SuppressWarnings("unused")
+	private transient String ownerNameExpr;
 	/**
 	 * the name (or part of it) of the owner
 	 */
@@ -56,9 +70,11 @@ public class RepositoryQuery
 	{
 		public static final String anchorID = "anchorID";
 		public static final String anchorTypeID = "anchorTypeID";
+		public static final String nameRegex = "nameRegex";
 		public static final String name = "name";
 		public static final String nameLanguageID = "nameLanguageID";
 		public static final String ownerID = "ownerID";
+		public static final String ownerNameRegex = "ownerNameRegex";
 		public static final String ownerName = "ownerName";
 		public static final String repositoryTypeID = "repositoryTypeID";
 	}
@@ -101,7 +117,8 @@ public class RepositoryQuery
 		}
 
 		if (isFieldEnabled(FieldName.ownerName) && ownerName != null && !"".equals(ownerName)) {
-			filter.append("\n && (this.owner.person.displayName.toLowerCase().indexOf(\""+ownerName.toLowerCase()+"\") >= 0)");
+			ownerNameExpr = isOwnerNameRegex() ? ownerName : ".*" + ownerName + ".*";
+			filter.append("\n && (this.owner.person.displayName.toLowerCase().matches(:ownerNameExpr.toLowerCase()))");
 		}
 
 		if (logger.isDebugEnabled()) {
@@ -125,9 +142,10 @@ public class RepositoryQuery
 		String containsStr = "containsValue("+varName+")";
 		if (nameLanguageID != null)
 			containsStr = "containsEntry(\""+nameLanguageID+"\","+varName+")";
+		nameExpr = isNameRegex() ? name : ".*" + name + ".*";
 		filter.append("\n (\n" +
 				"  this."+member+".names."+containsStr+"\n" +
-				"  && "+varName+".toLowerCase().matches(:name.toLowerCase())" +
+				"  && "+varName+".toLowerCase().matches(:nameExpr.toLowerCase())" +
 				" )");
 	}
 
@@ -150,6 +168,28 @@ public class RepositoryQuery
 		notifyListeners(FieldName.name, oldName, name);
 	}
 
+	/**
+	 * @return Whether the value set with {@link #setName(String)} represents a regular
+	 *         expression. If this is <code>true</code>, the value set with {@link #setName(String)}
+	 *         will be passed directly as matching string, if it is <code>false</code> a regular expression
+	 *         will be made out of it by prefixing and suffixing the value with ".*"
+	 */
+	public boolean isNameRegex() {
+		return nameRegex;
+	}
+
+	/**
+	 * Sets whether the value set with {@link #setName(String)} represents a 
+	 * regular expression.
+	 * 
+	 * @param nameRegex The nameRegex to search. 
+	 */
+	public void setNameRegex(boolean nameRegex) {
+		final boolean oldnameRegex = this.nameRegex;
+		this.nameRegex = nameRegex;
+		notifyListeners(FieldName.nameRegex, oldnameRegex, nameRegex);
+	}
+	
 	/**
 	 * returns the nameLanguageID.
 	 * @return the nameLanguageID
@@ -256,6 +296,28 @@ public class RepositoryQuery
 		notifyListeners(FieldName.ownerName, oldOwnerName, ownerName);
 	}
 
+	/**
+	 * @return Whether the value set with {@link #setOwnerName(String)} represents a regular
+	 *         expression. If this is <code>true</code>, the value set with {@link #setOwnerName(String)}
+	 *         will be passed directly as matching string, if it is <code>false</code> a regular expression
+	 *         will be made out of it by prefixing and suffixing the value with ".*"
+	 */
+	public boolean isOwnerNameRegex() {
+		return ownerNameRegex;
+	}
+
+	/**
+	 * Sets whether the value set with {@link #setOwnerName(String)} represents a 
+	 * regular expression.
+	 * 
+	 * @param ownerNameRegex The ownerNameRegex to search. 
+	 */
+	public void setOwnerNameRegex(boolean ownerNameRegex) {
+		final boolean oldOwnerNameRegex = this.ownerNameRegex;
+		this.ownerNameRegex = ownerNameRegex;
+		notifyListeners(FieldName.ownerNameRegex, oldOwnerNameRegex, ownerNameRegex);
+	}
+	
 	@Override
 	protected Class<Repository> initCandidateClass()
 	{

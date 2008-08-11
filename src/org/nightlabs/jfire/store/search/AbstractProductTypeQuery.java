@@ -12,14 +12,21 @@ import org.nightlabs.jfire.transfer.id.AnchorID;
  *
  * @author Daniel.Mazurek [at] NightLabs [dot] de
  * @author Marius Heinzmann - marius[at]nightlabs[dot]com
+ * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
  */
 public abstract class AbstractProductTypeQuery
 	extends VendorDependentQuery
 	implements ISaleAccessQuery
 {
-	private static final long serialVersionUID = 4L;
+	private static final long serialVersionUID = 20080811L;
 
 	private String fullTextLanguageID = null;
+	private boolean fullTextSearchRegex = false;
+	/**
+	 * This member is used to create the jdoql query
+	 */
+	@SuppressWarnings("unused")
+	private transient String fullTextSearchExpr;
 	private String fullTextSearch = null;
 
 	private Boolean published = null;
@@ -39,6 +46,7 @@ public abstract class AbstractProductTypeQuery
 	{
 		public static final String closed = "closed";
 		public static final String confirmed = "confirmed";
+		public static final String fullTextSearchRegex = "fullTextSearchRegex";
 		public static final String fullTextLanguageID = "fullTextLanguageID";
 		public static final String fullTextSearch = "fullTextSearch";
 		public static final String maxNestedProductTypeAmount = "maxNestedProductTypeAmount";
@@ -120,9 +128,10 @@ public abstract class AbstractProductTypeQuery
 		String containsStr = "containsValue("+varName+")";
 		if (fullTextLanguageID != null)
 			containsStr = "containsEntry(\""+fullTextLanguageID+"\","+varName+")";
+		fullTextSearchExpr = isFullTextSearchRegex() ? fullTextSearch : ".*" + fullTextSearch + ".*";
 		filter.append("\n (\n" +
 				"  this."+member+".names."+containsStr+"\n" +
-				"  && "+varName+".toLowerCase().matches(:fullTextSearch.toLowerCase())" +
+				"  && "+varName+".toLowerCase().matches(:fullTextSearchExpr.toLowerCase())" +
 				" )");
 	}
 
@@ -183,6 +192,28 @@ public abstract class AbstractProductTypeQuery
 		notifyListeners(FieldName.fullTextSearch, oldFullTextSearch, fullTextSearch);
 	}
 
+	/**
+	 * @return Whether the value set with {@link #setFullTextSearch(String)} represents a regular
+	 *         expression. If this is <code>true</code>, the value set with {@link #setFullTextSearch(String)}
+	 *         will be passed directly as matching string, if it is <code>false</code> a regular expression
+	 *         will be made out of it by prefixing and suffixing the value with ".*"
+	 */
+	public boolean isFullTextSearchRegex() {
+		return fullTextSearchRegex;
+	}
+
+	/**
+	 * Sets whether the value set with {@link #setFullTextSearch(String)} represents a 
+	 * regular expression.
+	 * 
+	 * @param fullTextSearchRegex The fullTextSearchRegex to search. 
+	 */
+	public void setFullTextSearchRegex(boolean fullTextSearchRegex) {
+		final boolean oldFullTextSearchRegex = this.fullTextSearchRegex;
+		this.fullTextSearchRegex = fullTextSearchRegex;
+		notifyListeners(FieldName.fullTextSearchRegex, oldFullTextSearchRegex, fullTextSearchRegex);
+	}
+	
 	/**
 	 * @return the published
 	 */

@@ -44,9 +44,8 @@ implements Serializable
 
 	/**
 	 * @jdo.field primary-key="true"
-	 * @jdo.column length="100"
 	 */
-	private String projectID;
+	private long projectID;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" dependent="true" mapped-by="project"
@@ -59,7 +58,7 @@ implements Serializable
 	@Deprecated
 	protected Project() { }
 
-	public Project(String organisationID, String projectID)
+	public Project(String organisationID, long projectID)
 	{
 		Organisation.assertValidOrganisationID(organisationID);
 		this.organisationID = organisationID;
@@ -75,7 +74,7 @@ implements Serializable
 		return organisationID;
 	}
 
-	public String getProjectID() {
+	public long getProjectID() {
 		return projectID;
 	}
 

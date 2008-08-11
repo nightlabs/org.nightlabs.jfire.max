@@ -15,9 +15,9 @@ import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
  * is created. Unfortunately the actual parameters are
  * available only later (after prepare + getResultSetMetaData).
  * <p>
- * The {@link JFSQueryPropertySet} of a JFS query are created
+ * The {@link JFSQueryPropertySet} of a JFS query is created
  * by XML serialisation into and de-serialisation from the
- * query string.
+ * query string of the data set.
  * </p>
  * 
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->

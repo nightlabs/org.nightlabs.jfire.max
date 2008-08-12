@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -1436,6 +1437,43 @@ implements SessionBean
 		}
 	}
 
+	/**
+	 * @ejb.interface-method
+	 * @ejb.transaction type="Required"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	public Offer setOfferExpiry(
+			OfferID offerID,
+			Date expiryTimestampUnfinalized, boolean expiryTimestampUnfinalizedAutoManaged,
+			Date expiryTimestampFinalized, boolean expiryTimestampFinalizedAutoManaged,
+			boolean get, String[] fetchGroups, int maxFetchDepth)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+			if (fetchGroups != null)
+				pm.getFetchPlan().setGroups(fetchGroups);
+
+			Offer offer = (Offer) pm.getObjectById(offerID);
+			if (!offer.isFinalized()) {
+				offer.setExpiryTimestampUnfinalizedAutoManaged(expiryTimestampUnfinalizedAutoManaged);
+				offer.setExpiryTimestampUnfinalized(expiryTimestampUnfinalized);
+			}
+			if (!offer.getOfferLocal().isAccepted()) {
+				offer.setExpiryTimestampFinalizedAutoManaged(expiryTimestampFinalizedAutoManaged);
+				offer.setExpiryTimestampFinalized(expiryTimestampFinalized);
+			}
+
+			Trader.getTrader(pm).setOfferExpiry(offer);
+
+			if (!get)
+				return null;
+
+			return pm.detachCopy(offer);
+		} finally {
+			pm.close();
+		}
+	}
 
 	/**
 	 * @ejb.interface-method

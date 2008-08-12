@@ -692,7 +692,7 @@ public class Trader
 		}
 	}
 
-	protected void setOfferExpiry(Offer offer)
+	public void setOfferExpiry(Offer offer)
 	{
 		Workstation workstation = Workstation.getWorkstation(getPersistenceManager(), WorkstationResolveStrategy.FALLBACK);
 

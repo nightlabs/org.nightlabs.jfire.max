@@ -1,6 +1,7 @@
 package org.nightlabs.jfire.trade.dao;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -47,21 +48,51 @@ public class OfferDAO
 	{
 		return getJDOObjects(null, offerIDs, fetchGroups, maxFetchDepth, monitor);
 	}
-	
+
 	public Collection<Offer> getOffersByQuery(
-		QueryCollection<? extends AbstractJDOQuery> queries, 
-			String[] fetchGroups,	int maxFetchDepth, ProgressMonitor monitor)
-//		throws Exception
+		QueryCollection<? extends AbstractJDOQuery> queries,
+		String[] fetchGroups,	int maxFetchDepth, ProgressMonitor monitor)
 	{
 		try
 		{
 			TradeManager tm = TradeManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
 			Set<OfferID> offerIDs = tm.getOfferIDs(queries);
-			
+
 			return getJDOObjects(null, offerIDs, fetchGroups, maxFetchDepth, monitor);
 		}
 		catch (Exception e) {
 			throw new RuntimeException("Cannot fetch Offers via Queries.", e); //$NON-NLS-1$
 		}
+	}
+
+	public Offer setOfferExpiry(
+			OfferID offerID,
+			Date expiryTimestampUnfinalized, boolean expiryTimestampUnfinalizedAutoManaged,
+			Date expiryTimestampFinalized, boolean expiryTimestampFinalizedAutoManaged,
+			boolean get, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor
+	)
+	{
+		Offer offer;
+		monitor.beginTask("Set offer expiry", 100);
+		try {
+			TradeManager tm = TradeManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			monitor.worked(20);
+			offer = tm.setOfferExpiry(
+					offerID,
+					expiryTimestampUnfinalized, expiryTimestampUnfinalizedAutoManaged,
+					expiryTimestampFinalized, expiryTimestampFinalizedAutoManaged,
+					get, fetchGroups, maxFetchDepth
+			);
+
+			if (offer != null)
+				getCache().put(null, offer, fetchGroups, maxFetchDepth);
+
+			monitor.worked(80);
+		} catch (Exception x) {
+			throw new RuntimeException(x);
+		} finally {
+			monitor.done();
+		}
+		return offer;
 	}
 }

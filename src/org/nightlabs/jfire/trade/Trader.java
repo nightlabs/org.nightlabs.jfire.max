@@ -694,6 +694,9 @@ public class Trader
 
 	public void setOfferExpiry(Offer offer)
 	{
+		if (offer.isFinalized()) // unmodifiable after finalization.
+			return;
+
 		Workstation workstation = Workstation.getWorkstation(getPersistenceManager(), WorkstationResolveStrategy.FALLBACK);
 
 		OfferConfigModule offerConfigModule;
@@ -1642,11 +1645,10 @@ public class Trader
 			} // for (Iterator itO = offerRequirement.getPartnerOffers().iterator(); itO.hasNext(); ) {
 		} // if (offerRequirement != null) {
 
-		offer.setFinalized(user);
-
 		// set expiry timestamp
-		// important to call this *after* Offer.setFinalized(...)
 		setOfferExpiry(offer);
+
+		offer.setFinalized(user);
 
 		// trigger listeners
 		for (OfferActionHandler offerActionHandler : offer.getOfferLocal().getOfferActionHandlers()) {

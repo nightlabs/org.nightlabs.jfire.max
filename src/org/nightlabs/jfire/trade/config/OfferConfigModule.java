@@ -8,7 +8,6 @@ import javax.jdo.PersistenceManager;
 import org.nightlabs.annotation.Implement;
 import org.nightlabs.jfire.config.ConfigModule;
 import org.nightlabs.jfire.trade.Offer;
-import org.nightlabs.util.Util;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -64,21 +63,13 @@ public class OfferConfigModule
 
 	public void setOfferExpiry(Offer offer)
 	{
-		if (offer.isExpiryTimestampFinalizedAutoManaged()) {
-			Date finalizeDT = offer.getFinalizeDT();
-			if (finalizeDT == null)
-				offer.setExpiryTimestampFinalized(new Date(System.currentTimeMillis() + expiryDurationMSecFinalized));
-			else {
-				// We do not change it anymore, if it already has the correct time (reduce synchronization load due to dirty markings).
-				Date expiry = new Date(finalizeDT.getTime() + expiryDurationMSecFinalized);
-				if (!Util.equals(expiry, offer.getExpiryTimestampFinalized()))
-					offer.setExpiryTimestampFinalized(expiry);
-			}
-		}
+		if (offer.isFinalized()) // unmodifiable after finalization!
+			return;
 
-		if (!offer.isFinalized()) {
-			if (offer.isExpiryTimestampUnfinalizedAutoManaged())
-				offer.setExpiryTimestampUnfinalized(new Date(System.currentTimeMillis() + expiryDurationMSecUnfinalized));
-		}
+		if (offer.isExpiryTimestampFinalizedAutoManaged())
+			offer.setExpiryTimestampFinalized(new Date(System.currentTimeMillis() + expiryDurationMSecFinalized));
+
+		if (offer.isExpiryTimestampUnfinalizedAutoManaged())
+			offer.setExpiryTimestampUnfinalized(new Date(System.currentTimeMillis() + expiryDurationMSecUnfinalized));
 	}
 }

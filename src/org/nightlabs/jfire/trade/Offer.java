@@ -1029,6 +1029,8 @@ implements
 	 * @see #getExpiryTimestampFinalized()
 	 */
 	public void setExpiryTimestampFinalized(Date expiryTimestampFinalized) {
+		if (isFinalized())
+			throw new IllegalStateException("This offer is already finalized! Cannot set setExpiryTimestampFinalized! " + this);
 		this.expiryTimestampFinalized = expiryTimestampFinalized;
 	}
 
@@ -1078,6 +1080,9 @@ implements
 		return expiryTimestampFinalizedAutoManaged;
 	}
 	public void setExpiryTimestampFinalizedAutoManaged(boolean expiryTimestampFinalizedAutoManaged) {
+		if (isFinalized())
+			throw new IllegalStateException("This offer is already finalized! Cannot set expiryTimestampFinalizedAutoManaged! " + this);
+
 		this.expiryTimestampFinalizedAutoManaged = expiryTimestampFinalizedAutoManaged;
 	}
 }

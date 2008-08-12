@@ -35,6 +35,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 import javax.ejb.CreateException;
@@ -90,6 +91,8 @@ import org.nightlabs.jfire.store.reverse.IReverseProductError;
 import org.nightlabs.jfire.store.reverse.NoArticlesFoundReverseProductError;
 import org.nightlabs.jfire.store.reverse.OfferNotAcceptedReverseProductError;
 import org.nightlabs.jfire.store.reverse.ReverseProductException;
+import org.nightlabs.jfire.timer.Task;
+import org.nightlabs.jfire.timer.id.TaskID;
 import org.nightlabs.jfire.trade.config.LegalEntityViewConfigModule;
 import org.nightlabs.jfire.trade.config.OfferConfigModule;
 import org.nightlabs.jfire.trade.config.TradePrintingConfigModule;
@@ -108,6 +111,7 @@ import org.nightlabs.jfire.trade.recurring.RecurredOffer;
 import org.nightlabs.jfire.trade.recurring.RecurringOffer;
 import org.nightlabs.jfire.trade.recurring.RecurringOrder;
 import org.nightlabs.jfire.transfer.id.AnchorID;
+import org.nightlabs.timepattern.TimePatternFormatException;
 import org.nightlabs.version.MalformedVersionException;
 
 
@@ -1289,14 +1293,12 @@ implements SessionBean
 	}
 
 	/**
-	 * @throws ModuleException
-	 *
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_System_"
 	 */
 	public void initialise()
-	throws IOException, MalformedVersionException
+	throws IOException, MalformedVersionException, TimePatternFormatException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -1379,12 +1381,139 @@ implements SessionBean
 
 			// In case the JFireTrade module is deployed into a running server, there might already exist cooperations
 			// with other organisations => need to create OrganisationLegalEntities - see #crossOrganisationRegistrationCallback(...)
-			for (Iterator<Organisation> it = pm.getExtent(Organisation.class).iterator(); it.hasNext(); )
+			for (Iterator<Organisation> it = pm.getExtent(Organisation.class).iterator(); it.hasNext(); ) {
 				OrganisationLegalEntity.getOrganisationLegalEntity(pm, it.next().getOrganisationID());
+			}
+
+			{
+				Task task = new Task(
+						getOrganisationID(), Task.TASK_TYPE_ID_SYSTEM, "releaseExpiredUnfinalizedOffers",
+						User.getUser(pm, getOrganisationID(), User.USER_ID_SYSTEM),
+						TradeManagerHome.JNDI_NAME, "releaseExpiredUnfinalizedOffers"
+				);
+				task = pm.makePersistent(task);
+				task.getTimePatternSet().createTimePattern("*", "*", "*", "*", "*/6", "0");
+
+				task.getName().setText(Locale.ENGLISH.getLanguage(), "Release expired UNfinalized offers");
+				task.getDescription().setText(Locale.ENGLISH.getLanguage(), "This task releases expired offers that are *not* finalized.");
+
+				task.getName().setText(Locale.GERMAN.getLanguage(), "Freigabe unfinalisierter ausgelaufener Angebote");
+				task.getDescription().setText(Locale.GERMAN.getLanguage(), "Dieser Task gibt Angebote frei, deren Verfallsdatum erreicht ist und die *nicht* finalisiert sind.");
+				task.setEnabled(true);
+			}
+
+			{
+				Task task = new Task(
+						getOrganisationID(), Task.TASK_TYPE_ID_SYSTEM, "releaseExpiredFinalizedOffers",
+						User.getUser(pm, getOrganisationID(), User.USER_ID_SYSTEM),
+						TradeManagerHome.JNDI_NAME, "releaseExpiredFinalizedOffers"
+				);
+				task = pm.makePersistent(task);
+				task.getTimePatternSet().createTimePattern("*", "*", "*", "*", "0", "0");
+
+				task.getName().setText(Locale.ENGLISH.getLanguage(), "Release expired finalized offers");
+				task.getDescription().setText(Locale.ENGLISH.getLanguage(), "This task releases expired offers that are finalized.");
+
+				task.getName().setText(Locale.GERMAN.getLanguage(), "Freigabe finalisierter ausgelaufener Angebote");
+				task.getDescription().setText(Locale.GERMAN.getLanguage(), "Dieser Task gibt Angebote frei, deren Verfallsdatum erreicht ist und die bereits finalisiert sind.");
+				task.setEnabled(true);
+			}
 		} finally {
 			pm.close();
 		}
 	}
+
+	/**
+	 * @ejb.interface-method
+	 * @ejb.transaction type="Required"
+	 * @ejb.permission role-name="_System_"
+	 */
+	public void releaseExpiredUnfinalizedOffers(TaskID taskID)
+	throws Exception
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			Trader trader = null;
+			User user = null;
+			Query q = pm.newQuery(Offer.class);
+			q.declareVariables(Article.class.getName() + " allocatedArticle");
+			q.setFilter(
+					"this.order.vendor == :localOrganisationLegalEntity && " +
+					"this.finalizeDT == null && " +
+					"this.expiryTimestampUnfinalized < :now && " +
+					"this.articles.contains(allocatedArticle) && " +
+					"allocatedArticle.allocated"
+			);
+			OrganisationLegalEntity localOrganisationLegalEntity = OrganisationLegalEntity.getOrganisationLegalEntity(pm, getOrganisationID());
+			Collection<?> c = (Collection<?>) q.execute(localOrganisationLegalEntity, new Date());
+			for (Iterator<?> it = c.iterator(); it.hasNext();) {
+				Offer offer = (Offer) it.next();
+
+				if (trader == null)
+					trader = Trader.getTrader(pm);
+
+				if (user == null)
+					user = User.getUser(pm, getPrincipal());
+
+				Collection<? extends Article> offerArticles = offer.getArticles();
+				Set<Article> allocatedArticles = new HashSet<Article>(offerArticles.size());
+				for (Article article : offerArticles) {
+					if (article.isAllocated())
+						allocatedArticles.add(article);
+				}
+
+				if (allocatedArticles.isEmpty())
+					logger.warn("releaseExpiredUnfinalizedOffers: Even though the Offer was found by the query it doesn't have allocated articles! " + offer);
+				else
+					trader.releaseArticles(user, allocatedArticles, true, false, true);
+			}
+		} finally {
+			pm.close();
+		}
+	}
+
+	/**
+	 * @ejb.interface-method
+	 * @ejb.transaction type="Required"
+	 * @ejb.permission role-name="_System_"
+	 */
+	public void releaseExpiredFinalizedOffers(TaskID taskID)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			OrganisationLegalEntity localOrganisationLegalEntity = OrganisationLegalEntity.getOrganisationLegalEntity(pm, getOrganisationID());
+			Query q = pm.newQuery(Offer.class);
+			q.setFilter(
+					"this.order.vendor == :localOrganisationLegalEntity && " +
+					"this.finalizeDT != null && " +
+					"this.offerLocal.acceptDT == null && " +
+					"this.offerLocal.rejectDT == null && " +
+					"!this.offerLocal.processEnded && " +
+					"this.expiryTimestampFinalized < :now"
+			);
+			Collection<?> c = (Collection<?>) q.execute(localOrganisationLegalEntity, new Date());
+
+			if (c.isEmpty())
+				return; // nothing to do
+
+			JbpmContext jbpmContext = JbpmLookup.getJbpmConfiguration().createJbpmContext();
+			try {
+
+				for (Iterator<?> it = c.iterator(); it.hasNext();) {
+					Offer offer = (Offer) it.next();
+
+					ProcessInstance processInstance = jbpmContext.getProcessInstanceForUpdate(offer.getOfferLocal().getJbpmProcessInstanceId());
+					processInstance.signal(JbpmConstantsOffer.Vendor.TRANSITION_NAME_EXPIRE);
+				}
+
+			} finally {
+				jbpmContext.close();
+			}
+		} finally {
+			pm.close();
+		}
+	}
+
 
 	/**
 	 * This method assigns a customer to an {@link Order}. This fails with

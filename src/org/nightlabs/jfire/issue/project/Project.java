@@ -1,6 +1,9 @@
 package org.nightlabs.jfire.issue.project;
 
 import java.io.Serializable;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
@@ -24,7 +27,8 @@ import org.nightlabs.util.Util;
  *		field-order="organisationID, projectID"
  *
  * @jdo.fetch-group name="Project.issue" fields="issue"
- * @jdo.fetch-group name="Project.user" fields="user"
+ * @jdo.fetch-group name="Project.name" fields="name"
+ * @jdo.fetch-group name="Project.subProjects" fields="subProjects"
  *
  **/
 public class Project
@@ -34,7 +38,8 @@ implements Serializable
 	private static final Logger logger = Logger.getLogger(Project.class);
 
 	public static final String FETCH_GROUP_ISSUE = "Project.issue";
-	public static final String FETCH_GROUP_USER = "Project.user";
+	public static final String FETCH_GROUP_NAME = "Project.name";
+	public static final String FETCH_GROUP_SUBPROJECTS = "Project.subProjects";
 
 	/**
 	 * @jdo.field primary-key="true"
@@ -53,6 +58,11 @@ implements Serializable
 	private ProjectName name;
 
 	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private Collection<Project> subProjects;
+	
+	/**
 	 * @deprecated Constructor exists only for JDO! 
 	 */
 	@Deprecated
@@ -65,16 +75,20 @@ implements Serializable
 		this.projectID = projectID;
 
 		this.name = new ProjectName(this);
+		
+		subProjects = new HashSet<Project>();
 	}
 
 	/**
 	 * @return Returns the organisationID.
 	 */
-	public String getOrganisationID() {
+	public String getOrganisationID() 
+	{
 		return organisationID;
 	}
 
-	public long getProjectID() {
+	public long getProjectID() 
+	{
 		return projectID;
 	}
 
@@ -82,11 +96,30 @@ implements Serializable
 	{
 		return name;
 	}
+	
+	public Collection<Project> getSubProjects() 
+	{
+		return Collections.unmodifiableCollection(subProjects);
+	}
+	
+	public void addSubProject(Project project) 
+	{
+		subProjects.add(project);
+	}
+	
+	public void removeSubProject(Project project) 
+	{
+		if (project == null)
+			throw new IllegalArgumentException("project must not be null!");
+		subProjects.remove(project);
+	}
+	
 	/**
 	 * Internal method.
 	 * @return The PersistenceManager associated with this object. 
 	 */
-	protected PersistenceManager getPersistenceManager() {
+	protected PersistenceManager getPersistenceManager() 
+	{
 		PersistenceManager projectPM = JDOHelper.getPersistenceManager(this);
 		if (projectPM == null)
 			throw new IllegalStateException("This instance of " + this.getClass().getName() + " is not persistent, can not get a PersistenceManager!");

@@ -94,22 +94,6 @@ implements SessionBean
 	public void ejbRemove() throws EJBException, RemoteException { }
 
 	/**
-	 * There seems to be a heisenbug in JPOX which causes it to fail sometimes with a "mc closed" error. Therefore, we simply perform
-	 * the initialisation twice (if the first time succeeded, the second call is a noop anymway).
-	 *
-	 * @throws ModuleException
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_System_"
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 */
-	public void initialise2()
-	throws Exception
-	{
-		initialise();
-	}
-
-	/**
 	 * This method is called by the datastore initialisation mechanism.
 	 * It populates the datastore with the demo data.
 	 * @throws MalformedVersionException

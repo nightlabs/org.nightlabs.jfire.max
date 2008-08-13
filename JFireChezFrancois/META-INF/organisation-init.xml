@@ -9,11 +9,4 @@
 		<depends module="JFireDynamicTrade.ear" resolution="optional" />
 	</init>
 
-<!-- TODO remove this once the JPOX heisenbug disappeared -->
-	<init bean="jfire/ejb/JFireChezFrancois/ChezFrancoisDatastoreInitialiser" method="initialise2">
-		<depends module="JFireSimpleTrade.ear" resolution="optional" />
-		<depends module="JFireVoucher.ear" resolution="optional" />
-		<depends module="JFireDynamicTrade.ear" resolution="optional" />
-	</init>
-
 </organisation-initialisation>

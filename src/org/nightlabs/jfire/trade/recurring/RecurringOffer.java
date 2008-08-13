@@ -42,9 +42,9 @@ public class RecurringOffer extends Offer {
 	public RecurringOffer(User user, Order order, String offerIDPrefix,
 			long offerID) {
 		super(user, order, offerIDPrefix, offerID);
-
-		recurringOfferConfiguration = null;
-
+		
+		this.recurringOfferConfiguration = new RecurringOfferConfiguration(this ,user,getOrganisationID(),
+				offerID);
 	}
 
 	public RecurringOfferConfiguration getRecurringOfferConfiguration() {

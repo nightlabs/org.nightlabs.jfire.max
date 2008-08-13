@@ -116,6 +116,7 @@ import org.nightlabs.jfire.trade.id.ArticleID;
 import org.nightlabs.jfire.trade.id.CustomerGroupID;
 import org.nightlabs.jfire.trade.id.OfferID;
 import org.nightlabs.jfire.trade.id.SegmentID;
+import org.nightlabs.jfire.trade.recurring.RecurringOffer;
 import org.nightlabs.util.CollectionUtil;
 
 /**
@@ -251,195 +252,195 @@ implements SessionBean
 //			// TEST add test products
 //			// TODO remove this test stuff
 //			{
-//				String langID = Locale.ENGLISH.getLanguage();
-//
-////				pm.getExtent(CustomerGroup.class);
-////				CustomerGroup customerGroup = (CustomerGroup) pm.getObjectById(CustomerGroupID.create(organisationID, "default"));
-//
-//				pm.getExtent(Currency.class);
-//				Currency euro = (Currency) pm.getObjectById(CurrencyID.create("EUR"));
-//
-//				pm.getExtent(Tariff.class);
-//				Tariff tariff;
-//				try {
-//					tariff = (Tariff) pm.getObjectById(TariffID.create(organisationID, 0));
-//				} catch (JDOObjectNotFoundException x) {
-//					tariff = new Tariff(organisationID);
-//					tariff.getName().setText(langID, "Normal Price");
-//					pm.makePersistent(tariff);
-//				}
-//
-//				// create the category "car"
-//				SimpleProductType car = new SimpleProductType(
-//						organisationID, "car", rootSimpleProductType, null,
-//						ProductType.INHERITANCE_NATURE_BRANCH, ProductType.PACKAGE_NATURE_OUTER);
-//				car.getName().setText(langID, "Car");
-////				car.setDeliveryConfiguration(deliveryConfiguration);
-//				store.addProductType(user, car, SimpleProductType.getDefaultHome(pm, car));
-//				store.setProductTypeStatus_published(user, car);
-//
-//				// create the price config "Car - Middle Class"
-//				PriceFragmentType totalPriceFragmentType = PriceFragmentType.getTotalPriceFragmentType(pm);
-//				PriceFragmentType vatNet = (PriceFragmentType) pm.getObjectById(PriceFragmentTypeID.create(getRootOrganisationID(), "vat-de-19-net"));
-//				PriceFragmentType vatVal = (PriceFragmentType) pm.getObjectById(PriceFragmentTypeID.create(getRootOrganisationID(), "vat-de-19-val"));
-//
-//				Accounting accounting = Accounting.getAccounting(pm);
-//				Trader trader = Trader.getTrader(pm);
-//				StablePriceConfig stablePriceConfig = new StablePriceConfig(organisationID, accounting.createPriceConfigID());
-//				FormulaPriceConfig formulaPriceConfig = new FormulaPriceConfig(organisationID, accounting.createPriceConfigID());
-//				formulaPriceConfig.getName().setText(langID, "Car - Middle Class");
-//
-//				CustomerGroup customerGroupDefault = trader.getDefaultCustomerGroupForKnownCustomer();
-//				CustomerGroup customerGroupAnonymous = LegalEntity.getAnonymousCustomer(pm).getDefaultCustomerGroup();
-//				formulaPriceConfig.addCustomerGroup(customerGroupDefault);
-//				formulaPriceConfig.addCustomerGroup(customerGroupAnonymous);
-//				formulaPriceConfig.addCurrency(euro);
-//				formulaPriceConfig.addTariff(tariff);
-////				formulaPriceConfig.addProductType(rootSimpleProductType);
-//				formulaPriceConfig.addPriceFragmentType(totalPriceFragmentType);
-//				formulaPriceConfig.addPriceFragmentType(vatNet);
-//				formulaPriceConfig.addPriceFragmentType(vatVal);
-//				stablePriceConfig.adoptParameters(formulaPriceConfig);
-//
-//				FormulaCell fallbackFormulaCell = formulaPriceConfig.createFallbackFormulaCell();
-//				fallbackFormulaCell.setFormula(totalPriceFragmentType,
-//						"cell.resolvePriceCellsAmount(\n" +
-//						"	new AbsolutePriceCoordinate(\n" +
-//						"		\""+organisationID+"/"+CustomerGroup.CUSTOMER_GROUP_ID_DEFAULT+"\",\n" +
-//						"		null,\n" +
-//						"		null,\n" +
-//						"		null,\n" +
-//						"		null\n" +
-//						"	)\n" +
-//						");");
-//				fallbackFormulaCell.setFormula(vatNet, "cell.resolvePriceCellsAmount(\n" +
-//						"	new AbsolutePriceCoordinate(\n" +
-//						"		null,\n" +
-//						"		null,\n" +
-//						"		null,\n" +
-//						"		null,\n" +
-//						"		\""+Organisation.DEV_ORGANISATION_ID+"/_Total_\"\n" +
-//						"	)\n" +
-//						") / 1.16;");
-//				fallbackFormulaCell.setFormula(vatVal, "cell.resolvePriceCellsAmount(\n" +
-//						"	new AbsolutePriceCoordinate(\n" +
-//						"		null,\n" +
-//						"		null,\n" +
-//						"		null,\n" +
-//						"		null,\n" +
-//						"		\""+Organisation.DEV_ORGANISATION_ID+"/_Total_\"\n" +
-//						"	)\n" +
-//						")\n" +
-//
-////						"/ 1.16 * 0.16");
-//
-//						"\n" +
-//						"-\n" +
-//						"\n" +
-//						"cell.resolvePriceCellsAmount(\n" +
-//						"	new AbsolutePriceCoordinate(\n" +
-//						"		null,\n" +
-//						"		null,\n" +
-//						"		null,\n" +
-//						"		null,\n" +
-//						"		\""+getRootOrganisationID()+"/vat-de-19-net\"\n" +
-//						"	)\n" +
-//						");");
-//
-//				FormulaCell cell = formulaPriceConfig.createFormulaCell(customerGroupDefault, tariff, euro);
-//				cell.setFormula(totalPriceFragmentType, "5000");
-//
-//				// create the car "BMW 320i" and assign the "Car - Middle Class" price config
-//				SimpleProductType bmw320i = new SimpleProductType(
-//						organisationID, "bmw320i", car, null, ProductType.INHERITANCE_NATURE_LEAF, ProductType.PACKAGE_NATURE_OUTER);
-//				bmw320i.getName().setText(Locale.ENGLISH.getLanguage(), "BMW 320i");
-//				bmw320i.setPackagePriceConfig(stablePriceConfig);
-//				bmw320i.setInnerPriceConfig(formulaPriceConfig);
-//				bmw320i.setDeliveryConfiguration(deliveryConfiguration);
-//				store.addProductType(user, bmw320i, SimpleProductType.getDefaultHome(pm, bmw320i));
-//
-//				store.setProductTypeStatus_published(user, bmw320i);
-//				store.setProductTypeStatus_confirmed(user, bmw320i);
-//				store.setProductTypeStatus_saleable(user, bmw320i, true);
-//
-//				// create the category "Car Part"
-//				SimpleProductType carPart = new SimpleProductType(
-//						organisationID, "carPart", rootSimpleProductType, null, ProductType.INHERITANCE_NATURE_BRANCH, ProductType.PACKAGE_NATURE_INNER);
-//				carPart.getName().setText(Locale.ENGLISH.getLanguage(), "Car Part");
-//				carPart.setDeliveryConfiguration(deliveryConfiguration);
-//				store.addProductType(user, carPart, SimpleProductType.getDefaultHome(pm, carPart));
-//
-//				// create the part "Wheel"
-//				SimpleProductType wheel = new SimpleProductType(
-//						organisationID, "wheel", carPart, null, ProductType.INHERITANCE_NATURE_LEAF, ProductType.PACKAGE_NATURE_INNER);
-//				wheel.getName().setText(Locale.ENGLISH.getLanguage(), "Wheel");
-//				wheel.setDeliveryConfiguration(deliveryConfiguration);
-//				store.addProductType(user, wheel, SimpleProductType.getDefaultHome(pm, wheel));
-//
-//				// create the priceConfig "Car Part - Wheel" and assign it to "Wheel"
-//				formulaPriceConfig = new FormulaPriceConfig(organisationID, accounting.createPriceConfigID());
-//				formulaPriceConfig.addProductType(car);
-//				formulaPriceConfig.addPriceFragmentType(vatVal);
-//				formulaPriceConfig.addPriceFragmentType(vatNet);
-//				formulaPriceConfig.getName().setText(langID, "Car Part - Wheel");
-//				fallbackFormulaCell = formulaPriceConfig.createFallbackFormulaCell();
-//				fallbackFormulaCell.setFormula(
-//						Organisation.DEV_ORGANISATION_ID,
-//						PriceFragmentType.TOTAL_PRICEFRAGMENTTYPEID,
-//						"cell.resolvePriceCellsAmount(\n" +
-//						"	new AbsolutePriceCoordinate(\n" +
-//						"		null,\n" +
-//						"		null,\n" +
-//						"		null,\n" +
-//						"		\""+car.getPrimaryKey()+"\",\n" +
-//						"		null\n" +
-//						"	)\n" +
-//						") * 0.1;");
-//
-//				fallbackFormulaCell.setFormula(vatNet, "cell.resolvePriceCellsAmount(\n" +
-//						"	new AbsolutePriceCoordinate(\n" +
-//						"		null,\n" +
-//						"		null,\n" +
-//						"		null,\n" +
-//						"		null,\n" +
-//						"		\""+Organisation.DEV_ORGANISATION_ID+"/_Total_\"\n" +
-//						"	)\n"+
-//						") / 1.16;");
-//				fallbackFormulaCell.setFormula(vatVal, "cell.resolvePriceCellsAmount(\n" +
-//						"	new AbsolutePriceCoordinate(\n" +
-//						"		null,\n" +
-//						"		null,\n" +
-//						"		null,\n" +
-//						"		null,\n" +
-//						"		\""+Organisation.DEV_ORGANISATION_ID+"/_Total_\"\n" +
-//						"	)\n"+
-//						")\n" +
-//
-////						"/ 1.16 * 0.16;");
-//
-//						"\n" +
-//						"-\n" +
-//						"\n" +
-//						"cell.resolvePriceCellsAmount(\n" +
-//						"	new AbsolutePriceCoordinate(\n" +
-//						"		null,\n" +
-//						"		null,\n" +
-//						"		null,\n" +
-//						"		null,\n" +
-//						"		\""+getRootOrganisationID()+"/vat-de-19-net\"\n" +
-//						"	)\n"+
-//						");");
-//
-//				wheel.setInnerPriceConfig(formulaPriceConfig);
-//
-//				// package 4 wheels inside the bmw320i
-//				NestedProductTypeLocal wheelInsideBMW = bmw320i.createNestedProductType(wheel);
-//				wheelInsideBMW.setQuantity(4);
-//
-//				// calculate prices
-//				PriceCalculator priceCalculator = new PriceCalculator(bmw320i);
-//				priceCalculator.preparePriceCalculation(accounting);
-//				priceCalculator.calculatePrices();
+//			String langID = Locale.ENGLISH.getLanguage();
+
+////			pm.getExtent(CustomerGroup.class);
+////			CustomerGroup customerGroup = (CustomerGroup) pm.getObjectById(CustomerGroupID.create(organisationID, "default"));
+
+//			pm.getExtent(Currency.class);
+//			Currency euro = (Currency) pm.getObjectById(CurrencyID.create("EUR"));
+
+//			pm.getExtent(Tariff.class);
+//			Tariff tariff;
+//			try {
+//			tariff = (Tariff) pm.getObjectById(TariffID.create(organisationID, 0));
+//			} catch (JDOObjectNotFoundException x) {
+//			tariff = new Tariff(organisationID);
+//			tariff.getName().setText(langID, "Normal Price");
+//			pm.makePersistent(tariff);
+//			}
+
+//			// create the category "car"
+//			SimpleProductType car = new SimpleProductType(
+//			organisationID, "car", rootSimpleProductType, null,
+//			ProductType.INHERITANCE_NATURE_BRANCH, ProductType.PACKAGE_NATURE_OUTER);
+//			car.getName().setText(langID, "Car");
+////			car.setDeliveryConfiguration(deliveryConfiguration);
+//			store.addProductType(user, car, SimpleProductType.getDefaultHome(pm, car));
+//			store.setProductTypeStatus_published(user, car);
+
+//			// create the price config "Car - Middle Class"
+//			PriceFragmentType totalPriceFragmentType = PriceFragmentType.getTotalPriceFragmentType(pm);
+//			PriceFragmentType vatNet = (PriceFragmentType) pm.getObjectById(PriceFragmentTypeID.create(getRootOrganisationID(), "vat-de-19-net"));
+//			PriceFragmentType vatVal = (PriceFragmentType) pm.getObjectById(PriceFragmentTypeID.create(getRootOrganisationID(), "vat-de-19-val"));
+
+//			Accounting accounting = Accounting.getAccounting(pm);
+//			Trader trader = Trader.getTrader(pm);
+//			StablePriceConfig stablePriceConfig = new StablePriceConfig(organisationID, accounting.createPriceConfigID());
+//			FormulaPriceConfig formulaPriceConfig = new FormulaPriceConfig(organisationID, accounting.createPriceConfigID());
+//			formulaPriceConfig.getName().setText(langID, "Car - Middle Class");
+
+//			CustomerGroup customerGroupDefault = trader.getDefaultCustomerGroupForKnownCustomer();
+//			CustomerGroup customerGroupAnonymous = LegalEntity.getAnonymousCustomer(pm).getDefaultCustomerGroup();
+//			formulaPriceConfig.addCustomerGroup(customerGroupDefault);
+//			formulaPriceConfig.addCustomerGroup(customerGroupAnonymous);
+//			formulaPriceConfig.addCurrency(euro);
+//			formulaPriceConfig.addTariff(tariff);
+////			formulaPriceConfig.addProductType(rootSimpleProductType);
+//			formulaPriceConfig.addPriceFragmentType(totalPriceFragmentType);
+//			formulaPriceConfig.addPriceFragmentType(vatNet);
+//			formulaPriceConfig.addPriceFragmentType(vatVal);
+//			stablePriceConfig.adoptParameters(formulaPriceConfig);
+
+//			FormulaCell fallbackFormulaCell = formulaPriceConfig.createFallbackFormulaCell();
+//			fallbackFormulaCell.setFormula(totalPriceFragmentType,
+//			"cell.resolvePriceCellsAmount(\n" +
+//			"	new AbsolutePriceCoordinate(\n" +
+//			"		\""+organisationID+"/"+CustomerGroup.CUSTOMER_GROUP_ID_DEFAULT+"\",\n" +
+//			"		null,\n" +
+//			"		null,\n" +
+//			"		null,\n" +
+//			"		null\n" +
+//			"	)\n" +
+//			");");
+//			fallbackFormulaCell.setFormula(vatNet, "cell.resolvePriceCellsAmount(\n" +
+//			"	new AbsolutePriceCoordinate(\n" +
+//			"		null,\n" +
+//			"		null,\n" +
+//			"		null,\n" +
+//			"		null,\n" +
+//			"		\""+Organisation.DEV_ORGANISATION_ID+"/_Total_\"\n" +
+//			"	)\n" +
+//			") / 1.16;");
+//			fallbackFormulaCell.setFormula(vatVal, "cell.resolvePriceCellsAmount(\n" +
+//			"	new AbsolutePriceCoordinate(\n" +
+//			"		null,\n" +
+//			"		null,\n" +
+//			"		null,\n" +
+//			"		null,\n" +
+//			"		\""+Organisation.DEV_ORGANISATION_ID+"/_Total_\"\n" +
+//			"	)\n" +
+//			")\n" +
+
+////			"/ 1.16 * 0.16");
+
+//			"\n" +
+//			"-\n" +
+//			"\n" +
+//			"cell.resolvePriceCellsAmount(\n" +
+//			"	new AbsolutePriceCoordinate(\n" +
+//			"		null,\n" +
+//			"		null,\n" +
+//			"		null,\n" +
+//			"		null,\n" +
+//			"		\""+getRootOrganisationID()+"/vat-de-19-net\"\n" +
+//			"	)\n" +
+//			");");
+
+//			FormulaCell cell = formulaPriceConfig.createFormulaCell(customerGroupDefault, tariff, euro);
+//			cell.setFormula(totalPriceFragmentType, "5000");
+
+//			// create the car "BMW 320i" and assign the "Car - Middle Class" price config
+//			SimpleProductType bmw320i = new SimpleProductType(
+//			organisationID, "bmw320i", car, null, ProductType.INHERITANCE_NATURE_LEAF, ProductType.PACKAGE_NATURE_OUTER);
+//			bmw320i.getName().setText(Locale.ENGLISH.getLanguage(), "BMW 320i");
+//			bmw320i.setPackagePriceConfig(stablePriceConfig);
+//			bmw320i.setInnerPriceConfig(formulaPriceConfig);
+//			bmw320i.setDeliveryConfiguration(deliveryConfiguration);
+//			store.addProductType(user, bmw320i, SimpleProductType.getDefaultHome(pm, bmw320i));
+
+//			store.setProductTypeStatus_published(user, bmw320i);
+//			store.setProductTypeStatus_confirmed(user, bmw320i);
+//			store.setProductTypeStatus_saleable(user, bmw320i, true);
+
+//			// create the category "Car Part"
+//			SimpleProductType carPart = new SimpleProductType(
+//			organisationID, "carPart", rootSimpleProductType, null, ProductType.INHERITANCE_NATURE_BRANCH, ProductType.PACKAGE_NATURE_INNER);
+//			carPart.getName().setText(Locale.ENGLISH.getLanguage(), "Car Part");
+//			carPart.setDeliveryConfiguration(deliveryConfiguration);
+//			store.addProductType(user, carPart, SimpleProductType.getDefaultHome(pm, carPart));
+
+//			// create the part "Wheel"
+//			SimpleProductType wheel = new SimpleProductType(
+//			organisationID, "wheel", carPart, null, ProductType.INHERITANCE_NATURE_LEAF, ProductType.PACKAGE_NATURE_INNER);
+//			wheel.getName().setText(Locale.ENGLISH.getLanguage(), "Wheel");
+//			wheel.setDeliveryConfiguration(deliveryConfiguration);
+//			store.addProductType(user, wheel, SimpleProductType.getDefaultHome(pm, wheel));
+
+//			// create the priceConfig "Car Part - Wheel" and assign it to "Wheel"
+//			formulaPriceConfig = new FormulaPriceConfig(organisationID, accounting.createPriceConfigID());
+//			formulaPriceConfig.addProductType(car);
+//			formulaPriceConfig.addPriceFragmentType(vatVal);
+//			formulaPriceConfig.addPriceFragmentType(vatNet);
+//			formulaPriceConfig.getName().setText(langID, "Car Part - Wheel");
+//			fallbackFormulaCell = formulaPriceConfig.createFallbackFormulaCell();
+//			fallbackFormulaCell.setFormula(
+//			Organisation.DEV_ORGANISATION_ID,
+//			PriceFragmentType.TOTAL_PRICEFRAGMENTTYPEID,
+//			"cell.resolvePriceCellsAmount(\n" +
+//			"	new AbsolutePriceCoordinate(\n" +
+//			"		null,\n" +
+//			"		null,\n" +
+//			"		null,\n" +
+//			"		\""+car.getPrimaryKey()+"\",\n" +
+//			"		null\n" +
+//			"	)\n" +
+//			") * 0.1;");
+
+//			fallbackFormulaCell.setFormula(vatNet, "cell.resolvePriceCellsAmount(\n" +
+//			"	new AbsolutePriceCoordinate(\n" +
+//			"		null,\n" +
+//			"		null,\n" +
+//			"		null,\n" +
+//			"		null,\n" +
+//			"		\""+Organisation.DEV_ORGANISATION_ID+"/_Total_\"\n" +
+//			"	)\n"+
+//			") / 1.16;");
+//			fallbackFormulaCell.setFormula(vatVal, "cell.resolvePriceCellsAmount(\n" +
+//			"	new AbsolutePriceCoordinate(\n" +
+//			"		null,\n" +
+//			"		null,\n" +
+//			"		null,\n" +
+//			"		null,\n" +
+//			"		\""+Organisation.DEV_ORGANISATION_ID+"/_Total_\"\n" +
+//			"	)\n"+
+//			")\n" +
+
+////			"/ 1.16 * 0.16;");
+
+//			"\n" +
+//			"-\n" +
+//			"\n" +
+//			"cell.resolvePriceCellsAmount(\n" +
+//			"	new AbsolutePriceCoordinate(\n" +
+//			"		null,\n" +
+//			"		null,\n" +
+//			"		null,\n" +
+//			"		null,\n" +
+//			"		\""+getRootOrganisationID()+"/vat-de-19-net\"\n" +
+//			"	)\n"+
+//			");");
+
+//			wheel.setInnerPriceConfig(formulaPriceConfig);
+
+//			// package 4 wheels inside the bmw320i
+//			NestedProductTypeLocal wheelInsideBMW = bmw320i.createNestedProductType(wheel);
+//			wheelInsideBMW.setQuantity(4);
+
+//			// calculate prices
+//			PriceCalculator priceCalculator = new PriceCalculator(bmw320i);
+//			priceCalculator.preparePriceCalculation(accounting);
+//			priceCalculator.calculatePrices();
 //			}
 //			// TEST END
 
@@ -450,41 +451,41 @@ implements SessionBean
 	}
 
 //	/**
-//	 * @return Returns a <tt>Collection</tt> of <tt>SimpleProductType</tt>.
-//	 *
-//	 * @ejb.interface-method
-//	 * @ejb.permission role-name="SimpleTradeManager-user"
-//	 * @ejb.transaction type="Required"
-//	 */
+//	* @return Returns a <tt>Collection</tt> of <tt>SimpleProductType</tt>.
+//	*
+//	* @ejb.interface-method
+//	* @ejb.permission role-name="SimpleTradeManager-user"
+//	* @ejb.transaction type="Required"
+//	*/
 //	public Collection<SimpleProductType> test(Map<String, SimpleProductType> m)
-//		throws ModuleException
+//	throws ModuleException
 //	{
-//		return new ArrayList<SimpleProductType>(m.values());
+//	return new ArrayList<SimpleProductType>(m.values());
 //	}
-//
+
 //	/**
-//	 * @return Returns a <tt>Collection</tt> of <tt>SimpleProductType</tt>.
-//	 *
-//	 * @ejb.interface-method
-//	 * @ejb.permission role-name="SimpleTradeManager-user"
-//	 * @ejb.transaction type="Required"
-//	 */
+//	* @return Returns a <tt>Collection</tt> of <tt>SimpleProductType</tt>.
+//	*
+//	* @ejb.interface-method
+//	* @ejb.permission role-name="SimpleTradeManager-user"
+//	* @ejb.transaction type="Required"
+//	*/
 //	public Collection getChildProductTypes(ProductTypeID parentProductTypeID, String[] fetchGroups, int maxFetchDepth)
-//		throws ModuleException
+//	throws ModuleException
 //	{
-//		PersistenceManager pm = getPersistenceManager();
-//		try {
-//			Collection res = SimpleProductType.getChildProductTypes(pm, parentProductTypeID);
-//
-//			FetchPlan fetchPlan = pm.getFetchPlan();
-//			fetchPlan.setMaxFetchDepth(maxFetchDepth);
-//			if (fetchGroups != null)
-//				fetchPlan.setGroups(fetchGroups);
-//
-//			return pm.detachCopyAll(res);
-//		} finally {
-//			pm.close();
-//		}
+//	PersistenceManager pm = getPersistenceManager();
+//	try {
+//	Collection res = SimpleProductType.getChildProductTypes(pm, parentProductTypeID);
+
+//	FetchPlan fetchPlan = pm.getFetchPlan();
+//	fetchPlan.setMaxFetchDepth(maxFetchDepth);
+//	if (fetchGroups != null)
+//	fetchPlan.setGroups(fetchGroups);
+
+//	return pm.detachCopyAll(res);
+//	} finally {
+//	pm.close();
+//	}
 //	}
 
 	/**
@@ -600,53 +601,53 @@ implements SessionBean
 			}
 
 //			03:09:47,950 ERROR [LogInterceptor] RuntimeException in method: public abstract org.nightlabs.jfire.simpletrade.store.SimpleProductType org.nightlabs.jfire.simpletrade.SimpleTradeManager.storeProductType(org.nightlabs.jfire.simpletrade.store.SimpleProductType,boolean,java.lang.String[],int) throws org.nightlabs.ModuleException,java.rmi.RemoteException:
-//				javax.jdo.JDODetachedFieldAccessException: You have just attempted to access field "extendedProductType" yet this field was not detached when you detached the object. Either dont access this field, or detach the field when detaching the object.
-//				        at org.nightlabs.jfire.store.ProductType.jdoGetextendedProductType(ProductType.java)
-//				        at org.nightlabs.jfire.store.ProductType.getExtendedProductType(ProductType.java:680)
-//				        at org.nightlabs.jfire.accounting.gridpriceconfig.PriceCalculator._resolvableProductTypes_registerWithAnchestors(PriceCalculator.java:300)
-//				        at org.nightlabs.jfire.accounting.gridpriceconfig.PriceCalculator.preparePriceCalculation_createResolvableProductTypesMap(PriceCalculator.java:282)
-//				        at org.nightlabs.jfire.accounting.gridpriceconfig.PriceCalculator.preparePriceCalculation(PriceCalculator.java:159)
-//				        at org.nightlabs.jfire.simpletrade.SimpleTradeManagerBean.storeProductType(SimpleTradeManagerBean.java:611)
-//				        at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-//				        at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:39)
-//				        at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
-//				        at java.lang.reflect.Method.invoke(Method.java:585)
-//				        at org.jboss.invocation.Invocation.performCall(Invocation.java:359)
-//				        at org.jboss.ejb.StatelessSessionContainer$ContainerInterceptor.invoke(StatelessSessionContainer.java:237)
-//				        at org.jboss.resource.connectionmanager.CachedConnectionInterceptor.invoke(CachedConnectionInterceptor.java:158)
-//				        at org.jboss.ejb.plugins.StatelessSessionInstanceInterceptor.invoke(StatelessSessionInstanceInterceptor.java:169)
-//				        at org.jboss.ejb.plugins.CallValidationInterceptor.invoke(CallValidationInterceptor.java:63)
-//				        at org.jboss.ejb.plugins.AbstractTxInterceptor.invokeNext(AbstractTxInterceptor.java:121)
-//				        at org.jboss.ejb.plugins.TxInterceptorCMT.runWithTransactions(TxInterceptorCMT.java:350)
-//				        at org.jboss.ejb.plugins.TxInterceptorCMT.invoke(TxInterceptorCMT.java:181)
-//				        at org.jboss.ejb.plugins.SecurityInterceptor.invoke(SecurityInterceptor.java:168)
-//				        at org.jboss.ejb.plugins.LogInterceptor.invoke(LogInterceptor.java:205)
-//				        at org.jboss.ejb.plugins.ProxyFactoryFinderInterceptor.invoke(ProxyFactoryFinderInterceptor.java:138)
-//				        at org.jboss.ejb.SessionContainer.internalInvoke(SessionContainer.java:648)
-//				        at org.jboss.ejb.Container.invoke(Container.java:960)
-//				        at sun.reflect.GeneratedMethodAccessor109.invoke(Unknown Source)
-//				        at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
-//				        at java.lang.reflect.Method.invoke(Method.java:585)
-//				        at org.jboss.mx.interceptor.ReflectedDispatcher.invoke(ReflectedDispatcher.java:155)
-//				        at org.jboss.mx.server.Invocation.dispatch(Invocation.java:94)
-//				        at org.jboss.mx.server.Invocation.invoke(Invocation.java:86)
-//				        at org.jboss.mx.server.AbstractMBeanInvoker.invoke(AbstractMBeanInvoker.java:264)
-//				        at org.jboss.mx.server.MBeanServerImpl.invoke(MBeanServerImpl.java:659)
-//				        at org.jboss.invocation.unified.server.UnifiedInvoker.invoke(UnifiedInvoker.java:231)
-//				        at sun.reflect.GeneratedMethodAccessor133.invoke(Unknown Source)
-//				        at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
-//				        at java.lang.reflect.Method.invoke(Method.java:585)
-//				        at org.jboss.mx.interceptor.ReflectedDispatcher.invoke(ReflectedDispatcher.java:155)
-//				        at org.jboss.mx.server.Invocation.dispatch(Invocation.java:94)
-//				        at org.jboss.mx.server.Invocation.invoke(Invocation.java:86)
-//				        at org.jboss.mx.server.AbstractMBeanInvoker.invoke(AbstractMBeanInvoker.java:264)
-//				        at org.jboss.mx.server.MBeanServerImpl.invoke(MBeanServerImpl.java:659)
-//				        at javax.management.MBeanServerInvocationHandler.invoke(MBeanServerInvocationHandler.java:201)
-//				        at $Proxy16.invoke(Unknown Source)
-//				        at org.jboss.remoting.ServerInvoker.invoke(ServerInvoker.java:734)
-//				        at org.jboss.remoting.transport.socket.ServerThread.processInvocation(ServerThread.java:560)
-//				        at org.jboss.remoting.transport.socket.ServerThread.dorun(ServerThread.java:383)
-//				        at org.jboss.remoting.transport.socket.ServerThread.run(ServerThread.java:165)
+//			javax.jdo.JDODetachedFieldAccessException: You have just attempted to access field "extendedProductType" yet this field was not detached when you detached the object. Either dont access this field, or detach the field when detaching the object.
+//			at org.nightlabs.jfire.store.ProductType.jdoGetextendedProductType(ProductType.java)
+//			at org.nightlabs.jfire.store.ProductType.getExtendedProductType(ProductType.java:680)
+//			at org.nightlabs.jfire.accounting.gridpriceconfig.PriceCalculator._resolvableProductTypes_registerWithAnchestors(PriceCalculator.java:300)
+//			at org.nightlabs.jfire.accounting.gridpriceconfig.PriceCalculator.preparePriceCalculation_createResolvableProductTypesMap(PriceCalculator.java:282)
+//			at org.nightlabs.jfire.accounting.gridpriceconfig.PriceCalculator.preparePriceCalculation(PriceCalculator.java:159)
+//			at org.nightlabs.jfire.simpletrade.SimpleTradeManagerBean.storeProductType(SimpleTradeManagerBean.java:611)
+//			at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+//			at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:39)
+//			at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
+//			at java.lang.reflect.Method.invoke(Method.java:585)
+//			at org.jboss.invocation.Invocation.performCall(Invocation.java:359)
+//			at org.jboss.ejb.StatelessSessionContainer$ContainerInterceptor.invoke(StatelessSessionContainer.java:237)
+//			at org.jboss.resource.connectionmanager.CachedConnectionInterceptor.invoke(CachedConnectionInterceptor.java:158)
+//			at org.jboss.ejb.plugins.StatelessSessionInstanceInterceptor.invoke(StatelessSessionInstanceInterceptor.java:169)
+//			at org.jboss.ejb.plugins.CallValidationInterceptor.invoke(CallValidationInterceptor.java:63)
+//			at org.jboss.ejb.plugins.AbstractTxInterceptor.invokeNext(AbstractTxInterceptor.java:121)
+//			at org.jboss.ejb.plugins.TxInterceptorCMT.runWithTransactions(TxInterceptorCMT.java:350)
+//			at org.jboss.ejb.plugins.TxInterceptorCMT.invoke(TxInterceptorCMT.java:181)
+//			at org.jboss.ejb.plugins.SecurityInterceptor.invoke(SecurityInterceptor.java:168)
+//			at org.jboss.ejb.plugins.LogInterceptor.invoke(LogInterceptor.java:205)
+//			at org.jboss.ejb.plugins.ProxyFactoryFinderInterceptor.invoke(ProxyFactoryFinderInterceptor.java:138)
+//			at org.jboss.ejb.SessionContainer.internalInvoke(SessionContainer.java:648)
+//			at org.jboss.ejb.Container.invoke(Container.java:960)
+//			at sun.reflect.GeneratedMethodAccessor109.invoke(Unknown Source)
+//			at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
+//			at java.lang.reflect.Method.invoke(Method.java:585)
+//			at org.jboss.mx.interceptor.ReflectedDispatcher.invoke(ReflectedDispatcher.java:155)
+//			at org.jboss.mx.server.Invocation.dispatch(Invocation.java:94)
+//			at org.jboss.mx.server.Invocation.invoke(Invocation.java:86)
+//			at org.jboss.mx.server.AbstractMBeanInvoker.invoke(AbstractMBeanInvoker.java:264)
+//			at org.jboss.mx.server.MBeanServerImpl.invoke(MBeanServerImpl.java:659)
+//			at org.jboss.invocation.unified.server.UnifiedInvoker.invoke(UnifiedInvoker.java:231)
+//			at sun.reflect.GeneratedMethodAccessor133.invoke(Unknown Source)
+//			at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
+//			at java.lang.reflect.Method.invoke(Method.java:585)
+//			at org.jboss.mx.interceptor.ReflectedDispatcher.invoke(ReflectedDispatcher.java:155)
+//			at org.jboss.mx.server.Invocation.dispatch(Invocation.java:94)
+//			at org.jboss.mx.server.Invocation.invoke(Invocation.java:86)
+//			at org.jboss.mx.server.AbstractMBeanInvoker.invoke(AbstractMBeanInvoker.java:264)
+//			at org.jboss.mx.server.MBeanServerImpl.invoke(MBeanServerImpl.java:659)
+//			at javax.management.MBeanServerInvocationHandler.invoke(MBeanServerInvocationHandler.java:201)
+//			at $Proxy16.invoke(Unknown Source)
+//			at org.jboss.remoting.ServerInvoker.invoke(ServerInvoker.java:734)
+//			at org.jboss.remoting.transport.socket.ServerThread.processInvocation(ServerThread.java:560)
+//			at org.jboss.remoting.transport.socket.ServerThread.dorun(ServerThread.java:383)
+//			at org.jboss.remoting.transport.socket.ServerThread.run(ServerThread.java:165)
 
 
 			if (priceCalculationNeeded) {
@@ -708,7 +709,7 @@ implements SessionBean
 			Set<ProductTypeID> simpleProductTypeIDs,
 			Set<StructFieldID> structFieldIDs,
 			String[] fetchGroups, int maxFetchDepth
-		)
+	)
 	{
 		Map<ProductTypeID, PropertySet> result = new HashMap<ProductTypeID, PropertySet>(simpleProductTypeIDs.size());
 		PersistenceManager pm = getPersistenceManager();
@@ -719,7 +720,7 @@ implements SessionBean
 						pm,
 						productType.getPropertySet(), structFieldIDs,
 						fetchGroups, maxFetchDepth
-					);
+				);
 				result.put(productTypeID, detached);
 			}
 			return result;
@@ -729,66 +730,66 @@ implements SessionBean
 	}
 
 //	/**
-//	 * @return Returns a newly detached instance of <tt>SimpleProductType</tt> if <tt>get</tt> is true - otherwise <tt>null</tt>.
-//	 *
-//	 * @ejb.interface-method
-//	 * @ejb.permission role-name="SimpleTradeManager.Admin"
-//	 * @ejb.transaction type="Required"
-//	 */
+//	* @return Returns a newly detached instance of <tt>SimpleProductType</tt> if <tt>get</tt> is true - otherwise <tt>null</tt>.
+//	*
+//	* @ejb.interface-method
+//	* @ejb.permission role-name="SimpleTradeManager.Admin"
+//	* @ejb.transaction type="Required"
+//	*/
 //	public SimpleProductType updateProductType(SimpleProductType productType, boolean get, String[] fetchGroups, int maxFetchDepth)
-//		throws ModuleException
+//	throws ModuleException
 //	{
-//		if (productType == null)
-//			throw new NullPointerException("productType");
-//
-//		PersistenceManager pm = getPersistenceManager();
-//		try {
-////			// WORKAROUND
-////			pm.getExtent(SimpleProductType.class);
-////			if (productType.getExtendedProductType() != null) {
-////				Object oid = JDOHelper.getObjectId(productType.getExtendedProductType());
-////				productType.setExtendedProductType((ProductType)pm.getObjectById(oid));
-////			}
-////
-////			IInnerPriceConfig packagePriceConfig = productType.getInnerPriceConfig();
-////			if (packagePriceConfig != null) {
-////				pm.getExtent(packagePriceConfig.getClass());
-////				Object oid = JDOHelper.getObjectId(packagePriceConfig);
-////				if (oid != null) {
-////					try {
-////						packagePriceConfig = (IInnerPriceConfig) pm.getObjectById(oid);
-////						productType.setInnerPriceConfig(packagePriceConfig);
-////					} catch (JDOObjectNotFoundException x) {
-////						// Object is not in datastore, so try to store it as it is.
-////					}
-////				}
-////			}
-////
-////			IInnerPriceConfig innerPriceConfig = productType.getInnerPriceConfig();
-////			if (innerPriceConfig != null) {
-////				pm.getExtent(innerPriceConfig.getClass());
-////				Object oid = JDOHelper.getObjectId(innerPriceConfig);
-////				if (oid != null) {
-////					try {
-////						innerPriceConfig = (IInnerPriceConfig) pm.getObjectById(oid);
-////						productType.setInnerPriceConfig(innerPriceConfig);
-////					} catch (JDOObjectNotFoundException x) {
-////						// Object is not in datastore, so try to store it as it is.
-////					}
-////				}
-////			}
-////			// END WORK AROUND
-////			Object productTypeID = JDOHelper.getObjectId(productType);
-////			if (productTypeID != null)
-////				cache_addChangedObjectID(productTypeID);
-//			if (!Store.getStore(pm).containsProductType(productType))
-//				throw new IllegalStateException("The productType \""+productType.getPrimaryKey()+"\" is not yet known! Use addProductType(...) instead!");
-//
-//			return (SimpleProductType) NLJDOHelper.storeJDO(pm, productType, get, fetchGroups);
-////			return (SimpleProductType)NLJDOHelper.storeJDO(pm, product);
-//		} finally {
-//			pm.close();
-//		}
+//	if (productType == null)
+//	throw new NullPointerException("productType");
+
+//	PersistenceManager pm = getPersistenceManager();
+//	try {
+////	// WORKAROUND
+////	pm.getExtent(SimpleProductType.class);
+////	if (productType.getExtendedProductType() != null) {
+////	Object oid = JDOHelper.getObjectId(productType.getExtendedProductType());
+////	productType.setExtendedProductType((ProductType)pm.getObjectById(oid));
+////	}
+
+////	IInnerPriceConfig packagePriceConfig = productType.getInnerPriceConfig();
+////	if (packagePriceConfig != null) {
+////	pm.getExtent(packagePriceConfig.getClass());
+////	Object oid = JDOHelper.getObjectId(packagePriceConfig);
+////	if (oid != null) {
+////	try {
+////	packagePriceConfig = (IInnerPriceConfig) pm.getObjectById(oid);
+////	productType.setInnerPriceConfig(packagePriceConfig);
+////	} catch (JDOObjectNotFoundException x) {
+////	// Object is not in datastore, so try to store it as it is.
+////	}
+////	}
+////	}
+
+////	IInnerPriceConfig innerPriceConfig = productType.getInnerPriceConfig();
+////	if (innerPriceConfig != null) {
+////	pm.getExtent(innerPriceConfig.getClass());
+////	Object oid = JDOHelper.getObjectId(innerPriceConfig);
+////	if (oid != null) {
+////	try {
+////	innerPriceConfig = (IInnerPriceConfig) pm.getObjectById(oid);
+////	productType.setInnerPriceConfig(innerPriceConfig);
+////	} catch (JDOObjectNotFoundException x) {
+////	// Object is not in datastore, so try to store it as it is.
+////	}
+////	}
+////	}
+////	// END WORK AROUND
+////	Object productTypeID = JDOHelper.getObjectId(productType);
+////	if (productTypeID != null)
+////	cache_addChangedObjectID(productTypeID);
+//	if (!Store.getStore(pm).containsProductType(productType))
+//	throw new IllegalStateException("The productType \""+productType.getPrimaryKey()+"\" is not yet known! Use addProductType(...) instead!");
+
+//	return (SimpleProductType) NLJDOHelper.storeJDO(pm, productType, get, fetchGroups);
+////	return (SimpleProductType)NLJDOHelper.storeJDO(pm, product);
+//	} finally {
+//	pm.close();
+//	}
 //	}
 
 	/**
@@ -823,6 +824,65 @@ implements SessionBean
 		}
 	}
 
+
+
+	/**
+	 * @return <tt>Collection</tt> of {@link org.nightlabs.jfire.trade.Article}
+	 * @throws org.nightlabs.jfire.store.NotAvailableException in case there are not enough <tt>Product</tt>s available and the <tt>Product</tt>s cannot be created (because of a limit).
+	 *
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type="Required"
+	 */
+	public Collection<? extends Article> createArticles(
+			SegmentID segmentID,
+			OfferID offerID,
+			Collection<ProductType> productTypes,
+			TariffID tariffID,
+			String[] fetchGroups, int maxFetchDepth)
+			throws ModuleException
+			{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			Trader trader = Trader.getTrader(pm);
+			Segment segment = (Segment) pm.getObjectById(segmentID);
+
+			User user = User.getUser(pm, getPrincipal());
+			Tariff tariff = (Tariff) pm.getObjectById(tariffID);
+
+			pm.getExtent(RecurringOffer.class);
+			RecurringOffer offer = (RecurringOffer) pm.getObjectById(offerID);
+
+			Collection<? extends Article> articles = trader.createArticles(user,offer,segment,productTypes,new ArticleCreator(tariff));
+
+			pm.getFetchPlan().setDetachmentOptions(FetchPlan.DETACH_LOAD_FIELDS | FetchPlan.DETACH_UNLOAD_FIELDS);
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+			if (fetchGroups != null)
+				pm.getFetchPlan().setGroups(fetchGroups);
+
+			if (JFireBaseEAR.JPOX_WORKAROUND_FLUSH_ENABLED) {
+				List<ArticleID> articleIDs = NLJDOHelper.getObjectIDList(articles);
+				for (int tryCounter = 0; tryCounter < 10; ++tryCounter) {
+					pm.flush();
+					pm.evictAll();
+					articles = NLJDOHelper.getObjectList(pm, articleIDs, Article.class);
+					try {
+						Collection<? extends Article> detachedArticles = null;
+						detachedArticles = pm.detachCopyAll(articles);
+						return detachedArticles;
+					} catch (Exception x) {
+						logger.warn("Detaching Articles failed! Trying it again. tryCounter="+tryCounter, x);
+					}
+				}
+			}
+
+			return pm.detachCopyAll(articles);
+		} finally {
+			pm.close();
+		}
+			}
+
+
 	/**
 	 * @return <tt>Collection</tt> of {@link org.nightlabs.jfire.trade.Article}
 	 * @throws org.nightlabs.jfire.store.NotAvailableException in case there are not enough <tt>Product</tt>s available and the <tt>Product</tt>s cannot be created (because of a limit).
@@ -840,8 +900,8 @@ implements SessionBean
 			boolean allocate,
 			boolean allocateSynchronously,
 			String[] fetchGroups, int maxFetchDepth)
-	throws ModuleException
-	{
+			throws ModuleException
+			{
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			Trader trader = Trader.getTrader(pm);
@@ -890,14 +950,14 @@ implements SessionBean
 					allocate, allocateSynchronously);
 //			Collection articles = new ArrayList();
 //			for (Iterator it = products.iterator(); it.hasNext(); ) {
-//				SimpleProduct product = (SimpleProduct) it.next();
-//				Article article = trader.createArticle(
-//						user, offer, segment, product,
-//						new ArticleCreator(tariff),
-//						true, false);
-//// auto-release must be controlled via the offer (the whole offer has an expiry time
-////						new Date(System.currentTimeMillis() + 3600 * 1000 * 10)); // TODO the autoReleaseTimeout must come from the config
-//				articles.add(article);
+//			SimpleProduct product = (SimpleProduct) it.next();
+//			Article article = trader.createArticle(
+//			user, offer, segment, product,
+//			new ArticleCreator(tariff),
+//			true, false);
+////			auto-release must be controlled via the offer (the whole offer has an expiry time
+////			new Date(System.currentTimeMillis() + 3600 * 1000 * 10)); // TODO the autoReleaseTimeout must come from the config
+//			articles.add(article);
 //			}
 
 			pm.getFetchPlan().setDetachmentOptions(FetchPlan.DETACH_LOAD_FIELDS | FetchPlan.DETACH_UNLOAD_FIELDS);
@@ -908,54 +968,54 @@ implements SessionBean
 			// TODO remove this JPOX WORKAROUND! getting sometimes:
 //			Caused by: javax.jdo.JDOUserException: Cannot read fields from a deleted object
 //			FailedObject:jdo/org.nightlabs.jfire.accounting.id.PriceFragmentID?organisationID=chezfrancois.jfire.org&priceConfigID=9&priceID=232&priceFragmentTypePK=dev.jfire.org%2F_Total_
-//			        at org.jpox.state.jdo.PersistentNewDeleted.transitionReadField(PersistentNewDeleted.java:105)
-//			        at org.jpox.state.StateManagerImpl.transitionReadField(StateManagerImpl.java:3394)
-//			        at org.jpox.state.StateManagerImpl.isLoaded(StateManagerImpl.java:1982)
-//			        at org.jpox.store.rdbms.scostore.FKMapStore.put(FKMapStore.java:764)
-//			        at org.jpox.store.rdbms.scostore.AbstractMapStore.putAll(AbstractMapStore.java:320)
-//			        at org.jpox.store.mapping.MapMapping.postUpdate(MapMapping.java:175)
-//			        at org.jpox.store.rdbms.request.UpdateRequest.execute(UpdateRequest.java:318)
-//			        at org.jpox.store.rdbms.table.ClassTable.update(ClassTable.java:2573)
-//			        at org.jpox.store.rdbms.table.ClassTable.update(ClassTable.java:2568)
-//			        at org.jpox.store.StoreManager.update(StoreManager.java:967)
-//			        at org.jpox.state.StateManagerImpl.flush(StateManagerImpl.java:4928)
-//			        at org.jpox.AbstractPersistenceManager.flush(AbstractPersistenceManager.java:3233)
-//			        at org.jpox.store.rdbms.RDBMSManagedTransaction.getConnection(RDBMSManagedTransaction.java:172)
-//			        at org.jpox.store.rdbms.AbstractRDBMSTransaction.getConnection(AbstractRDBMSTransaction.java:97)
-//			        at org.jpox.resource.JdoTransactionHandle.getConnection(JdoTransactionHandle.java:246)
-//			        at org.jpox.store.rdbms.RDBMSManager.getConnection(RDBMSManager.java:426)
-//			        at org.jpox.store.rdbms.scostore.AbstractSetStore.iterator(AbstractSetStore.java:123)
-//			        at org.jpox.store.rdbms.scostore.FKMapStore.clear(FKMapStore.java:991)
-//			        at org.jpox.sco.HashMap.clear(HashMap.java:717)
-//			        at org.jpox.sco.HashMap.setValueFrom(HashMap.java:232)
-//			        at org.jpox.sco.SCOUtils.newSCOInstance(SCOUtils.java:100)
-//			        at org.jpox.state.StateManagerImpl.newSCOInstance(StateManagerImpl.java:3339)
-//			        at org.jpox.state.StateManagerImpl.replaceSCOField(StateManagerImpl.java:3356)
-//			        at org.jpox.state.DetachFieldManager.internalFetchObjectField(DetachFieldManager.java:88)
-//			        at org.jpox.state.AbstractFetchFieldManager.fetchObjectField(AbstractFetchFieldManager.java:108)
-//			        at org.jpox.state.StateManagerImpl.replacingObjectField(StateManagerImpl.java:2951)
-//			        at org.nightlabs.jfire.accounting.Price.jdoReplaceField(Price.java)
-//			        at org.nightlabs.jfire.trade.ArticlePrice.jdoReplaceField(ArticlePrice.java)
-//			        at org.nightlabs.jfire.accounting.Price.jdoReplaceFields(Price.java)
-//			        at org.jpox.state.StateManagerImpl.replaceFields(StateManagerImpl.java:3170)
-//			        at org.jpox.state.StateManagerImpl.replaceFields(StateManagerImpl.java:3188)
-//			        at org.jpox.state.StateManagerImpl.detachCopy(StateManagerImpl.java:4193)
-//			        at org.jpox.AbstractPersistenceManager.internalDetachCopy(AbstractPersistenceManager.java:1944)
-//			        at org.jpox.AbstractPersistenceManager.detachCopyInternal(AbstractPersistenceManager.java:1974)
-//			        at org.jpox.resource.PersistenceManagerImpl.detachCopyInternal(PersistenceManagerImpl.java:961)
-//			        at org.jpox.state.DetachFieldManager.internalFetchObjectField(DetachFieldManager.java:144)
-//			        at org.jpox.state.AbstractFetchFieldManager.fetchObjectField(AbstractFetchFieldManager.java:108)
-//			        at org.jpox.state.StateManagerImpl.replacingObjectField(StateManagerImpl.java:2951)
-//			        at org.nightlabs.jfire.trade.Article.jdoReplaceField(Article.java)
-//			        at org.nightlabs.jfire.trade.Article.jdoReplaceFields(Article.java)
-//			        at org.jpox.state.StateManagerImpl.replaceFields(StateManagerImpl.java:3170)
-//			        at org.jpox.state.StateManagerImpl.replaceFields(StateManagerImpl.java:3188)
-//			        at org.jpox.state.StateManagerImpl.detachCopy(StateManagerImpl.java:4193)
-//			        at org.jpox.AbstractPersistenceManager.internalDetachCopy(AbstractPersistenceManager.java:1944)
-//			        at org.jpox.AbstractPersistenceManager.detachCopyInternal(AbstractPersistenceManager.java:1974)
-//			        at org.jpox.AbstractPersistenceManager.detachCopyAll(AbstractPersistenceManager.java:2043)
-//			        at org.jpox.resource.PersistenceManagerImpl.detachCopyAll(PersistenceManagerImpl.java:1000)
-//			        at org.nightlabs.jfire.simpletrade.SimpleTradeManagerBean.createArticles(SimpleTradeManagerBean.java:745)
+//			at org.jpox.state.jdo.PersistentNewDeleted.transitionReadField(PersistentNewDeleted.java:105)
+//			at org.jpox.state.StateManagerImpl.transitionReadField(StateManagerImpl.java:3394)
+//			at org.jpox.state.StateManagerImpl.isLoaded(StateManagerImpl.java:1982)
+//			at org.jpox.store.rdbms.scostore.FKMapStore.put(FKMapStore.java:764)
+//			at org.jpox.store.rdbms.scostore.AbstractMapStore.putAll(AbstractMapStore.java:320)
+//			at org.jpox.store.mapping.MapMapping.postUpdate(MapMapping.java:175)
+//			at org.jpox.store.rdbms.request.UpdateRequest.execute(UpdateRequest.java:318)
+//			at org.jpox.store.rdbms.table.ClassTable.update(ClassTable.java:2573)
+//			at org.jpox.store.rdbms.table.ClassTable.update(ClassTable.java:2568)
+//			at org.jpox.store.StoreManager.update(StoreManager.java:967)
+//			at org.jpox.state.StateManagerImpl.flush(StateManagerImpl.java:4928)
+//			at org.jpox.AbstractPersistenceManager.flush(AbstractPersistenceManager.java:3233)
+//			at org.jpox.store.rdbms.RDBMSManagedTransaction.getConnection(RDBMSManagedTransaction.java:172)
+//			at org.jpox.store.rdbms.AbstractRDBMSTransaction.getConnection(AbstractRDBMSTransaction.java:97)
+//			at org.jpox.resource.JdoTransactionHandle.getConnection(JdoTransactionHandle.java:246)
+//			at org.jpox.store.rdbms.RDBMSManager.getConnection(RDBMSManager.java:426)
+//			at org.jpox.store.rdbms.scostore.AbstractSetStore.iterator(AbstractSetStore.java:123)
+//			at org.jpox.store.rdbms.scostore.FKMapStore.clear(FKMapStore.java:991)
+//			at org.jpox.sco.HashMap.clear(HashMap.java:717)
+//			at org.jpox.sco.HashMap.setValueFrom(HashMap.java:232)
+//			at org.jpox.sco.SCOUtils.newSCOInstance(SCOUtils.java:100)
+//			at org.jpox.state.StateManagerImpl.newSCOInstance(StateManagerImpl.java:3339)
+//			at org.jpox.state.StateManagerImpl.replaceSCOField(StateManagerImpl.java:3356)
+//			at org.jpox.state.DetachFieldManager.internalFetchObjectField(DetachFieldManager.java:88)
+//			at org.jpox.state.AbstractFetchFieldManager.fetchObjectField(AbstractFetchFieldManager.java:108)
+//			at org.jpox.state.StateManagerImpl.replacingObjectField(StateManagerImpl.java:2951)
+//			at org.nightlabs.jfire.accounting.Price.jdoReplaceField(Price.java)
+//			at org.nightlabs.jfire.trade.ArticlePrice.jdoReplaceField(ArticlePrice.java)
+//			at org.nightlabs.jfire.accounting.Price.jdoReplaceFields(Price.java)
+//			at org.jpox.state.StateManagerImpl.replaceFields(StateManagerImpl.java:3170)
+//			at org.jpox.state.StateManagerImpl.replaceFields(StateManagerImpl.java:3188)
+//			at org.jpox.state.StateManagerImpl.detachCopy(StateManagerImpl.java:4193)
+//			at org.jpox.AbstractPersistenceManager.internalDetachCopy(AbstractPersistenceManager.java:1944)
+//			at org.jpox.AbstractPersistenceManager.detachCopyInternal(AbstractPersistenceManager.java:1974)
+//			at org.jpox.resource.PersistenceManagerImpl.detachCopyInternal(PersistenceManagerImpl.java:961)
+//			at org.jpox.state.DetachFieldManager.internalFetchObjectField(DetachFieldManager.java:144)
+//			at org.jpox.state.AbstractFetchFieldManager.fetchObjectField(AbstractFetchFieldManager.java:108)
+//			at org.jpox.state.StateManagerImpl.replacingObjectField(StateManagerImpl.java:2951)
+//			at org.nightlabs.jfire.trade.Article.jdoReplaceField(Article.java)
+//			at org.nightlabs.jfire.trade.Article.jdoReplaceFields(Article.java)
+//			at org.jpox.state.StateManagerImpl.replaceFields(StateManagerImpl.java:3170)
+//			at org.jpox.state.StateManagerImpl.replaceFields(StateManagerImpl.java:3188)
+//			at org.jpox.state.StateManagerImpl.detachCopy(StateManagerImpl.java:4193)
+//			at org.jpox.AbstractPersistenceManager.internalDetachCopy(AbstractPersistenceManager.java:1944)
+//			at org.jpox.AbstractPersistenceManager.detachCopyInternal(AbstractPersistenceManager.java:1974)
+//			at org.jpox.AbstractPersistenceManager.detachCopyAll(AbstractPersistenceManager.java:2043)
+//			at org.jpox.resource.PersistenceManagerImpl.detachCopyAll(PersistenceManagerImpl.java:1000)
+//			at org.nightlabs.jfire.simpletrade.SimpleTradeManagerBean.createArticles(SimpleTradeManagerBean.java:745)
 
 			if (JFireBaseEAR.JPOX_WORKAROUND_FLUSH_ENABLED) {
 				List<ArticleID> articleIDs = NLJDOHelper.getObjectIDList(articles);
@@ -977,7 +1037,7 @@ implements SessionBean
 		} finally {
 			pm.close();
 		}
-	}
+			}
 
 
 	/**
@@ -1018,7 +1078,7 @@ implements SessionBean
 					OrganisationLegalEntity.FETCH_GROUP_ORGANISATION,
 					LegalEntity.FETCH_GROUP_PERSON,
 					PropertySet.FETCH_GROUP_FULL_DATA // TODO we should somehow filter this so only public data is exported
-					});
+			});
 			pm.getFetchPlan().setMaxFetchDepth(NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
 			pm.getFetchPlan().setDetachmentOptions(FetchPlan.DETACH_LOAD_FIELDS);
 
@@ -1103,14 +1163,14 @@ implements SessionBean
 				notificationReceiver.replicateSimpleProductTypes(emitterOrganisationID, productTypeIDs, new HashSet<ProductTypeID>(0));
 
 //				if (productTypes.size() != 1)
-//					throw new IllegalStateException("productTypes.size() != 1");
-//
+//				throw new IllegalStateException("productTypes.size() != 1");
+
 //				// currently we only support subscribing root-producttypes
 //				for (SimpleProductType productType : productTypes) {
-//					if (productType.getExtendedProductType() != null)
-//						throw new UnsupportedOperationException("The given SimpleProductType is not a root node (not yet supported!): " + productTypeID);
+//				if (productType.getExtendedProductType() != null)
+//				throw new UnsupportedOperationException("The given SimpleProductType is not a root node (not yet supported!): " + productTypeID);
 //				}
-//
+
 //				productTypes = pm.makePersistentAll(productTypes);
 //				return productTypes.iterator().next();
 				rollback = false;
@@ -1127,18 +1187,18 @@ implements SessionBean
 	}
 
 //	/**
-//	 * @ejb.interface-method
-//	 * @ejb.permission role-name="_Guest_"
-//	 * @ejb.transaction type="Required"
-//	 */
+//	* @ejb.interface-method
+//	* @ejb.permission role-name="_Guest_"
+//	* @ejb.transaction type="Required"
+//	*/
 //	public SimpleProductType backend_subscribe(ProductTypeID productTypeID, String[] fetchGroups, int maxFetchDepth)
 //	{
-//		PersistenceManager pm = getPersistenceManager();
-//		try {
-//
-//		} finally {
-//			pm.close();
-//		}
+//	PersistenceManager pm = getPersistenceManager();
+//	try {
+
+//	} finally {
+//	pm.close();
+//	}
 //	}
 
 	private static Pattern tariffPKSplitPattern = null;
@@ -1153,7 +1213,7 @@ implements SessionBean
 	public Collection<TariffPricePair> getTariffPricePairs(
 			PriceConfigID priceConfigID, CustomerGroupID customerGroupID, CurrencyID currencyID,
 			String[] tariffFetchGroups, String[] priceFetchGroups)
-	{
+			{
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			if (tariffPKSplitPattern == null)
@@ -1173,8 +1233,8 @@ implements SessionBean
 				TariffID tariffID = TariffID.create(tariffPK);
 //				String[] tariffPKParts = tariffPKSplitPattern.split(tariffPK);
 //				if (tariffPKParts.length != 2)
-//					throw new IllegalStateException("How the hell can it happen that the tariffPK does not consist out of two parts?");
-//
+//				throw new IllegalStateException("How the hell can it happen that the tariffPK does not consist out of two parts?");
+
 //				String tariffOrganisationID = tariffPKParts[0];
 //				long tariffID = Long.parseLong(tariffPKParts[1], 16);
 
@@ -1196,7 +1256,7 @@ implements SessionBean
 		} finally {
 			pm.close();
 		}
-	}
+			}
 
 	/**
 	 * @ejb.interface-method
@@ -1263,26 +1323,26 @@ implements SessionBean
 
 	// Is never used as this is done generic by the ProductTypeDAO
 //	/**
-//	 * Searches with the given searchQuery for {@link SimpleProductType}s.
-//	 *
-//	 * @ejb.interface-method
-//	 * @ejb.permission role-name="_Guest_"
-//	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-//	 *
-//	 */
+//	* Searches with the given searchQuery for {@link SimpleProductType}s.
+//	*
+//	* @ejb.interface-method
+//	* @ejb.permission role-name="_Guest_"
+//	* @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+//	*
+//	*/
 //	public Collection<ProductTypeID> searchProductTypes(SimpleProductTypeQuery searchQuery)
 //	{
-//		PersistenceManager pm = getPersistenceManager();
-//		try {
-//			pm.getFetchPlan().clearGroups();
-//			searchQuery.setPersistenceManager(pm);
-//			Collection<SimpleProductType> productTypes = (Collection<SimpleProductType>) searchQuery.getResult();
-//			Collection<ProductTypeID> ids = new ArrayList<ProductTypeID>(productTypes.size());
-//			for (ProductType	productType : productTypes)
-//				ids.add(productType.getObjectId());
-//			return ids;
-//		} finally {
-//			pm.close();
-//		}
+//	PersistenceManager pm = getPersistenceManager();
+//	try {
+//	pm.getFetchPlan().clearGroups();
+//	searchQuery.setPersistenceManager(pm);
+//	Collection<SimpleProductType> productTypes = (Collection<SimpleProductType>) searchQuery.getResult();
+//	Collection<ProductTypeID> ids = new ArrayList<ProductTypeID>(productTypes.size());
+//	for (ProductType	productType : productTypes)
+//	ids.add(productType.getObjectId());
+//	return ids;
+//	} finally {
+//	pm.close();
+//	}
 //	}
 }

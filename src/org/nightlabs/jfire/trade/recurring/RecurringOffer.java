@@ -1,5 +1,6 @@
 package org.nightlabs.jfire.trade.recurring;
 
+import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.trade.Offer;
 import org.nightlabs.jfire.trade.Order;
@@ -39,12 +40,10 @@ public class RecurringOffer extends Offer {
 	@Deprecated
 	protected RecurringOffer() {}
 
-	public RecurringOffer(User user, Order order, String offerIDPrefix,
-			long offerID) {
-		super(user, order, offerIDPrefix, offerID);
+	public RecurringOffer(User user,Order order,String offerIDPrefix,long offerID) {
+		super(user,order,offerIDPrefix,offerID);
 		
-		this.recurringOfferConfiguration = new RecurringOfferConfiguration(this ,user,getOrganisationID(),
-				offerID);
+		this.recurringOfferConfiguration = new RecurringOfferConfiguration(this,user,getOrganisationID(),IDGenerator.nextID(RecurringOfferConfiguration.class));
 	}
 
 	public RecurringOfferConfiguration getRecurringOfferConfiguration() {

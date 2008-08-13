@@ -40,8 +40,7 @@ public class RecurringOfferConfiguration {
 	 */
 	private long recurringOfferConfigurationID;
 
-	public RecurringOfferConfiguration(RecurringOffer recurringOffer , User user,String organisationID,
-			long recurringOfferConfigurationID) {
+	public RecurringOfferConfiguration(RecurringOffer recurringOffer,User user,String organisationID,long recurringOfferConfigurationID) {
 		this.organisationID = organisationID;
 		this.recurringOffer = recurringOffer;
 		this.recurringOfferConfigurationID = recurringOfferConfigurationID;

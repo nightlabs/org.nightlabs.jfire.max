@@ -117,6 +117,8 @@ import org.nightlabs.jfire.trade.id.CustomerGroupID;
 import org.nightlabs.jfire.trade.id.OfferID;
 import org.nightlabs.jfire.trade.id.SegmentID;
 import org.nightlabs.jfire.trade.recurring.RecurringOffer;
+import org.nightlabs.jfire.trade.recurring.RecurringOrder;
+import org.nightlabs.jfire.trade.recurring.RecurringTrader;
 import org.nightlabs.util.CollectionUtil;
 
 /**
@@ -845,13 +847,33 @@ implements SessionBean
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			Trader trader = Trader.getTrader(pm);
+			RecurringTrader recurringTrader = RecurringTrader.getRecurringTrader(pm);
 			Segment segment = (Segment) pm.getObjectById(segmentID);
 
 			User user = User.getUser(pm, getPrincipal());
 			Tariff tariff = (Tariff) pm.getObjectById(tariffID);
+			Order order = segment.getOrder();
 
-			pm.getExtent(RecurringOffer.class);
-			RecurringOffer offer = (RecurringOffer) pm.getObjectById(offerID);
+
+			// find an Offer within the Order which is not finalized - or create one
+			Offer offer;
+			if (offerID == null) {
+				Collection<Offer> offers = Offer.getNonFinalizedNonEndedOffers(pm, order);
+				if (!offers.isEmpty()) {
+					offer = offers.iterator().next();
+				}
+				else {
+
+					if (order instanceof RecurringOrder)
+						offer = recurringTrader.createRecurredOffer(user, order, null); // TODO offerIDPrefix ???
+					else
+						offer = trader.createOffer(user, order, null); // TODO offerIDPrefix ???
+				}
+			}
+			else {
+				pm.getExtent(Offer.class);
+				offer = (Offer) pm.getObjectById(offerID);
+			}
 
 			Collection<? extends Article> articles = trader.createArticles(user,offer,segment,productTypes,new ArticleCreator(tariff));
 

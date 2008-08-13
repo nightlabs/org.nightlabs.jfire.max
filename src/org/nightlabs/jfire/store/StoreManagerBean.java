@@ -185,20 +185,6 @@ implements SessionBean
 	}
 
 	/**
-	 * TODO JPOX WORKAROUND
-	 * This is a workaround - see datastoreinit.xml
-	 *
-	 * @ejb.interface-method
-	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="_System_"
-	 */
-	public void initialise2()
-	throws IOException
-	{
-		initialise();
-	}
-
-	/**
 	 * @throws IOException While loading an icon from a local resource, this might happen and we don't care in the initialise method.
 	 *
 	 * @ejb.interface-method
@@ -1690,15 +1676,15 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * This method returns the delivery with the respective ID.
-	 * 
+	 *
 	 * @param deliveryID The ID of the delivery to be retrieved.
 	 * @param fetchGroups The fetch groups to be used.
 	 * @param maxFetchDepth The max fetch depth to be used.
 	 * @return A detached copy of the delivery with the respective ID.
-	 * 
+	 *
  	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Required"

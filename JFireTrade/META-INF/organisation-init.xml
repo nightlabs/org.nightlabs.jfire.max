@@ -33,47 +33,4 @@
 			bean="jfire/ejb/JFireTrade/TradeManager"
 			method="initialise" />
 	</init>
-	
-
-<!--
-TODO JPOX WORKAROUND
-The following is a workaround for a jpox bug: occasionally, we get:
-
-Caused by: javax.jdo.JDOException: Invalid state, closed or no mc
-        at org.jpox.resource.PersistenceManagerImpl.checkStatus(PersistenceManagerImpl.java:1276)
-        at org.jpox.resource.PersistenceManagerImpl.findStateManager(PersistenceManagerImpl.java:1199)
-        at org.jpox.store.expression.ObjectLiteral.getFieldValue(ObjectLiteral.java:494)
-        at org.jpox.store.expression.ObjectLiteral.getEqualityExpressionForObjectExpression(ObjectLiteral.java:215)
-        at org.jpox.store.expression.ObjectLiteral.eq(ObjectLiteral.java:115)
-        at org.jpox.store.expression.ObjectExpression.eq(ObjectExpression.java:286)
-        at org.jpox.store.rdbms.RDBMSStoreHelper.getClassNameForIdKeyUsingUnion(RDBMSStoreHelper.java:591)
-        at org.jpox.store.rdbms.RDBMSManager.getClassNameForObjectID(RDBMSManager.java:1313)
-        at org.jpox.AbstractPersistenceManager.getObjectById(AbstractPersistenceManager.java:2651)
-        at org.jpox.AbstractPersistenceManager.getObjectById(AbstractPersistenceManager.java:2600)
-        at org.jpox.resource.PersistenceManagerImpl.getObjectById(PersistenceManagerImpl.java:617)
-        at org.jpox.resource.PersistenceManagerImpl.getObjectById(PersistenceManagerImpl.java:605)
-
-Therefore, we simply try it twice.
-
-This bug has been fixed a long time ago. All these inits are unnecessary now, except for TradeManager.initialise2() which
-is for a new problem: http://www.jpox.org/servlet/jira/browse/NUCCORE-93
--->
-	<init bean="jfire/ejb/JFireTrade/AccountingManager" method="initialise2">
-		<depends module="JFireTrade.ear"
-			archive="JFireTrade.jar"
-			bean="jfire/ejb/JFireTrade/AccountingManager"
-			method="initialise" />
-	</init>
-	<init bean="jfire/ejb/JFireTrade/StoreManager" method="initialise2">
-		<depends module="JFireTrade.ear"
-			archive="JFireTrade.jar"
-			bean="jfire/ejb/JFireTrade/StoreManager"
-			method="initialise" />
-	</init>
-	<init bean="jfire/ejb/JFireTrade/TradeManager" method="initialise2" priority="900">
-		<depends module="JFireTrade.ear"
-			archive="JFireTrade.jar"
-			bean="jfire/ejb/JFireTrade/TradeManager"
-			method="initialise" />
-	</init>
 </organisation-initialisation>

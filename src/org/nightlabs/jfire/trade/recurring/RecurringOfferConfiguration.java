@@ -45,15 +45,15 @@ public class RecurringOfferConfiguration {
 		this.recurringOffer = recurringOffer;
 		this.recurringOfferConfigurationID = recurringOfferConfigurationID;
 		String _taskID =  ObjectIDUtil.longObjectIDFieldToString(recurringOfferConfigurationID);
-		this.taskID = TaskID.create(organisationID,TASK_TYPE_ID_RECURRED_OFFER_CREATOR_TASK, _taskID);
+		TaskID taskID = TaskID.create(organisationID,TASK_TYPE_ID_RECURRED_OFFER_CREATOR_TASK, _taskID);
 		this.creatorTask = new Task(
-				this.taskID,
+				taskID,
 				user,
 				"",
-		"");	
+		"");
 
 		creatorTask.setParam(JDOHelper.getObjectId(recurringOffer));
-			
+
 	}
 
 	/**
@@ -69,8 +69,8 @@ public class RecurringOfferConfiguration {
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
-	 */	
-	private RecurringOffer recurringOffer; 
+	 */
+	private RecurringOffer recurringOffer;
 
 
 	/**
@@ -83,12 +83,32 @@ public class RecurringOfferConfiguration {
 	 */
 	private Task creatorTask;
 
-	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 */
-	private TaskID taskID;
-	
-	
+// Hello Fitas,
+//
+// an object-id cannot be persisted! And besides that: A JDO object that has already been persisted knows its object-ID and can be
+// asked for it by JDOHelper.getObjectId(jdoObject). Note, that it knows its object-id even after having been detached - this method
+// only returns null, if the jdo-object has never touched a PersistenceManager, yet.
+//
+// If you really want to hold the ID, you should name the field appropriately, so that it is visible that it's the ID
+// of the "creatorTask" - "creatorTaskID" would thus be better than "taskID". And you have to persist it as String (and recreate an
+// instance of the real object-id by either 'new TaskID(theString)' or - if you don't know the class - by ObjectIDUtil.createObjectID(...).
+//
+// If you need the creatorTaskID just in the client when detached (in order to reduce traffic and not detach the whole creatorTask), this
+// creatorTaskID field must not be persistent - i.e. tagged with persistence-modifier="none". In this case, you'll need a DetachCallback
+// and manually handle the field during detachment.
+//
+// If you have questions, please contact Bieber or me in IRC.
+//
+// Best regards, Marco :-)
+//
+// P.S.: I saw that getTaskID (which I renamed to getCreatorTaskID) is never called by any other code. What do you need it for, then?
+//
+//	/**
+//	 * @jdo.field persistence-modifier="persistent"
+//	 */
+//	private TaskID taskID;
+
+
 	public boolean isCreateInvoice() {
 		return createInvoice;
 	}
@@ -113,7 +133,11 @@ public class RecurringOfferConfiguration {
 		return recurringOffer;
 	}
 
-	public TaskID getTaskID() {
+	public TaskID getCreatorTaskID() {
+		TaskID taskID = (TaskID) JDOHelper.getObjectId(creatorTask);
+		if (taskID == null && creatorTask != null)
+			throw new IllegalStateException("creatorTask has not yet been persisted!"); // if you really come into this situation, either create the TaskID manually by TaskID.create(...) or persist first (and maybe detach) before accessing this method.
+
 		return taskID;
 	}
 }

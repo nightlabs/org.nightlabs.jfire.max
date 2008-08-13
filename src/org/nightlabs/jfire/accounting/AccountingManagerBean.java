@@ -133,7 +133,7 @@ import org.nightlabs.jfire.transfer.id.TransferID;
 
 /**
  * @author Alexander Bieber - alex[AT]nightlabs[DOT]de
- * 
+ *
  * @ejb.bean name="jfire/ejb/JFireTrade/AccountingManager"
  *           jndi-name="jfire/ejb/JFireTrade/AccountingManager"
  *           type="Stateless"
@@ -170,14 +170,14 @@ public abstract class AccountingManagerBean
 	}
 	/**
 	 * @see javax.ejb.SessionBean#ejbRemove()
-	 * 
+	 *
 	 * @ejb.permission unchecked="true"
 	 */
 	public void ejbRemove() throws EJBException, RemoteException
 	{
 		logger.debug(this.getClass().getName() + ".ejbRemove()");
 	}
-	
+
 	/**
 	 * @see javax.ejb.SessionBean#ejbActivate()
 	 */
@@ -193,19 +193,6 @@ public abstract class AccountingManagerBean
 		logger.debug(this.getClass().getName() + ".ejbPassivate()");
 	}
 
-	/**
-	 * TODO JPOX WORKAROUND
-	 * This is a workaround - see datastoreinit.xml
-	 *
-	 * @ejb.interface-method
-	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="_System_"
-	 */
-	public void initialise2()
-	throws IOException
-	{
-		initialise();
-	}
 	/**
 	 * @throws IOException While loading an icon from a local resource, this might happen and we don't care in the initialise method.
 	 *
@@ -719,7 +706,7 @@ public abstract class AccountingManagerBean
 		} finally {
 			pm.close();
 		}
-			
+
 	}
 	/**
 	 * @ejb.interface-method
@@ -733,13 +720,13 @@ public abstract class AccountingManagerBean
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
-			
+
 			searchFilter.setPersistenceManager(pm);
 			Collection<Account> accounts = (Collection<Account>) searchFilter.getResult();
 
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
-			
+
 //			Collection result = pm.detachCopyAll(accounts);
 			return NLJDOHelper.getDetachedQueryResultAsSet(pm, accounts);
 		} finally {
@@ -812,7 +799,7 @@ public abstract class AccountingManagerBean
 //			pm.close();
 //		}
 //	}
-	
+
 	/**
 	 * @throws ModuleException
 	 *
@@ -913,10 +900,10 @@ public abstract class AccountingManagerBean
 	 * TODO is this method still used? What about inheritance? It should be possible to control the inheritance-meta-data via this method, too.
 	 * Assign the LocalAccountantDelegate defined by the given localAccountantDelegateID
 	 * to the ProductType defined by the given productTypeID.
-	 * 
+	 *
 	 * @param productTypeID The ProductTypeID of the ProductType to which the delegate should be assigned.
 	 * @param localAccountantDelegateID The LocalAccountantDelegateID of the LocalAccountantDelegate to assign.
-	 * 
+	 *
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
@@ -941,9 +928,9 @@ public abstract class AccountingManagerBean
 	/**
 	 * Returns a Collection of {@link LocalAccountantDelegateID} not detached
 	 * delegates.
-	 * 
+	 *
 	 * @param delegateClass The class/type of delegates that should be returned.
-	 * 
+	 *
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
@@ -964,13 +951,13 @@ public abstract class AccountingManagerBean
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * Returns a Clloection of {@link LocalAccountantDelegateID} not detached
 	 * delegates which have the given delegate as extendedLocalAccountantDelegate
 	 *
 	 * @param delegateID The LocalAccountantDelegateID children should be searched for.
-	 * 
+	 *
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
@@ -995,15 +982,15 @@ public abstract class AccountingManagerBean
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * Returns detached instances of the LocalAccountantDelegates referenced by
 	 * the given LocalAccountantDelegateIDs in the delegateIDs parameter.
-	 * 
+	 *
 	 * @param delegateIDs The LocalAccountantDelegateID of the delegates to return.
 	 * @param fetchGroups The fetchGroups to detach the delegates with.
 	 * @throws ModuleException
-	 * 
+	 *
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
@@ -1016,7 +1003,7 @@ public abstract class AccountingManagerBean
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
-			
+
 			Collection<LocalAccountantDelegate> result = new LinkedList<LocalAccountantDelegate>();
 			for (Iterator iter = delegateIDs.iterator(); iter.hasNext();) {
 				LocalAccountantDelegateID delegateID = null;
@@ -1033,15 +1020,15 @@ public abstract class AccountingManagerBean
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * Returns the detached LocalAccountantDelegates referenced by
 	 * the given LocalAccountantDelegateID.
-	 * 
+	 *
 	 * @param delegateID The LocalAccountantDelegateID of the delegate to return.
 	 * @param fetchGroups The fetchGroups to detach the delegates with.
 	 * @throws ModuleException
-	 * 
+	 *
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
@@ -1054,23 +1041,23 @@ public abstract class AccountingManagerBean
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
-			
+
 			LocalAccountantDelegate delegate = (LocalAccountantDelegate)pm.getObjectById(delegateID);
 			return pm.detachCopy(delegate);
 		} finally {
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * Stores the given LocalAccountantDelegate and returns a newly detached
 	 * version of it if desired.
-	 * 
+	 *
 	 * @param delegate The LocalAccountantDelegate to store.
 	 * @param get Whether or not to return the a newly detached version of the stored delegate.
 	 * @param fetchGroups The fetchGroups to detach the stored delegate with.
 	 * @throws ModuleException
-	 * 
+	 *
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
@@ -1089,7 +1076,7 @@ public abstract class AccountingManagerBean
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
@@ -1107,7 +1094,7 @@ public abstract class AccountingManagerBean
 			pm.close();
 		}
 	}
-	
+
 	protected Map<ResolvedMapKey, ResolvedMapEntry> getResolvedMoneyFlowMappings(
 			PersistenceManager pm,
 			LocalAccountantDelegateID localAccountantDelegateID,
@@ -1119,7 +1106,7 @@ public abstract class AccountingManagerBean
 		if (mappingFetchGroups != null)
 			pm.getFetchPlan().setGroups(mappingFetchGroups);
 		pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
-		
+
 		ProductType productType = (ProductType) pm.getObjectById(productTypeID);
 		LocalAccountantDelegate delegate = (LocalAccountantDelegate) pm.getObjectById(localAccountantDelegateID);
 		if (!(delegate instanceof MappingBasedAccountantDelegate))
@@ -1129,7 +1116,7 @@ public abstract class AccountingManagerBean
 		for (Entry<ResolvedMapKey, ResolvedMapEntry> entry : resolvedMappings.entrySet()) {
 			ResolvedMapEntry persitentMapEntry = entry.getValue();
 			ResolvedMapEntry mapEntry = new ResolvedMapEntry();
-			
+
 			for (Iterator iterator = persitentMapEntry.getResolvedMappings().entrySet().iterator(); iterator.hasNext();) {
 				Map.Entry resolvedEntry = (Map.Entry) iterator.next();
 				MoneyFlowMapping persistentMapping = (MoneyFlowMapping)resolvedEntry.getValue();
@@ -1139,9 +1126,9 @@ public abstract class AccountingManagerBean
 			result.put(entry.getKey(), mapEntry);
 		}
 		return result;
-		
+
 	}
-	
+
 	/**
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
@@ -1163,7 +1150,7 @@ public abstract class AccountingManagerBean
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
@@ -1181,7 +1168,7 @@ public abstract class AccountingManagerBean
 			pm.close();
 		}
 	}
-	
+
 
 //	/**
 //	 * @throws ModuleException
@@ -1209,7 +1196,7 @@ public abstract class AccountingManagerBean
 	/**
 	 * @param priceFragmentTypeIDs Can be <code>null</code> in order to return ALL {@link PriceFragmentType}s or a collection of {@link PriceFragmentTypeID}s to return only a subset.
 	 * @throws ModuleException
-	 * 
+	 *
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
@@ -1239,10 +1226,10 @@ public abstract class AccountingManagerBean
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * Returns a Collection of PriceFragmentTypeID of all known PriceFragementTypes
-	 * 
+	 *
 	 * @throws ModuleException
 	 *
 	 * @ejb.interface-method
@@ -1266,7 +1253,7 @@ public abstract class AccountingManagerBean
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * @throws ModuleException
 	 *
@@ -1353,7 +1340,7 @@ public abstract class AccountingManagerBean
 	 * Creates an Invoice for all Articles of the Offer identified by
 	 * the given offerID. If get is true, a detached version of the
 	 * new Invoice will be returned.
-	 * 
+	 *
 	 * @param offerID OfferID of the offer to be billed.
 	 * @param get Whether a detached version of the created Invoice should be returned, otherwise null will be returned.
 	 * @param fetchGroups Array ouf fetch-groups the invoice should be detached with.
@@ -1692,7 +1679,7 @@ public abstract class AccountingManagerBean
 	{
 		return _payBegin(paymentData);
 	}
-	
+
 	/**
 	 * @ejb.interface-method view-type="local"
 	 * @ejb.transaction type="RequiresNew"
@@ -1765,8 +1752,8 @@ public abstract class AccountingManagerBean
 			}
 		}
 	}
-	
-	
+
+
 	/**
 	 * @param paymentIDs Instances of {@link PaymentID}
 	 * @param payDoWorkClientResults Instances of {@link PaymentResult} corresponding
@@ -1898,8 +1885,8 @@ public abstract class AccountingManagerBean
 			}
 		}
 	}
-	
-	
+
+
 	/**
 	 * @param paymentIDs Instances of {@link PaymentID}
 	 * @param payEndClientResults Instances of {@link PaymentResult} corresponding
@@ -2139,8 +2126,8 @@ public abstract class AccountingManagerBean
 //			pm.close();
 //		}
 //	}
-	
-	
+
+
 //	/**
 //	 * Returns a Map with key productTypePK and value PFMoneyFlowConfigurator
 //	 * holding all declared global Mappings for each element of the
@@ -2184,7 +2171,7 @@ public abstract class AccountingManagerBean
 //			pm.close();
 //		}
 //	}
-	
+
 
 //	/**
 //	 * Store the MoneyFlowMappings managed by the given Configurator.
@@ -2229,7 +2216,7 @@ public abstract class AccountingManagerBean
 //			pm.close();
 //		}
 //	}
-	
+
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
@@ -2264,13 +2251,13 @@ public abstract class AccountingManagerBean
 	{
 		if (invoiceQueries == null)
 			return null;
-		
+
 		if (! Invoice.class.isAssignableFrom(invoiceQueries.getResultClass()))
 		{
 			throw new RuntimeException("Given QueryCollection has invalid return type! " +
 					"Invalid return type= "+ invoiceQueries.getResultClassName());
 		}
-		
+
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(1);
@@ -2280,13 +2267,13 @@ public abstract class AccountingManagerBean
 			{
 				invoiceQueries = new JDOQueryCollectionDecorator<AbstractJDOQuery>(invoiceQueries);
 			}
-			
+
 			JDOQueryCollectionDecorator<AbstractJDOQuery> queryCollection =
 				(JDOQueryCollectionDecorator<AbstractJDOQuery>) invoiceQueries;
 
 			queryCollection.setPersistenceManager(pm);
 			Collection<Invoice> invoices = (Collection<Invoice>) queryCollection.executeQueries();
-			
+
 			return NLJDOHelper.getObjectIDSet(invoices);
 		} finally {
 			pm.close();
@@ -2361,7 +2348,7 @@ public abstract class AccountingManagerBean
 //			pm.close();
 //		}
 //	}
-	
+
 	/**
 	 * This method queries all <code>Invoice</code>s which exist between the given vendor and customer and
 	 * are not yet finalized. They are ordered by invoiceID descending (means newest first).
@@ -2419,7 +2406,7 @@ public abstract class AccountingManagerBean
 //			pm.close();
 //		}
 //	}
-	
+
 	/**
 	 * @param customerGroupIDs A <tt>Collection</tt> of {@link CustomerGroupID}. If <tt>null</tt>, all {@link ModeOfPaymentFlavour}s will be returned.
 	 * @param mergeMode one of {@link ModeOfPaymentFlavour#MERGE_MODE_INTERSECTION} or {@link ModeOfPaymentFlavour#MERGE_MODE_UNION}
@@ -2446,7 +2433,7 @@ public abstract class AccountingManagerBean
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 *
 	 * @ejb.interface-method
@@ -2461,7 +2448,7 @@ public abstract class AccountingManagerBean
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * @param fetchGroups Either <tt>null</tt> or all desired fetch groups.
 	 *
@@ -2478,7 +2465,7 @@ public abstract class AccountingManagerBean
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 *
 	 * @ejb.interface-method
@@ -2493,7 +2480,7 @@ public abstract class AccountingManagerBean
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * @param fetchGroups Either <tt>null</tt> or all desired fetch groups.
 	 *
@@ -2639,13 +2626,13 @@ public abstract class AccountingManagerBean
 	{
 		if (queries == null)
 			return null;
-		
+
 		if (! Account.class.isAssignableFrom(queries.getResultClass()))
 		{
 			throw new RuntimeException("Given QueryCollection has invalid return type! " +
 					"Invalid return type= "+ queries.getResultClassName());
 		}
-		
+
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(1);
@@ -2657,16 +2644,16 @@ public abstract class AccountingManagerBean
 			}
 			JDOQueryCollectionDecorator<AbstractJDOQuery> decoratedQueries =
 				(JDOQueryCollectionDecorator<AbstractJDOQuery>) queries;
-			
+
 			decoratedQueries.setPersistenceManager(pm);
 			Collection<Account> accounts = (Collection<Account>) decoratedQueries.executeQueries();
-			
+
 			return NLJDOHelper.getObjectIDSet(accounts);
 		} finally {
 			pm.close();
 		}
 	}
-		
+
 //	/**
 //	 * assign a new {@link LocalAccountantDelegate} to a {@link ProductType}
 //	 *
@@ -2846,7 +2833,7 @@ public abstract class AccountingManagerBean
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"

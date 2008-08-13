@@ -45,15 +45,15 @@ public class RecurringOfferConfiguration {
 		this.recurringOffer = recurringOffer;
 		this.recurringOfferConfigurationID = recurringOfferConfigurationID;
 		String _taskID =  ObjectIDUtil.longObjectIDFieldToString(recurringOfferConfigurationID);
-		TaskID taskID = TaskID.create(organisationID,TASK_TYPE_ID_RECURRED_OFFER_CREATOR_TASK, _taskID);
+		this.taskID = TaskID.create(organisationID,TASK_TYPE_ID_RECURRED_OFFER_CREATOR_TASK, _taskID);
 		this.creatorTask = new Task(
-				taskID,
+				this.taskID,
 				user,
 				"",
 		"");	
 
 		creatorTask.setParam(JDOHelper.getObjectId(recurringOffer));
-				
+			
 	}
 
 	/**
@@ -83,6 +83,12 @@ public class RecurringOfferConfiguration {
 	 */
 	private Task creatorTask;
 
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private TaskID taskID;
+	
+	
 	public boolean isCreateInvoice() {
 		return createInvoice;
 	}
@@ -105,5 +111,9 @@ public class RecurringOfferConfiguration {
 
 	public RecurringOffer getRecurringOffer() {
 		return recurringOffer;
+	}
+
+	public TaskID getTaskID() {
+		return taskID;
 	}
 }

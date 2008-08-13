@@ -92,6 +92,8 @@ import org.nightlabs.jfire.trade.Trader;
 import org.nightlabs.jfire.trade.id.ArticleID;
 import org.nightlabs.jfire.trade.id.OfferID;
 import org.nightlabs.jfire.trade.id.SegmentID;
+import org.nightlabs.jfire.trade.recurring.RecurringOrder;
+import org.nightlabs.jfire.trade.recurring.RecurringTrader;
 import org.nightlabs.jfire.voucher.accounting.ModeOfPaymentConst;
 import org.nightlabs.jfire.voucher.accounting.VoucherLocalAccountantDelegate;
 import org.nightlabs.jfire.voucher.accounting.VoucherPriceConfig;
@@ -513,6 +515,47 @@ implements SessionBean
 		}
 	}
 
+	/**
+	 * @return <tt>Collection</tt> of {@link org.nightlabs.jfire.trade.Article}
+	 * @throws org.nightlabs.jfire.store.NotAvailableException
+	 *           in case there are not enough <tt>Voucher</tt>s available and
+	 *           the <tt>Product</tt>s cannot be created (because of a limit).
+	 */	
+	protected Collection<? extends Article> createArticles(PersistenceManager pm,
+			SegmentID segmentID, OfferID offerID, Collection<ProductType> productTypes) throws ModuleException {
+		Trader trader = Trader.getTrader(pm);
+		RecurringTrader recurringTrader = RecurringTrader.getRecurringTrader(pm);
+		Segment segment = (Segment) pm.getObjectById(segmentID);
+		Order order = segment.getOrder();
+
+		User user = User.getUser(pm, getPrincipal());
+
+		// find an Offer within the Order which is not finalized - or create one
+		Offer offer;
+		if (offerID == null) {
+			Collection<Offer> offers = Offer.getNonFinalizedNonEndedOffers(pm, order);
+			if (!offers.isEmpty()) {
+				offer = offers.iterator().next();
+			}
+			else {
+
+				if (order instanceof RecurringOrder)
+					offer = recurringTrader.createRecurredOffer(user, order, null); // TODO offerIDPrefix ???
+				else
+					offer = trader.createOffer(user, order, null); // TODO offerIDPrefix ???
+			}
+		}
+		else {
+			pm.getExtent(Offer.class);
+			offer = (Offer) pm.getObjectById(offerID);
+		}
+
+		Collection<? extends Article> articles = trader.createArticles(user,offer,segment,productTypes,new ArticleCreator(null));
+	
+		return articles;
+	}
+	
+	
 	/**
 	 * @return <tt>Collection</tt> of {@link org.nightlabs.jfire.trade.Article}
 	 * @throws org.nightlabs.jfire.store.NotAvailableException

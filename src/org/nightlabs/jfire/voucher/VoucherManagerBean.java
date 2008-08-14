@@ -536,17 +536,12 @@ implements SessionBean
 	}
 
 	/**
-	 * @return <tt>Collection</tt> of {@link org.nightlabs.jfire.trade.Article}
-	 * @throws org.nightlabs.jfire.store.NotAvailableException
-	 * in case there are not enough <tt>Voucher</tt>s available and
-	 * the <tt>Product</tt>s cannot be created (because of a limit).
-	 * 
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Required"
-	 *
-	 */	
-	protected Collection<? extends Article> createArticles(SegmentID segmentID, OfferID offerID, Collection<ProductType> productTypes,String[] fetchGroups, int maxFetchDepth) throws ModuleException {
+	 */
+	public Collection<? extends Article> createArticles(SegmentID segmentID, OfferID offerID, Collection<ProductType> productTypes,String[] fetchGroups, int maxFetchDepth) 
+	throws ModuleException {
 
 		PersistenceManager pm = getPersistenceManager();
 

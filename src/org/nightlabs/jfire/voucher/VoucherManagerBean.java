@@ -112,6 +112,7 @@ import org.nightlabs.jfire.voucher.store.VoucherType;
 import org.nightlabs.jfire.voucher.store.VoucherTypeActionHandler;
 import org.nightlabs.jfire.voucher.store.deliver.ServerDeliveryProcessorClientSideVoucherPrint;
 import org.nightlabs.jfire.voucher.store.id.VoucherKeyID;
+import org.nightlabs.util.CollectionUtil;
 
 /**
  * @ejb.bean name="jfire/ejb/JFireVoucher/VoucherManager"
@@ -130,7 +131,7 @@ implements SessionBean
 
 	@Override
 	public void setSessionContext(SessionContext sessionContext)
-			throws EJBException, RemoteException {
+	throws EJBException, RemoteException {
 		super.setSessionContext(sessionContext);
 	}
 
@@ -167,7 +168,7 @@ implements SessionBean
 			// init scripts
 			new ScriptingInitialiser(jsm, pm,
 					Organisation.DEV_ORGANISATION_ID).initialise(); // this is a
-																														// throw-away-instance
+			// throw-away-instance
 
 			DeliveryConfiguration deliveryConfiguration = checkDeliveryConfiguration(pm);
 			// check each time for ticketPrinter module, to register corresponding
@@ -175,7 +176,7 @@ implements SessionBean
 			checkModeOfDeliveryFlavourTicketPrinter(pm);
 
 			ModuleMetaData moduleMetaData = ModuleMetaData.getModuleMetaData(pm,
-					"JFireVoucher");
+			"JFireVoucher");
 			if (moduleMetaData != null)
 				return;
 
@@ -186,7 +187,7 @@ implements SessionBean
 
 			// version is {major}.{minor}.{release}-{patchlevel}-{suffix}
 			moduleMetaData = new ModuleMetaData("JFireVoucher", "0.9.5-0-beta", // TODO use constant for "JFireVoucher" like in other EARs
-					"0.9.5-0-beta");
+			"0.9.5-0-beta");
 			moduleMetaData = pm.makePersistent(moduleMetaData);
 
 			User user = User.getUser(pm, getPrincipal());
@@ -200,7 +201,7 @@ implements SessionBean
 			// create the ProductTypeActionHandler for VoucherTypes
 			VoucherTypeActionHandler voucherTypeActionHandler = new VoucherTypeActionHandler(
 					Organisation.DEV_ORGANISATION_ID, VoucherTypeActionHandler.class
-							.getName(), VoucherType.class);
+					.getName(), VoucherType.class);
 			pm.makePersistent(voucherTypeActionHandler);
 
 			VoucherDeliveryNoteActionHandler voucherDeliveryNoteActionHandler = new VoucherDeliveryNoteActionHandler(
@@ -216,8 +217,8 @@ implements SessionBean
 				VoucherType vt = (VoucherType) pm.getObjectById(ProductTypeID.create(
 						getOrganisationID(), VoucherType.class.getName()));
 				vt.getDeliveryConfiguration(); // JPOX bug (sometimes it recognises
-																				// only that the object isn't there when
-																				// accessing a field)
+				// only that the object isn't there when
+				// accessing a field)
 			} catch (JDOObjectNotFoundException x) {
 				VoucherType rootVoucherType = new VoucherType(getOrganisationID(),
 						VoucherType.class.getName(), null,
@@ -232,30 +233,30 @@ implements SessionBean
 
 			LegalEntity anonymousCustomer = LegalEntity.getAnonymousLegalEntity(pm);
 			CustomerGroup anonymousCustomerGroup = anonymousCustomer
-					.getDefaultCustomerGroup();
+			.getDefaultCustomerGroup();
 
 			ModeOfPayment modeOfPayment = new ModeOfPayment(
 					ModeOfPaymentConst.MODE_OF_PAYMENT_ID_VOUCHER);
 			modeOfPayment.getName().setText(Locale.ENGLISH.getLanguage(), "Voucher");
 			modeOfPayment.getName().setText(Locale.GERMAN.getLanguage(), "Gutschein");
 			ModeOfPaymentFlavour modeOfPaymentFlavour = modeOfPayment
-					.createFlavour(ModeOfPaymentConst.MODE_OF_PAYMENT_FLAVOUR_ID_VOUCHER);
+			.createFlavour(ModeOfPaymentConst.MODE_OF_PAYMENT_FLAVOUR_ID_VOUCHER);
 			modeOfPaymentFlavour.getName().setText(Locale.ENGLISH.getLanguage(),
-					"Voucher");
+			"Voucher");
 			modeOfPaymentFlavour.getName().setText(Locale.GERMAN.getLanguage(),
-					"Gutschein");
+			"Gutschein");
 			modeOfPaymentFlavour
-					.loadIconFromResource(ModeOfPaymentConst.class, "resource/"
-							+ ModeOfPaymentConst.class.getSimpleName() + '-'
-							+ ModeOfPaymentFlavour.class.getSimpleName() + '-'
-							+ modeOfPaymentFlavour.getModeOfPaymentFlavourID() + ".16x16.png");
+			.loadIconFromResource(ModeOfPaymentConst.class, "resource/"
+					+ ModeOfPaymentConst.class.getSimpleName() + '-'
+					+ ModeOfPaymentFlavour.class.getSimpleName() + '-'
+					+ modeOfPaymentFlavour.getModeOfPaymentFlavourID() + ".16x16.png");
 			pm.makePersistent(modeOfPayment);
 			trader.getDefaultCustomerGroupForKnownCustomer().addModeOfPayment(
 					modeOfPayment);
 			anonymousCustomerGroup.addModeOfPayment(modeOfPayment);
 
 			ServerPaymentProcessorVoucher serverPaymentProcessorVoucher = ServerPaymentProcessorVoucher
-					.getServerPaymentProcessorVoucher(pm);
+			.getServerPaymentProcessorVoucher(pm);
 			serverPaymentProcessorVoucher.getName().setText(
 					Locale.ENGLISH.getLanguage(), "Voucher");
 			serverPaymentProcessorVoucher.getName().setText(
@@ -290,8 +291,8 @@ implements SessionBean
 			// Tobias: I don't think it is necessary to "pollute" the server log with the exception
 
 //			logger.info("Class "+ticketPrinterClassName+" could not be resolved, means TicketPrinter Module " +
-//					"is not deployed, will skip registering of ModeOfDeliveryFlavour " +
-//					JFireVoucherEAR.MODE_OF_DELIVERY_FLAVOUR_ID_VOUCHER_PRINT_VIA_TICKET_PRINTER, e2);
+//			"is not deployed, will skip registering of ModeOfDeliveryFlavour " +
+//			JFireVoucherEAR.MODE_OF_DELIVERY_FLAVOUR_ID_VOUCHER_PRINT_VIA_TICKET_PRINTER, e2);
 			logger.info("Class "+ticketPrinterClassName+" could not be resolved, means TicketPrinter Module " +
 					"is not deployed, will skip registering of ModeOfDeliveryFlavour " +
 					JFireVoucherEAR.MODE_OF_DELIVERY_FLAVOUR_ID_VOUCHER_PRINT_VIA_TICKET_PRINTER);
@@ -329,48 +330,48 @@ implements SessionBean
 		}
 		catch (JDOObjectNotFoundException jdoonfe)
 		{
-				// create a default DeliveryConfiguration with all default ModeOfDeliverys
-				deliveryConfiguration = new DeliveryConfiguration(
-						getOrganisationID(), "JFireVoucher.default");
-				deliveryConfiguration.getName().setText(Locale.ENGLISH.getLanguage(),
-						"Default Delivery Configuration for Vouchers");
-				deliveryConfiguration.getName().setText(Locale.GERMAN.getLanguage(),
-						"Standard-Liefer-Konfiguration für Gutscheine");
-				pm.getExtent(ModeOfDelivery.class);
+			// create a default DeliveryConfiguration with all default ModeOfDeliverys
+			deliveryConfiguration = new DeliveryConfiguration(
+					getOrganisationID(), "JFireVoucher.default");
+			deliveryConfiguration.getName().setText(Locale.ENGLISH.getLanguage(),
+			"Default Delivery Configuration for Vouchers");
+			deliveryConfiguration.getName().setText(Locale.GERMAN.getLanguage(),
+			"Standard-Liefer-Konfiguration für Gutscheine");
+			pm.getExtent(ModeOfDelivery.class);
 
-				try {
-					ModeOfDelivery modeOfDelivery;
-					ModeOfDeliveryFlavour modeOfDeliveryFlavour;
+			try {
+				ModeOfDelivery modeOfDelivery;
+				ModeOfDeliveryFlavour modeOfDeliveryFlavour;
 
-					modeOfDelivery = (ModeOfDelivery) pm.getObjectById(ModeOfDeliveryConst.MODE_OF_DELIVERY_ID_MANUAL);
-					deliveryConfiguration.addModeOfDelivery(modeOfDelivery);
+				modeOfDelivery = (ModeOfDelivery) pm.getObjectById(ModeOfDeliveryConst.MODE_OF_DELIVERY_ID_MANUAL);
+				deliveryConfiguration.addModeOfDelivery(modeOfDelivery);
 
-					modeOfDelivery = getModeOfDeliveryVoucherPrint(pm);
+				modeOfDelivery = getModeOfDeliveryVoucherPrint(pm);
 
-					for (Iterator<CustomerGroup> it = pm.getExtent(CustomerGroup.class).iterator(); it.hasNext(); ) {
-						CustomerGroup customerGroup = it.next();
-						customerGroup.addModeOfDelivery(modeOfDelivery);
-					}
-
-					modeOfDeliveryFlavour = modeOfDelivery.createFlavour(JFireVoucherEAR.MODE_OF_DELIVERY_FLAVOUR_ID_VOUCHER_PRINT_VIA_OPERATING_SYSTEM_PRINTER);
-					modeOfDeliveryFlavour.getName().setText(Locale.ENGLISH.getLanguage(), "Print To Operating System Printer");
-					modeOfDeliveryFlavour.getName().setText(Locale.GERMAN.getLanguage(), "Druck via Betriebssystem-Drucker");
-
-					deliveryConfiguration.addModeOfDelivery(modeOfDelivery);
-
-					ServerDeliveryProcessorClientSideVoucherPrint.getServerDeliveryProcessorClientSideVoucherPrint(pm).addModeOfDelivery(modeOfDelivery);
-
-
-					modeOfDelivery = (ModeOfDelivery) pm.getObjectById(ModeOfDeliveryConst.MODE_OF_DELIVERY_ID_DELIVER_TO_DELIVERY_QUEUE);
-					deliveryConfiguration.addModeOfDelivery(modeOfDelivery);
-
-					pm.makePersistent(deliveryConfiguration);
-				} catch (JDOObjectNotFoundException x) {
-					logger
-							.warn(
-									"Could not populate default DeliveryConfiguration for JFireVoucher with ModeOfDelivery s!",
-									x);
+				for (Iterator<CustomerGroup> it = pm.getExtent(CustomerGroup.class).iterator(); it.hasNext(); ) {
+					CustomerGroup customerGroup = it.next();
+					customerGroup.addModeOfDelivery(modeOfDelivery);
 				}
+
+				modeOfDeliveryFlavour = modeOfDelivery.createFlavour(JFireVoucherEAR.MODE_OF_DELIVERY_FLAVOUR_ID_VOUCHER_PRINT_VIA_OPERATING_SYSTEM_PRINTER);
+				modeOfDeliveryFlavour.getName().setText(Locale.ENGLISH.getLanguage(), "Print To Operating System Printer");
+				modeOfDeliveryFlavour.getName().setText(Locale.GERMAN.getLanguage(), "Druck via Betriebssystem-Drucker");
+
+				deliveryConfiguration.addModeOfDelivery(modeOfDelivery);
+
+				ServerDeliveryProcessorClientSideVoucherPrint.getServerDeliveryProcessorClientSideVoucherPrint(pm).addModeOfDelivery(modeOfDelivery);
+
+
+				modeOfDelivery = (ModeOfDelivery) pm.getObjectById(ModeOfDeliveryConst.MODE_OF_DELIVERY_ID_DELIVER_TO_DELIVERY_QUEUE);
+				deliveryConfiguration.addModeOfDelivery(modeOfDelivery);
+
+				pm.makePersistent(deliveryConfiguration);
+			} catch (JDOObjectNotFoundException x) {
+				logger
+				.warn(
+						"Could not populate default DeliveryConfiguration for JFireVoucher with ModeOfDelivery s!",
+						x);
+			}
 		}
 		return deliveryConfiguration;
 	}
@@ -387,6 +388,25 @@ implements SessionBean
 		try {
 			return NLJDOHelper.getObjectIDSet(VoucherType.getChildVoucherTypes(pm,
 					parentVoucherTypeID));
+		} finally {
+			pm.close();
+		}
+	}
+
+	/**
+	 * @ejb.interface-method
+	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+	 * @ejb.permission role-name="org.nightlabs.jfire.voucher.VoucherManager.VoucherType.read"
+	 */
+	public VoucherType getVoucherType(
+			ProductTypeID voucherTypeID, String[] fetchGroups,
+			int maxFetchDepth) {
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			List<VoucherType> spts = getVoucherTypes(CollectionUtil.array2HashSet(new ProductTypeID[] {voucherTypeID}), fetchGroups, maxFetchDepth);
+			if (spts.size() > 0)
+				return spts.get(0);
+			return null;
 		} finally {
 			pm.close();
 		}
@@ -518,44 +538,61 @@ implements SessionBean
 	/**
 	 * @return <tt>Collection</tt> of {@link org.nightlabs.jfire.trade.Article}
 	 * @throws org.nightlabs.jfire.store.NotAvailableException
-	 *           in case there are not enough <tt>Voucher</tt>s available and
-	 *           the <tt>Product</tt>s cannot be created (because of a limit).
+	 * in case there are not enough <tt>Voucher</tt>s available and
+	 * the <tt>Product</tt>s cannot be created (because of a limit).
+	 * 
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type="Required"
+	 *
 	 */	
-	protected Collection<? extends Article> createArticles(PersistenceManager pm,
-			SegmentID segmentID, OfferID offerID, Collection<ProductType> productTypes) throws ModuleException {
-		Trader trader = Trader.getTrader(pm);
-		RecurringTrader recurringTrader = RecurringTrader.getRecurringTrader(pm);
-		Segment segment = (Segment) pm.getObjectById(segmentID);
-		Order order = segment.getOrder();
+	protected Collection<? extends Article> createArticles(SegmentID segmentID, OfferID offerID, Collection<ProductType> productTypes,String[] fetchGroups, int maxFetchDepth) throws ModuleException {
 
-		User user = User.getUser(pm, getPrincipal());
+		PersistenceManager pm = getPersistenceManager();
 
-		// find an Offer within the Order which is not finalized - or create one
-		Offer offer;
-		if (offerID == null) {
-			Collection<Offer> offers = Offer.getNonFinalizedNonEndedOffers(pm, order);
-			if (!offers.isEmpty()) {
-				offer = offers.iterator().next();
+		try {
+			Trader trader = Trader.getTrader(pm);
+			RecurringTrader recurringTrader = RecurringTrader.getRecurringTrader(pm);
+			Segment segment = (Segment) pm.getObjectById(segmentID);
+			Order order = segment.getOrder();
+
+			User user = User.getUser(pm, getPrincipal());
+
+			// find an Offer within the Order which is not finalized - or create one
+			Offer offer;
+			if (offerID == null) {
+				Collection<Offer> offers = Offer.getNonFinalizedNonEndedOffers(pm, order);
+				if (!offers.isEmpty()) {
+					offer = offers.iterator().next();
+				}
+				else {
+
+					if (order instanceof RecurringOrder)
+						offer = recurringTrader.createRecurredOffer(user, order, null); // TODO offerIDPrefix ???
+					else
+						offer = trader.createOffer(user, order, null); // TODO offerIDPrefix ???
+				}
 			}
 			else {
-
-				if (order instanceof RecurringOrder)
-					offer = recurringTrader.createRecurredOffer(user, order, null); // TODO offerIDPrefix ???
-				else
-					offer = trader.createOffer(user, order, null); // TODO offerIDPrefix ???
+				pm.getExtent(Offer.class);
+				offer = (Offer) pm.getObjectById(offerID);
 			}
+
+			Collection<? extends Article> articles = trader.createArticles(user,offer,segment,productTypes,new ArticleCreator(null));		
+
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+			if (fetchGroups != null)
+				pm.getFetchPlan().setGroups(fetchGroups);
+
+			return pm.detachCopyAll(articles);
 		}
-		else {
-			pm.getExtent(Offer.class);
-			offer = (Offer) pm.getObjectById(offerID);
+		finally {
+			pm.close();
 		}
 
-		Collection<? extends Article> articles = trader.createArticles(user,offer,segment,productTypes,new ArticleCreator(null));
-	
-		return articles;
 	}
-	
-	
+
+
 	/**
 	 * @return <tt>Collection</tt> of {@link org.nightlabs.jfire.trade.Article}
 	 * @throws org.nightlabs.jfire.store.NotAvailableException
@@ -740,7 +777,7 @@ implements SessionBean
 	protected Map<ProductID, Map<ScriptRegistryItemID, Object>> getVoucherScriptingResults(
 			PersistenceManager pm, Collection<ProductID> voucherIDs,
 			boolean allScripts) throws ModuleException
-	{
+			{
 		allScripts = true; // TODO remove this line!
 		// TODO obtain the scripts via the voucher-layout-file,
 		try {
@@ -766,15 +803,15 @@ implements SessionBean
 
 						// scripts.addAll((Collection)q.execute(VoucherScriptingConstants.SCRIPT_REGISTRY_ITEM_TYPE_VOUCHER));
 						scripts
-								.addAll((Collection<? extends Script>) q
-										.execute(VoucherScriptingConstants.SCRIPT_REGISTRY_ITEM_TYPE_TRADE_VOUCHER));
+						.addAll((Collection<? extends Script>) q
+								.execute(VoucherScriptingConstants.SCRIPT_REGISTRY_ITEM_TYPE_TRADE_VOUCHER));
 					} else {
 						// TODO obtain the scripts via the voucher-layout-file,
 						// scriptRegistryItemIDs from scriptDrawComponents as well as from
 						// visibleScripts
 						if (voucherType.getVoucherLayout() == null)
 							throw new IllegalStateException(
-									"voucher.getVoucherLayout() == null");
+							"voucher.getVoucherLayout() == null");
 					}
 
 					// TODO this way, we cannot really print duplicates as a duplicate will always be printed with the
@@ -784,8 +821,8 @@ implements SessionBean
 					VoucherKey voucherKey = voucher.getVoucherKey();
 					if (voucherKey == null) {
 //						logger.error(
-//								"voucher.voucherKey == null! voucher.getPrimaryKey()=" + voucher.getPrimaryKey(),
-//								new IllegalStateException("The voucher does not have a voucherKey assigned! " + voucher.getPrimaryKey()));
+//						"voucher.voucherKey == null! voucher.getPrimaryKey()=" + voucher.getPrimaryKey(),
+//						new IllegalStateException("The voucher does not have a voucherKey assigned! " + voucher.getPrimaryKey()));
 						throw new IllegalStateException("The voucher does not have a voucherKey assigned! " + voucher.getPrimaryKey());
 
 //						Query q = pm.newQuery(VoucherKey.class);
@@ -793,10 +830,10 @@ implements SessionBean
 //						q.setOrdering("this.voucherNumber DESC");
 //						Collection<VoucherKey> voucherKeys = (Collection<VoucherKey>) q.execute(voucher);
 //						if (voucherKeys.isEmpty())
-//							throw new IllegalStateException("The voucher does not have a voucherKey assigned and even a query on the datastore did not return any VoucherKey! " + voucher.getPrimaryKey());
-//
+//						throw new IllegalStateException("The voucher does not have a voucherKey assigned and even a query on the datastore did not return any VoucherKey! " + voucher.getPrimaryKey());
+
 //						for (VoucherKey vk : voucherKeys) {
-//							voucherKey = vk; break;
+//						voucherKey = vk; break;
 //						}
 					}
 
@@ -826,7 +863,7 @@ implements SessionBean
 		} catch (Exception x) {
 			throw new ModuleException(x);
 		}
-	}
+			}
 
 	private static class PreviewParameterSetExtension {
 		public VoucherType voucherType;
@@ -850,7 +887,7 @@ implements SessionBean
 //					PreviewParameterSet previewParameterSet = new PreviewParameterSet(voucherTypeID);
 
 //					PreviewParameterSetExtension previewParameterSetExtension = ensureFinishedConfiguration(
-//							pm, user, previewParameterSet);
+//					pm, user, previewParameterSet);
 
 					pm.getExtent(VoucherType.class);
 					VoucherType voucherType = (VoucherType) pm.getObjectById(voucherTypeID);
@@ -864,7 +901,7 @@ implements SessionBean
 			}
 		} catch (RuntimeException x) {
 			throw x;
-//		} catch (ModuleException x) {
+//			} catch (ModuleException x) {
 //			throw x;
 		} catch (Exception x) {
 			throw new ModuleException(x);
@@ -900,17 +937,17 @@ implements SessionBean
 	 */
 	private PreviewParameterSetExtension ensureFinishedConfiguration(
 			PersistenceManager pm, User user, PreviewParameterSet previewParameterSet)
-			throws ModuleException, NamingException, IOException, CannotConfirmProductTypeException {
+	throws ModuleException, NamingException, IOException, CannotConfirmProductTypeException {
 		if (user == null)
 			throw new IllegalArgumentException("user must not be null!");
 
 		if (previewParameterSet == null)
 			throw new IllegalArgumentException(
-					"previewParameterSet must not be null!");
+			"previewParameterSet must not be null!");
 
 		if (previewParameterSet.getVoucherTypeID() == null)
 			throw new IllegalArgumentException(
-					"previewParameterSet.voucherTypeID must not be null!");
+			"previewParameterSet.voucherTypeID must not be null!");
 
 		// configure the given event, create an order, add an article and query the
 		// ticket data
@@ -925,7 +962,7 @@ implements SessionBean
 		// ensure the event is correctly configured and confirmed
 		pm.getExtent(VoucherType.class);
 		previewParameterSetExtension.voucherType = (VoucherType) pm
-				.getObjectById(previewParameterSet.getVoucherTypeID());
+		.getObjectById(previewParameterSet.getVoucherTypeID());
 
 		// Currency
 		Extent extent = pm.getExtent(Currency.class);
@@ -941,15 +978,15 @@ implements SessionBean
 					.getObjectId(previewParameterSetExtension.currency));
 		} else
 			previewParameterSetExtension.currency = (Currency) pm
-					.getObjectById(previewParameterSet.getCurrencyID());
+			.getObjectById(previewParameterSet.getCurrencyID());
 
 		if (!previewParameterSetExtension.voucherType.isConfirmed()) {
 			if (previewParameterSetExtension.voucherType.getDeliveryConfiguration() == null) {
 				pm.getExtent(DeliveryConfiguration.class);
 				previewParameterSetExtension.voucherType
-						.setDeliveryConfiguration((DeliveryConfiguration) pm
-								.getObjectById(DeliveryConfigurationID.create(organisationID,
-										JFireVoucherEAR.DEFAULT_DELIVERY_CONFIGURATION_ID)));
+				.setDeliveryConfiguration((DeliveryConfiguration) pm
+						.getObjectById(DeliveryConfigurationID.create(organisationID,
+								JFireVoucherEAR.DEFAULT_DELIVERY_CONFIGURATION_ID)));
 			}
 
 			boolean calculatePrices = false;
@@ -959,7 +996,7 @@ implements SessionBean
 						IDGenerator.getOrganisationID(), PriceConfig.createPriceConfigID()); // TODO do we really need to consume IDs here - hmmm... shouldn't be such a big problem
 				pm.makePersistent(packagePriceConfig);
 				previewParameterSetExtension.voucherType
-						.setPackagePriceConfig(packagePriceConfig);
+				.setPackagePriceConfig(packagePriceConfig);
 			}
 
 			if (previewParameterSetExtension.voucherType.getInnerPriceConfig() == null) {
@@ -967,7 +1004,7 @@ implements SessionBean
 			}
 
 			VoucherPriceConfig voucherPriceConfig = (VoucherPriceConfig) previewParameterSetExtension.voucherType
-					.getPackagePriceConfig();
+			.getPackagePriceConfig();
 
 			if (voucherPriceConfig.getCurrency(
 					previewParameterSet.getCurrencyID().currencyID, false) == null) {
@@ -1020,9 +1057,9 @@ implements SessionBean
 						.nextID(PropertySet.class));
 				person.inflate(personStruct);
 				((TextDataField) person.getDataField(PersonStruct.PERSONALDATA_COMPANY))
-						.setText("NightLabs GmbH");
+				.setText("NightLabs GmbH");
 				((TextDataField) person.getDataField(PersonStruct.PERSONALDATA_NAME))
-						.setText("Schulze");
+				.setText("Schulze");
 				((TextDataField) person
 						.getDataField(PersonStruct.PERSONALDATA_FIRSTNAME))
 						.setText("Marco");
@@ -1088,14 +1125,14 @@ implements SessionBean
 				articleIDs.add((ArticleID) JDOHelper.getObjectId(article));
 				delivery.setArticleIDs(articleIDs);
 				ModeOfDeliveryFlavourID modeOfDeliveryFlavourID = ModeOfDeliveryFlavourID
-						.create(Organisation.DEV_ORGANISATION_ID,
-								"mailing.physical.default"); // TODO should be a constant!
+				.create(Organisation.DEV_ORGANISATION_ID,
+				"mailing.physical.default"); // TODO should be a constant!
 				delivery.setModeOfDeliveryFlavourID(modeOfDeliveryFlavourID);
 				delivery.setClientDeliveryProcessorFactoryID("dummy"); // should not
-																																// matter
+				// matter
 				ServerDeliveryProcessorID serverDeliveryProcessorID = (ServerDeliveryProcessorID) JDOHelper
-						.getObjectId(ServerDeliveryProcessorManual
-								.getServerDeliveryProcessorManual(pm));
+				.getObjectId(ServerDeliveryProcessorManual
+						.getServerDeliveryProcessorManual(pm));
 				delivery.setServerDeliveryProcessorID(serverDeliveryProcessorID);
 				DeliveryData deliveryData = new DeliveryData(delivery);
 				deliveryData = pm.makePersistent(deliveryData);
@@ -1185,38 +1222,38 @@ implements SessionBean
 	}
 
 //	/**
-//	 * This method checks, whether all specified <code>Article</code>s have a VoucherLayout assigned and thus can be printed.
-//	 *
-//	 * @ejb.interface-method
-//	 * @ejb.transaction type="Required"
-//	 * @ejb.permission role-name="_Guest_"
-//	 */
+//	* This method checks, whether all specified <code>Article</code>s have a VoucherLayout assigned and thus can be printed.
+//	*
+//	* @ejb.interface-method
+//	* @ejb.transaction type="Required"
+//	* @ejb.permission role-name="_Guest_"
+//	*/
 //	public Map<ArticleID, PrintabilityStatus> getArticleID2PrintabilityStatusMap(Set<ArticleID> articleIDs)
 //	{
-//		if (articleIDs == null)
-//			throw new IllegalArgumentException("articleIDs must not be null!");
-//
-//		PersistenceManager pm = getPersistenceManager();
-//		try {
-//			pm.getExtent(Article.class);
-//			Map<ArticleID, PrintabilityStatus> res = new HashMap<ArticleID, PrintabilityStatus>(articleIDs.size());
-//
-//			for (ArticleID articleID : articleIDs) {
-//				Article article = (Article) pm.getObjectById(articleID);
-//				if (!(article.getProductType() instanceof VoucherType))
-//					res.put(articleID, PrintabilityStatus.NOT_A_VOUCHER_TYPE);
-//				else {
-//					VoucherType voucherType = (VoucherType) article.getProductType();
-//					if (voucherType.getVoucherLayout() == null)
-//						res.put(articleID, PrintabilityStatus.MISSING_VOUCHER_LAYOUT);
-//					else
-//						res.put(articleID, PrintabilityStatus.OK);
-//				}
-//			} // for (ArticleID articleID : articleIDs) {
-//
-//			return res;
-//		} finally {
-//			pm.close();
-//		}
+//	if (articleIDs == null)
+//	throw new IllegalArgumentException("articleIDs must not be null!");
+
+//	PersistenceManager pm = getPersistenceManager();
+//	try {
+//	pm.getExtent(Article.class);
+//	Map<ArticleID, PrintabilityStatus> res = new HashMap<ArticleID, PrintabilityStatus>(articleIDs.size());
+
+//	for (ArticleID articleID : articleIDs) {
+//	Article article = (Article) pm.getObjectById(articleID);
+//	if (!(article.getProductType() instanceof VoucherType))
+//	res.put(articleID, PrintabilityStatus.NOT_A_VOUCHER_TYPE);
+//	else {
+//	VoucherType voucherType = (VoucherType) article.getProductType();
+//	if (voucherType.getVoucherLayout() == null)
+//	res.put(articleID, PrintabilityStatus.MISSING_VOUCHER_LAYOUT);
+//	else
+//	res.put(articleID, PrintabilityStatus.OK);
+//	}
+//	} // for (ArticleID articleID : articleIDs) {
+
+//	return res;
+//	} finally {
+//	pm.close();
+//	}
 //	}
 }

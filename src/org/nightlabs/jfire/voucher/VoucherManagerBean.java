@@ -112,7 +112,6 @@ import org.nightlabs.jfire.voucher.store.VoucherType;
 import org.nightlabs.jfire.voucher.store.VoucherTypeActionHandler;
 import org.nightlabs.jfire.voucher.store.deliver.ServerDeliveryProcessorClientSideVoucherPrint;
 import org.nightlabs.jfire.voucher.store.id.VoucherKeyID;
-import org.nightlabs.util.CollectionUtil;
 
 /**
  * @ejb.bean name="jfire/ejb/JFireVoucher/VoucherManager"
@@ -393,24 +392,26 @@ implements SessionBean
 		}
 	}
 
-	/**
-	 * @ejb.interface-method
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 * @ejb.permission role-name="org.nightlabs.jfire.voucher.VoucherManager.VoucherType.read"
-	 */
-	public VoucherType getVoucherType(
-			ProductTypeID voucherTypeID, String[] fetchGroups,
-			int maxFetchDepth) {
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			List<VoucherType> spts = getVoucherTypes(CollectionUtil.array2HashSet(new ProductTypeID[] {voucherTypeID}), fetchGroups, maxFetchDepth);
-			if (spts.size() > 0)
-				return spts.get(0);
-			return null;
-		} finally {
-			pm.close();
-		}
-	}
+// There is no need for this method since there is getVoucherTypes. Additionally, we want to get rid of these specific methods anyway
+// and instead use the basic-ProductType-methods. So please don't add even more of these deprecated methods ;-) Marco.
+//	/**
+//	 * @ejb.interface-method
+//	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+//	 * @ejb.permission role-name="org.nightlabs.jfire.voucher.VoucherManager.VoucherType.read"
+//	 */
+//	public VoucherType getVoucherType(
+//			ProductTypeID voucherTypeID, String[] fetchGroups,
+//			int maxFetchDepth) {
+//		PersistenceManager pm = getPersistenceManager();
+//		try {
+//			List<VoucherType> spts = getVoucherTypes(CollectionUtil.array2HashSet(new ProductTypeID[] {voucherTypeID}), fetchGroups, maxFetchDepth);
+//			if (spts.size() > 0)
+//				return spts.get(0);
+//			return null;
+//		} finally {
+//			pm.close();
+//		}
+//	}
 
 	/**
 	 * @ejb.interface-method
@@ -540,7 +541,7 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Required"
 	 */
-	public Collection<? extends Article> createArticles(SegmentID segmentID, OfferID offerID, Collection<ProductType> productTypes,String[] fetchGroups, int maxFetchDepth) 
+	public Collection<? extends Article> createArticles(SegmentID segmentID, OfferID offerID, Collection<ProductType> productTypes,String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException {
 
 		PersistenceManager pm = getPersistenceManager();
@@ -573,7 +574,7 @@ implements SessionBean
 				offer = (Offer) pm.getObjectById(offerID);
 			}
 
-			Collection<? extends Article> articles = trader.createArticles(user,offer,segment,productTypes,new ArticleCreator(null));		
+			Collection<? extends Article> articles = trader.createArticles(user,offer,segment,productTypes,new ArticleCreator(null));
 
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
@@ -1046,7 +1047,7 @@ implements SessionBean
 				Trader trader = Trader.getTrader(pm);
 
 				IStruct personStruct = StructLocal.getStructLocal(pm, getOrganisationID(),
-						Person.class.getName(), 
+						Person.class.getName(),
 						Person.STRUCT_SCOPE, Person.STRUCT_LOCAL_SCOPE);
 				Person person = new Person(getOrganisationID(), IDGenerator
 						.nextID(PropertySet.class));

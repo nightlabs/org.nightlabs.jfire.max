@@ -66,11 +66,11 @@ public class TariffMappingDAO
 		return getJDOObjects(null, tariffMappingIDs, fetchGroups, maxFetchDepth, monitor);
 	}
 
-	public TariffMapping createTariffMapping_new(TariffID localTariffID, TariffID partnerTariffID, boolean get, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
+	public TariffMapping createTariffMapping(TariffID localTariffID, TariffID partnerTariffID, boolean get, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
 		try {
 			AccountingManager am = AccountingManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
-			TariffMapping tm = am.createTariffMapping_new(localTariffID, partnerTariffID, get, fetchGroups, maxFetchDepth);
+			TariffMapping tm = am.createTariffMapping(localTariffID, partnerTariffID, get, fetchGroups, maxFetchDepth);
 
 			if (tm != null)
 				Cache.sharedInstance().put(null, tm, fetchGroups, maxFetchDepth);

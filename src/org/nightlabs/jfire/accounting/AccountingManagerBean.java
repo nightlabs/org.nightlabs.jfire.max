@@ -33,7 +33,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -116,7 +115,6 @@ import org.nightlabs.jfire.trade.ArticleContainer;
 import org.nightlabs.jfire.trade.CustomerGroup;
 import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.trade.Offer;
-import org.nightlabs.jfire.trade.OfferLocal;
 import org.nightlabs.jfire.trade.Order;
 import org.nightlabs.jfire.trade.TradeSide;
 import org.nightlabs.jfire.trade.Trader;
@@ -127,7 +125,6 @@ import org.nightlabs.jfire.trade.id.OfferID;
 import org.nightlabs.jfire.trade.id.OrderID;
 import org.nightlabs.jfire.trade.jbpm.ProcessDefinitionAssignment;
 import org.nightlabs.jfire.trade.query.InvoiceQuery;
-import org.nightlabs.jfire.transfer.Anchor;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 import org.nightlabs.jfire.transfer.id.TransferID;
 
@@ -147,16 +144,12 @@ public abstract class AccountingManagerBean
 	implements SessionBean
 {
 	private static final long serialVersionUID = 1L;
-	/**
-	 * LOG4J logger used by this class
-	 */
 	private static final Logger logger = Logger.getLogger(AccountingManagerBean.class);
 
 	@Override
 	public void setSessionContext(SessionContext sessionContext)
 			throws EJBException, RemoteException
 	{
-		logger.debug(this.getClass().getName() + ".setSessionContext("+sessionContext+")");
 		super.setSessionContext(sessionContext);
 	}
 	/**
@@ -166,28 +159,23 @@ public abstract class AccountingManagerBean
 	public void ejbCreate()
 	throws CreateException
 	{
-		logger.debug(this.getClass().getName() + ".ejbCreate()");
 	}
 	/**
-	 * @see javax.ejb.SessionBean#ejbRemove()
+	 * {@inheritDoc}
 	 *
 	 * @ejb.permission unchecked="true"
 	 */
+	@Override
 	public void ejbRemove() throws EJBException, RemoteException
 	{
 		logger.debug(this.getClass().getName() + ".ejbRemove()");
 	}
-
-	/**
-	 * @see javax.ejb.SessionBean#ejbActivate()
-	 */
+	@Override
 	public void ejbActivate() throws EJBException, RemoteException
 	{
 		logger.debug(this.getClass().getName() + ".ejbActivate()");
 	}
-	/**
-	 * @see javax.ejb.SessionBean#ejbPassivate()
-	 */
+	@Override
 	public void ejbPassivate() throws EJBException, RemoteException
 	{
 		logger.debug(this.getClass().getName() + ".ejbPassivate()");
@@ -465,10 +453,16 @@ public abstract class AccountingManagerBean
 	}
 
 	/**
+	 * Get the object-ids of all existing {@link TariffMapping}s.
+	 * <p>
+	 * This method can be called by everyone, because it does not reveal critical data.
+	 * </p>
+	 *
 	 * @ejb.interface-method
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
+	@SuppressWarnings("unchecked")
 	public Set<TariffMappingID> getTariffMappingIDs()
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -482,6 +476,11 @@ public abstract class AccountingManagerBean
 	}
 
 	/**
+	 * Get the object-ids of all existing {@link TariffMapping}s.
+	 * <p>
+	 * This method can be called by everyone, because it does not reveal critical data.
+	 * </p>
+	 *
 	 * @ejb.interface-method
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
@@ -498,13 +497,11 @@ public abstract class AccountingManagerBean
 	}
 
 	/**
-	 * TODO remove the "_new" suffix after a while (when the clients are updated for sure)
-	 *
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.editTariffMapping"
 	 */
-	public TariffMapping createTariffMapping_new(TariffID localTariffID, TariffID partnerTariffID, boolean get, String[] fetchGroups, int maxFetchDepth)
+	public TariffMapping createTariffMapping(TariffID localTariffID, TariffID partnerTariffID, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -523,6 +520,12 @@ public abstract class AccountingManagerBean
 	}
 
 	/**
+	 * Get the object-ids of all {@link Tariff}s or the ones matching (or not matching, if <code>inverse == true</code>)
+	 * the given <code>organisationID</code>.
+	 * <p>
+	 * This method can be called by everyone, because it does not reveal any sensitive information.
+	 * </p>
+	 *
 	 * @param organisationID <code>null</code> in order to get all tariffs (no filtering). non-<code>null</code> to filter by <code>organisationID</code>.
 	 * @param inverse This applies only if <code>organisationID != null</code>. If <code>true</code>, it will return all {@link TariffID}s where the <code>organisationID</code>
 	 *		is NOT the one passed as parameter <code>organisationID</code>.
@@ -531,6 +534,7 @@ public abstract class AccountingManagerBean
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
+	@SuppressWarnings("unchecked")
 	public Set<TariffID> getTariffIDs(String organisationID, boolean inverse)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -547,6 +551,12 @@ public abstract class AccountingManagerBean
 	}
 
 	/**
+	 * Get the {@link Tariff}s for the specified object-ids.
+	 * <p>
+	 * Everyone can call this method. At the moment, all requested {@link Tariff}s will be returned. Later on, this
+	 * method will filter the result and only give the user those <code>Tariff</code>s he is allowed to see.
+	 * </p>
+	 *
 	 * @ejb.interface-method
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
@@ -554,6 +564,10 @@ public abstract class AccountingManagerBean
 	@SuppressWarnings("unchecked")
 	public Collection<Tariff> getTariffs(Collection<TariffID> tariffIDs, String[] fetchGroups, int maxFetchDepth)
 	{
+		// TODO filter Tariffs according to visibility-configuration for the currently logged-in user.
+		// We should additionally introduce a new access right that allows to see all (suppress filtering)
+		// or alternatively only use org.nightlabs.jfire.accounting.editTariff, too. Marco.
+
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			return NLJDOHelper.getDetachedObjectList(pm, tariffIDs, Tariff.class, fetchGroups, maxFetchDepth);
@@ -562,36 +576,12 @@ public abstract class AccountingManagerBean
 		}
 	}
 
-//	/**
-//	 * @ejb.interface-method
-//	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-//	 * @ejb.permission role-name="_Guest_"
-//	 */
-//	public Collection<Tariff> getTariffs(String[] fetchGroups, int maxFetchDepth)
-//	{
-//		PersistenceManager pm = getPersistenceManager();
-//		try {
-//			FetchPlan fetchPlan = pm.getFetchPlan();
-//			fetchPlan.setMaxFetchDepth(maxFetchDepth);
-//			if (fetchGroups != null)
-//				fetchPlan.setGroups(fetchGroups);
-//
-//			Collection<Tariff> res = new ArrayList<Tariff>();
-//			for (Iterator it = pm.getExtent(Tariff.class, true).iterator(); it.hasNext(); ) {
-//				Tariff t = (Tariff)it.next();
-//				res.add((Tariff) pm.detachCopy(t));
-//			}
-//
-//			return res;
-//		} finally {
-//			pm.close();
-//		}
-//	}
-
 	/**
+	 * Save a new or modified <code>Tariff</code> to the server.
+	 *
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.editTariff"
 	 */
 	public Tariff storeTariff(Tariff tariff, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
@@ -603,54 +593,18 @@ public abstract class AccountingManagerBean
 		}
 	}
 
-//	/**
-//	 * @throws ModuleException
-//	 *
-//	 * @ejb.interface-method
-//	 * @ejb.transaction type="Required"
-//	 * @ejb.permission role-name="_Guest_"
-//	 */
-//	public Collection getCustomerGroups(String[] fetchGroups, int maxFetchDepth)
-//	throws ModuleException
-//	{
-//		PersistenceManager pm = getPersistenceManager();
-//		try {
-//			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
-//			if (fetchGroups != null)
-//				pm.getFetchPlan().setGroups(fetchGroups);
-//			Query q = pm.newQuery(CustomerGroup.class);
-//			return pm.detachCopyAll((Collection)q.execute());
-//		} finally {
-//			pm.close();
-//		}
-//	}
-//
-//	/**
-//	 * @throws ModuleException
-//	 *
-//	 * @ejb.interface-method
-//	 * @ejb.transaction type="Required"
-//	 * @ejb.permission role-name="_Guest_"
-//	 */
-//	public CustomerGroup storeCustomerGroup(CustomerGroup customerGroup, boolean get, String[] fetchGroups, int maxFetchDepth)
-//	{
-//		PersistenceManager pm = getPersistenceManager();
-//		try {
-//			return (CustomerGroup) NLJDOHelper.storeJDO(pm, customerGroup, get, fetchGroups, maxFetchDepth);
-//		} finally {
-//			pm.close();
-//		}
-//	}
-
 	/**
-	 * @throws ModuleException
+	 * Get all {@link Currency} instances.
+	 * <p>
+	 * This method can be called by everyone, because currencies are not confidential.
+	 * </p>
 	 *
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public Collection getCurrencies(String[] fetchGroups, int maxFetchDepth)
-	throws ModuleException
+	@SuppressWarnings("unchecked")
+	public Collection<Currency> getCurrencies(String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -659,85 +613,42 @@ public abstract class AccountingManagerBean
 				pm.getFetchPlan().setGroups(fetchGroups);
 
 			Query q = pm.newQuery(Currency.class);
-			return pm.detachCopyAll((Collection)q.execute());
+			return pm.detachCopyAll((Collection<Currency>)q.execute());
 		} finally {
 			pm.close();
 		}
 	}
 
-	/**
-	 * @throws ModuleException
-	 *
-	 * @ejb.interface-method
-	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="_Guest_"
-	 */
-	public Account getAccount(AnchorID accountID, String[] fetchGroups, int maxFetchDepth)
-	throws ModuleException
-	{
-		return getAccount(Anchor.getPrimaryKey(accountID.organisationID, accountID.anchorTypeID, accountID.anchorID), fetchGroups, maxFetchDepth);
-	}
-
-		/**
-	 * @throws ModuleException
-	 *
-	 * @ejb.interface-method
-	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="_Guest_"
-	 */
-	public Account getAccount(String accountPK, String[] fetchGroups, int maxFetchDepth)
-	throws ModuleException
-	{
-		Account result = null;
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
-			if (fetchGroups != null)
-				pm.getFetchPlan().setGroups(fetchGroups);
-
-			Query q = pm.newQuery(Account.class);
-			q.declareParameters("java.lang.String accountPK");
-			q.setFilter("this.primaryKey == accountPK");
-			Collection found = (Collection)q.executeWithArray(new Object[]{accountPK});
-			if (found.size() != 1)
-				throw new IllegalArgumentException("Could not find Account with primary key \""+accountPK+"\"");
-			result = (Account)pm.detachCopyAll(found).iterator().next();
-			return result;
-		} finally {
-			pm.close();
-		}
-
-	}
-	/**
-	 * @ejb.interface-method
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 * @ejb.permission role-name="_Guest_"
-	 */
-	public Collection<Account> getAccounts(AccountSearchFilter searchFilter,  String[] fetchGroups, int maxFetchDepth)
-	{
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
-			if (fetchGroups != null)
-				pm.getFetchPlan().setGroups(fetchGroups);
-
-			searchFilter.setPersistenceManager(pm);
-			Collection<Account> accounts = (Collection<Account>) searchFilter.getResult();
-
-			if (fetchGroups != null)
-				pm.getFetchPlan().setGroups(fetchGroups);
-
-//			Collection result = pm.detachCopyAll(accounts);
-			return NLJDOHelper.getDetachedQueryResultAsSet(pm, accounts);
-		} finally {
-			pm.close();
-		}
-	}
+//	/**
+//	 * @ejb.interface-method
+//	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+//	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.queryAccounts"
+//	 */
+//	public Collection<Account> getAccounts(AccountSearchFilter searchFilter,  String[] fetchGroups, int maxFetchDepth)
+//	{
+//		PersistenceManager pm = getPersistenceManager();
+//		try {
+//			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+//			if (fetchGroups != null)
+//				pm.getFetchPlan().setGroups(fetchGroups);
+//
+//			searchFilter.setPersistenceManager(pm);
+//			Collection<Account> accounts = (Collection<Account>) searchFilter.getResult();
+//
+//			if (fetchGroups != null)
+//				pm.getFetchPlan().setGroups(fetchGroups);
+//
+////			Collection result = pm.detachCopyAll(accounts);
+//			return NLJDOHelper.getDetachedQueryResultAsSet(pm, accounts);
+//		} finally {
+//			pm.close();
+//		}
+//	}
 
 	/**
 	 * @ejb.interface-method
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.queryAccounts"
 	 */
 	@SuppressWarnings("unchecked")
 	public Set<AnchorID> getAccountIDs(AccountSearchFilter searchFilter)
@@ -754,7 +665,7 @@ public abstract class AccountingManagerBean
 	/**
 	 * @ejb.interface-method
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.queryAccounts"
 	 */
 	@SuppressWarnings("unchecked")
 	public List<Account> getAccounts(Collection<AnchorID> accountIDs,  String[] fetchGroups, int maxFetchDepth)
@@ -767,53 +678,15 @@ public abstract class AccountingManagerBean
 		}
 	}
 
-//	/**
-//	 * @throws ModuleException
-//	 *
-//	 * @ejb.interface-method
-//	 * @ejb.transaction type="Required"
-//	 * @ejb.permission role-name="_Guest_"
-//	 */
-//	public Account createMandatorAccount(String anchorID, String currencyID, boolean createSummaryAccount, boolean get, String[] fetchGroups, int maxFetchDepth)
-//	throws ModuleException
-//	{
-//		PersistenceManager pm = getPersistenceManager();
-//		try {
-//			Currency currency = null;
-//			try {
-//				currency = (Currency)pm.getObjectById(CurrencyID.create(currencyID));
-//			} catch(JDOObjectNotFoundException e) {
-//				throw new ModuleException("No currency with currencyID "+currencyID+" known.", e);
-//			}
-//
-//			Account newAccount = Accounting.getAccounting(pm).createMandatorAccount(anchorID, currency, createSummaryAccount);
-//			if (get) {
-//				pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
-//				if (fetchGroups != null)
-//					pm.getFetchPlan().setGroups(fetchGroups);
-//
-//				return (Account)pm.detachCopy(newAccount);
-//			}
-//			return null;
-//		} finally {
-//			pm.close();
-//		}
-//	}
-
 	/**
-	 * @throws ModuleException
-	 *
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.editAccount"
 	 */
 	public Account storeAccount(Account account, boolean get, String[] fetchGroups, int maxFetchDepth)
-	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
-//			if (!JDOHelper.isDetached(account))
-//				throw new IllegalArgumentException("storeAccount can only accept detached Accounts. Use create_*_Account methods to create an Account.");
 			if (!account.getOrganisationID().equals(getOrganisationID()))
 				throw new IllegalArgumentException("Given Account was created for a different organisation, can not store to this datastore!");
 
@@ -827,14 +700,12 @@ public abstract class AccountingManagerBean
 	/**
 	 * @param anchorID The anchorID of the Account wich SummaryAccounts are to be set
 	 * @param SummaryAccounts A Collection of the AnchorIDs of the SummaryAccounts to be set to the given Account.
-	 * @throws ModuleException
 	 *
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.editAccount"
 	 */
 	public void setAccountSummaryAccounts(AnchorID anchorID, Collection<AnchorID> _summaryAccountIDs)
-	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -863,14 +734,12 @@ public abstract class AccountingManagerBean
 	/**
 	 * @param summaryAccountID The anchorID of the SummaryAccount wich summedAccounts are to be set
 	 * @param summedAccountIDs A Collection of the AnchorIDs of the Accounts to be summed up by the given SummaryAccount.
-	 * @throws ModuleException
 	 *
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.editAccount"
 	 */
 	public void setSummaryAccountSummedAccounts(AnchorID summaryAccountID, Collection<AnchorID> _summedAccountIDs)
-	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -896,34 +765,33 @@ public abstract class AccountingManagerBean
 		}
 	}
 
-	/**
-	 * TODO is this method still used? What about inheritance? It should be possible to control the inheritance-meta-data via this method, too.
-	 * Assign the LocalAccountantDelegate defined by the given localAccountantDelegateID
-	 * to the ProductType defined by the given productTypeID.
-	 *
-	 * @param productTypeID The ProductTypeID of the ProductType to which the delegate should be assigned.
-	 * @param localAccountantDelegateID The LocalAccountantDelegateID of the LocalAccountantDelegate to assign.
-	 *
-	 * @ejb.interface-method
-	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="_Guest_"
-	 */
-	public void assignLocalAccountantDelegateToProductType(
-			ProductTypeID productTypeID,
-			LocalAccountantDelegateID localAccountantDelegateID
-	)
-	throws ModuleException
-	{
-		// TODO we should check the Authority of the given ProductType! => authorize this action via the authority!
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			ProductType productType = (ProductType) pm.getObjectById(productTypeID);
-			LocalAccountantDelegate localAccountantDelegate = (LocalAccountantDelegate) pm.getObjectById(localAccountantDelegateID);
-			productType.getProductTypeLocal().setLocalAccountantDelegate(localAccountantDelegate);
-		} finally {
-			pm.close();
-		}
-	}
+//	/**
+//	 * TODO is this method still used? What about inheritance? It should be possible to control the inheritance-meta-data via this method, too.
+//	 * Assign the LocalAccountantDelegate defined by the given localAccountantDelegateID
+//	 * to the ProductType defined by the given productTypeID.
+//	 *
+//	 * @param productTypeID The ProductTypeID of the ProductType to which the delegate should be assigned.
+//	 * @param localAccountantDelegateID The LocalAccountantDelegateID of the LocalAccountantDelegate to assign.
+//	 *
+//	 * @ejb.interface-method
+//	 * @ejb.transaction type="Required"
+//	 * @ejb.permission role-name="_Guest_"
+//	 */
+//	public void assignLocalAccountantDelegateToProductType(
+//			ProductTypeID productTypeID,
+//			LocalAccountantDelegateID localAccountantDelegateID
+//	)
+//	{
+//		// TODO we should check the Authority of the given ProductType! => authorize this action via the authority!
+//		PersistenceManager pm = getPersistenceManager();
+//		try {
+//			ProductType productType = (ProductType) pm.getObjectById(productTypeID);
+//			LocalAccountantDelegate localAccountantDelegate = (LocalAccountantDelegate) pm.getObjectById(localAccountantDelegateID);
+//			productType.getProductTypeLocal().setLocalAccountantDelegate(localAccountantDelegate);
+//		} finally {
+//			pm.close();
+//		}
+//	}
 
 	/**
 	 * Returns a Collection of {@link LocalAccountantDelegateID} not detached
@@ -933,20 +801,14 @@ public abstract class AccountingManagerBean
 	 *
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.queryLocalAccountantDelegates"
 	 */
-	public Collection<Object> getTopLevelAccountantDelegates(Class delegateClass)
-	throws ModuleException
+	public Collection<LocalAccountantDelegateID> getTopLevelAccountantDelegates(Class<? extends LocalAccountantDelegate> delegateClass)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			Collection delegates = LocalAccountantDelegate.getTopLevelDelegates(pm, delegateClass);
-			Collection<Object> result = new LinkedList<Object>();
-			for (Iterator iter = delegates.iterator(); iter.hasNext();) {
-				LocalAccountantDelegate delegate = (LocalAccountantDelegate) iter.next();
-				result.add(JDOHelper.getObjectId(delegate));
-			}
-			return result;
+			Collection<? extends LocalAccountantDelegate> delegates = LocalAccountantDelegate.getTopLevelDelegates(pm, delegateClass);
+			return NLJDOHelper.getObjectIDSet(delegates);
 		} finally {
 			pm.close();
 		}
@@ -960,24 +822,18 @@ public abstract class AccountingManagerBean
 	 *
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.queryLocalAccountantDelegates"
 	 */
-	public Collection<Object> getChildAccountantDelegates(LocalAccountantDelegateID delegateID)
-	throws ModuleException
+	public Collection<LocalAccountantDelegateID> getChildAccountantDelegates(LocalAccountantDelegateID delegateID)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			Collection delegates = LocalAccountantDelegate.getChildDelegates(
+			Collection<? extends LocalAccountantDelegate> delegates = LocalAccountantDelegate.getChildDelegates(
 					pm,
 					delegateID.organisationID,
 					delegateID.localAccountantDelegateID
 				);
-			Collection<Object> result = new LinkedList<Object>();
-			for (Iterator iter = delegates.iterator(); iter.hasNext();) {
-				LocalAccountantDelegate delegate = (LocalAccountantDelegate) iter.next();
-				result.add(JDOHelper.getObjectId(delegate));
-			}
-			return result;
+			return NLJDOHelper.getObjectIDSet(delegates);
 		} finally {
 			pm.close();
 		}
@@ -989,33 +845,16 @@ public abstract class AccountingManagerBean
 	 *
 	 * @param delegateIDs The LocalAccountantDelegateID of the delegates to return.
 	 * @param fetchGroups The fetchGroups to detach the delegates with.
-	 * @throws ModuleException
 	 *
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.queryLocalAccountantDelegates"
 	 */
-	public Collection<LocalAccountantDelegate> getLocalAccountantDelegates(Collection delegateIDs, String[] fetchGroups, int maxFetchDepth)
-	throws ModuleException
+	public Collection<LocalAccountantDelegate> getLocalAccountantDelegates(Collection<LocalAccountantDelegateID> delegateIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
-			if (fetchGroups != null)
-				pm.getFetchPlan().setGroups(fetchGroups);
-
-			Collection<LocalAccountantDelegate> result = new LinkedList<LocalAccountantDelegate>();
-			for (Iterator iter = delegateIDs.iterator(); iter.hasNext();) {
-				LocalAccountantDelegateID delegateID = null;
-				try {
-					delegateID = (LocalAccountantDelegateID) iter.next();
-				} catch (ClassCastException e) {
-					throw new IllegalArgumentException("Please pass only instances of LocalAccountantDelegateID as members of the delegateIDs paramaeter to this method.");
-				}
-				LocalAccountantDelegate delegate = (LocalAccountantDelegate)pm.getObjectById(delegateID);
-				result.add(pm.detachCopy(delegate));
-			}
-			return result;
+			return NLJDOHelper.getDetachedObjectSet(pm, delegateIDs, LocalAccountantDelegate.class, fetchGroups, maxFetchDepth);
 		} finally {
 			pm.close();
 		}
@@ -1027,14 +866,12 @@ public abstract class AccountingManagerBean
 	 *
 	 * @param delegateID The LocalAccountantDelegateID of the delegate to return.
 	 * @param fetchGroups The fetchGroups to detach the delegates with.
-	 * @throws ModuleException
 	 *
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.queryLocalAccountantDelegates"
 	 */
 	public LocalAccountantDelegate getLocalAccountantDelegate(LocalAccountantDelegateID delegateID, String[] fetchGroups, int maxFetchDepth)
-	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -1056,18 +893,16 @@ public abstract class AccountingManagerBean
 	 * @param delegate The LocalAccountantDelegate to store.
 	 * @param get Whether or not to return the a newly detached version of the stored delegate.
 	 * @param fetchGroups The fetchGroups to detach the stored delegate with.
-	 * @throws ModuleException
 	 *
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.editLocalAccountantDelegate"
 	 */
 	public LocalAccountantDelegate storeLocalAccountantDelegate(
 			LocalAccountantDelegate delegate,
 			boolean get,
 			String[] fetchGroups, int maxFetchDepth
-		)
-	throws ModuleException
+	)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -1079,7 +914,7 @@ public abstract class AccountingManagerBean
 
 	/**
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.editLocalAccountantDelegate"
 	 * @ejb.transaction type="Required"
 	 */
 	public MoneyFlowMapping storeMoneyFlowMapping(MoneyFlowMapping mapping, boolean get, String[] fetchGroups, int maxFetchDepth)
@@ -1117,11 +952,10 @@ public abstract class AccountingManagerBean
 			ResolvedMapEntry persitentMapEntry = entry.getValue();
 			ResolvedMapEntry mapEntry = new ResolvedMapEntry();
 
-			for (Iterator iterator = persitentMapEntry.getResolvedMappings().entrySet().iterator(); iterator.hasNext();) {
-				Map.Entry resolvedEntry = (Map.Entry) iterator.next();
-				MoneyFlowMapping persistentMapping = (MoneyFlowMapping)resolvedEntry.getValue();
+			for (Map.Entry<String, MoneyFlowMapping> resolvedEntry : persitentMapEntry.getResolvedMappings().entrySet()) {
+				MoneyFlowMapping persistentMapping = resolvedEntry.getValue();
 				MoneyFlowMapping detachedMapping = pm.detachCopy(persistentMapping);
-				mapEntry.getResolvedMappings().put((String)resolvedEntry.getKey(), detachedMapping);
+				mapEntry.getResolvedMappings().put(resolvedEntry.getKey(), detachedMapping);
 			}
 			result.put(entry.getKey(), mapEntry);
 		}
@@ -1132,7 +966,7 @@ public abstract class AccountingManagerBean
 	/**
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.queryLocalAccountantDelegates"
 	 */
 	public Map<ResolvedMapKey, ResolvedMapEntry> getResolvedMoneyFlowMappings(ProductTypeID productTypeID, String[] mappingFetchGroups, int maxFetchDepth)
 	throws ModuleException
@@ -1154,7 +988,7 @@ public abstract class AccountingManagerBean
 	/**
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.queryLocalAccountantDelegates"
 	 */
 	public Map<ResolvedMapKey, ResolvedMapEntry> getResolvedMoneyFlowMappings(ProductTypeID productTypeID, LocalAccountantDelegateID delegateID, String[] mappingFetchGroups, int maxFetchDepth)
 	throws ModuleException
@@ -1169,40 +1003,20 @@ public abstract class AccountingManagerBean
 		}
 	}
 
-
-//	/**
-//	 * @throws ModuleException
-//	 * @deprecated use {@link #getPriceFragmentTypes(Collection, String[], int)}
-//	 *
-//	 * @ejb.interface-method
-//	 * @ejb.transaction type="Required"
-//	 * @ejb.permission role-name="_Guest_"
-//	 */
-//	public Collection getPriceFragmentTypes(String[] fetchGroups, int maxFetchDepth)
-//	throws ModuleException
-//	{
-//		PersistenceManager pm = getPersistenceManager();
-//		try {
-//			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
-//			if (fetchGroups != null)
-//				pm.getFetchPlan().setGroups(fetchGroups);
-//			Query q = pm.newQuery(PriceFragmentType.class);
-//			return pm.detachCopyAll((Collection)q.execute());
-//		} finally {
-//			pm.close();
-//		}
-//	}
-
 	/**
+	 * Get all {@link PriceFragmentType}s or those specified by <code>priceFragmentTypeIDs</code>.
+	 * <p>
+	 * This method can be called by everyone, since price fragment types don't reveal any information
+	 * except their name. This is - at least for now - not considered confidential.
+	 * </p>
+	 *
 	 * @param priceFragmentTypeIDs Can be <code>null</code> in order to return ALL {@link PriceFragmentType}s or a collection of {@link PriceFragmentTypeID}s to return only a subset.
-	 * @throws ModuleException
 	 *
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public Collection<PriceFragmentType> getPriceFragmentTypes(Collection<PriceFragmentTypeID> priceFragmentTypeIDs, String[] fetchGroups, int maxFetchDepth)
-	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -1210,72 +1024,74 @@ public abstract class AccountingManagerBean
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 
-			if (priceFragmentTypeIDs == null) {
-				Query q = pm.newQuery(PriceFragmentType.class);
-				return pm.detachCopyAll((Collection<PriceFragmentType>)q.execute());
-			}
-
-			Collection<PriceFragmentType> result = new LinkedList<PriceFragmentType>();
-			for (Iterator iter = priceFragmentTypeIDs.iterator(); iter.hasNext();) {
-				PriceFragmentTypeID priceFragmentTypeID = (PriceFragmentTypeID) iter.next();
-				PriceFragmentType pType = (PriceFragmentType)pm.getObjectById(priceFragmentTypeID);
-				result.add(pType);
-			}
-			return pm.detachCopyAll(result);
+			return NLJDOHelper.getDetachedObjectList(pm, priceFragmentTypeIDs, PriceFragmentType.class, fetchGroups, maxFetchDepth);
+//			if (priceFragmentTypeIDs == null) {
+//				Query q = pm.newQuery(PriceFragmentType.class);
+//				return pm.detachCopyAll((Collection<PriceFragmentType>)q.execute());
+//			}
+//
+//			Collection<PriceFragmentType> result = new LinkedList<PriceFragmentType>();
+//			for (Iterator iter = priceFragmentTypeIDs.iterator(); iter.hasNext();) {
+//				PriceFragmentTypeID priceFragmentTypeID = (PriceFragmentTypeID) iter.next();
+//				PriceFragmentType pType = (PriceFragmentType)pm.getObjectById(priceFragmentTypeID);
+//				result.add(pType);
+//			}
+//			return pm.detachCopyAll(result);
 		} finally {
 			pm.close();
 		}
 	}
 
 	/**
-	 * Returns a Collection of PriceFragmentTypeID of all known PriceFragementTypes
-	 *
-	 * @throws ModuleException
+	 * Get a <code>Collection</code> of <code>PriceFragmentTypeID</code> of all known <code>PriceFragementType</code>s.
+	 * <p>
+	 * This method can be called by everyone, because the object-ids don't reveal any confidential information.
+	 * </p>
 	 *
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public Collection<Object> getPriceFragmentTypeIDs()
-	throws ModuleException
+	@SuppressWarnings("unchecked")
+	public Collection<PriceFragmentTypeID> getPriceFragmentTypeIDs()
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			Query q = pm.newQuery(PriceFragmentType.class);
-			Collection pTypes = (Collection)q.execute();
-			Collection<Object> result = new LinkedList<Object>();
-			for (Iterator iter = pTypes.iterator(); iter.hasNext();) {
-				PriceFragmentType pType = (PriceFragmentType) iter.next();
-				result.add(JDOHelper.getObjectId(pType));
-			}
-			return result;
+			q.setResult("JDOHelper.getObjectId(this)");
+			return (Collection<PriceFragmentTypeID>)q.execute();
+
+//			Collection pTypes = (Collection)q.execute();
+//			Collection<Object> result = new LinkedList<Object>();
+//			for (Iterator iter = pTypes.iterator(); iter.hasNext();) {
+//				PriceFragmentType pType = (PriceFragmentType) iter.next();
+//				result.add(JDOHelper.getObjectId(pType));
+//			}
+//			return result;
 		} finally {
 			pm.close();
 		}
 	}
 
-	/**
-	 * @throws ModuleException
-	 *
-	 * @ejb.interface-method
-	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="_Guest_"
-	 */
-	public PriceFragmentType getPriceFragmentType(PriceFragmentTypeID priceFragmentTypeID, String[] fetchGroups, int maxFetchDepth)
-	throws ModuleException
-	{
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
-			if (fetchGroups != null)
-				pm.getFetchPlan().setGroups(fetchGroups);
-
-			PriceFragmentType priceFragmentType = (PriceFragmentType)pm.getObjectById(priceFragmentTypeID);
-			return pm.detachCopy(priceFragmentType);
-		} finally {
-			pm.close();
-		}
-	}
+//	/**
+//	 * @ejb.interface-method
+//	 * @ejb.transaction type="Required"
+//	 * @ejb.permission role-name="_Guest_"
+//	 */
+//	public PriceFragmentType getPriceFragmentType(PriceFragmentTypeID priceFragmentTypeID, String[] fetchGroups, int maxFetchDepth)
+//	{
+//		PersistenceManager pm = getPersistenceManager();
+//		try {
+//			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+//			if (fetchGroups != null)
+//				pm.getFetchPlan().setGroups(fetchGroups);
+//
+//			PriceFragmentType priceFragmentType = (PriceFragmentType)pm.getObjectById(priceFragmentTypeID);
+//			return pm.detachCopy(priceFragmentType);
+//		} finally {
+//			pm.close();
+//		}
+//	}
 
 
 	/**
@@ -1287,16 +1103,16 @@ public abstract class AccountingManagerBean
 	 * @param fetchGroups Array ouf fetch-groups the invoice should be detached with.
 	 * @return Detached Invoice or null.
 	 *
-	 * @throws ModuleException
+	 * @throws InvoiceEditException if the invoice cannot be created with the given parameters.
 	 *
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.editInvoice"
 	 */
 	public Invoice createInvoice(
 			Collection<ArticleID> articleIDs, String invoiceIDPrefix,
 			boolean get, String[] fetchGroups, int maxFetchDepth)
-		throws ModuleException
+		throws InvoiceEditException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -1310,7 +1126,7 @@ public abstract class AccountingManagerBean
 				ArticleID articleID = it.next();
 				Article article = (Article) pm.getObjectById(articleID);
 				Offer offer = article.getOffer();
-				OfferLocal offerLocal = offer.getOfferLocal();
+//				OfferLocal offerLocal = offer.getOfferLocal();
 				trader.validateOffer(offer);
 				trader.acceptOfferImplicitely(offer);
 //				trader.finalizeOffer(user, offer);
@@ -1346,16 +1162,16 @@ public abstract class AccountingManagerBean
 	 * @param fetchGroups Array ouf fetch-groups the invoice should be detached with.
 	 * @return Detached Invoice or null.
 	 *
-	 * @throws ModuleException
+	 * @throws InvoiceEditException if the invoice cannot be created with the given parameters.
 	 *
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.editInvoice"
 	 */
 	public Invoice createInvoice(
 			ArticleContainerID articleContainerID, String invoiceIDPrefix,
 			boolean get, String[] fetchGroups, int maxFetchDepth)
-		throws ModuleException
+		throws InvoiceEditException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -1379,7 +1195,7 @@ public abstract class AccountingManagerBean
 
 			if (articleContainer instanceof Offer) {
 				Offer offer = (Offer) articleContainer;
-				OfferLocal offerLocal = offer.getOfferLocal();
+//				OfferLocal offerLocal = offer.getOfferLocal();
 				trader.validateOffer(offer);
 				trader.acceptOfferImplicitely(offer);
 //				trader.finalizeOffer(user, offer);
@@ -1388,8 +1204,7 @@ public abstract class AccountingManagerBean
 			}
 			else {
 				Set<Offer> offers = new HashSet<Offer>();
-				for (Iterator it = articleContainer.getArticles().iterator(); it.hasNext(); ) {
-					Article article = (Article) it.next();
+				for (Article article : articleContainer.getArticles()) {
 					Offer offer = article.getOffer();
 					offers.add(offer);
 				}
@@ -1425,7 +1240,7 @@ public abstract class AccountingManagerBean
 	 *
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.editInvoice"
 	 */
 	public Invoice addArticlesToInvoice(
 			InvoiceID invoiceID, Collection<ArticleID> articleIDs,
@@ -1466,7 +1281,7 @@ public abstract class AccountingManagerBean
 	 *
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.editInvoice"
 	 */
 	public Invoice removeArticlesFromInvoice(
 			InvoiceID invoiceID, Collection<ArticleID> articleIDs,
@@ -1503,114 +1318,6 @@ public abstract class AccountingManagerBean
 		}
 	}
 
-//	/**
-//	 * @throws ModuleException
-//	 *
-//	 * @ejb.interface-method
-//	 * @ejb.transaction type="Required"
-//	 * @ejb.permission role-name="_Guest_"
-//	 */
-//	public void finalizeInvoice(InvoiceID invoiceID)
-//		throws ModuleException
-//	{
-//		PersistenceManager pm = getPersistenceManager();
-//		try {
-//			User user = User.getUser(pm, getPrincipal());
-//			finalizeInvoice(pm, user, invoiceID);
-//		} finally {
-//			pm.close();
-//		}
-//	}
-//
-//	/**
-//	 * @throws ModuleException
-//	 *
-//	 * @ejb.interface-method
-//	 * @ejb.transaction type="Required"
-//	 * @ejb.permission role-name="_Guest_"
-//	 */
-//	public void finalizeInvoices(Collection invoiceIDs)
-//		throws ModuleException
-//	{
-//		PersistenceManager pm = getPersistenceManager();
-//		try {
-//			User user = User.getUser(pm, getPrincipal());
-//			for (Iterator iter = invoiceIDs.iterator(); iter.hasNext();) {
-//				InvoiceID invoiceID = (InvoiceID) iter.next();
-//				finalizeInvoice(pm, user, invoiceID);
-//			}
-//		} finally {
-//			pm.close();
-//		}
-//	}
-//
-//	/**
-//	 * @throws ModuleException
-//	 *
-//	 * @ejb.interface-method
-//	 * @ejb.transaction type="Required"
-//	 * @ejb.permission role-name="_Guest_"
-//	 */
-//	public void bookInvoice(InvoiceID invoiceID, boolean finalizeIfNecessary, boolean silentlyIgnoreBookedInvoice)
-//		throws ModuleException
-//	{
-//		PersistenceManager pm = getPersistenceManager();
-//		try {
-//			User user = User.getUser(pm, getPrincipal());
-//			bookInvoice(pm, user, invoiceID, finalizeIfNecessary, silentlyIgnoreBookedInvoice);
-//		} finally {
-//			pm.close();
-//		}
-//	}
-//
-//	/**
-//	 * @throws ModuleException
-//	 *
-//	 * @ejb.interface-method
-//	 * @ejb.transaction type="Required"
-//	 * @ejb.permission role-name="_Guest_"
-//	 */
-//	public void bookInvoices(Collection invoiceIDs, boolean finalizeIfNecessary, boolean silentlyIgnoreBookedInvoice)
-//		throws ModuleException
-//	{
-//		PersistenceManager pm = getPersistenceManager();
-//		try {
-//			User user = User.getUser(pm, getPrincipal());
-//			for (Iterator iter = invoiceIDs.iterator(); iter.hasNext();) {
-//				InvoiceID invoiceID = (InvoiceID) iter.next();
-//				bookInvoice(pm, user, invoiceID, finalizeIfNecessary, silentlyIgnoreBookedInvoice);
-//			}
-//		} finally {
-//			pm.close();
-//		}
-//	}
-
-//	protected void bookInvoice(
-//			PersistenceManager pm, User user, InvoiceID invoiceID,
-//			boolean finalizeIfNecessary, boolean silentlyIgnoreBookedInvoice)
-//	throws ModuleException
-//	{
-//		Invoice invoice = null;
-//		try {
-//			invoice = (Invoice)pm.getObjectById(invoiceID);
-//		} catch (JDOObjectNotFoundException e) {
-//			throw new ModuleException("Could not find an Invoice in datastore for invcoiceID: "+invoiceID, e);
-//		}
-//		Accounting.getAccounting(pm).bookInvoice(user, invoice, finalizeIfNecessary, silentlyIgnoreBookedInvoice);
-//	}
-//
-//	protected void finalizeInvoice(PersistenceManager pm, User user, InvoiceID invoiceID)
-//	throws ModuleException
-//	{
-//		Invoice invoice = null;
-//		try {
-//			invoice = (Invoice)pm.getObjectById(invoiceID);
-//		} catch (JDOObjectNotFoundException e) {
-//			throw new ModuleException("Could not find an Invoice in datastore for invcoiceID: "+invoiceID, e);
-//		}
-//		Accounting.getAccounting(pm).finalizeInvoice(user, invoice);
-//	}
-
 
 	/**
 	 * @param paymentDataList A <tt>List</tt> of {@link PaymentData}.
@@ -1620,18 +1327,16 @@ public abstract class AccountingManagerBean
 	 *
 	 * @ejb.interface-method
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.pay"
 	 */
-	public List<PaymentResult> payBegin(List paymentDataList)
+	public List<PaymentResult> payBegin(List<PaymentData> paymentDataList)
 	throws ModuleException
 	{
 		try {
 			AccountingManagerLocal accountingManagerLocal = AccountingManagerUtil.getLocalHome().create();
 
 			List<PaymentResult> resList = new ArrayList<PaymentResult>();
-			for (Iterator it = paymentDataList.iterator(); it.hasNext(); ) {
-				PaymentData paymentData = (PaymentData) it.next();
-
+			for (PaymentData paymentData : paymentDataList) {
 				PaymentResult res = null;
 				try {
 					res = accountingManagerLocal._payBegin(paymentData);
@@ -1672,7 +1377,7 @@ public abstract class AccountingManagerBean
 	 *
 	 * @ejb.interface-method
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.pay"
 	 */
 	public PaymentResult payBegin(PaymentData paymentData)
 	throws ModuleException
@@ -1681,6 +1386,8 @@ public abstract class AccountingManagerBean
 	}
 
 	/**
+	 * This method does not require access right control, because it can only be called internally (see view-type="local").
+	 *
 	 * @ejb.interface-method view-type="local"
 	 * @ejb.transaction type="RequiresNew"
 	 * @ejb.permission role-name="_Guest_"
@@ -1755,6 +1462,9 @@ public abstract class AccountingManagerBean
 
 
 	/**
+	 * This method does not require access right control, because it can only be performed, if <code>payBegin</code> was
+	 * called before, which is restricted.
+	 *
 	 * @param paymentIDs Instances of {@link PaymentID}
 	 * @param payDoWorkClientResults Instances of {@link PaymentResult} corresponding
 	 *		to the <tt>paymentIDs</tt>. Hence, both lists must have the same number of items.
@@ -1768,7 +1478,7 @@ public abstract class AccountingManagerBean
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public List<PaymentResult> payDoWork(List paymentIDs, List payDoWorkClientResults, boolean forceRollback)
+	public List<PaymentResult> payDoWork(List<PaymentID> paymentIDs, List<PaymentResult> payDoWorkClientResults, boolean forceRollback)
 	throws ModuleException
 	{
 		try {
@@ -1778,10 +1488,10 @@ public abstract class AccountingManagerBean
 				throw new IllegalArgumentException("paymentIDs.size() != payDoWorkClientResults.size()!!!");
 
 			List<PaymentResult> resList = new ArrayList<PaymentResult>();
-			Iterator itResults = payDoWorkClientResults.iterator();
-			for (Iterator itIDs = paymentIDs.iterator(); itIDs.hasNext(); ) {
-				PaymentID paymentID = (PaymentID) itIDs.next();
-				PaymentResult payDoWorkClientResult = (PaymentResult) itResults.next();
+			Iterator<PaymentResult> itResults = payDoWorkClientResults.iterator();
+			for (Iterator<PaymentID> itIDs = paymentIDs.iterator(); itIDs.hasNext(); ) {
+				PaymentID paymentID = itIDs.next();
+				PaymentResult payDoWorkClientResult = itResults.next();
 
 				PaymentResult res = null;
 				try {
@@ -1812,6 +1522,9 @@ public abstract class AccountingManagerBean
 
 
 	/**
+	 * This method does not require access right control, because it can only be performed, if <code>payBegin</code> was
+	 * called before, which is restricted.
+	 *
 	 * @throws ModuleException
 	 *
 	 * @see Accounting#payEnd(User, PaymentData)
@@ -1830,6 +1543,8 @@ public abstract class AccountingManagerBean
 	}
 
 	/**
+	 * This method does not require access right control, because it can only be called internally (see view-type="local").
+	 *
 	 * @ejb.interface-method view-type="local"
 	 * @ejb.transaction type="RequiresNew"
 	 * @ejb.permission role-name="_Guest_"
@@ -1888,6 +1603,9 @@ public abstract class AccountingManagerBean
 
 
 	/**
+	 * This method does not require access right control, because it can only be performed, if <code>payBegin</code> was
+	 * called before, which is restricted.
+	 *
 	 * @param paymentIDs Instances of {@link PaymentID}
 	 * @param payEndClientResults Instances of {@link PaymentResult} corresponding
 	 *		to the <tt>paymentIDs</tt>. Hence, both lists must have the same number of items.
@@ -1901,7 +1619,7 @@ public abstract class AccountingManagerBean
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public List<PaymentResult> payEnd(List paymentIDs, List payEndClientResults, boolean forceRollback)
+	public List<PaymentResult> payEnd(List<PaymentID> paymentIDs, List<PaymentResult> payEndClientResults, boolean forceRollback)
 	throws ModuleException
 	{
 		try {
@@ -1911,10 +1629,10 @@ public abstract class AccountingManagerBean
 				throw new IllegalArgumentException("paymentIDs.size() != payEndClientResults.size()!!!");
 
 			List<PaymentResult> resList = new ArrayList<PaymentResult>();
-			Iterator itResults = payEndClientResults.iterator();
-			for (Iterator itIDs = paymentIDs.iterator(); itIDs.hasNext(); ) {
-				PaymentID paymentID = (PaymentID) itIDs.next();
-				PaymentResult payEndClientResult = (PaymentResult) itResults.next();
+			Iterator<PaymentResult> itResults = payEndClientResults.iterator();
+			for (Iterator<PaymentID> itIDs = paymentIDs.iterator(); itIDs.hasNext(); ) {
+				PaymentID paymentID = itIDs.next();
+				PaymentResult payEndClientResult = itResults.next();
 
 				PaymentResult res = null;
 				try {
@@ -1944,6 +1662,9 @@ public abstract class AccountingManagerBean
 	}
 
 	/**
+	 * This method does not require access right control, because it can only be performed, if <code>payBegin</code> was
+	 * called before, which is restricted.
+	 *
 	 * @throws ModuleException
 	 *
 	 * @see Accounting#payEnd(User, PaymentData)
@@ -1962,6 +1683,8 @@ public abstract class AccountingManagerBean
 	}
 
 	/**
+	 * This method does not require access right control, because it can only be called internally (see view-type="local").
+	 *
 	 * @ejb.interface-method view-type="local"
 	 * @ejb.transaction type="RequiresNew"
 	 * @ejb.permission role-name="_Guest_"
@@ -2020,206 +1743,9 @@ public abstract class AccountingManagerBean
 		}
 	}
 
-//	/**
-//	 * TODO remove this and use {@link IDGenerator}
-//	 *
-//	 * @throws ModuleException
-//	 *
-//	 * @ejb.interface-method
-//	 * @ejb.transaction type="Required"
-//	 * @ejb.permission role-name="_Guest_"
-//	 */
-//	public int createMoneyFlowMappingID()
-//		throws ModuleException
-//	{
-//		PersistenceManager pm = getPersistenceManager();
-//		try {
-//			return Accounting.getAccounting(pm).createMoneyFlowMappingID();
-//		} finally {
-//			pm.close();
-//		}
-//	}
-
-//	/**
-//	 * Returns a Configurator for MoneyFlowMappings initially handling
-//	 * all MoneyFlowMappings found according to the given filters. Set
-//	 * a parameter to null to have it ignored in the filter.
-//	 *
-//	 * @throws ModuleException
-//	 *
-//	 * @ejb.interface-method
-//	 * @ejb.transaction type="Required"
-//	 * @ejb.permission role-name="_Guest_"
-//	 */
-//	public PFMoneyFlowMappingConfigurator getPFMoneyFlowMappingConfigurator(
-//			String accountantDelegateID,
-//			String productTypePK,
-//			String priceFragmentTypePK,
-//			String currencyID,
-//			String packageType,
-//			String[] fetchGroups
-//	)
-//	throws ModuleException
-//	{
-//		PersistenceManager pm = getPersistenceManager();
-//		try {
-//			Query q = pm.newQuery(PFMoneyFlowMapping.class);
-//			StringBuffer filter = new StringBuffer();
-//
-//			if (productTypePK != null) {
-////				filter.append("this.productTypePK == qProductTypePK");
-//				filter.append("this.productTypePK == '"+productTypePK+"'");
-//			}
-//
-//			if (priceFragmentTypePK != null) {
-//				if (filter.length() > 0) {
-//					filter.append(" && ");
-//				}
-////				filter.append("this.priceFragmentTypePK == qPriceFragmentTypePK");
-//				filter.append("this.priceFragmentTypePK == '"+priceFragmentTypePK+"'");
-//			}
-//
-//			if (currencyID != null){
-//				if (filter.length() > 0) {
-//					filter.append(" && ");
-//				}
-////				filter.append("this.currencyID == qCurrencyID");
-//				filter.append("this.currencyID == '"+currencyID+"'");
-//			}
-//
-//			if (packageType != null){
-//				if (filter.length() > 0) {
-//					filter.append(" && ");
-//				}
-////				filter.append("this.packageType == qPackageType");
-//				filter.append("this.packageType == '"+packageType+"'");
-//			}
-//
-//			if (filter.length() > 0)
-//				filter.append(" && ");
-//			if (accountantDelegateID == null)
-//				filter.append("this.accountantDelegateID == null");
-//			else
-//				filter.append("this.accountantDelegateID == \""+accountantDelegateID+"\"");
-//
-//			if (filter.length() > 0) {
-////				q.declareParameters(params.toString());
-//				q.setFilter(filter.toString());
-//			}
-//			Collection mappings = null;
-//			try {
-//				mappings = (Collection)q.execute(); //WithArray(new Object[]{productTypePK, priceFragmentTypePK, currencyID, packageType});
-//			} catch(Throwable t) {
-//				LOGGER.error("Error executing PFMoneyFlowMapping query: ", t);
-//				throw new RuntimeException(t);
-//			}
-//
-//			if (fetchGroups != null)
-//				pm.getFetchPlan().setGroups(Utils.array2ArrayList(fetchGroups));
-//
-//			Collection detachedMappings = pm.detachCopyAll(mappings);
-//
-//			PFMoneyFlowMappingConfigurator result = new PFMoneyFlowMappingConfigurator(getOrganisationID(), detachedMappings, null);
-//			result.setAccountantDelegateID(accountantDelegateID);
-//			return result;
-//		} finally {
-//			pm.close();
-//		}
-//	}
-
-
-//	/**
-//	 * Returns a Map with key productTypePK and value PFMoneyFlowConfigurator
-//	 * holding all declared global Mappings for each element of the
-//	 * given list of productTypePKs.
-//	 *
-//	 * @throws ModuleException
-//	 *
-//	 * @ejb.interface-method
-//	 * @ejb.transaction type="Required"
-//	 * @ejb.permission role-name="_Guest_"
-//	 */
-//	public Map getPFMoneyFlowMappingConfigurators (
-//			Collection productTypePKs,
-//			String[] fetchGroups
-//	)
-//	throws ModuleException
-//	{
-//		PersistenceManager pm = getPersistenceManager();
-//		try {
-//			Query q = pm.newQuery(PFMoneyFlowMapping.class);
-//			StringBuffer filter = new StringBuffer();
-//
-//			Map result = new HashMap();
-//
-//			for (Iterator iter = productTypePKs.iterator(); iter.hasNext();) {
-//				String productTypePK = (String) iter.next();
-//				result.put(
-//						productTypePK,
-//						getPFMoneyFlowMappingConfigurator(
-//								null,
-//								productTypePK,
-//								null,
-//								null,
-//								null,
-//								fetchGroups
-//						)
-//				);
-//			}
-//			return result;
-//		} finally {
-//			pm.close();
-//		}
-//	}
-
-
-//	/**
-//	 * Store the MoneyFlowMappings managed by the given Configurator.
-//	 * @param configurator The configurator to store.
-//	 * @throws ModuleException
-//	 *
-//	 * @ejb.interface-method
-//	 * @ejb.transaction type="Required"
-//	 * @ejb.permission role-name="_Guest_"
-//	 */
-//	public void storeMoneyFlowMappingConfiguration(PFMoneyFlowMappingConfigurator configurator)
-//	throws ModuleException
-//	{
-//		PersistenceManager pm = getPersistenceManager();
-//		try {
-//			configurator.validateAndStore(pm);
-//		} finally {
-//			pm.close();
-//		}
-//	}
-//
-//	/**
-//	 * Store the MoneyFlowMappings managed by the given Configurators.
-//	 *
-//	 * @param configurators A Collection of PFMoneyFlowMappingConfigurators to store.
-//	 * @throws ModuleException
-//	 *
-//	 * @ejb.interface-method
-//	 * @ejb.transaction type="Required"
-//	 * @ejb.permission role-name="_Guest_"
-//	 */
-//	public void storeMoneyFlowMappingConfiguration(Collection configurators)
-//	throws ModuleException
-//	{
-//		PersistenceManager pm = getPersistenceManager();
-//		try {
-//			for (Iterator iter = configurators.iterator(); iter.hasNext();) {
-//				PFMoneyFlowMappingConfigurator configurator = (PFMoneyFlowMappingConfigurator) iter.next();
-//				configurator.validateAndStore(pm);
-//			}
-//		} finally {
-//			pm.close();
-//		}
-//	}
-
 	/**
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.queryInvoices"
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
 	public Invoice getInvoice(InvoiceID invoiceID, String[] fetchGroups, int maxFetchDepth)
@@ -2243,7 +1769,7 @@ public abstract class AccountingManagerBean
 	 *		next one using the {@link AbstractJDOQuery#setCandidates(Collection)}.
 	 *
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.queryInvoices"
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
 	@SuppressWarnings("unchecked")
@@ -2282,7 +1808,7 @@ public abstract class AccountingManagerBean
 
 	/**
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.queryInvoices"
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
 	@SuppressWarnings("unchecked")
@@ -2307,7 +1833,7 @@ public abstract class AccountingManagerBean
 	 * @return Returns instances of {@link Invoice}.
 	 *
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.queryInvoices"
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
 	public List<InvoiceID> getInvoiceIDs(AnchorID vendorID, AnchorID customerID, long rangeBeginIdx, long rangeEndIdx)
@@ -2324,90 +1850,33 @@ public abstract class AccountingManagerBean
 		}
 	}
 
-//	/**
-//	 * @ejb.interface-method
-//	 * @ejb.permission role-name="_Guest_"
-//	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-//	 */
-//	public Set<InvoiceID> getInvoiceIDsByQueries(Collection<AbstractJDOQuery> queries)
-//	{
-//		PersistenceManager pm = getPersistenceManager();
-//		try {
-//			pm.getFetchPlan().setMaxFetchDepth(1);
-//			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
-//
-//			Collection<Invoice> invoices = null;
-//			for (AbstractSearchQuery<R> query : queries) {
-//				query.setPersistenceManager(pm);
-//				query.setCandidates(invoices);
-//				invoices = (Collection) query.getResult();
-//			}
-//
-//			return NLJDOHelper.getObjectIDSet(invoices);
-//		} finally {
-//			pm.close();
-//		}
-//	}
-
 	/**
 	 * This method queries all <code>Invoice</code>s which exist between the given vendor and customer and
 	 * are not yet finalized. They are ordered by invoiceID descending (means newest first).
 	 *
  	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.queryInvoices"
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
-	public List getNonFinalizedInvoices(AnchorID vendorID, AnchorID customerID, String[] fetchGroups, int maxFetchDepth)
+	public List<Invoice> getNonFinalizedInvoices(AnchorID vendorID, AnchorID customerID, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
-			return (List) pm.detachCopyAll(Invoice.getNonFinalizedInvoices(pm, vendorID, customerID));
+			return (List<Invoice>) pm.detachCopyAll(Invoice.getNonFinalizedInvoices(pm, vendorID, customerID));
 		} finally {
 			pm.close();
 		}
 	}
 
-//	/**
-//	 * This method looks up the {@link LegalEntity} specified by the given {@link AnchorID}
-//	 * and returns all {@link ModeOfPaymentFlavour}s that are attached to the
-//	 * default {@link CustomerGroup} of the <tt>LegalEntity</tt>.
-//	 *
-//	 * @ejb.interface-method
-//	 * @ejb.permission role-name="_Guest_"
-//	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-//	 */
-//	public Collection getAvailableModeOfPaymentFlavoursForOneCustomer(AnchorID legalEntityID, String[] fetchGroups, int maxFetchDepth)
-//	throws ModuleException
-//	{
-//		PersistenceManager pm = getPersistenceManager();
-//		try {
-//			pm.getExtent(LegalEntity.class);
-//			Anchor anchor = (Anchor) pm.getObjectById(legalEntityID);
-//			if (!(anchor instanceof LegalEntity))
-//				throw new IllegalArgumentException("Given anchorID \""+legalEntityID+"\" does not represent an instance of LegalEntity, but "+anchor.getClass().getName()+"!");
-//
-//			LegalEntity legalEntity = (LegalEntity)anchor;
-//			if (legalEntity.getDefaultCustomerGroup() == null)
-//				throw new IllegalStateException("There is no default CustomerGroup assigned to the LegalEntity "+legalEntity.getPrimaryKey()+"!");
-//
-//			CustomerGroupID customerGroupID = (CustomerGroupID) pm.getObjectId(legalEntity.getDefaultCustomerGroup());
-//
-//			if (fetchGroups != null)
-//				pm.getFetchPlan().setGroups(fetchGroups);
-//
-//			Collection c = ModeOfPaymentFlavour.getAvailableModeOfPaymentFlavoursForOneCustomerGroup(
-//					pm, customerGroupID);
-//
-//			return pm.detachCopyAll(c);
-//		} finally {
-//			pm.close();
-//		}
-//	}
-
 	/**
+	 * Get the mode of payment flavours that are available to the specified customer groups.
+	 * <p>
+	 * This method can be called by everyone, because mode of payment flavours are not considered confidential.
+	 * </p>
+	 *
 	 * @param customerGroupIDs A <tt>Collection</tt> of {@link CustomerGroupID}. If <tt>null</tt>, all {@link ModeOfPaymentFlavour}s will be returned.
 	 * @param mergeMode one of {@link ModeOfPaymentFlavour#MERGE_MODE_INTERSECTION} or {@link ModeOfPaymentFlavour#MERGE_MODE_UNION}
 	 * @param fetchGroups Either <tt>null</tt> or all desired fetch groups.
@@ -2416,8 +1885,8 @@ public abstract class AccountingManagerBean
 	 * @ejb.permission role-name="_Guest_"
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
-	public Collection getAvailableModeOfPaymentFlavoursForAllCustomerGroups(
-			Collection customerGroupIDs, byte mergeMode, String[] fetchGroups, int maxFetchDepth)
+	public Collection<ModeOfPaymentFlavour> getAvailableModeOfPaymentFlavoursForAllCustomerGroups(
+			Collection<CustomerGroupID> customerGroupIDs, byte mergeMode, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -2425,7 +1894,7 @@ public abstract class AccountingManagerBean
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 
-			Collection c = ModeOfPaymentFlavour.getAvailableModeOfPaymentFlavoursForAllCustomerGroups(
+			Collection<ModeOfPaymentFlavour> c = ModeOfPaymentFlavour.getAvailableModeOfPaymentFlavoursForAllCustomerGroups(
 					pm, customerGroupIDs, mergeMode);
 
 			return pm.detachCopyAll(c);
@@ -2435,6 +1904,10 @@ public abstract class AccountingManagerBean
 	}
 
 	/**
+	 * Get the object-ids of all modes of payment.
+	 * <p>
+	 * This method can be called by everyone, because the returned object-ids are not confidential.
+	 * </p>
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
@@ -2450,6 +1923,10 @@ public abstract class AccountingManagerBean
 	}
 
 	/**
+	 * Get the modes of payment that are specified by the given object-ids.
+	 * <p>
+	 * This method can be called by everyone, because modes of payment are not considered confidential.
+	 * </p>
 	 * @param fetchGroups Either <tt>null</tt> or all desired fetch groups.
 	 *
 	 * @ejb.interface-method
@@ -2467,6 +1944,10 @@ public abstract class AccountingManagerBean
 	}
 
 	/**
+	 * Get the object-ids of all mode of payment flavours.
+	 * <p>
+	 * This method can be called by everyone, because the returned object-ids are not confidential.
+	 * </p>
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
@@ -2482,6 +1963,10 @@ public abstract class AccountingManagerBean
 	}
 
 	/**
+	 * Get the mode of payment flavours that are specified by the given object-ids.
+	 * <p>
+	 * This method can be called by everyone, because mode of payment flavours are not considered confidential.
+	 * </p>
 	 * @param fetchGroups Either <tt>null</tt> or all desired fetch groups.
 	 *
 	 * @ejb.interface-method
@@ -2499,6 +1984,11 @@ public abstract class AccountingManagerBean
 	}
 
 	/**
+	 * Get the server payment processors available for the specified mode of payment flavour.
+	 * <p>
+	 * This method can be called by everyone, because the returned server payment processors do not reveal confidential data.
+	 * </p>
+	 *
 	 * @param fetchGroups Either <tt>null</tt> or all desired fetch groups.
 	 *
 	 * @ejb.interface-method
@@ -2536,11 +2026,16 @@ public abstract class AccountingManagerBean
 	}
 
 	/**
+	 * Get the mode of payment flavours that are available to the specified customer group.
+	 * <p>
+	 * This method can be called by everyone, because the mode of payment flavours are not confidential.
+	 * </p>
+	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
-	public Collection getAvailableModeOfPaymentFlavoursForOneCustomerGroup(CustomerGroupID customerGroupID, String[] fetchGroups, int maxFetchDepth)
+	public Collection<ModeOfPaymentFlavour> getAvailableModeOfPaymentFlavoursForOneCustomerGroup(CustomerGroupID customerGroupID, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -2548,7 +2043,7 @@ public abstract class AccountingManagerBean
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 
-			Collection c = ModeOfPaymentFlavour.getAvailableModeOfPaymentFlavoursForOneCustomerGroup(
+			Collection<ModeOfPaymentFlavour> c = ModeOfPaymentFlavour.getAvailableModeOfPaymentFlavoursForOneCustomerGroup(
 					pm, customerGroupID);
 
 			return pm.detachCopyAll(c);
@@ -2562,10 +2057,9 @@ public abstract class AccountingManagerBean
 	 *
 	 * @ejb.interface-method
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.editPriceConfiguration"
 	 */
-	public ProductType getProductTypeForPriceConfigEditing(
-			ProductTypeID productTypeID)
+	public ProductType getProductTypeForPriceConfigEditing(ProductTypeID productTypeID)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -2578,7 +2072,7 @@ public abstract class AccountingManagerBean
 	/**
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.editInvoice"
 	 */
 	public void signalInvoice(InvoiceID invoiceID, String jbpmTransitionName)
 	{
@@ -2603,7 +2097,7 @@ public abstract class AccountingManagerBean
 	 *
 	 * @ejb.interface-method
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.editPriceConfiguration" // This method is AFAIK only called when editing and storing a price config. marco.
 	 */
 	public Map<PriceConfigID, List<AffectedProductType>> getAffectedProductTypes(Set<PriceConfigID> priceConfigIDs, ProductTypeID productTypeID, PriceConfigID innerPriceConfigID)
 	{
@@ -2618,7 +2112,7 @@ public abstract class AccountingManagerBean
 
 	/**
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.queryAccounts"
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
 	@SuppressWarnings("unchecked")
@@ -2696,7 +2190,7 @@ public abstract class AccountingManagerBean
 	/**
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.manualMoneyTransfer"
 	 */
 	public ManualMoneyTransfer createManualMoneyTransfer(
 			AnchorID fromID, AnchorID toID, CurrencyID currencyID, long amount, I18nText reason,
@@ -2743,14 +2237,15 @@ public abstract class AccountingManagerBean
 	 *
 	 * @ejb.interface-method
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.queryMoneyTransfers"
 	 */
+	@SuppressWarnings("unchecked")
 	public List<TransferID> getMoneyTransferIDs(MoneyTransferIDQuery productTransferIDQuery)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			productTransferIDQuery.setPersistenceManager(pm);
-			return new ArrayList<TransferID>( (Collection<TransferID>) productTransferIDQuery.getResult());
+			return new ArrayList<TransferID>((Collection<TransferID>) productTransferIDQuery.getResult());
 		} finally {
 			pm.close();
 		}
@@ -2767,8 +2262,9 @@ public abstract class AccountingManagerBean
 	 *
 	 * @ejb.interface-method
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.queryMoneyTransfers"
 	 */
+	@SuppressWarnings("unchecked")
 	public List<TransferID> getMoneyTransferIDs(Collection<MoneyTransferQuery> moneyTransferQueries)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -2789,7 +2285,7 @@ public abstract class AccountingManagerBean
 	/**
 	 * @ejb.interface-method
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.queryMoneyTransfers"
 	 */
 	public List<MoneyTransfer> getMoneyTransfers(Collection<TransferID> moneyTransferIDs, String[] fetchGroups, int maxFetchDepth)
 	{
@@ -2802,6 +2298,11 @@ public abstract class AccountingManagerBean
 	}
 
 	/**
+	 * Get the object-ids of all {@link AccountType}s.
+	 * <p>
+	 * This method can be called by everyone, because the object-ids are not confidential.
+	 * </p>
+	 *
 	 * @ejb.interface-method
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
@@ -2820,6 +2321,10 @@ public abstract class AccountingManagerBean
 	}
 
 	/**
+	 * Get the <code>AccountType</code>s for the specified object-ids.
+	 * <p>
+	 * This method can be called by everyone, because the <code>AccountType</code>s are not confidential.
+	 * </p>
 	 * @ejb.interface-method
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
@@ -2837,7 +2342,7 @@ public abstract class AccountingManagerBean
 	/**
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.editPriceFragmentType"
 	 */
 	public PriceFragmentType storePriceFragmentType(PriceFragmentType priceFragmentType, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{

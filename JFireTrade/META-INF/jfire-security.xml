@@ -4,6 +4,161 @@
 		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 		xsi:schemaLocation="urn:jfire.org:jfire-security_1_0 https://www.jfire.org/schema/jfire-security_1_0.xsd "
 >
+<!-- BEGIN accounting -->
+	<role-group id="org.nightlabs.jfire.accounting.editTariffMapping">
+		<name>Edit tariff mappings</name>
+		<name language="de">Tarif-Mappings editieren</name>
+		<description>
+			Edit the tariff mappings which are required in
+			cross-organisation-trade.
+		</description>
+		<description language="de">
+			Editieren der Tarif-Mappings, die für den
+			Cross-Organisations-Handel verwendet werden.
+		</description>
+		<role id="org.nightlabs.jfire.accounting.editTariffMapping" />
+	</role-group>
+
+	<role-group id="org.nightlabs.jfire.accounting.editTariff">
+		<name>Edit tariffs</name>
+		<name language="de">Tarife editieren</name>
+		<description>
+			Create or modify tariffs. Note that this has no influence on
+			whether price configuration changes are allowed!
+		</description>
+		<description language="de">
+			Erzeugen oder Ändern von Tarifen. Beachten Sie, daß dies
+			keine Auswirkung darauf hat, ob Preiskonfigurationen
+			editiert werden dürfen!
+		</description>
+		<role id="org.nightlabs.jfire.accounting.editTariff" />
+	</role-group>
+
+	<role-group id="org.nightlabs.jfire.accounting.queryAccounts">
+		<name>Query accounts</name>
+		<name language="de">Konten abfragen</name>
+		<description>
+			Read access to accounts.
+		</description>
+		<description language="de">
+			Lesezugriff auf Konten.
+		</description>
+		<role id="org.nightlabs.jfire.accounting.queryAccounts" />
+		<role id="org.nightlabs.jfire.accounting.queryMoneyTransfers" />
+	</role-group>
+
+	<role-group id="org.nightlabs.jfire.accounting.editAccount">
+		<name>Edit accounts</name>
+		<name language="de">Konten editieren</name>
+		<description>
+			Write access to accounts.
+		</description>
+		<description language="de">
+			Schreibzugriff auf Konten.
+		</description>
+		<role id="org.nightlabs.jfire.accounting.editAccount" />
+		<role id="org.nightlabs.jfire.accounting.manualMoneyTransfer" />
+		<include-role-group id="org.nightlabs.jfire.accounting.queryAccounts"/>
+	</role-group>
+
+
+	<role-group id="org.nightlabs.jfire.accounting.queryLocalAccountantDelegates">
+		<name>Query money flow configurations</name>
+		<name language="de">Geldflußkonfigurationen abfragen</name>
+		<description>
+			Query money flow configurations and see their properties.
+		</description>
+		<description language="de">
+			Geldflußkonfigurationen abfragen und deren Eigenschaften einsehen.
+		</description>
+		<role id="org.nightlabs.jfire.accounting.queryLocalAccountantDelegates" />
+	</role-group>
+
+	<role-group id="org.nightlabs.jfire.accounting.editLocalAccountantDelegate">
+		<name>Edit money flow configurations</name>
+		<name language="de">Geldflußkonfigurationen bearbeiten</name>
+		<description>
+			Edit money flow configurations with all their properties.
+		</description>
+		<description language="de">
+			Geldflußkonfigurationen und all ihre Eigenschaften editieren.
+		</description>
+		<role id="org.nightlabs.jfire.accounting.queryLocalAccountantDelegates" />
+		<role id="org.nightlabs.jfire.accounting.editLocalAccountantDelegate" />
+	</role-group>
+
+	<role-group id="org.nightlabs.jfire.accounting.editInvoice">
+		<name>Edit invoices</name>
+		<name language="de">Rechnungen bearbeiten</name>
+		<description>
+			Create or modify invoices.
+		</description>
+		<description language="de">
+			Rechnungen erzeugen oder ändern.
+		</description>
+		<role id="org.nightlabs.jfire.accounting.pay"/>
+		<role id="org.nightlabs.jfire.accounting.editInvoice"/>
+		<include-role-group id="org.nightlabs.jfire.accounting.queryInvoices"/>
+	</role-group>
+
+	<role-group id="org.nightlabs.jfire.accounting.queryInvoices">
+		<name>Query invoices</name>
+		<name language="de">Rechnungen abfragen</name>
+		<description>
+			Query invoices and see their properties.
+		</description>
+		<description language="de">
+			Rechnungen abfragen und deren Eigenschaften einsehen.
+		</description>
+		<role id="org.nightlabs.jfire.accounting.queryInvoices"/>
+	</role-group>
+
+	<role-group id="org.nightlabs.jfire.accounting.editPriceConfiguration">
+		<name>Edit price configurations</name>
+		<name language="de">Preiskonfigurationen bearbeiten</name>
+		<description>
+			Create or modify price configurations.
+		</description>
+		<description language="de">
+			Preiskonfigurationen erzeugen oder ändern.
+		</description>
+		<role id="org.nightlabs.jfire.accounting.editPriceConfiguration"/>
+	</role-group>
+
+	<role-group id="org.nightlabs.jfire.accounting.editPriceFragmentType">
+		<name>Edit price fragment type</name>
+		<name language="de">Preisfragmenttypen bearbeiten</name>
+		<description>
+			Create or modify price fragment types.
+		</description>
+		<description language="de">
+			Preisfragmenttypen erzeugen oder ändern.
+		</description>
+		<role id="org.nightlabs.jfire.accounting.editPriceFragmentType"/>
+	</role-group>
+
+	<!-- END accounting -->
+
+
+<!-- BEGIN store -->
+
+	<role-group id="org.nightlabs.jfire.store.editDeliveryNote">
+		<name>Edit delivery notes</name>
+		<name language="de">Lieferscheine bearbeiten</name>
+		<description>
+			Create or modify delivery notes. This includes performing a delivery.
+		</description>
+		<description language="de">
+			Lieferscheine erzeugen oder ändern. Dies beinhaltet die Durchführung von Lieferungen.
+		</description>
+		<role id="org.nightlabs.jfire.store.deliver"/>
+		<!-- TODO add missing roles (see editInvoice above) -->
+	</role-group>
+	
+<!-- END store -->
+
+<!-- BEGIN trade -->
+
 	<role-group id="org.nightlabs.jfire.trade.seeProductType">
 		<name>See product types</name>
 		<name language="de">Produkttypen sehen</name>
@@ -52,7 +207,6 @@
 		<role id="org.nightlabs.jfire.trade.queryDeliveryNotes"/>
 	</role-group>
 
-	<role-group id="org.nightlabs.jfire.trade.queryInvoices">
-		<role id="org.nightlabs.jfire.trade.queryInvoices"/>
-	</role-group>
+<!-- END trade -->
+
 </jfire-security>

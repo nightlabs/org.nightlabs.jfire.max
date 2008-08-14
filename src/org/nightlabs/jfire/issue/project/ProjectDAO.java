@@ -4,12 +4,16 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
+import org.nightlabs.jfire.issue.Issue;
 import org.nightlabs.jfire.issue.IssueManager;
 import org.nightlabs.jfire.issue.IssueManagerUtil;
+import org.nightlabs.jfire.issue.id.IssueID;
 import org.nightlabs.jfire.issue.project.id.ProjectID;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.progress.ProgressMonitor;
+import org.nightlabs.progress.SubProgressMonitor;
 
 public class ProjectDAO extends BaseJDOObjectDAO<ProjectID, Project>{
 
@@ -47,6 +51,23 @@ public class ProjectDAO extends BaseJDOObjectDAO<ProjectID, Project>{
 	
 	private IssueManager issueManager;
 
+	/**
+	 * Get a single project.
+	 * @param projectID The ID of the project to get
+	 * @param fetchGroups Wich fetch groups to use
+	 * @param maxFetchDepth Fetch depth or {@link NLJDOHelper#MAX_FETCH_DEPTH_NO_LIMIT} 
+	 * @param monitor The progress monitor for this action. For every downloaded
+	 * 					object, <code>monitor.worked(1)</code> will be called.
+	 * @return The requested project object
+	 */
+	public synchronized Project getProject(ProjectID projectID, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
+	{
+		monitor.beginTask("Loading project " + projectID.projectID, 1);
+		Project project = getJDOObject(null, projectID, fetchGroups, maxFetchDepth, new SubProgressMonitor(monitor, 1));
+		monitor.done();
+		return project;
+	}
+	
 	public synchronized List<Project> getProjects(String[] fetchGroups, int maxFetchDepth,
 			ProgressMonitor monitor)
 	{

@@ -9,6 +9,7 @@ import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 
 import org.apache.log4j.Logger;
+import org.nightlabs.jfire.issue.project.id.ProjectID;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.util.Util;
 
@@ -28,6 +29,7 @@ import org.nightlabs.util.Util;
  *
  * @jdo.fetch-group name="Project.issue" fields="issue"
  * @jdo.fetch-group name="Project.name" fields="name"
+ * @jdo.fetch-group name="Project.parentProject" fields="parentProject"
  * @jdo.fetch-group name="Project.subProjects" fields="subProjects"
  *
  **/
@@ -39,6 +41,7 @@ implements Serializable
 
 	public static final String FETCH_GROUP_ISSUE = "Project.issue";
 	public static final String FETCH_GROUP_NAME = "Project.name";
+	public static final String FETCH_GROUP_PARENT_PROJECT = "Project.parentProject";
 	public static final String FETCH_GROUP_SUBPROJECTS = "Project.subProjects";
 
 	/**
@@ -57,6 +60,11 @@ implements Serializable
 	 */
 	private ProjectName name;
 
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private Project parentProject;
+	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
@@ -95,6 +103,23 @@ implements Serializable
 	public ProjectName getName()
 	{
 		return name;
+	}
+	
+	/**
+	 * Get the JDO object id.
+	 * @return the JDO object id.
+	 */
+	public ProjectID getObjectId()
+	{
+		return (ProjectID)JDOHelper.getObjectId(this);
+	}
+	
+	public void setParentProject(Project project) {
+		this.parentProject = project;
+	}
+	
+	public Project getParentProject() {
+		return parentProject;
 	}
 	
 	public Collection<Project> getSubProjects() 

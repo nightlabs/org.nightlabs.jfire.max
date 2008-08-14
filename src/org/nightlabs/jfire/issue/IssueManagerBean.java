@@ -1041,7 +1041,7 @@ implements SessionBean
 			issueResolution = pm.makePersistent(issueResolution);
 			issueType.getIssueResolutions().add(issueResolution);
 
-			// create the process definitions.
+			// Create the process definitions.
 			issueType.readProcessDefinition(IssueType.class.getResource("jbpm/status/"));
 
 			// Create the issueLinkTypes
@@ -1066,7 +1066,46 @@ implements SessionBean
 			issueLinkType.getName().setText(Locale.ENGLISH.getLanguage(), "Duplicate");
 			issueLinkType.addLinkedObjectClass(Issue.class);
 			issueLinkType = pm.makePersistent(issueLinkType);
-
+			
+//			// Create the projects
+//			Project project;
+//
+//			project = new Project(IDGenerator.getOrganisationID(), IDGenerator.nextID(Project.class));
+//			project.getName().setText(Locale.ENGLISH.getLanguage(), "Project 1");
+//			project = pm.makePersistent(project);
+//
+//			project = new Project(IDGenerator.getOrganisationID(), IDGenerator.nextID(Project.class));
+//			project.getName().setText(Locale.ENGLISH.getLanguage(), "Project 2");
+//			project = pm.makePersistent(project);
+//			
+//			project = new Project(IDGenerator.getOrganisationID(), IDGenerator.nextID(Project.class));
+//			project.getName().setText(Locale.ENGLISH.getLanguage(), "Project 2");
+//			project = pm.makePersistent(project);
+//			
+//			project = new Project(IDGenerator.getOrganisationID(), IDGenerator.nextID(Project.class));
+//			project.getName().setText(Locale.ENGLISH.getLanguage(), "Project 3");
+//			project = pm.makePersistent(project);
+//			
+//			project = new Project(IDGenerator.getOrganisationID(), IDGenerator.nextID(Project.class));
+//			project.getName().setText(Locale.ENGLISH.getLanguage(), "Project 4");
+//			project = pm.makePersistent(project);
+//			
+//			Project subProject = new Project(IDGenerator.getOrganisationID(), IDGenerator.nextID(Project.class));
+//			subProject.getName().setText(Locale.ENGLISH.getLanguage(), "Sub project 1");
+//			project.addSubProject(subProject);
+//			
+//			subProject = new Project(IDGenerator.getOrganisationID(), IDGenerator.nextID(Project.class));
+//			subProject.getName().setText(Locale.ENGLISH.getLanguage(), "Sub project 2");
+//			project.addSubProject(subProject);
+//			
+//			subProject = new Project(IDGenerator.getOrganisationID(), IDGenerator.nextID(Project.class));
+//			subProject.getName().setText(Locale.ENGLISH.getLanguage(), "Sub project 3");
+//			project.addSubProject(subProject);
+//			
+//			subProject = new Project(IDGenerator.getOrganisationID(), IDGenerator.nextID(Project.class));
+//			subProject.getName().setText(Locale.ENGLISH.getLanguage(), "Sub project 4");
+//			project.addSubProject(subProject);
+			
 			EditLockType issueEditLock = new EditLockType(EditLockTypeIssue.EDIT_LOCK_TYPE_ID);
 			issueEditLock = pm.makePersistent(issueEditLock);
 			//------------------------------------------------

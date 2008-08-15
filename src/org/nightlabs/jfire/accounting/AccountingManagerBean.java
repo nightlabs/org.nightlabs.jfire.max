@@ -168,17 +168,14 @@ public abstract class AccountingManagerBean
 	@Override
 	public void ejbRemove() throws EJBException, RemoteException
 	{
-		logger.debug(this.getClass().getName() + ".ejbRemove()");
 	}
 	@Override
 	public void ejbActivate() throws EJBException, RemoteException
 	{
-		logger.debug(this.getClass().getName() + ".ejbActivate()");
 	}
 	@Override
 	public void ejbPassivate() throws EJBException, RemoteException
 	{
-		logger.debug(this.getClass().getName() + ".ejbPassivate()");
 	}
 
 	/**

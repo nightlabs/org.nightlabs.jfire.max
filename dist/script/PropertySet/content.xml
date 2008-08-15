@@ -1,6 +1,6 @@
 <!DOCTYPE script-category PUBLIC "-//NightLabs//DTD ScriptingInitializer V 1.1//EN" "http://www.nightlabs.de/dtd/scripting-initializer-content_1_1.dtd">
 <script-category 
-	id="InvoceData"
+	id="PropertySetData"
 	type="JFireReporting-Scripting-PropertySet"
 >
 	<name language="de">PropertySet Daten</name>

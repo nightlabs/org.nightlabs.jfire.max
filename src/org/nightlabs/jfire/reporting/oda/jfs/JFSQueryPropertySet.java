@@ -31,7 +31,7 @@ public class JFSQueryPropertySet implements Serializable {
 	private Map<String, String> properties;
 	
 	/**
-	 * 
+	 * Create a new {@link JFSQueryPropertySet}.
 	 */
 	public JFSQueryPropertySet() {
 		this.properties = new HashMap<String, String>();

@@ -12,13 +12,14 @@ import org.eclipse.datatools.connectivity.oda.IParameterMetaData;
 import org.eclipse.datatools.connectivity.oda.IResultSet;
 import org.eclipse.datatools.connectivity.oda.IResultSetMetaData;
 import org.eclipse.datatools.connectivity.oda.OdaException;
-import org.nightlabs.ModuleException;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.reporting.oda.JFireReportingOdaException;
 import org.nightlabs.jfire.reporting.oda.ParameterMetaData;
 import org.nightlabs.jfire.reporting.oda.jfs.AbstractJFSQueryProxy;
+import org.nightlabs.jfire.reporting.oda.jfs.IJFSQueryPropertySetMetaData;
 import org.nightlabs.jfire.reporting.oda.jfs.JFSQueryPropertySet;
 import org.nightlabs.jfire.reporting.oda.jfs.ReportingScriptExecutor;
+import org.nightlabs.jfire.reporting.oda.jfs.ScriptExecutorJavaClassReportingDelegate;
 import org.nightlabs.jfire.scripting.Script;
 import org.nightlabs.jfire.scripting.ScriptException;
 import org.nightlabs.jfire.scripting.ScriptExecutor;
@@ -48,6 +49,7 @@ public class ServerJFSQueryProxy extends AbstractJFSQueryProxy {
 	/**
 	 * 
 	 */
+	@SuppressWarnings("unchecked")
 	public ServerJFSQueryProxy(Map properties) {
 		super();
 		logger.debug("ServerJFSQueryProxy instantiated");
@@ -130,14 +132,13 @@ public class ServerJFSQueryProxy extends AbstractJFSQueryProxy {
 	}
 	
 	/**
-	 * Returns the script associated to the dataset. Scripts are associated
+	 * Returns the script associated to the data-set. Scripts are associated
 	 * by referencing them with the String representation of their {@link ScriptRegistryItemID}
-	 * int the query property of the dataset.
+	 * in the query property of the data-set.
 	 * <p>
 	 * Note that this method replaces the organisationID of the itemID passed with the
 	 * organisationID of the executing user.
 	 * <p>
-	 * TODO: Refactor script reference in query text to have an option whether to replace the organisation-id or not
 	 * 
 	 * @param pm The PersistenceManager to lookup the script with.
 	 * @param itemID The script's id.
@@ -173,7 +174,7 @@ s	 */
 	 * @param pm The PersistenceManager to use.
 	 * @param script The Script to create the executor for.
 	 * @return A {@link ReportingScriptExecutor} for the given script.
-	 * @throws InstantiationException
+	 * @throws InstantiationException If creating the executor fails.
 	 */
 	private static ReportingScriptExecutor createReportingScriptExecutor(PersistenceManager pm, Script script) throws InstantiationException
 	{
@@ -194,9 +195,8 @@ s	 */
 	 * @param pm The PersistenceManager to lookup the executor.
 	 * @param scriptRegistryItemID The scriptRegistryItemID that will be delegate to (does the real work).
 	 * @return An {@link IResultSetMetaData} created by the Script referenced by the given scriptRegistryItemID.
-	 * @throws InstantiationException
-	 * @throws ScriptException
-	 * @throws ModuleException
+	 * @throws ScriptException If getting the meta-data fails.
+	 * @throws InstantiationException If creating the executor fails.
 	 */
 	public static IResultSetMetaData getJFSResultSetMetaData(PersistenceManager pm, ScriptRegistryItemID scriptRegistryItemID, JFSQueryPropertySet queryPropertySet) throws ScriptException, InstantiationException
 	{
@@ -205,16 +205,29 @@ s	 */
 	}
 
 	/**
+	 * Obtains the {@link IJFSQueryPropertySetMetaData} of the referenced sscript if it is a {@link ScriptExecutorJavaClassReportingDelegate}. 
+	 * 
+	 * @param pm The {@link PersistenceManager} to use.
+	 * @param scriptRegistryItemID The id of the script to find the {@link IJFSQueryPropertySetMetaData} for.
+	 * @return the {@link IJFSQueryPropertySetMetaData} of the referenced script.
+	 * @throws ScriptException If getting the meta-data fails.
+	 * @throws InstantiationException If creating the executor fails.
+	 */
+	public static IJFSQueryPropertySetMetaData getJFSQueryPropertySetMetaData(PersistenceManager pm, ScriptRegistryItemID scriptRegistryItemID) throws ScriptException, InstantiationException
+	{
+		Script script = getScript(pm, scriptRegistryItemID);
+		return createReportingScriptExecutor(pm, script).getJFSQueryPropertySetMetaData(script);
+	}
+	
+	/**
 	 * Lookup the {@link ReportingScriptExecutor} and let him execute {@link ReportingScriptExecutor#getResultSet(Script, Map, JFSQueryPropertySet)}.
 	 * 
 	 * @param pm The PersistenceManager to lookup the executor.
 	 * @param scriptRegistryItemID The scriptRegistryItemID that will be delegate to (does the real work).
 	 * @param parameters The parameters for the script to execute.
 	 * @return An {@link IResultSetMetaData} created by the Script referenced by the given scriptRegistryItemID.
-	 * @throws InstantiationException
-	 * @throws ScriptException
-	 * 
-	 * @throws ModuleException
+	 * @throws ScriptException If getting the meta-data fails.
+	 * @throws InstantiationException If creating the executor fails.
 	 */
 	public static IResultSet getJFSResultSet(PersistenceManager pm, ScriptRegistryItemID scriptRegistryItemID, JFSQueryPropertySet queryPropertySet, Map<String, Object> parameters)
 	throws ScriptException, InstantiationException

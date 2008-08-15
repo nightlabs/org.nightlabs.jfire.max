@@ -33,7 +33,7 @@ public interface ReportingScriptExecutor {
 	 * @return The ODA IResultSetMetaData for the given script.
 	 * @throws ScriptException Might throw a ScriptException.
 	 */
-	public IResultSetMetaData getResultSetMetaData(Script script, JFSQueryPropertySet queryPropertySet) throws ScriptException;
+	IResultSetMetaData getResultSetMetaData(Script script, JFSQueryPropertySet queryPropertySet) throws ScriptException;
 	
 	/**
 	 * Returns the ODA IResultSet for the given script.
@@ -44,5 +44,13 @@ public interface ReportingScriptExecutor {
 	 * @return The ODA IResultSet for the given script.
 	 * @throws ScriptException Might throw a ScriptException.
 	 */
-	public IResultSet getResultSet(Script script, Map<String, Object> parameters, JFSQueryPropertySet queryPropertySet) throws ScriptException;
+	IResultSet getResultSet(Script script, Map<String, Object> parameters, JFSQueryPropertySet queryPropertySet) throws ScriptException;
+	
+	/**
+	 * Returns the {@link IJFSQueryPropertySetMetaData} of the given script
+	 * 
+	 * @return The {@link IJFSQueryPropertySetMetaData} of the given script
+	 */
+	IJFSQueryPropertySetMetaData getJFSQueryPropertySetMetaData(Script script) throws ScriptException;
+	
 }

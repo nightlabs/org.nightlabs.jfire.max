@@ -77,6 +77,7 @@ import org.nightlabs.jfire.reporting.layout.render.ReportLayoutRendererUtil;
 import org.nightlabs.jfire.reporting.oda.JFireReportingOdaException;
 import org.nightlabs.jfire.reporting.oda.jdoql.JDOQLMetaDataParser;
 import org.nightlabs.jfire.reporting.oda.jdoql.JDOQLResultSetMetaData;
+import org.nightlabs.jfire.reporting.oda.jfs.IJFSQueryPropertySetMetaData;
 import org.nightlabs.jfire.reporting.oda.jfs.JFSQueryPropertySet;
 import org.nightlabs.jfire.reporting.oda.jfs.ScriptExecutorJavaClassReporting;
 import org.nightlabs.jfire.reporting.oda.server.jfs.ServerJFSQueryProxy;
@@ -522,6 +523,26 @@ implements SessionBean
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			return ServerJFSQueryProxy.getJFSResultSetMetaData(pm, queryPropertySet.getScriptRegistryItemID(), queryPropertySet);
+		} finally {
+			pm.close();
+		}
+	}
+	
+	/**
+	 * Obtains the {@link IJFSQueryPropertySetMetaData} of the referenced script.
+	 *  
+	 * @throws ScriptException If getting the meta-data fails.
+	 * @throws InstantiationException If creating the executor fails.
+	 * 
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type="Never"
+	 */
+	public IJFSQueryPropertySetMetaData getJFSQueryPropertySetMetaData(ScriptRegistryItemID scriptID) throws ScriptException, InstantiationException
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			return ServerJFSQueryProxy.getJFSQueryPropertySetMetaData(pm, scriptID);
 		} finally {
 			pm.close();
 		}

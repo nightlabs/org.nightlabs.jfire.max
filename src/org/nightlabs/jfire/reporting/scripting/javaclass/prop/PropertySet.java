@@ -13,6 +13,7 @@ import java.util.TreeMap;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 
+import org.apache.log4j.Logger;
 import org.eclipse.datatools.connectivity.oda.IResultSetMetaData;
 import org.nightlabs.jfire.prop.DataField;
 import org.nightlabs.jfire.prop.IStruct;
@@ -31,10 +32,13 @@ import org.nightlabs.jfire.prop.structfield.NumberStructField;
 import org.nightlabs.jfire.reporting.JFireReportingHelper;
 import org.nightlabs.jfire.reporting.oda.DataType;
 import org.nightlabs.jfire.reporting.oda.jfs.AbstractJFSScriptExecutorDelegate;
+import org.nightlabs.jfire.reporting.oda.jfs.IJFSQueryPropertySetMetaData;
+import org.nightlabs.jfire.reporting.oda.jfs.JFSQueryPropertySet;
+import org.nightlabs.jfire.reporting.oda.jfs.JFSQueryPropertySetMetaData;
 import org.nightlabs.jfire.reporting.oda.jfs.JFSResultSet;
 import org.nightlabs.jfire.reporting.oda.jfs.JFSResultSetMetaData;
+import org.nightlabs.jfire.reporting.oda.jfs.JFSQueryPropertySetMetaData.Entry;
 import org.nightlabs.jfire.scripting.ScriptException;
-import org.nightlabs.jfire.scripting.ScriptExecutorJavaClass;
 import org.nightlabs.jfire.security.SecurityReflector;
 
 /**
@@ -74,41 +78,39 @@ public class PropertySet
 extends AbstractJFSScriptExecutorDelegate
 {
 
-//	private static final Logger logger = Logger.getLogger(PropertySet.class);
+	private static final Logger logger = Logger.getLogger(PropertySet.class);
 
 	public static final String PARAMETER_NAME_PROPERTY_SET_ID = "propertySetID";
 
 	public static final String PROPERTY_NAME_LINK_CLASS = "linkClass";
-	public static final String PROPERTY_NAME_SCOPE = "scope";
+	public static final String PROPERTY_NAME_STRUCT_SCOPE = "structScope";
+	public static final String PROPERTY_NAME_STRUCT_LOCAL_SCOPE = "structLocalScope";
 
 	public PropertySet() {
 		super();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.nightlabs.jfire.reporting.oda.jfs.AbstractJFSScriptExecutorDelegate#getJFSQueryPropertySetMetaData()
+	 */
+	@Override
+	public IJFSQueryPropertySetMetaData getJFSQueryPropertySetMetaData() {
+		JFSQueryPropertySetMetaData metaData = new JFSQueryPropertySetMetaData();
+		metaData.addEntry(new Entry(PROPERTY_NAME_LINK_CLASS, true));
+		metaData.addEntry(new Entry(PROPERTY_NAME_STRUCT_SCOPE, false));
+		metaData.addEntry(new Entry(PROPERTY_NAME_STRUCT_LOCAL_SCOPE, false));
+		return metaData;
+	}
+	
 	private JFSResultSetMetaData metaData;
 
 	public IResultSetMetaData getResultSetMetaData() {
 		if (metaData == null) {
 			metaData = new JFSResultSetMetaData();
-			PersistenceManager pm = getScriptExecutorJavaClass().getPersistenceManager();
-			String linkClass = getJFSQueryPropertySet().getProperties().get(PROPERTY_NAME_LINK_CLASS);;
-			if (linkClass == null || "".equals(linkClass)) {
-				throw new IllegalArgumentException("Query property linkClass was not set.");
-			}
-			String scope = getJFSQueryPropertySet().getProperties().get(PROPERTY_NAME_SCOPE);
-			if (scope == null || "".equals(scope)) {
-				throw new IllegalArgumentException("Query property scope was not set.");
-			}
+			IStruct struct = getStruct();
 			metaData.addColumn("DisplayName", DataType.STRING);
-			// TODO: Struct.DEFAULT_SCOPE is used here, which limits the usages of this query to this scope. 
-			//       On the long run this should become a parameter and only if it is not set the default should apply.
-			IStruct struct = StructLocal.getStructLocal(linkClass, Struct.DEFAULT_SCOPE, scope, pm);
-			SortedMap<String, StructBlock> sortedBlocks = new TreeMap<String, StructBlock>();
-			for (Iterator<StructBlock> iter = struct.getStructBlocks().iterator(); iter.hasNext();) {
-				StructBlock structBlock = iter.next();
-				sortedBlocks.put(structBlock.getPrimaryKey(), structBlock);
-			}
-			for (Iterator<StructBlock> iter = sortedBlocks.values().iterator(); iter.hasNext();) {
+			for (Iterator<StructBlock> iter = getSortedBlocks(struct).values().iterator(); iter.hasNext();) {
 				StructBlock structBlock = iter.next();
 				SortedMap<String, StructField<? extends DataField>> sortedFields = new TreeMap<String, StructField<? extends DataField>>();
 				for (Iterator<StructField<? extends DataField>> iterator = structBlock.getStructFields().iterator(); iterator.hasNext();) {
@@ -139,6 +141,35 @@ extends AbstractJFSScriptExecutorDelegate
 		return metaData;
 	}
 
+	/**
+	 * @return The {@link StructLocal} based on the linkClass, structScope and structLocalScope
+	 *         set in the {@link JFSQueryPropertySet} of this delegate.
+	 */
+	protected IStruct getStruct() {
+		PersistenceManager pm = getScriptExecutorJavaClass().getPersistenceManager();
+		String linkClass = getJFSQueryPropertySet().getProperties().get(PROPERTY_NAME_LINK_CLASS);;
+		if (linkClass == null || "".equals(linkClass)) {
+			throw new IllegalArgumentException("Query property linkClass was not set.");
+		}
+		String structScope = getJFSQueryPropertySet().getProperties().get(PROPERTY_NAME_STRUCT_SCOPE);
+		if (structScope == null || "".equals(structScope)) {
+			logger.debug("Query property " + PROPERTY_NAME_STRUCT_SCOPE + " was not set, using '" + Struct.DEFAULT_SCOPE + "' instead");
+		}
+		String structLocalScope = getJFSQueryPropertySet().getProperties().get(PROPERTY_NAME_STRUCT_SCOPE);
+		if (structLocalScope == null || "".equals(structLocalScope)) {
+			logger.debug("Query property " + PROPERTY_NAME_STRUCT_LOCAL_SCOPE + " was not set, using '" + StructLocal.DEFAULT_SCOPE + "' instead");
+		}
+		return StructLocal.getStructLocal(linkClass, structScope, structLocalScope, pm);
+	}
+
+	protected SortedMap<String, StructBlock> getSortedBlocks(IStruct struct) {
+		SortedMap<String, StructBlock> sortedBlocks = new TreeMap<String, StructBlock>();
+		for (Iterator<StructBlock> iter = struct.getStructBlocks().iterator(); iter.hasNext();) {
+			StructBlock structBlock = iter.next();
+			sortedBlocks.put(structBlock.getPrimaryKey(), structBlock);
+		}
+		return sortedBlocks;
+	}
 
 	protected String getColumnName(StructField<? extends DataField> structField) {
 		return structField.getStructBlockID() + "_" + structField.getStructFieldID();
@@ -158,30 +189,16 @@ extends AbstractJFSScriptExecutorDelegate
 			throw new IllegalArgumentException("Parameter " + PARAMETER_NAME_PROPERTY_SET_ID + " is not set.");
 
 		PersistenceManager pm = getScriptExecutorJavaClass().getPersistenceManager();
-//		Set oldGroups = pm.getFetchPlan().getGroups();
-//		int oldFetchDepth = pm.getFetchPlan().getMaxFetchDepth();
-//		pm.getFetchPlan().setGroups(new String[] {FetchPlan.DEFAULT, org.nightlabs.jfire.prop.PropertySet.FETCH_GROUP_FULL_DATA});
-//		pm.getFetchPlan().setMaxFetchDepth(NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
-
 		org.nightlabs.jfire.prop.PropertySet propertySet = (org.nightlabs.jfire.prop.PropertySet) pm.getObjectById(propertySetID);
 
 		IStruct struct = StructLocal.getStructLocal(
 				propertySet.getStructLocalLinkClass(), 
 				propertySet.getStructScope(), propertySet.getStructLocalScope(), pm);
-		// no need to detach any more, data is obtained via getPersitentDataField()
-//		propertySet = pm.detachCopy(propertySet);
-//		pm.getFetchPlan().setGroups(oldGroups);
-//		pm.getFetchPlan().setMaxFetchDepth(oldFetchDepth);
-//		propertySet.inflate(struct);
+		
 		List<Object> elements = new LinkedList<Object>();
 		Locale locale = JFireReportingHelper.getLocale();
-		SortedMap<String, StructBlock> sortedBlocks = new TreeMap<String, StructBlock>();
-		elements.add(propertySet.getDisplayName());
-		for (Iterator<StructBlock> iter = struct.getStructBlocks().iterator(); iter.hasNext();) {
-			StructBlock structBlock = iter.next();
-			sortedBlocks.put(structBlock.getPrimaryKey(), structBlock);
-		}
-		for (Iterator<StructBlock> iter = sortedBlocks.values().iterator(); iter.hasNext();) {
+		elements.add(propertySet.getDisplayName());		
+		for (Iterator<StructBlock> iter = getSortedBlocks(struct).values().iterator(); iter.hasNext();) {
 			StructBlock structBlock = iter.next();
 			SortedMap<String, StructField<? extends DataField>> sortedFields = new TreeMap<String, StructField<? extends DataField>>();
 			for (Iterator<StructField<? extends DataField>> iterator = structBlock.getStructFields().iterator(); iterator.hasNext();) {
@@ -225,29 +242,4 @@ extends AbstractJFSScriptExecutorDelegate
 		resultSet.init();
 		return resultSet;
 	}
-
-	/* (non-Javadoc)
-	 * @see org.nightlabs.jfire.scripting.ScriptExecutorJavaClassDelegate#doPrepare()
-	 */
-	public void doPrepare() throws ScriptException {
-	}
-
-	private ScriptExecutorJavaClass scriptExecutorJavaClass;
-
-	/* (non-Javadoc)
-	 * @see org.nightlabs.jfire.scripting.ScriptExecutorJavaClassDelegate#getScriptExecutorJavaClass()
-	 */
-	@Override
-	public ScriptExecutorJavaClass getScriptExecutorJavaClass() {
-		return scriptExecutorJavaClass;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.nightlabs.jfire.scripting.ScriptExecutorJavaClassDelegate#setScriptExecutorJavaClass(org.nightlabs.jfire.scripting.ScriptExecutorJavaClass)
-	 */
-	@Override
-	public void setScriptExecutorJavaClass(ScriptExecutorJavaClass scriptExecutorJavaClass) {
-		this.scriptExecutorJavaClass = scriptExecutorJavaClass;
-	}
-
 }

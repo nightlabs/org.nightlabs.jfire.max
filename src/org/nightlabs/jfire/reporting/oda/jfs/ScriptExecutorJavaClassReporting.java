@@ -32,7 +32,7 @@ implements ReportingScriptExecutor
 {
 
 	/**
-	 * 
+	 * Create a new {@link ScriptExecutorJavaClassReporting}.
 	 */
 	public ScriptExecutorJavaClassReporting() {
 		super();
@@ -70,9 +70,24 @@ implements ReportingScriptExecutor
 	 * 
 	 * @see org.nightlabs.jfire.reporting.oda.jfs.ReportingScriptExecutor#getResultSetMetaData(org.nightlabs.jfire.scripting.Script, JFSQueryPropertySet)
 	 */
+	@Override
 	public IResultSetMetaData getResultSetMetaData(Script script, JFSQueryPropertySet queryPropertySet)
 	throws ScriptException
 	{
+		prepareWithFakeParams(script);
+		ScriptExecutorJavaClassReportingDelegate reportingDelegate = getReportingDelegate(queryPropertySet);
+		return reportingDelegate.getResultSetMetaData();
+	}
+
+	/**
+	 * Calls {@link #prepare(org.nightlabs.jfire.scripting.IScript, Map)} with
+	 * faked parameters, i.e. the right parameter names but with 'this' as value
+	 * for all parameter entries.
+	 * 
+	 * @param script The script to prepare.
+	 * @throws ScriptException If preparing fails.
+	 */
+	private void prepareWithFakeParams(Script script) throws ScriptException {
 		ScriptParameterSet parameterSet = script.getParameterSet();
 		Map<String, Object> fakeParams = null;
 		if (parameterSet != null) {
@@ -83,10 +98,20 @@ implements ReportingScriptExecutor
 			}
 		}
 		prepare(script, fakeParams);
-		ScriptExecutorJavaClassReportingDelegate reportingDelegate = getReportingDelegate(queryPropertySet);
-		return reportingDelegate.getResultSetMetaData();
 	}
-
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.nightlabs.jfire.reporting.oda.jfs.ReportingScriptExecutor#getJFSQueryPropertySetMetaData(org.nightlabs.jfire.scripting.Script)
+	 */
+	@Override
+	public IJFSQueryPropertySetMetaData getJFSQueryPropertySetMetaData(Script script) throws ScriptException	
+	{
+		prepareWithFakeParams(script);
+		ScriptExecutorJavaClassReportingDelegate reportingDelegate = getReportingDelegate(null);
+		return reportingDelegate.getJFSQueryPropertySetMetaData();
+	}
+	
 	/**
 	 * {@inheritDoc}
 	 * <p>
@@ -96,7 +121,7 @@ implements ReportingScriptExecutor
 	 * <p>
 	 * Additionally it will convert the parameters of the script to the value
 	 * according to {@link JFireReportingHelper#getDataSetParamObject(Object)} in
-	 * order to provide the scripts with the actual object parameter instead of
+	 * order to provide the scripts with the actual object parameters instead of
 	 * its String representation.
 	 * </p>
 	 * 
@@ -105,6 +130,7 @@ implements ReportingScriptExecutor
 	 * 
 	 * @see org.nightlabs.jfire.reporting.oda.jfs.ReportingScriptExecutor#getResultSet(org.nightlabs.jfire.scripting.Script, java.util.Map, JFSQueryPropertySet)
 	 */
+	@Override
 	public IResultSet getResultSet(Script script, Map<String, Object> parameters, JFSQueryPropertySet queryPropertySet)
 	throws ScriptException
 	{
@@ -137,7 +163,4 @@ implements ReportingScriptExecutor
 		}
 		return convertedParams;
 	}
-
-	
-
 }

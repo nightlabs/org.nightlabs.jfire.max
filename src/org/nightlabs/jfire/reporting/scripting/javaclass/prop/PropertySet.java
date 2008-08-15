@@ -154,10 +154,12 @@ extends AbstractJFSScriptExecutorDelegate
 		String structScope = getJFSQueryPropertySet().getProperties().get(PROPERTY_NAME_STRUCT_SCOPE);
 		if (structScope == null || "".equals(structScope)) {
 			logger.debug("Query property " + PROPERTY_NAME_STRUCT_SCOPE + " was not set, using '" + Struct.DEFAULT_SCOPE + "' instead");
+			structScope = Struct.DEFAULT_SCOPE;
 		}
 		String structLocalScope = getJFSQueryPropertySet().getProperties().get(PROPERTY_NAME_STRUCT_SCOPE);
 		if (structLocalScope == null || "".equals(structLocalScope)) {
 			logger.debug("Query property " + PROPERTY_NAME_STRUCT_LOCAL_SCOPE + " was not set, using '" + StructLocal.DEFAULT_SCOPE + "' instead");
+			structLocalScope = StructLocal.DEFAULT_SCOPE;
 		}
 		return StructLocal.getStructLocal(linkClass, structScope, structLocalScope, pm);
 	}

@@ -266,7 +266,7 @@ public class RecurringTrader {
 
 			RecurringOffer recurringOffer = new RecurringOffer(
 					user, recurringOrder,
-					offerIDPrefix, IDGenerator.nextID(RecurringOffer.class, offerIDPrefix));
+					offerIDPrefix, IDGenerator.nextID(Offer.class, offerIDPrefix));
 
 			new OfferLocal(recurringOffer); // OfferLocal registers itself in Offer
 

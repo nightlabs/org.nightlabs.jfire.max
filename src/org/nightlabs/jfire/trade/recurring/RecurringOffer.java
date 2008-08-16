@@ -29,7 +29,7 @@ public class RecurringOffer extends Offer {
 	public static final String FETCH_GROUP_RECURRING_OFFER_CONFIGURATION = "RecurringOffer.recurringOfferConfiguration";
 
 	/**
-	 * @jdo.field persistence-modifier="persistent"
+	 * @jdo.field persistence-modifier="persistent" mapped-by="recurringOffer"
 	 */
 	private RecurringOfferConfiguration recurringOfferConfiguration;
 

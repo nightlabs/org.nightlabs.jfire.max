@@ -17,8 +17,12 @@ import org.nightlabs.jfire.accounting.id.CurrencyID;
 import org.nightlabs.jfire.config.ConfigModule;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.store.DeliveryNote;
+import org.nightlabs.jfire.trade.ArticleContainer;
 import org.nightlabs.jfire.trade.Offer;
 import org.nightlabs.jfire.trade.Order;
+import org.nightlabs.jfire.trade.recurring.RecurredOffer;
+import org.nightlabs.jfire.trade.recurring.RecurringOffer;
+import org.nightlabs.jfire.trade.recurring.RecurringOrder;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -157,14 +161,36 @@ public class TradeConfigModule
 		return cf;
 	}
 
+	/**
+	 * Checks if the class with the given name is an implementation of {@link ArticleContainer}.
+	 * This will be done if the class with the given name can be loaded.
+	 * Otherwise this method will check for the known implementations.
+	 * 
+	 * @param articleContainerClassName The class name to check
+	 * @return Whether the given class name is valid.
+	 */
+	protected boolean checkArticleContainerClassName(String articleContainerClassName) {
+		try {
+			Class<?> clazz = Class.forName(articleContainerClassName);
+			return ArticleContainer.class.isAssignableFrom(clazz);
+		} catch (ClassNotFoundException e) {
+		}
+		// the class could not be resolved, we check for the known implementations
+		return 
+			Order.class.getName().equals(articleContainerClassName) ||
+			Offer.class.getName().equals(articleContainerClassName) ||
+			Invoice.class.getName().equals(articleContainerClassName) ||
+			DeliveryNote.class.getName().equals(articleContainerClassName) ||
+			RecurringOrder.class.getName().equals(articleContainerClassName) ||
+			RecurringOffer.class.getName().equals(articleContainerClassName) ||
+			RecurredOffer.class.getName().equals(articleContainerClassName);
+	}
+	
 	public IDPrefixCf getIDPrefixCf(String articleContainerClassName, boolean throwExceptionIfNotFound)
 	{
 		if (!IDPrefixCf.ARTICLE_CONTAINER_CLASS_NAME_GLOBAL.equals(articleContainerClassName) &&
-				!Order.class.getName().equals(articleContainerClassName) &&
-				!Offer.class.getName().equals(articleContainerClassName) &&
-				!Invoice.class.getName().equals(articleContainerClassName) &&
-				!DeliveryNote.class.getName().equals(articleContainerClassName))
-			throw new IllegalArgumentException("articleContainerClassName invalid!");
+				!checkArticleContainerClassName(articleContainerClassName))
+			throw new IllegalArgumentException("articleContainerClassName invalid: " + articleContainerClassName + ".");
 
 		IDPrefixCf res = idPrefixCfs.get(articleContainerClassName);
 		if (res == null && throwExceptionIfNotFound)

@@ -54,7 +54,6 @@ public class TransitionPassThroughActionHandler implements ActionHandler {
 		String transitionName = getEnteringTransitionName();
 		if (transitionName != null && !"".equals(transitionName)) {
 			Transition transition = ctx.getToken().getNode().getLeavingTransition(transitionName);
-			System.out.println("Context Transition: " + ctx.getTransition());
 			if (transition != null) {
 				ctx.leaveNode(transition);
 				return;

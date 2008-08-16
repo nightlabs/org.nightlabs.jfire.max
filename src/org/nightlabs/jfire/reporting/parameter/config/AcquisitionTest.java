@@ -225,7 +225,6 @@ public class AcquisitionTest {
 		AcquisitionTest test = new AcquisitionTest();
 		SortedMap<Integer, List<ValueProviderConfig>> result = test.createAcquisitionSequence(setup, provider);
 
-		
 		for (Entry<Integer, List<ValueProviderConfig>> entry : result.entrySet()) {
 			System.out.println("*** Page "+entry.getKey()+" ***");
 			for (ValueProviderConfig config : entry.getValue()) {

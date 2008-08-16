@@ -47,17 +47,6 @@ public class ClientJFSQueryProxy extends AbstractJFSQueryProxy {
 	 */
 	public ClientJFSQueryProxy(Map properties) {
 		super();
-//		ParameterMetaData metaData = new ParameterMetaData();
-//		ParameterDescriptor descriptor = new ParameterDescriptor();
-//		descriptor.setDataType(1);
-//		descriptor.setDataTypeName("String");
-//		descriptor.setMode(IParameterMetaData.parameterModeIn);
-////		descriptor.getPrecision();
-//		descriptor.setNullable(IParameterMetaData.parameterNullable);
-////		descriptor.set
-//		metaData.addParameterDescriptor(descriptor);
-//		setParameterMetaData(metaData);
-//		System.out.println("Constructor of "+this.getClass().getName()+" called.");
 	}
 
 	private ScriptRegistryItemID lastParamMetaDataItemID;

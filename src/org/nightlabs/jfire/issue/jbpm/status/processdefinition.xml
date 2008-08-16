@@ -45,9 +45,6 @@
 	</state>
 
 	<node name="dev.jfire.org:acknowledgedImplicitely">
-		<event type="node-enter">
-			<action class="org.nightlabs.jfire.jbpm.graph.def.TransitionPassThroughActionHandler"></action>
-		</event>
 		<action class="org.nightlabs.jfire.jbpm.graph.def.TransitionPassThroughActionHandler"></action>
 		<transition to="dev.jfire.org:confirmed" name="confirm"></transition>
 		<transition to="dev.jfire.org:confirmedImplicitely" name="dev.jfire.org:assign"></transition>
@@ -56,9 +53,6 @@
 	</node>
 
 	<node name="dev.jfire.org:confirmedImplicitely">
-		<event type="node-enter">
-			<action class="org.nightlabs.jfire.jbpm.graph.def.TransitionPassThroughActionHandler"></action>
-		</event>
 		<action class="org.nightlabs.jfire.jbpm.graph.def.TransitionPassThroughActionHandler"></action>
 		<transition to="dev.jfire.org:assigned" name="dev.jfire.org:assign"></transition>
 		<transition to="dev.jfire.org:resolved" name="resolve"></transition>
@@ -66,9 +60,6 @@
 	</node>
 
 	<node name="dev.jfire.org:resolvedImplicitely">
-		<event type="node-enter">
-			<action class="org.nightlabs.jfire.jbpm.graph.def.TransitionPassThroughActionHandler"></action>
-		</event>
 		<action class="org.nightlabs.jfire.jbpm.graph.def.TransitionPassThroughActionHandler"></action>
 		<transition to="dev.jfire.org:closed" name="close"></transition>
 	</node>
@@ -87,9 +78,6 @@
 	</state>
 
 	<node name="dev.jfire.org:openedImplicitely">		
-		<event type="node-enter">
-			<action class="org.nightlabs.jfire.jbpm.graph.def.TransitionPassThroughActionHandler"></action>
-		</event>
 		<action class="org.nightlabs.jfire.jbpm.graph.def.TransitionPassThroughActionHandler"></action>
 		<transition to="dev.jfire.org:acknowledged" name="acknowledge"></transition>
 		<transition to="dev.jfire.org:acknowledgedImplicitely" name="confirm"></transition>

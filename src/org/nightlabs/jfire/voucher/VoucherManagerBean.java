@@ -541,7 +541,11 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Required"
 	 */
-	public Collection<? extends Article> createArticles(SegmentID segmentID, OfferID offerID, Collection<ProductType> productTypes,String[] fetchGroups, int maxFetchDepth)
+	public Collection<? extends Article> createArticles(
+			SegmentID segmentID, 
+			OfferID offerID, 
+			Collection<ProductTypeID> productTypeIDs,
+			String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException {
 
 		PersistenceManager pm = getPersistenceManager();
@@ -574,7 +578,13 @@ implements SessionBean
 				offer = (Offer) pm.getObjectById(offerID);
 			}
 
-			Collection<? extends Article> articles = trader.createArticles(user,offer,segment,productTypes,new ArticleCreator(null));
+			Collection<ProductType> productTypes = new LinkedList<ProductType>();
+			for (ProductTypeID productTypeID : productTypeIDs) {
+				productTypes.add((ProductType) pm.getObjectById(productTypeID));
+			}
+			
+			Collection<? extends Article> articles = trader.createArticles(
+					user, offer, segment, productTypes, new ArticleCreator(null));
 
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)

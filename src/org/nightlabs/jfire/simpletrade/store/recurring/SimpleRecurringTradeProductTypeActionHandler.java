@@ -54,11 +54,11 @@ extends RecurringTradeProductTypeActionHandler{
 
 
 	@Override
-	public  Map<Article, Article> createArticles(RecurredOffer offer, Set<Article> recurringArticles,Segment segment) throws ModuleException
+	public  Map<Article, Article> createArticles(RecurredOffer offer, Set<Article> recurringArticles, Segment segment) throws ModuleException
 	{	
 		Map<Article, Article> articlesMap=  new HashMap<Article, Article>();
 
-		Article article;
+		Article recurredArticle;
 
 		PersistenceManager pm = getPersistenceManager();
 		Trader trader = Trader.getTrader(pm);
@@ -69,8 +69,8 @@ extends RecurringTradeProductTypeActionHandler{
 		
 		for (Iterator<Article> it = recurringArticles.iterator(); it.hasNext(); ) 
 		{	
-			article = it.next();
-			pt = article.getProductType();
+			recurredArticle = it.next();
+			pt = recurredArticle.getProductType();
 
 			SimpleProductType productType = (SimpleProductType)pt;		
 
@@ -80,11 +80,11 @@ extends RecurringTradeProductTypeActionHandler{
 				throw new IllegalStateException("store.findProducts(...) created " + products.size() + " instead of exactly 1 product!");
 
 			Collection<? extends Article> articles=  trader.createArticles(user, offer, segment, products,
-					new ArticleCreator(null), true, false);
+					new ArticleCreator(recurredArticle.getTariff()), true, true);
 			if (articles.size() != 1)
 				throw new IllegalStateException("trader.createArticles(...) created " + articles.size() + " instead of exactly 1 article!");
 				
-			articlesMap.put(article, articles.iterator().next());
+			articlesMap.put(recurredArticle, articles.iterator().next());
 
 		}
 

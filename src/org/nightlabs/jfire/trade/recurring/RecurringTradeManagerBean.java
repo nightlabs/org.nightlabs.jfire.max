@@ -44,10 +44,8 @@ import org.nightlabs.ModuleException;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.accounting.Accounting;
 import org.nightlabs.jfire.accounting.Currency;
-import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.accounting.id.CurrencyID;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
-import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.jbpm.graph.def.ProcessDefinition;
 import org.nightlabs.jfire.jbpm.graph.def.id.ProcessDefinitionID;
 import org.nightlabs.jfire.organisation.Organisation;
@@ -70,6 +68,8 @@ import org.nightlabs.version.MalformedVersionException;
 
 
 /**
+ * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
+ * 
  * @ejb.bean name="jfire/ejb/JFireTrade/RecurringTradeManager"
  *					 jndi-name="jfire/ejb/JFireTrade/RecurringTradeManager"
  *					 type="Stateless"
@@ -190,7 +190,8 @@ implements SessionBean
 		Accounting account = Accounting.getAccounting(pm);
 		try {
 			Task task = (Task) pm.getObjectById(taskID);
-			RecurringOffer recurringOffer =  (RecurringOffer)pm.getObjectById((OfferID) task.getParam());
+			RecurringOffer recurringOffer =  (RecurringOffer) task.getParam();
+			logger.info("Have recurringOffer " + JDOHelper.getObjectId(recurringOffer));
 			// Create the recurred Offer
 			RecurringTrader recurringTrader = RecurringTrader.getRecurringTrader(pm);
 			RecurredOffer  recurredOffer =  recurringTrader.createRecurredOffer(recurringOffer);

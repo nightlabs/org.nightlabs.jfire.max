@@ -8,6 +8,8 @@ import org.nightlabs.jfire.trade.Order;
 
 /**
  * @author Fitas Amine <fitas@nightlabs.de>
+ * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
+ * 
  * @jdo.persistence-capable
  *		identity-type="application"
  *		persistence-capable-superclass="org.nightlabs.jfire.trade.Offer"
@@ -46,6 +48,17 @@ public class RecurringOffer extends Offer {
 		this.recurringOfferConfiguration = new RecurringOfferConfiguration(this,user,getOrganisationID(),IDGenerator.nextID(RecurringOfferConfiguration.class));
 	}
 
+	@Override
+	protected boolean validate() {
+		boolean superResult = super.validate();
+		if (superResult) {
+			if (getRecurringOfferConfiguration().getCreatorTask().getParam() == null) {
+				getRecurringOfferConfiguration().getCreatorTask().setParam(this);
+			}
+		}
+		return superResult;
+	}
+	
 	public RecurringOfferConfiguration getRecurringOfferConfiguration() {
 		return recurringOfferConfiguration;
 	}

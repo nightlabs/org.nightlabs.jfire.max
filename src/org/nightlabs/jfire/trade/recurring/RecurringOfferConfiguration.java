@@ -10,6 +10,7 @@ import org.nightlabs.jfire.timer.id.TaskID;
 
 /**
  * @author Fitas Amine <fitas@nightlabs.de>
+ * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
  *
  * @jdo.persistence-capable
  *		identity-type="application"
@@ -22,12 +23,14 @@ import org.nightlabs.jfire.timer.id.TaskID;
  *
  * @jdo.create-objectid-class field-order="organisationID, recurringOfferConfigurationID"
  *
+ * @jdo.fetch-group name="RecurringOfferConfiguration.creatorTask" fields="creatorTask"
  */
 public class RecurringOfferConfiguration {
 
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 20080818L;
 	public static final String TASK_TYPE_ID_RECURRED_OFFER_CREATOR_TASK = "RecurredOfferCreatorTask";
-
+	
+	public static final String FETCH_GROUP_CREATOR_TASK = "RecurringOfferConfiguration.creatorTask"; 
 
 	/**
 	 * @jdo.field primary-key="true"
@@ -49,11 +52,13 @@ public class RecurringOfferConfiguration {
 		this.creatorTask = new Task(
 				taskID,
 				user,
-				"",
-		"");
+				RecurringTradeManagerHome.JNDI_NAME,
+				"processRecurringOfferTimed");
 
-		creatorTask.setParam(JDOHelper.getObjectId(recurringOffer));
-
+		// We can not set the parameter here in the constructor as Task.setParam will call makePersistent() 
+		// for the given parameter if it's not, and so it will try to persist the object we are currently creating
+		// This is now handled by RecurringOffer.validate()
+//		creatorTask.setParam(recurringOffer);
 	}
 
 	/**
@@ -113,8 +118,16 @@ public class RecurringOfferConfiguration {
 		return createInvoice;
 	}
 
+	public void setCreateInvoice(boolean createInvoice) {
+		this.createInvoice = createInvoice;
+	}
+	
 	public boolean isCreateDelivery() {
 		return createDelivery;
+	}
+	
+	public void setCreateDelivery(boolean createDelivery) {
+		this.createDelivery = createDelivery;
 	}
 
 	public Task getCreatorTask() {

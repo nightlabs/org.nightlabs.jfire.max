@@ -13,10 +13,10 @@ import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 
+import org.apache.log4j.Logger;
 import org.nightlabs.ModuleException;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.accounting.Currency;
-import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.config.Config;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.jbpm.graph.def.ActionHandlerNodeEnter;
@@ -47,6 +47,7 @@ import org.nightlabs.jfire.trade.jbpm.id.ProcessDefinitionAssignmentID;
  * RecurringTrader is responsible for purchase and sale of recurring orders and offers
  *
  * @author Fitas Amine <fitas[AT]nightlabs[DOT]de>
+ * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
  *
  * @jdo.persistence-capable
  *		identity-type="application"
@@ -60,6 +61,8 @@ import org.nightlabs.jfire.trade.jbpm.id.ProcessDefinitionAssignmentID;
  */
 public class RecurringTrader {
 
+	private static final Logger logger = Logger.getLogger(RecurringTrader.class);
+	
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
@@ -158,12 +161,13 @@ public class RecurringTrader {
 	 */
 	public RecurredOffer createRecurredOffer(RecurringOffer recurringOffer) throws ModuleException
 	{
-
+		logger.debug("Starting creation of RecurredOffer (with new Order) for RecurringOffer: " + JDOHelper.getObjectId(recurringOffer));
 		PersistenceManager pm = getPersistenceManager();
 		Trader trader = Trader.getTrader(pm);
 
 		Order order = trader.createOrder(recurringOffer.getVendor(),
 				recurringOffer.getCustomer(), null, recurringOffer.getCurrency());
+		logger.debug("Created Order: " + JDOHelper.getObjectId(order));
 
 		User user = SecurityReflector.getUserDescriptor().getUser(pm);
 
@@ -175,6 +179,8 @@ public class RecurringTrader {
 		}
 		
 		RecurredOffer recurredOffer = createRecurredOffer(user, order, offerIDPrefix);
+		
+		logger.debug("Created RecurredOffer: " + JDOHelper.getObjectId(recurredOffer));
 
 		// Loop over all articles in the given offer and group
 		// them by SegmentType and ProductType-class
@@ -196,8 +202,22 @@ public class RecurringTrader {
 			articles.add(recurringArticle);
 		}
 		
+		if (logger.isDebugEnabled()) {
+			logger.debug("Grouped articles in RecurringOffer:");
+			for (Map.Entry<SegmentType, Map<Class<? extends ProductType>, Set<Article>>> segmentTypeEntry : segmentTypes2PTClass2Articles.entrySet()) {
+				logger.debug("  SegmentType: " + JDOHelper.getObjectId(segmentTypeEntry.getKey()));
+				for (Map.Entry<Class<? extends ProductType>, Set<Article>> productTypeEntry : segmentTypeEntry.getValue().entrySet()) {
+					logger.debug("    ProductType class: " + productTypeEntry.getKey());
+					for (Article article : productTypeEntry.getValue()) {
+						logger.debug("      Article: " + JDOHelper.getObjectId(article));
+					}
+				}
+			}
+		}
+		
 		// loop over the segments added to the order
 		for (Segment segment : order.getSegments()) {
+			logger.debug("Creating articles for RecurredOffer for SegmentType " + JDOHelper.getObjectId(segment.getSegmentType()));
 			Map<Class<? extends ProductType>, Set<Article>> collected = segmentTypes2PTClass2Articles.get(segment.getSegmentType());
 			if (collected != null) { // it is possible that there are segments with no articles in the RecurringOffer				
 				// add each segment to the RecurredOffer
@@ -206,15 +226,28 @@ public class RecurringTrader {
 				{
 					// now for each ProductType class find the handler and let him create the articles 
 					Class<? extends ProductType> pt = it.next();
+					logger.debug("  Creating articles for RecurredOffer for ProductType class " + pt);
 
 					Set<Article> articles = collected.get(pt);
 
 					RecurringTradeProductTypeActionHandler handler = RecurringTradeProductTypeActionHandler.getRecurringTradeProductTypeActionHandler(pm, pt);
 					if (handler == null)
 						throw new IllegalStateException("Could not find a " + RecurringTradeProductTypeActionHandler.class.getName() + 
-								" for the ProductType class " + pt);
-
-					handler.createArticles(recurredOffer, articles, segment);
+								" for the ProductType class " + pt);					
+					logger.debug("  Found handler " + handler.getClass().getName() + " ProductType class " + pt);
+					
+					Map<Article, Article> recurredArticles = handler.createArticles(recurredOffer, articles, segment);
+					
+					if (logger.isDebugEnabled()) {
+						for (Map.Entry<Article, Article> articleEntry : recurredArticles.entrySet()) {
+							if (!articleEntry.getValue().isAllocated()) {
+								logger.debug("    An Article was created which was NOT allocated: " + JDOHelper.getObjectId(articleEntry.getValue()));					
+							} else {
+								logger.debug("    An allocated Article was created: " + JDOHelper.getObjectId(articleEntry.getValue()));					
+							}
+						}
+						logger.debug("  Finished creatingArticles");					
+					}
 				}
 			}
 		}
@@ -322,7 +355,7 @@ public class RecurringTrader {
 
 			RecurredOffer recurredOffer = new RecurredOffer(
 					user, order,
-					offerIDPrefix, IDGenerator.nextID(RecurringOffer.class, offerIDPrefix));
+					offerIDPrefix, IDGenerator.nextID(Offer.class, offerIDPrefix));
 
 			new OfferLocal(recurredOffer); // OfferLocal registers itself in Offer
 

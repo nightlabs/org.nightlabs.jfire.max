@@ -98,6 +98,7 @@ import org.nightlabs.jfire.voucher.accounting.ModeOfPaymentConst;
 import org.nightlabs.jfire.voucher.accounting.VoucherLocalAccountantDelegate;
 import org.nightlabs.jfire.voucher.accounting.VoucherPriceConfig;
 import org.nightlabs.jfire.voucher.accounting.pay.ServerPaymentProcessorVoucher;
+import org.nightlabs.jfire.voucher.recurring.VoucherRecurringTradeProductTypeActionHandler;
 import org.nightlabs.jfire.voucher.scripting.PreviewParameterSet;
 import org.nightlabs.jfire.voucher.scripting.PreviewParameterValuesResult;
 import org.nightlabs.jfire.voucher.scripting.ScriptingInitialiser;
@@ -207,6 +208,12 @@ implements SessionBean
 					Organisation.DEV_ORGANISATION_ID,
 					VoucherDeliveryNoteActionHandler.class.getName());
 			pm.makePersistent(voucherDeliveryNoteActionHandler);
+			
+			// Register the RecurringTradeProductTypeActionHandler for VoucherTypes
+			VoucherRecurringTradeProductTypeActionHandler vrtptah = new VoucherRecurringTradeProductTypeActionHandler(
+					Organisation.DEV_ORGANISATION_ID, VoucherRecurringTradeProductTypeActionHandler.class.getName(), VoucherType.class);
+			vrtptah = pm.makePersistent(vrtptah);
+			
 
 //			DeliveryConfiguration deliveryConfiguration = checkDeliveryConfiguration(pm);
 

@@ -84,7 +84,7 @@ extends	RecurringTradeProductTypeActionHandler
 				throw new IllegalStateException("store.findProducts(...) created " + products.size() + " instead of exactly 1 product!");
 
 			Collection<? extends Article> articles=  trader.createArticles(user, offer, segment, products,
-					new ArticleCreator(null), true, false);
+					new ArticleCreator(null), true, true);
 			if (articles.size() != 1)
 				throw new IllegalStateException("trader.createArticles(...) created " + articles.size() + " instead of exactly 1 article!");
 

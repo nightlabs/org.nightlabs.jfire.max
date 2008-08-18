@@ -33,6 +33,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -116,7 +117,6 @@ import org.nightlabs.jfire.trade.id.ArticleID;
 import org.nightlabs.jfire.trade.id.CustomerGroupID;
 import org.nightlabs.jfire.trade.id.OfferID;
 import org.nightlabs.jfire.trade.id.SegmentID;
-import org.nightlabs.jfire.trade.recurring.RecurringOffer;
 import org.nightlabs.jfire.trade.recurring.RecurringOrder;
 import org.nightlabs.jfire.trade.recurring.RecurringTrader;
 import org.nightlabs.util.CollectionUtil;
@@ -839,7 +839,7 @@ implements SessionBean
 	public Collection<? extends Article> createArticles(
 			SegmentID segmentID,
 			OfferID offerID,
-			Collection<ProductType> productTypes,
+			Collection<ProductTypeID> productTypeIDs,
 			TariffID tariffID,
 			String[] fetchGroups, int maxFetchDepth)
 			throws ModuleException
@@ -874,8 +874,14 @@ implements SessionBean
 				pm.getExtent(Offer.class);
 				offer = (Offer) pm.getObjectById(offerID);
 			}
+			
+			Collection<ProductType> productTypes = new LinkedList<ProductType>();
+			for (ProductTypeID productTypeID : productTypeIDs) {
+				productTypes.add((ProductType) pm.getObjectById(productTypeID));
+			}
 
-			Collection<? extends Article> articles = trader.createArticles(user,offer,segment,productTypes,new ArticleCreator(tariff));
+			Collection<? extends Article> articles = trader.createArticles(
+					user, offer, segment, productTypes, new ArticleCreator(tariff));
 
 			pm.getFetchPlan().setDetachmentOptions(FetchPlan.DETACH_LOAD_FIELDS | FetchPlan.DETACH_UNLOAD_FIELDS);
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);

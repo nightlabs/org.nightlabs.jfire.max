@@ -87,15 +87,7 @@ public class ProjectDAO extends BaseJDOObjectDAO<ProjectID, Project>{
 	@SuppressWarnings("unchecked")
 	public Collection<Project> getProjects(Collection<ProjectID> projectIDs, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
-		monitor.beginTask("Loading projects...", 1);
-		try {
-			IssueManager im = IssueManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
-			Collection<Project> projects = im.getProjects(projectIDs, fetchGroups, maxFetchDepth);
-			monitor.done();
-			return projects;			
-		} catch (Exception x) {
-			throw new RuntimeException(x);
-		}
+		return getJDOObjects(null, projectIDs, fetchGroups, maxFetchDepth, monitor);
 	}
 	
 	public synchronized Project storeProject(Project project, boolean get, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor){

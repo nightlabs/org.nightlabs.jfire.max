@@ -27,10 +27,8 @@ import org.nightlabs.util.Util;
  * @jdo.create-objectid-class
  *		field-order="organisationID, projectID"
  *
- * @jdo.fetch-group name="Project.issue" fields="issue"
  * @jdo.fetch-group name="Project.name" fields="name"
- * @jdo.fetch-group name="Project.parentProject" fields="parentProject"
- * @jdo.fetch-group name="Project.subProjects" fields="subProjects"
+ * @jdo.fetch-group name="Project.projectItems" fields="projectItems"
  *
  **/
 public class Project
@@ -39,10 +37,8 @@ implements Serializable
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger = Logger.getLogger(Project.class);
 
-	public static final String FETCH_GROUP_ISSUE = "Project.issue";
 	public static final String FETCH_GROUP_NAME = "Project.name";
-	public static final String FETCH_GROUP_PARENT_PROJECT = "Project.parentProject";
-	public static final String FETCH_GROUP_SUBPROJECTS = "Project.subProjects";
+	public static final String FETCH_GROUP_SUBPROJECTS = "Project.projectItems";
 
 	/**
 	 * @jdo.field primary-key="true"
@@ -63,12 +59,7 @@ implements Serializable
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
-	private Project parentProject;
-	
-	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 */
-	private Collection<Project> subProjects;
+	private Collection<ProjectItem> projectItems;
 	
 	/**
 	 * @deprecated Constructor exists only for JDO! 
@@ -84,7 +75,7 @@ implements Serializable
 
 		this.name = new ProjectName(this);
 		
-		subProjects = new HashSet<Project>();
+		projectItems = new HashSet<ProjectItem>();
 	}
 
 	/**
@@ -114,29 +105,10 @@ implements Serializable
 		return (ProjectID)JDOHelper.getObjectId(this);
 	}
 	
-	public void setParentProject(Project project) {
-		this.parentProject = project;
-	}
 	
-	public Project getParentProject() {
-		return parentProject;
-	}
-	
-	public Collection<Project> getSubProjects() 
+	public Collection<ProjectItem> getProjectItems() 
 	{
-		return Collections.unmodifiableCollection(subProjects);
-	}
-	
-	public void addSubProject(Project project) 
-	{
-		subProjects.add(project);
-	}
-	
-	public void removeSubProject(Project project) 
-	{
-		if (project == null)
-			throw new IllegalArgumentException("project must not be null!");
-		subProjects.remove(project);
+		return Collections.unmodifiableCollection(projectItems);
 	}
 	
 	/**

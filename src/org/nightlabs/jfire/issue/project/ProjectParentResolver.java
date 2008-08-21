@@ -10,7 +10,7 @@ implements TreeNodeParentResolver
 
 	public ObjectID getParentObjectID(Object jdoObject)
 	{
-		ProjectItem p = (ProjectItem)jdoObject;
-		return p.getProject() == null ? null : p.getProject().getObjectId();
+		ProjectItem pi = (ProjectItem)jdoObject;
+		return pi.getProject() == null ? null : pi.getProject().getObjectId();
 	}
 }

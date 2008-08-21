@@ -9,6 +9,7 @@ import org.apache.log4j.Logger;
 import org.nightlabs.jdo.query.AbstractJDOQuery;
 import org.nightlabs.jfire.issue.Issue;
 import org.nightlabs.jfire.issue.IssueLink;
+import org.nightlabs.jfire.issue.IssueWorkTimeRange;
 import org.nightlabs.jfire.issue.id.IssueLinkTypeID;
 import org.nightlabs.jfire.issue.id.IssuePriorityID;
 import org.nightlabs.jfire.issue.id.IssueResolutionID;
@@ -60,6 +61,8 @@ public class IssueQuery
 	private Date updateTimestamp;
 	private IssueLinkTypeID issueLinkTypeID;
 	private Set<IssueLink> issueLinks;
+	private Date issueWorkTimeRangeFrom;
+	private Date issueWorkTimeRangeTo;
 
 	public static final class FieldName
 	{
@@ -79,6 +82,7 @@ public class IssueQuery
 		public static final String issueComment = "issueComment";
 		public static final String issueLinkTypeID = "issueLinkTypeID";
 		public static final String issueLinks = "issueLinks";
+		public static final String issueWorkTimeRange = "issueWorkTimeRange";
 	}
 
 	@Override
@@ -154,6 +158,11 @@ public class IssueQuery
 			filter.append("\n && (this.issueLinks.contains(varIssueLinkType) && (varIssueLinkType.issueLinkType.issueLinkTypeID == :issueLinkTypeID.issueLinkTypeID))");
 		}
 
+		if (isFieldEnabled(FieldName.issueWorkTimeRange) && (issueWorkTimeRangeTo != null || issueWorkTimeRangeFrom != null)) {
+			filter.append("\n && (this.issueWorkTimeRanges.contains(varIssueWorkTimeRange) && (varIssueWorkTimeRange.from >= :issueWorkTimeRangeFrom))");
+			filter.append("\n && (this.issueWorkTimeRanges.contains(varIssueWorkTimeRange) && (varIssueWorkTimeRange.to <= :issueWorkTimeRangeTo))");
+		}
+		
 		// FIXME: chairat please rewrite this part as soon as you have refactored the linkage of objects to Issues. (marius)
 //		if (issueLinks != null && !issueLinks.isEmpty())
 //		{

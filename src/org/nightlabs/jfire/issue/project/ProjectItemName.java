@@ -54,7 +54,7 @@ extends I18nText{
 	 *		key-type="java.lang.String"
 	 *		default-fetch-group="true"
 	 *		value-type="java.lang.String"
-	 *		table="JFireIssueTracking_IssueProjectItemName_names"
+	 *		table="JFireIssueTracking_ProjectItemName_names"
 	 *		null-value="exception"
 	 *
 	 * @jdo.join

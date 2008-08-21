@@ -38,7 +38,7 @@ implements Serializable
 	private static final Logger logger = Logger.getLogger(Project.class);
 
 	public static final String FETCH_GROUP_NAME = "Project.name";
-	public static final String FETCH_GROUP_SUBPROJECTS = "Project.projectItems";
+	public static final String FETCH_GROUP_PROJECT_ITEMS = "Project.projectItems";
 
 	/**
 	 * @jdo.field primary-key="true"

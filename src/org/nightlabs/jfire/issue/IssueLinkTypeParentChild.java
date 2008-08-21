@@ -1,12 +1,7 @@
 package org.nightlabs.jfire.issue;
 
-import java.util.Set;
-
-import javax.jdo.FetchPlan;
-import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 
-import org.nightlabs.jfire.issue.dao.IssueDAO;
 import org.nightlabs.jfire.issue.id.IssueLinkTypeID;
 import org.nightlabs.jfire.organisation.Organisation;
 

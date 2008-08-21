@@ -341,6 +341,14 @@ implements
 	@Deprecated
 	protected Offer() { }
 
+	/**
+	 * Create a new Offer for the given Order and with the given primary-key-values.
+	 * 
+	 * @param user The user that initiated the creation of the new {@link Offer}.
+	 * @param order The {@link Order} the new {@link Offer} should be part of.
+	 * @param offerIDPrefix The offerIDPrefix primary-key-value.
+	 * @param offerID The offerID primary-key-value.
+	 */
 	public Offer(User user, Order order, String offerIDPrefix, long offerID)
 	{
 		if (order == null)
@@ -898,7 +906,7 @@ implements
 			throw new IllegalArgumentException("state.stateDefinition.publicState is false!");
 
 		if (logger.isDebugEnabled())
-			logger.debug("setState: offer=" + getPrimaryKey() + " (" + this + ") state=" + currentState.getPrimaryKey());
+			logger.debug("setState: offer=" + getPrimaryKey() + " (" + this + ") state=" + currentState.getPrimaryKey() + " (" + currentState.getStateDefinition().getJbpmNodeName() + ")");
 
 		this.state = currentState;
 		this.states.add(currentState);

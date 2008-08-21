@@ -1,5 +1,7 @@
 package org.nightlabs.jfire.trade.recurring;
 
+import java.io.Serializable;
+
 import javax.jdo.JDOHelper;
 
 import org.nightlabs.jdo.ObjectIDUtil;
@@ -25,7 +27,7 @@ import org.nightlabs.jfire.timer.id.TaskID;
  *
  * @jdo.fetch-group name="RecurringOfferConfiguration.creatorTask" fields="creatorTask"
  */
-public class RecurringOfferConfiguration {
+public class RecurringOfferConfiguration implements Serializable{
 
 	private static final long serialVersionUID = 20080818L;
 	public static final String TASK_TYPE_ID_RECURRED_OFFER_CREATOR_TASK = "RecurredOfferCreatorTask";

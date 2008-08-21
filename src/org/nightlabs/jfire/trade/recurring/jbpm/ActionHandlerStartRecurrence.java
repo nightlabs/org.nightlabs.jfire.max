@@ -6,9 +6,10 @@ package org.nightlabs.jfire.trade.recurring.jbpm;
 import org.jbpm.graph.exe.ExecutionContext;
 import org.nightlabs.jfire.jbpm.graph.def.AbstractActionHandler;
 import org.nightlabs.jfire.trade.recurring.RecurredOffer;
+import org.nightlabs.jfire.trade.recurring.RecurringOffer;
 
 /**
- * TODO: This handler should enable the task that creates {@link RecurredOffer}s
+ * This handler enables the task that creates {@link RecurredOffer}s
  */
 public class ActionHandlerStartRecurrence extends AbstractActionHandler {
 
@@ -27,7 +28,8 @@ public class ActionHandlerStartRecurrence extends AbstractActionHandler {
 	protected void doExecute(ExecutionContext executionContext)
 	throws Exception 
 	{
-		// TODO: Here the creation of the RecurredOffers by the task in RecurringOfferConfiguration needs to be started.
+		RecurringOffer recurringOffer = (RecurringOffer) getStatable();
+		recurringOffer.getRecurringOfferConfiguration().getCreatorTask().setEnabled(true);
 	}
 
 }

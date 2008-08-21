@@ -6,9 +6,11 @@ package org.nightlabs.jfire.trade.recurring.jbpm;
 import org.jbpm.graph.exe.ExecutionContext;
 import org.nightlabs.jfire.trade.jbpm.ActionHandlerAcceptOffer;
 import org.nightlabs.jfire.trade.recurring.RecurredOffer;
+import org.nightlabs.jfire.trade.recurring.RecurringOffer;
 
 /**
- * TODO: In addition to the super implementation, this handler should disable the task that creates {@link RecurredOffer}s
+ * In addition to the super implementation, this handler disables the task that is associated
+ * to the {@link RecurringOffer} the workflow runs for that and creates {@link RecurredOffer}s.
  */
 public class ActionHandlerAcceptRecurringOffer extends ActionHandlerAcceptOffer {
 
@@ -23,7 +25,8 @@ public class ActionHandlerAcceptRecurringOffer extends ActionHandlerAcceptOffer 
 	throws Exception 
 	{
 		super.doExecute(executionContext);
-		// TODO: Here the creation of the RecurredOffers by the task in RecurringOfferConfiguration needs to be stopped.
+		RecurringOffer recurringOffer = (RecurringOffer) getStatable();
+		recurringOffer.getRecurringOfferConfiguration().getCreatorTask().setEnabled(false);
 	}
 	
 }

@@ -575,7 +575,9 @@ implements SessionBean
 				else {
 
 					if (order instanceof RecurringOrder)
-						offer = recurringTrader.createRecurredOffer(user, order, null); // TODO offerIDPrefix ???
+					{
+						offer = recurringTrader.createRecurringOffer(user, (RecurringOrder) order, null); // TODO offerIDPrefix ???
+					}
 					else
 						offer = trader.createOffer(user, order, null); // TODO offerIDPrefix ???
 				}

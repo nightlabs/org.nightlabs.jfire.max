@@ -178,7 +178,7 @@ public class RecurringTrader {
 			trader.createSegment(order, segment.getSegmentType());
 		}
 		
-		RecurredOffer recurredOffer = createRecurredOffer(user, order, offerIDPrefix);
+		RecurredOffer recurredOffer = createRecurredOffer(recurringOffer,user, order, offerIDPrefix);
 		
 		logger.debug("Created RecurredOffer: " + JDOHelper.getObjectId(recurredOffer));
 
@@ -322,7 +322,7 @@ public class RecurringTrader {
 	 * @param offerIDPrefix The prefix for the id of the new offer. This might be <code>null</code>. 
 	 * @return The newly created {@link RecurredOffer}·
 	 */
-	public RecurredOffer createRecurredOffer(User user, Order order, String offerIDPrefix)
+	public RecurredOffer createRecurredOffer(RecurringOffer recurringOffer,User user, Order order, String offerIDPrefix)
 	{
 		TradeSide tradeSide;
 
@@ -353,7 +353,7 @@ public class RecurringTrader {
 
 			offerIDPrefix = getOfferIDPrefix(user, offerIDPrefix);
 
-			RecurredOffer recurredOffer = new RecurredOffer(
+			RecurredOffer recurredOffer = new RecurredOffer(recurringOffer,
 					user, order,
 					offerIDPrefix, IDGenerator.nextID(Offer.class, offerIDPrefix));
 

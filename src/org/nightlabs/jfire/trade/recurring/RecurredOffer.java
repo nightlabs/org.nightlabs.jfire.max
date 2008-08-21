@@ -1,12 +1,20 @@
 package org.nightlabs.jfire.trade.recurring;
 
 import org.nightlabs.jfire.security.User;
+import org.nightlabs.jfire.timer.Task;
 import org.nightlabs.jfire.trade.Offer;
 import org.nightlabs.jfire.trade.Order;
 
 
 /**
+ * {@link RecurredOffer}s are created by a {@link Task} and will be built 
+ * from a template {@link RecurringOffer}. The {@link RecurringOffer} that
+ * served as template for the creation of a {@link RecurredOffer} is linked
+ * to it see {@link #getRecurringOffer()}.
+ * 
  * @author Fitas Amine <fitas@nightlabs.de>
+ * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
+ *
  * @jdo.persistence-capable
  *		identity-type="application"
  *		persistence-capable-superclass="org.nightlabs.jfire.trade.Offer"
@@ -26,7 +34,7 @@ public class RecurredOffer extends Offer {
 	private static final long serialVersionUID = 1L;
 	
 	/**
-	 * @jdo.field persistence-modifier="persistent"
+	 * @jdo.field persistence-modifier="persistent" null-value="exception"
 	 */
 	private RecurringOffer recurringOffer;
 
@@ -36,7 +44,16 @@ public class RecurredOffer extends Offer {
 	@Deprecated
 	protected RecurredOffer() {}
 
-	public RecurredOffer(RecurringOffer recurringOffer,User user,Order order,String offerIDPrefix,long offerID) {
+	/**
+	 * Create a new {@link RecurredOffer}.
+	 * 
+	 * @param recurringOffer The {@link RecurringOffer} that was the template for this {@link RecurredOffer}.
+	 * @param user The user that initiated the creation of this offer.
+	 * @param order The {@link Order} the new Offer should be part of.
+	 * @param offerIDPrefix The orderIdPrefix primary-key-value.
+	 * @param offerID The orderId primary-key-value.
+	 */
+	public RecurredOffer(RecurringOffer recurringOffer, User user, Order order, String offerIDPrefix, long offerID) {
 		super(user, order, offerIDPrefix, offerID);
 		this.recurringOffer = recurringOffer;
 	}

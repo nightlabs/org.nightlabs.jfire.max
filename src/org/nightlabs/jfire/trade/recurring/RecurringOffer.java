@@ -42,10 +42,10 @@ public class RecurringOffer extends Offer {
 	@Deprecated
 	protected RecurringOffer() {}
 
-	public RecurringOffer(User user,Order order,String offerIDPrefix,long offerID) {
-		super(user,order,offerIDPrefix,offerID);
-		
-		this.recurringOfferConfiguration = new RecurringOfferConfiguration(this,user,getOrganisationID(),IDGenerator.nextID(RecurringOfferConfiguration.class));
+	public RecurringOffer(User user, Order order, String offerIDPrefix, long offerID) {
+		super(user, order, offerIDPrefix, offerID);
+		this.recurringOfferConfiguration = new RecurringOfferConfiguration(
+				this, user, getOrganisationID(), IDGenerator.nextID(RecurringOfferConfiguration.class));
 	}
 
 	@Override

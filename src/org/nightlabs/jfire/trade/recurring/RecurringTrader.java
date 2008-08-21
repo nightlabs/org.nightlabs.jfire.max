@@ -16,7 +16,9 @@ import javax.jdo.PersistenceManager;
 import org.apache.log4j.Logger;
 import org.nightlabs.ModuleException;
 import org.nightlabs.jdo.NLJDOHelper;
+import org.nightlabs.jfire.accounting.Accounting;
 import org.nightlabs.jfire.accounting.Currency;
+import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.config.Config;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.jbpm.graph.def.ActionHandlerNodeEnter;
@@ -41,6 +43,7 @@ import org.nightlabs.jfire.trade.config.TradeConfigModule;
 import org.nightlabs.jfire.trade.jbpm.JbpmConstantsOffer;
 import org.nightlabs.jfire.trade.jbpm.ProcessDefinitionAssignment;
 import org.nightlabs.jfire.trade.jbpm.id.ProcessDefinitionAssignmentID;
+import org.nightlabs.jfire.trade.recurring.jbpm.JbpmConstantsRecurringOffer;
 
 
 /**
@@ -159,8 +162,12 @@ public class RecurringTrader {
 	 * @return newly created {@link RecurredOffer}
 	 * @throws ModuleException If creating the recurred articles fails.
 	 */
-	public RecurredOffer createRecurredOffer(RecurringOffer recurringOffer) throws ModuleException
+	public RecurredOffer processRecurringOffer(RecurringOffer recurringOffer) throws ModuleException
 	{
+		String nodeName = recurringOffer.getState().getStateDefinition().getJbpmNodeName();
+		if (!JbpmConstantsRecurringOffer.Vendor.NODE_NAME_RECURRENCE_STARTED.equals(nodeName)) {
+			throw new IllegalStateException("The recurrence for RecurringOffer " + JDOHelper.getObjectId(recurringOffer) + " is not started, it is in the state '" + nodeName + "'.");
+		}
 		logger.debug("Starting creation of RecurredOffer (with new Order) for RecurringOffer: " + JDOHelper.getObjectId(recurringOffer));
 		PersistenceManager pm = getPersistenceManager();
 		Trader trader = Trader.getTrader(pm);
@@ -251,6 +258,34 @@ public class RecurringTrader {
 				}
 			}
 		}
+		// TODO: Check/Compare article prices from RecurringOffer and crated RecurredOffer
+		/* Depending on the configuration of the RecurringOffer the following strageties should be supported:
+		 * * Always use offered prices (Meaning that the process will enforce the
+		 *   old prices for the newly created RecurredOffer)
+		 * * Use offered prices but don't finalize (Meaning that the old prices will
+		 *   be used, but the new offer will not be finalized, it would be best if this
+		 *   could somehow notify the user then, but this for later)
+		 * * Use current prices (Meaning that the process will always take the
+		 *   current prices for the new offers, this is what currently happens)
+		 * * Use current prices but don't finalize (Meaning that the new prices will
+		 *   be used, but the new offer will not be finalized)
+		 *   How to enforce old prices is not absolutely clear to me now, but I know
+		 *   that it's possible somehow
+		 *   
+		 * Alex    
+		 */ 
+		// finished creating articles
+		
+		// For now, as long as the different strategies are not present, we directly accept the offer.
+		trader.acceptOfferImplicitely(recurredOffer);
+		
+		if(recurringOffer.getRecurringOfferConfiguration().isCreateInvoice()) {
+			logger.debug("Creating invoice for new RecurredOffer");
+			// If the configuration says so, automatically create an invoice
+			Accounting accounting = Accounting.getAccounting(pm);
+			Invoice invoice = accounting.createInvoice(user, recurredOffer.getArticles(), null);
+			logger.debug("Successfully created Invoice " + JDOHelper.getObjectId(invoice));
+		}	
 		
 		return recurredOffer;
 	}
@@ -450,31 +485,36 @@ public class RecurringTrader {
 		case vendor:
 		{
 			// give known StateDefinitions a name and a description
-			setStateDefinitionProperties(processDefinition, JbpmConstantsOffer.Vendor.NODE_NAME_CREATED,
+			setStateDefinitionProperties(processDefinition, JbpmConstantsRecurringOffer.Vendor.NODE_NAME_CREATED,
 					"created",
 					"The Offer has been newly created. This is the first state in the Offer related workflow.",
 					true);
 
-			setStateDefinitionProperties(processDefinition, JbpmConstantsOffer.Vendor.NODE_NAME_ABORTED,
+			setStateDefinitionProperties(processDefinition, JbpmConstantsRecurringOffer.Vendor.NODE_NAME_ABORTED,
 					"aborted",
 					"The Offer has been aborted by the vendor (before finalization). A new Offer needs to be created in order to continue the interaction.",
 					true);
 
-			setStateDefinitionProperties(processDefinition, JbpmConstantsOffer.Vendor.NODE_NAME_FINALIZED,
+			setStateDefinitionProperties(processDefinition, JbpmConstantsRecurringOffer.Vendor.NODE_NAME_FINALIZED,
 					"finalized",
 					"The Offer has been finalized. After that, it cannot be modified anymore. A modification would require revocation and recreation.",
 					true);
 
-			setStateDefinitionProperties(processDefinition, JbpmConstantsOffer.Vendor.NODE_NAME_ACCEPTED,
+			setStateDefinitionProperties(processDefinition, JbpmConstantsRecurringOffer.Vendor.NODE_NAME_ACCEPTED,
 					"accepted",
 					"The Offer has been accepted by the customer. That turns the offer into a binding contract.",
 					true);
 
-			setStateDefinitionProperties(processDefinition, JbpmConstantsOffer.Vendor.NODE_NAME_REJECTED,
+			setStateDefinitionProperties(processDefinition, JbpmConstantsRecurringOffer.Vendor.NODE_NAME_REJECTED,
 					"rejected",
 					"The Offer has been rejected by the customer. A new Offer needs to be created in order to continue the interaction.",
 					true);
 
+			setStateDefinitionProperties(processDefinition, JbpmConstantsRecurringOffer.Vendor.NODE_NAME_RECURRENCE_STARTED,
+					"recurrence started",
+					"The timed creation of recurred offers has been started.",
+					true);
+			
 			// give known Transitions a name
 			for (Transition transition : Transition.getTransitions(pm, processDefinitionID, JbpmConstantsOffer.Vendor.TRANSITION_NAME_ACCEPT_IMPLICITELY)) {
 				transition.setUserExecutable(false);

@@ -194,12 +194,7 @@ implements SessionBean
 			logger.info("Have recurringOffer " + JDOHelper.getObjectId(recurringOffer));
 			// Create the recurred Offer
 			RecurringTrader recurringTrader = RecurringTrader.getRecurringTrader(pm);
-			RecurredOffer  recurredOffer =  recurringTrader.createRecurredOffer(recurringOffer);
-
-			if(recurringOffer.getRecurringOfferConfiguration().isCreateInvoice())
-			{
-				account.createInvoice(user, recurredOffer.getArticles(), null);		
-			}	
+			recurringTrader.processRecurringOffer(recurringOffer);
 		} finally {
 			pm.close();
 		}

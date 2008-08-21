@@ -17,8 +17,6 @@ import org.nightlabs.jfire.trade.Order;
  *
  * @jdo.inheritance strategy="new-table"
  * 
- *
- *
  **/
 public class RecurringOrder extends Order {
 	
@@ -33,7 +31,6 @@ public class RecurringOrder extends Order {
 	public RecurringOrder(LegalEntity vendor, LegalEntity customer,
 			String orderIDPrefix, long orderID, Currency currency, User user) {
 		super(vendor, customer, orderIDPrefix, orderID, currency, user);
-		// TODO Auto-generated constructor stub
 	}
 
 }

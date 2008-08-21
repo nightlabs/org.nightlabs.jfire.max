@@ -11,7 +11,6 @@
    <state name="dev.jfire.org:finalized">
       <event type="node-enter">
 			<action class="org.nightlabs.jfire.trade.jbpm.ActionHandlerFinalizeOffer"></action>
-			<action></action>
 		</event>
 		<transition name="dev.jfire.org:expire" to="dev.jfire.org:expired"></transition>
       <transition name="revoke" to="dev.jfire.org:revoked"></transition>
@@ -37,12 +36,10 @@
       <transition name="reject" to="dev.jfire.org:rejected"></transition>
    </node>
    <node name="dev.jfire.org:sent">
-      <event type="node-enter">
-			<action class="org.nightlabs.jfire.trade.jbpm.ActionHandlerSendOffer"></action>
-		</event>
+		<action class="org.nightlabs.jfire.trade.jbpm.ActionHandlerSendOffer"></action>		
 		<transition name="dev.jfire.org:send" to="dev.jfire.org:finalized"></transition>
       <transition name="sendImplicitely" to="dev.jfire.org:accepted"></transition>
-      <transition name="" to="dev.jfire.org:accepted"></transition>
+      <transition name="dev.jfire.org:acceptImplicitely" to="dev.jfire.org:accepted"></transition>
    </node>
    <node name="dev.jfire.org:acceptedImplicitely">
       <event type="node-enter">
@@ -51,9 +48,7 @@
 		<transition name="sendImplicitely" to="dev.jfire.org:sent"></transition>
    </node>
    <state name="dev.jfire.org:accepted">
-		<event type="node-enter">
-			<action class="org.nightlabs.jfire.trade.recurring.jbpm.ActionHandlerAcceptRecurringOffer"></action>
-		</event>
+        <action class="org.nightlabs.jfire.trade.recurring.jbpm.ActionHandlerAcceptRecurringOffer"></action>
 		<transition to="dev.jfire.org:recurrenceStopped" name="stopRecurrence"></transition>
 		<transition to="dev.jfire.org:recurrenceStarted" name="startRecurrence"></transition>
 	</state>

@@ -1,9 +1,6 @@
 package org.nightlabs.jfire.issue.project;
 
 import java.io.Serializable;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
@@ -57,11 +54,6 @@ implements Serializable
 	private ProjectName name;
 
 	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 */
-	private Collection<ProjectItem> projectItems;
-	
-	/**
 	 * @deprecated Constructor exists only for JDO! 
 	 */
 	@Deprecated
@@ -74,8 +66,6 @@ implements Serializable
 		this.projectID = projectID;
 
 		this.name = new ProjectName(this);
-		
-		projectItems = new HashSet<ProjectItem>();
 	}
 
 	/**
@@ -105,11 +95,6 @@ implements Serializable
 		return (ProjectID)JDOHelper.getObjectId(this);
 	}
 	
-	
-	public Collection<ProjectItem> getProjectItems() 
-	{
-		return Collections.unmodifiableCollection(projectItems);
-	}
 	
 	/**
 	 * Internal method.

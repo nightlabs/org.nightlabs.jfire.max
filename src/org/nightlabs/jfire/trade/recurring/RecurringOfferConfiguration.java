@@ -73,6 +73,11 @@ public class RecurringOfferConfiguration implements Serializable{
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private boolean createInvoice;
+	
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private boolean isBookInvoice;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -128,5 +133,13 @@ public class RecurringOfferConfiguration implements Serializable{
 			throw new IllegalStateException("creatorTask has not yet been persisted!"); // if you really come into this situation, either create the TaskID manually by TaskID.create(...) or persist first (and maybe detach) before accessing this method.
 
 		return taskID;
+	}
+
+	public boolean isBookInvoice() {
+		return isBookInvoice;
+	}
+
+	public void setBookInvoice(boolean isBookInvoice) {
+		this.isBookInvoice = isBookInvoice;
 	}
 }

@@ -9,16 +9,22 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import javax.ejb.CreateException;
 import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
+import javax.naming.NamingException;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.ModuleException;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.accounting.Accounting;
+import org.nightlabs.jfire.accounting.AccountingManagerLocal;
+import org.nightlabs.jfire.accounting.AccountingManagerUtil;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.Invoice;
+import org.nightlabs.jfire.accounting.id.InvoiceID;
+import org.nightlabs.jfire.accounting.jbpm.JbpmConstantsInvoice;
 import org.nightlabs.jfire.config.Config;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.jbpm.graph.def.ActionHandlerNodeEnter;
@@ -65,7 +71,7 @@ import org.nightlabs.jfire.trade.recurring.jbpm.JbpmConstantsRecurringOffer;
 public class RecurringTrader {
 
 	private static final Logger logger = Logger.getLogger(RecurringTrader.class);
-	
+
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
@@ -153,16 +159,18 @@ public class RecurringTrader {
 		}
 		return orderIDPrefix;
 	}
-	
-	
+
+
 	/**
 	 * This method creates a new {@link RecurredOffer} from an existing {@link RecurringOffer}
 	 *
 	 * @param recurringOffer the {@link RecurringOffer}
 	 * @return newly created {@link RecurredOffer}
 	 * @throws ModuleException If creating the recurred articles fails.
+	 * @throws NamingException 
+	 * @throws CreateException 
 	 */
-	public RecurredOffer processRecurringOffer(RecurringOffer recurringOffer) throws ModuleException
+	public RecurredOffer processRecurringOffer(RecurringOffer recurringOffer) throws ModuleException, CreateException, NamingException
 	{
 		String nodeName = recurringOffer.getState().getStateDefinition().getJbpmNodeName();
 		if (!JbpmConstantsRecurringOffer.Vendor.NODE_NAME_RECURRENCE_STARTED.equals(nodeName)) {
@@ -184,9 +192,9 @@ public class RecurringTrader {
 		for (Segment segment : recurringOffer.getSegments()) { 		
 			trader.createSegment(order, segment.getSegmentType());
 		}
-		
+
 		RecurredOffer recurredOffer = createRecurredOffer(recurringOffer,user, order, offerIDPrefix);
-		
+
 		logger.debug("Created RecurredOffer: " + JDOHelper.getObjectId(recurredOffer));
 
 		// Loop over all articles in the given offer and group
@@ -208,7 +216,7 @@ public class RecurringTrader {
 			}
 			articles.add(recurringArticle);
 		}
-		
+
 		if (logger.isDebugEnabled()) {
 			logger.debug("Grouped articles in RecurringOffer:");
 			for (Map.Entry<SegmentType, Map<Class<? extends ProductType>, Set<Article>>> segmentTypeEntry : segmentTypes2PTClass2Articles.entrySet()) {
@@ -221,7 +229,7 @@ public class RecurringTrader {
 				}
 			}
 		}
-		
+
 		// loop over the segments added to the order
 		for (Segment segment : order.getSegments()) {
 			logger.debug("Creating articles for RecurredOffer for SegmentType " + JDOHelper.getObjectId(segment.getSegmentType()));
@@ -242,9 +250,9 @@ public class RecurringTrader {
 						throw new IllegalStateException("Could not find a " + RecurringTradeProductTypeActionHandler.class.getName() + 
 								" for the ProductType class " + pt);					
 					logger.debug("  Found handler " + handler.getClass().getName() + " ProductType class " + pt);
-					
+
 					Map<Article, Article> recurredArticles = handler.createArticles(recurredOffer, articles, segment);
-					
+
 					if (logger.isDebugEnabled()) {
 						for (Map.Entry<Article, Article> articleEntry : recurredArticles.entrySet()) {
 							if (!articleEntry.getValue().isAllocated()) {
@@ -275,18 +283,26 @@ public class RecurringTrader {
 		 * Alex    
 		 */ 
 		// finished creating articles
-		
+
 		// For now, as long as the different strategies are not present, we directly accept the offer.
 		trader.acceptOfferImplicitely(recurredOffer);
-		
+
 		if(recurringOffer.getRecurringOfferConfiguration().isCreateInvoice()) {
 			logger.debug("Creating invoice for new RecurredOffer");
 			// If the configuration says so, automatically create an invoice
 			Accounting accounting = Accounting.getAccounting(pm);
 			Invoice invoice = accounting.createInvoice(user, recurredOffer.getArticles(), null);
+
 			logger.debug("Successfully created Invoice " + JDOHelper.getObjectId(invoice));
+			accounting.validateInvoice(invoice);
+
+			AccountingManagerLocal aml = AccountingManagerUtil.getLocalHome().create();
+
+			if(recurringOffer.getRecurringOfferConfiguration().isBookInvoice())
+				aml.signalInvoice((InvoiceID)JDOHelper.getObjectId(invoice), JbpmConstantsInvoice.Vendor.TRANSITION_NAME_BOOK_IMPLICITELY);
+
 		}	
-		
+
 		return recurredOffer;
 	}
 
@@ -348,7 +364,7 @@ public class RecurringTrader {
 			return recurringOffer;
 		}
 	}
-	
+
 	/**
 	 * Creates a new {@link RecurredOffer} for the given {@link Order}.
 	 * 
@@ -514,7 +530,7 @@ public class RecurringTrader {
 					"recurrence started",
 					"The timed creation of recurred offers has been started.",
 					true);
-			
+
 			// give known Transitions a name
 			for (Transition transition : Transition.getTransitions(pm, processDefinitionID, JbpmConstantsOffer.Vendor.TRANSITION_NAME_ACCEPT_IMPLICITELY)) {
 				transition.setUserExecutable(false);

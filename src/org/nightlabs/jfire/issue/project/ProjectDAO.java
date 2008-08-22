@@ -4,12 +4,15 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import javax.jdo.FetchPlan;
+
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.issue.IssueManager;
 import org.nightlabs.jfire.issue.IssueManagerUtil;
 import org.nightlabs.jfire.issue.project.id.ProjectID;
 import org.nightlabs.jfire.security.SecurityReflector;
+import org.nightlabs.progress.NullProgressMonitor;
 import org.nightlabs.progress.ProgressMonitor;
 import org.nightlabs.progress.SubProgressMonitor;
 
@@ -105,6 +108,19 @@ public class ProjectDAO extends BaseJDOObjectDAO<ProjectID, Project>{
 			return result;
 		} catch (Exception e) {
 			monitor.done();
+			throw new RuntimeException(e);
+		}
+	}
+	
+	public synchronized Collection<Project> getRootProjects(String organisationID) 
+	{
+		if(organisationID == null)
+			throw new NullPointerException("OrganisationID must not be null");
+		try {
+			IssueManager im = IssueManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			Collection<Project> result = ProjectDAO.sharedInstance.getProjects(im.getRootProjects(organisationID), new String[]{FetchPlan.DEFAULT, Project.FETCH_GROUP_PARENT_PROJECT, Project.FETCH_GROUP_SUBPROJECTS, Project.FETCH_GROUP_NAME}, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT, new NullProgressMonitor());
+			return result;
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}

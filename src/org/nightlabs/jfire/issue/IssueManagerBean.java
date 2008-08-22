@@ -517,27 +517,21 @@ implements SessionBean
 		}
 	}
 	
-//	/**
-//	* @throws ModuleException
-//	*
-//	* @ejb.interface-method
-//	* @ejb.transaction type="Required"
-//	* @ejb.permission role-name="_Guest_"
-//	*/
-//	public Collection getIssueComments(String[] fetchGroups, int maxFetchDepth)
-//	{
-//	PersistenceManager pm = getPersistenceManager();
-//	try {
-//	pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
-//	if (fetchGroups != null)
-//	pm.getFetchPlan().setGroups(fetchGroups);
-
-//	Query q = pm.newQuery(IssueComment.class);
-//	return pm.detachCopyAll((Collection)q.execute());
-//	} finally {
-//	pm.close();
-//	}
-//	}
+	/**
+	 * @ejb.interface-method
+	 * @!ejb.transaction type="Supports"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	@SuppressWarnings("unchecked")
+	public Collection<ProjectID> getRootProjects(String organisationID)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			return NLJDOHelper.getObjectIDSet(Project.getRootProjects(pm, organisationID));
+		} finally {
+			pm.close();
+		}
+	}
 
 	/**
 	 * @ejb.interface-method

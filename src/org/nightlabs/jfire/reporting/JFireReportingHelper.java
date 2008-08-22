@@ -32,6 +32,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 
@@ -39,6 +40,7 @@ import org.apache.log4j.Logger;
 import org.eclipse.datatools.connectivity.oda.IQuery;
 import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jdo.ObjectIDUtil;
+import org.nightlabs.jfire.reporting.layout.ReportLayout;
 import org.nightlabs.jfire.reporting.layout.render.RenderManager;
 import org.nightlabs.jfire.reporting.oda.jfs.JFSParameterUtil;
 
@@ -75,6 +77,8 @@ public class JFireReportingHelper {
 		private Map<String, Object> parameters = new HashMap<String, Object>();
 		private Locale locale;
 	
+		private ReportLayout reportLayout;
+		
 		public PersistenceManager getPersistenceManager() {
 			return pm;
 		}
@@ -95,10 +99,21 @@ public class JFireReportingHelper {
 			return locale;
 		}
 		
-		public void open(PersistenceManager pm, Map<String, Object> params, Locale locale, boolean closePM) {
+		public ReportLayout getReportLayout() {
+			return reportLayout;
+		}
+		
+		public void open(
+				PersistenceManager pm, boolean closePM, 
+				Map<String, Object> params, 
+				Locale locale, ReportLayout reportLayout) {
+			
 			JFireReportingHelper.logger.debug("Opening (JFireReporting)Helper with pm = "+pm+" and closePM="+closePM);
 			this.closePM = closePM;
 			this.locale = locale;
+			JFireReportingHelper.logger.debug("JFireReportingHelper with locale " + locale);
+			this.reportLayout = reportLayout;
+			JFireReportingHelper.logger.debug("JFireReportingHelper with reportLayout " + JDOHelper.getObjectId(reportLayout));
 			setPersistenceManager(pm);
 			getVars().clear();
 			getParameters().clear();
@@ -140,9 +155,14 @@ public class JFireReportingHelper {
 	 * @param params The report params set for the next execution.
 	 * @param locale The Locale used by this helper for the next run.
 	 * @param closePM Whether to close the pm after using the Helper.
+	 * @param reportLayout The currently executed {@link ReportLayout}.
 	 */
-	public static void open(PersistenceManager pm, Map<String, Object> params, Locale locale, boolean closePM) {
-		helpers.get().open(pm, params, locale, closePM);
+	public static void open(
+			PersistenceManager pm, boolean closePM, 
+			Map<String, Object> params, 
+			Locale locale, ReportLayout reportLayout) {
+			
+		helpers.get().open(pm, closePM, params, locale, reportLayout);
 	}
 	
 	/**
@@ -218,6 +238,14 @@ public class JFireReportingHelper {
 	 */
 	public static Locale getLocale() {
 		return helpers.get().getLocale();
+	}
+	
+	/**
+	 * Returns the currently executed/rendered {@link ReportLayout}. 
+	 * @return The currently executed/rendered {@link ReportLayout}.
+	 */
+	public static ReportLayout getReportLayout() {
+		return helpers.get().getReportLayout();
 	}
 	
 	/**

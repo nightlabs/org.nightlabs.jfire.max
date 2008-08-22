@@ -185,7 +185,7 @@ public class RenderManager {
 			renderRequest.setParameters(parsedParams);
 
 			logger.debug("Have report renderer, delegating render work");
-			JFireReportingHelper.open(pm, parsedParams, locale, false);
+			JFireReportingHelper.open(pm, false, parsedParams, locale, reportLayout);
 			RenderedReportLayout result = null;
 			// Ask the renderer to do the work
 			try {

@@ -5,16 +5,16 @@
 	xsi:schemaLocation="urn:jfire.org:jfire-security_1_0 https://www.jfire.org/schema/jfire-security_1_0.xsd "
 >
 	<security:authority-type id="org.nightlabs.jfire.simpletrade.store.SimpleProductType">
-		<name>Simple Product Types</name>
-		<description>
+		<security:name>Simple Product Types</security:name>
+		<security:description>
 			Authorities of this type are used to control the access
 			rights for Simple Product Types.
-		</description>
-		<name language="de">Einfache Produkttypen</name>
-		<description language="de">
+		</security:description>
+		<security:name language="de">Einfache Produkttypen</security:name>
+		<security:description language="de">
 			Vollmachten dieses Typs werden verwendet um den Zugriff auf
 			einfache Produkttypen zu kontrollieren.
-		</description>	
+		</security:description>	
 		<security:role-group id="org.nightlabs.jfire.store.seeProductType" />
 	</security:authority-type>
 </security:jfire-security>

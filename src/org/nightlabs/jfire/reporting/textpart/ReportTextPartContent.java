@@ -56,7 +56,6 @@ public class ReportTextPartContent extends I18nText implements Serializable {
 	 *		persistence-modifier="persistent"
 	 *		default-fetch-group="true"
 	 *		table="JFireReporting_ReportTextPartContent_contents"
-	 *		null-value="exception"
 	 *
 	 * @jdo.join
 	 * @jdo.value-column sql-type="CLOB"

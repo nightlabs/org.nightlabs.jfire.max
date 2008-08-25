@@ -15,6 +15,6 @@
 			Vollmachten dieses Typs werden verwendet um den Zugriff auf
 			einfache Produkttypen zu kontrollieren.
 		</description>	
-		<security:role-group id="org.nightlabs.jfire.trade.seeProductType" />
+		<security:role-group id="org.nightlabs.jfire.store.seeProductType" />
 	</security:authority-type>
 </security:jfire-security>

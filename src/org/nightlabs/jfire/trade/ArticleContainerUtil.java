@@ -8,6 +8,8 @@ import org.nightlabs.jfire.security.SecurityReflector;
  */
 public class ArticleContainerUtil 
 {
+	public static final String ID_SEPARATOR = "/";
+	
 	public static String getArticleContainerID(ArticleContainer articleContainer) 
 	{
 		if (articleContainer == null)
@@ -16,8 +18,12 @@ public class ArticleContainerUtil
 		String organisationID = articleContainer.getOrganisationID();
 		if (organisationID.equals(SecurityReflector.getUserDescriptor().getOrganisationID())) {
 			organisationID = ""; 
+		} else {
+			organisationID += ID_SEPARATOR;
 		}
 		
-		return organisationID + articleContainer.getArticleContainerIDPrefix() + articleContainer.getArticleContainerIDAsString();
+		return organisationID + 
+			articleContainer.getArticleContainerIDPrefix() + 
+			ID_SEPARATOR + articleContainer.getArticleContainerIDAsString();
 	}
 }

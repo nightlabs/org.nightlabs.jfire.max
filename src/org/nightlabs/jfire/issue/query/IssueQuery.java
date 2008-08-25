@@ -82,7 +82,8 @@ public class IssueQuery
 		public static final String issueComment = "issueComment";
 		public static final String issueLinkTypeID = "issueLinkTypeID";
 		public static final String issueLinks = "issueLinks";
-		public static final String issueWorkTimeRange = "issueWorkTimeRange";
+		public static final String issueWorkTimeRangeFrom = "issueWorkTimeRangeFrom";
+		public static final String issueWorkTimeRangeTo = "issueWorkTimeRangeTo";
 	}
 
 	@Override
@@ -158,7 +159,12 @@ public class IssueQuery
 			filter.append("\n && (this.issueLinks.contains(varIssueLinkType) && (varIssueLinkType.issueLinkType.issueLinkTypeID == :issueLinkTypeID.issueLinkTypeID))");
 		}
 
-		if (isFieldEnabled(FieldName.issueWorkTimeRange) && (issueWorkTimeRangeTo != null || issueWorkTimeRangeFrom != null)) {
+		if (isFieldEnabled(FieldName.issueWorkTimeRangeFrom) && (issueWorkTimeRangeTo != null || issueWorkTimeRangeFrom != null)) {
+			filter.append("\n && (this.issueWorkTimeRanges.contains(varIssueWorkTimeRange) && (varIssueWorkTimeRange.from >= :issueWorkTimeRangeFrom))");
+			filter.append("\n && (this.issueWorkTimeRanges.contains(varIssueWorkTimeRange) && (varIssueWorkTimeRange.to <= :issueWorkTimeRangeTo))");
+		}
+		
+		if (isFieldEnabled(FieldName.issueWorkTimeRangeTo) && (issueWorkTimeRangeTo != null || issueWorkTimeRangeFrom != null)) {
 			filter.append("\n && (this.issueWorkTimeRanges.contains(varIssueWorkTimeRange) && (varIssueWorkTimeRange.from >= :issueWorkTimeRangeFrom))");
 			filter.append("\n && (this.issueWorkTimeRanges.contains(varIssueWorkTimeRange) && (varIssueWorkTimeRange.to <= :issueWorkTimeRangeTo))");
 		}
@@ -401,25 +407,26 @@ public class IssueQuery
 		notifyListeners(FieldName.assigneeID, oldAssigneeID, assigneeID);
 	}
 
-	public Date getCreateTimestamp() {
-		return createTimestamp;
+	public Date getIssueWorkTimeRangeFrom() {
+		return issueWorkTimeRangeFrom;
 	}
 
-	public void setCreateTimestamp(Date createTimestamp)
+	public void setIssueWorkTimeRangeFrom(Date issueWorkTimeRangeFrom)
 	{
-		final Date oldCreateTimestamp = this.createTimestamp;
-		this.createTimestamp = createTimestamp;
-		notifyListeners(FieldName.createTimestamp, oldCreateTimestamp, createTimestamp);
+		final Date oldIssueWorkTimeRangeFrom = this.issueWorkTimeRangeFrom;
+		this.issueWorkTimeRangeFrom = issueWorkTimeRangeFrom;
+		notifyListeners(FieldName.issueWorkTimeRangeFrom, oldIssueWorkTimeRangeFrom, issueWorkTimeRangeFrom);
 	}
-	public Date getUpdateTimestamp() {
-		return updateTimestamp;
+	
+	public Date getIssueWorkTimeRangeTo() {
+		return issueWorkTimeRangeTo;
 	}
 
-	public void setUpdateTimestamp(Date updateTimestamp)
+	public void setIssueWorkTimeRangeTo(Date issueWorkTimeRangeTo)
 	{
-		final Date oldUpdateTimestamp = this.updateTimestamp;
-		this.updateTimestamp = updateTimestamp;
-		notifyListeners(FieldName.updateTimestamp, oldUpdateTimestamp, updateTimestamp);
+		final Date oldIssueWorkTimeRangeTo = this.issueWorkTimeRangeTo;
+		this.issueWorkTimeRangeFrom = issueWorkTimeRangeFrom;
+		notifyListeners(FieldName.issueWorkTimeRangeTo, oldIssueWorkTimeRangeTo, issueWorkTimeRangeTo);
 	}
 
 	public IssueLinkTypeID getIssueLinkTypeID() {
@@ -444,6 +451,27 @@ public class IssueQuery
 		return issueLinks;
 	}
 
+	public Date getCreateTimestamp() {
+		return createTimestamp;
+	}
+
+	public void setCreateTimestamp(Date createTimestamp)
+	{
+		final Date oldCreateTimestamp = this.createTimestamp;
+		this.createTimestamp = createTimestamp;
+		notifyListeners(FieldName.createTimestamp, oldCreateTimestamp, createTimestamp);
+	}
+	public Date getUpdateTimestamp() {
+		return updateTimestamp;
+	}
+
+	public void setUpdateTimestamp(Date updateTimestamp)
+	{
+		final Date oldUpdateTimestamp = this.updateTimestamp;
+		this.updateTimestamp = updateTimestamp;
+		notifyListeners(FieldName.updateTimestamp, oldUpdateTimestamp, updateTimestamp);
+	}
+	
 	@Override
 	protected Class<Issue> initCandidateClass()
 	{

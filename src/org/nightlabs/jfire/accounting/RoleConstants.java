@@ -17,6 +17,8 @@ public class RoleConstants {
 
 	public static final RoleID editLocalAccountantDelegate = RoleID.create("org.nightlabs.jfire.accounting.editLocalAccountantDelegate");
 
+	public static final RoleID queryInvoices = RoleID.create("org.nightlabs.jfire.accounting.queryInvoices");
+
 	public static final RoleID editInvoice = RoleID.create("org.nightlabs.jfire.accounting.editInvoice");
 
 	public static final RoleID pay = RoleID.create("org.nightlabs.jfire.accounting.pay");

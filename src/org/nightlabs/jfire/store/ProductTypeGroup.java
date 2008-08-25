@@ -38,6 +38,9 @@ import javax.jdo.listener.DetachCallback;
 import org.nightlabs.inheritance.FieldInheriter;
 import org.nightlabs.inheritance.FieldMetaData;
 import org.nightlabs.inheritance.Inheritable;
+import org.nightlabs.jfire.security.Authority;
+import org.nightlabs.jfire.security.ResolveSecuringAuthorityStrategy;
+import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.store.id.ProductTypeGroupID;
 import org.nightlabs.util.Util;
 
@@ -74,7 +77,7 @@ implements Serializable, DetachCallback
 	/**
 	 * This class defines constants for the field names of implementation of
 	 * {@link Inheritable}, to avoid the use of "hardcoded" Strings for retrieving
-	 * {@link FieldMetaData} or {@link FieldInheriter}.  
+	 * {@link FieldMetaData} or {@link FieldInheriter}.
 	 * In the future the JFire project will probably autogenerate this class,
 	 * but until then you should implement it manually.
 	 */
@@ -87,7 +90,7 @@ implements Serializable, DetachCallback
 		public static final String productTypeGroupID = "productTypeGroupID";
 		public static final String productTypes = "productTypes";
 	};
-	
+
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
@@ -193,7 +196,16 @@ implements Serializable, DetachCallback
 			return productTypes;
 
 		try{
-			return getProductTypes(getPersistenceManager(), (ProductTypeGroupID) JDOHelper.getObjectId(this));
+			Collection<ProductType> pts = getProductTypes(getPersistenceManager(), (ProductTypeGroupID) JDOHelper.getObjectId(this));
+
+			pts = Authority.filterIndirectlySecuredObjectIDs(
+					getPersistenceManager(),
+					pts,
+					SecurityReflector.getUserDescriptor().getUserObjectID(),
+					RoleConstants.seeProductType,
+					ResolveSecuringAuthorityStrategy.allow);
+
+			return pts;
 		} catch (IllegalStateException x) {
 			throw new IllegalStateException("It seems, you are calling getProductTypes() on a detached instance without having called loadProductTypes() before detaching it.", x);
 		}

@@ -62,6 +62,8 @@ import org.nightlabs.jfire.accounting.priceconfig.PriceConfig;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.organisation.LocalOrganisation;
 import org.nightlabs.jfire.organisation.Organisation;
+import org.nightlabs.jfire.security.IndirectlySecuredObject;
+import org.nightlabs.jfire.security.SecuredObject;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.deliver.DeliveryConfiguration;
 import org.nightlabs.jfire.store.id.ProductTypeGroupID;
@@ -182,7 +184,8 @@ implements
 		InheritanceCallbacks,
 		StoreCallback,
 		Serializable,
-		DetachCallback
+		DetachCallback,
+		IndirectlySecuredObject
 {
 	private static final long serialVersionUID = 1L;
 
@@ -191,7 +194,7 @@ implements
 	/**
 	 * This class defines constants for the field names of implementation of
 	 * {@link Inheritable}, to avoid the use of "hardcoded" Strings for retrieving
-	 * {@link FieldMetaData} or {@link FieldInheriter}.  
+	 * {@link FieldMetaData} or {@link FieldInheriter}.
 	 * In the future the JFire project will probably autogenerate this class,
 	 * but until then you should implement it manually.
 	 */
@@ -249,10 +252,11 @@ implements
 //	public static final String FETCH_GROUP_LOCAL_STOREKEEPER_DELEGATE = "ProductType.localStorekeeperDelegate";
 	public static final String FETCH_GROUP_PRODUCT_TYPE_LOCAL = "ProductType.productTypeLocal";
 	/**
-	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon! 
+	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon!
 	 */
+	@Deprecated
 	public static final String FETCH_GROUP_THIS_PRODUCT_TYPE = "ProductType.this";
-	
+
 	public static final String CANNOT_MAKE_SALEABLE_REASON_NOT_PUBLISHED = "ProductType.cannotMakeSaleable.notPublished";
 	public static final String CANNOT_MAKE_SALEABLE_REASON_NOT_CONFIRMED = "ProductType.cannotMakeSaleable.notConfirmed";
 	public static final String CANNOT_MAKE_SALEABLE_REASON_ALREADY_CLOSED = "ProductType.cannotMakeSaleable.alreadyClosed";
@@ -261,10 +265,10 @@ implements
 
 	public static final String CANNOT_CONFIRM_REASON_IMMUTABLE = "ProductType.cannotConfirm.immutable";
 	public static final String CANNOT_CONFIRM_REASON_INHERITANCE_BRANCH = "ProductType.cannotConfirm.inheritanceBranch"; // only leafs can be confirmed
-	
+
 	public static final String CANNOT_PUBLISH_REASON_IMMUTABLE = "ProductType.cannotPublish.immutable";
 	public static final String CANNOT_PUBLISH_REASON_PARENT_NOT_PUBLISHED = "ProductType.cannotPublish.parentNotPublished";
-	
+
 	public static List<ProductType> getProductTypesNestingThis(PersistenceManager pm, ProductTypeID productTypeID)
 	{
 		pm.getExtent(ProductType.class);
@@ -585,6 +589,7 @@ implements
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected ProductType() {}
 
 	/**
@@ -647,7 +652,7 @@ implements
 
 		productTypeGroups = new HashMap<String, ProductTypeGroup>();
 		fieldMetaDataMap = new HashMap<String, ProductTypeFieldMetaData>();
-		
+
 		this.name = new ProductTypeName(this);
 		FieldMetaData fmd = getFieldMetaData(FieldName.name);
 		if (fmd != null)
@@ -662,7 +667,7 @@ implements
 	{
 		return (ProductTypeID)JDOHelper.getObjectId(this);
 	}
-	
+
 	/**
 	 * @return Returns the organisationID.
 	 */
@@ -810,12 +815,13 @@ implements
 	 *		from outside. Currently it is not yet possible to change the structure of the inheritance
 	 *		tree (it's fixed after creation)!!!
 	 * @see #getExtendedProductType()
-	 * 
+	 *
 	 * @deprecated Currently it is not yet possible to change the structure of the inheritance
 	 *		tree!!! You must not call this method! Even after we implemented
 	 *		the possibility to restructure the product type tree, you will use another API
 	 *		(via the {@link Store})!!!
 	 */
+	@Deprecated
 	protected void setExtendedProductType(ProductType extendedProductType)
 	{
 		if (extendedProductType != null) {
@@ -958,12 +964,12 @@ implements
 	{
 		return getFieldMetaData(fieldName, true);
 	}
-	
+
 	public org.nightlabs.inheritance.FieldMetaData getFieldMetaData(String fieldName, boolean createMissingMetaData)
 	{
 		if (isClosed())
 			return null;
-		
+
 		if (fieldName.startsWith("jdo"))
 			return null;
 
@@ -1299,7 +1305,7 @@ implements
 
 	/**
 	 * Sets whether this ProductType is published.  This flag is immutable after once set to true.
-	 * 
+	 *
 	 * @param published Weather the ProductType should be published.
 	 * @throws CannotPublishProductTypeException If the ProductType cannot be published.
 	 */
@@ -1311,14 +1317,14 @@ implements
 
 		this.published = published;
 	}
-	
+
 	/**
 	 * Checks if the ProductType can be confirmed.
 	 * This implementation checks whether the parent ProductType (the productType this extends) is published.
 	 * <p>
 	 * This method might be overridden, however the super implementation should be invoked then.
 	 * </p>
-	 * 
+	 *
 	 * @throws CannotPublishProductTypeException If the ProductType cannot be published.
 	 */
 	protected void checkCanPublish() throws CannotPublishProductTypeException {
@@ -1361,13 +1367,13 @@ implements
 
 		this.confirmed = confirmed;
 	}
-	
+
 	/**
 	 * Checks if the ProductType can be confirmed. This implementation does nothing.
 	 * <p>
 	 * This method might be overridden, however the super implementation should be invoked then.
 	 * </p>
-	 * 
+	 *
 	 * @throws CannotConfirmProductTypeException If the ProductType cannot be confirmed.
 	 */
 	protected void checkCanConfirm() throws CannotConfirmProductTypeException {
@@ -1378,7 +1384,7 @@ implements
 	/**
 	 * A ProductType can only be sold when saleable and published are true.
 	 * This method only returns the saleable flag, which can be used for filtering.
-	 * 
+	 *
 	 * @return Weather this ProductType is saleable
 	 */
 	public boolean isSaleable() {
@@ -1389,7 +1395,7 @@ implements
 	 * Sets if this ProductType can be sold. If a product-type is saleable but not published,
 	 * it cannot be sold by resellers, though - only within the local organisation.
 	 * This is used as a filter flag.
-	 * 
+	 *
 	 * @param saleable Wheather this ProductType is saleable
 	 * @throws CannotMakeProductTypeSaleableException If the ProductType cannot be made saleable.
 	 */
@@ -1399,13 +1405,13 @@ implements
 
 		if (this.saleable == saleable)
 			return;
-		
+
 		if (saleable)
 			checkCanMakeSaleable();
-		
+
 		this.saleable = saleable;
 	}
-	
+
 	/**
 	 * Checks if the productType can be made saleable (saleable can be set to <code>true</code>).
 	 * <p>
@@ -1435,7 +1441,7 @@ implements
 		if (getPriceConfigInPackage(this.getPrimaryKey()) == null)
 			throw new CannotMakeProductTypeSaleableException(CANNOT_MAKE_SALEABLE_REASON_NO_PRICECONFIG, "Cannot make ProductType \"" + getPrimaryKey() + "\" saleable, because it has no PriceConfig assigned!");
 	}
-	
+
 
 	/**
 	 * A ProductType can be closed. This is irreversile.
@@ -1540,16 +1546,16 @@ implements
 		else
 			return this.getInnerPriceConfig();
 	}
-	
+
 //public abstract I18nText getName();
-	
+
 	/**
 	 * @jdo.field persistence-modifier="persistent" mapped-by="productType" dependent="true"
 	 */
 	private ProductTypeName name;
 	/**
 	 * return the multilanguage capable name of the productType
-	 * 
+	 *
 	 * @return the {@link I18nText} which stores the name of the productType
 	 * in a  {@link ProductTypeName}
 	 */
@@ -1626,6 +1632,10 @@ implements
 	{
 		return productTypeLocal;
 	}
+	@Override
+	public SecuredObject getSecuredObject() {
+		return productTypeLocal;
+	}
 	protected void setProductTypeLocal(ProductTypeLocal productTypeLocal)
 	{
 		this.productTypeLocal = productTypeLocal;
@@ -1642,7 +1652,7 @@ implements
 
 	public void jdoPreDetach()
 	{
-		
+
 	}
 
 	@SuppressWarnings("unchecked")

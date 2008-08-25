@@ -34,7 +34,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -73,6 +72,7 @@ import org.nightlabs.jfire.jbpm.graph.def.ProcessDefinition;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.security.Authority;
 import org.nightlabs.jfire.security.ResolveSecuringAuthorityStrategy;
+import org.nightlabs.jfire.security.SecuredObject;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.book.DefaultLocalStorekeeperDelegate;
 import org.nightlabs.jfire.store.deliver.CheckRequirementsEnvironment;
@@ -101,14 +101,12 @@ import org.nightlabs.jfire.store.deliver.id.DeliveryQueueID;
 import org.nightlabs.jfire.store.deliver.id.ModeOfDeliveryFlavourID;
 import org.nightlabs.jfire.store.id.DeliveryNoteID;
 import org.nightlabs.jfire.store.id.DeliveryNoteLocalID;
-import org.nightlabs.jfire.store.id.ProductID;
 import org.nightlabs.jfire.store.id.ProductTypeGroupID;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.store.id.RepositoryTypeID;
 import org.nightlabs.jfire.store.id.UnitID;
 import org.nightlabs.jfire.store.query.ProductTransferIDQuery;
 import org.nightlabs.jfire.store.query.ProductTransferQuery;
-import org.nightlabs.jfire.store.search.AbstractProductQuery;
 import org.nightlabs.jfire.store.search.AbstractProductTypeGroupQuery;
 import org.nightlabs.jfire.store.search.AbstractProductTypeQuery;
 import org.nightlabs.jfire.trade.Article;
@@ -120,7 +118,6 @@ import org.nightlabs.jfire.trade.OfferLocal;
 import org.nightlabs.jfire.trade.OfferRequirement;
 import org.nightlabs.jfire.trade.Order;
 import org.nightlabs.jfire.trade.OrganisationLegalEntity;
-import org.nightlabs.jfire.trade.RoleConstants;
 import org.nightlabs.jfire.trade.TradeSide;
 import org.nightlabs.jfire.trade.Trader;
 import org.nightlabs.jfire.trade.id.ArticleContainerID;
@@ -185,6 +182,8 @@ implements SessionBean
 	}
 
 	/**
+	 * Initialisation method called by the organisation-init framework to set up essential things for JFireTrade's store.
+	 *
 	 * @throws IOException While loading an icon from a local resource, this might happen and we don't care in the initialise method.
 	 *
 	 * @ejb.interface-method
@@ -206,36 +205,6 @@ implements SessionBean
 			}
 
 			DefaultLocalStorekeeperDelegate.getDefaultLocalStorekeeperDelegate(pm);
-
-//			// create the essential DeliveryNoteStateDefinitions
-//			JbpmConstantsDeliveryNote deliveryNoteStateDefinitionUtil;
-//
-//			deliveryNoteStateDefinitionUtil = new JbpmConstantsDeliveryNote(JbpmConstantsDeliveryNote.STATE_DEFINITION_ID_CREATED);
-//			deliveryNoteStateDefinitionUtil.getName().setText(Locale.ENGLISH.getLanguage(), "created");
-//			deliveryNoteStateDefinitionUtil.getDescription().setText(Locale.ENGLISH.getLanguage(), "The DeliveryNote has been newly created. This is the first state in the DeliveryNote related workflow.");
-//			pm.makePersistent(deliveryNoteStateDefinitionUtil);
-//
-//			deliveryNoteStateDefinitionUtil = new JbpmConstantsDeliveryNote(JbpmConstantsDeliveryNote.STATE_DEFINITION_ID_FINALIZED);
-//			deliveryNoteStateDefinitionUtil.getName().setText(Locale.ENGLISH.getLanguage(), "finalized");
-//			deliveryNoteStateDefinitionUtil.getDescription().setText(Locale.ENGLISH.getLanguage(), "The DeliveryNote was finalized. After that, it cannot be modified anymore. A modification would require cancellation and recreation.");
-//			pm.makePersistent(deliveryNoteStateDefinitionUtil);
-//
-//			deliveryNoteStateDefinitionUtil = new JbpmConstantsDeliveryNote(JbpmConstantsDeliveryNote.STATE_DEFINITION_ID_BOOKED);
-//			deliveryNoteStateDefinitionUtil.getName().setText(Locale.ENGLISH.getLanguage(), "booked");
-//			deliveryNoteStateDefinitionUtil.getDescription().setText(Locale.ENGLISH.getLanguage(), "The DeliveryNote has been booked. That means, all the product transfers for all Articles has been performed internally onto the configured Repositories.");
-//			pm.makePersistent(deliveryNoteStateDefinitionUtil);
-//
-//			deliveryNoteStateDefinitionUtil = new JbpmConstantsDeliveryNote(JbpmConstantsDeliveryNote.STATE_DEFINITION_ID_CANCELLED);
-//			deliveryNoteStateDefinitionUtil.getName().setText(Locale.ENGLISH.getLanguage(), "cancelled");
-//			deliveryNoteStateDefinitionUtil.getDescription().setText(Locale.ENGLISH.getLanguage(), "The DeliveryNote was cancelled after finalization (and maybe after booking). In case it was already booked, a reversing booking has been done. The Article.deliveryNote fields are nulled and the Articles within the DeliveryNote have been replaced by referencingArticles.");
-//			pm.makePersistent(deliveryNoteStateDefinitionUtil);
-//
-//			deliveryNoteStateDefinitionUtil = new JbpmConstantsDeliveryNote(JbpmConstantsDeliveryNote.STATE_DEFINITION_ID_DELIVERED);
-//			deliveryNoteStateDefinitionUtil.getName().setText(Locale.ENGLISH.getLanguage(), "delivered");
-//			deliveryNoteStateDefinitionUtil.getDescription().setText(Locale.ENGLISH.getLanguage(), "All Articles of the DeliveryNote were delivered. There's no Article left that still needs to be delivered.");
-//			pm.makePersistent(deliveryNoteStateDefinitionUtil);
-
-			// TODO deploy process definitions!
 
 			// create & persist instances of RepositoryType
 			RepositoryType repositoryType;
@@ -413,6 +382,11 @@ implements SessionBean
 	}
 
 	/**
+	 * Get the object-ids of all {@link Unit}s known to the organisation.
+	 * <p>
+	 * This method can be called by everyone, because the object-ids are not confidential.
+	 * </p>
+	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
@@ -430,6 +404,11 @@ implements SessionBean
 	}
 
 	/**
+	 * Get the {@link Unit}s for the specified object-ids.
+	 * <p>
+	 * This method can be called by everyone, because {@link Unit}s are not confidential.
+	 * </p>
+	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
@@ -446,8 +425,10 @@ implements SessionBean
 	}
 
 	/**
+	 * Get the {@link DeliveryNote}s for the specified object-ids.
+	 *
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="org.nightlabs.jfire.trade.queryDeliveryNotes"
+	 * @ejb.permission role-name="org.nightlabs.jfire.store.queryDeliveryNotes"
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
 	@SuppressWarnings("unchecked")
@@ -461,28 +442,30 @@ implements SessionBean
 		}
 	}
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="org.nightlabs.jfire.trade.queryDeliveryNotes"
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 */
-	public DeliveryNote getDeliveryNote(DeliveryNoteID deliveryID, String[] fetchGroups, int maxFetchDepth)
-	{
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
-			if (fetchGroups != null)
-				pm.getFetchPlan().setGroups(fetchGroups);
+//	/**
+//	 * @ejb.interface-method
+//	 * @ejb.permission role-name="org.nightlabs.jfire.store.queryDeliveryNotes"
+//	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+//	 */
+//	public DeliveryNote getDeliveryNote(DeliveryNoteID deliveryNoteID, String[] fetchGroups, int maxFetchDepth)
+//	{
+//		PersistenceManager pm = getPersistenceManager();
+//		try {
+//			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+//			if (fetchGroups != null)
+//				pm.getFetchPlan().setGroups(fetchGroups);
+//
+//			return (DeliveryNote) pm.detachCopy(pm.getObjectById(deliveryNoteID));
+//		} finally {
+//			pm.close();
+//		}
+//	}
 
-			return (DeliveryNote) pm.detachCopy(pm.getObjectById(deliveryID));
-		} finally {
-			pm.close();
-		}
-	}
-
 	/**
+	 * Get the {@link DeliveryNote}s' object-ids that match the criteria specified by the given queries.
+	 *
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="org.nightlabs.jfire.trade.queryDeliveryNotes"
+	 * @ejb.permission role-name="org.nightlabs.jfire.store.queryDeliveryNotes"
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
 	@SuppressWarnings("unchecked")
@@ -520,95 +503,9 @@ implements SessionBean
 		}
 	}
 
-//	/**
-//	 * Searches with the given QueryCollection of subclasses of
-//	 * <code>AbstractProductTypeGroupQuery<\code> for {@link ProductTypeGroup}s.
-//	 * This method creates a ProductTypeGroupIDSearchResult out of the
-//	 * result.
-//	 *
-//	 * @ejb.interface-method
-//	 * @ejb.permission role-name="_Guest_"
-//	 * @ejb.transaction type="Required"
-//	 */
-//	public ProductTypeGroupIDSearchResult getProductTypeGroupSearchResult(QueryCollection<? extends AbstractProductTypeGroupQuery> productTypeGroupQueries)
-//	{
-//		if (productTypeGroupQueries == null)
-//			return null;
-//
-//		if (! ProductTypeGroup.class.isAssignableFrom(productTypeGroupQueries.getResultClass()))
-//		{
-//			throw new RuntimeException("Given QueryCollection has invalid return type! " +
-//					"Invalid return type= "+ productTypeGroupQueries.getResultClassName());
-//		}
-//
-//// TODO: Implement Authority checking here
-//		PersistenceManager pm = getPersistenceManager();
-//		try {
-//			pm.getFetchPlan().setMaxFetchDepth(1);
-//			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
-//
-//			if (! (productTypeGroupQueries instanceof JDOQueryCollectionDecorator)) {
-//				productTypeGroupQueries = new JDOQueryCollectionDecorator<AbstractProductTypeGroupQuery>(productTypeGroupQueries);
-//			}
-//
-//			JDOQueryCollectionDecorator<AbstractProductTypeGroupQuery> queries =
-//				(JDOQueryCollectionDecorator<AbstractProductTypeGroupQuery>) productTypeGroupQueries;
-//			queries.setPersistenceManager(pm);
-//
-//			Collection<ProductTypeGroup> productTypeGroups = (Collection<ProductTypeGroup>) queries.executeQueries();
-//			return ProductTypeGroupIDSearchResult.createProductTypeGroupSearchResult(productTypeGroups);
-//		} finally {
-//			pm.close();
-//		}
-//	}
-
-//	/**
-//	 * @ejb.interface-method
-//	 * @ejb.permission role-name="org.nightlabs.jfire.trade.seeProductType"
-//	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-//	 */
-//	public ProductType getProductType(ProductTypeID productTypeID, String[] fetchGroups, int maxFetchDepth)
-//	{
-//		PersistenceManager pm = getPersistenceManager();
-//		try {
-//			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
-//			if (fetchGroups != null)
-//				pm.getFetchPlan().setGroups(fetchGroups);
-//
-//			ProductType productType = (ProductType) pm.getObjectById(productTypeID);
-//
-//			Authority.resolveSecuringAuthority(
-//					pm,
-//					productType.getProductTypeLocal(),
-//					ResolveSecuringAuthorityStrategy.allow
-//			).assertContainsRoleRef(
-//					getPrincipal(),
-//					RoleConstants.seeProductType
-//			);
-//
-//			return (ProductType) pm.detachCopy(productType);
-//		} finally {
-//			pm.close();
-//		}
-//	}
-
 	/**
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 */
-	public List<Product> getProducts(Set<ProductID> productIDs, String[] fetchGroups, int maxFetchDepth) {
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			return NLJDOHelper.getDetachedObjectList(pm, productIDs, Product.class, fetchGroups, maxFetchDepth);
-		} finally {
-			pm.close();
-		}
-	}
-
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="org.nightlabs.jfire.trade.seeProductType"
+	 * @ejb.permission role-name="org.nightlabs.jfire.store.seeProductType"
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
 	public List<ProductType> getProductTypes(Set<ProductTypeID> productTypeIDs, String[] fetchGroups, int maxFetchDepth)
@@ -619,32 +516,43 @@ implements SessionBean
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 
-			List<ProductTypeLocal> productTypeLocals = new ArrayList<ProductTypeLocal>(productTypeIDs.size());
-			for (ProductTypeID productTypeID : productTypeIDs) {
-				ProductType productType = (ProductType) pm.getObjectById(productTypeID);
-				ProductTypeLocal productTypeLocal = productType.getProductTypeLocal();
-				if (productTypeLocal == null)
-					throw new IllegalStateException("productType.productTypeLocal is null: " + productType);
+//			List<ProductTypeLocal> productTypeLocals = new ArrayList<ProductTypeLocal>(productTypeIDs.size());
+//			for (ProductTypeID productTypeID : productTypeIDs) {
+//				ProductType productType = (ProductType) pm.getObjectById(productTypeID);
+//				ProductTypeLocal productTypeLocal = productType.getProductTypeLocal();
+//				if (productTypeLocal == null)
+//					throw new IllegalStateException("productType.productTypeLocal is null: " + productType);
+//
+//				productTypeLocals.add(productTypeLocal);
+//			}
+//
+//			productTypeLocals = Authority.filterSecuredObjects(
+//					pm,
+//					productTypeLocals,
+//					getPrincipal(),
+//					RoleConstants.seeProductType,
+//					ResolveSecuringAuthorityStrategy.allow
+//			);
+//
+//			List<ProductType> productTypes = new ArrayList<ProductType>(productTypeLocals.size());
+//			for (ProductTypeLocal productTypeLocal : productTypeLocals) {
+//				ProductType productType = productTypeLocal.getProductType();
+//				if (productType == null)
+//					throw new IllegalStateException("productTypeLocal.productType is null: " + productTypeLocal);
+//
+//				productTypes.add(pm.detachCopy(productType));
+//			}
+			List<ProductType> productTypes = NLJDOHelper.getObjectList(pm, productTypeIDs, ProductType.class);
 
-				productTypeLocals.add(productTypeLocal);
-			}
-
-			productTypeLocals = Authority.filterSecuredObjects(
+			productTypes = Authority.filterIndirectlySecuredObjects(
 					pm,
-					productTypeLocals,
+					productTypes,
 					getPrincipal(),
 					RoleConstants.seeProductType,
-					ResolveSecuringAuthorityStrategy.allow
-			);
+					ResolveSecuringAuthorityStrategy.allow);
 
-			List<ProductType> productTypes = new ArrayList<ProductType>(productTypeLocals.size());
-			for (ProductTypeLocal productTypeLocal : productTypeLocals) {
-				ProductType productType = productTypeLocal.getProductType();
-				if (productType == null)
-					throw new IllegalStateException("productTypeLocal.productType is null: " + productTypeLocal);
+			productTypes = (List<ProductType>) pm.detachCopyAll(productTypes);
 
-				productTypes.add(pm.detachCopy(productType));
-			}
 			return productTypes;
 
 //			return NLJDOHelper.getDetachedObjectList(pm, productTypeIDs, ProductType.class, fetchGroups, maxFetchDepth);
@@ -656,7 +564,7 @@ implements SessionBean
 	/**
 	 * @throws CannotPublishProductTypeException
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.store.editUnconfirmedProductType, org.nightlabs.jfire.store.editConfirmedProductType"
 	 * @ejb.transaction type="Required"
 	 */
 	public ProductTypeStatus setProductTypeStatus_published(ProductTypeID productTypeID, boolean get, String[] fetchGroups, int maxFetchDepth)
@@ -687,7 +595,7 @@ implements SessionBean
 	/**
 	 * @throws CannotConfirmProductTypeException
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.store.editUnconfirmedProductType, org.nightlabs.jfire.store.editConfirmedProductType"
 	 * @ejb.transaction type="Required"
 	 */
 	public ProductTypeStatus setProductTypeStatus_confirmed(ProductTypeID productTypeID, boolean get, String[] fetchGroups, int maxFetchDepth)
@@ -718,7 +626,7 @@ implements SessionBean
 	/**
 	 * @throws CannotMakeProductTypeSaleableException
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.store.editUnconfirmedProductType, org.nightlabs.jfire.store.editConfirmedProductType"
 	 * @ejb.transaction type="Required"
 	 */
 	public ProductTypeStatus setProductTypeStatus_saleable(ProductTypeID productTypeID, boolean saleable, boolean get, String[] fetchGroups, int maxFetchDepth)
@@ -748,7 +656,7 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.store.editConfirmedProductType"
 	 * @ejb.transaction type="Required"
 	 */
 	public ProductTypeStatus setProductTypeStatus_closed(ProductTypeID productTypeID, boolean get, String[] fetchGroups, int maxFetchDepth)
@@ -776,6 +684,11 @@ implements SessionBean
 	}
 
 	/**
+	 * Get mode of delivery flavours available to the given customer-group(s) and the specified product-types.
+	 * <p>
+	 * This method can be called by everyone, because mode of delivery flavours are not considered confidential.
+	 * </p>
+	 *
 	 * @param productTypeIDs Instances of {@link ProductTypeID}.
 	 * @param customerGroupIDs Instances of {@link org.nightlabs.jfire.trade.id.CustomerGroupID}.
 	 * @param mergeMode One of {@link ModeOfDeliveryFlavour#MERGE_MODE_SUBTRACTIVE} or {@link ModeOfDeliveryFlavour#MERGE_MODE_ADDITIVE}
@@ -821,6 +734,11 @@ implements SessionBean
 	}
 
 	/**
+	 * Get the server delivery processors that are available for the specified mode of delivery flavour.
+	 * <p>
+	 * This method can be called by everyone, because server delivery processors do not contain confidential information.
+	 * </p>
+	 *
 	 * @param fetchGroups Either <tt>null</tt> or all desired fetch groups.
 	 *
 	 * @ejb.interface-method
@@ -857,7 +775,7 @@ implements SessionBean
 	}
 
 	/**
-	 * Creates an DeliveryNote for all specified <code>Article</code>s. If
+	 * Creates a <code>DeliveryNote</code> for all specified <code>Article</code>s. If
 	 * get is true, a detached version of the new DeliveryNote will be returned.
 	 *
 	 * @param articleIDs The {@link ArticleID}s of those {@link Article}s that shall be added to the new <code>DeliveryNote</code>.
@@ -870,7 +788,7 @@ implements SessionBean
 	 *
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.store.editDeliveryNote"
 	 */
 	public DeliveryNote createDeliveryNote(
 			Collection<ArticleID> articleIDs, String deliveryNoteIDPrefix,
@@ -889,7 +807,7 @@ implements SessionBean
 				ArticleID articleID = it.next();
 				Article article = (Article) pm.getObjectById(articleID);
 				Offer offer = article.getOffer();
-				OfferLocal offerLocal = offer.getOfferLocal();
+//				OfferLocal offerLocal = offer.getOfferLocal();
 				trader.validateOffer(offer);
 				trader.acceptOfferImplicitely(offer);
 //				trader.finalizeOffer(user, offer);
@@ -930,7 +848,7 @@ implements SessionBean
 	 *
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.store.editDeliveryNote"
 	 */
 	public DeliveryNote createDeliveryNote(
 			ArticleContainerID articleContainerID, String deliveryNoteIDPrefix,
@@ -1001,7 +919,7 @@ implements SessionBean
 	 *
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.store.editDeliveryNote"
 	 */
 	public DeliveryNote addArticlesToDeliveryNote(
 			DeliveryNoteID deliveryNoteID, Collection<ArticleID> articleIDs,
@@ -1043,7 +961,7 @@ implements SessionBean
 	 *
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.store.editDeliveryNote"
 	 */
 	public DeliveryNote removeArticlesFromDeliveryNote(
 			DeliveryNoteID deliveryNoteID, Collection<ArticleID> articleIDs,
@@ -1088,7 +1006,7 @@ implements SessionBean
 	 *
 	 * @ejb.interface-method
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.store.deliver"
 	 */
 	public List<DeliveryResult> deliverBegin(List<DeliveryData> deliveryDataList)
 	throws ModuleException
@@ -1139,7 +1057,7 @@ implements SessionBean
 	 *
 	 * @ejb.interface-method
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.store.deliver"
 	 */
 	public DeliveryResult deliverBegin(DeliveryData deliveryData)
 	throws ModuleException
@@ -1148,6 +1066,9 @@ implements SessionBean
 	}
 
 	/**
+	 * Because this method is only available locally, it does not require any authorization and can be called by everyone
+	 * (authorization is required for the remotely available <code>deliverBegin</code> methods which lead to this method being called).
+	 *
 	 * @ejb.interface-method view-type="local"
 	 * @ejb.transaction type="RequiresNew"
 	 * @ejb.permission role-name="_Guest_"
@@ -1235,6 +1156,9 @@ implements SessionBean
 
 
 	/**
+	 * This method does not require access right control, because it can only be performed, if <code>deliverBegin</code> was
+	 * called before, which is restricted.
+	 *
 	 * @param deliveryIDs Instances of {@link DeliveryID}
 	 * @param deliverEndClientResults Instances of {@link DeliveryResult} corresponding
 	 *		to the <tt>deliveryIDs</tt>. Hence, both lists must have the same number of items.
@@ -1292,6 +1216,9 @@ implements SessionBean
 
 
 	/**
+	 * This method does not require access right control, because it can only be performed, if <code>deliverBegin</code> was
+	 * called before, which is restricted.
+	 *
 	 * @param deliveryIDs Instances of {@link DeliveryID}
 	 * @param deliverDoWorkClientResults Instances of {@link DeliveryResult} corresponding
 	 *		to the <tt>deliveryIDs</tt>. Hence, both lists must have the same number of items.
@@ -1349,6 +1276,9 @@ implements SessionBean
 
 
 	/**
+	 * This method does not require access right control, because it can only be performed, if <code>deliverBegin</code> was
+	 * called before, which is restricted.
+	 *
 	 * @throws ModuleException
 	 *
 	 * @see Accounting#deliverEnd(User, DeliveryData)
@@ -1367,6 +1297,9 @@ implements SessionBean
 	}
 
 	/**
+	 * This method does not require access right control, because it can only be performed, if <code>deliverBegin</code> was
+	 * called before, which is restricted.
+	 *
 	 * @ejb.interface-method view-type="local"
 	 * @ejb.transaction type="RequiresNew"
 	 * @ejb.permission role-name="_Guest_"
@@ -1424,6 +1357,9 @@ implements SessionBean
 
 
 	/**
+	 * This method does not require access right control, because it can only be performed, if <code>deliverBegin</code> was
+	 * called before, which is restricted.
+	 *
 	 * @throws ModuleException
 	 *
 	 * @see Accounting#deliverEnd(User, DeliveryData)
@@ -1442,6 +1378,9 @@ implements SessionBean
 	}
 
 	/**
+	 * This method does not require access right control, because it can only be performed, if <code>deliverBegin</code> was
+	 * called before, which is restricted.
+	 *
 	 * @ejb.interface-method view-type="local"
 	 * @ejb.transaction type="RequiresNew"
 	 * @ejb.permission role-name="_Guest_"
@@ -1663,7 +1602,7 @@ implements SessionBean
 	 * @return Returns instances of {@link DeliveryNote}.
 	 *
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.store.queryDeliveryNotes"
 	 * @ejb.transaction type="Required"
 	 */
 	public List<DeliveryNoteID> getDeliveryNoteIDs(AnchorID vendorID, AnchorID customerID, long rangeBeginIdx, long rangeEndIdx)
@@ -1679,6 +1618,10 @@ implements SessionBean
 
 	/**
 	 * This method returns the delivery with the respective ID.
+	 * <p>
+	 * Because this method is (currently) only used when performing a delivery, it requires
+	 * the role <code>org.nightlabs.jfire.store.deliver</code> to be granted.
+	 * </p>
 	 *
 	 * @param deliveryID The ID of the delivery to be retrieved.
 	 * @param fetchGroups The fetch groups to be used.
@@ -1686,7 +1629,7 @@ implements SessionBean
 	 * @return A detached copy of the delivery with the respective ID.
 	 *
  	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.store.deliver"
 	 * @ejb.transaction type="Required"
 	 */
 	public Delivery getDelivery(DeliveryID deliveryID, String[] fetchGroups, int maxFetchDepth) {
@@ -1707,10 +1650,11 @@ implements SessionBean
 	 * are not yet finalized. They are ordered by invoiceID descending (means newest first).
 	 *
  	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.store.queryDeliveryNotes"
 	 * @ejb.transaction type="Required"
 	 */
-	public List getNonFinalizedDeliveryNotes(AnchorID vendorID, AnchorID customerID, String[] fetchGroups, int maxFetchDepth)
+	@SuppressWarnings("unchecked")
+	public List<DeliveryNote> getNonFinalizedDeliveryNotes(AnchorID vendorID, AnchorID customerID, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -1718,7 +1662,7 @@ implements SessionBean
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
-			return (List) pm.detachCopyAll(DeliveryNote.getNonFinalizedDeliveryNotes(pm, vendorID, customerID));
+			return (List<DeliveryNote>) pm.detachCopyAll(DeliveryNote.getNonFinalizedDeliveryNotes(pm, vendorID, customerID));
 		} finally {
 			pm.close();
 		}
@@ -1727,7 +1671,7 @@ implements SessionBean
 	/**
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.store.editDeliveryNote"
 	 */
 	public void signalDeliveryNote(DeliveryNoteID deliveryNoteID, String jbpmTransitionName)
 	{
@@ -1746,48 +1690,48 @@ implements SessionBean
 		}
 	}
 
+//	/**
+//	 * @ejb.interface-method
+//	 * @ejb.permission role-name="_Guest_"
+//	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+//	 */
+//	public Set<ProductID> getProductIDs(QueryCollection<? extends AbstractProductQuery> productQueries)
+//	{
+//		if (productQueries == null)
+//			return null;
+//
+//		if (!Product.class.isAssignableFrom(productQueries.getResultClass())) {
+//			throw new RuntimeException("Given QueryCollection has invalid return type! " +
+//					"Invalid return type= "+ productQueries.getResultClassName());
+//		}
+//
+//		PersistenceManager pm = getPersistenceManager();
+//		try {
+//			pm.getFetchPlan().setMaxFetchDepth(1);
+//			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
+//
+//			if (!(productQueries instanceof JDOQueryCollectionDecorator)){
+//				productQueries = new JDOQueryCollectionDecorator<AbstractProductQuery>(productQueries);
+//			}
+//			JDOQueryCollectionDecorator<AbstractProductQuery> queries =
+//				(JDOQueryCollectionDecorator<AbstractProductQuery>) productQueries;
+//
+//			queries.setPersistenceManager(pm);
+//
+//			Collection<Product> products = (Collection<Product>) queries.executeQueries();
+//
+//// TODO: Implement Authority checking here - only the role is missing - the rest is just the following line. marco.
+////			products = Authority.filterSecuredObjects(pm, products, getPrincipal(), roleID);
+//
+//			return NLJDOHelper.getObjectIDSet(products);
+//		} finally {
+//			pm.close();
+//		}
+//	}
+
 	/**
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 */
-	public Set<ProductID> getProductIDs(QueryCollection<? extends AbstractProductQuery> productQueries)
-	{
-		if (productQueries == null)
-			return null;
-
-		if (!Product.class.isAssignableFrom(productQueries.getResultClass())) {
-			throw new RuntimeException("Given QueryCollection has invalid return type! " +
-					"Invalid return type= "+ productQueries.getResultClassName());
-		}
-
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			pm.getFetchPlan().setMaxFetchDepth(1);
-			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
-
-			if (!(productQueries instanceof JDOQueryCollectionDecorator)){
-				productQueries = new JDOQueryCollectionDecorator<AbstractProductQuery>(productQueries);
-			}
-			JDOQueryCollectionDecorator<AbstractProductQuery> queries =
-				(JDOQueryCollectionDecorator<AbstractProductQuery>) productQueries;
-
-			queries.setPersistenceManager(pm);
-
-			Collection<Product> products = (Collection<Product>) queries.executeQueries();
-
-// TODO: Implement Authority checking here - only the role is missing - the rest is just the following line. marco.
-//			products = Authority.filterSecuredObjects(pm, products, getPrincipal(), roleID);
-
-			return NLJDOHelper.getObjectIDSet(products);
-		} finally {
-			pm.close();
-		}
-	}
-
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.store.seeProductType"
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
 	@SuppressWarnings("unchecked")
@@ -1818,8 +1762,12 @@ implements SessionBean
 
 			Collection<ProductType> productTypes = (Collection<ProductType>) queries.executeQueries();
 
-// TODO: Implement Authority checking here - only the role is missing - the rest is just the following line. marco.
-//			productTypes = Authority.filterSecuredObjects(pm, productTypes, getPrincipal(), roleID);
+			productTypes = Authority.filterIndirectlySecuredObjects(
+					pm,
+					productTypes,
+					getPrincipal(),
+					RoleConstants.seeProductType,
+					ResolveSecuringAuthorityStrategy.allow);
 
 			return NLJDOHelper.getObjectIDSet(productTypes);
 		} finally {
@@ -1830,7 +1778,7 @@ implements SessionBean
 	/**
 	 *
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.store.seeProductType"
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
 	@SuppressWarnings("unchecked")
@@ -1840,47 +1788,59 @@ implements SessionBean
 		return getProductTypeIDs(productTypeQueries);
 	}
 
-	/**
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 */
-	@SuppressWarnings("unchecked")
-	public Set<ProductTypeGroupID> getProductTypeGroupIDs(
-			QueryCollection<? extends AbstractProductTypeGroupQuery> productTypeGroupQueries)
-	{
-		if (productTypeGroupQueries == null)
-			return null;
-
-		if (! ProductTypeGroup.class.isAssignableFrom(productTypeGroupQueries.getResultClass()))
-		{
-			throw new RuntimeException("Given QueryCollection has invalid return type! " +
-					"Invalid return type= "+ productTypeGroupQueries.getResultClassName());
-		}
-
-// TODO: Implement Authority checking here
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			pm.getFetchPlan().setMaxFetchDepth(1);
-			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
-
-			if (! (productTypeGroupQueries instanceof JDOQueryCollectionDecorator))
-			{
-				productTypeGroupQueries = new JDOQueryCollectionDecorator<AbstractProductTypeGroupQuery>(productTypeGroupQueries);
-			}
-			JDOQueryCollectionDecorator<AbstractProductTypeGroupQuery> queries =
-				(JDOQueryCollectionDecorator<AbstractProductTypeGroupQuery>) productTypeGroupQueries;
-
-			queries.setPersistenceManager(pm);
-
-			Collection<ProductTypeGroup> productTypeGroups = (Collection<ProductTypeGroup>) queries.executeQueries();
-
-			return NLJDOHelper.getObjectIDSet(productTypeGroups);
-		} finally {
-			pm.close();
-		}
-	}
+//	/**
+//	 *
+//	 * @ejb.interface-method
+//	 * @ejb.permission role-name="org.nightlabs.jfire.store.seeProductType"
+//	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+//	 */
+//	@SuppressWarnings("unchecked")
+//	public Set<ProductTypeGroupID> getProductTypeGroupIDs(
+//			QueryCollection<? extends AbstractProductTypeGroupQuery> productTypeGroupQueries)
+//	{
+//		if (productTypeGroupQueries == null)
+//			return null;
+//
+//		if (! ProductTypeGroup.class.isAssignableFrom(productTypeGroupQueries.getResultClass()))
+//		{
+//			throw new RuntimeException("Given QueryCollection has invalid return type! " +
+//					"Invalid return type= "+ productTypeGroupQueries.getResultClassName());
+//		}
+//
+//		PersistenceManager pm = getPersistenceManager();
+//		try {
+//			pm.getFetchPlan().setMaxFetchDepth(1);
+//			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
+//
+//			if (! (productTypeGroupQueries instanceof JDOQueryCollectionDecorator))
+//			{
+//				productTypeGroupQueries = new JDOQueryCollectionDecorator<AbstractProductTypeGroupQuery>(productTypeGroupQueries);
+//			}
+//			JDOQueryCollectionDecorator<AbstractProductTypeGroupQuery> queries =
+//				(JDOQueryCollectionDecorator<AbstractProductTypeGroupQuery>) productTypeGroupQueries;
+//
+//			queries.setPersistenceManager(pm);
+//
+//			Collection<ProductTypeGroup> productTypeGroups_unfiltered = (Collection<ProductTypeGroup>) queries.executeQueries();
+//
+//			Collection<ProductTypeGroup> productTypeGroups = new ArrayList<ProductTypeGroup>(productTypeGroups_unfiltered.size());
+//			for (ProductTypeGroup productTypeGroup : productTypeGroups_unfiltered) {
+//				boolean hasFilteredProductTypes = !Authority.filterIndirectlySecuredObjects(
+//						pm,
+//						productTypeGroup.getProductTypes(),
+//						getPrincipal(),
+//						RoleConstants.seeProductType,
+//						ResolveSecuringAuthorityStrategy.allow).isEmpty();
+//
+//				if (hasFilteredProductTypes)
+//					productTypeGroups.add(productTypeGroup);
+//			}
+//
+//			return NLJDOHelper.getObjectIDSet(productTypeGroups);
+//		} finally {
+//			pm.close();
+//		}
+//	}
 
 	/**
 	 *
@@ -1901,7 +1861,6 @@ implements SessionBean
 					"Invalid return type= "+ productTypeGroupQueries.getResultClassName());
 		}
 
-//TODO: Implement Authority checking here
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			pm.getFetchPlan().setGroups(FetchPlan.DEFAULT);
@@ -1925,7 +1884,8 @@ implements SessionBean
 				for (Iterator<ProductType> iterator = group.getProductTypes().iterator(); iterator.hasNext();) {
 					ProductType type = iterator.next();
 					ProductTypeID typeID = (ProductTypeID) JDOHelper.getObjectId(type);
-					result.addType(groupID, typeID);
+					if (Authority.resolveSecuringAuthority(pm, type.getProductTypeLocal(), ResolveSecuringAuthorityStrategy.allow).containsRoleRef(getPrincipal(), RoleConstants.seeProductType))
+						result.addType(groupID, typeID);
 				}
 			}
 			return result;
@@ -1936,6 +1896,13 @@ implements SessionBean
 
 	/**
 	 * Returns the {@link DeliveryQueue}s identified by the given IDs.
+	 * <p>
+	 * Because the delivery queues used (and even visible) to a user are configured in a config module,
+	 * there is at the moment no authorization required for this method (though, authentication is
+	 * necessary - i.e this method cannot be called anonymously). This may change later (we may implement
+	 * {@link SecuredObject} in {@link DeliveryQueue}).
+	 * </p>
+	 *
 	 * @param deliveryQueueIds The IDs of the DeliveryQueues to be returned.
 	 * @param fetchGroups The fetch groups to be used to detach the DeliveryQueues
 	 * @param fetchDepth The fetch depth to be used to detach the DeliveryQueues (-1 for unlimited)
@@ -1967,7 +1934,7 @@ implements SessionBean
 	 * @return A collection of the detached copies of the stored {@link DeliveryQueue}s
 	 *
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.store.editDeliveryQueue"
 	 */
 	public Collection<DeliveryQueue> storeDeliveryQueues(Collection<DeliveryQueue> deliveryQueues, boolean get, String[] fetchGroups, int fetchDepth) {
 		PersistenceManager pm = getPersistenceManager();
@@ -1987,30 +1954,30 @@ implements SessionBean
 		}
 	}
 
-	/**
-	 * Returns all {@link DeliveryQueue}s available.
-	 * @return All {@link DeliveryQueue}s available.
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 *
-	 * @param fetchGroups The desired fetch groups
-	 * @param fetchDepth The desired JDO fetch depth
-	 * @param includeDeleted Determines whether delivery queues marked as deleted are also returned.
-	 */
-	public Collection<DeliveryQueue> getAvailableDeliveryQueues(String[] fetchGroups, int fetchDepth, boolean includeDeleted) {
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			pm.getFetchPlan().setMaxFetchDepth(fetchDepth);
-
-			if (fetchGroups != null)
-				pm.getFetchPlan().setGroups(fetchGroups);
-
-			return pm.detachCopyAll(DeliveryQueue.getDeliveryQueues(pm, includeDeleted));
-		} finally {
-			pm.close();
-		}
-	}
+//	/**
+//	 * Returns all {@link DeliveryQueue}s available.
+//	 * @return All {@link DeliveryQueue}s available.
+//	 *
+//	 * @ejb.interface-method
+//	 * @ejb.permission role-name="_Guest_"
+//	 *
+//	 * @param fetchGroups The desired fetch groups
+//	 * @param fetchDepth The desired JDO fetch depth
+//	 * @param includeDeleted Determines whether delivery queues marked as deleted are also returned.
+//	 */
+//	public Collection<DeliveryQueue> getAvailableDeliveryQueues(String[] fetchGroups, int fetchDepth, boolean includeDeleted) {
+//		PersistenceManager pm = getPersistenceManager();
+//		try {
+//			pm.getFetchPlan().setMaxFetchDepth(fetchDepth);
+//
+//			if (fetchGroups != null)
+//				pm.getFetchPlan().setGroups(fetchGroups);
+//
+//			return pm.detachCopyAll(DeliveryQueue.getDeliveryQueues(pm, includeDeleted));
+//		} finally {
+//			pm.close();
+//		}
+//	}
 
 	/**
 	 * Returns the {@link DeliveryQueueID}s of all {@link DeliveryQueue}s available.
@@ -2023,72 +1990,73 @@ implements SessionBean
 	public Collection<DeliveryQueueID> getAvailableDeliveryQueueIDs(boolean includeDefunct) {
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			return NLJDOHelper.getDetachedQueryResultAsList(pm, DeliveryQueue.getDeliveryQueueIDs(pm, includeDefunct));
+//			return NLJDOHelper.getDetachedQueryResultAsList(pm, DeliveryQueue.getDeliveryQueueIDs(pm, includeDefunct));
+			return new ArrayList<DeliveryQueueID>(DeliveryQueue.getDeliveryQueueIDs(pm, includeDefunct));
 		} finally {
 			pm.close();
 		}
 	}
 
-	/**
-	 * Stores the given {@link DeliveryQueue}.
-	 * @param pq The {@link DeliveryQueue} to be stored.
-	 * @return A detached copy of the persisted {@link DeliveryQueue}.
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 */
-	public DeliveryQueue storeDeliveryQueue(DeliveryQueue pq) {
-		List<DeliveryQueue> tmp = new LinkedList<DeliveryQueue>();
-		tmp.add(pq);
-		return storeDeliveryQueues(tmp).get(0);
-	}
+//	/**
+//	 * Stores the given {@link DeliveryQueue}.
+//	 * @param pq The {@link DeliveryQueue} to be stored.
+//	 * @return A detached copy of the persisted {@link DeliveryQueue}.
+//	 *
+//	 * @ejb.interface-method
+//	 * @ejb.permission role-name="_Guest_"
+//	 */
+//	public DeliveryQueue storeDeliveryQueue(DeliveryQueue pq) {
+//		List<DeliveryQueue> tmp = new LinkedList<DeliveryQueue>();
+//		tmp.add(pq);
+//		return storeDeliveryQueues(tmp).get(0);
+//	}
+//
+//	/**
+//	 * Stores all {@link DeliveryQueue}s in the given collection.
+//	 * @param deliveryQueues The collection of the {@link DeliveryQueue}s to be stored.
+//	 * @return A list of detached copies of the stored delivery queues.
+//	 *
+//	 * @ejb.interface-method
+//	 * @ejb.permission role-name="_Guest_"
+//	 */
+//	public List<DeliveryQueue> storeDeliveryQueues(Collection<DeliveryQueue> deliveryQueues) {
+//		PersistenceManager pm = getPersistenceManager();
+//		try {
+//			deliveryQueues = storeDeliveryQueues(deliveryQueues, pm);
+//			return (List<DeliveryQueue>) pm.detachCopyAll(deliveryQueues);
+//		} finally {
+//			pm.close();
+//		}
+//	}
+//
+//	/**
+//	 * Returns all {@link DeliveryQueue}s available without the ones that have been marked as deleted.
+//	 * @return All {@link DeliveryQueue}s available without the ones that have been marked as deleted.
+//	 *
+//	 * @ejb.interface-method
+//	 * @ejb.permission role-name="_Guest_"
+//	 *
+//	 * @param fetchGroups The desired fetch groups
+//	 * @param fetchDepth The desired JDO fetch depth
+//	 */
+//	public Collection<DeliveryQueue> getAvailableDeliveryQueues(String[] fetchGroups, int fetchDepth) {
+//		return getAvailableDeliveryQueues(fetchGroups, fetchDepth, false);
+//	}
+//
+//	private List<DeliveryQueue> storeDeliveryQueues(Collection<DeliveryQueue> deliveryQueues, PersistenceManager pm) {
+//		List<DeliveryQueue> pqs = new LinkedList<DeliveryQueue>();
+//		for (DeliveryQueue clientPQ : deliveryQueues) {
+//			logger.debug("TicketingManagerBean.storeDeliveryQueue: Storing deliveryQueue " + clientPQ.getName().getText());
+//			clientPQ = pm.makePersistent(clientPQ);
+//			pqs.add(clientPQ);
+//		}
+//
+//		return pqs;
+//	}
 
 	/**
-	 * Stores all {@link DeliveryQueue}s in the given collection.
-	 * @param deliveryQueues The collection of the {@link DeliveryQueue}s to be stored.
-	 * @return A list of detached copies of the stored delivery queues.
-	 *
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 */
-	public List<DeliveryQueue> storeDeliveryQueues(Collection<DeliveryQueue> deliveryQueues) {
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			deliveryQueues = storeDeliveryQueues(deliveryQueues, pm);
-			return (List<DeliveryQueue>) pm.detachCopyAll(deliveryQueues);
-		} finally {
-			pm.close();
-		}
-	}
-
-	/**
-	 * Returns all {@link DeliveryQueue}s available without the ones that have been marked as deleted.
-	 * @return All {@link DeliveryQueue}s available without the ones that have been marked as deleted.
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 *
-	 * @param fetchGroups The desired fetch groups
-	 * @param fetchDepth The desired JDO fetch depth
-	 */
-	public Collection<DeliveryQueue> getAvailableDeliveryQueues(String[] fetchGroups, int fetchDepth) {
-		return getAvailableDeliveryQueues(fetchGroups, fetchDepth, false);
-	}
-
-	private List<DeliveryQueue> storeDeliveryQueues(Collection<DeliveryQueue> deliveryQueues, PersistenceManager pm) {
-		List<DeliveryQueue> pqs = new LinkedList<DeliveryQueue>();
-		for (DeliveryQueue clientPQ : deliveryQueues) {
-			logger.debug("TicketingManagerBean.storeDeliveryQueue: Storing deliveryQueue " + clientPQ.getName().getText());
-			clientPQ = pm.makePersistent(clientPQ);
-			pqs.add(clientPQ);
-		}
-
-		return pqs;
-	}
-
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.store.queryRepositories"
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
 	@SuppressWarnings("unchecked")
@@ -2128,7 +2096,7 @@ implements SessionBean
 	/**
 	 * @ejb.interface-method
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.store.queryRepositories"
 	 */
 	@SuppressWarnings("unchecked")
 	public List<Repository> getRepositories(Collection<AnchorID> repositoryIDs, String[] fetchGroups, int maxFetchDepth)
@@ -2144,7 +2112,7 @@ implements SessionBean
 	/**
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.store.editRepository"
 	 */
 	public Repository storeRepository(Repository repository, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
@@ -2189,7 +2157,7 @@ implements SessionBean
 	 *
 	 * @ejb.interface-method
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.store.queryProductTransfers"
 	 */
 	public List<TransferID> getProductTransferIDs(QueryCollection<? extends ProductTransferQuery> productTransferQueries)
 	{
@@ -2233,7 +2201,7 @@ implements SessionBean
 	/**
 	 * @ejb.interface-method
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.store.queryProductTransfers"
 	 */
 	public List<ProductTransfer> getProductTransfers(Collection<TransferID> productTransferIDs, String[] fetchGroups, int maxFetchDepth)
 	{
@@ -2246,6 +2214,11 @@ implements SessionBean
 	}
 
 	/**
+	 * Get the object-ids of all {@link RepositoryType}s.
+	 * <p>
+	 * This method can be called by everyone, because the object-ids are not confidential.
+	 * </p>
+	 *
 	 * @ejb.interface-method
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
@@ -2264,6 +2237,11 @@ implements SessionBean
 	}
 
 	/**
+	 * Get the <code>RepositoryType</code>s for the specified object-ids.
+	 * <p>
+	 * This method can be called by everyone, because the <code>RepositoryType</code>s are not confidential.
+	 * </p>
+	 *
 	 * @ejb.interface-method
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
@@ -2278,28 +2256,28 @@ implements SessionBean
 		}
 	}
 
-	/**
-	 * @param productTypeGroupID The ID of the desired <code>ProductTypeGroup</code>.
-	 *
-	 * @ejb.interface-method
-	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="_Guest_"
-	 */
-	public ProductTypeGroup getProductTypeGroup(ProductTypeGroupID productTypeGroupID,
-			String[] fetchGroups, int maxFetchDepth)
-	throws ModuleException
-	{
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			if (fetchGroups != null)
-				pm.getFetchPlan().setGroups(fetchGroups);
-			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
-			pm.getExtent(ProductTypeGroup.class);
-			return (ProductTypeGroup) pm.detachCopy(pm.getObjectById(productTypeGroupID));
-		} finally {
-			pm.close();
-		}
-	}
+//	/**
+//	 * @param productTypeGroupID The ID of the desired <code>ProductTypeGroup</code>.
+//	 *
+//	 * @ejb.interface-method
+//	 * @ejb.transaction type="Required"
+//	 * @ejb.permission role-name="_Guest_"
+//	 */
+//	public ProductTypeGroup getProductTypeGroup(ProductTypeGroupID productTypeGroupID,
+//			String[] fetchGroups, int maxFetchDepth)
+//	throws ModuleException
+//	{
+//		PersistenceManager pm = getPersistenceManager();
+//		try {
+//			if (fetchGroups != null)
+//				pm.getFetchPlan().setGroups(fetchGroups);
+//			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+//			pm.getExtent(ProductTypeGroup.class);
+//			return (ProductTypeGroup) pm.detachCopy(pm.getObjectById(productTypeGroupID));
+//		} finally {
+//			pm.close();
+//		}
+//	}
 
 	/**
 	 * @param productTypeGroupIDs Either <code>null</code> in order to return all or instances of {@link ProductTypeGroupID}
@@ -2307,7 +2285,7 @@ implements SessionBean
 	 *
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.store.seeProductType"
 	 */
 	public Collection<ProductTypeGroup> getProductTypeGroups(Collection<ProductTypeGroupID>
 		productTypeGroupIDs, String[] fetchGroups, int maxFetchDepth)
@@ -2319,24 +2297,14 @@ implements SessionBean
 				pm.getFetchPlan().setGroups(fetchGroups);
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 
-// TODO reactivate as soon as JPOX bug is fixed.
-//			Query q;
-//			if (productTypeGroupIDs == null)
-//				q = pm.newQuery(ProductTypeGroup.class);
-//			else
-//				q = pm.newQuery(
-//					"SELECT " +
-//					"FROM " + ProductTypeGroup.class.getName() + " " +
-//					"WHERE paramEventGroupIDs.contains(JDOHelper.getObjectId(this)) " +
-//					"import java.util.Collection " +
-//					"PARAMETERS Collection paramEventGroupIDs");
-//
-//			Collection productTypeGroups = (Collection) q.execute(productTypeGroupIDs);
-
 			pm.getExtent(ProductTypeGroup.class);
 			ArrayList<ProductTypeGroup> productTypeGroups = new ArrayList<ProductTypeGroup>(productTypeGroupIDs.size());
 			for (ProductTypeGroupID productTypeGroupID : productTypeGroupIDs) {
-				productTypeGroups.add((ProductTypeGroup) pm.getObjectById(productTypeGroupID));
+				ProductTypeGroup productTypeGroup = (ProductTypeGroup) pm.getObjectById(productTypeGroupID);
+				// The method ProductTypeGroup.getProductTypes() already filters the product-types by their
+				// authorities. Therefore, we simply suppress those groups that contain no product type anymore after filtering.
+				if (!productTypeGroup.getProductTypes().isEmpty())
+					productTypeGroups.add(productTypeGroup);
 			}
 
 			return pm.detachCopyAll(productTypeGroups);

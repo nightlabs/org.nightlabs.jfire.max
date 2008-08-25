@@ -1741,26 +1741,6 @@ public abstract class AccountingManagerBean
 	}
 
 	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.queryInvoices"
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 */
-	public Invoice getInvoice(InvoiceID invoiceID, String[] fetchGroups, int maxFetchDepth)
-	throws ModuleException
-	{
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
-			if (fetchGroups != null)
-				pm.getFetchPlan().setGroups(fetchGroups);
-
-			return (Invoice) pm.detachCopy(pm.getObjectById(invoiceID));
-		} finally {
-			pm.close();
-		}
-	}
-
-	/**
 	 * @param invoiceQueries Instances of {@link InvoiceQuery} that shall be chained
 	 *		in order to retrieve the result. The result of one query is passed to the
 	 *		next one using the {@link AbstractJDOQuery#setCandidates(Collection)}.

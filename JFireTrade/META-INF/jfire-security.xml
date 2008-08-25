@@ -137,7 +137,7 @@
 		<role id="org.nightlabs.jfire.accounting.editPriceFragmentType"/>
 	</role-group>
 
-	<!-- END accounting -->
+<!-- END accounting -->
 
 
 <!-- BEGIN store -->
@@ -152,20 +152,85 @@
 			Lieferscheine erzeugen oder ändern. Dies beinhaltet die Durchführung von Lieferungen.
 		</description>
 		<role id="org.nightlabs.jfire.store.deliver"/>
-		<!-- TODO add missing roles (see editInvoice above) -->
+		<role id="org.nightlabs.jfire.store.editDeliveryNote"/>
+		<role id="org.nightlabs.jfire.store.queryDeliveryNotes"/>
 	</role-group>
-	
-<!-- END store -->
 
-<!-- BEGIN trade -->
+	<role-group id="org.nightlabs.jfire.store.queryDeliveryNotes">
+		<name>Query delivery notes</name>
+		<name language="de">Lieferscheine abfragen</name>
+		<description>
+			Query delivery notes and see their properties.
+		</description>
+		<description language="de">
+			Lieferscheine abfragen und deren Eigenschaften einsehen.
+		</description>
+		<role id="org.nightlabs.jfire.store.queryDeliveryNotes"/>
+	</role-group>
 
-	<role-group id="org.nightlabs.jfire.trade.seeProductType">
+	<role-group id="org.nightlabs.jfire.store.seeProductType">
 		<name>See product types</name>
 		<name language="de">Produkttypen sehen</name>
 		<description>See product types with all their properties.</description>
 		<description language="de">Produkttypen mit all ihren Eigenschaften sehen.</description>
-		<role id="org.nightlabs.jfire.trade.seeProductType"/>
+		<role id="org.nightlabs.jfire.store.seeProductType"/>
 	</role-group>
+
+	<role-group id="org.nightlabs.jfire.store.editUnconfirmedProductType">
+		<name>Edit unconfirmed product types</name>
+		<name language="de">Unbestätigte Produkttypen editieren</name>
+		<description>Edit product types before they have been confirmed.</description>
+		<description language="de">Produkttypen bearbeiten, bevor sie bestätigt wurden.</description>
+		<role id="org.nightlabs.jfire.store.editUnconfirmedProductType"/>
+	</role-group>
+
+	<role-group id="org.nightlabs.jfire.store.editConfirmedProductType">
+		<name>Edit confirmed product types</name>
+		<name language="de">Bestätigte Produkttypen editieren</name>
+		<description>Edit product types *after* they have been confirmed.</description>
+		<description language="de">Produkttypen bearbeiten, auch *nachdem* sie bestätigt wurden.</description>
+
+		<role id="org.nightlabs.jfire.store.editUnconfirmedProductType"/>
+		<role id="org.nightlabs.jfire.store.editConfirmedProductType"/>
+	</role-group>
+
+	<role-group id="org.nightlabs.jfire.store.editDeliveryQueue">
+		<name>Edit delivery queues</name>
+		<name language="de">Lieferwarteschlangen editieren</name>
+		<description>Create or modify delivery queues.</description>
+		<description language="de">Erzeugen oder Bearbeiten von Lieferwarteschlangen.</description>
+		<role id="org.nightlabs.jfire.store.editDeliveryQueue"/>
+	</role-group>
+
+
+	<role-group id="org.nightlabs.jfire.store.queryRepositories">
+		<name>Query repositories</name>
+		<name language="de">Lagerstätten abfragen</name>
+		<description>
+			Read access to repositories.
+		</description>
+		<description language="de">
+			Lesezugriff auf Lagerstätte.
+		</description>
+		<role id="org.nightlabs.jfire.store.queryRepositories" />
+		<role id="org.nightlabs.jfire.store.queryProductTransfers" />
+	</role-group>
+
+	<role-group id="org.nightlabs.jfire.store.editRepository">
+		<name>Edit repositories</name>
+		<name language="de">Lagerstätten editieren</name>
+		<description>
+			Write access to repositories.
+		</description>
+		<description language="de">
+			Schreibzugriff auf Lagerstätte.
+		</description>
+		<role id="org.nightlabs.jfire.store.editRepository" />
+		<include-role-group id="org.nightlabs.jfire.store.queryRepositories"/>
+	</role-group>
+<!-- END store -->
+
+<!-- BEGIN trade -->
 
 	<role-group id="org.nightlabs.jfire.trade.sellProductType">
 		<name>Sell</name>
@@ -177,14 +242,6 @@
 		<name>Reverse</name>
 		<name language="de">Stornieren</name>
 		<role id="org.nightlabs.jfire.trade.reverseProductType"/>
-	</role-group>
-
-	<role-group id="org.nightlabs.jfire.trade.editUnconfirmedProductType">
-		<role id="org.nightlabs.jfire.trade.editUnconfirmedProductType"/>
-	</role-group>
-
-	<role-group id="org.nightlabs.jfire.trade.editConfirmedProductType">
-		<role id="org.nightlabs.jfire.trade.editConfirmedProductType"/>
 	</role-group>
 
 	<role-group id="org.nightlabs.jfire.trade.createOrder">
@@ -201,10 +258,6 @@
 
 	<role-group id="org.nightlabs.jfire.trade.queryOrders">
 		<role id="org.nightlabs.jfire.trade.queryOrders"/>
-	</role-group>
-
-	<role-group id="org.nightlabs.jfire.trade.queryDeliveryNotes">
-		<role id="org.nightlabs.jfire.trade.queryDeliveryNotes"/>
 	</role-group>
 
 <!-- END trade -->

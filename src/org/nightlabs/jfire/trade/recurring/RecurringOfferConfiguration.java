@@ -77,7 +77,7 @@ public class RecurringOfferConfiguration implements Serializable{
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
-	private boolean isBookInvoice;
+	private boolean bookInvoice;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -136,10 +136,10 @@ public class RecurringOfferConfiguration implements Serializable{
 	}
 
 	public boolean isBookInvoice() {
-		return isBookInvoice;
+		return bookInvoice;
 	}
 
 	public void setBookInvoice(boolean isBookInvoice) {
-		this.isBookInvoice = isBookInvoice;
+		this.bookInvoice = isBookInvoice;
 	}
 }

@@ -232,7 +232,7 @@ public class RecurringTrader {
 				}
 			}
 		}
-
+		
 		// loop over the segments added to the order
 		for (Segment segment : order.getSegments()) {
 			logger.debug("Creating articles for RecurredOffer for SegmentType " + JDOHelper.getObjectId(segment.getSegmentType()));

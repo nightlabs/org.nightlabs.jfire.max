@@ -11,6 +11,7 @@ import java.util.Set;
 
 import javax.jdo.JDOHelper;
 
+import org.apache.log4j.Logger;
 import org.nightlabs.jdo.query.QueryCollection;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.security.SecurityReflector;
@@ -33,6 +34,8 @@ import org.nightlabs.progress.SubProgressMonitor;
 public class ProductTypeGroupDAO
 extends BaseJDOObjectDAO<ProductTypeGroupID, ProductTypeGroup>
 {
+	private static final Logger logger = Logger.getLogger(ProductTypeGroupDAO.class);
+
 	protected ProductTypeGroupDAO() {}
 
 	private static ProductTypeGroupDAO sharedInstance = null;
@@ -209,6 +212,10 @@ extends BaseJDOObjectDAO<ProductTypeGroupID, ProductTypeGroup>
 			if (productTypeGroups != null && resultIDs != null) {
 				for (Entry entry : resultIDs.getEntries()) {
 					ProductTypeGroup group = productTypeGroupID2ProductTypeGroup.get(entry.getProductTypeGroupID());
+					if (group == null) {
+						logger.warn("No group found with this id: " + entry.getProductTypeGroupID());
+						continue;
+					}
 					org.nightlabs.jfire.store.ProductTypeGroupSearchResult.Entry e = searchResult.addEntry(group);
 					List<ProductTypeID> productTypesIDs = entry.getProductTypeIDs();
 					for (ProductTypeID productTypeID : productTypesIDs) {

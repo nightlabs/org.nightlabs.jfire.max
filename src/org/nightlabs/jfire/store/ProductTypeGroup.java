@@ -198,7 +198,7 @@ implements Serializable, DetachCallback
 		try{
 			Collection<ProductType> pts = getProductTypes(getPersistenceManager(), (ProductTypeGroupID) JDOHelper.getObjectId(this));
 
-			pts = Authority.filterIndirectlySecuredObjectIDs(
+			pts = Authority.filterIndirectlySecuredObjects(
 					getPersistenceManager(),
 					pts,
 					SecurityReflector.getUserDescriptor().getUserObjectID(),

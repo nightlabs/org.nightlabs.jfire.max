@@ -12,6 +12,7 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
 import org.apache.log4j.Logger;
+import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jfire.issue.project.id.ProjectID;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.util.Util;
@@ -75,7 +76,14 @@ implements Serializable
 	private Project parentProject;
 	
 	/**
-	 * @jdo.field persistence-modifier="persistent"
+	 * Instances of IssueLink that are representations of {@link ObjectID}s.
+	 *
+	 * @jdo.field
+	 *		persistence-modifier="persistent"
+	 *		collection-type="collection"
+	 *		element-type="Project"
+	 *		dependent-element="true"
+	 *		mapped-by="parentProject"
 	 */
 	private Collection<Project> subProjects;
 	

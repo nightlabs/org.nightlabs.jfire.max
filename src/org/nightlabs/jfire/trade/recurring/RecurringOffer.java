@@ -30,12 +30,23 @@ public class RecurringOffer extends Offer {
 
 	public static final String FETCH_GROUP_RECURRING_OFFER_CONFIGURATION = "RecurringOffer.recurringOfferConfiguration";
 
+	public static final String PROBLEM_KEY_NONE = null;
+
+	public static final String PROBLEM_KEY_PRICE_NONEQUAL = "Prices Non-Equal";
+
+	
 	/**
 	 * @jdo.field persistence-modifier="persistent" mapped-by="recurringOffer"
 	 */
 	private RecurringOfferConfiguration recurringOfferConfiguration;
 
-
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private String problemKey;
+	
+	
+	
 	/**
 	 * @deprecated Only for JDO!
 	 */
@@ -46,6 +57,7 @@ public class RecurringOffer extends Offer {
 		super(user, order, offerIDPrefix, offerID);
 		this.recurringOfferConfiguration = new RecurringOfferConfiguration(
 				this, user, getOrganisationID(), IDGenerator.nextID(RecurringOfferConfiguration.class));
+		this.problemKey = PROBLEM_KEY_NONE;
 	}
 
 	@Override
@@ -61,6 +73,14 @@ public class RecurringOffer extends Offer {
 	
 	public RecurringOfferConfiguration getRecurringOfferConfiguration() {
 		return recurringOfferConfiguration;
+	}
+
+	public String getProblemKey() {
+		return problemKey;
+	}
+
+	public void setProblemKey(String problemKey) {
+		this.problemKey = problemKey;
 	}
 
 

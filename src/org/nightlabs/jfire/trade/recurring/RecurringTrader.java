@@ -172,6 +172,9 @@ public class RecurringTrader {
 	 */
 	public RecurredOffer processRecurringOffer(RecurringOffer recurringOffer) throws ModuleException, CreateException, NamingException
 	{
+		Boolean PriceDiffer = false;
+
+
 		String nodeName = recurringOffer.getState().getStateDefinition().getJbpmNodeName();
 		if (!JbpmConstantsRecurringOffer.Vendor.NODE_NAME_RECURRENCE_STARTED.equals(nodeName)) {
 			throw new IllegalStateException("The recurrence for RecurringOffer " + JDOHelper.getObjectId(recurringOffer) + " is not started, it is in the state '" + nodeName + "'.");
@@ -253,15 +256,21 @@ public class RecurringTrader {
 
 					Map<Article, Article> recurredArticles = handler.createArticles(recurredOffer, articles, segment);
 
-					if (logger.isDebugEnabled()) {
-						for (Map.Entry<Article, Article> articleEntry : recurredArticles.entrySet()) {
+					for (Map.Entry<Article, Article> articleEntry : recurredArticles.entrySet()) {
+						//	Compare Prices to check if they the Differ
+						if(!articleEntry.getValue().getPrice().equals(articleEntry.getKey().getPrice()))
+							PriceDiffer = true;
+
+						if (logger.isDebugEnabled()) {			
 							if (!articleEntry.getValue().isAllocated()) {
 								logger.debug("    An Article was created which was NOT allocated: " + JDOHelper.getObjectId(articleEntry.getValue()));					
 							} else {
 								logger.debug("    An allocated Article was created: " + JDOHelper.getObjectId(articleEntry.getValue()));					
-							}
+							}		
+
+							logger.debug("  Finished creatingArticles");										
 						}
-						logger.debug("  Finished creatingArticles");					
+
 					}
 				}
 			}
@@ -284,24 +293,31 @@ public class RecurringTrader {
 		 */ 
 		// finished creating articles
 
-		// For now, as long as the different strategies are not present, we directly accept the offer.
-		trader.acceptOfferImplicitely(recurredOffer);
+		if(!PriceDiffer)
+		{
+			// For now, as long as the different strategies are not present, we directly accept the offer.
+			trader.acceptOfferImplicitely(recurredOffer);
 
-		if(recurringOffer.getRecurringOfferConfiguration().isCreateInvoice()) {
-			logger.debug("Creating invoice for new RecurredOffer");
-			// If the configuration says so, automatically create an invoice
-			Accounting accounting = Accounting.getAccounting(pm);
-			Invoice invoice = accounting.createInvoice(user, recurredOffer.getArticles(), null);
+			if(recurringOffer.getRecurringOfferConfiguration().isCreateInvoice()) {
+				logger.debug("Creating invoice for new RecurredOffer");
+				// If the configuration says so, automatically create an invoice
+				Accounting accounting = Accounting.getAccounting(pm);
+				Invoice invoice = accounting.createInvoice(user, recurredOffer.getArticles(), null);
 
-			logger.debug("Successfully created Invoice " + JDOHelper.getObjectId(invoice));
-			accounting.validateInvoice(invoice);
+				logger.debug("Successfully created Invoice " + JDOHelper.getObjectId(invoice));
+				accounting.validateInvoice(invoice);
 
-			AccountingManagerLocal aml = AccountingManagerUtil.getLocalHome().create();
+				AccountingManagerLocal aml = AccountingManagerUtil.getLocalHome().create();
 
-			if(recurringOffer.getRecurringOfferConfiguration().isBookInvoice())
-				aml.signalInvoice((InvoiceID)JDOHelper.getObjectId(invoice), JbpmConstantsInvoice.Vendor.TRANSITION_NAME_BOOK_IMPLICITELY);
+				if(recurringOffer.getRecurringOfferConfiguration().isBookInvoice())
+					aml.signalInvoice((InvoiceID)JDOHelper.getObjectId(invoice), JbpmConstantsInvoice.Vendor.TRANSITION_NAME_BOOK_IMPLICITELY);
 
+			}
 		}	
+		else
+			//Mark the Error
+			recurringOffer.setProblemKey(RecurringOffer.PROBLEM_KEY_PRICE_NONEQUAL);
+
 
 		return recurredOffer;
 	}

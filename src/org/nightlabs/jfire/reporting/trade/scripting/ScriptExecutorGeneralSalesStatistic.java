@@ -10,6 +10,7 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
 import org.eclipse.datatools.connectivity.oda.IResultSetMetaData;
+import org.nightlabs.jfire.reporting.JFireReportingHelper;
 import org.nightlabs.jfire.reporting.oda.DataType;
 import org.nightlabs.jfire.reporting.oda.jfs.AbstractJFSScriptExecutorDelegate;
 import org.nightlabs.jfire.reporting.oda.jfs.JFSResultSet;
@@ -68,7 +69,7 @@ public class ScriptExecutorGeneralSalesStatistic extends AbstractJFSScriptExecut
 		for (Iterator<Object[]> iter = products.iterator(); iter.hasNext();) {
 			Object[] row = iter.next();
 			Object[] nRow = new Object[3];
-			nRow[0] = ((ProductType)row[0]).getName().getText(NLLocale.getDefault().getLanguage());
+			nRow[0] = ((ProductType)row[0]).getName().getText(JFireReportingHelper.getLocale());
 			nRow[1] = row[1];
 			nRow[2] = row[2];
 			resultSet.addRow(nRow);

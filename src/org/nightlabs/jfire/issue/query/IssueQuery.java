@@ -159,14 +159,18 @@ public class IssueQuery
 			filter.append("\n && (this.issueLinks.contains(varIssueLinkType) && (varIssueLinkType.issueLinkType.issueLinkTypeID == :issueLinkTypeID.issueLinkTypeID))");
 		}
 
-		if (isFieldEnabled(FieldName.issueWorkTimeRangeFrom) && (issueWorkTimeRangeTo != null || issueWorkTimeRangeFrom != null)) {
+		if (isFieldEnabled(FieldName.issueWorkTimeRangeFrom) && !isFieldEnabled(FieldName.issueWorkTimeRangeTo) && issueWorkTimeRangeFrom != null) {
 			filter.append("\n && (this.issueWorkTimeRanges.contains(varIssueWorkTimeRange) && (varIssueWorkTimeRange.from >= :issueWorkTimeRangeFrom))");
+		}
+		
+		if (!isFieldEnabled(FieldName.issueWorkTimeRangeFrom) && isFieldEnabled(FieldName.issueWorkTimeRangeTo) && issueWorkTimeRangeTo != null) {
 			filter.append("\n && (this.issueWorkTimeRanges.contains(varIssueWorkTimeRange) && (varIssueWorkTimeRange.to <= :issueWorkTimeRangeTo))");
 		}
 		
-		if (isFieldEnabled(FieldName.issueWorkTimeRangeTo) && (issueWorkTimeRangeTo != null || issueWorkTimeRangeFrom != null)) {
-			filter.append("\n && (this.issueWorkTimeRanges.contains(varIssueWorkTimeRange) && (varIssueWorkTimeRange.from >= :issueWorkTimeRangeFrom))");
-			filter.append("\n && (this.issueWorkTimeRanges.contains(varIssueWorkTimeRange) && (varIssueWorkTimeRange.to <= :issueWorkTimeRangeTo))");
+		if (isFieldEnabled(FieldName.issueWorkTimeRangeFrom) && isFieldEnabled(FieldName.issueWorkTimeRangeTo) 
+				&& issueWorkTimeRangeFrom != null && issueWorkTimeRangeTo != null) {
+			filter.append("\n && (this.issueWorkTimeRanges.contains(varIssueWorkTimeRange) && !((varIssueWorkTimeRange.from >= :issueWorkTimeRangeTo) && (varIssueWorkTimeRange.to > :issueWorkTimeRangeTo))) ");
+			filter.append("\n || (this.issueWorkTimeRanges.contains(varIssueWorkTimeRange) && !((varIssueWorkTimeRange.to <= :issueWorkTimeRangeFrom) && (varIssueWorkTimeRange.from < :issueWorkTimeRangeFrom)))");
 		}
 		
 		// FIXME: chairat please rewrite this part as soon as you have refactored the linkage of objects to Issues. (marius)

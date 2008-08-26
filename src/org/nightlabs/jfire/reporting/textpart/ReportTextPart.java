@@ -4,6 +4,7 @@
 package org.nightlabs.jfire.reporting.textpart;
 
 import java.io.Serializable;
+import java.util.Locale;
 
 /**
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
@@ -22,6 +23,11 @@ import java.io.Serializable;
 public class ReportTextPart implements Serializable {
 	
 	private static final long serialVersionUID = 20080821L;
+	
+	public enum Type {
+		HTML,
+		JAVASCRIPT
+	}
 	
 	/**
 	 * Fetch-group that will include the {@link ReportTextPartContent}.
@@ -59,12 +65,17 @@ public class ReportTextPart implements Serializable {
 	private ReportTextPartConfiguration reportTextPartConfiguration;
 	
 	/**
-	 * @jdo.field persistence-modifier="persistent" mapped-by="reportTextPartType" dependent="true"
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private Type type;
+	
+	/**
+	 * @jdo.field persistence-modifier="persistent" mapped-by="reportTextPart" dependent="true"
 	 */
 	private ReportTextPartName name;
 	
 	/**
-	 * @jdo.field persistence-modifier="persistent" mapped-by="reportTextPartType" dependent="true"
+	 * @jdo.field persistence-modifier="persistent" mapped-by="reportTextPart" dependent="true"
 	 */
 	private ReportTextPartContent content;
 
@@ -80,6 +91,7 @@ public class ReportTextPart implements Serializable {
 		this.reportTextPartConfiguration = reportTextPartConfiguration;
 		this.name = new ReportTextPartName(this);
 		this.content = new ReportTextPartContent(this);
+		this.type = Type.HTML;
 	}
 	
 	/**
@@ -110,6 +122,28 @@ public class ReportTextPart implements Serializable {
 	 */
 	public ReportTextPartConfiguration getReportTextPartConfiguration() {
 		return reportTextPartConfiguration;
+	}
+	
+	/**
+	 * Get the {@link Type} of this {@link ReportTextPart}. 
+	 * This will be never <code>null</code>. 
+	 * 
+	 * @return The {@link Type} of this {@link ReportTextPart}, never <code>null</code>.
+	 */
+	public Type getType() {
+		return type;
+	}
+	
+	/**
+	 * Set the Type fo this {@link ReportTextPart}. Note that passing <code>null</code>
+	 * here will result in an {@link IllegalArgumentException}.
+	 * 
+	 * @param type The {@link Type} to set.
+	 */
+	public void setType(Type type) {
+		if (type == null)
+			throw new IllegalArgumentException("Type must not be null.");
+		this.type = type;
 	}
 	
 	/**

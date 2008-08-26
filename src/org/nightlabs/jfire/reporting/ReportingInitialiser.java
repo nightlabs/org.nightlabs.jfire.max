@@ -29,7 +29,6 @@ import javax.naming.NamingException;
 import javax.xml.transform.TransformerException;
 
 import org.apache.log4j.Logger;
-import org.nightlabs.ModuleException;
 import org.nightlabs.i18n.I18nText;
 import org.nightlabs.jfire.base.JFireBaseEAR;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
@@ -51,6 +50,8 @@ import org.nightlabs.jfire.reporting.parameter.config.ValueConsumerBinding;
 import org.nightlabs.jfire.reporting.parameter.config.ValueProviderConfig;
 import org.nightlabs.jfire.reporting.parameter.config.id.ReportParameterAcquisitionUseCaseID;
 import org.nightlabs.jfire.reporting.parameter.id.ValueProviderID;
+import org.nightlabs.jfire.reporting.textpart.ReportTextPart;
+import org.nightlabs.jfire.reporting.textpart.ReportTextPartConfiguration;
 import org.nightlabs.jfire.scripting.ScriptRegistry;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.servermanager.JFireServerManager;
@@ -67,13 +68,13 @@ import org.xml.sax.SAXParseException;
 /**
  * <p>
  * Helper class to initialize report layouts. The ReportingInitialiser will
- * recusursively scan a given directory and create a tree of {@link ReportCategory}s
+ * recursively scan a given directory and create a tree of {@link ReportCategory}s
  * and {@link ReportLayout}s according to the directory structure it finds.
  * </p>
  * <p>
  * For each folder the initializer finds a category will be created as child of
- * the upper directorys one. A descriptor file 'content.xml' can be placed in
- * the directory to define in detail what id and names the category and report layous
+ * the upper directories one. A descriptor file 'content.xml' can be placed in
+ * the directory to define in detail what id and names the category and report layouts
  * should get.
  * </p>
  * <p>
@@ -83,7 +84,7 @@ import org.xml.sax.SAXParseException;
  * </p>
  * <p>
  * Additionally resource bundles used for localisation of the reports are created by the
- * initialzer. These files should be placed in a subfolder 'resource' for each category and should be
+ * initializer. These files should be placed in a subfolder 'resource' for each category and should be
  * prefixed with the report layout id. (e.g. DefaultInvoiceLayout_en_EN.properties)
  * </p>
  * <p>
@@ -108,7 +109,7 @@ public class ReportingInitialiser {
 	private String organisationID;
 	private String reportRegistryItemType;
 	
-	private SAXException parseException;
+//	private SAXException parseException;
 	private Map<File, Document> categoryDescriptors = new HashMap<File, Document>();
 
 	/**
@@ -184,18 +185,18 @@ public class ReportingInitialiser {
 	/**
 	 * Start the initializing process.
 	 * 
-	 * @throws ModuleException
+	 * @throws ReportingInitialiserException If initializing fails. 
 	 */
 	public void initialise()
 	throws ReportingInitialiserException
 	{
 		String j2eeBaseDir = jfsm.getJFireServerConfigModule().getJ2ee().getJ2eeDeployBaseDirectory();
-		File scriptDir = new File(j2eeBaseDir, scriptSubDir);
+		File reportInitDir = new File(j2eeBaseDir, scriptSubDir);
 
-		if (!scriptDir.exists())
-			throw new IllegalStateException("Script directory does not exist: " + scriptDir.getAbsolutePath());
+		if (!reportInitDir.exists())
+			throw new IllegalStateException("Report initialisation directory does not exist: " + reportInitDir.getAbsolutePath());
 
-		logger.debug("BEGIN initialization of Scripts");
+		logger.debug("BEGIN initialization of ReportLayouts");
 //		initDefaultParameterSets();
 
 		// initialise meta-data
@@ -207,9 +208,44 @@ public class ReportingInitialiser {
 		pm.getExtent(ValueProvider.class);
 		pm.getExtent(ValueAcquisitionSetup.class);
 
-		createReportCategories(scriptDir, baseCategory);
+		createReportCategories(reportInitDir, baseCategory);
 	}
 
+	private Document parseFile(final File xmlFile)
+	throws SAXException, IOException
+	{
+		if (!xmlFile.exists())
+			return null;
+		
+		DOMParser parser = new DOMParser();
+		final SAXException[] parseException = new SAXException[1];
+		parser.setErrorHandler(new ErrorHandler(){
+			public void error(SAXParseException exception) throws SAXException {
+				logger.error("Parse ("+xmlFile+"): ", exception);
+				parseException[0] = exception;
+			}
+
+			public void fatalError(SAXParseException exception) throws SAXException {
+				logger.fatal("Parse ("+xmlFile+"): ", exception);
+				parseException[0] = exception;
+			}
+
+			public void warning(SAXParseException exception) throws SAXException {
+				logger.warn("Parse ("+xmlFile+"): ", exception);
+			}
+		});
+		InputSource inputSource;
+		try {
+			inputSource = new InputSource(new FileInputStream(xmlFile));
+		} catch (FileNotFoundException e) {
+			throw new IllegalStateException("Although checked with .exists() file "+xmlFile+" does not seem to exist. ", e);
+		}
+		parser.parse(inputSource);
+		if (parseException[0] != null)
+			throw parseException[0];
+		return parser.getDocument();
+	}
+	
 	private Document getCategoryDescriptor(File categoryDir)
 	throws SAXException, IOException
 	{
@@ -217,33 +253,7 @@ public class ReportingInitialiser {
 		if (doc == null) {
 			final File contentFile = new File(categoryDir, "content.xml");
 			if (contentFile.exists()) {
-				DOMParser parser = new DOMParser();
-				parser.setErrorHandler(new ErrorHandler(){
-					public void error(SAXParseException exception) throws SAXException {
-						logger.error("Parse ("+contentFile+"): ", exception);
-						parseException = exception;
-					}
-
-					public void fatalError(SAXParseException exception) throws SAXException {
-						logger.fatal("Parse ("+contentFile+"): ", exception);
-						parseException = exception;
-					}
-
-					public void warning(SAXParseException exception) throws SAXException {
-						logger.warn("Parse ("+contentFile+"): ", exception);
-					}
-				});
-				parseException = null;
-				InputSource inputSource;
-				try {
-					inputSource = new InputSource(new FileInputStream(contentFile));
-				} catch (FileNotFoundException e) {
-					throw new IllegalStateException("Although checked with .exists() file "+contentFile+" does not seem to exist. ", e);
-				}
-				parser.parse(inputSource);
-				if (parseException != null)
-					throw parseException;
-				doc = parser.getDocument();
+				doc = parseFile(contentFile);
 				categoryDescriptors.put(categoryDir, doc);
 			}
 		}
@@ -262,6 +272,18 @@ public class ReportingInitialiser {
 		return null;
 	}
 	
+	/**
+	 * Read the contents of an {@link I18nText} from an xml node.
+	 * The xml element has to be in the following style
+	 * <pre>
+	 * <elementName language="somelanguage">content</elementName>
+	 * </pre>
+	 * 
+	 * @param elementNode The node to read children from.
+	 * @param elementName The name of the sub-elements that form the content.
+	 * @param name The {@link I18nText} to fill
+	 * @param def This will be set for english if nothing else was set and def != null
+	 */
 	private void createElementName(Node elementNode, String elementName, I18nText name, String def)
 	{
 		if (name == null) {
@@ -406,7 +428,8 @@ public class ReportingInitialiser {
 			layoutFile.delete();
 			createElementName(reportNode, "name", layout.getName(), reportID);
 			createElementName(reportNode, "description", layout.getDescription(), null);
-			createReportLocalisationBundle(reportFile, reportID, reportNode, layout);
+			createReportLocalisationData(reportFile, reportID, reportNode, layout);
+			createReportTextPartConfiguration(reportFile, reportID, reportNode, layout);
 		}
 		// This has its own overwriteOnInit
 		createReportParameterAcquisitionSetup(reportFile, reportNode, layout);
@@ -874,7 +897,7 @@ public class ReportingInitialiser {
 	 * @param layout The {@link ReportLayout} currently processed.
 	 * @throws ReportingInitialiserException
 	 */
-	protected void createReportLocalisationBundle(File reportFile, final String reportID, Node reportNode, ReportLayout layout) // TODO shouldn't this method be named createReportLocalisationData ???
+	protected void createReportLocalisationData(File reportFile, final String reportID, Node reportNode, ReportLayout layout)
 	throws ReportingInitialiserException
 	{
 		// initialise meta-data
@@ -910,4 +933,69 @@ public class ReportingInitialiser {
 			}
 		}
 	}
+	
+	/**
+	 * 
+	 * @param reportFile The report file currently processed.
+	 * @param reportID The id of the {@link ReportLayout} currently processed.
+	 * @param reportNode The 'report' node of the content.xml document currenty processed
+	 * @param layout The {@link ReportLayout} currently processed.
+	 * @throws ReportingInitialiserException
+	 */
+	protected void createReportTextPartConfiguration(File reportFile, final String reportID, Node reportNode, ReportLayout layout)
+	throws ReportingInitialiserException
+	{
+		// initialise meta-data
+		pm.getExtent(ReportLayoutLocalisationData.class);
+
+		File resourceFolder = new File(reportFile.getParentFile(), "resource");
+		File targetConfigurationFile = new File(reportFile.getParentFile(), 
+			IOUtil.getFileNameWithoutExtension(reportFile.getName()) + "." + 
+			ReportTextPartConfiguration.class.getSimpleName() +
+			".xml");
+
+		if (!targetConfigurationFile.exists())
+			return; // Nothing to do.
+		
+		Document doc;
+		try {
+			doc = parseFile(targetConfigurationFile);
+		} catch (Exception e) {
+			throw new ReportingInitialiserException("Parsing file failed " + targetConfigurationFile, e);
+		}
+		if (doc == null) {
+			logger.error("Parsing " +  targetConfigurationFile + " failed, document is null.");
+			return;
+		}
+		ReportTextPartConfiguration configuration = null;
+		Collection<Node> nodes = NLDOMUtil.findNodeList(doc, "reportTextPartConfiguration/reportTextPart");
+		for (Node reportTextPartNode : nodes) {
+			Node idNode = reportTextPartNode.getAttributes().getNamedItem("id");
+			if (idNode == null || "".equals(idNode.getTextContent())) {
+				logger.error("No 'id' was specified for a 'reportTextPart' in file " + targetConfigurationFile);
+				continue;
+			}
+			Node typeNode = reportTextPartNode.getAttributes().getNamedItem("type");
+			if (typeNode == null || "".equals(typeNode.getTextContent())) {
+				logger.error("No 'type' was specified for a 'reportTextPart' in file " + targetConfigurationFile);
+				continue;
+			}
+			ReportTextPart.Type type = ReportTextPart.Type.valueOf(typeNode.getTextContent().toUpperCase());
+			if (configuration == null) {
+				// create only when a text part was defined
+				configuration = new ReportTextPartConfiguration(layout.getOrganisationID(), IDGenerator.nextID(ReportTextPartConfiguration.class));
+			}
+			
+			ReportTextPart part = new ReportTextPart(configuration, idNode.getTextContent());
+			part.setType(type);
+			createElementName(reportTextPartNode, "name", part.getName(), null);
+			createElementName(reportTextPartNode, "content", part.getContent(), null);
+			
+			configuration.addReportTextPart(part);
+		}
+		if (configuration != null) {
+			pm.makePersistent(configuration);
+		}
+	}
+	
 }

@@ -78,10 +78,13 @@ import org.nightlabs.jfire.jbpm.graph.def.State;
 import org.nightlabs.jfire.jbpm.graph.def.id.ProcessDefinitionID;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.person.Person;
+import org.nightlabs.jfire.security.Authority;
+import org.nightlabs.jfire.security.ResolveSecuringAuthorityStrategy;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.security.id.UserID;
 import org.nightlabs.jfire.store.DeliveryNote;
 import org.nightlabs.jfire.store.Product;
+import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.ReceptionNote;
 import org.nightlabs.jfire.store.id.ProductID;
 import org.nightlabs.jfire.store.id.ReceptionNoteID;
@@ -128,9 +131,6 @@ extends BaseSessionBeanImpl
 implements SessionBean
 {
 	private static final long serialVersionUID = 1L;
-	/**
-	 * LOG4J logger used by this class
-	 */
 	private static final Logger logger = Logger.getLogger(TradeManagerBean.class);
 
 	////////////////////// EJB "constuctor" ////////////////////////////
@@ -146,24 +146,26 @@ implements SessionBean
 	}
 
 	/**
-	 * @see javax.ejb.SessionBean#ejbRemove()
+	 * {@inheritDoc}
 	 *
 	 * @ejb.permission unchecked="true"
 	 */
+	@Override
 	public void ejbRemove() throws EJBException, RemoteException
 	{
 		logger.debug(this.getClass().getName() + ".ejbRemove()");
 	}
 
 	// //// begin EJB stuff ////
-	/**
-	 * @see org.nightlabs.jfire.base.BaseSessionBeanImpl#setSessionContext(javax.ejb.SessionContext)
-	 */
 	@Override
 	public void setSessionContext(SessionContext ctx)
 		throws EJBException, RemoteException
 	{
 		super.setSessionContext(ctx);
+	}
+	@Override
+	public void unsetSessionContext() {
+		super.unsetSessionContext();
 	}
 	// //// end EJB stuff ////
 
@@ -174,7 +176,7 @@ implements SessionBean
 	 *
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="org.nightlabs.jfire.trade.createOrder"
+	 * @ejb.permission role-name="org.nightlabs.jfire.trade.editOrder"
 	 */
 	public OrderID createQuickSaleWorkOrder(AnchorID customerID, String orderIDPrefix, CurrencyID currencyID,
 			SegmentTypeID[] segmentTypeIDs)
@@ -238,7 +240,7 @@ implements SessionBean
 	 * @param fetchGroups What fields should be detached.
 	 *
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="org.nightlabs.jfire.trade.createOrder"
+	 * @ejb.permission role-name="org.nightlabs.jfire.trade.editOrder"
 	 * @ejb.transaction type="Required"
 	 **/
 	public Order createPurchaseOrder(
@@ -297,7 +299,7 @@ implements SessionBean
 	 * @param fetchGroups What fields should be detached.
 	 *
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="org.nightlabs.jfire.trade.createOrder"
+	 * @ejb.permission role-name="org.nightlabs.jfire.trade.editOrder"
 	 * @ejb.transaction type="Required"
 	 **/
 	public Order createSaleOrder(
@@ -369,7 +371,7 @@ implements SessionBean
 	 *		same {@link SegmentType}.
 	 *
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="org.nightlabs.jfire.trade.createOrder"
+	 * @ejb.permission role-name="org.nightlabs.jfire.trade.editOrder"
 	 * @ejb.transaction type="Required"
 	 */
 	public Collection<Segment> createCrossTradeSegments(OrderID orderID, Collection<SegmentTypeID> segmentTypeIDs)
@@ -401,7 +403,7 @@ implements SessionBean
 	 * @param customerGroupID Either <code>null</code> (then the default will be used) or an ID of a {@link CustomerGroup} which is allowed to the customer.
 	 *
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="org.nightlabs.jfire.trade.createOrder"
+	 * @ejb.permission role-name="org.nightlabs.jfire.trade.editOrder"
 	 * @ejb.transaction type="Required"
 	 */
 	public Order createCrossTradeOrder(String orderIDPrefix, String currencyID, CustomerGroupID customerGroupID, Collection<SegmentTypeID> segmentTypeIDs)
@@ -459,7 +461,7 @@ implements SessionBean
 	 * @throws ModuleException
 	 *
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="org.nightlabs.jfire.trade.createOffer"
+	 * @ejb.permission role-name="org.nightlabs.jfire.trade.editOffer"
 	 * @ejb.transaction type="Required"
 	 */
 	public Offer createCrossTradeOffer(OrderID orderID, String offerIDPrefix)
@@ -490,7 +492,7 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="org.nightlabs.jfire.trade.createOffer"
+	 * @ejb.permission role-name="org.nightlabs.jfire.trade.editOffer"
 	 * @ejb.transaction type="Required"
 	 */
 	public Offer createCrossTradeReverseOffer(Collection<ArticleID> reversedArticleIDs, String offerIDPrefix)
@@ -534,7 +536,7 @@ implements SessionBean
 	 * @throws ModuleException
 	 *
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="org.nightlabs.jfire.trade.createOffer"
+	 * @ejb.permission role-name="org.nightlabs.jfire.trade.editOffer"
 	 * @ejb.transaction type="Required"
 	 **/
 	public Offer createOffer(OrderID orderID, String offerIDPrefix, String[] fetchGroups, int maxFetchDepth)
@@ -651,6 +653,7 @@ implements SessionBean
 			pm.getExtent(Article.class);
 			Order order = null;
 			List<Article> reversedArticles = new ArrayList<Article>(reversedArticleIDs.size());
+			Set<ProductType> productTypes = new HashSet<ProductType>();
 			for (ArticleID articleID : reversedArticleIDs) {
 				Article article = (Article) pm.getObjectById(articleID);
 				if (order == null)
@@ -658,6 +661,7 @@ implements SessionBean
 				else if (!order.equals(article.getOrder()))
 					throw new IllegalArgumentException("Not all Articles are in the same Order!");
 
+				productTypes.add(article.getProductType());
 				reversedArticles.add(article);
 			}
 			if (order == null)
@@ -666,9 +670,13 @@ implements SessionBean
 			if (!order.equals(offer.getOrder()))
 				throw new IllegalArgumentException("Specified offer is not in the same order as the specified articles!");
 
+			// check for all requested articles' product types, whether 'org.nightlabs.jfire.trade.reverseProductType' is allowed!
+			for (ProductType productType : productTypes) {
+				Authority.resolveSecuringAuthority(pm, productType.getProductTypeLocal(), ResolveSecuringAuthorityStrategy.allow).assertContainsRoleRef(getPrincipal(), RoleConstants.reverseProductType);
+			}
+
 			User user = User.getUser(pm, getPrincipal());
 
-			// TODO check for all requested articles, whether 'org.nightlabs.jfire.trade.reverseProductType' is allowed!
 			Collection<Article> reversingArticles = Trader.getTrader(pm).reverseArticles(user, offer, reversedArticles);
 
 			offer.validate();
@@ -706,7 +714,7 @@ implements SessionBean
 	 * @throws ModuleException
 	 *
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="org.nightlabs.jfire.trade.createOffer"
+	 * @ejb.permission role-name="org.nightlabs.jfire.trade.editOffer"
 	 * @ejb.transaction type="Required"
 	 **/
 	public Offer createReverseOffer(
@@ -720,7 +728,20 @@ implements SessionBean
 			User user = User.getUser(pm, getPrincipal());
 			Trader trader = Trader.getTrader(pm);
 
-			// TODO check for all requested articles, whether 'org.nightlabs.jfire.trade.reverseProductType' is allowed!
+			// check for all requested articles' product types, whether 'org.nightlabs.jfire.trade.reverseProductType' is allowed!
+			Set<ProductType> productTypes = new HashSet<ProductType>();
+			for (Article reversedArticle : reversedArticles) {
+				productTypes.add(reversedArticle.getProductType());
+			}
+			for (ProductType productType : productTypes) {
+				Authority.resolveSecuringAuthority(
+						pm,
+						productType.getProductTypeLocal(),
+						ResolveSecuringAuthorityStrategy.organisation // We must use "organisation" here, because the EJB-level check does not yet check for the role! Marco.
+				).assertContainsRoleRef(getPrincipal(), RoleConstants.reverseProductType);
+			}
+
+			// create the reversing offer
 			Offer offer = trader.createReverseOffer(user, reversedArticles, offerIDPrefix);
 
 			offer.validate();
@@ -741,9 +762,13 @@ implements SessionBean
 	/**
 	 * This method delegates to
 	 * {@link LegalEntity#getAnonymousLegalEntity(PersistenceManager)}.
+	 * <p>
+	 * It's OK if everyone can read the anonymous business partner, because that's not confidential.
+	 * Therefore, this method can be called by every authenticated user.
+	 * </p>
 	 *
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_" // I think it's OK if everyone can read the anonymous business partner. Marco.
+	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Required"
 	 */
 	public LegalEntity getAnonymousLegalEntity(String[] fetchGroups, int maxFetchDepth)
@@ -765,9 +790,16 @@ implements SessionBean
 	/**
 	 * This method delegates to
 	 * {@link OrganisationLegalEntity#getOrganisationLegalEntity(PersistenceManager, String)}.
+	 * <p>
+	 * At the moment, this method can be called by every authenticated user. We believe that the revealed
+	 * information is not so extremely confidential - the same
+	 * information (address, VAT number, phone number and the like) can ususally be found on a web site, too.
+	 * We might change this later, and filter some of the {@link Person}'s data blocks as well as maybe
+	 * some information of the {@link LegalEntity}.
+	 * </p>
 	 *
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_" // At least for now, it's IMHO OK to make this information public. Marco.
+	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Required"
 	 */
 	public OrganisationLegalEntity getOrganisationLegalEntity(
@@ -826,6 +858,19 @@ implements SessionBean
 			pm.close();
 		}
 	}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// This is a marker for me working on: https://www.jfire.org/modules/bugs/view.php?id=625
+// I have to continue below (above is already done).
+// IMPORTANT: If you add new methods, please add them below!
+// Marco.
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	/**
 	 * Stores the given Person to a LegalEntity. If no LegalEntity with the right

@@ -231,6 +231,39 @@
 <!-- END store -->
 
 <!-- BEGIN trade -->
+	<role-group id="org.nightlabs.jfire.trade.editOrder">
+		<name>Edit orders</name>
+		<name language="de">Aufträge bearbeiten</name>
+		<description>Create or modify orders.</description>
+		<description language="de">Aufträge anlegen oder bearbeiten.</description>
+		<role id="org.nightlabs.jfire.trade.editOrder"/>
+		<role id="org.nightlabs.jfire.trade.queryOrders"/>
+	</role-group>
+
+	<role-group id="org.nightlabs.jfire.trade.queryOrders">
+		<name>Query orders</name>
+		<name language="de">Aufträge abfragen</name>
+		<description>Query orders and see their properties.</description>
+		<description language="de">Aufträge abfragen und deren Eigenschaften einsehen.</description>
+		<role id="org.nightlabs.jfire.trade.queryOrders"/>
+	</role-group>
+
+	<role-group id="org.nightlabs.jfire.trade.editOffer">
+		<name>Edit offers</name>
+		<name language="de">Angebote bearbeiten</name>
+		<description>Create or modify offers.</description>
+		<description language="de">Angebote anlegen oder bearbeiten.</description>
+		<role id="org.nightlabs.jfire.trade.editOffer"/>
+		<role id="org.nightlabs.jfire.trade.queryOffers"/>
+	</role-group>
+
+	<role-group id="org.nightlabs.jfire.trade.queryOffers">
+		<name>Query offers</name>
+		<name language="de">Angebote abfragen</name>
+		<description>Query offers and see their properties.</description>
+		<description language="de">Angebote abfragen und deren Eigenschaften einsehen.</description>
+		<role id="org.nightlabs.jfire.trade.queryOffers"/>
+	</role-group>
 
 	<role-group id="org.nightlabs.jfire.trade.sellProductType">
 		<name>Sell</name>
@@ -242,22 +275,6 @@
 		<name>Reverse</name>
 		<name language="de">Stornieren</name>
 		<role id="org.nightlabs.jfire.trade.reverseProductType"/>
-	</role-group>
-
-	<role-group id="org.nightlabs.jfire.trade.createOrder">
-		<role id="org.nightlabs.jfire.trade.createOrder"/>
-	</role-group>
-
-	<role-group id="org.nightlabs.jfire.trade.createOffer">
-		<role id="org.nightlabs.jfire.trade.createOffer"/>
-	</role-group>
-
-	<role-group id="org.nightlabs.jfire.trade.queryOffers">
-		<role id="org.nightlabs.jfire.trade.queryOffers"/>
-	</role-group>
-
-	<role-group id="org.nightlabs.jfire.trade.queryOrders">
-		<role id="org.nightlabs.jfire.trade.queryOrders"/>
 	</role-group>
 
 <!-- END trade -->

@@ -2050,7 +2050,7 @@ implements SessionBean
 			Authority.resolveSecuringAuthority(
 					pm,
 					product.getProductType().getProductTypeLocal(),
-					ResolveSecuringAuthorityStrategy.organisation // We must use organisation-fallback, because the revereProductType role is not checked on method level!
+					ResolveSecuringAuthorityStrategy.organisation // We must use organisation-fallback, because the reverseProductType role is not checked on method level!
 			).assertContainsRoleRef(
 					getPrincipal(),
 					RoleConstants.reverseProductType

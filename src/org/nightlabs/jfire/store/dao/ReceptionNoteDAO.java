@@ -1,4 +1,4 @@
-package org.nightlabs.jfire.trade.dao;
+package org.nightlabs.jfire.store.dao;
 
 import java.util.Collection;
 import java.util.Set;
@@ -8,9 +8,9 @@ import org.nightlabs.jdo.query.QueryCollection;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.store.ReceptionNote;
+import org.nightlabs.jfire.store.StoreManager;
+import org.nightlabs.jfire.store.StoreManagerUtil;
 import org.nightlabs.jfire.store.id.ReceptionNoteID;
-import org.nightlabs.jfire.trade.TradeManager;
-import org.nightlabs.jfire.trade.TradeManagerUtil;
 import org.nightlabs.progress.ProgressMonitor;
 
 /**
@@ -39,8 +39,8 @@ extends BaseJDOObjectDAO<ReceptionNoteID, ReceptionNote>
 			int maxFetchDepth, ProgressMonitor monitor)
 	throws Exception
 	{
-		TradeManager tm = TradeManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
-		return tm.getReceptionNotes(objectIDs, fetchGroups, maxFetchDepth);
+		StoreManager sm = StoreManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+		return sm.getReceptionNotes(objectIDs, fetchGroups, maxFetchDepth);
 	}
 
 	public Collection<ReceptionNote> getReceptionNotes(Set<ReceptionNoteID> objectIDs, String[] fetchGroups,
@@ -49,15 +49,15 @@ extends BaseJDOObjectDAO<ReceptionNoteID, ReceptionNote>
 	{
 		return retrieveJDOObjects(objectIDs, fetchGroups, maxFetchDepth, monitor);
 	}
-	
+
 	public Collection<ReceptionNote> getReceptionNotesByQueries(
 		QueryCollection<? extends AbstractJDOQuery> queries,
 			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
 		try
 		{
-			TradeManager tm = TradeManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
-			Set<ReceptionNoteID> receptionNoteIDs = tm.getReceptionNoteIDs(queries);
+			StoreManager sm = StoreManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			Set<ReceptionNoteID> receptionNoteIDs = sm.getReceptionNoteIDs(queries);
 			return getJDOObjects(null, receptionNoteIDs, fetchGroups, maxFetchDepth, monitor);
 		}
 		catch (Exception e) {

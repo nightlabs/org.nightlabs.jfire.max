@@ -1,4 +1,4 @@
-package org.nightlabs.jfire.trade.dao;
+package org.nightlabs.jfire.store.dao;
 
 import java.util.ArrayList;
 import java.util.Collection;

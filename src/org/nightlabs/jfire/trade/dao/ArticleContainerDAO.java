@@ -41,7 +41,7 @@ extends BaseJDOObjectDAO<ArticleContainerID, ArticleContainer>
 		}
 		return sharedInstance;
 	}
-	
+
 	protected ArticleContainerDAO() {
 	}
 
@@ -53,7 +53,7 @@ extends BaseJDOObjectDAO<ArticleContainerID, ArticleContainer>
 	{
 		if (articleContainerIDs == null)
 			throw new IllegalArgumentException("Param articleContainerIDs must NOT be null!");
-					
+
 		monitor.beginTask("Loading ArticleContainers", 1);
 		try {
 			if (!articleContainerIDs.isEmpty()) {
@@ -75,28 +75,28 @@ extends BaseJDOObjectDAO<ArticleContainerID, ArticleContainer>
 					return tm.getOrders(articleContainerIDs, fetchGroups, maxFetchDepth);
 				}
 				if (articleContainerID instanceof ReceptionNoteID) {
-					TradeManager tm = TradeManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
-					return tm.getReceptionNotes(articleContainerIDs, fetchGroups, maxFetchDepth);
+					StoreManager sm = StoreManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+					return sm.getReceptionNotes(articleContainerIDs, fetchGroups, maxFetchDepth);
 				}
 			}
 			return null;
 		} catch (Exception e) {
 			monitor.setCanceled(true);
 			throw e;
-			
+
 		} finally {
 			monitor.worked(1);
 			monitor.done();
 		}
 	}
-	
+
 	public Collection<ArticleContainer> getArticleContainers(
 			Set<ArticleContainerID> articleContainerIDs, String[] fetchGroups,
 			int maxFetchDepth, ProgressMonitor monitor)
 	{
 		return getJDOObjects(null, articleContainerIDs, fetchGroups, maxFetchDepth, monitor);
 	}
-	
+
 	public Collection<?> getArticleContainersForQueries(
 			QueryCollection<? extends AbstractArticleContainerQuery> queries,
 			String[] fetchGroups,
@@ -105,7 +105,7 @@ extends BaseJDOObjectDAO<ArticleContainerID, ArticleContainer>
 		try {
 			TradeManager tm = TradeManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
 			Collection<ArticleContainerID> articleContainerIDs = tm.getArticleContainerIDs(queries);
-			return CollectionUtil.castCollection( 
+			return CollectionUtil.castCollection(
 				getJDOObjects(null, articleContainerIDs, fetchGroups, maxFetchDepth, monitor)
 				);
 		}
@@ -113,7 +113,7 @@ extends BaseJDOObjectDAO<ArticleContainerID, ArticleContainer>
 			throw new RuntimeException(t);
 		}
 	}
-	
+
 	public ArticleContainer getArticleContainer(ArticleContainerID articleContainerID,
 			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{

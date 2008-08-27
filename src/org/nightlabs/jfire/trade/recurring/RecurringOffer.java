@@ -2,11 +2,18 @@ package org.nightlabs.jfire.trade.recurring;
 
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.security.User;
+import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.Offer;
 import org.nightlabs.jfire.trade.Order;
 
 
 /**
+ * 
+ * A RecurringOffer extends the class  {@link Offer} is basically a collection of {@link Article}s along with
+ * status information as its name implies the RecurringOffer is in a recurring state ,
+ * defined by the timer Task in configuration class  {@link RecurringOfferConfiguration} 
+ * 
+ * 
  * @author Fitas Amine <fitas@nightlabs.de>
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
  * 
@@ -41,6 +48,10 @@ public class RecurringOffer extends Offer {
 	private RecurringOfferConfiguration recurringOfferConfiguration;
 
 	/**
+	 * the ProblemKey stores the error statues upon the validation of the RecurringOffer
+	 * see the method  {@link  RecurringTrader.processRecurringOffer(RecurringOffer)}
+	 * also see the constants  {@link #PROBLEM_KEY_NONE} {@link #PROBLEM_KEY_PRICE_NONEQUAL} 
+	 * 
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private String problemKey;

@@ -6,13 +6,8 @@ import javax.jdo.JDOHelper;
 
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.security.User;
-import org.nightlabs.jfire.store.Product;
-import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.timer.Task;
 import org.nightlabs.jfire.timer.id.TaskID;
-import org.nightlabs.jfire.trade.Offer;
-import org.nightlabs.jfire.trade.Order;
-import org.nightlabs.jfire.trade.Segment;
 
 
 /**

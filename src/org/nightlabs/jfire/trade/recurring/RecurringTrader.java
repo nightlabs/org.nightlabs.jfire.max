@@ -53,7 +53,9 @@ import org.nightlabs.jfire.trade.recurring.jbpm.JbpmConstantsRecurringOffer;
 
 
 /**
- * RecurringTrader is responsible for purchase and sale of recurring orders and offers
+ * RecurringTrader is responsible for the purchase and the sale of the {@link RecurringOrder}  {@link RecurringOffer} , {@link RecurredOffer} 
+ * It manages orders, offers and delegates to the Trader and the Store and to the Accounting.
+ *
  *
  * @author Fitas Amine <fitas[AT]nightlabs[DOT]de>
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
@@ -382,7 +384,7 @@ public class RecurringTrader {
 	}
 
 	/**
-	 * Creates a new {@link RecurredOffer} for the given {@link Order}.
+	 * Creates a new {@link RecurredOffer} for the given {@link RecurringOffer}.
 	 * 
 	 * @param user The user that created the Offer.
 	 * @param order The {@link Order} the new {@link RecurredOffer} should be part of.

@@ -351,6 +351,7 @@ implements SessionBean
 	}
 
 	/**
+	 * stores the {@link RecurringOfferConfiguration} in the store
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="org.nightlabs.jfire.trade.recurring.storeOffer"
 	 * @ejb.transaction type="Required"

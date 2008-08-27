@@ -13,6 +13,7 @@ import javax.jdo.Query;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.jdo.ObjectID;
+import org.nightlabs.jfire.issue.IssueDescription;
 import org.nightlabs.jfire.issue.project.id.ProjectID;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.util.Util;
@@ -33,6 +34,7 @@ import org.nightlabs.util.Util;
  *
  * @jdo.fetch-group name="Project.issue" fields="issue"
  * @jdo.fetch-group name="Project.name" fields="name"
+ * @jdo.fetch-group name="Project.description" fields="description"
  * @jdo.fetch-group name="Project.parentProject" fields="parentProject"
  * @jdo.fetch-group name="Project.subProjects" fields="subProjects"
  *
@@ -49,6 +51,7 @@ implements Serializable
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger = Logger.getLogger(Project.class);
 
+	public static final String FETCH_GROUP_DESCRIPTION = "Project.description";
 	public static final String FETCH_GROUP_ISSUE = "Project.issue";
 	public static final String FETCH_GROUP_NAME = "Project.name";
 	public static final String FETCH_GROUP_PARENT_PROJECT = "Project.parentProject";
@@ -69,6 +72,14 @@ implements Serializable
 	 * @jdo.field persistence-modifier="persistent" dependent="true" mapped-by="project"
 	 */
 	private ProjectName name;
+	
+	/**
+	 * @jdo.field 
+	 * 		persistence-modifier="persistent" 
+	 * 		dependent="true" 
+	 * 		mapped-by="project"
+	 */
+	private ProjectDescription description;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -155,6 +166,21 @@ implements Serializable
 			throw new IllegalArgumentException("project must not be null!");
 		subProjects.remove(project);
 	}
+	
+	/**
+	 * @return Returns the description.
+	 */
+	public ProjectDescription getDescription() {
+		return description;
+	}
+
+	/**
+	 * @param description The description to set.
+	 */
+	public void setDescription(ProjectDescription description) {
+		this.description = description;
+	}
+
 	
 	public static Collection<Project> getRootProjects(PersistenceManager pm, String organisationID)
 	{

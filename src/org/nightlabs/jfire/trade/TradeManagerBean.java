@@ -78,6 +78,7 @@ import org.nightlabs.jfire.jbpm.graph.def.State;
 import org.nightlabs.jfire.jbpm.graph.def.id.ProcessDefinitionID;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.person.Person;
+import org.nightlabs.jfire.prop.id.PropertySetID;
 import org.nightlabs.jfire.security.Authority;
 import org.nightlabs.jfire.security.ResolveSecuringAuthorityStrategy;
 import org.nightlabs.jfire.security.User;
@@ -87,7 +88,6 @@ import org.nightlabs.jfire.store.Product;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.ReceptionNote;
 import org.nightlabs.jfire.store.id.ProductID;
-import org.nightlabs.jfire.store.id.ReceptionNoteID;
 import org.nightlabs.jfire.store.reverse.AlreadyReversedArticleReverseProductError;
 import org.nightlabs.jfire.store.reverse.IReverseProductError;
 import org.nightlabs.jfire.store.reverse.NoArticlesFoundReverseProductError;
@@ -879,6 +879,9 @@ implements SessionBean
 	 * Note that this method will throw an {@link IllegalArgumentException} on an
 	 * attempt to change the person of an anonymous {@link LegalEntity}.
 	 * </p>
+	 * <p>
+	 * TODO https://www.jfire.org/modules/bugs/view.php?id=896
+	 * </p>
 	 *
 	 * @param person The person to be set to the LegalEntity
 	 * @param get If true the created LegalEntity will be returned else null
@@ -915,18 +918,23 @@ implements SessionBean
 
 	/**
 	 * Returns the {@link LegalEntity} for the given {@link Person} or <code>null</code> if none could be found.
-	 * @param person The {@link Person} for which a {@link LegalEntity} is to be returned.
+	 * <p>
+	 * TODO https://www.jfire.org/modules/bugs/view.php?id=896
+	 * </p>
+	 *
+	 * @param personID The object-id of the {@link Person} for which a {@link LegalEntity} is to be returned.
 	 * @return the {@link LegalEntity} for the given {@link Person} or <code>null</code> if none could be found.
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @!ejb.transaction type="Supports"
 	 */
-	public LegalEntity getLegalEntityForPerson(Person person, String[] fetchGroups, int maxFetchDepth) {
-		if (person == null)
-			throw new IllegalArgumentException("person must not be null!");
+	public LegalEntity getLegalEntityForPerson(PropertySetID personID, String[] fetchGroups, int maxFetchDepth) {
+		if (personID == null)
+			throw new IllegalArgumentException("personID must not be null!");
 
 		PersistenceManager pm = getPersistenceManager();
+		Person person = (Person) pm.getObjectById(personID);
 		LegalEntity legalEntity = LegalEntity.getLegalEntity(pm, person);
 
 		if (legalEntity == null)
@@ -943,6 +951,9 @@ implements SessionBean
 	 * <p>
 	 * Note that this method will throw an {@link IllegalArgumentException} on an
 	 * attempt to change the person of an anonymous {@link LegalEntity}.
+	 * </p>
+	 * <p>
+	 * TODO https://www.jfire.org/modules/bugs/view.php?id=896
 	 * </p>
 	 * @param legalEntity The LegalEntity to be stored
 	 * @param get Whether the stored instance or null should be returned.
@@ -967,7 +978,7 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.trade.queryOrders"
 	 * @ejb.transaction type="Required"
 	 */
 	public Order getOrder(OrderID orderID, String[] fetchGroups, int maxFetchDepth)
@@ -984,57 +995,66 @@ implements SessionBean
 		}
 	}
 
+//	/**
+//	 * <p>
+//	 * TODO https://www.jfire.org/modules/bugs/view.php?id=896
+//	 * </p>
+//	 *
+//	 * @ejb.interface-method
+//	 * @ejb.permission role-name="_Guest_"
+//	 * @ejb.transaction type="Required"
+//	 */
+//	public LegalEntity getLegalEntity(AnchorID anchorID, String[] fetchGroups, int maxFetchDepth)
+//	{
+//		PersistenceManager pm = getPersistenceManager();
+//		try {
+//			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+//			if (fetchGroups != null)
+//				pm.getFetchPlan().setGroups(fetchGroups);
+//
+//			return (LegalEntity) pm.detachCopy(pm.getObjectById(anchorID));
+//		} finally {
+//			pm.close();
+//		}
+//	}
+
+//	/**
+//	 * @ejb.interface-method
+//	 * @ejb.permission role-name="_Guest_"
+//	 * @ejb.transaction type="Required"
+//	 */
+//	public Collection<LegalEntity> getLegalEntities(Object[] leAnchorIDs, String[] fetchGroups, int maxFetchDepth)
+//	{
+//		PersistenceManager pm = getPersistenceManager();
+//		try {
+//			Collection<LegalEntity> les = new LinkedList<LegalEntity>();
+//			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+//			if (fetchGroups != null)
+//				pm.getFetchPlan().setGroups(fetchGroups);
+//
+//			for (int i = 0; i < leAnchorIDs.length; i++) {
+//				if (!(leAnchorIDs[i] instanceof AnchorID))
+//					throw new IllegalArgumentException("leAnchorIDs["+i+" is not of type AnchorID");
+//
+//				les.add((LegalEntity) pm.getObjectById(leAnchorIDs[i]));
+//			}
+//
+//			long time = System.currentTimeMillis();
+//			Collection<LegalEntity> result = pm.detachCopyAll(les);
+//			time = System.currentTimeMillis() - time;
+//			logger.debug("Detach of "+result.size()+" LegalEntities took "+((double)time / (double)1000));
+//			return result;
+//		}
+//		finally {
+//			pm.close();
+//		}
+//	}
+
 	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Required"
-	 */
-	public LegalEntity getLegalEntity(AnchorID anchorID, String[] fetchGroups, int maxFetchDepth)
-	{
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
-			if (fetchGroups != null)
-				pm.getFetchPlan().setGroups(fetchGroups);
-
-			return (LegalEntity) pm.detachCopy(pm.getObjectById(anchorID));
-		} finally {
-			pm.close();
-		}
-	}
-
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Required"
-	 */
-	public Collection getLegalEntities(Object[] leAnchorIDs, String[] fetchGroups, int maxFetchDepth)
-	{
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			Collection les = new LinkedList();
-			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
-			if (fetchGroups != null)
-				pm.getFetchPlan().setGroups(fetchGroups);
-
-			for (int i = 0; i < leAnchorIDs.length; i++) {
-				if (!(leAnchorIDs[i] instanceof AnchorID))
-					throw new IllegalArgumentException("leAnchorIDs["+i+" is not of type AnchorID");
-				les.add(pm.getObjectById(leAnchorIDs[i]));
-			}
-
-			long time = System.currentTimeMillis();
-			Collection result = pm.detachCopyAll(les);
-			time = System.currentTimeMillis() - time;
-			logger.debug("Detach of "+result.size()+" LegalEntities took "+((double)time / (double)1000));
-			return result;
-		}
-		finally {
-			pm.close();
-		}
-	}
-
-	/**
+	 * <p>
+	 * TODO https://www.jfire.org/modules/bugs/view.php?id=896
+	 * </p>
+	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Required"
@@ -1043,17 +1063,17 @@ implements SessionBean
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			Collection les = new LinkedList();
+			Collection<LegalEntity> les = new LinkedList<LegalEntity>();
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 
 			for (AnchorID anchorID : anchorIDs) {
-				les.add(pm.getObjectById(anchorID));
+				les.add((LegalEntity) pm.getObjectById(anchorID));
 			}
 
 			long time = System.currentTimeMillis();
-			Collection result = pm.detachCopyAll(les);
+			Collection<LegalEntity> result = pm.detachCopyAll(les);
 			time = System.currentTimeMillis() - time;
 			logger.debug("Detach of "+result.size()+" LegalEntities took "+((double)time / (double)1000));
 			return result;
@@ -1065,7 +1085,7 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.trade.queryOffers"
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
 	public Offer getOffer(OfferID offerID, String[] fetchGroups, int maxFetchDepth)
@@ -1085,7 +1105,7 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.trade.queryOffers"
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
 	@SuppressWarnings("unchecked")
@@ -1100,31 +1120,11 @@ implements SessionBean
 	}
 
 	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Required"
-	 */
-	public Article getArticle(ArticleID articleID, String[] fetchGroups, int maxFetchDepth)
-	{
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
-			if (fetchGroups != null)
-				pm.getFetchPlan().setGroups(fetchGroups);
-
-			pm.getExtent(Article.class);
-			return (Article) pm.detachCopy(pm.getObjectById(articleID));
-		} finally {
-			pm.close();
-		}
-	}
-
-	/**
 	 * @param articleIDs Instances of {@link ArticleID}.
 	 * @return Returns instances of {@link Article}
 	 *
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.trade.queryOrders, org.nightlabs.jfire.trade.queryOffers, org.nightlabs.jfire.store.queryDeliveryNotes, org.nightlabs.jfire.accounting.queryInvoices"
 	 * @ejb.transaction type="Required"
 	 */
 	public Collection<Article> getArticles(Collection<ArticleID> articleIDs, String[] fetchGroups, int maxFetchDepth)
@@ -1132,23 +1132,6 @@ implements SessionBean
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			return NLJDOHelper.getDetachedObjectList(pm, articleIDs, Article.class, fetchGroups, maxFetchDepth);
-
-//			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
-//			if (fetchGroups != null)
-//				pm.getFetchPlan().setGroups(fetchGroups);
-//
-//			if (!(articleIDs instanceof Set)) // make sure the entries are unique (prevent duplicate lookups)
-//				articleIDs = new HashSet(articleIDs);
-//
-//			pm.getExtent(Article.class);
-//
-//			Collection res = new ArrayList(articleIDs.size());
-//			for (Iterator it = articleIDs.iterator(); it.hasNext(); ) {
-//				ArticleID articleID = (ArticleID) it.next();
-//				res.add(pm.getObjectById(articleID));
-//			}
-//
-//			return (Collection) pm.detachCopyAll(res);
 		} finally {
 			pm.close();
 		}
@@ -1168,7 +1151,7 @@ implements SessionBean
 	 * @throws ModuleException
 	 *
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.trade.editOrder"
 	 * @ejb.transaction type="Required"
 	 **/
 	public Segment createSegment(
@@ -1203,7 +1186,7 @@ implements SessionBean
 	 *
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.trade.editOffer"
 	 */
 	public void deleteArticles(Collection<ArticleID> articleIDs, boolean validate)
 		throws ModuleException
@@ -1248,7 +1231,7 @@ implements SessionBean
 	 *
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.trade.editOffer"
 	 */
 	public Collection<Article> releaseArticles(Collection<ArticleID> articleIDs, boolean synchronously, boolean get, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
@@ -1276,7 +1259,7 @@ implements SessionBean
 	/**
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.trade.editOffer"
 	 */
 	public void signalOffer(OfferID offerID, String jbpmTransitionName)
 	{
@@ -1529,7 +1512,7 @@ implements SessionBean
 	 *
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.trade.editOrder"
 	 */
 	public Order assignCustomer(OrderID orderID, AnchorID customerID, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
@@ -1572,7 +1555,7 @@ implements SessionBean
 	/**
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.trade.editOffer"
 	 */
 	public Offer setOfferExpiry(
 			OfferID offerID,
@@ -1608,6 +1591,11 @@ implements SessionBean
 	}
 
 	/**
+	 * Get the object-ids of all mappings between customer-groups. These mappings are necessary for cross-organisation-trade.
+	 * <p>
+	 * This method can be called by all authenticated users, because it does not reveal any confidential data.
+	 * </p>
+	 *
 	 * @ejb.interface-method
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
@@ -1626,6 +1614,11 @@ implements SessionBean
 	}
 
 	/**
+	 * Get the mappings between customer-groups specified by their object-ids.
+	 * <p>
+	 * This method can be called by all authenticated users, because it does not reveal any highly confidential data.
+	 * We will add filtering of CustomerGroups later, though, because this information is slightly confidential.
+	 * </p>
 	 * @ejb.interface-method
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
@@ -1642,13 +1635,11 @@ implements SessionBean
 	}
 
 	/**
- 	 * TODO remove the "_new" suffix after a while (when the clients are updated for sure)
-	 *
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.trade.editCustomerGroupMapping"
 	 */
-	public CustomerGroupMapping createCustomerGroupMapping_new(CustomerGroupID localCustomerGroupID, CustomerGroupID partnerCustomerGroupID, boolean get, String[] fetchGroups, int maxFetchDepth)
+	public CustomerGroupMapping createCustomerGroupMapping(CustomerGroupID localCustomerGroupID, CustomerGroupID partnerCustomerGroupID, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -1667,6 +1658,12 @@ implements SessionBean
 	}
 
 	/**
+	 * Get the object-ids of all customer-groups matching a certain <code>organisationID</code> or all, if
+	 * the specified <code>organisationID</code> is <code>null</code>.
+	 * <p>
+	 * This method can be called by all authenticated users, because it does not reveal any confidential data.
+	 * </p>
+	 *
 	 * @param organisationID <code>null</code> in order to get all customerGroups (no filtering). non-<code>null</code> to filter by <code>organisationID</code>.
 	 * @param inverse This applies only if <code>organisationID != null</code>. If <code>true</code>, it will return all {@link CustomerGroupID}s where the <code>organisationID</code>
 	 *		is NOT the one passed as parameter <code>organisationID</code>.
@@ -1692,6 +1689,12 @@ implements SessionBean
 	}
 
 	/**
+	 * Get customer-groups specified by their object-ids.
+	 * <p>
+	 * This method can be called by all authenticated users, because it does not reveal any highly confidential data.
+	 * We will add filtering of CustomerGroups later, though, because this information is slightly confidential.
+	 * </p>
+	 *
 	 * @ejb.interface-method
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
@@ -1710,7 +1713,7 @@ implements SessionBean
 	/**
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.trade.editCustomerGroup"
 	 */
 	public CustomerGroup storeCustomerGroup(CustomerGroup customerGroup, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
@@ -1743,7 +1746,7 @@ implements SessionBean
 	 *		next one using the {@link AbstractJDOQuery#setCandidates(Collection)}.
 	 *
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.trade.queryOrders, org.nightlabs.jfire.trade.queryOffers, org.nightlabs.jfire.store.queryDeliveryNotes, org.nightlabs.jfire.accounting.queryInvoices"
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
 	@SuppressWarnings("unchecked")
@@ -1752,7 +1755,6 @@ implements SessionBean
 	{
 		if (queries == null)
 			return null;
-
 		if (! ArticleContainer.class.isAssignableFrom(queries.getResultClass()))
 		{
 			throw new RuntimeException("Given QueryCollection has invalid return type! " +
@@ -1873,7 +1875,7 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.trade.queryOffers"
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
 	@SuppressWarnings("unchecked")
@@ -1919,7 +1921,7 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.trade.queryOrders"
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
 	@SuppressWarnings("unchecked")
@@ -1961,65 +1963,6 @@ implements SessionBean
 	}
 
 	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 */
-	@SuppressWarnings("unchecked")
-	public Set<ReceptionNoteID> getReceptionNoteIDs(QueryCollection<? extends AbstractJDOQuery> queries)
-	{
-		if (queries == null)
-			return null;
-
-		if (! ReceptionNote.class.isAssignableFrom(queries.getResultClass()))
-		{
-			throw new RuntimeException("Given QueryCollection has invalid return type! " +
-					"Invalid return type= "+ queries.getResultClassName());
-		}
-
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			pm.getFetchPlan().setMaxFetchDepth(1);
-			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
-
-			JDOQueryCollectionDecorator<AbstractJDOQuery> decoratedQueries;
-
-			if (queries instanceof JDOQueryCollectionDecorator)
-			{
-				decoratedQueries = (JDOQueryCollectionDecorator<AbstractJDOQuery>) queries;
-			}
-			else
-			{
-				decoratedQueries = new JDOQueryCollectionDecorator<AbstractJDOQuery>(queries);
-			}
-
-			decoratedQueries.setPersistenceManager(pm);
-			Collection<ReceptionNote> receptionNotes =
-				(Collection<ReceptionNote>) decoratedQueries.executeQueries();
-
-			return NLJDOHelper.getObjectIDSet(receptionNotes);
-		} finally {
-			pm.close();
-		}
-	}
-
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 */
-	@SuppressWarnings("unchecked")
-	public List<ReceptionNote> getReceptionNotes(Set<ReceptionNoteID> receptionNoteIDs, String[] fetchGroups, int maxFetchDepth)
-	{
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			return NLJDOHelper.getDetachedObjectList(pm, receptionNoteIDs, ReceptionNote.class, fetchGroups, maxFetchDepth);
-		} finally {
-			pm.close();
-		}
-	}
-
-	/**
 	 * Assign a tariff to the specified articles.
 	 *
 	 * @param articleIDs the object-ids of the articles to be changed.
@@ -2030,7 +1973,7 @@ implements SessionBean
 	 * @return either <code>null</code>, if <code>get</code> is <code>false</code> or the articles identified by <code>articleIDs</code>.
 	 *
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.trade.editOffer"
 	 * @ejb.transaction type="Required"
 	 */
 	public Collection<Article> assignTariff(Set<ArticleID> articleIDs, TariffID tariffID, boolean get, String[] fetchGroups, int maxFetchDepth)
@@ -2084,7 +2027,7 @@ implements SessionBean
 	 * @param productID the {@link ProductID} to get the reversing {@link Offer} for.
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.trade.editOffer"
 	 */
 	public Offer createReverseOfferForProduct(
 			ProductID productID,
@@ -2103,6 +2046,15 @@ implements SessionBean
 			} catch (JDOObjectNotFoundException x) {
 				return null;
 			}
+
+			Authority.resolveSecuringAuthority(
+					pm,
+					product.getProductType().getProductTypeLocal(),
+					ResolveSecuringAuthorityStrategy.organisation // We must use organisation-fallback, because the revereProductType role is not checked on method level!
+			).assertContainsRoleRef(
+					getPrincipal(),
+					RoleConstants.reverseProductType
+			);
 
 			ReverseProductException result = new ReverseProductException(productID);
 			// get all articles for product

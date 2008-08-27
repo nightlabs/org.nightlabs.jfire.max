@@ -168,6 +168,18 @@
 		<role id="org.nightlabs.jfire.store.queryDeliveryNotes"/>
 	</role-group>
 
+	<role-group id="org.nightlabs.jfire.store.queryReceptionNotes">
+		<name>Query reception notes</name>
+		<name language="de">Empfangsscheine abfragen</name>
+		<description>
+			Query reception notes and see their properties.
+		</description>
+		<description language="de">
+			Empfangsscheine abfragen und deren Eigenschaften einsehen.
+		</description>
+		<role id="org.nightlabs.jfire.store.queryReceptionNotes"/>
+	</role-group>
+
 	<role-group id="org.nightlabs.jfire.store.seeProductType">
 		<name>See product types</name>
 		<name language="de">Produkttypen sehen</name>
@@ -268,15 +280,48 @@
 	<role-group id="org.nightlabs.jfire.trade.sellProductType">
 		<name>Sell</name>
 		<name language="de">Verkaufen</name>
+		<description>Sell products. Note that other rights are necessary additionally to this (e.g. the right to edit offers).</description>
+		<description language="de">Produkte verkaufen. Beachten Sie, daß andere Rechte zusätzlich zu diesem gewährt sein müssen (z.B. das Recht, Angebote zu bearbeiten).</description>
 		<role id="org.nightlabs.jfire.trade.sellProductType"/>
 	</role-group>
 
 	<role-group id="org.nightlabs.jfire.trade.reverseProductType">
 		<name>Reverse</name>
+		<name language="de">Storno</name>
+		<description>Reverse products. Note that other rights are necessary additionally to this (e.g. the right to edit offers).</description>
+		<description language="de">Produkte stornieren. Beachten Sie, daß andere Rechte zusätzlich zu diesem gewährt sein müssen (z.B. das Recht, Angebote zu bearbeiten).</description>
 		<name language="de">Stornieren</name>
 		<role id="org.nightlabs.jfire.trade.reverseProductType"/>
 	</role-group>
 
+	<role-group id="org.nightlabs.jfire.trade.editCustomerGroupMapping">
+		<name>Edit customer group mappings</name>
+		<name language="de">Kundengruppen-Mappings editieren</name>
+		<description>
+			Edit the customer group mappings which are required in
+			cross-organisation-trade.
+		</description>
+		<description language="de">
+			Editieren der Kundengruppen-Mappings, die für den
+			Cross-Organisations-Handel verwendet werden.
+		</description>
+		<role id="org.nightlabs.jfire.trade.editCustomerGroupMapping" />
+	</role-group>
+
+	<role-group id="org.nightlabs.jfire.trade.editCustomerGroup">
+		<name>Edit customer groups</name>
+		<name language="de">Kundengruppen editieren</name>
+		<description>
+			Create or modify customer groups. Note that this has no influence on
+			whether price configuration changes are allowed!
+		</description>
+		<description language="de">
+			Erzeugen oder Ändern von Kundengruppen. Beachten Sie, daß dies
+			keine Auswirkung darauf hat, ob Preiskonfigurationen
+			editiert werden dürfen!
+		</description>
+		<role id="org.nightlabs.jfire.trade.editCustomerGroup" />
+	</role-group>
 <!-- END trade -->
 
 </jfire-security>

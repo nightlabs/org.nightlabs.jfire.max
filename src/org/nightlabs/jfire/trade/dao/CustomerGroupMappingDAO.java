@@ -66,11 +66,11 @@ extends BaseJDOObjectDAO<CustomerGroupMappingID, CustomerGroupMapping>
 		return getJDOObjects(null, customerGroupMappingIDs, fetchGroups, maxFetchDepth, monitor);
 	}
 
-	public CustomerGroupMapping createCustomerGroupMapping_new(CustomerGroupID localCustomerGroupID, CustomerGroupID partnerCustomerGroupID, boolean get, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
+	public CustomerGroupMapping createCustomerGroupMapping(CustomerGroupID localCustomerGroupID, CustomerGroupID partnerCustomerGroupID, boolean get, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
 		try {
 			TradeManager tm = TradeManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
-			CustomerGroupMapping cgm = tm.createCustomerGroupMapping_new(localCustomerGroupID, partnerCustomerGroupID, get, fetchGroups, maxFetchDepth);
+			CustomerGroupMapping cgm = tm.createCustomerGroupMapping(localCustomerGroupID, partnerCustomerGroupID, get, fetchGroups, maxFetchDepth);
 
 			if (cgm != null)
 				Cache.sharedInstance().put(null, cgm, fetchGroups, maxFetchDepth);

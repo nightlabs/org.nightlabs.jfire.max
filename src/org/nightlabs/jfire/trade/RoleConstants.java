@@ -16,4 +16,8 @@ public class RoleConstants {
 	public static final RoleID queryOffers = RoleID.create("org.nightlabs.jfire.trade.queryOffers");
 
 	public static final RoleID queryOrders = RoleID.create("org.nightlabs.jfire.trade.queryOrders");
+
+	public static final RoleID editCustomerGroupMapping = RoleID.create("org.nightlabs.jfire.trade.editCustomerGroupMapping");
+
+	public static final RoleID editCustomerGroup = RoleID.create("org.nightlabs.jfire.trade.editCustomerGroup");
 }

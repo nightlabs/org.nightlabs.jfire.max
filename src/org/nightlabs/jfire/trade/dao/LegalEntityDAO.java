@@ -38,11 +38,10 @@ import org.nightlabs.jfire.base.jdo.IJDOObjectDAO;
 import org.nightlabs.jfire.person.Person;
 import org.nightlabs.jfire.prop.IStruct;
 import org.nightlabs.jfire.prop.PropertySet;
-import org.nightlabs.jfire.prop.Struct;
-import org.nightlabs.jfire.prop.StructLocal;
 import org.nightlabs.jfire.prop.dao.StructLocalDAO;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.trade.LegalEntity;
+import org.nightlabs.jfire.trade.OrganisationLegalEntity;
 import org.nightlabs.jfire.trade.TradeManager;
 import org.nightlabs.jfire.trade.TradeManagerUtil;
 import org.nightlabs.jfire.transfer.id.AnchorID;
@@ -51,7 +50,7 @@ import org.nightlabs.progress.ProgressMonitor;
 
 /**
  * JDOObjectDAO for LegalEntities.
- * 
+ *
  * @author Alexander Bieber <!-- alex [AT] nightlabs[DOT] de -->
  */
 public class LegalEntityDAO
@@ -60,9 +59,9 @@ implements IJDOObjectDAO<LegalEntity>
 {
 
 	private static String[] DEFAULT_FETCH_GROUP_ANONYMOUS = new String[] {FetchPlan.DEFAULT, LegalEntity.FETCH_GROUP_PERSON, PropertySet.FETCH_GROUP_FULL_DATA};
- 
+
 	private AnchorID anonymousAnchorID;
-	
+
 //	private LoginStateListener loginStateListener = new LoginStateListener() {
 //
 //		public void loginStateChanged(int loginState, IAction action) {
@@ -79,9 +78,9 @@ implements IJDOObjectDAO<LegalEntity>
 //			}
 //		}
 //	};
-	
+
 	/**
-	 * 
+	 *
 	 */
 	public LegalEntityDAO() {
 		super();
@@ -95,7 +94,7 @@ implements IJDOObjectDAO<LegalEntity>
 			throw new RuntimeException(e);
 		}
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 * @see org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO#retrieveJDOObjects(java.util.Set, java.lang.String[], int, org.nightlabs.progress.ProgressMonitor)
@@ -107,7 +106,7 @@ implements IJDOObjectDAO<LegalEntity>
 			ProgressMonitor monitor) throws Exception {
 		TradeManager tradeManager = TradeManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
 		Collection<LegalEntity> legalEntities = tradeManager.getLegalEntities(objectIDs, fetchGroups, maxFetchDepth);
-		
+
 		IStruct struct = StructLocalDAO.sharedInstance().getStructLocal(
 				Person.class, Person.STRUCT_SCOPE, Person.STRUCT_LOCAL_SCOPE, new NullProgressMonitor());
 //		IStruct struct = StructDAO.sharedInstance().getStruct(Person.class, StructLocal.DEFAULT_SCOPE, new NullProgressMonitor());
@@ -123,7 +122,7 @@ implements IJDOObjectDAO<LegalEntity>
 		}
 		return legalEntities;
 	}
-	
+
 	/**
 	 * Returns the LegalEntity with the given leAnchorID detached with the given
 	 * fetchGroups out of Cache if possible.
@@ -135,7 +134,7 @@ implements IJDOObjectDAO<LegalEntity>
 	public LegalEntity getLegalEntity(AnchorID leAnchorID, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) {
 		return getJDOObject(null, leAnchorID, fetchGroups, maxFetchDepth, monitor);
 	}
-	
+
 	/**
 	 * Returns the anonymous LegalEntity for the organisation of the currently
 	 * logged in user. It will be detached with the given fetchGroups.
@@ -151,7 +150,7 @@ implements IJDOObjectDAO<LegalEntity>
 		);
 		return getJDOObject(null, anonymousAnchorID, fetchGroups, maxFetchDepth, monitor);
 	}
-	
+
 	/**
 	 * Returns the anonymous LegalEntity for the organisation of the currently
 	 * logged in user. It will be detached with the {@link #DEFAULT_FETCH_GROUP_ANONYMOUS}.
@@ -160,7 +159,7 @@ implements IJDOObjectDAO<LegalEntity>
 	public LegalEntity getAnonymousLegalEntity(ProgressMonitor monitor) {
 		return getAnonymousLegalEntity(DEFAULT_FETCH_GROUP_ANONYMOUS, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT, monitor);
 	}
-	
+
 	/**
 	 * Get the list of LegalEntity for the given AnchorIDs detached with the
 	 * given fetchGroups.
@@ -172,7 +171,7 @@ implements IJDOObjectDAO<LegalEntity>
 	public Collection<LegalEntity> getLegalEntities(Set<AnchorID> leAnchorIDs, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) {
 		return getJDOObjects(null, leAnchorIDs, fetchGroups, maxFetchDepth, monitor);
 	}
-	
+
 	/** The shared instance */
 	private static LegalEntityDAO sharedInstance = null;
 	/**
@@ -197,14 +196,17 @@ implements IJDOObjectDAO<LegalEntity>
 			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) {
 		try {
 			TradeManager tradeManager = TradeManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
-			return tradeManager.storeLegalEntity(jdoObject, get, fetchGroups, maxFetchDepth);
+			LegalEntity le = tradeManager.storeLegalEntity(jdoObject, get, fetchGroups, maxFetchDepth);
+			if (le != null)
+				getCache().put(null, le, fetchGroups, maxFetchDepth);
+			return le;
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @param jdoObject
 	 * @param get
 	 * @param fetchGroups
@@ -216,5 +218,28 @@ implements IJDOObjectDAO<LegalEntity>
 			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) {
 		return storeJDOObject(jdoObject, get, fetchGroups, maxFetchDepth, monitor);
 	}
-	
+
+	public OrganisationLegalEntity getOrganisationLegalEntity(String organisationID, boolean throwExceptionIfNotExistent, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
+	{
+		monitor.beginTask("Getting organisation legal entity", 100);
+		try {
+			String objectID = OrganisationLegalEntity.class + "/" + organisationID;
+
+			OrganisationLegalEntity le = (OrganisationLegalEntity) getCache().get(null, objectID, fetchGroups, maxFetchDepth);
+			if (le != null)
+				return le;
+
+			TradeManager tradeManager = TradeManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			le = tradeManager.getOrganisationLegalEntity(organisationID, throwExceptionIfNotExistent, fetchGroups, maxFetchDepth);
+			if (le != null) {
+				getCache().put(null, objectID, le, fetchGroups, maxFetchDepth);
+				getCache().put(null, le, fetchGroups, maxFetchDepth);
+			}
+			return le;
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		} finally {
+			monitor.done();
+		}
+	}
 }

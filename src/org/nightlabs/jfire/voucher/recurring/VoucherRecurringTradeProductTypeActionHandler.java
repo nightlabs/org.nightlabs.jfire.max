@@ -26,6 +26,9 @@ import org.nightlabs.jfire.voucher.store.VoucherType;
 /**
  * @author Fitas Amine - fitas at nightlabs dot de
  *
+ * the {@link VoucherRecurringTradeProductTypeActionHandler} extends the abstract class {@link RecurringTradeProductTypeActionHandler}
+ * it creates articles for the voucher type. 
+ *
  * @jdo.persistence-capable
  *		identity-type="application"
  *		persistence-capable-superclass="org.nightlabs.jfire.trade.recurring.RecurringTradeProductTypeActionHandler"

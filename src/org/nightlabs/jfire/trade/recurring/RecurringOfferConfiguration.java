@@ -6,11 +6,23 @@ import javax.jdo.JDOHelper;
 
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.security.User;
+import org.nightlabs.jfire.store.Product;
+import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.timer.Task;
 import org.nightlabs.jfire.timer.id.TaskID;
+import org.nightlabs.jfire.trade.Offer;
+import org.nightlabs.jfire.trade.Order;
+import org.nightlabs.jfire.trade.Segment;
 
 
 /**
+ * 
+ * An instance of <tt>RecurringOfferConfiguration</tt> is created on a new {@link RecurringOffer}. 
+ * it stores the various config information about how we should create and manipulate the {@link RecurringOffer}
+ * as we could define settings such as booking Invoice , Delivery etc..
+ * the classs initite and New Timer Task class {@link Task}. 
+ * 
+ * 
  * @author Fitas Amine <fitas@nightlabs.de>
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
  *
@@ -31,7 +43,7 @@ public class RecurringOfferConfiguration implements Serializable{
 
 	private static final long serialVersionUID = 20080818L;
 	public static final String TASK_TYPE_ID_RECURRED_OFFER_CREATOR_TASK = "RecurredOfferCreatorTask";
-	
+
 	public static final String FETCH_GROUP_CREATOR_TASK = "RecurringOfferConfiguration.creatorTask"; 
 
 	/**
@@ -55,7 +67,7 @@ public class RecurringOfferConfiguration implements Serializable{
 				taskID,
 				user,
 				RecurringTradeManagerHome.JNDI_NAME,
-				"processRecurringOfferTimed");
+		"processRecurringOfferTimed");
 
 		// We can not set the parameter here in the constructor as Task.setParam will call makePersistent() 
 		// for the given parameter if it's not, and so it will try to persist the object we are currently creating
@@ -73,7 +85,7 @@ public class RecurringOfferConfiguration implements Serializable{
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private boolean createInvoice;
-	
+
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
@@ -102,11 +114,11 @@ public class RecurringOfferConfiguration implements Serializable{
 	public void setCreateInvoice(boolean createInvoice) {
 		this.createInvoice = createInvoice;
 	}
-	
+
 	public boolean isCreateDelivery() {
 		return createDelivery;
 	}
-	
+
 	public void setCreateDelivery(boolean createDelivery) {
 		this.createDelivery = createDelivery;
 	}

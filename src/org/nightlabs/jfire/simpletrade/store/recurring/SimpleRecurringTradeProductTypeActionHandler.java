@@ -23,7 +23,11 @@ import org.nightlabs.jfire.trade.Trader;
 import org.nightlabs.jfire.trade.recurring.RecurredOffer;
 import org.nightlabs.jfire.trade.recurring.RecurringTradeProductTypeActionHandler;
 
+
 /**
+ * {@link SimpleRecurringTradeProductTypeActionHandler} extends the abstract class {@link RecurringTradeProductTypeActionHandler}
+ * it creates articles for the simple product type. 
+ * 
  * @author Fitas Amine - fitas at nightlabs dot de
  *
  * @jdo.persistence-capable

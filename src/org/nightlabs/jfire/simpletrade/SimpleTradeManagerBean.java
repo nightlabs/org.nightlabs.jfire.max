@@ -38,7 +38,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Pattern;
 
 import javax.ejb.CreateException;
 import javax.ejb.EJBException;
@@ -86,6 +85,8 @@ import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.organisation.id.OrganisationID;
 import org.nightlabs.jfire.prop.PropertySet;
 import org.nightlabs.jfire.prop.id.StructFieldID;
+import org.nightlabs.jfire.security.Authority;
+import org.nightlabs.jfire.security.ResolveSecuringAuthorityStrategy;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.simpletrade.notification.SimpleProductTypeNotificationFilter;
 import org.nightlabs.jfire.simpletrade.notification.SimpleProductTypeNotificationReceiver;
@@ -98,6 +99,7 @@ import org.nightlabs.jfire.store.NestedProductTypeLocal;
 import org.nightlabs.jfire.store.Product;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.ProductTypeLocal;
+import org.nightlabs.jfire.store.RoleConstants;
 import org.nightlabs.jfire.store.Store;
 import org.nightlabs.jfire.store.deliver.CrossTradeDeliveryCoordinator;
 import org.nightlabs.jfire.store.deliver.DeliveryConfiguration;
@@ -141,18 +143,12 @@ implements SessionBean
 	 */
 	private static final Logger logger = Logger.getLogger(SimpleTradeManagerBean.class);
 
-	/**
-	 * @see org.nightlabs.jfire.base.BaseSessionBeanImpl#setSessionContext(javax.ejb.SessionContext)
-	 */
 	@Override
 	public void setSessionContext(SessionContext sessionContext)
 	throws EJBException, RemoteException
 	{
 		super.setSessionContext(sessionContext);
 	}
-	/**
-	 * @see org.nightlabs.jfire.base.BaseSessionBeanImpl#unsetSessionContext()
-	 */
 	@Override
 	public void unsetSessionContext() {
 		super.unsetSessionContext();
@@ -166,10 +162,11 @@ implements SessionBean
 	{
 	}
 	/**
-	 * @see javax.ejb.SessionBean#ejbRemove()
+	 * {@inheritDoc}
 	 *
 	 * @ejb.permission unchecked="true"
 	 */
+	@Override
 	public void ejbRemove() throws EJBException, RemoteException { }
 
 	/**
@@ -212,7 +209,7 @@ implements SessionBean
 			SimpleRecurringTradeProductTypeActionHandler srtptah = new SimpleRecurringTradeProductTypeActionHandler(
 					Organisation.DEV_ORGANISATION_ID, SimpleRecurringTradeProductTypeActionHandler.class.getName(), SimpleProductType.class);
 			srtptah = pm.makePersistent(srtptah);
-			
+
 			Store store = Store.getStore(pm);
 //			Accounting accounting = Accounting.getAccounting(pm);
 
@@ -262,48 +259,10 @@ implements SessionBean
 		}
 	}
 
-//	/**
-//	* @return Returns a <tt>Collection</tt> of <tt>SimpleProductType</tt>.
-//	*
-//	* @ejb.interface-method
-//	* @ejb.permission role-name="SimpleTradeManager-user"
-//	* @ejb.transaction type="Required"
-//	*/
-//	public Collection<SimpleProductType> test(Map<String, SimpleProductType> m)
-//	throws ModuleException
-//	{
-//	return new ArrayList<SimpleProductType>(m.values());
-//	}
-
-//	/**
-//	* @return Returns a <tt>Collection</tt> of <tt>SimpleProductType</tt>.
-//	*
-//	* @ejb.interface-method
-//	* @ejb.permission role-name="SimpleTradeManager-user"
-//	* @ejb.transaction type="Required"
-//	*/
-//	public Collection getChildProductTypes(ProductTypeID parentProductTypeID, String[] fetchGroups, int maxFetchDepth)
-//	throws ModuleException
-//	{
-//	PersistenceManager pm = getPersistenceManager();
-//	try {
-//	Collection res = SimpleProductType.getChildProductTypes(pm, parentProductTypeID);
-
-//	FetchPlan fetchPlan = pm.getFetchPlan();
-//	fetchPlan.setMaxFetchDepth(maxFetchDepth);
-//	if (fetchGroups != null)
-//	fetchPlan.setGroups(fetchGroups);
-
-//	return pm.detachCopyAll(res);
-//	} finally {
-//	pm.close();
-//	}
-//	}
-
 	/**
 	 * @ejb.interface-method
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.store.seeProductType"
 	 */
 	public Set<ProductTypeID> getChildSimpleProductTypeIDs(
 			ProductTypeID parentSimpleProductTypeID) {
@@ -316,47 +275,47 @@ implements SessionBean
 		}
 	}
 
-	/**
-	 * @ejb.interface-method
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 * @ejb.permission role-name="_Guest_"
-	 */
-	public SimpleProductType getSimpleProductType(
-			ProductTypeID simpleProductTypeID, String[] fetchGroups,
-			int maxFetchDepth) {
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			List<SimpleProductType> spts = getSimpleProductTypes(CollectionUtil.array2HashSet(new ProductTypeID[] {simpleProductTypeID}), fetchGroups, maxFetchDepth);
-			if (spts.size() > 0)
-				return spts.get(0);
-			return null;
-		} finally {
-			pm.close();
-		}
-	}
-
-	/**
-	 * @ejb.interface-method
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 * @ejb.permission role-name="_Guest_"
-	 */
-	public List<SimpleProductType> getSimpleProductTypes(
-			Collection<ProductTypeID> simpleProductTypeIDs, String[] fetchGroups,
-			int maxFetchDepth) {
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			return NLJDOHelper.getDetachedObjectList(pm, simpleProductTypeIDs,
-					SimpleProductType.class, fetchGroups, maxFetchDepth);
-		} finally {
-			pm.close();
-		}
-	}
+//	/**
+//	 * @ejb.interface-method
+//	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+//	 * @ejb.permission role-name="_Guest_"
+//	 */
+//	public SimpleProductType getSimpleProductType(
+//			ProductTypeID simpleProductTypeID, String[] fetchGroups,
+//			int maxFetchDepth) {
+//		PersistenceManager pm = getPersistenceManager();
+//		try {
+//			List<SimpleProductType> spts = getSimpleProductTypes(CollectionUtil.array2HashSet(new ProductTypeID[] {simpleProductTypeID}), fetchGroups, maxFetchDepth);
+//			if (spts.size() > 0)
+//				return spts.get(0);
+//			return null;
+//		} finally {
+//			pm.close();
+//		}
+//	}
+//
+//	/**
+//	 * @ejb.interface-method
+//	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+//	 * @ejb.permission role-name="_Guest_"
+//	 */
+//	public List<SimpleProductType> getSimpleProductTypes(
+//			Collection<ProductTypeID> simpleProductTypeIDs, String[] fetchGroups,
+//			int maxFetchDepth) {
+//		PersistenceManager pm = getPersistenceManager();
+//		try {
+//			return NLJDOHelper.getDetachedObjectList(pm, simpleProductTypeIDs,
+//					SimpleProductType.class, fetchGroups, maxFetchDepth);
+//		} finally {
+//			pm.close();
+//		}
+//	}
 
 	/**
 	 * @return Returns a newly detached instance of <tt>SimpleProductType</tt> if <tt>get</tt> is true - otherwise <tt>null</tt>.
 	 *
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="SimpleTradeManager.Admin"
+	 * @ejb.permission role-name="org.nightlabs.jfire.store.editUnconfirmedProductType"
 	 * @ejb.transaction type="Required"
 	 */
 	public SimpleProductType storeProductType(SimpleProductType productType, boolean get, String[] fetchGroups, int maxFetchDepth)
@@ -496,6 +455,17 @@ implements SessionBean
 			else
 				logger.info("storeProductType: price-calculation is NOT necessary! Stored ProductType without recalculation: " + JDOHelper.getObjectId(productType));
 
+			if (productType.isConfirmed()) {
+				Authority.resolveSecuringAuthority(
+						pm,
+						productType.getProductTypeLocal(),
+						ResolveSecuringAuthorityStrategy.organisation
+				).assertContainsRoleRef(
+						getPrincipal(),
+						RoleConstants.editConfirmedProductType
+				);
+			}
+
 			// take care about the inheritance
 			productType.applyInheritance();
 			// imho, the recalculation of the prices for the inherited ProductTypes is already implemented in JFireTrade. Marco.
@@ -514,7 +484,7 @@ implements SessionBean
 	 * @see PropertySet#detachPropertySetWithTrimmedFieldList(PersistenceManager, PropertySet, Set, String[], int)
 	 *
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="SimpleTradeManager.Admin"
+	 * @ejb.permission role-name="org.nightlabs.jfire.store.seeProductType"
 	 * @ejb.transaction type="Required"
 	 */
 	public Map<ProductTypeID, PropertySet> getSimpleProductTypesPropertySets(
@@ -528,6 +498,14 @@ implements SessionBean
 		try {
 			for (ProductTypeID productTypeID : simpleProductTypeIDs) {
 				SimpleProductType productType = (SimpleProductType) pm.getObjectById(productTypeID);
+
+				boolean seeAllowed = Authority.resolveSecuringAuthority(
+						pm, productType.getProductTypeLocal(), ResolveSecuringAuthorityStrategy.allow
+				).containsRoleRef(getPrincipal(), RoleConstants.seeProductType);
+
+				if (!seeAllowed)
+					continue;
+
 				PropertySet detached = PropertySet.detachPropertySetWithTrimmedFieldList(
 						pm,
 						productType.getPropertySet(), structFieldIDs,
@@ -541,72 +519,9 @@ implements SessionBean
 		}
 	}
 
-//	/**
-//	* @return Returns a newly detached instance of <tt>SimpleProductType</tt> if <tt>get</tt> is true - otherwise <tt>null</tt>.
-//	*
-//	* @ejb.interface-method
-//	* @ejb.permission role-name="SimpleTradeManager.Admin"
-//	* @ejb.transaction type="Required"
-//	*/
-//	public SimpleProductType updateProductType(SimpleProductType productType, boolean get, String[] fetchGroups, int maxFetchDepth)
-//	throws ModuleException
-//	{
-//	if (productType == null)
-//	throw new NullPointerException("productType");
-
-//	PersistenceManager pm = getPersistenceManager();
-//	try {
-////	// WORKAROUND
-////	pm.getExtent(SimpleProductType.class);
-////	if (productType.getExtendedProductType() != null) {
-////	Object oid = JDOHelper.getObjectId(productType.getExtendedProductType());
-////	productType.setExtendedProductType((ProductType)pm.getObjectById(oid));
-////	}
-
-////	IInnerPriceConfig packagePriceConfig = productType.getInnerPriceConfig();
-////	if (packagePriceConfig != null) {
-////	pm.getExtent(packagePriceConfig.getClass());
-////	Object oid = JDOHelper.getObjectId(packagePriceConfig);
-////	if (oid != null) {
-////	try {
-////	packagePriceConfig = (IInnerPriceConfig) pm.getObjectById(oid);
-////	productType.setInnerPriceConfig(packagePriceConfig);
-////	} catch (JDOObjectNotFoundException x) {
-////	// Object is not in datastore, so try to store it as it is.
-////	}
-////	}
-////	}
-
-////	IInnerPriceConfig innerPriceConfig = productType.getInnerPriceConfig();
-////	if (innerPriceConfig != null) {
-////	pm.getExtent(innerPriceConfig.getClass());
-////	Object oid = JDOHelper.getObjectId(innerPriceConfig);
-////	if (oid != null) {
-////	try {
-////	innerPriceConfig = (IInnerPriceConfig) pm.getObjectById(oid);
-////	productType.setInnerPriceConfig(innerPriceConfig);
-////	} catch (JDOObjectNotFoundException x) {
-////	// Object is not in datastore, so try to store it as it is.
-////	}
-////	}
-////	}
-////	// END WORK AROUND
-////	Object productTypeID = JDOHelper.getObjectId(productType);
-////	if (productTypeID != null)
-////	cache_addChangedObjectID(productTypeID);
-//	if (!Store.getStore(pm).containsProductType(productType))
-//	throw new IllegalStateException("The productType \""+productType.getPrimaryKey()+"\" is not yet known! Use addProductType(...) instead!");
-
-//	return (SimpleProductType) NLJDOHelper.storeJDO(pm, productType, get, fetchGroups);
-////	return (SimpleProductType)NLJDOHelper.storeJDO(pm, product);
-//	} finally {
-//	pm.close();
-//	}
-//	}
-
 	/**
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.queryPriceConfigurations"
 	 * @ejb.transaction type="Required"
 	 */
 	public Set<PriceConfigID> getFormulaPriceConfigIDs()
@@ -623,7 +538,7 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.queryPriceConfigurations"
 	 * @ejb.transaction type="Required"
 	 */
 	public List<FormulaPriceConfig> getFormulaPriceConfigs(Collection<PriceConfigID> formulaPriceConfigIDs, String[] fetchGroups, int maxFetchDepth)
@@ -643,7 +558,7 @@ implements SessionBean
 	 * @throws org.nightlabs.jfire.store.NotAvailableException in case there are not enough <tt>Product</tt>s available and the <tt>Product</tt>s cannot be created (because of a limit).
 	 *
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.trade.editOffer"
 	 * @ejb.transaction type="Required"
 	 */
 	public Collection<? extends Article> createArticles(
@@ -651,9 +566,10 @@ implements SessionBean
 			OfferID offerID,
 			Collection<ProductTypeID> productTypeIDs,
 			TariffID tariffID,
-			String[] fetchGroups, int maxFetchDepth)
-			throws ModuleException
-			{
+			String[] fetchGroups, int maxFetchDepth
+	)
+	throws ModuleException
+	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			Trader trader = Trader.getTrader(pm);
@@ -684,10 +600,21 @@ implements SessionBean
 				pm.getExtent(Offer.class);
 				offer = (Offer) pm.getObjectById(offerID);
 			}
-			
+
 			Collection<ProductType> productTypes = new LinkedList<ProductType>();
 			for (ProductTypeID productTypeID : productTypeIDs) {
-				productTypes.add((ProductType) pm.getObjectById(productTypeID));
+				ProductType productType = (ProductType) pm.getObjectById(productTypeID);
+
+				Authority.resolveSecuringAuthority(
+						pm,
+						productType.getProductTypeLocal(),
+						ResolveSecuringAuthorityStrategy.organisation // must be "organisation", because the role "sellProductType" is not checked on EJB method level!
+				).assertContainsRoleRef(
+						getPrincipal(),
+						org.nightlabs.jfire.trade.RoleConstants.sellProductType
+				);
+
+				productTypes.add(productType);
 			}
 
 			Collection<? extends Article> articles = trader.createArticles(
@@ -718,7 +645,7 @@ implements SessionBean
 		} finally {
 			pm.close();
 		}
-			}
+	}
 
 
 	/**
@@ -726,7 +653,7 @@ implements SessionBean
 	 * @throws org.nightlabs.jfire.store.NotAvailableException in case there are not enough <tt>Product</tt>s available and the <tt>Product</tt>s cannot be created (because of a limit).
 	 *
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.trade.editOffer"
 	 * @ejb.transaction type="Required"
 	 */
 	public Collection<? extends Article> createArticles(
@@ -737,9 +664,10 @@ implements SessionBean
 			TariffID tariffID,
 			boolean allocate,
 			boolean allocateSynchronously,
-			String[] fetchGroups, int maxFetchDepth)
-			throws ModuleException
-			{
+			String[] fetchGroups, int maxFetchDepth
+	)
+	throws ModuleException
+	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			Trader trader = Trader.getTrader(pm);
@@ -755,6 +683,15 @@ implements SessionBean
 				throw new IllegalArgumentException("productTypeID \""+productTypeID+"\" specifies a ProductType of type \""+pt.getClass().getName()+"\", but must be \""+SimpleProductType.class.getName()+"\"!");
 
 			SimpleProductType productType = (SimpleProductType)pt;
+
+			Authority.resolveSecuringAuthority(
+					pm,
+					productType.getProductTypeLocal(),
+					ResolveSecuringAuthorityStrategy.organisation // must be "organisation", because the role "sellProductType" is not checked on EJB method level!
+			).assertContainsRoleRef(
+					getPrincipal(),
+					org.nightlabs.jfire.trade.RoleConstants.sellProductType
+			);
 
 			Tariff tariff = (Tariff) pm.getObjectById(tariffID);
 
@@ -793,8 +730,8 @@ implements SessionBean
 //			user, offer, segment, product,
 //			new ArticleCreator(tariff),
 //			true, false);
-////			auto-release must be controlled via the offer (the whole offer has an expiry time
-////			new Date(System.currentTimeMillis() + 3600 * 1000 * 10)); // TODO the autoReleaseTimeout must come from the config
+////		auto-release must be controlled via the offer (the whole offer has an expiry time
+////		new Date(System.currentTimeMillis() + 3600 * 1000 * 10)); // TODO the autoReleaseTimeout must come from the config
 //			articles.add(article);
 //			}
 
@@ -875,7 +812,7 @@ implements SessionBean
 		} finally {
 			pm.close();
 		}
-			}
+	}
 
 
 	/**
@@ -885,6 +822,9 @@ implements SessionBean
 	 */
 	public Set<ProductTypeID> getPublishedSimpleProductTypeIDs()
 	{
+		if (!userIsOrganisation()) // noone else needs this method - at least at the moment.
+			throw new IllegalStateException("For security reasons, this method can only be called by partner organisations! You are not an organisation!");
+
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			Query q = pm.newQuery(SimpleProductType.class);
@@ -905,6 +845,9 @@ implements SessionBean
 	 */
 	public List<SimpleProductType> getSimpleProductTypesForReseller(Collection<ProductTypeID> productTypeIDs)
 	{
+		if (!userIsOrganisation()) // noone else needs this method - at least at the moment.
+			throw new IllegalStateException("For security reasons, this method can only be called by partner organisations! You are not an organisation!");
+
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			pm.getExtent(SimpleProductType.class);
@@ -969,7 +912,7 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.store.editUnconfirmedProductType"
 	 * @ejb.transaction type="Required"
 	 */
 	public void importSimpleProductTypesForReselling(String emitterOrganisationID)
@@ -1039,24 +982,20 @@ implements SessionBean
 //	}
 //	}
 
-	private static Pattern tariffPKSplitPattern = null;
-
 	/**
 	 * @return a <tt>Collection</tt> of {@link TariffPricePair}
 	 *
 	 * @ejb.interface-method
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.trade.sellProductType, org.nightlabs.jfire.accounting.queryPriceConfigurations"
 	 */
 	public Collection<TariffPricePair> getTariffPricePairs(
 			PriceConfigID priceConfigID, CustomerGroupID customerGroupID, CurrencyID currencyID,
-			String[] tariffFetchGroups, String[] priceFetchGroups)
-			{
+			String[] tariffFetchGroups, String[] priceFetchGroups
+	)
+	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			if (tariffPKSplitPattern == null)
-				tariffPKSplitPattern = Pattern.compile("/");
-
 			// TODO use setResult and put all this logic into the JDO query!
 			StablePriceConfig priceConfig = (StablePriceConfig) pm.getObjectById(priceConfigID);
 			Collection<PriceCell> priceCells = priceConfig.getPriceCells(
@@ -1069,17 +1008,11 @@ implements SessionBean
 				PriceCell priceCell = it.next();
 				String tariffPK = priceCell.getPriceCoordinate().getTariffPK();
 				TariffID tariffID = TariffID.create(tariffPK);
-//				String[] tariffPKParts = tariffPKSplitPattern.split(tariffPK);
-//				if (tariffPKParts.length != 2)
-//				throw new IllegalStateException("How the hell can it happen that the tariffPK does not consist out of two parts?");
-
-//				String tariffOrganisationID = tariffPKParts[0];
-//				long tariffID = Long.parseLong(tariffPKParts[1], 16);
 
 				if (tariffFetchGroups != null)
 					pm.getFetchPlan().setGroups(tariffFetchGroups);
 
-				Tariff tariff = (Tariff) pm.getObjectById(tariffID); // TariffID.create(tariffOrganisationID, tariffID));
+				Tariff tariff = (Tariff) pm.getObjectById(tariffID);
 				tariff = pm.detachCopy(tariff);
 
 				if (priceFetchGroups != null)
@@ -1094,12 +1027,12 @@ implements SessionBean
 		} finally {
 			pm.close();
 		}
-			}
+	}
 
 	/**
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.editPriceConfiguration"
 	 */
 	public Collection<GridPriceConfig> storePriceConfigs(Collection<GridPriceConfig> priceConfigs, boolean get, AssignInnerPriceConfigCommand assignInnerPriceConfigCommand)
 	throws PriceCalculationException
@@ -1132,7 +1065,7 @@ implements SessionBean
 	 *
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.store.editUnconfirmedProductType"
 	 */
 	public Collection<OrganisationID> getCandidateOrganisationIDsForCrossTrade()
 	{
@@ -1159,28 +1092,4 @@ implements SessionBean
 		}
 	}
 
-	// Is never used as this is done generic by the ProductTypeDAO
-//	/**
-//	* Searches with the given searchQuery for {@link SimpleProductType}s.
-//	*
-//	* @ejb.interface-method
-//	* @ejb.permission role-name="_Guest_"
-//	* @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-//	*
-//	*/
-//	public Collection<ProductTypeID> searchProductTypes(SimpleProductTypeQuery searchQuery)
-//	{
-//	PersistenceManager pm = getPersistenceManager();
-//	try {
-//	pm.getFetchPlan().clearGroups();
-//	searchQuery.setPersistenceManager(pm);
-//	Collection<SimpleProductType> productTypes = (Collection<SimpleProductType>) searchQuery.getResult();
-//	Collection<ProductTypeID> ids = new ArrayList<ProductTypeID>(productTypes.size());
-//	for (ProductType	productType : productTypes)
-//	ids.add(productType.getObjectId());
-//	return ids;
-//	} finally {
-//	pm.close();
-//	}
-//	}
 }

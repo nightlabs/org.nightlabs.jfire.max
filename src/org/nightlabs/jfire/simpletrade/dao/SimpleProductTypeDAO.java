@@ -16,8 +16,11 @@ import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.simpletrade.SimpleTradeManager;
 import org.nightlabs.jfire.simpletrade.SimpleTradeManagerUtil;
 import org.nightlabs.jfire.simpletrade.store.SimpleProductType;
+import org.nightlabs.jfire.store.StoreManager;
+import org.nightlabs.jfire.store.StoreManagerUtil;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.progress.ProgressMonitor;
+import org.nightlabs.util.CollectionUtil;
 import org.nightlabs.util.Util;
 
 public class SimpleProductTypeDAO
@@ -46,11 +49,13 @@ implements IJDOObjectDAO<SimpleProductType>
 	{
 		monitor.beginTask("Loading SimpleProductTypes", 1);
 		try {
-			SimpleTradeManager vm = simpleTradeManager;
-			if (vm == null)
-				vm = SimpleTradeManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
-
-			return vm.getSimpleProductTypes(simpleProductTypeIDs, fetchGroups, maxFetchDepth);
+//			SimpleTradeManager vm = simpleTradeManager;
+//			if (vm == null)
+//				vm = SimpleTradeManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+//
+//			return vm.getSimpleProductTypes(simpleProductTypeIDs, fetchGroups, maxFetchDepth);
+			StoreManager sm = StoreManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			return CollectionUtil.castCollection(sm.getProductTypes(simpleProductTypeIDs, fetchGroups, maxFetchDepth));
 		} finally {
 			monitor.worked(1);
 		}
@@ -94,7 +99,7 @@ implements IJDOObjectDAO<SimpleProductType>
 
 		return getJDOObject(null, simpleProductTypeID, fetchGroups, maxFetchDepth, monitor);
 	}
-	
+
 	/**
 	 * Store a {@link SimpleProductType} and its properties on the server.
 	 * @param productType the ProductType to save

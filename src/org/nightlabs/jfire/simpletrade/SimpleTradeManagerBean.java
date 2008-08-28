@@ -264,12 +264,20 @@ implements SessionBean
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="org.nightlabs.jfire.store.seeProductType"
 	 */
-	public Set<ProductTypeID> getChildSimpleProductTypeIDs(
-			ProductTypeID parentSimpleProductTypeID) {
+	public Set<ProductTypeID> getChildSimpleProductTypeIDs(ProductTypeID parentSimpleProductTypeID) {
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			return NLJDOHelper.getObjectIDSet(SimpleProductType.getChildProductTypes(pm,
-					parentSimpleProductTypeID));
+			Collection<SimpleProductType> productTypes = SimpleProductType.getChildProductTypes(pm, parentSimpleProductTypeID);
+
+			productTypes = Authority.filterIndirectlySecuredObjects(
+					pm,
+					productTypes,
+					getPrincipal(),
+					RoleConstants.seeProductType,
+					ResolveSecuringAuthorityStrategy.allow
+			);
+
+			return NLJDOHelper.getObjectIDSet(productTypes);
 		} finally {
 			pm.close();
 		}

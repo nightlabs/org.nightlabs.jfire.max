@@ -151,6 +151,8 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	 *		collection-type="collection"
 	 *		element-type="Project"
 	 *		table="JFireIssueTracking_Issue_projects"
+	 *
+	 * @jdo.join
 	 */
 	private Set<Project> projects;
 

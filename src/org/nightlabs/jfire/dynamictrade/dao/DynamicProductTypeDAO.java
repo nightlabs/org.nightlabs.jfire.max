@@ -11,8 +11,11 @@ import org.nightlabs.jfire.dynamictrade.DynamicTradeManager;
 import org.nightlabs.jfire.dynamictrade.DynamicTradeManagerUtil;
 import org.nightlabs.jfire.dynamictrade.store.DynamicProductType;
 import org.nightlabs.jfire.security.SecurityReflector;
+import org.nightlabs.jfire.store.StoreManager;
+import org.nightlabs.jfire.store.StoreManagerUtil;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.progress.ProgressMonitor;
+import org.nightlabs.util.CollectionUtil;
 
 public class DynamicProductTypeDAO
 extends BaseJDOObjectDAO<ProductTypeID, DynamicProductType>
@@ -40,11 +43,13 @@ implements IJDOObjectDAO<DynamicProductType>
 	{
 		monitor.beginTask("Loading DynamicProductTypes", 1);
 		try {
-			DynamicTradeManager vm = dynamicTradeManager;
-			if (vm == null)
-				vm = DynamicTradeManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
-
-			return vm.getDynamicProductTypes(dynamicProductTypeIDs, fetchGroups, maxFetchDepth);
+//			DynamicTradeManager vm = dynamicTradeManager;
+//			if (vm == null)
+//				vm = DynamicTradeManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+//
+//			return vm.getDynamicProductTypes(dynamicProductTypeIDs, fetchGroups, maxFetchDepth);
+			StoreManager sm = StoreManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			return CollectionUtil.castCollection(sm.getProductTypes(dynamicProductTypeIDs, fetchGroups, maxFetchDepth));
 		} finally {
 			monitor.worked(1);
 		}
@@ -69,21 +74,21 @@ implements IJDOObjectDAO<DynamicProductType>
 		}
 	}
 
-	public List<DynamicProductType> getDynamicProductTypes(Byte inheritanceNature, Boolean saleable, String[] fetchGroups, int maxFetchDepth,
-			ProgressMonitor monitor)
-	{
-		try {
-			dynamicTradeManager = DynamicTradeManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
-			try {
-				Collection<ProductTypeID> dynamicProductTypeIDs = dynamicTradeManager.getDynamicProductTypeIDs(inheritanceNature, saleable);
-				return getJDOObjects(null, dynamicProductTypeIDs, fetchGroups, maxFetchDepth, monitor);
-			} finally {
-				dynamicTradeManager = null;
-			}
-		} catch (Exception x) {
-			throw new RuntimeException(x);
-		}
-	}
+//	public List<DynamicProductType> getDynamicProductTypes(Byte inheritanceNature, Boolean saleable, String[] fetchGroups, int maxFetchDepth,
+//			ProgressMonitor monitor)
+//	{
+//		try {
+//			dynamicTradeManager = DynamicTradeManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+//			try {
+//				Collection<ProductTypeID> dynamicProductTypeIDs = dynamicTradeManager.getDynamicProductTypeIDs(inheritanceNature, saleable);
+//				return getJDOObjects(null, dynamicProductTypeIDs, fetchGroups, maxFetchDepth, monitor);
+//			} finally {
+//				dynamicTradeManager = null;
+//			}
+//		} catch (Exception x) {
+//			throw new RuntimeException(x);
+//		}
+//	}
 
 	public List<DynamicProductType> getDynamicProductTypes(Collection<ProductTypeID> dynamicProductTypeIDs,
 			String[] fetchGroups, int maxFetchDepth,

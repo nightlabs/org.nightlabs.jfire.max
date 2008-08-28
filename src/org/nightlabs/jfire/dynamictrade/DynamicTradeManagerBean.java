@@ -2,7 +2,6 @@ package org.nightlabs.jfire.dynamictrade;
 
 import java.rmi.RemoteException;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -39,10 +38,12 @@ import org.nightlabs.jfire.dynamictrade.store.DynamicProductType;
 import org.nightlabs.jfire.dynamictrade.store.DynamicProductTypeActionHandler;
 import org.nightlabs.jfire.organisation.LocalOrganisation;
 import org.nightlabs.jfire.organisation.Organisation;
+import org.nightlabs.jfire.security.Authority;
+import org.nightlabs.jfire.security.ResolveSecuringAuthorityStrategy;
 import org.nightlabs.jfire.security.User;
-import org.nightlabs.jfire.store.CannotPublishProductTypeException;
 import org.nightlabs.jfire.store.Product;
 import org.nightlabs.jfire.store.ProductType;
+import org.nightlabs.jfire.store.RoleConstants;
 import org.nightlabs.jfire.store.Store;
 import org.nightlabs.jfire.store.Unit;
 import org.nightlabs.jfire.store.deliver.DeliveryConfiguration;
@@ -87,19 +88,19 @@ implements SessionBean
 	public void unsetSessionContext() {
 		super.unsetSessionContext();
 	}
-	
+
 	/**
 	 * @ejb.create-method
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public void ejbCreate() throws CreateException
-	{
-	}
+	public void ejbCreate() throws CreateException { }
+
 	/**
-	 * @see javax.ejb.SessionBean#ejbRemove()
+	 * {@inheritDoc}
 	 *
 	 * @ejb.permission unchecked="true"
 	 */
+	@Override
 	public void ejbRemove() throws EJBException, RemoteException { }
 
 	/**
@@ -107,7 +108,6 @@ implements SessionBean
 	 * It creates the root DynamicProductType for the organisation itself.
 	 * DynamicProductTypes of other organisations cannot be imported or
 	 * traded as reseller.
-	 * @throws CannotPublishProductTypeException
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_System_"
@@ -152,10 +152,10 @@ implements SessionBean
 			ModeOfDelivery modeOfDelivery;
 			modeOfDelivery = (ModeOfDelivery) pm.getObjectById(ModeOfDeliveryConst.MODE_OF_DELIVERY_ID_MANUAL);
 			deliveryConfiguration.addModeOfDelivery(modeOfDelivery);
-			
+
 			modeOfDelivery = (ModeOfDelivery) pm.getObjectById(ModeOfDeliveryConst.MODE_OF_DELIVERY_ID_DELIVER_TO_DELIVERY_QUEUE);
 			deliveryConfiguration.addModeOfDelivery(modeOfDelivery);
-			
+
 			deliveryConfiguration = pm.makePersistent(deliveryConfiguration);
 
 
@@ -181,79 +181,84 @@ implements SessionBean
 	/**
 	 * @ejb.interface-method
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.store.seeProductType"
 	 */
-	public Set<ProductTypeID> getChildDynamicProductTypeIDs(
-			ProductTypeID parentDynamicProductTypeID) {
+	public Set<ProductTypeID> getChildDynamicProductTypeIDs(ProductTypeID parentDynamicProductTypeID)
+	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			return NLJDOHelper.getObjectIDSet(DynamicProductType.getChildProductTypes(pm,
-					parentDynamicProductTypeID));
+			Collection<DynamicProductType> productTypes = DynamicProductType.getChildProductTypes(pm, parentDynamicProductTypeID);
+
+			productTypes = Authority.filterIndirectlySecuredObjects(
+					pm,
+					productTypes,
+					getPrincipal(),
+					RoleConstants.seeProductType,
+					ResolveSecuringAuthorityStrategy.allow);
+
+			return NLJDOHelper.getObjectIDSet(productTypes);
 		} finally {
 			pm.close();
 		}
 	}
 
-	/**
-	 * @ejb.interface-method
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 * @ejb.permission role-name="_Guest_"
-	 */
-	public Set<ProductTypeID> getDynamicProductTypeIDs(Byte inheritanceNature, Boolean saleable) {
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			Query q = pm.newQuery(DynamicProductType.class);
-			q.setResult("JDOHelper.getObjectId(this)");
-			if (inheritanceNature != null || saleable != null) {
-				StringBuffer filter = new StringBuffer();
+//	/**
+//	 * @ejb.interface-method
+//	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+//	 * @ejb.permission role-name="_Guest_"
+//	 */
+//	public Set<ProductTypeID> getDynamicProductTypeIDs(Byte inheritanceNature, Boolean saleable) {
+//		PersistenceManager pm = getPersistenceManager();
+//		try {
+//			Query q = pm.newQuery(DynamicProductType.class);
+//			q.setResult("JDOHelper.getObjectId(this)");
+//			if (inheritanceNature != null || saleable != null) {
+//				StringBuffer filter = new StringBuffer();
+//
+//				if (inheritanceNature != null)
+//					filter.append("inheritanceNature == :inheritanceNature");
+//
+//				if (saleable != null) {
+//					if (filter.length() != 0)
+//						filter.append(" && ");
+//
+//					filter.append("saleable == :saleable");
+//				}
+//
+//				q.setFilter(filter.toString());
+//			}
+//
+//			HashMap<String, Object> params = new HashMap<String, Object>(2);
+//			params.put("inheritanceNature", inheritanceNature);
+//			params.put("saleable", saleable);
+//
+//			return new HashSet<ProductTypeID>((Collection<? extends ProductTypeID>) q.executeWithMap(params));
+//		} finally {
+//			pm.close();
+//		}
+//	}
 
-				if (inheritanceNature != null)
-					filter.append("inheritanceNature == :inheritanceNature");
-
-				if (saleable != null) {
-					if (filter.length() != 0)
-						filter.append(" && ");
-
-					filter.append("saleable == :saleable");
-				}
-
-				q.setFilter(filter.toString());
-			}
-
-			HashMap<String, Object> params = new HashMap<String, Object>(2);
-			params.put("inheritanceNature", inheritanceNature);
-			params.put("saleable", saleable);
-
-			return new HashSet<ProductTypeID>((Collection<? extends ProductTypeID>) q.executeWithMap(params));
-		} finally {
-			pm.close();
-		}
-	}
-
-	/**
-	 * @ejb.interface-method
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 * @ejb.permission role-name="_Guest_"
-	 */
-	public List<DynamicProductType> getDynamicProductTypes(
-			Collection<ProductTypeID> dynamicProductTypeIDs, String[] fetchGroups,
-			int maxFetchDepth) {
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			return NLJDOHelper.getDetachedObjectList(pm, dynamicProductTypeIDs,
-					DynamicProductType.class, fetchGroups, maxFetchDepth);
-		} finally {
-			pm.close();
-		}
-	}
+//	/**
+//	 * @ejb.interface-method
+//	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+//	 * @ejb.permission role-name="org.nightlabs.jfire.store.seeProductType"
+//	 */
+//	public List<DynamicProductType> getDynamicProductTypes(Collection<ProductTypeID> dynamicProductTypeIDs, String[] fetchGroups, int maxFetchDepth) {
+//		PersistenceManager pm = getPersistenceManager();
+//		try {
+//			return NLJDOHelper.getDetachedObjectList(pm, dynamicProductTypeIDs, DynamicProductType.class, fetchGroups, maxFetchDepth);
+//		} finally {
+//			pm.close();
+//		}
+//	}
 
 	/**
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.store.editUnconfirmedProductType"
 	 * @ejb.transaction type="Required"
 	 */
-	public DynamicProductType storeDynamicProductType(DynamicProductType dynamicProductType, boolean get,
-			String[] fetchGroups, int maxFetchDepth) {
+	public DynamicProductType storeDynamicProductType(DynamicProductType dynamicProductType, boolean get, String[] fetchGroups, int maxFetchDepth)
+	{
 		if (dynamicProductType == null)
 			throw new IllegalArgumentException("dynamicProductType must not be null!");
 
@@ -359,6 +364,17 @@ implements SessionBean
 				}
 			}
 
+			if (dynamicProductType.isConfirmed()) {
+				Authority.resolveSecuringAuthority(
+						pm,
+						dynamicProductType.getProductTypeLocal(),
+						ResolveSecuringAuthorityStrategy.organisation
+				).assertContainsRoleRef(
+						getPrincipal(),
+						RoleConstants.editConfirmedProductType
+				);
+			}
+
 			// take care about the inheritance
 			dynamicProductType.applyInheritance();
 
@@ -374,7 +390,7 @@ implements SessionBean
 	/**
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.editPriceConfiguration"
 	 */
 	public Collection<DynamicTradePriceConfig> storeDynamicTradePriceConfigs(Collection<DynamicTradePriceConfig> priceConfigs, boolean get, AssignInnerPriceConfigCommand assignInnerPriceConfigCommand)
 	throws PriceCalculationException
@@ -420,8 +436,10 @@ implements SessionBean
 	}
 
 	/**
+	 * Get the object-ids of all {@link DynamicTradePriceConfig}s.
+	 *
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.queryPriceConfigurations"
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
 	public Set<PriceConfigID> getDynamicTradePriceConfigIDs()
@@ -438,7 +456,7 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.queryPriceConfigurations"
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
 	public List<DynamicTradePriceConfig> getDynamicTradePriceConfigs(Collection<PriceConfigID> dynamicTradePriceConfigIDs, String[] fetchGroups, int maxFetchDepth)
@@ -453,7 +471,7 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.trade.editOffer"
 	 * @ejb.transaction type="Required"
 	 */
 	public Article createArticle(
@@ -497,6 +515,15 @@ implements SessionBean
 				throw new IllegalArgumentException("productTypeID \""+productTypeID+"\" specifies a ProductType of type \""+pt.getClass().getName()+"\", but must be \""+DynamicProductType.class.getName()+"\"!");
 
 			DynamicProductType productType = (DynamicProductType)pt;
+
+			Authority.resolveSecuringAuthority(
+					pm,
+					productType.getProductTypeLocal(),
+					ResolveSecuringAuthorityStrategy.organisation // must be "organisation", because the role "sellProductType" is not checked on EJB method level!
+			).assertContainsRoleRef(
+					getPrincipal(),
+					org.nightlabs.jfire.trade.RoleConstants.sellProductType
+			);
 
 			Tariff tariff = (Tariff) pm.getObjectById(tariffID);
 
@@ -555,7 +582,7 @@ implements SessionBean
 	 * @param singlePrice If <code>null</code>, no change will happen to this property - otherwise it will be updated (causes recalculation of the offer's price).
 	 *
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.trade.editOffer"
 	 * @ejb.transaction type="Required"
 	 */
 	public Article modifyArticle(
@@ -574,6 +601,15 @@ implements SessionBean
 			Offer offer = article.getOffer();
 			if (offer.isFinalized())
 				throw new IllegalStateException("Offer is already finalized! Cannot modify!");
+
+			Authority.resolveSecuringAuthority(
+					pm,
+					article.getProductType().getProductTypeLocal(),
+					ResolveSecuringAuthorityStrategy.organisation // must be "organisation", because the role "sellProductType" is not checked on EJB method level!
+			).assertContainsRoleRef(
+					getPrincipal(),
+					org.nightlabs.jfire.trade.RoleConstants.sellProductType
+			);
 
 			DynamicProduct product = (DynamicProduct) article.getProduct();
 

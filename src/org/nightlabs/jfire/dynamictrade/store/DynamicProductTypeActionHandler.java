@@ -3,13 +3,10 @@ package org.nightlabs.jfire.dynamictrade.store;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Hashtable;
-import java.util.Locale;
 
 import javax.jdo.PersistenceManager;
 
 import org.nightlabs.annotation.Implement;
-import org.nightlabs.jfire.organisation.Organisation;
-import org.nightlabs.jfire.security.AuthorityType;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.security.id.AuthorityTypeID;
 import org.nightlabs.jfire.store.NestedProductTypeLocal;
@@ -38,39 +35,6 @@ public class DynamicProductTypeActionHandler
 		extends ProductTypeActionHandler
 {
 	public static final AuthorityTypeID AUTHORITY_TYPE_ID = AuthorityTypeID.create(DynamicProductType.class.getName());
-
-//	/**
-//	 * This is the {@link org.nightlabs.jfire.transfer.Anchor#getAnchorID()} of
-//	 * the {@link Repository} which becomes the factory-output-repository for all
-//	 * newly created {@link DynamicProduct}s.
-//	 */
-//	public static final String ANCHOR_ID_REPOSITORY_HOME_LOCAL = DynamicProductType.class.getName() + ".local";
-//
-////	/**
-////	 * This is the {@link org.nightlabs.jfire.transfer.Anchor#getAnchorID()} of
-////	 * the {@link Repository} which is used for products that are bought from a foreign organisation.
-////	 */
-////	public static final String ANCHOR_ID_REPOSITORY_HOME_FOREIGN = DynamicProductType.class.getName() + ".foreign";
-//
-//	public static Repository getDefaultHome(PersistenceManager pm, DynamicProductType simpleProductType)
-//	{
-//		Store store = Store.getStore(pm);
-//		if (store.getOrganisationID().equals(simpleProductType.getOrganisationID()))
-//			return getDefaultLocalHome(pm, store);
-//		else
-//			throw new UnsupportedOperationException("DynamicTrade does not support cross-trade-functionality!");
-////			return getDefaultForeignHome(pm, store);
-//	}
-//
-//	protected static Repository getDefaultLocalHome(PersistenceManager pm, Store store)
-//	{
-//		return Repository.createRepository(
-//				pm,
-//				store.getOrganisationID(),
-//				Repository.ANCHOR_TYPE_ID_HOME,
-//				ANCHOR_ID_REPOSITORY_HOME_LOCAL,
-//				store.getMandator(), false);
-//	}
 
 	/**
 	 * @deprecated Only for JDO!
@@ -104,43 +68,6 @@ public class DynamicProductTypeActionHandler
 			res.add(product);
 		}
 		return res;
-//		DynamicProductType spt = (DynamicProductType) productType;
-//		DynamicProductTypeLocal sptl = (DynamicProductTypeLocal) productType.getProductTypeLocal();
-//		int qty = nestedProductTypeLocal == null ? 1 : nestedProductTypeLocal.getQuantity();
-//		PersistenceManager pm = getPersistenceManager();
-//
-//		Store store = Store.getStore(pm);
-//		// search for an available product
-//		Query q = pm.newQuery(DynamicProduct.class);
-//		q.setFilter("productType == pProductType && productLocal.available");
-//		q.declareParameters("DynamicProductType pProductType");
-//		q.declareImports("import " + DynamicProductType.class.getName());
-//		Collection availableProducts = (Collection) q.execute(this); // Product.getProducts(pm, this, ProductStatus.STATUS_AVAILABLE);
-//		ArrayList res = new ArrayList();
-//		Iterator iteratorAvailableProducts = availableProducts.iterator();
-//		for (int i = 0; i < qty; ++i) {
-//			DynamicProduct product = null;
-//			if (iteratorAvailableProducts.hasNext()) {
-//				product = (DynamicProduct) iteratorAvailableProducts.next();
-//				res.add(product);
-//			}
-//			else {
-//				// create products only if this product type is ours
-//				if (productType.getOrganisationID().equals(store.getOrganisationID())) {
-//					long createdProductCount = sptl.getCreatedProductCount();
-//					if (sptl.getMaxProductCount() < 0 || createdProductCount + 1 <= sptl.getMaxProductCount()) {
-//						product = new DynamicProduct(spt, DynamicProduct.createProductID());
-//						sptl.setCreatedProductCount(createdProductCount + 1);
-//
-//						product = (DynamicProduct) store.addProduct(user, product, (Repository)spt.getProductTypeLocal().getHome());
-//						res.add(product);
-//					}
-//				} // This productType is factored by this organisation
-//				else
-//					throw new UnsupportedOperationException("NYI");
-//			}
-//		}
-//		return res;
 	}
 
 
@@ -160,17 +87,17 @@ public class DynamicProductTypeActionHandler
 		return AUTHORITY_TYPE_ID;
 	}
 
-	@Override
-	protected AuthorityType createAuthorityType(AuthorityTypeID authorityTypeID, ProductType rootProductType) {
-		AuthorityType authorityType = new AuthorityType(authorityTypeID);
-
-		authorityType.getName().setText(Locale.ENGLISH.getLanguage(), "Dynamic product types");
-		authorityType.getDescription().setText(Locale.ENGLISH.getLanguage(), "Authorities of this type control the access rights for dynamic product types.");
-
-		authorityType.getName().setText(Locale.GERMAN.getLanguage(), "Dynamische Produkttypen");
-		authorityType.getDescription().setText(Locale.GERMAN.getLanguage(), "Vollmachten dieses Typs kontrollieren den Zugriff auf dynamische Produkttypen.");
-
-		// TODO configure access rights completely - implement manual checking where necessary!
-		return authorityType;
-	}
+//	@Override
+//	protected AuthorityType createAuthorityType(AuthorityTypeID authorityTypeID, ProductType rootProductType) {
+//		AuthorityType authorityType = new AuthorityType(authorityTypeID);
+//
+//		authorityType.getName().setText(Locale.ENGLISH.getLanguage(), "Dynamic product types");
+//		authorityType.getDescription().setText(Locale.ENGLISH.getLanguage(), "Authorities of this type control the access rights for dynamic product types.");
+//
+//		authorityType.getName().setText(Locale.GERMAN.getLanguage(), "Dynamische Produkttypen");
+//		authorityType.getDescription().setText(Locale.GERMAN.getLanguage(), "Vollmachten dieses Typs kontrollieren den Zugriff auf dynamische Produkttypen.");
+//
+//		// TODO configure access rights completely - implement manual checking where necessary!
+//		return authorityType;
+//	}
 }

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jfire-security
+	xmlns="urn:jfire.org:jfire-security_1_0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="urn:jfire.org:jfire-security_1_0 https://www.jfire.org/schema/jfire-security_1_0.xsd "
+>
+	<authority-type id="org.nightlabs.jfire.dynamictrade.store.DynamicProductType">
+		<name>Dynamic product types</name>
+		<name language="de">Dynamische Produkttypen</name>
+		<description>
+			Authorities of this type control the access rights for dynamic product types.
+		</description>
+		<description language="de">
+			Vollmachten dieses Typs kontrollieren den Zugriff auf dynamische Produkttypen.
+		</description>
+
+		<role-group id="org.nightlabs.jfire.store.seeProductType"/>
+		<role-group id="org.nightlabs.jfire.store.editUnconfirmedProductType"/>
+		<role-group id="org.nightlabs.jfire.store.editConfirmedProductType"/>
+		<role-group id="org.nightlabs.jfire.trade.sellProductType"/>
+		<role-group id="org.nightlabs.jfire.trade.reverseProductType"/>
+	</authority-type>
+</jfire-security>

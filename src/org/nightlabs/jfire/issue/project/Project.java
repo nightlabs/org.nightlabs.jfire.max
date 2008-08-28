@@ -111,6 +111,7 @@ implements Serializable
 		this.projectID = projectID;
 
 		this.name = new ProjectName(this);
+		this.description = new ProjectDescription(this);
 		
 		subProjects = new HashSet<Project>();
 	}

@@ -43,6 +43,7 @@ import javax.jdo.listener.DeleteCallback;
 import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
+import org.nightlabs.jfire.issue.project.Project;
 import org.nightlabs.jfire.jbpm.graph.def.Statable;
 import org.nightlabs.jfire.jbpm.graph.def.StatableLocal;
 import org.nightlabs.jfire.jbpm.graph.def.State;
@@ -141,6 +142,17 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	 *		mapped-by="issue"
 	 */
 	private Set<IssueLink> issueLinks;
+	
+	/**
+	 * Instances of IssueLink that are representations of {@link ObjectID}s.
+	 *
+	 * @jdo.field
+	 *		persistence-modifier="persistent"
+	 *		collection-type="collection"
+	 *		element-type="Project"
+	 *		table="JFireIssueTracking_Issue_projects"
+	 */
+	private Set<Project> projects;
 
 	/**
 	 * Instances of {@link IssueFileAttachment}.
@@ -331,6 +343,8 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 		issueLinks = new HashSet<IssueLink>();
 		issueWorkTimeRanges = new ArrayList<IssueWorkTimeRange>();
 
+		projects = new HashSet<Project>();
+		
 		this.issueLocal = new IssueLocal(this);
 		this.structScope = Struct.DEFAULT_SCOPE;
 		this.structLocalScope = StructLocal.DEFAULT_SCOPE;
@@ -733,6 +747,14 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 			pm.deletePersistent(state);
 	}
 
+	public boolean addProject(Project project) {
+		return this.projects.add(project);
+	}
+	
+	public Collection<Project> getProjects() {
+		return Collections.unmodifiableCollection(projects);
+	}
+	
 	public boolean addIssueFileAttachment(IssueFileAttachment issueFileAttachment) {
 		return this.issueFileAttachments.add(issueFileAttachment);
 	}

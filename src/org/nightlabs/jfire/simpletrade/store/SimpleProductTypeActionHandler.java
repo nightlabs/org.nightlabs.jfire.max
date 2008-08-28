@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 
 import javax.jdo.FetchPlan;
 import javax.jdo.JDOHelper;
@@ -17,7 +16,6 @@ import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.accounting.Price;
 import org.nightlabs.jfire.accounting.TariffMapping;
 import org.nightlabs.jfire.accounting.id.TariffID;
-import org.nightlabs.jfire.security.AuthorityType;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.security.id.AuthorityTypeID;
 import org.nightlabs.jfire.simpletrade.SimpleTradeManager;
@@ -146,23 +144,23 @@ public class SimpleProductTypeActionHandler
 		return AUTHORITY_TYPE_ID;
 	}
 
-	@Override
-	protected AuthorityType createAuthorityType(AuthorityTypeID authorityTypeID, ProductType rootProductType) {
-		PersistenceManager pm = getPersistenceManager();
-		AuthorityType authorityType = new AuthorityType(authorityTypeID);
-
-		authorityType.getName().setText(Locale.ENGLISH.getLanguage(), "Simple product types");
-		authorityType.getDescription().setText(Locale.ENGLISH.getLanguage(), "Authorities of this type control the access rights for simple product types.");
-
-		authorityType.getName().setText(Locale.GERMAN.getLanguage(), "Einfache Produkttypen");
-		authorityType.getDescription().setText(Locale.GERMAN.getLanguage(), "Vollmachten dieses Typs kontrollieren den Zugriff auf einfache Produkttypen.");
-
-		// TODO configure access rights completely - implement manual checking where necessary!
-//		authorityType.addRoleGroup((RoleGroup) pm.getObjectById(RoleConstants.seeProductType));
-//		authorityType.addRoleGroup((RoleGroup) pm.getObjectById(RoleConstants.sellProductType));
-//		authorityType.addRoleGroup((RoleGroup) pm.getObjectById(RoleConstants.reverseProductType));
-//		authorityType.addRoleGroup((RoleGroup) pm.getObjectById(RoleConstants.editProductType));
-		return authorityType;
-	}
+//	@Override
+//	protected AuthorityType createAuthorityType(AuthorityTypeID authorityTypeID, ProductType rootProductType) {
+//		PersistenceManager pm = getPersistenceManager();
+//		AuthorityType authorityType = new AuthorityType(authorityTypeID);
+//
+//		authorityType.getName().setText(Locale.ENGLISH.getLanguage(), "Simple product types");
+//		authorityType.getDescription().setText(Locale.ENGLISH.getLanguage(), "Authorities of this type control the access rights for simple product types.");
+//
+//		authorityType.getName().setText(Locale.GERMAN.getLanguage(), "Einfache Produkttypen");
+//		authorityType.getDescription().setText(Locale.GERMAN.getLanguage(), "Vollmachten dieses Typs kontrollieren den Zugriff auf einfache Produkttypen.");
+//
+//		// TODO configure access rights completely - implement manual checking where necessary!
+////		authorityType.addRoleGroup((RoleGroup) pm.getObjectById(RoleConstants.seeProductType));
+////		authorityType.addRoleGroup((RoleGroup) pm.getObjectById(RoleConstants.sellProductType));
+////		authorityType.addRoleGroup((RoleGroup) pm.getObjectById(RoleConstants.reverseProductType));
+////		authorityType.addRoleGroup((RoleGroup) pm.getObjectById(RoleConstants.editProductType));
+//		return authorityType;
+//	}
 
 }

@@ -23,6 +23,8 @@ public class RoleConstants {
 
 	public static final RoleID pay = RoleID.create("org.nightlabs.jfire.accounting.pay");
 
+	public static final RoleID queryPriceConfigurations = RoleID.create("org.nightlabs.jfire.accounting.queryPriceConfigurations");
+
 	public static final RoleID editPriceConfiguration = RoleID.create("org.nightlabs.jfire.accounting.editPriceConfiguration");
 
 	public static final RoleID manualMoneyTransfer = RoleID.create("org.nightlabs.jfire.accounting.manualMoneyTransfer");

@@ -1776,18 +1776,17 @@ implements SessionBean
 		}
 	}
 
-	/**
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="org.nightlabs.jfire.store.seeProductType"
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 */
-	@SuppressWarnings("unchecked")
-	public Set<ProductTypeID> getProductTypes(
-			QueryCollection<? extends AbstractProductTypeQuery> productTypeQueries)
-	{
-		return getProductTypeIDs(productTypeQueries);
-	}
+//	/**
+//	 *
+//	 * @ejb.interface-method
+//	 * @ejb.permission role-name="org.nightlabs.jfire.store.seeProductType"
+//	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+//	 */
+//	@SuppressWarnings("unchecked")
+//	public Set<ProductTypeID> getProductTypes(QueryCollection<? extends AbstractProductTypeQuery> productTypeQueries)
+//	{
+//		return getProductTypeIDs(productTypeQueries);
+//	}
 
 //	/**
 //	 *

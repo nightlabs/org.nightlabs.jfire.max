@@ -125,6 +125,18 @@
 		<role id="org.nightlabs.jfire.accounting.editPriceConfiguration"/>
 	</role-group>
 
+	<role-group id="org.nightlabs.jfire.accounting.queryPriceConfigurations">
+		<name>Query price configurations</name>
+		<name language="de">Preiskonfigurationen abfragen</name>
+		<description>
+			Query price configurations. This is necessary to configure a product type, namely for assigning a price configuration.
+		</description>
+		<description language="de">
+			Preiskonfigurationen abfragen. Dies ist notwendig für die Konfiguration eines Produkttypen, nämlich der Zuweisung einer Preiskonfiguration.
+		</description>
+		<role id="org.nightlabs.jfire.accounting.queryPriceConfigurations"/>
+	</role-group>
+
 	<role-group id="org.nightlabs.jfire.accounting.editPriceFragmentType">
 		<name>Edit price fragment type</name>
 		<name language="de">Preisfragmenttypen bearbeiten</name>

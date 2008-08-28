@@ -568,7 +568,7 @@ public abstract class ProductTypeActionHandler
 			else {
 				if (organisationID2partnerNestedProductTypes == null)
 					organisationID2partnerNestedProductTypes = new HashMap<String, List<NestedProductTypeLocal>>();
-				
+
 				// nested productType is coming from a remote organisation and must be acquired from there
 				// this means: an Offer must be created (or a previously created one used) and an Article be added
 				// we group them in order to make it more efficient
@@ -996,22 +996,22 @@ public abstract class ProductTypeActionHandler
 		try {
 			authorityType = (AuthorityType) pm.getObjectById(authorityTypeID);
 		} catch (JDOObjectNotFoundException x) {
-			authorityType = pm.makePersistent(createAuthorityType(authorityTypeID, rootProductType));
+			throw new IllegalStateException("The AuthorityType does not exist! Declare it in your jfire-security.xml! " + authorityTypeID);
 		}
 		return authorityType;
 	}
 
-	/**
-	 * Create the AuthorityType defined by the given <code>authorityTypeID</code>. This is usually done during
-	 * datastore initialisation. You should populate the role groups by calling
-	 * {@link AuthorityType#addRoleGroup(org.nightlabs.jfire.security.RoleGroup)}.
-	 *
-	 * @param authorityTypeID
-	 * @param rootProductType
-	 * @return the new <code>AuthorityType</code>
-	 * @deprecated AuthorityTypes should be declared in the jfire-security.xml and not here anymore! See 
-	 */
-	protected AuthorityType createAuthorityType(AuthorityTypeID authorityTypeID, ProductType rootProductType) { throw new UnsupportedOperationException("Declare your AuthorityType in the jfire-security.xml!"); }
+//	/**
+//	 * Create the AuthorityType defined by the given <code>authorityTypeID</code>. This is usually done during
+//	 * datastore initialisation. You should populate the role groups by calling
+//	 * {@link AuthorityType#addRoleGroup(org.nightlabs.jfire.security.RoleGroup)}.
+//	 *
+//	 * @param authorityTypeID
+//	 * @param rootProductType
+//	 * @return the new <code>AuthorityType</code>
+//	 * @deprecated AuthorityTypes should be declared in the jfire-security.xml and not here anymore! See
+//	 */
+//	protected AuthorityType createAuthorityType(AuthorityTypeID authorityTypeID, ProductType rootProductType) { throw new UnsupportedOperationException("Declare your AuthorityType in the jfire-security.xml!"); }
 
 	public abstract AuthorityTypeID getAuthorityTypeID(ProductType rootProductType);
 

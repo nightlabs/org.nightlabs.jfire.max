@@ -8,6 +8,8 @@ import org.nightlabs.annotation.Implement;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.base.jdo.IJDOObjectDAO;
 import org.nightlabs.jfire.security.SecurityReflector;
+import org.nightlabs.jfire.store.StoreManager;
+import org.nightlabs.jfire.store.StoreManagerUtil;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.voucher.VoucherManager;
 import org.nightlabs.jfire.voucher.VoucherManagerUtil;
@@ -38,13 +40,16 @@ implements IJDOObjectDAO<VoucherType>
 	{
 		monitor.beginTask("Loading VoucherTypes", 1);
 		try {
-			VoucherManager vm = voucherManager;
-			if (vm == null)
-				vm = VoucherManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
-
-			return vm.getVoucherTypes(voucherTypeIDs, fetchGroups, maxFetchDepth);
+//			VoucherManager vm = voucherManager;
+//			if (vm == null)
+//				vm = VoucherManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+//
+//			return vm.getVoucherTypes(voucherTypeIDs, fetchGroups, maxFetchDepth);
+			StoreManager sm = StoreManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			return sm.getProductTypes(voucherTypeIDs, fetchGroups, maxFetchDepth);
 		} finally {
 			monitor.worked(1);
+			monitor.done();
 		}
 	}
 

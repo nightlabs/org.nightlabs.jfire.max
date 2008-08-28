@@ -29,7 +29,6 @@ import javax.naming.NamingException;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.ModuleException;
-import org.nightlabs.annotation.Implement;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
@@ -57,6 +56,8 @@ import org.nightlabs.jfire.scripting.Script;
 import org.nightlabs.jfire.scripting.ScriptRegistry;
 import org.nightlabs.jfire.scripting.ScriptRegistryItem;
 import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
+import org.nightlabs.jfire.security.Authority;
+import org.nightlabs.jfire.security.ResolveSecuringAuthorityStrategy;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.servermanager.JFireServerManager;
 import org.nightlabs.jfire.store.CannotConfirmProductTypeException;
@@ -64,6 +65,7 @@ import org.nightlabs.jfire.store.DeliveryNote;
 import org.nightlabs.jfire.store.NestedProductTypeLocal;
 import org.nightlabs.jfire.store.Product;
 import org.nightlabs.jfire.store.ProductType;
+import org.nightlabs.jfire.store.RoleConstants;
 import org.nightlabs.jfire.store.Store;
 import org.nightlabs.jfire.store.deliver.Delivery;
 import org.nightlabs.jfire.store.deliver.DeliveryConfiguration;
@@ -134,7 +136,6 @@ implements SessionBean
 	throws EJBException, RemoteException {
 		super.setSessionContext(sessionContext);
 	}
-
 	@Override
 	public void unsetSessionContext() {
 		super.unsetSessionContext();
@@ -148,13 +149,12 @@ implements SessionBean
 	}
 
 	/**
-	 * @see javax.ejb.SessionBean#ejbRemove()
+	 * {@inheritDoc}
 	 *
 	 * @ejb.permission unchecked="true"
 	 */
-	@Implement
-	public void ejbRemove() throws EJBException, RemoteException {
-	}
+	@Override
+	public void ejbRemove() throws EJBException, RemoteException { }
 
 	/**
 	 * @ejb.interface-method
@@ -208,12 +208,12 @@ implements SessionBean
 					Organisation.DEV_ORGANISATION_ID,
 					VoucherDeliveryNoteActionHandler.class.getName());
 			pm.makePersistent(voucherDeliveryNoteActionHandler);
-			
+
 			// Register the RecurringTradeProductTypeActionHandler for VoucherTypes
 			VoucherRecurringTradeProductTypeActionHandler vrtptah = new VoucherRecurringTradeProductTypeActionHandler(
 					Organisation.DEV_ORGANISATION_ID, VoucherRecurringTradeProductTypeActionHandler.class.getName(), VoucherType.class);
 			vrtptah = pm.makePersistent(vrtptah);
-			
+
 
 //			DeliveryConfiguration deliveryConfiguration = checkDeliveryConfiguration(pm);
 
@@ -373,10 +373,7 @@ implements SessionBean
 
 				pm.makePersistent(deliveryConfiguration);
 			} catch (JDOObjectNotFoundException x) {
-				logger
-				.warn(
-						"Could not populate default DeliveryConfiguration for JFireVoucher with ModeOfDelivery s!",
-						x);
+				logger.warn("Could not populate default DeliveryConfiguration for JFireVoucher with ModeOfDelivery s!", x);
 			}
 		}
 		return deliveryConfiguration;
@@ -385,53 +382,24 @@ implements SessionBean
 	/**
 	 * @ejb.interface-method
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 * @ejb.permission role-name="org.nightlabs.jfire.voucher.VoucherManager.VoucherType.read"
+	 * @ejb.permission role-name="org.nightlabs.jfire.store.seeProductType"
 	 */
 	@SuppressWarnings("unchecked")
 	public Set<ProductTypeID> getChildVoucherTypeIDs(
 			ProductTypeID parentVoucherTypeID) {
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			return NLJDOHelper.getObjectIDSet(VoucherType.getChildVoucherTypes(pm,
-					parentVoucherTypeID));
-		} finally {
-			pm.close();
-		}
-	}
+			Collection<VoucherType> voucherTypes = VoucherType.getChildVoucherTypes(pm, parentVoucherTypeID);
 
-// There is no need for this method since there is getVoucherTypes. Additionally, we want to get rid of these specific methods anyway
-// and instead use the basic-ProductType-methods. So please don't add even more of these deprecated methods ;-) Marco.
-//	/**
-//	 * @ejb.interface-method
-//	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-//	 * @ejb.permission role-name="org.nightlabs.jfire.voucher.VoucherManager.VoucherType.read"
-//	 */
-//	public VoucherType getVoucherType(
-//			ProductTypeID voucherTypeID, String[] fetchGroups,
-//			int maxFetchDepth) {
-//		PersistenceManager pm = getPersistenceManager();
-//		try {
-//			List<VoucherType> spts = getVoucherTypes(CollectionUtil.array2HashSet(new ProductTypeID[] {voucherTypeID}), fetchGroups, maxFetchDepth);
-//			if (spts.size() > 0)
-//				return spts.get(0);
-//			return null;
-//		} finally {
-//			pm.close();
-//		}
-//	}
+			voucherTypes = Authority.filterIndirectlySecuredObjects(
+					pm,
+					voucherTypes,
+					getPrincipal(),
+					RoleConstants.seeProductType,
+					ResolveSecuringAuthorityStrategy.allow
+			);
 
-	/**
-	 * @ejb.interface-method
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 * @ejb.permission role-name="org.nightlabs.jfire.voucher.VoucherManager.VoucherType.read"
-	 */
-	@SuppressWarnings("unchecked")
-	public List<VoucherType> getVoucherTypes(Collection<ProductTypeID> voucherTypeIDs, String[] fetchGroups, int maxFetchDepth)
-	{
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			return NLJDOHelper.getDetachedObjectList(pm, voucherTypeIDs,
-					VoucherType.class, fetchGroups, maxFetchDepth);
+			return NLJDOHelper.getObjectIDSet(voucherTypes);
 		} finally {
 			pm.close();
 		}
@@ -440,7 +408,7 @@ implements SessionBean
 	/**
 	 * @ejb.interface-method
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.queryPriceConfigurations"
 	 */
 	@SuppressWarnings("unchecked")
 	public Set<PriceConfigID> getVoucherPriceConfigIDs()
@@ -458,7 +426,7 @@ implements SessionBean
 	/**
 	 * @ejb.interface-method
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.queryPriceConfigurations"
 	 */
 	@SuppressWarnings("unchecked")
 	public List<VoucherPriceConfig> getVoucherPriceConfigs(Collection<PriceConfigID> voucherPriceConfigIDs, String[] fetchGroups, int maxFetchDepth)
@@ -474,7 +442,7 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.store.editUnconfirmedProductType"
 	 * @ejb.transaction type="Required"
 	 */
 	public VoucherType storeVoucherType(VoucherType voucherType, boolean get, String[] fetchGroups, int maxFetchDepth)
@@ -530,6 +498,17 @@ implements SessionBean
 				voucherType = (VoucherType) pm.getObjectById(vtid);
 			}
 
+			if (voucherType.isConfirmed()) {
+				Authority.resolveSecuringAuthority(
+						pm,
+						voucherType.getProductTypeLocal(),
+						ResolveSecuringAuthorityStrategy.organisation
+				).assertContainsRoleRef(
+						getPrincipal(),
+						RoleConstants.editConfirmedProductType
+				);
+			}
+
 			// take care about the inheritance
 			voucherType.applyInheritance();
 
@@ -545,12 +524,12 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.trade.editOffer"
 	 * @ejb.transaction type="Required"
 	 */
 	public Collection<? extends Article> createArticles(
-			SegmentID segmentID, 
-			OfferID offerID, 
+			SegmentID segmentID,
+			OfferID offerID,
 			Collection<ProductTypeID> productTypeIDs,
 			String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException {
@@ -589,9 +568,20 @@ implements SessionBean
 
 			Collection<ProductType> productTypes = new LinkedList<ProductType>();
 			for (ProductTypeID productTypeID : productTypeIDs) {
-				productTypes.add((ProductType) pm.getObjectById(productTypeID));
+				ProductType productType = (ProductType) pm.getObjectById(productTypeID);
+
+				Authority.resolveSecuringAuthority(
+						pm,
+						productType.getProductTypeLocal(),
+						ResolveSecuringAuthorityStrategy.organisation // must be "organisation", because the role "sellProductType" is not checked on EJB method level!
+				).assertContainsRoleRef(
+						getPrincipal(),
+						org.nightlabs.jfire.trade.RoleConstants.sellProductType
+				);
+
+				productTypes.add(productType);
 			}
-			
+
 			Collection<? extends Article> articles = trader.createArticles(
 					user, offer, segment, productTypes, new ArticleCreator(null));
 
@@ -616,7 +606,9 @@ implements SessionBean
 	 */
 	protected Collection<? extends Article> createArticles(PersistenceManager pm,
 			SegmentID segmentID, OfferID offerID, ProductTypeID productTypeID,
-			int quantity) throws ModuleException {
+			int quantity
+	) throws ModuleException
+	{
 		Trader trader = Trader.getTrader(pm);
 		Store store = Store.getStore(pm);
 		Segment segment = (Segment) pm.getObjectById(segmentID);
@@ -632,6 +624,15 @@ implements SessionBean
 					+ "\", but must be \"" + VoucherType.class.getName() + "\"!");
 
 		VoucherType voucherType = (VoucherType) pt;
+
+		Authority.resolveSecuringAuthority(
+				pm,
+				voucherType.getProductTypeLocal(),
+				ResolveSecuringAuthorityStrategy.organisation // must be "organisation", because the role "sellProductType" is not checked on EJB method level!
+		).assertContainsRoleRef(
+				getPrincipal(),
+				org.nightlabs.jfire.trade.RoleConstants.sellProductType
+		);
 
 		// find an Offer within the Order which is not finalized - or create one
 		Offer offer;
@@ -673,12 +674,14 @@ implements SessionBean
 	 *           the <tt>Product</tt>s cannot be created (because of a limit).
 	 *
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.trade.editOffer"
 	 * @ejb.transaction type="Required"
 	 */
 	public Collection<? extends Article> createArticles(SegmentID segmentID,
 			OfferID offerID, ProductTypeID productTypeID, int quantity,
-			String[] fetchGroups, int maxFetchDepth) throws ModuleException {
+			String[] fetchGroups, int maxFetchDepth
+	) throws ModuleException
+	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			Collection<? extends Article> articles = createArticles(
@@ -698,7 +701,7 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.queryLocalAccountantDelegates"
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
 	public Set<LocalAccountantDelegateID> getVoucherLocalAccountantDelegateIDs() {
@@ -715,7 +718,7 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.queryLocalAccountantDelegates"
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
 	@SuppressWarnings("unchecked")
@@ -754,7 +757,9 @@ implements SessionBean
 	@SuppressWarnings("unchecked")
 	public List<VoucherKey> getVoucherKeys(
 			Collection<VoucherKeyID> voucherKeyIDs, String[] fetchGroups,
-			int maxFetchDepth) {
+			int maxFetchDepth
+	)
+	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			return NLJDOHelper.getDetachedObjectList(pm, voucherKeyIDs,
@@ -780,10 +785,10 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public Map<ProductID, Map<ScriptRegistryItemID, Object>> getVoucherScriptingResults(
-			Collection<ProductID> voucherIDs, boolean allScripts)
-			throws ModuleException {
-		return getVoucherScriptingResults((PersistenceManager) null, voucherIDs,
-				allScripts);
+			Collection<ProductID> voucherIDs, boolean allScripts
+	) throws ModuleException
+	{
+		return getVoucherScriptingResults((PersistenceManager) null, voucherIDs, allScripts);
 	}
 
 	// TODO we need to pass ArticleIDs instead of ProductIDs, because products can be resold
@@ -791,8 +796,9 @@ implements SessionBean
 	// the correct data.
 	protected Map<ProductID, Map<ScriptRegistryItemID, Object>> getVoucherScriptingResults(
 			PersistenceManager pm, Collection<ProductID> voucherIDs,
-			boolean allScripts) throws ModuleException
-			{
+			boolean allScripts
+	) throws ModuleException
+	{
 		allScripts = true; // TODO remove this line!
 		// TODO obtain the scripts via the voucher-layout-file,
 		try {
@@ -857,13 +863,8 @@ implements SessionBean
 						throw new IllegalStateException("The voucherKey does not have an ID assigned! " + voucherKey.getVoucherKey());
 
 					Map<String, Object> paramValues = new HashMap<String, Object>();
-					paramValues.put(
-							VoucherScriptingConstants.PARAMETER_ID_PERSISTENCE_MANAGER, pm);
-					// paramValues.put(VoucherScriptingConstants.PARAMETER_ID_VOUCHER_ID,
-					// voucherID);
-					paramValues.put(
-							VoucherScriptingConstants.PARAMETER_ID_VOUCHER_KEY_ID,
-							voucherKeyID);
+					paramValues.put(VoucherScriptingConstants.PARAMETER_ID_PERSISTENCE_MANAGER, pm);
+					paramValues.put(VoucherScriptingConstants.PARAMETER_ID_VOUCHER_KEY_ID, voucherKeyID);
 					res.put(voucherID, scriptRegistry.execute(scripts, paramValues));
 				}
 				return res;
@@ -878,7 +879,7 @@ implements SessionBean
 		} catch (Exception x) {
 			throw new ModuleException(x);
 		}
-			}
+	}
 
 	private static class PreviewParameterSetExtension {
 		public VoucherType voucherType;
@@ -951,8 +952,10 @@ implements SessionBean
 	 * @throws CannotConfirmProductTypeException
 	 */
 	private PreviewParameterSetExtension ensureFinishedConfiguration(
-			PersistenceManager pm, User user, PreviewParameterSet previewParameterSet)
-	throws ModuleException, NamingException, IOException, CannotConfirmProductTypeException {
+			PersistenceManager pm, User user, PreviewParameterSet previewParameterSet
+	)
+	throws ModuleException, NamingException, IOException, CannotConfirmProductTypeException
+	{
 		if (user == null)
 			throw new IllegalArgumentException("user must not be null!");
 
@@ -980,64 +983,58 @@ implements SessionBean
 		.getObjectById(previewParameterSet.getVoucherTypeID());
 
 		// Currency
-		Extent extent = pm.getExtent(Currency.class);
+		Extent<Currency> extent = pm.getExtent(Currency.class);
 		if (previewParameterSet.getCurrencyID() == null) {
 			Iterator<Currency> it = extent.iterator();
 			if (it.hasNext())
 				previewParameterSetExtension.currency = it.next();
 			else {
-				previewParameterSetExtension.currency = new Currency("EUR", "EUR", 2);
-				pm.makePersistent(previewParameterSetExtension.currency);
+				previewParameterSetExtension.currency = pm.makePersistent(new Currency("EUR", "EUR", 2));
 			}
-			previewParameterSet.setCurrencyID((CurrencyID) JDOHelper
-					.getObjectId(previewParameterSetExtension.currency));
+			previewParameterSet.setCurrencyID((CurrencyID) JDOHelper.getObjectId(previewParameterSetExtension.currency));
 		} else
-			previewParameterSetExtension.currency = (Currency) pm
-			.getObjectById(previewParameterSet.getCurrencyID());
+			previewParameterSetExtension.currency = (Currency) pm.getObjectById(previewParameterSet.getCurrencyID());
 
 		if (!previewParameterSetExtension.voucherType.isConfirmed()) {
 			if (previewParameterSetExtension.voucherType.getDeliveryConfiguration() == null) {
 				pm.getExtent(DeliveryConfiguration.class);
-				previewParameterSetExtension.voucherType
-				.setDeliveryConfiguration((DeliveryConfiguration) pm
-						.getObjectById(DeliveryConfigurationID.create(organisationID,
-								JFireVoucherEAR.DEFAULT_DELIVERY_CONFIGURATION_ID)));
+				previewParameterSetExtension.voucherType.setDeliveryConfiguration(
+						(DeliveryConfiguration) pm.getObjectById(
+								DeliveryConfigurationID.create(organisationID, JFireVoucherEAR.DEFAULT_DELIVERY_CONFIGURATION_ID)
+						)
+				);
 			}
 
 			boolean calculatePrices = false;
 			if (previewParameterSetExtension.voucherType.getPackagePriceConfig() == null) {
 				calculatePrices = true;
 				VoucherPriceConfig packagePriceConfig = new VoucherPriceConfig(
-						IDGenerator.getOrganisationID(), PriceConfig.createPriceConfigID()); // TODO do we really need to consume IDs here - hmmm... shouldn't be such a big problem
-				pm.makePersistent(packagePriceConfig);
-				previewParameterSetExtension.voucherType
-				.setPackagePriceConfig(packagePriceConfig);
+						IDGenerator.getOrganisationID(), PriceConfig.createPriceConfigID() // TODO do we really need to consume IDs here - hmmm... shouldn't be such a big problem
+				);
+				packagePriceConfig = pm.makePersistent(packagePriceConfig);
+				previewParameterSetExtension.voucherType.setPackagePriceConfig(packagePriceConfig);
 			}
 
 			if (previewParameterSetExtension.voucherType.getInnerPriceConfig() == null) {
 				// Ignore as vouchers don't have innerPriceConfig
 			}
 
-			VoucherPriceConfig voucherPriceConfig = (VoucherPriceConfig) previewParameterSetExtension.voucherType
-			.getPackagePriceConfig();
+			VoucherPriceConfig voucherPriceConfig = (VoucherPriceConfig) previewParameterSetExtension.voucherType.getPackagePriceConfig();
 
-			if (voucherPriceConfig.getCurrency(
-					previewParameterSet.getCurrencyID().currencyID, false) == null) {
+			if (voucherPriceConfig.getCurrency(previewParameterSet.getCurrencyID().currencyID, false) == null) {
 				calculatePrices = true;
 				voucherPriceConfig.addCurrency(previewParameterSetExtension.currency);
 			}
 
 			if (calculatePrices) {
 				long defaultValue = 5000;
-				voucherPriceConfig.setPrice(previewParameterSetExtension.currency,
-						defaultValue);
+				voucherPriceConfig.setPrice(previewParameterSetExtension.currency, defaultValue);
 				// the PriceCalculator may do some detaching stuff
 				pm.getFetchPlan().setMaxFetchDepth(1);
 				pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
 			}
 
-			store.setProductTypeStatus_confirmed(user,
-					previewParameterSetExtension.voucherType);
+			store.setProductTypeStatus_confirmed(user, previewParameterSetExtension.voucherType);
 		} // if (!previewParameterSetExtension.voucherType.isConfirmed())
 
 		return previewParameterSetExtension;
@@ -1048,8 +1045,8 @@ implements SessionBean
 	 * @ejb.transaction type="RequiresNew"
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public Map<ProductID, Map<ScriptRegistryItemID, Object>> getPreviewVoucherData(
-			PreviewParameterSet previewParameterSet) throws ModuleException {
+	public Map<ProductID, Map<ScriptRegistryItemID, Object>> getPreviewVoucherData(PreviewParameterSet previewParameterSet) throws ModuleException
+	{
 		try {
 			PersistenceManager pm = getPersistenceManager();
 			try {
@@ -1236,39 +1233,4 @@ implements SessionBean
 		}
 	}
 
-//	/**
-//	* This method checks, whether all specified <code>Article</code>s have a VoucherLayout assigned and thus can be printed.
-//	*
-//	* @ejb.interface-method
-//	* @ejb.transaction type="Required"
-//	* @ejb.permission role-name="_Guest_"
-//	*/
-//	public Map<ArticleID, PrintabilityStatus> getArticleID2PrintabilityStatusMap(Set<ArticleID> articleIDs)
-//	{
-//	if (articleIDs == null)
-//	throw new IllegalArgumentException("articleIDs must not be null!");
-
-//	PersistenceManager pm = getPersistenceManager();
-//	try {
-//	pm.getExtent(Article.class);
-//	Map<ArticleID, PrintabilityStatus> res = new HashMap<ArticleID, PrintabilityStatus>(articleIDs.size());
-
-//	for (ArticleID articleID : articleIDs) {
-//	Article article = (Article) pm.getObjectById(articleID);
-//	if (!(article.getProductType() instanceof VoucherType))
-//	res.put(articleID, PrintabilityStatus.NOT_A_VOUCHER_TYPE);
-//	else {
-//	VoucherType voucherType = (VoucherType) article.getProductType();
-//	if (voucherType.getVoucherLayout() == null)
-//	res.put(articleID, PrintabilityStatus.MISSING_VOUCHER_LAYOUT);
-//	else
-//	res.put(articleID, PrintabilityStatus.OK);
-//	}
-//	} // for (ArticleID articleID : articleIDs) {
-
-//	return res;
-//	} finally {
-//	pm.close();
-//	}
-//	}
 }

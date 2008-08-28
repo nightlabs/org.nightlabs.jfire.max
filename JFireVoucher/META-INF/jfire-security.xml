@@ -4,6 +4,18 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="urn:jfire.org:jfire-security_1_0 https://www.jfire.org/schema/jfire-security_1_0.xsd "
 >
+	<authority-type id="org.nightlabs.jfire.voucher.store.VoucherType">
+		<name>Voucher types</name>
+		<name language="de">Gutscheintypen</name>
+		<description>
+			Authorities of this type control the access rights for voucher types.
+		</description>
+		<description language="de">
+			Vollmachten dieses Typs kontrollieren den Zugriff auf Gutscheintypen.
+		</description>
+	</authority-type>
+
+<!--
 	<role-group id="JFireVoucher.VoucherType.edit">
 		<name>Edit voucher types</name>
 		<name language="de">Gutscheintypen bearbeiten</name>
@@ -56,10 +68,6 @@
 	</role-group>
 
 	<role-group id="JFireVoucher.Admin">
-		<!-- This rolegroup is defined as "defaultgroup". This means, all roles that are not mentioned
-			in this file, but declared in ejb-jar.xml, will be registered within this rolegroup.
-		-->
-
 		<name>Administrate vouchers</name>
 		<name language="de">Gutscheine verwalten</name>
 		<description>
@@ -74,4 +82,5 @@
 		<include-role-group id="JFireVoucher.Voucher.reverse" />
 		<include-role-group id="JFireVoucher.VoucherType.edit" />
 	</role-group>
+-->
 </jfire-security>

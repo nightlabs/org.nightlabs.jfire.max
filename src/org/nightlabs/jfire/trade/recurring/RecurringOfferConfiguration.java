@@ -83,6 +83,8 @@ public class RecurringOfferConfiguration implements Serializable{
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
+	 * 
+	 * weather we book the invoice implicitly
 	 */
 	private boolean bookInvoice;
 
@@ -94,11 +96,17 @@ public class RecurringOfferConfiguration implements Serializable{
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
+	 * 
+	 * create a delivery note
 	 */
 	private boolean createDelivery;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
+	 * 
+	 * the Task timer used to define at what moment we call the EJB method 
+	 * to process the {@link RecurringOffer} , see {@link RecurringTrade.processRecurringOffer(RecurringOffer)} 
+	 *
 	 */
 	private Task creatorTask;
 

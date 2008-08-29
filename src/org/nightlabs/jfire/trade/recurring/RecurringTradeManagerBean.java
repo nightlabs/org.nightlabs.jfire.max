@@ -176,7 +176,7 @@ implements SessionBean
 	}
 
 	/**
-	 * this method is an EJB Timer Interface and will be called by the timer
+	 * this is the EJB interface called by the Task Time frame to process the Recurring
 	 *  
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="org.nightlabs.jfire.trade.recurring.processRecurringOfferTimed"

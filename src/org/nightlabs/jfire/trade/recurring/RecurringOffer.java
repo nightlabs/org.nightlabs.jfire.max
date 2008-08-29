@@ -33,6 +33,13 @@ import org.nightlabs.jfire.trade.Order;
  */
 public class RecurringOffer extends Offer {
 
+	
+	/**
+	 * the Problem key Constants to store the state of the Offer
+	 * see  {@link #ProblemKey} 
+	 * 
+	 */
+	
 	private static final long serialVersionUID = 1L;
 
 	public static final String FETCH_GROUP_RECURRING_OFFER_CONFIGURATION = "RecurringOffer.recurringOfferConfiguration";

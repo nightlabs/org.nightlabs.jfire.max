@@ -1,18 +1,11 @@
 package org.nightlabs.jfire.issue.project;
 
 import java.io.Serializable;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
-import javax.jdo.Query;
 
 import org.apache.log4j.Logger;
-import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jfire.issue.project.id.ProjectTypeID;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.util.Util;
@@ -57,6 +50,11 @@ implements Serializable
 	 * @jdo.field persistence-modifier="persistent" dependent="true" mapped-by="project"
 	 */
 	private ProjectTypeName name;
+	
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private ProjectTypeDescription description;
 
 	/**
 	 * @deprecated Constructor exists only for JDO! 
@@ -84,6 +82,15 @@ implements Serializable
 	public long getProjectTypeID() 
 	{
 		return projectTypeID;
+	}
+
+	
+	public ProjectTypeDescription getDescription() {
+		return description;
+	}
+
+	public void setDescription(ProjectTypeDescription description) {
+		this.description = description;
 	}
 
 	public ProjectTypeName getName()

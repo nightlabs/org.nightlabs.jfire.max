@@ -13,9 +13,9 @@ import javax.jdo.Query;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.jdo.ObjectID;
-import org.nightlabs.jfire.issue.IssueDescription;
 import org.nightlabs.jfire.issue.project.id.ProjectID;
 import org.nightlabs.jfire.organisation.Organisation;
+import org.nightlabs.jfire.security.User;
 import org.nightlabs.util.Util;
 
 /**
@@ -46,7 +46,7 @@ import org.nightlabs.util.Util;
  *				this.parentProject == null"
  **/
 public class Project
-implements Serializable 
+implements Serializable, Comparable<Project> 
 {
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger = Logger.getLogger(Project.class);
@@ -220,5 +220,10 @@ implements Serializable
 		return 
 		Util.hashCode(organisationID) ^
 		Util.hashCode(projectID);
+	}
+
+	@Override
+	public int compareTo(Project o) {
+		return this.name.getText().compareTo(o.getName().getText());
 	}
 }

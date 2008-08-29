@@ -82,6 +82,7 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="Issue.states" fields="states"
  * @jdo.fetch-group name="Issue.issueLocal" fields="issueLocal"
  * @jdo.fetch-group name="Issue.issueType" fields="issueType"
+ * @jdo.fetch-group name="Issue.projects" fields="projects"
  * @jdo.fetch-group name="Issue.comments" fields="comments"
  * @jdo.fetch-group name="Issue.issueLinks" fields="issueLinks"
  * @jdo.fetch-group name="Issue.propertySet" fields="propertySet"
@@ -112,6 +113,7 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	public static final String FETCH_GROUP_ISSUE_ASSIGNEE = "Issue.assignee";
 	public static final String FETCH_GROUP_ISSUE_WORK_TIME_RANGES = "Issue.issueWorkTimeRanges";
 	public static final String FETCH_GROUP_ISSUE_FILELIST = "Issue.issueFileAttachments";
+	public static final String FETCH_GROUP_ISSUE_PROJECTS = "Issue.projects";
 
 	public static final String FETCH_GROUP_PROPERTY_SET = "Issue.propertySet";
 

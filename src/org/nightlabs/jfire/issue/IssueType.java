@@ -55,7 +55,7 @@ import org.nightlabs.util.Util;
  * @jdo.query name="getAllIssueTypeIDs" query="SELECT JDOHelper.getObjectId(this)"
  */
 public class IssueType
-implements Serializable
+implements Serializable, Comparable<IssueType>
 {
 	private static final long serialVersionUID = 1L;
 	/**
@@ -270,5 +270,10 @@ implements Serializable
 	public int hashCode()
 	{
 		return (31 * Util.hashCode(organisationID)) + Util.hashCode(issueTypeID);
+	}
+
+	@Override
+	public int compareTo(IssueType o) {
+		return this.name.getText().compareTo(o.getName().getText());
 	}
 }

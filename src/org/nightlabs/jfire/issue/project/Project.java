@@ -15,7 +15,6 @@ import org.apache.log4j.Logger;
 import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jfire.issue.project.id.ProjectID;
 import org.nightlabs.jfire.organisation.Organisation;
-import org.nightlabs.jfire.security.User;
 import org.nightlabs.util.Util;
 
 /**
@@ -32,7 +31,6 @@ import org.nightlabs.util.Util;
  * @jdo.create-objectid-class
  *		field-order="organisationID, projectID"
  *
- * @jdo.fetch-group name="Project.issue" fields="issue"
  * @jdo.fetch-group name="Project.name" fields="name"
  * @jdo.fetch-group name="Project.description" fields="description"
  * @jdo.fetch-group name="Project.parentProject" fields="parentProject"
@@ -52,7 +50,6 @@ implements Serializable, Comparable<Project>
 	private static final Logger logger = Logger.getLogger(Project.class);
 
 	public static final String FETCH_GROUP_DESCRIPTION = "Project.description";
-	public static final String FETCH_GROUP_ISSUE = "Project.issue";
 	public static final String FETCH_GROUP_NAME = "Project.name";
 	public static final String FETCH_GROUP_PARENT_PROJECT = "Project.parentProject";
 	public static final String FETCH_GROUP_SUBPROJECTS = "Project.subProjects";
@@ -97,6 +94,11 @@ implements Serializable, Comparable<Project>
 	 *		mapped-by="parentProject"
 	 */
 	private Collection<Project> subProjects;
+	
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private ProjectType projectType;
 	
 	/**
 	 * @deprecated Constructor exists only for JDO! 
@@ -151,6 +153,14 @@ implements Serializable, Comparable<Project>
 		return parentProject;
 	}
 	
+	public ProjectType getProjectType() {
+		return projectType;
+	}
+
+	public void setProjectType(ProjectType projectType) {
+		this.projectType = projectType;
+	}
+
 	public Collection<Project> getSubProjects() 
 	{
 		return Collections.unmodifiableCollection(subProjects);

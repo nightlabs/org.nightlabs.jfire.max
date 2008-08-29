@@ -59,23 +59,6 @@ implements Serializable
 	private ProjectTypeName name;
 
 	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 */
-	private ProjectType parentProjectType;
-	
-	/**
-	 * Instances of IssueLink that are representations of {@link ObjectID}s.
-	 *
-	 * @jdo.field
-	 *		persistence-modifier="persistent"
-	 *		collection-type="collection"
-	 *		element-type="ProjectType"
-	 *		dependent-element="true"
-	 *		mapped-by="parentProjectType"
-	 */
-	private Collection<ProjectType> subProjectTypes;
-	
-	/**
 	 * @deprecated Constructor exists only for JDO! 
 	 */
 	@Deprecated
@@ -88,8 +71,6 @@ implements Serializable
 		this.projectTypeID = projectTypeID;
 
 		this.name = new ProjectTypeName(this);
-		
-		subProjectTypes = new HashSet<ProjectType>();
 	}
 
 	/**
@@ -119,38 +100,6 @@ implements Serializable
 		return (ProjectTypeID)JDOHelper.getObjectId(this);
 	}
 	
-	public void setParentProjectType(ProjectType project) {
-		this.parentProjectType = project;
-	}
-	
-	public ProjectType getParentProjectType() {
-		return parentProjectType;
-	}
-	
-	public Collection<ProjectType> getSubProjectTypes() 
-	{
-		return Collections.unmodifiableCollection(subProjectTypes);
-	}
-	
-	public void addSubProjectType(ProjectType project) 
-	{
-		subProjectTypes.add(project);
-	}
-	
-	public void removeSubProjectType(ProjectType project) 
-	{
-		if (project == null)
-			throw new IllegalArgumentException("project must not be null!");
-		subProjectTypes.remove(project);
-	}
-	
-	public static Collection<ProjectType> getRootProjectTypes(PersistenceManager pm, String organisationID)
-	{
-		Query q = pm.newNamedQuery(ProjectType.class, "getRootProjectTypes");
-		Map<String, Object> params = new HashMap<String, Object>(1);
-		params.put("organisationID", organisationID);
-		return (Collection<ProjectType>) q.executeWithMap(params);
-	}
 	/**
 	 * Internal method.
 	 * @return The PersistenceManager associated with this object. 

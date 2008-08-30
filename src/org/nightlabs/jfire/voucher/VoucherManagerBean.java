@@ -736,8 +736,14 @@ implements SessionBean
 	}
 
 	/**
+	 * Get the {@link VoucherKeyID} for a given voucher-key-{@link String}.
+	 * <p>
+	 * Since this method is used when redeeming a voucher, this method can only be called by users
+	 * having the right 'org.nightlabs.jfire.voucher.redeemVoucher' granted.
+	 * </p>
+	 *
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.voucher.redeemVoucher"
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
 	public VoucherKeyID getVoucherKeyID(String voucherKeyString) {
@@ -750,8 +756,14 @@ implements SessionBean
 	}
 
 	/**
+	 * Get {@link VoucherKey}s for the given object-ids.
+	 * <p>
+	 * Since this method is used when redeeming a voucher, this method can only be called by users
+	 * having the right 'org.nightlabs.jfire.voucher.redeemVoucher' granted.
+	 * </p>
+	 *
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.voucher.redeemVoucher"
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
 	@SuppressWarnings("unchecked")
@@ -762,8 +774,7 @@ implements SessionBean
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			return NLJDOHelper.getDetachedObjectList(pm, voucherKeyIDs,
-					VoucherKey.class, fetchGroups, maxFetchDepth);
+			return NLJDOHelper.getDetachedObjectList(pm, voucherKeyIDs, VoucherKey.class, fetchGroups, maxFetchDepth);
 		} finally {
 			pm.close();
 		}
@@ -823,9 +834,9 @@ implements SessionBean
 								+ "PARAMETERS java.lang.String pScriptRegistryItemType");
 
 						// scripts.addAll((Collection)q.execute(VoucherScriptingConstants.SCRIPT_REGISTRY_ITEM_TYPE_VOUCHER));
-						scripts
-						.addAll((Collection<? extends Script>) q
-								.execute(VoucherScriptingConstants.SCRIPT_REGISTRY_ITEM_TYPE_TRADE_VOUCHER));
+						scripts.addAll(
+								(Collection<? extends Script>) q.execute(VoucherScriptingConstants.SCRIPT_REGISTRY_ITEM_TYPE_TRADE_VOUCHER)
+						);
 					} else {
 						// TODO obtain the scripts via the voucher-layout-file,
 						// scriptRegistryItemIDs from scriptDrawComponents as well as from

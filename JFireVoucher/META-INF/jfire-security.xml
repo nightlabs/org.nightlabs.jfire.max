@@ -13,6 +13,20 @@
 		<description language="de">
 			Vollmachten dieses Typs kontrollieren den Zugriff auf Gutscheintypen.
 		</description>
+
+		<role-group id="org.nightlabs.jfire.store.seeProductType"/>
+		<role-group id="org.nightlabs.jfire.store.editUnconfirmedProductType"/>
+		<role-group id="org.nightlabs.jfire.store.editConfirmedProductType"/>
+		<role-group id="org.nightlabs.jfire.trade.sellProductType"/>
+		<role-group id="org.nightlabs.jfire.trade.reverseProductType"/>
+
+		<role-group id="org.nightlabs.jfire.voucher.redeemVoucher">
+			<name>Redeem vouchers</name>
+			<name language="de">Gutscheine einlösen</name>
+			<description>Redeem vouchers - i.e. use them for payment.</description>
+			<description language="de">Gutscheine einlösen - d.h. sie zur Zahlung verwenden.</description>
+			<role id="org.nightlabs.jfire.voucher.redeemVoucher"/>
+		</role-group>
 	</authority-type>
 
 <!--

@@ -47,7 +47,7 @@ implements Serializable
 	private long projectTypeID;
 
 	/**
-	 * @jdo.field persistence-modifier="persistent" dependent="true" mapped-by="project"
+	 * @jdo.field persistence-modifier="persistent" dependent="true" mapped-by="projectType"
 	 */
 	private ProjectTypeName name;
 	

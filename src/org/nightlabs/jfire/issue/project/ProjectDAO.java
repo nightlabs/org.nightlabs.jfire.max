@@ -10,6 +10,7 @@ import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.issue.IssueManager;
 import org.nightlabs.jfire.issue.IssueManagerUtil;
+import org.nightlabs.jfire.issue.id.IssueID;
 import org.nightlabs.jfire.issue.project.id.ProjectID;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.progress.NullProgressMonitor;
@@ -109,6 +110,19 @@ public class ProjectDAO extends BaseJDOObjectDAO<ProjectID, Project>{
 		} catch (Exception e) {
 			monitor.done();
 			throw new RuntimeException(e);
+		}
+	}
+	
+	public synchronized void deleteProject(ProjectID projectID, ProgressMonitor monitor) {
+		monitor.beginTask("Deleting project: "+ projectID, 3);
+		try {
+			IssueManager im = IssueManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			im.deleteProject(projectID);
+			monitor.worked(1);
+			monitor.done();
+		} catch (Exception e) {
+			monitor.done();
+			throw new RuntimeException("Error while deleting project!\n" ,e);
 		}
 	}
 	

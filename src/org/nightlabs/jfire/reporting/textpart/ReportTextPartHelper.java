@@ -4,6 +4,7 @@
 package org.nightlabs.jfire.reporting.textpart;
 
 import java.util.Locale;
+import java.util.regex.Matcher;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
@@ -18,8 +19,15 @@ import org.nightlabs.jfire.reporting.textpart.ReportTextPart.Type;
  * Static helper class that helps to build evaluation strings for {@link ReportTextPart}s inside a report layout.
  * It should be used in like the following example inside a dynamic text part in a report layout.
  * <pre>
- * eval(ReportTextPartHelper.getEvalString(JFireReportingHelper.getDataSetParamObject(myVar), "reportTextPartID"));
+ * importClass(Packages.org.nightlabs.jfire.reporting.textpart.ReportTextPartHelper);
+ * eval("" + ReportTextPartHelper.getEvalString(JFireReportingHelper.getDataSetParamObject(myVar), "reportTextPartID"));
  * </pre>
+ * The empty String before the call to {@link #getEvalString(ObjectID, String)} is unfortunately neccessary,
+ * otherwise the eval() method for some reason will only echo the String it receives.
+ * <p>
+ * Of course the import could also be done somewhere else in the reports context but it has to be 
+ * made before {@link ReportTextPartHelper} is accessed.
+ * </p>
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
  */
 public class ReportTextPartHelper {
@@ -93,22 +101,34 @@ public class ReportTextPartHelper {
 			return "";
 		String contentStr = reportTextPart.getContent().getText(locale.getLanguage());
 		if (reportTextPart.getType() == Type.HTML) {
-			contentStr = "\"" + escapeEvalString(contentStr, 1) + "\"";
+			contentStr = "\"" + escapeEvalString(contentStr, 1, true) + "\"";
+//			contentStr = escapeEvalString(contentStr, 1, true);
+			logger.debug("getEvalString() found HTML type content and returning: " + contentStr);
 			// TODO: Later we can split for special images (or similar elements)
 			// and have the surrounding html wrapped in an inner eval(escapeEvalString(, 2)) + codeForVariable + eval(escapeEvalString(, 2)
 		} else if (reportTextPart.getType() == Type.JAVASCRIPT) {
-			contentStr = escapeEvalString(contentStr, 1);
+			logger.debug("getEvalString() found JAVASCRIPT type content and returning: " + contentStr);
 		}
 		return contentStr;
 	}
 	
-	private static String escapeEvalString(String strToEval, int level) {
+	private static String escapeEvalString(String strToEval, int level, boolean convertStringLineBreaks) {
 		String escaped = strToEval;
 		for (int i = 0; i < level; i++) {
-			escaped = escaped.replaceAll("\\\\", "\\\\");
-			escaped = escaped.replaceAll("\"", "\\\"");
+			escaped = escaped.replaceAll("\\\\", Matcher.quoteReplacement("\\\\"));
+			escaped = escaped.replaceAll("\"", Matcher.quoteReplacement("\\\""));
+		}
+		if (convertStringLineBreaks) {
+			escaped = escaped.replaceAll("\\n", Matcher.quoteReplacement("\" + \n\""));
 		}
 		return escaped;
+	}
+	
+	public static void main(String[] args) {
+		String test = "chars: \" \n this \n is a \n line break \\ / \n";
+		System.out.println(test);
+		System.out.println("-------------------------------------------------");
+		System.out.println("\"" + escapeEvalString(test, 1, true) + "\"");
 	}
 	
 }

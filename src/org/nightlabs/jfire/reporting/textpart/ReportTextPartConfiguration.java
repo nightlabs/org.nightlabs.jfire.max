@@ -5,6 +5,7 @@ package org.nightlabs.jfire.reporting.textpart;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -32,7 +33,7 @@ import org.nightlabs.util.Util;
  * 
  * @jdo.query
  *	name="getReportTextPartConfigurationByLinkedObject"
- *	query="SELECT UNIQUE this
+ *	query="SELECT this
  *		WHERE this.linkedObjectID == :paramLinkedObjectID"
  */
 public class ReportTextPartConfiguration implements Serializable {
@@ -235,6 +236,26 @@ public class ReportTextPartConfiguration implements Serializable {
 	}
 
 	/**
+	 * Returns the first {@link ReportTextPartConfiguration} that is linked to the given
+	 * linkedObjectID. Note, that it's theoretically possible that more than one {@link ReportTextPartConfiguration}
+	 * exists that is linked to the given object, but this is an illegal state in the datastore
+	 * and will be ignored by this method.
+	 *    
+	 * @param pm The {@link PersistenceManager} to use.
+	 * @param linkedObjectID The {@link ObjectID} of the object the {@link ReportTextPartConfiguration} should be used for.
+	 * @return The first {@link ReportTextPartConfiguration} that is linked to the given
+	 *         linkedObjectID, or <code>null</code> if none could be found.
+	 */
+	@SuppressWarnings("unchecked")
+	public static final ReportTextPartConfiguration getReportTextPartConfiguration(PersistenceManager pm, ObjectID linkedObjectID) {
+		Query q = pm.newNamedQuery(ReportTextPartConfiguration.class, "getReportTextPartConfigurationByLinkedObject");
+		Collection<ReportTextPartConfiguration> configs = (Collection<ReportTextPartConfiguration>) q.execute(linkedObjectID.toString());
+		if (configs.size() >= 1)
+			return configs.iterator().next();
+		return null;
+	}
+	
+	/**
 	 * Searches the {@link ReportTextPartConfiguration} for the given linkedObjectID. If none can be found in the 
 	 * datastore this method will search for a {@link ReportTextPartConfiguration}s linked to the given 
 	 * {@link ReportRegistryItem} (referenced with reportRegistryItemID) or its parent {@link ReportCategory}s.
@@ -251,8 +272,7 @@ public class ReportTextPartConfiguration implements Serializable {
 	public static final ReportTextPartConfiguration getReportTextPartConfiguration(
 			PersistenceManager pm, ObjectID linkedObjectID, ReportRegistryItemID reportRegistryItemID) {
 		
-		Query q = pm.newNamedQuery(ReportTextPartConfiguration.class, "getReportTextPartConfigurationByLinkedObject");
-		ReportTextPartConfiguration configuration = (ReportTextPartConfiguration) q.execute(linkedObjectID.toString());
+		ReportTextPartConfiguration configuration = getReportTextPartConfiguration(pm, linkedObjectID);
 		
 		if (configuration != null) {
 			// The configuration could be found. 

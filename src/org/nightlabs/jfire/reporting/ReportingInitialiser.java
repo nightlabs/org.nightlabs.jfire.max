@@ -30,6 +30,7 @@ import javax.xml.transform.TransformerException;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.i18n.I18nText;
+import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jfire.base.JFireBaseEAR;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.organisation.Organisation;
@@ -349,6 +350,8 @@ public class ReportingInitialiser {
 			createElementName(catNode, "description", category.getDescription(), null);
 			logger.debug("create Script Category = "+category.getName());
 			
+			createReportTextPartConfiguration(new File(dir, "content.xml"), category.getReportRegistryItemID(), category);
+
 
 			// Create reports
 			File[] reports = dir.listFiles(scriptFileNameFilter);
@@ -429,7 +432,7 @@ public class ReportingInitialiser {
 			createElementName(reportNode, "name", layout.getName(), reportID);
 			createElementName(reportNode, "description", layout.getDescription(), null);
 			createReportLocalisationData(reportFile, reportID, reportNode, layout);
-			createReportTextPartConfiguration(reportFile, reportID, reportNode, layout);
+			createReportTextPartConfiguration(reportFile, reportID, layout);
 		}
 		// This has its own overwriteOnInit
 		createReportParameterAcquisitionSetup(reportFile, reportNode, layout);
@@ -935,22 +938,21 @@ public class ReportingInitialiser {
 	}
 	
 	/**
-	 * 
-	 * @param reportFile The report file currently processed.
-	 * @param reportID The id of the {@link ReportLayout} currently processed.
-	 * @param reportNode The 'report' node of the content.xml document currenty processed
+	 * @param file The report file currently processed (This might be the content.xml file for a category or the .rptdesign file for a layout).
+	 * @param reportRegistryItemID The id of the {@link ReportRegistryItem} currently processed.
 	 * @param layout The {@link ReportLayout} currently processed.
 	 * @throws ReportingInitialiserException
 	 */
-	protected void createReportTextPartConfiguration(File reportFile, final String reportID, Node reportNode, ReportLayout layout)
+	protected void createReportTextPartConfiguration(File file, final String reportRegistryItemID, ReportRegistryItem reportRegistryItem)
 	throws ReportingInitialiserException
 	{
+		logger.debug("Initializatin of ReportTextPartConfiguration of " + JDOHelper.getObjectId(reportRegistryItem) + " started.");
+		
 		// initialise meta-data
 		pm.getExtent(ReportLayoutLocalisationData.class);
 
-		File resourceFolder = new File(reportFile.getParentFile(), "resource");
-		File targetConfigurationFile = new File(reportFile.getParentFile(), 
-			IOUtil.getFileNameWithoutExtension(reportFile.getName()) + "." + 
+		File targetConfigurationFile = new File(file.getParentFile(), 
+			reportRegistryItemID + "." + 
 			ReportTextPartConfiguration.class.getSimpleName() +
 			".xml");
 
@@ -967,8 +969,21 @@ public class ReportingInitialiser {
 			logger.error("Parsing " +  targetConfigurationFile + " failed, document is null.");
 			return;
 		}
-		ReportTextPartConfiguration configuration = null;
-		Collection<Node> nodes = NLDOMUtil.findNodeList(doc, "reportTextPartConfiguration/reportTextPart");
+		logger.debug("Parsed ReportTextConfiguration file " + targetConfigurationFile);
+
+		// Lookup/Create the configuration object
+		ReportTextPartConfiguration configuration = ReportTextPartConfiguration.getReportTextPartConfiguration(
+				pm, (ObjectID) JDOHelper.getObjectId(reportRegistryItem));
+		boolean needsPersisting = false;
+		if (configuration == null) {
+			needsPersisting = true;
+			configuration = new ReportTextPartConfiguration(
+					reportRegistryItem.getOrganisationID(), IDGenerator.nextID(ReportTextPartConfiguration.class));
+			configuration.setLinkedObject(reportRegistryItem);
+		}
+		
+		// Update/Create the ReportTextParts wihtin the configuration
+		Collection<Node> nodes = NLDOMUtil.findNodeList(doc, "reportTextPartConfiguration/reportTextPart");		
 		for (Node reportTextPartNode : nodes) {
 			Node idNode = reportTextPartNode.getAttributes().getNamedItem("id");
 			if (idNode == null || "".equals(idNode.getTextContent())) {
@@ -983,17 +998,19 @@ public class ReportingInitialiser {
 			ReportTextPart.Type type = ReportTextPart.Type.valueOf(typeNode.getTextContent().toUpperCase());
 			if (configuration == null) {
 				// create only when a text part was defined
-				configuration = new ReportTextPartConfiguration(layout.getOrganisationID(), IDGenerator.nextID(ReportTextPartConfiguration.class));
 			}
 			
-			ReportTextPart part = new ReportTextPart(configuration, idNode.getTextContent());
+			ReportTextPart part = configuration.getReportTextPart(idNode.getTextContent());
+			if (part == null) {
+				part = new ReportTextPart(configuration, idNode.getTextContent());
+				configuration.addReportTextPart(part);
+			}
 			part.setType(type);
 			createElementName(reportTextPartNode, "name", part.getName(), null);
 			createElementName(reportTextPartNode, "content", part.getContent(), null);
-			
-			configuration.addReportTextPart(part);
+			logger.debug("Created ReportTextPart with id " + part.getReportTextPartID());
 		}
-		if (configuration != null) {
+		if (needsPersisting && configuration != null) {
 			pm.makePersistent(configuration);
 		}
 	}

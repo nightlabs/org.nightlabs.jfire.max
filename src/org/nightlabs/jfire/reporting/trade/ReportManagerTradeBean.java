@@ -110,17 +110,6 @@ implements SessionBean
 	public void ejbRemove() throws EJBException, RemoteException { }
 	
 	/**
-	 * TODO JPOX WORKAROUND
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_System_"
-	 * @ejb.transaction type="Required"
-	 */
-	public void initializeScripting2() throws ScriptingIntialiserException
-	{
-		initializeScripting();
-	}
-	/**
 	 * This method is called by the datastore initialization mechanism.
 	 * 
 	 * @throws ScriptingIntialiserException
@@ -145,18 +134,6 @@ implements SessionBean
 	}
 
 	/**
-	 * TODO JPOX WORKAROUND
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_System_"
-	 * @ejb.transaction type="Required"
-	 */
-	public void initializeReporting2() throws Exception
-	{
-		initializeReporting();
-	}
-
-	/**
 	 * This method is called by the datastore initialization mechanism.
 	 * @throws ReportingInitialiserException
 	 * 
@@ -171,29 +148,31 @@ implements SessionBean
 		JFireServerManager jfireServerManager = getJFireServerManager();
 		try {
 			ModuleMetaData moduleMetaData = ModuleMetaData.getModuleMetaData(pm, JFireReportingTradeEAR.MODULE_NAME);
-			if (moduleMetaData != null)
-				return;
+			if (moduleMetaData == null) {
 
-			pm.makePersistent(new ModuleMetaData(
-					JFireReportingTradeEAR.MODULE_NAME, "0.9.5.0.0.beta", "0.9.5.0.0.beta")
-			);
+				pm.makePersistent(new ModuleMetaData(
+						JFireReportingTradeEAR.MODULE_NAME, "0.9.5.0.0.beta", "0.9.5.0.0.beta")
+				);
 
-			// initialise meta-data
-			pm.getExtent(ReportLayoutCfModInitialiserArticleContainerLayouts.class);
+				// initialise meta-data
+				pm.getExtent(ReportLayoutCfModInitialiserArticleContainerLayouts.class);
 
-			initializeReportParameterAcquisition(pm);
+				initializeReportParameterAcquisition(pm);
 
+
+				ConfigModuleInitialiserID initialiserID = ReportLayoutCfModInitialiserArticleContainerLayouts.getConfigModuleInitialiserID(getOrganisationID());
+				ReportLayoutCfModInitialiserArticleContainerLayouts initialiser = null;
+				try {
+					initialiser = (ReportLayoutCfModInitialiserArticleContainerLayouts) pm.getObjectById(initialiserID);
+				} catch (JDOObjectNotFoundException e) {
+					initialiser = new ReportLayoutCfModInitialiserArticleContainerLayouts(getOrganisationID());
+					initialiser = pm.makePersistent(initialiser);
+				}
+			}
+			// Report initialization is done on every run.
 			// better have the layouts for the local organisation, than for the dev organisation
 			ReportingInitialiser.initialise(pm, jfireServerManager, getOrganisationID());
-
-			ConfigModuleInitialiserID initialiserID = ReportLayoutCfModInitialiserArticleContainerLayouts.getConfigModuleInitialiserID(getOrganisationID());
-			ReportLayoutCfModInitialiserArticleContainerLayouts initialiser = null;
-			try {
-				initialiser = (ReportLayoutCfModInitialiserArticleContainerLayouts) pm.getObjectById(initialiserID);
-			} catch (JDOObjectNotFoundException e) {
-				initialiser = new ReportLayoutCfModInitialiserArticleContainerLayouts(getOrganisationID());
-				initialiser = pm.makePersistent(initialiser);
-			}
+			
 		} finally {
 			pm.close();
 			jfireServerManager.close();

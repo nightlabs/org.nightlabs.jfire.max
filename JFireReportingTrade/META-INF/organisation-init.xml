@@ -13,41 +13,4 @@
 			bean="jfire/ejb/JFireReportingTrade/ReportManagerTrade"
 			method="initializeScripting" />
 	</init>
-
-<!--
-TODO JPOX WORKAROUND
-The following is a workaround for a jpox bug: occasionally, we get:
-
-Caused by: javax.jdo.JDOException: Invalid state, closed or no mc
-        at org.jpox.resource.PersistenceManagerImpl.checkStatus(PersistenceManagerImpl.java:1276)
-        at org.jpox.resource.PersistenceManagerImpl.findStateManager(PersistenceManagerImpl.java:1199)
-        at org.jpox.store.expression.ObjectLiteral.getFieldValue(ObjectLiteral.java:494)
-        at org.jpox.store.expression.ObjectLiteral.getEqualityExpressionForObjectExpression(ObjectLiteral.java:215)
-        at org.jpox.store.expression.ObjectLiteral.eq(ObjectLiteral.java:115)
-        at org.jpox.store.expression.ObjectExpression.eq(ObjectExpression.java:286)
-        at org.jpox.store.rdbms.RDBMSStoreHelper.getClassNameForIdKeyUsingUnion(RDBMSStoreHelper.java:591)
-        at org.jpox.store.rdbms.RDBMSManager.getClassNameForObjectID(RDBMSManager.java:1313)
-        at org.jpox.AbstractPersistenceManager.getObjectById(AbstractPersistenceManager.java:2651)
-        at org.jpox.AbstractPersistenceManager.getObjectById(AbstractPersistenceManager.java:2600)
-        at org.jpox.resource.PersistenceManagerImpl.getObjectById(PersistenceManagerImpl.java:617)
-        at org.jpox.resource.PersistenceManagerImpl.getObjectById(PersistenceManagerImpl.java:605)
-
-Therefore, we simply try it twice.
--->
-	<init bean="jfire/ejb/JFireReportingTrade/ReportManagerTrade" method="initializeScripting2">
-		<depends
-			module="JFireReportingTrade.ear"
-			archive="JFireReportingTrade.jar"
-			bean="jfire/ejb/JFireReportingTrade/ReportManagerTrade"
-			method="initializeScripting" />
-	</init>
-
-	<init bean="jfire/ejb/JFireReportingTrade/ReportManagerTrade" method="initializeReporting2">
-		<depends
-			module="JFireReportingTrade.ear"
-			archive="JFireReportingTrade.jar"
-			bean="jfire/ejb/JFireReportingTrade/ReportManagerTrade"
-			method="initializeScripting2" />
-	</init>
-
 </organisation-initialisation>

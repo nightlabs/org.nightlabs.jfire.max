@@ -19,6 +19,11 @@ import org.nightlabs.jfire.trade.Segment;
 /**
  * {@link RecurringTradeProductTypeActionHandler}s are used by the {@link RecurringTrader}
  * to create {@link Article}s for {@link RecurredOffer}s on the basis of Articles in a {@link RecurringOffer}.
+ * <p>
+ * {@link RecurringTradeProductTypeActionHandler} are stored with and resolved by the class-name 
+ * of the {@link ProductType} they can handle. It will then be used only for article with 
+ * {@link ProductType}s of this class (or superclasses if no other could be found). 
+ * </p>
  * 
  * @author Fitas Amine- fitas at nightlabs dot de
  *
@@ -83,12 +88,15 @@ public abstract class RecurringTradeProductTypeActionHandler {
 	protected RecurringTradeProductTypeActionHandler() { }	
 
 	/**	
-	 * Implement this method to create a new article in the given RecurredOffer for each template article passed as parameter.
-	 * The parameter articles come from a {@link RecurringOffer}).
+	 * Implement this method to create a new {@link Article} in the given {@link RecurredOffer} for 
+	 * each template article passed as parameter. The parameter {@link Article} come from a 
+	 * currently processed {@link RecurringOffer}).
 	 *
-	 * @param offer the recurredOffer created in the recurringTrader s createrecurredOffer
-	 * @param recurringArticles a collection list of articles
-	 * @param segment current segment in the order
+	 * @param offer The {@link RecurredOffer} created upon the processing of a {@link RecurringOffer}. 
+	 *              The new Articles should be created for this {@link RecurredOffer}.
+	 * @param recurringArticles A collection of the {@link Article}s in the {@link RecurringOffer} this handler
+	 *                          should create new {@link Article}s in the RecurredOffer.
+	 * @param segment The segment in the offer the new Articles should be placed in.
 	 *
 	 * @return return a Map where the template article is mapped to the newly created article.
 	 */

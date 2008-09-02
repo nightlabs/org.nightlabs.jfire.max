@@ -2,16 +2,13 @@ package org.nightlabs.jfire.trade.recurring;
 
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.security.User;
-import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.LegalEntity;
-import org.nightlabs.jfire.trade.Offer;
 import org.nightlabs.jfire.trade.Order;
 
 
 /**
  *
- * A {@link RecurringOrder} is an extention of {@link Order} thus it is a collection of {@link Offer}s between two {@link LegalEntity}s,
- * it knows all {@link Article} of the contained {@link Offer}.
+ * A {@link RecurringOrder} is an extension of {@link Order} that manages {@link RecurringOffer}s.
  * 
  * @author Fitas Amine <fitas@nightlabs.de>
  * @jdo.persistence-capable
@@ -37,5 +34,5 @@ public class RecurringOrder extends Order {
 			String orderIDPrefix, long orderID, Currency currency, User user) {
 		super(vendor, customer, orderIDPrefix, orderID, currency, user);
 	}
-
+	
 }

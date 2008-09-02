@@ -318,7 +318,7 @@ public class RecurringTrader {
 		}	
 		else
 			//Mark the Error
-			recurringOffer.setProblemKey(RecurringOffer.PROBLEM_KEY_PRICE_NONEQUAL);
+			recurringOffer.setProblemKey(RecurringOffer.PROBLEM_KEY_PRICES_NOT_EQUAL);
 
 
 		return recurredOffer;

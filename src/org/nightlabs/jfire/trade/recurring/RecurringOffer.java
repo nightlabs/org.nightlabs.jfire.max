@@ -2,17 +2,25 @@ package org.nightlabs.jfire.trade.recurring;
 
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.security.User;
+import org.nightlabs.jfire.store.Product;
+import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.Offer;
-import org.nightlabs.jfire.trade.Order;
 
 
 /**
- * 
- * A RecurringOffer extends the class  {@link Offer} is basically a collection of {@link Article}s along with
- * status information as its name implies the RecurringOffer is in a recurring state ,
- * defined by the timer Task in configuration class  {@link RecurringOfferConfiguration} 
- * 
+ * A {@link RecurringOffer} is an offer that serves as a template for the recurring/timed
+ * creation of {@link RecurredOffer}s. All {@link Article}s of a {@link RecurringOffer} 
+ * are reference a {@link ProductType} rather than a {@link Product}. When a {@link RecurringOffer}
+ * is processed in the background an a new {@link RecurredOffer} is created for it
+ * {@link Product} instances for the {@link ProductType}s referenced by the articles of 
+ * the template {@link RecurringOffer} - this is done using {@link RecurringTradeProductTypeActionHandler}s. 
+ * <p>
+ * The configuration of a {@link RecurringOffer} is stored in its member {@link #getRecurringOfferConfiguration()}.
+ * This {@link RecurringOfferConfiguration} defines the frequency new {@link RecurredOffer}s
+ * should be created and has other controls that enable the user to define whether invoices should
+ * be automatically created etc.. 
+ * </p>
  * 
  * @author Fitas Amine <fitas@nightlabs.de>
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
@@ -33,20 +41,19 @@ import org.nightlabs.jfire.trade.Order;
  */
 public class RecurringOffer extends Offer {
 
-	
-	/**
-	 * the Problem key Constants to store the state of the Offer
-	 * see  {@link #ProblemKey} 
-	 * 
-	 */
-	
 	private static final long serialVersionUID = 1L;
 
 	public static final String FETCH_GROUP_RECURRING_OFFER_CONFIGURATION = "RecurringOffer.recurringOfferConfiguration";
 
+	/**
+	 * Constant indicating that no problem occurred on the last execution. Value is <code>null</code>.
+	 */
 	public static final String PROBLEM_KEY_NONE = null;
-
-	public static final String PROBLEM_KEY_PRICE_NONEQUAL = "Prices Non-Equal";
+	/**
+	 * Constant indication that on the last processing a price difference was found between
+	 * the articles in the newly create {@link RecurredOffer} and the {@link RecurringOffer}.
+	 */
+	public static final String PROBLEM_KEY_PRICES_NOT_EQUAL = "PricesNotEqual";
 
 	
 	/**
@@ -55,15 +62,9 @@ public class RecurringOffer extends Offer {
 	private RecurringOfferConfiguration recurringOfferConfiguration;
 
 	/**
-	 * the ProblemKey stores the error statues upon the validation of the RecurringOffer
-	 * see the method  {@link  RecurringTrader.processRecurringOffer(RecurringOffer)}
-	 * also see the constants  {@link #PROBLEM_KEY_NONE} {@link #PROBLEM_KEY_PRICE_NONEQUAL} 
-	 * 
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private String problemKey;
-	
-	
 	
 	/**
 	 * @deprecated Only for JDO!
@@ -71,13 +72,27 @@ public class RecurringOffer extends Offer {
 	@Deprecated
 	protected RecurringOffer() {}
 
-	public RecurringOffer(User user, Order order, String offerIDPrefix, long offerID) {
+	/**
+	 * Create a new {@link RecurringOffer}.
+	 * @param user The user that initiated the creation.
+	 * @param order The {@link RecurringOrder} the new {@link RecurringOffer} should be part of. 
+	 * @param offerIDPrefix The offerID prefix to use.
+	 * @param offerID The id for the new {@link RecurringOffer}.
+	 */
+	public RecurringOffer(User user, RecurringOrder order, String offerIDPrefix, long offerID) {
 		super(user, order, offerIDPrefix, offerID);
 		this.recurringOfferConfiguration = new RecurringOfferConfiguration(
 				this, user, getOrganisationID(), IDGenerator.nextID(RecurringOfferConfiguration.class));
 		this.problemKey = PROBLEM_KEY_NONE;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * <p>
+	 * Additionally to the super implementation {@link RecurringOffer}s
+	 * set the param of their {@link RecurringOfferConfiguration}s task.
+	 * </p>
+	 */
 	@Override
 	protected boolean validate() {
 		boolean superResult = super.validate();
@@ -88,20 +103,32 @@ public class RecurringOffer extends Offer {
 		}
 		return superResult;
 	}
-	
+
+	/**
+	 * Get the {@link RecurringOfferConfiguration} associated to this {@link RecurringOffer}.
+	 * @return The {@link RecurringOfferConfiguration} associated to this {@link RecurringOffer}.
+	 */
 	public RecurringOfferConfiguration getRecurringOfferConfiguration() {
 		return recurringOfferConfiguration;
 	}
 
+	/**
+	 * The ProblemKey stores the error statues upon the last processing
+	 * and the attempt to create a {@link RecurredOffer} on its basis.
+	 * See the method  {@link RecurringTrader#processRecurringOffer(RecurringOffer)}
+	 * also see the constants  {@link #PROBLEM_KEY_NONE} {@link #PROBLEM_KEY_PRICE_NONEQUAL} 
+	 * 
+	 * @return The problem key set for the last processing.
+	 */
 	public String getProblemKey() {
 		return problemKey;
 	}
 
+	/**
+	 * Set the problem key.
+	 * @param problemKey The problem key to set.
+	 */
 	public void setProblemKey(String problemKey) {
 		this.problemKey = problemKey;
 	}
-
-
-
-
 }

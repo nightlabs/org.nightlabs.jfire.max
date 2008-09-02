@@ -176,7 +176,8 @@ implements SessionBean
 	}
 
 	/**
-	 * this is the EJB interface called by the Task Time frame to process the Recurring
+	 * This is the EJB method called by the {@link Task} of a {@link RecurringOfferConfiguration}
+	 * in order to process its associated {@link RecurringOffer}.
 	 *  
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="org.nightlabs.jfire.trade.recurring.processRecurringOfferTimed"
@@ -315,7 +316,7 @@ implements SessionBean
 
 
 	/**
-	 * Creates a new Recurring Offer within a given Recurring Order.
+	 * Creates a new {@link RecurringOffer} within a given {@link RecurringOrder}.
 	 *
 	 * @param orderID The orderID defining the Order in which to create a new Offer.
 	 * @throws ModuleException
@@ -351,7 +352,8 @@ implements SessionBean
 	}
 
 	/**
-	 * stores the {@link RecurringOfferConfiguration} in the store
+	 * Stores the given {@link RecurringOfferConfiguration}.
+	 * 
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="org.nightlabs.jfire.trade.recurring.storeOffer"
 	 * @ejb.transaction type="Required"

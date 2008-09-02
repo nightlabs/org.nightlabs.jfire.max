@@ -5,18 +5,23 @@ import java.io.Serializable;
 import javax.jdo.JDOHelper;
 
 import org.nightlabs.jdo.ObjectIDUtil;
+import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.timer.Task;
 import org.nightlabs.jfire.timer.id.TaskID;
 
 
 /**
- * 
- * An instance of <tt>RecurringOfferConfiguration</tt> is created on a new {@link RecurringOffer}. 
- * it stores the various config information about how we should create and manipulate the {@link RecurringOffer}
- * as we could define settings such as booking Invoice , Delivery etc..
- * the classs initite and New Timer Task class {@link Task}. 
- * 
+ * An instance of {@link RecurringOfferConfiguration} is created for each {@link RecurringOffer}. 
+ * It stores the user-definable configuration for the timed processing of a {@link RecurringOffer}.
+ * This information contains whether an invoice should be automatically created for the
+ * {@link RecurredOffer}, whether this invoice should be booked and more.
+ * <p>
+ * Additionally {@link RecurringOfferConfiguration} creates and holds the {@link Task} that will
+ * do the processing of the {@link RecurringOffer} 
+ * (the task will execute {@link RecurringTradeManager#processRecurringOfferTimed(TaskID)} which 
+ * itself will delegate to {@link RecurringTrader#processRecurringOffer(RecurringOffer)})
+ * </p>
  * 
  * @author Fitas Amine <fitas@nightlabs.de>
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
@@ -52,6 +57,14 @@ public class RecurringOfferConfiguration implements Serializable{
 	 */
 	private long recurringOfferConfigurationID;
 
+	/**
+	 * Create a new {@link RecurringOfferConfiguration}. 
+	 * 
+	 * @param recurringOffer The {@link RecurringOffer} the new configuration is for.
+	 * @param user The user that initiated the creation.
+	 * @param organisationID The organisationID of the new {@link RecurringOfferConfiguration}.
+	 * @param recurringOfferConfigurationID The id of the new {@link RecurringOfferConfiguration}.
+	 */
 	public RecurringOfferConfiguration(RecurringOffer recurringOffer,User user,String organisationID,long recurringOfferConfigurationID) {
 		this.organisationID = organisationID;
 		this.recurringOffer = recurringOffer;
@@ -82,9 +95,9 @@ public class RecurringOfferConfiguration implements Serializable{
 	private boolean createInvoice;
 
 	/**
-	 * @jdo.field persistence-modifier="persistent"
+	 * Whether we book the invoice implicitly
 	 * 
-	 * weather we book the invoice implicitly
+	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private boolean bookInvoice;
 
@@ -92,7 +105,6 @@ public class RecurringOfferConfiguration implements Serializable{
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private RecurringOffer recurringOffer;
-
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -102,46 +114,96 @@ public class RecurringOfferConfiguration implements Serializable{
 	private boolean createDelivery;
 
 	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 * 
 	 * the Task timer used to define at what moment we call the EJB method 
 	 * to process the {@link RecurringOffer} , see {@link RecurringTrade.processRecurringOffer(RecurringOffer)} 
 	 *
+	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private Task creatorTask;
 
+	/**
+	 * Returns whether upon processing of the {@link RecurringOffer} 
+	 * an {@link Invoice} should be created for the articles of the 
+	 * {@link RecurredOffer}.
+	 *  
+	 * @return Whether an invoice should be automatically created.
+	 */
 	public boolean isCreateInvoice() {
 		return createInvoice;
 	}
 
+	/**
+	 * Define whether upon processing of the {@link RecurringOffer} 
+	 * an {@link Invoice} should be created for the articles of the 
+	 * {@link RecurredOffer}.
+	 * 
+	 * @param createInvoice Whether an invoice should be created automatically.
+	 */
 	public void setCreateInvoice(boolean createInvoice) {
 		this.createInvoice = createInvoice;
 	}
 
+	/**
+	 * Returns whether upon processing of the {@link RecurringOffer} 
+	 * an delivery should be made for the articles of the 
+	 * {@link RecurredOffer}.
+	 * 
+	 * @return Whether a delivery should be made.
+	 */
 	public boolean isCreateDelivery() {
 		return createDelivery;
 	}
 
+	/**
+	 * Define whether upon processing of the {@link RecurringOffer} 
+	 * an delivery should be made for the articles of the 
+	 * {@link RecurredOffer.
+	 * 
+	 * @param createDelivery Whether a delivery should be made.
+	 */
 	public void setCreateDelivery(boolean createDelivery) {
 		this.createDelivery = createDelivery;
 	}
 
+	/**
+	 * Get the {@link Task} that was created for this {@link RecurringOfferConfiguration}
+	 * processes the associated {@link RecurringOffer}. 
+	 * 
+	 * @return The {@link Task} that processes the associated {@link RecurringOffer}.
+	 */
 	public Task getCreatorTask() {
 		return creatorTask;
 	}
 
+	/**
+	 * @return The organisationID pk-member of this {@link RecurringOfferConfiguration}.
+	 */
 	public String getOrganisationID() {
 		return organisationID;
 	}
-
+	
+	/**
+	 * @return The recurringOfferConfigurationID pk-member of this {@link RecurringOfferConfiguration}.
+	 */
 	public long getRecurringOfferConfigurationID() {
 		return recurringOfferConfigurationID;
 	}
-
+	
+	/**
+	 * Returns the {@link RecurringOffer} this configuration is associated to.
+	 * @return The {@link RecurringOffer} this configuration is associated to.
+	 */
 	public RecurringOffer getRecurringOffer() {
 		return recurringOffer;
 	}
 
+	/**
+	 * Returns the {@link TaskID} of the {@link Task} that processes 
+	 * the associated {@link RecurringOffer}.
+	 * 
+	 * @return The {@link TaskID} for the {@link Task} that processes
+	 *         the associated {@link RecurringOffer}. 
+	 */
 	public TaskID getCreatorTaskID() {
 		TaskID taskID = (TaskID) JDOHelper.getObjectId(creatorTask);
 		if (taskID == null && creatorTask != null)
@@ -150,10 +212,24 @@ public class RecurringOfferConfiguration implements Serializable{
 		return taskID;
 	}
 
+	/**
+	 * Returns whether upon processing of the {@link RecurringOffer} 
+	 * if an invoice was created for the new {@link RecurredOffer}
+	 * this invoice should be booked/finalized, too.
+	 * 
+	 * @return Whether the invoice created upon processing should be booked, too.
+	 */
 	public boolean isBookInvoice() {
 		return bookInvoice;
 	}
 
+	/**
+	 * Define whether upon processing of the {@link RecurringOffer} 
+	 * if an invoice was created for the new {@link RecurredOffer}
+	 * this invoice should be booked/finalized, too.
+	 * 
+	 * @param isBookInvoice Whether the invoice created upon processing should be booked, too.
+	 */
 	public void setBookInvoice(boolean isBookInvoice) {
 		this.bookInvoice = isBookInvoice;
 	}

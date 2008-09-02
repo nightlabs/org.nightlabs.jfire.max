@@ -128,7 +128,7 @@ implements SessionBean
 	public void createModuleMetaData()
 	throws MalformedVersionException
 	{
-		logger.info("createModuleMetaData: begin");
+		logger.trace("createModuleMetaData: begin");
 
 		PersistenceManager pm = this.getPersistenceManager();
 		try {
@@ -136,7 +136,7 @@ implements SessionBean
 			if (moduleMetaData != null)
 				return;
 
-			logger.info("Initialization of JFireChezFrancois started...");
+			logger.debug("Initialization of JFireChezFrancois started...");
 
 			// version is {major}.{minor}.{release}-{patchlevel}-{suffix}
 			moduleMetaData = new ModuleMetaData(
@@ -149,7 +149,7 @@ implements SessionBean
 
 		} finally {
 			pm.close();
-			logger.info("createModuleMetaData: end");
+			logger.trace("createModuleMetaData: end");
 		}
 	}
 
@@ -169,7 +169,7 @@ implements SessionBean
 	 */
 	public void createDemoTimerTask() throws TimePatternFormatException
 	{
-		logger.info("createDemoTimerTask: begin");
+		logger.trace("createDemoTimerTask: begin");
 
 		PersistenceManager pm = this.getPersistenceManager();
 		try {
@@ -215,7 +215,7 @@ implements SessionBean
 			}
 		} finally {
 			pm.close();
-			logger.info("createDemoTimerTask: end");
+			logger.trace("createDemoTimerTask: end");
 		}
 	}
 

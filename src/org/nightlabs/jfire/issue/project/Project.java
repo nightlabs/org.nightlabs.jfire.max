@@ -31,7 +31,7 @@ import org.nightlabs.util.Util;
  * @jdo.create-objectid-class
  *		field-order="organisationID, projectID"
  *
- * @jdo.fetch-group name="Project.name" fetch-groups="default" fields="name"
+ * @jdo.fetch-group name="Project.name" fields="name"
  * @jdo.fetch-group name="Project.description" fields="description"
  * @jdo.fetch-group name="Project.parentProject" fields="parentProject"
  * @jdo.fetch-group name="Project.subProjects" fields="subProjects"
@@ -66,7 +66,7 @@ implements Serializable, Comparable<Project>
 	private long projectID;
 
 	/**
-	 * @jdo.field persistence-modifier="persistent" dependent="true" mapped-by="project"
+	 * @jdo.field persistence-modifier="persistent" fetch-groups="default"  dependent="true" mapped-by="project"
 	 */
 	private ProjectName name;
 	

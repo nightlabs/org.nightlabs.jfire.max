@@ -18,7 +18,7 @@ import org.nightlabs.i18n.I18nText;
  *
  * @jdo.create-objectid-class field-order="organisationID, projectID"
  * 
- * @jdo.fetch-group name="ProjectName.name" fetch-groups="default" fields="project, names"
+ * @jdo.fetch-group name="Project.name" fetch-groups="default" fields="project, names"
  */ 
 public class ProjectName 
 extends I18nText{

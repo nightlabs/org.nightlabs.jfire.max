@@ -37,13 +37,21 @@ import java.util.Set;
 
 import javax.jdo.JDOHelper;
 
+import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.trade.id.ArticleContainerID;
 import org.nightlabs.jfire.trade.id.ArticleID;
 
 /**
- * New (2007-06-07): Since this class is used in the client with Jobs, it is now Thread-safe.
+ * {@link ArticleSegmentGroupSet}s group/manage the {@link Article}s of an {@link ArticleContainer}
+ * by their segment and within the segments the articles are grouped by the type/class
+ * of {@link ProductType}. For this grouping {@link ArticleSegmentGroup}s and {@link ArticleProductTypeClassGroup}s
+ * are used. 
+ * <p>
+ * This class is thread-safe.
+ * </p> 
  *
  * @author Marco Schulze - marco at nightlabs dot de
+ * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
  */
 public class ArticleSegmentGroupSet
 {

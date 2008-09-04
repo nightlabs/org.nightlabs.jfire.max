@@ -34,9 +34,19 @@ import java.util.Map;
 import org.nightlabs.jfire.store.ProductType;
 
 /**
- * New (2007-06-07): Since this class is used in the client with Jobs, it is now Thread-safe.
+ * {@link ArticleSegmentGroup}s hold and manage the {@link Article}s of a {@link Segment}
+ * in {@link ArticleProductTypeClassGroup}s that means it groups the articles within
+ * the segment by the type (class) of {@link ProductType} the {@link Article}s wrap.
+ * <p>
+ * {@link ArticleSegmentGroup}s are used within {@link ArticleSegmentGroupSet}s that
+ * manage one {@link ArticleSegmentGroup} per {@link Segment}.
+ * </p>
+ * <p>
+ * This class is thread-safe.
+ * </p>
  *
  * @author Marco Schulze - marco at nightlabs dot de
+ * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
  */
 public class ArticleSegmentGroup
 {
@@ -49,23 +59,40 @@ public class ArticleSegmentGroup
 	 */
 	private Map<String, ArticleProductTypeClassGroup> articleProductTypeClassGroups = Collections.synchronizedMap(new HashMap<String, ArticleProductTypeClassGroup>());
 
+	/**
+	 * Create a new {@link ArticleSegmentGroup} for the given container and segment.
+	 *  
+	 * @param articleSegmentGroupSet The container {@link ArticleSegmentGroup}.
+	 * @param segment The segment this group is for.
+	 */
 	public ArticleSegmentGroup(ArticleSegmentGroupSet articleSegmentGroupSet, Segment segment)
 	{
 		this.articleSegmentGroupSet = articleSegmentGroupSet;
 		this.segment = segment;
 	}
-
-	public ArticleSegmentGroupSet getArticleSegmentGroups()
+	
+	/**
+	 * @return The {@link ArticleSegmentGroupSet} this {@link ArticleSegmentGroup} is part of.
+	 */
+	public ArticleSegmentGroupSet getArticleSegmentGroupSet()
 	{
 		return articleSegmentGroupSet;
 	}
 
+	/**
+	 * Finds the appropriate {@link ArticleProductTypeClassGroup} for the given {@link Article}
+	 * and adds it to it (see {@link ArticleProductTypeClassGroup#addArticle(Article, boolean)}).
+	 */
 	public ArticleCarrier addArticle(Article article, boolean filterExisting) // better not synchronized to avoid deadlocks
 	{
 		ArticleProductTypeClassGroup aptg = createArticleProductTypeClassGroup(article.getProductType().getClass());
 		return aptg.addArticle(article, filterExisting);
 	}
-
+	
+	/**
+	 * Finds the appropriate {@link ArticleProductTypeClassGroup} for the given {@link Article}
+	 * and removes it from there.
+	 */
 	public void removeArticle(Article article)
 	{
 		ArticleProductTypeClassGroup aptg = getArticleProductTypeClassGroup(article.getProductType(), false);
@@ -73,24 +100,8 @@ public class ArticleSegmentGroup
 			aptg.removeArticle(article);
 	}
 
-//	public synchronized void addArticles(Collection<? extends Article> articles, boolean filterExisting)
-//	{
-//		for (Iterator<? extends Article> it = articles.iterator(); it.hasNext(); ) {
-//			Article article = (Article)it.next();
-//			addArticle(article, filterExisting);
-//		}
-//	}
-//
-//	public synchronized void removeArticles(Collection<? extends Article> articles)
-//	{
-//		for (Iterator<? extends Article> it = articles.iterator(); it.hasNext(); ) {
-//			Article article = (Article)it.next();
-//			removeArticle(article);
-//		}
-//	}
-
 	/**
-	 * @return Returns the segment.
+	 * @return Returns the segment this {@link ArticleSegmentGroup} is for.
 	 */
 	public Segment getSegment()
 	{
@@ -105,14 +116,28 @@ public class ArticleSegmentGroup
 	}
 
 	/**
-	 * @param productType
-	 * @return null or a group
+	 * Returns the {@link ArticleProductTypeClassGroup} for the given {@link ProductType}.
+	 * This might return <code>null</code> if none is found, or even throw and exception
+	 * if throwExceptionIfNotFound is <code>true</code>. 
+	 *
+	 * @param productType The PoductType for whose class the appropriate {@link ArticleProductTypeClassGroup} should be found for.
+	 * @param throwExceptionIfNotFound Defines whether an exception should be thrown when no {@link ArticleProductTypeClassGroup} was found.
+	 * @return Either the appropriate {@link ArticleProductTypeClassGroup} or <code>null</code>.
 	 */
 	public ArticleProductTypeClassGroup getArticleProductTypeClassGroup(ProductType productType, boolean throwExceptionIfNotFound)
 	{
 		return getArticleProductTypeClassGroup(productType.getClass().getName(), throwExceptionIfNotFound);
 	}
 
+	/**
+	 * Returns the {@link ArticleProductTypeClassGroup} for the {@link ProductType} of the given class-name.
+	 * This might return <code>null</code> if none is found, or even throw and exception
+	 * if throwExceptionIfNotFound is <code>true</code>. 
+	 *
+	 * @param productType The PoductType for whose class the appropriate {@link ArticleProductTypeClassGroup} should be found for.
+	 * @param throwExceptionIfNotFound Defines whether an exception should be thrown when no {@link ArticleProductTypeClassGroup} was found.
+	 * @return Either the appropriate {@link ArticleProductTypeClassGroup} or <code>null</code>.
+	 */
 	public ArticleProductTypeClassGroup getArticleProductTypeClassGroup(String productTypeClassName, boolean throwExceptionIfNotFound)
 	{
 		ArticleProductTypeClassGroup aptg = articleProductTypeClassGroups.get(productTypeClassName);
@@ -132,7 +157,7 @@ public class ArticleSegmentGroup
 	}
 
 	/**
-	 * @param productType
+	 * @param productTypeClass The class the {@link ArticleProductTypeClassGroup} should be searched for.
 	 * @return a newly created group or an old one if already existent before
 	 */
 	public synchronized ArticleProductTypeClassGroup createArticleProductTypeClassGroup(Class<? extends ProductType> productTypeClass)

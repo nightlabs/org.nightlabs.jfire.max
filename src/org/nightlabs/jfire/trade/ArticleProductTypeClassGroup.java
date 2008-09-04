@@ -37,9 +37,15 @@ import java.util.Set;
 import org.nightlabs.jfire.store.ProductType;
 
 /**
- * New (2007-06-07): Since this class is used in the client with Jobs, it is now Thread-safe.
+ * This class groups the {@link Article}s wrapping a certain (sub-)class of {@link ProductType}.
+ * It is used inside {@link ArticleSegmentGroup}s and thus only groups the {@link Article}s
+ * within one {@link Segment}.
+ * <p>
+ * This class is thread-safe.
+ * </p>
  * 
  * @author Marco Schulze - marco at nightlabs dot de
+ * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
  */
 public class ArticleProductTypeClassGroup
 {
@@ -53,13 +59,6 @@ public class ArticleProductTypeClassGroup
 	 */
 	private Map<String, ArticleCarrier> articleCarriers = Collections.synchronizedMap(new HashMap<String, ArticleCarrier>());
 
-//	/**
-//	 * Cache for articles, which is normally <code>null</code>!!!
-//	 * It will be created and populated by {@link #getArticles()} from
-//	 * {@link #articleCarriers}.
-//	 */
-//	private Set articles = null;
-
 	public ArticleProductTypeClassGroup(ArticleSegmentGroup articleSegmentGroup, Class<? extends ProductType> productTypeClass)
 	{
 		this.articleSegmentGroup = articleSegmentGroup;
@@ -70,18 +69,14 @@ public class ArticleProductTypeClassGroup
 		this.productTypeClass = productTypeClass;
 	}
 
+	/**
+	 * @return The {@link ArticleSegmentGroup} this {@link ArticleProductTypeClassGroup} is associated to.
+	 */
 	public ArticleSegmentGroup getArticleSegmentGroup()
 	{
 		return articleSegmentGroup;
 	}
 
-//	/**
-//	 * @return Returns the productTypeClassName.
-//	 */
-//	public String getProductTypeClassName()
-//	{
-//		return productTypeClassName;
-//	}
 	/**
 	 * @return Returns the productTypeClass.
 	 */
@@ -89,12 +84,21 @@ public class ArticleProductTypeClassGroup
 	{
 		return productTypeClass;
 	}
+	
+	/**
+	 * Removes the given {@link Article} from this group. 
+	 * @param article The article to remove.
+	 */
 	public void removeArticle(Article article)
 	{
 		articleCarriers.remove(article.getPrimaryKey());
-		getArticleSegmentGroup().getArticleSegmentGroups()._removeArticle(article);
-//		articles = null;
+		getArticleSegmentGroup().getArticleSegmentGroupSet()._removeArticle(article);
 	}
+
+	/**
+	 * Removes all given articles from this group.
+	 * @param articles The articles to remove.
+	 */
 	public void removeArticles(Collection<? extends Article> articles)
 	{
 		for (Iterator<? extends Article> it = articles.iterator(); it.hasNext(); )
@@ -123,7 +127,7 @@ public class ArticleProductTypeClassGroup
 
 		articleCarrier = new ArticleCarrier(this, article);
 		articleCarriers.put(article.getPrimaryKey(), articleCarrier);
-		getArticleSegmentGroup().getArticleSegmentGroups()._addArticleCarrier(articleCarrier);
+		getArticleSegmentGroup().getArticleSegmentGroupSet()._addArticleCarrier(articleCarrier);
 //		articles = null;
 		return articleCarrier;
 	}

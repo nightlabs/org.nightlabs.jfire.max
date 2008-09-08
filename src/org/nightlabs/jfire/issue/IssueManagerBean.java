@@ -4,9 +4,11 @@ import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 
 import javax.ejb.CreateException;
@@ -527,7 +529,30 @@ implements SessionBean
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			return NLJDOHelper.getObjectIDSet(Project.getRootProjects(pm, organisationID));
+			Query q = pm.newNamedQuery(Project.class, "getRootProjects");
+			Map<String, Object> params = new HashMap<String, Object>(1);
+			params.put("organisationID", organisationID);
+			return NLJDOHelper.getObjectIDSet((Collection<Project>) q.executeWithMap(params));
+		} finally {
+			pm.close();
+		}
+	}
+	
+	/**
+	 * @ejb.interface-method
+	 * @!ejb.transaction type="Supports"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	@SuppressWarnings("unchecked")
+	public Collection<ProjectID> getProjectsByParentProjectID(String organisationID, long parentProjectsID)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			Query q = pm.newNamedQuery(Project.class, "getProjectsByParentProjectID");
+			Map<String, Object> params = new HashMap<String, Object>(2);
+			params.put("organisationID", organisationID);
+			params.put("parentProjectID", parentProjectsID);
+			return NLJDOHelper.getObjectIDSet((Collection<Project>) q.executeWithMap(params));
 		} finally {
 			pm.close();
 		}

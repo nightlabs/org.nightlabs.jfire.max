@@ -138,4 +138,15 @@ public class ProjectDAO extends BaseJDOObjectDAO<ProjectID, Project>{
 			throw new RuntimeException(e);
 		}
 	}
+	
+	public synchronized Collection<Project> getProjectsByParentProjectID(String organisationID, long parentProjectID) 
+	{
+		try {
+			IssueManager im = IssueManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			Collection<Project> result = ProjectDAO.sharedInstance.getProjects(im.getProjectsByParentProjectID(organisationID, parentProjectID), new String[]{FetchPlan.DEFAULT, Project.FETCH_GROUP_PARENT_PROJECT, Project.FETCH_GROUP_SUBPROJECTS, Project.FETCH_GROUP_NAME}, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT, new NullProgressMonitor());
+			return result;
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 }

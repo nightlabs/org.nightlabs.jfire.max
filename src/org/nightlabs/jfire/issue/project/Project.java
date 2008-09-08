@@ -42,6 +42,13 @@ import org.nightlabs.util.Util;
  *			WHERE 
  *				this.organisationID == :organisationID &&
  *				this.parentProject == null"
+ *
+ * @jdo.query
+ *		name="getProjectsByParentProjectID"
+ *		query="SELECT
+ *			WHERE 
+ *				this.organisationID == :organisationID &&
+ *				this.parentProject.projectID == :parentProjectID"
  **/
 public class Project
 implements Serializable, Comparable<Project> 
@@ -192,14 +199,6 @@ implements Serializable, Comparable<Project>
 		this.description = description;
 	}
 
-	
-	public static Collection<Project> getRootProjects(PersistenceManager pm, String organisationID)
-	{
-		Query q = pm.newNamedQuery(Project.class, "getRootProjects");
-		Map<String, Object> params = new HashMap<String, Object>(1);
-		params.put("organisationID", organisationID);
-		return (Collection<Project>) q.executeWithMap(params);
-	}
 	/**
 	 * Internal method.
 	 * @return The PersistenceManager associated with this object. 

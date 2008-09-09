@@ -235,4 +235,17 @@ implements Serializable, Comparable<Project>
 	public int compareTo(Project o) {
 		return this.name.getText().compareTo(o.getName().getText());
 	}
+	
+	/**
+	 * @jdo.field persistence-modifier="none"
+	 */
+	private int level;
+	
+	public int getLevel() {
+		return level;
+	}
+	
+	public void setLevel(int level) {
+		this.level = level;
+	}
 }

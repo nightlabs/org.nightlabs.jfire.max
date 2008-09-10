@@ -35,6 +35,7 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="Project.description" fields="description"
  * @jdo.fetch-group name="Project.parentProject" fields="parentProject"
  * @jdo.fetch-group name="Project.subProjects" fields="subProjects"
+ * @jdo.fetch-group name="Issue.project" fields="name"
  *
  * @jdo.query
  *		name="getRootProjects"

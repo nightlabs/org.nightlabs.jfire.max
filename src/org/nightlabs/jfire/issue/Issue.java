@@ -82,7 +82,7 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="Issue.states" fields="states"
  * @jdo.fetch-group name="Issue.issueLocal" fields="issueLocal"
  * @jdo.fetch-group name="Issue.issueType" fields="issueType"
- * @jdo.fetch-group name="Issue.projects" fields="projects"
+ * @jdo.fetch-group name="Issue.project" fields="project"
  * @jdo.fetch-group name="Issue.comments" fields="comments"
  * @jdo.fetch-group name="Issue.issueLinks" fields="issueLinks"
  * @jdo.fetch-group name="Issue.propertySet" fields="propertySet"
@@ -113,7 +113,7 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	public static final String FETCH_GROUP_ISSUE_ASSIGNEE = "Issue.assignee";
 	public static final String FETCH_GROUP_ISSUE_WORK_TIME_RANGES = "Issue.issueWorkTimeRanges";
 	public static final String FETCH_GROUP_ISSUE_FILELIST = "Issue.issueFileAttachments";
-	public static final String FETCH_GROUP_ISSUE_PROJECTS = "Issue.projects";
+	public static final String FETCH_GROUP_ISSUE_PROJECT = "Issue.project";
 
 	public static final String FETCH_GROUP_PROPERTY_SET = "Issue.propertySet";
 
@@ -146,17 +146,9 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	private Set<IssueLink> issueLinks;
 	
 	/**
-	 * Instances of IssueLink that are representations of {@link ObjectID}s.
-	 *
-	 * @jdo.field
-	 *		persistence-modifier="persistent"
-	 *		collection-type="collection"
-	 *		element-type="Project"
-	 *		table="JFireIssueTracking_Issue_projects"
-	 *
-	 * @jdo.join
+	 * @jdo.field persistence-modifier="persistent"
 	 */
-	private Set<Project> projects;
+	private Project project;
 
 	/**
 	 * Instances of {@link IssueFileAttachment}.
@@ -347,8 +339,6 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 		issueLinks = new HashSet<IssueLink>();
 		issueWorkTimeRanges = new ArrayList<IssueWorkTimeRange>();
 
-		projects = new HashSet<Project>();
-		
 		this.issueLocal = new IssueLocal(this);
 		this.structScope = Struct.DEFAULT_SCOPE;
 		this.structLocalScope = StructLocal.DEFAULT_SCOPE;
@@ -751,12 +741,12 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 			pm.deletePersistent(state);
 	}
 
-	public boolean addProject(Project project) {
-		return this.projects.add(project);
+	public void setProject(Project project) {
+		this.project = project;
 	}
 	
-	public Collection<Project> getProjects() {
-		return Collections.unmodifiableCollection(projects);
+	public Project getProject() {
+		return project;
 	}
 	
 	public boolean addIssueFileAttachment(IssueFileAttachment issueFileAttachment) {

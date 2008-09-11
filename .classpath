@@ -9,7 +9,7 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/NightLabsBase"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/NightLabsJDO"/>
 	<classpathentry kind="var" path="JDO2"/>
-	<classpathentry kind="var" path="DATANUCLEUS_CORE"/> <classpathentry kind="var" path="DATANUCLEUS_JAVA5"/>
+	<classpathentry kind="var" path="DATANUCLEUS_CORE"/>
 	<classpathentry kind="var" path="DATANUCLEUS_ENHANCER"/>
 	<classpathentry kind="var" path="LOG4J"/>
 	<classpathentry sourcepath="/RHINO_SRC" kind="var" path="RHINO"/>

@@ -17,7 +17,7 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="var" path="DATANUCLEUS_ENHANCER"/>
-	<classpathentry kind="var" path="DATANUCLEUS_CORE"/> <classpathentry kind="var" path="DATANUCLEUS_JAVA5"/>
+	<classpathentry kind="var" path="DATANUCLEUS_CORE"/>
 	<classpathentry kind="var" path="BCEL"/>
 	<classpathentry kind="var" path="JBOSS/server/default/lib/mail.jar"/>
 	<classpathentry kind="output" path="bin"/>

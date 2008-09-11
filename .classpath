@@ -5,7 +5,6 @@
 	<classpathentry kind="var" path="JBOSS/client/jboss-j2ee.jar"/>
 	<classpathentry kind="var" path="JDO2"/>
 	<classpathentry kind="var" path="DATANUCLEUS_CORE"/>
-	<classpathentry kind="var" path="DATANUCLEUS_JAVA5"/>
 	<classpathentry kind="var" path="ASM"/>
 	<classpathentry kind="var" path="DATANUCLEUS_ENHANCER"/>
 	<classpathentry kind="src" path="ejbsrc"/>

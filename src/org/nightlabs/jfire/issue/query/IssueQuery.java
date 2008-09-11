@@ -9,12 +9,12 @@ import org.apache.log4j.Logger;
 import org.nightlabs.jdo.query.AbstractJDOQuery;
 import org.nightlabs.jfire.issue.Issue;
 import org.nightlabs.jfire.issue.IssueLink;
-import org.nightlabs.jfire.issue.IssueWorkTimeRange;
 import org.nightlabs.jfire.issue.id.IssueLinkTypeID;
 import org.nightlabs.jfire.issue.id.IssuePriorityID;
 import org.nightlabs.jfire.issue.id.IssueResolutionID;
 import org.nightlabs.jfire.issue.id.IssueSeverityTypeID;
 import org.nightlabs.jfire.issue.id.IssueTypeID;
+import org.nightlabs.jfire.issue.project.id.ProjectID;
 import org.nightlabs.jfire.security.id.UserID;
 
 /**
@@ -63,6 +63,7 @@ public class IssueQuery
 	private Set<IssueLink> issueLinks;
 	private Date issueWorkTimeRangeFrom;
 	private Date issueWorkTimeRangeTo;
+	private ProjectID projectID;
 
 	public static final class FieldName
 	{
@@ -84,6 +85,7 @@ public class IssueQuery
 		public static final String issueLinks = "issueLinks";
 		public static final String issueWorkTimeRangeFrom = "issueWorkTimeRangeFrom";
 		public static final String issueWorkTimeRangeTo = "issueWorkTimeRangeTo";
+		public static final String projectID = "projectID";
 	}
 
 	@Override
@@ -173,6 +175,10 @@ public class IssueQuery
 			filter.append("\n || (this.issueWorkTimeRanges.contains(varIssueWorkTimeRange) && !((varIssueWorkTimeRange.to <= :issueWorkTimeRangeFrom) && (varIssueWorkTimeRange.from < :issueWorkTimeRangeFrom)))");
 		}
 		
+		if (isFieldEnabled(FieldName.projectID) && projectID != null) {
+			filter.append("\n && this.project.organisationID == :projectID.organisationID ");
+			filter.append("\n && this.project.projectID == :projectID.projectID ");
+		}
 		// FIXME: chairat please rewrite this part as soon as you have refactored the linkage of objects to Issues. (marius)
 //		if (issueLinks != null && !issueLinks.isEmpty())
 //		{
@@ -474,6 +480,17 @@ public class IssueQuery
 		final Date oldUpdateTimestamp = this.updateTimestamp;
 		this.updateTimestamp = updateTimestamp;
 		notifyListeners(FieldName.updateTimestamp, oldUpdateTimestamp, updateTimestamp);
+	}
+	
+	public ProjectID getProjectID() {
+		return projectID;
+	}
+
+	public void setProjectID(ProjectID projectID)
+	{
+		final ProjectID oldProjectID = this.projectID;
+		this.projectID = projectID;
+		notifyListeners(FieldName.projectID, oldProjectID, projectID);
 	}
 	
 	@Override

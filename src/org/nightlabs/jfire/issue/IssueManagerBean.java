@@ -27,6 +27,7 @@ import org.jbpm.graph.exe.ProcessInstance;
 import org.nightlabs.ModuleException;
 import org.nightlabs.jdo.FetchPlanBackup;
 import org.nightlabs.jdo.NLJDOHelper;
+import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
 import org.nightlabs.jdo.query.AbstractJDOQuery;
 import org.nightlabs.jdo.query.AbstractSearchQuery;
@@ -1152,7 +1153,25 @@ implements SessionBean
 			issueLinkType.addLinkedObjectClass(Issue.class);
 			issueLinkType = pm.makePersistent(issueLinkType);
 
+			// Create the project type
+			pm.getExtent(ProjectType.class); 
+			
+			ProjectType projectType;
+			projectType = new ProjectType(IDGenerator.getOrganisationID(), ProjectType.PROJECT_TYPE_ID_DEFAULT.projectTypeID);
+			projectType.getName().setText(Locale.ENGLISH.getLanguage(), "Default");
+			projectType = pm.makePersistent(projectType);
+			
+			projectType = new ProjectType(IDGenerator.getOrganisationID(), "cross ticket");
+			projectType.getName().setText(Locale.ENGLISH.getLanguage(), "Cross Ticket");
+			projectType = pm.makePersistent(projectType);
+
+			projectType = new ProjectType(IDGenerator.getOrganisationID(), "jfire");
+			projectType.getName().setText(Locale.ENGLISH.getLanguage(), "JFire");
+			projectType = pm.makePersistent(projectType);
+			
 			// Create the projects
+			pm.getExtent(Project.class); 
+			
 			Project project;
 
 			project = new Project(IDGenerator.getOrganisationID(), IDGenerator.nextID(Project.class));

@@ -6,6 +6,7 @@ import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 
 import org.apache.log4j.Logger;
+import org.nightlabs.jfire.issue.id.IssueLinkTypeID;
 import org.nightlabs.jfire.issue.project.id.ProjectTypeID;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.util.Util;
@@ -33,6 +34,8 @@ implements Serializable
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger = Logger.getLogger(ProjectType.class);
 
+	public static final ProjectTypeID PROJECT_TYPE_ID_DEFAULT = ProjectTypeID.create(Organisation.DEV_ORGANISATION_ID, "default");
+	
 	public static final String FETCH_GROUP_NAME = "ProjectType.name";
 
 	/**

@@ -173,37 +173,6 @@ implements SessionBean
 		}
 	}
 
-//	/**
-//	* @throws ModuleException
-//	*
-//	* @ejb.interface-method
-//	* @ejb.transaction type="Required"
-//	* @ejb.permission role-name="_Guest_"
-//	*/
-//	public Collection getIssueTypes(String[] fetchGroups, int maxFetchDepth)
-//	throws ModuleException
-//	{
-//	PersistenceManager pm = getPersistenceManager();
-//	try {
-//	return NLJDOHelper.getDetachedObjectList(pm, userGroupIDs, null, fetchGroups, maxFetchDepth);
-//	}
-//	finally {
-//	pm.close();
-//	}
-
-//	PersistenceManager pm = getPersistenceManager();
-//	try {
-//	pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
-//	if (fetchGroups != null)
-//	pm.getFetchPlan().setGroups(fetchGroups);
-
-//	Query q = pm.newQuery(IssueType.class);
-//	return pm.detachCopyAll((Collection)q.execute());
-//	} finally {
-//	pm.close();
-//	}
-//	}
-
 	//ProjectType//
 	/**
 	 * @ejb.interface-method
@@ -252,6 +221,24 @@ implements SessionBean
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			return NLJDOHelper.getDetachedObjectList(pm, projectTypeIDs, ProjectType.class, fetchGroups, maxFetchDepth);
+		} finally {
+			pm.close();
+		}
+	}
+	
+	/**
+	 * @ejb.interface-method
+	 * @!ejb.transaction type="Supports"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	@SuppressWarnings("unchecked")
+	public Set<ProjectTypeID> getProjectTypeIDs()
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			Query q = pm.newQuery(ProjectType.class);
+			q.setResult("JDOHelper.getObjectId(this)");
+			return new HashSet<ProjectTypeID>((Collection<? extends ProjectTypeID>) q.execute());
 		} finally {
 			pm.close();
 		}
@@ -334,7 +321,7 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@SuppressWarnings("unchecked")
-	public Collection<ProjectID> getRootProjects(String organisationID)
+	public Collection<ProjectID> getRootProjectIDs(String organisationID)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -353,20 +340,40 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@SuppressWarnings("unchecked")
-	public Collection<ProjectID> getProjectsByParentProjectID(String organisationID, long parentProjectsID)
+	public Collection<ProjectID> getProjectIDsByParentProjectID(ProjectID projectID)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			Query q = pm.newNamedQuery(Project.class, "getProjectsByParentProjectID");
 			Map<String, Object> params = new HashMap<String, Object>(2);
-			params.put("organisationID", organisationID);
-			params.put("parentProjectID", parentProjectsID);
+			params.put("organisationID", projectID.organisationID);
+			params.put("parentProjectID", projectID.projectID);
 			return NLJDOHelper.getObjectIDSet((Collection<Project>) q.executeWithMap(params));
 		} finally {
 			pm.close();
 		}
 	}
 
+	/**
+	 * @ejb.interface-method
+	 * @!ejb.transaction type="Supports"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	@SuppressWarnings("unchecked")
+	public Collection<ProjectID> getProjectIDsByProjectTypeID(ProjectTypeID projectTypeID)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			Query q = pm.newNamedQuery(Project.class, "getProjectsByProjectTypeID");
+			Map<String, Object> params = new HashMap<String, Object>(2);
+			params.put("organisationID", projectTypeID.organisationID);
+			params.put("projectTypeID", projectTypeID.projectTypeID);
+			return NLJDOHelper.getObjectIDSet((Collection<Project>) q.executeWithMap(params));
+		} finally {
+			pm.close();
+		}
+	}
+	
 	//IssueComment//
 	/**
 	 * @ejb.interface-method

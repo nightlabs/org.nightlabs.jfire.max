@@ -31,12 +31,6 @@ import org.nightlabs.util.Util;
  * @jdo.create-objectid-class
  *		field-order="organisationID, projectID"
  *
- * @jdo.fetch-group name="Project.name" fields="name"
- * @jdo.fetch-group name="Project.description" fields="description"
- * @jdo.fetch-group name="Project.parentProject" fields="parentProject"
- * @jdo.fetch-group name="Project.subProjects" fields="subProjects"
- * @jdo.fetch-group name="Issue.project" fields="name"
- *
  * @jdo.query
  *		name="getRootProjects"
  *		query="SELECT
@@ -50,6 +44,21 @@ import org.nightlabs.util.Util;
  *			WHERE 
  *				this.organisationID == :organisationID &&
  *				this.parentProject.projectID == :parentProjectID"
+ *
+ * @jdo.query
+ *		name="getProjectsByProjectTypeID"
+ *		query="SELECT
+ *			WHERE 
+ *				this.projectType.organisationID == :organisationID &&
+ *				this.projectType.projectTypeID == :projectTypeID"
+ *
+ * @jdo.fetch-group name="Project.name" fields="name"
+ * @jdo.fetch-group name="Project.description" fields="description"
+ * @jdo.fetch-group name="Project.parentProject" fields="parentProject"
+ * @jdo.fetch-group name="Project.subProjects" fields="subProjects"
+ * @jdo.fetch-group name="Project.projectType" fields="projectType"
+ * @jdo.fetch-group name="Issue.project" fields="name"
+ * 
  **/
 public class Project
 implements Serializable, Comparable<Project> 

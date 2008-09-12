@@ -4,16 +4,13 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import javax.jdo.FetchPlan;
-
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.issue.IssueManager;
 import org.nightlabs.jfire.issue.IssueManagerUtil;
-import org.nightlabs.jfire.issue.id.IssueID;
 import org.nightlabs.jfire.issue.project.id.ProjectID;
+import org.nightlabs.jfire.issue.project.id.ProjectTypeID;
 import org.nightlabs.jfire.security.SecurityReflector;
-import org.nightlabs.progress.NullProgressMonitor;
 import org.nightlabs.progress.ProgressMonitor;
 import org.nightlabs.progress.SubProgressMonitor;
 
@@ -126,24 +123,35 @@ public class ProjectDAO extends BaseJDOObjectDAO<ProjectID, Project>{
 		}
 	}
 	
-	public synchronized Collection<Project> getRootProjects(String organisationID) 
+	public synchronized Collection<Project> getRootProjects(String organisationID, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) 
 	{
 		if(organisationID == null)
 			throw new NullPointerException("OrganisationID must not be null");
 		try {
 			IssueManager im = IssueManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
-			Collection<Project> result = ProjectDAO.sharedInstance.getProjects(im.getRootProjects(organisationID), new String[]{FetchPlan.DEFAULT, Project.FETCH_GROUP_PARENT_PROJECT, Project.FETCH_GROUP_SUBPROJECTS, Project.FETCH_GROUP_NAME}, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT, new NullProgressMonitor());
+			Collection<Project> result = ProjectDAO.sharedInstance.getProjects(im.getRootProjectIDs(organisationID), fetchGroups, maxFetchDepth, monitor);
 			return result;
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
 	
-	public synchronized Collection<Project> getProjectsByParentProjectID(String organisationID, long parentProjectID) 
+	public synchronized Collection<Project> getProjectsByParentProjectID(ProjectID projectID, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) 
 	{
 		try {
 			IssueManager im = IssueManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
-			Collection<Project> result = ProjectDAO.sharedInstance.getProjects(im.getProjectsByParentProjectID(organisationID, parentProjectID), new String[]{FetchPlan.DEFAULT, Project.FETCH_GROUP_PARENT_PROJECT, Project.FETCH_GROUP_SUBPROJECTS, Project.FETCH_GROUP_NAME}, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT, new NullProgressMonitor());
+			Collection<Project> result = ProjectDAO.sharedInstance.getProjects(im.getProjectIDsByParentProjectID(projectID), fetchGroups, maxFetchDepth, monitor);
+			return result;
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
+	public synchronized Collection<Project> getProjectsByProjectTypeID(ProjectTypeID projectTypeID, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) 
+	{
+		try {
+			IssueManager im = IssueManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			Collection<Project> result = ProjectDAO.sharedInstance.getProjects(im.getProjectIDsByProjectTypeID(projectTypeID), fetchGroups, maxFetchDepth, monitor);
 			return result;
 		} catch (Exception e) {
 			throw new RuntimeException(e);

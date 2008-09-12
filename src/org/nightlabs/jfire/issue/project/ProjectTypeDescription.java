@@ -38,7 +38,7 @@ public class ProjectTypeDescription
 	/**
 	 * @jdo.field primary-key="true"
 	 */
-	private long projectTypeID;
+	private String projectTypeID;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -80,7 +80,7 @@ public class ProjectTypeDescription
 		return organisationID;
 	}
 
-	public long getProjectTypeID() {
+	public String getProjectTypeID() {
 		return projectTypeID;
 	}
 

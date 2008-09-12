@@ -37,7 +37,7 @@ extends I18nText{
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
-	private long projectTypeID;
+	private String projectTypeID;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -91,7 +91,7 @@ extends I18nText{
 		return projectType;
 	}
 	
-	public long getProjectID() {
+	public String getProjectID() {
 		return projectTypeID;
 	}
 
@@ -100,6 +100,6 @@ extends I18nText{
 	 */
 	protected String getFallBackValue(String languageID)
 	{
-		return projectTypeID == 0 ? languageID : Long.toString(projectTypeID);
+		return projectTypeID == null ? languageID : projectTypeID;
 	}
 }

@@ -49,7 +49,9 @@ import org.nightlabs.jfire.issue.id.IssueSeverityTypeID;
 import org.nightlabs.jfire.issue.id.IssueTypeID;
 import org.nightlabs.jfire.issue.jbpm.JbpmConstants;
 import org.nightlabs.jfire.issue.project.Project;
+import org.nightlabs.jfire.issue.project.ProjectType;
 import org.nightlabs.jfire.issue.project.id.ProjectID;
+import org.nightlabs.jfire.issue.project.id.ProjectTypeID;
 import org.nightlabs.jfire.issue.prop.IssueStruct;
 import org.nightlabs.jfire.jbpm.JbpmLookup;
 import org.nightlabs.jfire.jbpm.graph.def.State;
@@ -71,7 +73,6 @@ public class IssueManagerBean
 extends BaseSessionBeanImpl
 implements SessionBean
 {
-
 	private static final long serialVersionUID = 1L;
 	/**
 	 * LOG4J logger used by this class
@@ -121,23 +122,7 @@ implements SessionBean
 		logger.debug(this.getClass().getName() + ".ejbPassivate()");
 	}
 
-	/**
-	 * @ejb.interface-method
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 * @ejb.permission role-name="_Guest_"
-	 */
-	public Set<IssueID> getIssueIDs()
-	{
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			Query q = pm.newQuery(Issue.class);
-			q.setResult("JDOHelper.getObjectId(this)");
-			return new HashSet<IssueID>((Collection<? extends IssueID>) q.execute());
-		} finally {
-			pm.close();
-		}
-	}
-
+	//IssueFileAttachment//
 	/**
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
@@ -150,66 +135,6 @@ implements SessionBean
 			Query q = pm.newQuery(IssueFileAttachment.class);
 			q.setResult("JDOHelper.getObjectId(this)");
 			return new HashSet<IssueFileAttachmentID>((Collection<? extends IssueFileAttachmentID>) q.execute());
-		} finally {
-			pm.close();
-		}
-	}
-
-	/**
-	 * @param queries the QueryCollection containing all queries that shall be chained
-	 *		in order to retrieve the result. The result of one query is passed to the
-	 *		next one using the {@link AbstractJDOQuery#setCandidates(Collection)}.
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 */
-	public Set<IssueID> getIssueIDs(QueryCollection<? extends AbstractJDOQuery> queries)
-	{
-		if (queries == null)
-			return null;
-
-		if (! Issue.class.isAssignableFrom(queries.getResultClass()))
-		{
-			throw new RuntimeException("Given QueryCollection has invalid return type! " +
-					"Invalid return type= "+ queries.getResultClassName());
-		}
-
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			pm.getFetchPlan().setMaxFetchDepth(1);
-			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
-
-			JDOQueryCollectionDecorator<? extends AbstractSearchQuery> decoratedCollection;
-			if (queries instanceof JDOQueryCollectionDecorator)
-			{
-				decoratedCollection = (JDOQueryCollectionDecorator<? extends AbstractSearchQuery>) queries;
-			}
-			else
-			{
-				decoratedCollection = new JDOQueryCollectionDecorator<AbstractSearchQuery>(queries);
-			}
-
-			decoratedCollection.setPersistenceManager(pm);
-			Collection<? extends Issue> issues = (Collection<? extends Issue>) decoratedCollection.executeQueries();
-
-			return NLJDOHelper.getObjectIDSet(issues);
-		} finally {
-			pm.close();
-		}
-	}
-
-	/**
-	 * @ejb.interface-method
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 * @ejb.permission role-name="_Guest_"
-	 */
-	@SuppressWarnings("unchecked")
-	public List<Issue> getIssues(Collection<IssueID> issueIDs, String[] fetchGroups, int maxFetchDepth)
-	{
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			return NLJDOHelper.getDetachedObjectList(pm, issueIDs, Issue.class, fetchGroups, maxFetchDepth);
 		} finally {
 			pm.close();
 		}
@@ -230,7 +155,8 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
+	//IssueWorkTimeRange//
 	/**
 	 * @ejb.interface-method
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
@@ -242,144 +168,6 @@ implements SessionBean
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			return NLJDOHelper.getDetachedObjectList(pm, issueWorkTimeRangeIDs, IssueWorkTimeRange.class, fetchGroups, maxFetchDepth);
-		} finally {
-			pm.close();
-		}
-	}
-
-	/**
-	 * @ejb.interface-method
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 * @ejb.permission role-name="_Guest_"
-	 */
-	public Set<IssueSeverityTypeID> getIssueSeverityTypeIDs()
-	{
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			Query q = pm.newQuery(IssueSeverityType.class);
-			q.setResult("JDOHelper.getObjectId(this)");
-			return new HashSet<IssueSeverityTypeID>((Collection<? extends IssueSeverityTypeID>) q.execute());
-		} finally {
-			pm.close();
-		}
-	}
-
-	/**
-	 * @ejb.interface-method
-	 * @!ejb.transaction type="Supports"
-	 * @ejb.permission role-name="_Guest_"
-	 */
-	@SuppressWarnings("unchecked")
-	public List<IssueSeverityType> getIssueSeverityTypes(Collection<IssueSeverityTypeID> issueSeverityTypeIDs, String[] fetchGroups, int maxFetchDepth)
-	{
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			return NLJDOHelper.getDetachedObjectList(pm, issueSeverityTypeIDs, IssueSeverityType.class, fetchGroups, maxFetchDepth);
-		} finally {
-			pm.close();
-		}
-	}
-
-	/**
-	 * @ejb.interface-method
-	 * @!ejb.transaction type="Supports"
-	 * @ejb.permission role-name="_Guest_"
-	 */
-	@SuppressWarnings("unchecked")
-	public Collection<IssueHistoryID> getIssueHistoryIDsByIssueID(IssueID issueID)
-	{
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			return NLJDOHelper.getObjectIDSet(IssueHistory.getIssueHistoryByIssue(pm, issueID));
-		} finally {
-			pm.close();
-		}
-	}
-
-	/**
-	 * @ejb.interface-method
-	 * @!ejb.transaction type="Supports"
-	 * @ejb.permission role-name="_Guest_"
-	 */
-	@SuppressWarnings("unchecked")
-	public List<IssueHistory> getIssueHistories(Collection<IssueHistoryID> issueHistoryIDs, String[] fetchGroups, int maxFetchDepth)
-	{
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			return NLJDOHelper.getDetachedObjectList(pm, issueHistoryIDs, IssueHistory.class, fetchGroups, maxFetchDepth);
-		} finally {
-			pm.close();
-		}
-	}
-	
-	/**
-	 * @ejb.interface-method
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 * @ejb.permission role-name="_Guest_"
-	 */
-	@SuppressWarnings("unchecked")
-	public Set<IssuePriorityID> getIssuePriorityIDs()
-	{
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			Query q = pm.newQuery(IssuePriority.class);
-			q.setResult("JDOHelper.getObjectId(this)");
-			return new HashSet<IssuePriorityID>((Collection)q.execute()); 
-		} finally {
-			pm.close();
-		}
-	}
-
-	/**
-	 * @ejb.interface-method
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 * @ejb.permission role-name="_Guest_"
-	 */
-	@SuppressWarnings("unchecked")
-	public List<IssuePriority> getIssuePriorities(Collection<IssuePriorityID> issuePriorityIDs, String[] fetchGroups, int maxFetchDepth)
-	{
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			return NLJDOHelper.getDetachedObjectList(pm, issuePriorityIDs, IssuePriority.class, fetchGroups, maxFetchDepth);
-		} finally {
-			pm.close();
-		}
-	}
-
-	/**
-	 * @throws ModuleException
-	 *
-	 * @ejb.interface-method
-	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="_Guest_"
-	 */
-	public Collection getIssueResolutions(String[] fetchGroups, int maxFetchDepth)
-	throws ModuleException
-	{
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
-			if (fetchGroups != null)
-				pm.getFetchPlan().setGroups(fetchGroups);
-
-			Query q = pm.newQuery(IssueResolution.class);
-			return pm.detachCopyAll((Collection)q.execute());
-		} finally {
-			pm.close();
-		}
-	}
-
-	/**
-	 * @ejb.interface-method
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 * @ejb.permission role-name="_Guest_"
-	 */
-	@SuppressWarnings("unchecked")
-	public List<IssueResolution> getIssueResolutions(Collection<IssueResolutionID> issueResolutionIDs, String[] fetchGroups, int maxFetchDepth)
-	{
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			return NLJDOHelper.getDetachedObjectList(pm, issueResolutionIDs, IssueResolution.class, fetchGroups, maxFetchDepth);
 		} finally {
 			pm.close();
 		}
@@ -416,20 +204,41 @@ implements SessionBean
 //	}
 //	}
 
+	//ProjectType//
 	/**
 	 * @ejb.interface-method
-	 * @!ejb.transaction type="Supports"
 	 * @ejb.permission role-name="_Guest_"
-	 */
-	@SuppressWarnings("unchecked")
-	public List<IssueType> getIssueTypes(Collection<IssueTypeID> issueTypeIDs, String[] fetchGroups, int maxFetchDepth)
+	 * @ejb.transaction type="Required"
+	 */	
+	public ProjectType storeProjectType(ProjectType projectType, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			return NLJDOHelper.getDetachedObjectList(pm, issueTypeIDs, IssueType.class, fetchGroups, maxFetchDepth);
-		} finally {
+			return NLJDOHelper.storeJDO(pm, projectType, get, fetchGroups, maxFetchDepth);
+		}//try
+		finally {
 			pm.close();
-		}
+		}//finally
+	}
+
+	/**
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type="Required"
+	 */	
+	public void deleteProjectType(ProjectTypeID projectTypeID)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
+			pm.getExtent(ProjectType.class, true);
+			ProjectType projectType = (ProjectType) pm.getObjectById(projectTypeID);
+			pm.deletePersistent(projectType);
+			pm.flush();
+		}//try
+		finally {
+			pm.close();
+		}//finally
 	}
 
 	/**
@@ -438,17 +247,17 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@SuppressWarnings("unchecked")
-	public Set<IssueTypeID> getIssueTypeIDs()
+	public List<ProjectType> getProjectTypes(Collection<ProjectTypeID> projectTypeIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			final Query allIDsQuery = pm.newNamedQuery(IssueType.class, IssueType.QUERY_ALL_ISSUETYPE_IDS);
-			return new HashSet<IssueTypeID>((Collection<? extends IssueTypeID>)allIDsQuery.execute());
+			return NLJDOHelper.getDetachedObjectList(pm, projectTypeIDs, ProjectType.class, fetchGroups, maxFetchDepth);
 		} finally {
 			pm.close();
 		}
 	}
-
+	
+	//Project//
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
@@ -464,7 +273,7 @@ implements SessionBean
 			pm.close();
 		}//finally
 	}
-	
+
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
@@ -484,7 +293,7 @@ implements SessionBean
 			pm.close();
 		}//finally
 	}
-	
+
 	/**
 	 * @ejb.interface-method
 	 * @!ejb.transaction type="Supports"
@@ -518,7 +327,7 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * @ejb.interface-method
 	 * @!ejb.transaction type="Supports"
@@ -537,7 +346,7 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * @ejb.interface-method
 	 * @!ejb.transaction type="Supports"
@@ -558,24 +367,38 @@ implements SessionBean
 		}
 	}
 
+	//IssueComment//
 	/**
 	 * @ejb.interface-method
 	 * @!ejb.transaction type="Supports"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@SuppressWarnings("unchecked")
-	public List<IssueComment> getIssueComments(Collection<IssueCommentID> issueCommentIDs, 
-			String[] fetchGroups, 
-			int maxFetchDepth)
-			{
+	public List<IssueComment> getIssueComments(Collection<IssueCommentID> issueCommentIDs, String[] fetchGroups,int maxFetchDepth) {
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			return NLJDOHelper.getDetachedObjectList(pm, issueCommentIDs, IssueComment.class, fetchGroups, maxFetchDepth);
 		} finally {
 			pm.close();
 		}
-			}
+	}
 
+	/**
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type="Required"
+	 */	
+	public IssueComment storeIssueComment(IssueComment issueComment, boolean get, String[] fetchGroups, int maxFetchDepth)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			return NLJDOHelper.storeJDO(pm, issueComment, get, fetchGroups, maxFetchDepth);
+		}//try
+		finally {
+			pm.close();
+		}//finally
+	}
+	//IssueLinkType//
 	/**
 	 * @ejb.interface-method
 	 * @!ejb.transaction type="Supports"
@@ -628,7 +451,7 @@ implements SessionBean
 		}
 	}
 
-
+	//Issue//
 	/**
 	 * Stores the given Issue. If the issue is a new issue, do the initializing process instance.
 	 * If not new, do the issue history creation process & check the assignee for do the 
@@ -651,7 +474,7 @@ implements SessionBean
 
 			if (isNewIssue) {
 				pIssue = pm.makePersistent(issue);
-				
+
 				IssueType type;
 
 				if (JFireBaseEAR.JPOX_WORKAROUND_FLUSH_ENABLED) {				
@@ -733,107 +556,11 @@ implements SessionBean
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
-			
+
 			return pm.detachCopy(pIssue);
 		} finally {
 			pm.close();
 		}
-	}
-
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Required"
-	 */	
-	public IssueHistory storeIssueHistory(IssueHistory issueHistory, boolean get, String[] fetchGroups, int maxFetchDepth)
-	{
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			return NLJDOHelper.storeJDO(pm, issueHistory, get, fetchGroups, maxFetchDepth);
-		}//try
-		finally {
-			pm.close();
-		}//finally
-	}
-
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Required"
-	 */	
-	public IssueType storeIssueType(IssueType issueType, boolean get, String[] fetchGroups, int maxFetchDepth)
-	{
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			return NLJDOHelper.storeJDO(pm, issueType, get, fetchGroups, maxFetchDepth);
-		}//try
-		finally {
-			pm.close();
-		}//finally
-	}
-
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Required"
-	 */	
-	public IssuePriority storeIssuePriority(IssuePriority issuePriority, boolean get, String[] fetchGroups, int maxFetchDepth) 
-	{
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			return NLJDOHelper.storeJDO(pm, issuePriority, get, fetchGroups, maxFetchDepth);
-		}//try
-		finally {
-			pm.close();
-		}//finally
-	}
-
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Required"
-	 */	
-	public IssueSeverityType storeIssueSeverityType(IssueSeverityType issueSeverityType, boolean get, String[] fetchGroups, int maxFetchDepth)
-	{
-		PersistenceManager pm = getPersistenceManager();
-		try{
-			return NLJDOHelper.storeJDO(pm, issueSeverityType, get, fetchGroups, maxFetchDepth);
-		}//try
-		finally{
-			pm.close();
-		}//finally
-	}
-
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Required"
-	 */	
-	public IssueResolution storeIssueResolution(IssueResolution issueResolution, boolean get, String[] fetchGroups, int maxFetchDepth) 
-	{
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			return NLJDOHelper.storeJDO(pm, issueResolution, get, fetchGroups, maxFetchDepth);
-		}//try
-		finally {
-			pm.close();
-		}//finally
-	}
-
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Required"
-	 */	
-	public IssueComment storeIssueComment(IssueComment issueComment, boolean get, String[] fetchGroups, int maxFetchDepth)
-	{
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			return NLJDOHelper.storeJDO(pm, issueComment, get, fetchGroups, maxFetchDepth);
-		}//try
-		finally {
-			pm.close();
-		}//finally
 	}
 
 	/**
@@ -915,7 +642,339 @@ implements SessionBean
 
 		return null;
 	}
+	
+	/**
+	 * @param queries the QueryCollection containing all queries that shall be chained
+	 *		in order to retrieve the result. The result of one query is passed to the
+	 *		next one using the {@link AbstractJDOQuery#setCandidates(Collection)}.
+	 *
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+	 */
+	public Set<IssueID> getIssueIDs(QueryCollection<? extends AbstractJDOQuery> queries)
+	{
+		if (queries == null)
+			return null;
 
+		if (! Issue.class.isAssignableFrom(queries.getResultClass()))
+		{
+			throw new RuntimeException("Given QueryCollection has invalid return type! " +
+					"Invalid return type= "+ queries.getResultClassName());
+		}
+
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			pm.getFetchPlan().setMaxFetchDepth(1);
+			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
+
+			JDOQueryCollectionDecorator<? extends AbstractSearchQuery> decoratedCollection;
+			if (queries instanceof JDOQueryCollectionDecorator)
+			{
+				decoratedCollection = (JDOQueryCollectionDecorator<? extends AbstractSearchQuery>) queries;
+			}
+			else
+			{
+				decoratedCollection = new JDOQueryCollectionDecorator<AbstractSearchQuery>(queries);
+			}
+
+			decoratedCollection.setPersistenceManager(pm);
+			Collection<? extends Issue> issues = (Collection<? extends Issue>) decoratedCollection.executeQueries();
+
+			return NLJDOHelper.getObjectIDSet(issues);
+		} finally {
+			pm.close();
+		}
+	}
+
+	/**
+	 * @ejb.interface-method
+	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	@SuppressWarnings("unchecked")
+	public List<Issue> getIssues(Collection<IssueID> issueIDs, String[] fetchGroups, int maxFetchDepth)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			return NLJDOHelper.getDetachedObjectList(pm, issueIDs, Issue.class, fetchGroups, maxFetchDepth);
+		} finally {
+			pm.close();
+		}
+	}
+	
+	/**
+	 * @ejb.interface-method
+	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	public Set<IssueID> getIssueIDs()
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			Query q = pm.newQuery(Issue.class);
+			q.setResult("JDOHelper.getObjectId(this)");
+			return new HashSet<IssueID>((Collection<? extends IssueID>) q.execute());
+		} finally {
+			pm.close();
+		}
+	}
+	//IssueHistory//
+	/**
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type="Required"
+	 */	
+	public IssueHistory storeIssueHistory(IssueHistory issueHistory, boolean get, String[] fetchGroups, int maxFetchDepth)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			return NLJDOHelper.storeJDO(pm, issueHistory, get, fetchGroups, maxFetchDepth);
+		}//try
+		finally {
+			pm.close();
+		}//finally
+	}
+
+	/**
+	 * @ejb.interface-method
+	 * @!ejb.transaction type="Supports"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	@SuppressWarnings("unchecked")
+	public Collection<IssueHistoryID> getIssueHistoryIDsByIssueID(IssueID issueID)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			return NLJDOHelper.getObjectIDSet(IssueHistory.getIssueHistoryByIssue(pm, issueID));
+		} finally {
+			pm.close();
+		}
+	}
+
+	/**
+	 * @ejb.interface-method
+	 * @!ejb.transaction type="Supports"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	@SuppressWarnings("unchecked")
+	public List<IssueHistory> getIssueHistories(Collection<IssueHistoryID> issueHistoryIDs, String[] fetchGroups, int maxFetchDepth)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			return NLJDOHelper.getDetachedObjectList(pm, issueHistoryIDs, IssueHistory.class, fetchGroups, maxFetchDepth);
+		} finally {
+			pm.close();
+		}
+	}
+	//IssueType//
+	/**
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type="Required"
+	 */	
+	public IssueType storeIssueType(IssueType issueType, boolean get, String[] fetchGroups, int maxFetchDepth)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			return NLJDOHelper.storeJDO(pm, issueType, get, fetchGroups, maxFetchDepth);
+		}//try
+		finally {
+			pm.close();
+		}//finally
+	}
+
+	/**
+	 * @ejb.interface-method
+	 * @!ejb.transaction type="Supports"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	@SuppressWarnings("unchecked")
+	public List<IssueType> getIssueTypes(Collection<IssueTypeID> issueTypeIDs, String[] fetchGroups, int maxFetchDepth)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			return NLJDOHelper.getDetachedObjectList(pm, issueTypeIDs, IssueType.class, fetchGroups, maxFetchDepth);
+		} finally {
+			pm.close();
+		}
+	}
+
+	/**
+	 * @ejb.interface-method
+	 * @!ejb.transaction type="Supports"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	@SuppressWarnings("unchecked")
+	public Set<IssueTypeID> getIssueTypeIDs()
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			final Query allIDsQuery = pm.newNamedQuery(IssueType.class, IssueType.QUERY_ALL_ISSUETYPE_IDS);
+			return new HashSet<IssueTypeID>((Collection<? extends IssueTypeID>)allIDsQuery.execute());
+		} finally {
+			pm.close();
+		}
+	}
+	
+	//IssuePriority//
+	/**
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type="Required"
+	 */	
+	public IssuePriority storeIssuePriority(IssuePriority issuePriority, boolean get, String[] fetchGroups, int maxFetchDepth) 
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			return NLJDOHelper.storeJDO(pm, issuePriority, get, fetchGroups, maxFetchDepth);
+		}//try
+		finally {
+			pm.close();
+		}//finally
+	}
+
+	/**
+	 * @ejb.interface-method
+	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	@SuppressWarnings("unchecked")
+	public Set<IssuePriorityID> getIssuePriorityIDs()
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			Query q = pm.newQuery(IssuePriority.class);
+			q.setResult("JDOHelper.getObjectId(this)");
+			return new HashSet<IssuePriorityID>((Collection)q.execute()); 
+		} finally {
+			pm.close();
+		}
+	}
+
+	/**
+	 * @ejb.interface-method
+	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	@SuppressWarnings("unchecked")
+	public List<IssuePriority> getIssuePriorities(Collection<IssuePriorityID> issuePriorityIDs, String[] fetchGroups, int maxFetchDepth)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			return NLJDOHelper.getDetachedObjectList(pm, issuePriorityIDs, IssuePriority.class, fetchGroups, maxFetchDepth);
+		} finally {
+			pm.close();
+		}
+	}
+	
+	//IssueSeverityType//
+	/**
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type="Required"
+	 */	
+	public IssueSeverityType storeIssueSeverityType(IssueSeverityType issueSeverityType, boolean get, String[] fetchGroups, int maxFetchDepth)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try{
+			return NLJDOHelper.storeJDO(pm, issueSeverityType, get, fetchGroups, maxFetchDepth);
+		}//try
+		finally{
+			pm.close();
+		}//finally
+	}
+
+	/**
+	 * @ejb.interface-method
+	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	public Set<IssueSeverityTypeID> getIssueSeverityTypeIDs()
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			Query q = pm.newQuery(IssueSeverityType.class);
+			q.setResult("JDOHelper.getObjectId(this)");
+			return new HashSet<IssueSeverityTypeID>((Collection<? extends IssueSeverityTypeID>) q.execute());
+		} finally {
+			pm.close();
+		}
+	}
+
+	/**
+	 * @ejb.interface-method
+	 * @!ejb.transaction type="Supports"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	@SuppressWarnings("unchecked")
+	public List<IssueSeverityType> getIssueSeverityTypes(Collection<IssueSeverityTypeID> issueSeverityTypeIDs, String[] fetchGroups, int maxFetchDepth)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			return NLJDOHelper.getDetachedObjectList(pm, issueSeverityTypeIDs, IssueSeverityType.class, fetchGroups, maxFetchDepth);
+		} finally {
+			pm.close();
+		}
+	}
+	
+	//IssueResolution//
+	/**
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type="Required"
+	 */	
+	public IssueResolution storeIssueResolution(IssueResolution issueResolution, boolean get, String[] fetchGroups, int maxFetchDepth) 
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			return NLJDOHelper.storeJDO(pm, issueResolution, get, fetchGroups, maxFetchDepth);
+		}//try
+		finally {
+			pm.close();
+		}//finally
+	}
+
+	/**
+	 * @throws ModuleException
+	 *
+	 * @ejb.interface-method
+	 * @ejb.transaction type="Required"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	public Collection getIssueResolutions(String[] fetchGroups, int maxFetchDepth)
+	throws ModuleException
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+			if (fetchGroups != null)
+				pm.getFetchPlan().setGroups(fetchGroups);
+
+			Query q = pm.newQuery(IssueResolution.class);
+			return pm.detachCopyAll((Collection)q.execute());
+		} finally {
+			pm.close();
+		}
+	}
+
+	/**
+	 * @ejb.interface-method
+	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	@SuppressWarnings("unchecked")
+	public List<IssueResolution> getIssueResolutions(Collection<IssueResolutionID> issueResolutionIDs, String[] fetchGroups, int maxFetchDepth)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			return NLJDOHelper.getDetachedObjectList(pm, issueResolutionIDs, IssueResolution.class, fetchGroups, maxFetchDepth);
+		} finally {
+			pm.close();
+		}
+	}
+	
+	//Bean//
 	/**
 	 * @throws IOException While loading an icon from a local resource, this might happen and we don't care in the initialise method.
 	 *
@@ -929,11 +988,11 @@ implements SessionBean
 		try {
 			// WORKAROUND JPOX Bug to avoid problems with creating workflows as State.statable is defined as interface and has subclassed implementations 
 			pm.getExtent(Issue.class); 
-			
+
 			String organisationID = getOrganisationID();
-			
+
 			IssueStruct.getIssueStruct(organisationID, pm);
-			
+
 			// The complete method is executed in *one* transaction. So if one thing fails, all fail.
 			// => We check once at the beginning, if this module has already been initialised.
 			ModuleMetaData moduleMetaData = ModuleMetaData.getModuleMetaData(pm, JFireIssueTrackingEAR.MODULE_NAME);
@@ -1085,38 +1144,38 @@ implements SessionBean
 			issueLinkType.getName().setText(Locale.ENGLISH.getLanguage(), "Duplicate");
 			issueLinkType.addLinkedObjectClass(Issue.class);
 			issueLinkType = pm.makePersistent(issueLinkType);
-			
+
 			// Create the projects
 			Project project;
 
 			project = new Project(IDGenerator.getOrganisationID(), IDGenerator.nextID(Project.class));
 			project.getName().setText(Locale.ENGLISH.getLanguage(), "Project 1");
 			project = pm.makePersistent(project);
-			
+
 			Project subProject = new Project(IDGenerator.getOrganisationID(), IDGenerator.nextID(Project.class));
 			subProject.getName().setText(Locale.ENGLISH.getLanguage(), "Sub project 1");
 			project.addSubProject(subProject);
-			
+
 			Project subsubProject = new Project(IDGenerator.getOrganisationID(), IDGenerator.nextID(Project.class));
 			subsubProject.getName().setText(Locale.ENGLISH.getLanguage(), "Sub Sub project 1");
 			subProject.addSubProject(subsubProject);
-			
+
 			subsubProject = new Project(IDGenerator.getOrganisationID(), IDGenerator.nextID(Project.class));
 			subsubProject.getName().setText(Locale.ENGLISH.getLanguage(), "Sub Sub project 2");
 			subProject.addSubProject(subsubProject);
-			
+
 			subsubProject = new Project(IDGenerator.getOrganisationID(), IDGenerator.nextID(Project.class));
 			subsubProject.getName().setText(Locale.ENGLISH.getLanguage(), "Sub Sub project 3");
 			subProject.addSubProject(subsubProject);
-			
+
 			subProject = new Project(IDGenerator.getOrganisationID(), IDGenerator.nextID(Project.class));
 			subProject.getName().setText(Locale.ENGLISH.getLanguage(), "Sub project 2");
 			project.addSubProject(subProject);
-			
+
 			subProject = new Project(IDGenerator.getOrganisationID(), IDGenerator.nextID(Project.class));
 			subProject.getName().setText(Locale.ENGLISH.getLanguage(), "Sub project 3");
 			project.addSubProject(subProject);
-			
+
 			subProject = new Project(IDGenerator.getOrganisationID(), IDGenerator.nextID(Project.class));
 			subProject.getName().setText(Locale.ENGLISH.getLanguage(), "Sub project 4");
 			project.addSubProject(subProject);
@@ -1124,19 +1183,19 @@ implements SessionBean
 			project = new Project(IDGenerator.getOrganisationID(), IDGenerator.nextID(Project.class));
 			project.getName().setText(Locale.ENGLISH.getLanguage(), "Project 2");
 			project = pm.makePersistent(project);
-			
+
 			project = new Project(IDGenerator.getOrganisationID(), IDGenerator.nextID(Project.class));
 			project.getName().setText(Locale.ENGLISH.getLanguage(), "Project 3");
 			project = pm.makePersistent(project);
-			
+
 			project = new Project(IDGenerator.getOrganisationID(), IDGenerator.nextID(Project.class));
 			project.getName().setText(Locale.ENGLISH.getLanguage(), "Project 4");
 			project = pm.makePersistent(project);
-			
+
 			project = new Project(IDGenerator.getOrganisationID(), IDGenerator.nextID(Project.class));
 			project.getName().setText(Locale.ENGLISH.getLanguage(), "Project 5");
 			project = pm.makePersistent(project);
-			
+
 			EditLockType issueEditLock = new EditLockType(EditLockTypeIssue.EDIT_LOCK_TYPE_ID);
 			issueEditLock = pm.makePersistent(issueEditLock);
 			//------------------------------------------------

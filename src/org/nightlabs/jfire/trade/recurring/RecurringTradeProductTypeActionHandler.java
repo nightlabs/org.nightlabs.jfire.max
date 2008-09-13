@@ -172,13 +172,11 @@ public abstract class RecurringTradeProductTypeActionHandler {
 				return res;
 
 			Class<?>[] interfaces = searchClass.getInterfaces();
-			if (interfaces.length > 1) {
-				for (int i = 0; i < interfaces.length; i++) {
-					Class<?> intf = interfaces[i];
-					res = (RecurringTradeProductTypeActionHandler) q.execute(intf.getName());
-					if (res != null)
-						return res;
-				}
+			for (int i = 0; i < interfaces.length; i++) {
+				Class<?> intf = interfaces[i];
+				res = (RecurringTradeProductTypeActionHandler) q.execute(intf.getName());
+				if (res != null)
+					return res;
 			}
 
 			searchClass = searchClass.getSuperclass();

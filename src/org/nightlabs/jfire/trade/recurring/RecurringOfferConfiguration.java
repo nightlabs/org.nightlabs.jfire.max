@@ -1,6 +1,7 @@
 package org.nightlabs.jfire.trade.recurring;
 
 import java.io.Serializable;
+import java.util.Date;
 
 import javax.jdo.JDOHelper;
 
@@ -56,7 +57,7 @@ public class RecurringOfferConfiguration implements Serializable{
 	 * @jdo.field primary-key="true"
 	 */
 	private long recurringOfferConfigurationID;
-
+	
 	/**
 	 * Create a new {@link RecurringOfferConfiguration}. 
 	 * 
@@ -75,8 +76,12 @@ public class RecurringOfferConfiguration implements Serializable{
 				taskID,
 				user,
 				RecurringTradeManagerHome.JNDI_NAME,
-		"processRecurringOfferTimed");
-
+		"processRecurringOfferTimed");	
+		suspendDate = null;
+		
+		
+		
+		
 		// We can not set the parameter here in the constructor as Task.setParam will call makePersistent() 
 		// for the given parameter if it's not, and so it will try to persist the object we are currently creating
 		// This is now handled by RecurringOffer.validate()
@@ -94,6 +99,13 @@ public class RecurringOfferConfiguration implements Serializable{
 	 */
 	private boolean createInvoice;
 
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private Date suspendDate;
+	
+	
+	
 	/**
 	 * Whether we book the invoice implicitly
 	 * 
@@ -233,4 +245,18 @@ public class RecurringOfferConfiguration implements Serializable{
 	public void setBookInvoice(boolean isBookInvoice) {
 		this.bookInvoice = isBookInvoice;
 	}
+
+	public Date getSuspendDate() {
+		return suspendDate;
+	}
+
+	public void setSuspendDate(Date suspendDate) {
+		this.suspendDate = suspendDate;
+	}
+
+
+
+
+
+
 }

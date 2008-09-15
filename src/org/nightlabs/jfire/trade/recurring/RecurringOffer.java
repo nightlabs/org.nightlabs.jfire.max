@@ -48,13 +48,21 @@ public class RecurringOffer extends Offer {
 	/**
 	 * Constant indicating that no problem occurred on the last execution. Value is <code>null</code>.
 	 */
-	public static final String PROBLEM_KEY_NONE = null;
+	public static final String STATUS_KEY_NONE = null;
 	/**
 	 * Constant indication that on the last processing a price difference was found between
 	 * the articles in the newly create {@link RecurredOffer} and the {@link RecurringOffer}.
 	 */
-	public static final String PROBLEM_KEY_PRICES_NOT_EQUAL = "PricesNotEqual";
+	public static final String STATUS_KEY_PRICES_NOT_EQUAL = "PricesNotEqual";
 
+	
+	
+	/**
+	 * Constant indication that on the last processing a price difference was found between
+	 * the articles in the newly create {@link RecurredOffer} and the {@link RecurringOffer}.
+	 */
+	public static final String STATUS_KEY_SUSPENDED = "Suspended";
+	
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent" mapped-by="recurringOffer"
@@ -64,7 +72,7 @@ public class RecurringOffer extends Offer {
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
-	private String problemKey;
+	private String statusKey;
 	
 	/**
 	 * @deprecated Only for JDO!
@@ -83,7 +91,7 @@ public class RecurringOffer extends Offer {
 		super(user, order, offerIDPrefix, offerID);
 		this.recurringOfferConfiguration = new RecurringOfferConfiguration(
 				this, user, getOrganisationID(), IDGenerator.nextID(RecurringOfferConfiguration.class));
-		this.problemKey = PROBLEM_KEY_NONE;
+		this.statusKey = STATUS_KEY_NONE;
 	}
 
 	/**
@@ -116,19 +124,19 @@ public class RecurringOffer extends Offer {
 	 * The ProblemKey stores the error statues upon the last processing
 	 * and the attempt to create a {@link RecurredOffer} on its basis.
 	 * See the method  {@link RecurringTrader#processRecurringOffer(RecurringOffer)}
-	 * also see the constants  {@link #PROBLEM_KEY_NONE} {@link #PROBLEM_KEY_PRICE_NONEQUAL} 
+	 * also see the constants  {@link #STATUS_KEY_NONE} {@link #PROBLEM_KEY_PRICE_NONEQUAL} 
 	 * 
 	 * @return The problem key set for the last processing.
 	 */
-	public String getProblemKey() {
-		return problemKey;
+	public String getStatusKey() {
+		return statusKey;
 	}
 
 	/**
 	 * Set the problem key.
 	 * @param problemKey The problem key to set.
 	 */
-	public void setProblemKey(String problemKey) {
-		this.problemKey = problemKey;
+	public void setStatusKey(String statusKey) {
+		this.statusKey = statusKey;
 	}
 }

@@ -32,8 +32,10 @@ import org.nightlabs.jfire.jbpm.graph.def.ProcessDefinition;
 import org.nightlabs.jfire.jbpm.graph.def.StateDefinition;
 import org.nightlabs.jfire.jbpm.graph.def.Transition;
 import org.nightlabs.jfire.jbpm.graph.def.id.ProcessDefinitionID;
+import org.nightlabs.jfire.security.Authority;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.security.User;
+import org.nightlabs.jfire.security.id.UserID;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.LegalEntity;
@@ -53,7 +55,7 @@ import org.nightlabs.jfire.trade.recurring.jbpm.JbpmConstantsRecurringOffer;
 
 
 /**
- * RecurringTrader is responsible for the purchase and the sale of the {@link RecurringOrder}  {@link RecurringOffer} , {@link RecurredOffer} 
+ * RecurringTrader is responsible for the purchase and the sale of the {@link RecurringOrder}  {@link RecurringOffer} , {@link RecurredOffer}
  * It manages orders, offers and delegates to the Trader and the Store and to the Accounting.
  *
  *
@@ -134,7 +136,7 @@ public class RecurringTrader {
 		if (orderIDPrefix == null) {
 			TradeConfigModule tradeConfigModule;
 			try {
-				tradeConfigModule = (TradeConfigModule) Config.getConfig(
+				tradeConfigModule = Config.getConfig(
 						getPersistenceManager(), getOrganisationID(), user).createConfigModule(TradeConfigModule.class);
 			} catch (ModuleException x) {
 				throw new RuntimeException(x); // should not happen.
@@ -151,7 +153,7 @@ public class RecurringTrader {
 		if (orderIDPrefix == null) {
 			TradeConfigModule tradeConfigModule;
 			try {
-				tradeConfigModule = (TradeConfigModule) Config.getConfig(
+				tradeConfigModule = Config.getConfig(
 						getPersistenceManager(), getOrganisationID(), user).createConfigModule(TradeConfigModule.class);
 			} catch (ModuleException x) {
 				throw new RuntimeException(x); // should not happen.
@@ -169,13 +171,20 @@ public class RecurringTrader {
 	 * @param recurringOffer the {@link RecurringOffer}
 	 * @return newly created {@link RecurredOffer}
 	 * @throws ModuleException If creating the recurred articles fails.
-	 * @throws NamingException 
-	 * @throws CreateException 
+	 * @throws NamingException
+	 * @throws CreateException
 	 */
 	public RecurredOffer processRecurringOffer(RecurringOffer recurringOffer) throws ModuleException, CreateException, NamingException
 	{
-		Boolean PriceDiffer = false;
+		boolean priceDiffer = false;
 
+		Authority organisationAuthority = Authority.getOrganisationAuthority(getPersistenceManager());
+		// userID references the principal, i.e. the currently logged-in user.
+		UserID userID = SecurityReflector.getUserDescriptor().getUserObjectID();
+
+		// TODO set problem key instead of assert (which throws an exception and thus rolls the whole transaction back).
+		organisationAuthority.assertContainsRoleRef(userID, org.nightlabs.jfire.trade.RoleConstants.editOrder);
+		organisationAuthority.assertContainsRoleRef(userID, org.nightlabs.jfire.trade.RoleConstants.editOffer);
 
 		String nodeName = recurringOffer.getState().getStateDefinition().getJbpmNodeName();
 		if (!JbpmConstantsRecurringOffer.Vendor.NODE_NAME_RECURRENCE_STARTED.equals(nodeName)) {
@@ -194,7 +203,7 @@ public class RecurringTrader {
 		String offerIDPrefix = recurringOffer.getOfferIDPrefix();
 
 		// create the new segment for the order
-		for (Segment segment : recurringOffer.getSegments()) { 		
+		for (Segment segment : recurringOffer.getSegments()) {
 			trader.createSegment(order, segment.getSegmentType());
 		}
 
@@ -234,17 +243,17 @@ public class RecurringTrader {
 				}
 			}
 		}
-		
+
 		// loop over the segments added to the order
 		for (Segment segment : order.getSegments()) {
 			logger.debug("Creating articles for RecurredOffer for SegmentType " + JDOHelper.getObjectId(segment.getSegmentType()));
 			Map<Class<? extends ProductType>, Set<Article>> collected = segmentTypes2PTClass2Articles.get(segment.getSegmentType());
-			if (collected != null) { // it is possible that there are segments with no articles in the RecurringOffer				
+			if (collected != null) { // it is possible that there are segments with no articles in the RecurringOffer
 				// add each segment to the RecurredOffer
 				recurredOffer.addSegment(segment);
 				for (Iterator< Class<? extends ProductType>> it = collected.keySet().iterator(); it.hasNext();)
 				{
-					// now for each ProductType class find the handler and let him create the articles 
+					// now for each ProductType class find the handler and let him create the articles
 					Class<? extends ProductType> pt = it.next();
 					logger.debug("  Creating articles for RecurredOffer for ProductType class " + pt);
 
@@ -252,8 +261,8 @@ public class RecurringTrader {
 
 					RecurringTradeProductTypeActionHandler handler = RecurringTradeProductTypeActionHandler.getRecurringTradeProductTypeActionHandler(pm, pt);
 					if (handler == null)
-						throw new IllegalStateException("Could not find a " + RecurringTradeProductTypeActionHandler.class.getName() + 
-								" for the ProductType class " + pt);					
+						throw new IllegalStateException("Could not find a " + RecurringTradeProductTypeActionHandler.class.getName() +
+								" for the ProductType class " + pt);
 					logger.debug("  Found handler " + handler.getClass().getName() + " ProductType class " + pt);
 
 					Map<Article, Article> recurredArticles = handler.createArticles(recurredOffer, articles, segment);
@@ -261,16 +270,16 @@ public class RecurringTrader {
 					for (Map.Entry<Article, Article> articleEntry : recurredArticles.entrySet()) {
 						//	Compare Prices to check if they the Differ
 						if(!articleEntry.getValue().getPrice().equals(articleEntry.getKey().getPrice()))
-							PriceDiffer = true;
+							priceDiffer = true;
 
-						if (logger.isDebugEnabled()) {			
+						if (logger.isDebugEnabled()) {
 							if (!articleEntry.getValue().isAllocated()) {
-								logger.debug("    An Article was created which was NOT allocated: " + JDOHelper.getObjectId(articleEntry.getValue()));					
+								logger.debug("    An Article was created which was NOT allocated: " + JDOHelper.getObjectId(articleEntry.getValue()));
 							} else {
-								logger.debug("    An allocated Article was created: " + JDOHelper.getObjectId(articleEntry.getValue()));					
-							}		
+								logger.debug("    An allocated Article was created: " + JDOHelper.getObjectId(articleEntry.getValue()));
+							}
 
-							logger.debug("  Finished creatingArticles");										
+							logger.debug("  Finished creatingArticles");
 						}
 
 					}
@@ -290,19 +299,23 @@ public class RecurringTrader {
 		 *   be used, but the new offer will not be finalized)
 		 *   How to enforce old prices is not absolutely clear to me now, but I know
 		 *   that it's possible somehow
-		 *   
-		 * Alex    
-		 */ 
+		 *
+		 * Alex
+		 */
 		// finished creating articles
 
-		if(!PriceDiffer)
+		if(!priceDiffer)
 		{
 			// For now, as long as the different strategies are not present, we directly accept the offer.
 			trader.acceptOfferImplicitely(recurredOffer);
 
 			if(recurringOffer.getRecurringOfferConfiguration().isCreateInvoice()) {
-				logger.debug("Creating invoice for new RecurredOffer");
 				// If the configuration says so, automatically create an invoice
+				logger.debug("Creating invoice for new RecurredOffer");
+
+				// TODO set problem key instead of assert (which throws an exception and thus rolls the whole transaction back).
+				organisationAuthority.assertContainsRoleRef(userID, org.nightlabs.jfire.accounting.RoleConstants.editInvoice);
+
 				Accounting accounting = Accounting.getAccounting(pm);
 				Invoice invoice = accounting.createInvoice(user, recurredOffer.getArticles(), null);
 
@@ -315,7 +328,7 @@ public class RecurringTrader {
 					aml.signalInvoice((InvoiceID)JDOHelper.getObjectId(invoice), JbpmConstantsInvoice.Vendor.TRANSITION_NAME_BOOK_IMPLICITELY);
 
 			}
-		}	
+		}
 		else
 			//Mark the Error
 			recurringOffer.setProblemKey(RecurringOffer.PROBLEM_KEY_PRICES_NOT_EQUAL);
@@ -327,9 +340,9 @@ public class RecurringTrader {
 
 	/**
 	 * Creates a new {@link RecurringOffer}.
-	 * A {@link RecurringOffer} has a workflow differing from normal 
+	 * A {@link RecurringOffer} has a workflow differing from normal
 	 * offers as it serves as a template for the creation of {@link RecurredOffer}s.
-	 * 
+	 *
 	 * @param user The user that created the Offer.
 	 * @param recurringOrder The {@link RecurringOrder} the new {@link RecurringOffer} should be part of.
 	 * @param offerIDPrefix The prefix for the id of the new offer. This might be <code>null</code>.
@@ -385,10 +398,10 @@ public class RecurringTrader {
 
 	/**
 	 * Creates a new {@link RecurredOffer} for the given {@link RecurringOffer}.
-	 * 
+	 *
 	 * @param user The user that created the Offer.
 	 * @param order The {@link Order} the new {@link RecurredOffer} should be part of.
-	 * @param offerIDPrefix The prefix for the id of the new offer. This might be <code>null</code>. 
+	 * @param offerIDPrefix The prefix for the id of the new offer. This might be <code>null</code>.
 	 * @return The newly created {@link RecurredOffer}·
 	 */
 	public RecurredOffer createRecurredOffer(RecurringOffer recurringOffer,User user, Order order, String offerIDPrefix)
@@ -439,7 +452,7 @@ public class RecurringTrader {
 
 			return recurredOffer;
 		}
-	}	
+	}
 
 
 	public RecurringOrder createRecurringOrder(LegalEntity vendor,
@@ -492,7 +505,7 @@ public class RecurringTrader {
 
 		// The ActionHandlerNodeEnter is added for all nodes!
 		ActionHandlerNodeEnter.register(jbpmProcessDefinition);
-		// All other handlers are configured in the process definition file		
+		// All other handlers are configured in the process definition file
 
 		// store the process definition
 		ProcessDefinition processDefinition = ProcessDefinition.storeProcessDefinition(pm, null, jbpmProcessDefinition, jbpmProcessDefinitionURL);

@@ -793,7 +793,7 @@ implements SessionBean
 	 *
 	 * @ejb.interface-method
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.trade.sellProductType"
 	 */
 	public Map<ProductID, Map<ScriptRegistryItemID, Object>> getVoucherScriptingResults(
 			Collection<ProductID> voucherIDs, boolean allScripts
@@ -899,6 +899,12 @@ implements SessionBean
 	}
 
 	/**
+	 * Get some preview data which can be used in a graphical voucher editor
+	 * or similar use cases to show meaningful data for the various data-source-scripts.
+	 * <p>
+	 * This method can be called by every authenticated user. We might restrict access in the future.
+	 * </p>
+	 *
 	 * @ejb.interface-method
 	 * @ejb.transaction type="RequiresNew"
 	 * @ejb.permission role-name="_Guest_"
@@ -1052,6 +1058,12 @@ implements SessionBean
 	}
 
 	/**
+	 * Get some preview data which can be used in a graphical voucher editor
+	 * or similar use cases to show meaningful data for the various data-source-scripts.
+	 * <p>
+	 * This method can be called by every authenticated user. We might restrict access in the future.
+	 * </p>
+	 *
 	 * @ejb.interface-method
 	 * @ejb.transaction type="RequiresNew"
 	 * @ejb.permission role-name="_Guest_"
@@ -1194,7 +1206,7 @@ implements SessionBean
 	/**
 	 * @ejb.interface-method
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.trade.sellProductType"
 	 */
 	public LayoutMapForArticleIDSet getVoucherLayoutMapForArticleIDSet(
 			Collection<ArticleID> articleIDs, String[] fetchGroups, int maxFetchDepth)
@@ -1225,6 +1237,11 @@ implements SessionBean
 	}
 
 	/**
+	 * Get {@link VoucherLayout}s specified by their object-ids.
+	 * <p>
+	 * This method can be called by every authenticated user. We might restrict access in the future.
+	 * </p>
+	 *
 	 * @ejb.interface-method
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"

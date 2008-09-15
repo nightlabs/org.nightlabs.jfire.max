@@ -60,7 +60,7 @@ import org.nightlabs.util.TimePeriod;
 
 /**
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
- * 
+ *
  * @ejb.bean name="jfire/ejb/JFireReporting/ReportParameterManager"
  *					 jndi-name="jfire/ejb/JFireReporting/ReportParameterManager"
  *					 type="Stateless"
@@ -74,7 +74,7 @@ extends BaseSessionBeanImpl
 implements SessionBean
 {
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 1L;
 
@@ -110,7 +110,7 @@ implements SessionBean
 	public void ejbRemove() throws EJBException, RemoteException { }
 
 	/**
-	 * 
+	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_System_"
 	 * @ejb.transaction type="Required"
@@ -169,20 +169,20 @@ implements SessionBean
 					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Let the user select a user.")},
 					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Select a user")}
 			);
-			
+
 			ReportParameterUtil.createValueProvider(pm, jfireObjects, ReportingConstants.VALUE_PROVIDER_ID_CURRENT_USER, UserID.class.getName(),
 					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Current user")},
 					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Current user pre-selected (change possible).")},
 					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Current user is selected. You might select an other user.")}
 			);
-			
+
 			ReportParameterUtil.createValueProvider(pm, jfireObjects, ReportingConstants.VALUE_PROVIDER_ID_CURRENT_USER_MULTIPLE,
 					Collection.class.getName() + "<" + UserID.class.getName() + ">",
 					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Current user (with multiple selection)")},
 					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Current user pre-selected (change possible with multiple selection).")},
 					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Current user is selected. You might select an a list of other users.")}
 			);
-			
+
 			ReportParameterUtil.createValueProvider(pm, jfireObjects, ReportingConstants.VALUE_PROVIDER_ID_USERS,
 					Collection.class.getName() + "<" + UserID.class.getName() + ">",
 					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "List of users")},
@@ -214,13 +214,13 @@ implements SessionBean
 					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Let the user select a workstation.")},
 					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Select a workstation")}
 			);
-			
+
 			ReportParameterUtil.createValueProvider(pm, jfireObjects, ReportingConstants.VALUE_PROVIDER_ID_CURRENT_WORKSTATION, WorkstationID.class.getName(),
 					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Current workstation")},
 					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Current workstation pre-selected (change possible).")},
 					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Current workstation is selected. You might select another one.")}
 			);
-			
+
 			ReportParameterUtil.createValueProvider(pm, jfireObjects, ReportingConstants.VALUE_PROVIDER_ID_WORKSTATIONS,
 					Collection.class.getName() + "<" + WorkstationID.class.getName() + ">",
 					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "List of workstations")},
@@ -237,7 +237,7 @@ implements SessionBean
 	 * @throws ModuleException
 	 *
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.reporting.editReport"
 	 * @ejb.transaction type="Required"
 	 */
 	@SuppressWarnings("unchecked")
@@ -370,7 +370,7 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.reporting.editReport"
 	 * @ejb.transaction type="Required"
 	 */
 	public ReportParameterAcquisitionSetup storeReportParameterAcquisitionSetup(

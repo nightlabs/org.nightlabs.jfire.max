@@ -75,8 +75,6 @@ import org.nightlabs.jfire.reporting.layout.render.ReportLayoutRendererHTML;
 import org.nightlabs.jfire.reporting.layout.render.ReportLayoutRendererPDF;
 import org.nightlabs.jfire.reporting.layout.render.ReportLayoutRendererUtil;
 import org.nightlabs.jfire.reporting.oda.JFireReportingOdaException;
-import org.nightlabs.jfire.reporting.oda.jdoql.JDOQLMetaDataParser;
-import org.nightlabs.jfire.reporting.oda.jdoql.JDOQLResultSetMetaData;
 import org.nightlabs.jfire.reporting.oda.jfs.IJFSQueryPropertySetMetaData;
 import org.nightlabs.jfire.reporting.oda.jfs.JFSQueryPropertySet;
 import org.nightlabs.jfire.reporting.oda.jfs.ScriptExecutorJavaClassReporting;
@@ -97,7 +95,7 @@ import org.nightlabs.version.MalformedVersionException;
 /**
  * TODO: Unify method names for ResultSet and ResultSetMetaData getter (also in Dirvers, and Queries)
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
- * 
+ *
  * @ejb.bean name="jfire/ejb/JFireReporting/ReportManager"
  *					 jndi-name="jfire/ejb/JFireReporting/ReportManager"
  *					 type="Stateless"
@@ -111,28 +109,19 @@ extends BaseSessionBeanImpl
 implements SessionBean
 {
 	private static final long serialVersionUID = 1L;
-	/**
-	 * LOG4J logger used by this class
-	 */
 	private static final Logger logger = Logger.getLogger(ReportManagerBean.class);
 
-	/**
-	 * @see com.nightlabs.jfire.base.BaseSessionBeanImpl#setSessionContext(javax.ejb.SessionContext)
-	 */
 	@Override
 	public void setSessionContext(SessionContext sessionContext)
 	throws EJBException, RemoteException
 	{
 		super.setSessionContext(sessionContext);
 	}
-	/**
-	 * @see com.nightlabs.jfire.base.BaseSessionBeanImpl#unsetSessionContext()
-	 */
 	@Override
 	public void unsetSessionContext() {
 		super.unsetSessionContext();
 	}
-	
+
 	/**
 	 * @ejb.create-method
 	 * @ejb.permission role-name="_Guest_"
@@ -141,13 +130,13 @@ implements SessionBean
 	{
 	}
 	/**
-	 * @see javax.ejb.SessionBean#ejbRemove()
+	 * {@inheritDoc}
 	 *
 	 * @ejb.permission unchecked="true"
 	 */
 	public void ejbRemove() throws EJBException, RemoteException { }
-	
-	
+
+
 	@SuppressWarnings("unchecked")
 	private void initRegisterConfigModules(PersistenceManager pm)
 	{
@@ -160,7 +149,7 @@ implements SessionBean
 		configSetup.getConfigModuleClasses().add(ReportLayoutConfigModule.class.getName());
 		ConfigSetup.ensureAllPrerequisites(pm);
 	}
-	
+
 //	private void initDefaultCatReportLayout(PersistenceManager pm, ReportCategory cat, File earDir, String catType, String germanName, String englishName)
 //	throws ModuleException
 //	{
@@ -191,7 +180,7 @@ implements SessionBean
 //			logger.info("Created new default report layout for catType "+catType);
 //		}
 //	}
-	
+
 //	private void initRegisterCategoriesAndLayouts(PersistenceManager pm, JFireServerManager jfireServerManager)
 //	throws ModuleException
 //	{
@@ -340,12 +329,12 @@ implements SessionBean
 //				"Umsatz Statistik"
 //			);
 //	}
-	
+
 	private void initRegisterScripts(PersistenceManager pm, JFireServerManager jfireServerManager) throws InstantiationException, IllegalAccessException
 	{
 		ScriptRegistry.getScriptRegistry(pm).registerScriptExecutorClass(ScriptExecutorJavaClassReporting.class);
 	}
-	
+
 	/**
 	 * This method is called by the datastore initialization mechanism.
 	 * @throws IllegalAccessException
@@ -366,13 +355,13 @@ implements SessionBean
 			JFireServerManager jfireServerManager = getJFireServerManager();
 			try {
 				try {
- 
+
 					ServerPlatformContext platformContext = new ServerPlatformContext();
 					System.setProperty(Platform.PROPERTY_BIRT_HOME, platformContext.getPlatform());
 					EngineConfig config = new EngineConfig();
 					config.setEngineHome(platformContext.getPlatform());
 					config.setLogConfig(platformContext.getPlatform(), java.util.logging.Level.ALL);
-					
+
 					config.setPlatformContext(platformContext);
 					Platform.startup(config);
 //					Platform.initialize(platformContext);
@@ -408,16 +397,16 @@ implements SessionBean
 			} catch (Exception e) {
 				logger.warn("Could not initially register HTML ReportLayoutRenderer when initializing ReportRegistry.", e);
 			}
-			
+
 			// Init scripts before module metat data check
 			initRegisterScripts(pm, jfireServerManager);
-			
+
 			ModuleMetaData moduleMetaData = ModuleMetaData.getModuleMetaData(pm, JFireReportingEAR.MODULE_NAME);
 			if (moduleMetaData == null) {
-			
+
 				logger.info("Initialization of JFireReporting started ...");
-	
-				
+
+
 				// version is {major}.{minor}.{release}-{patchlevel}-{suffix}
 				moduleMetaData = new ModuleMetaData(
 						JFireReportingEAR.MODULE_NAME, "0.9.5-0-beta", "0.9.5-0-beta");
@@ -426,9 +415,9 @@ implements SessionBean
 
 				initRegisterConfigModules(pm);
 				logger.info("Initialized Reporting ConfigModules");
-				
+
 			}
-			
+
 			logger.info("Intializing JFireReporting basic scripts");
 			ScriptingInitialiser.initialise(pm, jfireServerManager, Organisation.DEV_ORGANISATION_ID);
 
@@ -439,9 +428,9 @@ implements SessionBean
 			pm.close();
 			jfireServerManager.close();
 		}
-		
+
 	}
-	
+
 	protected void initialiseCleanupRenderedReportLayoutFoldersTask(PersistenceManager pm) {
 		TaskID taskID = TaskID.create(
 				getOrganisationID(),
@@ -481,7 +470,7 @@ implements SessionBean
 		task.setEnabled(true);
 		pm.makePersistent(task);
 	}
-	
+
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_System_"
@@ -497,25 +486,23 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
-	/**
-	 * @throws ModuleException
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Required"
-	 */
-	public JDOQLResultSetMetaData getQueryMetaData(String organisationID, String queryText)
-	{
-		return JDOQLMetaDataParser.parseJDOQLMetaData(queryText);
-	}
-	
+
+//	/**
+//	 * @ejb.interface-method
+//	 * @ejb.permission role-name="_Guest_"
+//	 * @ejb.transaction type="Required"
+//	 */
+//	public JDOQLResultSetMetaData getQueryMetaData(String organisationID, String queryText)
+//	{
+//		return JDOQLMetaDataParser.parseJDOQLMetaData(queryText);
+//	}
+
 	/**
 	 * @throws InstantiationException
 	 * @throws ScriptException
 	 *
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.reporting.editReport"
 	 * @ejb.transaction type="Never"
 	 */
 	public IResultSetMetaData getJFSResultSetMetaData(JFSQueryPropertySet queryPropertySet) throws ScriptException, InstantiationException
@@ -527,15 +514,15 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * Obtains the {@link IJFSQueryPropertySetMetaData} of the referenced script.
-	 *  
+	 *
 	 * @throws ScriptException If getting the meta-data fails.
 	 * @throws InstantiationException If creating the executor fails.
-	 * 
+	 *
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.reporting.editReport"
 	 * @ejb.transaction type="Never"
 	 */
 	public IJFSQueryPropertySetMetaData getJFSQueryPropertySetMetaData(ScriptRegistryItemID scriptID) throws ScriptException, InstantiationException
@@ -547,13 +534,13 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * @throws InstantiationException
 	 * @throws ScriptException
 	 *
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.reporting.editReport"
 	 * @ejb.transaction type="Never"
 	 */
 	public IResultSet getJFSResultSet(
@@ -573,12 +560,12 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 *
 	 * @throws JFireReportingOdaException
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.reporting.editReport"
 	 * @ejb.transaction type="Never"
 	 */
 	public IParameterMetaData getJFSParameterMetaData(
@@ -595,16 +582,16 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
-	
+
+
 	/**
 	 * Returns the {@link ReportRegistryItem} with the given id.
 	 * It will be detached with the given fetch-groups and fetch-depth.
-	 * 
+	 *
 	 * @param reportRegistryItemID The id of the {@link ReportRegistryItem} to fetch.
 	 * @param fetchGroups The fetch-groups to detach the item with.
 	 * @param maxFetchDepth The maximum fetch-depth while detaching.
-	 * 
+	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Required"
@@ -627,17 +614,17 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * Returns the {@link ReportRegistryItem}s represented by the given list of {@link ReportRegistryItemID}s.
 	 * All will be detached with the given fetch-groups.
-	 * 
+	 *
 	 * @param reportRegistryItemIDs The list of id of items to fetch.
 	 * @param fetchGroups The fetch-groups to detach the items with.
 	 * @param maxFetchDepth The maximum fetch-depth while detaching.
-	 * 
+	 *
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.reporting.renderReport"
 	 * @ejb.transaction type="Required"
 	 */
 	public List<ReportRegistryItem> getReportRegistryItems (
@@ -651,7 +638,7 @@ implements SessionBean
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
-			
+
 			List<ReportRegistryItem> result = new ArrayList<ReportRegistryItem>();
 			for (ReportRegistryItemID itemID : reportRegistryItemIDs) {
 				ReportRegistryItem item = (ReportRegistryItem)pm.getObjectById(itemID);
@@ -663,15 +650,15 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * Returns the {@link ReportRegistryItemID}s of all {@link ReportRegistryItem}s
 	 * that are direct children of the given reportRegistryItemID.
-	 * 
+	 *
 	 * @param reportRegistryItemID The id of the parent to search the children for.
-	 * 
+	 *
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.reporting.renderReport"
 	 * @ejb.transaction type="Required"
 	 */
 	public Collection<ReportRegistryItemID> getReportRegistryItemIDsForParent(ReportRegistryItemID reportRegistryItemID)
@@ -690,44 +677,44 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
-	/**
-	 * Returns all {@link ReportRegistryItem}s for the given organisationID that do
-	 * not have a parent.
-	 * 
-	 * @param organisationID The organisationID to search top-level items for.
-	 * @param fetchGroups The fetch-groups to detach the found items with.
-	 * @param maxFetchDepth The maximum fetch-depth while detaching.
-	 * 
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Required"
-	 */
-	public Collection getTopLevelReportRegistryItems (
-			String organisationID,
-			String[] fetchGroups, int maxFetchDepth
-		)
-	{
-		PersistenceManager pm;
-		pm = getPersistenceManager();
-		try {
-			Collection topLevelItems = ReportRegistryItem.getTopReportRegistryItems(pm, organisationID);
-			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
-			if (fetchGroups != null)
-				pm.getFetchPlan().setGroups(fetchGroups);
-			Collection result = pm.detachCopyAll(topLevelItems);
-			return result;
-		} finally {
-			pm.close();
-		}
-	}
-	
+
+//	/**
+//	 * Returns all {@link ReportRegistryItem}s for the given organisationID that do
+//	 * not have a parent.
+//	 *
+//	 * @param organisationID The organisationID to search top-level items for.
+//	 * @param fetchGroups The fetch-groups to detach the found items with.
+//	 * @param maxFetchDepth The maximum fetch-depth while detaching.
+//	 *
+//	 * @ejb.interface-method
+//	 * @ejb.permission role-name="org.nightlabs.jfire.reporting.renderReport"
+//	 * @ejb.transaction type="Required"
+//	 */
+//	public Collection getTopLevelReportRegistryItems (
+//			String organisationID,
+//			String[] fetchGroups, int maxFetchDepth
+//		)
+//	{
+//		PersistenceManager pm;
+//		pm = getPersistenceManager();
+//		try {
+//			Collection topLevelItems = ReportRegistryItem.getTopReportRegistryItems(pm, organisationID);
+//			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+//			if (fetchGroups != null)
+//				pm.getFetchPlan().setGroups(fetchGroups);
+//			Collection result = pm.detachCopyAll(topLevelItems);
+//			return result;
+//		} finally {
+//			pm.close();
+//		}
+//	}
+
 	/**
 	 * Returns all {@link ReportRegistryItemID}s that do not have a parent.
 	 * These will be only for the organisationID of the calling user.
 	 *
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.reporting.renderReport"
 	 * @ejb.transaction type="Required"
 	 */
 	public Collection<ReportRegistryItemID> getTopLevelReportRegistryItemIDs ()
@@ -745,30 +732,30 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * Get the {@link ReportingManagerFactory} for the actual organisationID.
-	 * 
+	 *
 	 * @return The {@link ReportingManagerFactory} for the actual organisationID.
 	 */
 	protected ReportingManagerFactory getReportingManagerFactory() throws NamingException
 	{
 		return ReportingManagerFactory.getReportingManagerFactory(getInitialContext(getOrganisationID()), getOrganisationID());
 	}
-	
+
 	/**
 	 * Stores the given {@link ReportRegistryItem} to the datastore
 	 * of the organiation of the calling user.
-	 * 
+	 *
 	 * @param reportRegistryItem The item to store.
 	 * @param get Wheter a detached copy of the stored item should be returned.
 	 * @param fetchGroups If get is <code>true</code>, this defines the fetch-groups the
 	 * 		retuned item will be detached with.
 	 * @param maxFetchDepth If get is <code>true</code>, this defines the maximum fetch-depth
 	 * 		when detaching.
-	 * 
+	 *
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.reporting.editReport"
 	 * @ejb.transaction type="Required"
 	 */
 	public ReportRegistryItem storeRegistryItem (
@@ -785,15 +772,15 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
-	
+
+
 	/**
 	 * Delete the {@link ReportRegistryItem} with the given id.
-	 * 
+	 *
 	 * @param reportRegistryItemID The id of the item to delete.
-	 * 
+	 *
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.reporting.editReport"
 	 * @ejb.transaction type="Required"
 	 */
 	public void deleteRegistryItem (ReportRegistryItemID reportRegistryItemID)
@@ -816,20 +803,20 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 
 	/**
 	 * Renders the {@link ReportLayout} referenced by the given {@link RenderReportRequest}
 	 * and returns the resulting {@link RenderedReportLayout}.
-	 * 
-	 * @param renderReportRequest The request defining wich report to render, to which format it
-	 * 		should be rendered and wich Locale should be applied etc.
-	 * 
-	 * @throws NamingException Might be thrown while resoving the {@link ReportingManagerFactory}.
+	 *
+	 * @param renderReportRequest The request defining which report to render, to which format it
+	 * 		should be rendered and which Locale should be applied etc.
+	 *
+	 * @throws NamingException Might be thrown while resolving the {@link ReportingManagerFactory}.
 	 * @throws RenderReportException Might be thrown if rendering the report fails.
 	 *
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.reporting.renderReport"
 	 * @ejb.transaction type="Never"
 	 */
 	public RenderedReportLayout renderReportLayout(RenderReportRequest renderReportRequest)
@@ -848,11 +835,11 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 *
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.reporting.editReport"
 	 * @ejb.transaction type="Required"
 	 */
 	public Collection execJDOQL (
@@ -880,17 +867,17 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * Returns the {@link ReportLayoutLocalisationData} for the given report layout id.
 	 * The localisation data contains localisation labels for the report.
-	 * 
+	 *
 	 * @param reportLayoutID The id of the layout to get the localisation data for.
 	 * @param fetchGroups The fetch-groups to detach the localisation data with.
 	 * @param maxFetchDepth The maximum fetch-depth when detaching.
-	 * 
+	 *
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.reporting.editReport"
 	 * @ejb.transaction type="Required"
 	 */
 	@SuppressWarnings("unchecked")
@@ -905,7 +892,7 @@ implements SessionBean
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
-			
+
 			ReportLayout reportLayout = (ReportLayout) pm.getObjectById(reportLayoutID);
 			Collection<ReportLayoutLocalisationData> bundle = ReportLayoutLocalisationData.getReportLayoutLocalisationBundle(pm, reportLayout);
 			return pm.detachCopyAll(bundle);
@@ -913,11 +900,11 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * Stores the given {@link ReportLayoutLocalisationData} to the datastore
 	 * of the organiation of the calling user.
-	 * 
+	 *
 	 * @param bundle The bundle to store.
 	 * @param get Wheter a detached copy of the stored bundle should be returned.
 	 * @param fetchGroups If get is <code>true</code>, this defines the fetch-groups the
@@ -926,7 +913,7 @@ implements SessionBean
 	 * 		when detaching.
 	 *
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.reporting.editReport"
 	 * @ejb.transaction type="Required"
 	 */
 	@SuppressWarnings("unchecked")

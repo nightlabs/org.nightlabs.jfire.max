@@ -385,8 +385,8 @@ implements SessionBean
 	 * @ejb.permission role-name="org.nightlabs.jfire.store.seeProductType"
 	 */
 	@SuppressWarnings("unchecked")
-	public Set<ProductTypeID> getChildVoucherTypeIDs(
-			ProductTypeID parentVoucherTypeID) {
+	public Set<ProductTypeID> getChildVoucherTypeIDs(ProductTypeID parentVoucherTypeID)
+	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			Collection<VoucherType> voucherTypes = VoucherType.getChildVoucherTypes(pm, parentVoucherTypeID);
@@ -506,6 +506,16 @@ implements SessionBean
 				).assertContainsRoleRef(
 						getPrincipal(),
 						RoleConstants.editConfirmedProductType
+				);
+			}
+			else {
+				Authority.resolveSecuringAuthority(
+						pm,
+						voucherType.getProductTypeLocal(),
+						ResolveSecuringAuthorityStrategy.allow // already checked by the JavaEE server
+				).assertContainsRoleRef(
+						getPrincipal(),
+						RoleConstants.editUnconfirmedProductType
 				);
 			}
 
@@ -907,7 +917,7 @@ implements SessionBean
 	 *
 	 * @ejb.interface-method
 	 * @ejb.transaction type="RequiresNew"
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.voucher.editVoucherLayout"
 	 */
 	public PreviewParameterValuesResult getPreviewParameterValues(
 			ProductTypeID voucherTypeID) throws ModuleException {
@@ -1066,7 +1076,7 @@ implements SessionBean
 	 *
 	 * @ejb.interface-method
 	 * @ejb.transaction type="RequiresNew"
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.voucher.editVoucherLayout"
 	 */
 	public Map<ProductID, Map<ScriptRegistryItemID, Object>> getPreviewVoucherData(PreviewParameterSet previewParameterSet) throws ModuleException
 	{
@@ -1244,7 +1254,7 @@ implements SessionBean
 	 *
 	 * @ejb.interface-method
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.voucher.editVoucherLayout"
 	 */
 	@SuppressWarnings("unchecked")
 	public List<VoucherLayout> getVoucherLayouts(Set<VoucherLayoutID> voucherLayoutIDs, String[] fetchGroups, int maxFetchDepth)

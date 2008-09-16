@@ -29,7 +29,21 @@
 		</role-group>
 	</authority-type>
 
-<!--
+	<role-group id="org.nightlabs.jfire.voucher.editVoucherLayout">
+		<name>Edit voucher layouts</name>
+		<name language="de">Gutschein-Layouts bearbeiten</name>
+		<description>
+			Retrieve example data for the layout editor; get and modify
+			voucher layouts.
+		</description>
+		<description>
+			Beispieldaten für den Layout-Editor abfragen;
+			Gutschein-Layout abfragen und verändern.
+		</description>
+		<role id="org.nightlabs.jfire.voucher.editVoucherLayout" />
+	</role-group>
+
+	<!--
 	<role-group id="JFireVoucher.VoucherType.edit">
 		<name>Edit voucher types</name>
 		<name language="de">Gutscheintypen bearbeiten</name>

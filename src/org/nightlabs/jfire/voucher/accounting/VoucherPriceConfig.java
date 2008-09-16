@@ -52,11 +52,14 @@ implements IPackagePriceConfig
 	 * @jdo.join
 	 */
 	private Map<Currency, Long> prices;
-	
-	/**
-	 * @jdo.field persistence-modifier="none"
-	 */
-	private Map<Currency, Long> pricesAsDouble;
+
+// First: This should not be here! If you really need this in your web shop, please implement it there - noone else never needed it before => makes no sense to bloat this class with it.
+// Second: Why do you write "pricesAsDouble" when the Map is still containing Long instances????
+// Marco.
+//	/**
+//	 * @jdo.field persistence-modifier="none"
+//	 */
+//	private Map<Currency, Long> pricesAsDouble;
 
 	/**
 	 * @deprecated Only for JDO!
@@ -164,18 +167,21 @@ implements IPackagePriceConfig
 
 		return readOnlyPrices;
 	}
-	
-	public Map<Currency, Long> getPricesAsDouble()
-	{
-		if (pricesAsDouble == null){
-			pricesAsDouble = new HashMap<Currency, Long>();
-			for	(Currency c : prices.keySet()) {
-				Long longValue = prices.get(c).longValue()/100;
-				pricesAsDouble.put(c, longValue);
-			}
-		}
-		return pricesAsDouble;
-	}
+
+//	public Map<Currency, Long> getPricesAsDouble()
+//	{
+//		if (pricesAsDouble == null){
+//			pricesAsDouble = new HashMap<Currency, Long>();
+//			for	(Currency c : prices.keySet()) {
+//
+// You loose data here!!! You divide a long by 100 => for example 2535 cent become 25 EUR - but they should be 25.35 EUR!!!
+//
+//				Long longValue = prices.get(c).longValue()/100;
+//				pricesAsDouble.put(c, longValue);
+//			}
+//		}
+//		return pricesAsDouble;
+//	}
 
 	public void setPrice(Currency currency, Long value)
 	{

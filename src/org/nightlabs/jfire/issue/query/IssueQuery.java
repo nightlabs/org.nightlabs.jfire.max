@@ -1,14 +1,12 @@
 package org.nightlabs.jfire.issue.query;
 
 import java.util.Date;
-import java.util.Set;
 
 import javax.jdo.Query;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.jdo.query.AbstractJDOQuery;
 import org.nightlabs.jfire.issue.Issue;
-import org.nightlabs.jfire.issue.IssueLink;
 import org.nightlabs.jfire.issue.id.IssueLinkTypeID;
 import org.nightlabs.jfire.issue.id.IssuePriorityID;
 import org.nightlabs.jfire.issue.id.IssueResolutionID;
@@ -60,7 +58,7 @@ public class IssueQuery
 	private Date createTimestamp;
 	private Date updateTimestamp;
 	private IssueLinkTypeID issueLinkTypeID;
-	private Set<IssueLink> issueLinks;
+//	private Set<IssueLink> issueLinks;
 	private Date issueWorkTimeRangeFrom;
 	private Date issueWorkTimeRangeTo;
 	private ProjectID projectID;
@@ -82,7 +80,6 @@ public class IssueQuery
 		public static final String issueCommentRegex = "issueCommentRegex";
 		public static final String issueComment = "issueComment";
 		public static final String issueLinkTypeID = "issueLinkTypeID";
-		public static final String issueLinks = "issueLinks";
 		public static final String issueWorkTimeRangeFrom = "issueWorkTimeRangeFrom";
 		public static final String issueWorkTimeRangeTo = "issueWorkTimeRangeTo";
 		public static final String projectID = "projectID";
@@ -157,22 +154,22 @@ public class IssueQuery
 		}
 
 		if (isFieldEnabled(FieldName.issueLinkTypeID) && issueLinkTypeID != null) {
-			filter.append("\n && (this.issueLinks.contains(varIssueLinkType) && (varIssueLinkType.issueLinkType.organisationID == :issueLinkTypeID.organisationID))");
-			filter.append("\n && (this.issueLinks.contains(varIssueLinkType) && (varIssueLinkType.issueLinkType.issueLinkTypeID == :issueLinkTypeID.issueLinkTypeID))");
+//			filter.append("\n && (this.issueLinks.contains(varIssueLink) )) ");
+			filter.append("\n && (this.issueLinks.contains(varIssueLink) && (varIssueLink.issueLinkType.organisationID == :issueLinkTypeID.organisationID) && (varIssueLink.issueLinkType.issueLinkTypeID == :issueLinkTypeID.issueLinkTypeID)) ");
 		}
 
 		if (isFieldEnabled(FieldName.issueWorkTimeRangeFrom) && !isFieldEnabled(FieldName.issueWorkTimeRangeTo) && issueWorkTimeRangeFrom != null) {
-			filter.append("\n && (this.issueWorkTimeRanges.contains(varIssueWorkTimeRange) && (varIssueWorkTimeRange.from >= :issueWorkTimeRangeFrom))");
+			filter.append("\n && (this.issueWorkTimeRanges.contains(varIssueWorkTimeRange) && (varIssueWorkTimeRange.from >= :issueWorkTimeRangeFrom)) ");
 		}
 		
 		if (!isFieldEnabled(FieldName.issueWorkTimeRangeFrom) && isFieldEnabled(FieldName.issueWorkTimeRangeTo) && issueWorkTimeRangeTo != null) {
-			filter.append("\n && (this.issueWorkTimeRanges.contains(varIssueWorkTimeRange) && (varIssueWorkTimeRange.to <= :issueWorkTimeRangeTo))");
+			filter.append("\n && (this.issueWorkTimeRanges.contains(varIssueWorkTimeRange) && (varIssueWorkTimeRange.to <= :issueWorkTimeRangeTo)) ");
 		}
 		
 		if (isFieldEnabled(FieldName.issueWorkTimeRangeFrom) && isFieldEnabled(FieldName.issueWorkTimeRangeTo) 
 				&& issueWorkTimeRangeFrom != null && issueWorkTimeRangeTo != null) {
 			filter.append("\n && (this.issueWorkTimeRanges.contains(varIssueWorkTimeRange) && !((varIssueWorkTimeRange.from >= :issueWorkTimeRangeTo) && (varIssueWorkTimeRange.to > :issueWorkTimeRangeTo))) ");
-			filter.append("\n || (this.issueWorkTimeRanges.contains(varIssueWorkTimeRange) && !((varIssueWorkTimeRange.to <= :issueWorkTimeRangeFrom) && (varIssueWorkTimeRange.from < :issueWorkTimeRangeFrom)))");
+			filter.append("\n || (this.issueWorkTimeRanges.contains(varIssueWorkTimeRange) && !((varIssueWorkTimeRange.to <= :issueWorkTimeRangeFrom) && (varIssueWorkTimeRange.from < :issueWorkTimeRangeFrom))) ");
 		}
 		
 		if (isFieldEnabled(FieldName.projectID) && projectID != null) {
@@ -435,7 +432,7 @@ public class IssueQuery
 	public void setIssueWorkTimeRangeTo(Date issueWorkTimeRangeTo)
 	{
 		final Date oldIssueWorkTimeRangeTo = this.issueWorkTimeRangeTo;
-		this.issueWorkTimeRangeFrom = issueWorkTimeRangeFrom;
+		this.issueWorkTimeRangeTo = issueWorkTimeRangeTo;
 		notifyListeners(FieldName.issueWorkTimeRangeTo, oldIssueWorkTimeRangeTo, issueWorkTimeRangeTo);
 	}
 
@@ -448,17 +445,6 @@ public class IssueQuery
 		final IssueLinkTypeID oldIssueLinkTypeID = this.issueLinkTypeID;
 		this.issueLinkTypeID = issueLinkTypeID;
 		notifyListeners(FieldName.issueLinkTypeID, oldIssueLinkTypeID, issueLinkTypeID);
-	}
-
-	public void setIssueLinks(Set<IssueLink> issueLinks)
-	{
-		final Set<IssueLink> oldIssueLinks = this.issueLinks;
-		this.issueLinks = issueLinks;
-		notifyListeners(FieldName.issueLinks, oldIssueLinks, issueLinks);
-	}
-
-	public Set<IssueLink> getIssueLinks() {
-		return issueLinks;
 	}
 
 	public Date getCreateTimestamp() {

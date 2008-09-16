@@ -374,6 +374,16 @@ implements SessionBean
 						RoleConstants.editConfirmedProductType
 				);
 			}
+			else {
+				Authority.resolveSecuringAuthority(
+						pm,
+						dynamicProductType.getProductTypeLocal(),
+						ResolveSecuringAuthorityStrategy.allow // already checked by the JavaEE server
+				).assertContainsRoleRef(
+						getPrincipal(),
+						RoleConstants.editUnconfirmedProductType
+				);
+			}
 
 			// take care about the inheritance
 			dynamicProductType.applyInheritance();

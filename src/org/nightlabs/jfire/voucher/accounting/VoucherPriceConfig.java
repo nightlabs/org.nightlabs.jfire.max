@@ -20,6 +20,7 @@ import org.nightlabs.jfire.trade.ArticlePrice;
 
 /**
  * @author Marco Schulze - Marco at NightLabs dot de
+ * @author Attapol Thomprasert - Attapol at NightLabs dot de
  *
  * @jdo.persistence-capable
  *		identity-type="application"
@@ -51,6 +52,11 @@ implements IPackagePriceConfig
 	 * @jdo.join
 	 */
 	private Map<Currency, Long> prices;
+	
+	/**
+	 * @jdo.field persistence-modifier="none"
+	 */
+	private Map<Currency, Long> pricesAsDouble;
 
 	/**
 	 * @deprecated Only for JDO!
@@ -157,6 +163,18 @@ implements IPackagePriceConfig
 			readOnlyPrices = Collections.unmodifiableMap(prices);
 
 		return readOnlyPrices;
+	}
+	
+	public Map<Currency, Long> getPricesAsDouble()
+	{
+		if (pricesAsDouble == null){
+			pricesAsDouble = new HashMap<Currency, Long>();
+			for	(Currency c : prices.keySet()) {
+				Long longValue = prices.get(c).longValue()/100;
+				pricesAsDouble.put(c, longValue);
+			}
+		}
+		return pricesAsDouble;
 	}
 
 	public void setPrice(Currency currency, Long value)

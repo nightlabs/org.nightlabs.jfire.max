@@ -333,7 +333,8 @@ public class RecurringTrader {
 			//Mark the Error
 			recurringOffer.setStatusKey(RecurringOffer.STATUS_KEY_PRICES_NOT_EQUAL);
 
-
+		// Increment the recurredOffer Counter
+		recurringOffer.setRecurredOfferCount(recurringOffer.getRecurredOfferCount()+1);
 		return recurredOffer;
 	}
 

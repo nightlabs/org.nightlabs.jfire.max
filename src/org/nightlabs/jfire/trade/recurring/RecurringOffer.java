@@ -55,11 +55,10 @@ public class RecurringOffer extends Offer {
 	 */
 	public static final String STATUS_KEY_PRICES_NOT_EQUAL = "PricesNotEqual";
 
-	
+		
 	
 	/**
-	 * Constant indication that on the last processing a price difference was found between
-	 * the articles in the newly create {@link RecurredOffer} and the {@link RecurringOffer}.
+	 * the recurringOffer has been suspended due to stop date mostly
 	 */
 	public static final String STATUS_KEY_SUSPENDED = "Suspended";
 	
@@ -73,6 +72,13 @@ public class RecurringOffer extends Offer {
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private String statusKey;
+	
+	
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private int recurredOfferCount;
+	
 	
 	/**
 	 * @deprecated Only for JDO!
@@ -92,6 +98,8 @@ public class RecurringOffer extends Offer {
 		this.recurringOfferConfiguration = new RecurringOfferConfiguration(
 				this, user, getOrganisationID(), IDGenerator.nextID(RecurringOfferConfiguration.class));
 		this.statusKey = STATUS_KEY_NONE;
+		this.recurredOfferCount = 0;
+		
 	}
 
 	/**
@@ -138,5 +146,13 @@ public class RecurringOffer extends Offer {
 	 */
 	public void setStatusKey(String statusKey) {
 		this.statusKey = statusKey;
+	}
+
+	public int getRecurredOfferCount() {
+		return recurredOfferCount;
+	}
+
+	protected void setRecurredOfferCount(int recurredOfferCount) {
+		this.recurredOfferCount = recurredOfferCount;
 	}
 }

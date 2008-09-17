@@ -53,7 +53,6 @@ import org.eclipse.birt.report.engine.api.EngineConfig;
 import org.eclipse.datatools.connectivity.oda.IParameterMetaData;
 import org.eclipse.datatools.connectivity.oda.IResultSet;
 import org.eclipse.datatools.connectivity.oda.IResultSetMetaData;
-import org.nightlabs.ModuleException;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
@@ -93,7 +92,9 @@ import org.nightlabs.timepattern.TimePatternFormatException;
 import org.nightlabs.version.MalformedVersionException;
 
 /**
- * TODO: Unify method names for ResultSet and ResultSetMetaData getter (also in Dirvers, and Queries)
+ * Manager that gives access to {@link ReportRegistryItem}s and other objects linked to them.
+ * This is also the entry point for rendering report layouts.
+ * 
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  *
  * @ejb.bean name="jfire/ejb/JFireReporting/ReportManager"
@@ -136,8 +137,10 @@ implements SessionBean
 	 */
 	public void ejbRemove() throws EJBException, RemoteException { }
 
-
-	@SuppressWarnings("unchecked")
+	/**
+	 * Called by {@link #initialise()} and registeres the reporting
+	 * config-modules in their config-setup.
+	 */
 	private void initRegisterConfigModules(PersistenceManager pm)
 	{
 		// Register all Reporting-ConfigModules
@@ -149,201 +152,22 @@ implements SessionBean
 		configSetup.getConfigModuleClasses().add(ReportLayoutConfigModule.class.getName());
 		ConfigSetup.ensureAllPrerequisites(pm);
 	}
-
-//	private void initDefaultCatReportLayout(PersistenceManager pm, ReportCategory cat, File earDir, String catType, String germanName, String englishName)
-//	throws ModuleException
-//	{
-//		File layoutDesign = new File(earDir, "Default-"+catType+".rptdesign");
-//		logger.info("Checking default report layout fo catType "+catType+" file: "+layoutDesign);
-//		if (layoutDesign.exists()) {
-//			logger.info("File: "+layoutDesign+" existing");
-//			ReportLayout layout = new ReportLayout(pm, cat, null);
-//			try {
-//				layout.loadFile(layoutDesign);
-//			} catch (IOException e) {
-//				logger.error("Could not read ReportLayout file for default offer layout: ", e);
-//			}
-//			layout.getName().setText(Locale.ENGLISH.getLanguage(), englishName);
-//			layout.getName().setText(Locale.GERMAN.getLanguage(), germanName);
-//			logger.info("Persisting default layout for "+catType);
-//			pm.makePersistent(layout);
-//			logger.info("Persisting default layout for "+catType+" ...  DONE");
-//
-//			Collection configs = Config.getConfigsByType(pm, getOrganisationID(), UserConfigSetup.CONFIG_TYPE_USER_CONFIG);
-//			for (Iterator iter = configs.iterator(); iter.hasNext();) {
-//				Config config = (Config) iter.next();
-//				ReportLayoutConfigModule configModule = (ReportLayoutConfigModule)config.createConfigModule(ReportLayoutConfigModule.class, null);
-////				ReportLayoutConfigModule configModule = (ReportLayoutConfigModule)ConfigModule.getAutoCreateConfigModule(pm, config, ReportLayoutConfigModule.class, null);
-//				configModule.getAvailEntry(catType).setDefaultReportLayoutKey(JDOHelper.getObjectId(layout).toString());
-//				logger.info("Set default for ReportLayoutConfigModule for category "+catType+" and Config "+config.getConfigKey());
-//			}
-//			logger.info("Created new default report layout for catType "+catType);
-//		}
-//	}
-
-//	private void initRegisterCategoriesAndLayouts(PersistenceManager pm, JFireServerManager jfireServerManager)
-//	throws ModuleException
-//	{
-//		// TODO: Init report categories and layouts like spcripting
-//		File earDir = new File(
-//				jfireServerManager.getJFireServerConfigModule()
-//				.getJ2ee().getJ2eeDeployBaseDirectory()+
-//				"JFireReporting.ear"
-//			);
-//
-////		 Register internal report categories if not existent
-//		ReportCategory offerCat = ReportCategory.getReportCategory(
-//				pm,
-//				getOrganisationID(),
-//				ReportCategory.INTERNAL_CATEGORY_TYPE_OFFER
-//		);
-//		if (offerCat == null) {
-//			offerCat = new ReportCategory(
-//					null,
-//					getOrganisationID(),
-//					ReportCategory.INTERNAL_CATEGORY_TYPE_OFFER,
-//					true
-//			);
-//			offerCat.getName().setText(Locale.ENGLISH.getLanguage(), "Offer Layouts");
-//			offerCat.getName().setText(Locale.GERMAN.getLanguage(), "Angebots-Vorlagen");
-//			pm.makePersistent(offerCat);
-//		}
-//		initDefaultCatReportLayout(
-//				pm,
-//				offerCat,
-//				earDir,
-//				ReportCategory.INTERNAL_CATEGORY_TYPE_OFFER,
-//				"Standard Angebots-Vorlage",
-//				"Default offer layout"
-//			);
-//
-//
-//		ReportCategory orderCat = ReportCategory.getReportCategory(
-//				pm,
-//				getOrganisationID(),
-//				ReportCategory.INTERNAL_CATEGORY_TYPE_ORDER
-//		);
-//		if (orderCat == null) {
-//			orderCat = new ReportCategory(
-//					pm,
-//					null,
-//					getOrganisationID(),
-//					ReportCategory.INTERNAL_CATEGORY_TYPE_ORDER,
-//					true
-//			);
-//			orderCat.getName().setText(Locale.ENGLISH.getLanguage(), "Order Layouts");
-//			orderCat.getName().setText(Locale.GERMAN.getLanguage(), "Auftrags-Vorlagen");
-//			pm.makePersistent(orderCat);
-//		}
-//
-//		initDefaultCatReportLayout(
-//				pm,
-//				orderCat,
-//				earDir,
-//				ReportCategory.INTERNAL_CATEGORY_TYPE_ORDER,
-//				"Standard Auftrags-Vorlage",
-//				"Default order layout"
-//			);
-//
-//
-//		ReportCategory invoiceCat = ReportCategory.getReportCategory(
-//				pm,
-//				getOrganisationID(),
-//				ReportCategory.INTERNAL_CATEGORY_TYPE_INVOICE
-//		);
-//		if (invoiceCat == null) {
-//			invoiceCat = new ReportCategory(
-//					pm,
-//					null,
-//					getOrganisationID(),
-//					ReportCategory.INTERNAL_CATEGORY_TYPE_INVOICE,
-//					true
-//			);
-//			invoiceCat.getName().setText(Locale.ENGLISH.getLanguage(), "Invoice Layouts");
-//			invoiceCat.getName().setText(Locale.GERMAN.getLanguage(), "Rechnungs-Vorlagen");
-//			pm.makePersistent(invoiceCat);
-//		}
-//
-//		initDefaultCatReportLayout(
-//				pm,
-//				invoiceCat,
-//				earDir,
-//				ReportCategory.INTERNAL_CATEGORY_TYPE_INVOICE,
-//				"Standard Rechnungs-Vorlage",
-//				"Default invoice layout"
-//			);
-//
-//
-//		ReportCategory deliveryNoteCat = ReportCategory.getReportCategory(
-//				pm,
-//				getOrganisationID(),
-//				ReportCategory.INTERNAL_CATEGORY_TYPE_DELIVERY_NOTE
-//		);
-//		if (deliveryNoteCat == null) {
-//			deliveryNoteCat = new ReportCategory(
-//					pm,
-//					null,
-//					getOrganisationID(),
-//					ReportCategory.INTERNAL_CATEGORY_TYPE_DELIVERY_NOTE,
-//					true
-//			);
-//			deliveryNoteCat.getName().setText(Locale.ENGLISH.getLanguage(), "Deliverynote Layouts");
-//			deliveryNoteCat.getName().setText(Locale.GERMAN.getLanguage(), "Lieferschein-Vorlagen");
-//			pm.makePersistent(deliveryNoteCat);
-//		}
-//
-//		initDefaultCatReportLayout(
-//				pm,
-//				deliveryNoteCat,
-//				earDir,
-//				ReportCategory.INTERNAL_CATEGORY_TYPE_DELIVERY_NOTE,
-//				"Standard Lieferschein-Vorlage",
-//				"Default deliverynote layout"
-//			);
-//
-//
-//		ReportCategory generalCat = ReportCategory.getReportCategory(
-//				pm,
-//				getOrganisationID(),
-//				ReportCategory.CATEGORY_TYPE_GENERAL
-//			);
-//		if (generalCat == null) {
-//			generalCat = new ReportCategory(
-//					pm,
-//					null,
-//					getOrganisationID(),
-//					ReportCategory.CATEGORY_TYPE_GENERAL,
-//					true
-//			);
-//			generalCat.getName().setText(Locale.ENGLISH.getLanguage(), "General");
-//			generalCat.getName().setText(Locale.GERMAN.getLanguage(), "Allgemein");
-//			pm.makePersistent(generalCat);
-//		}
-//
-//		initDefaultCatReportLayout(
-//				pm,
-//				generalCat,
-//				earDir,
-//				ReportCategory.CATEGORY_TYPE_GENERAL,
-//				"Sales Statistic",
-//				"Umsatz Statistik"
-//			);
-//	}
-
+	
+	/**
+	 * 
+	 * @param pm
+	 * @param jfireServerManager
+	 * @throws InstantiationException
+	 * @throws IllegalAccessException
+	 */
 	private void initRegisterScripts(PersistenceManager pm, JFireServerManager jfireServerManager) throws InstantiationException, IllegalAccessException
 	{
 		ScriptRegistry.getScriptRegistry(pm).registerScriptExecutorClass(ScriptExecutorJavaClassReporting.class);
 	}
 
 	/**
-	 * This method is called by the datastore initialization mechanism.
-	 * @throws IllegalAccessException
-	 * @throws InstantiationException
-	 * @throws MalformedVersionException
-	 * @throws ScriptingIntialiserException
-	 * @throws ModuleException
-	 * @throws ModuleException
-	 *
+	 * This method is called by the organisation-init system and is not intended to be called directly.
+	 * 
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_System_"
 	 * @ejb.transaction type="Required"
@@ -430,7 +254,11 @@ implements SessionBean
 		}
 
 	}
-
+	
+	/**
+	 * Create (if necessary) a task that will cleanup the temporary report folders
+	 * using {@link #cleanupRenderedReportLayoutFolders(TaskID)}.
+	 */
 	protected void initialiseCleanupRenderedReportLayoutFoldersTask(PersistenceManager pm) {
 		TaskID taskID = TaskID.create(
 				getOrganisationID(),
@@ -444,7 +272,7 @@ implements SessionBean
 			task = null;
 		}
 		if (task != null) {
-			logger.info("Task already initialised");
+			logger.debug("Task already initialised");
 			return;
 		}
 		task = new Task(
@@ -472,6 +300,9 @@ implements SessionBean
 	}
 
 	/**
+	 * This method is called from a timer-task it is not intended to be called directly.
+	 * The method will clean folders temporarily used for reporting. 
+	 *  
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_System_"
 	 * @ejb.transaction type="Required"
@@ -487,23 +318,22 @@ implements SessionBean
 		}
 	}
 
-//	/**
-//	 * @ejb.interface-method
-//	 * @ejb.permission role-name="_Guest_"
-//	 * @ejb.transaction type="Required"
-//	 */
-//	public JDOQLResultSetMetaData getQueryMetaData(String organisationID, String queryText)
-//	{
-//		return JDOQLMetaDataParser.parseJDOQLMetaData(queryText);
-//	}
-
 	/**
-	 * @throws InstantiationException
-	 * @throws ScriptException
+	 * Returns the result-set meta-data for the query/script referenced by the given {@link JFSQueryPropertySet}
+	 * (its scriptRegistryItemID to be precise). Note, that the properties in the given queryPropertySet might
+	 * be necessary to determine the result-set meta-data, this is why this method does not operate on a 
+	 * {@link ScriptRegistryItemID} but on {@link JFSQueryPropertySet}.
+	 * <p>
+	 * This method delegates to {@link ServerJFSQueryProxy} and will be called only for report design-time.
+	 * It therefore is tagged with permission role {@link RoleConstants#editReport}.
+	 * </p>
+	 * 
+	 * @throws InstantiationException If instantiating the referenced script fails.
+	 * @throws ScriptException If creating the meta-data fails.
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="org.nightlabs.jfire.reporting.editReport"
-	 * @ejb.transaction type="Never"
+	 * @ejb.transaction type="Supports"
 	 */
 	public IResultSetMetaData getJFSResultSetMetaData(JFSQueryPropertySet queryPropertySet) throws ScriptException, InstantiationException
 	{
@@ -517,13 +347,17 @@ implements SessionBean
 
 	/**
 	 * Obtains the {@link IJFSQueryPropertySetMetaData} of the referenced script.
+	 * <p>
+	 * This method delegates to {@link ServerJFSQueryProxy} and will be called only for report desing-time.
+	 * It therefore is tagged with permission role {@link RoleConstants#editReport}.
+	 * </p>
 	 *
 	 * @throws ScriptException If getting the meta-data fails.
 	 * @throws InstantiationException If creating the executor fails.
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="org.nightlabs.jfire.reporting.editReport"
-	 * @ejb.transaction type="Never"
+	 * @ejb.transaction type="Supports"
 	 */
 	public IJFSQueryPropertySetMetaData getJFSQueryPropertySetMetaData(ScriptRegistryItemID scriptID) throws ScriptException, InstantiationException
 	{
@@ -536,12 +370,19 @@ implements SessionBean
 	}
 
 	/**
-	 * @throws InstantiationException
-	 * @throws ScriptException
+	 * Executes the script referenced by the given {@link JFSQueryPropertySet} with
+	 * the given queryPropertySet and the given parameters. 
+	 * <p>
+	 * This method delegates to {@link ServerJFSQueryProxy} and will be called only for report desing-time.
+	 * It therefore is tagged with permission role {@link RoleConstants#editReport}.
+	 * </p>
+	 *  
+	 * @throws InstantiationException If instantiating the script fails.
+	 * @throws ScriptException If the script execution fails.
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="org.nightlabs.jfire.reporting.editReport"
-	 * @ejb.transaction type="Never"
+	 * @ejb.transaction type="Never" @!This is tagged with Never as we don't want write operations to be performed by the script that will be executed by this call. 
 	 */
 	public IResultSet getJFSResultSet(
 			JFSQueryPropertySet queryPropertySet,
@@ -562,11 +403,17 @@ implements SessionBean
 	}
 
 	/**
-	 *
+	 * Returns the parameter meta-data for the referenced script.
+	 * <p>
+	 * This method delegates to {@link ServerJFSQueryProxy} and will be called only for report desing-time.
+	 * It therefore is tagged with permission role {@link RoleConstants#editReport}.
+	 * </p>
+	 * 
 	 * @throws JFireReportingOdaException
+	 * 
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="org.nightlabs.jfire.reporting.editReport"
-	 * @ejb.transaction type="Never"
+	 * @ejb.transaction type="Supports"
 	 */
 	public IParameterMetaData getJFSParameterMetaData(
 			ScriptRegistryItemID scriptRegistryItemID
@@ -583,38 +430,6 @@ implements SessionBean
 		}
 	}
 
-
-	/**
-	 * Returns the {@link ReportRegistryItem} with the given id.
-	 * It will be detached with the given fetch-groups and fetch-depth.
-	 *
-	 * @param reportRegistryItemID The id of the {@link ReportRegistryItem} to fetch.
-	 * @param fetchGroups The fetch-groups to detach the item with.
-	 * @param maxFetchDepth The maximum fetch-depth while detaching.
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Required"
-	 */
-	public ReportRegistryItem getReportRegistryItem (
-			ReportRegistryItemID reportRegistryItemID,
-			String[] fetchGroups, int maxFetchDepth
-		)
-	{
-		PersistenceManager pm;
-		pm = getPersistenceManager();
-		try {
-			ReportRegistryItem reportRegistryItem = (ReportRegistryItem)pm.getObjectById(reportRegistryItemID);
-			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
-			if (fetchGroups != null)
-				pm.getFetchPlan().setGroups(fetchGroups);
-			ReportRegistryItem result = pm.detachCopy(reportRegistryItem);
-			return result;
-		} finally {
-			pm.close();
-		}
-	}
-
 	/**
 	 * Returns the {@link ReportRegistryItem}s represented by the given list of {@link ReportRegistryItemID}s.
 	 * All will be detached with the given fetch-groups.
@@ -625,7 +440,7 @@ implements SessionBean
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="org.nightlabs.jfire.reporting.renderReport"
-	 * @ejb.transaction type="Required"
+	 * @ejb.transaction type="Supports"
 	 */
 	public List<ReportRegistryItem> getReportRegistryItems (
 			List<ReportRegistryItemID> reportRegistryItemIDs,
@@ -659,7 +474,7 @@ implements SessionBean
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="org.nightlabs.jfire.reporting.renderReport"
-	 * @ejb.transaction type="Required"
+	 * @ejb.transaction type="Supports"
 	 */
 	public Collection<ReportRegistryItemID> getReportRegistryItemIDsForParent(ReportRegistryItemID reportRegistryItemID)
 	{
@@ -678,44 +493,13 @@ implements SessionBean
 		}
 	}
 
-//	/**
-//	 * Returns all {@link ReportRegistryItem}s for the given organisationID that do
-//	 * not have a parent.
-//	 *
-//	 * @param organisationID The organisationID to search top-level items for.
-//	 * @param fetchGroups The fetch-groups to detach the found items with.
-//	 * @param maxFetchDepth The maximum fetch-depth while detaching.
-//	 *
-//	 * @ejb.interface-method
-//	 * @ejb.permission role-name="org.nightlabs.jfire.reporting.renderReport"
-//	 * @ejb.transaction type="Required"
-//	 */
-//	public Collection getTopLevelReportRegistryItems (
-//			String organisationID,
-//			String[] fetchGroups, int maxFetchDepth
-//		)
-//	{
-//		PersistenceManager pm;
-//		pm = getPersistenceManager();
-//		try {
-//			Collection topLevelItems = ReportRegistryItem.getTopReportRegistryItems(pm, organisationID);
-//			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
-//			if (fetchGroups != null)
-//				pm.getFetchPlan().setGroups(fetchGroups);
-//			Collection result = pm.detachCopyAll(topLevelItems);
-//			return result;
-//		} finally {
-//			pm.close();
-//		}
-//	}
-
 	/**
 	 * Returns all {@link ReportRegistryItemID}s that do not have a parent.
 	 * These will be only for the organisationID of the calling user.
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="org.nightlabs.jfire.reporting.renderReport"
-	 * @ejb.transaction type="Required"
+	 * @ejb.transaction type="Supports"
 	 */
 	public Collection<ReportRegistryItemID> getTopLevelReportRegistryItemIDs ()
 	{
@@ -745,7 +529,7 @@ implements SessionBean
 
 	/**
 	 * Stores the given {@link ReportRegistryItem} to the datastore
-	 * of the organiation of the calling user.
+	 * of the organisation of the calling user.
 	 *
 	 * @param reportRegistryItem The item to store.
 	 * @param get Wheter a detached copy of the stored item should be returned.
@@ -817,7 +601,7 @@ implements SessionBean
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="org.nightlabs.jfire.reporting.renderReport"
-	 * @ejb.transaction type="Never"
+	 * @ejb.transaction type="Never" @!Tagged with Never, so the data-sources can't perform write operations.
 	 */
 	public RenderedReportLayout renderReportLayout(RenderReportRequest renderReportRequest)
 	throws NamingException, RenderReportException
@@ -880,12 +664,10 @@ implements SessionBean
 	 * @ejb.permission role-name="org.nightlabs.jfire.reporting.editReport"
 	 * @ejb.transaction type="Required"
 	 */
-	@SuppressWarnings("unchecked")
 	public Collection<ReportLayoutLocalisationData> getReportLayoutLocalisationBundle(
 			ReportRegistryItemID reportLayoutID,
 			String[] fetchGroups, int maxFetchDepth
-		)
-	{
+	) {
 		PersistenceManager pm;
 		pm = getPersistenceManager();
 		try {
@@ -916,11 +698,9 @@ implements SessionBean
 	 * @ejb.permission role-name="org.nightlabs.jfire.reporting.editReport"
 	 * @ejb.transaction type="Required"
 	 */
-	@SuppressWarnings("unchecked")
 	public Collection<ReportLayoutLocalisationData> storeReportLayoutLocalisationBundle(
 			Collection<ReportLayoutLocalisationData> bundle, boolean get, String[] fetchGroups, int maxFetchDepth
-		)
-	{
+	) {
 		PersistenceManager pm;
 		pm = getPersistenceManager();
 		try {

@@ -44,12 +44,15 @@ import org.nightlabs.util.Util;
  *
  * @jdo.inheritance strategy="new-table"
  *
- * @jdo.create-objectid-class field-order="countryID, organisationID, locationID"
+ * @jdo.create-objectid-class
+ *		field-order="countryID, organisationID, locationID"
+ *		include-imports="id/LocationID.imports.inc"
+ *		include-body="id/LocationID.body.inc"
  *
  * @jdo.fetch-group name="Location.name" fields="name"
  * @jdo.fetch-group name="Location.city" fields="city"
  * @jdo.fetch-group name="Location.this" fields="city, district, name"
- * 
+ *
  */
 public class Location implements Serializable
 {
@@ -57,14 +60,15 @@ public class Location implements Serializable
 	 * The serial version of this class.
 	 */
 	private static final long serialVersionUID = 1L;
-	
+
 	public static final String FETCH_GROUP_NAME = "Location.name";
 	public static final String FETCH_GROUP_CITY = "Location.city";
 	/**
-	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon! 
+	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon!
 	 */
+	@Deprecated
 	public static final String FETCH_GROUP_THIS_LOCATION = "Location.this";
-	
+
 	/**
 	 * 2-char-iso-code
 	 *

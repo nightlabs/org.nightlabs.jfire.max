@@ -27,16 +27,17 @@
 package org.nightlabs.jfire.geography;
 
 import java.rmi.RemoteException;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
+import java.util.HashSet;
 
 import javax.ejb.CreateException;
 import javax.ejb.EJBException;
 import javax.ejb.SessionBean;
 import javax.ejb.SessionContext;
 import javax.jdo.FetchPlan;
+import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
+import javax.jdo.Query;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
@@ -49,6 +50,7 @@ import org.nightlabs.jfire.geography.id.CountryID;
 import org.nightlabs.jfire.geography.id.LocationID;
 import org.nightlabs.jfire.geography.id.RegionID;
 import org.nightlabs.jfire.organisation.Organisation;
+import org.nightlabs.util.CollectionUtil;
 
 /**
  * @ejb.bean name="jfire/ejb/JFireGeography/GeographyManager"
@@ -64,24 +66,17 @@ extends BaseSessionBeanImpl
 implements SessionBean
 {
 	private static final long serialVersionUID = 1L;
-	/**
-	 * LOG4J logger used by this class
-	 */
 	private static final Logger logger = Logger.getLogger(GeographyManagerBean.class);
 
-	/**
-	 * @see org.nightlabs.jfire.base.BaseSessionBeanImpl#setSessionContext(javax.ejb.SessionContext)
-	 */
 	@Override
 	public void setSessionContext(SessionContext sessionContext)
 	throws EJBException, RemoteException
 	{
-		logger.debug(this.getClass().getName() + ".setSessionContext("+sessionContext+")");
+		if (logger.isDebugEnabled())
+			logger.debug(this.getClass().getName() + ".setSessionContext("+sessionContext+")");
+
 		super.setSessionContext(sessionContext);
 	}
-	/**
-	 * @see org.nightlabs.jfire.base.BaseSessionBeanImpl#unsetSessionContext()
-	 */
 	@Override
 	public void unsetSessionContext() {
 		super.unsetSessionContext();
@@ -93,45 +88,33 @@ implements SessionBean
 	public void ejbCreate()
 	throws CreateException
 	{
-		logger.debug(this.getClass().getName() + ".ejbCreate()");
+		if (logger.isDebugEnabled())
+			logger.debug(this.getClass().getName() + ".ejbCreate()");
 	}
 	/**
-	 * @see javax.ejb.SessionBean#ejbRemove()
-	 * 
+	 * {@inheritDoc}
+	 *
 	 * @ejb.permission unchecked="true"
 	 */
+	@Override
 	public void ejbRemove() throws EJBException, RemoteException
 	{
-		logger.debug(this.getClass().getName() + ".ejbRemove()");
+		if (logger.isDebugEnabled())
+			logger.debug(this.getClass().getName() + ".ejbRemove()");
 	}
 
-	/**
-	 * @see javax.ejb.SessionBean#ejbActivate()
-	 */
+	@Override
 	public void ejbActivate() throws EJBException, RemoteException
 	{
-		logger.debug(this.getClass().getName() + ".ejbActivate()");
+		if (logger.isDebugEnabled())
+			logger.debug(this.getClass().getName() + ".ejbActivate()");
 	}
-	/**
-	 * @see javax.ejb.SessionBean#ejbPassivate()
-	 */
+	@Override
 	public void ejbPassivate() throws EJBException, RemoteException
 	{
-		logger.debug(this.getClass().getName() + ".ejbPassivate()");
+		if (logger.isDebugEnabled())
+			logger.debug(this.getClass().getName() + ".ejbPassivate()");
 	}
-
-//	protected static StreamTokenizer getCSVTokenizer(InputStreamReader reader)
-//	{
-//	StreamTokenizer tokenizer = new StreamTokenizer(reader);
-//	tokenizer.resetSyntax();
-//	tokenizer.wordChars(0, Integer.MAX_VALUE);
-//	tokenizer.quoteChar('"');
-//	tokenizer.whitespaceChars(';', ';');
-//	tokenizer.whitespaceChars('\r', '\r');
-//	tokenizer.whitespaceChars('\n', '\n');
-//	tokenizer.eolIsSignificant(true);
-//	return tokenizer;
-//	}
 
 	/**
 	 * @ejb.interface-method
@@ -142,13 +125,6 @@ implements SessionBean
 	{
 //		GeographyImplResourceCSV.register();
 		GeographyImplJDO.register();
-
-//		PersistenceManager pm = getPersistenceManager();
-//		try {
-//		Geography.getGeography(pm);
-//		} finally {
-//		pm.close();
-//		}
 	}
 
 	/**
@@ -156,22 +132,14 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
-	public Collection<Country> getCountries(String[] fetchGroups, int maxFetchDepth)
+	public Collection<CountryID> getCountryIDs()
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
-			if (fetchGroups != null)
-				pm.getFetchPlan().setGroups(fetchGroups);
-
-			ArrayList<Country> res = new ArrayList<Country>();
-			for (Iterator<?> it = pm.getExtent(Country.class).iterator(); it.hasNext(); ) {
-				Country country = (Country) it.next();
-
-				res.add(pm.detachCopy(country));
-			}
-
-			return res;
+			Query q = pm.newQuery(Country.class);
+			q.setResult("JDOHelper.getObjectId(this)");
+			Collection<CountryID> res = CollectionUtil.castCollection((Collection<?>) q.execute());
+			return new HashSet<CountryID>(res);
 		} finally {
 			pm.close();
 		}
@@ -182,16 +150,155 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
-	public Country getCountry(CountryID countryID, String[] fetchGroups, int maxFetchDepth)
+	public Collection<RegionID> getRegionIDs(CountryID countryID)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
+			Query q = pm.newQuery(Region.class);
+			q.setResult("JDOHelper.getObjectId(this)");
+			if (countryID != null)
+				q.setFilter("JDOHelper.getObjectId(this.country) == :countryID");
+
+			Collection<RegionID> res = CollectionUtil.castCollection((Collection<?>) q.execute(countryID));
+			return new HashSet<RegionID>(res);
+		} finally {
+			pm.close();
+		}
+	}
+
+	/**
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+	 */
+	public Collection<CityID> getCityIDs(RegionID regionID)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			Query q = pm.newQuery(City.class);
+			q.setResult("JDOHelper.getObjectId(this)");
+			if (regionID != null)
+				q.setFilter("JDOHelper.getObjectId(this.region) == :regionID");
+
+			Collection<CityID> res = CollectionUtil.castCollection((Collection<?>) q.execute(regionID));
+			return new HashSet<CityID>(res);
+		} finally {
+			pm.close();
+		}
+	}
+
+	/**
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+	 */
+	public Collection<LocationID> getLocationIDs(CityID cityID)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			Query q = pm.newQuery(Location.class);
+			q.setResult("JDOHelper.getObjectId(this)");
+			if (cityID != null)
+				q.setFilter("JDOHelper.getObjectId(this.city) == :cityID");
+
+			Collection<LocationID> res = CollectionUtil.castCollection((Collection<?>) q.execute(cityID));
+			return new HashSet<LocationID>(res);
+		} finally {
+			pm.close();
+		}
+	}
+
+	/**
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+	 */
+	public Collection<Country> getCountries(Collection<CountryID> countryIDs, String[] fetchGroups, int maxFetchDepth)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			return NLJDOHelper.getDetachedObjectList(pm, countryIDs, Country.class, fetchGroups, maxFetchDepth);
+		} finally {
+			pm.close();
+		}
+	}
+
+	/**
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+	 */
+	public Collection<Region> getRegions(Collection<RegionID> regionIDs, String[] fetchGroups, int maxFetchDepth)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			return NLJDOHelper.getDetachedObjectList(pm, regionIDs, Region.class, fetchGroups, maxFetchDepth);
+		} finally {
+			pm.close();
+		}
+	}
+
+	/**
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+	 */
+	public Collection<City> getCities(Collection<CityID> cityIDs, String[] fetchGroups, int maxFetchDepth)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			return NLJDOHelper.getDetachedObjectList(pm, cityIDs, City.class, fetchGroups, maxFetchDepth);
+		} finally {
+			pm.close();
+		}
+	}
+
+	/**
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+	 */
+	public Collection<Location> getLocations(Collection<LocationID> locationIDs, String[] fetchGroups, int maxFetchDepth)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			return NLJDOHelper.getDetachedObjectList(pm, locationIDs, Location.class, fetchGroups, maxFetchDepth);
+		} finally {
+			pm.close();
+		}
+	}
+
+	/**
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	public Country importCountry(CountryID countryID, boolean get, String[] fetchGroups, int maxFetchDepth)
+	{
+		if (countryID == null)
+			throw new IllegalArgumentException("countryID must not be null!");
+
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			Country country;
+			try {
+				country = (Country) pm.getObjectById(countryID);
+			} catch (JDOObjectNotFoundException x) {
+				country = null;
+			}
+
+			if (country == null) {
+				country = Geography.sharedInstance().getCountry(countryID, true);
+				country = country.copyForJDOStorage();
+				country = pm.makePersistent(country);
+			}
+
+			if (!get)
+				return null;
+
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 
-			pm.getExtent(Country.class);
-			Country country = (Country) pm.getObjectById(countryID);
 			return pm.detachCopy(country);
 		} finally {
 			pm.close();
@@ -201,18 +308,33 @@ implements SessionBean
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
-	public Region getRegion(RegionID regionID, String[] fetchGroups, int maxFetchDepth)
+	public Region importRegion(RegionID regionID, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
+			Region region;
+			try {
+				region = (Region) pm.getObjectById(regionID);
+			} catch (JDOObjectNotFoundException x) {
+				region = null;
+			}
+
+			if (region == null) {
+				region = Geography.sharedInstance().getRegion(regionID, true);
+				CountryID countryID = CountryID.create(region);
+				Country persistentCountry = (Country) pm.getObjectById(countryID);
+				region = region.copyForJDOStorage(persistentCountry);
+				region = persistentCountry.addRegion(region);
+			}
+
+			if (!get)
+				return null;
+
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 
-			pm.getExtent(Region.class);
-			Region region = (Region) pm.getObjectById(regionID);
 			return pm.detachCopy(region);
 		} finally {
 			pm.close();
@@ -222,18 +344,33 @@ implements SessionBean
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
-	public City getCity(CityID cityID, String[] fetchGroups, int maxFetchDepth)
+	public City importCity(CityID cityID, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
+			City city;
+			try {
+				city = (City) pm.getObjectById(cityID);
+			} catch (JDOObjectNotFoundException x) {
+				city = null;
+			}
+
+			if (city == null) {
+				city = Geography.sharedInstance().getCity(cityID, true);
+				RegionID regionID = RegionID.create(city.getRegion());
+				Region persistentRegion = (Region) pm.getObjectById(regionID);
+				city = city.copyForJDOStorage(persistentRegion);
+				city = persistentRegion.addCity(city);
+			}
+
+			if (!get)
+				return null;
+
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 
-			pm.getExtent(City.class);
-			City city = (City) pm.getObjectById(cityID);
 			return pm.detachCopy(city);
 		} finally {
 			pm.close();
@@ -243,66 +380,80 @@ implements SessionBean
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
-	public Location getLocation(LocationID locationID, String[] fetchGroups, int maxFetchDepth)
+	public Location importLocation(LocationID locationID, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
+			Location location;
+			try {
+				location = (Location) pm.getObjectById(locationID);
+			} catch (JDOObjectNotFoundException x) {
+				location = null;
+			}
+
+			if (location == null) {
+				location = Geography.sharedInstance().getLocation(locationID, true);
+				CityID cityID = CityID.create(location.getCity());
+				City persistentCity = (City) pm.getObjectById(cityID);
+				location = location.copyForJDOStorage(persistentCity);
+				location = persistentCity.addLocation(location);
+			}
+
+			if (!get)
+				return null;
+
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 
-			pm.getExtent(Location.class);
-			Location location = (Location) pm.getObjectById(locationID);
 			return pm.detachCopy(location);
 		} finally {
 			pm.close();
 		}
 	}
 
+//	/**
+//	 * @ejb.interface-method
+//	 * @ejb.permission role-name="_Guest_"
+//	 */
+//	public Country storeCountry(Country country, boolean get, String[] fetchGroups, int maxFetchDepth)
+//	{
+//		PersistenceManager pm = getPersistenceManager();
+//		try {
+//			return NLJDOHelper.storeJDO(pm, country, get, fetchGroups, maxFetchDepth);
+//		} finally {
+//			pm.close();
+//		}
+//	}
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 */
-	public Country storeCountry(Country country, boolean get, String[] fetchGroups, int maxFetchDepth)
-	{
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			return NLJDOHelper.storeJDO(pm, country, get, fetchGroups, maxFetchDepth);
-		} finally {
-			pm.close();
-		}
-	}
+//	/**
+//	 * @ejb.interface-method
+//	 * @ejb.permission role-name="_Guest_"
+//	 */
+//	public Region storeRegion(Region region, boolean get, String[] fetchGroups, int maxFetchDepth)
+//	{
+//		PersistenceManager pm = getPersistenceManager();
+//		try {
+//			return NLJDOHelper.storeJDO(pm, region, get, fetchGroups, maxFetchDepth);
+//		} finally {
+//			pm.close();
+//		}
+//	}
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 */
-	public Region storeRegion(Region region, boolean get, String[] fetchGroups, int maxFetchDepth)
-	{
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			return NLJDOHelper.storeJDO(pm, region, get, fetchGroups, maxFetchDepth);
-		} finally {
-			pm.close();
-		}
-	}
-
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 */
-	public City storeCity(City city, boolean get, String[] fetchGroups, int maxFetchDepth)
-	{
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			return NLJDOHelper.storeJDO(pm, city, get, fetchGroups, maxFetchDepth);
-		} finally {
-			pm.close();
-		}
-	}
+//	/**
+//	 * @ejb.interface-method
+//	 * @ejb.permission role-name="_Guest_"
+//	 */
+//	public City storeCity(City city, boolean get, String[] fetchGroups, int maxFetchDepth)
+//	{
+//		PersistenceManager pm = getPersistenceManager();
+//		try {
+//			return NLJDOHelper.storeJDO(pm, city, get, fetchGroups, maxFetchDepth);
+//		} finally {
+//			pm.close();
+//		}
+//	}
 
 	/**
 	 * @ejb.interface-method
@@ -362,12 +513,12 @@ implements SessionBean
 //	 * Returns the {@link Country} with the given name and {@link Locale}
 //	 * @param countryName the name of the country
 //	 * @param locale the {@link Locale} to search in the multiLanguage name of the country
-//	 * @return the {@link Country} with the given name and {@link Locale}  
-//	 * 
+//	 * @return the {@link Country} with the given name and {@link Locale}
+//	 *
 //	 * @ejb.interface-method
 //	 * @ejb.permission role-name="_Guest_"
-//	 */	
-//	public Country getCountryByName(String countryName, Locale locale) 
+//	 */
+//	public Country getCountryByName(String countryName, Locale locale)
 //	{
 //		PersistenceManager pm = getPersistenceManager();
 //		try {
@@ -375,25 +526,25 @@ implements SessionBean
 //			if (countries != null && !countries.isEmpty()) {
 //				return countries.iterator().next();
 //			}
-//			return null;			
+//			return null;
 //		} finally {
 //			pm.close();
 //		}
 //	}
-//	
+//
 //	/**
 //	 * Returns the {@link Region} with the given name and {@link Locale}
 //	 * @param regionName the name of the region
 //	 * @param locale the {@link Locale} to search in the multiLanguage name of the region
-//	 * @return the {@link Region} with the given name and {@link Locale}  
+//	 * @return the {@link Region} with the given name and {@link Locale}
 //	 *
 //	 * @ejb.interface-method
 //	 * @ejb.permission role-name="_Guest_"
-//	 */	
-//	public Region getRegionByName(String regionName, Locale locale) 
+//	 */
+//	public Region getRegionByName(String regionName, Locale locale)
 //	{
 //		PersistenceManager pm = getPersistenceManager();
-//		try {		
+//		try {
 //			Collection<Region> regions = Region.getRegionByName(pm, regionName, locale);
 //			if (regions != null && !regions.isEmpty()) {
 //				return regions.iterator().next();
@@ -408,16 +559,16 @@ implements SessionBean
 //	 * Returns the {@link City} with the given name and {@link Locale}
 //	 * @param cityName the name of the city
 //	 * @param locale the {@link Locale} to search in the multiLanguage name of the city
-//	 * @return the {@link City} with the given name and {@link Locale}  
-//	 * 
+//	 * @return the {@link City} with the given name and {@link Locale}
+//	 *
 //	 * @ejb.interface-method
 //	 * @ejb.permission role-name="_Guest_"
-//	 */	
-//	public City getCityByName(String cityName, Locale locale) 
+//	 */
+//	public City getCityByName(String cityName, Locale locale)
 //	{
 //		PersistenceManager pm = getPersistenceManager();
-//		try {				
-//			Collection<City> cities = City.getCityByName(getPersistenceManager(), 
+//		try {
+//			Collection<City> cities = City.getCityByName(getPersistenceManager(),
 //					cityName, locale);
 //			if (cities != null && !cities.isEmpty()) {
 //				return cities.iterator().next();
@@ -432,15 +583,15 @@ implements SessionBean
 //	 * Returns the {@link Location} with the given name and {@link Locale}
 //	 * @param locationName the name of the location
 //	 * @param locale the {@link Locale} to search in the multiLanguage name of the location
-//	 * @return the {@link Location} with the given name and {@link Locale}  
+//	 * @return the {@link Location} with the given name and {@link Locale}
 // 	*
 //	 * @ejb.interface-method
 //	 * @ejb.permission role-name="_Guest_"
-//	 */	
-//	public Location getLocationByName(String locationName, Locale locale) 
+//	 */
+//	public Location getLocationByName(String locationName, Locale locale)
 //	{
 //		PersistenceManager pm = getPersistenceManager();
-//		try {						
+//		try {
 //			Collection<Location> locations = Location.getLocationByName(pm, locationName, locale);
 //			if (locations != null && !locations.isEmpty()) {
 //				return locations.iterator().next();
@@ -450,5 +601,5 @@ implements SessionBean
 //			pm.close();
 //		}
 //	}
-	
+
 }

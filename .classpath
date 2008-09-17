@@ -24,5 +24,6 @@
 	<classpathentry kind="var" path="DATANUCLEUS_ENHANCER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireServerManager"/>
 	<classpathentry kind="var" path="ASM"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/JFireBaseClientLib"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -13,6 +13,11 @@
 		<security:description language="de">
 			Vollmachten dieses Typs kontrollieren den Zugriff auf einfache Produkttypen.
 		</security:description>	
+
 		<security:role-group id="org.nightlabs.jfire.store.seeProductType" />
+		<security:role-group id="org.nightlabs.jfire.store.editUnconfirmedProductType"/>
+		<security:role-group id="org.nightlabs.jfire.store.editConfirmedProductType"/>
+		<security:role-group id="org.nightlabs.jfire.trade.sellProductType"/>
+		<security:role-group id="org.nightlabs.jfire.trade.reverseProductType"/>
 	</security:authority-type>
 </security:jfire-security>

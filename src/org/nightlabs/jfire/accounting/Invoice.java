@@ -81,6 +81,7 @@ import org.nightlabs.util.Util;
  * @jdo.create-objectid-class
  *		field-order="organisationID, invoiceIDPrefix, invoiceID"
  *		add-interfaces="org.nightlabs.jfire.trade.id.ArticleContainerID"
+ *		include-body="id/InvoiceID.body.inc"
  *
  * @jdo.query
  *		name="getInvoiceIDsByVendorAndCustomer"

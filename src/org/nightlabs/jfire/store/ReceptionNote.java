@@ -44,6 +44,7 @@ import org.nightlabs.util.Util;
  * @jdo.create-objectid-class
  *		field-order="organisationID, receptionNoteIDPrefix, receptionNoteID"
  *		add-interfaces="org.nightlabs.jfire.trade.id.ArticleContainerID"
+ *		include-body="id/ReceptionNoteID.body.inc"
  *
  * TODO other fetch-groups
  *

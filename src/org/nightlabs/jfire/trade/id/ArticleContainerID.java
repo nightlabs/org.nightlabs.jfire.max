@@ -27,8 +27,37 @@
 package org.nightlabs.jfire.trade.id;
 
 import org.nightlabs.jdo.ObjectID;
+import org.nightlabs.jdo.ObjectIDUtil;
 
 public interface ArticleContainerID
 extends ObjectID
 {
+	/**
+	 * @return the organisation that issued the ArticleContainer - usually the vendor organisation. This is the first part
+	 * of the composite primary key.
+	 * @see #getArticleContainerIDPrefix()
+	 * @see #getArticleContainerID()
+	 */
+	String getOrganisationID();
+
+	/**
+	 * @return the prefix for the local ID, which can be used to have a namespace per year or per topic. This is the 2nd part
+	 * of the composite primary key.
+	 * @see #getOrganisationID()
+	 * @see #getArticleContainerID()
+	 */
+	String getArticleContainerIDPrefix();
+
+	/**
+	 * @return the id within the scope of the organisationID and the prefix. This is the 3rd part of the composite primary key.
+	 * @see #getOrganisationID()
+	 * @see #getArticleContainerIDPrefix()
+	 */
+	long getArticleContainerID();
+
+	/**
+	 * @return the result of {@link ObjectIDUtil#longObjectIDFieldToString(long)} applied to {@link #getArticleContainerID()}
+	 */
+	String getArticleContainerIDAsString();
+	
 }

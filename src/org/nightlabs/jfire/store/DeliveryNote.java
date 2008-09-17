@@ -84,6 +84,7 @@ import org.nightlabs.util.Util;
  * @jdo.create-objectid-class
  *		field-order="organisationID, deliveryNoteIDPrefix, deliveryNoteID"
  *		add-interfaces="org.nightlabs.jfire.trade.id.ArticleContainerID"
+ *		include-body="id/DeliveryNoteID.body.inc"
  *
  * @jdo.query
  *		name="getDeliveryNoteIDsByVendorAndCustomer"

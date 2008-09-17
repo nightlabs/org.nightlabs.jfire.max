@@ -76,6 +76,7 @@ import org.nightlabs.util.Util;
  * @jdo.create-objectid-class
  *		field-order="organisationID, orderIDPrefix, orderID"
  *		add-interfaces="org.nightlabs.jfire.trade.id.ArticleContainerID"
+ *		include-body="id/OrderID.body.inc"
  *
  * @jdo.query
  *		name="getOrderIDsByVendorAndCustomer"

@@ -30,7 +30,6 @@ import javax.xml.transform.TransformerException;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.i18n.I18nText;
-import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jfire.base.JFireBaseEAR;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.organisation.Organisation;
@@ -972,8 +971,7 @@ public class ReportingInitialiser {
 		logger.debug("Parsed ReportTextConfiguration file " + targetConfigurationFile);
 
 		// Lookup/Create the configuration object
-		ReportTextPartConfiguration configuration = ReportTextPartConfiguration.getReportTextPartConfiguration(
-				pm, (ObjectID) JDOHelper.getObjectId(reportRegistryItem));
+		ReportTextPartConfiguration configuration = ReportTextPartConfiguration.getReportTextPartConfiguration(pm, reportRegistryItem);
 		boolean needsPersisting = false;
 		if (configuration == null) {
 			needsPersisting = true;

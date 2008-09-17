@@ -4,9 +4,24 @@
 package org.nightlabs.jfire.reporting.textpart;
 
 import java.io.Serializable;
-import java.util.Locale;
 
 /**
+ * {@link ReportTextPart}s can be considered as parts of report layouts that can be changed without
+ * changing the the report layout (or without having the right to edit reports).
+ * <p>
+ * {@link ReportTextPart}s are organised in {@link ReportTextPartConfiguration}s and are referenced
+ * inside those by their {@link #reportTextPartID} ({@link #getReportTextPartID()}). The configurations
+ * are linked to report categories or layout and can also be linked to arbitrary objects. When a report layout
+ * is rendered the configuration can be searched using an objectID. This search will then also find
+ * the configurations linked to either the currently rendered layout or one of the categories in the
+ * hierarchy of its parent. 
+ * </p>
+ * <p>
+ * The content of a {@link ReportTextPart} can be of two {@link Type}s (HTML or JAVASCRIPT) and is
+ * converted to a String that can be passed to the javascript <code>eval()</code> method inside
+ * a dynamic-text report-item. 
+ * </p>
+ * 
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
  *
  * @jdo.persistence-capable

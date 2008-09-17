@@ -17,7 +17,7 @@ import org.nightlabs.jfire.reporting.textpart.ReportTextPart.Type;
 
 /**
  * Static helper class that helps to build evaluation strings for {@link ReportTextPart}s inside a report layout.
- * It should be used in like the following example inside a dynamic text part in a report layout.
+ * It should be used like the following example inside a dynamic text part in a report layout.
  * <pre>
  * importClass(Packages.org.nightlabs.jfire.reporting.textpart.ReportTextPartHelper);
  * eval("" + ReportTextPartHelper.getEvalString(JFireReportingHelper.getDataSetParamObject(myVar), "reportTextPartID"));
@@ -43,7 +43,7 @@ public class ReportTextPartHelper {
 	 * 
 	 * @param linkedObjectID
 	 * @param reportTextPartID
-	 * @return
+	 * @return A String that can be passed to the javascript eval() method inside a report layout.
 	 */
 	public static String getEvalString(ObjectID linkedObjectID, String reportTextPartID) {
 		PersistenceManager pm = JFireReportingHelper.getPersistenceManager();
@@ -53,7 +53,7 @@ public class ReportTextPartHelper {
 					"(linkedObjectID = " + linkedObjectID + ", " + 
 					"reportTextPartID = " + reportTextPartID + ")");
 		}
-		ReportTextPartConfiguration configuration = ReportTextPartConfiguration.getReportTextPartConfiguration(pm, linkedObjectID, reportRegistryItemID);
+		ReportTextPartConfiguration configuration = ReportTextPartConfiguration.getReportTextPartConfiguration(pm, reportRegistryItemID, linkedObjectID);
 		if (
 				configuration != null &&
 				configuration.getReportTextParts().size() != 1 &&
@@ -92,9 +92,11 @@ public class ReportTextPartHelper {
 	}
 	
 	/**
+	 * Returns a String that can be passed to the javascript eval() method and that will
+	 * evaluate to the content of the given {@link ReportTextPart}.
 	 * 
-	 * @param locale
-	 * @return
+	 * @param locale The locale to localize the {@link ReportTextPart}s content to.
+	 * @return A String that can be passed to the javascript eval() method inside a report layout.
 	 */
 	public static String getEvalString(ReportTextPart reportTextPart, Locale locale) {
 		if (!reportTextPart.getContent().containsLanguageID(locale.getLanguage()))
@@ -123,12 +125,4 @@ public class ReportTextPartHelper {
 		}
 		return escaped;
 	}
-	
-	public static void main(String[] args) {
-		String test = "chars: \" \n this \n is a \n line break \\ / \n";
-		System.out.println(test);
-		System.out.println("-------------------------------------------------");
-		System.out.println("\"" + escapeEvalString(test, 1, true) + "\"");
-	}
-	
 }

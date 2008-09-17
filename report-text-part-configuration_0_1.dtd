@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Reporting Initialiser DTD for ReportTextParts - version 0.1 -->
+<!-- Author: Alexander Bieber -->
+
+<!-- 
+  While the report intialiser scans through directories and intialises
+  report categories and report layouts it will also look for files
+  named like {reportRegistryItemID}.ReportTextPartConfiguration.xml
+  where reportRegistryItemID is the last part of the id of the currently
+  initialised report item (category or report).
+  
+  If such a file is found its contents will be used to create/update
+  a ReportTextPartConfiguration linked to the item currently initialised.
+  
+  This is the dtd of these files.  
+-->
+
+<!--
+  reportTextPartConfiguration is the document main element.
+  A file should only contain one such element and that element
+  might contain one or more reportTextPart elements
+-->
+<!ELEMENT reportTextPartConfiguration ( reportTextPart+ ) >
+
+<!--
+  A <reportTextPartConfiguration> is made up of a list of <reportTextPart>s 
+  Each <reportTextPart> defines an id that the created ReportTextPart will
+  have in the ReportTextPartConfiguration created.
+  Additionally each <reportTextPart> needs to define the type of its content. 
+-->
+<!ELEMENT reportTextPart ( name*, content+ ) >
+<!ATTLIST reportTextPart 
+	id NMTOKEN #REQUIRED
+	type  #REQUIRED
+>
+
+<!-- 
+  <name> elements are used to define a <reportTextPart>s i18n name.
+  They are used like
+  <name language="en">MyName</name>
+-->
+<!ELEMENT name ( #PCDATA ) >
+<!ATTLIST name language NMTOKEN #REQUIRED >
+
+<!-- 
+  The <content> element is used to define the content of a 
+  reportTextPart. It is an i18n text of large strings.
+  Use it like
+  <content language="en"><![CDATA[
+Some content, either javascript or html  
+	]]></content>
+-->
+<!ELEMENT content ( #CDATA ) >
+<!ATTLIST content language NMTOKEN #REQUIRED >

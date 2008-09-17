@@ -10,6 +10,8 @@ import java.util.Map;
 import org.nightlabs.i18n.I18nText;
 
 /**
+ * {@link I18nText} holding the content of an {@link ReportTextPart}.
+ * 
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
  *
  * @jdo.persistence-capable

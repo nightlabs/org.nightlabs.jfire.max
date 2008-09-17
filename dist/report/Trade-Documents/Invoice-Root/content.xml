@@ -12,7 +12,7 @@
 	<report
 		file="Default-InvoiceLayout.rptdesign" 
 		id="Default-InvoiceLayout"
-		overwriteOnInit="true"
+		overwriteOnInit="false"
 	>
 	<!-- id is optional and defaults to the value of file without extension -->
 	<!-- overwriteOnInit is optional and defaults to true -->

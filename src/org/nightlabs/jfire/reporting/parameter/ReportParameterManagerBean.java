@@ -52,6 +52,8 @@ import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
 import org.nightlabs.jfire.reporting.parameter.ReportParameterUtil.NameEntry;
 import org.nightlabs.jfire.reporting.parameter.config.ReportParameterAcquisitionSetup;
 import org.nightlabs.jfire.reporting.parameter.config.id.ReportParameterAcquisitionSetupID;
+import org.nightlabs.jfire.reporting.parameter.dao.ReportParameterAcquisitionSetupDAO;
+import org.nightlabs.jfire.reporting.parameter.dao.ValueProviderDAO;
 import org.nightlabs.jfire.reporting.parameter.id.ValueProviderCategoryID;
 import org.nightlabs.jfire.reporting.parameter.id.ValueProviderID;
 import org.nightlabs.jfire.security.id.UserID;
@@ -59,6 +61,8 @@ import org.nightlabs.jfire.workstation.id.WorkstationID;
 import org.nightlabs.util.TimePeriod;
 
 /**
+ * Manager giving acces to {@link ValueProvider}s, their categories and complete {@link ReportParameterAcquisitionSetup}s. 
+ * 
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  *
  * @ejb.bean name="jfire/ejb/JFireReporting/ReportParameterManager"
@@ -67,7 +71,6 @@ import org.nightlabs.util.TimePeriod;
  *					 transaction-type="Container"
  *
  * @ejb.util generate="physical"
- * @ejb.transaction type="Required"
  */
 public abstract class ReportParameterManagerBean
 extends BaseSessionBeanImpl
@@ -110,7 +113,11 @@ implements SessionBean
 	public void ejbRemove() throws EJBException, RemoteException { }
 
 	/**
-	 *
+	 * This method is called by the organisation-init system, it is not intended to be called directly.
+	 * <p>
+	 * This initializes the default value providers for simple data-types.
+	 * </p>
+	 * 
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_System_"
 	 * @ejb.transaction type="Required"
@@ -234,18 +241,16 @@ implements SessionBean
 
 
 	/**
-	 * @throws ModuleException
-	 *
+	 * This method returns detached copies of the {@link ValueProvider}s for the given ids.
+	 * {@link ValueProviderDAO} uses this method, use the dao rather than using this method directly.
+	 * 
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="org.nightlabs.jfire.reporting.editReport"
-	 * @ejb.transaction type="Required"
+	 * @ejb.permission role-name="org.nightlabs.jfire.reporting.renderReport"
+	 * @ejb.transaction type="Supports"
 	 */
-	@SuppressWarnings("unchecked")
-	public Set<ReportParameterAcquisitionSetup> getValueProviders(
+	public Set<ValueProvider> getValueProviders(
 			Set<ValueProviderID> providerIDs, String[] fetchGroups, int maxFetchDepth
-	)
-	throws ModuleException
-	{
+	) {
 		PersistenceManager pm;
 		pm = getPersistenceManager();
 		try {
@@ -256,16 +261,19 @@ implements SessionBean
 	}
 
 	/**
-	 * @throws ModuleException
-	 *
+	 * Returns the ids of the {@link ReportParameterAcquisitionSetup}s mapped to the given report layouts.
+	 * Note, that for those report layouts with no {@link ReportParameterAcquisitionSetup} linked to them,
+	 * this report layout id will be returned mapping to <code>null</code>.
+	 * <p>
+	 * This method in combination with {@link #getReportParameterAcquisitionSetups(Set, String[], int)} is
+	 * used by {@link ReportParameterAcquisitionSetupDAO}. Use the dao rather than using this method directly.
+	 * </p>  
+	 * 
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Required"
+	 * @ejb.permission role-name="org.nightlabs.jfire.reporting.renderReport"
+	 * @ejb.transaction type="Supports"
 	 */
-	@SuppressWarnings("unchecked")
-	public Map<ReportRegistryItemID, ReportParameterAcquisitionSetupID> getReportParameterAcquisitionSetupIDs(Collection<ReportRegistryItemID> reportLayoutIDs)
-	throws ModuleException
-	{
+	public Map<ReportRegistryItemID, ReportParameterAcquisitionSetupID> getReportParameterAcquisitionSetupIDs(Collection<ReportRegistryItemID> reportLayoutIDs) {
 		PersistenceManager pm;
 		pm = getPersistenceManager();
 		try {
@@ -284,18 +292,17 @@ implements SessionBean
 	}
 
 	/**
-	 * @throws ModuleException
-	 *
+	 * Returns detached copies of the {@link ReportParameterAcquisitionSetup}s referenced by the given ids.
+	 * This is used by {@link ReportParameterAcquisitionSetupDAO}, use the dao rather than this method directly.
+	 *   
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Required"
+	 * @ejb.permission role-name="org.nightlabs.jfire.reporting.renderReport"
+	 * @ejb.transaction type="Supports"
 	 */
 	@SuppressWarnings("unchecked")
 	public Set<ReportParameterAcquisitionSetup> getReportParameterAcquisitionSetups(
 			Set<ReportParameterAcquisitionSetupID> setupIDs, String[] fetchGroups, int maxFetchDepth
-	)
-	throws ModuleException
-	{
+	) {
 		PersistenceManager pm;
 		pm = getPersistenceManager();
 		try {
@@ -307,15 +314,14 @@ implements SessionBean
 
 
 	/**
-	 * @throws ModuleException
-	 *
+	 * Searches for the ids of the {@link ValueProviderCategory}ies that are children of the category
+	 * referenced by the given valueProviderCategoryID.
+	 * 
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Required"
+	 * @ejb.permission role-name="org.nightlabs.jfire.reporting.renderReport"
+	 * @ejb.transaction type="Supports"
 	 */
-	public Set<ValueProviderCategoryID> getValueProviderCategoryIDsForParent(ValueProviderCategoryID valueProviderCategoryID)
-	throws ModuleException
-	{
+	public Set<ValueProviderCategoryID> getValueProviderCategoryIDsForParent(ValueProviderCategoryID valueProviderCategoryID) {
 		PersistenceManager pm;
 		pm = getPersistenceManager();
 		try {
@@ -327,18 +333,15 @@ implements SessionBean
 	}
 
 	/**
-	 * @throws ModuleException
 	 *
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Required"
+	 * @ejb.permission role-name="org.nightlabs.jfire.reporting.renderReport"
+	 * @ejb.transaction type="Supports"
 	 */
 	@SuppressWarnings("unchecked")
 	public Set<ValueProviderCategory> getValueProviderCategories(
 			Set<ValueProviderCategoryID> categoryIDs, String[] fetchGroups, int maxFetchDepth
-	)
-	throws ModuleException
-	{
+	) {
 		PersistenceManager pm;
 		pm = getPersistenceManager();
 		try {
@@ -352,12 +355,10 @@ implements SessionBean
 	 * @throws ModuleException
 	 *
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+	 * @ejb.permission role-name="org.nightlabs.jfire.reporting.renderReport"
+	 * @ejb.transaction type="Supports"
 	 */
-	public Set<ValueProviderID> getValueProviderIDsForParent(ValueProviderCategoryID valueProviderCategoryID)
-	throws ModuleException
-	{
+	public Set<ValueProviderID> getValueProviderIDsForParent(ValueProviderCategoryID valueProviderCategoryID) {
 		PersistenceManager pm;
 		pm = getPersistenceManager();
 		try {
@@ -369,6 +370,8 @@ implements SessionBean
 	}
 
 	/**
+	 * Stores the given {@link ReportParameterAcquisitionSetup}.
+	 * 
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="org.nightlabs.jfire.reporting.editReport"
 	 * @ejb.transaction type="Required"

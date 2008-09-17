@@ -233,10 +233,6 @@ s	 */
 	throws ScriptException, InstantiationException
 	{
 		Script script = getScript(pm, scriptRegistryItemID);
-		// if this script relies on a persistenceManager parameter, provide one ;-)
-		// FIXME: this is legacy code (JavaClass)scripts can now obtain the pm from their executor
-		if (script.getParameterSet().getParameter("persistenceManager", false) != null)
-			parameters.put("persistenceManager", pm);
 		return createReportingScriptExecutor(pm, script).getResultSet(script, parameters, queryPropertySet);
 	}
 	
@@ -259,13 +255,11 @@ s	 */
 	}
 
 	/**
-	 * Returns the parameter metadata of the given JFire Script in the form
+	 * Returns the ParameterSet meta-data of the given JFire script in the form
 	 * of an ODA runtime interface {@link IParameterMetaData}.
 	 *
 	 * @param pm The PersistenceManager to use.
 	 * @param itemID The id of the JFire script.
-	 * @throws JFireReportingOdaException
-	 * @throws OdaException
 	 */
 	public static IParameterMetaData getScriptParameterMetaData(PersistenceManager pm, ScriptRegistryItemID itemID) throws JFireReportingOdaException
 	{

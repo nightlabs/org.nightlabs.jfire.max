@@ -1178,26 +1178,40 @@ implements SessionBean
 			project.getName().setText(Locale.ENGLISH.getLanguage(), "Project 1");
 			project = pm.makePersistent(project);
 
+			//--
 			Project subProject = new Project(IDGenerator.getOrganisationID(), IDGenerator.nextID(Project.class));
 			subProject.getName().setText(Locale.ENGLISH.getLanguage(), "Sub project 1");
 			project.addSubProject(subProject);
 
 			Project subsubProject = new Project(IDGenerator.getOrganisationID(), IDGenerator.nextID(Project.class));
-			subsubProject.getName().setText(Locale.ENGLISH.getLanguage(), "Sub Sub project 1");
+			subsubProject.getName().setText(Locale.ENGLISH.getLanguage(), "Sub Sub project 1.1");
 			subProject.addSubProject(subsubProject);
 
 			subsubProject = new Project(IDGenerator.getOrganisationID(), IDGenerator.nextID(Project.class));
-			subsubProject.getName().setText(Locale.ENGLISH.getLanguage(), "Sub Sub project 2");
+			subsubProject.getName().setText(Locale.ENGLISH.getLanguage(), "Sub Sub project 1.2");
 			subProject.addSubProject(subsubProject);
 
 			subsubProject = new Project(IDGenerator.getOrganisationID(), IDGenerator.nextID(Project.class));
-			subsubProject.getName().setText(Locale.ENGLISH.getLanguage(), "Sub Sub project 3");
+			subsubProject.getName().setText(Locale.ENGLISH.getLanguage(), "Sub Sub project 1.3");
 			subProject.addSubProject(subsubProject);
 
+			//--
 			subProject = new Project(IDGenerator.getOrganisationID(), IDGenerator.nextID(Project.class));
 			subProject.getName().setText(Locale.ENGLISH.getLanguage(), "Sub project 2");
 			project.addSubProject(subProject);
+			
+			subsubProject = new Project(IDGenerator.getOrganisationID(), IDGenerator.nextID(Project.class));
+			subsubProject.getName().setText(Locale.ENGLISH.getLanguage(), "Sub Sub project 2.1");
+			subProject.addSubProject(subsubProject);
 
+			subsubProject = new Project(IDGenerator.getOrganisationID(), IDGenerator.nextID(Project.class));
+			subsubProject.getName().setText(Locale.ENGLISH.getLanguage(), "Sub Sub project 2.2");
+			subProject.addSubProject(subsubProject);
+
+			subsubProject = new Project(IDGenerator.getOrganisationID(), IDGenerator.nextID(Project.class));
+			subsubProject.getName().setText(Locale.ENGLISH.getLanguage(), "Sub Sub project 2.3");
+			subProject.addSubProject(subsubProject);
+			//--
 			subProject = new Project(IDGenerator.getOrganisationID(), IDGenerator.nextID(Project.class));
 			subProject.getName().setText(Locale.ENGLISH.getLanguage(), "Sub project 3");
 			project.addSubProject(subProject);
@@ -1206,6 +1220,7 @@ implements SessionBean
 			subProject.getName().setText(Locale.ENGLISH.getLanguage(), "Sub project 4");
 			project.addSubProject(subProject);
 
+			//--
 			project = new Project(IDGenerator.getOrganisationID(), IDGenerator.nextID(Project.class));
 			project.getName().setText(Locale.ENGLISH.getLanguage(), "Project 2");
 			project = pm.makePersistent(project);

@@ -1059,6 +1059,10 @@ implements SessionBean
 			issueSeverityType.getIssueSeverityTypeText().setText(Locale.ENGLISH.getLanguage(), "Tweak");
 			issueSeverityType = pm.makePersistent(issueSeverityType);
 			issueType.getIssueSeverityTypes().add(issueSeverityType);
+			
+			issueType = new IssueType(getOrganisationID(), "Customer");
+			issueType.getName().setText(Locale.ENGLISH.getLanguage(), "Customer");
+			issueType = pm.makePersistent(issueType);
 			////////////////////////////////////////////////////////
 			// Create the priorities
 			// check, whether the datastore is already initialized
@@ -1156,18 +1160,17 @@ implements SessionBean
 			// Create the project type
 			pm.getExtent(ProjectType.class); 
 			
-			ProjectType projectType;
-			projectType = new ProjectType(IDGenerator.getOrganisationID(), ProjectType.PROJECT_TYPE_ID_DEFAULT.projectTypeID);
-			projectType.getName().setText(Locale.ENGLISH.getLanguage(), "Default");
-			projectType = pm.makePersistent(projectType);
+			ProjectType projectType1 = new ProjectType(IDGenerator.getOrganisationID(), ProjectType.PROJECT_TYPE_ID_DEFAULT.projectTypeID);
+			projectType1.getName().setText(Locale.ENGLISH.getLanguage(), "Default");
+			projectType1 = pm.makePersistent(projectType1);
 			
-			projectType = new ProjectType(IDGenerator.getOrganisationID(), "cross ticket");
-			projectType.getName().setText(Locale.ENGLISH.getLanguage(), "Cross Ticket");
-			projectType = pm.makePersistent(projectType);
+			ProjectType projectType2 = new ProjectType(IDGenerator.getOrganisationID(), "cross ticket");
+			projectType2.getName().setText(Locale.ENGLISH.getLanguage(), "Cross Ticket");
+			projectType2 = pm.makePersistent(projectType2);
 
-			projectType = new ProjectType(IDGenerator.getOrganisationID(), "jfire");
-			projectType.getName().setText(Locale.ENGLISH.getLanguage(), "JFire");
-			projectType = pm.makePersistent(projectType);
+			ProjectType projectType3 = new ProjectType(IDGenerator.getOrganisationID(), "jfire");
+			projectType3.getName().setText(Locale.ENGLISH.getLanguage(), "JFire");
+			projectType3 = pm.makePersistent(projectType3);
 			
 			// Create the projects
 			pm.getExtent(Project.class); 
@@ -1176,6 +1179,7 @@ implements SessionBean
 
 			project = new Project(IDGenerator.getOrganisationID(), IDGenerator.nextID(Project.class));
 			project.getName().setText(Locale.ENGLISH.getLanguage(), "Project 1");
+			project.setProjectType(projectType1);
 			project = pm.makePersistent(project);
 
 			//--

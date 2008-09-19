@@ -3,18 +3,20 @@ package org.nightlabs.jfire.issue.project;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
-import javax.jdo.Query;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.jdo.ObjectID;
+import org.nightlabs.jfire.idgenerator.IDGenerator;
+import org.nightlabs.jfire.issue.Issue;
 import org.nightlabs.jfire.issue.project.id.ProjectID;
 import org.nightlabs.jfire.organisation.Organisation;
+import org.nightlabs.jfire.prop.PropertySet;
+import org.nightlabs.jfire.prop.Struct;
+import org.nightlabs.jfire.prop.StructLocal;
 import org.nightlabs.util.Util;
 
 /**
@@ -57,6 +59,7 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="Project.parentProject" fields="parentProject"
  * @jdo.fetch-group name="Project.subProjects" fields="subProjects"
  * @jdo.fetch-group name="Project.projectType" fields="projectType"
+ * @jdo.fetch-group name="Project.propertySet" fields="propertySet"
  * @jdo.fetch-group name="Issue.project" fields="name"
  * 
  **/
@@ -70,6 +73,7 @@ implements Serializable, Comparable<Project>
 	public static final String FETCH_GROUP_NAME = "Project.name";
 	public static final String FETCH_GROUP_PARENT_PROJECT = "Project.parentProject";
 	public static final String FETCH_GROUP_SUBPROJECTS = "Project.subProjects";
+	public static final String FETCH_GROUP_PROPERTY_SET = "Project.propertySet";
 
 	/**
 	 * @jdo.field primary-key="true"
@@ -101,8 +105,6 @@ implements Serializable, Comparable<Project>
 	private Project parentProject;
 	
 	/**
-	 * Instances of IssueLink that are representations of {@link ObjectID}s.
-	 *
 	 * @jdo.field
 	 *		persistence-modifier="persistent"
 	 *		collection-type="collection"
@@ -116,6 +118,50 @@ implements Serializable, Comparable<Project>
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private ProjectType projectType;
+	
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private PropertySet propertySet;
+
+	/**
+	 * Returns the property set of this {@link Project}.
+	 * 
+	 * @return The property set of this {@link Project}.
+	 */
+	public PropertySet getPropertySet() {
+		return propertySet;
+	}
+	
+	/**
+	 * The scope of the StructLocal by which the propertySet is build from.
+	 * 
+	 * @jdo.field persistence-modifier="persistent" null-value="exception" indexed="true"
+	 */
+	private String structLocalScope;
+
+	/**
+	 * Returns the scope of the StructLocal by which the propertySet is build from.
+	 * @return The scope of the StructLocal by which the propertySet is build from.
+	 */
+	public String getStructLocalScope() {
+		return structLocalScope;
+	}
+
+	/**
+	 * The scope of the Struct by which the propertySet is build from.
+	 * 
+	 * @jdo.field persistence-modifier="persistent" null-value="exception" indexed="true"
+	 */
+	private String structScope;
+
+	/**
+	 * Returns the scope of the Struct by which the propertySet is build from.
+	 * @return The scope of the Struct by which the propertySet is build from.
+	 */
+	public String getStructScope() {
+		return structScope;
+	}
 	
 	/**
 	 * @deprecated Constructor exists only for JDO! 
@@ -133,6 +179,13 @@ implements Serializable, Comparable<Project>
 		this.description = new ProjectDescription(this);
 		
 		subProjects = new HashSet<Project>();
+		
+		this.structScope = Struct.DEFAULT_SCOPE;
+		this.structLocalScope = StructLocal.DEFAULT_SCOPE;
+		this.propertySet = new PropertySet(
+				organisationID, IDGenerator.nextID(PropertySet.class), 
+				Issue.class.getName(), 
+				structScope, structLocalScope);
 	}
 
 	/**

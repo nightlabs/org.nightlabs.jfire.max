@@ -17,28 +17,27 @@ import org.nightlabs.i18n.I18nText;
  * @jdo.inheritance strategy="new-table"
  *
  * @jdo.create-objectid-class field-order="organisationID, projectID"
- * 
+ *
  * @jdo.fetch-group name="Project.name" fetch-groups="default" fields="project, names"
- */ 
-public class ProjectName 
+ */
+public class ProjectName
 extends I18nText{
 	/**
 	 * The serial version of this class.
 	 */
 	private static final long serialVersionUID = 1L;
-	
+
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
 	private String organisationID;
-	
+
 	/**
 	 * @jdo.field primary-key="true"
-	 * @jdo.column length="100"
 	 */
 	private long projectID;
-	
+
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
@@ -47,7 +46,7 @@ extends I18nText{
 	/**
 	 * key: String languageID<br/>
 	 * value: String description
-	 * 
+	 *
 	 * @jdo.field
 	 *		persistence-modifier="persistent"
 	 *		collection-type="map"
@@ -64,6 +63,7 @@ extends I18nText{
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected ProjectName()
 	{
 	}
@@ -78,19 +78,20 @@ extends I18nText{
 	/**
 	 * @see org.nightlabs.i18n.I18nText#getI18nMap()
 	 */
+	@Override
 	protected Map<String, String> getI18nMap()
 	{
 		return names;
 	}
-	
+
 	public String getOrganisationID() {
 		return organisationID;
 	}
-	
+
 	public Project getProject() {
 		return project;
 	}
-	
+
 	public long getProjectID() {
 		return projectID;
 	}
@@ -98,6 +99,7 @@ extends I18nText{
 	/**
 	 * @see org.nightlabs.i18n.I18nText#getFallBackValue(java.lang.String)
 	 */
+	@Override
 	protected String getFallBackValue(String languageID)
 	{
 		return projectID == 0 ? languageID : Long.toString(projectID);

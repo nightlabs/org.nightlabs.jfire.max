@@ -79,6 +79,7 @@ implements Serializable, Comparable<Project>
 	public static final String FETCH_GROUP_PARENT_PROJECT = "Project.parentProject";
 	public static final String FETCH_GROUP_SUBPROJECTS = "Project.subProjects";
 	public static final String FETCH_GROUP_PROPERTY_SET = "Project.propertySet";
+	public static final String FETCH_GROUP_PROJECT_TYPE = "Project.projectType";
 
 	/**
 	 * @jdo.field primary-key="true"

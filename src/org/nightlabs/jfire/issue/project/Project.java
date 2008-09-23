@@ -1,9 +1,11 @@
 package org.nightlabs.jfire.issue.project;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
@@ -12,11 +14,14 @@ import org.apache.log4j.Logger;
 import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.issue.Issue;
+import org.nightlabs.jfire.issue.IssueComment;
 import org.nightlabs.jfire.issue.project.id.ProjectID;
+import org.nightlabs.jfire.jbpm.graph.def.State;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.prop.PropertySet;
 import org.nightlabs.jfire.prop.Struct;
 import org.nightlabs.jfire.prop.StructLocal;
+import org.nightlabs.jfire.security.User;
 import org.nightlabs.util.Util;
 
 /**
@@ -100,6 +105,26 @@ implements Serializable, Comparable<Project>
 	private ProjectDescription description;
 
 	/**
+	 * @jdo.field 
+	 * 		persistence-modifier="persistent" 
+	 * 		load-fetch-group="all"
+	 */
+	private User projectManager;
+	
+	/**
+	 * @jdo.field
+	 *		persistence-modifier="persistent"
+	 *		collection-type="collection"
+	 *		element-type="User"
+	 *		table="JFireIssueTracking_Project_members"
+	 *
+	 * @jdo.join
+	 */
+	private List<User> members;
+	
+	
+	
+	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private Project parentProject;
@@ -179,6 +204,7 @@ implements Serializable, Comparable<Project>
 		this.description = new ProjectDescription(this);
 		
 		subProjects = new HashSet<Project>();
+		members = new ArrayList<User>();
 		
 		this.structScope = Struct.DEFAULT_SCOPE;
 		this.structLocalScope = StructLocal.DEFAULT_SCOPE;
@@ -262,6 +288,26 @@ implements Serializable, Comparable<Project>
 		this.description = description;
 	}
 
+	public List<User> getMembers() {
+		return Collections.unmodifiableList(members);
+	}
+	
+	public void addMember(User user) {
+		members.add(user);
+	}
+	
+	public void addMembers(Collection<User> users) {
+		members.addAll(users);
+	}
+	
+	public boolean removeMember(User user) {
+		return members.remove(user);
+	}
+	
+	public boolean removeMembers(Collection<User> users) {
+		return members.removeAll(users);
+	}
+	
 	/**
 	 * Internal method.
 	 * @return The PersistenceManager associated with this object. 

@@ -12,7 +12,7 @@ import org.nightlabs.i18n.I18nText;
  *		identity-type="application"
  *		objectid-class="org.nightlabs.jfire.issue.project.id.ProjectDescriptionID"
  *		detachable="true"
- *		table="JFireProjectTracking_ProjectDescription"
+ *		table="JFireIssueTracking_ProjectDescription"
  *
  * @jdo.inheritance strategy="new-table"
  *

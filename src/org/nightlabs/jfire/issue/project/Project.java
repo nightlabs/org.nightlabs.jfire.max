@@ -123,8 +123,6 @@ implements Serializable, Comparable<Project>
 	 */
 	private List<User> members;
 	
-	
-	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
@@ -211,7 +209,7 @@ implements Serializable, Comparable<Project>
 		this.structLocalScope = StructLocal.DEFAULT_SCOPE;
 		this.propertySet = new PropertySet(
 				organisationID, IDGenerator.nextID(PropertySet.class), 
-				Issue.class.getName(), 
+				Project.class.getName(), 
 				structScope, structLocalScope);
 	}
 

@@ -1128,6 +1128,9 @@ implements SessionBean
 			issueResolution = pm.makePersistent(issueResolution);
 			issueType.getIssueResolutions().add(issueResolution);
 
+			// Create the process definitions.
+			issueType.readProcessDefinition(IssueType.class.getResource("jbpm/status/"));
+			
 			issueType = new IssueType(getOrganisationID(), "Customer");
 			issueType.getName().setText(Locale.ENGLISH.getLanguage(), "Customer");
 			issueType = pm.makePersistent(issueType);

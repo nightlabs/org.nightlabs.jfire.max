@@ -50,7 +50,7 @@ implements Serializable
 	private String projectTypeID;
 
 	/**
-	 * @jdo.field persistence-modifier="persistent" dependent="true" mapped-by="projectType"
+	 * @jdo.field persistence-modifier="persistent" fetch-groups="default" dependent="true" mapped-by="projectType"
 	 */
 	private ProjectTypeName name;
 	
@@ -116,11 +116,11 @@ implements Serializable
 	 */
 	protected PersistenceManager getPersistenceManager() 
 	{
-		PersistenceManager projectPM = JDOHelper.getPersistenceManager(this);
-		if (projectPM == null)
+		PersistenceManager projectTypePM = JDOHelper.getPersistenceManager(this);
+		if (projectTypePM == null)
 			throw new IllegalStateException("This instance of " + this.getClass().getName() + " is not persistent, can not get a PersistenceManager!");
 
-		return projectPM;
+		return projectTypePM;
 	}	
 
 	@Override

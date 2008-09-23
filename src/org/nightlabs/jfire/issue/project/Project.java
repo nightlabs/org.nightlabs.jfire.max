@@ -65,6 +65,8 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="Project.subProjects" fields="subProjects"
  * @jdo.fetch-group name="Project.projectType" fields="projectType"
  * @jdo.fetch-group name="Project.propertySet" fields="propertySet"
+ * @jdo.fetch-group name="Project.projectManager" fields="projectManager"
+ * @jdo.fetch-group name="Project.members" fields="members"
  * @jdo.fetch-group name="Issue.project" fields="name"
  * 
  **/
@@ -80,6 +82,8 @@ implements Serializable, Comparable<Project>
 	public static final String FETCH_GROUP_SUBPROJECTS = "Project.subProjects";
 	public static final String FETCH_GROUP_PROPERTY_SET = "Project.propertySet";
 	public static final String FETCH_GROUP_PROJECT_TYPE = "Project.projectType";
+	public static final String FETCH_GROUP_PROJECT_MANAGER = "Project.projectManager";
+	public static final String FETCH_GROUP_MEMBERS = "Project.members";
 
 	/**
 	 * @jdo.field primary-key="true"
@@ -305,6 +309,14 @@ implements Serializable, Comparable<Project>
 	
 	public boolean removeMembers(Collection<User> users) {
 		return members.removeAll(users);
+	}
+	
+	public void setProjectManager(User user) {
+		this.projectManager = user;
+	}
+	
+	public User getProjectManager() {
+		return projectManager;
 	}
 	
 	/**

@@ -1059,10 +1059,7 @@ implements SessionBean
 			issueSeverityType.getIssueSeverityTypeText().setText(Locale.ENGLISH.getLanguage(), "Tweak");
 			issueSeverityType = pm.makePersistent(issueSeverityType);
 			issueType.getIssueSeverityTypes().add(issueSeverityType);
-			
-			issueType = new IssueType(getOrganisationID(), "Customer");
-			issueType.getName().setText(Locale.ENGLISH.getLanguage(), "Customer");
-			issueType = pm.makePersistent(issueType);
+
 			////////////////////////////////////////////////////////
 			// Create the priorities
 			// check, whether the datastore is already initialized
@@ -1131,6 +1128,10 @@ implements SessionBean
 			issueResolution = pm.makePersistent(issueResolution);
 			issueType.getIssueResolutions().add(issueResolution);
 
+			issueType = new IssueType(getOrganisationID(), "Customer");
+			issueType.getName().setText(Locale.ENGLISH.getLanguage(), "Customer");
+			issueType = pm.makePersistent(issueType);
+			
 			// Create the process definitions.
 			issueType.readProcessDefinition(IssueType.class.getResource("jbpm/status/"));
 

@@ -1231,18 +1231,22 @@ implements SessionBean
 			//--
 			project = new Project(IDGenerator.getOrganisationID(), IDGenerator.nextID(Project.class));
 			project.getName().setText(Locale.ENGLISH.getLanguage(), "Project 2");
+			project.setProjectType(projectType1);
 			project = pm.makePersistent(project);
 
 			project = new Project(IDGenerator.getOrganisationID(), IDGenerator.nextID(Project.class));
 			project.getName().setText(Locale.ENGLISH.getLanguage(), "Project 3");
+			project.setProjectType(projectType1);
 			project = pm.makePersistent(project);
 
 			project = new Project(IDGenerator.getOrganisationID(), IDGenerator.nextID(Project.class));
 			project.getName().setText(Locale.ENGLISH.getLanguage(), "Project 4");
+			project.setProjectType(projectType1);
 			project = pm.makePersistent(project);
 
 			project = new Project(IDGenerator.getOrganisationID(), IDGenerator.nextID(Project.class));
 			project.getName().setText(Locale.ENGLISH.getLanguage(), "Project 5");
+			project.setProjectType(projectType1);
 			project = pm.makePersistent(project);
 
 			EditLockType issueEditLock = new EditLockType(EditLockTypeIssue.EDIT_LOCK_TYPE_ID);

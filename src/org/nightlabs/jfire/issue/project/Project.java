@@ -6,22 +6,20 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 
 import org.apache.log4j.Logger;
-import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
-import org.nightlabs.jfire.issue.Issue;
-import org.nightlabs.jfire.issue.IssueComment;
 import org.nightlabs.jfire.issue.project.id.ProjectID;
-import org.nightlabs.jfire.jbpm.graph.def.State;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.prop.PropertySet;
 import org.nightlabs.jfire.prop.Struct;
 import org.nightlabs.jfire.prop.StructLocal;
 import org.nightlabs.jfire.security.User;
+import org.nightlabs.jfire.security.UserSecurityGroup;
 import org.nightlabs.util.Util;
 
 /**
@@ -125,7 +123,7 @@ implements Serializable, Comparable<Project>
 	 *
 	 * @jdo.join
 	 */
-	private List<User> members;
+	private Set<User> members;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -207,7 +205,7 @@ implements Serializable, Comparable<Project>
 		this.description = new ProjectDescription(this);
 		
 		subProjects = new HashSet<Project>();
-		members = new ArrayList<User>();
+		members = new HashSet<User>();
 		
 		this.structScope = Struct.DEFAULT_SCOPE;
 		this.structLocalScope = StructLocal.DEFAULT_SCOPE;
@@ -291,16 +289,24 @@ implements Serializable, Comparable<Project>
 		this.description = description;
 	}
 
-	public List<User> getMembers() {
-		return Collections.unmodifiableList(members);
+	public Set<User> getMembers() {
+		return Collections.unmodifiableSet(members);
 	}
 	
 	public void addMember(User user) {
+		if (user == null)
+			throw new IllegalArgumentException("user must not be null!");
+
+		if (!user.getOrganisationID().equals(this.getOrganisationID()))
+			throw new IllegalArgumentException("this.organisationID != user.organisationID");
+
 		members.add(user);
 	}
 	
 	public void addMembers(Collection<User> users) {
-		members.addAll(users);
+		for (User user : users) {
+			addMember(user);
+		}
 	}
 	
 	public boolean removeMember(User user) {

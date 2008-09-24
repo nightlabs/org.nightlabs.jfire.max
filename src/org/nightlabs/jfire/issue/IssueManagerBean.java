@@ -1249,11 +1249,6 @@ implements SessionBean
 			project.setProjectType(projectType1);
 			project = pm.makePersistent(project);
 
-			project = new Project(IDGenerator.getOrganisationID(), -1);
-			project.getName().setText(Locale.ENGLISH.getLanguage(), "Not specific");
-			project.setProjectType(projectType1);
-			project = pm.makePersistent(project);
-			
 			EditLockType issueEditLock = new EditLockType(EditLockTypeIssue.EDIT_LOCK_TYPE_ID);
 			issueEditLock = pm.makePersistent(issueEditLock);
 			//------------------------------------------------

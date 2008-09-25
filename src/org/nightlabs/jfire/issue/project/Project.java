@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -149,6 +150,16 @@ implements Serializable, Comparable<Project>
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	private Date createTimestamp;
+
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private Date updateTimestamp;
+	
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
 	private PropertySet propertySet;
 
 	/**
@@ -207,6 +218,8 @@ implements Serializable, Comparable<Project>
 		
 		subProjects = new HashSet<Project>();
 		members = new HashSet<User>();
+		
+		this.createTimestamp = new Date();
 		
 		this.structScope = Struct.DEFAULT_SCOPE;
 		this.structLocalScope = StructLocal.DEFAULT_SCOPE;
@@ -324,6 +337,27 @@ implements Serializable, Comparable<Project>
 	
 	public User getProjectManager() {
 		return projectManager;
+	}
+	
+	/**
+	 * @return Returns the create timestamp.
+	 */
+	public Date getCreateTimestamp() {
+		return createTimestamp;
+	}
+	
+	/**
+	 * @return Returns the update timestamp.
+	 */
+	public Date getUpdateTimestamp() {
+		return updateTimestamp;
+	}
+
+	/**
+	 * @param timestamp The timestamp to set.
+	 */
+	public void setUpdateTimestamp(Date timestamp) {
+		this.updateTimestamp = timestamp;
 	}
 	
 	/**

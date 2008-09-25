@@ -255,6 +255,9 @@ implements SessionBean
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
+			if (project.getCreateTimestamp() != null) {
+				project.setUpdateTimestamp(new Date());
+			}
 			return NLJDOHelper.storeJDO(pm, project, get, fetchGroups, maxFetchDepth);
 		}//try
 		finally {

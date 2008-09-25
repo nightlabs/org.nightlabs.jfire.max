@@ -395,13 +395,6 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	}
 
 	/**
-	 * @param timestamp The timestamp to set.
-	 */
-	public void setCreateTimestamp(Date timestamp) {
-		this.createTimestamp = timestamp;
-	}
-
-	/**
 	 * @return Returns the update timestamp.
 	 */
 	public Date getUpdateTimestamp() {

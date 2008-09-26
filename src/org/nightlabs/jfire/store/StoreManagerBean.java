@@ -57,6 +57,7 @@ import org.nightlabs.ModuleException;
 import org.nightlabs.annotation.Implement;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.query.AbstractJDOQuery;
+import org.nightlabs.jdo.query.AbstractSearchQuery;
 import org.nightlabs.jdo.query.JDOQueryCollectionDecorator;
 import org.nightlabs.jdo.query.QueryCollection;
 import org.nightlabs.jfire.accounting.Accounting;
@@ -69,6 +70,7 @@ import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.idgenerator.IDNamespaceDefault;
 import org.nightlabs.jfire.jbpm.JbpmLookup;
 import org.nightlabs.jfire.jbpm.graph.def.ProcessDefinition;
+import org.nightlabs.jfire.jbpm.query.StatableQuery;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.security.Authority;
 import org.nightlabs.jfire.security.ResolveSecuringAuthorityStrategy;
@@ -127,6 +129,7 @@ import org.nightlabs.jfire.trade.id.CustomerGroupID;
 import org.nightlabs.jfire.trade.id.OfferID;
 import org.nightlabs.jfire.trade.id.OrderID;
 import org.nightlabs.jfire.trade.jbpm.ProcessDefinitionAssignment;
+import org.nightlabs.jfire.trade.query.OfferQuery;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 import org.nightlabs.jfire.transfer.id.TransferID;
 import org.nightlabs.util.CollectionUtil;
@@ -1776,6 +1779,46 @@ implements SessionBean
 		}
 	}
 
+	private Set<ProductTypeID> getInternalProductTypeIDs(QueryCollection<? extends AbstractProductTypeQuery> productTypeQueries)
+	{
+		if (productTypeQueries == null)
+			return null;
+
+		if (! ProductType.class.isAssignableFrom(productTypeQueries.getResultClass()))
+		{
+			throw new RuntimeException("Given QueryCollection has invalid return type! " +
+					"Invalid return type= "+ productTypeQueries.getResultClassName());
+		}
+
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			pm.getFetchPlan().setMaxFetchDepth(1);
+			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
+
+			if (! (productTypeQueries instanceof JDOQueryCollectionDecorator))
+			{
+				productTypeQueries = new JDOQueryCollectionDecorator<AbstractProductTypeQuery>(productTypeQueries);
+			}
+			JDOQueryCollectionDecorator<AbstractProductTypeQuery> queries =
+				(JDOQueryCollectionDecorator<AbstractProductTypeQuery>) productTypeQueries;
+
+			queries.setPersistenceManager(pm);
+
+			Collection<ProductType> productTypes = (Collection<ProductType>) queries.executeQueries();
+
+			productTypes = Authority.filterIndirectlySecuredObjects(
+					pm,
+					productTypes,
+					getPrincipal(),
+					RoleConstants.seeProductType,
+					ResolveSecuringAuthorityStrategy.allow);
+
+			return NLJDOHelper.getObjectIDSet(productTypes);
+		} finally {
+			pm.close();
+		}
+	}
+
 //	/**
 //	 *
 //	 * @ejb.interface-method
@@ -2471,6 +2514,53 @@ implements SessionBean
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			return NLJDOHelper.getDetachedObjectList(pm, receptionNoteIDs, ReceptionNote.class, fetchGroups, maxFetchDepth);
+		} finally {
+			pm.close();
+		}
+	}
+
+	/**
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="org.nightlabs.jfire.store.seeProductType"
+	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+	 */
+	public Set<OfferID> getReservations(ProductTypeID productTypeID, String fetchGroups, int maxFetchDepth)
+	{
+		// TODO; Maybe needs other role
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			pm.getFetchPlan().setMaxFetchDepth(1);
+			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
+
+			QueryCollection<AbstractSearchQuery> queryCollection = new QueryCollection<AbstractSearchQuery>(Offer.class);
+			OfferQuery offerQuery = new OfferQuery();
+			offerQuery.setProductTypeID(productTypeID);
+			queryCollection.add(offerQuery);
+
+			StatableQuery statableQuery = new StatableQuery();
+			statableQuery.setStatableClass(Offer.class);
+			// TODO set finalized as criteria for StatableQuery
+			queryCollection.add(statableQuery);
+
+			if (! (queryCollection instanceof JDOQueryCollectionDecorator))
+			{
+				queryCollection = new JDOQueryCollectionDecorator<AbstractSearchQuery>(queryCollection);
+			}
+			JDOQueryCollectionDecorator<AbstractSearchQuery> queries =
+				(JDOQueryCollectionDecorator<AbstractSearchQuery>) queryCollection;
+
+			queries.setPersistenceManager(pm);
+
+			Collection<ProductType> productTypes = (Collection<ProductType>) queries.executeQueries();
+
+			productTypes = Authority.filterIndirectlySecuredObjects(
+					pm,
+					productTypes,
+					getPrincipal(),
+					RoleConstants.seeProductType,
+					ResolveSecuringAuthorityStrategy.allow);
+
+			return NLJDOHelper.getObjectIDSet(productTypes);
 		} finally {
 			pm.close();
 		}

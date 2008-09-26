@@ -9,6 +9,7 @@ import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jdo.query.AbstractJDOQuery;
 import org.nightlabs.jfire.security.id.UserID;
 import org.nightlabs.jfire.store.id.ProductID;
+import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.ArticleContainer;
 import org.nightlabs.jfire.transfer.id.AnchorID;
@@ -47,8 +48,9 @@ public abstract class AbstractArticleContainerQuery
 		public static final String customerName = "customerName";
 		public static final String vendorID = "vendorID";
 		public static final String vendorNameRegex = "creatorName";
-		public static final String vendorName = "vendorName";		
+		public static final String vendorName = "vendorName";
 		public static final String productID = "productID";
+		public static final String productTypeID = "productTypeID";
 	}
 
 	@Override
@@ -98,8 +100,24 @@ public abstract class AbstractArticleContainerQuery
 		q.setFilter(filter.toString());
 		q.declareVariables(vars.toString());
 
+		checkProductTypeID(filter, vars, getArticleContainerArticlesMemberName());
+
 		if (logger.isDebugEnabled())
 			logger.debug("query = "+filter);
+	}
+
+	protected void checkProductTypeID(StringBuffer filter, StringBuffer vars, String member)
+	{
+		if (isFieldEnabled(FieldName.productTypeID) && productTypeID != null) {
+			if (vars.length() > 0)
+				vars.append("; ");
+			String varName = member+"Var";
+			vars.append(Article.class.getName()+" "+varName);
+			filter.append(" && \n (" +
+					"  this."+member+".contains("+varName+")" +
+					"  && JDOHelper.getObjectId("+varName+".productType) == :productTypeID" +
+					" )");
+		}
 	}
 
 	/**
@@ -214,7 +232,7 @@ public abstract class AbstractArticleContainerQuery
 		this.creatorName = creatorName;
 		notifyListeners(FieldName.creatorName, oldCreatorName, creatorName);
 	}
-	
+
 	/**
 	 * @return Whether the value set with {@link #setCreatorName(String)} represents a regular
 	 *         expression. If this is <code>true</code>, the value set with {@link #setCreatorName(String)}
@@ -226,17 +244,17 @@ public abstract class AbstractArticleContainerQuery
 	}
 
 	/**
-	 * Sets whether the value set with {@link #setCreatorName(String)} represents a 
+	 * Sets whether the value set with {@link #setCreatorName(String)} represents a
 	 * regular expression.
-	 * 
-	 * @param creatorNameRegex The creatorNameRegex to search. 
+	 *
+	 * @param creatorNameRegex The creatorNameRegex to search.
 	 */
 	public void setCreatorNameRegex(boolean creatorNameRegex) {
 		final boolean oldCreatorNameRegex = this.creatorNameRegex;
 		this.creatorNameRegex = creatorNameRegex;
 		notifyListeners(FieldName.creatorNameRegex, oldCreatorNameRegex, creatorNameRegex);
 	}
-	
+
 
 	private boolean customerNameRegex = false;
 	@SuppressWarnings("unused")
@@ -260,7 +278,7 @@ public abstract class AbstractArticleContainerQuery
 		this.customerName = customerName;
 		notifyListeners(FieldName.customerName, oldCustomerName, customerName);
 	}
-	
+
 	/**
 	 * @return Whether the value set with {@link #setCustomerName(String)} represents a regular
 	 *         expression. If this is <code>true</code>, the value set with {@link #setCustomerName(String)}
@@ -272,17 +290,17 @@ public abstract class AbstractArticleContainerQuery
 	}
 
 	/**
-	 * Sets whether the value set with {@link #setCustomerName(String)} represents a 
+	 * Sets whether the value set with {@link #setCustomerName(String)} represents a
 	 * regular expression.
-	 * 
-	 * @param customerNameRegex The customerNameRegex to search. 
+	 *
+	 * @param customerNameRegex The customerNameRegex to search.
 	 */
 	public void setCustomerNameRegex(boolean customerNameRegex) {
 		final boolean oldCustomerNameRegex = this.customerNameRegex;
 		this.customerNameRegex = customerNameRegex;
 		notifyListeners(FieldName.customerNameRegex, oldCustomerNameRegex, customerNameRegex);
 	}
-	
+
 
 	private boolean vendorNameRegex = false;
 	@SuppressWarnings("unused")
@@ -318,17 +336,17 @@ public abstract class AbstractArticleContainerQuery
 	}
 
 	/**
-	 * Sets whether the value set with {@link #setVendorName(String)} represents a 
+	 * Sets whether the value set with {@link #setVendorName(String)} represents a
 	 * regular expression.
-	 * 
-	 * @param vendorNameRegex The vendorNameRegex to search. 
+	 *
+	 * @param vendorNameRegex The vendorNameRegex to search.
 	 */
 	public void setVendorNameRegex(boolean vendorNameRegex) {
 		final boolean oldVendorNameRegex = this.vendorNameRegex;
 		this.vendorNameRegex = vendorNameRegex;
 		notifyListeners(FieldName.vendorNameRegex, oldVendorNameRegex, vendorNameRegex);
 	}
-	
+
 	private String articleContainerID;
 	/**
 	 * returns the articleContainerID
@@ -469,6 +487,21 @@ public abstract class AbstractArticleContainerQuery
 	 */
 	public String getArticleContainerArticlesMemberName() {
 		return "articles";
+	}
+
+	private ProductTypeID productTypeID;
+	/**
+	 * @return the productTypeID
+	 */
+	public ProductTypeID getProductTypeID() {
+		return productTypeID;
+	}
+
+	/**
+	 * @param productTypeID the productTypeID to set
+	 */
+	public void setProductTypeID(ProductTypeID productTypeID) {
+		this.productTypeID = productTypeID;
 	}
 
 }

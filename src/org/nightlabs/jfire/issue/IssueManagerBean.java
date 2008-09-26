@@ -409,6 +409,7 @@ implements SessionBean
 			pm.close();
 		}//finally
 	}
+	
 	//IssueLinkType//
 	/**
 	 * @ejb.interface-method
@@ -730,6 +731,33 @@ implements SessionBean
 			pm.close();
 		}
 	}
+	
+	public Set<Issue> getIssueByProjectID(ProjectID projectID) {
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			Query q = pm.newNamedQuery(Project.class, "getIssuesByProjectID");
+			Map<String, Object> params = new HashMap<String, Object>(2);
+			params.put("organisationID", projectID.organisationID);
+			params.put("projectID", projectID.projectID);
+			return NLJDOHelper.getObjectIDSet((Collection<Issue>) q.executeWithMap(params));
+		} finally {
+			pm.close();
+		}	
+	}
+	
+	public Set<Issue> getIssueByProjectTypeID(ProjectTypeID projectTypeID) {
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			Query q = pm.newNamedQuery(Project.class, "getIssuesByProjectTypeID");
+			Map<String, Object> params = new HashMap<String, Object>(2);
+			params.put("organisationID", projectTypeID.organisationID);
+			params.put("projectTypeID", projectTypeID.projectTypeID);
+			return NLJDOHelper.getObjectIDSet((Collection<Issue>) q.executeWithMap(params));
+		} finally {
+			pm.close();
+		}	
+	}
+	
 	//IssueHistory//
 	/**
 	 * @ejb.interface-method
@@ -778,6 +806,7 @@ implements SessionBean
 			pm.close();
 		}
 	}
+	
 	//IssueType//
 	/**
 	 * @ejb.interface-method

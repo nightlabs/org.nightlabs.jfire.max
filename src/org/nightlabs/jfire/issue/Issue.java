@@ -72,6 +72,20 @@ import org.nightlabs.util.Util;
  * @jdo.create-objectid-class
  *		field-order="organisationID, issueID"
  *
+ * @jdo.query
+ *		name="getIssuesByProjectID"
+ *		query="SELECT
+ *			WHERE 
+ *				this.project.organisationID == :organisationID &&
+ *				this.project.projectID == :projectID"
+ *
+ * @jdo.query
+ *		name="getIssuesByProjectTypeID"
+ *		query="SELECT
+ *			WHERE 
+ *				this.project.projectType.organisationID == :organisationID &&
+ *				this.project.projectType.projectTypeID == :projectTypeID"
+ *
  * @jdo.fetch-group name="Issue.issueFileAttachments" fields="issueFileAttachments"
  * @jdo.fetch-group name="Issue.description" fields="description"
  * @jdo.fetch-group name="Issue.subject" fields="subject" 

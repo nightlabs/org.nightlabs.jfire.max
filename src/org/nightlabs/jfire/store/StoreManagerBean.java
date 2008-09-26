@@ -1779,6 +1779,7 @@ implements SessionBean
 		}
 	}
 
+// TODO @Daniel: this new method checked-in by you today, but it's not used anywhere. Is it really necessary? Marco.
 	private Set<ProductTypeID> getInternalProductTypeIDs(QueryCollection<? extends AbstractProductTypeQuery> productTypeQueries)
 	{
 		if (productTypeQueries == null)

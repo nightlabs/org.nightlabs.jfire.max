@@ -208,6 +208,8 @@ implements SessionBean
 				// not yet initialized
 			}
 
+			SecurityChangeListenerProductTypePermission.register(pm);
+
 			DefaultLocalStorekeeperDelegate.getDefaultLocalStorekeeperDelegate(pm);
 
 			// create & persist instances of RepositoryType

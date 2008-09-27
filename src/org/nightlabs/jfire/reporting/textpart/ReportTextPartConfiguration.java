@@ -8,13 +8,16 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
+import org.apache.log4j.Logger;
 import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jdo.ObjectIDUtil;
+import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.reporting.layout.ReportCategory;
 import org.nightlabs.jfire.reporting.layout.ReportRegistryItem;
 import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
@@ -44,6 +47,10 @@ import org.nightlabs.util.Util;
  * </p>
  * 
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
+ * 
+ * @jdo.fetch-group name="ReportTextPartConfiguration.reportRegistryItem" fetch-groups="default" fields="reportRegistryItem"
+ * @jdo.fetch-group name="ReportTextPartConfiguration.reportTextParts" fetch-groups="default" fields="reportTextParts"
+ * 
  *
  * @jdo.persistence-capable
  *		identity-type = "application"
@@ -72,6 +79,12 @@ public class ReportTextPartConfiguration implements Serializable {
 	
 	private static final long serialVersionUID = 20080916L;
 
+	private static Logger logger = Logger.getLogger(ReportTextPartConfiguration.class);
+	
+	public static final String FETCH_GROUP_REPORT_REGISTRY_ITEM = "ReportTextPartConfiguration.reportRegistryItem";
+	public static final String FETCH_GROUP_REPORT_TEXT_PARTS = "ReportTextPartConfiguration.reportTextParts";
+	
+	
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
@@ -318,6 +331,55 @@ public class ReportTextPartConfiguration implements Serializable {
 	private void setSynthetic(boolean synthetic) {
 		this.synthetic = synthetic;
 	}
+
+	/**
+	 * Creates a new, synthetic {@link ReportTextPartConfiguration} with copies of the
+	 * values of the given one. The returned configuration can be made persistent.
+	 *  
+	 * @param pm The PersistenceManager to use.
+	 * @param reportTextPartConfiguration The configuration to clone.
+	 * @param reportRegistryItemID The reportRegistryItemID the new config should be synthesized for.
+	 * @param linkedObjectID The ObjectID to link the new configuration to.
+	 * @param fetchGroups The fetch-groups to detach parts of the configuration with.
+	 * @param maxFetchDepth The maximum fetch-depth to use while detaching.
+	 * @return A new but persistable {@link ReportTextPartConfiguration} with copies of the values of the given one.
+	 */
+	private static ReportTextPartConfiguration synthesizeReportTextPartConfiguration(
+			PersistenceManager pm, ReportTextPartConfiguration reportTextPartConfiguration,
+			ReportRegistryItemID reportRegistryItemID, ObjectID linkedObjectID, 
+			String[] fetchGroups, int maxFetchDepth) {
+		
+		ReportTextPartConfiguration result = new ReportTextPartConfiguration(
+				reportTextPartConfiguration.getOrganisationID(), 
+				IDGenerator.nextID(ReportTextPartConfiguration.class));
+		result.setSynthetic(true);
+		Set<String> oldFetchGroups = pm.getFetchPlan().getGroups();
+		int oldFetchDepth = pm.getFetchPlan().getMaxFetchDepth();
+		try {
+			pm.getFetchPlan().setGroups(fetchGroups);
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+			
+			ReportRegistryItem reportRegistryItem = (ReportRegistryItem) pm.getObjectById(reportRegistryItemID);
+			if (reportTextPartConfiguration.getReportRegistryItem() != null) {
+				result.setReportRegistryItem(pm.detachCopy(reportRegistryItem));
+			}
+			
+			result.setLinkedObjectID(linkedObjectID);
+			
+			for (ReportTextPart textPart : reportTextPartConfiguration.getReportTextParts()) {
+				ReportTextPart newPart = new ReportTextPart(result, textPart.getReportTextPartID());
+				newPart.setType(textPart.getType());
+				newPart.getName().copyFrom(textPart.getName());
+				newPart.getContent().copyFrom(textPart.getContent());
+				result.addReportTextPart(newPart);
+			}
+			
+		} finally {
+			pm.getFetchPlan().setGroups(oldFetchGroups);
+			pm.getFetchPlan().setMaxFetchDepth(oldFetchDepth);
+		}
+		return result;		
+	}
 	
 	/**
 	 * Returns the first {@link ReportTextPartConfiguration} that is linked to the given
@@ -334,16 +396,34 @@ public class ReportTextPartConfiguration implements Serializable {
 	 */
 	@SuppressWarnings("unchecked")
 	public static ReportTextPartConfiguration getReportTextPartConfigurationByLinkedObject(PersistenceManager pm, ReportRegistryItem reportRegistryItem, ObjectID linkedObjectID) {
+		if (logger.isDebugEnabled())
+			logger.debug("Searching for ReportTextPartConfiguration by linkedObjectID " + linkedObjectID);
 		Query q = pm.newNamedQuery(ReportTextPartConfiguration.class, "getReportTextPartConfigurationByLinkedObject");
 		Collection<ReportTextPartConfiguration> configs = 
 			(Collection<ReportTextPartConfiguration>) q.execute(linkedObjectID.toString(), reportRegistryItem);
 		if (configs.size() > 0) {
+			// We found some configurations linked to the given linkedObjectID,
+			// now find the one linked to the given reportRegistryItem as well.
 			for (ReportTextPartConfiguration reportTextPartConfiguration : configs) {
 				ReportRegistryItem reportItem = reportTextPartConfiguration.getReportRegistryItem(); 
-				if (reportItem != null && reportItem.equals(reportRegistryItem))
+				if (reportItem != null && reportItem.equals(reportRegistryItem)) {					
+					if (logger.isDebugEnabled())
+						logger.debug("Found ReportTextPartConfiguration by linkedObjectID " + linkedObjectID + ": " + reportTextPartConfiguration);
 					return reportTextPartConfiguration;
+				}
 			}
-			return configs.iterator().next();
+			if (logger.isDebugEnabled())
+				logger.debug("No ReportTextPartConfiguration found by linkedObjectID " + linkedObjectID + ", trying to find one linked to no reportRegistryItem");
+			// None could be found linked to the given reportRegistryItem, maybe we find one
+			// linked to no reportRegistryItem at all?
+			for (ReportTextPartConfiguration reportTextPartConfiguration : configs) {
+				if (reportTextPartConfiguration.getReportRegistryItem() == null)					
+					if (logger.isDebugEnabled())
+						logger.debug("Found ReportTextPartConfiguration by linkedObjectID " + linkedObjectID + " and linked to no reportRegistryItem:  " + reportTextPartConfiguration);
+					return reportTextPartConfiguration;				
+			}
+			// Well, nothing found
+			return null;
 		}
 		return null;
 	}
@@ -363,12 +443,18 @@ public class ReportTextPartConfiguration implements Serializable {
 	 *         linkedObjectID, or <code>null</code> if none could be found.
 	 */
 	@SuppressWarnings("unchecked")
-	public static final ReportTextPartConfiguration getReportTextPartConfigurationByReportRegistryItem(PersistenceManager pm, ReportRegistryItem reportRegistryItem) {
+	public static ReportTextPartConfiguration getReportTextPartConfigurationByReportRegistryItem(PersistenceManager pm, ReportRegistryItem reportRegistryItem) {
+		if (logger.isDebugEnabled())
+			logger.debug("Searching for ReportTextPartConfiguration by reportRegistryItem " + reportRegistryItem);
 		Query q = pm.newNamedQuery(ReportTextPartConfiguration.class, "getReportTextPartConfigurationByReportRegistryItem");
 		Collection<ReportTextPartConfiguration> configs = 
 			(Collection<ReportTextPartConfiguration>) q.execute(reportRegistryItem);
+		// Found some, return the first one.
 		if (configs.size() >= 1) {
-			return configs.iterator().next();
+			ReportTextPartConfiguration config = configs.iterator().next();
+			if (logger.isDebugEnabled())
+				logger.debug("Found ReportTextPartConfiguration by reportRegistryItem " + reportRegistryItem + ": " + config);
+			return config;
 		}
 		return null;
 	}
@@ -377,29 +463,69 @@ public class ReportTextPartConfiguration implements Serializable {
 	 * Searches the {@link ReportTextPartConfiguration} for the given linkedObjectID and reportRegistryItemID. 
 	 * If none can be found in the data-store this method will search for a {@link ReportTextPartConfiguration} 
 	 * linked to one of the parent {@link ReportCategory}s of the given reportRegistryItemID.
-	 * Note that if the given linkedObjectID is itself a {@link ReportRegistryItemID} the second parameter will 
-	 * be ignored.
+	 * <p>
+	 * Additionally this method can be used to get a synthetic, new {@link ReportTextPartConfiguration}
+	 * linked to the given linkedObjectID. A synthetic {@link ReportTextPartConfiguration} will have the
+	 * values of that one found when searching for the given reportRegistryItem. The synthetic configuration 
+	 * will not be persisted and the parts of it referencing existing/persisted objects will be detached.
+	 * </p>
 	 * 
-	 * @param pm The {@link PersistenceManager} to use.
-	 * @param linkedObjectID The {@link ObjectID} a linked {@link ReportTextPartConfiguration} should be found for.
-	 * @param reportRegistryItemID The {@link ReportRegistryItemID} to start the search for a {@link ReportTextPartConfiguration}
-	 *                             that is linked to a {@link ReportRegistryItem} should be started from.
-	 * @return The {@link ReportTextPartConfiguration} found either for the given linkedObjectID or for a
-	 *         {@link ReportRegistryItem}. If nothing can be found, <code>null</code> will be returned.
+	 * @param pm 
+	 * 			The {@link PersistenceManager} to use.
+	 * @param linkedObjectID 
+	 * 			The {@link ObjectID} a linked {@link ReportTextPartConfiguration} should be found for.
+	 * @param reportRegistryItemID 
+	 * 			The {@link ReportRegistryItemID} to start the search for a {@link ReportTextPartConfiguration}
+	 * 			that is linked to a {@link ReportRegistryItem} should be started from.
+	 * @param synthesize 
+	 * 			Whether to synthesize a new {@link ReportTextPartConfiguration} when none directly linked to the
+	 * 			given linkedObjectID was found but one was found linked to a reportRegistryItem.
+	 * @param fetchGroups
+	 * 			The fetch-groups used - when synthesizing a new configuration - to detach those parts of the
+	 * 			the found configuration that reference already persisted object.                             
+	 * @param maxFetchDepth
+	 * 			The maximum fetch-depth used - when synthesizing a new configuration - to detach those parts of the
+	 * 			the found configuration that reference already persisted object.                             
+	 * @return 
+	 * 			The {@link ReportTextPartConfiguration} either found (or synthesized) for the given linkedObjectID 
+	 * 			or the configuration found for a {@link ReportRegistryItem}. If nothing can be found, <code>null</code> will be returned.
 	 */
-	public static final ReportTextPartConfiguration getReportTextPartConfiguration(
-			PersistenceManager pm, ReportRegistryItemID reportRegistryItemID, ObjectID linkedObjectID) {
+	public static ReportTextPartConfiguration getReportTextPartConfiguration(
+			PersistenceManager pm, ReportRegistryItemID reportRegistryItemID, ObjectID linkedObjectID, 
+			boolean synthesize, String[] fetchGroups, int maxFetchDepth) {
 		
+		if (logger.isDebugEnabled())
+			logger.debug("Searching ReportTextPartConfiguration for reportRegistryItemID =  " + reportRegistryItemID +
+					"linkedObjectID = " + linkedObjectID + ", synthesize = " + synthesize);
 		ReportRegistryItem item = (ReportRegistryItem) pm.getObjectById(reportRegistryItemID);
 		ReportTextPartConfiguration configuration = getReportTextPartConfigurationByLinkedObject(pm, item, linkedObjectID);
 		
 		if (configuration != null) {
+			if (logger.isDebugEnabled())
+				logger.debug("Found configuration directly linked to linkedObjectID");
 			// The configuration could be found. 
 			return configuration;
 		}
 		
+		if (logger.isDebugEnabled())
+			logger.debug("No configuration found directly linked to linkedObjectID, searching for reportRegistryItemID");
 		// search for the configuration linked to a report registry item
-		return getReportTextPartConfiguration(pm, item);
+		configuration = getReportTextPartConfiguration(pm, item);
+		if (logger.isDebugEnabled()) {
+			if (configuration == null)
+				logger.debug("No configuration searching for reportRegistryItemID, returning null");
+			else 
+				logger.debug("Found configuration searching for reportRegistryItemID.");
+		}
+		
+		if (configuration != null && synthesize) {
+			if (logger.isDebugEnabled())
+				logger.debug("Synthesizing found configuration");
+			configuration = synthesizeReportTextPartConfiguration(pm, configuration, reportRegistryItemID, linkedObjectID, fetchGroups, maxFetchDepth);
+		}
+		if (logger.isDebugEnabled())
+			logger.debug("Return configuration: " + configuration);
+		return configuration;
 	}
 
 	/**
@@ -411,11 +537,15 @@ public class ReportTextPartConfiguration implements Serializable {
 	 * @return The {@link ReportTextPartConfiguration} registered to the given item or one of its parents, 
 	 *         or <code>null</code> if none could be found.
 	 */
-	public static final ReportTextPartConfiguration getReportTextPartConfiguration(PersistenceManager pm, ReportRegistryItem reportRegistryItem) {
+	public static ReportTextPartConfiguration getReportTextPartConfiguration(PersistenceManager pm, ReportRegistryItem reportRegistryItem) {
 		
+		if (logger.isDebugEnabled())
+			logger.debug("Searching ReportTextPartConfiguration for reportRegistryItem " + reportRegistryItem);
 		ReportTextPartConfiguration configuration = getReportTextPartConfigurationByReportRegistryItem(pm, reportRegistryItem);
 		
 		if (configuration != null) {
+			if (logger.isDebugEnabled())
+				logger.debug("Found ReportTextPartConfiguration for reportRegistryItem " + reportRegistryItem + ": " + configuration);
 			// The configuration could be found. 
 			return configuration;
 		}
@@ -426,6 +556,8 @@ public class ReportTextPartConfiguration implements Serializable {
 		// now we try to find something for the parent-ReportCategory
 		nextSearchReportRegistryItem = reportRegistryItem.getParentCategory();
 		
+		if (logger.isDebugEnabled())
+			logger.debug("No ReportTextPartConfiguration for reportRegistryItem " + reportRegistryItem + ", searching for parent category " + nextSearchReportRegistryItem);
 		if (nextSearchReportRegistryItem == null) {
 			// Well, no parent ReportCategory seems to be left
 			// so the search is finished, we haven't found anything

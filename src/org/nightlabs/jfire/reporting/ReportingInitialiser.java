@@ -977,7 +977,7 @@ public class ReportingInitialiser {
 			needsPersisting = true;
 			configuration = new ReportTextPartConfiguration(
 					reportRegistryItem.getOrganisationID(), IDGenerator.nextID(ReportTextPartConfiguration.class));
-			configuration.setLinkedObject(reportRegistryItem);
+			configuration.setReportRegistryItem(reportRegistryItem);
 		}
 		
 		// Update/Create the ReportTextParts wihtin the configuration

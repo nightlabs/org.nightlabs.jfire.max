@@ -34,6 +34,9 @@ import java.io.Serializable;
  * 
  * @jdo.fetch-group name="ReportTextPart.content" fields="content" 
  * @jdo.fetch-group name="ReportTextPart.name" fields="name"
+ * @jdo.fetch-group name="ReportTextPart.reportTextPartConfiguration" fields="reportTextPartConfiguration" 
+ * @jdo.fetch-group name="ReportTextPartConfiguration.reportTextParts" fields="reportTextPartConfiguration" 
+ * 
  */
 public class ReportTextPart implements Serializable {
 	
@@ -57,6 +60,13 @@ public class ReportTextPart implements Serializable {
 	 */
 	public static final String FETCH_GROUP_NAME = "ReportTextPart.name";
 
+	/**
+	 * Fetch-group that will include the {@link ReportTextPartName}.
+	 * Note, that {@link ReportTextPartName} will ensure that it
+	 * includes all fields with this fetch-group, too.
+	 */
+	public static final String FETCH_GROUP_REPORT_TEXT_PART_CONIGURATION = "ReportTextPart.reportTextPartConfiguration";
+	
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"

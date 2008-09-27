@@ -41,8 +41,8 @@ public class ReportTextPartHelper {
 	 * evaluate to the content in the {@link ReportTextPart} found either for the given
 	 * linkedObjectID or for the currently rendered report layout. 
 	 * 
-	 * @param linkedObjectID
-	 * @param reportTextPartID
+	 * @param linkedObjectID The ObjectID the {@link ReportTextPartConfiguration} to search should be linked to.
+	 * @param reportTextPartID The id of the {@link ReportTextPart} within the configuration.
 	 * @return A String that can be passed to the javascript eval() method inside a report layout.
 	 */
 	public static String getEvalString(ObjectID linkedObjectID, String reportTextPartID) {
@@ -53,7 +53,9 @@ public class ReportTextPartHelper {
 					"(linkedObjectID = " + linkedObjectID + ", " + 
 					"reportTextPartID = " + reportTextPartID + ")");
 		}
-		ReportTextPartConfiguration configuration = ReportTextPartConfiguration.getReportTextPartConfiguration(pm, reportRegistryItemID, linkedObjectID);
+		ReportTextPartConfiguration configuration = ReportTextPartConfiguration.getReportTextPartConfiguration(
+				pm, reportRegistryItemID, linkedObjectID,
+				false, null, -1);
 		if (
 				configuration != null &&
 				configuration.getReportTextParts().size() != 1 &&

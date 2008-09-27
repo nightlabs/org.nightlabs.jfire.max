@@ -109,7 +109,8 @@ public abstract class ReportManagerBean
 extends BaseSessionBeanImpl
 implements SessionBean
 {
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 20080926L;
+	
 	private static final Logger logger = Logger.getLogger(ReportManagerBean.class);
 
 	@Override

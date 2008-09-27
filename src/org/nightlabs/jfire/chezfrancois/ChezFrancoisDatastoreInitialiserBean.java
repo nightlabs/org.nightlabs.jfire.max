@@ -42,6 +42,7 @@ import org.nightlabs.ModuleException;
 import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.security.User;
+import org.nightlabs.jfire.security.listener.SecurityChangeController;
 import org.nightlabs.jfire.timer.Task;
 import org.nightlabs.jfire.timer.id.TaskID;
 import org.nightlabs.jfire.workstation.Workstation;
@@ -236,7 +237,14 @@ implements SessionBean
 
 		PersistenceManager pm = this.getPersistenceManager();
 		try {
-			new InitialiserVoucher(pm, getPrincipal()).createDemoData();
+			boolean successful = false;
+			SecurityChangeController.beginChanging();
+			try {
+				new InitialiserVoucher(pm, getPrincipal()).createDemoData();
+				successful = true;
+			} finally {
+				SecurityChangeController.endChanging(successful);
+			}
 		} finally {
 			pm.close();
 		}
@@ -259,7 +267,14 @@ implements SessionBean
 
 		PersistenceManager pm = this.getPersistenceManager();
 		try {
-			new InitialiserDynamicTrade(pm, getPrincipal()).createDemoData();
+			boolean successful = false;
+			SecurityChangeController.beginChanging();
+			try {
+				new InitialiserDynamicTrade(pm, getPrincipal()).createDemoData();
+				successful = true;
+			} finally {
+				SecurityChangeController.endChanging(successful);
+			}
 		} finally {
 			pm.close();
 		}
@@ -282,7 +297,14 @@ implements SessionBean
 
 		PersistenceManager pm = this.getPersistenceManager();
 		try {
-			new InitialiserSimpleTrade(pm, getPrincipal()).createDemoData();
+			boolean successful = false;
+			SecurityChangeController.beginChanging();
+			try {
+				new InitialiserSimpleTrade(pm, getPrincipal()).createDemoData();
+				successful = true;
+			} finally {
+				SecurityChangeController.endChanging(successful);
+			}
 		} finally {
 			pm.close();
 		}

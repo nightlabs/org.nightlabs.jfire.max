@@ -247,7 +247,7 @@ public class PriceConfigUtil
 				nestedProductTypeStack.addFirst(nestedProductTypeLocal);
 				productStack.addFirst(nestedProduct);
 				try {
-	
+
 					for (Iterator it = nestedProduct.getProductLocal().getNestedProductLocals(true).iterator(); it.hasNext(); ) {
 						ProductLocal innerProductLocal = (ProductLocal) it.next();
 						NestedProductTypeLocal innerNestedProductType = productType.getProductTypeLocal().getNestedProductTypeLocal(
@@ -281,7 +281,7 @@ public class PriceConfigUtil
 
 		return articlePrice;
 	}
-	
+
 	public static ArticlePrice createNestedArticlePrice(
 			IPackagePriceConfig topLevelPriceConfig,
 			IPriceConfig priceConfig,
@@ -311,7 +311,7 @@ public class PriceConfigUtil
 		ProductType productType = nestedProductTypeLocal.getInnerProductTypeLocal().getProductType();
 
 		if (productType.isPackageOuter()) {
-			
+
 			// prevent eternal loop when self-packaging
 			ProductType nextLevelProductType;
 			if (nestedProductTypeStack.isEmpty())
@@ -325,10 +325,10 @@ public class PriceConfigUtil
 				articlePriceStack.addFirst(articlePrice);
 				nestedProductTypeStack.addFirst(nestedProductTypeLocal);
 				try {
-	
+
 					for (NestedProductTypeLocal innerNestedProductType : productType.getProductTypeLocal().getNestedProductTypeLocals(true)) {
 						ProductType innerProductType = innerNestedProductType.getInnerProductTypeLocal().getProductType();
-	
+
 						innerProductType.getPriceConfigInPackage(productType.getPrimaryKey()).createNestedArticlePrice(
 								topLevelPriceConfig,
 								article,
@@ -340,7 +340,7 @@ public class PriceConfigUtil
 								nestedProductTypeStack
 								);
 					}
-	
+
 				} finally {
 					priceConfigStack.removeFirst();
 					articlePriceStack.removeFirst();
@@ -403,7 +403,7 @@ public class PriceConfigUtil
 
 	private static void populateAffectedProductTypeListWithProductTypesNestingThis(List<AffectedProductType> affectedProductTypes, PersistenceManager pm, ProductType productType)
 	{
-		List<ProductType> productTypes = ProductType.getProductTypesNestingThis(pm, productType);
+		Collection<ProductType> productTypes = ProductType.getProductTypesNestingThis(pm, productType);
 		ArrayList<AffectedProductType> res = new ArrayList<AffectedProductType>(productTypes.size());
 		for (ProductType pt : productTypes) {
 			res.add(new AffectedProductType(

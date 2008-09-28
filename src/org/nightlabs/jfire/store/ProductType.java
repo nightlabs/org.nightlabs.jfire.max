@@ -28,10 +28,10 @@ package org.nightlabs.jfire.store;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -50,6 +50,7 @@ import org.nightlabs.inheritance.Inheritable;
 import org.nightlabs.inheritance.InheritanceCallbacks;
 import org.nightlabs.inheritance.InheritanceManager;
 import org.nightlabs.inheritance.StaticFieldMetaData;
+import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jdo.inheritance.JDOInheritableFieldInheriter;
 import org.nightlabs.jdo.inheritance.JDOInheritanceManager;
@@ -177,7 +178,8 @@ import org.nightlabs.util.Util;
  *				this.productTypeLocal.nestedProductTypeLocals.containsValue(nestedProductTypeLocal) &&
  *				nestedProductTypeLocal.innerProductTypeLocal.productType == :productType
  *				VARIABLES org.nightlabs.jfire.store.NestedProductTypeLocal nestedProductTypeLocal"
- **/
+ *
+ */
 public abstract class ProductType
 implements
 		Inheritable,
@@ -269,17 +271,36 @@ implements
 	public static final String CANNOT_PUBLISH_REASON_IMMUTABLE = "ProductType.cannotPublish.immutable";
 	public static final String CANNOT_PUBLISH_REASON_PARENT_NOT_PUBLISHED = "ProductType.cannotPublish.parentNotPublished";
 
-	public static List<ProductType> getProductTypesNestingThis(PersistenceManager pm, ProductTypeID productTypeID)
+	public static Collection<ProductType> getProductTypesNestingOneOfTheseProductTypeIDs(PersistenceManager pm, Set<ProductTypeID> productTypeIDs)
+	{
+		Set<ProductType> productTypes = NLJDOHelper.getObjectIDSet(productTypeIDs);
+		return getProductTypesNestingOneOfTheseProductTypes(pm, productTypes);
+	}
+	public static Collection<ProductType> getProductTypesNestingOneOfTheseProductTypes(PersistenceManager pm, Set<ProductType> productTypes)
+	{
+		// TODO optimize this to use one single query instead of iteration. Marco.
+		Set<ProductType> res = null;
+		for (ProductType productType : productTypes) {
+			Collection<ProductType> c = getProductTypesNestingThis(pm, productType);
+			if (res == null)
+				res = new HashSet<ProductType>(c);
+			else
+				res.addAll(c);
+		}
+		return res;
+	}
+
+	public static Collection<ProductType> getProductTypesNestingThis(PersistenceManager pm, ProductTypeID productTypeID)
 	{
 		pm.getExtent(ProductType.class);
 		ProductType productType = (ProductType) pm.getObjectById(productTypeID);
 		return getProductTypesNestingThis(pm, productType);
 	}
 	@SuppressWarnings("unchecked")
-	public static List<ProductType> getProductTypesNestingThis(PersistenceManager pm, ProductType productType)
+	public static Collection<ProductType> getProductTypesNestingThis(PersistenceManager pm, ProductType productType)
 	{
 		Query q = pm.newNamedQuery(ProductType.class, "getProductTypesNestingThis");
-		return (List<ProductType>)q.execute(productType);
+		return (Collection<ProductType>)q.execute(productType);
 	}
 
 	/**
@@ -579,7 +600,7 @@ implements
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
-	private boolean closed = false;
+	private Date closeTimestamp = null;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -1432,7 +1453,7 @@ implements
 		if (!confirmed)
 			throw new CannotMakeProductTypeSaleableException(CANNOT_MAKE_SALEABLE_REASON_NOT_CONFIRMED, "Cannot make ProductType \"" + getPrimaryKey() + "\" saleable, because it is not yet confirmed!");
 
-		if (closed)
+		if (isClosed())
 			throw new CannotMakeProductTypeSaleableException(CANNOT_MAKE_SALEABLE_REASON_ALREADY_CLOSED, "Cannot make ProductType \"" + getPrimaryKey() + "\" saleable, because it is already closed!");
 
 //		if (localAccountantDelegate == null)
@@ -1450,7 +1471,11 @@ implements
 	 */
 	public boolean isClosed()
 	{
-		return closed;
+		return closeTimestamp != null;
+	}
+
+	public Date getCloseTimestamp() {
+		return closeTimestamp;
 	}
 
 	protected void setClosed(boolean closed)
@@ -1460,10 +1485,13 @@ implements
 		if (saleable && closed)
 			throw new IllegalStateException("Cannot close ProductType \"" + getPrimaryKey() + "\", because it is still saleable!");
 
-		if (this.closed && !closed)
+		if (isClosed() == closed)
+			return;
+
+		if (isClosed() && !closed)
 			throw new IllegalArgumentException("The closed flag of a ProductType is immutable after once set to true");
 
-		this.closed = closed;
+		this.closeTimestamp = new Date();
 	}
 
 	/**

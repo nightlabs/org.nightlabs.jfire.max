@@ -1,15 +1,26 @@
 package org.nightlabs.jfire.store;
 
 import java.io.Serializable;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
+import javax.jdo.Query;
 
 import org.nightlabs.jfire.security.Authority;
 import org.nightlabs.jfire.security.SecuredObject;
 import org.nightlabs.jfire.security.User;
+import org.nightlabs.jfire.security.id.AuthorityID;
+import org.nightlabs.jfire.security.id.RoleID;
+import org.nightlabs.jfire.security.id.UserID;
 import org.nightlabs.jfire.store.id.ProductTypePermissionFlagSetID;
+import org.nightlabs.util.CollectionUtil;
 import org.nightlabs.util.Util;
 
 /**
@@ -22,6 +33,7 @@ import org.nightlabs.util.Util;
  *		identity-type="application"
  *		objectid-class="org.nightlabs.jfire.store.id.ProductTypePermissionFlagSetID"
  *		detachable="true"
+ *		table="JFireTrade_ProductTypePermissionFlagSet"
  *
  * @jdo.create-objectid-class
  *		field-order="productTypeOrganisationID, productTypeID, userOrganisationID, userID"
@@ -31,6 +43,178 @@ public class ProductTypePermissionFlagSet
 implements Serializable
 {
 	private static final long serialVersionUID = 1L;
+
+	/**
+	 * Find all {@link ProductType}s for which - in combination with the specified {@link User} - there
+	 * is no <code>ProductTypePermissionFlagSet</code> existing in the datastore.
+	 *
+	 * @param pm the door to the datastore.
+	 * @param userID the user for which to check the presence of link <code>ProductTypePermissionFlagSet</code>s
+	 * @return the product types that are missing a <code>ProductTypePermissionFlagSet</code>.
+	 */
+	public static Collection<ProductType> getProductTypesMissingProductTypePermissionFlagSet(PersistenceManager pm, UserID userID)
+	{
+		Query qSub1 = pm.newQuery(ProductTypePermissionFlagSet.class);
+		qSub1.setResult("count(this.userID)");
+		qSub1.setFilter(
+				"this.productTypeOrganisationID == :subParamProductTypeOrganisationID && " +
+				"this.productTypeID == :subParamProductTypeID && " +
+				"this.userOrganisationID == \"" + userID.organisationID + "\" && " + // this didn't work with parameters, so I hardcode these arguments
+				"this.userID == \"" + userID.userID + "\""
+		);
+
+		Query q = pm.newQuery(ProductType.class, "this.inheritanceNature == " + ProductType.INHERITANCE_NATURE_LEAF + " && 1 > ptpfsCount");
+		q.declareVariables("long ptpfsCount");
+		Map<String, Object> linkParams = new HashMap<String, Object>();
+		linkParams.put("subParamProductTypeOrganisationID", "this.organisationID");
+		linkParams.put("subParamProductTypeID", "this.productTypeID");
+		q.addSubquery(qSub1, "long ptpfsCount", null, linkParams);
+
+		Collection<ProductType> c = CollectionUtil.castCollection((Collection<?>) q.execute());
+		return c;
+	}
+
+	public static void updateFlagsSellReverseProductType(PersistenceManager pm, Collection<ProductType> productTypes, User user)
+	{
+		_updateFlagsSellReverseProductType(pm, productTypes, user);
+	}
+	private static void _updateFlagsSellReverseProductType(PersistenceManager pm, Collection<ProductType> productTypes, User user)
+	{
+		UserID userID = (UserID) JDOHelper.getObjectId(user);
+		if (userID == null)
+			throw new IllegalStateException("JDOHelper.getObjectId(user) returned null for " + user);
+
+		Authority organisationAuthority = Authority.getOrganisationAuthority(pm);
+
+		boolean sellMissingInOrganisationAuthority = !organisationAuthority.containsRoleRef(
+				userID,
+				org.nightlabs.jfire.trade.RoleConstants.sellProductType
+		);
+
+		boolean reverseMissingInOrganisationAuthority = !organisationAuthority.containsRoleRef(
+				userID,
+				org.nightlabs.jfire.trade.RoleConstants.reverseProductType
+		);
+
+		Set<ProductType> nestingProductTypes = new HashSet<ProductType>();
+
+		Map<AuthorityID, Integer> authorityID2sellFlags = new HashMap<AuthorityID, Integer>();
+		Map<AuthorityID, Integer> authorityID2reverseFlags = new HashMap<AuthorityID, Integer>();
+		for (ProductType productType : productTypes) {
+			nestingProductTypes.addAll(ProductType.getProductTypesNestingThis(pm, productType));
+			ProductTypePermissionFlagSet flagSet = getProductTypePermissionFlagSet(pm, productType, user, true, false);
+
+			flagSet.setClosed(productType.isClosed());
+			if (productType.isClosed())
+				flagSet.setExpired(System.currentTimeMillis() - productType.getCloseTimestamp().getTime() > expireDurationMSec);
+			else
+				flagSet.setExpired(false);
+
+			AuthorityID securingAuthorityID = productType.getProductTypeLocal().getSecuringAuthorityID();
+
+			Integer sellFlagsWithoutNestedData = authorityID2sellFlags.get(securingAuthorityID);
+			if (sellFlagsWithoutNestedData == null) {
+				sellFlagsWithoutNestedData = sellMissingInOrganisationAuthority ? FlagSellProductType.SELL_MISSING_IN_ORGANISATION_AUTHORITY : 0;
+				if (securingAuthorityID != null) {
+					Authority securingAuthority = (Authority) pm.getObjectById(securingAuthorityID);
+					boolean missing = !securingAuthority.containsRoleRef(userID, org.nightlabs.jfire.trade.RoleConstants.sellProductType);
+					sellFlagsWithoutNestedData |= missing ? FlagSellProductType.SELL_MISSING_IN_SECURING_AUTHORITY : 0;
+				}
+				authorityID2sellFlags.put(securingAuthorityID, sellFlagsWithoutNestedData);
+			}
+
+			Integer reverseFlagsWithoutNestedData = authorityID2reverseFlags.get(securingAuthorityID);
+			if (reverseFlagsWithoutNestedData == null) {
+				reverseFlagsWithoutNestedData = reverseMissingInOrganisationAuthority ? FlagReverseProductType.REVERSE_MISSING_IN_ORGANISATION_AUTHORITY : 0;
+				if (securingAuthorityID != null) {
+					Authority securingAuthority = (Authority) pm.getObjectById(securingAuthorityID);
+					boolean missing = !securingAuthority.containsRoleRef(userID, org.nightlabs.jfire.trade.RoleConstants.reverseProductType);
+					reverseFlagsWithoutNestedData |= missing ? FlagReverseProductType.REVERSE_MISSING_IN_SECURING_AUTHORITY : 0;
+				}
+				authorityID2reverseFlags.put(securingAuthorityID, reverseFlagsWithoutNestedData);
+			}
+
+			int sellFlagsOnlyNestedData = 0;
+			int reverseFlagsOnlyNestedData = 0;
+			for (NestedProductTypeLocal	nestedProductTypeLocal : productType.getProductTypeLocal().getNestedProductTypeLocals()) {
+				ProductTypePermissionFlagSet nestedFlagSet = ProductTypePermissionFlagSet.getProductTypePermissionFlagSet(
+						pm,
+						nestedProductTypeLocal.getInnerProductTypeLocal().getProductType(),
+						user,
+						true,
+						false
+				);
+				int sellNestedFlags = nestedFlagSet.getFlags(org.nightlabs.jfire.trade.RoleConstants.sellProductType);
+				int reverseNestedFlags = nestedFlagSet.getFlags(org.nightlabs.jfire.trade.RoleConstants.reverseProductType);
+
+				if ((sellNestedFlags & FlagSellProductType.SELL_MISSING_IN_ORGANISATION_AUTHORITY) != 0 ||
+						(sellNestedFlags & FlagSellProductType.SELL_MISSING_FOR_INNER_PRODUCT_TYPE_IN_ORGANISATION_AUTHORITY) != 0)
+					sellFlagsOnlyNestedData |= FlagSellProductType.SELL_MISSING_FOR_INNER_PRODUCT_TYPE_IN_ORGANISATION_AUTHORITY;
+
+				if ((sellNestedFlags & FlagSellProductType.SELL_MISSING_IN_SECURING_AUTHORITY) != 0 ||
+						(sellNestedFlags & FlagSellProductType.SELL_MISSING_FOR_INNER_PRODUCT_TYPE_IN_SECURING_AUTHORITY) != 0)
+					sellFlagsOnlyNestedData |= FlagSellProductType.SELL_MISSING_FOR_INNER_PRODUCT_TYPE_IN_SECURING_AUTHORITY;
+
+				if ((reverseNestedFlags & FlagReverseProductType.REVERSE_MISSING_IN_ORGANISATION_AUTHORITY) != 0 ||
+						(reverseNestedFlags & FlagReverseProductType.REVERSE_MISSING_FOR_INNER_PRODUCT_TYPE_IN_ORGANISATION_AUTHORITY) != 0)
+					reverseFlagsOnlyNestedData |= FlagReverseProductType.REVERSE_MISSING_FOR_INNER_PRODUCT_TYPE_IN_ORGANISATION_AUTHORITY;
+
+				if ((reverseNestedFlags & FlagReverseProductType.REVERSE_MISSING_IN_SECURING_AUTHORITY) != 0 ||
+						(reverseNestedFlags & FlagReverseProductType.REVERSE_MISSING_FOR_INNER_PRODUCT_TYPE_IN_SECURING_AUTHORITY) != 0)
+					reverseFlagsOnlyNestedData |= FlagReverseProductType.REVERSE_MISSING_FOR_INNER_PRODUCT_TYPE_IN_SECURING_AUTHORITY;
+			}
+
+			flagSet.setFlags(org.nightlabs.jfire.trade.RoleConstants.sellProductType, sellFlagsWithoutNestedData | sellFlagsOnlyNestedData);
+			flagSet.setFlags(org.nightlabs.jfire.trade.RoleConstants.reverseProductType, reverseFlagsWithoutNestedData | reverseFlagsOnlyNestedData);
+		}
+
+		// recursion up the nesting hierarchy
+		if (!nestingProductTypes.isEmpty())
+			_updateFlagsSellReverseProductType(pm, nestingProductTypes, user);
+	}
+
+	public static void updateFlagsSeeProductType(PersistenceManager pm, Collection<ProductType> productTypes, User user)
+	{
+		UserID userID = (UserID) JDOHelper.getObjectId(user);
+		if (userID == null)
+			throw new IllegalStateException("JDOHelper.getObjectId(user) returned null for " + user);
+
+		boolean missingInOrganisationAuthority = !Authority.getOrganisationAuthority(pm).containsRoleRef(
+				userID,
+				org.nightlabs.jfire.store.RoleConstants.seeProductType
+		);
+
+		Set<ProductType> nestingProductTypes = new HashSet<ProductType>();
+
+		Map<AuthorityID, Integer> authorityID2flags = new HashMap<AuthorityID, Integer>();
+		for (ProductType productType : productTypes) {
+			nestingProductTypes.addAll(ProductType.getProductTypesNestingThis(pm, productType));
+			ProductTypePermissionFlagSet flagSet = getProductTypePermissionFlagSet(pm, productType, user, true, false);
+
+			flagSet.setClosed(productType.isClosed());
+			if (productType.isClosed())
+				flagSet.setExpired(System.currentTimeMillis() - productType.getCloseTimestamp().getTime() > expireDurationMSec);
+			else
+				flagSet.setExpired(false);
+
+			AuthorityID securingAuthorityID = productType.getProductTypeLocal().getSecuringAuthorityID();
+			Integer flagsWithoutNestedData = authorityID2flags.get(securingAuthorityID); // see is not escalating the nesting structure!
+			if (flagsWithoutNestedData == null) {
+				flagsWithoutNestedData = missingInOrganisationAuthority ? FlagSeeProductType.SEE_MISSING_IN_ORGANISATION_AUTHORITY : 0;
+				if (securingAuthorityID != null) {
+					Authority securingAuthority = (Authority)
+					pm.getObjectById(securingAuthorityID);
+					boolean missing = !securingAuthority.containsRoleRef(userID, org.nightlabs.jfire.store.RoleConstants.seeProductType);
+					flagsWithoutNestedData |= missing ? FlagSeeProductType.SEE_MISSING_IN_SECURING_AUTHORITY : 0;
+				}
+				authorityID2flags.put(securingAuthorityID, flagsWithoutNestedData);
+			}
+
+			flagSet.setFlags(org.nightlabs.jfire.store.RoleConstants.seeProductType, flagsWithoutNestedData);
+		}
+	}
+
+	private static final long expireDurationMSec = 1000L * 60L * 60L * 24L * 365L * 3L;
 
 	public static final class FlagSeeProductType {
 		/**
@@ -120,15 +304,31 @@ implements Serializable
 
 	/**
 	 * Get the <code>ProductTypePermissionFlagSet</code> for a certain combination of {@link ProductType} and {@link User}.
+	 * If such an instance does not exist, either throw an exception or return <code>null</code>.
+	 *
+	 * @param pm the door to the datastore.
+	 * @param productType the {@link ProductType} in question.
+	 * @param user the {@link User} in question.
+	 * @param throwExceptionIfNotExisting throw a {@link JDOObjectNotFoundException} instead of returning <code>null</code>.
+	 * @return an instance of <code>ProductTypePermissionFlagSet</code> for the specified arguments or <code>null</code>.
+	 */
+	public static ProductTypePermissionFlagSet getProductTypePermissionFlagSet(PersistenceManager pm, ProductType productType, User user, boolean throwExceptionIfNotExisting)
+	{
+		return getProductTypePermissionFlagSet(pm, productType, user, false, throwExceptionIfNotExisting);
+	}
+
+	/**
+	 * Get the <code>ProductTypePermissionFlagSet</code> for a certain combination of {@link ProductType} and {@link User}.
 	 * If such an instance does not exist, it is created and persisted.
 	 *
 	 * @param pm the door to the datastore.
 	 * @param productType the {@link ProductType} in question.
 	 * @param user the {@link User} in question.
-	 * @param throwExceptionIfNotExisting throw a {@link JDOObjectNotFoundException} instead of creating it.
+	 * @param createIfNotExisting if <code>true</code>, an instance is created if not existing (and <code>throwExceptionIfNotExisting</code> is ignored in this case).
+	 * @param throwExceptionIfNotExisting throw a {@link JDOObjectNotFoundException} instead of returning <code>null</code>.
 	 * @return an instance of <code>ProductTypePermissionFlagSet</code> for the specified arguments.
 	 */
-	public static ProductTypePermissionFlagSet getProductTypePermissionFlagSet(PersistenceManager pm, ProductType productType, User user, boolean throwExceptionIfNotExisting)
+	private static ProductTypePermissionFlagSet getProductTypePermissionFlagSet(PersistenceManager pm, ProductType productType, User user, boolean createIfNotExisting, boolean throwExceptionIfNotExisting)
 	{
 		ProductTypePermissionFlagSet res;
 		try {
@@ -141,8 +341,12 @@ implements Serializable
 				res = pm.makePersistent(res);
 			}
 		} catch (JDOObjectNotFoundException x) {
-			if (throwExceptionIfNotExisting)
-				throw x;
+			if (!createIfNotExisting) {
+				if (throwExceptionIfNotExisting)
+					throw x;
+
+				return null;
+			}
 
 			// does not yet exist => create it.
 			res = new ProductTypePermissionFlagSet(productType, user);
@@ -196,6 +400,16 @@ implements Serializable
 	private int flagsReverseProductType;
 
 	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private boolean closed;
+
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private boolean expired;
+
+	/**
 	 * @deprecated Only for JDO!
 	 */
 	@Deprecated
@@ -232,26 +446,94 @@ implements Serializable
 		return user;
 	}
 
-	public int getFlagsSeeProductType() {
-		return flagsSeeProductType;
-	}
-	public void setFlagsSeeProductType(int flagSeeProductType) {
-		this.flagsSeeProductType = flagSeeProductType;
-	}
-
-	public int getFlagsSellProductType() {
-		return flagsSellProductType;
-	}
-	public void setFlagsSellProductType(int flagSellProductType) {
-		this.flagsSellProductType = flagSellProductType;
+	public int getFlags(RoleID roleID)
+	{
+		if (org.nightlabs.jfire.store.RoleConstants.seeProductType.equals(roleID))
+			return flagsSeeProductType;
+		else if (org.nightlabs.jfire.trade.RoleConstants.sellProductType.equals(roleID))
+			return flagsSellProductType;
+		else if (org.nightlabs.jfire.trade.RoleConstants.reverseProductType.equals(roleID))
+			return flagsReverseProductType;
+		else
+			throw new IllegalArgumentException("Unsupported roleID: " + roleID);
 	}
 
-	public int getFlagsReverseProductType() {
-		return flagsReverseProductType;
+	private void setFlags(RoleID roleID, int flags)
+	{
+		if (org.nightlabs.jfire.store.RoleConstants.seeProductType.equals(roleID)) {
+			if (this.flagsSeeProductType != flags)
+				this.flagsSeeProductType = flags;
+		}
+		else if (org.nightlabs.jfire.trade.RoleConstants.sellProductType.equals(roleID)) {
+			if (this.flagsSellProductType != flags)
+				this.flagsSellProductType = flags;
+		}
+		else if (org.nightlabs.jfire.trade.RoleConstants.reverseProductType.equals(roleID)) {
+			if (this.flagsReverseProductType != flags)
+				this.flagsReverseProductType = flags;
+		}
+		else
+			throw new IllegalArgumentException("Unsupported roleID: " + roleID);
 	}
-	public void setFlagsReverseProductType(int flagReverseProductType) {
-		this.flagsReverseProductType = flagReverseProductType;
+
+	public boolean isClosed() {
+		return closed;
 	}
+	public boolean isExpired() {
+		return expired;
+	}
+
+	private void setClosed(boolean closed)
+	{
+		if (this.closed == closed)
+			return;
+
+		this.closed = closed;
+
+		if (closed) {
+			this.flagsSellProductType |= FlagSellProductType.PRODUCT_TYPE_CLOSED;
+			this.flagsReverseProductType |= FlagSellProductType.PRODUCT_TYPE_CLOSED;
+		}
+		else {
+			updateFlagsSellReverseProductType(JDOHelper.getPersistenceManager(this), Collections.singleton(productType), user);
+		}
+	}
+
+	private void setExpired(boolean expired)
+	{
+		if (this.expired == expired)
+			return;
+
+		this.expired = expired;
+
+		if (expired) {
+			this.flagsSeeProductType |= FlagSeeProductType.PRODUCT_TYPE_CLOSED_AND_EXPIRED;
+		}
+		else {
+			updateFlagsSeeProductType(JDOHelper.getPersistenceManager(this), Collections.singleton(productType), user);
+		}
+	}
+
+//	public int getFlagsSeeProductType() {
+//		return flagsSeeProductType;
+//	}
+//	public void setFlagsSeeProductType(int flagSeeProductType) {
+//		this.flagsSeeProductType = flagSeeProductType;
+//	}
+//
+//	public int getFlagsSellProductType() {
+//		return flagsSellProductType;
+//	}
+//	public void setFlagsSellProductType(int flagSellProductType) {
+//		this.flagsSellProductType = flagSellProductType;
+//	}
+//
+//	public int getFlagsReverseProductType() {
+//		return flagsReverseProductType;
+//	}
+//	public void setFlagsReverseProductType(int flagReverseProductType) {
+//		this.flagsReverseProductType = flagReverseProductType;
+//	}
 
 	@Override
 	public int hashCode() {

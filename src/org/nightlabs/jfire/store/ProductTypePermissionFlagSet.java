@@ -13,6 +13,7 @@ import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
+import org.nightlabs.jfire.organisation.LocalOrganisation;
 import org.nightlabs.jfire.security.Authority;
 import org.nightlabs.jfire.security.SecuredObject;
 import org.nightlabs.jfire.security.User;
@@ -63,7 +64,12 @@ implements Serializable
 				"this.userID == \"" + userID.userID + "\""
 		);
 
-		Query q = pm.newQuery(ProductType.class, "this.inheritanceNature == " + ProductType.INHERITANCE_NATURE_LEAF + " && 1 > ptpfsCount");
+		Query q = pm.newQuery(
+				ProductType.class,
+				"this.organisationID == (SELECT UNIQUE lOrg.organisationID FROM " + LocalOrganisation.class + " lOrg) && " +
+				"this.inheritanceNature == " + ProductType.INHERITANCE_NATURE_LEAF + " && " +
+				"1 > ptpfsCount"
+		);
 		q.declareVariables("long ptpfsCount");
 		Map<String, Object> linkParams = new HashMap<String, Object>();
 		linkParams.put("subParamProductTypeOrganisationID", "this.organisationID");
@@ -74,12 +80,58 @@ implements Serializable
 		return c;
 	}
 
+	public static void updateFlags(PersistenceManager pm, Collection<ProductType> productTypes)
+	{
+		for (User user : getRelevantUsers(pm)) {
+			updateFlags(pm, productTypes, user);
+		}
+	}
+
+	public static Collection<? extends User> getRelevantUsers(PersistenceManager pm)
+	{
+		Query qUsers = pm.newQuery(User.class);
+		qUsers.setFilter(
+				"this.organisationID == (SELECT UNIQUE lOrg.organisationID FROM " + LocalOrganisation.class + " lOrg) && " +
+				"this.userID != :systemUserID && " +
+				"this.userID != :otherUserID"
+		);
+		Collection<?> users = (Collection<?>) qUsers.execute(
+				User.USER_ID_SYSTEM,
+				User.USER_ID_OTHER
+		);
+		return CollectionUtil.castCollection(users);
+	}
+
+	public static void updateFlags(PersistenceManager pm, Collection<ProductType> productTypes, User user)
+	{
+		if (pm == null)
+			throw new IllegalArgumentException("pm must not be null!");
+
+		if (productTypes == null)
+			throw new IllegalArgumentException("productTypes must not be null!");
+
+		if (user == null)
+			throw new IllegalArgumentException("user must not be null!");
+
+		updateFlagsSeeProductType(pm, productTypes, user);
+		updateFlagsSellReverseProductType(pm, productTypes, user);
+	}
+
 	public static void updateFlagsSellReverseProductType(PersistenceManager pm, Collection<ProductType> productTypes, User user)
 	{
 		_updateFlagsSellReverseProductType(pm, productTypes, user);
 	}
 	private static void _updateFlagsSellReverseProductType(PersistenceManager pm, Collection<ProductType> productTypes, User user)
 	{
+		if (pm == null)
+			throw new IllegalArgumentException("pm must not be null!");
+
+		if (productTypes == null)
+			throw new IllegalArgumentException("productTypes must not be null!");
+
+		if (user == null)
+			throw new IllegalArgumentException("user must not be null!");
+
 		UserID userID = (UserID) JDOHelper.getObjectId(user);
 		if (userID == null)
 			throw new IllegalStateException("JDOHelper.getObjectId(user) returned null for " + user);
@@ -175,6 +227,15 @@ implements Serializable
 
 	public static void updateFlagsSeeProductType(PersistenceManager pm, Collection<ProductType> productTypes, User user)
 	{
+		if (pm == null)
+			throw new IllegalArgumentException("pm must not be null!");
+
+		if (productTypes == null)
+			throw new IllegalArgumentException("productTypes must not be null!");
+
+		if (user == null)
+			throw new IllegalArgumentException("user must not be null!");
+
 		UserID userID = (UserID) JDOHelper.getObjectId(user);
 		if (userID == null)
 			throw new IllegalStateException("JDOHelper.getObjectId(user) returned null for " + user);
@@ -190,10 +251,15 @@ implements Serializable
 				org.nightlabs.jfire.store.RoleConstants.seeProductType
 		);
 
+		String localOrganisationID = LocalOrganisation.getLocalOrganisation(pm).getOrganisationID();
+
 		Set<ProductType> nestingProductTypes = new HashSet<ProductType>();
 
 		Map<AuthorityID, Integer> authorityID2flags = new HashMap<AuthorityID, Integer>();
 		for (ProductType productType : productTypes) {
+			if (!localOrganisationID.equals(productType.getOrganisationID()))
+				throw new IllegalArgumentException("productType.organisationID does not reference the local organisation! " + productType);
+
 			nestingProductTypes.addAll(ProductType.getProductTypesNestingThis(pm, productType));
 			ProductTypePermissionFlagSet flagSet = getProductTypePermissionFlagSet(pm, productType, user, true, false);
 

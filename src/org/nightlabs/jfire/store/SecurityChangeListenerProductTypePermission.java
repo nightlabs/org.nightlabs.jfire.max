@@ -74,16 +74,15 @@ extends SecurityChangeListener
 	 */
 	private Map<AuthorizedObject, Map<Authority, Map<RoleID, Boolean>>> roleGrantedBackupMap = new HashMap<AuthorizedObject, Map<Authority,Map<RoleID,Boolean>>>();
 
-	private static final Set<RoleID> interestingRoleIDs = getInterestingRoleIDs();
-	private static Set<RoleID> getInterestingRoleIDs()
-	{
+	private static final Set<RoleID> interestingRoleIDs;
+	static {
 		Set<RoleID> set = new HashSet<RoleID>();
 
 		set.add(org.nightlabs.jfire.store.RoleConstants.seeProductType);
 		set.add(org.nightlabs.jfire.trade.RoleConstants.sellProductType);
 		set.add(org.nightlabs.jfire.trade.RoleConstants.reverseProductType);
 
-		return Collections.unmodifiableSet(set);
+		interestingRoleIDs = Collections.unmodifiableSet(set);
 	}
 
 	private void backupRoleGranted(AuthorizedObject authorizedObject, Authority authority, RoleID roleID)

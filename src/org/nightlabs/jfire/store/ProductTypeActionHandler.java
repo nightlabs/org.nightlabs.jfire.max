@@ -1162,7 +1162,7 @@ public abstract class ProductTypeActionHandler
 //	{
 //	}
 
-	private static final String pmKey_productTypeIDsAssignedSecuringAuthority = ProductTypeActionHandler.class.getName() + "#productTypeIDsAssignedSecuringAuthority";
+	private static final String pmKey_productTypeIDsAssignedSecuringAuthority = ProductTypeActionHandler.class.getName() + "#productTypeIDs";
 
 	/**
 	 * This method is called whenever a securing {@link Authority} is assigned to a {@link ProductTypeLocal}.
@@ -1223,14 +1223,14 @@ public abstract class ProductTypeActionHandler
 	{
 		private static final long serialVersionUID = 1L;
 
-		private Set<ProductTypeID> productTypeIDsAssignedSecuringAuthority;
+		private Set<ProductTypeID> productTypeIDs;
 
-		public CalculateProductTypePermissionFlagSetsInvocation(Set<ProductTypeID> productTypeIDsAssignedSecuringAuthority)
+		public CalculateProductTypePermissionFlagSetsInvocation(Set<ProductTypeID> productTypeIDs)
 		{
-			if (productTypeIDsAssignedSecuringAuthority == null)
-				throw new IllegalArgumentException("productTypeIDsAssignedSecuringAuthority == null");
+			if (productTypeIDs == null)
+				throw new IllegalArgumentException("productTypeIDs == null");
 
-			this.productTypeIDsAssignedSecuringAuthority = productTypeIDsAssignedSecuringAuthority;
+			this.productTypeIDs = productTypeIDs;
 		}
 
 		@Override
@@ -1238,20 +1238,8 @@ public abstract class ProductTypeActionHandler
 		{
 			PersistenceManager pm = getPersistenceManager();
 			try {
-				List<ProductType> productTypesAssignedSecuringAuthority = NLJDOHelper.getObjectList(pm, productTypeIDsAssignedSecuringAuthority, ProductType.class);
-				Query qUsers = pm.newQuery(User.class);
-				qUsers.setFilter("this.organisationID == :organisationID && this.userID != :systemUserID && this.userID != :otherUserID");
-				Collection<?> users = (Collection<?>) qUsers.execute(
-						SecurityReflector.getUserDescriptor().getOrganisationID(),
-						User.USER_ID_SYSTEM,
-						User.USER_ID_OTHER
-				);
-				for (Object o : users) {
-					User user = (User) o;
-					ProductTypePermissionFlagSet.updateFlagsSeeProductType(pm, productTypesAssignedSecuringAuthority, user);
-					ProductTypePermissionFlagSet.updateFlagsSellReverseProductType(pm, productTypesAssignedSecuringAuthority, user);
-				}
-
+				List<ProductType> productTypes = NLJDOHelper.getObjectList(pm, productTypeIDs, ProductType.class);
+				ProductTypePermissionFlagSet.updateFlags(pm, productTypes);
 			} finally {
 				pm.close();
 			}

@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -46,6 +47,7 @@ import org.apache.log4j.Logger;
 import org.jbpm.JbpmContext;
 import org.jbpm.graph.exe.ProcessInstance;
 import org.nightlabs.ModuleException;
+import org.nightlabs.jfire.asyncinvoke.AsyncInvoke;
 import org.nightlabs.jfire.config.Config;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.jbpm.JbpmLookup;
@@ -98,7 +100,7 @@ import org.nightlabs.jfire.transfer.Transfer;
 /**
  * The Store is responsible for managing all ProductTypes and Products
  * within the store. There exists exactly one instance in the jdo datastore.
- * 
+ *
  * @author marco at nightlabs dot de
  *
  * @jdo.persistence-capable
@@ -118,7 +120,7 @@ implements StoreCallback
 	 * LOG4J logger used by this class
 	 */
 	private static final Logger logger = Logger.getLogger(Store.class);
-	
+
 	/**
 	 * This method returns the singleton instance of Store. If there is
 	 * no instance of Store in the datastore, yet, it will be created.
@@ -152,7 +154,7 @@ implements StoreCallback
 		store.mandator.setStorekeeper(store.localStorekeeper);
 		store.partnerStorekeeper = new PartnerStorekeeper(organisationID, PartnerStorekeeper.class.getName());
 
-		store = (Store) pm.makePersistent(store);
+		store = pm.makePersistent(store);
 		return store;
 	}
 
@@ -171,7 +173,7 @@ implements StoreCallback
 	 * @jdo.column length="100"
 	 */
 	private String organisationID;
-	
+
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
@@ -195,7 +197,7 @@ implements StoreCallback
 //	 * @jdo.map-vendor-extension vendor-name="jpox" key="key-length" value="max 201"
 //	 */
 //	protected Map productTypes = new HashMap();
-	
+
 //	/**
 //	 * key: String productPrimaryKey {organisationID + / + productID}<br/>
 //	 * value: ProductStatusTracker productStatusTracker
@@ -229,7 +231,7 @@ implements StoreCallback
 //	 * @jdo.map-vendor-extension vendor-name="jpox" key="key-length" value="max 201"
 //	 */
 //	protected Map products = new HashMap();
-	
+
 //	/**
 //	 * key: String productPrimaryKey {organisationID + / + productID}<br/>
 //	 * value: ProductStatusTracker productStatusTracker
@@ -579,6 +581,21 @@ implements StoreCallback
 			productType.getProductTypeLocal().setSecuringAuthorityTypeID(authorityTypeID);
 		}
 
+		if (organisationID.equals(productType.getOrganisationID())) {
+			ProductTypeID productTypeID = (ProductTypeID) JDOHelper.getObjectId(productType);
+			if (productTypeID == null)
+				throw new IllegalStateException("JDOHelper.getObjectId(productType) returned null!");
+
+			try {
+				AsyncInvoke.exec(
+						new ProductTypeActionHandler.CalculateProductTypePermissionFlagSetsInvocation(Collections.singleton(productTypeID)),
+						true
+				);
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+		}
+
 		return productType;
 	}
 
@@ -601,7 +618,7 @@ implements StoreCallback
 	{
 		// note that the product might already be persistent - e.g. when importing from another organisation (cross-trade).
 		PersistenceManager pm = getPersistenceManager();
-		product = (Product) pm.makePersistent(product);
+		product = pm.makePersistent(product);
 
 		if (product.getProductLocal() != null)
 			throw new IllegalArgumentException("This Product has already a ProductLocal assigned! Obviously you either called Store.addProduct(...) twice or you detached a ProductLocal from a remote organisation! Both is illegal!");
@@ -758,7 +775,7 @@ implements StoreCallback
 		for (Article article : articles) {
 			ProductTypeActionHandler productTypeActionHandler = ProductTypeActionHandler.getProductTypeActionHandler(
 					pm, article.getProductType().getClass());
-			Set<Article> as = (Set<Article>) productTypeActionHandler2Articles.get(productTypeActionHandler);
+			Set<Article> as = productTypeActionHandler2Articles.get(productTypeActionHandler);
 			if (as == null) {
 				as = new HashSet<Article>();
 				productTypeActionHandler2Articles.put(productTypeActionHandler, as);
@@ -824,7 +841,7 @@ implements StoreCallback
 		LegalEntity customerLE = null;
 		for (Iterator<? extends Article> iter = articles.iterator(); iter.hasNext();) {
 			Article article = iter.next();
-			
+
 			if (vendorPK == null) {
 				vendorLE = article.getOffer().getOrder().getVendor();
 				vendorPK = vendorLE.getPrimaryKey();
@@ -836,7 +853,7 @@ implements StoreCallback
 
 			Offer articleOffer = article.getOffer();
 			Order articleOrder = articleOffer.getOrder();
-			
+
 			if (!articleOffer.getOfferLocal().isAccepted()) {
 				throw new DeliveryNoteEditException(
 					DeliveryNoteEditException.REASON_OFFER_NOT_ACCEPTED,
@@ -878,7 +895,7 @@ implements StoreCallback
 		if (deliveryNoteIDPrefix == null) {
 			TradeConfigModule tradeConfigModule;
 			try {
-				tradeConfigModule = (TradeConfigModule) Config.getConfig(
+				tradeConfigModule = Config.getConfig(
 						getPersistenceManager(), organisationID, user).createConfigModule(TradeConfigModule.class);
 			} catch (ModuleException x) {
 				throw new RuntimeException(x); // should not happen.
@@ -902,7 +919,7 @@ implements StoreCallback
 			deliveryNote.addArticle(article);
 		}
 
-		Map<ProductTypeActionHandler, Set<Article>> productTypeActionHandler2Articles = 
+		Map<ProductTypeActionHandler, Set<Article>> productTypeActionHandler2Articles =
 			getProductTypeActionHandler2ArticlesMap(getPersistenceManager(), articles);
 		for (Iterator<Map.Entry<ProductTypeActionHandler, Set<Article>>> it = productTypeActionHandler2Articles.entrySet().iterator(); it.hasNext();) {
 			Map.Entry<ProductTypeActionHandler, Set<Article>> me = it.next();
@@ -966,7 +983,7 @@ implements StoreCallback
 			if (c.isEmpty())
 				throw new IllegalStateException("No ServerDeliveryProcessor registered for ModeOfDeliveryFlavour \""+modeOfDeliveryFlavour.getPrimaryKey()+"\"!");
 
-			serverDeliveryProcessor = (ServerDeliveryProcessor) c.iterator().next();
+			serverDeliveryProcessor = c.iterator().next();
 		} // if (serverDeliveryProcessor == null) {
 
 		return serverDeliveryProcessor;
@@ -1082,7 +1099,7 @@ implements StoreCallback
 	/**
 	 * Finalizes a deliveryNote and sends it to the involved
 	 * organisation if neccessary.
-	 * 
+	 *
 	 * @param finalizer
 	 * @param deliveryNote
 	 */
@@ -1233,7 +1250,7 @@ implements StoreCallback
 				int qty = productReference.getQuantity();
 				switch (qty) {
 					case -1: {
-						ProductReference pr = (ProductReference) fromProductReferenceByProductMap.get(product);
+						ProductReference pr = fromProductReferenceByProductMap.get(product);
 						if (pr != null)
 							throw new IllegalStateException("The Product \"" + product.getPrimaryKey() + "\" has more than one ProductReference with quantity = -1: ProductReference \"" + pr.getPrimaryKey() + "\" and \"" + productReference.getPrimaryKey() + "\" (and maybe even more)!");
 
@@ -1244,7 +1261,7 @@ implements StoreCallback
 						// nothing
 						break;
 					case 1: {
-						ProductReference pr = (ProductReference) toProductReferenceByProductMap.get(product);
+						ProductReference pr = toProductReferenceByProductMap.get(product);
 						if (pr != null)
 							throw new IllegalStateException("The Product \"" + product.getPrimaryKey() + "\" has more than one ProductReference with quantity = +1: ProductReference \"" + pr.getPrimaryKey() + "\" and \"" + productReference.getPrimaryKey() + "\" (and maybe even more)!");
 
@@ -1318,8 +1335,8 @@ implements StoreCallback
 				continue;
 			}
 
-			ProductReference productReferenceSource = (ProductReference) productReferencesSource.iterator().next();
-			ProductReference productReferenceDest = (ProductReference) productReferencesDest.iterator().next();
+			ProductReference productReferenceSource = productReferencesSource.iterator().next();
+			ProductReference productReferenceDest = productReferencesDest.iterator().next();
 			Repository repositorySource = (Repository) productReferenceSource.getAnchor();
 			Repository repositoryDest = (Repository) productReferenceDest.getAnchor();
 			ProductLocal productLocal = product.getProductLocal();
@@ -1410,7 +1427,7 @@ implements StoreCallback
 
 		if (partner.getStorekeeper() == null)
 			partner.setStorekeeper(getPartnerStorekeeper());
-		
+
 //		The DeliveryLocal object is normally created in DeliveryHelperBean#deliverBegin_storeDeliveryData(DeliveryData).
 //		But some use cases do not use this API, this is why we create it here if it does not exist yet.
 		if (deliveryData.getDelivery().getDeliveryLocal() == null)
@@ -1451,7 +1468,7 @@ implements StoreCallback
 							"Calling DeliveryNoteActionHandler.onDeliverBegin failed! localOrganisation="+getOrganisationID(),
 							x));
 		}
-		
+
 		Set<Delivery> precursorDeliverySet = deliveryData.getDelivery().getPrecursorSet();
 		for (Delivery precursorDelivery : precursorDeliverySet) {
 			try {
@@ -1490,7 +1507,7 @@ implements StoreCallback
 			boolean failed = true;
 			try {
 				deliverProductTransfer.bookTransfer(user, involvedAnchors);
-	
+
 				// check consistence
 				checkIntegrity(containers, involvedAnchors);
 
@@ -1600,7 +1617,7 @@ implements StoreCallback
 							"Calling DeliveryNoteActionHandler.onDeliverDoWork failed!",
 							x));
 		}
-		
+
 		Set<Delivery> precursorDeliverySet = deliveryData.getDelivery().getPrecursorSet();
 		for (Delivery precursorDelivery : precursorDeliverySet) {
 			try {
@@ -1695,7 +1712,7 @@ implements StoreCallback
 							"Calling DeliveryNoteActionHandler.onDeliverEnd failed!",
 							x));
 		}
-		
+
 		Set<Delivery> precursorDeliverySet = deliveryData.getDelivery().getPrecursorSet();
 		for (Delivery precursorDelivery : precursorDeliverySet) {
 			try {
@@ -1782,19 +1799,19 @@ implements StoreCallback
 		containers.add(deliverProductTransfer);
 		boolean failed = true;
 		try {
-	
+
 			for (Iterator<ProductTransfer> it = deliverProductTransfer.getChildren().iterator(); it.hasNext(); ) {
 				ProductTransfer productTransfer = it.next();
-	
+
 				if (productTransfer.isBooked())
 					productTransfer.rollbackTransfer(user, involvedAnchors);
-	
+
 				pm.deletePersistent(productTransfer);
 			}
-	
+
 			if (deliverProductTransfer.isBooked())
 				deliverProductTransfer.rollbackTransfer(user, involvedAnchors);
-	
+
 			checkIntegrity(containers, involvedAnchors);
 
 			failed = false;

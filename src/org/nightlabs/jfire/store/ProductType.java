@@ -1134,12 +1134,14 @@ implements
 			im.inheritAllFields(extendedProductType, this);
 
 		applyInheritance(pm, im);
+
+		ProductTypeActionHandler.getProductTypeActionHandler(pm, this.getClass()).postApplyInheritance(this);
 	}
 	private void applyInheritance(PersistenceManager pm, InheritanceManager im)
 	{
-		Collection children = getChildProductTypes(pm, (ProductTypeID) JDOHelper.getObjectId(this));
-		for (Iterator it = children.iterator(); it.hasNext();) {
-			ProductType child = (ProductType) it.next();
+		Collection<? extends ProductType> children = getChildProductTypes(pm, (ProductTypeID) JDOHelper.getObjectId(this));
+		for (Iterator<? extends ProductType> it = children.iterator(); it.hasNext();) {
+			ProductType child = it.next();
 
 			// before inheriting, we need to check, whether the following things change:
 			// - a priceConfig

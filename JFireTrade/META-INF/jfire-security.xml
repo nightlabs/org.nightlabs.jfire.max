@@ -206,6 +206,12 @@
 		<description>Edit product types before they have been confirmed.</description>
 		<description language="de">Produkttypen bearbeiten, bevor sie bestätigt wurden.</description>
 		<role id="org.nightlabs.jfire.store.editUnconfirmedProductType"/>
+<!--
+	Not to include this role has the advantage that the ProductTypePermissionFlagSet does not need to be recalculated at all when
+	this role group is granted/revoked.
+	Hence, I leave it separate. Marco.
+		<role id="org.nightlabs.jfire.store.seeProductType"/>
+-->
 	</role-group>
 
 	<role-group id="org.nightlabs.jfire.store.editConfirmedProductType">
@@ -214,8 +220,8 @@
 		<description>Edit product types *after* they have been confirmed.</description>
 		<description language="de">Produkttypen bearbeiten, auch *nachdem* sie bestätigt wurden.</description>
 
-		<role id="org.nightlabs.jfire.store.editUnconfirmedProductType"/>
 		<role id="org.nightlabs.jfire.store.editConfirmedProductType"/>
+		<include-role-group id="org.nightlabs.jfire.store.editUnconfirmedProductType"/>
 	</role-group>
 
 	<role-group id="org.nightlabs.jfire.store.editDeliveryQueue">
@@ -295,6 +301,11 @@
 		<description>Sell products. Note that other rights are necessary additionally to this (e.g. the right to edit offers).</description>
 		<description language="de">Produkte verkaufen. Beachten Sie, daß andere Rechte zusätzlich zu diesem gewährt sein müssen (z.B. das Recht, Angebote zu bearbeiten).</description>
 		<role id="org.nightlabs.jfire.trade.sellProductType"/>
+<!--
+	Not to include this role has the advantage that the ProductTypePermissionFlagSet needs to be recalculated for less ProductTypes.
+	Hence, I leave it separate. Marco.
+		<role id="org.nightlabs.jfire.store.seeProductType"/>
+-->
 	</role-group>
 
 	<role-group id="org.nightlabs.jfire.trade.reverseProductType">
@@ -304,6 +315,11 @@
 		<description language="de">Produkte stornieren. Beachten Sie, daß andere Rechte zusätzlich zu diesem gewährt sein müssen (z.B. das Recht, Angebote zu bearbeiten).</description>
 		<name language="de">Stornieren</name>
 		<role id="org.nightlabs.jfire.trade.reverseProductType"/>
+<!--
+	Not to include this role has the advantage that the ProductTypePermissionFlagSet needs to be recalculated for less ProductTypes.
+	Hence, I leave it separate. Marco.
+		<role id="org.nightlabs.jfire.store.seeProductType"/>
+-->
 	</role-group>
 
 	<role-group id="org.nightlabs.jfire.trade.editCustomerGroupMapping">

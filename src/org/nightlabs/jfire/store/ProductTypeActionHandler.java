@@ -25,6 +25,7 @@
  ******************************************************************************/
 package org.nightlabs.jfire.store;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -45,18 +46,23 @@ import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.accounting.Accounting;
 import org.nightlabs.jfire.accounting.Invoice;
+import org.nightlabs.jfire.asyncinvoke.AsyncInvoke;
+import org.nightlabs.jfire.asyncinvoke.Invocation;
 import org.nightlabs.jfire.base.JFireBaseEAR;
 import org.nightlabs.jfire.base.JFirePrincipal;
 import org.nightlabs.jfire.base.Lookup;
 import org.nightlabs.jfire.organisation.Organisation;
+import org.nightlabs.jfire.security.Authority;
 import org.nightlabs.jfire.security.AuthorityType;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.security.User;
+import org.nightlabs.jfire.security.id.AuthorityID;
 import org.nightlabs.jfire.security.id.AuthorityTypeID;
 import org.nightlabs.jfire.store.deliver.Delivery;
 import org.nightlabs.jfire.store.deliver.DeliveryData;
 import org.nightlabs.jfire.store.deliver.id.DeliveryDataID;
 import org.nightlabs.jfire.store.id.ProductID;
+import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.Offer;
 import org.nightlabs.jfire.trade.OfferLocal;
@@ -78,6 +84,7 @@ import org.nightlabs.jfire.trade.jbpm.ProcessDefinitionAssignment;
 import org.nightlabs.jfire.trade.jbpm.id.ProcessDefinitionAssignmentID;
 import org.nightlabs.jfire.transfer.Anchor;
 import org.nightlabs.jfire.transfer.id.AnchorID;
+import org.nightlabs.util.CollectionUtil;
 import org.nightlabs.util.Util;
 
 /**
@@ -1154,6 +1161,104 @@ public abstract class ProductTypeActionHandler
 //	public void onPayEnd_storePayEndServerResult(JFirePrincipal principal, Payment payment, Set<? extends Article> articles)
 //	{
 //	}
+
+	private static final String pmKey_productTypeIDsAssignedSecuringAuthority = ProductTypeActionHandler.class.getName() + "#productTypeIDsAssignedSecuringAuthority";
+
+	/**
+	 * This method is called whenever a securing {@link Authority} is assigned to a {@link ProductTypeLocal}.
+	 * When this method is called, the assignment has already been done, but was not yet propagated to inheriting
+	 * {@link ProductType}s.
+	 */
+	public void onAssignSecuringAuthority(ProductTypeLocal productTypeLocal, AuthorityID oldSecuringAuthorityID, AuthorityID newSecuringAuthorityID)
+	{
+		if (ProductType.INHERITANCE_NATURE_LEAF != productTypeLocal.getProductType().getInheritanceNature())
+			return;
+
+		PersistenceManager pm = getPersistenceManager();
+
+		Set<ProductTypeID> productTypeIDsAssignedSecuringAuthority = CollectionUtil.castSet((Set<?>) pm.getUserObject(pmKey_productTypeIDsAssignedSecuringAuthority));
+		if (productTypeIDsAssignedSecuringAuthority == null) {
+			productTypeIDsAssignedSecuringAuthority = new HashSet<ProductTypeID>();
+			pm.putUserObject(pmKey_productTypeIDsAssignedSecuringAuthority, productTypeIDsAssignedSecuringAuthority);
+		}
+
+		ProductTypeID productTypeID = (ProductTypeID) JDOHelper.getObjectId(productTypeLocal.getProductType());
+		if (productTypeID == null)
+			throw new IllegalStateException("JDOHelper.getObjectId(productTypeLocal.getProductType()) returned null!");
+
+		productTypeIDsAssignedSecuringAuthority.add(productTypeID);
+	}
+
+	/**
+	 * Notify the {@link ProductTypeActionHandler} about the fact that {@link ProductType#applyInheritance()}
+	 * was called. This method is not triggered for all children, but only for the original {@link ProductType}
+	 * (where <code>applyInheritance()</code> was called).
+	 *
+	 * @param productType the {@link ProductType} instance on which the method {@link ProductType#applyInheritance()} was invoked.
+	 */
+	public void postApplyInheritance(ProductType productType)
+	{
+		PersistenceManager pm = getPersistenceManager();
+
+		// applyInheritance() is called when a securingAuthorityID has been assigned using ProductTypeLocal.setSecuringAuthority().
+		// Therefore, we can collect all changes during onAssignSecuringAuthority(...) since this is called during inheritance
+		// (by ProductTypeLocal.postInherit(...)) as well as directly by ProductTypeLocal.setSecuringAuthority() and then simply
+		// "commit" all changes at once here.
+		Set<ProductTypeID> productTypeIDsAssignedSecuringAuthority = CollectionUtil.castSet((Set<?>) pm.getUserObject(pmKey_productTypeIDsAssignedSecuringAuthority));
+		if (productTypeIDsAssignedSecuringAuthority != null && !productTypeIDsAssignedSecuringAuthority.isEmpty()) {
+			try {
+				AsyncInvoke.exec(
+						new CalculateProductTypePermissionFlagSetsInvocation(productTypeIDsAssignedSecuringAuthority),
+						true
+				);
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+		}
+		productTypeIDsAssignedSecuringAuthority = null;
+	}
+
+	public static class CalculateProductTypePermissionFlagSetsInvocation
+	extends Invocation
+	{
+		private static final long serialVersionUID = 1L;
+
+		private Set<ProductTypeID> productTypeIDsAssignedSecuringAuthority;
+
+		public CalculateProductTypePermissionFlagSetsInvocation(Set<ProductTypeID> productTypeIDsAssignedSecuringAuthority)
+		{
+			if (productTypeIDsAssignedSecuringAuthority == null)
+				throw new IllegalArgumentException("productTypeIDsAssignedSecuringAuthority == null");
+
+			this.productTypeIDsAssignedSecuringAuthority = productTypeIDsAssignedSecuringAuthority;
+		}
+
+		@Override
+		public Serializable invoke() throws Exception
+		{
+			PersistenceManager pm = getPersistenceManager();
+			try {
+				List<ProductType> productTypesAssignedSecuringAuthority = NLJDOHelper.getObjectList(pm, productTypeIDsAssignedSecuringAuthority, ProductType.class);
+				Query qUsers = pm.newQuery(User.class);
+				qUsers.setFilter("this.organisationID == :organisationID && this.userID != :systemUserID && this.userID != :otherUserID");
+				Collection<?> users = (Collection<?>) qUsers.execute(
+						SecurityReflector.getUserDescriptor().getOrganisationID(),
+						User.USER_ID_SYSTEM,
+						User.USER_ID_OTHER
+				);
+				for (Object o : users) {
+					User user = (User) o;
+					ProductTypePermissionFlagSet.updateFlagsSeeProductType(pm, productTypesAssignedSecuringAuthority, user);
+					ProductTypePermissionFlagSet.updateFlagsSellReverseProductType(pm, productTypesAssignedSecuringAuthority, user);
+				}
+
+			} finally {
+				pm.close();
+			}
+			return null;
+		}
+	}
+
 
 	@Override
 	public int hashCode()

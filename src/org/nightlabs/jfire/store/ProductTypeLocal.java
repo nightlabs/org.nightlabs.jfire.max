@@ -110,10 +110,10 @@ implements Serializable, Inheritable, InheritanceCallbacks, SecuredObject
 	/**
 	 * This class defines constants for the field names of implementation of
 	 * {@link Inheritable}, to avoid the use of "hardcoded" Strings for retrieving
-	 * {@link FieldMetaData} or {@link FieldInheriter}.  
+	 * {@link FieldMetaData} or {@link FieldInheriter}.
 	 * In the future the JFire project will probably autogenerate this class,
 	 * but until then you should implement it manually.
-	 */	
+	 */
 	public static final class FieldName
 	{
 		public static final String fieldMetaDataMap = "fieldMetaDataMap";
@@ -128,7 +128,7 @@ implements Serializable, Inheritable, InheritanceCallbacks, SecuredObject
 		public static final String tmpInherit_innerPriceConfigID = "tmpInherit_innerPriceConfigID";
 		public static final String tmpInherit_nestedProductTypes = "tmpInherit_nestedProductTypes";
 	};
-	
+
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
@@ -280,18 +280,15 @@ implements Serializable, Inheritable, InheritanceCallbacks, SecuredObject
 	{
 		return getFieldMetaData(fieldName, true);
 	}
-	
+
 	public FieldMetaData getFieldMetaData(String fieldName, boolean createMissingMetaData)
 	{
 		if (fieldName.startsWith("jdo"))
 			return null;
 
-		if (fieldName.equals(FieldName.tmpInherit_innerPriceConfigID))
+		if (fieldName.startsWith("tmpInherit"))
 			return null;
 
-		if (fieldName.equals(FieldName.tmpInherit_nestedProductTypes))
-			return null;
-		
 		if (FieldName.securingAuthority.equals(fieldName))
 			return new StaticFieldMetaData(fieldName);
 
@@ -338,11 +335,16 @@ implements Serializable, Inheritable, InheritanceCallbacks, SecuredObject
 	 */
 	private transient Map<String, NestedProductTypeLocal> tmpInherit_nestedProductTypes = null;
 
+	/**
+	 * @jdo.field persistence-modifier="none"
+	 */
+	private transient String tmpInherit_securingAuthorityIDString;
+
 	public void preInherit(Inheritable mother, Inheritable child)
 	{
-		if (getSecuringAuthorityID() == null);
+		tmpInherit_securingAuthorityIDString = this.securingAuthorityID;
 		if (getSecuringAuthorityTypeID() == null);
-		
+
 		if (child == this) {
 			// check whether the nestedPoductTypes change - in this case we will recalculate prices after inheritance in postInherit(...)
 			// we copy the current nestedProductTypeLocals to tmpInherit_nestedProductTypes - then we compare them afterwards
@@ -398,17 +400,18 @@ implements Serializable, Inheritable, InheritanceCallbacks, SecuredObject
 	public void postInherit(Inheritable mother, Inheritable child)
 	{
 		if (child == this) {
-			if (!Util.equals(tmpInherit_innerPriceConfigID, JDOHelper.getObjectId(getProductType().getInnerPriceConfig())) ||
-					!compareNestedProductTypeLocals(nestedProductTypeLocals.values(), tmpInherit_nestedProductTypes)) {
-				// there are changes => recalculate prices!
-				PersistenceManager pm = getPersistenceManager();
+			PersistenceManager pm = getPersistenceManager();
 
+			if (!Util.equals(tmpInherit_innerPriceConfigID, JDOHelper.getObjectId(getProductType().getInnerPriceConfig())) ||
+					!compareNestedProductTypeLocals(nestedProductTypeLocals.values(), tmpInherit_nestedProductTypes))
+			{
+				// there are changes => recalculate prices!
 				HashSet<ProductTypeID> processedProductTypeIDs = new HashSet<ProductTypeID>();
 				ProductTypeID productTypeID = (ProductTypeID) JDOHelper.getObjectId(this.getProductType());
 				for (AffectedProductType apt : PriceConfigUtil.getAffectedProductTypes(pm, this.getProductType())) {
 					if (!processedProductTypeIDs.add(apt.getProductTypeID()))
 						continue;
-					
+
 					ProductType pt;
 					if (apt.getProductTypeID().equals(productTypeID))
 						pt = this.getProductType();
@@ -423,6 +426,21 @@ implements Serializable, Inheritable, InheritanceCallbacks, SecuredObject
 						logger.info("postInherit: price-calculation complete for: " + JDOHelper.getObjectId(pt));
 					}
 				}
+			}
+
+			if (!Util.equals(this.securingAuthorityID, tmpInherit_securingAuthorityIDString)) {
+				AuthorityID oldSecuringAuthorityID;
+				try {
+					oldSecuringAuthorityID = tmpInherit_securingAuthorityIDString == null ?
+							null : new AuthorityID(tmpInherit_securingAuthorityIDString);
+				} catch (Exception e) {
+					throw new RuntimeException(e);
+				}
+				AuthorityID newSecuringAuthorityID = this.getSecuringAuthorityID();
+
+				ProductTypeActionHandler.getProductTypeActionHandler(pm, getProductType().getClass()).onAssignSecuringAuthority(
+						this, oldSecuringAuthorityID, newSecuringAuthorityID
+				);
 			}
 		}
 	}
@@ -585,7 +603,14 @@ implements Serializable, Inheritable, InheritanceCallbacks, SecuredObject
 	@Override
 	public AuthorityID getSecuringAuthorityID()
 	{
-		return (AuthorityID) ObjectIDUtil.createObjectID(securingAuthorityID);
+		if (securingAuthorityID == null)
+			return null;
+
+		try {
+			return new AuthorityID(securingAuthorityID);
+		} catch (Exception e) {
+			throw new RuntimeException(e); // should never happen.
+		}
 	}
 
 	/**
@@ -593,7 +618,7 @@ implements Serializable, Inheritable, InheritanceCallbacks, SecuredObject
 	 * <p>
 	 * {@inheritDoc}
 	 * </p>
-	 * 
+	 *
 	 * @param authorityID the new <code>AuthorityID</code> or <code>null</code>.
 	 * @see #getSecuringAuthorityID()
 	 */
@@ -604,7 +629,8 @@ implements Serializable, Inheritable, InheritanceCallbacks, SecuredObject
 		// always fails outside of the server (independent from the parameter).
 		PersistenceManager pm = getPersistenceManager();
 
-		if (Util.equals(authorityID, this.getSecuringAuthorityID()))
+		AuthorityID oldSecuringAuthorityID = this.getSecuringAuthorityID();
+		if (Util.equals(authorityID, oldSecuringAuthorityID))
 			return; // no change => no need to do anything
 
 		if (authorityID != null) {
@@ -616,7 +642,12 @@ implements Serializable, Inheritable, InheritanceCallbacks, SecuredObject
 			if (!authority.getAuthorityType().equals(securingAuthorityType))
 				throw new IllegalArgumentException("securingAuthority.authorityType does not match this.securingAuthorityTypeID! securingAuthority: " + authorityID + " this: " + JDOHelper.getObjectId(this));
 		}
+
 		this.securingAuthorityID = authorityID == null ? null : authorityID.toString();
+
+		ProductTypeActionHandler.getProductTypeActionHandler(pm, getProductType().getClass()).onAssignSecuringAuthority(
+				this, oldSecuringAuthorityID, authorityID
+		);
 
 		getProductType().applyInheritance();
 	}

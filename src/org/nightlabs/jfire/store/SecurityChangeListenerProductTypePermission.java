@@ -2,6 +2,7 @@ package org.nightlabs.jfire.store;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -18,16 +19,13 @@ import org.nightlabs.jfire.asyncinvoke.Invocation;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.security.Authority;
 import org.nightlabs.jfire.security.AuthorizedObject;
-import org.nightlabs.jfire.security.AuthorizedObjectRef;
-import org.nightlabs.jfire.security.RoleRef;
-import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.security.UserLocal;
 import org.nightlabs.jfire.security.id.AuthorityID;
-import org.nightlabs.jfire.security.id.AuthorizedObjectID;
 import org.nightlabs.jfire.security.id.RoleID;
 import org.nightlabs.jfire.security.id.UserID;
 import org.nightlabs.jfire.security.id.UserLocalID;
+import org.nightlabs.jfire.security.listener.SecurityChangeEvent_Authority_createDestroyAuthorizedObjectRef;
 import org.nightlabs.jfire.security.listener.SecurityChangeEvent_AuthorizedObjectRef_addRemoveRole;
 import org.nightlabs.jfire.security.listener.SecurityChangeListener;
 import org.nightlabs.jfire.security.listener.id.SecurityChangeListenerID;
@@ -74,219 +72,156 @@ extends SecurityChangeListener
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
-	private Map<AuthorizedObject, Map<Authority, Integer>> seeRefCountBefore = new HashMap<AuthorizedObject, Map<Authority,Integer>>();
+	private Map<AuthorizedObject, Map<Authority, Map<RoleID, Boolean>>> roleGrantedBackupMap = new HashMap<AuthorizedObject, Map<Authority,Map<RoleID,Boolean>>>();
 
-	/**
-	 * @jdo.field persistence-modifier="none"
-	 */
-	private Map<AuthorizedObject, Map<Authority, Integer>> sellRefCountBefore = new HashMap<AuthorizedObject, Map<Authority,Integer>>();
-
-	/**
-	 * @jdo.field persistence-modifier="none"
-	 */
-	private Map<AuthorizedObject, Map<Authority, Integer>> reverseRefCountBefore = new HashMap<AuthorizedObject, Map<Authority,Integer>>();
-
-	private static void addFirstEntryToRoleRefCountMap(Map<AuthorizedObject, Map<Authority, Integer>> authorizedObject2authority2roleRefCount, SecurityChangeEvent_AuthorizedObjectRef_addRemoveRole event, RoleID roleID)
+	private static final Set<RoleID> interestingRoleIDs = getInterestingRoleIDs();
+	private static Set<RoleID> getInterestingRoleIDs()
 	{
-		if (!roleID.roleID.equals(event.getRole().getRoleID())) {
-			// silently return
-			return;
-		}
+		Set<RoleID> set = new HashSet<RoleID>();
 
-		addFirstEntryToRoleRefCountMap(
-				authorizedObject2authority2roleRefCount,
-				event.getAuthorizedObjectRef().getAuthority(),
-				event.getAuthorizedObjectRef().getAuthorizedObject(),
-				roleID
-		);
+		set.add(org.nightlabs.jfire.store.RoleConstants.seeProductType);
+		set.add(org.nightlabs.jfire.trade.RoleConstants.sellProductType);
+		set.add(org.nightlabs.jfire.trade.RoleConstants.reverseProductType);
+
+		return Collections.unmodifiableSet(set);
 	}
 
-	private static void addFirstEntryToRoleRefCountMap(
-			Map<AuthorizedObject, Map<Authority, Integer>> authorizedObject2authority2roleRefCount,
-			Authority authority,
-			AuthorizedObject authorizedObject,
-			RoleID roleID)
+	private void backupRoleGranted(AuthorizedObject authorizedObject, Authority authority, RoleID roleID)
 	{
-		// if the user "other" is modified, we need to add entries for the indirectly affected users (that are the others)
-		if (authorizedObject instanceof UserLocal) {
-			UserLocal userLocal = (UserLocal) authorizedObject;
-			if (userLocal.getUserID().equals(User.USER_ID_OTHER)) {
-				for (UserLocal userLocalMangedViaOther : authority.getUserLocalsManagedViaOther()) {
-					addFirstEntryToRoleRefCountMap(
-							authorizedObject2authority2roleRefCount,
-							authority,
-							userLocalMangedViaOther,
-							roleID
-					);
-				}
-			}
-		}
+		if (authorizedObject == null)
+			throw new IllegalArgumentException("authorizedObject == null");
 
-		Map<Authority, Integer> authority2roleRefCount = authorizedObject2authority2roleRefCount.get(authorizedObject);
-		if (authority2roleRefCount == null) {
-			authority2roleRefCount = new HashMap<Authority, Integer>();
-			authorizedObject2authority2roleRefCount.put(authorizedObject, authority2roleRefCount);
-		}
+		if (authority == null)
+			throw new IllegalArgumentException("authority == null");
 
-		Integer c = authority2roleRefCount.get(authority);
-		if (c == null) {
-			int roleRefCount = getRoleRefCount(authority, authorizedObject, roleID);
-			authority2roleRefCount.put(authority, new Integer(roleRefCount));
+		if (roleID == null)
+			throw new IllegalArgumentException("roleID == null");
 
-//			RoleRef roleRef = authorizedObjectRef.getRoleRef(roleID);
-//			if (roleRef == null)
-//				authority2roleRefCount.put(authorizedObjectRef.getAuthority(), 0);
-//			else
-//				authority2roleRefCount.put(authorizedObjectRef.getAuthority(), roleRef.getReferenceCount());
-		}
-	}
-
-	@Override
-	public void pre_AuthorizedObjectRef_addRole(SecurityChangeEvent_AuthorizedObjectRef_addRemoveRole event)
-	{
-		if (!(event.getAuthorizedObjectRef().getAuthorizedObject() instanceof UserLocal)) {
+		if (!(authorizedObject instanceof UserLocal)) {
 			// changes to UserSecurityGroups are reflected via ...addRole(...) calls to the UserLocals immediately
 			// and cause this method to be triggered for the users directly. So we can ignore changes to user-security-groups.
 			return;
 		}
 
-		addFirstEntryToRoleRefCountMap(seeRefCountBefore, event, org.nightlabs.jfire.store.RoleConstants.seeProductType);
-		addFirstEntryToRoleRefCountMap(sellRefCountBefore, event, org.nightlabs.jfire.trade.RoleConstants.sellProductType);
-		addFirstEntryToRoleRefCountMap(reverseRefCountBefore, event, org.nightlabs.jfire.trade.RoleConstants.reverseProductType);
+		UserLocal userLocal = (UserLocal) authorizedObject;
+		UserID userID = (UserID) JDOHelper.getObjectId(userLocal.getUser());
+		if (userID == null)
+			throw new IllegalStateException("JDOHelper.getObjectId(userLocal.getUser()) returned null!");
+
+		if (!interestingRoleIDs.contains(roleID))
+			return;
+
+		if (User.USER_ID_OTHER.equals(userLocal.getUserID())) {
+			for (UserLocal userLocalManagedViaOther : authority.getUserLocalsManagedViaOther())
+				backupRoleGranted(userLocalManagedViaOther, authority, roleID);
+		}
+		else if (!User.USER_ID_SYSTEM.equals(userLocal.getUserID())) {
+			Map<Authority, Map<RoleID, Boolean>> m1 = roleGrantedBackupMap.get(authorizedObject);
+			if (m1 == null) {
+				m1 = new HashMap<Authority, Map<RoleID,Boolean>>();
+				roleGrantedBackupMap.put(authorizedObject, m1);
+			}
+
+			Map<RoleID, Boolean> m2 = m1.get(authority);
+			if (m2 == null) {
+				m2 = new HashMap<RoleID, Boolean>();
+				m1.put(authority, m2);
+			}
+
+			Boolean grantedOld = m2.get(roleID);
+			if (grantedOld == null) {
+				boolean granted = authority.containsRoleRef(userID, roleID);
+				m2.put(roleID, granted);
+			}
+		}
+	}
+
+	private void backupRoleGranted(SecurityChangeEvent_AuthorizedObjectRef_addRemoveRole event)
+	{
+		Authority authority = event.getAuthorizedObjectRef().getAuthority();
+		AuthorizedObject authorizedObject = event.getAuthorizedObjectRef().getAuthorizedObject();
+		if (!(authorizedObject instanceof UserLocal)) {
+			// changes to UserSecurityGroups are reflected via ...addRole(...) calls to the UserLocals immediately
+			// and cause this method to be triggered for the users directly. So we can ignore changes to user-security-groups.
+			return;
+		}
+
+		RoleID roleID = (RoleID) JDOHelper.getObjectId(event.getRole());
+		backupRoleGranted(authorizedObject, authority, roleID);
+	}
+
+	private void backupRoleGranted(SecurityChangeEvent_Authority_createDestroyAuthorizedObjectRef event)
+	{
+		Authority authority = event.getAuthority();
+		AuthorizedObject authorizedObject = event.getAuthorizedObject();
+		if (!(authorizedObject instanceof UserLocal)) {
+			// changes to UserSecurityGroups are reflected via ...addRole(...) calls to the UserLocals immediately
+			// and cause this method to be triggered for the users directly. So we can ignore changes to user-security-groups.
+			return;
+		}
+
+		for (RoleID roleID : interestingRoleIDs)
+			backupRoleGranted(authorizedObject, authority, roleID);
+	}
+
+	@Override
+	public void pre_Authority_createAuthorizedObjectRef(SecurityChangeEvent_Authority_createDestroyAuthorizedObjectRef event) {
+		backupRoleGranted(event);
+	}
+
+	@Override
+	public void pre_Authority_destroyAuthorizedObjectRef(SecurityChangeEvent_Authority_createDestroyAuthorizedObjectRef event) {
+		backupRoleGranted(event);
+	}
+
+	@Override
+	public void pre_AuthorizedObjectRef_addRole(SecurityChangeEvent_AuthorizedObjectRef_addRemoveRole event) {
+		backupRoleGranted(event);
 	}
 
 	@Override
 	public void pre_AuthorizedObjectRef_removeRole(SecurityChangeEvent_AuthorizedObjectRef_addRemoveRole event) {
-		if (!(event.getAuthorizedObjectRef().getAuthorizedObject() instanceof UserLocal)) {
-			// changes to UserSecurityGroups are reflected via ...addRole(...) calls to the UserLocals immediately
-			// and cause this method to be triggered for the users directly. So we can ignore changes to user-security-groups.
-			return;
-		}
-
-		addFirstEntryToRoleRefCountMap(seeRefCountBefore, event, org.nightlabs.jfire.store.RoleConstants.seeProductType);
-		addFirstEntryToRoleRefCountMap(sellRefCountBefore, event, org.nightlabs.jfire.trade.RoleConstants.sellProductType);
-		addFirstEntryToRoleRefCountMap(reverseRefCountBefore, event, org.nightlabs.jfire.trade.RoleConstants.reverseProductType);
+		backupRoleGranted(event);
 	}
 
-	private static int getRoleRefCount(Authority authority, AuthorizedObject authorizedObject, RoleID roleID)
-	{
-		AuthorizedObjectID authorizedObjectID = (AuthorizedObjectID) JDOHelper.getObjectId(authorizedObject);
-		String localOrganisationID = SecurityReflector.getUserDescriptor().getOrganisationID();
-		AuthorizedObjectID otherUserLocalID = UserLocalID.create(localOrganisationID, User.USER_ID_OTHER, localOrganisationID);
-
-		int res;
-		AuthorizedObjectRef authorizedObjectRef = authority.getAuthorizedObjectRef(authorizedObject);
-		// Because the AuthorizedObjectRef might have been removed from the Authority (and deleted from the datastore),
-		// authorizedObjectRef might be null now.
-		if (authorizedObjectRef == null) {
-			// The user is not managed directly or indirectly via UserSecurityGroups => Check _Other_
-			if (authorizedObjectID.equals(otherUserLocalID)) {
-				// The user is _Other_ himself.
-				res = 0;
-			}
-			else {
-				// the current user is *NOT* itself _Other_
-				AuthorizedObjectRef otherAuthorizedObjectRef = authority.getAuthorizedObjectRef(otherUserLocalID);
-				if (otherAuthorizedObjectRef == null) {
-					// _Other_ is not in the Authority, either
-					res = 0;
-				}
-				else {
-					// access maybe granted indirectly by _Other_
-					RoleRef roleRef = otherAuthorizedObjectRef.getRoleRef(roleID);
-					if (roleRef == null)
-						res = 0;
-					else
-						res = roleRef.getReferenceCount();
-				}
-			} // if (!User.USER_ID_OTHER.equals(userLocal.getUserID())) {
-		}
-		else {
-			RoleRef roleRef = authorizedObjectRef.getRoleRef(roleID);
-			if (roleRef == null)
-				res = 0;
-			else
-				res = roleRef.getReferenceCount();
-		}
-		return res;
-	}
-
-	private static Map<UserLocalID, Set<AuthorityID>> getAffectedUserLocalIDs(Map<AuthorizedObject, Map<Authority, Integer>> authorizedObject2authority2roleRefCount, RoleID roleID)
+	private Map<UserLocalID, Set<AuthorityID>> getAffectedUserLocalIDs(RoleID roleID)
 	{
 		Map<UserLocalID, Set<AuthorityID>> res = new HashMap<UserLocalID, Set<AuthorityID>>();
 
-		for (Map.Entry<AuthorizedObject, Map<Authority, Integer>> me1 : authorizedObject2authority2roleRefCount.entrySet()) {
+		for (Map.Entry<AuthorizedObject, Map<Authority, Map<RoleID, Boolean>>> me1 : roleGrantedBackupMap.entrySet()) {
 			AuthorizedObject authorizedObject = me1.getKey();
 			UserLocal userLocal = (UserLocal) authorizedObject;
 			UserLocalID userLocalID = (UserLocalID) JDOHelper.getObjectId(userLocal);
+			UserID userID = UserID.create(userLocalID);
 
-			for (Map.Entry<Authority, Integer> me2 : me1.getValue().entrySet()) {
+			for (Map.Entry<Authority, Map<RoleID, Boolean>> me2 : me1.getValue().entrySet()) {
 				Authority authority = me2.getKey();
-				int roleRefCountOld = me2.getValue().intValue();
-//				int roleRefCountNew;
-//
-//				AuthorizedObjectRef authorizedObjectRef = authority.getAuthorizedObjectRef(authorizedObject);
-//				// Because the AuthorizedObjectRef might have been removed from the Authority (and deleted from the datastore),
-//				// authorizedObjectRef might be null now.
-//				if (authorizedObjectRef == null) {
-//					// The user is not managed directly or indirectly via UserSecurityGroups => Check _Other_
-//					if (User.USER_ID_OTHER.equals(userLocal.getUserID())) {
-//						// The user is _Other_ himself.
-//						roleRefCountNew = 0;
-//					}
-//					else {
-//						// the current user is *NOT* itself _Other_
-//						AuthorizedObjectID otherID = UserLocalID.create(userLocal.getOrganisationID(), User.USER_ID_OTHER, userLocal.getLocalOrganisationID());
-//						AuthorizedObjectRef otherAuthorizedObjectRef = authority.getAuthorizedObjectRef(otherID);
-//						if (otherAuthorizedObjectRef != null) {
-//							// _Other_ is not in the Authority, either
-//							roleRefCountNew = 0;
-//						}
-//						else {
-//							// access maybe granted indirectly by _Other_
-//							RoleRef roleRef = otherAuthorizedObjectRef.getRoleRef(roleID);
-//							if (roleRef == null)
-//								roleRefCountNew = 0;
-//							else
-//								roleRefCountNew = roleRef.getReferenceCount();
-//						}
-//					} // if (!User.USER_ID_OTHER.equals(userLocal.getUserID())) {
-//				}
-//				else {
-//					RoleRef roleRef = authorizedObjectRef.getRoleRef(roleID);
-//					if (roleRef == null)
-//						roleRefCountNew = 0;
-//					else
-//						roleRefCountNew = roleRef.getReferenceCount();
-//				}
 
-				int roleRefCountNew = getRoleRefCount(authority, authorizedObject, roleID);
-
-				boolean grantedOld = roleRefCountOld > 0;
-				boolean grantedNew = roleRefCountNew > 0;
-
-				if (grantedOld != grantedNew) {
-					Set<AuthorityID> authorityIDSet = res.get(userLocalID);
-					if (authorityIDSet == null) {
-						authorityIDSet = new HashSet<AuthorityID>();
-						res.put(userLocalID, authorityIDSet);
+				Boolean oldGranted = me2.getValue().get(roleID);
+				if (oldGranted != null) {
+					boolean newGranted = authority.containsRoleRef(userID, roleID);
+					if (oldGranted.booleanValue() != newGranted) {
+						Set<AuthorityID> authorityIDSet = res.get(userLocalID);
+						if (authorityIDSet == null) {
+							authorityIDSet = new HashSet<AuthorityID>();
+							res.put(userLocalID, authorityIDSet);
+						}
+						authorityIDSet.add((AuthorityID) JDOHelper.getObjectId(authority));
 					}
-					authorityIDSet.add((AuthorityID) JDOHelper.getObjectId(authority));
 				}
 			}
 		}
 
 		return res;
 	}
-
 
 	@Override
 	public void on_SecurityChangeController_endChanging() {
 		try {
 			CalculateProductTypePermissionFlagSetsInvocation invocation = new CalculateProductTypePermissionFlagSetsInvocation(
-					getAffectedUserLocalIDs(seeRefCountBefore, org.nightlabs.jfire.store.RoleConstants.seeProductType),
-					getAffectedUserLocalIDs(sellRefCountBefore, org.nightlabs.jfire.trade.RoleConstants.sellProductType),
-					getAffectedUserLocalIDs(reverseRefCountBefore, org.nightlabs.jfire.trade.RoleConstants.reverseProductType)
+					getAffectedUserLocalIDs(org.nightlabs.jfire.store.RoleConstants.seeProductType),
+					getAffectedUserLocalIDs(org.nightlabs.jfire.trade.RoleConstants.sellProductType),
+					getAffectedUserLocalIDs(org.nightlabs.jfire.trade.RoleConstants.reverseProductType)
 			);
 			if (!invocation.isEmpty()) {
 				AsyncInvoke.exec(

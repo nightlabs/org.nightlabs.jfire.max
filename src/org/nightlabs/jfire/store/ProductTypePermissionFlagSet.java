@@ -179,6 +179,12 @@ implements Serializable
 		if (userID == null)
 			throw new IllegalStateException("JDOHelper.getObjectId(user) returned null for " + user);
 
+		if (User.USER_ID_SYSTEM.equals(userID.userID))
+			throw new IllegalArgumentException("user must not be internal *system* user!");
+
+		if (User.USER_ID_OTHER.equals(userID.userID))
+			throw new IllegalArgumentException("user must not be internal *other* user!");
+
 		boolean missingInOrganisationAuthority = !Authority.getOrganisationAuthority(pm).containsRoleRef(
 				userID,
 				org.nightlabs.jfire.store.RoleConstants.seeProductType

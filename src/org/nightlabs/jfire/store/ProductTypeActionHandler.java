@@ -1236,14 +1236,25 @@ public abstract class ProductTypeActionHandler
 		@Override
 		public Serializable invoke() throws Exception
 		{
-			PersistenceManager pm = getPersistenceManager();
-			try {
-				List<ProductType> productTypes = NLJDOHelper.getObjectList(pm, productTypeIDs, ProductType.class);
-				ProductTypePermissionFlagSet.updateFlags(pm, productTypes);
-			} finally {
-				pm.close();
-			}
-			return null;
+			synchronized (ProductTypePermissionFlagSet.class) {
+
+				PersistenceManager pm = getPersistenceManager();
+				try {
+					// TODO this should be DataNucleus-independent!
+					// If it is not making it into the JDO standard, we need to write our own
+					// JDO-implementation-independent API!
+					((org.datanucleus.jdo.JDOTransaction)pm.currentTransaction()).setOption(
+							"transaction.serializeReadObjects", Boolean.TRUE
+					);
+
+					List<ProductType> productTypes = NLJDOHelper.getObjectList(pm, productTypeIDs, ProductType.class);
+					ProductTypePermissionFlagSet.updateFlags(pm, productTypes);
+				} finally {
+					pm.close();
+				}
+				return null;
+
+			} // synchronized (ProductTypePermissionFlagSet.class) {
 		}
 	}
 

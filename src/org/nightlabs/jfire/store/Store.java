@@ -581,7 +581,7 @@ implements StoreCallback
 			productType.getProductTypeLocal().setSecuringAuthorityTypeID(authorityTypeID);
 		}
 
-		if (organisationID.equals(productType.getOrganisationID())) {
+		if (organisationID.equals(productType.getOrganisationID()) && productType.getInheritanceNature() == ProductType.INHERITANCE_NATURE_LEAF) {
 			ProductTypeID productTypeID = (ProductTypeID) JDOHelper.getObjectId(productType);
 			if (productTypeID == null)
 				throw new IllegalStateException("JDOHelper.getObjectId(productType) returned null!");

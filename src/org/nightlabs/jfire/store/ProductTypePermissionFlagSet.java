@@ -66,7 +66,7 @@ implements Serializable
 
 		Query q = pm.newQuery(
 				ProductType.class,
-				"this.organisationID == (SELECT UNIQUE lOrg.organisationID FROM " + LocalOrganisation.class + " lOrg) && " +
+				"this.organisationID == :localOrganisationID && " +
 				"this.inheritanceNature == " + ProductType.INHERITANCE_NATURE_LEAF + " && " +
 				"1 > ptpfsCount"
 		);
@@ -76,7 +76,9 @@ implements Serializable
 		linkParams.put("subParamProductTypeID", "this.productTypeID");
 		q.addSubquery(qSub1, "long ptpfsCount", null, linkParams);
 
-		Collection<ProductType> c = CollectionUtil.castCollection((Collection<?>) q.execute());
+		Collection<ProductType> c = CollectionUtil.castCollection((Collection<?>) q.execute(
+				LocalOrganisation.getLocalOrganisation(pm).getOrganisationID())
+		);
 		return c;
 	}
 
@@ -91,11 +93,13 @@ implements Serializable
 	{
 		Query qUsers = pm.newQuery(User.class);
 		qUsers.setFilter(
-				"this.organisationID == (SELECT UNIQUE lOrg.organisationID FROM " + LocalOrganisation.class + " lOrg) && " +
+				"this.organisationID == :localOrganisationID && " +
 				"this.userID != :systemUserID && " +
 				"this.userID != :otherUserID"
 		);
+
 		Collection<?> users = (Collection<?>) qUsers.execute(
+				LocalOrganisation.getLocalOrganisation(pm).getOrganisationID(),
 				User.USER_ID_SYSTEM,
 				User.USER_ID_OTHER
 		);
@@ -259,6 +263,9 @@ implements Serializable
 		for (ProductType productType : productTypes) {
 			if (!localOrganisationID.equals(productType.getOrganisationID()))
 				throw new IllegalArgumentException("productType.organisationID does not reference the local organisation! " + productType);
+
+			if (productType.getInheritanceNature() != ProductType.INHERITANCE_NATURE_LEAF)
+				throw new IllegalArgumentException("productType.inheritanceNature is not ProductType.INHERITANCE_NATURE_LEAF! " + productType);
 
 			nestingProductTypes.addAll(ProductType.getProductTypesNestingThis(pm, productType));
 			ProductTypePermissionFlagSet flagSet = getProductTypePermissionFlagSet(pm, productType, user, true, false);

@@ -208,6 +208,8 @@ implements SessionBean
 				// not yet initialized
 			}
 
+			pm.getExtent(ProductTypePermissionFlagSet.class); // We must already initialize the meta data here, because otherwise we run into deadlocks.
+
 			SecurityChangeListenerProductTypePermission.register(pm);
 
 			DefaultLocalStorekeeperDelegate.getDefaultLocalStorekeeperDelegate(pm);

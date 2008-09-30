@@ -1,12 +1,10 @@
 package org.nightlabs.jfire.issue.project;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import javax.jdo.JDOHelper;
@@ -14,14 +12,12 @@ import javax.jdo.PersistenceManager;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
-import org.nightlabs.jfire.issue.id.IssueLinkTypeID;
 import org.nightlabs.jfire.issue.project.id.ProjectID;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.prop.PropertySet;
 import org.nightlabs.jfire.prop.Struct;
 import org.nightlabs.jfire.prop.StructLocal;
 import org.nightlabs.jfire.security.User;
-import org.nightlabs.jfire.security.UserSecurityGroup;
 import org.nightlabs.util.Util;
 
 /**
@@ -85,6 +81,8 @@ implements Serializable, Comparable<Project>
 	public static final String FETCH_GROUP_PROJECT_MANAGER = "Project.projectManager";
 	public static final String FETCH_GROUP_MEMBERS = "Project.members";
 
+	public static final ProjectID PROJECT_ID_DEFAULT = ProjectID.create(Organisation.DEV_ORGANISATION_ID, -1);
+	
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
@@ -207,6 +205,10 @@ implements Serializable, Comparable<Project>
 	@Deprecated
 	protected Project() { }
 
+	public Project(ProjectID projectID) {
+		this(projectID.organisationID, projectID.projectID);
+	}
+	
 	public Project(String organisationID, long projectID)
 	{
 		Organisation.assertValidOrganisationID(organisationID);

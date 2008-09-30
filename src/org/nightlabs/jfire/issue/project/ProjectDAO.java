@@ -4,6 +4,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import javax.jdo.FetchPlan;
+
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.issue.IssueManager;
@@ -11,6 +13,7 @@ import org.nightlabs.jfire.issue.IssueManagerUtil;
 import org.nightlabs.jfire.issue.project.id.ProjectID;
 import org.nightlabs.jfire.issue.project.id.ProjectTypeID;
 import org.nightlabs.jfire.security.SecurityReflector;
+import org.nightlabs.progress.NullProgressMonitor;
 import org.nightlabs.progress.ProgressMonitor;
 import org.nightlabs.progress.SubProgressMonitor;
 
@@ -47,7 +50,7 @@ public class ProjectDAO extends BaseJDOObjectDAO<ProjectID, Project>{
 			monitor.done();
 		}
 	}
-	
+
 	private IssueManager issueManager;
 
 	/**
@@ -66,10 +69,10 @@ public class ProjectDAO extends BaseJDOObjectDAO<ProjectID, Project>{
 		monitor.done();
 		return project;
 	}
-	
+
 	public synchronized List<Project> getProjects(String[] fetchGroups, int maxFetchDepth,
 			ProgressMonitor monitor)
-	{
+			{
 		try {
 			issueManager = IssueManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
 			try {
@@ -81,14 +84,14 @@ public class ProjectDAO extends BaseJDOObjectDAO<ProjectID, Project>{
 		} catch (Exception x) {
 			throw new RuntimeException(x);
 		}
-	}
-	
+			}
+
 	@SuppressWarnings("unchecked")
 	public Collection<Project> getProjects(Collection<ProjectID> projectIDs, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
 		return getJDOObjects(null, projectIDs, fetchGroups, maxFetchDepth, monitor);
 	}
-	
+
 	public synchronized Project storeProject(Project project, boolean get, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor){
 		if(project == null)
 			throw new NullPointerException("Project to save must not be null");
@@ -96,6 +99,17 @@ public class ProjectDAO extends BaseJDOObjectDAO<ProjectID, Project>{
 		try {
 			IssueManager im = IssueManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
 			monitor.worked(1);
+
+			if (project.getProjectType() == null) {
+				project.setProjectType(
+						ProjectTypeDAO.sharedInstance().getProjectType(
+								ProjectType.PROJECT_TYPE_ID_DEFAULT, 
+								new String[] {FetchPlan.DEFAULT}, 
+								NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT, 
+								new NullProgressMonitor()
+						)
+				);
+			}
 
 			Project result = im.storeProject(project, get, fetchGroups, maxFetchDepth);
 			if (result != null)
@@ -109,7 +123,7 @@ public class ProjectDAO extends BaseJDOObjectDAO<ProjectID, Project>{
 			throw new RuntimeException(e);
 		}
 	}
-	
+
 	public synchronized void deleteProject(ProjectID projectID, ProgressMonitor monitor) {
 		monitor.beginTask("Deleting project: "+ projectID, 3);
 		try {
@@ -122,20 +136,21 @@ public class ProjectDAO extends BaseJDOObjectDAO<ProjectID, Project>{
 			throw new RuntimeException("Error while deleting project!\n" ,e);
 		}
 	}
-	
+
 	public synchronized Collection<Project> getRootProjects(String organisationID, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) 
 	{
 		if(organisationID == null)
 			throw new NullPointerException("OrganisationID must not be null");
 		try {
 			IssueManager im = IssueManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
-			Collection<Project> result = ProjectDAO.sharedInstance.getProjects(im.getRootProjectIDs(organisationID), fetchGroups, maxFetchDepth, monitor);
+			Collection<Project> result = getProjects(im.getRootProjectIDs(organisationID), fetchGroups, maxFetchDepth, monitor);
+			result.add(getProject(Project.PROJECT_ID_DEFAULT, fetchGroups, maxFetchDepth, monitor));
 			return result;
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
-	
+
 	public synchronized Collection<Project> getProjectsByParentProjectID(ProjectID projectID, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) 
 	{
 		try {
@@ -146,7 +161,7 @@ public class ProjectDAO extends BaseJDOObjectDAO<ProjectID, Project>{
 			throw new RuntimeException(e);
 		}
 	}
-	
+
 	public synchronized Collection<Project> getProjectsByProjectTypeID(ProjectTypeID projectTypeID, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) 
 	{
 		try {

@@ -27,7 +27,6 @@ import org.jbpm.graph.exe.ProcessInstance;
 import org.nightlabs.ModuleException;
 import org.nightlabs.jdo.FetchPlanBackup;
 import org.nightlabs.jdo.NLJDOHelper;
-import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
 import org.nightlabs.jdo.query.AbstractJDOQuery;
 import org.nightlabs.jdo.query.AbstractSearchQuery;
@@ -1196,7 +1195,7 @@ implements SessionBean
 			// Create the project type
 			pm.getExtent(ProjectType.class); 
 			
-			ProjectType projectType1 = new ProjectType(IDGenerator.getOrganisationID(), ProjectType.PROJECT_TYPE_ID_DEFAULT.projectTypeID);
+			ProjectType projectType1 = new ProjectType(ProjectType.PROJECT_TYPE_ID_DEFAULT);
 			projectType1.getName().setText(Locale.ENGLISH.getLanguage(), "Default");
 			projectType1 = pm.makePersistent(projectType1);
 			
@@ -1213,6 +1212,11 @@ implements SessionBean
 			
 			Project project;
 
+			project = new Project(Project.PROJECT_ID_DEFAULT);
+			project.getName().setText(Locale.ENGLISH.getLanguage(), "Default");
+			project.setProjectType(projectType1);
+			project = pm.makePersistent(project);
+			
 			project = new Project(IDGenerator.getOrganisationID(), IDGenerator.nextID(Project.class));
 			project.getName().setText(Locale.ENGLISH.getLanguage(), "Project 1");
 			project.setProjectType(projectType1);

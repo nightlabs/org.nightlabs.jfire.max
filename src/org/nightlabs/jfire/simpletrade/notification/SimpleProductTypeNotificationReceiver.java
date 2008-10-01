@@ -97,6 +97,8 @@ extends NotificationReceiver
 		SimpleTradeManager simpleTradeManager = SimpleTradeManagerUtil.getHome(initialContextProperties).create();
 		Collection<SimpleProductType> productTypes = simpleTradeManager.getSimpleProductTypesForReseller(productTypeIDs_load);
 
+		NLJDOHelper.setTransactionSerializeReadObjects(pm, true);
+
 		Set<PriceConfigID> priceConfigIDs = new HashSet<PriceConfigID>();
 
 		Store store = Store.getStore(pm);

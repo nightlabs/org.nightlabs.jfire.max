@@ -867,12 +867,20 @@ implements SessionBean
 		if (!userIsOrganisation()) // noone else needs this method - at least at the moment.
 			throw new IllegalStateException("For security reasons, this method can only be called by partner organisations! You are not an organisation!");
 
+	// TODO We need to think about how we proceed about non-visible ProductTypes. We MUST update objects
+	// that have been published once (because the partners already know them). Maybe we don't filter "hard" for them, but only
+	// transmit this visibility as a "soft" information and hide it in the UI (and probably not even in the trade ADMIN UI, but
+	// only in normal sales UI, because in the admin UI, we probably have to see the nested product types, even when they're
+	// not "visible" anymore. This definitely needs further thoughts. Marco.
+
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			pm.getExtent(SimpleProductType.class);
 			pm.getFetchPlan().setGroups(new String[] {
 					FetchPlan.DEFAULT,
 					ProductType.FETCH_GROUP_NAME,
+					SimpleProductType.FETCH_GROUP_PROPERTY_SET,
+					PropertySet.FETCH_GROUP_FULL_DATA, // TODO this applies to SimpleProductType.propertySet - maybe we should somehow control what parts of it shall be public?!
 					FetchGroupsPriceConfig.FETCH_GROUP_EDIT,
 					DeliveryConfiguration.FETCH_GROUP_THIS_DELIVERY_CONFIGURATION,
 					OrganisationLegalEntity.FETCH_GROUP_ORGANISATION,
@@ -881,6 +889,7 @@ implements SessionBean
 			});
 			pm.getFetchPlan().setMaxFetchDepth(NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
 			pm.getFetchPlan().setDetachmentOptions(FetchPlan.DETACH_LOAD_FIELDS);
+			pm.evictAll(true, ProductType.class); // if we don't throw them out of the cache, they might have already fields resolved which I don't want to be loaded and detached.
 
 			List<SimpleProductType> res = new ArrayList<SimpleProductType>(productTypeIDs.size());
 			for (ProductTypeID productTypeID : productTypeIDs) {

@@ -77,7 +77,7 @@ import org.nightlabs.util.Util;
  */
 public class ReportTextPartConfiguration implements Serializable {
 	
-	private static final long serialVersionUID = 20080916L;
+	private static final long serialVersionUID = 20080929L;
 
 	private static Logger logger = Logger.getLogger(ReportTextPartConfiguration.class);
 	
@@ -125,6 +125,11 @@ public class ReportTextPartConfiguration implements Serializable {
 	 * @jdo.field persistence-modifier="none"
 	 */
 	private boolean synthetic = false;
+	
+	/**
+	 * @jdo.field persistence-modifier="none"
+	 */
+	private ReportRegistryItemID synthesizeTemplateReportRegistryItemID;
 	
 	/**
 	 * @deprecated Only for JDO.
@@ -331,7 +336,20 @@ public class ReportTextPartConfiguration implements Serializable {
 	private void setSynthetic(boolean synthetic) {
 		this.synthetic = synthetic;
 	}
+	
+	private void setSynthesizeTemplateReportRegistryItemID(ReportRegistryItemID synthesizeTemplateReportRegistryItemID) {
+		this.synthesizeTemplateReportRegistryItemID = synthesizeTemplateReportRegistryItemID;
+	}
 
+	/**
+	 * @return 
+	 * 			If this {@link ReportTextPartConfiguration} is synthetic, this method returns the {@link ReportRegistryItemID}
+	 * 			of this {@link ReportRegistryItem} that was the template/basis for the new synthetic one.	
+	 */
+	public ReportRegistryItemID getSynthesizeTemplateReportRegistryItemID() {
+		return synthesizeTemplateReportRegistryItemID;
+	}
+	
 	/**
 	 * Creates a new, synthetic {@link ReportTextPartConfiguration} with copies of the
 	 * values of the given one. The returned configuration can be made persistent.
@@ -344,6 +362,7 @@ public class ReportTextPartConfiguration implements Serializable {
 	 * @param maxFetchDepth The maximum fetch-depth to use while detaching.
 	 * @return A new but persistable {@link ReportTextPartConfiguration} with copies of the values of the given one.
 	 */
+	@SuppressWarnings("unchecked")
 	private static ReportTextPartConfiguration synthesizeReportTextPartConfiguration(
 			PersistenceManager pm, ReportTextPartConfiguration reportTextPartConfiguration,
 			ReportRegistryItemID reportRegistryItemID, ObjectID linkedObjectID, 
@@ -352,7 +371,12 @@ public class ReportTextPartConfiguration implements Serializable {
 		ReportTextPartConfiguration result = new ReportTextPartConfiguration(
 				reportTextPartConfiguration.getOrganisationID(), 
 				IDGenerator.nextID(ReportTextPartConfiguration.class));
+		
 		result.setSynthetic(true);
+		if (reportTextPartConfiguration.getReportRegistryItem() != null) {
+			result.setSynthesizeTemplateReportRegistryItemID(
+					(ReportRegistryItemID) JDOHelper.getObjectId(reportTextPartConfiguration.getReportRegistryItem()));
+		}
 		Set<String> oldFetchGroups = pm.getFetchPlan().getGroups();
 		int oldFetchDepth = pm.getFetchPlan().getMaxFetchDepth();
 		try {
@@ -567,4 +591,45 @@ public class ReportTextPartConfiguration implements Serializable {
 		return getReportTextPartConfiguration(pm, nextSearchReportRegistryItem);
 	}
 	
+	/**
+	 * Searches for a {@link ReportTextPartConfiguration} linked to the given
+	 * {@link ReportRegistryItem} or one of its parent {@link ReportCategory}s.
+	 * <p>
+	 * Additionally this method can be used to get a synthetic, new {@link ReportTextPartConfiguration}
+	 * linked to the given {@link ReportRegistryItem}. A synthetic {@link ReportTextPartConfiguration} will have the
+	 * values of that one found when searching for a parent category. The synthetic configuration 
+	 * will not be persisted and the parts of it referencing existing/persisted objects will be detached.
+	 * </p>
+	 * 
+	 * @param pm 
+	 * 			The {@link PersistenceManager} to use.
+	 * @param reportRegistryItem 
+	 * 			The {@link ReportRegistryItem} to search a configuration for.
+	 * @param synthesize 
+	 * 			Whether to synthesize a new {@link ReportTextPartConfiguration} when none directly linked to the
+	 * 			given reportRegistryItem was found but one was found linked to parent category.
+	 * @param fetchGroups
+	 * 			The fetch-groups used - when synthesizing a new configuration - to detach those parts of the
+	 * 			the found configuration that reference already persisted object.                             
+	 * @param maxFetchDepth
+	 * 			The maximum fetch-depth used - when synthesizing a new configuration - to detach those parts of the
+	 * 			the found configuration that reference already persisted object.                             
+	 * @return 
+	 * 			The {@link ReportTextPartConfiguration} registered to the given item or one of its parents,
+	 * 			or <code>null</code> if none could be found.
+	 */
+	public static ReportTextPartConfiguration getReportTextPartConfiguration(
+			PersistenceManager pm, ReportRegistryItem reportRegistryItem, 
+			boolean synthesize, String[] fetchGroups, int maxFetchDepth) {
+		
+		ReportTextPartConfiguration config = getReportTextPartConfiguration(pm, reportRegistryItem);
+		if (config == null)
+			return null;
+		if (!reportRegistryItem.equals(config.getReportRegistryItem()) && synthesize) {
+			// have to synthesize a new one
+			ReportRegistryItemID reportRegistryItemID = (ReportRegistryItemID) JDOHelper.getObjectId(reportRegistryItem);
+			config = synthesizeReportTextPartConfiguration(pm, config, reportRegistryItemID, null, fetchGroups, maxFetchDepth);
+		}
+		return config;
+	}
 }

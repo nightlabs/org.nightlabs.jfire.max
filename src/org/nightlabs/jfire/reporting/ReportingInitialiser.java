@@ -971,7 +971,7 @@ public class ReportingInitialiser {
 		logger.debug("Parsed ReportTextConfiguration file " + targetConfigurationFile);
 
 		// Lookup/Create the configuration object
-		ReportTextPartConfiguration configuration = ReportTextPartConfiguration.getReportTextPartConfiguration(pm, reportRegistryItem);
+		ReportTextPartConfiguration configuration = ReportTextPartConfiguration.getReportTextPartConfigurationByReportRegistryItem(pm, reportRegistryItem);
 		boolean needsPersisting = false;
 		if (configuration == null) {
 			needsPersisting = true;

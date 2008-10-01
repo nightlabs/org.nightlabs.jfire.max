@@ -90,6 +90,23 @@ public class ReportTextPartConfigurationDAO extends BaseJDOObjectDAO<ReportTextP
 		return result;
 	}
 	
+	public ReportTextPartConfiguration getReportTextPartConfiguration(
+			ReportRegistryItemID reportRegistryItemID, 
+			boolean synthesize, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) {
+		monitor.beginTask("Loading ReportTextPartConfiguration", 2);
+		ReportTextPartManager rtpm = getReportTextPartManager();
+		monitor.worked(1);
+		ReportTextPartConfiguration result = null;
+		try {
+			result = rtpm.getReportTextPartConfiguration(
+					reportRegistryItemID, synthesize, fetchGroups, maxFetchDepth);
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
+		monitor.done();
+		return result;
+	}
+	
 	/**
 	 * This method stores the given {@link ReportTextPartConfiguration} if it is 
 	 * a configuration linked to an object in the datastore.

@@ -98,6 +98,37 @@ implements SessionBean
 	 * @ejb.permission role-name="org.nightlabs.jfire.reporting.editReport"
 	 * @ejb.transaction type="Supports"
 	 */
+	public ReportTextPartConfiguration getReportTextPartConfiguration(
+			ReportRegistryItemID reportRegistryItemID,
+			boolean synthesize, String[] fetchGroups, int maxFetchDepth) {
+		PersistenceManager pm;
+		pm = getPersistenceManager();
+		try {
+			ReportRegistryItem reportRegistryItem = (ReportRegistryItem) pm.getObjectById(reportRegistryItemID);
+			ReportTextPartConfiguration configuration = ReportTextPartConfiguration.getReportTextPartConfiguration(
+					pm, reportRegistryItem, synthesize, fetchGroups, maxFetchDepth);
+			if (JDOHelper.getPersistenceManager(configuration) != null) {
+				// TODO: How to check better if the config is attached? JDOHelper.isPersistent() ?!?
+				pm.getFetchPlan().setGroups(fetchGroups);
+				pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+				return pm.detachCopy(configuration);
+			} else if (configuration.isSynthetic())
+				return configuration;
+			else
+				throw new IllegalStateException("ReportTextPartConfiguration.getReportTextPartConfiguration() returned not-attached and not-synthesized ReportTextPartConfiguration");
+		} finally {
+			pm.close();
+		}
+	}
+
+	/**
+	 * This method returns the id of the {@link ReportTextPartConfiguration} linked to 
+	 * the {@link ReportRegistryItem} referenced by the given reportRegistryItemID.
+	 * 
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="org.nightlabs.jfire.reporting.editReport"
+	 * @ejb.transaction type="Supports"
+	 */
 	public ReportTextPartConfigurationID getReportTextPartConfigurationID(ReportRegistryItemID reportRegistryItemID) {
 		PersistenceManager pm;
 		pm = getPersistenceManager();

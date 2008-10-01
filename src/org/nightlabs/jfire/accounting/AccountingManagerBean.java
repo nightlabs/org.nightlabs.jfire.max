@@ -127,6 +127,7 @@ import org.nightlabs.jfire.trade.jbpm.ProcessDefinitionAssignment;
 import org.nightlabs.jfire.trade.query.InvoiceQuery;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 import org.nightlabs.jfire.transfer.id.TransferID;
+import org.nightlabs.util.CollectionUtil;
 
 /**
  * @author Alexander Bieber - alex[AT]nightlabs[DOT]de
@@ -1049,22 +1050,14 @@ public abstract class AccountingManagerBean
 	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	@SuppressWarnings("unchecked")
 	public Collection<PriceFragmentTypeID> getPriceFragmentTypeIDs()
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			Query q = pm.newQuery(PriceFragmentType.class);
 			q.setResult("JDOHelper.getObjectId(this)");
-			return (Collection<PriceFragmentTypeID>)q.execute();
-
-//			Collection pTypes = (Collection)q.execute();
-//			Collection<Object> result = new LinkedList<Object>();
-//			for (Iterator iter = pTypes.iterator(); iter.hasNext();) {
-//				PriceFragmentType pType = (PriceFragmentType) iter.next();
-//				result.add(JDOHelper.getObjectId(pType));
-//			}
-//			return result;
+			Collection<PriceFragmentTypeID> c = CollectionUtil.castCollection((Collection<?>)q.execute());
+			return new HashSet<PriceFragmentTypeID>(c);
 		} finally {
 			pm.close();
 		}

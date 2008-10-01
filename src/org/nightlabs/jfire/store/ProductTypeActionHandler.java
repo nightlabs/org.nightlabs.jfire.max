@@ -1240,12 +1240,7 @@ public abstract class ProductTypeActionHandler
 
 				PersistenceManager pm = getPersistenceManager();
 				try {
-					// TODO this should be DataNucleus-independent!
-					// If it is not making it into the JDO standard, we need to write our own
-					// JDO-implementation-independent API!
-					((org.datanucleus.jdo.JDOTransaction)pm.currentTransaction()).setOption(
-							"transaction.serializeReadObjects", Boolean.TRUE
-					);
+					NLJDOHelper.setTransactionSerializeReadObjects(pm, true);
 
 					List<ProductType> productTypes = NLJDOHelper.getObjectList(pm, productTypeIDs, ProductType.class);
 					ProductTypePermissionFlagSet.updateFlags(pm, productTypes);

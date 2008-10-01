@@ -14,6 +14,7 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
 import org.apache.log4j.Logger;
+import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.asyncinvoke.AsyncInvoke;
 import org.nightlabs.jfire.asyncinvoke.Invocation;
 import org.nightlabs.jfire.organisation.Organisation;
@@ -322,12 +323,7 @@ extends SecurityChangeListener
 
 				PersistenceManager pm = getPersistenceManager();
 				try {
-					// TODO this should be DataNucleus-independent!
-					// If it is not making it into the JDO standard, we need to write our own
-					// JDO-implementation-independent API!
-					((org.datanucleus.jdo.JDOTransaction)pm.currentTransaction()).setOption(
-							"transaction.serializeReadObjects", Boolean.TRUE
-					);
+					NLJDOHelper.setTransactionSerializeReadObjects(pm, true);
 
 					Set<UserLocalID> userLocalIDs = new HashSet<UserLocalID>(
 							// prevent exception when max expected size has an overflow (theoretical max: 3 * Integer.MAX_VALUE) and becomes negative

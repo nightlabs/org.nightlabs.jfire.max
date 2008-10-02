@@ -1,6 +1,8 @@
 package org.nightlabs.jfire.issue.query;
 
 import java.util.Date;
+import java.util.Iterator;
+import java.util.Set;
 
 import javax.jdo.Query;
 
@@ -61,7 +63,7 @@ public class IssueQuery
 //	private Set<IssueLink> issueLinks;
 	private Date issueWorkTimeRangeFrom;
 	private Date issueWorkTimeRangeTo;
-	private ProjectID projectID;
+	private Set<ProjectID> projectIDs;
 
 	public static final class FieldName
 	{
@@ -82,7 +84,7 @@ public class IssueQuery
 		public static final String issueLinkTypeID = "issueLinkTypeID";
 		public static final String issueWorkTimeRangeFrom = "issueWorkTimeRangeFrom";
 		public static final String issueWorkTimeRangeTo = "issueWorkTimeRangeTo";
-		public static final String projectID = "projectID";
+		public static final String projectIDs = "projectIDs";
 	}
 
 	@Override
@@ -172,9 +174,24 @@ public class IssueQuery
 			filter.append("\n || (this.issueWorkTimeRanges.contains(varIssueWorkTimeRange) && !((varIssueWorkTimeRange.to <= :issueWorkTimeRangeFrom) && (varIssueWorkTimeRange.from < :issueWorkTimeRangeFrom))) ");
 		}
 		
-		if (isFieldEnabled(FieldName.projectID) && projectID != null) {
-			filter.append("\n && this.project.organisationID == :projectID.organisationID ");
-			filter.append("\n && this.project.projectID == :projectID.projectID ");
+		if (isFieldEnabled(FieldName.projectIDs) && projectIDs != null && projectIDs.size() > 0) {
+			int i = 0;
+			for ( Iterator<ProjectID> it = projectIDs.iterator(); it.hasNext(); i++) {
+				ProjectID pid = it.next();
+				if (i == 0) {
+					filter.append("\n && this.project.organisationID == \"" + pid.organisationID + "\" && (");
+				}
+				
+				filter.append("this.project.projectID == " + pid.projectID);
+				
+				if (i != projectIDs.size() - 1) {
+					filter.append(" || ");
+				}
+				else {
+					filter.append(")");
+				}
+			}
+			logger.info(filter);
 		}
 		// FIXME: chairat please rewrite this part as soon as you have refactored the linkage of objects to Issues. (marius)
 //		if (issueLinks != null && !issueLinks.isEmpty())
@@ -468,15 +485,15 @@ public class IssueQuery
 		notifyListeners(FieldName.updateTimestamp, oldUpdateTimestamp, updateTimestamp);
 	}
 	
-	public ProjectID getProjectID() {
-		return projectID;
+	public Set<ProjectID> getProjectIDs() {
+		return projectIDs;
 	}
 
-	public void setProjectID(ProjectID projectID)
+	public void setProjectIDs(Set<ProjectID> projectIDs)
 	{
-		final ProjectID oldProjectID = this.projectID;
-		this.projectID = projectID;
-		notifyListeners(FieldName.projectID, oldProjectID, projectID);
+		final Set<ProjectID> oldProjectIDs = this.projectIDs;
+		this.projectIDs = projectIDs;
+		notifyListeners(FieldName.projectIDs, oldProjectIDs, projectIDs);
 	}
 	
 	@Override

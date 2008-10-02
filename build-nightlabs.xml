@@ -1,6 +1,6 @@
 <!--
   Generic j2ee and webapp (jboss/tomcat/jpox/xdoclet) ant build file 
-  Version: 2008-07-28
+  Version: 2008-10-01
   Author: marc [at] nightlabs [dot] de
   Author: marco [at] nightlabs [dot] de
   Author: tobias [at] nightlabs [dot] de
@@ -176,6 +176,7 @@
   	<echo>project.path: ${project.path}</echo>
   	<echo>project.path.includes: ${project.path.includes}</echo>
   	<echo>project.path.dirincludes: ${project.path.dirincludes}</echo>
+  	<echo>xdoclet.path: ${xdoclet.path}</echo>
 	<echo>javac.debug: ${javac.debug}</echo>
 	<echo>javac.source: ${javac.source}</echo>
 	<echo>javac.target: ${javac.target}</echo>
@@ -575,12 +576,18 @@
     <target name="xdoclet.impl">
         <path id="xdoclet.classpath">
           <pathelement location="${project.dir}/${bin.dir}" />
+          <!-- TODO: these entries may be removed later when latest sdk and xdoclet plugin 
+               are available everywhere and the nightly build provides a correct
+               xdoclet.path property. (marc) -->
           <fileset dir="${eclipse.sdk}/plugins">
             <include name="**/ant.jar"/>
             <include name="**/sf.net.xdoclet*/*.jar"/>
             <include name="**/org.apache.log4j*/**/*.jar"/>
             <include name="**/org.apache.commons*/**/*.jar"/>
           </fileset>
+          <!-- replaced by this: -->
+          <!-- append xdoclet classpath -->
+          <pathelement path="${xdoclet.path}" />
           <!-- append the external classpath lastly -->
           <pathelement path="${java.class.path}" />
           <!-- append the path sent through eclipse to classpath -->
@@ -597,6 +604,8 @@
 	<!-- run jpox enhancer -->
   <target name="jpoxenhance.impl">
     <path id="jpoxenhancer.classpath">
+      <!-- TODO: the enhancer classpath should not be part of the project path,
+           but provided by the build system just as with xdoclet. (marc) -->
       <pathelement path="${project.dir}/${bin.dir}"/>
       <pathelement path="${project.dir}/${ejbsrc.dir}"/>
       <pathelement path="${project.path}" />

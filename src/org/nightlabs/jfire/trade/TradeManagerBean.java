@@ -380,7 +380,7 @@ implements SessionBean
 		try {
 			pm.getExtent(Order.class);
 			Order order = (Order) pm.getObjectById(orderID);
-			List<SegmentType> segmentTypes = NLJDOHelper.getObjectList(pm, segmentTypeIDs, SegmentType.class, false);
+			List<SegmentType> segmentTypes = NLJDOHelper.getObjectList(pm, segmentTypeIDs, SegmentType.class);
 			Collection<Segment> segments = Trader.getTrader(pm).createSegments(order, segmentTypes);
 
 			pm.getFetchPlan().setMaxFetchDepth(NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
@@ -443,7 +443,7 @@ implements SessionBean
 				order.setCustomerGroup(customerGroup);
 
 			if (segmentTypeIDs != null) {
-				List<SegmentType> segmentTypes = NLJDOHelper.getObjectList(pm, segmentTypeIDs, SegmentType.class, false);
+				List<SegmentType> segmentTypes = NLJDOHelper.getObjectList(pm, segmentTypeIDs, SegmentType.class);
 				Trader.getTrader(pm).createSegments(order, segmentTypes);
 			}
 

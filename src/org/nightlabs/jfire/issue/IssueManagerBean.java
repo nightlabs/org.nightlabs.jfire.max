@@ -484,6 +484,9 @@ implements SessionBean
 			boolean isNewIssue = !JDOHelper.isDetached(issue);
 
 			if (isNewIssue) {
+				if (issue.getProject() == null) {
+					issue.setProject((Project)pm.getObjectById(Project.PROJECT_ID_DEFAULT));
+				}
 				pIssue = pm.makePersistent(issue);
 
 				IssueType type;

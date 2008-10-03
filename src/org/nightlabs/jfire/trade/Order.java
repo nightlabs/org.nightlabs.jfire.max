@@ -792,7 +792,7 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 
 	public void removeArticle(Article article)
 	{
-		articles.remove(article.getPrimaryKey());
+		articles.remove(article);
 		articleCount = articles.size();
 	}
 

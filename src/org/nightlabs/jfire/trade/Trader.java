@@ -1688,12 +1688,13 @@ public class Trader
 	 * @param articles
 	 *          Instances of {@link Article}.
 	 */
-	public void deleteArticles(User user, Collection articles)
+	public void deleteArticles(User user, Collection<? extends Article> articles)
 			throws ModuleException
 	{
-		for (Iterator it = articles.iterator(); it.hasNext();) {
-			Article article = (Article) it.next();
+		for (Article article : articles) {
+			Order order = article.getOrder();
 			Offer offer = article.getOffer();
+			order.removeArticle(article);
 			offer.removeArticle(article);
 		}
 	}

@@ -10,17 +10,17 @@ import org.nightlabs.i18n.I18nText;
  *
  * @jdo.persistence-capable
  *		identity-type="application"
- *		objectid-class="org.nightlabs.jfire.issue.project.id.ProjectTypeNameID"
+ *		objectid-class="org.nightlabs.jfire.issue.project.id.ProjectPhaseNameID"
  *		detachable="true"
- *		table="JFireIssueTracking_ProjectTypeName"
+ *		table="JFireIssueTracking_ProjectPhaseName"
  *
  * @jdo.inheritance strategy="new-table"
  *
- * @jdo.create-objectid-class field-order="organisationID, projectTypeID"
+ * @jdo.create-objectid-class field-order="organisationID, projectPhaseID"
  * 
- * @jdo.fetch-group name="ProjectTypeName.name" fetch-groups="default" fields="projectType, names"
+ * @jdo.fetch-group name="ProjectPhaseName.name" fetch-groups="default" fields="projectPhase, names"
  */ 
-public class ProjectTypeName 
+public class ProjectPhaseName 
 extends I18nText{
 	/**
 	 * The serial version of this class.
@@ -37,12 +37,12 @@ extends I18nText{
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
-	private String projectTypeID;
+	private String projectPhaseID;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
-	private ProjectType projectType;
+	private ProjectPhase projectPhase;
 
 	/**
 	 * key: String languageID<br/>
@@ -54,7 +54,7 @@ extends I18nText{
 	 *		key-type="java.lang.String"
 	 *		default-fetch-group="true"
 	 *		value-type="java.lang.String"
-	 *		table="JFireIssueTracking_ProjectTypeName_names"
+	 *		table="JFireIssueTracking_ProjectPhaseName_names"
 	 *		null-value="exception"
 	 *
 	 * @jdo.join
@@ -64,15 +64,15 @@ extends I18nText{
 	/**
 	 * @deprecated Only for JDO!
 	 */
-	protected ProjectTypeName()
+	protected ProjectPhaseName()
 	{
 	}
 
-	public ProjectTypeName(ProjectType projectType)
+	public ProjectPhaseName(ProjectPhase projectPhase)
 	{
-		this.projectType = projectType;
-		this.organisationID = projectType.getOrganisationID();
-		projectTypeID = projectType.getProjectTypeID();
+		this.projectPhase = projectPhase;
+		this.organisationID = projectPhase.getOrganisationID();
+		projectPhaseID = projectPhase.getProjectPhaseID();
 	}
 
 	/**
@@ -87,19 +87,15 @@ extends I18nText{
 		return organisationID;
 	}
 	
-	public ProjectType getProjectType() {
-		return projectType;
+	public ProjectPhase getProjectPhase() {
+		return projectPhase;
 	}
 	
-	public String getProjectID() {
-		return projectTypeID;
-	}
-
 	/**
 	 * @see org.nightlabs.i18n.I18nText#getFallBackValue(java.lang.String)
 	 */
 	protected String getFallBackValue(String languageID)
 	{
-		return projectTypeID == null ? languageID : projectTypeID;
+		return projectPhaseID == null ? languageID : projectPhaseID;
 	}
 }

@@ -102,47 +102,50 @@ extends NotificationReceiver
 		Store store = Store.getStore(pm);
 		User user = SecurityReflector.getUserDescriptor().getUser(pm);
 
-		NLJDOHelper.setTransactionSerializeReadObjects(pm, true);
+		NLJDOHelper.enableTransactionSerializeReadObjects(pm);
+		try {
 
-		int previousProductTypesSize = productTypes.size();
-		while (!productTypes.isEmpty()) {
-			for (Iterator<SimpleProductType> itPT = productTypes.iterator(); itPT.hasNext(); ) {
-				SimpleProductType simpleProductType = itPT.next();
+			int previousProductTypesSize = productTypes.size();
+			while (!productTypes.isEmpty()) {
+				for (Iterator<SimpleProductType> itPT = productTypes.iterator(); itPT.hasNext(); ) {
+					SimpleProductType simpleProductType = itPT.next();
 
-				if (simpleProductType.getExtendedProductType() == null || NLJDOHelper.exists(pm, simpleProductType.getExtendedProductType())) {
-					if (simpleProductType.getPackagePriceConfig() != null)
-						priceConfigIDs.add((PriceConfigID) JDOHelper.getObjectId(simpleProductType.getPackagePriceConfig()));
+					if (simpleProductType.getExtendedProductType() == null || NLJDOHelper.exists(pm, simpleProductType.getExtendedProductType())) {
+						if (simpleProductType.getPackagePriceConfig() != null)
+							priceConfigIDs.add((PriceConfigID) JDOHelper.getObjectId(simpleProductType.getPackagePriceConfig()));
 
-					try {
+						try {
 
-						NLJDOHelper.makeDirtyAllFieldsRecursively(simpleProductType);
+							NLJDOHelper.makeDirtyAllFieldsRecursively(simpleProductType);
 
-						if (NLJDOHelper.exists(pm, simpleProductType))
-							simpleProductType = pm.makePersistent(simpleProductType);
-						else {
-							simpleProductType = (SimpleProductType) store.addProductType(
-									user,
-									simpleProductType);
+							if (NLJDOHelper.exists(pm, simpleProductType))
+								simpleProductType = pm.makePersistent(simpleProductType);
+							else {
+								simpleProductType = (SimpleProductType) store.addProductType(
+										user,
+										simpleProductType);
+							}
+
+							if (simpleProductType.getName() == null)
+								throw new IllegalStateException("simpleProductType.getName() == null after replication!");
+						} catch (Exception x) {
+							logger.error("Adding SimpleProductType \"" + simpleProductType.getPrimaryKey() + "\" to Store failed!", x);
+							throw x instanceof RuntimeException ? (RuntimeException)x : new RuntimeException(x);
 						}
 
-						if (simpleProductType.getName() == null)
-							throw new IllegalStateException("simpleProductType.getName() == null after replication!");
-					} catch (Exception x) {
-						logger.error("Adding SimpleProductType \"" + simpleProductType.getPrimaryKey() + "\" to Store failed!", x);
-						throw x instanceof RuntimeException ? (RuntimeException)x : new RuntimeException(x);
+						itPT.remove();
 					}
-
-					itPT.remove();
 				}
+
+				if (previousProductTypesSize == productTypes.size())
+					break;
+
+				previousProductTypesSize = productTypes.size();
 			}
 
-			if (previousProductTypesSize == productTypes.size())
-				break;
-
-			previousProductTypesSize = productTypes.size();
+		} finally {
+			NLJDOHelper.disableTransactionSerializeReadObjects(pm);
 		}
-
-		NLJDOHelper.setTransactionSerializeReadObjects(pm, false);
 
 		if (!priceConfigIDs.isEmpty())
 			GridPriceConfigUtil.assertConsistency(pm, priceConfigIDs);

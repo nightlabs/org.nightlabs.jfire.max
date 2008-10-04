@@ -1163,8 +1163,31 @@ public class Trader
 	}
 
 	protected void releaseArticlesBegin(User user, Collection<Article> articles)
-			throws ModuleException
+	throws ModuleException
 	{
+		if (logger.isDebugEnabled()) {
+			logger.debug("releaseArticlesBegin: entered with " + articles.size() + " articles.");
+			if (logger.isTraceEnabled()) {
+				for (Article article : articles)
+					logger.trace("releaseArticlesBegin: * " + article);
+			}
+		}
+
+		PersistenceManager pm = getPersistenceManager();
+		NLJDOHelper.enableTransactionSerializeReadObjects(pm);
+		try {
+			pm.refreshAll(articles);
+			for (Article article : articles) {
+				pm.refresh(article.getProduct().getProductLocal());
+			}
+		} finally {
+			NLJDOHelper.disableTransactionSerializeReadObjects(pm);
+		}
+
+		if (logger.isTraceEnabled()) {
+			logger.trace("releaseArticlesBegin: refreshing articles done.");
+		}
+
 		TotalArticleStatus tas = getTotalArticleStatus(articles);
 
 		if (!tas.allocated || tas.releasePending)
@@ -1178,9 +1201,9 @@ public class Trader
 
 		Map<ProductTypeActionHandler, List<Article>> productTypeActionHandler2Articles = new HashMap<ProductTypeActionHandler, List<Article>>();
 
-		JbpmContext jbpmContext = JbpmLookup.getJbpmConfiguration().createJbpmContext();
-		try {
-			Map<Offer, ProcessInstance> offer2ProcessInstance = new HashMap<Offer, ProcessInstance>();
+//		JbpmContext jbpmContext = JbpmLookup.getJbpmConfiguration().createJbpmContext();
+//		try {
+//			Map<Offer, ProcessInstance> offer2ProcessInstance = new HashMap<Offer, ProcessInstance>();
 
 			for (Article article : articles) {
 				if (article.isReversing()) {
@@ -1213,11 +1236,11 @@ public class Trader
 					// check, whether the article is finalized
 					if (article.getOffer().isFinalized()) {
 						// it is finalized, so we only allow to release, if the offer's workflow has ended in a non-successful way (abort, reject, revoke etc.)
-						ProcessInstance processInstance = offer2ProcessInstance.get(article.getOffer());
-						if (processInstance == null) {
-							processInstance = jbpmContext.getProcessInstance(article.getOffer().getOfferLocal().getJbpmProcessInstanceId());
-							offer2ProcessInstance.put(article.getOffer(), processInstance);
-						}
+//						ProcessInstance processInstance = offer2ProcessInstance.get(article.getOffer());
+//						if (processInstance == null) {
+//							processInstance = jbpmContext.getProcessInstance(article.getOffer().getOfferLocal().getJbpmProcessInstanceId());
+//							offer2ProcessInstance.put(article.getOffer(), processInstance);
+//						}
 
 //						if (!(processInstance.getRootToken().getNode() instanceof EndState)) // currently finishing
 						State state = article.getOffer().getOfferLocal().getState();
@@ -1234,7 +1257,8 @@ public class Trader
 				product.getProductLocal().setReleasePending(true);
 
 				ProductTypeActionHandler productTypeActionHandler = ProductTypeActionHandler.getProductTypeActionHandler(
-						getPersistenceManager(), article.getProductType().getClass());
+						pm, article.getProductType().getClass()
+				);
 				List<Article> al = productTypeActionHandler2Articles.get(productTypeActionHandler);
 				if (al == null) {
 					al = new LinkedList<Article>();
@@ -1243,18 +1267,53 @@ public class Trader
 				al.add(article);
 			}
 
-		} finally {
-			jbpmContext.close();
+//		} finally {
+//			jbpmContext.close();
+//		}
+
+		if (logger.isTraceEnabled()) {
+			logger.trace("releaseArticlesBegin: about to notify " + productTypeActionHandler2Articles.size() + " ProductTypeActionHandlers.");
 		}
 
 		for (Map.Entry<ProductTypeActionHandler, List<Article>> me : productTypeActionHandler2Articles.entrySet()) {
 			me.getKey().onReleaseArticlesBegin(user, this, me.getValue());
 		}
+
+		if (logger.isTraceEnabled()) {
+			logger.trace("releaseArticlesBegin: exit.");
+		}
 	}
 
 	protected void releaseArticlesEnd(User user, Collection<Article> articles, boolean deleteAfterRelease)
-			throws ModuleException
+	throws ModuleException
 	{
+		if (logger.isDebugEnabled()) {
+			logger.debug("releaseArticlesEnd: entered with " + articles.size() + " articles.");
+			if (logger.isTraceEnabled()) {
+				for (Article article : articles)
+					logger.trace("releaseArticlesEnd: * " + article);
+			}
+		}
+
+		PersistenceManager pm = getPersistenceManager();
+		NLJDOHelper.enableTransactionSerializeReadObjects(pm);
+		try {
+			pm.refreshAll(articles);
+			for (Article article : articles) {
+				pm.refresh(article.getProduct().getProductLocal());
+			}
+		} finally {
+			NLJDOHelper.disableTransactionSerializeReadObjects(pm);
+		}
+
+		if (logger.isTraceEnabled()) {
+			logger.trace("releaseArticlesEnd: refreshing articles done.");
+//			if (logger.isTraceEnabled()) {
+				for (Article article : articles)
+					logger.trace("releaseArticlesEnd: * " + article);
+//			}
+		}
+
 		TotalArticleStatus tas = getTotalArticleStatus(articles);
 
 		if (!tas.allocated)
@@ -1264,7 +1323,7 @@ public class Trader
 			throw new IllegalArgumentException("Articles "
 					+ getToStringList(articles) + " are NOT in state releasePending!");
 
-		ProductTypeActionHandlerCache productTypeActionHandlerCache = new ProductTypeActionHandlerCache(getPersistenceManager());
+		ProductTypeActionHandlerCache productTypeActionHandlerCache = new ProductTypeActionHandlerCache(pm);
 
 		Map<ProductTypeActionHandler, List<Article>> productTypeActionHandler2Articles = new HashMap<ProductTypeActionHandler, List<Article>>();
 		for (Article article : articles) {
@@ -1294,12 +1353,23 @@ public class Trader
 			// re-allocate
 		}
 
+		if (logger.isTraceEnabled()) {
+			logger.trace("releaseArticlesEnd: about to notify " + productTypeActionHandler2Articles.size() + " ProductTypeActionHandlers.");
+		}
+
 		for (Map.Entry<ProductTypeActionHandler, List<Article>> me : productTypeActionHandler2Articles.entrySet()) {
 			me.getKey().onReleaseArticlesEnd(user, this, me.getValue());
 		}
 
 		if (deleteAfterRelease) {
 			deleteArticles(user, articles);
+		}
+
+		if (logger.isTraceEnabled()) {
+			logger.trace("releaseArticlesEnd: exit.");
+
+			for (Article article : articles)
+				logger.trace("releaseArticlesEnd: * " + article);
 		}
 	}
 
@@ -1391,6 +1461,30 @@ public class Trader
 	protected void allocateArticlesBegin(User user, Collection<? extends Article> articles)
 			throws ModuleException
 	{
+		if (logger.isDebugEnabled()) {
+			logger.debug("allocateArticlesBegin: entered with " + articles.size() + " articles.");
+			if (logger.isTraceEnabled()) {
+				for (Article article : articles)
+					logger.trace("allocateArticlesBegin: * " + article);
+			}
+		}
+
+		PersistenceManager pm = getPersistenceManager();
+		pm.flush(); // the refreshAll sometimes fails, because it seems the articles have not yet been written to the datastore (in situations in which they are freshly created)
+		NLJDOHelper.enableTransactionSerializeReadObjects(pm);
+		try {
+			pm.refreshAll(articles);
+			for (Article article : articles) {
+				pm.refresh(article.getProduct().getProductLocal());
+			}
+		} finally {
+			NLJDOHelper.disableTransactionSerializeReadObjects(pm);
+		}
+
+		if (logger.isTraceEnabled()) {
+			logger.trace("allocateArticlesBegin: refreshing articles done.");
+		}
+
 		// If all articles are currently allocated or the allocation is pending, we
 		// silently return.
 		// If the status is different between them, we throw an
@@ -1414,7 +1508,7 @@ public class Trader
 
 			productTypeClass2ProductTypeActionHandler.put(
 					ptClazz,
-					ProductTypeActionHandler.getProductTypeActionHandler(getPersistenceManager(), ptClazz)
+					ProductTypeActionHandler.getProductTypeActionHandler(pm, ptClazz)
 			);
 		}
 
@@ -1474,9 +1568,18 @@ public class Trader
 			}
 			al.add(article);
 		}
+
+		if (logger.isTraceEnabled()) {
+			logger.trace("allocateArticlesBegin: about to notify " + productTypeActionHandler2Articles.size() + " ProductTypeActionHandlers.");
+		}
+
 //		getPersistenceManager().flush(); // TODO is this necessary? JPOX Bug
 		for (Map.Entry<ProductTypeActionHandler, List<Article>> me : productTypeActionHandler2Articles.entrySet()) {
 			(me.getKey()).onAllocateArticlesBegin(user, this, me.getValue());
+		}
+
+		if (logger.isTraceEnabled()) {
+			logger.trace("allocateArticlesBegin: exit.");
 		}
 	}
 
@@ -1498,6 +1601,29 @@ public class Trader
 	protected void allocateArticlesEnd(User user, Collection<? extends Article> articles)
 			throws ModuleException
 	{
+		if (logger.isDebugEnabled()) {
+			logger.debug("allocateArticlesEnd: entered with " + articles.size() + " articles.");
+			if (logger.isTraceEnabled()) {
+				for (Article article : articles)
+					logger.trace("allocateArticlesEnd: * " + article);
+			}
+		}
+
+		PersistenceManager pm = getPersistenceManager();
+		NLJDOHelper.enableTransactionSerializeReadObjects(pm);
+		try {
+			pm.refreshAll(articles);
+			for (Article article : articles) {
+				pm.refresh(article.getProduct().getProductLocal());
+			}
+		} finally {
+			NLJDOHelper.disableTransactionSerializeReadObjects(pm);
+		}
+
+		if (logger.isTraceEnabled()) {
+			logger.trace("allocateArticlesEnd: refreshing articles done.");
+		}
+
 		TotalArticleStatus tas = getTotalArticleStatus(articles);
 		if (tas.allocated)
 			return;
@@ -1506,7 +1632,7 @@ public class Trader
 			throw new IllegalArgumentException("Articles "
 					+ getToStringList(articles) + " are NOT in state allocationPending!");
 
-		ProductTypeActionHandlerCache productTypeActionHandlerCache = new ProductTypeActionHandlerCache(getPersistenceManager());
+		ProductTypeActionHandlerCache productTypeActionHandlerCache = new ProductTypeActionHandlerCache(pm);
 
 		Map<ProductTypeActionHandler, List<Article>> productTypeActionHandler2Articles = new HashMap<ProductTypeActionHandler, List<Article>>();
 		for (Article article : articles) {
@@ -1532,8 +1658,16 @@ public class Trader
 			al.add(article);
 		}
 
+		if (logger.isTraceEnabled()) {
+			logger.trace("allocateArticlesEnd: about to notify " + productTypeActionHandler2Articles.size() + " ProductTypeActionHandlers.");
+		}
+
 		for (Map.Entry<ProductTypeActionHandler, List<Article>> me : productTypeActionHandler2Articles.entrySet()) {
 			(me.getKey()).onAllocateArticlesEnd(user, this, me.getValue());
+		}
+
+		if (logger.isTraceEnabled()) {
+			logger.trace("allocateArticlesEnd: exit.");
 		}
 	}
 
@@ -1691,10 +1825,16 @@ public class Trader
 	public void deleteArticles(User user, Collection<? extends Article> articles)
 			throws ModuleException
 	{
+		if (logger.isDebugEnabled()) {
+			logger.debug("deleteArticles: entered with " + articles.size() + " articles.");
+			if (logger.isTraceEnabled()) {
+				for (Article article : articles)
+					logger.trace("deleteArticles: * " + article);
+			}
+		}
+
 		for (Article article : articles) {
-			Order order = article.getOrder();
 			Offer offer = article.getOffer();
-			order.removeArticle(article);
 			offer.removeArticle(article);
 		}
 	}

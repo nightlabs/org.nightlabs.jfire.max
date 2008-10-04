@@ -323,68 +323,72 @@ extends SecurityChangeListener
 
 				PersistenceManager pm = getPersistenceManager();
 				try {
-					NLJDOHelper.setTransactionSerializeReadObjects(pm, true);
+					NLJDOHelper.enableTransactionSerializeReadObjects(pm);
+					try {
 
-					Set<UserLocalID> userLocalIDs = new HashSet<UserLocalID>(
-							// prevent exception when max expected size has an overflow (theoretical max: 3 * Integer.MAX_VALUE) and becomes negative
-							Math.max(
-									10,
-									seeProductTypeGrantChanged.size() + sellProductTypeGrantChanged.size() + reverseProductTypeGrantChanged.size()
-							)
-					);
-					userLocalIDs.addAll(seeProductTypeGrantChanged.keySet());
-					userLocalIDs.addAll(sellProductTypeGrantChanged.keySet());
-					userLocalIDs.addAll(reverseProductTypeGrantChanged.keySet());
+						Set<UserLocalID> userLocalIDs = new HashSet<UserLocalID>(
+								// prevent exception when max expected size has an overflow (theoretical max: 3 * Integer.MAX_VALUE) and becomes negative
+								Math.max(
+										10,
+										seeProductTypeGrantChanged.size() + sellProductTypeGrantChanged.size() + reverseProductTypeGrantChanged.size()
+								)
+						);
+						userLocalIDs.addAll(seeProductTypeGrantChanged.keySet());
+						userLocalIDs.addAll(sellProductTypeGrantChanged.keySet());
+						userLocalIDs.addAll(reverseProductTypeGrantChanged.keySet());
 
-					Map<UserLocalID, Set<ProductType>> userLocalID2productTypes_see = new HashMap<UserLocalID, Set<ProductType>>();
-					Map<UserLocalID, Set<ProductType>> userLocalID2productTypes_sellReverse = new HashMap<UserLocalID, Set<ProductType>>();
+						Map<UserLocalID, Set<ProductType>> userLocalID2productTypes_see = new HashMap<UserLocalID, Set<ProductType>>();
+						Map<UserLocalID, Set<ProductType>> userLocalID2productTypes_sellReverse = new HashMap<UserLocalID, Set<ProductType>>();
 
-					for (UserLocalID userLocalID : userLocalIDs) {
-						UserID userID = UserID.create(userLocalID);
-						Collection<ProductType> productTypes = ProductTypePermissionFlagSet.getProductTypesMissingProductTypePermissionFlagSet(pm, userID);
-						if (logger.isDebugEnabled()) {
-							logger.debug("productTypesMissingProductTypePermissionFlagSet.size=" + productTypes.size());
-							for (ProductType productType : productTypes) {
-								logger.debug("* productType missing permissionFlagSet: " + productType);
+						for (UserLocalID userLocalID : userLocalIDs) {
+							UserID userID = UserID.create(userLocalID);
+							Collection<ProductType> productTypes = ProductTypePermissionFlagSet.getProductTypesMissingProductTypePermissionFlagSet(pm, userID);
+							if (logger.isDebugEnabled()) {
+								logger.debug("productTypesMissingProductTypePermissionFlagSet.size=" + productTypes.size());
+								for (ProductType productType : productTypes) {
+									logger.debug("* productType missing permissionFlagSet: " + productType);
+								}
 							}
+
+							populateUserLocalID2ProductTypeSetMap(userLocalID2productTypes_see, userLocalID, productTypes);
+							populateUserLocalID2ProductTypeSetMap(userLocalID2productTypes_sellReverse, userLocalID, productTypes);
 						}
 
-						populateUserLocalID2ProductTypeSetMap(userLocalID2productTypes_see, userLocalID, productTypes);
-						populateUserLocalID2ProductTypeSetMap(userLocalID2productTypes_sellReverse, userLocalID, productTypes);
-					}
+						for (Map.Entry<UserLocalID, Set<AuthorityID>> me : seeProductTypeGrantChanged.entrySet()) {
+							UserLocalID userLocalID = me.getKey();
+							Set<AuthorityID> authorityIDs = me.getValue();
+							Set<ProductType> affectedProductTypes = getDirectlyAffectedProductTypes(pm, userLocalID, authorityIDs, true);
+							populateUserLocalID2ProductTypeSetMap(userLocalID2productTypes_see, userLocalID, affectedProductTypes);
+						}
 
-					for (Map.Entry<UserLocalID, Set<AuthorityID>> me : seeProductTypeGrantChanged.entrySet()) {
-						UserLocalID userLocalID = me.getKey();
-						Set<AuthorityID> authorityIDs = me.getValue();
-						Set<ProductType> affectedProductTypes = getDirectlyAffectedProductTypes(pm, userLocalID, authorityIDs, true);
-						populateUserLocalID2ProductTypeSetMap(userLocalID2productTypes_see, userLocalID, affectedProductTypes);
-					}
+						Map<UserLocalID, Set<AuthorityID>> sellOrReverseProductTypeGrantChanged = new HashMap<UserLocalID, Set<AuthorityID>>();
+						populateUserLocalID2AuthorityIDMap(sellOrReverseProductTypeGrantChanged, sellProductTypeGrantChanged);
+						populateUserLocalID2AuthorityIDMap(sellOrReverseProductTypeGrantChanged, reverseProductTypeGrantChanged);
 
-					Map<UserLocalID, Set<AuthorityID>> sellOrReverseProductTypeGrantChanged = new HashMap<UserLocalID, Set<AuthorityID>>();
-					populateUserLocalID2AuthorityIDMap(sellOrReverseProductTypeGrantChanged, sellProductTypeGrantChanged);
-					populateUserLocalID2AuthorityIDMap(sellOrReverseProductTypeGrantChanged, reverseProductTypeGrantChanged);
+						for (Map.Entry<UserLocalID, Set<AuthorityID>> me : sellOrReverseProductTypeGrantChanged.entrySet()) {
+							UserLocalID userLocalID = me.getKey();
+							Set<AuthorityID> authorityIDs = me.getValue();
+							Set<ProductType> affectedProductTypes = getDirectlyAffectedProductTypes(pm, userLocalID, authorityIDs, false);
+							populateUserLocalID2ProductTypeSetMap(userLocalID2productTypes_sellReverse, userLocalID, affectedProductTypes);
+						}
 
-					for (Map.Entry<UserLocalID, Set<AuthorityID>> me : sellOrReverseProductTypeGrantChanged.entrySet()) {
-						UserLocalID userLocalID = me.getKey();
-						Set<AuthorityID> authorityIDs = me.getValue();
-						Set<ProductType> affectedProductTypes = getDirectlyAffectedProductTypes(pm, userLocalID, authorityIDs, false);
-						populateUserLocalID2ProductTypeSetMap(userLocalID2productTypes_sellReverse, userLocalID, affectedProductTypes);
-					}
+						for (Map.Entry<UserLocalID, Set<ProductType>> me : userLocalID2productTypes_see.entrySet()) {
+							UserLocalID userLocalID = me.getKey();
+							Set<ProductType> productTypes = me.getValue();
+							UserLocal userLocal = (UserLocal) pm.getObjectById(userLocalID);
 
-					for (Map.Entry<UserLocalID, Set<ProductType>> me : userLocalID2productTypes_see.entrySet()) {
-						UserLocalID userLocalID = me.getKey();
-						Set<ProductType> productTypes = me.getValue();
-						UserLocal userLocal = (UserLocal) pm.getObjectById(userLocalID);
+							ProductTypePermissionFlagSet.updateFlagsSeeProductType(pm, productTypes, userLocal.getUser());
+						}
 
-						ProductTypePermissionFlagSet.updateFlagsSeeProductType(pm, productTypes, userLocal.getUser());
-					}
+						for (Map.Entry<UserLocalID, Set<ProductType>> me : userLocalID2productTypes_sellReverse.entrySet()) {
+							UserLocalID userLocalID = me.getKey();
+							Set<ProductType> productTypes = me.getValue();
+							UserLocal userLocal = (UserLocal) pm.getObjectById(userLocalID);
 
-					for (Map.Entry<UserLocalID, Set<ProductType>> me : userLocalID2productTypes_sellReverse.entrySet()) {
-						UserLocalID userLocalID = me.getKey();
-						Set<ProductType> productTypes = me.getValue();
-						UserLocal userLocal = (UserLocal) pm.getObjectById(userLocalID);
-
-						ProductTypePermissionFlagSet.updateFlagsSellReverseProductType(pm, productTypes, userLocal.getUser());
+							ProductTypePermissionFlagSet.updateFlagsSellReverseProductType(pm, productTypes, userLocal.getUser());
+						}
+					} finally {
+						NLJDOHelper.disableTransactionSerializeReadObjects(pm);
 					}
 				} finally {
 					pm.close();

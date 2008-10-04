@@ -1118,7 +1118,40 @@ implements SessionBean
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			return NLJDOHelper.getDetachedObjectList(pm, articleIDs, Article.class, fetchGroups, maxFetchDepth);
+
+			// TODO WORKAROUND experimental: Maybe this helps to get no outdated data anymore?! Marco.
+//			NLJDOHelper.enableTransactionSerializeReadObjects(pm);
+//			try {
+//				return NLJDOHelper.getDetachedObjectList(pm, articleIDs, Article.class, fetchGroups, maxFetchDepth);
+
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+			if (fetchGroups != null)
+				pm.getFetchPlan().setGroups(fetchGroups);
+
+			Collection<Article> articles = NLJDOHelper.getObjectList(pm, articleIDs, Article.class);
+
+			if (logger.isTraceEnabled()) {
+				logger.trace("getArticles: got " + articles.size() + " articles from JDO:");
+				for (Article article : articles) {
+					logger.trace("getArticles: * " + article);
+				}
+			}
+
+// TODO WORKAROUND for DataNucleus bug: Without this, I get always version 2 of a newly created TicArticle - even though, in the datastore, there's already version 4, 5 or even higher.
+			pm.refreshAll(articles);
+
+			if (logger.isTraceEnabled()) {
+				logger.trace("getArticles: refreshed " + articles.size() + ":");
+				for (Article article : articles) {
+					logger.trace("getArticles: * " + article);
+				}
+			}
+
+			articles = pm.detachCopyAll(articles);
+			return articles;
+//			} finally {
+//				NLJDOHelper.disableTransactionSerializeReadObjects(pm);
+//			}
 		} finally {
 			pm.close();
 		}
@@ -1169,14 +1202,16 @@ implements SessionBean
 	}
 
 	/**
+	 * @return <code>null</code> if <code>get == false</code>, otherwise those {@link Article}s that were <b>not</b> yet removed, because
+	 *		they are released asynchronously first.
 	 * @throws ModuleException
 	 *
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="org.nightlabs.jfire.trade.editOffer"
 	 */
-	public void deleteArticles(Collection<ArticleID> articleIDs, boolean validate)
-		throws ModuleException
+	public Collection<Article> deleteArticles(Collection<ArticleID> articleIDs, boolean validate, boolean get, String[] fetchGroups, int maxFetchDepth)
+	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -1208,6 +1243,14 @@ implements SessionBean
 					trader.validateOffer(offer);
 			}
 
+			if (!get)
+				return null;
+
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+			if (fetchGroups != null)
+				pm.getFetchPlan().setGroups(fetchGroups);
+
+			return pm.detachCopyAll(allocatedArticles);
 		} finally {
 			pm.close();
 		}

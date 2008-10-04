@@ -343,7 +343,7 @@ implements
 
 	/**
 	 * Create a new Offer for the given Order and with the given primary-key-values.
-	 * 
+	 *
 	 * @param user The user that initiated the creation of the new {@link Offer}.
 	 * @param order The {@link Order} the new {@link Offer} should be part of.
 	 * @param offerIDPrefix The offerIDPrefix primary-key-value.
@@ -498,6 +498,8 @@ implements
 		if (JDOHelper.isDetached(this))
 			attachable = false;
 		else {
+			this.order.removeArticle(article);
+
 			// WORKAROUND JPOX should have deleted the Article automatically, because dependent=true, but it doesn't work :-(
 			PersistenceManager pm = JDOHelper.getPersistenceManager(this);
 			if (pm != null) { // only in the server - this method is called in the client, too.

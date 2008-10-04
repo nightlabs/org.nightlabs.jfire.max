@@ -198,10 +198,10 @@ implements Serializable, DeleteCallback, DetachCallback, StoreCallback
 	}
 
 	/**
-	 * Returns the Set of of {@link Article}s where the given {@link Product} is referenced 
+	 * Returns the Set of of {@link Article}s where the given {@link Product} is referenced
 	 * or <code>null</code>, if no {@link Article}s can be found matching the
 	 * specified <code>Product</code>.
-	 * 
+	 *
 	 * @param pm The {@link PersistenceManager} used to access the datastore.
 	 * @param product The {@link Product} referenced by the searched <code>Article</code>s.
 	 * @return Either <code>null</code>, if no {@link Article}s can be found matching the
@@ -213,7 +213,7 @@ implements Serializable, DeleteCallback, DetachCallback, StoreCallback
 		Query q = pm.newNamedQuery(Article.class, "getArticlesByProduct");
 		return new HashSet<Article>((Collection<Article>) q.execute(product));
 	}
-	
+
 	public static Map<Class<? extends ProductType>, Set<Article>> getProductTypeClass2articleSetMapFromArticleContainers(Collection<? extends ArticleContainer> articleContainers)
 	{
 		Map<Class<? extends ProductType>, Set<Article>> result = new HashMap<Class<? extends ProductType>, Set<Article>>();
@@ -289,7 +289,7 @@ implements Serializable, DeleteCallback, DetachCallback, StoreCallback
 
 	/**
 	 * An <tt>Article</tt> can only be part of none or exactly one <tt>Invoice</tt>.
-	 * 
+	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private Invoice invoice = null;
@@ -321,18 +321,18 @@ implements Serializable, DeleteCallback, DetachCallback, StoreCallback
 
 	/**
 	 * Creation date of this Invoice.
-	 * 
+	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private Date createDT;
-	
+
 	/**
 	 * The user who created this Invoice.
-	 * 
+	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private User createUser = null;
-	
+
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
@@ -481,7 +481,7 @@ implements Serializable, DeleteCallback, DetachCallback, StoreCallback
 
 	/**
 	 * This is set according to the result of PriceConfig.isDependentOnOffer().
-	 * 
+	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private boolean priceDependentOnOffer;
@@ -835,25 +835,25 @@ implements Serializable, DeleteCallback, DetachCallback, StoreCallback
 	public String getPrimaryKey() {
 		return primaryKey;
 	}
-	
+
 	/**
 	 * Returns the creation {@link Date} of this {@link Article}.
-	 * 
+	 *
 	 * @return The creation {@link Date} of this {@link Article}.
 	 */
 	public Date getCreateDT() {
 		return createDT;
 	}
-	
+
 	/**
 	 * Returns the {@link User} who created this {@link Article}
-	 * 
+	 *
 	 * @return The {@link User} who created this {@link Article}
 	 */
 	public User getCreateUser() {
 		return createUser;
 	}
-	
+
 	/**
 	 * @return Returns the productType.
 	 */
@@ -1196,7 +1196,7 @@ implements Serializable, DeleteCallback, DetachCallback, StoreCallback
 		return reversing;
 	}
 	/**
-	 * @return This flag is set <code>true</code>, if the reversing offer is 
+	 * @return This flag is set <code>true</code>, if the reversing offer is
 	 *         somehow cancelled (rejected, expired, revoked, aborted etc.).
 	 */
 	public boolean isReversingAborted()
@@ -1427,7 +1427,7 @@ implements Serializable, DeleteCallback, DetachCallback, StoreCallback
 
 	@Override
 	public String toString() {
-		return this.getClass().getName() + '@' + Integer.toHexString(System.identityHashCode(this)) + '[' + organisationID + ',' + ObjectIDUtil.longObjectIDFieldToString(articleID) + ']';
+		return this.getClass().getName() + '@' + Integer.toHexString(System.identityHashCode(this)) + '[' + organisationID + ',' + ObjectIDUtil.longObjectIDFieldToString(articleID) + ']' + "(version " + JDOHelper.getVersion(this) + ')';
 	}
 
 	@Override

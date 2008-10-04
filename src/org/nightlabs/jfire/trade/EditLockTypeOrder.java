@@ -1,5 +1,8 @@
 package org.nightlabs.jfire.trade;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import javax.jdo.PersistenceManager;
 
 import org.nightlabs.ModuleException;
@@ -66,7 +69,23 @@ extends EditLockType
 					Trader trader = Trader.getTrader(pm);
 					User user = SecurityReflector.getUserDescriptor().getUser(pm);
 					if (!order.getArticles().isEmpty()) {
-						trader.releaseArticles(user, order.getArticles(), true, false, true);
+						Set<Article> articles_allocated_nothingPending = new HashSet<Article>(order.getArticles().size());
+//						Set<Article> articles_nonAllocated_nothingPending = new HashSet<Article>();
+						for (Article article : order.getArticles()) {
+							if (article.isAllocated() && !article.isReleasePending())
+								articles_allocated_nothingPending.add(article);
+							else if (!article.isAllocated() && !article.isAllocationPending())
+								; // nothing, we can directly delete it
+//								articles_nonAllocated_nothingPending.add(article);
+							else if (article.isReleasePending())
+								throw new IllegalStateException("Article is in state 'release pending' - have to retry later: " + article);
+							else if (article.isAllocationPending())
+								throw new IllegalStateException("Article is in state 'allocation pending' - have to retry later: " + article);
+							else
+								throw new IllegalStateException("Article is in unexpected state!!! " + article);
+						}
+
+						trader.releaseArticles(user, articles_allocated_nothingPending, true, false, true);
 						trader.deleteArticles(user, order.getArticles());
 					}
 				} // if (!containsFinalizedOffer) {

@@ -1240,10 +1240,15 @@ public abstract class ProductTypeActionHandler
 
 				PersistenceManager pm = getPersistenceManager();
 				try {
-					NLJDOHelper.setTransactionSerializeReadObjects(pm, true);
+					NLJDOHelper.enableTransactionSerializeReadObjects(pm);
+					try {
 
-					List<ProductType> productTypes = NLJDOHelper.getObjectList(pm, productTypeIDs, ProductType.class);
-					ProductTypePermissionFlagSet.updateFlags(pm, productTypes);
+						List<ProductType> productTypes = NLJDOHelper.getObjectList(pm, productTypeIDs, ProductType.class);
+						ProductTypePermissionFlagSet.updateFlags(pm, productTypes);
+
+					} finally {
+						NLJDOHelper.disableTransactionSerializeReadObjects(pm);
+					}
 				} finally {
 					pm.close();
 				}

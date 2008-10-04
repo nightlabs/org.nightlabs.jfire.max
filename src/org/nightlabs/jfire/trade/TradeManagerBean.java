@@ -1134,6 +1134,9 @@ implements SessionBean
 				logger.trace("getArticles: got " + articles.size() + " articles from JDO:");
 				for (Article article : articles) {
 					logger.trace("getArticles: * " + article);
+					logger.trace("getArticles:   - article.allocated=" + article.isAllocated());
+					logger.trace("getArticles:   - article.allocationPending=" + article.isAllocationPending());
+					logger.trace("getArticles:   - article.releasePending=" + article.isReleasePending());
 				}
 			}
 
@@ -1144,6 +1147,9 @@ implements SessionBean
 				logger.trace("getArticles: refreshed " + articles.size() + ":");
 				for (Article article : articles) {
 					logger.trace("getArticles: * " + article);
+					logger.trace("getArticles:   - article.allocated=" + article.isAllocated());
+					logger.trace("getArticles:   - article.allocationPending=" + article.isAllocationPending());
+					logger.trace("getArticles:   - article.releasePending=" + article.isReleasePending());
 				}
 			}
 

@@ -1140,18 +1140,18 @@ implements SessionBean
 				}
 			}
 
-// TODO WORKAROUND for DataNucleus bug: Without this, I get always version 2 of a newly created TicArticle - even though, in the datastore, there's already version 4, 5 or even higher.
-			pm.refreshAll(articles);
-
-			if (logger.isTraceEnabled()) {
-				logger.trace("getArticles: refreshed " + articles.size() + ":");
-				for (Article article : articles) {
-					logger.trace("getArticles: * " + article);
-					logger.trace("getArticles:   - article.allocated=" + article.isAllocated());
-					logger.trace("getArticles:   - article.allocationPending=" + article.isAllocationPending());
-					logger.trace("getArticles:   - article.releasePending=" + article.isReleasePending());
-				}
-			}
+//// TODO WORKAROUND for DataNucleus bug: Without this, I get always version 2 of a newly created TicArticle - even though, in the datastore, there's already version 4, 5 or even higher.
+//			pm.refreshAll(articles);
+//
+//			if (logger.isTraceEnabled()) {
+//				logger.trace("getArticles: refreshed " + articles.size() + ":");
+//				for (Article article : articles) {
+//					logger.trace("getArticles: * " + article);
+//					logger.trace("getArticles:   - article.allocated=" + article.isAllocated());
+//					logger.trace("getArticles:   - article.allocationPending=" + article.isAllocationPending());
+//					logger.trace("getArticles:   - article.releasePending=" + article.isReleasePending());
+//				}
+//			}
 
 			articles = pm.detachCopyAll(articles);
 			return articles;

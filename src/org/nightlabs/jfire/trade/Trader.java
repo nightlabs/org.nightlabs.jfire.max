@@ -1334,7 +1334,7 @@ public class Trader
 			productTypeActionHandler.disassembleProduct(user, productTypeActionHandlerCache, product, true);
 //			product.disassemble(user, true);
 
-			// clear product's article and update all stati
+			// clear product's article and update all states
 			ProductLocal productLocal = product.getProductLocal();
 			productLocal.setAllocated(false);
 			productLocal.setSaleArticle(null);

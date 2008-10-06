@@ -49,6 +49,7 @@ import org.nightlabs.jfire.issue.id.IssueSeverityTypeID;
 import org.nightlabs.jfire.issue.id.IssueTypeID;
 import org.nightlabs.jfire.issue.jbpm.JbpmConstants;
 import org.nightlabs.jfire.issue.project.Project;
+import org.nightlabs.jfire.issue.project.ProjectPhase;
 import org.nightlabs.jfire.issue.project.ProjectType;
 import org.nightlabs.jfire.issue.project.id.ProjectID;
 import org.nightlabs.jfire.issue.project.id.ProjectTypeID;
@@ -1288,6 +1289,25 @@ implements SessionBean
 			project.setProjectType(projectType1);
 			project = pm.makePersistent(project);
 
+			// Create the project phases
+			pm.getExtent(ProjectPhase.class); 
+			
+			ProjectPhase projectPhase = new ProjectPhase(IDGenerator.getOrganisationID(), "phase1");
+			projectPhase.getName().setText(Locale.ENGLISH.getLanguage(), "Phase 1");
+			projectPhase = pm.makePersistent(projectPhase);
+			
+			projectPhase = new ProjectPhase(IDGenerator.getOrganisationID(), "phase2");
+			projectPhase.getName().setText(Locale.ENGLISH.getLanguage(), "Phase 2");
+			projectPhase = pm.makePersistent(projectPhase);
+			
+			projectPhase = new ProjectPhase(IDGenerator.getOrganisationID(), "phase3");
+			projectPhase.getName().setText(Locale.ENGLISH.getLanguage(), "Phase 3");
+			projectPhase = pm.makePersistent(projectPhase);
+			
+			projectPhase = new ProjectPhase(IDGenerator.getOrganisationID(), "phase4");
+			projectPhase.getName().setText(Locale.ENGLISH.getLanguage(), "Phase 4");
+			projectPhase = pm.makePersistent(projectPhase);
+			
 			EditLockType issueEditLock = new EditLockType(EditLockTypeIssue.EDIT_LOCK_TYPE_ID);
 			issueEditLock = pm.makePersistent(issueEditLock);
 			//------------------------------------------------

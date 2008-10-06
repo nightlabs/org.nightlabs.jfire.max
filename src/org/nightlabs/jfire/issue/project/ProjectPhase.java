@@ -51,10 +51,10 @@ implements Serializable
 	 */
 	private ProjectPhaseName name;
 	
-//	/**
-//	 * @jdo.field persistence-modifier="persistent"
-//	 */
-//	private ProjectPhaseDescription description;
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private ProjectPhaseDescription description;
 
 	/**
 	 * @deprecated Constructor exists only for JDO! 
@@ -89,13 +89,13 @@ implements Serializable
 	}
 
 	
-//	public ProjectTypeDescription getDescription() {
-//		return description;
-//	}
-//
-//	public void setDescription(ProjectPhaseDescription description) {
-//		this.description = description;
-//	}
+	public ProjectPhaseDescription getDescription() {
+		return description;
+	}
+
+	public void setDescription(ProjectPhaseDescription description) {
+		this.description = description;
+	}
 
 	public ProjectPhaseName getName()
 	{

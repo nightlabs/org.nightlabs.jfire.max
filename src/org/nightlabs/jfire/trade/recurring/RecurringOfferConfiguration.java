@@ -10,6 +10,7 @@ import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.timer.Task;
 import org.nightlabs.jfire.timer.id.TaskID;
+import org.nightlabs.timepattern.TimePatternFormatException;
 
 
 /**
@@ -57,7 +58,7 @@ public class RecurringOfferConfiguration implements Serializable{
 	 * @jdo.field primary-key="true"
 	 */
 	private long recurringOfferConfigurationID;
-	
+
 	/**
 	 * Create a new {@link RecurringOfferConfiguration}. 
 	 * 
@@ -78,181 +79,182 @@ public class RecurringOfferConfiguration implements Serializable{
 				RecurringTradeManagerHome.JNDI_NAME,
 		"processRecurringOfferTimed");	
 		suspendDate = null;
-		
-		
-		
-		
-		// We can not set the parameter here in the constructor as Task.setParam will call makePersistent() 
-		// for the given parameter if it's not, and so it will try to persist the object we are currently creating
-		// This is now handled by RecurringOffer.validate()
-//		creatorTask.setParam(recurringOffer);
-	}
+		creatorTask.getTimePatternSet().createTimePattern();
 
-	/**
-	 * @deprecated Only for JDO!
-	 */
-	@Deprecated
-	protected RecurringOfferConfiguration() {}
 
-	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 */
-	private boolean createInvoice;
 
-	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 */
-	private Date suspendDate;
-	
-	
-	
-	/**
-	 * Whether we book the invoice implicitly
-	 * 
-	 * @jdo.field persistence-modifier="persistent"
-	 */
-	private boolean bookInvoice;
 
-	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 */
-	private RecurringOffer recurringOffer;
+	// We can not set the parameter here in the constructor as Task.setParam will call makePersistent() 
+	// for the given parameter if it's not, and so it will try to persist the object we are currently creating
+	// This is now handled by RecurringOffer.validate()
+//	creatorTask.setParam(recurringOffer);
+}
 
-	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 * 
-	 * create a delivery note
-	 */
-	private boolean createDelivery;
+/**
+ * @deprecated Only for JDO!
+ */
+@Deprecated
+protected RecurringOfferConfiguration() {}
 
-	/**
-	 * the Task timer used to define at what moment we call the EJB method 
-	 * to process the {@link RecurringOffer} , see {@link RecurringTrade.processRecurringOffer(RecurringOffer)} 
-	 *
-	 * @jdo.field persistence-modifier="persistent"
-	 */
-	private Task creatorTask;
+/**
+ * @jdo.field persistence-modifier="persistent"
+ */
+private boolean createInvoice;
 
-	/**
-	 * Returns whether upon processing of the {@link RecurringOffer} 
-	 * an {@link Invoice} should be created for the articles of the 
-	 * {@link RecurredOffer}.
-	 *  
-	 * @return Whether an invoice should be automatically created.
-	 */
-	public boolean isCreateInvoice() {
-		return createInvoice;
-	}
+/**
+ * @jdo.field persistence-modifier="persistent"
+ */
+private Date suspendDate;
 
-	/**
-	 * Define whether upon processing of the {@link RecurringOffer} 
-	 * an {@link Invoice} should be created for the articles of the 
-	 * {@link RecurredOffer}.
-	 * 
-	 * @param createInvoice Whether an invoice should be created automatically.
-	 */
-	public void setCreateInvoice(boolean createInvoice) {
-		this.createInvoice = createInvoice;
-	}
 
-	/**
-	 * Returns whether upon processing of the {@link RecurringOffer} 
-	 * an delivery should be made for the articles of the 
-	 * {@link RecurredOffer}.
-	 * 
-	 * @return Whether a delivery should be made.
-	 */
-	public boolean isCreateDelivery() {
-		return createDelivery;
-	}
 
-	/**
-	 * Define whether upon processing of the {@link RecurringOffer} 
-	 * an delivery should be made for the articles of the 
-	 * {@link RecurredOffer.
-	 * 
-	 * @param createDelivery Whether a delivery should be made.
-	 */
-	public void setCreateDelivery(boolean createDelivery) {
-		this.createDelivery = createDelivery;
-	}
+/**
+ * Whether we book the invoice implicitly
+ * 
+ * @jdo.field persistence-modifier="persistent"
+ */
+private boolean bookInvoice;
 
-	/**
-	 * Get the {@link Task} that was created for this {@link RecurringOfferConfiguration}
-	 * processes the associated {@link RecurringOffer}. 
-	 * 
-	 * @return The {@link Task} that processes the associated {@link RecurringOffer}.
-	 */
-	public Task getCreatorTask() {
-		return creatorTask;
-	}
+/**
+ * @jdo.field persistence-modifier="persistent"
+ */
+private RecurringOffer recurringOffer;
 
-	/**
-	 * @return The organisationID pk-member of this {@link RecurringOfferConfiguration}.
-	 */
-	public String getOrganisationID() {
-		return organisationID;
-	}
-	
-	/**
-	 * @return The recurringOfferConfigurationID pk-member of this {@link RecurringOfferConfiguration}.
-	 */
-	public long getRecurringOfferConfigurationID() {
-		return recurringOfferConfigurationID;
-	}
-	
-	/**
-	 * Returns the {@link RecurringOffer} this configuration is associated to.
-	 * @return The {@link RecurringOffer} this configuration is associated to.
-	 */
-	public RecurringOffer getRecurringOffer() {
-		return recurringOffer;
-	}
+/**
+ * @jdo.field persistence-modifier="persistent"
+ * 
+ * create a delivery note
+ */
+private boolean createDelivery;
 
-	/**
-	 * Returns the {@link TaskID} of the {@link Task} that processes 
-	 * the associated {@link RecurringOffer}.
-	 * 
-	 * @return The {@link TaskID} for the {@link Task} that processes
-	 *         the associated {@link RecurringOffer}. 
-	 */
-	public TaskID getCreatorTaskID() {
-		TaskID taskID = (TaskID) JDOHelper.getObjectId(creatorTask);
-		if (taskID == null && creatorTask != null)
-			throw new IllegalStateException("creatorTask has not yet been persisted!"); // if you really come into this situation, either create the TaskID manually by TaskID.create(...) or persist first (and maybe detach) before accessing this method.
+/**
+ * the Task timer used to define at what moment we call the EJB method 
+ * to process the {@link RecurringOffer} , see {@link RecurringTrade.processRecurringOffer(RecurringOffer)} 
+ *
+ * @jdo.field persistence-modifier="persistent"
+ */
+private Task creatorTask;
 
-		return taskID;
-	}
+/**
+ * Returns whether upon processing of the {@link RecurringOffer} 
+ * an {@link Invoice} should be created for the articles of the 
+ * {@link RecurredOffer}.
+ *  
+ * @return Whether an invoice should be automatically created.
+ */
+public boolean isCreateInvoice() {
+	return createInvoice;
+}
 
-	/**
-	 * Returns whether upon processing of the {@link RecurringOffer} 
-	 * if an invoice was created for the new {@link RecurredOffer}
-	 * this invoice should be booked/finalized, too.
-	 * 
-	 * @return Whether the invoice created upon processing should be booked, too.
-	 */
-	public boolean isBookInvoice() {
-		return bookInvoice;
-	}
+/**
+ * Define whether upon processing of the {@link RecurringOffer} 
+ * an {@link Invoice} should be created for the articles of the 
+ * {@link RecurredOffer}.
+ * 
+ * @param createInvoice Whether an invoice should be created automatically.
+ */
+public void setCreateInvoice(boolean createInvoice) {
+	this.createInvoice = createInvoice;
+}
 
-	/**
-	 * Define whether upon processing of the {@link RecurringOffer} 
-	 * if an invoice was created for the new {@link RecurredOffer}
-	 * this invoice should be booked/finalized, too.
-	 * 
-	 * @param isBookInvoice Whether the invoice created upon processing should be booked, too.
-	 */
-	public void setBookInvoice(boolean isBookInvoice) {
-		this.bookInvoice = isBookInvoice;
-	}
+/**
+ * Returns whether upon processing of the {@link RecurringOffer} 
+ * an delivery should be made for the articles of the 
+ * {@link RecurredOffer}.
+ * 
+ * @return Whether a delivery should be made.
+ */
+public boolean isCreateDelivery() {
+	return createDelivery;
+}
 
-	public Date getSuspendDate() {
-		return suspendDate;
-	}
+/**
+ * Define whether upon processing of the {@link RecurringOffer} 
+ * an delivery should be made for the articles of the 
+ * {@link RecurredOffer.
+ * 
+ * @param createDelivery Whether a delivery should be made.
+ */
+public void setCreateDelivery(boolean createDelivery) {
+	this.createDelivery = createDelivery;
+}
 
-	public void setSuspendDate(Date suspendDate) {
-		this.suspendDate = suspendDate;
-	}
+/**
+ * Get the {@link Task} that was created for this {@link RecurringOfferConfiguration}
+ * processes the associated {@link RecurringOffer}. 
+ * 
+ * @return The {@link Task} that processes the associated {@link RecurringOffer}.
+ */
+public Task getCreatorTask() {
+	return creatorTask;
+}
+
+/**
+ * @return The organisationID pk-member of this {@link RecurringOfferConfiguration}.
+ */
+public String getOrganisationID() {
+	return organisationID;
+}
+
+/**
+ * @return The recurringOfferConfigurationID pk-member of this {@link RecurringOfferConfiguration}.
+ */
+public long getRecurringOfferConfigurationID() {
+	return recurringOfferConfigurationID;
+}
+
+/**
+ * Returns the {@link RecurringOffer} this configuration is associated to.
+ * @return The {@link RecurringOffer} this configuration is associated to.
+ */
+public RecurringOffer getRecurringOffer() {
+	return recurringOffer;
+}
+
+/**
+ * Returns the {@link TaskID} of the {@link Task} that processes 
+ * the associated {@link RecurringOffer}.
+ * 
+ * @return The {@link TaskID} for the {@link Task} that processes
+ *         the associated {@link RecurringOffer}. 
+ */
+public TaskID getCreatorTaskID() {
+	TaskID taskID = (TaskID) JDOHelper.getObjectId(creatorTask);
+	if (taskID == null && creatorTask != null)
+		throw new IllegalStateException("creatorTask has not yet been persisted!"); // if you really come into this situation, either create the TaskID manually by TaskID.create(...) or persist first (and maybe detach) before accessing this method.
+
+	return taskID;
+}
+
+/**
+ * Returns whether upon processing of the {@link RecurringOffer} 
+ * if an invoice was created for the new {@link RecurredOffer}
+ * this invoice should be booked/finalized, too.
+ * 
+ * @return Whether the invoice created upon processing should be booked, too.
+ */
+public boolean isBookInvoice() {
+	return bookInvoice;
+}
+
+/**
+ * Define whether upon processing of the {@link RecurringOffer} 
+ * if an invoice was created for the new {@link RecurredOffer}
+ * this invoice should be booked/finalized, too.
+ * 
+ * @param isBookInvoice Whether the invoice created upon processing should be booked, too.
+ */
+public void setBookInvoice(boolean isBookInvoice) {
+	this.bookInvoice = isBookInvoice;
+}
+
+public Date getSuspendDate() {
+	return suspendDate;
+}
+
+public void setSuspendDate(Date suspendDate) {
+	this.suspendDate = suspendDate;
+}
 
 
 

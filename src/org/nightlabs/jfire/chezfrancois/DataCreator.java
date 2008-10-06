@@ -346,7 +346,7 @@ public class DataCreator
 			Date dateOfBirth, String salutation, String title, String postAdress, String postCode,
 			String postCity, String postRegion, String postCountry, String phoneCountryCode,
 			String phoneAreaCode, String phoneNumber, String faxCountryCode,
-			String faxAreaCode, String faxNumber, String bankAccountHolder, int bankAccountNumber,
+			String faxAreaCode, String faxNumber, String bankAccountHolder, String bankAccountNumber,
 			String bankCode, String bankName, String creditCardHolder, String creditCardNumber,
 			int creditCardExpiryMonth, int creditCardExpiryYear, String comment)
 	throws DataBlockNotFoundException, DataBlockGroupNotFoundException, DataFieldNotFoundException, StructFieldValueNotFoundException, StructFieldNotFoundException, StructBlockNotFoundException
@@ -382,7 +382,7 @@ public class DataCreator
 		((PhoneNumberDataField)person.getDataField(PersonStruct.FAX)).setLocalNumber(faxNumber);
 
 		((TextDataField)person.getDataField(PersonStruct.BANKDATA_ACCOUNTHOLDER)).setText(bankAccountHolder);
-		((NumberDataField)person.getDataField(PersonStruct.BANKDATA_ACCOUNTNUMBER)).setValue(bankAccountNumber);
+		((TextDataField)person.getDataField(PersonStruct.BANKDATA_ACCOUNTNUMBER)).setText(bankAccountNumber);
 		((TextDataField)person.getDataField(PersonStruct.BANKDATA_BANKCODE)).setText(bankCode);
 		((TextDataField)person.getDataField(PersonStruct.BANKDATA_BANKNAME)).setText(bankName);
 

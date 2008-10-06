@@ -388,7 +388,7 @@ extends Initialiser
 
 		Person person = dataCreator.createPerson("NightLabs GmbH", "Marco", "Schulze", "marco@nightlabs.de", new Date(),
 				PersonStruct.PERSONALDATA_SALUTATION_MR, "Dr.", "Teststrasse", "79100", "Freiburg", "Baden-Württemberg", "Deutschland",
-				"49", "761", "123456789", "49", "761", "987654321", "Marco Schulze", 123456789, "68090000", "TestBank",
+				"49", "761", "123456789", "49", "761", "987654321", "Marco Schulze", "123456789", "68090000", "TestBank",
 				"Marco Schulze", "1234567890",
 				01, 2008, "Comment for Marco Schulze");
 		User user02 = dataCreator.createUser("marco", "test", person);
@@ -429,7 +429,7 @@ extends Initialiser
 
 			userGroupRef.addRoleGroupRef(roleGroupRef);
 		}
-		
+
 		logger.info("Chezfrancois Created all SimpleProductTypes; publishing, confirming and making available now!");
 		dataCreator.makeAllLeavesSaleable();
 
@@ -437,8 +437,8 @@ extends Initialiser
 		dataCreator.createOrderForEndcustomer(LegalEntity.getAnonymousLegalEntity(pm));
 		dataCreator.createOrderForEndcustomer(legalEntity00);
 		dataCreator.createOrderForEndcustomer(LegalEntity.getAnonymousLegalEntity(pm));
-		dataCreator.createOrderForEndcustomer(legalEntity00);		
-		
+		dataCreator.createOrderForEndcustomer(legalEntity00);
+
 		logger.info("Initialization of JFireChezFrancois complete!");
 
 		logger.info("Initializing JDO for Article.class...");

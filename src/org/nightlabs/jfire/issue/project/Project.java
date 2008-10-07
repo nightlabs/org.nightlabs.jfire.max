@@ -160,6 +160,11 @@ implements Serializable, Comparable<Project>
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private ProjectType projectType;
+
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private boolean active = true;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -174,8 +179,24 @@ implements Serializable, Comparable<Project>
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	private Date contractDate;
+
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private Date finishDate;
+	
+//	/**
+//	 * @jdo.field persistence-modifier="persistent"
+//	 */
+//	private Currency currency;
+	
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
 	private PropertySet propertySet;
 
+	
 	/**
 	 * Returns the property set of this {@link Project}.
 	 * 
@@ -221,11 +242,11 @@ implements Serializable, Comparable<Project>
 	@Deprecated
 	protected Project() { }
 
-	public Project(ProjectID projectID) {
-		this(projectID.organisationID, projectID.projectID);
+	public Project(ProjectID projectID/*, Currency currency*/) {
+		this(projectID.organisationID, projectID.projectID/*, currency*/);
 	}
 	
-	public Project(String organisationID, long projectID)
+	public Project(String organisationID, long projectID/*, Currency currency*/)
 	{
 		Organisation.assertValidOrganisationID(organisationID);
 		this.organisationID = organisationID;
@@ -236,8 +257,9 @@ implements Serializable, Comparable<Project>
 		
 		subProjects = new HashSet<Project>();
 		members = new HashSet<User>();
-		projectPhases = new ArrayList();
+		projectPhases = new ArrayList<ProjectPhase>();
 		
+//		this.currency = currency;
 		this.createTimestamp = new Date();
 		
 		this.structScope = Struct.DEFAULT_SCOPE;
@@ -354,6 +376,14 @@ implements Serializable, Comparable<Project>
 		return Collections.unmodifiableList(projectPhases);
 	}
 	
+	public boolean isActive() {
+		return active;
+	}
+	
+	public void setActive(boolean active) {
+		this.active = active;
+	}
+	
 	public void addProjectPhase(ProjectPhase phase) {
 		if (phase == null)
 			throw new IllegalArgumentException("phase must not be null!");
@@ -386,6 +416,14 @@ implements Serializable, Comparable<Project>
 		return projectManager;
 	}
 	
+//	/**
+//	 * @return Returns the currency.
+//	 */
+//	public Currency getCurrency()
+//	{
+//		return currency;
+//	}
+	
 	/**
 	 * @return Returns the create timestamp.
 	 */
@@ -405,6 +443,34 @@ implements Serializable, Comparable<Project>
 	 */
 	public void setUpdateTimestamp(Date timestamp) {
 		this.updateTimestamp = timestamp;
+	}
+	
+	/**
+	 * @return Returns the contact date.
+	 */
+	public Date getContactDate() {
+		return contractDate;
+	}
+
+	/**
+	 * @param timestamp The timestamp to set.
+	 */
+	public void setContactDate(Date contractDate) {
+		this.contractDate = contractDate;
+	}
+	
+	/**
+	 * @return Returns the finish date.
+	 */
+	public Date getFinishDate() {
+		return finishDate;
+	}
+
+	/**
+	 * @param timestamp The timestamp to set.
+	 */
+	public void setFinishDate(Date finishDate) {
+		this.finishDate = finishDate;
 	}
 	
 	/**

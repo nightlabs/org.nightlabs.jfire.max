@@ -57,6 +57,11 @@ implements Serializable
 	private ProjectPhaseDescription description;
 
 	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private boolean active = true;
+	
+	/**
 	 * @deprecated Constructor exists only for JDO! 
 	 */
 	@Deprecated
@@ -100,6 +105,14 @@ implements Serializable
 	public ProjectPhaseName getName()
 	{
 		return name;
+	}
+	
+	public boolean isActive() {
+		return active;
+	}
+	
+	public void setActive(boolean active) {
+		this.active = active;
 	}
 	
 	/**

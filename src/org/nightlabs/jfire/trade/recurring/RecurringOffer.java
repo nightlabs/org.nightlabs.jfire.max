@@ -1,5 +1,7 @@
 package org.nightlabs.jfire.trade.recurring;
 
+import java.util.Collection;
+
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.Product;
@@ -154,5 +156,15 @@ public class RecurringOffer extends Offer {
 
 	protected void setRecurredOfferCount(int recurredOfferCount) {
 		this.recurredOfferCount = recurredOfferCount;
+	}
+	
+	@Override
+	protected void checkArticles(Collection<? extends Article> articles) {
+		for (Article article : articles) {
+			if (article.getProduct() != null) {
+				throw new IllegalStateException("RecurringOffer does not support Articles with a Product assigned: " + article.getProduct());
+			}
+		}
+		super.checkArticles(articles);
 	}
 }

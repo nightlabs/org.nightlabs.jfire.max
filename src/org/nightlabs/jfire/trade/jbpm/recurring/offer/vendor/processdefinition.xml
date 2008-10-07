@@ -49,15 +49,15 @@
    </node>
    <state name="dev.jfire.org:accepted">
         <action class="org.nightlabs.jfire.trade.recurring.jbpm.ActionHandlerAcceptRecurringOffer"></action>
-		<transition to="dev.jfire.org:recurrenceStopped" name="stopRecurrence"></transition>
-		<transition to="dev.jfire.org:recurrenceStarted" name="startRecurrence"></transition>
+		<transition to="dev.jfire.org:recurrenceStopped" name="dev.jfire.org:stopRecurrence"></transition>
+		<transition to="dev.jfire.org:recurrenceStarted" name="dev.jfire.org:startRecurrence"></transition>
 	</state>
 
 	<state name="dev.jfire.org:recurrenceStarted">
 		<event type="node-enter">
 			<action class="org.nightlabs.jfire.trade.recurring.jbpm.ActionHandlerStartRecurrence"></action>
 		</event>
-		<transition to="dev.jfire.org:recurrenceStopped" name="stopRecurrence"></transition>
-		<transition to="dev.jfire.org:accepted" name="pauseRecurrence"></transition>
+		<transition to="dev.jfire.org:recurrenceStopped" name="dev.jfire.org:stopRecurrence"></transition>
+		<transition to="dev.jfire.org:accepted" name="dev.jfire.org:pauseRecurrence"></transition>
 	</state>
 </process-definition>

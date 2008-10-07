@@ -443,9 +443,15 @@ implements
 	{
 		this.offerLocal = offerLocal;
 	}
+	
+	protected void checkArticles(Collection<? extends Article> articles) {
+	
+	}
 
 	public void addArticles(Collection<? extends Article> articles)
 	{
+		checkArticles(articles);
+		
 		if (isFinalized())
 			throw new IllegalStateException("This offer is already finalized! Cannot add a new Article!");
 
@@ -465,6 +471,7 @@ implements
 
 	public void addArticle(Article article)
 	{
+		checkArticles(Collections.singleton(article));
 		if (isFinalized())
 			throw new IllegalStateException("This offer is already finalized! Cannot add a new Article!");
 

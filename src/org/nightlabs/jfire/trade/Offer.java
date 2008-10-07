@@ -444,6 +444,16 @@ implements
 		this.offerLocal = offerLocal;
 	}
 	
+	/**
+	 * This method will be called to check the validity of the given
+	 * articles before they are added to the list of {@link Article}s
+	 * of this {@link Offer}.
+	 * <p>
+	 * This implementation does nothing, implementations might throw 
+	 * an RuntimeException if one of the articles is invalid.
+	 * </p> 
+	 * @param articles The articles to check.
+	 */
 	protected void checkArticles(Collection<? extends Article> articles) {
 	
 	}

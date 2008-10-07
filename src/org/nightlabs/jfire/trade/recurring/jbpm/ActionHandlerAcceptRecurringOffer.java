@@ -4,6 +4,7 @@
 package org.nightlabs.jfire.trade.recurring.jbpm;
 
 import org.jbpm.graph.exe.ExecutionContext;
+import org.nightlabs.jfire.timer.Task;
 import org.nightlabs.jfire.trade.jbpm.ActionHandlerAcceptOffer;
 import org.nightlabs.jfire.trade.recurring.RecurredOffer;
 import org.nightlabs.jfire.trade.recurring.RecurringOffer;
@@ -19,14 +20,21 @@ public class ActionHandlerAcceptRecurringOffer extends ActionHandlerAcceptOffer 
 	public ActionHandlerAcceptRecurringOffer() {
 		super();
 	}
-	
+
 	@Override
 	protected void doExecute(ExecutionContext executionContext)
 	throws Exception 
 	{
 		super.doExecute(executionContext);
 		RecurringOffer recurringOffer = (RecurringOffer) getStatable();
-		recurringOffer.getRecurringOfferConfiguration().getCreatorTask().setEnabled(false);
-	}
+
+		Task recurringTask = recurringOffer.getRecurringOfferConfiguration().getCreatorTask();
+		if(	recurringTask.getTimePatternSet().getTimePatterns() != null)
+			recurringOffer.getRecurringOfferConfiguration().getCreatorTask().setEnabled(false);
+		else
+			throw new IllegalStateException("Recurrence cant be disabled because of a null timePattern");
+
 	
+	}
+
 }

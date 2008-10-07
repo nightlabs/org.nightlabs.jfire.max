@@ -78,7 +78,7 @@ public class RecurringOfferConfiguration implements Serializable{
 				RecurringTradeManagerHome.JNDI_NAME,
 		"processRecurringOfferTimed");	
 		suspendDate = null;
-		creatorTask.getTimePatternSet().createTimePattern();
+		//creatorTask.getTimePatternSet().createTimePattern();
 
 		// We can not set the parameter here in the constructor as Task.setParam will call makePersistent() 
 		// for the given parameter if it's not, and so it will try to persist the object we are currently creating

@@ -450,7 +450,7 @@ implements
 	 * of this {@link Offer}.
 	 * <p>
 	 * This implementation does nothing, implementations might throw 
-	 * an RuntimeException if one of the articles is invalid.
+	 * a RuntimeException if one of the articles is invalid.
 	 * </p> 
 	 * @param articles The articles to check.
 	 */

@@ -30,7 +30,7 @@ public class ActionHandlerAcceptRecurringOffer extends ActionHandlerAcceptOffer 
 
 		Task recurringTask = recurringOffer.getRecurringOfferConfiguration().getCreatorTask();
 		if(	recurringTask.getTimePatternSet().getTimePatterns() != null)
-			recurringOffer.getRecurringOfferConfiguration().getCreatorTask().setEnabled(false);
+			recurringTask.setEnabled(false);
 		else
 			throw new IllegalStateException("Recurrence cant be disabled because of a null timePattern");
 

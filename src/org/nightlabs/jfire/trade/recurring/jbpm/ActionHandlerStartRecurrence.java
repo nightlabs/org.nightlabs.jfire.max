@@ -34,7 +34,7 @@ public class ActionHandlerStartRecurrence extends AbstractActionHandler {
 		Task recurringTask = recurringOffer.getRecurringOfferConfiguration().getCreatorTask();
 		
 		if(	recurringTask.getTimePatternSet().getTimePatterns() != null)
-			recurringOffer.getRecurringOfferConfiguration().getCreatorTask().setEnabled(true);
+			recurringTask.setEnabled(true);
 		else
 			throw new IllegalStateException("Recurrence cant be started because of a null timePattern");
 	}

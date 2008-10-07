@@ -28,7 +28,7 @@ import org.nightlabs.util.Util;
  *
  **/
 public class ProjectType
-implements Serializable 
+implements Serializable , Comparable<ProjectType>
 {
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger = Logger.getLogger(ProjectType.class);
@@ -143,5 +143,10 @@ implements Serializable
 		return 
 		Util.hashCode(organisationID) ^
 		Util.hashCode(projectTypeID);
+	}
+	
+	@Override
+	public int compareTo(ProjectType o) {
+		return this.name.getText().compareTo(o.getName().getText());
 	}
 }

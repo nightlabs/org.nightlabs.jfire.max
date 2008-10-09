@@ -50,14 +50,13 @@ public class RecurringOffer extends Offer {
 	/**
 	 * Constant indicating that no problem occurred on the last execution. Value is <code>null</code>.
 	 */
-	public static final String STATUS_KEY_NONE = null;
+	public static final String STATUS_KEY_NONE = "None";
 	/**
 	 * Constant indication that on the last processing a price difference was found between
 	 * the articles in the newly create {@link RecurredOffer} and the {@link RecurringOffer}.
 	 */
 	public static final String STATUS_KEY_PRICES_NOT_EQUAL = "PricesNotEqual";
 
-		
 	
 	/**
 	 * the recurringOffer has been suspended due to stop date mostly

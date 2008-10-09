@@ -313,7 +313,7 @@ public class Trader
 	{
 		if (!getOrganisationID().equals(customerGroupForEndCustomer.getOrganisationID()))
 			throw new IllegalArgumentException(
-					"defaultCustomerGroupForKnownCustomer.organisationID is foreign!");
+			"defaultCustomerGroupForKnownCustomer.organisationID is foreign!");
 
 		this.defaultCustomerGroupForKnownCustomer = customerGroupForEndCustomer;
 	}
@@ -434,9 +434,9 @@ public class Trader
 	public Segment createSegment(Order order, SegmentType segmentType)
 	{
 		if (!getOrganisationID().equals(order.getOrganisationID())) // TODO implement
-																														// later.
+			// later.
 			throw new UnsupportedOperationException(
-					"Cannot yet create a Segment in a foreign order.");
+			"Cannot yet create a Segment in a foreign order.");
 
 		PersistenceManager pm = getPersistenceManager();
 
@@ -555,84 +555,84 @@ public class Trader
 
 //	public OrderRequirement createOrderRequirement(Order order)
 //	{
-//		if (!order.getOrganisationID().equals(this.getOrganisationID()))
-//			throw new IllegalArgumentException(
-//					"Cannot create an instance of OrderRequirement for a foreign Organisation!");
-//
-//		// TODO implement this
-//		throw new UnsupportedOperationException("NYI");
-//		// OrderRequirement orderRequirement =
-//		// (OrderRequirement)orderRequirements.get(order.getPrimaryKey());
-//		// if (orderRequirement == null) {
-//		// orderRequirement = new OrderRequirement(this, order);
-//		// orderRequirements.put(order.getPrimaryKey(), orderRequirement);
-//		// }
-//		// return orderRequirement;
+//	if (!order.getOrganisationID().equals(this.getOrganisationID()))
+//	throw new IllegalArgumentException(
+//	"Cannot create an instance of OrderRequirement for a foreign Organisation!");
+
+//	// TODO implement this
+//	throw new UnsupportedOperationException("NYI");
+//	// OrderRequirement orderRequirement =
+//	// (OrderRequirement)orderRequirements.get(order.getPrimaryKey());
+//	// if (orderRequirement == null) {
+//	// orderRequirement = new OrderRequirement(this, order);
+//	// orderRequirements.put(order.getPrimaryKey(), orderRequirement);
+//	// }
+//	// return orderRequirement;
 //	}
-//
+
 //	public OfferRequirement createOfferRequirement(Offer offer)
 //	{
-//		if (!offer.getOrganisationID().equals(this.getOrganisationID()))
-//			throw new IllegalArgumentException(
-//					"Cannot create an instance of OfferRequirement for a foreign Organisation!");
-//
-//		// TODO implement this
-//		throw new UnsupportedOperationException("NYI");
-//		// OfferRequirement offerRequirement =
-//		// (OfferRequirement)offerRequirements.get(offer.getPrimaryKey());
-//		// if (offerRequirement == null) {
-//		// offerRequirement = new OfferRequirement(this, offer);
-//		// offerRequirements.put(offer.getPrimaryKey(), offerRequirement);
-//		// }
-//		// return offerRequirement;
+//	if (!offer.getOrganisationID().equals(this.getOrganisationID()))
+//	throw new IllegalArgumentException(
+//	"Cannot create an instance of OfferRequirement for a foreign Organisation!");
+
+//	// TODO implement this
+//	throw new UnsupportedOperationException("NYI");
+//	// OfferRequirement offerRequirement =
+//	// (OfferRequirement)offerRequirements.get(offer.getPrimaryKey());
+//	// if (offerRequirement == null) {
+//	// offerRequirement = new OfferRequirement(this, offer);
+//	// offerRequirements.put(offer.getPrimaryKey(), offerRequirement);
+//	// }
+//	// return offerRequirement;
 //	}
-//
+
 //	/**
-//	 * This method creates a new Offer for the given vendor or returns a
-//	 * previously created one.
-//	 *
-//	 * @param vendor
-//	 * @return Returns the offer for the given vendor. Never returns <tt>null</tt>.
-//	 * @throws ModuleException
-//	 */
+//	* This method creates a new Offer for the given vendor or returns a
+//	* previously created one.
+//	*
+//	* @param vendor
+//	* @return Returns the offer for the given vendor. Never returns <tt>null</tt>.
+//	* @throws ModuleException
+//	*/
 //	public Offer createOfferRequirementOffer(OfferRequirement offerRequirement,
-//			OrganisationLegalEntity vendor, String orderIDPrefix) throws ModuleException // TODO shouldn't orderIDPrefix be looked up or generated automatically?
+//	OrganisationLegalEntity vendor, String orderIDPrefix) throws ModuleException // TODO shouldn't orderIDPrefix be looked up or generated automatically?
 //	{
-//		Offer offer = offerRequirement.getOfferByVendor(vendor);
-//		if (offer == null) {
-//			// We don't have an Offer registered, thus we need to create one.
-//			// Therefore, we first need the OrderRequirement instance assigned
-//			// for the order equivalent.
-//			OrderRequirement orderRequirement = createOrderRequirement(offerRequirement
-//					.getOffer().getOrder());
-//
-//			// From the OrderRequirement, we obtain the order for the given vendor.
-//			// Order order = orderRequirement.createOrder(vendor);
-//			Order order = createOrderRequirementOrder(orderRequirement, vendor, orderIDPrefix);
-//
-//			// offer = createOffer();
-//			offerRequirement.addOffer(offer);
-//		}
-//		return offer;
+//	Offer offer = offerRequirement.getOfferByVendor(vendor);
+//	if (offer == null) {
+//	// We don't have an Offer registered, thus we need to create one.
+//	// Therefore, we first need the OrderRequirement instance assigned
+//	// for the order equivalent.
+//	OrderRequirement orderRequirement = createOrderRequirement(offerRequirement
+//	.getOffer().getOrder());
+
+//	// From the OrderRequirement, we obtain the order for the given vendor.
+//	// Order order = orderRequirement.createOrder(vendor);
+//	Order order = createOrderRequirementOrder(orderRequirement, vendor, orderIDPrefix);
+
+//	// offer = createOffer();
+//	offerRequirement.addOffer(offer);
 //	}
-//
+//	return offer;
+//	}
+
 //	/**
-//	 * This method creates a new Order for the given vendor or returns a
-//	 * previously created one.
-//	 *
-//	 * @param vendor
-//	 * @return Returns the order for the given vendor. Never returns <tt>null</tt>.
-//	 * @throws ModuleException
-//	 */
+//	* This method creates a new Order for the given vendor or returns a
+//	* previously created one.
+//	*
+//	* @param vendor
+//	* @return Returns the order for the given vendor. Never returns <tt>null</tt>.
+//	* @throws ModuleException
+//	*/
 //	public Order createOrderRequirementOrder(OrderRequirement orderRequirement,
-//			OrganisationLegalEntity vendor, String orderIDPrefix) throws ModuleException // TODO shouldn't orderIDPrefix be looked up or generated automatically?
+//	OrganisationLegalEntity vendor, String orderIDPrefix) throws ModuleException // TODO shouldn't orderIDPrefix be looked up or generated automatically?
 //	{
-//		Order order = orderRequirement.getPartnerOrder(vendor);
-//		if (order == null) {
-//			order = createOrder(vendor, getMandator(), orderIDPrefix, order.getCurrency());
-//			orderRequirement.addOrder(order);
-//		}
-//		return order;
+//	Order order = orderRequirement.getPartnerOrder(vendor);
+//	if (order == null) {
+//	order = createOrder(vendor, getMandator(), orderIDPrefix, order.getCurrency());
+//	orderRequirement.addOrder(order);
+//	}
+//	return order;
 //	}
 
 	public Offer createOffer(User user, Order order, String offerIDPrefix) throws ModuleException
@@ -714,7 +714,7 @@ public class Trader
 	{
 		Set<Article> res = new HashSet<Article>(reversedArticles.size());
 //		for (Iterator it = reversedArticles.iterator(); it.hasNext();) {
-//			Article reversedArticle = (Article) it.next();
+//		Article reversedArticle = (Article) it.next();
 		for (Article reversedArticle : reversedArticles) {
 			if (!reversedArticle.getOffer().getOfferLocal().isAccepted())
 				throw new IllegalStateException("Offer " + reversedArticle.getOffer().getPrimaryKey() + " of Article " + reversedArticle.getPrimaryKey() + " has NOT been accepted! Cannot create reversing Article!");
@@ -728,20 +728,20 @@ public class Trader
 
 
 //	public Article reverseArticle(User user, Offer offer, Article reversedArticle)
-//			throws ModuleException
+//	throws ModuleException
 //	{
-//		if (!reversedArticle.getOffer().getOfferLocal().isConfirmed())
-//			throw new IllegalStateException("Offer " + reversedArticle.getOffer().getPrimaryKey() + " of Article " + reversedArticle.getPrimaryKey() + " is NOT confirmed! Cannot create reversing Article!");
-//
-//		Article reversingArticle = reversedArticle.reverseArticle(user, offer, createArticleID());
-//		reversingArticle.createArticleLocal(user);
-//		return reversingArticle;
+//	if (!reversedArticle.getOffer().getOfferLocal().isConfirmed())
+//	throw new IllegalStateException("Offer " + reversedArticle.getOffer().getPrimaryKey() + " of Article " + reversedArticle.getPrimaryKey() + " is NOT confirmed! Cannot create reversing Article!");
+
+//	Article reversingArticle = reversedArticle.reverseArticle(user, offer, createArticleID());
+//	reversingArticle.createArticleLocal(user);
+//	return reversingArticle;
 //	}
 
 	protected void createArticleLocals(User user, Collection<? extends Article> articles)
 	{
 //		for (Iterator it = articles.iterator(); it.hasNext();) {
-//			Article article = (Article) it.next();
+//		Article article = (Article) it.next();
 		for (Article article : articles) {
 			article.createArticleLocal(user);
 		}
@@ -759,7 +759,7 @@ public class Trader
 	public Collection<? extends Article>  createArticles(User user, Offer offer, Segment segment,
 			Collection<ProductType> productTypes, ArticleCreator articleCreator)
 			throws ModuleException
-	{
+			{
 		if (!segment.getOrder().equals(offer.getOrder()))
 			throw new IllegalArgumentException("segment.order != offer.order :: " + segment.getOrder().getPrimaryKey() + " != " + offer.getOrder().getPrimaryKey());
 
@@ -789,7 +789,7 @@ public class Trader
 		setOfferExpiry(offer);
 
 		return articles;
-	}
+			}
 
 	/**
 	 * This method creates an <tt>Article</tt> with a specific <tt>Product</tt>.
@@ -826,7 +826,7 @@ public class Trader
 	public Collection<? extends Article> createArticles(User user, Offer offer, Segment segment,
 			Collection<? extends Product> products, ArticleCreator articleCreator, boolean allocate,
 			boolean allocateSynchronously) throws ModuleException
-	{
+			{
 		if (!segment.getOrder().equals(offer.getOrder()))
 			throw new IllegalArgumentException("segment.order != offer.order :: " + segment.getOrder().getPrimaryKey() + " != " + offer.getOrder().getPrimaryKey());
 
@@ -850,7 +850,7 @@ public class Trader
 			// create the Articles' prices
 			for (Article article : articles) {
 				IPackagePriceConfig packagePriceConfig = article.getProductType()
-						.getPackagePriceConfig();
+				.getPackagePriceConfig();
 				article.setPrice(packagePriceConfig.createArticlePrice(article));
 			}
 		}
@@ -860,7 +860,7 @@ public class Trader
 		setOfferExpiry(offer);
 
 		return articles;
-	}
+			}
 
 	/**
 	 * @param user
@@ -873,10 +873,10 @@ public class Trader
 	 */
 	public void allocateArticles(User user, Collection<? extends Article> articles,
 			boolean synchronously) throws ModuleException
-	{
+			{
 		try {
 			allocateArticlesBegin(user, articles); // allocateArticleBegin
-																							// (re)creates the price
+			// (re)creates the price
 
 			if (synchronously)
 				allocateArticlesEnd(user, articles);
@@ -894,10 +894,10 @@ public class Trader
 		} catch (Exception x) {
 			throw new ModuleException(x);
 		}
-	}
+			}
 
 	public static class AllocateArticlesEndUndeliverableCallback extends
-			UndeliverableCallback
+	UndeliverableCallback
 	{
 		private static final long serialVersionUID = 1L;
 
@@ -910,7 +910,7 @@ public class Trader
 				Collection<ArticleID> articleIDs = ((AllocateArticlesEndInvocation) envelope
 						.getInvocation()).getArticleIDs();
 //				for (Iterator iter = articleIDs.iterator(); iter.hasNext();) {
-//					ArticleID articleID = (ArticleID) iter.next();
+//				ArticleID articleID = (ArticleID) iter.next();
 				for (ArticleID articleID : articleIDs) {
 					Article article = null;
 					try {
@@ -920,7 +920,7 @@ public class Trader
 					}
 
 					if (article != null)
-					article.setAllocationAbandoned(true);
+						article.setAllocationAbandoned(true);
 				}
 			} finally {
 				pm.close();
@@ -934,7 +934,7 @@ public class Trader
 
 		@Override
 		public void handle(AsyncInvokeEnvelope envelope)
-				throws Exception
+		throws Exception
 		{
 			PersistenceManager pm = getPersistenceManager();
 			try {
@@ -944,7 +944,7 @@ public class Trader
 				Collection<ArticleID> articleIDs = ((AllocateArticlesEndInvocation) envelope
 						.getInvocation()).getArticleIDs();
 //				for (Iterator iter = articleIDs.iterator(); iter.hasNext();) {
-//					ArticleID articleID = (ArticleID) iter.next();
+//				ArticleID articleID = (ArticleID) iter.next();
 				for (ArticleID articleID : articleIDs) {
 					Article article = null;
 					try {
@@ -990,7 +990,7 @@ public class Trader
 		{
 //			// WORKAROUND it doesn't work immediately - the transactions collide
 //			try {
-//				Thread.sleep(3000);
+//			Thread.sleep(3000);
 //			} catch (InterruptedException x) {
 //			}
 
@@ -1038,7 +1038,7 @@ public class Trader
 	 */
 	public void releaseArticles(User user, Collection<Article> articles,
 			boolean synchronously, boolean deleteAfterRelease, boolean enableXA) throws ModuleException
-	{
+			{
 		try {
 			releaseArticlesBegin(user, articles);
 
@@ -1059,10 +1059,10 @@ public class Trader
 		} catch (Exception x) {
 			throw new ModuleException(x);
 		}
-	}
+			}
 
 	public static class ReleaseArticlesEndUndeliverableCallback extends
-			UndeliverableCallback
+	UndeliverableCallback
 	{
 		private static final long serialVersionUID = 1L;
 
@@ -1075,7 +1075,7 @@ public class Trader
 				Collection<ArticleID> articleIDs = ((ReleaseArticlesEndInvocation) envelope
 						.getInvocation()).getArticleIDs();
 //				for (Iterator iter = articleIDs.iterator(); iter.hasNext();) {
-//					ArticleID articleID = (ArticleID) iter.next();
+//				ArticleID articleID = (ArticleID) iter.next();
 				for (ArticleID articleID : articleIDs) {
 					Article article = (Article) pm.getObjectById(articleID);
 					article.setReleaseAbandoned(true);
@@ -1092,7 +1092,7 @@ public class Trader
 
 		@Override
 		public void handle(AsyncInvokeEnvelope envelope)
-				throws Exception
+		throws Exception
 		{
 			PersistenceManager pm = getPersistenceManager();
 			try {
@@ -1102,7 +1102,7 @@ public class Trader
 				Collection<ArticleID> articleIDs = ((ReleaseArticlesEndInvocation) envelope
 						.getInvocation()).getArticleIDs();
 //				for (Iterator iter = articleIDs.iterator(); iter.hasNext();) {
-//					ArticleID articleID = (ArticleID) iter.next();
+//				ArticleID articleID = (ArticleID) iter.next();
 				for (ArticleID articleID : articleIDs) {
 					Article article = (Article) pm.getObjectById(articleID);
 
@@ -1144,7 +1144,7 @@ public class Trader
 		{
 //			// WORKAROUND it doesn't work immediately - the transactions collide
 //			try {
-//				Thread.sleep(3000);
+//			Thread.sleep(3000);
 //			} catch (InterruptedException x) {
 //			}
 
@@ -1177,8 +1177,9 @@ public class Trader
 		NLJDOHelper.enableTransactionSerializeReadObjects(pm);
 		try {
 			pm.refreshAll(articles);
-			for (Article article : articles) {
-				pm.refresh(article.getProduct().getProductLocal());
+			for (Article article : articles) {	
+				if (article.getProduct() != null)
+					pm.refresh(article.getProduct().getProductLocal());
 			}
 		} finally {
 			NLJDOHelper.disableTransactionSerializeReadObjects(pm);
@@ -1196,79 +1197,79 @@ public class Trader
 		if (tas.allocationPending)
 			throw new IllegalStateException(
 					"Articles \""
-							+ getToStringList(articles)
-							+ "\" cannot be released, because they are currently in state allocationPending!");
+					+ getToStringList(articles)
+					+ "\" cannot be released, because they are currently in state allocationPending!");
 
 		Map<ProductTypeActionHandler, List<Article>> productTypeActionHandler2Articles = new HashMap<ProductTypeActionHandler, List<Article>>();
 
 //		JbpmContext jbpmContext = JbpmLookup.getJbpmConfiguration().createJbpmContext();
 //		try {
-//			Map<Offer, ProcessInstance> offer2ProcessInstance = new HashMap<Offer, ProcessInstance>();
+//		Map<Offer, ProcessInstance> offer2ProcessInstance = new HashMap<Offer, ProcessInstance>();
 
-			for (Article article : articles) {
-				if (article.isReversing()) {
-					// reversing article
+		for (Article article : articles) {
+			if (article.isReversing()) {
+				// reversing article
 
-					// If the reversing article is in a non-accepted Offer, it must not be released!
-					if (!article.getOffer().getOfferLocal().isAccepted())
-						throw new IllegalStateException("The Offer " + article.getOffer().getPrimaryKey() + " of reversing Article " + article.getPrimaryKey() + " has NOT been accepted!");
+				// If the reversing article is in a non-accepted Offer, it must not be released!
+				if (!article.getOffer().getOfferLocal().isAccepted())
+					throw new IllegalStateException("The Offer " + article.getOffer().getPrimaryKey() + " of reversing Article " + article.getPrimaryKey() + " has NOT been accepted!");
 
 
-					// If the reversed article is in a DeliveryNote, both - reversed and reversing - articles must be in a DeliveryNote.
-					// The DeliveryNotes must be booked!
+				// If the reversed article is in a DeliveryNote, both - reversed and reversing - articles must be in a DeliveryNote.
+				// The DeliveryNotes must be booked!
 
-					Article reversedArticle = article.getReversedArticle();
-					if (reversedArticle.getDeliveryNote() != null) {
-						if (article.getDeliveryNote() ==  null)
-							throw new IllegalStateException("The reversing Article " + article.getPrimaryKey() + " is NOT in a DeliveryNote, but its corresponding reversed Article is! In this case, the reversing Article MUST be in a DeliveryNote, too!");
+				Article reversedArticle = article.getReversedArticle();
+				if (reversedArticle.getDeliveryNote() != null) {
+					if (article.getDeliveryNote() ==  null)
+						throw new IllegalStateException("The reversing Article " + article.getPrimaryKey() + " is NOT in a DeliveryNote, but its corresponding reversed Article is! In this case, the reversing Article MUST be in a DeliveryNote, too!");
 
-						if (!reversedArticle.getDeliveryNote().getDeliveryNoteLocal().isBooked())
-							throw new IllegalStateException("The reversed Article " + reversedArticle.getPrimaryKey() + " is in a DeliveryNote, but it is NOT booked! The DeliveryNote must be booked!");
+					if (!reversedArticle.getDeliveryNote().getDeliveryNoteLocal().isBooked())
+						throw new IllegalStateException("The reversed Article " + reversedArticle.getPrimaryKey() + " is in a DeliveryNote, but it is NOT booked! The DeliveryNote must be booked!");
 
-						if (!article.getDeliveryNote().getDeliveryNoteLocal().isBooked())
-							throw new IllegalStateException("The reversing Article " + article.getPrimaryKey() + " is in a DeliveryNote, but it is NOT booked! The DeliveryNote must be booked!");
-					}
-
-				}
-				else {
-					// normal article (non-reversing)
-
-					// check, whether the article is finalized
-					if (article.getOffer().isFinalized()) {
-						// it is finalized, so we only allow to release, if the offer's workflow has ended in a non-successful way (abort, reject, revoke etc.)
-//						ProcessInstance processInstance = offer2ProcessInstance.get(article.getOffer());
-//						if (processInstance == null) {
-//							processInstance = jbpmContext.getProcessInstance(article.getOffer().getOfferLocal().getJbpmProcessInstanceId());
-//							offer2ProcessInstance.put(article.getOffer(), processInstance);
-//						}
-
-//						if (!(processInstance.getRootToken().getNode() instanceof EndState)) // currently finishing
-						State state = article.getOffer().getOfferLocal().getState();
-						if (!state.getStateDefinition().isEndState())
-							throw new IllegalStateException("Article \"" + article.getPrimaryKey() + "\" cannot be released, because its Offer is finalized and the Offer's workflow has not ended yet!");
-
-						if (JbpmConstantsOffer.Vendor.NODE_NAME_ACCEPTED.equals(state.getStateDefinition().getJbpmNodeName()))
-							throw new IllegalStateException("Article \"" + article.getPrimaryKey() + "\" cannot be released, because its Offer is finalized and the Offer's workflow has ended successfully!");
-					}
+					if (!article.getDeliveryNote().getDeliveryNoteLocal().isBooked())
+						throw new IllegalStateException("The reversing Article " + article.getPrimaryKey() + " is in a DeliveryNote, but it is NOT booked! The DeliveryNote must be booked!");
 				}
 
-				Product product = article.getProduct();
-				article.setReleasePending(true);
-				product.getProductLocal().setReleasePending(true);
+			}
+			else {
+				// normal article (non-reversing)
 
-				ProductTypeActionHandler productTypeActionHandler = ProductTypeActionHandler.getProductTypeActionHandler(
-						pm, article.getProductType().getClass()
-				);
-				List<Article> al = productTypeActionHandler2Articles.get(productTypeActionHandler);
-				if (al == null) {
-					al = new LinkedList<Article>();
-					productTypeActionHandler2Articles.put(productTypeActionHandler, al);
+				// check, whether the article is finalized
+				if (article.getOffer().isFinalized()) {
+					// it is finalized, so we only allow to release, if the offer's workflow has ended in a non-successful way (abort, reject, revoke etc.)
+//					ProcessInstance processInstance = offer2ProcessInstance.get(article.getOffer());
+//					if (processInstance == null) {
+//					processInstance = jbpmContext.getProcessInstance(article.getOffer().getOfferLocal().getJbpmProcessInstanceId());
+//					offer2ProcessInstance.put(article.getOffer(), processInstance);
+//					}
+
+//					if (!(processInstance.getRootToken().getNode() instanceof EndState)) // currently finishing
+					State state = article.getOffer().getOfferLocal().getState();
+					if (!state.getStateDefinition().isEndState())
+						throw new IllegalStateException("Article \"" + article.getPrimaryKey() + "\" cannot be released, because its Offer is finalized and the Offer's workflow has not ended yet!");
+
+					if (JbpmConstantsOffer.Vendor.NODE_NAME_ACCEPTED.equals(state.getStateDefinition().getJbpmNodeName()))
+						throw new IllegalStateException("Article \"" + article.getPrimaryKey() + "\" cannot be released, because its Offer is finalized and the Offer's workflow has ended successfully!");
 				}
-				al.add(article);
 			}
 
+			Product product = article.getProduct();
+			article.setReleasePending(true);
+			product.getProductLocal().setReleasePending(true);
+
+			ProductTypeActionHandler productTypeActionHandler = ProductTypeActionHandler.getProductTypeActionHandler(
+					pm, article.getProductType().getClass()
+			);
+			List<Article> al = productTypeActionHandler2Articles.get(productTypeActionHandler);
+			if (al == null) {
+				al = new LinkedList<Article>();
+				productTypeActionHandler2Articles.put(productTypeActionHandler, al);
+			}
+			al.add(article);
+		}
+
 //		} finally {
-//			jbpmContext.close();
+//		jbpmContext.close();
 //		}
 
 		if (logger.isTraceEnabled()) {
@@ -1309,8 +1310,8 @@ public class Trader
 		if (logger.isTraceEnabled()) {
 			logger.trace("releaseArticlesEnd: refreshing articles done.");
 //			if (logger.isTraceEnabled()) {
-				for (Article article : articles)
-					logger.trace("releaseArticlesEnd: * " + article);
+			for (Article article : articles)
+				logger.trace("releaseArticlesEnd: * " + article);
 //			}
 		}
 
@@ -1342,7 +1343,7 @@ public class Trader
 			article.setReleasePending(false);
 
 //			ProductTypeActionHandler productTypeActionHandler = ProductTypeActionHandler.getProductTypeActionHandler(
-//					getPersistenceManager(), article.getProductType().getClass());
+//			getPersistenceManager(), article.getProductType().getClass());
 			List<Article> al = productTypeActionHandler2Articles.get(productTypeActionHandler);
 			if (al == null) {
 				al = new LinkedList<Article>();
@@ -1402,7 +1403,7 @@ public class Trader
 		boolean first = true;
 		TotalArticleStatus res = new TotalArticleStatus();
 //		for (Iterator iter = articles.iterator(); iter.hasNext();) {
-//			Article article = (Article) iter.next();
+//		Article article = (Article) iter.next();
 		for (Article article : articles) {
 			if (first) {
 				res.allocated = article.isAllocated();
@@ -1459,7 +1460,7 @@ public class Trader
 	 *           If another error occurs.
 	 */
 	protected void allocateArticlesBegin(User user, Collection<? extends Article> articles)
-			throws ModuleException
+	throws ModuleException
 	{
 		if (logger.isDebugEnabled()) {
 			logger.debug("allocateArticlesBegin: entered with " + articles.size() + " articles.");
@@ -1497,8 +1498,8 @@ public class Trader
 		if (tas.releasePending)
 			throw new IllegalStateException(
 					"Articles \""
-							+ getToStringList(articles)
-							+ "\" cannot be allocated, because it is currently in state releasePending!");
+					+ getToStringList(articles)
+					+ "\" cannot be allocated, because it is currently in state releasePending!");
 
 		Map<Class<? extends ProductType>, ProductTypeActionHandler> productTypeClass2ProductTypeActionHandler = new HashMap<Class<? extends ProductType>, ProductTypeActionHandler>();
 		for (Article article : articles) {
@@ -1523,11 +1524,11 @@ public class Trader
 			if (productLocal.getSaleArticle() != null)
 				throw new NotAvailableException(
 						"The article '"
-								+ article.getPrimaryKey()
-								+ "' with product '"
-								+ product.getPrimaryKey()
-								+ "' cannot be allocated, because the product is already allocated in article '"
-								+ productLocal.getSaleArticle().getPrimaryKey() + "'!");
+						+ article.getPrimaryKey()
+						+ "' with product '"
+						+ product.getPrimaryKey()
+						+ "' cannot be allocated, because the product is already allocated in article '"
+						+ productLocal.getSaleArticle().getPrimaryKey() + "'!");
 
 			if (!article.getOrganisationID().equals(product.getOrganisationID()))
 				throw new IllegalStateException("The article '"
@@ -1539,27 +1540,27 @@ public class Trader
 			productLocal.setAllocationPending(true);
 			article.setAllocationPending(true);
 			IPackagePriceConfig packagePriceConfig = product.getProductType()
-					.getPackagePriceConfig();
+			.getPackagePriceConfig();
 
 //			pm.flush();
-//
+
 //			// TODO remove this JPOX Workaround - getting:
 //			// com.mysql.jdbc.exceptions.MySQLIntegrityConstraintViolationException: Duplicate entry 'chezfrancois.jfire.org-9-8' for key 1
 			ArticlePrice articlePrice = packagePriceConfig.createArticlePrice(article);
 //			for (int tryCounter = 0; tryCounter < 10; ++tryCounter) {
-//				try {
-//					articlePrice = pm.makePersistent(articlePrice);
-//					break;
-//				} catch (Exception x) {
-//					logger.warn("Persisting articlePrice instance failed! Trying it again. tryCounter=" + tryCounter, x);
-//				}
+//			try {
+//			articlePrice = pm.makePersistent(articlePrice);
+//			break;
+//			} catch (Exception x) {
+//			logger.warn("Persisting articlePrice instance failed! Trying it again. tryCounter=" + tryCounter, x);
+//			}
 //			}
 			article.setPrice(articlePrice);
 
 //			pm.flush();
 
 //			ProductTypeActionHandler productTypeActionHandler = ProductTypeActionHandler.getProductTypeActionHandler(
-//					getPersistenceManager(), article.getProductType().getClass());
+//			getPersistenceManager(), article.getProductType().getClass());
 			ProductTypeActionHandler productTypeActionHandler = productTypeClass2ProductTypeActionHandler.get(article.getProductType().getClass());
 			List<Article> al = productTypeActionHandler2Articles.get(productTypeActionHandler);
 			if (al == null) {
@@ -1599,7 +1600,7 @@ public class Trader
 	 * @throws ModuleException
 	 */
 	protected void allocateArticlesEnd(User user, Collection<? extends Article> articles)
-			throws ModuleException
+	throws ModuleException
 	{
 		if (logger.isDebugEnabled()) {
 			logger.debug("allocateArticlesEnd: entered with " + articles.size() + " articles.");
@@ -1643,7 +1644,7 @@ public class Trader
 			productTypeActionHandler.assembleProduct(user, productTypeActionHandlerCache, product);
 
 			IPackagePriceConfig packagePriceConfig = product.getProductType()
-					.getPackagePriceConfig();
+			.getPackagePriceConfig();
 			packagePriceConfig.fillArticlePrice(article);
 
 			product.getProductLocal().setAllocated(true);
@@ -1688,19 +1689,19 @@ public class Trader
 		validateOffer(offer, false);
 	}
 
-// has been moved into the ActionHandler
+//	has been moved into the ActionHandler
 //	/**
-//	 * This method must not be called directly. It's triggered by jBPM via the {@link ActionHandlerFinalizeOffer}
-//	 */
+//	* This method must not be called directly. It's triggered by jBPM via the {@link ActionHandlerFinalizeOffer}
+//	*/
 //	public void onFinalizeOffer(User user, Offer offer)
 //	{
-//		if (offer.isFinalized())
-//			return;
-//
-//		offer.setFinalized(user);
-//		for (OfferActionHandler offerActionHandler : offer.getOfferLocal().getOfferActionHandlers()) {
-//			offerActionHandler.onFinalizeOffer(user, offer);
-//		}
+//	if (offer.isFinalized())
+//	return;
+
+//	offer.setFinalized(user);
+//	for (OfferActionHandler offerActionHandler : offer.getOfferLocal().getOfferActionHandlers()) {
+//	offerActionHandler.onFinalizeOffer(user, offer);
+//	}
 //	}
 
 	/**
@@ -1804,14 +1805,14 @@ public class Trader
 
 //	public void confirmOffer(User user, OfferLocal offerLocal)
 //	{
-//		offerLocal.confirm(user);
+//	offerLocal.confirm(user);
 //	}
 //	/**
-//	 * This is a convenience method which calls {@link #confirmOffer(User, OfferLocal)}.
-//	 */
+//	* This is a convenience method which calls {@link #confirmOffer(User, OfferLocal)}.
+//	*/
 //	public void confirmOffer(User user, Offer offer)
 //	{
-//		confirmOffer(user, offer.getOfferLocal());
+//	confirmOffer(user, offer.getOfferLocal());
 //	}
 
 	/**
@@ -1823,7 +1824,7 @@ public class Trader
 	 *          Instances of {@link Article}.
 	 */
 	public void deleteArticles(User user, Collection<? extends Article> articles)
-			throws ModuleException
+	throws ModuleException
 	{
 		if (logger.isDebugEnabled()) {
 			logger.debug("deleteArticles: entered with " + articles.size() + " articles.");
@@ -1844,7 +1845,7 @@ public class Trader
 		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
 		if (pm == null)
 			throw new IllegalStateException(
-					"This instance of Trader is currently not attached to a datastore! Cannot get a PersistenceManager!");
+			"This instance of Trader is currently not attached to a datastore! Cannot get a PersistenceManager!");
 
 		return pm;
 	}
@@ -1911,114 +1912,114 @@ public class Trader
 				true);
 
 		switch (tradeSide) {
-			case vendor:
-			{
-				// give known StateDefinitions a name and a description
-				setStateDefinitionProperties(processDefinition, JbpmConstantsOffer.Vendor.NODE_NAME_CREATED,
-						"created",
-						"The Offer has been newly created. This is the first state in the Offer related workflow.",
-						true);
+		case vendor:
+		{
+			// give known StateDefinitions a name and a description
+			setStateDefinitionProperties(processDefinition, JbpmConstantsOffer.Vendor.NODE_NAME_CREATED,
+					"created",
+					"The Offer has been newly created. This is the first state in the Offer related workflow.",
+					true);
 
-				setStateDefinitionProperties(processDefinition, JbpmConstantsOffer.Vendor.NODE_NAME_ABORTED,
-						"aborted",
-						"The Offer has been aborted by the vendor (before finalization). A new Offer needs to be created in order to continue the interaction.",
-						true);
+			setStateDefinitionProperties(processDefinition, JbpmConstantsOffer.Vendor.NODE_NAME_ABORTED,
+					"aborted",
+					"The Offer has been aborted by the vendor (before finalization). A new Offer needs to be created in order to continue the interaction.",
+					true);
 
-				setStateDefinitionProperties(processDefinition, JbpmConstantsOffer.Vendor.NODE_NAME_FINALIZED,
-						"finalized",
-						"The Offer has been finalized. After that, it cannot be modified anymore. A modification would require revocation and recreation.",
-						true);
+			setStateDefinitionProperties(processDefinition, JbpmConstantsOffer.Vendor.NODE_NAME_FINALIZED,
+					"finalized",
+					"The Offer has been finalized. After that, it cannot be modified anymore. A modification would require revocation and recreation.",
+					true);
 
-				setStateDefinitionProperties(processDefinition, JbpmConstantsOffer.Vendor.NODE_NAME_ACCEPTED,
-						"accepted",
-						"The Offer has been accepted by the customer. That turns the offer into a binding contract.",
-						true);
+			setStateDefinitionProperties(processDefinition, JbpmConstantsOffer.Vendor.NODE_NAME_ACCEPTED,
+					"accepted",
+					"The Offer has been accepted by the customer. That turns the offer into a binding contract.",
+					true);
 
-				setStateDefinitionProperties(processDefinition, JbpmConstantsOffer.Vendor.NODE_NAME_REJECTED,
-						"rejected",
-						"The Offer has been rejected by the customer. A new Offer needs to be created in order to continue the interaction.",
-						true);
+			setStateDefinitionProperties(processDefinition, JbpmConstantsOffer.Vendor.NODE_NAME_REJECTED,
+					"rejected",
+					"The Offer has been rejected by the customer. A new Offer needs to be created in order to continue the interaction.",
+					true);
 
-				// give known Transitions a name
-				for (Transition transition : Transition.getTransitions(pm, processDefinitionID, JbpmConstantsOffer.Vendor.TRANSITION_NAME_ACCEPT_IMPLICITELY)) {
-//					transition.getName().setText(Locale.ENGLISH.getLanguage(), "accept implicitely"); - no name necessary as it's not displayed to the user
-					transition.setUserExecutable(false);
-				}
+			// give known Transitions a name
+			for (Transition transition : Transition.getTransitions(pm, processDefinitionID, JbpmConstantsOffer.Vendor.TRANSITION_NAME_ACCEPT_IMPLICITELY)) {
+//				transition.getName().setText(Locale.ENGLISH.getLanguage(), "accept implicitely"); - no name necessary as it's not displayed to the user
+				transition.setUserExecutable(false);
+			}
 
-				for (Transition transition : Transition.getTransitions(pm, processDefinitionID, JbpmConstantsOffer.Vendor.TRANSITION_NAME_CUSTOMER_ACCEPTED)) {
-//					transition.getName().setText(Locale.ENGLISH.getLanguage(), "customer accepted");
-					transition.setUserExecutable(false);
-				}
-
-				for (Transition transition : Transition.getTransitions(pm, processDefinitionID, JbpmConstantsOffer.Vendor.TRANSITION_NAME_CUSTOMER_REJECTED)) {
-//					transition.getName().setText(Locale.ENGLISH.getLanguage(), "customer rejected");
-					transition.setUserExecutable(false);
-				}
-
-//				Transition transition;
-//
-//				try {
-//					transition = (Transition) pm.getObjectById(JbpmConstantsOffer.Vendor.getTransitionID_created_2_accept(processDefinitionID));
-//					transition.getName().setText(Locale.ENGLISH.getLanguage(), "accept");
-//					transition.setUserExecutable(false);
-//				} catch (JDOObjectNotFoundException x) {
-//					logger.warn("The ProcessDefinition \"" + processDefinition.getJbpmProcessDefinitionName() + "\" does not contain a jBPM Transition named \"accept\" from Node \"created\"!");
-//				}
-//
-//				transition = (Transition) pm.getObjectById(JbpmConstantsOffer.Vendor.getTransitionID_finalized_2_customerAccepted(processDefinitionID));
+			for (Transition transition : Transition.getTransitions(pm, processDefinitionID, JbpmConstantsOffer.Vendor.TRANSITION_NAME_CUSTOMER_ACCEPTED)) {
 //				transition.getName().setText(Locale.ENGLISH.getLanguage(), "customer accepted");
-//				transition.setUserExecutable(false);
-//
-//				transition = (Transition) pm.getObjectById(JbpmConstantsOffer.Vendor.getTransitionID_finalized_2_customerRejected(processDefinitionID));
+				transition.setUserExecutable(false);
+			}
+
+			for (Transition transition : Transition.getTransitions(pm, processDefinitionID, JbpmConstantsOffer.Vendor.TRANSITION_NAME_CUSTOMER_REJECTED)) {
 //				transition.getName().setText(Locale.ENGLISH.getLanguage(), "customer rejected");
-//				transition.setUserExecutable(false);
+				transition.setUserExecutable(false);
 			}
-			break;
-			case customerCrossOrganisation:
-			{
-				// give known StateDefinitions a name and a description
-				setStateDefinitionProperties(processDefinition, JbpmConstantsOffer.Customer.NODE_NAME_CUSTOMER_ACCEPTED,
-						"customer accepted",
-						"The customer has accepted the Offer.",
-						true);
 
-				setStateDefinitionProperties(processDefinition, JbpmConstantsOffer.Customer.NODE_NAME_CUSTOMER_REJECTED,
-						"customer rejected",
-						"The customer has rejected the Offer.",
-						true);
+//			Transition transition;
 
-				for (Transition transition : Transition.getTransitions(pm, processDefinitionID, JbpmConstantsOffer.Customer.TRANSITION_NAME_EXPIRED)) {
-//					transition.getName().setText(Locale.ENGLISH.getLanguage(), "expired"); - no name necessary as it's not displayed to the user
-					transition.setUserExecutable(false);
-				}
+//			try {
+//			transition = (Transition) pm.getObjectById(JbpmConstantsOffer.Vendor.getTransitionID_created_2_accept(processDefinitionID));
+//			transition.getName().setText(Locale.ENGLISH.getLanguage(), "accept");
+//			transition.setUserExecutable(false);
+//			} catch (JDOObjectNotFoundException x) {
+//			logger.warn("The ProcessDefinition \"" + processDefinition.getJbpmProcessDefinitionName() + "\" does not contain a jBPM Transition named \"accept\" from Node \"created\"!");
+//			}
 
-				for (Transition transition : Transition.getTransitions(pm, processDefinitionID, JbpmConstantsOffer.Customer.TRANSITION_NAME_REVOKED)) {
-					transition.setUserExecutable(false);
-				}
+//			transition = (Transition) pm.getObjectById(JbpmConstantsOffer.Vendor.getTransitionID_finalized_2_customerAccepted(processDefinitionID));
+//			transition.getName().setText(Locale.ENGLISH.getLanguage(), "customer accepted");
+//			transition.setUserExecutable(false);
 
-				for (Transition transition : Transition.getTransitions(pm, processDefinitionID, JbpmConstantsOffer.Customer.TRANSITION_NAME_ACCEPTED_IMPLICITELY)) {
-					transition.setUserExecutable(false);
-				}
+//			transition = (Transition) pm.getObjectById(JbpmConstantsOffer.Vendor.getTransitionID_finalized_2_customerRejected(processDefinitionID));
+//			transition.getName().setText(Locale.ENGLISH.getLanguage(), "customer rejected");
+//			transition.setUserExecutable(false);
+		}
+		break;
+		case customerCrossOrganisation:
+		{
+			// give known StateDefinitions a name and a description
+			setStateDefinitionProperties(processDefinition, JbpmConstantsOffer.Customer.NODE_NAME_CUSTOMER_ACCEPTED,
+					"customer accepted",
+					"The customer has accepted the Offer.",
+					true);
 
-//				// give known Transitions a name
-//				Transition transition;
-//
-//				transition = (Transition) pm.getObjectById(JbpmConstantsOffer.Customer.getTransitionID_sent_2_expired(processDefinitionID));
-//				transition.getName().setText(Locale.ENGLISH.getLanguage(), "expired");
-//				transition.setUserExecutable(false);
-//
-//				transition = (Transition) pm.getObjectById(JbpmConstantsOffer.Customer.getTransitionID_sent_2_revoked(processDefinitionID));
-//				transition.getName().setText(Locale.ENGLISH.getLanguage(), "revoked");
-//				transition.setUserExecutable(false);
+			setStateDefinitionProperties(processDefinition, JbpmConstantsOffer.Customer.NODE_NAME_CUSTOMER_REJECTED,
+					"customer rejected",
+					"The customer has rejected the Offer.",
+					true);
+
+			for (Transition transition : Transition.getTransitions(pm, processDefinitionID, JbpmConstantsOffer.Customer.TRANSITION_NAME_EXPIRED)) {
+//				transition.getName().setText(Locale.ENGLISH.getLanguage(), "expired"); - no name necessary as it's not displayed to the user
+				transition.setUserExecutable(false);
 			}
-			break;
-			case customerLocal:
-			{
-				// later...
+
+			for (Transition transition : Transition.getTransitions(pm, processDefinitionID, JbpmConstantsOffer.Customer.TRANSITION_NAME_REVOKED)) {
+				transition.setUserExecutable(false);
 			}
-			break;
-			default:
-				throw new IllegalStateException("Unknown TradeSide: " + tradeSide);
+
+			for (Transition transition : Transition.getTransitions(pm, processDefinitionID, JbpmConstantsOffer.Customer.TRANSITION_NAME_ACCEPTED_IMPLICITELY)) {
+				transition.setUserExecutable(false);
+			}
+
+//			// give known Transitions a name
+//			Transition transition;
+
+//			transition = (Transition) pm.getObjectById(JbpmConstantsOffer.Customer.getTransitionID_sent_2_expired(processDefinitionID));
+//			transition.getName().setText(Locale.ENGLISH.getLanguage(), "expired");
+//			transition.setUserExecutable(false);
+
+//			transition = (Transition) pm.getObjectById(JbpmConstantsOffer.Customer.getTransitionID_sent_2_revoked(processDefinitionID));
+//			transition.getName().setText(Locale.ENGLISH.getLanguage(), "revoked");
+//			transition.setUserExecutable(false);
+		}
+		break;
+		case customerLocal:
+		{
+			// later...
+		}
+		break;
+		default:
+			throw new IllegalStateException("Unknown TradeSide: " + tradeSide);
 		}
 
 		return processDefinition;
@@ -2212,140 +2213,140 @@ public class Trader
 
 //	public Collection<? extends Article> onProductAssemble_importNestedProduct(User user, Product packageProduct, String partnerOrganisationID, Collection<NestedProductTypeLocal> partnerNestedProductTypes)
 //	{
-//		try {
-//			PersistenceManager pm = getPersistenceManager();
-//			Article localArticle = packageProduct.getProductLocal().getArticle();
-//			Order localOrder = localArticle.getOrder();
-//			Offer localOffer = localArticle.getOffer();
-//			SegmentType segmentType = localArticle.getSegment().getSegmentType();
-//
-//			Set segmentTypeIDsWithTheCurrentInstanceOnly = new HashSet();
-//			segmentTypeIDsWithTheCurrentInstanceOnly.add(JDOHelper.getObjectId(segmentType));
-//
-//			OrganisationLegalEntity partner = OrganisationLegalEntity.getOrganisationLegalEntity(pm, partnerOrganisationID, OrganisationLegalEntity.ANCHOR_TYPE_ID_ORGANISATION, true);
-//
-//			Hashtable initialContextProperties = Lookup.getInitialContextProperties(pm, partnerOrganisationID);
-//			TradeManager tradeManager = TradeManagerUtil.getHome(initialContextProperties).create();
-//
-////			Set segmentTypeIDs = Segment.getSegmentTypeIDs(pm, localOrder);
-//
-//			// for the current order, we create/find an instance of OrderRequirement
-//			OrderRequirement orderRequirement = OrderRequirement.getOrderRequirement(pm, localOrder);
-//			Order partnerOrder = orderRequirement.getPartnerOrder(partner);
-//			OrderID partnerOrderID;
-//			SegmentID partnerSegmentID;
-//			if (partnerOrder == null) {
-//				Order order = tradeManager.createCrossTradeOrder(null, // TODO should we somehow configure the orderIDPrefix on this side? I don't think so. Marco.
-//						localOrder.getCurrency().getCurrencyID(),
-//						null, // TODO we should find out and pass the CustomerGroupID
-////						segmentTypeIDs);
-//						segmentTypeIDsWithTheCurrentInstanceOnly);
-//				partnerOrder = (Order) pm.makePersistent(order);
-//				orderRequirement.addPartnerOrder(partnerOrder);
-//				partnerOrderID = (OrderID) JDOHelper.getObjectId(partnerOrder);
-//				partnerSegmentID = Segment.getSegmentIDs(pm, partnerOrder, segmentType).iterator().next();
-//			}
-//			else {
-//				partnerOrderID = (OrderID) JDOHelper.getObjectId(partnerOrder);
-//				Set segmentIDs = Segment.getSegmentIDs(pm, partnerOrder, segmentType);
-//				if (segmentIDs.isEmpty()) {
-//					Collection segments = tradeManager.createCrossTradeSegments(partnerOrderID, segmentTypeIDsWithTheCurrentInstanceOnly);
-//					segments = pm.makePersistentAll(segments);
-//					segmentIDs = NLJDOHelper.getObjectIDSet(segments);
-//				}
-//				partnerSegmentID = (SegmentID) segmentIDs.iterator().next();
-////				Set partnerSegmentTypeIDs = Segment.getSegmentTypeIDs(pm, partnerOrder);
-////				if (!segmentTypeIDs.equals(partnerSegmentTypeIDs))
-////					tradeManager.createCrossTradeSegments(partnerOrderID, segmentTypeIDs);
-//			}
-//
-//			// for the current offer, we create/find an instance of OfferRequirement
-//			OfferRequirement offerRequirement = OfferRequirement.getOfferRequirement(pm, localOffer);
-//			Offer partnerOffer = offerRequirement.getPartnerOffer(partner);
-//			if (partnerOffer == null) {
-//				{
-//					Offer offer = tradeManager.createCrossTradeOffer(partnerOrderID, null); // we don't pass the offerIDPrefix - or should we?
-//					new OfferLocal(offer);
-//					partnerOffer = (Offer) pm.makePersistent(offer);
-//					offerRequirement.addPartnerOffer(partnerOffer);
-//				}
-//
-//				ProcessDefinitionAssignment processDefinitionAssignment = (ProcessDefinitionAssignment) getPersistenceManager().getObjectById(
-//						ProcessDefinitionAssignmentID.create(Offer.class, TradeSide.customer));
-//				processDefinitionAssignment.createProcessInstance(null, user, partnerOffer);
-//			}
-//			OfferID partnerOfferID = (OfferID) JDOHelper.getObjectId(partnerOffer);
-//
-////			ProductTypeID[] productTypeIDs = new ProductTypeID[partnerNestedProductTypes.size()];
-////			int[] quantities = new int[partnerNestedProductTypes.size()];
-////			ProductLocator[] productLocators = new ProductLocator[partnerNestedProductTypes.size()];
-////
-////			int idx = 0;
-////			for (NestedProductTypeLocal partnerNestedProductType : partnerNestedProductTypes) {
-////				ProductLocator productLocator = packageProduct.getProductLocator(user, partnerNestedProductType);
-////				productTypeIDs[idx] = (ProductTypeID) JDOHelper.getObjectId(partnerNestedProductType.getInnerProductType());
-////				quantities[idx] = partnerNestedProductType.getQuantity();
-////				productLocators[idx] = productLocator;
-////				++idx;
-////			}
-////
-////			Map<Integer, Collection<? extends Article>> articleMap = tradeManager.createCrossTradeArticles(partnerOfferID, productTypeIDs, quantities, productLocators);
-//
-//			Map productType2NestedProductTypes = new HashMap();
-//			for (NestedProductTypeLocal partnerNestedProductType : partnerNestedProductTypes) {
-//				Collection nestedProductTypes = (Collection) productType2NestedProductTypes.get(partnerNestedProductType.getInnerProductType());
-//				if (nestedProductTypes == null) {
-//					nestedProductTypes = new ArrayList();
-//					productType2NestedProductTypes.put(partnerNestedProductType.getInnerProductType(), nestedProductTypes);
-//				}
-//				nestedProductTypes.add(partnerNestedProductType);
-//			}
-//
-//			Collection resultArticles = null;
-//
-//			for (Iterator itME = productType2NestedProductTypes.entrySet().iterator(); itME.hasNext();) {
-//				Map.Entry me = (Map.Entry) itME.next();
-//				ProductType productType = (ProductType) me.getKey();
-//				Collection nestedProductTypes = (Collection) me.getValue();
-//				ProductTypeActionHandler productTypeActionHandler = ProductTypeActionHandler.getProductTypeActionHandler(pm, productType.getClass());
-//
-//				Collection articles = productTypeActionHandler.createCrossTradeArticles(
-//						user, packageProduct, localArticle,
-//						partnerOrganisationID, initialContextProperties,
-//						partnerOffer, partnerOfferID, partnerSegmentID,
-//						productType, nestedProductTypes);
-//
-//				articles = pm.makePersistentAll(articles);
-//
-//				if (resultArticles == null)
-//					resultArticles = new ArrayList(articles);
-//				else
-//					resultArticles.addAll(articles);
-//
-//				for (Iterator itA = articles.iterator(); itA.hasNext();) {
-//					Article article = (Article) itA.next();
-//					article.createArticleLocal(user);
-//
-//					ProductType articleProductType = article.getProductType();
-//					if (articleProductType == null)
-//						throw new IllegalStateException("article.getProductType() == null for imported Article: " + article.getPrimaryKey());
-//
-//					ProductTypeLocal articleProductTypeLocal = articleProductType.getProductTypeLocal();
-//					if (articleProductTypeLocal == null)
-//						throw new IllegalStateException("article.getProductType().getProductTypeLocal() == null for imported Article (" + article.getPrimaryKey() + "). ProductType: " + articleProductType.getPrimaryKey());
-//
-//					store.addProduct(user, article.getProduct(), articleProductTypeLocal.getHome());
-//				}
-//			}
-//
-//			pm.flush();
-//
-//			if (resultArticles == null) // can this ever happen?!
-//				resultArticles = new ArrayList(0);
-//
-//			return resultArticles;
-//		} catch (Exception e) {
-//			throw new RuntimeException(e);
-//		}
+//	try {
+//	PersistenceManager pm = getPersistenceManager();
+//	Article localArticle = packageProduct.getProductLocal().getArticle();
+//	Order localOrder = localArticle.getOrder();
+//	Offer localOffer = localArticle.getOffer();
+//	SegmentType segmentType = localArticle.getSegment().getSegmentType();
+
+//	Set segmentTypeIDsWithTheCurrentInstanceOnly = new HashSet();
+//	segmentTypeIDsWithTheCurrentInstanceOnly.add(JDOHelper.getObjectId(segmentType));
+
+//	OrganisationLegalEntity partner = OrganisationLegalEntity.getOrganisationLegalEntity(pm, partnerOrganisationID, OrganisationLegalEntity.ANCHOR_TYPE_ID_ORGANISATION, true);
+
+//	Hashtable initialContextProperties = Lookup.getInitialContextProperties(pm, partnerOrganisationID);
+//	TradeManager tradeManager = TradeManagerUtil.getHome(initialContextProperties).create();
+
+////	Set segmentTypeIDs = Segment.getSegmentTypeIDs(pm, localOrder);
+
+//	// for the current order, we create/find an instance of OrderRequirement
+//	OrderRequirement orderRequirement = OrderRequirement.getOrderRequirement(pm, localOrder);
+//	Order partnerOrder = orderRequirement.getPartnerOrder(partner);
+//	OrderID partnerOrderID;
+//	SegmentID partnerSegmentID;
+//	if (partnerOrder == null) {
+//	Order order = tradeManager.createCrossTradeOrder(null, // TODO should we somehow configure the orderIDPrefix on this side? I don't think so. Marco.
+//	localOrder.getCurrency().getCurrencyID(),
+//	null, // TODO we should find out and pass the CustomerGroupID
+////	segmentTypeIDs);
+//	segmentTypeIDsWithTheCurrentInstanceOnly);
+//	partnerOrder = (Order) pm.makePersistent(order);
+//	orderRequirement.addPartnerOrder(partnerOrder);
+//	partnerOrderID = (OrderID) JDOHelper.getObjectId(partnerOrder);
+//	partnerSegmentID = Segment.getSegmentIDs(pm, partnerOrder, segmentType).iterator().next();
+//	}
+//	else {
+//	partnerOrderID = (OrderID) JDOHelper.getObjectId(partnerOrder);
+//	Set segmentIDs = Segment.getSegmentIDs(pm, partnerOrder, segmentType);
+//	if (segmentIDs.isEmpty()) {
+//	Collection segments = tradeManager.createCrossTradeSegments(partnerOrderID, segmentTypeIDsWithTheCurrentInstanceOnly);
+//	segments = pm.makePersistentAll(segments);
+//	segmentIDs = NLJDOHelper.getObjectIDSet(segments);
+//	}
+//	partnerSegmentID = (SegmentID) segmentIDs.iterator().next();
+////	Set partnerSegmentTypeIDs = Segment.getSegmentTypeIDs(pm, partnerOrder);
+////	if (!segmentTypeIDs.equals(partnerSegmentTypeIDs))
+////	tradeManager.createCrossTradeSegments(partnerOrderID, segmentTypeIDs);
+//	}
+
+//	// for the current offer, we create/find an instance of OfferRequirement
+//	OfferRequirement offerRequirement = OfferRequirement.getOfferRequirement(pm, localOffer);
+//	Offer partnerOffer = offerRequirement.getPartnerOffer(partner);
+//	if (partnerOffer == null) {
+//	{
+//	Offer offer = tradeManager.createCrossTradeOffer(partnerOrderID, null); // we don't pass the offerIDPrefix - or should we?
+//	new OfferLocal(offer);
+//	partnerOffer = (Offer) pm.makePersistent(offer);
+//	offerRequirement.addPartnerOffer(partnerOffer);
+//	}
+
+//	ProcessDefinitionAssignment processDefinitionAssignment = (ProcessDefinitionAssignment) getPersistenceManager().getObjectById(
+//	ProcessDefinitionAssignmentID.create(Offer.class, TradeSide.customer));
+//	processDefinitionAssignment.createProcessInstance(null, user, partnerOffer);
+//	}
+//	OfferID partnerOfferID = (OfferID) JDOHelper.getObjectId(partnerOffer);
+
+////	ProductTypeID[] productTypeIDs = new ProductTypeID[partnerNestedProductTypes.size()];
+////	int[] quantities = new int[partnerNestedProductTypes.size()];
+////	ProductLocator[] productLocators = new ProductLocator[partnerNestedProductTypes.size()];
+
+////	int idx = 0;
+////	for (NestedProductTypeLocal partnerNestedProductType : partnerNestedProductTypes) {
+////	ProductLocator productLocator = packageProduct.getProductLocator(user, partnerNestedProductType);
+////	productTypeIDs[idx] = (ProductTypeID) JDOHelper.getObjectId(partnerNestedProductType.getInnerProductType());
+////	quantities[idx] = partnerNestedProductType.getQuantity();
+////	productLocators[idx] = productLocator;
+////	++idx;
+////	}
+
+////	Map<Integer, Collection<? extends Article>> articleMap = tradeManager.createCrossTradeArticles(partnerOfferID, productTypeIDs, quantities, productLocators);
+
+//	Map productType2NestedProductTypes = new HashMap();
+//	for (NestedProductTypeLocal partnerNestedProductType : partnerNestedProductTypes) {
+//	Collection nestedProductTypes = (Collection) productType2NestedProductTypes.get(partnerNestedProductType.getInnerProductType());
+//	if (nestedProductTypes == null) {
+//	nestedProductTypes = new ArrayList();
+//	productType2NestedProductTypes.put(partnerNestedProductType.getInnerProductType(), nestedProductTypes);
+//	}
+//	nestedProductTypes.add(partnerNestedProductType);
+//	}
+
+//	Collection resultArticles = null;
+
+//	for (Iterator itME = productType2NestedProductTypes.entrySet().iterator(); itME.hasNext();) {
+//	Map.Entry me = (Map.Entry) itME.next();
+//	ProductType productType = (ProductType) me.getKey();
+//	Collection nestedProductTypes = (Collection) me.getValue();
+//	ProductTypeActionHandler productTypeActionHandler = ProductTypeActionHandler.getProductTypeActionHandler(pm, productType.getClass());
+
+//	Collection articles = productTypeActionHandler.createCrossTradeArticles(
+//	user, packageProduct, localArticle,
+//	partnerOrganisationID, initialContextProperties,
+//	partnerOffer, partnerOfferID, partnerSegmentID,
+//	productType, nestedProductTypes);
+
+//	articles = pm.makePersistentAll(articles);
+
+//	if (resultArticles == null)
+//	resultArticles = new ArrayList(articles);
+//	else
+//	resultArticles.addAll(articles);
+
+//	for (Iterator itA = articles.iterator(); itA.hasNext();) {
+//	Article article = (Article) itA.next();
+//	article.createArticleLocal(user);
+
+//	ProductType articleProductType = article.getProductType();
+//	if (articleProductType == null)
+//	throw new IllegalStateException("article.getProductType() == null for imported Article: " + article.getPrimaryKey());
+
+//	ProductTypeLocal articleProductTypeLocal = articleProductType.getProductTypeLocal();
+//	if (articleProductTypeLocal == null)
+//	throw new IllegalStateException("article.getProductType().getProductTypeLocal() == null for imported Article (" + article.getPrimaryKey() + "). ProductType: " + articleProductType.getPrimaryKey());
+
+//	store.addProduct(user, article.getProduct(), articleProductTypeLocal.getHome());
+//	}
+//	}
+
+//	pm.flush();
+
+//	if (resultArticles == null) // can this ever happen?!
+//	resultArticles = new ArrayList(0);
+
+//	return resultArticles;
+//	} catch (Exception e) {
+//	throw new RuntimeException(e);
+//	}
 //	}
 }

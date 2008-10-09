@@ -2,6 +2,7 @@ package org.nightlabs.jfire.trade.recurring;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -22,6 +23,7 @@ import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.accounting.Accounting;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.Invoice;
+import org.nightlabs.jfire.accounting.Price;
 import org.nightlabs.jfire.accounting.id.InvoiceID;
 import org.nightlabs.jfire.accounting.jbpm.JbpmConstantsInvoice;
 import org.nightlabs.jfire.config.Config;
@@ -177,10 +179,10 @@ public class RecurringTrader {
 	public RecurredOffer processRecurringOffer(RecurringOffer recurringOffer) throws ModuleException, CreateException, NamingException
 	{
 		boolean priceDiffer = false;
-	
+
 		// check if the recurring task is past the stop / suspend date
 		Date stopDate =  recurringOffer.getRecurringOfferConfiguration().getSuspendDate();
-		
+
 		if(stopDate != null)		
 		{				
 			Date localDate = new Date();
@@ -193,7 +195,7 @@ public class RecurringTrader {
 		}
 
 		String nodeName = recurringOffer.getState().getStateDefinition().getJbpmNodeName();
-		
+
 		if (!JbpmConstantsRecurringOffer.Vendor.NODE_NAME_RECURRENCE_STARTED.equals(nodeName)) 
 		{		
 			recurringOffer.getRecurringOfferConfiguration().getCreatorTask().setEnabled(false);
@@ -221,9 +223,14 @@ public class RecurringTrader {
 		User user = SecurityReflector.getUserDescriptor().getUser(pm);
 
 		String offerIDPrefix = recurringOffer.getOfferIDPrefix();
-
+		
+		Collection<Segment> recurringSegments = new HashSet<Segment>();
+		for (Article article : recurringOffer.getArticles()) {
+			recurringSegments.add(article.getSegment());
+		}
+		
 		// create the new segment for the order
-		for (Segment segment : recurringOffer.getSegments()) {
+		for (Segment segment : recurringSegments) {
 			trader.createSegment(order, segment.getSegmentType());
 		}
 
@@ -234,6 +241,7 @@ public class RecurringTrader {
 		// Loop over all articles in the given offer and group
 		// them by SegmentType and ProductType-class
 		Map<SegmentType, Map<Class<? extends ProductType>, Set<Article>>> segmentTypes2PTClass2Articles =  new HashMap<SegmentType, Map<Class<? extends ProductType>, Set<Article>>>();
+		Set<Article> articles = new HashSet<Article>();
 
 		for (Article recurringArticle : recurringOffer.getArticles()) {
 			SegmentType segmentType = recurringArticle.getSegment().getSegmentType();
@@ -243,7 +251,7 @@ public class RecurringTrader {
 				segmentTypes2PTClass2Articles.put(segmentType, ptClass2Articles);
 			}
 			Class<? extends ProductType> productTypeClass = recurringArticle.getProductType().getClass();
-			Set<Article> articles = ptClass2Articles.get(productTypeClass);
+			articles = ptClass2Articles.get(productTypeClass);
 			if (articles == null) {
 				articles = new HashSet<Article>();
 				ptClass2Articles.put(productTypeClass, articles);
@@ -263,7 +271,7 @@ public class RecurringTrader {
 				}
 			}
 		}
-
+		
 		// loop over the segments added to the order
 		for (Segment segment : order.getSegments()) {
 			logger.debug("Creating articles for RecurredOffer for SegmentType " + JDOHelper.getObjectId(segment.getSegmentType()));
@@ -277,7 +285,7 @@ public class RecurringTrader {
 					Class<? extends ProductType> pt = it.next();
 					logger.debug("  Creating articles for RecurredOffer for ProductType class " + pt);
 
-					Set<Article> articles = collected.get(pt);
+					articles = collected.get(pt);
 
 					RecurringTradeProductTypeActionHandler handler = RecurringTradeProductTypeActionHandler.getRecurringTradeProductTypeActionHandler(pm, pt);
 					if (handler == null)
@@ -287,9 +295,18 @@ public class RecurringTrader {
 
 					Map<Article, Article> recurredArticles = handler.createArticles(recurredOffer, articles, segment);
 
+					if(recurredArticles.size() != articles.size())
+						throw new IllegalStateException(
+								"RecurringTradeProductTypeActionHandler " + handler.getClass().getName() +
+								" created " + recurredArticles.size() + " recurred articles for " + articles.size() +
+								" template/recurring articles");
+					
 					for (Map.Entry<Article, Article> articleEntry : recurredArticles.entrySet()) {
 						//	Compare Prices to check if they the Differ
-						if(!articleEntry.getValue().getPrice().equals(articleEntry.getKey().getPrice()))
+						Price recurringPrice = articleEntry.getValue().getPrice();
+						Price recurredPrice = articleEntry.getKey().getPrice();
+						// if amount or currency differs 
+						if (recurredPrice.getAmount() != recurringPrice.getAmount() || !recurredPrice.getCurrency().equals(recurringPrice.getCurrency()))
 							priceDiffer = true;
 
 						if (logger.isDebugEnabled()) {

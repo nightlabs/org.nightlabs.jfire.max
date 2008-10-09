@@ -9,7 +9,7 @@ import org.nightlabs.jfire.trade.Order;
 /**
  *
  * A {@link RecurringOrder} is an extension of {@link Order} that manages {@link RecurringOffer}s.
- * 
+ *
  * @author Fitas Amine <fitas@nightlabs.de>
  * @jdo.persistence-capable
  *		identity-type="application"
@@ -18,10 +18,12 @@ import org.nightlabs.jfire.trade.Order;
  *		table="JFireTrade_RecurringOrder"
  *
  * @jdo.inheritance strategy="new-table"
- * 
- **/
-public class RecurringOrder extends Order {
-	
+ */
+public class RecurringOrder
+extends Order
+implements RecurringArticleContainer
+{
+
 	private static final long serialVersionUID = 1L;
 
 	/**
@@ -29,10 +31,10 @@ public class RecurringOrder extends Order {
 	 */
 	@Deprecated
 	protected RecurringOrder() { }
-	
+
 	public RecurringOrder(LegalEntity vendor, LegalEntity customer,
 			String orderIDPrefix, long orderID, Currency currency, User user) {
 		super(vendor, customer, orderIDPrefix, orderID, currency, user);
 	}
-	
+
 }

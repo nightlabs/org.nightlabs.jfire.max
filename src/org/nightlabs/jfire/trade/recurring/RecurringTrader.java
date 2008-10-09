@@ -194,11 +194,10 @@ public class RecurringTrader {
 
 		String nodeName = recurringOffer.getState().getStateDefinition().getJbpmNodeName();
 		
-		if (JbpmConstantsRecurringOffer.Vendor.NODE_NAME_RECURRENCE_STOPED.equals(nodeName)) 
+		if (!JbpmConstantsRecurringOffer.Vendor.NODE_NAME_RECURRENCE_STARTED.equals(nodeName)) 
 		{		
 			recurringOffer.getRecurringOfferConfiguration().getCreatorTask().setEnabled(false);
 			return null;
-
 		}
 		Authority organisationAuthority = Authority.getOrganisationAuthority(getPersistenceManager());
 		// userID references the principal, i.e. the currently logged-in user.

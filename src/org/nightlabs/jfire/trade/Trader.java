@@ -64,7 +64,6 @@ import org.nightlabs.jfire.asyncinvoke.ErrorCallback;
 import org.nightlabs.jfire.asyncinvoke.Invocation;
 import org.nightlabs.jfire.asyncinvoke.InvocationError;
 import org.nightlabs.jfire.asyncinvoke.UndeliverableCallback;
-import org.nightlabs.jfire.base.Lookup;
 import org.nightlabs.jfire.config.Config;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.jbpm.JbpmLookup;
@@ -96,6 +95,7 @@ import org.nightlabs.jfire.trade.history.ProductHistoryItem;
 import org.nightlabs.jfire.trade.history.ProductHistoryItem.ProductHistoryItemType;
 import org.nightlabs.jfire.trade.id.ArticleID;
 import org.nightlabs.jfire.trade.id.OfferID;
+import org.nightlabs.jfire.trade.id.OfferLocalID;
 import org.nightlabs.jfire.trade.jbpm.ActionHandlerAcceptOffer;
 import org.nightlabs.jfire.trade.jbpm.ActionHandlerAcceptOfferImplicitelyVendor;
 import org.nightlabs.jfire.trade.jbpm.ActionHandlerFinalizeOffer;
@@ -1743,8 +1743,8 @@ public class Trader
 
 				String partnerOrganisationID = vendor.getOrganisationID();
 
-				TradeManager tradeManager = TradeManagerUtil.getHome(Lookup.getInitialContextProperties(pm, partnerOrganisationID)).create();
-				tradeManager.signalOffer((OfferID) JDOHelper.getObjectId(partnerOffer), JbpmConstantsOffer.Vendor.TRANSITION_NAME_ACCEPT_FOR_CROSS_TRADE);
+//				TradeManager tradeManager = TradeManagerUtil.getHome(Lookup.getInitialContextProperties(pm, partnerOrganisationID)).create();
+				signalOffer((OfferID) JDOHelper.getObjectId(partnerOffer), JbpmConstantsOffer.Vendor.TRANSITION_NAME_ACCEPT_FOR_CROSS_TRADE);
 				// TODO this is not yet the right handling of JBPM - needs to be fixed! Isn't this fine now? Marco.
 			} // for (Iterator itO = offerRequirement.getPartnerOffers().iterator(); itO.hasNext(); ) {
 		} // if (offerRequirement != null) {
@@ -1773,9 +1773,10 @@ public class Trader
 
 				String partnerOrganisationID = vendor.getOrganisationID();
 
-				TradeManager tradeManager = TradeManagerUtil.getHome(Lookup.getInitialContextProperties(pm, partnerOrganisationID)).create();
-//				tradeManager.signalOffer((OfferID) JDOHelper.getObjectId(partnerOffer), JbpmConstantsOffer.Vendor.TRANSITION_NAME_ACCEPT_FOR_CROSS_TRADE);
-				tradeManager.signalOffer((OfferID) JDOHelper.getObjectId(partnerOffer), JbpmConstantsOffer.Vendor.TRANSITION_NAME_FINALIZE_FOR_CROSS_TRADE);
+//				TradeManager tradeManager = TradeManagerUtil.getHome(Lookup.getInitialContextProperties(pm, partnerOrganisationID)).create();
+////				tradeManager.signalOffer((OfferID) JDOHelper.getObjectId(partnerOffer), JbpmConstantsOffer.Vendor.TRANSITION_NAME_ACCEPT_FOR_CROSS_TRADE);
+//				tradeManager.
+				signalOffer((OfferID) JDOHelper.getObjectId(partnerOffer), JbpmConstantsOffer.Vendor.TRANSITION_NAME_FINALIZE_FOR_CROSS_TRADE);
 				// TODO this is not yet the right handling of JBPM - needs to be fixed! Isn't this correct, now? Marco.
 			} // for (Iterator itO = offerRequirement.getPartnerOffers().iterator(); itO.hasNext(); ) {
 		} // if (offerRequirement != null) {
@@ -2209,6 +2210,29 @@ public class Trader
 
 		}
 		return productHistory;
+	}
+
+
+	/**
+	 * 
+	 * signal a given Jbpm transition to the offer 
+	 */
+	public void signalOffer(OfferID offerID, String jbpmTransitionName)
+	{
+		PersistenceManager pm = getPersistenceManager();
+
+		OfferLocal offerLocal = (OfferLocal) pm.getObjectById(OfferLocalID.create(offerID));
+		JbpmContext jbpmContext = JbpmLookup.getJbpmConfiguration().createJbpmContext();
+		
+		try{
+			ProcessInstance processInstance = jbpmContext.getProcessInstanceForUpdate(offerLocal.getJbpmProcessInstanceId());
+			processInstance.signal(jbpmTransitionName);
+		}
+		finally {
+			jbpmContext.close();
+		}
+
+
 	}
 
 //	public Collection<? extends Article> onProductAssemble_importNestedProduct(User user, Product packageProduct, String partnerOrganisationID, Collection<NestedProductTypeLocal> partnerNestedProductTypes)

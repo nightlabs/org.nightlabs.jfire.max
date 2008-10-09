@@ -2,6 +2,7 @@ package org.nightlabs.jfire.trade.recurring;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -19,8 +20,6 @@ import org.apache.log4j.Logger;
 import org.nightlabs.ModuleException;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.accounting.Accounting;
-import org.nightlabs.jfire.accounting.AccountingManagerLocal;
-import org.nightlabs.jfire.accounting.AccountingManagerUtil;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.accounting.id.InvoiceID;
@@ -48,6 +47,7 @@ import org.nightlabs.jfire.trade.SegmentType;
 import org.nightlabs.jfire.trade.TradeSide;
 import org.nightlabs.jfire.trade.Trader;
 import org.nightlabs.jfire.trade.config.TradeConfigModule;
+import org.nightlabs.jfire.trade.id.OfferID;
 import org.nightlabs.jfire.trade.jbpm.JbpmConstantsOffer;
 import org.nightlabs.jfire.trade.jbpm.ProcessDefinitionAssignment;
 import org.nightlabs.jfire.trade.jbpm.id.ProcessDefinitionAssignmentID;
@@ -169,7 +169,7 @@ public class RecurringTrader {
 	 * This method creates a new {@link RecurredOffer} from an existing {@link RecurringOffer}
 	 *
 	 * @param recurringOffer the {@link RecurringOffer}
-	 * @return newly created {@link RecurredOffer}
+	 * @return newly created {@link RecurredOffer} or null if it is past the stop / suspend date
 	 * @throws ModuleException If creating the recurred articles fails.
 	 * @throws NamingException
 	 * @throws CreateException
@@ -177,7 +177,29 @@ public class RecurringTrader {
 	public RecurredOffer processRecurringOffer(RecurringOffer recurringOffer) throws ModuleException, CreateException, NamingException
 	{
 		boolean priceDiffer = false;
+	
+		// check if the recurring task is past the stop / suspend date
+		Date stopDate =  recurringOffer.getRecurringOfferConfiguration().getSuspendDate();
+		
+		if(stopDate != null)		
+		{				
+			Date localDate = new Date();
+			if(localDate.after(stopDate)|| localDate.equals(stopDate))
+			{
+				recurringOffer.setStatusKey(RecurringOffer.STATUS_KEY_SUSPENDED);
+				Trader.getTrader(getPersistenceManager()).signalOffer((OfferID) JDOHelper.getObjectId(recurringOffer), JbpmConstantsRecurringOffer.Vendor.TRANSITION_NAME_STOP_RECURRENCE);	
+				return null;
+			}
+		}
 
+		String nodeName = recurringOffer.getState().getStateDefinition().getJbpmNodeName();
+		
+		if (JbpmConstantsRecurringOffer.Vendor.NODE_NAME_RECURRENCE_STOPED.equals(nodeName)) 
+		{		
+			recurringOffer.getRecurringOfferConfiguration().getCreatorTask().setEnabled(false);
+			return null;
+
+		}
 		Authority organisationAuthority = Authority.getOrganisationAuthority(getPersistenceManager());
 		// userID references the principal, i.e. the currently logged-in user.
 		UserID userID = SecurityReflector.getUserDescriptor().getUserObjectID();
@@ -186,7 +208,6 @@ public class RecurringTrader {
 		organisationAuthority.assertContainsRoleRef(userID, org.nightlabs.jfire.trade.RoleConstants.editOrder);
 		organisationAuthority.assertContainsRoleRef(userID, org.nightlabs.jfire.trade.RoleConstants.editOffer);
 
-		String nodeName = recurringOffer.getState().getStateDefinition().getJbpmNodeName();
 		if (!JbpmConstantsRecurringOffer.Vendor.NODE_NAME_RECURRENCE_STARTED.equals(nodeName)) {
 			throw new IllegalStateException("The recurrence for RecurringOffer " + JDOHelper.getObjectId(recurringOffer) + " is not started, it is in the state '" + nodeName + "'.");
 		}
@@ -322,10 +343,8 @@ public class RecurringTrader {
 				logger.debug("Successfully created Invoice " + JDOHelper.getObjectId(invoice));
 				accounting.validateInvoice(invoice);
 
-				AccountingManagerLocal aml = AccountingManagerUtil.getLocalHome().create();
-
 				if(recurringOffer.getRecurringOfferConfiguration().isBookInvoice())
-					aml.signalInvoice((InvoiceID)JDOHelper.getObjectId(invoice), JbpmConstantsInvoice.Vendor.TRANSITION_NAME_BOOK_IMPLICITELY);
+					accounting.signalInvoice((InvoiceID)JDOHelper.getObjectId(invoice), JbpmConstantsInvoice.Vendor.TRANSITION_NAME_BOOK_IMPLICITELY);
 
 			}
 		}

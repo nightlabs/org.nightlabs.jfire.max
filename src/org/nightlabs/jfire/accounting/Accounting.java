@@ -54,6 +54,7 @@ import org.nightlabs.jfire.accounting.book.BookMoneyTransfer;
 import org.nightlabs.jfire.accounting.book.LocalAccountant;
 import org.nightlabs.jfire.accounting.book.PartnerAccountant;
 import org.nightlabs.jfire.accounting.id.InvoiceID;
+import org.nightlabs.jfire.accounting.id.InvoiceLocalID;
 import org.nightlabs.jfire.accounting.jbpm.ActionHandlerBookInvoice;
 import org.nightlabs.jfire.accounting.jbpm.ActionHandlerBookInvoiceImplicitely;
 import org.nightlabs.jfire.accounting.jbpm.ActionHandlerFinalizeInvoice;
@@ -1334,4 +1335,26 @@ implements StoreCallback
 
 		return manualMoneyTransfer;
 	}
+	
+	
+	
+	/**
+	 * 
+	 * signal a given Jbpm transition to the invoice. 
+	 */
+	public void signalInvoice(InvoiceID invoiceID, String jbpmTransitionName)
+	{
+		PersistenceManager pm = getPersistenceManager();
+
+		InvoiceLocal invoiceLocal = (InvoiceLocal) pm.getObjectById(InvoiceLocalID.create(invoiceID));
+		JbpmContext jbpmContext = JbpmLookup.getJbpmConfiguration().createJbpmContext();
+		try {
+			ProcessInstance processInstance = jbpmContext.getProcessInstanceForUpdate(invoiceLocal.getJbpmProcessInstanceId());
+			processInstance.signal(jbpmTransitionName);
+		} finally {
+			jbpmContext.close();
+		}
+	}
+
+	
 }

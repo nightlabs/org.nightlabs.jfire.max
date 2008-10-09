@@ -76,6 +76,7 @@ import org.nightlabs.jfire.store.deliver.ServerDeliveryProcessor;
 import org.nightlabs.jfire.store.deliver.ServerDeliveryProcessor.DeliverParams;
 import org.nightlabs.jfire.store.deliver.id.ServerDeliveryProcessorID;
 import org.nightlabs.jfire.store.id.DeliveryNoteID;
+import org.nightlabs.jfire.store.id.DeliveryNoteLocalID;
 import org.nightlabs.jfire.store.id.ProductID;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.store.id.ProductTypeStatusTrackerID;
@@ -1909,4 +1910,26 @@ implements StoreCallback
 
 		return processDefinition;
 	}
+	
+	
+	
+	
+	/**
+	 * 
+	 *
+	 */
+	public void signalDeliveryNote(DeliveryNoteID deliveryNoteID, String jbpmTransitionName)
+	{
+		PersistenceManager pm = getPersistenceManager();
+
+		DeliveryNoteLocal deliveryNoteLocal = (DeliveryNoteLocal) pm.getObjectById(DeliveryNoteLocalID.create(deliveryNoteID));
+		JbpmContext jbpmContext = JbpmLookup.getJbpmConfiguration().createJbpmContext();
+		try {
+			ProcessInstance processInstance = jbpmContext.getProcessInstanceForUpdate(deliveryNoteLocal.getJbpmProcessInstanceId());
+			processInstance.signal(jbpmTransitionName);
+		} finally {
+			jbpmContext.close();
+		}		 
+	}
+	
 }

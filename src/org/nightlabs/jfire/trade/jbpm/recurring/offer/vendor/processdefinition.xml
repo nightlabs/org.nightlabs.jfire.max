@@ -25,7 +25,11 @@
    <end-state name="dev.jfire.org:aborted"></end-state>
    <end-state name="dev.jfire.org:revoked"></end-state>
 
-	<end-state name="dev.jfire.org:recurrenceStopped"></end-state>
+	<end-state name="dev.jfire.org:recurrenceStopped">
+		<event type="node-enter">
+   	    	<action class="org.nightlabs.jfire.trade.recurring.jbpm.ActionHandlerStopRecurrence"></action>
+   		 </event>
+	</end-state>
 	<event type="process-end">
 		<action name="org.nightlabs.jfire.trade.jbpm.ActionHandlerOfferProcessEnd" class="org.nightlabs.jfire.trade.jbpm.ActionHandlerOfferProcessEnd"></action>
 	</event>
@@ -48,7 +52,9 @@
 		<transition name="sendImplicitely" to="dev.jfire.org:sent"></transition>
    </node>
    <state name="dev.jfire.org:accepted">
-        <action class="org.nightlabs.jfire.trade.recurring.jbpm.ActionHandlerAcceptRecurringOffer"></action>
+   		<event type="node-enter">
+        	<action class="org.nightlabs.jfire.trade.recurring.jbpm.ActionHandlerAcceptRecurringOffer"></action>
+        </event>
 		<transition to="dev.jfire.org:recurrenceStopped" name="dev.jfire.org:stopRecurrence"></transition>
 		<transition to="dev.jfire.org:recurrenceStarted" name="dev.jfire.org:startRecurrence"></transition>
 	</state>

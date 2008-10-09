@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<root-container name="dev.jfire.org:RecurringOffer.Vendor" width="1051" height="620">
+<root-container name="dev.jfire.org:RecurringOffer.Vendor" width="1051" height="604">
   <node name="dev.jfire.org:created" x="389" y="13" width="217" height="36">
     <edge>
       <label x="5" y="-10"/>
@@ -81,6 +81,7 @@
     </edge>
     <edge>
       <label x="-9" y="-24"/>
+      <bendpoint w1="32" h1="92" w2="-280" h2="-16"/>
     </edge>
   </node>
   <node name="dev.jfire.org:recurrenceStarted" x="389" y="541" width="217" height="36">
@@ -89,6 +90,7 @@
     </edge>
     <edge>
       <label x="-67" y="-4"/>
+      <bendpoint w1="-84" h1="-76" w2="228" h2="32"/>
     </edge>
   </node>
 </root-container>

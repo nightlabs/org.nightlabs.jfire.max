@@ -1685,14 +1685,7 @@ implements SessionBean
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			DeliveryNoteLocal deliveryNoteLocal = (DeliveryNoteLocal) pm.getObjectById(DeliveryNoteLocalID.create(deliveryNoteID));
-			JbpmContext jbpmContext = JbpmLookup.getJbpmConfiguration().createJbpmContext();
-			try {
-				ProcessInstance processInstance = jbpmContext.getProcessInstanceForUpdate(deliveryNoteLocal.getJbpmProcessInstanceId());
-				processInstance.signal(jbpmTransitionName);
-			} finally {
-				jbpmContext.close();
-			}
+			Store.getStore(pm).signalDeliveryNote(deliveryNoteID, jbpmTransitionName);
 		} finally {
 			pm.close();
 		}

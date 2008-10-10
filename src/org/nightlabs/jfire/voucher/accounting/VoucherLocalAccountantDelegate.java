@@ -26,8 +26,8 @@ import org.nightlabs.jfire.voucher.store.VoucherType;
 /**
  * {@link VoucherLocalAccountantDelegate} is assigned to ProductTypes of type
  * {@link VoucherType}. It directs money from/to an account defined for
- * the delegate. Account for this delegate are defined per currency.  
- * 
+ * the delegate. Account for this delegate are defined per currency.
+ *
  * @author Marco Schulze - Marco at NightLabs dot de
  *
  * @jdo.persistence-capable
@@ -82,7 +82,6 @@ extends LocalAccountantDelegate
 	 * @see org.nightlabs.jfire.accounting.book.LocalAccountantDelegate#bookArticle(org.nightlabs.jfire.trade.OrganisationLegalEntity, org.nightlabs.jfire.security.User, org.nightlabs.jfire.accounting.Invoice, org.nightlabs.jfire.trade.Article, org.nightlabs.jfire.accounting.book.BookMoneyTransfer, java.util.Map)
 	 */
 	@Override
-	@Implement
 	public void bookArticle(OrganisationLegalEntity mandator, User user,
 			Invoice invoice, Article article, BookMoneyTransfer container,
 			Set<Anchor> involvedAnchors)
@@ -134,7 +133,7 @@ extends LocalAccountantDelegate
 			from = to;
 			to = tmp;
 		}
-		
+
 		Invoice invoice = container.getInvoice();
 		if (invoice.getCustomer().equals(mandator)) {
 			// if the local organisation is the customer of the invoice

@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
-import org.nightlabs.annotation.Implement;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.Price;
 import org.nightlabs.jfire.accounting.PriceFragmentType;
@@ -74,21 +73,18 @@ implements IPackagePriceConfig
 	}
 
 	@Override
-	@Implement
 	public boolean isDependentOnOffer()
 	{
 		return false;
 	}
 
 	@Override
-	@Implement
 	public boolean requiresProductTypePackageInternal()
 	{
 		return false;
 	}
 
 	@Override
-	@Implement
 	public ArticlePrice createArticlePrice(Article article)
 	{
 		Long amount = prices.get(article.getCurrency());
@@ -103,7 +99,7 @@ implements IPackagePriceConfig
 		return PriceConfigUtil.createArticlePrice(this, article, price);
 	}
 
-	@Implement
+	@Override
 	public ArticlePrice createNestedArticlePrice(
 			IPackagePriceConfig topLevelPriceConfig, Article article,
 			LinkedList<IPriceConfig> priceConfigStack, ArticlePrice topLevelArticlePrice,
@@ -125,7 +121,7 @@ implements IPackagePriceConfig
 				nestedProductTypeLocal, nestedProductTypeStack, origPrice);
 	}
 
-	@Implement
+	@Override
 	public ArticlePrice createNestedArticlePrice(
 			IPackagePriceConfig topLevelPriceConfig, Article article,
 			LinkedList<IPriceConfig> priceConfigStack, ArticlePrice topLevelArticlePrice,
@@ -149,7 +145,7 @@ implements IPackagePriceConfig
 				productStack, origPrice);
 	}
 
-	@Implement
+	@Override
 	public void fillArticlePrice(Article article)
 	{
 		PriceConfigUtil.fillArticlePrice(this, article);

@@ -4,7 +4,6 @@ import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 
-import org.nightlabs.annotation.Implement;
 import org.nightlabs.jfire.accounting.Account;
 import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.accounting.pay.PaymentException;
@@ -62,7 +61,6 @@ public class ServerPaymentProcessorVoucher
 	}
 
 	@Override
-	@Implement
 	protected PaymentResult externalPayBegin(PayParams payParams)
 			throws PaymentException
 	{
@@ -70,7 +68,6 @@ public class ServerPaymentProcessorVoucher
 	}
 
 	@Override
-	@Implement
 	protected PaymentResult externalPayCommit(PayParams payParams)
 			throws PaymentException
 	{
@@ -86,7 +83,6 @@ public class ServerPaymentProcessorVoucher
 	}
 
 	@Override
-	@Implement
 	protected PaymentResult externalPayDoWork(PayParams payParams)
 			throws PaymentException
 	{
@@ -94,7 +90,6 @@ public class ServerPaymentProcessorVoucher
 	}
 
 	@Override
-	@Implement
 	protected PaymentResult externalPayRollback(PayParams payParams)
 			throws PaymentException
 	{
@@ -102,7 +97,6 @@ public class ServerPaymentProcessorVoucher
 	}
 
 	@Override
-	@Implement
 	public Anchor getAnchorOutside(PayParams payParams)
 	{
 		PersistenceManager pm = getPersistenceManager();

@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import org.nightlabs.annotation.Implement;
 import org.nightlabs.jfire.accounting.book.id.LocalAccountantDelegateID;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.security.SecurityReflector;
@@ -31,7 +30,6 @@ extends BaseJDOObjectDAO<LocalAccountantDelegateID, VoucherLocalAccountantDelega
 
 	@Override
 	@SuppressWarnings("unchecked")
-	@Implement
 	protected Collection<VoucherLocalAccountantDelegate> retrieveJDOObjects(
 			Set<LocalAccountantDelegateID> objectIDs, String[] fetchGroups,
 			int maxFetchDepth, ProgressMonitor monitor)

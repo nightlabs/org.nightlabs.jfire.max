@@ -9,7 +9,6 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
 import org.apache.log4j.Logger;
-import org.nightlabs.annotation.Implement;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.security.id.AuthorityTypeID;
@@ -99,7 +98,6 @@ public class VoucherTypeActionHandler
 
 	@Override
 	@SuppressWarnings("unchecked")
-	@Implement
 	public Collection<? extends Product> findProducts(User user,
 			ProductType productType, NestedProductTypeLocal nestedProductTypeLocal, ProductLocator productLocator)
 	{
@@ -160,7 +158,6 @@ public class VoucherTypeActionHandler
 	}
 
 	@Override
-	@Implement
 	protected Collection<? extends Article> createCrossTradeArticles(
 			User user, Product localPackageProduct, Article localArticle,
 			String partnerOrganisationID, Hashtable<?, ?> partnerInitialContextProperties,

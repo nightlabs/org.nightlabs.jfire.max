@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import org.nightlabs.annotation.Implement;
 import org.nightlabs.jfire.accounting.priceconfig.id.PriceConfigID;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.security.SecurityReflector;
@@ -33,7 +32,6 @@ extends BaseJDOObjectDAO<PriceConfigID, VoucherPriceConfig>
 
 	@Override
 	@SuppressWarnings("unchecked")
-	@Implement
 	protected Collection<VoucherPriceConfig> retrieveJDOObjects(
 			Set<PriceConfigID> objectIDs, String[] fetchGroups, int maxFetchDepth,
 			ProgressMonitor monitor)
@@ -78,7 +76,7 @@ extends BaseJDOObjectDAO<PriceConfigID, VoucherPriceConfig>
 
 		return getJDOObjects(null, priceConfigIDs, fetchGroups, maxFetchDepth, monitor);
 	}
-	
+
 	public VoucherPriceConfig getVoucherPriceConfig(
 			PriceConfigID priceConfigID, String[] fetchGroups, int maxFetchDepth,
 			ProgressMonitor monitor)

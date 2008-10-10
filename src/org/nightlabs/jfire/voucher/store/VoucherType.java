@@ -5,7 +5,6 @@ import java.util.Collection;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
-import org.nightlabs.annotation.Implement;
 import org.nightlabs.jfire.accounting.priceconfig.IPriceConfig;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.ProductType;
@@ -15,7 +14,7 @@ import org.nightlabs.jfire.voucher.scripting.VoucherLayout;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
- * 
+ *
  * @jdo.persistence-capable
  *		identity-type="application"
  *		persistence-capable-superclass="org.nightlabs.jfire.store.ProductType"
@@ -47,14 +46,14 @@ public class VoucherType
 extends ProductType
 {
 	public static final String FETCH_GROUP_VOUCHER_LAYOUT = "VoucherType.voucherLayout";
-	
+
 	private static final long serialVersionUID = 1L;
 
 	public static final class FieldName
 	{
 		public static final String voucherLayout = "voucherLayout";
 	};
-	
+
 	@SuppressWarnings("unchecked")
 	public static Collection<VoucherType> getChildVoucherTypes(PersistenceManager pm, ProductTypeID parentVoucherTypeID)
 	{
@@ -102,7 +101,6 @@ extends ProductType
 	}
 
 	@Override
-	@Implement
 	protected void calculatePrices()
 	{
 		// TODO Auto-generated method stub
@@ -150,17 +148,17 @@ extends ProductType
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private VoucherLayout voucherLayout;
-	
+
 	public VoucherLayout getVoucherLayout()
 	{
 		return voucherLayout;
 	}
-	
+
 	public void setVoucherLayout(VoucherLayout voucherLayout)
 	{
 		this.voucherLayout = voucherLayout;
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 * <p>

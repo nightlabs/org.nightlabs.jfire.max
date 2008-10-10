@@ -1,6 +1,5 @@
 package org.nightlabs.jfire.voucher.store;
 
-import org.nightlabs.annotation.Implement;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.NestedProductTypeLocal;
 import org.nightlabs.jfire.store.Product;
@@ -49,7 +48,6 @@ extends Product
 	 * @see org.nightlabs.jfire.store.Product#getProductLocator(User, NestedProductTypeLocal)
 	 */
 	@Override
-	@Implement
 	public ProductLocator getProductLocator(User user, NestedProductTypeLocal nestedProductTypeLocal)
 	{
 		return null;

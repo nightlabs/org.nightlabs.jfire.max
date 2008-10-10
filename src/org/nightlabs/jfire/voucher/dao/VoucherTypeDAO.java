@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import org.nightlabs.annotation.Implement;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.base.jdo.IJDOObjectDAO;
 import org.nightlabs.jfire.security.SecurityReflector;
@@ -32,7 +31,6 @@ implements IJDOObjectDAO<VoucherType>
 
 	@Override
 	@SuppressWarnings("unchecked")
-	@Implement
 	protected Collection<VoucherType> retrieveJDOObjects(
 			Set<ProductTypeID> voucherTypeIDs, String[] fetchGroups, int maxFetchDepth,
 			ProgressMonitor monitor)
@@ -93,11 +91,7 @@ implements IJDOObjectDAO<VoucherType>
 		return getJDOObject(null, voucherTypeID, fetchGroups, maxFetchDepth, monitor);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 * @see org.nightlabs.jfire.base.jdo.IJDOObjectDAO#storeJDOObject(java.lang.Object, boolean, java.lang.String[], int, org.nightlabs.progress.ProgressMonitor)
-	 */
-	@Implement
+	@Override
 	public VoucherType storeJDOObject(VoucherType jdoObject, boolean get, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) {
 		try {
 			VoucherManager vm = VoucherManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();

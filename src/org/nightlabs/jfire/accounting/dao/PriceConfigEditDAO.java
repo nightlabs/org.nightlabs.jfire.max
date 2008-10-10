@@ -3,7 +3,6 @@ package org.nightlabs.jfire.accounting.dao;
 import java.util.Collection;
 import java.util.Set;
 
-import org.nightlabs.annotation.Implement;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.accounting.AccountingManager;
 import org.nightlabs.jfire.accounting.AccountingManagerUtil;
@@ -21,7 +20,7 @@ public class PriceConfigEditDAO
 extends BaseJDOObjectDAO<ProductTypeID, ProductType>
 {
 	private static PriceConfigEditDAO sharedInstance;
-	
+
 	public static final String PRICE_CONFIG_EDITING_SCOPE = "getProductTypeForPriceConfigEditing";
 
 	public static PriceConfigEditDAO sharedInstance() {
@@ -35,7 +34,6 @@ extends BaseJDOObjectDAO<ProductTypeID, ProductType>
 	};
 
 	@Override
-	@Implement
 	protected Collection<ProductType> retrieveJDOObjects(
 			Set<ProductTypeID> objectIDs, String[] fetchGroups, int maxFetchDepth,
 			ProgressMonitor monitor) throws Exception {

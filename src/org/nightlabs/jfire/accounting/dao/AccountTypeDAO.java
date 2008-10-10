@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import org.nightlabs.annotation.Implement;
 import org.nightlabs.jfire.accounting.AccountType;
 import org.nightlabs.jfire.accounting.AccountingManager;
 import org.nightlabs.jfire.accounting.AccountingManagerUtil;
@@ -31,7 +30,6 @@ extends BaseJDOObjectDAO<AccountTypeID, AccountType>
 
 	@Override
 	@SuppressWarnings("unchecked")
-	@Implement
 	protected Collection<AccountType> retrieveJDOObjects(Set<AccountTypeID> objectIDs, String[] fetchGroups,
 			int maxFetchDepth, ProgressMonitor monitor)
 			throws Exception
@@ -40,11 +38,11 @@ extends BaseJDOObjectDAO<AccountTypeID, AccountType>
 		try {
 			AccountingManager am = AccountingManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
 			return am.getAccountTypes(objectIDs, fetchGroups, maxFetchDepth);
-			
+
 		} catch (Exception e) {
 			monitor.setCanceled(true);
 			throw e;
-			
+
 		} finally {
 			monitor.worked(1);
 			monitor.done();
@@ -69,7 +67,7 @@ extends BaseJDOObjectDAO<AccountTypeID, AccountType>
 	{
 		return getJDOObjects(null, accountTypeIDs, fetchGroups, maxFetchDepth, monitor);
 	}
-	
+
 	public AccountType getAccountType(AccountTypeID accountTypeID, String[] fetchGroups,
 			int maxFetchDepth, ProgressMonitor monitor)
 	{

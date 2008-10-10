@@ -6,7 +6,6 @@ import java.util.Collection;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 
-import org.nightlabs.annotation.Implement;
 import org.nightlabs.jfire.accounting.id.InvoiceID;
 import org.nightlabs.jfire.jdo.notification.DirtyObjectID;
 import org.nightlabs.jfire.jdo.notification.JDOLifecycleListenerFilter;
@@ -37,21 +36,21 @@ extends JDOLifecycleListenerFilter
 		return articleContainerID;
 	}
 
-	private static final Class[] candidateClasses = { Article.class };
+	private static final Class<?>[] candidateClasses = { Article.class };
 
-	@Implement
+	@Override
 	public Class<?>[] getCandidateClasses()
 	{
 		return candidateClasses;
 	}
 
-	@Implement
+	@Override
 	public JDOLifecycleState[] getLifecycleStates()
 	{
 		return jdoLifecycleStates;
 	}
 
-	@Implement
+	@Override
 	public Collection<DirtyObjectID> filter(JDOLifecycleRemoteEvent event)
 	{
 		if (articleContainerID == null)

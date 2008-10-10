@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import org.nightlabs.annotation.Implement;
 import org.nightlabs.jfire.accounting.AccountingManager;
 import org.nightlabs.jfire.accounting.AccountingManagerUtil;
 import org.nightlabs.jfire.accounting.pay.ModeOfPayment;
@@ -28,7 +27,6 @@ public class ModeOfPaymentDAO
 
 	@SuppressWarnings("unchecked")
 	@Override
-	@Implement
 	protected Collection<ModeOfPayment> retrieveJDOObjects(
 			Set<ModeOfPaymentID> modeOfPaymentIDs, String[] fetchGroups, int maxFetchDepth,
 			ProgressMonitor monitor)

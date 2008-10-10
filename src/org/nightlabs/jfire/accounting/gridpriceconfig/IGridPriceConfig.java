@@ -2,7 +2,6 @@ package org.nightlabs.jfire.accounting.gridpriceconfig;
 
 import java.util.Collection;
 
-import org.nightlabs.annotation.Implement;
 import org.nightlabs.jfire.accounting.Tariff;
 import org.nightlabs.jfire.accounting.id.TariffID;
 import org.nightlabs.jfire.accounting.priceconfig.IPriceConfig;
@@ -12,8 +11,7 @@ import org.nightlabs.jfire.trade.id.CustomerGroupID;
 public interface IGridPriceConfig extends IPriceConfig
 {
 
-	@Implement
-	boolean isDependentOnOffer();
+//	boolean isDependentOnOffer();
 
 	/**
 	 * @return Returns the customerGroups.

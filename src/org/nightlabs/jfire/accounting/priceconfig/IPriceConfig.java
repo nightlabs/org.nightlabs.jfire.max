@@ -42,6 +42,9 @@ import org.nightlabs.jfire.trade.ArticlePrice;
  */
 public interface IPriceConfig
 {
+
+	boolean isDependentOnOffer();
+
 	/**
 	 * @return Returns the organisationID.
 	 */
@@ -107,7 +110,7 @@ public interface IPriceConfig
 	/**
 	 * @param priceFragmentTypePK The composite primary key of the PriceFragmentType to remove.
 	 * @return Returns the PriceFragmentType that has been removed or <tt>null</tt> if none was registered with the given key.
-	 * 
+	 *
 	 * @see #removePriceFragmentType(String, String)
 	 */
 	PriceFragmentType removePriceFragmentType(String priceFragmentTypePK);

@@ -218,19 +218,22 @@ public abstract class PriceConfig implements Serializable, StoreCallback, IPrice
 			throw new IndexOutOfBoundsException("There is no Currency registered in this PriceConfig with the currencyID "+currencyID);
 		return res;
 	}
+	@Override
 	public boolean containsCurrency(String currencyID)
 	{
 		return currencies.containsKey(currencyID);
 	}
+	@Override
 	public boolean containsCurrency(Currency currency)
 	{
 		return currencies.containsKey(currency.getCurrencyID());
 	}
+	@Override
 	public Currency removeCurrency(String currencyID)
 	{
 		return (Currency) currencies.remove(currencyID);
 	}
-	
+
 	/**
 	 * key: String priceFragmentTypePK<br/>
 	 * value: PriceFragmentType priceFragmentType
@@ -246,21 +249,25 @@ public abstract class PriceConfig implements Serializable, StoreCallback, IPrice
 	 * @jdo.join
 	 */
 	private Map priceFragmentTypes = new HashMap();
-	
+
+	@Override
 	public Collection<PriceFragmentType> getPriceFragmentTypes()
 	{
 		return priceFragmentTypes.values();
 	}
+	@Override
 	public boolean addPriceFragmentType(PriceFragmentType priceFragmentType)
 	{
 		return null == priceFragmentTypes.put(priceFragmentType.getPrimaryKey(), priceFragmentType);
 	}
+	@Override
 	public PriceFragmentType getPriceFragmentType(String organisationID, String priceFragmentTypeID, boolean throwExceptionIfNotExistent)
 	{
 		return getPriceFragmentType(
 				PriceFragmentType.getPrimaryKey(organisationID, priceFragmentTypeID),
 				throwExceptionIfNotExistent);
 	}
+	@Override
 	public PriceFragmentType getPriceFragmentType(String priceFragmentTypePK, boolean throwExceptionIfNotExistent)
 	{
 		PriceFragmentType res = (PriceFragmentType) priceFragmentTypes.get(priceFragmentTypePK);
@@ -268,14 +275,17 @@ public abstract class PriceConfig implements Serializable, StoreCallback, IPrice
 			throw new IllegalArgumentException("No PriceFragmentType registered with \""+priceFragmentTypePK+"\"!");
 		return res;
 	}
+	@Override
 	public boolean containsPriceFragmentType(PriceFragmentType priceFragmentType)
 	{
 		return priceFragmentTypes.containsKey(priceFragmentType.getPrimaryKey());
 	}
+	@Override
 	public boolean containsPriceFragmentType(String priceFragmentTypePK)
 	{
 		return priceFragmentTypes.containsKey(priceFragmentTypePK);
 	}
+	@Override
 	public boolean containsPriceFragmentType(String organisationID, String priceFragmentTypeID)
 	{
 		return priceFragmentTypes.containsKey(
@@ -285,20 +295,26 @@ public abstract class PriceConfig implements Serializable, StoreCallback, IPrice
 	 * This method calls removePriceFragmentType(String priceFragmentTypePK), hence
 	 * you don't need to overwrite this method to react on a remove.
 	 *
+	 * {@inheritDoc}
+	 *
 	 * @see #removePriceFragmentType(String)
 	 * @see PriceFragmentType#getPrimaryKey(String, String)
 	 */
+	@Override
 	public PriceFragmentType removePriceFragmentType(String organisationID, String priceFragmentTypeID)
 	{
 		return removePriceFragmentType(
 				PriceFragmentType.getPrimaryKey(organisationID, priceFragmentTypeID));
 	}
 	/**
+	 * {@inheritDoc}
+	 *
 	 * @param priceFragmentTypePK The composite primary key of the PriceFragmentType to remove.
 	 * @return Returns the PriceFragmentType that has been removed or <tt>null</tt> if none was registered with the given key.
-	 * 
+	 *
 	 * @see #removePriceFragmentType(String, String)
 	 */
+	@Override
 	public PriceFragmentType removePriceFragmentType(String priceFragmentTypePK)
 	{
 		return (PriceFragmentType) priceFragmentTypes.remove(priceFragmentTypePK);
@@ -345,7 +361,7 @@ public abstract class PriceConfig implements Serializable, StoreCallback, IPrice
 	 *		filled later.
 	 */
 	public abstract ArticlePrice createArticlePrice(Article article);
-	
+
 	/**
 	 * Is automatically set to the value returned by <tt>isDependentOnOffer()</tt>
 	 * in the jdoPreStore method.
@@ -354,8 +370,9 @@ public abstract class PriceConfig implements Serializable, StoreCallback, IPrice
 	 */
 	private boolean dependentOnOffer;
 
+	@Override
 	public abstract boolean isDependentOnOffer();
-	
+
 	/**
 	 * Is automatically set to the value returned by <tt>requiresProductTypePackageInternal()</tt>
 	 * in the jdoPreStore method.
@@ -411,14 +428,13 @@ public abstract class PriceConfig implements Serializable, StoreCallback, IPrice
 		throw new UnsupportedOperationException("This method does not yet support to generate a priceID when called outside its organisation!");
 	}
 
+	@Override
 	public long createPriceID()
 	{
 		return createPriceID(organisationID, priceConfigID);
 	}
 
-	/**
-	 * @see javax.jdo.listener.StoreCallback#jdoPreStore()
-	 */
+	@Override
 	public void jdoPreStore()
 	{
 		if (JDOHelper.isNew(this)) {
@@ -426,15 +442,13 @@ public abstract class PriceConfig implements Serializable, StoreCallback, IPrice
 
 			PriceFragmentType totalPFT = PriceFragmentType.getTotalPriceFragmentType(pm);
 			addPriceFragmentType(totalPFT);
-			
+
 			this.dependentOnOffer = isDependentOnOffer();
 			this.requiresProductTypePackageInternal = requiresProductTypePackageInternal();
 		}
 	}
-	
-	/**
-	 * @return Returns the name.
-	 */
+
+	@Override
 	public PriceConfigName getName()
 	{
 		return name;

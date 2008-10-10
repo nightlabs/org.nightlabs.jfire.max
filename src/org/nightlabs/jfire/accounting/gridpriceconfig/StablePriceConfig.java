@@ -54,7 +54,7 @@ import org.nightlabs.jfire.trade.CustomerGroup;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
- * 
+ *
  * @jdo.persistence-capable
  *		identity-type="application"
  *		persistence-capable-superclass="org.nightlabs.jfire.accounting.gridpriceconfig.GridPriceConfig"
@@ -226,7 +226,7 @@ implements IPackagePriceConfig, IResultPriceConfig
 			priceCell.resetPriceFragmentCalculationStatus();
 		}
 	}
-	
+
 	protected PriceCell createPriceCell(
 			CustomerGroup customerGroup,
 			Tariff tariff, Currency currency)
@@ -271,7 +271,6 @@ implements IPackagePriceConfig, IResultPriceConfig
 		return priceCell;
 	}
 
-	@Implement
 	@Override
 	public PriceCell createPriceCell(IPriceCoordinate priceCoordinate)
 	{
@@ -472,10 +471,10 @@ implements IPackagePriceConfig, IResultPriceConfig
 
 			for (Iterator<Tariff> itTariffs = tariffs.iterator(); itTariffs.hasNext(); ) {
 				Tariff tariff = itTariffs.next();
-				
+
 				for (Iterator<Currency> itCurrencies = currencies.iterator(); itCurrencies.hasNext(); ) {
 					Currency currency = itCurrencies.next();
-					
+
 					removePriceCell(customerGroup, tariff, currency);
 				} // iterate Currency
 			} // iterate Tariff

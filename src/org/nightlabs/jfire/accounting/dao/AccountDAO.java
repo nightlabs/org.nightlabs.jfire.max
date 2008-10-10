@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import org.nightlabs.annotation.Implement;
 import org.nightlabs.jdo.query.QueryCollection;
 import org.nightlabs.jfire.accounting.Account;
 import org.nightlabs.jfire.accounting.AccountSearchFilter;
@@ -35,7 +34,6 @@ extends BaseJDOObjectDAO<AnchorID, Account>
 
 	@Override
 	@SuppressWarnings("unchecked")
-	@Implement
 	protected Collection<Account> retrieveJDOObjects(Set<AnchorID> objectIDs, String[] fetchGroups,
 			int maxFetchDepth, ProgressMonitor monitor)
 			throws Exception
@@ -44,11 +42,11 @@ extends BaseJDOObjectDAO<AnchorID, Account>
 		try {
 			AccountingManager am = AccountingManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
 			return am.getAccounts(objectIDs, fetchGroups, maxFetchDepth);
-			
+
 		} catch (Exception e) {
 			monitor.setCanceled(true);
 			throw e;
-			
+
 		} finally {
 			monitor.worked(1);
 			monitor.done();
@@ -87,13 +85,13 @@ extends BaseJDOObjectDAO<AnchorID, Account>
 	{
 		return getJDOObjects(null, accountIDs, fetchGroups, maxFetchDepth, monitor);
 	}
-	
+
 	public Account getAccount(AnchorID accountID, String[] fetchGroups,
 			int maxFetchDepth, ProgressMonitor monitor)
 	{
 		return getJDOObject(null, accountID, fetchGroups, maxFetchDepth, monitor);
 	}
-	
+
 	public Account storeAccount(Account account, boolean get, String[] fetchGroups,
 			int maxFetchDepth, ProgressMonitor monitor)
 	{

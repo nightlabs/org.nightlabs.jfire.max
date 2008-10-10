@@ -10,7 +10,6 @@ import java.util.Set;
 
 import javax.jdo.JDOHelper;
 
-import org.nightlabs.annotation.Implement;
 import org.nightlabs.jdo.query.QueryCollection;
 import org.nightlabs.jfire.accounting.AccountingManager;
 import org.nightlabs.jfire.accounting.AccountingManagerUtil;
@@ -39,7 +38,6 @@ public class InvoiceDAO
 	}
 
 	@Override
-	@Implement
 	protected Collection<Invoice> retrieveJDOObjects(Set<InvoiceID> invoiceIDs,
 			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 			throws Exception
@@ -57,7 +55,7 @@ public class InvoiceDAO
 	{
 		return getJDOObjects(null, invoiceIDs, fetchGroups, maxFetchDepth, monitor);
 	}
-	
+
 
 	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	public List<Invoice> getInvoices(

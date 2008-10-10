@@ -36,7 +36,6 @@ import java.util.Set;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 
-import org.nightlabs.annotation.Implement;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.PriceFragmentType;
 import org.nightlabs.jfire.accounting.Tariff;
@@ -123,40 +122,31 @@ public abstract class GridPriceConfig extends PriceConfig implements IGridPriceC
 		super(organisationID, priceConfigID);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.nightlabs.jfire.accounting.gridpriceconfig.IGridPriceConfig#isDependentOnOffer()
-	 */
 	@Override
-	@Implement
 	public boolean isDependentOnOffer()
 	{
 		return false;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.nightlabs.jfire.accounting.gridpriceconfig.IGridPriceConfig#getCustomerGroups()
-	 */
+	@Override
 	public Collection<CustomerGroup> getCustomerGroups()
 	{
 		return customerGroups.values();
 	}
-	/* (non-Javadoc)
-	 * @see org.nightlabs.jfire.accounting.gridpriceconfig.IGridPriceConfig#addCustomerGroup(org.nightlabs.jfire.trade.CustomerGroup)
-	 */
+
+	@Override
 	public boolean addCustomerGroup(CustomerGroup customerGroup)
 	{
 		return null == customerGroups.put(customerGroup.getPrimaryKey(), customerGroup);
 	}
-	/* (non-Javadoc)
-	 * @see org.nightlabs.jfire.accounting.gridpriceconfig.IGridPriceConfig#getCustomerGroup(org.nightlabs.jfire.trade.id.CustomerGroupID, boolean)
-	 */
+
+	@Override
 	public CustomerGroup getCustomerGroup(CustomerGroupID customerGroupID, boolean throwExceptionIfNotExistent)
 	{
 		return getCustomerGroup(customerGroupID.organisationID, customerGroupID.customerGroupID, throwExceptionIfNotExistent);
 	}
-	/* (non-Javadoc)
-	 * @see org.nightlabs.jfire.accounting.gridpriceconfig.IGridPriceConfig#getCustomerGroup(java.lang.String, java.lang.String, boolean)
-	 */
+
+	@Override
 	public CustomerGroup getCustomerGroup(String organisationID, String customerGroupID, boolean throwExceptionIfNotExistent)
 	{
 		CustomerGroup customerGroup = customerGroups.get(CustomerGroup.getPrimaryKey(organisationID, customerGroupID));
@@ -164,46 +154,39 @@ public abstract class GridPriceConfig extends PriceConfig implements IGridPriceC
 			throw new IllegalArgumentException("No CustomerGroup registered with organisationID=\""+organisationID+"\" customerGroupID=\""+customerGroupID+"\"!");
 		return customerGroup;
 	}
-	/* (non-Javadoc)
-	 * @see org.nightlabs.jfire.accounting.gridpriceconfig.IGridPriceConfig#containsCustomerGroup(org.nightlabs.jfire.trade.CustomerGroup)
-	 */
+
+	@Override
 	public boolean containsCustomerGroup(CustomerGroup customerGroup)
 	{
 		return customerGroups.containsKey(customerGroup.getPrimaryKey());
 	}
-	/* (non-Javadoc)
-	 * @see org.nightlabs.jfire.accounting.gridpriceconfig.IGridPriceConfig#removeCustomerGroup(java.lang.String, java.lang.String)
-	 */
+
+	@Override
 	public CustomerGroup removeCustomerGroup(String organisationID, String customerGroupID)
 	{
 		return customerGroups.remove(
 				CustomerGroup.getPrimaryKey(organisationID, customerGroupID));
 	}
 
-	/* (non-Javadoc)
-	 * @see org.nightlabs.jfire.accounting.gridpriceconfig.IGridPriceConfig#getTariffs()
-	 */
+	@Override
 	public Collection<Tariff> getTariffs()
 	{
 		return tariffs.values();
 	}
-	/* (non-Javadoc)
-	 * @see org.nightlabs.jfire.accounting.gridpriceconfig.IGridPriceConfig#addTariff(org.nightlabs.jfire.accounting.Tariff)
-	 */
+
+	@Override
 	public boolean addTariff(Tariff tariff)
 	{
 		return null == tariffs.put(tariff.getPrimaryKey(), tariff);
 	}
-	/* (non-Javadoc)
-	 * @see org.nightlabs.jfire.accounting.gridpriceconfig.IGridPriceConfig#getTariff(org.nightlabs.jfire.accounting.id.TariffID, boolean)
-	 */
+
+	@Override
 	public Tariff getTariff(TariffID tariffID, boolean throwExceptionIfNotExistent)
 	{
 		return getTariff(tariffID.organisationID, tariffID.tariffID, throwExceptionIfNotExistent);
 	}
-	/* (non-Javadoc)
-	 * @see org.nightlabs.jfire.accounting.gridpriceconfig.IGridPriceConfig#getTariff(java.lang.String, java.lang.String, boolean)
-	 */
+
+	@Override
 	public Tariff getTariff(String organisationID, String tariffID, boolean throwExceptionIfNotExistent)
 	{
 		Tariff tariff = tariffs.get(Tariff.getPrimaryKey(organisationID, tariffID));
@@ -212,48 +195,38 @@ public abstract class GridPriceConfig extends PriceConfig implements IGridPriceC
 
 		return tariff;
 	}
-	/* (non-Javadoc)
-	 * @see org.nightlabs.jfire.accounting.gridpriceconfig.IGridPriceConfig#containsTariff(org.nightlabs.jfire.accounting.Tariff)
-	 */
+
+	@Override
 	public boolean containsTariff(Tariff tariff)
 	{
 		return tariffs.containsKey(tariff.getPrimaryKey());
 	}
-	/* (non-Javadoc)
-	 * @see org.nightlabs.jfire.accounting.gridpriceconfig.IGridPriceConfig#removeTariff(java.lang.String, java.lang.String)
-	 */
+
+	@Override
 	public Tariff removeTariff(String organisationID, String tariffID)
 	{
 		return tariffs.remove(Tariff.getPrimaryKey(organisationID, tariffID));
 	}
 
-	/* (non-Javadoc)
-	 * @see org.nightlabs.jfire.accounting.gridpriceconfig.IGridPriceConfig#removeTariff(org.nightlabs.jfire.accounting.Tariff)
-	 */
+	@Override
 	public void removeTariff(Tariff tariff)
 	{
 		tariffs.remove(Tariff.getPrimaryKey(tariff.getOrganisationID(), tariff.getTariffID()));
 	}
 
-	/* (non-Javadoc)
-	 * @see org.nightlabs.jfire.accounting.gridpriceconfig.IGridPriceConfig#clearTariffs()
-	 */
+	@Override
 	public void clearTariffs()
 	{
 		tariffs.clear();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.nightlabs.jfire.accounting.gridpriceconfig.IGridPriceConfig#adoptParameters(org.nightlabs.jfire.accounting.priceconfig.IPriceConfig)
-	 */
+	@Override
 	public void adoptParameters(IPriceConfig other)
 	{
 		adoptParameters(other, false);
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.nightlabs.jfire.accounting.gridpriceconfig.IGridPriceConfig#adoptParameters(org.nightlabs.jfire.accounting.priceconfig.IPriceConfig, boolean)
-	 */
+
+	@Override
 	public void adoptParameters(IPriceConfig _other, boolean onlyAdd)
 	{
 		if (_other == null)
@@ -336,7 +309,7 @@ public abstract class GridPriceConfig extends PriceConfig implements IGridPriceC
 			this.addPriceFragmentType(it.next());
 
 	}
-	
+
 	protected PersistenceManager getPersistenceManager()
 	{
 		PersistenceManager pm = JDOHelper.getPersistenceManager(this);

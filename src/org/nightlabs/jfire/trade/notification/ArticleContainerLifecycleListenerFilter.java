@@ -6,7 +6,6 @@ import java.util.Collection;
 import javax.jdo.PersistenceManager;
 
 import org.apache.log4j.Logger;
-import org.nightlabs.annotation.Implement;
 import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.jdo.notification.DirtyObjectID;
 import org.nightlabs.jfire.jdo.notification.JDOLifecycleListenerFilter;
@@ -48,14 +47,14 @@ extends JDOLifecycleListenerFilter
 	{
 		if (jdoLifecycleStates == null)
 			throw new IllegalArgumentException("jdoLifecycleStates must not be null!");
-		
+
 		this.jdoLifecycleStates = jdoLifecycleStates;
 		this.customerID = customerID;
 		this.vendorID = vendorID;
 		this.customerIDOrVendorID = customerIDOrVendorID;
 	}
 
-	@Implement
+	@Override
 	public Collection<DirtyObjectID> filter(JDOLifecycleRemoteEvent event)
 	{
 		if (logger.isDebugEnabled())
@@ -116,15 +115,15 @@ extends JDOLifecycleListenerFilter
 
 //	private static final Class[] candidateClasses = { ArticleContainer.class };
 // TODO the FilterRegistry does not (yet?) support interfaces. Marco.
-	private static final Class[] candidateClasses = { Order.class, Offer.class, Invoice.class, DeliveryNote.class };
+	private static final Class<?>[] candidateClasses = { Order.class, Offer.class, Invoice.class, DeliveryNote.class };
 
-	@Implement
+	@Override
 	public Class<?>[] getCandidateClasses()
 	{
 		return candidateClasses;
 	}
 
-	@Implement
+	@Override
 	public JDOLifecycleState[] getLifecycleStates()
 	{
 		return jdoLifecycleStates;

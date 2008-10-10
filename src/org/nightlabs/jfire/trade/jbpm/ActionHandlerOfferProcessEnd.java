@@ -6,7 +6,6 @@ import java.util.Set;
 import javax.jdo.PersistenceManager;
 
 import org.jbpm.graph.exe.ExecutionContext;
-import org.nightlabs.annotation.Implement;
 import org.nightlabs.jfire.jbpm.graph.def.AbstractActionHandler;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.security.User;
@@ -37,7 +36,6 @@ extends AbstractActionHandler
 //	}
 
 	@Override
-	@Implement
 	protected void doExecute(ExecutionContext executionContext)
 	throws Exception
 	{

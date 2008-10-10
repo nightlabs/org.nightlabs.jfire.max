@@ -1,6 +1,7 @@
 package org.nightlabs.jfire.trade.query;
 
 import org.nightlabs.jfire.trade.Offer;
+import org.nightlabs.jfire.trade.jbpm.JbpmConstantsOffer;
 
 /**
  * @author Daniel Mazurek - daniel <at> nightlabs <dot> de
@@ -11,6 +12,15 @@ public class OfferQuery
 	extends AbstractArticleContainerQuery
 {
 	private static final long serialVersionUID = 1L;
+
+	private boolean reserved;
+
+	public boolean isReserved() {
+		return reserved;
+	}
+	public void setReserved(boolean reserved) {
+		this.reserved = reserved;
+	}
 
 	@Override
 	public String getArticleContainerIDMemberName() {
@@ -62,9 +72,9 @@ public class OfferQuery
 					"this.order.vendor.anchorTypeID == \""+getVendorID().anchorTypeID+"\" && " +
 					"this.order.vendor.anchorID == \""+getVendorID().anchorID+"\"" +
 							")");
-		}	
+		}
 	}
-	
+
 	@Override
 	protected Class<Offer> initCandidateClass()
 	{
@@ -74,6 +84,17 @@ public class OfferQuery
 	@Override
 	protected void checkAdditionalFields(StringBuffer filter)
 	{
-		// no additional fields to check.
+		if (reserved) {
+//			filter.append("\n && ((this.states.contains(state)");
+//			filter.append(" && state.stateDefinition.jbpmNodeName == \"" + JbpmConstantsOffer.Vendor.NODE_NAME_ACCEPTED + "\")");
+//			filter.append("\n || (this.offerLocal.states.contains(stateLocal)");
+//			filter.append(" && stateLocal.stateDefinition.jbpmNodeName == \"" + JbpmConstantsOffer.Vendor.NODE_NAME_ACCEPTED + "\")");
+//			filter.append(")");
+
+			// The accepted node is defined by dev.jfire.org and it is known that it is in the Statable (not only the StatableLocal).
+			// Therefore, we only need to query this.states
+			filter.append("\n && this.states.contains(state)");
+			filter.append(" && state.stateDefinition.jbpmNodeName == \"" + JbpmConstantsOffer.Vendor.NODE_NAME_ACCEPTED + "\"");
+		}
 	}
 }

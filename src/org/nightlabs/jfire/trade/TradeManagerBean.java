@@ -103,7 +103,6 @@ import org.nightlabs.jfire.trade.id.ArticleID;
 import org.nightlabs.jfire.trade.id.CustomerGroupID;
 import org.nightlabs.jfire.trade.id.CustomerGroupMappingID;
 import org.nightlabs.jfire.trade.id.OfferID;
-import org.nightlabs.jfire.trade.id.OfferLocalID;
 import org.nightlabs.jfire.trade.id.OrderID;
 import org.nightlabs.jfire.trade.id.SegmentTypeID;
 import org.nightlabs.jfire.trade.jbpm.JbpmConstantsOffer;
@@ -1293,8 +1292,8 @@ implements SessionBean
 	}
 
 	/**
-	 * 
-	 * signal a given Jbpm transition to the offer 
+	 *
+	 * signal a given Jbpm transition to the offer
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="org.nightlabs.jfire.trade.editOffer"
@@ -1395,6 +1394,7 @@ implements SessionBean
 
 			// WORKAROUND JPOX Bug to avoid java.util.ConcurrentModificationException in OfferRequirement.getOfferRequirement(OfferRequirement.java:86) at runtime
 			pm.getExtent(OfferRequirement.class);
+
 
 			// In case the JFireTrade module is deployed into a running server, there might already exist cooperations
 			// with other organisations => need to create OrganisationLegalEntities - see #crossOrganisationRegistrationCallback(...)
@@ -2191,6 +2191,21 @@ implements SessionBean
 					throw new ModuleException(e);
 				}
 			}
+		} finally {
+			pm.close();
+		}
+	}
+
+	/**
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+	 */
+	public Set<ProcessDefinitionID> getProcessDefinitionIDs(String statableClassName, TradeSide tradeSide)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			return NLJDOHelper.getObjectIDSet(ProcessDefinitionAssignment.getProcessDefinitions(pm, statableClassName, tradeSide));
 		} finally {
 			pm.close();
 		}

@@ -94,13 +94,12 @@ public abstract class AbstractArticleContainerQuery
 		checkVendor(filter);
 		checkCustomer(filter);
 		checkProductID(filter, vars, getArticleContainerArticlesMemberName());
+		checkProductTypeID(filter, vars, getArticleContainerArticlesMemberName());
 
 		// append filter for the additional fields of the implementing class.
 		checkAdditionalFields(filter);
 		q.setFilter(filter.toString());
 		q.declareVariables(vars.toString());
-
-		checkProductTypeID(filter, vars, getArticleContainerArticlesMemberName());
 
 		if (logger.isDebugEnabled())
 			logger.debug("query = "+filter);

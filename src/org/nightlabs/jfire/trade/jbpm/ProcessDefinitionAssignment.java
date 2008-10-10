@@ -40,6 +40,9 @@ import org.nightlabs.jfire.trade.TradeSide;
  * @jdo.query name="getProcessDefinitionsForStatableClass"
  *		query="SELECT processDefinition WHERE this.statableClass == :statableClass"
  *
+ * @jdo.query name="getProcessDefinitionsForStatableClassAndTradeSide"
+ *		query="SELECT processDefinition WHERE this.statableClass == :statableClass AND this.tradeSide == :tradeSide"
+ *
  * @author Marco Schulze - marco at nightlabs dot de
  */
 public class ProcessDefinitionAssignment
@@ -49,7 +52,7 @@ implements Serializable
 
 	/**
 	 * returns a List of {@link ProcessDefinition} defined for the given {@link Statable} class
-	 * 
+	 *
 	 * @param pm the {@link PersistenceManager} to use
 	 * @param statableClass the name of the {@link Statable} class as String
 	 * @return a List of {@link ProcessDefinition} defined for the given statable class
@@ -59,7 +62,23 @@ implements Serializable
 		Query q = pm.newNamedQuery(ProcessDefinitionAssignment.class, "getProcessDefinitionsForStatableClass");
 		return (List<ProcessDefinition>) q.execute(statableClass);
 	}
-	
+
+	/**
+	 * returns a List of {@link ProcessDefinition} defined for the given {@link Statable} class
+	 * and TradeSide
+	 *
+	 * @param pm the {@link PersistenceManager} to use
+	 * @param statableClass the name of the {@link Statable} class as String
+	 * @param tradeSide the {@link TradeSide}
+	 * @return a List of {@link ProcessDefinition} defined for the given statable class
+	 */
+	public static List<ProcessDefinition> getProcessDefinitions(PersistenceManager pm, String statableClass,
+			TradeSide tradeSide)
+	{
+		Query q = pm.newNamedQuery(ProcessDefinitionAssignment.class, "getProcessDefinitionsForStatableClassAndTradeSide");
+		return (List<ProcessDefinition>) q.execute(statableClass, tradeSide);
+	}
+
 	/**
 	 * The fully qualified class name of a class implementing {@link Statable}. Usually, this
 	 * will be one of {@link Offer}, {@link Invoice} or {@link DeliveryNote}.

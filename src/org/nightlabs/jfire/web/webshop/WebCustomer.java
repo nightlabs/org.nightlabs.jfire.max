@@ -33,7 +33,10 @@ import org.nightlabs.jfire.trade.LegalEntity;
  *		field-order="organisationID, webCustomerID"
  *
  * @jdo.fetch-group name="WebCustomer.legalEntity" fields="legalEntity"
+ * @jdo.fetch-group name="WebCustomer.webCustomerID" fields="webCustomerID"
+ * @jdo.fetch-group name="WebCustomer.password" fields="password"
  * @jdo.fetch-group name="WebCustomer.this" fields="legalEntity"
+ * 
  * 
  * @jdo.query name="getWebCustomerWithRegexField" query="
  * 		SELECT
@@ -56,6 +59,8 @@ public class WebCustomer
 {
 	
 	public static final String FETCH_GROUP_LEGAL_ENTITY = "WebCustomer.legalEntity";
+	public static final String FETCH_GROUP_WEB_CUSTOMER_ID = "WebCustomer.webCustomerID";
+	public static final String FETCH_GROUP_PASSWORD = "WebCustomer.password";
 	/**
 	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon! 
 	 */

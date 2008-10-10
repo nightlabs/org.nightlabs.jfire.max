@@ -11,7 +11,7 @@ import java.util.List;
  * create a {@link State} whenever a node is entered and
  * set it to the appropriate {@link #setState(State)}.
  * </p>
- * 
+ *
  * @author Marco Schulze
  */
 public interface Statable
@@ -38,7 +38,6 @@ public interface Statable
 	 *		whether they are created by this organisation or by the business partner.
 	 */
 	List<State> getStates();
-
 	/**
 	 * Virtual fetch-group used by implementations that should include the current state.
 	 */

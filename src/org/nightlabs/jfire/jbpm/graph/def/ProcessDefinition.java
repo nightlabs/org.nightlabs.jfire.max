@@ -46,10 +46,11 @@ implements Serializable
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon! 
+	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon!
 	 */
+	@Deprecated
 	public static final String FETCH_GROUP_THIS_PROCESS_DEFINITION = "ProcessDefinition.this";
-	
+
 	public static ProcessDefinitionID getProcessDefinitionID(org.jbpm.graph.def.ProcessDefinition jbpmProcessDefinition)
 	{
 		String pdName = jbpmProcessDefinition.getName();
@@ -75,7 +76,7 @@ implements Serializable
 
 		try {
 			org.jbpm.graph.def.ProcessDefinition jbpmProcessDefinition;
-	
+
 			InputStream in = jbpmProcessDefinitionURL.openStream();
 			if (in == null)
 				throw new FileNotFoundException("Could not open input stream for " + jbpmProcessDefinitionURL);
@@ -84,7 +85,7 @@ implements Serializable
 				JpdlXmlReader jpdlXmlReader = new JpdlXmlReader(reader);
 				jbpmProcessDefinition = jpdlXmlReader.readProcessDefinition();
 				jpdlXmlReader.close();
-	
+
 			} finally {
 				in.close();
 			}

@@ -7,6 +7,7 @@ import javax.jdo.Query;
 import org.apache.log4j.Logger;
 import org.nightlabs.jdo.query.AbstractJDOQuery;
 import org.nightlabs.jfire.jbpm.graph.def.Statable;
+import org.nightlabs.jfire.jbpm.graph.def.id.ProcessDefinitionID;
 import org.nightlabs.jfire.jbpm.graph.def.id.StateDefinitionID;
 
 /**
@@ -25,9 +26,11 @@ public class StatableQuery
 	public static final class FieldName
 	{
 		public static final String onlyInSelectedState = "onlyInSelectedState";
+		public static final String notInSelectedState = "notInSelectedState";
 		public static final String stateCreateDTMax = "stateCreateDTMax";
 		public static final String stateCreateDTMin = "stateCreateDTMin";
 		public static final String stateDefinitionID = "stateDefinitionID";
+		public static final String processDefinitionID = "processDefinitionID";
 	}
 
 	public StatableQuery()
@@ -77,27 +80,28 @@ public class StatableQuery
 
 		if (isFieldEnabled(FieldName.stateDefinitionID) && stateDefinitionID != null)
 		{
-			if (!onlyInSelectedState || ! isFieldEnabled(FieldName.onlyInSelectedState)) {
-				filter.append("\n && (this.states.contains(stateVar) && ( " +
-						"stateVar.stateDefinition.processDefinitionOrganisationID == \""+stateDefinitionID.processDefinitionOrganisationID+"\" && " +
-						"stateVar.stateDefinition.processDefinitionID == \""+stateDefinitionID.processDefinitionID+"\" && " +
-						"stateVar.stateDefinition.stateDefinitionOrganisationID == \""+stateDefinitionID.stateDefinitionOrganisationID+"\" && " +
-						"stateVar.stateDefinition.stateDefinitionID == \""+stateDefinitionID.stateDefinitionID+"\"" +
-						"))");
-
-//				q.declareImports("import "+State.class.getName());
-//				q.declareVariables(State.class.getName()+" stateVar");
-			} else {
-				// TODO: JDOHelper.getObjectId(this.*) does not seem to work (java.lang.IndexOutOfBoundsException: Index: 3, Size: 3)
-//				filter.append("\n && JDOHelper.getObjectId(this.stateDefinition) == :stateDefinitionID");
-				// WORKAROUND:
-				filter.append("\n && (" +
-						"this.state.stateDefinition.processDefinitionOrganisationID == \""+stateDefinitionID.processDefinitionOrganisationID+"\" && " +
-						"this.state.stateDefinition.processDefinitionID == \""+stateDefinitionID.processDefinitionID+"\" && " +
-						"this.state.stateDefinition.stateDefinitionOrganisationID == \""+stateDefinitionID.stateDefinitionOrganisationID+"\" && " +
-						"this.state.stateDefinition.stateDefinitionID == \""+stateDefinitionID.stateDefinitionID+"\"" +
-						")");
+			if (onlyInSelectedState || isFieldEnabled(FieldName.onlyInSelectedState)) {
+				filter.append("\n && (this.states.contains(stateVar))");
 			}
+			if (notInSelectedState || isFieldEnabled(FieldName.notInSelectedState)) {
+				filter.append("\n && !(this.states.contains(stateVar))");
+			}
+
+			// TODO: JDOHelper.getObjectId(this.*) does not seem to work (java.lang.IndexOutOfBoundsException: Index: 3, Size: 3)
+			// WORKAROUND:
+			filter.append("\n && (" +
+					"this.state.stateDefinition.processDefinitionOrganisationID == \""+stateDefinitionID.processDefinitionOrganisationID+"\" && " +
+					"this.state.stateDefinition.processDefinitionID == \""+stateDefinitionID.processDefinitionID+"\" && " +
+					"this.state.stateDefinition.stateDefinitionOrganisationID == \""+stateDefinitionID.stateDefinitionOrganisationID+"\" && " +
+					"this.state.stateDefinition.stateDefinitionID == \""+stateDefinitionID.stateDefinitionID+"\"" +
+					")");
+		}
+
+		if (isFieldEnabled(FieldName.processDefinitionID) && processDefinitionID != null)
+		{
+			filter.append("\n && (" +
+					"JDOHelper.getObjectId(this.state.stateDefinition.processDefinition) == :processDefinitionID" +
+			")");
 		}
 
 		if (isFieldEnabled(FieldName.stateCreateDTMin) && stateCreateDTMin != null)
@@ -123,6 +127,21 @@ public class StatableQuery
 		final StateDefinitionID oldStateDefinitionID = this.stateDefinitionID;
 		this.stateDefinitionID = stateDefinitionID;
 		notifyListeners(FieldName.stateDefinitionID, oldStateDefinitionID, stateDefinitionID);
+	}
+
+	private ProcessDefinitionID processDefinitionID = null;
+	/**
+	 * @return the processDefinitionID
+	 */
+	public ProcessDefinitionID getProcessDefinitionID() {
+		return processDefinitionID;
+	}
+
+	/**
+	 * @param processDefinitionID the processDefinitionID to set
+	 */
+	public void setProcessDefinitionID(ProcessDefinitionID processDefinitionID) {
+		this.processDefinitionID = processDefinitionID;
 	}
 
 	/**
@@ -175,6 +194,25 @@ public class StatableQuery
 			Boolean.valueOf(onlyInSelectedState));
 	}
 
+	private boolean notInSelectedState = false;
+
+	/**
+	 * @return the notInSelectedState
+	 */
+	public boolean isNotInSelectedState() {
+		return notInSelectedState;
+	}
+
+	/**
+	 * @param notInSelectedState the notInSelectedState to set
+	 */
+	public void setNotInSelectedState(boolean notInSelectedState) {
+		final Boolean oldNotInSelectedState = this.notInSelectedState;
+		this.notInSelectedState = notInSelectedState;
+		notifyListeners(FieldName.notInSelectedState, oldNotInSelectedState,
+			Boolean.valueOf(notInSelectedState));
+	}
+
 	@Override
 	protected Class<Statable> initCandidateClass()
 	{
@@ -196,4 +234,5 @@ public class StatableQuery
 	{
 		return statableClass != null ? statableClass : super.getResultClass();
 	}
+
 }

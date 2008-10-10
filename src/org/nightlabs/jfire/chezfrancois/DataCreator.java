@@ -388,7 +388,17 @@ public class DataCreator
 
 		((TextDataField)person.getDataField(PersonStruct.CREDITCARD_CREDITCARDHOLDER)).setText(creditCardHolder);
 		((TextDataField)person.getDataField(PersonStruct.CREDITCARD_NUMBER)).setText(creditCardNumber);
-		((NumberDataField)person.getDataField(PersonStruct.CREDITCARD_EXPIRYMONTH)).setValue(creditCardExpiryMonth);
+
+//		((NumberDataField)person.getDataField(PersonStruct.CREDITCARD_EXPIRYMONTH)).setValue(creditCardExpiryMonth);
+
+		SelectionStructField expiryMonthStructField = (SelectionStructField) personStruct.getStructField(
+				PersonStruct.CREDITCARD, PersonStruct.CREDITCARD_EXPIRYMONTH);
+		if (creditCardExpiryMonth < 1 || creditCardExpiryMonth > 12)
+			sfv = null;
+		else
+			sfv = expiryMonthStructField.getStructFieldValue(PersonStruct.CREDITCARD_EXPIRYMONTHS[creditCardExpiryMonth - 1]);
+		((SelectionDataField)person.getDataField(PersonStruct.CREDITCARD_EXPIRYMONTH)).setSelection(sfv);
+
 		((NumberDataField)person.getDataField(PersonStruct.CREDITCARD_EXPIRYYEAR)).setValue(creditCardExpiryYear);
 
 		((TextDataField)person.getDataField(PersonStruct.COMMENT_COMMENT)).setText(comment);

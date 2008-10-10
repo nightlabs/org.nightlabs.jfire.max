@@ -74,6 +74,7 @@ import org.nightlabs.util.Util;
  * on the GUI, a whole <tt>Segment</tt> could be rendered differently, not showing the <tt>Article</tt>s
  * in detail.
  *
+ * @version $Revision$ - $Date$
  * @author Marco Schulze - marco at nightlabs dot de
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  *

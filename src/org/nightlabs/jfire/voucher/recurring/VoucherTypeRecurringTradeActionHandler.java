@@ -25,7 +25,7 @@ import org.nightlabs.jfire.voucher.store.VoucherType;
 /**
  * @author Fitas Amine - fitas at nightlabs dot de
  *
- * the {@link VoucherRecurringTradeProductTypeActionHandler} extends the abstract class {@link RecurringTradeProductTypeActionHandler}
+ * the {@link VoucherTypeRecurringTradeActionHandler} extends the abstract class {@link RecurringTradeProductTypeActionHandler}
  * it creates articles for the voucher type. 
  *
  * @jdo.persistence-capable
@@ -37,7 +37,7 @@ import org.nightlabs.jfire.voucher.store.VoucherType;
  * @jdo.inheritance strategy="superclass-table"
  */
 
-public class VoucherRecurringTradeProductTypeActionHandler 
+public class VoucherTypeRecurringTradeActionHandler 
 extends	RecurringTradeProductTypeActionHandler
 {
 
@@ -45,7 +45,7 @@ extends	RecurringTradeProductTypeActionHandler
 	/**
 	 * @see ProductTypeActionHandler#ProductTypeActionHandler(String, String, Class)
 	 */
-	public VoucherRecurringTradeProductTypeActionHandler(String organisationID,
+	public VoucherTypeRecurringTradeActionHandler(String organisationID,
 			String productTypeActionHandlerID, Class<? extends VoucherType> productTypeClass)
 	{
 		super(organisationID, productTypeActionHandlerID, productTypeClass);
@@ -55,7 +55,7 @@ extends	RecurringTradeProductTypeActionHandler
 	 * @deprecated Only for JDO!
 	 */
 	@Deprecated
-	protected VoucherRecurringTradeProductTypeActionHandler() { }
+	protected VoucherTypeRecurringTradeActionHandler() { }
 
 
 

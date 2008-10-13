@@ -255,7 +255,8 @@ implements SessionBean
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			if (project.getCreateTimestamp() != null) {
+			boolean isNew = !JDOHelper.isDetached(project);
+			if (!isNew) {
 				project.setUpdateTimestamp(new Date());
 			}
 			return NLJDOHelper.storeJDO(pm, project, get, fetchGroups, maxFetchDepth);

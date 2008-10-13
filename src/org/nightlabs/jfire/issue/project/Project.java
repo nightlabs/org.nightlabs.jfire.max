@@ -424,6 +424,10 @@ implements Serializable, Comparable<Project>
 //		return currency;
 //	}
 	
+	public void setCreateTimestamp(Date createTimestamp) {
+		this.createTimestamp = createTimestamp;
+	}
+	
 	/**
 	 * @return Returns the create timestamp.
 	 */

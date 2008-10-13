@@ -2,6 +2,7 @@ package org.nightlabs.jfire.dynamictrade;
 
 import java.rmi.RemoteException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -33,6 +34,7 @@ import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.base.JFireBaseEAR;
 import org.nightlabs.jfire.dynamictrade.accounting.priceconfig.DynamicTradePriceConfig;
 import org.nightlabs.jfire.dynamictrade.accounting.priceconfig.PackagePriceConfig;
+import org.nightlabs.jfire.dynamictrade.recurring.DynamicProductTypeRecurringArticle;
 import org.nightlabs.jfire.dynamictrade.recurring.DynamicProductTypeRecurringArticleCreator;
 import org.nightlabs.jfire.dynamictrade.store.DynamicProduct;
 import org.nightlabs.jfire.dynamictrade.store.DynamicProductType;
@@ -204,53 +206,53 @@ implements SessionBean
 	}
 
 //	/**
-//	 * @ejb.interface-method
-//	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-//	 * @ejb.permission role-name="_Guest_"
-//	 */
+//	* @ejb.interface-method
+//	* @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+//	* @ejb.permission role-name="_Guest_"
+//	*/
 //	public Set<ProductTypeID> getDynamicProductTypeIDs(Byte inheritanceNature, Boolean saleable) {
-//		PersistenceManager pm = getPersistenceManager();
-//		try {
-//			Query q = pm.newQuery(DynamicProductType.class);
-//			q.setResult("JDOHelper.getObjectId(this)");
-//			if (inheritanceNature != null || saleable != null) {
-//				StringBuffer filter = new StringBuffer();
-//
-//				if (inheritanceNature != null)
-//					filter.append("inheritanceNature == :inheritanceNature");
-//
-//				if (saleable != null) {
-//					if (filter.length() != 0)
-//						filter.append(" && ");
-//
-//					filter.append("saleable == :saleable");
-//				}
-//
-//				q.setFilter(filter.toString());
-//			}
-//
-//			HashMap<String, Object> params = new HashMap<String, Object>(2);
-//			params.put("inheritanceNature", inheritanceNature);
-//			params.put("saleable", saleable);
-//
-//			return new HashSet<ProductTypeID>((Collection<? extends ProductTypeID>) q.executeWithMap(params));
-//		} finally {
-//			pm.close();
-//		}
+//	PersistenceManager pm = getPersistenceManager();
+//	try {
+//	Query q = pm.newQuery(DynamicProductType.class);
+//	q.setResult("JDOHelper.getObjectId(this)");
+//	if (inheritanceNature != null || saleable != null) {
+//	StringBuffer filter = new StringBuffer();
+
+//	if (inheritanceNature != null)
+//	filter.append("inheritanceNature == :inheritanceNature");
+
+//	if (saleable != null) {
+//	if (filter.length() != 0)
+//	filter.append(" && ");
+
+//	filter.append("saleable == :saleable");
+//	}
+
+//	q.setFilter(filter.toString());
+//	}
+
+//	HashMap<String, Object> params = new HashMap<String, Object>(2);
+//	params.put("inheritanceNature", inheritanceNature);
+//	params.put("saleable", saleable);
+
+//	return new HashSet<ProductTypeID>((Collection<? extends ProductTypeID>) q.executeWithMap(params));
+//	} finally {
+//	pm.close();
+//	}
 //	}
 
 //	/**
-//	 * @ejb.interface-method
-//	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-//	 * @ejb.permission role-name="org.nightlabs.jfire.store.seeProductType"
-//	 */
+//	* @ejb.interface-method
+//	* @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+//	* @ejb.permission role-name="org.nightlabs.jfire.store.seeProductType"
+//	*/
 //	public List<DynamicProductType> getDynamicProductTypes(Collection<ProductTypeID> dynamicProductTypeIDs, String[] fetchGroups, int maxFetchDepth) {
-//		PersistenceManager pm = getPersistenceManager();
-//		try {
-//			return NLJDOHelper.getDetachedObjectList(pm, dynamicProductTypeIDs, DynamicProductType.class, fetchGroups, maxFetchDepth);
-//		} finally {
-//			pm.close();
-//		}
+//	PersistenceManager pm = getPersistenceManager();
+//	try {
+//	return NLJDOHelper.getDetachedObjectList(pm, dynamicProductTypeIDs, DynamicProductType.class, fetchGroups, maxFetchDepth);
+//	} finally {
+//	pm.close();
+//	}
 //	}
 
 	/**
@@ -272,29 +274,29 @@ implements SessionBean
 				pm.getFetchPlan().setGroups(fetchGroups);
 
 //			try {
-//				DynamicProductLocalAccountantDelegate delegate = (DynamicProductLocalAccountantDelegate) dynamicProductType
-//						.getLocalAccountantDelegate();
-//				if (delegate != null) {
-//					OrganisationLegalEntity organisationLegalEntity = null;
-//
-//					for (Account account : delegate.getAccounts().values()) {
-//						try {
-//							if (account.getOwner() == null) {
-//								if (organisationLegalEntity == null)
-//									organisationLegalEntity = OrganisationLegalEntity
-//											.getOrganisationLegalEntity(pm, getOrganisationID(),
-//													OrganisationLegalEntity.ANCHOR_TYPE_ID_ORGANISATION,
-//													true);
-//
-//								account.setOwner(organisationLegalEntity);
-//							}
-//						} catch (JDODetachedFieldAccessException x) {
-//							// ignore
-//						}
-//					}
-//				}
+//			DynamicProductLocalAccountantDelegate delegate = (DynamicProductLocalAccountantDelegate) dynamicProductType
+//			.getLocalAccountantDelegate();
+//			if (delegate != null) {
+//			OrganisationLegalEntity organisationLegalEntity = null;
+
+//			for (Account account : delegate.getAccounts().values()) {
+//			try {
+//			if (account.getOwner() == null) {
+//			if (organisationLegalEntity == null)
+//			organisationLegalEntity = OrganisationLegalEntity
+//			.getOrganisationLegalEntity(pm, getOrganisationID(),
+//			OrganisationLegalEntity.ANCHOR_TYPE_ID_ORGANISATION,
+//			true);
+
+//			account.setOwner(organisationLegalEntity);
+//			}
 //			} catch (JDODetachedFieldAccessException x) {
-//				// ignore
+//			// ignore
+//			}
+//			}
+//			}
+//			} catch (JDODetachedFieldAccessException x) {
+//			// ignore
 //			}
 
 			// we don't need any price calculation as we have dynamic prices only - no cached values
@@ -308,51 +310,51 @@ implements SessionBean
 
 				// TODO DataNucleus WORKAROUND
 //				1141698 ERROR ({no user}) [LogInterceptor] RuntimeException in method: public abstract org.nightlabs.jfire.dynamictrade.store.DynamicProductType org.nightlabs.jfire.dynamictrade.DynamicTradeManager.storeDynamicProductType(org.nightlabs.jfire.dynamictrade.store.DynamicProductType,boolean,java.lang.String[],int) throws java.rmi.RemoteException:
-//					java.lang.IllegalStateException: There is no PersistenceManager assigned to this object (it is currently not persistent): org.nightlabs.jfire.dynamictrade.store.DynamicProductType@11feafe[chezfrancois.jfire.org,service]
-//					        at org.nightlabs.jdo.inheritance.JDOInheritanceManager.provideFields(JDOInheritanceManager.java:32)
-//					        at org.nightlabs.jdo.inheritance.JDOInheritanceManager.inheritAllFields(JDOInheritanceManager.java:22)
-//					        at org.nightlabs.jfire.store.ProductType.applyInheritance(ProductType.java:1107)
-//					        at org.nightlabs.jfire.dynamictrade.DynamicTradeManagerBean.storeDynamicProductType(DynamicTradeManagerBean.java:295)
-//					        at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-//					        at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:39)
-//					        at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
-//					        at java.lang.reflect.Method.invoke(Method.java:597)
-//					        at org.jboss.invocation.Invocation.performCall(Invocation.java:359)
-//					        at org.jboss.ejb.StatelessSessionContainer$ContainerInterceptor.invoke(StatelessSessionContainer.java:237)
-//					        at org.jboss.resource.connectionmanager.CachedConnectionInterceptor.invoke(CachedConnectionInterceptor.java:158)
-//					        at org.jboss.ejb.plugins.StatelessSessionInstanceInterceptor.invoke(StatelessSessionInstanceInterceptor.java:169)
-//					        at org.jboss.ejb.plugins.CallValidationInterceptor.invoke(CallValidationInterceptor.java:63)
-//					        at org.jboss.ejb.plugins.AbstractTxInterceptor.invokeNext(AbstractTxInterceptor.java:121)
-//					        at org.jboss.ejb.plugins.TxInterceptorCMT.runWithTransactions(TxInterceptorCMT.java:350)
-//					        at org.jboss.ejb.plugins.TxInterceptorCMT.invoke(TxInterceptorCMT.java:181)
-//					        at org.jboss.ejb.plugins.SecurityInterceptor.invoke(SecurityInterceptor.java:168)
-//					        at org.jboss.ejb.plugins.LogInterceptor.invoke(LogInterceptor.java:205)
-//					        at org.jboss.ejb.plugins.ProxyFactoryFinderInterceptor.invoke(ProxyFactoryFinderInterceptor.java:138)
-//					        at org.jboss.ejb.SessionContainer.internalInvoke(SessionContainer.java:648)
-//					        at org.jboss.ejb.Container.invoke(Container.java:960)
-//					        at sun.reflect.GeneratedMethodAccessor126.invoke(Unknown Source)
-//					        at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
-//					        at java.lang.reflect.Method.invoke(Method.java:597)
-//					        at org.jboss.mx.interceptor.ReflectedDispatcher.invoke(ReflectedDispatcher.java:155)
-//					        at org.jboss.mx.server.Invocation.dispatch(Invocation.java:94)
-//					        at org.jboss.mx.server.Invocation.invoke(Invocation.java:86)
-//					        at org.jboss.mx.server.AbstractMBeanInvoker.invoke(AbstractMBeanInvoker.java:264)
-//					        at org.jboss.mx.server.MBeanServerImpl.invoke(MBeanServerImpl.java:659)
-//					        at org.jboss.invocation.unified.server.UnifiedInvoker.invoke(UnifiedInvoker.java:231)
-//					        at sun.reflect.GeneratedMethodAccessor220.invoke(Unknown Source)
-//					        at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
-//					        at java.lang.reflect.Method.invoke(Method.java:597)
-//					        at org.jboss.mx.interceptor.ReflectedDispatcher.invoke(ReflectedDispatcher.java:155)
-//					        at org.jboss.mx.server.Invocation.dispatch(Invocation.java:94)
-//					        at org.jboss.mx.server.Invocation.invoke(Invocation.java:86)
-//					        at org.jboss.mx.server.AbstractMBeanInvoker.invoke(AbstractMBeanInvoker.java:264)
-//					        at org.jboss.mx.server.MBeanServerImpl.invoke(MBeanServerImpl.java:659)
-//					        at javax.management.MBeanServerInvocationHandler.invoke(MBeanServerInvocationHandler.java:288)
-//					        at $Proxy16.invoke(Unknown Source)
-//					        at org.jboss.remoting.ServerInvoker.invoke(ServerInvoker.java:769)
-//					        at org.jboss.remoting.transport.socket.ServerThread.processInvocation(ServerThread.java:573)
-//					        at org.jboss.remoting.transport.socket.ServerThread.dorun(ServerThread.java:387)
-//					        at org.jboss.remoting.transport.socket.ServerThread.run(ServerThread.java:166)
+//				java.lang.IllegalStateException: There is no PersistenceManager assigned to this object (it is currently not persistent): org.nightlabs.jfire.dynamictrade.store.DynamicProductType@11feafe[chezfrancois.jfire.org,service]
+//				at org.nightlabs.jdo.inheritance.JDOInheritanceManager.provideFields(JDOInheritanceManager.java:32)
+//				at org.nightlabs.jdo.inheritance.JDOInheritanceManager.inheritAllFields(JDOInheritanceManager.java:22)
+//				at org.nightlabs.jfire.store.ProductType.applyInheritance(ProductType.java:1107)
+//				at org.nightlabs.jfire.dynamictrade.DynamicTradeManagerBean.storeDynamicProductType(DynamicTradeManagerBean.java:295)
+//				at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+//				at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:39)
+//				at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
+//				at java.lang.reflect.Method.invoke(Method.java:597)
+//				at org.jboss.invocation.Invocation.performCall(Invocation.java:359)
+//				at org.jboss.ejb.StatelessSessionContainer$ContainerInterceptor.invoke(StatelessSessionContainer.java:237)
+//				at org.jboss.resource.connectionmanager.CachedConnectionInterceptor.invoke(CachedConnectionInterceptor.java:158)
+//				at org.jboss.ejb.plugins.StatelessSessionInstanceInterceptor.invoke(StatelessSessionInstanceInterceptor.java:169)
+//				at org.jboss.ejb.plugins.CallValidationInterceptor.invoke(CallValidationInterceptor.java:63)
+//				at org.jboss.ejb.plugins.AbstractTxInterceptor.invokeNext(AbstractTxInterceptor.java:121)
+//				at org.jboss.ejb.plugins.TxInterceptorCMT.runWithTransactions(TxInterceptorCMT.java:350)
+//				at org.jboss.ejb.plugins.TxInterceptorCMT.invoke(TxInterceptorCMT.java:181)
+//				at org.jboss.ejb.plugins.SecurityInterceptor.invoke(SecurityInterceptor.java:168)
+//				at org.jboss.ejb.plugins.LogInterceptor.invoke(LogInterceptor.java:205)
+//				at org.jboss.ejb.plugins.ProxyFactoryFinderInterceptor.invoke(ProxyFactoryFinderInterceptor.java:138)
+//				at org.jboss.ejb.SessionContainer.internalInvoke(SessionContainer.java:648)
+//				at org.jboss.ejb.Container.invoke(Container.java:960)
+//				at sun.reflect.GeneratedMethodAccessor126.invoke(Unknown Source)
+//				at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
+//				at java.lang.reflect.Method.invoke(Method.java:597)
+//				at org.jboss.mx.interceptor.ReflectedDispatcher.invoke(ReflectedDispatcher.java:155)
+//				at org.jboss.mx.server.Invocation.dispatch(Invocation.java:94)
+//				at org.jboss.mx.server.Invocation.invoke(Invocation.java:86)
+//				at org.jboss.mx.server.AbstractMBeanInvoker.invoke(AbstractMBeanInvoker.java:264)
+//				at org.jboss.mx.server.MBeanServerImpl.invoke(MBeanServerImpl.java:659)
+//				at org.jboss.invocation.unified.server.UnifiedInvoker.invoke(UnifiedInvoker.java:231)
+//				at sun.reflect.GeneratedMethodAccessor220.invoke(Unknown Source)
+//				at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
+//				at java.lang.reflect.Method.invoke(Method.java:597)
+//				at org.jboss.mx.interceptor.ReflectedDispatcher.invoke(ReflectedDispatcher.java:155)
+//				at org.jboss.mx.server.Invocation.dispatch(Invocation.java:94)
+//				at org.jboss.mx.server.Invocation.invoke(Invocation.java:86)
+//				at org.jboss.mx.server.AbstractMBeanInvoker.invoke(AbstractMBeanInvoker.java:264)
+//				at org.jboss.mx.server.MBeanServerImpl.invoke(MBeanServerImpl.java:659)
+//				at javax.management.MBeanServerInvocationHandler.invoke(MBeanServerInvocationHandler.java:288)
+//				at $Proxy16.invoke(Unknown Source)
+//				at org.jboss.remoting.ServerInvoker.invoke(ServerInvoker.java:769)
+//				at org.jboss.remoting.transport.socket.ServerThread.processInvocation(ServerThread.java:573)
+//				at org.jboss.remoting.transport.socket.ServerThread.dorun(ServerThread.java:387)
+//				at org.jboss.remoting.transport.socket.ServerThread.run(ServerThread.java:166)
 
 				if (JFireBaseEAR.JPOX_WORKAROUND_FLUSH_ENABLED) {
 					ProductTypeID productTypeID = (ProductTypeID) JDOHelper.getObjectId(dynamicProductType);
@@ -480,118 +482,109 @@ implements SessionBean
 		}
 	}
 
-	
-//	****************************** new code here	
-	
-//	public	Article createArticle(SegmentID segmentID,
-//			OfferID offerID,
-//			ProductTypeID productTypeID,
-//			long quantity,
-//			UnitID unitID,
-//			TariffID tariffID,
-//			I18nText productName,
-//			Price singlePrice,
-//			String[] fetchGroups, int maxFetchDepth) throws ModuleException
-//			{
-//		
-//		if (segmentID == null)     throw new IllegalArgumentException("segmentID must not be null!");
-//		// offerID can be null
-//		if (productTypeID == null) throw new IllegalArgumentException("productTypeID must not be null!");
-//		// quantity can be everything
-//		if (unitID == null) throw new IllegalArgumentException("unitID must not be null!");
-//		if (tariffID == null)      throw new IllegalArgumentException("tariffID must not be null!");
-//		if (productName == null)   throw new IllegalArgumentException("productName must not be null!");
-//		if (singlePrice == null)   throw new IllegalArgumentException("singlePrice must not be null!");
-//
-//
-//		
-//		PersistenceManager pm = getPersistenceManager();
-//		try {
-//			Trader trader = Trader.getTrader(pm);
-//			Store store = Store.getStore(pm);
-//			Segment segment = (Segment) pm.getObjectById(segmentID);
-//			Order order = segment.getOrder();
-//
-//			User user = User.getUser(pm, getPrincipal());
-//
-//			pm.getExtent(Unit.class);
-//			Unit unit = (Unit) pm.getObjectById(unitID);
-//
-//			pm.getExtent(DynamicProductType.class);
-//			ProductType pt = (ProductType) pm.getObjectById(productTypeID);
-//			if (!(pt instanceof DynamicProductType))
-//				throw new IllegalArgumentException("productTypeID \""+productTypeID+"\" specifies a ProductType of type \""+pt.getClass().getName()+"\", but must be \""+DynamicProductType.class.getName()+"\"!");
-//
-//			DynamicProductType productType = (DynamicProductType)pt;
-//
-//			Authority.resolveSecuringAuthority(
-//					pm,
-//					productType.getProductTypeLocal(),
-//					ResolveSecuringAuthorityStrategy.organisation // must be "organisation", because the role "sellProductType" is not checked on EJB method level!
-//			).assertContainsRoleRef(
-//					getPrincipal(),
-//					org.nightlabs.jfire.trade.RoleConstants.sellProductType
-//			);
-//
-//			Tariff tariff = (Tariff) pm.getObjectById(tariffID);
-//
-//			// find an Offer within the Order which is not finalized - or create one
-//			Offer offer;
-//			if (offerID == null) {
-//				Collection<Offer> offers = Offer.getNonFinalizedNonEndedOffers(pm, order);
-//				if (!offers.isEmpty()) {
-//					offer = offers.iterator().next();
-//				}
-//				else {
-//					offer = trader.createOffer(user, order, null); // TODO offerIDPrefix ???
-//				}
-//			}
-//			else {
-//				pm.getExtent(Offer.class);
-//				offer = (Offer) pm.getObjectById(offerID);
-//			}
-//
-//			// find / create Products
-//			Collection<? extends Product> products = store.findProducts(user, productType, null, null); // we create exactly one => no NestedProductTypeLocal needed
-//			if (products.size() != 1)
-//				throw new IllegalStateException("store.findProducts(...) created " + products.size() + " instead of exactly 1 product!");
-//
-//			DynamicProduct product = (DynamicProduct) products.iterator().next();
-//			product.setSinglePrice(singlePrice);
-//			product.getName().copyFrom(productName);
-//			product.setQuantity(quantity);
-//			product.setUnit(unit);
-//
-//			
-//			
-//			Collection<? extends Article> articles = trader.createArticles(
-//					user, offer, segment,
-//					products,
-//					new  DynamicProductTypeRecurringArticleCreator(tariff),
-//					allocate, allocateSynchronously);
-//
-//			if (articles.size() != 1)
-//				throw new IllegalStateException("trader.createArticles(...) created " + articles.size() + " instead of exactly 1 article!");
-//
-//			pm.getFetchPlan().setDetachmentOptions(FetchPlan.DETACH_LOAD_FIELDS | FetchPlan.DETACH_UNLOAD_FIELDS);
-//			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
-//			if (fetchGroups != null)
-//				pm.getFetchPlan().setGroups(fetchGroups);
-//
-//			return pm.detachCopy(articles.iterator().next());
-//		} finally {
-//			pm.close();
-//		}
-//		
-//		
-//		
-//		
-//		
-//		
-//			}
-//	
-	
-	
+
+	/**
+	 * creates a new Dynamic Recurring Article
+	 * 
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="org.nightlabs.jfire.trade.editOffer"
+	 * @ejb.transaction type="Required"
+	 */
+	public	Article createRecurringArticle(SegmentID segmentID,
+			OfferID offerID,
+			ProductTypeID productTypeID,
+			long quantity,
+			UnitID unitID,
+			TariffID tariffID,
+			I18nText productName,
+			String[] fetchGroups, int maxFetchDepth) throws ModuleException
+			{
+
+		if (segmentID == null)     throw new IllegalArgumentException("segmentID must not be null!");
+		// offerID can be null
+		if (productTypeID == null) throw new IllegalArgumentException("productTypeID must not be null!");
+		// quantity can be everything
+		if (unitID == null) throw new IllegalArgumentException("unitID must not be null!");
+		if (tariffID == null)      throw new IllegalArgumentException("tariffID must not be null!");
+		if (productName == null)   throw new IllegalArgumentException("productName must not be null!");
+
+
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			Trader trader = Trader.getTrader(pm);
+			Store store = Store.getStore(pm);
+			Segment segment = (Segment) pm.getObjectById(segmentID);
+			Order order = segment.getOrder();
+
+			User user = User.getUser(pm, getPrincipal());
+
+			pm.getExtent(Unit.class);
+			Unit unit = (Unit) pm.getObjectById(unitID);
+
+			pm.getExtent(DynamicProductType.class);
+			ProductType pt = (ProductType) pm.getObjectById(productTypeID);
+			if (!(pt instanceof DynamicProductType))
+				throw new IllegalArgumentException("productTypeID \""+productTypeID+"\" specifies a ProductType of type \""+pt.getClass().getName()+"\", but must be \""+DynamicProductType.class.getName()+"\"!");
+
+			DynamicProductType productType = (DynamicProductType)pt;
+
+			Authority.resolveSecuringAuthority(
+					pm,
+					productType.getProductTypeLocal(),
+					ResolveSecuringAuthorityStrategy.organisation // must be "organisation", because the role "sellProductType" is not checked on EJB method level!
+			).assertContainsRoleRef(
+					getPrincipal(),
+					org.nightlabs.jfire.trade.RoleConstants.sellProductType
+			);
+
+			Tariff tariff = (Tariff) pm.getObjectById(tariffID);
+
+			// find an Offer within the Order which is not finalized - or create one
+			Offer offer;
+			if (offerID == null) {
+				Collection<Offer> offers = Offer.getNonFinalizedNonEndedOffers(pm, order);
+				if (!offers.isEmpty()) {
+					offer = offers.iterator().next();
+				}
+				else {
+					offer = trader.createOffer(user, order, null); // TODO offerIDPrefix ???
+				}
+			}
+			else {
+				pm.getExtent(Offer.class);
+				offer = (Offer) pm.getObjectById(offerID);
+			}
+
+			DynamicProductTypeRecurringArticleCreator articleCreator = new  DynamicProductTypeRecurringArticleCreator(tariff);
+
+			Collection<? extends DynamicProductTypeRecurringArticle> articles = (Collection<? extends DynamicProductTypeRecurringArticle>) trader.createArticles(
+					user, offer, segment,
+					Collections.singleton(pt),
+					new  DynamicProductTypeRecurringArticleCreator(tariff));
+
+			if (articles.size() != 1)
+				throw new IllegalStateException("trader.createArticles(...) created " + articles.size() + " instead of exactly 1 article!");
+
+			for (DynamicProductTypeRecurringArticle article : articles) {
+				article.getName().copyFrom(productName);
+				article.setQuantity(quantity);
+				article.setUnit(unit);
+
+			}
+			pm.getFetchPlan().setDetachmentOptions(FetchPlan.DETACH_LOAD_FIELDS | FetchPlan.DETACH_UNLOAD_FIELDS);
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+			if (fetchGroups != null)
+				pm.getFetchPlan().setGroups(fetchGroups);
+
+			return pm.detachCopy(articles.iterator().next());
+		} finally {
+			pm.close();
+		}
+
+			}
+
+
+
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="org.nightlabs.jfire.trade.editOffer"

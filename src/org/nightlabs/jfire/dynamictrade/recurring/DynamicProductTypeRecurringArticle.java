@@ -21,13 +21,13 @@ import org.nightlabs.jfire.trade.Segment;
  * @jdo.inheritance strategy="new-table"
  *
  *
- * @jdo.fetch-group name="DynamicProductTypeRecurringArticle.dynamicProductTypeRecurringArticleName" fields="dynamicProductTypeRecurringArticleName"
+ * @jdo.fetch-group name="DynamicProductTypeRecurringArticle.name" fields="name"
  *
  */
 public class DynamicProductTypeRecurringArticle extends Article {
 
 
-	public static final String FETCH_GROUP_DYNAMIC_PRODUCT_TYPE_RECURRING_ARTICLE_NAME = "DynamicProductTypeRecurringArticle.dynamicProductTypeRecurringArticleName";
+	public static final String FETCH_GROUP_DYNAMIC_PRODUCT_TYPE_RECURRING_ARTICLE_NAME = "DynamicProductTypeRecurringArticle.name";
 
 	private static final long serialVersionUID = 1L;
 
@@ -52,18 +52,48 @@ public class DynamicProductTypeRecurringArticle extends Article {
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
-	private Unit ArticleUnit;
+	private Unit unit;
 
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
-	private DynamicProductTypeRecurringArticleName 	dynamicProductTypeRecurringArticleName;
+	private DynamicProductTypeRecurringArticleName 	name;
 
 
 	public DynamicProductTypeRecurringArticle(User user, Offer offer, Segment segment, long articleID, ProductType productType, Tariff tariff)
 	{
 		super(user, offer, segment, articleID, productType, null, tariff);
+	}
+
+
+	public long getQuantity() {
+		return quantity;
+	}
+
+
+	public void setQuantity(long quantity) {
+		this.quantity = quantity;
+	}
+
+
+	public Unit getUnit() {
+		return unit;
+	}
+
+
+	public void setUnit(Unit unit) {
+		this.unit = unit;
+	}
+
+
+	public DynamicProductTypeRecurringArticleName getName() {
+		return name;
+	}
+
+
+	public void setName(DynamicProductTypeRecurringArticleName name) {
+		this.name = name;
 	}
 
 

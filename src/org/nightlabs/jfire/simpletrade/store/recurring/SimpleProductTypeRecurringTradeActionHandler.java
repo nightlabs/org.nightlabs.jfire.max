@@ -25,7 +25,7 @@ import org.nightlabs.jfire.trade.recurring.RecurringTradeProductTypeActionHandle
 
 
 /**
- * {@link SimpleRecurringTradeProductTypeActionHandler} extends the abstract class {@link RecurringTradeProductTypeActionHandler}
+ * {@link SimpleProductTypeRecurringTradeActionHandler} extends the abstract class {@link RecurringTradeProductTypeActionHandler}
  * it creates articles for the simple product type. 
  * 
  * @author Fitas Amine - fitas at nightlabs dot de
@@ -38,13 +38,13 @@ import org.nightlabs.jfire.trade.recurring.RecurringTradeProductTypeActionHandle
  *
  * @jdo.inheritance strategy="superclass-table"
  */
-public class SimpleRecurringTradeProductTypeActionHandler
+public class SimpleProductTypeRecurringTradeActionHandler
 extends RecurringTradeProductTypeActionHandler{
 
 	/**
 	 * @see ProductTypeActionHandler#ProductTypeActionHandler(String, String, Class)
 	 */
-	public SimpleRecurringTradeProductTypeActionHandler(String organisationID,
+	public SimpleProductTypeRecurringTradeActionHandler(String organisationID,
 			String productTypeActionHandlerID, Class<? extends SimpleProductType> productTypeClass)
 	{
 		super(organisationID, productTypeActionHandlerID, productTypeClass);
@@ -54,7 +54,7 @@ extends RecurringTradeProductTypeActionHandler{
 	 * @deprecated Only for JDO!
 	 */
 	@Deprecated
-	protected SimpleRecurringTradeProductTypeActionHandler() { }
+	protected SimpleProductTypeRecurringTradeActionHandler() { }
 
 
 	@Override

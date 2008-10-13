@@ -93,7 +93,7 @@ import org.nightlabs.jfire.simpletrade.notification.SimpleProductTypeNotificatio
 import org.nightlabs.jfire.simpletrade.store.SimpleProductType;
 import org.nightlabs.jfire.simpletrade.store.SimpleProductTypeActionHandler;
 import org.nightlabs.jfire.simpletrade.store.prop.SimpleProductTypeStruct;
-import org.nightlabs.jfire.simpletrade.store.recurring.SimpleRecurringTradeProductTypeActionHandler;
+import org.nightlabs.jfire.simpletrade.store.recurring.SimpleProductTypeRecurringTradeActionHandler;
 import org.nightlabs.jfire.store.CannotPublishProductTypeException;
 import org.nightlabs.jfire.store.NestedProductTypeLocal;
 import org.nightlabs.jfire.store.Product;
@@ -206,8 +206,8 @@ implements SessionBean
 			simpleProductTypeActionHandler = pm.makePersistent(simpleProductTypeActionHandler);
 
 			// Register the RecurringTradeProductTypeActionHandler for SimpleProductTypes
-			SimpleRecurringTradeProductTypeActionHandler srtptah = new SimpleRecurringTradeProductTypeActionHandler(
-					Organisation.DEV_ORGANISATION_ID, SimpleRecurringTradeProductTypeActionHandler.class.getName(), SimpleProductType.class);
+			SimpleProductTypeRecurringTradeActionHandler srtptah = new SimpleProductTypeRecurringTradeActionHandler(
+					Organisation.DEV_ORGANISATION_ID, SimpleProductTypeRecurringTradeActionHandler.class.getName(), SimpleProductType.class);
 			srtptah = pm.makePersistent(srtptah);
 
 			Store store = Store.getStore(pm);

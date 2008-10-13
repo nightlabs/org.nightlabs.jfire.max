@@ -33,6 +33,7 @@ import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.base.JFireBaseEAR;
 import org.nightlabs.jfire.dynamictrade.accounting.priceconfig.DynamicTradePriceConfig;
 import org.nightlabs.jfire.dynamictrade.accounting.priceconfig.PackagePriceConfig;
+import org.nightlabs.jfire.dynamictrade.recurring.DynamicProductTypeRecurringArticleCreator;
 import org.nightlabs.jfire.dynamictrade.store.DynamicProduct;
 import org.nightlabs.jfire.dynamictrade.store.DynamicProductType;
 import org.nightlabs.jfire.dynamictrade.store.DynamicProductTypeActionHandler;
@@ -479,6 +480,118 @@ implements SessionBean
 		}
 	}
 
+	
+//	****************************** new code here	
+	
+//	public	Article createArticle(SegmentID segmentID,
+//			OfferID offerID,
+//			ProductTypeID productTypeID,
+//			long quantity,
+//			UnitID unitID,
+//			TariffID tariffID,
+//			I18nText productName,
+//			Price singlePrice,
+//			String[] fetchGroups, int maxFetchDepth) throws ModuleException
+//			{
+//		
+//		if (segmentID == null)     throw new IllegalArgumentException("segmentID must not be null!");
+//		// offerID can be null
+//		if (productTypeID == null) throw new IllegalArgumentException("productTypeID must not be null!");
+//		// quantity can be everything
+//		if (unitID == null) throw new IllegalArgumentException("unitID must not be null!");
+//		if (tariffID == null)      throw new IllegalArgumentException("tariffID must not be null!");
+//		if (productName == null)   throw new IllegalArgumentException("productName must not be null!");
+//		if (singlePrice == null)   throw new IllegalArgumentException("singlePrice must not be null!");
+//
+//
+//		
+//		PersistenceManager pm = getPersistenceManager();
+//		try {
+//			Trader trader = Trader.getTrader(pm);
+//			Store store = Store.getStore(pm);
+//			Segment segment = (Segment) pm.getObjectById(segmentID);
+//			Order order = segment.getOrder();
+//
+//			User user = User.getUser(pm, getPrincipal());
+//
+//			pm.getExtent(Unit.class);
+//			Unit unit = (Unit) pm.getObjectById(unitID);
+//
+//			pm.getExtent(DynamicProductType.class);
+//			ProductType pt = (ProductType) pm.getObjectById(productTypeID);
+//			if (!(pt instanceof DynamicProductType))
+//				throw new IllegalArgumentException("productTypeID \""+productTypeID+"\" specifies a ProductType of type \""+pt.getClass().getName()+"\", but must be \""+DynamicProductType.class.getName()+"\"!");
+//
+//			DynamicProductType productType = (DynamicProductType)pt;
+//
+//			Authority.resolveSecuringAuthority(
+//					pm,
+//					productType.getProductTypeLocal(),
+//					ResolveSecuringAuthorityStrategy.organisation // must be "organisation", because the role "sellProductType" is not checked on EJB method level!
+//			).assertContainsRoleRef(
+//					getPrincipal(),
+//					org.nightlabs.jfire.trade.RoleConstants.sellProductType
+//			);
+//
+//			Tariff tariff = (Tariff) pm.getObjectById(tariffID);
+//
+//			// find an Offer within the Order which is not finalized - or create one
+//			Offer offer;
+//			if (offerID == null) {
+//				Collection<Offer> offers = Offer.getNonFinalizedNonEndedOffers(pm, order);
+//				if (!offers.isEmpty()) {
+//					offer = offers.iterator().next();
+//				}
+//				else {
+//					offer = trader.createOffer(user, order, null); // TODO offerIDPrefix ???
+//				}
+//			}
+//			else {
+//				pm.getExtent(Offer.class);
+//				offer = (Offer) pm.getObjectById(offerID);
+//			}
+//
+//			// find / create Products
+//			Collection<? extends Product> products = store.findProducts(user, productType, null, null); // we create exactly one => no NestedProductTypeLocal needed
+//			if (products.size() != 1)
+//				throw new IllegalStateException("store.findProducts(...) created " + products.size() + " instead of exactly 1 product!");
+//
+//			DynamicProduct product = (DynamicProduct) products.iterator().next();
+//			product.setSinglePrice(singlePrice);
+//			product.getName().copyFrom(productName);
+//			product.setQuantity(quantity);
+//			product.setUnit(unit);
+//
+//			
+//			
+//			Collection<? extends Article> articles = trader.createArticles(
+//					user, offer, segment,
+//					products,
+//					new  DynamicProductTypeRecurringArticleCreator(tariff),
+//					allocate, allocateSynchronously);
+//
+//			if (articles.size() != 1)
+//				throw new IllegalStateException("trader.createArticles(...) created " + articles.size() + " instead of exactly 1 article!");
+//
+//			pm.getFetchPlan().setDetachmentOptions(FetchPlan.DETACH_LOAD_FIELDS | FetchPlan.DETACH_UNLOAD_FIELDS);
+//			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+//			if (fetchGroups != null)
+//				pm.getFetchPlan().setGroups(fetchGroups);
+//
+//			return pm.detachCopy(articles.iterator().next());
+//		} finally {
+//			pm.close();
+//		}
+//		
+//		
+//		
+//		
+//		
+//		
+//			}
+//	
+	
+	
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="org.nightlabs.jfire.trade.editOffer"

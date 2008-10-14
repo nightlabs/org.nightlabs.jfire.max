@@ -47,6 +47,7 @@ import org.nightlabs.jfire.store.deliver.id.ModeOfDeliveryFlavourID;
 import org.nightlabs.jfire.store.deliver.id.ModeOfDeliveryID;
 import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.transfer.Anchor;
+import org.nightlabs.jfire.transfer.RequirementCheckResult;
 import org.nightlabs.util.Util;
 
 /**
@@ -203,7 +204,7 @@ implements Serializable, DetachCallback
 	 *		value-type="ModeOfDelivery"
 	 *		table="JFireTrade_ServerDeliveryProcessor_modeOfDeliveries"
 	 *		null-value="exception"
-	 * 
+	 *
 	 * @jdo.join
 	 */
 	private Map<String, ModeOfDelivery> modeOfDeliveries;
@@ -216,7 +217,7 @@ implements Serializable, DetachCallback
 	 * <p>
 	 * key: String modeOfDeliveryFlavourPK <br/>value: ModeOfDeliveryFlavour
 	 * modeOfDeliveryFlavour
-	 * 
+	 *
 	 * @jdo.field
 	 *		persistence-modifier="persistent"
 	 *		collection-type="map"
@@ -224,7 +225,7 @@ implements Serializable, DetachCallback
 	 *		value-type="ModeOfDeliveryFlavour"
 	 *		table="JFireTrade_ServerDeliveryProcessor_modeOfDeliveryFlavours"
 	 *		null-value="exception"
-	 * 
+	 *
 	 * @jdo.join
 	 */
 	private Map<String, ModeOfDeliveryFlavour> modeOfDeliveryFlavours;
@@ -262,7 +263,7 @@ implements Serializable, DetachCallback
 	{
 		return serverDeliveryProcessorID;
 	}
-	
+
 	public static String getPrimaryKey(String organisationID, String serverDeliveryProcessorID)
 	{
 		return organisationID + '/' + serverDeliveryProcessorID;
@@ -275,7 +276,7 @@ implements Serializable, DetachCallback
 	{
 		return primaryKey;
 	}
-	
+
 	public void addModeOfDelivery(ModeOfDelivery modeOfDelivery)
 	{
 		modeOfDeliveries.put(modeOfDelivery.getPrimaryKey(), modeOfDelivery);
@@ -618,7 +619,7 @@ implements Serializable, DetachCallback
 	 * and {@link #externalDeliverRollback(DeliverParams).
 	 *
 	 * @param deliverParams
-	 * 
+	 *
 	 * @throws DeliveryException
 	 *           If sth. goes wrong you can either manually create a
 	 *           DeliverApproveResult indicating failure or throw a DeliveryException.
@@ -673,7 +674,7 @@ implements Serializable, DetachCallback
 	 */
 	protected abstract DeliveryResult externalDeliverCommit(DeliverParams deliverParams)
 	throws DeliveryException;
-	
+
 	/**
 	 * In your implementation of this method, you must rollback the delivery in
 	 * the external system.
@@ -687,19 +688,19 @@ implements Serializable, DetachCallback
 	 */
 	protected abstract DeliveryResult externalDeliverRollback(DeliverParams deliverParams)
 	throws DeliveryException;
-		
+
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
-	private CheckRequirementsResult requirementCheckResult;
-	
+	private RequirementCheckResult requirementCheckResult;
+
 	/**
 	 * This method returns null if all requirements are met and a descriptive string
 	 * otherwise.
-	 * 
+	 *
 	 * @return null if all requirements are met and a descriptive string otherwise.
 	 */
-	public CheckRequirementsResult getRequirementCheckResult() {
+	public RequirementCheckResult getRequirementCheckResult() {
 		return requirementCheckResult;
 	}
 
@@ -707,7 +708,7 @@ implements Serializable, DetachCallback
 	 * This method is not supposed to be called from outside.
 	 * Subclasses should implement {@link #_checkRequirements(CheckRequirementsEnvironment)} instead of this method.
 	 * @param checkRequirementsEnvironment the CheckRequirementsEnvironment object
-	 * containing the necessary information for the delivery 
+	 * containing the necessary information for the delivery
 	 */
 	public void checkRequirements(CheckRequirementsEnvironment checkRequirementsEnvironment) {
 		requirementCheckResult = _checkRequirements(checkRequirementsEnvironment);
@@ -716,14 +717,14 @@ implements Serializable, DetachCallback
 	/**
 	 * Subclasses should override this method if their {@link ServerDeliveryProcessor} if
 	 * it needs to ensure some requirements before it can be used. If everything is ok, this
-	 * method should return null. Otherwise a {@link CheckRequirementsResult} describing the 
+	 * method should return null. Otherwise a {@link RequirementCheckResult} describing the
 	 * failure should be returned.
 	 * @param checkRequirementsEnvironment the CheckRequirementsResult with an appropriate
 	 * localized error message and error code or null if everything is ok
-	 * 
+	 *
 	 * @return null if everything is ok, a descriptive CheckRequirementsResult otherwise.
 	 */
-	protected CheckRequirementsResult _checkRequirements(CheckRequirementsEnvironment checkRequirementsEnvironment) {
+	protected RequirementCheckResult _checkRequirements(CheckRequirementsEnvironment checkRequirementsEnvironment) {
 		return null;
 	}
 

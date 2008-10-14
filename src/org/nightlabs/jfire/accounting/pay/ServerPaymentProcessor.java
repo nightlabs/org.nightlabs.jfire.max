@@ -49,6 +49,7 @@ import org.nightlabs.jfire.accounting.pay.id.ModeOfPaymentID;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.transfer.Anchor;
+import org.nightlabs.jfire.transfer.RequirementCheckResult;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 import org.nightlabs.util.Util;
 
@@ -751,7 +752,7 @@ public PayMoneyTransfer payBegin(PayParams payParams)
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
-	private CheckRequirementsResult requirementCheckResult;
+	private RequirementCheckResult requirementCheckResult;
 	
 	/**
 	 * This method returns null if all requirements are met and a descriptive CheckRequirementsResult
@@ -759,7 +760,7 @@ public PayMoneyTransfer payBegin(PayParams payParams)
 	 * 
 	 * @return null if all requirements are met and a descriptive CheckRequirementsResult otherwise.
 	 */
-	public CheckRequirementsResult getRequirementCheckResult() {
+	public RequirementCheckResult getRequirementCheckResult() {
 		return requirementCheckResult;
 	}
 
@@ -780,7 +781,7 @@ public PayMoneyTransfer payBegin(PayParams payParams)
 	 * 
 	 * @return null if everything is ok, a descriptive CheckRequirementsResult otherwise.
 	 */
-	protected CheckRequirementsResult _checkRequirements(CheckRequirementsEnvironment checkRequirementsEnvironment) {
+	protected RequirementCheckResult _checkRequirements(CheckRequirementsEnvironment checkRequirementsEnvironment) {
 		return null;
 	}
 

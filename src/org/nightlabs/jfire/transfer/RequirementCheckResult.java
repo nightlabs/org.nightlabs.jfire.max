@@ -1,9 +1,11 @@
 /**
  * 
  */
-package org.nightlabs.jfire.accounting.pay;
+package org.nightlabs.jfire.transfer;
 
 import java.io.Serializable;
+
+import org.nightlabs.jfire.accounting.pay.ServerPaymentProcessor;
 
 
 /**
@@ -13,7 +15,7 @@ import java.io.Serializable;
  * 
  * @author Daniel Mazurek - daniel [at] nightlabs [dot] de
  */
-public class CheckRequirementsResult
+public class RequirementCheckResult
 implements Serializable
 {
 	private String localizedMessage;
@@ -26,7 +28,7 @@ implements Serializable
 	 * the result is coming from + an additional identifier describing the problem
 	 * @param localizedMessage the localized message
 	 */
-	public CheckRequirementsResult(String resultCode, String localizedMessage) {
+	public RequirementCheckResult(String resultCode, String localizedMessage) {
 		super();
 		this.localizedMessage = localizedMessage;
 		this.resultCode = resultCode;

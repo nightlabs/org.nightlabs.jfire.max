@@ -14,6 +14,7 @@ import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.deliver.id.ServerDeliveryProcessorID;
 import org.nightlabs.jfire.store.resource.Messages;
 import org.nightlabs.jfire.transfer.Anchor;
+import org.nightlabs.jfire.transfer.RequirementCheckResult;
 
 /**
  * This implementation of {@link org.nightlabs.jfire.store.deliver.ServerDeliveryProcessor}
@@ -36,7 +37,7 @@ extends ServerDeliveryProcessor
 	private static final Logger logger = Logger.getLogger(ServerDeliveryProcessorDeliveryQueue.class);
 
 	public static final String ERROR_CODE_NO_DELIVERY_QUEUE_DEFINED = ServerDeliveryProcessorDeliveryQueue.class.getName() + "." + "NO_DELIVERY_QUEUE_DEFINED"; //$NON-NLS-1$ //$NON-NLS-2$
-	
+
 	private static final long serialVersionUID = 1L;
 
 	/** @jdo.field persistence-modifier="none" */
@@ -89,7 +90,7 @@ extends ServerDeliveryProcessor
 		PersistenceManager pm = getPersistenceManager();
 		deliverParams.deliveryData.getDelivery().getDeliveryLocal().addDeliveryActionHandler(DeliveryActionHandlerDeliveryQueue.getDeliveryActionHandlerDeliveryQueue(pm));
 		logger.debug("Attached DeliveryActionHandlerDeliveryQueue to delivery '" + deliverParams.deliveryData.getDelivery().getPrimaryKey() + "'"); //$NON-NLS-1$ //$NON-NLS-2$
-		
+
 		return new DeliveryResult(DeliveryResult.CODE_POSTPONED, null, null);
 	}
 
@@ -131,20 +132,20 @@ extends ServerDeliveryProcessor
 		if (deliveryQueueConfigModule == null) {
 			String organisationID = SecurityReflector.getUserDescriptor().getOrganisationID();
 			User user = SecurityReflector.getUserDescriptor().getUser(getPersistenceManager());
-			deliveryQueueConfigModule = (DeliveryQueueConfigModule) Config.getConfig(getPersistenceManager(), organisationID, user).getConfigModule(DeliveryQueueConfigModule.class);
+			deliveryQueueConfigModule = Config.getConfig(getPersistenceManager(), organisationID, user).getConfigModule(DeliveryQueueConfigModule.class);
 		}
 
 		return deliveryQueueConfigModule;
 	}
 
 	@Override
-	protected CheckRequirementsResult _checkRequirements(CheckRequirementsEnvironment checkRequirementsEnvironment) {
+	protected RequirementCheckResult _checkRequirements(CheckRequirementsEnvironment checkRequirementsEnvironment) {
 		DeliveryQueueConfigModule cfMod = getDeliveryQueueConfigModule();
 		if (cfMod.getVisibleDeliveryQueues().isEmpty())
 		{
 			String resultCode = ERROR_CODE_NO_DELIVERY_QUEUE_DEFINED;
 			String message = Messages.getString("org.nightlabs.jfire.store.deliver.ServerDeliveryProcessorDeliveryQueue.message.noDeliveryQueueDefined"); //$NON-NLS-1$
-			return new CheckRequirementsResult(resultCode, message);
+			return new RequirementCheckResult(resultCode, message);
 		}
 		else
 			return null;

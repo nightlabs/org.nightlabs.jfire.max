@@ -184,9 +184,7 @@ public class DynamicTrader {
 			pm.getExtent(Offer.class);
 			offer = (Offer) pm.getObjectById(offerID);
 		}
-
-		DynamicProductTypeRecurringArticleCreator articleCreator = new  DynamicProductTypeRecurringArticleCreator(tariff);
-
+		
 		Collection<? extends DynamicProductTypeRecurringArticle> articles = (Collection<? extends DynamicProductTypeRecurringArticle>) trader.createArticles(
 				user, offer, segment,
 				Collections.singleton(pt),

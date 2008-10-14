@@ -114,10 +114,6 @@ public class DynamicTrader {
 	}
 
 
-
-
-
-
 	/**
 	 * creates a new Dynamic Recurring Article
 	 */
@@ -128,6 +124,7 @@ public class DynamicTrader {
 			UnitID unitID,
 			TariffID tariffID,
 			I18nText productName,
+			Price singlePrice,
 			String[] fetchGroups, int maxFetchDepth) throws ModuleException
 			{
 
@@ -146,8 +143,9 @@ public class DynamicTrader {
 		Store store = Store.getStore(pm);
 		Segment segment = (Segment) pm.getObjectById(segmentID);
 		Order order = segment.getOrder();
-		User user = User.getUser(pm);
+		User user = SecurityReflector.getUserDescriptor().getUser(pm);
 
+		
 
 		pm.getExtent(Unit.class);
 		Unit unit = (Unit) pm.getObjectById(unitID);
@@ -200,6 +198,7 @@ public class DynamicTrader {
 		for (DynamicProductTypeRecurringArticle article : articles) {
 			article.getName().copyFrom(productName);
 			article.setQuantity(quantity);
+			article.setSinglePrice(singlePrice);
 			article.setUnit(unit);
 
 		}
@@ -209,8 +208,6 @@ public class DynamicTrader {
 			pm.getFetchPlan().setGroups(fetchGroups);
 
 		return pm.detachCopy(articles.iterator().next());
-
-
 
 			}
 
@@ -245,8 +242,7 @@ public class DynamicTrader {
 		Store store = Store.getStore(pm);
 		Segment segment = (Segment) pm.getObjectById(segmentID);
 		Order order = segment.getOrder();
-
-		User user = User.getUser(pm);
+		User user = SecurityReflector.getUserDescriptor().getUser(pm);
 
 
 

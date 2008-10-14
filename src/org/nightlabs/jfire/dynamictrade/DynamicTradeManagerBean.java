@@ -489,13 +489,14 @@ implements SessionBean
 			UnitID unitID,
 			TariffID tariffID,
 			I18nText productName,
+			Price singlePrice,
 			String[] fetchGroups, int maxFetchDepth) throws ModuleException
 			{
 
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			DynamicTrader dynamicTrader = DynamicTrader.getDynamicTrader(pm);
-			return dynamicTrader.createRecurringArticle(segmentID, offerID, productTypeID, quantity, unitID, tariffID, productName,fetchGroups, maxFetchDepth);
+			return dynamicTrader.createRecurringArticle(segmentID, offerID, productTypeID, quantity, unitID, tariffID, productName,singlePrice,fetchGroups, maxFetchDepth);
 
 		} finally {
 			pm.close();

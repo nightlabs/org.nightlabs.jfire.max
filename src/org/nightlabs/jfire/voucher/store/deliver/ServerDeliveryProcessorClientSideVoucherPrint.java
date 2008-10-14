@@ -8,13 +8,13 @@ import javax.jdo.PersistenceManager;
 import org.nightlabs.jfire.accounting.pay.id.ServerPaymentProcessorID;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.store.deliver.CheckRequirementsEnvironment;
-import org.nightlabs.jfire.store.deliver.CheckRequirementsResult;
 import org.nightlabs.jfire.store.deliver.DeliveryException;
 import org.nightlabs.jfire.store.deliver.DeliveryResult;
 import org.nightlabs.jfire.store.deliver.ServerDeliveryProcessor;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.id.ArticleID;
 import org.nightlabs.jfire.transfer.Anchor;
+import org.nightlabs.jfire.transfer.RequirementCheckResult;
 import org.nightlabs.jfire.voucher.resource.Messages;
 import org.nightlabs.jfire.voucher.store.VoucherType;
 import org.nightlabs.util.NLLocale;
@@ -39,7 +39,7 @@ extends ServerDeliveryProcessor
 	private static final long serialVersionUID = 1L;
 
 	public static final String ERROR_CODE_MISSING_VOUCHER_LAYOUT = ServerDeliveryProcessorClientSideVoucherPrint.class + "." + "MISSING_VOUCHER_LAYOUT"; //$NON-NLS-1$ //$NON-NLS-2$
-	
+
 	public static ServerDeliveryProcessorClientSideVoucherPrint getServerDeliveryProcessorClientSideVoucherPrint(PersistenceManager pm)
 	{
 		ServerDeliveryProcessorClientSideVoucherPrint serverDeliveryProcessor;
@@ -63,12 +63,12 @@ extends ServerDeliveryProcessor
 
 		return serverDeliveryProcessor;
 	}
-	
+
 	public ServerDeliveryProcessorClientSideVoucherPrint(String organisationID, String serverDeliveryProcessorID)
 	{
 		super(organisationID, serverDeliveryProcessorID);
 	}
-	
+
 	@Override
 	protected DeliveryResult externalDeliverBegin(DeliverParams deliverParams)
 			throws DeliveryException {
@@ -99,7 +99,7 @@ extends ServerDeliveryProcessor
 	}
 
 	@Override
-	protected CheckRequirementsResult _checkRequirements(CheckRequirementsEnvironment checkRequirementsEnvironment)
+	protected RequirementCheckResult _checkRequirements(CheckRequirementsEnvironment checkRequirementsEnvironment)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		for (ArticleID articleID : checkRequirementsEnvironment.getArticleIDs()) {
@@ -109,10 +109,10 @@ extends ServerDeliveryProcessor
 
 			VoucherType voucherType = (VoucherType) article.getProductType();
 
-			if (voucherType.getVoucherLayout() == null) 
+			if (voucherType.getVoucherLayout() == null)
 			{
 				String message = String.format(Messages.getString("org.nightlabs.jfire.voucher.store.deliver.ServerDeliveryProcessorClientSideVoucherPrint.message.noVoucherLayout"), voucherType.getName().getText(NLLocale.getDefault())); //$NON-NLS-1$
-				return new CheckRequirementsResult(ERROR_CODE_MISSING_VOUCHER_LAYOUT, message);
+				return new RequirementCheckResult(ERROR_CODE_MISSING_VOUCHER_LAYOUT, message);
 			}
 		} // for (ArticleID articleID : articleIDs) {
 

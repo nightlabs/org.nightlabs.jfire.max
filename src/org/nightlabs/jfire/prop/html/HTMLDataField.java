@@ -3,6 +3,7 @@ package org.nightlabs.jfire.prop.html;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.nightlabs.htmlcontent.IFCKEditorContent;
@@ -12,6 +13,7 @@ import org.nightlabs.jfire.prop.DataBlock;
 import org.nightlabs.jfire.prop.DataField;
 import org.nightlabs.jfire.prop.PropertySet;
 import org.nightlabs.jfire.prop.StructField;
+import org.nightlabs.util.NLLocale;
 
 /**
  * @jdo.persistence-capable identity-type="application"
@@ -30,7 +32,7 @@ public class HTMLDataField extends DataField
 	/**
 	 * The serial version of this class.
 	 */
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 2L;
 
 	/**
 	 * key: String languageID<br/>
@@ -168,6 +170,22 @@ public class HTMLDataField extends DataField
 	public void setText(String languageId, String html)
 	{
 		texts.put(languageId, html);
+	}
+
+	public String getDefaultLanguage()
+	{
+		if(texts.isEmpty())
+			return null;
+		String language = NLLocale.getDefault().getLanguage();
+		if(texts.containsKey(language))
+			return language;
+		language = Locale.getDefault().getLanguage();
+		if(texts.containsKey(language))
+			return language;
+		language = "en";
+		if(texts.containsKey(language))
+			return language;
+		return texts.keySet().iterator().next();
 	}
 
 	/**

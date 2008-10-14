@@ -12,5 +12,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/NightLabsHTMLContent"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/NightLabsJDO"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/NightLabsBase"/>
+	<classpathentry kind="var" path="LOG4J" sourcepath="/LOG4J_SRC"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -1,5 +1,6 @@
 package org.nightlabs.jfire.dynamictrade.recurring;
 
+import org.nightlabs.jfire.accounting.Price;
 import org.nightlabs.jfire.accounting.Tariff;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.ProductType;
@@ -61,6 +62,8 @@ public class DynamicProductTypeRecurringArticle extends Article {
 	private DynamicProductTypeRecurringArticleName 	name;
 
 
+
+	
 	public DynamicProductTypeRecurringArticle(User user, Offer offer, Segment segment, long articleID, ProductType productType, Tariff tariff)
 	{
 		super(user, offer, segment, articleID, productType, null, tariff);
@@ -95,7 +98,6 @@ public class DynamicProductTypeRecurringArticle extends Article {
 	public void setName(DynamicProductTypeRecurringArticleName name) {
 		this.name = name;
 	}
-
 
 
 

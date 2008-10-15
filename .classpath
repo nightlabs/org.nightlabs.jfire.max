@@ -9,9 +9,9 @@
 	<classpathentry kind="var" path="DATANUCLEUS_ENHANCER"/>
 	<classpathentry kind="src" path="ejbsrc"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireBase"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/NightLabsHTMLContent"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/NightLabsJDO"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/NightLabsBase"/>
 	<classpathentry kind="var" path="LOG4J" sourcepath="/LOG4J_SRC"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/org.nightlabs.htmlcontent"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

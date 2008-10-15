@@ -496,7 +496,14 @@ implements SessionBean
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			DynamicTrader dynamicTrader = DynamicTrader.getDynamicTrader(pm);
-			return dynamicTrader.createRecurringArticle(segmentID, offerID, productTypeID, quantity, unitID, tariffID, productName,singlePrice,fetchGroups, maxFetchDepth);
+			Article article= dynamicTrader.createRecurringArticle(segmentID, offerID, productTypeID, quantity, unitID, tariffID, productName,singlePrice);
+
+			pm.getFetchPlan().setDetachmentOptions(FetchPlan.DETACH_LOAD_FIELDS | FetchPlan.DETACH_UNLOAD_FIELDS);
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+			if (fetchGroups != null)
+				pm.getFetchPlan().setGroups(fetchGroups);
+
+			return pm.detachCopy(article);		
 
 		} finally {
 			pm.close();
@@ -527,7 +534,15 @@ implements SessionBean
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			DynamicTrader dynamicTrader = DynamicTrader.getDynamicTrader(pm);
-			return dynamicTrader.createArticle(segmentID, offerID, productTypeID, quantity, unitID, tariffID, productName, singlePrice, allocate, allocateSynchronously, fetchGroups, maxFetchDepth);
+			Article article= dynamicTrader.createArticle(segmentID, offerID, productTypeID, quantity, unitID, tariffID, productName, singlePrice, allocate, allocateSynchronously);
+
+			pm.getFetchPlan().setDetachmentOptions(FetchPlan.DETACH_LOAD_FIELDS | FetchPlan.DETACH_UNLOAD_FIELDS);
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+			if (fetchGroups != null)
+				pm.getFetchPlan().setGroups(fetchGroups);
+
+			return pm.detachCopy(article);		
+
 
 		} finally {
 			pm.close();

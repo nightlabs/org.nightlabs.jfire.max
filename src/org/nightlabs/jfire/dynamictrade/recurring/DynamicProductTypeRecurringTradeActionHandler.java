@@ -69,9 +69,7 @@ public class DynamicProductTypeRecurringTradeActionHandler extends RecurringTrad
 
 			Article article = dtm.createArticle(segmentID, recurringArticle.getOfferID(), productTypeID, recurringArticle.getQuantity(), recurringArticle.getUnitID(), 
 					tariffID, recurringArticle.getName(), 
-					recurringArticle.getSinglePrice(),  true, false, 
-					new String[] {
-				FetchPlan.DEFAULT}, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
+					recurringArticle.getSinglePrice(),  true, false);
 			if (article == null)
 				throw new IllegalStateException("trader.createArticles(...) created  instead of exactly 1 article!");
 

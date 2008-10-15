@@ -124,8 +124,7 @@ public class DynamicTrader {
 			UnitID unitID,
 			TariffID tariffID,
 			I18nText productName,
-			Price singlePrice,
-			String[] fetchGroups, int maxFetchDepth) throws ModuleException
+			Price singlePrice) throws ModuleException
 			{
 
 		if (segmentID == null)     throw new IllegalArgumentException("segmentID must not be null!");
@@ -200,12 +199,7 @@ public class DynamicTrader {
 			article.setUnit(unit);
 
 		}
-		pm.getFetchPlan().setDetachmentOptions(FetchPlan.DETACH_LOAD_FIELDS | FetchPlan.DETACH_UNLOAD_FIELDS);
-		pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
-		if (fetchGroups != null)
-			pm.getFetchPlan().setGroups(fetchGroups);
-
-		return pm.detachCopy(articles.iterator().next());
+		return articles.iterator().next();
 
 			}
 
@@ -221,8 +215,7 @@ public class DynamicTrader {
 			I18nText productName,
 			Price singlePrice,
 			boolean allocate,
-			boolean allocateSynchronously,
-			String[] fetchGroups, int maxFetchDepth)
+			boolean allocateSynchronously)
 	throws ModuleException
 	{
 		if (segmentID == null)     throw new IllegalArgumentException("segmentID must not be null!");
@@ -301,10 +294,7 @@ public class DynamicTrader {
 		if (articles.size() != 1)
 			throw new IllegalStateException("trader.createArticles(...) created " + articles.size() + " instead of exactly 1 article!");
 
-		pm.getFetchPlan().setDetachmentOptions(FetchPlan.DETACH_LOAD_FIELDS | FetchPlan.DETACH_UNLOAD_FIELDS);
-		pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
-		if (fetchGroups != null)
-			pm.getFetchPlan().setGroups(fetchGroups);
+
 
 		return pm.detachCopy(articles.iterator().next());
 

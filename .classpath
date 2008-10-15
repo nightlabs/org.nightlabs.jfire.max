@@ -33,10 +33,10 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireReportingTrade"/>
 	<classpathentry kind="var" path="ASM"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireHTMLProp"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/NightLabsHTMLContent"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireScriptingEditor2D"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireVoucherEditor2D"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/NightLabsEditor2D"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireScripting"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/org.nightlabs.htmlcontent"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

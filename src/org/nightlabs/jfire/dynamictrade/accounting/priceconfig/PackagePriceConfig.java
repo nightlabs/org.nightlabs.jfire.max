@@ -5,12 +5,12 @@ import java.util.LinkedList;
 
 import javax.jdo.PersistenceManager;
 
-import org.nightlabs.annotation.Implement;
 import org.nightlabs.jfire.accounting.Price;
 import org.nightlabs.jfire.accounting.PriceFragment;
 import org.nightlabs.jfire.accounting.priceconfig.IPackagePriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.IPriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.PriceConfig;
+import org.nightlabs.jfire.dynamictrade.DynamicProductInfo;
 import org.nightlabs.jfire.dynamictrade.store.DynamicProduct;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.store.NestedProductTypeLocal;
@@ -50,37 +50,39 @@ implements IPackagePriceConfig
 	}
 
 	@Override
-	@Implement
 	public ArticlePrice createArticlePrice(Article article)
 	{
-		DynamicProduct dynamicProduct = (DynamicProduct) article.getProduct();
-		Price singlePrice = dynamicProduct.getSinglePrice();
+		DynamicProductInfo productInfo;
+		if (article.getProduct() != null)
+			productInfo = (DynamicProductInfo) article.getProduct();
+		else
+			productInfo = (DynamicProductInfo) article;
+		
+		Price singlePrice = productInfo.getSinglePrice();
 		long priceID = PriceConfig.createPriceID(singlePrice.getOrganisationID(), singlePrice.getPriceConfigID());
 		ArticlePrice articlePrice = new ArticlePrice(
 				article, singlePrice,
 				singlePrice.getOrganisationID(), singlePrice.getPriceConfigID(), priceID,
 				false);
 		for (PriceFragment pf : articlePrice.getFragments()) {
-			articlePrice.setAmount(pf.getPriceFragmentType(), (long) (pf.getAmount() * dynamicProduct.getQuantityAsDouble()));
+			articlePrice.setAmount(pf.getPriceFragmentType(), (long) (pf.getAmount() * productInfo.getQuantityAsDouble()));
 		}
 		return articlePrice;
 	}
 
 	@Override
-	@Implement
 	public boolean isDependentOnOffer()
 	{
 		return false;
 	}
 
 	@Override
-	@Implement
 	public boolean requiresProductTypePackageInternal()
 	{
 		return false;
 	}
 
-	@Implement
+	@Override
 	public ArticlePrice createNestedArticlePrice(
 			IPackagePriceConfig topLevelPriceConfig, Article article,
 			LinkedList<IPriceConfig> priceConfigStack, ArticlePrice topLevelArticlePrice,
@@ -90,7 +92,7 @@ implements IPackagePriceConfig
 		throw new UnsupportedOperationException("There should be nothing nested?!");
 	}
 
-	@Implement
+	@Override
 	public ArticlePrice createNestedArticlePrice(
 			IPackagePriceConfig topLevelPriceConfig, Article article,
 			LinkedList<IPriceConfig> priceConfigStack, ArticlePrice topLevelArticlePrice,
@@ -103,7 +105,7 @@ implements IPackagePriceConfig
 		throw new UnsupportedOperationException("There should be nothing nested?!");
 	}
 
-	@Implement
+	@Override
 	public void fillArticlePrice(Article article)
 	{
 		// this method is always called - and doesn't need to do anything, because DynamicProductTypes cannot be nested

@@ -33,6 +33,7 @@ import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.base.JFireBaseEAR;
 import org.nightlabs.jfire.dynamictrade.accounting.priceconfig.DynamicTradePriceConfig;
 import org.nightlabs.jfire.dynamictrade.accounting.priceconfig.PackagePriceConfig;
+import org.nightlabs.jfire.dynamictrade.recurring.DynamicProductTypeRecurringTradeActionHandler;
 import org.nightlabs.jfire.dynamictrade.store.DynamicProduct;
 import org.nightlabs.jfire.dynamictrade.store.DynamicProductType;
 import org.nightlabs.jfire.dynamictrade.store.DynamicProductTypeActionHandler;
@@ -139,6 +140,11 @@ implements SessionBean
 					Organisation.DEV_ORGANISATION_ID, DynamicProductTypeActionHandler.class.getName(), DynamicProductType.class);
 			dynamicProductTypeActionHandler = pm.makePersistent(dynamicProductTypeActionHandler);
 
+			// Register the RecurringTradeProductTypeActionHandler for SimpleProductTypes
+			DynamicProductTypeRecurringTradeActionHandler dptrtah = new DynamicProductTypeRecurringTradeActionHandler(
+					Organisation.DEV_ORGANISATION_ID, DynamicProductTypeRecurringTradeActionHandler.class.getName(), DynamicProductType.class);
+			dptrtah = pm.makePersistent(dptrtah);
+			
 			// create a default DeliveryConfiguration with one ModeOfDelivery
 			DeliveryConfiguration deliveryConfiguration = new DeliveryConfiguration(organisationID, "JFireDynamicTrade.default");
 			deliveryConfiguration.getName().setText(Locale.ENGLISH.getLanguage(), "Default Delivery Configuration for JFireDynamicTrade");

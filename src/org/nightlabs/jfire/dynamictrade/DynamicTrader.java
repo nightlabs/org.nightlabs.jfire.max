@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 
-import javax.jdo.FetchPlan;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 
@@ -124,8 +123,10 @@ public class DynamicTrader {
 			UnitID unitID,
 			TariffID tariffID,
 			I18nText productName,
-			Price singlePrice) throws ModuleException
-			{
+			Price singlePrice
+	) 
+	throws ModuleException
+	{
 
 		if (segmentID == null)     throw new IllegalArgumentException("segmentID must not be null!");
 		// offerID can be null
@@ -184,24 +185,18 @@ public class DynamicTrader {
 			offer = (Offer) pm.getObjectById(offerID);
 		}
 		
+		DynamicProductInfo productInfo = new DynamicProductInfoImpl(productName, quantity, unit, singlePrice);
+		
 		Collection<? extends DynamicProductTypeRecurringArticle> articles = (Collection<? extends DynamicProductTypeRecurringArticle>) trader.createArticles(
 				user, offer, segment,
 				Collections.singleton(pt),
-				new  DynamicProductTypeRecurringArticleCreator(tariff));
+				new  DynamicProductTypeRecurringArticleCreator(tariff, productInfo));
 
 		if (articles.size() != 1)
 			throw new IllegalStateException("trader.createArticles(...) created " + articles.size() + " instead of exactly 1 article!");
 
-		for (DynamicProductTypeRecurringArticle article : articles) {
-			article.getName().copyFrom(productName);
-			article.setQuantity(quantity);
-			article.setSinglePrice(singlePrice);
-			article.setUnit(unit);
-
-		}
 		return articles.iterator().next();
-
-			}
+	}
 
 
 
@@ -294,10 +289,7 @@ public class DynamicTrader {
 		if (articles.size() != 1)
 			throw new IllegalStateException("trader.createArticles(...) created " + articles.size() + " instead of exactly 1 article!");
 
-
-
-		return pm.detachCopy(articles.iterator().next());
-
+		return articles.iterator().next();
 	}
 
 }

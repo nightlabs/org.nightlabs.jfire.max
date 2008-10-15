@@ -20,7 +20,8 @@ import org.nightlabs.i18n.I18nText;
  * @jdo.create-objectid-class field-order="organisationID, dynamicProductTypeRecurringArticleID"
  * 
  * @jdo.fetch-group name="DynamicProductTypeRecurringArticle.name" fields="dynamicProductTypeRecurringArticle, names"
- *
+ * @jdo.fetch-group name="FetchGroupsTrade.articleInOrderEditor" fields="dynamicProductTypeRecurringArticle, names"
+ * @jdo.fetch-group name="FetchGroupsTrade.articleInOfferEditor" fields="dynamicProductTypeRecurringArticle, names"
  */
 public class DynamicProductTypeRecurringArticleName extends I18nText {
 
@@ -71,26 +72,25 @@ public class DynamicProductTypeRecurringArticleName extends I18nText {
 		this.dynamicProductTypeRecurringArticleID = dynamicProductTypeRecurringArticle.getArticleID();
 	}
 
-	
 	/**
 	 * @see org.nightlabs.i18n.I18nText#getFallBackValue(java.lang.String)
 	 */
 	@Override
 	protected String getFallBackValue(String languageID) {
-		// TODO Auto-generated method stub
 		return DynamicProductTypeRecurringArticle.getPrimaryKey(organisationID,dynamicProductTypeRecurringArticleID);
 	}
-	
 	
 	/**
 	 * @see org.nightlabs.i18n.I18nText#getI18nMap()
 	 */
 	@Override
 	protected Map<String, String> getI18nMap() {
-		// TODO Auto-generated method stub
 		return names;
 	}
-
+	
+	public DynamicProductTypeRecurringArticle getDynamicProductTypeRecurringArticle() {
+		return dynamicProductTypeRecurringArticle;
+	}
 }
 
 

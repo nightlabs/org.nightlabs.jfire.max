@@ -24,6 +24,7 @@ import org.nightlabs.util.Util;
  * @jdo.create-objectid-class
  *		field-order="organisationID, projectPhaseID"
  *
+ * @jdo.fetch-group name="ProjectPhase.description" fields="description"
  * @jdo.fetch-group name="ProjectPhase.name" fields="name"
  *
  **/
@@ -34,6 +35,7 @@ implements Serializable
 	private static final Logger logger = Logger.getLogger(ProjectPhase.class);
 
 	public static final String FETCH_GROUP_NAME = "ProjectPhase.name";
+	public static final String FETCH_GROUP_DESCRIPTION = "ProjectPhase.description";
 
 	/**
 	 * @jdo.field primary-key="true"
@@ -78,6 +80,7 @@ implements Serializable
 		this.projectPhaseID = projectPhaseID;
 
 		this.name = new ProjectPhaseName(this);
+		this.description = new ProjectPhaseDescription(this);
 	}
 
 	/**

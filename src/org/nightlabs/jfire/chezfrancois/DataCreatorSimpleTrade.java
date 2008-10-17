@@ -387,11 +387,12 @@ extends DataCreator
 
 		CustomerGroup customerGroupDefault = trader.getDefaultCustomerGroupForKnownCustomer();
 		CustomerGroup customerGroupAnonymous = LegalEntity.getAnonymousLegalEntity(pm).getDefaultCustomerGroup();
+		CustomerGroup customerGroupReseller = trader.getDefaultCustomerGroupForReseller();
 		formulaPriceConfig.addCustomerGroup(customerGroupDefault);
 		formulaPriceConfig.addCustomerGroup(customerGroupAnonymous);
+		formulaPriceConfig.addCustomerGroup(customerGroupReseller);
 		formulaPriceConfig.addCurrency(euro);
-		for (int i = 0; i < tariffs.length; i++) {
-			Tariff tariff = tariffs[i];
+		for (Tariff tariff : tariffs) {
 			formulaPriceConfig.addTariff(tariff);
 		}
 //			formulaPriceConfig.addProductType(rootSimpleProductType);
@@ -400,6 +401,19 @@ extends DataCreator
 		formulaPriceConfig.addPriceFragmentType(vatVal);
 		stablePriceConfig.adoptParameters(formulaPriceConfig);
 
+		// give resellers a special price
+		for (Tariff tariff : tariffs) {
+				FormulaCell cell = formulaPriceConfig.createFormulaCell(customerGroupReseller, tariff, euro);
+				cell.setFormula(totalPriceFragmentType,
+						"cell.resolvePriceCellsAmount(\n" +
+						"	new Array(\n" +
+						"		CustomerGroupID.create(\"" + organisationID + "\", \"" + CustomerGroup.CUSTOMER_GROUP_ID_DEFAULT + "\")\n" +
+						"	)\n" +
+						") * 0.85;" // give resellers a 15% margin
+				);
+		}
+
+		// set fallback values
 		FormulaCell fallbackFormulaCell = formulaPriceConfig.createFallbackFormulaCell();
 		fallbackFormulaCell.setFormula(totalPriceFragmentType,
 				"cell.resolvePriceCellsAmount(\n" +

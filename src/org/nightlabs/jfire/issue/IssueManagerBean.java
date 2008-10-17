@@ -52,6 +52,7 @@ import org.nightlabs.jfire.issue.project.Project;
 import org.nightlabs.jfire.issue.project.ProjectPhase;
 import org.nightlabs.jfire.issue.project.ProjectType;
 import org.nightlabs.jfire.issue.project.id.ProjectID;
+import org.nightlabs.jfire.issue.project.id.ProjectPhaseID;
 import org.nightlabs.jfire.issue.project.id.ProjectTypeID;
 import org.nightlabs.jfire.issue.prop.IssueStruct;
 import org.nightlabs.jfire.jbpm.JbpmLookup;
@@ -374,6 +375,58 @@ implements SessionBean
 			params.put("organisationID", projectTypeID.organisationID);
 			params.put("projectTypeID", projectTypeID.projectTypeID);
 			return NLJDOHelper.getObjectIDSet((Collection<Project>) q.executeWithMap(params));
+		} finally {
+			pm.close();
+		}
+	}
+	
+	//ProjectPhase//
+	/**
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type="Required"
+	 */	
+	public ProjectPhase storeProjectPhase(ProjectPhase projectPhase, boolean get, String[] fetchGroups, int maxFetchDepth)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+//			boolean isNew = !JDOHelper.isDetached(projectPhase);
+			return NLJDOHelper.storeJDO(pm, projectPhase, get, fetchGroups, maxFetchDepth);
+		}//try
+		finally {
+			pm.close();
+		}//finally
+	}
+
+	/**
+	 * @ejb.interface-method
+	 * @!ejb.transaction type="Supports"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	@SuppressWarnings("unchecked")
+	public Set<ProjectPhaseID> getProjectPhaseIDs()
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			Query q = pm.newQuery(ProjectPhase.class);
+			q.setResult("JDOHelper.getObjectId(this)");
+			return new HashSet<ProjectPhaseID>((Collection<? extends ProjectPhaseID>) q.execute());
+		} finally {
+			pm.close();
+		}
+	}
+	
+	/**
+	 * @ejb.interface-method
+	 * @!ejb.transaction type="Supports"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	@SuppressWarnings("unchecked")
+	public List<ProjectPhase> getProjectPhases(Collection<ProjectPhaseID> projectPhaseIDs, String[] fetchGroups, int maxFetchDepth)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			return NLJDOHelper.getDetachedObjectList(pm, projectPhaseIDs, Project.class, fetchGroups, maxFetchDepth);
 		} finally {
 			pm.close();
 		}

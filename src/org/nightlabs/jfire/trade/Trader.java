@@ -2242,8 +2242,7 @@ public class Trader
 
 
 	/**
-	 *
-	 * signal a given Jbpm transition to the offer
+	 * Signal a given Jbpm transition to the offer.
 	 */
 	public void signalOffer(OfferID offerID, String jbpmTransitionName)
 	{
@@ -2259,8 +2258,6 @@ public class Trader
 		finally {
 			jbpmContext.close();
 		}
-
-
 	}
 
 //	public Collection<? extends Article> onProductAssemble_importNestedProduct(User user, Product packageProduct, String partnerOrganisationID, Collection<NestedProductTypeLocal> partnerNestedProductTypes)
@@ -2401,4 +2398,22 @@ public class Trader
 //	throw new RuntimeException(e);
 //	}
 //	}
+
+	public void assignCustomer(Order order, LegalEntity customer)
+	{
+		// check if the vendor is the local organisation - otherwise the customer MUST NOT be changed
+		if (!getMandator().equals(order.getVendor()))
+			throw new UnsupportedOperationException("The customer must not be changed, if the vendor is not the local organisation! Cannot perform the requested operation for: " + order);
+
+		// check offers for finalization
+		for (Offer offer : order.getOffers()) {
+			if (offer.isFinalized())
+				throw new IllegalStateException("Order contains finalized Offer: " + JDOHelper.getObjectId(offer));
+
+			JDOHelper.makeDirty(offer, "finalizeDT"); // force the offer to become dirty as the virtually assigned customerID isn't correct anymore => cache notification
+		}
+
+		order.setCustomer(customer);
+		order.setCustomerGroup(customer.getDefaultCustomerGroup());
+	}
 }

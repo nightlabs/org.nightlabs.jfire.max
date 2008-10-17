@@ -1559,20 +1559,7 @@ implements SessionBean
 			Order order = (Order) pm.getObjectById(orderID);
 			LegalEntity newCustomer = (LegalEntity) pm.getObjectById(customerID);
 
-			// check if the vendor is the local organisation - otherwise the customer MUST NOT be changed
-			if (!Trader.getTrader(pm).getMandator().equals(order.getVendor()))
-				throw new UnsupportedOperationException("The customer must not be changed, if the vendor is not the local organisation! Cannot perform the requested operation for: " + order);
-
-			// check offers for finalization
-			for (Offer offer : order.getOffers()) {
-				if (offer.isFinalized())
-					throw new IllegalStateException("Order contains finalized Offer: " + JDOHelper.getObjectId(offer));
-
-				JDOHelper.makeDirty(offer, "finalizeDT"); // force the offer to become dirty as the virtually assigned customerID isn't correct anymore => cache notification
-			}
-
-			order.setCustomer(newCustomer);
-			order.setCustomerGroup(newCustomer.getDefaultCustomerGroup());
+			Trader.getTrader(pm).assignCustomer(order, newCustomer);
 
 			if (!get)
 				return null;
@@ -2216,5 +2203,31 @@ implements SessionBean
 		}
 	}
 
+	/**
+	 * @ejb.interface-method
+	 * @ejb.transaction type="Required"
+	 * @ejb.permission role-name="org.nightlabs.jfire.trade.editOrder"
+	 */
+	public void createReservation(OrderID orderID, AnchorID customerID)
+	{
+		// TODO: check/add rightsmanagement
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			Order order = (Order) pm.getObjectById(orderID);
+			LegalEntity customer = (LegalEntity) pm.getObjectById(customerID);
+			Trader trader = Trader.getTrader(pm);
+			trader.assignCustomer(order, customer);
+			for (Offer offer : order.getOffers())
+			{
+				if (!offer.isFinalized()) {
+					OfferID offerID = (OfferID) JDOHelper.getObjectId(offer);
+					trader.signalOffer(offerID, JbpmConstantsOffer.Vendor.TRANSITION_NAME_FINALIZE);
+				}
+			}
+		}
+		finally {
+			pm.close();
+		}
+	}
 }
 

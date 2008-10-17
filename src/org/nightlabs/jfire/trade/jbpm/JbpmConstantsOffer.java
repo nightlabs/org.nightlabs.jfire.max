@@ -47,6 +47,13 @@ public class JbpmConstantsOffer
 		public static final String TRANSITION_NAME_SEND = Organisation.DEV_ORGANISATION_ID + ":send";
 
 		/**
+		 * This transiation will be passed when a Offer is finalized directly (not via
+		 * {@link #TRANSITION_NAME_ACCEPT_IMPLICITELY} or
+		 * {@link #TRANSITION_NAME_ACCEPT_FOR_CROSS_TRADE}).
+		 */
+		public static final String TRANSITION_NAME_FINALIZE = Organisation.DEV_ORGANISATION_ID + ":finalize";
+
+		/**
 		 * This transition is triggered when acceptance is required and implicitely accepting possible. For example,
 		 * when working only in the Order editor, during a payment, this transition will be done implicitely, just as
 		 * an invoice is implicitely created (and the offer itself was implicitely created).

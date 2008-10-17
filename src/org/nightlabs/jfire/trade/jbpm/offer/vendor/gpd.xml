@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<root-container name="dev.jfire.org:Offer.Vendor" width="1466" height="1424">
+<root-container name="dev.jfire.org:Offer.Vendor" width="1131" height="532">
   <node name="dev.jfire.org:created" x="-24" y="17" width="190" height="40">
     <edge>
       <label x="-122" y="-52"/>

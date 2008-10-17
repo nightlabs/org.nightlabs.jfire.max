@@ -3,7 +3,7 @@
 <process-definition
   xmlns=""  name="dev.jfire.org:Offer.Vendor">
    <start-state name="dev.jfire.org:created">
-      <transition name="finalize" to="dev.jfire.org:finalized"></transition>
+      <transition name="dev.jfire.org:finalize" to="dev.jfire.org:finalized"></transition>
       <transition name="abort" to="dev.jfire.org:aborted"></transition>
       <transition name="dev.jfire.org:acceptImplicitely" to="dev.jfire.org:acceptedImplicitely"></transition>
       <transition name="dev.jfire.org:finalizeForCrossTrade" to="dev.jfire.org:finalizedForCrossTrade"></transition>

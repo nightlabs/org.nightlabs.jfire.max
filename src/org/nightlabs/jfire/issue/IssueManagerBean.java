@@ -426,7 +426,7 @@ implements SessionBean
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			return NLJDOHelper.getDetachedObjectList(pm, projectPhaseIDs, Project.class, fetchGroups, maxFetchDepth);
+			return NLJDOHelper.getDetachedObjectList(pm, projectPhaseIDs, ProjectPhase.class, fetchGroups, maxFetchDepth);
 		} finally {
 			pm.close();
 		}

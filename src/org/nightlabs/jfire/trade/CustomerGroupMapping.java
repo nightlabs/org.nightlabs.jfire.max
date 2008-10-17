@@ -107,6 +107,15 @@ implements Serializable
 		return pm.makePersistent(customerGroupMapping);
 	}
 
+	public static CustomerGroupMapping getCustomerGroupMappingForLocalCustomerGroupAndPartner(PersistenceManager pm, CustomerGroup localCustomerGroup, String partnerCustomerGroupOrganisationID)
+	{
+		CustomerGroupID localCustomerGroupID = (CustomerGroupID) JDOHelper.getObjectId(localCustomerGroup);
+		if (localCustomerGroupID == null)
+			throw new IllegalArgumentException("JDOHelper.getObjectId(localCustomerGroup) returned null!");
+
+		return getCustomerGroupMappingForLocalCustomerGroupAndPartner(pm, localCustomerGroupID, partnerCustomerGroupOrganisationID);
+	}
+
 	public static CustomerGroupMapping getCustomerGroupMappingForLocalCustomerGroupAndPartner(PersistenceManager pm, CustomerGroupID localCustomerGroupID, String partnerCustomerGroupOrganisationID)
 	{
 		Map<String, Object> params = new HashMap<String, Object>();
@@ -157,7 +166,7 @@ implements Serializable
 	{
 		this.localCustomerGroup = localCustomerGroup;
 		this.partnerCustomerGroup = partnerCustomerGroup;
-		
+
 		this.localCustomerGroupOrganisationID = localCustomerGroup.getOrganisationID();
 		this.localCustomerGroupCustomerGroupID = localCustomerGroup.getCustomerGroupID();
 
@@ -213,7 +222,7 @@ implements Serializable
 	{
 		if (localCustomerGroupID == null)
 			localCustomerGroupID = CustomerGroupID.create(localCustomerGroupOrganisationID, localCustomerGroupCustomerGroupID);
-		
+
 		return localCustomerGroupID;
 	}
 	public CustomerGroupID getPartnerCustomerGroupID()
@@ -227,7 +236,7 @@ implements Serializable
 	{
 		if (localCustomerGroupPK == null)
 			localCustomerGroupPK = CustomerGroup.getPrimaryKey(localCustomerGroupOrganisationID, localCustomerGroupCustomerGroupID);
-		
+
 		return localCustomerGroupPK;
 	}
 	public String getPartnerCustomerGroupPK()

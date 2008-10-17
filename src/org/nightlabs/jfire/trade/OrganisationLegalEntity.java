@@ -31,6 +31,7 @@ import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.listener.StoreCallback;
 
+import org.apache.log4j.Logger;
 import org.nightlabs.jfire.organisation.LocalOrganisation;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.transfer.Anchor;
@@ -38,18 +39,18 @@ import org.nightlabs.jfire.transfer.id.AnchorID;
 
 /**
  * All organisations known by a JFire organisation are represented in its datastore
- * with instances of this class. Note, that this also includes the local organisation. 
+ * with instances of this class. Note, that this also includes the local organisation.
  * The primary key of the instances will be made up using
  * the following schema:
  * <ul>
  *   <li>organisationID: The organistionID of the represented organisation.</li>
  *   <li>anchorTypeID: {@link LegalEntity#ANCHOR_TYPE_ID_LEGAL_ENTITY}</li>
  *   <li>anchorID: fully qualified class name of {@link OrganisationLegalEntity}</li>
- * </ul> 
- * 
+ * </ul>
+ *
  * @author Marco Schulze - marco at nightlabs dot de
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
- * 
+ *
  * @jdo.persistence-capable
  *		identity-type="application"
  *		persistence-capable-superclass="org.nightlabs.jfire.trade.LegalEntity"
@@ -65,11 +66,13 @@ public class OrganisationLegalEntity extends LegalEntity
 implements StoreCallback
 {
 	private static final long serialVersionUID = 1L;
+	private static final Logger logger = Logger.getLogger(OrganisationLegalEntity.class);
 
 	public static final String FETCH_GROUP_ORGANISATION = "OrganisationLegalEntity.organisation";
 	/**
-	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon! 
+	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon!
 	 */
+	@Deprecated
 	public static final String FETCH_GROUP_THIS_ORGANISATION_LEGAL_ENTITY = "OrganisationLegalEntity.this";
 
 //	public static final String ANCHOR_TYPE_ID_ORGANISATION = "Organisation";
@@ -105,14 +108,14 @@ implements StoreCallback
 		// TODO: The person and organisation should be set here, but is not because of JPOX bug, see public static OrganisationLegalEntity getOrganisationLegalEntity(...)
 //		this.organisation = organisation;
 //		this.setPerson(organisation.getPerson());
-		
+
 //		PersistenceManager pm = JDOHelper.getPersistenceManager(organisation);
 //		if (pm == null)
 //			throw new NullPointerException("organisation has no PersistenceManager attached! Can use this constructor only with a persistent non-detached organisation.");
 //		localOrganisationID = LocalOrganisation.getLocalOrganisation(pm).getOrganisationID();
 //		localOrganisation = localOrganisationID.equals(getOrganisationID());
 	}
-	
+
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
@@ -156,6 +159,7 @@ implements StoreCallback
 				try {
 					organisationLegalEntity = pm.makePersistent(organisationLegalEntity);
 				} catch (JDODataStoreException workaround) {
+					logger.warn("getOrganisationLegalEntity: pm.makePersistent(organisationLegalEntity) failed!", workaround);
 					System.out.println();
 					System.out.println("******************************************");
 					System.out.println("******************************************");
@@ -184,8 +188,7 @@ implements StoreCallback
 				// This method here is called by Accounting.getAccounting(...) and Trader.getTrader(...) calls Accounting.getAccounting(...).
 				// As the mandator-organisation doesn't need a customer-group anyway, it's no problem to filter out this situation.
 				if (!organisationID.equals(LocalOrganisation.getLocalOrganisation(pm).getOrganisationID())) {
-					organisationLegalEntity.setDefaultCustomerGroup(Trader.getTrader(pm).getDefaultCustomerGroupForKnownCustomer());
-					// TODO should we use another defaultCustomerGroup for organisation-legal-entities?
+					organisationLegalEntity.setDefaultCustomerGroup(Trader.getTrader(pm).getDefaultCustomerGroupForReseller());
 				}
 			}
 		}
@@ -200,11 +203,11 @@ implements StoreCallback
 //		if (getPerson() == null)
 //			setPerson(organisation.getPerson());
 	}
-	
+
 	/**
 	 * Returns the {@link AnchorID} referencing the {@link OrganisationLegalEntity}
 	 * of the given organisationID.
-	 * 
+	 *
 	 * @param organisationID The id of the organisation to reference.
 	 * @return The {@link AnchorID} referencing the {@link OrganisationLegalEntity}
 	 * of the given organisationID.
@@ -212,5 +215,5 @@ implements StoreCallback
 	public static AnchorID getOrganisationLegalEntityID(String organisationID) {
 		return AnchorID.create(organisationID, ANCHOR_TYPE_ID_LEGAL_ENTITY, OrganisationLegalEntity.class.getName());
 	}
-	
+
 }

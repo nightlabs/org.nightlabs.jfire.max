@@ -1399,7 +1399,7 @@ implements SessionBean
 			// In case the JFireTrade module is deployed into a running server, there might already exist cooperations
 			// with other organisations => need to create OrganisationLegalEntities - see #crossOrganisationRegistrationCallback(...)
 			for (Iterator<Organisation> it = pm.getExtent(Organisation.class).iterator(); it.hasNext(); ) {
-				OrganisationLegalEntity.getOrganisationLegalEntity(pm, it.next().getOrganisationID());
+				initialisePartnerLegalEntity(pm, it.next().getOrganisationID());
 			}
 
 			{
@@ -2040,12 +2040,17 @@ implements SessionBean
 		try {
 			// I think it's not necessary to ask the other organisation for its OrganisationLegalEntity. We have the person already
 			// here, thus we can simply create it.
-			OrganisationLegalEntity.getOrganisationLegalEntity(pm, context.getOtherOrganisationID());
+			initialisePartnerLegalEntity(pm, context.getOtherOrganisationID());
 			// Note, that this is done for all existing organisations in #initialise() as well, because the JFireTrade module
 			// might be deployed, AFTER a JFire server is already running for a long time.
 		} finally {
 			pm.close();
 		}
+	}
+
+	private static void initialisePartnerLegalEntity(PersistenceManager pm, String partnerOrganisationID)
+	{
+		OrganisationLegalEntity.getOrganisationLegalEntity(pm, partnerOrganisationID);
 	}
 
 	/**

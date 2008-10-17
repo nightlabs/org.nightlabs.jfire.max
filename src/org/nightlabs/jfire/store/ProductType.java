@@ -138,10 +138,10 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="ProductType.name" fields="name"
  * @jdo.fetch-group name="ProductType.this" fetch-groups="default" fields="deliveryConfiguration, extendedProductType, fieldMetaDataMap, innerPriceConfig, managedProductTypeGroup, name, owner, packagePriceConfig, productTypeGroups, productTypeLocal"
  *
- * @jdo.fetch-group name="FetchGroupsTrade.articleInOrderEditor" fetch-groups="default" fields="name"
- * @jdo.fetch-group name="FetchGroupsTrade.articleInOfferEditor" fetch-groups="default" fields="name"
- * @jdo.fetch-group name="FetchGroupsTrade.articleInInvoiceEditor" fetch-groups="default" fields="name"
- * @jdo.fetch-group name="FetchGroupsTrade.articleInDeliveryNoteEditor" fetch-groups="default" fields="name"
+ * @jdo.fetch-group name="FetchGroupsTrade.articleInOrderEditor" fetch-groups="default" fields="name, vendor"
+ * @jdo.fetch-group name="FetchGroupsTrade.articleInOfferEditor" fetch-groups="default" fields="name, vendor"
+ * @jdo.fetch-group name="FetchGroupsTrade.articleInInvoiceEditor" fetch-groups="default" fields="name, vendor"
+ * @jdo.fetch-group name="FetchGroupsTrade.articleInDeliveryNoteEditor" fetch-groups="default" fields="name, vendor"
  *
  * @!jdo.fetch-group name="FetchGroupsCrossTrade.ProductTypeForReseller" fetch-groups="default" fields="deliveryConfiguration, extendedProductType, fieldMetaDataMap, innerPriceConfig, localAccountantDelegate, localStorekeeperDelegate, managedProductTypeGroup, name, owner, packagePriceConfig, productTypeGroups"
  *

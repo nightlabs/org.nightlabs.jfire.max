@@ -64,6 +64,7 @@ import org.nightlabs.jfire.store.deliver.id.DeliveryDataID;
 import org.nightlabs.jfire.store.id.ProductID;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.trade.Article;
+import org.nightlabs.jfire.trade.CustomerGroupMapping;
 import org.nightlabs.jfire.trade.Offer;
 import org.nightlabs.jfire.trade.OfferLocal;
 import org.nightlabs.jfire.trade.OfferRequirement;
@@ -76,6 +77,7 @@ import org.nightlabs.jfire.trade.TradeManager;
 import org.nightlabs.jfire.trade.TradeManagerUtil;
 import org.nightlabs.jfire.trade.TradeSide;
 import org.nightlabs.jfire.trade.Trader;
+import org.nightlabs.jfire.trade.id.CustomerGroupID;
 import org.nightlabs.jfire.trade.id.OfferID;
 import org.nightlabs.jfire.trade.id.OrderID;
 import org.nightlabs.jfire.trade.id.SegmentID;
@@ -354,6 +356,16 @@ public abstract class ProductTypeActionHandler
 
 //			Set segmentTypeIDs = Segment.getSegmentTypeIDs(pm, localOrder);
 
+			CustomerGroupMapping customerGroupMapping = CustomerGroupMapping.getCustomerGroupMappingForLocalCustomerGroupAndPartner(
+					pm,
+					localOrder.getCustomerGroup(),
+					partnerOrganisationID
+			);
+			if (customerGroupMapping == null)
+				throw new IllegalStateException("There is no CustomerGroupMapping for the local CustomerGroup \"" + localOrder.getCustomerGroup() + "\" and the partner-organisation \"" + partnerOrganisationID + "\"! packageProduct=" + packageProduct);
+
+			CustomerGroupID partnerCustomerGroupID = customerGroupMapping.getPartnerCustomerGroupID();
+
 			// for the current order, we create/find an instance of OrderRequirement
 			OrderRequirement orderRequirement = OrderRequirement.getOrderRequirement(pm, localOrder);
 			Order partnerOrder = orderRequirement.getPartnerOrder(partner);
@@ -362,7 +374,7 @@ public abstract class ProductTypeActionHandler
 			if (partnerOrder == null) {
 				Order order = tradeManager.createCrossTradeOrder(null, // TODO should we somehow configure the orderIDPrefix on this side? I don't think so. Marco.
 						localOrder.getCurrency().getCurrencyID(),
-						null, // TODO we should find out and pass the CustomerGroupID
+						partnerCustomerGroupID,
 //						segmentTypeIDs);
 						segmentTypeIDsWithTheCurrentInstanceOnly);
 				partnerOrder = pm.makePersistent(order);

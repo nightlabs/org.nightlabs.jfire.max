@@ -181,6 +181,7 @@ public class Trader
 		defaultCustomerGroup = pm.makePersistent(defaultCustomerGroup);
 
 		trader.defaultCustomerGroupForKnownCustomer = defaultCustomerGroup;
+		trader.defaultCustomerGroupForReseller = resellerCustomerGroup;
 		trader = pm.makePersistent(trader);
 
 		// Normally this is done by OrganisationLegalEntity.getOrganisationLegalEntity(...), but since this would cause an endless recursion, we skip it in this situation
@@ -287,19 +288,38 @@ public class Trader
 	 * organisation). There will be a mapping within the priceconfig and a global
 	 * one. The priceconfig- customergroup-mapping will inherit the global one.
 	 *
+	 * Update2: The mapping exists. Need to change the complete javadoc here and
+	 * add javadoc to {@link #defaultCustomerGroupForReseller}.
+	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private CustomerGroup defaultCustomerGroupForKnownCustomer;
 
 	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private CustomerGroup defaultCustomerGroupForReseller;
+
+	/**
 	 * @return Returns the <tt>CustomerGroup</tt> that is automatically assigned
 	 *         to all newly created customers as
 	 *         {@link LegalEntity#defaultCustomerGroup}. Note, that the anonymous
-	 *         customer has a different <tt>CustomerGroup</tt> assigned!
+	 *         customer has a different <tt>CustomerGroup</tt> assigned! The same
+	 *         applies to resellers - see {@link #getDefaultCustomerGroupForReseller()}.
 	 */
 	public CustomerGroup getDefaultCustomerGroupForKnownCustomer()
 	{
 		return defaultCustomerGroupForKnownCustomer;
+	}
+
+	/**
+	 * @return Returns the <tt>CustomerGroup</tt> that is automatically assigned
+	 *         to all reseller-organisations as
+	 *         {@link LegalEntity#defaultCustomerGroup}. This assignment happens during
+	 *         cross-organisation-registration (in a callback).
+	 */
+	public CustomerGroup getDefaultCustomerGroupForReseller() {
+		return defaultCustomerGroupForReseller;
 	}
 
 	/**
@@ -308,14 +328,22 @@ public class Trader
 	 *
 	 * @see #getDefaultCustomerGroupForKnownCustomer()
 	 */
-	public void setDefaultCustomerGroupForKnownCustomer(
-			CustomerGroup customerGroupForEndCustomer)
+	public void setDefaultCustomerGroupForKnownCustomer(CustomerGroup customerGroupForEndCustomer)
 	{
 		if (!getOrganisationID().equals(customerGroupForEndCustomer.getOrganisationID()))
 			throw new IllegalArgumentException(
 			"defaultCustomerGroupForKnownCustomer.organisationID is foreign!");
 
 		this.defaultCustomerGroupForKnownCustomer = customerGroupForEndCustomer;
+	}
+
+	public void setDefaultCustomerGroupForReseller(CustomerGroup defaultCustomerGroupForReseller)
+	{
+		if (!getOrganisationID().equals(defaultCustomerGroupForReseller.getOrganisationID()))
+			throw new IllegalArgumentException(
+			"defaultCustomerGroupForReseller.organisationID is foreign!");
+
+		this.defaultCustomerGroupForReseller = defaultCustomerGroupForReseller;
 	}
 
 	/**
@@ -1177,7 +1205,7 @@ public class Trader
 		NLJDOHelper.enableTransactionSerializeReadObjects(pm);
 		try {
 			pm.refreshAll(articles);
-			for (Article article : articles) {	
+			for (Article article : articles) {
 				if (article.getProduct() != null)
 					pm.refresh(article.getProduct().getProductLocal());
 			}
@@ -2214,8 +2242,8 @@ public class Trader
 
 
 	/**
-	 * 
-	 * signal a given Jbpm transition to the offer 
+	 *
+	 * signal a given Jbpm transition to the offer
 	 */
 	public void signalOffer(OfferID offerID, String jbpmTransitionName)
 	{
@@ -2223,7 +2251,7 @@ public class Trader
 
 		OfferLocal offerLocal = (OfferLocal) pm.getObjectById(OfferLocalID.create(offerID));
 		JbpmContext jbpmContext = JbpmLookup.getJbpmConfiguration().createJbpmContext();
-		
+
 		try{
 			ProcessInstance processInstance = jbpmContext.getProcessInstanceForUpdate(offerLocal.getJbpmProcessInstanceId());
 			processInstance.signal(jbpmTransitionName);

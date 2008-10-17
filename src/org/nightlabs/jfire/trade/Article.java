@@ -592,7 +592,7 @@ implements Serializable, DeleteCallback, DetachCallback, StoreCallback
 	 * This is usually <tt>null</tt> or the exception message (no stacktrace) of the root exception.
 	 *
 	 * @jdo.field persistence-modifier="persistent"
-	 * @jdo.column length="255"
+	 * @jdo.column sql-type="CLOB"
 	 */
 	private String allocationExceptionMessage = null;
 
@@ -622,7 +622,7 @@ implements Serializable, DeleteCallback, DetachCallback, StoreCallback
 	 * This is usually <tt>null</tt> or the exception message (no stacktrace) of the root exception.
 	 *
 	 * @jdo.field persistence-modifier="persistent"
-	 * @jdo.column length="255"
+	 * @jdo.column sql-type="CLOB"
 	 */
 	private String releaseExceptionMessage = null;
 

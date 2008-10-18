@@ -2,13 +2,13 @@
 
 <process-definition
   xmlns=""  name="dev.jfire.org:Offer.CustomerCrossOrganisation">
-   <start-state name="dev.jfire.org:sent">
+   <start-state name="dev.jfire.org:created">
       <transition name="accept" to="dev.jfire.org:customerAccepted"></transition>
       <transition name="reject" to="dev.jfire.org:customerRejected"></transition>
       <transition name="dev.jfire.org:expired" to="dev.jfire.org:expired"></transition>
       <transition name="dev.jfire.org:revoked" to="dev.jfire.org:revoked"></transition>
       <transition name="dev.jfire.org:acceptedImplicitely" to="dev.jfire.org:acceptedImplicitely"></transition>
-      <transition name="dev.jfire.org:acceptedForCrossTrade" to="dev.jfire.org:acceptedForCrossTrade"></transition>
+      <transition name="dev.jfire.org:acceptForCrossTrade" to="dev.jfire.org:acceptedForCrossTrade"></transition>
    </start-state>
    <end-state name="dev.jfire.org:customerRejected"></end-state>
    <end-state name="dev.jfire.org:customerAccepted"></end-state>

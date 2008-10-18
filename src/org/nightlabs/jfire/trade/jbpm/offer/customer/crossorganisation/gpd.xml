@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <root-container name="dev.jfire.org:Offer.CustomerCrossOrganisation" width="1048" height="1424">
-  <node name="dev.jfire.org:sent" x="187" y="140" width="206" height="40">
+  <node name="dev.jfire.org:created" x="187" y="140" width="206" height="40">
     <edge>
       <label x="5" y="-10"/>
     </edge>

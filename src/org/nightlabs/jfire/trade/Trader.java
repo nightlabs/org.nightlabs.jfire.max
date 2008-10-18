@@ -64,6 +64,7 @@ import org.nightlabs.jfire.asyncinvoke.ErrorCallback;
 import org.nightlabs.jfire.asyncinvoke.Invocation;
 import org.nightlabs.jfire.asyncinvoke.InvocationError;
 import org.nightlabs.jfire.asyncinvoke.UndeliverableCallback;
+import org.nightlabs.jfire.base.Lookup;
 import org.nightlabs.jfire.config.Config;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.jbpm.JbpmLookup;
@@ -223,40 +224,6 @@ public class Trader
 		return store;
 	}
 
-	// /**
-	// * key: String orderPK<br/>
-	// * value: OrderRequirement orderRequirement
-	// *
-	// * @jdo.field
-	// * persistence-modifier="persistent"
-	// * collection-type="map"
-	// * key-type="java.lang.String"
-	// * value-type="OrderRequirement"
-	// *
-	// * @jdo.join
-	// *
-	// * @jdo.map-vendor-extension vendor-name="jpox" key="key-length" value="max
-	// 201"
-	// */
-	// protected Map orderRequirements = new HashMap();
-	//
-	// /**
-	// * key: String offerPK<br/>
-	// * value: OfferRequirement offerRequirement
-	// *
-	// * @jdo.field
-	// * persistence-modifier="persistent"
-	// * collection-type="map"
-	// * key-type="java.lang.String"
-	// * value-type="OfferRequirement"
-	// *
-	// * @jdo.join
-	// *
-	// * @jdo.map-vendor-extension vendor-name="jpox" key="key-length" value="max
-	// 201"
-	// */
-	// protected Map offerRequirements = new HashMap();
-
 	/**
 	 * @return Returns the organisationID.
 	 */
@@ -357,21 +324,21 @@ public class Trader
 		return mandator;
 	}
 
-	public LegalEntity getVendor(String organisationID, String anchorID)
-	{
-		// TODO: implement
-		return null;
-		// String vendorPK = LegalEntity.getPrimaryKey(organisationID, anchorID);
-		// return (LegalEntity) vendors.get(vendorPK);
-	}
-
-	public LegalEntity getCustomer(String organisationID, String anchorID)
-	{
-		// TODO: implement
-		return null;
-		// String customerPK = LegalEntity.getPrimaryKey(organisationID, anchorID);
-		// return (LegalEntity) vendors.get(customerPK);
-	}
+//	public LegalEntity getVendor(String organisationID, String anchorID)
+//	{
+//		// TODO: implement
+//		return null;
+//		// String vendorPK = LegalEntity.getPrimaryKey(organisationID, anchorID);
+//		// return (LegalEntity) vendors.get(vendorPK);
+//	}
+//
+//	public LegalEntity getCustomer(String organisationID, String anchorID)
+//	{
+//		// TODO: implement
+//		return null;
+//		// String customerPK = LegalEntity.getPrimaryKey(organisationID, anchorID);
+//		// return (LegalEntity) vendors.get(customerPK);
+//	}
 
 	/**
 	 * Creates a new OrganisationLegalEntity, if it does not yet exist. If it is
@@ -1758,28 +1725,34 @@ public class Trader
 	public void onAcceptOffer(User user, Offer offer)
 	throws RemoteException, CreateException, NamingException
 	{
-		// check whether we have to finalize remote offers as well
-		PersistenceManager pm = getPersistenceManager();
-		OfferRequirement offerRequirement = OfferRequirement.getOfferRequirement(pm, offer, false);
-		if (offerRequirement != null) {
-			for (Iterator itO = offerRequirement.getPartnerOffers().iterator(); itO.hasNext(); ) {
-				Offer partnerOffer = (Offer) itO.next();
+		boolean error = true;
+		try {
+			// check whether we have to finalize remote offers as well
+			PersistenceManager pm = getPersistenceManager();
+			OfferRequirement offerRequirement = OfferRequirement.getOfferRequirement(pm, offer, false);
+			if (offerRequirement != null) {
+				for (Offer partnerOffer : offerRequirement.getPartnerOffers()) {
+					LegalEntity vendor = partnerOffer.getOrder().getVendor();
+					if (!(vendor instanceof OrganisationLegalEntity))
+						throw new IllegalStateException("Vendor of Offer " + partnerOffer.getPrimaryKey() + " is not an OrganisationLegalEntity, even though this Offer is part of the OfferRequirements for Offer " + offer.getPrimaryKey());
 
-				LegalEntity vendor = partnerOffer.getOrder().getVendor();
-				if (!(vendor instanceof OrganisationLegalEntity))
-					throw new IllegalStateException("Vendor of Offer " + partnerOffer.getPrimaryKey() + " is not an OrganisationLegalEntity, even though this Offer is part of the OfferRequirements for Offer " + offer.getPrimaryKey());
+					String partnerOrganisationID = vendor.getOrganisationID();
 
-				String partnerOrganisationID = vendor.getOrganisationID();
+					TradeManager tradeManager = TradeManagerUtil.getHome(Lookup.getInitialContextProperties(pm, partnerOrganisationID)).create();
+					tradeManager.signalOffer((OfferID) JDOHelper.getObjectId(partnerOffer), JbpmConstantsOffer.Vendor.TRANSITION_NAME_ACCEPT_FOR_CROSS_TRADE);
+					// TODO we have to do sth. with the local workflow!
+				} // for (Iterator itO = offerRequirement.getPartnerOffers().iterator(); itO.hasNext(); ) {
+			} // if (offerRequirement != null) {
 
-//				TradeManager tradeManager = TradeManagerUtil.getHome(Lookup.getInitialContextProperties(pm, partnerOrganisationID)).create();
-				signalOffer((OfferID) JDOHelper.getObjectId(partnerOffer), JbpmConstantsOffer.Vendor.TRANSITION_NAME_ACCEPT_FOR_CROSS_TRADE);
-				// TODO this is not yet the right handling of JBPM - needs to be fixed! Isn't this fine now? Marco.
-			} // for (Iterator itO = offerRequirement.getPartnerOffers().iterator(); itO.hasNext(); ) {
-		} // if (offerRequirement != null) {
+			offer.getOfferLocal().accept(user);
+			for (OfferActionHandler offerActionHandler : offer.getOfferLocal().getOfferActionHandlers()) {
+				offerActionHandler.onAcceptOffer(user, offer);
+			}
 
-		offer.getOfferLocal().accept(user);
-		for (OfferActionHandler offerActionHandler : offer.getOfferLocal().getOfferActionHandlers()) {
-			offerActionHandler.onAcceptOffer(user, offer);
+			error = false;
+		} finally {
+			if (error)
+				logger.error("onAcceptOffer: failed for: " + offer);
 		}
 	}
 
@@ -1789,34 +1762,40 @@ public class Trader
 	public void onFinalizeOffer(User user, Offer offer)
 	throws RemoteException, CreateException, NamingException
 	{
-		PersistenceManager pm = getPersistenceManager();
+		boolean error = true;
+		try {
+			PersistenceManager pm = getPersistenceManager();
 
-		// check whether we have to finalize remote offers as well
-		OfferRequirement offerRequirement = OfferRequirement.getOfferRequirement(pm, offer, false);
-		if (offerRequirement != null) {
-			for (Offer partnerOffer : offerRequirement.getPartnerOffers()) {
-				LegalEntity vendor = partnerOffer.getOrder().getVendor();
-				if (!(vendor instanceof OrganisationLegalEntity))
-					throw new IllegalStateException("Vendor of Offer " + partnerOffer.getPrimaryKey() + " is not an OrganisationLegalEntity, even though this Offer is part of the OfferRequirements for Offer " + offer.getPrimaryKey());
+			// check whether we have to finalize remote offers as well
+			OfferRequirement offerRequirement = OfferRequirement.getOfferRequirement(pm, offer, false);
+			if (offerRequirement != null) {
+				for (Offer partnerOffer : offerRequirement.getPartnerOffers()) {
+					LegalEntity vendor = partnerOffer.getOrder().getVendor();
+					if (!(vendor instanceof OrganisationLegalEntity))
+						throw new IllegalStateException("Vendor of Offer " + partnerOffer.getPrimaryKey() + " is not an OrganisationLegalEntity, even though this Offer is part of the OfferRequirements for Offer " + offer.getPrimaryKey());
 
-				String partnerOrganisationID = vendor.getOrganisationID();
+					String partnerOrganisationID = vendor.getOrganisationID();
 
-//				TradeManager tradeManager = TradeManagerUtil.getHome(Lookup.getInitialContextProperties(pm, partnerOrganisationID)).create();
-////				tradeManager.signalOffer((OfferID) JDOHelper.getObjectId(partnerOffer), JbpmConstantsOffer.Vendor.TRANSITION_NAME_ACCEPT_FOR_CROSS_TRADE);
-//				tradeManager.
-				signalOffer((OfferID) JDOHelper.getObjectId(partnerOffer), JbpmConstantsOffer.Vendor.TRANSITION_NAME_FINALIZE_FOR_CROSS_TRADE);
-				// TODO this is not yet the right handling of JBPM - needs to be fixed! Isn't this correct, now? Marco.
-			} // for (Iterator itO = offerRequirement.getPartnerOffers().iterator(); itO.hasNext(); ) {
-		} // if (offerRequirement != null) {
+					TradeManager tradeManager = TradeManagerUtil.getHome(Lookup.getInitialContextProperties(pm, partnerOrganisationID)).create();
+					tradeManager.signalOffer((OfferID) JDOHelper.getObjectId(partnerOffer), JbpmConstantsOffer.Vendor.TRANSITION_NAME_FINALIZE_FOR_CROSS_TRADE);
+					// TODO we have to do sth. with the local workflow!
+				} // for (Iterator itO = offerRequirement.getPartnerOffers().iterator(); itO.hasNext(); ) {
+			} // if (offerRequirement != null) {
 
-		// set expiry timestamp
-		setOfferExpiry(offer);
+			// set expiry timestamp
+			setOfferExpiry(offer);
 
-		offer.setFinalized(user);
+			offer.setFinalized(user);
 
-		// trigger listeners
-		for (OfferActionHandler offerActionHandler : offer.getOfferLocal().getOfferActionHandlers()) {
-			offerActionHandler.onFinalizeOffer(user, offer);
+			// trigger listeners
+			for (OfferActionHandler offerActionHandler : offer.getOfferLocal().getOfferActionHandlers()) {
+				offerActionHandler.onFinalizeOffer(user, offer);
+			}
+
+			error = false;
+		} finally {
+			if (error)
+				logger.error("onFinalizeOffer: failed for: " + offer);
 		}
 	}
 
@@ -1883,10 +1862,8 @@ public class Trader
 			ProcessDefinition processDefinition, String jbpmNodeName,
 			String name, String description, boolean publicState)
 	{
-		StateDefinition stateDefinition;
-		try {
-			stateDefinition = StateDefinition.getStateDefinition(processDefinition, jbpmNodeName);
-		} catch (JDOObjectNotFoundException x) {
+		StateDefinition stateDefinition = StateDefinition.getStateDefinition(processDefinition, jbpmNodeName);
+		if (stateDefinition == null) {
 			logger.warn("The ProcessDefinition \"" + processDefinition.getJbpmProcessDefinitionName() + "\" does not contain a jBPM Node named \"" + jbpmNodeName + "\"!");
 			return;
 		}

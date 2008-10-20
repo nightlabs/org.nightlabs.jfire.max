@@ -35,6 +35,7 @@ import org.nightlabs.jfire.trade.Segment;
 import org.nightlabs.jfire.trade.Trader;
 import org.nightlabs.jfire.trade.id.OfferID;
 import org.nightlabs.jfire.trade.id.SegmentID;
+import org.nightlabs.jfire.trade.recurring.RecurringOrder;
 import org.nightlabs.jfire.trade.recurring.RecurringTrader;
 
 /**
@@ -140,6 +141,7 @@ public class DynamicTrader {
 		PersistenceManager pm = getPersistenceManager();
 
 		Trader trader = Trader.getTrader(pm);
+		RecurringTrader recurringTrader = RecurringTrader.getRecurringTrader(pm);
 		Store store = Store.getStore(pm);
 		Segment segment = (Segment) pm.getObjectById(segmentID);
 		Order order = segment.getOrder();
@@ -177,7 +179,7 @@ public class DynamicTrader {
 				offer = offers.iterator().next();
 			}
 			else {		
-				offer = trader.createOffer(user, order, null); // TODO offerIDPrefix ???
+				offer =recurringTrader.createRecurringOffer(user, (RecurringOrder) order,null);
 			}
 		}
 		else {
@@ -186,7 +188,7 @@ public class DynamicTrader {
 		}
 		
 		DynamicProductInfo productInfo = new DynamicProductInfoImpl(productName, quantity, unit, singlePrice);
-		
+	
 		Collection<? extends DynamicProductTypeRecurringArticle> articles = (Collection<? extends DynamicProductTypeRecurringArticle>) trader.createArticles(
 				user, offer, segment,
 				Collections.singleton(pt),

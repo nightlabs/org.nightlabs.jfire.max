@@ -179,7 +179,7 @@ public class DynamicTrader {
 				offer = offers.iterator().next();
 			}
 			else {		
-				offer =recurringTrader.createRecurringOffer(user, (RecurringOrder) order,null);
+				offer = recurringTrader.createRecurringOffer(user, (RecurringOrder) order, null);
 			}
 		}
 		else {

@@ -40,7 +40,7 @@ import org.nightlabs.util.Util;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
- * 
+ *
  * @jdo.persistence-capable
  *		identity-type="application"
  *		objectid-class="org.nightlabs.jfire.geography.id.CountryID"
@@ -55,7 +55,7 @@ import org.nightlabs.util.Util;
  *
  * @jdo.fetch-group name="Country.name" fields="name"
  * @jdo.fetch-group name="Country.regions" fields="regions"
- * 
+ *
  */
 public class Country implements Serializable
 {
@@ -63,7 +63,7 @@ public class Country implements Serializable
 
 	public static final String FETCH_GROUP_NAME = "Country.name";
 	public static final String FETCH_GROUP_REGIONS = "Country.regions";
-	
+
 	/////// begin primary key ///////
 	/**
 	 * 2-char-iso-code
@@ -82,7 +82,7 @@ public class Country implements Serializable
 	protected transient Geography geography;
 
 	/**
-	 * @jdo.field persistence-modifier="persistent"
+	 * @jdo.field persistence-modifier="persistent" mapped-by="country"
 	 */
 	private CountryName name;
 
@@ -104,9 +104,9 @@ public class Country implements Serializable
 	 */
 	protected Map<String, Region> regions = new HashMap<String, Region>();
 	/////// end normal fields ///////
-	
+
 	public static final String DEFAULT_LANGUAGEID = Locale.ENGLISH.getLanguage();
-	
+
 	/////// begin constructors ///////
 
 	/**
@@ -114,7 +114,7 @@ public class Country implements Serializable
 	 */
 	@Deprecated
 	protected Country() { }
-	
+
 	public Country(String countryID)
 	{
 		this(null, countryID);

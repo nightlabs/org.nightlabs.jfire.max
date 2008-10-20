@@ -57,7 +57,7 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="Region.country" fields="country"
  * @jdo.fetch-group name="Region.name" fields="name"
  * @jdo.fetch-group name="Region.cities" fields="cities"
- * 
+ *
  */
 public class Region implements Serializable
 {
@@ -65,11 +65,11 @@ public class Region implements Serializable
 	 * The serial version of this class.
 	 */
 	private static final long serialVersionUID = 1L;
-	
+
 	public static final String FETCH_GROUP_COUNTRY = "Region.country";
 	public static final String FETCH_GROUP_NAME = "Region.name";
 	public static final String FETCH_GROUP_CITIES = "Region.cities";
-	
+
 	/////// begin primary key ///////
 	/**
 	 * @jdo.field primary-key="true"
@@ -89,7 +89,7 @@ public class Region implements Serializable
 	 */
 	private String regionID;
 	/////// end primary key ///////
-	
+
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
@@ -108,7 +108,7 @@ public class Region implements Serializable
 	private Country country;
 
 	/**
-	 * @jdo.field persistence-modifier="persistent"
+	 * @jdo.field persistence-modifier="persistent" mapped-by="region"
 	 */
 	private RegionName name;
 
@@ -130,8 +130,8 @@ public class Region implements Serializable
 	 */
 	protected Map<String, City> cities = new HashMap<String, City>();
 	/////// end normal fields ///////
-	
-	
+
+
 	/////// begin constructors ///////
 
 	/**
@@ -139,7 +139,7 @@ public class Region implements Serializable
 	 */
 	@Deprecated
 	protected Region() { }
-	
+
 	public Region(String organisationID, String regionID, Country country)
 	{
 		this(null, organisationID, regionID, country);
@@ -162,8 +162,8 @@ public class Region implements Serializable
 	}
 
 	/////// end constructors ///////
-	
-	
+
+
 	/////// begin methods ///////
 	/**
 	 * @return Returns the countryID.
@@ -218,7 +218,7 @@ public class Region implements Serializable
 	{
 		return primaryKey;
 	}
-	
+
 	/**
 	 * @return Returns the country.
 	 */
@@ -244,7 +244,7 @@ public class Region implements Serializable
 			PersistenceManager pm = JDOHelper.getPersistenceManager(this);
 			if (pm == null)
 				throw new IllegalStateException("city does not have a primary key and this instance of Region is not persistent! Cannot assign a primary key!");
-			
+
 			res = pm.makePersistent(city);
 		}
 		else

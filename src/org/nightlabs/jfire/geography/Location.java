@@ -51,7 +51,7 @@ import org.nightlabs.util.Util;
  *
  * @jdo.fetch-group name="Location.name" fields="name"
  * @jdo.fetch-group name="Location.city" fields="city"
- * @jdo.fetch-group name="Location.this" fields="city, district, name"
+ * @!jdo.fetch-group name="Location.this" fields="city, district, name"
  *
  */
 public class Location implements Serializable
@@ -63,11 +63,11 @@ public class Location implements Serializable
 
 	public static final String FETCH_GROUP_NAME = "Location.name";
 	public static final String FETCH_GROUP_CITY = "Location.city";
-	/**
-	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon!
-	 */
-	@Deprecated
-	public static final String FETCH_GROUP_THIS_LOCATION = "Location.this";
+//	/**
+//	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon!
+//	 */
+//	@Deprecated
+//	public static final String FETCH_GROUP_THIS_LOCATION = "Location.this";
 
 	/**
 	 * 2-char-iso-code
@@ -110,7 +110,7 @@ public class Location implements Serializable
 	private District district;
 
 	/**
-	 * @jdo.field persistence-modifier="persistent"
+	 * @jdo.field persistence-modifier="persistent" mapped-by="location"
 	 */
 	private LocationName name;
 

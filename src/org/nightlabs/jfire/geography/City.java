@@ -58,7 +58,7 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="City.name" fields="name"
  * @jdo.fetch-group name="City.locations" fields="locations"
  * @jdo.fetch-group name="City.region" fields="region"
- * 
+ *
  */
 public class City implements Serializable
 {
@@ -66,11 +66,11 @@ public class City implements Serializable
 	 * The serial version of this class.
 	 */
 	private static final long serialVersionUID = 1L;
-	
+
 	public static final String FETCH_GROUP_NAME = "City.name";
 	public static final String FETCH_GROUP_LOCATIONS = "City.locations";
 	public static final String FETCH_GROUP_REGION = "City.region";
-	
+
 	/////// begin primary key ///////
 	/**
 	 * 2-char-iso-code
@@ -98,7 +98,7 @@ public class City implements Serializable
 	private String primaryKey;
 
 	public static final String DEFAULT_LANGUAGEID = Locale.ENGLISH.getLanguage();
-	
+
 	/////// begin normal fields ///////
 
 	/**
@@ -112,7 +112,7 @@ public class City implements Serializable
 	private Region region;
 
 	/**
-	 * @jdo.field persistence-modifier="persistent"
+	 * @jdo.field persistence-modifier="persistent" mapped-by="city"
 	 */
 	private CityName name;
 
@@ -183,8 +183,8 @@ public class City implements Serializable
 	}
 
 	/////// end constructors ///////
-	
-	
+
+
 	/////// begin methods ///////
 
 	public String getCountryID()
@@ -212,7 +212,7 @@ public class City implements Serializable
 	{
 		return region;
 	}
-	
+
 	public static String getPrimaryKey(String countryID, String organisationID, String cityID)
 	{
 		return countryID + '/' + organisationID + '/' + cityID;

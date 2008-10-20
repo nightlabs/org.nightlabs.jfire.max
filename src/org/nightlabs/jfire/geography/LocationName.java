@@ -52,7 +52,7 @@ public class LocationName extends I18nText
 	 * The serial version of this class.
 	 */
 	private static final long serialVersionUID = 1L;
-	
+
 	/////// begin primary key ///////
 	/**
 	 * 2-char-iso-code
@@ -83,7 +83,7 @@ public class LocationName extends I18nText
 	/**
 	 * key: String languageID<br/>
 	 * value: String name
-	 * 
+	 *
 	 * @jdo.field
 	 *		persistence-modifier="persistent"
 	 *		collection-type="map"

@@ -123,6 +123,7 @@ import org.nightlabs.jfire.trade.id.SegmentID;
 import org.nightlabs.jfire.trade.recurring.RecurringOrder;
 import org.nightlabs.jfire.trade.recurring.RecurringTrader;
 import org.nightlabs.util.CollectionUtil;
+import org.nightlabs.util.Util;
 
 /**
  * @ejb.bean name="jfire/ejb/JFireSimpleTrade/SimpleTradeManager"
@@ -331,6 +332,14 @@ implements SessionBean
 	{
 		if (productType == null)
 			throw new IllegalArgumentException("productType must not be null!");
+
+		// In case this method is called multiple times (e.g. retry on dead lock), it's essential that we get a fresh copy every time.
+		// TODO maybe put this into an interceptor!. Marco.
+		// It is a DataNucleus Bug that the object is manipulated during pm.makePersistent(...), because its COPY should be changed - not the original.
+		// Therefore, we will NOT put this into an interceptor, but instead create a test case and raise a DN JIRA issue.
+		// Additionally, the contract will be that all EJB methods which modify the arguments must copy them themselves just like we
+		// temporarily do below. Marco.
+		productType = Util.cloneSerializable(productType);
 
 		PersistenceManager pm = getPersistenceManager();
 		try {

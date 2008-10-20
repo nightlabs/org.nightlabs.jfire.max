@@ -11,7 +11,6 @@ import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
-import org.nightlabs.annotation.Implement;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.accounting.Price;
 import org.nightlabs.jfire.accounting.TariffMapping;
@@ -66,7 +65,6 @@ public class SimpleProductTypeActionHandler
 	}
 
 	@Override
-	@Implement
 	public Collection<? extends Product> findProducts(User user,
 			ProductType productType, NestedProductTypeLocal nestedProductTypeLocal, ProductLocator productLocator)
 	{
@@ -109,7 +107,6 @@ public class SimpleProductTypeActionHandler
 
 
 	@Override
-	@Implement
 	protected Collection<? extends Article> createCrossTradeArticles(
 			User user, Product localPackageProduct, Article localArticle,
 			String partnerOrganisationID, Hashtable<?, ?> partnerInitialContextProperties,
@@ -133,6 +130,7 @@ public class SimpleProductTypeActionHandler
 				qty, tariffMapping.getPartnerTariffID(), true, true,
 				new String[] {
 					FetchPlan.DEFAULT, Article.FETCH_GROUP_OFFER, Article.FETCH_GROUP_ORDER, Article.FETCH_GROUP_PRICE,
+					Article.FETCH_GROUP_CURRENCY, Article.FETCH_GROUP_TARIFF,
 					Article.FETCH_GROUP_PRODUCT, Article.FETCH_GROUP_PRODUCT_TYPE, Article.FETCH_GROUP_SEGMENT, Price.FETCH_GROUP_CURRENCY,
 					Product.FETCH_GROUP_PRODUCT_TYPE,
 					Price.FETCH_GROUP_FRAGMENTS, ArticlePrice.FETCH_GROUP_PACKAGE_ARTICLE_PRICE

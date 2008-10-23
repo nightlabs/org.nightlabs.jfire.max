@@ -1296,7 +1296,9 @@ public class Trader
 		try {
 			pm.refreshAll(articles);
 			for (Article article : articles) {
-				pm.refresh(article.getProduct().getProductLocal());
+				Product product = article.getProduct();
+				if (product != null)
+					pm.refresh(product.getProductLocal());
 			}
 		} finally {
 			NLJDOHelper.disableTransactionSerializeReadObjects(pm);

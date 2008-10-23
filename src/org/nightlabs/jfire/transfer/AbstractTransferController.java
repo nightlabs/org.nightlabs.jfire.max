@@ -22,13 +22,12 @@ import org.nightlabs.jfire.store.deliver.id.DeliveryID;
 import org.nightlabs.util.Util;
 
 /**
- * /**
  * Abstract base class for the two controllers for the delivery and payment process ({@link PaymentController} and {@link DeliveryController}).<br />
  * It encapsulates all stages of a transfer process for one single good (money or products) as described in more detail in the
  * <a href="https://www.jfire.org/modules/phpwiki/index.php/WorkflowPaymentAndDelivery">JFire Wiki</a>.
- * 
+ *
  * @author Tobias Langner <!-- tobias[dot]langner[at]nightlabs[dot]de -->
- * 
+ *
  * @param <D> The type of {@link TransferData} to be used by this {@link AbstractTransferController}
  * @param <ID> The type of {@link ObjectID} for the specific transfer ({@link PaymentID} or {@link DeliveryID})
  * @param <R> The type of result for the specific transfer ({@link PaymentResult} or {@link DeliveryResult})
@@ -37,16 +36,16 @@ public abstract class AbstractTransferController<D extends TransferData, ID exte
 	private Stage lastStage = Stage.Initial;
 	boolean forceRollback = false;
 	boolean skipServerStages = false;
-	
+
 	public AbstractTransferController(List<D> transferDatas, List<ID> transferIDs) {
 		setTransferDatas(transferDatas);
 		setTransferIDs(transferIDs);
 	}
-	
+
 	private List<D> transferDatas;
 	private List<ID> transferIDs;
 	private List<R> lastStageResults;
-	
+
 	protected List<R> getLastStageResults() {
 		return lastStageResults;
 	}
@@ -66,7 +65,7 @@ public abstract class AbstractTransferController<D extends TransferData, ID exte
 	protected void setTransferDatas(List<D> transferDatas) {
 		this.transferDatas = transferDatas;
 	}
-	
+
 	/**
 	 * This method returns the internal list of {@link TransferData}.
 	 * @return The internal list of {@link TransferData}.
@@ -79,14 +78,14 @@ public abstract class AbstractTransferController<D extends TransferData, ID exte
 	 * @see org.nightlabs.jfire.transfer.TransferController#isRollbackRequired()
 	 */
 	public abstract boolean isRollbackRequired();
-	
+
 	/**
 	 * Forces this controller to set the rollback flag in all subsequent stages.
 	 */
 	public void forceRollback() {
 		this.forceRollback = true;
 	}
-	
+
 	/**
 	 * Returns a boolean indicating whether the rollback flag is set.
 	 * @return A boolean indicating whether the rollback flag is set.
@@ -94,14 +93,14 @@ public abstract class AbstractTransferController<D extends TransferData, ID exte
 	protected boolean isForceRollback() {
 		return forceRollback;
 	}
-	
+
 	/**
 	 * Forces this controller to skip all subsequent server stages.
 	 */
 	public void skipServerStages() {
 		this.skipServerStages = true;
 	}
-	
+
 	/**
 	 * Returns whether all subsequent server stages should be skipped.
 	 * @return A boolean indicating whether all subsequent server stages should be skipped.
@@ -109,7 +108,7 @@ public abstract class AbstractTransferController<D extends TransferData, ID exte
 	protected boolean isSkipServerStages() {
 		return skipServerStages;
 	}
-	
+
 	/**
 	 * Sets the last stage that has been performed to the given {@link Stage}. This method is supposed to be used together with the method
 	 * {@link #assertLastStage(org.nightlabs.jfire.transfer.Stage)} to ensure that the different stages are executed in
@@ -119,7 +118,7 @@ public abstract class AbstractTransferController<D extends TransferData, ID exte
 	private  void setLastStage(Stage stage) {
 		this.lastStage = stage;
 	}
-	
+
 	/**
 	 * Checks whether the last executed stage (set by {@link #setLastStage(org.nightlabs.jfire.transfer.Stage)}) is the
 	 * given stage. This is supposed to be used to ensure that the different stages are executed in the correct order.
@@ -129,7 +128,7 @@ public abstract class AbstractTransferController<D extends TransferData, ID exte
 		if (lastStage != stage)
 			throw new IllegalStateException("Last stage should be " + stage.name() + " but is " + lastStage);
 	}
-	
+
 	/**
 	 * Returns the {@link StoreManager}.
 	 * @return The {@link StoreManager}
@@ -137,7 +136,7 @@ public abstract class AbstractTransferController<D extends TransferData, ID exte
 	public StoreManager getStoreManager() throws RemoteException, LoginException, CreateException, NamingException {
 		return StoreManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
 	}
-	
+
 	/**
 	 * Returns the {@link AccountingManager}.
 	 * @return The {@link AccountingManager}
@@ -145,11 +144,11 @@ public abstract class AbstractTransferController<D extends TransferData, ID exte
 	public AccountingManager getAccountingManager() throws RemoteException, LoginException, CreateException, NamingException {
 		return AccountingManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
 	}
-	
+
 	private boolean isInServer() {
 		return SecurityReflector.getInitialContextProperties() == null; // TODO this is not clean! Extend SecurityReflector with a method like String getLocation() or sth. similar - needs further thoughts!
 	}
-	
+
 	protected List<D> getTransferDatasForServer() {
 		if (!isInServer())
 			return getTransferDatas();
@@ -167,7 +166,7 @@ public abstract class AbstractTransferController<D extends TransferData, ID exte
 		setLastStage(Stage.ClientBegin);
 		return result;
 	}
-	
+
 	protected abstract boolean _clientBegin();
 
 	/* (non-Javadoc)
@@ -178,9 +177,9 @@ public abstract class AbstractTransferController<D extends TransferData, ID exte
 		_serverBegin();
 		setLastStage(Stage.ServerBegin);
 	}
-	
+
 	protected abstract void _serverBegin();
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.nightlabs.jfire.transfer.AbstractTransferController#clientDoWork()
@@ -201,9 +200,9 @@ public abstract class AbstractTransferController<D extends TransferData, ID exte
 		_serverDoWork();
 		setLastStage(Stage.ServerDoWork);
 	}
-	
+
 	protected abstract void _serverDoWork();
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.nightlabs.jfire.transfer.AbstractTransferController#clientEnd()

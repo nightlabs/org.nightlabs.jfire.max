@@ -16,25 +16,25 @@ import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.transfer.AbstractTransferController;
 
 public abstract class AbstractPaymentController extends AbstractTransferController<PaymentData, PaymentID, PaymentResult> implements PaymentController {
-	
+
 	public AbstractPaymentController(List<PaymentData> transferDatas) {
 		super(transferDatas, getPaymentIDs(transferDatas));
 	}
-	
+
 	private static List<PaymentID> getPaymentIDs(List<PaymentData> transferDatas) {
 		List<PaymentID> paymentIDs = new LinkedList<PaymentID>();
 		for (PaymentData data : transferDatas)
 			paymentIDs.add(PaymentID.create(data.getPayment().getOrganisationID(), data.getPayment().getPaymentID()));
-		
+
 		return paymentIDs;
 	}
-	
+
 
 	@Override
 	protected void _serverBegin() {
 		if (isSkipServerStages())
 			return;
-		
+
 		List<PaymentResult> payBeginServerResults = null;
 		try {
 			for (PaymentData paymentData : getTransferDatas())
@@ -49,7 +49,7 @@ public abstract class AbstractPaymentController extends AbstractTransferControll
 
 			if (payBeginServerResults.size() != getTransferDatas().size())
 				throw new IllegalStateException("accountingManager.payBegin(List) returned an invalid count of results! payBeginServerResults.size()=" + payBeginServerResults.size() + "; getTransferDatas().size()="+getTransferDatas().size());
-			
+
 			for (Iterator<?> itD = getTransferDatas().iterator(), itR = payBeginServerResults.iterator(); itD.hasNext(); ) {
 				PaymentData paymentData = (PaymentData) itD.next();
 				PaymentResult payBeginServerResult = (PaymentResult) itR.next();
@@ -64,7 +64,7 @@ public abstract class AbstractPaymentController extends AbstractTransferControll
 				paymentData.getPayment().setPayBeginServerResult(payBeginServerResult);
 		}
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.nightlabs.jfire.trade.transfer.TransferController#serverDoWork()
@@ -73,7 +73,7 @@ public abstract class AbstractPaymentController extends AbstractTransferControll
 	protected void _serverDoWork() {
 		if (isSkipServerStages())
 			return;
-		
+
 		List<PaymentResult> payDoWorkServerResults = null;
 		try {
 			List<PaymentResult> payDoWorkClientResults = getLastStageResults();
@@ -99,7 +99,7 @@ public abstract class AbstractPaymentController extends AbstractTransferControll
 				paymentData.getPayment().setPayDoWorkServerResult(payDoWorkServerResult);
 		}
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.nightlabs.jfire.trade.transfer.TransferController#serverEnd()
@@ -108,10 +108,10 @@ public abstract class AbstractPaymentController extends AbstractTransferControll
 	protected void _serverEnd() {
 		if (isSkipServerStages())
 			return;
-		
+
 		List<PaymentResult> payEndServerResults = null;
 		try {
-				payEndServerResults = getAccountingManager().payEnd(getTransferIDs(), getLastStageResults(), isForceRollback());
+			payEndServerResults = getAccountingManager().payEnd(getTransferIDs(), getLastStageResults(), isForceRollback());
 
 			if (payEndServerResults.size() != getTransferDatas().size())
 				throw new IllegalStateException("accountingManager.payEnd(List, List, boolean) returned an invalid count of results! payEndServerResults.size()=" + payEndServerResults.size() + "; paymentIDs.size()=" + getTransferIDs().size() + "; getTransferDatas().size()="+getTransferDatas().size());
@@ -130,7 +130,7 @@ public abstract class AbstractPaymentController extends AbstractTransferControll
 				paymentData.getPayment().setPayEndServerResult(payEndServerResult);
 		}
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.nightlabs.jfire.trade.transfer.TransferController#isRollbackRequired()
@@ -139,7 +139,7 @@ public abstract class AbstractPaymentController extends AbstractTransferControll
 	public boolean isRollbackRequired() {
 		if (isForceRollback())
 			return true;
-		
+
 		for (PaymentData paymentData : getTransferDatas()) {
 			Payment payment = paymentData.getPayment();
 			if (payment.isFailed() || payment.isForceRollback())
@@ -147,7 +147,7 @@ public abstract class AbstractPaymentController extends AbstractTransferControll
 		}
 		return false;
 	}
-	
+
 	@Override
 	public AccountingManager getAccountingManager() throws RemoteException, LoginException, CreateException, NamingException {
 		return AccountingManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();

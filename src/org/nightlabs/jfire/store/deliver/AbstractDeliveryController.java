@@ -8,11 +8,11 @@ import org.nightlabs.jfire.store.deliver.id.DeliveryID;
 import org.nightlabs.jfire.transfer.AbstractTransferController;
 
 public abstract class AbstractDeliveryController extends AbstractTransferController<DeliveryData, DeliveryID, DeliveryResult> implements DeliveryController {
-	
+
 	public AbstractDeliveryController(List<DeliveryData> transferDatas) {
 		super(transferDatas, getDeliveryIDs(transferDatas));
 	}
-	
+
 	private static List<DeliveryID> getDeliveryIDs(List<DeliveryData> transferDatas) {
 		List<DeliveryID> deliveryIDs = new LinkedList<DeliveryID>();
 		for (DeliveryData data : transferDatas) {
@@ -29,12 +29,12 @@ public abstract class AbstractDeliveryController extends AbstractTransferControl
 	protected void _serverBegin() {
 		if (isSkipServerStages())
 			return;
-		
+
 		List<DeliveryResult> deliverBeginServerResults = null;
 		try {
 			for (DeliveryData deliveryData : getTransferDatas())
 				deliveryData.prepareUpload();
-			
+
 			try {
 				deliverBeginServerResults = getStoreManager().deliverBegin(getTransferDatasForServer());
 			} finally {
@@ -59,12 +59,12 @@ public abstract class AbstractDeliveryController extends AbstractTransferControl
 				deliveryData.getDelivery().setDeliverBeginServerResult(deliverBeginServerResult);
 		}
 	}
-	
+
 	@Override
 	protected void _serverDoWork() {
 		if (isSkipServerStages())
 			return;
-		
+
 		List<DeliveryResult> serverDeliverDoWorkResults = null;
 		try {
 			List<DeliveryResult> clientDeliverDoWorkResults = getLastStageResults();
@@ -90,12 +90,12 @@ public abstract class AbstractDeliveryController extends AbstractTransferControl
 				deliveryData.getDelivery().setDeliverDoWorkServerResult(deliverDoWorkServerResult);
 		}
 	}
-	
+
 	@Override
 	protected void _serverEnd() {
 		if (isSkipServerStages())
 			return;
-		
+
 		List<DeliveryResult> deliverEndServerResults = null;
 		try {
 			deliverEndServerResults = getStoreManager().deliverEnd(getTransferIDs(), getLastStageResults(), isForceRollback());
@@ -116,5 +116,19 @@ public abstract class AbstractDeliveryController extends AbstractTransferControl
 			for (DeliveryData deliveryData : getTransferDatas())
 				deliveryData.getDelivery().setDeliverEndServerResult(deliverEndServerResult);
 		}
+	}
+
+	@Override
+	public boolean isRollbackRequired() {
+		if (isForceRollback())
+			return true;
+
+		for (DeliveryData deliveryData : getTransferDatas()) {
+			Delivery delivery = deliveryData.getDelivery();
+			if (delivery.isFailed() || delivery.isForceRollback())
+				return true;
+		}
+
+		return false;
 	}
 }

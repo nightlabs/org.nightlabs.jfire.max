@@ -199,8 +199,8 @@ implements Serializable, DeleteCallback, DetachCallback, StoreCallback
 	}
 
 	/**
-	 * Returns the Set of of {@link Article}s where the given {@link Product} is referenced
-	 * or <code>null</code>, if no {@link Article}s can be found matching the
+	 * Returns the Set of {@link Article}s where the given {@link Product} is referenced
+	 * or an empty Set, if no {@link Article}s can be found matching the
 	 * specified <code>Product</code>.
 	 *
 	 * @param pm The {@link PersistenceManager} used to access the datastore.
@@ -591,7 +591,7 @@ implements Serializable, DeleteCallback, DetachCallback, StoreCallback
 	/**
 	 * This is usually <tt>null</tt> or the exception message (no stacktrace) of the root exception.
 	 *
-	 * @jdo.field persistence-modifier="persistent"
+	 * @jdo.field persistence-modifier="persistent" default-fetch-group="false"
 	 * @jdo.column sql-type="CLOB"
 	 */
 	private String allocationExceptionMessage = null;
@@ -600,7 +600,7 @@ implements Serializable, DeleteCallback, DetachCallback, StoreCallback
 	 * This is usually <tt>null</tt> or the result of {@link StackTraceElement#toString()}
 	 * specifying where the root exception happened.
 	 *
-	 * @jdo.field persistence-modifier="persistent"
+	 * @jdo.field persistence-modifier="persistent" default-fetch-group="false"
 	 * @jdo.column sql-type="CLOB"
 	 */
 	private String allocationExceptionStackTrace = null;
@@ -621,7 +621,7 @@ implements Serializable, DeleteCallback, DetachCallback, StoreCallback
 	/**
 	 * This is usually <tt>null</tt> or the exception message (no stacktrace) of the root exception.
 	 *
-	 * @jdo.field persistence-modifier="persistent"
+	 * @jdo.field persistence-modifier="persistent" default-fetch-group="false"
 	 * @jdo.column sql-type="CLOB"
 	 */
 	private String releaseExceptionMessage = null;
@@ -630,7 +630,7 @@ implements Serializable, DeleteCallback, DetachCallback, StoreCallback
 	 * This is usually <tt>null</tt> or the result of {@link StackTraceElement#toString()}
 	 * specifying where the root exception happened.
 	 *
-	 * @jdo.field persistence-modifier="persistent"
+	 * @jdo.field persistence-modifier="persistent" default-fetch-group="false"
 	 * @jdo.column sql-type="CLOB"
 	 */
 	private String releaseExceptionStackTrace = null;

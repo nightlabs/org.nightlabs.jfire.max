@@ -47,6 +47,7 @@ import javax.jdo.Query;
 
 import org.nightlabs.io.DataBuffer;
 import org.nightlabs.jfire.store.ProductType;
+import org.nightlabs.jfire.store.deliver.id.DeliveryConfigurationID;
 import org.nightlabs.jfire.store.deliver.id.ModeOfDeliveryFlavourID;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.trade.id.CustomerGroupID;
@@ -60,7 +61,7 @@ import org.nightlabs.util.Util;
  * data for processing.
  *
  * @author Marco Schulze - marco at nightlabs dot de
- * 
+ *
  * @jdo.persistence-capable
  *		identity-type="application"
  *		objectid-class="org.nightlabs.jfire.store.deliver.id.ModeOfDeliveryFlavourID"
@@ -145,8 +146,9 @@ implements Serializable
 	public static final String FETCH_GROUP_MODE_OF_DELIVERY = "ModeOfDeliveryFlavour.modeOfDelivery";
 	public static final String FETCH_GROUP_ICON_16X16_DATA = "ModeOfDeliveryFlavour.icon16x16Data";
 	/**
-	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon! 
+	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon!
 	 */
+	@Deprecated
 	public static final String FETCH_GROUP_THIS_MODE_OF_DELIVERY_FLAVOUR = "ModeOfDeliveryFlavour.this";
 
 	public static class ModeOfDeliveryFlavourProductTypeGroupCarrier
@@ -168,13 +170,13 @@ implements Serializable
 		 * key: {@link org.nightlabs.jfire.store.deliver.id.ModeOfDeliveryFlavourID} modeOfDeliveryFlavourID<br/>
 		 * value: {@link ModeOfDeliveryFlavour} modeOfDeliveryFlavour
 		 */
-		private Map<ModeOfDeliveryFlavourID, ModeOfDeliveryFlavour> modeOfDeliveryFlavours = 
+		private Map<ModeOfDeliveryFlavourID, ModeOfDeliveryFlavour> modeOfDeliveryFlavours =
 			new HashMap<ModeOfDeliveryFlavourID, ModeOfDeliveryFlavour>();
 
 		/**
 		 * Contains instances of {@link ModeOfDeliveryFlavourProductTypeGroup}.
 		 */
-		private List<ModeOfDeliveryFlavourProductTypeGroup> modeOfDeliveryFlavourProductTypeGroups = 
+		private List<ModeOfDeliveryFlavourProductTypeGroup> modeOfDeliveryFlavourProductTypeGroups =
 			new ArrayList<ModeOfDeliveryFlavourProductTypeGroup>();
 
 		public void addModeOfDeliveryFlavour(ModeOfDeliveryFlavour modeOfDeliveryFlavour)
@@ -202,7 +204,7 @@ implements Serializable
 		}
 		public ModeOfDeliveryFlavour getModeOfDeliveryFlavour(ModeOfDeliveryFlavourID modeOfDeliveryFlavourID)
 		{
-			return (ModeOfDeliveryFlavour) modeOfDeliveryFlavours.get(modeOfDeliveryFlavourID);
+			return modeOfDeliveryFlavours.get(modeOfDeliveryFlavourID);
 		}
 
 		public void addModeOfDeliveryFlavourProductTypeGroup(ModeOfDeliveryFlavourProductTypeGroup modeOfDeliveryFlavourProductTypeGroup)
@@ -248,15 +250,11 @@ implements Serializable
 		}
 	}
 
-	// TODO we have to melt the Server&ClientDeliveryProcessors into this (in conjunction
-	// with the ModeOfDeliveryFlavours), as the DeliveryConfiguration can include/exclude
-	// processors
-	// TODO NO! Group by DeliveryConfiguration as it makes things much easier (and faster)
-	// and will in most of the cases lead to the same result!
 	public static class ModeOfDeliveryFlavourProductTypeGroup
 	implements Serializable
 	{
 		private static final long serialVersionUID = 1L;
+		private DeliveryConfigurationID deliveryConfigurationID;
 		private Set<ProductTypeID> productTypeIDs = new HashSet<ProductTypeID>();
 		private Set<ModeOfDeliveryFlavourID> modeOfDeliveryFlavourIDs = new HashSet<ModeOfDeliveryFlavourID>();
 
@@ -293,6 +291,13 @@ implements Serializable
 		{
 			return Collections.unmodifiableSet(modeOfDeliveryFlavourIDs);
 		}
+		public DeliveryConfigurationID getDeliveryConfigurationID() {
+			return deliveryConfigurationID;
+		}
+		public void setDeliveryConfigurationID(
+				DeliveryConfigurationID deliveryConfigurationID) {
+			this.deliveryConfigurationID = deliveryConfigurationID;
+		}
 	}
 
 	/**
@@ -318,18 +323,23 @@ implements Serializable
 			ProductTypeID productTypeID = itPT.next();
 			ProductType productType = (ProductType) pm.getObjectById(productTypeID);
 
-			DeliveryConfiguration cf = productType.getDeliveryConfiguration();
-			if (cf == null)
+			DeliveryConfiguration deliveryConfiguration = productType.getDeliveryConfiguration();
+			if (deliveryConfiguration == null)
 				throw new IllegalStateException("ProductType \""+productType.getPrimaryKey()+"\" has no DeliveryConfiguration assigned!");
 
-			String cfPK = cf.getPrimaryKey();
-			ModeOfDeliveryFlavourProductTypeGroup group = (ModeOfDeliveryFlavourProductTypeGroup) groupsByDeliveryConfigPK.get(cfPK);
+			DeliveryConfigurationID deliveryConfigurationID = (DeliveryConfigurationID) JDOHelper.getObjectId(deliveryConfiguration);
+			if (deliveryConfigurationID == null)
+				throw new IllegalStateException("JDOHelper.getObjectId(deliveryConfiguration) returned null!");
+
+			String cfPK = deliveryConfiguration.getPrimaryKey();
+			ModeOfDeliveryFlavourProductTypeGroup group = groupsByDeliveryConfigPK.get(cfPK);
 			if (group == null) {
-				deliveryConfigs.put(cfPK, cf);
+				deliveryConfigs.put(cfPK, deliveryConfiguration);
 				group = new ModeOfDeliveryFlavourProductTypeGroup();
+				group.setDeliveryConfigurationID(deliveryConfigurationID);
 				groupsByDeliveryConfigPK.put(cfPK, group);
 
-				for (Iterator<ModeOfDelivery> itMOD = cf.getModeOfDeliveries().iterator(); itMOD.hasNext(); ) {
+				for (Iterator<ModeOfDelivery> itMOD = deliveryConfiguration.getModeOfDeliveries().iterator(); itMOD.hasNext(); ) {
 					ModeOfDelivery mod = itMOD.next();
 
 					for (Iterator<ModeOfDeliveryFlavour> itMODF = mod.getFlavours().iterator(); itMODF.hasNext(); ) {
@@ -344,7 +354,7 @@ implements Serializable
 					}
 				}
 
-				for (Iterator<ModeOfDeliveryFlavour> itMODF = cf.getModeOfDeliveryFlavours().iterator(); itMODF.hasNext(); ) {
+				for (Iterator<ModeOfDeliveryFlavour> itMODF = deliveryConfiguration.getModeOfDeliveryFlavours().iterator(); itMODF.hasNext(); ) {
 					ModeOfDeliveryFlavour modf = itMODF.next();
 					ModeOfDeliveryFlavourID modfID = (ModeOfDeliveryFlavourID) JDOHelper.getObjectId(modf);
 
@@ -363,7 +373,7 @@ implements Serializable
 
 		for (Iterator<String> it = modeOfDeliveryFlavourPKs.iterator(); it.hasNext(); ) {
 			String modfPK = it.next();
-			ModeOfDeliveryFlavour modf = (ModeOfDeliveryFlavour) modfAvailableForCustomerGroups.get(modfPK);
+			ModeOfDeliveryFlavour modf = modfAvailableForCustomerGroups.get(modfPK);
 			if (modf == null)
 				throw new IllegalStateException("Found modeOfDeliveryPK \""+modfPK+"\" which is not registered in Map!");
 
@@ -391,7 +401,7 @@ implements Serializable
 
 		return res;
 	}
-	
+
 	public static final byte MERGE_MODE_ADDITIVE = 1;
 	public static final byte MERGE_MODE_SUBTRACTIVE = 2;
 
@@ -522,7 +532,7 @@ implements Serializable
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private ModeOfDelivery modeOfDelivery;
-	
+
 	/**
 	 * @jdo.field persistence-modifier="persistent" dependent="true" mapped-by="modeOfDeliveryFlavour"
 	 */

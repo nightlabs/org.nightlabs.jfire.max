@@ -154,7 +154,7 @@ implements Serializable, DetachCallback
 
 		// TODO We must - either here or somewhere else - ensure that all the nested products are transferred, too (and have the same repository as the package product afterwards).
 		super.bookTransfer(user, involvedAnchors);
-		
+
 		// hmmm... I'm not sure, maybe it's better to leave them were they are (i.e. only track till they are used in a "factory" to "produce" another product).
 		// Before changing sth. here, we should think about it again. Marco.
 	}
@@ -187,7 +187,7 @@ implements Serializable, DetachCallback
 			// I hope, https://www.jfire.org/modules/bugs/view.php?id=233 is fixed soon.
 			for (Product product : products) {
 				ProductType productType = product.getProductType();
-				Integer count = (Integer) m.get(productType);
+				Integer count = m.get(productType);
 
 				if (count == null)
 					count = new Integer(1);
@@ -211,11 +211,13 @@ implements Serializable, DetachCallback
 		return productType2productCountMap;
 	}
 
+	@Override
 	public void jdoPreDetach()
 	{
 		// nothing to do
 	}
 
+	@Override
 	@SuppressWarnings("unchecked")
 	public void jdoPostDetach(Object o)
 	{
@@ -228,10 +230,18 @@ implements Serializable, DetachCallback
 		if (attached.productCount != null || fetchGroups.contains(FETCH_GROUP_PRODUCT_COUNT) || fetchGroups.contains(FetchPlan.ALL))
 			detached.productCount = attached.getProductCount();
 
-		if (attached.productType2productCountMap != null || fetchGroups.contains(FETCH_GROUP_PRODUCT_TYPE_ID_2_PRODUCT_COUNT_MAP) || fetchGroups.contains(FetchPlan.ALL))
-			detached.productType2productCountMap = attached.getProductType2productCountMap();
+		if (attached.productType2productCountMap != null || fetchGroups.contains(FETCH_GROUP_PRODUCT_TYPE_ID_2_PRODUCT_COUNT_MAP) || fetchGroups.contains(FetchPlan.ALL)) {
+			Map<ProductType, Integer> m = attached.getProductType2productCountMap();
+			detached.productType2productCountMap = new HashMap<ProductType, Integer>(m.size());
+			for (Map.Entry<ProductType, Integer> me : m.entrySet()) {
+				detached.productType2productCountMap.put(
+						pm.detachCopy(me.getKey()),
+						me.getValue()
+				);
+			}
+		}
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 * <p>

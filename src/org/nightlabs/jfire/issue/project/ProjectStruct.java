@@ -28,7 +28,7 @@ public class ProjectStruct {
 			projectStruct = pm.makePersistent(projectStruct);
 			projectStructLocal = new StructLocal(projectStruct, organisationID, StructLocal.DEFAULT_SCOPE);
 			projectStructLocal.getName().setText(Locale.ENGLISH.getLanguage(), "Default Structure for Projects");
-			projectStructLocal.getName().setText(Locale.GERMAN.getLanguage(), "Standardstruktur für einfache Projekte");
+			projectStructLocal.getName().setText(Locale.GERMAN.getLanguage(), "Standardstruktur für Projekte");
 			projectStructLocal = pm.makePersistent(projectStructLocal);
 		}
 		return projectStruct;

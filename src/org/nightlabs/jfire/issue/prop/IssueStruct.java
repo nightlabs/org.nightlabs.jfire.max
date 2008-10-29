@@ -29,11 +29,11 @@ public class IssueStruct {
 			issueStruct = new Struct(organisationID, Issue.class.getName(), Struct.DEFAULT_SCOPE);
 //			createDefaultStructure(issueStruct);
 			issueStruct.getName().setText(Locale.ENGLISH.getLanguage(), "Issues");
-			issueStruct.getName().setText(Locale.GERMAN.getLanguage(), "Abkömmlinge");
+			issueStruct.getName().setText(Locale.GERMAN.getLanguage(), "Issues");
 			issueStruct = pm.makePersistent(issueStruct);
 			issueStructLocal = new StructLocal(issueStruct, organisationID, StructLocal.DEFAULT_SCOPE);
 			issueStructLocal.getName().setText(Locale.ENGLISH.getLanguage(), "Default Issue Structure");
-			issueStructLocal.getName().setText(Locale.GERMAN.getLanguage(), "Standardstruktur für einfache Abkömmlinge");
+			issueStructLocal.getName().setText(Locale.GERMAN.getLanguage(), "Standardstruktur für Issues");
 			issueStructLocal = pm.makePersistent(issueStructLocal);
 		}
 		return issueStruct;

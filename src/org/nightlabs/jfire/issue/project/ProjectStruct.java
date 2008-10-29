@@ -24,11 +24,11 @@ public class ProjectStruct {
 		} catch (JDOObjectNotFoundException e) {
 			projectStruct = new Struct(organisationID, Project.class.getName(), Struct.DEFAULT_SCOPE);
 			projectStruct.getName().setText(Locale.ENGLISH.getLanguage(), "Projects");
-			projectStruct.getName().setText(Locale.GERMAN.getLanguage(), "Abkömmlinge");
+			projectStruct.getName().setText(Locale.GERMAN.getLanguage(), "Projekte");
 			projectStruct = pm.makePersistent(projectStruct);
 			projectStructLocal = new StructLocal(projectStruct, organisationID, StructLocal.DEFAULT_SCOPE);
-			projectStructLocal.getName().setText(Locale.ENGLISH.getLanguage(), "Default Project Structure");
-			projectStructLocal.getName().setText(Locale.GERMAN.getLanguage(), "Standardstruktur für einfache Abkömmlinge");
+			projectStructLocal.getName().setText(Locale.ENGLISH.getLanguage(), "Default Structure for Projects");
+			projectStructLocal.getName().setText(Locale.GERMAN.getLanguage(), "Standardstruktur für einfache Projekte");
 			projectStructLocal = pm.makePersistent(projectStructLocal);
 		}
 		return projectStruct;

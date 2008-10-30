@@ -161,6 +161,6 @@ public class ManualMoneyTransferReason extends I18nText
 	@Implement
 	protected String getFallBackValue(String languageID)
 	{
-		return Transfer.getPrimaryKey(organisationID, transferTypeID, transferID);
+		return "";
 	}
 }

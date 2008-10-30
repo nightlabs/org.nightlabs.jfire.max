@@ -327,7 +327,7 @@ implements StoreCallback
 			// TODO this should be implemented later - at the moment we don't support this yet.
 			throw new InvoiceEditException(
 				InvoiceEditException.REASON_FOREIGN_ORGANISATION,
-				"Attempt to create a Invoice not with the local organisation as vendor. Vendor is "+vendorLE
+				"Attempt to create a Invoice not with the local organisation as customer and another organisation as vendor, this is not supported. Vendor is "+vendorLE
 			);
 		}
 		else if (customerLE.equals(getMandator()))

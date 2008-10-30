@@ -27,6 +27,7 @@ import org.nightlabs.jfire.trade.Segment;
  *
  *
  * @jdo.fetch-group name="DynamicProductTypeRecurringArticle.name" fields="name"
+ * @jdo.fetch-group name="DynamicProductTypeRecurringArticle.singlePrice" fields="singlePrice"
  * @jdo.fetch-group name="FetchGroupsTrade.articleInOrderEditor" fields="quantity, unit, name, singlePrice"
  * @jdo.fetch-group name="FetchGroupsTrade.articleInOfferEditor" fields="quantity, unit, name, singlePrice"
  */
@@ -34,6 +35,7 @@ public class DynamicProductTypeRecurringArticle extends Article implements Dynam
 
 
 	public static final String FETCH_GROUP_DYNAMIC_PRODUCT_TYPE_RECURRING_ARTICLE_NAME = "DynamicProductTypeRecurringArticle.name";
+	public static final String FETCH_GROUP_DYNAMIC_PRODUCT_TYPE_RECURRING_ARTICLE_SINGLEPRICE = "DynamicProductTypeRecurringArticle.singlePrice";
 
 	private static final long serialVersionUID = 1L;
 

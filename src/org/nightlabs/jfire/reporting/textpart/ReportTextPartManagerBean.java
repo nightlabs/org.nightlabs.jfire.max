@@ -107,14 +107,15 @@ implements SessionBean
 			ReportRegistryItem reportRegistryItem = (ReportRegistryItem) pm.getObjectById(reportRegistryItemID);
 			ReportTextPartConfiguration configuration = ReportTextPartConfiguration.getReportTextPartConfiguration(
 					pm, reportRegistryItem, synthesize, fetchGroups, maxFetchDepth);
-			if (JDOHelper.getPersistenceManager(configuration) != null) {
-				// TODO: How to check better if the config is attached? JDOHelper.isPersistent() ?!?
+			if (configuration == null) {
+				return null;
+			} else if (JDOHelper.getPersistenceManager(configuration) != null) {
 				pm.getFetchPlan().setGroups(fetchGroups);
 				pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 				return pm.detachCopy(configuration);
-			} else if (configuration.isSynthetic())
+			} else if (configuration.isSynthetic()) {
 				return configuration;
-			else
+			} else
 				throw new IllegalStateException("ReportTextPartConfiguration.getReportTextPartConfiguration() returned not-attached and not-synthesized ReportTextPartConfiguration");
 		} finally {
 			pm.close();

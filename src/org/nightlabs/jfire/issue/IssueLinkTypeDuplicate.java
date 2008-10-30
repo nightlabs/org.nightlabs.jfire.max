@@ -6,7 +6,7 @@ import org.nightlabs.jfire.issue.id.IssueLinkTypeID;
 import org.nightlabs.jfire.organisation.Organisation;
 
 /**
- * @author Chairat Kongarayawetchakun - chairat at nightlabs dot de
+ * @author Chairat Kongarayawetchakun - chairat [AT] nightlabs [DOT] de
  *
  * @jdo.persistence-capable
  *		identity-type="application"

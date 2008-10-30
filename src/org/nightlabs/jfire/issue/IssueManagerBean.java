@@ -59,10 +59,12 @@ import org.nightlabs.jfire.jbpm.JbpmLookup;
 import org.nightlabs.jfire.jbpm.graph.def.State;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.security.User;
+import org.nightlabs.jfire.trade.Order;
+import org.nightlabs.jfire.trade.SegmentType;
 import org.nightlabs.util.Util;
 
 /**
- * @author Chairat Kongarayawetchakun - chairat[AT]nightlabs[DOT]de
+ * @author Chairat Kongarayawetchakun - chairat [AT] nightlabs [DOT] de
  * 
  * @ejb.bean name="jfire/ejb/JFireIssueTracking/IssueManager"	
  *           jndi-name="jfire/ejb/JFireIssueTracking/IssueManager"
@@ -520,7 +522,7 @@ implements SessionBean
 	//Issue//
 	/**
 	 * Stores the given Issue. If the issue is a new issue, do the initializing process instance.
-	 * If not new, do the issue history creation process & check the assignee for do the 
+	 * If not new, do the issue history creation process & check the assignee for doing the 
 	 * state assignment.
 	 * 
 	 * @param issue The issue to be stored
@@ -536,6 +538,7 @@ implements SessionBean
 		PersistenceManager pm = getPersistenceManager();
 		Issue pIssue = null;
 		try {
+			//check if the issue is new.
 			boolean isNewIssue = !JDOHelper.isDetached(issue);
 
 			if (isNewIssue) {
@@ -633,6 +636,9 @@ implements SessionBean
 	}
 
 	/**
+	 * Delete an <code>Issue</code> by the given <code>IssueID</code>.
+	 * And also delete its <code>State</code> and <code>IssueLocal</code>.
+	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Required"
@@ -665,7 +671,7 @@ implements SessionBean
 	}
 
 	/**
-	 * Signal the issue to change its state.
+	 * Signal the issue to change its <code>State</code>.
 	 * 
 	 * @param issueID The issueID to be changed
 	 * @param jbpmTransitionName a node name that defined in JbpmConstants

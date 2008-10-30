@@ -17,7 +17,7 @@ import org.nightlabs.util.CollectionUtil;
 import org.nightlabs.util.Util;
 
 /**
- * @author Chairat Kongarayawetchakun <!-- chairat at nightlabs dot de -->
+ * @author Chairat Kongarayawetchakun - chairat [AT] nightlabs [DOT] de
  *
  * @jdo.persistence-capable
  *		identity-type="application"

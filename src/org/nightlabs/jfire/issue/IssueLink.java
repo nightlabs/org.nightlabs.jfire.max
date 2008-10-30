@@ -25,7 +25,7 @@ import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.util.Util;
 
 /**
- * @author Chairat Kongarayawetchakun - chairat at nightlabs dot de
+ * @author Chairat Kongarayawetchakun - chairat [AT] nightlabs [DOT] de
  *
  * @jdo.persistence-capable
  *		identity-type="application"
@@ -257,6 +257,8 @@ implements Serializable, DetachCallback, StoreCallback, DeleteCallback
 	};
 
 	/**
+	 * This method queries all <code>IssueLink</code>s which belong to an <code>Issue</code> and a specific object id.
+	 *
 	 * @param pm The <code>PersistenceManager</code> that should be used to access the datastore.
 	 * @param linkedObjectID
 	 * @return Returns instances of <code>IssueLink</code>.

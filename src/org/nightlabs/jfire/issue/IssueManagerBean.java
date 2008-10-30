@@ -59,21 +59,22 @@ import org.nightlabs.jfire.jbpm.JbpmLookup;
 import org.nightlabs.jfire.jbpm.graph.def.State;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.security.User;
-import org.nightlabs.jfire.trade.Order;
-import org.nightlabs.jfire.trade.SegmentType;
+// @Chairat: JFireIssueTracking MUST NOT be dependent on JFireTrade!!! Why did you add these imports, that aren't even necessary? They break the nightly build. Marco.
+//import org.nightlabs.jfire.trade.Order;
+//import org.nightlabs.jfire.trade.SegmentType;
 import org.nightlabs.util.Util;
 
 /**
  * @author Chairat Kongarayawetchakun - chairat [AT] nightlabs [DOT] de
- * 
- * @ejb.bean name="jfire/ejb/JFireIssueTracking/IssueManager"	
+ *
+ * @ejb.bean name="jfire/ejb/JFireIssueTracking/IssueManager"
  *           jndi-name="jfire/ejb/JFireIssueTracking/IssueManager"
- *           type="Stateless" 
+ *           type="Stateless"
  *
  * @ejb.util generate="physical"
  * @ejb.transaction type="Required"
  */
-public class IssueManagerBean 
+public class IssueManagerBean
 extends BaseSessionBeanImpl
 implements SessionBean
 {
@@ -92,7 +93,7 @@ implements SessionBean
 	}
 
 	/**
-	 * @ejb.create-method  
+	 * @ejb.create-method
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public void ejbCreate()
@@ -103,7 +104,7 @@ implements SessionBean
 
 	/**
 	 * @see javax.ejb.SessionBean#ejbRemove()
-	 * 
+	 *
 	 * @ejb.permission unchecked="true"
 	 */
 	public void ejbRemove() throws EJBException, RemoteException
@@ -182,7 +183,7 @@ implements SessionBean
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Required"
-	 */	
+	 */
 	public ProjectType storeProjectType(ProjectType projectType, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -198,7 +199,7 @@ implements SessionBean
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Required"
-	 */	
+	 */
 	public void deleteProjectType(ProjectTypeID projectTypeID)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -229,7 +230,7 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * @ejb.interface-method
 	 * @!ejb.transaction type="Supports"
@@ -247,13 +248,13 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	//Project//
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Required"
-	 */	
+	 */
 	public Project storeProject(Project project, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -273,7 +274,7 @@ implements SessionBean
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Required"
-	 */	
+	 */
 	public void deleteProject(ProjectID projectID)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -381,13 +382,13 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	//ProjectPhase//
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Required"
-	 */	
+	 */
 	public ProjectPhase storeProjectPhase(ProjectPhase projectPhase, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -417,7 +418,7 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * @ejb.interface-method
 	 * @!ejb.transaction type="Supports"
@@ -433,7 +434,7 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	//IssueComment//
 	/**
 	 * @ejb.interface-method
@@ -454,7 +455,7 @@ implements SessionBean
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Required"
-	 */	
+	 */
 	public IssueComment storeIssueComment(IssueComment issueComment, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -465,7 +466,7 @@ implements SessionBean
 			pm.close();
 		}//finally
 	}
-	
+
 	//IssueLinkType//
 	/**
 	 * @ejb.interface-method
@@ -513,7 +514,7 @@ implements SessionBean
 		try {
 			Query q = pm.newQuery(IssueLinkType.class);
 			q.setResult("JDOHelper.getObjectId(this)");
-			return new HashSet<IssueLinkTypeID>((Collection)q.execute()); 
+			return new HashSet<IssueLinkTypeID>((Collection)q.execute());
 		} finally {
 			pm.close();
 		}
@@ -522,13 +523,13 @@ implements SessionBean
 	//Issue//
 	/**
 	 * Stores the given Issue. If the issue is a new issue, do the initializing process instance.
-	 * If not new, do the issue history creation process & check the assignee for doing the 
+	 * If not new, do the issue history creation process & check the assignee for doing the
 	 * state assignment.
-	 * 
+	 *
 	 * @param issue The issue to be stored
 	 * @param get If true the created I will be returned else null
 	 * @param fetchGroups The fetchGroups the returned Issue should be detached with
-	 * 
+	 *
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
@@ -549,7 +550,7 @@ implements SessionBean
 
 				IssueType type;
 
-				if (JFireBaseEAR.JPOX_WORKAROUND_FLUSH_ENABLED) {				
+				if (JFireBaseEAR.JPOX_WORKAROUND_FLUSH_ENABLED) {
 					pm.flush();
 					// create the ProcessInstance for new Issues
 					// TODO: WORKAROUND: Calling createProcessInstanceForIssue on pIssue.getIssueType() says that this IssueType is not persistent ?!?
@@ -642,7 +643,7 @@ implements SessionBean
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Required"
-	 */	
+	 */
 	public void deleteIssue(IssueID issueID)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -653,7 +654,7 @@ implements SessionBean
 
 			pm.getExtent(State.class, true);
 			for (State state : issue.getStates()) {
-				pm.deletePersistent(state);		
+				pm.deletePersistent(state);
 			}
 			pm.flush();
 
@@ -672,12 +673,12 @@ implements SessionBean
 
 	/**
 	 * Signal the issue to change its <code>State</code>.
-	 * 
+	 *
 	 * @param issueID The issueID to be changed
 	 * @param jbpmTransitionName a node name that defined in JbpmConstants
 	 * @param get If true the created I will be returned else null
-	 * @param fetchGroups The fetchGroups the returned Issue should be detached with 
-	 * 
+	 * @param fetchGroups The fetchGroups the returned Issue should be detached with
+	 *
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
@@ -717,7 +718,7 @@ implements SessionBean
 
 		return null;
 	}
-	
+
 	/**
 	 * @param queries the QueryCollection containing all queries that shall be chained
 	 *		in order to retrieve the result. The result of one query is passed to the
@@ -777,7 +778,7 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * @ejb.interface-method
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
@@ -794,7 +795,7 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	public Set<Issue> getIssueByProjectID(ProjectID projectID) {
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -805,9 +806,9 @@ implements SessionBean
 			return NLJDOHelper.getObjectIDSet((Collection<Issue>) q.executeWithMap(params));
 		} finally {
 			pm.close();
-		}	
+		}
 	}
-	
+
 	public Set<Issue> getIssueByProjectTypeID(ProjectTypeID projectTypeID) {
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -818,15 +819,15 @@ implements SessionBean
 			return NLJDOHelper.getObjectIDSet((Collection<Issue>) q.executeWithMap(params));
 		} finally {
 			pm.close();
-		}	
+		}
 	}
-	
+
 	//IssueHistory//
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Required"
-	 */	
+	 */
 	public IssueHistory storeIssueHistory(IssueHistory issueHistory, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -869,13 +870,13 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	//IssueType//
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Required"
-	 */	
+	 */
 	public IssueType storeIssueType(IssueType issueType, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -919,14 +920,14 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	//IssuePriority//
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Required"
-	 */	
-	public IssuePriority storeIssuePriority(IssuePriority issuePriority, boolean get, String[] fetchGroups, int maxFetchDepth) 
+	 */
+	public IssuePriority storeIssuePriority(IssuePriority issuePriority, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -949,7 +950,7 @@ implements SessionBean
 		try {
 			Query q = pm.newQuery(IssuePriority.class);
 			q.setResult("JDOHelper.getObjectId(this)");
-			return new HashSet<IssuePriorityID>((Collection)q.execute()); 
+			return new HashSet<IssuePriorityID>((Collection)q.execute());
 		} finally {
 			pm.close();
 		}
@@ -970,13 +971,13 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	//IssueSeverityType//
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Required"
-	 */	
+	 */
 	public IssueSeverityType storeIssueSeverityType(IssueSeverityType issueSeverityType, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -1020,14 +1021,14 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	//IssueResolution//
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Required"
-	 */	
-	public IssueResolution storeIssueResolution(IssueResolution issueResolution, boolean get, String[] fetchGroups, int maxFetchDepth) 
+	 */
+	public IssueResolution storeIssueResolution(IssueResolution issueResolution, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -1076,7 +1077,7 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	//Bean//
 	/**
 	 * @throws IOException While loading an icon from a local resource, this might happen and we don't care in the initialise method.
@@ -1089,8 +1090,8 @@ implements SessionBean
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			// WORKAROUND JPOX Bug to avoid problems with creating workflows as State.statable is defined as interface and has subclassed implementations 
-			pm.getExtent(Issue.class); 
+			// WORKAROUND JPOX Bug to avoid problems with creating workflows as State.statable is defined as interface and has subclassed implementations
+			pm.getExtent(Issue.class);
 
 			String organisationID = getOrganisationID();
 
@@ -1225,11 +1226,11 @@ implements SessionBean
 
 			// Create the process definitions.
 			issueType.readProcessDefinition(IssueType.class.getResource("jbpm/status/"));
-			
+
 			issueType = new IssueType(getOrganisationID(), "Customer");
 			issueType.getName().setText(Locale.ENGLISH.getLanguage(), "Customer");
 			issueType = pm.makePersistent(issueType);
-			
+
 			// Create the process definitions.
 			issueType.readProcessDefinition(IssueType.class.getResource("jbpm/status/"));
 
@@ -1257,12 +1258,12 @@ implements SessionBean
 			issueLinkType = pm.makePersistent(issueLinkType);
 
 			// Create the project type
-			pm.getExtent(ProjectType.class); 
-			
+			pm.getExtent(ProjectType.class);
+
 			ProjectType projectType1 = new ProjectType(ProjectType.PROJECT_TYPE_ID_DEFAULT);
 			projectType1.getName().setText(Locale.ENGLISH.getLanguage(), "Default");
 			projectType1 = pm.makePersistent(projectType1);
-			
+
 			ProjectType projectType2 = new ProjectType(IDGenerator.getOrganisationID(), "cross ticket");
 			projectType2.getName().setText(Locale.ENGLISH.getLanguage(), "Cross Ticket");
 			projectType2 = pm.makePersistent(projectType2);
@@ -1270,17 +1271,17 @@ implements SessionBean
 			ProjectType projectType3 = new ProjectType(IDGenerator.getOrganisationID(), "jfire");
 			projectType3.getName().setText(Locale.ENGLISH.getLanguage(), "JFire");
 			projectType3 = pm.makePersistent(projectType3);
-			
+
 			// Create the projects
-			pm.getExtent(Project.class); 
-			
+			pm.getExtent(Project.class);
+
 			Project project;
 
 			project = new Project(Project.PROJECT_ID_DEFAULT);
 			project.getName().setText(Locale.ENGLISH.getLanguage(), "Default");
 			project.setProjectType(projectType1);
 			project = pm.makePersistent(project);
-			
+
 			project = new Project(IDGenerator.getOrganisationID(), IDGenerator.nextID(Project.class));
 			project.getName().setText(Locale.ENGLISH.getLanguage(), "Project 1");
 			project.setProjectType(projectType1);
@@ -1307,7 +1308,7 @@ implements SessionBean
 			subProject = new Project(IDGenerator.getOrganisationID(), IDGenerator.nextID(Project.class));
 			subProject.getName().setText(Locale.ENGLISH.getLanguage(), "Sub project 2");
 			project.addSubProject(subProject);
-			
+
 			subsubProject = new Project(IDGenerator.getOrganisationID(), IDGenerator.nextID(Project.class));
 			subsubProject.getName().setText(Locale.ENGLISH.getLanguage(), "Sub Sub project 2.1");
 			subProject.addSubProject(subsubProject);
@@ -1350,24 +1351,24 @@ implements SessionBean
 			project = pm.makePersistent(project);
 
 			// Create the project phases
-			pm.getExtent(ProjectPhase.class); 
-			
+			pm.getExtent(ProjectPhase.class);
+
 			ProjectPhase projectPhase = new ProjectPhase(IDGenerator.getOrganisationID(), "phase1");
 			projectPhase.getName().setText(Locale.ENGLISH.getLanguage(), "Phase 1");
 			projectPhase = pm.makePersistent(projectPhase);
-			
+
 			projectPhase = new ProjectPhase(IDGenerator.getOrganisationID(), "phase2");
 			projectPhase.getName().setText(Locale.ENGLISH.getLanguage(), "Phase 2");
 			projectPhase = pm.makePersistent(projectPhase);
-			
+
 			projectPhase = new ProjectPhase(IDGenerator.getOrganisationID(), "phase3");
 			projectPhase.getName().setText(Locale.ENGLISH.getLanguage(), "Phase 3");
 			projectPhase = pm.makePersistent(projectPhase);
-			
+
 			projectPhase = new ProjectPhase(IDGenerator.getOrganisationID(), "phase4");
 			projectPhase.getName().setText(Locale.ENGLISH.getLanguage(), "Phase 4");
 			projectPhase = pm.makePersistent(projectPhase);
-			
+
 			EditLockType issueEditLock = new EditLockType(EditLockTypeIssue.EDIT_LOCK_TYPE_ID);
 			issueEditLock = pm.makePersistent(issueEditLock);
 			//------------------------------------------------

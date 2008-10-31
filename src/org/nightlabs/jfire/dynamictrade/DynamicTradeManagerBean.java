@@ -592,18 +592,27 @@ implements SessionBean
 					org.nightlabs.jfire.trade.RoleConstants.sellProductType
 			);
 
-			DynamicProduct product = (DynamicProduct) article.getProduct();
+			
 
+			DynamicProduct product = (DynamicProduct) article.getProduct();
+			DynamicProductInfo ProductInfo; 
+			
+			// check if the Product is null and that happens in the case of Recurring Articl e
+			if (product != null)
+				ProductInfo = product;
+			else
+				ProductInfo = (DynamicProductInfo) article;
+					
 			boolean recalculatePrice = false;
 
 			if (quantity != null) {
-				product.setQuantity(quantity.longValue());
+				ProductInfo.setQuantity(quantity.longValue());
 				recalculatePrice = true;
 			}
 
 			if (unitID != null) {
 				Unit unit = (Unit) pm.getObjectById(unitID);
-				product.setUnit(unit);
+				ProductInfo.setUnit(unit);
 			}
 
 			if (tariffID != null) {
@@ -612,16 +621,16 @@ implements SessionBean
 			}
 
 			if (productName != null)
-				product.getName().copyFrom(productName);
+				ProductInfo.getName().copyFrom(productName);
 
 			if (singlePrice != null) {
-				product.getSinglePrice().setAmount(0);
-				product.getSinglePrice().clearFragments();
+				ProductInfo.getSinglePrice().setAmount(0);
+				ProductInfo.getSinglePrice().clearFragments();
 
 				if (JFireBaseEAR.JPOX_WORKAROUND_FLUSH_ENABLED)
 					pm.flush();
 
-				product.getSinglePrice().sumPrice(singlePrice);
+				ProductInfo.getSinglePrice().sumPrice(singlePrice);
 				recalculatePrice = true;
 
 				if (JFireBaseEAR.JPOX_WORKAROUND_FLUSH_ENABLED)

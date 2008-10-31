@@ -9,7 +9,7 @@ import org.nightlabs.util.Util;
 
 /**
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
- * @author Chairat Kongarayawetchakun - chairat at nightlabs dot de
+ * @author Chairat Kongarayawetchakun - chairat [AT] nightlabs [DOT] de
  * @author Marco Schulze - marco at nightlabs dot de
  *
  * @jdo.persistence-capable

@@ -7,7 +7,7 @@ import org.nightlabs.i18n.I18nText;
 import org.nightlabs.jdo.ObjectIDUtil;
 
 /**
- * @author Chairat Kongarayawetchakun - chairat at nightlabs dot de
+ * @author Chairat Kongarayawetchakun - chairat [AT] nightlabs [DOT] de
  *
  * @jdo.persistence-capable
  *		identity-type="application"

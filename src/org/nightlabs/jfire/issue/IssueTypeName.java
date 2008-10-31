@@ -9,7 +9,7 @@ import java.util.Map;
 import org.nightlabs.i18n.I18nText;
 
 /**
- * @author Chairat Kongarayawetchakun - chairat at nightlabs dot de
+ * @author Chairat Kongarayawetchakun - chairat [AT] nightlabs [DOT] de
  *
  * @jdo.persistence-capable
  *		identity-type="application"

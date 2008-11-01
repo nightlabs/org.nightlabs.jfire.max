@@ -1220,42 +1220,47 @@ implements SessionBean
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			pm.getExtent(Article.class);
-			Collection<Article> nonAllocatedArticles = new HashSet<Article>(articleIDs.size());
-			Set<Offer> offers = validate ? new HashSet<Offer>() : null;
-			Set<Article> allocatedArticles = new HashSet<Article>(articleIDs.size());
-			for (ArticleID articleID : articleIDs) {
-				Article article = (Article) pm.getObjectById(articleID);
-				if (validate)
-					offers.add(article.getOffer());
+			NLJDOHelper.enableTransactionSerializeReadObjects(pm);
+			try {
+				pm.getExtent(Article.class);
+				Collection<Article> nonAllocatedArticles = new HashSet<Article>(articleIDs.size());
+				Set<Offer> offers = validate ? new HashSet<Offer>() : null;
+				Set<Article> allocatedArticles = new HashSet<Article>(articleIDs.size());
+				for (ArticleID articleID : articleIDs) {
+					Article article = (Article) pm.getObjectById(articleID);
+					if (validate)
+						offers.add(article.getOffer());
 
-				if (article.isAllocated())
-					allocatedArticles.add(article);
-				else
-					nonAllocatedArticles.add(article);
+					if (article.isAllocated())
+						allocatedArticles.add(article);
+					else
+						nonAllocatedArticles.add(article);
+				}
+
+				Trader trader = Trader.getTrader(pm);
+
+				if (!allocatedArticles.isEmpty())
+					trader.releaseArticles(User.getUser(pm, getPrincipal()), allocatedArticles, false, true, true);
+
+				if (!nonAllocatedArticles.isEmpty())
+					trader.deleteArticles(User.getUser(pm, getPrincipal()), nonAllocatedArticles);
+
+				if (validate) {
+					for (Offer offer : offers)
+						trader.validateOffer(offer);
+				}
+
+				if (!get)
+					return null;
+
+				pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+				if (fetchGroups != null)
+					pm.getFetchPlan().setGroups(fetchGroups);
+
+				return pm.detachCopyAll(allocatedArticles);
+			} finally {
+				NLJDOHelper.disableTransactionSerializeReadObjects(pm);
 			}
-
-			Trader trader = Trader.getTrader(pm);
-
-			if (!allocatedArticles.isEmpty())
-				trader.releaseArticles(User.getUser(pm, getPrincipal()), allocatedArticles, false, true, true);
-
-			if (!nonAllocatedArticles.isEmpty())
-				trader.deleteArticles(User.getUser(pm, getPrincipal()), nonAllocatedArticles);
-
-			if (validate) {
-				for (Offer offer : offers)
-					trader.validateOffer(offer);
-			}
-
-			if (!get)
-				return null;
-
-			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
-			if (fetchGroups != null)
-				pm.getFetchPlan().setGroups(fetchGroups);
-
-			return pm.detachCopyAll(allocatedArticles);
 		} finally {
 			pm.close();
 		}

@@ -25,10 +25,10 @@ import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.util.Util;
 
 /**
- * {@link IssueType} defines the valid set of {@link IssuePriority}s and {@link IssueSeverityType}s 
+ * The {@link IssueType} class defines the valid set of {@link IssuePriority}s and {@link IssueSeverityType}s 
  * and {@link IssueResolution}s for an {@link Issue} of a given type.
  * <p>
- * Additionally an {@link IssueType} holds the ProcessDefinition for the workflow of the state transitions
+ * Additionally, an {@link IssueType} holds the ProcessDefinition for the workflow of the state transitions
  * of an Issue.
  * </p>
  * 

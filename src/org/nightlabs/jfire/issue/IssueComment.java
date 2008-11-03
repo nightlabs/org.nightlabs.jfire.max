@@ -9,6 +9,10 @@ import org.nightlabs.jfire.security.User;
 import org.nightlabs.util.Util;
 
 /**
+ * An {@link IssueComment} class represents a comment which is created in an {@link Issue}. 
+ * <p>
+ * </p>
+ * 
  * @author Chairat Kongarayawetchakun - chairat at nightlabs dot de
  *
  * @jdo.persistence-capable

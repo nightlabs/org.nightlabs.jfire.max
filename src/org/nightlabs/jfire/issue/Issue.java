@@ -56,6 +56,11 @@ import org.nightlabs.util.CollectionUtil;
 import org.nightlabs.util.Util;
 
 /**
+ * The {@link Issue} class represent an issue in JFire. 
+ * <p>
+ * An {@link Issue} created by a JFire's {@link User} should at lease have {@link IssueSubject} and {@link IssueDescription}.  
+ * </p>
+ * 
  * @author Chairat Kongarayawetchakun <!-- chairat [AT] nightlabs [DOT] de -->
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
  *

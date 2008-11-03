@@ -5,6 +5,8 @@ import org.nightlabs.jfire.editlock.id.EditLockTypeID;
 import org.nightlabs.jfire.organisation.Organisation;
 
 /**
+ * @author Chairat Kongarayawetchakun <!-- chairat [AT] nightlabs [DOT] de -->
+ * 
  * @jdo.persistence-capable
  *		identity-type="application"
  *		detachable="true"

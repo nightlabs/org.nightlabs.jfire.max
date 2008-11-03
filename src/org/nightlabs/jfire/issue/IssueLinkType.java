@@ -16,6 +16,10 @@ import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.util.Util;
 
 /**
+ * The {@link IssueLinkType} class represents a relation between an {@link Issue} and {@link IssueLink} file on an {@link Issue}. 
+ * <p>
+ * </p>
+ * 
  * @author Chairat Kongarayawetchakun - chairat [AT] nightlabs [DOT] de
  *
  * @jdo.persistence-capable

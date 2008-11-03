@@ -25,6 +25,10 @@ import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.util.Util;
 
 /**
+ * The {@link IssueFileAttachment} class represents an attached file on an {@link Issue}. 
+ * <p>
+ * </p>
+ * 
  * @author Chairat Kongarayawetchakun - chairat [AT] nightlabs [DOT] de
  *
  * @jdo.persistence-capable

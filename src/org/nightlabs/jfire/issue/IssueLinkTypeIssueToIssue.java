@@ -8,6 +8,10 @@ import javax.jdo.PersistenceManager;
 import org.nightlabs.jfire.issue.id.IssueLinkTypeID;
 
 /**
+ * This abstract class extended of {@link IssueLinkType} provides the process for creating the other way round of an {@link IssueLinkTypeIssueToIssue}
+ * <p>
+ * </p>
+ * 
  * @author Chairat Kongarayawetchakun - chairat [AT] nightlabs [DOT] de
  *
  * @jdo.persistence-capable

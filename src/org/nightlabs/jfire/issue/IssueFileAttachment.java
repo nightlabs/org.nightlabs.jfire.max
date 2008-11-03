@@ -17,6 +17,10 @@ import org.nightlabs.io.DataBuffer;
 import org.nightlabs.util.IOUtil;
 
 /**
+ * The {@link IssueFileAttachment} class represents an attached file on an {@link Issue}. 
+ * <p>
+ * </p>
+ * 
  * @author Chairat Kongarayawetchakun - chairat at nightlabs dot de
  *
  * @jdo.persistence-capable

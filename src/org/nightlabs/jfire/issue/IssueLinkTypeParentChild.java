@@ -6,6 +6,10 @@ import org.nightlabs.jfire.issue.id.IssueLinkTypeID;
 import org.nightlabs.jfire.organisation.Organisation;
 
 /**
+ * This extended class of {@link IssueLinkTypeIssueToIssue} used for creating parent-child relation between {@link Issue}s.
+ * <p>
+ * </p>
+ * 
  * @author Chairat Kongarayawetchakun - chairat [AT] nightlabs [DOT] de
  *
  * @jdo.persistence-capable

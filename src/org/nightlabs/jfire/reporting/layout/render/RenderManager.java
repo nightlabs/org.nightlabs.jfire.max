@@ -71,13 +71,13 @@ public class RenderManager {
 	private static final org.apache.log4j.Logger logger = org.apache.log4j.Logger
 			.getLogger(RenderManager.class);
 	
-	private ReportingManagerFactory factory;
+	private ReportEngine engine;
 	
 	/**
 	 * 
 	 */
-	public RenderManager(ReportingManagerFactory factory) {
-		this.factory = factory;
+	public RenderManager(ReportEngine engine) {
+		this.engine = engine;
 	}
 	
 	
@@ -136,7 +136,6 @@ public class RenderManager {
 		if (logger.isDebugEnabled())
 			logger.debug("Rendering report "+reportLayout.getReportRegistryItemID()+" to outputformat: "+renderRequest.getOutputFormat());
 		
-		ReportEngine reportEngine = factory.getReportEngine();
 		if (logger.isDebugEnabled())
 			logger.debug("Have report engine");
 		
@@ -146,7 +145,7 @@ public class RenderManager {
 			InputStream inputStream = reportLayout.createReportDesignInputStream();
 			IReportRunnable report = null;
 			try {
-				report = reportEngine.openReportDesign(inputStream);
+				report = engine.openReportDesign(inputStream);
 			} catch (EngineException e) {
 				throw new RenderReportException(e);
 			} finally {
@@ -158,7 +157,7 @@ public class RenderManager {
 			}
 			if (logger.isDebugEnabled())
 				logger.debug("Opened reportlayout, creating RunAndRenderTask");
-			IRunAndRenderTask task = reportEngine.createRunAndRenderTask(report);
+			IRunAndRenderTask task = engine.createRunAndRenderTask(report);
 			
 			Locale locale = NLLocale.getDefault();
 			if (renderRequest.getLocale() != null)
@@ -181,7 +180,7 @@ public class RenderManager {
 			if (logger.isDebugEnabled())
 				logger.debug("Have ReportLayoutRenderer: "+renderer.getClass().getName());
 
-			HashMap<String,Object> parsedParams = parseReportParams(reportEngine, report, renderRequest.getParameters());
+			HashMap<String,Object> parsedParams = parseReportParams(engine, report, renderRequest.getParameters());
 			renderRequest.setParameters(parsedParams);
 
 			logger.debug("Have report renderer, delegating render work");

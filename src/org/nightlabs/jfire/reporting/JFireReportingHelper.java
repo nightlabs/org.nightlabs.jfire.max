@@ -168,7 +168,7 @@ public class JFireReportingHelper {
 	/**
 	 * Close the Helper after the report has been rendered.
 	 * <p>
-	 * Do not call this method direcly, it is called by the {@link RenderManager}.+
+	 * Do not call this method directly, it is called by the {@link RenderManager}.+
 	 */
 	public static void close() {
 		helpers.get().close();

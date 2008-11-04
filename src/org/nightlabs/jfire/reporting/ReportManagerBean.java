@@ -50,6 +50,7 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.eclipse.birt.core.framework.Platform;
 import org.eclipse.birt.report.engine.api.EngineConfig;
+import org.eclipse.birt.report.engine.api.ReportEngine;
 import org.eclipse.datatools.connectivity.oda.IParameterMetaData;
 import org.eclipse.datatools.connectivity.oda.IResultSet;
 import org.eclipse.datatools.connectivity.oda.IResultSetMetaData;
@@ -527,6 +528,16 @@ implements SessionBean
 	{
 		return ReportingManagerFactory.getReportingManagerFactory(getInitialContext(getOrganisationID()), getOrganisationID());
 	}
+	
+	/**
+	 * Get the {@link ReportEnginePool} of this server.
+	 *
+	 * @return The {@link ReportEnginePool} of this server.
+	 */
+	protected ReportEnginePool getReportEnginePool() throws NamingException
+	{
+		return ReportEnginePool.getInstance(getInitialContext(getOrganisationID()));
+	}
 
 	/**
 	 * Stores the given {@link ReportRegistryItem} to the datastore
@@ -610,11 +621,23 @@ implements SessionBean
 		PersistenceManager pm;
 		pm = getPersistenceManager();
 		try {
-			RenderManager rm = getReportingManagerFactory().createRenderManager();
+//			RenderManager rm = getReportingManagerFactory().createRenderManager();
+			ReportEnginePool enginePool = getReportEnginePool();
+			ReportEngine engine;
 			try {
+				engine = enginePool.borrowReportEngine();
+			} catch (Exception e) {
+				throw new RenderReportException("Could not borrow ReportEngine.", e);
+			}
+			try {
+				RenderManager rm = new RenderManager(engine);
 				return rm.renderReport(pm, renderReportRequest);
 			} finally {
-				rm.close();
+				try {
+					enginePool.returnReportEngine(engine);
+				} catch (Exception e) {
+					throw new RenderReportException("Could not return ReportEngine", e);
+				}
 			}
 		} finally {
 			pm.close();

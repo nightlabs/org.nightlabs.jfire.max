@@ -15,6 +15,8 @@ import org.nightlabs.jfire.prop.Struct;
 import org.nightlabs.jfire.prop.StructLocal;
 
 /**
+ * This {@link IssueStruct} class provides methods for creating {@link Struct} of {@link Issue}.
+ * 
  * @author Chairat Kongarayawetchakun <!-- chairat [AT] nightlabs [DOT] de -->
  *
  */

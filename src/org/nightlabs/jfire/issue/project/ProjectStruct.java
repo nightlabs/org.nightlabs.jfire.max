@@ -11,6 +11,8 @@ import org.nightlabs.jfire.prop.Struct;
 import org.nightlabs.jfire.prop.StructLocal;
 
 /**
+ * This {@link ProjectStruct} class provides methods for creating {@link Struct} of {@link Project}.
+ * 
  * @author Chairat Kongarayawetchakun <!-- chairat [AT] nightlabs [DOT] de -->
  *
  */

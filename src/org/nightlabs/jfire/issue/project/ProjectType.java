@@ -11,6 +11,10 @@ import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.util.Util;
 
 /**
+ * The {@link ProjectType} class represents a type of {@link Project}. 
+ * <p>
+ * </p>
+ * 
  * @author Chairat Kongarayawetchakun <!-- chairat at nightlabs dot de -->
  *
  * @jdo.persistence-capable

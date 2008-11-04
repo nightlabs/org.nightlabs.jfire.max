@@ -6,6 +6,10 @@ import java.util.Map;
 import org.nightlabs.i18n.I18nText;
 
 /**
+ * An extended class of {@link I18nText} that represents the {@link ProjectPhase}'s description. 
+ * <p>
+ * </p>
+ * 
  * @author Chairat Kongarayawetchakun - chairat at nightlabs dot de
  *
  * @jdo.persistence-capable

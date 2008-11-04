@@ -7,6 +7,10 @@ import org.nightlabs.i18n.I18nText;
 import org.nightlabs.jfire.issue.Issue;
 
 /**
+ * An extended class of {@link I18nText} that represents the changed text of each change that made to an {@link Issue}. 
+ * <p>
+ * </p>
+ * 
  * @author Chairat Kongarayawetchakun - chairatk at nightlabs dot de
  *
  * @jdo.persistence-capable

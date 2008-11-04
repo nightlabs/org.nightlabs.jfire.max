@@ -18,6 +18,11 @@ import org.nightlabs.jfire.security.User;
 import org.nightlabs.util.Util;
 
 /**
+ * The {@link IssueHistory} class represents a history which recorded the change of each {@link Issue}. 
+ * <p>
+ * </p>
+ * 
+ * 
  * @author Chairat Kongarayawetchakun <!-- chairat at nightlabs dot de -->
  *
  * @jdo.persistence-capable

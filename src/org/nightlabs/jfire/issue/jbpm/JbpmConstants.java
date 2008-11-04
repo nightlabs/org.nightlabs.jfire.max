@@ -12,6 +12,10 @@ import org.nightlabs.jfire.jbpm.graph.def.StateDefinition;
 import org.nightlabs.jfire.organisation.Organisation;
 
 /**
+ * Contains constants for nodes and transitions.
+ * <p>
+ * </p>
+ * 
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
  */
 public class JbpmConstants

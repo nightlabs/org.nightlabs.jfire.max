@@ -11,6 +11,10 @@ import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.util.Util;
 
 /**
+ * The {@link ProjectPhase} class represents a phase in a {@link Project}. One {@link Project} can have many phases. 
+ * <p>
+ * </p>
+ * 
  * @author Chairat Kongarayawetchakun <!-- chairat at nightlabs dot de -->
  *
  * @jdo.persistence-capable

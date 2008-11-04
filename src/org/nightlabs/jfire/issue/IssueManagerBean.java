@@ -62,7 +62,7 @@ import org.nightlabs.jfire.security.User;
 import org.nightlabs.util.Util;
 
 /**
- * A EJB session bean provides methods for managing every objects used in the issue tracking.
+ * An EJB session bean provides methods for managing every objects used in the issue tracking.
  * <p>
  * 
  * </p>

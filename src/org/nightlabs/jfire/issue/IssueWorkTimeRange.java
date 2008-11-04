@@ -12,6 +12,10 @@ import org.nightlabs.jfire.security.User;
 import org.nightlabs.util.Util;
 
 /**
+ * The {@link IssueWorkTimeRange} class represents a range of working time of each {@link Issue}s. 
+ * <p>
+ * </p>
+ * 
  * @author Chairat Kongarayawetchakun <!-- chairat [AT] nightlabs [DOT] de -->
  *
  * @jdo.persistence-capable

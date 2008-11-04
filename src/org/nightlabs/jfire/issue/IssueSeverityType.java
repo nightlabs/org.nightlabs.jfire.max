@@ -5,6 +5,10 @@ import java.io.Serializable;
 import org.nightlabs.util.Util;
 
 /**
+ * The {@link IssueSeverityType} class represents a severity of each {@link Issue}s. 
+ * <p>
+ * </p>
+ * 
  * @author Chairat Kongarayawetchakun - chairat [AT] nightlabs [DOT] de
  *
  * @jdo.persistence-capable

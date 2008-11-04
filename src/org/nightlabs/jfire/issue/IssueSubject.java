@@ -7,6 +7,10 @@ import org.nightlabs.i18n.I18nText;
 import org.nightlabs.jdo.ObjectIDUtil;
 
 /**
+ * The {@link IssueSubject} class represents a subject of an {@link Issue}s. 
+ * <p>
+ * </p>
+ * 
  * @author Chairat Kongarayawetchakun - chairat [AT] nightlabs [DOT] de
  *
  * @jdo.persistence-capable

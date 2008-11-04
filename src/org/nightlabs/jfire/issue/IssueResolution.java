@@ -8,6 +8,10 @@ import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.util.Util;
 
 /**
+ * The {@link IssueResolution} class represents a resolution of each {@link Issue}s. 
+ * <p>
+ * </p>
+ * 
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
  * @author Chairat Kongarayawetchakun - chairat [AT] nightlabs [DOT] de
  * @author Marco Schulze - marco at nightlabs dot de

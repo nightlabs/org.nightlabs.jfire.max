@@ -9,10 +9,10 @@ import org.nightlabs.jfire.security.User;
 import org.nightlabs.util.Util;
 
 /**
- * An {@link IssueComment} class represents a comment which is created in an {@link Issue}. 
+ * An {@link IssueComment} class represents a comment which is created in an {@link Issue}.
  * <p>
  * </p>
- * 
+ *
  * @author Chairat Kongarayawetchakun - chairat at nightlabs dot de
  *
  * @jdo.persistence-capable
@@ -24,89 +24,82 @@ import org.nightlabs.util.Util;
  * @jdo.inheritance strategy="new-table"
  *
  * @jdo.create-objectid-class
- * 		field-order="organisationID, issueID, commentID"
- * 
+ * 		field-order="organisationID, commentID"
+ *
  * @jdo.fetch-group name="IssueComment.user" fetch-groups="default" fields="user"
  * @jdo.fetch-group name="IssueComment.this" fields="text, createTimestamp, user"
- * 
- */ 
+ *
+ */
 public class IssueComment
 implements Serializable, AttachCallback
 {
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon! 
+	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon!
 	 */
+	@Deprecated
 	public static final String FETCH_GROUP_THIS_COMMENT = "IssueComment.this";
-	
+
 	public static final String FETCH_GROUP_USER = "IssueComment.user";
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
 	private String organisationID;
-	
+
 	/**
 	 * @jdo.field primary-key="true"
 	 */
-	private long issueID;
-	
+	private long commentID;
+
 	/**
-	 * @jdo.field primary-key="true"
-	 * @jdo.column length="100"
+	 * @jdo.field persistence-modifier="persistent"
 	 */
-	private String commentID;
-	
+	private Issue issue;
+
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 * @jdo.column sql-type="clob"
 	 */
 	private String text;
-	
+
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private Date createTimestamp;
-	
+
 	/**
 	 * @jdo.field persistence-modifier="persistent" load-fetch-group="all"
 	 */
 	private User user;
-	
+
 	/**
 	 * @deprecated Only for JDO!!!!
 	 */
+	@Deprecated
 	protected IssueComment()
 	{
 	}
-	
-	public IssueComment(String organisationID, long issueID, String commentID, String text, User user){
-		if (commentID == null)
-			throw new IllegalArgumentException("commentID must not be null!");
 
+	public IssueComment(String organisationID, long commentID, Issue issue, String text, User user){
 		this.organisationID = organisationID;
-		this.issueID = issueID;
 		this.commentID = commentID;
+		this.issue = issue;
 		this.text = text;
 		this.user = user;
-		
+
 		createTimestamp = new Date();
 	}
-	
-	
+
 	public String getOrganisationID() {
 		return organisationID;
 	}
 
-	public long getIssueID() {
-		return issueID;
-	}
-
-	public String getCommentID() {
+	public long getCommentID() {
 		return commentID;
 	}
-	
+
 	public String getText() {
 		return text;
 	}
@@ -118,15 +111,19 @@ implements Serializable, AttachCallback
 	public User getUser() {
 		return user;
 	}
-	
+
+	public Issue getIssue() {
+		return issue;
+	}
+
 	@Override
 	public void jdoPostAttach(Object arg0) {
-		
+
 	}
 
 	@Override
 	public void jdoPreAttach() {
-		
+
 	}
 
 	@Override

@@ -25,5 +25,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireServerManager"/>
 	<classpathentry kind="var" path="ASM"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireBaseClientLib"/>
+	<classpathentry kind="var" path="WORKSPACE/JBossLibs/lib/jboss-server/deploy/opencsv-1.8.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

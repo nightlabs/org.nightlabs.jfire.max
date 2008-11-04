@@ -32,6 +32,8 @@ import java.io.OutputStreamWriter;
 import java.io.Serializable;
 import java.io.Writer;
 import java.rmi.RemoteException;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.zip.DeflaterOutputStream;
 
@@ -42,6 +44,7 @@ import javax.ejb.SessionContext;
 import javax.jdo.FetchPlan;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
+import javax.jdo.Query;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
@@ -67,6 +70,7 @@ import org.nightlabs.jfire.jdo.notification.persistent.SubscriptionUtil;
 import org.nightlabs.jfire.jdo.notification.persistent.id.NotificationReceiverID;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.organisation.id.OrganisationID;
+import org.nightlabs.util.CollectionUtil;
 import org.nightlabs.util.IOUtil;
 import org.nightlabs.version.MalformedVersionException;
 
@@ -153,7 +157,7 @@ implements SessionBean
 	/**
 	 * This organisation-init method is executed on every startup in case the Geography module has been deployed
 	 * into an existing server and the organisation is already registered at the root-organisation. In this
-	 * case {@link #initialiseJDOLifecycleListeners(Context)} is never called. 
+	 * case {@link #initialiseJDOLifecycleListeners(Context)} is never called.
 	 *
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
@@ -200,7 +204,7 @@ implements SessionBean
 				logger.warn("Creating JDO lifecycle listeners for CSV instances in the root organisation failed. Reason: Root organisation " + rootOrganisationID + " does not exist.");
 				return;
 			}
-			
+
 			persistentNotificationEJB.storeNotificationFilter(notificationFilter, false, null, 1);
 
 			GeographyTemplateDataNotificationReceiver notificationReceiver = new GeographyTemplateDataNotificationReceiver(notificationFilter);
@@ -339,7 +343,7 @@ implements SessionBean
 			Geography geography = Geography.sharedInstance();
 
 			String rootOrganisationID;
-			
+
 			try {
 				InitialContext initialContext = new InitialContext();
 				try {
@@ -388,14 +392,14 @@ implements SessionBean
 			}//finally
 
 			CSV.setCSVData(pm, rootOrganisationID, CSV.CSV_TYPE_COUNTRY, countryID.countryID, out.toByteArray());
-			
+
 			clearCache();
 		}//try
 		finally {
 			pm.close();
 		}//finally
 	}
-	
+
 	/**
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
@@ -414,7 +418,7 @@ implements SessionBean
 			Geography geography = Geography.sharedInstance();
 
 			String rootOrganisationID;
-			
+
 			try {
 				InitialContext initialContext = new InitialContext();
 				try {
@@ -464,7 +468,7 @@ implements SessionBean
 			}//finally
 
 			CSV.setCSVData(pm, rootOrganisationID, CSV.CSV_TYPE_REGION, countryID.countryID, out.toByteArray());
-			
+
 			clearCache();
 		}//try
 		finally {
@@ -490,7 +494,7 @@ implements SessionBean
 			Geography geography = Geography.sharedInstance();
 
 			String rootOrganisationID;
-			
+
 			try {
 				InitialContext initialContext = new InitialContext();
 				try {
@@ -517,7 +521,7 @@ implements SessionBean
 							existCity = storedCity;
 							storedCity = null; cityID = null;
 						}//if
-						
+
 						String csvLines = GeographyImplResourceCSV.city2csvLines(existCity);
 
 						if (logger.isDebugEnabled())
@@ -542,7 +546,7 @@ implements SessionBean
 			}//finally
 
 			CSV.setCSVData(pm, rootOrganisationID, CSV.CSV_TYPE_CITY, countryID.countryID, out.toByteArray());
-			
+
 			clearCache();
 		}//try
 		finally {
@@ -568,7 +572,7 @@ implements SessionBean
 			Geography geography = Geography.sharedInstance();
 
 			String rootOrganisationID;
-			
+
 			try {
 				InitialContext initialContext = new InitialContext();
 				try {
@@ -649,7 +653,7 @@ implements SessionBean
 			Geography.sharedInstance();
 
 			String rootOrganisationID;
-			
+
 			try {
 				InitialContext initialContext = new InitialContext();
 				try {
@@ -685,12 +689,29 @@ implements SessionBean
 			}//finally
 
 			CSV.setCSVData(pm, rootOrganisationID, CSV.CSV_TYPE_DISTRICT, countryID.countryID, out.toByteArray());
-			
+
 			clearCache();
 		}//try
 		finally {
 			pm.close();
 		}//finally
+	}
+
+	/**
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	public Set<CSVID> getCSVIDs()
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			Query q = pm.newQuery(CSV.class);
+			q.setResult("JDOHelper.getObjectId(this)");
+			Collection<CSVID> c = CollectionUtil.castCollection((Collection<?>) q.execute());
+			return new HashSet<CSVID>(c);
+		} finally{
+			pm.close();
+		}
 	}
 
 	/**

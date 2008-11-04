@@ -27,24 +27,18 @@
 package org.nightlabs.jfire.chezfrancois;
 
 import java.rmi.RemoteException;
-import java.util.Locale;
 
 import javax.ejb.CreateException;
 import javax.ejb.EJBException;
 import javax.ejb.SessionBean;
 import javax.ejb.SessionContext;
-import javax.jdo.FetchPlan;
-import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.ModuleException;
 import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
-import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.security.listener.SecurityChangeController;
-import org.nightlabs.jfire.timer.Task;
-import org.nightlabs.jfire.timer.id.TaskID;
 import org.nightlabs.jfire.workstation.Workstation;
 import org.nightlabs.timepattern.TimePatternFormatException;
 import org.nightlabs.version.MalformedVersionException;
@@ -114,7 +108,6 @@ implements SessionBean
 
 		ChezFrancoisDatastoreInitialiserLocal initialiser = ChezFrancoisDatastoreInitialiserUtil.getLocalHome().create();
 		initialiser.createModuleMetaData();
-		initialiser.createDemoTimerTask();
 
 		initialiser.createDemoData_JFireSimpleTrade();
 		initialiser.createDemoData_JFireVoucher();
@@ -151,72 +144,6 @@ implements SessionBean
 		} finally {
 			pm.close();
 			logger.trace("createModuleMetaData: end");
-		}
-	}
-
-	private String getDisplayName()
-	{
-		String displayName = "Chez Francois";
-		if (ChezFrancoisServerInitialiser.ORGANISATION_ID_RESELLER.equals(getOrganisationID())) {
-			displayName = "Reseller";
-		}
-		return displayName;
-	}
-
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_System_"
-	 * @ejb.transaction type="RequiresNew"
-	 */
-	public void createDemoTimerTask() throws TimePatternFormatException
-	{
-		logger.trace("createDemoTimerTask: begin");
-
-		PersistenceManager pm = this.getPersistenceManager();
-		try {
-			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
-			pm.getFetchPlan().setMaxFetchDepth(1);
-
-			// registering demo timer task
-			TaskID taskID = TaskID.create(
-					// Organisation.DEV_ORGANISATION_ID, // the task can be modified by the organisation and thus it's maybe more logical to use the real organisationID - not dev
-					getOrganisationID(),
-					Task.TASK_TYPE_ID_SYSTEM, "ChezFrancois-DemoTimerTask");
-			try {
-				Task task = (Task) pm.getObjectById(taskID);
-				task.getActiveExecID(); // WORKAROUND for jpox heisenbug
-			} catch (JDOObjectNotFoundException x) {
-				Task task = new Task(
-						taskID.organisationID, taskID.taskTypeID, taskID.taskID,
-						User.getUser(pm, getOrganisationID(), User.USER_ID_SYSTEM),
-						ChezFrancoisDatastoreInitialiserHome.JNDI_NAME,
-						"demoTimerTask");
-
-				task.getName().setText(Locale.ENGLISH.getLanguage(), getDisplayName() + " Demo Timer Task");
-				task.getDescription().setText(Locale.ENGLISH.getLanguage(), "This task demonstrates how to use the JFire Timer.");
-
-				task.getTimePatternSet().createTimePattern(
-						"*", // year
-						"*", // month
-						"*", // day
-						"mon-fri", // dayOfWeek
-						"*", //  hour
-				"*/2"); // minute
-
-				task.getTimePatternSet().createTimePattern(
-						"*", // year
-						"*", // month
-						"*", // day
-						"sat,sun", // dayOfWeek
-						"*", //  hour
-				"1-59/2"); // minute
-
-				task.setEnabled(true);
-				pm.makePersistent(task);
-			}
-		} finally {
-			pm.close();
-			logger.trace("createDemoTimerTask: end");
 		}
 	}
 
@@ -307,51 +234,6 @@ implements SessionBean
 			}
 		} finally {
 			pm.close();
-		}
-	}
-
-	/**
-	 * This is a demo task doing nothing.
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Required"
-	 */
-	public void demoTimerTask(TaskID taskID)
-	{
-		int sleepSec = 30;
-
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			if (logger.isDebugEnabled()) {
-				logger.debug("***************************************************************************************************************");
-				logger.debug("***************************************************************************************************************");
-				logger.debug("***************************************************************************************************************");
-				logger.debug("***************************************************************************************************************");
-				logger.debug("***************************************************************************************************************");
-				logger.debug("***************************************************************************************************************");
-				logger.debug("demoTimerTask: entered for taskID " + taskID);
-				logger.debug("demoTimerTask: sleeping " + sleepSec + " sec");
-			}
-
-			try {
-				Thread.sleep(1000L * sleepSec);
-			} catch (InterruptedException ignore) { }
-
-			if (logger.isDebugEnabled())
-				logger.debug("demoTimerTask: about to exit for taskID " + taskID);
-
-		} finally {
-			pm.close();
-		}
-		if (logger.isDebugEnabled()) {
-			logger.debug("demoTimerTask: pm closed - exiting for taskID " + taskID);
-			logger.debug("***************************************************************************************************************");
-			logger.debug("***************************************************************************************************************");
-			logger.debug("***************************************************************************************************************");
-			logger.debug("***************************************************************************************************************");
-			logger.debug("***************************************************************************************************************");
-			logger.debug("***************************************************************************************************************");
 		}
 	}
 

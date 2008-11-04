@@ -214,7 +214,7 @@ implements Serializable
 	 * This is usually <tt>null</tt> or the exception message (no stacktrace)
 	 *
 	 * @jdo.field persistence-modifier="persistent"
-	 * @jdo.column length="255"
+	 * @jdo.column sql-type="CLOB"
 	 */
 	private String text = null;
 

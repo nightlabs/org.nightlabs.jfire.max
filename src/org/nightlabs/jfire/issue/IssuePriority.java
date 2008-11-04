@@ -5,6 +5,11 @@ import java.io.Serializable;
 import org.nightlabs.util.Util;
 
 /**
+ * A session bean provides 
+ * <p>
+ * It's based on the design pattern called <a href="https://www.jfire.org/modules/phpwiki/index.php/Design%20Pattern%20XyzLocal">Design Pattern XyzLocal</a>
+ * </p>
+ * 
  * @author Chairat Kongarayawetchakun - chairat [AT] nightlabs [DOT] de
  *
  * @jdo.persistence-capable

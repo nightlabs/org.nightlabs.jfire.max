@@ -17,6 +17,11 @@ import org.nightlabs.util.CollectionUtil;
 import org.nightlabs.util.Util;
 
 /**
+ * This class is created for wrapping the issue with its state. It's intended to be used within an organisation.
+ * <p>
+ * It's based on the design pattern called <a href="https://www.jfire.org/modules/phpwiki/index.php/Design%20Pattern%20XyzLocal">Design Pattern XyzLocal</a>
+ * </p>
+ * 
  * @author Chairat Kongarayawetchakun - chairat [AT] nightlabs [DOT] de
  *
  * @jdo.persistence-capable
@@ -47,6 +52,8 @@ public class IssueLocal
 implements Serializable, StatableLocal
 {
 	private static final long serialVersionUID = 1L;
+	
+	@SuppressWarnings("unused")
 	private static final Logger logger = Logger.getLogger(IssueLocal.class);
 
 	/**

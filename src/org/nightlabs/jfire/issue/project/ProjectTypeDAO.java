@@ -4,18 +4,20 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import javax.jdo.FetchPlan;
-
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.issue.IssueManager;
 import org.nightlabs.jfire.issue.IssueManagerUtil;
 import org.nightlabs.jfire.issue.project.id.ProjectTypeID;
 import org.nightlabs.jfire.security.SecurityReflector;
-import org.nightlabs.progress.NullProgressMonitor;
 import org.nightlabs.progress.ProgressMonitor;
 import org.nightlabs.progress.SubProgressMonitor;
 
+/**
+ * Data access object for {@link ProjectType}s.
+ * 
+ * @author Chairat Kongarayawetchakun - chairat [AT] nightlabs [DOT] de
+ */
 public class ProjectTypeDAO 
 extends BaseJDOObjectDAO<ProjectTypeID, ProjectType>
 {
@@ -32,6 +34,7 @@ extends BaseJDOObjectDAO<ProjectTypeID, ProjectType>
 		return sharedInstance;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	protected synchronized Collection<ProjectType> retrieveJDOObjects(Set<ProjectTypeID> projectTypeIDs,
 			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
@@ -70,6 +73,7 @@ extends BaseJDOObjectDAO<ProjectTypeID, ProjectType>
 		return projectType;
 	}
 	
+	@SuppressWarnings("unchecked")
 	public synchronized List<ProjectType> getProjectTypes(String[] fetchGroups, int maxFetchDepth,
 			ProgressMonitor monitor)
 	{

@@ -13,6 +13,11 @@ import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.progress.ProgressMonitor;
 import org.nightlabs.progress.SubProgressMonitor;
 
+/**
+ * Data access object for {@link ProjectPhase}s.
+ * 
+ * @author Chairat Kongarayawetchakun - chairat [AT] nightlabs [DOT] de
+ */
 public class ProjectPhaseDAO extends BaseJDOObjectDAO<ProjectPhaseID, ProjectPhase>{
 
 	private static ProjectPhaseDAO sharedInstance = null;
@@ -28,6 +33,7 @@ public class ProjectPhaseDAO extends BaseJDOObjectDAO<ProjectPhaseID, ProjectPha
 		return sharedInstance;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	protected synchronized Collection<ProjectPhase> retrieveJDOObjects(Set<ProjectPhaseID> projectPhaseIDs,
 			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
@@ -66,6 +72,7 @@ public class ProjectPhaseDAO extends BaseJDOObjectDAO<ProjectPhaseID, ProjectPha
 		return projectPhase;
 	}
 
+	@SuppressWarnings("unchecked")
 	public synchronized List<ProjectPhase> getProjectPhases(String[] fetchGroups, int maxFetchDepth,
 			ProgressMonitor monitor)
 			{

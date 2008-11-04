@@ -15,7 +15,9 @@ import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.progress.ProgressMonitor;
 
 /**
- * @author chairatk
+ * Data access object for {@link IssueComment}s.
+ * 
+ * @author Chairat Kongarayawetchakun - chairat [AT] nightlabs [DOT] de
  *
  */
 public class IssueCommentDAO extends BaseJDOObjectDAO<IssueCommentID, IssueComment> {
@@ -34,6 +36,7 @@ public class IssueCommentDAO extends BaseJDOObjectDAO<IssueCommentID, IssueComme
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	protected Collection<IssueComment> retrieveJDOObjects(Set<IssueCommentID> commentIDs, 
 			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) throws Exception {
 		monitor.beginTask("Loading IssueComments", 1);

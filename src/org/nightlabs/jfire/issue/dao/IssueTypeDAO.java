@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import org.nightlabs.annotation.Implement;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.issue.IssueManager;
@@ -16,9 +15,9 @@ import org.nightlabs.progress.ProgressMonitor;
 import org.nightlabs.progress.SubProgressMonitor;
 
 /**
+ * Data access object for {@link IssueType}s.
  * 
- * @author chairatk
- *
+ * @author Chairat Kongarayawetchakun - chairat [AT] nightlabs [DOT] de
  */
 public class IssueTypeDAO extends BaseJDOObjectDAO<IssueTypeID, IssueType>
 {
@@ -49,8 +48,8 @@ public class IssueTypeDAO extends BaseJDOObjectDAO<IssueTypeID, IssueType>
 		return sharedInstance;
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Override
-	@Implement
 	protected Collection<IssueType> retrieveJDOObjects(Set<IssueTypeID> objectIDs, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) throws Exception {
 		monitor.beginTask("Fetching "+objectIDs.size()+" issue types information", 1);
 		Collection<IssueType> issueTypes;

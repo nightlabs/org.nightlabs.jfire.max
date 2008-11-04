@@ -44,6 +44,7 @@ public class IssueHistory
 implements Serializable 
 {
 	private static final long serialVersionUID = 1L;
+	@SuppressWarnings("unused")
 	private static final Logger logger = Logger.getLogger(IssueHistory.class);
 
 	public static final String FETCH_GROUP_ISSUE = "IssueHistory.issue";
@@ -66,12 +67,6 @@ implements Serializable
 	 * @jdo.field primary-key="true"
 	 */
 	private long issueHistoryID;
-
-	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 * @jdo.column length="100"
-	 */
-	private String field;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -155,6 +150,7 @@ implements Serializable
 	 * @param issue
 	 * @return Returns instances of <code>IssueHistory</code>.
 	 */
+	@SuppressWarnings("unchecked")
 	public static Collection<IssueHistory> getIssueHistoryByIssue(PersistenceManager pm, IssueID issueID)
 	{
 		Query q = pm.newNamedQuery(IssueHistory.class, IssueHistory.QUERY_ISSUE_HISTORYIDS_BY_ORGANISATION_ID_AND_ISSUE_ID);

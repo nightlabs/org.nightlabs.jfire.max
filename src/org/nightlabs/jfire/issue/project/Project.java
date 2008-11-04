@@ -74,6 +74,7 @@ public class Project
 implements Serializable, Comparable<Project> 
 {
 	private static final long serialVersionUID = 1L;
+	@SuppressWarnings("unused")
 	private static final Logger logger = Logger.getLogger(Project.class);
 
 	public static final String FETCH_GROUP_DESCRIPTION = "Project.description";

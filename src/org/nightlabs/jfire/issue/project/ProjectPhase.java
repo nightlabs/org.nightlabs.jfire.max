@@ -32,6 +32,7 @@ public class ProjectPhase
 implements Serializable 
 {
 	private static final long serialVersionUID = 1L;
+	@SuppressWarnings("unused")
 	private static final Logger logger = Logger.getLogger(ProjectPhase.class);
 
 	public static final String FETCH_GROUP_NAME = "ProjectPhase.name";

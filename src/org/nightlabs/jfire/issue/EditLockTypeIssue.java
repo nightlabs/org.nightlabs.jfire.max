@@ -5,6 +5,8 @@ import org.nightlabs.jfire.editlock.id.EditLockTypeID;
 import org.nightlabs.jfire.organisation.Organisation;
 
 /**
+ * An extended class of {@link EditLockType} that used for an editor in the RCP project.
+ * 
  * @author Chairat Kongarayawetchakun <!-- chairat [AT] nightlabs [DOT] de -->
  * 
  * @jdo.persistence-capable
@@ -32,6 +34,9 @@ extends EditLockType
 		super(editLockTypeID);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public EditLockTypeIssue(String organisationID, String editLockTypeID)
 	{
 		super(organisationID, editLockTypeID);

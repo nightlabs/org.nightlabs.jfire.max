@@ -16,6 +16,11 @@ import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.progress.ProgressMonitor;
 import org.nightlabs.progress.SubProgressMonitor;
 
+/**
+ * Data access object for {@link Issue}s.
+ * 
+ * @author Chairat Kongarayawetchakun - chairat [AT] nightlabs [DOT] de
+ */
 public class IssueDAO extends BaseJDOObjectDAO<IssueID, Issue>{
 
 	private static IssueDAO sharedInstance = null;
@@ -32,6 +37,7 @@ public class IssueDAO extends BaseJDOObjectDAO<IssueID, Issue>{
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	protected synchronized Collection<Issue> retrieveJDOObjects(Set<IssueID> issueIDs,
 			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 			throws Exception {

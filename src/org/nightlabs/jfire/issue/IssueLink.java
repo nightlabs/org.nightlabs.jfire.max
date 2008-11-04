@@ -25,7 +25,7 @@ import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.util.Util;
 
 /**
- * The {@link IssueFileAttachment} class represents an attached file on an {@link Issue}. 
+ * The {@link IssueLink} class represents a link between an {@link Issue} and the other object. 
  * <p>
  * </p>
  * 

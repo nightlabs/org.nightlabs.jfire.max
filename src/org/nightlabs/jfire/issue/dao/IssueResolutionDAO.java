@@ -17,6 +17,11 @@ import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.progress.ProgressMonitor;
 import org.nightlabs.progress.SubProgressMonitor;
 
+/**
+ * Data access object for {@link IssuResolution}s.
+ * 
+ * @author Chairat Kongarayawetchakun - chairat [AT] nightlabs [DOT] de
+ */
 public class IssueResolutionDAO
 extends BaseJDOObjectDAO<IssueResolutionID, IssueResolution>
 {

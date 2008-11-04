@@ -31,6 +31,7 @@ public class ProjectType
 implements Serializable , Comparable<ProjectType>
 {
 	private static final long serialVersionUID = 1L;
+	@SuppressWarnings("unused")
 	private static final Logger logger = Logger.getLogger(ProjectType.class);
 
 	public static final String FETCH_GROUP_NAME = "ProjectType.name";

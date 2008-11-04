@@ -59,12 +59,13 @@ import org.nightlabs.jfire.jbpm.JbpmLookup;
 import org.nightlabs.jfire.jbpm.graph.def.State;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.security.User;
-// @Chairat: JFireIssueTracking MUST NOT be dependent on JFireTrade!!! Why did you add these imports, that aren't even necessary? They break the nightly build. Marco.
-//import org.nightlabs.jfire.trade.Order;
-//import org.nightlabs.jfire.trade.SegmentType;
 import org.nightlabs.util.Util;
 
 /**
+ * A EJB session bean provides methods for managing every objects used in the issue tracking.
+ * <p>
+ * 
+ * </p>
  * @author Chairat Kongarayawetchakun - chairat [AT] nightlabs [DOT] de
  *
  * @ejb.bean name="jfire/ejb/JFireIssueTracking/IssueManager"

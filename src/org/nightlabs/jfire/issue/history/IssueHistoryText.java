@@ -20,6 +20,7 @@ import org.nightlabs.jfire.issue.Issue;
  * @jdo.create-objectid-class field-order="organisationID, issueHistoryID, issueHistoryTextID"
  *
  */
+@SuppressWarnings("serial")
 public class IssueHistoryText extends I18nText{
 	/**
 	 * @jdo.field primary-key="true"
@@ -31,11 +32,13 @@ public class IssueHistoryText extends I18nText{
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@SuppressWarnings("unused")
 	private long issueHistoryID;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@SuppressWarnings("unused")
 	private IssueHistory issueHistory;
 	
 	/**
@@ -59,6 +62,7 @@ public class IssueHistoryText extends I18nText{
 	 *
 	 * @jdo.join
 	 */
+	@SuppressWarnings("unchecked")
 	private Map texts = new HashMap();
 
 	/**
@@ -83,6 +87,7 @@ public class IssueHistoryText extends I18nText{
 	/**
 	 * @see org.nightlabs.i18n.I18nText#getI18nMap()
 	 */
+	@SuppressWarnings("unchecked")
 	protected Map getI18nMap()
 	{
 		return texts;

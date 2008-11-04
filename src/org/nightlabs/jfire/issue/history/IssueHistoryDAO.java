@@ -12,6 +12,11 @@ import org.nightlabs.jfire.issue.id.IssueID;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.progress.ProgressMonitor;
 
+/**
+ * Data access object for {@link IssueHistory}s.
+ * 
+ * @author Chairat Kongarayawetchakun - chairat [AT] nightlabs [DOT] de
+ */
 public class IssueHistoryDAO extends BaseJDOObjectDAO<IssueHistoryID, IssueHistory>{
 
 	private static IssueHistoryDAO sharedInstance = null;
@@ -27,6 +32,7 @@ public class IssueHistoryDAO extends BaseJDOObjectDAO<IssueHistoryID, IssueHisto
 		return sharedInstance;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	protected synchronized Collection<IssueHistory> retrieveJDOObjects(Set<IssueHistoryID> issueHistoryIDs,
 			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
@@ -48,6 +54,7 @@ public class IssueHistoryDAO extends BaseJDOObjectDAO<IssueHistoryID, IssueHisto
 	
 	private IssueManager issueManager;
 
+	@SuppressWarnings("unchecked")
 	public synchronized List<IssueHistory> getIssueHistories(IssueID issueID,
 			String[] fetchGroups, int maxFetchDepth,
 			ProgressMonitor monitor)

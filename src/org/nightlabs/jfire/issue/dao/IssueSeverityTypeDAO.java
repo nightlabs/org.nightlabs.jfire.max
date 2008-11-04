@@ -12,6 +12,11 @@ import org.nightlabs.jfire.issue.id.IssueSeverityTypeID;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.progress.ProgressMonitor;
 
+/**
+ * Data access object for {@link IssueSeverityType}s.
+ * 
+ * @author Chairat Kongarayawetchakun - chairat [AT] nightlabs [DOT] de
+ */
 public class IssueSeverityTypeDAO
 		extends BaseJDOObjectDAO<IssueSeverityTypeID, IssueSeverityType>
 {

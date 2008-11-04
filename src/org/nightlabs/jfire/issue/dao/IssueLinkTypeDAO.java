@@ -14,6 +14,11 @@ import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.progress.ProgressMonitor;
 import org.nightlabs.progress.SubProgressMonitor;
 
+/**
+ * Data access object for {@link IssueLinkType}s.
+ * 
+ * @author Chairat Kongarayawetchakun - chairat [AT] nightlabs [DOT] de
+ */
 public class IssueLinkTypeDAO
 extends BaseJDOObjectDAO<IssueLinkTypeID, IssueLinkType>
 {
@@ -65,6 +70,7 @@ extends BaseJDOObjectDAO<IssueLinkTypeID, IssueLinkType>
 
 	private IssueManager issueManager;
 
+	@SuppressWarnings("unchecked")
 	public synchronized List<IssueLinkType> getIssueLinkTypes(String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) 
 	{
 		try {
@@ -87,6 +93,7 @@ extends BaseJDOObjectDAO<IssueLinkTypeID, IssueLinkType>
 	 * 
 	 * @return The issue link types of the given linkClass.
 	 */
+	@SuppressWarnings("unchecked")
 	public synchronized Collection<IssueLinkType> getIssueLinkTypes(Class<?> linkedObjectClass, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
 		monitor.beginTask("Loading issue link types", 100);

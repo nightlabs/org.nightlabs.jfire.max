@@ -27,7 +27,7 @@ import org.nightlabs.util.Util;
  * 		field-order="organisationID, issueID, commentID"
  * 
  * @jdo.fetch-group name="IssueComment.user" fetch-groups="default" fields="user"
- * @jdo.fetch-group name="IssueComment.this" fields="issue, text, createTimestamp, user"
+ * @jdo.fetch-group name="IssueComment.this" fields="text, createTimestamp, user"
  * 
  */ 
 public class IssueComment
@@ -68,11 +68,6 @@ implements Serializable, AttachCallback
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private Date createTimestamp;
-	
-	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 */
-	private Issue issue;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent" load-fetch-group="all"

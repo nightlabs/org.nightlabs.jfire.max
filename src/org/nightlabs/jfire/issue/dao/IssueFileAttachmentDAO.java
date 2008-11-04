@@ -14,6 +14,11 @@ import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.progress.ProgressMonitor;
 import org.nightlabs.progress.SubProgressMonitor;
 
+/**
+ * Data access object for {@link IssueFileAttachment}s.
+ * 
+ * @author Chairat Kongarayawetchakun - chairat [AT] nightlabs [DOT] de
+ */
 public class IssueFileAttachmentDAO extends BaseJDOObjectDAO<IssueFileAttachmentID, IssueFileAttachment>{
 
 	private static IssueFileAttachmentDAO sharedInstance = null;
@@ -30,6 +35,7 @@ public class IssueFileAttachmentDAO extends BaseJDOObjectDAO<IssueFileAttachment
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	protected synchronized Collection<IssueFileAttachment> retrieveJDOObjects(Set<IssueFileAttachmentID> issueFileAttachmentIDs,
 			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 			throws Exception {

@@ -58,16 +58,19 @@ implements Serializable{
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@SuppressWarnings("unused")
 	private String organisationID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 */
+	@SuppressWarnings("unused")
 	private long issueID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 */
+	@SuppressWarnings("unused")
 	private long issueFileAttachmentID;
 
 	/**

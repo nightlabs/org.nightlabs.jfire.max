@@ -267,6 +267,10 @@ public class IssueQuery
 		return pattern;
 	}
 
+	/**
+	 * Sets the {@link String} of {@link IssueSubject}
+	 * @param issueSubject
+	 */
 	public void setIssueSubject(String issueSubject)
 	{
 		final String oldIssueSubject = removeRegexpSearch(this.issueSubject);
@@ -391,6 +395,10 @@ public class IssueQuery
 		return issueTypeID;
 	}
 
+	/**
+	 * Sets the {@link IssueTypeID}.
+	 * @param issueSubject
+	 */
 	public void setIssueTypeID(IssueTypeID issueTypeID)
 	{
 		final IssueTypeID oldIssueTypeID = this.issueTypeID;
@@ -405,6 +413,10 @@ public class IssueQuery
 		return issueSeverityTypeID;
 	}
 
+	/**
+	 * Sets the {@link IssueSeverityTypeID}.
+	 * @param issueSubject
+	 */
 	public void setIssueSeverityTypeID(IssueSeverityTypeID issueSeverityTypeID)
 	{
 		final IssueSeverityTypeID oldIssueSeverityTypeID = this.issueSeverityTypeID;
@@ -419,6 +431,10 @@ public class IssueQuery
 		return issuePriorityID;
 	}
 
+	/**
+	 * Sets the {@link IssuePriorityID}.
+	 * @param issueSubject
+	 */
 	public void setIssuePriorityID(IssuePriorityID issuePriorityID)
 	{
 		final IssuePriorityID oldIssuePriorityID = this.issuePriorityID;
@@ -433,6 +449,10 @@ public class IssueQuery
 		return issueResolutionID;
 	}
 
+	/**
+	 * Sets the {@link IssueResolutionID}.
+	 * @param issueSubject
+	 */
 	public void setIssueResolutionID(IssueResolutionID issueResolutionID)
 	{
 		final IssueResolutionID oldIssueResolutionID = this.issueResolutionID;
@@ -447,6 +467,10 @@ public class IssueQuery
 		return reporterID;
 	}
 
+	/**
+	 * Sets the {@link UserID}.
+	 * @param issueSubject
+	 */
 	public void setReporterID(UserID reporterID)
 	{
 		final UserID oldReporterID = this.reporterID;
@@ -461,6 +485,10 @@ public class IssueQuery
 		return assigneeID;
 	}
 
+	/**
+	 * Sets the {@link UserID}.
+	 * @param issueSubject
+	 */
 	public void setAssigneeID(UserID assigneeID)
 	{
 		final UserID oldAssigneeID = this.assigneeID;
@@ -475,6 +503,10 @@ public class IssueQuery
 		return issueWorkTimeRangeFrom;
 	}
 
+	/**
+	 * Sets the {@link Date}.
+	 * @param issueSubject
+	 */
 	public void setIssueWorkTimeRangeFrom(Date issueWorkTimeRangeFrom)
 	{
 		final Date oldIssueWorkTimeRangeFrom = this.issueWorkTimeRangeFrom;
@@ -489,6 +521,10 @@ public class IssueQuery
 		return issueWorkTimeRangeTo;
 	}
 
+	/**
+	 * Sets the {@link Date}.
+	 * @param issueSubject
+	 */
 	public void setIssueWorkTimeRangeTo(Date issueWorkTimeRangeTo)
 	{
 		final Date oldIssueWorkTimeRangeTo = this.issueWorkTimeRangeTo;
@@ -503,6 +539,10 @@ public class IssueQuery
 		return issueLinkTypeID;
 	}
 
+	/**
+	 * Sets the {@link IssueLinkTypeID}.
+	 * @param issueSubject
+	 */
 	public void setIssueLinkTypeID(IssueLinkTypeID issueLinkTypeID)
 	{
 		final IssueLinkTypeID oldIssueLinkTypeID = this.issueLinkTypeID;
@@ -517,6 +557,10 @@ public class IssueQuery
 		return createTimestamp;
 	}
 
+	/**
+	 * Sets the {@link Date}.
+	 * @param issueSubject
+	 */
 	public void setCreateTimestamp(Date createTimestamp)
 	{
 		final Date oldCreateTimestamp = this.createTimestamp;
@@ -531,6 +575,10 @@ public class IssueQuery
 		return updateTimestamp;
 	}
 
+	/**
+	 * Sets the {@link Date}.
+	 * @param issueSubject
+	 */
 	public void setUpdateTimestamp(Date updateTimestamp)
 	{
 		final Date oldUpdateTimestamp = this.updateTimestamp;
@@ -545,6 +593,10 @@ public class IssueQuery
 		return projectIDs;
 	}
 
+	/**
+	 * Sets the {@link Set} of {@link ProjectID}s.
+	 * @param issueSubject
+	 */
 	public void setProjectIDs(Set<ProjectID> projectIDs)
 	{
 		final Set<ProjectID> oldProjectIDs = this.projectIDs;
@@ -553,6 +605,9 @@ public class IssueQuery
 	}
 	
 	@Override
+	/**
+	 * {@inheritDoc}
+	 */
 	protected Class<Issue> initCandidateClass()
 	{
 		return Issue.class;

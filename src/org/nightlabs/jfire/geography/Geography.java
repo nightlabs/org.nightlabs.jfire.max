@@ -111,7 +111,7 @@ public abstract class Geography
 
 		if (sharedInstance == null)
 			throw new IllegalStateException("Neither does a shared instance of Geography exist, nor is the property '" + PROPERTY_KEY_GEOGRAPHY_CLASS + "' set!");
-	
+
 		return sharedInstance;
 	}
 
@@ -207,7 +207,7 @@ public abstract class Geography
 	protected Map<String, Location> locations = new HashMap<String, Location>();
 
 
-	public Collection<Country> getCountries()
+	public synchronized Collection<Country> getCountries()
 	{
 		needCountries();
 
@@ -220,7 +220,7 @@ public abstract class Geography
 	 */
 	private transient Map<String, List<Country>> countriesSortedByLanguageID = null;
 
-	public List<Country> getCountriesSorted(final Locale locale)
+	public synchronized List<Country> getCountriesSorted(final Locale locale)
 	{
 		if (countriesSortedByLanguageID == null)
 			countriesSortedByLanguageID = new HashMap<String, List<Country>>();
@@ -231,13 +231,13 @@ public abstract class Geography
 		if (countriesSorted == null) {
 			countriesSorted = new ArrayList<Country>(getCountries());
 			Collections.sort(countriesSorted, getCountryComparator(locale));
-
+			countriesSorted = Collections.unmodifiableList(countriesSorted);
 			countriesSortedByLanguageID.put(languageID, countriesSorted);
 		}
 
 		return countriesSorted;
 	}
-	
+
 	/**
 	 * key: CityID cityID<br/>
 	 * value: Map {<br/>
@@ -265,7 +265,7 @@ public abstract class Geography
 	 */
 	private transient Map<RegionID, Map<String, List<City>>> citiesSortedByLanguageIDByRegionID = null;
 
-	public Country getCountry(CountryID countryID, boolean throwExceptionIfNotFound)
+	public synchronized Country getCountry(CountryID countryID, boolean throwExceptionIfNotFound)
 	{
 		needCountries();
 
@@ -277,7 +277,7 @@ public abstract class Geography
 		return res;
 	}
 
-	public Region getRegion(RegionID regionID, boolean throwExceptionIfNotFound)
+	public synchronized Region getRegion(RegionID regionID, boolean throwExceptionIfNotFound)
 	{
 		needRegions(regionID.countryID);
 
@@ -289,7 +289,7 @@ public abstract class Geography
 		return res;
 	}
 
-	public City getCity(CityID cityID, boolean throwExceptionIfNotFound)
+	public synchronized City getCity(CityID cityID, boolean throwExceptionIfNotFound)
 	{
 		needCities(cityID.countryID);
 
@@ -307,7 +307,7 @@ public abstract class Geography
 	 * @return Returns an empty collection if <tt>throwExceptionIfNotFound == false</tt> and
 	 *		no <tt>Country</tt> exists for the given <tt>countryID</tt>.
 	 */
-	public Collection<Region> getRegions(CountryID countryID, boolean throwExceptionIfNotFound)
+	public synchronized Collection<Region> getRegions(CountryID countryID, boolean throwExceptionIfNotFound)
 	{
 		Country country = getCountry(countryID, throwExceptionIfNotFound);
 		if (country == null)
@@ -316,7 +316,7 @@ public abstract class Geography
 		return Collections.unmodifiableCollection(country.getRegions());
 	}
 
-	public List<Region> getRegionsSorted(final CountryID countryID, final Locale locale)
+	public synchronized List<Region> getRegionsSorted(final CountryID countryID, final Locale locale)
 	{
 		if (regionsSortedByLanguageIDByCountryID == null)
 			regionsSortedByLanguageIDByCountryID = new HashMap<String, Map<String,List<Region>>>();
@@ -334,14 +334,14 @@ public abstract class Geography
 		if (regionsSorted == null) {
 			regionsSorted = new ArrayList<Region>(getRegions(countryID, false));
 			Collections.sort(regionsSorted, getRegionComparator(locale));
-
+			regionsSorted = Collections.unmodifiableList(regionsSorted);
 			regionsSortedByLanguageID.put(languageID, regionsSorted);
 		}
 
 		return regionsSorted;
 	}
 
-	public Location getLocation(LocationID locationID, boolean throwExceptionIfNotFound)
+	public synchronized Location getLocation(LocationID locationID, boolean throwExceptionIfNotFound)
 	{
 		needLocations(locationID.countryID);
 
@@ -359,7 +359,7 @@ public abstract class Geography
 	 * @return Returns an empty collection if <tt>throwExceptionIfNotFound == false</tt> and
 	 *		no <tt>Country</tt> exists for the given <tt>countryID</tt>.
 	 */
-	public Collection<Location> getLocations(CityID cityID, boolean throwExceptionIfNotFound)
+	public synchronized Collection<Location> getLocations(CityID cityID, boolean throwExceptionIfNotFound)
 	{
 		City city = getCity(cityID, throwExceptionIfNotFound);
 		if (city == null)
@@ -386,7 +386,7 @@ public abstract class Geography
 		if (locationsSorted == null) {
 			locationsSorted = new ArrayList<Location>(getLocations(cityID, false));
 			Collections.sort(locationsSorted, getLocationComparator(locale));
-
+			locationsSorted = Collections.unmodifiableList(locationsSorted);
 			locationsSortedByLanguageID.put(languageID, locationsSorted);
 		}
 
@@ -399,7 +399,7 @@ public abstract class Geography
 	 * @return Returns an empty collection if <tt>throwExceptionIfNotFound == false</tt> and
 	 *		no <tt>Country</tt> exists for the given <tt>countryID</tt>.
 	 */
-	public Collection<City> getCities(RegionID regionID, boolean throwExceptionIfNotFound)
+	public synchronized Collection<City> getCities(RegionID regionID, boolean throwExceptionIfNotFound)
 	{
 		needCities(regionID.countryID);
 
@@ -474,7 +474,7 @@ public abstract class Geography
 		};
 	}
 
-	public List<City> getCitiesSorted(final RegionID regionID, Locale locale)
+	public synchronized List<City> getCitiesSorted(final RegionID regionID, Locale locale)
 	{
 		if (citiesSortedByLanguageIDByRegionID == null)
 			citiesSortedByLanguageIDByRegionID = new HashMap<RegionID, Map<String, List<City>>>();
@@ -492,7 +492,7 @@ public abstract class Geography
 		if (citiesSorted == null) {
 			citiesSorted = new ArrayList<City>(getCities(regionID, false));
 			Collections.sort(citiesSorted, getCityComparator(locale));
-
+			citiesSorted = Collections.unmodifiableList(citiesSorted);
 			citiesSortedByLanguageID.put(languageID, citiesSorted);
 		}
 
@@ -507,8 +507,8 @@ public abstract class Geography
 	 * }
 	 */
 	protected transient Map<String, FulltextMap<String, List<Country>>> countriesByCountryNameByLanguageID = null;
-	
-	protected FulltextMap<String, List<Country>> getCountriesByCountryNameMap(String languageID)
+
+	protected synchronized FulltextMap<String, List<Country>> getCountriesByCountryNameMap(String languageID)
 	{
 		logger.debug("getCountriesByCountryNameMap(languageID=\""+languageID+"\") entered.");
 
@@ -547,7 +547,7 @@ public abstract class Geography
 	 */
 	protected transient Map<CityID, Map<String, FulltextMap<String, List<Location>>>> locationsByLocationNameByLanguageIDByCityID = null;
 
-	protected FulltextMap<String, List<Location>> getLocationsByLocationNameMap(CityID cityID, String languageID)
+	protected synchronized FulltextMap<String, List<Location>> getLocationsByLocationNameMap(CityID cityID, String languageID)
 	{
 		logger.debug("getLocationsByLocationNameMap(cityID=\""+cityID+"\", languageID=\""+languageID+"\") entered.");
 
@@ -598,7 +598,7 @@ public abstract class Geography
 	 */
 	protected transient Map<CountryID, Map<String, FulltextMap<String, List<Region>>>> regionsByRegionNameByLanguageIDByCountryID = null;
 
-	protected FulltextMap<String, List<Region>> getRegionsByRegionNameMap(CountryID countryID, String languageID)
+	protected synchronized FulltextMap<String, List<Region>> getRegionsByRegionNameMap(CountryID countryID, String languageID)
 	{
 		logger.debug("getRegionsByRegionNameMap(countryID=\""+countryID+"\", languageID=\""+languageID+"\") entered.");
 
@@ -646,7 +646,7 @@ public abstract class Geography
 	 */
 	protected Map<RegionID, FulltextMap<String, List<District>>> districtsByZipByRegionID = null;
 
-	protected FulltextMap<String, List<District>> getDistrictsByZipMap(RegionID regionID)
+	protected synchronized FulltextMap<String, List<District>> getDistrictsByZipMap(RegionID regionID)
 	{
 		logger.debug("getDistrictsByZipMap(regionID=\""+regionID+"\") entered.");
 
@@ -697,7 +697,7 @@ public abstract class Geography
 	 */
 	protected Map<RegionID, Map<String, FulltextMap<String, List<City>>>> citiesByCityNameByLanguageIDByRegionID = null;
 
-	protected FulltextMap<String, List<City>> getCitiesByCityNameMap(RegionID regionID, String languageID)
+	protected synchronized FulltextMap<String, List<City>> getCitiesByCityNameMap(RegionID regionID, String languageID)
 	{
 		logger.debug("getCitiesByCityNameMap(regionID=\""+regionID+"\", languageID=\""+languageID+"\") entered.");
 
@@ -736,7 +736,7 @@ public abstract class Geography
 		return citiesByCityName;
 	}
 
-	public List<Country> findCountriesByCountryNameSorted(String countryNamePart, Locale locale, int findMode)
+	public synchronized List<Country> findCountriesByCountryNameSorted(String countryNamePart, Locale locale, int findMode)
 	{
 		if ("".equals(countryNamePart))
 			return getCountriesSorted(locale);
@@ -746,7 +746,7 @@ public abstract class Geography
 		return countriesSorted;
 	}
 
-	public Collection<Country> findCountriesByCountryName(String countryNamePart, Locale locale, int findMode)
+	public synchronized Collection<Country> findCountriesByCountryName(String countryNamePart, Locale locale, int findMode)
 	{
 		return findCountriesByCountryName(countryNamePart, locale.getLanguage(), findMode);
 	}
@@ -765,12 +765,12 @@ public abstract class Geography
 		return res;
 	}
 
-	public Collection<Region> findRegionsByRegionName(CountryID countryID, String regionNamePart, Locale locale, int findMode)
+	public synchronized Collection<Region> findRegionsByRegionName(CountryID countryID, String regionNamePart, Locale locale, int findMode)
 	{
 		return findRegionsByRegionName(countryID, regionNamePart, locale.getLanguage(), findMode);
 	}
 
-	protected Collection<Region> findRegionsByRegionName(CountryID countryID, String regionNamePart, String languageID, int findMode)
+	protected synchronized Collection<Region> findRegionsByRegionName(CountryID countryID, String regionNamePart, String languageID, int findMode)
 	{
 		if ("".equals(regionNamePart))
 			return getRegions(countryID, false);
@@ -783,7 +783,7 @@ public abstract class Geography
 		return res;
 	}
 
-	public List<Region> findRegionsByRegionNameSorted(CountryID countryID, String regionNamePart, Locale locale, int findMode)
+	public synchronized List<Region> findRegionsByRegionNameSorted(CountryID countryID, String regionNamePart, Locale locale, int findMode)
 	{
 		if ("".equals(regionNamePart))
 			return getRegionsSorted(countryID, locale);
@@ -793,7 +793,7 @@ public abstract class Geography
 		return regionsSorted;
 	}
 
-	public Collection<City> findCitiesByZip(RegionID regionID, String zipPart, int findMode)
+	public synchronized Collection<City> findCitiesByZip(RegionID regionID, String zipPart, int findMode)
 	{
 		if ("".equals(zipPart))
 			return getCities(regionID, false);
@@ -812,7 +812,7 @@ public abstract class Geography
 		return cities.values();
 	}
 
-	public List<City> findCitiesByZipSorted(RegionID regionID, String zipPart, Locale locale, int findMode)
+	public synchronized List<City> findCitiesByZipSorted(RegionID regionID, String zipPart, Locale locale, int findMode)
 	{
 		if ("".equals(zipPart))
 			return getCitiesSorted(regionID, locale);
@@ -822,12 +822,12 @@ public abstract class Geography
 		return citiesSorted;
 	}
 
-	public Collection<City> findCitiesByCityName(RegionID regionID, String cityNamePart, Locale locale, int findMode)
+	public synchronized Collection<City> findCitiesByCityName(RegionID regionID, String cityNamePart, Locale locale, int findMode)
 	{
 		return findCitiesByCityName(regionID, cityNamePart, locale.getLanguage(), findMode);
 	}
 
-	protected Collection<City> findCitiesByCityName(RegionID regionID, String cityNamePart, String languageID, int findMode)
+	protected synchronized Collection<City> findCitiesByCityName(RegionID regionID, String cityNamePart, String languageID, int findMode)
 	{
 		if ("".equals(cityNamePart))
 			return getCities(regionID, false);
@@ -841,7 +841,7 @@ public abstract class Geography
 		return res;
 	}
 
-	public List<City> findCitiesByCityNameSorted(RegionID regionID, String cityNamePart, Locale locale, int findMode)
+	public synchronized List<City> findCitiesByCityNameSorted(RegionID regionID, String cityNamePart, Locale locale, int findMode)
 	{
 		if ("".equals(cityNamePart))
 			return getCitiesSorted(regionID, locale);
@@ -852,12 +852,12 @@ public abstract class Geography
 	}
 
 
-	public Collection<Location> findLocationsByLocationName(CityID cityID, String locationNamePart, Locale locale, int findMode)
+	public synchronized Collection<Location> findLocationsByLocationName(CityID cityID, String locationNamePart, Locale locale, int findMode)
 	{
 		return findLocationsByLocationName(cityID, locationNamePart, locale.getLanguage(), findMode);
 	}
 
-	protected Collection<Location> findLocationsByLocationName(CityID cityID, String locationNamePart, String languageID, int findMode)
+	protected synchronized Collection<Location> findLocationsByLocationName(CityID cityID, String locationNamePart, String languageID, int findMode)
 	{
 		if ("".equals(locationNamePart))
 			return getLocations(cityID, false);
@@ -870,7 +870,7 @@ public abstract class Geography
 		return res;
 	}
 
-	public List<Location> findLocationsByLocationNameSorted(CityID cityID, String locationNamePart, Locale locale, int findMode)
+	public synchronized List<Location> findLocationsByLocationNameSorted(CityID cityID, String locationNamePart, Locale locale, int findMode)
 	{
 		if ("".equals(locationNamePart))
 			return getLocationsSorted(cityID, locale);
@@ -1095,7 +1095,7 @@ public abstract class Geography
 
 		return ObjectIDUtil.longObjectIDFieldToString(IDGenerator.nextID(Location.class.getName() + "#" + countryID));
 	}
-	
+
 	public static String nextDistrictID(String districtID, String organisationID)
 	{
 		if (!IDGenerator.getOrganisationID().equals(organisationID))
@@ -1103,5 +1103,5 @@ public abstract class Geography
 
 		return ObjectIDUtil.longObjectIDFieldToString(IDGenerator.nextID(District.class.getName() + "#" + districtID));
 	}
-	
+
 }

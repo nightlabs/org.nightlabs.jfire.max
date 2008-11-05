@@ -14,6 +14,7 @@ import org.nightlabs.jfire.organisation.Organisation;
 /**
  * Contains constants for nodes and transitions.
  * <p>
+ * This class is never instantiated.
  * </p>
  * 
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
@@ -28,17 +29,64 @@ public class JbpmConstants
 	// As soon as issue 386 is resolved, we should remove here what's really needed in order to provide maximum flexibility when
 	// designing process definitions.
 
+	/**
+	 * This constant represents a node that used for assigning <code>NEW</code> state. 
+	 */
 	public static final String NODE_NAME_NEW = Organisation.DEV_ORGANISATION_ID + ":new";
+	
+	/**
+	 * This constant represents a node that used for assigning <code>OPEN</code> state. 
+	 */
 	public static final String NODE_NAME_OPEN = Organisation.DEV_ORGANISATION_ID + ":open";
+	
+	/**
+	 * This constant represents a node that used for assigning <code>ACKNOWLEDGED</code> state. 
+	 */
 	public static final String NODE_NAME_ACKNOWLEDGED = Organisation.DEV_ORGANISATION_ID + ":acknowledged";
+	
+	/**
+	 * This constant represents a node that used for assigning <code>ACKNOWLEDGED IMPLICITELY</code> state. 
+	 */
 	public static final String NODE_NAME_ACKNOWLEDGED_IMPLICITELY = Organisation.DEV_ORGANISATION_ID + ":acknowledgedImplicitely";
+	
+	/**
+	 * This constant represents a node that used for assigning <code>CONFIRMED</code> state. 
+	 */
 	public static final String NODE_NAME_CONFIRMED = Organisation.DEV_ORGANISATION_ID + ":confirmed";
+	
+	/**
+	 * This constant represents a node that used for assigning <code>COMFIRMED IMPLICITELY</code> state. 
+	 */
 	public static final String NODE_NAME_CONFIRMED_IMPLICITELY = Organisation.DEV_ORGANISATION_ID + ":confirmedImplicitely";
+	
+	/**
+	 * This constant represents a node that used for assigning <code>ASSIGNED</code> state. 
+	 */
 	public static final String NODE_NAME_ASSIGNED = Organisation.DEV_ORGANISATION_ID + ":assigned";
+	
+	/**
+	 * This constant represents a node that used for assigning <code>RESOLVED</code> state. 
+	 */
 	public static final String NODE_NAME_RESOLVED = Organisation.DEV_ORGANISATION_ID + ":resolved";
+	
+	/**
+	 * This constant represents a node that used for assigning <code>RESOLVED IMPLICITELY</code> state. 
+	 */
 	public static final String NODE_NAME_RESOLVED_IMPLICITELY = Organisation.DEV_ORGANISATION_ID + ":resolvedImplicitely";
+	
+	/**
+	 * This constant represents a node that used for assigning <code>CLOSED</code> state. 
+	 */
 	public static final String NODE_NAME_CLOSED = Organisation.DEV_ORGANISATION_ID + ":closed";
+	
+	/**
+	 * This constant represents a node that used for assigning <code>REOPENED</code> state. 
+	 */
 	public static final String NODE_NAME_REOPENED = Organisation.DEV_ORGANISATION_ID + ":reopened";
+	
+	/**
+	 * This constant represents a node that used for assigning <code>REJECTED</code> state. 
+	 */
 	public static final String NODE_NAME_REJECTED = Organisation.DEV_ORGANISATION_ID + ":rejected";
 
 //	public static final String TRANSITION_NAME_NEW = "new";

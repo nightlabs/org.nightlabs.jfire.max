@@ -3,8 +3,6 @@ package org.nightlabs.jfire.issue;
 import java.io.Serializable;
 import java.util.Date;
 
-import javax.jdo.listener.AttachCallback;
-
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.util.Util;
 
@@ -31,7 +29,7 @@ import org.nightlabs.util.Util;
  *
  */
 public class IssueComment
-implements Serializable, AttachCallback
+implements Serializable
 {
 	private static final long serialVersionUID = 1L;
 
@@ -114,16 +112,6 @@ implements Serializable, AttachCallback
 
 	public Issue getIssue() {
 		return issue;
-	}
-
-	@Override
-	public void jdoPostAttach(Object arg0) {
-
-	}
-
-	@Override
-	public void jdoPreAttach() {
-
 	}
 
 	@Override

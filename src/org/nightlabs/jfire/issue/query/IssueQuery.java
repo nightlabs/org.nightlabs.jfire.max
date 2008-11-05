@@ -9,6 +9,7 @@ import javax.jdo.Query;
 import org.apache.log4j.Logger;
 import org.nightlabs.jdo.query.AbstractJDOQuery;
 import org.nightlabs.jfire.issue.Issue;
+import org.nightlabs.jfire.issue.IssueComment;
 import org.nightlabs.jfire.issue.id.IssueLinkTypeID;
 import org.nightlabs.jfire.issue.id.IssuePriorityID;
 import org.nightlabs.jfire.issue.id.IssueResolutionID;
@@ -18,7 +19,10 @@ import org.nightlabs.jfire.issue.project.id.ProjectID;
 import org.nightlabs.jfire.security.id.UserID;
 
 /**
- *
+ * An extended class of {@link AbstractJDOQuery} which intended to allow users setting parameters for querying {@link Issue}.
+ * <p>
+ * 
+ * </p>
  * @author Chairat Kongarayawetchakun <!-- chairat at nightlabs dot de -->
  * @author Marius Heinzmann - marius[at]nightlabs[dot]com
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
@@ -65,6 +69,10 @@ public class IssueQuery
 	private Date issueWorkTimeRangeTo;
 	private Set<ProjectID> projectIDs;
 
+	/**
+	 *  A static class contained all parameters that can be set to the query.
+	 *  It's intended to use internally!!
+	 */
 	public static final class FieldName
 	{
 		public static final String reporterID = "reporterID";
@@ -87,6 +95,9 @@ public class IssueQuery
 		public static final String projectIDs = "projectIDs";
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	protected void prepareQuery(Query q) {
 		StringBuilder filter = new StringBuilder("true");
@@ -226,6 +237,9 @@ public class IssueQuery
 		q.setFilter(filter.toString());
 	}
 
+	/**
+	 * @return a {@link String} of the {@link IssueSubject}.
+	 */
 	public String getIssueSubject()
 	{
 		return issueSubject;
@@ -297,6 +311,9 @@ public class IssueQuery
 		notifyListeners(FieldName.issueSubjectNComment, oldIssueSubjectNComment, issueSubjectNComment);
 	}
 
+	/**
+	 * @return a {@link String} of the {@link IssueSubject} combined with {@link IssueComment}.
+	 */
 	public String getIssueSubjectNComment() {
 		return issueSubjectNComment;
 	}
@@ -324,6 +341,9 @@ public class IssueQuery
 	}
 	
 
+	/**
+	 * @return a {@link String} of the {@link IssueComment}.
+	 */
 	public String getIssueComment() {
 		return issueComment;
 	}
@@ -364,7 +384,9 @@ public class IssueQuery
 		notifyListeners(FieldName.issueSubjectNCommentRegex, oldIssueCommentRegex, issueCommentRegex);
 	}
 	
-	
+	/**
+	 * @return an {@link IssueTypeID}.
+	 */
 	public IssueTypeID getIssueTypeID() {
 		return issueTypeID;
 	}
@@ -376,6 +398,9 @@ public class IssueQuery
 		notifyListeners(FieldName.issueTypeID, oldIssueTypeID, issueTypeID);
 	}
 
+	/**
+	 * @return an {@link IssueSeverityTypeID}.
+	 */
 	public IssueSeverityTypeID getIssueSeverityTypeID() {
 		return issueSeverityTypeID;
 	}
@@ -387,6 +412,9 @@ public class IssueQuery
 		notifyListeners(FieldName.issueSeverityTypeID, oldIssueSeverityTypeID, issueSeverityTypeID);
 	}
 
+	/**
+	 * @return an {@link IssuePriorityID}.
+	 */
 	public IssuePriorityID getIssuePriorityID() {
 		return issuePriorityID;
 	}
@@ -398,6 +426,9 @@ public class IssueQuery
 		notifyListeners(FieldName.issuePriorityID, oldIssuePriorityID, issuePriorityID);
 	}
 
+	/**
+	 * @return an {@link IssueResolutionID}.
+	 */
 	public IssueResolutionID getIssueResolutionID() {
 		return issueResolutionID;
 	}
@@ -409,6 +440,9 @@ public class IssueQuery
 		notifyListeners(FieldName.issueResolutionID, oldIssueResolutionID, issueResolutionID);
 	}
 
+	/**
+	 * @return an {@link UserID} of the {@link Issue}'s reporter.
+	 */
 	public UserID getReporterID() {
 		return reporterID;
 	}
@@ -420,6 +454,9 @@ public class IssueQuery
 		notifyListeners(FieldName.reporterID, oldReporterID, reporterID);
 	}
 
+	/**
+	 * @return an {@link UserID} of the {@link Issue}'s assignee.
+	 */
 	public UserID getAssigneeID() {
 		return assigneeID;
 	}
@@ -431,6 +468,9 @@ public class IssueQuery
 		notifyListeners(FieldName.assigneeID, oldAssigneeID, assigneeID);
 	}
 
+	/**
+	 * @return an {@link Date} of the {@link Issue}'s working time range starting time.
+	 */
 	public Date getIssueWorkTimeRangeFrom() {
 		return issueWorkTimeRangeFrom;
 	}
@@ -442,6 +482,9 @@ public class IssueQuery
 		notifyListeners(FieldName.issueWorkTimeRangeFrom, oldIssueWorkTimeRangeFrom, issueWorkTimeRangeFrom);
 	}
 	
+	/**
+	 * @return an {@link Date} of the {@link Issue}'s working time range ending time.
+	 */
 	public Date getIssueWorkTimeRangeTo() {
 		return issueWorkTimeRangeTo;
 	}
@@ -453,6 +496,9 @@ public class IssueQuery
 		notifyListeners(FieldName.issueWorkTimeRangeTo, oldIssueWorkTimeRangeTo, issueWorkTimeRangeTo);
 	}
 
+	/**
+	 * @return an {@link IssueLinkTypeID}.
+	 */
 	public IssueLinkTypeID getIssueLinkTypeID() {
 		return issueLinkTypeID;
 	}
@@ -464,6 +510,9 @@ public class IssueQuery
 		notifyListeners(FieldName.issueLinkTypeID, oldIssueLinkTypeID, issueLinkTypeID);
 	}
 
+	/**
+	 * @return a {@link Date} of {@link Issue}'s created time.
+	 */
 	public Date getCreateTimestamp() {
 		return createTimestamp;
 	}
@@ -474,6 +523,10 @@ public class IssueQuery
 		this.createTimestamp = createTimestamp;
 		notifyListeners(FieldName.createTimestamp, oldCreateTimestamp, createTimestamp);
 	}
+	
+	/**
+	 * @return a {@link Date} of {@link Issue}'s updated time.
+	 */
 	public Date getUpdateTimestamp() {
 		return updateTimestamp;
 	}
@@ -485,6 +538,9 @@ public class IssueQuery
 		notifyListeners(FieldName.updateTimestamp, oldUpdateTimestamp, updateTimestamp);
 	}
 	
+	/**
+	 * @return a {@link Set} of {@link ProjectID}.
+	 */
 	public Set<ProjectID> getProjectIDs() {
 		return projectIDs;
 	}

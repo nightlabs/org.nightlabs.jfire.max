@@ -54,6 +54,10 @@ implements Serializable
 	public static final String QUERY_ISSUE_WORK_TIME_RANGE_BY_USER_AND_ISSUE_ID = "getIssueWorkTimeRangeByUserAndIssueID";
 	
 	/**
+	 * This is the organisationID to which the issue work time range belongs. Within one organisation,
+	 * all the issue work time ranges have their organisation's ID stored here, thus it's the same
+	 * value for all of them.
+	 * 
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */

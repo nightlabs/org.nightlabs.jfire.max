@@ -45,6 +45,10 @@ implements Serializable{
 	public static final String ISSUE_SEVERITY_TYPE_TWEAK = "Tweak";
 
 	/**
+	 * This is the organisationID to which the issue severity type belongs. Within one organisation,
+	 * all the issue severity types have their organisation's ID stored here, thus it's the same
+	 * value for all of them.
+	 * 
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */

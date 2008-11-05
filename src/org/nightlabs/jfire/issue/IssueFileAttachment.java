@@ -50,6 +50,10 @@ implements Serializable{
 	public static final String FETCH_GROUP_DATA = "IssueFileAttachment.data";
 
 	/**
+	 * This is the organisationID to which the issue file attachment belongs. Within one organisation,
+	 * all the issue file attachments have their organisation's ID stored here, thus it's the same
+	 * value for all of them.
+	 * 
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */

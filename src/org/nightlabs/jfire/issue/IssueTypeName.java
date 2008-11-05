@@ -33,6 +33,10 @@ extends I18nText
 	private static final long serialVersionUID = 1L;
 
 	/**
+	 * This is the organisationID to which the issue type's name belongs. Within one organisation,
+	 * all the issue type's names have their organisation's ID stored here, thus it's the same
+	 * value for all of them.
+	 * 
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */

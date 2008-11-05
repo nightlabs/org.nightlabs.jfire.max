@@ -30,7 +30,12 @@ extends I18nText{
 	 * The serial version of this class.
 	 */
 	private static final long serialVersionUID = 1L;
+	
 	/**
+	 * This is the organisationID to which the issue severity type's name belongs. Within one organisation,
+	 * all the issue severity type's names have their organisation's ID stored here, thus it's the same
+	 * value for all of them.
+	 * 
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */

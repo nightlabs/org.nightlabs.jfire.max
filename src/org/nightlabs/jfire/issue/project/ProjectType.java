@@ -41,6 +41,10 @@ implements Serializable , Comparable<ProjectType>
 	public static final String FETCH_GROUP_NAME = "ProjectType.name";
 
 	/**
+	 * This is the organisationID to which the project type belongs. Within one organisation,
+	 * all the project types have their organisation's ID stored here, thus it's the same
+	 * value for all of them.
+	 * 
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */

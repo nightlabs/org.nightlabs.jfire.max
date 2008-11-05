@@ -29,7 +29,12 @@ implements Serializable{
 	public static final String FETCH_GROUP_NAME = "IssuePriority.name";
 
 	private static final long serialVersionUID = 1L;
+	
 	/**
+	 * This is the organisationID to which the issue priority belongs. Within one organisation,
+	 * all the issue priorities have their organisation's ID stored here, thus it's the same
+	 * value for all of them.
+	 * 
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */

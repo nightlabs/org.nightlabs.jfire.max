@@ -34,6 +34,10 @@ public class ProjectPhaseDescription
 	private static final long serialVersionUID = 1L;
 
 	/**
+	 * This is the organisationID to which the project phase description belongs. Within one organisation,
+	 * all the project phase descriptions have their organisation's ID stored here, thus it's the same
+	 * value for all of them.
+	 * 
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */

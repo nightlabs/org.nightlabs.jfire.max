@@ -41,6 +41,10 @@ implements Serializable
 
 	public static final String FETCH_GROUP_USER = "IssueComment.user";
 	/**
+	 * This is the organisationID to which the issue comment belongs. Within one organisation,
+	 * all the issue comments have their organisation's ID stored here, thus it's the same
+	 * value for all of them.
+	 * 
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */

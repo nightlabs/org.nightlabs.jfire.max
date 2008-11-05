@@ -71,6 +71,10 @@ implements Serializable, Comparable<IssueType>
 	public static final String QUERY_ALL_ISSUETYPE_IDS = "getAllIssueTypeIDs";
 
 	/**
+	 * This is the organisationID to which the issue type belongs. Within one organisation,
+	 * all the issue types have their organisation's ID stored here, thus it's the same
+	 * value for all of them.
+	 * 
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */

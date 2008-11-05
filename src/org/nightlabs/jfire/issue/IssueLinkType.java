@@ -79,6 +79,10 @@ implements Serializable
 	}
 
 	/**
+	 * This is the organisationID to which the issue link type belongs. Within one organisation,
+	 * all the issue link types have their organisation's ID stored here, thus it's the same
+	 * value for all of them.
+	 * 
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */

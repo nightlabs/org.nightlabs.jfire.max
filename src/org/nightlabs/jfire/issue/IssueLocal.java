@@ -62,6 +62,10 @@ implements Serializable, StatableLocal
 	public static final String FETCH_GROUP_THIS_ISSUE_LOCAL = "IssueLocal.this";
 	
 	/**
+	 * This is the organisationID to which the issue local belongs. Within one organisation,
+	 * all the issue locals have their organisation's ID stored here, thus it's the same
+	 * value for all of them.
+	 * 
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */

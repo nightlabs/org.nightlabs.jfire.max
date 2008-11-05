@@ -25,8 +25,14 @@ import org.nightlabs.jfire.issue.Issue;
  *
  */
 @SuppressWarnings("serial")
-public class IssueHistoryText extends I18nText{
+public class IssueHistoryText 
+extends I18nText
+{
 	/**
+	 * This is the organisationID to which the issue history's text belongs. Within one organisation,
+	 * all the issue history's texts have their organisation's ID stored here, thus it's the same
+	 * value for all of them.
+	 * 
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */

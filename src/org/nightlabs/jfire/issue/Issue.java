@@ -137,6 +137,10 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	public static final String FETCH_GROUP_PROPERTY_SET = "Issue.propertySet";
 
 	/**
+	 * This is the organisationID to which the issue belongs. Within one organisation,
+	 * all the issues have their organisation's ID stored here, thus it's the same
+	 * value for all of them.
+	 * 
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
@@ -165,6 +169,8 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	private Set<IssueLink> issueLinks;
 	
 	/**
+	 * 
+	 * 
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private Project project;
@@ -727,6 +733,23 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 		return organisationID + '/' + Long.toString(issueID);
 	}
 
+	/**
+	 * Get the <code>IssueLocal</code> holding local information for this <code>Issue</code>. According to our
+	 * <a href="https://www.jfire.org/modules/phpwiki/index.php/Design%20Pattern%20XyzLocal">Design Pattern XyzLocal</a>,
+	 * such local objects are normally not transferred between organisations.
+	 * <p>
+	 * <b>Important:</b> The <code>IssueLocal</code> is an exception to our rule: Because an organisation needs to know
+	 * which access rights it has as a user to another organisation, the <code>IssueLocal</code> of an organisation-user
+	 * is copied across organisations - to be more precise: it is copied to exactly that one client-organisation so that
+	 * it knows its own data managed by the business partner.
+	 * </p>
+	 * <p>
+	 * Because there is only exactly one instance of <code>IssueLocal</code> for every <code>Issue</code> (despite of the
+	 * extended primary key), this method returns exactly this one <code>IssueLocal</code> - even when in a foreign datastore.
+	 * </p>
+	 *
+	 * @return the <code>IssueLocal</code> corresponding to this <code>Issue</code> or <code>null</code>.
+	 */
 	public IssueLocal getIssueLocal() {
 		return issueLocal;
 	}

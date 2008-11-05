@@ -43,6 +43,10 @@ implements Serializable
 	public static final String FETCH_GROUP_DESCRIPTION = "ProjectPhase.description";
 
 	/**
+	 * This is the organisationID to which the project phase belongs. Within one organisation,
+	 * all the project phases have their organisation's ID stored here, thus it's the same
+	 * value for all of them.
+	 * 
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */

@@ -34,6 +34,10 @@ public class ProjectTypeDescription
 	private static final long serialVersionUID = 1L;
 
 	/**
+	 * This is the organisationID to which the project type description belongs. Within one organisation,
+	 * all the project type descriptions have their organisation's ID stored here, thus it's the same
+	 * value for all of them.
+	 * 
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */

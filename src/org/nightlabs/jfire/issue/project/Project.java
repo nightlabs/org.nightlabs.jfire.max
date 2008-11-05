@@ -27,6 +27,7 @@ import org.nightlabs.util.Util;
 /**
  * The {@link IssueHistory} class represents a history which recorded the change of each {@link Issue}. 
  * <p>
+ * The {@link Project} class can contain many sub-projects. 
  * </p>
  * 
  * @author Chairat Kongarayawetchakun <!-- chairat at nightlabs dot de -->
@@ -96,6 +97,10 @@ implements Serializable, Comparable<Project>
 	public static final ProjectID PROJECT_ID_DEFAULT = ProjectID.create(Organisation.DEV_ORGANISATION_ID, -1);
 	
 	/**
+	 * This is the organisationID to which the project belongs. Within one organisation,
+	 * all the projects have their organisation's ID stored here, thus it's the same
+	 * value for all of them.
+	 * 
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */

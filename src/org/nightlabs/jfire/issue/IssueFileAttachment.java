@@ -110,6 +110,15 @@ implements Serializable{
 		return issue;
 	}
 
+	/**
+	 * Loads an input stream into byte array.
+	 * 
+	 * @param in
+	 * @param length
+	 * @param timeStamp
+	 * @param name
+	 * @throws IOException
+	 */
 	public void loadStream(InputStream in, long length, Date timeStamp, String name)
 	throws IOException
 	{

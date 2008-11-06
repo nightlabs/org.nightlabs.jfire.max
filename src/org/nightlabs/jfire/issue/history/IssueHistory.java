@@ -122,35 +122,57 @@ implements Serializable
 	}
 
 	/**
-	 * @return Returns the organisationID.
+	 * Gets the organisation id.
+	 * @return the organisation id.
 	 */
 	public String getOrganisationID() {
 		return organisationID;
 	}
 
 	/**
-	 * @return Returns the issueID.
+	 * Gets the issue id.
+	 * @return the issue id.
 	 */
 	public long getIssueID() {
 		return issueID;
 	}
 
+	/**
+	 * Gets the issue history id.
+	 * @return
+	 */
 	public long getIssueHistoryID() {
 		return issueHistoryID;
 	}
 
+	/**
+	 * Gets the {@link Issue}.
+	 * @return the {@link Issue}.
+	 */
 	public Issue getIssue(){
 		return issue;
 	}
 
+	/**
+	 * Gets the created time's {@link Date}.
+	 * @return the created time's {@link Date}.
+	 */
 	public Date getCreateTimestamp() {
 		return createTimestamp;
 	}
 	
+	/**
+	 * Gets the string of change.
+	 * @return the string of change.
+	 */
 	public String getChange() {
 		return change;
 	}
 	
+	/**
+	 * Gets the {@link User}.
+	 * @return the {@link User}.
+	 */
 	public User getUser() {
 		return user;
 	}
@@ -321,6 +343,9 @@ implements Serializable
 	}	
 	
 	@Override
+	/**
+	 * {@inheritDoc}
+	 */
 	public boolean equals(Object obj)
 	{
 		if (obj == this) return true;
@@ -333,6 +358,9 @@ implements Serializable
 	}
 
 	@Override
+	/**
+	 * {@inheritDoc}
+	 */
 	public int hashCode()
 	{
 		return 

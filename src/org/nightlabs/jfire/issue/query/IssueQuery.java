@@ -238,7 +238,7 @@ public class IssueQuery
 	}
 
 	/**
-	 * @return a {@link String} of the {@link IssueSubject}.
+	 * @return a {@link String} of the {@link IssueSubject}
 	 */
 	public String getIssueSubject()
 	{
@@ -248,7 +248,7 @@ public class IssueQuery
 	/**
 	 * Helper that removes the '.*' from the beginning and end of the given string.
 	 * @param pattern the regexp pattern that should be cleansed of the '.*'
-	 * @return the pattern without '.*'.
+	 * @return the pattern without '.*'
 	 */
 	private String removeRegexpSearch(String pattern)
 	{
@@ -292,7 +292,7 @@ public class IssueQuery
 	 * Sets whether the value set with {@link #setIssueSubject(String)} represents a 
 	 * regular expression.
 	 * 
-	 * @param issueSubjectRegex The issueSubjectRegex to search. 
+	 * @param issueSubjectRegex The issueSubjectRegex to search.
 	 */
 	public void setIssueSubjectRegex(boolean issueSubjectRegex) {
 		final boolean oldIssueSubjectRegex = this.issueSubjectRegex;
@@ -306,7 +306,7 @@ public class IssueQuery
 	 * (set {@link #setIssueSubjectNCommentRegex(boolean)} to <code>true</code> then) or a string
 	 * that should be contained in either the subject or one of the comments of the Issues to find.
 	 *  
-	 * @param issueSubjectNComment The issueComment to set.
+	 * @param issueSubjectNComment The issueComment to set
 	 */
 	public void setIssueSubjectNComment(String issueSubjectNComment)
 	{
@@ -316,7 +316,7 @@ public class IssueQuery
 	}
 
 	/**
-	 * @return a {@link String} of the {@link IssueSubject} combined with {@link IssueComment}.
+	 * @return a {@link String} of the {@link IssueSubject} combined with {@link IssueComment}
 	 */
 	public String getIssueSubjectNComment() {
 		return issueSubjectNComment;
@@ -336,7 +336,7 @@ public class IssueQuery
 	 * Sets whether the value set with {@link #setIssueSubjectNComment(String)} represents a 
 	 * regular expression.
 	 * 
-	 * @param issueSubjectNCommentRegex The issueSubjectNCommentRegex to search. 
+	 * @param issueSubjectNCommentRegex The issueSubjectNCommentRegex to search.
 	 */
 	public void setIssueSubjectNCommentRegex(boolean issueSubjectNCommentRegex) {
 		final boolean oldIssueSubjectNCommentRegex = this.issueSubjectNCommentRegex;
@@ -346,7 +346,7 @@ public class IssueQuery
 	
 
 	/**
-	 * @return a {@link String} of the {@link IssueComment}.
+	 * @return a {@link String} of the {@link IssueComment}
 	 */
 	public String getIssueComment() {
 		return issueComment;
@@ -357,7 +357,7 @@ public class IssueQuery
 	 * (set {@link #setIssueCommentRegex(boolean)} to <code>true</code> then) or a string
 	 * that should be contained in one of the comments of the Issues to find.
 	 *  
-	 * @param issueComment The issueComment to set.
+	 * @param issueComment The issueComment to set
 	 */
 	public void setIssueComment(String issueComment)
 	{
@@ -380,7 +380,7 @@ public class IssueQuery
 	 * Sets whether the value set with {@link #setIssueComment(String)} represents a 
 	 * regular expression.
 	 * 
-	 * @param issueCommentRegex The issueCommentRegex to search. 
+	 * @param issueCommentRegex The issueCommentRegex to search
 	 */
 	public void setIssueCommentRegex(boolean issueCommentRegex) {
 		final boolean oldIssueCommentRegex = this.issueCommentRegex;
@@ -389,7 +389,7 @@ public class IssueQuery
 	}
 	
 	/**
-	 * @return an {@link IssueTypeID}.
+	 * @return an {@link IssueTypeID}
 	 */
 	public IssueTypeID getIssueTypeID() {
 		return issueTypeID;
@@ -407,7 +407,7 @@ public class IssueQuery
 	}
 
 	/**
-	 * @return an {@link IssueSeverityTypeID}.
+	 * @return an {@link IssueSeverityTypeID}
 	 */
 	public IssueSeverityTypeID getIssueSeverityTypeID() {
 		return issueSeverityTypeID;
@@ -425,7 +425,7 @@ public class IssueQuery
 	}
 
 	/**
-	 * @return an {@link IssuePriorityID}.
+	 * @return an {@link IssuePriorityID}
 	 */
 	public IssuePriorityID getIssuePriorityID() {
 		return issuePriorityID;
@@ -443,7 +443,7 @@ public class IssueQuery
 	}
 
 	/**
-	 * @return an {@link IssueResolutionID}.
+	 * @return an {@link IssueResolutionID}
 	 */
 	public IssueResolutionID getIssueResolutionID() {
 		return issueResolutionID;
@@ -461,7 +461,7 @@ public class IssueQuery
 	}
 
 	/**
-	 * @return an {@link UserID} of the {@link Issue}'s reporter.
+	 * @return an {@link UserID} of the {@link Issue}'s reporter
 	 */
 	public UserID getReporterID() {
 		return reporterID;
@@ -479,7 +479,7 @@ public class IssueQuery
 	}
 
 	/**
-	 * @return an {@link UserID} of the {@link Issue}'s assignee.
+	 * @return an {@link UserID} of the {@link Issue}'s assignee
 	 */
 	public UserID getAssigneeID() {
 		return assigneeID;
@@ -497,7 +497,7 @@ public class IssueQuery
 	}
 
 	/**
-	 * @return an {@link Date} of the {@link Issue}'s working time range starting time.
+	 * @return an {@link Date} of the {@link Issue}'s working time range starting time
 	 */
 	public Date getIssueWorkTimeRangeFrom() {
 		return issueWorkTimeRangeFrom;
@@ -515,7 +515,7 @@ public class IssueQuery
 	}
 	
 	/**
-	 * @return an {@link Date} of the {@link Issue}'s working time range ending time.
+	 * @return an {@link Date} of the {@link Issue}'s working time range ending time
 	 */
 	public Date getIssueWorkTimeRangeTo() {
 		return issueWorkTimeRangeTo;
@@ -533,7 +533,7 @@ public class IssueQuery
 	}
 
 	/**
-	 * @return an {@link IssueLinkTypeID}.
+	 * @return an {@link IssueLinkTypeID}
 	 */
 	public IssueLinkTypeID getIssueLinkTypeID() {
 		return issueLinkTypeID;
@@ -551,7 +551,7 @@ public class IssueQuery
 	}
 
 	/**
-	 * @return a {@link Date} of {@link Issue}'s created time.
+	 * @return a {@link Date} of {@link Issue}'s created time
 	 */
 	public Date getCreateTimestamp() {
 		return createTimestamp;
@@ -569,7 +569,7 @@ public class IssueQuery
 	}
 	
 	/**
-	 * @return a {@link Date} of {@link Issue}'s updated time.
+	 * @return a {@link Date} of {@link Issue}'s updated time
 	 */
 	public Date getUpdateTimestamp() {
 		return updateTimestamp;
@@ -587,7 +587,7 @@ public class IssueQuery
 	}
 	
 	/**
-	 * @return a {@link Set} of {@link ProjectID}.
+	 * @return a {@link Set} of {@link ProjectID}
 	 */
 	public Set<ProjectID> getProjectIDs() {
 		return projectIDs;

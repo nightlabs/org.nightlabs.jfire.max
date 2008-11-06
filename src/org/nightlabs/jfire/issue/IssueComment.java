@@ -84,6 +84,14 @@ implements Serializable
 	{
 	}
 
+	/**
+	 * Constructs a new IssueComment.
+	 * @param organisationID
+	 * @param commentID
+	 * @param issue
+	 * @param text
+	 * @param user
+	 */
 	public IssueComment(String organisationID, long commentID, Issue issue, String text, User user){
 		this.organisationID = organisationID;
 		this.commentID = commentID;
@@ -94,31 +102,56 @@ implements Serializable
 		createTimestamp = new Date();
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
 	public String getOrganisationID() {
 		return organisationID;
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
 	public long getCommentID() {
 		return commentID;
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
 	public String getText() {
 		return text;
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
 	public Date getCreateTimestamp() {
 		return createTimestamp;
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
 	public User getUser() {
 		return user;
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
 	public Issue getIssue() {
 		return issue;
 	}
 
 	@Override
+	
 	public boolean equals(Object obj)
 	{
 		if (obj == this) return true;

@@ -336,7 +336,7 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 
 	/**
 	 * Returns the scope of the Struct by which the propertySet is build from.
-	 * @return The scope of the Struct by which the propertySet is build from.
+	 * @return The scope of the Struct by which the propertySet is build from
 	 */
 	public String getStructScope() {
 		return structScope;
@@ -348,6 +348,11 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	@Deprecated
 	protected Issue() { }
 
+	/**
+	 * Constructs a new issue.
+	 * @param organisationID
+	 * @param issueID
+	 */
 	public Issue(String organisationID, long issueID)
 	{
 		Organisation.assertValidOrganisationID(organisationID);
@@ -373,6 +378,12 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 				structScope, structLocalScope);
 	}
 
+	/**
+	 * Constructs a new issue with {@link IssueType}.
+	 * @param organisationID
+	 * @param issueID
+	 * @param issueType
+	 */
 	public Issue(String organisationID, long issueID, IssueType issueType)
 	{
 		this(organisationID, issueID);
@@ -380,110 +391,119 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	}
 
 	/**
-	 * @return Returns the organisationID.
+	 * @return Returns the organisationID
 	 */
 	public String getOrganisationID() {
 		return organisationID;
 	}
 
 	/**
-	 * @return Returns the issueID.
+	 * Gets the issue id.
+	 * @return the issue id
 	 */
 	public long getIssueID() {
 		return issueID;
 	}
 
+	/**
+	 * Gets the string of issue id.
+	 * @return the string of issue id
+	 */
 	public String getIssueIDAsString()
 	{
 		return ObjectIDUtil.longObjectIDFieldToString(issueID);
 	}
 
 	/**
-	 * @return Returns the issueType.
+	 * Gets the {@link IssueType}.
+	 * @return the {@link IssueType}
 	 */
 	public IssueType getIssueType() {
 		return issueType;
 	}
 
 	/**
-	 * @param issueTypeID The issueTypeID to set.
+	 * Sets the {@link IssueType}.
+	 * @param issueType - the issue type for this issue
 	 */
 	public void setIssueType(IssueType issueType) {
 		this.issueType = issueType;
 	}
 
 	/**
-	 * @return Returns the create timestamp.
+	 * Gets the created time's {@link Date}.
+	 * @return the created timestamp
 	 */
 	public Date getCreateTimestamp() {
 		return createTimestamp;
 	}
 
 	/**
-	 * @return Returns the update timestamp.
+	 * Gets the updated time's {@link Date}.
+	 * @return the updated time's {@link Date}
 	 */
 	public Date getUpdateTimestamp() {
 		return updateTimestamp;
 	}
 
 	/**
-	 * @param timestamp The timestamp to set.
+	 * @param timestamp The timestamp to set
 	 */
 	public void setUpdateTimestamp(Date timestamp) {
 		this.updateTimestamp = timestamp;
 	}
 
 	/**
-	 * @return Returns the description.
+	 * @return Returns the description
 	 */
 	public IssueDescription getDescription() {
 		return description;
 	}
 
 	/**
-	 * @param description The description to set.
+	 * @param description The description to set
 	 */
 	public void setDescription(IssueDescription description) {
 		this.description = description;
 	}
 
 	/**
-	 * @return Returns the subject.
+	 * @return Returns the subject
 	 */
 	public IssueSubject getSubject() {
 		return subject;
 	}
 
 	/**
-	 * @param subject The subject to set.
+	 * @param subject The subject to set
 	 */
 	public void setSubject(IssueSubject subject) {
 		this.subject = subject;
 	}
 
 	/**
-	 * @return Returns the reporter.
+	 * @return Returns the reporter
 	 */
 	public User getReporter() {
 		return reporter;
 	}
 
 	/**
-	 * @param reporter The user to set.
+	 * @param reporter The user to set
 	 */
 	public void setReporter(User reporter) {
 		this.reporter = reporter;
 	}
 
 	/**
-	 * @return Returns the assignee.
+	 * @return Returns the assignee
 	 */
 	public User getAssignee() {
 		return assignee;
 	}
 
 	/**
-	 * @param assignee The user to set.
+	 * @param assignee The user to set
 	 */
 	public void setAssignee(User assignee) {
 		this.assignee = assignee;
@@ -584,8 +604,8 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 //	}
 
 	/**
-	 * @param issueLinkType the type of the new <code>IssueLink</code>. Must not be <code>null</code>.
-	 * @param linkedObject The linked object (a persistence-capable JDO object). 
+	 * @param issueLinkType the type of the new <code>IssueLink</code>. Must not be <code>null</code>
+	 * @param linkedObject The linked object (a persistence-capable JDO object).
 	 */
 	public IssueLink createIssueLink(IssueLinkType issueLinkType, Object linkedObject)
 	{
@@ -600,9 +620,9 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	}
 
 	/**
-	 * @param issueLinkType the type of the new <code>IssueLink</code>. Must not be <code>null</code>.
-	 * @param linkedObjectID  an object-id (implementing {@link ObjectID}) identifying a persistence-capable JDO object.
-	 * @param linkedObjectClass The linked object class(a persistence-capable JDO object). 
+	 * @param issueLinkType the type of the new <code>IssueLink</code>. Must not be <code>null</code>
+	 * @param linkedObjectID  an object-id (implementing {@link ObjectID}) identifying a persistence-capable JDO object
+	 * @param linkedObjectClass The linked object class(a persistence-capable JDO object)
 	 */
 	public IssueLink createIssueLink(IssueLinkType issueLinkType, ObjectID linkedObjectID, Class<?> linkedObjectClass)
 	{

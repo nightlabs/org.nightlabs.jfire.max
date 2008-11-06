@@ -37,6 +37,9 @@ public class IssueSeverityTypeDAO
 	
 	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	@Override
+	/**
+	 * {@inheritDoc}
+	 */
 	protected Collection<IssueSeverityType> retrieveJDOObjects(Set<IssueSeverityTypeID> objectIDs,
 			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 			throws Exception

@@ -50,6 +50,9 @@ public class IssueTypeDAO extends BaseJDOObjectDAO<IssueTypeID, IssueType>
 	
 	@SuppressWarnings("unchecked")
 	@Override
+	/**
+	 * {@inheritDoc}
+	 */
 	protected Collection<IssueType> retrieveJDOObjects(Set<IssueTypeID> objectIDs, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) throws Exception {
 		monitor.beginTask("Fetching "+objectIDs.size()+" issue types information", 1);
 		Collection<IssueType> issueTypes;

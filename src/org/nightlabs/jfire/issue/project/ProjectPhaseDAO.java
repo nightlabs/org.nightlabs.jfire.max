@@ -35,6 +35,9 @@ public class ProjectPhaseDAO extends BaseJDOObjectDAO<ProjectPhaseID, ProjectPha
 
 	@SuppressWarnings("unchecked")
 	@Override
+	/**
+	 * {@inheritDoc}
+	 */
 	protected synchronized Collection<ProjectPhase> retrieveJDOObjects(Set<ProjectPhaseID> projectPhaseIDs,
 			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 			throws Exception {

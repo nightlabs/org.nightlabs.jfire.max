@@ -36,6 +36,9 @@ extends BaseJDOObjectDAO<ProjectTypeID, ProjectType>
 
 	@SuppressWarnings("unchecked")
 	@Override
+	/**
+	 * {@inheritDoc}
+	 */
 	protected synchronized Collection<ProjectType> retrieveJDOObjects(Set<ProjectTypeID> projectTypeIDs,
 			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 			throws Exception {

@@ -41,6 +41,9 @@ extends BaseJDOObjectDAO<IssuePriorityID, IssuePriority>
 
 	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	@Override
+	/**
+	 * {@inheritDoc}
+	 */
 	protected Collection<IssuePriority> retrieveJDOObjects(Set<IssuePriorityID> objectIDs, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	throws Exception 
 	{

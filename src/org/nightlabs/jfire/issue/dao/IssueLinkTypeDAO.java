@@ -38,6 +38,9 @@ extends BaseJDOObjectDAO<IssueLinkTypeID, IssueLinkType>
 
 	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	@Override
+	/**
+	 * {@inheritDoc}
+	 */
 	protected Collection<IssueLinkType> retrieveJDOObjects(
 			Set<IssueLinkTypeID> objectIDs,
 			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor

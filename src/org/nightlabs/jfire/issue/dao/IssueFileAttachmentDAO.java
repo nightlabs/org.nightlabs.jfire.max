@@ -36,6 +36,9 @@ public class IssueFileAttachmentDAO extends BaseJDOObjectDAO<IssueFileAttachment
 
 	@Override
 	@SuppressWarnings("unchecked")
+	/**
+	 * {@inheritDoc}
+	 */
 	protected synchronized Collection<IssueFileAttachment> retrieveJDOObjects(Set<IssueFileAttachmentID> issueFileAttachmentIDs,
 			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 			throws Exception {

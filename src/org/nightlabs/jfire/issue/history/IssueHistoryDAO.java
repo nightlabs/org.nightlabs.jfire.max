@@ -34,6 +34,9 @@ public class IssueHistoryDAO extends BaseJDOObjectDAO<IssueHistoryID, IssueHisto
 
 	@SuppressWarnings("unchecked")
 	@Override
+	/**
+	 * {@inheritDoc}
+	 */
 	protected synchronized Collection<IssueHistory> retrieveJDOObjects(Set<IssueHistoryID> issueHistoryIDs,
 			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 			throws Exception {

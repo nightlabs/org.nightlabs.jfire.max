@@ -37,6 +37,9 @@ public class IssueCommentDAO extends BaseJDOObjectDAO<IssueCommentID, IssueComme
 
 	@Override
 	@SuppressWarnings("unchecked")
+	/**
+	 * {@inheritDoc}
+	 */
 	protected Collection<IssueComment> retrieveJDOObjects(Set<IssueCommentID> commentIDs, 
 			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) throws Exception {
 		monitor.beginTask("Loading IssueComments", 1);

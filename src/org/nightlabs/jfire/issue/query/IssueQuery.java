@@ -10,6 +10,7 @@ import org.apache.log4j.Logger;
 import org.nightlabs.jdo.query.AbstractJDOQuery;
 import org.nightlabs.jfire.issue.Issue;
 import org.nightlabs.jfire.issue.IssueComment;
+import org.nightlabs.jfire.issue.IssueSubject;
 import org.nightlabs.jfire.issue.id.IssueLinkTypeID;
 import org.nightlabs.jfire.issue.id.IssuePriorityID;
 import org.nightlabs.jfire.issue.id.IssueResolutionID;
@@ -238,7 +239,8 @@ public class IssueQuery
 	}
 
 	/**
-	 * @return a {@link String} of the {@link IssueSubject}
+	 * Returns the string of the {@link IssueSubject}.
+	 * @return a string of the {@link IssueSubject}
 	 */
 	public String getIssueSubject()
 	{
@@ -279,6 +281,7 @@ public class IssueQuery
 	}
 	
 	/**
+	 * Returns true if the string of {@link IssueSubject} represents a regular expression.
 	 * @return Whether the value set with {@link #setIssueSubject(String)} represents a regular
 	 *         expression. If this is <code>true</code>, the value set with {@link #setIssueSubject(String)}
 	 *         will be passed directly as matching string, if it is <code>false</code> a regular expression
@@ -316,13 +319,15 @@ public class IssueQuery
 	}
 
 	/**
-	 * @return a {@link String} of the {@link IssueSubject} combined with {@link IssueComment}
+	 * Returns the combined string of {@link IssueSubject} and {@link IssueComment}.
+	 * @return a string of the {@link IssueSubject} combined with string of the {@link IssueComment}
 	 */
 	public String getIssueSubjectNComment() {
 		return issueSubjectNComment;
 	}
 	
 	/**
+	 * Returns true if the combined string of {@link IssueSubject} and {@link IssueComment} represents a regular expression.
 	 * @return Whether the value set with {@link #setIssueSubjectNComment(String)} represents a regular
 	 *         expression. If this is <code>true</code>, the value set with {@link #setIssueSubjectNComment(String)}
 	 *         will be passed directly as matching string, if it is <code>false</code> a regular expression
@@ -346,7 +351,8 @@ public class IssueQuery
 	
 
 	/**
-	 * @return a {@link String} of the {@link IssueComment}
+	 * Returns the string of {@link IssueComment}.
+	 * @return a string of the {@link IssueComment}
 	 */
 	public String getIssueComment() {
 		return issueComment;
@@ -367,6 +373,7 @@ public class IssueQuery
 	}
 
 	/**
+	 * Returns true if the string of {@link IssueComment} represents a regular expression.
 	 * @return Whether the value set with {@link #setIssueComment(String)} represents a regular
 	 *         expression. If this is <code>true</code>, the value set with {@link #setIssueComment(String)}
 	 *         will be passed directly as matching string, if it is <code>false</code> a regular expression
@@ -389,6 +396,7 @@ public class IssueQuery
 	}
 	
 	/**
+	 * Returns the {@link IssueTypeID}.
 	 * @return an {@link IssueTypeID}
 	 */
 	public IssueTypeID getIssueTypeID() {
@@ -407,6 +415,7 @@ public class IssueQuery
 	}
 
 	/**
+	 * Returns the {@link IssueSeverityTypeID}.
 	 * @return an {@link IssueSeverityTypeID}
 	 */
 	public IssueSeverityTypeID getIssueSeverityTypeID() {
@@ -425,6 +434,7 @@ public class IssueQuery
 	}
 
 	/**
+	 * Returns the {@link IssuePriorityID}.
 	 * @return an {@link IssuePriorityID}
 	 */
 	public IssuePriorityID getIssuePriorityID() {
@@ -443,6 +453,7 @@ public class IssueQuery
 	}
 
 	/**
+	 * Returns the {@link IssueResolutionID}.
 	 * @return an {@link IssueResolutionID}
 	 */
 	public IssueResolutionID getIssueResolutionID() {
@@ -461,6 +472,7 @@ public class IssueQuery
 	}
 
 	/**
+	 * Returns the {@link UserID} of the {@link Issue}'s reporter.
 	 * @return an {@link UserID} of the {@link Issue}'s reporter
 	 */
 	public UserID getReporterID() {
@@ -479,6 +491,7 @@ public class IssueQuery
 	}
 
 	/**
+	 * Returns the {@link UserID} of the {@link Issue}'s assignee.
 	 * @return an {@link UserID} of the {@link Issue}'s assignee
 	 */
 	public UserID getAssigneeID() {
@@ -497,6 +510,7 @@ public class IssueQuery
 	}
 
 	/**
+	 * Returns the {@link Date} of the {@link Issue}'s working time range starting time.
 	 * @return an {@link Date} of the {@link Issue}'s working time range starting time
 	 */
 	public Date getIssueWorkTimeRangeFrom() {
@@ -515,6 +529,7 @@ public class IssueQuery
 	}
 	
 	/**
+	 * Returns the {@link Date} of the {@link Issue}'s working time range starting time.
 	 * @return an {@link Date} of the {@link Issue}'s working time range ending time
 	 */
 	public Date getIssueWorkTimeRangeTo() {
@@ -533,6 +548,7 @@ public class IssueQuery
 	}
 
 	/**
+	 * Returns the {@link IssueLinkTypeID}.
 	 * @return an {@link IssueLinkTypeID}
 	 */
 	public IssueLinkTypeID getIssueLinkTypeID() {
@@ -551,6 +567,7 @@ public class IssueQuery
 	}
 
 	/**
+	 * Returns the {@link Date} of {@link Issue}'s created time.
 	 * @return a {@link Date} of {@link Issue}'s created time
 	 */
 	public Date getCreateTimestamp() {
@@ -569,6 +586,7 @@ public class IssueQuery
 	}
 	
 	/**
+	 * Returns the {@link Date} of {@link Issue}'s updated time
 	 * @return a {@link Date} of {@link Issue}'s updated time
 	 */
 	public Date getUpdateTimestamp() {
@@ -587,6 +605,7 @@ public class IssueQuery
 	}
 	
 	/**
+	 * Returns the {@link Set} of {@link ProjectID}.
 	 * @return a {@link Set} of {@link ProjectID}
 	 */
 	public Set<ProjectID> getProjectIDs() {

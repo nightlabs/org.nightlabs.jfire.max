@@ -29,7 +29,7 @@ import org.nightlabs.jfire.security.id.UserID;
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
  */
 public class IssueQuery
-	extends AbstractJDOQuery
+extends AbstractJDOQuery
 {
 	private static final long serialVersionUID = 20080811L;
 
@@ -175,17 +175,17 @@ public class IssueQuery
 		if (isFieldEnabled(FieldName.issueWorkTimeRangeFrom) && !isFieldEnabled(FieldName.issueWorkTimeRangeTo) && issueWorkTimeRangeFrom != null) {
 			filter.append("\n && (this.issueWorkTimeRanges.contains(varIssueWorkTimeRange) && (varIssueWorkTimeRange.from >= :issueWorkTimeRangeFrom)) ");
 		}
-		
+
 		if (!isFieldEnabled(FieldName.issueWorkTimeRangeFrom) && isFieldEnabled(FieldName.issueWorkTimeRangeTo) && issueWorkTimeRangeTo != null) {
 			filter.append("\n && (this.issueWorkTimeRanges.contains(varIssueWorkTimeRange) && (varIssueWorkTimeRange.to <= :issueWorkTimeRangeTo)) ");
 		}
-		
+
 		if (isFieldEnabled(FieldName.issueWorkTimeRangeFrom) && isFieldEnabled(FieldName.issueWorkTimeRangeTo) 
 				&& issueWorkTimeRangeFrom != null && issueWorkTimeRangeTo != null) {
 			filter.append("\n && (this.issueWorkTimeRanges.contains(varIssueWorkTimeRange) && !((varIssueWorkTimeRange.from >= :issueWorkTimeRangeTo) && (varIssueWorkTimeRange.to > :issueWorkTimeRangeTo))) ");
 			filter.append("\n || (this.issueWorkTimeRanges.contains(varIssueWorkTimeRange) && !((varIssueWorkTimeRange.to <= :issueWorkTimeRangeFrom) && (varIssueWorkTimeRange.from < :issueWorkTimeRangeFrom))) ");
 		}
-		
+
 		if (isFieldEnabled(FieldName.projectIDs) && projectIDs != null && projectIDs.size() > 0) {
 			int i = 0;
 			for ( Iterator<ProjectID> it = projectIDs.iterator(); it.hasNext(); i++) {
@@ -193,9 +193,9 @@ public class IssueQuery
 				if (i == 0) {
 					filter.append("\n && this.project.organisationID == \"" + pid.organisationID + "\" && (");
 				}
-				
+
 				filter.append("this.project.projectID == " + pid.projectID);
-				
+
 				if (i != projectIDs.size() - 1) {
 					filter.append(" || ");
 				}
@@ -208,30 +208,30 @@ public class IssueQuery
 		// FIXME: chairat please rewrite this part as soon as you have refactored the linkage of objects to Issues. (marius)
 //		if (issueLinks != null && !issueLinks.isEmpty())
 //		{
-//			filter.append("\n && ( ");
-//			filter.append("\n \t this.issueLinks.contains(varIssueLink) && \n \t (");
-//			for (IssueLink issueLink : issueLinks)
-//			{
-//				ObjectID linkedObjectID = issueLink.getLinkedObjectID();
-//				filter.append("\n \t \t varIssueLink.linkedObjectID.matches(" + linkedObjectID + ") ||");
-//			}
-//			filter.delete(filter.length() - 2, filter.length());
-//			filter.append("\n \t )");
-//			filter.append("\n && )");
+//		filter.append("\n && ( ");
+//		filter.append("\n \t this.issueLinks.contains(varIssueLink) && \n \t (");
+//		for (IssueLink issueLink : issueLinks)
+//		{
+//		ObjectID linkedObjectID = issueLink.getLinkedObjectID();
+//		filter.append("\n \t \t varIssueLink.linkedObjectID.matches(" + linkedObjectID + ") ||");
 //		}
-//
+//		filter.delete(filter.length() - 2, filter.length());
+//		filter.append("\n \t )");
+//		filter.append("\n && )");
+//		}
+
 //		if (issueLinks != null && !issueLinks.isEmpty())
 //		{
-//			filter.append("\n && ( ");
-//			filter.append("\n \t this.referencedObjectIDs.contains(varObjectID) && \n \t (");
-//			for (ObjectID objectID : issueLinks)
-//			{
-//				String objectIDString = objectID.toString();
-//				filter.append("\n \t \t varObjectID.matches(" + objectIDString + ") ||");
-//			}
-//			filter.delete(filter.length() - 2, filter.length());
-//			filter.append("\n \t )");
-//			filter.append("\n && )");
+//		filter.append("\n && ( ");
+//		filter.append("\n \t this.referencedObjectIDs.contains(varObjectID) && \n \t (");
+//		for (ObjectID objectID : issueLinks)
+//		{
+//		String objectIDString = objectID.toString();
+//		filter.append("\n \t \t varObjectID.matches(" + objectIDString + ") ||");
+//		}
+//		filter.delete(filter.length() - 2, filter.length());
+//		filter.append("\n \t )");
+//		filter.append("\n && )");
 //		}
 
 		logger.info(filter.toString());
@@ -279,7 +279,7 @@ public class IssueQuery
 		this.issueSubject = issueSubject;
 		notifyListeners(FieldName.issueSubject, oldIssueSubject, issueSubject);
 	}
-	
+
 	/**
 	 * Returns true if the string of {@link IssueSubject} represents a regular expression.
 	 * @return Whether the value set with {@link #setIssueSubject(String)} represents a regular
@@ -302,7 +302,7 @@ public class IssueQuery
 		this.issueSubjectRegex = issueSubjectRegex;
 		notifyListeners(FieldName.issueSubjectRegex, oldIssueSubjectRegex, issueSubjectRegex);
 	}
-	
+
 
 	/**
 	 * Set the string to search in the issue subject and comments for. This can either be a regular expression
@@ -325,7 +325,7 @@ public class IssueQuery
 	public String getIssueSubjectNComment() {
 		return issueSubjectNComment;
 	}
-	
+
 	/**
 	 * Returns true if the combined string of {@link IssueSubject} and {@link IssueComment} represents a regular expression.
 	 * @return Whether the value set with {@link #setIssueSubjectNComment(String)} represents a regular
@@ -348,7 +348,7 @@ public class IssueQuery
 		this.issueSubjectNCommentRegex = issueSubjectNCommentRegex;
 		notifyListeners(FieldName.issueSubjectNCommentRegex, oldIssueSubjectNCommentRegex, issueSubjectNCommentRegex);
 	}
-	
+
 
 	/**
 	 * Returns the string of {@link IssueComment}.
@@ -394,7 +394,7 @@ public class IssueQuery
 		this.issueSubjectRegex = issueCommentRegex;
 		notifyListeners(FieldName.issueSubjectNCommentRegex, oldIssueCommentRegex, issueCommentRegex);
 	}
-	
+
 	/**
 	 * Returns the {@link IssueTypeID}.
 	 * @return an {@link IssueTypeID}
@@ -527,7 +527,7 @@ public class IssueQuery
 		this.issueWorkTimeRangeFrom = issueWorkTimeRangeFrom;
 		notifyListeners(FieldName.issueWorkTimeRangeFrom, oldIssueWorkTimeRangeFrom, issueWorkTimeRangeFrom);
 	}
-	
+
 	/**
 	 * Returns the {@link Date} of the {@link Issue}'s working time range starting time.
 	 * @return an {@link Date} of the {@link Issue}'s working time range ending time
@@ -584,7 +584,7 @@ public class IssueQuery
 		this.createTimestamp = createTimestamp;
 		notifyListeners(FieldName.createTimestamp, oldCreateTimestamp, createTimestamp);
 	}
-	
+
 	/**
 	 * Returns the {@link Date} of {@link Issue}'s updated time
 	 * @return a {@link Date} of {@link Issue}'s updated time
@@ -603,7 +603,7 @@ public class IssueQuery
 		this.updateTimestamp = updateTimestamp;
 		notifyListeners(FieldName.updateTimestamp, oldUpdateTimestamp, updateTimestamp);
 	}
-	
+
 	/**
 	 * Returns the {@link Set} of {@link ProjectID}.
 	 * @return a {@link Set} of {@link ProjectID}
@@ -622,7 +622,7 @@ public class IssueQuery
 		this.projectIDs = projectIDs;
 		notifyListeners(FieldName.projectIDs, oldProjectIDs, projectIDs);
 	}
-	
+
 	@Override
 	/**
 	 * {@inheritDoc}

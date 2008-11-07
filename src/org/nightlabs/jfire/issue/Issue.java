@@ -169,8 +169,6 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	private Set<IssueLink> issueLinks;
 	
 	/**
-	 * 
-	 * 
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private Project project;
@@ -305,38 +303,35 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 
 	/**
 	 * Returns the property set of this {@link Issue}.
-	 * 
-	 * @return The property set of this {@link Issue}.
+	 * @return The property set of this {@link Issue}
 	 */
 	public PropertySet getPropertySet() {
 		return propertySet;
 	}
 
 	/**
-	 * The scope of the StructLocal by which the propertySet is build from.
-	 * 
+	 * The scope of the {@link StructLocal} by which the propertySet is build from.
 	 * @jdo.field persistence-modifier="persistent" null-value="exception" indexed="true"
 	 */
 	private String structLocalScope;
 
 	/**
 	 * Returns the scope of the StructLocal by which the propertySet is build from.
-	 * @return The scope of the StructLocal by which the propertySet is build from.
+	 * @return The scope of the StructLocal by which the propertySet is build from
 	 */
 	public String getStructLocalScope() {
 		return structLocalScope;
 	}
 
 	/**
-	 * The scope of the Struct by which the propertySet is build from.
-	 * 
+	 * The scope of the {@link Struct} by which the propertySet is build from.
 	 * @jdo.field persistence-modifier="persistent" null-value="exception" indexed="true"
 	 */
 	private String structScope;
 
 	/**
-	 * Returns the scope of the Struct by which the propertySet is build from.
-	 * @return The scope of the Struct by which the propertySet is build from
+	 * Returns the scope of the {@link Struct} by which the propertySet is build from.
+	 * @return The scope of the {@link Struct} by which the propertySet is build from
 	 */
 	public String getStructScope() {
 		return structScope;
@@ -391,14 +386,15 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	}
 
 	/**
-	 * @return Returns the organisationID
+	 * Returns the organisation id.
+	 * @return the organisationID
 	 */
 	public String getOrganisationID() {
 		return organisationID;
 	}
 
 	/**
-	 * Gets the issue id.
+	 * Returns the issue id.
 	 * @return the issue id
 	 */
 	public long getIssueID() {
@@ -406,7 +402,7 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	}
 
 	/**
-	 * Gets the string of issue id.
+	 * Returns the string of issue id.
 	 * @return the string of issue id
 	 */
 	public String getIssueIDAsString()
@@ -415,7 +411,7 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	}
 
 	/**
-	 * Gets the {@link IssueType}.
+	 * Returns the {@link IssueType}.
 	 * @return the {@link IssueType}
 	 */
 	public IssueType getIssueType() {
@@ -424,14 +420,14 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 
 	/**
 	 * Sets the {@link IssueType}.
-	 * @param issueType - the issue type for this issue
+	 * @param issueType the issue type for this issue
 	 */
 	public void setIssueType(IssueType issueType) {
 		this.issueType = issueType;
 	}
 
 	/**
-	 * Gets the created time's {@link Date}.
+	 * Returns the created time's {@link Date}.
 	 * @return the created timestamp
 	 */
 	public Date getCreateTimestamp() {
@@ -439,7 +435,7 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	}
 
 	/**
-	 * Gets the updated time's {@link Date}.
+	 * Returns the updated time's {@link Date}.
 	 * @return the updated time's {@link Date}
 	 */
 	public Date getUpdateTimestamp() {
@@ -447,6 +443,7 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	}
 
 	/**
+	 * Sets the updated time.
 	 * @param timestamp The timestamp to set
 	 */
 	public void setUpdateTimestamp(Date timestamp) {
@@ -454,92 +451,129 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	}
 
 	/**
-	 * @return Returns the description
+	 * Returns the issue description.
+	 * @return the description of the issue
 	 */
 	public IssueDescription getDescription() {
 		return description;
 	}
 
 	/**
-	 * @param description The description to set
+	 * Sets the {@link IssueDescription}.
+	 * @param description the description to set
 	 */
 	public void setDescription(IssueDescription description) {
 		this.description = description;
 	}
 
 	/**
-	 * @return Returns the subject
+	 * Returns the {@link IssueSubject}.
+	 * @return the subject of the issue
 	 */
 	public IssueSubject getSubject() {
 		return subject;
 	}
 
 	/**
-	 * @param subject The subject to set
+	 * Sets the {@link IssueSubject}.
+	 * @param subject the subject to set
 	 */
 	public void setSubject(IssueSubject subject) {
 		this.subject = subject;
 	}
 
 	/**
-	 * @return Returns the reporter
+	 * Returns the {@link User} who reports the issue.
+	 * @return the user who report the issue
 	 */
 	public User getReporter() {
 		return reporter;
 	}
 
 	/**
-	 * @param reporter The user to set
+	 * Sets the {@link User} who reports the issue.
+	 * @param reporter the user who reports the issue
 	 */
 	public void setReporter(User reporter) {
 		this.reporter = reporter;
 	}
 
 	/**
-	 * @return Returns the assignee
+	 * Returns the {@link User} who is assigned to the issue.
+	 * @return the assignee
 	 */
 	public User getAssignee() {
 		return assignee;
 	}
 
 	/**
-	 * @param assignee The user to set
+	 * Sets the {@link User} who is assigned to the issue.
+	 * @param assignee the user who is assigned to the issue
 	 */
 	public void setAssignee(User assignee) {
 		this.assignee = assignee;
 	}
 
+	/**
+	 * Returns the {@link IssuePriority}.
+	 * @return the priority of the issue
+	 */
 	public IssuePriority getIssuePriority() {
 		return issuePriority;
 	}
 
+	/**
+	 * Sets the {@link IssuePriority}.
+	 * @param issuePriority the priority of the issue
+	 */
 	public void setIssuePriority(IssuePriority issuePriority) {
 		this.issuePriority = issuePriority;
 	}
 
+	/**
+	 * Returns the {@link IssueSeverityType} .
+	 * @return the severity type of the issue
+	 */
 	public IssueSeverityType getIssueSeverityType() {
 		return issueSeverityType;
 	}
 
+	/**
+	 * Sets the {@link IssueSeverityType}.
+	 * @param issueSeverityType the severity type of the issue
+	 */
 	public void setIssueSeverityType(IssueSeverityType issueSeverityType) {
 		this.issueSeverityType = issueSeverityType;
 	}
 
 	/**
-	 * @param organisationID The organisationID to set.
+	 * Sets the organisation id.
+	 * @param organisationID the organisationID to set
 	 */
 	public void setOrganisationID(String organisationID) {
 		this.organisationID = organisationID;
 	}
 
+	/**
+	 * Returns the collection of {@link IssueFileAttachment}s.
+	 * @return a collection of {@link IssueFileAttachment}s
+	 */
 	public Collection<IssueFileAttachment> getIssueFileAttachments() {
 		return Collections.unmodifiableCollection(issueFileAttachments);
 	}
 
+	/**
+	 * Returns the list of {@link IssueComment}s.
+	 * @return a list of {@link IssueComment}s
+	 */
 	public List<IssueComment> getComments() {
 		return comments;
 	}
 
+	/**
+	 * Returns the collection of {@link IssueWorkTimeRange}s.
+	 * @return a collection of {@link IssueWorkTimeRange}s.
+	 */
 	public Collection<IssueWorkTimeRange> getIssueWorkTimeRanges() {
 		return Collections.unmodifiableCollection(issueWorkTimeRanges);
 	}
@@ -578,6 +612,10 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 			_referencedObjectIDs.add(referencedObjectID);
 	}*/
 
+	/**
+	 * Returns the set of {@link IssueLink}.
+	 * @return a set of {@link IssueLink}
+	 */
 	public Set<IssueLink> getIssueLinks() {
 		return Collections.unmodifiableSet(issueLinks);
 	}
@@ -604,8 +642,10 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 //	}
 
 	/**
+	 * Creates and Adds a link with its type and linked object.
+	 * 
 	 * @param issueLinkType the type of the new <code>IssueLink</code>. Must not be <code>null</code>
-	 * @param linkedObject The linked object (a persistence-capable JDO object).
+	 * @param linkedObject the linked object (a persistence-capable JDO object).
 	 */
 	public IssueLink createIssueLink(IssueLinkType issueLinkType, Object linkedObject)
 	{
@@ -620,9 +660,11 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	}
 
 	/**
+	 * Creates a new link with the link type, linked object and specific class of the linked object.
+	 * 
 	 * @param issueLinkType the type of the new <code>IssueLink</code>. Must not be <code>null</code>
 	 * @param linkedObjectID  an object-id (implementing {@link ObjectID}) identifying a persistence-capable JDO object
-	 * @param linkedObjectClass The linked object class(a persistence-capable JDO object)
+	 * @param linkedObjectClass the linked object class(a persistence-capable JDO object)
 	 */
 	public IssueLink createIssueLink(IssueLinkType issueLinkType, ObjectID linkedObjectID, Class<?> linkedObjectClass)
 	{
@@ -636,6 +678,10 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 		return issueLink;
 	}
 
+	/**
+	 * Removes an issue link.
+	 * @param issueLink The issue link to be removed
+	 */
 	public void removeIssueLink(IssueLink issueLink) {
 		if (issueLink == null)
 			throw new IllegalArgumentException("issueLink must not be null!");
@@ -643,10 +689,18 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 		issueLinks.remove(issueLink);
 	}
 
+	/**
+	 * Returns the {@link IssueResolution}.
+	 * @return an issue resolution
+	 */
 	public IssueResolution getIssueResolution() {
 		return issueResolution;
 	}
 
+	/**
+	 * Sets the {@link IssueResolution}.
+	 * @param issueResolution the issueResolution to be set
+	 */
 	public void setIssueResolution(IssueResolution issueResolution) {
 		this.issueResolution = issueResolution;
 	}
@@ -670,6 +724,9 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	 */
 	private transient List<State> _states = null;
 
+	/**
+	 * 
+	 */
 	public List<State> getStates()
 	{
 		if (_states == null)
@@ -695,6 +752,7 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	}
 
 	/**
+	 * Checks if the issue has process instance already.
 	 * See {@link #jdoPreStore()}.
 	 */
 	public void jdoPostAttach(Object attached) {
@@ -796,27 +854,54 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 			pm.deletePersistent(state);
 	}
 
+	/**
+	 * Sets the {@link Project}. 
+	 * @param project the project that this issue is created on
+	 */
 	public void setProject(Project project) {
 		this.project = project;
 	}
 	
+	/**
+	 * Gets the {@link Project}.
+	 * @return a project
+	 */
 	public Project getProject() {
 		return project;
 	}
 	
+	/**
+	 * Adds an {@link IssueFileAttachment} to issue.
+	 * @param issueFileAttachment the issueFileAttachment to be added
+	 * @return true if it's added successfully
+	 */
 	public boolean addIssueFileAttachment(IssueFileAttachment issueFileAttachment) {
 		return this.issueFileAttachments.add(issueFileAttachment);
 	}
 
+	/**
+	 * Removes the {@link IssueFileAttachment} from the issue.
+	 * @param issueFileAttachment the issueFileAttachment to be removed
+	 * @return true if it's removes successfully
+	 */
 	public boolean removeIssueFileAttachment(IssueFileAttachment issueFileAttachment) {
 		return this.issueFileAttachments.remove(issueFileAttachment);
 	}
 
+	/**
+	 * Returns true if the issue state has already started.
+	 * @return true if the issue state has already started
+	 */
 	public boolean isStarted()
 	{
 		return isStarted;
 	}
 
+	/**
+	 * Sets the date that this issue is started.
+	 * @param date the date that this issue is started
+	 * @return true if it's successfully stared
+	 */
 	public boolean startWorking(Date date) {
 		if (isStarted) {
 			return false;
@@ -829,6 +914,11 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 		return this.issueWorkTimeRanges.add(wt);
 	}
 
+	/**
+	 * Sets the date that this issue is ended.
+	 * @param date the date that this issue is ended
+	 * @return true if it's successfully ended
+	 */
 	public boolean endWorking(Date date) {
 		if (!isStarted) {
 			return false;
@@ -840,6 +930,10 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 		return true;
 	}
 	
+	/**
+	 * Returns the {@link IssueWorkTimeRange} of the issue.
+	 * @return an issueWorkTimeRange
+	 */
 	public IssueWorkTimeRange getLastestIssueWorkTimeRange() {
 		return issueWorkTimeRanges.size() > 0 ? issueWorkTimeRanges.get(issueWorkTimeRanges.size() -1) : null;
 	}

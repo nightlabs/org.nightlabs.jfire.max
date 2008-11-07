@@ -58,6 +58,11 @@ import org.nightlabs.util.Util;
 /**
  * The {@link Issue} class represents an issue in JFire. 
  * <p>
+ * In computing, the term issue is a unit of work to accomplish an improvement in a data system. 
+ * An issue could be a bug, a requested feature, task, missing documentation, and so forth. 
+ * The word "issue" is popularly misused in lieu of "problem."
+ * </p>
+ * <p>
  * An {@link Issue} created by a JFire's {@link User} should at lease has {@link IssueSubject} and {@link IssueDescription}.  
  * </p>
  * 

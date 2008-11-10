@@ -15,6 +15,7 @@ import javax.jdo.PersistenceManager;
 import org.jbpm.JbpmContext;
 import org.jbpm.graph.exe.ProcessInstance;
 import org.nightlabs.jdo.ObjectIDUtil;
+import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.issue.jbpm.JbpmConstants;
 import org.nightlabs.jfire.jbpm.JbpmLookup;
 import org.nightlabs.jfire.jbpm.graph.def.AbstractActionHandler;
@@ -144,6 +145,11 @@ implements Serializable, Comparable<IssueType>
 	@Deprecated
 	protected IssueType() { }
 
+	/**
+	 * Constructs a new issue type.
+	 * @param organisationID the first part of the composite primary key - referencing the organisation which owns this <code>IssueType</code>.
+	 * @param issueTypeID the second part of the composite primary key. Use {@link IDGenerator#nextID(Class)} with <code>IssueType.class</code> to create an id.
+	 */
 	public IssueType(String organisationID, String issueTypeID) {
 		Organisation.assertValidOrganisationID(organisationID);
 		ObjectIDUtil.assertValidIDString(issueTypeID, "issueTypeID");

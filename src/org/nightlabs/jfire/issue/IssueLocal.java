@@ -116,6 +116,10 @@ implements Serializable, StatableLocal
 	 */
 	protected IssueLocal() { }
 
+	/**
+	 * 
+	 * @param issue
+	 */
 	public IssueLocal(Issue issue)
 	{
 		this.issue = issue;
@@ -150,6 +154,9 @@ implements Serializable, StatableLocal
 	 */
 	private transient List<State> _states = null;
 
+	/**
+	 * 
+	 */
 	public List<State> getStates()
 	{
 		if (_states == null)
@@ -158,19 +165,31 @@ implements Serializable, StatableLocal
 		return _states;
 	}
 	
+	/**
+	 * 
+	 */
 	public void setJbpmProcessInstanceId(long jbpmProcessInstanceId) {
 		this.jbpmProcessInstanceId = jbpmProcessInstanceId;
 	}
 	
+	/**
+	 * 
+	 */
 	public void setState(State state) {
 		this.state = state;
 		this.states.add(state);
 	}
 
+	/**
+	 * 
+	 */
 	public State getState() {
 		return state;
 	}
 	
+	/*
+	 * (non-Javadoc)
+	 */
 	protected PersistenceManager getPersistenceManager()
 	{
 		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
@@ -180,6 +199,9 @@ implements Serializable, StatableLocal
 	}
 
 	@Override
+	/*
+	 * (non-Javadoc)
+	 */
 	public boolean equals(Object obj)
 	{
 		if (obj == this)
@@ -196,6 +218,9 @@ implements Serializable, StatableLocal
 	}
 
 	@Override
+	/*
+	 * (non-Javadoc)
+	 */
 	public int hashCode()
 	{
 		return 
@@ -205,11 +230,18 @@ implements Serializable, StatableLocal
 	}
 
 	@Override
+	/**
+	 * 
+	 */
 	public boolean isProcessEnded()
 	{
 		return processEnded;
 	}
+	
 	@Override
+	/**
+	 * 
+	 */
 	public void setProcessEnded()
 	{
 		processEnded = true;
@@ -220,15 +252,29 @@ implements Serializable, StatableLocal
 	 */
 	private String primaryKey;
 
+	/**
+	 * 
+	 * @param organisationID
+	 * @param issueID
+	 * @return
+	 */
 	public static String getPrimaryKey(String organisationID, long issueID)
 	{
 		return organisationID + '/' + Long.toString(issueID);
 	}
+	
+	/**
+	 * 
+	 * @return
+	 */
 	public String getPrimaryKey()
 	{
 		return primaryKey;
 	}
-
+	
+	/*
+	 * (non-Javadoc)
+	 */
 	protected Set<State> clearStatesBeforeDelete() {
 		Set<State> res = new HashSet<State>(this.states);
 		res.add(this.state);

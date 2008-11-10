@@ -2,6 +2,7 @@ package org.nightlabs.jfire.issue;
 
 import java.io.Serializable;
 
+import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.util.Util;
 
 /**
@@ -65,10 +66,16 @@ implements Serializable{
 	 */
 	private IssueSeverityTypeName name;
 
-	protected IssueSeverityType()
-	{
-	}
+	/**
+	 * @deprecated Only for JDO!
+	 */
+	protected IssueSeverityType(){}
 
+	/**
+	 * Constructs a new issue severity type.
+	 * @param organisationID the first part of the composite primary key - referencing the organisation which owns this <code>IssueSeverityType</code>.
+	 * @param issueResolutionID the second part of the composite primary key. Use {@link IDGenerator#nextID(Class)} with <code>IssueSeverityType.class</code> to create an id.
+	 */
 	public IssueSeverityType(String organisationID, String issueSeverityTypeID){
 		if (issueSeverityTypeID == null)
 			throw new IllegalArgumentException("issueSeverityTypeID must not be null!");
@@ -77,14 +84,26 @@ implements Serializable{
 		this.name = new IssueSeverityTypeName(this);
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
 	public String getOrganisationID() {
 		return organisationID;
 	}
 
+	/**
+	 * 
+	 * @param organisationID
+	 */
 	public void setOrganisationID(String organisationID) {
 		this.organisationID = organisationID;
 	}
 
+	/**
+	 * 
+	 * @param issueSeverityTypeID
+	 */
 	public void setIssueSeverityTypeID(String issueSeverityTypeID) {
 		this.issueSeverityTypeID = issueSeverityTypeID;
 	}
@@ -107,6 +126,9 @@ implements Serializable{
 
 
 	@Override
+	/*
+	 * 
+	 */
 	public boolean equals(Object obj)
 	{
 		if (obj == this) return true;
@@ -118,6 +140,9 @@ implements Serializable{
 	}
 
 	@Override
+	/*
+	 * 
+	 */
 	public int hashCode()
 	{
 		return (31 * Util.hashCode(organisationID)) + Util.hashCode(issueSeverityTypeID);

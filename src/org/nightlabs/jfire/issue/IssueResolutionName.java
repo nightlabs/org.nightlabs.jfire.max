@@ -76,6 +76,10 @@ extends I18nText{
 	{
 	}
 
+	/**
+	 * 
+	 * @param issueResolution
+	 */
 	public IssueResolutionName(IssueResolution issueResolution)
 	{
 		this.issueResolution = issueResolution;
@@ -91,14 +95,26 @@ extends I18nText{
 		return names;
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
 	public String getOrganisationID() {
 		return organisationID;
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
 	public IssueResolution getIssueResolution() {
 		return issueResolution;
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
 	public String getIssueResolutionID() {
 		return issueResolutionID;
 	}

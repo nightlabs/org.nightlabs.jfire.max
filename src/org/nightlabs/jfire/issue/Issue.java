@@ -952,7 +952,7 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 
 		isStarted = true;
 		
-		IssueWorkTimeRange wt = new IssueWorkTimeRange(organisationID, assignee, this);
+		IssueWorkTimeRange wt = new IssueWorkTimeRange(organisationID, IDGenerator.nextID(IssueWorkTimeRange.class), assignee, this);
 		wt.setFrom(date);
 		return this.issueWorkTimeRanges.add(wt);
 	}

@@ -72,6 +72,10 @@ extends I18nText
 	 */
 	protected IssueLinkTypeName() { }
 
+	/**
+	 * 
+	 * @param issueLinkType
+	 */
 	public IssueLinkTypeName(IssueLinkType issueLinkType)
 	{
 		this.issueLinkType = issueLinkType;
@@ -85,19 +89,34 @@ extends I18nText
 		return names;
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
 	public String getOrganisationID() {
 		return organisationID;
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
 	public IssueLinkType getIssueLinkType() {
 		return issueLinkType;
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
 	public String getIssueLinkTypeID() {
 		return issueLinkTypeID;
 	}
 
 	@Override
+	/**
+	 * 
+	 */
 	protected String getFallBackValue(String languageID)
 	{
 		return issueLinkTypeID;

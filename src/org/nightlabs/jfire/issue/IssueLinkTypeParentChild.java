@@ -32,6 +32,10 @@ extends IssueLinkTypeIssueToIssue
 	 */
 	protected IssueLinkTypeParentChild() { }
 
+	/**
+	 * 
+	 * @param issueLinkTypeID
+	 */
 	public IssueLinkTypeParentChild(IssueLinkTypeID issueLinkTypeID) {
 		super(issueLinkTypeID);
 		if (!ISSUE_LINK_TYPE_ID_CHILD.equals(issueLinkTypeID) && !ISSUE_LINK_TYPE_ID_PARENT.equals(issueLinkTypeID))

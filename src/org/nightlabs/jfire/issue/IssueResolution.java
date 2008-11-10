@@ -3,6 +3,7 @@ package org.nightlabs.jfire.issue;
 import java.io.Serializable;
 
 import org.nightlabs.jdo.ObjectIDUtil;
+import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.issue.id.IssueResolutionID;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.util.Util;
@@ -65,6 +66,11 @@ implements Serializable
 	{
 	}
 
+	/**
+	 * Constructs a new issue resolution.
+	 * @param organisationID the first part of the composite primary key - referencing the organisation which owns this <code>IssueResolution</code>.
+	 * @param issueResolutionID the second part of the composite primary key. Use {@link IDGenerator#nextID(Class)} with <code>IssueResolution.class</code> to create an id.
+	 */
 	public IssueResolution(String organisationID, String issueResolutionID) {
 		Organisation.assertValidOrganisationID(organisationID);
 		ObjectIDUtil.assertValidIDString(issueResolutionID, "issueResolutionID");
@@ -74,6 +80,10 @@ implements Serializable
 		this.name = new IssueResolutionName(this);
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
 	public String getOrganisationID() {
 		return organisationID;
 	}
@@ -86,12 +96,19 @@ implements Serializable
 		return issueResolutionID;
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
 	public IssueResolutionName getName()
 	{
 		return name;
 	}
 
 	@Override
+	/*
+	 * 
+	 */
 	public boolean equals(Object obj)
 	{
 		if (obj == this) return true;
@@ -105,12 +122,18 @@ implements Serializable
 	}
 
 	@Override
+	/*
+	 * 
+	 */
 	public int hashCode()
 	{
 		return (31 * Util.hashCode(organisationID)) + Util.hashCode(issueResolutionID);
 	}
 
 	@Override
+	/*
+	 * 
+	 */
 	public String toString() {
 		return this.getClass().getName() + '@' + Integer.toHexString(System.identityHashCode(this)) + '[' + organisationID + ',' + issueResolutionID + ']';
 	}

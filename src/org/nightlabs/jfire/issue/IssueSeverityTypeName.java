@@ -76,6 +76,10 @@ extends I18nText{
 	{
 	}
 
+	/**
+	 * 
+	 * @param issueSeverityType
+	 */
 	public IssueSeverityTypeName(IssueSeverityType issueSeverityType)
 	{
 		this.issueSeverityType = issueSeverityType;
@@ -91,14 +95,26 @@ extends I18nText{
 		return names;
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
 	public String getOrganisationID() {
 		return organisationID;
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
 	public IssueSeverityType getIssueSeverityType() {
 		return issueSeverityType;
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
 	public String getIssueSeverityTypeID() {
 		return issueSeverityTypeID;
 	}

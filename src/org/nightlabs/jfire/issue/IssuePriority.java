@@ -2,6 +2,7 @@ package org.nightlabs.jfire.issue;
 
 import java.io.Serializable;
 
+import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.util.Util;
 
 /**
@@ -58,6 +59,11 @@ implements Serializable{
 	{
 	}
 
+	/**
+	 * Constructs a new issue priority.
+	 * @param organisationID the first part of the composite primary key - referencing the organisation which owns this <code>IssuePriority</code>.
+	 * @param issuePriorityID the second part of the composite primary key. Use {@link IDGenerator#nextID(Class)} with <code>IssuePriority.class</code> to create an id.
+	 */
 	public IssuePriority(String organisationID, String issuePriorityID){
 		if (issuePriorityID == null)
 			throw new IllegalArgumentException("issuePriorityID must not be null!");
@@ -67,6 +73,10 @@ implements Serializable{
 		this.name = new IssuePriorityName(this);
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
 	public String getOrganisationID() {
 		return organisationID;
 	}
@@ -79,12 +89,19 @@ implements Serializable{
 		return issuePriorityID;
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
 	public IssuePriorityName getIssuePriorityText()
 	{
 		return name;
 	}
 
 	@Override
+	/*
+	 * 
+	 */
 	public boolean equals(Object obj)
 	{
 		if (obj == this) return true;
@@ -96,6 +113,9 @@ implements Serializable{
 	}
 
 	@Override
+	/*
+	 * 
+	 */
 	public int hashCode()
 	{
 		return 

@@ -106,7 +106,14 @@ implements Serializable
 	@Deprecated
 	protected IssueWorkTimeRange() { }
 
-	public IssueWorkTimeRange(String organisationID, User user, Issue issue)
+	/**
+	 * 
+	 * @param organisationID the first part of the composite primary key - referencing the organisation which owns this <code>IssueWorkTimeRange</code>
+	 * @param issueWorkTimeRangeID the second part of the composite primary key. Use {@link IDGenerator#nextID(Class)} with <code>IssueWorkTimeRange.class</code> to create an id
+	 * @param user the user who takes this issue
+	 * @param issue the issue 
+	 */
+	public IssueWorkTimeRange(String organisationID, long issueWorkTimeRangeID, User user, Issue issue)
 	{
 		Organisation.assertValidOrganisationID(organisationID);
 		
@@ -116,8 +123,8 @@ implements Serializable
 		if (user == null)
 			throw new IllegalArgumentException("user must not be null!");
 		
-		this.issueWorkTimeRangeID = IDGenerator.nextID(IssueWorkTimeRange.class);
 		this.organisationID = organisationID;
+		this.issueWorkTimeRangeID = issueWorkTimeRangeID;
 		this.issue = issue;
 		this.user = user;
 	}
@@ -136,30 +143,58 @@ implements Serializable
 		return issueID;
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
 	public Issue getIssue(){
 		return issue;
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
 	public Date getFrom() {
 		return from;
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
 	public Date getTo() {
 		return to;
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
 	public Double getDuration() {
 		return duration;
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
 	public User getUser() {
 		return user;
 	}
 	
+	/**
+	 * 
+	 * @param from
+	 */
 	public void setFrom(Date from) {
 		this.from = from;
 	}
 	
+	/**
+	 * 
+	 * @param to
+	 */
 	public void setTo(Date to) {
 		this.to = to;
 		this.duration = new Double(to.getTime() - from.getTime());
@@ -178,6 +213,9 @@ implements Serializable
 	}	
 	
 	@Override
+	/*
+	 * 
+	 */
 	public boolean equals(Object obj)
 	{
 		if (obj == this) return true;
@@ -190,6 +228,9 @@ implements Serializable
 	}
 
 	@Override
+	/*
+	 * 
+	 */
 	public int hashCode()
 	{
 		return 

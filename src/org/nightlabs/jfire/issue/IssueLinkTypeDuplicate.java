@@ -31,6 +31,10 @@ extends IssueLinkTypeIssueToIssue
 	 */
 	protected IssueLinkTypeDuplicate() { }
 
+	/**
+	 * 
+	 * @param issueLinkTypeID
+	 */
 	public IssueLinkTypeDuplicate(IssueLinkTypeID issueLinkTypeID) {
 		super(issueLinkTypeID);
 		if (!ISSUE_LINK_TYPE_ID_DUPLICATE.equals(issueLinkTypeID))

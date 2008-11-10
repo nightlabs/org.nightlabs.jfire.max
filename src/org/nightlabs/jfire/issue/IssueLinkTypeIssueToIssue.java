@@ -29,6 +29,10 @@ extends IssueLinkType
 	 */
 	protected IssueLinkTypeIssueToIssue() { }
 	
+	/**
+	 * 
+	 * @param issueLinkTypeID
+	 */
 	public IssueLinkTypeIssueToIssue(IssueLinkTypeID issueLinkTypeID) {
 		super(issueLinkTypeID);
 	}

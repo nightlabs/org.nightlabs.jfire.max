@@ -81,6 +81,10 @@ public class IssueSubject
 	@Deprecated
 	protected IssueSubject() { }
 
+	/**
+	 * 
+	 * @param issue
+	 */
 	public IssueSubject(Issue issue)
 	{
 		this.issue = issue;
@@ -88,23 +92,43 @@ public class IssueSubject
 		this.issueID = issue.getIssueID();
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
 	public String getOrganisationID() {
 		return organisationID;
 	}
+	
+	/**
+	 * 
+	 * @return
+	 */
 	public long getIssueID() {
 		return issueID;
 	}
+	
+	/**
+	 * 
+	 * @return
+	 */
 	public Issue getIssue() {
 		return issue;
 	}
 	
 	@Override
+	/**
+	 * 
+	 */
 	protected Map<String, String> getI18nMap()
 	{
 		return names;
 	}
 
 	@Override
+	/**
+	 * 
+	 */
 	protected String getFallBackValue(String languageID)
 	{
 		return organisationID + '/' + ObjectIDUtil.longObjectIDFieldToString(issueID);

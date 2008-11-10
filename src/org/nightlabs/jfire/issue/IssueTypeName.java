@@ -72,32 +72,55 @@ extends I18nText
 	/**
 	 * @deprecated Only for JDO!
 	 */
-	protected IssueTypeName() {
-	}
+	protected IssueTypeName() {}
 	
+	/**
+	 * 
+	 * @param issueType
+	 */
 	public IssueTypeName(IssueType issueType) {
 		this.issueType = issueType;
 		organisationID = issueType.getOrganisationID();
 		issueTypeID = issueType.getIssueTypeID();
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
 	public String getOrganisationID() {
 		return organisationID;
 	}
+	
+	/**
+	 * 
+	 * @return
+	 */
 	public String getIssueTypeID() {
 		return issueTypeID;
 	}
+	
+	/**
+	 * 
+	 * @return
+	 */
 	public IssueType getIssueType() {
 		return issueType;
 	}
 
 	@Override
+	/**
+	 * 
+	 */
 	protected Map<String, String> getI18nMap()
 	{
 		return names;
 	}
 
 	@Override
+	/**
+	 * 
+	 */
 	protected String getFallBackValue(String languageID)
 	{
 		return organisationID + '/' + issueTypeID;

@@ -76,6 +76,10 @@ extends I18nText{
 	{
 	}
 
+	/**
+	 * 
+	 * @param issuePriority
+	 */
 	public IssuePriorityName(IssuePriority issuePriority)
 	{
 		this.issuePriority = issuePriority;
@@ -91,10 +95,17 @@ extends I18nText{
 		return names;
 	}
 	
+	/**
+	 * 
+	 */
 	public String getOrganisationID() {
 		return organisationID;
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
 	public IssuePriority getIssuePriority() {
 		return issuePriority;
 	}

@@ -11,6 +11,7 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
 import org.nightlabs.jdo.ObjectIDUtil;
+import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.issue.id.IssueLinkTypeID;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.util.Util;
@@ -116,10 +117,19 @@ implements Serializable
 	 */
 	protected IssueLinkType() {}
 
+	/**
+	 * Constructs a new IssueLinkType.
+	 * @param issueLinkTypeID
+	 */
 	public IssueLinkType(IssueLinkTypeID issueLinkTypeID) {
 		this(issueLinkTypeID.organisationID, issueLinkTypeID.issueLinkTypeID);
 	}
 
+	/**
+	 * Constructs a new IssueLinkType.
+	 * @param organisationID the first part of the composite primary key - referencing the organisation which owns this <code>IssueLinkType</code>
+	 * @param issueLinkTypeID the second part of the composite primary key. Use {@link IDGenerator#nextID(Class)} with <code>IssueLinkType.class</code> to create an id.
+	 */
 	public IssueLinkType(String organisationID, String issueLinkTypeID) {
 		Organisation.assertValidOrganisationID(organisationID);
 		ObjectIDUtil.assertValidIDString(issueLinkTypeID, "issueLinkTypeID");
@@ -130,6 +140,10 @@ implements Serializable
 		this.name = new IssueLinkTypeName(this);
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
 	public Set<String> getLinkedObjectClassNames() {
 		return Collections.unmodifiableSet(linkedObjectClassNames);
 	}
@@ -139,6 +153,11 @@ implements Serializable
 	 */
 	private transient Set<Class<?>> linkedObjectClasses;
 
+	/**
+	 * 
+	 * @return
+	 * @throws ClassNotFoundException
+	 */
 	public Set<Class<?>> getLinkedObjectClasses()
 	throws ClassNotFoundException
 	{
@@ -152,12 +171,20 @@ implements Serializable
 		return linkedObjectClasses;
 	}
 
+	/**
+	 * 
+	 */
 	public void clearLinkedObjectClasses()
 	{
 		linkedObjectClassNames.clear();
 		linkedObjectClasses = null;
 	}
 
+	/**
+	 * 
+	 * @param linkedObjectClass
+	 * @return
+	 */
 	public boolean addLinkedObjectClass(Class<?> linkedObjectClass)
 	{
 		boolean res = linkedObjectClassNames.add(linkedObjectClass.getName());
@@ -165,6 +192,11 @@ implements Serializable
 		return res;
 	}
 
+	/**
+	 * 
+	 * @param linkedObjectClass
+	 * @return
+	 */
 	public boolean removeLinkedObjectClass(Class<?> linkedObjectClass)
 	{
 		boolean res = linkedObjectClassNames.remove(linkedObjectClass.getName());
@@ -172,14 +204,26 @@ implements Serializable
 		return res;
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
 	public String getOrganisationID() {
 		return organisationID;
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
 	public String getIssueLinkTypeID() {
 		return issueLinkTypeID;
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
 	public IssueLinkTypeName getName() {
 		return name;
 	}
@@ -204,6 +248,9 @@ implements Serializable
 	 */
 	protected void preDeleteIssueLink(PersistenceManager pm, IssueLink issueLinkToBeDeleted) { }
 
+	/*
+	 * (non-Javadoc)
+	 */
 	protected PersistenceManager getPersistenceManager()
 	{
 		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
@@ -213,6 +260,9 @@ implements Serializable
 	}
 
 	@Override
+	/*
+	 * (non-Javadoc)
+	 */
 	public boolean equals(Object obj)
 	{
 		if (obj == this) return true;
@@ -226,12 +276,18 @@ implements Serializable
 	}
 
 	@Override
+	/*
+	 * (non-Javadoc)
+	 */
 	public int hashCode()
 	{
 		return (31 * Util.hashCode(organisationID)) ^ Util.hashCode(issueLinkTypeID);
 	}
 
 	@Override
+	/*
+	 * (non-Javadoc)
+	 */
 	public String toString() {
 		return (
 				this.getClass().getName()

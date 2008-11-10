@@ -181,6 +181,12 @@ implements SessionBean
 
 	//ProjectType//
 	/**
+	 * Stores a project type to the datastore.
+	 * @param projectType the project type to store
+	 * @param get true if you want to get the stored project type
+	 * @param fetchGroups the fetchGroups that used for specify fields to be detached from the datastore
+	 * @param maxFetchDepth specifies the number of level of the object to be fetched
+	 * 
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Required"

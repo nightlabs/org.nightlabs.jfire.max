@@ -7,8 +7,9 @@ import org.nightlabs.jfire.security.User;
 import org.nightlabs.util.Util;
 
 /**
- * An {@link IssueComment} class represents a comment which is created in an {@link Issue}.
+ * The {@link IssueComment} class represents a comment which is created in an {@link Issue}.
  * <p>
+ * 
  * </p>
  *
  * @author Chairat Kongarayawetchakun - chairat at nightlabs dot de
@@ -40,6 +41,7 @@ implements Serializable
 	public static final String FETCH_GROUP_THIS_COMMENT = "IssueComment.this";
 
 	public static final String FETCH_GROUP_USER = "IssueComment.user";
+	
 	/**
 	 * This is the organisationID to which the issue comment belongs. Within one organisation,
 	 * all the issue comments have their organisation's ID stored here, thus it's the same
@@ -86,14 +88,14 @@ implements Serializable
 
 	/**
 	 * Constructs a new IssueComment.
-	 * @param organisationID
-	 * @param commentID
-	 * @param issue
-	 * @param text
-	 * @param user
+	 * @param organisationID organisation id which this issue comment is stored in
+	 * @param commentID a unique id for this issue comment
+	 * @param issue the issue that this issue comment is made in 
+	 * @param text the text of the comment
+	 * @param user the user that created this comment
 	 */
-	public IssueComment(String organisationID, long commentID, Issue issue, String text, User user){
-		this.organisationID = organisationID;
+	public IssueComment(Issue issue, long commentID, String text, User user){
+		this.organisationID = issue.getOrganisationID();
 		this.commentID = commentID;
 		this.issue = issue;
 		this.text = text;
@@ -103,55 +105,57 @@ implements Serializable
 	}
 
 	/**
-	 * 
-	 * @return
+	 * Returns the organisation id.
+	 * @return the organisationID
 	 */
 	public String getOrganisationID() {
 		return organisationID;
 	}
 
 	/**
-	 * 
-	 * @return
+	 * Returns the comment id.
+	 * @return the commentID
 	 */
 	public long getCommentID() {
 		return commentID;
 	}
 
 	/**
-	 * 
-	 * @return
+	 * Returns the text of the comment.
+	 * @return the text of the comment
 	 */
 	public String getText() {
 		return text;
 	}
 
 	/**
-	 * 
-	 * @return
+	 * Returns the create time of the comment.
+	 * @return the create time of the comment
 	 */
 	public Date getCreateTimestamp() {
 		return createTimestamp;
 	}
 
 	/**
-	 * 
-	 * @return
+	 * Returns the user who created the comment.
+	 * @return the user who created the comment
 	 */
 	public User getUser() {
 		return user;
 	}
 
 	/**
-	 * 
-	 * @return
+	 * Returns the issue that this comment is created for.
+	 * @return the issue that this comment is created for
 	 */
 	public Issue getIssue() {
 		return issue;
 	}
 
 	@Override
-	
+	/*
+	 * 
+	 */
 	public boolean equals(Object obj)
 	{
 		if (obj == this) return true;
@@ -161,6 +165,9 @@ implements Serializable
 	}
 
 	@Override
+	/*
+	 * 
+	 */
 	public int hashCode()
 	{
 		return (31 * Util.hashCode(organisationID)) + Util.hashCode(commentID);

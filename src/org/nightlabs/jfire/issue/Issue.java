@@ -350,8 +350,8 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 
 	/**
 	 * Constructs a new issue.
-	 * @param organisationID
-	 * @param issueID
+	 * @param organisationID organisation id which this issue is stored in
+	 * @param issueID a unique id for this issue
 	 */
 	public Issue(String organisationID, long issueID)
 	{
@@ -380,9 +380,9 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 
 	/**
 	 * Constructs a new issue with {@link IssueType}.
-	 * @param organisationID
-	 * @param issueID
-	 * @param issueType
+	 * @param organisationID organisation id which this issue is stored in
+	 * @param issueID a unique id for this issue
+	 * @param issueType a specific issue type for this issue 
 	 */
 	public Issue(String organisationID, long issueID, IssueType issueType)
 	{
@@ -711,14 +711,14 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	}
 
 	/**
-	 * {@inheritDoc}}
+	 * {@inheritDoc}
 	 */
 	public StatableLocal getStatableLocal() {
 		return issueLocal;
 	}
 
 	/**
-	 * {@inheritDoc}}
+	 * {@inheritDoc}
 	 */
 	public State getState() {
 		return state;
@@ -730,7 +730,7 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	private transient List<State> _states = null;
 
 	/**
-	 * 
+	 * {@inheritDoc}
 	 */
 	public List<State> getStates()
 	{
@@ -741,13 +741,16 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	}
 
 	/**
-	 * {@inheritDoc}}
+	 * {@inheritDoc}
 	 */
 	public void setState(State state) {
 		this.state = state;
 		this.states.add(state);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 */
 	protected void ensureIssueHasProcessInstance() {
 		if (this.getStatableLocal().getJbpmProcessInstanceId() < 0) {
 			if (this.getIssueType() == null)
@@ -756,17 +759,25 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 		}
 	}
 
-	/**
+	/*
+	 * (non-Javadoc)
 	 * Checks if the issue has process instance already.
-	 * See {@link #jdoPreStore()}.
+	 * @see javax.jdo.listener.AttachCallback#jdoPostAttach(java.lang.Object)
 	 */
 	public void jdoPostAttach(Object attached) {
 		ensureIssueHasProcessInstance();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.jdo.listener.AttachCallback#jdoPreAttach()
+	 */
 	public void jdoPreAttach() {
 	}
 
+	/*
+	 * (non-Javadoc)
+	 */
 	protected PersistenceManager getPersistenceManager()
 	{
 		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
@@ -776,6 +787,11 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	}
 
 	@Override
+	/**
+	 * Compares this issue to the specified object. The result is true if and only if the argument is not null and is a issue object that represents the same primary keys.
+	 * @param obj the object to compare this issue against.
+	 * @return true if the issue are equal; false otherwise.
+	 */
 	public boolean equals(Object obj)
 	{
 		if (obj == this) return true;
@@ -788,12 +804,18 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	}
 
 	@Override
+	/*
+	 * (non-Javadoc)
+	 */
 	public int hashCode()
 	{
 		return (31 * Util.hashCode(organisationID)) ^ Util.hashCode(issueID);
 	}
 
 	@Override
+	/*
+	 * (non-Javadoc)
+	 */
 	public String toString() {
 		return (
 				this.getClass().getName()
@@ -807,10 +829,22 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 		);
 	}
 
+	/**
+	 * Gets a string of the {@link Issue}'s primary key.
+	 * 
+	 * @param organisationID organisation id of the issue
+	 * @param issueID issue id of the issue
+	 * @return
+	 */
 	public static String getPrimaryKey(String organisationID, long issueID)
 	{
 		return organisationID + '/' + Long.toString(issueID);
 	}
+	
+	/**
+	 * Gets a string of the {@link Issue}'s primary key.
+	 * @return a string of the issue primary key
+	 */
 	public String getPrimaryKey()
 	{
 		return organisationID + '/' + Long.toString(issueID);
@@ -838,6 +872,10 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	}
 
 	@Override
+	/*
+	 * (non-Javadoc)
+	 * @see javax.jdo.listener.DeleteCallback#jdoPreDelete()
+	 */
 	public void jdoPreDelete() {
 		PersistenceManager pm = getPersistenceManager();
 

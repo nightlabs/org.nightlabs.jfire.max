@@ -76,6 +76,10 @@ public class IssueDescription
 	{
 	}
 
+	/**
+	 * Constructs a new IssueDescription.
+	 * @param issue the issue that this issue description is made in 
+	 */
 	public IssueDescription(Issue issue)
 	{
 		this.issue = issue;
@@ -84,6 +88,7 @@ public class IssueDescription
 	}
 
 	/**
+	 * Returns the organisation id.
 	 * @return Returns the organisationID.
 	 */
 	public String getOrganisationID() {

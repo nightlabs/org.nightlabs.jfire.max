@@ -100,12 +100,21 @@ implements Serializable{
 	protected IssueFileAttachment() {
 	}
 
+	/**
+	 * Constructs a new IssueFileAttachment.
+	 * @param issue the issue that this issue attachment is made in 
+	 * @param issueFileAttachmentID a unique id for this issue attachment
+	 */
 	public IssueFileAttachment(Issue issue, long issueFileAttachmentID){
 		this.organisationID = issue.getOrganisationID();
 		this.issueID = issue.getIssueID();
 		this.issueFileAttachmentID = issueFileAttachmentID;
 	}
 
+	/**
+	 * Returns the issue that this attachment is created for.
+	 * @return the issue that this attachment is created for
+	 */
 	public Issue getIssue() {
 		return issue;
 	}
@@ -113,10 +122,10 @@ implements Serializable{
 	/**
 	 * Loads an input stream into byte array.
 	 * 
-	 * @param in
-	 * @param length
-	 * @param timeStamp
-	 * @param name
+	 * @param in the input stream of the file that will be loaded
+	 * @param length the byte length of the file 
+	 * @param timeStamp the date of the loaded time
+	 * @param name the name of the file
 	 * @throws IOException
 	 */
 	public void loadStream(InputStream in, long length, Date timeStamp, String name)
@@ -147,20 +156,39 @@ implements Serializable{
 		}
 	}
 
+	/**
+	 * Returns the file name.
+	 * @return the file name
+	 */
 	public String getFileName() {
 		return fileName;
 	}
 
+	/**
+	 * Returns the created time of the file.
+	 * @return the created time of the file.
+	 */
 	public Date getFileTimestamp() {
 		return fileTimestamp;
 	}
 
+	/**
+	 * 
+	 * @param in
+	 * @param name
+	 * @throws IOException
+	 */
 	public void loadStream(InputStream in, String name) 
 	throws IOException 
 	{
 		loadStream(in, 10 * 1024, new Date(), name);
 	}
 
+	/**
+	 * 
+	 * @param f
+	 * @throws IOException
+	 */
 	public void loadFile(File f)
 	throws IOException
 	{
@@ -182,6 +210,11 @@ implements Serializable{
 		return new InflaterInputStream(new ByteArrayInputStream(data));
 	}
 
+	/**
+	 * 
+	 * @param file
+	 * @throws IOException
+	 */
 	public void saveFile(File file) throws IOException
 	{
 		FileOutputStream out = new FileOutputStream(file);

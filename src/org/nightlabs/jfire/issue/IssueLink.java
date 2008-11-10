@@ -27,6 +27,8 @@ import org.nightlabs.util.Util;
 /**
  * The {@link IssueLink} class represents a link between an {@link Issue} and the other object. 
  * <p>
+ * The IssueLink is normally a relation that holds the information that 
+ * the issue is be related with which object and what kind of relation it is. 
  * </p>
  * 
  * @author Chairat Kongarayawetchakun - chairat [AT] nightlabs [DOT] de
@@ -210,6 +212,10 @@ implements Serializable, DetachCallback, StoreCallback, DeleteCallback
 		this.linkedObjectClass = linkedObjectClass;
 	}
 
+	/**
+	 * Returns the organisation id.
+	 * @return the organisationID
+	 */
 	public String getOrganisationID() {
 		return organisationID;
 	}

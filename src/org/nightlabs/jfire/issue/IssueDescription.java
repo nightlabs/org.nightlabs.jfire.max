@@ -89,12 +89,16 @@ public class IssueDescription
 
 	/**
 	 * Returns the organisation id.
-	 * @return Returns the organisationID.
+	 * @return the organisationID
 	 */
 	public String getOrganisationID() {
 		return organisationID;
 	}
 
+	/**
+	 * Returns the issue id.
+	 * @return the issue id
+	 */
 	public long getIssueID() {
 		return issueID;
 	}

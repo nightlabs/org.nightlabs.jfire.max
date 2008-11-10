@@ -3,6 +3,7 @@ package org.nightlabs.jfire.issue;
 import java.io.Serializable;
 import java.util.Date;
 
+import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.util.Util;
 
@@ -88,14 +89,14 @@ implements Serializable
 
 	/**
 	 * Constructs a new IssueComment.
-	 * @param organisationID organisation id which this issue comment is stored in
-	 * @param commentID a unique id for this issue comment
+	 * @param organisationID the first part of the composite primary key - referencing the organisation which owns this <code>IssueComment</code>.
+	 * @param commentID the second part of the composite primary key. Use {@link IDGenerator#nextID(Class)} with <code>IssueComment.class</code> to create an id.
 	 * @param issue the issue that this issue comment is made in 
 	 * @param text the text of the comment
 	 * @param user the user that created this comment
 	 */
-	public IssueComment(Issue issue, long commentID, String text, User user){
-		this.organisationID = issue.getOrganisationID();
+	public IssueComment(String organisationID, long commentID, Issue issue, String text, User user){
+		this.organisationID = organisationID;
 		this.commentID = commentID;
 		this.issue = issue;
 		this.text = text;

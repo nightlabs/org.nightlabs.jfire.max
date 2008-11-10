@@ -14,6 +14,7 @@ import java.util.zip.InflaterInputStream;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.io.DataBuffer;
+import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.util.IOUtil;
 
 /**
@@ -30,7 +31,7 @@ import org.nightlabs.util.IOUtil;
  *		detachable = "true"
  *		table="JFireIssueTracking_IssueFileAttachment"
  *
- * @jdo.create-objectid-class field-order="organisationID, issueID, issueFileAttachmentID"
+ * @jdo.create-objectid-class field-order="organisationID, issueFileAttachmentID"
  *
  * @jdo.inheritance strategy="new-table"
  *
@@ -60,11 +61,11 @@ implements Serializable{
 	@SuppressWarnings("unused")
 	private String organisationID;
 
-	/**
-	 * @jdo.field primary-key="true"
-	 */
-	@SuppressWarnings("unused")
-	private long issueID;
+//	/**
+//	 * @jdo.field primary-key="true"
+//	 */
+//	@SuppressWarnings("unused")
+//	private long issueID;
 
 	/**
 	 * @jdo.field primary-key="true"
@@ -102,13 +103,15 @@ implements Serializable{
 
 	/**
 	 * Constructs a new IssueFileAttachment.
+	 * 
+	 * @param organisationID the first part of the composite primary key - referencing the organisation which owns this <code>IssueFileAttachment</code>
+	 * @param issueFileAttachmentID the second part of the composite primary key. Use {@link IDGenerator#nextID(Class)} with <code>IssueFileAttachment.class</code> to create an id.
 	 * @param issue the issue that this issue attachment is made in 
-	 * @param issueFileAttachmentID a unique id for this issue attachment
 	 */
-	public IssueFileAttachment(Issue issue, long issueFileAttachmentID){
-		this.organisationID = issue.getOrganisationID();
-		this.issueID = issue.getIssueID();
+	public IssueFileAttachment(String organisationID, long issueFileAttachmentID, Issue issue){
+		this.organisationID = organisationID;
 		this.issueFileAttachmentID = issueFileAttachmentID;
+		this.issue = issue;
 	}
 
 	/**

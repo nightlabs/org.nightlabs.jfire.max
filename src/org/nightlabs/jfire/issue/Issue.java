@@ -350,8 +350,8 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 
 	/**
 	 * Constructs a new issue.
-	 * @param organisationID organisation id which this issue is stored in
-	 * @param issueID a unique id for this issue
+	 * @param organisationID the first part of the composite primary key - referencing the organisation which owns this <code>Issue</code>.
+	 * @param issueID the second part of the composite primary key. Use {@link IDGenerator#nextID(Class)} with <code>Issue.class</code> to create an id.
 	 */
 	public Issue(String organisationID, long issueID)
 	{
@@ -362,7 +362,7 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 		this.issueID = issueID;
 
 		subject = new IssueSubject(this);
-		description = new IssueDescription(this);
+		description = new IssueDescription(organisationID, issueID, this);
 
 		issueFileAttachments = new ArrayList<IssueFileAttachment>();
 		comments = new ArrayList<IssueComment>();
@@ -380,8 +380,8 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 
 	/**
 	 * Constructs a new issue with {@link IssueType}.
-	 * @param organisationID organisation id which this issue is stored in
-	 * @param issueID a unique id for this issue
+	 * @param organisationID the first part of the composite primary key - referencing the organisation which owns this <code>Issue</code>.
+	 * @param issueID the second part of the composite primary key. Use {@link IDGenerator#nextID(Class)} with <code>Issue.class</code> to create an id.
 	 * @param issueType a specific issue type for this issue 
 	 */
 	public Issue(String organisationID, long issueID, IssueType issueType)

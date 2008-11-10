@@ -80,11 +80,11 @@ public class IssueDescription
 	 * Constructs a new IssueDescription.
 	 * @param issue the issue that this issue description is made in 
 	 */
-	public IssueDescription(Issue issue)
+	public IssueDescription(String organisationID, long issueID, Issue issue)
 	{
 		this.issue = issue;
-		this.organisationID = issue.getOrganisationID();
-		this.issueID = issue.getIssueID();
+		this.organisationID = organisationID;
+		this.issueID = issueID;
 	}
 
 	/**

@@ -143,7 +143,7 @@ implements Serializable, ILayout
 
 		File orgF = f;
 		if (f.isDirectory()) {
-			f.mkdirs();
+//			f.mkdirs(); // Commented this out, because f.isDirectory() only returns true, if it already exists. Marco.
 			f = new File(f, fileName);
 		}
 		else

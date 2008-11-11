@@ -142,10 +142,12 @@ implements Serializable, ILayout
 		long timestamp = fileTimestamp.getTime();
 
 		File orgF = f;
-		if (f.isDirectory())
-			f = new File(f, fileName);
-		else
+		if (f.isDirectory()) {
 			f.mkdirs();
+			f = new File(f, fileName);
+		}
+		else
+			f.getParentFile().mkdirs();
 
 		logger.info("saveFile(\""+orgF.getAbsolutePath()+"\"): creating file \"" + f.getAbsolutePath() + "\" and writing " + fileData.length + " bytes into it.");
 

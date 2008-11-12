@@ -503,8 +503,21 @@ implements IPackagePriceConfig, IResultPriceConfig
 			ArticlePrice nextLevelArticlePrice, LinkedList<ArticlePrice> articlePriceStack,
 			NestedProductTypeLocal nestedProductTypeLocal, LinkedList<NestedProductTypeLocal> nestedProductTypeStack)
 	{
-//	 TODO implement
-		throw new UnsupportedOperationException("NYI");
+		CustomerGroup customerGroup = getCustomerGroup(article);
+		Tariff tariff = getTariff(article);
+		Currency currency = article.getCurrency();
+
+		PriceCell priceCell = getPriceCell(customerGroup, tariff, currency, true);
+
+		return PriceConfigUtil.createNestedArticlePrice(
+				packagePriceConfig,
+				this,
+				article, priceConfigStack,
+				topLevelArticlePrice, nextLevelArticlePrice,
+				articlePriceStack,
+				nestedProductTypeLocal,
+				nestedProductTypeStack,
+				priceCell.getPrice());
 	}
 
 	public ArticlePrice createNestedArticlePrice(

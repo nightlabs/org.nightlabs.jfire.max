@@ -2069,12 +2069,7 @@ public class Trader
 			// recalculate price
 			IPackagePriceConfig packagePriceConfig = article.getProductType().getPackagePriceConfig();
 			article.setPrice(packagePriceConfig.createArticlePrice(article));
-			
-			if (article.isAllocated()) {
-				// fillArticlePrice is only called when the article
-				// is allocated as it will be called by allocateArticlesEnd() anyhow.
-				packagePriceConfig.fillArticlePrice(article);
-			}
+			packagePriceConfig.fillArticlePrice(article);
 		}
 
 		for (Map.Entry<Offer, Set<Article>> me : offers.entrySet()) {

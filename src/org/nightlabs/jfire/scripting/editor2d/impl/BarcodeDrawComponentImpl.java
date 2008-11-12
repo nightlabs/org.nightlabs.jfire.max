@@ -387,5 +387,11 @@ implements BarcodeDrawComponent
 			setText(((String)scriptValue));
 		}
 	}
-	
+
+	@Override
+	public Object clone(DrawComponentContainer parent) {
+		BarcodeDrawComponentImpl clone = (BarcodeDrawComponentImpl) super.clone(parent);
+		clone.barcode = null;
+		return clone;
+	}
 }

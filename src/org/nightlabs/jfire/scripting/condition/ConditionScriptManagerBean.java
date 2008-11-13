@@ -105,7 +105,7 @@ implements SessionBean
 		super.unsetSessionContext();
 	}
 		
-	protected ScriptConditioner getScriptConditioner(PersistenceManager pm,
+	private static ScriptConditioner getScriptConditioner(PersistenceManager pm,
 			ScriptRegistryItemID scriptRegistryItemID,
 			Map<String, Object> parameterValues, int valueLimit)
 	{
@@ -139,7 +139,7 @@ implements SessionBean
 		}
 		catch (JDOObjectNotFoundException e) {
 			// If no valueprovider is registered use the default
-			PossibleValueProvider provider = PossibleValueProvider.getDefaultPossibleValueProvider(getPersistenceManager(), script);
+			PossibleValueProvider provider = PossibleValueProvider.getDefaultPossibleValueProvider(pm, script);
 			possibleValues = provider.getPossibleValues(parameterValues, valueLimit);			
 			logger.info("No possible values found for ScriptRegistryItemID "+scriptRegistryItemID+", use DefaultPossibleValueProvider!");
 		}
@@ -186,15 +186,19 @@ implements SessionBean
 			Map<ScriptRegistryItemID, Map<String, Object>> scriptID2Paramters, int valueLimit)
 	{
 		PersistenceManager pm = getPersistenceManager();
-		return getScriptConditioner(pm, scriptID2Paramters, valueLimit);
+		try {
+			return getScriptConditioner(pm, scriptID2Paramters, valueLimit);
+		} finally {
+			pm.close();
+		}
 	}
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Required" @!Is required because {@link #getScriptConditioner(PersistenceManager, ScriptRegistryItemID, Map, int)} can persist data
-	 */
-	public Map<ScriptRegistryItemID, ScriptConditioner> getScriptConditioner(
+//	/**
+//	 * @ejb.interface-method
+//	 * @ejb.permission role-name="_Guest_"
+//	 * @ejb.transaction type="Required" @!Is required because {@link #getScriptConditioner(PersistenceManager, ScriptRegistryItemID, Map, int)} can persist data
+//	 */
+	private static Map<ScriptRegistryItemID, ScriptConditioner> getScriptConditioner(
 			PersistenceManager pm, Map<ScriptRegistryItemID,
 			Map<String, Object>> scriptID2Paramters, int valueLimit)
 	{

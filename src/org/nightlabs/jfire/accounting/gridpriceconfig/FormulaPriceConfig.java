@@ -442,8 +442,12 @@ implements IFormulaPriceConfig
 
 	protected void removeFormulaCell(IPriceCoordinate priceCoordinate)
 	{
-		formulaCells.remove(priceCoordinate);
+//		formulaCells.remove(priceCoordinate);
+		FormulaCell oldFormulaCell = getPriceCoordinate2formulaCell().remove(priceCoordinate);
+		if (oldFormulaCell != null)
+			formulaCells.remove(oldFormulaCell);
 	}
+
 //	/**
 //	 * @see org.nightlabs.jfire.accounting.gridpriceconfig.GridPriceConfig#getPriceCell(org.nightlabs.jfire.accounting.gridpriceconfig.PriceCoordinate, boolean)
 //	 */

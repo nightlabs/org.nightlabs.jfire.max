@@ -322,7 +322,7 @@ implements IPackagePriceConfig, IResultPriceConfig
 			logger.debug("removePriceCell: " + priceCoordinate);
 
 //		priceCells.remove(priceCoordinate);
-		PriceCell oldPriceCell = getPriceCoordinate2priceCell().get(priceCoordinate);
+		PriceCell oldPriceCell = getPriceCoordinate2priceCell().remove(priceCoordinate);
 		if (oldPriceCell != null)
 			priceCells.remove(oldPriceCell);
 	}

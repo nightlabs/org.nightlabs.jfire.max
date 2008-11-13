@@ -248,7 +248,9 @@ public class GridPriceConfigUtil
 				pt.applyInheritance();
 		}
 
-		for (GridPriceConfig priceConfig : _priceConfigs) { // _priceConfigs is empty, if there is null assigned as inner price config => affectedProductTypes = null !!!
+//		for (GridPriceConfig priceConfig : _priceConfigs) { // _priceConfigs is empty, if there is null assigned as inner price config => affectedProductTypes = null !!!
+// hmmm... IMHO it's cleaner to iterate priceConfigs (holding the attached objects) rather than _priceConfigs and maybe it solves my problem. Marco.
+		for (GridPriceConfig priceConfig : priceConfigs) {
 			if (affectedProductTypes == null)
 				affectedProductTypes = PriceConfigUtil.getAffectedProductTypes(pm, priceConfig);
 			else

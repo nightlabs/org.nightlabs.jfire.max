@@ -193,12 +193,7 @@ implements SessionBean
 		}
 	}
 
-//	/**
-//	 * @ejb.interface-method
-//	 * @ejb.permission role-name="_Guest_"
-//	 * @ejb.transaction type="Required" @!Is required because {@link #getScriptConditioner(PersistenceManager, ScriptRegistryItemID, Map, int)} can persist data
-//	 */
-	private static Map<ScriptRegistryItemID, ScriptConditioner> getScriptConditioner(
+	public static Map<ScriptRegistryItemID, ScriptConditioner> getScriptConditioner(
 			PersistenceManager pm, Map<ScriptRegistryItemID,
 			Map<String, Object>> scriptID2Paramters, int valueLimit)
 	{

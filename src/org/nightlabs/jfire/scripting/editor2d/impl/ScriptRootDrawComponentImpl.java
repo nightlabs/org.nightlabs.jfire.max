@@ -51,15 +51,15 @@ extends RootDrawComponentImpl
 implements ScriptRootDrawComponent
 {
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger = Logger.getLogger(ScriptRootDrawComponentImpl.class);
-	
+
 	public void assignScriptResults(Map<ScriptRegistryItemID, Object> scriptValues)
 	{
 		// TODO: all scriptDrawComponents should already be cached when added
-		Collection<ScriptDrawComponent> scriptDrawComponents = findDrawComponents(ScriptDrawComponent.class, true);
+		Collection<ScriptDrawComponent> scriptDrawComponents = findDrawComponents(ScriptDrawComponent.class); // , true);
 		for (Iterator<ScriptDrawComponent> it = scriptDrawComponents.iterator(); it.hasNext(); )
 		{
 			ScriptDrawComponent sd = it.next();
@@ -86,12 +86,12 @@ implements ScriptRootDrawComponent
 		}
 		firePropertyChange(PROP_SCRIPT_VALUES, null, null);
 	}
-	
+
 	public Set<ScriptRegistryItemID> getScriptRegistryItemIDs()
 	{
 		// TODO: all scriptDrawComponents should already be cached when added
-		Collection<ScriptDrawComponent> scriptDrawComponents = findDrawComponents(ScriptDrawComponent.class, true);
-		
+		Collection<ScriptDrawComponent> scriptDrawComponents = findDrawComponents(ScriptDrawComponent.class); // , true);
+
 		Set<ScriptRegistryItemID> scriptIDs = new HashSet<ScriptRegistryItemID>();
 		for (Iterator<ScriptDrawComponent> it = scriptDrawComponents.iterator(); it.hasNext(); ) {
 			ScriptDrawComponent sd = it.next();
@@ -104,7 +104,7 @@ implements ScriptRootDrawComponent
 	{
 		if (scriptValues == null)
 			throw new IllegalArgumentException("Param scriptValues must NOT be null!");
-	
+
 		for (Map.Entry<Long, Boolean> entry : scriptValues.entrySet()) {
 			DrawComponent dc = getDrawComponent(entry.getKey());
 			if (dc != null) {
@@ -115,10 +115,10 @@ implements ScriptRootDrawComponent
 
 	public Map<Long, Script> getVisibleScripts() {
 		// TODO all DrawComponents with a visibleScript should already be cached
-		// when visibleScript is assigned		
+		// when visibleScript is assigned
 		return getVisibleScripts(this, new HashMap<Long, Script>());
 	}
-	
+
 	protected Map<Long, Script> getVisibleScripts(DrawComponent dc, Map<Long, Script> dcID2VisibleScript)
 	{
 		Script script = (Script) dc.getProperties().get(ScriptingConstants.PROP_VISIBLE_SCRIPT);

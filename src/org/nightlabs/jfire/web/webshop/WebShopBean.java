@@ -6,6 +6,7 @@ package org.nightlabs.jfire.web.webshop;
 import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -17,6 +18,7 @@ import javax.jdo.FetchPlan;
 import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
+import javax.jdo.Query;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Session;
@@ -34,13 +36,18 @@ import org.nightlabs.jfire.person.PersonStruct;
 import org.nightlabs.jfire.prop.DataBlock;
 import org.nightlabs.jfire.prop.DataBlockGroup;
 import org.nightlabs.jfire.prop.PropertySet;
+import org.nightlabs.jfire.prop.StructLocal;
+
+import org.nightlabs.jfire.prop.dao.StructLocalDAO;
 import org.nightlabs.jfire.prop.datafield.RegexDataField;
+import org.nightlabs.jfire.prop.datafield.TextDataField;
 import org.nightlabs.jfire.prop.exception.DataBlockGroupNotFoundException;
 import org.nightlabs.jfire.security.UserLocal;
 import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.trade.Trader;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 import org.nightlabs.jfire.webshop.id.WebCustomerID;
+import org.nightlabs.progress.NullProgressMonitor;
 
 /**
  * @author khaled
@@ -127,6 +134,23 @@ implements SessionBean
 		}
 	}
 
+	/**
+	 * @ejb.interface-method
+	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	public Set<WebCustomerID> getWebCustomerIDs()
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			Query q = pm.newQuery(WebCustomer.class);
+			q.setResult("JDOHelper.getObjectId(this)");
+			return new HashSet<WebCustomerID>((Collection<? extends WebCustomerID>) q.execute());
+		} finally {
+			pm.close();
+		}
+	}
+	
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
@@ -246,6 +270,43 @@ implements SessionBean
 			return false;
 		}
 		return true;
+	}
+	/**
+	 * @throws Exception 
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+	 */
+	public WebCustomer getWebCustomerByEmail( String email) throws Exception{
+		
+		Set<WebCustomerID> webCustomerIDs = getWebCustomerIDs();
+		WebCustomer result = null;  
+		try{
+			
+			WebShop webShop = WebShopUtil.getHome().create();
+			for(WebCustomerID webCustomerID : webCustomerIDs){
+				WebCustomer webCustomer = webShop.getPerson(webCustomerID,
+						new String[] {	WebCustomer.FETCH_GROUP_LEGAL_ENTITY,
+						WebCustomer.FETCH_GROUP_WEB_CUSTOMER_ID,
+						WebCustomer.FETCH_GROUP_PASSWORD,
+						LegalEntity.FETCH_GROUP_PERSON,
+						PropertySet.FETCH_GROUP_DATA_FIELDS, 
+						PropertySet.FETCH_GROUP_FULL_DATA } ,
+						NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
+				Person person = webCustomer.getLegalEntity().getPerson();
+				StructLocal struct = StructLocalDAO.sharedInstance().getStructLocal(Person.class, Person.STRUCT_SCOPE, Person.STRUCT_LOCAL_SCOPE, new NullProgressMonitor());
+				person.inflate(struct);
+					if(person.getDataField(PersonStruct.POSTADDRESS_ADDRESS).toString().equals(email));
+					result = webCustomer;
+					break;
+			}
+		} catch (Exception e) {
+			throw new Exception("get webcustomer by email failed", e);
+		}
+		
+		if (result==null)
+			throw new RuntimeException("get webcustomer by email failed");
+		return result;
 	}
 
 	/**

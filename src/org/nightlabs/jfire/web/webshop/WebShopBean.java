@@ -266,14 +266,15 @@ implements SessionBean
 		}
 		return true;
 	}
-//	/**
-//	 * @throws Exception
-//	 * @ejb.interface-method
-//	 * @ejb.permission role-name="_Guest_"
-//	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-//	 */
-//	public WebCustomer getWebCustomerByEmail( String email) throws Exception{
-//
+	/**
+	 * @throws Exception
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+	 */
+	public WebCustomer getWebCustomerByEmail(String email)
+	{
+		throw new UnsupportedOperationException("Temporarily deactivated!");
 //		Set<WebCustomerID> webCustomerIDs = getWebCustomerIDs();
 //		WebCustomer result = null;
 //		try{
@@ -302,7 +303,7 @@ implements SessionBean
 //		if (result==null)
 //			throw new RuntimeException("get webcustomer by email failed");
 //		return result;
-//	}
+	}
 
 	/**
 	 * Check if a customer can login. This is done by checking

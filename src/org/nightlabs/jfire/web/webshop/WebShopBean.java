@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.nightlabs.jfire.web.webshop;
 
@@ -36,26 +36,21 @@ import org.nightlabs.jfire.person.PersonStruct;
 import org.nightlabs.jfire.prop.DataBlock;
 import org.nightlabs.jfire.prop.DataBlockGroup;
 import org.nightlabs.jfire.prop.PropertySet;
-import org.nightlabs.jfire.prop.StructLocal;
-
-import org.nightlabs.jfire.prop.dao.StructLocalDAO;
 import org.nightlabs.jfire.prop.datafield.RegexDataField;
-import org.nightlabs.jfire.prop.datafield.TextDataField;
 import org.nightlabs.jfire.prop.exception.DataBlockGroupNotFoundException;
 import org.nightlabs.jfire.security.UserLocal;
 import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.trade.Trader;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 import org.nightlabs.jfire.webshop.id.WebCustomerID;
-import org.nightlabs.progress.NullProgressMonitor;
 
 /**
  * @author khaled
- * 
+ *
  * @ejb.bean name="jfire/ejb/JFireWebShopBase/WebShop"
  *           jndi-name="jfire/ejb/JFireWebShopBase/WebShop" type="Stateless"
  *           transaction-type="Container"
- * 
+ *
  * @ejb.util generate="physical"
  * @ejb.transaction type="Required"
  */
@@ -150,7 +145,7 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
@@ -206,7 +201,7 @@ implements SessionBean
 
 	/**
 	 * Create a new web customer.
-	 * 
+	 *
 	 * @param webCustomerID The customer to create
 	 * @param password The plain text password for the customer
 	 * @param person The person for the new customer
@@ -217,7 +212,7 @@ implements SessionBean
 	 * @return The newly created customer if the <code>get</code> parameter is <code>true</code> -
 	 * 		<code>null</code> otherwise.
 	 * @throws DuplicateIDException If a customer with the same id already exists.
-	 * 
+	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Required"
@@ -271,43 +266,43 @@ implements SessionBean
 		}
 		return true;
 	}
-	/**
-	 * @throws Exception 
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 */
-	public WebCustomer getWebCustomerByEmail( String email) throws Exception{
-		
-		Set<WebCustomerID> webCustomerIDs = getWebCustomerIDs();
-		WebCustomer result = null;  
-		try{
-			
-			WebShop webShop = WebShopUtil.getHome().create();
-			for(WebCustomerID webCustomerID : webCustomerIDs){
-				WebCustomer webCustomer = webShop.getPerson(webCustomerID,
-						new String[] {	WebCustomer.FETCH_GROUP_LEGAL_ENTITY,
-						WebCustomer.FETCH_GROUP_WEB_CUSTOMER_ID,
-						WebCustomer.FETCH_GROUP_PASSWORD,
-						LegalEntity.FETCH_GROUP_PERSON,
-						PropertySet.FETCH_GROUP_DATA_FIELDS, 
-						PropertySet.FETCH_GROUP_FULL_DATA } ,
-						NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
-				Person person = webCustomer.getLegalEntity().getPerson();
-				StructLocal struct = StructLocalDAO.sharedInstance().getStructLocal(Person.class, Person.STRUCT_SCOPE, Person.STRUCT_LOCAL_SCOPE, new NullProgressMonitor());
-				person.inflate(struct);
-					if(person.getDataField(PersonStruct.POSTADDRESS_ADDRESS).toString().equals(email));
-					result = webCustomer;
-					break;
-			}
-		} catch (Exception e) {
-			throw new Exception("get webcustomer by email failed", e);
-		}
-		
-		if (result==null)
-			throw new RuntimeException("get webcustomer by email failed");
-		return result;
-	}
+//	/**
+//	 * @throws Exception
+//	 * @ejb.interface-method
+//	 * @ejb.permission role-name="_Guest_"
+//	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+//	 */
+//	public WebCustomer getWebCustomerByEmail( String email) throws Exception{
+//
+//		Set<WebCustomerID> webCustomerIDs = getWebCustomerIDs();
+//		WebCustomer result = null;
+//		try{
+//
+//			WebShop webShop = WebShopUtil.getHome().create();
+//			for(WebCustomerID webCustomerID : webCustomerIDs){
+//				WebCustomer webCustomer = webShop.getPerson(webCustomerID,
+//						new String[] {	WebCustomer.FETCH_GROUP_LEGAL_ENTITY,
+//						WebCustomer.FETCH_GROUP_WEB_CUSTOMER_ID,
+//						WebCustomer.FETCH_GROUP_PASSWORD,
+//						LegalEntity.FETCH_GROUP_PERSON,
+//						PropertySet.FETCH_GROUP_DATA_FIELDS,
+//						PropertySet.FETCH_GROUP_FULL_DATA } ,
+//						NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
+//				Person person = webCustomer.getLegalEntity().getPerson();
+//				StructLocal struct = StructLocalDAO.sharedInstance().getStructLocal(Person.class, Person.STRUCT_SCOPE, Person.STRUCT_LOCAL_SCOPE, new NullProgressMonitor());
+//				person.inflate(struct);
+//					if(person.getDataField(PersonStruct.POSTADDRESS_ADDRESS).toString().equals(email));
+//					result = webCustomer;
+//					break;
+//			}
+//		} catch (Exception e) {
+//			throw new Exception("get webcustomer by email failed", e);
+//		}
+//
+//		if (result==null)
+//			throw new RuntimeException("get webcustomer by email failed");
+//		return result;
+//	}
 
 	/**
 	 * Check if a customer can login. This is done by checking
@@ -371,7 +366,7 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 //	/**
 //	 * @ejb.interface-method
 //	 * @ejb.permission role-name="_Guest_"
@@ -405,7 +400,7 @@ implements SessionBean
 //			pm.close();
 //		}
 //	}
-	
+
 //	/**
 //	 * The second password that can be set if a customer triggers the lostPassword procedure
 //	 * @ejb.interface-method
@@ -439,7 +434,7 @@ implements SessionBean
 //			pm.close();
 //		}
 //	}
-	
+
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
@@ -463,7 +458,7 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
@@ -484,7 +479,7 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 //	/**
 //	 * The second password that can be set if a customer triggers the lostPassword procedure
 //	 * @ejb.interface-method
@@ -516,7 +511,7 @@ implements SessionBean
 //		}
 //
 //	}
-	
+
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
@@ -551,7 +546,7 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
@@ -566,7 +561,7 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * This will send E-mails to every address found for that webCustomers
 	 * @param webCustomer
@@ -594,7 +589,7 @@ implements SessionBean
 			logger.error("Cannot send email - no Internet Block Group found for customer: "+webCustomerID);
 			return false;
 		}
-		
+
 		// Now sending mails to every E-Mail address found
 		boolean atLeastOneMailSent = false;
 		//String newPassword = UserLocal.createPassword(8,10);
@@ -607,10 +602,10 @@ implements SessionBean
 				logger.error("Sending email failed for customer: "+webCustomerID, e);
 			}
 		}
-		
+
 		if(!atLeastOneMailSent)
 			logger.error("No email could be sent to customer: "+webCustomerID);
-		
+
 		return atLeastOneMailSent;
 	}
 
@@ -631,7 +626,7 @@ implements SessionBean
 
 		ctx.close();
 	}
-	
+
 	/**
 	 * Creates, sends and if it succeeds stores it with an expiration Date.
 	 * @throws
@@ -673,7 +668,7 @@ implements SessionBean
 				// sending all mails failed
 				throw new Exception("Sending mail failed");
 	}
-	
+
 	/**
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"

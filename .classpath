@@ -20,8 +20,6 @@
 	<classpathentry kind="var" path="DATANUCLEUS_CORE"/>
 	<classpathentry kind="var" path="BCEL"/>
 	<classpathentry kind="var" path="JBOSS/server/default/lib/mail.jar"/>
-	<classpathentry kind="var" path="ASM"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/JFireBaseDAO"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/JFireBaseClientLib"/>
 	<classpathentry kind="output" path="bin"/>
+  <classpathentry kind="var" path="ASM"/>
 </classpath>

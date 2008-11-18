@@ -134,25 +134,6 @@ public class ReportingConstants {
 			Collection.class.getName() + "<" + User.class.getName() + ">"
 		);
 	
-//	/**
-//	 * ValueProvider id for a value provider that queries a {@link UserID} for a {@link UserGroup} from the user
-//	 */
-//	public static final ValueProviderID VALUE_PROVIDER_ID_USER_GROUP = ValueProviderID.create(
-//			Organisation.DEV_ORGANISATION_ID,
-//			ReportingConstants.VALUE_PROVIDER_CATEGORY_ID_JFIRE_OBJECTS.valueProviderCategoryID,
-//			UserGroup.class.getName()
-//		);
-//	
-//	// Current Usergroup not possible, as as the current User can be in multiple user groups.
-//	
-//	/**
-//	 * ValueProvider id for a value provider that queries a {@link Collection} of {@link UserID}s from the user
-//	 */
-//	public static final ValueProviderID VALUE_PROVIDER_ID_USER_GROUPS = ValueProviderID.create(
-//			Organisation.DEV_ORGANISATION_ID,
-//			ReportingConstants.VALUE_PROVIDER_CATEGORY_ID_JFIRE_OBJECTS.valueProviderCategoryID,
-//			Collection.class.getName() + "<" + UserGroup.class.getName() + ">"
-//		);
 	/**
 	 * ValueProvider id for a value provider that queries a {@link OrganisationID} from the user
 	 */

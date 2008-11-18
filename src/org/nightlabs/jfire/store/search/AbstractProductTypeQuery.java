@@ -2,7 +2,10 @@ package org.nightlabs.jfire.store.search;
 
 import javax.jdo.Query;
 
+import org.nightlabs.jfire.security.SecurityReflector;
+import org.nightlabs.jfire.security.id.UserID;
 import org.nightlabs.jfire.store.ProductType;
+import org.nightlabs.jfire.store.ProductTypePermissionFlagSet;
 import org.nightlabs.jfire.store.id.ProductTypeGroupID;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 
@@ -15,10 +18,10 @@ import org.nightlabs.jfire.transfer.id.AnchorID;
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
  */
 public abstract class AbstractProductTypeQuery
-	extends VendorDependentQuery
-	implements ISaleAccessQuery
+extends VendorDependentQuery
+implements ISaleAccessQuery
 {
-	private static final long serialVersionUID = 20080811L;
+	private static final long serialVersionUID = 20081118L;
 
 	private String fullTextLanguageID = null;
 	private boolean fullTextSearchRegex = false;
@@ -34,6 +37,10 @@ public abstract class AbstractProductTypeQuery
 	private Boolean saleable = null;
 	private Boolean closed = null;
 
+//	private Boolean permissionGrantedToSee = Boolean.TRUE;
+	private Boolean permissionGrantedToSell = null;
+	private Boolean permissionGrantedToReverse = null;
+
 	private int minNestedProductTypeAmount = -1;
 	private int maxNestedProductTypeAmount = -1;
 	private AnchorID ownerID = null;
@@ -41,6 +48,10 @@ public abstract class AbstractProductTypeQuery
 	private String organisationID = null;
 	// this value is initially set to avoid finding productType categories by default
 	private Byte inheritanceNature = ProductType.INHERITANCE_NATURE_LEAF;
+
+	// Is used for permissionGranted* checks. Currently, it's simply assigned to
+	// the current user's value - this might later be manually assignable and non-transient.
+	private transient UserID userID = null;
 
 	public static final class FieldName
 	{
@@ -57,12 +68,35 @@ public abstract class AbstractProductTypeQuery
 		public static final String saleable = "saleable";
 		public static final String organisationID = "organisationID";
 		public static final String inheritanceNature = "inheritanceNature";
+
+//		public static final String permissionGrantedToSee = "permissionGrantedToSee";
+		public static final String permissionGrantedToSell = "permissionGrantedToSell";
+		public static final String permissionGrantedToReverse = "permissionGrantedToReverse";
 	}
 
 	@Override
 	protected Query createQuery()
 	{
 		return getPersistenceManager().newQuery(getCandidateClass());
+	}
+
+	protected void populateFilterPermissionGranted(
+			String productTypePermissionFlagSetFlagsFieldName,
+			boolean permissionGranted, String variableName
+	)
+	{
+		StringBuffer filter = getFilter();
+		addVariable(ProductTypePermissionFlagSet.class, variableName);
+		// joining via primary key - faster than other fields
+		filter.append("\n && this.organisationID == " + variableName + ".productTypeOrganisationID");
+		filter.append("\n && this.productTypeID == " + variableName + ".productTypeID");
+		filter.append("\n && " + variableName + ".userOrganisationID == :userID.organisationID");
+		filter.append("\n && " + variableName + ".userID == :userID.userID");
+		filter.append("\n && " + variableName + '.' + productTypePermissionFlagSetFlagsFieldName + " ");
+		if (permissionGranted)
+			filter.append("== 0");
+		else
+			filter.append("!= 0");
 	}
 
 	@Override
@@ -72,6 +106,20 @@ public abstract class AbstractProductTypeQuery
 		StringBuffer vars = getVars();
 
 		filter.append("true");
+
+		if (userID == null)
+			userID = SecurityReflector.getUserDescriptor().getUserObjectID();
+
+//		if (isFieldEnabled(FieldName.permissionGrantedToSee) && permissionGrantedToSee != null)
+//			populateFilterPermissionGranted("flagsSeeProductType", permissionGrantedToSee, "productTypePermissionFlagSetSee");
+		populateFilterPermissionGranted("flagsSeeProductType", true, "productTypePermissionFlagSetSee");
+
+		if (isFieldEnabled(FieldName.permissionGrantedToSell) && permissionGrantedToSell != null)
+			populateFilterPermissionGranted("flagsSellProductType", permissionGrantedToSell, "productTypePermissionFlagSetSell");
+
+		if (isFieldEnabled(FieldName.permissionGrantedToReverse) && permissionGrantedToReverse != null)
+			populateFilterPermissionGranted("flagsReverseProductType", permissionGrantedToReverse, "productTypePermissionFlagSetReverse");
+
 
 		if (isFieldEnabled(FieldName.fullTextSearch) && fullTextSearch != null) {
 			filter.append("\n && ( ");
@@ -116,6 +164,8 @@ public abstract class AbstractProductTypeQuery
 		if (isFieldEnabled(VendorDependentQuery.FieldName.vendorID) && getVendorID() != null)
 			filter.append("\n && JDOHelper.getObjectId(this."+ProductType.FieldName.vendor+") == :vendorID");
 
+
+
 		q.setFilter(filter.toString());
 		q.declareVariables(vars.toString());
 	}
@@ -132,7 +182,7 @@ public abstract class AbstractProductTypeQuery
 		filter.append("\n (\n" +
 				"  this."+member+".names."+containsStr+"\n" +
 				"  && "+varName+".toLowerCase().matches(:fullTextSearchExpr.toLowerCase())" +
-				" )");
+		" )");
 	}
 
 	/**
@@ -203,17 +253,17 @@ public abstract class AbstractProductTypeQuery
 	}
 
 	/**
-	 * Sets whether the value set with {@link #setFullTextSearch(String)} represents a 
+	 * Sets whether the value set with {@link #setFullTextSearch(String)} represents a
 	 * regular expression.
-	 * 
-	 * @param fullTextSearchRegex The fullTextSearchRegex to search. 
+	 *
+	 * @param fullTextSearchRegex The fullTextSearchRegex to search.
 	 */
 	public void setFullTextSearchRegex(boolean fullTextSearchRegex) {
 		final boolean oldFullTextSearchRegex = this.fullTextSearchRegex;
 		this.fullTextSearchRegex = fullTextSearchRegex;
 		notifyListeners(FieldName.fullTextSearchRegex, oldFullTextSearchRegex, fullTextSearchRegex);
 	}
-	
+
 	/**
 	 * @return the published
 	 */
@@ -267,7 +317,7 @@ public abstract class AbstractProductTypeQuery
 		final Integer oldMinNestedProductTypeAmount = this.minNestedProductTypeAmount;
 		this.minNestedProductTypeAmount = minNestedProductTypeAmount;
 		notifyListeners(FieldName.minNestedProductTypeAmount, oldMinNestedProductTypeAmount,
-			minNestedProductTypeAmount);
+				minNestedProductTypeAmount);
 	}
 
 	/**
@@ -287,7 +337,7 @@ public abstract class AbstractProductTypeQuery
 		final Integer oldMaxNestedProductTypeAmount = this.maxNestedProductTypeAmount;
 		this.maxNestedProductTypeAmount = maxNestedProductTypeAmount;
 		notifyListeners(FieldName.maxNestedProductTypeAmount, oldMaxNestedProductTypeAmount,
-			maxNestedProductTypeAmount);
+				maxNestedProductTypeAmount);
 	}
 
 	/**
@@ -381,4 +431,28 @@ public abstract class AbstractProductTypeQuery
 		this.inheritanceNature = inheritanceNature;
 	}
 
+//	public Boolean getPermissionGrantedToSee() {
+//		return permissionGrantedToSee;
+//	}
+//	public void setPermissionGrantedToSee(Boolean permissionGrantedToSee) {
+//		Boolean oldPermissionGrantedToSee = this.permissionGrantedToSee;
+//		this.permissionGrantedToSee = permissionGrantedToSee;
+//		notifyListeners(FieldName.permissionGrantedToSee, oldPermissionGrantedToSee, permissionGrantedToSee);
+//	}
+	public Boolean getPermissionGrantedToSell() {
+		return permissionGrantedToSell;
+	}
+	public void setPermissionGrantedToSell(Boolean permissionGrantedToSell) {
+		Boolean oldPermissionGrantedToSell = this.permissionGrantedToSell;
+		this.permissionGrantedToSell = permissionGrantedToSell;
+		notifyListeners(FieldName.permissionGrantedToSell, oldPermissionGrantedToSell, permissionGrantedToSell);
+	}
+	public Boolean getPermissionGrantedToReverse() {
+		return permissionGrantedToReverse;
+	}
+	public void setPermissionGrantedToReverse(Boolean permissionGrantedToReverse) {
+		Boolean oldPermissionGrantedToReverse = this.permissionGrantedToReverse;
+		this.permissionGrantedToReverse = permissionGrantedToReverse;
+		notifyListeners(FieldName.permissionGrantedToReverse, oldPermissionGrantedToReverse, permissionGrantedToReverse);
+	}
 }

@@ -3,8 +3,10 @@ package org.nightlabs.jfire.store.search;
 import javax.jdo.Query;
 
 import org.apache.log4j.Logger;
+import org.nightlabs.jfire.security.id.UserID;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.ProductTypeGroup;
+import org.nightlabs.jfire.store.ProductTypePermissionFlagSet;
 
 /**
  * Abstract base class for queries which searches for {@link ProductTypeGroup}s.
@@ -21,8 +23,8 @@ public abstract class AbstractProductTypeGroupQuery
 {
 	private static final Logger logger = Logger.getLogger(AbstractProductTypeGroupQuery.class);
 
-	private static final long serialVersionUID = 20080811L;
-	
+	private static final long serialVersionUID = 2008111800L;
+
 	public static final class FieldName
 	{
 		public static final String fullTextSearchRegex = "fullTextSearchRegex";
@@ -33,6 +35,10 @@ public abstract class AbstractProductTypeGroupQuery
 		public static final String published = "published";
 		public static final String saleable = "saleable";
 		public static final String organisationID = "organisationID";
+
+//		public static final String permissionGrantedToSee = "permissionGrantedToSee";
+		public static final String permissionGrantedToSell = "permissionGrantedToSell";
+		public static final String permissionGrantedToReverse = "permissionGrantedToReverse";
 	}
 
 	private Boolean published = null;
@@ -51,6 +57,34 @@ public abstract class AbstractProductTypeGroupQuery
 
 	private String organisationID = null;
 
+
+//	private Boolean permissionGrantedToSee = Boolean.TRUE;
+	private Boolean permissionGrantedToSell = null;
+	private Boolean permissionGrantedToReverse = null;
+
+	// Is used for permissionGranted* checks. Currently, it's simply assigned to
+	// the current user's value - this might later be manually assignable and non-transient.
+	private transient UserID userID = null;
+
+	protected void populateFilterPermissionGranted(
+			String productTypePermissionFlagSetFlagsFieldName,
+			boolean permissionGranted, String variableName
+	)
+	{
+		StringBuffer filter = getFilter();
+		addVariable(ProductTypePermissionFlagSet.class, variableName);
+		// joining via primary key - faster than other fields
+		filter.append("\n && this.productType.organisationID == " + variableName + ".productTypeOrganisationID");
+		filter.append("\n && this.productType.productTypeID == " + variableName + ".productTypeID");
+		filter.append("\n && " + variableName + ".userOrganisationID == :userID.organisationID");
+		filter.append("\n && " + variableName + ".userID == :userID.userID");
+		filter.append("\n && " + variableName + '.' + productTypePermissionFlagSetFlagsFieldName + " ");
+		if (permissionGranted)
+			filter.append("== 0");
+		else
+			filter.append("!= 0");
+	}
+
 	/* (non-Javadoc)
 	 * @see org.nightlabs.jdo.query.AbstractJDOQuery#prepareQuery(javax.jdo.Query)
 	 */
@@ -59,6 +93,17 @@ public abstract class AbstractProductTypeGroupQuery
 	{
 		StringBuffer filter = getFilter();
 		StringBuffer vars = getVars();
+
+//		if (isFieldEnabled(FieldName.permissionGrantedToSee) && permissionGrantedToSee != null)
+//			populateFilterPermissionGranted("flagsSeeProductType", permissionGrantedToSee, "productTypePermissionFlagSetSee");
+		populateFilterPermissionGranted("flagsSeeProductType", true, "productTypePermissionFlagSetSee");
+
+		if (isFieldEnabled(FieldName.permissionGrantedToSell) && permissionGrantedToSell != null)
+			populateFilterPermissionGranted("flagsSellProductType", permissionGrantedToSell, "productTypePermissionFlagSetSell");
+
+		if (isFieldEnabled(FieldName.permissionGrantedToReverse) && permissionGrantedToReverse != null)
+			populateFilterPermissionGranted("flagsReverseProductType", permissionGrantedToReverse, "productTypePermissionFlagSetReverse");
+
 
 		filter.append("productType."+ProductType.FieldName.productTypeGroups+".containsValue(this)");
 
@@ -190,7 +235,7 @@ public abstract class AbstractProductTypeGroupQuery
 		this.fullTextSearch = fullTextSearch;
 		notifyListeners(FieldName.fullTextSearch, oldFullTextSearch, fullTextSearch);
 	}
-	
+
 	/**
 	 * @return Whether the value set with {@link #setFullTextSearch(String)} represents a regular
 	 *         expression. If this is <code>true</code>, the value set with {@link #setFullTextSearch(String)}
@@ -202,17 +247,17 @@ public abstract class AbstractProductTypeGroupQuery
 	}
 
 	/**
-	 * Sets whether the value set with {@link #setFullTextSearch(String)} represents a 
+	 * Sets whether the value set with {@link #setFullTextSearch(String)} represents a
 	 * regular expression.
-	 * 
-	 * @param fullTextSearchRegex The fullTextSearchRegex to search. 
+	 *
+	 * @param fullTextSearchRegex The fullTextSearchRegex to search.
 	 */
 	public void setFullTextSearchRegex(boolean fullTextSearchRegex) {
 		final boolean oldFullTextSearchRegex = this.fullTextSearchRegex;
 		this.fullTextSearchRegex = fullTextSearchRegex;
 		notifyListeners(FieldName.fullTextSearchRegex, oldFullTextSearchRegex, fullTextSearchRegex);
 	}
-	
+
 	/**
 	 * @return the confirmed
 	 */
@@ -268,4 +313,28 @@ public abstract class AbstractProductTypeGroupQuery
 		notifyListeners(FieldName.organisationID, oldOrganisationID, organisationID);
 	}
 
+//	public Boolean getPermissionGrantedToSee() {
+//		return permissionGrantedToSee;
+//	}
+//	public void setPermissionGrantedToSee(Boolean permissionGrantedToSee) {
+//		Boolean oldPermissionGrantedToSee = this.permissionGrantedToSee;
+//		this.permissionGrantedToSee = permissionGrantedToSee;
+//		notifyListeners(FieldName.permissionGrantedToSee, oldPermissionGrantedToSee, permissionGrantedToSee);
+//	}
+	public Boolean getPermissionGrantedToSell() {
+		return permissionGrantedToSell;
+	}
+	public void setPermissionGrantedToSell(Boolean permissionGrantedToSell) {
+		Boolean oldPermissionGrantedToSell = this.permissionGrantedToSell;
+		this.permissionGrantedToSell = permissionGrantedToSell;
+		notifyListeners(FieldName.permissionGrantedToSell, oldPermissionGrantedToSell, permissionGrantedToSell);
+	}
+	public Boolean getPermissionGrantedToReverse() {
+		return permissionGrantedToReverse;
+	}
+	public void setPermissionGrantedToReverse(Boolean permissionGrantedToReverse) {
+		Boolean oldPermissionGrantedToReverse = this.permissionGrantedToReverse;
+		this.permissionGrantedToReverse = permissionGrantedToReverse;
+		notifyListeners(FieldName.permissionGrantedToReverse, oldPermissionGrantedToReverse, permissionGrantedToReverse);
+	}
 }

@@ -272,9 +272,9 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
-	public WebCustomer getWebCustomerByEmail(String email)
+	public Collection<WebCustomer> getWebCustomerByEmail(String email)
 	{
-		return WebCustomer.getWebCustomersWithEmail(getPersistenceManager(), email);
+		return WebCustomer.getWebCustomerWithEmail(getPersistenceManager(), email);
 	}
 
 	/**
@@ -512,9 +512,9 @@ implements SessionBean
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			WebCustomer customer = WebCustomer.getWebCustomersWithEmail(pm, email);
+			Collection<WebCustomer> customer = WebCustomer.getWebCustomerWithEmail(pm, email);
 
-			return (customer!=null);
+			return (customer.size()>0);
 		} finally {
 			pm.close();
 		}
@@ -618,8 +618,10 @@ implements SessionBean
 			PersistenceManager pm = getPersistenceManager();
 			try {
 				WebCustomer wbc = (WebCustomer)pm.getObjectById(webCustomerID);
-				wbc.setSecondPassword(UserLocal.encryptPassword(newPassword));
-				wbc.setSecondPasswordDate(new Date());
+//				wbc.setSecondPassword(UserLocal.encryptPassword(newPassword));
+//				wbc.setSecondPasswordDate(new Date());
+				wbc.setPassword(UserLocal.encryptPassword(newPassword));
+				pm.makePersistent(wbc);
 //				setSecondPassword(pm, webCustomerID, UserLocal.encryptPassword(newPassword));
 			} finally {
 				pm.close();

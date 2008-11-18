@@ -3,19 +3,15 @@
  */
 package org.nightlabs.jfire.reporting.textpart;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.StreamTokenizer;
 import java.io.StringReader;
 import java.util.regex.Matcher;
 
-import org.nightlabs.util.IOUtil;
-
 
 /**
  * This parser takes the contents of a {@link ReportTextPart} as input
- * and iterpretes it as jshtml (inside out-javascript with html output).
+ * and interprets it as jshtml (inside out-javascript with html output).
  * <p>
  * This parser is a intended to be used only once (you pass the string 
  * to parse in the constructor).
@@ -205,10 +201,4 @@ public class ReportTextPartJSHTMLParser {
 		}
 		return escaped;
 	}
-
-	public static void main(String[] args) throws FileNotFoundException, IOException {
-		String js = IOUtil.readTextFile(new File("/home/alex/test.js"));
-		ReportTextPartJSHTMLParser parser = new ReportTextPartJSHTMLParser(js, "out", "append");
-		parser.parse();
 	}
-}

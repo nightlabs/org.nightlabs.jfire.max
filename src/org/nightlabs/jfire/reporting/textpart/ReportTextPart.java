@@ -43,8 +43,10 @@ public class ReportTextPart implements Serializable {
 	private static final long serialVersionUID = 20080821L;
 	
 	public enum Type {
-		HTML,
-		JAVASCRIPT
+		/**
+		 * JSHtml is inside-out javascript with html output. 
+		 */
+		JSHTML
 	}
 	
 	/**
@@ -116,7 +118,7 @@ public class ReportTextPart implements Serializable {
 		this.reportTextPartConfiguration = reportTextPartConfiguration;
 		this.name = new ReportTextPartName(this);
 		this.content = new ReportTextPartContent(this);
-		this.type = Type.HTML;
+		this.type = Type.JSHTML;
 	}
 	
 	/**

@@ -4,7 +4,6 @@
 package org.nightlabs.jfire.reporting.textpart;
 
 import java.util.Locale;
-import java.util.regex.Matcher;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
@@ -101,30 +100,17 @@ public class ReportTextPartHelper {
 	 * @return A String that can be passed to the javascript eval() method inside a report layout.
 	 */
 	public static String getEvalString(ReportTextPart reportTextPart, Locale locale) {
-		if (!reportTextPart.getContent().containsLanguageID(locale.getLanguage()))
-			return "";
-		String contentStr = reportTextPart.getContent().getText(locale.getLanguage());
-		if (reportTextPart.getType() == Type.HTML) {
-			contentStr = "\"" + escapeEvalString(contentStr, 1, true) + "\"";
-//			contentStr = escapeEvalString(contentStr, 1, true);
-			logger.debug("getEvalString() found HTML type content and returning: " + contentStr);
-			// TODO: Later we can split for special images (or similar elements)
-			// and have the surrounding html wrapped in an inner eval(escapeEvalString(, 2)) + codeForVariable + eval(escapeEvalString(, 2)
-		} else if (reportTextPart.getType() == Type.JAVASCRIPT) {
-			logger.debug("getEvalString() found JAVASCRIPT type content and returning: " + contentStr);
+		String contentStr = reportTextPart.getContent().getText(locale);
+		if (reportTextPart.getType() == Type.JSHTML) {
+			ReportTextPartJSHTMLParser parser = new ReportTextPartJSHTMLParser(contentStr, "context", "print");
+			parser.parse();
+			String result = "var context = new Packages." + ReportTextPartContext.class.getName() + "();\n" +
+				parser.getParsedText() + "\n" + 
+				"context.getContextResult()";
+			if (logger.isDebugEnabled())
+				logger.debug("getEvalString() found JAVASCRIPT type content and returning: " + result);
+			return result;
 		}
 		return contentStr;
-	}
-	
-	private static String escapeEvalString(String strToEval, int level, boolean convertStringLineBreaks) {
-		String escaped = strToEval;
-		for (int i = 0; i < level; i++) {
-			escaped = escaped.replaceAll("\\\\", Matcher.quoteReplacement("\\\\"));
-			escaped = escaped.replaceAll("\"", Matcher.quoteReplacement("\\\""));
-		}
-		if (convertStringLineBreaks) {
-			escaped = escaped.replaceAll("\\n", Matcher.quoteReplacement("\" + \n\""));
-		}
-		return escaped;
 	}
 }

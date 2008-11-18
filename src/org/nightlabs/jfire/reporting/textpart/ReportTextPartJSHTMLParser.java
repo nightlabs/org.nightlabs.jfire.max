@@ -14,12 +14,16 @@ import org.nightlabs.util.IOUtil;
 
 
 /**
+ * This parser takes the contents of a {@link ReportTextPart} as input
+ * and iterpretes it as jshtml (inside out-javascript with html output).
+ * <p>
+ * This parser is a intended to be used only once (you pass the string 
+ * to parse in the constructor).
+ * </p>
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
  */
-public class ReportTextPartParser {
+public class ReportTextPartJSHTMLParser {
 
-	private static String printWriter = "context.out";
-	
 	private static final char lt = '<';
 	private static final char gt ='>';
 	private static final char eq =  '=';
@@ -37,20 +41,29 @@ public class ReportTextPartParser {
 	private static final int NORMAL = 0;
 	
 	private String textPartContent;
-	private StringBuffer buffer;
-	private StringBuffer nextJS;
-	private StringBuffer nextTxt;
+	private StringBuilder buffer;
+	private StringBuilder nextJS;
+	private StringBuilder nextTxt;
 
 	private boolean nextJSSingleReturn;
 	
+	private final String printObject;
+	private final String printMethod;
+	
 	/**
-	 * 
+	 * Create a new {@link ReportTextPartJSHTMLParser}.
+	 *  
 	 */
-	public ReportTextPartParser(String textPartContent) {
+	public ReportTextPartJSHTMLParser(String textPartContent, String printObjectName, String printMethodName) {
 		this.textPartContent = textPartContent;
+		this.printObject = printObjectName;
+		this.printMethod = printMethodName;
 	}
 	
-	public synchronized void parse() throws IOException {
+	/**
+	 * Parse the String given in the constructor.
+	 */
+	public synchronized void parse() {
 		StringReader reader = new StringReader(textPartContent);
 		StreamTokenizer stk = new StreamTokenizer(reader);
 		try {
@@ -64,9 +77,9 @@ public class ReportTextPartParser {
 			stk.ordinaryChar(lb);
 			boolean inString = false;
 			boolean inJS = false;
-			buffer = new StringBuffer();
-			nextJS = new StringBuffer();
-			nextTxt = new StringBuffer();
+			buffer = new StringBuilder();
+			nextJS = new StringBuilder();
+			nextTxt = new StringBuilder();
 			
 			int expectedToken = NORMAL;
 			char previousOrdinary = 0;
@@ -149,7 +162,14 @@ public class ReportTextPartParser {
 					previousOrdinary = (char) stk.ttype; 
 				}
 			}
-			System.out.println(escapeEvalString(buffer.toString(), 1, true));
+			if (nextTxt.length() != 0)
+				writeTxt();
+			else if (nextJS.length() != 0)
+				writeJS();
+			
+			System.out.println(buffer.toString());
+		} catch (IOException ex) {
+			throw new RuntimeException(ex);
 		} finally {
 			reader.close();
 		}
@@ -157,7 +177,7 @@ public class ReportTextPartParser {
 
 	private void writeJS() {
 		if (nextJSSingleReturn) {
-			buffer.append(printWriter + ".print(" + nextJS.toString() + ");\n");
+			buffer.append(printObject + "." + printMethod + "(" + nextJS.toString() + ");\n");
 			nextJSSingleReturn = false;
 		} else {
 			buffer.append(nextJS.toString() + "\n");
@@ -166,11 +186,15 @@ public class ReportTextPartParser {
 	}
 	
 	private void writeTxt() {
-		buffer.append(printWriter + ".print(\"" + nextTxt.toString() + "\");\n");
+		buffer.append(printObject + "." + printMethod + "(\"" + nextTxt.toString() + "\");\n");
 		nextTxt.setLength(0);
 	}
 	
-	private static String escapeEvalString(String strToEval, int level, boolean convertStringLineBreaks) {
+	public String getParsedText() {
+		return buffer.toString();
+	}
+	
+	protected static String escapeEvalString(String strToEval, int level, boolean convertStringLineBreaks) {
 		String escaped = strToEval;
 		for (int i = 0; i < level; i++) {
 			escaped = escaped.replaceAll("\\\\", Matcher.quoteReplacement("\\\\"));
@@ -182,10 +206,9 @@ public class ReportTextPartParser {
 		return escaped;
 	}
 
-	
 	public static void main(String[] args) throws FileNotFoundException, IOException {
 		String js = IOUtil.readTextFile(new File("/home/alex/test.js"));
-		ReportTextPartParser parser = new ReportTextPartParser(js);
+		ReportTextPartJSHTMLParser parser = new ReportTextPartJSHTMLParser(js, "out", "append");
 		parser.parse();
 	}
 }

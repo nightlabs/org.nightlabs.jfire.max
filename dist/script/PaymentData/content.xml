@@ -17,7 +17,6 @@
 			<name language="de">ParameterSet: Zahlungsliste</name>
 			<name language="en">ParameterSet: Paymentlist</name>
 			<parameter name="userIDs" type="java.util.Collection"/>	
-			<parameter name="userGroupIDs" type="java.util.Collection"/>
 			<parameter name="modeOfPaymentFlavourIDs" type="java.util.Collection"/>	
 			<parameter name="partnerIDs" type="java.util.Collection"/>	
 			<parameter name="beginTimePeriod" type="org.nightlabs.util.TimePeriod"/>	

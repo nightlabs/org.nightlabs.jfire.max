@@ -274,35 +274,7 @@ implements SessionBean
 	 */
 	public WebCustomer getWebCustomerByEmail(String email)
 	{
-		throw new UnsupportedOperationException("Temporarily deactivated!");
-//		Set<WebCustomerID> webCustomerIDs = getWebCustomerIDs();
-//		WebCustomer result = null;
-//		try{
-//
-//			WebShop webShop = WebShopUtil.getHome().create();
-//			for(WebCustomerID webCustomerID : webCustomerIDs){
-//				WebCustomer webCustomer = webShop.getPerson(webCustomerID,
-//						new String[] {	WebCustomer.FETCH_GROUP_LEGAL_ENTITY,
-//						WebCustomer.FETCH_GROUP_WEB_CUSTOMER_ID,
-//						WebCustomer.FETCH_GROUP_PASSWORD,
-//						LegalEntity.FETCH_GROUP_PERSON,
-//						PropertySet.FETCH_GROUP_DATA_FIELDS,
-//						PropertySet.FETCH_GROUP_FULL_DATA } ,
-//						NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
-//				Person person = webCustomer.getLegalEntity().getPerson();
-//				StructLocal struct = StructLocalDAO.sharedInstance().getStructLocal(Person.class, Person.STRUCT_SCOPE, Person.STRUCT_LOCAL_SCOPE, new NullProgressMonitor());
-//				person.inflate(struct);
-//					if(person.getDataField(PersonStruct.POSTADDRESS_ADDRESS).toString().equals(email));
-//					result = webCustomer;
-//					break;
-//			}
-//		} catch (Exception e) {
-//			throw new Exception("get webcustomer by email failed", e);
-//		}
-//
-//		if (result==null)
-//			throw new RuntimeException("get webcustomer by email failed");
-//		return result;
+		return WebCustomer.getWebCustomersWithEmail(getPersistenceManager(), email);
 	}
 
 	/**
@@ -540,9 +512,9 @@ implements SessionBean
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			Collection<WebCustomer> customers = WebCustomer.getWebCustomersWithEmail(pm, email);
+			WebCustomer customer = WebCustomer.getWebCustomersWithEmail(pm, email);
 
-			return customers.size() > 0;
+			return (customer!=null);
 		} finally {
 			pm.close();
 		}

@@ -227,7 +227,7 @@ public class WebCustomer
 	}
 	
 
-	public static Collection<WebCustomer> getWebCustomersWithEmail(PersistenceManager pm, String email) {
+	public static WebCustomer getWebCustomersWithEmail(PersistenceManager pm, String email) {
 		Query q = pm.newNamedQuery(WebCustomer.class, "getWebCustomerWithRegexField");
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("regexFieldStructBlockOrganisationID", PersonStruct.INTERNET_EMAIL.structBlockOrganisationID);
@@ -235,6 +235,6 @@ public class WebCustomer
 		params.put("regexFieldStructFieldOrganisationID", PersonStruct.INTERNET_EMAIL.structFieldOrganisationID);
 		params.put("regexFieldStructFieldID", PersonStruct.INTERNET_EMAIL.structFieldID);
 		params.put("regexFieldValue", email.toLowerCase());
-		return (Collection<WebCustomer>) q.executeWithMap(params);
+		return (WebCustomer)q.execute(params);
 	}
 }

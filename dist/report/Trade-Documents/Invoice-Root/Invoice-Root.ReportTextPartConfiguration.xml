@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <reportTextPartConfiguration>
-	<reportTextPart id="salutation" type="javascript">
+	<reportTextPart id="salutation" type="jshtml">
 		<name language="en">Salutation text</name>
 		<content language="en"><![CDATA[
 "Dear " + row["Salutation"] + " " + row["Name"] + "," +
@@ -10,7 +10,7 @@
 ]]>
 		</content>
 	</reportTextPart>
-	<reportTextPart id="finish" type="html">
+	<reportTextPart id="finish" type="jshtml">
 		<name language="en">Finish text</name>
 		<content language="en"><![CDATA[
 We aks you to transfer the outstanding amount to our bank account within 14 days.

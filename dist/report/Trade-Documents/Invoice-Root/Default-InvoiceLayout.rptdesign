@@ -7,6 +7,9 @@
 importClass(Packages.org.nightlabs.jfire.reporting.JFireReportingHelper);
 // Import the JDOHelper
 importClass(Packages.javax.jdo.JDOHelper);
+// import the ReportTextPartHelper
+importClass(Packages.org.nightlabs.jfire.reporting.textpart.ReportTextPartHelper);
+
 // Resolve the articleContainer for this report
 // getJDOObject takes a string
 articleContainer = JFireReportingHelper.getJDOObject(params["articleContainerID"]);
@@ -439,7 +442,7 @@ function isDynamicProduct(productJDOID) {
                 <structure>
                     <property name="position">32</property>
                     <property name="name">${rootOrganisationIDConverted}/vat-de-7-val</property>
-                    <property name="nativeName">${rootOrganisationIDConverted}/vat-de-7-val</property>
+                    <property name="nativeName">${rootOrganisationIDConverted}g/vat-de-7-val</property>
                     <property name="dataType">float</property>
                     <property name="nativeDataType">3</property>
                 </structure>
@@ -876,6 +879,11 @@ JFireReportingHelper.createDataSetParam(JDOHelper.getObjectId(customer.getPerson
                     <expression name="expression">dataSetRow["PostAddress_City"]</expression>
                     <property name="dataType">string</property>
                 </structure>
+                <structure>
+                    <property name="name">Salutation</property>
+                    <expression name="expression">dataSetRow["PersonalData_Salutation"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
             </list-property>
             <column id="18"/>
             <header>
@@ -917,6 +925,7 @@ result = result + row["FirstName"]</expression>
                                         <row id="107">
                                             <cell id="108">
                                                 <data id="215">
+                                                    <property name="fontFamily">"Arial"</property>
                                                     <property name="resultSetColumn">PersonalData_Company</property>
                                                 </data>
                                             </cell>
@@ -941,6 +950,7 @@ if (!"".equals(row["City"]))
                                         <row id="116">
                                             <cell id="117">
                                                 <data id="216">
+                                                    <property name="fontFamily">"Arial"</property>
                                                     <property name="resultSetColumn">PostAddress_Country</property>
                                                 </data>
                                             </cell>
@@ -970,34 +980,31 @@ if (!"".equals(row["City"]))
             <footer>
                 <row id="16">
                     <property name="height">0.468in</property>
-                    <cell id="17"/>
-                </row>
-            </footer>
-        </table>
-        <text-data id="214">
-            <property name="fontFamily">"Arial"</property>
-            <property name="fontWeight">bold</property>
-            <property name="paddingTop">1pt</property>
-            <property name="paddingLeft">10pt</property>
-            <property name="paddingBottom">20pt</property>
-            <expression name="valueExpr">articleContainerType = "";
+                    <cell id="17">
+                        <text-data id="214">
+                            <property name="fontFamily">"Arial"</property>
+                            <property name="fontWeight">bold</property>
+                            <property name="paddingTop">1pt</property>
+                            <property name="paddingLeft">10pt</property>
+                            <property name="paddingBottom">20pt</property>
+                            <expression name="valueExpr">articleContainerType = "";
 articleContainer = JFireReportingHelper.getVar("articleContainer");
 className = articleContainer.getClass().getSimpleName();
 articleContainerType = reportContext.getMessage("articleContainer.name."+className, reportContext.getLocale());
-articleContainerType + " " + articleContainer.getArticleContainerIDPrefix() + " / " + articleContainer.getArticleContainerIDAsString()</expression>
-            <property name="contentType">html</property>
-        </text-data>
-        <text-data id="217">
-            <property name="fontFamily">"Arial"</property>
-            <property name="fontWeight">bold</property>
-            <property name="color">#808080</property>
-            <property name="paddingTop">1pt</property>
-            <property name="paddingLeft">10pt</property>
-            <property name="paddingBottom">20pt</property>
-            <list-property name="visibility">
-                <structure>
-                    <property name="format">all</property>
-                    <expression name="valueExpr">articleContainer = JFireReportingHelper.getVar("articleContainer");
+articleContainerType + " " + articleContainer.getArticleContainerIDPrefix() + "/" + articleContainer.getArticleContainerIDAsString()</expression>
+                            <property name="contentType">html</property>
+                        </text-data>
+                        <text-data id="217">
+                            <property name="fontFamily">"Arial"</property>
+                            <property name="fontWeight">bold</property>
+                            <property name="color">#808080</property>
+                            <property name="paddingTop">1pt</property>
+                            <property name="paddingLeft">10pt</property>
+                            <property name="paddingBottom">20pt</property>
+                            <list-property name="visibility">
+                                <structure>
+                                    <property name="format">all</property>
+                                    <expression name="valueExpr">articleContainer = JFireReportingHelper.getVar("articleContainer");
 className = articleContainer.getClass().getSimpleName();
 if (className != "Order") {
   articleContainer.isFinalized()
@@ -1013,16 +1020,29 @@ if (className != "Order") {
   }
   hide
 }</expression>
-                </structure>
-            </list-property>
-            <expression name="valueExpr">articleContainer = JFireReportingHelper.getVar("articleContainer");
+                                </structure>
+                            </list-property>
+                            <expression name="valueExpr">articleContainer = JFireReportingHelper.getVar("articleContainer");
 className = articleContainer.getClass().getSimpleName();
 if (className == "Order")
   reportContext.getMessage("message.draft.order", reportContext.getLocale())
 else
   reportContext.getMessage("message.draft", reportContext.getLocale())</expression>
-            <property name="contentType">html</property>
-        </text-data>
+                            <property name="contentType">html</property>
+                        </text-data>
+                        <text-data id="218">
+                            <property name="fontFamily">"Arial"</property>
+                            <property name="paddingTop">1pt</property>
+                            <property name="paddingLeft">10pt</property>
+                            <property name="paddingBottom">20pt</property>
+                            <expression name="valueExpr">eval(String(ReportTextPartHelper.getEvalString(
+  JFireReportingHelper.getDataSetParamObject(params["articleContainerID"]), "salutation")));</expression>
+                            <property name="contentType">html</property>
+                        </text-data>
+                    </cell>
+                </row>
+            </footer>
+        </table>
         <table id="62">
             <property name="borderBottomColor">#C0C0C0</property>
             <property name="borderBottomStyle">solid</property>
@@ -1176,8 +1196,8 @@ JFireReportingHelper.createDataSetParam(params["articleContainerID"])</expressio
                     <property name="dataType">string</property>
                 </structure>
                 <structure>
-                    <property name="name">${devOrganisationIDConverted}/__Total__</property>
-                    <expression name="expression">dataSetRow["${devOrganisationIDConverted}/__Total__"]</expression>
+                    <property name="name">"" + /__Total__</property>
+                    <expression name="expression">dataSetRow[""" + /__Total__"]</expression>
                     <property name="dataType">float</property>
                 </structure>
                 <structure>

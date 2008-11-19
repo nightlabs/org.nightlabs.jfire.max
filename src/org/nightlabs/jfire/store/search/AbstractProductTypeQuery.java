@@ -103,12 +103,9 @@ implements ISaleAccessQuery
 	protected void prepareQuery(Query q)
 	{
 		StringBuilder filter = getFilter();
-		StringBuilder vars = getVars();
-
 		filter.append("true");
 
-		if (userID == null)
-			userID = SecurityReflector.getUserDescriptor().getUserObjectID();
+		userID = SecurityReflector.getUserDescriptor().getUserObjectID();
 
 //		if (isFieldEnabled(FieldName.permissionGrantedToSee) && permissionGrantedToSee != null)
 //			populateFilterPermissionGranted("flagsSeeProductType", permissionGrantedToSee, "productTypePermissionFlagSetSee");
@@ -123,7 +120,7 @@ implements ISaleAccessQuery
 
 		if (isFieldEnabled(FieldName.fullTextSearch) && fullTextSearch != null) {
 			filter.append("\n && ( ");
-			addFullTextSearch(filter, vars, ProductType.FieldName.name);
+			addFullTextSearch(filter, ProductType.FieldName.name);
 			filter.append("\n )");
 		}
 
@@ -167,14 +164,12 @@ implements ISaleAccessQuery
 
 
 		q.setFilter(filter.toString());
-		q.declareVariables(vars.toString());
+		q.declareVariables(getVars());
 	}
 
-	protected void addFullTextSearch(StringBuilder filter, StringBuilder vars, String member) {
-		if (vars.length() > 0)
-			vars.append("; ");
+	protected void addFullTextSearch(StringBuilder filter, String member) {
 		String varName = member+"Var";
-		vars.append(String.class.getName()+" "+varName);
+		addVariable(String.class, varName);
 		String containsStr = "containsValue("+varName+")";
 		if (fullTextLanguageID != null)
 			containsStr = "containsEntry(\""+fullTextLanguageID+"\","+varName+")";

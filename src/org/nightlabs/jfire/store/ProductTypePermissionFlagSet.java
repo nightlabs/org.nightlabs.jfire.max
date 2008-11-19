@@ -45,6 +45,17 @@ implements Serializable
 {
 	private static final long serialVersionUID = 1L;
 
+	private static Map<String, Object> organisationID2mutex = new HashMap<String, Object>();
+	public synchronized static Object getMutex(String organisationID)
+	{
+		Object mutex = organisationID2mutex.get(organisationID);
+		if (mutex == null) {
+			mutex = new Object();
+			organisationID2mutex.put(organisationID, mutex);
+		}
+		return mutex;
+	}
+
 	/**
 	 * Find all {@link ProductType}s for which - in combination with the specified {@link User} - there
 	 * is no <code>ProductTypePermissionFlagSet</code> existing in the datastore.
@@ -157,12 +168,19 @@ implements Serializable
 		Map<AuthorityID, Integer> authorityID2sellFlags = new HashMap<AuthorityID, Integer>();
 		Map<AuthorityID, Integer> authorityID2reverseFlags = new HashMap<AuthorityID, Integer>();
 		for (ProductType productType : productTypes) {
+			if (productType.getInheritanceNature() != ProductType.INHERITANCE_NATURE_LEAF)
+				continue; // silently ignore this productType and continue with the next one
+
 			nestingProductTypes.addAll(ProductType.getProductTypesNestingThis(pm, productType));
 			ProductTypePermissionFlagSet flagSet = getProductTypePermissionFlagSet(pm, productType, user, true, false);
 
 			flagSet.setClosed(productType.isClosed());
-			if (productType.isClosed())
+			if (productType.isClosed()) {
 				flagSet.setExpired(System.currentTimeMillis() - productType.getCloseTimestamp().getTime() > expireDurationMSec);
+				flagSet.setFlags(org.nightlabs.jfire.trade.RoleConstants.sellProductType, FlagSellProductType.PRODUCT_TYPE_CLOSED);
+				flagSet.setFlags(org.nightlabs.jfire.trade.RoleConstants.reverseProductType, FlagReverseProductType.PRODUCT_TYPE_CLOSED);
+				continue; // the closed flag is alone - see javadoc
+			}
 			else
 				flagSet.setExpired(false);
 
@@ -218,9 +236,25 @@ implements Serializable
 				if ((reverseNestedFlags & FlagReverseProductType.REVERSE_MISSING_IN_SECURING_AUTHORITY) != 0 ||
 						(reverseNestedFlags & FlagReverseProductType.REVERSE_MISSING_FOR_INNER_PRODUCT_TYPE_IN_SECURING_AUTHORITY) != 0)
 					reverseFlagsOnlyNestedData |= FlagReverseProductType.REVERSE_MISSING_FOR_INNER_PRODUCT_TYPE_IN_SECURING_AUTHORITY;
+
+
+				if ((sellNestedFlags & FlagSellProductType.PRODUCT_TYPE_CLOSED) != 0 ||
+						(sellNestedFlags & FlagSellProductType.INNER_PRODUCT_TYPE_CLOSED) != 0)
+					sellFlagsOnlyNestedData |= FlagSellProductType.INNER_PRODUCT_TYPE_CLOSED;
+
+				if ((sellNestedFlags & FlagSellProductType.PRODUCT_TYPE_NOT_SALEABLE) != 0 ||
+						(sellNestedFlags & FlagSellProductType.INNER_PRODUCT_TYPE_NOT_SALEABLE) != 0)
+					sellFlagsOnlyNestedData |= FlagSellProductType.INNER_PRODUCT_TYPE_NOT_SALEABLE;
+
+
+				if ((reverseNestedFlags & FlagReverseProductType.PRODUCT_TYPE_CLOSED) != 0 ||
+						(reverseNestedFlags & FlagReverseProductType.INNER_PRODUCT_TYPE_CLOSED) != 0)
+					reverseFlagsOnlyNestedData |= FlagReverseProductType.INNER_PRODUCT_TYPE_CLOSED;
 			}
 
-			flagSet.setFlags(org.nightlabs.jfire.trade.RoleConstants.sellProductType, sellFlagsWithoutNestedData | sellFlagsOnlyNestedData);
+			int sellFlagSaleable = productType.isSaleable() ? 0 : FlagSellProductType.PRODUCT_TYPE_NOT_SALEABLE;
+
+			flagSet.setFlags(org.nightlabs.jfire.trade.RoleConstants.sellProductType, sellFlagsWithoutNestedData | sellFlagsOnlyNestedData | sellFlagSaleable);
 			flagSet.setFlags(org.nightlabs.jfire.trade.RoleConstants.reverseProductType, reverseFlagsWithoutNestedData | reverseFlagsOnlyNestedData);
 		}
 
@@ -265,7 +299,8 @@ implements Serializable
 				throw new IllegalArgumentException("productType.organisationID does not reference the local organisation! " + productType);
 
 			if (productType.getInheritanceNature() != ProductType.INHERITANCE_NATURE_LEAF)
-				throw new IllegalArgumentException("productType.inheritanceNature is not ProductType.INHERITANCE_NATURE_LEAF! " + productType);
+				continue; // silently ignore this productType and continue with the next one
+//				throw new IllegalArgumentException("productType.inheritanceNature is not ProductType.INHERITANCE_NATURE_LEAF! " + productType);
 
 			nestingProductTypes.addAll(ProductType.getProductTypesNestingThis(pm, productType));
 			ProductTypePermissionFlagSet flagSet = getProductTypePermissionFlagSet(pm, productType, user, true, false);

@@ -3,6 +3,7 @@ package org.nightlabs.jfire.store.search;
 import javax.jdo.Query;
 
 import org.apache.log4j.Logger;
+import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.security.id.UserID;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.ProductTypeGroup;
@@ -74,8 +75,8 @@ public abstract class AbstractProductTypeGroupQuery
 		StringBuilder filter = getFilter();
 		addVariable(ProductTypePermissionFlagSet.class, variableName);
 		// joining via primary key - faster than other fields
-		filter.append("\n && this.productType.organisationID == " + variableName + ".productTypeOrganisationID");
-		filter.append("\n && this.productType.productTypeID == " + variableName + ".productTypeID");
+		filter.append("\n && productType.organisationID == " + variableName + ".productTypeOrganisationID");
+		filter.append("\n && productType.productTypeID == " + variableName + ".productTypeID");
 		filter.append("\n && " + variableName + ".userOrganisationID == :userID.organisationID");
 		filter.append("\n && " + variableName + ".userID == :userID.userID");
 		filter.append("\n && " + variableName + '.' + productTypePermissionFlagSetFlagsFieldName + " ");
@@ -92,7 +93,11 @@ public abstract class AbstractProductTypeGroupQuery
 	protected void prepareQuery(Query q)
 	{
 		StringBuilder filter = getFilter();
-		StringBuilder vars = getVars();
+
+		userID = SecurityReflector.getUserDescriptor().getUserObjectID();
+
+		filter.append("productType."+ProductType.FieldName.productTypeGroups+".containsValue(this)");
+
 
 //		if (isFieldEnabled(FieldName.permissionGrantedToSee) && permissionGrantedToSee != null)
 //			populateFilterPermissionGranted("flagsSeeProductType", permissionGrantedToSee, "productTypePermissionFlagSetSee");
@@ -105,14 +110,13 @@ public abstract class AbstractProductTypeGroupQuery
 			populateFilterPermissionGranted("flagsReverseProductType", permissionGrantedToReverse, "productTypePermissionFlagSetReverse");
 
 
-		filter.append("productType."+ProductType.FieldName.productTypeGroups+".containsValue(this)");
 
 		if (isFieldEnabled(FieldName.organisationID) && organisationID != null)
 			filter.append("\n && this."+org.nightlabs.jfire.store.ProductTypeGroup.FieldName.organisationID+" == :"+org.nightlabs.jfire.store.ProductTypeGroup.FieldName.organisationID);
 
 		if (isFieldEnabled(FieldName.fullTextSearch) && fullTextSearch != null) {
 			filter.append("\n && ( ");
-			addFullTextSearch(filter, vars, ProductType.FieldName.name);
+			addFullTextSearch(filter, ProductType.FieldName.name);
 			filter.append("\n )");
 		}
 
@@ -131,26 +135,24 @@ public abstract class AbstractProductTypeGroupQuery
 		if (isFieldEnabled(VendorDependentQuery.FieldName.vendorID) && getVendorID() != null)
 			filter.append("\n && JDOHelper.getObjectId(productType."+ProductType.FieldName.vendor+") == :vendorID");
 
-		vars.append(ProductType.class.getName()+" productType;");
-		addImport(ProductType.class.getName());
+		addVariable(ProductType.class, "productType");
+		addImport(ProductType.class);
 
 //		result.append("distinct this");
 		if (logger.isDebugEnabled()) {
 			logger.debug("Vars:");
-			logger.debug(vars.toString());
+			logger.debug(getVars());
 			logger.debug("Filter:");
 			logger.debug(filter.toString());
 		}
 
 		q.setFilter(filter.toString());
-		q.declareVariables(vars.toString());
+		q.declareVariables(getVars());
 	}
 
-	protected void addFullTextSearch(StringBuilder filter, StringBuilder vars, String member) {
-		if (vars.length() > 0)
-			vars.append("; ");
+	protected void addFullTextSearch(StringBuilder filter, String member) {
 		String varName = member+"Var";
-		vars.append(String.class.getName()+" "+varName);
+		addVariable(String.class, varName);
 		String containsStr = "containsValue("+varName+")";
 		if (fullTextLanguageID != null)
 			containsStr = "containsEntry(\""+fullTextLanguageID+"\","+varName+")";

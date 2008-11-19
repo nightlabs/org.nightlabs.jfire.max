@@ -57,7 +57,6 @@ public abstract class AbstractArticleContainerQuery
 	protected void prepareQuery(Query q)
 	{
 		StringBuilder filter = getFilter();
-		StringBuilder vars = getVars();
 
 		filter.append("true");
 
@@ -93,25 +92,23 @@ public abstract class AbstractArticleContainerQuery
 	  // own to method to allow override for Offer where it is different
 		checkVendor(filter);
 		checkCustomer(filter);
-		checkProductID(filter, vars, getArticleContainerArticlesMemberName());
-		checkProductTypeID(filter, vars, getArticleContainerArticlesMemberName());
+		checkProductID(filter, getArticleContainerArticlesMemberName());
+		checkProductTypeID(filter, getArticleContainerArticlesMemberName());
 
 		// append filter for the additional fields of the implementing class.
 		checkAdditionalFields(filter);
 		q.setFilter(filter.toString());
-		q.declareVariables(vars.toString());
+		q.declareVariables(getVars());
 
 		if (logger.isDebugEnabled())
 			logger.debug("query = "+filter);
 	}
 
-	protected void checkProductTypeID(StringBuilder filter, StringBuilder vars, String member)
+	protected void checkProductTypeID(StringBuilder filter, String member)
 	{
 		if (isFieldEnabled(FieldName.productTypeID) && productTypeID != null) {
-			if (vars.length() > 0)
-				vars.append("; ");
 			String varName = member+"Var";
-			vars.append(Article.class.getName()+" "+varName);
+			addVariable(Article.class, varName);
 			filter.append(" && \n (" +
 					"  this."+member+".contains("+varName+")" +
 					"  && JDOHelper.getObjectId("+varName+".productType) == :productTypeID" +
@@ -195,13 +192,11 @@ public abstract class AbstractArticleContainerQuery
 		}
 	}
 
-	protected void checkProductID(StringBuilder filter, StringBuilder vars, String member)
+	protected void checkProductID(StringBuilder filter, String member)
 	{
 		if (isFieldEnabled(FieldName.productID) && productID != null) {
-			if (vars.length() > 0)
-				vars.append("; ");
 			String varName = member+"Var";
-			vars.append(Article.class.getName()+" "+varName);
+			addVariable(Article.class, varName);
 			filter.append(" && \n (" +
 					"  this."+member+".contains("+varName+")" +
 					"  && JDOHelper.getObjectId("+varName+".product) == :productID" +

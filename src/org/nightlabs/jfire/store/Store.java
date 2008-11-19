@@ -194,8 +194,17 @@ implements StoreCallback
 		ProductTypeStatusHistoryItem productTypeStatusHistoryItem = getPersistenceManager().makePersistent(
 				new ProductTypeStatusHistoryItem(productType, user)
 		);
-		// TODO queue recalculation of ProductTypePermissionFlagSet!
 
+		// queue recalculation of ProductTypePermissionFlagSets
+		ProductTypeID productTypeID = (ProductTypeID) JDOHelper.getObjectId(productType);
+		ProductTypeActionHandler.CalculateProductTypePermissionFlagSetsInvocation invocation = new ProductTypeActionHandler.CalculateProductTypePermissionFlagSetsInvocation(
+				Collections.singleton(productTypeID)
+		);
+		try {
+			AsyncInvoke.exec(invocation, true);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 
 		return productTypeStatusHistoryItem;
 	}
@@ -213,8 +222,17 @@ implements StoreCallback
 		ProductTypeStatusHistoryItem productTypeStatusHistoryItem = getPersistenceManager().makePersistent(
 				new ProductTypeStatusHistoryItem(productType, user)
 		);
-		// TODO queue recalculation of ProductTypePermissionFlagSet!
 
+		// queue recalculation of ProductTypePermissionFlagSets
+		ProductTypeID productTypeID = (ProductTypeID) JDOHelper.getObjectId(productType);
+		ProductTypeActionHandler.CalculateProductTypePermissionFlagSetsInvocation invocation = new ProductTypeActionHandler.CalculateProductTypePermissionFlagSetsInvocation(
+				Collections.singleton(productTypeID)
+		);
+		try {
+			AsyncInvoke.exec(invocation, true);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 
 		return productTypeStatusHistoryItem;
 	}
@@ -229,8 +247,17 @@ implements StoreCallback
 		ProductTypeStatusHistoryItem productTypeStatusHistoryItem = getPersistenceManager().makePersistent(
 				new ProductTypeStatusHistoryItem(productType, user)
 		);
-		// TODO queue recalculation of ProductTypePermissionFlagSet!
 
+		// queue recalculation of ProductTypePermissionFlagSets
+		ProductTypeID productTypeID = (ProductTypeID) JDOHelper.getObjectId(productType);
+		ProductTypeActionHandler.CalculateProductTypePermissionFlagSetsInvocation invocation = new ProductTypeActionHandler.CalculateProductTypePermissionFlagSetsInvocation(
+				Collections.singleton(productTypeID)
+		);
+		try {
+			AsyncInvoke.exec(invocation, true);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 
 		return productTypeStatusHistoryItem;
 	}
@@ -244,8 +271,17 @@ implements StoreCallback
 		ProductTypeStatusHistoryItem productTypeStatusHistoryItem = getPersistenceManager().makePersistent(
 				new ProductTypeStatusHistoryItem(productType, user)
 		);
-		// TODO queue recalculation of ProductTypePermissionFlagSet!
 
+		// queue recalculation of ProductTypePermissionFlagSets
+		ProductTypeID productTypeID = (ProductTypeID) JDOHelper.getObjectId(productType);
+		ProductTypeActionHandler.CalculateProductTypePermissionFlagSetsInvocation invocation = new ProductTypeActionHandler.CalculateProductTypePermissionFlagSetsInvocation(
+				Collections.singleton(productTypeID)
+		);
+		try {
+			AsyncInvoke.exec(invocation, true);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 
 		return productTypeStatusHistoryItem;
 	}

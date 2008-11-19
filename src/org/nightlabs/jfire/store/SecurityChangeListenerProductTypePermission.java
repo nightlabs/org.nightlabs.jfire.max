@@ -319,7 +319,7 @@ extends SecurityChangeListener
 		@Override
 		public Serializable invoke() throws Exception
 		{
-			synchronized (ProductTypePermissionFlagSet.class) {
+			synchronized (ProductTypePermissionFlagSet.getMutex(getOrganisationID())) {
 
 				PersistenceManager pm = getPersistenceManager();
 				try {
@@ -395,7 +395,7 @@ extends SecurityChangeListener
 				}
 				return null;
 
-			} // synchronized (ProductTypePermissionFlagSet.class) {
+			} // synchronized (ProductTypePermissionFlagSet.getMutex(getOrganisationID())) {
 		}
 	}
 

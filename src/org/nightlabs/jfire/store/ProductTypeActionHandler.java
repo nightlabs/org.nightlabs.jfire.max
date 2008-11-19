@@ -1183,8 +1183,9 @@ public abstract class ProductTypeActionHandler
 	 */
 	public void onAssignSecuringAuthority(ProductTypeLocal productTypeLocal, AuthorityID oldSecuringAuthorityID, AuthorityID newSecuringAuthorityID)
 	{
-		if (ProductType.INHERITANCE_NATURE_LEAF != productTypeLocal.getProductType().getInheritanceNature())
-			return;
+//		if (ProductType.INHERITANCE_NATURE_LEAF != productTypeLocal.getProductType().getInheritanceNature())
+//			return;
+// we collect all now in order to be able to decide what to process at one single point: in the ProductTypePermissionFlagSet
 
 		PersistenceManager pm = getPersistenceManager();
 
@@ -1248,7 +1249,7 @@ public abstract class ProductTypeActionHandler
 		@Override
 		public Serializable invoke() throws Exception
 		{
-			synchronized (ProductTypePermissionFlagSet.class) {
+			synchronized (ProductTypePermissionFlagSet.getMutex(getOrganisationID())) {
 
 				PersistenceManager pm = getPersistenceManager();
 				try {
@@ -1266,7 +1267,7 @@ public abstract class ProductTypeActionHandler
 				}
 				return null;
 
-			} // synchronized (ProductTypePermissionFlagSet.class) {
+			} // synchronized (ProductTypePermissionFlagSet.getMutex(getOrganisationID())) {
 		}
 	}
 

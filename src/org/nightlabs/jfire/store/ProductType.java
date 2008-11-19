@@ -35,9 +35,11 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import javax.jdo.JDODetachedFieldAccessException;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
+import javax.jdo.listener.AttachCallback;
 import javax.jdo.listener.DetachCallback;
 import javax.jdo.listener.StoreCallback;
 
@@ -187,6 +189,7 @@ implements
 		StoreCallback,
 		Serializable,
 		DetachCallback,
+		AttachCallback,
 		IndirectlySecuredObject
 {
 	private static final long serialVersionUID = 1L;
@@ -988,8 +991,12 @@ implements
 
 	public org.nightlabs.inheritance.FieldMetaData getFieldMetaData(String fieldName, boolean createMissingMetaData)
 	{
-		if (isClosed())
-			return null;
+		if (isClosed()) {
+			StaticFieldMetaData fmd = new StaticFieldMetaData(fieldName);
+			fmd.setValueInherited(false);
+			fmd.setWritable(false);
+			return fmd;
+		}
 
 		if (fieldName.startsWith("jdo"))
 			return null;
@@ -1676,14 +1683,32 @@ implements
 		return new ProductTypeLocal(user, this); // self-registering
 	}
 
-	public void jdoPreStore()
-	{
+	@Override
+	public void jdoPreStore() { }
+
+	@Override
+	public void jdoPreDetach() { }
+
+	@Override
+	public void jdoPreAttach() {
+		PersistenceManager pm = NLJDOHelper.getThreadPersistenceManager();
+		ProductType persistentProductType = (ProductType) pm.getObjectById(JDOHelper.getObjectId(this));
+		try {
+			this.saleable = persistentProductType.saleable;
+		} catch (JDODetachedFieldAccessException x) { } // ignore - no need to restore a non-detached field
+		try {
+			this.confirmed = persistentProductType.confirmed;
+		} catch (JDODetachedFieldAccessException x) { } // ignore - no need to restore a non-detached field
+		try {
+			this.closeTimestamp = persistentProductType.closeTimestamp;
+		} catch (JDODetachedFieldAccessException x) { } // ignore - no need to restore a non-detached field
+		try {
+			this.published = persistentProductType.published;
+		} catch (JDODetachedFieldAccessException x) { } // ignore - no need to restore a non-detached field
 	}
 
-	public void jdoPreDetach()
-	{
-
-	}
+	@Override
+	public void jdoPostAttach(Object attached) { }
 
 	@SuppressWarnings("unchecked")
 	public void jdoPostDetach(Object o)

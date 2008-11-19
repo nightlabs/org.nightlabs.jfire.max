@@ -79,7 +79,6 @@ import org.nightlabs.jfire.store.id.DeliveryNoteID;
 import org.nightlabs.jfire.store.id.DeliveryNoteLocalID;
 import org.nightlabs.jfire.store.id.ProductID;
 import org.nightlabs.jfire.store.id.ProductTypeID;
-import org.nightlabs.jfire.store.id.ProductTypeStatusTrackerID;
 import org.nightlabs.jfire.store.jbpm.ActionHandlerBookDeliveryNote;
 import org.nightlabs.jfire.store.jbpm.ActionHandlerBookDeliveryNoteImplicitely;
 import org.nightlabs.jfire.store.jbpm.ActionHandlerFinalizeDeliveryNote;
@@ -182,134 +181,73 @@ implements StoreCallback
 
 	protected Store() { }
 
-//	/**
-//	 * key: String productPrimaryKey {organisationID + / + productID}<br/>
-//	 * value: ProductType productType
-//	 *
-//	 * @jdo.field
-//	 *		persistence-modifier="persistent"
-//	 *		collection-type="map"
-//	 *		key-type="java.lang.String"
-//	 *		value-type="ProductType"
-//	 *		dependent="true"
-//	 *
-//	 * @jdo.join
-//	 *
-//	 * @jdo.map-vendor-extension vendor-name="jpox" key="key-length" value="max 201"
-//	 */
-//	protected Map productTypes = new HashMap();
-
-//	/**
-//	 * key: String productPrimaryKey {organisationID + / + productID}<br/>
-//	 * value: ProductStatusTracker productStatusTracker
-//	 *
-//	 * @jdo.field
-//	 *		persistence-modifier="persistent"
-//	 *		collection-type="map"
-//	 *		key-type="java.lang.String"
-//	 *		value-type="ProductStatusTracker"
-//	 *		dependent="true"
-//	 *
-//	 * @jdo.join
-//	 *
-//	 * @jdo.map-vendor-extension vendor-name="jpox" key="key-length" value="max 201"
-//	 */
-//	protected Map productTypeStatusTrackers = new HashMap();
-
-//	/**
-//	 * key: String productPrimaryKey {organisationID + / + productID}<br/>
-//	 * value: ProductType product
-//	 *
-//	 * @jdo.field
-//	 *		persistence-modifier="persistent"
-//	 *		collection-type="map"
-//	 *		key-type="java.lang.String"
-//	 *		value-type="ProductType"
-//	 *		dependent="true"
-//	 *
-//	 * @jdo.join
-//	 *
-//	 * @jdo.map-vendor-extension vendor-name="jpox" key="key-length" value="max 201"
-//	 */
-//	protected Map products = new HashMap();
-
-//	/**
-//	 * key: String productPrimaryKey {organisationID + / + productID}<br/>
-//	 * value: ProductStatusTracker productStatusTracker
-//	 *
-//	 * @jdo.field
-//	 *		persistence-modifier="persistent"
-//	 *		collection-type="map"
-//	 *		key-type="java.lang.String"
-//	 *		value-type="ProductStatusTracker"
-//	 *		dependent="true"
-//	 *
-//	 * @jdo.join
-//	 *
-//	 * @jdo.map-vendor-extension vendor-name="jpox" key="key-length" value="max 201"
-//	 */
-//	protected Map productStatusTrackers = new HashMap();
-
-//	/**
-//	 * key: String productPrimaryKey {organisationID + / + productID}<br/>
-//	 * value: ProductTransferTracker productTransferTracker
-//	 *
-//	 * @jdo.field
-//	 *		persistence-modifier="persistent"
-//	 *		collection-type="map"
-//	 *		key-type="java.lang.String"
-//	 *		value-type="ProductTransferTracker"
-//	 *		dependent="true"
-//	 *
-//	 * @jdo.join
-//	 *
-//	 * @jdo.map-vendor-extension vendor-name="jpox" key="key-length" value="max 201"
-//	 */
-//	protected Map productTransferTrackers = new HashMap();
-
-	public void setProductTypeStatus_published(User user, ProductType productType)
+	public ProductTypeStatusHistoryItem setProductTypeStatus_published(User user, ProductType productType)
 	throws CannotPublishProductTypeException
 	{
 		if (productType == null)
 			throw new IllegalArgumentException("productType must not be null!");
 
 		if (productType.isPublished())
-			return;
+			return null;
 
 		productType.setPublished(true);
-		getProductTypeStatusTracker(productType, true).newCurrentStatus(user);
+		ProductTypeStatusHistoryItem productTypeStatusHistoryItem = getPersistenceManager().makePersistent(
+				new ProductTypeStatusHistoryItem(productType, user)
+		);
+		// TODO queue recalculation of ProductTypePermissionFlagSet!
+
+
+		return productTypeStatusHistoryItem;
 	}
 
-	public void setProductTypeStatus_confirmed(User user, ProductType productType)
+	public ProductTypeStatusHistoryItem setProductTypeStatus_confirmed(User user, ProductType productType)
 	throws CannotConfirmProductTypeException
 	{
 		if (productType == null)
 			throw new IllegalArgumentException("productType must not be null!");
 
 		if (productType.isConfirmed())
-			return;
+			return null;
 
 		productType.setConfirmed(true);
-		getProductTypeStatusTracker(productType, true).newCurrentStatus(user);
+		ProductTypeStatusHistoryItem productTypeStatusHistoryItem = getPersistenceManager().makePersistent(
+				new ProductTypeStatusHistoryItem(productType, user)
+		);
+		// TODO queue recalculation of ProductTypePermissionFlagSet!
+
+
+		return productTypeStatusHistoryItem;
 	}
 
-	public void setProductTypeStatus_saleable(User user, ProductType productType, boolean saleable)
+	public ProductTypeStatusHistoryItem setProductTypeStatus_saleable(User user, ProductType productType, boolean saleable)
 	throws CannotMakeProductTypeSaleableException
 	{
 		if (productType.isSaleable() == saleable)
-			return;
+			return null;
 
 		productType.setSaleable(saleable);
-		getProductTypeStatusTracker(productType, true).newCurrentStatus(user);
+		ProductTypeStatusHistoryItem productTypeStatusHistoryItem = getPersistenceManager().makePersistent(
+				new ProductTypeStatusHistoryItem(productType, user)
+		);
+		// TODO queue recalculation of ProductTypePermissionFlagSet!
+
+
+		return productTypeStatusHistoryItem;
 	}
 
-	public void setProductTypeStatus_closed(User user, ProductType productType)
+	public ProductTypeStatusHistoryItem setProductTypeStatus_closed(User user, ProductType productType)
 	{
 		if (productType.isClosed())
-			return;
+			return null;
 
 		productType.setClosed(true);
-		getProductTypeStatusTracker(productType, true).newCurrentStatus(user);
+		ProductTypeStatusHistoryItem productTypeStatusHistoryItem = getPersistenceManager().makePersistent(
+				new ProductTypeStatusHistoryItem(productType, user)
+		);
+		// TODO queue recalculation of ProductTypePermissionFlagSet!
+
+
+		return productTypeStatusHistoryItem;
 	}
 
 	/**
@@ -417,10 +355,10 @@ implements StoreCallback
 		if (productType.getProductTypeLocal() != null)
 			throw new IllegalArgumentException("This ProductType has already a ProductTypeLocal assigned! Obviously you either called Store.addProductType(...) twice or you detached a ProductTypeLocal from a remote organisation! Both is illegal!");
 
-		// TODO remove this and put all the logic from ProductTypeStatusTracker into ProductTypeLocal!
 		if (organisationID.equals(productType.getOrganisationID())) {
-			ProductTypeStatusTracker productTypeStatusTracker = new ProductTypeStatusTracker(productType, user);
-			pm.makePersistent(productTypeStatusTracker);
+			pm.makePersistent(
+					new ProductTypeStatusHistoryItem(productType, user)
+			);
 		}
 
 		if (productType.getOwner() == null)
@@ -651,28 +589,6 @@ implements StoreCallback
 
 		return null;
 	}
-	public ProductTypeStatusTracker getProductTypeStatusTracker(String organisationID, String productTypeID, boolean throwExceptionIfNotFound)
-	{
-		PersistenceManager pm = getPersistenceManager();
-		pm.getExtent(ProductTypeStatusTracker.class);
-		ProductTypeStatusTracker res = null;
-		try {
-			res = (ProductTypeStatusTracker) pm.getObjectById(
-					ProductTypeStatusTrackerID.create(organisationID, productTypeID));
-		} catch (JDOObjectNotFoundException x) {
-			if (throwExceptionIfNotFound)
-				throw x;
-		}
-		return res;
-	}
-	public ProductTypeStatusTracker getProductTypeStatusTracker(ProductTypeID productTypeID, boolean throwExceptionIfNotFound)
-	{
-		return getProductTypeStatusTracker(productTypeID.organisationID, productTypeID.productTypeID, throwExceptionIfNotFound);
-	}
-	public ProductTypeStatusTracker getProductTypeStatusTracker(ProductType productType, boolean throwExceptionIfNotFound)
-	{
-		return getProductTypeStatusTracker((ProductTypeID)JDOHelper.getObjectId(productType), throwExceptionIfNotFound);
-	}
 
 	public Product getProduct(String organisationID, long productID, boolean throwExceptionIfNotFound)
 	{
@@ -687,59 +603,6 @@ implements StoreCallback
 
 		return null;
 	}
-//	public ProductStatusTracker getProductStatusTracker(Product product, boolean throwExceptionIfNotFound)
-//	{
-//		if (product == null)
-//			throw new NullPointerException("product must not be null!");
-//
-//		PersistenceManager pm = getPersistenceManager();
-//		pm.getExtent(ProductStatusTracker.class);
-//		try {
-//			return (ProductStatusTracker) pm.getObjectById(
-//					ProductStatusTrackerID.create(product.getOrganisationID(), product.getProductID()));
-//		} catch (JDOObjectNotFoundException x) {
-//			if (throwExceptionIfNotFound)
-//				throw x;
-//		}
-//		return null;
-//	}
-//	public ProductTransferTracker getProductTransferTracker(
-//			String organisationID, String productID, boolean throwExceptionIfNotFound)
-//	{
-//		// TODO
-//		throw new UnsupportedOperationException("NYI");
-//	}
-//	public ProductTransferTracker getProductTransferTracker(ProductType product, boolean throwExceptionIfNotFound)
-//	{
-//		// TODO
-//		throw new UnsupportedOperationException("NYI");
-//	}
-
-//	protected ProductTransfer transferProducts(ProductTransfer container, User initiator, Anchor from, Anchor to, Collection products)
-//	{
-//		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
-//		if (pm == null)
-//			throw new IllegalStateException("This store is not persistent! I don't have a PersistenceManager!");
-//
-//		ProductTransfer productTransfer = new ProductTransfer(this, container, initiator, from, to, products);
-//		for (Iterator it = products.iterator(); it.hasNext(); ) {
-//			Product product = (Product)it.next();
-////			getProductTransferTracker(product, true).addProductTransfer(productTransfer);
-//		}
-//		// TODO We should make sure that all products can be transferred (e.g. to check packaged products).
-//		// And probably we need to do much more...
-//		return productTransfer;
-//	}
-//
-//	public ProductTransfer transferProducts(User initiator, Anchor from, Anchor to, ProductTransfer container)
-//	{
-//		return transferProducts(container, initiator, from, to, container.products.values());
-//	}
-//
-//	public ProductTransfer transferProducts(User initiator, Anchor from, Anchor to, Collection products)
-//	{
-//		return transferProducts(null, initiator, from, to, products);
-//	}
 
 	/**
 	 * @param productType Can be <code>null</code>, if <code>nestedProductTypeLocal</code> is defined.
@@ -1910,12 +1773,12 @@ implements StoreCallback
 
 		return processDefinition;
 	}
-	
-	
-	
-	
+
+
+
+
 	/**
-	 * 
+	 *
 	 *
 	 */
 	public void signalDeliveryNote(DeliveryNoteID deliveryNoteID, String jbpmTransitionName)
@@ -1929,7 +1792,7 @@ implements StoreCallback
 			processInstance.signal(jbpmTransitionName);
 		} finally {
 			jbpmContext.close();
-		}		 
+		}
 	}
-	
+
 }

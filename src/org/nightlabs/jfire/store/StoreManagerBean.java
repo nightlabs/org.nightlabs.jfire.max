@@ -51,8 +51,6 @@ import javax.jdo.Query;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.log4j.Logger;
-import org.jbpm.JbpmContext;
-import org.jbpm.graph.exe.ProcessInstance;
 import org.nightlabs.ModuleException;
 import org.nightlabs.annotation.Implement;
 import org.nightlabs.jdo.NLJDOHelper;
@@ -68,7 +66,6 @@ import org.nightlabs.jfire.asyncinvoke.Invocation;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.idgenerator.IDNamespaceDefault;
-import org.nightlabs.jfire.jbpm.JbpmLookup;
 import org.nightlabs.jfire.jbpm.graph.def.ProcessDefinition;
 import org.nightlabs.jfire.jbpm.query.StatableQuery;
 import org.nightlabs.jfire.organisation.Organisation;
@@ -102,7 +99,6 @@ import org.nightlabs.jfire.store.deliver.id.DeliveryID;
 import org.nightlabs.jfire.store.deliver.id.DeliveryQueueID;
 import org.nightlabs.jfire.store.deliver.id.ModeOfDeliveryFlavourID;
 import org.nightlabs.jfire.store.id.DeliveryNoteID;
-import org.nightlabs.jfire.store.id.DeliveryNoteLocalID;
 import org.nightlabs.jfire.store.id.ProductTypeGroupID;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.store.id.ReceptionNoteID;
@@ -575,7 +571,7 @@ implements SessionBean
 	 * @ejb.permission role-name="org.nightlabs.jfire.store.editUnconfirmedProductType, org.nightlabs.jfire.store.editConfirmedProductType"
 	 * @ejb.transaction type="Required"
 	 */
-	public ProductTypeStatus setProductTypeStatus_published(ProductTypeID productTypeID, boolean get, String[] fetchGroups, int maxFetchDepth)
+	public ProductTypeStatusHistoryItem setProductTypeStatus_published(ProductTypeID productTypeID, boolean get, String[] fetchGroups, int maxFetchDepth)
 	throws CannotPublishProductTypeException
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -589,12 +585,12 @@ implements SessionBean
 			pm.getExtent(ProductType.class);
 			Store store = Store.getStore(pm);
 			ProductType productType = (ProductType) pm.getObjectById(productTypeID);
-			store.setProductTypeStatus_published(User.getUser(pm, getPrincipal()), productType);
+			ProductTypeStatusHistoryItem productTypeStatusHistoryItem = store.setProductTypeStatus_published(User.getUser(pm, getPrincipal()), productType);
 
-			if (!get)
+			if (productTypeStatusHistoryItem == null || !get)
 				return null;
 			else
-				return pm.detachCopy(store.getProductTypeStatusTracker(productTypeID, true).getCurrentStatus());
+				return pm.detachCopy(productTypeStatusHistoryItem);
 		} finally {
 			pm.close();
 		}
@@ -606,7 +602,7 @@ implements SessionBean
 	 * @ejb.permission role-name="org.nightlabs.jfire.store.editUnconfirmedProductType, org.nightlabs.jfire.store.editConfirmedProductType"
 	 * @ejb.transaction type="Required"
 	 */
-	public ProductTypeStatus setProductTypeStatus_confirmed(ProductTypeID productTypeID, boolean get, String[] fetchGroups, int maxFetchDepth)
+	public ProductTypeStatusHistoryItem setProductTypeStatus_confirmed(ProductTypeID productTypeID, boolean get, String[] fetchGroups, int maxFetchDepth)
 	throws CannotConfirmProductTypeException
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -620,12 +616,12 @@ implements SessionBean
 			pm.getExtent(ProductType.class);
 			Store store = Store.getStore(pm);
 			ProductType productType = (ProductType) pm.getObjectById(productTypeID);
-			store.setProductTypeStatus_confirmed(User.getUser(pm, getPrincipal()), productType);
+			ProductTypeStatusHistoryItem productTypeStatusHistoryItem = store.setProductTypeStatus_confirmed(User.getUser(pm, getPrincipal()), productType);
 
-			if (!get)
+			if (productTypeStatusHistoryItem == null || !get)
 				return null;
 			else
-				return pm.detachCopy(store.getProductTypeStatusTracker(productTypeID, true).getCurrentStatus());
+				return pm.detachCopy(productTypeStatusHistoryItem);
 		} finally {
 			pm.close();
 		}
@@ -637,7 +633,7 @@ implements SessionBean
 	 * @ejb.permission role-name="org.nightlabs.jfire.store.editUnconfirmedProductType, org.nightlabs.jfire.store.editConfirmedProductType"
 	 * @ejb.transaction type="Required"
 	 */
-	public ProductTypeStatus setProductTypeStatus_saleable(ProductTypeID productTypeID, boolean saleable, boolean get, String[] fetchGroups, int maxFetchDepth)
+	public ProductTypeStatusHistoryItem setProductTypeStatus_saleable(ProductTypeID productTypeID, boolean saleable, boolean get, String[] fetchGroups, int maxFetchDepth)
 	throws CannotMakeProductTypeSaleableException
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -651,12 +647,12 @@ implements SessionBean
 			pm.getExtent(ProductType.class);
 			Store store = Store.getStore(pm);
 			ProductType productType = (ProductType) pm.getObjectById(productTypeID);
-			store.setProductTypeStatus_saleable(User.getUser(pm, getPrincipal()), productType, saleable);
+			ProductTypeStatusHistoryItem productTypeStatusHistoryItem = store.setProductTypeStatus_saleable(User.getUser(pm, getPrincipal()), productType, saleable);
 
-			if (!get)
+			if (productTypeStatusHistoryItem == null || !get)
 				return null;
 			else
-				return pm.detachCopy(store.getProductTypeStatusTracker(productTypeID, true).getCurrentStatus());
+				return pm.detachCopy(productTypeStatusHistoryItem);
 		} finally {
 			pm.close();
 		}
@@ -667,7 +663,7 @@ implements SessionBean
 	 * @ejb.permission role-name="org.nightlabs.jfire.store.editConfirmedProductType"
 	 * @ejb.transaction type="Required"
 	 */
-	public ProductTypeStatus setProductTypeStatus_closed(ProductTypeID productTypeID, boolean get, String[] fetchGroups, int maxFetchDepth)
+	public ProductTypeStatusHistoryItem setProductTypeStatus_closed(ProductTypeID productTypeID, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -680,12 +676,12 @@ implements SessionBean
 			pm.getExtent(ProductType.class);
 			Store store = Store.getStore(pm);
 			ProductType productType = (ProductType) pm.getObjectById(productTypeID);
-			store.setProductTypeStatus_closed(User.getUser(pm, getPrincipal()), productType);
+			ProductTypeStatusHistoryItem productTypeStatusHistoryItem = store.setProductTypeStatus_closed(User.getUser(pm, getPrincipal()), productType);
 
-			if (!get)
+			if (productTypeStatusHistoryItem == null || !get)
 				return null;
 			else
-				return pm.detachCopy(store.getProductTypeStatusTracker(productTypeID, true).getCurrentStatus());
+				return pm.detachCopy(productTypeStatusHistoryItem);
 		} finally {
 			pm.close();
 		}

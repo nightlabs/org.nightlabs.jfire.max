@@ -27,23 +27,25 @@
 package org.nightlabs.jfire.store;
 
 import java.io.Serializable;
+import java.util.Date;
 
+import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.security.User;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
- * 
+ *
  * @jdo.persistence-capable
  *		identity-type="application"
- *		objectid-class="org.nightlabs.jfire.store.id.ProductTypeStatusTrackerID"
+ *		objectid-class="org.nightlabs.jfire.store.id.ProductTypeStatusHistoryItemID"
  *		detachable="true"
- *		table="JFireTrade_ProductTypeStatusTracker"
+ *		table="JFireTrade_ProductTypeStatusHistoryItem"
  *
  * @jdo.inheritance strategy="new-table"
  *
- * @jdo.create-objectid-class field-order="organisationID, productTypeID"
+ * @jdo.create-objectid-class field-order="organisationID, productTypeStatusHistoryItemID"
  */
-public class ProductTypeStatusTracker
+public class ProductTypeStatusHistoryItem
 implements Serializable
 {
 	private static final long serialVersionUID = 1L;
@@ -56,9 +58,8 @@ implements Serializable
 
 	/**
 	 * @jdo.field primary-key="true"
-	 * @jdo.column length="100"
 	 */
-	private String productTypeID;
+	private long productTypeStatusHistoryItemID;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -68,62 +69,114 @@ implements Serializable
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
-	private ProductTypeStatus currentStatus;
+	private User user;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
-	private int nextStatusID = 0;
-
-	protected ProductTypeStatusTracker()
-	{
-	}
-
-	public ProductTypeStatusTracker(ProductType productType, User user)
-	{
-		this.productType = productType;
-		this.organisationID = productType.getOrganisationID();
-		this.productTypeID = productType.getProductTypeID();
-
-		newCurrentStatus(user);
-	}
+	private Date timestamp;
 
 	/**
-	 * @return Returns the organisationID.
+	 * @jdo.field persistence-modifier="persistent"
 	 */
+	private boolean published;
+
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private boolean confirmed;
+
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private boolean saleable;
+
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private boolean closed;
+
+	/**
+	 * @deprecated Only for JDO!
+	 */
+	@Deprecated
+	protected ProductTypeStatusHistoryItem()
+	{
+	}
+
+	public ProductTypeStatusHistoryItem(ProductType productType, User user)
+	{
+		this(
+				IDGenerator.getOrganisationID(),
+				IDGenerator.nextID(ProductTypeStatusHistoryItem.class),
+				productType,
+				user
+		);
+	}
+
+	public ProductTypeStatusHistoryItem(String organisationID, long productTypeStatusHistoryItemID, ProductType productType, User user)
+	{
+		if (organisationID == null)
+			throw new IllegalArgumentException("organisationID == null");
+
+		if (productTypeStatusHistoryItemID < 0)
+			throw new IllegalArgumentException("productTypeStatusHistoryItemID < 0");
+
+		if (productType == null)
+			throw new IllegalArgumentException("productType == null");
+
+		if (user == null)
+			throw new IllegalArgumentException("user == null");
+
+		if (!organisationID.equals(productType.getOrganisationID()))
+			throw new IllegalArgumentException("organisationID != productType.organisationID :: " + organisationID  + " != " + productType.getOrganisationID());
+
+		this.organisationID = organisationID;
+		this.productTypeStatusHistoryItemID = productTypeStatusHistoryItemID;
+		this.productType = productType;
+		this.user = user;
+		this.timestamp = new Date();
+
+		this.published = productType.isPublished();
+		this.confirmed = productType.isConfirmed();
+		this.saleable = productType.isSaleable();
+		this.closed = productType.isClosed();
+	}
 	public String getOrganisationID()
 	{
 		return organisationID;
 	}
-	/**
-	 * @return Returns the productTypeID.
-	 */
-	public String getProductTypeID()
-	{
-		return productTypeID;
+	public long getProductTypeStatusHistoryItemID() {
+		return productTypeStatusHistoryItemID;
 	}
-	/**
-	 * @return Returns the productType.
-	 */
 	public ProductType getProductType()
 	{
 		return productType;
 	}
 
-	public void newCurrentStatus(User user)
+	public User getUser()
 	{
-		currentStatus = new ProductTypeStatus(this, createStatusID(), user);
+		return user;
+	}
+	public Date getTimestamp()
+	{
+		return timestamp;
 	}
 
-	public ProductTypeStatus getCurrentStatus()
+	public boolean isPublished()
 	{
-		return currentStatus;
+		return published;
 	}
-
-	protected synchronized int createStatusID()
+	public boolean isConfirmed()
 	{
-		int res = nextStatusID;
-		nextStatusID = res + 1;
-		return res;
+		return confirmed;
+	}
+	public boolean isSaleable()
+	{
+		return saleable;
+	}
+	public boolean isClosed()
+	{
+		return closed;
 	}
 }

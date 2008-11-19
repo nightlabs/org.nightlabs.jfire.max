@@ -39,7 +39,7 @@ public abstract class VendorDependentQuery
 	protected void prepareQuery(Query q)
 	{
 		PersistenceManager pm = getPersistenceManager();
-		StringBuffer filter = getFilter();
+		StringBuilder filter = getFilter();
 		filter.append("true");
 
 		if (vendorID != null)

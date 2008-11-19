@@ -25,7 +25,7 @@ public class InvoiceQuery
 	private Long amountPaidMin = null;
 	private Long amountPaidMax = null;
 	private Boolean booked = null;
-	
+
 	private Date bookDTMin = null;
 	private Date bookDTMax = null;
 
@@ -56,7 +56,7 @@ public class InvoiceQuery
 	}
 
 	@Override
-	protected void checkAdditionalFields(StringBuffer filter)
+	protected void checkAdditionalFields(StringBuilder filter)
 	{
 		if (currencyID != null) {
 //		filter.append("\n && JDOHelper.getObjectId(this.price.currency) == :currencyID");
@@ -90,7 +90,7 @@ public class InvoiceQuery
 	if (bookDTMax != null)
 		filter.append("\n && this.bookDT >= :bookDTMax");
 	}
-	
+
 	public CurrencyID getCurrencyID()
 	{
 		return currencyID;

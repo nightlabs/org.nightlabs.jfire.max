@@ -29,12 +29,12 @@ public class ReceptionNoteQuery
 	}
 
 	@Override
-	protected void checkAdditionalFields(StringBuffer filter)
+	protected void checkAdditionalFields(StringBuilder filter)
 	{
 	}
-	
+
 	@Override
-	protected void checkCustomer(StringBuffer filter)
+	protected void checkCustomer(StringBuilder filter)
 	{
 		final AnchorID customerID = getCustomerID();
 		if (customerID != null)
@@ -49,9 +49,9 @@ public class ReceptionNoteQuery
 			")");
 		}
 	}
-	
+
 	@Override
-	protected void checkCustomerName(StringBuffer filter)
+	protected void checkCustomerName(StringBuilder filter)
 	{
 		if (getCustomerName() != null)
 		{
@@ -59,9 +59,9 @@ public class ReceptionNoteQuery
 				+getCustomerName().toLowerCase()+"\") >= 0)");
 		}
 	}
-	
+
 	@Override
-	protected void checkVendor(StringBuffer filter)
+	protected void checkVendor(StringBuilder filter)
 	{
 		final AnchorID vendorID = getVendorID();
 		if (vendorID != null)
@@ -74,11 +74,11 @@ public class ReceptionNoteQuery
 				"this.deliveryNote.vendor.anchorTypeID == \""+vendorID.anchorTypeID+"\" && " +
 				"this.deliveryNote.vendor.anchorID == \""+vendorID.anchorID+"\"" +
 			")");
-		}	
+		}
 	}
-	
+
 	@Override
-	protected void checkVendorName(StringBuffer filter)
+	protected void checkVendorName(StringBuilder filter)
 	{
 		if (getVendorName() != null)
 		{

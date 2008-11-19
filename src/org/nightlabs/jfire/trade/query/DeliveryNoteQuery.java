@@ -28,8 +28,8 @@ public class DeliveryNoteQuery
 	}
 
 	@Override
-	protected void checkAdditionalFields(StringBuffer filter)
+	protected void checkAdditionalFields(StringBuilder filter)
 	{
-		// no additional fields needed yet 
+		// no additional fields needed yet
 	}
 }

@@ -71,7 +71,7 @@ public abstract class AbstractProductTypeGroupQuery
 			boolean permissionGranted, String variableName
 	)
 	{
-		StringBuffer filter = getFilter();
+		StringBuilder filter = getFilter();
 		addVariable(ProductTypePermissionFlagSet.class, variableName);
 		// joining via primary key - faster than other fields
 		filter.append("\n && this.productType.organisationID == " + variableName + ".productTypeOrganisationID");
@@ -91,8 +91,8 @@ public abstract class AbstractProductTypeGroupQuery
 	@Override
 	protected void prepareQuery(Query q)
 	{
-		StringBuffer filter = getFilter();
-		StringBuffer vars = getVars();
+		StringBuilder filter = getFilter();
+		StringBuilder vars = getVars();
 
 //		if (isFieldEnabled(FieldName.permissionGrantedToSee) && permissionGrantedToSee != null)
 //			populateFilterPermissionGranted("flagsSeeProductType", permissionGrantedToSee, "productTypePermissionFlagSetSee");
@@ -146,7 +146,7 @@ public abstract class AbstractProductTypeGroupQuery
 		q.declareVariables(vars.toString());
 	}
 
-	protected void addFullTextSearch(StringBuffer filter, StringBuffer vars, String member) {
+	protected void addFullTextSearch(StringBuilder filter, StringBuilder vars, String member) {
 		if (vars.length() > 0)
 			vars.append("; ");
 		String varName = member+"Var";

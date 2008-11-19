@@ -32,21 +32,21 @@ public class OfferQuery
 	}
 
 	@Override
-	protected void checkVendorName(StringBuffer filter)
+	protected void checkVendorName(StringBuilder filter)
 	{
 		if (getVendorName() != null)
 			filter.append("\n && (this.order.vendor.person.displayName.toLowerCase().indexOf(\""+getVendorName().toLowerCase()+"\") >= 0)");
 	}
 
 	@Override
-	protected void checkCustomerName(StringBuffer filter)
+	protected void checkCustomerName(StringBuilder filter)
 	{
 		if (getCustomerName() != null)
 			filter.append("\n && (this.order.customer.person.displayName.toLowerCase().indexOf(\""+getCustomerName().toLowerCase()+"\") >= 0)");
 	}
 
 	@Override
-	protected void checkCustomer(StringBuffer filter) {
+	protected void checkCustomer(StringBuilder filter) {
 		if (getCustomerID() != null) {
 			filter.append("\n && JDOHelper.getObjectId(this.order.customer) == :customerID");
 //		// WORKAROUND:
@@ -59,7 +59,7 @@ public class OfferQuery
 	}
 
 	@Override
-	protected void checkVendor(StringBuffer filter) {
+	protected void checkVendor(StringBuilder filter) {
 		if (getVendorID() != null)
 		{
 			filter.append("\n && JDOHelper.getObjectId(this.vendor) == :vendorID");
@@ -79,7 +79,7 @@ public class OfferQuery
 	}
 
 	@Override
-	protected void checkAdditionalFields(StringBuffer filter)
+	protected void checkAdditionalFields(StringBuilder filter)
 	{
 		if (reserved) {
 			// reserved means finalized but not accepted

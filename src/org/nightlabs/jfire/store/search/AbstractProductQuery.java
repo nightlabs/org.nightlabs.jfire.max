@@ -1,6 +1,5 @@
 package org.nightlabs.jfire.store.search;
 
-import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
 import org.nightlabs.jdo.query.AbstractJDOQuery;
@@ -33,8 +32,8 @@ extends AbstractJDOQuery
 	 */
 	@Override
 	protected void prepareQuery(Query q) {
-		PersistenceManager pm = getPersistenceManager();
-		StringBuffer filter = getFilter();
+//		PersistenceManager pm = getPersistenceManager();
+		StringBuilder filter = getFilter();
 		filter.append("true");
 
 		if (isFieldEnabled(FieldName.productTypeID) && productTypeID != null) {

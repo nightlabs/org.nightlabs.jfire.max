@@ -56,8 +56,8 @@ public abstract class AbstractArticleContainerQuery
 	@Override
 	protected void prepareQuery(Query q)
 	{
-		StringBuffer filter = getFilter();
-		StringBuffer vars = getVars();
+		StringBuilder filter = getFilter();
+		StringBuilder vars = getVars();
 
 		filter.append("true");
 
@@ -105,7 +105,7 @@ public abstract class AbstractArticleContainerQuery
 			logger.debug("query = "+filter);
 	}
 
-	protected void checkProductTypeID(StringBuffer filter, StringBuffer vars, String member)
+	protected void checkProductTypeID(StringBuilder filter, StringBuilder vars, String member)
 	{
 		if (isFieldEnabled(FieldName.productTypeID) && productTypeID != null) {
 			if (vars.length() > 0)
@@ -124,9 +124,9 @@ public abstract class AbstractArticleContainerQuery
 	 * @param filter the already constructed filter consisting of the vendor, customer and article id
 	 * 	check.
 	 */
-	protected abstract void checkAdditionalFields(StringBuffer filter);
+	protected abstract void checkAdditionalFields(StringBuilder filter);
 
-	protected void checkVendorName(StringBuffer filter)
+	protected void checkVendorName(StringBuilder filter)
 	{
 		if (isFieldEnabled(FieldName.vendorName) &&	getVendorName() != null) {
 			vendorNameExpr = isVendorNameRegex() ? vendorName : ".*" + vendorName + ".*";
@@ -134,7 +134,7 @@ public abstract class AbstractArticleContainerQuery
 		}
 	}
 
-	protected void checkCustomerName(StringBuffer filter)
+	protected void checkCustomerName(StringBuilder filter)
 	{
 		if (isFieldEnabled(FieldName.customerName) && getCustomerName() != null) {
 			customerNameExpr = isCustomerNameRegex() ? customerName : ".*" + customerName + ".*";
@@ -150,7 +150,7 @@ public abstract class AbstractArticleContainerQuery
 		}
 	}
 
-	protected void checkArticleContainerID(StringBuffer filter)
+	protected void checkArticleContainerID(StringBuilder filter)
 	{
 		if (isFieldEnabled(FieldName.articleContainerID) &&
 				getArticleContainerID() != null && !getArticleContainerID().trim().equals(""))
@@ -162,7 +162,7 @@ public abstract class AbstractArticleContainerQuery
 	 * Crops all elements from given vendor anchor.
 	 * @param filter the filter to write the query into.
 	 */
-	protected void checkVendor(StringBuffer filter) {
+	protected void checkVendor(StringBuilder filter) {
 		if (isFieldEnabled(FieldName.vendorID) && vendorID != null)
 		{
 			// FIXME: JPOX Bug JDOHelper.getObjectId(this.*) does not seem to work (java.lang.IndexOutOfBoundsException: Index: 3, Size: 3)
@@ -181,7 +181,7 @@ public abstract class AbstractArticleContainerQuery
 	 * Crops all elements from given customer anchor.
 	 * @param filter the filter to write the query into.
 	 */
-	protected void checkCustomer(StringBuffer filter) {
+	protected void checkCustomer(StringBuilder filter) {
 		if (isFieldEnabled(FieldName.customerID) &&	getCustomerID() != null)
 		{
 			// FIXME: JPOX Bug JDOHelper.getObjectId(this.*) does not seem to work (java.lang.IndexOutOfBoundsException: Index: 3, Size: 3)
@@ -195,7 +195,7 @@ public abstract class AbstractArticleContainerQuery
 		}
 	}
 
-	protected void checkProductID(StringBuffer filter, StringBuffer vars, String member)
+	protected void checkProductID(StringBuilder filter, StringBuilder vars, String member)
 	{
 		if (isFieldEnabled(FieldName.productID) && productID != null) {
 			if (vars.length() > 0)

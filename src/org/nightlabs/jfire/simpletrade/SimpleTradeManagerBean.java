@@ -106,6 +106,7 @@ import org.nightlabs.jfire.store.deliver.DeliveryConfiguration;
 import org.nightlabs.jfire.store.deliver.ModeOfDelivery;
 import org.nightlabs.jfire.store.deliver.ModeOfDeliveryConst;
 import org.nightlabs.jfire.store.id.ProductTypeID;
+import org.nightlabs.jfire.store.notification.ProductTypePermissionFlagSetNotificationReceiver;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.ArticleCreator;
 import org.nightlabs.jfire.trade.CustomerGroup;
@@ -955,19 +956,30 @@ implements SessionBean
 	public void importSimpleProductTypesForReselling(String emitterOrganisationID)
 	throws JFireException
 	{
+		PersistenceManager pm = getPersistenceManager();
 		try {
-			boolean rollback = true;
-			PersistenceManager pm = getPersistenceManager();
 			try {
 				Hashtable<?, ?> initialContextProperties = getInitialContextProperties(emitterOrganisationID);
 
 				PersistentNotificationEJB persistentNotificationEJB = PersistentNotificationEJBUtil.getHome(initialContextProperties).create();
-				SimpleProductTypeNotificationFilter notificationFilter = new SimpleProductTypeNotificationFilter(
+
+				SimpleProductTypeNotificationFilter simpleProductTypeNotificationFilter = new SimpleProductTypeNotificationFilter(
 						emitterOrganisationID, SubscriptionUtil.SUBSCRIBER_TYPE_ORGANISATION, getOrganisationID(),
-						SimpleProductTypeNotificationFilter.class.getName());
-				SimpleProductTypeNotificationReceiver notificationReceiver = new SimpleProductTypeNotificationReceiver(notificationFilter);
-				notificationReceiver = pm.makePersistent(notificationReceiver);
-				persistentNotificationEJB.storeNotificationFilter(notificationFilter, false, null, 1);
+						SimpleProductTypeNotificationFilter.class.getName()
+				);
+				SimpleProductTypeNotificationReceiver simpleProductTypeNotificationReceiver = new SimpleProductTypeNotificationReceiver(simpleProductTypeNotificationFilter);
+				simpleProductTypeNotificationReceiver = pm.makePersistent(simpleProductTypeNotificationReceiver);
+				persistentNotificationEJB.storeNotificationFilter(simpleProductTypeNotificationFilter, false, null, 1);
+
+
+//				ProductTypePermissionFlagSetNotificationFilter productTypePermissionFlagSetNotificationFilter = new ProductTypePermissionFlagSetNotificationFilter(
+//						emitterOrganisationID, SubscriptionUtil.SUBSCRIBER_TYPE_ORGANISATION, getOrganisationID(),
+//						ProductTypePermissionFlagSetNotificationFilter.class.getName()
+//				);
+//				ProductTypePermissionFlagSetNotificationReceiver productTypePermissionFlagSetNotificationReceiver = new ProductTypePermissionFlagSetNotificationReceiver(productTypePermissionFlagSetNotificationFilter);
+//				productTypePermissionFlagSetNotificationReceiver = pm.makePersistent(productTypePermissionFlagSetNotificationReceiver);
+//				persistentNotificationEJB.storeNotificationFilter(productTypePermissionFlagSetNotificationFilter, false, null, 1);
+				ProductTypePermissionFlagSetNotificationReceiver.register(pm, emitterOrganisationID);
 
 //				ArrayList<ProductTypeID> productTypeIDs = new ArrayList<ProductTypeID>(1);
 //				productTypeIDs.add(productTypeID);
@@ -978,7 +990,7 @@ implements SessionBean
 				// never used
 				//Collection<SimpleProductType> productTypes = simpleTradeManager.getSimpleProductTypesForReseller(productTypeIDs);
 
-				notificationReceiver.replicateSimpleProductTypes(emitterOrganisationID, productTypeIDs, new HashSet<ProductTypeID>(0));
+				simpleProductTypeNotificationReceiver.replicateSimpleProductTypes(emitterOrganisationID, productTypeIDs, new HashSet<ProductTypeID>(0));
 
 //				if (productTypes.size() != 1)
 //				throw new IllegalStateException("productTypes.size() != 1");
@@ -991,16 +1003,12 @@ implements SessionBean
 
 //				productTypes = pm.makePersistentAll(productTypes);
 //				return productTypes.iterator().next();
-				rollback = false;
-			} finally {
-				if (rollback)
-					sessionContext.setRollbackOnly();
-
-				pm.close();
+			} catch (Exception x) {
+				logger.error("Import of SimpleProductType failed!", x);
+				throw new JFireException(x);
 			}
-		} catch (Exception x) {
-			logger.error("Import of SimpleProductType failed!", x);
-			throw new JFireException(x);
+		} finally {
+			pm.close();
 		}
 	}
 

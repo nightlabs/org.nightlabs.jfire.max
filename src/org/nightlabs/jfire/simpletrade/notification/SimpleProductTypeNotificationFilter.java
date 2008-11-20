@@ -6,7 +6,6 @@ import java.util.List;
 
 import javax.jdo.PersistenceManager;
 
-import org.nightlabs.annotation.Implement;
 import org.nightlabs.jfire.jdo.notification.DirtyObjectID;
 import org.nightlabs.jfire.jdo.notification.JDOLifecycleState;
 import org.nightlabs.jfire.jdo.notification.persistent.NotificationFilter;
@@ -18,7 +17,6 @@ import org.nightlabs.jfire.store.id.ProductTypeID;
  *
  * @jdo.persistence-capable
  *		identity-type="application"
- *		persistence-capable-superclass="org.nightlabs.jfire.jdo.notification.persistent.NotificationFilter"
  *		detachable="true"
  *
  * @jdo.inheritance strategy="superclass-table"
@@ -43,7 +41,6 @@ public class SimpleProductTypeNotificationFilter
 	}
 
 	@Override
-	@Implement
 	public Collection<DirtyObjectID> filter(List<DirtyObjectID> dirtyObjectIDs)
 	{
 		PersistenceManager pm = null;

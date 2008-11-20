@@ -13,7 +13,6 @@ import javax.jdo.PersistenceManager;
 import javax.naming.NamingException;
 
 import org.apache.log4j.Logger;
-import org.nightlabs.annotation.Implement;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.accounting.gridpriceconfig.GridPriceConfigUtil;
 import org.nightlabs.jfire.accounting.priceconfig.id.PriceConfigID;
@@ -30,6 +29,11 @@ import org.nightlabs.jfire.simpletrade.SimpleTradeManagerUtil;
 import org.nightlabs.jfire.simpletrade.store.SimpleProductType;
 import org.nightlabs.jfire.store.Store;
 import org.nightlabs.jfire.store.id.ProductTypeID;
+import org.nightlabs.jfire.store.id.ProductTypePermissionFlagSetID;
+import org.nightlabs.jfire.store.notification.ProductTypePermissionFlagSetNotificationReceiver;
+import org.nightlabs.jfire.trade.TradeManager;
+import org.nightlabs.jfire.trade.TradeManagerUtil;
+import org.nightlabs.util.CollectionUtil;
 
 /**
  * @author Marco Schulze - Marco at NightLabs dot de
@@ -63,24 +67,22 @@ extends NotificationReceiver
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
-	@Implement
 	public void onReceiveNotificationBundle(NotificationBundle notificationBundle)
 	throws Exception
 	{
-		HashSet productTypeIDs_load = new HashSet();
-		HashSet productTypeIDs_delete = new HashSet();
+		HashSet<ProductTypeID> productTypeIDs_load = new HashSet<ProductTypeID>();
+		HashSet<ProductTypeID> productTypeIDs_delete = new HashSet<ProductTypeID>();
 		for (DirtyObjectID dirtyObjectID : notificationBundle.getDirtyObjectIDs()) {
 			if (JDOLifecycleState.DELETED.equals(dirtyObjectID.getLifecycleState())) {
-				productTypeIDs_delete.add(dirtyObjectID.getObjectID());
+				productTypeIDs_delete.add((ProductTypeID) dirtyObjectID.getObjectID());
 				productTypeIDs_load.remove(dirtyObjectID.getObjectID());
 			}
 			else if (JDOLifecycleState.NEW.equals(dirtyObjectID.getLifecycleState())) {
 				productTypeIDs_delete.remove(dirtyObjectID.getObjectID());
-				productTypeIDs_load.add(dirtyObjectID.getObjectID());
+				productTypeIDs_load.add((ProductTypeID) dirtyObjectID.getObjectID());
 			}
 			else
-				productTypeIDs_load.add(dirtyObjectID.getObjectID());
+				productTypeIDs_load.add((ProductTypeID) dirtyObjectID.getObjectID());
 		}
 		replicateSimpleProductTypes(notificationBundle.getOrganisationID(), productTypeIDs_load, productTypeIDs_delete);
 	}
@@ -95,7 +97,15 @@ extends NotificationReceiver
 
 		Hashtable<?,?> initialContextProperties = Lookup.getInitialContextProperties(pm, emitterOrganisationID);
 		SimpleTradeManager simpleTradeManager = SimpleTradeManagerUtil.getHome(initialContextProperties).create();
-		Collection<SimpleProductType> productTypes = simpleTradeManager.getSimpleProductTypesForReseller(productTypeIDs_load);
+		Collection<SimpleProductType> productTypes = CollectionUtil.castCollection(
+				simpleTradeManager.getSimpleProductTypesForReseller(productTypeIDs_load)
+		);
+		Set<ProductTypeID> productTypeIDs = NLJDOHelper.getObjectIDSet(productTypes);
+
+		TradeManager tradeManager = TradeManagerUtil.getHome(initialContextProperties).create();
+		Set<ProductTypePermissionFlagSetID> productTypePermissionFlagSetIDs = CollectionUtil.castSet(
+				tradeManager.getMyProductTypePermissionFlagSetIDs(productTypeIDs)
+		);
 
 		Set<PriceConfigID> priceConfigIDs = new HashSet<PriceConfigID>();
 
@@ -149,6 +159,13 @@ extends NotificationReceiver
 
 		if (!priceConfigIDs.isEmpty())
 			GridPriceConfigUtil.assertConsistency(pm, priceConfigIDs);
+
+		ProductTypePermissionFlagSetNotificationReceiver.replicateProductTypePermissionFlagSets(
+				pm,
+				emitterOrganisationID,
+				productTypePermissionFlagSetIDs,
+				null
+		);
 
 		if (!productTypes.isEmpty()) {
 			logger.error("Could not persist the following SimpleProductTypes because of missing extendedProductType:");

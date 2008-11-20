@@ -39,11 +39,19 @@ import org.nightlabs.util.Util;
  * @jdo.create-objectid-class
  *		field-order="productTypeOrganisationID, productTypeID, userOrganisationID, userID"
  *		include-body="id/ProductTypePermissionFlagSetID.body.inc"
+ *
+ * @jdo.version strategy="version-number"
+ *
+ * @jdo.fetch-group name="ProductTypePermissionFlagSet.productType" fields="productType"
+ * @jdo.fetch-group name="ProductTypePermissionFlagSet.user" fields="user"
  */
 public class ProductTypePermissionFlagSet
 implements Serializable
 {
 	private static final long serialVersionUID = 1L;
+
+	public static final String FETCH_GROUP_PRODUCT_TYPE = "ProductTypePermissionFlagSet.productType";
+	public static final String FETCH_GROUP_USER = "ProductTypePermissionFlagSet.user";
 
 	private static Map<String, Object> organisationID2mutex = new HashMap<String, Object>();
 	public synchronized static Object getMutex(String organisationID)
@@ -54,6 +62,14 @@ implements Serializable
 			organisationID2mutex.put(organisationID, mutex);
 		}
 		return mutex;
+	}
+
+	public long getVersion()
+	{
+		Object versionObject = JDOHelper.getVersion(this);
+		if (versionObject == null)
+			return 0;
+		return ((Long)versionObject).longValue();
 	}
 
 	/**
@@ -492,10 +508,14 @@ implements Serializable
 	private String userID;
 
 	/**
+	 * TODO report DataNucleus bug when replicating with null-value="exception" and re-enable it once the bug is fixed!
+	 * @!jdo.field persistence-modifier="persistent" null-value="exception"
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private ProductType productType;
 	/**
+	 * TODO report DataNucleus bug when replicating with null-value="exception" and re-enable it once the bug is fixed!
+	 * @!jdo.field persistence-modifier="persistent" null-value="exception"
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private User user;

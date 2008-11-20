@@ -37,6 +37,7 @@ import java.util.Set;
 
 import javax.jdo.JDODetachedFieldAccessException;
 import javax.jdo.JDOHelper;
+import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 import javax.jdo.listener.AttachCallback;
@@ -1692,7 +1693,14 @@ implements
 	@Override
 	public void jdoPreAttach() {
 		PersistenceManager pm = NLJDOHelper.getThreadPersistenceManager();
-		ProductType persistentProductType = (ProductType) pm.getObjectById(JDOHelper.getObjectId(this));
+		ProductType persistentProductType;
+		try {
+			persistentProductType = (ProductType) pm.getObjectById(JDOHelper.getObjectId(this));
+		} catch (JDOObjectNotFoundException x) {
+			// seems we are in replication (from one datastore to another) => silently return
+			return;
+		}
+
 		try {
 			this.saleable = persistentProductType.saleable;
 		} catch (JDODetachedFieldAccessException x) { } // ignore - no need to restore a non-detached field

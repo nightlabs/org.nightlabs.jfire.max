@@ -86,8 +86,11 @@ import org.nightlabs.jfire.security.id.UserID;
 import org.nightlabs.jfire.store.DeliveryNote;
 import org.nightlabs.jfire.store.Product;
 import org.nightlabs.jfire.store.ProductType;
+import org.nightlabs.jfire.store.ProductTypePermissionFlagSet;
 import org.nightlabs.jfire.store.ReceptionNote;
 import org.nightlabs.jfire.store.id.ProductID;
+import org.nightlabs.jfire.store.id.ProductTypeID;
+import org.nightlabs.jfire.store.id.ProductTypePermissionFlagSetID;
 import org.nightlabs.jfire.store.reverse.AlreadyReversedArticleReverseProductError;
 import org.nightlabs.jfire.store.reverse.IReverseProductError;
 import org.nightlabs.jfire.store.reverse.NoArticlesFoundReverseProductError;
@@ -113,6 +116,7 @@ import org.nightlabs.jfire.trade.recurring.RecurringOffer;
 import org.nightlabs.jfire.trade.recurring.RecurringOrder;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 import org.nightlabs.timepattern.TimePatternFormatException;
+import org.nightlabs.util.CollectionUtil;
 import org.nightlabs.version.MalformedVersionException;
 
 
@@ -2231,6 +2235,81 @@ implements SessionBean
 			}
 		}
 		finally {
+			pm.close();
+		}
+	}
+
+	/**
+	 * Get all {@link ProductTypePermissionFlagSet}s assigned to the current user and the specified ProductTypeIDs.
+	 *
+	 * @param productTypeIDs the {@link ProductTypeID}s of those {@link ProductType}s for which to obtain {@link ProductTypePermissionFlagSet}s.
+	 * @return the object-ids of the found {@link ProductTypePermissionFlagSet}s.
+	 *
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+	 */
+	public Set<ProductTypePermissionFlagSetID> getMyProductTypePermissionFlagSetIDs(Set<ProductTypeID> productTypeIDs)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			User user = User.getUser(pm, getPrincipal());
+			Collection<ProductType> productTypes = CollectionUtil.castCollection(pm.getObjectsById(productTypeIDs));
+			Set<ProductTypePermissionFlagSetID> res = new HashSet<ProductTypePermissionFlagSetID>();
+			for (ProductType productType : productTypes) {
+				ProductTypePermissionFlagSet flagSet = ProductTypePermissionFlagSet.getProductTypePermissionFlagSet(pm, productType, user, false);
+				if (flagSet != null) // might not exist
+					res.add((ProductTypePermissionFlagSetID) JDOHelper.getObjectId(flagSet));
+			}
+			return res;
+		} finally {
+			pm.close();
+		}
+	}
+
+	/**
+	 * Get the {@link ProductTypePermissionFlagSet}s specified by their object-ids.
+	 *
+	 * @param productTypePermissionFlagSetIDs the object-ids of the {@link ProductTypePermissionFlagSet}s to retrieve.
+	 * @param fetchGroups the JDO-fetch-groups to use for detaching.
+	 * @param maxFetchDepth the maximum depth of the object-graphs to be detached.
+	 * @return the {@link ProductTypePermissionFlagSet}s for the specified object-ids.
+	 *
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+	 */
+	public Collection<ProductTypePermissionFlagSet> getProductTypePermissionFlagSets(
+			Collection<ProductTypePermissionFlagSetID> productTypePermissionFlagSetIDs,
+			String[] fetchGroups,
+			int maxFetchDepth
+	)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+			if (fetchGroups != null)
+				pm.getFetchPlan().setGroups(fetchGroups);
+
+			List<ProductTypePermissionFlagSet> productTypePermissionFlagSets = new ArrayList<ProductTypePermissionFlagSet>(productTypePermissionFlagSetIDs.size());
+			UserID userID = UserID.create(getPrincipal());
+			for (ProductTypePermissionFlagSetID productTypePermissionFlagSetID : productTypePermissionFlagSetIDs) {
+				if (productTypePermissionFlagSetID == null)
+					throw new IllegalArgumentException("productTypePermissionFlagSetIDs contains null element!");
+
+				// We currently filter and return only those that are assigned to the currently
+				// authenticated user. Maybe we'll change this and introduce an access right
+				// (if granted, filtering would be deactivated).
+				if (!userID.organisationID.equals(productTypePermissionFlagSetID.userOrganisationID) || !userID.userID.equals(productTypePermissionFlagSetID.userID))
+					continue;
+
+				productTypePermissionFlagSets.add(
+						(ProductTypePermissionFlagSet) pm.getObjectById(productTypePermissionFlagSetID)
+				);
+			}
+
+			return pm.detachCopyAll(productTypePermissionFlagSets);
+		} finally {
 			pm.close();
 		}
 	}

@@ -861,9 +861,13 @@ currency.toDouble(row["amount"])</expression>
                 <property name="interval">none</property>
                 <property name="sortDirection">asc</property>
                 <expression name="keyExpr">row["queryAccountJDOID"]</expression>
-                <property name="repeatHeader">false</property>
+                <structure name="toc">
+                    <expression name="expressionValue">account = JFireReportingHelper.getJDOObject(row["queryAccountJDOID"]);
+account.getDescription()</expression>
+                </structure>
+                <property name="repeatHeader">true</property>
                 <property name="hideDetail">false</property>
-                <property name="pageBreakAfter">auto</property>
+                <property name="pageBreakAfter">avoid</property>
                 <property name="pageBreakBefore">auto</property>
                 <property name="pageBreakInside">avoid</property>
                 <header>
@@ -1082,7 +1086,7 @@ else {
                             <structure name="numberFormat">
                                 <property name="category">Currency</property>
                                 <property name="pattern">###0.00</property>
-                            </structure>                            
+                            </structure>
                             <property name="resultSetColumn">balanceAfterTransfer</property>
                         </data>
                     </cell>

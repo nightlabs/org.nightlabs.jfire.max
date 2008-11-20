@@ -534,6 +534,23 @@ implements SessionBean
 			pm.close();
 		}
 	}
+	
+	/**
+	 * @ejb.interface-method
+	 * @ejb.transaction type="Required"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	public void storeWebCustomerPassword(WebCustomerID webCustomerID, String newPassword)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			WebCustomer wbc = (WebCustomer)pm.getObjectById(webCustomerID);
+			wbc.setPassword(UserLocal.encryptPassword(newPassword));
+			pm.makePersistent(wbc);
+		} finally {
+			pm.close();
+		}
+	}
 
 	/**
 	 * This will send E-mails to every address found for that webCustomers

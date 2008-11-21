@@ -11,7 +11,6 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.io.DataBuffer;
-import org.nightlabs.jfire.reporting.JFireReportingEAR;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.util.CacheDirTag;
 import org.nightlabs.util.IOUtil;
@@ -34,13 +33,14 @@ public class ReportLayoutRendererUtil {
 	 * 		This is (JFireReporting#earDir/birt/rendered).
 	 */
 	public static File getRenderedLayoutOutputRootFolder() {
-		File earDir;
-		try {
-			earDir = JFireReportingEAR.getEARDir();
-		} catch (Exception e) {
-			throw new IllegalStateException("Could not obtain archive directory!",e);
-		}
-		File renderedRoot = new File(earDir, "birt"+File.separator+"rendered");
+//		File earDir;
+//		try {
+//			earDir = JFireReportingEAR.getEARDir();
+//		} catch (Exception e) {
+//			throw new IllegalStateException("Could not obtain archive directory!",e);
+//		}
+		File renderedRoot = IOUtil.getUserTempDir("jfire_birt.rendered.", null);
+//		File renderedRoot = new File(earDir, "birt"+File.separator+"rendered");
 		if (!renderedRoot.exists()) {
 			renderedRoot.mkdirs();
 			CacheDirTag cacheDirTag = new CacheDirTag(renderedRoot.getParentFile());

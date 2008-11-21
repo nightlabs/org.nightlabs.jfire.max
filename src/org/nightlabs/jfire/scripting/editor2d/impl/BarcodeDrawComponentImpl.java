@@ -27,6 +27,7 @@ package org.nightlabs.jfire.scripting.editor2d.impl;
 
 import java.awt.Font;
 import java.awt.Rectangle;
+import java.awt.geom.AffineTransform;
 
 import net.sourceforge.barbecue.Barcode;
 import net.sourceforge.barbecue.BarcodeException;
@@ -36,6 +37,7 @@ import org.apache.log4j.Logger;
 import org.nightlabs.editor2d.DrawComponent;
 import org.nightlabs.editor2d.DrawComponentContainer;
 import org.nightlabs.editor2d.impl.DrawComponentImpl;
+import org.nightlabs.editor2d.j2d.GeneralShape;
 import org.nightlabs.editor2d.render.BaseRenderer;
 import org.nightlabs.editor2d.render.Renderer;
 import org.nightlabs.i18n.unit.resolution.DPIResolutionUnit;
@@ -55,11 +57,13 @@ implements BarcodeDrawComponent
 {
 	private static final long serialVersionUID = 1L;
 	public static final Logger logger = Logger.getLogger(BarcodeDrawComponentImpl.class);
-	
+
+	private int barcodeHeight = HEIGHT_DEFAULT;
+
 	public BarcodeDrawComponentImpl() {
 		super();
 	}
-	
+
 	public BarcodeDrawComponentImpl(Type type, String value, int x, int y, WidthScale widthScale,
 			int height, Orientation orientation, boolean printHumanReadable,
 			DrawComponentContainer parent, ScriptRegistryItemID scriptID)
@@ -68,10 +72,10 @@ implements BarcodeDrawComponent
 
 		if (value == null)
 			throw new IllegalArgumentException("Param value must not be null!");
-		
+
 		if (scriptID == null)
 			throw new IllegalArgumentException("Param scriptID must not be null!");
-				
+
 		setParent(parent);
 		this.type = type;
 		this.x = x;
@@ -80,18 +84,38 @@ implements BarcodeDrawComponent
 		this.humanReadable = printHumanReadable;
 		this.widthScale = widthScale;
 		this.orientation = orientation;
-		this.height = height;
+		this.barcodeHeight = height;
 		this.scriptRegistryItemID = scriptID;
 		this.scriptRegistryItemIDKeyStr = scriptRegistryItemID.toString();
 
 		refresh();
+
+		getGeneralShape();
 	}
-	
+
+	private transient GeneralShape generalShape = null;
+	private GeneralShape getGeneralShape()
+	{
+		if (generalShape == null) {
+			Rectangle initialBounds = null;
+			if (orientation == Orientation.HORIZONTAL) {
+//				initialBounds = new Rectangle(x, y, getBarcode().getWidth(), getBarcode().getHeight());
+				initialBounds = new Rectangle(x, y, getBarcode().getWidth(), barcodeHeight);
+			}
+			if (orientation == Orientation.VERTICAL) {
+//				initialBounds = new Rectangle(x, y, getBarcode().getHeight(), getBarcode().getWidth());
+				initialBounds = new Rectangle(x, y, barcodeHeight, getBarcode().getWidth());
+			}
+			this.generalShape = new GeneralShape(initialBounds);
+		}
+		return generalShape;
+	}
+
 	private static final IResolutionUnit dpiUnit = new DPIResolutionUnit();
 	private int getModelResolution() {
 		return (int) getRoot().getResolution().getResolutionX(dpiUnit);
 	}
-	
+
 	private transient Barcode barcode = null;
 	public Barcode getBarcode()
 	{
@@ -105,7 +129,7 @@ implements BarcodeDrawComponent
 		}
 		return barcode;
 	}
-	
+
 	protected Barcode getBarcode(Type type)
 	throws BarcodeException
 	{
@@ -117,7 +141,7 @@ implements BarcodeDrawComponent
 		}
 		return barcode;
 	}
-		
+
 	private Type type = TYPE_DEFAULT;
 	public Type getType() {
 		return type;
@@ -129,10 +153,11 @@ implements BarcodeDrawComponent
 			Type oldType = this.type;
 			this.type = type;
 			refresh();
+			generalShape = null;
 			firePropertyChange(PROP_TYPE, oldType, type);
 		}
 	}
-	
+
 	private boolean humanReadable = HUMAN_READABLE_DEFAULT;
 	public boolean isHumanReadable() {
 		return humanReadable;
@@ -141,6 +166,7 @@ implements BarcodeDrawComponent
 		this.humanReadable = humanReadbale;
 		getBarcode().setDrawingText(humanReadbale);
 		clearBounds();
+		generalShape = null;
 		firePropertyChange(PROP_HUMAN_READABLE, !humanReadbale, humanReadbale);
 	}
 
@@ -172,6 +198,9 @@ implements BarcodeDrawComponent
 			Orientation oldOrientation = this.orientation;
 			this.orientation = orientation;
 			refresh();
+			int oldWidth = getBounds().width;
+			int oldHeight = getBounds().height;
+			generalShape = new GeneralShape(new Rectangle(x, y, oldHeight, oldWidth));
 			firePropertyChange(PROP_ORIENTATION, oldOrientation, orientation);
 		}
 	}
@@ -187,43 +216,21 @@ implements BarcodeDrawComponent
 			WidthScale oldWidthScale = this.widthScale;
 			this.widthScale = widthScale;
 			refresh();
+			generalShape = null;
 			firePropertyChange(PROP_WIDTH_SCALE, oldWidthScale, widthScale);
 		}
 	}
 
 	protected void refresh()
 	{
-		clearBounds();
-				
 		Font scaledFont = getScaledFont(DEFAULT_FONT);
 		getBarcode().setFont(scaledFont);
-		
 		getBarcode().setDrawingText(isHumanReadable());
 		getBarcode().setResolution(getModelResolution());
-						
 		double barWidth = getBarWidth(getWidthScale());
 		getBarcode().setBarWidth(barWidth);
-		
-//		if (orientation == Orientation.HORIZONTAL)
-//		{
-//			getBarcode().setBarHeight(height);
-//			this.width = getBarcode().getWidth();
-//			this.height = getBarcode().getHeight();
-//		}
-//		if (orientation == Orientation.VERTICAL)
-//		{
-////			getBarcode().setBarHeight(width);
-//			getBarcode().setBarHeight(height);
-//			this.width = getBarcode().getHeight();
-//			this.height = getBarcode().getWidth();
-//		}
-		
-		getBarcode().setBarHeight(height);
-//		this.width = getBarcode().getWidth();
-//		this.height = getBarcode().getHeight();
-		
-		clearBounds();
-		
+		getBarcode().setBarHeight(barcodeHeight);
+
 		if (logger.isDebugEnabled())
 		{
 			logger.debug("Resolution = "+getModelResolution());
@@ -233,59 +240,23 @@ implements BarcodeDrawComponent
 			logger.debug("barWidth = "+barWidth);
 			logger.debug("width = "+this.width);
 			logger.debug("height = "+this.height);
+			logger.debug("barcodeHeight = "+this.barcodeHeight);
 			logger.debug("getBarcode.getBounds() = "+getBarcode().getBounds());
 			logger.debug("this.getBounds() = "+this.getBounds());
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.nightlabs.editor2d.impl.DrawComponentImpl#getBounds()
-	 */
 	@Override
 	public Rectangle getBounds()
 	{
-		if (bounds == null) {
-			if (orientation == Orientation.HORIZONTAL)
-				bounds = new Rectangle(x, y, getBarcode().getWidth(), getBarcode().getHeight());
-			if (orientation == Orientation.VERTICAL)
-				bounds = new Rectangle(x, y, getBarcode().getHeight(), getBarcode().getWidth());
+		if (getGeneralShape() != null) {
+			return getGeneralShape().getBounds();
 		}
-		return bounds;
+		else {
+			return super.getBounds();
+		}
 	}
-		
-//	protected double getBarWidth(WidthScale scale)
-//	{
-//		double width = 1;
-//		switch (scale)
-//		{
-//			case SCALE_1:
-//				width = 4d;
-//				break;
-//			case SCALE_2:
-//				width = 5;
-//				break;
-//			case SCALE_3:
-//				width = 3;
-//				break;
-//			case SCALE_4:
-//				width = 2;
-//				break;
-//			default:
-//				width = 5;
-//				break;
-//		}
-//		
-//		int resolution = getModelResolution();
-//		double factor = (resolution) / 300d;
-//		double scaledWidth = width * factor;
-//		if (logger.isDebugEnabled()) {
-//			logger.debug("width = " + width);
-//			logger.debug("ModelUnit Factor = "+factor);
-//			logger.debug("ScaledBarWidth = " + scaledWidth);
-//		}
-//		return scaledWidth;
-//	}
-	
+
 	protected double getBarWidth(WidthScale scale)
 	{
 		double width = 1;
@@ -307,7 +278,7 @@ implements BarcodeDrawComponent
 				width = 3d;
 				break;
 		}
-		
+
 		int resolution = getModelResolution();
 		double factor = (resolution) / 300d;
 		double scaledWidth = width * factor;
@@ -317,8 +288,8 @@ implements BarcodeDrawComponent
 			logger.debug("ScaledBarWidth = " + scaledWidth);
 		}
 		return scaledWidth;
-	}	
-	
+	}
+
 	protected Font getScaledFont(Font f)
 	{
 		double defaultFontSize = f.getSize();
@@ -327,13 +298,13 @@ implements BarcodeDrawComponent
 		int newFontSize = (int) (defaultFontSize * resolutionScale);
 		return new Font(f.getName(), f.getStyle(), newFontSize);
 	}
-		
-	@Override
-	protected void primSetHeight(float height)
-	{
-		super.primSetHeight(height);
-		refresh();
-	}
+
+//	@Override
+//	protected void primSetHeight(float height)
+//	{
+//		super.primSetHeight(height);
+//		refresh();
+//	}
 
 	@Override
 	public String getTypeName() {
@@ -344,14 +315,14 @@ implements BarcodeDrawComponent
 	public Class<? extends DrawComponent> getRenderModeClass() {
 		return BarcodeDrawComponent.class;
 	}
-	
-	@Override
-	protected void primSetLocation(int newX, int newY)
-	{
-		this.x = newX;
-		this.y = newY;
-		getBarcode().setLocation(newX, newY);
-	}
+
+//	@Override
+//	protected void primSetLocation(int newX, int newY)
+//	{
+//		this.x = newX;
+//		this.y = newY;
+//		getBarcode().setLocation(newX, newY);
+//	}
 
 	@Override
 	protected Renderer initDefaultRenderer() {
@@ -359,7 +330,7 @@ implements BarcodeDrawComponent
 		r.addRenderContext(new J2DBarcodeDefaultRenderer());
 		return r;
 	}
-				
+
 	private transient String text = VALUE_DEFAULT;
 	public String getText() {
 		return text;
@@ -372,6 +343,7 @@ implements BarcodeDrawComponent
 			String oldValue = this.text;
 			this.text = text;
 			refresh();
+			generalShape = null;
 			firePropertyChange(PROP_VALUE, oldValue, text);
 		}
 	}
@@ -380,7 +352,7 @@ implements BarcodeDrawComponent
 	public Object getScriptValue() {
 		return scriptValue;
 	}
-	
+
 	public void setScriptValue(Object scriptValue) {
 		this.scriptValue = scriptValue;
 		if (scriptValue instanceof String) {
@@ -393,5 +365,32 @@ implements BarcodeDrawComponent
 		BarcodeDrawComponentImpl clone = (BarcodeDrawComponentImpl) super.clone(parent);
 		clone.barcode = null;
 		return clone;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.nightlabs.editor2d.impl.DrawComponentImpl#transform(java.awt.geom.AffineTransform, boolean)
+	 */
+	@Override
+	public void transform(AffineTransform newAT, boolean fromParent) {
+		super.transform(newAT, fromParent);
+		getGeneralShape().transform(newAT);
+		if (!fromParent && getParent() != null)
+			getParent().notifyChildTransform(this);
+
+		refresh();
+	}
+
+	public void setBarcodeHeight(int barcodeHeight)
+	{
+		int oldBarcodeHeight = this.barcodeHeight;
+		this.barcodeHeight = barcodeHeight;
+		refresh();
+		generalShape = null;
+		firePropertyChange(PROP_VALUE, oldBarcodeHeight, barcodeHeight);
+	}
+
+	public int getBarcodeHeight()
+	{
+		return barcodeHeight;
 	}
 }

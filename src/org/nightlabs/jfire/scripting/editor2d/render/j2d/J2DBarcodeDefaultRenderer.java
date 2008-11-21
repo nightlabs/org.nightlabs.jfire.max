@@ -47,20 +47,20 @@ extends J2DBaseRenderer
 	}
 
 	@Override
-  public void paint(DrawComponent dc, Graphics2D g2d)
-  {
-    BarcodeDrawComponent barcode = (BarcodeDrawComponent) dc;
-    if (barcode.getOrientation() == Orientation.HORIZONTAL)
-    	barcode.getBarcode().draw(g2d, barcode.getX(), barcode.getY());
-    else if (barcode.getOrientation() == Orientation.VERTICAL)
-    {
-    	AffineTransform oldAT = g2d.getTransform();
-    	g2d.rotate(Math.toRadians(90), barcode.getX(), barcode.getY());
-    	g2d.translate(0, -barcode.getWidth());
-    	barcode.getBarcode().draw(g2d, barcode.getX(), barcode.getY());
-    	g2d.setTransform(oldAT);
-    }
-  }
-	
+	public void paint(DrawComponent dc, Graphics2D g2d)
+	{
+		BarcodeDrawComponent barcode = (BarcodeDrawComponent) dc;
+		if (barcode.getOrientation() == Orientation.HORIZONTAL)
+			barcode.getBarcode().draw(g2d, barcode.getX(), barcode.getY());
+		else if (barcode.getOrientation() == Orientation.VERTICAL)
+		{
+			AffineTransform oldAT = g2d.getTransform();
+			g2d.rotate(Math.toRadians(90), barcode.getX(), barcode.getY());
+			g2d.translate(0, -barcode.getWidth());
+			barcode.getBarcode().draw(g2d, barcode.getX(), barcode.getY());
+			g2d.setTransform(oldAT);
+		}
+	}
+
 }
 

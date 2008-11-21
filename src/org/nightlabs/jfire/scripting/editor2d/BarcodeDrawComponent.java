@@ -45,46 +45,46 @@ extends DrawComponent, ScriptDrawComponent
 	public static final Font DEFAULT_FONT = new Font("Arial", Font.PLAIN, 12);
 	public static final Orientation ORIENTATION_DEFAULT = Orientation.VERTICAL;
 	public static final WidthScale WIDTH_SCALE_DEFAULT = WidthScale.SCALE_4;
-	
+
 	public static final String PROP_TYPE = "Type";
 	public static final String PROP_VALUE = "Value";
 	public static final String PROP_HUMAN_READABLE = "HumanReadable";
 	public static final String PROP_WIDTH_SCALE = "WidthScale";
 	public static final String PROP_ORIENTATION = "Orientation";
-	
-  public enum Type {
-  	TYPE_128
-  }
-    
-  public enum Orientation {
-  	HORIZONTAL,
-  	VERTICAL
-  }
-  
-  public enum WidthScale {
-  	SCALE_1,
-  	SCALE_2,
-  	SCALE_3,
-  	SCALE_4
-  }
-  
-  Type getType();
-  void setType(Type type);
-  
-  Orientation getOrientation();
-  void setOrientation(Orientation orientation);
-  
-  WidthScale getWidthScale();
-  void setWidthScale(WidthScale widthScale);
-  
-//  String getValue();
-//  void setValue(String value);
-  
-  boolean isHumanReadable();
-  void setHumanReadable(boolean b);
-    
-  Barcode getBarcode();
-  
-  String getText();
+	public static final String PROP_BARCODE_HEIGHT = "barcodeHeight";
 
+	public enum Type {
+		TYPE_128
+	}
+
+	public enum Orientation {
+		HORIZONTAL,
+		VERTICAL
+	}
+
+	public enum WidthScale {
+		SCALE_1,
+		SCALE_2,
+		SCALE_3,
+		SCALE_4
+	}
+
+	Type getType();
+	void setType(Type type);
+
+	Orientation getOrientation();
+	void setOrientation(Orientation orientation);
+
+	WidthScale getWidthScale();
+	void setWidthScale(WidthScale widthScale);
+
+	boolean isHumanReadable();
+	void setHumanReadable(boolean b);
+
+	Barcode getBarcode();
+
+	String getText();
+
+	void setBarcodeHeight(int barcodeHeight);
+	int getBarcodeHeight();
 }

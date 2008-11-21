@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin>
+   <extension
+         point="org.eclipse.datatools.connectivity.oda.dataSource">
+      <dataSource
+            defaultDisplayName="JFire Server Side Script Driver"
+            driverClass="org.nightlabs.jfire.reporting.oda.server.jfs.ServerJFSDriver"
+            id="org.nightlabs.jfire.reporting.oda.jfs.JFSDriver"
+            odaVersion="3.0"
+            setThreadContextClassLoader="false">
+      </dataSource>
+      <dataSet
+            defaultDisplayName="Server Side JFire Script Data Set"            
+            id="org.nightlabs.jfire.reporting.oda.jfs.JFSDataSet">
+         <dataTypeMapping
+               nativeDataType="String"
+               nativeDataTypeCode="1"
+               odaScalarDataType="String"/>
+         <dataTypeMapping
+               nativeDataType="Integer"
+               nativeDataTypeCode="2"
+               odaScalarDataType="Integer"/>
+         <dataTypeMapping
+               nativeDataType="Double"
+               nativeDataTypeCode="3"
+               odaScalarDataType="Double"/>
+         <dataTypeMapping
+               nativeDataType="Boolean"
+               nativeDataTypeCode="4"
+               odaScalarDataType="Integer"/>
+         <dataTypeMapping
+               nativeDataType="Date"
+               nativeDataTypeCode="5"
+               odaScalarDataType="Date"/>
+         <dataTypeMapping
+               nativeDataType="Time"
+               nativeDataTypeCode="92"
+               odaScalarDataType="Time"/>
+         <dataTypeMapping
+               nativeDataType="Timestamp"
+               nativeDataTypeCode="93"
+               odaScalarDataType="Timestamp"/>
+         <dataTypeMapping
+               nativeDataType="BigDecimal(Long)"
+               nativeDataTypeCode="6"
+               odaScalarDataType="Decimal"/>
+<!--         <dataTypeMapping
+               nativeDataType="JavaObject"
+               nativeDataTypeCode="2000"
+               />
+               -->
+      </dataSet>
+    </extension>    
+
+</plugin>

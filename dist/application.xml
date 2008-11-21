@@ -8,15 +8,19 @@
 	<module>
 		<java>birt/lib/chartengineapi.jar</java></module>		
 	<module>
-		<java>birt/lib/com.ibm.icu_3.6.1.v20070417.jar</java></module>
+		<java>birt/lib/com.ibm.icu_3.8.1.v20080530.jar</java></module>
 	<module>
 		<java>birt/lib/commons-cli-1.0.jar</java></module>
 	<module>
-		<java>birt/lib/commons-codec-1.3.jar</java></module> 
-	<module>
 		<java>birt/lib/coreapi.jar</java></module>
 	<module>
+		<java>birt/lib/crosstabcoreapi.jar</java></module>
+	<module>
 		<java>birt/lib/dataadapterapi.jar</java></module>
+	<module>
+		<java>birt/lib/dataaggregationapi.jar</java></module>
+	<module>
+		<java>birt/lib/dataextraction.jar</java></module>
 	<module>
 		<java>birt/lib/dteapi.jar</java></module>
 	<module>
@@ -28,15 +32,21 @@
 	<module>
 		<java>birt/lib/modelapi.jar</java></module>
 	<module>
-		<java>birt/lib/org.eclipse.emf.common_2.2.1.v200702131851.jar</java></module>
+		<java>birt/lib/modelodaapi.jar</java></module>
 	<module>
-		<java>birt/lib/org.eclipse.emf.ecore_2.2.2.v200702131851.jar</java></module>
+		<java>birt/lib/oda.jar</java></module>
 	<module>
-		<java>birt/lib/org.eclipse.emf.ecore.xmi_2.2.2.v200702131851.jar</java></module>
+		<java>birt/lib/odadesignapi.jar</java></module>
 	<module>
-		<java>birt/lib/org.w3c.css.sac_1.3.0.v200706111724.jar</java></module>		
+		<java>birt/lib/org.apache.commons.codec_1.3.0.v20080530-1600.jar</java></module>
+	<module>
+		<java>birt/lib/org.eclipse.emf.common_2.4.0.v200808251517.jar</java></module>
+	<module>
+		<java>birt/lib/org.eclipse.emf.ecore.xmi_2.4.1.v200808251517.jar</java></module>
+	<module>
+		<java>birt/lib/org.eclipse.emf.ecore_2.4.1.v200808251517.jar</java></module>
+	<module>
+		<java>birt/lib/org.w3c.css.sac_1.3.0.v200805290154.jar</java></module>		
 	<module>
 		<java>birt/lib/scriptapi.jar</java></module>
-    <module>
-		<java>birt/lib/oda.jar</java></module>
 </application>

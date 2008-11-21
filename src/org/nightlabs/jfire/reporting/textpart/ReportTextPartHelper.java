@@ -108,7 +108,7 @@ public class ReportTextPartHelper {
 				parser.getParsedText() + "\n" + 
 				"context.getContextResult()";
 			if (logger.isDebugEnabled())
-				logger.debug("getEvalString() found JAVASCRIPT type content and returning: " + result);
+				logger.debug("getEvalString() found JSHTML type content and returning: " + result);
 			return result;
 		}
 		return contentStr;

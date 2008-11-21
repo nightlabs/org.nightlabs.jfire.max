@@ -386,7 +386,9 @@ implements Serializable
 				++count;
 			}
 		}
-		Logger.getLogger(ValueAcquisitionSetup.class).info("removeOrphanedBindings: Deleted " + count + " orphaned bindings.");
+		Logger logger = Logger.getLogger(ValueAcquisitionSetup.class);
+		if (logger.isDebugEnabled())
+			logger.debug("removeOrphanedBindings: Deleted " + count + " orphaned bindings.");
 //		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
 //		if (pm != null)
 //			pm.flush();
@@ -404,7 +406,9 @@ implements Serializable
 				++count;
 			}
 		}
-		Logger.getLogger(ValueAcquisitionSetup.class).info("removeOrphanedBindings: Deleted " + count + " orphaned bindings.");
+		Logger logger = Logger.getLogger(ValueAcquisitionSetup.class);
+		if (logger.isDebugEnabled())
+			logger.debug("removeOrphanedBindings: Deleted " + count + " orphaned bindings.");
 //		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
 //		if (pm != null)
 //			pm.flush();

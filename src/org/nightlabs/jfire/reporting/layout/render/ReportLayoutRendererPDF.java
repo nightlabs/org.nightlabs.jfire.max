@@ -11,9 +11,9 @@ import javax.jdo.PersistenceManager;
 
 import org.eclipse.birt.report.engine.api.EngineConstants;
 import org.eclipse.birt.report.engine.api.EngineException;
-import org.eclipse.birt.report.engine.api.HTMLRenderOption;
 import org.eclipse.birt.report.engine.api.IRunAndRenderTask;
 import org.eclipse.birt.report.engine.api.PDFRenderContext;
+import org.eclipse.birt.report.engine.api.PDFRenderOption;
 import org.nightlabs.jfire.reporting.Birt;
 import org.nightlabs.jfire.reporting.Birt.OutputFormat;
 
@@ -52,9 +52,9 @@ public class ReportLayoutRendererPDF implements ReportLayoutRenderer {
 		if (renderRequest.getOutputFormat() != Birt.OutputFormat.pdf)
 			throw new IllegalArgumentException(this.getClass().getName()+" was asked to render a report to format "+renderRequest.getOutputFormat()+" altough it is registered to "+getOutputFormat());
 		
-		HTMLRenderOption options = new HTMLRenderOption( );
+		PDFRenderOption options = new PDFRenderOption();
+//		HTMLRenderOption options = new HTMLRenderOption( );
 		options.setOutputFormat(renderRequest.getOutputFormat().toString());
-		
 		PDFRenderContext renderContext = new PDFRenderContext();
 		
 		HashMap appContext = new HashMap( );
@@ -62,8 +62,11 @@ public class ReportLayoutRendererPDF implements ReportLayoutRenderer {
 		task.setAppContext( appContext );
 		
 		options.setOutputFileName(layoutRoot.getAbsolutePath().toString()+File.separator+fileName+".pdf");
-		task.setRenderOption( options );
+//		File imageDir = new File(layoutRoot, "images");
+//		imageDir.mkdirs();
+//		options.setImageDirectory(imageDir.getAbsolutePath());
 		
+		task.setRenderOption( options );
 		task.setParameterValues(renderRequest.getParameters());
 		
 		task.run();

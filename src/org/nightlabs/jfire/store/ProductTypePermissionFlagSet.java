@@ -179,6 +179,8 @@ implements Serializable
 				org.nightlabs.jfire.trade.RoleConstants.reverseProductType
 		);
 
+		String localOrganisationID = LocalOrganisation.getLocalOrganisation(pm).getOrganisationID();
+
 		Set<ProductType> nestingProductTypes = new HashSet<ProductType>();
 
 		Map<AuthorityID, Integer> authorityID2sellFlags = new HashMap<AuthorityID, Integer>();
@@ -227,10 +229,19 @@ implements Serializable
 			int sellFlagsOnlyNestedData = 0;
 			int reverseFlagsOnlyNestedData = 0;
 			for (NestedProductTypeLocal	nestedProductTypeLocal : productType.getProductTypeLocal().getNestedProductTypeLocals()) {
+				ProductType nestedPT = nestedProductTypeLocal.getInnerProductTypeLocal().getProductType();
+				User userForNestedPT = user;
+				if (!nestedPT.getOrganisationID().equals(localOrganisationID)) {
+					// The nested ProductType is obtained via cross-organisation-trade,
+					// thus, we need to get the user of the local organisation at the other org.
+					UserID userIDForNestedPT = UserID.create(nestedPT.getOrganisationID(), User.USER_ID_PREFIX_TYPE_ORGANISATION + localOrganisationID);
+					userForNestedPT = (User) pm.getObjectById(userIDForNestedPT);
+				}
+
 				ProductTypePermissionFlagSet nestedFlagSet = ProductTypePermissionFlagSet.getProductTypePermissionFlagSet(
 						pm,
-						nestedProductTypeLocal.getInnerProductTypeLocal().getProductType(),
-						user,
+						nestedPT,
+						userForNestedPT,
 						true,
 						false
 				);
@@ -551,6 +562,9 @@ implements Serializable
 
 	public ProductTypePermissionFlagSet(ProductType productType, User user)
 	{
+		if (!productType.getOrganisationID().equals(user.getOrganisationID()))
+			throw new IllegalArgumentException("organisationID mismatch! productType.organisationID != user.organisationID :: " + productType.getOrganisationID() + " != " + user.getOrganisationID());
+
 		this.productType = productType;
 		this.productTypeOrganisationID = productType.getOrganisationID();
 		this.productTypeID = productType.getProductTypeID();

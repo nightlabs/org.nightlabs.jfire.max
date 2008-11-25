@@ -233,15 +233,6 @@ implements SessionBean
 			webCustomer.setPassword(UserLocal.encryptPassword(password));
 			person = pm.makePersistent(person);
 			LegalEntity legalEntity = Trader.getTrader(pm).setPersonToLegalEntity(person, true);
-			// try {
-			// TradeManagerLocal tm = TradeManagerUtil.getLocalHome().create(); //
-			// TODO are we in the core server here?!
-			// legalEntity = tm.storePersonAsLegalEntity(person, false,
-			// new String[] {FetchPlan.DEFAULT, Person.FETCH_GROUP_FULL_DATA},
-			// NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
-			// } catch (Exception x) {
-			// throw new RuntimeException(x);
-			// }
 			webCustomer.setLegalEntity(legalEntity);
 			webCustomer = pm.makePersistent(webCustomer);
 			if(!get)
@@ -258,7 +249,6 @@ implements SessionBean
 	 */
 	public boolean isWebCustomerIDExisting(WebCustomerID webCustomerID, PersistenceManager pm)
 	{
-		//WebCustomerID id = WebCustomerID.create(getOrganisationID(), webCustomerID);
 		try {
 			pm.getObjectById(webCustomerID);
 		} catch (JDOObjectNotFoundException e) {
@@ -340,74 +330,6 @@ implements SessionBean
 		}
 	}
 
-//	/**
-//	 * @ejb.interface-method
-//	 * @ejb.permission role-name="_Guest_"
-//	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-//	 * @deprecated
-//	 */
-//	public boolean checkPassword(WebCustomerID webCustomerID, String password)
-//	{
-//		logger.debug("Trying authentication for web customer: "+webCustomerID);
-//		if(password == null) {
-//			logger.debug("Customer authentication failed: No password given.");
-//			return false;
-//		}
-//		PersistenceManager pm = getPersistenceManager();
-//		try {
-//			WebCustomer wbc = (WebCustomer)pm.getObjectById(webCustomerID);
-//			if(wbc.getPassword().equals(password)) {
-//				// login succeeded - reset second password
-//				setSecondPassword(webCustomerID, null);
-//				logger.debug("Customer authentication successful.");
-//				return true;
-//			}
-//			else {
-//				logger.debug("Customer authentication failed: Passwords don't match.");
-//				return false;
-//			}
-//		}	catch (JDOObjectNotFoundException e) {
-//			logger.error("Customer authentication failed: Customer not found: "+webCustomerID, e);
-//			return false;
-//		} finally {
-//			pm.close();
-//		}
-//	}
-
-//	/**
-//	 * The second password that can be set if a customer triggers the lostPassword procedure
-//	 * @ejb.interface-method
-//	 * @ejb.permission role-name="_Guest_"
-//	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-//	 * @deprecated
-//	 */
-//	public boolean checkSecondPassword(WebCustomerID webCustomerID, String password)
-//	{
-//		logger.debug("Trying authentication (2nd pwd) for web customer: "+webCustomerID);
-//		if(password == null) {
-//			logger.debug("Customer authentication (2nd pwd) failed: No password given.");
-//			return false;
-//		}
-//		PersistenceManager pm = getPersistenceManager();
-//		try {
-//			WebCustomer wbc = (WebCustomer)pm.getObjectById(webCustomerID);
-//			String secondPassword = wbc.getSecondPassword();
-//			if(secondPassword != null && secondPassword.equals(password))  {
-//				// TODO: login with second password succeeded - replace first password with second
-//				logger.debug("Customer authentication (2nd pwd) successful.");
-//				return true;
-//			} else {
-//				logger.debug("Customer authentication (2nd pwd) failed: Passwords don't match.");
-//				return false;
-//			}
-//		}	catch (JDOObjectNotFoundException e) {
-//			logger.error("Customer authentication (2nd pwd) failed: Customer not found: "+webCustomerID, e);
-//			return false;
-//		} finally {
-//			pm.close();
-//		}
-//	}
-
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
@@ -441,7 +363,6 @@ implements SessionBean
 	{
 		long expirationTime = 1000 * 60 * 60 * confirmationStringExpirationTimeInHours;
 		PersistenceManager pm = getPersistenceManager();
-		//	WebCustomerID id = WebCustomerID.create(getOrganisationID(), webCustomerID);
 		try {
 			WebCustomer wbc = (WebCustomer)pm.getObjectById(webCustomerID);
 			Date now = new Date();
@@ -453,37 +374,6 @@ implements SessionBean
 		}
 	}
 
-//	/**
-//	 * The second password that can be set if a customer triggers the lostPassword procedure
-//	 * @ejb.interface-method
-//	 * @ejb.permission role-name="_Guest_"
-//	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-//	 * @deprecated
-//	 */
-//	public boolean hasSecondPasswordDateExpired(WebCustomerID webCustomerID)
-//	{
-//		long expirationTime = 1000 * 60 * 60 * secondPasswordExpirationTimeInHours;
-//		PersistenceManager pm = getPersistenceManager();
-//		//	WebCustomerID id = WebCustomerID.create(getOrganisationID(), webCustomerID);
-//		try {
-//			WebCustomer wbc = (WebCustomer)pm.getObjectById(webCustomerID);
-//			Date now = new Date();
-//			if((now.getTime() - wbc.getSecondPasswordDate().getTime()) > expirationTime) {
-//				// has expired so delete it!
-//				setSecondPassword(webCustomerID, null);
-//				return true;
-//			}
-//			else {
-//				// everythings ok so move the secondpassword to the primary field
-//				setPassword(webCustomerID, wbc.getSecondPassword());
-//				setSecondPassword(webCustomerID, null);
-//				return false;
-//			}
-//		} finally {
-//			pm.close();
-//		}
-//
-//	}
 
 	/**
 	 * @ejb.interface-method
@@ -582,7 +472,6 @@ implements SessionBean
 
 		// Now sending mails to every E-Mail address found
 		boolean atLeastOneMailSent = false;
-		//String newPassword = UserLocal.createPassword(8,10);
 		for (DataBlock dataBlock : dataBlockGroupInternet.getDataBlocks()) {
 			try {
 				RegexDataField mailAddress = (RegexDataField)dataBlock.getDataField(PersonStruct.INTERNET_EMAIL);
@@ -635,11 +524,8 @@ implements SessionBean
 			PersistenceManager pm = getPersistenceManager();
 			try {
 				WebCustomer wbc = (WebCustomer)pm.getObjectById(webCustomerID);
-//				wbc.setSecondPassword(UserLocal.encryptPassword(newPassword));
-//				wbc.setSecondPasswordDate(new Date());
 				wbc.setPassword(UserLocal.encryptPassword(newPassword));
 				pm.makePersistent(wbc);
-//				setSecondPassword(pm, webCustomerID, UserLocal.encryptPassword(newPassword));
 			} finally {
 				pm.close();
 			}

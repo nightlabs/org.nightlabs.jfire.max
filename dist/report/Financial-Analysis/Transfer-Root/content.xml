@@ -10,7 +10,7 @@
 	<report
 		file="TransferReport.rptdesign" 
 		id="TransferReport"
-		overwriteOnInit="true"
+		overwriteOnInit="false"
 	>
 		<name language="de">Transferbericht</name>
 		<name language="en">Transfer report</name>
@@ -50,4 +50,55 @@
 		
 	</report>
 
+	<report
+	       file="InvoiceBookingList.rptdesign" 
+	       id="InvoiceBookingList"
+	       overwriteOnInit="true"
+	       >
+		<name language="de">Liste gebuchter Rechnungen</name>
+		<name language="en">Invoice booking list</name>
+		<description language="de">Ein Bericht, der die Transfers zu Rechnungsbuchungen mit den Rechnungseigenschaften listet.</description>
+		<description language="en">A report that lists the transfers made to book invoices along with the invoice attributes.</description>
+		<parameter-acquisition>
+			<use-case id="DefaultUseCase" default="true">
+				<name language="en">DefaultUseCase</name>
+				<description language="en">DefaultUseCase</description>
+				<parameters>
+					<parameter id="0" name="timePeriod" type="org.nightlabs.util.TimePeriod" x="611" y="28" />
+					<parameter id="1" name="initiatorIDs" type="java.util.Collection&lt;org.nightlabs.jfire.security.id.UserID&gt;" x="617" y="153" />
+					<parameter id="2" name="showOnlyOutstanding" type="java.lang.Boolean" x="614" y="89" />
+				</parameters>
+				<value-provider-configs>
+					<provider-config id="3" organisationID="dev.jfire.org" categoryID="JFireReporting-ValueProviderCategory-JFireObjects" valueProviderID="java.util.Collection&lt;org.nightlabs.jfire.security.User&gt;" pageIndex="0" pageRow="3" pageColumn="0" allowNullOutputValue="true" showMessageInHeader="true" growVertically="true" x="80" y="222" >
+						<message language="en">Select a list of users</message>
+					</provider-config>
+					<provider-config id="4" organisationID="dev.jfire.org" categoryID="JFireReporting-ValueProviderCategory-SimpleTypes" valueProviderID="org.nightlabs.util.TimePeriod" pageIndex="0" pageRow="1" pageColumn="0" allowNullOutputValue="true" showMessageInHeader="true" growVertically="false" x="82" y="29" >
+						<message language="de">Wählen Sie einen Zeitraum für den Bericht</message>
+						<message language="en">Select a time period</message>
+					</provider-config>
+					<provider-config id="5" organisationID="dev.jfire.org" categoryID="JFireReporting-ValueProviderCategory-SimpleTypes" valueProviderID="java.lang.Boolean" pageIndex="0" pageRow="0" pageColumn="0" allowNullOutputValue="true" showMessageInHeader="false" growVertically="false" x="81" y="116" >
+						<message language="en">Show only bookings of outstanding invoices</message>
+					</provider-config>
+				</value-provider-configs>
+				<value-consumer-bindings>
+					<value-consumer-binding>
+						<binding-provider id="5"/>
+						<binding-parameter name="showOnlyOutstanding"/>
+						<binding-consumer id="2"/>
+					</value-consumer-binding>
+					<value-consumer-binding>
+						<binding-provider id="3"/>
+						<binding-parameter name="initiatorIDs"/>
+						<binding-consumer id="1"/>
+					</value-consumer-binding>
+					<value-consumer-binding>
+						<binding-provider id="4"/>
+						<binding-parameter name="timePeriod"/>
+						<binding-consumer id="0"/>
+					</value-consumer-binding>
+				</value-consumer-bindings>
+			</use-case>
+		</parameter-acquisition>
+	</report>
+	
 </report-category>

@@ -12,13 +12,29 @@
 		resultClass="org.eclipse.datatools.connectivity.oda.IResultSet"
 	>
 		<name language="de">Geldtransfers: Liste</name>
-		<name language="en">Money transfers: List</name>
+		<name language="en">Money transfers: list</name>
 		<parameter-set>
 			<name language="de">ParameterSet: Geldtransferliste</name>
 			<name language="en">ParameterSet: Moeny transfer list</name>
 			<parameter name="timePeriod" type="org.nightlabs.util.TimePeriod"/>	
 			<parameter name="accountIDs" type="java.util.Collection"/>	
 			<parameter name="initiatorIDs" type="java.util.Collection"/>	
+		</parameter-set>
+	</script>
+	
+	<script 
+		file="BookMoneyTransferList.javaclass" 
+		id="BookMoneyTransferList"
+		resultClass="org.eclipse.datatools.connectivity.oda.IResultSet"
+	>
+		<name language="de">Rechnungsbuchungen: Liste</name>
+		<name language="en">Invoice bookings: list</name>
+		<parameter-set>
+			<name language="de">ParameterSet: BookMoneyTransferList</name>
+			<name language="en">ParameterSet: BookMoneyTransferList</name>
+			<parameter name="timePeriod" type="org.nightlabs.util.TimePeriod"/>	
+			<parameter name="initiatorIDs" type="java.util.Collection"/>	
+			<parameter name="showOnlyOutstanding" type="java.lang.Boolean"/>	
 		</parameter-set>
 	</script>
 	

@@ -65,8 +65,8 @@ public class PaymentList extends AbstractJFSScriptExecutorDelegate {
 			metaData.addColumn("partnerAccountJDOID", DataType.STRING);
 			metaData.addColumn("amount", DataType.BIGDECIMAL);
 			metaData.addColumn("userJDOID", DataType.STRING);
-			metaData.addColumn("beginDT", DataType.DATE);
-			metaData.addColumn("endDT", DataType.DATE);
+			metaData.addColumn("beginDT", DataType.TIMESTAMP);
+			metaData.addColumn("endDT", DataType.TIMESTAMP);
 			metaData.addColumn("postponed", DataType.BOOLEAN);
 			metaData.addColumn("pending", DataType.BOOLEAN);
 			metaData.addColumn("failed", DataType.BOOLEAN);

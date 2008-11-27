@@ -221,9 +221,11 @@ implements SessionBean
 			try {
 				registry.registerReportRenderer(Birt.OutputFormat.html.toString(), ReportLayoutRendererHTML.class);
 				registry.registerReportRenderer(Birt.OutputFormat.pdf.toString(), ReportLayoutRendererPDF.class);
-				registry.registerReportRenderer(Birt.OutputFormat.xls.toString(), ReportLayoutRendererGeneric.class);
-				registry.registerReportRenderer(Birt.OutputFormat.ppt.toString(), ReportLayoutRendererGeneric.class);
-				registry.registerReportRenderer(Birt.OutputFormat.ps.toString(), ReportLayoutRendererGeneric.class);
+				for (Birt.OutputFormat format : Birt.OutputFormat.values()) {
+					if (format != Birt.OutputFormat.html && format != Birt.OutputFormat.pdf) {
+						registry.registerReportRenderer(format.toString(), ReportLayoutRendererGeneric.class);
+					}
+				}
 			} catch (Exception e) {
 				logger.warn("Could not initially register HTML ReportLayoutRenderer when initializing ReportRegistry.", e);
 			}

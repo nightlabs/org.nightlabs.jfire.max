@@ -9,7 +9,6 @@ import javax.jdo.PersistenceManager;
 
 import org.eclipse.birt.report.engine.api.EngineException;
 import org.eclipse.birt.report.engine.api.IRunAndRenderTask;
-import org.nightlabs.jfire.reporting.Birt.OutputFormat;
 import org.nightlabs.jfire.reporting.layout.ReportRegistry;
 
 /**
@@ -25,8 +24,6 @@ import org.nightlabs.jfire.reporting.layout.ReportRegistry;
  */
 public interface ReportLayoutRenderer {
 
-	public OutputFormat getOutputFormat();
-	
 	/**
 	 * Render the report layout given by reportRegistryItemID to the
 	 * format of the implementation of this renderer.

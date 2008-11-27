@@ -38,6 +38,7 @@ public class Birt {
 
 	public static enum OutputFormat {
 		html, pdf
+		// , xls, ppt
 	}
 	
 	/**
@@ -47,12 +48,11 @@ public class Birt {
 	protected Birt() {}
 
 	public static OutputFormat parseOutputFormat(String s) {
-		if ("html".equals(s))
-			return OutputFormat.html;
-		else if ("pdf".equals(s))
-			return OutputFormat.pdf;
-		
-		throw new IllegalArgumentException(s+" is not a valid Birt OutputFormat");
+		try {
+			return OutputFormat.valueOf(s.toLowerCase());
+		} catch (Exception e) {
+			throw new IllegalArgumentException(s+" is not a valid Birt OutputFormat", e);
+		}
 	}
 	
 }

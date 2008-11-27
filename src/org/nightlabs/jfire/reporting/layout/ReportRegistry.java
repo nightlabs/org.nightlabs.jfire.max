@@ -55,11 +55,6 @@ import org.nightlabs.jfire.reporting.layout.render.ReportLayoutRenderer;
 public class ReportRegistry {
 
 	/**
-	 * LOG4J logger used by this class
-	 */
-//	private static final Logger logger = Logger.getLogger(ReportRegistry.class);
-	
-	/**
 	 * @jdo.field primary-key="true"
 	 */
 	private int reportRegistryID = 0;
@@ -114,18 +109,17 @@ public class ReportRegistry {
 	 * @throws InstantiationException When instantiating fails.
 	 * @throws IllegalAccessException When instantiating fails.
 	 */
-	public void registerReportRenderer(Class clazz)
+	public void registerReportRenderer(String format, Class<? extends ReportLayoutRenderer> clazz)
 	throws InstantiationException, IllegalAccessException
 	{
 		if (!ReportLayoutRenderer.class.isAssignableFrom(clazz))
 			throw new ClassCastException("Class " + clazz.getName() + " does not implement " + ReportLayoutRenderer.class.getName());
 
-		ReportLayoutRenderer renderer = (ReportLayoutRenderer) clazz.newInstance();
-		OutputFormat format = renderer.getOutputFormat();
-
-		unbindFormat(format);
-
-		format2ReportRendererClassName.put(format.toString(), clazz.getName());
+		ReportLayoutRenderer renderer = clazz.newInstance();
+		if (renderer != null) {
+			unbindFormat(format);
+			format2ReportRendererClassName.put(format.toString(), clazz.getName());
+		}
 	}
 
 	/**
@@ -133,7 +127,7 @@ public class ReportRegistry {
 	 * 
 	 * @param format The format to unbind.
 	 */
-	public void unbindFormat(OutputFormat format) {
+	public void unbindFormat(String format) {
 		format2ReportRendererClassName.remove(format.toString());
 	}
 	
@@ -147,7 +141,7 @@ public class ReportRegistry {
 	 * @throws ClassNotFoundException When the registered class can not be found in the classpath.
 	 * @throws IllegalArgumentException When no registration could be found and throwExceptionIfNotFound is true
 	 */
-	public Class getReportRendererClass(OutputFormat format, boolean throwExceptionIfNotFound)
+	public Class<? extends ReportLayoutRenderer> getReportRendererClass(OutputFormat format, boolean throwExceptionIfNotFound)
 	throws ClassNotFoundException, IllegalArgumentException
 	{
 		String className = format2ReportRendererClassName.get(format.toString());
@@ -158,7 +152,7 @@ public class ReportRegistry {
 			return null;
 		}
 
-		return Class.forName(className);
+		return (Class<? extends ReportLayoutRenderer>) Class.forName(className);
 	}
 
 	/**

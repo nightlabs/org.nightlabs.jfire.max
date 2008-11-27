@@ -71,6 +71,7 @@ import org.nightlabs.jfire.reporting.layout.render.RenderManager;
 import org.nightlabs.jfire.reporting.layout.render.RenderReportException;
 import org.nightlabs.jfire.reporting.layout.render.RenderReportRequest;
 import org.nightlabs.jfire.reporting.layout.render.RenderedReportLayout;
+import org.nightlabs.jfire.reporting.layout.render.ReportLayoutRendererGeneric;
 import org.nightlabs.jfire.reporting.layout.render.ReportLayoutRendererHTML;
 import org.nightlabs.jfire.reporting.layout.render.ReportLayoutRendererPDF;
 import org.nightlabs.jfire.reporting.layout.render.ReportLayoutRendererUtil;
@@ -218,8 +219,11 @@ implements SessionBean
 			// init layout renderer
 			ReportRegistry registry = ReportRegistry.getReportRegistry(pm);
 			try {
-				registry.registerReportRenderer(ReportLayoutRendererHTML.class);
-				registry.registerReportRenderer(ReportLayoutRendererPDF.class);
+				registry.registerReportRenderer(Birt.OutputFormat.html.toString(), ReportLayoutRendererHTML.class);
+				registry.registerReportRenderer(Birt.OutputFormat.pdf.toString(), ReportLayoutRendererPDF.class);
+				registry.registerReportRenderer(Birt.OutputFormat.xls.toString(), ReportLayoutRendererGeneric.class);
+				registry.registerReportRenderer(Birt.OutputFormat.ppt.toString(), ReportLayoutRendererGeneric.class);
+				registry.registerReportRenderer(Birt.OutputFormat.ps.toString(), ReportLayoutRendererGeneric.class);
 			} catch (Exception e) {
 				logger.warn("Could not initially register HTML ReportLayoutRenderer when initializing ReportRegistry.", e);
 			}

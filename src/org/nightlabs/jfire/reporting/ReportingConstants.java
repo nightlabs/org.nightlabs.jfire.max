@@ -89,6 +89,14 @@ public class ReportingConstants {
 			TimePeriod.class.getName()
 		);
 	
+	/**
+	 * ValueProvider id for a value provider that queries a {@link Boolean} value from the user
+	 */
+	public static final ValueProviderID VALUE_PROVIDER_ID_BOOLEAN = ValueProviderID.create(
+			Organisation.DEV_ORGANISATION_ID,
+			ReportingConstants.VALUE_PROVIDER_CATEGORY_ID_SIMPLE_TYPES.valueProviderCategoryID,
+			Boolean.class.getName()
+		);
 	
 	/**
 	 * ValueProvider category for JFire objects like Users, UserGroups, Organisations etc.

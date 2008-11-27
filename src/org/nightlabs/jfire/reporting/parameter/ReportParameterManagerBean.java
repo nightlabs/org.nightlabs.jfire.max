@@ -160,6 +160,12 @@ implements SessionBean
 					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Select a date")}
 			);
 
+			ReportParameterUtil.createValueProvider(pm, simpleTypes, ReportingConstants.VALUE_PROVIDER_ID_BOOLEAN, Boolean.class.getName(),
+					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Boolean")},
+					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Query a boolean value from the user")},
+					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Select a boolean")}
+			);
+			
 			ReportParameterUtil.createValueProvider(pm, simpleTypes, ReportingConstants.VALUE_PROVIDER_ID_TIME_PERIOD, TimePeriod.class.getName(),
 					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Timeperiod")},
 					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Query a time period from the user")},

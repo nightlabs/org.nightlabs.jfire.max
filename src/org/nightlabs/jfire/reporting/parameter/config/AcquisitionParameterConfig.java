@@ -181,7 +181,8 @@ implements ValueConsumer, Serializable, IGraphicalInfoProvider, DeleteCallback
 	}
 
 	public void jdoPreDelete() {
-		setup.removeOrphanedBindings(this);
+		if (setup != null)
+			setup.removeOrphanedBindings(this);
 	}
 
 	/** {@inheritDoc}

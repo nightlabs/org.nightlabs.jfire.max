@@ -28,7 +28,7 @@
          <dataTypeMapping
                nativeDataType="Boolean"
                nativeDataTypeCode="4"
-               odaScalarDataType="Integer"/>
+               odaScalarDataType="Boolean"/>
          <dataTypeMapping
                nativeDataType="Date"
                nativeDataTypeCode="5"

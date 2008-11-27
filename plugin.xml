@@ -28,7 +28,7 @@
          <dataTypeMapping
                nativeDataType="Boolean"
                nativeDataTypeCode="4"
-               odaScalarDataType="Integer"/>
+               odaScalarDataType="Boolean"/>
          <dataTypeMapping
                nativeDataType="Date"
                nativeDataTypeCode="5"
@@ -45,7 +45,7 @@
                nativeDataType="BigDecimal(Long)"
                nativeDataTypeCode="6"
                odaScalarDataType="Decimal"/>
-s<!--         <dataTypeMapping
+<!--         <dataTypeMapping
                nativeDataType="JavaObject"
                nativeDataTypeCode="2000"
                odaScalarDataType="Any"/> -->

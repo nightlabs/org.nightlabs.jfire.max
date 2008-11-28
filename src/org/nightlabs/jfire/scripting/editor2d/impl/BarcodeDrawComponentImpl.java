@@ -28,6 +28,7 @@ package org.nightlabs.jfire.scripting.editor2d.impl;
 import java.awt.Font;
 import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Point2D;
 
 import net.sourceforge.barbecue.Barcode;
 import net.sourceforge.barbecue.BarcodeException;
@@ -42,6 +43,7 @@ import org.nightlabs.editor2d.render.BaseRenderer;
 import org.nightlabs.editor2d.render.Renderer;
 import org.nightlabs.i18n.unit.resolution.DPIResolutionUnit;
 import org.nightlabs.i18n.unit.resolution.IResolutionUnit;
+import org.nightlabs.i18n.unit.resolution.Resolution;
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.scripting.editor2d.BarcodeDrawComponent;
 import org.nightlabs.jfire.scripting.editor2d.render.j2d.J2DBarcodeDefaultRenderer;
@@ -99,11 +101,9 @@ implements BarcodeDrawComponent
 		if (generalShape == null) {
 			Rectangle initialBounds = null;
 			if (orientation == Orientation.HORIZONTAL) {
-//				initialBounds = new Rectangle(x, y, getBarcode().getWidth(), getBarcode().getHeight());
 				initialBounds = new Rectangle(x, y, getBarcode().getWidth(), barcodeHeight);
 			}
 			if (orientation == Orientation.VERTICAL) {
-//				initialBounds = new Rectangle(x, y, getBarcode().getHeight(), getBarcode().getWidth());
 				initialBounds = new Rectangle(x, y, barcodeHeight, getBarcode().getWidth());
 			}
 			this.generalShape = new GeneralShape(initialBounds);
@@ -243,6 +243,7 @@ implements BarcodeDrawComponent
 			logger.debug("barcodeHeight = "+this.barcodeHeight);
 			logger.debug("getBarcode.getBounds() = "+getBarcode().getBounds());
 			logger.debug("this.getBounds() = "+this.getBounds());
+			logger.debug("");
 		}
 	}
 
@@ -282,6 +283,7 @@ implements BarcodeDrawComponent
 		int resolution = getModelResolution();
 		double factor = (resolution) / 300d;
 		double scaledWidth = width * factor;
+//		double scaledWidth = width / factor;
 		if (logger.isDebugEnabled()) {
 			logger.debug("width = " + width);
 			logger.debug("ModelUnit Factor = "+factor);
@@ -294,8 +296,17 @@ implements BarcodeDrawComponent
 	{
 		double defaultFontSize = f.getSize();
 		double defaultResolutionDPI = 72;
-		double resolutionScale = getModelResolution() / defaultResolutionDPI;
+//		double resolutionScale = getModelResolution() / defaultResolutionDPI;
+		double resolutionScale = 300 / defaultResolutionDPI;
 		int newFontSize = (int) (defaultFontSize * resolutionScale);
+
+		if (logger.isDebugEnabled()) {
+			logger.debug("defaultFontSize = "+defaultFontSize);
+			logger.debug("defaultResolutionDPI = "+defaultResolutionDPI);
+			logger.debug("getModelResolution() = "+getModelResolution());
+			logger.debug("resolutionScale = "+resolutionScale);
+			logger.debug("newFontSize = "+newFontSize);
+		}
 		return new Font(f.getName(), f.getStyle(), newFontSize);
 	}
 
@@ -393,4 +404,16 @@ implements BarcodeDrawComponent
 	{
 		return barcodeHeight;
 	}
+
+	/* (non-Javadoc)
+	 * @see org.nightlabs.editor2d.impl.DrawComponentImpl#resolutionChanged(org.nightlabs.i18n.unit.resolution.Resolution, org.nightlabs.i18n.unit.resolution.Resolution)
+	 */
+	@Override
+	public void resolutionChanged(Resolution oldResolution, Resolution newResolution)
+	{
+		Point2D scale = getResolutionScale(oldResolution, newResolution);
+		barcodeHeight = (int) Math.rint(barcodeHeight * scale.getY());
+		super.resolutionChanged(oldResolution, newResolution);
+	}
+
 }

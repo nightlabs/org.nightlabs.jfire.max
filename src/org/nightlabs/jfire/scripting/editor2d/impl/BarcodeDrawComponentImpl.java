@@ -61,6 +61,8 @@ implements BarcodeDrawComponent
 	public static final Logger logger = Logger.getLogger(BarcodeDrawComponentImpl.class);
 
 	private int barcodeHeight = HEIGHT_DEFAULT;
+	private int originalX = 0;
+	private int originalY = 0;
 
 	public BarcodeDrawComponentImpl() {
 		super();
@@ -80,8 +82,11 @@ implements BarcodeDrawComponent
 
 		setParent(parent);
 		this.type = type;
-		this.x = x;
-		this.y = y;
+//		this.x = x;
+//		this.y = y;
+		this.originalX = x;
+		this.originalY = y;
+
 		this.text = value;
 		this.humanReadable = printHumanReadable;
 		this.widthScale = widthScale;
@@ -101,10 +106,10 @@ implements BarcodeDrawComponent
 		if (generalShape == null) {
 			Rectangle initialBounds = null;
 			if (orientation == Orientation.HORIZONTAL) {
-				initialBounds = new Rectangle(x, y, getBarcode().getWidth(), barcodeHeight);
+				initialBounds = new Rectangle(originalX, originalY, getBarcode().getWidth(), barcodeHeight);
 			}
 			if (orientation == Orientation.VERTICAL) {
-				initialBounds = new Rectangle(x, y, barcodeHeight, getBarcode().getWidth());
+				initialBounds = new Rectangle(originalX, originalY, barcodeHeight, getBarcode().getWidth());
 			}
 			this.generalShape = new GeneralShape(initialBounds);
 		}
@@ -152,6 +157,7 @@ implements BarcodeDrawComponent
 		{
 			Type oldType = this.type;
 			this.type = type;
+			barcode = null;
 			refresh();
 			generalShape = null;
 			firePropertyChange(PROP_TYPE, oldType, type);
@@ -197,10 +203,11 @@ implements BarcodeDrawComponent
 		if (this.orientation != orientation) {
 			Orientation oldOrientation = this.orientation;
 			this.orientation = orientation;
+//			generalShape = null;
 			refresh();
-			int oldWidth = getBounds().width;
-			int oldHeight = getBounds().height;
-			generalShape = new GeneralShape(new Rectangle(x, y, oldHeight, oldWidth));
+//			int oldWidth = getBounds().width;
+//			int oldHeight = getBounds().height;
+//			generalShape = new GeneralShape(new Rectangle(x, y, oldHeight, oldWidth));
 			firePropertyChange(PROP_ORIENTATION, oldOrientation, orientation);
 		}
 	}
@@ -230,7 +237,6 @@ implements BarcodeDrawComponent
 		double barWidth = getBarWidth(getWidthScale());
 		getBarcode().setBarWidth(barWidth);
 		getBarcode().setBarHeight(barcodeHeight);
-
 		if (logger.isDebugEnabled())
 		{
 			logger.debug("Resolution = "+getModelResolution());
@@ -353,6 +359,7 @@ implements BarcodeDrawComponent
 		{
 			String oldValue = this.text;
 			this.text = text;
+			barcode = null;
 			refresh();
 			generalShape = null;
 			firePropertyChange(PROP_VALUE, oldValue, text);
@@ -384,7 +391,8 @@ implements BarcodeDrawComponent
 	@Override
 	public void transform(AffineTransform newAT, boolean fromParent) {
 		super.transform(newAT, fromParent);
-		getGeneralShape().transform(newAT);
+		generalShape = null;
+		getGeneralShape().transform(getAffineTransform());
 		if (!fromParent && getParent() != null)
 			getParent().notifyChildTransform(this);
 

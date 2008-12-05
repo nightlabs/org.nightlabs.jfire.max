@@ -38,7 +38,6 @@ import org.apache.log4j.Logger;
 import org.nightlabs.editor2d.DrawComponent;
 import org.nightlabs.editor2d.DrawComponentContainer;
 import org.nightlabs.editor2d.impl.DrawComponentImpl;
-import org.nightlabs.editor2d.j2d.GeneralShape;
 import org.nightlabs.editor2d.render.BaseRenderer;
 import org.nightlabs.editor2d.render.Renderer;
 import org.nightlabs.i18n.unit.resolution.DPIResolutionUnit;
@@ -61,8 +60,8 @@ implements BarcodeDrawComponent
 	public static final Logger logger = Logger.getLogger(BarcodeDrawComponentImpl.class);
 
 	private int barcodeHeight = HEIGHT_DEFAULT;
-	private int originalX = 0;
-	private int originalY = 0;
+//	private int originalX = 0;
+//	private int originalY = 0;
 
 	public BarcodeDrawComponentImpl() {
 		super();
@@ -82,10 +81,10 @@ implements BarcodeDrawComponent
 
 		setParent(parent);
 		this.type = type;
-//		this.x = x;
-//		this.y = y;
-		this.originalX = x;
-		this.originalY = y;
+		this.x = x;
+		this.y = y;
+//		this.originalX = x;
+//		this.originalY = y;
 
 		this.text = value;
 		this.humanReadable = printHumanReadable;
@@ -96,25 +95,26 @@ implements BarcodeDrawComponent
 		this.scriptRegistryItemIDKeyStr = scriptRegistryItemID.toString();
 
 		refresh();
-
-		getGeneralShape();
+//		getGeneralShape();
 	}
 
-	private transient GeneralShape generalShape = null;
-	private GeneralShape getGeneralShape()
-	{
-		if (generalShape == null) {
-			Rectangle initialBounds = null;
-			if (orientation == Orientation.HORIZONTAL) {
-				initialBounds = new Rectangle(originalX, originalY, getBarcode().getWidth(), barcodeHeight);
-			}
-			if (orientation == Orientation.VERTICAL) {
-				initialBounds = new Rectangle(originalX, originalY, barcodeHeight, getBarcode().getWidth());
-			}
-			this.generalShape = new GeneralShape(initialBounds);
-		}
-		return generalShape;
-	}
+//	private transient GeneralShape generalShape = null;
+//	private GeneralShape getGeneralShape()
+//	{
+//		if (generalShape == null) {
+//			Rectangle initialBounds = null;
+//			if (orientation == Orientation.HORIZONTAL) {
+////				initialBounds = new Rectangle(originalX, originalY, getBarcode().getWidth(), barcodeHeight);
+//				initialBounds = new Rectangle(x, y, getBarcode().getWidth(), barcodeHeight);
+//			}
+//			if (orientation == Orientation.VERTICAL) {
+////				initialBounds = new Rectangle(originalX, originalY, barcodeHeight, getBarcode().getWidth());
+//				initialBounds = new Rectangle(x, y, barcodeHeight, getBarcode().getWidth());
+//			}
+//			this.generalShape = new GeneralShape(initialBounds);
+//		}
+//		return generalShape;
+//	}
 
 	private static final IResolutionUnit dpiUnit = new DPIResolutionUnit();
 	private int getModelResolution() {
@@ -159,7 +159,6 @@ implements BarcodeDrawComponent
 			this.type = type;
 			barcode = null;
 			refresh();
-			generalShape = null;
 			firePropertyChange(PROP_TYPE, oldType, type);
 		}
 	}
@@ -172,7 +171,6 @@ implements BarcodeDrawComponent
 		this.humanReadable = humanReadbale;
 		getBarcode().setDrawingText(humanReadbale);
 		clearBounds();
-		generalShape = null;
 		firePropertyChange(PROP_HUMAN_READABLE, !humanReadbale, humanReadbale);
 	}
 
@@ -203,11 +201,7 @@ implements BarcodeDrawComponent
 		if (this.orientation != orientation) {
 			Orientation oldOrientation = this.orientation;
 			this.orientation = orientation;
-//			generalShape = null;
 			refresh();
-//			int oldWidth = getBounds().width;
-//			int oldHeight = getBounds().height;
-//			generalShape = new GeneralShape(new Rectangle(x, y, oldHeight, oldWidth));
 			firePropertyChange(PROP_ORIENTATION, oldOrientation, orientation);
 		}
 	}
@@ -223,13 +217,13 @@ implements BarcodeDrawComponent
 			WidthScale oldWidthScale = this.widthScale;
 			this.widthScale = widthScale;
 			refresh();
-			generalShape = null;
 			firePropertyChange(PROP_WIDTH_SCALE, oldWidthScale, widthScale);
 		}
 	}
 
 	protected void refresh()
 	{
+//		generalShape = null;
 		Font scaledFont = getScaledFont(DEFAULT_FONT);
 		getBarcode().setFont(scaledFont);
 		getBarcode().setDrawingText(isHumanReadable());
@@ -253,15 +247,30 @@ implements BarcodeDrawComponent
 		}
 	}
 
+//	@Override
+//	public Rectangle getBounds()
+//	{
+//		if (getGeneralShape() != null) {
+//			return getGeneralShape().getBounds();
+//		}
+//		else {
+//			return super.getBounds();
+//		}
+//	}
+
 	@Override
 	public Rectangle getBounds()
 	{
-		if (getGeneralShape() != null) {
-			return getGeneralShape().getBounds();
+		Rectangle initialBounds = null;
+		if (orientation == Orientation.HORIZONTAL) {
+			initialBounds = new Rectangle(x, y, getBarcode().getWidth(), barcodeHeight);
+//			initialBounds = new Rectangle(x, y, getBarcode().getWidth(), getBarcode().getHeight());
 		}
-		else {
-			return super.getBounds();
+		if (orientation == Orientation.VERTICAL) {
+			initialBounds = new Rectangle(x, y, barcodeHeight, getBarcode().getWidth());
+//			initialBounds = new Rectangle(x, y, getBarcode().getHeight(), getBarcode().getWidth());
 		}
+		return initialBounds;
 	}
 
 	protected double getBarWidth(WidthScale scale)
@@ -289,7 +298,6 @@ implements BarcodeDrawComponent
 		int resolution = getModelResolution();
 		double factor = (resolution) / 300d;
 		double scaledWidth = width * factor;
-//		double scaledWidth = width / factor;
 		if (logger.isDebugEnabled()) {
 			logger.debug("width = " + width);
 			logger.debug("ModelUnit Factor = "+factor);
@@ -361,7 +369,6 @@ implements BarcodeDrawComponent
 			this.text = text;
 			barcode = null;
 			refresh();
-			generalShape = null;
 			firePropertyChange(PROP_VALUE, oldValue, text);
 		}
 	}
@@ -385,14 +392,30 @@ implements BarcodeDrawComponent
 		return clone;
 	}
 
+//	/* (non-Javadoc)
+//	 * @see org.nightlabs.editor2d.impl.DrawComponentImpl#transform(java.awt.geom.AffineTransform, boolean)
+//	 */
+//	@Override
+//	public void transform(AffineTransform newAT, boolean fromParent) {
+//		super.transform(newAT, fromParent);
+//		generalShape = null;
+//		getGeneralShape().transform(getAffineTransform());
+//		if (!fromParent && getParent() != null)
+//			getParent().notifyChildTransform(this);
+//
+//		refresh();
+//	}
 	/* (non-Javadoc)
 	 * @see org.nightlabs.editor2d.impl.DrawComponentImpl#transform(java.awt.geom.AffineTransform, boolean)
 	 */
 	@Override
 	public void transform(AffineTransform newAT, boolean fromParent) {
 		super.transform(newAT, fromParent);
-		generalShape = null;
-		getGeneralShape().transform(getAffineTransform());
+		Point2D xy = new Point2D.Double(x,y);
+//		Point2D newXY = getAffineTransform().transform(xy, null);
+		Point2D newXY = newAT.transform(xy, null);
+		x = (int) Math.rint(newXY.getX());
+		y = (int) Math.rint(newXY.getY());
 		if (!fromParent && getParent() != null)
 			getParent().notifyChildTransform(this);
 
@@ -404,7 +427,6 @@ implements BarcodeDrawComponent
 		int oldBarcodeHeight = this.barcodeHeight;
 		this.barcodeHeight = barcodeHeight;
 		refresh();
-		generalShape = null;
 		firePropertyChange(PROP_VALUE, oldBarcodeHeight, barcodeHeight);
 	}
 

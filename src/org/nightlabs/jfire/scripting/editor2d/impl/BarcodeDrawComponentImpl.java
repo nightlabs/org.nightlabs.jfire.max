@@ -224,6 +224,8 @@ implements BarcodeDrawComponent
 	protected void refresh()
 	{
 //		generalShape = null;
+		clearBounds();
+
 		Font scaledFont = getScaledFont(DEFAULT_FONT);
 		getBarcode().setFont(scaledFont);
 		getBarcode().setDrawingText(isHumanReadable());
@@ -261,16 +263,19 @@ implements BarcodeDrawComponent
 	@Override
 	public Rectangle getBounds()
 	{
-		Rectangle initialBounds = null;
-		if (orientation == Orientation.HORIZONTAL) {
-			initialBounds = new Rectangle(x, y, getBarcode().getWidth(), barcodeHeight);
-//			initialBounds = new Rectangle(x, y, getBarcode().getWidth(), getBarcode().getHeight());
+		if (bounds == null) {
+			Rectangle initialBounds = null;
+			if (orientation == Orientation.HORIZONTAL) {
+				initialBounds = new Rectangle(x, y, getBarcode().getWidth(), barcodeHeight);
+//				initialBounds = new Rectangle(x, y, getBarcode().getWidth(), getBarcode().getHeight());
+			}
+			if (orientation == Orientation.VERTICAL) {
+				initialBounds = new Rectangle(x, y, barcodeHeight, getBarcode().getWidth());
+//				initialBounds = new Rectangle(x, y, getBarcode().getHeight(), getBarcode().getWidth());
+			}
+			this.bounds = initialBounds;
 		}
-		if (orientation == Orientation.VERTICAL) {
-			initialBounds = new Rectangle(x, y, barcodeHeight, getBarcode().getWidth());
-//			initialBounds = new Rectangle(x, y, getBarcode().getHeight(), getBarcode().getWidth());
-		}
-		return initialBounds;
+		return bounds;
 	}
 
 	protected double getBarWidth(WidthScale scale)

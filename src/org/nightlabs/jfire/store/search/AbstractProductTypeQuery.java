@@ -3,6 +3,7 @@ package org.nightlabs.jfire.store.search;
 import javax.jdo.Query;
 
 import org.nightlabs.jfire.security.SecurityReflector;
+import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.security.id.UserID;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.ProductTypePermissionFlagSet;
@@ -107,16 +108,18 @@ implements ISaleAccessQuery
 
 		userID = SecurityReflector.getUserDescriptor().getUserObjectID();
 
-//		if (isFieldEnabled(FieldName.permissionGrantedToSee) && permissionGrantedToSee != null)
-//			populateFilterPermissionGranted("flagsSeeProductType", permissionGrantedToSee, "productTypePermissionFlagSetSee");
-		populateFilterPermissionGranted("flagsSeeProductType", true, "productTypePermissionFlagSetSee");
+		if (!User.USER_ID_SYSTEM.equals(userID.userID)) // the system user is allowed to see/do everything and has no ProductTypePermissionFlagSet. TODO maybe we should give him ProductTypePermissionFlagSet entries?!
+			populateFilterPermissionGranted("flagsSeeProductType", true, "productTypePermissionFlagSetSee");
 
-		if (isFieldEnabled(FieldName.permissionGrantedToSell) && permissionGrantedToSell != null)
-			populateFilterPermissionGranted("flagsSellProductType", permissionGrantedToSell, "productTypePermissionFlagSetSell");
+		if (isFieldEnabled(FieldName.permissionGrantedToSell) && permissionGrantedToSell != null) {
+			if (!User.USER_ID_SYSTEM.equals(userID.userID) || !permissionGrantedToSell) // the system user is allowed to see/do everything and has no ProductTypePermissionFlagSet. TODO maybe we should give him ProductTypePermissionFlagSet entries?!
+				populateFilterPermissionGranted("flagsSellProductType", permissionGrantedToSell, "productTypePermissionFlagSetSell");
+		}
 
-		if (isFieldEnabled(FieldName.permissionGrantedToReverse) && permissionGrantedToReverse != null)
-			populateFilterPermissionGranted("flagsReverseProductType", permissionGrantedToReverse, "productTypePermissionFlagSetReverse");
-
+		if (isFieldEnabled(FieldName.permissionGrantedToReverse) && permissionGrantedToReverse != null) {
+			if (!User.USER_ID_SYSTEM.equals(userID.userID) || !permissionGrantedToReverse) // the system user is allowed to see/do everything and has no ProductTypePermissionFlagSet. TODO maybe we should give him ProductTypePermissionFlagSet entries?!
+				populateFilterPermissionGranted("flagsReverseProductType", permissionGrantedToReverse, "productTypePermissionFlagSetReverse");
+		}
 
 		if (isFieldEnabled(FieldName.fullTextSearch) && fullTextSearch != null) {
 			filter.append("\n && ( ");

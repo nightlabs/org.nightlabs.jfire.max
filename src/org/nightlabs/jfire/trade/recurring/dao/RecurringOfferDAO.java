@@ -30,15 +30,15 @@ public class RecurringOfferDAO extends BaseJDOObjectDAO<OfferID, RecurringOffer>
 	}
 
 	@Override
-	protected Collection<RecurringOffer> retrieveJDOObjects(Set<OfferID> offerIDs,
-			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
-			throws Exception
-			{
-
-
+	protected Collection<RecurringOffer> retrieveJDOObjects(
+			Set<OfferID> offerIDs,
+			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor
+	)
+	throws Exception
+	{
 		RecurringTradeManager tm = RecurringTradeManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
 		return tm.getRecurringOffers(offerIDs, fetchGroups, maxFetchDepth);
-			}
+	}
 
 	public RecurringOffer getRecurringOffer(OfferID offerID, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{

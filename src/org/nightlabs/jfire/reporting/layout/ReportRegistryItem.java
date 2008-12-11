@@ -34,7 +34,13 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 import javax.jdo.listener.DetachCallback;
 
+import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
+import org.nightlabs.jfire.security.Authority;
+import org.nightlabs.jfire.security.AuthorityType;
+import org.nightlabs.jfire.security.SecuredObject;
+import org.nightlabs.jfire.security.id.AuthorityID;
+import org.nightlabs.jfire.security.id.AuthorityTypeID;
 import org.nightlabs.util.Util;
 
 /**
@@ -100,9 +106,12 @@ import org.nightlabs.util.Util;
  *	query="SELECT JDOHelper.getObjectId(this)
  *		WHERE this.parentCategory == :paramParent"
  */
-public abstract class ReportRegistryItem implements Serializable, DetachCallback
+public abstract class ReportRegistryItem implements Serializable, DetachCallback, SecuredObject
 {
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 20081210L;
+	
+	public static final AuthorityTypeID AUTHORITY_TYPE_ID = AuthorityTypeID.create(ReportRegistryItem.class.getName());
+	
 	public static final String QUERY_GET_REPORT_REGISTRY_ITEM_BY_TYPE = "getReportRegistryItemByType";
 	public static final String QUERY_TOP_LEVEL_GET_REPORT_REGISTRY_ITEM_BY_TYPE = "getTopLevelReportRegistryItemByType";
 	public static final String QUERY_TOP_LEVEL_GET_REPORT_REGISTRY_ITEMS_BY_ORGANISATION = "getTopLevelReportRegistryItemsByOrganisation";
@@ -161,6 +170,22 @@ public abstract class ReportRegistryItem implements Serializable, DetachCallback
 	 */
 	private ReportRegistryItemID parentCategoryID;
 
+	/**
+	 * The securingAuthority type for this RegistryItemID. 
+	 * It has to be piont to an {@link AuthorityType} with an authorityTypeID of
+	 * org.nightlabs.jfire.reporting.layout.ReportRegistryItem.
+	 * It is intialized to the correct value in the constructor
+	 * and should not be changed.
+	 * 
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private String securingAuthorityTypeID;
+
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private String securingAuthorityID;
+	
 
 	/**
 	 * Creates a new ReportRegistryItem with the given
@@ -184,6 +209,7 @@ public abstract class ReportRegistryItem implements Serializable, DetachCallback
 		this.reportRegistryItemID = reportRegistryItemID;
 		this.name = new ReportRegistryItemName(this);
 		this.description = new ReportRegistryItemDescription(this);
+		this.securingAuthorityTypeID = AUTHORITY_TYPE_ID.toString();
 	}
 
 	/**
@@ -264,6 +290,54 @@ public abstract class ReportRegistryItem implements Serializable, DetachCallback
 		}
 		return parentCategoryID;
 	}
+	
+	@Override
+	public AuthorityTypeID getSecuringAuthorityTypeID() {
+		return (AuthorityTypeID) ObjectIDUtil.createObjectID(securingAuthorityTypeID);
+	}
+	
+	@Override
+	public void setSecuringAuthorityID(AuthorityID authorityID) {
+		// Already obtain the PM directly at the beginning of the method so that it
+		// always fails outside of the server (independent from the parameter).
+		PersistenceManager pm = getPersistenceManager();
+
+		AuthorityID oldSecuringAuthorityID = this.getSecuringAuthorityID();
+		if (Util.equals(authorityID, oldSecuringAuthorityID))
+			return; // no change => no need to do anything
+
+		if (authorityID != null) {
+			// check if the AuthorityType is correct. this is done already by JFireSecurityManager.assignAuthority(...), but just to be absolutely sure
+			// since this method might be called by someone else.
+			Authority authority = (Authority) pm.getObjectById(authorityID);
+			AuthorityType securingAuthorityType = (AuthorityType) pm.getObjectById(getSecuringAuthorityTypeID());
+
+			if (!authority.getAuthorityType().equals(securingAuthorityType))
+				throw new IllegalArgumentException("securingAuthority.authorityType does not match this.securingAuthorityTypeID! securingAuthority: " + authorityID + " this: " + JDOHelper.getObjectId(this));
+		}
+
+		this.securingAuthorityID = authorityID == null ? null : authorityID.toString();
+	}
+	
+	@Override
+	public AuthorityID getSecuringAuthorityID() {
+		if (securingAuthorityID == null)
+			return null;
+
+		try {
+			return new AuthorityID(securingAuthorityID);
+		} catch (Exception e) {
+			throw new RuntimeException(e); // should never happen.
+		}
+	}
+	
+	public void setSecuringAuthorityTypeID(String authorityTypeID) {
+		if (this.securingAuthorityTypeID != null && !this.getSecuringAuthorityTypeID().equals(authorityTypeID))
+			throw new IllegalStateException("A different AuthorityType has already been assigned! Cannot change this value afterwards! Currently assigned: " + this.securingAuthorityTypeID + " New value: " + authorityTypeID);
+
+		this.securingAuthorityTypeID = authorityTypeID == null ? null : authorityTypeID.toString();
+	}
+	
 
 	/**
 	 * Return all {@link ReportRegistryItem}s with the given type.

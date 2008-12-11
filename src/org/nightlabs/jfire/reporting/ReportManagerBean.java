@@ -34,6 +34,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import javax.ejb.CreateException;
 import javax.ejb.EJBException;
@@ -86,7 +87,10 @@ import org.nightlabs.jfire.scripting.ScriptException;
 import org.nightlabs.jfire.scripting.ScriptRegistry;
 import org.nightlabs.jfire.scripting.ScriptingIntialiserException;
 import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
+import org.nightlabs.jfire.security.Authority;
+import org.nightlabs.jfire.security.ResolveSecuringAuthorityStrategy;
 import org.nightlabs.jfire.security.User;
+import org.nightlabs.jfire.security.id.RoleID;
 import org.nightlabs.jfire.servermanager.JFireServerManager;
 import org.nightlabs.jfire.timer.Task;
 import org.nightlabs.jfire.timer.id.TaskID;
@@ -413,7 +417,7 @@ implements SessionBean
 	/**
 	 * Returns the parameter meta-data for the referenced script.
 	 * <p>
-	 * This method delegates to {@link ServerJFSQueryProxy} and will be called only for report desing-time.
+	 * This method delegates to {@link ServerJFSQueryProxy} and will be called only for report design-time.
 	 * It therefore is tagged with permission role {@link RoleConstants#editReport}.
 	 * </p>
 	 * 
@@ -442,7 +446,14 @@ implements SessionBean
 	 * Returns the {@link ReportRegistryItem}s represented by the given list of {@link ReportRegistryItemID}s.
 	 * All will be detached with the given fetch-groups.
 	 *
+	 * <p>
+	 * This method will filter the result for the given {@link RoleID}, however this is not a real
+	 * security check as a caller could call everything here. The security checks
+	 * are done in the store methods.
+	 * </p>
+	 * 
 	 * @param reportRegistryItemIDs The list of id of items to fetch.
+	 * @param filterRoleID The {@link RoleID} to filter the results with.
 	 * @param fetchGroups The fetch-groups to detach the items with.
 	 * @param maxFetchDepth The maximum fetch-depth while detaching.
 	 *
@@ -451,7 +462,7 @@ implements SessionBean
 	 * @ejb.transaction type="Supports"
 	 */
 	public List<ReportRegistryItem> getReportRegistryItems (
-			List<ReportRegistryItemID> reportRegistryItemIDs,
+			List<ReportRegistryItemID> reportRegistryItemIDs, RoleID filterRoleID,
 			String[] fetchGroups, int maxFetchDepth
 		)
 	{
@@ -467,50 +478,97 @@ implements SessionBean
 				ReportRegistryItem item = (ReportRegistryItem)pm.getObjectById(itemID);
 				result.add(pm.detachCopy(item));
 			}
-
-			return result;
+			return Authority.filterSecuredObjects(pm, result, getPrincipal(), filterRoleID, ResolveSecuringAuthorityStrategy.organisation);
 		} finally {
 			pm.close();
 		}
 	}
 
 	/**
+	 * Returns the {@link ReportRegistryItem}s represented by the given list of {@link ReportRegistryItemID}s.
+	 * All will be detached with the given fetch-groups.
+	 * <p>
+	 * This method will filter the result for the RoleID {@link RoleConstants#renderReport}
+	 * </p>
+	 *
+	 * @param reportRegistryItemIDs The list of id of items to fetch.
+	 * @param fetchGroups The fetch-groups to detach the items with.
+	 * @param maxFetchDepth The maximum fetch-depth while detaching.
+	 *
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="org.nightlabs.jfire.reporting.renderReport"
+	 * @ejb.transaction type="Supports"
+	 */
+	public List<ReportRegistryItem> getReportRegistryItems (
+			List<ReportRegistryItemID> reportRegistryItemIDs,
+			String[] fetchGroups, int maxFetchDepth
+		)
+	{
+		return getReportRegistryItems(reportRegistryItemIDs, RoleConstants.renderReport, fetchGroups, maxFetchDepth);
+	}
+	/**
 	 * Returns the {@link ReportRegistryItemID}s of all {@link ReportRegistryItem}s
 	 * that are direct children of the given reportRegistryItemID.
-	 *
+	 * <p>
+	 * This method will filter the result for the given {@link RoleID}, however this is not a real
+	 * security check as a caller could call everything here. The security checks
+	 * are done in the store methods.
+	 * </p>
+	 * 
 	 * @param reportRegistryItemID The id of the parent to search the children for.
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="org.nightlabs.jfire.reporting.renderReport"
 	 * @ejb.transaction type="Supports"
 	 */
-	public Collection<ReportRegistryItemID> getReportRegistryItemIDsForParent(ReportRegistryItemID reportRegistryItemID)
-	{
+	public Collection<ReportRegistryItemID> getReportRegistryItemIDsForParent(ReportRegistryItemID reportRegistryItemID, RoleID filterRoleID) {
 		PersistenceManager pm;
 		pm = getPersistenceManager();
 		try {
 			ReportRegistryItem item = (ReportRegistryItem) pm.getObjectById(reportRegistryItemID);
+			Collection<ReportRegistryItemID> result = Collections.emptyList();
 			if (item instanceof ReportCategory) {
-				return new ArrayList<ReportRegistryItemID>(ReportRegistryItem.getReportRegistryItemIDsForParent(pm, (ReportCategory) item));
-			} else {
-				// only ReportCategorys can have children
-				return Collections.emptyList();
+				result = new ArrayList<ReportRegistryItemID>(ReportRegistryItem.getReportRegistryItemIDsForParent(pm, (ReportCategory) item));
 			}
+			return Authority.filterSecuredObjectIDs(pm, result, getPrincipal(), filterRoleID, ResolveSecuringAuthorityStrategy.organisation);
 		} finally {
 			pm.close();
 		}
 	}
-
+	
 	/**
-	 * Returns all {@link ReportRegistryItemID}s that do not have a parent.
-	 * These will be only for the organisationID of the calling user.
+	 * Returns the {@link ReportRegistryItemID}s of all {@link ReportRegistryItem}s
+	 * that are direct children of the given reportRegistryItemID.
+	 * <p>
+	 * This method will filter the result for the RoleID {@link RoleConstants#renderReport}
+	 * </p>
+	 * 
+	 * @param reportRegistryItemID The id of the parent to search the children for.
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="org.nightlabs.jfire.reporting.renderReport"
 	 * @ejb.transaction type="Supports"
 	 */
-	public Collection<ReportRegistryItemID> getTopLevelReportRegistryItemIDs ()
-	{
+	public Collection<ReportRegistryItemID> getReportRegistryItemIDsForParent(ReportRegistryItemID reportRegistryItemID) {
+		return getReportRegistryItemIDsForParent(reportRegistryItemID, RoleConstants.renderReport);
+	}	
+
+	/**
+	 * Returns all {@link ReportRegistryItemID}s that do not have a parent.
+	 * These will be only for the organisationID of the calling user.
+	 * <p>
+	 * This method will filter by the given RoleID, however this is not a real
+	 * security check as a caller could call everything here. The security checks
+	 * are done in the store methods.
+	 * </p>
+	 *
+	 * @param filterRoleID The {@link RoleID} to filter the result for.
+	 * 
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="org.nightlabs.jfire.reporting.renderReport"
+	 * @ejb.transaction type="Supports"
+	 */
+	public Collection<ReportRegistryItemID> getTopLevelReportRegistryItemIDs(RoleID filterRoleID) {
 		PersistenceManager pm;
 		pm = getPersistenceManager();
 		try {
@@ -519,11 +577,25 @@ implements SessionBean
 			for (ReportRegistryItem item : topLevelItems) {
 				result.add((ReportRegistryItemID) JDOHelper.getObjectId(item));
 			}
+			Authority.filterSecuredObjectIDs(pm, result, getPrincipal(), filterRoleID, ResolveSecuringAuthorityStrategy.organisation);
 			return result;
 		} finally {
 			pm.close();
 		}
 	}
+	
+	/**
+	 * Returns all {@link ReportRegistryItemID}s that do not have a parent.
+	 * These will be only for the organisationID of the calling user.
+	 *
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="org.nightlabs.jfire.reporting.renderReport"
+	 * @ejb.transaction type="Supports"
+	 */
+	public Collection<ReportRegistryItemID> getTopLevelReportRegistryItemIDs() {
+		return getTopLevelReportRegistryItemIDs(RoleConstants.renderReport);
+	}
+	
 
 	/**
 	 * Get the {@link ReportingManagerFactory} for the actual organisationID.
@@ -549,7 +621,7 @@ implements SessionBean
 	 * Stores the given {@link ReportRegistryItem} to the datastore
 	 * of the organisation of the calling user.
 	 *
-	 * @param reportRegistryItem The item to store.
+	 * @param reportRegistryItemToStore The item to store.
 	 * @param get Wheter a detached copy of the stored item should be returned.
 	 * @param fetchGroups If get is <code>true</code>, this defines the fetch-groups the
 	 * 		retuned item will be detached with.
@@ -561,7 +633,7 @@ implements SessionBean
 	 * @ejb.transaction type="Required"
 	 */
 	public ReportRegistryItem storeRegistryItem (
-			ReportRegistryItem reportRegistryItem,
+			ReportRegistryItem reportRegistryItemToStore,
 			boolean get,
 			String[] fetchGroups, int maxFetchDepth
 		)
@@ -569,7 +641,17 @@ implements SessionBean
 		PersistenceManager pm;
 		pm = getPersistenceManager();
 		try {
-			return NLJDOHelper.storeJDO(pm, reportRegistryItem, get, fetchGroups, maxFetchDepth);
+			// first check if user is allowed to store the registry item
+			// check if user is allowed to render
+			if (JDOHelper.isDetached(reportRegistryItemToStore)) {
+				// if the object is not new, it might have an authority assigned and
+				// role checking on EJB method call level might not be sufficient
+				ReportRegistryItem registryItemPersistent = (ReportRegistryItem) pm.getObjectById(JDOHelper.getObjectId(reportRegistryItemToStore));
+				Authority.resolveSecuringAuthority(pm, registryItemPersistent, ResolveSecuringAuthorityStrategy.organisation)
+					.assertContainsRoleRef(getPrincipal(), RoleConstants.renderReport);
+			}
+			// if the object is not detached (= new) the check is only for the general right to edit reports
+			return NLJDOHelper.storeJDO(pm, reportRegistryItemToStore, get, fetchGroups, maxFetchDepth);
 		} finally {
 			pm.close();
 		}
@@ -596,6 +678,9 @@ implements SessionBean
 			} catch (JDOObjectNotFoundException e) {
 				return;
 			}
+			// Do the object level access right check also before deleting
+			Authority.resolveSecuringAuthority(pm, item, ResolveSecuringAuthorityStrategy.organisation)
+				.assertContainsRoleRef(getPrincipal(), RoleConstants.renderReport);
 			ReportCategory parent = item.getParentCategory();
 			if (parent != null && (parent instanceof ReportCategory)) {
 				parent.getChildItems().remove(item);
@@ -627,6 +712,11 @@ implements SessionBean
 		PersistenceManager pm;
 		pm = getPersistenceManager();
 		try {
+			// check if user is allowed to render
+			ReportRegistryItem registryItem = (ReportRegistryItem) pm.getObjectById(renderReportRequest.getReportRegistryItemID());
+			Authority.resolveSecuringAuthority(pm, registryItem, ResolveSecuringAuthorityStrategy.organisation)
+				.assertContainsRoleRef(getPrincipal(), RoleConstants.renderReport);
+			
 //			RenderManager rm = getReportingManagerFactory().createRenderManager();
 			ReportEnginePool enginePool = getReportEnginePool();
 			ReportEngine engine;
@@ -706,6 +796,11 @@ implements SessionBean
 				pm.getFetchPlan().setGroups(fetchGroups);
 
 			ReportLayout reportLayout = (ReportLayout) pm.getObjectById(reportLayoutID);
+			
+			// now do the access right check also on object level
+			Authority.resolveSecuringAuthority(pm, reportLayout, ResolveSecuringAuthorityStrategy.organisation)
+				.assertContainsRoleRef(getPrincipal(), RoleConstants.editReport);
+			
 			Collection<ReportLayoutLocalisationData> bundle = ReportLayoutLocalisationData.getReportLayoutLocalisationBundle(pm, reportLayout);
 			return pm.detachCopyAll(bundle);
 		} finally {
@@ -738,6 +833,19 @@ implements SessionBean
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 
+			Set<ReportRegistryItemID> checkItemIDs = new HashSet<ReportRegistryItemID>();
+			// collect all item IDs to check because its possible that there are several referenced in the collection of bundles
+			for (ReportLayoutLocalisationData data : bundle) {
+				ReportRegistryItemID itemID = ReportRegistryItemID.create(
+						data.getOrganisationID(), data.getReportRegistryItemType(), data.getReportRegistryItemID());
+				checkItemIDs.add(itemID);
+			}
+			// now check the access rights for all referenced
+			for (ReportRegistryItemID itemID : checkItemIDs) {
+				ReportRegistryItem item = (ReportRegistryItem) pm.getObjectById(itemID);
+				Authority.resolveSecuringAuthority(pm, item, ResolveSecuringAuthorityStrategy.organisation)
+					.assertContainsRoleRef(getPrincipal(), RoleConstants.editReport);
+			}
 			if (get) {
 				Collection<ReportLayoutLocalisationData> result = new ArrayList<ReportLayoutLocalisationData>(bundle.size());
 				for (ReportLayoutLocalisationData data : bundle) {

@@ -15,9 +15,12 @@ public class NestedProductTypeLocalMapInheriter
 {
 
 	@SuppressWarnings("unchecked")
-	public void copyFieldValue(Inheritable mother, Inheritable child,
-			Class motherClass, Class childClass, Field field,
-			FieldMetaData motherFieldMetaData, FieldMetaData childFieldMetaData)
+	public void copyFieldValue(
+			Inheritable mother, Inheritable child,
+			Class motherClass, Class childClass,
+			Field motherField, Field childField,
+			FieldMetaData motherFieldMetaData, FieldMetaData childFieldMetaData
+	)
 	{
 		ProductTypeLocal childProductTypeLocal = (ProductTypeLocal) child;
 		ProductTypeLocal motherProductTypeLocal = (ProductTypeLocal) mother;
@@ -27,9 +30,10 @@ public class NestedProductTypeLocalMapInheriter
 		MapFieldMetaData childMeta = (MapFieldMetaData) childFieldMetaData;
 
 		try {
-			field.setAccessible(true);
-			Map<String, NestedProductTypeLocal> motherNestedProductTypes = (Map<String, NestedProductTypeLocal>) field.get(mother);
-			Map<String, NestedProductTypeLocal> childNestedProductTypes = (Map<String, NestedProductTypeLocal>) field.get(child);
+			motherField.setAccessible(true);
+			childField.setAccessible(true);
+			Map<String, NestedProductTypeLocal> motherNestedProductTypes = (Map<String, NestedProductTypeLocal>) motherField.get(mother);
+			Map<String, NestedProductTypeLocal> childNestedProductTypes = (Map<String, NestedProductTypeLocal>) childField.get(child);
 
 			HashSet<String> keysToDelete = new HashSet<String>();
 			for (Map.Entry<String, NestedProductTypeLocal> me : childNestedProductTypes.entrySet()) {

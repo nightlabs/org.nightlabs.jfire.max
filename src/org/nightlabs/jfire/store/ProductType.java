@@ -44,8 +44,6 @@ import javax.jdo.listener.AttachCallback;
 import javax.jdo.listener.DetachCallback;
 import javax.jdo.listener.StoreCallback;
 
-import org.apache.log4j.Logger;
-import org.nightlabs.annotation.Implement;
 import org.nightlabs.i18n.I18nText;
 import org.nightlabs.inheritance.FieldInheriter;
 import org.nightlabs.inheritance.FieldMetaData;
@@ -74,6 +72,7 @@ import org.nightlabs.jfire.store.id.ProductTypeGroupID;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.trade.OrganisationLegalEntity;
+import org.nightlabs.util.CollectionUtil;
 import org.nightlabs.util.Util;
 
 /**
@@ -195,7 +194,7 @@ implements
 {
 	private static final long serialVersionUID = 1L;
 
-	private static final Logger logger = Logger.getLogger(ProductType.class);
+//	private static final Logger logger = Logger.getLogger(ProductType.class);
 
 	/**
 	 * This class defines constants for the field names of implementation of
@@ -300,11 +299,11 @@ implements
 		ProductType productType = (ProductType) pm.getObjectById(productTypeID);
 		return getProductTypesNestingThis(pm, productType);
 	}
-	@SuppressWarnings("unchecked")
+
 	public static Collection<ProductType> getProductTypesNestingThis(PersistenceManager pm, ProductType productType)
 	{
 		Query q = pm.newNamedQuery(ProductType.class, "getProductTypesNestingThis");
-		return (Collection<ProductType>)q.execute(productType);
+		return CollectionUtil.castCollection((Collection<?>)q.execute(productType));
 	}
 
 	/**
@@ -316,12 +315,15 @@ implements
 	{
 		if (parentProductTypeID == null) {
 			Query q = pm.newNamedQuery(ProductType.class, "getChildProductTypes_topLevel");
-			return (Collection<ProductType>)q.execute();
+			return CollectionUtil.castCollection((Collection<?>)q.execute());
 		}
 
 		Query q = pm.newNamedQuery(ProductType.class, "getChildProductTypes_hasParent");
-		return (Collection<ProductType>) q.execute(
-			parentProductTypeID.organisationID, parentProductTypeID.productTypeID);
+		return CollectionUtil.castCollection(
+				(Collection<?>) q.execute(
+						parentProductTypeID.organisationID, parentProductTypeID.productTypeID
+				)
+		);
 	}
 
 	public static String createProductTypeID()
@@ -985,6 +987,7 @@ implements
 	 * And please update the javadoc, if you encounter differences!
 	 * </p>
 	 */
+	@Override
 	public final org.nightlabs.inheritance.FieldMetaData getFieldMetaData(String fieldName)
 	{
 		return getFieldMetaData(fieldName, true);
@@ -1064,6 +1067,7 @@ implements
 		return fmd;
 	}
 
+	@Override
 	public FieldInheriter getFieldInheriter(String fieldName)
 	{
 		if (FieldName.productTypeLocal.equals(fieldName))
@@ -1075,6 +1079,7 @@ implements
 		return new JDOSimpleFieldInheriter();
 	}
 
+	@Override
 	public void preInherit(Inheritable mother, Inheritable child)
 	{
 		// JDOInheritanceManager uses PersistenceManager.retrieve, which works often,
@@ -1090,7 +1095,7 @@ implements
 		name.getI18nMap();
 	}
 
-	@Implement
+	@Override
 	public void postInherit(Inheritable mother, Inheritable child) {
 		// nothing to do
 	}

@@ -37,9 +37,9 @@ import javax.jdo.Query;
  * ReportCategories are used to organise reports on the server.
  * The JFire sytem itself uses internal categories to organise
  * report-layouts for invoices, orders etc.
- * 
+ *
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
- * 
+ *
  * @jdo.persistence-capable
  *		identity-type="application"
  * 		persistence-capable-superclass="org.nightlabs.jfire.reporting.layout.ReportRegistryItem"
@@ -52,7 +52,7 @@ import javax.jdo.Query;
  *
  * @jdo.fetch-group name="ReportCategory.childItems" fetch-groups="default" fields="childItems"
  * @jdo.fetch-group name="ReportCategory.this" fetch-groups="default, ReportRegistryItem.this" fields="childItems"
- * 
+ *
  * @jdo.query
  *	name="getReportCategory"
  *	query="SELECT UNIQUE
@@ -60,7 +60,7 @@ import javax.jdo.Query;
  *           this.reportRegistryItemType == paramCategoryType
  *		PARAMETERS String paramOrganisationID, String paramCategoryType
  *		import java.lang.String"
- * 
+ *
  */
 public class ReportCategory extends ReportRegistryItem implements NestableReportRegistryItem {
 
@@ -68,29 +68,30 @@ public class ReportCategory extends ReportRegistryItem implements NestableReport
 //	public static final String INTERNAL_CATEGORY_TYPE_OFFER = "OfferLayout";
 //	public static final String INTERNAL_CATEGORY_TYPE_INVOICE = "InvoiceLayout";
 //	public static final String INTERNAL_CATEGORY_TYPE_DELIVERY_NOTE = "DeliveryNoteLayout";
-	
+
 	public static final String CATEGORY_TYPE_GENERAL = "GeneralLayouts";
-	
+
 	public static final String QUERY_GET_REPORT_CATEGORY = "getReportCategory";
-	
+
 	// TODO: Would be great to have recursion depth here and for ReportRegistryItem.parentItem when thinking of caching in client
 	public static final String FETCH_GROUP_CHILD_ITEMS = "ReportCategory.childItems";
 	/**
-	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon! 
+	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon!
 	 */
+	@Deprecated
 	public static final String FETCH_GROUP_THIS_REPORT_CATEGORY = "ReportCategory.this";
-	
-	
+
+
 	/**
 	 * Serial version UID. Don't forget to change when changing members.
 	 */
 	private static final long serialVersionUID = 1L;
-	
+
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private boolean internal;
-	
+
 	/**
 	 * value: {@link ReportRegistryItem} childItem
 	 *
@@ -105,7 +106,7 @@ public class ReportCategory extends ReportRegistryItem implements NestableReport
 
 	/**
 	 * Create a new {@link ReportCategory} wth the given parent and primary key fields.
-	 * 
+	 *
 	 * @param parentCategory The parent of the new category.
 	 * @param organisationID The orgaisatoinID.
 	 * @param reportRegistryItemType The reportRegistryItemType.
@@ -127,13 +128,13 @@ public class ReportCategory extends ReportRegistryItem implements NestableReport
 			this.internal = internal;
 		this.childItems = new HashSet<ReportRegistryItem>();
 	}
-	
-	
-	
+
+
+
 	public boolean isInternal() {
 		return internal;
 	}
-	
+
 
 	public static ReportCategory getReportCategory(
 			PersistenceManager pm,
@@ -144,12 +145,13 @@ public class ReportCategory extends ReportRegistryItem implements NestableReport
 		Query q = pm.newNamedQuery(ReportCategory.class, QUERY_GET_REPORT_CATEGORY);
 		return (ReportCategory)q.execute(organisationID, categoryType);
 	}
-	
-	
+
+
+	@Override
 	public Set<ReportRegistryItem> getChildItems() {
 		return childItems;
 	}
-	
+
 	public void addChildItem(ReportRegistryItem childItem) {
 		childItem.setParentCategory(this);
 		this.childItems.add(childItem);

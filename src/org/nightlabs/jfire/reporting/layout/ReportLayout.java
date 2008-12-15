@@ -32,6 +32,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Collection;
 import java.util.Date;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.InflaterInputStream;
@@ -42,7 +43,7 @@ import org.nightlabs.util.Util;
 
 /**
  * A ReportLayout holds the BIRT report definition.
- * 
+ *
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  *
  * @jdo.persistence-capable
@@ -65,14 +66,15 @@ public class ReportLayout extends ReportRegistryItem {
 	 * LOG4J logger used by this class
 	 */
 	private static final Logger logger = Logger.getLogger(ReportLayout.class);
-	
+
 	public static final String FETCH_GROUP_REPORT_DESIGN = "ReportLayout.reportDesign";
 	public static final String FETCH_GROUP_REPORT_LOCALISATION_DATA = "ReportLayout.localisationData";
 	/**
-	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon! 
+	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon!
 	 */
+	@Deprecated
 	public static final String FETCH_GROUP_THIS_REPORT_LAYOUT = "ReportLayout.this";
-	
+
 	/**
 	 * Serial version UID. Don't forget to change after changing members.
 	 */
@@ -89,7 +91,7 @@ public class ReportLayout extends ReportRegistryItem {
 	/**
 	 * Creates a new ReportLayout as child of the given
 	 * ReportCategory with the given reportDesign.
-	 * 
+	 *
 	 * @param parentItem The parent category of the new layout. The reportItemRegistryItem type of the new layout will also match its parent.
 	 * @param reportRegistryItemID The reportRegistryItemID of the new layout.
 	 * @param reportDesign The report design data of the new layout.
@@ -108,7 +110,7 @@ public class ReportLayout extends ReportRegistryItem {
 	/**
 	 * Creates a new ReportLayout as child of the given ReportCategory and the given primary-key fields.
 	 * No reportDesign data will be set.
-	 * 
+	 *
 	 * @param parentItem The parent category of the new layout.
 	 * @param organisationID The organisationID of the new layout.
 	 * @param reportRegistryItemType The reportRegistryItemType of the new layout.
@@ -124,25 +126,25 @@ public class ReportLayout extends ReportRegistryItem {
 		super(parentItem, organisationID, reportRegistryItemType, reportRegistryItemID);
 //		this.localisationData = new HashMap<String, ReportLayoutLocalisationData>();
 	}
-	
-	
+
+
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 * @jdo.column sql-type="BLOB"
 	 */
 	private byte[] reportDesign;
-	
+
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private Date fileTimestamp;
-	
+
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private String fileName;
-	
-	
+
+
 //	/**
 //	 * @jdo.field
 //	 *		persistence-modifier="persistent"
@@ -156,7 +158,7 @@ public class ReportLayout extends ReportRegistryItem {
 //	 * 		mapped-by="locale"
 //	 */
 //	private Map<String, ReportLayoutLocalisationData> localisationData;
-	
+
 	public void loadStream(InputStream in, long length, Date timeStamp, String name)
 	throws IOException
 	{
@@ -184,13 +186,13 @@ public class ReportLayout extends ReportRegistryItem {
 			}
 		}
 	}
-	
+
 	public void loadStream(InputStream in, String name)
 	throws IOException
 	{
 		loadStream(in, 10 * 1024, new Date(), name);
 	}
-	
+
 	public void loadFile(File f)
 	throws IOException
 	{
@@ -211,13 +213,18 @@ public class ReportLayout extends ReportRegistryItem {
 	public InputStream createReportDesignInputStream() {
 		return new InflaterInputStream(new ByteArrayInputStream(reportDesign));
 	}
-	
+
 	public String getFileName() {
 		return fileName;
 	}
-	
+
 	public Date getFileTimestamp() {
 		return fileTimestamp;
+	}
+
+	@Override
+	protected Collection<ReportRegistryItem> getChildItems() {
+		return null;
 	}
 
 //	/**
@@ -228,7 +235,7 @@ public class ReportLayout extends ReportRegistryItem {
 //	public Map<String, ReportLayoutLocalisationData> getLocalisationData() {
 //		return localisationData;
 //	}
-	
+
 //	@Override
 //	public void jdoPreStore() {
 //		super.jdoPreStore();

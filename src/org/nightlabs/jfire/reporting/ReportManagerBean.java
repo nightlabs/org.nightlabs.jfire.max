@@ -650,8 +650,19 @@ implements SessionBean
 				Authority.resolveSecuringAuthority(pm, registryItemPersistent, ResolveSecuringAuthorityStrategy.organisation)
 					.assertContainsRoleRef(getPrincipal(), RoleConstants.renderReport);
 			}
-			// if the object is not detached (= new) the check is only for the general right to edit reports
-			return NLJDOHelper.storeJDO(pm, reportRegistryItemToStore, get, fetchGroups, maxFetchDepth);
+			
+			ReportRegistryItem item = pm.makePersistent(reportRegistryItemToStore);
+			
+			item.applyInheritance();
+			
+			if (!get)
+				return null;
+
+			if (fetchGroups != null)
+				pm.getFetchPlan().setGroups(fetchGroups);
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+
+			return pm.detachCopy(item);			
 		} finally {
 			pm.close();
 		}

@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.nightlabs.jfire.reporting;
 
@@ -94,7 +94,7 @@ import org.xml.sax.SAXParseException;
  * base category, root directory and fallback values for ids</li>
  * <li><b>Initialise (sub)directories</b>: Use {@link #initialise()} to start the initialisation</li>
  * </p>
- * 
+ *
  * @author Alexander Bieber <alex [AT] nightlabs [DOT] de>
  *
  */
@@ -108,14 +108,14 @@ public class ReportingInitialiser {
 	private PersistenceManager pm;
 	private String organisationID;
 	private String reportRegistryItemType;
-	
+
 //	private SAXException parseException;
 	private Map<File, Document> categoryDescriptors = new HashMap<File, Document>();
 
 	/**
 	 * Returns the ReportCategory with the given id-parameters. If neccessary (not found in the datastore)
 	 * it will be newly created.
-	 * 
+	 *
 	 * @param pm The PersistenceManager to use.
 	 * @param parent The parent category.
 	 * @param organisationID Organisation id-parameter.
@@ -146,13 +146,15 @@ public class ReportingInitialiser {
 				logger.debug("createCategory: persisting new category: categoryPK=\""+category.getOrganisationID()+'/'+category.getReportRegistryItemType()+'/'+category.getReportRegistryItemID()+"\"");
 
 			category = pm.makePersistent(category);
+			if (parent != null)
+				parent.addChildItem(category);
 		}
 		return category;
 	}
-	
+
 	/**
 	 * Creates a new ReportingInitialiser with the given parameters.
-	 * 
+	 *
 	 * @param scriptSubDir This is the relative directory under the deploy base directory (e.g. "JFireReporting.ear/script/General")
 	 * @param baseCategory The base category from where the category-tree will be build.
 	 * @param jfsm The JFireServerManager to use
@@ -184,8 +186,8 @@ public class ReportingInitialiser {
 
 	/**
 	 * Start the initializing process.
-	 * 
-	 * @throws ReportingInitialiserException If initializing fails. 
+	 *
+	 * @throws ReportingInitialiserException If initializing fails.
 	 */
 	public void initialise()
 	throws ReportingInitialiserException
@@ -216,7 +218,7 @@ public class ReportingInitialiser {
 	{
 		if (!xmlFile.exists())
 			return null;
-		
+
 		DOMParser parser = new DOMParser();
 		final SAXException[] parseException = new SAXException[1];
 		parser.setErrorHandler(new ErrorHandler(){
@@ -245,7 +247,7 @@ public class ReportingInitialiser {
 			throw parseException[0];
 		return parser.getDocument();
 	}
-	
+
 	private Document getCategoryDescriptor(File categoryDir)
 	throws SAXException, IOException
 	{
@@ -259,7 +261,7 @@ public class ReportingInitialiser {
 		}
 		return doc;
 	}
-	
+
 	private Node getReportDescriptor(File scriptFile, Document categoryDocument)
 	throws TransformerException
 	{
@@ -271,14 +273,14 @@ public class ReportingInitialiser {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Read the contents of an {@link I18nText} from an xml node.
 	 * The xml element has to be in the following style
 	 * <pre>
 	 * <elementName language="somelanguage">content</elementName>
 	 * </pre>
-	 * 
+	 *
 	 * @param elementNode The node to read children from.
 	 * @param elementName The name of the sub-elements that form the content.
 	 * @param name The {@link I18nText} to fill
@@ -306,11 +308,11 @@ public class ReportingInitialiser {
 		if (!nameSet && def != null)
 			name.setText(Locale.ENGLISH.getLanguage(), def);
 	}
-	
+
 	/**
 	 * Recurses from the given directory and report categories
 	 * based on the &lt;report-category&gt; element found in the content.xml files there.
-	 * 
+	 *
 	 * @param dir The directory to start recursion
 	 * @param parent The {@link ReportCategory}
 	 * @throws ReportingInitialiserException
@@ -330,11 +332,11 @@ public class ReportingInitialiser {
 					Node typeAttr = catNode.getAttributes().getNamedItem("type");
 					if (typeAttr != null && !"".equals(typeAttr.getTextContent()))
 						itemType = typeAttr.getTextContent();
-					
+
 					Node idAttr = catNode.getAttributes().getNamedItem("id");
 					if (idAttr != null && !"".equals(idAttr.getTextContent()))
 						categoryID = idAttr.getTextContent();
-					
+
 					Node internalAttr = catNode.getAttributes().getNamedItem("internal");
 					if (internalAttr != null && !"".equals(typeAttr.getTextContent()))
 						internal = Boolean.parseBoolean(internalAttr.getTextContent());
@@ -348,7 +350,7 @@ public class ReportingInitialiser {
 			createElementName(catNode, "name", category.getName(), categoryID);
 			createElementName(catNode, "description", category.getDescription(), null);
 			logger.debug("create Script Category = "+category.getName());
-			
+
 			createReportTextPartConfiguration(new File(dir, "content.xml"), category.getReportRegistryItemID(), category);
 
 
@@ -363,7 +365,7 @@ public class ReportingInitialiser {
 				}
 			}
 
-			
+
 			// recurse
 			File[] subDirs = dir.listFiles(dirFileFilter);
 			for (int i=0; i<subDirs.length; i++) {
@@ -378,7 +380,7 @@ public class ReportingInitialiser {
 
 	/**
 	 * Creates a {@link ReportLayout} from the given file.
-	 * 
+	 *
 	 * @param reportFile The file to create a new ReportFile from.
 	 * @param category The category to add the report
 	 * @param catDocument The document where meta-data of the report can be found
@@ -391,10 +393,10 @@ public class ReportingInitialiser {
 	throws Exception
 	{
 		Node reportNode = getReportDescriptor(reportFile, catDocument);
-		
+
 		String reportID = IOUtil.getFileNameWithoutExtension(reportFile.getName());
 		boolean overwriteOnInit = true;
-		
+
 		if (reportNode != null) {
 			Node idNode = reportNode.getAttributes().getNamedItem("id");
 			if (idNode != null && !"".equals(idNode.getTextContent()))
@@ -406,7 +408,7 @@ public class ReportingInitialiser {
 			if (overwriteNode != null && !"".equals(overwriteNode.getTextContent()))
 				overwriteOnInit = Boolean.parseBoolean(overwriteNode.getTextContent());
 		}
-		
+
 		logger.debug("create ReportLayout = " + reportID);
 		ReportLayout layout;
 		boolean hadToBeCreated = false;
@@ -420,6 +422,7 @@ public class ReportingInitialiser {
 		} catch (JDOObjectNotFoundException e) {
 			layout = new ReportLayout(category, organisationID, reportRegistryItemType, reportID);
 			layout = pm.makePersistent(layout);
+			category.addChildItem(layout);
 			hadToBeCreated = true;
 		}
 
@@ -436,7 +439,7 @@ public class ReportingInitialiser {
 		// This has its own overwriteOnInit
 		createReportParameterAcquisitionSetup(reportFile, reportNode, layout);
 	}
-	
+
 	/**
 	 * Creates a new report design file from the given one by replacing
 	 * variables in the given File.
@@ -455,7 +458,7 @@ public class ReportingInitialiser {
 		importTemplateToLayoutFile(reportFile, tmpFile);
 		return tmpFile;
 	}
-	
+
 	/**
 	 * Get the variable names and values that are replaced by
 	 * when a layout is imported or exported.
@@ -469,12 +472,12 @@ public class ReportingInitialiser {
 	 * </ul>
 	 * </p>
 	 * @param useAlsoDummyRootOrganisationID Whether to use the local organisationID as ${rootOrganisationID}
-	 * 		when there the server is in standalone mode. 
+	 * 		when there the server is in standalone mode.
 	 * @return The variable names and values
 	 * @throws Exception If something fails getting the organisationID or the rootOrganisationID
 	 */
-	protected static Map<String, String> getTemplateReplaceVariables(boolean useAlsoDummyRootOrganisationID) 
-	throws Exception 
+	protected static Map<String, String> getTemplateReplaceVariables(boolean useAlsoDummyRootOrganisationID)
+	throws Exception
 	{
 		String organisationID = SecurityReflector.getUserDescriptor().getOrganisationID();
 		Map<String, String> variables = new HashMap<String, String>();
@@ -482,7 +485,7 @@ public class ReportingInitialiser {
 			InitialContext ctx = new InitialContext(SecurityReflector.getInitialContextProperties());
 			String rootOrganisationID = null;
 			if (Organisation.hasRootOrganisation(ctx) || useAlsoDummyRootOrganisationID)
-				 rootOrganisationID = Organisation.getRootOrganisationID(ctx);			
+				 rootOrganisationID = Organisation.getRootOrganisationID(ctx);
 			try {
 				if (rootOrganisationID != null) {
 					variables.put("rootOrganisationID", rootOrganisationID);
@@ -500,10 +503,10 @@ public class ReportingInitialiser {
 		}
 		return variables;
 	}
-	
+
 	/**
 	 * Export the given ReportLayout file to a template file (variable values replaced by their names).
-	 * 
+	 *
 	 * @param reportFile The file to export.
 	 * @param exportFile The file to export to.
 	 * @throws Exception If something fails.
@@ -529,7 +532,7 @@ public class ReportingInitialiser {
 					for (Map.Entry<Pattern, String> varEntry : replacements.entrySet()) {
 						tmpStr = varEntry.getKey().matcher(tmpStr).replaceAll(varEntry.getValue());
 					}
-					writer.write(tmpStr + "\n");					
+					writer.write(tmpStr + "\n");
 				}
 			} finally {
 				reader.close();
@@ -540,9 +543,9 @@ public class ReportingInitialiser {
 		}
 	}
 	/**
-	 * Import the given template file as ReportLayout file 
+	 * Import the given template file as ReportLayout file
 	 * (variable names replaced by their values: see {@link #getTemplateReplaceVariables()}).
-	 * 
+	 *
 	 * @param templateFile The file to import.
 	 * @param layoutFile The file to create.
 	 * @throws Exception If something fails.
@@ -550,14 +553,14 @@ public class ReportingInitialiser {
 	public static void importTemplateToLayoutFile(File templateFile, File layoutFile)
 	throws Exception
 	{
-		Map<String, String> variables = getTemplateReplaceVariables(true);		
+		Map<String, String> variables = getTemplateReplaceVariables(true);
 		IOUtil.replaceTemplateVariables(layoutFile, templateFile, IOUtil.CHARSET_NAME_UTF_8, variables);
 	}
-	
+
 	/**
 	 * Returns the given string converted so that it can be used
 	 * as name of dataset column in a report.
-	 * 
+	 *
 	 * @param str The String to convert.
 	 * @return The given str with all "." replaced with "_" and "_" with "__"
 	 */
@@ -566,14 +569,14 @@ public class ReportingInitialiser {
 		key = key.replaceAll("\\.", "_");
 		return key;
 	}
-	
+
 	protected FileFilter dirFileFilter = new FileFilter() {
 		public boolean accept(File pathname) {
 			return pathname.isDirectory() && !(pathname.toString().endsWith("resource"));
 		}
 	};
 
-	private FilenameFilter scriptFileNameFilter = new FilenameFilter()
+	private final FilenameFilter scriptFileNameFilter = new FilenameFilter()
 	{
 		public boolean accept(File dir, String name)
 		{
@@ -582,7 +585,7 @@ public class ReportingInitialiser {
 		}
 	};
 
-	
+
 	protected void createReportParameterAcquisitionSetup(File reportFile, Node reportNode, ReportLayout layout)
 	throws ReportingInitialiserException
 	{
@@ -592,27 +595,27 @@ public class ReportingInitialiser {
 
 		// the setup already persistent
 		ReportParameterAcquisitionSetup setup = ReportParameterAcquisitionSetup.getSetupForReportLayout(pm, (ReportRegistryItemID)JDOHelper.getObjectId(layout));
-		
+
 		Map<String, Object> id2BindingObject = new HashMap<String, Object>();
-		
+
 		Collection<Node> useCaseNodes = NLDOMUtil.findNodeList(acquisitionNode, "use-case");
 		for (Node useCaseNode : useCaseNodes) {
 			Node useCaseIDNode = useCaseNode.getAttributes().getNamedItem("id");
 			if (useCaseIDNode == null)
 				throw new ReportingInitialiserException("ReportParameterAcquisitionUseCase element <use-case> must define an id attribute. See file "+reportFile.toString());
 			String useCaseID = useCaseIDNode.getNodeValue();
-			
+
 			boolean overwriteOnInit = false;
 			Node overwriteNode = reportNode.getAttributes().getNamedItem("overwriteOnInit");
 			if (overwriteNode != null && !"".equals(overwriteNode.getTextContent()))
 				overwriteOnInit = Boolean.parseBoolean(overwriteNode.getTextContent());
-			
+
 			ReportParameterAcquisitionUseCase useCase = getUseCase(setup, useCaseID);
 			if (!overwriteOnInit && useCase != null)
 				// use-case was already created sometime and should not be overwritten
 				// continue with next use-case
 				continue;
-			
+
 			if (useCase != null && overwriteOnInit) {
 				// use-case should be overwritten
 //				useCase = resetUseCaseAndAcquisitionSetup(setup, useCase);
@@ -627,7 +630,7 @@ public class ReportingInitialiser {
 				setup = new ReportParameterAcquisitionSetup(organisationID, IDGenerator.nextID(ReportParameterAcquisitionSetup.class), layout);
 				setup = pm.makePersistent(setup);
 			}
-			
+
 			// (re-)create the use case
 			if (useCase == null)
 				useCase = new ReportParameterAcquisitionUseCase(setup, useCaseID);
@@ -635,7 +638,7 @@ public class ReportingInitialiser {
 			createElementName(useCaseNode, "description", useCase.getDescription(), useCaseID);
 
 			ValueAcquisitionSetup acquisitionSetup = new ValueAcquisitionSetup(organisationID, IDGenerator.nextID(ValueAcquisitionSetup.class), setup, useCase);
-			
+
 			id2BindingObject.clear();
 
 			// Read parameter list
@@ -653,7 +656,7 @@ public class ReportingInitialiser {
 					throw new ReportingInitialiserException("Some attribute is missing for the parameters declaration in the parameter-acquisition in file "+reportFile, e);
 				}
 			}
-			
+
 			// Read value provider Config List
 			Collection<Node> providerConfigs = NLDOMUtil.findNodeList(useCaseNode, "value-provider-configs/provider-config");
 			for (Node providerNode : providerConfigs) {
@@ -662,7 +665,7 @@ public class ReportingInitialiser {
 					String providerOrganisationID = NLDOMUtil.getNonEmptyAttributeValue(providerNode, "organisationID");
 					String providerCategoryID = NLDOMUtil.getNonEmptyAttributeValue(providerNode, "categoryID");
 					String valueProviderID = NLDOMUtil.getNonEmptyAttributeValue(providerNode, "valueProviderID");
-					
+
 					int pageIndex = 0;
 					try {
 						String pageIndexStr = NLDOMUtil.getNonEmptyAttributeValue(providerNode, "pageIndex");
@@ -704,7 +707,7 @@ public class ReportingInitialiser {
 					config.setPageIndex(pageIndex);
 					config.setPageRow(pageRow);
 					config.setPageColumn(pageColumn);
-					
+
 					boolean allowOutputNull = false;
 					String allowNullValue = NLDOMUtil.getAttributeValue(providerNode, "allowNullOutputValue");
 					if (allowNullValue != null) {
@@ -715,7 +718,7 @@ public class ReportingInitialiser {
 						}
 					}
 					config.setAllowNullOutputValue(allowOutputNull);
-					
+
 					String showMessage = NLDOMUtil.getAttributeValue(providerNode, "showMessageInHeader");
 					if (showMessage != null) {
 						try {
@@ -723,7 +726,7 @@ public class ReportingInitialiser {
 						} catch (Exception e) {
 						}
 					}
-					
+
 					String growVert = NLDOMUtil.getAttributeValue(providerNode, "growVertically");
 					if (growVert != null) {
 						try {
@@ -731,18 +734,18 @@ public class ReportingInitialiser {
 						} catch (Exception e) {
 						}
 					}
-					
+
 					createElementName(providerNode, "message", config.getMessage(), null);
-					
+
 					setGraphicalData(providerNode, config);
-					
+
 					id2BindingObject.put(id, config);
 					acquisitionSetup.getValueProviderConfigs().add(config);
 				} catch (IllegalArgumentException e) {
 					throw new ReportingInitialiserException("Some attribute is missing for the value-provider-configs declaration in the parameter-acquisition in file "+reportFile, e);
 				}
 			}
-			
+
 			// Read binding list
 			Collection<Node> bindings = NLDOMUtil.findNodeList(useCaseNode, "value-consumer-bindings/value-consumer-binding");
 			for (Node bindingNode : bindings) {
@@ -822,7 +825,7 @@ public class ReportingInitialiser {
 				setup.setDefaultSetup(acquisitionSetup);
 		}
 	}
-	
+
 	private ReportParameterAcquisitionUseCase getUseCase(ReportParameterAcquisitionSetup setup, String useCaseID) {
 		if (setup == null)
 			return null;
@@ -845,7 +848,7 @@ public class ReportingInitialiser {
 		}
 		return useCase;
 	}
-	
+
 	private void setGraphicalData(Node elementNode, IGraphicalInfoProvider graphicalInfoProvider) {
 		String xStr = NLDOMUtil.getAttributeValue(elementNode, "x");
 		int x = 0;
@@ -855,7 +858,7 @@ public class ReportingInitialiser {
 			x = 0;
 		}
 		graphicalInfoProvider.setX(x);
-		
+
 		String yStr = NLDOMUtil.getAttributeValue(elementNode, "y");
 		int y = 0;
 		try {
@@ -865,7 +868,7 @@ public class ReportingInitialiser {
 		}
 		graphicalInfoProvider.setY(y);
 	}
-	
+
 //	private ReportParameterAcquisitionUseCase resetUseCaseAndAcquisitionSetup(ReportParameterAcquisitionSetup setup, ReportParameterAcquisitionUseCase useCase) {
 ////		if (setup.getDefaultSetup() != null && setup.getDefaultSetup().getUseCase() != null && setup.getDefaultSetup().getUseCase().equals(useCase))
 ////			setup.setDefaultSetup(null);
@@ -888,11 +891,11 @@ public class ReportingInitialiser {
 //		pm.flush();
 //		return useCase;
 //	}
-	
+
 	/**
 	 * Create the {@link ReportLayoutLocalisationData} objects for the given layout. It will search in a subfolder 'resource'
 	 * for entries named like reportID_{locale}.properties
-	 * 
+	 *
 	 * @param reportFile The report file currently processed.
 	 * @param reportID The id of the {@link ReportLayout} currently processed.
 	 * @param reportNode The 'report' node of the content.xml document currenty processed
@@ -935,7 +938,7 @@ public class ReportingInitialiser {
 			}
 		}
 	}
-	
+
 	/**
 	 * @param file The report file currently processed (This might be the content.xml file for a category or the .rptdesign file for a layout).
 	 * @param reportRegistryItemID The id of the {@link ReportRegistryItem} currently processed.
@@ -946,18 +949,18 @@ public class ReportingInitialiser {
 	throws ReportingInitialiserException
 	{
 		logger.debug("Initializatin of ReportTextPartConfiguration of " + JDOHelper.getObjectId(reportRegistryItem) + " started.");
-		
+
 		// initialise meta-data
 		pm.getExtent(ReportLayoutLocalisationData.class);
 
-		File targetConfigurationFile = new File(file.getParentFile(), 
-			reportRegistryItemID + "." + 
+		File targetConfigurationFile = new File(file.getParentFile(),
+			reportRegistryItemID + "." +
 			ReportTextPartConfiguration.class.getSimpleName() +
 			".xml");
 
 		if (!targetConfigurationFile.exists())
 			return; // Nothing to do.
-		
+
 		Document doc;
 		try {
 			doc = parseFile(targetConfigurationFile);
@@ -979,9 +982,9 @@ public class ReportingInitialiser {
 					reportRegistryItem.getOrganisationID(), IDGenerator.nextID(ReportTextPartConfiguration.class));
 			configuration.setReportRegistryItem(reportRegistryItem);
 		}
-		
+
 		// Update/Create the ReportTextParts wihtin the configuration
-		Collection<Node> nodes = NLDOMUtil.findNodeList(doc, "reportTextPartConfiguration/reportTextPart");		
+		Collection<Node> nodes = NLDOMUtil.findNodeList(doc, "reportTextPartConfiguration/reportTextPart");
 		for (Node reportTextPartNode : nodes) {
 			Node idNode = reportTextPartNode.getAttributes().getNamedItem("id");
 			if (idNode == null || "".equals(idNode.getTextContent())) {
@@ -997,7 +1000,7 @@ public class ReportingInitialiser {
 			if (configuration == null) {
 				// create only when a text part was defined
 			}
-			
+
 			ReportTextPart part = configuration.getReportTextPart(idNode.getTextContent());
 			if (part == null) {
 				part = new ReportTextPart(configuration, idNode.getTextContent());
@@ -1012,5 +1015,5 @@ public class ReportingInitialiser {
 			pm.makePersistent(configuration);
 		}
 	}
-	
+
 }

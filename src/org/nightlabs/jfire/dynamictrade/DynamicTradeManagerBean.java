@@ -28,6 +28,7 @@ import org.nightlabs.jfire.accounting.gridpriceconfig.PriceCalculationException;
 import org.nightlabs.jfire.accounting.id.TariffID;
 import org.nightlabs.jfire.accounting.priceconfig.FetchGroupsPriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.IInnerPriceConfig;
+import org.nightlabs.jfire.accounting.priceconfig.PriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.id.PriceConfigID;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.base.JFireBaseEAR;
@@ -419,7 +420,11 @@ implements SessionBean
 						FetchPlan.DEFAULT,
 						FetchGroupsPriceConfig.FETCH_GROUP_EDIT});
 			}
-
+			
+			for (DynamicTradePriceConfig dynamicTradePriceConfig : priceConfigs) {
+				PriceConfig.assertPriceConfigNotManaged(pm, (PriceConfigID) JDOHelper.getObjectId(dynamicTradePriceConfig));
+			}
+			
 			// Because we do not need to calculate any prices (all prices are dynamic), we
 			// do not need to use GridPriceConfigUtil.storePriceConfigs(...), but simply
 			// call pm.makePersistentAll(...).

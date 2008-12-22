@@ -36,6 +36,7 @@ import java.util.Set;
 
 import javax.jdo.FetchPlan;
 import javax.jdo.JDOHelper;
+import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 
 import org.apache.log4j.Logger;
@@ -43,7 +44,6 @@ import org.nightlabs.inheritance.FieldInheriter;
 import org.nightlabs.inheritance.FieldMetaData;
 import org.nightlabs.inheritance.Inheritable;
 import org.nightlabs.inheritance.InheritanceCallbacks;
-import org.nightlabs.inheritance.StaticFieldMetaData;
 import org.nightlabs.jdo.FetchPlanBackup;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.ObjectIDUtil;
@@ -60,6 +60,7 @@ import org.nightlabs.jfire.security.id.AuthorityID;
 import org.nightlabs.jfire.security.id.AuthorityTypeID;
 import org.nightlabs.jfire.store.book.LocalStorekeeperDelegate;
 import org.nightlabs.jfire.store.id.ProductTypeID;
+import org.nightlabs.jfire.store.id.ProductTypeLocalID;
 import org.nightlabs.util.Util;
 
 /**
@@ -102,6 +103,8 @@ implements Serializable, Inheritable, InheritanceCallbacks, SecuredObject
 	public static final String FETCH_GROUP_FIELD_METADATA_MAP = "ProductTypeLocal.fieldMetaDataMap";
 	public static final String FETCH_GROUP_NESTED_PRODUCT_TYPE_LOCALS = "ProductTypeLocal.nestedProductTypeLocals";
 
+	public static final String MANAGED_BY_JFIRE_PREFIX = "JFire";
+
 //	/**
 //	 * loads both fields {@link #securingAuthority} and {@link #securingAuthorityType}, because the <code>AuthorityType</code> is the same instance anyway.
 //	 */
@@ -123,10 +126,14 @@ implements Serializable, Inheritable, InheritanceCallbacks, SecuredObject
 		public static final String organisationID = "organisationID";
 		public static final String productType = "productType";
 		public static final String productTypeID = "productTypeID";
-		public static final String securingAuthority = "securingAuthority";
+		// Not sure what this was for, it is used in #getFieldMetaData() and a StaticFieldMetaData is returned there for it.
+		// Imho this is not neccessary any more, Alex.
+		// Marco agrees, commented the field name entry
+//		public static final String securingAuthority = "securingAuthority";
 		public static final String selfForVirtualSelfPackaging = "selfForVirtualSelfPackaging";
 		public static final String tmpInherit_innerPriceConfigID = "tmpInherit_innerPriceConfigID";
 		public static final String tmpInherit_nestedProductTypes = "tmpInherit_nestedProductTypes";
+		public static final String managedBy = "managedBy";
 	};
 
 	/**
@@ -198,6 +205,11 @@ implements Serializable, Inheritable, InheritanceCallbacks, SecuredObject
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private String securingAuthorityID;
+
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private String managedBy = null;
 
 	/**
 	 * @deprecated Only for JDO!
@@ -289,8 +301,8 @@ implements Serializable, Inheritable, InheritanceCallbacks, SecuredObject
 		if (fieldName.startsWith("tmpInherit"))
 			return null;
 
-		if (FieldName.securingAuthority.equals(fieldName))
-			return new StaticFieldMetaData(fieldName);
+//		if (FieldName.securingAuthority.equals(fieldName))
+//			return new StaticFieldMetaData(fieldName);
 
 // TODO the below checks for nestedProductTypes should be removed after a few months transition time.
 		if ("nestedProductTypes".equals(fieldName))
@@ -307,6 +319,7 @@ implements Serializable, Inheritable, InheritanceCallbacks, SecuredObject
 				nonInheritableFields.add(FieldName.productType);
 				nonInheritableFields.add(FieldName.fieldMetaDataMap);
 				nonInheritableFields.add(FieldName.selfForVirtualSelfPackaging);
+				nonInheritableFields.add(FieldName.managedBy);
 			}
 
 			if (nonInheritableFields.contains(fieldName))
@@ -650,6 +663,73 @@ implements Serializable, Inheritable, InheritanceCallbacks, SecuredObject
 		);
 
 		getProductType().applyInheritance();
+	}
+
+	/**
+	 * This property is <code>null</code> for all {@link ProductTypeLocal}s of {@link ProductType}s
+	 * of the local organisation if they were not created by an automated import from another system
+	 * or similar automated processes.
+	 * <p>
+	 * A non-<code>null</code> value indicates that the {@link ProductType} of this {@link ProductTypeLocal}
+	 * is managed by some automated system and should not be changed by the users of the organisation.
+	 * An example of an automated system that manages {@link ProductType}s is JFire itself, that
+	 * manages the {@link ProductType}s of a foreign organisation in the datastore of a reseller organisatin.
+	 * </p>
+	 *
+	 * @return The managed-by tag of this {@link ProductTypeLocal}, might be <code>null</code>.
+	 */
+	public String getManagedBy() {
+		return managedBy;
+	}
+
+	/**
+	 * Sets the managed-by flag for this {@link ProductTypeLocal} (see {@link #getManagedBy()}).
+	 * <p>
+	 * Note, that this property can only be set on attached instances of {@link ProductTypeLocal},
+	 * attempts of setting this to detached instances will result in an {@link IllegalStateException}.
+	 * </p>
+	 * @param managedBy The managed-by flag to set.
+	 */
+	public void setManagedBy(String managedBy) {
+		if (JDOHelper.isDetached(this))
+			throw new IllegalStateException("setManagedBy can only be set for attached instances of " + this.getClass().getSimpleName());
+		this.managedBy = managedBy;
+	}
+
+	/**
+	 * Checks if the {@link ProductTypeLocal} corresponding to the given {@link ProductTypeID} is tagged with a
+	 * non-<code>null</code> managed-by property.
+	 * <p>
+	 * If the corresponding {@link ProductTypeLocal} can't be found in the datastore <code>false</code> will be returned.
+	 * This might occur if the given ProductTypeID is of a {@link ProductType} not yet in the given datastore,
+	 * or <code>null</code>.
+	 * </p>
+	 * <p>
+	 * If <code>throwExceptionIfManaged</code> is <code>true</code>, this method will throw an {@link ManagedProductTypeModficationException}
+	 * if it finds the tag to be set.
+	 * </p>
+	 *
+	 * @param pm The {@link PersistenceManager} to use.
+	 * @param productTypeID The id of the {@link ProductType} to check, this might also be <code>null</code> (the result of JDOHelper.getObjectId() of a new object).
+	 * @param throwExceptionIfManaged Pass <code>true</code> to throw an exception rather then returning <code>true</code>.
+	 * @return <code>true</code> if this method finds the manged-by tag of the corresponding {@link ProductTypeLocal} to be non-<code>null</code>,
+	 * 		<code>false</code> otherwise (if no execption is thrown).
+	 */
+	public static boolean checkProductTypeManaged(PersistenceManager pm, ProductTypeID productTypeID, boolean throwExceptionIfManaged) {
+		if (productTypeID == null)
+			return false;
+		ProductTypeLocalID productTypeLocalID = ProductTypeLocalID.create(productTypeID.organisationID, productTypeID.productTypeID);
+		ProductTypeLocal productTypeLocal = null;
+		try {
+			productTypeLocal = (ProductTypeLocal) pm.getObjectById(productTypeLocalID);
+		} catch (JDOObjectNotFoundException e) {
+			// If we can not find the ProductTypeLocal, it might not have been persisted yet
+			return false;
+		}
+		boolean managed = productTypeLocal.getManagedBy() != null;
+		if (managed && throwExceptionIfManaged)
+			throw new ManagedProductTypeModficationException(productTypeID, productTypeLocal.getManagedBy());
+		return managed;
 	}
 
 	@Override

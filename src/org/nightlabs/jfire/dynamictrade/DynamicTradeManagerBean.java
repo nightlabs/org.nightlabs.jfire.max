@@ -43,6 +43,7 @@ import org.nightlabs.jfire.security.Authority;
 import org.nightlabs.jfire.security.ResolveSecuringAuthorityStrategy;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.ProductType;
+import org.nightlabs.jfire.store.ProductTypeLocal;
 import org.nightlabs.jfire.store.RoleConstants;
 import org.nightlabs.jfire.store.Store;
 import org.nightlabs.jfire.store.Unit;
@@ -144,7 +145,7 @@ implements SessionBean
 			DynamicProductTypeRecurringTradeActionHandler dptrtah = new DynamicProductTypeRecurringTradeActionHandler(
 					Organisation.DEV_ORGANISATION_ID, DynamicProductTypeRecurringTradeActionHandler.class.getName(), DynamicProductType.class);
 			dptrtah = pm.makePersistent(dptrtah);
-			
+
 			// create a default DeliveryConfiguration with one ModeOfDelivery
 			DeliveryConfiguration deliveryConfiguration = new DeliveryConfiguration(organisationID, "JFireDynamicTrade.default");
 			deliveryConfiguration.getName().setText(Locale.ENGLISH.getLanguage(), "Default Delivery Configuration for JFireDynamicTrade");
@@ -297,6 +298,9 @@ implements SessionBean
 //			} catch (JDODetachedFieldAccessException x) {
 //			// ignore
 //			}
+
+			// Check if this is a managed product type
+			ProductTypeLocal.checkProductTypeManaged(pm, (ProductTypeID) JDOHelper.getObjectId(dynamicProductType), true);
 
 			// we don't need any price calculation as we have dynamic prices only - no cached values
 
@@ -483,7 +487,7 @@ implements SessionBean
 
 	/**
 	 * creates a new Dynamic Recurring Article
-	 * 
+	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="org.nightlabs.jfire.trade.editOffer"
 	 * @ejb.transaction type="Required"
@@ -509,7 +513,7 @@ implements SessionBean
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 
-			return pm.detachCopy(article);		
+			return pm.detachCopy(article);
 
 		} finally {
 			pm.close();
@@ -547,7 +551,7 @@ implements SessionBean
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 
-			return pm.detachCopy(article);		
+			return pm.detachCopy(article);
 
 
 		} finally {
@@ -592,17 +596,17 @@ implements SessionBean
 					org.nightlabs.jfire.trade.RoleConstants.sellProductType
 			);
 
-			
+
 
 			DynamicProduct product = (DynamicProduct) article.getProduct();
-			DynamicProductInfo ProductInfo; 
-			
+			DynamicProductInfo ProductInfo;
+
 			// check if the Product is null and that happens in the case of Recurring Articl e
 			if (product != null)
 				ProductInfo = product;
 			else
 				ProductInfo = (DynamicProductInfo) article;
-					
+
 			boolean recalculatePrice = false;
 
 			if (quantity != null) {

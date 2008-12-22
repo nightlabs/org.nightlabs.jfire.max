@@ -351,7 +351,7 @@ implements SessionBean
 				pm.getFetchPlan().setGroups(fetchGroups);
 
 			// Check if this is a managed product type
-			ProductTypeLocal.checkProductTypeManaged(pm, (ProductTypeID) JDOHelper.getObjectId(productType), true);
+			ProductTypeLocal.assertProductTypeNotManaged(pm, (ProductTypeID) JDOHelper.getObjectId(productType));
 
 			boolean priceCalculationNeeded = false;
 			if (NLJDOHelper.exists(pm, productType)) {

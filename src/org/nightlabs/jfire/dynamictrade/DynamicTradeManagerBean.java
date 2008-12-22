@@ -300,7 +300,7 @@ implements SessionBean
 //			}
 
 			// Check if this is a managed product type
-			ProductTypeLocal.checkProductTypeManaged(pm, (ProductTypeID) JDOHelper.getObjectId(dynamicProductType), true);
+			ProductTypeLocal.assertProductTypeNotManaged(pm, (ProductTypeID) JDOHelper.getObjectId(dynamicProductType));
 
 			// we don't need any price calculation as we have dynamic prices only - no cached values
 

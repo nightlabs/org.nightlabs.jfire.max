@@ -33,6 +33,7 @@ import java.util.Map;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
+import javax.jdo.listener.AttachCallback;
 import javax.jdo.listener.StoreCallback;
 
 import org.nightlabs.jdo.ObjectIDUtil;
@@ -73,7 +74,7 @@ import org.nightlabs.util.Util;
  *
  * @jdo.fetch-group name="FetchGroupsPriceConfig.edit" fields="currencies, name, priceFragmentTypes"
  */
-public abstract class PriceConfig implements Serializable, StoreCallback, IPriceConfig
+public abstract class PriceConfig implements Serializable, StoreCallback, AttachCallback, IPriceConfig
 {
 	private static final long serialVersionUID = 1L;
 	public static final String FETCH_GROUP_CURRENCIES = "PriceConfig.currencies";
@@ -446,6 +447,14 @@ public abstract class PriceConfig implements Serializable, StoreCallback, IPrice
 			this.dependentOnOffer = isDependentOnOffer();
 			this.requiresProductTypePackageInternal = requiresProductTypePackageInternal();
 		}
+	}
+	
+	@Override
+	public void jdoPreAttach() {
+	}
+	
+	@Override
+	public void jdoPostAttach(Object detached) {
 	}
 
 	@Override

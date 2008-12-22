@@ -40,7 +40,6 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
 import org.apache.log4j.Logger;
-import org.nightlabs.annotation.Implement;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.Tariff;
 import org.nightlabs.jfire.accounting.priceconfig.IPackagePriceConfig;
@@ -165,13 +164,11 @@ implements IPackagePriceConfig, IResultPriceConfig
 	}
 
 	@Override
-	@Implement
 	public boolean requiresProductTypePackageInternal()
 	{
 		return false;
 	}
 
-	@Implement
 	@Override
 	public Collection<PriceCell> getPriceCells()
 	{
@@ -182,7 +179,6 @@ implements IPackagePriceConfig, IResultPriceConfig
 	 * in all <tt>PriceCell</tt> s which is equivalent to setting
 	 * them to <tt>CALCULATIONSTATUS_DIRTY</tt>.
 	 */
-	@Implement
 	@Override
 	public void resetPriceFragmentCalculationStatus()
 	{
@@ -248,7 +244,6 @@ implements IPackagePriceConfig, IResultPriceConfig
 		return getPriceCell(priceCoordinate, throwExceptionIfNotExistent);
 	}
 
-	@Implement
 	@Override
 	public PriceCell getPriceCell(IPriceCoordinate priceCoordinate, boolean throwExceptionIfNotExistent)
 	{

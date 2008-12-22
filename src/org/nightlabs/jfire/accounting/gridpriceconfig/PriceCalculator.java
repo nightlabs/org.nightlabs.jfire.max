@@ -52,8 +52,6 @@ import org.nightlabs.jfire.accounting.id.PriceFragmentTypeID;
 import org.nightlabs.jfire.accounting.id.TariffID;
 import org.nightlabs.jfire.accounting.priceconfig.IInnerPriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.IPriceConfig;
-import org.nightlabs.jfire.accounting.priceconfig.PriceConfig;
-import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.store.NestedProductTypeLocal;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.id.ProductTypeID;
@@ -96,6 +94,10 @@ public class PriceCalculator
 	}
 
 	PersistenceManager pm; // TODO JPOX WORKAROUND only needed for some workarounds! Will be removed again, soon.
+	
+	public IResultPriceConfig getPackagePriceConfig() {
+		return packagePriceConfig;
+	}
 
 	/**
 	 * @param packageProductType The <tt>ProductType</tt> which encloses all the other <tt>ProductType</tt>s and
@@ -133,8 +135,8 @@ public class PriceCalculator
 
 		this.packagePriceConfig = (IResultPriceConfig) packagePriceConfig;
 		if (this.packagePriceConfig == null) {
-			this.packagePriceConfig = createResultPriceConfig(); // we use a dummy price config, if the packageProductType does not have one.
 			IInnerPriceConfig innerPC = packageProductType.getInnerPriceConfig();
+			this.packagePriceConfig = createResultPriceConfig(innerPC); // we use a dummy price config, if the packageProductType does not have one.
 			if (innerPC == null)
 				throw new IllegalArgumentException("packageProductType does neither have a packagePriceConfig nor an innerPriceConfig! " + packageProductType.getPrimaryKey());
 			this.packagePriceConfig.adoptParameters(innerPC);
@@ -185,11 +187,9 @@ public class PriceCalculator
 //		}
 //	}
 	
-	protected IResultPriceConfig createResultPriceConfig()
+	protected IResultPriceConfig createResultPriceConfig(IPriceConfig innerPriceConfig)
 	{
-		return new StablePriceConfig(
-				IDGenerator.getOrganisationID(),
-				PriceConfig.createPriceConfigID());
+		return new TransientStablePriceConfig(innerPriceConfig);
 	}
 
 	/**
@@ -228,7 +228,7 @@ public class PriceCalculator
 						resultPriceConfig.resetPriceFragmentCalculationStatus();
 					}
 					else {
-						resultPriceConfig = createResultPriceConfig();
+						resultPriceConfig = createResultPriceConfig(priceConfig);
 
 						// force the new price config to be written to the DB - otherwise we run into a foreign key violation
 						// see http://www.jpox.org/servlet/forum/viewthread?thread=4871&offset=0#27443 error (2)

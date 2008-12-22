@@ -27,6 +27,7 @@ import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.simpletrade.SimpleTradeManager;
 import org.nightlabs.jfire.simpletrade.SimpleTradeManagerUtil;
 import org.nightlabs.jfire.simpletrade.store.SimpleProductType;
+import org.nightlabs.jfire.store.ProductTypeLocal;
 import org.nightlabs.jfire.store.Store;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.store.id.ProductTypePermissionFlagSetID;
@@ -138,6 +139,10 @@ extends NotificationReceiver
 
 							if (simpleProductType.getName() == null)
 								throw new IllegalStateException("simpleProductType.getName() == null after replication!");
+
+							// tag the product type as managed by jfire
+							simpleProductType.getProductTypeLocal().setManagedBy(ProductTypeLocal.MANAGED_BY_JFIRE_PREFIX + ": " + emitterOrganisationID);
+
 						} catch (Exception x) {
 							logger.error("Adding SimpleProductType \"" + simpleProductType.getPrimaryKey() + "\" to Store failed!", x);
 							throw x instanceof RuntimeException ? (RuntimeException)x : new RuntimeException(x);

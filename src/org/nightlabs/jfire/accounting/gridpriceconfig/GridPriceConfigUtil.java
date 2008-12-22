@@ -53,6 +53,7 @@ import org.nightlabs.jfire.accounting.priceconfig.AffectedProductType;
 import org.nightlabs.jfire.accounting.priceconfig.FetchGroupsPriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.IInnerPriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.IPriceConfig;
+import org.nightlabs.jfire.accounting.priceconfig.PriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.PriceConfigUtil;
 import org.nightlabs.jfire.accounting.priceconfig.id.PriceConfigID;
 import org.nightlabs.jfire.organisation.LocalOrganisation;
@@ -218,6 +219,11 @@ public class GridPriceConfigUtil
 		// prevent writing a partner-PriceConfig
 		String localOrganisationID = LocalOrganisation.getLocalOrganisation(pm).getOrganisationID();
 
+		// prevent storing managed PriceConfigs
+		for (T priceConfig : _priceConfigs) {
+			PriceConfig.assertPriceConfigNotManaged(pm, (PriceConfigID) JDOHelper.getObjectId(priceConfig));
+		}
+		
 		// store all price configs and put the living objects into priceConfigs
 		Set<T> priceConfigs = new HashSet<T>();
 		List<AffectedProductType> affectedProductTypes = null;

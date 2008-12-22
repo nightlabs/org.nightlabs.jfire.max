@@ -201,4 +201,27 @@ public interface IPriceConfig
 			LinkedList<NestedProductTypeLocal> nestedProductTypeStack,
 			Product nestedProduct,
 			LinkedList<Product> productStack);
+	
+	/**
+	 * This property is <code>null</code> for all {@link PriceConfig}s that were not created by 
+	 * an automated import from another system or similar automated processes.
+	 * <p>
+	 * A non-<code>null</code> value indicates that the {@link PriceConfig} is managed by some automated system 
+	 * and should not be changed by the users of the organisation.
+	 * </p>
+	 *
+	 * @return The managed-by tag of this {@link PriceConfig}, might be <code>null</code>.
+	 */
+	String getManagedBy();
+
+	/**
+	 * Sets the managed-by flag for this {@link PriceConfig} (see {@link #getManagedBy()}).
+	 * <p>
+	 * Note, that this property can only be set on attached instances of {@link PriceConfig},
+	 * attempts of setting this to detached instances will result in an {@link IllegalStateException}.
+	 * </p>
+	 * @param managedBy The managed-by flag to set.
+	 */
+	void setManagedBy(String managedBy);
+	
 }

@@ -41,6 +41,7 @@ import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.Price;
 import org.nightlabs.jfire.accounting.PriceFragmentType;
 import org.nightlabs.jfire.accounting.id.CurrencyID;
+import org.nightlabs.jfire.accounting.priceconfig.id.PriceConfigID;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.ArticlePrice;
@@ -110,6 +111,11 @@ public abstract class PriceConfig implements Serializable, StoreCallback, Attach
 	 * @jdo.field persistence-modifier="persistent" dependent="true" mapped-by="priceConfig"
 	 */
 	private PriceConfigName name;
+	
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private String managedBy;
 
 //	protected PriceConfig extendedPriceConfig = null;
 
@@ -133,6 +139,7 @@ public abstract class PriceConfig implements Serializable, StoreCallback, Attach
 		this.priceConfigID = priceConfigID;
 		this.primaryKey = getPrimaryKey(organisationID, priceConfigID);
 		this.name = new PriceConfigName(this);
+		this.managedBy = null;
 	}
 
 	/**
@@ -469,6 +476,49 @@ public abstract class PriceConfig implements Serializable, StoreCallback, Attach
 		return (31 * Util.hashCode(this.organisationID)) + Util.hashCode(this.priceConfigID);
 	}
 
+	@Override
+	public String getManagedBy() {
+		return managedBy;
+	}
+
+	@Override
+	public void setManagedBy(String managedBy) {
+		if (JDOHelper.isDetached(this))
+			throw new IllegalStateException("setManagedBy can only be set for attached instances of " + this.getClass().getSimpleName());
+		this.managedBy = managedBy;
+	}
+	
+	/**
+	 * Checks if the given {@link PriceConfig} is tagged with a non-<code>null</code> managed-by property. 
+	 * This method will throw an {@link ManagedPriceConfigModficationException}
+	 * if the given {@link PriceConfig} is found to be tagged with a manged-by flag.
+	 * 
+	 * @param pm The {@link PersistenceManager} to use.
+	 * @param priceConfigID The id of the {@link PriceConfig} to check, this might also be <code>null</code> (the result of JDOHelper.getObjectId() of a new object).
+	 */
+	public static void assertPriceConfigNotManaged(PersistenceManager pm, PriceConfigID priceConfigID) {
+		PriceConfig priceConfig = (PriceConfig) pm.getObjectById(priceConfigID);
+		if (priceConfig.getManagedBy() != null)
+			throw new ManagedPriceConfigModficationException(priceConfigID, priceConfig.getManagedBy());
+	}
+
+	/**
+	 * Checks if the {@link PriceConfig} is tagged with a non-<code>null</code> managed-by property.
+	 * <p>
+	 * If the {@link PriceConfig} can't be found in the datastore <code>false</code> will be returned.
+	 * This might occur if the given {@link PriceConfigID} is of a {@link PriceConfig} not yet in the given datastore,
+	 * or <code>null</code>.
+	 * </p>
+	 * 
+	 * @param pm The {@link PersistenceManager} to use.
+	 * @param priceConfigID The id of the {@link PriceConfig} to check, this might also be <code>null</code> (the result of JDOHelper.getObjectId() of a new object).
+	 * @return <code>true</code> if the given {@link PriceConfig} is found to be tagged with the managed-by flag, <code>false</code> otherwise.
+	 */
+	public static boolean isPriceConfigManaged(PersistenceManager pm, PriceConfigID priceConfigID) {
+		PriceConfig priceConfig = (PriceConfig) pm.getObjectById(priceConfigID);
+		return priceConfig.getManagedBy() != null;
+	}	
+	
 	@Override
 	public boolean equals(Object obj)
 	{

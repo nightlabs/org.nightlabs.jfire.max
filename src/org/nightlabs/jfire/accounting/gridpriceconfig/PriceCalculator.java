@@ -44,6 +44,7 @@ import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 import org.mozilla.javascript.Undefined;
 import org.nightlabs.ModuleException;
+import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.accounting.PriceFragmentType;
 import org.nightlabs.jfire.accounting.Tariff;
 import org.nightlabs.jfire.accounting.TariffMapper;
@@ -52,6 +53,8 @@ import org.nightlabs.jfire.accounting.id.PriceFragmentTypeID;
 import org.nightlabs.jfire.accounting.id.TariffID;
 import org.nightlabs.jfire.accounting.priceconfig.IInnerPriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.IPriceConfig;
+import org.nightlabs.jfire.accounting.priceconfig.PriceConfig;
+import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.store.NestedProductTypeLocal;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.id.ProductTypeID;
@@ -189,8 +192,11 @@ public class PriceCalculator
 	
 	protected IResultPriceConfig createResultPriceConfig(IPriceConfig innerPriceConfig)
 	{
-		return new TransientStablePriceConfig(innerPriceConfig);
+		return new StablePriceConfig(
+				IDGenerator.getOrganisationID(),
+				PriceConfig.createPriceConfigID());
 	}
+	
 
 	/**
 	 * This method creates an instance of IResultPriceConfig
@@ -232,7 +238,7 @@ public class PriceCalculator
 
 						// force the new price config to be written to the DB - otherwise we run into a foreign key violation
 						// see http://www.jpox.org/servlet/forum/viewthread?thread=4871&offset=0#27443 error (2)
-						if (pm != null)
+						if (pm != null && NLJDOHelper.isPersistenceCapable(resultPriceConfig))
 							resultPriceConfig = pm.makePersistent(resultPriceConfig);
 
 						fpc.setPackagingResultPriceConfig(

@@ -81,6 +81,17 @@ extends FormulaPriceConfig
 	{
 		inputPriceFragmentTypes.remove(priceFragmentType);
 	}
+	
+	/**
+	 * {@inheritDoc}
+	 * <p>
+	 * {@link DynamicTradePriceConfig} overrides this method and exposes it publicly.
+	 * </p>
+	 */
+	@Override
+	public void clearPackagingResultPriceConfigs() {
+		super.clearPackagingResultPriceConfigs();
+	}
 
 //	@Override
 //	public void addProductType(ProductType productType)
@@ -88,6 +99,12 @@ extends FormulaPriceConfig
 //		throw new UnsupportedOperationException("DynamicTradePriceConfig does not support nesting of other ProductTypes!");
 //	}
 
+	@Override
+	public void jdoPreAttach() {
+		super.jdoPreAttach();
+		clearPackagingResultPriceConfigs(); // we never store the results, because prices are dynamic
+	}
+	
 	@Override
 	public void jdoPreStore()
 	{

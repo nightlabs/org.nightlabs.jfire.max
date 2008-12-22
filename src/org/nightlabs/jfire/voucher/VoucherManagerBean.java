@@ -65,6 +65,7 @@ import org.nightlabs.jfire.store.DeliveryNote;
 import org.nightlabs.jfire.store.NestedProductTypeLocal;
 import org.nightlabs.jfire.store.Product;
 import org.nightlabs.jfire.store.ProductType;
+import org.nightlabs.jfire.store.ProductTypeLocal;
 import org.nightlabs.jfire.store.RoleConstants;
 import org.nightlabs.jfire.store.Store;
 import org.nightlabs.jfire.store.deliver.Delivery;
@@ -457,6 +458,9 @@ implements SessionBean
 				pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
 			else
 				pm.getFetchPlan().setGroups(fetchGroups);
+
+			// Check if this is a managed product type
+			ProductTypeLocal.checkProductTypeManaged(pm, (ProductTypeID) JDOHelper.getObjectId(voucherType), true);
 
 			try {
 				if (voucherType.getProductTypeLocal() != null) {

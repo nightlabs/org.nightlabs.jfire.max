@@ -460,7 +460,7 @@ implements SessionBean
 				pm.getFetchPlan().setGroups(fetchGroups);
 
 			// Check if this is a managed product type
-			ProductTypeLocal.checkProductTypeManaged(pm, (ProductTypeID) JDOHelper.getObjectId(voucherType), true);
+			ProductTypeLocal.assertProductTypeNotManaged(pm, (ProductTypeID) JDOHelper.getObjectId(voucherType));
 
 			try {
 				if (voucherType.getProductTypeLocal() != null) {

@@ -75,7 +75,7 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="ReportRegistryItem.name" fetch-groups="default" fields="name"
  * @jdo.fetch-group name="ReportRegistryItem.description" fetch-groups="default" fields="description"
  * @jdo.fetch-group name="ReportRegistryItem.this" fetch-groups="default" fields="parentCategory, name"
- *
+ * @jdo.fetch-group name="ReportRegistryItem.fieldMetaDataMap" fetch-groups="default" fields="fieldMetaDataMap"
  *
  * @jdo.query
  *		name="getReportRegistryItemByType"
@@ -136,6 +136,7 @@ implements Serializable, DetachCallback, SecuredObject, Inheritable, Inheritance
 	public static final String FETCH_GROUP_PARENT_CATEGORY_ID = "ReportRegistryItem.parentCategoryID";
 	public static final String FETCH_GROUP_NAME = "ReportRegistryItem.name";
 	public static final String FETCH_GROUP_DESCRIPTION = "ReportRegistryItem.description";
+	public static final String FETCH_GROUP_FIELD_META_DATA = "ReportRegistryItem.fieldMetaDataMap";
 	/**
 	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon!
 	 */

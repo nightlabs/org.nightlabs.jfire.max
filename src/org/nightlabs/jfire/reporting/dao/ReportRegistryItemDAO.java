@@ -32,10 +32,12 @@ import java.util.Collection;
 import java.util.Set;
 
 import javax.ejb.CreateException;
+import javax.jdo.JDOHelper;
 import javax.naming.NamingException;
 
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
+import org.nightlabs.jfire.base.jdo.cache.Cache;
 import org.nightlabs.jfire.reporting.ReportManager;
 import org.nightlabs.jfire.reporting.ReportManagerUtil;
 import org.nightlabs.jfire.reporting.layout.ReportCategory;
@@ -48,7 +50,7 @@ import org.nightlabs.progress.ProgressMonitor;
 /**
  * DAO object for {@link ReportRegistryItem}s,
  * i.e. {@link ReportCategory}s and {@link ReportLayout}s.
- * 
+ *
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
  */
 public class ReportRegistryItemDAO
@@ -56,7 +58,7 @@ extends BaseJDOObjectDAO<ReportRegistryItemID, ReportRegistryItem>
 {
 
 	/**
-	 * 
+	 *
 	 */
 	public ReportRegistryItemDAO() {
 	}
@@ -75,7 +77,7 @@ extends BaseJDOObjectDAO<ReportRegistryItemID, ReportRegistryItem>
 
 	/**
 	 * Get the {@link ReportRegistryItem} for the given reportRegistryItemID
-	 * 
+	 *
 	 * @param reportRegistryItemID The id of the {@link ReportRegistryItem} to fetch.
 	 * @param fetchGroups The fetch-groups to detach the item with.
 	 * @param monitor The monitor to provide progress.
@@ -84,13 +86,13 @@ extends BaseJDOObjectDAO<ReportRegistryItemID, ReportRegistryItem>
 	public ReportRegistryItem getReportRegistryItem(ReportRegistryItemID reportRegistryItemID, String[] fetchGroups, ProgressMonitor monitor) {
 		return getJDOObject(null, reportRegistryItemID, fetchGroups, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT, monitor);
 	}
-	
+
 	public Collection<ReportRegistryItem> getReportRegistryItems(Set<ReportRegistryItemID> itemIDs, String[] fetchGroups, ProgressMonitor monitor) {
 		return getJDOObjects(null, itemIDs, fetchGroups, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT, monitor);
 	}
-	
+
 	private static ReportRegistryItemDAO sharedInstance;
-	
+
 	/**
 	 * Returns the static/shared instance of the {@link ReportRegistryItemDAO}
 	 * @return The static/shared instance of the {@link ReportRegistryItemDAO}
@@ -111,14 +113,14 @@ extends BaseJDOObjectDAO<ReportRegistryItemID, ReportRegistryItem>
 	 * If get is true, the newly stored item will be returned. It will
 	 * be a copy, detached with the given fetchGroups.
 	 * </p>
-	 * 
+	 *
 	 * @param reportRegistryItem The item to save.
 	 * @param get Whether this method should return a detached copy of the newly saved item.
 	 * @param fetchGroups If get is <code>true</code> this defines the fetchgroups the returned item will be detached with.
 	 * @param maxFetchDepth If get is <code>true</code> this defines the maxFetchDepth set to the fetchplan when the returned item is detached.
 	 * @param monitor The monitor this method can report progress to.
 	 * @return A detached copy of the newly stored item, or <code>nul</code> when get is <code>false</code>.
-	 * 
+	 *
 	 * @throws RemoteException
 	 * @throws CreateException
 	 * @throws NamingException
@@ -128,6 +130,12 @@ extends BaseJDOObjectDAO<ReportRegistryItemID, ReportRegistryItem>
 	throws RemoteException, CreateException, NamingException
 	{
 		ReportManager rm = ReportManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
-		return rm.storeRegistryItem(reportRegistryItem, get, fetchGroups, maxFetchDepth);
+		if (get) {
+			Cache.sharedInstance().removeByObjectID(JDOHelper.getObjectId(reportRegistryItem), false);
+			ReportRegistryItem item = rm.storeRegistryItem(reportRegistryItem, get, fetchGroups, maxFetchDepth);
+			Cache.sharedInstance().put(null, item, fetchGroups, maxFetchDepth);
+			return item;
+		} else
+			return rm.storeRegistryItem(reportRegistryItem, get, fetchGroups, maxFetchDepth);
 	}
 }

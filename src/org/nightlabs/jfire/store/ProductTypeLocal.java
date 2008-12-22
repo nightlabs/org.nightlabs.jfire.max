@@ -698,39 +698,63 @@ implements Serializable, Inheritable, InheritanceCallbacks, SecuredObject
 
 	/**
 	 * Checks if the {@link ProductTypeLocal} corresponding to the given {@link ProductTypeID} is tagged with a
-	 * non-<code>null</code> managed-by property.
+	 * non-<code>null</code> managed-by property and returns the property if found.
 	 * <p>
-	 * If the corresponding {@link ProductTypeLocal} can't be found in the datastore <code>false</code> will be returned.
+	 * If the corresponding {@link ProductTypeLocal} can't be found in the datastore <code>null</code> will be returned.
 	 * This might occur if the given ProductTypeID is of a {@link ProductType} not yet in the given datastore,
 	 * or <code>null</code>.
-	 * </p>
-	 * <p>
-	 * If <code>throwExceptionIfManaged</code> is <code>true</code>, this method will throw an {@link ManagedProductTypeModficationException}
-	 * if it finds the tag to be set.
 	 * </p>
 	 *
 	 * @param pm The {@link PersistenceManager} to use.
 	 * @param productTypeID The id of the {@link ProductType} to check, this might also be <code>null</code> (the result of JDOHelper.getObjectId() of a new object).
-	 * @param throwExceptionIfManaged Pass <code>true</code> to throw an exception rather then returning <code>true</code>.
-	 * @return <code>true</code> if this method finds the manged-by tag of the corresponding {@link ProductTypeLocal} to be non-<code>null</code>,
-	 * 		<code>false</code> otherwise (if no execption is thrown).
+	 * @return The manged-by flag if this method finds the one for the corresponding {@link ProductTypeLocal} to be non-<code>null</code>,
+	 * 		<code>null</code> otherwise.
 	 */
-	public static boolean checkProductTypeManaged(PersistenceManager pm, ProductTypeID productTypeID, boolean throwExceptionIfManaged) {
+	private static String getProductTypeManagedBy(PersistenceManager pm, ProductTypeID productTypeID) {
 		if (productTypeID == null)
-			return false;
+			return null;
 		ProductTypeLocalID productTypeLocalID = ProductTypeLocalID.create(productTypeID.organisationID, productTypeID.productTypeID);
 		ProductTypeLocal productTypeLocal = null;
 		try {
 			productTypeLocal = (ProductTypeLocal) pm.getObjectById(productTypeLocalID);
 		} catch (JDOObjectNotFoundException e) {
 			// If we can not find the ProductTypeLocal, it might not have been persisted yet
-			return false;
+			return null;
 		}
-		boolean managed = productTypeLocal.getManagedBy() != null;
-		if (managed && throwExceptionIfManaged)
-			throw new ManagedProductTypeModficationException(productTypeID, productTypeLocal.getManagedBy());
-		return managed;
+		return productTypeLocal.getManagedBy();
 	}
+	
+	/**
+	 * Checks if the {@link ProductTypeLocal} corresponding to the given {@link ProductTypeID} is tagged with a
+	 * non-<code>null</code> managed-by property. This method will throw an {@link ManagedProductTypeModficationException}
+	 * if the given {@link ProductTypeLocal} is found to be tagged with a manged-by flag.
+	 * 
+	 * @param pm The {@link PersistenceManager} to use.
+	 * @param productTypeID The id of the {@link ProductType} to check, this might also be <code>null</code> (the result of JDOHelper.getObjectId() of a new object).
+	 */
+	public static void assertProductTypeNotManaged(PersistenceManager pm, ProductTypeID productTypeID) {
+		String managed = getProductTypeManagedBy(pm, productTypeID);
+		if (managed != null)
+			throw new ManagedProductTypeModficationException(productTypeID, managed);
+	}
+
+	/**
+	 * Checks if the {@link ProductTypeLocal} corresponding to the given {@link ProductTypeID} is tagged with a
+	 * non-<code>null</code> managed-by property.
+	 * <p>
+	 * If the corresponding {@link ProductTypeLocal} can't be found in the datastore <code>false</code> will be returned.
+	 * This might occur if the given ProductTypeID is of a {@link ProductType} not yet in the given datastore,
+	 * or <code>null</code>.
+	 * </p>
+	 * 
+	 * @param pm The {@link PersistenceManager} to use.
+	 * @param productTypeID The id of the {@link ProductType} to check, this might also be <code>null</code> (the result of JDOHelper.getObjectId() of a new object).
+	 * @return <code>true</code> if the given {@link ProductType} is found to be tagged with the managed-by flag, <code>false</code> otherwise.
+	 */
+	public static boolean isProductTypeManaged(PersistenceManager pm, ProductTypeID productTypeID) {
+		return getProductTypeManagedBy(pm, productTypeID) != null;
+	}
+	
 
 	@Override
 	public int hashCode()

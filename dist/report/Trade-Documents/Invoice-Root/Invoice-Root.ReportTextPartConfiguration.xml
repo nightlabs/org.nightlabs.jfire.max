@@ -9,6 +9,13 @@ thank you for your purchase, see below a list of your purchased items:
 <br/>
 ]]>
 		</content>
+		<content language="de"><![CDATA[
+Sehr geehrte(r) <?=row["Salutation"]?> <?=row["Name"]?>   		
+<br/><br/>
+vielen Dank für Ihren Einkauf. Im Folgenden finden sie die Liste Ihrer gekaufen Artikel:
+<br/>
+]]>
+		</content>
 	</reportTextPart>
 	<reportTextPart id="finish" type="jshtml">
 		<name language="en">Finish text</name>

@@ -34,6 +34,10 @@
                nativeDataTypeCode="5"
                odaScalarDataType="Date"/>
          <dataTypeMapping
+               nativeDataType="Blob"
+               nativeDataTypeCode="9"
+               odaScalarDataType="Blob"/>
+         <dataTypeMapping
                nativeDataType="Time"
                nativeDataTypeCode="92"
                odaScalarDataType="Time"/>

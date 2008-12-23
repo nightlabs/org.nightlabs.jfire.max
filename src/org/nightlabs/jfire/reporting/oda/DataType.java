@@ -33,6 +33,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.datatools.connectivity.oda.IBlob;
+
 /**
  * Public declarations concerning BIRT datatypes.
  * 
@@ -50,7 +52,7 @@ public class DataType {
 	public static final int BIGDECIMAL = 6;
 	public static final int TIME = 92;
 	public static final int TIMESTAMP = 93;
-	public static final int BLOB = 0;
+	public static final int BLOB = 9;
 	public static final int CLOB = 10;
 	public static final int JAVA_OBJECT = 2000;
 	public static final int UNKNOWN = 0;
@@ -101,6 +103,7 @@ public class DataType {
 		classes2Types.put(Date.class, DATE);
 		classes2Types.put(Long.class, BIGDECIMAL);
 		classes2Types.put(Serializable.class, BLOB);
+		classes2Types.put(byte[].class, BLOB);
 		classes2Types.put(Serializable.class, CLOB);
 		classes2Types.put(Boolean.class, BOOLEAN);
 //		classes2Types.put(java.sql..class, CLOB);
@@ -130,16 +133,13 @@ public class DataType {
 		indexDataTypeToSQLType(java.sql.Types.VARCHAR, STRING);
 		indexDataTypeToSQLType(java.sql.Types.LONGVARCHAR, STRING);
 		indexDataTypeToSQLType(java.sql.Types.DATE, DATE);
-//		indexDataTypeToSQLType(java.sql.Types.LONGVARCHAR, STRING); // FIXME why is this LONGVARCHAR here multiple times? See 2 lines above!
 		indexDataTypeToSQLType(java.sql.Types.TIME, TIME);
 		indexDataTypeToSQLType(java.sql.Types.TIMESTAMP, TIMESTAMP);
 		indexDataTypeToSQLType(java.sql.Types.BINARY, BLOB);
 		indexDataTypeToSQLType(java.sql.Types.VARBINARY, BLOB);
 		indexDataTypeToSQLType(java.sql.Types.LONGVARBINARY, BLOB);
-//		indexDataTypeToSQLType(java.sql.Types.LONGVARCHAR, UNKNOWN); // FIXME why is this LONGVARCHAR here multiple times? Is it ok to comment it out?
 		indexDataTypeToSQLType(java.sql.Types.OTHER, UNKNOWN);
 		indexDataTypeToSQLType(java.sql.Types.JAVA_OBJECT, JAVA_OBJECT);
-//		indexDataTypeToSQLType(java.sql.Types.LONGVARCHAR, UNKNOWN); // FIXME again a LONGVARCHAR
 		indexDataTypeToSQLType(java.sql.Types.ARRAY, UNKNOWN);
 		indexDataTypeToSQLType(java.sql.Types.BLOB, BLOB);
 		indexDataTypeToSQLType(java.sql.Types.CLOB, CLOB);
@@ -215,6 +215,15 @@ public class DataType {
 		if (result == null)
 			return Types.NULL; // TODO: Find better solution for UNKNOWN sql type
 		return result;
+	}
+	
+	public static IBlob getIBlob(Object o) {
+		if (o == null)
+			return null;
+		if (o instanceof byte[]) {
+			return new ByteArrayBlob((byte[]) o);
+		}
+		throw new IllegalArgumentException("The object of class " + o.getClass().getName() + " could not be converted to an IBlob.");
 	}
 	
 	

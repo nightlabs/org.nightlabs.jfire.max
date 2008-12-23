@@ -133,7 +133,7 @@ extends AbstractJFSScriptExecutorDelegate
 						metaData.addColumn(getColumnName(structField), DataType.STRING);
 					}
 					else if (ImageDataField.class.isAssignableFrom(structField.getDataFieldClass())) {
-						metaData.addColumn(getColumnName(structField), DataType.STRING);
+						metaData.addColumn(getColumnName(structField), DataType.BLOB);
 					}
 				}
 			}
@@ -232,8 +232,8 @@ extends AbstractJFSScriptExecutorDelegate
 						elements.add("");
 					}
 				} else if (ImageDataField.class.isAssignableFrom(structField.getDataFieldClass())) {
-					if (field != null) {
-						elements.add(JDOHelper.getObjectId(field).toString());
+					if (field != null && !field.isEmpty()) {
+						elements.add(((ImageDataField)field).getPlainContent());
 					} else {
 						elements.add(null);
 					}

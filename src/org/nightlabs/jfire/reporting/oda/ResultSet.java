@@ -274,7 +274,8 @@ public abstract class ResultSet implements IResultSet, Serializable {
 	 * @see org.eclipse.datatools.connectivity.oda.IResultSet#getBlob(int)
 	 */
 	public IBlob getBlob(int index) throws OdaException {
-		throw new UnsupportedOperationException("NYI");
+		Object o = getColObject(index);
+		return DataType.getIBlob(o);
 	}
 
 	/* (non-Javadoc)

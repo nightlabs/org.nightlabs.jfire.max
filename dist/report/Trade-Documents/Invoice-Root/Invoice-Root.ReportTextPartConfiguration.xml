@@ -4,7 +4,7 @@
 		<name language="en">Salutation text</name>
 		<content language="en"><![CDATA[
 Dear <?=row["Salutation"]?> <?=row["Name"]?>   		
-<br/><br/> 
+<br/><br/>
 thank you for your purchase, see below a list of your purchased items:
 <br/>
 ]]>

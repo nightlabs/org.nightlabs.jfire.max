@@ -130,6 +130,10 @@ implements Serializable, Inheritable, InheritanceCallbacks, SecuredObject
 		// Imho this is not neccessary any more, Alex.
 		// Marco agrees, commented the field name entry
 //		public static final String securingAuthority = "securingAuthority";
+
+		public static final String securingAuthorityTypeID = "securingAuthorityTypeID";
+		public static final String securingAuthorityID = "securingAuthorityID";
+
 		public static final String selfForVirtualSelfPackaging = "selfForVirtualSelfPackaging";
 		public static final String tmpInherit_innerPriceConfigID = "tmpInherit_innerPriceConfigID";
 		public static final String tmpInherit_nestedProductTypes = "tmpInherit_nestedProductTypes";

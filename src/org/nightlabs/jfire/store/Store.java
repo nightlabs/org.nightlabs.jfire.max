@@ -555,6 +555,8 @@ implements StoreCallback
 			AuthorityTypeID authorityTypeID = (AuthorityTypeID) JDOHelper.getObjectId(authorityType);
 			productType.getProductTypeLocal().setSecuringAuthorityTypeID(authorityTypeID);
 		}
+		else
+			productType.getProductTypeLocal().setSecuringAuthorityTypeID(productType.getExtendedProductType().getProductTypeLocal().getSecuringAuthorityTypeID());
 
 		if (organisationID.equals(productType.getOrganisationID()) && productType.getInheritanceNature() == ProductType.INHERITANCE_NATURE_LEAF) {
 			ProductTypeID productTypeID = (ProductTypeID) JDOHelper.getObjectId(productType);

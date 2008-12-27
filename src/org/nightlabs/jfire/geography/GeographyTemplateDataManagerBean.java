@@ -566,72 +566,75 @@ implements SessionBean
 
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			pm.getFetchPlan().setMaxFetchDepth(1);
-			pm.getFetchPlan().setGroup(FetchPlan.ALL);
-
-			Geography geography = Geography.sharedInstance();
-
-			String rootOrganisationID;
-
+			NLJDOHelper.enableTransactionSerializeReadObjects(pm);
 			try {
-				InitialContext initialContext = new InitialContext();
+				pm.getFetchPlan().setMaxFetchDepth(1);
+				pm.getFetchPlan().setGroup(FetchPlan.ALL);
+
+				Geography geography = Geography.sharedInstance();
+				geography.clearCache(); // ensure that the data we're going to manipulate in this transaction are really up-to-date.
+
+				String rootOrganisationID;
+
 				try {
-					rootOrganisationID = Organisation.getRootOrganisationID(initialContext);
-				}//try
-				finally {
-					initialContext.close();
-				}//finally
-			}//try
-			catch (NamingException x) {
-				throw new RuntimeException(x); // it's definitely an unexpected exception if we can't access the local JNDI.
-			}//catch
+					InitialContext initialContext = new InitialContext();
+					try {
+						rootOrganisationID = Organisation.getRootOrganisationID(initialContext);
+					} finally {
+						initialContext.close();
+					}
+				} catch (NamingException x) {
+					throw new RuntimeException(x); // it's definitely an unexpected exception if we can't access the local JNDI.
+				}
 
-			LocationID locationID = LocationID.create(storedLocation.getCountryID(), rootOrganisationID, storedLocation.getLocationID());
-			CountryID countryID = CountryID.create(storedLocation.getCountryID());
+				LocationID locationID = LocationID.create(storedLocation.getCountryID(), rootOrganisationID, storedLocation.getLocationID());
+				CountryID countryID = CountryID.create(storedLocation.getCountryID());
 
-			ByteArrayOutputStream out = new ByteArrayOutputStream();
-			Writer w = new OutputStreamWriter(new DeflaterOutputStream(out), IOUtil.CHARSET_UTF_8);
-			try {
-				w.write(LOCATION_CSV_HEADER);
-				for (Region r : geography.getRegions(countryID, true)) {
-					for (City c : geography.getCities(RegionID.create(r), true)) {
-						for (Location existLocation : geography.getLocations(CityID.create(c), true)){
-							if (LocationID.create(existLocation.getCountryID(), rootOrganisationID, existLocation.getLocationID()).equals(locationID)) {
-								existLocation = storedLocation;
-								storedLocation = null; locationID = null;
-							}//if
+				ByteArrayOutputStream out = new ByteArrayOutputStream();
+				Writer w = new OutputStreamWriter(new DeflaterOutputStream(out), IOUtil.CHARSET_UTF_8);
+				try {
+					w.write(LOCATION_CSV_HEADER);
+					for (Region r : geography.getRegions(countryID, true)) {
+						for (City c : geography.getCities(RegionID.create(r), true)) {
+							for (Location existLocation : geography.getLocations(CityID.create(c), true)){
+								if (LocationID.create(existLocation.getCountryID(), rootOrganisationID, existLocation.getLocationID()).equals(locationID)) {
+									existLocation = storedLocation;
+									storedLocation = null; locationID = null;
+								}//if
 
-							String csvLines = GeographyImplResourceCSV.location2csvLines(existLocation);
+								String csvLines = GeographyImplResourceCSV.location2csvLines(existLocation);
 
-							if (logger.isDebugEnabled())
-								logger.debug(csvLines);
+								if (logger.isDebugEnabled())
+									logger.debug(csvLines);
 
-							w.write(csvLines);
+								w.write(csvLines);
+							}//for
 						}//for
 					}//for
-				}//for
 
-				if (storedLocation != null) {
-					String csvLines = GeographyImplResourceCSV.location2csvLines(storedLocation);
+					if (storedLocation != null) {
+						String csvLines = GeographyImplResourceCSV.location2csvLines(storedLocation);
 
-					if (logger.isDebugEnabled())
-						logger.debug(csvLines);
+						if (logger.isDebugEnabled())
+							logger.debug(csvLines);
 
-					csvLines.trim();
-					w.write(csvLines);
-				}//if
-			}//try
-			finally {
-				w.close();
-			}//finally
+						csvLines.trim();
+						w.write(csvLines);
+					}//if
+				} finally {
+					w.close();
+				}
 
-			CSV.setCSVData(pm, rootOrganisationID, CSV.CSV_TYPE_LOCATION, countryID.countryID, out.toByteArray());
+				CSV.setCSVData(pm, rootOrganisationID, CSV.CSV_TYPE_LOCATION, countryID.countryID, out.toByteArray());
 
-			clearCache();
-		}//try
-		finally {
+				clearCache();
+
+			} finally {
+				NLJDOHelper.disableTransactionSerializeReadObjects(pm);
+			}
+		} finally {
 			pm.close();
-		}//finally
+		}
 	}
 
 	/**

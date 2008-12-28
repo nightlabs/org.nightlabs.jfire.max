@@ -1,8 +1,592 @@
 CountryID;LocationID;CityID;DistrictID;LanguageID;LocationName
-DE;Freiburg.Konzerthaus;16633;;de;Konzerthaus
-DE;Freiburg.NeueMesse;16633;;de;Neue Messe
-DE;Freiburg.Jazzhaus;16633;;de;Jazzhaus
-DE;Freiburg.Paulussaal;16633;;de;Paulussaal
-DE;Singen.Kunsthalle;24302;;de;Kunsthalle
+DE;187;15827;;de;Kulturreise nach Dresden
+DE;288;20259;;de;Stadttheater
+DE;34;20259;;de;Inselhalle
+DE;285;20259;;de;Stiftskirche
+DE;622;20259;;de;Lindau Inselhalle
+DE;623;20259;;de;Lindau Münster
+DE;179;20259;;de;Strandbad Eichwald
+DE;287;20259;;de;Club Vaudeville
+DE;286;20259;;de;Tanner Denkfabrik
+DE;172;20271;;de;Stadtpfarrkirche
+DE;177;21179;;de;Matthäuskirche
+DE;175;25171;;de;ChiemseeReggae
+DE;178;17668;;de;Legoland
+DE;176;21580;;de;Edwin-Scharff-Haus
+DE;182;14368;;de;Festivalgelände
+DE;181;16957;;de;Festivalgelände
+DE;183;20818;;de;Stadthalle Memmingen
+DE;180;21895;;de;Rockclub Goin
+DE;174;22542;;de;Seminarhotel Gut Sedlbrunn
+DE;185;15365;;de;St. Jakob
+DE;616;19199;;de;Parktheater
+DE;618;19199;;de;kultBOX ALLGÄU
+DE;617;19199;;de;Konzerthaus
+DE;173;19199;;de;Eisstadion
+DE;619;19199;;de;Big Box
+DE;620;19199;;de;Burghalde
+DE;621;19199;;de;Residenzplatz
+DE;171;19157;;de;Zeppelinhalle
+DE;184;13810;;de;Heilig-Kreuz-Kirche
+DE;615;17838;;de;Konzertexpress
+DE;170;17838;;de;Color Line Arena
+DE;614;17838;;de;Spiegelzelt
+DE;85;26178;;de;Open Air Platz
+DE;16;25776;;de;Stadthalle
+DE;350;19600;;de;Zeltfestival
+DE;351;19600;;de;Dreispitz Kulturzentrum
+DE;352;19600;;de;Kulturzentrum am Münster
+DE;335;19600;;de;Sporthalle Wollmatingen
+DE;353;19600;;de;Thomas-Blarer-Haus
+DE;334;19600;;de;Oberer Konzilsaal
+DE;337;19600;;de;Schänzle Halle
+DE;336;19600;;de;Festplatz klein Venedig
+DE;339;19600;;de;K9 Kulturzentrum
+DE;338;19600;;de;Klein Venedig
+DE;358;19600;;de;Konzil
+DE;359;19600;;de;Die Blechnerei
+DE;354;19600;;de;Audimax
+DE;355;19600;;de;Stadttheater
+DE;356;19600;;de;Tabaluga-Halle
+DE;357;19600;;de;Bodensee-Arena
+DE;346;19600;;de;Erlebniszelt
+DE;343;19600;;de;St.Stephanskirche
+DE;349;19600;;de;Mainau
+DE;56;19600;;de;Bodenseestadion
+DE;348;19600;;de;k9
+DE;347;19600;;de;Lutherkirche
+DE;342;19600;;de;Bürgersaal
+DE;341;19600;;de;Stadtgarten
+DE;340;19600;;de;Bodensee Fähre/Schiff
+DE;123;26379;;de;Festzelt-Dorotheenhütte
+DE;155;18060;;de;Brenzpark - Festwiese
+DE;516;18060;;de;Michaelskirche
+DE;515;18060;;de;Pauluskirche
+DE;129;22232;;de;Scharnhauser Park
+DE;21;23982;;de;FreigeländeJunkerGetränke
+DE;363;19861;;de;Schlachthof
+DE;364;19861;;de;Universal D.O.G.
+DE;66;19861;;de;Lahr Stadthalle
+DE;67;19863;;de;St. Albanskirche
+DE;41;23995;;de;Schießtalplatz
+DE;23;25086;;de;Kurhaus
+DE;49;18220;;de;Burgruine
+DE;289;20876;;de;Schloßvorplatz
+DE;290;20876;;de;Stadthalle
+DE;35;20876;;de;Schloss Innenhof
+DE;126;14513;;de;Rathaus-Innenhof
+DE;28;26330;;de;Barockkirche Mariä Himmelfahrt
+DE;97;23944;;de;Barbara-Künkelin-Halle
+DE;24;16730;;de;Sternenberghalle
+DE;73;21977;;de;Klosterkirche
+DE;378;21977;;de;Steinwasenpark
+DE;64;23938;;de;Stadthalle
+DE;165;23544;;de;Klosterkirche
+DE;120;22437;;de;Waldstadion
+DE;447;22437;;de;Stadthalle
+DE;113;22432;;de;CongressCentrum
+DE;444;22432;;de;Tripsdrill - Erlebnispark
+DE;216;14353;;de;Oktoberfesthalle Berkheim
+DE;121;23568;;de;Festzelt
+DE;78;26565;;de;Golfplatz
+DE;13;17151;;de;Stadthalle Grosser Saal
+DE;449;20422;;de;Forum Theatersaal
+DE;125;20422;;de;Schlosshof
+DE;115;21087;;de;Festzelt beim Strandbad
+DE;36;23528;;de;Domplatz
+DE;291;23528;;de;Theater am Martinstor
+DE;92;24485;;de;Aula des Faustgymnasiums
+DE;40;23330;;de;Reithalle
+DE;497;16713;;de;Messegelände
+DE;488;16713;;de;Club Metropol
+DE;489;16713;;de;Messehalle A 6
+DE;486;16713;;de;Messe Friedrichshafen
+DE;487;16713;;de;Adenauerplatz
+DE;484;16713;;de;Messehalle 9
+DE;490;16713;;de;Messehalle10
+DE;485;16713;;de;Messe Halle A1
+DE;482;16713;;de;Hugo-Eckener-Saal
+DE;491;16713;;de;Milchwerk
+DE;492;16713;;de;Arena
+DE;483;16713;;de;Messe Halle A2
+DE;493;16713;;de;Messehalle A2
+DE;480;16713;;de;Graf -Zeppelin-Haus
+DE;481;16713;;de;Bahnhof Fischbach
+DE;494;16713;;de;Zeppelin Museum
+DE;495;16713;;de;Halbhuber
+DE;496;16713;;de;Messehalle 10
+DE;139;16713;;de;Messehalle A1
+DE;161;13634;;de;Schlosskirche St. Michael
+DE;127;15078;;de;Sommerberghalle
+DE;386;18294;;de;Hettinger Hallen
+DE;77;18294;;de;Lauchertalhalle Hettingen
+DE;146;24134;;de;Ev.St. Nikolauskirche zu Seelbach
+DE;39;21902;;de;Kilwi-Festzelt
+DE;57;24902;;de;Neues Schloß Tettnang
+DE;327;24771;;de;Meierhof in Laufen
+DE;48;24771;;de;St. Cyriak
+DE;69;16132;;de;Ellwangen Marktplatz
+DE;372;16132;;de;Festival Gelände
+DE;11;13371;;de;Achernsee
+DE;420;13979;;de;Kursaal
+DE;421;13979;;de;Hochrheinstadion
+DE;422;13979;;de;Gloria-Theater
+DE;101;13979;;de;Freilichttheater
+DE;418;13979;;de;Fridolinsmünster
+DE;417;13979;;de;Schloßpark
+DE;419;13979;;de;Trompeter-Schloss
+DE;37;13366;;de;Ausaal
+DE;292;13366;;de;Kochertal Metropole
+DE;50;13350;;de;Turniergelände CSI Aach
+DE;328;13353;;de;ev. Stadtkirche zu Aalen
+DE;329;13353;;de;Stadthalle
+DE;51;13353;;de;Waldstadion
+DE;17;21392;;de;Stadthaus
+DE;5;16166;;de;Haus des Gastes
+DE;166;13944;;de;Vita Classica
+DE;532;13944;;de;Kurhaus
+DE;122;21949;;de;Jettergelände
+DE;448;21949;;de;Oberndorf
+DE;505;21936;;de;Gaststätte Kreuz
+DE;503;21936;;de;Obermarchtal
+DE;504;21936;;de;Gemeindehalle
+DE;145;21936;;de;Festhalle
+DE;130;16183;;de;Steinhalle
+DE;450;16183;;de;Wehrle-Werk
+DE;452;16183;;de;Konzerthaus
+DE;451;16183;;de;Marktplatz
+DE;454;16183;;de;St. Bonifatius
+DE;453;16183;;de;Fritz-Böhle-Halle
+DE;455;16183;;de;Schlossplatz
+DE;20;23484;;de;Schloss Salem
+DE;256;23484;;en;Schloßplatz Salem
+DE;163;21921;;de;Wald
+DE;531;21921;;de;Renchtalstadion
+DE;530;21921;;de;Weinfestzelt
+DE;430;24718;;de;Liederhalle Beethoven Saal
+DE;436;24718;;de;Theaterhaus
+DE;435;24718;;de;Flughafen
+DE;437;24718;;de;Hanns-Martin-Schleyerhalle
+DE;432;24718;;de;Cannstatter Wasen
+DE;431;24718;;de;Brasserie le Jardin
+DE;434;24718;;de;Congresscentrum
+DE;433;24718;;de;Apollo Theater
+DE;104;24718;;de;Herbstballsaal
+DE;428;24718;;de;SI-Centrum
+DE;424;24718;;de;Messe Congresscentrum B
+DE;425;24718;;de;Porsche Arena
+DE;429;24718;;de;CCB Sporthalle
+DE;426;24718;;de;Liederhalle
+DE;427;24718;;de;Freilichtbühne Killesberg
+DE;15;25209;;de;Betriebshof
+DE;248;25209;;en;Pauluskirche
+DE;239;25209;;en;Donaustadion
+DE;249;25209;;en;Münsterplatz
+DE;246;25209;;en;Congress Centrum Ulm
+DE;247;25209;;en;Citykirche R2
+DE;244;25209;;en;Kornhaus
+DE;245;25209;;en;Blautalcenter
+DE;242;25209;;en;Klosterkirche Oberelchingen
+DE;240;25209;;en;Haus der Begegnung
+DE;250;25209;;en;Roxy
+DE;241;25209;;en;CCU Einsteinsaal
+DE;251;25209;;en;Donaubastion
+DE;252;25209;;en;Donauhalle
+DE;253;25209;;en;Klostermauer
+DE;389;13985;;de;Stadtforum
+DE;387;13985;;de;Marktplatz
+DE;388;13985;;de;Festsaal Wolfartsweiler - Bad Saulgau
+DE;79;13985;;de;Stadthalle
+DE;156;21152;;de;Festzelt Mühlhausen
+DE;393;13989;;de;Schussenrieder Bierkrugstadel
+DE;392;13989;;de;Festzelt Bad Schussenried
+DE;391;13989;;de;Wallfahrtskirche Steinhausen
+DE;390;13989;;de;Galazelt
+DE;82;13989;;de;Bühne Schussenrieder Theaterzelt
+DE;394;13989;;de;OpenAir
+DE;46;14612;;de;4-Mast-Zelt Festivalgelände
+DE;162;22184;;de;Obstmarkthalle
+DE;221;25673;;en;Waldorfschule
+DE;220;25673;;en;Argensporthalle
+DE;222;25673;;en;Stadthalle Wangen
+DE;215;25673;;de;Diehl Ako Areal
+DE;439;22813;;de;Murgpark
+DE;105;22813;;de;Murgpark an der Badner Halle
+DE;438;22813;;de;Badner Halle
+DE;607;18877;;de;Kurhaus am Park
+DE;609;18877;;de;Marktplatz
+DE;608;18877;;de;Baggersee
+DE;168;18877;;de;Nikolaikirche
+DE;610;18877;;de;Kath. Pfarrkirche St. Georg
+DE;611;18877;;de;Freilichtbühne Schoß Isny-Neutrauchburg
+DE;612;18877;;de;Große Konzerthalle / Kurhaus Isny
+DE;279;25811;;de;Lure
+DE;278;25811;;de;Kulturcafé Kessler's
+DE;277;25811;;de;Dreiländergarten
+DE;281;25811;;de;kulturcafé
+DE;280;25811;;de;Evang. Kirche Altweil
+DE;29;25811;;de;Vitra Design Museum
+DE;283;25811;;de;Kesselhaus
+DE;282;25811;;de;Theater am Mühlenrain
+DE;362;20823;;de;Ablachhalle
+DE;63;20823;;de;Festplatz bei der Sporthalle
+DE;38;18654;;de;Alte Scheune im Gasthaus zum Raben
+DE;293;18654;;de;Barockkirche St. Agatha
+DE;33;18854;;de;Wasserschloss
+DE;31;19908;;de;Kath. Pfarrkirche St. Martin
+DE;65;25439;;de;Heinz-Ritter Halle
+DE;8;18863;;de;Eichfelsen-Halle
+DE;117;20015;;de;Stadthalle
+DE;445;20015;;de;Schlössle
+DE;381;25839;;de;Welfensaal
+DE;382;25839;;de;Kulturzentrum Linse
+DE;380;25839;;de;Kultur- und Kongresszentrum
+DE;383;25839;;de;Kornhaus
+DE;74;25839;;de;KKZ
+DE;379;25839;;de;Ermlandhof
+DE;118;15268;;de;Aula
+DE;446;15268;;de;Marktplatz
+DE;60;18416;;de;Rennstrecke
+DE;10;25010;;de;Wehratalhalle
+DE;234;25010;;en;Wallfahrtskirche
+DE;54;13909;;de;Kurhaus
+DE;509;20600;;de;Spiegelzelt
+DE;507;20600;;de;Citykirche
+DE;508;20600;;de;Capitol
+DE;506;20600;;de;Maimarktgelände
+DE;148;20600;;de;SAP ARENA
+DE;411;20022;;de;Schlosspark
+DE;94;20022;;de;Open Air Gelände
+DE;412;20022;;de;FV- Olympia
+DE;413;20022;;de;Kulturhaus Schloss Großlaupheim
+DE;71;13902;;de;Baden - Airpark
+DE;373;13902;;de;Museum Frieder Burda
+DE;374;13902;;de;Hans-Rosbaud Studio
+DE;375;13902;;de;Kurhaus
+DE;376;13902;;de;Festspielhaus
+DE;377;13902;;de;Benazefsaal
+DE;27;22166;;de;Günter-Bimmerle-Halle
+DE;230;25409;;en;Festzelt Kreisfeuerwehrtag
+DE;7;25409;;de;Klosterhof
+DE;231;25409;;en;Münsterplatz
+DE;232;25409;;en;Benediktinerkirche
+DE;229;25409;;en;Neue Tonhalle
+DE;228;25409;;en;Theater am Ring
+DE;227;25409;;en;Franzsikaner-Konzerthaus V - S
+DE;226;25409;;en;Festplatz am Stadion
+DE;25;22852;;de;Theater Ravensburg
+DE;268;22852;;de;Wetzisreute/Schlier_Festhalle
+DE;269;22852;;de;Pfarrkirche St. Jodok Ravensburg
+DE;266;22852;;de;Oberschwabenhalle
+DE;267;22852;;de;Schwörsaal
+DE;258;22852;;en;Spieleland
+DE;259;22852;;en;Festsaal Kloster Weißenau
+DE;272;22852;;de;Konzerthaus
+DE;260;22852;;en;Kultur- und Kongreßzentrum Weingarten
+DE;271;22852;;de;Hof Einhalden
+DE;270;22852;;de;Klosterkirche Weißenau
+DE;264;22852;;de;Eissporthalle
+DE;265;22852;;de;Zehntscheuer
+DE;274;22852;;de;Kornhaussaaal
+DE;262;22852;;de;Leibinger Halle
+DE;263;22852;;de;Ev. Stadtkirche
+DE;273;22852;;de;Festhalle Wetzisreute/Schlier
+DE;524;14449;;de;Theaterkneipe Applaus
+DE;159;14449;;de;Stadtteilhaus Gaisental
+DE;523;14449;;de;Komödienhaus
+DE;526;14449;;de;Wielandpark
+DE;525;14449;;de;Marktplatz
+DE;520;14449;;de;Gasthaus Rössle
+DE;3;14449;;de;Stadthalle
+DE;522;14449;;de;Kleiner Saal_Stadthalle Biberach
+DE;521;14449;;de;Stadtpfarrkirche St. Martin
+DE;529;14449;;de;Stadthalle Biberach
+DE;527;14449;;de;Gigelberghalle
+DE;528;14449;;de;Stadion Biberach
+DE;517;14449;;de;Pestalozzihaus
+DE;518;14449;;de;Festzelt Biberach-Bergershausen
+DE;519;14449;;de;Jazz-Keller 
+DE;61;23658;;de;Festzelt Schemmerhofen
+DE;142;14436;;de;Klosterkirche
+DE;45;22113;;de;Foyer Oberrheinhalle
+DE;315;22113;;de;Neue Oberrheinhalle
+DE;314;22113;;de;Freie Waldorfschule
+DE;317;22113;;de;Marktplatz
+DE;316;22113;;de;Reithalle
+DE;311;22113;;de;Grosser Saal Oberrheinhalle
+DE;310;22113;;de;Freigelände - Messe Offenburg-Ortenau
+DE;313;22113;;de;Bustransfer Racing Straßburg
+DE;312;22113;;de;Innenstadt
+DE;307;22113;;de;Park der Messe Offenburg
+DE;308;22113;;de;Kid & Play
+DE;309;22113;;de;Ev. Stadtkirche zu Offenburg
 DE;Offenburg.Oberrheinhalle;22113;;de;Oberrheinhalle
+DE;321;22113;;de;Platz der Verfassungsfreunde
+DE;320;22113;;de;Medien Lounge
+DE;299;22113;;de;EnergieSparCheck
+DE;298;22113;;de;Alte Reithalle
+DE;300;22113;;de;Menue Oenologique
+DE;301;22113;;de;Neue Messehalle
+DE;302;22113;;de;Alter Steinbruch
+DE;303;22113;;de;Baden-Arena
+DE;304;22113;;de;Ortenauhalle
+DE;305;22113;;de;Multiplex-Kino
+DE;318;22113;;de;Waldorfschule
+DE;306;22113;;de;Latin Cup
+DE;319;22113;;de;Messeplatz
+DE;237;18793;;en;Evangelische Kirche
+DE;238;18793;;en;Rathaus
+DE;12;18793;;de;Kaiserstuhlhalle
+DE;235;18793;;en;Neunlindenschule
+DE;236;18793;;en;Winzergenossenschaft
+DE;361;18369;;de;Evangelische Kirche
+DE;59;18369;;de;Katholische Kirche
+DE;360;18369;;de;Kurhaus
+DE;132;17946;;de;Stadthalle
+DE;32;22912;;de;Münster St. Maria und Markus
+DE;284;22912;;de;Jachthafen
+DE;14;22918;;de;H2O
+DE;370;23061;;de;Salmegg_Alte Rheinbrücke
+DE;371;23061;;de;Hans-Thoma-Halle
+DE;68;23061;;de;Bürgersaal im Rathaus
+DE;80;16674;;de;Theater im Kurhaus
+DE;6;20759;;de;Schaubühne
+DE;225;20759;;en;Schlossplatz
+DE;224;20759;;en;Schlosskirche
+DE;223;20759;;en;Klosterkeller
+DE;62;16682;;de;Graf-Burchard-Halle
+DE;53;17704;;de;Vogtsbauernhof
+DE;164;18191;;de;St. Oswald
+DE;214;16460;;de;am Fuße des Feldberggipfels
+DE;385;20178;;de;Wilhelmshöhe
+DE;384;20178;;de;Festhalle
+DE;75;20178;;de;Bocksaal
+DE;255;13785;;en;Festzelt Attenweiler
+DE;19;13785;;de;Festhalle Attenweiler
+DE;102;13505;;de;Kloster Hegne
+DE;Freiburg.Konzerthaus;16633;;de;Konzerthaus
+DE;540;16633;;de;Vorderhaus
+DE;600;16633;;de;Fritz-Hüttinger-Haus
+DE;542;16633;;de;Universitätskirche
+DE;601;16633;;de;Eissporthalle Freiburg
+DE;541;16633;;de;Evang. Ludwigskirche
+DE;167;16633;;de;Augustinerplatz
+DE;602;16633;;de;Alter Friedhof
+DE;544;16633;;de;Münsterplatz
+DE;603;16633;;de;Alemannische Bühne
+DE;543;16633;;de;Mobile
+DE;546;16633;;de;Münster
+DE;545;16633;;de;Mensa Bar
+DE;548;16633;;de;St. Peter und Paul
+DE;547;16633;;de;Domsingschule
+DE;538;16633;;de;Schauenberg-Halle
+DE;587;16633;;de;Hotel Kolpinghaus
+DE;539;16633;;de;Zirkuszelt
+DE;588;16633;;de;Freie Waldorfschule St. Georgen
+DE;585;16633;;de;Herz Jesu Kirche
+DE;586;16633;;de;Aula der Universität
+DE;589;16633;;de;Kaisersaal
+DE;Freiburg.Paulussaal;16633;;de;Paulussaal
+DE;580;16633;;de;ZMF - Zirkuszelt
+DE;583;16633;;de;Albert-Ludwig-Universität
+DE;584;16633;;de;Tunisee
+DE;581;16633;;de;St. Ursula Gymnasium
+DE;582;16633;;de;Innenhof Augustinermuseum
+DE;533;16633;;de;Halbhalb
+DE;537;16633;;de;SWR Foyer
+DE;536;16633;;de;Christengemeinde Lehen
+DE;535;16633;;de;ZMF - Spiegelzelt
+DE;534;16633;;de;Historisches Kaufhaus
+DE;574;16633;;de;Jos Fritz Café
+DE;575;16633;;de;May-Bellinghausen-Halle
+DE;576;16633;;de;Ethiopia
+DE;577;16633;;de;Kloster Lioba
+DE;578;16633;;de;Freiburger Münster 2008
+DE;579;16633;;de;Christuskirche
+DE;570;16633;;de;Waldsee
+DE;571;16633;;de;Schloss Ebnet
+DE;572;16633;;de;Kath. Akademie
+DE;573;16633;;de;Jazz- und Rockschule
+DE;1;16633;;de;Theater im Marienbad
+DE;2;16633;;de;Bürgerhaus Zähringen
+DE;569;16633;;de;St. Petrus Canisius Landwasser
+DE;Freiburg.Jazzhaus;16633;;de;Jazzhaus
+DE;567;16633;;de;EXIT
+DE;568;16633;;de;Alter Güterbahnhof - Freiburg Nord
+DE;565;16633;;de;Deko-Funduz
+DE;Freiburg.NeueMesse;16633;;de;Neue Messe
+DE;566;16633;;de;E-Werk
+DE;563;16633;;de;Thermalbad
+DE;564;16633;;de;Spiegelzelt
+DE;561;16633;;de;Rothaus Arena
+DE;562;16633;;de;White Rabbit
+DE;560;16633;;de;Bürgerhaus am Seepark
+DE;549;16633;;de;St.Ursula Kirche
+DE;593;16633;;de;Stadttheater
+DE;556;16633;;de;Freie Waldorfschule Wiehre
+DE;557;16633;;de;SWR-Studio
+DE;592;16633;;de;Aula des Faustgymnasiums
+DE;606;16633;;de;Mensa / Rempartstrasse
+DE;605;16633;;de;Studio im E-Werk
+DE;595;16633;;de;Ludwigskirche
+DE;558;16633;;de;Klub Kamikaze
+DE;559;16633;;de;Pfarrkirche Maria Hilf
+DE;594;16633;;de;Festhalle St. Georgen
+DE;604;16633;;de;Kath. Krche St. Johann
+DE;552;16633;;de;SWR Funkhaus
+DE;553;16633;;de;Wodanhalle
+DE;591;16633;;de;Campus Open Air
+DE;554;16633;;de;Haus der Jugend
+DE;555;16633;;de;Wentzingerhaus
+DE;590;16633;;de;FR_neue Messe
+DE;550;16633;;de;Weinschlösschen
+DE;551;16633;;de;Hans-Rosbaud Studio
+DE;597;16633;;de;Musikhochschule
+DE;596;16633;;de;Morat-Institut
+DE;599;16633;;de;Brauerei Ganter Freiburg
+DE;598;16633;;de;Martinskirche
+DE;52;13712;;de;Stadthalle
+DE;330;13712;;de;Schwarzwaldhalle
+DE;152;24556;;de;Wallfahrtskirche
+DE;147;17249;;de;Sportplatz Katzental
+DE;88;24585;;de;Kulturzelt Steisslingen
+DE;154;20339;;de;Festzelt
+DE;479;20347;;de;Schöpflin Areal
+DE;475;20347;;de;Gasthaus Zum Wilden Mann
+DE;463;20347;;de;Ev. Stadtkirche
+DE;476;20347;;de;Kirche St. Fridolin
+DE;462;20347;;de;Jazz auf der Burg
+DE;477;20347;;de;Burg Rötteln
+DE;461;20347;;de;Park im Gruett
+DE;478;20347;;de;Nellie Nashorn bestuhlt/unnummeriert
+DE;467;20347;;de;Altes Wasserwerk
+DE;471;20347;;de;Kirche St. Bonifatius
+DE;472;20347;;de;St. Peter Kirche
+DE;466;20347;;de;Stadtkirche
+DE;473;20347;;de;Marktplatz
+DE;465;20347;;de;Tagungsraum 3 u.4
+DE;474;20347;;de;Nellie Nashorn 1000
+DE;464;20347;;de;T3 / T4
+DE;4;20347;;de;Burghof
+DE;469;20347;;de;St. Ottilien Kirche - Tüllingen
+DE;470;20347;;de;Rosenfelspark
+DE;468;20347;;de;Stimmband
+DE;133;20347;;de;Garten Tüllinger Höhe
+DE;114;15519;;de;Kultur- & Bürgerhaus
+DE;150;13523;;de;Golfclub
+DE;26;23438;;de;Silver Star Dome
+DE;276;23438;;de;Varietétheater
+DE;275;23438;;de;Europa-Park
+DE;95;16215;;de;Festzelt
+DE;100;16629;;de;Kurhaus
+DE;157;21461;;de;Flugplatz
+DE;103;14666;;de;CCB Europasaal
+DE;423;14666;;de;CCB Sporthalle Böblingen
+DE;83;16202;;de;Stadthalle
+DE;107;23054;;de;Friedrich-Stephan Stadion
+DE;84;16005;;de;Stadthalle
+DE;396;16005;;de;Längenfeldhalle
+DE;395;16005;;de;Lindenhalle
+DE;110;23046;;de;Listhalle
+DE;442;23046;;de;Christuskirche
+DE;93;24302;;de;Liebfrauenkirche
+DE;402;24302;;de;Herz-Jesu Kirche
+DE;403;24302;;de;Hohentwielstadion
+DE;404;24302;;de;Theaterzelt beim Kulturzentrum GEMS
+DE;405;24302;;de;Discothek Top Ten
+DE;410;24302;;de;Stadthalle
+DE;409;24302;;de;Scheffelhalle
+DE;408;24302;;de;LGS Singen
+DE;407;24302;;de;Kunstmuseum & Rathaus
+DE;406;24302;;de;Hohentwiel Singen
+DE;Singen.Kunsthalle;24302;;de;Kunsthalle
+DE;44;17984;;de;Stadthalle
+DE;96;24300;;de;Stadthalle
+DE;333;21171;;de;Markgräflerplatz
+DE;332;21171;;de;Evangelische Stadtkirche
+DE;55;21171;;de;Bürgerhaus Müllheim
+DE;331;21171;;de;Martinskirche
+DE;257;15743;;en;Glashaus
+DE;22;15743;;de;Donauhalle
+DE;91;13476;;de;Neue Festhalle Ebingen
+DE;137;16818;;de;Festzelt Gammertingen
+DE;153;14057;;de;Messegelände
+DE;514;14057;;de;Stadthalle
+DE;513;14057;;de;Volksbank - Messe
+DE;512;14057;;de;Messe Balingen
+DE;511;14057;;de;Marktplatz
+DE;138;24883;;de;Randenhalle
+DE;140;24884;;de;Ludwig-Jahn-Halle
+DE;144;16040;;de;Turn und Sporthalle
+DE;502;16040;;de;Festhalle
+DE;136;14063;;de;Castellberghalle
+DE;111;16016;;de;Kirchberghalle
+DE;441;24616;;de;Festzelt am Dillplatz
+DE;440;24616;;de;Jahn-Halle
+DE;109;24616;;de;Pallottiheim
+DE;112;14034;;de;Winzergenossenschaft
+DE;443;14034;;de;Silberberghalle
+DE;90;14045;;de;Schwarzwaldhalle
 DE;Karlsruhe.Schauburg;19107;;de;Schauburg
+DE;131;19107;;de;dm-arena
+DE;460;19107;;de;Europahalle
+DE;456;19107;;de;Lutherkirche
+DE;458;19107;;de;Konzerthaus
+DE;457;19107;;de;NCO-Club
+DE;459;19107;;de;Schwarzwaldhalle
+DE;86;14041;;de;Gemeindehalle
+DE;128;24628;;de;Festplatz
+DE;76;14017;;de;Kurhaus
+DE;499;23372;;de;Alte Stallhalle
+DE;143;23372;;de;Kraftwerk
+DE;233;19320;;en;Kath. Pfarrkirche St. Gallus
+DE;9;19320;;de;Engenwaldwiese
+DE;116;13866;;de;Kurhaus
+DE;58;21202;;de;St. Trudpert
+DE;30;14742;;de;Möhlinhalle
+DE;498;13895;;de;Festplatz beim Sportpark
+DE;141;13895;;de;Festzelt Bad Dürrheim
+DE;397;25119;;de;Rathausplatz Trossingen
+DE;87;25119;;de;Dr. Ernst Hohner Konzerthaus
+DE;398;25119;;de;Konzerthaus_Trossingen
+DE;158;13885;;de;Kurzentrum
+DE;18;14008;;de;Freilichtbühne
+DE;254;14008;;en;Kurhaus
+DE;43;24277;;de;Areal Stadthalle
+DE;297;24277;;de;Stadthalle
+DE;326;25131;;de;Festsaal Uni
+DE;325;25131;;de;Montagehalle Firma Majer
+DE;324;25131;;de;Mensa Wilhelmstrasse
+DE;323;25131;;de;Festplatz
+DE;322;25131;;de;Sudhaus
+DE;47;25131;;de;Kino Museum
+DE;72;22073;;de;Wallfahrtskirche Schienen
+DE;149;15118;;de;Bürgerhaus Neuer Marktplatz
+DE;415;19168;;de;Messegelände Läger
+DE;416;19168;;de;Stadthalle
+DE;414;19168;;de;KT-Halle
+DE;98;19168;;de;Freibad Kehl
+DE;70;25531;;de;Bürgerzentrum
+DE;119;14900;;de;Tango-Schiff
+DE;81;18736;;de;Bürgersaal in der Limeshalle
+DE;135;17343;;de;Hochrheinhalle
+DE;42;25148;;de;Alte Festhalle
+DE;296;25148;;de;Angerhalle
+DE;295;25148;;de;Neue Stadthalle
+DE;294;25148;;de;Ruine Honberg
+DE;106;24821;;de;Stadthalle
+DE;99;16490;;de;Filharmonie
+DE;134;25170;;de;Kursaal am See
+DE;151;22048;;de;Neue Reithalle
+DE;510;22048;;de;Bräuhaussaal
+DE;160;18779;;de;Rennplatz Iffezheim/Baden-Baden
+DE;108;25581;;de;Stadthalle
+DE;124;25596;;de;Stadthalle
+DE;400;22750;;de;St. Nikolauskirche
+DE;401;22750;;de;Radolfzell Milchwerk unnum.
+DE;89;22750;;de;Milchwerk
+DE;399;22750;;de;Festzelt Messeplatz
+DE;186;14356;;de;Kesselhaus
+DE;169;17873;;de;AWD Arena, Arthur-Menge Ufer
+DE;613;17873;;de;Spiegelzelt
+DE;624;14356;;de;Waldbühne

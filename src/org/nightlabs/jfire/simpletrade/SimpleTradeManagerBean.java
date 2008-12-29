@@ -29,6 +29,7 @@ package org.nightlabs.jfire.simpletrade;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -74,6 +75,8 @@ import org.nightlabs.jfire.accounting.priceconfig.AffectedProductType;
 import org.nightlabs.jfire.accounting.priceconfig.FetchGroupsPriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.PriceConfigUtil;
 import org.nightlabs.jfire.accounting.priceconfig.id.PriceConfigID;
+import org.nightlabs.jfire.accounting.tariffuserset.AuthorizedObjectRef;
+import org.nightlabs.jfire.accounting.tariffuserset.TariffUserSet;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.base.JFireBaseEAR;
 import org.nightlabs.jfire.base.JFireException;
@@ -88,6 +91,7 @@ import org.nightlabs.jfire.prop.id.StructFieldID;
 import org.nightlabs.jfire.security.Authority;
 import org.nightlabs.jfire.security.ResolveSecuringAuthorityStrategy;
 import org.nightlabs.jfire.security.User;
+import org.nightlabs.jfire.security.id.UserLocalID;
 import org.nightlabs.jfire.simpletrade.notification.SimpleProductTypeNotificationFilter;
 import org.nightlabs.jfire.simpletrade.notification.SimpleProductTypeNotificationReceiver;
 import org.nightlabs.jfire.simpletrade.store.SimpleProductType;
@@ -1038,29 +1042,56 @@ implements SessionBean
 	 * @ejb.permission role-name="org.nightlabs.jfire.trade.sellProductType, org.nightlabs.jfire.accounting.queryPriceConfigurations"
 	 */
 	public Collection<TariffPricePair> getTariffPricePairs(
-			PriceConfigID priceConfigID, CustomerGroupID customerGroupID, CurrencyID currencyID,
+			ProductTypeID productTypeID, CustomerGroupID customerGroupID, CurrencyID currencyID,
 			String[] tariffFetchGroups, String[] priceFetchGroups
 	)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			// TODO use setResult and put all this logic into the JDO query!
-			StablePriceConfig priceConfig = (StablePriceConfig) pm.getObjectById(priceConfigID);
+//			StablePriceConfig priceConfig = (StablePriceConfig) pm.getObjectById(priceConfigID);
+
+			ProductType productType = (ProductType) pm.getObjectById(productTypeID);
+			StablePriceConfig priceConfig = (StablePriceConfig) productType.getPackagePriceConfig();
+			if (priceConfig == null)
+				return Collections.emptyList();
+
+			String organisationID = getOrganisationID();
+
+			TariffUserSet tariffUserSet = productType.getTariffUserSet();
+			AuthorizedObjectRef authorizedObjectRef = null;
+			if (tariffUserSet != null) {
+				authorizedObjectRef = tariffUserSet.getAuthorizedObjectRef(UserLocalID.create(organisationID, getUserID(), organisationID));
+				if (authorizedObjectRef == null)
+					authorizedObjectRef = tariffUserSet.getAuthorizedObjectRef(UserLocalID.create(organisationID, User.USER_ID_OTHER, organisationID));
+			}
+
 			Collection<PriceCell> priceCells = priceConfig.getPriceCells(
 					CustomerGroup.getPrimaryKey(customerGroupID.organisationID, customerGroupID.customerGroupID),
 					currencyID.currencyID);
 
 			Collection<TariffPricePair> res = new ArrayList<TariffPricePair>();
 
-			for (Iterator<PriceCell> it = priceCells.iterator(); it.hasNext(); ) {
+			iteratePriceCells: for (Iterator<PriceCell> it = priceCells.iterator(); it.hasNext(); ) {
 				PriceCell priceCell = it.next();
 				String tariffPK = priceCell.getPriceCoordinate().getTariffPK();
 				TariffID tariffID = TariffID.create(tariffPK);
 
 				if (tariffFetchGroups != null)
-					pm.getFetchPlan().setGroups(tariffFetchGroups);
+					pm.getFetchPlan().setGroups(tariffFetchGroups); // set it already before pm.getObjectById(...) to allow for JDO's optimization
 
 				Tariff tariff = (Tariff) pm.getObjectById(tariffID);
+
+				if (tariffUserSet != null) {
+					if (authorizedObjectRef == null)
+						continue iteratePriceCells;
+
+					if (authorizedObjectRef.getTariffRef(tariff) == null)
+						continue iteratePriceCells;
+				}
+
+				if (tariffFetchGroups != null)
+					pm.getFetchPlan().setGroups(tariffFetchGroups); // set it again, in case the fetch-plan was modified in the mean-time
+
 				tariff = pm.detachCopy(tariff);
 
 				if (priceFetchGroups != null)

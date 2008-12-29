@@ -2380,6 +2380,10 @@ public class Trader
 
 	public void assignCustomer(Order order, LegalEntity customer)
 	{
+		// if it's already the correct customer, there's no need to change anything.
+		if (order.getCustomer().equals(customer))
+			return;
+
 		// check if the vendor is the local organisation - otherwise the customer MUST NOT be changed
 		if (!getMandator().equals(order.getVendor()))
 			throw new UnsupportedOperationException("The customer must not be changed, if the vendor is not the local organisation! Cannot perform the requested operation for: " + order);

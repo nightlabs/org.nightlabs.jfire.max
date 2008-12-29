@@ -51,8 +51,6 @@ import javax.jdo.Query;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.log4j.Logger;
-import org.jbpm.JbpmContext;
-import org.jbpm.graph.exe.ProcessInstance;
 import org.nightlabs.ModuleException;
 import org.nightlabs.i18n.I18nText;
 import org.nightlabs.jdo.NLJDOHelper;
@@ -73,7 +71,6 @@ import org.nightlabs.jfire.accounting.gridpriceconfig.GridPriceConfigUtil;
 import org.nightlabs.jfire.accounting.id.AccountTypeID;
 import org.nightlabs.jfire.accounting.id.CurrencyID;
 import org.nightlabs.jfire.accounting.id.InvoiceID;
-import org.nightlabs.jfire.accounting.id.InvoiceLocalID;
 import org.nightlabs.jfire.accounting.id.PriceFragmentTypeID;
 import org.nightlabs.jfire.accounting.id.TariffID;
 import org.nightlabs.jfire.accounting.id.TariffMappingID;
@@ -101,9 +98,9 @@ import org.nightlabs.jfire.accounting.priceconfig.PriceConfigUtil;
 import org.nightlabs.jfire.accounting.priceconfig.id.PriceConfigID;
 import org.nightlabs.jfire.accounting.query.MoneyTransferIDQuery;
 import org.nightlabs.jfire.accounting.query.MoneyTransferQuery;
+import org.nightlabs.jfire.accounting.tariffuserset.SecurityChangeListenerTariffUserSet;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.idgenerator.IDNamespaceDefault;
-import org.nightlabs.jfire.jbpm.JbpmLookup;
 import org.nightlabs.jfire.jbpm.graph.def.ProcessDefinition;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.DeliveryNote;
@@ -191,6 +188,8 @@ implements SessionBean
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
+			SecurityChangeListenerTariffUserSet.register(pm);
+
 			MoneyFlowDimension priceFragmentDimension = MoneyFlowDimension.getMoneyFlowDimension(pm, PriceFragmentDimension.MONEY_FLOW_DIMENSION_ID);
 			if (priceFragmentDimension == null) {
 				priceFragmentDimension = new PriceFragmentDimension();

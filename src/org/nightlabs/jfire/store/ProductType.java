@@ -56,11 +56,13 @@ import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jdo.inheritance.JDOInheritableFieldInheriter;
 import org.nightlabs.jdo.inheritance.JDOInheritanceManager;
 import org.nightlabs.jdo.inheritance.JDOSimpleFieldInheriter;
+import org.nightlabs.jfire.accounting.Tariff;
 import org.nightlabs.jfire.accounting.book.LocalAccountantDelegate;
 import org.nightlabs.jfire.accounting.priceconfig.IInnerPriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.IPackagePriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.IPriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.PriceConfig;
+import org.nightlabs.jfire.accounting.tariffuserset.TariffUserSet;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.organisation.LocalOrganisation;
 import org.nightlabs.jfire.organisation.Organisation;
@@ -227,6 +229,7 @@ implements
 		public static final String published = "published";
 		public static final String saleable = "saleable";
 		public static final String vendor = "vendor";
+		public static final String tariffUserSet = "tariffUserSet";
 	};
 
 	/**
@@ -612,6 +615,11 @@ implements
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private DeliveryConfiguration deliveryConfiguration = null;
+
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private TariffUserSet tariffUserSet = null;
 
 	/**
 	 * @deprecated Only for JDO!
@@ -1687,6 +1695,30 @@ implements
 	protected ProductTypeLocal createProductTypeLocal(User user)
 	{
 		return new ProductTypeLocal(user, this); // self-registering
+	}
+
+	/**
+	 * Get the {@link TariffUserSet} that holds the information which user is allowed to access which
+	 * {@link Tariff}s (i.e. sell products with this tariff). If this is not assigned, the current policy
+	 * is that all {@code Tariff}s (those that are used in the assigned price configuration) are available.
+	 * This is likely to change later! The future policy will probably fallback to a default-{@code TariffUserSet}.
+	 *
+	 * @return the assigned {@link TariffUserSet} or <code>null</code>, if there is none assigned.
+	 * @see #setTariffUserSet(TariffUserSet)
+	 */
+	public TariffUserSet getTariffUserSet() {
+		return tariffUserSet;
+	}
+	/**
+	 * Assign a {@link TariffUserSet} or <code>null</code>. Note, that this property is subject to data-inheritance
+	 * and you might need to disable inheritance (otherwise your changes might be overwritten).
+	 *
+	 * @param tariffUserSet the new {@link TariffUserSet} or <code>null</code>.
+	 * @see #getTariffUserSet()
+	 * @see FieldName#tariffUserSet
+	 */
+	public void setTariffUserSet(TariffUserSet tariffUserSet) {
+		this.tariffUserSet = tariffUserSet;
 	}
 
 	@Override

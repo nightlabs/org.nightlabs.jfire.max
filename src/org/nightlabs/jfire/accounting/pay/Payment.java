@@ -64,7 +64,7 @@ import org.nightlabs.util.Util;
  * </p>
  * @author Marco Schulze - marco at nightlabs dot de
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
- * 
+ *
  * @jdo.persistence-capable
  *		identity-type="application"
  *		objectid-class="org.nightlabs.jfire.accounting.pay.id.PaymentID"
@@ -91,7 +91,7 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="Payment.partner" fields="partner"
  * @jdo.fetch-group name="Payment.partnerAccount" fields="partnerAccount"
  * @jdo.fetch-group name="Payment.modeOfPaymentFlavour" fields="modeOfPaymentFlavour"
- * 
+ *
  * @jdo.query
  * 	name="getPaymentsForInvoice"
  * 	query="SELECT
@@ -127,13 +127,13 @@ implements Serializable, StoreCallback
 		Query q = pm.newNamedQuery(Payment.class, "getPaymentsForInvoice");
 		return (Collection<Payment>) q.execute(invoice);
 	}
-	
+
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
 	private String organisationID;
-	
+
 	/**
 	 * @jdo.field primary-key="true"
 	 */
@@ -180,7 +180,7 @@ implements Serializable, StoreCallback
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private String clientPaymentProcessorFactoryID;
-	
+
 	/**
 	 * @jdo.field persistence-modifier="persistent" mapped-by="payment"
 	 */
@@ -485,7 +485,7 @@ implements Serializable, StoreCallback
 		this.payBeginServerResult = payBeginServerResult;
 		updateStatus(payBeginServerResult);
 	}
-	
+
 	/**
 	 * @return Returns the payDoWorkClientResult.
 	 */
@@ -609,7 +609,7 @@ implements Serializable, StoreCallback
 
 		this.user = user;
 	}
-	
+
 	/**
 	 * @return Returns the serverPaymentProcessorIDStrKey.
 	 */
@@ -759,7 +759,7 @@ implements Serializable, StoreCallback
 
 	/**
 	 * @return Returns true if this payment is postponed.
-	 * 
+	 *
 	 * @see #postponed
 	 */
 	public boolean isPostponed()
@@ -814,18 +814,18 @@ implements Serializable, StoreCallback
 	 */
 	private Account partnerAccount = null;
 // The above fields are not transferred to the server - only their IDs are.
-	
+
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private long amount = 0;
-	
+
 // IDs for the transfer to the server - the following fields are not stored in the DB
 
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
-	private Collection invoiceIDs = null;
+	private Set<InvoiceID> invoiceIDs = null;
 
 	/**
 	 * @jdo.field persistence-modifier="transactional"
@@ -861,7 +861,7 @@ implements Serializable, StoreCallback
 	{
 		return modeOfPaymentFlavour;
 	}
-	
+
 	/**
 	 * @return Returns the modeOfPaymentFlavourID.
 	 */
@@ -889,18 +889,26 @@ implements Serializable, StoreCallback
 	}
 
 	/**
+	 * Sets the {@link InvoiceID}s.
+	 * IMPORTANT: May only be called before the Payment is persisted, otherwise use {@link #setInvoices(Set)} instead.
+	 *
 	 * @param invoiceIDs The invoiceIDs to set.
 	 */
-	public void setInvoiceIDs(Collection invoiceIDs)
+	public void setInvoiceIDs(Set<InvoiceID> invoiceIDs)
 	{
 		if (invoiceIDs == null)
 			throw new NullPointerException("invoiceIDs must not be null!");
 
+		// check wether this object has not been persistet yet, only then setInvoiceIDs is legal
+		if (JDOHelper.getObjectId(this) != null) {
+			throw new IllegalStateException("setInvoiceIDs can only be called on NOT yet persisted instances of Payment, use setInvoices() instead!");
+		}
+
 		if (invoices != null)
 			invoices = null;
 
-		for (Iterator it = invoiceIDs.iterator(); it.hasNext(); ) {
-			InvoiceID invoiceID = (InvoiceID) it.next();
+		for (Iterator<InvoiceID> it = invoiceIDs.iterator(); it.hasNext(); ) {
+			InvoiceID invoiceID = it.next();
 			if (invoiceID == null)
 				throw new IllegalArgumentException("invoiceIDs must not contain null entries!");
 		}
@@ -909,21 +917,29 @@ implements Serializable, StoreCallback
 
 
 	/**
+	 * Sets the {@link Invoice}s.
+	 * IMPORTANT: May only be called after the Paymnet is persisted, otherwise use {@link #setInvoiceIDs(Set)} instead.
+	 *
 	 * @param invoices The invoices to set.
 	 */
-	public void setInvoices(Set invoices)
+	public void setInvoices(Set<Invoice> invoices)
 	{
 		if (invoices == null)
 			throw new NullPointerException("invoices must not be null!");
 
+		// check wether this object has been already persisted, only then setInvoices is legal
+		if (JDOHelper.getObjectId(this) == null) {
+			throw new IllegalStateException("setInvoices can only be called on already persisted instances of Payment, use setInvoiceIDs() instead!");
+		}
+
 		if (invoiceIDs == null)
-			invoiceIDs = new HashSet();
+			invoiceIDs = new HashSet<InvoiceID>();
 		else
 			invoiceIDs.clear();
 
-		for (Iterator it = invoices.iterator(); it.hasNext(); ) {
-			Invoice invoice = (Invoice) it.next();
-			invoiceIDs.add(JDOHelper.getObjectId(invoice));
+		for (Iterator<Invoice> it = invoices.iterator(); it.hasNext(); ) {
+			Invoice invoice = it.next();
+			invoiceIDs.add((InvoiceID) JDOHelper.getObjectId(invoice));
 		}
 		this.invoices = invoices;
 	}
@@ -931,14 +947,14 @@ implements Serializable, StoreCallback
 	/**
 	 * @return Returns the invoiceIDs.
 	 */
-	public Collection getInvoiceIDs()
+	public Set<InvoiceID> getInvoiceIDs()
 	{
 		if (invoiceIDs == null && invoices != null) {
-			Set s = new HashSet(invoices.size());
+			Set<InvoiceID> s = new HashSet<InvoiceID>(invoices.size());
 
-			for (Iterator it = invoices.iterator(); it.hasNext(); ) {
-				Invoice invoice = (Invoice) it.next();
-				s.add(JDOHelper.getObjectId(invoice));
+			for (Iterator<Invoice> it = invoices.iterator(); it.hasNext(); ) {
+				Invoice invoice = it.next();
+				s.add((InvoiceID) JDOHelper.getObjectId(invoice));
 			}
 
 			invoiceIDs = s;
@@ -976,7 +992,7 @@ implements Serializable, StoreCallback
 
 		return currencyID;
 	}
-	
+
 	/**
 	 * @return Returns the partnerAccount.
 	 */
@@ -1146,7 +1162,7 @@ implements Serializable, StoreCallback
 
 		return precursorID;
 	}
-	
+
 	/**
 	 * Returns the associated {@link PaymentLocal}.
 	 * @return The associated {@link PaymentLocal}.
@@ -1154,7 +1170,7 @@ implements Serializable, StoreCallback
 	public PaymentLocal getPaymentLocal() {
 		return paymentLocal;
 	}
-	
+
 	/**
 	 * Sets the associated {@link PaymentLocal}.
 	 * @param paymentLocal The {@link PaymentLocal} to be associated with this instance.
@@ -1221,10 +1237,10 @@ implements Serializable, StoreCallback
 
 		if (partnerID != null && partner == null)
 			partner = (LegalEntity) pm.getObjectById(partnerID);
-	
+
 		if (partnerAccountID != null && partnerAccount == null)
 			partnerAccount = (Account) pm.getObjectById(partnerAccountID);
-	
+
 		if (modeOfPaymentFlavourID != null && modeOfPaymentFlavour == null)
 			modeOfPaymentFlavour = (ModeOfPaymentFlavour) pm.getObjectById(modeOfPaymentFlavourID);
 
@@ -1234,12 +1250,12 @@ implements Serializable, StoreCallback
 		if (invoiceIDs != null) {
 			if (invoices == null || invoices.size() != invoiceIDs.size()) {
 				if (invoices == null)
-					invoices = new HashSet();
+					invoices = new HashSet<Invoice>();
 
 				invoices.clear();
 
-				for (Iterator it = invoiceIDs.iterator(); it.hasNext(); ) {
-					InvoiceID invoiceID = (InvoiceID) it.next();
+				for (Iterator<InvoiceID> it = invoiceIDs.iterator(); it.hasNext(); ) {
+					InvoiceID invoiceID = it.next();
 					Invoice invoice = (Invoice) pm.getObjectById(invoiceID);
 					invoices.add(invoice);
 				}
@@ -1248,7 +1264,7 @@ implements Serializable, StoreCallback
 
 		if (JDOHelper.isNew(this)) {
 			if (invoices == null)
-				invoices = new HashSet();
+				invoices = new HashSet<Invoice>();
 		}
 
 		if (precursorID != null && precursor != null) {
@@ -1268,7 +1284,7 @@ implements Serializable, StoreCallback
 		result = prime * result + (int) (paymentID ^ (paymentID >>> 32));
 		return result;
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
@@ -1283,7 +1299,7 @@ implements Serializable, StoreCallback
 				Util.equals(this.paymentID, other.paymentID)
 		);
 	}
-	
+
 	@Override
 	public String toString() {
 		return this.getClass().getName() + '@' + Integer.toHexString(System.identityHashCode(this)) + '[' + organisationID + ',' + ObjectIDUtil.longObjectIDFieldToString(paymentID) + ']';

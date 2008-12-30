@@ -31,6 +31,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 import javax.jdo.JDOHelper;
@@ -89,20 +90,20 @@ implements Serializable, StoreCallback, DetachCallback
 	// TODO this field should not be here! The place for use-case-specific fetch-groups is
 	// an external class like for example FetchGroupsTrade! Marco.
 	public static final String FETCH_GROUP_DELIVERY_TABLE_DATA = "DeliveryTableData";
-	
+
 	public static final String FETCH_GROUP_DELIVERY_NOTE_IDS = "deliveryNoteIDs";
 
 	public static final String DELIVERY_DIRECTION_INCOMING = "incoming";
 
 	public static final String DELIVERY_DIRECTION_OUTGOING = "outgoing";
-	
+
 
 	@SuppressWarnings("unchecked")
 	public static Collection<Delivery> getDeliveriesForDeliveryNote(PersistenceManager pm, DeliveryNote deliveryNote) {
 		Query q = pm.newNamedQuery(Delivery.class, "getDeliveriesForDeliveryNote");
 		return (Collection<Delivery>) q.execute(deliveryNote);
 	}
-	
+
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
@@ -118,14 +119,14 @@ implements Serializable, StoreCallback, DetachCallback
 	 * the previous delivery (which has not been completed yet but instead postponed) to this set. You can also add
 	 * the {@link DeliveryID} to {@link #precursorIDSet} instead, what may provide better performance when exchanging
 	 * deliveries between server and client.
-	 * 
+	 *
 	 * @jdo.field
 	 * 		persistence-modifier="persistent"
 	 *		collection-type="collection"
 	 *		element-type="org.nightlabs.jfire.store.deliver.Delivery"
 	 *		table="JFireTrade_Delivery_precursorDeliveries"
 	 *		null-value="exception"
-	 * 
+	 *
 	 * @jdo.join
 	 */
 	private Set<Delivery> precursorSet = null;
@@ -136,7 +137,7 @@ implements Serializable, StoreCallback, DetachCallback
 	 * @jdo.field persistence-modifier="none"
 	 */
 	private Set<DeliveryID> precursorIDSet = null;
-	
+
 //	Tobias: Since a delivery may have several follow up deliveries, this field is removed. Relations between
 //	postponed deliveries should be managed by using #precursor and #precursorIDSet
 //
@@ -157,7 +158,7 @@ implements Serializable, StoreCallback, DetachCallback
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private User user = null;
-	
+
 	/**
 	 * @jdo.field persistence-modifier="persistent" mapped-by="delivery"
 	 */
@@ -172,7 +173,7 @@ implements Serializable, StoreCallback, DetachCallback
 	 * @jdo.field persistence-modifier="none"
 	 */
 	private transient ServerDeliveryProcessorID serverDeliveryProcessorID = null;
-	
+
 	/**
 	 * @return Returns the serverDeliveryProcessorID. Might be <tt>null</tt> if client
 	 *		doesn't choose one.
@@ -310,7 +311,7 @@ implements Serializable, StoreCallback, DetachCallback
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private boolean forceRollback = false;
-	
+
 	/**
 	 * @param forceRollback The forceRollback to set.
 	 */
@@ -734,7 +735,7 @@ implements Serializable, StoreCallback, DetachCallback
 
 	/**
 	 * @return Returns true if this delivery is postponed.
-	 * 
+	 *
 	 * @see #postponed
 	 */
 	public boolean isPostponed()
@@ -796,7 +797,7 @@ implements Serializable, StoreCallback, DetachCallback
 	 *		element-type="org.nightlabs.jfire.store.DeliveryNote"
 	 *		table="JFireTrade_Delivery_deliveryNotes"
 	 *		null-value="exception"
-	 * 
+	 *
 	 * @jdo.join
 	 */
 	private Set<DeliveryNote> deliveryNotes = null;
@@ -822,12 +823,12 @@ implements Serializable, StoreCallback, DetachCallback
 //	private Account partnerAccount = null;
 
 // The above fields are not transferred to the server - only their IDs are.
-	
+
 //	/**
 //	 * @jdo.field persistence-modifier="persistent"
 //	 */
 //	private long amount = 0;
-	
+
 // IDs for the transfer to the server - the following fields are not stored in the DB
 
 //	/**
@@ -885,13 +886,42 @@ implements Serializable, StoreCallback, DetachCallback
 	public Set<DeliveryNoteID> getDeliveryNoteIDs()
 	{
 		if (deliveryNoteIDs == null) {
-			Set dnids = new HashSet();
-			for (DeliveryNote deliveryNote : deliveryNotes) {
-				dnids.add(JDOHelper.getObjectId(deliveryNote));
+			Set<DeliveryNoteID> dnids = new HashSet<DeliveryNoteID>();
+			if (deliveryNotes != null) {
+				for (DeliveryNote deliveryNote : deliveryNotes) {
+					dnids.add((DeliveryNoteID) JDOHelper.getObjectId(deliveryNote));
+				}
 			}
 			deliveryNoteIDs = dnids;
 		}
 		return deliveryNoteIDs;
+	}
+
+	/**
+	 * Sets the {@link DeliveryNoteID}s.
+	 * IMPORTANT: May only be called before the Delivery is persisted, otherwise use {@link #setDeliveryNotes(Set)} instead.
+	 *
+	 * @param deliveryNoteIDs the {@link DeliveryNoteID}s to set
+	 */
+	public void setDeliveryNoteIDs(Set<DeliveryNoteID> deliveryNoteIDs)
+	{
+		if (deliveryNoteIDs == null)
+			throw new NullPointerException("deliveryNoteIDs must not be null!");
+
+		// check wether this object has not been persistet yet, only then setDeliveryNoteIDs is legal
+		if (JDOHelper.getObjectId(this) != null) {
+			throw new IllegalStateException("setDeliveryNoteIDs can only be called on NOT yet persisted instances of Delivery, use setDeliveryNotes() instead!");
+		}
+
+		if (deliveryNotes != null)
+			deliveryNotes = null;
+
+		for (Iterator<DeliveryNoteID> it = deliveryNoteIDs.iterator(); it.hasNext(); ) {
+			DeliveryNoteID deliveryNoteID = it.next();
+			if (deliveryNoteID == null)
+				throw new IllegalArgumentException("deliveryNoteIDs must not contain null entries!");
+		}
+		this.deliveryNoteIDs = deliveryNoteIDs;
 	}
 
 	/**
@@ -901,7 +931,7 @@ implements Serializable, StoreCallback, DetachCallback
 	{
 		return modeOfDeliveryFlavour;
 	}
-	
+
 	/**
 	 * @return Returns the modeOfDeliveryFlavourID.
 	 */
@@ -934,9 +964,9 @@ implements Serializable, StoreCallback, DetachCallback
 	public Set<ArticleID> getArticleIDs()
 	{
 		if (articleIDs == null) {
-			HashSet s = new HashSet();
+			Set<ArticleID> s = new HashSet<ArticleID>();
 			for (Article article : getArticles()) {
-				s.add(JDOHelper.getObjectId(article));
+				s.add((ArticleID) JDOHelper.getObjectId(article));
 			}
 			articleIDs = s;
 		}
@@ -1085,25 +1115,33 @@ implements Serializable, StoreCallback, DetachCallback
 //	}
 
 
-//	/**
-//	 * @param deliveryNotes The deliveryNotes to set.
-//	 */
-//	public void setDeliveryNotes(Collection deliveryNotes)
-//	{
-//		if (deliveryNotes == null)
-//			throw new NullPointerException("deliveryNotes must not be null!");
-//
-//		if (deliveryNoteIDs == null)
-//			deliveryNoteIDs = new HashSet();
-//		else
-//			deliveryNoteIDs.clear();
-//
-//		for (Iterator it = deliveryNotes.iterator(); it.hasNext(); ) {
-//			DeliveryNote deliveryNote = (DeliveryNote) it.next();
-//			deliveryNoteIDs.add(JDOHelper.getObjectId(deliveryNote));
-//		}
-//		this.deliveryNotes = deliveryNotes;
-//	}
+	/**
+	 * Sets the {@link DeliveryNote}s.
+	 * IMPORTANT: May only be called after the Delivery is persisted, otherwise use {@link #setDeliveryNoteIDs(Set)} instead.
+	 *
+	 * @param deliveryNotes The deliveryNotes to set.
+	 */
+	public void setDeliveryNotes(Set<DeliveryNote> deliveryNotes)
+	{
+		if (deliveryNotes == null)
+			throw new NullPointerException("deliveryNotes must not be null!");
+
+		// check wether this object has been already persisted, only then setDeliveryNotes is legal
+		if (JDOHelper.getObjectId(this) == null) {
+			throw new IllegalStateException("setDeliveryNotes can only be called on already persisted instances of Delivery, use setDeliveryNoteIDs() instead!");
+		}
+
+		if (deliveryNoteIDs == null)
+			deliveryNoteIDs = new HashSet<DeliveryNoteID>();
+		else
+			deliveryNoteIDs.clear();
+
+		for (Iterator<DeliveryNote> it = deliveryNotes.iterator(); it.hasNext(); ) {
+			DeliveryNote deliveryNote = it.next();
+			deliveryNoteIDs.add((DeliveryNoteID) JDOHelper.getObjectId(deliveryNote));
+		}
+		this.deliveryNotes = deliveryNotes;
+	}
 
 //	/**
 //	 * @return Returns the deliveryNoteIDs.
@@ -1120,7 +1158,7 @@ implements Serializable, StoreCallback, DetachCallback
 //		}
 //		return deliveryNoteIDs;
 //	}
-	
+
 	/**
 	 * @return Returns the partnerID.
 	 */
@@ -1151,7 +1189,7 @@ implements Serializable, StoreCallback, DetachCallback
 //
 //		return currencyID;
 //	}
-	
+
 //	/**
 //	 * @return Returns the partnerAccount.
 //	 */
@@ -1311,7 +1349,7 @@ implements Serializable, StoreCallback, DetachCallback
 
 		return precursorIDSet;
 	}
-	
+
 	/**
 	 * Returns the associated {@link DeliveryLocal}.
 	 * @return The associated {@link DeliveryLocal}.
@@ -1319,7 +1357,7 @@ implements Serializable, StoreCallback, DetachCallback
 	public DeliveryLocal getDeliveryLocal() {
 		return deliveryLocal;
 	}
-	
+
 	/**
 	 * Sets the associated {@link DeliveryLocal}.
 	 * @param deliveryLocal The {@link DeliveryLocal} to associate with this instance.
@@ -1458,10 +1496,10 @@ implements Serializable, StoreCallback, DetachCallback
 //		} // if (deliveryNoteIDs != null) {
 
 		if (JDOHelper.isNew(this)) {
-			HashSet dnIDs = new HashSet();
+			Set<DeliveryNoteID> dnIDs = new HashSet<DeliveryNoteID>();
 			if (deliveryNotes == null)
 				deliveryNotes = new HashSet<DeliveryNote>();
-	
+
 			deliveryNotes.clear();
 //			for (Iterator it = articleLocals.iterator(); it.hasNext(); ) {
 //				ArticleLocal articleLocal = (ArticleLocal) it.next();
@@ -1489,12 +1527,12 @@ implements Serializable, StoreCallback, DetachCallback
 //			precursor = (Delivery) pm.getObjectById(precursorIDSet);
 //			precursor.followUp = this;
 //		}
-		
+
 		if (precursorIDSet != null && precursorSet == null) {
 			precursorSet = NLJDOHelper.getObjectSet(pm, precursorIDSet, Delivery.class);
 		}
 	}
-	
+
 	protected PersistenceManager getPersistenceManager()
 	{
 		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
@@ -1503,11 +1541,11 @@ implements Serializable, StoreCallback, DetachCallback
 
 		return pm;
 	}
-	
+
 	@Override
 	public void jdoPreDetach() {
 	}
-	
+
 	@Override
 	public void jdoPostDetach(Object attachedObj) {
 		Delivery attached = (Delivery) attachedObj;
@@ -1517,7 +1555,7 @@ implements Serializable, StoreCallback, DetachCallback
 			detached.deliveryNoteIDs = NLJDOHelper.getObjectIDSet(attached.deliveryNotes);
 		}
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see java.lang.Object#hashCode
 	 */
@@ -1529,7 +1567,7 @@ implements Serializable, StoreCallback, DetachCallback
 		result = prime * result + (int) (deliveryID ^ (deliveryID >>> 32));
 		return result;
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */

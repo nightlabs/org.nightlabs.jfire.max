@@ -129,8 +129,13 @@ public abstract class AbstractProductTypeGroupQuery
 		if (isFieldEnabled(FieldName.saleable) && saleable != null)
 			filter.append("\n && productType."+ProductType.FieldName.saleable+" == :saleable");
 
-		if (isFieldEnabled(FieldName.closed) && closed != null)
-			filter.append("\n && productType."+ProductType.FieldName.closed+" == :closed");
+		if (isFieldEnabled(FieldName.closed) && closed != null) {
+			filter.append("\n && productType."+ProductType.FieldName.closeTimestamp);
+			if (closed)
+				filter.append(" != null");
+			else
+				filter.append(" == null");
+		}
 
 		if (isFieldEnabled(VendorDependentQuery.FieldName.vendorID) && getVendorID() != null)
 			filter.append("\n && JDOHelper.getObjectId(productType."+ProductType.FieldName.vendor+") == :vendorID");

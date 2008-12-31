@@ -207,7 +207,7 @@ implements
 	 */
 	public static final class FieldName
 	{
-		public static final String closed = "closed";
+		public static final String closeTimestamp = "closeTimestamp";
 		public static final String confirmed = "confirmed";
 		public static final String deliveryConfiguration = "deliveryConfiguration";
 		public static final String extendedProductType = "extendedProductType";
@@ -1040,7 +1040,7 @@ implements
 				nonInheritableFields.add(FieldName.productTypeID);
 
 				// other fields
-				nonInheritableFields.add(FieldName.closed);
+				nonInheritableFields.add(FieldName.closeTimestamp);
 				nonInheritableFields.add(FieldName.confirmed);
 				nonInheritableFields.add(FieldName.fieldMetaDataMap);
 				nonInheritableFields.add(FieldName.extendedProductType);

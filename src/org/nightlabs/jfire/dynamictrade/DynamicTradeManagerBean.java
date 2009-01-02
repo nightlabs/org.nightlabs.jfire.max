@@ -420,11 +420,11 @@ implements SessionBean
 						FetchPlan.DEFAULT,
 						FetchGroupsPriceConfig.FETCH_GROUP_EDIT});
 			}
-			
+
 			for (DynamicTradePriceConfig dynamicTradePriceConfig : priceConfigs) {
 				PriceConfig.assertPriceConfigNotManaged(pm, (PriceConfigID) JDOHelper.getObjectId(dynamicTradePriceConfig));
 			}
-			
+
 			// Because we do not need to calculate any prices (all prices are dynamic), we
 			// do not need to use GridPriceConfigUtil.storePriceConfigs(...), but simply
 			// call pm.makePersistentAll(...).
@@ -676,5 +676,15 @@ implements SessionBean
 		} finally {
 			pm.close();
 		}
+	}
+
+	/**
+	 * @ejb.interface-method
+	 * @ejb.transaction type="Supports"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	@Override
+	public String ping(String message) {
+		return super.ping(message);
 	}
 }

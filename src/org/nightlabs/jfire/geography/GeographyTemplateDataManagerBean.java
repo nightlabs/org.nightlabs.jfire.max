@@ -137,6 +137,16 @@ implements SessionBean
 	}
 
 	/**
+	 * @ejb.interface-method
+	 * @ejb.transaction type="Supports"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	@Override
+	public String ping(String message) {
+		return super.ping(message);
+	}
+
+	/**
 	 * This cross-organisation-registration-init is executed every time the organisation
 	 * registers another organisation, but it only does sth. if the other organisation
 	 * is the root-organisation. In this case, it executes {@link #initialiseJDOLifecycleListeners()}.

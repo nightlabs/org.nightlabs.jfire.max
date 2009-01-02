@@ -16,6 +16,7 @@ import org.apache.log4j.Logger;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.accounting.gridpriceconfig.GridPriceConfigUtil;
 import org.nightlabs.jfire.accounting.priceconfig.id.PriceConfigID;
+import org.nightlabs.jfire.base.JFireEjbUtil;
 import org.nightlabs.jfire.base.Lookup;
 import org.nightlabs.jfire.jdo.notification.DirtyObjectID;
 import org.nightlabs.jfire.jdo.notification.JDOLifecycleState;
@@ -25,7 +26,6 @@ import org.nightlabs.jfire.jdo.notification.persistent.NotificationReceiver;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.simpletrade.SimpleTradeManager;
-import org.nightlabs.jfire.simpletrade.SimpleTradeManagerUtil;
 import org.nightlabs.jfire.simpletrade.store.SimpleProductType;
 import org.nightlabs.jfire.store.ProductTypeLocal;
 import org.nightlabs.jfire.store.Store;
@@ -33,7 +33,6 @@ import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.store.id.ProductTypePermissionFlagSetID;
 import org.nightlabs.jfire.store.notification.ProductTypePermissionFlagSetNotificationReceiver;
 import org.nightlabs.jfire.trade.TradeManager;
-import org.nightlabs.jfire.trade.TradeManagerUtil;
 import org.nightlabs.util.CollectionUtil;
 
 /**
@@ -97,13 +96,13 @@ extends NotificationReceiver
 		PersistenceManager pm = getPersistenceManager();
 
 		Hashtable<?,?> initialContextProperties = Lookup.getInitialContextProperties(pm, emitterOrganisationID);
-		SimpleTradeManager simpleTradeManager = SimpleTradeManagerUtil.getHome(initialContextProperties).create();
+		SimpleTradeManager simpleTradeManager = JFireEjbUtil.getBean(SimpleTradeManager.class, initialContextProperties);
 		Collection<SimpleProductType> productTypes = CollectionUtil.castCollection(
 				simpleTradeManager.getSimpleProductTypesForReseller(productTypeIDs_load)
 		);
 		Set<ProductTypeID> productTypeIDs = NLJDOHelper.getObjectIDSet(productTypes);
 
-		TradeManager tradeManager = TradeManagerUtil.getHome(initialContextProperties).create();
+		TradeManager tradeManager = JFireEjbUtil.getBean(TradeManager.class, initialContextProperties);
 		Set<ProductTypePermissionFlagSetID> productTypePermissionFlagSetIDs = CollectionUtil.castSet(
 				tradeManager.getMyProductTypePermissionFlagSetIDs(productTypeIDs)
 		);

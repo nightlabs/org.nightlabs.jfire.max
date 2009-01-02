@@ -9,15 +9,14 @@ import javax.jdo.JDODetachedFieldAccessException;
 
 import org.nightlabs.annotation.Implement;
 import org.nightlabs.jdo.NLJDOHelper;
+import org.nightlabs.jfire.base.JFireEjbUtil;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.base.jdo.IJDOObjectDAO;
 import org.nightlabs.jfire.prop.PropertySet;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.simpletrade.SimpleTradeManager;
-import org.nightlabs.jfire.simpletrade.SimpleTradeManagerUtil;
 import org.nightlabs.jfire.simpletrade.store.SimpleProductType;
 import org.nightlabs.jfire.store.StoreManager;
-import org.nightlabs.jfire.store.StoreManagerUtil;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.progress.ProgressMonitor;
 import org.nightlabs.util.CollectionUtil;
@@ -51,10 +50,10 @@ implements IJDOObjectDAO<SimpleProductType>
 		try {
 //			SimpleTradeManager vm = simpleTradeManager;
 //			if (vm == null)
-//				vm = SimpleTradeManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+//				vm = JFireEjbUtil.getBean(SimpleTradeManager.class, SecurityReflector.getInitialContextProperties());
 //
 //			return vm.getSimpleProductTypes(simpleProductTypeIDs, fetchGroups, maxFetchDepth);
-			StoreManager sm = StoreManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			StoreManager sm = JFireEjbUtil.getBean(StoreManager.class, SecurityReflector.getInitialContextProperties());
 			return CollectionUtil.castCollection(sm.getProductTypes(simpleProductTypeIDs, fetchGroups, maxFetchDepth));
 		} finally {
 			monitor.worked(1);
@@ -68,7 +67,7 @@ implements IJDOObjectDAO<SimpleProductType>
 			ProgressMonitor monitor)
 	{
 		try {
-			simpleTradeManager = SimpleTradeManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			simpleTradeManager = JFireEjbUtil.getBean(SimpleTradeManager.class, SecurityReflector.getInitialContextProperties());
 			try {
 				Collection<ProductTypeID> simpleProductTypeIDs = simpleTradeManager.getChildSimpleProductTypeIDs(parentSimpleProductTypeID);
 				return getJDOObjects(null, simpleProductTypeIDs, fetchGroups, maxFetchDepth, monitor);
@@ -135,7 +134,7 @@ implements IJDOObjectDAO<SimpleProductType>
 			if (propertySet != null) {
 				propertySet.deflate();
 			}
-			SimpleTradeManager simpleTradeManager = SimpleTradeManagerUtil.getHome(initialContextProperties).create();
+			SimpleTradeManager simpleTradeManager = JFireEjbUtil.getBean(SimpleTradeManager.class, initialContextProperties);
 			result = simpleTradeManager.storeProductType(productType, get, fetchGroups, maxFetchDepth);
 			monitor.worked(1);
 			monitor.done();

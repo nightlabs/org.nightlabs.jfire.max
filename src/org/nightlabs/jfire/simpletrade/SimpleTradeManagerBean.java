@@ -79,6 +79,7 @@ import org.nightlabs.jfire.accounting.tariffuserset.AuthorizedObjectRef;
 import org.nightlabs.jfire.accounting.tariffuserset.TariffUserSet;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.base.JFireBaseEAR;
+import org.nightlabs.jfire.base.JFireEjbUtil;
 import org.nightlabs.jfire.base.JFireException;
 import org.nightlabs.jfire.jdo.notification.persistent.PersistentNotificationEJB;
 import org.nightlabs.jfire.jdo.notification.persistent.PersistentNotificationEJBUtil;
@@ -991,7 +992,7 @@ implements SessionBean
 //				ArrayList<ProductTypeID> productTypeIDs = new ArrayList<ProductTypeID>(1);
 //				productTypeIDs.add(productTypeID);
 
-				SimpleTradeManager simpleTradeManager = SimpleTradeManagerUtil.getHome(initialContextProperties).create();
+				SimpleTradeManager simpleTradeManager = JFireEjbUtil.getBean(SimpleTradeManager.class, initialContextProperties);
 
 				Set<ProductTypeID> productTypeIDs = simpleTradeManager.getPublishedSimpleProductTypeIDs();
 				// never used
@@ -1171,4 +1172,13 @@ implements SessionBean
 		}
 	}
 
+	/**
+	 * @ejb.interface-method
+	 * @ejb.transaction type="Supports"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	@Override
+	public String ping(String message) {
+		return super.ping(message);
+	}
 }

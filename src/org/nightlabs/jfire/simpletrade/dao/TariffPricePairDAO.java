@@ -34,10 +34,10 @@ import org.nightlabs.jfire.accounting.Price;
 import org.nightlabs.jfire.accounting.Tariff;
 import org.nightlabs.jfire.accounting.gridpriceconfig.TariffPricePair;
 import org.nightlabs.jfire.accounting.id.CurrencyID;
+import org.nightlabs.jfire.base.JFireEjbUtil;
 import org.nightlabs.jfire.base.jdo.cache.Cache;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.simpletrade.SimpleTradeManager;
-import org.nightlabs.jfire.simpletrade.SimpleTradeManagerUtil;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.trade.id.CustomerGroupID;
 import org.nightlabs.progress.ProgressMonitor;
@@ -119,7 +119,7 @@ public class TariffPricePairDAO
 				TariffPricePairDAO.class.getName(), key, (String[])null, -1);
 		if (tppc == null) { // || System.currentTimeMillis() - tppc.loadDT > EXPIRE_MSEC) {
 			try {
-				SimpleTradeManager stm = SimpleTradeManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+				SimpleTradeManager stm = JFireEjbUtil.getBean(SimpleTradeManager.class, SecurityReflector.getInitialContextProperties());
 				Collection<TariffPricePair> tariffPricePairs = CollectionUtil.castCollection(stm.getTariffPricePairs(productTypeID,
 						customerGroupID,
 						currencyID,

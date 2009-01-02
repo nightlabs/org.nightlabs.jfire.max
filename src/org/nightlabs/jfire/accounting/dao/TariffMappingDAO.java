@@ -5,10 +5,10 @@ import java.util.List;
 import java.util.Set;
 
 import org.nightlabs.jfire.accounting.AccountingManager;
-import org.nightlabs.jfire.accounting.AccountingManagerUtil;
 import org.nightlabs.jfire.accounting.TariffMapping;
 import org.nightlabs.jfire.accounting.id.TariffID;
 import org.nightlabs.jfire.accounting.id.TariffMappingID;
+import org.nightlabs.jfire.base.JFireEjbUtil;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.base.jdo.cache.Cache;
 import org.nightlabs.jfire.security.SecurityReflector;
@@ -38,7 +38,7 @@ public class TariffMappingDAO
 	{
 		AccountingManager am = accountingManager;
 		if (am == null)
-			am = AccountingManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			am = JFireEjbUtil.getBean(AccountingManager.class, SecurityReflector.getInitialContextProperties());
 
 		return am.getTariffMappings(tariffMappingIDs, fetchGroups, maxFetchDepth);
 	}
@@ -49,7 +49,7 @@ public class TariffMappingDAO
 	public synchronized List<TariffMapping> getTariffMappings(String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
 		try {
-			accountingManager = AccountingManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			accountingManager = JFireEjbUtil.getBean(AccountingManager.class, SecurityReflector.getInitialContextProperties());
 			try {
 				Set<TariffMappingID> tariffMappingIDs = accountingManager.getTariffMappingIDs();
 				return getJDOObjects(null, tariffMappingIDs, fetchGroups, maxFetchDepth, monitor);
@@ -69,7 +69,7 @@ public class TariffMappingDAO
 	public TariffMapping createTariffMapping(TariffID localTariffID, TariffID partnerTariffID, boolean get, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
 		try {
-			AccountingManager am = AccountingManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			AccountingManager am = JFireEjbUtil.getBean(AccountingManager.class, SecurityReflector.getInitialContextProperties());
 			TariffMapping tm = am.createTariffMapping(localTariffID, partnerTariffID, get, fetchGroups, maxFetchDepth);
 
 			if (tm != null)

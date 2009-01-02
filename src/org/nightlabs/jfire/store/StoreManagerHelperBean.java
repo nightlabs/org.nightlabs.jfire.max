@@ -45,6 +45,7 @@ import javax.jdo.PersistenceManager;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.base.JFireBaseEAR;
+import org.nightlabs.jfire.base.JFireEjbUtil;
 import org.nightlabs.jfire.base.Lookup;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.deliver.CrossTradeDeliveryCoordinator;
@@ -54,7 +55,6 @@ import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.Offer;
 import org.nightlabs.jfire.trade.OfferLocal;
 import org.nightlabs.jfire.trade.TradeManager;
-import org.nightlabs.jfire.trade.TradeManagerUtil;
 import org.nightlabs.jfire.trade.TradeSide;
 import org.nightlabs.jfire.trade.id.ArticleID;
 import org.nightlabs.jfire.trade.id.OfferID;
@@ -205,7 +205,7 @@ implements SessionBean
 				}
 
 				if (!partnerArticles.isEmpty()) {
-					TradeManager tm = TradeManagerUtil.getHome(Lookup.getInitialContextProperties(pm, partnerOrganisationID)).create();
+					TradeManager tm = JFireEjbUtil.getBean(TradeManager.class, Lookup.getInitialContextProperties(pm, partnerOrganisationID));
 					Set<ArticleID> articleIDs = NLJDOHelper.getObjectIDSet(partnerArticles);
 					tm.releaseArticles(articleIDs, true, false, null, 1);
 				}
@@ -244,7 +244,7 @@ implements SessionBean
 					if (JFireBaseEAR.JPOX_WORKAROUND_FLUSH_ENABLED)
 						pm.flush(); // TODO JPOX WORKAROUND - maybe it helps against the update-problem (see 2nd workaround below)
 
-					TradeManager tradeManager = TradeManagerUtil.getHome(Lookup.getInitialContextProperties(pm, partnerOrganisationID)).create();
+					TradeManager tradeManager = JFireEjbUtil.getBean(TradeManager.class, Lookup.getInitialContextProperties(pm, partnerOrganisationID));
 					Offer offer = tradeManager.createCrossTradeReverseOffer(reversedArticleIDs, null);
 					NLJDOHelper.makeDirtyAllFieldsRecursively(offer);
 //					offer.makeAllDirty();

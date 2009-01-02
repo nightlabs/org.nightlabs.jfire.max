@@ -15,6 +15,7 @@ import javax.naming.NamingException;
 
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.asyncinvoke.AsyncInvoke;
+import org.nightlabs.jfire.base.JFireEjbUtil;
 import org.nightlabs.jfire.base.Lookup;
 import org.nightlabs.jfire.jdo.notification.DirtyObjectID;
 import org.nightlabs.jfire.jdo.notification.JDOLifecycleState;
@@ -32,7 +33,6 @@ import org.nightlabs.jfire.store.ProductTypePermissionFlagSet;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.store.id.ProductTypePermissionFlagSetID;
 import org.nightlabs.jfire.trade.TradeManager;
-import org.nightlabs.jfire.trade.TradeManagerUtil;
 import org.nightlabs.util.CollectionUtil;
 
 /**
@@ -130,7 +130,7 @@ extends NotificationReceiver
 //		PersistenceManager pm = getPersistenceManager();
 
 		Hashtable<?,?> initialContextProperties = Lookup.getInitialContextProperties(pm, emitterOrganisationID);
-		TradeManager tradeManager = TradeManagerUtil.getHome(initialContextProperties).create();
+		TradeManager tradeManager = JFireEjbUtil.getBean(TradeManager.class, initialContextProperties);
 		Collection<ProductTypePermissionFlagSet> productTypePermissionFlagSets = CollectionUtil.castCollection(tradeManager.getProductTypePermissionFlagSets(
 				productTypePermissionFlagSetIDs_load,
 				new String[] {

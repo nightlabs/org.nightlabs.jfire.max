@@ -13,12 +13,12 @@ import javax.jdo.JDOHelper;
 import org.nightlabs.annotation.Implement;
 import org.nightlabs.jdo.query.AbstractJDOQuery;
 import org.nightlabs.jdo.query.QueryCollection;
+import org.nightlabs.jfire.base.JFireEjbUtil;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.trade.Order;
 import org.nightlabs.jfire.trade.TradeManager;
-import org.nightlabs.jfire.trade.TradeManagerUtil;
 import org.nightlabs.jfire.trade.id.OrderID;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 import org.nightlabs.progress.ProgressMonitor;
@@ -58,7 +58,7 @@ public class OrderDAO extends BaseJDOObjectDAO<OrderID, Order> {
 	protected Collection<Order> retrieveJDOObjects(Set<OrderID> orderIDs,
 			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 			throws Exception {
-		TradeManager tm = TradeManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+		TradeManager tm = JFireEjbUtil.getBean(TradeManager.class, SecurityReflector.getInitialContextProperties());
 		return tm.getOrders(orderIDs, fetchGroups, maxFetchDepth);
 	}
 
@@ -103,7 +103,7 @@ public class OrderDAO extends BaseJDOObjectDAO<OrderID, Order> {
 			QueryCollection<? extends AbstractJDOQuery> queries,
 			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) {
 		try {
-			TradeManager tm = TradeManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			TradeManager tm = JFireEjbUtil.getBean(TradeManager.class, SecurityReflector.getInitialContextProperties());
 			Set<OrderID> orderIDs = tm.getOrderIDs(queries);
 
 			return getJDOObjects(null, orderIDs, fetchGroups, maxFetchDepth, monitor);
@@ -156,7 +156,7 @@ public class OrderDAO extends BaseJDOObjectDAO<OrderID, Order> {
 			long rangeBeginIdx, long rangeEndIdx, String[] fetchGroups,
 			int maxFetchDepth, ProgressMonitor monitor) {
 		try {
-			TradeManager tm = TradeManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			TradeManager tm = JFireEjbUtil.getBean(TradeManager.class, SecurityReflector.getInitialContextProperties());
 			List<OrderID> orderIDList = tm.getOrderIDs(orderClass, subclasses, vendorID, customerID, rangeBeginIdx, rangeEndIdx);
 			Set<OrderID> orderIDs = new HashSet<OrderID>(orderIDList);
 

@@ -5,11 +5,11 @@ import java.util.List;
 import java.util.Set;
 
 import org.nightlabs.annotation.Implement;
+import org.nightlabs.jfire.base.JFireEjbUtil;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.store.RepositoryType;
 import org.nightlabs.jfire.store.StoreManager;
-import org.nightlabs.jfire.store.StoreManagerUtil;
 import org.nightlabs.jfire.store.id.RepositoryTypeID;
 import org.nightlabs.progress.ProgressMonitor;
 
@@ -38,7 +38,7 @@ extends BaseJDOObjectDAO<RepositoryTypeID, RepositoryType>
 	{
 		monitor.beginTask("Loading RepositoryTypes", 1);
 		try {
-			StoreManager sm = StoreManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			StoreManager sm = JFireEjbUtil.getBean(StoreManager.class, SecurityReflector.getInitialContextProperties());
 			return sm.getRepositoryTypes(objectIDs, fetchGroups, maxFetchDepth);
 			
 		} catch (Exception e) {
@@ -56,7 +56,7 @@ extends BaseJDOObjectDAO<RepositoryTypeID, RepositoryType>
 			int maxFetchDepth, ProgressMonitor monitor)
 	{
 		try {
-			StoreManager sm = StoreManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			StoreManager sm = JFireEjbUtil.getBean(StoreManager.class, SecurityReflector.getInitialContextProperties());
 			Set<RepositoryTypeID> repositoryTypeIDs = sm.getRepositoryTypeIDs();
 			return getJDOObjects(null, repositoryTypeIDs, fetchGroups, maxFetchDepth, monitor);
 		} catch (Exception x) {

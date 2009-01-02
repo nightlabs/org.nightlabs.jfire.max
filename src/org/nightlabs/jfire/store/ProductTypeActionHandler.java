@@ -49,6 +49,7 @@ import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.asyncinvoke.AsyncInvoke;
 import org.nightlabs.jfire.asyncinvoke.Invocation;
 import org.nightlabs.jfire.base.JFireBaseEAR;
+import org.nightlabs.jfire.base.JFireEjbUtil;
 import org.nightlabs.jfire.base.JFirePrincipal;
 import org.nightlabs.jfire.base.Lookup;
 import org.nightlabs.jfire.organisation.Organisation;
@@ -352,7 +353,7 @@ public abstract class ProductTypeActionHandler
 			OrganisationLegalEntity partner = OrganisationLegalEntity.getOrganisationLegalEntity(pm, partnerOrganisationID);
 
 			Hashtable<?, ?> initialContextProperties = Lookup.getInitialContextProperties(pm, partnerOrganisationID);
-			TradeManager tradeManager = TradeManagerUtil.getHome(initialContextProperties).create();
+			TradeManager tradeManager = JFireEjbUtil.getBean(TradeManager.class, initialContextProperties);
 
 //			Set segmentTypeIDs = Segment.getSegmentTypeIDs(pm, localOrder);
 
@@ -670,7 +671,7 @@ public abstract class ProductTypeActionHandler
 //	) throws Exception
 //	{
 //		PersistenceManager pm = getPersistenceManager();
-//		TradeManager tm = TradeManagerUtil.getHome(Lookup.getInitialContextProperties(pm, partnerOrganisationID)).create();
+//		TradeManager tm = JFireEjbUtil.getBean(TradeManager.class, Lookup.getInitialContextProperties(pm, partnerOrganisationID));
 //		Set<ArticleID> articleIDs = NLJDOHelper.getObjectIDSet(partnerArticles);
 //		tm.releaseArticles(articleIDs, true, false, null, 1);
 //	}

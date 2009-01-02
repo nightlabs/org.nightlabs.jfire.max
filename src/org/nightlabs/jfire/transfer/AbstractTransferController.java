@@ -9,13 +9,12 @@ import javax.security.auth.login.LoginException;
 
 import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jfire.accounting.AccountingManager;
-import org.nightlabs.jfire.accounting.AccountingManagerUtil;
 import org.nightlabs.jfire.accounting.pay.PaymentController;
 import org.nightlabs.jfire.accounting.pay.PaymentResult;
 import org.nightlabs.jfire.accounting.pay.id.PaymentID;
+import org.nightlabs.jfire.base.JFireEjbUtil;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.store.StoreManager;
-import org.nightlabs.jfire.store.StoreManagerUtil;
 import org.nightlabs.jfire.store.deliver.DeliveryController;
 import org.nightlabs.jfire.store.deliver.DeliveryResult;
 import org.nightlabs.jfire.store.deliver.id.DeliveryID;
@@ -134,7 +133,7 @@ public abstract class AbstractTransferController<D extends TransferData, ID exte
 	 * @return The {@link StoreManager}
 	 */
 	public StoreManager getStoreManager() throws RemoteException, LoginException, CreateException, NamingException {
-		return StoreManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+		return JFireEjbUtil.getBean(StoreManager.class, SecurityReflector.getInitialContextProperties());
 	}
 
 	/**
@@ -142,7 +141,7 @@ public abstract class AbstractTransferController<D extends TransferData, ID exte
 	 * @return The {@link AccountingManager}
 	 */
 	public AccountingManager getAccountingManager() throws RemoteException, LoginException, CreateException, NamingException {
-		return AccountingManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+		return JFireEjbUtil.getBean(AccountingManager.class, SecurityReflector.getInitialContextProperties());
 	}
 
 	private boolean isInServer() {

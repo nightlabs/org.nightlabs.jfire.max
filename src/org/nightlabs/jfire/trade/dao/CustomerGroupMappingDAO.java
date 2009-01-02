@@ -4,12 +4,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import org.nightlabs.jfire.base.JFireEjbUtil;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.base.jdo.cache.Cache;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.trade.CustomerGroupMapping;
 import org.nightlabs.jfire.trade.TradeManager;
-import org.nightlabs.jfire.trade.TradeManagerUtil;
 import org.nightlabs.jfire.trade.id.CustomerGroupID;
 import org.nightlabs.jfire.trade.id.CustomerGroupMappingID;
 import org.nightlabs.progress.ProgressMonitor;
@@ -38,7 +38,7 @@ extends BaseJDOObjectDAO<CustomerGroupMappingID, CustomerGroupMapping>
 	{
 		TradeManager tm = tradeManager;
 		if (tm == null)
-			tm = TradeManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			tm = JFireEjbUtil.getBean(TradeManager.class, SecurityReflector.getInitialContextProperties());
 
 		return tm.getCustomerGroupMappings(customerGroupMappingIDs, fetchGroups, maxFetchDepth);
 	}
@@ -49,7 +49,7 @@ extends BaseJDOObjectDAO<CustomerGroupMappingID, CustomerGroupMapping>
 	public synchronized List<CustomerGroupMapping> getCustomerGroupMappings(String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
 		try {
-			tradeManager = TradeManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			tradeManager = JFireEjbUtil.getBean(TradeManager.class, SecurityReflector.getInitialContextProperties());
 			try {
 				Set<CustomerGroupMappingID> customerGroupMappingIDs = tradeManager.getCustomerGroupMappingIDs();
 				return getJDOObjects(null, customerGroupMappingIDs, fetchGroups, maxFetchDepth, monitor);
@@ -69,7 +69,7 @@ extends BaseJDOObjectDAO<CustomerGroupMappingID, CustomerGroupMapping>
 	public CustomerGroupMapping createCustomerGroupMapping(CustomerGroupID localCustomerGroupID, CustomerGroupID partnerCustomerGroupID, boolean get, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
 		try {
-			TradeManager tm = TradeManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			TradeManager tm = JFireEjbUtil.getBean(TradeManager.class, SecurityReflector.getInitialContextProperties());
 			CustomerGroupMapping cgm = tm.createCustomerGroupMapping(localCustomerGroupID, partnerCustomerGroupID, get, fetchGroups, maxFetchDepth);
 
 			if (cgm != null)

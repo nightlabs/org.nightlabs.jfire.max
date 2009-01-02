@@ -5,11 +5,11 @@ import java.util.List;
 import java.util.Set;
 
 import org.nightlabs.jdo.query.QueryCollection;
+import org.nightlabs.jfire.base.JFireEjbUtil;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.store.ProductTransfer;
 import org.nightlabs.jfire.store.StoreManager;
-import org.nightlabs.jfire.store.StoreManagerUtil;
 import org.nightlabs.jfire.store.query.ProductTransferQuery;
 import org.nightlabs.jfire.transfer.id.TransferID;
 import org.nightlabs.progress.ProgressMonitor;
@@ -36,7 +36,7 @@ public class ProductTransferDAO
 			ProgressMonitor monitor)
 			throws Exception
 	{
-		StoreManager sm = StoreManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+		StoreManager sm = JFireEjbUtil.getBean(StoreManager.class, SecurityReflector.getInitialContextProperties());
 		return sm.getProductTransfers(productTransferIDs, fetchGroups, maxFetchDepth);
 	}
 
@@ -47,7 +47,7 @@ public class ProductTransferDAO
 //			ProgressMonitor monitor)
 //	{
 //		try {
-//			StoreManager sm = StoreManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+//			StoreManager sm = JFireEjbUtil.getBean(StoreManager.class, SecurityReflector.getInitialContextProperties());
 //			List<TransferID> transferIDs = sm.getProductTransferIDs(productTransferIDQuery);
 //			return getJDOObjects(null, transferIDs, fetchGroups, maxFetchDepth, monitor);
 //		} catch (Exception e) {
@@ -62,7 +62,7 @@ public class ProductTransferDAO
 			ProgressMonitor monitor)
 	{
 		try {
-			StoreManager sm = StoreManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			StoreManager sm = JFireEjbUtil.getBean(StoreManager.class, SecurityReflector.getInitialContextProperties());
 			List<TransferID> transferIDs = sm.getProductTransferIDs(productTransferQueries);
 			return getJDOObjects(null, transferIDs, fetchGroups, maxFetchDepth, monitor);
 		} catch (Exception e) {
@@ -77,7 +77,7 @@ public class ProductTransferDAO
 //	{
 //		try
 //		{
-//			StoreManager sm = StoreManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+//			StoreManager sm = JFireEjbUtil.getBean(StoreManager.class, SecurityReflector.getInitialContextProperties());
 //			List<TransferID> transferIDs = sm.getProductTransferIDs(queries);
 //			return getJDOObjects(null, transferIDs, fetchGroups, maxFetchDepth, monitor);
 //		}

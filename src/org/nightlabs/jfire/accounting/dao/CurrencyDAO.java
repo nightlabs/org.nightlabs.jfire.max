@@ -9,9 +9,9 @@ import javax.jdo.FetchPlan;
 
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.accounting.AccountingManager;
-import org.nightlabs.jfire.accounting.AccountingManagerUtil;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.id.CurrencyID;
+import org.nightlabs.jfire.base.JFireEjbUtil;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.progress.ProgressMonitor;
@@ -40,7 +40,7 @@ public class CurrencyDAO extends BaseJDOObjectDAO<CurrencyID, Currency>
 	{
 		monitor.beginTask("Fetching Currencies...", 1); //$NON-NLS-1$
 		try {
-			AccountingManager am = AccountingManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			AccountingManager am = JFireEjbUtil.getBean(AccountingManager.class, SecurityReflector.getInitialContextProperties());
 			monitor.worked(1);
 			return am.getCurrencies(fetchGroups, maxFetchDepth);
 		} catch (Exception e) {

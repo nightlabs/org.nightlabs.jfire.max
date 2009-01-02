@@ -6,12 +6,12 @@ import java.util.Set;
 
 import org.nightlabs.annotation.Implement;
 import org.nightlabs.jdo.query.QueryCollection;
+import org.nightlabs.jfire.base.JFireEjbUtil;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.base.jdo.cache.Cache;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.store.Repository;
 import org.nightlabs.jfire.store.StoreManager;
-import org.nightlabs.jfire.store.StoreManagerUtil;
 import org.nightlabs.jfire.store.query.RepositoryQuery;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 import org.nightlabs.progress.ProgressMonitor;
@@ -41,7 +41,7 @@ extends BaseJDOObjectDAO<AnchorID, Repository>
 	{
 		monitor.beginTask("Loading Repositories", 1);
 		try {
-			StoreManager am = StoreManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			StoreManager am = JFireEjbUtil.getBean(StoreManager.class, SecurityReflector.getInitialContextProperties());
 			return am.getRepositories(objectIDs, fetchGroups, maxFetchDepth);
 			
 		} catch (Exception e) {
@@ -60,7 +60,7 @@ extends BaseJDOObjectDAO<AnchorID, Repository>
 			int maxFetchDepth, ProgressMonitor monitor)
 	{
 		try {
-			StoreManager sm = StoreManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			StoreManager sm = JFireEjbUtil.getBean(StoreManager.class, SecurityReflector.getInitialContextProperties());
 			Set<AnchorID> repositoryIDs = sm.getRepositoryIDs(queries);
 			return getJDOObjects(null, repositoryIDs, fetchGroups, maxFetchDepth, monitor);
 		} catch (Exception x) {
@@ -85,7 +85,7 @@ extends BaseJDOObjectDAO<AnchorID, Repository>
 	{
 		StoreManager sm;
 		try {
-			sm = StoreManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			sm = JFireEjbUtil.getBean(StoreManager.class, SecurityReflector.getInitialContextProperties());
 			repository = sm.storeRepository(repository, get, fetchGroups, maxFetchDepth);
 			if (repository != null)
 				Cache.sharedInstance().put(null, repository, fetchGroups, maxFetchDepth);

@@ -8,8 +8,8 @@ import org.nightlabs.jdo.query.QueryCollection;
 import org.nightlabs.jfire.accounting.Account;
 import org.nightlabs.jfire.accounting.AccountSearchFilter;
 import org.nightlabs.jfire.accounting.AccountingManager;
-import org.nightlabs.jfire.accounting.AccountingManagerUtil;
 import org.nightlabs.jfire.accounting.query.AccountQuery;
+import org.nightlabs.jfire.base.JFireEjbUtil;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.base.jdo.cache.Cache;
 import org.nightlabs.jfire.security.SecurityReflector;
@@ -40,7 +40,7 @@ extends BaseJDOObjectDAO<AnchorID, Account>
 	{
 		monitor.beginTask("Loading Accounts", 1);
 		try {
-			AccountingManager am = AccountingManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			AccountingManager am = JFireEjbUtil.getBean(AccountingManager.class, SecurityReflector.getInitialContextProperties());
 			return am.getAccounts(objectIDs, fetchGroups, maxFetchDepth);
 
 		} catch (Exception e) {
@@ -58,7 +58,7 @@ extends BaseJDOObjectDAO<AnchorID, Account>
 			int maxFetchDepth, ProgressMonitor monitor)
 	{
 		try {
-			AccountingManager am = AccountingManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			AccountingManager am = JFireEjbUtil.getBean(AccountingManager.class, SecurityReflector.getInitialContextProperties());
 			Set<AnchorID> accountIDs = am.getAccountIDs(accountSearchFilter);
 			return getJDOObjects(null, accountIDs, fetchGroups, maxFetchDepth, monitor);
 		} catch (Exception x) {
@@ -72,7 +72,7 @@ extends BaseJDOObjectDAO<AnchorID, Account>
 		int maxFetchDepth, ProgressMonitor monitor)
 	{
 		try {
-			AccountingManager am = AccountingManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			AccountingManager am = JFireEjbUtil.getBean(AccountingManager.class, SecurityReflector.getInitialContextProperties());
 			Set<AnchorID> accountIDs = am.getAccountIDs(queries);
 			return getJDOObjects(null, accountIDs, fetchGroups, maxFetchDepth, monitor);
 		} catch (Exception x) {
@@ -97,7 +97,7 @@ extends BaseJDOObjectDAO<AnchorID, Account>
 	{
 		monitor.beginTask("Save Account", 1);
 		try {
-			AccountingManager am = AccountingManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			AccountingManager am = JFireEjbUtil.getBean(AccountingManager.class, SecurityReflector.getInitialContextProperties());
 			account = am.storeAccount(account, get, fetchGroups, maxFetchDepth);
 			if (account != null)
 				Cache.sharedInstance().put(null, account, fetchGroups, maxFetchDepth);

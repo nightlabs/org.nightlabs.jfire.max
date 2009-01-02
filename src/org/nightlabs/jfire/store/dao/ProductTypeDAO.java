@@ -35,11 +35,11 @@ import java.util.Set;
 import javax.jdo.FetchPlan;
 
 import org.nightlabs.jdo.query.QueryCollection;
+import org.nightlabs.jfire.base.JFireEjbUtil;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.StoreManager;
-import org.nightlabs.jfire.store.StoreManagerUtil;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.progress.ProgressMonitor;
 
@@ -110,7 +110,7 @@ extends BaseJDOObjectDAO<ProductTypeID, ProductType>
 		progressMonitor.beginTask("Loading ProductTypes", 200);
 		StoreManager sm = storeManager;
 		if (sm == null)
-			sm = StoreManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			sm = JFireEjbUtil.getBean(StoreManager.class, SecurityReflector.getInitialContextProperties());
 
 		progressMonitor.worked(100);
 		Collection<ProductType> productTypes = sm.getProductTypes(objectIDs, fetchGroups, maxFetchDepth);
@@ -127,7 +127,7 @@ extends BaseJDOObjectDAO<ProductTypeID, ProductType>
 	public synchronized List<ProductType> getProductTypes(QueryCollection<?> queryCollection, String[] fetchGroups,
 	int maxFetchDepth, ProgressMonitor progressMonitor)throws Exception
 	{
-		storeManager = StoreManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+		storeManager = JFireEjbUtil.getBean(StoreManager.class, SecurityReflector.getInitialContextProperties());
 		try {	
 			Set<ProductTypeID> productTypeIDs = storeManager.getProductTypeIDs(queryCollection);
 			return getJDOObjects(null, productTypeIDs, fetchGroups, maxFetchDepth, progressMonitor);

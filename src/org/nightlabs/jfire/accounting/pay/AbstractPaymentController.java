@@ -10,8 +10,8 @@ import javax.naming.NamingException;
 import javax.security.auth.login.LoginException;
 
 import org.nightlabs.jfire.accounting.AccountingManager;
-import org.nightlabs.jfire.accounting.AccountingManagerUtil;
 import org.nightlabs.jfire.accounting.pay.id.PaymentID;
+import org.nightlabs.jfire.base.JFireEjbUtil;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.transfer.AbstractTransferController;
 
@@ -150,6 +150,6 @@ public abstract class AbstractPaymentController extends AbstractTransferControll
 
 	@Override
 	public AccountingManager getAccountingManager() throws RemoteException, LoginException, CreateException, NamingException {
-		return AccountingManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+		return JFireEjbUtil.getBean(AccountingManager.class, SecurityReflector.getInitialContextProperties());
 	}
 }

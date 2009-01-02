@@ -64,6 +64,7 @@ import org.nightlabs.jfire.asyncinvoke.ErrorCallback;
 import org.nightlabs.jfire.asyncinvoke.Invocation;
 import org.nightlabs.jfire.asyncinvoke.InvocationError;
 import org.nightlabs.jfire.asyncinvoke.UndeliverableCallback;
+import org.nightlabs.jfire.base.JFireEjbUtil;
 import org.nightlabs.jfire.base.Lookup;
 import org.nightlabs.jfire.config.Config;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
@@ -1740,7 +1741,7 @@ public class Trader
 
 					String partnerOrganisationID = vendor.getOrganisationID();
 
-					TradeManager tradeManager = TradeManagerUtil.getHome(Lookup.getInitialContextProperties(pm, partnerOrganisationID)).create();
+					TradeManager tradeManager = JFireEjbUtil.getBean(TradeManager.class, Lookup.getInitialContextProperties(pm, partnerOrganisationID));
 					tradeManager.signalOffer((OfferID) JDOHelper.getObjectId(partnerOffer), JbpmConstantsOffer.Vendor.TRANSITION_NAME_ACCEPT_FOR_CROSS_TRADE);
 					// TODO we have to do sth. with the local workflow!
 				} // for (Iterator itO = offerRequirement.getPartnerOffers().iterator(); itO.hasNext(); ) {
@@ -1778,7 +1779,7 @@ public class Trader
 
 					String partnerOrganisationID = vendor.getOrganisationID();
 
-					TradeManager tradeManager = TradeManagerUtil.getHome(Lookup.getInitialContextProperties(pm, partnerOrganisationID)).create();
+					TradeManager tradeManager = JFireEjbUtil.getBean(TradeManager.class, Lookup.getInitialContextProperties(pm, partnerOrganisationID));
 					tradeManager.signalOffer((OfferID) JDOHelper.getObjectId(partnerOffer), JbpmConstantsOffer.Vendor.TRANSITION_NAME_FINALIZE_FOR_CROSS_TRADE);
 					// TODO we have to do sth. with the local workflow!
 				} // for (Iterator itO = offerRequirement.getPartnerOffers().iterator(); itO.hasNext(); ) {
@@ -2254,7 +2255,7 @@ public class Trader
 //	OrganisationLegalEntity partner = OrganisationLegalEntity.getOrganisationLegalEntity(pm, partnerOrganisationID, OrganisationLegalEntity.ANCHOR_TYPE_ID_ORGANISATION, true);
 
 //	Hashtable initialContextProperties = Lookup.getInitialContextProperties(pm, partnerOrganisationID);
-//	TradeManager tradeManager = TradeManagerUtil.getHome(initialContextProperties).create();
+//	TradeManager tradeManager = JFireEjbUtil.getBean(TradeManager.class, initialContextProperties);
 
 ////	Set segmentTypeIDs = Segment.getSegmentTypeIDs(pm, localOrder);
 

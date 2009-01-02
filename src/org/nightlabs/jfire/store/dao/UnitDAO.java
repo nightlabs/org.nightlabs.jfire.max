@@ -5,10 +5,10 @@ import java.util.List;
 import java.util.Set;
 
 import org.nightlabs.annotation.Implement;
+import org.nightlabs.jfire.base.JFireEjbUtil;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.store.StoreManager;
-import org.nightlabs.jfire.store.StoreManagerUtil;
 import org.nightlabs.jfire.store.Unit;
 import org.nightlabs.jfire.store.id.UnitID;
 import org.nightlabs.progress.ProgressMonitor;
@@ -37,7 +37,7 @@ extends BaseJDOObjectDAO<UnitID, Unit>
 	{
 		StoreManager stm = storeManager;
 		if (stm == null)
-			stm = StoreManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			stm = JFireEjbUtil.getBean(StoreManager.class, SecurityReflector.getInitialContextProperties());
 
 		return stm.getUnits(unitIDs, fetchGroups, maxFetchDepth);
 	}
@@ -56,7 +56,7 @@ extends BaseJDOObjectDAO<UnitID, Unit>
 	public List<Unit> getUnits(String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
 		try {
-			storeManager = StoreManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			storeManager = JFireEjbUtil.getBean(StoreManager.class, SecurityReflector.getInitialContextProperties());
 			try {
 				Set<UnitID> unitIDs = storeManager.getUnitIDs();
 				return getJDOObjects(null, unitIDs, fetchGroups, maxFetchDepth, monitor);

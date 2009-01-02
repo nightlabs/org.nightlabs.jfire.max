@@ -31,7 +31,6 @@ import java.util.Map;
 
 import org.nightlabs.annotation.Implement;
 import org.nightlabs.i18n.I18nText;
-import org.nightlabs.jfire.transfer.Transfer;
 
 /**
  * @author Chairat Kongarayawetchakun - chairatk at nightlabs dot de

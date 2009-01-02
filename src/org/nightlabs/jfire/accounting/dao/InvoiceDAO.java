@@ -12,9 +12,9 @@ import javax.jdo.JDOHelper;
 
 import org.nightlabs.jdo.query.QueryCollection;
 import org.nightlabs.jfire.accounting.AccountingManager;
-import org.nightlabs.jfire.accounting.AccountingManagerUtil;
 import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.accounting.id.InvoiceID;
+import org.nightlabs.jfire.base.JFireEjbUtil;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.trade.query.InvoiceQuery;
@@ -42,7 +42,7 @@ public class InvoiceDAO
 			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 			throws Exception
 	{
-		AccountingManager am = AccountingManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+		AccountingManager am = JFireEjbUtil.getBean(AccountingManager.class, SecurityReflector.getInitialContextProperties());
 		return am.getInvoices(invoiceIDs, fetchGroups, maxFetchDepth);
 	}
 
@@ -63,7 +63,7 @@ public class InvoiceDAO
 			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
 		try {
-			AccountingManager am = AccountingManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			AccountingManager am = JFireEjbUtil.getBean(AccountingManager.class, SecurityReflector.getInitialContextProperties());
 			List<InvoiceID> invoiceIDList = am.getInvoiceIDs(vendorID, customerID, rangeBeginIdx, rangeEndIdx);
 			Set<InvoiceID> invoiceIDs = new HashSet<InvoiceID>(invoiceIDList);
 
@@ -88,7 +88,7 @@ public class InvoiceDAO
 		String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
 		try {
-			AccountingManager accountingManager = AccountingManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			AccountingManager accountingManager = JFireEjbUtil.getBean(AccountingManager.class, SecurityReflector.getInitialContextProperties());
 			Set<InvoiceID> invoiceIDs = accountingManager.getInvoiceIDs(queries);
 			return InvoiceDAO.sharedInstance().getInvoices(
 				invoiceIDs,

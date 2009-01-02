@@ -28,7 +28,6 @@ package org.nightlabs.jfire.accounting.book.mappingbased;
 
 import java.util.Map;
 
-import org.nightlabs.annotation.Implement;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.PriceFragmentType;
 import org.nightlabs.jfire.store.ProductType;

@@ -9,11 +9,11 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.nightlabs.jfire.base.JFireEjbUtil;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.TradeManager;
-import org.nightlabs.jfire.trade.TradeManagerUtil;
 import org.nightlabs.jfire.trade.id.ArticleID;
 import org.nightlabs.progress.ProgressMonitor;
 import org.nightlabs.util.CollectionUtil;
@@ -55,7 +55,7 @@ extends BaseJDOObjectDAO<ArticleID, Article>
 
 		monitor.beginTask("Loading articles", 1);
 		try {
-			TradeManager tradeManager = TradeManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			TradeManager tradeManager = JFireEjbUtil.getBean(TradeManager.class, SecurityReflector.getInitialContextProperties());
 			Collection<Article> articles = CollectionUtil.castCollection(
 					tradeManager.getArticles(articleIDs, fetchGroups, maxFetchDepth)
 			);
@@ -93,7 +93,7 @@ extends BaseJDOObjectDAO<ArticleID, Article>
 	)
 	{
 		try {
-			TradeManager tradeManager = TradeManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			TradeManager tradeManager = JFireEjbUtil.getBean(TradeManager.class, SecurityReflector.getInitialContextProperties());
 			Collection<?> c = tradeManager.releaseArticles(
 					articleIDs, synchronously,
 					get,
@@ -151,7 +151,7 @@ extends BaseJDOObjectDAO<ArticleID, Article>
 	)
 	{
 		try {
-			TradeManager tradeManager = TradeManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			TradeManager tradeManager = JFireEjbUtil.getBean(TradeManager.class, SecurityReflector.getInitialContextProperties());
 			Collection<?> c = tradeManager.deleteArticles(articleIDs, validate, get, fetchGroups, maxFetchDepth);
 
 			if (c == null) {

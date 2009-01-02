@@ -6,8 +6,8 @@ import java.util.Set;
 
 import org.nightlabs.jfire.accounting.AccountType;
 import org.nightlabs.jfire.accounting.AccountingManager;
-import org.nightlabs.jfire.accounting.AccountingManagerUtil;
 import org.nightlabs.jfire.accounting.id.AccountTypeID;
+import org.nightlabs.jfire.base.JFireEjbUtil;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.progress.ProgressMonitor;
@@ -36,7 +36,7 @@ extends BaseJDOObjectDAO<AccountTypeID, AccountType>
 	{
 		monitor.beginTask("Loading AccountTypes", 1);
 		try {
-			AccountingManager am = AccountingManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			AccountingManager am = JFireEjbUtil.getBean(AccountingManager.class, SecurityReflector.getInitialContextProperties());
 			return am.getAccountTypes(objectIDs, fetchGroups, maxFetchDepth);
 
 		} catch (Exception e) {
@@ -54,7 +54,7 @@ extends BaseJDOObjectDAO<AccountTypeID, AccountType>
 			int maxFetchDepth, ProgressMonitor monitor)
 	{
 		try {
-			AccountingManager am = AccountingManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			AccountingManager am = JFireEjbUtil.getBean(AccountingManager.class, SecurityReflector.getInitialContextProperties());
 			Set<AccountTypeID> accountTypeIDs = am.getAccountTypeIDs();
 			return getJDOObjects(null, accountTypeIDs, fetchGroups, maxFetchDepth, monitor);
 		} catch (Exception x) {

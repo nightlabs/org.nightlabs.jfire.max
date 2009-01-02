@@ -7,10 +7,10 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.nightlabs.jfire.base.JFireEjbUtil;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.store.StoreManager;
-import org.nightlabs.jfire.store.StoreManagerUtil;
 import org.nightlabs.jfire.store.deliver.id.DeliveryQueueID;
 import org.nightlabs.progress.ProgressMonitor;
 
@@ -79,7 +79,7 @@ public class DeliveryQueueDAO extends BaseJDOObjectDAO<DeliveryQueueID, Delivery
 	
 	private StoreManager getStoreManager() {
 		try {
-			return StoreManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			return JFireEjbUtil.getBean(StoreManager.class, SecurityReflector.getInitialContextProperties());
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

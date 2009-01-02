@@ -56,7 +56,7 @@ import org.nightlabs.util.IOUtil;
  *
  * @ejb.util generate="physical"
  * @ejb.transaction type="Required"
- * 
+ *
  * @author Marco Schulze
  * @author Marc Klinger - marc[at]nightlabs[dot]de
  */
@@ -85,14 +85,14 @@ implements SessionBean
 	}
 	/**
 	 * @see javax.ejb.SessionBean#ejbRemove()
-	 * 
+	 *
 	 * @ejb.permission unchecked="true"
 	 */
 	public void ejbRemove() throws EJBException, RemoteException
 	{
 		logger.debug(this.getClass().getName() + ".ejbRemove()");
 	}
-	
+
 	/**
 	 * @see javax.ejb.SessionBean#ejbActivate()
 	 */
@@ -106,6 +106,16 @@ implements SessionBean
 	public void ejbPassivate() throws EJBException, RemoteException
 	{
 		logger.debug(this.getClass().getName() + ".ejbPassivate()");
+	}
+
+	/**
+	 * @ejb.interface-method
+	 * @ejb.transaction type="Supports"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	@Override
+	public String ping(String message) {
+		return super.ping(message);
 	}
 
 	/**
@@ -442,7 +452,7 @@ implements SessionBean
 //			pm.close();
 //		}
 //	}
-		
+
 	/**
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
@@ -474,7 +484,7 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
@@ -491,7 +501,7 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 *
 	 * @ejb.interface-method
@@ -503,14 +513,14 @@ implements SessionBean
 	{
 		if (statableQueries == null)
 			return null;
-		
+
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(1);
 			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
 
 			JDOQueryCollectionDecorator<StatableQuery> decoratedCollection;
-			
+
 			// DO not apply generics to this instanceof check, otherwise the sun compiler will result in
 			// an error like this:
 //			 [javac] /home/marius/workspaces/crossticket/JFireJbpm/src/org/nightlabs/jfire/jbpm/JbpmManagerBean.java:510: inconvertible types
@@ -519,7 +529,7 @@ implements SessionBean
 //		   [javac] 			if (statableQueries instanceof JDOQueryCollectionDecorator<?, ?>)
 			if (statableQueries instanceof JDOQueryCollectionDecorator)
 			{
-				decoratedCollection = (JDOQueryCollectionDecorator<StatableQuery>) statableQueries; 
+				decoratedCollection = (JDOQueryCollectionDecorator<StatableQuery>) statableQueries;
 			}
 			else
 			{

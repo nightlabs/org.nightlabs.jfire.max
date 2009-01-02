@@ -45,8 +45,8 @@ import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
 import org.nightlabs.jfire.reporting.textpart.id.ReportTextPartConfigurationID;
 
 /**
- * Manager giving access to {@link ReportTextPartConfiguration}s and their {@link ReportTextPart}s. 
- * 
+ * Manager giving access to {@link ReportTextPartConfiguration}s and their {@link ReportTextPart}s.
+ *
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  *
  * @ejb.bean name="jfire/ejb/JFireReporting/ReportTextPartManager"
@@ -91,9 +91,19 @@ implements SessionBean
 	}
 
 	/**
-	 * This method returns the id of the {@link ReportTextPartConfiguration} linked to 
+	 * @ejb.interface-method
+	 * @ejb.transaction type="Supports"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	@Override
+	public String ping(String message) {
+		return super.ping(message);
+	}
+
+	/**
+	 * This method returns the id of the {@link ReportTextPartConfiguration} linked to
 	 * the {@link ReportRegistryItem} referenced by the given reportRegistryItemID.
-	 * 
+	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="org.nightlabs.jfire.reporting.editReport"
 	 * @ejb.transaction type="Supports"
@@ -123,9 +133,9 @@ implements SessionBean
 	}
 
 	/**
-	 * This method returns the id of the {@link ReportTextPartConfiguration} linked to 
+	 * This method returns the id of the {@link ReportTextPartConfiguration} linked to
 	 * the {@link ReportRegistryItem} referenced by the given reportRegistryItemID.
-	 * 
+	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="org.nightlabs.jfire.reporting.editReport"
 	 * @ejb.transaction type="Supports"
@@ -143,9 +153,9 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="org.nightlabs.jfire.reporting.editReport"
 	 * @ejb.transaction type="Supports"
@@ -163,54 +173,54 @@ implements SessionBean
 	}
 
 	/**
-	 * Searches the {@link ReportTextPartConfiguration} for the given linkedObjectID and reportRegistryItemID. 
-	 * If none can be found in the data-store this method will search for a {@link ReportTextPartConfiguration} 
+	 * Searches the {@link ReportTextPartConfiguration} for the given linkedObjectID and reportRegistryItemID.
+	 * If none can be found in the data-store this method will search for a {@link ReportTextPartConfiguration}
 	 * linked to one of the parent {@link ReportCategory}s of the given reportRegistryItemID.
 	 * <p>
 	 * Additionally this method can be used to get a synthetic, new {@link ReportTextPartConfiguration}
 	 * linked to the given linkedObjectID. A synthetic {@link ReportTextPartConfiguration} will have the
-	 * values of that one found when searching for the given reportRegistryItem. The synthetic configuration 
+	 * values of that one found when searching for the given reportRegistryItem. The synthetic configuration
 	 * will not be persisted and only the parts of it referencing existing/persisted objects will be detached.
 	 * A synthetic {@link ReportTextPartConfiguration} returned by this methot will therefore not be a
-	 * detached object itself, it is rather a newly created object. 
+	 * detached object itself, it is rather a newly created object.
 	 * </p>
-	 * 
-	 * @param linkedObjectID 
+	 *
+	 * @param linkedObjectID
 	 * 			The {@link ObjectID} a linked {@link ReportTextPartConfiguration} should be found for.
-	 * @param reportRegistryItemID 
+	 * @param reportRegistryItemID
 	 * 			The {@link ReportRegistryItemID} to start the search for a {@link ReportTextPartConfiguration}
 	 * 			that is linked to a {@link ReportRegistryItem} should be started from.
-	 * @param synthesize 
+	 * @param synthesize
 	 * 			Whether to synthesize a new {@link ReportTextPartConfiguration} when none directly linked to the
 	 * 			given linkedObjectID was found but one was found linked to a reportRegistryItem.
 	 * @param fetchGroups
-	 * 			The fetch-groups to detach the found {@link ReportTextPartConfiguration} with. Note, that this 
-	 * 			fetch-groups will also be used used when synthesizing a new configuration, but then to detach those 
-	 * 			parts of the the found configuration that reference already persisted object.                             
+	 * 			The fetch-groups to detach the found {@link ReportTextPartConfiguration} with. Note, that this
+	 * 			fetch-groups will also be used used when synthesizing a new configuration, but then to detach those
+	 * 			parts of the the found configuration that reference already persisted object.
 	 * @param maxFetchDepth
-	 * 			The maximum fetch-depth to detach the found {@link ReportTextPartConfiguration} with. Note, that this 
-	 * 			fetch-depth will also be used used when synthesizing a new configuration, but then to detach those 
-	 * 			parts of the the found configuration that reference already persisted object.         
-	 * @return 
-	 * 			The {@link ReportTextPartConfiguration} either found (or synthesized) for the given linkedObjectID 
+	 * 			The maximum fetch-depth to detach the found {@link ReportTextPartConfiguration} with. Note, that this
+	 * 			fetch-depth will also be used used when synthesizing a new configuration, but then to detach those
+	 * 			parts of the the found configuration that reference already persisted object.
+	 * @return
+	 * 			The {@link ReportTextPartConfiguration} either found (or synthesized) for the given linkedObjectID
 	 * 			or the configuration found for a {@link ReportRegistryItem}. If nothing can be found, <code>null</code> will be returned.
-	 * 
+	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="org.nightlabs.jfire.reporting.renderReport"
 	 * @ejb.transaction type="Supports"
-	 * 
+	 *
 	 */
 	public ReportTextPartConfiguration getReportTextPartConfiguration(
-			ReportRegistryItemID reportRegistryItemID, ObjectID linkedObjectID, 
+			ReportRegistryItemID reportRegistryItemID, ObjectID linkedObjectID,
 			boolean synthesize, String[] fetchGroups, int maxFetchDepth) {
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			ReportTextPartConfiguration configuration = ReportTextPartConfiguration.getReportTextPartConfiguration(
 					pm, reportRegistryItemID, linkedObjectID, synthesize, fetchGroups, maxFetchDepth);
-			
+
 			if (configuration == null)
 				return null;
-			
+
 			if (JDOHelper.getPersistenceManager(configuration) != null) {
 				// TODO: How to check better if the config is attached? JDOHelper.isPersistent() ?!?
 				pm.getFetchPlan().setGroups(fetchGroups);
@@ -226,32 +236,32 @@ implements SessionBean
 	}
 
 	/**
-	 * This method stores the given {@link ReportTextPartConfiguration} if it is 
+	 * This method stores the given {@link ReportTextPartConfiguration} if it is
 	 * a configuration linked to an object in the datastore.
-	 * 
-	 * @param reportTextPartConfiguration 
+	 *
+	 * @param reportTextPartConfiguration
 	 * 			The configuration to store.
-	 * @param get 
+	 * @param get
 	 * 			Wheter a detached copy of the stored item should be returned.
-	 * @param fetchGroups 
+	 * @param fetchGroups
 	 * 			If get is <code>true</code>, this defines the fetch-groups the
 	 * 			retuned item will be detached with.
-	 * @param maxFetchDepth 
+	 * @param maxFetchDepth
 	 * 			If get is <code>true</code>, this defines the maximum fetch-depth
 	 * 			when detaching.
 	 * @return
 	 * 			If get is <code>true</code> the detached {@link ReportTextPartConfiguration}
 	 * 			is returned, <code>null</code> otherwise.
-	 * 
+	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="org.nightlabs.jfire.reporting.renderReport"
 	 * @ejb.transaction type="Required"
 	 */
 	public ReportTextPartConfiguration storeLinkedObjectReportTextPartConfiguration(
-			ReportTextPartConfiguration reportTextPartConfiguration, 
+			ReportTextPartConfiguration reportTextPartConfiguration,
 			boolean get, String[] fetchGroups, int maxFetchDepth) {
-		
-		PersistenceManager pm = getPersistenceManager(); 
+
+		PersistenceManager pm = getPersistenceManager();
 		try {
 			if (reportTextPartConfiguration.getLinkedObjectID() == null) {
 				throw new IllegalStateException("This method can't store a ReportTextPartConfiguration that is not linked to an object (linkedObjectID == null).");
@@ -261,33 +271,33 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * This method stores the given {@link ReportTextPartConfiguration}.
-	 * 
-	 * @param reportTextPartConfiguration 
+	 *
+	 * @param reportTextPartConfiguration
 	 * 			The configuration to store.
-	 * @param get 
+	 * @param get
 	 * 			Wheter a detached copy of the stored item should be returned.
-	 * @param fetchGroups 
+	 * @param fetchGroups
 	 * 			If get is <code>true</code>, this defines the fetch-groups the
 	 * 			retuned item will be detached with.
-	 * @param maxFetchDepth 
+	 * @param maxFetchDepth
 	 * 			If get is <code>true</code>, this defines the maximum fetch-depth
 	 * 			when detaching.
 	 * @return
 	 * 			If get is <code>true</code> the detached {@link ReportTextPartConfiguration}
 	 * 			is returned, <code>null</code> otherwise.
-	 * 
+	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="org.nightlabs.jfire.reporting.editReport"
 	 * @ejb.transaction type="Required"
 	 */
 	public ReportTextPartConfiguration storeReportTextPartConfiguration(
-			ReportTextPartConfiguration reportTextPartConfiguration, 
+			ReportTextPartConfiguration reportTextPartConfiguration,
 			boolean get, String[] fetchGroups, int maxFetchDepth) {
-		
-		PersistenceManager pm = getPersistenceManager(); 
+
+		PersistenceManager pm = getPersistenceManager();
 		try {
 			return NLJDOHelper.storeJDO(pm, reportTextPartConfiguration, get, fetchGroups, maxFetchDepth);
 		} finally {

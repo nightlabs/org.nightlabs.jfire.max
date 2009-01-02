@@ -100,7 +100,7 @@ import org.nightlabs.version.MalformedVersionException;
 /**
  * Manager that gives access to {@link ReportRegistryItem}s and other objects linked to them.
  * This is also the entry point for rendering report layouts.
- * 
+ *
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  *
  * @ejb.bean name="jfire/ejb/JFireReporting/ReportManager"
@@ -116,7 +116,7 @@ extends BaseSessionBeanImpl
 implements SessionBean
 {
 	private static final long serialVersionUID = 20080926L;
-	
+
 	private static final Logger logger = Logger.getLogger(ReportManagerBean.class);
 
 	@Override
@@ -145,6 +145,16 @@ implements SessionBean
 	public void ejbRemove() throws EJBException, RemoteException { }
 
 	/**
+	 * @ejb.interface-method
+	 * @ejb.transaction type="Supports"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	@Override
+	public String ping(String message) {
+		return super.ping(message);
+	}
+
+	/**
 	 * Called by {@link #initialise()} and registeres the reporting
 	 * config-modules in their config-setup.
 	 */
@@ -159,9 +169,9 @@ implements SessionBean
 		configSetup.getConfigModuleClasses().add(ReportLayoutConfigModule.class.getName());
 		ConfigSetup.ensureAllPrerequisites(pm);
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @param pm
 	 * @param jfireServerManager
 	 * @throws InstantiationException
@@ -174,7 +184,7 @@ implements SessionBean
 
 	/**
 	 * This method is called by the organisation-init system and is not intended to be called directly.
-	 * 
+	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_System_"
 	 * @ejb.transaction type="Required"
@@ -266,7 +276,7 @@ implements SessionBean
 		}
 
 	}
-	
+
 	/**
 	 * Create (if necessary) a task that will cleanup the temporary report folders
 	 * using {@link #cleanupRenderedReportLayoutFolders(TaskID)}.
@@ -313,8 +323,8 @@ implements SessionBean
 
 	/**
 	 * This method is called from a timer-task it is not intended to be called directly.
-	 * The method will clean folders temporarily used for reporting. 
-	 *  
+	 * The method will clean folders temporarily used for reporting.
+	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_System_"
 	 * @ejb.transaction type="Required"
@@ -333,13 +343,13 @@ implements SessionBean
 	/**
 	 * Returns the result-set meta-data for the query/script referenced by the given {@link JFSQueryPropertySet}
 	 * (its scriptRegistryItemID to be precise). Note, that the properties in the given queryPropertySet might
-	 * be necessary to determine the result-set meta-data, this is why this method does not operate on a 
+	 * be necessary to determine the result-set meta-data, this is why this method does not operate on a
 	 * {@link ScriptRegistryItemID} but on {@link JFSQueryPropertySet}.
 	 * <p>
 	 * This method delegates to {@link ServerJFSQueryProxy} and will be called only for report design-time.
 	 * It therefore is tagged with permission role {@link RoleConstants#editReport}.
 	 * </p>
-	 * 
+	 *
 	 * @throws InstantiationException If instantiating the referenced script fails.
 	 * @throws ScriptException If creating the meta-data fails.
 	 *
@@ -383,18 +393,18 @@ implements SessionBean
 
 	/**
 	 * Executes the script referenced by the given {@link JFSQueryPropertySet} with
-	 * the given queryPropertySet and the given parameters. 
+	 * the given queryPropertySet and the given parameters.
 	 * <p>
 	 * This method delegates to {@link ServerJFSQueryProxy} and will be called only for report desing-time.
 	 * It therefore is tagged with permission role {@link RoleConstants#editReport}.
 	 * </p>
-	 *  
+	 *
 	 * @throws InstantiationException If instantiating the script fails.
 	 * @throws ScriptException If the script execution fails.
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="org.nightlabs.jfire.reporting.editReport"
-	 * @ejb.transaction type="Never" @!This is tagged with Never as we don't want write operations to be performed by the script that will be executed by this call. 
+	 * @ejb.transaction type="Never" @!This is tagged with Never as we don't want write operations to be performed by the script that will be executed by this call.
 	 */
 	public IResultSet getJFSResultSet(
 			JFSQueryPropertySet queryPropertySet,
@@ -420,9 +430,9 @@ implements SessionBean
 	 * This method delegates to {@link ServerJFSQueryProxy} and will be called only for report design-time.
 	 * It therefore is tagged with permission role {@link RoleConstants#editReport}.
 	 * </p>
-	 * 
+	 *
 	 * @throws JFireReportingOdaException
-	 * 
+	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="org.nightlabs.jfire.reporting.editReport"
 	 * @ejb.transaction type="Supports"
@@ -451,7 +461,7 @@ implements SessionBean
 	 * security check as a caller could call everything here. The security checks
 	 * are done in the store methods.
 	 * </p>
-	 * 
+	 *
 	 * @param reportRegistryItemIDs The list of id of items to fetch.
 	 * @param filterRoleID The {@link RoleID} to filter the results with.
 	 * @param fetchGroups The fetch-groups to detach the items with.
@@ -514,7 +524,7 @@ implements SessionBean
 	 * security check as a caller could call everything here. The security checks
 	 * are done in the store methods.
 	 * </p>
-	 * 
+	 *
 	 * @param reportRegistryItemID The id of the parent to search the children for.
 	 *
 	 * @ejb.interface-method
@@ -535,14 +545,14 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * Returns the {@link ReportRegistryItemID}s of all {@link ReportRegistryItem}s
 	 * that are direct children of the given reportRegistryItemID.
 	 * <p>
 	 * This method will filter the result for the RoleID {@link RoleConstants#renderReport}
 	 * </p>
-	 * 
+	 *
 	 * @param reportRegistryItemID The id of the parent to search the children for.
 	 *
 	 * @ejb.interface-method
@@ -551,7 +561,7 @@ implements SessionBean
 	 */
 	public Collection<ReportRegistryItemID> getReportRegistryItemIDsForParent(ReportRegistryItemID reportRegistryItemID) {
 		return getReportRegistryItemIDsForParent(reportRegistryItemID, RoleConstants.renderReport);
-	}	
+	}
 
 	/**
 	 * Returns all {@link ReportRegistryItemID}s that do not have a parent.
@@ -563,7 +573,7 @@ implements SessionBean
 	 * </p>
 	 *
 	 * @param filterRoleID The {@link RoleID} to filter the result for.
-	 * 
+	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="org.nightlabs.jfire.reporting.renderReport"
 	 * @ejb.transaction type="Supports"
@@ -583,7 +593,7 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * Returns all {@link ReportRegistryItemID}s that do not have a parent.
 	 * These will be only for the organisationID of the calling user.
@@ -595,7 +605,7 @@ implements SessionBean
 	public Collection<ReportRegistryItemID> getTopLevelReportRegistryItemIDs() {
 		return getTopLevelReportRegistryItemIDs(RoleConstants.renderReport);
 	}
-	
+
 
 	/**
 	 * Get the {@link ReportingManagerFactory} for the actual organisationID.
@@ -606,7 +616,7 @@ implements SessionBean
 	{
 		return ReportingManagerFactory.getReportingManagerFactory(getInitialContext(getOrganisationID()), getOrganisationID());
 	}
-	
+
 	/**
 	 * Get the {@link ReportEnginePool} of this server.
 	 *
@@ -650,11 +660,11 @@ implements SessionBean
 				Authority.resolveSecuringAuthority(pm, registryItemPersistent, ResolveSecuringAuthorityStrategy.organisation)
 					.assertContainsRoleRef(getPrincipal(), RoleConstants.renderReport);
 			}
-			
+
 			ReportRegistryItem item = pm.makePersistent(reportRegistryItemToStore);
-			
+
 			item.applyInheritance();
-			
+
 			if (!get)
 				return null;
 
@@ -662,7 +672,7 @@ implements SessionBean
 				pm.getFetchPlan().setGroups(fetchGroups);
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 
-			return pm.detachCopy(item);			
+			return pm.detachCopy(item);
 		} finally {
 			pm.close();
 		}
@@ -727,7 +737,7 @@ implements SessionBean
 			ReportRegistryItem registryItem = (ReportRegistryItem) pm.getObjectById(renderReportRequest.getReportRegistryItemID());
 			Authority.resolveSecuringAuthority(pm, registryItem, ResolveSecuringAuthorityStrategy.organisation)
 				.assertContainsRoleRef(getPrincipal(), RoleConstants.renderReport);
-			
+
 //			RenderManager rm = getReportingManagerFactory().createRenderManager();
 			ReportEnginePool enginePool = getReportEnginePool();
 			ReportEngine engine;
@@ -807,11 +817,11 @@ implements SessionBean
 				pm.getFetchPlan().setGroups(fetchGroups);
 
 			ReportLayout reportLayout = (ReportLayout) pm.getObjectById(reportLayoutID);
-			
+
 			// now do the access right check also on object level
 			Authority.resolveSecuringAuthority(pm, reportLayout, ResolveSecuringAuthorityStrategy.organisation)
 				.assertContainsRoleRef(getPrincipal(), RoleConstants.editReport);
-			
+
 			Collection<ReportLayoutLocalisationData> bundle = ReportLayoutLocalisationData.getReportLayoutLocalisationBundle(pm, reportLayout);
 			return pm.detachCopyAll(bundle);
 		} finally {

@@ -4,6 +4,7 @@ import javax.jdo.Query;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.jfire.security.SecurityReflector;
+import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.security.id.UserID;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.ProductTypeGroup;
@@ -101,7 +102,8 @@ public abstract class AbstractProductTypeGroupQuery
 
 //		if (isFieldEnabled(FieldName.permissionGrantedToSee) && permissionGrantedToSee != null)
 //			populateFilterPermissionGranted("flagsSeeProductType", permissionGrantedToSee, "productTypePermissionFlagSetSee");
-		populateFilterPermissionGranted("flagsSeeProductType", true, "productTypePermissionFlagSetSee");
+		if (!User.USER_ID_SYSTEM.equals(userID.userID)) // the system user is allowed to see/do everything and has no ProductTypePermissionFlagSet. TODO maybe we should give him ProductTypePermissionFlagSet entries?!
+			populateFilterPermissionGranted("flagsSeeProductType", true, "productTypePermissionFlagSetSee");
 
 		if (isFieldEnabled(FieldName.permissionGrantedToSell) && permissionGrantedToSell != null)
 			populateFilterPermissionGranted("flagsSellProductType", permissionGrantedToSell, "productTypePermissionFlagSetSell");

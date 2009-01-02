@@ -1759,12 +1759,13 @@ implements SessionBean
 
 			Collection<ProductType> productTypes = (Collection<ProductType>) queries.executeQueries();
 
-			productTypes = Authority.filterIndirectlySecuredObjects(
-					pm,
-					productTypes,
-					getPrincipal(),
-					RoleConstants.seeProductType,
-					ResolveSecuringAuthorityStrategy.allow);
+// Commented out the following filtering, because that's already done by the query using the ProductTypePermissionFlagSets. Marco.
+//			productTypes = Authority.filterIndirectlySecuredObjects(
+//					pm,
+//					productTypes,
+//					getPrincipal(),
+//					RoleConstants.seeProductType,
+//					ResolveSecuringAuthorityStrategy.allow);
 
 			return NLJDOHelper.getObjectIDSet(productTypes);
 		} finally {
@@ -1772,46 +1773,46 @@ implements SessionBean
 		}
 	}
 
-// TODO @Daniel: this new method checked-in by you today, but it's not used anywhere. Is it really necessary? Marco.
-	private Set<ProductTypeID> getInternalProductTypeIDs(QueryCollection<? extends AbstractProductTypeQuery> productTypeQueries)
-	{
-		if (productTypeQueries == null)
-			return null;
-
-		if (! ProductType.class.isAssignableFrom(productTypeQueries.getResultClass()))
-		{
-			throw new RuntimeException("Given QueryCollection has invalid return type! " +
-					"Invalid return type= "+ productTypeQueries.getResultClassName());
-		}
-
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			pm.getFetchPlan().setMaxFetchDepth(1);
-			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
-
-			if (! (productTypeQueries instanceof JDOQueryCollectionDecorator))
-			{
-				productTypeQueries = new JDOQueryCollectionDecorator<AbstractProductTypeQuery>(productTypeQueries);
-			}
-			JDOQueryCollectionDecorator<AbstractProductTypeQuery> queries =
-				(JDOQueryCollectionDecorator<AbstractProductTypeQuery>) productTypeQueries;
-
-			queries.setPersistenceManager(pm);
-
-			Collection<ProductType> productTypes = (Collection<ProductType>) queries.executeQueries();
-
-			productTypes = Authority.filterIndirectlySecuredObjects(
-					pm,
-					productTypes,
-					getPrincipal(),
-					RoleConstants.seeProductType,
-					ResolveSecuringAuthorityStrategy.allow);
-
-			return NLJDOHelper.getObjectIDSet(productTypes);
-		} finally {
-			pm.close();
-		}
-	}
+//// TODO @Daniel: this new method checked-in by you today, but it's not used anywhere. Is it really necessary? Marco.
+//	private Set<ProductTypeID> getInternalProductTypeIDs(QueryCollection<? extends AbstractProductTypeQuery> productTypeQueries)
+//	{
+//		if (productTypeQueries == null)
+//			return null;
+//
+//		if (! ProductType.class.isAssignableFrom(productTypeQueries.getResultClass()))
+//		{
+//			throw new RuntimeException("Given QueryCollection has invalid return type! " +
+//					"Invalid return type= "+ productTypeQueries.getResultClassName());
+//		}
+//
+//		PersistenceManager pm = getPersistenceManager();
+//		try {
+//			pm.getFetchPlan().setMaxFetchDepth(1);
+//			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
+//
+//			if (! (productTypeQueries instanceof JDOQueryCollectionDecorator))
+//			{
+//				productTypeQueries = new JDOQueryCollectionDecorator<AbstractProductTypeQuery>(productTypeQueries);
+//			}
+//			JDOQueryCollectionDecorator<AbstractProductTypeQuery> queries =
+//				(JDOQueryCollectionDecorator<AbstractProductTypeQuery>) productTypeQueries;
+//
+//			queries.setPersistenceManager(pm);
+//
+//			Collection<ProductType> productTypes = (Collection<ProductType>) queries.executeQueries();
+//
+//			productTypes = Authority.filterIndirectlySecuredObjects(
+//					pm,
+//					productTypes,
+//					getPrincipal(),
+//					RoleConstants.seeProductType,
+//					ResolveSecuringAuthorityStrategy.allow);
+//
+//			return NLJDOHelper.getObjectIDSet(productTypes);
+//		} finally {
+//			pm.close();
+//		}
+//	}
 
 //	/**
 //	 *
@@ -1920,9 +1921,12 @@ implements SessionBean
 				result.addEntry(groupID);
 				for (Iterator<ProductType> iterator = group.getProductTypes().iterator(); iterator.hasNext();) {
 					ProductType type = iterator.next();
+//					ProductTypeID typeID = (ProductTypeID) JDOHelper.getObjectId(type);
+//					if (Authority.resolveSecuringAuthority(pm, type.getProductTypeLocal(), ResolveSecuringAuthorityStrategy.allow).containsRoleRef(getPrincipal(), RoleConstants.seeProductType))
+//						result.addType(groupID, typeID);
+					// The filtering is already done in the method ProductTypeGroup.getProductTypes() - no need to filter again.
 					ProductTypeID typeID = (ProductTypeID) JDOHelper.getObjectId(type);
-					if (Authority.resolveSecuringAuthority(pm, type.getProductTypeLocal(), ResolveSecuringAuthorityStrategy.allow).containsRoleRef(getPrincipal(), RoleConstants.seeProductType))
-						result.addType(groupID, typeID);
+					result.addType(groupID, typeID);
 				}
 			}
 			return result;

@@ -7,9 +7,9 @@ import java.util.Set;
 import javax.jdo.FetchPlan;
 
 import org.nightlabs.jdo.NLJDOHelper;
+import org.nightlabs.jfire.base.JFireEjbUtil;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.issue.IssueManager;
-import org.nightlabs.jfire.issue.IssueManagerUtil;
 import org.nightlabs.jfire.issue.project.id.ProjectID;
 import org.nightlabs.jfire.issue.project.id.ProjectTypeID;
 import org.nightlabs.jfire.security.SecurityReflector;
@@ -19,7 +19,7 @@ import org.nightlabs.progress.SubProgressMonitor;
 
 /**
  * Data access object for {@link Project}s.
- * 
+ *
  * @author Chairat Kongarayawetchakun - chairat [AT] nightlabs [DOT] de
  */
 public class ProjectDAO extends BaseJDOObjectDAO<ProjectID, Project>{
@@ -37,18 +37,18 @@ public class ProjectDAO extends BaseJDOObjectDAO<ProjectID, Project>{
 		return sharedInstance;
 	}
 
-	@SuppressWarnings("unchecked")
-	@Override
 	/**
 	 * {@inheritDoc}
 	 */
+	@SuppressWarnings("unchecked")
+	@Override
 	protected synchronized Collection<Project> retrieveJDOObjects(Set<ProjectID> projectIDs,
 			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 			throws Exception {
 
 		monitor.beginTask("Loading Projects", 1);
 		try {
-			IssueManager im = IssueManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			IssueManager im = JFireEjbUtil.getBean(IssueManager.class, SecurityReflector.getInitialContextProperties());
 			return im.getProjects(projectIDs, fetchGroups, maxFetchDepth);
 		} catch (Exception e) {
 			monitor.setCanceled(true);
@@ -66,7 +66,7 @@ public class ProjectDAO extends BaseJDOObjectDAO<ProjectID, Project>{
 	 * Get a single project.
 	 * @param projectID The ID of the project to get
 	 * @param fetchGroups Wich fetch groups to use
-	 * @param maxFetchDepth Fetch depth or {@link NLJDOHelper#MAX_FETCH_DEPTH_NO_LIMIT} 
+	 * @param maxFetchDepth Fetch depth or {@link NLJDOHelper#MAX_FETCH_DEPTH_NO_LIMIT}
 	 * @param monitor The progress monitor for this action. For every downloaded
 	 * 					object, <code>monitor.worked(1)</code> will be called.
 	 * @return The requested project object
@@ -84,7 +84,7 @@ public class ProjectDAO extends BaseJDOObjectDAO<ProjectID, Project>{
 			ProgressMonitor monitor)
 			{
 		try {
-			issueManager = IssueManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			issueManager = JFireEjbUtil.getBean(IssueManager.class, SecurityReflector.getInitialContextProperties());
 			try {
 				Collection<ProjectID> projectIDs = issueManager.getProjectIDs();
 				return getJDOObjects(null, projectIDs, fetchGroups, maxFetchDepth, monitor);
@@ -107,15 +107,15 @@ public class ProjectDAO extends BaseJDOObjectDAO<ProjectID, Project>{
 			throw new NullPointerException("Project to save must not be null");
 		monitor.beginTask("Storing project: "+ project.getProjectID(), 3);
 		try {
-			IssueManager im = IssueManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			IssueManager im = JFireEjbUtil.getBean(IssueManager.class, SecurityReflector.getInitialContextProperties());
 			monitor.worked(1);
 
 			if (project.getProjectType() == null) {
 				project.setProjectType(
 						ProjectTypeDAO.sharedInstance().getProjectType(
-								ProjectType.PROJECT_TYPE_ID_DEFAULT, 
-								new String[] {FetchPlan.DEFAULT}, 
-								NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT, 
+								ProjectType.PROJECT_TYPE_ID_DEFAULT,
+								new String[] {FetchPlan.DEFAULT},
+								NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT,
 								new NullProgressMonitor()
 						)
 				);
@@ -137,7 +137,7 @@ public class ProjectDAO extends BaseJDOObjectDAO<ProjectID, Project>{
 	public synchronized void deleteProject(ProjectID projectID, ProgressMonitor monitor) {
 		monitor.beginTask("Deleting project: "+ projectID, 3);
 		try {
-			IssueManager im = IssueManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			IssueManager im = JFireEjbUtil.getBean(IssueManager.class, SecurityReflector.getInitialContextProperties());
 			im.deleteProject(projectID);
 			monitor.worked(1);
 			monitor.done();
@@ -148,12 +148,12 @@ public class ProjectDAO extends BaseJDOObjectDAO<ProjectID, Project>{
 	}
 
 	@SuppressWarnings("unchecked")
-	public synchronized Collection<Project> getRootProjects(String organisationID, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) 
+	public synchronized Collection<Project> getRootProjects(String organisationID, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
 		if(organisationID == null)
 			throw new NullPointerException("OrganisationID must not be null");
 		try {
-			IssueManager im = IssueManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			IssueManager im = JFireEjbUtil.getBean(IssueManager.class, SecurityReflector.getInitialContextProperties());
 			Collection<Project> result = getProjects(im.getRootProjectIDs(organisationID), fetchGroups, maxFetchDepth, monitor);
 			result.add(getProject(Project.PROJECT_ID_DEFAULT, fetchGroups, maxFetchDepth, monitor));
 			return result;
@@ -163,10 +163,10 @@ public class ProjectDAO extends BaseJDOObjectDAO<ProjectID, Project>{
 	}
 
 	@SuppressWarnings("unchecked")
-	public synchronized Collection<Project> getProjectsByParentProjectID(ProjectID projectID, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) 
+	public synchronized Collection<Project> getProjectsByParentProjectID(ProjectID projectID, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
 		try {
-			IssueManager im = IssueManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			IssueManager im = JFireEjbUtil.getBean(IssueManager.class, SecurityReflector.getInitialContextProperties());
 			Collection<Project> result = ProjectDAO.sharedInstance.getProjects(im.getProjectIDsByParentProjectID(projectID), fetchGroups, maxFetchDepth, monitor);
 			return result;
 		} catch (Exception e) {
@@ -175,10 +175,10 @@ public class ProjectDAO extends BaseJDOObjectDAO<ProjectID, Project>{
 	}
 
 	@SuppressWarnings("unchecked")
-	public synchronized Collection<Project> getProjectsByProjectTypeID(ProjectTypeID projectTypeID, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) 
+	public synchronized Collection<Project> getProjectsByProjectTypeID(ProjectTypeID projectTypeID, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
 		try {
-			IssueManager im = IssueManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			IssueManager im = JFireEjbUtil.getBean(IssueManager.class, SecurityReflector.getInitialContextProperties());
 			Collection<Project> result = ProjectDAO.sharedInstance.getProjects(im.getProjectIDsByProjectTypeID(projectTypeID), fetchGroups, maxFetchDepth, monitor);
 			return result;
 		} catch (Exception e) {

@@ -64,7 +64,7 @@ import org.nightlabs.util.Util;
 /**
  * An EJB session bean provides methods for managing every objects used in the issue tracking.
  * <p>
- * 
+ *
  * </p>
  * @author Chairat Kongarayawetchakun - chairat [AT] nightlabs [DOT] de
  *
@@ -128,6 +128,16 @@ implements SessionBean
 		logger.debug(this.getClass().getName() + ".ejbPassivate()");
 	}
 
+	/**
+	 * @ejb.interface-method
+	 * @ejb.transaction type="Supports"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	@Override
+	public String ping(String message) {
+		return super.ping(message);
+	}
+
 	//IssueFileAttachment//
 	/**
 	 * @ejb.interface-method
@@ -186,7 +196,7 @@ implements SessionBean
 	 * @param get true if you want to get the stored project type
 	 * @param fetchGroups the fetchGroups that used for specify fields to be detached from the datastore
 	 * @param maxFetchDepth specifies the number of level of the object to be fetched
-	 * 
+	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Required"

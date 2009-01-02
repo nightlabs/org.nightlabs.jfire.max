@@ -4,9 +4,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import org.nightlabs.jfire.base.JFireEjbUtil;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.issue.IssueManager;
-import org.nightlabs.jfire.issue.IssueManagerUtil;
 import org.nightlabs.jfire.issue.history.id.IssueHistoryID;
 import org.nightlabs.jfire.issue.id.IssueID;
 import org.nightlabs.jfire.security.SecurityReflector;
@@ -43,7 +43,7 @@ public class IssueHistoryDAO extends BaseJDOObjectDAO<IssueHistoryID, IssueHisto
 
 		monitor.beginTask("Loading Issue Histories", 1);
 		try {
-			IssueManager im = IssueManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			IssueManager im = JFireEjbUtil.getBean(IssueManager.class, SecurityReflector.getInitialContextProperties());
 			return im.getIssueHistories(issueHistoryIDs, fetchGroups, maxFetchDepth);
 		} catch (Exception e) {
 			monitor.setCanceled(true);
@@ -63,7 +63,7 @@ public class IssueHistoryDAO extends BaseJDOObjectDAO<IssueHistoryID, IssueHisto
 			ProgressMonitor monitor)
 	{
 		try {
-			issueManager = IssueManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			issueManager = JFireEjbUtil.getBean(IssueManager.class, SecurityReflector.getInitialContextProperties());
 			try {
 				Collection<IssueHistoryID> issueHistoryIDs = issueManager.getIssueHistoryIDsByIssueID(issueID);
 				return getJDOObjects(null, issueHistoryIDs, fetchGroups, maxFetchDepth, monitor);
@@ -80,7 +80,7 @@ public class IssueHistoryDAO extends BaseJDOObjectDAO<IssueHistoryID, IssueHisto
 	{
 		monitor.beginTask("Loading issue histories...", 1);
 		try {
-			IssueManager im = IssueManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			IssueManager im = JFireEjbUtil.getBean(IssueManager.class, SecurityReflector.getInitialContextProperties());
 			Collection<IssueHistory> issueHistories = im.getIssueHistories(issueHistoryIDs, fetchGroups, maxFetchDepth);
 			monitor.done();
 			return issueHistories;			

@@ -52,7 +52,7 @@ import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 
 /**
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
- * 
+ *
  * @ejb.bean name="jfire/ejb/JFireScripting/ScriptManager"
  *					 jndi-name="jfire/ejb/JFireScripting/ScriptManager"
  *					 type="Stateless"
@@ -87,7 +87,7 @@ implements SessionBean
 	public void unsetSessionContext() {
 		super.unsetSessionContext();
 	}
-	
+
 	/**
 	 * @ejb.create-method
 	 * @ejb.permission role-name="_Guest_"
@@ -101,11 +101,21 @@ implements SessionBean
 	 * @ejb.permission unchecked="true"
 	 */
 	public void ejbRemove() throws EJBException, RemoteException { }
-	
-	
+
+	/**
+	 * @ejb.interface-method
+	 * @ejb.transaction type="Supports"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	@Override
+	public String ping(String message) {
+		return super.ping(message);
+	}
+
+
 	/**
 	 * This method is called by the datastore initialisation mechanism.
-	 * 
+	 *
 	 * @throws ModuleException
 	 *
 	 * @ejb.interface-method
@@ -121,7 +131,7 @@ implements SessionBean
 			ModuleMetaData moduleMetaData = ModuleMetaData.getModuleMetaData(pm, JFireScriptingEAR.MODULE_NAME);
 			if (moduleMetaData == null) {
 				logger.info("Initialization of JFireScripting started ...");
-	
+
 				// version is {major}.{minor}.{release}-{patchlevel}-{suffix}
 				moduleMetaData = new ModuleMetaData(
 						JFireScriptingEAR.MODULE_NAME, "0.9.5-0-beta", "0.9.5-0-beta");
@@ -159,7 +169,7 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * @throws ModuleException
 	 *
@@ -178,7 +188,7 @@ implements SessionBean
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
-			
+
 			List<ScriptRegistryItem> result = new ArrayList<ScriptRegistryItem>();
 			for (ScriptRegistryItemID itemID : scriptRegistryItemIDs) {
 				ScriptRegistryItem item = (ScriptRegistryItem)pm.getObjectById(itemID);
@@ -190,7 +200,7 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * @throws ModuleException
 	 *
@@ -217,9 +227,9 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @param organisationID The organisationID the carriers should be searched for. If null top level carriers for all organisations are returned.
 	 * @throws ModuleException
 	 *
@@ -243,7 +253,7 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 //	/**
 //	 *
 //	 * @param topLevelIDs a Set of {@link ScriptRegistryItemID}s which {@link ScriptRegistryItemCarrier} you want to get for
@@ -271,7 +281,7 @@ implements SessionBean
 //			pm.close();
 //		}
 //	}
-	
+
 	/**
 	 * @throws ModuleException
 	 *
@@ -322,7 +332,7 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * @throws ModuleException
 	 *
@@ -341,7 +351,7 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * @throws ModuleException
 	 *
@@ -366,11 +376,11 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * Returns the {@link ScriptParameterSet}s associated with the
 	 * {@link ScriptRegistryItem}s referenced by the given {@link ScriptRegistryItemID}s.
-	 * 
+	 *
 	 * @throws ModuleException
 	 *
 	 * @ejb.interface-method
@@ -425,7 +435,7 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * @throws ModuleException
 	 *
@@ -451,7 +461,7 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * @throws ModuleException
 	 *
@@ -473,9 +483,9 @@ implements SessionBean
 			pm.close();
 		}
 	}
-			
+
 	/**
-	 * 
+	 *
 	 * @param organisationID The organisationID the carriers should be searched for.
 	 * If null top level carriers for all organisations are returned.
 	 * @param scriptRegistryItemType the scriptRegistryItemType to search for
@@ -503,10 +513,10 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * returns the detached {@link ScriptRegistry}
-	 * 
+	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Required"
@@ -525,10 +535,10 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * returns the detached {@link ScriptRegistry}
-	 * 
+	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Required"

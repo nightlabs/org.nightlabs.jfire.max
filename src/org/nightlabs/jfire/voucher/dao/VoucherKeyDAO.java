@@ -4,10 +4,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import org.nightlabs.jfire.base.JFireEjbUtil;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.voucher.VoucherManager;
-import org.nightlabs.jfire.voucher.VoucherManagerUtil;
 import org.nightlabs.jfire.voucher.store.VoucherKey;
 import org.nightlabs.jfire.voucher.store.id.VoucherKeyID;
 import org.nightlabs.progress.ProgressMonitor;
@@ -38,7 +38,7 @@ extends BaseJDOObjectDAO<VoucherKeyID, VoucherKey>
 		monitor.beginTask("Loading VoucherKeys", 1);
 		try {
 			VoucherManager vm = voucherManager;
-			if (vm == null) vm = VoucherManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			if (vm == null) vm = JFireEjbUtil.getBean(VoucherManager.class, SecurityReflector.getInitialContextProperties());
 			return vm.getVoucherKeys(voucherKeyIDs, fetchGroups, maxFetchDepth);
 		} finally {
 			monitor.worked(1);
@@ -69,7 +69,7 @@ extends BaseJDOObjectDAO<VoucherKeyID, VoucherKey>
 	)
 	{
 		try {
-			voucherManager = VoucherManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			voucherManager = JFireEjbUtil.getBean(VoucherManager.class, SecurityReflector.getInitialContextProperties());
 			try {
 				VoucherKeyID voucherKeyID = voucherManager.getVoucherKeyID(voucherKeyString);
 				if (voucherKeyID == null)

@@ -4,14 +4,13 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import org.nightlabs.jfire.base.JFireEjbUtil;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.base.jdo.IJDOObjectDAO;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.store.StoreManager;
-import org.nightlabs.jfire.store.StoreManagerUtil;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.voucher.VoucherManager;
-import org.nightlabs.jfire.voucher.VoucherManagerUtil;
 import org.nightlabs.jfire.voucher.store.VoucherType;
 import org.nightlabs.progress.ProgressMonitor;
 
@@ -40,10 +39,10 @@ implements IJDOObjectDAO<VoucherType>
 		try {
 //			VoucherManager vm = voucherManager;
 //			if (vm == null)
-//				vm = VoucherManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+//				vm = JFireEjbUtil.getBean(VoucherManager.class, SecurityReflector.getInitialContextProperties());
 //
 //			return vm.getVoucherTypes(voucherTypeIDs, fetchGroups, maxFetchDepth);
-			StoreManager sm = StoreManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			StoreManager sm = JFireEjbUtil.getBean(StoreManager.class, SecurityReflector.getInitialContextProperties());
 			return sm.getProductTypes(voucherTypeIDs, fetchGroups, maxFetchDepth);
 		} finally {
 			monitor.worked(1);
@@ -59,7 +58,7 @@ implements IJDOObjectDAO<VoucherType>
 			ProgressMonitor monitor)
 	{
 		try {
-			voucherManager = VoucherManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			voucherManager = JFireEjbUtil.getBean(VoucherManager.class, SecurityReflector.getInitialContextProperties());
 			try {
 				Collection<ProductTypeID> voucherTypeIDs = voucherManager.getChildVoucherTypeIDs(parentVoucherTypeID);
 				return getJDOObjects(null, voucherTypeIDs, fetchGroups, maxFetchDepth, monitor);
@@ -94,7 +93,7 @@ implements IJDOObjectDAO<VoucherType>
 	@Override
 	public VoucherType storeJDOObject(VoucherType jdoObject, boolean get, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) {
 		try {
-			VoucherManager vm = VoucherManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			VoucherManager vm = JFireEjbUtil.getBean(VoucherManager.class, SecurityReflector.getInitialContextProperties());
 			return vm.storeVoucherType(jdoObject, get, fetchGroups, maxFetchDepth);
 		} catch (Exception e) {
 			throw new RuntimeException(e);

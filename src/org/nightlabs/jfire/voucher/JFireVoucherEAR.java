@@ -4,7 +4,6 @@ import org.nightlabs.jfire.accounting.id.AccountTypeID;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.store.deliver.id.ModeOfDeliveryFlavourID;
 import org.nightlabs.jfire.store.deliver.id.ModeOfDeliveryID;
-import org.nightlabs.jfire.voucher.resource.Messages;
 
 /**
  * @author Daniel.Mazurek [at] NightLabs [dot] de

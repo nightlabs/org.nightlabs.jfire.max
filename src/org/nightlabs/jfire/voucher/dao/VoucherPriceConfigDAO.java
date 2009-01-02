@@ -5,10 +5,10 @@ import java.util.List;
 import java.util.Set;
 
 import org.nightlabs.jfire.accounting.priceconfig.id.PriceConfigID;
+import org.nightlabs.jfire.base.JFireEjbUtil;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.voucher.VoucherManager;
-import org.nightlabs.jfire.voucher.VoucherManagerUtil;
 import org.nightlabs.jfire.voucher.accounting.VoucherPriceConfig;
 import org.nightlabs.progress.ProgressMonitor;
 
@@ -40,7 +40,7 @@ extends BaseJDOObjectDAO<PriceConfigID, VoucherPriceConfig>
 		monitor.beginTask("Load VoucherPriceConfigs", 1);
 		try {
 			VoucherManager vm = voucherManager;
-			if (vm == null) vm = VoucherManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			if (vm == null) vm = JFireEjbUtil.getBean(VoucherManager.class, SecurityReflector.getInitialContextProperties());
 			return vm.getVoucherPriceConfigs(objectIDs, fetchGroups, maxFetchDepth);
 		} finally {
 			monitor.worked(1);
@@ -53,7 +53,7 @@ extends BaseJDOObjectDAO<PriceConfigID, VoucherPriceConfig>
 			ProgressMonitor monitor)
 	{
 		try {
-			voucherManager = VoucherManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			voucherManager = JFireEjbUtil.getBean(VoucherManager.class, SecurityReflector.getInitialContextProperties());
 			try {
 				Set<PriceConfigID> priceConfigIDs = voucherManager.getVoucherPriceConfigIDs();
 				return getJDOObjects(null, priceConfigIDs, fetchGroups, maxFetchDepth, monitor);

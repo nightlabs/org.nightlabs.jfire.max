@@ -5,10 +5,10 @@ import java.util.List;
 import java.util.Set;
 
 import org.nightlabs.jfire.accounting.book.id.LocalAccountantDelegateID;
+import org.nightlabs.jfire.base.JFireEjbUtil;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.voucher.VoucherManager;
-import org.nightlabs.jfire.voucher.VoucherManagerUtil;
 import org.nightlabs.jfire.voucher.accounting.VoucherLocalAccountantDelegate;
 import org.nightlabs.progress.ProgressMonitor;
 
@@ -36,7 +36,7 @@ extends BaseJDOObjectDAO<LocalAccountantDelegateID, VoucherLocalAccountantDelega
 			throws Exception
 	{
 		VoucherManager vm = voucherManager;
-		if (vm == null) vm = VoucherManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+		if (vm == null) vm = JFireEjbUtil.getBean(VoucherManager.class, SecurityReflector.getInitialContextProperties());
 		return vm.getVoucherLocalAccountantDelegates(objectIDs, fetchGroups, maxFetchDepth);
 	}
 
@@ -47,7 +47,7 @@ extends BaseJDOObjectDAO<LocalAccountantDelegateID, VoucherLocalAccountantDelega
 			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
 		try {
-			voucherManager = VoucherManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			voucherManager = JFireEjbUtil.getBean(VoucherManager.class, SecurityReflector.getInitialContextProperties());
 			try {
 				Set<LocalAccountantDelegateID> ids = voucherManager.getVoucherLocalAccountantDelegateIDs();
 				return getJDOObjects(null, ids, fetchGroups, maxFetchDepth, monitor);

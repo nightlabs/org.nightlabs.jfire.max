@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import org.nightlabs.jfire.base.JFireEjbUtil;
+import org.nightlabs.jfire.base.JFireEjbFactory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.base.jdo.IJDOObjectDAO;
 import org.nightlabs.jfire.security.SecurityReflector;
@@ -39,10 +39,10 @@ implements IJDOObjectDAO<VoucherType>
 		try {
 //			VoucherManager vm = voucherManager;
 //			if (vm == null)
-//				vm = JFireEjbUtil.getBean(VoucherManager.class, SecurityReflector.getInitialContextProperties());
+//				vm = JFireEjbFactory.getBean(VoucherManager.class, SecurityReflector.getInitialContextProperties());
 //
 //			return vm.getVoucherTypes(voucherTypeIDs, fetchGroups, maxFetchDepth);
-			StoreManager sm = JFireEjbUtil.getBean(StoreManager.class, SecurityReflector.getInitialContextProperties());
+			StoreManager sm = JFireEjbFactory.getBean(StoreManager.class, SecurityReflector.getInitialContextProperties());
 			return sm.getProductTypes(voucherTypeIDs, fetchGroups, maxFetchDepth);
 		} finally {
 			monitor.worked(1);
@@ -58,7 +58,7 @@ implements IJDOObjectDAO<VoucherType>
 			ProgressMonitor monitor)
 	{
 		try {
-			voucherManager = JFireEjbUtil.getBean(VoucherManager.class, SecurityReflector.getInitialContextProperties());
+			voucherManager = JFireEjbFactory.getBean(VoucherManager.class, SecurityReflector.getInitialContextProperties());
 			try {
 				Collection<ProductTypeID> voucherTypeIDs = voucherManager.getChildVoucherTypeIDs(parentVoucherTypeID);
 				return getJDOObjects(null, voucherTypeIDs, fetchGroups, maxFetchDepth, monitor);
@@ -93,7 +93,7 @@ implements IJDOObjectDAO<VoucherType>
 	@Override
 	public VoucherType storeJDOObject(VoucherType jdoObject, boolean get, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) {
 		try {
-			VoucherManager vm = JFireEjbUtil.getBean(VoucherManager.class, SecurityReflector.getInitialContextProperties());
+			VoucherManager vm = JFireEjbFactory.getBean(VoucherManager.class, SecurityReflector.getInitialContextProperties());
 			return vm.storeVoucherType(jdoObject, get, fetchGroups, maxFetchDepth);
 		} catch (Exception e) {
 			throw new RuntimeException(e);

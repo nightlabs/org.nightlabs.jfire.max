@@ -28,7 +28,6 @@ package org.nightlabs.jfire.chezfrancois;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.ModuleException;
-import org.nightlabs.annotation.Implement;
 import org.nightlabs.jfire.init.InitException;
 import org.nightlabs.jfire.serverinit.ServerInitialiserDelegate;
 import org.nightlabs.jfire.servermanager.JFireServerManager;
@@ -40,44 +39,30 @@ public class ChezFrancoisServerInitialiser extends ServerInitialiserDelegate
 	public static final String ORGANISATION_ID_RESELLER = "reseller.jfire.org"; // this is used if the project is deployed together with JFireDemoSetupMultiOrganisation (there are no inter-dependencies between these two projects, but they still cooperate if optionally deployed together)
 
 	@Override
-	@Implement
 	public void initialise() throws InitException
 	{
-//		TransactionManager transactionManager = getJ2EEVendorAdapter().getTransactionManager(getInitialContext());
+		JFireServerManager jfsm = getJFireServerManagerFactory().getJFireServerManager();
+		try {
+			if (jfsm.isNewServerNeedingSetup()) {
+				Logger logger = Logger.getLogger(ChezFrancoisServerInitialiser.class);
+				logger.error("Server initialization is not possible, because the basic server configuration is not complete yet! Configure and reboot the server!");
+				return;
+			}
 
-//		boolean doCommit = false;
-//		transactionManager.begin();
-//    try {
-    	JFireServerManager jfsm = getJFireServerManagerFactory().getJFireServerManager();
-    	try {
-    		if (jfsm.isNewServerNeedingSetup()) {
-    			Logger logger = Logger.getLogger(ChezFrancoisServerInitialiser.class);
-    			logger.error("Server initialization is not possible, because the basic server configuration is not complete yet! Configure and reboot the server!");
-    			return;
-    		}
-
-    		try {
-    			jfsm.getOrganisationConfig(ORGANISATION_ID_WINE_STORE);
-    		} catch (OrganisationNotFoundException x) {
-    			// do initialization!
-//    			jfsm.createOrganisation(ORGANISATION_ID_WINE_STORE, "Chez François Wine Store", "francois", "test", true);
-    			try {
-						jfsm.createOrganisation(ORGANISATION_ID_WINE_STORE, "Chez Francois Wine Store", "francois", "test", true);
-					} catch (ModuleException e) {
-						throw new InitException(e.getMessage(), e);
-					}
-    		}
-    	} finally {
-    		jfsm.close();
-    	}
-
-//			doCommit = true;
-//    } finally {
-//    	if (doCommit)
-//    		transactionManager.commit();
-//    	else
-//    		transactionManager.rollback();
-//    }
+			try {
+				jfsm.getOrganisationConfig(ORGANISATION_ID_WINE_STORE);
+			} catch (OrganisationNotFoundException x) {
+				// do initialization!
+				//    jfsm.createOrganisation(ORGANISATION_ID_WINE_STORE, "Chez François Wine Store", "francois", "test", true);
+				try {
+					jfsm.createOrganisation(ORGANISATION_ID_WINE_STORE, "Chez Francois Wine Store", "francois", "test", true);
+				} catch (ModuleException e) {
+					throw new InitException(e.getMessage(), e);
+				}
+			}
+		} finally {
+			jfsm.close();
+		}
 	}
 
 }

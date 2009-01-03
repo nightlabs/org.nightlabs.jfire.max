@@ -26,18 +26,32 @@
 
 package org.nightlabs.jfire.chezfrancois;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.rmi.RemoteException;
 
 import javax.ejb.CreateException;
 import javax.ejb.EJBException;
 import javax.ejb.SessionBean;
 import javax.ejb.SessionContext;
+import javax.jdo.FetchPlan;
 import javax.jdo.PersistenceManager;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.ModuleException;
 import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
+import org.nightlabs.jfire.idgenerator.IDGenerator;
+import org.nightlabs.jfire.organisation.LocalOrganisation;
+import org.nightlabs.jfire.person.Person;
+import org.nightlabs.jfire.person.PersonStruct;
+import org.nightlabs.jfire.prop.PropertySet;
+import org.nightlabs.jfire.prop.Struct;
+import org.nightlabs.jfire.prop.StructLocal;
+import org.nightlabs.jfire.prop.datafield.ImageDataField;
+import org.nightlabs.jfire.prop.exception.DataBlockGroupNotFoundException;
+import org.nightlabs.jfire.prop.exception.DataBlockNotFoundException;
+import org.nightlabs.jfire.prop.exception.DataFieldNotFoundException;
 import org.nightlabs.jfire.security.listener.SecurityChangeController;
 import org.nightlabs.jfire.workstation.Workstation;
 import org.nightlabs.timepattern.TimePatternFormatException;
@@ -107,6 +121,7 @@ implements SessionBean
 			return;
 
 		ChezFrancoisDatastoreInitialiserLocal initialiser = ChezFrancoisDatastoreInitialiserUtil.getLocalHome().create();
+		initialiser.configureLocalOrganisation(); // have to do this before createModuleMetaData as it checks for the ModuleMetaData
 		initialiser.createModuleMetaData();
 
 		initialiser.createDemoData_JFireSimpleTrade();
@@ -147,6 +162,60 @@ implements SessionBean
 		}
 	}
 
+	/**
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_System_"
+	 * @ejb.transaction type="Required"
+	 */
+	public void configureLocalOrganisation()
+	throws MalformedVersionException, DataBlockNotFoundException, DataBlockGroupNotFoundException, DataFieldNotFoundException
+	{
+		logger.trace("createModuleMetaData: begin");
+
+		PersistenceManager pm = this.getPersistenceManager();
+		try {
+			ModuleMetaData moduleMetaData = ModuleMetaData.getModuleMetaData(pm, "JFireChezFrancois");
+			if (moduleMetaData != null)
+				return;
+
+			logger.debug("Configuring JFireChezFrancois local organisation...");
+
+			LocalOrganisation org = LocalOrganisation.getLocalOrganisation(pm);
+			Person person = org.getOrganisation().getPerson();
+			if (person == null) {
+				person = new Person(org.getOrganisationID(), IDGenerator.nextID(PropertySet.class));
+				org.getOrganisation().setPerson(person);
+				person = org.getOrganisation().getPerson();
+			}
+			pm.getFetchPlan().setGroups(
+					FetchPlan.DEFAULT, PropertySet.FETCH_GROUP_DATA_FIELDS, PropertySet.FETCH_GROUP_FULL_DATA
+				);
+			Person detachedPerson = pm.detachCopy(person);
+			StructLocal structLocal = StructLocal.getStructLocal(Person.class, Struct.DEFAULT_SCOPE, StructLocal.DEFAULT_SCOPE, pm);
+			detachedPerson.inflate(structLocal);
+			ImageDataField photoField = (ImageDataField) detachedPerson.getDataField(PersonStruct.PERSONALDATA_PHOTO);
+			InputStream in = getClass().getResourceAsStream("resource/jfire-logo.jpg");
+			if (in != null) {
+				try {
+					photoField.loadStream(in, "jfire-logo.jpg", "image/jpeg");
+				} catch (IOException e) {
+					logger.error("Error loading image", e);
+				} finally {
+					try {
+						in.close();
+					} catch (IOException e) {
+						logger.error("Error loading image", e);
+					}
+				}
+			}			
+			detachedPerson.deflate();
+			pm.makePersistent(detachedPerson);
+		} finally {
+			pm.close();
+			logger.trace("createModuleMetaData: end");
+		}
+	}
+	
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_System_"

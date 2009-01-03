@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.nightlabs.jdo.NLJDOHelper;
-import org.nightlabs.jfire.base.JFireEjbUtil;
+import org.nightlabs.jfire.base.JFireEjbFactory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.issue.IssueFileAttachment;
 import org.nightlabs.jfire.issue.IssueManager;
@@ -45,7 +45,7 @@ public class IssueFileAttachmentDAO extends BaseJDOObjectDAO<IssueFileAttachment
 
 		monitor.beginTask("Loading IssueFileAttachments", 1);
 		try {
-			IssueManager im = JFireEjbUtil.getBean(IssueManager.class, SecurityReflector.getInitialContextProperties());
+			IssueManager im = JFireEjbFactory.getBean(IssueManager.class, SecurityReflector.getInitialContextProperties());
 			return im.getIssueFileAttachments(issueFileAttachmentIDs, fetchGroups, maxFetchDepth);
 		} catch (Exception e) {
 			monitor.setCanceled(true);
@@ -91,7 +91,7 @@ public class IssueFileAttachmentDAO extends BaseJDOObjectDAO<IssueFileAttachment
 	public synchronized Collection<IssueFileAttachment> getIssueFileAttachments(String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) 
 	{
 		try {
-			IssueManager im = JFireEjbUtil.getBean(IssueManager.class, SecurityReflector.getInitialContextProperties());
+			IssueManager im = JFireEjbFactory.getBean(IssueManager.class, SecurityReflector.getInitialContextProperties());
 			Set<IssueFileAttachmentID> is = im.getIssueFileAttachmentIDs();
 			return getJDOObjects(null, is, fetchGroups, maxFetchDepth, monitor);
 		} catch (Exception e) {

@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.nightlabs.jdo.NLJDOHelper;
-import org.nightlabs.jfire.base.JFireEjbUtil;
+import org.nightlabs.jfire.base.JFireEjbFactory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.issue.IssueLinkType;
 import org.nightlabs.jfire.issue.IssueManager;
@@ -51,7 +51,7 @@ extends BaseJDOObjectDAO<IssueLinkTypeID, IssueLinkType>
 		try {
 			IssueManager im = issueManager;
 			if (im == null)
-				im = JFireEjbUtil.getBean(IssueManager.class, SecurityReflector.getInitialContextProperties());
+				im = JFireEjbFactory.getBean(IssueManager.class, SecurityReflector.getInitialContextProperties());
 
 			return im.getIssueLinkTypes(objectIDs, fetchGroups, maxFetchDepth);	
 		} catch (Exception e) {
@@ -77,7 +77,7 @@ extends BaseJDOObjectDAO<IssueLinkTypeID, IssueLinkType>
 	public synchronized List<IssueLinkType> getIssueLinkTypes(String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) 
 	{
 		try {
-			issueManager = JFireEjbUtil.getBean(IssueManager.class, SecurityReflector.getInitialContextProperties());
+			issueManager = JFireEjbFactory.getBean(IssueManager.class, SecurityReflector.getInitialContextProperties());
 			Set<IssueLinkTypeID> issueLinkTypeIDs = issueManager.getIssueLinkTypeIDs();
 			return getJDOObjects(null, issueLinkTypeIDs, fetchGroups, maxFetchDepth, monitor);
 		} catch (Exception e) {
@@ -101,7 +101,7 @@ extends BaseJDOObjectDAO<IssueLinkTypeID, IssueLinkType>
 	{
 		monitor.beginTask("Loading issue link types", 100);
 		try {
-			issueManager = JFireEjbUtil.getBean(IssueManager.class, SecurityReflector.getInitialContextProperties());
+			issueManager = JFireEjbFactory.getBean(IssueManager.class, SecurityReflector.getInitialContextProperties());
 			Set<IssueLinkTypeID> issueLinkTypeIDs = issueManager.getIssueLinkTypeIDs(linkedObjectClass);
 			monitor.worked(30);
 			return getJDOObjects(null, issueLinkTypeIDs, fetchGroups, maxFetchDepth, new SubProgressMonitor(monitor, 70));

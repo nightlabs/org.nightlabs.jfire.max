@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.nightlabs.jdo.NLJDOHelper;
-import org.nightlabs.jfire.base.JFireEjbUtil;
+import org.nightlabs.jfire.base.JFireEjbFactory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.issue.IssueManager;
 import org.nightlabs.jfire.issue.IssueType;
@@ -57,7 +57,7 @@ public class IssueTypeDAO extends BaseJDOObjectDAO<IssueTypeID, IssueType>
 		monitor.beginTask("Fetching "+objectIDs.size()+" issue types information", 1);
 		Collection<IssueType> issueTypes;
 		try {
-			IssueManager im = JFireEjbUtil.getBean(IssueManager.class, SecurityReflector.getInitialContextProperties());
+			IssueManager im = JFireEjbFactory.getBean(IssueManager.class, SecurityReflector.getInitialContextProperties());
 			issueTypes = im.getIssueTypes(objectIDs, fetchGroups, maxFetchDepth);
 			monitor.worked(1);
 		} catch (Exception e) {
@@ -98,7 +98,7 @@ public class IssueTypeDAO extends BaseJDOObjectDAO<IssueTypeID, IssueType>
 	{
 		monitor.beginTask("Fetching all IssueTypes", 100);
 		try {
-			IssueManager im = JFireEjbUtil.getBean(IssueManager.class, SecurityReflector.getInitialContextProperties());
+			IssueManager im = JFireEjbFactory.getBean(IssueManager.class, SecurityReflector.getInitialContextProperties());
 			monitor.worked(20);
 			Set<IssueTypeID> allTypeIDs = im.getIssueTypeIDs();
 			List<IssueType> allTypes = getIssueTypes(allTypeIDs, fetchgroups, maxFetchDepth, new SubProgressMonitor(monitor, 80));
@@ -125,7 +125,7 @@ public class IssueTypeDAO extends BaseJDOObjectDAO<IssueTypeID, IssueType>
 	public synchronized IssueType storeIssueTypes(IssueType issueType, String[] fetchgroups, int maxFetchDepth, ProgressMonitor monitor) 
 	{
 		try {
-			IssueManager im = JFireEjbUtil.getBean(IssueManager.class, SecurityReflector.getInitialContextProperties());
+			IssueManager im = JFireEjbFactory.getBean(IssueManager.class, SecurityReflector.getInitialContextProperties());
 			return im.storeIssueType(issueType, true, fetchgroups, maxFetchDepth);
 		} catch (Exception e) {
 			throw new RuntimeException(e);

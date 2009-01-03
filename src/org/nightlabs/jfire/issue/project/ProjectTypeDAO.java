@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.nightlabs.jdo.NLJDOHelper;
-import org.nightlabs.jfire.base.JFireEjbUtil;
+import org.nightlabs.jfire.base.JFireEjbFactory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.issue.IssueManager;
 import org.nightlabs.jfire.issue.project.id.ProjectTypeID;
@@ -45,7 +45,7 @@ extends BaseJDOObjectDAO<ProjectTypeID, ProjectType>
 
 		monitor.beginTask("Loading ProjectTypes", 1);
 		try {
-			IssueManager im = JFireEjbUtil.getBean(IssueManager.class, SecurityReflector.getInitialContextProperties());
+			IssueManager im = JFireEjbFactory.getBean(IssueManager.class, SecurityReflector.getInitialContextProperties());
 			return im.getProjectTypes(projectTypeIDs, fetchGroups, maxFetchDepth);
 		} catch (Exception e) {
 			monitor.setCanceled(true);
@@ -81,7 +81,7 @@ extends BaseJDOObjectDAO<ProjectTypeID, ProjectType>
 			ProgressMonitor monitor)
 	{
 		try {
-			issueManager = JFireEjbUtil.getBean(IssueManager.class, SecurityReflector.getInitialContextProperties());
+			issueManager = JFireEjbFactory.getBean(IssueManager.class, SecurityReflector.getInitialContextProperties());
 			try {
 				Collection<ProjectTypeID> projectTypeIDs = issueManager.getProjectTypeIDs();
 				return getJDOObjects(null, projectTypeIDs, fetchGroups, maxFetchDepth, monitor);
@@ -104,7 +104,7 @@ extends BaseJDOObjectDAO<ProjectTypeID, ProjectType>
 			throw new NullPointerException("ProjectType to save must not be null");
 		monitor.beginTask("Storing projectType: "+ projectType.getProjectTypeID(), 3);
 		try {
-			IssueManager im = JFireEjbUtil.getBean(IssueManager.class, SecurityReflector.getInitialContextProperties());
+			IssueManager im = JFireEjbFactory.getBean(IssueManager.class, SecurityReflector.getInitialContextProperties());
 			monitor.worked(1);
 
 			ProjectType result = im.storeProjectType(projectType, get, fetchGroups, maxFetchDepth);
@@ -123,7 +123,7 @@ extends BaseJDOObjectDAO<ProjectTypeID, ProjectType>
 	public synchronized void deleteProjectType(ProjectTypeID projectTypeID, ProgressMonitor monitor) {
 		monitor.beginTask("Deleting projectType: "+ projectTypeID, 3);
 		try {
-			IssueManager im = JFireEjbUtil.getBean(IssueManager.class, SecurityReflector.getInitialContextProperties());
+			IssueManager im = JFireEjbFactory.getBean(IssueManager.class, SecurityReflector.getInitialContextProperties());
 			im.deleteProjectType(projectTypeID);
 			monitor.worked(1);
 			monitor.done();

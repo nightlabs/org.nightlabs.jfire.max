@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import org.nightlabs.jfire.base.JFireEjbUtil;
+import org.nightlabs.jfire.base.JFireEjbFactory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.issue.IssueManager;
 import org.nightlabs.jfire.issue.history.id.IssueHistoryID;
@@ -43,7 +43,7 @@ public class IssueHistoryDAO extends BaseJDOObjectDAO<IssueHistoryID, IssueHisto
 
 		monitor.beginTask("Loading Issue Histories", 1);
 		try {
-			IssueManager im = JFireEjbUtil.getBean(IssueManager.class, SecurityReflector.getInitialContextProperties());
+			IssueManager im = JFireEjbFactory.getBean(IssueManager.class, SecurityReflector.getInitialContextProperties());
 			return im.getIssueHistories(issueHistoryIDs, fetchGroups, maxFetchDepth);
 		} catch (Exception e) {
 			monitor.setCanceled(true);
@@ -63,7 +63,7 @@ public class IssueHistoryDAO extends BaseJDOObjectDAO<IssueHistoryID, IssueHisto
 			ProgressMonitor monitor)
 	{
 		try {
-			issueManager = JFireEjbUtil.getBean(IssueManager.class, SecurityReflector.getInitialContextProperties());
+			issueManager = JFireEjbFactory.getBean(IssueManager.class, SecurityReflector.getInitialContextProperties());
 			try {
 				Collection<IssueHistoryID> issueHistoryIDs = issueManager.getIssueHistoryIDsByIssueID(issueID);
 				return getJDOObjects(null, issueHistoryIDs, fetchGroups, maxFetchDepth, monitor);
@@ -80,7 +80,7 @@ public class IssueHistoryDAO extends BaseJDOObjectDAO<IssueHistoryID, IssueHisto
 	{
 		monitor.beginTask("Loading issue histories...", 1);
 		try {
-			IssueManager im = JFireEjbUtil.getBean(IssueManager.class, SecurityReflector.getInitialContextProperties());
+			IssueManager im = JFireEjbFactory.getBean(IssueManager.class, SecurityReflector.getInitialContextProperties());
 			Collection<IssueHistory> issueHistories = im.getIssueHistories(issueHistoryIDs, fetchGroups, maxFetchDepth);
 			monitor.done();
 			return issueHistories;			

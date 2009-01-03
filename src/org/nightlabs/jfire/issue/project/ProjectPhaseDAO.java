@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.nightlabs.jdo.NLJDOHelper;
-import org.nightlabs.jfire.base.JFireEjbUtil;
+import org.nightlabs.jfire.base.JFireEjbFactory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.issue.IssueManager;
 import org.nightlabs.jfire.issue.project.id.ProjectPhaseID;
@@ -44,7 +44,7 @@ public class ProjectPhaseDAO extends BaseJDOObjectDAO<ProjectPhaseID, ProjectPha
 
 		monitor.beginTask("Loading Project Phases", 1);
 		try {
-			IssueManager im = JFireEjbUtil.getBean(IssueManager.class, SecurityReflector.getInitialContextProperties());
+			IssueManager im = JFireEjbFactory.getBean(IssueManager.class, SecurityReflector.getInitialContextProperties());
 			return im.getProjectPhases(projectPhaseIDs, fetchGroups, maxFetchDepth);
 		} catch (Exception e) {
 			monitor.setCanceled(true);
@@ -80,7 +80,7 @@ public class ProjectPhaseDAO extends BaseJDOObjectDAO<ProjectPhaseID, ProjectPha
 			ProgressMonitor monitor)
 			{
 		try {
-			issueManager = JFireEjbUtil.getBean(IssueManager.class, SecurityReflector.getInitialContextProperties());
+			issueManager = JFireEjbFactory.getBean(IssueManager.class, SecurityReflector.getInitialContextProperties());
 			try {
 				Collection<ProjectPhaseID> projectPhaseIDs = issueManager.getProjectPhaseIDs();
 				return getJDOObjects(null, projectPhaseIDs, fetchGroups, maxFetchDepth, monitor);
@@ -103,7 +103,7 @@ public class ProjectPhaseDAO extends BaseJDOObjectDAO<ProjectPhaseID, ProjectPha
 			throw new NullPointerException("Project Phase to save must not be null");
 		monitor.beginTask("Storing project phase : "+ projectPhase.getProjectPhaseID(), 3);
 		try {
-			IssueManager im = JFireEjbUtil.getBean(IssueManager.class, SecurityReflector.getInitialContextProperties());
+			IssueManager im = JFireEjbFactory.getBean(IssueManager.class, SecurityReflector.getInitialContextProperties());
 			monitor.worked(1);
 
 			ProjectPhase result = im.storeProjectPhase(projectPhase, get, fetchGroups, maxFetchDepth);

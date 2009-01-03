@@ -6,7 +6,7 @@ import java.util.Set;
 
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.query.QueryCollection;
-import org.nightlabs.jfire.base.JFireEjbUtil;
+import org.nightlabs.jfire.base.JFireEjbFactory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.issue.Issue;
 import org.nightlabs.jfire.issue.IssueManager;
@@ -47,7 +47,7 @@ public class IssueDAO extends BaseJDOObjectDAO<IssueID, Issue>{
 
 		monitor.beginTask("Loading Issues", 1);
 		try {
-			IssueManager im = JFireEjbUtil.getBean(IssueManager.class, SecurityReflector.getInitialContextProperties());
+			IssueManager im = JFireEjbFactory.getBean(IssueManager.class, SecurityReflector.getInitialContextProperties());
 			return im.getIssues(issueIDs, fetchGroups, maxFetchDepth);
 		} catch (Exception e) {
 			monitor.setCanceled(true);
@@ -64,7 +64,7 @@ public class IssueDAO extends BaseJDOObjectDAO<IssueID, Issue>{
 			throw new NullPointerException("Issue to save must not be null");
 		monitor.beginTask("Storing issue: "+ issue.getIssueID(), 3);
 		try {
-			IssueManager im = JFireEjbUtil.getBean(IssueManager.class, SecurityReflector.getInitialContextProperties());
+			IssueManager im = JFireEjbFactory.getBean(IssueManager.class, SecurityReflector.getInitialContextProperties());
 			monitor.worked(1);
 
 			Issue result = im.storeIssue(issue, get, fetchGroups, maxFetchDepth);
@@ -83,7 +83,7 @@ public class IssueDAO extends BaseJDOObjectDAO<IssueID, Issue>{
 	public synchronized void deleteIssue(IssueID issueID, ProgressMonitor monitor) {
 		monitor.beginTask("Deleting issue: "+ issueID, 3);
 		try {
-			IssueManager im = JFireEjbUtil.getBean(IssueManager.class, SecurityReflector.getInitialContextProperties());
+			IssueManager im = JFireEjbFactory.getBean(IssueManager.class, SecurityReflector.getInitialContextProperties());
 			im.deleteIssue(issueID);
 			monitor.worked(1);
 			monitor.done();
@@ -128,7 +128,7 @@ public class IssueDAO extends BaseJDOObjectDAO<IssueID, Issue>{
 	{
 		monitor.beginTask("Loading issues", 1);
 		try {
-			IssueManager im = JFireEjbUtil.getBean(IssueManager.class, SecurityReflector.getInitialContextProperties());
+			IssueManager im = JFireEjbFactory.getBean(IssueManager.class, SecurityReflector.getInitialContextProperties());
 			Set<IssueID> is = im.getIssueIDs();
 			monitor.done();
 			return getJDOObjects(null, is, fetchGroups, maxFetchDepth, monitor);
@@ -142,7 +142,7 @@ public class IssueDAO extends BaseJDOObjectDAO<IssueID, Issue>{
 		String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
 		try {
-			IssueManager im = JFireEjbUtil.getBean(IssueManager.class, SecurityReflector.getInitialContextProperties());
+			IssueManager im = JFireEjbFactory.getBean(IssueManager.class, SecurityReflector.getInitialContextProperties());
 			Set<IssueID> issueIDs = im.getIssueIDs(queries);
 			return getJDOObjects(null, issueIDs, fetchGroups, maxFetchDepth, monitor);			
 		} catch (Exception x) {
@@ -157,7 +157,7 @@ public class IssueDAO extends BaseJDOObjectDAO<IssueID, Issue>{
 
 		monitor.beginTask("Performing transition for issue "+ issueID, 3);
 		try {
-			IssueManager im = JFireEjbUtil.getBean(IssueManager.class, SecurityReflector.getInitialContextProperties());
+			IssueManager im = JFireEjbFactory.getBean(IssueManager.class, SecurityReflector.getInitialContextProperties());
 			monitor.worked(1);
 			
 			Issue result = im.signalIssue(issueID, jbpmTransitionName, get, fetchGroups, maxFetchDepth);

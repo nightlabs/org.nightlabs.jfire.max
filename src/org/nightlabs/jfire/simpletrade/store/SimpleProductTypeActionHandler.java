@@ -15,7 +15,7 @@ import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.accounting.Price;
 import org.nightlabs.jfire.accounting.TariffMapping;
 import org.nightlabs.jfire.accounting.id.TariffID;
-import org.nightlabs.jfire.base.JFireEjbUtil;
+import org.nightlabs.jfire.base.JFireEjbFactory;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.security.id.AuthorityTypeID;
 import org.nightlabs.jfire.simpletrade.SimpleTradeManager;
@@ -113,7 +113,7 @@ public class SimpleProductTypeActionHandler
 			Offer partnerOffer, OfferID partnerOfferID, SegmentID partnerSegmentID,
 			ProductType nestedProductType, Collection<NestedProductTypeLocal> nestedProductTypeLocals) throws Exception
 	{
-		SimpleTradeManager stm = JFireEjbUtil.getBean(SimpleTradeManager.class, partnerInitialContextProperties);
+		SimpleTradeManager stm = JFireEjbFactory.getBean(SimpleTradeManager.class, partnerInitialContextProperties);
 		int qty = 0;
 		for (NestedProductTypeLocal npt : nestedProductTypeLocals) {
 			qty += npt.getQuantity();

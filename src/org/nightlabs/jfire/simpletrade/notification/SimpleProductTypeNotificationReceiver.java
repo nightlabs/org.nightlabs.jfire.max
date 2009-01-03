@@ -16,7 +16,7 @@ import org.apache.log4j.Logger;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.accounting.gridpriceconfig.GridPriceConfigUtil;
 import org.nightlabs.jfire.accounting.priceconfig.id.PriceConfigID;
-import org.nightlabs.jfire.base.JFireEjbUtil;
+import org.nightlabs.jfire.base.JFireEjbFactory;
 import org.nightlabs.jfire.base.Lookup;
 import org.nightlabs.jfire.jdo.notification.DirtyObjectID;
 import org.nightlabs.jfire.jdo.notification.JDOLifecycleState;
@@ -96,13 +96,13 @@ extends NotificationReceiver
 		PersistenceManager pm = getPersistenceManager();
 
 		Hashtable<?,?> initialContextProperties = Lookup.getInitialContextProperties(pm, emitterOrganisationID);
-		SimpleTradeManager simpleTradeManager = JFireEjbUtil.getBean(SimpleTradeManager.class, initialContextProperties);
+		SimpleTradeManager simpleTradeManager = JFireEjbFactory.getBean(SimpleTradeManager.class, initialContextProperties);
 		Collection<SimpleProductType> productTypes = CollectionUtil.castCollection(
 				simpleTradeManager.getSimpleProductTypesForReseller(productTypeIDs_load)
 		);
 		Set<ProductTypeID> productTypeIDs = NLJDOHelper.getObjectIDSet(productTypes);
 
-		TradeManager tradeManager = JFireEjbUtil.getBean(TradeManager.class, initialContextProperties);
+		TradeManager tradeManager = JFireEjbFactory.getBean(TradeManager.class, initialContextProperties);
 		Set<ProductTypePermissionFlagSetID> productTypePermissionFlagSetIDs = CollectionUtil.castSet(
 				tradeManager.getMyProductTypePermissionFlagSetIDs(productTypeIDs)
 		);

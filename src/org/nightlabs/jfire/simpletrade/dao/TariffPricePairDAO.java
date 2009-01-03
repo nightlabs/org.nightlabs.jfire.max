@@ -34,7 +34,7 @@ import org.nightlabs.jfire.accounting.Price;
 import org.nightlabs.jfire.accounting.Tariff;
 import org.nightlabs.jfire.accounting.gridpriceconfig.TariffPricePair;
 import org.nightlabs.jfire.accounting.id.CurrencyID;
-import org.nightlabs.jfire.base.JFireEjbUtil;
+import org.nightlabs.jfire.base.JFireEjbFactory;
 import org.nightlabs.jfire.base.jdo.cache.Cache;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.simpletrade.SimpleTradeManager;
@@ -119,7 +119,7 @@ public class TariffPricePairDAO
 				TariffPricePairDAO.class.getName(), key, (String[])null, -1);
 		if (tppc == null) { // || System.currentTimeMillis() - tppc.loadDT > EXPIRE_MSEC) {
 			try {
-				SimpleTradeManager stm = JFireEjbUtil.getBean(SimpleTradeManager.class, SecurityReflector.getInitialContextProperties());
+				SimpleTradeManager stm = JFireEjbFactory.getBean(SimpleTradeManager.class, SecurityReflector.getInitialContextProperties());
 				Collection<TariffPricePair> tariffPricePairs = CollectionUtil.castCollection(stm.getTariffPricePairs(productTypeID,
 						customerGroupID,
 						currencyID,

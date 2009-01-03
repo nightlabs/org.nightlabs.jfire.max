@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import org.nightlabs.jfire.base.JFireEjbUtil;
+import org.nightlabs.jfire.base.JFireEjbFactory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.base.jdo.IJDOObjectDAO;
 import org.nightlabs.jfire.dynamictrade.DynamicTradeManager;
@@ -42,10 +42,10 @@ implements IJDOObjectDAO<DynamicProductType>
 		try {
 //			DynamicTradeManager vm = dynamicTradeManager;
 //			if (vm == null)
-//				vm = JFireEjbUtil.getBean(DynamicTradeManager.class, SecurityReflector.getInitialContextProperties());
+//				vm = JFireEjbFactory.getBean(DynamicTradeManager.class, SecurityReflector.getInitialContextProperties());
 //
 //			return vm.getDynamicProductTypes(dynamicProductTypeIDs, fetchGroups, maxFetchDepth);
-			StoreManager sm = JFireEjbUtil.getBean(StoreManager.class, SecurityReflector.getInitialContextProperties());
+			StoreManager sm = JFireEjbFactory.getBean(StoreManager.class, SecurityReflector.getInitialContextProperties());
 			return CollectionUtil.castCollection(sm.getProductTypes(dynamicProductTypeIDs, fetchGroups, maxFetchDepth));
 		} finally {
 			monitor.worked(1);
@@ -59,7 +59,7 @@ implements IJDOObjectDAO<DynamicProductType>
 			ProgressMonitor monitor)
 	{
 		try {
-			dynamicTradeManager = JFireEjbUtil.getBean(DynamicTradeManager.class, SecurityReflector.getInitialContextProperties());
+			dynamicTradeManager = JFireEjbFactory.getBean(DynamicTradeManager.class, SecurityReflector.getInitialContextProperties());
 			try {
 				Collection<ProductTypeID> dynamicProductTypeIDs = dynamicTradeManager.getChildDynamicProductTypeIDs(parentDynamicProductTypeID);
 				return getJDOObjects(null, dynamicProductTypeIDs, fetchGroups, maxFetchDepth, monitor);
@@ -75,7 +75,7 @@ implements IJDOObjectDAO<DynamicProductType>
 //			ProgressMonitor monitor)
 //	{
 //		try {
-//			dynamicTradeManager = JFireEjbUtil.getBean(DynamicTradeManager.class, SecurityReflector.getInitialContextProperties());
+//			dynamicTradeManager = JFireEjbFactory.getBean(DynamicTradeManager.class, SecurityReflector.getInitialContextProperties());
 //			try {
 //				Collection<ProductTypeID> dynamicProductTypeIDs = dynamicTradeManager.getDynamicProductTypeIDs(inheritanceNature, saleable);
 //				return getJDOObjects(null, dynamicProductTypeIDs, fetchGroups, maxFetchDepth, monitor);
@@ -114,7 +114,7 @@ implements IJDOObjectDAO<DynamicProductType>
 	@Override
 	public DynamicProductType storeJDOObject(DynamicProductType jdoObject, boolean get, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) {
 		try {
-			DynamicTradeManager dtm = JFireEjbUtil.getBean(DynamicTradeManager.class, SecurityReflector.getInitialContextProperties());
+			DynamicTradeManager dtm = JFireEjbFactory.getBean(DynamicTradeManager.class, SecurityReflector.getInitialContextProperties());
 			return dtm.storeDynamicProductType(jdoObject, get, fetchGroups, maxFetchDepth);
 		} catch (Exception e) {
 			throw new RuntimeException(e);

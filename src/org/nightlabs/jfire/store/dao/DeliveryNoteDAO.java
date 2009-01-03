@@ -13,7 +13,7 @@ import javax.jdo.JDOHelper;
 import org.nightlabs.annotation.Implement;
 import org.nightlabs.jdo.query.AbstractJDOQuery;
 import org.nightlabs.jdo.query.QueryCollection;
-import org.nightlabs.jfire.base.JFireEjbUtil;
+import org.nightlabs.jfire.base.JFireEjbFactory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.store.DeliveryNote;
@@ -38,7 +38,7 @@ public class DeliveryNoteDAO extends BaseJDOObjectDAO<DeliveryNoteID, DeliveryNo
 	protected Collection<DeliveryNote> retrieveJDOObjects(
 			Set<DeliveryNoteID> deliveryNoteIDs, String[] fetchGroups,
 			int maxFetchDepth, ProgressMonitor monitor) throws Exception {
-		StoreManager sm = JFireEjbUtil.getBean(StoreManager.class, SecurityReflector.getInitialContextProperties());
+		StoreManager sm = JFireEjbFactory.getBean(StoreManager.class, SecurityReflector.getInitialContextProperties());
 		return sm.getDeliveryNotes(deliveryNoteIDs, fetchGroups, maxFetchDepth);
 	}
 
@@ -57,7 +57,7 @@ public class DeliveryNoteDAO extends BaseJDOObjectDAO<DeliveryNoteID, DeliveryNo
 			AnchorID customerID, long rangeBeginIdx, long rangeEndIdx,
 			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) {
 		try {
-			StoreManager sm = JFireEjbUtil.getBean(StoreManager.class, SecurityReflector.getInitialContextProperties());
+			StoreManager sm = JFireEjbFactory.getBean(StoreManager.class, SecurityReflector.getInitialContextProperties());
 			List<DeliveryNoteID> deliveryNoteIDList = sm.getDeliveryNoteIDs(vendorID, customerID, rangeBeginIdx, rangeEndIdx);
 			Set<DeliveryNoteID> deliveryNoteIDs = new HashSet<DeliveryNoteID>(deliveryNoteIDList);
 
@@ -85,7 +85,7 @@ public class DeliveryNoteDAO extends BaseJDOObjectDAO<DeliveryNoteID, DeliveryNo
 			QueryCollection<? extends AbstractJDOQuery> queries,
 			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) {
 		try {
-			StoreManager sm = JFireEjbUtil.getBean(StoreManager.class, SecurityReflector.getInitialContextProperties());
+			StoreManager sm = JFireEjbFactory.getBean(StoreManager.class, SecurityReflector.getInitialContextProperties());
 			Set<DeliveryNoteID> deliveryNoteIDs = sm.getDeliveryNoteIDs(queries);
 
 			return getJDOObjects(null, deliveryNoteIDs, fetchGroups, maxFetchDepth, monitor);

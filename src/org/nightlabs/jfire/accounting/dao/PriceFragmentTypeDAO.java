@@ -9,7 +9,7 @@ import java.util.Set;
 import org.nightlabs.jfire.accounting.AccountingManager;
 import org.nightlabs.jfire.accounting.PriceFragmentType;
 import org.nightlabs.jfire.accounting.id.PriceFragmentTypeID;
-import org.nightlabs.jfire.base.JFireEjbUtil;
+import org.nightlabs.jfire.base.JFireEjbFactory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.progress.ProgressMonitor;
@@ -38,7 +38,7 @@ extends BaseJDOObjectDAO<PriceFragmentTypeID, PriceFragmentType>
 	{
 		monitor.beginTask("Loading Accounts", 1);
 		try {
-			AccountingManager am = JFireEjbUtil.getBean(AccountingManager.class, SecurityReflector.getInitialContextProperties());
+			AccountingManager am = JFireEjbFactory.getBean(AccountingManager.class, SecurityReflector.getInitialContextProperties());
 			return am.getPriceFragmentTypes(objectIDs, fetchGroups, maxFetchDepth);
 			
 		} catch (Exception e) {
@@ -55,7 +55,7 @@ extends BaseJDOObjectDAO<PriceFragmentTypeID, PriceFragmentType>
 			int maxFetchDepth, ProgressMonitor monitor) 
 	{
 		try {
-			AccountingManager am = JFireEjbUtil.getBean(AccountingManager.class, SecurityReflector.getInitialContextProperties());
+			AccountingManager am = JFireEjbFactory.getBean(AccountingManager.class, SecurityReflector.getInitialContextProperties());
 			Collection<PriceFragmentTypeID> priceFragementTypeIDs = am.getPriceFragmentTypeIDs();
 			return getJDOObjects(null, priceFragementTypeIDs, fetchGroups, maxFetchDepth, monitor);			
 		} catch (Exception e) {

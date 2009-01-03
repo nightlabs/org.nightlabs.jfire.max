@@ -7,7 +7,7 @@ import java.util.Set;
 import org.nightlabs.jfire.accounting.AccountingManager;
 import org.nightlabs.jfire.accounting.Tariff;
 import org.nightlabs.jfire.accounting.id.TariffID;
-import org.nightlabs.jfire.base.JFireEjbUtil;
+import org.nightlabs.jfire.base.JFireEjbFactory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.progress.ProgressMonitor;
@@ -34,7 +34,7 @@ public class TariffDAO
 	{
 		AccountingManager am = accountingManager;
 		if (am == null)
-			am = JFireEjbUtil.getBean(AccountingManager.class, SecurityReflector.getInitialContextProperties());
+			am = JFireEjbFactory.getBean(AccountingManager.class, SecurityReflector.getInitialContextProperties());
 
 		return am.getTariffs(tariffIDs, fetchGroups, maxFetchDepth);
 	}
@@ -59,7 +59,7 @@ public class TariffDAO
 	public synchronized List<Tariff> getTariffs(String organisationID, boolean inverse, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
 		try {
-			accountingManager = JFireEjbUtil.getBean(AccountingManager.class, SecurityReflector.getInitialContextProperties());
+			accountingManager = JFireEjbFactory.getBean(AccountingManager.class, SecurityReflector.getInitialContextProperties());
 			try {
 				Set<TariffID> tariffIDs = accountingManager.getTariffIDs(organisationID, inverse);
 				return getJDOObjects(null, tariffIDs, fetchGroups, maxFetchDepth, monitor);

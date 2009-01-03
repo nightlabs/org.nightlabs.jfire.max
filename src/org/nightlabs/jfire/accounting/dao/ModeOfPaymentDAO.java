@@ -7,7 +7,7 @@ import java.util.Set;
 import org.nightlabs.jfire.accounting.AccountingManager;
 import org.nightlabs.jfire.accounting.pay.ModeOfPayment;
 import org.nightlabs.jfire.accounting.pay.id.ModeOfPaymentID;
-import org.nightlabs.jfire.base.JFireEjbUtil;
+import org.nightlabs.jfire.base.JFireEjbFactory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.progress.ProgressMonitor;
@@ -34,7 +34,7 @@ public class ModeOfPaymentDAO
 	{
 		AccountingManager am = accountingManager;
 		if (am == null)
-			am = JFireEjbUtil.getBean(AccountingManager.class, SecurityReflector.getInitialContextProperties());
+			am = JFireEjbFactory.getBean(AccountingManager.class, SecurityReflector.getInitialContextProperties());
 
 		return am.getModeOfPayments(modeOfPaymentIDs, fetchGroups, maxFetchDepth);
 	}
@@ -45,7 +45,7 @@ public class ModeOfPaymentDAO
 	public synchronized List<ModeOfPayment> getModeOfPayments(String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
 		try {
-			accountingManager = JFireEjbUtil.getBean(AccountingManager.class, SecurityReflector.getInitialContextProperties());
+			accountingManager = JFireEjbFactory.getBean(AccountingManager.class, SecurityReflector.getInitialContextProperties());
 			try {
 				Set<ModeOfPaymentID> modeOfPaymentIDs = accountingManager.getAllModeOfPaymentIDs();
 				return getJDOObjects(null, modeOfPaymentIDs, fetchGroups, maxFetchDepth, monitor);

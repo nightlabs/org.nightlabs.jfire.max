@@ -13,7 +13,7 @@ import javax.jdo.JDOHelper;
 import org.nightlabs.annotation.Implement;
 import org.nightlabs.jdo.query.AbstractJDOQuery;
 import org.nightlabs.jdo.query.QueryCollection;
-import org.nightlabs.jfire.base.JFireEjbUtil;
+import org.nightlabs.jfire.base.JFireEjbFactory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.trade.LegalEntity;
@@ -58,7 +58,7 @@ public class OrderDAO extends BaseJDOObjectDAO<OrderID, Order> {
 	protected Collection<Order> retrieveJDOObjects(Set<OrderID> orderIDs,
 			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 			throws Exception {
-		TradeManager tm = JFireEjbUtil.getBean(TradeManager.class, SecurityReflector.getInitialContextProperties());
+		TradeManager tm = JFireEjbFactory.getBean(TradeManager.class, SecurityReflector.getInitialContextProperties());
 		return tm.getOrders(orderIDs, fetchGroups, maxFetchDepth);
 	}
 
@@ -103,7 +103,7 @@ public class OrderDAO extends BaseJDOObjectDAO<OrderID, Order> {
 			QueryCollection<? extends AbstractJDOQuery> queries,
 			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) {
 		try {
-			TradeManager tm = JFireEjbUtil.getBean(TradeManager.class, SecurityReflector.getInitialContextProperties());
+			TradeManager tm = JFireEjbFactory.getBean(TradeManager.class, SecurityReflector.getInitialContextProperties());
 			Set<OrderID> orderIDs = tm.getOrderIDs(queries);
 
 			return getJDOObjects(null, orderIDs, fetchGroups, maxFetchDepth, monitor);
@@ -156,7 +156,7 @@ public class OrderDAO extends BaseJDOObjectDAO<OrderID, Order> {
 			long rangeBeginIdx, long rangeEndIdx, String[] fetchGroups,
 			int maxFetchDepth, ProgressMonitor monitor) {
 		try {
-			TradeManager tm = JFireEjbUtil.getBean(TradeManager.class, SecurityReflector.getInitialContextProperties());
+			TradeManager tm = JFireEjbFactory.getBean(TradeManager.class, SecurityReflector.getInitialContextProperties());
 			List<OrderID> orderIDList = tm.getOrderIDs(orderClass, subclasses, vendorID, customerID, rangeBeginIdx, rangeEndIdx);
 			Set<OrderID> orderIDs = new HashSet<OrderID>(orderIDList);
 

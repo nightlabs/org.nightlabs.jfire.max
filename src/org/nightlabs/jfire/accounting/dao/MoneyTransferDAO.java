@@ -8,7 +8,7 @@ import org.nightlabs.jfire.accounting.AccountingManager;
 import org.nightlabs.jfire.accounting.MoneyTransfer;
 import org.nightlabs.jfire.accounting.query.MoneyTransferIDQuery;
 import org.nightlabs.jfire.accounting.query.MoneyTransferQuery;
-import org.nightlabs.jfire.base.JFireEjbUtil;
+import org.nightlabs.jfire.base.JFireEjbFactory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.transfer.id.TransferID;
@@ -36,7 +36,7 @@ extends BaseJDOObjectDAO<TransferID, MoneyTransfer>
 			ProgressMonitor monitor)
 			throws Exception
 	{
-		AccountingManager sm = JFireEjbUtil.getBean(AccountingManager.class, SecurityReflector.getInitialContextProperties());
+		AccountingManager sm = JFireEjbFactory.getBean(AccountingManager.class, SecurityReflector.getInitialContextProperties());
 		return sm.getMoneyTransfers(productTransferIDs, fetchGroups, maxFetchDepth);
 	}
 
@@ -47,7 +47,7 @@ extends BaseJDOObjectDAO<TransferID, MoneyTransfer>
 			ProgressMonitor monitor)
 	{
 		try {
-			AccountingManager sm = JFireEjbUtil.getBean(AccountingManager.class, SecurityReflector.getInitialContextProperties());
+			AccountingManager sm = JFireEjbFactory.getBean(AccountingManager.class, SecurityReflector.getInitialContextProperties());
 			List<TransferID> transferIDs = sm.getMoneyTransferIDs(productTransferIDQuery);
 			return getJDOObjects(null, transferIDs, fetchGroups, maxFetchDepth, monitor);
 		} catch (Exception e) {
@@ -62,7 +62,7 @@ extends BaseJDOObjectDAO<TransferID, MoneyTransfer>
 			ProgressMonitor monitor)
 	{
 		try {
-			AccountingManager sm = JFireEjbUtil.getBean(AccountingManager.class, SecurityReflector.getInitialContextProperties());
+			AccountingManager sm = JFireEjbFactory.getBean(AccountingManager.class, SecurityReflector.getInitialContextProperties());
 			List<TransferID> transferIDs = sm.getMoneyTransferIDs(productTransferQueries);
 			return getJDOObjects(null, transferIDs, fetchGroups, maxFetchDepth, monitor);
 		} catch (Exception e) {

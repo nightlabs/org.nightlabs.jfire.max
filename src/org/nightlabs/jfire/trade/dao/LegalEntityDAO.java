@@ -33,7 +33,7 @@ import javax.jdo.FetchPlan;
 import javax.jdo.JDODetachedFieldAccessException;
 
 import org.nightlabs.jdo.NLJDOHelper;
-import org.nightlabs.jfire.base.JFireEjbUtil;
+import org.nightlabs.jfire.base.JFireEjbFactory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.base.jdo.IJDOObjectDAO;
 import org.nightlabs.jfire.person.Person;
@@ -104,7 +104,7 @@ implements IJDOObjectDAO<LegalEntity>
 	protected Collection<LegalEntity> retrieveJDOObjects(
 			Set<AnchorID> objectIDs, String[] fetchGroups, int maxFetchDepth,
 			ProgressMonitor monitor) throws Exception {
-		TradeManager tradeManager = JFireEjbUtil.getBean(TradeManager.class, SecurityReflector.getInitialContextProperties());
+		TradeManager tradeManager = JFireEjbFactory.getBean(TradeManager.class, SecurityReflector.getInitialContextProperties());
 		Collection<LegalEntity> legalEntities = tradeManager.getLegalEntities(objectIDs, fetchGroups, maxFetchDepth);
 
 		IStruct struct = StructLocalDAO.sharedInstance().getStructLocal(
@@ -195,7 +195,7 @@ implements IJDOObjectDAO<LegalEntity>
 	public LegalEntity storeJDOObject(LegalEntity jdoObject, boolean get,
 			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) {
 		try {
-			TradeManager tradeManager = JFireEjbUtil.getBean(TradeManager.class, SecurityReflector.getInitialContextProperties());
+			TradeManager tradeManager = JFireEjbFactory.getBean(TradeManager.class, SecurityReflector.getInitialContextProperties());
 			LegalEntity le = tradeManager.storeLegalEntity(jdoObject, get, fetchGroups, maxFetchDepth);
 			if (le != null)
 				getCache().put(null, le, fetchGroups, maxFetchDepth);
@@ -229,7 +229,7 @@ implements IJDOObjectDAO<LegalEntity>
 			if (le != null)
 				return le;
 
-			TradeManager tradeManager = JFireEjbUtil.getBean(TradeManager.class, SecurityReflector.getInitialContextProperties());
+			TradeManager tradeManager = JFireEjbFactory.getBean(TradeManager.class, SecurityReflector.getInitialContextProperties());
 			le = tradeManager.getOrganisationLegalEntity(organisationID, throwExceptionIfNotExistent, fetchGroups, maxFetchDepth);
 			if (le != null) {
 				getCache().put(null, objectID, le, fetchGroups, maxFetchDepth);

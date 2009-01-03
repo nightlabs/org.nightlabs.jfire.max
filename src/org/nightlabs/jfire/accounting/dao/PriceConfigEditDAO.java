@@ -5,7 +5,7 @@ import java.util.Set;
 
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.accounting.AccountingManager;
-import org.nightlabs.jfire.base.JFireEjbUtil;
+import org.nightlabs.jfire.base.JFireEjbFactory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.store.ProductType;
@@ -45,7 +45,7 @@ extends BaseJDOObjectDAO<ProductTypeID, ProductType>
 			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	throws Exception
 	{
-		AccountingManager am = JFireEjbUtil.getBean(AccountingManager.class, SecurityReflector.getInitialContextProperties());
+		AccountingManager am = JFireEjbFactory.getBean(AccountingManager.class, SecurityReflector.getInitialContextProperties());
 		return am.getProductTypeForPriceConfigEditing(objectID);
 	}
 

@@ -6,7 +6,7 @@ import java.util.Set;
 import org.nightlabs.jdo.query.QueryCollection;
 import org.nightlabs.jfire.accounting.AccountingManager;
 import org.nightlabs.jfire.accounting.id.InvoiceID;
-import org.nightlabs.jfire.base.JFireEjbUtil;
+import org.nightlabs.jfire.base.JFireEjbFactory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.store.StoreManager;
@@ -57,23 +57,23 @@ extends BaseJDOObjectDAO<ArticleContainerID, ArticleContainer>
 			if (!articleContainerIDs.isEmpty()) {
 				ArticleContainerID articleContainerID = articleContainerIDs.iterator().next();
 				if (articleContainerID instanceof DeliveryNoteID) {
-					StoreManager sm = JFireEjbUtil.getBean(StoreManager.class, SecurityReflector.getInitialContextProperties());
+					StoreManager sm = JFireEjbFactory.getBean(StoreManager.class, SecurityReflector.getInitialContextProperties());
 					return sm.getDeliveryNotes(articleContainerIDs, fetchGroups, maxFetchDepth);
 				}
 				if (articleContainerID instanceof InvoiceID) {
-					AccountingManager am = JFireEjbUtil.getBean(AccountingManager.class, SecurityReflector.getInitialContextProperties());
+					AccountingManager am = JFireEjbFactory.getBean(AccountingManager.class, SecurityReflector.getInitialContextProperties());
 					return am.getInvoices(articleContainerIDs, fetchGroups, maxFetchDepth);
 				}
 				if (articleContainerID instanceof OfferID) {
-					TradeManager tm = JFireEjbUtil.getBean(TradeManager.class, SecurityReflector.getInitialContextProperties());
+					TradeManager tm = JFireEjbFactory.getBean(TradeManager.class, SecurityReflector.getInitialContextProperties());
 					return tm.getOffers(articleContainerIDs, fetchGroups, maxFetchDepth);
 				}
 				if (articleContainerID instanceof OrderID) {
-					TradeManager tm = JFireEjbUtil.getBean(TradeManager.class, SecurityReflector.getInitialContextProperties());
+					TradeManager tm = JFireEjbFactory.getBean(TradeManager.class, SecurityReflector.getInitialContextProperties());
 					return tm.getOrders(articleContainerIDs, fetchGroups, maxFetchDepth);
 				}
 				if (articleContainerID instanceof ReceptionNoteID) {
-					StoreManager sm = JFireEjbUtil.getBean(StoreManager.class, SecurityReflector.getInitialContextProperties());
+					StoreManager sm = JFireEjbFactory.getBean(StoreManager.class, SecurityReflector.getInitialContextProperties());
 					return sm.getReceptionNotes(articleContainerIDs, fetchGroups, maxFetchDepth);
 				}
 			}
@@ -101,7 +101,7 @@ extends BaseJDOObjectDAO<ArticleContainerID, ArticleContainer>
 			int maxFetchDepth, ProgressMonitor monitor)
 	{
 		try {
-			TradeManager tm = JFireEjbUtil.getBean(TradeManager.class, SecurityReflector.getInitialContextProperties());
+			TradeManager tm = JFireEjbFactory.getBean(TradeManager.class, SecurityReflector.getInitialContextProperties());
 			Collection<ArticleContainerID> articleContainerIDs = tm.getArticleContainerIDs(queries);
 			return CollectionUtil.castCollection(
 				getJDOObjects(null, articleContainerIDs, fetchGroups, maxFetchDepth, monitor)

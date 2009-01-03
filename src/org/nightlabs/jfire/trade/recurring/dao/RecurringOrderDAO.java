@@ -10,7 +10,7 @@ import java.util.Set;
 
 import javax.jdo.JDOHelper;
 
-import org.nightlabs.jfire.base.JFireEjbUtil;
+import org.nightlabs.jfire.base.JFireEjbFactory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.trade.LegalEntity;
@@ -105,7 +105,7 @@ extends BaseJDOObjectDAO<OrderID, RecurringOrder>
 			long rangeBeginIdx, long rangeEndIdx, String[] fetchGroups,
 			int maxFetchDepth, ProgressMonitor monitor) {
 		try {
-			TradeManager tm = JFireEjbUtil.getBean(TradeManager.class, SecurityReflector.getInitialContextProperties());
+			TradeManager tm = JFireEjbFactory.getBean(TradeManager.class, SecurityReflector.getInitialContextProperties());
 			List<OrderID> orderIDList = tm.getOrderIDs(orderClass, subclasses, vendorID, customerID, rangeBeginIdx, rangeEndIdx);
 			Set<OrderID> orderIDs = new HashSet<OrderID>(orderIDList);
 

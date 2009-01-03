@@ -5,7 +5,7 @@ import java.util.Set;
 
 import org.nightlabs.jdo.query.AbstractJDOQuery;
 import org.nightlabs.jdo.query.QueryCollection;
-import org.nightlabs.jfire.base.JFireEjbUtil;
+import org.nightlabs.jfire.base.JFireEjbFactory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.store.ReceptionNote;
@@ -39,7 +39,7 @@ extends BaseJDOObjectDAO<ReceptionNoteID, ReceptionNote>
 			int maxFetchDepth, ProgressMonitor monitor)
 	throws Exception
 	{
-		StoreManager sm = JFireEjbUtil.getBean(StoreManager.class, SecurityReflector.getInitialContextProperties());
+		StoreManager sm = JFireEjbFactory.getBean(StoreManager.class, SecurityReflector.getInitialContextProperties());
 		return sm.getReceptionNotes(objectIDs, fetchGroups, maxFetchDepth);
 	}
 
@@ -56,7 +56,7 @@ extends BaseJDOObjectDAO<ReceptionNoteID, ReceptionNote>
 	{
 		try
 		{
-			StoreManager sm = JFireEjbUtil.getBean(StoreManager.class, SecurityReflector.getInitialContextProperties());
+			StoreManager sm = JFireEjbFactory.getBean(StoreManager.class, SecurityReflector.getInitialContextProperties());
 			Set<ReceptionNoteID> receptionNoteIDs = sm.getReceptionNoteIDs(queries);
 			return getJDOObjects(null, receptionNoteIDs, fetchGroups, maxFetchDepth, monitor);
 		}

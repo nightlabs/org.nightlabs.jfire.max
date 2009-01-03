@@ -9,7 +9,7 @@ import java.util.Set;
 import org.nightlabs.jfire.accounting.AccountingManager;
 import org.nightlabs.jfire.accounting.book.LocalAccountantDelegate;
 import org.nightlabs.jfire.accounting.book.id.LocalAccountantDelegateID;
-import org.nightlabs.jfire.base.JFireEjbUtil;
+import org.nightlabs.jfire.base.JFireEjbFactory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.progress.ProgressMonitor;
@@ -46,7 +46,7 @@ extends BaseJDOObjectDAO<LocalAccountantDelegateID, LocalAccountantDelegate>
 	{
 		monitor.beginTask("Loading LocalAccountDelegates", 1);
 		try {
-			AccountingManager am = JFireEjbUtil.getBean(AccountingManager.class, SecurityReflector.getInitialContextProperties());  
+			AccountingManager am = JFireEjbFactory.getBean(AccountingManager.class, SecurityReflector.getInitialContextProperties());  
 			return am.getLocalAccountantDelegates(delegateIDs, fetchGroups, maxFetchDepth);
 		} catch (Exception e) {
 			monitor.setCanceled(true);
@@ -74,7 +74,7 @@ extends BaseJDOObjectDAO<LocalAccountantDelegateID, LocalAccountantDelegate>
 			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) 
 	{
 		try {
-			AccountingManager am = JFireEjbUtil.getBean(AccountingManager.class, SecurityReflector.getInitialContextProperties());
+			AccountingManager am = JFireEjbFactory.getBean(AccountingManager.class, SecurityReflector.getInitialContextProperties());
 			return getJDOObjects(
 					null, am.getTopLevelAccountantDelegates(delegateClass),
 					fetchGroups, maxFetchDepth, monitor
@@ -95,7 +95,7 @@ extends BaseJDOObjectDAO<LocalAccountantDelegateID, LocalAccountantDelegate>
 			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) 
 	{
 		try {
-			AccountingManager am = JFireEjbUtil.getBean(AccountingManager.class, SecurityReflector.getInitialContextProperties());
+			AccountingManager am = JFireEjbFactory.getBean(AccountingManager.class, SecurityReflector.getInitialContextProperties());
 			return getJDOObjects(
 					null, am.getChildAccountantDelegates(delegateID),
 					fetchGroups, maxFetchDepth, monitor

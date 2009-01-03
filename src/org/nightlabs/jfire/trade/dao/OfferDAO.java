@@ -8,7 +8,7 @@ import java.util.Set;
 import org.nightlabs.annotation.Implement;
 import org.nightlabs.jdo.query.AbstractJDOQuery;
 import org.nightlabs.jdo.query.QueryCollection;
-import org.nightlabs.jfire.base.JFireEjbUtil;
+import org.nightlabs.jfire.base.JFireEjbFactory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.trade.Offer;
@@ -35,7 +35,7 @@ public class OfferDAO
 			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 			throws Exception
 	{
-		TradeManager tm = JFireEjbUtil.getBean(TradeManager.class, SecurityReflector.getInitialContextProperties());
+		TradeManager tm = JFireEjbFactory.getBean(TradeManager.class, SecurityReflector.getInitialContextProperties());
 		return tm.getOffers(offerIDs, fetchGroups, maxFetchDepth);
 	}
 
@@ -55,7 +55,7 @@ public class OfferDAO
 	{
 		try
 		{
-			TradeManager tm = JFireEjbUtil.getBean(TradeManager.class, SecurityReflector.getInitialContextProperties());
+			TradeManager tm = JFireEjbFactory.getBean(TradeManager.class, SecurityReflector.getInitialContextProperties());
 			Set<OfferID> offerIDs = tm.getOfferIDs(queries);
 
 			return getJDOObjects(null, offerIDs, fetchGroups, maxFetchDepth, monitor);
@@ -75,7 +75,7 @@ public class OfferDAO
 		Offer offer;
 		monitor.beginTask("Set offer expiry", 100);
 		try {
-			TradeManager tm = JFireEjbUtil.getBean(TradeManager.class, SecurityReflector.getInitialContextProperties());
+			TradeManager tm = JFireEjbFactory.getBean(TradeManager.class, SecurityReflector.getInitialContextProperties());
 			monitor.worked(20);
 			offer = tm.setOfferExpiry(
 					offerID,

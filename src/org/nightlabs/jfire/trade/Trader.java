@@ -1769,6 +1769,9 @@ public class Trader
 		try {
 			PersistenceManager pm = getPersistenceManager();
 
+			if (offer.isFinalized()) // we (might) come here multiple times => do work only first time.
+				return;
+
 			// check whether we have to finalize remote offers as well
 			OfferRequirement offerRequirement = OfferRequirement.getOfferRequirement(pm, offer, false);
 			if (offerRequirement != null) {

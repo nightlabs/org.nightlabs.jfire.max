@@ -40,22 +40,22 @@ import javax.jdo.JDOHelper;
 import org.nightlabs.jfire.store.id.ProductTypeGroupID;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 
-public class ProductTypeGroupIDSearchResult 
-implements Serializable 
-{	
+public class ProductTypeGroupIDSearchResult
+implements Serializable
+{
 	private static final long serialVersionUID = 1L;
 
-	public static class Entry 
-	implements Serializable 
+	public static class Entry
+	implements Serializable
 	{
 		private static final long serialVersionUID = 1L;
 		private ProductTypeGroupID productTypeGroupID;
 		private List<ProductTypeID> productTypeIDs = new LinkedList<ProductTypeID>();
-		
+
 		public Entry(ProductTypeGroupID productTypeGroupID) {
 			this.productTypeGroupID = productTypeGroupID;
 		}
-		
+
 //		public Entry(ProductTypeGroup productTypeGroup) {
 //			this.productTypeGroupID = (ProductTypeGroupID)JDOHelper.getObjectId(productTypeGroup);
 //		}
@@ -63,64 +63,65 @@ implements Serializable
 //		public void addProductType(ProductType productType) {
 //			productTypeIDs.add((ProductTypeID)JDOHelper.getObjectId(productType));
 //		}
-		
+
 		public void addProductType(ProductTypeID productType) {
 			productTypeIDs.add(productType);
 		}
-		
+
 		public List<ProductTypeID> getProductTypeIDs() {
 			return productTypeIDs;
 		}
-		
+
 		public ProductTypeGroupID getProductTypeGroupID() {
 			return productTypeGroupID;
 		}
 	}
-	
+
 	private Map<ProductTypeGroupID, Entry> entries = new HashMap<ProductTypeGroupID, Entry>();
 
 	public ProductTypeGroupIDSearchResult() {
 		super();
 	}
-	
+
 	public Collection<Entry> getEntries() {
 		return entries.values();
 	}
-	
+
 	public Set<ProductTypeGroupID> getProductTypesGroupIDs() {
 		return entries.keySet();
 	}
-	
+
 	public Entry getEntry(ProductTypeGroup productTypeGroup) {
 		return entries.get(JDOHelper.getObjectId(productTypeGroup));
 	}
-	
-	public Entry getEntry(ProductTypeGroupID productTypeGroup) {
-		return entries.get(productTypeGroup);
+
+	public Entry getEntry(ProductTypeGroupID productTypeGroupID) {
+		return entries.get(productTypeGroupID);
 	}
-	
+
 	public void addEntry(Entry entry) {
 		entries.put(entry.productTypeGroupID, entry);
 	}
-	
-	public void addEntry(ProductTypeGroupID productTypeGroup) {
-		entries.put(productTypeGroup, new Entry(productTypeGroup));
+
+	public void addEntry(ProductTypeGroupID productTypeGroupID) {
+		if (!entries.containsKey(productTypeGroupID))
+			entries.put(productTypeGroupID, new Entry(productTypeGroupID));
 	}
-	
+
 //	public void addEntry(ProductTypeGroup productTypeGroup) {
 //		entries.put((ProductTypeGroupID)JDOHelper.getObjectId(productTypeGroup), new Entry(productTypeGroup));
 //	}
-		
-	public void addType(ProductTypeGroupID productTypeGroup, ProductTypeID productType) {
-		Entry entry = getEntry(productTypeGroup);
+
+	public void addType(ProductTypeGroupID productTypeGroupID, ProductTypeID productTypeID) {
+		Entry entry = getEntry(productTypeGroupID);
 		if (entry != null)
-			entry.addProductType(productType);
+			entry.addProductType(productTypeID);
 	}
-	
+
 	public int getSize() {
 		return entries.size();
 	}
-	
+
 	// TODO: don't iterate each time but build up when corresponding add-methods are called
 	public Set<ProductTypeID> getAllProductTypeIDs() {
 		Set<ProductTypeID> productTypeIDs = new HashSet<ProductTypeID>();

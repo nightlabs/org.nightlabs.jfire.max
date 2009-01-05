@@ -106,7 +106,6 @@ import org.nightlabs.jfire.store.id.RepositoryTypeID;
 import org.nightlabs.jfire.store.id.UnitID;
 import org.nightlabs.jfire.store.query.ProductTransferIDQuery;
 import org.nightlabs.jfire.store.query.ProductTransferQuery;
-import org.nightlabs.jfire.store.search.AbstractProductTypeGroupQuery;
 import org.nightlabs.jfire.store.search.AbstractProductTypeQuery;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.ArticleContainer;
@@ -1880,6 +1879,62 @@ implements SessionBean
 //		}
 //	}
 
+//	/**
+//	 *
+//	 * @ejb.interface-method
+//	 * @ejb.permission role-name="_Guest_"
+//	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+//	 */
+//	@SuppressWarnings("unchecked")
+//	public ProductTypeGroupIDSearchResult getProductTypeGroupSearchResult(
+//			QueryCollection<? extends AbstractProductTypeGroupQuery> productTypeGroupQueries)
+//	{
+//		if (productTypeGroupQueries == null)
+//			return null;
+//
+//		if (! ProductTypeGroup.class.isAssignableFrom(productTypeGroupQueries.getResultClass()))
+//		{
+//			throw new RuntimeException("Given QueryCollection has invalid return type! " +
+//					"Invalid return type= "+ productTypeGroupQueries.getResultClassName());
+//		}
+//
+//		PersistenceManager pm = getPersistenceManager();
+//		try {
+//			pm.getFetchPlan().setGroups(FetchPlan.DEFAULT);
+//
+//			if (! (productTypeGroupQueries instanceof JDOQueryCollectionDecorator))
+//			{
+//				productTypeGroupQueries = new JDOQueryCollectionDecorator<AbstractProductTypeGroupQuery>(productTypeGroupQueries);
+//			}
+//			JDOQueryCollectionDecorator<AbstractProductTypeGroupQuery> queries =
+//				(JDOQueryCollectionDecorator<AbstractProductTypeGroupQuery>) productTypeGroupQueries;
+//
+//			queries.setPersistenceManager(pm);
+//
+//			Collection<ProductTypeGroup> productTypeGroups = (Collection<ProductTypeGroup>) queries.executeQueries();
+//
+//			ProductTypeGroupIDSearchResult result = new ProductTypeGroupIDSearchResult();
+//			for (Iterator<? extends ProductTypeGroup> iter = productTypeGroups.iterator(); iter.hasNext();) {
+//				ProductTypeGroup group = iter.next();
+//				ProductTypeGroupID groupID = (ProductTypeGroupID) JDOHelper.getObjectId(group);
+//				result.addEntry(groupID);
+//				for (Iterator<ProductType> iterator = group.getProductTypes().iterator(); iterator.hasNext();) {
+//					ProductType type = iterator.next();
+//					//					ProductTypeID typeID = (ProductTypeID) JDOHelper.getObjectId(type);
+//					//					if (Authority.resolveSecuringAuthority(pm, type.getProductTypeLocal(), ResolveSecuringAuthorityStrategy.allow).containsRoleRef(getPrincipal(), RoleConstants.seeProductType))
+//					//						result.addType(groupID, typeID);
+//					// The filtering is already done in the method ProductTypeGroup.getProductTypes() - no need to filter again.
+//					ProductTypeID typeID = (ProductTypeID) JDOHelper.getObjectId(type);
+//					result.addType(groupID, typeID);
+//				}
+//			}
+//			return result;
+//		} finally {
+//			pm.close();
+//		}
+//	}
+
+
 	/**
 	 *
 	 * @ejb.interface-method
@@ -1887,46 +1942,39 @@ implements SessionBean
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
 	@SuppressWarnings("unchecked")
-	public ProductTypeGroupIDSearchResult getProductTypeGroupSearchResult(
-			QueryCollection<? extends AbstractProductTypeGroupQuery> productTypeGroupQueries)
+	public ProductTypeGroupIDSearchResult getProductTypeGroupIDSearchResultForProductTypeQueries(
+			QueryCollection<? extends AbstractProductTypeQuery> productTypeQueries)
 	{
-		if (productTypeGroupQueries == null)
+		if (productTypeQueries == null)
 			return null;
 
-		if (! ProductTypeGroup.class.isAssignableFrom(productTypeGroupQueries.getResultClass()))
+		if (! ProductType.class.isAssignableFrom(productTypeQueries.getResultClass()))
 		{
 			throw new RuntimeException("Given QueryCollection has invalid return type! " +
-					"Invalid return type= "+ productTypeGroupQueries.getResultClassName());
+					"Invalid return type= "+ productTypeQueries.getResultClassName());
 		}
 
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			pm.getFetchPlan().setGroups(FetchPlan.DEFAULT);
 
-			if (! (productTypeGroupQueries instanceof JDOQueryCollectionDecorator))
+			if (! (productTypeQueries instanceof JDOQueryCollectionDecorator))
 			{
-				productTypeGroupQueries = new JDOQueryCollectionDecorator<AbstractProductTypeGroupQuery>(productTypeGroupQueries);
+				productTypeQueries = new JDOQueryCollectionDecorator<AbstractProductTypeQuery>(productTypeQueries);
 			}
-			JDOQueryCollectionDecorator<AbstractProductTypeGroupQuery> queries =
-				(JDOQueryCollectionDecorator<AbstractProductTypeGroupQuery>) productTypeGroupQueries;
+			JDOQueryCollectionDecorator<AbstractProductTypeQuery> queries =
+				(JDOQueryCollectionDecorator<AbstractProductTypeQuery>) productTypeQueries;
 
 			queries.setPersistenceManager(pm);
 
-			Collection<ProductTypeGroup> productTypeGroups = (Collection<ProductTypeGroup>) queries.executeQueries();
-
 			ProductTypeGroupIDSearchResult result = new ProductTypeGroupIDSearchResult();
-			for (Iterator<? extends ProductTypeGroup> iter = productTypeGroups.iterator(); iter.hasNext();) {
-				ProductTypeGroup group = iter.next();
-				ProductTypeGroupID groupID = (ProductTypeGroupID) JDOHelper.getObjectId(group);
-				result.addEntry(groupID);
-				for (Iterator<ProductType> iterator = group.getProductTypes().iterator(); iterator.hasNext();) {
-					ProductType type = iterator.next();
-//					ProductTypeID typeID = (ProductTypeID) JDOHelper.getObjectId(type);
-//					if (Authority.resolveSecuringAuthority(pm, type.getProductTypeLocal(), ResolveSecuringAuthorityStrategy.allow).containsRoleRef(getPrincipal(), RoleConstants.seeProductType))
-//						result.addType(groupID, typeID);
-					// The filtering is already done in the method ProductTypeGroup.getProductTypes() - no need to filter again.
-					ProductTypeID typeID = (ProductTypeID) JDOHelper.getObjectId(type);
-					result.addType(groupID, typeID);
+			Collection<ProductType> productTypes = (Collection<ProductType>) queries.executeQueries();
+			for (ProductType productType : productTypes) {
+				ProductTypeID productTypeID = (ProductTypeID) JDOHelper.getObjectId(productType);
+				for (ProductTypeGroup productTypeGroup : productType.getProductTypeGroups()) {
+					ProductTypeGroupID productTypeGroupID = (ProductTypeGroupID) JDOHelper.getObjectId(productTypeGroup);
+					result.addEntry(productTypeGroupID);
+					result.addType(productTypeGroupID, productTypeID);
 				}
 			}
 			return result;
@@ -1934,6 +1982,8 @@ implements SessionBean
 			pm.close();
 		}
 	}
+
+
 
 	/**
 	 * Returns the {@link DeliveryQueue}s identified by the given IDs.

@@ -1055,6 +1055,12 @@ implements SessionBean
 			StablePriceConfig priceConfig = (StablePriceConfig) productType.getPackagePriceConfig();
 			if (priceConfig == null)
 				return Collections.emptyList();
+			
+			pm.getFetchPlan().setMaxFetchDepth(NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
+			pm.getFetchPlan().setGroups(new String[] {
+					FetchPlan.DEFAULT, ProductType.FETCH_GROUP_TARIFF_USER_SET
+			});
+			ProductType detachedProductType = pm.detachCopy(productType);
 
 			String organisationID = getOrganisationID();
 
@@ -1100,7 +1106,7 @@ implements SessionBean
 
 				Price price = pm.detachCopy(priceCell.getPrice());
 
-				res.add(new TariffPricePair(tariff, price));
+				res.add(new TariffPricePair(detachedProductType, tariff, price));
 			}
 
 			return res;

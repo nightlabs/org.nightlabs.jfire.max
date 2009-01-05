@@ -1945,6 +1945,10 @@ implements SessionBean
 	public ProductTypeGroupIDSearchResult getProductTypeGroupIDSearchResultForProductTypeQueries(
 			QueryCollection<? extends AbstractProductTypeQuery> productTypeQueries)
 	{
+		long startTotal = System.currentTimeMillis();
+		if (logger.isDebugEnabled())
+			logger.debug("getProductTypeGroupIDSearchResultForProductTypeQueries: enter");
+
 		if (productTypeQueries == null)
 			return null;
 
@@ -1968,7 +1972,12 @@ implements SessionBean
 			queries.setPersistenceManager(pm);
 
 			ProductTypeGroupIDSearchResult result = new ProductTypeGroupIDSearchResult();
+
+			long startExecuteQueries = System.currentTimeMillis();
 			Collection<ProductType> productTypes = (Collection<ProductType>) queries.executeQueries();
+			if (logger.isDebugEnabled())
+				logger.debug("getProductTypeGroupIDSearchResultForProductTypeQueries: executeQueries took " + (System.currentTimeMillis() - startExecuteQueries) + " msec");
+
 			for (ProductType productType : productTypes) {
 				ProductTypeID productTypeID = (ProductTypeID) JDOHelper.getObjectId(productType);
 				for (ProductTypeGroup productTypeGroup : productType.getProductTypeGroups()) {
@@ -1977,6 +1986,10 @@ implements SessionBean
 					result.addType(productTypeGroupID, productTypeID);
 				}
 			}
+
+			if (logger.isDebugEnabled())
+				logger.debug("getProductTypeGroupIDSearchResultForProductTypeQueries: exit (took " + (System.currentTimeMillis() - startTotal) + " msec)");
+
 			return result;
 		} finally {
 			pm.close();

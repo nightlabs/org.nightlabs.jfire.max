@@ -30,6 +30,8 @@ import java.io.Serializable;
 
 import org.nightlabs.jfire.accounting.Price;
 import org.nightlabs.jfire.accounting.Tariff;
+import org.nightlabs.jfire.accounting.tariffuserset.TariffUserSet;
+import org.nightlabs.jfire.store.ProductType;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -41,12 +43,21 @@ implements Serializable
 	private Tariff tariff;
 	private Price price;
 
-	public TariffPricePair()
+	/**
+	 * The productType is only detached (flat with only the {@link ProductType#getTariffUserSet()} property) for
+	 * automatic cache-invalidation, when the {@link TariffUserSet} is modified or another <code>TariffUserSet</code>
+	 * assigned to the {@link ProductType}.
+	 */
+	@SuppressWarnings("unused")
+	private ProductType productType;
+
+//	public TariffPricePair()
+//	{
+//	}
+
+	public TariffPricePair(ProductType productType, Tariff tariff, Price price)
 	{
-	}
-	
-	public TariffPricePair(Tariff tariff, Price price)
-	{
+		this.productType = productType;
 		this.tariff = tariff;
 		this.price = price;
 	}

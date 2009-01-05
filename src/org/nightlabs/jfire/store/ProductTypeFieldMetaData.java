@@ -36,7 +36,7 @@ import org.nightlabs.util.Util;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
- * 
+ *
  * @jdo.persistence-capable
  *		identity-type="application"
  *		objectid-class="org.nightlabs.jfire.store.id.ProductTypeFieldMetaDataID"
@@ -55,7 +55,7 @@ implements org.nightlabs.inheritance.FieldMetaData, Serializable
 {
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger = Logger.getLogger(ProductTypeFieldMetaData.class);
-	
+
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
@@ -81,7 +81,7 @@ implements org.nightlabs.inheritance.FieldMetaData, Serializable
 
 	/**
 	 * Whether or not the field may be changed by children.
-	 * 
+	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private byte writableByChildren = FieldMetaData.WRITABLEBYCHILDREN_YES;
@@ -97,7 +97,7 @@ implements org.nightlabs.inheritance.FieldMetaData, Serializable
 	/**
 	 * If true, the value of the child is automatically updated if the
 	 * mother's field is changed.
-	 * 
+	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private boolean valueInherited = true;
@@ -223,13 +223,16 @@ implements org.nightlabs.inheritance.FieldMetaData, Serializable
 	 */
 	public void setValueInherited(boolean valueInherited)
 	{
+		if (this.valueInherited == valueInherited)
+			return;
+
 		if (!writable && !valueInherited)
 			throw new IllegalStateException("The field is not writable, thus the value must be inherited. Cannot set valueInherited to false!");
 
 		if (logger.isTraceEnabled()) {
 			logger.trace("[" + ObjectIDUtil.intObjectIDFieldToString(System.identityHashCode(this)) + "] setValueInherited: "+valueInherited+" for field "+fieldName+" and productType "+productType.getPrimaryKey());
 		}
-		
+
 		this.valueInherited = valueInherited;
 	}
 

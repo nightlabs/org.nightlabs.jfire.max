@@ -25,10 +25,11 @@ import org.nightlabs.util.Util;
  *		detachable="true"
  *		table="JFireTrade_TariffUserSet"
  *
- * @jdo.inheritance strategy = "new-table"
+ * @jdo.inheritance strategy="new-table"
  *
- * @jdo.create-objectid-class
- *		field-order="organisationID, tariffUserSetID"
+ * @jdo.version strategy="version-number"
+ *
+ * @jdo.create-objectid-class field-order="organisationID, tariffUserSetID"
  */
 public class TariffUserSet
 implements Serializable

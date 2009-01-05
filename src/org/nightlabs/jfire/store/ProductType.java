@@ -140,6 +140,7 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="ProductType.managedProductTypeGroup" fields="managedProductTypeGroup"
  * @jdo.fetch-group name="ProductType.productTypeLocal" fields="productTypeLocal"
  * @jdo.fetch-group name="ProductType.name" fields="name"
+ * @jdo.fetch-group name="ProductType.tariffUserSet" fields="tariffUserSet"
  * @jdo.fetch-group name="ProductType.this" fetch-groups="default" fields="deliveryConfiguration, extendedProductType, fieldMetaDataMap, innerPriceConfig, managedProductTypeGroup, name, owner, packagePriceConfig, productTypeGroups, productTypeLocal"
  *
  * @jdo.fetch-group name="FetchGroupsTrade.articleInOrderEditor" fetch-groups="default" fields="name, vendor"
@@ -259,6 +260,8 @@ implements
 //	public static final String FETCH_GROUP_LOCAL_ACCOUNTANT_DELEGATE = "ProductType.localAccountantDelegate";
 //	public static final String FETCH_GROUP_LOCAL_STOREKEEPER_DELEGATE = "ProductType.localStorekeeperDelegate";
 	public static final String FETCH_GROUP_PRODUCT_TYPE_LOCAL = "ProductType.productTypeLocal";
+	public static final String FETCH_GROUP_TARIFF_USER_SET = "ProductType.tariffUserSet";
+
 	/**
 	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon!
 	 */
@@ -1718,6 +1721,9 @@ implements
 	 * @see FieldName#tariffUserSet
 	 */
 	public void setTariffUserSet(TariffUserSet tariffUserSet) {
+		if (Util.equals(this.tariffUserSet, tariffUserSet))
+			return;
+
 		this.tariffUserSet = tariffUserSet;
 	}
 

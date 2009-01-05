@@ -211,11 +211,11 @@ implements Serializable
 			tariffRefs.remove(tariff.getPrimaryKey());
 	}
 
-	public void addTariff(Tariff tariff)
+	public boolean addTariff(Tariff tariff)
 	{
 		TariffRef tariffRef = createTariffRef(tariff);
 		if (tariffRef.isDirectlyReferenced())
-			return;
+			return false; // indicate NO modification
 
 		tariffRef.setDirectlyReferenced(true);
 
@@ -229,6 +229,8 @@ implements Serializable
 				memberAuthorizedObjectRef.addTariffIndirectly(tariff);
 			}
 		}
+
+		return true; // indicate modification
 	}
 
 	public void removeTariff(Tariff tariff)

@@ -33,7 +33,7 @@ import org.nightlabs.inheritance.NotWritableException;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
- * 
+ *
  * @jdo.persistence-capable
  *		identity-type="application"
  *		objectid-class="org.nightlabs.jfire.store.id.ProductTypeLocalFieldMetaDataID"
@@ -77,7 +77,7 @@ implements org.nightlabs.inheritance.FieldMetaData, Serializable
 
 	/**
 	 * Whether or not the field may be changed by children.
-	 * 
+	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private byte writableByChildren = FieldMetaData.WRITABLEBYCHILDREN_YES;
@@ -93,7 +93,7 @@ implements org.nightlabs.inheritance.FieldMetaData, Serializable
 	/**
 	 * If true, the value of the child is automatically updated if the
 	 * mother's field is changed.
-	 * 
+	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private boolean valueInherited = true;
@@ -209,6 +209,9 @@ implements org.nightlabs.inheritance.FieldMetaData, Serializable
 	 */
 	public void setValueInherited(boolean valueInherited)
 	{
+		if (this.valueInherited == valueInherited)
+			return;
+
 		if (!writable && !valueInherited)
 			throw new IllegalStateException("The field is not writable, thus the value must be inherited. Cannot set valueInherited to false!");
 

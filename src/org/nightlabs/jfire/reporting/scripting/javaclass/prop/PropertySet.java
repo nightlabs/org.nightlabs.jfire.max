@@ -180,22 +180,28 @@ extends AbstractJFSScriptExecutorDelegate
 	protected String getOrganisation() {
 		return SecurityReflector.getUserDescriptor().getOrganisationID();
 	}
-
-	/* (non-Javadoc)
-	 * @see org.nightlabs.jfire.scripting.ScriptExecutorJavaClassDelegate#doExecute()
-	 */
-	public Object doExecute() throws ScriptException {
-		JFSResultSet resultSet = new JFSResultSet((JFSResultSetMetaData)getResultSetMetaData());
+	
+	protected org.nightlabs.jfire.prop.PropertySet getPropertySet() {
 		PropertySetID propertySetID = (PropertySetID) getParameterValue(PARAMETER_NAME_PROPERTY_SET_ID);
 		if (propertySetID == null)
 			throw new IllegalArgumentException("Parameter " + PARAMETER_NAME_PROPERTY_SET_ID + " is not set.");
 
 		PersistenceManager pm = getScriptExecutorJavaClass().getPersistenceManager();
 		org.nightlabs.jfire.prop.PropertySet propertySet = (org.nightlabs.jfire.prop.PropertySet) pm.getObjectById(propertySetID);
+		return propertySet;
+	}
 
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.scripting.ScriptExecutorJavaClassDelegate#doExecute()
+	 */
+	public Object doExecute() throws ScriptException {
+		JFSResultSet resultSet = new JFSResultSet((JFSResultSetMetaData)getResultSetMetaData());
+
+		org.nightlabs.jfire.prop.PropertySet propertySet = getPropertySet();
+		
 		IStruct struct = StructLocal.getStructLocal(
 				propertySet.getStructLocalLinkClass(), 
-				propertySet.getStructScope(), propertySet.getStructLocalScope(), pm);
+				propertySet.getStructScope(), propertySet.getStructLocalScope(), getPersistenceManager());
 		
 		List<Object> elements = new LinkedList<Object>();
 		Locale locale = JFireReportingHelper.getLocale();

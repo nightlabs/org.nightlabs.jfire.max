@@ -50,4 +50,21 @@ script need to be passed two script-properties:
 		</description>
 	</script>
 	
+	<script 
+		file="LocalOrganisationPropertySet.javaclass" 
+		id="LocalOrganisationPropertySet"
+		resultClass="org.nightlabs.jfire.reporting.oda.ResultSet"
+	>
+		<parameter-set>
+			<name language="de">ParameterSet: LocalOrganisationPropertySet</name>
+			<name language="en">ParameterSet: LocalOrganisationPropertySet</name>
+		</parameter-set>
+		<name language="de">PropertySet: Lokale Organisation</name>
+		<name language="en">PropertySet: Local Organisation</name>
+		<description language="de">Dieses Skript ermöglicht die Ausgabe der Eigenschaften der lokalen Organisation.
+		</description>
+		<description language="en">This script enables the output of the properties of the local organisation.
+		</description>
+	</script>	
+	
 </script-category>

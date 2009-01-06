@@ -2096,7 +2096,11 @@ user.getName()</expression>
                     <property name="name">PaymentAmountSum</property>
                     <expression name="expression">importClass(Packages.org.nightlabs.jfire.reporting.JFireReportingHelper);
 currency = JFireReportingHelper.getJDOObject(dataSetRow["currencyJDOID"]);
-currency.toDouble(dataSetRow["PaymentAccount"])</expression>
+if (!row["failed"]) {
+  currency.toDouble(dataSetRow["PaymentAccount"])
+} else {
+  0
+}</expression>
                     <property name="dataType">float</property>
                     <simple-property-list name="aggregateOn">
                         <value>CurrencyGroup</value>
@@ -2129,18 +2133,20 @@ currency.toDouble(dataSetRow["PaymentAccount"])</expression>
                 </list-property>
             </column>
             <column id="312">
-                <property name="width">0.6in</property>
+                <property name="width">2.5cm</property>
             </column>
             <column id="438">
-                <property name="width">2.1in</property>
+                <property name="width">4cm</property>
             </column>
             <column id="314">
-                <property name="width">1.8in</property>
+                <property name="width">5.5cm</property>
             </column>
             <column id="316">
                 <property name="width">1.5in</property>
             </column>
-            <column id="445"/>
+            <column id="445">
+                <property name="width">2.3cm</property>
+            </column>
             <column id="466">
                 <property name="width">2in</property>
             </column>
@@ -2288,6 +2294,11 @@ currency.toDouble(dataSetRow["PaymentAccount"])</expression>
                             <expression name="testExpr">Total.runningCount() % 2</expression>
                             <expression name="value1">0</expression>
                         </structure>
+                        <structure>
+                            <property name="operator">is-true</property>
+                            <property name="fontStyle">italic</property>
+                            <expression name="testExpr">row["failed"]</expression>
+                        </structure>
                     </list-property>
                     <cell id="276">
                         <property name="paddingTop">1pt</property>
@@ -2296,7 +2307,7 @@ currency.toDouble(dataSetRow["PaymentAccount"])</expression>
                             <property name="marginTop">0pt</property>
                             <structure name="dateTimeFormat">
                                 <property name="category">Custom</property>
-                                <property name="pattern">d. MM yyyy HH:mm:ss</property>
+                                <property name="pattern">dd. MM yyyy HH:mm:ss</property>
                             </structure>
                             <property name="resultSetColumn">beginDT</property>
                         </data>
@@ -2405,6 +2416,13 @@ JFireReportingHelper.createDataSetParam(JDOHelper.getObjectId(partner.getPerson(
                         <property name="paddingLeft">5pt</property>
                         <text-data id="447">
                             <property name="fontFamily">"Arial Narrow"</property>
+                            <list-property name="highlightRules">
+                                <structure>
+                                    <property name="operator">is-true</property>
+                                    <property name="color">#FF0000</property>
+                                    <expression name="testExpr">row["failed"]</expression>
+                                </structure>
+                            </list-property>
                             <expression name="valueExpr">key = "paymentStatus.";
 if (row["pending"] != 0)
   key = key + "pending";

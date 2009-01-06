@@ -408,9 +408,14 @@ implements ISaleAccessQuery
 
 	/**
 	 * Sets the filter to include only ProductTypes whose name
-	 * matches the given fullTextSearch. The match will be performed
+	 * matches the given fullTextSearch. 
+	 * If {@link #isFullTextSearchRegex()} returns <code>true</code>
+	 * the match against the value set here will be performed
 	 * following the rules of {@link String#matches(String)}, i.e.
 	 * you need to pass a regular expression here.
+	 * If {@link #isFullTextSearchRegex()} returns <code>false</code>
+	 * a regular expression will be made out of the value set here
+	 * by prefixing and suffixing it with ".*";
 	 *
 	 * @param fullTextSearch the fullTextSearch to set
 	 */

@@ -242,8 +242,9 @@ public class AccountQuery
 	}
 
 	/**
-	 * set the accountName
-	 * @param accountName the accountName to set
+	 * Set the regular expression to match the account name against.
+	 * 
+	 * @param accountName the accountName to set.
 	 */
 	public void setAccountName(String accountName)
 	{

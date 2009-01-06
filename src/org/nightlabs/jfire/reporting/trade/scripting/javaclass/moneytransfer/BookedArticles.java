@@ -163,7 +163,7 @@ public class BookedArticles extends AbstractJFSScriptExecutorDelegate {
 		Collection<Object[]> queryResult = (Collection<Object[]>)q.executeWithMap(jdoParams);
 
 		for (Object[] queryRow : queryResult) {
-			List<Object> resultRow = new ArrayList<Object>(8);
+			List<Object> resultRow = new ArrayList<Object>(9);
 			if (!groupResults)
 				resultRow.add(JDOHelper.getObjectId(queryRow[0])); // 0 = this
 			else

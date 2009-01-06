@@ -55,4 +55,22 @@
 			<parameter name="productTypeOwnerIDs" type="java.util.Collection"/>	
 		</parameter-set>
 	</script>
+	
+	<script 
+		file="BookedArticlesWithPaymentInfo.javaclass" 
+		id="BookedArticlesWithPaymentInfo"
+		resultClass="org.eclipse.datatools.connectivity.oda.IResultSet"
+	>
+		<name language="de">Rechnungsbuchungen: Liste gebuchter Artikel + Zahlungsinformationen</name>
+		<name language="en">Invoice bookings: booked articles + payment info</name>
+		<parameter-set>
+			<name language="de">ParameterSet: BookedArticlesWithPaymentInfo</name>
+			<name language="en">ParameterSet: BookedArticlesWithPaymentInfo</name>
+			<parameter name="timePeriod" type="org.nightlabs.util.TimePeriod"/>	
+			<parameter name="bookUserIDs" type="java.util.Collection"/>	
+			<parameter name="productTypeIDs" type="java.util.Collection"/>
+			<parameter name="productTypeOwnerIDs" type="java.util.Collection"/>	
+		</parameter-set>
+	</script>
+	
 </script-category>

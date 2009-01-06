@@ -26,7 +26,11 @@
 
 package org.nightlabs.jfire.accounting;
 
+import java.util.Collection;
 import java.util.Set;
+
+import javax.jdo.PersistenceManager;
+import javax.jdo.Query;
 
 import org.nightlabs.jfire.accounting.pay.Payment;
 import org.nightlabs.jfire.security.User;
@@ -47,6 +51,15 @@ import org.nightlabs.jfire.transfer.Anchor;
  *		table="JFireTrade_InvoiceMoneyTransfer"
  *
  * @jdo.inheritance strategy = "new-table"
+ * 
+ * @jdo.query
+ * 	name="getInvoiceMoneyTransfersForInvoice"
+ * 	query="SELECT
+ *			WHERE
+ *				this.invoice == :pInvoice &&
+ *				this.bookType == :pBookType
+ *			"
+ * 
  */
 public class InvoiceMoneyTransfer
 extends MoneyTransfer
@@ -188,5 +201,20 @@ extends MoneyTransfer
 	protected void rollbackTransferAtInvoice(User user, Set<Anchor> involvedAnchors)
 	{
 		invoice.bookInvoiceMoneyTransfer(this, true);
+	}
+
+	/**
+	 * Get those {@link InvoiceMoneyTransfer}s that where made for the given invoice and bookType.
+	 * The bookType can be one of the constants in this class {@link #BOOK_TYPE_BOOK} or {@link #BOOK_TYPE_PAY}.
+	 * 
+	 * @param pm The {@link PersistenceManager} to use.
+	 * @param invoice The invoice to find the transfers for.
+	 * @param bookType The bookType to find the transfers for. Use one of the constants {@link #BOOK_TYPE_BOOK} or {@link #BOOK_TYPE_PAY}.
+	 * @return Those {@link InvoiceMoneyTransfer}s that where made for the given invoice and bookType
+	 */
+	@SuppressWarnings("unchecked")
+	public static Collection<InvoiceMoneyTransfer> getInvoiceMoneyTransfers(PersistenceManager pm, Invoice invoice, String bookType) {
+		Query q = pm.newNamedQuery(InvoiceMoneyTransfer.class, "getInvoiceMoneyTransfersForInvoice");
+		return (Collection<InvoiceMoneyTransfer>) q.execute(invoice, bookType);
 	}
 }

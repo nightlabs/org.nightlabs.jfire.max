@@ -1,5 +1,12 @@
 package org.nightlabs.jfire.store.search;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import javax.jdo.JDOHelper;
+import javax.jdo.JDOObjectNotFoundException;
+import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
 import org.nightlabs.jfire.security.SecurityReflector;
@@ -8,7 +15,10 @@ import org.nightlabs.jfire.security.id.UserID;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.ProductTypePermissionFlagSet;
 import org.nightlabs.jfire.store.id.ProductTypeGroupID;
+import org.nightlabs.jfire.store.id.ProductTypeID;
+import org.nightlabs.jfire.store.id.ProductTypePermissionFlagSetID;
 import org.nightlabs.jfire.transfer.id.AnchorID;
+import org.nightlabs.util.CollectionUtil;
 
 /**
  * Searches {@link ProductType}s. Every field that's <code>null</code> is ignored,
@@ -81,24 +91,134 @@ implements ISaleAccessQuery
 		return getPersistenceManager().newQuery(getCandidateClass());
 	}
 
-	protected void populateFilterPermissionGranted(
-			String productTypePermissionFlagSetFlagsFieldName,
-			boolean permissionGranted, String variableName
-	)
-	{
-		StringBuilder filter = getFilter();
-		addVariable(ProductTypePermissionFlagSet.class, variableName);
-		// joining via primary key - faster than other fields
-		filter.append("\n && this.organisationID == " + variableName + ".productTypeOrganisationID");
-		filter.append("\n && this.productTypeID == " + variableName + ".productTypeID");
-		filter.append("\n && " + variableName + ".userOrganisationID == :userID.organisationID");
-		filter.append("\n && " + variableName + ".userID == :userID.userID");
-		filter.append("\n && " + variableName + '.' + productTypePermissionFlagSetFlagsFieldName + " ");
-		if (permissionGranted)
-			filter.append("== 0");
-		else
-			filter.append("!= 0");
-	}
+// TODO temporarily deactivated the inclusion of the ProductTypePermissionFlagSet into the query. Have to file a DataNucleus bug and put URL here!!! Marco.
+// This code produces EXTREMELY slow queries (because of CROSS JOIN):
+//
+// The following JDOQL:
+//
+//	SELECT FROM org.nightlabs.crossticket.trade.store.Event
+//	WHERE true
+//	 && this.organisationID == productTypePermissionFlagSetSee.productTypeOrganisationID
+//	 && this.productTypeID == productTypePermissionFlagSetSee.productTypeID
+//	 && productTypePermissionFlagSetSee.userOrganisationID == :userID.organisationID
+//	 && productTypePermissionFlagSetSee.userID == :userID.userID
+//	 && productTypePermissionFlagSetSee.flagsSeeProductType == 0
+//	 && this.inheritanceNature == :inheritanceNature
+//	 && JDOHelper.getObjectId(this.vendor) == :vendorID
+//	 && ( this.performanceTimes.contains(varPerformanceTime))
+//	VARIABLES org.nightlabs.jfire.store.ProductTypePermissionFlagSet productTypePermissionFlagSetSee; org.nightlabs.crossticket.trade.store.PerformanceTime varPerformanceTime"
+//
+// is translated to the following highly ineffecient SQL:
+//
+//	SELECT
+//	  'org.nightlabs.crossticket.trade.store.Event        ' AS NUCMETADATA,
+//	  this_1.opt_version,
+//	  this_1.close_timestamp,
+//	  this_1.confirmed,
+//	  this_1.inheritance_nature,
+//	  this_1.organisation_id,
+//	  this_1.package_nature,
+//	  this_1.product_available,
+//	  this_1.product_type_id,
+//	  this_1.published,
+//	  this_1.saleable,
+//	  this.event_package,
+//	  this.next_performance_time_id,
+//	  this.performance_container
+//	FROM crosstickettrade_event this
+//	LEFT OUTER JOIN crosstickettrade_resellerevent subelement0
+//	  ON
+//	    subelement0.organisation_id = this.organisation_id AND
+//	    subelement0.product_type_id = this.product_type_id
+//	INNER JOIN jfiretrade_producttype this_1
+//	  ON
+//	    this_1.organisation_id = this.organisation_id AND
+//	    this_1.product_type_id = this.product_type_id
+//	CROSS JOIN jfiretrade_producttypepermissionflagset unbound_product_type_permission_flag_set_see
+//	WHERE
+//	  (
+//	    EXISTS (
+//	      SELECT 1
+//	      FROM crosstickettrade_performancetime this_performancetimes_varperformancetime
+//	      WHERE
+//		  this_performancetimes_varperformancetime.event_organisation_id_oid = this.organisation_id AND
+//		  this_performancetimes_varperformancetime.event_product_type_id_oid = this.product_type_id AND
+//		  this_1.organisation_id = unbound_product_type_permission_flag_set_see.product_type_organisation_id AND
+//		  this_1.product_type_id = unbound_product_type_permission_flag_set_see.product_type_id AND
+//		  unbound_product_type_permission_flag_set_see.user_organisation_id = 'chezfrancois.jfire.org' AND
+//		  unbound_product_type_permission_flag_set_see.user_id = 'francois' AND
+//		  unbound_product_type_permission_flag_set_see.flags_see_product_type = 0 AND
+//		  this_1.inheritance_nature = 12 AND
+//		  'org.nightlabs.jfire.trade.OrganisationLegalEntity' = this_1.vendor_anchor_id_oid AND
+//		  'LegalEntity' = this_1.vendor_anchor_type_id_oid AND
+//		  'chezfrancois.jfire.org' = this_1.vendor_organisation_id_oid
+//	    )
+//	  ) AND
+//	  subelement0.organisation_id IS NULL AND
+//	  subelement0.product_type_id IS NULL
+//	UNION
+//	  SELECT 'org.nightlabs.crossticket.trade.store.ResellerEvent' AS NUCMETADATA,
+//	  this_1.opt_version,
+//	  this_1.close_timestamp,
+//	  this_1.confirmed,
+//	  this_1.inheritance_nature,
+//	  this_1.organisation_id,
+//	  this_1.package_nature,
+//	  this_1.product_available,
+//	  this_1.product_type_id,
+//	  this_1.published,this_1.saleable,
+//	  this.event_package,
+//	  this.next_performance_time_id,
+//	  this.performance_container
+//	FROM crosstickettrade_event this
+//	INNER JOIN crosstickettrade_resellerevent `element`
+//	  ON
+//	    `element`.organisation_id = this.organisation_id AND
+//	    `element`.product_type_id = this.product_type_id
+//	INNER JOIN jfiretrade_producttype this_1
+//	  ON
+//	    this_1.organisation_id = this.organisation_id AND
+//	    this_1.product_type_id = this.product_type_id
+//	CROSS JOIN jfiretrade_producttypepermissionflagset unbound_product_type_permission_flag_set_see
+//	WHERE
+//	  (
+//	    EXISTS (
+//	      SELECT 1
+//	      FROM crosstickettrade_performancetime this_performancetimes_varperformancetime
+//	      WHERE this_performancetimes_varperformancetime.event_organisation_id_oid = this.organisation_id AND
+//		this_performancetimes_varperformancetime.event_product_type_id_oid = this.product_type_id AND
+//		this_1.organisation_id = unbound_product_type_permission_flag_set_see.product_type_organisation_id AND
+//		this_1.product_type_id = unbound_product_type_permission_flag_set_see.product_type_id AND
+//		unbound_product_type_permission_flag_set_see.user_organisation_id = 'chezfrancois.jfire.org' AND
+//		unbound_product_type_permission_flag_set_see.user_id = 'francois' AND
+//		unbound_product_type_permission_flag_set_see.flags_see_product_type = 0 AND
+//		this_1.inheritance_nature = 12 AND
+//		'org.nightlabs.jfire.trade.OrganisationLegalEntity' = this_1.vendor_anchor_id_oid AND
+//		'LegalEntity' = this_1.vendor_anchor_type_id_oid AND
+//		'chezfrancois.jfire.org' = this_1.vendor_organisation_id_oid
+//	    )
+//	  )
+
+
+
+//	protected void populateFilterPermissionGranted(
+//			String productTypePermissionFlagSetFlagsFieldName,
+//			boolean permissionGranted, String variableName
+//	)
+//	{
+//		StringBuilder filter = getFilter();
+//		addVariable(ProductTypePermissionFlagSet.class, variableName);
+////		// joining via primary key - hopefully faster than other fields
+//		filter.append("\n && this.organisationID == " + variableName + ".productTypeOrganisationID");
+//		filter.append("\n && this.productTypeID == " + variableName + ".productTypeID");
+//		filter.append("\n && " + variableName + ".userOrganisationID == :userID.organisationID");
+//		filter.append("\n && " + variableName + ".userID == :userID.userID");
+//		filter.append("\n && " + variableName + '.' + productTypePermissionFlagSetFlagsFieldName + " ");
+//		if (permissionGranted)
+//			filter.append("== 0");
+//		else
+//			filter.append("!= 0");
+//	}
 
 	@Override
 	protected void prepareQuery(Query q)
@@ -108,18 +228,19 @@ implements ISaleAccessQuery
 
 		userID = SecurityReflector.getUserDescriptor().getUserObjectID();
 
-		if (!User.USER_ID_SYSTEM.equals(userID.userID)) // the system user is allowed to see/do everything and has no ProductTypePermissionFlagSet. TODO maybe we should give him ProductTypePermissionFlagSet entries?!
-			populateFilterPermissionGranted("flagsSeeProductType", true, "productTypePermissionFlagSetSee");
-
-		if (isFieldEnabled(FieldName.permissionGrantedToSell) && permissionGrantedToSell != null) {
-			if (!User.USER_ID_SYSTEM.equals(userID.userID) || !permissionGrantedToSell) // the system user is allowed to see/do everything and has no ProductTypePermissionFlagSet. TODO maybe we should give him ProductTypePermissionFlagSet entries?!
-				populateFilterPermissionGranted("flagsSellProductType", permissionGrantedToSell, "productTypePermissionFlagSetSell");
-		}
-
-		if (isFieldEnabled(FieldName.permissionGrantedToReverse) && permissionGrantedToReverse != null) {
-			if (!User.USER_ID_SYSTEM.equals(userID.userID) || !permissionGrantedToReverse) // the system user is allowed to see/do everything and has no ProductTypePermissionFlagSet. TODO maybe we should give him ProductTypePermissionFlagSet entries?!
-				populateFilterPermissionGranted("flagsReverseProductType", permissionGrantedToReverse, "productTypePermissionFlagSetReverse");
-		}
+// TODO temporarily deactivated the method populateFilterPermissionGranted(...) - see above!
+//		if (!User.USER_ID_SYSTEM.equals(userID.userID)) // the system user is allowed to see/do everything and has no ProductTypePermissionFlagSet. TODO maybe we should give him ProductTypePermissionFlagSet entries?!
+//			populateFilterPermissionGranted("flagsSeeProductType", true, "productTypePermissionFlagSetSee");
+//
+//		if (isFieldEnabled(FieldName.permissionGrantedToSell) && permissionGrantedToSell != null) {
+//			if (!User.USER_ID_SYSTEM.equals(userID.userID) || !permissionGrantedToSell) // the system user is allowed to see/do everything and has no ProductTypePermissionFlagSet. TODO maybe we should give him ProductTypePermissionFlagSet entries?!
+//				populateFilterPermissionGranted("flagsSellProductType", permissionGrantedToSell, "productTypePermissionFlagSetSell");
+//		}
+//
+//		if (isFieldEnabled(FieldName.permissionGrantedToReverse) && permissionGrantedToReverse != null) {
+//			if (!User.USER_ID_SYSTEM.equals(userID.userID) || !permissionGrantedToReverse) // the system user is allowed to see/do everything and has no ProductTypePermissionFlagSet. TODO maybe we should give him ProductTypePermissionFlagSet entries?!
+//				populateFilterPermissionGranted("flagsReverseProductType", permissionGrantedToReverse, "productTypePermissionFlagSetReverse");
+//		}
 
 		if (isFieldEnabled(FieldName.fullTextSearch) && fullTextSearch != null) {
 			filter.append("\n && ( ");
@@ -173,6 +294,53 @@ implements ISaleAccessQuery
 
 		q.setFilter(filter.toString());
 		q.declareVariables(getVars());
+	}
+
+	// TODO DataNucleus WORKAROUND: remove this temporary workaround (the whole implementation of postProcessQueryResult) and activate the populateFilterPermissionGranted(...) above.
+	@Override
+	protected Object postProcessQueryResult(Object result) {
+		Collection<? extends ProductType> rawProductTypes = CollectionUtil.castCollection((Collection<?>) super.postProcessQueryResult(result));
+		List<ProductType> filteredProductTypes = new ArrayList<ProductType>(rawProductTypes.size());
+		PersistenceManager pm = getPersistenceManager();
+
+		if (userID == null)
+			throw new IllegalStateException("userID is null! Was prepareQuery(...) not called before?!");
+
+		iterateProductTypes: for (ProductType productType : rawProductTypes) {
+			ProductTypePermissionFlagSet ptpfs;
+			try {
+				ptpfs = (ProductTypePermissionFlagSet) pm.getObjectById(
+						ProductTypePermissionFlagSetID.create((ProductTypeID)JDOHelper.getObjectId(productType), userID)
+				);
+			} catch (JDOObjectNotFoundException x) {
+				continue iterateProductTypes;
+			}
+
+
+			if (!User.USER_ID_SYSTEM.equals(userID.userID)) { // the system user is allowed to see/do everything and has no ProductTypePermissionFlagSet. TODO maybe we should give him ProductTypePermissionFlagSet entries?!
+				if (ptpfs.getFlags(org.nightlabs.jfire.store.RoleConstants.seeProductType) != 0)
+					continue iterateProductTypes;
+			}
+
+			if (isFieldEnabled(FieldName.permissionGrantedToSell) && permissionGrantedToSell != null) {
+				if (!User.USER_ID_SYSTEM.equals(userID.userID) || !permissionGrantedToSell) { // the system user is allowed to see/do everything and has no ProductTypePermissionFlagSet. TODO maybe we should give him ProductTypePermissionFlagSet entries?!
+					if (ptpfs.getFlags(org.nightlabs.jfire.trade.RoleConstants.sellProductType) != 0)
+						continue iterateProductTypes;
+				}
+			}
+
+			if (isFieldEnabled(FieldName.permissionGrantedToReverse) && permissionGrantedToReverse != null) {
+				if (!User.USER_ID_SYSTEM.equals(userID.userID) || !permissionGrantedToReverse) { // the system user is allowed to see/do everything and has no ProductTypePermissionFlagSet. TODO maybe we should give him ProductTypePermissionFlagSet entries?!
+					if (ptpfs.getFlags(org.nightlabs.jfire.trade.RoleConstants.reverseProductType) != 0)
+						continue iterateProductTypes;
+				}
+			}
+
+
+			filteredProductTypes.add(productType);
+		}
+
+		return filteredProductTypes;
 	}
 
 	protected void addFullTextSearch(StringBuilder filter, String member) {

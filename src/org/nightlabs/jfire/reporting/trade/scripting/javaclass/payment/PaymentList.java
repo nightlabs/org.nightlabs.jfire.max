@@ -17,7 +17,6 @@ import javax.jdo.Query;
 import org.eclipse.datatools.connectivity.oda.IResultSetMetaData;
 import org.nightlabs.db.Record;
 import org.nightlabs.db.TableBuffer;
-import org.nightlabs.jfire.accounting.pay.PayMoneyTransfer;
 import org.nightlabs.jfire.accounting.pay.Payment;
 import org.nightlabs.jfire.accounting.pay.id.ModeOfPaymentFlavourID;
 import org.nightlabs.jfire.reporting.JFireReportingHelper;
@@ -110,9 +109,9 @@ public class PaymentList extends AbstractJFSScriptExecutorDelegate {
 		
 		StringBuffer jdoql = new StringBuffer();
 		 jdoql.append("SELECT "+
-		 "  this.payment "+
+		 "  this "+
 		"FROM " +
-		"  "+PayMoneyTransfer.class.getName()+" " +
+		"  "+Payment.class.getName()+" " +
 		"WHERE (1 == 1) ");
 		Map<String, Object> jdoParams = new HashMap<String, Object>();
 		
@@ -124,7 +123,7 @@ public class PaymentList extends AbstractJFSScriptExecutorDelegate {
 				UserID userID = iterator.next();
 				// TODO: WORKAROUND: JPOX Bug
 //				jdoql.append("(JDOHelper.getObjectId(this.user) == :userID" + i + ") ");
-				jdoql.append("(this.payment.user.organisationID == \"" + userID.organisationID + "\" && this.payment.user.userID == \"" + userID.userID + "\")");
+				jdoql.append("(this.user.organisationID == \"" + userID.organisationID + "\" && this.user.userID == \"" + userID.userID + "\")");
 				jdoParams.put("userID" + i, userID);
 				if (iterator.hasNext())
 					jdoql.append("|| ");
@@ -140,9 +139,9 @@ public class PaymentList extends AbstractJFSScriptExecutorDelegate {
 			for (Iterator<AnchorID> iterator = partnerIDs.iterator(); iterator.hasNext();) {
 				AnchorID partnerID = iterator.next();
 				// TODO: WORKAROUND: JPOX Bug
-//				jdoql.append("(JDOHelper.getObjectId(this.payment.partner) == :partnerID" + i + ") ");
+//				jdoql.append("(JDOHelper.getObjectId(this.partner) == :partnerID" + i + ") ");
 //				jdoParams.put("partnerID"+i, partnerID);
-				jdoql.append("(this.payment.partner == :partner" + i + ") ");
+				jdoql.append("(this.partner == :partner" + i + ") ");
 				jdoParams.put("partner"+i, pm.getObjectById(partnerID));
 				if (iterator.hasNext())
 					jdoql.append("|| ");
@@ -158,9 +157,9 @@ public class PaymentList extends AbstractJFSScriptExecutorDelegate {
 			for (Iterator<ModeOfPaymentFlavourID> iterator = modeOfPaymentFlavourIDs.iterator(); iterator.hasNext();) {
 				ModeOfPaymentFlavourID modeOfPaymentFlavourID = iterator.next();
 				// TODO: WORKAROUND: JPOX Bug
-//				jdoql.append("(JDOHelper.getObjectId(this.payment.modeOfPaymentFlavour) == :modeOfPaymentFlavourID" + i + ") ");
+//				jdoql.append("(JDOHelper.getObjectId(this.modeOfPaymentFlavour) == :modeOfPaymentFlavourID" + i + ") ");
 //				jdoParams.put(":modeOfPaymentFlavourID" + i, modeOfPaymentFlavourID);
-				jdoql.append("(this.payment.modeOfPaymentFlavour == :modeOfPaymentFlavour" + i + ") ");
+				jdoql.append("(this.modeOfPaymentFlavour == :modeOfPaymentFlavour" + i + ") ");
 				jdoParams.put("modeOfPaymentFlavour" + i, pm.getObjectById(modeOfPaymentFlavourID));
 				if (iterator.hasNext())
 					jdoql.append("|| ");
@@ -170,9 +169,9 @@ public class PaymentList extends AbstractJFSScriptExecutorDelegate {
 		}
 		
 		// filter by begin time period
-		ReportingScriptUtil.addTimePeriodCondition(jdoql, "this.payment.beginDT", "beginDT", beginTimePeriod, jdoParams);
+		ReportingScriptUtil.addTimePeriodCondition(jdoql, "this.beginDT", "beginDT", beginTimePeriod, jdoParams);
 		// filter by begin time period
-		ReportingScriptUtil.addTimePeriodCondition(jdoql, "this.payment.endDT", "endDT", endTimePeriod, jdoParams);
+		ReportingScriptUtil.addTimePeriodCondition(jdoql, "this.endDT", "endDT", endTimePeriod, jdoParams);
 		
 		Query q = pm.newQuery(jdoql.toString());
 		Collection<Payment> queryResult = (Collection<Payment>)q.executeWithMap(jdoParams);

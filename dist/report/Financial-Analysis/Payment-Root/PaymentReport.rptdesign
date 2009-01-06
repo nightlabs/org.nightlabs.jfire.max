@@ -370,7 +370,7 @@ function isParamSet(param) {
             </list-property>
             <property name="queryText">&lt;queryPropertySet>&lt;org.nightlabs.jfire.reporting.oda.jfs.JFSQueryPropertySet>
   &lt;scriptRegistryItemID>
-    &lt;organisationID>dev.jfire.org&lt;/organisationID>
+    &lt;organisationID>${devOrganisationID}&lt;/organisationID>
     &lt;scriptRegistryItemType>JFireReportingTrade-PaymentData&lt;/scriptRegistryItemType>
     &lt;scriptRegistryItemID>PaymentList&lt;/scriptRegistryItemID>
   &lt;/scriptRegistryItemID>
@@ -1082,7 +1082,7 @@ function isParamSet(param) {
             </list-property>
             <property name="queryText">&lt;queryPropertySet>&lt;org.nightlabs.jfire.reporting.oda.jfs.JFSQueryPropertySet>
   &lt;scriptRegistryItemID>
-    &lt;organisationID>dev.jfire.org&lt;/organisationID>
+    &lt;organisationID>${devOrganisationID}&lt;/organisationID>
     &lt;scriptRegistryItemType>JFireReporting-Scripting-PropertySet&lt;/scriptRegistryItemType>
     &lt;scriptRegistryItemID>PropertySet&lt;/scriptRegistryItemID>
   &lt;/scriptRegistryItemID>
@@ -1396,7 +1396,7 @@ function isParamSet(param) {
             </list-property>
             <property name="queryText">&lt;queryPropertySet>&lt;org.nightlabs.jfire.reporting.oda.jfs.JFSQueryPropertySet>
   &lt;scriptRegistryItemID>
-    &lt;organisationID>dev.jfire.org&lt;/organisationID>
+    &lt;organisationID>${devOrganisationID}&lt;/organisationID>
     &lt;scriptRegistryItemType>JFireReportingTrade-InvoiceData&lt;/scriptRegistryItemType>
     &lt;scriptRegistryItemID>InvoiceData&lt;/scriptRegistryItemID>
   &lt;/scriptRegistryItemID>

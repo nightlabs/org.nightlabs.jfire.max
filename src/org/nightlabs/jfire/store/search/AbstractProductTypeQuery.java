@@ -9,6 +9,7 @@ import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
+import org.apache.log4j.Logger;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.security.id.UserID;
@@ -33,6 +34,7 @@ extends VendorDependentQuery
 implements ISaleAccessQuery
 {
 	private static final long serialVersionUID = 20081118L;
+	private static final Logger logger = Logger.getLogger(AbstractProductTypeQuery.class);
 
 	private String fullTextLanguageID = null;
 	private boolean fullTextSearchRegex = false;
@@ -298,7 +300,10 @@ implements ISaleAccessQuery
 
 	// TODO DataNucleus WORKAROUND: remove this temporary workaround (the whole implementation of postProcessQueryResult) and activate the populateFilterPermissionGranted(...) above.
 	@Override
-	protected Object postProcessQueryResult(Object result) {
+	protected Object postProcessQueryResult(Object result)
+	{
+		long start = System.currentTimeMillis();
+
 		Collection<? extends ProductType> rawProductTypes = CollectionUtil.castCollection((Collection<?>) super.postProcessQueryResult(result));
 		List<ProductType> filteredProductTypes = new ArrayList<ProductType>(rawProductTypes.size());
 		PersistenceManager pm = getPersistenceManager();
@@ -339,6 +344,9 @@ implements ISaleAccessQuery
 
 			filteredProductTypes.add(productType);
 		}
+
+		if (logger.isDebugEnabled())
+			logger.debug("postProcessQueryResult: took " + (System.currentTimeMillis() - start) + " msec");
 
 		return filteredProductTypes;
 	}

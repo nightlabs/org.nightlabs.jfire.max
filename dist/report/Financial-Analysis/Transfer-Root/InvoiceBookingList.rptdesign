@@ -934,18 +934,22 @@ inv.getCurrency().toDouble(inv.getInvoiceLocal().getAmountToPay())</expression>
                 <property name="width">3.5cm</property>
             </column>
             <column id="726"/>
-            <column id="577">
-                <property name="width">5cm</property>
+            <column id="577"/>
+            <column id="585">
+                <property name="width">1.5cm</property>
             </column>
-            <column id="585"/>
             <column id="716">
-                <property name="width">5cm</property>
+                <property name="width">2cm</property>
             </column>
             <column id="721">
-                <property name="width">5cm</property>
+                <property name="width">6cm</property>
             </column>
-            <column id="709"/>
-            <column id="687"/>
+            <column id="709">
+                <property name="width">2cm</property>
+            </column>
+            <column id="687">
+                <property name="width">2cm</property>
+            </column>
             <header>
                 <row id="493">
                     <property name="borderBottomColor">#000000</property>

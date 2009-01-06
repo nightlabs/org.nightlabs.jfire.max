@@ -37,7 +37,6 @@ import org.nightlabs.jfire.security.id.UserID;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.trade.Article;
-import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 import org.nightlabs.util.TimePeriod;
 
@@ -50,6 +49,11 @@ import org.nightlabs.util.TimePeriod;
 public class BookedArticlesWithPaymentInfo extends AbstractJFSScriptExecutorDelegate {
 
 	private static final Logger logger = Logger.getLogger(BookedArticlesWithPaymentInfo.class);
+	
+	private static class MOPArticleEntry {
+		long amount;
+		double quantity;
+	}
 	
 	public BookedArticlesWithPaymentInfo() {
 		super();
@@ -168,7 +172,7 @@ public class BookedArticlesWithPaymentInfo extends AbstractJFSScriptExecutorDele
 			Invoice invoice = article.getInvoice(); // invoice can't be null as we searched for booked articles
 			
 			// This map collects the amount paid by the mode of payment flavour
-			Map<ModeOfPaymentFlavourID, Long> amountsByMOP = new HashMap<ModeOfPaymentFlavourID, Long>(1);
+			Map<ModeOfPaymentFlavourID, MOPArticleEntry> amountsByMOP = new HashMap<ModeOfPaymentFlavourID, MOPArticleEntry>(1);
 			// this cumulates the amounts registered in amountsByMOP 
 			long articlePaidAmount = 0;
 //			// articleFactor is the factor by which the payments will be 
@@ -187,39 +191,71 @@ public class BookedArticlesWithPaymentInfo extends AbstractJFSScriptExecutorDele
 				// Get the MOP-flavour of the payment that lead to the transfer
 				ModeOfPaymentFlavourID mopf = (ModeOfPaymentFlavourID) JDOHelper.getObjectId(payMoneyTransfer.getPayment().getModeOfPaymentFlavour());
 
-				// The transferFactor is the fraction of the current transfer to the total amount of the invoice
-				// the article amount is multiplied with this factor to obtain the amount paid for this article related to this payment/transfer
-				double transferFactor = (double)invoice.getPrice().getAmount() / (double)invoiceMoneyTransfer.getAmount();
-				if (invoiceMoneyTransfer.getTo() instanceof LegalEntity) {
-					transferFactor *= -1;
+				long invoiceAmount = invoice.getPrice().getAmount();
+				long transferAmount = invoiceMoneyTransfer.getAmount();
+				if (article.isReversing()) {
+					transferAmount *= -1;
 				}
+				// The transferFactor is the fraction of the article paid with the current InvoiceMoneyTransfer 
+				double transferFactor = 0d;
+				if (invoiceAmount != 0) {
+					transferFactor = (double)transferAmount / (double)invoiceAmount;
+				} else {
+					continue; // invoices with 0-amount are treated as non-payment
+				}
+				
 				long paymentArticleAmount = Math.round(article.getPrice().getAmount() * transferFactor);
-
-				// The following is old
-//				// calculate the amount paid for this article with the current payment
-//				// it is the value according to the percentage of the articles amount in the invoice
-//				long paymentArticleAmount = Math.round(articleFactor * invoiceMoneyTransfer.getAmount());
 
 				// Cumulate the amounts for this article
 				articlePaidAmount += paymentArticleAmount;
 				
 				// insert the amount in the map of amounts per MOP-flavour
-				Long amountByMOP = amountsByMOP.get(mopf);
-				if (amountByMOP == null)
-					amountByMOP = Long.valueOf(paymentArticleAmount);
-				else
-					amountByMOP = Long.valueOf(amountByMOP.longValue() + paymentArticleAmount);
-				amountsByMOP.put(mopf, amountByMOP);
+				MOPArticleEntry articleEntry = amountsByMOP.get(mopf);
+				if (articleEntry == null) {
+					articleEntry = new MOPArticleEntry();
+					amountsByMOP.put(mopf, articleEntry);
+				}
+				articleEntry.amount += paymentArticleAmount;
+				
+				// calculate the article quantity
+				// it is the fraction of the article currently paid
+				// unless the article price is zero, then the fraction will always be 1
+				double articleFactor = 1d;
+				if (article.getPrice().getAmount() != 0) {
+					articleFactor = (double)paymentArticleAmount / (double)article.getPrice().getAmount();
+				}
+				if (article.isReversing()) {
+					articleEntry.quantity += -articleFactor;
+				} else {
+					articleEntry.quantity += articleFactor;
+				}
 			}
 			
 			// If the article/invoice was not paid completely, we add an entry for 'non-payment'
-			if (articlePaidAmount != article.getPrice().getAmount()) {
-				amountsByMOP.put(ModeOfPaymentConst.MODE_OF_PAYMENT_FLAVOUR_ID_NON_PAYMENT, Long.valueOf(article.getPrice().getAmount() - articlePaidAmount));
+			if (articlePaidAmount != article.getPrice().getAmount() || (articlePaidAmount == 0 && article.getPrice().getAmount() == 0)) {
+				MOPArticleEntry articleEntry = amountsByMOP.get(ModeOfPaymentConst.MODE_OF_PAYMENT_FLAVOUR_ID_NON_PAYMENT);
+				if (articleEntry == null) {
+					articleEntry = new MOPArticleEntry();
+					amountsByMOP.put(ModeOfPaymentConst.MODE_OF_PAYMENT_FLAVOUR_ID_NON_PAYMENT, articleEntry);
+				}
+				long diffAmount = (article.getPrice().getAmount() - articlePaidAmount);
+				articleEntry.amount += diffAmount;
+				long articleAmount = article.getPrice().getAmount();
+				double diffFactor = 0d;
+				if (articleAmount != 0)
+					diffFactor = (double)diffAmount / (double)articleAmount;
+				else 
+					diffFactor = 1d;
+				if (article.isReversing()) {
+					articleEntry.quantity += -Math.abs(diffFactor);
+				} else {
+					articleEntry.quantity += Math.abs(diffFactor);
+				}
 			}
 			
 			// Now iterate the cumulated amount entries and create a result row for each one
 			// so there might be multiple result rows for one article -> the quantity is a double value (parts summing up to 1)
-			for (Map.Entry<ModeOfPaymentFlavourID, Long> amountEntry : amountsByMOP.entrySet()) {
+			for (Map.Entry<ModeOfPaymentFlavourID, MOPArticleEntry> amountEntry : amountsByMOP.entrySet()) {
 				List<Object> resultRow = new ArrayList<Object>(11);
 				resultRow.add(JDOHelper.getObjectId(article).toString()); // 0 = this
 				resultRow.add(JDOHelper.getObjectId(queryRow[1]).toString()); // 1 = productTpye
@@ -234,13 +270,10 @@ public class BookedArticlesWithPaymentInfo extends AbstractJFSScriptExecutorDele
 				resultRow.add(amountEntry.getKey().toString());
 				resultRow.add(mopf.getName().getText(JFireReportingHelper.getLocale()));
 				
-				long factor = 1;
-				if (reversing)
-					factor = -1;
-				Long amount = Long.valueOf(amountEntry.getValue());
+				Long amount = new Long(amountEntry.getValue().amount);
 				resultRow.add(amount);
 				resultRow.add(curr.toDouble(amount));
-				resultRow.add(((double) factor * 1d/(double)amountsByMOP.size()));
+				resultRow.add(amountEntry.getValue().quantity);
 				try {
 					buffer.addRecord(new Record(resultRow));
 				} catch (Exception e) {

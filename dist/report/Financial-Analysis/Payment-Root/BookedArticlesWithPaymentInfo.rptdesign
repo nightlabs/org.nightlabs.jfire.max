@@ -1522,12 +1522,10 @@ if (isEvent(productType)) {
             <detail>
                 <row id="765">
                     <cell id="766">
-                        <text id="471">
-                            <property name="fontFamily">"Sans Serif"</property>
+                        <label id="897">
                             <property name="fontWeight">bold</property>
-                            <property name="contentType">auto</property>
-                            <text-property name="content"><![CDATA[Parameters:]]></text-property>
-                        </text>
+                            <text-property name="text" key="parameterListing.header"></text-property>
+                        </label>
                         <text-data id="681">
                             <property name="fontFamily">"Sans Serif"</property>
                             <property name="paddingTop">1pt</property>
@@ -1576,6 +1574,13 @@ text</expression>
                         </text-data>
                     </cell>
                     <cell id="767">
+                        <label id="895">
+                            <property name="fontWeight">bold</property>
+                            <property name="marginTop">0pt</property>
+                            <property name="marginBottom">15pt</property>
+                            <property name="paddingTop">1pt</property>
+                            <text-property name="text" key="header.description"></text-property>
+                        </label>
                         <image id="774">
                             <property name="source">expr</property>
                             <expression name="valueExpr">row["PersonalData_Photo"]</expression>
@@ -1601,6 +1606,309 @@ text</expression>
                 <cell id="785"/>
             </row>
         </grid>
+        <label id="893">
+            <property name="fontWeight">bold</property>
+            <property name="marginTop">0pt</property>
+            <property name="marginBottom">15pt</property>
+            <text-property name="text" key="header.sumModesOfPayment"></text-property>
+        </label>
+        <table id="836">
+            <property name="pageBreakAfter">auto</property>
+            <property name="width">100%</property>
+            <property name="dataSet">BookedArticles</property>
+            <list-property name="boundDataColumns">
+                <structure>
+                    <property name="name">articleJDOID</property>
+                    <expression name="expression">dataSetRow["articleJDOID"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">productTypeJDOID</property>
+                    <expression name="expression">dataSetRow["productTypeJDOID"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">productTypeName</property>
+                    <expression name="expression">dataSetRow["productTypeName"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">reversing</property>
+                    <expression name="expression">dataSetRow["reversing"]</expression>
+                    <property name="dataType">boolean</property>
+                </structure>
+                <structure>
+                    <property name="name">currencyJDOID</property>
+                    <expression name="expression">dataSetRow["currencyJDOID"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">currencyName</property>
+                    <expression name="expression">dataSetRow["currencyName"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">modeOfPaymentJDOID</property>
+                    <expression name="expression">dataSetRow["modeOfPaymentJDOID"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">modeOfPaymentName</property>
+                    <expression name="expression">dataSetRow["modeOfPaymentName"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">amount</property>
+                    <expression name="expression">dataSetRow["amount"]</expression>
+                    <property name="dataType">decimal</property>
+                </structure>
+                <structure>
+                    <property name="name">amountDouble</property>
+                    <expression name="expression">dataSetRow["amountDouble"]</expression>
+                    <property name="dataType">float</property>
+                </structure>
+                <structure>
+                    <property name="name">quantity</property>
+                    <expression name="expression">dataSetRow["quantity"]</expression>
+                    <property name="dataType">float</property>
+                </structure>
+                <structure>
+                    <property name="name">ownerAnchorJDOID</property>
+                    <expression name="expression">dataSetRow["ownerAnchorJDOID"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">ownerName</property>
+                    <expression name="expression">dataSetRow["ownerName"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">performanceBeginDT</property>
+                    <expression name="expression">dataSetRow["performanceBeginDT"]</expression>
+                    <property name="dataType">date-time</property>
+                </structure>
+                <structure>
+                    <property name="name">reversedQuantity</property>
+                    <expression name="expression">dataSetRow["reversedQuantity"]</expression>
+                    <property name="dataType">integer</property>
+                </structure>
+                <structure>
+                    <property name="name">reversedAmount</property>
+                    <expression name="expression">dataSetRow["reversedAmount"]</expression>
+                    <property name="dataType">decimal</property>
+                </structure>
+                <structure>
+                    <property name="name">productTypeDescription</property>
+                    <expression name="expression">dataSetRow["productTypeDescription"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">SumAmountMOP</property>
+                    <expression name="expression">dataSetRow["amount"]</expression>
+                    <property name="dataType">decimal</property>
+                    <simple-property-list name="aggregateOn">
+                        <value>GroupMOP</value>
+                    </simple-property-list>
+                    <property name="aggregateFunction">sum</property>
+                </structure>
+                <structure>
+                    <property name="name">SumAmountCurrency</property>
+                    <expression name="expression">dataSetRow["amount"]</expression>
+                    <property name="dataType">decimal</property>
+                    <simple-property-list name="aggregateOn">
+                        <value>GroupCurrency</value>
+                    </simple-property-list>
+                    <property name="aggregateFunction">sum</property>
+                </structure>
+                <structure>
+                    <property name="name">SumQuantityMOP</property>
+                    <expression name="expression">dataSetRow["quantity"]</expression>
+                    <property name="dataType">float</property>
+                    <simple-property-list name="aggregateOn">
+                        <value>GroupMOP</value>
+                    </simple-property-list>
+                    <property name="aggregateFunction">sum</property>
+                </structure>
+                <structure>
+                    <property name="name">SumQuantityCurrency</property>
+                    <expression name="expression">dataSetRow["quantity"]</expression>
+                    <property name="dataType">float</property>
+                    <simple-property-list name="aggregateOn">
+                        <value>GroupCurrency</value>
+                    </simple-property-list>
+                    <property name="aggregateFunction">sum</property>
+                </structure>
+                <structure>
+                    <property name="name">SumAmountMOPDouble</property>
+                    <expression name="expression">JFireReportingHelper.getJDOObject(row["currencyJDOID"]).toDouble(row["SumAmountMOP"])</expression>
+                    <property name="dataType">float</property>
+                </structure>
+                <structure>
+                    <property name="name">SumAmountCurrencyDouble</property>
+                    <expression name="expression">JFireReportingHelper.getJDOObject(row["currencyJDOID"]).toDouble(row["SumAmountCurrency"])</expression>
+                    <property name="dataType">float</property>
+                </structure>
+            </list-property>
+            <column id="849"/>
+            <column id="850"/>
+            <column id="851">
+                <property name="textAlign">right</property>
+            </column>
+            <column id="879">
+                <property name="textAlign">right</property>
+            </column>
+            <header>
+                <row id="837">
+                    <property name="borderBottomColor">#000000</property>
+                    <property name="borderBottomStyle">solid</property>
+                    <property name="borderBottomWidth">thin</property>
+                    <cell id="838">
+                        <label id="888">
+                            <text-property name="text" key="header.currency">header.currency</text-property>
+                        </label>
+                    </cell>
+                    <cell id="839">
+                        <label id="885">
+                            <text-property name="text" key="header.modeOfPayment">header.modeOfPayment</text-property>
+                        </label>
+                    </cell>
+                    <cell id="840">
+                        <label id="886">
+                            <text-property name="text" key="header.quantity">header.quantity</text-property>
+                        </label>
+                    </cell>
+                    <cell id="872">
+                        <label id="887">
+                            <text-property name="text" key="header.amount">header.amount</text-property>
+                        </label>
+                    </cell>
+                </row>
+            </header>
+            <group id="852">
+                <property name="groupName">GroupCurrency</property>
+                <property name="interval">none</property>
+                <property name="sortDirection">asc</property>
+                <expression name="keyExpr">row["currencyJDOID"]</expression>
+                <structure name="toc">
+                    <expression name="expressionValue">row["currencyName"]</expression>
+                </structure>
+                <property name="repeatHeader">true</property>
+                <property name="hideDetail">false</property>
+                <property name="pageBreakAfter">auto</property>
+                <property name="pageBreakBefore">auto</property>
+                <property name="pageBreakInside">auto</property>
+                <header>
+                    <row id="853">
+                        <cell id="854">
+                            <data id="861">
+                                <property name="resultSetColumn">currencyName</property>
+                            </data>
+                        </cell>
+                        <cell id="855"/>
+                        <cell id="856"/>
+                        <cell id="873"/>
+                    </row>
+                </header>
+                <footer>
+                    <row id="857">
+                        <property name="borderTopColor">#000000</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <cell id="858">
+                            <data id="884">
+                                <property name="fontWeight">bold</property>
+                                <property name="resultSetColumn">currencyName</property>
+                            </data>
+                        </cell>
+                        <cell id="859"/>
+                        <cell id="860">
+                            <data id="881">
+                                <property name="fontWeight">bold</property>
+                                <structure name="numberFormat">
+                                    <property name="category">Custom</property>
+                                    <property name="pattern">#0.00</property>
+                                </structure>
+                                <property name="resultSetColumn">SumQuantityCurrency</property>
+                            </data>
+                        </cell>
+                        <cell id="877">
+                            <data id="883">
+                                <property name="fontWeight">bold</property>
+                                <structure name="numberFormat">
+                                    <property name="category">Currency</property>
+                                    <property name="pattern">###0.00</property>
+                                </structure>
+                                <property name="resultSetColumn">SumAmountCurrencyDouble</property>
+                            </data>
+                        </cell>
+                    </row>
+                </footer>
+            </group>
+            <group id="862">
+                <property name="groupName">GroupMOP</property>
+                <property name="interval">none</property>
+                <property name="sortDirection">asc</property>
+                <expression name="keyExpr">row["modeOfPaymentJDOID"]</expression>
+                <structure name="toc">
+                    <expression name="expressionValue">row["modeOfPaymentName"]</expression>
+                </structure>
+                <property name="repeatHeader">true</property>
+                <property name="hideDetail">false</property>
+                <property name="pageBreakAfter">auto</property>
+                <property name="pageBreakBefore">auto</property>
+                <property name="pageBreakInside">auto</property>
+                <footer>
+                    <row id="867">
+                        <cell id="868"/>
+                        <cell id="869">
+                            <data id="871">
+                                <property name="resultSetColumn">modeOfPaymentName</property>
+                            </data>
+                        </cell>
+                        <cell id="870">
+                            <data id="880">
+                                <structure name="numberFormat">
+                                    <property name="category">Custom</property>
+                                    <property name="pattern">#0.00</property>
+                                </structure>
+                                <property name="resultSetColumn">SumQuantityMOP</property>
+                            </data>
+                        </cell>
+                        <cell id="876">
+                            <data id="882">
+                                <structure name="numberFormat">
+                                    <property name="category">Currency</property>
+                                    <property name="pattern">###0.00</property>
+                                </structure>
+                                <property name="resultSetColumn">SumAmountMOPDouble</property>
+                            </data>
+                        </cell>
+                    </row>
+                </footer>
+            </group>
+            <footer>
+                <row id="845">
+                    <cell id="846"/>
+                    <cell id="847"/>
+                    <cell id="848"/>
+                    <cell id="878"/>
+                </row>
+            </footer>
+        </table>
+        <grid id="889">
+            <property name="width">100%</property>
+            <column id="890"/>
+            <row id="891">
+                <property name="height">2cm</property>
+                <cell id="892"/>
+            </row>
+        </grid>
+        <label id="894">
+            <property name="fontWeight">bold</property>
+            <property name="marginTop">0pt</property>
+            <property name="marginBottom">15pt</property>
+            <text-property name="text" key="header.details"></text-property>
+        </label>
         <table id="552">
             <property name="marginTop">0pt</property>
             <property name="width">100%</property>

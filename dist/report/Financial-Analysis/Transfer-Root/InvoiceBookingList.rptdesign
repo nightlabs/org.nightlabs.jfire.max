@@ -92,6 +92,26 @@ if (user.getPerson() != null)
 s</expression>
                     <property name="dataType">string</property>
                 </structure>
+                <structure>
+                    <property name="name">transferAmount</property>
+                    <expression name="expression">mandator = JFireReportingHelper.getVar("mandator");
+toAnchor = JFireReportingHelper.getJDOObject(row["toAnchorJDOID"]);
+if (JDOHelper.getObjectId(toAnchor).equals(mandator))
+  row["amount"]
+else
+  -row["amount"]</expression>
+                    <property name="dataType">decimal</property>
+                </structure>
+                <structure>
+                    <property name="name">currencyName</property>
+                    <expression name="expression">JFireReportingHelper.getJDOObject(row["currencyJDOID"]).getCurrencySymbol()</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">invoiceAmountToPay</property>
+                    <expression name="expression">JFireReportingHelper.getJDOObject(row["invoiceJDOID"]).getInvoiceLocal().getAmountToPay()</expression>
+                    <property name="dataType">decimal</property>
+                </structure>
             </list-property>
             <structure name="cachedMetaData">
                 <list-property name="resultSet">
@@ -189,6 +209,21 @@ s</expression>
                         <property name="position">19</property>
                         <property name="name">initiatorDescription</property>
                         <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">20</property>
+                        <property name="name">transferAmount</property>
+                        <property name="dataType">decimal</property>
+                    </structure>
+                    <structure>
+                        <property name="position">21</property>
+                        <property name="name">currencyName</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">22</property>
+                        <property name="name">invoiceAmountToPay</property>
+                        <property name="dataType">decimal</property>
                     </structure>
                 </list-property>
             </structure>
@@ -649,10 +684,10 @@ s</expression>
         <simple-master-page name="Simple MasterPage" id="2">
             <property name="type">a4</property>
             <property name="orientation">landscape</property>
-            <property name="topMargin">0.5in</property>
-            <property name="leftMargin">0.5in</property>
-            <property name="bottomMargin">0.5in</property>
-            <property name="rightMargin">0.5in</property>
+            <property name="topMargin">1cm</property>
+            <property name="leftMargin">1cm</property>
+            <property name="bottomMargin">0.5cm</property>
+            <property name="rightMargin">1cm</property>
             <property name="fontSize">medium</property>
             <property name="textIndent">0em</property>
             <property name="showHeaderOnFirst">false</property>
@@ -878,7 +913,7 @@ Invoice booking list
                 </structure>
                 <structure>
                     <property name="name">amount</property>
-                    <expression name="expression">dataSetRow["amount"]</expression>
+                    <expression name="expression">dataSetRow["transferAmount"]</expression>
                     <property name="dataType">decimal</property>
                 </structure>
                 <structure>
@@ -923,6 +958,46 @@ inv.getCurrency().toDouble(inv.getInvoiceLocal().getAmountToPay())</expression>
                     <expression name="expression">dataSetRow["initiatorDescription"]</expression>
                     <property name="dataType">string</property>
                 </structure>
+                <structure>
+                    <property name="name">SumAmount</property>
+                    <expression name="expression">dataSetRow["transferAmount"]</expression>
+                    <property name="dataType">decimal</property>
+                    <simple-property-list name="aggregateOn">
+                        <value>GroupCurrency</value>
+                    </simple-property-list>
+                    <property name="aggregateFunction">sum</property>
+                </structure>
+                <structure>
+                    <property name="name">SumTransferAmount</property>
+                    <expression name="expression">currency = JFireReportingHelper.getJDOObject(dataSetRow["currencyJDOID"]);
+currency.toDouble(row["SumAmount"])</expression>
+                    <property name="dataType">float</property>
+                </structure>
+                <structure>
+                    <property name="name">currencyName</property>
+                    <expression name="expression">dataSetRow["currencyName"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">inoiceAmountToPay</property>
+                    <expression name="expression">dataSetRow["invoiceAmountToPay"]</expression>
+                    <property name="dataType">decimal</property>
+                </structure>
+                <structure>
+                    <property name="name">SumInvoiceAmountToPay</property>
+                    <expression name="expression">dataSetRow["invoiceAmountToPay"]</expression>
+                    <property name="dataType">decimal</property>
+                    <simple-property-list name="aggregateOn">
+                        <value>GroupCurrency</value>
+                    </simple-property-list>
+                    <property name="aggregateFunction">sum</property>
+                </structure>
+                <structure>
+                    <property name="name">SumAmountToPay</property>
+                    <expression name="expression">currency = JFireReportingHelper.getJDOObject(dataSetRow["currencyJDOID"]);
+currency.toDouble(row["SumInvoiceAmountToPay"])</expression>
+                    <property name="dataType">float</property>
+                </structure>
             </list-property>
             <list-property name="sort">
                 <structure>
@@ -946,9 +1021,11 @@ inv.getCurrency().toDouble(inv.getInvoiceLocal().getAmountToPay())</expression>
             </column>
             <column id="709">
                 <property name="width">2cm</property>
+                <property name="textAlign">right</property>
             </column>
             <column id="687">
                 <property name="width">2cm</property>
+                <property name="textAlign">right</property>
             </column>
             <header>
                 <row id="493">
@@ -1034,8 +1111,103 @@ inv.getCurrency().toDouble(inv.getInvoiceLocal().getAmountToPay())</expression>
                     </cell>
                 </row>
             </header>
+            <group id="770">
+                <property name="groupName">GroupCurrency</property>
+                <property name="interval">none</property>
+                <property name="sortDirection">asc</property>
+                <expression name="keyExpr">row["currencyJDOID"]</expression>
+                <structure name="toc">
+                    <expression name="expressionValue">row["currencyName"]</expression>
+                </structure>
+                <property name="repeatHeader">true</property>
+                <property name="hideDetail">false</property>
+                <property name="pageBreakAfter">auto</property>
+                <property name="pageBreakBefore">auto</property>
+                <property name="pageBreakInside">auto</property>
+                <header>
+                    <row id="771">
+                        <property name="borderLeftColor">#000000</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightColor">#000000</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <cell id="772">
+                            <data id="789">
+                                <property name="fontFamily">sans-serif</property>
+                                <property name="resultSetColumn">currencyName</property>
+                            </data>
+                        </cell>
+                        <cell id="773"/>
+                        <cell id="774"/>
+                        <cell id="775"/>
+                        <cell id="776"/>
+                        <cell id="777"/>
+                        <cell id="778"/>
+                        <cell id="779"/>
+                    </row>
+                </header>
+                <footer>
+                    <row id="780">
+                        <property name="backgroundColor">silver</property>
+                        <property name="borderBottomColor">#000000</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftColor">#000000</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightColor">#000000</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopColor">#000000</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <cell id="781">
+                            <data id="790">
+                                <property name="fontFamily">sans-serif</property>
+                                <property name="fontWeight">bold</property>
+                                <property name="resultSetColumn">currencyName</property>
+                            </data>
+                        </cell>
+                        <cell id="782"/>
+                        <cell id="783"/>
+                        <cell id="784"/>
+                        <cell id="785"/>
+                        <cell id="786"/>
+                        <cell id="787">
+                            <data id="731">
+                                <property name="fontFamily">sans-serif</property>
+                                <property name="fontWeight">bold</property>
+                                <structure name="numberFormat">
+                                    <property name="category">Currency</property>
+                                    <property name="pattern">#,##0.00</property>
+                                </structure>
+                                <property name="resultSetColumn">SumTransferAmount</property>
+                            </data>
+                        </cell>
+                        <cell id="788">
+                            <data id="791">
+                                <property name="fontFamily">sans-serif</property>
+                                <property name="fontWeight">bold</property>
+                                <property name="marginTop">0pt</property>
+                                <structure name="numberFormat">
+                                    <property name="category">Currency</property>
+                                    <property name="pattern">#,##0.00</property>
+                                </structure>
+                                <property name="resultSetColumn">SumAmountToPay</property>
+                            </data>
+                        </cell>
+                    </row>
+                </footer>
+            </group>
             <detail>
                 <row id="524">
+                    <property name="borderLeftColor">#000000</property>
+                    <property name="borderLeftStyle">solid</property>
+                    <property name="borderLeftWidth">thin</property>
+                    <property name="borderRightColor">#000000</property>
+                    <property name="borderRightStyle">solid</property>
+                    <property name="borderRightWidth">thin</property>
                     <list-property name="highlightRules">
                         <structure>
                             <property name="operator">eq</property>
@@ -1045,9 +1217,6 @@ inv.getCurrency().toDouble(inv.getInvoiceLocal().getAmountToPay())</expression>
                         </structure>
                     </list-property>
                     <cell id="632">
-                        <property name="borderLeftColor">#000000</property>
-                        <property name="borderLeftStyle">solid</property>
-                        <property name="borderLeftWidth">thin</property>
                         <property name="paddingTop">1pt</property>
                         <data id="548">
                             <property name="fontFamily">"Sans Serif"</property>
@@ -1117,23 +1286,20 @@ ArticleContainerUtil.getArticleContainerID(row["invoice"]);</expression>
                             <property name="fontFamily">"Sans Serif"</property>
                             <structure name="numberFormat">
                                 <property name="category">Currency</property>
-                                <property name="pattern">###0.00</property>
+                                <property name="pattern">#,##0.00</property>
                             </structure>
                             <property name="textAlign">right</property>
                             <property name="resultSetColumn">TransferAmount</property>
                         </data>
                     </cell>
                     <cell id="685">
-                        <property name="borderRightColor">#000000</property>
-                        <property name="borderRightStyle">solid</property>
-                        <property name="borderRightWidth">thin</property>
                         <property name="paddingTop">1pt</property>
                         <property name="paddingLeft">5pt</property>
                         <data id="710">
                             <property name="fontFamily">"Sans Serif"</property>
                             <structure name="numberFormat">
                                 <property name="category">Currency</property>
-                                <property name="pattern">###0.00</property>
+                                <property name="pattern">#,##0.00</property>
                             </structure>
                             <property name="textAlign">right</property>
                             <list-property name="highlightRules">
@@ -1152,10 +1318,6 @@ ArticleContainerUtil.getArticleContainerID(row["invoice"]);</expression>
             </detail>
             <footer>
                 <row id="555">
-                    <property name="height">0.448in</property>
-                    <property name="borderTopColor">#000000</property>
-                    <property name="borderTopStyle">solid</property>
-                    <property name="borderTopWidth">thin</property>
                     <cell id="634">
                         <property name="paddingTop">1pt</property>
                     </cell>

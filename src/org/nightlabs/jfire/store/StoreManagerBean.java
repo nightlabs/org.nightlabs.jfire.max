@@ -52,7 +52,6 @@ import javax.jdo.Query;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.log4j.Logger;
 import org.nightlabs.ModuleException;
-import org.nightlabs.annotation.Implement;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.query.AbstractJDOQuery;
 import org.nightlabs.jdo.query.AbstractSearchQuery;
@@ -1467,130 +1466,133 @@ implements SessionBean
 		}
 
 		@Override
-		@Implement
 		public Serializable invoke()
 				throws Exception
 		{
 			PersistenceManager pm = getPersistenceManager();
-			String localOrganisationID = getOrganisationID();
+			try {
+				String localOrganisationID = getOrganisationID();
 
-//			Map<Class, Map<String, Map<Boolean, Set<Article>>>> productTypeClass2organisationID2articleSet = null;
-			Map<CrossTradeDeliveryCoordinator, Map<String, Map<Boolean, Set<Article>>>> productTypeClass2organisationID2articleSet = null;
+				//			Map<Class, Map<String, Map<Boolean, Set<Article>>>> productTypeClass2organisationID2articleSet = null;
+				Map<CrossTradeDeliveryCoordinator, Map<String, Map<Boolean, Set<Article>>>> productTypeClass2organisationID2articleSet = null;
 
-			Delivery delivery = (Delivery) pm.getObjectById(deliveryID);
-			for (Article article : delivery.getArticles()) {
-				ProductLocal productLocal = article.getProduct().getProductLocal();
+				Delivery delivery = (Delivery) pm.getObjectById(deliveryID);
+				for (Article article : delivery.getArticles()) {
+					ProductLocal productLocal = article.getProduct().getProductLocal();
 
-				for (ProductLocal nestedProductLocal : productLocal.getNestedProductLocals()) {
-					if (!localOrganisationID.equals(nestedProductLocal.getOrganisationID())) {
-						// supplier of the nested Product is a remote organisation => check, whether it's already here or needs delivery
-						//
-						// General info about ProductLocal.quantity:
-						// ProductLocal.quantity is > 0 (usually 1), if it's available (i.e. in this store AND not nested in another product)
-						// ProductLocal.quantity is = 0, if it's either (here in the store AND nested in another product) or (NOT here AND NOT nested)
-						// ProductLocal.quantity is < 0 (usually -1), if it's not here in the store AND nested in another product
-						//
-						// Info about ProductLocal.quantity at this point:
-						// Because we already delivered to our customer and now asynchronously obtain the supply, the quantity is normally -1.
-						// If the Product was already obtained before (e.g. because it was sold and refunded, but not given back to the supplier),
-						// then it should be 0, because the container has already been assembled and during assembling, the quantity of the nested
-						// product is decremented. Hence, in this case, it is here in the store, but not available (due to being part of another
-						// assembled product).
-						if (nestedProductLocal.getQuantity() < 0) {
-							// quantity indicates that the product is not here - is it still at supplier?
+					for (ProductLocal nestedProductLocal : productLocal.getNestedProductLocals()) {
+						if (!localOrganisationID.equals(nestedProductLocal.getOrganisationID())) {
+							// supplier of the nested Product is a remote organisation => check, whether it's already here or needs delivery
+							//
+							// General info about ProductLocal.quantity:
+							// ProductLocal.quantity is > 0 (usually 1), if it's available (i.e. in this store AND not nested in another product)
+							// ProductLocal.quantity is = 0, if it's either (here in the store AND nested in another product) or (NOT here AND NOT nested)
+							// ProductLocal.quantity is < 0 (usually -1), if it's not here in the store AND nested in another product
+							//
+							// Info about ProductLocal.quantity at this point:
+							// Because we already delivered to our customer and now asynchronously obtain the supply, the quantity is normally -1.
+							// If the Product was already obtained before (e.g. because it was sold and refunded, but not given back to the supplier),
+							// then it should be 0, because the container has already been assembled and during assembling, the quantity of the nested
+							// product is decremented. Hence, in this case, it is here in the store, but not available (due to being part of another
+							// assembled product).
+							if (nestedProductLocal.getQuantity() < 0) {
+								// quantity indicates that the product is not here - is it still at supplier?
 
-							if (!(nestedProductLocal.getAnchor() instanceof Repository))
-								throw new IllegalStateException("The nested product is not in a Repository, but its anchor is of type \"" + (nestedProductLocal.getAnchor() == null ? null : nestedProductLocal.getAnchor().getClass().getName()) + "\"! localArticle \"" + article.getPrimaryKey() + "\" + nestedProductLocal \"" + nestedProductLocal.getPrimaryKey() + "\"");
+								if (!(nestedProductLocal.getAnchor() instanceof Repository))
+									throw new IllegalStateException("The nested product is not in a Repository, but its anchor is of type \"" + (nestedProductLocal.getAnchor() == null ? null : nestedProductLocal.getAnchor().getClass().getName()) + "\"! localArticle \"" + article.getPrimaryKey() + "\" + nestedProductLocal \"" + nestedProductLocal.getPrimaryKey() + "\"");
 
-							Repository nestedProductLocalRepository = (Repository) nestedProductLocal.getAnchor();
+								Repository nestedProductLocalRepository = (Repository) nestedProductLocal.getAnchor();
 
-							if (!nestedProductLocalRepository.getRepositoryType().isOutside())
-								throw new IllegalStateException("The nested product is not outside, but has a quanity < 0! localArticle \"" + article.getPrimaryKey() + "\" + nestedProductLocal \"" + nestedProductLocal.getPrimaryKey() + "\"");
+								if (!nestedProductLocalRepository.getRepositoryType().isOutside())
+									throw new IllegalStateException("The nested product is not outside, but has a quanity < 0! localArticle \"" + article.getPrimaryKey() + "\" + nestedProductLocal \"" + nestedProductLocal.getPrimaryKey() + "\"");
 
-							if (!nestedProductLocalRepository.getOwner().equals(OrganisationLegalEntity.getOrganisationLegalEntity(pm, nestedProductLocal.getOrganisationID())))
-								throw new IllegalStateException("The nested product is not in an outside Repository belonging to the supplier! Has it already been delivered to another customer? localArticle \"" + article.getPrimaryKey() + "\" + nestedProductLocal \"" + nestedProductLocal.getPrimaryKey() + "\"");
+								if (!nestedProductLocalRepository.getOwner().equals(OrganisationLegalEntity.getOrganisationLegalEntity(pm, nestedProductLocal.getOrganisationID())))
+									throw new IllegalStateException("The nested product is not in an outside Repository belonging to the supplier! Has it already been delivered to another customer? localArticle \"" + article.getPrimaryKey() + "\" + nestedProductLocal \"" + nestedProductLocal.getPrimaryKey() + "\"");
 
-							if (productTypeClass2organisationID2articleSet == null)
-//								productTypeClass2organisationID2articleSet = new HashMap<Class, Map<String,Map<Boolean,Set<Article>>>>();
-								productTypeClass2organisationID2articleSet = new HashMap<CrossTradeDeliveryCoordinator, Map<String,Map<Boolean,Set<Article>>>>();
+								if (productTypeClass2organisationID2articleSet == null)
+									//								productTypeClass2organisationID2articleSet = new HashMap<Class, Map<String,Map<Boolean,Set<Article>>>>();
+									productTypeClass2organisationID2articleSet = new HashMap<CrossTradeDeliveryCoordinator, Map<String,Map<Boolean,Set<Article>>>>();
 
-							ProductType nestedProductType = nestedProductLocal.getProduct().getProductType();
-//							Class nestedProductTypeClass = nestedProductTypeLocal.getClass();
+								ProductType nestedProductType = nestedProductLocal.getProduct().getProductType();
+								//							Class nestedProductTypeClass = nestedProductTypeLocal.getClass();
 
-							if (nestedProductType.getDeliveryConfiguration() == null)
-								throw new IllegalStateException("productType.deliveryConfiguration is null!!! productType \"" + nestedProductType.getPrimaryKey() + "\" localArticle \"" + article.getPrimaryKey() + "\" + nestedProductLocal \"" + nestedProductLocal.getPrimaryKey() + "\"");
+								if (nestedProductType.getDeliveryConfiguration() == null)
+									throw new IllegalStateException("productType.deliveryConfiguration is null!!! productType \"" + nestedProductType.getPrimaryKey() + "\" localArticle \"" + article.getPrimaryKey() + "\" + nestedProductLocal \"" + nestedProductLocal.getPrimaryKey() + "\"");
 
-							CrossTradeDeliveryCoordinator crossTradeDeliveryCoordinator = nestedProductType.getDeliveryConfiguration().getCrossTradeDeliveryCoordinator();
-							if (crossTradeDeliveryCoordinator == null)
-								throw new IllegalStateException("productType.deliveryConfiguration.crossTradeDeliveryCoordinator is null!!! productType \"" + nestedProductType.getPrimaryKey() + "\" deliveryConfiguration \"" + nestedProductType.getDeliveryConfiguration().getPrimaryKey() + "\" localArticle \"" + article.getPrimaryKey() + "\" + nestedProductLocal \"" + nestedProductLocal.getPrimaryKey() + "\"");
+								CrossTradeDeliveryCoordinator crossTradeDeliveryCoordinator = nestedProductType.getDeliveryConfiguration().getCrossTradeDeliveryCoordinator();
+								if (crossTradeDeliveryCoordinator == null)
+									throw new IllegalStateException("productType.deliveryConfiguration.crossTradeDeliveryCoordinator is null!!! productType \"" + nestedProductType.getPrimaryKey() + "\" deliveryConfiguration \"" + nestedProductType.getDeliveryConfiguration().getPrimaryKey() + "\" localArticle \"" + article.getPrimaryKey() + "\" + nestedProductLocal \"" + nestedProductLocal.getPrimaryKey() + "\"");
 
-							Map<String, Map<Boolean, Set<Article>>> organisationID2articleSet = productTypeClass2organisationID2articleSet.get(crossTradeDeliveryCoordinator);
-							if (organisationID2articleSet == null) {
-								organisationID2articleSet = new HashMap<String, Map<Boolean,Set<Article>>>();
-								productTypeClass2organisationID2articleSet.put(crossTradeDeliveryCoordinator, organisationID2articleSet);
-							}
+								Map<String, Map<Boolean, Set<Article>>> organisationID2articleSet = productTypeClass2organisationID2articleSet.get(crossTradeDeliveryCoordinator);
+								if (organisationID2articleSet == null) {
+									organisationID2articleSet = new HashMap<String, Map<Boolean,Set<Article>>>();
+									productTypeClass2organisationID2articleSet.put(crossTradeDeliveryCoordinator, organisationID2articleSet);
+								}
 
-							Map<Boolean, Set<Article>> direction2articleSet = organisationID2articleSet.get(nestedProductLocal.getOrganisationID());
-							if (direction2articleSet == null) {
-								direction2articleSet = new HashMap<Boolean, Set<Article>>();
-								organisationID2articleSet.put(nestedProductLocal.getOrganisationID(), direction2articleSet);
-							}
+								Map<Boolean, Set<Article>> direction2articleSet = organisationID2articleSet.get(nestedProductLocal.getOrganisationID());
+								if (direction2articleSet == null) {
+									direction2articleSet = new HashMap<Boolean, Set<Article>>();
+									organisationID2articleSet.put(nestedProductLocal.getOrganisationID(), direction2articleSet);
+								}
 
-							LegalEntity partner = OrganisationLegalEntity.getOrganisationLegalEntity(pm, nestedProductLocal.getOrganisationID());
+								LegalEntity partner = OrganisationLegalEntity.getOrganisationLegalEntity(pm, nestedProductLocal.getOrganisationID());
 
-							Boolean directionIncoming = Boolean.TRUE;
-							if (article.isReversing()) // TODO this should imho never happen - maybe throw an exception?
-								directionIncoming = Boolean.FALSE;
+								Boolean directionIncoming = Boolean.TRUE;
+								if (article.isReversing()) // TODO this should imho never happen - maybe throw an exception?
+									directionIncoming = Boolean.FALSE;
 
-							Set<Article> articleSet = direction2articleSet.get(directionIncoming);
-							if (articleSet == null) {
-								articleSet = new HashSet<Article>();
-								direction2articleSet.put(directionIncoming, articleSet);
-							}
+								Set<Article> articleSet = direction2articleSet.get(directionIncoming);
+								if (articleSet == null) {
+									articleSet = new HashSet<Article>();
+									direction2articleSet.put(directionIncoming, articleSet);
+								}
 
-							// find the backhand-Article for this nestedProductLocal
-							OfferRequirement backhandOfferRequirement = OfferRequirement.getOfferRequirement(pm, article.getOffer(), true);
+								// find the backhand-Article for this nestedProductLocal
+								OfferRequirement backhandOfferRequirement = OfferRequirement.getOfferRequirement(pm, article.getOffer(), true);
 
-							Offer backhandOffer = backhandOfferRequirement.getPartnerOffer(partner);
-							if (backhandOffer == null)
-								throw new IllegalStateException("Cannot find backhand-Offer for local Article \"" + article.getPrimaryKey() + "\" + and nestedProductLocal \"" + nestedProductLocal.getPrimaryKey() + "\" and partnerLegalEntity \"" + partner.getPrimaryKey() + "\"");
+								Offer backhandOffer = backhandOfferRequirement.getPartnerOffer(partner);
+								if (backhandOffer == null)
+									throw new IllegalStateException("Cannot find backhand-Offer for local Article \"" + article.getPrimaryKey() + "\" + and nestedProductLocal \"" + nestedProductLocal.getPrimaryKey() + "\" and partnerLegalEntity \"" + partner.getPrimaryKey() + "\"");
 
-							Article backhandArticle = Article.getArticle(pm, backhandOffer, nestedProductLocal.getProduct());
-							if (backhandArticle == null)
-								throw new IllegalStateException("Cannot find backhand-Article for local Article \"" + article.getPrimaryKey() + "\" + and nestedProductLocal \"" + nestedProductLocal.getPrimaryKey() + "\"");
+								Article backhandArticle = Article.getArticle(pm, backhandOffer, nestedProductLocal.getProduct());
+								if (backhandArticle == null)
+									throw new IllegalStateException("Cannot find backhand-Article for local Article \"" + article.getPrimaryKey() + "\" + and nestedProductLocal \"" + nestedProductLocal.getPrimaryKey() + "\"");
 
-							articleSet.add(backhandArticle);
-						} // if (nestedProductLocal.getQuantity() < 1) {
-					}
-				}
-			}
-
-			if (productTypeClass2organisationID2articleSet != null) {
-//				for (Map.Entry<Class, Map<String, Map<Boolean, Set<Article>>>> me1 : productTypeClass2organisationID2articleSet.entrySet()) {
-//					Class productTypeClass = me1.getKey();
-//					ProductTypeActionHandler productTypeActionHandler = ProductTypeActionHandler.getProductTypeActionHandler(pm, productTypeClass);
-//					CrossTradeDeliveryCoordinator crossTradeDeliveryCoordinator = productTypeActionHandler.getCrossTradeDeliveryCoordinator();
-				for (Map.Entry<CrossTradeDeliveryCoordinator, Map<String, Map<Boolean, Set<Article>>>> me1 : productTypeClass2organisationID2articleSet.entrySet()) {
-					CrossTradeDeliveryCoordinator crossTradeDeliveryCoordinator = me1.getKey();
-
-					for (Map.Entry<String, Map<Boolean, Set<Article>>> me2 : me1.getValue().entrySet()) {
-//						String organisationID = me2.getKey();
-
-						for (Map.Entry<Boolean, Set<Article>> me3 : me2.getValue().entrySet()) {
-//							Boolean directionIncoming = me3.getKey();
-
-							Set<Article> backhandArticles = me3.getValue();
-
-							// Because of transactional problems, crossTradeDeliveryCoordinator.performCrossTradeDelivery(...) will spawn an additional AsyncInvoke
-							// In the long run, we should implement a special "fast-track-delivery" which will be used between organisations and work within one
-							// transaction. See javadoc of the performCrossTradeDelivery method.
-							crossTradeDeliveryCoordinator.performCrossTradeDelivery(backhandArticles);
+								articleSet.add(backhandArticle);
+							} // if (nestedProductLocal.getQuantity() < 1) {
 						}
 					}
 				}
-			}
 
-			return null;
+				if (productTypeClass2organisationID2articleSet != null) {
+//					for (Map.Entry<Class, Map<String, Map<Boolean, Set<Article>>>> me1 : productTypeClass2organisationID2articleSet.entrySet()) {
+//						Class productTypeClass = me1.getKey();
+//						ProductTypeActionHandler productTypeActionHandler = ProductTypeActionHandler.getProductTypeActionHandler(pm, productTypeClass);
+//						CrossTradeDeliveryCoordinator crossTradeDeliveryCoordinator = productTypeActionHandler.getCrossTradeDeliveryCoordinator();
+					for (Map.Entry<CrossTradeDeliveryCoordinator, Map<String, Map<Boolean, Set<Article>>>> me1 : productTypeClass2organisationID2articleSet.entrySet()) {
+						CrossTradeDeliveryCoordinator crossTradeDeliveryCoordinator = me1.getKey();
+
+						for (Map.Entry<String, Map<Boolean, Set<Article>>> me2 : me1.getValue().entrySet()) {
+//							String organisationID = me2.getKey();
+
+							for (Map.Entry<Boolean, Set<Article>> me3 : me2.getValue().entrySet()) {
+//								Boolean directionIncoming = me3.getKey();
+
+								Set<Article> backhandArticles = me3.getValue();
+
+								// Because of transactional problems, crossTradeDeliveryCoordinator.performCrossTradeDelivery(...) will spawn an additional AsyncInvoke
+								// In the long run, we should implement a special "fast-track-delivery" which will be used between organisations and work within one
+								// transaction. See javadoc of the performCrossTradeDelivery method.
+								crossTradeDeliveryCoordinator.performCrossTradeDelivery(backhandArticles);
+							}
+						}
+					}
+				}
+
+				return null;
+			} finally {
+				pm.close();
+			}
 		}
 	}
 

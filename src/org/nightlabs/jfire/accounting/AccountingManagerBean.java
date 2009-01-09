@@ -89,6 +89,7 @@ import org.nightlabs.jfire.accounting.pay.ServerPaymentProcessorCash;
 import org.nightlabs.jfire.accounting.pay.ServerPaymentProcessorCreditCardDummyForClientPayment;
 import org.nightlabs.jfire.accounting.pay.ServerPaymentProcessorDebitNoteGermany;
 import org.nightlabs.jfire.accounting.pay.ServerPaymentProcessorNonPayment;
+import org.nightlabs.jfire.accounting.pay.config.ModeOfPaymentConfigModule;
 import org.nightlabs.jfire.accounting.pay.id.ModeOfPaymentFlavourID;
 import org.nightlabs.jfire.accounting.pay.id.ModeOfPaymentID;
 import org.nightlabs.jfire.accounting.pay.id.PaymentDataID;
@@ -100,6 +101,9 @@ import org.nightlabs.jfire.accounting.query.MoneyTransferIDQuery;
 import org.nightlabs.jfire.accounting.query.MoneyTransferQuery;
 import org.nightlabs.jfire.accounting.tariffuserset.SecurityChangeListenerTariffUserSet;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
+import org.nightlabs.jfire.config.ConfigSetup;
+import org.nightlabs.jfire.config.UserConfigSetup;
+import org.nightlabs.jfire.config.WorkstationConfigSetup;
 import org.nightlabs.jfire.idgenerator.IDNamespaceDefault;
 import org.nightlabs.jfire.jbpm.graph.def.ProcessDefinition;
 import org.nightlabs.jfire.security.User;
@@ -444,11 +448,37 @@ implements SessionBean
 
 
 			pm.makePersistent(new EditLockTypeInvoice(EditLockTypeInvoice.EDIT_LOCK_TYPE_ID));
+			
+			initRegisterConfigModules(pm);
 		} finally {
 			pm.close();
 		}
 	}
 
+	/**
+	 * Called by {@link #initialise()} and registeres the
+	 * config-modules in their config-setup.
+	 */
+	private void initRegisterConfigModules(PersistenceManager pm)
+	{
+		// Register all User - ConfigModules
+		ConfigSetup configSetup = ConfigSetup.getConfigSetup(
+				pm,
+				getOrganisationID(),
+				UserConfigSetup.CONFIG_SETUP_TYPE_USER
+			);
+		configSetup.getConfigModuleClasses().add(ModeOfPaymentConfigModule.class.getName());
+		
+		// Register all Workstation - ConfigModules
+		configSetup = ConfigSetup.getConfigSetup(
+				pm,
+				getOrganisationID(),
+				WorkstationConfigSetup.CONFIG_SETUP_TYPE_WORKSTATION
+			);
+		configSetup.getConfigModuleClasses().add(ModeOfPaymentConfigModule.class.getName());
+		ConfigSetup.ensureAllPrerequisites(pm);
+	}
+	
 	/**
 	 * Get the object-ids of all existing {@link TariffMapping}s.
 	 * <p>
@@ -1848,6 +1878,7 @@ implements SessionBean
 	 *
 	 * @param customerGroupIDs A <tt>Collection</tt> of {@link CustomerGroupID}. If <tt>null</tt>, all {@link ModeOfPaymentFlavour}s will be returned.
 	 * @param mergeMode one of {@link ModeOfPaymentFlavour#MERGE_MODE_INTERSECTION} or {@link ModeOfPaymentFlavour#MERGE_MODE_UNION}
+	 * @param filterByConfig If <code>true</code> the 
 	 * @param fetchGroups Either <tt>null</tt> or all desired fetch groups.
 	 *
 	 * @ejb.interface-method
@@ -1855,7 +1886,7 @@ implements SessionBean
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
 	public Collection<ModeOfPaymentFlavour> getAvailableModeOfPaymentFlavoursForAllCustomerGroups(
-			Collection<CustomerGroupID> customerGroupIDs, byte mergeMode, String[] fetchGroups, int maxFetchDepth)
+			Collection<CustomerGroupID> customerGroupIDs, byte mergeMode, boolean filterByConfig, String[] fetchGroups, int maxFetchDepth)
 			{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -1864,7 +1895,7 @@ implements SessionBean
 				pm.getFetchPlan().setGroups(fetchGroups);
 
 			Collection<ModeOfPaymentFlavour> c = ModeOfPaymentFlavour.getAvailableModeOfPaymentFlavoursForAllCustomerGroups(
-					pm, customerGroupIDs, mergeMode);
+					pm, customerGroupIDs, mergeMode, filterByConfig);
 
 			return pm.detachCopyAll(c);
 		} finally {
@@ -2004,7 +2035,7 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
-	public Collection<ModeOfPaymentFlavour> getAvailableModeOfPaymentFlavoursForOneCustomerGroup(CustomerGroupID customerGroupID, String[] fetchGroups, int maxFetchDepth)
+	public Collection<ModeOfPaymentFlavour> getAvailableModeOfPaymentFlavoursForOneCustomerGroup(CustomerGroupID customerGroupID, boolean filterByConfig, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -2013,7 +2044,7 @@ implements SessionBean
 				pm.getFetchPlan().setGroups(fetchGroups);
 
 			Collection<ModeOfPaymentFlavour> c = ModeOfPaymentFlavour.getAvailableModeOfPaymentFlavoursForOneCustomerGroup(
-					pm, customerGroupID);
+					pm, customerGroupID, filterByConfig);
 
 			return pm.detachCopyAll(c);
 		} finally {

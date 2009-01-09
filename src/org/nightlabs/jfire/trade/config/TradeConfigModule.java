@@ -10,7 +10,6 @@ import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
-import org.nightlabs.annotation.Implement;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.accounting.id.CurrencyID;
@@ -76,7 +75,6 @@ public class TradeConfigModule
 	public TradeConfigModule() { }
 
 	@Override
-	@Implement
 	public void init() {
 		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
 		if (pm == null)

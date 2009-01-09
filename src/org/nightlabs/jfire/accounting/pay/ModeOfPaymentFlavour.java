@@ -38,11 +38,16 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
+import org.nightlabs.ModuleException;
 import org.nightlabs.io.DataBuffer;
+import org.nightlabs.jfire.accounting.pay.config.ModeOfPaymentConfigModule;
 import org.nightlabs.jfire.accounting.pay.id.ModeOfPaymentFlavourID;
+import org.nightlabs.jfire.config.UserConfigSetup;
+import org.nightlabs.jfire.config.WorkstationConfigSetup;
 import org.nightlabs.jfire.trade.CustomerGroup;
 import org.nightlabs.jfire.trade.id.CustomerGroupID;
 import org.nightlabs.util.IOUtil;
@@ -158,6 +163,10 @@ implements Serializable
 	/**
 	 * @param customerGroupIDs A <tt>Collection</tt> of {@link CustomerGroupID}. Can be <tt>null</tt> in order to return all <tt>ModeOfPaymentFlavour</tt>s.
 	 * @param mergeMode Whether the intersection or the combination of all <tt>CustomerGroup</tt> configurations shall be used.
+	 * @param filterByConfig 
+	 * 		If this is <code>true</code> the flavours available found for the given customer-groups will also be filtered by the 
+	 * 		intersection of the entries configured in the {@link ModeOfPaymentConfigModule} for the current user and the 
+	 * 		workstation he is currently loggen on. 
 	 *
 	 * @return Returns those <tt>ModeOfPaymentFlavour</tt>s that are available for all given
 	 *		<tt>CustomerGroup</tt>s. If <tt>mergeMode</tt> is {@link #MERGE_MODE_UNION},
@@ -170,7 +179,7 @@ implements Serializable
 	 */
 	@SuppressWarnings("unchecked")
 	public static Collection<ModeOfPaymentFlavour> getAvailableModeOfPaymentFlavoursForAllCustomerGroups(
-			PersistenceManager pm, Collection<CustomerGroupID> customerGroupIDs, byte mergeMode)
+			PersistenceManager pm, Collection<CustomerGroupID> customerGroupIDs, byte mergeMode, boolean filterByConfig)
 	{
 		if (customerGroupIDs == null)
 			return (Collection<ModeOfPaymentFlavour>) pm.newQuery(ModeOfPaymentFlavour.class).execute();
@@ -183,7 +192,8 @@ implements Serializable
 		for (Iterator<CustomerGroupID> itCustomerGroups = customerGroupIDs.iterator(); itCustomerGroups.hasNext(); ) {
 			CustomerGroupID customerGroupID = itCustomerGroups.next();
 
-			Map<String, ModeOfPaymentFlavour> m = getAvailableModeOfPaymentFlavoursMapForOneCustomerGroup(pm, customerGroupID.organisationID, customerGroupID.customerGroupID);
+			Map<String, ModeOfPaymentFlavour> m = getAvailableModeOfPaymentFlavoursMapForOneCustomerGroup(
+					pm, customerGroupID.organisationID, customerGroupID.customerGroupID, filterByConfig);
 
 			if (res == null) {
 				res = m;
@@ -215,12 +225,12 @@ implements Serializable
 	/**
 	 * @see #getAvailableModeOfPaymentFlavoursForOneCustomerGroup(PersistenceManager, String, String)
 	 */
-	public static Collection<ModeOfPaymentFlavour> getAvailableModeOfPaymentFlavoursForOneCustomerGroup(PersistenceManager pm, CustomerGroupID customerGroupID)
+	public static Collection<ModeOfPaymentFlavour> getAvailableModeOfPaymentFlavoursForOneCustomerGroup(PersistenceManager pm, CustomerGroupID customerGroupID, boolean filterByConfig)
 	{
 //		pm.getExtent(CustomerGroup.class);
 //		CustomerGroup customerGroup = (CustomerGroup) pm.getObjectById(customerGroupID);
 		return getAvailableModeOfPaymentFlavoursForOneCustomerGroup(
-				pm, customerGroupID.organisationID, customerGroupID.customerGroupID);
+				pm, customerGroupID.organisationID, customerGroupID.customerGroupID, filterByConfig);
 	}
 
 //	/**
@@ -247,19 +257,23 @@ implements Serializable
 	 * @param pm The <tt>PersistenceManager</tt> with which to access the datastore.
 	 * @param organisationID The first part of the primary key of the <tt>CustomerGroup</tt>.
 	 * @param customerGroupID The second part of the primary key of the <tt>CustomerGroup</tt>.
+	 * @param filterByConfig 
+	 * 		If this is <code>true</code> the flavours available found for the given customer-group will also be filtered by the 
+	 * 		intersection of the entries configured in the {@link ModeOfPaymentConfigModule} for the current user and the 
+	 * 		workstation he is currently loggen on. 
 	 *
 	 * @return A <tt>Collection</tt> with instances of type <tt>ModeOfPaymentFlavour</tt>.
 	 *
 	 * @see #getAvailableModeOfPaymentFlavoursForOneCustomerGroup(PersistenceManager, CustomerGroupID)
 	 */
-	public static Collection<ModeOfPaymentFlavour> getAvailableModeOfPaymentFlavoursForOneCustomerGroup(PersistenceManager pm, String organisationID, String customerGroupID)
+	public static Collection<ModeOfPaymentFlavour> getAvailableModeOfPaymentFlavoursForOneCustomerGroup(PersistenceManager pm, String organisationID, String customerGroupID, boolean filterByConfig)
 	{
 		return getAvailableModeOfPaymentFlavoursMapForOneCustomerGroup(
-				pm, organisationID, customerGroupID).values();
+				pm, organisationID, customerGroupID, filterByConfig).values();
 	}
 
 	@SuppressWarnings("unchecked")
-	protected static Map<String, ModeOfPaymentFlavour> getAvailableModeOfPaymentFlavoursMapForOneCustomerGroup(PersistenceManager pm, String organisationID, String customerGroupID)
+	protected static Map<String, ModeOfPaymentFlavour> getAvailableModeOfPaymentFlavoursMapForOneCustomerGroup(PersistenceManager pm, String organisationID, String customerGroupID, boolean filterByConfig)
 	{
 		// return getAvailableModeOfPaymentFlavoursForOneCustomerGroup(pm, CustomerGroupID.create(organisationID, customerGroupID));
 
@@ -279,6 +293,29 @@ implements Serializable
 			ModeOfPaymentFlavour modeOfPaymentFlavour = it.next();
 			m.put(modeOfPaymentFlavour.getPrimaryKey(), modeOfPaymentFlavour);
 		}
+		if (filterByConfig) {
+			ModeOfPaymentConfigModule cfMod;
+			try {
+				cfMod = UserConfigSetup.getUserConfigModule(pm, ModeOfPaymentConfigModule.class);
+			} catch (ModuleException e) {
+				throw new RuntimeException(e);
+			}
+			for (Iterator<Map.Entry<String, ModeOfPaymentFlavour>> it = m.entrySet().iterator(); it.hasNext(); ) {
+				if (!cfMod.getModeOfPaymentFlavours().contains(it.next().getValue())) {
+					it.remove();
+				}
+			}
+			try {
+				cfMod = WorkstationConfigSetup.getWorkstationConfigModule(pm, ModeOfPaymentConfigModule.class);
+			} catch (ModuleException e) {
+				throw new RuntimeException(e);
+			}
+			for (Iterator<Map.Entry<String, ModeOfPaymentFlavour>> it = m.entrySet().iterator(); it.hasNext(); ) {
+				if (!cfMod.getModeOfPaymentFlavours().contains(it.next().getValue())) {
+					it.remove();
+				}
+			}
+		}
 
 		return m;
 	}
@@ -289,6 +326,15 @@ implements Serializable
 		return new HashSet<ModeOfPaymentFlavourID>((Collection<? extends ModeOfPaymentFlavourID>) query.execute());
 	}
 
+	@SuppressWarnings("unchecked")
+	public static Set<ModeOfPaymentFlavour> getAllModeOfPaymentFlavours(PersistenceManager pm) {
+		HashSet<ModeOfPaymentFlavour> result = new HashSet<ModeOfPaymentFlavour>();
+		for (Iterator it = pm.getExtent(ModeOfPaymentFlavour.class).iterator(); it.hasNext(); ) {
+			result.add((ModeOfPaymentFlavour) it.next());
+		}
+		return result;
+	}
+	
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
@@ -455,5 +501,10 @@ implements Serializable
 		return
 				Util.equals(this.organisationID, o.organisationID) &&
 				Util.equals(this.modeOfPaymentFlavourID, o.modeOfPaymentFlavourID);
+	}
+	
+	@Override
+	public String toString() {
+		return this.getClass().getName() + '@' + Integer.toHexString(System.identityHashCode(this)) + '[' + organisationID + ',' + modeOfPaymentFlavourID + ']' + "(version " + JDOHelper.getVersion(this) + ')';
 	}
 }

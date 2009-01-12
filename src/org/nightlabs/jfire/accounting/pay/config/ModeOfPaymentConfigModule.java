@@ -14,6 +14,7 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.listener.AttachCallback;
 import javax.jdo.listener.DetachCallback;
 
+import org.nightlabs.inheritance.FieldMetaData;
 import org.nightlabs.jfire.accounting.pay.ModeOfPaymentFlavour;
 import org.nightlabs.jfire.accounting.pay.id.ModeOfPaymentFlavourID;
 import org.nightlabs.jfire.config.ConfigModule;
@@ -22,7 +23,7 @@ import org.nightlabs.jfire.config.ConfigModule;
  * ConfigModule for a set of {@link ModeOfPaymentFlavour}s.
  * Use the API for {@link ModeOfPaymentFlavourID}s on detached instances.
  * <p>
- * This is registred for Users and Workstations and the {@link ModeOfPaymentFlavour}s
+ * This is registered for Users and Workstations and the {@link ModeOfPaymentFlavour}s
  * available for a payment can be filtered by the intersection of the entries
  * configured for the current user and the workstation he is currently logged on
  * (see {@link ModeOfPaymentFlavour#getAvailableModeOfPaymentFlavoursForAllCustomerGroups(PersistenceManager, java.util.Collection, byte, boolean)}) 
@@ -54,6 +55,7 @@ public class ModeOfPaymentConfigModule extends ConfigModule implements DetachCal
 	public static final class FieldName {
 		public static final String modeOfPaymentFlavours = "modeOfPaymentFlavours";
 		public static final String modeOfPaymentFlavourIDs = "modeOfPaymentFlavourIDs";
+		public static final String modeOfPaymentFlavourIDsDetached = "modeOfPaymentFlavourIDsDetached";
 	}
 	
 	/**
@@ -150,5 +152,13 @@ public class ModeOfPaymentConfigModule extends ConfigModule implements DetachCal
 
 	@Override
 	public void jdoPreAttach() {
+	}
+	
+	@Override
+	public FieldMetaData getFieldMetaData(String fieldName) {
+		if (FieldName.modeOfPaymentFlavourIDs.equals(fieldName) || FieldName.modeOfPaymentFlavourIDsDetached.equals(fieldName)) {
+			return null;
+		}
+		return super.getFieldMetaData(fieldName);
 	}
 }

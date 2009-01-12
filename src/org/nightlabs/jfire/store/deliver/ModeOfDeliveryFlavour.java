@@ -45,8 +45,12 @@ import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
+import org.nightlabs.ModuleException;
 import org.nightlabs.io.DataBuffer;
+import org.nightlabs.jfire.config.UserConfigSetup;
+import org.nightlabs.jfire.config.WorkstationConfigSetup;
 import org.nightlabs.jfire.store.ProductType;
+import org.nightlabs.jfire.store.deliver.config.ModeOfDeliveryConfigModule;
 import org.nightlabs.jfire.store.deliver.id.DeliveryConfigurationID;
 import org.nightlabs.jfire.store.deliver.id.ModeOfDeliveryFlavourID;
 import org.nightlabs.jfire.store.id.ProductTypeID;
@@ -136,6 +140,9 @@ import org.nightlabs.util.Util;
  *			import org.nightlabs.jfire.trade.CustomerGroup;
  *			import org.nightlabs.jfire.store.deliver.ModeOfDelivery"
  *
+ * @jdo.query
+ *		name="getAllModeOfDeliveryFlavourIDs"
+ *		query="SELECT JDOHelper.getObjectId(this)"
  */
 public class ModeOfDeliveryFlavour
 implements Serializable
@@ -304,15 +311,20 @@ implements Serializable
 	 * @param productTypeIDs Instances of {@link ProductTypeID}.
 	 * @param customerGroupIDs Instances of {@link org.nightlabs.jfire.trade.id.CustomerGroupID}.
 	 * @param mergeMode see {@link #getAvailableModeOfDeliveryFlavoursMapForAllCustomerGroups(PersistenceManager, Collection, byte)}
+	 * @param filterByConfig
+	 * 		If this is <code>true</code> the flavours available found for the given product-types and customer-groups will also be filtered by the 
+	 * 		intersection of the entries configured in the {@link ModeOfDeliveryConfigModule} for the current user and the 
+	 * 		workstation he is currently loggen on. 
+	 * 
 	 */
 	public static ModeOfDeliveryFlavourProductTypeGroupCarrier
 			getModeOfDeliveryFlavourProductTypeGroupCarrier(
 					PersistenceManager pm, Collection<ProductTypeID> productTypeIDs,
-					Collection<CustomerGroupID> customerGroupIDs, byte mergeMode)
+					Collection<CustomerGroupID> customerGroupIDs, byte mergeMode, boolean filterByConfig)
 	{
 		ModeOfDeliveryFlavourProductTypeGroupCarrier res = new ModeOfDeliveryFlavourProductTypeGroupCarrier(customerGroupIDs);
 
-		Map<String, ModeOfDeliveryFlavour> modfAvailableForCustomerGroups = getAvailableModeOfDeliveryFlavoursMapForAllCustomerGroups(pm, customerGroupIDs, mergeMode);
+		Map<String, ModeOfDeliveryFlavour> modfAvailableForCustomerGroups = getAvailableModeOfDeliveryFlavoursMapForAllCustomerGroups(pm, customerGroupIDs, mergeMode, filterByConfig);
 
 		Map<String, DeliveryConfiguration> deliveryConfigs = new HashMap<String, DeliveryConfiguration>();
 		Map<String, ModeOfDeliveryFlavourProductTypeGroup> groupsByDeliveryConfigPK = new HashMap<String, ModeOfDeliveryFlavourProductTypeGroup>();
@@ -421,7 +433,7 @@ implements Serializable
 	 *		key: String modeOfDeliveryFlavourPK<br/>
 	 *		value: ModeOfDeliveryFlavour modf
 	 */
-	protected static Map<String, ModeOfDeliveryFlavour> getAvailableModeOfDeliveryFlavoursMapForAllCustomerGroups(PersistenceManager pm, Collection<CustomerGroupID> customerGroupIDs, byte mergeMode)
+	protected static Map<String, ModeOfDeliveryFlavour> getAvailableModeOfDeliveryFlavoursMapForAllCustomerGroups(PersistenceManager pm, Collection<CustomerGroupID> customerGroupIDs, byte mergeMode, boolean filterByConfig)
 	{
 		if (mergeMode != MERGE_MODE_ADDITIVE && mergeMode != MERGE_MODE_SUBTRACTIVE)
 			throw new IllegalArgumentException("mergeMode invalid! Must be MERGE_MODE_UNION or MERGE_MODE_INTERSECTION!");
@@ -430,7 +442,7 @@ implements Serializable
 		for (Iterator<CustomerGroupID> itCustomerGroups = customerGroupIDs.iterator(); itCustomerGroups.hasNext(); ) {
 			CustomerGroupID customerGroupID = itCustomerGroups.next();
 
-			Map<String, ModeOfDeliveryFlavour> m = getAvailableModeOfDeliveryFlavoursMapForOneCustomerGroup(pm, customerGroupID.organisationID, customerGroupID.customerGroupID);
+			Map<String, ModeOfDeliveryFlavour> m = getAvailableModeOfDeliveryFlavoursMapForOneCustomerGroup(pm, customerGroupID.organisationID, customerGroupID.customerGroupID, filterByConfig);
 
 			if (res == null) {
 				res = m;
@@ -462,7 +474,8 @@ implements Serializable
 			return res;
 	}
 
-	protected static Map<String, ModeOfDeliveryFlavour> getAvailableModeOfDeliveryFlavoursMapForOneCustomerGroup(PersistenceManager pm, String organisationID, String customerGroupID)
+	protected static Map<String, ModeOfDeliveryFlavour> getAvailableModeOfDeliveryFlavoursMapForOneCustomerGroup(
+			PersistenceManager pm, String organisationID, String customerGroupID, boolean filterByConfig)
 	{
 		// WORKAROUND The normal query returns an empty result, probably because of issues with ORs.
 		Map<String, ModeOfDeliveryFlavour> m = new HashMap<String, ModeOfDeliveryFlavour>();
@@ -478,8 +491,48 @@ implements Serializable
 			m.put(modeOfDeliveryFlavour.getPrimaryKey(), modeOfDeliveryFlavour);
 		}
 
+		if (filterByConfig) {
+			ModeOfDeliveryConfigModule cfMod;
+			try {
+				cfMod = UserConfigSetup.getUserConfigModule(pm, ModeOfDeliveryConfigModule.class);
+			} catch (ModuleException e) {
+				throw new RuntimeException(e);
+			}
+			for (Iterator<Map.Entry<String, ModeOfDeliveryFlavour>> it = m.entrySet().iterator(); it.hasNext(); ) {
+				if (!cfMod.getModeOfDeliveryFlavours().contains(it.next().getValue())) {
+					it.remove();
+				}
+			}
+			try {
+				cfMod = WorkstationConfigSetup.getWorkstationConfigModule(pm, ModeOfDeliveryConfigModule.class);
+			} catch (ModuleException e) {
+				throw new RuntimeException(e);
+			}
+			for (Iterator<Map.Entry<String, ModeOfDeliveryFlavour>> it = m.entrySet().iterator(); it.hasNext(); ) {
+				if (!cfMod.getModeOfDeliveryFlavours().contains(it.next().getValue())) {
+					it.remove();
+				}
+			}
+		}
+		
 		return m;
 	}
+	
+	@SuppressWarnings("unchecked")
+	public static Set<ModeOfDeliveryFlavour> getAllModeOfDeliveryFlavours(PersistenceManager pm) {
+		HashSet<ModeOfDeliveryFlavour> result = new HashSet<ModeOfDeliveryFlavour>();
+		for (Iterator it = pm.getExtent(ModeOfDeliveryFlavour.class).iterator(); it.hasNext(); ) {
+			result.add((ModeOfDeliveryFlavour) it.next());
+		}
+		return result;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public static Set<ModeOfDeliveryFlavourID> getAllModeOfDeliveryFlavourIDs(PersistenceManager pm) {
+		Query query = pm.newNamedQuery(ModeOfDeliveryFlavour.class, "getAllModeOfDeliveryFlavourIDs");
+		return new HashSet<ModeOfDeliveryFlavourID>((Collection<? extends ModeOfDeliveryFlavourID>) query.execute());
+	}
+	
 
 //	public static Collection getAvailableModeOfDeliveryFlavoursForOneProductType(PersistenceManager pm, ProductTypeID productTypeID)
 //	{

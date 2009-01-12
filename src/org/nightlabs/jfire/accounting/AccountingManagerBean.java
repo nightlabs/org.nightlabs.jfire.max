@@ -212,6 +212,8 @@ implements SessionBean
 				pm.makePersistent(sourceOrgDimension);
 			}
 
+			initRegisterConfigModules(pm);
+			
 			// check, whether the datastore is already initialized
 			pm.getExtent(Currency.class);
 			try {
@@ -448,8 +450,6 @@ implements SessionBean
 
 
 			pm.makePersistent(new EditLockTypeInvoice(EditLockTypeInvoice.EDIT_LOCK_TYPE_ID));
-			
-			initRegisterConfigModules(pm);
 		} finally {
 			pm.close();
 		}
@@ -458,16 +458,24 @@ implements SessionBean
 	/**
 	 * Called by {@link #initialise()} and registeres the
 	 * config-modules in their config-setup.
+	 * 
+	 * This method checks itself whether initialisation 
+	 * was performed already and therefore can be safely
+	 * called anytime in the process.
 	 */
 	private void initRegisterConfigModules(PersistenceManager pm)
 	{
+		boolean needsUpdate = false;
 		// Register all User - ConfigModules
 		ConfigSetup configSetup = ConfigSetup.getConfigSetup(
 				pm,
 				getOrganisationID(),
 				UserConfigSetup.CONFIG_SETUP_TYPE_USER
 			);
-		configSetup.getConfigModuleClasses().add(ModeOfPaymentConfigModule.class.getName());
+		if (!configSetup.getConfigModuleClasses().contains(ModeOfPaymentConfigModule.class.getName())) {
+			configSetup.getConfigModuleClasses().add(ModeOfPaymentConfigModule.class.getName());
+			needsUpdate = true; 
+		}
 		
 		// Register all Workstation - ConfigModules
 		configSetup = ConfigSetup.getConfigSetup(
@@ -475,8 +483,12 @@ implements SessionBean
 				getOrganisationID(),
 				WorkstationConfigSetup.CONFIG_SETUP_TYPE_WORKSTATION
 			);
-		configSetup.getConfigModuleClasses().add(ModeOfPaymentConfigModule.class.getName());
-		ConfigSetup.ensureAllPrerequisites(pm);
+		if (!configSetup.getConfigModuleClasses().contains(ModeOfPaymentConfigModule.class.getName())) {
+			configSetup.getConfigModuleClasses().add(ModeOfPaymentConfigModule.class.getName());
+			needsUpdate = true;
+		}
+		if (needsUpdate)
+			ConfigSetup.ensureAllPrerequisites(pm);
 	}
 	
 	/**
@@ -1878,7 +1890,10 @@ implements SessionBean
 	 *
 	 * @param customerGroupIDs A <tt>Collection</tt> of {@link CustomerGroupID}. If <tt>null</tt>, all {@link ModeOfPaymentFlavour}s will be returned.
 	 * @param mergeMode one of {@link ModeOfPaymentFlavour#MERGE_MODE_INTERSECTION} or {@link ModeOfPaymentFlavour#MERGE_MODE_UNION}
-	 * @param filterByConfig If <code>true</code> the 
+	 * @param filterByConfig 
+	 * 		If this is <code>true</code> the flavours available found for the given customer-groups will also be filtered by the 
+	 * 		intersection of the entries configured in the {@link ModeOfPaymentConfigModule} for the current user and the 
+	 * 		workstation he is currently loggen on. 
 	 * @param fetchGroups Either <tt>null</tt> or all desired fetch groups.
 	 *
 	 * @ejb.interface-method

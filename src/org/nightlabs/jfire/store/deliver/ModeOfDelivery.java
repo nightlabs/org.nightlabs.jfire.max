@@ -29,7 +29,12 @@ package org.nightlabs.jfire.store.deliver;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
+
+import javax.jdo.PersistenceManager;
+import javax.jdo.Query;
 
 import org.nightlabs.jfire.store.deliver.id.ModeOfDeliveryFlavourID;
 import org.nightlabs.jfire.store.deliver.id.ModeOfDeliveryID;
@@ -51,6 +56,11 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="ModeOfDelivery.name" fields="name"
  * @jdo.fetch-group name="ModeOfDelivery.flavours" fields="flavours"
  * @jdo.fetch-group name="ModeOfDelivery.this" fetch-groups="default" fields="flavours, name"
+ * 
+ * @jdo.query
+ *		name="getAllModeOfDeliveryFlavourIDs"
+ *		query="SELECT JDOHelper.getObjectId(this)"
+ * 
  */
 public class ModeOfDelivery
 implements Serializable
@@ -193,6 +203,13 @@ implements Serializable
 		}
 		return res;
 	}
+	
+	@SuppressWarnings("unchecked")
+	public static Set<ModeOfDeliveryID> getAllModeOfDeliveryIDs(PersistenceManager pm) {
+		Query query = pm.newNamedQuery(ModeOfDelivery.class, "getAllModeOfDeliveryIDs");
+		return new HashSet<ModeOfDeliveryID>((Collection<? extends ModeOfDeliveryID>) query.execute());
+	}
+	
 
 	@Override
 	public int hashCode()

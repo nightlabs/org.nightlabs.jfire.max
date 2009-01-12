@@ -63,6 +63,9 @@ import org.nightlabs.jfire.accounting.id.InvoiceID;
 import org.nightlabs.jfire.asyncinvoke.AsyncInvoke;
 import org.nightlabs.jfire.asyncinvoke.Invocation;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
+import org.nightlabs.jfire.config.ConfigSetup;
+import org.nightlabs.jfire.config.UserConfigSetup;
+import org.nightlabs.jfire.config.WorkstationConfigSetup;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.idgenerator.IDNamespaceDefault;
 import org.nightlabs.jfire.jbpm.graph.def.ProcessDefinition;
@@ -93,10 +96,12 @@ import org.nightlabs.jfire.store.deliver.ServerDeliveryProcessorManual;
 import org.nightlabs.jfire.store.deliver.ServerDeliveryProcessorNonDelivery;
 import org.nightlabs.jfire.store.deliver.ModeOfDeliveryFlavour.ModeOfDeliveryFlavourProductTypeGroup;
 import org.nightlabs.jfire.store.deliver.ModeOfDeliveryFlavour.ModeOfDeliveryFlavourProductTypeGroupCarrier;
+import org.nightlabs.jfire.store.deliver.config.ModeOfDeliveryConfigModule;
 import org.nightlabs.jfire.store.deliver.id.DeliveryDataID;
 import org.nightlabs.jfire.store.deliver.id.DeliveryID;
 import org.nightlabs.jfire.store.deliver.id.DeliveryQueueID;
 import org.nightlabs.jfire.store.deliver.id.ModeOfDeliveryFlavourID;
+import org.nightlabs.jfire.store.deliver.id.ModeOfDeliveryID;
 import org.nightlabs.jfire.store.id.DeliveryNoteID;
 import org.nightlabs.jfire.store.id.ProductTypeGroupID;
 import org.nightlabs.jfire.store.id.ProductTypeID;
@@ -192,6 +197,8 @@ implements SessionBean
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
+			initRegisterConfigModules(pm);
+			
 			pm.getExtent(ModeOfDelivery.class);
 			try {
 				pm.getObjectById(ModeOfDeliveryConst.MODE_OF_DELIVERY_ID_MANUAL);
@@ -378,11 +385,49 @@ implements SessionBean
 			unit.getSymbol().setText(Locale.GERMAN.getLanguage(), "()");
 			unit.getName().setText(Locale.GERMAN.getLanguage(), "(pauschal)");
 			pm.makePersistent(unit);
+			
 		} finally {
 			pm.close();
 		}
 	}
 
+	/**
+	 * Called by {@link #initialise()} and registeres the
+	 * config-modules in their config-setup.
+	 * 
+	 * This method checks itself whether initialisation 
+	 * was performed already and therefore can be safely
+	 * called anytime in the process.
+	 */
+	private void initRegisterConfigModules(PersistenceManager pm)
+	{
+		boolean needsUpdate = false;
+		// Register all User - ConfigModules
+		ConfigSetup configSetup = ConfigSetup.getConfigSetup(
+				pm,
+				getOrganisationID(),
+				UserConfigSetup.CONFIG_SETUP_TYPE_USER
+			);
+		if (!configSetup.getConfigModuleClasses().contains(ModeOfDeliveryConfigModule.class.getName())) {
+			configSetup.getConfigModuleClasses().add(ModeOfDeliveryConfigModule.class.getName());
+			needsUpdate = true;
+		}
+		
+		// Register all Workstation - ConfigModules
+		configSetup = ConfigSetup.getConfigSetup(
+				pm,
+				getOrganisationID(),
+				WorkstationConfigSetup.CONFIG_SETUP_TYPE_WORKSTATION
+			);
+		if (!configSetup.getConfigModuleClasses().contains(ModeOfDeliveryConfigModule.class.getName())) {
+			configSetup.getConfigModuleClasses().add(ModeOfDeliveryConfigModule.class.getName());
+			needsUpdate = true;
+		}
+		if (needsUpdate)
+			ConfigSetup.ensureAllPrerequisites(pm);
+	}
+
+	
 	/**
 	 * Get the object-ids of all {@link Unit}s known to the organisation.
 	 * <p>
@@ -694,6 +739,10 @@ implements SessionBean
 	 * @param productTypeIDs Instances of {@link ProductTypeID}.
 	 * @param customerGroupIDs Instances of {@link org.nightlabs.jfire.trade.id.CustomerGroupID}.
 	 * @param mergeMode One of {@link ModeOfDeliveryFlavour#MERGE_MODE_SUBTRACTIVE} or {@link ModeOfDeliveryFlavour#MERGE_MODE_ADDITIVE}
+	 * @param filterByConfig
+	 * 		If this is <code>true</code> the flavours available found for the given product-types and customer-groups will also be filtered by the 
+	 * 		intersection of the entries configured in the {@link ModeOfDeliveryConfigModule} for the current user and the 
+	 * 		workstation he is currently loggen on. 
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
@@ -703,14 +752,14 @@ implements SessionBean
 			getModeOfDeliveryFlavourProductTypeGroupCarrier(
 					Collection<ProductTypeID> productTypeIDs,
 					Collection<CustomerGroupID> customerGroupIDs,
-					byte mergeMode,
+					byte mergeMode, boolean filterByConfig,
 					String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			ModeOfDeliveryFlavourProductTypeGroupCarrier res =
 				ModeOfDeliveryFlavour.getModeOfDeliveryFlavourProductTypeGroupCarrier(
-						pm, productTypeIDs, customerGroupIDs, mergeMode);
+						pm, productTypeIDs, customerGroupIDs, mergeMode, filterByConfig);
 
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
@@ -735,6 +784,86 @@ implements SessionBean
 		}
 	}
 
+	/**
+	 * Get the modes of delivery that are specified by the given object-ids.
+	 * <p>
+	 * This method can be called by everyone, because modes of delivery are not considered confidential.
+	 * </p>
+	 * @param fetchGroups Either <tt>null</tt> or all desired fetch groups.
+	 *
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+	 */
+	public Collection<ModeOfDelivery> getModeOfDeliverys(Set<ModeOfDeliveryID> modeOfDeliveryIDs, String[] fetchGroups, int maxFetchDepth)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			return NLJDOHelper.getDetachedObjectList(pm, modeOfDeliveryIDs, ModeOfDelivery.class, fetchGroups, maxFetchDepth);
+		} finally {
+			pm.close();
+		}
+	}
+
+	/**
+	 * Get the object-ids of all mode of delivery flavours.
+	 * <p>
+	 * This method can be called by everyone, because the returned object-ids are not confidential.
+	 * </p>
+	 *
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+	 */
+	public Set<ModeOfDeliveryFlavourID> getAllModeOfDeliveryFlavourIDs() {
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			return ModeOfDeliveryFlavour.getAllModeOfDeliveryFlavourIDs(pm);
+		} finally {
+			pm.close();
+		}
+	}
+
+	/**
+	 * Get the object-ids of all modes of delivery.
+	 * <p>
+	 * This method can be called by everyone, because the returned object-ids are not confidential.
+	 * </p>
+	 *
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+	 */
+	public Set<ModeOfDeliveryID> getAllModeOfDeliveryIDs() {
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			return ModeOfDelivery.getAllModeOfDeliveryIDs(pm);
+		} finally {
+			pm.close();
+		}
+	}
+	
+	/**
+	 * Get the mode of delivery flavours that are specified by the given object-ids.
+	 * <p>
+	 * This method can be called by everyone, because mode of delivery flavours are not considered confidential.
+	 * </p>
+	 * @param fetchGroups Either <tt>null</tt> or all desired fetch groups.
+	 *
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+	 */
+	public Collection<ModeOfDeliveryFlavour> getModeOfDeliveryFlavours(Set<ModeOfDeliveryFlavourID> modeOfDeliveryFlavourIDs, String[] fetchGroups, int maxFetchDepth)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			return NLJDOHelper.getDetachedObjectList(pm, modeOfDeliveryFlavourIDs, ModeOfDeliveryFlavour.class, fetchGroups, maxFetchDepth);
+		} finally {
+			pm.close();
+		}
+	}
+	
 	/**
 	 * Get the server delivery processors that are available for the specified mode of delivery flavour.
 	 * <p>

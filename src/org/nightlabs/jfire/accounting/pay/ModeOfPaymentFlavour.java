@@ -293,6 +293,7 @@ implements Serializable
 			ModeOfPaymentFlavour modeOfPaymentFlavour = it.next();
 			m.put(modeOfPaymentFlavour.getPrimaryKey(), modeOfPaymentFlavour);
 		}
+		
 		if (filterByConfig) {
 			ModeOfPaymentConfigModule cfMod;
 			try {

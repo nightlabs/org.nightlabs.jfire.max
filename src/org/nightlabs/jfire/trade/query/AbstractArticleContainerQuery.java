@@ -37,7 +37,7 @@ public abstract class AbstractArticleContainerQuery
 	{
 		public static final String articleCountMax = "articleCountMax";
 		public static final String articleCountMin = "articleCountMin";
-		public static final String articleContainerID = "articleContainerID";
+		public static final String articleContainerIDString = "articleContainerIDString";
 		public static final String createDTMax = "createDTMax";
 		public static final String createDTMin = "createDTMin";
 		public static final String createUserID = "createUserID";
@@ -63,7 +63,7 @@ public abstract class AbstractArticleContainerQuery
 		// own methods to allow override e.g. for Offer where for customerName it is different
 		checkCustomerName(filter);
 		checkVendorName(filter);
-		checkArticleContainerID(filter);
+		checkArticleContainerIDString(filter);
 
 		// check creation time and counts
 		if (isFieldEnabled(FieldName.articleCountMin) && articleCountMin >= 0)
@@ -147,12 +147,48 @@ public abstract class AbstractArticleContainerQuery
 		}
 	}
 
-	protected void checkArticleContainerID(StringBuilder filter)
+	protected void checkArticleContainerIDString(StringBuilder filter)
 	{
-		if (isFieldEnabled(FieldName.articleContainerID) &&
-				getArticleContainerID() != null && !getArticleContainerID().trim().equals(""))
-//			filter.append("\n && (this."+getArticleContainerIDMemberName()+" == \""+ObjectIDUtil.parseLongObjectIDField(articleContainerID)+"\"");
-			filter.append("\n && (this."+getArticleContainerIDMemberName()+" == "+ObjectIDUtil.parseLongObjectIDField(articleContainerID)+")");
+		if (isFieldEnabled(FieldName.articleContainerIDString) &&
+				getArticleContainerIDString() != null &&
+				!getArticleContainerIDString().trim().equals(""))
+		{
+			String[] parts = articleContainerIDString.split("/");
+			if (parts.length > 0) {
+				if (parts.length == 1) {
+					String articleContainerID = parts[0];
+					checkArticleContainerID(filter, articleContainerID);
+				}
+				else if (parts.length == 2) {
+					String prefix = parts[0];
+					String articleContainerID = parts[1];
+					filter.append("\n && (this."+getArticleContainerIDPrefixMemberName()+" == \""+prefix+"\")");
+					checkArticleContainerID(filter, articleContainerID);
+				}
+				else if (parts.length == 3) {
+					String organisationID = parts[0];
+					String prefix = parts[1];
+					String articleContainerID = parts[2];
+					filter.append("\n && (this."+getOrganisationIDMemberName()+" == \""+organisationID+"\")");
+					filter.append("\n && (this."+getArticleContainerIDPrefixMemberName()+" == \""+prefix+"\")");
+					checkArticleContainerID(filter, articleContainerID);
+				}
+			}
+			// no separators found only check for articleContainerID
+			else {
+				checkArticleContainerID(filter, articleContainerIDString);
+			}
+		}
+	}
+
+	protected void checkArticleContainerID(StringBuilder filter, String articleContainerIDString)
+	{
+		try {
+			long articleContainerID = ObjectIDUtil.parseLongObjectIDField(articleContainerIDString);
+			filter.append("\n && (this."+getArticleContainerIDMemberName()+" == "+articleContainerID+")");
+		} catch (NumberFormatException nfe) {
+			return;
+		}
 	}
 
 	/**
@@ -341,23 +377,26 @@ public abstract class AbstractArticleContainerQuery
 		notifyListeners(FieldName.vendorNameRegex, oldVendorNameRegex, vendorNameRegex);
 	}
 
-	private String articleContainerID;
+	private String articleContainerIDString;
 	/**
-	 * returns the articleContainerID
-	 * @return the articleContainerID
+	 * returns the articleContainerIDString
+	 * @return the articleContainerIDString
 	 */
-	public String getArticleContainerID() {
-		return articleContainerID;
+	public String getArticleContainerIDString() {
+		return articleContainerIDString;
 	}
 
 	/**
-	 * sets the articleContainerID
-	 * @param articleContainerID the articleContainerID to set
+	 * Sets the articleContainerIDString.
+	 * This String may consist of 3 parts (organisationID/prefix/articleContainerID),
+	 * but you can also provide only the articleContainerID or only prefix/articleContainerID.
+	 *
+	 * @param articleContainerIDString the articleContainerIDString to set
 	 */
-	public void setArticleContainerID(String articleContainerID) {
-		String oldID = this.articleContainerID;
-		this.articleContainerID = articleContainerID;
-		notifyListeners(FieldName.articleContainerID, oldID, articleContainerID);
+	public void setArticleContainerIDString(String articleContainerIDString) {
+		String oldID = this.articleContainerIDString;
+		this.articleContainerIDString = articleContainerIDString;
+		notifyListeners(FieldName.articleContainerIDString, oldID, articleContainerIDString);
 	}
 
 	private int articleCountMin = -1;
@@ -455,7 +494,16 @@ public abstract class AbstractArticleContainerQuery
 	}
 
 	/**
-	 * returns the name of the articleContainerID member
+	 * Returns the name of the member which contains the organisationID.
+	 * Subclasses may override in case the member name is different.
+	 * @return the name of the member which contains the organisationID.
+	 */
+	protected String getOrganisationIDMemberName() {
+		return "organisationID";
+	}
+
+	/**
+	 * returns the name of the articleContainerIDString member
 	 *
 	 * @return the name of the member which defines the value
 	 * which is returned by {@link ArticleContainer#getArticleContainerID()}

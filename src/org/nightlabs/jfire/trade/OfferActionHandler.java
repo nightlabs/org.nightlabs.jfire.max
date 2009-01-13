@@ -88,7 +88,7 @@ public class OfferActionHandler
 
 	public void onArticlesTariffChanged(User user, Offer offer, Set<Article> articles)
 	{
-		
+
 	}
 
 	protected PersistenceManager getPersistenceManager()
@@ -98,5 +98,9 @@ public class OfferActionHandler
 			throw new IllegalStateException("This instance of OfferActionHandler has currently no PersistenceManager assigned!");
 
 		return pm;
+	}
+
+	public void onRejectOffer(User user, Offer offer) {
+
 	}
 }

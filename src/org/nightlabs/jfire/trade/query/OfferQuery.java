@@ -84,6 +84,7 @@ public class OfferQuery
 		if (reserved) {
 			// reserved means finalized but not accepted
 			filter.append("\n && this.offerLocal.acceptDT == null");
+			filter.append(" && this.offerLocal.rejectDT == null");
 			filter.append(" && this.finalizeDT != null");
 		}
 	}

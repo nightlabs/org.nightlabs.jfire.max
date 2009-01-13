@@ -102,6 +102,7 @@ import org.nightlabs.jfire.trade.jbpm.ActionHandlerAcceptOffer;
 import org.nightlabs.jfire.trade.jbpm.ActionHandlerAcceptOfferImplicitelyVendor;
 import org.nightlabs.jfire.trade.jbpm.ActionHandlerFinalizeOffer;
 import org.nightlabs.jfire.trade.jbpm.ActionHandlerFinalizeOfferForCrossTrade;
+import org.nightlabs.jfire.trade.jbpm.ActionHandlerRejectOffer;
 import org.nightlabs.jfire.trade.jbpm.ActionHandlerSendOffer;
 import org.nightlabs.jfire.trade.jbpm.JbpmConstantsOffer;
 import org.nightlabs.jfire.trade.jbpm.ProcessDefinitionAssignment;
@@ -1898,6 +1899,7 @@ public class Trader
 			ActionHandlerFinalizeOffer.register(jbpmProcessDefinition);
 			ActionHandlerSendOffer.register(jbpmProcessDefinition);
 			ActionHandlerAcceptOffer.register(jbpmProcessDefinition);
+			ActionHandlerRejectOffer.register(jbpmProcessDefinition);
 			ActionHandlerAcceptOfferImplicitelyVendor.register(jbpmProcessDefinition);
 		}
 		if (TradeSide.vendor == tradeSide) {
@@ -2402,5 +2404,12 @@ public class Trader
 
 		order.setCustomer(customer);
 		order.setCustomerGroup(customer.getDefaultCustomerGroup());
+	}
+
+	public void onRejectOffer(User user, Offer offer) {
+		offer.getOfferLocal().reject(user);
+		for (OfferActionHandler offerActionHandler : offer.getOfferLocal().getOfferActionHandlers()) {
+			offerActionHandler.onRejectOffer(user, offer);
+		}
 	}
 }

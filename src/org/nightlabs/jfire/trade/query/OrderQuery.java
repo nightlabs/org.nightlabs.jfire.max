@@ -18,7 +18,7 @@ public class OrderQuery
 
 	@Override
 	public String getArticleContainerIDPrefixMemberName() {
-		return "orderPrefixID";
+		return "orderIDPrefix";
 	}
 
 	@Override

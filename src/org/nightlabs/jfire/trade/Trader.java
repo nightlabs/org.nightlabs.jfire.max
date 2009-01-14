@@ -1326,7 +1326,9 @@ public class Trader
 		ProductTypeActionHandlerCache productTypeActionHandlerCache = new ProductTypeActionHandlerCache(pm);
 
 		Map<ProductTypeActionHandler, List<Article>> productTypeActionHandler2Articles = new HashMap<ProductTypeActionHandler, List<Article>>();
+		Set<Offer> offers = new HashSet<Offer>();
 		for (Article article : articles) {
+			offers.add(article.getOffer());
 			Product product = article.getProduct();
 
 			ProductTypeActionHandler productTypeActionHandler = productTypeActionHandlerCache.getProductTypeActionHandler(product);
@@ -1363,6 +1365,10 @@ public class Trader
 
 		if (deleteAfterRelease) {
 			deleteArticles(user, articles);
+		}
+
+		for (Offer offer : offers) {
+			validateOffer(offer);
 		}
 
 		if (logger.isTraceEnabled()) {

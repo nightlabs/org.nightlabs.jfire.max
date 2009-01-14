@@ -146,6 +146,29 @@ extends BaseJDOObjectDAO<ArticleID, Article>
 	 *		because they need to be released first (which is done asynchronously).
 	 */
 	public List<Article> deleteArticles(
+			Collection<ArticleID> articleIDs, boolean get, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
+	{
+		return deleteArticles(articleIDs, true, get, fetchGroups, maxFetchDepth, monitor);
+	}
+
+	/**
+	 * Delete {@link Article}s from the datastore. Those articles that are not allocated
+	 * (and not allocationPending either) are immediately deleted (synchronously). Those
+	 * articles that are allocated, are asynchronously released (this method returns immediately).
+	 * After the release, they are automatically deleted (asynchronously).
+	 *
+	 * @param articleIDs the object-ids of the {@link Article}s to be deleted.
+	 * @param get whether to return a result.
+	 * @param fetchGroups if <code>get == true</code> these fetch-groups are used for detaching the result.
+	 * @param maxFetchDepth if <code>get == true</code> this maximum fetch-depth is used for detaching the result.
+	 * @param monitor the progress monitor.
+	 * @return <code>null</code> if <code>get == false</code>. Otherwise, those {@link Article}s that were not immediately deleted,
+	 *		because they need to be released first (which is done asynchronously).
+	 *
+	 * @deprecated use {@link #deleteArticles(Collection, boolean, String[], int, ProgressMonitor)} instead
+	 */
+	@Deprecated
+	public List<Article> deleteArticles(
 			Collection<ArticleID> articleIDs, boolean validate,
 			boolean get, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor
 	)

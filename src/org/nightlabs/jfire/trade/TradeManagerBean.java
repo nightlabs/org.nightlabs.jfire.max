@@ -1218,7 +1218,10 @@ implements SessionBean
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="org.nightlabs.jfire.trade.editOffer"
+	 *
+	 * @deprecated use {@link #deleteArticles(Collection, boolean, String[], int)} instead.
 	 */
+	@Deprecated
 	public Collection<Article> deleteArticles(Collection<ArticleID> articleIDs, boolean validate, boolean get, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
@@ -1268,6 +1271,21 @@ implements SessionBean
 		} finally {
 			pm.close();
 		}
+	}
+
+	/**
+	 * @return <code>null</code> if <code>get == false</code>, otherwise those {@link Article}s that were <b>not</b> yet removed, because
+	 *		they are released asynchronously first.
+	 * @throws ModuleException
+	 *
+	 * @ejb.interface-method
+	 * @ejb.transaction type="Required"
+	 * @ejb.permission role-name="org.nightlabs.jfire.trade.editOffer"
+	 */
+	public Collection<Article> deleteArticles(Collection<ArticleID> articleIDs, boolean get, String[] fetchGroups, int maxFetchDepth)
+	throws ModuleException
+	{
+		return deleteArticles(articleIDs, true, get, fetchGroups, maxFetchDepth);
 	}
 
 	/**

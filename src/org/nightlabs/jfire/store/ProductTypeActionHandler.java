@@ -503,7 +503,7 @@ public abstract class ProductTypeActionHandler
 
 
 	/**
-	 * This method is called by {@link Trader#allocateArticlesEnd(User user, Collection articles)} and
+	 * This method is called by {@link Trader#allocateArticlesEnd(String allocateExecID, User user, Collection articles)} and
 	 * must ensure that the product is fully allocated and assembled.
 	 * <p>
 	 * This method DOES NOT set the allocated status in {@link ProductLocal} - this
@@ -878,7 +878,7 @@ public abstract class ProductTypeActionHandler
 	}
 
 	/**
-	 * This method is called by {@link Trader#allocateArticlesBegin(User, Collection)}
+	 * This method is called by {@link Trader#allocateArticlesBegin(String, User, Collection)}
 	 * when an Article is allocated. You can extend this method
 	 * in order to do sth. when allocation starts. The basic implementation in
 	 * <code>ProductTypeActionHandler</code> is a noop.
@@ -895,12 +895,12 @@ public abstract class ProductTypeActionHandler
 	}
 
 	/**
-	 * This method is called by {@link Trader#allocateArticlesEnd(User, Collection)}
+	 * This method is called by {@link Trader#allocateArticlesEnd(String, User, Collection)}
 	 * when an Article is allocated. You can extend this method
 	 * in order to do sth. when allocation ends. The basic implementation in
 	 * <code>ProductTypeActionHandler</code> is a noop.
 	 * <p>
-	 * As {@link Trader#allocateArticlesEnd(User, Collection)} is normally called asynchronously,
+	 * As {@link Trader#allocateArticlesEnd(String, User, Collection)} is normally called asynchronously,
 	 * you should do expensive things here (and not in {@link #onAllocateArticlesBegin(User, Trader, Collection)}).
 	 * But still, you should try to get your work done as fast as possible ;-)
 	 * </p>
@@ -913,7 +913,7 @@ public abstract class ProductTypeActionHandler
 	}
 
 	/**
-	 * This method is called by {@link Trader#releaseArticlesBegin(User, Collection)}.
+	 * This method is called by {@link Trader#releaseArticlesBegin(String, User, Collection)}.
 	 * The basic implementation in
 	 * <code>ProductTypeActionHandler</code> is a noop.
 	 *

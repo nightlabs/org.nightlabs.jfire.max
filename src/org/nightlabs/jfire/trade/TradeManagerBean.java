@@ -1225,52 +1225,7 @@ implements SessionBean
 	public Collection<Article> deleteArticles(Collection<ArticleID> articleIDs, boolean validate, boolean get, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			NLJDOHelper.enableTransactionSerializeReadObjects(pm);
-			try {
-				pm.getExtent(Article.class);
-				Collection<Article> nonAllocatedArticles = new HashSet<Article>(articleIDs.size());
-				Set<Offer> offers = validate ? new HashSet<Offer>() : null;
-				Set<Article> allocatedArticles = new HashSet<Article>(articleIDs.size());
-				for (ArticleID articleID : articleIDs) {
-					Article article = (Article) pm.getObjectById(articleID);
-					if (validate)
-						offers.add(article.getOffer());
-
-					if (article.isAllocated())
-						allocatedArticles.add(article);
-					else
-						nonAllocatedArticles.add(article);
-				}
-
-				Trader trader = Trader.getTrader(pm);
-
-				if (!allocatedArticles.isEmpty())
-					trader.releaseArticles(User.getUser(pm, getPrincipal()), allocatedArticles, false, true, true);
-
-				if (!nonAllocatedArticles.isEmpty())
-					trader.deleteArticles(User.getUser(pm, getPrincipal()), nonAllocatedArticles);
-
-				if (validate) {
-					for (Offer offer : offers)
-						trader.validateOffer(offer);
-				}
-
-				if (!get)
-					return null;
-
-				pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
-				if (fetchGroups != null)
-					pm.getFetchPlan().setGroups(fetchGroups);
-
-				return pm.detachCopyAll(allocatedArticles);
-			} finally {
-				NLJDOHelper.disableTransactionSerializeReadObjects(pm);
-			}
-		} finally {
-			pm.close();
-		}
+		return deleteArticles(articleIDs, get, fetchGroups, maxFetchDepth);
 	}
 
 	/**
@@ -1285,7 +1240,51 @@ implements SessionBean
 	public Collection<Article> deleteArticles(Collection<ArticleID> articleIDs, boolean get, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
-		return deleteArticles(articleIDs, true, get, fetchGroups, maxFetchDepth);
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			Set<Article> articles;
+			NLJDOHelper.enableTransactionSerializeReadObjects(pm);
+			try {
+				articles = NLJDOHelper.getObjectSet(pm, articleIDs, Article.class);
+				pm.refreshAll(articles);
+			} finally {
+				NLJDOHelper.disableTransactionSerializeReadObjects(pm);
+			}
+
+			Collection<Article> nonAllocatedArticles = new HashSet<Article>(articleIDs.size());
+			Set<Offer> offers = new HashSet<Offer>();
+			Set<Article> allocatedArticles = new HashSet<Article>(articleIDs.size());
+			for (Article article : articles) {
+				offers.add(article.getOffer());
+
+				if (article.isAllocated() || article.isAllocationPending())
+					allocatedArticles.add(article);
+				else
+					nonAllocatedArticles.add(article);
+			}
+
+			Trader trader = Trader.getTrader(pm);
+
+			if (!allocatedArticles.isEmpty())
+				trader.releaseArticles(User.getUser(pm, getPrincipal()), allocatedArticles, false, true);
+
+			if (!nonAllocatedArticles.isEmpty())
+				trader.deleteArticles(User.getUser(pm, getPrincipal()), nonAllocatedArticles);
+
+			for (Offer offer : offers)
+				trader.validateOffer(offer);
+
+			if (!get)
+				return null;
+
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+			if (fetchGroups != null)
+				pm.getFetchPlan().setGroups(fetchGroups);
+
+			return pm.detachCopyAll(allocatedArticles);
+		} finally {
+			pm.close();
+		}
 	}
 
 	/**
@@ -1303,7 +1302,7 @@ implements SessionBean
 			Collection<Article> articles = NLJDOHelper.getObjectList(pm, articleIDs, Article.class);
 
 			Trader trader = Trader.getTrader(pm);
-			trader.releaseArticles(User.getUser(pm, getPrincipal()), articles, synchronously, false, true);
+			trader.releaseArticles(User.getUser(pm, getPrincipal()), articles, synchronously, false);
 
 			if (!get)
 				return null;
@@ -1509,7 +1508,7 @@ implements SessionBean
 				if (allocatedArticles.isEmpty())
 					logger.warn("releaseExpiredUnfinalizedOffers: Even though the Offer was found by the query it doesn't have allocated articles! " + offer);
 				else
-					trader.releaseArticles(user, allocatedArticles, true, false, true);
+					trader.releaseArticles(user, allocatedArticles, true, false);
 			}
 		} finally {
 			pm.close();

@@ -69,7 +69,7 @@ extends AbstractActionHandler
 				trader.unregisterReversingArticles(user, reversingArticlesToBeUnregistered);
 
 			if (articlesToBeReleased != null && !articlesToBeReleased.isEmpty())
-				trader.releaseArticles(user, articlesToBeReleased, false, false, true);
+				trader.releaseArticles(user, articlesToBeReleased, false, false);
 		}
 	}
 }

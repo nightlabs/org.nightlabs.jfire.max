@@ -85,7 +85,7 @@ extends EditLockType
 								throw new IllegalStateException("Article is in unexpected state!!! " + article);
 						}
 
-						trader.releaseArticles(user, articles_allocated_nothingPending, true, false, true);
+						trader.releaseArticles(user, articles_allocated_nothingPending, true, false);
 						trader.deleteArticles(user, order.getArticles());
 					}
 				} // if (!containsFinalizedOffer) {

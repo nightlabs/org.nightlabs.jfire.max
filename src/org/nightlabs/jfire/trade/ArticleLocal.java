@@ -125,6 +125,11 @@ implements Serializable, DetachCallback
 	}
 
 	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private String allocateReleaseExecID;
+
+	/**
 	 * @deprecated Only for JDO!
 	 */
 	@Deprecated
@@ -211,5 +216,23 @@ implements Serializable, DetachCallback
 
 		if (fetchGroupsArticleInEditor)
 			detached.invoicePaid = attached.isInvoicePaid();
+	}
+
+	/**
+	 * Get the current allocate/release exec identifier (which might be <code>null</code>).
+	 *
+	 * @return the identifier for the current allocate/release execution.
+	 */
+	public String getAllocateReleaseExecID() {
+		return allocateReleaseExecID;
+	}
+	/**
+	 * Set the current allocate/release exec identifier.
+	 *
+	 * @param allocateReleaseExecID the new identifier or <code>null</code>.
+	 * @see #getAllocateReleaseExecID()
+	 */
+	public void setAllocateReleaseExecID(String allocateReleaseExecID) {
+		this.allocateReleaseExecID = allocateReleaseExecID;
 	}
 }

@@ -43,7 +43,6 @@ import java.util.Set;
 
 import javax.ejb.CreateException;
 import javax.jdo.JDOHelper;
-import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.naming.NamingException;
 
@@ -52,6 +51,7 @@ import org.jbpm.JbpmContext;
 import org.jbpm.graph.exe.ProcessInstance;
 import org.nightlabs.ModuleException;
 import org.nightlabs.jdo.NLJDOHelper;
+import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.accounting.Accounting;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.Invoice;
@@ -792,7 +792,7 @@ public class Trader
 	 * This method creates an <tt>Article</tt> with a specific <tt>Product</tt>.
 	 * If <tt>allocate</tt> is true, the method
 	 * {@link #allocateArticleBegin(User, Article)} is called immediately and the
-	 * method {@link #allocateArticlesEnd(User, Collection)} is either called
+	 * method {@link #allocateArticlesEnd(String, User, Collection)} is either called
 	 * asynchronously or immediately, depending on
 	 * <code>allocateSynchronously</code>.
 	 *
@@ -868,18 +868,19 @@ public class Trader
 	 *          Whether the second phase of allocation shall be done
 	 *          synchronously. Otherwise it will be done via {@link AsyncInvoke}.
 	 */
-	public void allocateArticles(User user, Collection<? extends Article> articles,
-			boolean synchronously) throws ModuleException
-			{
+	public void allocateArticles(User user, Collection<? extends Article> articles, boolean synchronously) throws ModuleException
+	{
 		try {
-			allocateArticlesBegin(user, articles); // allocateArticleBegin
+			String allocateExecID = ObjectIDUtil.makeValidIDString("allocate", true);
+
+			allocateArticlesBegin(allocateExecID, user, articles); // allocateArticleBegin
 			// (re)creates the price
 
 			if (synchronously)
-				allocateArticlesEnd(user, articles);
+				allocateArticlesEnd(allocateExecID, user, articles);
 			else
 				AsyncInvoke.exec(
-						new AllocateArticlesEndInvocation(user, articles),
+						new AllocateArticlesEndInvocation(allocateExecID, user, articles),
 						null,
 						new AllocateArticlesEndErrorCallback(),
 						new AllocateArticlesEndUndeliverableCallback(), true);
@@ -891,10 +892,9 @@ public class Trader
 		} catch (Exception x) {
 			throw new ModuleException(x);
 		}
-			}
+	}
 
-	public static class AllocateArticlesEndUndeliverableCallback extends
-	UndeliverableCallback
+	public static class AllocateArticlesEndUndeliverableCallback extends UndeliverableCallback
 	{
 		private static final long serialVersionUID = 1L;
 
@@ -903,20 +903,36 @@ public class Trader
 		{
 			PersistenceManager pm = getPersistenceManager();
 			try {
-				pm.getExtent(Article.class);
-				Collection<ArticleID> articleIDs = ((AllocateArticlesEndInvocation) envelope
-						.getInvocation()).getArticleIDs();
+				AllocateArticlesEndInvocation allocateArticlesEndInvocation = (AllocateArticlesEndInvocation) envelope.getInvocation();
+				String allocateExecID = allocateArticlesEndInvocation.getAllocateExecID();
+
+				Collection<ArticleID> articleIDs = ((AllocateArticlesEndInvocation) envelope.getInvocation()).getArticleIDs();
 //				for (Iterator iter = articleIDs.iterator(); iter.hasNext();) {
 //				ArticleID articleID = (ArticleID) iter.next();
-				for (ArticleID articleID : articleIDs) {
-					Article article = null;
-					try {
-						article = (Article) pm.getObjectById(articleID);
-					} catch (JDOObjectNotFoundException x) {
-						logger.error("AllocateArticlesEndUndeliverableCallback: Article does not exist in datastore: " + articleID);
+
+				Collection<Article> articles;
+				NLJDOHelper.enableTransactionSerializeReadObjects(pm);
+				try {
+					articles = NLJDOHelper.getObjectSet(pm, articleIDs, Article.class);
+					pm.refreshAll(articles);
+				} finally {
+					NLJDOHelper.disableTransactionSerializeReadObjects(pm);
+				}
+
+				for (Article article : articles) {
+					if (!allocateExecID.equals(article.getArticleLocal().getAllocateReleaseExecID())) {
+						logger.warn("AllocateArticlesEndUndeliverableCallback.handle: allocateExecID != article.articleLocal.allocateReleaseExecID :: " + allocateExecID + " != " + article.getArticleLocal().getAllocateReleaseExecID() + " :: " + article);
+						continue;
 					}
 
-					if (article != null)
+//					Article article = null;
+//					try {
+//						article = (Article) pm.getObjectById(articleID);
+//					} catch (JDOObjectNotFoundException x) {
+//						logger.error("AllocateArticlesEndUndeliverableCallback: Article does not exist in datastore: " + articleID);
+//					}
+//
+//					if (article != null)
 						article.setAllocationAbandoned(true);
 				}
 			} finally {
@@ -935,27 +951,42 @@ public class Trader
 		{
 			PersistenceManager pm = getPersistenceManager();
 			try {
+				AllocateArticlesEndInvocation allocateArticlesEndInvocation = (AllocateArticlesEndInvocation) envelope.getInvocation();
+				String allocateExecID = allocateArticlesEndInvocation.getAllocateExecID();
 				InvocationError invocationError = envelope.getAsyncInvokeProblem(pm).getLastError();
 
-				pm.getExtent(Article.class);
-				Collection<ArticleID> articleIDs = ((AllocateArticlesEndInvocation) envelope
-						.getInvocation()).getArticleIDs();
+				Collection<ArticleID> articleIDs = ((AllocateArticlesEndInvocation) envelope.getInvocation()).getArticleIDs();
 //				for (Iterator iter = articleIDs.iterator(); iter.hasNext();) {
 //				ArticleID articleID = (ArticleID) iter.next();
-				for (ArticleID articleID : articleIDs) {
-					Article article = null;
-					try {
-						article = (Article) pm.getObjectById(articleID);
-					} catch (JDOObjectNotFoundException x) {
-						logger.error("AllocateArticlesEndErrorCallback: Article does not exist in datastore: " + articleID);
+
+				Collection<Article> articles;
+				NLJDOHelper.enableTransactionSerializeReadObjects(pm);
+				try {
+					articles = NLJDOHelper.getObjectSet(pm, articleIDs, Article.class);
+					pm.refreshAll(articles);
+				} finally {
+					NLJDOHelper.disableTransactionSerializeReadObjects(pm);
+				}
+
+				for (Article article : articles) {
+					if (!allocateExecID.equals(article.getArticleLocal().getAllocateReleaseExecID())) {
+						logger.warn("AllocateArticlesEndErrorCallback.handle: allocateExecID != article.articleLocal.allocateReleaseExecID :: " + allocateExecID + " != " + article.getArticleLocal().getAllocateReleaseExecID() + " :: " + article);
+						continue;
 					}
 
-					if (article != null) {
+//					Article article = null;
+//					try {
+//						article = (Article) pm.getObjectById(articleID);
+//					} catch (JDOObjectNotFoundException x) {
+//						logger.error("AllocateArticlesEndErrorCallback: Article does not exist in datastore: " + articleID);
+//					}
+//
+//					if (article != null) {
 						if (invocationError.getError() != null)
 							article.setAllocationException(invocationError.getError());
 						else
 							article.setAllocationException(invocationError.getErrorRootCauseClassName(), invocationError.getErrorMessage(), invocationError.getErrorStackTrace());
-					}
+//					}
 				}
 			} finally {
 				pm.close();
@@ -965,7 +996,9 @@ public class Trader
 
 	public static class AllocateArticlesEndInvocation extends Invocation
 	{
-		private static final long serialVersionUID = 1L;
+		private static final long serialVersionUID = 2L;
+
+		private String allocateExecID;
 
 		private UserID userID;
 
@@ -976,8 +1009,16 @@ public class Trader
 			return articleIDs;
 		}
 
-		public AllocateArticlesEndInvocation(User user, Collection<? extends Article> articles)
+		public String getAllocateExecID() {
+			return allocateExecID;
+		}
+
+		public AllocateArticlesEndInvocation(String allocateExecID, User user, Collection<? extends Article> articles)
 		{
+			if (allocateExecID == null)
+				throw new IllegalArgumentException("allocateExecID == null");
+
+			this.allocateExecID = allocateExecID;
 			this.userID = (UserID) JDOHelper.getObjectId(user);
 			this.articleIDs = NLJDOHelper.getObjectIDSet(articles);
 		}
@@ -997,7 +1038,7 @@ public class Trader
 				User user = (User) pm.getObjectById(userID);
 				Collection<Article>articles = NLJDOHelper.getObjectSet(pm, articleIDs,
 						Article.class);
-				Trader.getTrader(pm).allocateArticlesEnd(user, articles);
+				Trader.getTrader(pm).allocateArticlesEnd(allocateExecID, user, articles);
 			} finally {
 				pm.close();
 			}
@@ -1030,24 +1071,24 @@ public class Trader
 	 * @param articles
 	 *          Instances of {@link Article}.
 	 * @param synchronously
-	 * @param enableXA This applies only if <code>synchronously==false</code> and it is passed to
-	 *		{@link AsyncInvoke#exec(Invocation, org.nightlabs.jfire.asyncinvoke.SuccessCallback, ErrorCallback, UndeliverableCallback, boolean)}.
 	 */
-	public void releaseArticles(User user, Collection<Article> articles,
-			boolean synchronously, boolean deleteAfterRelease, boolean enableXA) throws ModuleException
-			{
+	public void releaseArticles(User user, Collection<Article> articles, boolean synchronously, boolean deleteAfterRelease)
+	throws ModuleException
+	{
 		try {
-			releaseArticlesBegin(user, articles);
+			String releaseExecID = ObjectIDUtil.makeValidIDString("release", true);
+
+			releaseArticlesBegin(releaseExecID, user, articles);
 
 			if (synchronously)
-				releaseArticlesEnd(user, articles, deleteAfterRelease);
+				releaseArticlesEnd(releaseExecID, user, articles, deleteAfterRelease);
 			else
 				AsyncInvoke.exec(
-						new ReleaseArticlesEndInvocation(user, articles, deleteAfterRelease),
+						new ReleaseArticlesEndInvocation(releaseExecID, user, articles, deleteAfterRelease),
 						null,
 						new ReleaseArticlesEndErrorCallback(),
 						new ReleaseArticlesEndUndeliverableCallback(),
-						enableXA);
+						true);
 
 		} catch (RuntimeException x) {
 			throw x;
@@ -1056,10 +1097,9 @@ public class Trader
 		} catch (Exception x) {
 			throw new ModuleException(x);
 		}
-			}
+	}
 
-	public static class ReleaseArticlesEndUndeliverableCallback extends
-	UndeliverableCallback
+	public static class ReleaseArticlesEndUndeliverableCallback extends UndeliverableCallback
 	{
 		private static final long serialVersionUID = 1L;
 
@@ -1068,13 +1108,28 @@ public class Trader
 		{
 			PersistenceManager pm = getPersistenceManager();
 			try {
-				pm.getExtent(Article.class);
-				Collection<ArticleID> articleIDs = ((ReleaseArticlesEndInvocation) envelope
-						.getInvocation()).getArticleIDs();
+				ReleaseArticlesEndInvocation releaseArticlesEndInvocation = (ReleaseArticlesEndInvocation) envelope.getInvocation();
+				String releaseExecID = releaseArticlesEndInvocation.getReleaseExecID();
+
+				Collection<ArticleID> articleIDs = ((ReleaseArticlesEndInvocation) envelope.getInvocation()).getArticleIDs();
 //				for (Iterator iter = articleIDs.iterator(); iter.hasNext();) {
 //				ArticleID articleID = (ArticleID) iter.next();
-				for (ArticleID articleID : articleIDs) {
-					Article article = (Article) pm.getObjectById(articleID);
+
+				Collection<Article> articles;
+				NLJDOHelper.enableTransactionSerializeReadObjects(pm);
+				try {
+					articles = NLJDOHelper.getObjectSet(pm, articleIDs, Article.class);
+					pm.refreshAll(articles);
+				} finally {
+					NLJDOHelper.disableTransactionSerializeReadObjects(pm);
+				}
+
+				for (Article article : articles) {
+					if (!releaseExecID.equals(article.getArticleLocal().getAllocateReleaseExecID())) {
+						logger.warn("ReleaseArticlesEndUndeliverableCallback.handle: releaseExecID != article.articleLocal.allocateReleaseExecID :: " + releaseExecID + " != " + article.getArticleLocal().getAllocateReleaseExecID() + " :: " + article);
+						continue;
+					}
+
 					article.setReleaseAbandoned(true);
 				}
 			} finally {
@@ -1093,15 +1148,28 @@ public class Trader
 		{
 			PersistenceManager pm = getPersistenceManager();
 			try {
+				ReleaseArticlesEndInvocation releaseArticlesEndInvocation = (ReleaseArticlesEndInvocation) envelope.getInvocation();
+				String releaseExecID = releaseArticlesEndInvocation.getReleaseExecID();
 				InvocationError invocationError = envelope.getAsyncInvokeProblem(pm).getLastError();
 
-				pm.getExtent(Article.class);
-				Collection<ArticleID> articleIDs = ((ReleaseArticlesEndInvocation) envelope
-						.getInvocation()).getArticleIDs();
+				Collection<ArticleID> articleIDs = ((ReleaseArticlesEndInvocation) envelope.getInvocation()).getArticleIDs();
 //				for (Iterator iter = articleIDs.iterator(); iter.hasNext();) {
 //				ArticleID articleID = (ArticleID) iter.next();
-				for (ArticleID articleID : articleIDs) {
-					Article article = (Article) pm.getObjectById(articleID);
+
+				Collection<Article> articles;
+				NLJDOHelper.enableTransactionSerializeReadObjects(pm);
+				try {
+					articles = NLJDOHelper.getObjectSet(pm, articleIDs, Article.class);
+					pm.refreshAll(articles);
+				} finally {
+					NLJDOHelper.disableTransactionSerializeReadObjects(pm);
+				}
+
+				for (Article article : articles) {
+					if (!releaseExecID.equals(article.getArticleLocal().getAllocateReleaseExecID())) {
+						logger.warn("ReleaseArticlesEndErrorCallback.handle: releaseExecID != article.articleLocal.allocateReleaseExecID :: " + releaseExecID + " != " + article.getArticleLocal().getAllocateReleaseExecID() + " :: " + article);
+						continue;
+					}
 
 					if (invocationError.getError() != null)
 						article.setReleaseException(invocationError.getError());
@@ -1118,6 +1186,8 @@ public class Trader
 	{
 		private static final long serialVersionUID = 1L;
 
+		private String releaseExecID;
+
 		private UserID userID;
 
 		private Collection<ArticleID> articleIDs;
@@ -1129,8 +1199,16 @@ public class Trader
 			return articleIDs;
 		}
 
-		public ReleaseArticlesEndInvocation(User user, Collection<Article> articles, boolean deleteAfterRelease)
+		public String getReleaseExecID() {
+			return releaseExecID;
+		}
+
+		public ReleaseArticlesEndInvocation(String releaseExecID, User user, Collection<Article> articles, boolean deleteAfterRelease)
 		{
+			if (releaseExecID == null)
+				throw new IllegalArgumentException("releaseExecID == null");
+
+			this.releaseExecID = releaseExecID;
 			this.userID = (UserID) JDOHelper.getObjectId(user);
 			this.articleIDs = NLJDOHelper.getObjectIDSet(articles);
 			this.deleteAfterRelease = deleteAfterRelease;
@@ -1149,9 +1227,8 @@ public class Trader
 			try {
 				pm.getExtent(User.class);
 				User user = (User) pm.getObjectById(userID);
-				Collection<Article> articles = NLJDOHelper.getObjectSet(pm, articleIDs,
-						Article.class);
-				Trader.getTrader(pm).releaseArticlesEnd(user, articles, deleteAfterRelease);
+				Collection<Article> articles = NLJDOHelper.getObjectSet(pm, articleIDs, Article.class);
+				Trader.getTrader(pm).releaseArticlesEnd(releaseExecID, user, articles, deleteAfterRelease);
 			} finally {
 				pm.close();
 			}
@@ -1159,9 +1236,12 @@ public class Trader
 		}
 	}
 
-	protected void releaseArticlesBegin(User user, Collection<Article> articles)
+	protected void releaseArticlesBegin(String releaseExecID, User user, Collection<Article> articles)
 	throws ModuleException
 	{
+		if (releaseExecID == null)
+			throw new IllegalArgumentException("releaseExecID == null");
+
 		if (logger.isDebugEnabled()) {
 			logger.debug("releaseArticlesBegin: entered with " + articles.size() + " articles.");
 			if (logger.isTraceEnabled()) {
@@ -1175,6 +1255,7 @@ public class Trader
 		try {
 			pm.refreshAll(articles);
 			for (Article article : articles) {
+				pm.refresh(article.getArticleLocal());
 				if (article.getProduct() != null)
 					pm.refresh(article.getProduct().getProductLocal());
 			}
@@ -1188,14 +1269,26 @@ public class Trader
 
 		TotalArticleStatus tas = getTotalArticleStatus(articles);
 
-		if (!tas.allocated || tas.releasePending)
-			return;
+//		if (!tas.allocated || tas.releasePending)
+//			return;
+//
+//		if (tas.allocationPending)
+//			throw new IllegalStateException("Articles \"" + getToStringList(articles) + "\" cannot be released, because they are currently in state allocationPending!");
 
-		if (tas.allocationPending)
-			throw new IllegalStateException(
-					"Articles \""
-					+ getToStringList(articles)
-					+ "\" cannot be released, because they are currently in state allocationPending!");
+		// Policy change: We allow releasing even when the allocateArticlesEnd was not yet called (i.e. it's still in state allocationPending), because
+		// there might be a problem to perform the allocation and we have no other chance to solve the situation than releasing.
+		if (tas.releasePending) {
+			logger.warn("releaseArticlesBegin: articles are already in state 'releasePending'!", new Exception("StackTrace"));
+			for (Article article : articles) {
+				logger.warn("releaseArticlesBegin: * " + article);
+			}
+			// we try it again - commented out the return. marco.
+//			return; // already releasing... not trying it again (or should we?)
+		}
+
+		if (!tas.allocated && !tas.allocationPending)
+			return; // it's neither allocated nor allocationPending - there seems to be nothing to do.
+
 
 		Map<ProductTypeActionHandler, List<Article>> productTypeActionHandler2Articles = new HashMap<ProductTypeActionHandler, List<Article>>();
 
@@ -1204,6 +1297,8 @@ public class Trader
 //		Map<Offer, ProcessInstance> offer2ProcessInstance = new HashMap<Offer, ProcessInstance>();
 
 		for (Article article : articles) {
+			article.getArticleLocal().setAllocateReleaseExecID(releaseExecID);
+
 			if (article.isReversing()) {
 				// reversing article
 
@@ -1252,6 +1347,8 @@ public class Trader
 
 			Product product = article.getProduct();
 			article.setReleasePending(true);
+			article.setReleaseAbandoned(false);
+			article.setReleaseException(null);
 			product.getProductLocal().setReleasePending(true);
 
 			ProductTypeActionHandler productTypeActionHandler = ProductTypeActionHandler.getProductTypeActionHandler(
@@ -1282,9 +1379,12 @@ public class Trader
 		}
 	}
 
-	protected void releaseArticlesEnd(User user, Collection<Article> articles, boolean deleteAfterRelease)
+	protected void releaseArticlesEnd(String releaseExecID, User user, Collection<Article> articles, boolean deleteAfterRelease)
 	throws ModuleException
 	{
+		if (releaseExecID == null)
+			throw new IllegalArgumentException("releaseExecID == null");
+
 		if (logger.isDebugEnabled()) {
 			logger.debug("releaseArticlesEnd: entered with " + articles.size() + " articles.");
 			if (logger.isTraceEnabled()) {
@@ -1293,11 +1393,25 @@ public class Trader
 			}
 		}
 
+		// We remove all Articles that have a different allocate/release exec ID - thus we need our own local HashSet.
+		articles = new HashSet<Article>(articles);
+
 		PersistenceManager pm = getPersistenceManager();
 		NLJDOHelper.enableTransactionSerializeReadObjects(pm);
 		try {
 			pm.refreshAll(articles);
-			for (Article article : articles) {
+			for (Iterator<Article> it = articles.iterator(); it.hasNext(); ) {
+				Article article = it.next();
+				pm.refresh(article.getArticleLocal());
+
+				if (!releaseExecID.equals(article.getArticleLocal().getAllocateReleaseExecID())) {
+					if (logger.isDebugEnabled())
+						logger.debug("releaseArticlesEnd: Article.articleLocal.allocateReleaseExecID != releaseExecID :: " + article.getArticleLocal().getAllocateReleaseExecID() + " != " + releaseExecID + " :: Skipping " + article);
+
+					it.remove();
+					continue;
+				}
+
 				Product product = article.getProduct();
 				if (product != null)
 					pm.refresh(product.getProductLocal());
@@ -1314,14 +1428,18 @@ public class Trader
 //			}
 		}
 
-		TotalArticleStatus tas = getTotalArticleStatus(articles);
-
-		if (!tas.allocated)
+		if (articles.isEmpty())
 			return;
 
-		if (!tas.releasePending)
-			throw new IllegalArgumentException("Articles "
-					+ getToStringList(articles) + " are NOT in state releasePending!");
+// It's not necessary to check the status, because we already did all the checks in releaseArticlesBegin and the newly introduced
+// allocateReleaseExecID guarantees that the state is preserved between the first and the second stage. Marco.
+//		TotalArticleStatus tas = getTotalArticleStatus(articles);
+//
+//		if (!tas.allocated && !tas.allocationPending)
+//			return;
+//
+//		if (!tas.releasePending)
+//			throw new IllegalArgumentException("Articles " + getToStringList(articles) + " are NOT in state releasePending!");
 
 		ProductTypeActionHandlerCache productTypeActionHandlerCache = new ProductTypeActionHandlerCache(pm);
 
@@ -1339,8 +1457,13 @@ public class Trader
 			// clear product's article and update all states
 			ProductLocal productLocal = product.getProductLocal();
 			productLocal.setAllocated(false);
+			productLocal.setAllocationPending(false);
 			productLocal.setSaleArticle(null);
 			article.setAllocated(false);
+			article.setAllocationPending(false);
+			article.setAllocationAbandoned(false);
+			article.setAllocationException(null);
+			article.setReleaseException(null);
 			article.setReleasePending(false);
 
 //			ProductTypeActionHandler productTypeActionHandler = ProductTypeActionHandler.getProductTypeActionHandler(
@@ -1361,6 +1484,10 @@ public class Trader
 
 		for (Map.Entry<ProductTypeActionHandler, List<Article>> me : productTypeActionHandler2Articles.entrySet()) {
 			me.getKey().onReleaseArticlesEnd(user, this, me.getValue());
+		}
+
+		for (Article article : articles) {
+			article.getArticleLocal().setAllocateReleaseExecID(null);
 		}
 
 		if (deleteAfterRelease) {
@@ -1452,21 +1579,25 @@ public class Trader
 	 * This method creates a top-level-{@link ArticlePrice} (it will be filled
 	 * with nested details in {@link #allocateArticleEnd(User, Article)}).
 	 * </p>
-	 *
+	 * @param allocateExecID TODO
 	 * @param user
 	 *          The user who is responsible for this allocation.
 	 * @param article
 	 *          The <code>Article</code> that shall be allocated. It must have
 	 *          its <code>Product</code> assigned ({@link Article#getProduct()}
 	 *          must not return <code>null</code>).
+	 *
 	 * @throws org.nightlabs.jfire.store.NotAvailableException
 	 *           If the product (or a packaged product) cannot be allocated.
 	 * @throws ModuleException
 	 *           If another error occurs.
 	 */
-	protected void allocateArticlesBegin(User user, Collection<? extends Article> articles)
+	protected void allocateArticlesBegin(String allocateExecID, User user, Collection<? extends Article> articles)
 	throws ModuleException
 	{
+		if (allocateExecID == null)
+			throw new IllegalArgumentException("allocateExecID == null");
+
 		if (logger.isDebugEnabled()) {
 			logger.debug("allocateArticlesBegin: entered with " + articles.size() + " articles.");
 			if (logger.isTraceEnabled()) {
@@ -1481,6 +1612,7 @@ public class Trader
 		try {
 			pm.refreshAll(articles);
 			for (Article article : articles) {
+				pm.refresh(article.getArticleLocal());
 				pm.refresh(article.getProduct().getProductLocal());
 			}
 		} finally {
@@ -1491,20 +1623,15 @@ public class Trader
 			logger.trace("allocateArticlesBegin: refreshing articles done.");
 		}
 
-		// If all articles are currently allocated or the allocation is pending, we
-		// silently return.
-		// If the status is different between them, we throw an
-		// IllegalArgumentException
+		// If all articles are currently allocated or the allocation is pending, we silently return.
+		// If the status is different between them, we throw an IllegalArgumentException.
 		TotalArticleStatus tas = getTotalArticleStatus(articles);
 
 		if (tas.allocated || tas.allocationPending)
 			return;
 
 		if (tas.releasePending)
-			throw new IllegalStateException(
-					"Articles \""
-					+ getToStringList(articles)
-					+ "\" cannot be allocated, because it is currently in state releasePending!");
+			throw new IllegalStateException("Articles \"" + getToStringList(articles) + "\" cannot be allocated, because it is currently in state releasePending!");
 
 		Map<Class<? extends ProductType>, ProductTypeActionHandler> productTypeClass2ProductTypeActionHandler = new HashMap<Class<? extends ProductType>, ProductTypeActionHandler>();
 		for (Article article : articles) {
@@ -1520,6 +1647,7 @@ public class Trader
 
 		Map<ProductTypeActionHandler, List<Article>> productTypeActionHandler2Articles = new HashMap<ProductTypeActionHandler, List<Article>>();
 		for (Article article : articles) {
+			article.getArticleLocal().setAllocateReleaseExecID(allocateExecID);
 			Product product = article.getProduct();
 			if (product == null)
 				throw new IllegalStateException("Article '" + article.getPrimaryKey() + "' does not have a product!");
@@ -1544,8 +1672,9 @@ public class Trader
 			productLocal.setSaleArticle(article);
 			productLocal.setAllocationPending(true);
 			article.setAllocationPending(true);
-			IPackagePriceConfig packagePriceConfig = product.getProductType()
-			.getPackagePriceConfig();
+			article.setAllocationAbandoned(false);
+			article.setAllocationException(null);
+			IPackagePriceConfig packagePriceConfig = product.getProductType().getPackagePriceConfig();
 
 //			pm.flush();
 
@@ -1595,18 +1724,22 @@ public class Trader
 	 * <code>Article</code> and the corresponding <code>ProductLocal</code> to
 	 * status <code>allocationPending</code>, this method assembles the
 	 * ProductLocal recursively.
-	 *
+	 * @param allocateExecID TODO
 	 * @param user
 	 *          The user who is responsible for this allocation.
 	 * @param article
 	 *          The <code>Article</code> that shall be allocated. It must have
 	 *          its <code>Product</code> assigned ({@link Article#getProduct()}
 	 *          must not return <code>null</code>).
+	 *
 	 * @throws ModuleException
 	 */
-	protected void allocateArticlesEnd(User user, Collection<? extends Article> articles)
+	protected void allocateArticlesEnd(String allocateExecID, User user, Collection<? extends Article> articles)
 	throws ModuleException
 	{
+		if (allocateExecID == null)
+			throw new IllegalArgumentException("allocateExecID == null");
+
 		if (logger.isDebugEnabled()) {
 			logger.debug("allocateArticlesEnd: entered with " + articles.size() + " articles.");
 			if (logger.isTraceEnabled()) {
@@ -1615,12 +1748,28 @@ public class Trader
 			}
 		}
 
+		// We remove all Articles that have a different allocate/release exec ID - thus we need our own local HashSet.
+		articles = new HashSet<Article>(articles);
+
 		PersistenceManager pm = getPersistenceManager();
 		NLJDOHelper.enableTransactionSerializeReadObjects(pm);
 		try {
 			pm.refreshAll(articles);
-			for (Article article : articles) {
-				pm.refresh(article.getProduct().getProductLocal());
+			for (Iterator<? extends Article> it = articles.iterator(); it.hasNext(); ) {
+				Article article = it.next();
+				pm.refresh(article.getArticleLocal());
+
+				if (!allocateExecID.equals(article.getArticleLocal().getAllocateReleaseExecID())) {
+					if (logger.isDebugEnabled())
+						logger.debug("allocateArticlesEnd: Article.articleLocal.allocateReleaseExecID != allocateExecID :: " + article.getArticleLocal().getAllocateReleaseExecID() + " != " + allocateExecID + " :: Skipping " + article);
+
+					it.remove();
+					continue;
+				}
+
+				Product product = article.getProduct();
+				if (product != null)
+					pm.refresh(product.getProductLocal());
 			}
 		} finally {
 			NLJDOHelper.disableTransactionSerializeReadObjects(pm);
@@ -1630,13 +1779,17 @@ public class Trader
 			logger.trace("allocateArticlesEnd: refreshing articles done.");
 		}
 
-		TotalArticleStatus tas = getTotalArticleStatus(articles);
-		if (tas.allocated)
+		if (articles.isEmpty())
 			return;
 
-		if (!tas.allocationPending)
-			throw new IllegalArgumentException("Articles "
-					+ getToStringList(articles) + " are NOT in state allocationPending!");
+// It's not necessary to check the status, because we already did all the checks in releaseArticlesBegin and the newly introduced
+// allocateReleaseExecID guarantees that the state is preserved between the first and the second stage. Marco.
+//		TotalArticleStatus tas = getTotalArticleStatus(articles);
+//		if (tas.allocated)
+//			return;
+//
+//		if (!tas.allocationPending)
+//			throw new IllegalArgumentException("Articles " + getToStringList(articles) + " are NOT in state allocationPending!");
 
 		ProductTypeActionHandlerCache productTypeActionHandlerCache = new ProductTypeActionHandlerCache(pm);
 
@@ -1653,8 +1806,12 @@ public class Trader
 			packagePriceConfig.fillArticlePrice(article);
 
 			product.getProductLocal().setAllocated(true);
+			product.getProductLocal().setReleasePending(false);
 			article.setAllocated(true);
+			article.setAllocationException(null);
 			article.setAllocationPending(false);
+			article.setReleasePending(false);
+			article.setReleaseException(null);
 
 			List<Article> al = productTypeActionHandler2Articles.get(productTypeActionHandler);
 			if (al == null) {
@@ -1670,6 +1827,10 @@ public class Trader
 
 		for (Map.Entry<ProductTypeActionHandler, List<Article>> me : productTypeActionHandler2Articles.entrySet()) {
 			(me.getKey()).onAllocateArticlesEnd(user, this, me.getValue());
+		}
+
+		for (Article article : articles) {
+			article.getArticleLocal().setAllocateReleaseExecID(null);
 		}
 
 		if (logger.isTraceEnabled()) {

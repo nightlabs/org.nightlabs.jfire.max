@@ -64,6 +64,7 @@ import org.nightlabs.jfire.asyncinvoke.ErrorCallback;
 import org.nightlabs.jfire.asyncinvoke.Invocation;
 import org.nightlabs.jfire.asyncinvoke.InvocationError;
 import org.nightlabs.jfire.asyncinvoke.UndeliverableCallback;
+import org.nightlabs.jfire.asyncinvoke.UndeliverableCallbackResult;
 import org.nightlabs.jfire.base.JFireEjbFactory;
 import org.nightlabs.jfire.base.Lookup;
 import org.nightlabs.jfire.config.Config;
@@ -899,7 +900,7 @@ public class Trader
 		private static final long serialVersionUID = 1L;
 
 		@Override
-		public void handle(AsyncInvokeEnvelope envelope) throws Exception
+		public UndeliverableCallbackResult handle(AsyncInvokeEnvelope envelope) throws Exception
 		{
 			PersistenceManager pm = getPersistenceManager();
 			try {
@@ -938,6 +939,8 @@ public class Trader
 			} finally {
 				pm.close();
 			}
+
+			return null;
 		}
 	}
 
@@ -1104,7 +1107,7 @@ public class Trader
 		private static final long serialVersionUID = 1L;
 
 		@Override
-		public void handle(AsyncInvokeEnvelope envelope) throws Exception
+		public UndeliverableCallbackResult handle(AsyncInvokeEnvelope envelope) throws Exception
 		{
 			PersistenceManager pm = getPersistenceManager();
 			try {
@@ -1135,6 +1138,8 @@ public class Trader
 			} finally {
 				pm.close();
 			}
+
+			return null;
 		}
 	}
 
@@ -1465,6 +1470,7 @@ public class Trader
 			article.setAllocationException(null);
 			article.setReleaseException(null);
 			article.setReleasePending(false);
+			article.setReleaseAbandoned(false);
 
 //			ProductTypeActionHandler productTypeActionHandler = ProductTypeActionHandler.getProductTypeActionHandler(
 //			getPersistenceManager(), article.getProductType().getClass());
@@ -1810,7 +1816,9 @@ public class Trader
 			article.setAllocated(true);
 			article.setAllocationException(null);
 			article.setAllocationPending(false);
+			article.setAllocationAbandoned(false);
 			article.setReleasePending(false);
+			article.setReleaseAbandoned(false);
 			article.setReleaseException(null);
 
 			List<Article> al = productTypeActionHandler2Articles.get(productTypeActionHandler);

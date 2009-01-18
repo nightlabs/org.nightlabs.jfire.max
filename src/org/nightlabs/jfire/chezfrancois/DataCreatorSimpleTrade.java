@@ -167,7 +167,7 @@ extends DataCreator
 		props.inflate(struct);
 		I18nTextDataField shortDesc;
 		try {
-			shortDesc = (I18nTextDataField)props.getDataField(SimpleProductTypeStruct.DESCRIPTION_SHORT);
+			shortDesc = props.getDataField(SimpleProductTypeStruct.DESCRIPTION_SHORT, I18nTextDataField.class);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -175,7 +175,7 @@ extends DataCreator
 		shortDesc.getI18nText().setText(Locale.GERMAN.getLanguage(), germanShort);
 		I18nTextDataField longDesc;
 		try {
-			longDesc = (I18nTextDataField)props.getDataField(SimpleProductTypeStruct.DESCRIPTION_LONG);
+			longDesc = props.getDataField(SimpleProductTypeStruct.DESCRIPTION_LONG, I18nTextDataField.class);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

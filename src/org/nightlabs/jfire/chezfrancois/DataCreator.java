@@ -54,12 +54,8 @@ import org.nightlabs.jfire.person.PersonStruct;
 import org.nightlabs.jfire.prop.IStruct;
 import org.nightlabs.jfire.prop.PropertySet;
 import org.nightlabs.jfire.prop.StructLocal;
-import org.nightlabs.jfire.prop.datafield.DateDataField;
-import org.nightlabs.jfire.prop.datafield.NumberDataField;
 import org.nightlabs.jfire.prop.datafield.PhoneNumberDataField;
-import org.nightlabs.jfire.prop.datafield.RegexDataField;
 import org.nightlabs.jfire.prop.datafield.SelectionDataField;
-import org.nightlabs.jfire.prop.datafield.TextDataField;
 import org.nightlabs.jfire.prop.exception.DataBlockGroupNotFoundException;
 import org.nightlabs.jfire.prop.exception.DataBlockNotFoundException;
 import org.nightlabs.jfire.prop.exception.DataFieldNotFoundException;
@@ -355,39 +351,41 @@ public class DataCreator
 
 		Person person = new Person(IDGenerator.getOrganisationID(), IDGenerator.nextID(PropertySet.class));
 		person.inflate(personStruct);
-		((TextDataField)person.getDataField(PersonStruct.PERSONALDATA_COMPANY)).setText(company);
-		((TextDataField)person.getDataField(PersonStruct.PERSONALDATA_NAME)).setText(name);
-		((TextDataField)person.getDataField(PersonStruct.PERSONALDATA_FIRSTNAME)).setText(firstName);
-		((RegexDataField)person.getDataField(PersonStruct.INTERNET_EMAIL)).setText(eMail);
-		((DateDataField)person.getDataField(PersonStruct.PERSONALDATA_DATEOFBIRTH)).setDate(dateOfBirth);
+		person.getDataField(PersonStruct.PERSONALDATA_COMPANY).setData(company);
+		person.getDataField(PersonStruct.PERSONALDATA_NAME).setData(name);
+		person.getDataField(PersonStruct.PERSONALDATA_FIRSTNAME).setData(firstName);
+		person.getDataField(PersonStruct.INTERNET_EMAIL).setData(eMail);
+		person.getDataField(PersonStruct.PERSONALDATA_DATEOFBIRTH).setData(dateOfBirth);
 
 		SelectionStructField salutationSelectionStructField = (SelectionStructField) personStruct.getStructField(
 				PersonStruct.PERSONALDATA, PersonStruct.PERSONALDATA_SALUTATION);
 		StructFieldValue sfv = salutationSelectionStructField.getStructFieldValue(PersonStruct.PERSONALDATA_SALUTATION_MR);
-		((SelectionDataField)person.getDataField(PersonStruct.PERSONALDATA_SALUTATION)).setSelection(sfv);
+		person.getDataField(PersonStruct.PERSONALDATA_SALUTATION, SelectionDataField.class).setSelection(sfv);
 
-		((TextDataField)person.getDataField(PersonStruct.PERSONALDATA_TITLE)).setText(title);
-		((TextDataField)person.getDataField(PersonStruct.POSTADDRESS_ADDRESS)).setText(postAdress);
-		((TextDataField)person.getDataField(PersonStruct.POSTADDRESS_POSTCODE)).setText(postCode);
-		((TextDataField)person.getDataField(PersonStruct.POSTADDRESS_CITY)).setText(postCity);
-		((TextDataField)person.getDataField(PersonStruct.POSTADDRESS_REGION)).setText(postRegion);
-		((TextDataField)person.getDataField(PersonStruct.POSTADDRESS_COUNTRY)).setText(postCountry);
+		person.getDataField(PersonStruct.PERSONALDATA_TITLE).setData(title);
+		person.getDataField(PersonStruct.POSTADDRESS_ADDRESS).setData(postAdress);
+		person.getDataField(PersonStruct.POSTADDRESS_POSTCODE).setData(postCode);
+		person.getDataField(PersonStruct.POSTADDRESS_CITY).setData(postCity);
+		person.getDataField(PersonStruct.POSTADDRESS_REGION).setData(postRegion);
+		person.getDataField(PersonStruct.POSTADDRESS_COUNTRY).setData(postCountry);
 
-		((PhoneNumberDataField)person.getDataField(PersonStruct.PHONE_PRIMARY)).setCountryCode(phoneCountryCode);
-		((PhoneNumberDataField)person.getDataField(PersonStruct.PHONE_PRIMARY)).setAreaCode(phoneAreaCode);
-		((PhoneNumberDataField)person.getDataField(PersonStruct.PHONE_PRIMARY)).setLocalNumber(phoneNumber);
+		PhoneNumberDataField phoneNumberDF = person.getDataField(PersonStruct.PHONE_PRIMARY, PhoneNumberDataField.class);
+		phoneNumberDF.setCountryCode(phoneCountryCode);
+		phoneNumberDF.setAreaCode(phoneAreaCode);
+		phoneNumberDF.setLocalNumber(phoneNumber);
 
-		((PhoneNumberDataField)person.getDataField(PersonStruct.FAX)).setCountryCode(faxCountryCode);
-		((PhoneNumberDataField)person.getDataField(PersonStruct.FAX)).setAreaCode(faxAreaCode);
-		((PhoneNumberDataField)person.getDataField(PersonStruct.FAX)).setLocalNumber(faxNumber);
+		PhoneNumberDataField faxDF = person.getDataField(PersonStruct.FAX, PhoneNumberDataField.class);
+		faxDF.setCountryCode(faxCountryCode);
+		faxDF.setAreaCode(faxAreaCode);
+		faxDF.setLocalNumber(faxNumber);
 
-		((TextDataField)person.getDataField(PersonStruct.BANKDATA_ACCOUNTHOLDER)).setText(bankAccountHolder);
-		((TextDataField)person.getDataField(PersonStruct.BANKDATA_ACCOUNTNUMBER)).setText(bankAccountNumber);
-		((TextDataField)person.getDataField(PersonStruct.BANKDATA_BANKCODE)).setText(bankCode);
-		((TextDataField)person.getDataField(PersonStruct.BANKDATA_BANKNAME)).setText(bankName);
+		person.getDataField(PersonStruct.BANKDATA_ACCOUNTHOLDER).setData(bankAccountHolder);
+		person.getDataField(PersonStruct.BANKDATA_ACCOUNTNUMBER).setData(bankAccountNumber);
+		person.getDataField(PersonStruct.BANKDATA_BANKCODE).setData(bankCode);
+		person.getDataField(PersonStruct.BANKDATA_BANKNAME).setData(bankName);
 
-		((TextDataField)person.getDataField(PersonStruct.CREDITCARD_CREDITCARDHOLDER)).setText(creditCardHolder);
-		((TextDataField)person.getDataField(PersonStruct.CREDITCARD_NUMBER)).setText(creditCardNumber);
+		person.getDataField(PersonStruct.CREDITCARD_CREDITCARDHOLDER).setData(creditCardHolder);
+		person.getDataField(PersonStruct.CREDITCARD_NUMBER).setData(creditCardNumber);
 
 //		((NumberDataField)person.getDataField(PersonStruct.CREDITCARD_EXPIRYMONTH)).setValue(creditCardExpiryMonth);
 
@@ -397,11 +395,11 @@ public class DataCreator
 			sfv = null;
 		else
 			sfv = expiryMonthStructField.getStructFieldValue(PersonStruct.CREDITCARD_EXPIRYMONTHS[creditCardExpiryMonth - 1]);
-		((SelectionDataField)person.getDataField(PersonStruct.CREDITCARD_EXPIRYMONTH)).setSelection(sfv);
+		person.getDataField(PersonStruct.CREDITCARD_EXPIRYMONTH, SelectionDataField.class).setSelection(sfv);
 
-		((NumberDataField)person.getDataField(PersonStruct.CREDITCARD_EXPIRYYEAR)).setValue(creditCardExpiryYear);
+		person.getDataField(PersonStruct.CREDITCARD_EXPIRYYEAR).setData(creditCardExpiryYear);
 
-		((TextDataField)person.getDataField(PersonStruct.COMMENT_COMMENT)).setText(comment);
+		person.getDataField(PersonStruct.COMMENT_COMMENT).setData(comment);
 
 		person.setAutoGenerateDisplayName(true);
 		person.setDisplayName(null, personStruct);
@@ -429,11 +427,10 @@ public class DataCreator
 		IStruct personStruct = getPersonStruct();
 		Person person = new Person(IDGenerator.getOrganisationID(), IDGenerator.nextID(PropertySet.class));
 		person.inflate(personStruct);
-		((TextDataField)person.getDataField(PersonStruct.PERSONALDATA_COMPANY)).setText(company);
-		((TextDataField)person.getDataField(PersonStruct.PERSONALDATA_NAME)).setText(name);
-		((TextDataField)person.getDataField(PersonStruct.PERSONALDATA_FIRSTNAME)).setText(firstName);
-		((RegexDataField)person.getDataField(PersonStruct.INTERNET_EMAIL)).setText(eMail);
-		//((TextDataField)person.getDataField(PersonStruct.INTERNET_EMAIL)).setText(eMail);
+		person.getDataField(PersonStruct.PERSONALDATA_COMPANY).setData(company);
+		person.getDataField(PersonStruct.PERSONALDATA_NAME).setData(name);
+		person.getDataField(PersonStruct.PERSONALDATA_FIRSTNAME).setData(firstName);
+		person.getDataField(PersonStruct.INTERNET_EMAIL).setData(eMail);
 		person.setAutoGenerateDisplayName(true);
 		person.setDisplayName(null, personStruct);
 		person.deflate();

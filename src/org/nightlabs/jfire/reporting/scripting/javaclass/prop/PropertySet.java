@@ -233,7 +233,7 @@ extends AbstractJFSScriptExecutorDelegate
 				}
 				else if (II18nTextDataField.class.isAssignableFrom(structField.getDataFieldClass())) {
 					if (field != null) {
-						elements.add(((II18nTextDataField) field).getText(locale));
+						elements.add(((II18nTextDataField) field).getI18nText().getText());
 					} else {
 						elements.add("");
 					}

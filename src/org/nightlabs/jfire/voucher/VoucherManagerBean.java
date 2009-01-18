@@ -51,7 +51,6 @@ import org.nightlabs.jfire.person.PersonStruct;
 import org.nightlabs.jfire.prop.IStruct;
 import org.nightlabs.jfire.prop.PropertySet;
 import org.nightlabs.jfire.prop.StructLocal;
-import org.nightlabs.jfire.prop.datafield.TextDataField;
 import org.nightlabs.jfire.scripting.Script;
 import org.nightlabs.jfire.scripting.ScriptRegistry;
 import org.nightlabs.jfire.scripting.ScriptRegistryItem;
@@ -1105,13 +1104,9 @@ implements SessionBean
 				Person person = new Person(getOrganisationID(), IDGenerator
 						.nextID(PropertySet.class));
 				person.inflate(personStruct);
-				((TextDataField) person.getDataField(PersonStruct.PERSONALDATA_COMPANY))
-				.setText("NightLabs GmbH");
-				((TextDataField) person.getDataField(PersonStruct.PERSONALDATA_NAME))
-				.setText("Schulze");
-				((TextDataField) person
-						.getDataField(PersonStruct.PERSONALDATA_FIRSTNAME))
-						.setText("Marco");
+				person.getDataField(PersonStruct.PERSONALDATA_COMPANY).setData("NightLabs GmbH");
+				person.getDataField(PersonStruct.PERSONALDATA_NAME).setData("Schulze");
+				person.getDataField(PersonStruct.PERSONALDATA_FIRSTNAME).setData("Marco");
 				person.deflate();
 
 				LegalEntity customer = new LegalEntity(getOrganisationID(),

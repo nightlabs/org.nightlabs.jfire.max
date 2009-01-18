@@ -32,7 +32,7 @@ public class HTMLDataField extends DataField
 	/**
 	 * The serial version of this class.
 	 */
-	private static final long serialVersionUID = 2L;
+	private static final long serialVersionUID = 20090116L;
 
 	/**
 	 * key: String languageID<br/>
@@ -249,5 +249,20 @@ public class HTMLDataField extends DataField
 	public IFCKEditorContent getContent(String languageId)
 	{
 		return new HTMLDataFieldFCKEditorContent(this, languageId);
+	}
+
+	@Override
+	public Object getData() {
+		return getContent(NLLocale.getDefault().getLanguage());
+	}
+
+	@Override
+	public void setData(Object data) {
+		throw new UnsupportedOperationException(this.getClass().getName() + " does not implement setData() yet.");
+	}
+
+	@Override
+	public boolean supportsInputType(Class<?> inputType) {
+		return false;
 	}
 }

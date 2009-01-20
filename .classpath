@@ -34,5 +34,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireJbpm"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/NightLabsQueryJDO"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/NightLabsQuery"/>
+	<classpathentry kind="var" path="JBOSS/server/default/lib/mail.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

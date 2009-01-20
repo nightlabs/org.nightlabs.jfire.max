@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
 import javax.ejb.CreateException;
@@ -20,6 +21,11 @@ import javax.jdo.JDODetachedFieldAccessException;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
+import javax.mail.Message;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 
 import org.apache.log4j.Logger;
 import org.jbpm.JbpmContext;
@@ -57,8 +63,16 @@ import org.nightlabs.jfire.issue.project.id.ProjectTypeID;
 import org.nightlabs.jfire.issue.prop.IssueStruct;
 import org.nightlabs.jfire.jbpm.JbpmLookup;
 import org.nightlabs.jfire.jbpm.graph.def.State;
+import org.nightlabs.jfire.person.PersonStruct;
+import org.nightlabs.jfire.prop.datafield.TextDataField;
+import org.nightlabs.jfire.prop.exception.DataBlockGroupNotFoundException;
+import org.nightlabs.jfire.prop.exception.DataBlockNotFoundException;
+import org.nightlabs.jfire.prop.exception.DataFieldNotFoundException;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.security.User;
+import org.nightlabs.jfire.security.dao.UserDAO;
+import org.nightlabs.jfire.security.id.UserID;
+import org.nightlabs.progress.NullProgressMonitor;
 import org.nightlabs.util.Util;
 
 /**
@@ -1093,6 +1107,72 @@ implements SessionBean
 		} finally {
 			pm.close();
 		}
+	}
+	
+	/**
+	 * @throws ModuleException
+	 *
+	 * @ejb.interface-method
+	 * @ejb.transaction type="Required"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	public void sendRemindEMail(String messageString, String subject, UserID senderID, Set<UserID> recipientIDs)
+	{
+		User sender = UserDAO.sharedInstance().getUser(senderID, 
+				new String[]{User.FETCH_GROUP_PERSON, User.FETCH_GROUP_NAME},
+				NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT, new NullProgressMonitor());
+		String senderEmail = "";
+		try {
+			senderEmail = ((TextDataField)sender.getPerson().getDataField(PersonStruct.INTERNET_EMAIL)).getText();
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+		
+		List<User> recipients = UserDAO.sharedInstance().getUsers(recipientIDs, 
+				new String[]{User.FETCH_GROUP_PERSON, User.FETCH_GROUP_NAME},
+				NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT, new NullProgressMonitor());
+		
+		Properties props = new Properties();
+		props.setProperty("mail.transport.protocol", "smtp");
+		props.setProperty("mail.host", "classic.asianet.co.th");
+		props.setProperty("mail.user", senderEmail);
+		props.setProperty("mail.password", "");
+		Session session = Session.getDefaultInstance(props, null);
+		try {
+			Transport transport = session.getTransport();
+			MimeMessage message = new MimeMessage(session);
+			message.setSubject(subject);
+			message.setContent(messageString, "text/plain");
+			message.setFrom(new InternetAddress(senderEmail));
+
+			try {
+				for (User recipient : recipients) {
+					String recipientEmail = 
+						((TextDataField)recipient.getPerson().getDataField(PersonStruct.INTERNET_EMAIL)).getText();
+					message.setRecipient(Message.RecipientType.TO, new InternetAddress(recipientEmail));
+				}
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+			message.setRecipient(Message.RecipientType.TO, new InternetAddress("chairat@guinaree.com"));
+			
+			transport.connect();
+			transport.sendMessage(message, message.getRecipients(Message.RecipientType.TO));
+			transport.close();
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e); 
+		}
+//		PersistenceManager pm = getPersistenceManager();
+//		try {
+//			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+//			if (fetchGroups != null)
+//				pm.getFetchPlan().setGroups(fetchGroups);
+//
+//			Query q = pm.newQuery(IssueResolution.class);
+//		} finally {
+//			pm.close();
+//		}
 	}
 
 	//Bean//

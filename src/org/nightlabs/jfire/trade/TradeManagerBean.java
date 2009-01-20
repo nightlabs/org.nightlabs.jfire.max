@@ -2239,6 +2239,12 @@ implements SessionBean
 		// TODO: check/add rightsmanagement
 		PersistenceManager pm = getPersistenceManager();
 		try {
+			// check if reservation is tried to be done for anonymous customer
+			LegalEntity anonymousLegalEntity = LegalEntity.getAnonymousLegalEntity(pm);
+			AnchorID anonymousID = (AnchorID) JDOHelper.getObjectId(anonymousLegalEntity);
+			if (customerID.equals(anonymousID)) {
+				throw new IllegalArgumentException("Can not make an reservation for the anonymous customer!");
+			}
 			Order order = (Order) pm.getObjectById(orderID);
 			LegalEntity customer = (LegalEntity) pm.getObjectById(customerID);
 			Trader trader = Trader.getTrader(pm);

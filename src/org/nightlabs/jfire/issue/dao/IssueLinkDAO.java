@@ -55,7 +55,8 @@ extends BaseJDOObjectDAO<IssueLinkID, IssueLink>
 	{
 		try {
 			IssueManager im = JFireEjbFactory.getBean(IssueManager.class, SecurityReflector.getInitialContextProperties());
-			Collection<IssueLink> result = im.getIssueLinksByOrganisationIDAndLinkedObjectID(organisationID, linkedObjectID);
+			Collection<IssueLink> result = 
+				getJDOObjects(null, im.getIssueLinkIDsByOrganisationIDAndLinkedObjectID(organisationID, linkedObjectID), fetchGroups, maxFetchDepth, monitor);
 			return result;
 		} catch (Exception e) {
 			throw new RuntimeException(e);

@@ -591,7 +591,7 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@SuppressWarnings("unchecked")
-	public Collection<IssueLink> getIssueLinksByOrganisationIDAndLinkedObjectID(String organisationID, String linkedObjectID)
+	public Collection<IssueLinkID> getIssueLinkIDsByOrganisationIDAndLinkedObjectID(String organisationID, String linkedObjectID)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -599,7 +599,8 @@ implements SessionBean
 			Map<String, Object> params = new HashMap<String, Object>(2);
 			params.put("organisationID", organisationID);
 			params.put("linkedObjectID", linkedObjectID);
-			return (Collection<IssueLink>) q.executeWithMap(params);
+
+			return NLJDOHelper.getObjectIDSet((Collection<IssueLink>) q.executeWithMap(params));
 		} finally {
 			pm.close();
 		}

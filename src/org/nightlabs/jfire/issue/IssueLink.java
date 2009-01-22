@@ -52,12 +52,12 @@ import org.nightlabs.util.Util;
  *				this.issueLinkType == :issueLinkType &&
  *				this.linkedObjectID == :linkedObjectID"
  *
- * @!jdo.query
- *		name="getIssueLinkByLinkedObjectID"
+ * @jdo.query
+ *		name="getIssueLinksByOrganisationIDAndLinkedObjectID"
  *		query="SELECT
- *			WHERE this.linkedObjectID == paramLinkedObjectID
- *			PARAMETERS String paramLinkedObjectID
- *			import java.lang.String"
+ *			WHERE
+ *				this.organisationID == :organisationID && 
+ *				this.linkedObjectID == :linkedObjectID"
  *
  * jdo.fetch-group name="IssueLink.linkedObjectID" fetch-groups="default" fields="linkedObjectID"
  * jdo.fetch-group name="IssueLink.linkedObjectClass" fetch-groups="default" fields="linkedObjectClass"

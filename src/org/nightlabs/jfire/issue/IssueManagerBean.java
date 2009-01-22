@@ -33,6 +33,7 @@ import org.jbpm.graph.exe.ProcessInstance;
 import org.nightlabs.ModuleException;
 import org.nightlabs.jdo.FetchPlanBackup;
 import org.nightlabs.jdo.NLJDOHelper;
+import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
 import org.nightlabs.jdo.query.AbstractJDOQuery;
 import org.nightlabs.jdo.query.AbstractSearchQuery;
@@ -47,6 +48,7 @@ import org.nightlabs.jfire.issue.history.id.IssueHistoryID;
 import org.nightlabs.jfire.issue.id.IssueCommentID;
 import org.nightlabs.jfire.issue.id.IssueFileAttachmentID;
 import org.nightlabs.jfire.issue.id.IssueID;
+import org.nightlabs.jfire.issue.id.IssueLinkID;
 import org.nightlabs.jfire.issue.id.IssueLinkTypeID;
 import org.nightlabs.jfire.issue.id.IssueLocalID;
 import org.nightlabs.jfire.issue.id.IssuePriorityID;
@@ -65,9 +67,6 @@ import org.nightlabs.jfire.jbpm.JbpmLookup;
 import org.nightlabs.jfire.jbpm.graph.def.State;
 import org.nightlabs.jfire.person.PersonStruct;
 import org.nightlabs.jfire.prop.datafield.TextDataField;
-import org.nightlabs.jfire.prop.exception.DataBlockGroupNotFoundException;
-import org.nightlabs.jfire.prop.exception.DataBlockNotFoundException;
-import org.nightlabs.jfire.prop.exception.DataFieldNotFoundException;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.security.dao.UserDAO;
@@ -551,6 +550,61 @@ implements SessionBean
 		}
 	}
 
+	//IssueLink//
+	/**
+	 * @ejb.interface-method
+	 * @!ejb.transaction type="Supports"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	@SuppressWarnings("unchecked")
+	public List<IssueLink> getIssueLinks(Collection<IssueLinkID> issueLinkIDs, String[] fetchGroups, int maxFetchDepth)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			return NLJDOHelper.getDetachedObjectList(pm, issueLinkIDs, IssueLink.class, fetchGroups, maxFetchDepth);
+		} finally {
+			pm.close();
+		}
+	}
+	
+	/**
+	 * @ejb.interface-method
+	 * @!ejb.transaction type="Supports"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	@SuppressWarnings("unchecked")
+	public Set<IssueLinkID> getIssueLinkIDs()
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			Query q = pm.newQuery(IssueLink.class);
+			q.setResult("JDOHelper.getObjectId(this)");
+			return new HashSet<IssueLinkID>((Collection)q.execute());
+		} finally {
+			pm.close();
+		}
+	}
+	
+	/**
+	 * @ejb.interface-method
+	 * @!ejb.transaction type="Supports"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	@SuppressWarnings("unchecked")
+	public Collection<IssueLink> getIssueLinksByOrganisationIDAndLinkedObjectID(String organisationID, String linkedObjectID)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			Query q = pm.newNamedQuery(IssueLink.class, "getIssueLinksByOrganisationIDAndLinkedObjectID");
+			Map<String, Object> params = new HashMap<String, Object>(2);
+			params.put("organisationID", organisationID);
+			params.put("linkedObjectID", linkedObjectID);
+			return (Collection<IssueLink>) q.executeWithMap(params);
+		} finally {
+			pm.close();
+		}
+	}
+	
 	//Issue//
 	/**
 	 * Stores the given Issue. If the issue is a new issue, do the initializing process instance.

@@ -13,7 +13,6 @@ import org.jbpm.graph.def.GraphElement;
 import org.jbpm.graph.exe.ExecutionContext;
 import org.jbpm.graph.node.EndState;
 import org.jbpm.instantiation.Delegation;
-import org.nightlabs.annotation.Implement;
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.security.SecurityReflector;
@@ -114,7 +113,6 @@ extends AbstractActionHandler
 	}
 
 	@Override
-	@Implement
 	protected void doExecute(ExecutionContext executionContext)
 			throws Exception
 	{

@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import org.nightlabs.annotation.Implement;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.jbpm.JbpmManager;
 import org.nightlabs.jfire.jbpm.JbpmManagerUtil;
@@ -30,7 +29,6 @@ public class TransitionDAO
 	protected TransitionDAO() { }
 
 	@Override
-	@Implement
 	protected Collection<Transition> retrieveJDOObjects(
 			Set<TransitionID> transitionIDs, String[] fetchGroups, int maxFetchDepth,
 			ProgressMonitor monitor)

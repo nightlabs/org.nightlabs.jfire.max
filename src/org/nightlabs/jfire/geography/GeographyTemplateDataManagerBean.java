@@ -49,7 +49,6 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
 import org.apache.log4j.Logger;
-import org.nightlabs.annotation.Implement;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
 import org.nightlabs.jfire.asyncinvoke.AsyncInvoke;
@@ -296,7 +295,6 @@ implements SessionBean
 		private static final long serialVersionUID = 1L;
 
 		@Override
-		@Implement
 		public Serializable invoke()
 		throws Exception
 		{

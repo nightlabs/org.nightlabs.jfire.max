@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.StringTokenizer;
 
 import org.apache.log4j.Logger;
-import org.nightlabs.annotation.Implement;
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.util.CollectionUtil;
@@ -238,7 +237,6 @@ extends Geography
 	}
 
 	@Override
-	@Implement
 	protected void loadCountries()
 	{
 		int row = 0;
@@ -317,7 +315,6 @@ extends Geography
 	}
 
 	@Override
-	@Implement
 	protected void loadRegions(String countryID)
 	{
 		Country country = countries.get(countryID);
@@ -423,7 +420,6 @@ extends Geography
 	}
 
 	@Override
-	@Implement
 	protected void loadCities(String countryID)
 	{
 		int row = 0;
@@ -527,7 +523,6 @@ extends Geography
 	}
 
 	@Override
-	@Implement
 	protected void loadDistricts(String countryID)
 	{
 		int row = 0;
@@ -654,7 +649,6 @@ extends Geography
 	}
 
 	@Override
-	@Implement
 	protected void loadZips(String countryID)
 	{
 		int row = 0;
@@ -760,7 +754,6 @@ extends Geography
 	}
 
 	@Override
-	@Implement
 	protected void loadLocations(String countryID)
 	{
 		int row = 0;

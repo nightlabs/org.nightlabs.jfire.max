@@ -9,9 +9,7 @@ import java.util.Set;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 
-import org.nightlabs.annotation.Implement;
 import org.nightlabs.jfire.accounting.Account;
-import org.nightlabs.jfire.accounting.Accounting;
 import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.accounting.InvoiceMoneyTransfer;
 import org.nightlabs.jfire.accounting.book.BookMoneyTransfer;

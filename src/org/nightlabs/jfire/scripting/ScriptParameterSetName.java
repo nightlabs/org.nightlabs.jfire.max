@@ -29,7 +29,6 @@ package org.nightlabs.jfire.scripting;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.nightlabs.annotation.Implement;
 import org.nightlabs.i18n.I18nText;
 
 /**
@@ -100,14 +99,12 @@ extends I18nText
 	}
 
 	@Override
-	@Implement
 	protected Map<String, String> getI18nMap()
 	{
 		return names;
 	}
 
 	@Override
-	@Implement
 	protected String getFallBackValue(String languageID)
 	{
 		return ScriptParameterSet.getPrimaryKey(organisationID, scriptParameterSetID);

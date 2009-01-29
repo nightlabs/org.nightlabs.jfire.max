@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import org.nightlabs.annotation.Implement;
 import org.nightlabs.jfire.accounting.priceconfig.id.PriceConfigID;
 import org.nightlabs.jfire.base.JFireEjbFactory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
@@ -30,7 +29,6 @@ extends BaseJDOObjectDAO<PriceConfigID, DynamicTradePriceConfig>
 	}
 
 	@Override
-	@Implement
 	protected Collection<DynamicTradePriceConfig> retrieveJDOObjects(
 			Set<PriceConfigID> dynamicTradePriceConfigIDs, String[] fetchGroups, int maxFetchDepth,
 			ProgressMonitor monitor)

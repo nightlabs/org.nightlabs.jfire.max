@@ -5,7 +5,6 @@ import java.util.Collection;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
-import org.nightlabs.annotation.Implement;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 
@@ -83,7 +82,6 @@ extends ProductType
 	}
 
 	@Override
-	@Implement
 	protected void calculatePrices()
 	{
 		// Nothing to do, because DynamicProducts have dynamic prices that are entered

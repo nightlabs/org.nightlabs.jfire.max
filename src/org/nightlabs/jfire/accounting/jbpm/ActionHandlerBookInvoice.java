@@ -8,7 +8,6 @@ import org.jbpm.graph.def.Event;
 import org.jbpm.graph.def.Node;
 import org.jbpm.graph.exe.ExecutionContext;
 import org.jbpm.instantiation.Delegation;
-import org.nightlabs.annotation.Implement;
 import org.nightlabs.jfire.accounting.Accounting;
 import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.accounting.id.InvoiceID;
@@ -38,7 +37,6 @@ extends AbstractActionHandler
 	}
 
 	@Override
-	@Implement
 	protected void doExecute(ExecutionContext executionContext)
 	throws Exception
 	{

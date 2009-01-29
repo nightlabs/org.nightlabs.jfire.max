@@ -29,7 +29,6 @@ package org.nightlabs.jfire.accounting;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.nightlabs.annotation.Implement;
 import org.nightlabs.i18n.I18nText;
 
 /**
@@ -150,14 +149,12 @@ public class ManualMoneyTransferReason extends I18nText
 	}
 
 	@Override
-	@Implement
 	protected Map<String, String> getI18nMap()
 	{
 		return texts;
 	}
 
 	@Override
-	@Implement
 	protected String getFallBackValue(String languageID)
 	{
 		return "";

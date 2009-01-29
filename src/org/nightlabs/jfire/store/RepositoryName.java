@@ -29,7 +29,6 @@ package org.nightlabs.jfire.store;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.nightlabs.annotation.Implement;
 import org.nightlabs.i18n.I18nText;
 import org.nightlabs.jfire.transfer.Anchor;
 
@@ -106,13 +105,11 @@ public class RepositoryName extends I18nText
 	protected Map<String, String> names;
 
 	@Override
-	@Implement
 	protected Map<String, String> getI18nMap() {
 		return names;
 	}
 
 	@Override
-	@Implement
 	protected String getFallBackValue(String languageID) {
 		return Anchor.getPrimaryKey(organisationID, anchorTypeID, anchorID);
 //		return anchorID;

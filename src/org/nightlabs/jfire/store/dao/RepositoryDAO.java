@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import org.nightlabs.annotation.Implement;
 import org.nightlabs.jdo.query.QueryCollection;
 import org.nightlabs.jfire.base.JFireEjbFactory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
@@ -34,7 +33,6 @@ extends BaseJDOObjectDAO<AnchorID, Repository>
 
 	@Override
 	@SuppressWarnings("unchecked")
-	@Implement
 	protected Collection<Repository> retrieveJDOObjects(Set<AnchorID> objectIDs, String[] fetchGroups,
 			int maxFetchDepth, ProgressMonitor monitor)
 			throws Exception

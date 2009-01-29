@@ -2,7 +2,6 @@ package org.nightlabs.jfire.accounting.query;
 
 import javax.jdo.Query;
 
-import org.nightlabs.annotation.Implement;
 import org.nightlabs.jfire.transfer.id.TransferID;
 
 public class MoneyTransferIDQuery
@@ -10,7 +9,6 @@ public class MoneyTransferIDQuery
 {
 	private static final long serialVersionUID = 1L;
 
-	@Implement
 	@Override
 	protected void setQueryResult(Query q)
 	{
@@ -22,5 +20,4 @@ public class MoneyTransferIDQuery
 	{
 		return TransferID.class;
 	}
-	
 }

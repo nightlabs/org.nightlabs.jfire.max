@@ -3,7 +3,6 @@ package org.nightlabs.jfire.store.deliver;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 
-import org.nightlabs.annotation.Implement;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.store.deliver.id.ServerDeliveryProcessorID;
 import org.nightlabs.jfire.transfer.Anchor;
@@ -52,7 +51,6 @@ extends ServerDeliveryProcessor
 	}
 
 	@Override
-	@Implement
 	protected DeliveryResult externalDeliverBegin(DeliverParams deliverParams)
 			throws DeliveryException
 	{
@@ -60,7 +58,6 @@ extends ServerDeliveryProcessor
 	}
 
 	@Override
-	@Implement
 	protected DeliveryResult externalDeliverCommit(DeliverParams deliverParams)
 			throws DeliveryException
 	{
@@ -69,7 +66,6 @@ extends ServerDeliveryProcessor
 	}
 
 	@Override
-	@Implement
 	protected DeliveryResult externalDeliverDoWork(DeliverParams deliverParams)
 			throws DeliveryException
 	{
@@ -78,7 +74,6 @@ extends ServerDeliveryProcessor
 	}
 
 	@Override
-	@Implement
 	protected DeliveryResult externalDeliverRollback(DeliverParams deliverParams)
 			throws DeliveryException
 	{
@@ -87,7 +82,6 @@ extends ServerDeliveryProcessor
 	}
 
 	@Override
-	@Implement
 	public Anchor getAnchorOutside(DeliverParams deliverParams)
 	{
 		return getRepositoryOutside(deliverParams, null);
@@ -97,5 +91,4 @@ extends ServerDeliveryProcessor
 //		Repository outsideRepository = PartnerStorekeeper.createPartnerOutsideRepository(pm, organisationID, partner);
 //		return outsideRepository;
 	}
-
 }

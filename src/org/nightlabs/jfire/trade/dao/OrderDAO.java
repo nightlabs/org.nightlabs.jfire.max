@@ -10,7 +10,6 @@ import java.util.Set;
 
 import javax.jdo.JDOHelper;
 
-import org.nightlabs.annotation.Implement;
 import org.nightlabs.jdo.query.AbstractJDOQuery;
 import org.nightlabs.jdo.query.QueryCollection;
 import org.nightlabs.jfire.base.JFireEjbFactory;
@@ -54,7 +53,6 @@ public class OrderDAO extends BaseJDOObjectDAO<OrderID, Order> {
 	 */
 	@Override
 	@SuppressWarnings("unchecked")//$NON-NLS-1$
-	@Implement
 	protected Collection<Order> retrieveJDOObjects(Set<OrderID> orderIDs,
 			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 			throws Exception {

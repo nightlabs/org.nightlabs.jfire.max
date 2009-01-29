@@ -7,7 +7,6 @@ import org.jbpm.graph.def.Event;
 import org.jbpm.graph.def.Node;
 import org.jbpm.graph.exe.ExecutionContext;
 import org.jbpm.instantiation.Delegation;
-import org.nightlabs.annotation.Implement;
 import org.nightlabs.jfire.jbpm.graph.def.AbstractActionHandler;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.security.User;
@@ -35,7 +34,6 @@ extends AbstractActionHandler
 	}
 
 	@Override
-	@Implement
 	protected void doExecute(ExecutionContext executionContext)
 	throws Exception
 	{
@@ -46,5 +44,4 @@ extends AbstractActionHandler
 		deliveryNote.setFinalized(user);
 //		ActionHandlerFinalizeDeliveryNote.doExecute(pm, deliveryNote);
 	}
-
 }

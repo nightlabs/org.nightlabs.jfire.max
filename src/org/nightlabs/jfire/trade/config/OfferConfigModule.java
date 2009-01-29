@@ -5,7 +5,6 @@ import java.util.Date;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 
-import org.nightlabs.annotation.Implement;
 import org.nightlabs.jfire.config.ConfigModule;
 import org.nightlabs.jfire.trade.Offer;
 
@@ -32,7 +31,6 @@ public class OfferConfigModule
 	public OfferConfigModule() { }
 
 	@Override
-	@Implement
 	public void init() {
 		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
 		if (pm == null)

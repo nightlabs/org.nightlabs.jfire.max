@@ -6,7 +6,6 @@ import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 
 import org.apache.log4j.Logger;
-import org.nightlabs.annotation.Implement;
 import org.nightlabs.jfire.config.Config;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.security.SecurityReflector;
@@ -77,14 +76,12 @@ extends ServerDeliveryProcessor
 	}
 
 	@Override
-	@Implement
 	public Anchor getAnchorOutside(DeliverParams deliverParams) {
 		// I think this doesn't matter since the delivery will be postponed anyway and thus no transfer done.
 		return getRepositoryOutside(deliverParams, "anchorOutside.deliveryQueue"); //$NON-NLS-1$
 	}
 
 	@Override
-	@Implement
 	protected DeliveryResult externalDeliverBegin(DeliverParams deliverParams) throws DeliveryException {
 		// Attach DeliveryActionHandlerDeliveryQueue
 		PersistenceManager pm = getPersistenceManager();
@@ -95,7 +92,6 @@ extends ServerDeliveryProcessor
 	}
 
 	@Override
-	@Implement
 	protected DeliveryResult externalDeliverDoWork(DeliverParams deliverParams) throws DeliveryException {
 		DeliveryQueue targetDeliveryQueue = getTargetDeliveryQueue(deliverParams);
 		targetDeliveryQueue.addDelivery(deliverParams.deliveryData.getDelivery());
@@ -104,14 +100,12 @@ extends ServerDeliveryProcessor
 	}
 
 	@Override
-	@Implement
 	protected DeliveryResult externalDeliverCommit(DeliverParams deliverParams) throws DeliveryException {
 		// Nothing to do
 		return null; // should automatically be correct ;-)
 	}
 
 	@Override
-	@Implement
 	protected DeliveryResult externalDeliverRollback(DeliverParams deliverParams) throws DeliveryException {
 		DeliveryQueue targetDeliveryQueue = getTargetDeliveryQueue(deliverParams);
 		targetDeliveryQueue.removeDelivery(deliverParams.deliveryData.getDelivery());

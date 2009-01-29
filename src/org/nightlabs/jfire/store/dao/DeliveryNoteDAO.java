@@ -10,7 +10,6 @@ import java.util.Set;
 
 import javax.jdo.JDOHelper;
 
-import org.nightlabs.annotation.Implement;
 import org.nightlabs.jdo.query.AbstractJDOQuery;
 import org.nightlabs.jdo.query.QueryCollection;
 import org.nightlabs.jfire.base.JFireEjbFactory;
@@ -34,7 +33,6 @@ public class DeliveryNoteDAO extends BaseJDOObjectDAO<DeliveryNoteID, DeliveryNo
 	}
 
 	@Override
-	@Implement
 	protected Collection<DeliveryNote> retrieveJDOObjects(
 			Set<DeliveryNoteID> deliveryNoteIDs, String[] fetchGroups,
 			int maxFetchDepth, ProgressMonitor monitor) throws Exception {

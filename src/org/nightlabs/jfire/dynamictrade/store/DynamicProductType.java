@@ -50,6 +50,7 @@ extends ProductType
 	 * @param parentProductTypeID The <tt>ProductType</tt> of which to find all children or <tt>null</tt> to find all top-level-<tt>DynamicProductType</tt>s.
 	 * @return Returns instances of <tt>DynamicProductType</tt>.
 	 */
+	@SuppressWarnings("unchecked")
 	public static Collection<DynamicProductType> getChildProductTypes(PersistenceManager pm, ProductTypeID parentProductTypeID)
 	{
 		if (parentProductTypeID == null) {

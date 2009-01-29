@@ -28,6 +28,7 @@ extends BaseJDOObjectDAO<PriceConfigID, DynamicTradePriceConfig>
 		return sharedInstance;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	protected Collection<DynamicTradePriceConfig> retrieveJDOObjects(
 			Set<PriceConfigID> dynamicTradePriceConfigIDs, String[] fetchGroups, int maxFetchDepth,
@@ -48,6 +49,7 @@ extends BaseJDOObjectDAO<PriceConfigID, DynamicTradePriceConfig>
 
 	private DynamicTradeManager dynamicTradeManager;
 
+	@SuppressWarnings("unchecked")
 	public List<DynamicTradePriceConfig> getDynamicTradePriceConfigs(String[] fetchGroups, int maxFetchDepth,
 			ProgressMonitor monitor)
 	{

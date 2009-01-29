@@ -54,6 +54,7 @@ implements IJDOObjectDAO<DynamicProductType>
 
 	private DynamicTradeManager dynamicTradeManager;
 
+	@SuppressWarnings("unchecked")
 	public synchronized List<DynamicProductType> getChildDynamicProductTypes(ProductTypeID parentDynamicProductTypeID,
 			String[] fetchGroups, int maxFetchDepth,
 			ProgressMonitor monitor)

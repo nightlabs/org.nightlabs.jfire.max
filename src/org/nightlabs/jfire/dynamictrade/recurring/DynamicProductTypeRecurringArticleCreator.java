@@ -15,12 +15,10 @@ import org.nightlabs.jfire.trade.Segment;
 import org.nightlabs.jfire.trade.Trader;
 
 /**
- *
  * @author Fitas Amine - fitas at nightlabs dot de
  */
-
-public class DynamicProductTypeRecurringArticleCreator extends ArticleCreator{
-
+public class DynamicProductTypeRecurringArticleCreator extends ArticleCreator
+{
 	private DynamicProductInfo dynamicProductInfo;
 	private Tariff tariff;
 	
@@ -30,10 +28,8 @@ public class DynamicProductTypeRecurringArticleCreator extends ArticleCreator{
 		this.dynamicProductInfo = dynamicProductInfo;
 	}
 
-
 	@Override
 	public List<? extends Article> createProductTypeArticles(Trader trader, User user, Offer offer, Segment segment, Collection<? extends ProductType> productTypes)
-
 	{
 		List<DynamicProductTypeRecurringArticle> res = new ArrayList<DynamicProductTypeRecurringArticle>(productTypes.size());
 		for (ProductType productType : productTypes) {
@@ -47,5 +43,4 @@ public class DynamicProductTypeRecurringArticleCreator extends ArticleCreator{
 		return res;
 
 	}
-
 }

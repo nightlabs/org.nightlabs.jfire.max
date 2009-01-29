@@ -113,6 +113,7 @@ public class DynamicTrader {
 	/**
 	 * creates a new Dynamic Recurring Article
 	 */
+	@SuppressWarnings("unchecked")
 	public	Article createRecurringArticle(SegmentID segmentID,
 			OfferID offerID,
 			ProductTypeID productTypeID,
@@ -138,7 +139,8 @@ public class DynamicTrader {
 
 		Trader trader = Trader.getTrader(pm);
 		RecurringTrader recurringTrader = RecurringTrader.getRecurringTrader(pm);
-		Store store = Store.getStore(pm);
+		// commenting unused - I hope there are no side-effects (Marc):
+		//Store store = Store.getStore(pm);
 		Segment segment = (Segment) pm.getObjectById(segmentID);
 		Order order = segment.getOrder();
 		User user = SecurityReflector.getUserDescriptor().getUser(pm);

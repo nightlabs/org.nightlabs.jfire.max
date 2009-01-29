@@ -7,7 +7,6 @@ import java.util.Iterator;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 
-import org.apache.log4j.Logger;
 import org.nightlabs.ModuleException;
 import org.nightlabs.i18n.I18nText;
 import org.nightlabs.jfire.accounting.Price;
@@ -54,9 +53,6 @@ import org.nightlabs.jfire.trade.recurring.RecurringTrader;
  * @jdo.inheritance strategy="new-table"
  */
 public class DynamicTrader {
-
-
-	private static final Logger logger = Logger.getLogger(DynamicTrader.class);
 
 	/**
 	 * @jdo.field primary-key="true"

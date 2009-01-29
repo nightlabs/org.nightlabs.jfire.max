@@ -221,9 +221,11 @@ public class GridPriceConfigUtil
 
 		// prevent storing managed PriceConfigs
 		for (T priceConfig : _priceConfigs) {
-			PriceConfig.assertPriceConfigNotManaged(pm, (PriceConfigID) JDOHelper.getObjectId(priceConfig));
+			PriceConfigID priceConfigID = (PriceConfigID) JDOHelper.getObjectId(priceConfig);
+			if (priceConfigID != null)
+				PriceConfig.assertPriceConfigNotManaged(pm, priceConfigID);
 		}
-		
+
 		// store all price configs and put the living objects into priceConfigs
 		Set<T> priceConfigs = new HashSet<T>();
 		List<AffectedProductType> affectedProductTypes = null;

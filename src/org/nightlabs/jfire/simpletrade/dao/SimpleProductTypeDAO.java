@@ -7,7 +7,6 @@ import java.util.Set;
 
 import javax.jdo.JDODetachedFieldAccessException;
 
-import org.nightlabs.annotation.Implement;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.base.JFireEjbFactory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
@@ -40,7 +39,6 @@ implements IJDOObjectDAO<SimpleProductType>
 	}
 
 	@Override
-	@Implement
 	protected Collection<SimpleProductType> retrieveJDOObjects(
 			Set<ProductTypeID> simpleProductTypeIDs, String[] fetchGroups, int maxFetchDepth,
 			ProgressMonitor monitor)
@@ -113,7 +111,7 @@ implements IJDOObjectDAO<SimpleProductType>
 	 * {@inheritDoc}
 	 * @see org.nightlabs.jfire.base.jdo.IJDOObjectDAO#storeJDOObject(java.lang.Object, boolean, java.lang.String[], int, org.nightlabs.progress.ProgressMonitor)
 	 */
-	@Implement
+	@Override
 	public SimpleProductType storeJDOObject(SimpleProductType jdoObject, boolean get, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) {
 		if(jdoObject == null)
 			throw new NullPointerException("SimpleProductType to save must not be null");

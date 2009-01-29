@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import org.nightlabs.annotation.Implement;
 import org.nightlabs.jfire.accounting.gridpriceconfig.FormulaPriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.id.PriceConfigID;
 import org.nightlabs.jfire.base.JFireEjbFactory;
@@ -30,7 +29,6 @@ extends BaseJDOObjectDAO<PriceConfigID, FormulaPriceConfig>
 	}
 
 	@Override
-	@Implement
 	protected Collection<FormulaPriceConfig> retrieveJDOObjects(
 			Set<PriceConfigID> formulaPriceConfigIDs, String[] fetchGroups, int maxFetchDepth,
 			ProgressMonitor monitor)

@@ -31,7 +31,6 @@ import java.util.Collection;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
-import org.nightlabs.annotation.Implement;
 import org.nightlabs.inheritance.FieldInheriter;
 import org.nightlabs.inheritance.FieldMetaData;
 import org.nightlabs.inheritance.Inheritable;
@@ -160,7 +159,6 @@ public class SimpleProductType extends ProductType
 	}
 
 	@Override
-	@Implement
 	protected void calculatePrices()
 	{
 		PersistenceManager pm = getPersistenceManager();

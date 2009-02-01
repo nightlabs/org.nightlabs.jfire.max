@@ -49,6 +49,7 @@ import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.scripting.id.ScriptParameterSetID;
 import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
+import org.nightlabs.version.Version;
 
 /**
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
@@ -123,7 +124,6 @@ implements SessionBean
 	 * @ejb.transaction type="Required"
 	 */
 	public void initialise()
-	throws ModuleException
 	{
 		PersistenceManager pm;
 		pm = getPersistenceManager();
@@ -133,8 +133,8 @@ implements SessionBean
 				logger.info("Initialization of JFireScripting started ...");
 
 				// version is {major}.{minor}.{release}-{patchlevel}-{suffix}
-				moduleMetaData = new ModuleMetaData(
-						JFireScriptingEAR.MODULE_NAME, "0.9.5-0-beta", "0.9.5-0-beta");
+				Version version = new Version(0, 9, 5, 0, "beta");
+				moduleMetaData = new ModuleMetaData(JFireScriptingEAR.MODULE_NAME, version, version);
 				pm.makePersistent(moduleMetaData);
 				logger.info("Persisted ModuleMetaData for JFireScripting with version 0.9.5-0-beta");
 			}

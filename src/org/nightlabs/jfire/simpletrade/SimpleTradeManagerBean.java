@@ -130,6 +130,7 @@ import org.nightlabs.jfire.trade.recurring.RecurringOrder;
 import org.nightlabs.jfire.trade.recurring.RecurringTrader;
 import org.nightlabs.util.CollectionUtil;
 import org.nightlabs.util.Util;
+import org.nightlabs.version.Version;
 
 /**
  * @ejb.bean name="jfire/ejb/JFireSimpleTrade/SimpleTradeManager"
@@ -189,7 +190,7 @@ implements SessionBean
 	 * @ejb.transaction type="Required"
 	 */
 	public void initialise()
-	throws ModuleException, CannotPublishProductTypeException
+	throws CannotPublishProductTypeException
 	{
 		PersistenceManager pm = this.getPersistenceManager();
 		try {
@@ -202,8 +203,8 @@ implements SessionBean
 			logger.info("Initialization of JFireSimpleTrade started...");
 
 			// version is {major}.{minor}.{release}-{patchlevel}-{suffix}
-			moduleMetaData = new ModuleMetaData(
-					JFireSimpleTradeEAR.MODULE_NAME, "0.9.5-0-beta", "0.9.5-0-beta");
+			Version version = new Version(0, 9, 5, 0, "beta");
+			moduleMetaData = new ModuleMetaData(JFireSimpleTradeEAR.MODULE_NAME, version, version);
 			pm.makePersistent(moduleMetaData);
 
 			SimpleProductTypeStruct.getSimpleProductTypeStruct(organisationID, pm);

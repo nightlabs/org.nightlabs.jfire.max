@@ -702,6 +702,11 @@ implements Serializable
 		return availabilityPercentageTimestamp;
 	}
 
+	public void setAvailabilityPercentage(double availabilityPercentage) {
+		this.availabilityPercentage = availabilityPercentage;
+		this.availabilityPercentageTimestamp = new Date();
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;

@@ -111,6 +111,7 @@ import org.nightlabs.jfire.store.id.UnitID;
 import org.nightlabs.jfire.store.query.ProductTransferIDQuery;
 import org.nightlabs.jfire.store.query.ProductTransferQuery;
 import org.nightlabs.jfire.store.search.AbstractProductTypeQuery;
+import org.nightlabs.jfire.timer.Task;
 import org.nightlabs.jfire.timer.id.TaskID;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.ArticleContainer;
@@ -188,17 +189,21 @@ implements SessionBean
 	/**
 	 * Initialisation method called by the organisation-init framework to set up essential things for JFireTrade's store.
 	 *
-	 * @throws IOException While loading an icon from a local resource, this might happen and we don't care in the initialise method.
+	 * @throws Exception While loading an icon from a local resource, an {@link IOException} might happen; in
+	 *	{@link #initTimerTaskCalculateProductTypeAvailabilityPercentage(PersistenceManager)} timepattern-related
+	 *	exceptions might occur; and we don't care in the initialise method.
 	 *
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_System_"
 	 */
-	public void initialise() throws IOException
+	public void initialise() throws Exception
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			initRegisterConfigModules(pm);
+
+			initTimerTaskCalculateProductTypeAvailabilityPercentage(pm);
 
 			pm.getExtent(ModeOfDelivery.class);
 			try {
@@ -2772,9 +2777,12 @@ implements SessionBean
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_System_"
 	 */
-	public void calculateProductTypeAvailabilityPercentage(TaskID taskID) {
+	public void calculateProductTypeAvailabilityPercentage(TaskID taskID)
+	throws Exception
+	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
+			Map<String, ProductTypePermissionFlagSet> key2productTypePermissionFlagSet = new HashMap<String, ProductTypePermissionFlagSet>();
 			Map<Class<? extends ProductType>, ProductTypeActionHandler> productTypeClass2productTypeActionHandler = new HashMap<Class<? extends ProductType>, ProductTypeActionHandler>();
 			Map<ProductTypeActionHandler, Map<ProductType, Set<User>>> productTypeActionHandler2productType2users = new HashMap<ProductTypeActionHandler, Map<ProductType,Set<User>>>();
 
@@ -2783,6 +2791,7 @@ implements SessionBean
 			Collection<? extends ProductTypePermissionFlagSet> c = CollectionUtil.castCollection((Collection<?>) q.execute());
 			for (ProductTypePermissionFlagSet productTypePermissionFlagSet : c) {
 				ProductType productType = productTypePermissionFlagSet.getProductType();
+				User user = productTypePermissionFlagSet.getUser();
 				Class<? extends ProductType> productTypeClass = productType.getClass();
 
 				ProductTypeActionHandler productTypeActionHandler = productTypeClass2productTypeActionHandler.get(productTypeClass);
@@ -2803,15 +2812,70 @@ implements SessionBean
 					productType2users.put(productType, users);
 				}
 
-				users.add(productTypePermissionFlagSet.getUser());
+				users.add(user);
+
+				String key = JDOHelper.getObjectId(productType).toString() + "::" + JDOHelper.getObjectId(user);
+				Object o = key2productTypePermissionFlagSet.put(key, productTypePermissionFlagSet);
+				if (o != null)
+					throw new IllegalStateException("There is already a ProductTypePermissionFlagSet with this key: " + key);
 			}
 
-			for (Map.Entry<ProductTypeActionHandler, Map<ProductType, Set<User>>> me : productTypeActionHandler2productType2users.entrySet()) {
-				Map<ProductType, Map<User, Double>> percentages = me.getKey().calculateProductTypeAvailabilityPercentage(me.getValue());
+			for (Map.Entry<ProductTypeActionHandler, Map<ProductType, Set<User>>> me1 : productTypeActionHandler2productType2users.entrySet()) {
+				ProductTypeActionHandler productTypeActionHandler = me1.getKey();
+				Map<ProductType, Map<User, Double>> percentages = me1.getKey().calculateProductTypeAvailabilityPercentage(me1.getValue());
+				for (Map.Entry<ProductType, Set<User>> me2 : me1.getValue().entrySet()) {
+					ProductType productType = me2.getKey();
+					for (User user : me2.getValue()) {
+						Map<User, Double> user2percentage = percentages.get(productType);
+						if (user2percentage == null)
+							throw new IllegalStateException(
+									"ProductTypeActionHandler " + productTypeActionHandler + " in organisation \"" + getOrganisationID() + "\" returned an incomplete result in method calculateProductTypeAvailabilityPercentage(...): No entry for ProductType: " + productType
+							);
+
+						Double percentage = user2percentage.get(user);
+						if (percentage == null)
+							throw new IllegalStateException(
+									"ProductTypeActionHandler " + productTypeActionHandler + " in organisation \"" + getOrganisationID() + "\" returned an incomplete result in method calculateProductTypeAvailabilityPercentage(...) for ProductType \"" + productType + "\": No entry for user: " + user
+							);
+
+						String key = JDOHelper.getObjectId(productType).toString() + "::" + JDOHelper.getObjectId(user);
+						ProductTypePermissionFlagSet productTypePermissionFlagSet = key2productTypePermissionFlagSet.get(key);
+						if (productTypePermissionFlagSet == null)
+							throw new IllegalStateException("There is no ProductTypePermissionFlagSet with this key: " + key + "!!! The ProductTypeActionHandler " + productTypeActionHandler + " in organisation \"" + getOrganisationID() + "\" returned an more elements than requested in method calculateProductTypeAvailabilityPercentage(...) for ProductType \"" + productType + "\" and user \"" + user + "\"");
+
+						productTypePermissionFlagSet.setAvailabilityPercentage(percentage);
+					}
+				}
 			}
 
 		} finally {
 			pm.close();
 		}
+	}
+
+	private void initTimerTaskCalculateProductTypeAvailabilityPercentage(PersistenceManager pm)
+	throws Exception
+	{
+		TaskID taskID = TaskID.create(getOrganisationID(), Task.TASK_TYPE_ID_SYSTEM, "calculateProductTypeAvailabilityPercentage");
+		try {
+			pm.getObjectById(taskID);
+			return; // no JDOObjectNotFoundException => it exists already => return without creating it
+		} catch (JDOObjectNotFoundException x) {
+			// fine - it does not exist => create it below
+		}
+		Task task = new Task(
+				taskID,
+				User.getUser(pm, getOrganisationID(), User.USER_ID_SYSTEM),
+				StoreManagerHome.JNDI_NAME, "calculateProductTypeAvailabilityPercentage"
+		);
+		task = pm.makePersistent(task);
+		task.getTimePatternSet().createTimePattern("*", "*", "*", "*", "*", "51");
+
+		task.getName().setText(Locale.ENGLISH.getLanguage(), "Calculate product type availability");
+		task.getDescription().setText(Locale.ENGLISH.getLanguage(), "This task calculates the availability percentage of all active product types.");
+
+		task.getName().setText(Locale.GERMAN.getLanguage(), "Berechnung der Produkttyp-Verfügbarkeit");
+		task.getDescription().setText(Locale.GERMAN.getLanguage(), "Dieser Task berechnet den Produkttyp-Verfügbarkeits-Prozentsatz für alle aktiven Produkttypen.");
+		task.setEnabled(true);
 	}
 }

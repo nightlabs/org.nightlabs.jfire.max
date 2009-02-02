@@ -1326,4 +1326,9 @@ public abstract class ProductTypeActionHandler
 				Util.equals(this.organisationID, other.organisationID) &&
 				Util.equals(this.productTypeActionHandlerID, other.productTypeActionHandlerID);
 	}
+
+	@Override
+	public String toString() {
+		return this.getClass().getName() + '@' + Integer.toHexString(System.identityHashCode(this)) + '[' + organisationID + ',' + productTypeActionHandlerID+ ']';
+	}
 }

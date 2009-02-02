@@ -1272,6 +1272,38 @@ public abstract class ProductTypeActionHandler
 		}
 	}
 
+	/**
+	 * Calculate the availability-percentage for the specified product types and users.
+	 * The availability-percentage indicates, how many products of a product type are in stock
+	 * or otherwise immediately deliverable. A value of 100 means, there is none yet sold (i.e. stock full)
+	 * or the number of available products is infinite (because it is produced on-the-fly).
+	 * A value of 0 means the stock is empty.
+	 * <p>
+	 * Due to varying access rights, this percentage might differ from user to user. That's
+	 * why this method takes a <code>Map</code> with both {@link ProductType} and {@link User} instances
+	 * and must return a capacity for each of them.
+	 * </p>
+	 * <p>
+	 * The default implementation in {@link ProductTypeActionHandler} returns 100% for everything.
+	 * Hence, you only need to override this method, if your implementation has limited capacity
+	 * (and doesn't produce on-the-fly).
+	 * </p>
+	 *
+	 * @param productType2users the requested product types and users.
+	 * @return the availability for each product type and user passed in <code>productType2users</code>.
+	 */
+	public Map<ProductType, Map<User, Double>> calculateProductTypeAvailabilityPercentage(Map<ProductType, Set<User>> productType2users)
+	{
+		Map<ProductType, Map<User, Double>> result = new HashMap<ProductType, Map<User,Double>>(productType2users.size());
+		for (Map.Entry<ProductType, Set<User>> me : productType2users.entrySet()) {
+			Map<User, Double> user2availability = new HashMap<User, Double>(me.getValue().size());
+			for (User user : me.getValue()) {
+				user2availability.put(user, 100d);
+			}
+			result.put(me.getKey(), user2availability);
+		}
+		return result;
+	}
 
 	@Override
 	public int hashCode()

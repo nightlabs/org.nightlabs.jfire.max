@@ -111,6 +111,7 @@ import org.nightlabs.jfire.store.id.UnitID;
 import org.nightlabs.jfire.store.query.ProductTransferIDQuery;
 import org.nightlabs.jfire.store.query.ProductTransferQuery;
 import org.nightlabs.jfire.store.search.AbstractProductTypeQuery;
+import org.nightlabs.jfire.timer.id.TaskID;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.ArticleContainer;
 import org.nightlabs.jfire.trade.CustomerGroup;
@@ -198,7 +199,7 @@ implements SessionBean
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			initRegisterConfigModules(pm);
-			
+
 			pm.getExtent(ModeOfDelivery.class);
 			try {
 				pm.getObjectById(ModeOfDeliveryConst.MODE_OF_DELIVERY_ID_MANUAL);
@@ -385,7 +386,7 @@ implements SessionBean
 			unit.getSymbol().setText(Locale.GERMAN.getLanguage(), "()");
 			unit.getName().setText(Locale.GERMAN.getLanguage(), "(pauschal)");
 			pm.makePersistent(unit);
-			
+
 		} finally {
 			pm.close();
 		}
@@ -394,8 +395,8 @@ implements SessionBean
 	/**
 	 * Called by {@link #initialise()} and registeres the
 	 * config-modules in their config-setup.
-	 * 
-	 * This method checks itself whether initialisation 
+	 *
+	 * This method checks itself whether initialisation
 	 * was performed already and therefore can be safely
 	 * called anytime in the process.
 	 */
@@ -412,7 +413,7 @@ implements SessionBean
 			configSetup.getConfigModuleClasses().add(ModeOfDeliveryConfigModule.class.getName());
 			needsUpdate = true;
 		}
-		
+
 		// Register all Workstation - ConfigModules
 		configSetup = ConfigSetup.getConfigSetup(
 				pm,
@@ -427,7 +428,7 @@ implements SessionBean
 			ConfigSetup.ensureAllPrerequisites(pm);
 	}
 
-	
+
 	/**
 	 * Get the object-ids of all {@link Unit}s known to the organisation.
 	 * <p>
@@ -740,9 +741,9 @@ implements SessionBean
 	 * @param customerGroupIDs Instances of {@link org.nightlabs.jfire.trade.id.CustomerGroupID}.
 	 * @param mergeMode One of {@link ModeOfDeliveryFlavour#MERGE_MODE_SUBTRACTIVE} or {@link ModeOfDeliveryFlavour#MERGE_MODE_ADDITIVE}
 	 * @param filterByConfig
-	 * 		If this is <code>true</code> the flavours available found for the given product-types and customer-groups will also be filtered by the 
-	 * 		intersection of the entries configured in the {@link ModeOfDeliveryConfigModule} for the current user and the 
-	 * 		workstation he is currently loggen on. 
+	 * 		If this is <code>true</code> the flavours available found for the given product-types and customer-groups will also be filtered by the
+	 * 		intersection of the entries configured in the {@link ModeOfDeliveryConfigModule} for the current user and the
+	 * 		workstation he is currently loggen on.
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
@@ -842,7 +843,7 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * Get the mode of delivery flavours that are specified by the given object-ids.
 	 * <p>
@@ -863,7 +864,7 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * Get the server delivery processors that are available for the specified mode of delivery flavour.
 	 * <p>
@@ -2700,7 +2701,6 @@ implements SessionBean
 	 * @ejb.permission role-name="org.nightlabs.jfire.store.queryReceptionNotes"
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
-	@SuppressWarnings("unchecked")
 	public List<ReceptionNote> getReceptionNotes(Set<ReceptionNoteID> receptionNoteIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -2743,7 +2743,7 @@ implements SessionBean
 
 			queries.setPersistenceManager(pm);
 
-			Collection<ProductType> productTypes = (Collection<ProductType>) queries.executeQueries();
+			Collection<? extends ProductType> productTypes = CollectionUtil.castCollection(queries.executeQueries());
 
 			productTypes = Authority.filterIndirectlySecuredObjects(
 					pm,
@@ -2766,5 +2766,52 @@ implements SessionBean
 	@Override
 	public String ping(String message) {
 		return super.ping(message);
+	}
+
+	/**
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_System_"
+	 */
+	public void calculateProductTypeAvailabilityPercentage(TaskID taskID) {
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			Map<Class<? extends ProductType>, ProductTypeActionHandler> productTypeClass2productTypeActionHandler = new HashMap<Class<? extends ProductType>, ProductTypeActionHandler>();
+			Map<ProductTypeActionHandler, Map<ProductType, Set<User>>> productTypeActionHandler2productType2users = new HashMap<ProductTypeActionHandler, Map<ProductType,Set<User>>>();
+
+			Query q = pm.newQuery(ProductTypePermissionFlagSet.class);
+			q.setFilter("this.closed == false && this.expired == false");
+			Collection<? extends ProductTypePermissionFlagSet> c = CollectionUtil.castCollection((Collection<?>) q.execute());
+			for (ProductTypePermissionFlagSet productTypePermissionFlagSet : c) {
+				ProductType productType = productTypePermissionFlagSet.getProductType();
+				Class<? extends ProductType> productTypeClass = productType.getClass();
+
+				ProductTypeActionHandler productTypeActionHandler = productTypeClass2productTypeActionHandler.get(productTypeClass);
+				if (productTypeActionHandler == null) {
+					productTypeActionHandler = ProductTypeActionHandler.getProductTypeActionHandler(pm, productTypeClass);
+					productTypeClass2productTypeActionHandler.put(productTypeClass, productTypeActionHandler);
+				}
+
+				Map<ProductType, Set<User>> productType2users = productTypeActionHandler2productType2users.get(productTypeActionHandler);
+				if (productType2users == null) {
+					productType2users = new HashMap<ProductType, Set<User>>();
+					productTypeActionHandler2productType2users.put(productTypeActionHandler, productType2users);
+				}
+
+				Set<User> users = productType2users.get(productType);
+				if (users == null) {
+					users = new HashSet<User>();
+					productType2users.put(productType, users);
+				}
+
+				users.add(productTypePermissionFlagSet.getUser());
+			}
+
+			for (Map.Entry<ProductTypeActionHandler, Map<ProductType, Set<User>>> me : productTypeActionHandler2productType2users.entrySet()) {
+				Map<ProductType, Map<User, Double>> percentages = me.getKey().calculateProductTypeAvailabilityPercentage(me.getValue());
+			}
+
+		} finally {
+			pm.close();
+		}
 	}
 }

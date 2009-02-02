@@ -3,6 +3,7 @@ package org.nightlabs.jfire.store;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -555,6 +556,16 @@ implements Serializable
 	private boolean expired;
 
 	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private double availabilityPercentage;
+
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private Date availabilityPercentageTimestamp;
+
+	/**
 	 * @deprecated Only for JDO!
 	 */
 	@Deprecated
@@ -568,6 +579,7 @@ implements Serializable
 		this.productType = productType;
 		this.productTypeOrganisationID = productType.getOrganisationID();
 		this.productTypeID = productType.getProductTypeID();
+		this.availabilityPercentage = -1d; // < 0 means unknown
 
 		this.user = user;
 		this.userOrganisationID = user.getOrganisationID();
@@ -682,6 +694,13 @@ implements Serializable
 //	public void setFlagsReverseProductType(int flagReverseProductType) {
 //		this.flagsReverseProductType = flagReverseProductType;
 //	}
+
+	public double getAvailabilityPercentage() {
+		return availabilityPercentage;
+	}
+	public Date getAvailabilityPercentageTimestamp() {
+		return availabilityPercentageTimestamp;
+	}
 
 	@Override
 	public int hashCode() {

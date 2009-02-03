@@ -105,6 +105,7 @@ import org.nightlabs.jfire.store.deliver.id.ModeOfDeliveryID;
 import org.nightlabs.jfire.store.id.DeliveryNoteID;
 import org.nightlabs.jfire.store.id.ProductTypeGroupID;
 import org.nightlabs.jfire.store.id.ProductTypeID;
+import org.nightlabs.jfire.store.id.ProductTypePermissionFlagSetID;
 import org.nightlabs.jfire.store.id.ReceptionNoteID;
 import org.nightlabs.jfire.store.id.RepositoryTypeID;
 import org.nightlabs.jfire.store.id.UnitID;
@@ -2877,5 +2878,70 @@ implements SessionBean
 		task.getName().setText(Locale.GERMAN.getLanguage(), "Berechnung der Produkttyp-Verfügbarkeit");
 		task.getDescription().setText(Locale.GERMAN.getLanguage(), "Dieser Task berechnet den Produkttyp-Verfügbarkeits-Prozentsatz für alle aktiven Produkttypen.");
 		task.setEnabled(true);
+	}
+
+	/**
+	 * @ejb.interface-method
+	 * @ejb.transaction type="Supports"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	public Set<ProductTypePermissionFlagSetID> getMyProductTypePermissionFlagSetIDs(Collection<? extends ProductTypeID> productTypeIDs)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			User user = User.getUser(pm, getPrincipal());
+
+			Collection<? extends ProductType> productTypes = CollectionUtil.castCollection(pm.getObjectsById(productTypeIDs));
+
+			Set<ProductTypePermissionFlagSetID> result = new HashSet<ProductTypePermissionFlagSetID>();
+			for (ProductType productType : productTypes) {
+				ProductTypePermissionFlagSet productTypePermissionFlagSet = ProductTypePermissionFlagSet.getProductTypePermissionFlagSet(pm, productType, user, false);
+				if (productTypePermissionFlagSet == null)
+					continue;
+
+				result.add((ProductTypePermissionFlagSetID) JDOHelper.getObjectId(productTypePermissionFlagSet));
+			}
+			return result;
+		} finally {
+			pm.close();
+		}
+	}
+
+	/**
+	 * We allow this method to be executed by everyone, because it currently filters out (silently!) all {@link ProductTypePermissionFlagSet}s
+	 * that have a differen user than the current principal. We might later extend this method to silently filter only then,
+	 * when the current principal does not have the right to see access right configurations.
+	 * <p>
+	 * For security reasons, it is not possible to specify fetch-groups or max-fetch-depth. This method returns
+	 * the {@link ProductTypePermissionFlagSet}s being detached with {@link FetchPlan#DEFAULT} only. Hence, the methods
+	 * {@link ProductTypePermissionFlagSet#getProductType()} and {@link ProductTypePermissionFlagSet#getUser()} cannot be used
+	 * (use {@link ProductTypePermissionFlagSet#getProductTypeObjectID()} and {@link ProductTypePermissionFlagSet#getUserObjectID()}
+	 * instead!).
+	 * </p>
+	 *
+	 * @ejb.interface-method
+	 * @ejb.transaction type="Supports"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	public Collection<ProductTypePermissionFlagSet> getProductTypePermissionFlagSets(Collection<? extends ProductTypePermissionFlagSetID> productTypePermissionFlagSetIDs)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			User user = User.getUser(pm, getPrincipal());
+
+			List<ProductTypePermissionFlagSet> result = new ArrayList<ProductTypePermissionFlagSet>();
+			Collection<? extends ProductTypePermissionFlagSet> ptpfss = CollectionUtil.castCollection(pm.getObjectsById(productTypePermissionFlagSetIDs));
+			for (ProductTypePermissionFlagSet ptpfs : ptpfss) {
+				if (user.equals(ptpfs.getUser()))
+					result.add(ptpfs);
+			}
+
+			pm.getFetchPlan().setMaxFetchDepth(1);
+			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
+
+			return pm.detachCopyAll(result);
+		} finally {
+			pm.close();
+		}
 	}
 }

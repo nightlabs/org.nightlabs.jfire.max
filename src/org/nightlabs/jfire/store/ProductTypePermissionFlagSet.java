@@ -21,6 +21,7 @@ import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.security.id.AuthorityID;
 import org.nightlabs.jfire.security.id.RoleID;
 import org.nightlabs.jfire.security.id.UserID;
+import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.store.id.ProductTypePermissionFlagSetID;
 import org.nightlabs.util.CollectionUtil;
 import org.nightlabs.util.Util;
@@ -599,9 +600,18 @@ implements Serializable
 		return userID;
 	}
 
+	public ProductTypeID getProductTypeObjectID() {
+		return ProductTypeID.create(productTypeOrganisationID, productTypeID);
+	}
+
 	public ProductType getProductType() {
 		return productType;
 	}
+
+	public UserID getUserObjectID() {
+		return UserID.create(userOrganisationID, userID);
+	}
+
 	public User getUser() {
 		return user;
 	}

@@ -70,11 +70,13 @@ import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.idgenerator.IDNamespaceDefault;
 import org.nightlabs.jfire.jbpm.graph.def.ProcessDefinition;
 import org.nightlabs.jfire.jbpm.query.StatableQuery;
+import org.nightlabs.jfire.multitxjob.MultiTxJob;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.security.Authority;
 import org.nightlabs.jfire.security.ResolveSecuringAuthorityStrategy;
 import org.nightlabs.jfire.security.SecuredObject;
 import org.nightlabs.jfire.security.User;
+import org.nightlabs.jfire.security.id.UserID;
 import org.nightlabs.jfire.store.book.DefaultLocalStorekeeperDelegate;
 import org.nightlabs.jfire.store.deliver.CheckRequirementsEnvironment;
 import org.nightlabs.jfire.store.deliver.CrossTradeDeliveryCoordinator;
@@ -103,6 +105,7 @@ import org.nightlabs.jfire.store.deliver.id.DeliveryQueueID;
 import org.nightlabs.jfire.store.deliver.id.ModeOfDeliveryFlavourID;
 import org.nightlabs.jfire.store.deliver.id.ModeOfDeliveryID;
 import org.nightlabs.jfire.store.id.DeliveryNoteID;
+import org.nightlabs.jfire.store.id.ProductTypeActionHandlerID;
 import org.nightlabs.jfire.store.id.ProductTypeGroupID;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.store.id.ProductTypePermissionFlagSetID;
@@ -119,7 +122,6 @@ import org.nightlabs.jfire.trade.ArticleContainer;
 import org.nightlabs.jfire.trade.CustomerGroup;
 import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.trade.Offer;
-import org.nightlabs.jfire.trade.OfferLocal;
 import org.nightlabs.jfire.trade.OfferRequirement;
 import org.nightlabs.jfire.trade.Order;
 import org.nightlabs.jfire.trade.OrganisationLegalEntity;
@@ -451,7 +453,8 @@ implements SessionBean
 		try {
 			Query q = pm.newQuery(Unit.class);
 			q.setResult("JDOHelper.getObjectId(this)");
-			return new HashSet<UnitID>((Collection<? extends UnitID>) q.execute());
+			Collection<? extends UnitID> c = CollectionUtil.castCollection((Collection<?>) q.execute());
+			return new HashSet<UnitID>(c);
 		} finally {
 			pm.close();
 		}
@@ -467,7 +470,6 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
-	@SuppressWarnings("unchecked")
 	public List<Unit> getUnits(Collection<UnitID> unitIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -485,7 +487,6 @@ implements SessionBean
 	 * @ejb.permission role-name="org.nightlabs.jfire.store.queryDeliveryNotes"
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
-	@SuppressWarnings("unchecked")
 	public List<DeliveryNote> getDeliveryNotes(Set<DeliveryNoteID> deliveryNoteIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -1015,7 +1016,7 @@ implements SessionBean
 
 			if (articleContainer instanceof Offer) {
 				Offer offer = (Offer) articleContainer;
-				OfferLocal offerLocal = offer.getOfferLocal();
+//				OfferLocal offerLocal = offer.getOfferLocal();
 				trader.validateOffer(offer);
 				trader.acceptOfferImplicitely(offer);
 //				trader.finalizeOffer(user, offer);
@@ -1026,7 +1027,7 @@ implements SessionBean
 				for (Iterator<Article> it = articleContainer.getArticles().iterator(); it.hasNext(); ) {
 					Article article = it.next();
 					Offer offer = article.getOffer();
-					OfferLocal offerLocal = offer.getOfferLocal();
+//					OfferLocal offerLocal = offer.getOfferLocal();
 					trader.validateOffer(offer);
 					trader.acceptOfferImplicitely(offer);
 //					trader.finalizeOffer(user, offer);
@@ -2160,7 +2161,8 @@ implements SessionBean
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 
-			return pm.detachCopyAll(pm.getObjectsById(deliveryQueueIds));
+			Collection<DeliveryQueue> c = CollectionUtil.castCollection(pm.getObjectsById(deliveryQueueIds));
+			return pm.detachCopyAll(c);
 		} finally {
 			pm.close();
 		}
@@ -2340,7 +2342,6 @@ implements SessionBean
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="org.nightlabs.jfire.store.queryRepositories"
 	 */
-	@SuppressWarnings("unchecked")
 	public List<Repository> getRepositories(Collection<AnchorID> repositoryIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -2774,6 +2775,15 @@ implements SessionBean
 		return super.ping(message);
 	}
 
+	private static final String calculateProductTypeAvailabilityPercentage_multiTxJobID = "calculateProductTypeAvailabilityPercentage";
+	private static final int calculateProductTypeAvailabilityPercentage_chunkProductTypeQty = 3;
+
+	/**
+	 * The process in {@link #calculateProductTypeAvailabilityPercentage(TaskID)} breaks after this duration has been reached.
+	 * Hence, it might take longer (if it is close to this duration and another chunk is begun).
+	 */
+	private static final long calculateProductTypeAvailabilityPercentage_breakDurationMSec = 10L * 1000L; // = 90L * 1000L;
+
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_System_"
@@ -2781,72 +2791,136 @@ implements SessionBean
 	public void calculateProductTypeAvailabilityPercentage(TaskID taskID)
 	throws Exception
 	{
+		long startTimestamp = System.currentTimeMillis();
+		boolean forceAtLeastOneChunk = true;
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			Map<String, ProductTypePermissionFlagSet> key2productTypePermissionFlagSet = new HashMap<String, ProductTypePermissionFlagSet>();
 			Map<Class<? extends ProductType>, ProductTypeActionHandler> productTypeClass2productTypeActionHandler = new HashMap<Class<? extends ProductType>, ProductTypeActionHandler>();
-			Map<ProductTypeActionHandler, Map<ProductType, Set<User>>> productTypeActionHandler2productType2users = new HashMap<ProductTypeActionHandler, Map<ProductType,Set<User>>>();
 
-			Query q = pm.newQuery(ProductTypePermissionFlagSet.class);
-			q.setFilter("this.closed == false && this.expired == false");
-			Collection<? extends ProductTypePermissionFlagSet> c = CollectionUtil.castCollection((Collection<?>) q.execute());
-			for (ProductTypePermissionFlagSet productTypePermissionFlagSet : c) {
-				ProductType productType = productTypePermissionFlagSet.getProductType();
-				User user = productTypePermissionFlagSet.getUser();
-				Class<? extends ProductType> productTypeClass = productType.getClass();
+			Map<ProductTypeActionHandlerID, Map<ProductTypeID, Set<UserID>>> productTypeActionHandlerID2productTypeID2userIDs = CollectionUtil.castMap(
+					(Map<?, ?>) MultiTxJob.popMultiTxJobPartData(pm, calculateProductTypeAvailabilityPercentage_multiTxJobID)
+			);
+			if (productTypeActionHandlerID2productTypeID2userIDs != null && productTypeActionHandlerID2productTypeID2userIDs.isEmpty())
+				productTypeActionHandlerID2productTypeID2userIDs = null;
 
-				ProductTypeActionHandler productTypeActionHandler = productTypeClass2productTypeActionHandler.get(productTypeClass);
-				if (productTypeActionHandler == null) {
-					productTypeActionHandler = ProductTypeActionHandler.getProductTypeActionHandler(pm, productTypeClass);
-					productTypeClass2productTypeActionHandler.put(productTypeClass, productTypeActionHandler);
+//			Map<ProductTypeActionHandler, Map<ProductType, Set<User>>> productTypeActionHandler2productType2users = new HashMap<ProductTypeActionHandler, Map<ProductType,Set<User>>>();
+
+			if (productTypeActionHandlerID2productTypeID2userIDs != null) {
+				if (logger.isDebugEnabled())
+					logger.debug("calculateProductTypeAvailabilityPercentage: entered with MultiTxJob data pending => won't query new data.");
+			}
+			else {
+				if (logger.isDebugEnabled())
+					logger.debug("calculateProductTypeAvailabilityPercentage: entered without MultiTxJob data pending => querying fresh data.");
+
+				productTypeActionHandlerID2productTypeID2userIDs = new HashMap<ProductTypeActionHandlerID, Map<ProductTypeID,Set<UserID>>>();
+				forceAtLeastOneChunk = false;
+
+				Query q = pm.newQuery(ProductTypePermissionFlagSet.class);
+				q.setFilter("this.closed == false && this.expired == false");
+				Collection<? extends ProductTypePermissionFlagSet> c = CollectionUtil.castCollection((Collection<?>) q.execute());
+				for (ProductTypePermissionFlagSet productTypePermissionFlagSet : c) {
+					ProductType productType = productTypePermissionFlagSet.getProductType();
+					Class<? extends ProductType> productTypeClass = productType.getClass();
+					ProductTypeID productTypeID = (ProductTypeID) JDOHelper.getObjectId(productType);
+					User user = productTypePermissionFlagSet.getUser();
+					UserID userID = (UserID) JDOHelper.getObjectId(user);
+
+					ProductTypeActionHandler productTypeActionHandler = productTypeClass2productTypeActionHandler.get(productTypeClass);
+					if (productTypeActionHandler == null) {
+						productTypeActionHandler = ProductTypeActionHandler.getProductTypeActionHandler(pm, productTypeClass);
+						productTypeClass2productTypeActionHandler.put(productTypeClass, productTypeActionHandler);
+					}
+					ProductTypeActionHandlerID productTypeActionHandlerID = (ProductTypeActionHandlerID) JDOHelper.getObjectId(productTypeActionHandler);
+
+					Map<ProductTypeID, Set<UserID>> productTypeID2userIDs = productTypeActionHandlerID2productTypeID2userIDs.get(productTypeActionHandlerID);
+					if (productTypeID2userIDs == null) {
+						productTypeID2userIDs = new HashMap<ProductTypeID, Set<UserID>>();
+						productTypeActionHandlerID2productTypeID2userIDs.put(productTypeActionHandlerID, productTypeID2userIDs);
+					}
+
+					Set<UserID> userIDs = productTypeID2userIDs.get(productType);
+					if (userIDs == null) {
+						userIDs = new HashSet<UserID>();
+						productTypeID2userIDs.put(productTypeID, userIDs);
+					}
+
+					userIDs.add(userID);
 				}
-
-				Map<ProductType, Set<User>> productType2users = productTypeActionHandler2productType2users.get(productTypeActionHandler);
-				if (productType2users == null) {
-					productType2users = new HashMap<ProductType, Set<User>>();
-					productTypeActionHandler2productType2users.put(productTypeActionHandler, productType2users);
-				}
-
-				Set<User> users = productType2users.get(productType);
-				if (users == null) {
-					users = new HashSet<User>();
-					productType2users.put(productType, users);
-				}
-
-				users.add(user);
-
-				String key = JDOHelper.getObjectId(productType).toString() + "::" + JDOHelper.getObjectId(user);
-				Object o = key2productTypePermissionFlagSet.put(key, productTypePermissionFlagSet);
-				if (o != null)
-					throw new IllegalStateException("There is already a ProductTypePermissionFlagSet with this key: " + key);
 			}
 
-			for (Map.Entry<ProductTypeActionHandler, Map<ProductType, Set<User>>> me1 : productTypeActionHandler2productType2users.entrySet()) {
-				ProductTypeActionHandler productTypeActionHandler = me1.getKey();
-				Map<ProductType, Map<User, Double>> percentages = me1.getKey().calculateProductTypeAvailabilityPercentage(me1.getValue());
-				for (Map.Entry<ProductType, Set<User>> me2 : me1.getValue().entrySet()) {
-					ProductType productType = me2.getKey();
-					for (User user : me2.getValue()) {
-						Map<User, Double> user2percentage = percentages.get(productType);
-						if (user2percentage == null)
-							throw new IllegalStateException(
-									"ProductTypeActionHandler " + productTypeActionHandler + " in organisation \"" + getOrganisationID() + "\" returned an incomplete result in method calculateProductTypeAvailabilityPercentage(...): No entry for ProductType: " + productType
-							);
+			long productTypesDoneCount = 0;
+			mainLoop: for (Iterator<Map.Entry<ProductTypeActionHandlerID, Map<ProductTypeID, Set<UserID>>>> it1 = productTypeActionHandlerID2productTypeID2userIDs.entrySet().iterator(); it1.hasNext(); ) {
+				Map.Entry<ProductTypeActionHandlerID, Map<ProductTypeID, Set<UserID>>> me1 = it1.next();
+				ProductTypeActionHandlerID productTypeActionHandlerID = me1.getKey();
+				Map<ProductTypeID, Set<UserID>> productTypeID2userIDs = me1.getValue();
+				ProductTypeActionHandler productTypeActionHandler = (ProductTypeActionHandler) pm.getObjectById(productTypeActionHandlerID);
 
-						Double percentage = user2percentage.get(user);
-						if (percentage == null)
-							throw new IllegalStateException(
-									"ProductTypeActionHandler " + productTypeActionHandler + " in organisation \"" + getOrganisationID() + "\" returned an incomplete result in method calculateProductTypeAvailabilityPercentage(...) for ProductType \"" + productType + "\": No entry for user: " + user
-							);
+				Map<ProductType, Set<User>> productType2users = new HashMap<ProductType, Set<User>>(calculateProductTypeAvailabilityPercentage_chunkProductTypeQty);
+				Iterator<Map.Entry<ProductTypeID, Set<UserID>>> it2 = productTypeID2userIDs.entrySet().iterator();
 
-						String key = JDOHelper.getObjectId(productType).toString() + "::" + JDOHelper.getObjectId(user);
-						ProductTypePermissionFlagSet productTypePermissionFlagSet = key2productTypePermissionFlagSet.get(key);
-						if (productTypePermissionFlagSet == null)
-							throw new IllegalStateException("There is no ProductTypePermissionFlagSet with this key: " + key + "!!! The ProductTypeActionHandler " + productTypeActionHandler + " in organisation \"" + getOrganisationID() + "\" returned an more elements than requested in method calculateProductTypeAvailabilityPercentage(...) for ProductType \"" + productType + "\" and user \"" + user + "\"");
+				while (it2.hasNext()) {
 
-						productTypePermissionFlagSet.setAvailabilityPercentage(percentage);
+					if (!forceAtLeastOneChunk) {
+						if (System.currentTimeMillis() - startTimestamp > calculateProductTypeAvailabilityPercentage_breakDurationMSec)
+							break mainLoop;
 					}
+					else
+						forceAtLeastOneChunk = false;
+
+					for (int i = 0; i < calculateProductTypeAvailabilityPercentage_chunkProductTypeQty; ++i) {
+						if (!it2.hasNext())
+							continue;
+
+						Map.Entry<ProductTypeID, Set<UserID>> me2 = it2.next();
+						it2.remove();
+
+						if (me1.getValue().isEmpty())
+							it1.remove();
+
+						ProductType productType = (ProductType) pm.getObjectById(me2.getKey());
+						Set<UserID> userIDs = me2.getValue();
+						Set<User> users = NLJDOHelper.getObjectSet(pm, userIDs, User.class);
+						productType2users.put(productType, users);
+						++productTypesDoneCount;
+					}
+
+					Map<ProductType, Map<User, Double>> percentages = productTypeActionHandler.calculateProductTypeAvailabilityPercentage(productType2users);
+					for (Map.Entry<ProductType, Set<User>> me2 : productType2users.entrySet()) {
+						ProductType productType = me2.getKey();
+						for (User user : me2.getValue()) {
+							Map<User, Double> user2percentage = percentages.get(productType);
+							if (user2percentage == null)
+								throw new IllegalStateException(
+										"ProductTypeActionHandler " + productTypeActionHandler + " in organisation \"" + getOrganisationID() + "\" returned an incomplete result in method calculateProductTypeAvailabilityPercentage(...): No entry for ProductType: " + productType
+								);
+
+							Double percentage = user2percentage.get(user);
+							if (percentage == null)
+								throw new IllegalStateException(
+										"ProductTypeActionHandler " + productTypeActionHandler + " in organisation \"" + getOrganisationID() + "\" returned an incomplete result in method calculateProductTypeAvailabilityPercentage(...) for ProductType \"" + productType + "\": No entry for user: " + user
+								);
+
+							ProductTypePermissionFlagSet productTypePermissionFlagSet = (ProductTypePermissionFlagSet) pm.getObjectById(
+									ProductTypePermissionFlagSetID.create(productType, user)
+							);
+							productTypePermissionFlagSet.setAvailabilityPercentage(percentage);
+						}
+					}
+
+				} // while (it.hasNext()) {
+			} // mainLoop
+
+			if (!productTypeActionHandlerID2productTypeID2userIDs.isEmpty())
+				MultiTxJob.createMultiTxJobPart(pm, calculateProductTypeAvailabilityPercentage_multiTxJobID, productTypeActionHandlerID2productTypeID2userIDs);
+
+			if (logger.isDebugEnabled()) {
+				long productTypesToDoCount = 0;
+				for (Map.Entry<ProductTypeActionHandlerID, Map<ProductTypeID, Set<UserID>>> me1 : productTypeActionHandlerID2productTypeID2userIDs.entrySet()) {
+					productTypesToDoCount += me1.getValue().size();
 				}
+
+				logger.debug("calculateProductTypeAvailabilityPercentage: exiting after having processed " + productTypesDoneCount + " product types (still " + productTypesToDoCount + " to do).");
 			}
 
 		} finally {

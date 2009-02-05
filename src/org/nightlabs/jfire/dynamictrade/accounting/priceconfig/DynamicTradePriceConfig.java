@@ -4,6 +4,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.jdo.JDODetachedFieldAccessException;
+
 import org.nightlabs.jfire.accounting.PriceFragmentType;
 import org.nightlabs.jfire.accounting.gridpriceconfig.FormulaPriceConfig;
 
@@ -81,7 +83,7 @@ extends FormulaPriceConfig
 	{
 		inputPriceFragmentTypes.remove(priceFragmentType);
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 * <p>
@@ -102,9 +104,23 @@ extends FormulaPriceConfig
 	@Override
 	public void jdoPreAttach() {
 		super.jdoPreAttach();
+		try {
+			clearPackagingResultPriceConfigs(); // we never store the results, because prices are dynamic
+		} catch (JDODetachedFieldAccessException x) {
+			// silently ignore it - the field packagingResultPriceConfigs is not detached => no problem.
+		}
+	}
+
+	@Override
+	public void jdoPostAttach(Object detached) {
+		super.jdoPostAttach(detached);
+
+		// make sure that the field packagingResultPriceConfigs is really empty
+		// (in case the JDODetachedFieldAccessException above in jdoPreAttach() was
+		// not caused by this field (highly unlikely)).
 		clearPackagingResultPriceConfigs(); // we never store the results, because prices are dynamic
 	}
-	
+
 	@Override
 	public void jdoPreStore()
 	{

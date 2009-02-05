@@ -2782,7 +2782,7 @@ implements SessionBean
 	 * The process in {@link #calculateProductTypeAvailabilityPercentage(TaskID)} breaks after this duration has been reached.
 	 * Hence, it might take longer (if it is close to this duration and another chunk is begun).
 	 */
-	private static final long calculateProductTypeAvailabilityPercentage_breakDurationMSec = 10L * 1000L; // = 90L * 1000L;
+	private static final long calculateProductTypeAvailabilityPercentage_breakDurationMSec = 90L * 1000L;
 
 	/**
 	 * @ejb.interface-method

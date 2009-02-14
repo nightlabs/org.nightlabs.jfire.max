@@ -9,12 +9,12 @@ import java.util.Set;
 
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
-import org.nightlabs.jfire.geography.Region;
+import org.nightlabs.jfire.geography.City;
 import org.nightlabs.jfire.geography.GeographyManager;
 import org.nightlabs.jfire.geography.GeographyManagerUtil;
-import org.nightlabs.jfire.geography.City;
-import org.nightlabs.jfire.geography.id.RegionID;
+import org.nightlabs.jfire.geography.Region;
 import org.nightlabs.jfire.geography.id.CityID;
+import org.nightlabs.jfire.geography.id.RegionID;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.progress.ProgressMonitor;
 import org.nightlabs.progress.SubProgressMonitor;

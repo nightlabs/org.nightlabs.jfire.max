@@ -489,7 +489,6 @@ public class DataCreator
 	}
 
 	public Order createOrderForEndcustomer(LegalEntity customer)
-	throws ModuleException
 	{
 		Trader trader = Trader.getTrader(pm);
 		Order order = trader.createOrder(trader.getMandator(), customer, null, getCurrencyEUR());

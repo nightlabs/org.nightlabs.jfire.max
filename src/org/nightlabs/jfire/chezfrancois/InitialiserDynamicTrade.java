@@ -20,6 +20,9 @@ import org.nightlabs.jfire.base.JFirePrincipal;
 import org.nightlabs.jfire.dynamictrade.accounting.priceconfig.DynamicTradePriceConfig;
 import org.nightlabs.jfire.dynamictrade.store.DynamicProductType;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
+import org.nightlabs.jfire.prop.exception.DataBlockGroupNotFoundException;
+import org.nightlabs.jfire.prop.exception.DataBlockNotFoundException;
+import org.nightlabs.jfire.prop.exception.DataFieldNotFoundException;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.CannotConfirmProductTypeException;
 import org.nightlabs.jfire.store.CannotMakeProductTypeSaleableException;
@@ -38,7 +41,7 @@ extends Initialiser
 	}
 
 	public void createDemoData()
-	throws ModuleException, CannotPublishProductTypeException, CannotConfirmProductTypeException, CannotMakeProductTypeSaleableException
+	throws CannotPublishProductTypeException, CannotConfirmProductTypeException, CannotMakeProductTypeSaleableException, DataBlockNotFoundException, DataBlockGroupNotFoundException, DataFieldNotFoundException
 	{
 		String organisationID = getOrganisationID();
 

@@ -14,10 +14,17 @@ import org.nightlabs.jfire.accounting.Account;
 import org.nightlabs.jfire.accounting.Tariff;
 import org.nightlabs.jfire.accounting.book.mappingbased.MappingBasedAccountantDelegate;
 import org.nightlabs.jfire.accounting.gridpriceconfig.FormulaPriceConfig;
+import org.nightlabs.jfire.accounting.gridpriceconfig.PriceCalculationException;
 import org.nightlabs.jfire.accounting.priceconfig.IInnerPriceConfig;
 import org.nightlabs.jfire.base.JFirePrincipal;
 import org.nightlabs.jfire.person.Person;
 import org.nightlabs.jfire.person.PersonStruct;
+import org.nightlabs.jfire.prop.exception.DataBlockGroupNotFoundException;
+import org.nightlabs.jfire.prop.exception.DataBlockNotFoundException;
+import org.nightlabs.jfire.prop.exception.DataFieldNotFoundException;
+import org.nightlabs.jfire.prop.exception.StructBlockNotFoundException;
+import org.nightlabs.jfire.prop.exception.StructFieldNotFoundException;
+import org.nightlabs.jfire.prop.exception.StructFieldValueNotFoundException;
 import org.nightlabs.jfire.security.Authority;
 import org.nightlabs.jfire.security.RoleGroup;
 import org.nightlabs.jfire.security.RoleGroupRef;
@@ -50,7 +57,7 @@ extends Initialiser
 	}
 
 	public void createDemoData()
-	throws ModuleException, CannotPublishProductTypeException, CannotConfirmProductTypeException, CannotMakeProductTypeSaleableException
+	throws CannotPublishProductTypeException, CannotConfirmProductTypeException, CannotMakeProductTypeSaleableException, DataBlockNotFoundException, DataBlockGroupNotFoundException, DataFieldNotFoundException, SecurityException, PriceCalculationException, StructFieldValueNotFoundException, StructFieldNotFoundException, StructBlockNotFoundException
 	{
 		String organisationID = getOrganisationID();
 

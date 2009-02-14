@@ -48,6 +48,7 @@ import org.nightlabs.jfire.accounting.Tariff;
 import org.nightlabs.jfire.accounting.TariffMapper;
 import org.nightlabs.jfire.accounting.gridpriceconfig.FormulaCell;
 import org.nightlabs.jfire.accounting.gridpriceconfig.FormulaPriceConfig;
+import org.nightlabs.jfire.accounting.gridpriceconfig.PriceCalculationException;
 import org.nightlabs.jfire.accounting.gridpriceconfig.PriceCalculator;
 import org.nightlabs.jfire.accounting.gridpriceconfig.StablePriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.IInnerPriceConfig;
@@ -303,8 +304,7 @@ extends DataCreator
 		return text;
 	}
 
-	public void calculatePrices()
-	throws ModuleException
+	public void calculatePrices() throws PriceCalculationException
 	{
 		for (ProductTypeID ptID : createdLeafIDs) {
 			SimpleProductType pt = (SimpleProductType) pm.getObjectById(ptID);

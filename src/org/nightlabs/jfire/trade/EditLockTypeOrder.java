@@ -47,9 +47,11 @@ extends EditLockType
 		super(organisationID, editLockTypeID);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.editlock.EditLockType#onReleaseEditLock(org.nightlabs.jfire.editlock.EditLock, org.nightlabs.jfire.editlock.ReleaseReason)
+	 */
 	@Override
 	public void onReleaseEditLock(EditLock editLock, ReleaseReason releaseReason)
-	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		pm.getExtent(Order.class);

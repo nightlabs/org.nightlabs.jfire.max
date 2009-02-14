@@ -795,14 +795,8 @@ implements StoreCallback
 			);
 
 		if (deliveryNoteIDPrefix == null) {
-			TradeConfigModule tradeConfigModule;
-			try {
-				tradeConfigModule = Config.getConfig(
+			TradeConfigModule tradeConfigModule = Config.getConfig(
 						getPersistenceManager(), organisationID, user).createConfigModule(TradeConfigModule.class);
-			} catch (ModuleException x) {
-				throw new RuntimeException(x); // should not happen.
-			}
-
 			deliveryNoteIDPrefix = tradeConfigModule.getActiveIDPrefixCf(DeliveryNote.class.getName()).getDefaultIDPrefix();
 		}
 

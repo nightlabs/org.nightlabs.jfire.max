@@ -136,14 +136,8 @@ public class RecurringTrader {
 	public String getOrderIDPrefix(User user, String orderIDPrefix)
 	{
 		if (orderIDPrefix == null) {
-			TradeConfigModule tradeConfigModule;
-			try {
-				tradeConfigModule = Config.getConfig(
+			TradeConfigModule tradeConfigModule = Config.getConfig(
 						getPersistenceManager(), getOrganisationID(), user).createConfigModule(TradeConfigModule.class);
-			} catch (ModuleException x) {
-				throw new RuntimeException(x); // should not happen.
-			}
-
 			orderIDPrefix = tradeConfigModule.getActiveIDPrefixCf(RecurringOrder.class.getName()).getDefaultIDPrefix();
 		}
 		return orderIDPrefix;
@@ -153,14 +147,8 @@ public class RecurringTrader {
 	public String getOfferIDPrefix(User user, String orderIDPrefix)
 	{
 		if (orderIDPrefix == null) {
-			TradeConfigModule tradeConfigModule;
-			try {
-				tradeConfigModule = Config.getConfig(
+			TradeConfigModule tradeConfigModule = Config.getConfig(
 						getPersistenceManager(), getOrganisationID(), user).createConfigModule(TradeConfigModule.class);
-			} catch (ModuleException x) {
-				throw new RuntimeException(x); // should not happen.
-			}
-
 			orderIDPrefix = tradeConfigModule.getActiveIDPrefixCf(RecurringOffer.class.getName()).getDefaultIDPrefix();
 		}
 		return orderIDPrefix;

@@ -338,14 +338,8 @@ implements StoreCallback
 			throw new IllegalArgumentException("The mandator is neither involved as vendor nor as customer!");
 
 		if (invoiceIDPrefix == null) {
-			TradeConfigModule tradeConfigModule;
-			try {
-				tradeConfigModule = (TradeConfigModule) Config.getConfig(
+			TradeConfigModule tradeConfigModule = (TradeConfigModule) Config.getConfig(
 						getPersistenceManager(), organisationID, user).createConfigModule(TradeConfigModule.class);
-			} catch (ModuleException x) {
-				throw new RuntimeException(x); // should not happen.
-			}
-
 			invoiceIDPrefix = tradeConfigModule.getActiveIDPrefixCf(Invoice.class.getName()).getDefaultIDPrefix();
 		}
 

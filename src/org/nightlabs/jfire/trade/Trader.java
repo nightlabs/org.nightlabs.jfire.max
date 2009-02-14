@@ -468,12 +468,8 @@ public class Trader
 
 		if (offerIDPrefix == null) {
 			TradeConfigModule tradeConfigModule;
-			try {
-				tradeConfigModule = Config.getConfig(
-						getPersistenceManager(), getOrganisationID(), user).createConfigModule(TradeConfigModule.class);
-			} catch (ModuleException x) {
-				throw new RuntimeException(x); // should not happen.
-			}
+			tradeConfigModule = Config.getConfig(
+					getPersistenceManager(), getOrganisationID(), user).createConfigModule(TradeConfigModule.class);
 
 			offerIDPrefix = tradeConfigModule.getActiveIDPrefixCf(Offer.class.getName()).getDefaultIDPrefix();
 		}
@@ -504,13 +500,8 @@ public class Trader
 	{
 		if (orderIDPrefix == null) {
 			TradeConfigModule tradeConfigModule;
-			try {
-				tradeConfigModule = Config.getConfig(
-						getPersistenceManager(), getOrganisationID(), user).createConfigModule(TradeConfigModule.class);
-			} catch (ModuleException x) {
-				throw new RuntimeException(x); // should not happen.
-			}
-
+			tradeConfigModule = Config.getConfig(
+					getPersistenceManager(), getOrganisationID(), user).createConfigModule(TradeConfigModule.class);
 			orderIDPrefix = tradeConfigModule.getActiveIDPrefixCf(Order.class.getName()).getDefaultIDPrefix();
 		}
 		return orderIDPrefix;
@@ -660,12 +651,7 @@ public class Trader
 
 			if (offerIDPrefix == null) {
 				TradeConfigModule tradeConfigModule;
-				try {
-					tradeConfigModule = Config.getConfig(getPersistenceManager(), organisationID, user).createConfigModule(TradeConfigModule.class);
-				} catch (ModuleException x) {
-					throw new RuntimeException(x); // should not happen.
-				}
-
+				tradeConfigModule = Config.getConfig(getPersistenceManager(), organisationID, user).createConfigModule(TradeConfigModule.class);
 				offerIDPrefix = tradeConfigModule.getActiveIDPrefixCf(Offer.class.getName()).getDefaultIDPrefix();
 			}
 
@@ -696,14 +682,7 @@ public class Trader
 			return;
 
 		Workstation workstation = Workstation.getWorkstation(getPersistenceManager(), WorkstationResolveStrategy.FALLBACK);
-
-		OfferConfigModule offerConfigModule;
-		try {
-			offerConfigModule = Config.getConfig(getPersistenceManager(), organisationID, workstation).createConfigModule(OfferConfigModule.class);
-		} catch (ModuleException x) {
-			throw new RuntimeException(x); // should not happen.
-		}
-
+		OfferConfigModule offerConfigModule = Config.getConfig(getPersistenceManager(), organisationID, workstation).createConfigModule(OfferConfigModule.class);
 		offerConfigModule.setOfferExpiry(offer);
 	}
 
@@ -1076,7 +1055,6 @@ public class Trader
 	 * @param synchronously
 	 */
 	public void releaseArticles(User user, Collection<Article> articles, boolean synchronously, boolean deleteAfterRelease)
-	throws ModuleException
 	{
 		try {
 			String releaseExecID = ObjectIDUtil.makeValidIDString("release", true);
@@ -1095,10 +1073,8 @@ public class Trader
 
 		} catch (RuntimeException x) {
 			throw x;
-		} catch (ModuleException x) {
-			throw x;
 		} catch (Exception x) {
-			throw new ModuleException(x);
+			throw new RuntimeException(x);
 		}
 	}
 
@@ -2014,7 +1990,6 @@ public class Trader
 	 *          Instances of {@link Article}.
 	 */
 	public void deleteArticles(User user, Collection<? extends Article> articles)
-	throws ModuleException
 	{
 		if (logger.isDebugEnabled()) {
 			logger.debug("deleteArticles: entered with " + articles.size() + " articles.");

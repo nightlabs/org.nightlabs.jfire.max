@@ -384,7 +384,6 @@ implements SessionBean
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="org.nightlabs.jfire.store.seeProductType"
 	 */
-	@SuppressWarnings("unchecked")
 	public Set<ProductTypeID> getChildVoucherTypeIDs(ProductTypeID parentVoucherTypeID)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -428,7 +427,6 @@ implements SessionBean
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.queryPriceConfigurations"
 	 */
-	@SuppressWarnings("unchecked")
 	public List<VoucherPriceConfig> getVoucherPriceConfigs(Collection<PriceConfigID> voucherPriceConfigIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -717,6 +715,7 @@ implements SessionBean
 	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.queryLocalAccountantDelegates"
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
+	@SuppressWarnings("unchecked")
 	public Set<LocalAccountantDelegateID> getVoucherLocalAccountantDelegateIDs() {
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -734,7 +733,6 @@ implements SessionBean
 	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.queryLocalAccountantDelegates"
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
-	@SuppressWarnings("unchecked")
 	public List<VoucherLocalAccountantDelegate> getVoucherLocalAccountantDelegates(
 			Collection<LocalAccountantDelegateID> voucherLocalAccountantDelegateIDs,
 			String[] fetchGroups, int maxFetchDepth) {
@@ -779,7 +777,6 @@ implements SessionBean
 	 * @ejb.permission role-name="org.nightlabs.jfire.voucher.redeemVoucher"
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
-	@SuppressWarnings("unchecked")
 	public List<VoucherKey> getVoucherKeys(
 			Collection<VoucherKeyID> voucherKeyIDs, String[] fetchGroups,
 			int maxFetchDepth
@@ -809,8 +806,7 @@ implements SessionBean
 	 * @ejb.permission role-name="org.nightlabs.jfire.trade.sellProductType"
 	 */
 	public Map<ProductID, Map<ScriptRegistryItemID, Object>> getVoucherScriptingResults(
-			Collection<ProductID> voucherIDs, boolean allScripts
-	) throws ModuleException
+			Collection<ProductID> voucherIDs, boolean allScripts)
 	{
 		return getVoucherScriptingResults((PersistenceManager) null, voucherIDs, allScripts);
 	}
@@ -818,10 +814,10 @@ implements SessionBean
 	// TODO we need to pass ArticleIDs instead of ProductIDs, because products can be resold
 	// after having been reversed and we should be able to print duplicates at any time with
 	// the correct data.
+	@SuppressWarnings("unchecked")
 	protected Map<ProductID, Map<ScriptRegistryItemID, Object>> getVoucherScriptingResults(
 			PersistenceManager pm, Collection<ProductID> voucherIDs,
-			boolean allScripts
-	) throws ModuleException
+			boolean allScripts)
 	{
 		allScripts = true; // TODO remove this line!
 		// TODO obtain the scripts via the voucher-layout-file,
@@ -898,10 +894,8 @@ implements SessionBean
 			}
 		} catch (RuntimeException x) {
 			throw x;
-		} catch (ModuleException x) {
-			throw x;
 		} catch (Exception x) {
-			throw new ModuleException(x);
+			throw new RuntimeException(x);
 		}
 	}
 
@@ -1255,7 +1249,6 @@ implements SessionBean
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="org.nightlabs.jfire.voucher.editVoucherLayout"
 	 */
-	@SuppressWarnings("unchecked")
 	public List<VoucherLayout> getVoucherLayouts(Set<VoucherLayoutID> voucherLayoutIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();

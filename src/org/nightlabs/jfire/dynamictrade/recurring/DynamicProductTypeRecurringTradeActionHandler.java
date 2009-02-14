@@ -8,7 +8,6 @@ import java.util.Set;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 
-import org.nightlabs.ModuleException;
 import org.nightlabs.jfire.accounting.id.TariffID;
 import org.nightlabs.jfire.dynamictrade.DynamicTrader;
 import org.nightlabs.jfire.dynamictrade.store.DynamicProductType;

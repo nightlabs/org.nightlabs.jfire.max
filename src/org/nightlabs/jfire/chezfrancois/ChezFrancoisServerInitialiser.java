@@ -32,6 +32,7 @@ import org.nightlabs.jfire.init.InitException;
 import org.nightlabs.jfire.serverinit.ServerInitialiserDelegate;
 import org.nightlabs.jfire.servermanager.JFireServerManager;
 import org.nightlabs.jfire.servermanager.OrganisationNotFoundException;
+import org.nightlabs.jfire.servermanager.createorganisation.CreateOrganisationException;
 
 public class ChezFrancoisServerInitialiser extends ServerInitialiserDelegate
 {
@@ -56,7 +57,7 @@ public class ChezFrancoisServerInitialiser extends ServerInitialiserDelegate
 				//    jfsm.createOrganisation(ORGANISATION_ID_WINE_STORE, "Chez François Wine Store", "francois", "test", true);
 				try {
 					jfsm.createOrganisation(ORGANISATION_ID_WINE_STORE, "Chez Francois Wine Store", "francois", "test", true);
-				} catch (ModuleException e) {
+				} catch (CreateOrganisationException e) {
 					throw new InitException(e.getMessage(), e);
 				}
 			}

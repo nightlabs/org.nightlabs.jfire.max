@@ -39,7 +39,6 @@ import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 
 import org.apache.log4j.Logger;
-import org.nightlabs.ModuleException;
 import org.nightlabs.htmlcontent.ContentTypeUtil;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.accounting.Currency;

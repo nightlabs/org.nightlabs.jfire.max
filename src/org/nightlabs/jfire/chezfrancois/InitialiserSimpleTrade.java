@@ -8,7 +8,6 @@ import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 
 import org.apache.log4j.Logger;
-import org.nightlabs.ModuleException;
 import org.nightlabs.config.Config;
 import org.nightlabs.jfire.accounting.Account;
 import org.nightlabs.jfire.accounting.Tariff;

@@ -6,7 +6,6 @@ import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 
-import org.nightlabs.ModuleException;
 import org.nightlabs.jfire.accounting.Account;
 import org.nightlabs.jfire.accounting.PriceFragmentType;
 import org.nightlabs.jfire.accounting.Tariff;

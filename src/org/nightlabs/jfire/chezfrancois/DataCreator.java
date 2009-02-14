@@ -34,7 +34,6 @@ import javax.jdo.PersistenceManager;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
-import org.nightlabs.ModuleException;
 import org.nightlabs.i18n.I18nText;
 import org.nightlabs.jfire.accounting.Account;
 import org.nightlabs.jfire.accounting.AccountType;

@@ -5,7 +5,6 @@ import java.util.Locale;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 
-import org.nightlabs.ModuleException;
 import org.nightlabs.jfire.accounting.Account;
 import org.nightlabs.jfire.accounting.AccountType;
 import org.nightlabs.jfire.accounting.priceconfig.PriceConfig;

@@ -27,7 +27,6 @@
 package org.nightlabs.jfire.chezfrancois;
 
 import org.apache.log4j.Logger;
-import org.nightlabs.ModuleException;
 import org.nightlabs.jfire.init.InitException;
 import org.nightlabs.jfire.serverinit.ServerInitialiserDelegate;
 import org.nightlabs.jfire.servermanager.JFireServerManager;

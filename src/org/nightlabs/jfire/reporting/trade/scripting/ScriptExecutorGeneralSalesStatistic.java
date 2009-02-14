@@ -18,7 +18,6 @@ import org.nightlabs.jfire.reporting.oda.jfs.JFSResultSetMetaData;
 import org.nightlabs.jfire.scripting.ScriptException;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.trade.Article;
-import org.nightlabs.util.NLLocale;
 
 /**
  * @author Alexander Bieber <alex [AT] nightlabs [DOT] de>

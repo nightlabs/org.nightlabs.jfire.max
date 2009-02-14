@@ -211,7 +211,6 @@ public class DynamicTrader {
 			Price singlePrice,
 			boolean allocate,
 			boolean allocateSynchronously)
-	throws ModuleException
 	{
 		if (segmentID == null)     throw new IllegalArgumentException("segmentID must not be null!");
 		// offerID can be null

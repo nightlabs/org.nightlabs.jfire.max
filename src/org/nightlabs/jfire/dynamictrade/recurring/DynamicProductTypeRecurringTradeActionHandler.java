@@ -55,8 +55,7 @@ public class DynamicProductTypeRecurringTradeActionHandler extends RecurringTrad
 	@Override
 	public Map<Article, Article> createArticles(RecurredOffer offer,
 			Set<Article> recurringArticles, Segment segment)
-			throws ModuleException {
-
+	{
 		Map<Article, Article> articlesMap=  new HashMap<Article, Article>();
 
 		DynamicProductTypeRecurringArticle recurringArticle;

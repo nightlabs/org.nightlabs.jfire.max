@@ -42,7 +42,6 @@ import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
-import org.nightlabs.ModuleException;
 import org.nightlabs.io.DataBuffer;
 import org.nightlabs.jfire.accounting.pay.config.ModeOfPaymentConfigModule;
 import org.nightlabs.jfire.accounting.pay.id.ModeOfPaymentFlavourID;
@@ -296,21 +295,13 @@ implements Serializable
 		
 		if (filterByConfig) {
 			ModeOfPaymentConfigModule cfMod;
-			try {
-				cfMod = UserConfigSetup.getUserConfigModule(pm, ModeOfPaymentConfigModule.class);
-			} catch (ModuleException e) {
-				throw new RuntimeException(e);
-			}
+			cfMod = UserConfigSetup.getUserConfigModule(pm, ModeOfPaymentConfigModule.class);
 			for (Iterator<Map.Entry<String, ModeOfPaymentFlavour>> it = m.entrySet().iterator(); it.hasNext(); ) {
 				if (!cfMod.getModeOfPaymentFlavours().contains(it.next().getValue())) {
 					it.remove();
 				}
 			}
-			try {
-				cfMod = WorkstationConfigSetup.getWorkstationConfigModule(pm, ModeOfPaymentConfigModule.class);
-			} catch (ModuleException e) {
-				throw new RuntimeException(e);
-			}
+			cfMod = WorkstationConfigSetup.getWorkstationConfigModule(pm, ModeOfPaymentConfigModule.class);
 			for (Iterator<Map.Entry<String, ModeOfPaymentFlavour>> it = m.entrySet().iterator(); it.hasNext(); ) {
 				if (!cfMod.getModeOfPaymentFlavours().contains(it.next().getValue())) {
 					it.remove();

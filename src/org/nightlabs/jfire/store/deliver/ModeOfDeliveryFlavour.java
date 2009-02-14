@@ -45,7 +45,6 @@ import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
-import org.nightlabs.ModuleException;
 import org.nightlabs.io.DataBuffer;
 import org.nightlabs.jfire.config.UserConfigSetup;
 import org.nightlabs.jfire.config.WorkstationConfigSetup;
@@ -493,21 +492,13 @@ implements Serializable
 
 		if (filterByConfig) {
 			ModeOfDeliveryConfigModule cfMod;
-			try {
-				cfMod = UserConfigSetup.getUserConfigModule(pm, ModeOfDeliveryConfigModule.class);
-			} catch (ModuleException e) {
-				throw new RuntimeException(e);
-			}
+			cfMod = UserConfigSetup.getUserConfigModule(pm, ModeOfDeliveryConfigModule.class);
 			for (Iterator<Map.Entry<String, ModeOfDeliveryFlavour>> it = m.entrySet().iterator(); it.hasNext(); ) {
 				if (!cfMod.getModeOfDeliveryFlavours().contains(it.next().getValue())) {
 					it.remove();
 				}
 			}
-			try {
-				cfMod = WorkstationConfigSetup.getWorkstationConfigModule(pm, ModeOfDeliveryConfigModule.class);
-			} catch (ModuleException e) {
-				throw new RuntimeException(e);
-			}
+			cfMod = WorkstationConfigSetup.getWorkstationConfigModule(pm, ModeOfDeliveryConfigModule.class);
 			for (Iterator<Map.Entry<String, ModeOfDeliveryFlavour>> it = m.entrySet().iterator(); it.hasNext(); ) {
 				if (!cfMod.getModeOfDeliveryFlavours().contains(it.next().getValue())) {
 					it.remove();

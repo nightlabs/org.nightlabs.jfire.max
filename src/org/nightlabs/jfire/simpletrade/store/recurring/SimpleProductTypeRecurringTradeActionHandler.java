@@ -8,7 +8,6 @@ import java.util.Set;
 
 import javax.jdo.PersistenceManager;
 
-import org.nightlabs.ModuleException;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.simpletrade.store.SimpleProductType;

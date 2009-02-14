@@ -26,12 +26,11 @@
 
 package org.nightlabs.jfire.accounting.gridpriceconfig;
 
-import org.nightlabs.ModuleException;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  */
-public class PriceCalculationException extends ModuleException
+public class PriceCalculationException extends Exception
 {
 	private static final long serialVersionUID = 1L;
 	private IAbsolutePriceCoordinate absolutePriceCoordinate;

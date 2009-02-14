@@ -26,12 +26,11 @@
 
 package org.nightlabs.jfire.store.deliver;
 
-import org.nightlabs.ModuleException;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  */
-public class DeliveryException extends ModuleException
+public class DeliveryException extends Exception
 {
 	private static final long serialVersionUID = 1L;
 	private DeliveryResult deliveryResult;

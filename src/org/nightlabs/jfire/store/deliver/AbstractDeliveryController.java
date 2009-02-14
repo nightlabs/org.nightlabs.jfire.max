@@ -25,6 +25,7 @@ public abstract class AbstractDeliveryController extends AbstractTransferControl
 		return deliveryIDs;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	protected void _serverBegin() {
 		if (isSkipServerStages())
@@ -50,9 +51,6 @@ public abstract class AbstractDeliveryController extends AbstractTransferControl
 				DeliveryResult deliverBeginServerResult = (DeliveryResult) itR.next();
 				deliveryData.getDelivery().setDeliverBeginServerResult(deliverBeginServerResult);
 			}
-		} catch (DeliveryException x) {
-			for (DeliveryData deliveryData : getTransferDatas())
-				deliveryData.getDelivery().setDeliverBeginServerResult(x.getDeliveryResult());
 		} catch (Throwable t) {
 			DeliveryResult deliverBeginServerResult = new DeliveryResult(t);
 			for (DeliveryData deliveryData : getTransferDatas())
@@ -60,6 +58,7 @@ public abstract class AbstractDeliveryController extends AbstractTransferControl
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	protected void _serverDoWork() {
 		if (isSkipServerStages())
@@ -80,9 +79,10 @@ public abstract class AbstractDeliveryController extends AbstractTransferControl
 				DeliveryResult deliverDoWorkServerResult = itR.next();
 				deliveryData.getDelivery().setDeliverDoWorkServerResult(deliverDoWorkServerResult);
 			}
-		} catch (DeliveryException x) {
-			for (DeliveryData deliveryData : getTransferDatas())
-				deliveryData.getDelivery().setDeliverDoWorkServerResult(x.getDeliveryResult());
+		// impossible to be thrown now since it does not inherit ModuleException anymore
+//		} catch (DeliveryException x) {
+//			for (DeliveryData deliveryData : getTransferDatas())
+//				deliveryData.getDelivery().setDeliverDoWorkServerResult(x.getDeliveryResult());
 		} catch (Throwable t) {
 			DeliveryResult deliverDoWorkServerResult = new DeliveryResult(t);
 
@@ -91,6 +91,7 @@ public abstract class AbstractDeliveryController extends AbstractTransferControl
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	protected void _serverEnd() {
 		if (isSkipServerStages())
@@ -108,9 +109,10 @@ public abstract class AbstractDeliveryController extends AbstractTransferControl
 				DeliveryResult deliverEndServerResult = (DeliveryResult) itR.next();
 				deliveryData.getDelivery().setDeliverEndServerResult(deliverEndServerResult);
 			}
-		} catch (DeliveryException x) {
-			for (DeliveryData deliveryData : getTransferDatas())
-				deliveryData.getDelivery().setDeliverEndServerResult(x.getDeliveryResult());
+			// impossible to be thrown now since it does not inherit ModuleException anymore
+//		} catch (DeliveryException x) {
+//			for (DeliveryData deliveryData : getTransferDatas())
+//				deliveryData.getDelivery().setDeliverEndServerResult(x.getDeliveryResult());
 		} catch (Throwable t) {
 			DeliveryResult deliverEndServerResult = new DeliveryResult(t);
 			for (DeliveryData deliveryData : getTransferDatas())

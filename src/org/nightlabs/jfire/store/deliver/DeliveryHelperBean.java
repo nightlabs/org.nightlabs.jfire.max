@@ -43,6 +43,7 @@ import javax.jdo.PersistenceManager;
 import org.apache.log4j.Logger;
 import org.nightlabs.ModuleException;
 import org.nightlabs.jfire.asyncinvoke.AsyncInvoke;
+import org.nightlabs.jfire.asyncinvoke.AsyncInvokeEnqueueException;
 import org.nightlabs.jfire.asyncinvoke.Invocation;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
@@ -162,7 +163,7 @@ implements SessionBean
 	public DeliveryResult deliverBegin_internal(
 			DeliveryDataID deliveryDataID,
 			String[] fetchGroups, int maxFetchDepth)
-	throws ModuleException
+	throws DeliveryException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -218,7 +219,7 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public DeliveryResult deliverDoWork_internal(DeliveryID deliveryID, String[] fetchGroups, int maxFetchDepth)
-	throws ModuleException
+	throws DeliveryException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -255,7 +256,7 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public DeliveryResult deliverEnd_internal(DeliveryID deliveryID, String[] fetchGroups, int maxFetchDepth)
-	throws ModuleException
+	throws DeliveryException, AsyncInvokeEnqueueException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -287,11 +288,7 @@ implements SessionBean
 			DeliveryResult deliverEndServerResult_detached = pm.detachCopy(deliverEndServerResult);
 //			deliverBeginServerResult_detached.setError(deliverBeginServerResult.getError());
 
-			try {
-				AsyncInvoke.exec(new ConsolidateProductReferencesInvocation(deliveryNoteIDs, 5000), true);
-			} catch (Exception e) {
-				throw new ModuleException(e);
-			}
+			AsyncInvoke.exec(new ConsolidateProductReferencesInvocation(deliveryNoteIDs, 5000), true);
 
 			return deliverEndServerResult_detached;
 		} finally {

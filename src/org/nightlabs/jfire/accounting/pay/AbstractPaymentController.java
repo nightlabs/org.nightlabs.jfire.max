@@ -30,6 +30,7 @@ public abstract class AbstractPaymentController extends AbstractTransferControll
 	}
 
 
+	@SuppressWarnings("unchecked")
 	@Override
 	protected void _serverBegin() {
 		if (isSkipServerStages())
@@ -55,9 +56,10 @@ public abstract class AbstractPaymentController extends AbstractTransferControll
 				PaymentResult payBeginServerResult = (PaymentResult) itR.next();
 				paymentData.getPayment().setPayBeginServerResult(payBeginServerResult);
 			}
-		} catch (PaymentException x) {
-			for (PaymentData paymentData : getTransferDatas())
-				paymentData.getPayment().setPayBeginServerResult(x.getPaymentResult());
+			// impossible to be thrown now since it does not inherit ModuleException anymore
+//		} catch (PaymentException x) {
+//			for (PaymentData paymentData : getTransferDatas())
+//				paymentData.getPayment().setPayBeginServerResult(x.getPaymentResult());
 		} catch (Throwable t) {
 			PaymentResult payBeginServerResult = new PaymentResult(SecurityReflector.getUserDescriptor().getOrganisationID(), t);
 			for (PaymentData paymentData : getTransferDatas())
@@ -90,9 +92,10 @@ public abstract class AbstractPaymentController extends AbstractTransferControll
 				PaymentResult payDoWorkServerResult = itR.next();
 				paymentData.getPayment().setPayDoWorkServerResult(payDoWorkServerResult);
 			}
-		} catch (PaymentException x) {
-			for (Iterator<PaymentData> itD = getTransferDatas().iterator(); itD.hasNext();)
-				(itD.next()).getPayment().setPayDoWorkServerResult(x.getPaymentResult());
+			// impossible to be thrown now since it does not inherit ModuleException anymore
+//		} catch (PaymentException x) {
+//			for (Iterator<PaymentData> itD = getTransferDatas().iterator(); itD.hasNext();)
+//				(itD.next()).getPayment().setPayDoWorkServerResult(x.getPaymentResult());
 		} catch (Throwable t) {
 			PaymentResult payDoWorkServerResult = new PaymentResult(SecurityReflector.getUserDescriptor().getOrganisationID(), t);
 			for (PaymentData paymentData : getTransferDatas())
@@ -121,9 +124,10 @@ public abstract class AbstractPaymentController extends AbstractTransferControll
 				PaymentResult payEndServerResult = (PaymentResult) itR.next();
 				paymentData.getPayment().setPayEndServerResult(payEndServerResult);
 			}
-		} catch (PaymentException x) {
-			for (PaymentData paymentData : getTransferDatas())
-				paymentData.getPayment().setPayEndServerResult(x.getPaymentResult());
+			// impossible to be thrown now since it does not inherit ModuleException anymore
+//		} catch (PaymentException x) {
+//			for (PaymentData paymentData : getTransferDatas())
+//				paymentData.getPayment().setPayEndServerResult(x.getPaymentResult());
 		} catch (Throwable t) {
 			PaymentResult payEndServerResult = new PaymentResult(SecurityReflector.getUserDescriptor().getOrganisationID(), t);
 			for (PaymentData paymentData : getTransferDatas())

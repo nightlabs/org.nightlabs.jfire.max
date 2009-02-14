@@ -249,7 +249,7 @@ implements SessionBean
 	public Order createPurchaseOrder(
 			AnchorID vendorID, String orderIDPrefix, CurrencyID currencyID,
 			SegmentTypeID[] segmentTypeIDs, String[] fetchGroups, int maxFetchDepth)
-//	throws ModuleException
+	//	throws ModuleException
 	{
 		if (vendorID == null)
 			throw new IllegalArgumentException("vendorID must not be null!");
@@ -308,7 +308,7 @@ implements SessionBean
 	public Order createSaleOrder(
 			AnchorID customerID, String orderIDPrefix, CurrencyID currencyID,
 			SegmentTypeID[] segmentTypeIDs, String[] fetchGroups, int maxFetchDepth)
-//	throws ModuleException
+	//	throws ModuleException
 	{
 		if (customerID == null)
 			throw new IllegalArgumentException("customerID must not be null!");
@@ -438,7 +438,7 @@ implements SessionBean
 					Order.FETCH_GROUP_CURRENCY, Order.FETCH_GROUP_CUSTOMER, Order.FETCH_GROUP_CUSTOMER_GROUP,
 					Order.FETCH_GROUP_SEGMENTS, Order.FETCH_GROUP_VENDOR, Segment.FETCH_GROUP_ORDER, Segment.FETCH_GROUP_SEGMENT_TYPE
 			});
-//			pm.getFetchPlan().setDetachmentOptions(FetchPlan.DETACH_LOAD_FIELDS);
+			//			pm.getFetchPlan().setDetachmentOptions(FetchPlan.DETACH_LOAD_FIELDS);
 
 			Order order = trader.createOrder(trader.getMandator(), customer, orderIDPrefix, currency);
 
@@ -571,37 +571,37 @@ implements SessionBean
 		}
 	}
 
-//	/**
-//	* Rejects the specified {@link Offer}.
-//	*
-//	* @ejb.interface-method
-//	* @ejb.permission role-name="TradeManager-write"
-//	* @ejb.transaction type="Required"
-//	**/
-//	public Offer rejectOffer(OfferID offerID, boolean get, String[] fetchGroups, int maxFetchDepth)
-//	throws ModuleException
-//	{
-//	PersistenceManager pm = getPersistenceManager();
-//	try {
-//	pm.getExtent(Offer.class);
+	//	/**
+	//	* Rejects the specified {@link Offer}.
+	//	*
+	//	* @ejb.interface-method
+	//	* @ejb.permission role-name="TradeManager-write"
+	//	* @ejb.transaction type="Required"
+	//	**/
+	//	public Offer rejectOffer(OfferID offerID, boolean get, String[] fetchGroups, int maxFetchDepth)
+	//	throws ModuleException
+	//	{
+	//	PersistenceManager pm = getPersistenceManager();
+	//	try {
+	//	pm.getExtent(Offer.class);
 
-//	if (get) {
-//	pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
-//	if (fetchGroups != null)
-//	pm.getFetchPlan().setGroups(fetchGroups);
-//	}
+	//	if (get) {
+	//	pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+	//	if (fetchGroups != null)
+	//	pm.getFetchPlan().setGroups(fetchGroups);
+	//	}
 
-//	Offer offer = (Offer) pm.getObjectById(offerID);
-//	Trader.getTrader(pm).rejectOffer(User.getUser(pm, getPrincipal()), offer);
+	//	Offer offer = (Offer) pm.getObjectById(offerID);
+	//	Trader.getTrader(pm).rejectOffer(User.getUser(pm, getPrincipal()), offer);
 
-//	if (get)
-//	return pm.detachCopy(offer);
-//	else
-//	return null;
-//	} finally {
-//	pm.close();
-//	}
-//	}
+	//	if (get)
+	//	return pm.detachCopy(offer);
+	//	else
+	//	return null;
+	//	} finally {
+	//	pm.close();
+	//	}
+	//	}
 
 	/**
 	 * @param orderID The orderID defining the Order for which to find all non-finalized offers.
@@ -985,60 +985,60 @@ implements SessionBean
 		}
 	}
 
-//	/**
-//	* <p>
-//	* TODO https://www.jfire.org/modules/bugs/view.php?id=896
-//	* </p>
-//	*
-//	* @ejb.interface-method
-//	* @ejb.permission role-name="_Guest_"
-//	* @ejb.transaction type="Required"
-//	*/
-//	public LegalEntity getLegalEntity(AnchorID anchorID, String[] fetchGroups, int maxFetchDepth)
-//	{
-//	PersistenceManager pm = getPersistenceManager();
-//	try {
-//	pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
-//	if (fetchGroups != null)
-//	pm.getFetchPlan().setGroups(fetchGroups);
+	//	/**
+	//	* <p>
+	//	* TODO https://www.jfire.org/modules/bugs/view.php?id=896
+	//	* </p>
+	//	*
+	//	* @ejb.interface-method
+	//	* @ejb.permission role-name="_Guest_"
+	//	* @ejb.transaction type="Required"
+	//	*/
+	//	public LegalEntity getLegalEntity(AnchorID anchorID, String[] fetchGroups, int maxFetchDepth)
+	//	{
+	//	PersistenceManager pm = getPersistenceManager();
+	//	try {
+	//	pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+	//	if (fetchGroups != null)
+	//	pm.getFetchPlan().setGroups(fetchGroups);
 
-//	return (LegalEntity) pm.detachCopy(pm.getObjectById(anchorID));
-//	} finally {
-//	pm.close();
-//	}
-//	}
+	//	return (LegalEntity) pm.detachCopy(pm.getObjectById(anchorID));
+	//	} finally {
+	//	pm.close();
+	//	}
+	//	}
 
-//	/**
-//	* @ejb.interface-method
-//	* @ejb.permission role-name="_Guest_"
-//	* @ejb.transaction type="Required"
-//	*/
-//	public Collection<LegalEntity> getLegalEntities(Object[] leAnchorIDs, String[] fetchGroups, int maxFetchDepth)
-//	{
-//	PersistenceManager pm = getPersistenceManager();
-//	try {
-//	Collection<LegalEntity> les = new LinkedList<LegalEntity>();
-//	pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
-//	if (fetchGroups != null)
-//	pm.getFetchPlan().setGroups(fetchGroups);
+	//	/**
+	//	* @ejb.interface-method
+	//	* @ejb.permission role-name="_Guest_"
+	//	* @ejb.transaction type="Required"
+	//	*/
+	//	public Collection<LegalEntity> getLegalEntities(Object[] leAnchorIDs, String[] fetchGroups, int maxFetchDepth)
+	//	{
+	//	PersistenceManager pm = getPersistenceManager();
+	//	try {
+	//	Collection<LegalEntity> les = new LinkedList<LegalEntity>();
+	//	pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+	//	if (fetchGroups != null)
+	//	pm.getFetchPlan().setGroups(fetchGroups);
 
-//	for (int i = 0; i < leAnchorIDs.length; i++) {
-//	if (!(leAnchorIDs[i] instanceof AnchorID))
-//	throw new IllegalArgumentException("leAnchorIDs["+i+" is not of type AnchorID");
+	//	for (int i = 0; i < leAnchorIDs.length; i++) {
+	//	if (!(leAnchorIDs[i] instanceof AnchorID))
+	//	throw new IllegalArgumentException("leAnchorIDs["+i+" is not of type AnchorID");
 
-//	les.add((LegalEntity) pm.getObjectById(leAnchorIDs[i]));
-//	}
+	//	les.add((LegalEntity) pm.getObjectById(leAnchorIDs[i]));
+	//	}
 
-//	long time = System.currentTimeMillis();
-//	Collection<LegalEntity> result = pm.detachCopyAll(les);
-//	time = System.currentTimeMillis() - time;
-//	logger.debug("Detach of "+result.size()+" LegalEntities took "+((double)time / (double)1000));
-//	return result;
-//	}
-//	finally {
-//	pm.close();
-//	}
-//	}
+	//	long time = System.currentTimeMillis();
+	//	Collection<LegalEntity> result = pm.detachCopyAll(les);
+	//	time = System.currentTimeMillis() - time;
+	//	logger.debug("Detach of "+result.size()+" LegalEntities took "+((double)time / (double)1000));
+	//	return result;
+	//	}
+	//	finally {
+	//	pm.close();
+	//	}
+	//	}
 
 	/**
 	 * <p>
@@ -1123,9 +1123,9 @@ implements SessionBean
 		try {
 
 			// TODO WORKAROUND experimental: Maybe this helps to get no outdated data anymore?! Marco.
-//			NLJDOHelper.enableTransactionSerializeReadObjects(pm);
-//			try {
-//			return NLJDOHelper.getDetachedObjectList(pm, articleIDs, Article.class, fetchGroups, maxFetchDepth);
+			//			NLJDOHelper.enableTransactionSerializeReadObjects(pm);
+			//			try {
+			//			return NLJDOHelper.getDetachedObjectList(pm, articleIDs, Article.class, fetchGroups, maxFetchDepth);
 
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
@@ -1143,24 +1143,24 @@ implements SessionBean
 				}
 			}
 
-////			TODO WORKAROUND for DataNucleus bug: Without this, I get always version 2 of a newly created TicArticle - even though, in the datastore, there's already version 4, 5 or even higher.
-//			pm.refreshAll(articles);
+			////			TODO WORKAROUND for DataNucleus bug: Without this, I get always version 2 of a newly created TicArticle - even though, in the datastore, there's already version 4, 5 or even higher.
+			//			pm.refreshAll(articles);
 
-//			if (logger.isTraceEnabled()) {
-//			logger.trace("getArticles: refreshed " + articles.size() + ":");
-//			for (Article article : articles) {
-//			logger.trace("getArticles: * " + article);
-//			logger.trace("getArticles:   - article.allocated=" + article.isAllocated());
-//			logger.trace("getArticles:   - article.allocationPending=" + article.isAllocationPending());
-//			logger.trace("getArticles:   - article.releasePending=" + article.isReleasePending());
-//			}
-//			}
+			//			if (logger.isTraceEnabled()) {
+			//			logger.trace("getArticles: refreshed " + articles.size() + ":");
+			//			for (Article article : articles) {
+			//			logger.trace("getArticles: * " + article);
+			//			logger.trace("getArticles:   - article.allocated=" + article.isAllocated());
+			//			logger.trace("getArticles:   - article.allocationPending=" + article.isAllocationPending());
+			//			logger.trace("getArticles:   - article.releasePending=" + article.isReleasePending());
+			//			}
+			//			}
 
 			articles = pm.detachCopyAll(articles);
 			return articles;
-//			} finally {
-//			NLJDOHelper.disableTransactionSerializeReadObjects(pm);
-//			}
+			//			} finally {
+			//			NLJDOHelper.disableTransactionSerializeReadObjects(pm);
+			//			}
 		} finally {
 			pm.close();
 		}
@@ -1832,90 +1832,90 @@ implements SessionBean
 		}
 			}
 
-//	/**
-//	* @param articleContainerQueries Instances of {@link ArticleContainerQuery}
-//	* 		that shall be chained
-//	*		in order to retrieve the result. The result of one query is passed to the
-//	*		next one using the {@link JDOQuery#setCandidates(Collection)}.
-//	*
-//	* @ejb.interface-method
-//	* @ejb.permission role-name="_Guest_"
-//	* @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-//	*/
-//	public Set<ArticleContainerID> getArticleContainerIDsForQueries(Collection<ArticleContainerQuery> articleContainerQueries)
-//	{
-//	PersistenceManager pm = getPersistenceManager();
-//	try {
-//	pm.getFetchPlan().setMaxFetchDepth(1);
-//	pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
+	//	/**
+	//	* @param articleContainerQueries Instances of {@link ArticleContainerQuery}
+	//	* 		that shall be chained
+	//	*		in order to retrieve the result. The result of one query is passed to the
+	//	*		next one using the {@link JDOQuery#setCandidates(Collection)}.
+	//	*
+	//	* @ejb.interface-method
+	//	* @ejb.permission role-name="_Guest_"
+	//	* @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+	//	*/
+	//	public Set<ArticleContainerID> getArticleContainerIDsForQueries(Collection<ArticleContainerQuery> articleContainerQueries)
+	//	{
+	//	PersistenceManager pm = getPersistenceManager();
+	//	try {
+	//	pm.getFetchPlan().setMaxFetchDepth(1);
+	//	pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
 
-//	Collection<ArticleContainer> articleContainers = null;
-//	for (ArticleContainerQuery query : articleContainerQueries) {
-//	query.setPersistenceManager(pm);
-//	query.setCandidates(articleContainers);
-//	articleContainers = (Collection) query.getResult();
-//	}
+	//	Collection<ArticleContainer> articleContainers = null;
+	//	for (ArticleContainerQuery query : articleContainerQueries) {
+	//	query.setPersistenceManager(pm);
+	//	query.setCandidates(articleContainers);
+	//	articleContainers = (Collection) query.getResult();
+	//	}
 
-//	return NLJDOHelper.getObjectIDSet(articleContainers);
-//	} finally {
-//	pm.close();
-//	}
-//	}
+	//	return NLJDOHelper.getObjectIDSet(articleContainers);
+	//	} finally {
+	//	pm.close();
+	//	}
+	//	}
 
-//	/**
-//	* @param articleContainerQueries Instances of {@link AbstractArticleContainerQuery}
-//	* 		that shall be chained
-//	*		in order to retrieve the result. The result of one query is passed to the
-//	*		next one using the {@link JDOQuery#setCandidates(Collection)}.
-//	*
-//	* @ejb.interface-method
-//	* @ejb.permission role-name="_Guest_"
-//	* @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-//	*/
-//	public Set<ArticleContainerID> getArticleContainerIDsForQuickSearchQueries(Collection<AbstractArticleContainerQuery> articleContainerQuickSearchQueries)
-//	{
-//	PersistenceManager pm = getPersistenceManager();
-//	try {
-//	pm.getFetchPlan().setMaxFetchDepth(1);
-//	pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
+	//	/**
+	//	* @param articleContainerQueries Instances of {@link AbstractArticleContainerQuery}
+	//	* 		that shall be chained
+	//	*		in order to retrieve the result. The result of one query is passed to the
+	//	*		next one using the {@link JDOQuery#setCandidates(Collection)}.
+	//	*
+	//	* @ejb.interface-method
+	//	* @ejb.permission role-name="_Guest_"
+	//	* @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+	//	*/
+	//	public Set<ArticleContainerID> getArticleContainerIDsForQuickSearchQueries(Collection<AbstractArticleContainerQuery> articleContainerQuickSearchQueries)
+	//	{
+	//	PersistenceManager pm = getPersistenceManager();
+	//	try {
+	//	pm.getFetchPlan().setMaxFetchDepth(1);
+	//	pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
 
-//	Collection<AbstractArticleContainerQuery> articleContainers = null;
-//	for (AbstractArticleContainerQuery query : articleContainerQuickSearchQueries) {
-//	query.setPersistenceManager(pm);
-//	query.setCandidates(articleContainers);
-//	articleContainers = (Collection) query.getResult();
-//	}
+	//	Collection<AbstractArticleContainerQuery> articleContainers = null;
+	//	for (AbstractArticleContainerQuery query : articleContainerQuickSearchQueries) {
+	//	query.setPersistenceManager(pm);
+	//	query.setCandidates(articleContainers);
+	//	articleContainers = (Collection) query.getResult();
+	//	}
 
-//	return NLJDOHelper.getObjectIDSet(articleContainers);
-//	} finally {
-//	pm.close();
-//	}
-//	}
+	//	return NLJDOHelper.getObjectIDSet(articleContainers);
+	//	} finally {
+	//	pm.close();
+	//	}
+	//	}
 
-//	/**
-//	* @ejb.interface-method
-//	* @ejb.permission role-name="_Guest_"
-//	* @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-//	*/
-//	public Set<InvoiceID> getInvoiceIDs(Collection<JDOQuery> queries)
-//	{
-//	PersistenceManager pm = getPersistenceManager();
-//	try {
-//	pm.getFetchPlan().setMaxFetchDepth(1);
-//	pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
+	//	/**
+	//	* @ejb.interface-method
+	//	* @ejb.permission role-name="_Guest_"
+	//	* @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+	//	*/
+	//	public Set<InvoiceID> getInvoiceIDs(Collection<JDOQuery> queries)
+	//	{
+	//	PersistenceManager pm = getPersistenceManager();
+	//	try {
+	//	pm.getFetchPlan().setMaxFetchDepth(1);
+	//	pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
 
-//	Collection<Invoice> invoices = null;
-//	for (JDOQuery query : queries) {
-//	query.setPersistenceManager(pm);
-//	query.setCandidates(invoices);
-//	invoices = (Collection) query.getResult();
-//	}
+	//	Collection<Invoice> invoices = null;
+	//	for (JDOQuery query : queries) {
+	//	query.setPersistenceManager(pm);
+	//	query.setCandidates(invoices);
+	//	invoices = (Collection) query.getResult();
+	//	}
 
-//	return NLJDOHelper.getObjectIDSet(invoices);
-//	} finally {
-//	pm.close();
-//	}
-//	}
+	//	return NLJDOHelper.getObjectIDSet(invoices);
+	//	} finally {
+	//	pm.close();
+	//	}
+	//	}
 
 	/**
 	 * @ejb.interface-method
@@ -2085,7 +2085,7 @@ implements SessionBean
 			String[] fetchGroups,
 			int maxFetchDepth
 	)
-	throws ModuleException
+	throws ReverseProductException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -2112,7 +2112,7 @@ implements SessionBean
 				// no article found
 				String description = "There was not article found for the given product";
 				IReverseProductError error = new NoArticlesFoundReverseProductError(description);
-//				result.addReverseProductResultError(error);
+				//				result.addReverseProductResultError(error);
 				result.setReverseProductError(error);
 				throw result;
 			}
@@ -2149,7 +2149,7 @@ implements SessionBean
 					AlreadyReversedArticleReverseProductError error = new AlreadyReversedArticleReverseProductError(description);
 					error.setReversedArticleID((ArticleID) JDOHelper.getObjectId(reversedArticle));
 					error.setReversingArticleID((ArticleID) JDOHelper.getObjectId(reversingArticle));
-//					result.addReverseProductResultError(error);
+					//					result.addReverseProductResultError(error);
 					result.setReverseProductError(error);
 					throw result;
 				}
@@ -2174,40 +2174,36 @@ implements SessionBean
 				description = "The offer ist not accepted.";
 				OfferNotAcceptedReverseProductError error = new OfferNotAcceptedReverseProductError(description);
 				error.setOfferID(article.getOfferID());
-//				result.addReverseProductResultError(error);
+				//				result.addReverseProductResultError(error);
 				result.setReverseProductError(error);
 				throw result;
 			}
 			else {
 				// everything is ok, article can be reversed, so create reversing offer
-				try {
-					User user = User.getUser(pm, getPrincipal());
-					// check if complete offer should be reversed
-					if (completeOffer) {
-						Collection<Article> offerArticles = offer.getArticles();
-						Set<Article> reversableArticles = new HashSet<Article>();
-						// remove all reversing articles from offer
-						for (Article offerArticle : offerArticles) {
-							if (!offerArticle.isReversing() && !offerArticle.isReversed()) {
-								reversableArticles.add(offerArticle);
-							}
+				User user = User.getUser(pm, getPrincipal());
+				// check if complete offer should be reversed
+				if (completeOffer) {
+					Collection<Article> offerArticles = offer.getArticles();
+					Set<Article> reversableArticles = new HashSet<Article>();
+					// remove all reversing articles from offer
+					for (Article offerArticle : offerArticles) {
+						if (!offerArticle.isReversing() && !offerArticle.isReversed()) {
+							reversableArticles.add(offerArticle);
 						}
-						articles = reversableArticles;
 					}
-					Offer reversingOffer = trader.createReverseOffer(user, articles, null);
-					reversingOffer.validate();
-
-					if (!get)
-						return null;
-
-					pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
-					if (fetchGroups != null)
-						pm.getFetchPlan().setGroups(fetchGroups);
-
-					return pm.detachCopy(reversingOffer);
-				} catch (Exception e) {
-					throw new ModuleException(e);
+					articles = reversableArticles;
 				}
+				Offer reversingOffer = trader.createReverseOffer(user, articles, null);
+				reversingOffer.validate();
+
+				if (!get)
+					return null;
+
+				pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+				if (fetchGroups != null)
+					pm.getFetchPlan().setGroups(fetchGroups);
+
+				return pm.detachCopy(reversingOffer);
 			}
 		} finally {
 			pm.close();

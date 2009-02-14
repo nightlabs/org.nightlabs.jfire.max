@@ -160,7 +160,7 @@ public class CellReflector
 	}
 
 	public long resolvePriceCellsAmount(Object ... dimensionValues)
-	throws ModuleException
+	throws PriceCalculationException
 	{
 		return resolvePriceCellsAmount(createAbsolutePriceCoordinate(dimensionValues));
 	}
@@ -181,7 +181,7 @@ public class CellReflector
 //			String _currencyID,
 //			String _productTypePK,
 //			String _priceFragmentTypePK)
-		throws ModuleException
+		throws PriceCalculationException
 	{
 		if (logger.isDebugEnabled())
 			logger.debug("resolvePriceCellsAmount (" + address + "): enter");
@@ -320,7 +320,7 @@ public class CellReflector
 	 */
 	public Collection<ResolvedPriceCell> resolvePriceCells(
 			IAbsolutePriceCoordinate address)
-	throws ModuleException
+	throws PriceCalculationException
 	{
 		if (logger.isDebugEnabled())
 			logger.debug("resolvePriceCells (" + address + "): enter");

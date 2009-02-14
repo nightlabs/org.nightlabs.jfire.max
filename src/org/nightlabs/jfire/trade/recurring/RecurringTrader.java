@@ -23,6 +23,7 @@ import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.accounting.Accounting;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.Invoice;
+import org.nightlabs.jfire.accounting.InvoiceEditException;
 import org.nightlabs.jfire.accounting.Price;
 import org.nightlabs.jfire.accounting.id.InvoiceID;
 import org.nightlabs.jfire.accounting.jbpm.JbpmConstantsInvoice;
@@ -160,11 +161,8 @@ public class RecurringTrader {
 	 *
 	 * @param recurringOffer the {@link RecurringOffer}
 	 * @return newly created {@link RecurredOffer} or null if it is past the stop / suspend date
-	 * @throws ModuleException If creating the recurred articles fails.
-	 * @throws NamingException
-	 * @throws CreateException
 	 */
-	public RecurredOffer processRecurringOffer(RecurringOffer recurringOffer) throws ModuleException, CreateException, NamingException
+	public RecurredOffer processRecurringOffer(RecurringOffer recurringOffer) throws CreateException, NamingException, InvoiceEditException
 	{
 		boolean priceDiffer = false;
 

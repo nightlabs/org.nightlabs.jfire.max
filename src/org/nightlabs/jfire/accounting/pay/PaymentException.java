@@ -26,12 +26,11 @@
 
 package org.nightlabs.jfire.accounting.pay;
 
-import org.nightlabs.ModuleException;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  */
-public class PaymentException extends ModuleException
+public class PaymentException extends Exception
 {
 	private static final long serialVersionUID = 1L;
 	private PaymentResult paymentResult;

@@ -145,7 +145,7 @@ implements SessionBean
 	public PaymentResult payBegin_internal(
 			PaymentDataID paymentDataID,
 			String[] fetchGroups, int maxFetchDepth)
-	throws ModuleException
+	throws PaymentException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -202,7 +202,7 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public PaymentResult payDoWork_internal(PaymentID paymentID, String[] fetchGroups, int maxFetchDepth)
-	throws ModuleException
+	throws PaymentException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -240,7 +240,7 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public PaymentResult payEnd_internal(PaymentID paymentID, String[] fetchGroups, int maxFetchDepth)
-	throws ModuleException
+	throws PaymentException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {

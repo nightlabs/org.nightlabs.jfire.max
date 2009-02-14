@@ -51,7 +51,6 @@ import javax.jdo.Query;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.log4j.Logger;
-import org.nightlabs.ModuleException;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.query.AbstractJDOQuery;
 import org.nightlabs.jdo.query.AbstractSearchQuery;
@@ -1148,7 +1147,6 @@ implements SessionBean
 	 * @ejb.permission role-name="org.nightlabs.jfire.store.deliver"
 	 */
 	public List<DeliveryResult> deliverBegin(List<DeliveryData> deliveryDataList)
-	throws ModuleException
 	{
 		try {
 			StoreManagerLocal storeManagerLocal = StoreManagerUtil.getLocalHome().create();
@@ -1179,8 +1177,10 @@ implements SessionBean
 
 			}
 			return resList;
+		} catch(RuntimeException x) {
+			throw x;
 		} catch (Exception x) {
-			throw new ModuleException(x);
+			throw new RuntimeException(x);
 		}
 	}
 
@@ -1199,7 +1199,6 @@ implements SessionBean
 	 * @ejb.permission role-name="org.nightlabs.jfire.store.deliver"
 	 */
 	public DeliveryResult deliverBegin(DeliveryData deliveryData)
-	throws ModuleException
 	{
 		return _deliverBegin(deliveryData);
 	}
@@ -1213,7 +1212,6 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public DeliveryResult _deliverBegin(DeliveryData deliveryData)
-	throws ModuleException
 	{
 		if (logger.isDebugEnabled()) {
 			logger.debug("_deliverBegin: *** begin ******************************************* ");
@@ -1263,12 +1261,10 @@ implements SessionBean
 		try {
 			deliveryHelperLocal = DeliveryHelperUtil.getLocalHome().create();
 			deliveryDataID = deliveryHelperLocal.deliverBegin_storeDeliveryData(deliveryData);
-		} catch (ModuleException x) {
-			throw x;
 		} catch (RuntimeException x) {
 			throw x;
 		} catch (Exception x) {
-			throw new ModuleException(x);
+			throw new RuntimeException(x);
 		}
 
 		String[] fetchGroups = new String[] {FetchPlan.DEFAULT};
@@ -1283,12 +1279,10 @@ implements SessionBean
 			try {
 				return deliveryHelperLocal.deliverBegin_storeDeliverBeginServerResult(
 						DeliveryID.create(deliveryDataID), deliverBeginServerResult, true, fetchGroups, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
-			} catch (ModuleException x) {
-				throw x;
 			} catch (RuntimeException x) {
 				throw x;
 			} catch (Exception x) {
-				throw new ModuleException(x);
+				throw new RuntimeException(x);
 			}
 		}
 	}
@@ -1312,7 +1306,6 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public List<DeliveryResult> deliverEnd(List<DeliveryID> deliveryIDs, List<DeliveryResult> deliverEndClientResults, boolean forceRollback)
-	throws ModuleException
 	{
 		try {
 			StoreManagerLocal storeManagerLocal = StoreManagerUtil.getLocalHome().create();
@@ -1348,8 +1341,10 @@ implements SessionBean
 
 			}
 			return resList;
+		} catch (RuntimeException x) {
+			throw x;
 		} catch (Exception x) {
-			throw new ModuleException(x);
+			throw new RuntimeException(x);
 		}
 	}
 
@@ -1372,10 +1367,13 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public List<DeliveryResult> deliverDoWork(List<DeliveryID> deliveryIDs, List<DeliveryResult> deliverDoWorkClientResults, boolean forceRollback)
-	throws ModuleException
 	{
-		try {
-			StoreManagerLocal storeManagerLocal = StoreManagerUtil.getLocalHome().create();
+			StoreManagerLocal storeManagerLocal;
+			try {
+				storeManagerLocal = StoreManagerUtil.getLocalHome().create();
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
 
 			if (deliveryIDs.size() != deliverDoWorkClientResults.size())
 				throw new IllegalArgumentException("deliveryIDs.size() != deliverDoWorkClientResults.size()!!!");
@@ -1408,9 +1406,6 @@ implements SessionBean
 
 			}
 			return resList;
-		} catch (Exception x) {
-			throw new ModuleException(x);
-		}
 	}
 
 
@@ -1430,7 +1425,6 @@ implements SessionBean
 			DeliveryID deliveryID,
 			DeliveryResult deliverEndClientResult,
 			boolean forceRollback)
-	throws ModuleException
 	{
 		return _deliverDoWork(deliveryID, deliverEndClientResult, forceRollback);
 	}
@@ -1447,7 +1441,6 @@ implements SessionBean
 			DeliveryID deliveryID,
 			DeliveryResult deliverDoWorkClientResult,
 			boolean forceRollback)
-	throws ModuleException
 	{
 		if (deliveryID == null)
 			throw new NullPointerException("deliveryID");
@@ -1462,12 +1455,10 @@ implements SessionBean
 			deliveryHelperLocal = DeliveryHelperUtil.getLocalHome().create();
 			deliveryHelperLocal.deliverDoWork_storeDeliverDoWorkClientResult(
 					deliveryID, deliverDoWorkClientResult, forceRollback);
-		} catch (ModuleException x) {
-			throw x;
 		} catch (RuntimeException x) {
 			throw x;
 		} catch (Exception x) {
-			throw new ModuleException(x);
+			throw new RuntimeException(x);
 		}
 
 		String[] fetchGroups = new String[] {FetchPlan.DEFAULT};
@@ -1484,12 +1475,10 @@ implements SessionBean
 						deliveryID, deliverDoWorkServerResult, true, fetchGroups, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
 
 				return deliverDoWorkServerResult_detached;
-			} catch (ModuleException x) {
-				throw x;
 			} catch (RuntimeException x) {
 				throw x;
 			} catch (Exception x) {
-				throw new ModuleException(x);
+				throw new RuntimeException(x);
 			}
 		}
 	}
@@ -1511,7 +1500,6 @@ implements SessionBean
 			DeliveryID deliveryID,
 			DeliveryResult deliverEndClientResult,
 			boolean forceRollback)
-	throws ModuleException
 	{
 		return _deliverEnd(deliveryID, deliverEndClientResult, forceRollback);
 	}
@@ -1528,7 +1516,6 @@ implements SessionBean
 			DeliveryID deliveryID,
 			DeliveryResult deliverEndClientResult,
 			boolean forceRollback)
-	throws ModuleException
 	{
 		if (deliveryID == null)
 			throw new NullPointerException("deliveryID");
@@ -1543,12 +1530,10 @@ implements SessionBean
 			deliveryHelperLocal = DeliveryHelperUtil.getLocalHome().create();
 			deliveryHelperLocal.deliverEnd_storeDeliverEndClientResult(
 					deliveryID, deliverEndClientResult, forceRollback);
-		} catch (ModuleException x) {
-			throw x;
 		} catch (RuntimeException x) {
 			throw x;
 		} catch (Exception x) {
-			throw new ModuleException(x);
+			throw new RuntimeException(x);
 		}
 
 		String[] fetchGroups = new String[] {FetchPlan.DEFAULT};
@@ -1571,12 +1556,10 @@ implements SessionBean
 				deliveryHelperLocal.deliverRollback(deliveryID);
 
 				return deliverEndServerResult_detached;
-			} catch (ModuleException x) {
-				throw x;
 			} catch (RuntimeException x) {
 				throw x;
 			} catch (Exception x) {
-				throw new ModuleException(x);
+				throw new RuntimeException(x);
 			}
 		}
 	}
@@ -1748,7 +1731,6 @@ implements SessionBean
 	 * @ejb.transaction type="Required"
 	 */
 	public List<DeliveryNoteID> getDeliveryNoteIDs(AnchorID vendorID, AnchorID customerID, long rangeBeginIdx, long rangeEndIdx)
-	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -1797,7 +1779,6 @@ implements SessionBean
 	 */
 	@SuppressWarnings("unchecked")
 	public List<DeliveryNote> getNonFinalizedDeliveryNotes(AnchorID vendorID, AnchorID customerID, String[] fetchGroups, int maxFetchDepth)
-	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -2532,7 +2513,6 @@ implements SessionBean
 	 */
 	public Collection<ProductTypeGroup> getProductTypeGroups(Collection<ProductTypeGroupID>
 		productTypeGroupIDs, String[] fetchGroups, int maxFetchDepth)
-	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {

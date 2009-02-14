@@ -26,13 +26,11 @@
 
 package org.nightlabs.jfire.store;
 
-import org.nightlabs.ModuleException;
 
 /**
  * @author Niklas Schiffler <nick@nightlabs.de>
- *
  */
-public class StoreException extends ModuleException
+public class StoreException extends Exception
 {
 	private static final long serialVersionUID = 1L;
 

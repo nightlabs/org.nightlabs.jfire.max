@@ -1,6 +1,5 @@
 package org.nightlabs.jfire.store.reverse;
 
-import org.nightlabs.ModuleException;
 import org.nightlabs.jfire.store.id.ProductID;
 
 /**
@@ -9,10 +8,9 @@ import org.nightlabs.jfire.store.id.ProductID;
  * information why not. 
  * 
  * @author Daniel Mazurek - daniel [at] nightlabs [dot] de
- *
  */
 public class ReverseProductException
-extends ModuleException
+extends Exception
 {
 	private static final long serialVersionUID = 1L;
 	

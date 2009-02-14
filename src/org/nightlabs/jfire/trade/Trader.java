@@ -461,7 +461,6 @@ public class Trader
 	// }
 
 	public Offer createReverseOffer(User user, Set<Article> reversedArticles, String offerIDPrefix)
-	throws ModuleException
 	{
 		if (reversedArticles.isEmpty())
 			throw new IllegalArgumentException("Set reversedArticles must not be empty!");
@@ -624,7 +623,7 @@ public class Trader
 //	return order;
 //	}
 
-	public Offer createOffer(User user, Order order, String offerIDPrefix) throws ModuleException
+	public Offer createOffer(User user, Order order, String offerIDPrefix)
 	{
 		TradeSide tradeSide;
 
@@ -687,7 +686,6 @@ public class Trader
 	}
 
 	public Set<Article> reverseArticles(User user, Offer reversingOffer, Collection<Article> reversedArticles)
-	throws ModuleException
 	{
 		Set<Article> res = new HashSet<Article>(reversedArticles.size());
 //		for (Iterator it = reversedArticles.iterator(); it.hasNext();) {
@@ -802,8 +800,8 @@ public class Trader
 	 */
 	public Collection<? extends Article> createArticles(User user, Offer offer, Segment segment,
 			Collection<? extends Product> products, ArticleCreator articleCreator, boolean allocate,
-			boolean allocateSynchronously) throws ModuleException
-			{
+			boolean allocateSynchronously)
+	{
 		if (!segment.getOrder().equals(offer.getOrder()))
 			throw new IllegalArgumentException("segment.order != offer.order :: " + segment.getOrder().getPrimaryKey() + " != " + offer.getOrder().getPrimaryKey());
 
@@ -848,7 +846,7 @@ public class Trader
 	 *          Whether the second phase of allocation shall be done
 	 *          synchronously. Otherwise it will be done via {@link AsyncInvoke}.
 	 */
-	public void allocateArticles(User user, Collection<? extends Article> articles, boolean synchronously) throws ModuleException
+	public void allocateArticles(User user, Collection<? extends Article> articles, boolean synchronously)
 	{
 		try {
 			String allocateExecID = ObjectIDUtil.makeValidIDString("allocate", true);
@@ -867,10 +865,8 @@ public class Trader
 
 		} catch (RuntimeException x) {
 			throw x;
-		} catch (ModuleException x) {
-			throw x;
 		} catch (Exception x) {
-			throw new ModuleException(x);
+			throw new RuntimeException(x);
 		}
 	}
 
@@ -1573,9 +1569,10 @@ public class Trader
 	 *           If the product (or a packaged product) cannot be allocated.
 	 * @throws ModuleException
 	 *           If another error occurs.
+	 * @throws NotAvailableException If articles could not be allocated
 	 */
 	protected void allocateArticlesBegin(String allocateExecID, User user, Collection<? extends Article> articles)
-	throws ModuleException
+	throws NotAvailableException
 	{
 		if (allocateExecID == null)
 			throw new IllegalArgumentException("allocateExecID == null");
@@ -1714,10 +1711,9 @@ public class Trader
 	 *          its <code>Product</code> assigned ({@link Article#getProduct()}
 	 *          must not return <code>null</code>).
 	 *
-	 * @throws ModuleException
 	 */
 	protected void allocateArticlesEnd(String allocateExecID, User user, Collection<? extends Article> articles)
-	throws ModuleException
+	throws NotAvailableException
 	{
 		if (allocateExecID == null)
 			throw new IllegalArgumentException("allocateExecID == null");

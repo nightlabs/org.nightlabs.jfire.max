@@ -100,7 +100,7 @@ public abstract class RecurringTradeProductTypeActionHandler {
 	 *
 	 * @return return a Map where the template article is mapped to the newly created article.
 	 */
-	public abstract Map<Article, Article> createArticles(RecurredOffer offer, Set<Article> recurringArticles, Segment segment) throws ModuleException;
+	public abstract Map<Article, Article> createArticles(RecurredOffer offer, Set<Article> recurringArticles, Segment segment);
 
 	protected PersistenceManager getPersistenceManager()
 	{

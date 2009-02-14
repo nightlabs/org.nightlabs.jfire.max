@@ -334,11 +334,11 @@ public abstract class ProductTypeActionHandler
 	 * @return the purchase-{@link Article}s which are buying the required nested {@link Product}s for the given <code>partnerNestedProductTypes</code>
 	 * @throws ModuleException if sth. goes wrong - e.g. a {@link NotAvailableException} if the nested products cannot be bought (the supplier cannot supply us).
 	 */
+	@SuppressWarnings("unchecked")
 	protected Collection<? extends Article> importCrossTradeNestedProducts(
 			User user, ProductTypeActionHandlerCache productTypeActionHandlerCache, Product packageProduct,
 			String partnerOrganisationID, Collection<NestedProductTypeLocal> partnerNestedProductTypes
 	)
-	throws ModuleException
 	{
 		try {
 			PersistenceManager pm = getPersistenceManager();
@@ -515,7 +515,7 @@ public abstract class ProductTypeActionHandler
 	 * @throws ModuleException if sth. goes wrong - e.g. a {@link NotAvailableException} if the nested products cannot be bought (the supplier cannot supply us).
 	 */
 	public void assembleProduct(User user, ProductTypeActionHandlerCache productTypeActionHandlerCache, Product product)
-	throws ModuleException
+	throws NotAvailableException
 	{
 		ProductLocal productLocal = product.getProductLocal();
 		if (productLocal.isAssembled())

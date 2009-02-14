@@ -524,7 +524,6 @@ implements SessionBean
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	@SuppressWarnings("unchecked")
 	public Collection<TariffMapping> getTariffMappings(Collection<TariffMappingID> tariffMappingIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -600,7 +599,6 @@ implements SessionBean
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	@SuppressWarnings("unchecked")
 	public Collection<Tariff> getTariffs(Collection<TariffID> tariffIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		// TODO filter Tariffs according to visibility-configuration for the currently logged-in user.
@@ -689,7 +687,6 @@ implements SessionBean
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.queryAccounts"
 	 */
-	@SuppressWarnings("unchecked")
 	public Set<AnchorID> getAccountIDs(AccountSearchFilter searchFilter)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -706,7 +703,6 @@ implements SessionBean
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.queryAccounts"
 	 */
-	@SuppressWarnings("unchecked")
 	public List<Account> getAccounts(Collection<AnchorID> accountIDs,  String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -957,7 +953,6 @@ implements SessionBean
 	 * @ejb.transaction type="Required"
 	 */
 	public MoneyFlowMapping storeMoneyFlowMapping(MoneyFlowMapping mapping, boolean get, String[] fetchGroups, int maxFetchDepth)
-	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -1008,7 +1003,6 @@ implements SessionBean
 	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.queryLocalAccountantDelegates"
 	 */
 	public Map<ResolvedMapKey, ResolvedMapEntry> getResolvedMoneyFlowMappings(ProductTypeID productTypeID, String[] mappingFetchGroups, int maxFetchDepth)
-	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -1030,7 +1024,6 @@ implements SessionBean
 	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.queryLocalAccountantDelegates"
 	 */
 	public Map<ResolvedMapKey, ResolvedMapEntry> getResolvedMoneyFlowMappings(ProductTypeID productTypeID, LocalAccountantDelegateID delegateID, String[] mappingFetchGroups, int maxFetchDepth)
-	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -1267,8 +1260,6 @@ implements SessionBean
 	}
 
 	/**
-	 * @throws ModuleException
-	 *
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.editInvoice"
@@ -1276,7 +1267,7 @@ implements SessionBean
 	public Invoice addArticlesToInvoice(
 			InvoiceID invoiceID, Collection<ArticleID> articleIDs,
 			boolean validate, boolean get, String[] fetchGroups, int maxFetchDepth)
-	throws ModuleException
+	throws InvoiceEditException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -1308,8 +1299,6 @@ implements SessionBean
 	}
 
 	/**
-	 * @throws ModuleException
-	 *
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.editInvoice"
@@ -1317,7 +1306,7 @@ implements SessionBean
 	public Invoice removeArticlesFromInvoice(
 			InvoiceID invoiceID, Collection<ArticleID> articleIDs,
 			boolean validate, boolean get, String[] fetchGroups, int maxFetchDepth)
-	throws ModuleException
+	throws InvoiceEditException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -1361,7 +1350,6 @@ implements SessionBean
 	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.pay"
 	 */
 	public List<PaymentResult> payBegin(List<PaymentData> paymentDataList)
-	throws ModuleException
 	{
 		try {
 			AccountingManagerLocal accountingManagerLocal = AccountingManagerUtil.getLocalHome().create();
@@ -1390,8 +1378,10 @@ implements SessionBean
 
 			}
 			return resList;
+		} catch (RuntimeException x) {
+			throw x;
 		} catch (Exception x) {
-			throw new ModuleException(x);
+			throw new RuntimeException(x);
 		}
 	}
 
@@ -1411,7 +1401,6 @@ implements SessionBean
 	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.pay"
 	 */
 	public PaymentResult payBegin(PaymentData paymentData)
-	throws ModuleException
 	{
 		return _payBegin(paymentData);
 	}
@@ -1424,7 +1413,6 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public PaymentResult _payBegin(PaymentData paymentData)
-	throws ModuleException
 	{
 		if (paymentData == null)
 			throw new NullPointerException("paymentData");
@@ -1460,12 +1448,10 @@ implements SessionBean
 		try {
 			paymentHelperLocal = PaymentHelperUtil.getLocalHome().create();
 			paymentDataID = paymentHelperLocal.payBegin_storePaymentData(paymentData);
-		} catch (ModuleException x) {
-			throw x;
 		} catch (RuntimeException x) {
 			throw x;
 		} catch (Exception x) {
-			throw new ModuleException(x);
+			throw new RuntimeException(x);
 		}
 
 		String[] fetchGroups = new String[] {FetchPlan.DEFAULT};
@@ -1481,12 +1467,10 @@ implements SessionBean
 			try {
 				return paymentHelperLocal.payBegin_storePayBeginServerResult(
 						PaymentID.create(paymentDataID), payBeginServerResult, true, fetchGroups, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
-			} catch (ModuleException x) {
-				throw x;
 			} catch (RuntimeException x) {
 				throw x;
 			} catch (Exception x) {
-				throw new ModuleException(x);
+				throw new RuntimeException(x);
 			}
 		}
 	}
@@ -1510,7 +1494,6 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public List<PaymentResult> payDoWork(List<PaymentID> paymentIDs, List<PaymentResult> payDoWorkClientResults, boolean forceRollback)
-	throws ModuleException
 	{
 		try {
 			AccountingManagerLocal accountingManagerLocal = AccountingManagerUtil.getLocalHome().create();
@@ -1546,8 +1529,10 @@ implements SessionBean
 
 			}
 			return resList;
+		} catch (RuntimeException x) {
+			throw x;
 		} catch (Exception x) {
-			throw new ModuleException(x);
+			throw new RuntimeException(x);
 		}
 	}
 
@@ -1568,7 +1553,6 @@ implements SessionBean
 			PaymentID paymentID,
 			PaymentResult payEndClientResult,
 			boolean forceRollback)
-	throws ModuleException
 	{
 		return _payDoWork(paymentID, payEndClientResult, forceRollback);
 	}
@@ -1584,7 +1568,6 @@ implements SessionBean
 			PaymentID paymentID,
 			PaymentResult payDoWorkClientResult,
 			boolean forceRollback)
-	throws ModuleException
 	{
 		if (paymentID == null)
 			throw new NullPointerException("paymentID");
@@ -1599,12 +1582,10 @@ implements SessionBean
 			paymentHelperLocal = PaymentHelperUtil.getLocalHome().create();
 			paymentHelperLocal.payDoWork_storePayDoWorkClientResult(
 					paymentID, payDoWorkClientResult, forceRollback);
-		} catch (ModuleException x) {
-			throw x;
 		} catch (RuntimeException x) {
 			throw x;
 		} catch (Exception x) {
-			throw new ModuleException(x);
+			throw new RuntimeException(x);
 		}
 
 		String[] fetchGroups = new String[] {FetchPlan.DEFAULT};
@@ -1622,12 +1603,10 @@ implements SessionBean
 						paymentID, payDoWorkServerResult, true, fetchGroups, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
 
 				return payDoWorkServerResult_detached;
-			} catch (ModuleException x) {
-				throw x;
 			} catch (RuntimeException x) {
 				throw x;
 			} catch (Exception x) {
-				throw new ModuleException(x);
+				throw new RuntimeException(x);
 			}
 		}
 	}
@@ -1651,7 +1630,6 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public List<PaymentResult> payEnd(List<PaymentID> paymentIDs, List<PaymentResult> payEndClientResults, boolean forceRollback)
-	throws ModuleException
 	{
 		try {
 			AccountingManagerLocal accountingManagerLocal = AccountingManagerUtil.getLocalHome().create();
@@ -1687,8 +1665,10 @@ implements SessionBean
 
 			}
 			return resList;
+		} catch (RuntimeException x) {
+			throw x;
 		} catch (Exception x) {
-			throw new ModuleException(x);
+			throw new RuntimeException(x);
 		}
 	}
 
@@ -1708,7 +1688,6 @@ implements SessionBean
 			PaymentID paymentID,
 			PaymentResult payEndClientResult,
 			boolean forceRollback)
-	throws ModuleException
 	{
 		return _payEnd(paymentID, payEndClientResult, forceRollback);
 	}
@@ -1724,7 +1703,6 @@ implements SessionBean
 			PaymentID paymentID,
 			PaymentResult payEndClientResult,
 			boolean forceRollback)
-	throws ModuleException
 	{
 		if (paymentID == null)
 			throw new NullPointerException("paymentID");
@@ -1739,12 +1717,10 @@ implements SessionBean
 			paymentHelperLocal = PaymentHelperUtil.getLocalHome().create();
 			paymentHelperLocal.payEnd_storePayEndClientResult(
 					paymentID, payEndClientResult, forceRollback);
-		} catch (ModuleException x) {
-			throw x;
 		} catch (RuntimeException x) {
 			throw x;
 		} catch (Exception x) {
-			throw new ModuleException(x);
+			throw new RuntimeException(x);
 		}
 
 		String[] fetchGroups = new String[] {FetchPlan.DEFAULT};
@@ -1764,12 +1740,10 @@ implements SessionBean
 				paymentHelperLocal.payRollback(paymentID);
 
 				return payEndServerResult_detached;
-			} catch (ModuleException x) {
-				throw x;
 			} catch (RuntimeException x) {
 				throw x;
 			} catch (Exception x) {
-				throw new ModuleException(x);
+				throw new RuntimeException(x);
 			}
 		}
 	}
@@ -1822,7 +1796,6 @@ implements SessionBean
 	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.queryInvoices"
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
-	@SuppressWarnings("unchecked")
 	public List<Invoice> getInvoices(Set<InvoiceID> invoiceIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();

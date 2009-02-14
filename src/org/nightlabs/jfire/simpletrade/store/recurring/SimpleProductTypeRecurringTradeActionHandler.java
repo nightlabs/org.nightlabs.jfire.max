@@ -58,7 +58,7 @@ extends RecurringTradeProductTypeActionHandler{
 
 
 	@Override
-	public  Map<Article, Article> createArticles(RecurredOffer offer, Set<Article> recurringArticles, Segment segment) throws ModuleException
+	public  Map<Article, Article> createArticles(RecurredOffer offer, Set<Article> recurringArticles, Segment segment)
 	{	
 		Map<Article, Article> articlesMap=  new HashMap<Article, Article>();
 

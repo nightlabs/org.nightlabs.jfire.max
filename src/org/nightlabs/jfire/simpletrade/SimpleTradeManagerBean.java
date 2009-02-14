@@ -335,7 +335,7 @@ implements SessionBean
 	 * @ejb.transaction type="Required"
 	 */
 	public SimpleProductType storeProductType(SimpleProductType productType, boolean get, String[] fetchGroups, int maxFetchDepth)
-	throws ModuleException
+	throws PriceCalculationException
 	{
 		if (productType == null)
 			throw new IllegalArgumentException("productType must not be null!");

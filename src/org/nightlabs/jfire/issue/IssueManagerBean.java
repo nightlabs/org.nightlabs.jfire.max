@@ -33,7 +33,6 @@ import org.jbpm.graph.exe.ProcessInstance;
 import org.nightlabs.ModuleException;
 import org.nightlabs.jdo.FetchPlanBackup;
 import org.nightlabs.jdo.NLJDOHelper;
-import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
 import org.nightlabs.jdo.query.AbstractJDOQuery;
 import org.nightlabs.jdo.query.AbstractSearchQuery;

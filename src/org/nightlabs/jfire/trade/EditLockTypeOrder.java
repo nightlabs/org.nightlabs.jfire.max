@@ -5,7 +5,6 @@ import java.util.Set;
 
 import javax.jdo.PersistenceManager;
 
-import org.nightlabs.ModuleException;
 import org.nightlabs.jfire.editlock.EditLock;
 import org.nightlabs.jfire.editlock.EditLockType;
 import org.nightlabs.jfire.editlock.ReleaseReason;

@@ -19,6 +19,19 @@ import org.nightlabs.progress.SubProgressMonitor;
 public class ProductTypePermissionFlagSetDAO
 extends BaseJDOObjectDAO<ProductTypePermissionFlagSetID, ProductTypePermissionFlagSet>
 {
+	private static volatile ProductTypePermissionFlagSetDAO _sharedInstance = null;
+
+	public static ProductTypePermissionFlagSetDAO sharedInstance()
+	{
+		if (_sharedInstance == null) {
+			synchronized (ProductTypePermissionFlagSetDAO.class) {
+				if (_sharedInstance == null)
+					_sharedInstance = new ProductTypePermissionFlagSetDAO();
+			}
+		}
+		return _sharedInstance;
+	}
+
 	private StoreManager storeManager;
 
 	@SuppressWarnings("unchecked")

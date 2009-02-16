@@ -2820,7 +2820,7 @@ implements SessionBean
 						productTypeActionHandlerID2productTypeID2userIDs.put(productTypeActionHandlerID, productTypeID2userIDs);
 					}
 
-					Set<UserID> userIDs = productTypeID2userIDs.get(productType);
+					Set<UserID> userIDs = productTypeID2userIDs.get(productTypeID);
 					if (userIDs == null) {
 						userIDs = new HashSet<UserID>();
 						productTypeID2userIDs.put(productTypeID, userIDs);

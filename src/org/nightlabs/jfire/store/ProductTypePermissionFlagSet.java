@@ -111,7 +111,7 @@ implements Serializable
 		return c;
 	}
 
-	public static void updateFlags(PersistenceManager pm, Collection<ProductType> productTypes)
+	public static void updateFlags(PersistenceManager pm, Collection<? extends ProductType> productTypes)
 	{
 		for (User user : getRelevantUsers(pm)) {
 			updateFlags(pm, productTypes, user);
@@ -135,7 +135,7 @@ implements Serializable
 		return CollectionUtil.castCollection(users);
 	}
 
-	public static void updateFlags(PersistenceManager pm, Collection<ProductType> productTypes, User user)
+	public static void updateFlags(PersistenceManager pm, Collection<? extends ProductType> productTypes, User user)
 	{
 		if (pm == null)
 			throw new IllegalArgumentException("pm must not be null!");
@@ -150,11 +150,11 @@ implements Serializable
 		updateFlagsSellReverseProductType(pm, productTypes, user);
 	}
 
-	public static void updateFlagsSellReverseProductType(PersistenceManager pm, Collection<ProductType> productTypes, User user)
+	public static void updateFlagsSellReverseProductType(PersistenceManager pm, Collection<? extends ProductType> productTypes, User user)
 	{
 		_updateFlagsSellReverseProductType(pm, productTypes, user);
 	}
-	private static void _updateFlagsSellReverseProductType(PersistenceManager pm, Collection<ProductType> productTypes, User user)
+	private static void _updateFlagsSellReverseProductType(PersistenceManager pm, Collection<? extends ProductType> productTypes, User user)
 	{
 		if (pm == null)
 			throw new IllegalArgumentException("pm must not be null!");
@@ -292,7 +292,7 @@ implements Serializable
 			_updateFlagsSellReverseProductType(pm, nestingProductTypes, user);
 	}
 
-	public static void updateFlagsSeeProductType(PersistenceManager pm, Collection<ProductType> productTypes, User user)
+	public static void updateFlagsSeeProductType(PersistenceManager pm, Collection<? extends ProductType> productTypes, User user)
 	{
 		if (pm == null)
 			throw new IllegalArgumentException("pm must not be null!");

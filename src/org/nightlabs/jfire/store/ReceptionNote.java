@@ -50,7 +50,7 @@ import org.nightlabs.util.Util;
  *
  * @jdo.fetch-group name="Statable.state" fields="state"
  * @jdo.fetch-group name="Statable.states" fields="states"
- * 
+ *
  * @jdo.fetch-group name="ArticleContainer.customer" fields="customer"
  * @jdo.fetch-group name="ArticleContainer.vendor" fields="vendor"
  *
@@ -68,8 +68,9 @@ implements
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon! 
+	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon!
 	 */
+	@Deprecated
 	public static final String FETCH_GROUP_THIS_RECEPTION_NOTE = "ReceptionNote.this";
 
 
@@ -133,6 +134,15 @@ implements
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	private LegalEntity endCustomer = null;
+	/**
+	 * @jdo.field persistence-modifier="none"
+	 */
+	private boolean endCustomer_detached = false;
+
+	/**
+	 * @jdo.field persistence-modifier="none"
+	 */
 	private AnchorID vendorID = null;
 	/**
 	 * @jdo.field persistence-modifier="none"
@@ -149,10 +159,20 @@ implements
 	private boolean customerID_detached = false;
 
 	/**
+	 * @jdo.field persistence-modifier="none"
+	 */
+	private AnchorID endCustomerID = null;
+
+	/**
+	 * @jdo.field persistence-modifier="none"
+	 */
+	private boolean endCustomerID_detached = false;
+
+	/**
 	 * @jdo.field persistence-modifier="persistent" mapped-by="receptionNote"
 	 */
 	private ReceptionNoteLocal receptionNoteLocal;
-	
+
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
@@ -231,7 +251,7 @@ implements
 	throws ArticleContainerException
 	{
 		// TODO check, whether we're allowed to add or whether we're maybe finalized (or other problems exist - i.e. the Article being already in another ReceptionNote)
-		
+
 		articles.add(article);
 	}
 
@@ -246,23 +266,28 @@ implements
 	 */
 	private transient Set<Article> _articles = null;
 
-	public Collection getArticles()
+	@Override
+	public Collection<Article> getArticles()
 	{
 		if (_articles == null)
 			_articles = Collections.unmodifiableSet(articles);
+
 		return _articles;
 	}
 
+	@Override
 	public Date getCreateDT()
 	{
 		return createDT;
 	}
 
+	@Override
 	public User getCreateUser()
 	{
 		return createUser;
 	}
 
+	@Override
 	public LegalEntity getVendor()
 	{
 		if (vendor == null && !vendor_detached)
@@ -271,6 +296,7 @@ implements
 		return vendor;
 	}
 
+	@Override
 	public LegalEntity getCustomer()
 	{
 		if (customer == null && !customer_detached)
@@ -279,6 +305,16 @@ implements
 		return customer;
 	}
 
+	@Override
+	public LegalEntity getEndCustomer()
+	{
+		if (endCustomer == null && !endCustomer_detached)
+			endCustomer = deliveryNote.getEndCustomer();
+
+		return endCustomer;
+	}
+
+	@Override
 	public AnchorID getVendorID()
 	{
 		if (vendorID == null && !vendorID_detached)
@@ -287,12 +323,22 @@ implements
 		return vendorID;
 	}
 
+	@Override
 	public AnchorID getCustomerID()
 	{
 		if (customerID == null && !customerID_detached)
 			customerID = deliveryNote.getCustomerID();
 
 		return customerID;
+	}
+
+	@Override
+	public AnchorID getEndCustomerID()
+	{
+		if (endCustomerID == null && !endCustomerID_detached)
+			endCustomerID = deliveryNote.getEndCustomerID();
+
+		return endCustomerID;
 	}
 
 	public ReceptionNoteLocal getReceptionNoteLocal()
@@ -326,7 +372,7 @@ implements
 		ReceptionNote attached = (ReceptionNote)_attached;
 		ReceptionNote detached = this;
 		PersistenceManager pm = attached.getPersistenceManager();
-		Collection fetchGroups = pm.getFetchPlan().getGroups();
+		Collection<String> fetchGroups = CollectionUtil.castSet(pm.getFetchPlan().getGroups());
 
 		if (fetchGroups.contains(FETCH_GROUP_THIS_RECEPTION_NOTE) || fetchGroups.contains(FETCH_GROUP_VENDOR)) {
 			detached.vendor = pm.detachCopy(attached.getVendor());
@@ -338,6 +384,11 @@ implements
 			detached.customer_detached = true;
 		}
 
+		if (fetchGroups.contains(FETCH_GROUP_END_CUSTOMER)) {
+			detached.endCustomer = pm.detachCopy(attached.getEndCustomer());
+			detached.endCustomer_detached = true;
+		}
+
 		if (fetchGroups.contains(FETCH_GROUP_THIS_RECEPTION_NOTE) || fetchGroups.contains(FETCH_GROUP_VENDOR_ID)) {
 			detached.vendorID = attached.getVendorID();
 			detached.vendorID_detached = true;
@@ -347,6 +398,12 @@ implements
 			detached.customerID = attached.getCustomerID();
 			detached.customerID_detached = true;
 		}
+
+		if (fetchGroups.contains(FETCH_GROUP_END_CUSTOMER_ID)) {
+			detached.endCustomerID = attached.getEndCustomerID();
+			detached.endCustomerID_detached = true;
+		}
+
 //		detached.attachable = true;
 	}
 
@@ -418,7 +475,7 @@ implements
 	{
 		return receptionNoteLocal;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.nightlabs.jfire.trade.ArticleContainer#getArticleCount()

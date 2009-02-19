@@ -50,6 +50,7 @@ import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.security.id.UserID;
 import org.nightlabs.jfire.trade.id.OrderID;
 import org.nightlabs.jfire.transfer.id.AnchorID;
+import org.nightlabs.util.CollectionUtil;
 import org.nightlabs.util.Util;
 
 
@@ -128,6 +129,7 @@ import org.nightlabs.util.Util;
  *
  * @jdo.fetch-group name="ArticleContainer.vendor" fields="vendor"
  * @jdo.fetch-group name="ArticleContainer.customer" fields="customer"
+ * @jdo.fetch-group name="ArticleContainer.endCustomer" fields="endCustomer"
  *
  * @jdo.fetch-group name="FetchGroupsTrade.articleContainerInEditor" fields="vendor, currency, customer, customerGroup, segments, offers, createUser, changeUser"
  */
@@ -383,6 +385,11 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 	private LegalEntity customer;
 
 	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private LegalEntity endCustomer;
+
+	/**
 	 * Because the {@link #customer} may have many available <tt>CustomerGroup</tt>s,
 	 * it is necessary to define which one shall be used for this <tt>Order</tt>.
 	 *
@@ -525,6 +532,16 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 	private boolean customerID_detached = false;
 
 	/**
+	 * @jdo.field persistence-modifier="none"
+	 */
+	private AnchorID endCustomerID = null;
+
+	/**
+	 * @jdo.field persistence-modifier="none"
+	 */
+	private boolean endCustomerID_detached = false;
+
+	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private int articleCount = 0;
@@ -626,6 +643,7 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 	/**
 	 * @return Returns the vendor.
 	 */
+	@Override
 	public LegalEntity getVendor()
 	{
 		return vendor;
@@ -633,11 +651,25 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 	/**
 	 * @return Returns the customer.
 	 */
+	@Override
 	public LegalEntity getCustomer()
 	{
 		return customer;
 	}
 
+	@Override
+	public LegalEntity getEndCustomer() {
+		return endCustomer;
+	}
+
+	public void setEndCustomer(LegalEntity endCustomer) {
+		this.endCustomer = endCustomer;
+
+		this.endCustomerID = null;
+		this.endCustomerID_detached = false;
+	}
+
+	@Override
 	public AnchorID getVendorID()
 	{
 		if (vendorID == null && !vendorID_detached)
@@ -646,12 +678,22 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 		return vendorID;
 	}
 
+	@Override
 	public AnchorID getCustomerID()
 	{
 		if (customerID == null && !customerID_detached)
 			customerID = (AnchorID) JDOHelper.getObjectId(customer);
 
 		return customerID;
+	}
+
+	@Override
+	public AnchorID getEndCustomerID()
+	{
+		if (endCustomerID == null && !endCustomerID_detached)
+			endCustomerID = (AnchorID) JDOHelper.getObjectId(endCustomer);
+
+		return endCustomerID;
 	}
 
 	/**
@@ -663,6 +705,8 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 			throw new IllegalStateException("Customer cannot be changed anymore!");
 
 		this.customer = customer;
+		this.customerID = null;
+		this.customerID_detached = false;
 	}
 	/**
 	 * After the first <tt>Offer</tt> has been finalized, the <tt>Order</tt>'s <tt>customer</tt>
@@ -820,7 +864,7 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 	{
 		Order attached = (Order)_attached;
 		Order detached = this;
-		Collection<String> fetchGroups = attached.getPersistenceManager().getFetchPlan().getGroups();
+		Collection<String> fetchGroups = CollectionUtil.castCollection(attached.getPersistenceManager().getFetchPlan().getGroups());
 
 		if (fetchGroups.contains(FETCH_GROUP_VENDOR_ID)) {
 			detached.vendorID = attached.getVendorID();
@@ -830,6 +874,11 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 		if (fetchGroups.contains(FETCH_GROUP_CUSTOMER_ID)) {
 			detached.customerID = attached.getCustomerID();
 			detached.customerID_detached = true;
+		}
+
+		if (fetchGroups.contains(FETCH_GROUP_END_CUSTOMER_ID)) {
+			detached.endCustomerID = attached.getEndCustomerID();
+			detached.endCustomerID_detached = true;
 		}
 	}
 

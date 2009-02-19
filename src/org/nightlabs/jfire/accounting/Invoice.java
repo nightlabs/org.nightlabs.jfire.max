@@ -119,6 +119,7 @@ import org.nightlabs.util.Util;
  *
  * @jdo.fetch-group name="ArticleContainer.customer" fields="customer"
  * @jdo.fetch-group name="ArticleContainer.vendor" fields="vendor"
+ * @jdo.fetch-group name="ArticleContainer.endCustomer" fields="endCustomer"
  *
  * @jdo.fetch-group name="FetchGroupsTrade.articleContainerInEditor" fields="invoiceLocal, createUser, currency, customer, discount, finalizeUser, price, vendor, state, states"
  *
@@ -268,6 +269,11 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	private LegalEntity customer;
 
 	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private LegalEntity endCustomer;
+
+	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
 	private AnchorID vendorID = null;
@@ -284,6 +290,16 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	 * @jdo.field persistence-modifier="none"
 	 */
 	private boolean customerID_detached = false;
+
+	/**
+	 * @jdo.field persistence-modifier="none"
+	 */
+	private AnchorID endCustomerID = null;
+
+	/**
+	 * @jdo.field persistence-modifier="none"
+	 */
+	private boolean endCustomerID_detached = false;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -579,16 +595,27 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 		}
 	}
 
+	@Override
 	public Date getCreateDT() {
 		return createDT;
 	}
+
+	@Override
 	public User getCreateUser() {
 		return createUser;
 	}
+
+	@Override
 	public LegalEntity getCustomer() {
 		return customer;
 	}
 
+	@Override
+	public LegalEntity getEndCustomer() {
+		return endCustomer;
+	}
+
+	@Override
 	public AnchorID getVendorID()
 	{
 		if (vendorID == null && !vendorID_detached)
@@ -597,6 +624,7 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 		return vendorID;
 	}
 
+	@Override
 	public AnchorID getCustomerID()
 	{
 		if (customerID == null && !customerID_detached)
@@ -605,10 +633,21 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 		return customerID;
 	}
 
+	@Override
+	public AnchorID getEndCustomerID()
+	{
+		if (endCustomerID == null && !endCustomerID_detached)
+			endCustomerID = (AnchorID) JDOHelper.getObjectId(endCustomer);
+
+		return endCustomerID;
+	}
+
 	public String getInvoiceIDPrefix()
 	{
 		return invoiceIDPrefix;
 	}
+
+	@Override
 	public String getArticleContainerIDPrefix()
 	{
 		return getInvoiceIDPrefix();
@@ -616,13 +655,18 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	public long getInvoiceID() {
 		return invoiceID;
 	}
+
+	@Override
 	public long getArticleContainerID()
 	{
 		return getInvoiceID();
 	}
+
 	public String getInvoiceIDAsString() {
 		return ObjectIDUtil.longObjectIDFieldToString(invoiceID);
 	}
+
+	@Override
 	public String getArticleContainerIDAsString()
 	{
 		return getInvoiceIDAsString();
@@ -712,7 +756,7 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	{
 		Invoice attached = (Invoice)_attached;
 		Invoice detached = this;
-		Collection fetchGroups = attached.getPersistenceManager().getFetchPlan().getGroups();
+		Collection<String> fetchGroups = CollectionUtil.castSet(attached.getPersistenceManager().getFetchPlan().getGroups());
 
 		if (fetchGroups.contains(FETCH_GROUP_VENDOR_ID)) {
 			detached.vendorID = attached.getVendorID();
@@ -722,6 +766,11 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 		if (fetchGroups.contains(FETCH_GROUP_CUSTOMER_ID)) {
 			detached.customerID = attached.getCustomerID();
 			detached.customerID_detached = true;
+		}
+
+		if (fetchGroups.contains(FETCH_GROUP_END_CUSTOMER_ID)) {
+			detached.endCustomerID = attached.getEndCustomerID();
+			detached.endCustomerID_detached = true;
 		}
 	}
 

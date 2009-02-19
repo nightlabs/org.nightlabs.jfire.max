@@ -282,6 +282,15 @@ implements
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	private LegalEntity endCustomer = null;
+	/**
+	 * @jdo.field persistence-modifier="none"
+	 */
+	private boolean endCustomer_detached = false;
+
+	/**
+	 * @jdo.field persistence-modifier="none"
+	 */
 	private AnchorID vendorID = null;
 	/**
 	 * @jdo.field persistence-modifier="none"
@@ -296,6 +305,15 @@ implements
 	 * @jdo.field persistence-modifier="none"
 	 */
 	private boolean customerID_detached = false;
+
+	/**
+	 * @jdo.field persistence-modifier="none"
+	 */
+	private AnchorID endCustomerID = null;
+	/**
+	 * @jdo.field persistence-modifier="none"
+	 */
+	private boolean endCustomerID_detached = false;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -443,25 +461,25 @@ implements
 	{
 		this.offerLocal = offerLocal;
 	}
-	
+
 	/**
 	 * This method will be called to check the validity of the given
 	 * articles before they are added to the list of {@link Article}s
 	 * of this {@link Offer}.
 	 * <p>
-	 * This implementation does nothing, implementations might throw 
+	 * This implementation does nothing, implementations might throw
 	 * a RuntimeException if one of the articles is invalid.
-	 * </p> 
+	 * </p>
 	 * @param articles The articles to check.
 	 */
 	protected void checkArticles(Collection<? extends Article> articles) {
-	
+
 	}
 
 	public void addArticles(Collection<? extends Article> articles)
 	{
 		checkArticles(articles);
-		
+
 		if (isFinalized())
 			throw new IllegalStateException("This offer is already finalized! Cannot add a new Article!");
 
@@ -645,6 +663,7 @@ implements
 	 * instance was not detached (or is <code>null</code>).
 	 * </p>
 	 */
+	@Override
 	public LegalEntity getCustomer()
 	{
 		if (customer == null && !customer_detached)
@@ -653,10 +672,20 @@ implements
 		return customer;
 	}
 
+	@Override
+	public LegalEntity getEndCustomer()
+	{
+		if (endCustomer == null && !endCustomer_detached)
+			endCustomer = order.getEndCustomer();
+
+		return endCustomer;
+	}
+
 	/**
 	 * @return Returns the ID of the customer, which is either obtained via {@link Order#getCustomerID()} or
 	 *		manually detached in {@link #jdoPostDetach(Object)}.
 	 */
+	@Override
 	public AnchorID getCustomerID()
 	{
 		if (customerID == null && !customerID_detached)
@@ -664,6 +693,16 @@ implements
 
 		return customerID;
 	}
+
+	@Override
+	public AnchorID getEndCustomerID()
+	{
+		if (endCustomerID == null && !endCustomerID_detached)
+			endCustomerID = order.getEndCustomerID();
+
+		return endCustomerID;
+	}
+
 	/**
 	 * @return The date and time this {@link Offer} was created.
 	 */
@@ -861,6 +900,11 @@ implements
 			detached.customer_detached = true;
 		}
 
+		if (fetchGroups.contains(FETCH_GROUP_END_CUSTOMER)) {
+			detached.endCustomer = pm.detachCopy(attached.getEndCustomer());
+			detached.endCustomer_detached = true;
+		}
+
 		if (fetchGroups.contains(FETCH_GROUP_VENDOR_ID)) {
 			detached.vendorID = attached.getVendorID();
 			detached.vendorID_detached = true;
@@ -869,6 +913,11 @@ implements
 		if (fetchGroups.contains(FETCH_GROUP_CUSTOMER_ID)) {
 			detached.customerID = attached.getCustomerID();
 			detached.customerID_detached = true;
+		}
+
+		if (fetchGroups.contains(FETCH_GROUP_END_CUSTOMER_ID)) {
+			detached.endCustomerID = attached.getEndCustomerID();
+			detached.endCustomerID_detached = true;
 		}
 
 		detached.attachable = true;

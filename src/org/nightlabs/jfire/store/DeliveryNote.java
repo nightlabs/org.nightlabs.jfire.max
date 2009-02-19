@@ -119,6 +119,7 @@ import org.nightlabs.util.Util;
  *
  * @jdo.fetch-group name="ArticleContainer.vendor" fields="vendor"
  * @jdo.fetch-group name="ArticleContainer.customer" fields="customer"
+ * @jdo.fetch-group name="ArticleContainer.endCustomer" fields="endCustomer"
  *
  * @jdo.fetch-group name="FetchGroupsTrade.articleContainerInEditor" fields="deliveryNoteLocal, articles, createUser, customer, finalizeUser, vendor, state, states"
  *
@@ -271,6 +272,11 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	private LegalEntity customer;
 
 	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private LegalEntity endCustomer;
+
+	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
 	private AnchorID vendorID = null;
@@ -287,6 +293,16 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	 * @jdo.field persistence-modifier="none"
 	 */
 	private boolean customerID_detached = false;
+
+	/**
+	 * @jdo.field persistence-modifier="none"
+	 */
+	private AnchorID endCustomerID = null;
+
+	/**
+	 * @jdo.field persistence-modifier="none"
+	 */
+	private boolean endCustomerID_detached = false;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -403,6 +419,8 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	{
 		return deliveryNoteLocal;
 	}
+
+	@Override
 	public StatableLocal getStatableLocal()
 	{
 		return deliveryNoteLocal;
@@ -413,16 +431,28 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 		this.deliveryNoteLocal = deliveryNoteLocal;
 	}
 
+	@Override
 	public Date getCreateDT() {
 		return createDT;
 	}
+
+	@Override
 	public User getCreateUser()
 	{
 		return createUser;
 	}
+
+	@Override
 	public LegalEntity getCustomer() {
 		return customer;
 	}
+
+	@Override
+	public LegalEntity getEndCustomer() {
+		return endCustomer;
+	}
+
+	@Override
 	public LegalEntity getVendor() {
 		return vendor;
 	}
@@ -443,12 +473,21 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 		return customerID;
 	}
 
+	@Override
+	public AnchorID getEndCustomerID()
+	{
+		if (endCustomerID == null && !endCustomerID_detached)
+			endCustomerID = (AnchorID) JDOHelper.getObjectId(endCustomer);
+
+		return endCustomerID;
+	}
+
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
 	private transient Set<Article> _articles = null;
 
-	@SuppressWarnings("unchecked")
+	@Override
 	public Collection<Article> getArticles()
 	{
 		if (_articles == null)
@@ -457,6 +496,7 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 		return _articles;
 	}
 
+	@Override
 	public int getArticleCount()
 	{
 		return articleCount;
@@ -626,14 +666,17 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 		return pm;
 	}
 
+	@Override
 	public void jdoPreDetach()
 	{
 	}
+
+	@Override
 	public void jdoPostDetach(Object _attached)
 	{
 		DeliveryNote attached = (DeliveryNote)_attached;
 		DeliveryNote detached = this;
-		Collection fetchGroups = attached.getPersistenceManager().getFetchPlan().getGroups();
+		Collection<String> fetchGroups = CollectionUtil.castCollection(attached.getPersistenceManager().getFetchPlan().getGroups());
 
 		if (fetchGroups.contains(FETCH_GROUP_VENDOR_ID)) {
 			detached.vendorID = attached.getVendorID();
@@ -643,6 +686,11 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 		if (fetchGroups.contains(FETCH_GROUP_CUSTOMER_ID)) {
 			detached.customerID = attached.getCustomerID();
 			detached.customerID_detached = true;
+		}
+
+		if (fetchGroups.contains(FETCH_GROUP_END_CUSTOMER_ID)) {
+			detached.endCustomerID = attached.getEndCustomerID();
+			detached.endCustomerID_detached = true;
 		}
 	}
 

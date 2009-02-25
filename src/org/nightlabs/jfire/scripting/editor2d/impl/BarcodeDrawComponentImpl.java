@@ -231,7 +231,7 @@ implements BarcodeDrawComponent
 		getBarcode().setDrawingText(isHumanReadable());
 		getBarcode().setResolution(getModelResolution());
 		double barWidth = getBarWidth(getWidthScale());
-		getBarcode().setBarWidth(barWidth);
+		getBarcode().setBarWidth((int)barWidth);
 		getBarcode().setBarHeight(barcodeHeight);
 		if (logger.isDebugEnabled())
 		{

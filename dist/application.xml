@@ -6,6 +6,6 @@
 		<java>JFireScriptingEditor2D.jar</java>
 	</module>
 	<module>
-		<java>barbecue-1.0.6d.jar</java>
+		<java>barbecue-1.5-beta1.jar</java>
 	</module>	
 </application>

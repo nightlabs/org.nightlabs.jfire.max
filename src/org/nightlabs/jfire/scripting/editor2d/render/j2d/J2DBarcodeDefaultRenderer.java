@@ -28,6 +28,8 @@ package org.nightlabs.jfire.scripting.editor2d.render.j2d;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 
+import net.sourceforge.barbecue.output.OutputException;
+
 import org.apache.log4j.Logger;
 import org.nightlabs.editor2d.DrawComponent;
 import org.nightlabs.editor2d.render.j2d.J2DBaseRenderer;
@@ -41,7 +43,8 @@ import org.nightlabs.jfire.scripting.editor2d.BarcodeDrawComponent.Orientation;
 public class J2DBarcodeDefaultRenderer
 extends J2DBaseRenderer
 {
-	public static final Logger LOGGER = Logger.getLogger(J2DBarcodeDefaultRenderer.class);
+	public static final Logger logger  = Logger.getLogger(J2DBarcodeDefaultRenderer.class);
+	
 	public J2DBarcodeDefaultRenderer() {
 		super();
 	}
@@ -50,15 +53,20 @@ extends J2DBaseRenderer
 	public void paint(DrawComponent dc, Graphics2D g2d)
 	{
 		BarcodeDrawComponent barcode = (BarcodeDrawComponent) dc;
-		if (barcode.getOrientation() == Orientation.HORIZONTAL)
-			barcode.getBarcode().draw(g2d, barcode.getX(), barcode.getY());
-		else if (barcode.getOrientation() == Orientation.VERTICAL)
-		{
-			AffineTransform oldAT = g2d.getTransform();
-			g2d.rotate(Math.toRadians(90), barcode.getX(), barcode.getY());
-			g2d.translate(0, -barcode.getWidth());
-			barcode.getBarcode().draw(g2d, barcode.getX(), barcode.getY());
-			g2d.setTransform(oldAT);
+		try {
+			if (barcode.getOrientation() == Orientation.HORIZONTAL) {
+				barcode.getBarcode().draw(g2d, barcode.getX(), barcode.getY());	
+			}
+			else if (barcode.getOrientation() == Orientation.VERTICAL)
+			{
+				AffineTransform oldAT = g2d.getTransform();
+				g2d.rotate(Math.toRadians(90), barcode.getX(), barcode.getY());
+				g2d.translate(0, -barcode.getWidth());
+				barcode.getBarcode().draw(g2d, barcode.getX(), barcode.getY());
+				g2d.setTransform(oldAT);
+			}
+		} catch (OutputException e) {
+			logger.error("An error occured during barcode painting", e);
 		}
 	}
 

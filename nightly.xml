@@ -7,7 +7,7 @@
     <ant path="JFireScriptingEditor2D" file="build-nightlabs.xml" target="deploy"/>
     <requires/> <!-- default requires: uses .classpath file -->
     <provides/> <!-- default provides: provides dist/<projectname>.jar in all variations -->
-    <provides path="WORKSPACE/JFireScriptingEditor2D/lib/barbecue-1.0.6d.jar" location="JFireScriptingEditor2D/lib/barbecue-1.0.6d.jar"/>
+    <provides path="BARBECUE" location="JFireScriptingEditor2D/lib/barbecue-1.5-beta1.jar"/>
     <publishes location="JFireScriptingEditor2D/dist/JFireScriptingEditor2D.jar"/>
     <javadoc path="JFireScriptingEditor2D/src"/>
     <javadoc path="JFireScriptingEditor2D/ejbsrc"/>

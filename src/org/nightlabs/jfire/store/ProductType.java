@@ -74,6 +74,7 @@ import org.nightlabs.jfire.store.id.ProductTypeGroupID;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.trade.OrganisationLegalEntity;
+import org.nightlabs.jfire.trade.endcustomer.EndCustomerTransferPolicy;
 import org.nightlabs.util.CollectionUtil;
 import org.nightlabs.util.Util;
 
@@ -141,6 +142,7 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="ProductType.productTypeLocal" fields="productTypeLocal"
  * @jdo.fetch-group name="ProductType.name" fields="name"
  * @jdo.fetch-group name="ProductType.tariffUserSet" fields="tariffUserSet"
+ * @jdo.fetch-group name="ProductType.endCustomerTransferPolicy" fields="endCustomerTransferPolicy"
  * @jdo.fetch-group name="ProductType.this" fetch-groups="default" fields="deliveryConfiguration, extendedProductType, fieldMetaDataMap, innerPriceConfig, managedProductTypeGroup, name, owner, packagePriceConfig, productTypeGroups, productTypeLocal"
  *
  * @jdo.fetch-group name="FetchGroupsTrade.articleInOrderEditor" fetch-groups="default" fields="name, vendor"
@@ -231,6 +233,7 @@ implements
 		public static final String saleable = "saleable";
 		public static final String vendor = "vendor";
 		public static final String tariffUserSet = "tariffUserSet";
+		public static final String endCustomerTransferPolicy = "endCustomerTransferPolicy";
 	};
 
 	/**
@@ -261,6 +264,7 @@ implements
 //	public static final String FETCH_GROUP_LOCAL_STOREKEEPER_DELEGATE = "ProductType.localStorekeeperDelegate";
 	public static final String FETCH_GROUP_PRODUCT_TYPE_LOCAL = "ProductType.productTypeLocal";
 	public static final String FETCH_GROUP_TARIFF_USER_SET = "ProductType.tariffUserSet";
+	public static final String FETCH_GROUP_END_CUSTOMER_TRANSFER_POLICY = "ProductType.endCustomerTransferPolicy";
 
 	/**
 	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon!
@@ -623,6 +627,11 @@ implements
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private TariffUserSet tariffUserSet = null;
+
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private EndCustomerTransferPolicy endCustomerTransferPolicy = null;
 
 	/**
 	 * @deprecated Only for JDO!
@@ -1725,6 +1734,13 @@ implements
 			return;
 
 		this.tariffUserSet = tariffUserSet;
+	}
+
+	public EndCustomerTransferPolicy getEndCustomerTransferPolicy() {
+		return endCustomerTransferPolicy;
+	}
+	public void setEndCustomerTransferPolicy(EndCustomerTransferPolicy endCustomerTransferPolicy) {
+		this.endCustomerTransferPolicy = endCustomerTransferPolicy;
 	}
 
 	@Override

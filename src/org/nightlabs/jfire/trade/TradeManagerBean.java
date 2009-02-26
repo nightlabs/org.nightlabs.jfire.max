@@ -101,6 +101,8 @@ import org.nightlabs.jfire.timer.id.TaskID;
 import org.nightlabs.jfire.trade.config.LegalEntityViewConfigModule;
 import org.nightlabs.jfire.trade.config.OfferConfigModule;
 import org.nightlabs.jfire.trade.config.TradePrintingConfigModule;
+import org.nightlabs.jfire.trade.endcustomer.EndCustomerTransferPolicy;
+import org.nightlabs.jfire.trade.endcustomer.id.EndCustomerTransferPolicyID;
 import org.nightlabs.jfire.trade.id.ArticleContainerID;
 import org.nightlabs.jfire.trade.id.ArticleID;
 import org.nightlabs.jfire.trade.id.CustomerGroupID;
@@ -2328,6 +2330,43 @@ implements SessionBean
 			}
 
 			return pm.detachCopyAll(productTypePermissionFlagSets);
+		} finally {
+			pm.close();
+		}
+	}
+
+	/**
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+	 */
+	public Set<EndCustomerTransferPolicyID> getEndCustomerTransferPolicyIDs()
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			Query q = pm.newQuery(EndCustomerTransferPolicy.class);
+			q.setResult("JDOHelper.getObjectId(this)");
+			Collection<? extends EndCustomerTransferPolicyID> c = CollectionUtil.castCollection((Collection<?>) q.execute());
+			return new HashSet<EndCustomerTransferPolicyID>(c);
+		} finally {
+			pm.close();
+		}
+	}
+
+	/**
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+	 */
+	public Collection<EndCustomerTransferPolicy> getEndCustomerTransferPolicies(
+			Collection<EndCustomerTransferPolicyID> endCustomerTransferPolicyIDs,
+			String[] fetchGroups,
+			int maxFetchDepth
+	)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			return NLJDOHelper.getDetachedObjectList(pm, endCustomerTransferPolicyIDs, EndCustomerTransferPolicy.class, fetchGroups, maxFetchDepth);
 		} finally {
 			pm.close();
 		}

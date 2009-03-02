@@ -173,7 +173,6 @@ implements SessionBean
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	@SuppressWarnings("unchecked")
 	public List<IssueFileAttachment> getIssueFileAttachments(Collection<IssueFileAttachmentID> issueFileAttachmentIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -190,7 +189,6 @@ implements SessionBean
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	@SuppressWarnings("unchecked")
 	public List<IssueWorkTimeRange> getIssueWorkTimeRanges(Collection<IssueWorkTimeRange> issueWorkTimeRangeIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -565,7 +563,7 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * @ejb.interface-method
 	 * @!ejb.transaction type="Supports"
@@ -583,7 +581,7 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * @ejb.interface-method
 	 * @!ejb.transaction type="Supports"
@@ -604,7 +602,7 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	//Issue//
 	/**
 	 * Stores the given Issue. If the issue is a new issue, do the initializing process instance.
@@ -1162,7 +1160,7 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * @throws ModuleException
 	 *
@@ -1172,7 +1170,7 @@ implements SessionBean
 	 */
 	public void sendRemindEMail(String messageString, String subject, UserID senderID, Set<UserID> recipientIDs)
 	{
-		User sender = UserDAO.sharedInstance().getUser(senderID, 
+		User sender = UserDAO.sharedInstance().getUser(senderID,
 				new String[]{User.FETCH_GROUP_PERSON, User.FETCH_GROUP_NAME},
 				NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT, new NullProgressMonitor());
 		String senderEmail = "";
@@ -1181,11 +1179,11 @@ implements SessionBean
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-		
-		List<User> recipients = UserDAO.sharedInstance().getUsers(recipientIDs, 
+
+		List<User> recipients = UserDAO.sharedInstance().getUsers(recipientIDs,
 				new String[]{User.FETCH_GROUP_PERSON, User.FETCH_GROUP_NAME},
 				NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT, new NullProgressMonitor());
-		
+
 		Properties props = new Properties();
 		props.setProperty("mail.transport.protocol", "smtp");
 		props.setProperty("mail.host", "classic.asianet.co.th");
@@ -1201,7 +1199,7 @@ implements SessionBean
 
 			try {
 				for (User recipient : recipients) {
-					String recipientEmail = 
+					String recipientEmail =
 						((TextDataField)recipient.getPerson().getDataField(PersonStruct.INTERNET_EMAIL)).getText();
 					message.setRecipient(Message.RecipientType.TO, new InternetAddress(recipientEmail));
 				}
@@ -1209,13 +1207,13 @@ implements SessionBean
 				throw new RuntimeException(e);
 			}
 			message.setRecipient(Message.RecipientType.TO, new InternetAddress("chairat@guinaree.com"));
-			
+
 			transport.connect();
 			transport.sendMessage(message, message.getRecipients(Message.RecipientType.TO));
 			transport.close();
 		}
 		catch (Exception e) {
-			throw new RuntimeException(e); 
+			throw new RuntimeException(e);
 		}
 //		PersistenceManager pm = getPersistenceManager();
 //		try {
@@ -1244,9 +1242,7 @@ implements SessionBean
 			// WORKAROUND JPOX Bug to avoid problems with creating workflows as State.statable is defined as interface and has subclassed implementations
 			pm.getExtent(Issue.class);
 
-			String organisationID = getOrganisationID();
-
-			IssueStruct.getIssueStruct(organisationID, pm);
+			IssueStruct.getIssueStruct(pm);
 
 			// The complete method is executed in *one* transaction. So if one thing fails, all fail.
 			// => We check once at the beginning, if this module has already been initialised.

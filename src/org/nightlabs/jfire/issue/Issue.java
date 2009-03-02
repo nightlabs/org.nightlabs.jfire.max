@@ -56,16 +56,16 @@ import org.nightlabs.util.CollectionUtil;
 import org.nightlabs.util.Util;
 
 /**
- * The {@link Issue} class represents an issue in JFire. 
+ * The {@link Issue} class represents an issue in JFire.
  * <p>
- * In computing, the term issue is a unit of work to accomplish an improvement in a data system. 
- * An issue could be a bug, a requested feature, task, missing documentation, and so forth. 
+ * In computing, the term issue is a unit of work to accomplish an improvement in a data system.
+ * An issue could be a bug, a requested feature, task, missing documentation, and so forth.
  * The word "issue" is popularly misused in lieu of "problem."
  * </p>
  * <p>
- * An {@link Issue} created by a JFire's {@link User} should at lease has {@link IssueSubject} and {@link IssueDescription}.  
+ * An {@link Issue} created by a JFire's {@link User} should at lease has {@link IssueSubject} and {@link IssueDescription}.
  * </p>
- * 
+ *
  * @author Chairat Kongarayawetchakun <!-- chairat [AT] nightlabs [DOT] de -->
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
  *
@@ -76,7 +76,7 @@ import org.nightlabs.util.Util;
  *		table="JFireIssueTracking_Issue"
  *
  * @jdo.inheritance strategy="new-table"
- * 
+ *
  * @jdo.implements name="org.nightlabs.jfire.jbpm.graph.def.Statable"
  *
  * @jdo.create-objectid-class
@@ -85,20 +85,20 @@ import org.nightlabs.util.Util;
  * @jdo.query
  *		name="getIssuesByProjectID"
  *		query="SELECT
- *			WHERE 
+ *			WHERE
  *				this.project.organisationID == :organisationID &&
  *				this.project.projectID == :projectID"
  *
  * @jdo.query
  *		name="getIssuesByProjectTypeID"
  *		query="SELECT
- *			WHERE 
+ *			WHERE
  *				this.project.projectType.organisationID == :organisationID &&
  *				this.project.projectType.projectTypeID == :projectTypeID"
  *
  * @jdo.fetch-group name="Issue.issueFileAttachments" fields="issueFileAttachments"
  * @jdo.fetch-group name="Issue.description" fields="description"
- * @jdo.fetch-group name="Issue.subject" fields="subject" 
+ * @jdo.fetch-group name="Issue.subject" fields="subject"
  * @jdo.fetch-group name="Issue.issuePriority" fields="issuePriority"
  * @jdo.fetch-group name="Issue.issueSeverityType" fields="issueSeverityType"
  * @jdo.fetch-group name="Issue.issueResolution" fields="issueResolution"
@@ -145,7 +145,7 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	 * This is the organisationID to which the issue belongs. Within one organisation,
 	 * all the issues have their organisation's ID stored here, thus it's the same
 	 * value for all of them.
-	 * 
+	 *
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
@@ -172,7 +172,7 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	 *		mapped-by="issue"
 	 */
 	private Set<IssueLink> issueLinks;
-	
+
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
@@ -225,39 +225,39 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	private IssueSeverityType issueSeverityType;
 
 	/**
-	 * @jdo.field 	
-	 * 		persistence-modifier="persistent" 
-	 * 		dependent="true" 
+	 * @jdo.field
+	 * 		persistence-modifier="persistent"
+	 * 		dependent="true"
 	 * 		mapped-by="issue"
 	 */
 	private IssueSubject subject;
 
 	/**
-	 * @jdo.field 
-	 * 		persistence-modifier="persistent" 
-	 * 		dependent="true" 
+	 * @jdo.field
+	 * 		persistence-modifier="persistent"
+	 * 		dependent="true"
 	 * 		mapped-by="issue"
 	 */
 	private IssueDescription description;
 
 	/**
-	 * @jdo.field 
-	 * 		persistence-modifier="persistent" 
+	 * @jdo.field
+	 * 		persistence-modifier="persistent"
 	 * 		load-fetch-group="all"
 	 */
-	private User reporter; 
+	private User reporter;
 
 	/**
-	 * @jdo.field 
-	 * 		persistence-modifier="persistent" 
+	 * @jdo.field
+	 * 		persistence-modifier="persistent"
 	 * 		load-fetch-group="all"
 	 */
-	private User assignee; 
+	private User assignee;
 
 	/**
-	 * @jdo.field persistence-modifier="persistent" 
+	 * @jdo.field persistence-modifier="persistent"
 	 */
-	private boolean isStarted = false;; 
+	private boolean isStarted = false;;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -275,9 +275,9 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	private IssueResolution issueResolution;
 
 	/**
-	 * @jdo.field 
-	 * 		persistence-modifier="persistent" 
-	 * 		mapped-by="issue" 
+	 * @jdo.field
+	 * 		persistence-modifier="persistent"
+	 * 		mapped-by="issue"
 	 * 		dependent="true"
 	 */
 	private IssueLocal issueLocal;
@@ -343,7 +343,7 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	}
 
 	/**
-	 * @deprecated Constructor exists only for JDO! 
+	 * @deprecated Constructor exists only for JDO!
 	 */
 	@Deprecated
 	protected Issue() { }
@@ -373,16 +373,16 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 		this.structScope = Struct.DEFAULT_SCOPE;
 		this.structLocalScope = StructLocal.DEFAULT_SCOPE;
 		this.propertySet = new PropertySet(
-				organisationID, IDGenerator.nextID(PropertySet.class), 
-				Issue.class.getName(), 
-				structScope, structLocalScope);
+				IDGenerator.getOrganisationID(), IDGenerator.nextID(PropertySet.class),
+				Organisation.DEV_ORGANISATION_ID,
+				Issue.class.getName(), structScope, structLocalScope);
 	}
 
 	/**
 	 * Constructs a new issue with {@link IssueType}.
 	 * @param organisationID the first part of the composite primary key - referencing the organisation which owns this <code>Issue</code>.
 	 * @param issueID the second part of the composite primary key. Use {@link IDGenerator#nextID(Class)} with <code>Issue.class</code> to create an id.
-	 * @param issueType a specific issue type for this issue 
+	 * @param issueType a specific issue type for this issue
 	 */
 	public Issue(String organisationID, long issueID, IssueType issueType)
 	{
@@ -588,7 +588,7 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 //	* but to be consistent, there should never be the possibility (in a JDO object) to replace the set (in non-JDO-objects there are many reasons to do the same,
 //	* as well). Therefore you should better have add and remove methods here and remove the setter.
 //	* As you see below, I've hidden the internal String management more or less completely and instead work with instances of {@link ObjectID} - which
-//	* is a much nicer API. This couldn't be easily done when exposing the Set<String> referencedObjectIDs directly. 
+//	* is a much nicer API. This couldn't be easily done when exposing the Set<String> referencedObjectIDs directly.
 //	*/
 //	public void setReferencedObjectIDs(Set<String> objIds) {
 //	this.referencedObjectIDs = objIds;
@@ -648,7 +648,7 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 
 	/**
 	 * Creates and Adds a link with its type and linked object.
-	 * 
+	 *
 	 * @param issueLinkType the type of the new <code>IssueLink</code>. Must not be <code>null</code>
 	 * @param linkedObject the linked object (a persistence-capable JDO object).
 	 */
@@ -666,7 +666,7 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 
 	/**
 	 * Creates a new link with the link type, linked object and specific class of the linked object.
-	 * 
+	 *
 	 * @param issueLinkType the type of the new <code>IssueLink</code>. Must not be <code>null</code>
 	 * @param linkedObjectID  an object-id (implementing {@link ObjectID}) identifying a persistence-capable JDO object
 	 * @param linkedObjectClass the linked object class(a persistence-capable JDO object)
@@ -831,7 +831,7 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 
 	/**
 	 * Gets a string of the {@link Issue}'s primary key.
-	 * 
+	 *
 	 * @param organisationID organisation id of the issue
 	 * @param issueID issue id of the issue
 	 * @return
@@ -840,7 +840,7 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	{
 		return organisationID + '/' + Long.toString(issueID);
 	}
-	
+
 	/**
 	 * Gets a string of the {@link Issue}'s primary key.
 	 * @return a string of the issue primary key
@@ -898,13 +898,13 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	}
 
 	/**
-	 * Sets the {@link Project}. 
+	 * Sets the {@link Project}.
 	 * @param project the project that this issue is created on
 	 */
 	public void setProject(Project project) {
 		this.project = project;
 	}
-	
+
 	/**
 	 * Gets the {@link Project}.
 	 * @return a project
@@ -912,7 +912,7 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	public Project getProject() {
 		return project;
 	}
-	
+
 	/**
 	 * Adds an {@link IssueFileAttachment} to issue.
 	 * @param issueFileAttachment the issueFileAttachment to be added
@@ -951,7 +951,7 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 		}
 
 		isStarted = true;
-		
+
 		IssueWorkTimeRange wt = new IssueWorkTimeRange(organisationID, IDGenerator.nextID(IssueWorkTimeRange.class), assignee, this);
 		wt.setFrom(date);
 		return this.issueWorkTimeRanges.add(wt);
@@ -972,7 +972,7 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 		wt.setTo(date);
 		return true;
 	}
-	
+
 	/**
 	 * Returns the {@link IssueWorkTimeRange} of the issue.
 	 * @return an issueWorkTimeRange

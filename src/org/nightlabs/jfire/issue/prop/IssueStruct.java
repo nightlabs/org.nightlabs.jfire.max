@@ -16,24 +16,26 @@ import org.nightlabs.jfire.prop.StructLocal;
 
 /**
  * This {@link IssueStruct} class provides methods for creating {@link Struct} of {@link Issue}.
- * 
+ *
  * @author Chairat Kongarayawetchakun <!-- chairat [AT] nightlabs [DOT] de -->
  *
  */
 public class IssueStruct {
 
-	public static IStruct getIssueStruct(String organisationID, PersistenceManager pm) {
+	public static IStruct getIssueStruct(PersistenceManager pm) {
+		String devOrganisationID = Organisation.DEV_ORGANISATION_ID;
+
 		Struct issueStruct = null;
 		StructLocal issueStructLocal = null;
 		try {
-			issueStruct = Struct.getStruct(organisationID, Issue.class, Struct.DEFAULT_SCOPE, pm);
+			issueStruct = Struct.getStruct(devOrganisationID, Issue.class, Struct.DEFAULT_SCOPE, pm);
 		} catch (JDOObjectNotFoundException e) {
-			issueStruct = new Struct(organisationID, Issue.class.getName(), Struct.DEFAULT_SCOPE);
+			issueStruct = new Struct(devOrganisationID, Issue.class.getName(), Struct.DEFAULT_SCOPE);
 //			createDefaultStructure(issueStruct);
 			issueStruct.getName().setText(Locale.ENGLISH.getLanguage(), "Issues");
 			issueStruct.getName().setText(Locale.GERMAN.getLanguage(), "Issues");
 			issueStruct = pm.makePersistent(issueStruct);
-			issueStructLocal = new StructLocal(issueStruct, organisationID, StructLocal.DEFAULT_SCOPE);
+			issueStructLocal = new StructLocal(issueStruct, StructLocal.DEFAULT_SCOPE);
 			issueStructLocal.getName().setText(Locale.ENGLISH.getLanguage(), "Default Issue Structure");
 			issueStructLocal.getName().setText(Locale.GERMAN.getLanguage(), "Standardstruktur für Issues");
 			issueStructLocal = pm.makePersistent(issueStructLocal);

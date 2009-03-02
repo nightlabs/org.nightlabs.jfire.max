@@ -12,7 +12,7 @@ import org.nightlabs.jfire.prop.StructLocal;
 
 /**
  * This {@link ProjectStruct} class provides methods for creating {@link Struct} of {@link Project}.
- * 
+ *
  * @author Chairat Kongarayawetchakun <!-- chairat [AT] nightlabs [DOT] de -->
  *
  */
@@ -28,7 +28,7 @@ public class ProjectStruct {
 			projectStruct.getName().setText(Locale.ENGLISH.getLanguage(), "Projects");
 			projectStruct.getName().setText(Locale.GERMAN.getLanguage(), "Projekte");
 			projectStruct = pm.makePersistent(projectStruct);
-			projectStructLocal = new StructLocal(projectStruct, organisationID, StructLocal.DEFAULT_SCOPE);
+			projectStructLocal = new StructLocal(projectStruct, StructLocal.DEFAULT_SCOPE);
 			projectStructLocal.getName().setText(Locale.ENGLISH.getLanguage(), "Default Structure for Projects");
 			projectStructLocal.getName().setText(Locale.GERMAN.getLanguage(), "Standardstruktur für Projekte");
 			projectStructLocal = pm.makePersistent(projectStructLocal);

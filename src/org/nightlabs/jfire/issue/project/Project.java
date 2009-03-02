@@ -25,11 +25,11 @@ import org.nightlabs.jfire.security.User;
 import org.nightlabs.util.Util;
 
 /**
- * The {@link IssueHistory} class represents a history which recorded the change of each {@link Issue}. 
+ * The {@link IssueHistory} class represents a history which recorded the change of each {@link Issue}.
  * <p>
- * The {@link Project} class can contain many sub-projects. 
+ * The {@link Project} class can contain many sub-projects.
  * </p>
- * 
+ *
  * @author Chairat Kongarayawetchakun <!-- chairat at nightlabs dot de -->
  *
  * @jdo.persistence-capable
@@ -46,21 +46,21 @@ import org.nightlabs.util.Util;
  * @jdo.query
  *		name="getRootProjects"
  *		query="SELECT
- *			WHERE 
+ *			WHERE
  *				this.organisationID == :organisationID &&
  *				this.parentProject == null"
  *
  * @jdo.query
  *		name="getProjectsByParentProjectID"
  *		query="SELECT
- *			WHERE 
+ *			WHERE
  *				this.organisationID == :organisationID &&
  *				this.parentProject.projectID == :parentProjectID"
  *
  * @jdo.query
  *		name="getProjectsByProjectTypeID"
  *		query="SELECT
- *			WHERE 
+ *			WHERE
  *				this.projectType.organisationID == :organisationID &&
  *				this.projectType.projectTypeID == :projectTypeID"
  *
@@ -73,12 +73,12 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="Project.projectManager" fields="projectManager"
  * @jdo.fetch-group name="Project.members" fields="members"
  * @jdo.fetch-group name="Project.projectPhases" fields="projectPhases"
- * 
+ *
  * @jdo.fetch-group name="Issue.project" fields="name"
- * 
+ *
  **/
 public class Project
-implements Serializable, Comparable<Project> 
+implements Serializable, Comparable<Project>
 {
 	private static final long serialVersionUID = 1L;
 	@SuppressWarnings("unused")
@@ -95,12 +95,12 @@ implements Serializable, Comparable<Project>
 	public static final String FETCH_GROUP_PROJECT_PHASES = "Project.projectPhases";
 
 	public static final ProjectID PROJECT_ID_DEFAULT = ProjectID.create(Organisation.DEV_ORGANISATION_ID, -1);
-	
+
 	/**
 	 * This is the organisationID to which the project belongs. Within one organisation,
 	 * all the projects have their organisation's ID stored here, thus it's the same
 	 * value for all of them.
-	 * 
+	 *
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
@@ -115,22 +115,22 @@ implements Serializable, Comparable<Project>
 	 * @jdo.field persistence-modifier="persistent" fetch-groups="default"  dependent="true" mapped-by="project"
 	 */
 	private ProjectName name;
-	
+
 	/**
-	 * @jdo.field 
-	 * 		persistence-modifier="persistent" 
-	 * 		dependent="true" 
+	 * @jdo.field
+	 * 		persistence-modifier="persistent"
+	 * 		dependent="true"
 	 * 		mapped-by="project"
 	 */
 	private ProjectDescription description;
 
 	/**
-	 * @jdo.field 
-	 * 		persistence-modifier="persistent" 
+	 * @jdo.field
+	 * 		persistence-modifier="persistent"
 	 * 		load-fetch-group="all"
 	 */
 	private User projectManager;
-	
+
 	/**
 	 * @jdo.field
 	 *		persistence-modifier="persistent"
@@ -141,7 +141,7 @@ implements Serializable, Comparable<Project>
 	 * @jdo.join
 	 */
 	private Set<User> members;
-	
+
 	/**
 	 * @jdo.field
 	 *		persistence-modifier="persistent"
@@ -152,12 +152,12 @@ implements Serializable, Comparable<Project>
 	 * @jdo.join
 	 */
 	private List<ProjectPhase> projectPhases;
-	
+
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private Project parentProject;
-	
+
 	/**
 	 * @jdo.field
 	 *		persistence-modifier="persistent"
@@ -167,7 +167,7 @@ implements Serializable, Comparable<Project>
 	 *		mapped-by="parentProject"
 	 */
 	private Collection<Project> subProjects;
-	
+
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
@@ -177,7 +177,7 @@ implements Serializable, Comparable<Project>
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private boolean active = true;
-	
+
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
@@ -187,7 +187,7 @@ implements Serializable, Comparable<Project>
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private Date updateTimestamp;
-	
+
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
@@ -197,30 +197,30 @@ implements Serializable, Comparable<Project>
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private Date finishDate;
-	
+
 //	/**
 //	 * @jdo.field persistence-modifier="persistent"
 //	 */
 //	private Currency currency;
-	
+
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private PropertySet propertySet;
 
-	
+
 	/**
 	 * Returns the property set of this {@link Project}.
-	 * 
+	 *
 	 * @return The property set of this {@link Project}.
 	 */
 	public PropertySet getPropertySet() {
 		return propertySet;
 	}
-	
+
 	/**
 	 * The scope of the StructLocal by which the propertySet is build from.
-	 * 
+	 *
 	 * @jdo.field persistence-modifier="persistent" null-value="exception" indexed="true"
 	 */
 	private String structLocalScope;
@@ -235,7 +235,7 @@ implements Serializable, Comparable<Project>
 
 	/**
 	 * The scope of the Struct by which the propertySet is build from.
-	 * 
+	 *
 	 * @jdo.field persistence-modifier="persistent" null-value="exception" indexed="true"
 	 */
 	private String structScope;
@@ -247,9 +247,9 @@ implements Serializable, Comparable<Project>
 	public String getStructScope() {
 		return structScope;
 	}
-	
+
 	/**
-	 * @deprecated Constructor exists only for JDO! 
+	 * @deprecated Constructor exists only for JDO!
 	 */
 	@Deprecated
 	protected Project() { }
@@ -257,7 +257,7 @@ implements Serializable, Comparable<Project>
 	public Project(ProjectID projectID/*, Currency currency*/) {
 		this(projectID.organisationID, projectID.projectID/*, currency*/);
 	}
-	
+
 	public Project(String organisationID, long projectID/*, Currency currency*/)
 	{
 		Organisation.assertValidOrganisationID(organisationID);
@@ -266,31 +266,31 @@ implements Serializable, Comparable<Project>
 
 		this.name = new ProjectName(this);
 		this.description = new ProjectDescription(this);
-		
+
 		subProjects = new HashSet<Project>();
 		members = new HashSet<User>();
 		projectPhases = new ArrayList<ProjectPhase>();
-		
+
 //		this.currency = currency;
 		this.createTimestamp = new Date();
-		
+
 		this.structScope = Struct.DEFAULT_SCOPE;
 		this.structLocalScope = StructLocal.DEFAULT_SCOPE;
 		this.propertySet = new PropertySet(
-				organisationID, IDGenerator.nextID(PropertySet.class), 
-				Project.class.getName(), 
-				structScope, structLocalScope);
+				organisationID, IDGenerator.nextID(PropertySet.class),
+				Organisation.DEV_ORGANISATION_ID,
+				Project.class.getName(), structScope, structLocalScope);
 	}
 
 	/**
 	 * @return Returns the organisationID.
 	 */
-	public String getOrganisationID() 
+	public String getOrganisationID()
 	{
 		return organisationID;
 	}
 
-	public long getProjectID() 
+	public long getProjectID()
 	{
 		return projectID;
 	}
@@ -299,7 +299,7 @@ implements Serializable, Comparable<Project>
 	{
 		return name;
 	}
-	
+
 	/**
 	 * Get the JDO object id.
 	 * @return the JDO object id.
@@ -308,15 +308,15 @@ implements Serializable, Comparable<Project>
 	{
 		return (ProjectID)JDOHelper.getObjectId(this);
 	}
-	
+
 	public void setParentProject(Project project) {
 		this.parentProject = project;
 	}
-	
+
 	public Project getParentProject() {
 		return parentProject;
 	}
-	
+
 	public ProjectType getProjectType() {
 		return projectType;
 	}
@@ -325,23 +325,23 @@ implements Serializable, Comparable<Project>
 		this.projectType = projectType;
 	}
 
-	public Collection<Project> getSubProjects() 
+	public Collection<Project> getSubProjects()
 	{
 		return Collections.unmodifiableCollection(subProjects);
 	}
-	
-	public void addSubProject(Project project) 
+
+	public void addSubProject(Project project)
 	{
 		subProjects.add(project);
 	}
-	
-	public void removeSubProject(Project project) 
+
+	public void removeSubProject(Project project)
 	{
 		if (project == null)
 			throw new IllegalArgumentException("project must not be null!");
 		subProjects.remove(project);
 	}
-	
+
 	/**
 	 * @return Returns the description.
 	 */
@@ -359,7 +359,7 @@ implements Serializable, Comparable<Project>
 	public Set<User> getMembers() {
 		return Collections.unmodifiableSet(members);
 	}
-	
+
 	public void addMember(User user) {
 		if (user == null)
 			throw new IllegalArgumentException("user must not be null!");
@@ -369,33 +369,33 @@ implements Serializable, Comparable<Project>
 
 		members.add(user);
 	}
-	
+
 	public void addMembers(Collection<User> users) {
 		for (User user : users) {
 			addMember(user);
 		}
 	}
-	
+
 	public boolean removeMember(User user) {
 		return members.remove(user);
 	}
-	
+
 	public boolean removeMembers(Collection<User> users) {
 		return members.removeAll(users);
 	}
-	
+
 	public List<ProjectPhase> getProjectPhases() {
 		return Collections.unmodifiableList(projectPhases);
 	}
-	
+
 	public boolean isActive() {
 		return active;
 	}
-	
+
 	public void setActive(boolean active) {
 		this.active = active;
 	}
-	
+
 	public void addProjectPhase(ProjectPhase phase) {
 		if (phase == null)
 			throw new IllegalArgumentException("phase must not be null!");
@@ -405,17 +405,17 @@ implements Serializable, Comparable<Project>
 
 		projectPhases.add(phase);
 	}
-	
+
 	public void addProjectPhases(Collection<ProjectPhase> phases) {
 		for (ProjectPhase phase : phases) {
 			addProjectPhase(phase);
 		}
 	}
-	
+
 	public boolean removeProjectPhase(ProjectPhase phase) {
 		return projectPhases.remove(phase);
 	}
-	
+
 	public boolean removeProjectPhases(Collection<ProjectPhase> phases) {
 		return projectPhases.removeAll(phases);
 	}
@@ -423,11 +423,11 @@ implements Serializable, Comparable<Project>
 	public void setProjectManager(User user) {
 		this.projectManager = user;
 	}
-	
+
 	public User getProjectManager() {
 		return projectManager;
 	}
-	
+
 //	/**
 //	 * @return Returns the currency.
 //	 */
@@ -435,18 +435,18 @@ implements Serializable, Comparable<Project>
 //	{
 //		return currency;
 //	}
-	
+
 	public void setCreateTimestamp(Date createTimestamp) {
 		this.createTimestamp = createTimestamp;
 	}
-	
+
 	/**
 	 * @return Returns the create timestamp.
 	 */
 	public Date getCreateTimestamp() {
 		return createTimestamp;
 	}
-	
+
 	/**
 	 * @return Returns the update timestamp.
 	 */
@@ -460,7 +460,7 @@ implements Serializable, Comparable<Project>
 	public void setUpdateTimestamp(Date timestamp) {
 		this.updateTimestamp = timestamp;
 	}
-	
+
 	/**
 	 * @return Returns the contact date.
 	 */
@@ -474,7 +474,7 @@ implements Serializable, Comparable<Project>
 	public void setContactDate(Date contractDate) {
 		this.contractDate = contractDate;
 	}
-	
+
 	/**
 	 * @return Returns the finish date.
 	 */
@@ -488,19 +488,19 @@ implements Serializable, Comparable<Project>
 	public void setFinishDate(Date finishDate) {
 		this.finishDate = finishDate;
 	}
-	
+
 	/**
 	 * Internal method.
-	 * @return The PersistenceManager associated with this object. 
+	 * @return The PersistenceManager associated with this object.
 	 */
-	protected PersistenceManager getPersistenceManager() 
+	protected PersistenceManager getPersistenceManager()
 	{
 		PersistenceManager projectPM = JDOHelper.getPersistenceManager(this);
 		if (projectPM == null)
 			throw new IllegalStateException("This instance of " + this.getClass().getName() + " is not persistent, can not get a PersistenceManager!");
 
 		return projectPM;
-	}	
+	}
 
 	@Override
 	public boolean equals(Object obj)
@@ -509,14 +509,14 @@ implements Serializable, Comparable<Project>
 		if (!(obj instanceof Project)) return false;
 		Project o = (Project) obj;
 		return
-		Util.equals(this.organisationID, o.organisationID) && 
+		Util.equals(this.organisationID, o.organisationID) &&
 		Util.equals(this.projectID, o.projectID);
 	}
 
 	@Override
 	public int hashCode()
 	{
-		return 
+		return
 		Util.hashCode(organisationID) ^
 		Util.hashCode(projectID);
 	}
@@ -525,16 +525,16 @@ implements Serializable, Comparable<Project>
 	public int compareTo(Project o) {
 		return this.name.getText().compareTo(o.getName().getText());
 	}
-	
+
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
 	private int level;
-	
+
 	public int getLevel() {
 		return level;
 	}
-	
+
 	public void setLevel(int level) {
 		this.level = level;
 	}

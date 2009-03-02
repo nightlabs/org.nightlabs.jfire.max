@@ -69,8 +69,9 @@ public abstract class Anchor
 
 	//	public static final String FETCH_GROUP_TRANSFERS = "Anchor.transfers";
 	/**
-	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon! 
+	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon!
 	 */
+	@Deprecated
 	public static final String FETCH_GROUP_THIS_ANCHOR = "Anchor.this";
 	public static final String FETCH_GROUP_DESCRIPTION = "Anchor.description";
 
@@ -91,7 +92,7 @@ public abstract class Anchor
 	 * @jdo.column length="100"
 	 */
 	private String anchorID;
-	
+
 
 //	/**
 //	 * key: String transferPK<br/>
@@ -142,12 +143,12 @@ public abstract class Anchor
 		}
 		return AnchorID.create(parts[0], parts[1], anchorID);
 	}
-	
+
 //	/**
 //	 * @jdo.field persistence-modifier="persistent"
 //	 */
 //	protected String primaryKey;
-	
+
 	public String getPrimaryKey()
 	{
 //		return primaryKey;
@@ -191,7 +192,7 @@ public abstract class Anchor
 //		String pk = transfer.getPrimaryKey();
 //		if (!transfers.containsKey(pk))
 //			throw new IllegalArgumentException("Transfer \""+pk+"\" is not known to this Anchor \""+this.getPrimaryKey()+"\"!");
-		
+
 		if (transfer.getAnchorType(this) == Transfer.ANCHORTYPE_FROM) {
 			if (!transfer.isBookedFrom())
 				throw new IllegalStateException("This Anchor \""+this.getPrimaryKey()+"\" has already rolled back the transfer \""+transfer.getPrimaryKey()+"\" or it has not been booked!");
@@ -321,7 +322,7 @@ public abstract class Anchor
 
 		return pm;
 	}
-	
+
 	/**
 	 * Checks whether this anchor is the from-anchor of the given transfer.
 	 * @param transfer The transfer to check.
@@ -330,7 +331,7 @@ public abstract class Anchor
 	protected boolean isTransferFrom(Transfer transfer) {
 		return (transfer.getFrom() != null && transfer.getFrom().equals(this));
 	}
-	
+
 	/**
 	 * Checks whether this anchor is the to-anchor of the given transfer.
 	 * @param transfer The transfer to check.
@@ -339,30 +340,30 @@ public abstract class Anchor
 	protected boolean isTransferTo(Transfer transfer) {
 		return (transfer.getTo() != null && transfer.getTo().equals(this));
 	}
-	
+
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
 	private String description = null;
-	
+
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
 	private boolean description_detached = false;
-	
+
 	/**
-	 * Returns a human readable description for this Transfer
-	 * for the default Locale of the current user. 
-	 * 
-	 * @return returns a human readable description for this Transfer
+	 * Returns a human readable description for this <code>Anchor</code>
+	 * for the default Locale of the current user.
+	 *
+	 * @return returns a human readable description for this <code>Anchor</code>.
 	 */
 	public String getDescription() {
 		if (description == null && !description_detached)
 			description = internalGetDescription();
-		
+
 		return description;
 	}
-	
+
 	/**
 	 * Checks for the {@link #FETCH_GROUP_DESCRIPTION} and
 	 * set the non-persitent member for the description.
@@ -377,11 +378,11 @@ public abstract class Anchor
 			detached.description = attached.getDescription();
 		}
 	}
-	
+
 	@Override
 	public void jdoPreDetach() {
-	}	
-	
+	}
+
 	/**
 	 * This should return a human readable description of this anchor.
 	 * <p>
@@ -389,7 +390,7 @@ public abstract class Anchor
 	 * @return A description of this Anchor.
 	 */
 	protected abstract String internalGetDescription();
-	
+
 	@Override
 	public boolean equals(Object obj)
 	{

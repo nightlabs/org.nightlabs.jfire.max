@@ -53,6 +53,7 @@ import org.jbpm.JbpmContext;
 import org.jbpm.graph.exe.ProcessInstance;
 import org.nightlabs.ModuleException;
 import org.nightlabs.jdo.NLJDOHelper;
+import org.nightlabs.jdo.QueryOption;
 import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
 import org.nightlabs.jdo.query.AbstractJDOQuery;
 import org.nightlabs.jdo.query.JDOQueryCollectionDecorator;
@@ -2367,6 +2368,25 @@ implements SessionBean
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			return NLJDOHelper.getDetachedObjectList(pm, endCustomerTransferPolicyIDs, EndCustomerTransferPolicy.class, fetchGroups, maxFetchDepth);
+		} finally {
+			pm.close();
+		}
+	}
+
+	/**
+	 * @ejb.interface-method
+	 * @ejb.transaction type="Required"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	public void storeEndCustomer(LegalEntity endCustomer, Set<OrderID> assignOrderIDs)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			LegalEntity attachedEndCustomer = EndCustomerTransferPolicy.attachLegalEntity(pm, endCustomer);
+			Set<Order> orders = NLJDOHelper.getObjectSet(pm, assignOrderIDs, Order.class, QueryOption.throwExceptionOnMissingObject);
+			for (Order order : orders) {
+				order.setEndCustomer(attachedEndCustomer);
+			}
 		} finally {
 			pm.close();
 		}

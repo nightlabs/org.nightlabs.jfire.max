@@ -1113,6 +1113,7 @@ implements
 		if (owner == null);
 		if (vendor == null);
 		name.getI18nMap();
+		if (endCustomerTransferPolicy == null);
 	}
 
 	@Override

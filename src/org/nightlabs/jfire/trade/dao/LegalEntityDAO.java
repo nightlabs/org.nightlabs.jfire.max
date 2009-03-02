@@ -36,7 +36,6 @@ import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.base.JFireEjbFactory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.base.jdo.IJDOObjectDAO;
-import org.nightlabs.jfire.person.Person;
 import org.nightlabs.jfire.prop.IStruct;
 import org.nightlabs.jfire.prop.PropertySet;
 import org.nightlabs.jfire.prop.dao.StructLocalDAO;
@@ -107,20 +106,45 @@ implements IJDOObjectDAO<LegalEntity>
 		TradeManager tradeManager = JFireEjbFactory.getBean(TradeManager.class, SecurityReflector.getInitialContextProperties());
 		Collection<LegalEntity> legalEntities = tradeManager.getLegalEntities(objectIDs, fetchGroups, maxFetchDepth);
 
-		IStruct struct = StructLocalDAO.sharedInstance().getStructLocal(
-				Person.class, Person.STRUCT_SCOPE, Person.STRUCT_LOCAL_SCOPE, new NullProgressMonitor());
+//		IStruct struct = StructLocalDAO.sharedInstance().getStructLocal(
+//				Organisation.DEV_ORGANISATION_ID,
+//				Person.class,
+//				Person.STRUCT_SCOPE,
+//				Person.STRUCT_LOCAL_SCOPE,
+//				new NullProgressMonitor()
+//		);
 //		IStruct struct = StructDAO.sharedInstance().getStruct(Person.class, StructLocal.DEFAULT_SCOPE, new NullProgressMonitor());
 		// TODO: Really need this ?!? Better not to explode here I think, Alex.
 		for (LegalEntity le : legalEntities) {
-			try {
-				if (le.getPerson() != null)
-					le.getPerson().inflate(struct);
-			} catch (JDODetachedFieldAccessException e) {
-				// le.person was not detached -> no explosion, break
-				break;
-			}
+			inflatePerson(le);
+//			try {
+//				if (le.getPerson() != null)
+//					le.getPerson().inflate(struct);
+//			} catch (JDODetachedFieldAccessException e) {
+//				// le.person was not detached -> no explosion, break
+//				break; // why break? what about the others?
+//			}
 		}
 		return legalEntities;
+	}
+
+	private void inflatePerson(LegalEntity le)
+	{
+		if (le == null || le.getPerson() == null)
+			return;
+
+		IStruct struct = StructLocalDAO.sharedInstance().getStructLocal(
+				le.getPerson().getStructLocalObjectID(),
+				new NullProgressMonitor()
+		);
+
+		try {
+			if (le.getPerson() != null)
+				le.getPerson().inflate(struct);
+		} catch (JDODetachedFieldAccessException e) {
+			// le.person was not detached -> no explosion, break
+//			break; // why break? what about the others?
+		}
 	}
 
 	/**

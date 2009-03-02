@@ -93,12 +93,14 @@ import org.nightlabs.jfire.store.deliver.Delivery;
 import org.nightlabs.jfire.store.id.ProductID;
 import org.nightlabs.jfire.trade.config.OfferConfigModule;
 import org.nightlabs.jfire.trade.config.TradeConfigModule;
+import org.nightlabs.jfire.trade.endcustomer.EndCustomerTransferPolicy;
 import org.nightlabs.jfire.trade.history.ProductHistory;
 import org.nightlabs.jfire.trade.history.ProductHistoryItem;
 import org.nightlabs.jfire.trade.history.ProductHistoryItem.ProductHistoryItemType;
 import org.nightlabs.jfire.trade.id.ArticleID;
 import org.nightlabs.jfire.trade.id.OfferID;
 import org.nightlabs.jfire.trade.id.OfferLocalID;
+import org.nightlabs.jfire.trade.id.OrderID;
 import org.nightlabs.jfire.trade.jbpm.ActionHandlerAcceptOffer;
 import org.nightlabs.jfire.trade.jbpm.ActionHandlerAcceptOfferImplicitelyVendor;
 import org.nightlabs.jfire.trade.jbpm.ActionHandlerFinalizeOffer;
@@ -1911,7 +1913,7 @@ public class Trader
 	 * You must NOT call this method directly. It is called by {@link ActionHandlerFinalizeOffer}.
 	 */
 	public void onFinalizeOffer(User user, Offer offer)
-	throws RemoteException, CreateException, NamingException
+	throws RemoteException, NamingException
 	{
 		boolean error = true;
 		try {
@@ -1941,6 +1943,8 @@ public class Trader
 
 			offer.setFinalized(user);
 
+			replicateEndCustomer(offer);
+
 			// trigger listeners
 			for (OfferActionHandler offerActionHandler : offer.getOfferLocal().getOfferActionHandlers()) {
 				offerActionHandler.onFinalizeOffer(user, offer);
@@ -1951,6 +1955,67 @@ public class Trader
 			if (error)
 				logger.error("onFinalizeOffer: failed for: " + offer);
 		}
+	}
+
+	public void replicateEndCustomer(Offer offer)
+	throws NamingException, RemoteException
+	{
+		PersistenceManager pm = getPersistenceManager();
+
+		LegalEntity endCustomer = offer.getEndCustomer();
+		if (endCustomer == null)
+			endCustomer = offer.getCustomer();
+
+		Map<OrganisationLegalEntity, Set<EndCustomerTransferPolicy>> vendor2EndCustomerTransferPoliciesMap = new HashMap<OrganisationLegalEntity, Set<EndCustomerTransferPolicy>>();
+		Map<OrganisationLegalEntity, Set<Order>> vendor2OrdersMap = new HashMap<OrganisationLegalEntity, Set<Order>>();
+
+		OfferRequirement offerRequirement = OfferRequirement.getOfferRequirement(pm, offer, false);
+		if (offerRequirement != null) {
+			for (Offer partnerOffer : offerRequirement.getPartnerOffers()) {
+				LegalEntity v = partnerOffer.getOrder().getVendor();
+				if (!(v instanceof OrganisationLegalEntity))
+					throw new IllegalStateException("Vendor of Offer " + partnerOffer.getPrimaryKey() + " is not an OrganisationLegalEntity, even though this Offer is part of the OfferRequirements for Offer " + offer.getPrimaryKey());
+
+				OrganisationLegalEntity vendor = (OrganisationLegalEntity) v;
+
+				for (Article partnerArticle : partnerOffer.getArticles()) {
+					ProductType productType = partnerArticle.getProductType();
+					EndCustomerTransferPolicy endCustomerTransferPolicy = productType.getEndCustomerTransferPolicy();
+					if (endCustomerTransferPolicy != null) {
+						Set<EndCustomerTransferPolicy> endCustomerTransferPolicies = vendor2EndCustomerTransferPoliciesMap.get(vendor);
+						if (endCustomerTransferPolicies == null) {
+							endCustomerTransferPolicies = new HashSet<EndCustomerTransferPolicy>();
+							vendor2EndCustomerTransferPoliciesMap.put(vendor, endCustomerTransferPolicies);
+						}
+						endCustomerTransferPolicies.add(endCustomerTransferPolicy);
+
+
+						Set<Order> orders = vendor2OrdersMap.get(vendor);
+						if (orders == null) {
+							orders = new HashSet<Order>();
+							vendor2OrdersMap.put(vendor, orders);
+						}
+						orders.add(partnerOffer.getOrder());
+					}
+				}
+			}
+
+			for (Map.Entry<OrganisationLegalEntity, Set<EndCustomerTransferPolicy>> me1 : vendor2EndCustomerTransferPoliciesMap.entrySet()) {
+				OrganisationLegalEntity vendor = me1.getKey();
+				Set<EndCustomerTransferPolicy> endCustomerTransferPolicies = me1.getValue();
+				Set<Order> orders = vendor2OrdersMap.get(vendor);
+				if (orders == null)
+					throw new IllegalStateException("vendor2OrdersMap.get(vendor) returned null! " + vendor);
+
+				LegalEntity detachedEndCustomer = EndCustomerTransferPolicy.detachLegalEntity(pm, endCustomer, endCustomerTransferPolicies);
+
+				String partnerOrganisationID = vendor.getOrganisationID();
+				TradeManager tradeManager = JFireEjbFactory.getBean(TradeManager.class, Lookup.getInitialContextProperties(pm, partnerOrganisationID));
+
+				Set<OrderID> orderIDs = NLJDOHelper.getObjectIDSet(orders);
+				tradeManager.storeEndCustomer(detachedEndCustomer, orderIDs);
+			}
+		} // if (offerRequirement != null) {
 	}
 
 	public void rejectOffer(User user, OfferLocal offerLocal)

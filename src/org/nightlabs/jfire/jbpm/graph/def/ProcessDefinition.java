@@ -147,10 +147,16 @@ implements Serializable
 				JpdlXmlExtensionReader jpdlXmlReaderExtension = new JpdlXmlExtensionReader(extensionReader);
 				processDefinitionDescriptor = jpdlXmlReaderExtension.getExtendedProcessDefinitionDescriptor();				
 
+			}catch (Throwable t) {
+				logger.error("reading extended process definition failed: " + jbpmExtensionURL, t);
+				if (t instanceof IOException)
+					throw (IOException)t;
+				if (t instanceof RuntimeException)
+					throw (RuntimeException)t;
+				throw new RuntimeException(t);
 			} finally {
 				extensionIn.close();
 			}
-
 			// create StateDefinitions
 			for (Iterator<?> itNode = jbpmProcessDefinition.getNodes().iterator(); itNode.hasNext(); ) {
 				Node node = (Node) itNode.next();

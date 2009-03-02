@@ -248,8 +248,6 @@ public class JpdlXmlExtensionReader implements ProblemListener {
 		return nodeDescriptor;
 	}
 
-	private static final Logger logger = Logger.getLogger(JpdlXmlExtensionReader.class);
-
 	private static List<Element> findChildElements(Element parent) {
 		List<Element> result = new LinkedList<Element>();
 		NodeList children = parent.getChildNodes();
@@ -260,4 +258,6 @@ public class JpdlXmlExtensionReader implements ProblemListener {
 		}
 		return result;
 	}
+
+	private static final Logger logger = Logger.getLogger(JpdlXmlExtensionReader.class);
 }

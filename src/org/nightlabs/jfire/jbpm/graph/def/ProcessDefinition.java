@@ -79,7 +79,6 @@ implements Serializable
 
 		try {
 			org.jbpm.graph.def.ProcessDefinition jbpmProcessDefinition;
-
 			InputStream in = jbpmProcessDefinitionURL.openStream();
 			if (in == null)
 				throw new FileNotFoundException("Could not open input stream for " + jbpmProcessDefinitionURL);
@@ -115,9 +114,9 @@ implements Serializable
 			URL jbpmProcessDefinitionURL)
 	throws IOException
 	{
-	
+
 		ExtendedProcessDefinitionDescriptor processDefinitionDescriptor;
-		
+
 		pm.getExtent(ProcessDefinition.class);
 
 		boolean closeJbpmContext = false;
@@ -125,6 +124,7 @@ implements Serializable
 			closeJbpmContext = true;
 			jbpmContext = JbpmLookup.getJbpmConfiguration().createJbpmContext();
 		}
+		
 		try {
 			jbpmContext.deployProcessDefinition(jbpmProcessDefinition);
 
@@ -150,30 +150,33 @@ implements Serializable
 			} finally {
 				extensionIn.close();
 			}
-			
+
 			// create StateDefinitions
 			for (Iterator<?> itNode = jbpmProcessDefinition.getNodes().iterator(); itNode.hasNext(); ) {
 				Node node = (Node) itNode.next();
-//				if (node instanceof StartState ||
-//						node instanceof EndState ||
-//						node instanceof org.jbpm.graph.node.State)
-//				{
-					StateDefinition stateDefinition = pm.makePersistent(new StateDefinition(processDefinition, node));
-					ExtendedNodeDescriptor extendedNode = processDefinitionDescriptor.getExtendedNodeDescriptor(node);
+				//				if (node instanceof StartState ||
+				//						node instanceof EndState ||
+				//						node instanceof org.jbpm.graph.node.State)
+				//				{
+				StateDefinition stateDefinition = pm.makePersistent(new StateDefinition(processDefinition, node));
+				// look up for the extended node if it has matches
+				ExtendedNodeDescriptor extendedNode = processDefinitionDescriptor.getExtendedNodeDescriptor(node);
+				if(extendedNode != null)
+				{
 					// set the name and description from the extended I18in Node
 					stateDefinition.getName().copyFrom(extendedNode.getName());
 					stateDefinition.getDescription().copyFrom(extendedNode.getDescription());
-					
-					// create Transitions
-					// TODO should we create JDO Transition objects for all jbpm Transitions? right now we can't because we create only StateDefinitions for States (not for other Nodes)
-					if (node.getLeavingTransitions() != null) {
-						for (Iterator <?>itTransition = node.getLeavingTransitions().iterator(); itTransition.hasNext(); ) {
-							org.jbpm.graph.def.Transition jbpmTransition = (org.jbpm.graph.def.Transition) itTransition.next();
-//							TransitionID transitionID = Transition.getTransitionID(jbpmTransition);
-							pm.makePersistent(new Transition(stateDefinition, jbpmTransition.getName()));
-						}
-					} // if (node.getLeavingTransitions() != null) {
-//				}
+				}
+				// create Transitions
+				// TODO should we create JDO Transition objects for all jbpm Transitions? right now we can't because we create only StateDefinitions for States (not for other Nodes)
+				if (node.getLeavingTransitions() != null) {
+					for (Iterator <?>itTransition = node.getLeavingTransitions().iterator(); itTransition.hasNext(); ) {
+						org.jbpm.graph.def.Transition jbpmTransition = (org.jbpm.graph.def.Transition) itTransition.next();
+						//							TransitionID transitionID = Transition.getTransitionID(jbpmTransition);
+						pm.makePersistent(new Transition(stateDefinition, jbpmTransition.getName()));
+					}
+				} // if (node.getLeavingTransitions() != null) {
+				//				}
 			}
 
 			return processDefinition;

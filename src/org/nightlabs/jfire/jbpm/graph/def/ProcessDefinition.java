@@ -115,7 +115,7 @@ implements Serializable
 	throws IOException
 	{
 
-		ExtendedProcessDefinitionDescriptor processDefinitionDescriptor;
+		ExtendedProcessDefinitionDescriptor processDefinitionDescriptor = null;
 
 		pm.getExtent(ProcessDefinition.class);
 
@@ -124,7 +124,7 @@ implements Serializable
 			closeJbpmContext = true;
 			jbpmContext = JbpmLookup.getJbpmConfiguration().createJbpmContext();
 		}
-		
+
 		try {
 			jbpmContext.deployProcessDefinition(jbpmProcessDefinition);
 
@@ -140,22 +140,22 @@ implements Serializable
 			// read the jbpm extension process file
 			URL jbpmExtensionURL = new URL(jbpmProcessDefinitionURL, "process-definition-extension.xml");
 			InputStream extensionIn = jbpmProcessDefinitionURL.openStream();
-			if (extensionIn == null)
-				throw new FileNotFoundException("Could not open input stream for " + jbpmExtensionURL);			
-			try {
-				Reader extensionReader = new InputStreamReader(extensionIn);
-				JpdlXmlExtensionReader jpdlXmlReaderExtension = new JpdlXmlExtensionReader(extensionReader);
-				processDefinitionDescriptor = jpdlXmlReaderExtension.getExtendedProcessDefinitionDescriptor();				
-
-			}catch (Throwable t) {
-				logger.error("reading extended process definition failed: " + jbpmExtensionURL, t);
-				if (t instanceof IOException)
-					throw (IOException)t;
-				if (t instanceof RuntimeException)
-					throw (RuntimeException)t;
-				throw new RuntimeException(t);
-			} finally {
-				extensionIn.close();
+			if (extensionIn != null)
+			{			
+				try {
+					Reader extensionReader = new InputStreamReader(extensionIn);
+					JpdlXmlExtensionReader jpdlXmlReaderExtension = new JpdlXmlExtensionReader(extensionReader);
+					processDefinitionDescriptor = jpdlXmlReaderExtension.getExtendedProcessDefinitionDescriptor();				
+				}catch (Throwable t) {
+					logger.error("reading extended process definition failed: " + jbpmExtensionURL, t);
+					if (t instanceof IOException)
+						throw (IOException)t;
+					if (t instanceof RuntimeException)
+						throw (RuntimeException)t;
+					throw new RuntimeException(t);
+				} finally {
+					extensionIn.close();
+				}
 			}
 			// create StateDefinitions
 			for (Iterator<?> itNode = jbpmProcessDefinition.getNodes().iterator(); itNode.hasNext(); ) {
@@ -166,12 +166,16 @@ implements Serializable
 				//				{
 				StateDefinition stateDefinition = pm.makePersistent(new StateDefinition(processDefinition, node));
 				// look up for the extended node if it has matches
-				ExtendedNodeDescriptor extendedNode = processDefinitionDescriptor.getExtendedNodeDescriptor(node);
-				if(extendedNode != null)
+				if(processDefinitionDescriptor!=null)
 				{
-					// set the name and description from the extended I18in Node
-					stateDefinition.getName().copyFrom(extendedNode.getName());
-					stateDefinition.getDescription().copyFrom(extendedNode.getDescription());
+					ExtendedNodeDescriptor extendedNode = processDefinitionDescriptor.getExtendedNodeDescriptor(node);
+					if(extendedNode != null)
+					{
+						// set the name and description from the extended I18in Node
+						stateDefinition.getName().copyFrom(extendedNode.getName());
+						stateDefinition.getDescription().copyFrom(extendedNode.getDescription());
+					}
+
 				}
 				// create Transitions
 				// TODO should we create JDO Transition objects for all jbpm Transitions? right now we can't because we create only StateDefinitions for States (not for other Nodes)
@@ -180,13 +184,16 @@ implements Serializable
 						org.jbpm.graph.def.Transition jbpmTransition = (org.jbpm.graph.def.Transition) itTransition.next();
 						//							TransitionID transitionID = Transition.getTransitionID(jbpmTransition);
 						Transition transition = pm.makePersistent(new Transition(stateDefinition, jbpmTransition.getName()));
-						ExtendedNodeDescriptor transitionExtendedNode = processDefinitionDescriptor.getExtendedNodeDescriptor(jbpmTransition);
-						if(transitionExtendedNode != null)
+						if(processDefinitionDescriptor!=null)
 						{
-							// set the name and description from the extended I18in Node
-							transition.getName().copyFrom(extendedNode.getName());
-							transition.getDescription().copyFrom(extendedNode.getDescription());
-						}	
+							ExtendedNodeDescriptor transitionExtendedNode = processDefinitionDescriptor.getExtendedNodeDescriptor(jbpmTransition);
+							if(transitionExtendedNode != null)
+							{
+								// set the name and description from the extended I18in Node
+								transition.getName().copyFrom(transitionExtendedNode .getName());
+								transition.getDescription().copyFrom(transitionExtendedNode .getDescription());
+							}	
+						}
 					}
 				} // if (node.getLeavingTransitions() != null) {
 				//				}

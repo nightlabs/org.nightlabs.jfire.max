@@ -15,6 +15,7 @@ import javax.jdo.PersistenceManager;
 
 import org.apache.log4j.Logger;
 import org.eclipse.datatools.connectivity.oda.IResultSetMetaData;
+import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.prop.DataField;
 import org.nightlabs.jfire.prop.IStruct;
 import org.nightlabs.jfire.prop.Struct;
@@ -47,7 +48,7 @@ import org.nightlabs.jfire.security.SecurityReflector;
  * <p>
  * <ul>
  *   <li>For {@link NumberDataField}s columns of either {@link DataType#INTEGER} or {@link DataType#DOUBLE} will be added,
- *       depending on how the corresponding {@link NumberStructField} is configured</li>. The column value will then 
+ *       depending on how the corresponding {@link NumberStructField} is configured</li>. The column value will then
  *       be either {@link Integer} or {@link Double}.
  *   </li>
  *   <li>For {@link II18nTextDataField}s columns of either {@link DataType#STRING} will be added. The column value
@@ -55,8 +56,8 @@ import org.nightlabs.jfire.security.SecurityReflector;
  *   </li>
  *   <li>For {@link ImageDataField}s columns of either {@link DataType#STRING} will be added. The column value
  *       will the String representation of the {@link ImageDataField}s id-object, or the empty string if no
- *       image was was stored for that field. The image URLs can then be obtained using 
- *       {@link PropertySetReportingHelper#getImageURL(String)} passing column value. 
+ *       image was was stored for that field. The image URLs can then be obtained using
+ *       {@link PropertySetReportingHelper#getImageURL(String)} passing column value.
  *   </li>
  * </ul>
  * </p>
@@ -82,6 +83,7 @@ extends AbstractJFSScriptExecutorDelegate
 
 	public static final String PARAMETER_NAME_PROPERTY_SET_ID = "propertySetID";
 
+	public static final String PROPERTY_NAME_ORGANISATION_ID = "organisationID"; // defaults to dev-org, if not specified - TODO make it required later?! Provide possibility to reference local organisation by variable?! @Bieber: Please, think about it. Marco.
 	public static final String PROPERTY_NAME_LINK_CLASS = "linkClass";
 	public static final String PROPERTY_NAME_STRUCT_SCOPE = "structScope";
 	public static final String PROPERTY_NAME_STRUCT_LOCAL_SCOPE = "structLocalScope";
@@ -97,12 +99,13 @@ extends AbstractJFSScriptExecutorDelegate
 	@Override
 	public IJFSQueryPropertySetMetaData getJFSQueryPropertySetMetaData() {
 		JFSQueryPropertySetMetaData metaData = new JFSQueryPropertySetMetaData();
+		metaData.addEntry(new Entry(PROPERTY_NAME_ORGANISATION_ID, false)); // TODO see above at declaration of PROPERTY_NAME_ORGANISATION_ID
 		metaData.addEntry(new Entry(PROPERTY_NAME_LINK_CLASS, true));
 		metaData.addEntry(new Entry(PROPERTY_NAME_STRUCT_SCOPE, false));
 		metaData.addEntry(new Entry(PROPERTY_NAME_STRUCT_LOCAL_SCOPE, false));
 		return metaData;
 	}
-	
+
 	private JFSResultSetMetaData metaData;
 
 	public IResultSetMetaData getResultSetMetaData() {
@@ -147,7 +150,11 @@ extends AbstractJFSScriptExecutorDelegate
 	 */
 	protected IStruct getStruct() {
 		PersistenceManager pm = getScriptExecutorJavaClass().getPersistenceManager();
-		String linkClass = getJFSQueryPropertySet().getProperties().get(PROPERTY_NAME_LINK_CLASS);;
+		String organisationID = getJFSQueryPropertySet().getProperties().get(PROPERTY_NAME_ORGANISATION_ID);
+		if (organisationID == null || "".equals(organisationID))
+			organisationID = Organisation.DEV_ORGANISATION_ID; // TODO see above at PROPERTY_NAME_ORGANISATION_ID
+
+		String linkClass = getJFSQueryPropertySet().getProperties().get(PROPERTY_NAME_LINK_CLASS);
 		if (linkClass == null || "".equals(linkClass)) {
 			throw new IllegalArgumentException("Query property linkClass was not set.");
 		}
@@ -161,7 +168,7 @@ extends AbstractJFSScriptExecutorDelegate
 			logger.debug("Query property " + PROPERTY_NAME_STRUCT_LOCAL_SCOPE + " was not set, using '" + StructLocal.DEFAULT_SCOPE + "' instead");
 			structLocalScope = StructLocal.DEFAULT_SCOPE;
 		}
-		return StructLocal.getStructLocal(linkClass, structScope, structLocalScope, pm);
+		return StructLocal.getStructLocal(pm, organisationID, linkClass, structScope, structLocalScope);
 	}
 
 	protected SortedMap<String, StructBlock> getSortedBlocks(IStruct struct) {
@@ -177,10 +184,10 @@ extends AbstractJFSScriptExecutorDelegate
 		return structField.getStructBlockID() + "_" + structField.getStructFieldID();
 	}
 
-	protected String getOrganisation() {
+	protected String getOrganisation() { // TODO shouldn't this be named "getOrganisationID()" and in what relationship does it stand to PROPERTY_NAME_ORGANISATION_ID (which I just added)? Marco.
 		return SecurityReflector.getUserDescriptor().getOrganisationID();
 	}
-	
+
 	protected org.nightlabs.jfire.prop.PropertySet getPropertySet() {
 		PropertySetID propertySetID = (PropertySetID) getParameterValue(PARAMETER_NAME_PROPERTY_SET_ID);
 		if (propertySetID == null)
@@ -198,14 +205,16 @@ extends AbstractJFSScriptExecutorDelegate
 		JFSResultSet resultSet = new JFSResultSet((JFSResultSetMetaData)getResultSetMetaData());
 
 		org.nightlabs.jfire.prop.PropertySet propertySet = getPropertySet();
-		
+
 		IStruct struct = StructLocal.getStructLocal(
-				propertySet.getStructLocalLinkClass(), 
-				propertySet.getStructScope(), propertySet.getStructLocalScope(), getPersistenceManager());
-		
+				getPersistenceManager(),
+				propertySet.getStructOrganisationID(), // TODO this should be the one specified above (see getStruct())!!! This applies IMHO to the other params, too. @Bieber: We have to talk about this again! Marco.
+				propertySet.getStructLinkClass(),
+				propertySet.getStructScope(), propertySet.getStructLocalScope());
+
 		List<Object> elements = new LinkedList<Object>();
 		Locale locale = JFireReportingHelper.getLocale();
-		elements.add(propertySet.getDisplayName());		
+		elements.add(propertySet.getDisplayName());
 		for (Iterator<StructBlock> iter = getSortedBlocks(struct).values().iterator(); iter.hasNext();) {
 			StructBlock structBlock = iter.next();
 			SortedMap<String, StructField<? extends DataField>> sortedFields = new TreeMap<String, StructField<? extends DataField>>();
@@ -220,7 +229,7 @@ extends AbstractJFSScriptExecutorDelegate
 					field = propertySet.getPersistentDataFieldByIndex((StructFieldID)JDOHelper.getObjectId(structField), 0);
 				} catch (Exception e) {
 					throw new ScriptException(e);
-				}				
+				}
 				if (structField instanceof NumberStructField) {
 					NumberStructField numberStructField = (NumberStructField) structField;
 					if (numberStructField.isInteger())

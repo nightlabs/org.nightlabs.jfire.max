@@ -1,6 +1,6 @@
 <!--
   Generic j2ee and webapp (jboss/tomcat/jpox/xdoclet) ant build file 
-  Version: 2008-10-01
+  Version: 2009-03-02
   Author: marc [at] nightlabs [dot] de
   Author: marco [at] nightlabs [dot] de
   Author: tobias [at] nightlabs [dot] de
@@ -658,6 +658,7 @@
       <dirset dir="." includes="${project.path.dirincludes}" />
     </path>
     <javac debug="${javac.debug}" encoding="UTF-8" source="${javac.source}" target="${javac.target}" destdir="${project.dir}/${bin.dir}" classpathref="javac.classpath">
+    	<compilerarg value="-proc:none" />
       <src path="${project.dir}/${src.dir}"/>
       <src path="${project.dir}/${ejbsrc.dir}"/>
     </javac>

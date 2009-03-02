@@ -52,7 +52,6 @@ import org.nightlabs.jfire.person.Person;
 import org.nightlabs.jfire.person.PersonStruct;
 import org.nightlabs.jfire.prop.IStruct;
 import org.nightlabs.jfire.prop.PropertySet;
-import org.nightlabs.jfire.prop.StructLocal;
 import org.nightlabs.jfire.prop.datafield.PhoneNumberDataField;
 import org.nightlabs.jfire.prop.datafield.SelectionDataField;
 import org.nightlabs.jfire.prop.exception.DataBlockGroupNotFoundException;
@@ -413,7 +412,8 @@ public class DataCreator
 		if (personStruct == null) {
 			// We have to work with the StructLocal here...
 			// personStruct = Struct.getStruct(getOrganisationLegalEntity().getOrganisationID(), Person.class, pm);
-			personStruct = StructLocal.getStructLocal(pm, getOrganisationLegalEntity().getOrganisationID(), Person.class.getName(), Person.STRUCT_SCOPE, Person.STRUCT_LOCAL_SCOPE);
+//			personStruct = StructLocal.getStructLocal(pm, getOrganisationLegalEntity().getOrganisationID(), Person.class.getName(), Person.STRUCT_SCOPE, Person.STRUCT_LOCAL_SCOPE);
+			personStruct = PersonStruct.getPersonStructLocal(pm);
 		}
 
 		return personStruct;

@@ -45,9 +45,8 @@ import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.organisation.LocalOrganisation;
 import org.nightlabs.jfire.person.Person;
 import org.nightlabs.jfire.person.PersonStruct;
+import org.nightlabs.jfire.prop.IStruct;
 import org.nightlabs.jfire.prop.PropertySet;
-import org.nightlabs.jfire.prop.Struct;
-import org.nightlabs.jfire.prop.StructLocal;
 import org.nightlabs.jfire.prop.datafield.ImageDataField;
 import org.nightlabs.jfire.prop.exception.DataBlockGroupNotFoundException;
 import org.nightlabs.jfire.prop.exception.DataBlockNotFoundException;
@@ -191,7 +190,8 @@ implements SessionBean
 					FetchPlan.DEFAULT, PropertySet.FETCH_GROUP_DATA_FIELDS, PropertySet.FETCH_GROUP_FULL_DATA
 				);
 			Person detachedPerson = pm.detachCopy(person);
-			StructLocal structLocal = StructLocal.getStructLocal(Person.class, Struct.DEFAULT_SCOPE, StructLocal.DEFAULT_SCOPE, pm);
+//			StructLocal structLocal = StructLocal.getStructLocal(Person.class, Struct.DEFAULT_SCOPE, StructLocal.DEFAULT_SCOPE, pm);
+			IStruct structLocal = PersonStruct.getPersonStructLocal(pm);
 			detachedPerson.inflate(structLocal);
 			ImageDataField photoField = (ImageDataField) detachedPerson.getDataField(PersonStruct.PERSONALDATA_PHOTO);
 			InputStream in = getClass().getResourceAsStream("resource/jfire-logo.jpg");
@@ -207,7 +207,7 @@ implements SessionBean
 						logger.error("Error loading image", e);
 					}
 				}
-			}			
+			}
 			detachedPerson.deflate();
 			pm.makePersistent(detachedPerson);
 		} finally {
@@ -215,7 +215,7 @@ implements SessionBean
 			logger.trace("createModuleMetaData: end");
 		}
 	}
-	
+
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_System_"

@@ -155,7 +155,11 @@ public class Transition
 	 */
 	private TransitionName name;
 
-	// TODO a Transition should have a description as well!
+	/**
+	 * @jdo.field
+	 *		persistence-modifier="persistent"
+	 */
+	private TransitionDescription description;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -198,7 +202,8 @@ public class Transition
 		}
 
 		this.name = new TransitionName(this);
-	}
+		this.description = new TransitionDescription(this);
+		}
 
 	public String getProcessDefinitionOrganisationID()
 	{
@@ -227,6 +232,9 @@ public class Transition
 	public TransitionName getName()
 	{
 		return name;
+	}
+	public TransitionDescription getDescription() {
+		return description;
 	}
 	public StateDefinition getFromStateDefinition()
 	{

@@ -1,10 +1,9 @@
-package org.nightlabs.jfire.jbpm.extensionI18n;
+package org.nightlabs.jfire.jbpm.graph.def;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import org.nightlabs.i18n.I18nText;
-import org.nightlabs.jfire.jbpm.graph.def.Transition;
 
 /**
  * @author Fitas Amine - fitas at nightlabs dot de

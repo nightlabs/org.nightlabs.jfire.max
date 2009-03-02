@@ -173,7 +173,14 @@ implements Serializable
 					for (Iterator <?>itTransition = node.getLeavingTransitions().iterator(); itTransition.hasNext(); ) {
 						org.jbpm.graph.def.Transition jbpmTransition = (org.jbpm.graph.def.Transition) itTransition.next();
 						//							TransitionID transitionID = Transition.getTransitionID(jbpmTransition);
-						pm.makePersistent(new Transition(stateDefinition, jbpmTransition.getName()));
+						Transition transition = pm.makePersistent(new Transition(stateDefinition, jbpmTransition.getName()));
+						ExtendedNodeDescriptor transitionExtendedNode = processDefinitionDescriptor.getExtendedNodeDescriptor(jbpmTransition);
+						if(transitionExtendedNode != null)
+						{
+							// set the name and description from the extended I18in Node
+							transition.getName().copyFrom(extendedNode.getName());
+							transition.getDescription().copyFrom(extendedNode.getDescription());
+						}	
 					}
 				} // if (node.getLeavingTransitions() != null) {
 				//				}

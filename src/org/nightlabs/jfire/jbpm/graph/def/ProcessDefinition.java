@@ -166,7 +166,7 @@ implements Serializable
 				//				{
 				StateDefinition stateDefinition = pm.makePersistent(new StateDefinition(processDefinition, node));
 				// look up for the extended node if it has matches
-				if(processDefinitionDescriptor!=null)
+				if(processDefinitionDescriptor != null)
 				{
 					ExtendedNodeDescriptor extendedNode = processDefinitionDescriptor.getExtendedNodeDescriptor(node);
 					if(extendedNode != null)
@@ -184,7 +184,7 @@ implements Serializable
 						org.jbpm.graph.def.Transition jbpmTransition = (org.jbpm.graph.def.Transition) itTransition.next();
 						//							TransitionID transitionID = Transition.getTransitionID(jbpmTransition);
 						Transition transition = pm.makePersistent(new Transition(stateDefinition, jbpmTransition.getName()));
-						if(processDefinitionDescriptor!=null)
+						if(processDefinitionDescriptor != null)
 						{
 							ExtendedNodeDescriptor transitionExtendedNode = processDefinitionDescriptor.getExtendedNodeDescriptor(jbpmTransition);
 							if(transitionExtendedNode != null)

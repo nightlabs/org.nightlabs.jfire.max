@@ -22,7 +22,7 @@ import org.nightlabs.i18n.I18nText;
  *				stateDefinitionOrganisationID, stateDefinitionID,
  *				transitionOrganisationID, transitionID"
  *
- * @jdo.fetch-group name="Transition.name" fields="transition, names"
+ * @jdo.fetch-group name="Transition.description" fields="transition, descriptions"
  */
 public class TransitionDescription extends I18nText
 {
@@ -74,7 +74,7 @@ public class TransitionDescription extends I18nText
 	 *		key-type="java.lang.String"
 	 *		value-type="java.lang.String"
 	 *		default-fetch-group="true"
-	 *		table="JFireJbpm_TransitionName_names"
+	 *		table="JFireJbpm_TransitionDescription_descriptions"
 	 *		null-value="exception"
 	 *
 	 * @jdo.join

@@ -25,6 +25,9 @@ import org.nightlabs.jfire.trade.ILayout;
  *
  * @jdo.fetch-group name="VoucherLayout.file" fields="fileName, fileTimestamp, fileData"
  *
+ * @jdo.query
+ * 		name="getVoucherLayoutIdsByFileName"
+ * 		query="SELECT JDOHelper.getObjectId(this) WHERE fileName == :fileName"
  */
 public class VoucherLayout
 implements Serializable, ILayout

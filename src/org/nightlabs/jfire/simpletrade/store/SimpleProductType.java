@@ -39,6 +39,7 @@ import org.nightlabs.jfire.accounting.TariffMapper;
 import org.nightlabs.jfire.accounting.gridpriceconfig.PriceCalculationException;
 import org.nightlabs.jfire.accounting.gridpriceconfig.PriceCalculator;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
+import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.prop.PropertySet;
 import org.nightlabs.jfire.prop.Struct;
 import org.nightlabs.jfire.prop.StructLocal;
@@ -48,10 +49,11 @@ import org.nightlabs.jfire.store.ProductTypeLocal;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.trade.CustomerGroupMapper;
 import org.nightlabs.jfire.trade.LegalEntity;
+import org.nightlabs.util.CollectionUtil;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
- * 
+ *
  * @jdo.persistence-capable
  *		identity-type="application"
  *		persistence-capable-superclass="org.nightlabs.jfire.store.ProductType"
@@ -76,7 +78,7 @@ import org.nightlabs.jfire.trade.LegalEntity;
  *		    this.extendedProductType.productTypeID == parentProductTypeProductTypeID
  *		  PARAMETERS String parentProductTypeOrganisationID, String parentProductTypeProductTypeID
  *		  import java.lang.String"
- * 
+ *
  * @jdo.fetch-group name="SimpleProductType.this" fetch-groups="default, ProductType.this"
  * @jdo.fetch-group name="SimpleProductType.propertySet" fetch-groups="default" fields="propertySet"
  *
@@ -91,17 +93,18 @@ public class SimpleProductType extends ProductType
 {
 	private static final long serialVersionUID = 20080610L;
 	/**
-	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon! 
+	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon!
 	 */
+	@Deprecated
 	public static final String FETCH_GROUP_THIS_SIMPLE_PRODUCT_TYPE = "SimpleProductType.this";
 	public static final String FETCH_GROUP_PROPERTY_SET = "SimpleProductType.propertySet";
 
 	public static final class FieldName
 	{
 		public static final String propertySet = "propertySet";
-		public static final String structLocalScope = "structLocalScope";		
+		public static final String structLocalScope = "structLocalScope";
 	};
-	
+
 	/**
 	 * Note, that this method does only return instances of {@link SimpleProductType} while
 	 * the same-named method {@link ProductType#getChildProductTypes(PersistenceManager, ProductTypeID)}
@@ -115,12 +118,12 @@ public class SimpleProductType extends ProductType
 	{
 		if (parentProductTypeID == null) {
 			Query q = pm.newNamedQuery(SimpleProductType.class, "getChildProductTypes_topLevel");
-			return (Collection<SimpleProductType>)q.execute();
+			return CollectionUtil.castCollection((Collection<?>)q.execute());
 		}
 
 		Query q = pm.newNamedQuery(SimpleProductType.class, "getChildProductTypes_hasParent");
-		return (Collection<SimpleProductType>) q.execute(
-			parentProductTypeID.organisationID, parentProductTypeID.productTypeID);
+		return CollectionUtil.castCollection((Collection<?>) q.execute(
+			parentProductTypeID.organisationID, parentProductTypeID.productTypeID));
 	}
 
 	/**
@@ -147,9 +150,9 @@ public class SimpleProductType extends ProductType
 		String structLocalScope = StructLocal.DEFAULT_SCOPE;
 
 		this.propertySet = new PropertySet(
-				organisationID, IDGenerator.nextID(PropertySet.class), 
-				SimpleProductType.class.getName(), 
-				structScope, structLocalScope);
+				organisationID, IDGenerator.nextID(PropertySet.class),
+				Organisation.DEV_ORGANISATION_ID,
+				SimpleProductType.class.getName(), structScope, structLocalScope);
 	}
 
 	@Override
@@ -170,30 +173,30 @@ public class SimpleProductType extends ProductType
 			throw new RuntimeException(e);
 		}
 	}
-	
+
 //	/**
-//	 * The scope of the Struct by which the StructLocal 
+//	 * The scope of the Struct by which the StructLocal
 //	 * of the PropertySet of this SimpleProductType is build from.
-//	 * 
+//	 *
 //	 * @jdo.field persistence-modifier="persistent" null-value="exception" indexed="true"
 //	 */
 //	private String structScope;
-//	
+//
 //	/**
-//	 * @return The scope of the Struct by which the StructLocal 
+//	 * @return The scope of the Struct by which the StructLocal
 //	 * of the PropertySet of this SimpleProductType is build from.
 //	 */
 //	public String getStructScope() {
 //		return structScope;
 //	}
-//	
+//
 //	/**
 //	 * The scope of the StructLocal by which the propertySet is build from.
-//	 * 
+//	 *
 //	 * @jdo.field persistence-modifier="persistent" null-value="exception" indexed="true"
 //	 */
 //	private String structLocalScope;
-//	
+//
 //	/**
 //	 * Returns the scope of the StructLocal by which the propertySet is build from.
 //	 * @return The scope of the StructLocal by which the propertySet is build from.
@@ -201,7 +204,7 @@ public class SimpleProductType extends ProductType
 //	public String getStructLocalScope() {
 //		return structLocalScope;
 //	}
-	
+
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
@@ -209,7 +212,7 @@ public class SimpleProductType extends ProductType
 
 	/**
 	 * Returns the property set of this {@link SimpleProductType}.
-	 * 
+	 *
 	 * @return The property set of this {@link SimpleProductType}.
 	 */
 	public PropertySet getPropertySet() {

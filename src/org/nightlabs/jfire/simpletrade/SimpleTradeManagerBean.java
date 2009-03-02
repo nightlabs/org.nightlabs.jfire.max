@@ -207,7 +207,7 @@ implements SessionBean
 			moduleMetaData = new ModuleMetaData(JFireSimpleTradeEAR.MODULE_NAME, version, version);
 			pm.makePersistent(moduleMetaData);
 
-			SimpleProductTypeStruct.getSimpleProductTypeStruct(organisationID, pm);
+			SimpleProductTypeStruct.getSimpleProductTypeStructLocal(pm);
 
 			SimpleProductTypeActionHandler simpleProductTypeActionHandler = new SimpleProductTypeActionHandler(
 					Organisation.DEV_ORGANISATION_ID, SimpleProductTypeActionHandler.class.getName(), SimpleProductType.class);
@@ -1056,7 +1056,7 @@ implements SessionBean
 			StablePriceConfig priceConfig = (StablePriceConfig) productType.getPackagePriceConfig();
 			if (priceConfig == null)
 				return Collections.emptyList();
-			
+
 			pm.getFetchPlan().setMaxFetchDepth(NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
 			pm.getFetchPlan().setGroups(new String[] {
 					FetchPlan.DEFAULT, ProductType.FETCH_GROUP_TARIFF_USER_SET

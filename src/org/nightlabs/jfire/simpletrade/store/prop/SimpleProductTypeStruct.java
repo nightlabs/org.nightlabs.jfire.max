@@ -27,24 +27,31 @@ import org.nightlabs.jfire.simpletrade.store.SimpleProductType;
  */
 public class SimpleProductTypeStruct {
 
-	public static IStruct getSimpleProductTypeStruct(String organisationID, PersistenceManager pm) {
+	public static IStruct getSimpleProductTypeStructLocal(PersistenceManager pm) {
+		String devOrganisationID = Organisation.DEV_ORGANISATION_ID;
+
 		Struct productTypeStruct = null;
 		StructLocal productTypeStructLocal = null;
 		try {
-			productTypeStruct = Struct.getStruct(organisationID, SimpleProductType.class, Struct.DEFAULT_SCOPE, pm);
+			productTypeStruct = Struct.getStruct(devOrganisationID, SimpleProductType.class, Struct.DEFAULT_SCOPE, pm);
 		} catch (JDOObjectNotFoundException e) {
 			// person struct not persisted yet.
-			productTypeStruct = new Struct(organisationID, SimpleProductType.class.getName(), Struct.DEFAULT_SCOPE);
+			productTypeStruct = new Struct(devOrganisationID, SimpleProductType.class.getName(), Struct.DEFAULT_SCOPE);
 			createDefaultStructure(productTypeStruct);
 			productTypeStruct.getName().setText(Locale.ENGLISH.getLanguage(), "Simple products");
 			productTypeStruct.getName().setText(Locale.GERMAN.getLanguage(), "Einfache Produkte");
 			productTypeStruct = pm.makePersistent(productTypeStruct);
-			productTypeStructLocal = new StructLocal(productTypeStruct, organisationID, StructLocal.DEFAULT_SCOPE);
+		}
+
+		try {
+			productTypeStructLocal = StructLocal.getStructLocal(pm, devOrganisationID, SimpleProductType.class, productTypeStruct.getStructScope(), StructLocal.DEFAULT_SCOPE);
+		} catch (JDOObjectNotFoundException e) {
+			productTypeStructLocal = new StructLocal(productTypeStruct, StructLocal.DEFAULT_SCOPE);
 			productTypeStructLocal.getName().setText(Locale.ENGLISH.getLanguage(), "Default simple product structure");
 			productTypeStructLocal.getName().setText(Locale.GERMAN.getLanguage(), "Standardstruktur für einfache Produkte");
 			productTypeStructLocal = pm.makePersistent(productTypeStructLocal);
 		}
-		return productTypeStruct;
+		return productTypeStructLocal;
 	}
 
 	private static void createDefaultStructure(IStruct productTypeStruct) {

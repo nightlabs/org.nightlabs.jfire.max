@@ -145,16 +145,18 @@ implements Serializable
 				jbpmExtensionURL = new URL(jbpmProcessDefinitionURL, "process-definition-extension.xml");
 				InputStream extensionIn = jbpmProcessDefinitionURL.openStream();
 				if (extensionIn != null && jbpmProcessDefinitionURL.openConnection().getContentLength()!= 0)
-				{	try{		
-					Reader extensionReader = new InputStreamReader(extensionIn);
-					JpdlXmlExtensionReader jpdlXmlReaderExtension = new JpdlXmlExtensionReader(extensionReader);
-					processDefinitionDescriptor = jpdlXmlReaderExtension.getExtendedProcessDefinitionDescriptor();					
+				{	
+					try{		
+						Reader extensionReader = new InputStreamReader(extensionIn);
+						JpdlXmlExtensionReader jpdlXmlReaderExtension = new JpdlXmlExtensionReader(extensionReader);
+						processDefinitionDescriptor = jpdlXmlReaderExtension.getExtendedProcessDefinitionDescriptor();					
+					}
+					finally {
+						extensionIn.close();
+					}					
 				}
-				finally {
-					extensionIn.close();
-				}					
-				}
-			}catch (FileNotFoundException e) {
+			} 
+			catch (FileNotFoundException e) {
 				logger.warn("the extended process definition file was not found: " + jbpmExtensionURL, e);
 			}			
 			catch (Throwable t) {

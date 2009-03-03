@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.Serializable;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -137,20 +138,33 @@ implements Serializable
 				processDefinition = pm.makePersistent(
 						new ProcessDefinition(processDefinitionID, jbpmProcessDefinition, jbpmProcessDefinitionURL));
 			}
-			// read the jbpm extension process file
-			URL jbpmExtensionURL = new URL(jbpmProcessDefinitionURL, "process-definition-extension.xml");
-			InputStream extensionIn = jbpmProcessDefinitionURL.openStream();
-			if (extensionIn != null)
-			{			
-				try {
+			
+			URL jbpmExtensionURL = null;
+			InputStream extensionIn = null;
+			try {
+				// read the jbpm extension process file
+				jbpmExtensionURL = new URL(jbpmProcessDefinitionURL, "process-definition-extension.xml");
+				extensionIn = jbpmProcessDefinitionURL.openStream();
+				if (extensionIn != null && jbpmProcessDefinitionURL.openConnection().getContentLength()!= 0)
+				{			
 					Reader extensionReader = new InputStreamReader(extensionIn);
 					JpdlXmlExtensionReader jpdlXmlReaderExtension = new JpdlXmlExtensionReader(extensionReader);
-					processDefinitionDescriptor = jpdlXmlReaderExtension.getExtendedProcessDefinitionDescriptor();				
-				}catch (Throwable t) {
-					logger.warn("reading extended process definition file failed: " + jbpmExtensionURL, t);
-					} finally {
-					extensionIn.close();
+					processDefinitionDescriptor = jpdlXmlReaderExtension.getExtendedProcessDefinitionDescriptor();					
 				}
+			}
+			catch (FileNotFoundException e) {
+				logger.warn("the extended process definition file was not found: " + jbpmExtensionURL, e);
+			}	
+			catch (Throwable t) {
+				logger.error("reading process definition failed: " + jbpmProcessDefinitionURL, t);
+				if (t instanceof IOException)
+					throw (IOException)t;
+				if (t instanceof RuntimeException)
+					throw (RuntimeException)t;
+				throw new RuntimeException(t);	
+			} 			
+			finally {
+				extensionIn.close();
 			}
 			// create StateDefinitions
 			for (Iterator<?> itNode = jbpmProcessDefinition.getNodes().iterator(); itNode.hasNext(); ) {

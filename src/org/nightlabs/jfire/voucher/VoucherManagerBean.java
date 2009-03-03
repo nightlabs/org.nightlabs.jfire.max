@@ -1092,11 +1092,8 @@ implements SessionBean
 				// find or create an Order
 				Trader trader = Trader.getTrader(pm);
 
-				IStruct personStruct = StructLocal.getStructLocal(pm, getOrganisationID(),
-						Person.class.getName(),
-						Person.STRUCT_SCOPE, Person.STRUCT_LOCAL_SCOPE);
-				Person person = new Person(getOrganisationID(), IDGenerator
-						.nextID(PropertySet.class));
+				IStruct personStruct = PersonStruct.getPersonStructLocal(pm);
+				Person person = new Person(getOrganisationID(), IDGenerator.nextID(PropertySet.class));
 				person.inflate(personStruct);
 				person.getDataField(PersonStruct.PERSONALDATA_COMPANY).setData("NightLabs GmbH");
 				person.getDataField(PersonStruct.PERSONALDATA_NAME).setData("Schulze");

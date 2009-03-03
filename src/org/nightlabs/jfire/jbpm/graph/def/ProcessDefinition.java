@@ -140,21 +140,23 @@ implements Serializable
 			}
 			
 			URL jbpmExtensionURL = null;
-			InputStream extensionIn = null;
 			try {
 				// read the jbpm extension process file
 				jbpmExtensionURL = new URL(jbpmProcessDefinitionURL, "process-definition-extension.xml");
-				extensionIn = jbpmProcessDefinitionURL.openStream();
+				InputStream extensionIn = jbpmProcessDefinitionURL.openStream();
 				if (extensionIn != null && jbpmProcessDefinitionURL.openConnection().getContentLength()!= 0)
-				{			
+				{	try{		
 					Reader extensionReader = new InputStreamReader(extensionIn);
 					JpdlXmlExtensionReader jpdlXmlReaderExtension = new JpdlXmlExtensionReader(extensionReader);
 					processDefinitionDescriptor = jpdlXmlReaderExtension.getExtendedProcessDefinitionDescriptor();					
 				}
-			}
-			catch (FileNotFoundException e) {
+				finally {
+					extensionIn.close();
+				}					
+				}
+			}catch (FileNotFoundException e) {
 				logger.warn("the extended process definition file was not found: " + jbpmExtensionURL, e);
-			}	
+			}			
 			catch (Throwable t) {
 				logger.error("reading process definition failed: " + jbpmProcessDefinitionURL, t);
 				if (t instanceof IOException)
@@ -163,9 +165,7 @@ implements Serializable
 					throw (RuntimeException)t;
 				throw new RuntimeException(t);	
 			} 			
-			finally {
-				extensionIn.close();
-			}
+
 			// create StateDefinitions
 			for (Iterator<?> itNode = jbpmProcessDefinition.getNodes().iterator(); itNode.hasNext(); ) {
 				Node node = (Node) itNode.next();

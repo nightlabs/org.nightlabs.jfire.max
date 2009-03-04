@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<process-definition-extension xmlns=" " name="dev.jfire.org:Offer.Vendor">
+<start-state name="dev.jfire.org:created">
+<name language="de">created</name>
+<description language="de">created</description>
+<name language="en">created</name>
+<description language="en">created</description>
+<icon file=""/>
+<transition name="dev.jfire.org:finalize">
+<name language="de">finalize</name>
+<description language="de">finalize</description>
+<name language="en">finalize</name>
+<description language="en">finalize</description>
+<icon file=""/>
+</transition>
+<transition name="abort">
+<name language="de">abort</name>
+<description language="de">abort</description>
+<name language="en">abort</name>
+<description language="en">abort</description>
+<icon file=""/>
+</transition>
+<transition name="dev.jfire.org:acceptImplicitely">
+<name language="de">acceptImplicitely</name>
+<description language="de">acceptImplicitely</description>
+<name language="en">acceptImplicitely</name>
+<description language="en">acceptImplicitely</description>
+<icon file=""/>
+</transition>
+<transition name="dev.jfire.org:finalizeForCrossTrade">
+<name language="de">finalizeForCrossTrade</name>
+<description language="de">finalizeForCrossTrade</description>
+<name language="en">finalizeForCrossTrade</name>
+<description language="en">finalizeForCrossTrade</description>
+<icon file=""/>
+</transition>
+</start-state>
+<end-state name="dev.jfire.org:rejected">
+<name language="de">rejected</name>
+<description language="de">rejected</description>
+<name language="en">rejected</name>
+<description language="en">rejected</description>
+<icon file=""/>
+</end-state>
+<end-state name="dev.jfire.org:accepted">
+<name language="de">accepted</name>
+<description language="de">accepted</description>
+<name language="en">accepted</name>
+<description language="en">accepted</description>
+<icon file=""/>
+</end-state>
+<state name="dev.jfire.org:finalized">
+<name language="de">finalized</name>
+<description language="de">finalized</description>
+<name language="en">finalized</name>
+<description language="en">finalized</description>
+<icon file=""/>
+<transition name="dev.jfire.org:expire">
+<name language="de">expire</name>
+<description language="de">expire</description>
+<name language="en">expire</name>
+<description language="en">expire</description>
+<icon file=""/>
+</transition>
+<transition name="revoke">
+<name language="de">revoke</name>
+<description language="de">revoke</description>
+<name language="en">revoke</name>
+<description language="en">revoke</description>
+<icon file=""/>
+</transition>
+<transition name="reject">
+<name language="de">reject</name>
+<description language="de">reject</description>
+<name language="en">reject</name>
+<description language="en">reject</description>
+<icon file=""/>
+</transition>
+<transition name="dev.jfire.org:customerAccepted">
+<name language="de">customerAccepted</name>
+<description language="de">customerAccepted</description>
+<name language="en">customerAccepted</name>
+<description language="en">customerAccepted</description>
+<icon file=""/>
+</transition>
+<transition name="dev.jfire.org:customerRejected">
+<name language="de">customerRejected</name>
+<description language="de">customerRejected</description>
+<name language="en">customerRejected</name>
+<description language="en">customerRejected</description>
+<icon file=""/>
+</transition>
+<transition name="accept">
+<name language="de">accept</name>
+<description language="de">accept</description>
+<name language="en">accept</name>
+<description language="en">accept</description>
+<icon file=""/>
+</transition>
+<transition name="dev.jfire.org:send">
+<name language="de">send</name>
+<description language="de">send</description>
+<name language="en">send</name>
+<description language="en">send</description>
+<icon file=""/>
+</transition>
+<transition name="dev.jfire.org:acceptImplicitely">
+<name language="de">acceptImplicitely</name>
+<description language="de">acceptImplicitely</description>
+<name language="en">acceptImplicitely</name>
+<description language="en">acceptImplicitely</description>
+<icon file=""/>
+</transition>
+</state>
+<end-state name="dev.jfire.org:expired">
+<name language="de">expired</name>
+<description language="de">expired</description>
+<name language="en">expired</name>
+<description language="en">expired</description>
+<icon file=""/>
+</end-state>
+<end-state name="dev.jfire.org:aborted">
+<name language="de">aborted</name>
+<description language="de">aborted</description>
+<name language="en">aborted</name>
+<description language="en">aborted</description>
+<icon file=""/>
+</end-state>
+<end-state name="dev.jfire.org:revoked">
+<name language="de">revoked</name>
+<description language="de">revoked</description>
+<name language="en">revoked</name>
+<description language="en">revoked</description>
+<icon file=""/>
+</end-state>
+<node name="dev.jfire.org:customerAccepted">
+<name language="de">customerAccepted</name>
+<description language="de">customerAccepted</description>
+<name language="en">customerAccepted</name>
+<description language="en">customerAccepted</description>
+<icon file=""/>
+<transition name="accept">
+<name language="de">accept</name>
+<description language="de">accept</description>
+<name language="en">accept</name>
+<description language="en">accept</description>
+<icon file=""/>
+</transition>
+</node>
+<node name="dev.jfire.org:customerRejected">
+<name language="de">customerRejected</name>
+<description language="de">customerRejected</description>
+<name language="en">customerRejected</name>
+<description language="en">customerRejected</description>
+<icon file=""/>
+<transition name="reject">
+<name language="de">reject</name>
+<description language="de">reject</description>
+<name language="en">reject</name>
+<description language="en">reject</description>
+<icon file=""/>
+</transition>
+</node>
+<node name="dev.jfire.org:sent">
+<name language="de">sent</name>
+<description language="de">sent</description>
+<name language="en">sent</name>
+<description language="en">sent</description>
+<icon file=""/>
+<transition name="dev.jfire.org:send">
+<name language="de">send</name>
+<description language="de">send</description>
+<name language="en">send</name>
+<description language="en">send</description>
+<icon file=""/>
+</transition>
+<transition name="sendImplicitely">
+<name language="de">sendImplicitely</name>
+<description language="de">sendImplicitely</description>
+<name language="en">sendImplicitely</name>
+<description language="en">sendImplicitely</description>
+<icon file=""/>
+</transition>
+</node>
+</process-definition-extension>

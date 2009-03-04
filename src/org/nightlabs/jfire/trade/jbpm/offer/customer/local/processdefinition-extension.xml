@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<process-definition-extension xmlns=" " name="dev.jfire.org:Invoice.CustomerLocal">
+<start-state name="dev.jfire.org:created">
+<name language="de">created</name>
+<description language="de">created</description>
+<name language="en">created</name>
+<description language="en">created</description>
+<icon file=""/>
+<transition name="abort">
+<name language="de">abort</name>
+<description language="de">abort</description>
+<name language="en">abort</name>
+<description language="en">abort</description>
+<icon file=""/>
+</transition>
+<transition name="finalize">
+<name language="de">finalize</name>
+<description language="de">finalize</description>
+<name language="en">finalize</name>
+<description language="en">finalize</description>
+<icon file=""/>
+</transition>
+<transition name="dev.jfire.org:bookImplicitely">
+<name language="de">bookImplicitely</name>
+<description language="de">bookImplicitely</description>
+<name language="en">bookImplicitely</name>
+<description language="en">bookImplicitely</description>
+<icon file=""/>
+</transition>
+</start-state>
+<state name="dev.jfire.org:finalized">
+<name language="de">finalized</name>
+<description language="de">finalized</description>
+<name language="en">finalized</name>
+<description language="en">finalized</description>
+<icon file=""/>
+<transition name="dev.jfire.org:book">
+<name language="de">book</name>
+<description language="de">book</description>
+<name language="en">book</name>
+<description language="en">book</description>
+<icon file=""/>
+</transition>
+</state>
+<end-state name="dev.jfire.org:aborted">
+<name language="de">aborted</name>
+<description language="de">aborted</description>
+<name language="en">aborted</name>
+<description language="en">aborted</description>
+<icon file=""/>
+</end-state>
+<state name="dev.jfire.org:doubtful">
+<name language="de">doubtful</name>
+<description language="de">doubtful</description>
+<name language="en">doubtful</name>
+<description language="en">doubtful</description>
+<icon file=""/>
+<transition name="dev.jfire.org:pay">
+<name language="de">pay</name>
+<description language="de">pay</description>
+<name language="en">pay</name>
+<description language="en">pay</description>
+<icon file=""/>
+</transition>
+<transition name="bookUnreceivable">
+<name language="de">bookUnreceivable</name>
+<description language="de">bookUnreceivable</description>
+<name language="en">bookUnreceivable</name>
+<description language="en">bookUnreceivable</description>
+<icon file=""/>
+</transition>
+<transition name="trust">
+<name language="de">trust</name>
+<description language="de">trust</description>
+<name language="en">trust</name>
+<description language="en">trust</description>
+<icon file=""/>
+</transition>
+</state>
+<end-state name="dev.jfire.org:uncollectable">
+<name language="de">uncollectable</name>
+<description language="de">uncollectable</description>
+<name language="en">uncollectable</name>
+<description language="en">uncollectable</description>
+<icon file=""/>
+</end-state>
+<end-state name="dev.jfire.org:paid">
+<name language="de">paid</name>
+<description language="de">paid</description>
+<name language="en">paid</name>
+<description language="en">paid</description>
+<icon file=""/>
+</end-state>
+<state name="dev.jfire.org:booked">
+<name language="de">booked</name>
+<description language="de">booked</description>
+<name language="en">booked</name>
+<description language="en">booked</description>
+<icon file=""/>
+<transition name="doubt">
+<name language="de">doubt</name>
+<description language="de">doubt</description>
+<name language="en">doubt</name>
+<description language="en">doubt</description>
+<icon file=""/>
+</transition>
+<transition name="dev.jfire.org:pay">
+<name language="de">pay</name>
+<description language="de">pay</description>
+<name language="en">pay</name>
+<description language="en">pay</description>
+<icon file=""/>
+</transition>
+<transition name="sendReminder">
+<name language="de">sendReminder</name>
+<description language="de">sendReminder</description>
+<name language="en">sendReminder</name>
+<description language="en">sendReminder</description>
+<icon file=""/>
+</transition>
+<transition name="dev.jfire.org:send">
+<name language="de">send</name>
+<description language="de">send</description>
+<name language="en">send</name>
+<description language="en">send</description>
+<icon file=""/>
+</transition>
+</state>
+<node name="dev.jfire.org:bookedUnreceivable">
+<name language="de">bookedUnreceivable</name>
+<description language="de">bookedUnreceivable</description>
+<name language="en">bookedUnreceivable</name>
+<description language="en">bookedUnreceivable</description>
+<icon file=""/>
+<transition name="endAsUncollectable">
+<name language="de">endAsUncollectable</name>
+<description language="de">endAsUncollectable</description>
+<name language="en">endAsUncollectable</name>
+<description language="en">endAsUncollectable</description>
+<icon file=""/>
+</transition>
+</node>
+<node name="dev.jfire.org:bookedImplicitely">
+<name language="de">bookedImplicitely</name>
+<description language="de">bookedImplicitely</description>
+<name language="en">bookedImplicitely</name>
+<description language="en">bookedImplicitely</description>
+<icon file=""/>
+</node>
+</process-definition-extension>

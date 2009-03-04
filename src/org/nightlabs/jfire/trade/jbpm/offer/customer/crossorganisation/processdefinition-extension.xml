@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<process-definition-extension xmlns=" " name="dev.jfire.org:Invoice.CustomerCrossOrganisation">
+<start-state name="dev.jfire.org:sent">
+<name language="de">sent</name>
+<description language="de">sent</description>
+<name language="en">sent</name>
+<description language="en">sent</description>
+<icon file=""/>
+<transition name="book">
+<name language="de">book</name>
+<description language="de">book</description>
+<name language="en">book</name>
+<description language="en">book</description>
+<icon file=""/>
+</transition>
+<transition name="dispute">
+<name language="de">dispute</name>
+<description language="de">dispute</description>
+<name language="en">dispute</name>
+<description language="en">dispute</description>
+<icon file=""/>
+</transition>
+</start-state>
+<end-state name="dev.jfire.org:paid">
+<name language="de">paid</name>
+<description language="de">paid</description>
+<name language="en">paid</name>
+<description language="en">paid</description>
+<icon file=""/>
+</end-state>
+<state name="dev.jfire.org:booked">
+<name language="de">booked</name>
+<description language="de">booked</description>
+<name language="en">booked</name>
+<description language="en">booked</description>
+<icon file=""/>
+<transition name="dev.jfire.org:pay">
+<name language="de">pay</name>
+<description language="de">pay</description>
+<name language="en">pay</name>
+<description language="en">pay</description>
+<icon file=""/>
+</transition>
+<transition name="dispute">
+<name language="de">dispute</name>
+<description language="de">dispute</description>
+<name language="en">dispute</name>
+<description language="en">dispute</description>
+<icon file=""/>
+</transition>
+</state>
+<state name="disputeStarted.beforeBook">
+<name language="de">disputeStarted.beforeBook</name>
+<description language="de">disputeStarted.beforeBook</description>
+<name language="en">disputeStarted.beforeBook</name>
+<description language="en">disputeStarted.beforeBook</description>
+<icon file=""/>
+<transition name="book">
+<name language="de">book</name>
+<description language="de">book</description>
+<name language="en">book</name>
+<description language="en">book</description>
+<icon file=""/>
+</transition>
+</state>
+<state name="disputeStarted.afterBook">
+<name language="de">disputeStarted.afterBook</name>
+<description language="de">disputeStarted.afterBook</description>
+<name language="en">disputeStarted.afterBook</name>
+<description language="en">disputeStarted.afterBook</description>
+<icon file=""/>
+<transition name="dev.jfire.org:pay">
+<name language="de">pay</name>
+<description language="de">pay</description>
+<name language="en">pay</name>
+<description language="en">pay</description>
+<icon file=""/>
+</transition>
+</state>
+</process-definition-extension>

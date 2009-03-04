@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<process-definition-extension xmlns=" " name="dev.jfire.org:DeliveryNote.CustomerCrossOrganisation">
+<start-state name="dev.jfire.org:sent">
+<name language="de">sent</name>
+<description language="de">sent</description>
+<name language="en">sent</name>
+<description language="en">sent</description>
+<icon file=""/>
+<transition name="createReceptionNote">
+<name language="de">createReceptionNote</name>
+<description language="de">createReceptionNote</description>
+<name language="en">createReceptionNote</name>
+<description language="en">createReceptionNote</description>
+<icon file=""/>
+</transition>
+<transition name="dev.jfire.org:deliver">
+<name language="de">deliver</name>
+<description language="de">deliver</description>
+<name language="en">deliver</name>
+<description language="en">deliver</description>
+<icon file=""/>
+</transition>
+</start-state>
+<end-state name="dev.jfire.org:createdReceptionNote">
+<name language="de">createdReceptionNote</name>
+<description language="de">createdReceptionNote</description>
+<name language="en">createdReceptionNote</name>
+<description language="en">createdReceptionNote</description>
+<icon file=""/>
+</end-state>
+<end-state name="dev.jfire.org:booked">
+<name language="de">booked</name>
+<description language="de">booked</description>
+<name language="en">booked</name>
+<description language="en">booked</description>
+<icon file=""/>
+</end-state>
+<state name="dev.jfire.org:delivered">
+<name language="de">delivered</name>
+<description language="de">delivered</description>
+<name language="en">delivered</name>
+<description language="en">delivered</description>
+<icon file=""/>
+<transition name="dev.jfire.org:book">
+<name language="de">book</name>
+<description language="de">book</description>
+<name language="en">book</name>
+<description language="en">book</description>
+<icon file=""/>
+</transition>
+<transition name="dev.jfire.org:bookImplicitely">
+<name language="de">bookImplicitely</name>
+<description language="de">bookImplicitely</description>
+<name language="en">bookImplicitely</name>
+<description language="en">bookImplicitely</description>
+<icon file=""/>
+</transition>
+</state>
+<node name="dev.jfire.org:bookedImplicitely">
+<name language="de">bookedImplicitely</name>
+<description language="de">bookedImplicitely</description>
+<name language="en">bookedImplicitely</name>
+<description language="en">bookedImplicitely</description>
+<icon file=""/>
+</node>
+</process-definition-extension>

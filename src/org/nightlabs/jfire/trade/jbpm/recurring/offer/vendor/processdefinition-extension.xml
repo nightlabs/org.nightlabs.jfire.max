@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <process-definition-extension xmlns="" name="dev.jfire.org:RecurringOffer.Vendor">
 <start-state name="dev.jfire.org:created">
 <name language="de">created</name>

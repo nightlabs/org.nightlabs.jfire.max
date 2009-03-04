@@ -1,5 +1,5 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<process-definition-extension xmlns=" " name="dev.jfire.org:ReceptionNote.Customer">
+<?xml version="1.0" encoding="UTF-8"?>
+<process-definition-extension xmlns="" name="dev.jfire.org:ReceptionNote.Customer">
 <start-state name="dev.jfire.org:created">
 <name language="de">created</name>
 <description language="de">created</description>

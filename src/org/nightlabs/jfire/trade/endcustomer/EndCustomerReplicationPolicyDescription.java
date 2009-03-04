@@ -30,25 +30,24 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.nightlabs.i18n.I18nText;
-import org.nightlabs.jdo.ObjectIDUtil;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  *
  * @jdo.persistence-capable
  *		identity-type="application"
- *		objectid-class="org.nightlabs.jfire.trade.endcustomer.id.EndCustomerTransferPolicyNameID"
+ *		objectid-class="org.nightlabs.jfire.trade.endcustomer.id.EndCustomerReplicationPolicyDescriptionID"
  *		detachable="true"
- *		table="JFireTrade_EndCustomerTransferPolicyName"
+ *		table="JFireTrade_EndCustomerReplicationPolicyDescription"
  *
  * @jdo.inheritance strategy="new-table"
  *
  * @jdo.create-objectid-class
- *		field-order="organisationID, endCustomerTransferPolicyID"
+ *		field-order="organisationID, endCustomerReplicationPolicyID"
  *
- * @jdo.fetch-group name="EndCustomerTransferPolicy.name" fields="endCustomerTransferPolicy, names"
+ * @jdo.fetch-group description="EndCustomerReplicationPolicy.description" fields="endCustomerReplicationPolicy, descriptions"
  */
-public class EndCustomerTransferPolicyName extends I18nText
+public class EndCustomerReplicationPolicyDescription extends I18nText
 {
 	private static final long serialVersionUID = 1L;
 
@@ -60,29 +59,29 @@ public class EndCustomerTransferPolicyName extends I18nText
 	/**
 	 * @jdo.field primary-key="true"
 	 */
-	private long endCustomerTransferPolicyID;
+	private long endCustomerReplicationPolicyID;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
-	private EndCustomerTransferPolicy endCustomerTransferPolicy;
+	private EndCustomerReplicationPolicy endCustomerReplicationPolicy;
 
 	/**
 	 * @deprecated Only for JDO!
 	 */
 	@Deprecated
-	protected EndCustomerTransferPolicyName() { }
+	protected EndCustomerReplicationPolicyDescription() { }
 
-	public EndCustomerTransferPolicyName(EndCustomerTransferPolicy endCustomerTransferPolicy) {
-		this.organisationID = endCustomerTransferPolicy.getOrganisationID();
-		this.endCustomerTransferPolicyID = endCustomerTransferPolicy.getEndCustomerTransferPolicyID();
-		this.endCustomerTransferPolicy = endCustomerTransferPolicy;
-		this.names = new HashMap<String, String>();
+	public EndCustomerReplicationPolicyDescription(EndCustomerReplicationPolicy endCustomerReplicationPolicy) {
+		this.organisationID = endCustomerReplicationPolicy.getOrganisationID();
+		this.endCustomerReplicationPolicyID = endCustomerReplicationPolicy.getEndCustomerReplicationPolicyID();
+		this.endCustomerReplicationPolicy = endCustomerReplicationPolicy;
+		this.texts = new HashMap<String, String>();
 	}
 
 	/**
 	 * key: String languageID<br/>
-	 * value: String name
+	 * value: String description
 	 *
 	 * @jdo.field
 	 *		persistence-modifier="persistent"
@@ -90,33 +89,33 @@ public class EndCustomerTransferPolicyName extends I18nText
 	 *		key-type="java.lang.String"
 	 *		value-type="java.lang.String"
 	 *		default-fetch-group="true"
-	 *		table="JFireTrade_EndCustomerTransferPolicyName_names"
+	 *		table="JFireTrade_EndCustomerReplicationPolicyDescription_texts"
 	 *
 	 * @jdo.join
 	 */
-	protected Map<String, String> names;
+	protected Map<String, String> texts;
 
 	@Override
 	protected Map<String, String> getI18nMap() {
-		return names;
+		return texts;
 	}
 
 	@Override
 	protected String getFallBackValue(String languageID) {
-		return ObjectIDUtil.longObjectIDFieldToString(endCustomerTransferPolicyID);
+		return "";
 	}
 
 	public String getOrganisationID() {
 		return organisationID;
 	}
 
-	public long getEndCustomerTransferPolicyID() {
-		return endCustomerTransferPolicyID;
+	public long getEndCustomerReplicationPolicyID() {
+		return endCustomerReplicationPolicyID;
 	}
 
-	public EndCustomerTransferPolicy getEndCustomerTransferPolicy()
+	public EndCustomerReplicationPolicy getEndCustomerReplicationPolicy()
 	{
-		return endCustomerTransferPolicy;
+		return endCustomerReplicationPolicy;
 	}
 
 }

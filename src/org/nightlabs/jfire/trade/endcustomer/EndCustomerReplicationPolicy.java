@@ -38,29 +38,29 @@ import org.nightlabs.util.Util;
  *
  * @jdo.persistence-capable
  *		identity-type="application"
- *		objectid-class="org.nightlabs.jfire.trade.endcustomer.id.EndCustomerTransferPolicyID"
+ *		objectid-class="org.nightlabs.jfire.trade.endcustomer.id.EndCustomerReplicationPolicyID"
  *		detachable="true"
- *		table="JFireTrade_EndCustomerTransferPolicy"
+ *		table="JFireTrade_EndCustomerReplicationPolicy"
  *
  * @jdo.inheritance strategy="new-table"
  *
  * @jdo.create-objectid-class
- *		field-order="organisationID, endCustomerTransferPolicyID"
+ *		field-order="organisationID, endCustomerReplicationPolicyID"
  *
- * @jdo.fetch-group name="EndCustomerTransferPolicy.name" fields="name"
- * @jdo.fetch-group name="EndCustomerTransferPolicy.description" fields="description"
- * @jdo.fetch-group name="EndCustomerTransferPolicy.structBlocks" fields="structBlocks"
- * @jdo.fetch-group name="EndCustomerTransferPolicy.structFields" fields="structFields"
+ * @jdo.fetch-group name="EndCustomerReplicationPolicy.name" fields="name"
+ * @jdo.fetch-group name="EndCustomerReplicationPolicy.description" fields="description"
+ * @jdo.fetch-group name="EndCustomerReplicationPolicy.structBlocks" fields="structBlocks"
+ * @jdo.fetch-group name="EndCustomerReplicationPolicy.structFields" fields="structFields"
  */
-public class EndCustomerTransferPolicy
+public class EndCustomerReplicationPolicy
 implements Serializable
 {
 	private static final long serialVersionUID = 1L;
 
-	public static final String FETCH_GROUP_NAME = "EndCustomerTransferPolicy.name";
-	public static final String FETCH_GROUP_DESCRIPTION = "EndCustomerTransferPolicy.description";
-	public static final String FETCH_GROUP_STRUCT_BLOCKS = "EndCustomerTransferPolicy.structBlocks";
-	public static final String FETCH_GROUP_STRUCT_FIELDS = "EndCustomerTransferPolicy.structFields";
+	public static final String FETCH_GROUP_NAME = "EndCustomerReplicationPolicy.name";
+	public static final String FETCH_GROUP_DESCRIPTION = "EndCustomerReplicationPolicy.description";
+	public static final String FETCH_GROUP_STRUCT_BLOCKS = "EndCustomerReplicationPolicy.structBlocks";
+	public static final String FETCH_GROUP_STRUCT_FIELDS = "EndCustomerReplicationPolicy.structFields";
 
 	/**
 	 * @jdo.field primary-key="true"
@@ -70,24 +70,24 @@ implements Serializable
 	/**
 	 * @jdo.field primary-key="true"
 	 */
-	private long endCustomerTransferPolicyID;
+	private long endCustomerReplicationPolicyID;
 
 	/**
-	 * @jdo.field persistence-modifier="persistent" mapped-by="endCustomerTransferPolicy"
+	 * @jdo.field persistence-modifier="persistent" mapped-by="endCustomerReplicationPolicy"
 	 */
-	private EndCustomerTransferPolicyName name;
+	private EndCustomerReplicationPolicyName name;
 
 	/**
-	 * @jdo.field persistence-modifier="persistent" mapped-by="endCustomerTransferPolicy"
+	 * @jdo.field persistence-modifier="persistent" mapped-by="endCustomerReplicationPolicy"
 	 */
-	private EndCustomerTransferPolicyDescription description;
+	private EndCustomerReplicationPolicyDescription description;
 
 	/**
 	 * @jdo.field
 	 *		persistence-modifier="persistent"
 	 *		collection-type="collection"
 	 *		element-type="org.nightlabs.jfire.prop.StructBlock"
-	 *		table="JFireTrade_EndCustomerTransferPolicy_structBlocks"
+	 *		table="JFireTrade_EndCustomerReplicationPolicy_structBlocks"
 	 * @jdo.join
 	 */
 	private Set<StructBlock> structBlocks;
@@ -97,7 +97,7 @@ implements Serializable
 	 *		persistence-modifier="persistent"
 	 *		collection-type="collection"
 	 *		element-type="org.nightlabs.jfire.prop.StructField"
-	 *		table="JFireTrade_EndCustomerTransferPolicy_structFields"
+	 *		table="JFireTrade_EndCustomerReplicationPolicy_structFields"
 	 * @jdo.join
 	 */
 	private Set<StructField<? extends DataField>> structFields;
@@ -106,30 +106,30 @@ implements Serializable
 	 * @deprecated Only for JDO!
 	 */
 	@Deprecated
-	protected EndCustomerTransferPolicy() { }
+	protected EndCustomerReplicationPolicy() { }
 
-	public EndCustomerTransferPolicy(String organisationID, long endCustomerTransferPolicyID) {
+	public EndCustomerReplicationPolicy(String organisationID, long endCustomerReplicationPolicyID) {
 		this.organisationID = organisationID;
-		this.endCustomerTransferPolicyID = endCustomerTransferPolicyID;
+		this.endCustomerReplicationPolicyID = endCustomerReplicationPolicyID;
 
 		structBlocks = new HashSet<StructBlock>();
 		structFields = new HashSet<StructField<? extends DataField>>();
-		name = new EndCustomerTransferPolicyName(this);
-		description = new EndCustomerTransferPolicyDescription(this);
+		name = new EndCustomerReplicationPolicyName(this);
+		description = new EndCustomerReplicationPolicyDescription(this);
 	}
 
 	public String getOrganisationID() {
 		return organisationID;
 	}
-	public long getEndCustomerTransferPolicyID() {
-		return endCustomerTransferPolicyID;
+	public long getEndCustomerReplicationPolicyID() {
+		return endCustomerReplicationPolicyID;
 	}
 
-	public EndCustomerTransferPolicyName getName() {
+	public EndCustomerReplicationPolicyName getName() {
 		return name;
 	}
 
-	public EndCustomerTransferPolicyDescription getDescription() {
+	public EndCustomerReplicationPolicyDescription getDescription() {
 		return description;
 	}
 
@@ -175,14 +175,14 @@ implements Serializable
 		return structFields.remove(structField);
 	}
 
-	private static void removeNonTransferableFields(PersistenceManager pm, Person detachedPerson, Set<EndCustomerTransferPolicy> endCustomerTransferPolicies)
+	private static void removeNonTransferableFields(PersistenceManager pm, Person detachedPerson, Set<EndCustomerReplicationPolicy> endCustomerReplicationPolicies)
 	{
 		Set<StructBlock> structBlocks = new HashSet<StructBlock>();
 		Set<StructField<? extends DataField>> structFields = new HashSet<StructField<? extends DataField>>();
 
-		for (EndCustomerTransferPolicy endCustomerTransferPolicy : endCustomerTransferPolicies) {
-			structBlocks.addAll(endCustomerTransferPolicy.getStructBlocks());
-			structFields.addAll(endCustomerTransferPolicy.getStructFields());
+		for (EndCustomerReplicationPolicy endCustomerReplicationPolicy : endCustomerReplicationPolicies) {
+			structBlocks.addAll(endCustomerReplicationPolicy.getStructBlocks());
+			structFields.addAll(endCustomerReplicationPolicy.getStructFields());
 		}
 
 		Set<StructBlockID> structBlockIDs = NLJDOHelper.getObjectIDSet(structBlocks);
@@ -225,7 +225,7 @@ implements Serializable
 		detachedPerson.deflate();
 	}
 
-	public static LegalEntity detachLegalEntity(PersistenceManager pm, LegalEntity legalEntity, Set<EndCustomerTransferPolicy> endCustomerTransferPolicies)
+	public static LegalEntity detachLegalEntity(PersistenceManager pm, LegalEntity legalEntity, Set<EndCustomerReplicationPolicy> endCustomerReplicationPolicies)
 	{
 		FetchPlanBackup fetchPlanBackup = NLJDOHelper.backupFetchPlan(pm.getFetchPlan());
 		try {
@@ -241,7 +241,7 @@ implements Serializable
 			pm.getFetchPlan().setMaxFetchDepth(NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
 
 			LegalEntity detached = pm.detachCopy(legalEntity);
-			removeNonTransferableFields(pm, detached.getPerson(), endCustomerTransferPolicies);
+			removeNonTransferableFields(pm, detached.getPerson(), endCustomerReplicationPolicies);
 			return detached;
 		} finally {
 			NLJDOHelper.restoreFetchPlan(pm.getFetchPlan(), fetchPlanBackup);
@@ -251,7 +251,7 @@ implements Serializable
 	/**
 	 * Adds all those data-fields that are existing locally but have been actively filtered out of the
 	 * <code>detachedPerson</code>. This means {@link StructField}s that are known in the datastore
-	 * where the {@link Person} was detached but that are not in the {@link EndCustomerTransferPolicy}s.
+	 * where the {@link Person} was detached but that are not in the {@link EndCustomerReplicationPolicy}s.
 	 *
 	 * @param pm
 	 * @param detachedPerson
@@ -294,7 +294,7 @@ implements Serializable
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((organisationID == null) ? 0 : organisationID.hashCode());
-		result = prime * result + (int) (endCustomerTransferPolicyID ^ (endCustomerTransferPolicyID >>> 32));
+		result = prime * result + (int) (endCustomerReplicationPolicyID ^ (endCustomerReplicationPolicyID >>> 32));
 		return result;
 	}
 
@@ -304,15 +304,15 @@ implements Serializable
 		if (obj == null) return false;
 		if (getClass() != obj.getClass()) return false;
 
-		EndCustomerTransferPolicy other = (EndCustomerTransferPolicy) obj;
+		EndCustomerReplicationPolicy other = (EndCustomerReplicationPolicy) obj;
 		return (
-				Util.equals(this.endCustomerTransferPolicyID, other.endCustomerTransferPolicyID) &&
+				Util.equals(this.endCustomerReplicationPolicyID, other.endCustomerReplicationPolicyID) &&
 				Util.equals(this.organisationID, other.organisationID)
 		);
 	}
 
 	@Override
 	public String toString() {
-		return this.getClass().getName() + Integer.toHexString(System.identityHashCode(this)) + '[' + organisationID + ',' + ObjectIDUtil.longObjectIDFieldToString(endCustomerTransferPolicyID) + ']';
+		return this.getClass().getName() + Integer.toHexString(System.identityHashCode(this)) + '[' + organisationID + ',' + ObjectIDUtil.longObjectIDFieldToString(endCustomerReplicationPolicyID) + ']';
 	}
 }

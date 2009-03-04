@@ -93,7 +93,7 @@ import org.nightlabs.jfire.store.deliver.Delivery;
 import org.nightlabs.jfire.store.id.ProductID;
 import org.nightlabs.jfire.trade.config.OfferConfigModule;
 import org.nightlabs.jfire.trade.config.TradeConfigModule;
-import org.nightlabs.jfire.trade.endcustomer.EndCustomerTransferPolicy;
+import org.nightlabs.jfire.trade.endcustomer.EndCustomerReplicationPolicy;
 import org.nightlabs.jfire.trade.history.ProductHistory;
 import org.nightlabs.jfire.trade.history.ProductHistoryItem;
 import org.nightlabs.jfire.trade.history.ProductHistoryItem.ProductHistoryItemType;
@@ -1966,7 +1966,7 @@ public class Trader
 		if (endCustomer == null)
 			endCustomer = offer.getCustomer();
 
-		Map<OrganisationLegalEntity, Set<EndCustomerTransferPolicy>> vendor2EndCustomerTransferPoliciesMap = new HashMap<OrganisationLegalEntity, Set<EndCustomerTransferPolicy>>();
+		Map<OrganisationLegalEntity, Set<EndCustomerReplicationPolicy>> vendor2EndCustomerReplicationPoliciesMap = new HashMap<OrganisationLegalEntity, Set<EndCustomerReplicationPolicy>>();
 		Map<OrganisationLegalEntity, Set<Order>> vendor2OrdersMap = new HashMap<OrganisationLegalEntity, Set<Order>>();
 
 		OfferRequirement offerRequirement = OfferRequirement.getOfferRequirement(pm, offer, false);
@@ -1980,14 +1980,14 @@ public class Trader
 
 				for (Article partnerArticle : partnerOffer.getArticles()) {
 					ProductType productType = partnerArticle.getProductType();
-					EndCustomerTransferPolicy endCustomerTransferPolicy = productType.getEndCustomerTransferPolicy();
-					if (endCustomerTransferPolicy != null) {
-						Set<EndCustomerTransferPolicy> endCustomerTransferPolicies = vendor2EndCustomerTransferPoliciesMap.get(vendor);
-						if (endCustomerTransferPolicies == null) {
-							endCustomerTransferPolicies = new HashSet<EndCustomerTransferPolicy>();
-							vendor2EndCustomerTransferPoliciesMap.put(vendor, endCustomerTransferPolicies);
+					EndCustomerReplicationPolicy endCustomerReplicationPolicy = productType.getEndCustomerReplicationPolicy();
+					if (endCustomerReplicationPolicy != null) {
+						Set<EndCustomerReplicationPolicy> endCustomerReplicationPolicies = vendor2EndCustomerReplicationPoliciesMap.get(vendor);
+						if (endCustomerReplicationPolicies == null) {
+							endCustomerReplicationPolicies = new HashSet<EndCustomerReplicationPolicy>();
+							vendor2EndCustomerReplicationPoliciesMap.put(vendor, endCustomerReplicationPolicies);
 						}
-						endCustomerTransferPolicies.add(endCustomerTransferPolicy);
+						endCustomerReplicationPolicies.add(endCustomerReplicationPolicy);
 
 
 						Set<Order> orders = vendor2OrdersMap.get(vendor);
@@ -2000,14 +2000,14 @@ public class Trader
 				}
 			}
 
-			for (Map.Entry<OrganisationLegalEntity, Set<EndCustomerTransferPolicy>> me1 : vendor2EndCustomerTransferPoliciesMap.entrySet()) {
+			for (Map.Entry<OrganisationLegalEntity, Set<EndCustomerReplicationPolicy>> me1 : vendor2EndCustomerReplicationPoliciesMap.entrySet()) {
 				OrganisationLegalEntity vendor = me1.getKey();
-				Set<EndCustomerTransferPolicy> endCustomerTransferPolicies = me1.getValue();
+				Set<EndCustomerReplicationPolicy> endCustomerReplicationPolicies = me1.getValue();
 				Set<Order> orders = vendor2OrdersMap.get(vendor);
 				if (orders == null)
 					throw new IllegalStateException("vendor2OrdersMap.get(vendor) returned null! " + vendor);
 
-				LegalEntity detachedEndCustomer = EndCustomerTransferPolicy.detachLegalEntity(pm, endCustomer, endCustomerTransferPolicies);
+				LegalEntity detachedEndCustomer = EndCustomerReplicationPolicy.detachLegalEntity(pm, endCustomer, endCustomerReplicationPolicies);
 
 				String partnerOrganisationID = vendor.getOrganisationID();
 				TradeManager tradeManager = JFireEjbFactory.getBean(TradeManager.class, Lookup.getInitialContextProperties(pm, partnerOrganisationID));

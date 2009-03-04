@@ -102,8 +102,8 @@ import org.nightlabs.jfire.timer.id.TaskID;
 import org.nightlabs.jfire.trade.config.LegalEntityViewConfigModule;
 import org.nightlabs.jfire.trade.config.OfferConfigModule;
 import org.nightlabs.jfire.trade.config.TradePrintingConfigModule;
-import org.nightlabs.jfire.trade.endcustomer.EndCustomerTransferPolicy;
-import org.nightlabs.jfire.trade.endcustomer.id.EndCustomerTransferPolicyID;
+import org.nightlabs.jfire.trade.endcustomer.EndCustomerReplicationPolicy;
+import org.nightlabs.jfire.trade.endcustomer.id.EndCustomerReplicationPolicyID;
 import org.nightlabs.jfire.trade.id.ArticleContainerID;
 import org.nightlabs.jfire.trade.id.ArticleID;
 import org.nightlabs.jfire.trade.id.CustomerGroupID;
@@ -2341,14 +2341,14 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
-	public Set<EndCustomerTransferPolicyID> getEndCustomerTransferPolicyIDs()
+	public Set<EndCustomerReplicationPolicyID> getEndCustomerReplicationPolicyIDs()
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			Query q = pm.newQuery(EndCustomerTransferPolicy.class);
+			Query q = pm.newQuery(EndCustomerReplicationPolicy.class);
 			q.setResult("JDOHelper.getObjectId(this)");
-			Collection<? extends EndCustomerTransferPolicyID> c = CollectionUtil.castCollection((Collection<?>) q.execute());
-			return new HashSet<EndCustomerTransferPolicyID>(c);
+			Collection<? extends EndCustomerReplicationPolicyID> c = CollectionUtil.castCollection((Collection<?>) q.execute());
+			return new HashSet<EndCustomerReplicationPolicyID>(c);
 		} finally {
 			pm.close();
 		}
@@ -2359,15 +2359,15 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
-	public Collection<EndCustomerTransferPolicy> getEndCustomerTransferPolicies(
-			Collection<EndCustomerTransferPolicyID> endCustomerTransferPolicyIDs,
+	public Collection<EndCustomerReplicationPolicy> getEndCustomerReplicationPolicies(
+			Collection<EndCustomerReplicationPolicyID> endCustomerReplicationPolicyIDs,
 			String[] fetchGroups,
 			int maxFetchDepth
 	)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			return NLJDOHelper.getDetachedObjectList(pm, endCustomerTransferPolicyIDs, EndCustomerTransferPolicy.class, fetchGroups, maxFetchDepth);
+			return NLJDOHelper.getDetachedObjectList(pm, endCustomerReplicationPolicyIDs, EndCustomerReplicationPolicy.class, fetchGroups, maxFetchDepth);
 		} finally {
 			pm.close();
 		}
@@ -2382,7 +2382,7 @@ implements SessionBean
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			LegalEntity attachedEndCustomer = EndCustomerTransferPolicy.attachLegalEntity(pm, endCustomer);
+			LegalEntity attachedEndCustomer = EndCustomerReplicationPolicy.attachLegalEntity(pm, endCustomer);
 			Set<Order> orders = NLJDOHelper.getObjectSet(pm, assignOrderIDs, Order.class, QueryOption.throwExceptionOnMissingObject);
 			for (Order order : orders) {
 				order.setEndCustomer(attachedEndCustomer);

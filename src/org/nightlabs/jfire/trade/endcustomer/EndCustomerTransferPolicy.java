@@ -1,7 +1,6 @@
 package org.nightlabs.jfire.trade.endcustomer;
 
 import java.io.Serializable;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -19,11 +18,15 @@ import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.person.Person;
 import org.nightlabs.jfire.prop.DataBlock;
 import org.nightlabs.jfire.prop.DataField;
+import org.nightlabs.jfire.prop.IStruct;
 import org.nightlabs.jfire.prop.StructBlock;
 import org.nightlabs.jfire.prop.StructField;
 import org.nightlabs.jfire.prop.id.PropertySetID;
+import org.nightlabs.jfire.prop.id.StructBlockID;
+import org.nightlabs.jfire.prop.id.StructFieldID;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.trade.LegalEntity;
+import org.nightlabs.util.CollectionUtil;
 import org.nightlabs.util.Util;
 
 /**
@@ -172,7 +175,7 @@ implements Serializable
 		return structFields.remove(structField);
 	}
 
-	private static void removeNonTransferableFields(Person detachedPerson, Set<EndCustomerTransferPolicy> endCustomerTransferPolicies)
+	private static void removeNonTransferableFields(PersistenceManager pm, Person detachedPerson, Set<EndCustomerTransferPolicy> endCustomerTransferPolicies)
 	{
 		Set<StructBlock> structBlocks = new HashSet<StructBlock>();
 		Set<StructField<? extends DataField>> structFields = new HashSet<StructField<? extends DataField>>();
@@ -182,31 +185,44 @@ implements Serializable
 			structFields.addAll(endCustomerTransferPolicy.getStructFields());
 		}
 
-		removeNonTransferableFields(detachedPerson, structBlocks, structFields);
+		Set<StructBlockID> structBlockIDs = NLJDOHelper.getObjectIDSet(structBlocks);
+		Set<StructFieldID> structFieldIDs = NLJDOHelper.getObjectIDSet(structFields);
+		removeNonTransferableFields(pm, detachedPerson, structBlockIDs, structFieldIDs);
 	}
 
-	private static void removeNonTransferableFields(Person detachedPerson, Set<StructBlock> structBlocks, Set<StructField<? extends DataField>> structFields)
+	private static void removeNonTransferableFields(PersistenceManager pm, Person detachedPerson, Set<StructBlockID> structBlockIDs, Set<StructFieldID> structFieldIDs)
 	{
 		if (JDOHelper.getPersistenceManager(detachedPerson) != null)
 			throw new IllegalArgumentException("detachedPerson is not detached!");
 
-		List<DataField> dataFieldsToRemove = new LinkedList<DataField>();
+		List<DataField> dataFieldsToFilter = new LinkedList<DataField>();
 
-// TODO dataField.getStructField() is null => temporarily commented out
-//		for (DataField dataField : detachedPerson.getDataFields()) {
-//			if (structBlocks.contains(dataField.getStructField().getStructBlock()))
-//				continue; // keep current; continue with next
-//
-//			if (structFields.contains(dataField.getStructField()))
-//				continue; // keep current; continue with next
-//
-//			// if we come here, it needs to be removed => add it to our list
-//			dataFieldsToRemove.add(dataField);
-//		}
+		IStruct struct = (IStruct) pm.getObjectById(detachedPerson.getStructLocalObjectID());
+		detachedPerson.inflate(struct);
+
+		for (DataField dataField : detachedPerson.getDataFields()) {
+			StructBlockID structBlockID = StructBlockID.create(dataField.getStructBlockOrganisationID(), dataField.getStructBlockID());
+
+			if (structBlockIDs.contains(structBlockID))
+				continue; // keep current; continue with next
+
+			if (structFieldIDs.contains(dataField.getStructFieldIDObj()))
+				continue; // keep current; continue with next
+
+			// if we come here, it needs to be removed => add it to our list
+			dataFieldsToFilter.add(dataField);
+		}
 
 		// remove all from the list
-		for (DataField dataField : dataFieldsToRemove)
+		for (DataField dataField : dataFieldsToFilter)
 			detachedPerson.internalRemoveDataFieldFromPersistentCollection(dataField);
+
+		Set<StructFieldID> nonFilteredStructFieldIDs = new HashSet<StructFieldID>();
+		detachedPerson.getNonPersistentUserObjectMap().put("nonFilteredStructFieldIDs", nonFilteredStructFieldIDs);
+		for (DataField dataField : detachedPerson.getDataFields())
+			nonFilteredStructFieldIDs.add(dataField.getStructFieldIDObj());
+
+		detachedPerson.deflate();
 	}
 
 	public static LegalEntity detachLegalEntity(PersistenceManager pm, LegalEntity legalEntity, Set<EndCustomerTransferPolicy> endCustomerTransferPolicies)
@@ -225,13 +241,21 @@ implements Serializable
 			pm.getFetchPlan().setMaxFetchDepth(NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
 
 			LegalEntity detached = pm.detachCopy(legalEntity);
-			removeNonTransferableFields(detached.getPerson(), endCustomerTransferPolicies);
+			removeNonTransferableFields(pm, detached.getPerson(), endCustomerTransferPolicies);
 			return detached;
 		} finally {
 			NLJDOHelper.restoreFetchPlan(pm.getFetchPlan(), fetchPlanBackup);
 		}
 	}
 
+	/**
+	 * Adds all those data-fields that are existing locally but have been actively filtered out of the
+	 * <code>detachedPerson</code>. This means {@link StructField}s that are known in the datastore
+	 * where the {@link Person} was detached but that are not in the {@link EndCustomerTransferPolicy}s.
+	 *
+	 * @param pm
+	 * @param detachedPerson
+	 */
 	private static void addExistingDataFields(PersistenceManager pm, Person detachedPerson)
 	{
 		if (JDOHelper.getPersistenceManager(detachedPerson) != null)
@@ -249,15 +273,18 @@ implements Serializable
 			return;
 		}
 
-		Collection<? extends DataField> detachedDataFields = detachedPerson.getDataFields();
+//		Collection<? extends DataField> detachedDataFields = detachedPerson.getDataFields();
+		Set<StructFieldID> nonFilteredStructFieldIDs = CollectionUtil.castSet((Set<?>) detachedPerson.getNonPersistentUserObjectMap().get("nonFilteredStructFieldIDs"));
 		for (DataField attachedDataField : attachedPerson.getDataFields()) {
-			if (!detachedDataFields.contains(attachedPerson))
+//			if (!detachedDataFields.contains(attachedDataField))
+			if (!nonFilteredStructFieldIDs.contains(attachedDataField.getStructFieldIDObj()))
 				detachedPerson.internalAddDataFieldToPersistentCollection(attachedDataField);
 		}
 	}
 
 	public static LegalEntity attachLegalEntity(PersistenceManager pm, LegalEntity legalEntity)
 	{
+		NLJDOHelper.makeDirtyAllFieldsRecursively(legalEntity);
 		addExistingDataFields(pm, legalEntity.getPerson());
 		return pm.makePersistent(legalEntity);
 	}

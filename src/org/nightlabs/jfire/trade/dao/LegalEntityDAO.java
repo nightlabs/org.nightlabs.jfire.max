@@ -36,6 +36,7 @@ import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.base.JFireEjbFactory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.base.jdo.IJDOObjectDAO;
+import org.nightlabs.jfire.person.Person;
 import org.nightlabs.jfire.prop.IStruct;
 import org.nightlabs.jfire.prop.PropertySet;
 import org.nightlabs.jfire.prop.dao.StructLocalDAO;
@@ -130,19 +131,28 @@ implements IJDOObjectDAO<LegalEntity>
 
 	private void inflatePerson(LegalEntity le)
 	{
-		if (le == null || le.getPerson() == null)
+		if (le == null)
 			return;
 
+		Person person;
+		try {
+			person = le.getPerson();
+		} catch (JDODetachedFieldAccessException e) {
+			return; // le.person was not detached -> return
+		}
+
+		if (person == null)
+			return; // LegalEntity doesn't have a Person assigned => return
+
 		IStruct struct = StructLocalDAO.sharedInstance().getStructLocal(
-				le.getPerson().getStructLocalObjectID(),
+				person.getStructLocalObjectID(),
 				new NullProgressMonitor()
 		);
 
 		try {
-			if (le.getPerson() != null)
-				le.getPerson().inflate(struct);
+			person.inflate(struct);
 		} catch (JDODetachedFieldAccessException e) {
-			// le.person was not detached -> no explosion, break
+			// le.person was detached INCOMPLETELY -> no explosion, break
 //			break; // why break? what about the others?
 		}
 	}

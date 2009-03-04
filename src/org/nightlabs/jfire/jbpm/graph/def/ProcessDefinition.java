@@ -142,7 +142,7 @@ implements Serializable
 			URL jbpmExtensionURL = null;
 			try {
 				// read the jbpm extension process file
-				jbpmExtensionURL = new URL(jbpmProcessDefinitionURL, "process-definition-extension.xml");
+				jbpmExtensionURL = new URL(jbpmProcessDefinitionURL, "processdefinition-extension.xml");
 				InputStream extensionIn = jbpmProcessDefinitionURL.openStream();
 				if (extensionIn != null && jbpmProcessDefinitionURL.openConnection().getContentLength()!= 0)
 				{	

@@ -1,85 +1,85 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <process-definition-extension xmlns="" name="dev.jfire.org:DeliveryNote.CustomerLocal">
 <start-state name="dev.jfire.org:created">
-<name language="de">created</name>
-<description language="de">created</description>
+<name language="de">erzeugt</name>
+<description language="de">erzeugt</description>
 <name language="en">created</name>
 <description language="en">created</description>
 <icon file=""/>
 <transition name="finalize">
-<name language="de">finalize</name>
-<description language="de">finalize</description>
+<name language="de">finalisieren</name>
+<description language="de">finalisieren</description>
 <name language="en">finalize</name>
 <description language="en">finalize</description>
 <icon file=""/>
 </transition>
 <transition name="abort">
-<name language="de">abort</name>
-<description language="de">abort</description>
+<name language="de">abbrechen</name>
+<description language="de">abbrechen</description>
 <name language="en">abort</name>
 <description language="en">abort</description>
 <icon file=""/>
 </transition>
 <transition name="dev.jfire.org:bookImplicitely">
-<name language="de">bookImplicitely</name>
-<description language="de">bookImplicitely</description>
+<name language="de">buchen-implizit</name>
+<description language="de">buchen-implizit</description>
 <name language="en">bookImplicitely</name>
 <description language="en">bookImplicitely</description>
 <icon file=""/>
 </transition>
 </start-state>
 <state name="dev.jfire.org:finalized">
-<name language="de">finalized</name>
-<description language="de">finalized</description>
+<name language="de">finalisiert</name>
+<description language="de">finalisiert</description>
 <name language="en">finalized</name>
 <description language="en">finalized</description>
 <icon file=""/>
 <transition name="dev.jfire.org:book">
-<name language="de">book</name>
-<description language="de">book</description>
+<name language="de">buchen</name>
+<description language="de">buchen</description>
 <name language="en">book</name>
 <description language="en">book</description>
 <icon file=""/>
 </transition>
 </state>
 <state name="dev.jfire.org:booked">
-<name language="de">booked</name>
-<description language="de">booked</description>
+<name language="de">gebucht</name>
+<description language="de">gebucht</description>
 <name language="en">booked</name>
 <description language="en">booked</description>
 <icon file=""/>
 <transition name="dev.jfire.org:send">
-<name language="de">send</name>
-<description language="de">send</description>
+<name language="de">senden</name>
+<description language="de">senden</description>
 <name language="en">send</name>
 <description language="en">send</description>
 <icon file=""/>
 </transition>
 <transition name="dev.jfire.org:deliver">
-<name language="de">deliver</name>
-<description language="de">deliver</description>
+<name language="de">liefern</name>
+<description language="de">liefern</description>
 <name language="en">deliver</name>
 <description language="en">deliver</description>
 <icon file=""/>
 </transition>
 </state>
 <end-state name="dev.jfire.org:aborted">
-<name language="de">aborted</name>
-<description language="de">aborted</description>
+<name language="de">abgebrochen</name>
+<description language="de">abgebrochen</description>
 <name language="en">aborted</name>
 <description language="en">aborted</description>
 <icon file=""/>
 </end-state>
 <end-state name="dev.jfire.org:delivered">
-<name language="de">delivered</name>
-<description language="de">delivered</description>
+<name language="de">geliefert</name>
+<description language="de">geliefert</description>
 <name language="en">delivered</name>
 <description language="en">delivered</description>
 <icon file=""/>
 </end-state>
 <node name="dev.jfire.org:sent">
-<name language="de">sent</name>
-<description language="de">sent</description>
+<name language="de">gesendet</name>
+<description language="de">gesendet</description>
 <name language="en">sent</name>
 <description language="en">sent</description>
 <icon file=""/>

@@ -1258,6 +1258,7 @@ implements SessionBean
 
 			IssueType issueType = new IssueType(getOrganisationID(), "Default");
 			issueType.getName().setText(Locale.ENGLISH.getLanguage(), "Default");
+			issueType.getName().setText(Locale.GERMAN.getLanguage(), "Standard");
 			issueType = pm.makePersistent(issueType);
 
 			// Create the statuses
@@ -1265,11 +1266,13 @@ implements SessionBean
 
 			issueSeverityType = new IssueSeverityType(getOrganisationID(), IssueSeverityType.ISSUE_SEVERITY_TYPE_MINOR);
 			issueSeverityType.getIssueSeverityTypeText().setText(Locale.ENGLISH.getLanguage(), "Minor");
+//			issueSeverityType.getIssueSeverityTypeText().setText(Locale.ENGLISH.getLanguage(), "Gering");
 			issueSeverityType = pm.makePersistent(issueSeverityType);
 			issueType.getIssueSeverityTypes().add(issueSeverityType);
 
 			issueSeverityType = new IssueSeverityType(getOrganisationID(), IssueSeverityType.ISSUE_SEVERITY_TYPE_MAJOR);
 			issueSeverityType.getIssueSeverityTypeText().setText(Locale.ENGLISH.getLanguage(), "Major");
+//			issueSeverityType.getIssueSeverityTypeText().setText(Locale.ENGLISH.getLanguage(), "Wichtig");
 			issueSeverityType = pm.makePersistent(issueSeverityType);
 			issueType.getIssueSeverityTypes().add(issueSeverityType);
 
@@ -1310,31 +1313,37 @@ implements SessionBean
 
 			issuePriority = new IssuePriority(getOrganisationID(), "None");
 			issuePriority.getIssuePriorityText().setText(Locale.ENGLISH.getLanguage(), "None");
+			issuePriority.getIssuePriorityText().setText(Locale.GERMAN.getLanguage(), "Keine");
 			issuePriority = pm.makePersistent(issuePriority);
 			issueType.getIssuePriorities().add(issuePriority);
 
 			issuePriority = new IssuePriority(getOrganisationID(), "Low");
 			issuePriority.getIssuePriorityText().setText(Locale.ENGLISH.getLanguage(), "Low");
+			issuePriority.getIssuePriorityText().setText(Locale.GERMAN.getLanguage(), "Gering");
 			issuePriority = pm.makePersistent(issuePriority);
 			issueType.getIssuePriorities().add(issuePriority);
 
 			issuePriority = new IssuePriority(getOrganisationID(), "Normal");
 			issuePriority.getIssuePriorityText().setText(Locale.ENGLISH.getLanguage(), "Normal");
+			issuePriority.getIssuePriorityText().setText(Locale.GERMAN.getLanguage(), "Normal");
 			issuePriority = pm.makePersistent(issuePriority);
 			issueType.getIssuePriorities().add(issuePriority);
 
 			issuePriority = new IssuePriority(getOrganisationID(), "High");
 			issuePriority.getIssuePriorityText().setText(Locale.ENGLISH.getLanguage(), "High");
+			issuePriority.getIssuePriorityText().setText(Locale.GERMAN.getLanguage(), "Hoch");
 			issuePriority = pm.makePersistent(issuePriority);
 			issueType.getIssuePriorities().add(issuePriority);
 
 			issuePriority = new IssuePriority(getOrganisationID(), "Urgent");
 			issuePriority.getIssuePriorityText().setText(Locale.ENGLISH.getLanguage(), "Urgent");
+			issuePriority.getIssuePriorityText().setText(Locale.GERMAN.getLanguage(), "Dringend");
 			issuePriority = pm.makePersistent(issuePriority);
 			issueType.getIssuePriorities().add(issuePriority);
 
 			issuePriority = new IssuePriority(getOrganisationID(), "Immediate");
 			issuePriority.getIssuePriorityText().setText(Locale.ENGLISH.getLanguage(), "Immediate");
+			issuePriority.getIssuePriorityText().setText(Locale.GERMAN.getLanguage(), "Umgehend");
 			issuePriority = pm.makePersistent(issuePriority);
 			issueType.getIssuePriorities().add(issuePriority);
 
@@ -1343,31 +1352,34 @@ implements SessionBean
 
 			issueResolution = new IssueResolution(getOrganisationID(), IssueResolution.ISSUE_RESOLUTION_ID_NOT_ASSIGNED.issueResolutionID);
 			issueResolution.getName().setText(Locale.ENGLISH.getLanguage(), "Not assigned");
+			issueResolution.getName().setText(Locale.GERMAN.getLanguage(), "Nicht zugewiesen");
 			issueResolution = pm.makePersistent(issueResolution);
 			issueType.getIssueResolutions().add(issueResolution);
 
 			issueResolution = new IssueResolution(getOrganisationID(), "Open");
 			issueResolution.getName().setText(Locale.ENGLISH.getLanguage(), "Open");
+			issueResolution.getName().setText(Locale.GERMAN.getLanguage(), "Offen");
 			issueResolution = pm.makePersistent(issueResolution);
 			issueType.getIssueResolutions().add(issueResolution);
 
 			issueResolution = new IssueResolution(getOrganisationID(), "Fixed");
 			issueResolution.getName().setText(Locale.ENGLISH.getLanguage(), "Fixed");
+			issueResolution.getName().setText(Locale.GERMAN.getLanguage(), "Gelöst");
 			issueResolution = pm.makePersistent(issueResolution);
 			issueType.getIssueResolutions().add(issueResolution);
 
 			issueResolution = new IssueResolution(getOrganisationID(), "Reopened");
-			issueResolution.getName().setText(Locale.ENGLISH.getLanguage(), "Reopened");
+			issueResolution.getName().setText(Locale.ENGLISH.getLanguage(), "Wiedereröffnet");
 			issueResolution = pm.makePersistent(issueResolution);
 			issueType.getIssueResolutions().add(issueResolution);
 
 			issueResolution = new IssueResolution(getOrganisationID(), "NotFixable");
-			issueResolution.getName().setText(Locale.ENGLISH.getLanguage(), "Not fixable");
+			issueResolution.getName().setText(Locale.ENGLISH.getLanguage(), "Nicht lösbar");
 			issueResolution = pm.makePersistent(issueResolution);
 			issueType.getIssueResolutions().add(issueResolution);
 
 			issueResolution = new IssueResolution(getOrganisationID(), "WillNotFix");
-			issueResolution.getName().setText(Locale.ENGLISH.getLanguage(), "Won't fix");
+			issueResolution.getName().setText(Locale.ENGLISH.getLanguage(), "Wird nicht gelöst");
 			issueResolution = pm.makePersistent(issueResolution);
 			issueType.getIssueResolutions().add(issueResolution);
 
@@ -1376,6 +1388,7 @@ implements SessionBean
 
 			issueType = new IssueType(getOrganisationID(), "Customer");
 			issueType.getName().setText(Locale.ENGLISH.getLanguage(), "Customer");
+			issueType.getName().setText(Locale.GERMAN.getLanguage(), "Kunde");
 			issueType = pm.makePersistent(issueType);
 
 			// Create the process definitions.
@@ -1386,21 +1399,25 @@ implements SessionBean
 
 			issueLinkType = new IssueLinkType(IssueLinkType.ISSUE_LINK_TYPE_ID_RELATED);
 			issueLinkType.getName().setText(Locale.ENGLISH.getLanguage(), "Related");
+			issueLinkType.getName().setText(Locale.GERMAN.getLanguage(), "Zugehörig");
 			issueLinkType.addLinkedObjectClass(Object.class);
 			issueLinkType = pm.makePersistent(issueLinkType);
 
 			issueLinkType = new IssueLinkTypeParentChild(IssueLinkTypeParentChild.ISSUE_LINK_TYPE_ID_PARENT);
 			issueLinkType.getName().setText(Locale.ENGLISH.getLanguage(), "Parent of");
+			issueLinkType.getName().setText(Locale.GERMAN.getLanguage(), "Übergeordnet zu");
 			issueLinkType.addLinkedObjectClass(Issue.class);
 			issueLinkType = pm.makePersistent(issueLinkType);
 
 			issueLinkType = new IssueLinkTypeParentChild(IssueLinkTypeParentChild.ISSUE_LINK_TYPE_ID_CHILD);
 			issueLinkType.getName().setText(Locale.ENGLISH.getLanguage(), "Child of");
+			issueLinkType.getName().setText(Locale.GERMAN.getLanguage(), "Untergeordnet zu");
 			issueLinkType.addLinkedObjectClass(Issue.class);
 			issueLinkType = pm.makePersistent(issueLinkType);
 
 			issueLinkType = new IssueLinkTypeDuplicate(IssueLinkTypeDuplicate.ISSUE_LINK_TYPE_ID_DUPLICATE);
 			issueLinkType.getName().setText(Locale.ENGLISH.getLanguage(), "Duplicate");
+			issueLinkType.getName().setText(Locale.GERMAN.getLanguage(), "Duplikat");
 			issueLinkType.addLinkedObjectClass(Issue.class);
 			issueLinkType = pm.makePersistent(issueLinkType);
 
@@ -1409,6 +1426,7 @@ implements SessionBean
 
 			ProjectType projectType1 = new ProjectType(ProjectType.PROJECT_TYPE_ID_DEFAULT);
 			projectType1.getName().setText(Locale.ENGLISH.getLanguage(), "Default");
+			projectType1.getName().setText(Locale.GERMAN.getLanguage(), "Standard");
 			projectType1 = pm.makePersistent(projectType1);
 
 			ProjectType projectType2 = new ProjectType(IDGenerator.getOrganisationID(), "cross ticket");
@@ -1426,6 +1444,7 @@ implements SessionBean
 
 			project = new Project(Project.PROJECT_ID_DEFAULT);
 			project.getName().setText(Locale.ENGLISH.getLanguage(), "Default");
+			project.getName().setText(Locale.GERMAN.getLanguage(), "Standard");
 			project.setProjectType(projectType1);
 			project = pm.makePersistent(project);
 

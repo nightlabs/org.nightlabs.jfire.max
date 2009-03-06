@@ -70,6 +70,8 @@ implements Serializable, Comparable<IssueType>
 	public static final String FETCH_GROUP_PROCESS_DEFINITION = "IssueType.processDefinition";
 
 	public static final String QUERY_ALL_ISSUETYPE_IDS = "getAllIssueTypeIDs";
+	
+	public static final String DEFAULT_ISSUE_TYPE_ID = "Default"; 
 
 	/**
 	 * This is the organisationID to which the issue type belongs. Within one organisation,
@@ -139,6 +141,11 @@ implements Serializable, Comparable<IssueType>
 	 */
 	private ProcessDefinition processDefinition;
 
+	/**
+	 * @jdo.field
+	 *		persistence-modifier="persistent"
+	 */
+	private boolean isDefault;
 	/**
 	 * @deprecated Only for JDO!!!! 
 	 */

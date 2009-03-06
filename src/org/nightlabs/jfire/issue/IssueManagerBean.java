@@ -1256,7 +1256,7 @@ implements SessionBean
 					JFireIssueTrackingEAR.MODULE_NAME, "0.9.5.0.0.beta", "0.9.5.0.0.beta")
 			);
 
-			IssueType issueType = new IssueType(getOrganisationID(), "Default");
+			IssueType issueType = new IssueType(getOrganisationID(), IssueType.DEFAULT_ISSUE_TYPE_ID);
 			issueType.getName().setText(Locale.ENGLISH.getLanguage(), "Default");
 			issueType.getName().setText(Locale.GERMAN.getLanguage(), "Standard");
 			issueType = pm.makePersistent(issueType);

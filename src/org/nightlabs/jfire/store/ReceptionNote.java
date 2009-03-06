@@ -53,6 +53,7 @@ import org.nightlabs.util.Util;
  *
  * @jdo.fetch-group name="ArticleContainer.customer" fields="customer"
  * @jdo.fetch-group name="ArticleContainer.vendor" fields="vendor"
+ * @jdo.fetch-group name="ArticleContainer.endCustomer" fields="endCustomer"
  *
  * @jdo.fetch-group name="ReceptionNote.articles" fields="articles"
  * @jdo.fetch-group name="ReceptionNote.this" fetch-groups="default" fields="receptionNoteLocal, articles, createDT, createUser, state, states";

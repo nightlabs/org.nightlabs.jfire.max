@@ -840,11 +840,11 @@ implements SessionBean
 	 * @ejb.permission role-name="org.nightlabs.jfire.trade.queryOrders"
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
-	public List<OrderID> getOrderIDs(Class<? extends Order> orderClass, boolean subclasses, AnchorID vendorID, AnchorID customerID, long rangeBeginIdx, long rangeEndIdx)
+	public List<OrderID> getOrderIDs(Class<? extends Order> orderClass, boolean subclasses, AnchorID vendorID, AnchorID customerID, AnchorID endCustomerID, long rangeBeginIdx, long rangeEndIdx)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			return new ArrayList<OrderID>(Order.getOrderIDs(pm, orderClass, subclasses,vendorID, customerID, rangeBeginIdx, rangeEndIdx));
+			return new ArrayList<OrderID>(Order.getOrderIDs(pm, orderClass, subclasses,vendorID, customerID, endCustomerID, rangeBeginIdx, rangeEndIdx));
 		} finally {
 			pm.close();
 		}

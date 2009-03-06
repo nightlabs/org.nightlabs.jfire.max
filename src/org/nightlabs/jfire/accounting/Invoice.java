@@ -32,7 +32,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -86,13 +85,26 @@ import org.nightlabs.util.Util;
  * @jdo.query
  *		name="getInvoiceIDsByVendorAndCustomer"
  *		query="SELECT JDOHelper.getObjectId(this)
- *			WHERE vendor.organisationID == paramVendorID_organisationID &&
- *            vendor.anchorID == paramVendorID_anchorID &&
- *			      customer.organisationID == paramCustomerID_organisationID &&
- *            customer.anchorID == paramCustomerID_anchorID
- *			PARAMETERS String paramVendorID_organisationID, String paramVendorID_anchorID,
- *                 String paramCustomerID_organisationID, String paramCustomerID_anchorID
- *			import java.lang.String
+ *          WHERE
+ *            JDOHelper.getObjectId(vendor) == :vendorID &&
+ *            JDOHelper.getObjectId(customer) == :customerID
+ *			ORDER BY invoiceID DESC"
+ *
+ * @jdo.query
+ *		name="getInvoiceIDsByVendorAndEndCustomer"
+ *		query="SELECT JDOHelper.getObjectId(this)
+ *          WHERE
+ *            JDOHelper.getObjectId(vendor) == :vendorID &&
+ *            JDOHelper.getObjectId(endCustomer) == :customerID
+ *			ORDER BY invoiceID DESC"
+ *
+ * @jdo.query
+ *		name="getInvoiceIDsByVendorAndCustomerAndEndCustomer"
+ *		query="SELECT JDOHelper.getObjectId(this)
+ *          WHERE
+ *            JDOHelper.getObjectId(vendor) == :vendorID &&
+ *            JDOHelper.getObjectId(customer) == :customerID &&
+ *            JDOHelper.getObjectId(endCustomer) == :endCustomerID
  *			ORDER BY invoiceID DESC"
  *
  * @jdo.query
@@ -121,7 +133,7 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="ArticleContainer.vendor" fields="vendor"
  * @jdo.fetch-group name="ArticleContainer.endCustomer" fields="endCustomer"
  *
- * @jdo.fetch-group name="FetchGroupsTrade.articleContainerInEditor" fields="invoiceLocal, createUser, currency, customer, discount, finalizeUser, price, vendor, state, states"
+ * @jdo.fetch-group name="FetchGroupsTrade.articleContainerInEditor" fields="invoiceLocal, createUser, currency, customer, endCustomer, discount, finalizeUser, price, vendor, state, states"
  *
  * @jdo.fetch-group name="Statable.state" fields="state"
  * @jdo.fetch-group name="Statable.states" fields="states"
@@ -155,14 +167,25 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	 * @param rangeEndIdx Either -1, if no range shall be specified, or a positive number (incl. 0) defining the index where the range shall end (exclusive).
 	 * @return Returns instances of {@link Invoice}.
 	 */
-	public static List<InvoiceID> getInvoiceIDs(PersistenceManager pm, AnchorID vendorID, AnchorID customerID, long rangeBeginIdx, long rangeEndIdx)
+	public static List<InvoiceID> getInvoiceIDs(PersistenceManager pm, AnchorID vendorID, AnchorID customerID, AnchorID endCustomerID, long rangeBeginIdx, long rangeEndIdx)
 	{
-		Query query = pm.newNamedQuery(Invoice.class, "getInvoiceIDsByVendorAndCustomer");
+		if (customerID != null && endCustomerID != null) {
+			Query query = pm.newNamedQuery(Invoice.class, "getInvoiceIDsByVendorAndCustomerAndEndCustomer");
+			Map<String, Object> params = new HashMap<String, Object>();
+			params.put("vendorID", vendorID);
+			params.put("customerID", customerID);
+			params.put("endCustomerID", endCustomerID);
+
+			if (rangeBeginIdx >= 0 && rangeEndIdx >= 0)
+				query.setRange(rangeBeginIdx, rangeEndIdx);
+
+			return CollectionUtil.castList((List<?>) query.executeWithMap(params));
+		}
+
+		Query query = pm.newNamedQuery(Invoice.class, endCustomerID == null ? "getInvoiceIDsByVendorAndCustomer" : "getInvoiceIDsByVendorAndEndCustomer");
 		Map<String, Object> params = new HashMap<String, Object>();
-		params.put("paramVendorID_organisationID", vendorID.organisationID);
-		params.put("paramVendorID_anchorID", vendorID.anchorID);
-		params.put("paramCustomerID_organisationID", customerID.organisationID);
-		params.put("paramCustomerID_anchorID", customerID.anchorID);
+		params.put("vendorID", vendorID);
+		params.put("customerID", endCustomerID != null ? endCustomerID : customerID);
 
 		if (rangeBeginIdx >= 0 && rangeEndIdx >= 0)
 			query.setRange(rangeBeginIdx, rangeEndIdx);
@@ -519,8 +542,7 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 		price.clearFragments();
 		price.setAmount(0);
 
-		for (Iterator it = articles.iterator(); it.hasNext(); ) {
-			Article article = (Article)it.next();
+		for (Article article : articles) {
 			price.sumPrice(article.getPrice());
 		}
 	}

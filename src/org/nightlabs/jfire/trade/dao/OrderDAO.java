@@ -21,14 +21,15 @@ import org.nightlabs.jfire.trade.TradeManager;
 import org.nightlabs.jfire.trade.id.OrderID;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 import org.nightlabs.progress.ProgressMonitor;
+import org.nightlabs.util.CollectionUtil;
 
 /**
  * Accessor for {@link Order} instances.
- * 
+ *
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
  */
 public class OrderDAO extends BaseJDOObjectDAO<OrderID, Order> {
-	
+
 	private static OrderDAO sharedInstance = null;
 
 	/**
@@ -62,7 +63,7 @@ public class OrderDAO extends BaseJDOObjectDAO<OrderID, Order> {
 
 	/**
 	 * Get the detached {@link Order} for the given {@link OrderID} using the cache.
-	 * 
+	 *
 	 * @param orderID The {@link OrderID} to get the {@link Order} for.
 	 * @param fetchGroups The fetch-groups to detach the result with.
 	 * @param maxFetchDepth The max fetch-depth to detach the result with.
@@ -76,7 +77,7 @@ public class OrderDAO extends BaseJDOObjectDAO<OrderID, Order> {
 
 	/**
 	 * Obtain the detached {@link Order}s for the given {@link OrderID}s using the cache.
-	 *  
+	 *
 	 * @param orderIDs The {@link OrderID}s to get {@link Order}s for.
 	 * @param fetchGroups The fetch-groups to detach the result with.
 	 * @param maxFetchDepth The max fetch-depth to detach the result with.
@@ -90,7 +91,7 @@ public class OrderDAO extends BaseJDOObjectDAO<OrderID, Order> {
 
 	/**
 	 * Get the detached results of the given query-collection.
-	 * 
+	 *
 	 * @param queries The queries used to search for the orders.
 	 * @param fetchGroups The fetch-groups to detach the result with.
 	 * @param maxFetchDepth The max fetch-depth to detach the result with.
@@ -102,7 +103,7 @@ public class OrderDAO extends BaseJDOObjectDAO<OrderID, Order> {
 			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) {
 		try {
 			TradeManager tm = JFireEjbFactory.getBean(TradeManager.class, SecurityReflector.getInitialContextProperties());
-			Set<OrderID> orderIDs = tm.getOrderIDs(queries);
+			Set<OrderID> orderIDs = CollectionUtil.castSet(tm.getOrderIDs(queries));
 
 			return getJDOObjects(null, orderIDs, fetchGroups, maxFetchDepth, monitor);
 		} catch (Exception e) {
@@ -116,33 +117,34 @@ public class OrderDAO extends BaseJDOObjectDAO<OrderID, Order> {
 	 * using the Cache.
 	 * <p>
 	 * Note that this method will return only {@link Order}s of the class {@link Order} not including subclasses
-	 * </p> 
-	 * 
+	 * </p>
+	 *
 	 * @param vendorID The ID specifying the vendor (which must be a {@link LegalEntity}).
 	 * @param customerID The ID specifying the customer (which must be a {@link LegalEntity}).
-	 * @param rangeBeginIdx Either -1, if no range shall be specified, or a positive number (incl. 0) defining the index where the range shall begin (inclusive). 
+	 * @param endCustomerID TODO
+	 * @param rangeBeginIdx Either -1, if no range shall be specified, or a positive number (incl. 0) defining the index where the range shall begin (inclusive).
 	 * @param rangeEndIdx Either -1, if no range shall be specified, or a positive number (incl. 0) defining the index where the range shall end (exclusive).
 	 * @param fetchGroups The fetch-groups to detach the result with.
 	 * @param maxFetchDepth The max fetch-depth to detach the result with.
 	 * @param monitor The monitor to use to report progress.
 	 * @return The {@link Order}s (of the given class) for the given vendor and owner.
 	 */
-	@SuppressWarnings("unchecked")//$NON-NLS-1$
 	public List<Order> getOrders(AnchorID vendorID, AnchorID customerID,
-			long rangeBeginIdx, long rangeEndIdx, String[] fetchGroups,
-			int maxFetchDepth, ProgressMonitor monitor) {
-		return getOrders(Order.class, false, vendorID, customerID, rangeBeginIdx, rangeEndIdx, fetchGroups, maxFetchDepth, monitor);
+			AnchorID endCustomerID, long rangeBeginIdx, long rangeEndIdx,
+			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) {
+		return getOrders(Order.class, false, vendorID, customerID, endCustomerID, rangeBeginIdx, rangeEndIdx, fetchGroups, maxFetchDepth, monitor);
 	}
 
 	/**
 	 * Queries the OrderIDs for the given vendor and customer from the server and returns the {@link Order} instances
 	 * using the Cache.
-	 * 
-	 * @param orderClass The class of {@link Order}s to fetch. 
+	 *
+	 * @param orderClass The class of {@link Order}s to fetch.
 	 * @param subclasses Whether to include subclasses of the given orderClass.
 	 * @param vendorID The ID specifying the vendor (which must be a {@link LegalEntity}).
 	 * @param customerID The ID specifying the customer (which must be a {@link LegalEntity}).
-	 * @param rangeBeginIdx Either -1, if no range shall be specified, or a positive number (incl. 0) defining the index where the range shall begin (inclusive). 
+	 * @param endCustomerID TODO
+	 * @param rangeBeginIdx Either -1, if no range shall be specified, or a positive number (incl. 0) defining the index where the range shall begin (inclusive).
 	 * @param rangeEndIdx Either -1, if no range shall be specified, or a positive number (incl. 0) defining the index where the range shall end (exclusive).
 	 * @param fetchGroups The fetch-groups to detach the result with.
 	 * @param maxFetchDepth The max fetch-depth to detach the result with.
@@ -151,11 +153,11 @@ public class OrderDAO extends BaseJDOObjectDAO<OrderID, Order> {
 	 */
 	@SuppressWarnings("unchecked")//$NON-NLS-1$
 	public List<Order> getOrders(Class<? extends Order> orderClass, boolean subclasses, AnchorID vendorID, AnchorID customerID,
-			long rangeBeginIdx, long rangeEndIdx, String[] fetchGroups,
-			int maxFetchDepth, ProgressMonitor monitor) {
+			AnchorID endCustomerID, long rangeBeginIdx, long rangeEndIdx,
+			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) {
 		try {
 			TradeManager tm = JFireEjbFactory.getBean(TradeManager.class, SecurityReflector.getInitialContextProperties());
-			List<OrderID> orderIDList = tm.getOrderIDs(orderClass, subclasses, vendorID, customerID, rangeBeginIdx, rangeEndIdx);
+			List<OrderID> orderIDList = tm.getOrderIDs(orderClass, subclasses, vendorID, customerID, endCustomerID, rangeBeginIdx, rangeEndIdx);
 			Set<OrderID> orderIDs = new HashSet<OrderID>(orderIDList);
 
 			Map<OrderID, Order> orderMap = new HashMap<OrderID, Order>(orderIDs.size());

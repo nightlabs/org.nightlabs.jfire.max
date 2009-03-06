@@ -213,7 +213,7 @@ implements SessionBean
 			}
 
 			initRegisterConfigModules(pm);
-			
+
 			// check, whether the datastore is already initialized
 			pm.getExtent(Currency.class);
 			try {
@@ -458,8 +458,8 @@ implements SessionBean
 	/**
 	 * Called by {@link #initialise()} and registeres the
 	 * config-modules in their config-setup.
-	 * 
-	 * This method checks itself whether initialisation 
+	 *
+	 * This method checks itself whether initialisation
 	 * was performed already and therefore can be safely
 	 * called anytime in the process.
 	 */
@@ -474,9 +474,9 @@ implements SessionBean
 			);
 		if (!configSetup.getConfigModuleClasses().contains(ModeOfPaymentConfigModule.class.getName())) {
 			configSetup.getConfigModuleClasses().add(ModeOfPaymentConfigModule.class.getName());
-			needsUpdate = true; 
+			needsUpdate = true;
 		}
-		
+
 		// Register all Workstation - ConfigModules
 		configSetup = ConfigSetup.getConfigSetup(
 				pm,
@@ -490,7 +490,7 @@ implements SessionBean
 		if (needsUpdate)
 			ConfigSetup.ensureAllPrerequisites(pm);
 	}
-	
+
 	/**
 	 * Get the object-ids of all existing {@link TariffMapping}s.
 	 * <p>
@@ -1820,11 +1820,11 @@ implements SessionBean
 	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.queryInvoices"
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
-	public List<InvoiceID> getInvoiceIDs(AnchorID vendorID, AnchorID customerID, long rangeBeginIdx, long rangeEndIdx)
+	public List<InvoiceID> getInvoiceIDs(AnchorID vendorID, AnchorID customerID, AnchorID endCustomerID, long rangeBeginIdx, long rangeEndIdx)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			return new ArrayList<InvoiceID>(Invoice.getInvoiceIDs(pm, vendorID, customerID, rangeBeginIdx, rangeEndIdx));
+			return new ArrayList<InvoiceID>(Invoice.getInvoiceIDs(pm, vendorID, customerID, endCustomerID, rangeBeginIdx, rangeEndIdx));
 //			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 //			if (fetchGroups != null)
 //			pm.getFetchPlan().setGroups(fetchGroups);
@@ -1863,10 +1863,10 @@ implements SessionBean
 	 *
 	 * @param customerGroupIDs A <tt>Collection</tt> of {@link CustomerGroupID}. If <tt>null</tt>, all {@link ModeOfPaymentFlavour}s will be returned.
 	 * @param mergeMode one of {@link ModeOfPaymentFlavour#MERGE_MODE_INTERSECTION} or {@link ModeOfPaymentFlavour#MERGE_MODE_UNION}
-	 * @param filterByConfig 
-	 * 		If this is <code>true</code> the flavours available found for the given customer-groups will also be filtered by the 
-	 * 		intersection of the entries configured in the {@link ModeOfPaymentConfigModule} for the current user and the 
-	 * 		workstation he is currently loggen on. 
+	 * @param filterByConfig
+	 * 		If this is <code>true</code> the flavours available found for the given customer-groups will also be filtered by the
+	 * 		intersection of the entries configured in the {@link ModeOfPaymentConfigModule} for the current user and the
+	 * 		workstation he is currently loggen on.
 	 * @param fetchGroups Either <tt>null</tt> or all desired fetch groups.
 	 *
 	 * @ejb.interface-method

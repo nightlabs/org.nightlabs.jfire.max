@@ -84,7 +84,21 @@ import org.nightlabs.util.Util;
  *		query="SELECT JDOHelper.getObjectId(this)
  *			WHERE JDOHelper.getObjectId(vendor) == :vendorID &&
  *			      JDOHelper.getObjectId(customer) == :customerID
- *			import org.nightlabs.jfire.transfer.id.AnchorID
+ *			ORDER BY orderID DESC"
+ *
+ * @jdo.query
+ *		name="getOrderIDsByVendorAndEndCustomer"
+ *		query="SELECT JDOHelper.getObjectId(this)
+ *			WHERE JDOHelper.getObjectId(vendor) == :vendorID &&
+ *			      JDOHelper.getObjectId(endCustomer) == :customerID
+ *			ORDER BY orderID DESC"
+ *
+ * @jdo.query
+ *		name="getOrderIDsByVendorAndCustomerAndEndCustomer"
+ *		query="SELECT JDOHelper.getObjectId(this)
+ *			WHERE JDOHelper.getObjectId(vendor) == :vendorID &&
+ *			      JDOHelper.getObjectId(customer) == :customerID &&
+ *			      JDOHelper.getObjectId(endCustomer) == :endCustomerID
  *			ORDER BY orderID DESC"
  *
  * @!jdo.query
@@ -131,7 +145,7 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="ArticleContainer.customer" fields="customer"
  * @jdo.fetch-group name="ArticleContainer.endCustomer" fields="endCustomer"
  *
- * @jdo.fetch-group name="FetchGroupsTrade.articleContainerInEditor" fields="vendor, currency, customer, customerGroup, segments, offers, createUser, changeUser"
+ * @jdo.fetch-group name="FetchGroupsTrade.articleContainerInEditor" fields="vendor, currency, customer, endCustomer, customerGroup, segments, offers, createUser, changeUser"
  */
 public class Order
 implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
@@ -164,13 +178,27 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 	 * @return Returns instances of {@link Order}.
 	 */
 	@SuppressWarnings("unchecked")
-	public static List<OrderID> getOrderIDs(PersistenceManager pm, Class<? extends Order> orderClass, boolean subclasses, AnchorID vendorID, AnchorID customerID, long rangeBeginIdx, long rangeEndIdx)
+	public static List<OrderID> getOrderIDs(PersistenceManager pm, Class<? extends Order> orderClass, boolean subclasses, AnchorID vendorID, AnchorID customerID, AnchorID endCustomerID, long rangeBeginIdx, long rangeEndIdx)
 	{
-		Query query = pm.newNamedQuery(Order.class, "getOrderIDsByVendorAndCustomer");
+		if (customerID != null && endCustomerID != null) {
+			Query query = pm.newNamedQuery(Order.class, "getOrderIDsByVendorAndCustomerAndEndCustomer");
+			query.setCandidates(pm.getExtent(orderClass, subclasses));
+			Map params = new HashMap();
+			params.put("vendorID", vendorID);
+			params.put("customerID", customerID);
+			params.put("endCustomerID", endCustomerID);
+
+			if (rangeBeginIdx >= 0 && rangeEndIdx >= 0)
+				query.setRange(rangeBeginIdx, rangeEndIdx);
+
+			return (List<OrderID>) query.executeWithMap(params);
+		}
+
+		Query query = pm.newNamedQuery(Order.class, endCustomerID == null ? "getOrderIDsByVendorAndCustomer" : "getOrderIDsByVendorAndEndCustomer");
 		query.setCandidates(pm.getExtent(orderClass, subclasses));
 		Map params = new HashMap();
 		params.put("vendorID", vendorID);
-		params.put("customerID", customerID);
+		params.put("customerID", endCustomerID != null ? endCustomerID : customerID);
 
 		if (rangeBeginIdx >= 0 && rangeEndIdx >= 0)
 			query.setRange(rangeBeginIdx, rangeEndIdx);

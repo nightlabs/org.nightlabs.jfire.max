@@ -89,14 +89,28 @@ import org.nightlabs.util.Util;
  * @jdo.query
  *		name="getDeliveryNoteIDsByVendorAndCustomer"
  *		query="SELECT JDOHelper.getObjectId(this)
- *			WHERE vendor.organisationID == paramVendorID_organisationID &&
- *            vendor.anchorID == paramVendorID_anchorID &&
- *			      customer.organisationID == paramCustomerID_organisationID &&
- *            customer.anchorID == paramCustomerID_anchorID
- *			PARAMETERS String paramVendorID_organisationID, String paramVendorID_anchorID,
- *                 String paramCustomerID_organisationID, String paramCustomerID_anchorID
- *			import java.lang.String
+ *			WHERE
+ *            JDOHelper.getObjectId(vendor) == :vendorID &&
+ *            JDOHelper.getObjectId(customer) == :customerID
  *			ORDER BY deliveryNoteID DESC"
+ *
+ * @jdo.query
+ *		name="getDeliveryNoteIDsByVendorAndEndCustomer"
+ *		query="SELECT JDOHelper.getObjectId(this)
+ *			WHERE
+ *            JDOHelper.getObjectId(vendor) == :vendorID &&
+ *            JDOHelper.getObjectId(endCustomer) == :customerID
+ *			ORDER BY deliveryNoteID DESC"
+ *
+ * @jdo.query
+ *		name="getDeliveryNoteIDsByVendorAndCustomerAndEndCustomer"
+ *		query="SELECT JDOHelper.getObjectId(this)
+ *			WHERE
+ *            JDOHelper.getObjectId(vendor) == :vendorID &&
+ *            JDOHelper.getObjectId(customer) == :customerID &&
+ *            JDOHelper.getObjectId(endCustomer) == :endCustomerID
+ *			ORDER BY deliveryNoteID DESC"
+
  *
  * @jdo.query
  *		name="getNonFinalizedDeliveryNotesByVendorAndCustomer"
@@ -121,7 +135,7 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="ArticleContainer.customer" fields="customer"
  * @jdo.fetch-group name="ArticleContainer.endCustomer" fields="endCustomer"
  *
- * @jdo.fetch-group name="FetchGroupsTrade.articleContainerInEditor" fields="deliveryNoteLocal, articles, createUser, customer, finalizeUser, vendor, state, states"
+ * @jdo.fetch-group name="FetchGroupsTrade.articleContainerInEditor" fields="deliveryNoteLocal, articles, createUser, customer, endCustomer, finalizeUser, vendor, state, states"
  *
  * @jdo.fetch-group name="Statable.state" fields="state"
  * @jdo.fetch-group name="Statable.states" fields="states"
@@ -160,32 +174,42 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	 * @param rangeEndIdx Either -1, if no range shall be specified, or a positive number (incl. 0) defining the index where the range shall end (exclusive).
 	 * @return Returns instances of {@link DeliveryNote}.
 	 */
-	@SuppressWarnings("unchecked")
-	public static List<DeliveryNoteID> getDeliveryNoteIDs(PersistenceManager pm, AnchorID vendorID, AnchorID customerID, long rangeBeginIdx, long rangeEndIdx)
+	public static List<DeliveryNoteID> getDeliveryNoteIDs(PersistenceManager pm, AnchorID vendorID, AnchorID customerID, AnchorID endCustomerID, long rangeBeginIdx, long rangeEndIdx)
 	{
-		Query query = pm.newNamedQuery(DeliveryNote.class, "getDeliveryNoteIDsByVendorAndCustomer");
-		Map params = new HashMap();
-		params.put("paramVendorID_organisationID", vendorID.organisationID);
-		params.put("paramVendorID_anchorID", vendorID.anchorID);
-		params.put("paramCustomerID_organisationID", customerID.organisationID);
-		params.put("paramCustomerID_anchorID", customerID.anchorID);
+		if (customerID != null && endCustomerID != null) {
+			Query query = pm.newNamedQuery(DeliveryNote.class, "getDeliveryNoteIDsByVendorAndCustomerAndEndCustomer");
+			Map<String, Object> params = new HashMap<String, Object>();
+			params.put("vendorID", vendorID);
+			params.put("customerID", customerID);
+			params.put("endCustomerID", endCustomerID);
+
+			if (rangeBeginIdx >= 0 && rangeEndIdx >= 0)
+				query.setRange(rangeBeginIdx, rangeEndIdx);
+
+			return CollectionUtil.castList((List<?>) query.executeWithMap(params));
+		}
+
+		Query query = pm.newNamedQuery(DeliveryNote.class, endCustomerID == null ? "getDeliveryNoteIDsByVendorAndCustomer" : "getDeliveryNoteIDsByVendorAndEndCustomer");
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("vendorID", vendorID);
+		params.put("customerID", endCustomerID != null ? endCustomerID : customerID);
 
 		if (rangeBeginIdx >= 0 && rangeEndIdx >= 0)
 			query.setRange(rangeBeginIdx, rangeEndIdx);
 
-		return (List<DeliveryNoteID>) query.executeWithMap(params);
+		return CollectionUtil.castList((List<?>) query.executeWithMap(params));
 	}
 
-	public static List getNonFinalizedDeliveryNotes(PersistenceManager pm, AnchorID vendorID, AnchorID customerID)
+	public static List<DeliveryNote> getNonFinalizedDeliveryNotes(PersistenceManager pm, AnchorID vendorID, AnchorID customerID)
 	{
 		Query query = pm.newNamedQuery(DeliveryNote.class, "getNonFinalizedDeliveryNotesByVendorAndCustomer");
-		Map params = new HashMap();
+		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("paramVendorID_organisationID", vendorID.organisationID);
 		params.put("paramVendorID_anchorID", vendorID.anchorID);
 		params.put("paramCustomerID_organisationID", customerID.organisationID);
 		params.put("paramCustomerID_anchorID", customerID.anchorID);
 
-		return (List) query.executeWithMap(params);
+		return CollectionUtil.castList((List<?>) query.executeWithMap(params));
 	}
 
 	/**

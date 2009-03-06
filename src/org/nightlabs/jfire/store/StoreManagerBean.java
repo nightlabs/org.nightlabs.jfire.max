@@ -1731,11 +1731,11 @@ implements SessionBean
 	 * @ejb.permission role-name="org.nightlabs.jfire.store.queryDeliveryNotes"
 	 * @ejb.transaction type="Required"
 	 */
-	public List<DeliveryNoteID> getDeliveryNoteIDs(AnchorID vendorID, AnchorID customerID, long rangeBeginIdx, long rangeEndIdx)
+	public List<DeliveryNoteID> getDeliveryNoteIDs(AnchorID vendorID, AnchorID customerID, AnchorID endCustomerID, long rangeBeginIdx, long rangeEndIdx)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			return new ArrayList<DeliveryNoteID>(DeliveryNote.getDeliveryNoteIDs(pm, vendorID, customerID, rangeBeginIdx, rangeEndIdx));
+			return new ArrayList<DeliveryNoteID>(DeliveryNote.getDeliveryNoteIDs(pm, vendorID, customerID, endCustomerID, rangeBeginIdx, rangeEndIdx));
 		} finally {
 			pm.close();
 		}

@@ -20,6 +20,7 @@ import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.trade.query.InvoiceQuery;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 import org.nightlabs.progress.ProgressMonitor;
+import org.nightlabs.util.CollectionUtil;
 
 public class InvoiceDAO
 		extends BaseJDOObjectDAO<InvoiceID, Invoice>
@@ -43,7 +44,7 @@ public class InvoiceDAO
 			throws Exception
 	{
 		AccountingManager am = JFireEjbFactory.getBean(AccountingManager.class, SecurityReflector.getInitialContextProperties());
-		return am.getInvoices(invoiceIDs, fetchGroups, maxFetchDepth);
+		return CollectionUtil.castCollection(am.getInvoices(invoiceIDs, fetchGroups, maxFetchDepth));
 	}
 
 	public Invoice getInvoice(InvoiceID invoiceID, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
@@ -57,14 +58,13 @@ public class InvoiceDAO
 	}
 
 
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	public List<Invoice> getInvoices(
-			AnchorID vendorID, AnchorID customerID, long rangeBeginIdx, long rangeEndIdx,
+			AnchorID vendorID, AnchorID customerID, AnchorID endCustomerID, long rangeBeginIdx, long rangeEndIdx,
 			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
 		try {
 			AccountingManager am = JFireEjbFactory.getBean(AccountingManager.class, SecurityReflector.getInitialContextProperties());
-			List<InvoiceID> invoiceIDList = am.getInvoiceIDs(vendorID, customerID, rangeBeginIdx, rangeEndIdx);
+			List<InvoiceID> invoiceIDList = CollectionUtil.castList(am.getInvoiceIDs(vendorID, customerID, endCustomerID, rangeBeginIdx, rangeEndIdx));
 			Set<InvoiceID> invoiceIDs = new HashSet<InvoiceID>(invoiceIDList);
 
 			Map<InvoiceID, Invoice> invoiceMap = new HashMap<InvoiceID, Invoice>(invoiceIDs.size());
@@ -89,7 +89,7 @@ public class InvoiceDAO
 	{
 		try {
 			AccountingManager accountingManager = JFireEjbFactory.getBean(AccountingManager.class, SecurityReflector.getInitialContextProperties());
-			Set<InvoiceID> invoiceIDs = accountingManager.getInvoiceIDs(queries);
+			Set<InvoiceID> invoiceIDs = CollectionUtil.castSet(accountingManager.getInvoiceIDs(queries));
 			return InvoiceDAO.sharedInstance().getInvoices(
 				invoiceIDs,
 				fetchGroups,

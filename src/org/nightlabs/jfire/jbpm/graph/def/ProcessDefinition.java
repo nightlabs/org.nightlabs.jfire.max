@@ -145,9 +145,8 @@ implements Serializable
 				// read the jbpm extension process file
 				jbpmExtensionURL = new URL(jbpmProcessDefinitionURL, "processdefinition-extension.xml");
 				InputStream extensionInput = jbpmExtensionURL.openStream();
-				// a simple check to throws I/O exception if file doesnt exist.
-				jbpmExtensionURL.openConnection().getInputStream(); 
-				if (extensionInput != null)
+				// a simple check to throws I/O exception if file doesnt exist.			
+				if (jbpmExtensionURL.openConnection().getInputStream()!= null)
 				{
 					try {		
 						Reader extensionReader = new InputStreamReader(extensionInput);

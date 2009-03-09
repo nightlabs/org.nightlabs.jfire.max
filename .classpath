@@ -16,7 +16,11 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireScripting"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireSimpleTrade"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireTrade"/>
-	<classpathentry kind="var" path="JDO2" sourcepath="/JDO2"/>
+	<classpathentry kind="var" path="JDO2" sourcepath="/JDO2_SRC">
+		<attributes>
+			<attribute name="javadoc_location" value="http://db.apache.org/jdo/api22/apidocs/"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireBase"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/NightLabsBase"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireServerManager"/>

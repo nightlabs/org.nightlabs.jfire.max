@@ -20,6 +20,7 @@ import org.apache.log4j.Logger;
 import org.jbpm.JbpmContext;
 import org.jbpm.graph.def.Node;
 import org.jbpm.jpdl.xml.JpdlXmlReader;
+import org.nightlabs.i18n.I18nTextBuffer;
 import org.nightlabs.jfire.jbpm.JbpmLookup;
 import org.nightlabs.jfire.jbpm.extensionI18n.ExtendedNodeDescriptor;
 import org.nightlabs.jfire.jbpm.extensionI18n.ExtendedProcessDefinitionDescriptor;
@@ -143,24 +144,25 @@ implements Serializable
 			try {
 				// read the jbpm extension process file
 				jbpmExtensionURL = new URL(jbpmProcessDefinitionURL, "processdefinition-extension.xml");
-				InputStream extensionIn = jbpmProcessDefinitionURL.openStream();
-				if (extensionIn != null && jbpmProcessDefinitionURL.openConnection().getContentLength()!= 0)
-				{	
+				InputStream extensionInput = jbpmExtensionURL.openStream();
+				jbpmExtensionURL.openConnection().getInputStream(); // a simple check to throws I/O exception if file doesnt exist.
+				if (extensionInput != null)
+				{
 					try{		
-						Reader extensionReader = new InputStreamReader(extensionIn);
+						Reader extensionReader = new InputStreamReader(extensionInput);
 						JpdlXmlExtensionReader jpdlXmlReaderExtension = new JpdlXmlExtensionReader(extensionReader);
 						processDefinitionDescriptor = jpdlXmlReaderExtension.getExtendedProcessDefinitionDescriptor();					
 					}
 					finally {
-						extensionIn.close();
+						extensionInput.close();
 					}					
 				}
 			} 
 			catch (FileNotFoundException e) {
-				logger.warn("the extended process definition file was not found: " + jbpmExtensionURL, e);
+				logger.info("the extended process definition file was not found: " + jbpmExtensionURL, e);
 			}			
 			catch (Throwable t) {
-				logger.error("reading process definition failed: " + jbpmProcessDefinitionURL, t);
+				logger.info("reading process definition failed: " + jbpmProcessDefinitionURL, t);
 				if (t instanceof IOException)
 					throw (IOException)t;
 				if (t instanceof RuntimeException)
@@ -195,12 +197,14 @@ implements Serializable
 						org.jbpm.graph.def.Transition jbpmTransition = (org.jbpm.graph.def.Transition) itTransition.next();
 						//							TransitionID transitionID = Transition.getTransitionID(jbpmTransition);
 						Transition transition = pm.makePersistent(new Transition(stateDefinition, jbpmTransition.getName()));
+
+												
 						if(processDefinitionDescriptor != null)
 						{
 							ExtendedNodeDescriptor transitionExtendedNode = processDefinitionDescriptor.getExtendedNodeDescriptor(jbpmTransition);
-							if(transitionExtendedNode != null)
+							if( transitionExtendedNode != null)
 							{
-								// set the name and description from the extended I18in Node
+								// SET THE NAME AND DESCRIPTION FROM THE EXTENDED I18IN NODE
 								transition.getName().copyFrom(transitionExtendedNode .getName());
 								transition.getDescription().copyFrom(transitionExtendedNode .getDescription());
 							}	

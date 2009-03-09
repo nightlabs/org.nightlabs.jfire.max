@@ -3,7 +3,7 @@ package org.nightlabs.jfire.jbpm.graph.def;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.nightlabs.i18n.I18nText;
+import org.nightlabs.i18n.I18nTextBuffer;
 
 /**
  * @author Fitas Amine - fitas at nightlabs dot de
@@ -24,7 +24,7 @@ import org.nightlabs.i18n.I18nText;
  *
  * @jdo.fetch-group name="Transition.description" fields="transition, descriptions"
  */
-public class TransitionDescription extends I18nText
+public class TransitionDescription extends I18nTextBuffer
 {
 	private static final long serialVersionUID = 1L;
 

@@ -147,17 +147,12 @@ public class Transition
 	private boolean userExecutable = true;
 
 	/**
-	 * @jdo.field
-	 *		persistence-modifier="persistent"
-	 *		dependent="true"
-	 *		mapped-by="transition"
-	 *		null-value="exception"
+	 * @jdo.field persistence-modifier="persistent" mapped-by="transition"
 	 */
 	private TransitionName name;
 
 	/**
-	 * @jdo.field
-	 *		persistence-modifier="persistent"
+	 * @jdo.field persistence-modifier="persistent" mapped-by="transition"
 	 */
 	private TransitionDescription description;
 

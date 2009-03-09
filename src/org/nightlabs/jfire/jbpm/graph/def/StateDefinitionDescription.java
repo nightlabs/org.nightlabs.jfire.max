@@ -29,7 +29,7 @@ package org.nightlabs.jfire.jbpm.graph.def;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.nightlabs.i18n.I18nText;
+import org.nightlabs.i18n.I18nTextBuffer;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -47,7 +47,7 @@ import org.nightlabs.i18n.I18nText;
  *
  * @jdo.fetch-group name="StateDefinition.description" fields="stateDefinition, descriptions"
  */
-public class StateDefinitionDescription extends I18nText
+public class StateDefinitionDescription extends I18nTextBuffer
 {
 	private static final long serialVersionUID = 1L;
 

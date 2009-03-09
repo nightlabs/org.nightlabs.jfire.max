@@ -5,7 +5,7 @@ import javax.jdo.Query;
 import org.nightlabs.jfire.store.ProductType;
 
 /**
- * Generic ProductType Query that may be used to retrieve all kinds of Product Types. 
+ * Generic ProductType Query that may be used to retrieve all kinds of Product types. 
  * @author Marius Heinzmann - marius[at]nightlabs[dot]com
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
  */

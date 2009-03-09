@@ -139,35 +139,37 @@ implements Serializable
 				processDefinition = pm.makePersistent(
 						new ProcessDefinition(processDefinitionID, jbpmProcessDefinition, jbpmProcessDefinitionURL));
 			}
-			
+
 			URL jbpmExtensionURL = null;
 			try {
 				// read the jbpm extension process file
 				jbpmExtensionURL = new URL(jbpmProcessDefinitionURL, "processdefinition-extension.xml");
 				InputStream extensionInput = jbpmExtensionURL.openStream();
-				jbpmExtensionURL.openConnection().getInputStream(); // a simple check to throws I/O exception if file doesnt exist.
+				// a simple check to throws I/O exception if file doesnt exist.
+				jbpmExtensionURL.openConnection().getInputStream(); 
 				if (extensionInput != null)
 				{
-					try{		
+					try {		
 						Reader extensionReader = new InputStreamReader(extensionInput);
 						JpdlXmlExtensionReader jpdlXmlReaderExtension = new JpdlXmlExtensionReader(extensionReader);
 						processDefinitionDescriptor = jpdlXmlReaderExtension.getExtendedProcessDefinitionDescriptor();					
-					}
-					finally {
+					} finally {
 						extensionInput.close();
 					}					
-				}
+				} else
+					logger.info("input stream is null in process definition extension:" + jbpmProcessDefinitionURL);
+
 			} 
 			catch (FileNotFoundException e) {
-				logger.info("the extended process definition file was not found: " + jbpmExtensionURL, e);
+				logger.info("the extended process definition extension file was not found: " + jbpmExtensionURL, e);
 			}			
 			catch (Throwable t) {
-				logger.info("reading process definition failed: " + jbpmProcessDefinitionURL, t);
 				if (t instanceof IOException)
-					throw (IOException)t;
+					logger.info("reading process definition extension failed because of IO Exception: " + jbpmProcessDefinitionURL, t);
 				if (t instanceof RuntimeException)
-					throw (RuntimeException)t;
-				throw new RuntimeException(t);	
+					logger.info("reading process definition extension failed because of Runtime Exception: " + jbpmProcessDefinitionURL, t);
+				else	
+					logger.info("reading process definition extension failed:" + jbpmProcessDefinitionURL, t);
 			} 			
 
 			// create StateDefinitions

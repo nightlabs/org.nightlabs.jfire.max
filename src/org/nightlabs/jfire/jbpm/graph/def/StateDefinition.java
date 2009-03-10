@@ -118,7 +118,7 @@ implements Serializable
 	private ProcessDefinition processDefinition;
 
 	/**
-	 * @jdo.field persistence-modifier="persistent" null-value="exception" dependent="true"
+	 * @jdo.field persistence-modifier="persistent" null-value="exception" 
 	 */
 	private String jbpmNodeName;
 
@@ -128,7 +128,7 @@ implements Serializable
 	private StateDefinitionName name;
 
 	/**
-	 * @jdo.field persistence-modifier="persistent" mapped-by="stateDefinition"
+	 * @jdo.field persistence-modifier="persistent" mapped-by="stateDefinition" dependent="true"
 	 */
 	private StateDefinitionDescription description;
 

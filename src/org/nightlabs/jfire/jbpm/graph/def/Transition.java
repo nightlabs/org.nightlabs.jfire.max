@@ -147,12 +147,12 @@ public class Transition
 	private boolean userExecutable = true;
 
 	/**
-	 * @jdo.field persistence-modifier="persistent" mapped-by="transition"
+	 * @jdo.field persistence-modifier="persistent" mapped-by="transition" dependent="true"
 	 */
 	private TransitionName name;
 
 	/**
-	 * @jdo.field persistence-modifier="persistent" mapped-by="transition"
+	 * @jdo.field persistence-modifier="persistent" mapped-by="transition" dependent="true"
 	 */
 	private TransitionDescription description;
 
@@ -161,16 +161,12 @@ public class Transition
 	 */
 	private StateDefinition fromStateDefinition;
 
-	protected Transition()
-	{
-	}
+	protected Transition() { }
 
 	public Transition(
-//			String processDefinitionOrganisationID, String processDefinitionID,
-//			String stateDefinitionOrganisationID, String stateDefinitionID,
 			StateDefinition fromStateDefinition,
-			String jbpmTransitionName)
-//			String transitionOrganisationID, String transitionID)
+			String jbpmTransitionName
+	)
 	{
 		this.fromStateDefinition = fromStateDefinition;
 		this.processDefinitionOrganisationID = fromStateDefinition.getProcessDefinitionOrganisationID();
@@ -178,11 +174,6 @@ public class Transition
 		this.stateDefinitionOrganisationID = fromStateDefinition.getStateDefinitionOrganisationID();
 		this.stateDefinitionID = fromStateDefinition.getStateDefinitionID();
 		this.jbpmTransitionName = jbpmTransitionName;
-
-//		this.processDefinitionOrganisationID = processDefinitionOrganisationID;
-//		this.processDefinitionID = processDefinitionID;
-//		this.stateDefinitionOrganisationID = stateDefinitionOrganisationID;
-//		this.stateDefinitionID = stateDefinitionID;
 
 		if (jbpmTransitionName.indexOf(':') < 0) {
 			this.transitionOrganisationID = IDGenerator.getOrganisationID(); // TODO is it safe to allow local names (without organisationID)? do we really never share process definitions across organisations?
@@ -198,7 +189,7 @@ public class Transition
 
 		this.name = new TransitionName(this);
 		this.description = new TransitionDescription(this);
-		}
+	}
 
 	public String getProcessDefinitionOrganisationID()
 	{

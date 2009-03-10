@@ -1,18 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<process-definition-extension xmlns="" name="dev.jfire.org:Invoice.CustomerLocal">
+<process-definition-extension xmlns="" name="dev.jfire.org:Offer.CustomerLocal">
 <start-state name="dev.jfire.org:created">
 <name language="de">erzeugt</name>
 <description language="de">erzeugt</description>
 <name language="en">created</name>
 <description language="en">created</description>
 <icon file=""/>
-<transition name="abort">
-<name language="de">abbrechen</name>
-<description language="de">abbrechen</description>
-<name language="en">abort</name>
-<description language="en">abort</description>
-<icon file=""/>
-</transition>
 <transition name="finalize">
 <name language="de">finalisieren</name>
 <description language="de">finalisieren</description>
@@ -20,131 +13,145 @@
 <description language="en">finalize</description>
 <icon file=""/>
 </transition>
-<transition name="dev.jfire.org:bookImplicitely">
-<name language="de">buchen-implzit</name>
-<description language="de">buchen-implzit</description>
-<name language="en">bookImplicitely</name>
-<description language="en">bookImplicitely</description>
+<transition name="abort">
+<name language="de">abbrechen</name>
+<description language="de">abbrechen</description>
+<name language="en">abort</name>
+<description language="en">abort</description>
+<icon file=""/>
+</transition>
+<transition name="dev.jfire.org:acceptImplicitely">
+<name language="de">acceptImplicitely</name>
+<description language="de">acceptImplicitely</description>
+<name language="en">acceptImplicitely</name>
+<description language="en">acceptImplicitely</description>
 <icon file=""/>
 </transition>
 </start-state>
+<end-state name="dev.jfire.org:rejected">
+<name language="de">rejected</name>
+<description language="de">rejected</description>
+<name language="en">rejected</name>
+<description language="en">rejected</description>
+<icon file=""/>
+</end-state>
+<end-state name="dev.jfire.org:accepted">
+<name language="de">accepted</name>
+<description language="de">accepted</description>
+<name language="en">accepted</name>
+<description language="en">accepted</description>
+<icon file=""/>
+</end-state>
 <state name="dev.jfire.org:finalized">
-<name language="de">finalisiert</name>
-<description language="de">finalisiert</description>
+<name language="de">finalized</name>
+<description language="de">finalized</description>
 <name language="en">finalized</name>
 <description language="en">finalized</description>
 <icon file=""/>
-<transition name="dev.jfire.org:book">
-<name language="de">buchen</name>
-<description language="de">buchen</description>
-<name language="en">book</name>
-<description language="en">book</description>
+<transition name="dev.jfire.org:expire">
+<name language="de">expire</name>
+<description language="de">expire</description>
+<name language="en">expire</name>
+<description language="en">The Offer has expired - the customer waited too long. A new Offer needs to be created in order to continue the interaction.</description>
 <icon file=""/>
 </transition>
-</state>
-<end-state name="dev.jfire.org:aborted">
-<name language="de">abgebrochen</name>
-<description language="de">abgebrochen</description>
-<name language="en">aborted</name>
-<description language="en">aborted</description>
-<icon file=""/>
-</end-state>
-<state name="dev.jfire.org:doubtful">
-<name language="de">zweifelhaft</name>
-<description language="de">zweifelhaft</description>
-<name language="en">doubtful</name>
-<description language="en">doubtful</description>
-<icon file=""/>
-<transition name="dev.jfire.org:pay">
-<name language="de">zahlen</name>
-<description language="de">zahlen</description>
-<name language="en">pay</name>
-<description language="en">pay</description>
+<transition name="revoke">
+<name language="de">revoke</name>
+<description language="de">revoke</description>
+<name language="en">revoke</name>
+<description language="en">revoke</description>
 <icon file=""/>
 </transition>
-<transition name="bookUnreceivable">
-<name language="de">buchen-unempfangbar</name>
-<description language="de">buchen-unempfangbar</description>
-<name language="en">bookUnreceivable</name>
-<description language="en">bookUnreceivable</description>
+<transition name="reject">
+<name language="de">reject</name>
+<description language="de">reject</description>
+<name language="en">reject</name>
+<description language="en">reject</description>
 <icon file=""/>
 </transition>
-<transition name="trust">
-<name language="de">vertrauen</name>
-<description language="de">vertrauen</description>
-<name language="en">trust</name>
-<description language="en">trust</description>
+<transition name="dev.jfire.org:customerAccepted">
+<name language="de">customerAccepted</name>
+<description language="de">customerAccepted</description>
+<name language="en">customerAccepted</name>
+<description language="en">customerAccepted</description>
 <icon file=""/>
 </transition>
-</state>
-<end-state name="dev.jfire.org:uncollectable">
-<name language="de">nicht-beitreibbar</name>
-<description language="de">nicht-beitreibbar</description>
-<name language="en">uncollectable</name>
-<description language="en">uncollectable</description>
-<icon file=""/>
-</end-state>
-<end-state name="dev.jfire.org:paid">
-<name language="de">bezahlt</name>
-<description language="de">bezahlt</description>
-<name language="en">paid</name>
-<description language="en">paid</description>
-<icon file=""/>
-</end-state>
-<state name="dev.jfire.org:booked">
-<name language="de">gebucht</name>
-<description language="de">gebucht</description>
-<name language="en">booked</name>
-<description language="en">booked</description>
-<icon file=""/>
-<transition name="doubt">
-<name language="de">anzweifeln</name>
-<description language="de">anzweifeln</description>
-<name language="en">doubt</name>
-<description language="en">doubt</description>
-<icon file=""/>
-</transition>
-<transition name="dev.jfire.org:pay">
-<name language="de">zahlen</name>
-<description language="de">zahlen</description>
-<name language="en">pay</name>
-<description language="en">pay</description>
-<icon file=""/>
-</transition>
-<transition name="sendReminder">
-<name language="de">Mahnung-senden</name>
-<description language="de">Mahnung-senden</description>
-<name language="en">sendReminder</name>
-<description language="en">sendReminder</description>
+<transition name="accept">
+<name language="de">accept</name>
+<description language="de">accept</description>
+<name language="en">accept</name>
+<description language="en">accept</description>
 <icon file=""/>
 </transition>
 <transition name="dev.jfire.org:send">
-<name language="de">senden</name>
-<description language="de">senden</description>
+<name language="de">send</name>
+<description language="de">send</description>
 <name language="en">send</name>
 <description language="en">send</description>
 <icon file=""/>
 </transition>
-</state>
-<node name="dev.jfire.org:bookedUnreceivable">
-<name language="de">gebucht-unempfangbar</name>
-<description language="de">gebucht-unempfangbar</description>
-<name language="en">bookedUnreceivable</name>
-<description language="en">bookedUnreceivable</description>
+<transition name="dev.jfire.org:acceptImplicitely">
+<name language="de">acceptImplicitely</name>
+<description language="de">acceptImplicitely</description>
+<name language="en">acceptImplicitely</name>
+<description language="en">acceptImplicitely</description>
 <icon file=""/>
-<transition name="endAsUncollectable">
-<name language="de">endet-als-nicht-beitreibbar</name>
-<description language="de">endet-als-nicht-beitreibbar</description>
-<name language="en">endAsUncollectable</name>
-<description language="en">endAsUncollectable</description>
+</transition>
+</state>
+<end-state name="dev.jfire.org:expired">
+<name language="de">expired</name>
+<description language="de">expired</description>
+<name language="en">expired</name>
+<description language="en">expired</description>
+<icon file=""/>
+</end-state>
+<end-state name="dev.jfire.org:aborted">
+<name language="de">aborted</name>
+<description language="de">aborted</description>
+<name language="en">aborted</name>
+<description language="en">aborted</description>
+<icon file=""/>
+</end-state>
+<end-state name="dev.jfire.org:revoked">
+<name language="de">revoked</name>
+<description language="de">revoked</description>
+<name language="en">revoked</name>
+<description language="en">The Offer has been revoked by the vendor. The result is the same as if the customer had rejected the offer. A new Offer needs to be created in order to continue the interaction.</description>
+<icon file=""/>
+</end-state>
+<node name="dev.jfire.org:customerAccepted">
+<name language="de">customerAccepted</name>
+<description language="de">customerAccepted</description>
+<name language="en">customerAccepted</name>
+<description language="en">customerAccepted</description>
+<icon file=""/>
+<transition name="accept">
+<name language="de">accept</name>
+<description language="de">accept</description>
+<name language="en">accept</name>
+<description language="en">accept</description>
 <icon file=""/>
 </transition>
 </node>
-<node name="dev.jfire.org:bookedImplicitely">
-<name language="de">gebucht-implizit</name>
-<description language="de">gebucht-implizit</description>
-<name language="en">bookedImplicitely</name>
-<description language="en">bookedImplicitely</description>
+<node name="dev.jfire.org:sent">
+<name language="de">sent</name>
+<description language="de">sent</description>
+<name language="en">sent</name>
+<description language="en">The Offer has been sent from the vendor to the customer.</description>
 <icon file=""/>
+<transition name="dev.jfire.org:send">
+<name language="de">send</name>
+<description language="de">send</description>
+<name language="en">send</name>
+<description language="en">send</description>
+<icon file=""/>
+</transition>
+<transition name="sendImplicitely">
+<name language="de">sendImplicitely</name>
+<description language="de">sendImplicitely</description>
+<name language="en">sendImplicitely</name>
+<description language="en">sendImplicitely</description>
+<icon file=""/>
+</transition>
 </node>
 </process-definition-extension>

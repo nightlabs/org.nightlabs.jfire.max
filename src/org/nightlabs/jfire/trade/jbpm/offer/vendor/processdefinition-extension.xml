@@ -116,7 +116,7 @@
 <name language="de">ist-verfallen</name>
 <description language="de">ist-verfallen</description>
 <name language="en">expired</name>
-<description language="en">expired</description>
+<description language="en">The Offer has expired - the customer waited too long. A new Offer needs to be created in order to continue the interaction.</description>
 <icon file=""/>
 </end-state>
 <end-state name="dev.jfire.org:aborted">
@@ -130,7 +130,7 @@
 <name language="de">ist-zurückgenommen</name>
 <description language="de">ist-zurückgenommen</description>
 <name language="en">revoked</name>
-<description language="en">revoked</description>
+<description language="en">The Offer has been revoked by the vendor. The result is the same as if the customer had rejected the offer. A new Offer needs to be created in order to continue the interaction.</description>
 <icon file=""/>
 </end-state>
 <node name="dev.jfire.org:customerAccepted">
@@ -165,7 +165,7 @@
 <name language="de">gesendet</name>
 <description language="de">gesendet</description>
 <name language="en">sent</name>
-<description language="en">sent</description>
+<description language="en">The Offer has been sent from the vendor to the customer.</description>
 <icon file=""/>
 <transition name="dev.jfire.org:send">
 <name language="de">senden</name>

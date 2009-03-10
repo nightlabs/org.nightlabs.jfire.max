@@ -4,7 +4,7 @@
 <name language="de">erzeugt</name>
 <description language="de">erzeugt</description>
 <name language="en">created</name>
-<description language="en">created</description>
+<description language="en">The Offer has been newly created. This is the first state in the Offer related workflow.</description>
 <icon file=""/>
 <transition name="dev.jfire.org:finalize">
 <name language="de">finalisieren</name>
@@ -39,21 +39,21 @@
 <name language="de">abgelehnt</name>
 <description language="de">abgelehnt</description>
 <name language="en">rejected</name>
-<description language="en">rejected</description>
+<description language="en">The Offer has been rejected by the customer. A new Offer needs to be created in order to continue the interaction.</description>
 <icon file=""/>
 </end-state>
 <end-state name="dev.jfire.org:accepted">
 <name language="de">akzeptiert</name>
 <description language="de">akzeptiert</description>
 <name language="en">accepted</name>
-<description language="en">accepted</description>
+<description language="en">The Offer has been accepted by the customer. That turns the offer into a binding contract.</description>
 <icon file=""/>
 </end-state>
 <state name="dev.jfire.org:finalized">
 <name language="de">finalisiert</name>
 <description language="de">finalisiert</description>
 <name language="en">finalized</name>
-<description language="en">finalized</description>
+<description language="en">The Offer has been finalized. After that, it cannot be modified anymore. A modification would require revocation and recreation.</description>
 <icon file=""/>
 <transition name="dev.jfire.org:expire">
 <name language="de">verfallen</name>
@@ -123,7 +123,7 @@
 <name language="de">abgebrochen</name>
 <description language="de">abgebrochen</description>
 <name language="en">aborted</name>
-<description language="en">aborted</description>
+<description language="en">The Offer has been aborted by the vendor (before finalization). A new Offer needs to be created in order to continue the interaction.</description>
 <icon file=""/>
 </end-state>
 <end-state name="dev.jfire.org:revoked">

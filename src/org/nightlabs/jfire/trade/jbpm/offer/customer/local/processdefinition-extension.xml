@@ -52,7 +52,7 @@
 <name language="de">expire</name>
 <description language="de">expire</description>
 <name language="en">expire</name>
-<description language="en">The Offer has expired - the customer waited too long. A new Offer needs to be created in order to continue the interaction.</description>
+<description language="en">expire</description>
 <icon file=""/>
 </transition>
 <transition name="revoke">
@@ -102,7 +102,7 @@
 <name language="de">expired</name>
 <description language="de">expired</description>
 <name language="en">expired</name>
-<description language="en">expired</description>
+<description language="en">The Offer has expired - the customer waited too long. A new Offer needs to be created in order to continue the interaction.</description>
 <icon file=""/>
 </end-state>
 <end-state name="dev.jfire.org:aborted">

@@ -1,80 +1,94 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<process-definition-extension xmlns="" name="dev.jfire.org:Invoice.CustomerCrossOrganisation">
-<start-state name="dev.jfire.org:sent">
-<name language="de">gesendet</name>
-<description language="de">gesendet</description>
-<name language="en">sent</name>
-<description language="en">sent</description>
+<process-definition-extension xmlns="" name="dev.jfire.org:Offer.CustomerCrossOrganisation">
+<start-state name="dev.jfire.org:created">
+<name language="de">erzeugt</name>
+<description language="de">erzeugt</description>
+<name language="en">created</name>
+<description language="en">created</description>
 <icon file=""/>
-<transition name="book">
-<name language="de">buchen</name>
-<description language="de">buchen</description>
-<name language="en">book</name>
-<description language="en">book</description>
+<transition name="accept">
+<name language="de">akzeptieren</name>
+<description language="de">akzeptieren</description>
+<name language="en">accept</name>
+<description language="en">accept</description>
 <icon file=""/>
 </transition>
-<transition name="dispute">
-<name language="de">abstreiten</name>
-<description language="de">abstreiten</description>
-<name language="en">dispute</name>
-<description language="en">dispute</description>
+<transition name="reject">
+<name language="de">ablehnen</name>
+<description language="de">ablehnen</description>
+<name language="en">reject</name>
+<description language="en">reject</description>
+<icon file=""/>
+</transition>
+<transition name="dev.jfire.org:expired">
+<name language="de">ist-verfallen</name>
+<description language="de">ist-verfallen</description>
+<name language="en">expired</name>
+<description language="en">expired</description>
+<icon file=""/>
+</transition>
+<transition name="dev.jfire.org:revoked">
+<name language="de">ist-zurückgenommen</name>
+<description language="de">ist-zurückgenommen</description>
+<name language="en">revoked</name>
+<description language="en">revoked</description>
+<icon file=""/>
+</transition>
+<transition name="dev.jfire.org:acceptedImplicitely">
+<name language="de">acceptedImplicitely</name>
+<description language="de">acceptedImplicitely</description>
+<name language="en">acceptedImplicitely</name>
+<description language="en">acceptedImplicitely</description>
+<icon file=""/>
+</transition>
+<transition name="dev.jfire.org:acceptForCrossTrade">
+<name language="de">acceptForCrossTrade</name>
+<description language="de">acceptForCrossTrade</description>
+<name language="en">acceptForCrossTrade</name>
+<description language="en">acceptForCrossTrade</description>
 <icon file=""/>
 </transition>
 </start-state>
-<end-state name="dev.jfire.org:paid">
-<name language="de">bezahlt</name>
-<description language="de">bezahlt</description>
-<name language="en">paid</name>
-<description language="en">paid</description>
+<end-state name="dev.jfire.org:customerRejected">
+<name language="de">customerRejected</name>
+<description language="de">customerRejected</description>
+<name language="en">customerRejected</name>
+<description language="en">customerRejected</description>
 <icon file=""/>
 </end-state>
-<state name="dev.jfire.org:booked">
-<name language="de">gebucht</name>
-<description language="de">gebucht</description>
-<name language="en">booked</name>
-<description language="en">booked</description>
+<end-state name="dev.jfire.org:customerAccepted">
+<name language="de">customerAccepted</name>
+<description language="de">customerAccepted</description>
+<name language="en">customerAccepted</name>
+<description language="en">customerAccepted</description>
 <icon file=""/>
-<transition name="dev.jfire.org:pay">
-<name language="de">zahlen</name>
-<description language="de">zahlen</description>
-<name language="en">pay</name>
-<description language="en">pay</description>
+</end-state>
+<end-state name="dev.jfire.org:expired">
+<name language="de">ist-verfallen</name>
+<description language="de">ist-verfallen</description>
+<name language="en">expired</name>
+<description language="en">The Offer has expired - the customer waited too long. A new Offer needs to be created in order to continue the interaction.</description>
 <icon file=""/>
-</transition>
-<transition name="dispute">
-<name language="de">abstreiten</name>
-<description language="de">abstreiten</description>
-<name language="en">dispute</name>
-<description language="en">dispute</description>
+</end-state>
+<end-state name="dev.jfire.org:revoked">
+<name language="de">ist-zurückgenommen</name>
+<description language="de">ist-zurückgenommen</description>
+<name language="en">revoked</name>
+<description language="en">The Offer has been revoked by the vendor. The result is the same as if the customer had rejected the offer. A new Offer needs to be created in order to continue the interaction.</description>
 <icon file=""/>
-</transition>
-</state>
-<state name="disputeStarted.beforeBook">
-<name language="de">abstreiten-begonnen.vor-buchen</name>
-<description language="de">abstreiten-begonnen.vor-buchen</description>
-<name language="en">disputeStarted.beforeBook</name>
-<description language="en">disputeStarted.beforeBook</description>
+</end-state>
+<end-state name="dev.jfire.org:acceptedImplicitely">
+<name language="de">acceptedImplicitely</name>
+<description language="de">acceptedImplicitely</description>
+<name language="en">acceptedImplicitely</name>
+<description language="en">acceptedImplicitely</description>
 <icon file=""/>
-<transition name="book">
-<name language="de">buchen</name>
-<description language="de">buchen</description>
-<name language="en">book</name>
-<description language="en">book</description>
+</end-state>
+<end-state name="dev.jfire.org:acceptedForCrossTrade">
+<name language="de">acceptedForCrossTrade</name>
+<description language="de">acceptedForCrossTrade</description>
+<name language="en">acceptedForCrossTrade</name>
+<description language="en">acceptedForCrossTrade</description>
 <icon file=""/>
-</transition>
-</state>
-<state name="disputeStarted.afterBook">
-<name language="de">abstreiten-begonnen.nach-buchen</name>
-<description language="de">abstreiten-begonnen.nach-buchen</description>
-<name language="en">disputeStarted.afterBook</name>
-<description language="en">disputeStarted.afterBook</description>
-<icon file=""/>
-<transition name="dev.jfire.org:pay">
-<name language="de">zahlen</name>
-<description language="de">zahlen</description>
-<name language="en">pay</name>
-<description language="en">pay</description>
-<icon file=""/>
-</transition>
-</state>
+</end-state>
 </process-definition-extension>

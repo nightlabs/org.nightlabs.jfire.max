@@ -2090,22 +2090,14 @@ public class Trader
 		stateDefinition.setPublicState(publicState);
 	}
 
-	/**
-	 * TODO: Most things done here should be configured in the process definition xml file, not in code.
-	 *       Examples:
-	 *          * the action handlers on certain nodes
-	 *          * The names of the nodes/states/transitions should also be in a xml file
-	 */
+
 	public ProcessDefinition storeProcessDefinitionOffer(TradeSide tradeSide, URL jbpmProcessDefinitionURL)
 	throws IOException
 	{
 		PersistenceManager pm = getPersistenceManager();
-
 		org.jbpm.graph.def.ProcessDefinition jbpmProcessDefinition = ProcessDefinition.readProcessDefinition(jbpmProcessDefinitionURL);
-
 		// we add the events+actionhandlers
 		ActionHandlerNodeEnter.register(jbpmProcessDefinition);
-
 		if (TradeSide.vendor == tradeSide || TradeSide.customerLocal == tradeSide) {
 			ActionHandlerFinalizeOffer.register(jbpmProcessDefinition);
 			ActionHandlerSendOffer.register(jbpmProcessDefinition);
@@ -2116,138 +2108,8 @@ public class Trader
 		if (TradeSide.vendor == tradeSide) {
 			ActionHandlerFinalizeOfferForCrossTrade.register(jbpmProcessDefinition);
 		}
-
-		// store it
-		ProcessDefinition processDefinition = ProcessDefinition.storeProcessDefinition(pm, null, jbpmProcessDefinition, jbpmProcessDefinitionURL);
-		ProcessDefinitionID processDefinitionID = (ProcessDefinitionID) JDOHelper.getObjectId(processDefinition);
-
-		setStateDefinitionProperties(processDefinition, JbpmConstantsOffer.Both.NODE_NAME_SENT,
-				"sent",
-				"The Offer has been sent from the vendor to the customer.",
-				true);
-
-		setStateDefinitionProperties(processDefinition, JbpmConstantsOffer.Both.NODE_NAME_REVOKED,
-				"revoked",
-				"The Offer has been revoked by the vendor. The result is the same as if the customer had rejected the offer. A new Offer needs to be created in order to continue the interaction.",
-				true);
-
-		setStateDefinitionProperties(processDefinition, JbpmConstantsOffer.Both.NODE_NAME_EXPIRED,
-				"expired",
-				"The Offer has expired - the customer waited too long. A new Offer needs to be created in order to continue the interaction.",
-				true);
-
-		switch (tradeSide) {
-		case vendor:
-		{
-			// give known StateDefinitions a name and a description
-			setStateDefinitionProperties(processDefinition, JbpmConstantsOffer.Vendor.NODE_NAME_CREATED,
-					"created",
-					"The Offer has been newly created. This is the first state in the Offer related workflow.",
-					true);
-
-			setStateDefinitionProperties(processDefinition, JbpmConstantsOffer.Vendor.NODE_NAME_ABORTED,
-					"aborted",
-					"The Offer has been aborted by the vendor (before finalization). A new Offer needs to be created in order to continue the interaction.",
-					true);
-
-			setStateDefinitionProperties(processDefinition, JbpmConstantsOffer.Vendor.NODE_NAME_FINALIZED,
-					"finalized",
-					"The Offer has been finalized. After that, it cannot be modified anymore. A modification would require revocation and recreation.",
-					true);
-
-			setStateDefinitionProperties(processDefinition, JbpmConstantsOffer.Vendor.NODE_NAME_ACCEPTED,
-					"accepted",
-					"The Offer has been accepted by the customer. That turns the offer into a binding contract.",
-					true);
-
-			setStateDefinitionProperties(processDefinition, JbpmConstantsOffer.Vendor.NODE_NAME_REJECTED,
-					"rejected",
-					"The Offer has been rejected by the customer. A new Offer needs to be created in order to continue the interaction.",
-					true);
-
-			// give known Transitions a name
-			for (Transition transition : Transition.getTransitions(pm, processDefinitionID, JbpmConstantsOffer.Vendor.TRANSITION_NAME_ACCEPT_IMPLICITELY)) {
-//				transition.getName().setText(Locale.ENGLISH.getLanguage(), "accept implicitely"); - no name necessary as it's not displayed to the user
-				transition.setUserExecutable(false);
-			}
-
-			for (Transition transition : Transition.getTransitions(pm, processDefinitionID, JbpmConstantsOffer.Vendor.TRANSITION_NAME_CUSTOMER_ACCEPTED)) {
-//				transition.getName().setText(Locale.ENGLISH.getLanguage(), "customer accepted");
-				transition.setUserExecutable(false);
-			}
-
-			for (Transition transition : Transition.getTransitions(pm, processDefinitionID, JbpmConstantsOffer.Vendor.TRANSITION_NAME_CUSTOMER_REJECTED)) {
-//				transition.getName().setText(Locale.ENGLISH.getLanguage(), "customer rejected");
-				transition.setUserExecutable(false);
-			}
-
-//			Transition transition;
-
-//			try {
-//			transition = (Transition) pm.getObjectById(JbpmConstantsOffer.Vendor.getTransitionID_created_2_accept(processDefinitionID));
-//			transition.getName().setText(Locale.ENGLISH.getLanguage(), "accept");
-//			transition.setUserExecutable(false);
-//			} catch (JDOObjectNotFoundException x) {
-//			logger.warn("The ProcessDefinition \"" + processDefinition.getJbpmProcessDefinitionName() + "\" does not contain a jBPM Transition named \"accept\" from Node \"created\"!");
-//			}
-
-//			transition = (Transition) pm.getObjectById(JbpmConstantsOffer.Vendor.getTransitionID_finalized_2_customerAccepted(processDefinitionID));
-//			transition.getName().setText(Locale.ENGLISH.getLanguage(), "customer accepted");
-//			transition.setUserExecutable(false);
-
-//			transition = (Transition) pm.getObjectById(JbpmConstantsOffer.Vendor.getTransitionID_finalized_2_customerRejected(processDefinitionID));
-//			transition.getName().setText(Locale.ENGLISH.getLanguage(), "customer rejected");
-//			transition.setUserExecutable(false);
-		}
-		break;
-		case customerCrossOrganisation:
-		{
-			// give known StateDefinitions a name and a description
-			setStateDefinitionProperties(processDefinition, JbpmConstantsOffer.Customer.NODE_NAME_CUSTOMER_ACCEPTED,
-					"customer accepted",
-					"The customer has accepted the Offer.",
-					true);
-
-			setStateDefinitionProperties(processDefinition, JbpmConstantsOffer.Customer.NODE_NAME_CUSTOMER_REJECTED,
-					"customer rejected",
-					"The customer has rejected the Offer.",
-					true);
-
-			for (Transition transition : Transition.getTransitions(pm, processDefinitionID, JbpmConstantsOffer.Customer.TRANSITION_NAME_EXPIRED)) {
-//				transition.getName().setText(Locale.ENGLISH.getLanguage(), "expired"); - no name necessary as it's not displayed to the user
-				transition.setUserExecutable(false);
-			}
-
-			for (Transition transition : Transition.getTransitions(pm, processDefinitionID, JbpmConstantsOffer.Customer.TRANSITION_NAME_REVOKED)) {
-				transition.setUserExecutable(false);
-			}
-
-			for (Transition transition : Transition.getTransitions(pm, processDefinitionID, JbpmConstantsOffer.Customer.TRANSITION_NAME_ACCEPTED_IMPLICITELY)) {
-				transition.setUserExecutable(false);
-			}
-
-//			// give known Transitions a name
-//			Transition transition;
-
-//			transition = (Transition) pm.getObjectById(JbpmConstantsOffer.Customer.getTransitionID_sent_2_expired(processDefinitionID));
-//			transition.getName().setText(Locale.ENGLISH.getLanguage(), "expired");
-//			transition.setUserExecutable(false);
-
-//			transition = (Transition) pm.getObjectById(JbpmConstantsOffer.Customer.getTransitionID_sent_2_revoked(processDefinitionID));
-//			transition.getName().setText(Locale.ENGLISH.getLanguage(), "revoked");
-//			transition.setUserExecutable(false);
-		}
-		break;
-		case customerLocal:
-		{
-			// later...
-		}
-		break;
-		default:
-			throw new IllegalStateException("Unknown TradeSide: " + tradeSide);
-		}
-
-		return processDefinition;
+		// store it and return it, most properties of config are written in the XML file now.
+		return ProcessDefinition.storeProcessDefinition(pm, null, jbpmProcessDefinition, jbpmProcessDefinitionURL);
 	}
 
 	public void assignTariff(User user, Set<? extends Article> articles, Tariff tariff)

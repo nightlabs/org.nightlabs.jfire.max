@@ -1778,7 +1778,6 @@ implements SessionBean
 	 * @ejb.permission role-name="org.nightlabs.jfire.store.queryDeliveryNotes"
 	 * @ejb.transaction type="Required"
 	 */
-	@SuppressWarnings("unchecked")
 	public List<DeliveryNote> getNonFinalizedDeliveryNotes(AnchorID vendorID, AnchorID customerID, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -2925,7 +2924,7 @@ implements SessionBean
 				StoreManagerHome.JNDI_NAME, "calculateProductTypeAvailabilityPercentage"
 		);
 		task = pm.makePersistent(task);
-		task.getTimePatternSet().createTimePattern("*", "*", "*", "*", "*", "51");
+		task.getTimePatternSet().createTimePattern("*", "*", "*", "*", "*", "9-59/10");
 
 		task.getName().setText(Locale.ENGLISH.getLanguage(), "Calculate product type availability");
 		task.getDescription().setText(Locale.ENGLISH.getLanguage(), "This task calculates the availability percentage of all active product types.");

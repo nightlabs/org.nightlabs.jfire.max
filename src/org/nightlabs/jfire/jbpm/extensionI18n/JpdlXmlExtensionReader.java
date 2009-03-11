@@ -254,8 +254,10 @@ public class JpdlXmlExtensionReader implements ProblemListener {
 		{	
 			String userExecutable = element.getAttribute( "userExecutable");
 			if (userExecutable == null || userExecutable.isEmpty()) 
-				throw new IllegalStateException("Found name element with invalid/no userExecutable attribute for element " + element.getNodeName() + "(userExecutable=" + element.getAttribute("userExecutable") + ").");
-			nodeDescriptor.setUserExecutable(Boolean.parseBoolean(userExecutable));
+				// The default value of 'userExecutable' should be true if not defined.
+				nodeDescriptor.setUserExecutable(true);  
+			else	
+				nodeDescriptor.setUserExecutable(Boolean.parseBoolean(userExecutable));
 		}
 		else
 		{	
@@ -264,8 +266,10 @@ public class JpdlXmlExtensionReader implements ProblemListener {
 				// set publicState for the node 
 				String publicState = element.getAttribute( "publicState");
 				if (publicState == null || publicState.isEmpty()) 
-					throw new IllegalStateException("Found name element with invalid/no publicState attribute for element " + element.getNodeName() + "(publicState=" + element.getAttribute("publicState") + ").");
-				nodeDescriptor.setPublicState(Boolean.parseBoolean(publicState));
+					// The default value of 'publicState' should be false if not defined.
+					nodeDescriptor.setPublicState(false);
+				else
+					nodeDescriptor.setPublicState(Boolean.parseBoolean(publicState));
 			}
 		}
 

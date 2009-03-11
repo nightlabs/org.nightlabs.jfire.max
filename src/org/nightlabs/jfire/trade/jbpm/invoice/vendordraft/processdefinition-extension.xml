@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <process-definition-extension xmlns="" name="dev.jfire.org:Invoice.Vendor">
-	<start-state name="dev.jfire.org:created" publicState="false">
+	<start-state name="dev.jfire.org:created">
 		<name language="de">erzeugt</name>
 		<description language="de">erzeugt</description>
 		<name language="en">created</name>

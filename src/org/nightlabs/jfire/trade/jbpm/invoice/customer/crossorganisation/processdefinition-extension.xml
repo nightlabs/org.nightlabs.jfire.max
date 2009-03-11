@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <process-definition-extension xmlns="" name="dev.jfire.org:Invoice.CustomerCrossOrganisation">
-	<start-state name="dev.jfire.org:sent" publicState="false">
+	<start-state name="dev.jfire.org:sent">
 		<name language="de">gesendet</name>
 		<description language="de">gesendet</description>
 		<name language="en">sent</name>

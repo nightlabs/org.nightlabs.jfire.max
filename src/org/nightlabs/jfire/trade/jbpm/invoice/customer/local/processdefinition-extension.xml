@@ -43,7 +43,7 @@
 			<icon file="" />
 		</transition>
 	</state>
-	<state name="dev.jfire.org:booked">
+	<state name="dev.jfire.org:booked" publicState="true">
 		<name language="de">gebucht</name>
 		<description language="de">gebucht</description>
 		<name language="en">booked</name>
@@ -78,7 +78,7 @@
 		<description language="en">delivered</description>
 		<icon file="" />
 	</end-state>
-	<node name="dev.jfire.org:sent">
+	<node name="dev.jfire.org:sent" publicState="true">
 		<name language="de">gesendet</name>
 		<description language="de">gesendet</description>
 		<name language="en">sent</name>

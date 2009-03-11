@@ -29,7 +29,7 @@
 		<description language="en">createdReceptionNote</description>
 		<icon file="" />
 	</end-state>
-	<end-state name="dev.jfire.org:booked">
+	<end-state name="dev.jfire.org:booked" publicState="true">
 		<name language="de">gebucht</name>
 		<description language="de">gebucht</description>
 		<name language="en">booked</name>

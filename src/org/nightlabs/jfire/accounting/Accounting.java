@@ -1198,89 +1198,89 @@ implements StoreCallback
 
 		ActionHandlerBookInvoice.register(jbpmProcessDefinition);
 
-		// store the process definition
-		ProcessDefinition processDefinition = ProcessDefinition.storeProcessDefinition(pm, null, jbpmProcessDefinition, jbpmProcessDefinitionURL);
-		ProcessDefinitionID processDefinitionID = (ProcessDefinitionID) JDOHelper.getObjectId(processDefinition);
-
-		setStateDefinitionProperties(processDefinition, JbpmConstantsInvoice.Both.NODE_NAME_BOOKED,
-				"booked",
-				"Booked.",
-				true);
-
-		setStateDefinitionProperties(processDefinition, JbpmConstantsInvoice.Both.NODE_NAME_SENT,
-				"sent",
-				"sent",
-				true);
-
-		setStateDefinitionProperties(processDefinition, JbpmConstantsInvoice.Both.NODE_NAME_PAID,
-				"paid",
-				"paid",
-				true);
-
-		switch (tradeSide) {
-			case vendor:
-			{
-				// give known StateDefinitions a name and a description
-				setStateDefinitionProperties(processDefinition, JbpmConstantsInvoice.Vendor.NODE_NAME_CREATED,
-						"created",
-						"The Invoice has been newly created. This is the first state in the Invoice related workflow.",
-						true);
-
-				setStateDefinitionProperties(processDefinition, JbpmConstantsInvoice.Vendor.NODE_NAME_ABORTED,
-						"aborted",
-						"Aborted.",
-						true);
-
-				setStateDefinitionProperties(processDefinition, JbpmConstantsInvoice.Vendor.NODE_NAME_BOOKED_UNRECEIVABLE,
-						"booked unreceivable",
-						"booked unreceivable",
-						true);
-
-				setStateDefinitionProperties(processDefinition, JbpmConstantsInvoice.Vendor.NODE_NAME_DOUBTFUL,
-						"doubtful",
-						"doubtful",
-						true);
-
-				setStateDefinitionProperties(processDefinition, JbpmConstantsInvoice.Vendor.NODE_NAME_FINALIZED,
-						"finalized",
-						"finalized",
-						true);
-
-				setStateDefinitionProperties(processDefinition, JbpmConstantsInvoice.Vendor.NODE_NAME_SENT_PRE_COLLECTION_LETTER,
-						"sent pre-collection letter",
-						"sent pre-collection letter",
-						true);
-
-				setStateDefinitionProperties(processDefinition, JbpmConstantsInvoice.Vendor.NODE_NAME_SENT_REMINDER,
-						"sent reminder",
-						"sent reminder",
-						true);
-
-				setStateDefinitionProperties(processDefinition, JbpmConstantsInvoice.Vendor.NODE_NAME_UNCOLLECTABLE,
-						"uncollectable",
-						"uncollectable",
-						true);
-
-				for (Transition transition : Transition.getTransitions(pm, processDefinitionID, JbpmConstantsInvoice.Vendor.TRANSITION_NAME_BOOK_IMPLICITELY)) {
-					transition.setUserExecutable(false);
-				}
-			}
-			break;
-			case customerCrossOrganisation:
-			{
-
-			}
-			case customerLocal:
-			{
-				// TODO set the names. Or even better implement a framework that reads some XML files colocated with the processdefinition.xml
-			}
-			break;
-			default:
-				throw new IllegalStateException("Unknown TradeSide: " + tradeSide);
-		}
-
-
-		return processDefinition;
+		// store the process definition and return it
+		return ProcessDefinition.storeProcessDefinition(pm, null, jbpmProcessDefinition, jbpmProcessDefinitionURL);
+//		ProcessDefinitionID processDefinitionID = (ProcessDefinitionID) JDOHelper.getObjectId(processDefinition);
+//
+//		setStateDefinitionProperties(processDefinition, JbpmConstantsInvoice.Both.NODE_NAME_BOOKED,
+//				"booked",
+//				"Booked.",
+//				true);
+//
+//		setStateDefinitionProperties(processDefinition, JbpmConstantsInvoice.Both.NODE_NAME_SENT,
+//				"sent",
+//				"sent",
+//				true);
+//
+//		setStateDefinitionProperties(processDefinition, JbpmConstantsInvoice.Both.NODE_NAME_PAID,
+//				"paid",
+//				"paid",
+//				true);
+//
+//		switch (tradeSide) {
+//			case vendor:
+//			{
+//				// give known StateDefinitions a name and a description
+//				setStateDefinitionProperties(processDefinition, JbpmConstantsInvoice.Vendor.NODE_NAME_CREATED,
+//						"created",
+//						"The Invoice has been newly created. This is the first state in the Invoice related workflow.",
+//						true);
+//
+//				setStateDefinitionProperties(processDefinition, JbpmConstantsInvoice.Vendor.NODE_NAME_ABORTED,
+//						"aborted",
+//						"Aborted.",
+//						true);
+//
+//				setStateDefinitionProperties(processDefinition, JbpmConstantsInvoice.Vendor.NODE_NAME_BOOKED_UNRECEIVABLE,
+//						"booked unreceivable",
+//						"booked unreceivable",
+//						true);
+//
+//				setStateDefinitionProperties(processDefinition, JbpmConstantsInvoice.Vendor.NODE_NAME_DOUBTFUL,
+//						"doubtful",
+//						"doubtful",
+//						true);
+//
+//				setStateDefinitionProperties(processDefinition, JbpmConstantsInvoice.Vendor.NODE_NAME_FINALIZED,
+//						"finalized",
+//						"finalized",
+//						true);
+//
+//				setStateDefinitionProperties(processDefinition, JbpmConstantsInvoice.Vendor.NODE_NAME_SENT_PRE_COLLECTION_LETTER,
+//						"sent pre-collection letter",
+//						"sent pre-collection letter",
+//						true);
+//
+//				setStateDefinitionProperties(processDefinition, JbpmConstantsInvoice.Vendor.NODE_NAME_SENT_REMINDER,
+//						"sent reminder",
+//						"sent reminder",
+//						true);
+//
+//				setStateDefinitionProperties(processDefinition, JbpmConstantsInvoice.Vendor.NODE_NAME_UNCOLLECTABLE,
+//						"uncollectable",
+//						"uncollectable",
+//						true);
+//
+//				for (Transition transition : Transition.getTransitions(pm, processDefinitionID, JbpmConstantsInvoice.Vendor.TRANSITION_NAME_BOOK_IMPLICITELY)) {
+//					transition.setUserExecutable(false);
+//				}
+//			}
+//			break;
+//			case customerCrossOrganisation:
+//			{
+//
+//			}
+//			case customerLocal:
+//			{
+//				// TODO set the names. Or even better implement a framework that reads some XML files colocated with the processdefinition.xml
+//			}
+//			break;
+//			default:
+//				throw new IllegalStateException("Unknown TradeSide: " + tradeSide);
+//		}
+//
+//
+//		return processDefinition;
 	}
 
 	/**

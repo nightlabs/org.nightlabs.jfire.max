@@ -1,94 +1,104 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<process-definition-extension xmlns="" name="dev.jfire.org:Offer.CustomerCrossOrganisation">
-<start-state name="dev.jfire.org:created" publicState="false">
-<name language="de">erzeugt</name>
-<description language="de">erzeugt</description>
-<name language="en">created</name>
-<description language="en">created</description>
-<icon file=""/>
-<transition name="accept" userExecutable="false">
-<name language="de">akzeptieren</name>
-<description language="de">akzeptieren</description>
-<name language="en">accept</name>
-<description language="en">accept</description>
-<icon file=""/>
-</transition>
-<transition name="reject" userExecutable="false">
-<name language="de">ablehnen</name>
-<description language="de">ablehnen</description>
-<name language="en">reject</name>
-<description language="en">reject</description>
-<icon file=""/>
-</transition>
-<transition name="dev.jfire.org:expired" userExecutable="false">
-<name language="de">ist-verfallen</name>
-<description language="de">ist-verfallen</description>
-<name language="en">expired</name>
-<description language="en">expired</description>
-<icon file=""/>
-</transition>
-<transition name="dev.jfire.org:revoked" userExecutable="false">
-<name language="de">ist-zurÃ¼ckgenommen</name>
-<description language="de">ist-zurÃ¼ckgenommen</description>
-<name language="en">revoked</name>
-<description language="en">revoked</description>
-<icon file=""/>
-</transition>
-<transition name="dev.jfire.org:acceptedImplicitely" userExecutable="false">
-<name language="de">acceptedImplicitely</name>
-<description language="de">acceptedImplicitely</description>
-<name language="en">acceptedImplicitely</name>
-<description language="en">acceptedImplicitely</description>
-<icon file=""/>
-</transition>
-<transition name="dev.jfire.org:acceptForCrossTrade" userExecutable="false">
-<name language="de">acceptForCrossTrade</name>
-<description language="de">acceptForCrossTrade</description>
-<name language="en">acceptForCrossTrade</name>
-<description language="en">acceptForCrossTrade</description>
-<icon file=""/>
-</transition>
-</start-state>
-<end-state name="dev.jfire.org:customerRejected" publicState="false">
-<name language="de">customerRejected</name>
-<description language="de">customerRejected</description>
-<name language="en">customerRejected</name>
-<description language="en">customerRejected</description>
-<icon file=""/>
-</end-state>
-<end-state name="dev.jfire.org:customerAccepted" publicState="false">
-<name language="de">customerAccepted</name>
-<description language="de">customerAccepted</description>
-<name language="en">customerAccepted</name>
-<description language="en">customerAccepted</description>
-<icon file=""/>
-</end-state>
-<end-state name="dev.jfire.org:expired" publicState="true">
-<name language="de">ist-verfallen</name>
-<description language="de">ist-verfallen</description>
-<name language="en">expired</name>
-<description language="en">The Offer has expired - the customer waited too long. A new Offer needs to be created in order to continue the interaction.</description>
-<icon file=""/>
-</end-state>
-<end-state name="dev.jfire.org:revoked" publicState="true">
-<name language="de">ist-zurÃ¼ckgenommen</name>
-<description language="de">ist-zurÃ¼ckgenommen</description>
-<name language="en">revoked</name>
-<description language="en">The Offer has been revoked by the vendor. The result is the same as if the customer had rejected the offer. A new Offer needs to be created in order to continue the interaction.</description>
-<icon file=""/>
-</end-state>
-<end-state name="dev.jfire.org:acceptedImplicitely" publicState="false">
-<name language="de">acceptedImplicitely</name>
-<description language="de">acceptedImplicitely</description>
-<name language="en">acceptedImplicitely</name>
-<description language="en">acceptedImplicitely</description>
-<icon file=""/>
-</end-state>
-<end-state name="dev.jfire.org:acceptedForCrossTrade" publicState="false">
-<name language="de">acceptedForCrossTrade</name>
-<description language="de">acceptedForCrossTrade</description>
-<name language="en">acceptedForCrossTrade</name>
-<description language="en">acceptedForCrossTrade</description>
-<icon file=""/>
-</end-state>
+<process-definition-extension xmlns=""
+	name="dev.jfire.org:Offer.CustomerCrossOrganisation">
+	<start-state name="dev.jfire.org:created" publicState="false">
+		<name language="de">erzeugt</name>
+		<description language="de">erzeugt</description>
+		<name language="en">created</name>
+		<description language="en">created</description>
+		<icon file="" />
+		<transition name="accept" userExecutable="false">
+			<name language="de">akzeptieren</name>
+			<description language="de">akzeptieren</description>
+			<name language="en">accept</name>
+			<description language="en">accept</description>
+			<icon file="" />
+		</transition>
+		<transition name="reject" userExecutable="false">
+			<name language="de">ablehnen</name>
+			<description language="de">ablehnen</description>
+			<name language="en">reject</name>
+			<description language="en">reject</description>
+			<icon file="" />
+		</transition>
+		<transition name="dev.jfire.org:expired" userExecutable="false">
+			<name language="de">ist-verfallen</name>
+			<description language="de">ist-verfallen</description>
+			<name language="en">expired</name>
+			<description language="en">expired</description>
+			<icon file="" />
+		</transition>
+		<transition name="dev.jfire.org:revoked" userExecutable="false">
+			<name language="de">ist-zurÃ¼ckgenommen</name>
+			<description language="de">ist-zurÃ¼ckgenommen</description>
+			<name language="en">revoked</name>
+			<description language="en">revoked</description>
+			<icon file="" />
+		</transition>
+		<transition name="dev.jfire.org:acceptedImplicitely"
+			userExecutable="false">
+			<name language="de">acceptedImplicitely</name>
+			<description language="de">acceptedImplicitely</description>
+			<name language="en">acceptedImplicitely</name>
+			<description language="en">acceptedImplicitely</description>
+			<icon file="" />
+		</transition>
+		<transition name="dev.jfire.org:acceptForCrossTrade"
+			userExecutable="false">
+			<name language="de">acceptForCrossTrade</name>
+			<description language="de">acceptForCrossTrade</description>
+			<name language="en">acceptForCrossTrade</name>
+			<description language="en">acceptForCrossTrade</description>
+			<icon file="" />
+		</transition>
+	</start-state>
+	<end-state name="dev.jfire.org:customerRejected" publicState="false">
+		<name language="de">customerRejected</name>
+		<description language="de">customerRejected</description>
+		<name language="en">customerRejected</name>
+		<description language="en">customerRejected</description>
+		<icon file="" />
+	</end-state>
+	<end-state name="dev.jfire.org:customerAccepted" publicState="false">
+		<name language="de">customerAccepted</name>
+		<description language="de">customerAccepted</description>
+		<name language="en">customerAccepted</name>
+		<description language="en">customerAccepted</description>
+		<icon file="" />
+	</end-state>
+	<end-state name="dev.jfire.org:expired" publicState="true">
+		<name language="de">ist-verfallen</name>
+		<description language="de">ist-verfallen</description>
+		<name language="en">expired</name>
+		<description language="en">The Offer has expired - the
+			customer waited too long. A new Offer needs to be created in order to
+			continue the interaction.</description>
+		<icon file="" />
+	</end-state>
+	<end-state name="dev.jfire.org:revoked" publicState="true">
+		<name language="de">ist-zurÃ¼ckgenommen</name>
+		<description language="de">ist-zurÃ¼ckgenommen</description>
+		<name language="en">revoked</name>
+		<description language="en">The Offer has been revoked by the
+			vendor. The result is the same as if the customer had rejected the
+			offer. A new Offer needs to be created in order to continue the
+			interaction.</description>
+		<icon file="" />
+	</end-state>
+	<end-state name="dev.jfire.org:acceptedImplicitely"
+		publicState="false">
+		<name language="de">acceptedImplicitely</name>
+		<description language="de">acceptedImplicitely</description>
+		<name language="en">acceptedImplicitely</name>
+		<description language="en">acceptedImplicitely</description>
+		<icon file="" />
+	</end-state>
+	<end-state name="dev.jfire.org:acceptedForCrossTrade"
+		publicState="false">
+		<name language="de">acceptedForCrossTrade</name>
+		<description language="de">acceptedForCrossTrade</description>
+		<name language="en">acceptedForCrossTrade</name>
+		<description language="en">acceptedForCrossTrade</description>
+		<icon file="" />
+	</end-state>
 </process-definition-extension>

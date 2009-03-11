@@ -1,66 +1,69 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<process-definition-extension xmlns="" name="dev.jfire.org:Invoice.CustomerCrossOrganisation">
-<start-state name="dev.jfire.org:sent" publicState="false">
-<name language="de">gesendet</name>
-<description language="de">gesendet</description>
-<name language="en">sent</name>
-<description language="en">sent</description>
-<icon file=""/>
-<transition name="createReceptionNote" userExecutable="false">
-<name language="de">erzeugeLieferschein</name>
-<description language="de">erzeugeLieferschein</description>
-<name language="en">createReceptionNote</name>
-<description language="en">createReceptionNote</description>
-<icon file=""/>
-</transition>
-<transition name="dev.jfire.org:deliver" userExecutable="false">
-<name language="de">liefern</name>
-<description language="de">liefern</description>
-<name language="en">deliver</name>
-<description language="en">deliver</description>
-<icon file=""/>
-</transition>
-</start-state>
-<end-state name="dev.jfire.org:createdReceptionNote" publicState="false">
-<name language="de">Lieferschein-erzeugt</name>
-<description language="de">Lieferschein-erzeugt</description>
-<name language="en">createdReceptionNote</name>
-<description language="en">createdReceptionNote</description>
-<icon file=""/>
-</end-state>
-<end-state name="dev.jfire.org:booked" publicState="false">
-<name language="de">gebucht</name>
-<description language="de">gebucht</description>
-<name language="en">booked</name>
-<description language="en">booked</description>
-<icon file=""/>
-</end-state>
-<state name="dev.jfire.org:delivered" publicState="false">
-<name language="de">geliefert</name>
-<description language="de">geliefert</description>
-<name language="en">delivered</name>
-<description language="en">delivered</description>
-<icon file=""/>
-<transition name="dev.jfire.org:book" userExecutable="false">
-<name language="de">buchen</name>
-<description language="de">buchen</description>
-<name language="en">book</name>
-<description language="en">book</description>
-<icon file=""/>
-</transition>
-<transition name="dev.jfire.org:bookImplicitely" userExecutable="false">
-<name language="de">buchen-implizit</name>
-<description language="de">buchen-implizit</description>
-<name language="en">bookImplicitely</name>
-<description language="en">bookImplicitely</description>
-<icon file=""/>
-</transition>
-</state>
-<node name="dev.jfire.org:bookedImplicitely" publicState="false">
-<name language="de">gebucht-implizit</name>
-<description language="de">gebucht-implizit</description>
-<name language="en">bookedImplicitely</name>
-<description language="en">bookedImplicitely</description>
-<icon file=""/>
-</node>
+<process-definition-extension xmlns=""
+	name="dev.jfire.org:Invoice.CustomerCrossOrganisation">
+	<start-state name="dev.jfire.org:sent" publicState="false">
+		<name language="de">gesendet</name>
+		<description language="de">gesendet</description>
+		<name language="en">sent</name>
+		<description language="en">sent</description>
+		<icon file="" />
+		<transition name="createReceptionNote" userExecutable="false">
+			<name language="de">erzeugeLieferschein</name>
+			<description language="de">erzeugeLieferschein</description>
+			<name language="en">createReceptionNote</name>
+			<description language="en">createReceptionNote</description>
+			<icon file="" />
+		</transition>
+		<transition name="dev.jfire.org:deliver" userExecutable="false">
+			<name language="de">liefern</name>
+			<description language="de">liefern</description>
+			<name language="en">deliver</name>
+			<description language="en">deliver</description>
+			<icon file="" />
+		</transition>
+	</start-state>
+	<end-state name="dev.jfire.org:createdReceptionNote"
+		publicState="false">
+		<name language="de">Lieferschein-erzeugt</name>
+		<description language="de">Lieferschein-erzeugt</description>
+		<name language="en">createdReceptionNote</name>
+		<description language="en">createdReceptionNote</description>
+		<icon file="" />
+	</end-state>
+	<end-state name="dev.jfire.org:booked" publicState="false">
+		<name language="de">gebucht</name>
+		<description language="de">gebucht</description>
+		<name language="en">booked</name>
+		<description language="en">booked</description>
+		<icon file="" />
+	</end-state>
+	<state name="dev.jfire.org:delivered" publicState="false">
+		<name language="de">geliefert</name>
+		<description language="de">geliefert</description>
+		<name language="en">delivered</name>
+		<description language="en">delivered</description>
+		<icon file="" />
+		<transition name="dev.jfire.org:book" userExecutable="false">
+			<name language="de">buchen</name>
+			<description language="de">buchen</description>
+			<name language="en">book</name>
+			<description language="en">book</description>
+			<icon file="" />
+		</transition>
+		<transition name="dev.jfire.org:bookImplicitely"
+			userExecutable="false">
+			<name language="de">buchen-implizit</name>
+			<description language="de">buchen-implizit</description>
+			<name language="en">bookImplicitely</name>
+			<description language="en">bookImplicitely</description>
+			<icon file="" />
+		</transition>
+	</state>
+	<node name="dev.jfire.org:bookedImplicitely" publicState="false">
+		<name language="de">gebucht-implizit</name>
+		<description language="de">gebucht-implizit</description>
+		<name language="en">bookedImplicitely</name>
+		<description language="en">bookedImplicitely</description>
+		<icon file="" />
+	</node>
 </process-definition-extension>

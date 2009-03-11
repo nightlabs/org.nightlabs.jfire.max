@@ -1,87 +1,89 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<process-definition-extension xmlns="" name="dev.jfire.org:Invoice.CustomerLocal">
-<start-state name="dev.jfire.org:created" publicState="false">
-<name language="de">erzeugt</name>
-<description language="de">erzeugt</description>
-<name language="en">created</name>
-<description language="en">created</description>
-<icon file=""/>
-<transition name="finalize" userExecutable="false">
-<name language="de">finalisieren</name>
-<description language="de">finalisieren</description>
-<name language="en">finalize</name>
-<description language="en">finalize</description>
-<icon file=""/>
-</transition>
-<transition name="abort" userExecutable="false">
-<name language="de">abbrechen</name>
-<description language="de">abbrechen</description>
-<name language="en">abort</name>
-<description language="en">abort</description>
-<icon file=""/>
-</transition>
-<transition name="dev.jfire.org:bookImplicitely" userExecutable="false">
-<name language="de">buchen-implizit</name>
-<description language="de">buchen-implizit</description>
-<name language="en">bookImplicitely</name>
-<description language="en">bookImplicitely</description>
-<icon file=""/>
-</transition>
-</start-state>
-<state name="dev.jfire.org:finalized" publicState="false">
-<name language="de">finalisiert</name>
-<description language="de">finalisiert</description>
-<name language="en">finalized</name>
-<description language="en">finalized</description>
-<icon file=""/>
-<transition name="dev.jfire.org:book" userExecutable="false">
-<name language="de">buchen</name>
-<description language="de">buchen</description>
-<name language="en">book</name>
-<description language="en">book</description>
-<icon file=""/>
-</transition>
-</state>
-<state name="dev.jfire.org:booked" publicState="false">
-<name language="de">gebucht</name>
-<description language="de">gebucht</description>
-<name language="en">booked</name>
-<description language="en">booked</description>
-<icon file=""/>
-<transition name="dev.jfire.org:send" userExecutable="false">
-<name language="de">senden</name>
-<description language="de">senden</description>
-<name language="en">send</name>
-<description language="en">send</description>
-<icon file=""/>
-</transition>
-<transition name="dev.jfire.org:deliver" userExecutable="false">
-<name language="de">liefern</name>
-<description language="de">liefern</description>
-<name language="en">deliver</name>
-<description language="en">deliver</description>
-<icon file=""/>
-</transition>
-</state>
-<end-state name="dev.jfire.org:aborted" publicState="false">
-<name language="de">abgebrochen</name>
-<description language="de">abgebrochen</description>
-<name language="en">aborted</name>
-<description language="en">aborted</description>
-<icon file=""/>
-</end-state>
-<end-state name="dev.jfire.org:delivered" publicState="false">
-<name language="de">geliefert</name>
-<description language="de">geliefert</description>
-<name language="en">delivered</name>
-<description language="en">delivered</description>
-<icon file=""/>
-</end-state>
-<node name="dev.jfire.org:sent" publicState="false">
-<name language="de">gesendet</name>
-<description language="de">gesendet</description>
-<name language="en">sent</name>
-<description language="en">sent</description>
-<icon file=""/>
-</node>
+<process-definition-extension xmlns=""
+	name="dev.jfire.org:Invoice.CustomerLocal">
+	<start-state name="dev.jfire.org:created" publicState="false">
+		<name language="de">erzeugt</name>
+		<description language="de">erzeugt</description>
+		<name language="en">created</name>
+		<description language="en">created</description>
+		<icon file="" />
+		<transition name="finalize" userExecutable="false">
+			<name language="de">finalisieren</name>
+			<description language="de">finalisieren</description>
+			<name language="en">finalize</name>
+			<description language="en">finalize</description>
+			<icon file="" />
+		</transition>
+		<transition name="abort" userExecutable="false">
+			<name language="de">abbrechen</name>
+			<description language="de">abbrechen</description>
+			<name language="en">abort</name>
+			<description language="en">abort</description>
+			<icon file="" />
+		</transition>
+		<transition name="dev.jfire.org:bookImplicitely"
+			userExecutable="false">
+			<name language="de">buchen-implizit</name>
+			<description language="de">buchen-implizit</description>
+			<name language="en">bookImplicitely</name>
+			<description language="en">bookImplicitely</description>
+			<icon file="" />
+		</transition>
+	</start-state>
+	<state name="dev.jfire.org:finalized" publicState="false">
+		<name language="de">finalisiert</name>
+		<description language="de">finalisiert</description>
+		<name language="en">finalized</name>
+		<description language="en">finalized</description>
+		<icon file="" />
+		<transition name="dev.jfire.org:book" userExecutable="false">
+			<name language="de">buchen</name>
+			<description language="de">buchen</description>
+			<name language="en">book</name>
+			<description language="en">book</description>
+			<icon file="" />
+		</transition>
+	</state>
+	<state name="dev.jfire.org:booked" publicState="false">
+		<name language="de">gebucht</name>
+		<description language="de">gebucht</description>
+		<name language="en">booked</name>
+		<description language="en">booked</description>
+		<icon file="" />
+		<transition name="dev.jfire.org:send" userExecutable="false">
+			<name language="de">senden</name>
+			<description language="de">senden</description>
+			<name language="en">send</name>
+			<description language="en">send</description>
+			<icon file="" />
+		</transition>
+		<transition name="dev.jfire.org:deliver" userExecutable="false">
+			<name language="de">liefern</name>
+			<description language="de">liefern</description>
+			<name language="en">deliver</name>
+			<description language="en">deliver</description>
+			<icon file="" />
+		</transition>
+	</state>
+	<end-state name="dev.jfire.org:aborted" publicState="false">
+		<name language="de">abgebrochen</name>
+		<description language="de">abgebrochen</description>
+		<name language="en">aborted</name>
+		<description language="en">aborted</description>
+		<icon file="" />
+	</end-state>
+	<end-state name="dev.jfire.org:delivered" publicState="false">
+		<name language="de">geliefert</name>
+		<description language="de">geliefert</description>
+		<name language="en">delivered</name>
+		<description language="en">delivered</description>
+		<icon file="" />
+	</end-state>
+	<node name="dev.jfire.org:sent" publicState="false">
+		<name language="de">gesendet</name>
+		<description language="de">gesendet</description>
+		<name language="en">sent</name>
+		<description language="en">sent</description>
+		<icon file="" />
+	</node>
 </process-definition-extension>

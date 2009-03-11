@@ -193,14 +193,11 @@ implements Serializable
 
 				}
 				// create Transitions
-				// TODO should we create JDO Transition objects for all jbpm Transitions? right now we can't because we create only StateDefinitions for States (not for other Nodes)
 				if (node.getLeavingTransitions() != null) {
 					for (Iterator <?>itTransition = node.getLeavingTransitions().iterator(); itTransition.hasNext(); ) {
 						org.jbpm.graph.def.Transition jbpmTransition = (org.jbpm.graph.def.Transition) itTransition.next();
 						//							TransitionID transitionID = Transition.getTransitionID(jbpmTransition);
-						Transition transition = pm.makePersistent(new Transition(stateDefinition, jbpmTransition.getName()));
-
-												
+						Transition transition = pm.makePersistent(new Transition(stateDefinition, jbpmTransition.getName()));						
 						if(processDefinitionDescriptor != null)
 						{
 							ExtendedNodeDescriptor transitionExtendedNode = processDefinitionDescriptor.getExtendedNodeDescriptor(jbpmTransition);
@@ -213,8 +210,7 @@ implements Serializable
 							}	
 						}
 					}
-				} // if (node.getLeavingTransitions() != null) {
-				//				}
+				} 
 			}
 
 			return processDefinition;

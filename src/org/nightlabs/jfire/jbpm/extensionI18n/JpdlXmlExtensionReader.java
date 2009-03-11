@@ -248,7 +248,6 @@ public class JpdlXmlExtensionReader implements ProblemListener {
 		// create descriptor
 		ExtendedNodeDescriptor nodeDescriptor = new ExtendedNodeDescriptor(nodeID, name, buffer);
 		nodeDescriptor.setIconFile(iconFile); // set the icon file
-
 		// set a userExecutable for a transition.
 		if(element.getNodeName().equals("transition"))	
 		{	

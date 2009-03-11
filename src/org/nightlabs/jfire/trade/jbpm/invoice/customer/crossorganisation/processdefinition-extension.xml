@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <process-definition-extension xmlns="" name="dev.jfire.org:Invoice.CustomerCrossOrganisation">
-	<start-state name="dev.jfire.org:sent">
+	<start-state name="dev.jfire.org:sent" publicState="true">
 		<name language="de">gesendet</name>
 		<description language="de">gesendet</description>
 		<name language="en">sent</name>
@@ -65,4 +65,11 @@
 		<description language="en">bookedImplicitely</description>
 		<icon file="" />
 	</node>
+	<end-state name="dev.jfire.org:paid" publicState="true">
+		<name language="de">paid</name>
+		<description language="de">paid</description>
+		<name language="en">paid</name>
+		<description language="en">paid</description>
+		<icon file="" />
+	</end-state>
 </process-definition-extension>

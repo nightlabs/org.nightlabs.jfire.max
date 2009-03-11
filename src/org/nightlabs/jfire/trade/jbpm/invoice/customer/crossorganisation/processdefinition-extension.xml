@@ -7,14 +7,14 @@
 		<name language="en">sent</name>
 		<description language="en">sent</description>
 		<icon file="" />
-		<transition name="createReceptionNote" userExecutable="false">
+		<transition name="createReceptionNote">
 			<name language="de">erzeugeLieferschein</name>
 			<description language="de">erzeugeLieferschein</description>
 			<name language="en">createReceptionNote</name>
 			<description language="en">createReceptionNote</description>
 			<icon file="" />
 		</transition>
-		<transition name="dev.jfire.org:deliver" userExecutable="false">
+		<transition name="dev.jfire.org:deliver">
 			<name language="de">liefern</name>
 			<description language="de">liefern</description>
 			<name language="en">deliver</name>
@@ -30,20 +30,20 @@
 		<description language="en">createdReceptionNote</description>
 		<icon file="" />
 	</end-state>
-	<end-state name="dev.jfire.org:booked" publicState="false">
+	<end-state name="dev.jfire.org:booked">
 		<name language="de">gebucht</name>
 		<description language="de">gebucht</description>
 		<name language="en">booked</name>
 		<description language="en">booked</description>
 		<icon file="" />
 	</end-state>
-	<state name="dev.jfire.org:delivered" publicState="false">
+	<state name="dev.jfire.org:delivered">
 		<name language="de">geliefert</name>
 		<description language="de">geliefert</description>
 		<name language="en">delivered</name>
 		<description language="en">delivered</description>
 		<icon file="" />
-		<transition name="dev.jfire.org:book" userExecutable="false">
+		<transition name="dev.jfire.org:book">
 			<name language="de">buchen</name>
 			<description language="de">buchen</description>
 			<name language="en">book</name>
@@ -59,7 +59,7 @@
 			<icon file="" />
 		</transition>
 	</state>
-	<node name="dev.jfire.org:bookedImplicitely" publicState="false">
+	<node name="dev.jfire.org:bookedImplicitely">
 		<name language="de">gebucht-implizit</name>
 		<description language="de">gebucht-implizit</description>
 		<name language="en">bookedImplicitely</name>

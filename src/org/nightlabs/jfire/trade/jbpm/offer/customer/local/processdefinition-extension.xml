@@ -14,7 +14,7 @@
 			<description language="en">finalize</description>
 			<icon file="" />
 		</transition>
-		<transition name="abort" userExecutable="false">
+		<transition name="abort">
 			<name language="de">abbrechen</name>
 			<description language="de">abbrechen</description>
 			<name language="en">abort</name>
@@ -30,41 +30,41 @@
 			<icon file="" />
 		</transition>
 	</start-state>
-	<end-state name="dev.jfire.org:rejected" publicState="false">
+	<end-state name="dev.jfire.org:rejected">
 		<name language="de">rejected</name>
 		<description language="de">rejected</description>
 		<name language="en">rejected</name>
 		<description language="en">rejected</description>
 		<icon file="" />
 	</end-state>
-	<end-state name="dev.jfire.org:accepted" publicState="false">
+	<end-state name="dev.jfire.org:accepted">
 		<name language="de">accepted</name>
 		<description language="de">accepted</description>
 		<name language="en">accepted</name>
 		<description language="en">accepted</description>
 		<icon file="" />
 	</end-state>
-	<state name="dev.jfire.org:finalized" publicState="false">
+	<state name="dev.jfire.org:finalized">
 		<name language="de">finalized</name>
 		<description language="de">finalized</description>
 		<name language="en">finalized</name>
 		<description language="en">finalized</description>
 		<icon file="" />
-		<transition name="dev.jfire.org:expire" userExecutable="false">
+		<transition name="dev.jfire.org:expire">
 			<name language="de">expire</name>
 			<description language="de">expire</description>
 			<name language="en">expire</name>
 			<description language="en">expire</description>
 			<icon file="" />
 		</transition>
-		<transition name="revoke" userExecutable="false">
+		<transition name="revoke">
 			<name language="de">revoke</name>
 			<description language="de">revoke</description>
 			<name language="en">revoke</name>
 			<description language="en">revoke</description>
 			<icon file="" />
 		</transition>
-		<transition name="reject" userExecutable="false">
+		<transition name="reject">
 			<name language="de">reject</name>
 			<description language="de">reject</description>
 			<name language="en">reject</name>
@@ -79,14 +79,14 @@
 			<description language="en">customerAccepted</description>
 			<icon file="" />
 		</transition>
-		<transition name="accept" userExecutable="false">
+		<transition name="accept">
 			<name language="de">accept</name>
 			<description language="de">accept</description>
 			<name language="en">accept</name>
 			<description language="en">accept</description>
 			<icon file="" />
 		</transition>
-		<transition name="dev.jfire.org:send" userExecutable="false">
+		<transition name="dev.jfire.org:send">
 			<name language="de">send</name>
 			<description language="de">send</description>
 			<name language="en">send</name>
@@ -111,7 +111,7 @@
 			continue the interaction.</description>
 		<icon file="" />
 	</end-state>
-	<end-state name="dev.jfire.org:aborted" publicState="false">
+	<end-state name="dev.jfire.org:aborted">
 		<name language="de">aborted</name>
 		<description language="de">aborted</description>
 		<name language="en">aborted</name>
@@ -128,13 +128,13 @@
 			interaction.</description>
 		<icon file="" />
 	</end-state>
-	<node name="dev.jfire.org:customerAccepted" publicState="false">
+	<node name="dev.jfire.org:customerAccepted">
 		<name language="de">customerAccepted</name>
 		<description language="de">customerAccepted</description>
 		<name language="en">customerAccepted</name>
 		<description language="en">customerAccepted</description>
 		<icon file="" />
-		<transition name="accept" userExecutable="false">
+		<transition name="accept">
 			<name language="de">accept</name>
 			<description language="de">accept</description>
 			<name language="en">accept</name>
@@ -149,14 +149,14 @@
 		<description language="en">The Offer has been sent from the
 			vendor to the customer.</description>
 		<icon file="" />
-		<transition name="dev.jfire.org:send" userExecutable="false">
+		<transition name="dev.jfire.org:send">
 			<name language="de">send</name>
 			<description language="de">send</description>
 			<name language="en">send</name>
 			<description language="en">send</description>
 			<icon file="" />
 		</transition>
-		<transition name="sendImplicitely" userExecutable="false">
+		<transition name="sendImplicitely">
 			<name language="de">sendImplicitely</name>
 			<description language="de">sendImplicitely</description>
 			<name language="en">sendImplicitely</name>

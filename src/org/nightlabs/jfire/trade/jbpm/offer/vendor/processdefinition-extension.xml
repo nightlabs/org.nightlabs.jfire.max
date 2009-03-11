@@ -119,7 +119,7 @@
 			<icon file="" />
 		</transition>
 	</state>
-	<end-state name="dev.jfire.org:expired" publicState="false">
+	<end-state name="dev.jfire.org:expired">
 		<name language="de">ist-verfallen</name>
 		<description language="de">ist-verfallen</description>
 		<name language="en">expired</name>
@@ -128,7 +128,7 @@
 			continue the interaction.</description>
 		<icon file="" />
 	</end-state>
-	<end-state name="dev.jfire.org:aborted" publicState="false">
+	<end-state name="dev.jfire.org:aborted">
 		<name language="de">abgebrochen</name>
 		<description language="de">abgebrochen</description>
 		<name language="en">aborted</name>
@@ -137,7 +137,7 @@
 			order to continue the interaction.</description>
 		<icon file="" />
 	</end-state>
-	<end-state name="dev.jfire.org:revoked" publicState="false">
+	<end-state name="dev.jfire.org:revoked">
 		<name language="de">ist-zurÃ¼ckgenommen</name>
 		<description language="de">ist-zurÃ¼ckgenommen</description>
 		<name language="en">revoked</name>
@@ -147,7 +147,7 @@
 			interaction.</description>
 		<icon file="" />
 	</end-state>
-	<node name="dev.jfire.org:customerAccepted" publicState="false">
+	<node name="dev.jfire.org:customerAccepted">
 		<name language="de">Kunde-akzeptierte</name>
 		<description language="de">Kunde-akzeptierte</description>
 		<name language="en">customerAccepted</name>
@@ -161,7 +161,7 @@
 			<icon file="" />
 		</transition>
 	</node>
-	<node name="dev.jfire.org:customerRejected" publicState="false">
+	<node name="dev.jfire.org:customerRejected">
 		<name language="de">Kunde-hat-abgelehnt</name>
 		<description language="de">Kunde-hat-abgelehnt</description>
 		<name language="en">customerRejected</name>
@@ -175,7 +175,7 @@
 			<icon file="" />
 		</transition>
 	</node>
-	<node name="dev.jfire.org:sent" publicState="false">
+	<node name="dev.jfire.org:sent">
 		<name language="de">gesendet</name>
 		<description language="de">gesendet</description>
 		<name language="en">sent</name>

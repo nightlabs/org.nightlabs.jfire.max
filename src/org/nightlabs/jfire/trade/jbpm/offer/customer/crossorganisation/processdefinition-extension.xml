@@ -1,34 +1,34 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <process-definition-extension xmlns=""
 	name="dev.jfire.org:Offer.CustomerCrossOrganisation">
-	<start-state name="dev.jfire.org:created" publicState="false">
+	<start-state name="dev.jfire.org:created">
 		<name language="de">erzeugt</name>
 		<description language="de">erzeugt</description>
 		<name language="en">created</name>
 		<description language="en">created</description>
 		<icon file="" />
-		<transition name="accept" userExecutable="false">
+		<transition name="accept">
 			<name language="de">akzeptieren</name>
 			<description language="de">akzeptieren</description>
 			<name language="en">accept</name>
 			<description language="en">accept</description>
 			<icon file="" />
 		</transition>
-		<transition name="reject" userExecutable="false">
+		<transition name="reject">
 			<name language="de">ablehnen</name>
 			<description language="de">ablehnen</description>
 			<name language="en">reject</name>
 			<description language="en">reject</description>
 			<icon file="" />
 		</transition>
-		<transition name="dev.jfire.org:expired" userExecutable="false">
+		<transition name="dev.jfire.org:expired">
 			<name language="de">ist-verfallen</name>
 			<description language="de">ist-verfallen</description>
 			<name language="en">expired</name>
 			<description language="en">expired</description>
 			<icon file="" />
 		</transition>
-		<transition name="dev.jfire.org:revoked" userExecutable="false">
+		<transition name="dev.jfire.org:revoked">
 			<name language="de">ist-zurÃ¼ckgenommen</name>
 			<description language="de">ist-zurÃ¼ckgenommen</description>
 			<name language="en">revoked</name>
@@ -52,14 +52,14 @@
 			<icon file="" />
 		</transition>
 	</start-state>
-	<end-state name="dev.jfire.org:customerRejected" publicState="false">
+	<end-state name="dev.jfire.org:customerRejected">
 		<name language="de">customerRejected</name>
 		<description language="de">customerRejected</description>
 		<name language="en">customerRejected</name>
 		<description language="en">customerRejected</description>
 		<icon file="" />
 	</end-state>
-	<end-state name="dev.jfire.org:customerAccepted" publicState="false">
+	<end-state name="dev.jfire.org:customerAccepted">
 		<name language="de">customerAccepted</name>
 		<description language="de">customerAccepted</description>
 		<name language="en">customerAccepted</name>

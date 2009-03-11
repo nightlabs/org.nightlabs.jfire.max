@@ -7,7 +7,7 @@
 		<name language="en">created</name>
 		<description language="en">created</description>
 		<icon file="" />
-		<transition name="finalize" userExecutable="false">
+		<transition name="finalize">
 			<name language="de">finalisieren</name>
 			<description language="de">finalisieren</description>
 			<name language="en">finalize</name>
@@ -15,13 +15,13 @@
 			<icon file="" />
 		</transition>
 	</start-state>
-	<state name="dev.jfire.org:finalized" publicState="false">
+	<state name="dev.jfire.org:finalized">
 		<name language="de">finalisiert</name>
 		<description language="de">finalisiert</description>
 		<name language="en">finalized</name>
 		<description language="en">finalized</description>
 		<icon file="" />
-		<transition name="dev.jfire.org:book" userExecutable="false">
+		<transition name="dev.jfire.org:book">
 			<name language="de">buchen</name>
 			<description language="de">buchen</description>
 			<name language="en">book</name>
@@ -29,20 +29,20 @@
 			<icon file="" />
 		</transition>
 	</state>
-	<state name="dev.jfire.org:booked" publicState="false">
+	<state name="dev.jfire.org:booked">
 		<name language="de">gebucht</name>
 		<description language="de">gebucht</description>
 		<name language="en">booked</name>
 		<description language="en">booked</description>
 		<icon file="" />
-		<transition name="dev.jfire.org:send" userExecutable="false">
+		<transition name="dev.jfire.org:send">
 			<name language="de">senden</name>
 			<description language="de">senden</description>
 			<name language="en">send</name>
 			<description language="en">send</description>
 			<icon file="" />
 		</transition>
-		<transition name="dev.jfire.org:deliver" userExecutable="false">
+		<transition name="dev.jfire.org:deliver">
 			<name language="de">liefern</name>
 			<description language="de">liefern</description>
 			<name language="en">deliver</name>
@@ -50,7 +50,7 @@
 			<icon file="" />
 		</transition>
 	</state>
-	<node name="dev.jfire.org:sent" publicState="false">
+	<node name="dev.jfire.org:sent">
 		<name language="de">gesendet</name>
 		<description language="de">gesendet</description>
 		<name language="en">sent</name>

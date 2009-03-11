@@ -236,8 +236,7 @@
 			<description language="en">stopRecurrence</description>
 			<icon file="" />
 		</transition>
-		<transition name="dev.jfire.org:pauseRecurrence"
-			userExecutable="false">
+		<transition name="dev.jfire.org:pauseRecurrence" userExecutable="false">
 			<name language="de">Wiederkehr-pausieren</name>
 			<description language="de">Wiederkehr-pausieren</description>
 			<name language="en">pauseRecurrence</name>

@@ -40,17 +40,14 @@
 		<name language="de">abgelehnt</name>
 		<description language="de">abgelehnt</description>
 		<name language="en">rejected</name>
-		<description language="en">The Offer has been rejected by
-			the customer. A new Offer needs to be created in order to continue
-			the interaction.</description>
+		<description language="en">The Offer has been rejected by the customer. A new Offer needs to be created in order to continue the interaction.</description>
 		<icon file="" />
 	</end-state>
 	<end-state name="dev.jfire.org:accepted" publicState="true">
 		<name language="de">akzeptiert</name>
 		<description language="de">akzeptiert</description>
 		<name language="en">accepted</name>
-		<description language="en">The Offer has been accepted by
-			the customer. That turns the offer into a binding contract.</description>
+		<description language="en">The Offer has been accepted by the customer. That turns the offer into a binding contract.</description>
 		<icon file="" />
 	</end-state>
 	<state name="dev.jfire.org:finalized" publicState="true">
@@ -120,18 +117,14 @@
 		<name language="de">ist-verfallen</name>
 		<description language="de">ist-verfallen</description>
 		<name language="en">expired</name>
-		<description language="en">The Offer has expired - the
-			customer waited too long. A new Offer needs to be created in order to
-			continue the interaction.</description>
+		<description language="en">The Offer has expired - the customer waited too long. A new Offer needs to be created in order to continue the interaction.</description>
 		<icon file="" />
 	</end-state>
 	<end-state name="dev.jfire.org:aborted">
 		<name language="de">abgebrochen</name>
 		<description language="de">abgebrochen</description>
 		<name language="en">aborted</name>
-		<description language="en">The Offer has been aborted by the
-			vendor (before finalization). A new Offer needs to be created in
-			order to continue the interaction.</description>
+		<description language="en">The Offer has been aborted by the vendor (before finalization). A new Offer needs to be created in order to continue the interaction.</description>
 		<icon file="" />
 	</end-state>
 	<end-state name="dev.jfire.org:revoked">

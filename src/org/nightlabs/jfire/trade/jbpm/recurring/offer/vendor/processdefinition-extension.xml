@@ -1,26 +1,26 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <process-definition-extension xmlns="" name="dev.jfire.org:RecurringOffer.Vendor">
-<start-state name="dev.jfire.org:created">
+<start-state name="dev.jfire.org:created" publicState="false">
 <name language="de">erzeugt</name>
 <description language="de">erzeugt</description>
 <name language="en">created</name>
 <description language="en">created</description>
 <icon file=""/>
-<transition name="finalize">
+<transition name="finalize" userExecutable="false">
 <name language="de">finalisieren</name>
 <description language="de">finalisieren</description>
 <name language="en">finalize</name>
 <description language="en">finalize</description>
 <icon file=""/>
 </transition>
-<transition name="abort">
+<transition name="abort" userExecutable="false">
 <name language="de">abbrechen</name>
 <description language="de">abbrechen</description>
 <name language="en">abort</name>
 <description language="en">abort</description>
 <icon file=""/>
 </transition>
-<transition name="dev.jfire.org:acceptImplicitely">
+<transition name="dev.jfire.org:acceptImplicitely" userExecutable="false">
 <name language="de">akzeptieren-implizit</name>
 <description language="de">akzeptieren-implizit</description>
 <name language="en">acceptImplicitely</name>
@@ -28,69 +28,69 @@
 <icon file=""/>
 </transition>
 </start-state>
-<end-state name="dev.jfire.org:rejected">
+<end-state name="dev.jfire.org:rejected" publicState="false">
 <name language="de">abgelehnt</name>
 <description language="de">abgelehnt</description>
 <name language="en">rejected</name>
 <description language="en">rejected</description>
 <icon file=""/>
 </end-state>
-<state name="dev.jfire.org:finalized">
+<state name="dev.jfire.org:finalized" publicState="false">
 <name language="de">finalisiert</name>
 <description language="de">finalisiert</description>
 <name language="en">finalized</name>
 <description language="en">finalized</description>
 <icon file=""/>
-<transition name="dev.jfire.org:expire">
+<transition name="dev.jfire.org:expire" userExecutable="false">
 <name language="de">verfallen</name>
 <description language="de">verfallen</description>
 <name language="en">expire</name>
 <description language="en">expire</description>
 <icon file=""/>
 </transition>
-<transition name="revoke">
-<name language="de">zurücknehmen</name>
-<description language="de">zurücknehmen</description>
+<transition name="revoke" userExecutable="false">
+<name language="de">zurÃ¼cknehmen</name>
+<description language="de">zurÃ¼cknehmen</description>
 <name language="en">revoke</name>
 <description language="en">revoke</description>
 <icon file=""/>
 </transition>
-<transition name="reject">
+<transition name="reject" userExecutable="false">
 <name language="de">ablehnen</name>
 <description language="de">ablehnen</description>
 <name language="en">reject</name>
 <description language="en">reject</description>
 <icon file=""/>
 </transition>
-<transition name="dev.jfire.org:customerAccepted">
+<transition name="dev.jfire.org:customerAccepted" userExecutable="false">
 <name language="de">Kunde-akzeptierte</name>
 <description language="de">Kunde-akzeptierte</description>
 <name language="en">customerAccepted</name>
 <description language="en">customerAccepted</description>
 <icon file=""/>
 </transition>
-<transition name="dev.jfire.org:customerRejected">
+<transition name="dev.jfire.org:customerRejected" userExecutable="false">
 <name language="de">Kunde-hat-abgelehnt</name>
 <description language="de">Kunde-hat-abgelehnt</description>
 <name language="en">customerRejected</name>
 <description language="en">customerRejected</description>
 <icon file=""/>
 </transition>
-<transition name="accept">
+<transition name="accept" userExecutable="false">
 <name language="de">akzeptieren</name>
 <description language="de">akzeptieren</description>
 <name language="en">accept</name>
 <description language="en">accept</description>
 <icon file=""/>
 </transition>
-<transition name="dev.jfire.org:send">
+<transition name="dev.jfire.org:send" userExecutable="false">
 <name language="de">senden</name>
 <description language="de">senden</description>
 <name language="en">send</name>
 <description language="en">send</description>
 <icon file=""/>
 </transition>
-<transition name="dev.jfire.org:acceptImplicitely">
+<transition name="dev.jfire.org:acceptImplicitely" userExecutable="false">
 <name language="de">akzeptieren-implizit</name>
 <description language="de">akzeptieren-implizit</description>
 <name language="en">acceptImplicitely</name>
@@ -98,41 +98,41 @@
 <icon file=""/>
 </transition>
 </state>
-<end-state name="dev.jfire.org:expired">
+<end-state name="dev.jfire.org:expired" publicState="false">
 <name language="de">ist-verfallen</name>
 <description language="de">ist-verfallen</description>
 <name language="en">expired</name>
 <description language="en">expired</description>
 <icon file=""/>
 </end-state>
-<end-state name="dev.jfire.org:aborted">
+<end-state name="dev.jfire.org:aborted" publicState="false">
 <name language="de">abgebrochen</name>
 <description language="de">abgebrochen</description>
 <name language="en">aborted</name>
 <description language="en">aborted</description>
 <icon file=""/>
 </end-state>
-<end-state name="dev.jfire.org:revoked">
-<name language="de">ist-zurückgenommen</name>
-<description language="de">ist-zurückgenommen</description>
+<end-state name="dev.jfire.org:revoked" publicState="false">
+<name language="de">ist-zurÃ¼ckgenommen</name>
+<description language="de">ist-zurÃ¼ckgenommen</description>
 <name language="en">revoked</name>
 <description language="en">revoked</description>
 <icon file=""/>
 </end-state>
-<end-state name="dev.jfire.org:recurrenceStopped">
+<end-state name="dev.jfire.org:recurrenceStopped" publicState="false">
 <name language="de">Wiederkehr-gestoppt</name>
 <description language="de">Wiederkehr-gestoppt</description>
 <name language="en">recurrenceStopped</name>
 <description language="en">recurrenceStopped</description>
 <icon file=""/>
 </end-state>
-<node name="dev.jfire.org:customerAccepted">
+<node name="dev.jfire.org:customerAccepted" publicState="false">
 <name language="de">Kunde-akzeptierte</name>
 <description language="de">Kunde-akzeptierte</description>
 <name language="en">customerAccepted</name>
 <description language="en">customerAccepted</description>
 <icon file=""/>
-<transition name="accept">
+<transition name="accept" userExecutable="false">
 <name language="de">akzeptieren</name>
 <description language="de">akzeptieren</description>
 <name language="en">accept</name>
@@ -140,13 +140,13 @@
 <icon file=""/>
 </transition>
 </node>
-<node name="dev.jfire.org:customerRejected">
+<node name="dev.jfire.org:customerRejected" publicState="false">
 <name language="de">Kunde-hat-abgelehnt</name>
 <description language="de">Kunde-hat-abgelehnt</description>
 <name language="en">customerRejected</name>
 <description language="en">customerRejected</description>
 <icon file=""/>
-<transition name="reject">
+<transition name="reject" userExecutable="false">
 <name language="de">ablehnen</name>
 <description language="de">ablehnen</description>
 <name language="en">reject</name>
@@ -154,27 +154,27 @@
 <icon file=""/>
 </transition>
 </node>
-<node name="dev.jfire.org:sent">
+<node name="dev.jfire.org:sent" publicState="false">
 <name language="de">gesendet</name>
 <description language="de">gesendet</description>
 <name language="en">sent</name>
 <description language="en">sent</description>
 <icon file=""/>
-<transition name="dev.jfire.org:send">
+<transition name="dev.jfire.org:send" userExecutable="false">
 <name language="de">senden</name>
 <description language="de">senden</description>
 <name language="en">send</name>
 <description language="en">send</description>
 <icon file=""/>
 </transition>
-<transition name="sendImplicitely">
+<transition name="sendImplicitely" userExecutable="false">
 <name language="de">senden-implizit</name>
 <description language="de">senden-implizit</description>
 <name language="en">sendImplicitely</name>
 <description language="en">sendImplicitely</description>
 <icon file=""/>
 </transition>
-<transition name="dev.jfire.org:acceptImplicitely">
+<transition name="dev.jfire.org:acceptImplicitely" userExecutable="false">
 <name language="de">akzeptieren-implizit</name>
 <description language="de">akzeptieren-implizit</description>
 <name language="en">acceptImplicitely</name>
@@ -182,13 +182,13 @@
 <icon file=""/>
 </transition>
 </node>
-<node name="dev.jfire.org:acceptedImplicitely">
+<node name="dev.jfire.org:acceptedImplicitely" publicState="false">
 <name language="de">akzeptiert-implizit</name>
 <description language="de">akzeptiert-implizit</description>
 <name language="en">acceptedImplicitely</name>
 <description language="en">acceptedImplicitely</description>
 <icon file=""/>
-<transition name="sendImplicitely">
+<transition name="sendImplicitely" userExecutable="false">
 <name language="de">senden-implizit</name>
 <description language="de">senden-implizit</description>
 <name language="en">sendImplicitely</name>
@@ -196,20 +196,20 @@
 <icon file=""/>
 </transition>
 </node>
-<state name="dev.jfire.org:accepted">
+<state name="dev.jfire.org:accepted" publicState="false">
 <name language="de">akzeptiert</name>
 <description language="de">akzeptiert</description>
 <name language="en">accepted</name>
 <description language="en">accepted</description>
 <icon file=""/>
-<transition name="dev.jfire.org:stopRecurrence">
+<transition name="dev.jfire.org:stopRecurrence" userExecutable="false">
 <name language="de">Wiederkehr-stoppen</name>
 <description language="de">Wiederkehr-stoppen</description>
 <name language="en">stopRecurrence</name>
 <description language="en">stopRecurrence</description>
 <icon file=""/>
 </transition>
-<transition name="dev.jfire.org:startRecurrence">
+<transition name="dev.jfire.org:startRecurrence" userExecutable="false">
 <name language="de">Wiederkehr-starten</name>
 <description language="de">Wiederkehr-starten</description>
 <name language="en">startRecurrence</name>
@@ -217,20 +217,20 @@
 <icon file=""/>
 </transition>
 </state>
-<state name="dev.jfire.org:recurrenceStarted">
+<state name="dev.jfire.org:recurrenceStarted" publicState="false">
 <name language="de">Wiederkehr-gestartet</name>
 <description language="de">Wiederkehr-gestartet</description>
 <name language="en">recurrenceStarted</name>
 <description language="en">recurrenceStarted</description>
 <icon file=""/>
-<transition name="dev.jfire.org:stopRecurrence">
+<transition name="dev.jfire.org:stopRecurrence" userExecutable="false">
 <name language="de">Wiederkehr-stoppen</name>
 <description language="de">Wiederkehr-stoppen</description>
 <name language="en">stopRecurrence</name>
 <description language="en">stopRecurrence</description>
 <icon file=""/>
 </transition>
-<transition name="dev.jfire.org:pauseRecurrence">
+<transition name="dev.jfire.org:pauseRecurrence" userExecutable="false">
 <name language="de">Wiederkehr-pausieren</name>
 <description language="de">Wiederkehr-pausieren</description>
 <name language="en">pauseRecurrence</name>

@@ -34,11 +34,17 @@ import org.nightlabs.util.Util;
  * @jdo.query
  *		name="getAuthorizedObjectRefsForAuthorizedObjectID"
  *		query="SELECT WHERE this.authorizedObjectID == :authorizedObjectID"
+ *
+ * @jdo.fetch-group name="AuthorizedObjectRef.tariffRefs" fields="tariffRefs"
+ *
+ * @jdo.fetch-group name="TariffUserSet.authorizedObjectRefs" fields="tariffUserSet"
  */
 public class AuthorizedObjectRef
 implements Serializable
 {
 	private static final long serialVersionUID = 1L;
+
+	public static final String FETCH_GROUP_TARIFF_REFS = "AuthorizedObjectRef.tariffRefs";
 
 	public static Collection<? extends AuthorizedObjectRef> getAuthorizedObjectRefs(PersistenceManager pm, AuthorizedObjectID authorizedObjectID)
 	{

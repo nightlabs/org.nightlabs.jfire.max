@@ -26,15 +26,24 @@ import org.nightlabs.util.Util;
  *		table="JFireTrade_TariffUserSet"
  *
  * @jdo.inheritance strategy="new-table"
+ * @jdo.inheritance-discriminator strategy="class-name"
  *
  * @jdo.version strategy="version-number"
  *
  * @jdo.create-objectid-class field-order="organisationID, tariffUserSetID"
+ *
+ * @jdo.fetch-group name="TariffUserSet.authorizedObjectRefs" fields="authorizedObjectRefs"
+ * @jdo.fetch-group name="TariffUserSet.name" fields="name"
+ * @jdo.fetch-group name="TariffUserSet.description" fields="description"
  */
 public class TariffUserSet
 implements Serializable
 {
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 2L;
+
+	public static final String FETCH_GROUP_AUTHORIZED_OBJECT_REFS = "TariffUserSet.authorizedObjectRefs";
+	public static final String FETCH_GROUP_NAME = "TariffUserSet.name";
+	public static final String FETCH_GROUP_DESCRIPTION = "TariffUserSet.description";
 
 	/**
 	 * @jdo.field primary-key="true"
@@ -67,6 +76,15 @@ implements Serializable
 	private transient TariffUserSetController tariffUserSetController;
 
 	/**
+	 * @jdo.field persistence-modifier="persistent" mapped-by="tariffUserSet" dependent="true"
+	 */
+	private TariffUserSetName name;
+	/**
+	 * @jdo.field persistence-modifier="persistent" mapped-by="tariffUserSet" dependent="true"
+	 */
+	private TariffUserSetDescription description;
+
+	/**
 	 * @deprecated Only for JDO!
 	 */
 	@Deprecated
@@ -77,6 +95,9 @@ implements Serializable
 		ObjectIDUtil.assertValidIDString(tariffUserSetID, "tariffUserSetID");
 		this.organisationID = organisationID;
 		this.tariffUserSetID = tariffUserSetID;
+
+		this.name = new TariffUserSetName(this);
+		this.description = new TariffUserSetDescription(this);
 
 		authorizedObjectRefs = new HashMap<String, AuthorizedObjectRef>();
 	}
@@ -101,6 +122,14 @@ implements Serializable
 	}
 	public String getTariffUserSetID() {
 		return tariffUserSetID;
+	}
+
+	public TariffUserSetName getName() {
+		return name;
+	}
+
+	public TariffUserSetDescription getDescription() {
+		return description;
 	}
 
 	protected AuthorizedObjectRef createAuthorizedObjectRef(AuthorizedObjectID authorizedObjectID)

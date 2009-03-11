@@ -22,6 +22,8 @@ import org.nightlabs.util.Util;
  *
  * @jdo.create-objectid-class
  *		field-order="tariffUserSetOrganisationID, tariffUserSetID, authorizedObjectID, tariffOrganisationID, tariffID"
+ *
+ * @jdo.fetch-group name="AuthorizedObjectRef.tariffRefs" fields="tariffUserSet, authorizedObjectRef, tariff"
  */
 public class TariffRef
 implements Serializable

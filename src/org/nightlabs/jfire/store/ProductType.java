@@ -1114,6 +1114,7 @@ implements
 		if (vendor == null);
 		name.getI18nMap();
 		if (endCustomerReplicationPolicy == null);
+		if (tariffUserSet == null);
 	}
 
 	@Override

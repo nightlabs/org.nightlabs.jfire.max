@@ -24,7 +24,7 @@
  *                                                                             *
  ******************************************************************************/
 
-package org.nightlabs.jfire.accounting;
+package org.nightlabs.jfire.accounting.tariffuserset;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -32,23 +32,22 @@ import java.util.Map;
 import org.nightlabs.i18n.I18nText;
 
 /**
- * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  * @author marco schulze - marco at nightlabs dot de
  *
  * @jdo.persistence-capable
  *		identity-type="application"
- *		objectid-class="org.nightlabs.jfire.accounting.id.AccountTypeNameID"
+ *		objectid-class="org.nightlabs.jfire.accounting.tariffuserset.id.TariffUserSetNameID"
  *		detachable="true"
- *		table="JFireTrade_AccountTypeName"
+ *		table="JFireTrade_TariffUserSetName"
  *
  * @jdo.inheritance strategy="new-table"
  *
  * @jdo.create-objectid-class
- *		field-order="organisationID, accountTypeID"
+ *		field-order="organisationID, tariffUserSetID"
  *
- * @jdo.fetch-group name="AccountType.name" fields="accountType, names"
+ * @jdo.fetch-group name="TariffUserSet.name" fields="tariffUserSet, names"
  */
-public class AccountTypeName extends I18nText
+public class TariffUserSetName extends I18nText
 {
 	private static final long serialVersionUID = 1L;
 	/**
@@ -56,28 +55,29 @@ public class AccountTypeName extends I18nText
 	 * @jdo.column length="100"
 	 */
 	private String organisationID;
+
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
-	private String accountTypeID;
+	private String tariffUserSetID;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
-	private AccountType accountType;
+	private TariffUserSet tariffUserSet;
 
 	/**
 	 * @deprecated Only for JDO!
 	 */
 	@Deprecated
-	protected AccountTypeName() {
+	protected TariffUserSetName() {
 	}
 
-	public AccountTypeName(AccountType accountType) {
-		this.accountType = accountType;
-		this.organisationID = accountType.getOrganisationID();
-		this.accountTypeID = accountType.getAccountTypeID();
+	public TariffUserSetName(TariffUserSet tariffUserSet) {
+		this.tariffUserSet = tariffUserSet;
+		this.organisationID = tariffUserSet.getOrganisationID();
+		this.tariffUserSetID = tariffUserSet.getTariffUserSetID();
 		this.names = new HashMap<String, String>();
 	}
 
@@ -91,12 +91,12 @@ public class AccountTypeName extends I18nText
 	 *		key-type="java.lang.String"
 	 *		value-type="java.lang.String"
 	 *		default-fetch-group="true"
-	 *		table="JFireTrade_AccountTypeName_names"
+	 *		table="JFireTrade_TariffUserSetName_names"
 	 *		null-value="exception"
 	 *
 	 * @jdo.join
 	 */
-	protected Map<String, String> names;
+	private Map<String, String> names;
 
 	@Override
 	protected Map<String, String> getI18nMap() {
@@ -105,19 +105,17 @@ public class AccountTypeName extends I18nText
 
 	@Override
 	protected String getFallBackValue(String languageID) {
-		return accountTypeID;
+		return organisationID + '/' + tariffUserSetID;
 	}
 
 	public String getOrganisationID() {
 		return organisationID;
 	}
-
-	public String getAccountTypeID() {
-		return accountTypeID;
+	public String getTariffUserSetID() {
+		return tariffUserSetID;
 	}
 
-	public AccountType getAccountType()
-	{
-		return accountType;
+	public TariffUserSet getTariffUserSet() {
+		return tariffUserSet;
 	}
 }

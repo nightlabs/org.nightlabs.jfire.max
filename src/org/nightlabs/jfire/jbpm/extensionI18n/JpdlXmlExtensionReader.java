@@ -40,17 +40,16 @@ public class JpdlXmlExtensionReader implements ProblemListener {
 	private static final List<String> EXTENDABLE_NODE_NAMES = Arrays.asList(new String[] {
 			"start-state", "end-state", "state", "node", "transition"
 	});
-
-	private static final List<String> PUBLIC_STATE_NODE_NAMES = Arrays.asList(new String[] {
-			"start-state", "end-state", "state", "node"
-	});
-
 	protected InputSource inputSource = null;
 	// TODO: Please parameterize this!
 	protected List<Problem> problems = new ArrayList<Problem>();
 	protected ProblemListener problemListener = null;
 	boolean hadStartState;
-
+	// the nodes that may contain the tag publicState
+	private static final List<String> PUBLIC_STATE_NODE_NAMES = Arrays.asList(new String[] {
+			"start-state", "end-state", "state", "node"
+	});
+	
 	public ExtendedProcessDefinitionDescriptor getExtendedProcessDefinitionDescriptor() {
 		ExtendedProcessDefinitionDescriptor descriptor = new ExtendedProcessDefinitionDescriptor();
 		readProcessDefinitionExtension(descriptor);
@@ -248,7 +247,7 @@ public class JpdlXmlExtensionReader implements ProblemListener {
 		// create descriptor
 		ExtendedNodeDescriptor nodeDescriptor = new ExtendedNodeDescriptor(nodeID, name, buffer);
 		nodeDescriptor.setIconFile(iconFile); // set the icon file
-		// set a userExecutable for a transition.
+		// set the userExecutable attribute for a transition.
 		if(element.getNodeName().equals("transition"))	
 		{	
 			String userExecutable = element.getAttribute( "userExecutable");

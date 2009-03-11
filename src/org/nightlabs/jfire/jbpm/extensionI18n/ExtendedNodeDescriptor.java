@@ -35,11 +35,11 @@ public class ExtendedNodeDescriptor {
 	 */		
 	private String iconFile;
 	/**
-	 * if we should mark a transition as 'userExecutable'.
+	 * if we should mark a transition as 'userExecutable' {@link org.nightlabs.jfire.jbpm.graph.def.Transition#isUserExecutable()} .
 	 */		
 	private Boolean UserExecutable;
 	/**
-	 * mark a state/node as 'publicState'.
+	 * mark a state/node as 'publicState'{@link org.nightlabs.jfire.jbpm.graph.def.StateDefinition#isPublicState()).
 	 */			
 	private Boolean publicState;
 

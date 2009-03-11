@@ -63,14 +63,14 @@
 <description language="en">customerAccepted</description>
 <icon file=""/>
 </end-state>
-<end-state name="dev.jfire.org:expired" publicState="false">
+<end-state name="dev.jfire.org:expired" publicState="true">
 <name language="de">ist-verfallen</name>
 <description language="de">ist-verfallen</description>
 <name language="en">expired</name>
 <description language="en">The Offer has expired - the customer waited too long. A new Offer needs to be created in order to continue the interaction.</description>
 <icon file=""/>
 </end-state>
-<end-state name="dev.jfire.org:revoked" publicState="false">
+<end-state name="dev.jfire.org:revoked" publicState="true">
 <name language="de">ist-zurÃ¼ckgenommen</name>
 <description language="de">ist-zurÃ¼ckgenommen</description>
 <name language="en">revoked</name>

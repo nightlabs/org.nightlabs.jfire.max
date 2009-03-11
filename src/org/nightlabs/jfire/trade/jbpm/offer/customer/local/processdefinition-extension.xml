@@ -98,7 +98,7 @@
 <icon file=""/>
 </transition>
 </state>
-<end-state name="dev.jfire.org:expired" publicState="false">
+<end-state name="dev.jfire.org:expired" publicState="true">
 <name language="de">expired</name>
 <description language="de">expired</description>
 <name language="en">expired</name>
@@ -112,7 +112,7 @@
 <description language="en">aborted</description>
 <icon file=""/>
 </end-state>
-<end-state name="dev.jfire.org:revoked" publicState="false">
+<end-state name="dev.jfire.org:revoked" publicState="true">
 <name language="de">revoked</name>
 <description language="de">revoked</description>
 <name language="en">revoked</name>
@@ -133,7 +133,7 @@
 <icon file=""/>
 </transition>
 </node>
-<node name="dev.jfire.org:sent" publicState="false">
+<node name="dev.jfire.org:sent" publicState="true">
 <name language="de">sent</name>
 <description language="de">sent</description>
 <name language="en">sent</name>

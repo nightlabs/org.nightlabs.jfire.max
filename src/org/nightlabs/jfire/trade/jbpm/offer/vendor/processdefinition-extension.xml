@@ -7,14 +7,14 @@
 		<description language="en">The Offer has been newly created.
 			This is the first state in the Offer related workflow.</description>
 		<icon file="" />
-		<transition name="dev.jfire.org:finalize" userExecutable="false">
+		<transition name="dev.jfire.org:finalize">
 			<name language="de">finalisieren</name>
 			<description language="de">finalisieren</description>
 			<name language="en">finalize</name>
 			<description language="en">finalize</description>
 			<icon file="" />
 		</transition>
-		<transition name="abort" userExecutable="false">
+		<transition name="abort">
 			<name language="de">abbrechen</name>
 			<description language="de">abbrechen</description>
 			<name language="en">abort</name>
@@ -28,7 +28,7 @@
 			<description language="en">acceptImplicitely</description>
 			<icon file="" />
 		</transition>
-		<transition name="dev.jfire.org:finalizeForCrossTrade" userExecutable="false">
+		<transition name="dev.jfire.org:finalizeForCrossTrade">
 			<name language="de">finalisieren-fÃ¼r-weitergehenden-Warenverkehr</name>
 			<description language="de">finalisieren-fÃ¼r-weitergehenden-Warenverkehr</description>
 			<name language="en">finalizeForCrossTrade</name>
@@ -57,25 +57,23 @@
 		<name language="de">finalisiert</name>
 		<description language="de">finalisiert</description>
 		<name language="en">finalized</name>
-		<description language="en">The Offer has been finalized.
-			After that, it cannot be modified anymore. A modification would
-			require revocation and recreation.</description>
+		<description language="en">The Offer has been finalized.After that, it cannot be modified anymore. A modification would require revocation and recreation.</description>
 		<icon file="" />
-		<transition name="dev.jfire.org:expire" userExecutable="false">
+		<transition name="dev.jfire.org:expire">
 			<name language="de">verfallen</name>
 			<description language="de">verfallen</description>
 			<name language="en">expire</name>
 			<description language="en">expire</description>
 			<icon file="" />
 		</transition>
-		<transition name="revoke" userExecutable="false">
+		<transition name="revoke">
 			<name language="de">zurÃ¼cknehmen</name>
 			<description language="de">zurÃ¼cknehmen</description>
 			<name language="en">revoke</name>
 			<description language="en">revoke</description>
 			<icon file="" />
 		</transition>
-		<transition name="reject" userExecutable="false">
+		<transition name="reject">
 			<name language="de">ablehnen</name>
 			<description language="de">ablehnen</description>
 			<name language="en">reject</name>
@@ -96,21 +94,21 @@
 			<description language="en">customerRejected</description>
 			<icon file="" />
 		</transition>
-		<transition name="accept" userExecutable="false">
+		<transition name="accept">
 			<name language="de">akzeptieren</name>
 			<description language="de">akzeptieren</description>
 			<name language="en">accept</name>
 			<description language="en">accept</description>
 			<icon file="" />
 		</transition>
-		<transition name="dev.jfire.org:send" userExecutable="false">
+		<transition name="dev.jfire.org:send">
 			<name language="de">senden</name>
 			<description language="de">senden</description>
 			<name language="en">send</name>
 			<description language="en">send</description>
 			<icon file="" />
 		</transition>
-		<transition name="dev.jfire.org:acceptImplicitely" userExecutable="false">
+		<transition name="dev.jfire.org:acceptImplicitely">
 			<name language="de">akzeptieren-implizit</name>
 			<description language="de">akzeptieren-implizit</description>
 			<name language="en">acceptImplicitely</name>
@@ -140,10 +138,7 @@
 		<name language="de">ist-zurÃ¼ckgenommen</name>
 		<description language="de">ist-zurÃ¼ckgenommen</description>
 		<name language="en">revoked</name>
-		<description language="en">The Offer has been revoked by the
-			vendor. The result is the same as if the customer had rejected the
-			offer. A new Offer needs to be created in order to continue the
-			interaction.</description>
+		<description language="en">The Offer has been revoked by the vendor. The result is the same as if the customer had rejected the offer. A new Offer needs to be created in order to continue the interaction.</description>
 		<icon file="" />
 	</end-state>
 	<node name="dev.jfire.org:customerAccepted">
@@ -152,7 +147,7 @@
 		<name language="en">customerAccepted</name>
 		<description language="en">customerAccepted</description>
 		<icon file="" />
-		<transition name="accept" userExecutable="false">
+		<transition name="accept">
 			<name language="de">akzeptieren</name>
 			<description language="de">akzeptieren</description>
 			<name language="en">accept</name>
@@ -166,7 +161,7 @@
 		<name language="en">customerRejected</name>
 		<description language="en">customerRejected</description>
 		<icon file="" />
-		<transition name="reject" userExecutable="false">
+		<transition name="reject">
 			<name language="de">ablehnen</name>
 			<description language="de">ablehnen</description>
 			<name language="en">reject</name>
@@ -178,17 +173,16 @@
 		<name language="de">gesendet</name>
 		<description language="de">gesendet</description>
 		<name language="en">sent</name>
-		<description language="en">The Offer has been sent from the
-			vendor to the customer.</description>
+		<description language="en">The Offer has been sent from the vendor to the customer.</description>
 		<icon file="" />
-		<transition name="dev.jfire.org:send" userExecutable="false">
+		<transition name="dev.jfire.org:send">
 			<name language="de">senden</name>
 			<description language="de">senden</description>
 			<name language="en">send</name>
 			<description language="en">send</description>
 			<icon file="" />
 		</transition>
-		<transition name="sendImplicitely" userExecutable="false">
+		<transition name="sendImplicitely">
 			<name language="de">senden-implizit</name>
 			<description language="de">senden-implizit</description>
 			<name language="en">sendImplicitely</name>

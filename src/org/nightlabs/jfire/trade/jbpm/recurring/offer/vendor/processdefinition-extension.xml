@@ -62,16 +62,14 @@
 			<description language="en">reject</description>
 			<icon file="" />
 		</transition>
-		<transition name="dev.jfire.org:customerAccepted"
-			userExecutable="false">
+		<transition name="dev.jfire.org:customerAccepted" userExecutable="false">
 			<name language="de">Kunde-akzeptierte</name>
 			<description language="de">Kunde-akzeptierte</description>
 			<name language="en">customerAccepted</name>
 			<description language="en">customerAccepted</description>
 			<icon file="" />
 		</transition>
-		<transition name="dev.jfire.org:customerRejected"
-			userExecutable="false">
+		<transition name="dev.jfire.org:customerRejected" userExecutable="false">
 			<name language="de">Kunde-hat-abgelehnt</name>
 			<description language="de">Kunde-hat-abgelehnt</description>
 			<name language="en">customerRejected</name>

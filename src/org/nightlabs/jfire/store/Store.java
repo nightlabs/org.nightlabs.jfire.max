@@ -1728,44 +1728,19 @@ implements StoreCallback
 	throws IOException
 	{
 		PersistenceManager pm = getPersistenceManager();
-
 		org.jbpm.graph.def.ProcessDefinition jbpmProcessDefinition = ProcessDefinition.readProcessDefinition(jbpmProcessDefinitionURL);
-
 		// we add the events+actionhandlers
 		ActionHandlerNodeEnter.register(jbpmProcessDefinition);
-
 		// TODO implement this completely!
-
-		// store it
-		ProcessDefinition processDefinition = ProcessDefinition.storeProcessDefinition(pm, null, jbpmProcessDefinition, jbpmProcessDefinitionURL);
-		ProcessDefinitionID processDefinitionID = (ProcessDefinitionID) JDOHelper.getObjectId(processDefinition);
-
-		switch (tradeSide) {
-			case vendor:
-			{
-			}
-			break;
-			case customerCrossOrganisation:
-			{
-			}
-			case customerLocal:
-			{
-			}
-			break;
-			default:
-				throw new IllegalStateException("Unknown TradeSide: " + tradeSide);
-		}
-
-		return processDefinition;
+		// store it and return it
+		return ProcessDefinition.storeProcessDefinition(pm, null, jbpmProcessDefinition, jbpmProcessDefinitionURL);
 	}
 
 	public ProcessDefinition storeProcessDefinitionDeliveryNote(TradeSide tradeSide, URL jbpmProcessDefinitionURL)
 	throws IOException
 	{
 		PersistenceManager pm = getPersistenceManager();
-
 		org.jbpm.graph.def.ProcessDefinition jbpmProcessDefinition = ProcessDefinition.readProcessDefinition(jbpmProcessDefinitionURL);
-
 		// we add the events+actionhandlers
 		ActionHandlerNodeEnter.register(jbpmProcessDefinition);
 
@@ -1775,38 +1750,9 @@ implements StoreCallback
 		}
 
 		ActionHandlerBookDeliveryNote.register(jbpmProcessDefinition);
-
-		// store it
-		ProcessDefinition processDefinition = ProcessDefinition.storeProcessDefinition(pm, null, jbpmProcessDefinition, jbpmProcessDefinitionURL);
-		ProcessDefinitionID processDefinitionID = (ProcessDefinitionID) JDOHelper.getObjectId(processDefinition);
-
-		switch (tradeSide) {
-			case vendor:
-			{
-
-				for (Transition transition : Transition.getTransitions(pm, processDefinitionID, JbpmConstantsDeliveryNote.Vendor.TRANSITION_NAME_BOOK_IMPLICITELY)) {
-					transition.setUserExecutable(false);
-				}
-			}
-			break;
-			case customerCrossOrganisation:
-			{
-				// TODO some names and descriptions
-			}
-			case customerLocal:
-			{
-				// TODO some names and descriptions
-			}
-			break;
-			default:
-				throw new IllegalStateException("Unknown TradeSide: " + tradeSide);
-		}
-
-		return processDefinition;
+		// store it and return it
+		return ProcessDefinition.storeProcessDefinition(pm, null, jbpmProcessDefinition, jbpmProcessDefinitionURL);
 	}
-
-
-
 
 	/**
 	 *

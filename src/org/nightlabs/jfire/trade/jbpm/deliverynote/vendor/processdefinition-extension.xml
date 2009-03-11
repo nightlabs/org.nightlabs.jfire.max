@@ -20,8 +20,7 @@
 			<description language="en">abort</description>
 			<icon file="" />
 		</transition>
-		<transition name="dev.jfire.org:bookImplicitely"
-			userExecutable="false">
+		<transition name="dev.jfire.org:bookImplicitely" userExecutable="false">
 			<name language="de">buchen-implizit</name>
 			<description language="de">buchen-implizit</description>
 			<name language="en">bookImplicitely</name>

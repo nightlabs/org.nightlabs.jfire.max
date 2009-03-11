@@ -7,7 +7,7 @@
 		<name language="en">created</name>
 		<description language="en">created</description>
 		<icon file="" />
-		<transition name="finalize" userExecutable="false">
+		<transition name="finalize" userExecutable="false" userExecutable="false">
 			<name language="de">finalisieren</name>
 			<description language="de">finalisieren</description>
 			<name language="en">finalize</name>
@@ -21,7 +21,7 @@
 		<name language="en">finalized</name>
 		<description language="en">finalized</description>
 		<icon file="" />
-		<transition name="dev.jfire.org:deliver">
+		<transition name="dev.jfire.org:deliver" userExecutable="false">
 			<name language="de">liefern</name>
 			<description language="de">liefern</description>
 			<name language="en">deliver</name>
@@ -35,7 +35,7 @@
 		<name language="en">booked</name>
 		<description language="en">booked</description>
 		<icon file="" />
-		<transition name="dev.jfire.org:send">
+		<transition name="dev.jfire.org:send" userExecutable="false">
 			<name language="de">senden</name>
 			<description language="de">senden</description>
 			<name language="en">send</name>
@@ -56,7 +56,7 @@
 		<name language="en">delivered</name>
 		<description language="en">delivered</description>
 		<icon file="" />
-		<transition name="dev.jfire.org:book">
+		<transition name="dev.jfire.org:book" userExecutable="false">
 			<name language="de">buchen</name>
 			<description language="de">buchen</description>
 			<name language="en">book</name>

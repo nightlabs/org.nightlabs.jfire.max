@@ -14,15 +14,14 @@
 			<description language="en">finalize</description>
 			<icon file="" />
 		</transition>
-		<transition name="abort">
+		<transition name="abort" userExecutable="false">
 			<name language="de">abbrechen</name>
 			<description language="de">abbrechen</description>
 			<name language="en">abort</name>
 			<description language="en">abort</description>
 			<icon file="" />
 		</transition>
-		<transition name="dev.jfire.org:acceptImplicitely"
-			userExecutable="false">
+		<transition name="dev.jfire.org:acceptImplicitely" userExecutable="false">
 			<name language="de">acceptImplicitely</name>
 			<description language="de">acceptImplicitely</description>
 			<name language="en">acceptImplicitely</name>
@@ -50,51 +49,49 @@
 		<name language="en">finalized</name>
 		<description language="en">finalized</description>
 		<icon file="" />
-		<transition name="dev.jfire.org:expire">
+		<transition name="dev.jfire.org:expire" userExecutable="false">
 			<name language="de">expire</name>
 			<description language="de">expire</description>
 			<name language="en">expire</name>
 			<description language="en">expire</description>
 			<icon file="" />
 		</transition>
-		<transition name="revoke">
+		<transition name="revoke" userExecutable="false">
 			<name language="de">revoke</name>
 			<description language="de">revoke</description>
 			<name language="en">revoke</name>
 			<description language="en">revoke</description>
 			<icon file="" />
 		</transition>
-		<transition name="reject">
+		<transition name="reject" userExecutable="false">
 			<name language="de">reject</name>
 			<description language="de">reject</description>
 			<name language="en">reject</name>
 			<description language="en">reject</description>
 			<icon file="" />
 		</transition>
-		<transition name="dev.jfire.org:customerAccepted"
-			userExecutable="false">
+		<transition name="dev.jfire.org:customerAccepted" userExecutable="false">
 			<name language="de">customerAccepted</name>
 			<description language="de">customerAccepted</description>
 			<name language="en">customerAccepted</name>
 			<description language="en">customerAccepted</description>
 			<icon file="" />
 		</transition>
-		<transition name="accept">
+		<transition name="accept" userExecutable="false">
 			<name language="de">accept</name>
 			<description language="de">accept</description>
 			<name language="en">accept</name>
 			<description language="en">accept</description>
 			<icon file="" />
 		</transition>
-		<transition name="dev.jfire.org:send">
+		<transition name="dev.jfire.org:send" userExecutable="false">
 			<name language="de">send</name>
 			<description language="de">send</description>
 			<name language="en">send</name>
 			<description language="en">send</description>
 			<icon file="" />
 		</transition>
-		<transition name="dev.jfire.org:acceptImplicitely"
-			userExecutable="false">
+		<transition name="dev.jfire.org:acceptImplicitely" userExecutable="false">
 			<name language="de">acceptImplicitely</name>
 			<description language="de">acceptImplicitely</description>
 			<name language="en">acceptImplicitely</name>
@@ -149,14 +146,14 @@
 		<description language="en">The Offer has been sent from the
 			vendor to the customer.</description>
 		<icon file="" />
-		<transition name="dev.jfire.org:send">
+		<transition name="dev.jfire.org:send" userExecutable="false">
 			<name language="de">send</name>
 			<description language="de">send</description>
 			<name language="en">send</name>
 			<description language="en">send</description>
 			<icon file="" />
 		</transition>
-		<transition name="sendImplicitely">
+		<transition name="sendImplicitely" userExecutable="false">
 			<name language="de">sendImplicitely</name>
 			<description language="de">sendImplicitely</description>
 			<name language="en">sendImplicitely</name>

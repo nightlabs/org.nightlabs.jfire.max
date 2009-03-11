@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <process-definition-extension xmlns="" name="dev.jfire.org:RecurringOffer.Vendor">
-	<start-state name="dev.jfire.org:created">
+	<start-state name="dev.jfire.org:created" publicState="true">
 		<name language="de">erzeugt</name>
 		<description language="de">erzeugt</description>
 		<name language="en">created</name>
@@ -20,8 +20,7 @@
 			<description language="en">abort</description>
 			<icon file="" />
 		</transition>
-		<transition name="dev.jfire.org:acceptImplicitely"
-			userExecutable="false">
+		<transition name="dev.jfire.org:acceptImplicitely" userExecutable="false">
 			<name language="de">akzeptieren-implizit</name>
 			<description language="de">akzeptieren-implizit</description>
 			<name language="en">acceptImplicitely</name>
@@ -29,14 +28,14 @@
 			<icon file="" />
 		</transition>
 	</start-state>
-	<end-state name="dev.jfire.org:rejected">
+	<end-state name="dev.jfire.org:rejected" publicState="true">
 		<name language="de">abgelehnt</name>
 		<description language="de">abgelehnt</description>
 		<name language="en">rejected</name>
 		<description language="en">rejected</description>
 		<icon file="" />
 	</end-state>
-	<state name="dev.jfire.org:finalized">
+	<state name="dev.jfire.org:finalized" publicState="true">
 		<name language="de">finalisiert</name>
 		<description language="de">finalisiert</description>
 		<name language="en">finalized</name>
@@ -102,21 +101,21 @@
 			<icon file="" />
 		</transition>
 	</state>
-	<end-state name="dev.jfire.org:expired">
+	<end-state name="dev.jfire.org:expired" publicState="true">
 		<name language="de">ist-verfallen</name>
 		<description language="de">ist-verfallen</description>
 		<name language="en">expired</name>
 		<description language="en">expired</description>
 		<icon file="" />
 	</end-state>
-	<end-state name="dev.jfire.org:aborted">
+	<end-state name="dev.jfire.org:aborted" publicState="true">
 		<name language="de">abgebrochen</name>
 		<description language="de">abgebrochen</description>
 		<name language="en">aborted</name>
 		<description language="en">aborted</description>
 		<icon file="" />
 	</end-state>
-	<end-state name="dev.jfire.org:revoked">
+	<end-state name="dev.jfire.org:revoked" publicState="true">
 		<name language="de">ist-zurÃ¼ckgenommen</name>
 		<description language="de">ist-zurÃ¼ckgenommen</description>
 		<name language="en">revoked</name>
@@ -159,7 +158,7 @@
 			<icon file="" />
 		</transition>
 	</node>
-	<node name="dev.jfire.org:sent">
+	<node name="dev.jfire.org:sent" publicState="true">
 		<name language="de">gesendet</name>
 		<description language="de">gesendet</description>
 		<name language="en">sent</name>
@@ -202,7 +201,7 @@
 			<icon file="" />
 		</transition>
 	</node>
-	<state name="dev.jfire.org:accepted">
+	<state name="dev.jfire.org:accepted" publicState="true">
 		<name language="de">akzeptiert</name>
 		<description language="de">akzeptiert</description>
 		<name language="en">accepted</name>
@@ -225,7 +224,7 @@
 			<icon file="" />
 		</transition>
 	</state>
-	<state name="dev.jfire.org:recurrenceStarted">
+	<state name="dev.jfire.org:recurrenceStarted" publicState="true">
 		<name language="de">Wiederkehr-gestartet</name>
 		<description language="de">Wiederkehr-gestartet</description>
 		<name language="en">recurrenceStarted</name>

@@ -34,6 +34,14 @@ public class ExtendedNodeDescriptor {
 	 * the icon reference file of the node.
 	 */		
 	private String iconFile;
+	/**
+	 * if we should mark a transition as 'userExecutable'.
+	 */		
+	private Boolean UserExecutable;
+	/**
+	 * mark a state/node as 'publicState'.
+	 */			
+	private Boolean publicState;
 
 	public I18nTextBuffer getName() {
 		return name;
@@ -47,17 +55,13 @@ public class ExtendedNodeDescriptor {
 		super();
 	}
 
-	public ExtendedNodeDescriptor(String nodeID, I18nTextBuffer name) {
-		super();
-		this.nodeID = nodeID;
-		this.name = name;
-	}
-
 	public ExtendedNodeDescriptor(String nodeID, I18nTextBuffer name, I18nTextBuffer description) {
 		super();
 		this.nodeID = nodeID;
 		this.description = description;
 		this.name = name;
+		this.UserExecutable = false;	
+		this.publicState = false;		
 	}
 
 	public String getNodeID() {
@@ -105,6 +109,22 @@ public class ExtendedNodeDescriptor {
 			sb.append(node).append(PREFIX_SUBNODE);
 		sb.append(subnode);
 		return sb.toString();
+	}
+
+	public Boolean getUserExecutable() {
+		return UserExecutable;
+	}
+
+	public void setUserExecutable(Boolean userExecutable) {
+		UserExecutable = userExecutable;
+	}
+
+	public Boolean getPublicState() {
+		return publicState;
+	}
+
+	public void setPublicState(Boolean publicState) {
+		this.publicState = publicState;
 	}
 
 

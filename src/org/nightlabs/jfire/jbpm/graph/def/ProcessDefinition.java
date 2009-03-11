@@ -188,6 +188,7 @@ implements Serializable
 						// set the name and description from the extended I18in Node
 						stateDefinition.getName().copyFrom(extendedNode.getName());
 						stateDefinition.getDescription().copyFrom(extendedNode.getDescription());
+						stateDefinition.setPublicState(extendedNode.getPublicState());
 					}
 
 				}
@@ -206,8 +207,9 @@ implements Serializable
 							if( transitionExtendedNode != null)
 							{
 								// SET THE NAME AND DESCRIPTION FROM THE EXTENDED I18IN NODE
-								transition.getName().copyFrom(transitionExtendedNode .getName());
-								transition.getDescription().copyFrom(transitionExtendedNode .getDescription());
+								transition.getName().copyFrom(transitionExtendedNode.getName());
+								transition.getDescription().copyFrom(transitionExtendedNode.getDescription());
+								transition.setUserExecutable(transitionExtendedNode.getUserExecutable());
 							}	
 						}
 					}

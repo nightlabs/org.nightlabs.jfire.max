@@ -41,6 +41,10 @@ public class JpdlXmlExtensionReader implements ProblemListener {
 			"start-state", "end-state", "state", "node", "transition"
 	});
 
+	private static final List<String> PUBLIC_STATE_NODE_NAMES = Arrays.asList(new String[] {
+			"start-state", "end-state", "state", "node"
+	});
+
 	protected InputSource inputSource = null;
 	// TODO: Please parameterize this!
 	protected List<Problem> problems = new ArrayList<Problem>();
@@ -243,7 +247,27 @@ public class JpdlXmlExtensionReader implements ProblemListener {
 
 		// create descriptor
 		ExtendedNodeDescriptor nodeDescriptor = new ExtendedNodeDescriptor(nodeID, name, buffer);
-		nodeDescriptor.setIconFile(iconFile);
+		nodeDescriptor.setIconFile(iconFile); // set the icon file
+
+		// set a userExecutable for a transition.
+		if(element.getNodeName().equals("transition"))	
+		{	
+			String userExecutable = element.getAttribute( "userExecutable");
+			if (userExecutable == null || userExecutable.isEmpty()) 
+				throw new IllegalStateException("Found name element with invalid/no userExecutable attribute for element " + element.getNodeName() + "(userExecutable=" + element.getAttribute("userExecutable") + ").");
+			nodeDescriptor.setUserExecutable(Boolean.parseBoolean(userExecutable));
+		}
+		else
+		{	
+			if(PUBLIC_STATE_NODE_NAMES.contains(element.getNodeName()))
+			{
+				// set publicState for the node 
+				String publicState = element.getAttribute( "publicState");
+				if (publicState == null || publicState.isEmpty()) 
+					throw new IllegalStateException("Found name element with invalid/no publicState attribute for element " + element.getNodeName() + "(publicState=" + element.getAttribute("publicState") + ").");
+				nodeDescriptor.setPublicState(Boolean.parseBoolean(publicState));
+			}
+		}
 
 		return nodeDescriptor;
 	}

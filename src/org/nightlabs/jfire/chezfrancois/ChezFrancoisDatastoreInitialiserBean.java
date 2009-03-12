@@ -148,7 +148,7 @@ implements SessionBean
 
 			// version is {major}.{minor}.{release}-{patchlevel}-{suffix}
 			moduleMetaData = new ModuleMetaData(
-					"JFireChezFrancois", "0.9.5-0-beta", "0.9.5-0-beta");
+					"JFireChezFrancois", "0.9.7-0-beta", "0.9.7-0-beta");
 			pm.makePersistent(moduleMetaData);
 
 			Workstation ws = new Workstation(getOrganisationID(), "ws00");

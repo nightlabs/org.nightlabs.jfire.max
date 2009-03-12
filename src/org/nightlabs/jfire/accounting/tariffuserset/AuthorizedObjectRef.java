@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 
@@ -237,6 +238,33 @@ implements Serializable
 		}
 
 		return true; // indicate modification
+	}
+
+	public boolean addTariffs(Collection<? extends Tariff> tariffs)
+	{
+		boolean atLeastOneAdded = false;
+		for (Tariff tariff : tariffs)
+			atLeastOneAdded |= addTariff(tariff);
+
+		return atLeastOneAdded;
+	}
+
+	public void retainTariffs(Collection<? extends Tariff> tariffs)
+	{
+		Collection<Tariff> tariffsToRemove = new LinkedList<Tariff>();
+		for (TariffRef tariffRef : this.getTariffRefs()) {
+			if (!tariffs.contains(tariffRef.getTariff()))
+				tariffsToRemove.add(tariffRef.getTariff());
+		}
+
+		for (Tariff tariff : tariffsToRemove)
+			this.removeTariff(tariff);
+	}
+
+	public void removeTariffs(Collection<? extends Tariff> tariffs)
+	{
+		for (Tariff tariff : tariffs)
+			removeTariff(tariff);
 	}
 
 	public void removeTariff(Tariff tariff)

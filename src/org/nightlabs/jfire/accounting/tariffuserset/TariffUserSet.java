@@ -2,7 +2,10 @@ package org.nightlabs.jfire.accounting.tariffuserset;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 
@@ -198,6 +201,23 @@ implements Serializable
 		return authorizedObjectRef;
 	}
 
+	public void retainAuthorizedObjects(Collection<? extends AuthorizedObjectID> authorizedObjectIDs)
+	{
+		Collection<AuthorizedObjectRef> authorizedObjectRefsToRemove = new LinkedList<AuthorizedObjectRef>();
+		for (AuthorizedObjectRef authorizedObjectRef : authorizedObjectRefs.values()) {
+			if (!authorizedObjectIDs.contains(authorizedObjectRef.getAuthorizedObjectIDAsOID()))
+				authorizedObjectRefsToRemove.add(authorizedObjectRef);
+		}
+		for (AuthorizedObjectRef authorizedObjectRef : authorizedObjectRefsToRemove)
+			this.removeAuthorizedObject(authorizedObjectRef.getAuthorizedObjectIDAsOID());
+	}
+
+	public void removeAuthorizedObjects(Collection<? extends AuthorizedObjectID> authorizedObjectIDs)
+	{
+		for (AuthorizedObjectID authorizedObjectID : authorizedObjectIDs)
+			removeAuthorizedObject(authorizedObjectID);
+	}
+
 	public void removeAuthorizedObject(AuthorizedObjectID authorizedObjectID)
 	{
 		String authorizedObjectIDAsString = authorizedObjectID.toString();
@@ -246,6 +266,10 @@ implements Serializable
 		if (internalAuthorizedObjectRef.getReferenceCount() != 0)
 			throw new IllegalStateException("internalAuthorizedObjectRef.referenceCount != 0 :: internalAuthorizedObjectRef = " + internalAuthorizedObjectRef + " :: internalAuthorizedObjectRef.referenceCount = " + internalAuthorizedObjectRef.getReferenceCount());
 
+	}
+
+	public Collection<AuthorizedObjectRef> getAuthorizedObjectRefs() {
+		return Collections.unmodifiableCollection(authorizedObjectRefs.values());
 	}
 
 	@Override

@@ -1253,7 +1253,7 @@ implements SessionBean
 			logger.info("Initialization of " + JFireIssueTrackingEAR.MODULE_NAME + " started...");
 
 			pm.makePersistent(new ModuleMetaData(
-					JFireIssueTrackingEAR.MODULE_NAME, "0.9.5.0.0.beta", "0.9.5.0.0.beta")
+					JFireIssueTrackingEAR.MODULE_NAME, "0.9.7.0.0.beta", "0.9.7.0.0.beta")
 			);
 
 			IssueType issueType = new IssueType(getOrganisationID(), IssueType.DEFAULT_ISSUE_TYPE_ID);

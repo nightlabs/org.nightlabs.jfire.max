@@ -162,7 +162,7 @@ implements SessionBean
 
 			if (ModuleMetaData.getModuleMetaData(pm, JFireNumericOrganisationIDEAR.MODULE_NAME) == null) {
 				pm.makePersistent(new ModuleMetaData(
-						JFireNumericOrganisationIDEAR.MODULE_NAME, "0.9.5.0.0.beta", "0.9.5.0.0.beta")
+						JFireNumericOrganisationIDEAR.MODULE_NAME, "0.9.7.0.0.beta", "0.9.7.0.0.beta")
 				);
 			}
 

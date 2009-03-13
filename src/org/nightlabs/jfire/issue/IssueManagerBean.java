@@ -62,10 +62,12 @@ import org.nightlabs.jfire.issue.project.id.ProjectID;
 import org.nightlabs.jfire.issue.project.id.ProjectPhaseID;
 import org.nightlabs.jfire.issue.project.id.ProjectTypeID;
 import org.nightlabs.jfire.issue.prop.IssueStruct;
+import org.nightlabs.jfire.issue.query.IssueQuery;
 import org.nightlabs.jfire.jbpm.JbpmLookup;
 import org.nightlabs.jfire.jbpm.graph.def.State;
 import org.nightlabs.jfire.person.PersonStruct;
 import org.nightlabs.jfire.prop.datafield.TextDataField;
+import org.nightlabs.jfire.query.store.BaseQueryStore;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.security.dao.UserDAO;
@@ -420,7 +422,7 @@ implements SessionBean
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
-//			boolean isNew = !JDOHelper.isDetached(projectPhase);
+			//			boolean isNew = !JDOHelper.isDetached(projectPhase);
 			return NLJDOHelper.storeJDO(pm, projectPhase, get, fetchGroups, maxFetchDepth);
 		}//try
 		finally {
@@ -1215,16 +1217,16 @@ implements SessionBean
 		catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-//		PersistenceManager pm = getPersistenceManager();
-//		try {
-//			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
-//			if (fetchGroups != null)
-//				pm.getFetchPlan().setGroups(fetchGroups);
-//
-//			Query q = pm.newQuery(IssueResolution.class);
-//		} finally {
-//			pm.close();
-//		}
+		//		PersistenceManager pm = getPersistenceManager();
+		//		try {
+		//			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+		//			if (fetchGroups != null)
+		//				pm.getFetchPlan().setGroups(fetchGroups);
+		//
+		//			Query q = pm.newQuery(IssueResolution.class);
+		//		} finally {
+		//			pm.close();
+		//		}
 	}
 
 	//Bean//
@@ -1253,268 +1255,261 @@ implements SessionBean
 			logger.info("Initialization of " + JFireIssueTrackingEAR.MODULE_NAME + " started...");
 
 			pm.makePersistent(new ModuleMetaData(
-					JFireIssueTrackingEAR.MODULE_NAME, "0.9.7.0.0.beta", "0.9.7.0.0.beta")
+					JFireIssueTrackingEAR.MODULE_NAME, "0.9.5.0.0.beta", "0.9.5.0.0.beta")
 			);
 
-			IssueType issueType = new IssueType(getOrganisationID(), IssueType.DEFAULT_ISSUE_TYPE_ID);
-			issueType.getName().setText(Locale.ENGLISH.getLanguage(), "Default");
-			issueType.getName().setText(Locale.GERMAN.getLanguage(), "Standard");
-			issueType = pm.makePersistent(issueType);
+			IssueType issueTypeDefault = new IssueType(getOrganisationID(), IssueType.DEFAULT_ISSUE_TYPE_ID);
+			issueTypeDefault.getName().setText(Locale.ENGLISH.getLanguage(), "Default");
+			issueTypeDefault.getName().setText(Locale.GERMAN.getLanguage(), "Standard");
+			issueTypeDefault = pm.makePersistent(issueTypeDefault);
 
 			// Create the statuses
-			IssueSeverityType issueSeverityType;
+			IssueSeverityType issueSeverityTypeMinor = new IssueSeverityType(getOrganisationID(), IssueSeverityType.ISSUE_SEVERITY_TYPE_MINOR);
+			issueSeverityTypeMinor.getIssueSeverityTypeText().setText(Locale.ENGLISH.getLanguage(), "Minor");
+			issueSeverityTypeMinor.getIssueSeverityTypeText().setText(Locale.GERMAN.getLanguage(), "Gering");
+			issueSeverityTypeMinor = pm.makePersistent(issueSeverityTypeMinor);
+			issueTypeDefault.getIssueSeverityTypes().add(issueSeverityTypeMinor);
 
-			issueSeverityType = new IssueSeverityType(getOrganisationID(), IssueSeverityType.ISSUE_SEVERITY_TYPE_MINOR);
-			issueSeverityType.getIssueSeverityTypeText().setText(Locale.ENGLISH.getLanguage(), "Minor");
-//			issueSeverityType.getIssueSeverityTypeText().setText(Locale.ENGLISH.getLanguage(), "Gering");
-			issueSeverityType = pm.makePersistent(issueSeverityType);
-			issueType.getIssueSeverityTypes().add(issueSeverityType);
+			IssueSeverityType issueSeverityTypeMajor = new IssueSeverityType(getOrganisationID(), IssueSeverityType.ISSUE_SEVERITY_TYPE_MAJOR);
+			issueSeverityTypeMajor.getIssueSeverityTypeText().setText(Locale.ENGLISH.getLanguage(), "Major");
+			issueSeverityTypeMajor.getIssueSeverityTypeText().setText(Locale.GERMAN.getLanguage(), "Wichtig");
+			issueSeverityTypeMajor = pm.makePersistent(issueSeverityTypeMajor);
+			issueTypeDefault.getIssueSeverityTypes().add(issueSeverityTypeMajor);
 
-			issueSeverityType = new IssueSeverityType(getOrganisationID(), IssueSeverityType.ISSUE_SEVERITY_TYPE_MAJOR);
-			issueSeverityType.getIssueSeverityTypeText().setText(Locale.ENGLISH.getLanguage(), "Major");
-//			issueSeverityType.getIssueSeverityTypeText().setText(Locale.ENGLISH.getLanguage(), "Wichtig");
-			issueSeverityType = pm.makePersistent(issueSeverityType);
-			issueType.getIssueSeverityTypes().add(issueSeverityType);
+			IssueSeverityType issueSeverityTypeCrash = new IssueSeverityType(getOrganisationID(), IssueSeverityType.ISSUE_SEVERITY_TYPE_CRASH);
+			issueSeverityTypeCrash.getIssueSeverityTypeText().setText(Locale.ENGLISH.getLanguage(), "Crash");
+			issueSeverityTypeCrash = pm.makePersistent(issueSeverityTypeCrash);
+			issueTypeDefault.getIssueSeverityTypes().add(issueSeverityTypeCrash);
 
-			issueSeverityType = new IssueSeverityType(getOrganisationID(), IssueSeverityType.ISSUE_SEVERITY_TYPE_CRASH);
-			issueSeverityType.getIssueSeverityTypeText().setText(Locale.ENGLISH.getLanguage(), "Crash");
-			issueSeverityType = pm.makePersistent(issueSeverityType);
-			issueType.getIssueSeverityTypes().add(issueSeverityType);
+			IssueSeverityType issueSeverityTypeBlock = new IssueSeverityType(getOrganisationID(), IssueSeverityType.ISSUE_SEVERITY_TYPE_BLOCK);
+			issueSeverityTypeBlock.getIssueSeverityTypeText().setText(Locale.ENGLISH.getLanguage(), "Block");
+			issueSeverityTypeBlock = pm.makePersistent(issueSeverityTypeBlock);
+			issueTypeDefault.getIssueSeverityTypes().add(issueSeverityTypeBlock);
 
-			issueSeverityType = new IssueSeverityType(getOrganisationID(), IssueSeverityType.ISSUE_SEVERITY_TYPE_BLOCK);
-			issueSeverityType.getIssueSeverityTypeText().setText(Locale.ENGLISH.getLanguage(), "Block");
-			issueSeverityType = pm.makePersistent(issueSeverityType);
-			issueType.getIssueSeverityTypes().add(issueSeverityType);
+			IssueSeverityType issueSeverityTypeFeature = new IssueSeverityType(getOrganisationID(), IssueSeverityType.ISSUE_SEVERITY_TYPE_FEATURE);
+			issueSeverityTypeFeature.getIssueSeverityTypeText().setText(Locale.ENGLISH.getLanguage(), "Feature");
+			issueSeverityTypeFeature = pm.makePersistent(issueSeverityTypeFeature);
+			issueTypeDefault.getIssueSeverityTypes().add(issueSeverityTypeFeature);
 
-			issueSeverityType = new IssueSeverityType(getOrganisationID(), IssueSeverityType.ISSUE_SEVERITY_TYPE_FEATURE);
-			issueSeverityType.getIssueSeverityTypeText().setText(Locale.ENGLISH.getLanguage(), "Feature");
-			issueSeverityType = pm.makePersistent(issueSeverityType);
-			issueType.getIssueSeverityTypes().add(issueSeverityType);
+			IssueSeverityType issueSeverityTypeTrivial = new IssueSeverityType(getOrganisationID(), IssueSeverityType.ISSUE_SEVERITY_TYPE_TRIVIAL);
+			issueSeverityTypeTrivial.getIssueSeverityTypeText().setText(Locale.ENGLISH.getLanguage(), "Trivial");
+			issueSeverityTypeTrivial = pm.makePersistent(issueSeverityTypeTrivial);
+			issueTypeDefault.getIssueSeverityTypes().add(issueSeverityTypeTrivial);
 
-			issueSeverityType = new IssueSeverityType(getOrganisationID(), IssueSeverityType.ISSUE_SEVERITY_TYPE_TRIVIAL);
-			issueSeverityType.getIssueSeverityTypeText().setText(Locale.ENGLISH.getLanguage(), "Trivial");
-			issueSeverityType = pm.makePersistent(issueSeverityType);
-			issueType.getIssueSeverityTypes().add(issueSeverityType);
+			IssueSeverityType issueSeverityTypeText = new IssueSeverityType(getOrganisationID(), IssueSeverityType.ISSUE_SEVERITY_TYPE_TEXT);
+			issueSeverityTypeText.getIssueSeverityTypeText().setText(Locale.ENGLISH.getLanguage(), "Text");
+			issueSeverityTypeText = pm.makePersistent(issueSeverityTypeText);
+			issueTypeDefault.getIssueSeverityTypes().add(issueSeverityTypeText);
 
-			issueSeverityType = new IssueSeverityType(getOrganisationID(), IssueSeverityType.ISSUE_SEVERITY_TYPE_TEXT);
-			issueSeverityType.getIssueSeverityTypeText().setText(Locale.ENGLISH.getLanguage(), "Text");
-			issueSeverityType = pm.makePersistent(issueSeverityType);
-			issueType.getIssueSeverityTypes().add(issueSeverityType);
-
-			issueSeverityType = new IssueSeverityType(getOrganisationID(), IssueSeverityType.ISSUE_SEVERITY_TYPE_TWEAK);
-			issueSeverityType.getIssueSeverityTypeText().setText(Locale.ENGLISH.getLanguage(), "Tweak");
-			issueSeverityType = pm.makePersistent(issueSeverityType);
-			issueType.getIssueSeverityTypes().add(issueSeverityType);
+			IssueSeverityType issueSeverityTypeTweak = new IssueSeverityType(getOrganisationID(), IssueSeverityType.ISSUE_SEVERITY_TYPE_TWEAK);
+			issueSeverityTypeTweak.getIssueSeverityTypeText().setText(Locale.ENGLISH.getLanguage(), "Tweak");
+			issueSeverityTypeTweak = pm.makePersistent(issueSeverityTypeTweak);
+			issueTypeDefault.getIssueSeverityTypes().add(issueSeverityTypeTweak);
 
 			////////////////////////////////////////////////////////
 			// Create the priorities
 			// check, whether the datastore is already initialized
-			IssuePriority issuePriority;
+			IssuePriority issuePriorityNone = new IssuePriority(getOrganisationID(), "None");
+			issuePriorityNone.getIssuePriorityText().setText(Locale.ENGLISH.getLanguage(), "None");
+			issuePriorityNone.getIssuePriorityText().setText(Locale.GERMAN.getLanguage(), "Keine");
+			issuePriorityNone = pm.makePersistent(issuePriorityNone);
+			issueTypeDefault.getIssuePriorities().add(issuePriorityNone);
 
-			issuePriority = new IssuePriority(getOrganisationID(), "None");
-			issuePriority.getIssuePriorityText().setText(Locale.ENGLISH.getLanguage(), "None");
-			issuePriority.getIssuePriorityText().setText(Locale.GERMAN.getLanguage(), "Keine");
-			issuePriority = pm.makePersistent(issuePriority);
-			issueType.getIssuePriorities().add(issuePriority);
+			IssuePriority issuePriorityLow = new IssuePriority(getOrganisationID(), "Low");
+			issuePriorityLow.getIssuePriorityText().setText(Locale.ENGLISH.getLanguage(), "Low");
+			issuePriorityLow.getIssuePriorityText().setText(Locale.GERMAN.getLanguage(), "Gering");
+			issuePriorityLow = pm.makePersistent(issuePriorityLow);
+			issueTypeDefault.getIssuePriorities().add(issuePriorityLow);
 
-			issuePriority = new IssuePriority(getOrganisationID(), "Low");
-			issuePriority.getIssuePriorityText().setText(Locale.ENGLISH.getLanguage(), "Low");
-			issuePriority.getIssuePriorityText().setText(Locale.GERMAN.getLanguage(), "Gering");
-			issuePriority = pm.makePersistent(issuePriority);
-			issueType.getIssuePriorities().add(issuePriority);
+			IssuePriority issuePriorityNormal = new IssuePriority(getOrganisationID(), "Normal");
+			issuePriorityNormal.getIssuePriorityText().setText(Locale.ENGLISH.getLanguage(), "Normal");
+			issuePriorityNormal.getIssuePriorityText().setText(Locale.GERMAN.getLanguage(), "Normal");
+			issuePriorityNormal = pm.makePersistent(issuePriorityNormal);
+			issueTypeDefault.getIssuePriorities().add(issuePriorityNormal);
 
-			issuePriority = new IssuePriority(getOrganisationID(), "Normal");
-			issuePriority.getIssuePriorityText().setText(Locale.ENGLISH.getLanguage(), "Normal");
-			issuePriority.getIssuePriorityText().setText(Locale.GERMAN.getLanguage(), "Normal");
-			issuePriority = pm.makePersistent(issuePriority);
-			issueType.getIssuePriorities().add(issuePriority);
+			IssuePriority issuePriorityHigh = new IssuePriority(getOrganisationID(), "High");
+			issuePriorityHigh.getIssuePriorityText().setText(Locale.ENGLISH.getLanguage(), "High");
+			issuePriorityHigh.getIssuePriorityText().setText(Locale.GERMAN.getLanguage(), "Hoch");
+			issuePriorityHigh = pm.makePersistent(issuePriorityHigh);
+			issueTypeDefault.getIssuePriorities().add(issuePriorityHigh);
 
-			issuePriority = new IssuePriority(getOrganisationID(), "High");
-			issuePriority.getIssuePriorityText().setText(Locale.ENGLISH.getLanguage(), "High");
-			issuePriority.getIssuePriorityText().setText(Locale.GERMAN.getLanguage(), "Hoch");
-			issuePriority = pm.makePersistent(issuePriority);
-			issueType.getIssuePriorities().add(issuePriority);
+			IssuePriority issuePriorityUrgent = new IssuePriority(getOrganisationID(), "Urgent");
+			issuePriorityUrgent.getIssuePriorityText().setText(Locale.ENGLISH.getLanguage(), "Urgent");
+			issuePriorityUrgent.getIssuePriorityText().setText(Locale.GERMAN.getLanguage(), "Dringend");
+			issuePriorityUrgent = pm.makePersistent(issuePriorityUrgent);
+			issueTypeDefault.getIssuePriorities().add(issuePriorityUrgent);
 
-			issuePriority = new IssuePriority(getOrganisationID(), "Urgent");
-			issuePriority.getIssuePriorityText().setText(Locale.ENGLISH.getLanguage(), "Urgent");
-			issuePriority.getIssuePriorityText().setText(Locale.GERMAN.getLanguage(), "Dringend");
-			issuePriority = pm.makePersistent(issuePriority);
-			issueType.getIssuePriorities().add(issuePriority);
-
-			issuePriority = new IssuePriority(getOrganisationID(), "Immediate");
-			issuePriority.getIssuePriorityText().setText(Locale.ENGLISH.getLanguage(), "Immediate");
-			issuePriority.getIssuePriorityText().setText(Locale.GERMAN.getLanguage(), "Umgehend");
-			issuePriority = pm.makePersistent(issuePriority);
-			issueType.getIssuePriorities().add(issuePriority);
+			IssuePriority issuePriorityImmediate = new IssuePriority(getOrganisationID(), "Immediate");
+			issuePriorityImmediate.getIssuePriorityText().setText(Locale.ENGLISH.getLanguage(), "Immediate");
+			issuePriorityImmediate.getIssuePriorityText().setText(Locale.GERMAN.getLanguage(), "Umgehend");
+			issuePriorityImmediate = pm.makePersistent(issuePriorityImmediate);
+			issueTypeDefault.getIssuePriorities().add(issuePriorityImmediate);
 
 			// Create the resolutions
-			IssueResolution issueResolution;
+			IssueResolution issueResolutionNotAssigned = new IssueResolution(getOrganisationID(), IssueResolution.ISSUE_RESOLUTION_ID_NOT_ASSIGNED.issueResolutionID);
+			issueResolutionNotAssigned.getName().setText(Locale.ENGLISH.getLanguage(), "Not assigned");
+			issueResolutionNotAssigned.getName().setText(Locale.GERMAN.getLanguage(), "Nicht zugewiesen");
+			issueResolutionNotAssigned = pm.makePersistent(issueResolutionNotAssigned);
+			issueTypeDefault.getIssueResolutions().add(issueResolutionNotAssigned);
 
-			issueResolution = new IssueResolution(getOrganisationID(), IssueResolution.ISSUE_RESOLUTION_ID_NOT_ASSIGNED.issueResolutionID);
-			issueResolution.getName().setText(Locale.ENGLISH.getLanguage(), "Not assigned");
-			issueResolution.getName().setText(Locale.GERMAN.getLanguage(), "Nicht zugewiesen");
-			issueResolution = pm.makePersistent(issueResolution);
-			issueType.getIssueResolutions().add(issueResolution);
+			IssueResolution issueResolutionOpen = new IssueResolution(getOrganisationID(), "Open");
+			issueResolutionOpen.getName().setText(Locale.ENGLISH.getLanguage(), "Open");
+			issueResolutionOpen.getName().setText(Locale.GERMAN.getLanguage(), "Offen");
+			issueResolutionOpen = pm.makePersistent(issueResolutionOpen);
+			issueTypeDefault.getIssueResolutions().add(issueResolutionOpen);
 
-			issueResolution = new IssueResolution(getOrganisationID(), "Open");
-			issueResolution.getName().setText(Locale.ENGLISH.getLanguage(), "Open");
-			issueResolution.getName().setText(Locale.GERMAN.getLanguage(), "Offen");
-			issueResolution = pm.makePersistent(issueResolution);
-			issueType.getIssueResolutions().add(issueResolution);
+			IssueResolution issueResolutionFixed = new IssueResolution(getOrganisationID(), "Fixed");
+			issueResolutionFixed.getName().setText(Locale.ENGLISH.getLanguage(), "Fixed");
+			issueResolutionFixed.getName().setText(Locale.GERMAN.getLanguage(), "Gelöst");
+			issueResolutionFixed = pm.makePersistent(issueResolutionFixed);
+			issueTypeDefault.getIssueResolutions().add(issueResolutionFixed);
 
-			issueResolution = new IssueResolution(getOrganisationID(), "Fixed");
-			issueResolution.getName().setText(Locale.ENGLISH.getLanguage(), "Fixed");
-			issueResolution.getName().setText(Locale.GERMAN.getLanguage(), "Gelöst");
-			issueResolution = pm.makePersistent(issueResolution);
-			issueType.getIssueResolutions().add(issueResolution);
+			IssueResolution issueResolutionReopened = new IssueResolution(getOrganisationID(), "Reopened");
+			issueResolutionReopened.getName().setText(Locale.ENGLISH.getLanguage(), "Reopened");
+			issueResolutionReopened.getName().setText(Locale.GERMAN.getLanguage(), "Wiedereröffnet");
+			issueResolutionReopened = pm.makePersistent(issueResolutionReopened);
+			issueTypeDefault.getIssueResolutions().add(issueResolutionReopened);
 
-			issueResolution = new IssueResolution(getOrganisationID(), "Reopened");
-			issueResolution.getName().setText(Locale.ENGLISH.getLanguage(), "Wiedereröffnet");
-			issueResolution = pm.makePersistent(issueResolution);
-			issueType.getIssueResolutions().add(issueResolution);
+			IssueResolution issueResolutionNotFixable = new IssueResolution(getOrganisationID(), "NotFixable");
+			issueResolutionNotFixable.getName().setText(Locale.ENGLISH.getLanguage(), "Not Fixable");
+			issueResolutionNotFixable.getName().setText(Locale.GERMAN.getLanguage(), "Nicht lösbar");
+			issueResolutionNotFixable = pm.makePersistent(issueResolutionNotFixable);
+			issueTypeDefault.getIssueResolutions().add(issueResolutionNotFixable);
 
-			issueResolution = new IssueResolution(getOrganisationID(), "NotFixable");
-			issueResolution.getName().setText(Locale.ENGLISH.getLanguage(), "Nicht lösbar");
-			issueResolution = pm.makePersistent(issueResolution);
-			issueType.getIssueResolutions().add(issueResolution);
-
-			issueResolution = new IssueResolution(getOrganisationID(), "WillNotFix");
-			issueResolution.getName().setText(Locale.ENGLISH.getLanguage(), "Wird nicht gelöst");
-			issueResolution = pm.makePersistent(issueResolution);
-			issueType.getIssueResolutions().add(issueResolution);
-
-			// Create the process definitions.
-			issueType.readProcessDefinition(IssueType.class.getResource("jbpm/status/"));
-
-			issueType = new IssueType(getOrganisationID(), "Customer");
-			issueType.getName().setText(Locale.ENGLISH.getLanguage(), "Customer");
-			issueType.getName().setText(Locale.GERMAN.getLanguage(), "Kunde");
-			issueType = pm.makePersistent(issueType);
+			IssueResolution issueResolutionWillNotFix = new IssueResolution(getOrganisationID(), "WillNotFix");
+			issueResolutionWillNotFix.getName().setText(Locale.ENGLISH.getLanguage(), "Will not fix");
+			issueResolutionWillNotFix.getName().setText(Locale.GERMAN.getLanguage(), "Wird nicht gelöst");
+			issueResolutionWillNotFix = pm.makePersistent(issueResolutionWillNotFix);
+			issueTypeDefault.getIssueResolutions().add(issueResolutionWillNotFix);
 
 			// Create the process definitions.
-			issueType.readProcessDefinition(IssueType.class.getResource("jbpm/status/"));
+			issueTypeDefault.readProcessDefinition(IssueType.class.getResource("jbpm/status/"));
+
+			IssueType issueTypeCustomer = new IssueType(getOrganisationID(), "Customer");
+			issueTypeCustomer.getName().setText(Locale.ENGLISH.getLanguage(), "Customer");
+			issueTypeCustomer.getName().setText(Locale.GERMAN.getLanguage(), "Kunde");
+			issueTypeCustomer = pm.makePersistent(issueTypeCustomer);
+
+			// Create the process definitions.
+			issueTypeCustomer.readProcessDefinition(IssueType.class.getResource("jbpm/status/"));
 
 			// Create the issueLinkTypes
-			IssueLinkType issueLinkType;
+			IssueLinkType issueLinkTypeRelated = new IssueLinkType(IssueLinkType.ISSUE_LINK_TYPE_ID_RELATED);
+			issueLinkTypeRelated.getName().setText(Locale.ENGLISH.getLanguage(), "Related");
+			issueLinkTypeRelated.getName().setText(Locale.GERMAN.getLanguage(), "Zugehörig");
+			issueLinkTypeRelated.addLinkedObjectClass(Object.class);
+			issueLinkTypeRelated = pm.makePersistent(issueLinkTypeRelated);
 
-			issueLinkType = new IssueLinkType(IssueLinkType.ISSUE_LINK_TYPE_ID_RELATED);
-			issueLinkType.getName().setText(Locale.ENGLISH.getLanguage(), "Related");
-			issueLinkType.getName().setText(Locale.GERMAN.getLanguage(), "Zugehörig");
-			issueLinkType.addLinkedObjectClass(Object.class);
-			issueLinkType = pm.makePersistent(issueLinkType);
+			IssueLinkType issueLinkTypeParent = new IssueLinkTypeParentChild(IssueLinkTypeParentChild.ISSUE_LINK_TYPE_ID_PARENT);
+			issueLinkTypeParent.getName().setText(Locale.ENGLISH.getLanguage(), "Parent of");
+			issueLinkTypeParent.getName().setText(Locale.GERMAN.getLanguage(), "Übergeordnet zu");
+			issueLinkTypeParent.addLinkedObjectClass(Issue.class);
+			issueLinkTypeParent = pm.makePersistent(issueLinkTypeParent);
 
-			issueLinkType = new IssueLinkTypeParentChild(IssueLinkTypeParentChild.ISSUE_LINK_TYPE_ID_PARENT);
-			issueLinkType.getName().setText(Locale.ENGLISH.getLanguage(), "Parent of");
-			issueLinkType.getName().setText(Locale.GERMAN.getLanguage(), "Übergeordnet zu");
-			issueLinkType.addLinkedObjectClass(Issue.class);
-			issueLinkType = pm.makePersistent(issueLinkType);
+			IssueLinkType issueLinkTypeChild = new IssueLinkTypeParentChild(IssueLinkTypeParentChild.ISSUE_LINK_TYPE_ID_CHILD);
+			issueLinkTypeChild.getName().setText(Locale.ENGLISH.getLanguage(), "Child of");
+			issueLinkTypeChild.getName().setText(Locale.GERMAN.getLanguage(), "Untergeordnet zu");
+			issueLinkTypeChild.addLinkedObjectClass(Issue.class);
+			issueLinkTypeChild = pm.makePersistent(issueLinkTypeChild);
 
-			issueLinkType = new IssueLinkTypeParentChild(IssueLinkTypeParentChild.ISSUE_LINK_TYPE_ID_CHILD);
-			issueLinkType.getName().setText(Locale.ENGLISH.getLanguage(), "Child of");
-			issueLinkType.getName().setText(Locale.GERMAN.getLanguage(), "Untergeordnet zu");
-			issueLinkType.addLinkedObjectClass(Issue.class);
-			issueLinkType = pm.makePersistent(issueLinkType);
-
-			issueLinkType = new IssueLinkTypeDuplicate(IssueLinkTypeDuplicate.ISSUE_LINK_TYPE_ID_DUPLICATE);
-			issueLinkType.getName().setText(Locale.ENGLISH.getLanguage(), "Duplicate");
-			issueLinkType.getName().setText(Locale.GERMAN.getLanguage(), "Duplikat");
-			issueLinkType.addLinkedObjectClass(Issue.class);
-			issueLinkType = pm.makePersistent(issueLinkType);
+			IssueLinkType issueLinkTypeDuplicate = new IssueLinkTypeDuplicate(IssueLinkTypeDuplicate.ISSUE_LINK_TYPE_ID_DUPLICATE);
+			issueLinkTypeDuplicate.getName().setText(Locale.ENGLISH.getLanguage(), "Duplicate");
+			issueLinkTypeDuplicate.getName().setText(Locale.GERMAN.getLanguage(), "Duplikat");
+			issueLinkTypeDuplicate.addLinkedObjectClass(Issue.class);
+			issueLinkTypeDuplicate = pm.makePersistent(issueLinkTypeDuplicate);
 
 			// Create the project type
 			pm.getExtent(ProjectType.class);
 
-			ProjectType projectType1 = new ProjectType(ProjectType.PROJECT_TYPE_ID_DEFAULT);
-			projectType1.getName().setText(Locale.ENGLISH.getLanguage(), "Default");
-			projectType1.getName().setText(Locale.GERMAN.getLanguage(), "Standard");
-			projectType1 = pm.makePersistent(projectType1);
+			ProjectType projectTypeDefault = new ProjectType(ProjectType.PROJECT_TYPE_ID_DEFAULT);
+			projectTypeDefault.getName().setText(Locale.ENGLISH.getLanguage(), "Default");
+			projectTypeDefault.getName().setText(Locale.GERMAN.getLanguage(), "Standard");
+			projectTypeDefault = pm.makePersistent(projectTypeDefault);
 
-			ProjectType projectType2 = new ProjectType(IDGenerator.getOrganisationID(), "cross ticket");
-			projectType2.getName().setText(Locale.ENGLISH.getLanguage(), "Cross Ticket");
-			projectType2 = pm.makePersistent(projectType2);
+			ProjectType projectTypeDemo1 = new ProjectType(IDGenerator.getOrganisationID(), "cross ticket");
+			projectTypeDemo1.getName().setText(Locale.ENGLISH.getLanguage(), "Cross Ticket");
+			projectTypeDemo1 = pm.makePersistent(projectTypeDemo1);
 
-			ProjectType projectType3 = new ProjectType(IDGenerator.getOrganisationID(), "jfire");
-			projectType3.getName().setText(Locale.ENGLISH.getLanguage(), "JFire");
-			projectType3 = pm.makePersistent(projectType3);
+			ProjectType projectTypeDemo2 = new ProjectType(IDGenerator.getOrganisationID(), "jfire");
+			projectTypeDemo2.getName().setText(Locale.ENGLISH.getLanguage(), "JFire");
+			projectTypeDemo2 = pm.makePersistent(projectTypeDemo2);
 
 			// Create the projects
 			pm.getExtent(Project.class);
 
-			Project project;
+			Project projectDefault = new Project(Project.PROJECT_ID_DEFAULT);
+			projectDefault.getName().setText(Locale.ENGLISH.getLanguage(), "Default");
+			projectDefault.getName().setText(Locale.GERMAN.getLanguage(), "Standard");
+			projectDefault.setProjectType(projectTypeDefault);
+			projectDefault = pm.makePersistent(projectDefault);
 
-			project = new Project(Project.PROJECT_ID_DEFAULT);
-			project.getName().setText(Locale.ENGLISH.getLanguage(), "Default");
-			project.getName().setText(Locale.GERMAN.getLanguage(), "Standard");
-			project.setProjectType(projectType1);
-			project = pm.makePersistent(project);
-
-			project = new Project(IDGenerator.getOrganisationID(), IDGenerator.nextID(Project.class));
-			project.getName().setText(Locale.ENGLISH.getLanguage(), "Project 1");
-			project.setProjectType(projectType1);
-			project = pm.makePersistent(project);
-
-			//--
-			Project subProject = new Project(IDGenerator.getOrganisationID(), IDGenerator.nextID(Project.class));
-			subProject.getName().setText(Locale.ENGLISH.getLanguage(), "Sub project 1");
-			project.addSubProject(subProject);
-
-			Project subsubProject = new Project(IDGenerator.getOrganisationID(), IDGenerator.nextID(Project.class));
-			subsubProject.getName().setText(Locale.ENGLISH.getLanguage(), "Sub Sub project 1.1");
-			subProject.addSubProject(subsubProject);
-
-			subsubProject = new Project(IDGenerator.getOrganisationID(), IDGenerator.nextID(Project.class));
-			subsubProject.getName().setText(Locale.ENGLISH.getLanguage(), "Sub Sub project 1.2");
-			subProject.addSubProject(subsubProject);
-
-			subsubProject = new Project(IDGenerator.getOrganisationID(), IDGenerator.nextID(Project.class));
-			subsubProject.getName().setText(Locale.ENGLISH.getLanguage(), "Sub Sub project 1.3");
-			subProject.addSubProject(subsubProject);
-
-			//--
-			subProject = new Project(IDGenerator.getOrganisationID(), IDGenerator.nextID(Project.class));
-			subProject.getName().setText(Locale.ENGLISH.getLanguage(), "Sub project 2");
-			project.addSubProject(subProject);
-
-			subsubProject = new Project(IDGenerator.getOrganisationID(), IDGenerator.nextID(Project.class));
-			subsubProject.getName().setText(Locale.ENGLISH.getLanguage(), "Sub Sub project 2.1");
-			subProject.addSubProject(subsubProject);
-
-			subsubProject = new Project(IDGenerator.getOrganisationID(), IDGenerator.nextID(Project.class));
-			subsubProject.getName().setText(Locale.ENGLISH.getLanguage(), "Sub Sub project 2.2");
-			subProject.addSubProject(subsubProject);
-
-			subsubProject = new Project(IDGenerator.getOrganisationID(), IDGenerator.nextID(Project.class));
-			subsubProject.getName().setText(Locale.ENGLISH.getLanguage(), "Sub Sub project 2.3");
-			subProject.addSubProject(subsubProject);
-			//--
-			subProject = new Project(IDGenerator.getOrganisationID(), IDGenerator.nextID(Project.class));
-			subProject.getName().setText(Locale.ENGLISH.getLanguage(), "Sub project 3");
-			project.addSubProject(subProject);
-
-			subProject = new Project(IDGenerator.getOrganisationID(), IDGenerator.nextID(Project.class));
-			subProject.getName().setText(Locale.ENGLISH.getLanguage(), "Sub project 4");
-			project.addSubProject(subProject);
+//			project = new Project(IDGenerator.getOrganisationID(), IDGenerator.nextID(Project.class));
+//			project.getName().setText(Locale.ENGLISH.getLanguage(), "Project 1");
+//			project.setProjectType(projectType1);
+//			project = pm.makePersistent(project);
+//
+//			//--
+//			Project subProject = new Project(IDGenerator.getOrganisationID(), IDGenerator.nextID(Project.class));
+//			subProject.getName().setText(Locale.ENGLISH.getLanguage(), "Sub project 1");
+//			project.addSubProject(subProject);
+//
+//			Project subsubProject = new Project(IDGenerator.getOrganisationID(), IDGenerator.nextID(Project.class));
+//			subsubProject.getName().setText(Locale.ENGLISH.getLanguage(), "Sub Sub project 1.1");
+//			subProject.addSubProject(subsubProject);
+//
+//			subsubProject = new Project(IDGenerator.getOrganisationID(), IDGenerator.nextID(Project.class));
+//			subsubProject.getName().setText(Locale.ENGLISH.getLanguage(), "Sub Sub project 1.2");
+//			subProject.addSubProject(subsubProject);
+//
+//			subsubProject = new Project(IDGenerator.getOrganisationID(), IDGenerator.nextID(Project.class));
+//			subsubProject.getName().setText(Locale.ENGLISH.getLanguage(), "Sub Sub project 1.3");
+//			subProject.addSubProject(subsubProject);
+//
+//			//--
+//			subProject = new Project(IDGenerator.getOrganisationID(), IDGenerator.nextID(Project.class));
+//			subProject.getName().setText(Locale.ENGLISH.getLanguage(), "Sub project 2");
+//			project.addSubProject(subProject);
+//
+//			subsubProject = new Project(IDGenerator.getOrganisationID(), IDGenerator.nextID(Project.class));
+//			subsubProject.getName().setText(Locale.ENGLISH.getLanguage(), "Sub Sub project 2.1");
+//			subProject.addSubProject(subsubProject);
+//
+//			subsubProject = new Project(IDGenerator.getOrganisationID(), IDGenerator.nextID(Project.class));
+//			subsubProject.getName().setText(Locale.ENGLISH.getLanguage(), "Sub Sub project 2.2");
+//			subProject.addSubProject(subsubProject);
+//
+//			subsubProject = new Project(IDGenerator.getOrganisationID(), IDGenerator.nextID(Project.class));
+//			subsubProject.getName().setText(Locale.ENGLISH.getLanguage(), "Sub Sub project 2.3");
+//			subProject.addSubProject(subsubProject);
+//			//--
+//			subProject = new Project(IDGenerator.getOrganisationID(), IDGenerator.nextID(Project.class));
+//			subProject.getName().setText(Locale.ENGLISH.getLanguage(), "Sub project 3");
+//			project.addSubProject(subProject);
+//
+//			subProject = new Project(IDGenerator.getOrganisationID(), IDGenerator.nextID(Project.class));
+//			subProject.getName().setText(Locale.ENGLISH.getLanguage(), "Sub project 4");
+//			project.addSubProject(subProject);
 
 			//--
-			project = new Project(IDGenerator.getOrganisationID(), IDGenerator.nextID(Project.class));
-			project.getName().setText(Locale.ENGLISH.getLanguage(), "Project 2");
-			project.setProjectType(projectType1);
-			project = pm.makePersistent(project);
+//			project = new Project(IDGenerator.getOrganisationID(), IDGenerator.nextID(Project.class));
+//			project.getName().setText(Locale.ENGLISH.getLanguage(), "Project 2");
+//			project.setProjectType(projectType1);
+//			project = pm.makePersistent(project);
+//
+//			project = new Project(IDGenerator.getOrganisationID(), IDGenerator.nextID(Project.class));
+//			project.getName().setText(Locale.ENGLISH.getLanguage(), "Project 3");
+//			project.setProjectType(projectType1);
+//			project = pm.makePersistent(project);
+//
+//			project = new Project(IDGenerator.getOrganisationID(), IDGenerator.nextID(Project.class));
+//			project.getName().setText(Locale.ENGLISH.getLanguage(), "Project 4");
+//			project.setProjectType(projectType1);
+//			project = pm.makePersistent(project);
 
-			project = new Project(IDGenerator.getOrganisationID(), IDGenerator.nextID(Project.class));
-			project.getName().setText(Locale.ENGLISH.getLanguage(), "Project 3");
-			project.setProjectType(projectType1);
-			project = pm.makePersistent(project);
-
-			project = new Project(IDGenerator.getOrganisationID(), IDGenerator.nextID(Project.class));
-			project.getName().setText(Locale.ENGLISH.getLanguage(), "Project 4");
-			project.setProjectType(projectType1);
-			project = pm.makePersistent(project);
-
-			project = new Project(IDGenerator.getOrganisationID(), IDGenerator.nextID(Project.class));
-			project.getName().setText(Locale.ENGLISH.getLanguage(), "Project 5");
-			project.setProjectType(projectType1);
-			project = pm.makePersistent(project);
+//			projectDefault = new Project(IDGenerator.getOrganisationID(), IDGenerator.nextID(Project.class));
+//			projectDefault.getName().setText(Locale.ENGLISH.getLanguage(), "Project 5");
+//			projectDefault.setProjectType(projectTypeDefault);
+//			projectDefault = pm.makePersistent(projectDefault);
 
 			// Create the project phases
 			pm.getExtent(ProjectPhase.class);
@@ -1535,6 +1530,99 @@ implements SessionBean
 			projectPhase.getName().setText(Locale.ENGLISH.getLanguage(), "Phase 4");
 			projectPhase = pm.makePersistent(projectPhase);
 
+			//Issues
+			pm.getExtent(Issue.class);
+			
+			Issue issue1 = new Issue(IDGenerator.getOrganisationID(), IDGenerator.nextID(Issue.class), issueTypeDefault);
+			issue1.setIssuePriority(issuePriorityHigh);
+			issue1.setIssueResolution(issueResolutionOpen);
+			issue1.setIssueSeverityType(issueSeverityTypeMinor);
+			IssueSubject subject1 = new IssueSubject(issue1);
+			subject1.setText(Locale.ENGLISH.getLanguage(), "Subject 1");
+			issue1.setSubject(subject1);
+			
+			storeIssue(issue1, false, new String[0], NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
+			
+			Issue issue2 = new Issue(IDGenerator.getOrganisationID(), IDGenerator.nextID(Issue.class), issueTypeDefault);
+			issue2.setIssuePriority(issuePriorityHigh);
+			issue2.setIssueResolution(issueResolutionOpen);
+			issue2.setIssueSeverityType(issueSeverityTypeMinor);
+			IssueSubject subject2 = new IssueSubject(issue2);
+			subject2.setText(Locale.ENGLISH.getLanguage(), "Subject 2");
+			issue2.setSubject(subject2);
+			
+			storeIssue(issue2, false, new String[0], NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
+			
+			Issue issue3 = new Issue(IDGenerator.getOrganisationID(), IDGenerator.nextID(Issue.class), issueTypeDefault);
+			issue3.setIssuePriority(issuePriorityHigh);
+			issue3.setIssueResolution(issueResolutionOpen);
+			issue3.setIssueSeverityType(issueSeverityTypeMinor);
+			IssueSubject subject3 = new IssueSubject(issue3);
+			subject3.setText(Locale.ENGLISH.getLanguage(), "Subject 3");
+			issue3.setSubject(subject3);
+			
+			storeIssue(issue3, false, new String[0], NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
+			
+			Issue issue4 = new Issue(IDGenerator.getOrganisationID(), IDGenerator.nextID(Issue.class), issueTypeDefault);
+			issue4.setIssuePriority(issuePriorityHigh);
+			issue4.setIssueResolution(issueResolutionOpen);
+			issue4.setIssueSeverityType(issueSeverityTypeMinor);
+			IssueSubject subject4 = new IssueSubject(issue4);
+			subject4.setText(Locale.ENGLISH.getLanguage(), "Subject 4");
+			issue4.setSubject(subject4);
+			
+			storeIssue(issue4, false, new String[0], NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
+			
+			Issue issue5 = new Issue(IDGenerator.getOrganisationID(), IDGenerator.nextID(Issue.class), issueTypeDefault);
+			issue5.setIssuePriority(issuePriorityHigh);
+			issue5.setIssueResolution(issueResolutionOpen);
+			issue5.setIssueSeverityType(issueSeverityTypeMinor);
+			IssueSubject subject5 = new IssueSubject(issue5);
+			subject5.setText(Locale.ENGLISH.getLanguage(), "Subject 5");
+			issue5.setSubject(subject5);
+			
+			storeIssue(issue5, false, new String[0], NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
+			
+			//Predefined Query Stores
+			IssueQuery unassignedIssueIssueQuery = new IssueQuery();
+			unassignedIssueIssueQuery.setAssigneeID(null);
+
+			IssueQuery resolvedIssueIssueQuery = new IssueQuery();
+			resolvedIssueIssueQuery.setStateDefinitionName(JbpmConstants.NODE_NAME_RESOLVED);
+
+			IssueQuery modifiedIssueIssueQuery = new IssueQuery();
+
+			//1
+			pm.getExtent(BaseQueryStore.class);
+			
+			UserID systemUserID = UserID.create(getOrganisationID(), getUserID());
+			User systemUser = (User)pm.getObjectById(systemUserID);
+			
+			QueryCollection<IssueQuery> queryCollection = new QueryCollection<IssueQuery>(Issue.class);
+			queryCollection.add(unassignedIssueIssueQuery);
+			
+			BaseQueryStore queryStore = new BaseQueryStore(systemUser,
+					IDGenerator.nextID(BaseQueryStore.class), queryCollection);
+			
+			queryStore.setQueryCollection(queryCollection);
+			queryStore.setPubliclyAvailable(true);
+			queryStore.getName().setText(Locale.ENGLISH.getLanguage(), "Unassigned");
+			queryStore.serialiseCollection();
+			queryStore = pm.makePersistent(queryStore);
+
+			//2
+			queryCollection = new QueryCollection<IssueQuery>(Issue.class);
+			queryCollection.add(resolvedIssueIssueQuery);
+			
+			queryStore = new BaseQueryStore(systemUser, 
+					IDGenerator.nextID(BaseQueryStore.class), queryCollection);
+			
+			queryStore.setQueryCollection(queryCollection);
+			queryStore.setPubliclyAvailable(true);
+			queryStore.getName().setText(Locale.ENGLISH.getLanguage(), "Resolved");
+			queryStore.serialiseCollection();
+			queryStore = pm.makePersistent(queryStore);
+			
 			EditLockType issueEditLock = new EditLockType(EditLockTypeIssue.EDIT_LOCK_TYPE_ID);
 			issueEditLock = pm.makePersistent(issueEditLock);
 			//------------------------------------------------

@@ -17,6 +17,7 @@ import org.nightlabs.jfire.issue.id.IssueResolutionID;
 import org.nightlabs.jfire.issue.id.IssueSeverityTypeID;
 import org.nightlabs.jfire.issue.id.IssueTypeID;
 import org.nightlabs.jfire.issue.project.id.ProjectID;
+import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.security.id.UserID;
 
 /**
@@ -69,7 +70,11 @@ extends AbstractJDOQuery
 	private Date issueWorkTimeRangeFrom;
 	private Date issueWorkTimeRangeTo;
 	private Set<ProjectID> projectIDs;
-
+	
+	private String stateDefinitionName;
+	private boolean isSetCurrentUserAsAssignee;
+	private boolean isSetCurrentUserAsReporter;
+	
 	/**
 	 *  A static class contained all parameters that can be set to the query.
 	 *  It's intended to use internally!!
@@ -94,6 +99,8 @@ extends AbstractJDOQuery
 		public static final String issueWorkTimeRangeFrom = "issueWorkTimeRangeFrom";
 		public static final String issueWorkTimeRangeTo = "issueWorkTimeRangeTo";
 		public static final String projectIDs = "projectIDs";
+		
+		public static final String stateDefinitionName = "stateDefinitionName";
 	}
 
 	/**
@@ -186,6 +193,10 @@ extends AbstractJDOQuery
 			filter.append("\n || (this.issueWorkTimeRanges.contains(varIssueWorkTimeRange) && !((varIssueWorkTimeRange.to <= :issueWorkTimeRangeFrom) && (varIssueWorkTimeRange.from < :issueWorkTimeRangeFrom))) ");
 		}
 
+		if (isFieldEnabled(FieldName.stateDefinitionName) && stateDefinitionName != null) {
+			filter.append("\n && this.stateDefinitionName == :stateDefinitionName ");
+		}
+		
 		if (isFieldEnabled(FieldName.projectIDs) && projectIDs != null && projectIDs.size() > 0) {
 			int i = 0;
 			for ( Iterator<ProjectID> it = projectIDs.iterator(); it.hasNext(); i++) {
@@ -623,6 +634,23 @@ extends AbstractJDOQuery
 		notifyListeners(FieldName.projectIDs, oldProjectIDs, projectIDs);
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
+	public String getStateDefinitionName() {
+		return stateDefinitionName;
+	}
+	
+	/**
+	 * 
+	 * @param stateDefinitionName
+	 */
+	public void setStateDefinitionName(String stateDefinitionName) {
+		final String oldStateDefinitionName = this.stateDefinitionName;
+		this.stateDefinitionName = stateDefinitionName;
+		notifyListeners(FieldName.stateDefinitionName, oldStateDefinitionName, stateDefinitionName);
+	}
 	@Override
 	/**
 	 * {@inheritDoc}
@@ -630,5 +658,15 @@ extends AbstractJDOQuery
 	protected Class<Issue> initCandidateClass()
 	{
 		return Issue.class;
+	}
+	
+	public void setCurrentUserAsAssignee() {
+		if (isSetCurrentUserAsAssignee)
+			this.assigneeID = SecurityReflector.getUserDescriptor().getUserObjectID();
+	}
+	
+	public void setCurrentUserAsReporter() {
+		if (isSetCurrentUserAsReporter)
+			this.reporterID = SecurityReflector.getUserDescriptor().getUserObjectID();
 	}
 }

@@ -85,4 +85,11 @@
 		<description language="en">sent</description>
 		<icon file="" />
 	</node>
+	<end-state name="dev.jfire.org:paid" publicState="true">
+		<name language="de">bezahlt</name>
+		<description language="de">bezahlt</description>
+		<name language="en">paid</name>
+		<description language="en">paid</description>
+		<icon file="" />
+	</end-state>
 </process-definition-extension>

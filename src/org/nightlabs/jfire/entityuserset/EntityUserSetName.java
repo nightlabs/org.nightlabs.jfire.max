@@ -43,7 +43,7 @@ import org.nightlabs.i18n.I18nText;
  * @jdo.inheritance strategy="new-table"
  *
  * @jdo.create-objectid-class
- *		field-order="organisationID, entityUserSetID"
+ *		field-order="organisationID, entityClassName, entityUserSetID"
  *
  * @jdo.fetch-group name="EntityUserSet.name" fields="entityUserSet, names"
  */
@@ -55,6 +55,12 @@ public class EntityUserSetName extends I18nText
 	 * @jdo.column length="100"
 	 */
 	private String organisationID;
+
+	/**
+	 * @jdo.field primary-key="true"
+	 * @jdo.column length="100"
+	 */
+	private String entityClassName;
 
 	/**
 	 * @jdo.field primary-key="true"
@@ -77,6 +83,7 @@ public class EntityUserSetName extends I18nText
 	public EntityUserSetName(IEntityUserSet<?> entityUserSet) {
 		this.entityUserSet = entityUserSet;
 		this.organisationID = entityUserSet.getOrganisationID();
+		this.entityClassName = entityUserSet.getEntityClassName();
 		this.entityUserSetID = entityUserSet.getEntityUserSetID();
 		this.names = new HashMap<String, String>();
 	}
@@ -110,6 +117,9 @@ public class EntityUserSetName extends I18nText
 
 	public String getOrganisationID() {
 		return organisationID;
+	}
+	public String getEntityClassName() {
+		return entityClassName;
 	}
 	public String getEntityUserSetID() {
 		return entityUserSetID;

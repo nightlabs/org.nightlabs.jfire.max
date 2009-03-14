@@ -61,7 +61,7 @@ implements SessionBean
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
-
+			SecurityChangeListenerEntityUserSet.register(pm);
 		} finally {
 			pm.close();
 		}

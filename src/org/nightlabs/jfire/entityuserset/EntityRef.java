@@ -21,7 +21,7 @@ import org.nightlabs.util.Util;
  * @jdo.create-objectid-class
  *		field-order="entityUserSetOrganisationID, entityUserSetID, authorizedObjectID, entityObjectIDString"
  *
- * @jdo.fetch-group name="AuthorizedObjectRef.entityRefs" fields="entityUserSet, authorizedObjectRef, entity"
+ * @jdo.fetch-group name="AuthorizedObjectRef.entityRefs" fields="entityUserSet, authorizedObjectRef"
  */
 public abstract class EntityRef<Entity>
 implements Serializable

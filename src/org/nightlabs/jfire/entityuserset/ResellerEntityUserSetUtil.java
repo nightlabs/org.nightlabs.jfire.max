@@ -22,7 +22,7 @@ import org.nightlabs.util.reflect.ReflectUtil;
 /**
  * @author marco schulze - marco at nightlabs dot de
  */
-public abstract class ResellerEntityUserSetUtil<Entity>
+public abstract class ResellerEntityUserSetUtil<Entity, ResellerEntityUserSetImplementation extends IResellerEntityUserSet<Entity>>
 {
 	private static final long serialVersionUID = 1L;
 
@@ -60,10 +60,10 @@ public abstract class ResellerEntityUserSetUtil<Entity>
 		return fieldName;
 	}
 
-	protected abstract IResellerEntityUserSet<Entity> createResellerEntityUserSetForBackendEntityUserSet(IEntityUserSet<Entity> backendEntityUserSet);
+	protected abstract ResellerEntityUserSetImplementation createResellerEntityUserSetForBackendEntityUserSet(IEntityUserSet<Entity> backendEntityUserSet);
 
 	@SuppressWarnings("unchecked")
-	public IResellerEntityUserSet<Entity> getResellerEntityUserSetForBackendEntityUserSet(IEntityUserSet<Entity> backendEntityUserSet)
+	public ResellerEntityUserSetImplementation getResellerEntityUserSetForBackendEntityUserSet(IEntityUserSet<Entity> backendEntityUserSet)
 	{
 		if (backendEntityUserSet == null)
 			throw new IllegalArgumentException("backendEntityUserSet must not be null!");
@@ -71,12 +71,12 @@ public abstract class ResellerEntityUserSetUtil<Entity>
 		Query q = pm.newQuery(getResellerEntityUserSetClass());
 		q.setFilter("this." + getBackendEntityUserSetFieldName() + " == :backendEntityUserSet");
 		q.setUnique(true);
-		return (IResellerEntityUserSet<Entity>) q.execute(backendEntityUserSet);
+		return (ResellerEntityUserSetImplementation) q.execute(backendEntityUserSet);
 	}
 
-	public IResellerEntityUserSet<Entity> configureResellerEntityUserSetForBackendEntityUserSet(IEntityUserSet<Entity> backendEntityUserSet)
+	public ResellerEntityUserSetImplementation configureResellerEntityUserSetForBackendEntityUserSet(IEntityUserSet<Entity> backendEntityUserSet)
 	{
-		IResellerEntityUserSet<Entity> resellerEntityUserSet = getResellerEntityUserSetForBackendEntityUserSet(backendEntityUserSet);
+		ResellerEntityUserSetImplementation resellerEntityUserSet = getResellerEntityUserSetForBackendEntityUserSet(backendEntityUserSet);
 		if (resellerEntityUserSet == null) {
 			resellerEntityUserSet = createResellerEntityUserSetForBackendEntityUserSet(backendEntityUserSet);
 			resellerEntityUserSet = pm.makePersistent(resellerEntityUserSet);

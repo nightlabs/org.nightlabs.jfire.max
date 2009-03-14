@@ -23,6 +23,8 @@ public interface IEntityUserSet<Entity>
 
 	String getOrganisationID();
 
+	String getEntityClassName();
+
 	String getEntityUserSetID();
 
 	EntityUserSetName getName();

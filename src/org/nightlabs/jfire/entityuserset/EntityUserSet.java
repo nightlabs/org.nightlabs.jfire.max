@@ -13,6 +13,7 @@ import javax.jdo.JDOHelper;
 
 import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jdo.ObjectIDUtil;
+import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.security.id.AuthorizedObjectID;
 import org.nightlabs.util.Util;
@@ -32,7 +33,7 @@ import org.nightlabs.util.Util;
  *
  * @jdo.version strategy="version-number"
  *
- * @jdo.create-objectid-class field-order="organisationID, entityUserSetID"
+ * @jdo.create-objectid-class field-order="organisationID, entityClassName, entityUserSetID"
  *
  * @jdo.fetch-group name="IEntityUserSet.authorizedObjectRefs" fields="authorizedObjectRefs"
  * @jdo.fetch-group name="IEntityUserSet.name" fields="name"
@@ -48,6 +49,12 @@ implements Serializable, IEntityUserSet<Entity>
 	 * @jdo.column length="100"
 	 */
 	private String organisationID;
+
+	/**
+	 * @jdo.field primary-key="true"
+	 * @jdo.column length="100"
+	 */
+	private String entityClassName;
 
 	/**
 	 * @jdo.field primary-key="true"
@@ -88,10 +95,19 @@ implements Serializable, IEntityUserSet<Entity>
 	@Deprecated
 	protected EntityUserSet() { }
 
-	public EntityUserSet(String organisationID, String entityUserSetID) {
+	public EntityUserSet(Class<?> entityClass) {
+		this(
+				IDGenerator.getOrganisationID(),
+				entityClass,
+				ObjectIDUtil.longObjectIDFieldToString(IDGenerator.nextID(EntityUserSet.class, entityClass.getName()))
+		);
+	}
+
+	public EntityUserSet(String organisationID, Class<?> entityClass, String entityUserSetID) {
 		Organisation.assertValidOrganisationID(organisationID);
 		ObjectIDUtil.assertValidIDString(entityUserSetID, "entityUserSetID");
 		this.organisationID = organisationID;
+		this.entityClassName = entityClass.getName();
 		this.entityUserSetID = entityUserSetID;
 
 		this.name = new EntityUserSetName(this);
@@ -100,23 +116,17 @@ implements Serializable, IEntityUserSet<Entity>
 		authorizedObjectRefs = new HashMap<String, AuthorizedObjectRef<Entity>>();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.nightlabs.jfire.entityuserset.IEntityUserSet#setEntityUserSetController(org.nightlabs.jfire.entityuserset.EntityUserSetController)
-	 */
+	@Override
 	public void setEntityUserSetController(EntityUserSetController entityUserSetController) {
 		this.entityUserSetController = entityUserSetController;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.nightlabs.jfire.entityuserset.IEntityUserSet#getEntityUserSetController()
-	 */
+	@Override
 	public EntityUserSetController getEntityUserSetController() {
 		return entityUserSetController;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.nightlabs.jfire.entityuserset.IEntityUserSet#getEntityUserSetController(boolean)
-	 */
+	@Override
 	public EntityUserSetController getEntityUserSetController(boolean throwExceptionIfNotAssigned) {
 		if (entityUserSetController == null)
 			throw new IllegalStateException("There is no EntityUserSetController assigned! You must call setEntityUserSetController(...) before!");
@@ -124,29 +134,25 @@ implements Serializable, IEntityUserSet<Entity>
 		return entityUserSetController;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.nightlabs.jfire.entityuserset.IEntityUserSet#getOrganisationID()
-	 */
+	@Override
 	public String getOrganisationID() {
 		return organisationID;
 	}
-	/* (non-Javadoc)
-	 * @see org.nightlabs.jfire.entityuserset.IEntityUserSet#getEntityUserSetID()
-	 */
+	@Override
+	public String getEntityClassName() {
+		return entityClassName;
+	}
+	@Override
 	public String getEntityUserSetID() {
 		return entityUserSetID;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.nightlabs.jfire.entityuserset.IEntityUserSet#getName()
-	 */
+	@Override
 	public EntityUserSetName getName() {
 		return name;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.nightlabs.jfire.entityuserset.IEntityUserSet#getDescription()
-	 */
+	@Override
 	public EntityUserSetDescription getDescription() {
 		return description;
 	}

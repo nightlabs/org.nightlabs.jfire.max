@@ -8,6 +8,7 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 
+import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
@@ -44,7 +45,7 @@ implements Serializable
 {
 	private static final long serialVersionUID = 1L;
 
-	public static final String FETCH_GROUP_TARIFF_REFS = "AuthorizedObjectRef.entityRefs";
+	public static final String FETCH_GROUP_ENTITY_REFS = "AuthorizedObjectRef.entityRefs";
 
 	public static Collection<? extends AuthorizedObjectRef<?>> getAuthorizedObjectRefs(PersistenceManager pm, AuthorizedObjectID authorizedObjectID)
 	{
@@ -95,7 +96,7 @@ implements Serializable
 	 *		dependent-value="true"
 	 *		mapped-by="authorizedObjectRef"
 	 *
-	 * @jdo.key mapped-by="entityPK"
+	 * @jdo.key mapped-by="entityObjectIDString"
 	 */
 	private Map<String, EntityRef<Entity>> entityRefs;
 
@@ -239,7 +240,13 @@ implements Serializable
 			}
 		}
 
+		makeEntityUserSetDirty();
+
 		return true; // indicate modification
+	}
+
+	private void makeEntityUserSetDirty() {
+		JDOHelper.makeDirty(entityUserSet, "authorizedObjectRefs");
 	}
 
 	public boolean addEntitys(Collection<? extends Entity> entitys)
@@ -294,6 +301,8 @@ implements Serializable
 
 		if (entityRef.getReferenceCount() == 0)
 			entityRefs.remove(entityObjectIDString);
+
+		makeEntityUserSetDirty();
 	}
 
 	public Collection<EntityRef<Entity>> getEntityRefs() {

@@ -95,7 +95,7 @@ implements Serializable, IEntityUserSet<Entity>
 	@Deprecated
 	protected EntityUserSet() { }
 
-	public EntityUserSet(Class<?> entityClass) {
+	public EntityUserSet(Class<? extends Entity> entityClass) {
 		this(
 				IDGenerator.getOrganisationID(),
 				entityClass,
@@ -103,7 +103,7 @@ implements Serializable, IEntityUserSet<Entity>
 		);
 	}
 
-	public EntityUserSet(String organisationID, Class<?> entityClass, String entityUserSetID) {
+	public EntityUserSet(String organisationID, Class<? extends Entity> entityClass, String entityUserSetID) {
 		Organisation.assertValidOrganisationID(organisationID);
 		ObjectIDUtil.assertValidIDString(entityUserSetID, "entityUserSetID");
 		this.organisationID = organisationID;

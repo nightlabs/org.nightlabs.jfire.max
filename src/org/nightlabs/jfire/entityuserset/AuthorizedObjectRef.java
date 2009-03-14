@@ -249,30 +249,30 @@ implements Serializable
 		JDOHelper.makeDirty(entityUserSet, "authorizedObjectRefs");
 	}
 
-	public boolean addEntitys(Collection<? extends Entity> entitys)
+	public boolean addEntities(Collection<? extends Entity> entities)
 	{
 		boolean atLeastOneAdded = false;
-		for (Entity entity : entitys)
+		for (Entity entity : entities)
 			atLeastOneAdded |= addEntity(entity);
 
 		return atLeastOneAdded;
 	}
 
-	public void retainEntitys(Collection<? extends Entity> entitys)
+	public void retainEntities(Collection<? extends Entity> entities)
 	{
-		Collection<Entity> entitysToRemove = new LinkedList<Entity>();
+		Collection<Entity> entitiesToRemove = new LinkedList<Entity>();
 		for (EntityRef<Entity> entityRef : this.getEntityRefs()) {
-			if (!entitys.contains(entityRef.getEntity()))
-				entitysToRemove.add(entityRef.getEntity());
+			if (!entities.contains(entityRef.getEntity()))
+				entitiesToRemove.add(entityRef.getEntity());
 		}
 
-		for (Entity entity : entitysToRemove)
+		for (Entity entity : entitiesToRemove)
 			this.removeEntity(entity);
 	}
 
-	public void removeEntitys(Collection<? extends Entity> entitys)
+	public void removeEntities(Collection<? extends Entity> entities)
 	{
-		for (Entity entity : entitys)
+		for (Entity entity : entities)
 			removeEntity(entity);
 	}
 

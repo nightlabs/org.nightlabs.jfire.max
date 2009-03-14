@@ -55,6 +55,11 @@ public abstract class ResellerEntityUserSetUtil<Entity, ResellerEntityUserSetImp
 				}
 			}
 
+			if (foundField == null)
+				throw new IllegalStateException("The class " + resellerEntityUserSetClass.getName() + " does not contain any field of type IEntityUserSet. You must implement IResellerEntityUserSet correctly and maybe you must override the method getBackendEntityUserSetFieldName() in your class " + this.getClass().getName() + "!");
+
+			fieldName = foundField.getName();
+
 			resellerEntityUserSetClass2backendEntityUserSetFieldName.put(resellerEntityUserSetClass, fieldName);
 		}
 		return fieldName;
@@ -108,14 +113,14 @@ public abstract class ResellerEntityUserSetUtil<Entity, ResellerEntityUserSetImp
 			resellerEntityUserSet.retainAuthorizedObjects(userLocalIDs);
 
 			Collection<? extends EntityRef<Entity>> entityRefs = resellerUserLocalAuthorizedObjectRef.getEntityRefs();
-			Set<Entity> entitys = new HashSet<Entity>(entityRefs.size());
+			Set<Entity> entities = new HashSet<Entity>(entityRefs.size());
 			for (EntityRef<Entity> entityRef : entityRefs)
-				entitys.add(entityRef.getEntity());
+				entities.add(entityRef.getEntity());
 
 			for (UserLocalID userLocalID : userLocalIDs) {
 				AuthorizedObjectRef<Entity> authorizedObjectRef = resellerEntityUserSet.addAuthorizedObject(userLocalID);
-				authorizedObjectRef.retainEntitys(entitys);
-				authorizedObjectRef.addEntitys(entitys);
+				authorizedObjectRef.retainEntities(entities);
+				authorizedObjectRef.addEntities(entities);
 			}
 		}
 

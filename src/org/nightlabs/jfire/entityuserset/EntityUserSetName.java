@@ -71,7 +71,7 @@ public class EntityUserSetName extends I18nText
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
-	private IEntityUserSet<?> entityUserSet;
+	private EntityUserSet<?> entityUserSet;
 
 	/**
 	 * @deprecated Only for JDO!
@@ -80,7 +80,7 @@ public class EntityUserSetName extends I18nText
 	protected EntityUserSetName() {
 	}
 
-	public EntityUserSetName(IEntityUserSet<?> entityUserSet) {
+	public EntityUserSetName(EntityUserSet<?> entityUserSet) {
 		this.entityUserSet = entityUserSet;
 		this.organisationID = entityUserSet.getOrganisationID();
 		this.entityClassName = entityUserSet.getEntityClassName();
@@ -125,7 +125,7 @@ public class EntityUserSetName extends I18nText
 		return entityUserSetID;
 	}
 
-	public IEntityUserSet<?> getEntityUserSet() {
+	public EntityUserSet<?> getEntityUserSet() {
 		return entityUserSet;
 	}
 }

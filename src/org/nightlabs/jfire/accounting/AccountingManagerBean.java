@@ -99,7 +99,6 @@ import org.nightlabs.jfire.accounting.priceconfig.PriceConfigUtil;
 import org.nightlabs.jfire.accounting.priceconfig.id.PriceConfigID;
 import org.nightlabs.jfire.accounting.query.MoneyTransferIDQuery;
 import org.nightlabs.jfire.accounting.query.MoneyTransferQuery;
-import org.nightlabs.jfire.accounting.tariffuserset.SecurityChangeListenerTariffUserSet;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.config.ConfigSetup;
 import org.nightlabs.jfire.config.UserConfigSetup;
@@ -192,7 +191,7 @@ implements SessionBean
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			SecurityChangeListenerTariffUserSet.register(pm);
+//			SecurityChangeListenerTariffUserSet.register(pm);
 
 			MoneyFlowDimension priceFragmentDimension = MoneyFlowDimension.getMoneyFlowDimension(pm, PriceFragmentDimension.MONEY_FLOW_DIMENSION_ID);
 			if (priceFragmentDimension == null) {

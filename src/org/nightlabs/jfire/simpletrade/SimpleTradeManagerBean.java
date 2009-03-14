@@ -75,12 +75,12 @@ import org.nightlabs.jfire.accounting.priceconfig.AffectedProductType;
 import org.nightlabs.jfire.accounting.priceconfig.FetchGroupsPriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.PriceConfigUtil;
 import org.nightlabs.jfire.accounting.priceconfig.id.PriceConfigID;
-import org.nightlabs.jfire.accounting.tariffuserset.AuthorizedObjectRef;
 import org.nightlabs.jfire.accounting.tariffuserset.TariffUserSet;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.base.JFireBaseEAR;
 import org.nightlabs.jfire.base.JFireEjbFactory;
 import org.nightlabs.jfire.base.JFireException;
+import org.nightlabs.jfire.entityuserset.AuthorizedObjectRef;
 import org.nightlabs.jfire.jdo.notification.persistent.PersistentNotificationEJB;
 import org.nightlabs.jfire.jdo.notification.persistent.PersistentNotificationEJBUtil;
 import org.nightlabs.jfire.jdo.notification.persistent.SubscriptionUtil;
@@ -1066,7 +1066,7 @@ implements SessionBean
 			String organisationID = getOrganisationID();
 
 			TariffUserSet tariffUserSet = productType.getTariffUserSet();
-			AuthorizedObjectRef authorizedObjectRef = null;
+			AuthorizedObjectRef<Tariff> authorizedObjectRef = null;
 			if (tariffUserSet != null) {
 				authorizedObjectRef = tariffUserSet.getAuthorizedObjectRef(UserLocalID.create(organisationID, getUserID(), organisationID));
 				if (authorizedObjectRef == null)
@@ -1093,7 +1093,7 @@ implements SessionBean
 					if (authorizedObjectRef == null)
 						continue iteratePriceCells;
 
-					if (authorizedObjectRef.getTariffRef(tariff) == null)
+					if (authorizedObjectRef.getEntityRef(tariff) == null)
 						continue iteratePriceCells;
 				}
 

@@ -35,5 +35,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/NightLabsQuery"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/NightLabsJDO"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireHTMLProp"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/JFireEntityUserSet"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -14,8 +14,11 @@ import org.nightlabs.jfire.entityuserset.EntityRef;
  */
 public class TariffRef extends EntityRef<Tariff>
 {
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 2L;
 
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
 	private Tariff tariff;
 
 	/**

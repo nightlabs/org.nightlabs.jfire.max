@@ -15,10 +15,17 @@ import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.organisation.Organisation;
+import org.nightlabs.jfire.security.UserLocal;
+import org.nightlabs.jfire.security.UserSecurityGroup;
 import org.nightlabs.jfire.security.id.AuthorizedObjectID;
 import org.nightlabs.util.Util;
 
 /**
+ * Base-class for assignments of some entities to users or
+ * user-groups (more precisely {@link UserLocal}s or {@link UserSecurityGroup}s).
+ * <p>
+ * See <a href="https://www.jfire.org/modules/phpwiki/index.php/Framework%20EntityUserSet">Framework EntityUserSet</a>
+ * </p>
  *
  * @author Marco Schulze - marco at nightlabs dot de
  *

@@ -63,7 +63,11 @@ public class SecurityChangeListenerEntityUserSet extends SecurityChangeListener
 
 		UserSecurityGroup userSecurityGroup = event.getUserSecurityGroup();
 		IAuthorizedObject member = event.getMember();
-		Collection<AuthorizedObjectRef<Object>> c = CollectionUtil.castCollection(AuthorizedObjectRef.getAuthorizedObjectRefs(pm, (AuthorizedObjectID) JDOHelper.getObjectId(userSecurityGroup)));
+		// We cast the generic type <Entity> to <Object>, because we can be sure that the real types of the entity in
+		// group-AuthorizedObjectRef and member-AuthorizedObjectRef is the same. If we don't cast this way (but <?> instead),
+		// the compiler produces an error because he thinks that the types are incompatible.
+		// It's not 100% clean but IMHO clean enough and I don't see a better way. Marco.
+		Collection<? extends AuthorizedObjectRef<Object>> c = CollectionUtil.castCollection(AuthorizedObjectRef.getAuthorizedObjectRefs(pm, (AuthorizedObjectID) JDOHelper.getObjectId(userSecurityGroup)));
 		for (AuthorizedObjectRef<Object> groupAuthorizedObjectRef : c) {
 			EntityUserSet<Object> entityUserSet = groupAuthorizedObjectRef.getEntityUserSet();
 			AuthorizedObjectRef<Object> memberAuthorizedObjectRef = entityUserSet.createOrGetAuthorizedObjectRef((AuthorizedObjectID) JDOHelper.getObjectId(member));
@@ -88,7 +92,11 @@ public class SecurityChangeListenerEntityUserSet extends SecurityChangeListener
 
 		UserSecurityGroup userSecurityGroup = event.getUserSecurityGroup();
 		IAuthorizedObject member = event.getMember();
-		Collection<AuthorizedObjectRef<Object>> c = CollectionUtil.castCollection(AuthorizedObjectRef.getAuthorizedObjectRefs(pm, (AuthorizedObjectID) JDOHelper.getObjectId(userSecurityGroup)));
+		// We cast the generic type <Entity> to <Object>, because we can be sure that the real types of the entity in
+		// group-AuthorizedObjectRef and member-AuthorizedObjectRef is the same. If we don't cast this way (but <?> instead),
+		// the compiler produces an error because he thinks that the types are incompatible.
+		// It's not 100% clean but IMHO clean enough and I don't see a better way. Marco.
+		Collection<? extends AuthorizedObjectRef<Object>> c = CollectionUtil.castCollection(AuthorizedObjectRef.getAuthorizedObjectRefs(pm, (AuthorizedObjectID) JDOHelper.getObjectId(userSecurityGroup)));
 		for (AuthorizedObjectRef<Object> groupAuthorizedObjectRef : c) {
 			EntityUserSet<Object> entityUserSet = groupAuthorizedObjectRef.getEntityUserSet();
 			AuthorizedObjectRef<Object> memberAuthorizedObjectRef = entityUserSet.getAuthorizedObjectRef((AuthorizedObjectID) JDOHelper.getObjectId(member));

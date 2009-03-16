@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
@@ -21,23 +22,86 @@ import org.nightlabs.util.reflect.ReflectUtil;
 
 /**
  * @author marco schulze - marco at nightlabs dot de
+ *
+ * @jdo.persistence-capable
+ *		identity-type="application"
+ *		objectid-class="org.nightlabs.jfire.entityuserset.id.ResellerEntityUserSetFactoryID"
+ *		detachable="true"
+ *		table="JFireEntityUserSet_ResellerEntityUserSetFactory"
+ *
+ * @jdo.create-objectid-class
+ *
+ * @jdo.inheritance strategy="new-table"
+ * @jdo.inheritance-discriminator strategy="class-name"
+ *
+ * @jdo.query name="getResellerEntityUserSetFactoryForEntityClassName" query="SELECT UNIQUE WHERE this.entityClassName == :entityClassName"
  */
-public abstract class ResellerEntityUserSetUtil<Entity, ResellerEntityUserSetImplementation extends IResellerEntityUserSet<Entity>>
+public abstract class ResellerEntityUserSetFactory<Entity>
 {
 	private static final long serialVersionUID = 1L;
 
-	private PersistenceManager pm;
+	public static <T> ResellerEntityUserSetFactory<T> getResellerEntityUserSetFactory(PersistenceManager pm, Class<T> entityClass, boolean throwExceptionIfNotFound)
+	{
+		return getResellerEntityUserSetFactory(pm, entityClass.getName(), throwExceptionIfNotFound);
+	}
 
-	public ResellerEntityUserSetUtil(PersistenceManager pm) {
-		if (pm == null)
-			throw new IllegalArgumentException("pm must not be null!");
+	@SuppressWarnings("unchecked")
+	public static <T> ResellerEntityUserSetFactory<T> getResellerEntityUserSetFactory(PersistenceManager pm, String entityClassName, boolean throwExceptionIfNotFound)
+	{
+		Query q = pm.newNamedQuery(ResellerEntityUserSetFactory.class, "getResellerEntityUserSetFactoryForEntityClassName");
+		ResellerEntityUserSetFactory<T> result = (ResellerEntityUserSetFactory<T>) q.execute(entityClassName);
+		if (throwExceptionIfNotFound && result == null)
+			throw new IllegalStateException("There is no ResellerEntityUserSetFactory for this entityClass: " + entityClassName);
 
-		this.pm = pm;
+		return result;
+	}
+
+	/**
+	 * @jdo.field primary-key="true"
+	 */
+	private String organisationID;
+
+	/**
+	 * @jdo.field primary-key="true"
+	 */
+	private String resellerEntityUserSetFactoryID;
+
+	/**
+	 * @jdo.field persistence-modifier="persistent" unique="true"
+	 */
+	private String entityClassName;
+
+	protected ResellerEntityUserSetFactory() { }
+
+	public ResellerEntityUserSetFactory(String organisationID, String resellerEntityUserSetFactoryID, Class<? extends Entity> entityClass) {
+		this.organisationID = organisationID;
+		this.resellerEntityUserSetFactoryID = resellerEntityUserSetFactoryID;
+		this.entityClassName = entityClass.getName();
+	}
+
+	public String getOrganisationID() {
+		return organisationID;
+	}
+
+	public String getResellerEntityUserSetFactoryID() {
+		return resellerEntityUserSetFactoryID;
+	}
+
+	public String getEntityClassName() {
+		return entityClassName;
 	}
 
 	protected abstract Class<? extends IResellerEntityUserSet<Entity>> getResellerEntityUserSetClass();
 
 	private static final Map<Class<? extends IResellerEntityUserSet<?>>, String> resellerEntityUserSetClass2backendEntityUserSetFieldName = new HashMap<Class<? extends IResellerEntityUserSet<?>>, String>();
+
+	protected PersistenceManager getPersistenceManager()
+	{
+		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
+		if (pm == null)
+			throw new IllegalStateException("Cannot obtain PersistenceManager from this instance: " + this);
+		return pm;
+	}
 
 	protected String getBackendEntityUserSetFieldName()
 	{
@@ -65,23 +129,29 @@ public abstract class ResellerEntityUserSetUtil<Entity, ResellerEntityUserSetImp
 		return fieldName;
 	}
 
-	protected abstract ResellerEntityUserSetImplementation createResellerEntityUserSetForBackendEntityUserSet(IEntityUserSet<Entity> backendEntityUserSet);
+	protected abstract IResellerEntityUserSet<Entity> createResellerEntityUserSetForBackendEntityUserSet(IEntityUserSet<Entity> backendEntityUserSet);
 
 	@SuppressWarnings("unchecked")
-	public ResellerEntityUserSetImplementation getResellerEntityUserSetForBackendEntityUserSet(IEntityUserSet<Entity> backendEntityUserSet)
+	public IResellerEntityUserSet<Entity> getResellerEntityUserSetForBackendEntityUserSet(IEntityUserSet<Entity> backendEntityUserSet, boolean throwExceptionIfNotFound)
 	{
 		if (backendEntityUserSet == null)
 			throw new IllegalArgumentException("backendEntityUserSet must not be null!");
 
+		PersistenceManager pm = getPersistenceManager();
 		Query q = pm.newQuery(getResellerEntityUserSetClass());
 		q.setFilter("this." + getBackendEntityUserSetFieldName() + " == :backendEntityUserSet");
 		q.setUnique(true);
-		return (ResellerEntityUserSetImplementation) q.execute(backendEntityUserSet);
+		IResellerEntityUserSet<Entity> resellerEntityUserSet = (IResellerEntityUserSet<Entity>) q.execute(backendEntityUserSet);
+		if (throwExceptionIfNotFound && resellerEntityUserSet == null)
+			throw new IllegalStateException("There is no resellerEntityUserSet for this backendEntityUserSet: " + backendEntityUserSet);
+
+		return resellerEntityUserSet;
 	}
 
-	public ResellerEntityUserSetImplementation configureResellerEntityUserSetForBackendEntityUserSet(IEntityUserSet<Entity> backendEntityUserSet)
+	public IResellerEntityUserSet<Entity> configureResellerEntityUserSetForBackendEntityUserSet(IEntityUserSet<Entity> backendEntityUserSet)
 	{
-		ResellerEntityUserSetImplementation resellerEntityUserSet = getResellerEntityUserSetForBackendEntityUserSet(backendEntityUserSet);
+		PersistenceManager pm = getPersistenceManager();
+		IResellerEntityUserSet<Entity> resellerEntityUserSet = getResellerEntityUserSetForBackendEntityUserSet(backendEntityUserSet, false);
 		if (resellerEntityUserSet == null) {
 			resellerEntityUserSet = createResellerEntityUserSetForBackendEntityUserSet(backendEntityUserSet);
 			resellerEntityUserSet = pm.makePersistent(resellerEntityUserSet);

@@ -18,6 +18,7 @@ import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.security.UserLocal;
 import org.nightlabs.jfire.security.UserSecurityGroup;
 import org.nightlabs.jfire.security.id.AuthorizedObjectID;
+import org.nightlabs.jfire.security.id.UserLocalID;
 import org.nightlabs.util.Util;
 
 /**
@@ -45,6 +46,8 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="IEntityUserSet.authorizedObjectRefs" fields="authorizedObjectRefs"
  * @jdo.fetch-group name="IEntityUserSet.name" fields="name"
  * @jdo.fetch-group name="IEntityUserSet.description" fields="description"
+ *
+ * @jdo.fetch-group name="FetchGroupsEntityUserSet.replicateToReseller" fields="authorizedObjectRefs, name, description"
  */
 public abstract class EntityUserSet<Entity>
 implements Serializable, IEntityUserSet<Entity>
@@ -229,9 +232,21 @@ implements Serializable, IEntityUserSet<Entity>
 		return authorizedObjectRef;
 	}
 
+	public void retainAuthorizedObjectsForReplication(UserLocalID principalAuthorizedObjectID)
+	{
+		Collection<AuthorizedObjectRef<Entity>> authorizedObjectRefsToRemove = new LinkedList<AuthorizedObjectRef<Entity>>();
+		for (AuthorizedObjectRef<Entity> authorizedObjectRef : authorizedObjectRefs.values()) {
+			if (!principalAuthorizedObjectID.equals(authorizedObjectRef.getAuthorizedObjectIDAsOID()))
+				authorizedObjectRefsToRemove.add(authorizedObjectRef);
+		}
+		for (AuthorizedObjectRef<Entity> authorizedObjectRef : authorizedObjectRefsToRemove)
+			 authorizedObjectRefs.remove(authorizedObjectRef.getAuthorizedObjectID());
+	}
+
 	/* (non-Javadoc)
 	 * @see org.nightlabs.jfire.entityuserset.IEntityUserSet#retainAuthorizedObjects(java.util.Collection)
 	 */
+	@Override
 	public void retainAuthorizedObjects(Collection<? extends AuthorizedObjectID> authorizedObjectIDs)
 	{
 		Collection<AuthorizedObjectRef<Entity>> authorizedObjectRefsToRemove = new LinkedList<AuthorizedObjectRef<Entity>>();

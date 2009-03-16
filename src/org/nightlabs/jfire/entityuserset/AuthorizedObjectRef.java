@@ -39,6 +39,8 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="AuthorizedObjectRef.entityRefs" fields="entityRefs"
  *
  * @jdo.fetch-group name="EntityUserSet.authorizedObjectRefs" fields="entityUserSet"
+ *
+ * @jdo.fetch-group name="FetchGroupsEntityUserSet.replicateToReseller" fields="entityUserSet, entityRefs"
  */
 public class AuthorizedObjectRef<Entity>
 implements Serializable

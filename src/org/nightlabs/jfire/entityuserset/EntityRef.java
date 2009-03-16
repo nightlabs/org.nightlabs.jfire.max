@@ -22,6 +22,8 @@ import org.nightlabs.util.Util;
  *		field-order="entityUserSetOrganisationID, entityUserSetID, authorizedObjectID, entityObjectIDString"
  *
  * @jdo.fetch-group name="AuthorizedObjectRef.entityRefs" fields="entityUserSet, authorizedObjectRef"
+ *
+ * @jdo.fetch-group name="FetchGroupsEntityUserSet.replicateToReseller" fields="entityUserSet, authorizedObjectRef"
  */
 public abstract class EntityRef<Entity>
 implements Serializable

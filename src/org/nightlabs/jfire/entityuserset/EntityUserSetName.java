@@ -46,6 +46,8 @@ import org.nightlabs.i18n.I18nText;
  *		field-order="organisationID, entityClassName, entityUserSetID"
  *
  * @jdo.fetch-group name="EntityUserSet.name" fields="entityUserSet, names"
+ *
+ * @jdo.fetch-group name="FetchGroupsEntityUserSet.replicateToReseller" fields="entityUserSet, names"
  */
 public class EntityUserSetName extends I18nText
 {

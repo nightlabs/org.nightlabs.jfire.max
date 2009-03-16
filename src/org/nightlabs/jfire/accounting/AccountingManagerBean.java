@@ -99,12 +99,15 @@ import org.nightlabs.jfire.accounting.priceconfig.PriceConfigUtil;
 import org.nightlabs.jfire.accounting.priceconfig.id.PriceConfigID;
 import org.nightlabs.jfire.accounting.query.MoneyTransferIDQuery;
 import org.nightlabs.jfire.accounting.query.MoneyTransferQuery;
+import org.nightlabs.jfire.accounting.tariffuserset.ResellerTariffUserSetFactory;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.config.ConfigSetup;
 import org.nightlabs.jfire.config.UserConfigSetup;
 import org.nightlabs.jfire.config.WorkstationConfigSetup;
+import org.nightlabs.jfire.entityuserset.notification.EntityUserSetNotificationFilterEntry;
 import org.nightlabs.jfire.idgenerator.IDNamespaceDefault;
 import org.nightlabs.jfire.jbpm.graph.def.ProcessDefinition;
+import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.DeliveryNote;
 import org.nightlabs.jfire.store.ProductType;
@@ -223,16 +226,24 @@ implements SessionBean
 			}
 
 			// Create the currencies EUR and CHF
-			Currency currency;
+			{
+				Currency currency;
 
-			// TODO currencySymbol (second "EUR") should be €,
-			// but this doesn't work yet because of a charset problem with the db
-			currency = new Currency("EUR", "EUR", 2);
-			pm.makePersistent(currency);
+				// TODO currencySymbol (second "EUR") should be €,
+				// but this doesn't work yet because of a charset problem with the db
+				currency = new Currency("EUR", "EUR", 2);
+				pm.makePersistent(currency);
 
-			currency = new Currency("CHF", "CHF", 2);
-			pm.makePersistent(currency);
+				currency = new Currency("CHF", "CHF", 2);
+				pm.makePersistent(currency);
+			}
 
+			pm.makePersistent(
+					new ResellerTariffUserSetFactory(Organisation.DEV_ORGANISATION_ID, ResellerTariffUserSetFactory.class.getName(), Tariff.class)
+			);
+			pm.makePersistent(
+					new EntityUserSetNotificationFilterEntry(Organisation.DEV_ORGANISATION_ID, Tariff.class.getName(), Tariff.class)
+			);
 
 			// create and persist the AccountTypes
 			AccountType accountType;

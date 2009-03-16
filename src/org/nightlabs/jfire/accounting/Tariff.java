@@ -58,7 +58,7 @@ import org.nightlabs.util.Util;
  *		table="JFireTrade_Tariff"
  *
  * @jdo.inheritance strategy = "new-table"
- * 
+ *
  * @jdo.create-objectid-class
  *		field-order="organisationID, tariffID"
  *		include-body="id/TariffID.body.inc"
@@ -72,14 +72,16 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="FetchGroupsTrade.articleInDeliveryNoteEditor" fields="name"
  *
  * @jdo.fetch-group name="FetchGroupsPriceConfig.edit" fields="name"
- * 
+ *
+ * @jdo.fetch-group name="FetchGroupsEntityUserSet.replicateToReseller" fields="name"
+ *
  * @jdo.query
  *		name="getTariffByName"
  *		query="SELECT
  *			WHERE
  *				this.name.names.get(paramLanguageID)==paramName
  *		PARAMETERS String paramLanguageID, String paramName
- *		import java.lang.String;  
+ *		import java.lang.String;
  */
 public class Tariff
 implements Serializable
@@ -88,26 +90,28 @@ implements Serializable
 	 * The serial version of this class.
 	 */
 	private static final long serialVersionUID = 1L;
-	
+
 	public static final String FETCH_GROUP_NAME = "Tariff.name"; //$NON-NLS-1$
 
 	/**
-	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon! 
+	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon!
 	 */
+	@Deprecated
 	public static final String FETCH_GROUP_THIS_TARIFF = "Tariff.this"; //$NON-NLS-1$
 
 	/**
 	 * Return a {@link Collection} of Tariffs with the given name in the given Locale language.
 	 * @param pm the PersistenceManager to use
 	 * @param name the name in the given locale language
-	 * @param locale the Locale to search with its language in the I18nText of the tariff  
+	 * @param locale the Locale to search with its language in the I18nText of the tariff
 	 * @return a {@link Collection} of Tariffs with the given name in the given Locale language
 	 */
+	@SuppressWarnings("unchecked")
 	public static Collection<Tariff> getTariffByName(PersistenceManager pm, String name, Locale locale) {
 		Query q = pm.newNamedQuery(Tariff.class, "getTariffByName"); //$NON-NLS-1$
 		return (Collection<Tariff>)q.execute(locale.getLanguage(), name);
 	}
-	
+
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
@@ -133,7 +137,7 @@ implements Serializable
 	 * @jdo.field persistence-modifier="persistent" dependent="true" mapped-by="tariff"
 	 */
 	private TariffName name;
-	
+
 	/** @jdo.field persistence-modifier="persistent" */
 	private int tariffIndex;
 
@@ -202,7 +206,7 @@ implements Serializable
 	{
 		return primaryKey;
 	}
-	
+
 //	/**
 //	 * @see javax.jdo.listener.StoreCallback#jdoPreStore()
 //	 */
@@ -240,11 +244,11 @@ implements Serializable
 //		tariff.name.localize(languageID, this.name);
 //		return tariff;
 //	}
-	
+
 	public int getTariffIndex() {
 		return tariffIndex;
 	}
-	
+
 	public void setTariffIndex(int tariffIndex) {
 		this.tariffIndex = tariffIndex;
 	}
@@ -263,7 +267,7 @@ implements Serializable
 	{
 		return Util.hashCode(organisationID) + Util.hashCode(tariffID);
 	}
-	
+
 	@Override
 	public String toString() {
 		try {

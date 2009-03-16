@@ -16,7 +16,8 @@ implements IResellerEntityUserSet<Tariff>
 	private static final long serialVersionUID = 2L;
 
 	/**
-	 * @jdo.field persistence-modifier="persistent" unique="true" null-value="exception"
+	 * The tariff-user-set of the supplier, on which this <code>ResellerTariffUserSet</code> is based. This field can be null only if this instance is itself replicated to another organisation.
+	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private TariffUserSet backendTariffUserSet;
 

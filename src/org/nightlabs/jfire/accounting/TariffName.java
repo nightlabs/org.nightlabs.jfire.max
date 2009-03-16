@@ -43,7 +43,7 @@ import org.nightlabs.i18n.I18nText;
  *		table="JFireTrade_TariffName"
  *
  * @jdo.inheritance strategy = "new-table"
- * 
+ *
  * @jdo.create-objectid-class
  *		field-order="organisationID, tariffID"
  *
@@ -57,8 +57,7 @@ import org.nightlabs.i18n.I18nText;
  *
  * @jdo.fetch-group name="FetchGroupsPriceConfig.edit" fields="tariff, names"
  *
- * @!
- * TODO What is that fetch-group "PriceCell.this" doing here? Marco ;-) Well, not mine, maybe just delete it. Alex
+ * @jdo.fetch-group name="FetchGroupsEntityUserSet.replicateToReseller" fields="tariff, names"
  */
 public class TariffName extends I18nText
 implements StoreCallback
@@ -100,7 +99,7 @@ implements StoreCallback
 	/**
 	 * key: String languageID<br/>
 	 * value: String name
-	 * 
+	 *
 	 * @jdo.field
 	 *		persistence-modifier="persistent"
 	 *		collection-type="map"

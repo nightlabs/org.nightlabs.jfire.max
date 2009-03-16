@@ -11,6 +11,8 @@ import org.nightlabs.jfire.entityuserset.EntityRef;
  * @jdo.inheritance strategy="new-table"
  *
  * @jdo.fetch-group name="AuthorizedObjectRef.entityRefs" fields="tariff"
+ *
+ * @jdo.fetch-group name="FetchGroupsEntityUserSet.replicateToReseller" fields="tariff"
  */
 public class TariffRef extends EntityRef<Tariff>
 {

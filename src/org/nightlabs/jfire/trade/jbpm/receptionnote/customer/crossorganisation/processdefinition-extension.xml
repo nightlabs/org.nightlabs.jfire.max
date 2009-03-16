@@ -6,7 +6,7 @@
 		<name language="en">created</name>
 		<description language="en">created</description>
 		<icon file="" />
-		<transition name="finalize" userExecutable="false" userExecutable="false">
+		<transition name="finalize" userExecutable="false">
 			<name language="de">finalisieren</name>
 			<description language="de">finalisieren</description>
 			<name language="en">finalize</name>

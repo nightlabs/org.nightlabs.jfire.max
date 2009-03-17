@@ -26,7 +26,6 @@ public class ExtendedProcessDefinitionDescriptor {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	private Map<String, ExtendedActionHandlerNode> actionHandlers = new HashMap<String, ExtendedActionHandlerNode>();
 
 	private Map<String, ExtendedNodeDescriptor> descriptors = new HashMap<String, ExtendedNodeDescriptor>();
 
@@ -34,22 +33,9 @@ public class ExtendedProcessDefinitionDescriptor {
 	public ExtendedProcessDefinitionDescriptor() {
 	}
 
-	protected void addEventActionHandler(String nodeID, ExtendedActionHandlerNode descriptor) {
-		actionHandlers.put(nodeID, descriptor);
-	}
 	
 	protected void addNodeDescriptor(String nodeID, ExtendedNodeDescriptor descriptor) {
 		descriptors.put(nodeID, descriptor);
-	}
-	/**
-	 * Retrieves the registered action handlers nodes.
-	 */	
-	public Collection<ExtendedActionHandlerNode> getActionHandlerNodes() {
-		return Collections.unmodifiableCollection(actionHandlers.values());
-	}
-	
-	public boolean hasActionHandlerNodes() {
-		return !actionHandlers.isEmpty();
 	}
 	
 	public Collection<ExtendedNodeDescriptor> getExtendedNodeDescriptors() {

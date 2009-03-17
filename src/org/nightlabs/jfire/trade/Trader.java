@@ -2109,7 +2109,7 @@ public class Trader
 //		if (TradeSide.vendor == tradeSide) {
 //			ActionHandlerFinalizeOfferForCrossTrade.register(jbpmProcessDefinition);
 //		}
-		// store it and return it, most properties of config are written in the XML file now.
+		// store it and return it, most properties of config are written in the extension XML file now.
 		return ProcessDefinition.storeProcessDefinition(pm, null, jbpmProcessDefinition, jbpmProcessDefinitionURL);
 	}
 

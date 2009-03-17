@@ -525,7 +525,7 @@ public class RecurringTrader {
 		org.jbpm.graph.def.ProcessDefinition jbpmProcessDefinition = ProcessDefinition.readProcessDefinition(jbpmProcessDefinitionURL);
 
 		// The ActionHandlerNodeEnter is added for all nodes!
-		ActionHandlerNodeEnter.register(jbpmProcessDefinition);
+		//ActionHandlerNodeEnter.register(jbpmProcessDefinition);
 		// All other handlers are configured in the process definition file
 
 		// store the process definition and return it

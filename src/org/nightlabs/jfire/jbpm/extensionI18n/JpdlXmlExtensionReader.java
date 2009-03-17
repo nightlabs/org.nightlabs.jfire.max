@@ -170,6 +170,17 @@ public class JpdlXmlExtensionReader implements ProblemListener {
 		}
 	}
 
+	// simple function to check if the element has the boolean attribute and 
+	Boolean hasBoolAttribute(Element element, String attribute)
+	{
+		String nodeAttr = element.getAttribute(attribute);
+		if (nodeAttr == null || nodeAttr.isEmpty())
+			return false;
+		
+		return Boolean.parseBoolean(nodeAttr);
+	}
+	
+	
 	/**
 	 * Reads the extensions of the given element (uses {@link #parseElementExtensions(Element, String)})
 	 * and recurses to read the extensions of sub-elements.
@@ -187,21 +198,69 @@ public class JpdlXmlExtensionReader implements ProblemListener {
 			if (nodeNameAttr == null || nodeNameAttr.isEmpty()) {
 				throw new IllegalStateException("Found extendable node '" + nodeName + "' of parent '" + parentNodeID + "' with no/invalid name attribute");
 			}
+
 			// the 
-			String nodeID = ExtendedNodeDescriptor.createSubNodeIDPrefix(parentNodeID, ExtendedNodeDescriptor.createNodeIDPrefix(nodeName, nodeNameAttr));
-			ExtendedNodeDescriptor nodeDescriptor = parseElementExtensions(nodeElement, nodeID);
-			if (nodeDescriptor != null) {
-				descriptor.addNodeDescriptor(nodeID, nodeDescriptor);
+			String nodeID = ExtendedNodeDescriptor.createSubNodeIDPrefix(parentNodeID, ExtendedNodeDescriptor.createNodeIDPrefix(nodeName, nodeNameAttr));			
+				
+			// check if it s action handler node and if so parse it
+			if(nodeName.equals("node") && hasBoolAttribute(nodeElement,"actionHandlerNode"))
+			{	
+				parseActionHandlers(nodeElement,nodeID,descriptor);			
+			}
+			else
+			{
+				ExtendedNodeDescriptor nodeDescriptor = parseElementExtensions(nodeElement, nodeID);
+				if (nodeDescriptor != null) {
+					descriptor.addNodeDescriptor(nodeID, nodeDescriptor);
+				}
+				// recurse
+				List<Element> children = findChildElements(nodeElement);
+				for (Element child : children) {
+					readExtendedElement(child, nodeID, descriptor);
+				}
 			}
 
-			// recurse
-			List<Element> children = findChildElements(nodeElement);
-			for (Element child : children) {
-				readExtendedElement(child, nodeID, descriptor);
-			}
 		}
 	}
 
+	/**
+	 * 
+	 * parses the action handler node and adds all the action listeners to the descriptor.
+	 * 
+	 * 
+	 * @param actionElement The element of the action node.
+	 * @param parentNodeID The parent ID node the event descriptor should be stored under.
+	 * @param descriptor The Descriptor where the actionevent Handlers will be stored. 
+	 */
+	private void parseActionHandlers(Element actionElement, String parentNodeID, ExtendedProcessDefinitionDescriptor descriptor)
+	{
+		// read names
+		NodeList nameElements = actionElement.getElementsByTagName("action");
+		for (int i = 0; i < nameElements.getLength(); i++) {
+			Element nameElement = (Element) nameElements.item(i);
+
+			String name= nameElement.getAttribute("name");
+			if (name == null || name.isEmpty()) {
+				throw new IllegalStateException("Found name element with invalid/no language attribute for element " + actionElement.getNodeName() + "(name=" + actionElement.getAttribute("name") + ").");
+			}
+			// create the Node ID of the Event
+			String nodeID = ExtendedNodeDescriptor.createSubNodeIDPrefix(parentNodeID, ExtendedNodeDescriptor.createNodeIDPrefix(nameElement.getNodeName(), name));	
+
+			String actionHandlerClass= nameElement.getAttribute("actionHandlerClass");
+			if (actionHandlerClass == null || actionHandlerClass.isEmpty()) {
+				throw new IllegalStateException("Found name element with invalid/no language attribute for element " + actionElement.getNodeName() + "(name=" + actionElement.getAttribute("name") + ").");
+			}		
+
+			String eventType= nameElement.getAttribute("eventType");
+			if (eventType == null || eventType.isEmpty()) {
+				throw new IllegalStateException("Found name element with invalid/no language attribute for element " + actionElement.getNodeName() + "(name=" + actionElement.getAttribute("name") + ").");
+			}
+			// add the action descriptor 
+			descriptor.addEventActionHandler(nodeID, new ExtendedActionHandlerNode(name,actionHandlerClass,eventType));
+		}
+
+	}
+	
 	/**
 	 * Builds the {@link ExtendedNodeDescriptor} from the extension nodes
 	 * found in the given element and puts it into the map under the given nodeID.
@@ -212,8 +271,11 @@ public class JpdlXmlExtensionReader implements ProblemListener {
 	private ExtendedNodeDescriptor parseElementExtensions(Element element, String nodeID) {
 		I18nTextBuffer buffer = new I18nTextBuffer();
 		I18nTextBuffer name = new I18nTextBuffer();
-		String iconFile = "";
-
+		String iconFile = "";		
+		
+		// create descriptor
+		ExtendedNodeDescriptor nodeDescriptor = new ExtendedNodeDescriptor(nodeID, name, buffer);
+		
 		// read names
 		NodeList nameElements = element.getElementsByTagName("name");
 		for (int i = 0; i < nameElements.getLength(); i++) {
@@ -238,14 +300,12 @@ public class JpdlXmlExtensionReader implements ProblemListener {
 			buffer.setText(languageID, value);
 		}
 
-		// read icon
+		// read icon file name 
 		Element iconElement = (Element) NLDOMUtil.findSingleNode(element, "icon");
 		if (iconElement != null) {
 			iconFile = iconElement.getAttribute("file");
 		}
 
-		// create descriptor
-		ExtendedNodeDescriptor nodeDescriptor = new ExtendedNodeDescriptor(nodeID, name, buffer);
 		nodeDescriptor.setIconFile(iconFile); // set the icon file
 		// set the userExecutable attribute for a transition.
 		if(element.getNodeName().equals("transition"))	

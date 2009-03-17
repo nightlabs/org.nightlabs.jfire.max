@@ -18,14 +18,19 @@ import javax.jdo.PersistenceManager;
 
 import org.apache.log4j.Logger;
 import org.jbpm.JbpmContext;
+import org.jbpm.graph.def.Action;
+import org.jbpm.graph.def.Event;
 import org.jbpm.graph.def.Node;
+import org.jbpm.instantiation.Delegation;
 import org.jbpm.jpdl.xml.JpdlXmlReader;
 import org.nightlabs.i18n.I18nTextBuffer;
 import org.nightlabs.jfire.jbpm.JbpmLookup;
+import org.nightlabs.jfire.jbpm.extensionI18n.ExtendedActionHandlerNode;
 import org.nightlabs.jfire.jbpm.extensionI18n.ExtendedNodeDescriptor;
 import org.nightlabs.jfire.jbpm.extensionI18n.ExtendedProcessDefinitionDescriptor;
 import org.nightlabs.jfire.jbpm.extensionI18n.JpdlXmlExtensionReader;
 import org.nightlabs.jfire.jbpm.graph.def.id.ProcessDefinitionID;
+import org.w3c.dom.Element;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -170,7 +175,22 @@ implements Serializable
 				else	
 					logger.info("reading process definition extension failed:" + jbpmProcessDefinitionURL, t);
 			} 			
-
+		
+			// find and register the action handlers
+			if(processDefinitionDescriptor != null) 
+			{
+				if(processDefinitionDescriptor.hasActionHandlerNodes())
+				{
+					for (ExtendedActionHandlerNode actionNode : processDefinitionDescriptor.getActionHandlerNodes()) 
+					{	
+						Action action = new Action(new Delegation(actionNode.getActionHandlerClassName()));
+						action.setName(actionNode.getActionHandlerNodeName());
+						Event event = new Event(actionNode.getActionHandlerEventType());
+						event.addAction(action);
+						jbpmProcessDefinition.addEvent(event);	
+					}	
+				}
+			}
 			// create StateDefinitions
 			for (Iterator<?> itNode = jbpmProcessDefinition.getNodes().iterator(); itNode.hasNext(); ) {
 				Node node = (Node) itNode.next();

@@ -35,8 +35,7 @@
 	<end-state name="dev.jfire.org:aborted"></end-state>
 	<end-state name="dev.jfire.org:revoked"></end-state>
 	<event type="process-end">
-		<action name="org.nightlabs.jfire.trade.jbpm.ActionHandlerOfferProcessEnd"
-			class="org.nightlabs.jfire.trade.jbpm.ActionHandlerOfferProcessEnd"></action>
+		<action name="org.nightlabs.jfire.trade.jbpm.ActionHandlerOfferProcessEnd" class="org.nightlabs.jfire.trade.jbpm.ActionHandlerOfferProcessEnd"></action>
 	</event>
 	<node name="dev.jfire.org:customerAccepted">
 		<transition name="accept" to="dev.jfire.org:accepted"></transition>
@@ -55,8 +54,7 @@
 	</node>
 	<node name="dev.jfire.org:acceptedImplicitely">
 		<event type="node-enter">
-			<action
-				class="org.nightlabs.jfire.trade.jbpm.ActionHandlerAcceptOfferImplicitelyVendor" />
+			<action class="org.nightlabs.jfire.trade.jbpm.ActionHandlerAcceptOfferImplicitelyVendor" />
 		</event>
 		<transition name="sendImplicitely" to="dev.jfire.org:sent"></transition>
 	</node>

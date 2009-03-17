@@ -2096,18 +2096,19 @@ public class Trader
 	{
 		PersistenceManager pm = getPersistenceManager();
 		org.jbpm.graph.def.ProcessDefinition jbpmProcessDefinition = ProcessDefinition.readProcessDefinition(jbpmProcessDefinitionURL);
-		// we add the events+actionhandlers
-		ActionHandlerNodeEnter.register(jbpmProcessDefinition);
-		if (TradeSide.vendor == tradeSide || TradeSide.customerLocal == tradeSide) {
-			ActionHandlerFinalizeOffer.register(jbpmProcessDefinition);
-			ActionHandlerSendOffer.register(jbpmProcessDefinition);
-			ActionHandlerAcceptOffer.register(jbpmProcessDefinition);
-			ActionHandlerRejectOffer.register(jbpmProcessDefinition);
-			ActionHandlerAcceptOfferImplicitelyVendor.register(jbpmProcessDefinition);
-		}
-		if (TradeSide.vendor == tradeSide) {
-			ActionHandlerFinalizeOfferForCrossTrade.register(jbpmProcessDefinition);
-		}
+// all the actions are defined and registered now in the process definition extension file 		
+//		// we add the events+actionhandlers
+//		ActionHandlerNodeEnter.register(jbpmProcessDefinition);
+//		if (TradeSide.vendor == tradeSide || TradeSide.customerLocal == tradeSide) {
+//			ActionHandlerFinalizeOffer.register(jbpmProcessDefinition);
+//			ActionHandlerSendOffer.register(jbpmProcessDefinition);
+//			ActionHandlerAcceptOffer.register(jbpmProcessDefinition);
+//			ActionHandlerRejectOffer.register(jbpmProcessDefinition);
+//			ActionHandlerAcceptOfferImplicitelyVendor.register(jbpmProcessDefinition);
+//		}
+//		if (TradeSide.vendor == tradeSide) {
+//			ActionHandlerFinalizeOfferForCrossTrade.register(jbpmProcessDefinition);
+//		}
 		// store it and return it, most properties of config are written in the XML file now.
 		return ProcessDefinition.storeProcessDefinition(pm, null, jbpmProcessDefinition, jbpmProcessDefinitionURL);
 	}

@@ -154,4 +154,25 @@
 			<icon file="" />
 		</transition>
 	</node>
+	<node name="customerLocalActions" actionHandlerNode="true">
+		<action name="ActionHandlerNodeEnter" eventType="node-enter"
+			actionHandlerClass="org.nightlabs.jfire.jbpm.graph.def.ActionHandlerNodeEnter">
+		</action>
+		<action name="ActionHandlerFinalizeOffer" eventType="node-enter"
+			actionHandlerClass="org.nightlabs.jfire.trade.jbpm.ActionHandlerFinalizeOffer">
+		</action>
+		<action name="ActionHandlerSendOffer" eventType="node-enter"
+			actionHandlerClass="org.nightlabs.jfire.trade.jbpm.ActionHandlerSendOffer">
+		</action>
+		<action name="ActionHandlerAcceptVendor" eventType="node-enter"
+			actionHandlerClass="org.nightlabs.jfire.trade.jbpm.ActionHandlerAcceptOffer">
+		</action>
+		<action name="ActionHandlerRejectOffer" eventType="node-enter"
+			actionHandlerClass="org.nightlabs.jfire.trade.jbpm.ActionHandlerRejectOffer">
+		</action>
+		<action name="ActionHandlerAcceptOfferImplicitelyVendor"
+			eventType="node-enter"
+			actionHandlerClass="org.nightlabs.jfire.trade.jbpm.ActionHandlerAcceptOfferImplicitelyVendor">
+		</action>
+	</node>
 </process-definition-extension>

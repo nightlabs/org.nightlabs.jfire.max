@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<root-container name="dev.jfire.org:DeliveryNote.CustomerLocal" width="1009" height="1443">
+<root-container name="dev.jfire.org:DeliveryNote.CustomerLocal" width="702" height="414">
   <node name="dev.jfire.org:created" x="5" y="6" width="206" height="40">
     <edge>
       <label x="5" y="-10"/>
@@ -20,10 +20,9 @@
   <node name="dev.jfire.org:booked" x="5" y="226" width="207" height="40">
     <edge>
       <label x="5" y="-10"/>
-      <bendpoint w1="159" h1="-25" w2="-143" h2="-26"/>
     </edge>
     <edge>
-      <label x="1" y="-12"/>
+      <label x="5" y="-10"/>
     </edge>
   </node>
   <node name="dev.jfire.org:aborted" x="320" y="5" width="181" height="40"/>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<root-container name="dev.jfire.org:Invoice.CustomerLocal" width="1181" height="1424">
+<root-container name="dev.jfire.org:Invoice.CustomerLocal" width="913" height="622">
   <node name="dev.jfire.org:created" x="97" y="21" width="206" height="40">
     <edge>
       <label x="-44" y="-17"/>
@@ -15,7 +15,7 @@
   </node>
   <node name="dev.jfire.org:finalized" x="97" y="109" width="207" height="40">
     <edge>
-      <label x="-155" y="-11"/>
+      <label x="5" y="-10"/>
     </edge>
   </node>
   <node name="dev.jfire.org:aborted" x="420" y="21" width="221" height="40"/>
@@ -37,17 +37,16 @@
   <node name="dev.jfire.org:paid" x="104" y="443" width="195" height="40"/>
   <node name="dev.jfire.org:booked" x="98" y="196" width="208" height="40">
     <edge>
-      <label x="20" y="-14"/>
-      <bendpoint w1="140" h1="206" w2="-192" h2="0"/>
+      <label x="5" y="-10"/>
     </edge>
     <edge>
-      <label x="-100" y="-30"/>
+      <label x="5" y="-10"/>
     </edge>
     <edge>
-      <label x="-48" y="-17"/>
+      <label x="5" y="-10"/>
     </edge>
     <edge>
-      <label x="10" y="-2"/>
+      <label x="5" y="-10"/>
     </edge>
   </node>
   <node name="dev.jfire.org:bookedUnreceivable" x="414" y="499" width="240" height="40">

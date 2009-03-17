@@ -1,20 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<process-definition
-  xmlns=""  name="dev.jfire.org:Invoice.CustomerCrossOrganisation">
-   <start-state name="dev.jfire.org:sent">
-      <transition name="book" to="dev.jfire.org:booked"></transition>
-      <transition name="dispute" to="disputeStarted.beforeBook"></transition>
-   </start-state>
-   <end-state name="dev.jfire.org:paid"></end-state>
-   <state name="dev.jfire.org:booked">
-      <transition name="dev.jfire.org:pay" to="dev.jfire.org:paid"></transition>
-      <transition name="dispute" to="disputeStarted.afterBook"></transition>
-   </state>
-   <state name="disputeStarted.beforeBook">
-      <transition name="book" to="dev.jfire.org:booked"></transition>
-   </state>
-   <state name="disputeStarted.afterBook">
-      <transition name="dev.jfire.org:pay" to="dev.jfire.org:paid"></transition>
-   </state>
+<process-definition xmlns=""
+	name="dev.jfire.org:Invoice.CustomerCrossOrganisation">
+	<start-state name="dev.jfire.org:sent">
+		<transition name="book" to="dev.jfire.org:booked"></transition>
+		<transition name="dispute" to="disputeStarted.beforeBook"></transition>
+	</start-state>
+	<end-state name="dev.jfire.org:paid"></end-state>
+	<state name="dev.jfire.org:booked">
+		<event type="node-enter">
+			<action class="org.nightlabs.jfire.accounting.jbpm.ActionHandlerBookInvoice" />
+		</event>
+		<transition name="dev.jfire.org:pay" to="dev.jfire.org:paid"></transition>
+		<transition name="dispute" to="disputeStarted.afterBook"></transition>
+	</state>
+	<state name="disputeStarted.beforeBook">
+		<transition name="book" to="dev.jfire.org:booked"></transition>
+	</state>
+	<state name="disputeStarted.afterBook">
+		<transition name="dev.jfire.org:pay" to="dev.jfire.org:paid"></transition>
+	</state>
 </process-definition>

@@ -8,6 +8,9 @@
       <transition name="dev.jfire.org:bookImplicitely" to="dev.jfire.org:bookedImplicitely"></transition>
    </start-state>
    <state name="dev.jfire.org:finalized">
+   		<event type="node-enter">
+			<action class="org.nightlabs.jfire.accounting.jbpm.ActionHandlerFinalizeInvoice" />
+		</event>
       <transition name="dev.jfire.org:book" to="dev.jfire.org:booked"></transition>
    </state>
    <end-state name="dev.jfire.org:aborted"></end-state>
@@ -18,12 +21,15 @@
    </state>
    <end-state name="dev.jfire.org:uncollectable"></end-state>
    <end-state name="dev.jfire.org:paid"></end-state>
-   <state name="dev.jfire.org:booked">
-      <transition name="dev.jfire.org:send" to="dev.jfire.org:sent"></transition>
-      <transition name="doubt" to="dev.jfire.org:doubtful"></transition>
-      <transition name="dev.jfire.org:pay" to="dev.jfire.org:paid"></transition>
-      <transition name="sendReminder" to="dev.jfire.org:sentReminder"></transition>
-   </state>
+	<state name="dev.jfire.org:booked">
+		<event type="node-enter">
+			<action class="org.nightlabs.jfire.accounting.jbpm.ActionHandlerBookInvoice" />
+		</event>
+		<transition name="dev.jfire.org:send" to="dev.jfire.org:sent"></transition>
+		<transition name="doubt" to="dev.jfire.org:doubtful"></transition>
+		<transition name="dev.jfire.org:pay" to="dev.jfire.org:paid"></transition>
+		<transition name="sendReminder" to="dev.jfire.org:sentReminder"></transition>
+	</state>
    <node name="dev.jfire.org:sent">
       <transition name="" to="dev.jfire.org:booked"></transition>
    </node>
@@ -39,7 +45,10 @@
       <transition name="doubt" to="dev.jfire.org:doubtful"></transition>
       <transition name="dev.jfire.org:pay" to="dev.jfire.org:paid"></transition>
    </state>
-   <node name="dev.jfire.org:bookedImplicitely">
-      <transition name="" to="dev.jfire.org:booked"></transition>
-   </node>
+	<node name="dev.jfire.org:bookedImplicitely">
+		<event type="node-enter">
+			<action class="org.nightlabs.jfire.accounting.jbpm.ActionHandlerBookInvoiceImplicitely" />
+		</event>
+		<transition name="" to="dev.jfire.org:booked"></transition>
+	</node>
 </process-definition>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<root-container name="dev.jfire.org:Invoice.CustomerCrossOrganisation" width="1009" height="1445">
+<root-container name="dev.jfire.org:Invoice.CustomerCrossOrganisation" width="702" height="417">
   <node name="dev.jfire.org:sent" x="3" y="3" width="216" height="40">
     <edge>
       <label x="0" y="-10"/>
@@ -12,7 +12,7 @@
   <node name="dev.jfire.org:paid" x="1" y="211" width="220" height="40"/>
   <node name="dev.jfire.org:booked" x="2" y="103" width="219" height="40">
     <edge>
-      <label x="-1" y="-10"/>
+      <label x="5" y="-10"/>
     </edge>
     <edge>
       <label x="5" y="-10"/>

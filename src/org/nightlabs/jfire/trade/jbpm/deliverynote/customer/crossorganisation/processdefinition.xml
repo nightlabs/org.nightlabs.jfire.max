@@ -1,18 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<process-definition
-  xmlns=""  name="dev.jfire.org:DeliveryNote.CustomerCrossOrganisation">
-   <start-state name="dev.jfire.org:sent">
-      <transition name="createReceptionNote" to="dev.jfire.org:createdReceptionNote"></transition>
-      <transition name="dev.jfire.org:deliver" to="dev.jfire.org:delivered"></transition>
-   </start-state>
-   <end-state name="dev.jfire.org:createdReceptionNote"></end-state>
-   <end-state name="dev.jfire.org:booked"></end-state>
-   <state name="dev.jfire.org:delivered">
-      <transition name="dev.jfire.org:book" to="dev.jfire.org:booked"></transition>
-      <transition name="dev.jfire.org:bookImplicitely" to="dev.jfire.org:bookedImplicitely"></transition>
-   </state>
-   <node name="dev.jfire.org:bookedImplicitely">
-      <transition name="" to="dev.jfire.org:booked"></transition>
-   </node>
+<process-definition xmlns=""
+	name="dev.jfire.org:DeliveryNote.CustomerCrossOrganisation">
+	<start-state name="dev.jfire.org:sent">
+		<transition name="createReceptionNote" to="dev.jfire.org:createdReceptionNote"></transition>
+		<transition name="dev.jfire.org:deliver" to="dev.jfire.org:delivered"></transition>
+	</start-state>
+	<end-state name="dev.jfire.org:createdReceptionNote"></end-state>
+	<end-state name="dev.jfire.org:booked">
+		<event type="node-enter">
+			<action class="org.nightlabs.jfire.store.jbpm.ActionHandlerBookDeliveryNote" />
+		</event>
+	</end-state>
+	<state name="dev.jfire.org:delivered">
+		<transition name="dev.jfire.org:book" to="dev.jfire.org:booked"></transition>
+		<transition name="dev.jfire.org:bookImplicitely" to="dev.jfire.org:bookedImplicitely"></transition>
+	</state>
+	<node name="dev.jfire.org:bookedImplicitely">
+		<transition name="" to="dev.jfire.org:booked"></transition>
+	</node>
 </process-definition>

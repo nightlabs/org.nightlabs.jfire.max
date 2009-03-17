@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<root-container name="dev.jfire.org:DeliveryNote.CustomerCrossOrganisation" width="1009" height="1443">
+<root-container name="dev.jfire.org:DeliveryNote.CustomerCrossOrganisation" width="702" height="414">
   <node name="dev.jfire.org:sent" x="4" y="4" width="206" height="40">
     <edge>
       <label x="5" y="-10"/>

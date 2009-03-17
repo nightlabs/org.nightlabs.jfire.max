@@ -118,10 +118,10 @@ implements Serializable
 		ExtendedProcessDefinitionDescriptor processDefinitionDescriptor = null;
 
 		pm.getExtent(ProcessDefinition.class);
-		
-		// register the action handler ActionHandlerNodeEnter 
+
+		// register the action handler ActionHandlerNodeEnter
 		ActionHandlerNodeEnter.register(jbpmProcessDefinition);
-		
+
 		boolean closeJbpmContext = false;
 		if (jbpmContext == null) {
 			closeJbpmContext = true;
@@ -146,45 +146,45 @@ implements Serializable
 				// read the jbpm extension process file
 				jbpmExtensionURL = new URL(jbpmProcessDefinitionURL, "processdefinition-extension.xml");
 				InputStream extensionInput = jbpmExtensionURL.openStream();
-				// a simple check to throws I/O exception if file doesnt exist.			
+				// a simple check to throws I/O exception if file doesnt exist.
 				if (jbpmExtensionURL.openConnection().getInputStream()!= null)
 				{
-					try {		
+					try {
 						Reader extensionReader = new InputStreamReader(extensionInput);
 						JpdlXmlExtensionReader jpdlXmlReaderExtension = new JpdlXmlExtensionReader(extensionReader);
-						processDefinitionDescriptor = jpdlXmlReaderExtension.getExtendedProcessDefinitionDescriptor();					
+						processDefinitionDescriptor = jpdlXmlReaderExtension.getExtendedProcessDefinitionDescriptor();
 					} finally {
 						extensionInput.close();
-					}					
+					}
 				} else
-					logger.info("input stream is null in process definition extension:" + jbpmProcessDefinitionURL);
+					logger.info("Input stream is null in process definition extension:" + jbpmProcessDefinitionURL);
 
-			} 
+			}
 			catch (FileNotFoundException e) {
-				logger.info("the extended process definition extension file was not found: " + jbpmExtensionURL, e);
-			}			
+				logger.info("No additional process definition extension file found: " + jbpmExtensionURL);
+			}
 			catch (Throwable t) {
 				if (t instanceof IOException)
 					logger.info("reading process definition extension failed because of IO Exception: " + jbpmProcessDefinitionURL, t);
 				if (t instanceof RuntimeException)
 					logger.info("reading process definition extension failed because of Runtime Exception: " + jbpmProcessDefinitionURL, t);
-				else	
+				else
 					logger.info("reading process definition extension failed:" + jbpmProcessDefinitionURL, t);
-			} 			
-		
+			}
+
 //			// find and register the action handlers
-//			if(processDefinitionDescriptor != null) 
+//			if(processDefinitionDescriptor != null)
 //			{
 //				if(processDefinitionDescriptor.hasActionHandlerNodes())
 //				{
-//					for (ExtendedActionHandlerNode actionNode : processDefinitionDescriptor.getActionHandlerNodes()) 
-//					{	
+//					for (ExtendedActionHandlerNode actionNode : processDefinitionDescriptor.getActionHandlerNodes())
+//					{
 //						Action action = new Action(new Delegation(actionNode.getActionHandlerClassName()));
 //						action.setName(actionNode.getActionHandlerNodeName());
 //						Event event = new Event(actionNode.getActionHandlerEventType());
 //						event.addAction(action);
-//						jbpmProcessDefinition.addEvent(event);	
-//					}	
+//						jbpmProcessDefinition.addEvent(event);
+//					}
 //				}
 //			}
 			// create StateDefinitions
@@ -213,7 +213,7 @@ implements Serializable
 					for (Iterator <?>itTransition = node.getLeavingTransitions().iterator(); itTransition.hasNext(); ) {
 						org.jbpm.graph.def.Transition jbpmTransition = (org.jbpm.graph.def.Transition) itTransition.next();
 						//							TransitionID transitionID = Transition.getTransitionID(jbpmTransition);
-						Transition transition = pm.makePersistent(new Transition(stateDefinition, jbpmTransition.getName()));						
+						Transition transition = pm.makePersistent(new Transition(stateDefinition, jbpmTransition.getName()));
 						if(processDefinitionDescriptor != null)
 						{
 							ExtendedNodeDescriptor transitionExtendedNode = processDefinitionDescriptor.getExtendedNodeDescriptor(jbpmTransition);
@@ -223,10 +223,10 @@ implements Serializable
 								transition.getName().copyFrom(transitionExtendedNode.getName());
 								transition.getDescription().copyFrom(transitionExtendedNode.getDescription());
 								transition.setUserExecutable(transitionExtendedNode.getUserExecutable());
-							}	
+							}
 						}
 					}
-				} 
+				}
 			}
 
 			return processDefinition;

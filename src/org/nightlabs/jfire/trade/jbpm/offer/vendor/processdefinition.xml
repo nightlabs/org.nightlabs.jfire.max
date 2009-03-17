@@ -44,9 +44,7 @@
 		<transition name="reject" to="dev.jfire.org:rejected"></transition>
 	</node>
 	<node name="dev.jfire.org:sent">
-		<event type="node-enter">
-			<action class="org.nightlabs.jfire.trade.jbpm.ActionHandlerSendOffer" />
-		</event>
+		<action class="org.nightlabs.jfire.trade.jbpm.ActionHandlerSendOffer" />
 		<transition name="dev.jfire.org:send" to="dev.jfire.org:finalized"></transition>
 		<transition name="sendImplicitely" to="dev.jfire.org:accepted"></transition>
 		<transition name="" to="dev.jfire.org:accepted"></transition>

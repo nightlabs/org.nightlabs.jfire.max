@@ -1,55 +1,76 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<process-definition
-  xmlns=""  name="dev.jfire.org:Offer.Vendor">
-   <start-state name="dev.jfire.org:created">
-      <transition name="dev.jfire.org:finalize" to="dev.jfire.org:finalized"></transition>
-      <transition name="abort" to="dev.jfire.org:aborted"></transition>
-      <transition name="dev.jfire.org:acceptImplicitely" to="dev.jfire.org:acceptedImplicitely"></transition>
-      <transition name="dev.jfire.org:finalizeForCrossTrade" to="dev.jfire.org:finalizedForCrossTrade"></transition>
-   </start-state>
-   <end-state name="dev.jfire.org:rejected"></end-state>
-   <end-state name="dev.jfire.org:accepted"></end-state>
-   <state name="dev.jfire.org:finalized">
-      <transition name="dev.jfire.org:expire" to="dev.jfire.org:expired"></transition>
-      <transition name="revoke" to="dev.jfire.org:revoked"></transition>
-      <transition name="reject" to="dev.jfire.org:rejected"></transition>
-      <transition name="dev.jfire.org:customerAccepted" to="dev.jfire.org:customerAccepted"></transition>
-      <transition name="dev.jfire.org:customerRejected" to="dev.jfire.org:customerRejected"></transition>
-      <transition name="accept" to="dev.jfire.org:accepted"></transition>
-      <transition name="dev.jfire.org:send" to="dev.jfire.org:sent"></transition>
+<process-definition xmlns=""
+	name="dev.jfire.org:Offer.Vendor">
+	<start-state name="dev.jfire.org:created">
+		<transition name="dev.jfire.org:finalize" to="dev.jfire.org:finalized"></transition>
+		<transition name="abort" to="dev.jfire.org:aborted"></transition>
+		<transition name="dev.jfire.org:acceptImplicitely" to="dev.jfire.org:acceptedImplicitely"></transition>
+		<transition name="dev.jfire.org:finalizeForCrossTrade" to="dev.jfire.org:finalizedForCrossTrade"></transition>
+	</start-state>
+	<end-state name="dev.jfire.org:rejected">
+		<event type="node-enter">
+			<action class="org.nightlabs.jfire.trade.jbpm.ActionHandlerRejectOffer" />
+		</event>
+	</end-state>
+	<end-state name="dev.jfire.org:accepted">
+		<event type="node-enter">
+			<action class="org.nightlabs.jfire.trade.jbpm.ActionHandlerAcceptOffer" />
+		</event>
+	</end-state>
+	<state name="dev.jfire.org:finalized">
+		<event type="node-enter">
+			<action class="org.nightlabs.jfire.trade.jbpm.ActionHandlerFinalizeOffer" />
+		</event>
+		<transition name="dev.jfire.org:expire" to="dev.jfire.org:expired"></transition>
+		<transition name="revoke" to="dev.jfire.org:revoked"></transition>
+		<transition name="reject" to="dev.jfire.org:rejected"></transition>
+		<transition name="dev.jfire.org:customerAccepted" to="dev.jfire.org:customerAccepted"></transition>
+		<transition name="dev.jfire.org:customerRejected" to="dev.jfire.org:customerRejected"></transition>
+		<transition name="accept" to="dev.jfire.org:accepted"></transition>
+		<transition name="dev.jfire.org:send" to="dev.jfire.org:sent"></transition>
 		<transition to="dev.jfire.org:accepted" name="dev.jfire.org:acceptImplicitely"></transition>
-   </state>
-   <end-state name="dev.jfire.org:expired"></end-state>
-   <end-state name="dev.jfire.org:aborted"></end-state>
-   <end-state name="dev.jfire.org:revoked"></end-state>
-
-
+	</state>
+	<end-state name="dev.jfire.org:expired"></end-state>
+	<end-state name="dev.jfire.org:aborted"></end-state>
+	<end-state name="dev.jfire.org:revoked"></end-state>
 	<event type="process-end">
-		<action name="org.nightlabs.jfire.trade.jbpm.ActionHandlerOfferProcessEnd" class="org.nightlabs.jfire.trade.jbpm.ActionHandlerOfferProcessEnd"></action>
+		<action name="org.nightlabs.jfire.trade.jbpm.ActionHandlerOfferProcessEnd"
+			class="org.nightlabs.jfire.trade.jbpm.ActionHandlerOfferProcessEnd"></action>
 	</event>
-   <node name="dev.jfire.org:customerAccepted">
-      <transition name="accept" to="dev.jfire.org:accepted"></transition>
-   </node>
-   <node name="dev.jfire.org:customerRejected">
-      <transition name="reject" to="dev.jfire.org:rejected"></transition>
-   </node>
-   <node name="dev.jfire.org:sent">
-      <transition name="dev.jfire.org:send" to="dev.jfire.org:finalized"></transition>
-      <transition name="sendImplicitely" to="dev.jfire.org:accepted"></transition>
-      <transition name="" to="dev.jfire.org:accepted"></transition>
-      <transition name="sendForCrossTrade" to="dev.jfire.org:sentForCrossTrade"></transition>
-   </node>
-   <node name="dev.jfire.org:acceptedImplicitely">
-      <transition name="sendImplicitely" to="dev.jfire.org:sent"></transition>
-   </node>
-   <state name="dev.jfire.org:sentForCrossTrade">
-      <transition name="dev.jfire.org:acceptForCrossTrade" to="dev.jfire.org:acceptedForCrossTrade"></transition>
-   </state>
-   <node name="dev.jfire.org:acceptedForCrossTrade">
-      <transition name="" to="dev.jfire.org:accepted"></transition>
-   </node>
-   <node name="dev.jfire.org:finalizedForCrossTrade">
-      <transition name="sendForCrossTrade" to="dev.jfire.org:sent"></transition>
-   </node>
+	<node name="dev.jfire.org:customerAccepted">
+		<transition name="accept" to="dev.jfire.org:accepted"></transition>
+	</node>
+	<node name="dev.jfire.org:customerRejected">
+		<transition name="reject" to="dev.jfire.org:rejected"></transition>
+	</node>
+	<node name="dev.jfire.org:sent">
+		<event type="node-enter">
+			<action class="org.nightlabs.jfire.trade.jbpm.ActionHandlerSendOffer" />
+		</event>
+		<transition name="dev.jfire.org:send" to="dev.jfire.org:finalized"></transition>
+		<transition name="sendImplicitely" to="dev.jfire.org:accepted"></transition>
+		<transition name="" to="dev.jfire.org:accepted"></transition>
+		<transition name="sendForCrossTrade" to="dev.jfire.org:sentForCrossTrade"></transition>
+	</node>
+	<node name="dev.jfire.org:acceptedImplicitely">
+		<event type="node-enter">
+			<action
+				class="org.nightlabs.jfire.trade.jbpm.ActionHandlerAcceptOfferImplicitelyVendor" />
+		</event>
+		<transition name="sendImplicitely" to="dev.jfire.org:sent"></transition>
+	</node>
+	<state name="dev.jfire.org:sentForCrossTrade">
+		<transition name="dev.jfire.org:acceptForCrossTrade" to="dev.jfire.org:acceptedForCrossTrade"></transition>
+	</state>
+	<node name="dev.jfire.org:acceptedForCrossTrade">
+		<transition name="" to="dev.jfire.org:accepted"></transition>
+	</node>
+	<node name="dev.jfire.org:finalizedForCrossTrade">
+		<event type="node-enter">
+			<action class="org.nightlabs.jfire.trade.jbpm.ActionHandlerFinalizeOfferForCrossTrade" />
+		</event>
+		<transition name="sendForCrossTrade" to="dev.jfire.org:sent"></transition>
+	</node>
+
 </process-definition>

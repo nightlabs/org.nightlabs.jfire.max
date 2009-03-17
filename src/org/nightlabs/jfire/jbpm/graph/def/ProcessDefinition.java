@@ -125,7 +125,10 @@ implements Serializable
 		ExtendedProcessDefinitionDescriptor processDefinitionDescriptor = null;
 
 		pm.getExtent(ProcessDefinition.class);
-
+		
+		// register the action handler ActionHandlerNodeEnter 
+		ActionHandlerNodeEnter.register(jbpmProcessDefinition);
+		
 		boolean closeJbpmContext = false;
 		if (jbpmContext == null) {
 			closeJbpmContext = true;
@@ -176,21 +179,21 @@ implements Serializable
 					logger.info("reading process definition extension failed:" + jbpmProcessDefinitionURL, t);
 			} 			
 		
-			// find and register the action handlers
-			if(processDefinitionDescriptor != null) 
-			{
-				if(processDefinitionDescriptor.hasActionHandlerNodes())
-				{
-					for (ExtendedActionHandlerNode actionNode : processDefinitionDescriptor.getActionHandlerNodes()) 
-					{	
-						Action action = new Action(new Delegation(actionNode.getActionHandlerClassName()));
-						action.setName(actionNode.getActionHandlerNodeName());
-						Event event = new Event(actionNode.getActionHandlerEventType());
-						event.addAction(action);
-						jbpmProcessDefinition.addEvent(event);	
-					}	
-				}
-			}
+//			// find and register the action handlers
+//			if(processDefinitionDescriptor != null) 
+//			{
+//				if(processDefinitionDescriptor.hasActionHandlerNodes())
+//				{
+//					for (ExtendedActionHandlerNode actionNode : processDefinitionDescriptor.getActionHandlerNodes()) 
+//					{	
+//						Action action = new Action(new Delegation(actionNode.getActionHandlerClassName()));
+//						action.setName(actionNode.getActionHandlerNodeName());
+//						Event event = new Event(actionNode.getActionHandlerEventType());
+//						event.addAction(action);
+//						jbpmProcessDefinition.addEvent(event);	
+//					}	
+//				}
+//			}
 			// create StateDefinitions
 			for (Iterator<?> itNode = jbpmProcessDefinition.getNodes().iterator(); itNode.hasNext(); ) {
 				Node node = (Node) itNode.next();

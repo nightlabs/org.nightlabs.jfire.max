@@ -25,6 +25,8 @@ import org.nightlabs.jfire.jbpm.extensionI18n.ExtendedProcessDefinitionDescripto
 import org.nightlabs.jfire.jbpm.extensionI18n.JpdlXmlExtensionReader;
 import org.nightlabs.jfire.jbpm.graph.def.id.ProcessDefinitionID;
 
+
+
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  *
@@ -119,7 +121,7 @@ implements Serializable
 
 		pm.getExtent(ProcessDefinition.class);
 
-		// register the action handler ActionHandlerNodeEnter
+		// register the main action handler ActionHandlerNodeEnter
 		ActionHandlerNodeEnter.register(jbpmProcessDefinition);
 
 		boolean closeJbpmContext = false;
@@ -172,21 +174,6 @@ implements Serializable
 					logger.info("reading process definition extension failed:" + jbpmProcessDefinitionURL, t);
 			}
 
-//			// find and register the action handlers
-//			if(processDefinitionDescriptor != null)
-//			{
-//				if(processDefinitionDescriptor.hasActionHandlerNodes())
-//				{
-//					for (ExtendedActionHandlerNode actionNode : processDefinitionDescriptor.getActionHandlerNodes())
-//					{
-//						Action action = new Action(new Delegation(actionNode.getActionHandlerClassName()));
-//						action.setName(actionNode.getActionHandlerNodeName());
-//						Event event = new Event(actionNode.getActionHandlerEventType());
-//						event.addAction(action);
-//						jbpmProcessDefinition.addEvent(event);
-//					}
-//				}
-//			}
 			// create StateDefinitions
 			for (Iterator<?> itNode = jbpmProcessDefinition.getNodes().iterator(); itNode.hasNext(); ) {
 				Node node = (Node) itNode.next();

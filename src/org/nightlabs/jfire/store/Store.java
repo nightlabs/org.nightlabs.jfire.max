@@ -1738,13 +1738,6 @@ implements StoreCallback
 	{
 		PersistenceManager pm = getPersistenceManager();
 		org.jbpm.graph.def.ProcessDefinition jbpmProcessDefinition = ProcessDefinition.readProcessDefinition(jbpmProcessDefinitionURL);
-		
-		if (TradeSide.vendor == tradeSide) {
-			ActionHandlerFinalizeDeliveryNote.register(jbpmProcessDefinition);
-			ActionHandlerBookDeliveryNoteImplicitely.register(jbpmProcessDefinition);
-		}
-
-		ActionHandlerBookDeliveryNote.register(jbpmProcessDefinition);
 		// store it and return it
 		return ProcessDefinition.storeProcessDefinition(pm, null, jbpmProcessDefinition, jbpmProcessDefinitionURL);
 	}

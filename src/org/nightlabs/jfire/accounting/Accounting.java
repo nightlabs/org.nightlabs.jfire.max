@@ -1185,19 +1185,7 @@ implements StoreCallback
 	throws IOException
 	{
 		PersistenceManager pm = getPersistenceManager();
-
 		org.jbpm.graph.def.ProcessDefinition jbpmProcessDefinition = ProcessDefinition.readProcessDefinition(jbpmProcessDefinitionURL);
-
-		// we add the events+actionhandlers
-		//ActionHandlerNodeEnter.register(jbpmProcessDefinition);
-//
-//		if (TradeSide.vendor == tradeSide || TradeSide.customerLocal == tradeSide) {
-//			ActionHandlerFinalizeInvoice.register(jbpmProcessDefinition);
-//			ActionHandlerBookInvoiceImplicitely.register(jbpmProcessDefinition);
-//		}
-//
-//		ActionHandlerBookInvoice.register(jbpmProcessDefinition);
-
 		// store the process definition and return it
 		return ProcessDefinition.storeProcessDefinition(pm, null, jbpmProcessDefinition, jbpmProcessDefinitionURL);
 	}

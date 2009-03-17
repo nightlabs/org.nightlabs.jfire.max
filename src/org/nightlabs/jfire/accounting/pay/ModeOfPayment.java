@@ -38,11 +38,12 @@ import javax.jdo.Query;
 
 import org.nightlabs.jfire.accounting.pay.id.ModeOfPaymentFlavourID;
 import org.nightlabs.jfire.accounting.pay.id.ModeOfPaymentID;
+import org.nightlabs.util.CollectionUtil;
 import org.nightlabs.util.Util;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
- * 
+ *
  * @jdo.persistence-capable
  *		identity-type="application"
  *		objectid-class="org.nightlabs.jfire.accounting.pay.id.ModeOfPaymentID"
@@ -56,11 +57,8 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="ModeOfPayment.name" fields="name"
  * @jdo.fetch-group name="ModeOfPayment.flavours" fields="flavours"
  * @jdo.fetch-group name="ModeOfPayment.this" fetch-groups="default" fields="flavours, name"
- * 
- * @jdo.query
- *		name="getAllModeOfPaymentIDs"
- *		query="SELECT JDOHelper.getObjectId(this)"
- * 
+ *
+ * @jdo.query name="getAllModeOfPaymentIDs" query="SELECT JDOHelper.getObjectId(this)"
  */
 public class ModeOfPayment
 implements Serializable
@@ -70,8 +68,9 @@ implements Serializable
 	public static final String FETCH_GROUP_NAME = "ModeOfPayment.name";
 	public static final String FETCH_GROUP_FLAVOURS = "ModeOfPayment.flavours";
 	/**
-	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon! 
+	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon!
 	 */
+	@Deprecated
 	public static final String FETCH_GROUP_THIS_MODE_OF_PAYMENT = "ModeOfPayment.this";
 
 	/**
@@ -189,7 +188,7 @@ implements Serializable
 
 	/**
 	 * Creates a new <tt>ModeOfPaymentFlavour</tt> or returns a previously created one.
-	 * 
+	 *
 	 * @param flavourID The local id (within this <tt>ModeOfPayment</tt>) for the new flavour.
 	 *
 	 * @return The newly created <tt>ModeOfPaymentFlavour</tt> (or an old instance, if already existent before).
@@ -204,11 +203,16 @@ implements Serializable
 		}
 		return res;
 	}
-	
-	@SuppressWarnings("unchecked")
+
 	public static Set<ModeOfPaymentID> getAllModeOfPaymentIDs(PersistenceManager pm) {
 		Query query = pm.newNamedQuery(ModeOfPayment.class, "getAllModeOfPaymentIDs");
-		return new HashSet<ModeOfPaymentID>((Collection<? extends ModeOfPaymentID>) query.execute());
+		Collection<ModeOfPaymentID> c = CollectionUtil.castCollection((Collection<?>) query.execute());
+		return new HashSet<ModeOfPaymentID>(c);
+	}
+
+	public static Collection<ModeOfPayment> getAllModeOfPayments(PersistenceManager pm) {
+		Query query = pm.newQuery(ModeOfPayment.class);
+		return CollectionUtil.castCollection((Collection<?>) query.execute());
 	}
 
 	@Override

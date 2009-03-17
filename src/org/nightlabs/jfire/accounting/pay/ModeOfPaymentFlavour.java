@@ -49,6 +49,7 @@ import org.nightlabs.jfire.config.UserConfigSetup;
 import org.nightlabs.jfire.config.WorkstationConfigSetup;
 import org.nightlabs.jfire.trade.CustomerGroup;
 import org.nightlabs.jfire.trade.id.CustomerGroupID;
+import org.nightlabs.util.CollectionUtil;
 import org.nightlabs.util.IOUtil;
 import org.nightlabs.util.Util;
 
@@ -59,7 +60,7 @@ import org.nightlabs.util.Util;
  * data for processing.
  *
  * @author Marco Schulze - marco at nightlabs dot de
- * 
+ *
  * @jdo.persistence-capable
  *		identity-type="application"
  *		objectid-class="org.nightlabs.jfire.accounting.pay.id.ModeOfPaymentFlavourID"
@@ -138,10 +139,7 @@ import org.nightlabs.util.Util;
  *			import org.nightlabs.jfire.trade.CustomerGroup;
  *			import org.nightlabs.jfire.accounting.pay.ModeOfPayment"
  *
- * @jdo.query
- *		name="getAllModeOfPaymentFlavourIDs"
- *		query="SELECT JDOHelper.getObjectId(this)"
- *
+ * @jdo.query name="getAllModeOfPaymentFlavourIDs" query="SELECT JDOHelper.getObjectId(this)"
  */
 public class ModeOfPaymentFlavour
 implements Serializable
@@ -152,20 +150,21 @@ implements Serializable
 	public static final String FETCH_GROUP_MODE_OF_PAYMENT = "ModeOfPaymentFlavour.modeOfPayment";
 	public static final String FETCH_GROUP_ICON_16X16_DATA = "ModeOfPaymentFlavour.icon16x16Data";
 	/**
-	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon! 
+	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon!
 	 */
+	@Deprecated
 	public static final String FETCH_GROUP_THIS_MODE_OF_PAYMENT_FLAVOUR = "ModeOfPaymentFlavour.this";
 
 	public static final byte MERGE_MODE_UNION = 1;
 	public static final byte MERGE_MODE_INTERSECTION = 2;
-	
+
 	/**
 	 * @param customerGroupIDs A <tt>Collection</tt> of {@link CustomerGroupID}. Can be <tt>null</tt> in order to return all <tt>ModeOfPaymentFlavour</tt>s.
 	 * @param mergeMode Whether the intersection or the combination of all <tt>CustomerGroup</tt> configurations shall be used.
-	 * @param filterByConfig 
-	 * 		If this is <code>true</code> the flavours available found for the given customer-groups will also be filtered by the 
-	 * 		intersection of the entries configured in the {@link ModeOfPaymentConfigModule} for the current user and the 
-	 * 		workstation he is currently loggen on. 
+	 * @param filterByConfig
+	 * 		If this is <code>true</code> the flavours available found for the given customer-groups will also be filtered by the
+	 * 		intersection of the entries configured in the {@link ModeOfPaymentConfigModule} for the current user and the
+	 * 		workstation he is currently loggen on.
 	 *
 	 * @return Returns those <tt>ModeOfPaymentFlavour</tt>s that are available for all given
 	 *		<tt>CustomerGroup</tt>s. If <tt>mergeMode</tt> is {@link #MERGE_MODE_UNION},
@@ -220,7 +219,7 @@ implements Serializable
 
 		return res.values();
 	}
-	
+
 	/**
 	 * @see #getAvailableModeOfPaymentFlavoursForOneCustomerGroup(PersistenceManager, String, String)
 	 */
@@ -256,10 +255,10 @@ implements Serializable
 	 * @param pm The <tt>PersistenceManager</tt> with which to access the datastore.
 	 * @param organisationID The first part of the primary key of the <tt>CustomerGroup</tt>.
 	 * @param customerGroupID The second part of the primary key of the <tt>CustomerGroup</tt>.
-	 * @param filterByConfig 
-	 * 		If this is <code>true</code> the flavours available found for the given customer-group will also be filtered by the 
-	 * 		intersection of the entries configured in the {@link ModeOfPaymentConfigModule} for the current user and the 
-	 * 		workstation he is currently loggen on. 
+	 * @param filterByConfig
+	 * 		If this is <code>true</code> the flavours available found for the given customer-group will also be filtered by the
+	 * 		intersection of the entries configured in the {@link ModeOfPaymentConfigModule} for the current user and the
+	 * 		workstation he is currently loggen on.
 	 *
 	 * @return A <tt>Collection</tt> with instances of type <tt>ModeOfPaymentFlavour</tt>.
 	 *
@@ -292,7 +291,7 @@ implements Serializable
 			ModeOfPaymentFlavour modeOfPaymentFlavour = it.next();
 			m.put(modeOfPaymentFlavour.getPrimaryKey(), modeOfPaymentFlavour);
 		}
-		
+
 		if (filterByConfig) {
 			ModeOfPaymentConfigModule cfMod;
 			cfMod = UserConfigSetup.getUserConfigModule(pm, ModeOfPaymentConfigModule.class);
@@ -311,22 +310,18 @@ implements Serializable
 
 		return m;
 	}
-	
-	@SuppressWarnings("unchecked")
+
 	public static Set<ModeOfPaymentFlavourID> getAllModeOfPaymentFlavourIDs(PersistenceManager pm) {
 		Query query = pm.newNamedQuery(ModeOfPaymentFlavour.class, "getAllModeOfPaymentFlavourIDs");
-		return new HashSet<ModeOfPaymentFlavourID>((Collection<? extends ModeOfPaymentFlavourID>) query.execute());
+		Collection<ModeOfPaymentFlavourID> c = CollectionUtil.castCollection((Collection<?>) query.execute());
+		return new HashSet<ModeOfPaymentFlavourID>(c);
 	}
 
-	@SuppressWarnings("unchecked")
-	public static Set<ModeOfPaymentFlavour> getAllModeOfPaymentFlavours(PersistenceManager pm) {
-		HashSet<ModeOfPaymentFlavour> result = new HashSet<ModeOfPaymentFlavour>();
-		for (Iterator it = pm.getExtent(ModeOfPaymentFlavour.class).iterator(); it.hasNext(); ) {
-			result.add((ModeOfPaymentFlavour) it.next());
-		}
-		return result;
+	public static Collection<ModeOfPaymentFlavour> getAllModeOfPaymentFlavours(PersistenceManager pm) {
+		Query query = pm.newQuery(ModeOfPaymentFlavour.class);
+		return CollectionUtil.castCollection((Collection<?>) query.execute());
 	}
-	
+
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
@@ -494,7 +489,7 @@ implements Serializable
 				Util.equals(this.organisationID, o.organisationID) &&
 				Util.equals(this.modeOfPaymentFlavourID, o.modeOfPaymentFlavourID);
 	}
-	
+
 	@Override
 	public String toString() {
 		return this.getClass().getName() + '@' + Integer.toHexString(System.identityHashCode(this)) + '[' + organisationID + ',' + modeOfPaymentFlavourID + ']' + "(version " + JDOHelper.getVersion(this) + ')';

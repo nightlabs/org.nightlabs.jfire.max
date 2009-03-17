@@ -1914,7 +1914,11 @@ implements SessionBean
 	public Set<ModeOfPaymentID> getAllModeOfPaymentIDs() {
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			return ModeOfPayment.getAllModeOfPaymentIDs(pm);
+			Query q = pm.newQuery(ModeOfPayment.class);
+			q.setResult("JDOHelper.getObjectId(this)");
+			Collection<ModeOfPaymentID> c = CollectionUtil.castCollection((Collection<?>) q.execute());
+			return new HashSet<ModeOfPaymentID>(c);
+//			return ModeOfPayment.getAllModeOfPaymentIDs(pm);
 		} finally {
 			pm.close();
 		}
@@ -1954,7 +1958,11 @@ implements SessionBean
 	public Set<ModeOfPaymentFlavourID> getAllModeOfPaymentFlavourIDs() {
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			return ModeOfPaymentFlavour.getAllModeOfPaymentFlavourIDs(pm);
+			Query q = pm.newQuery(ModeOfPaymentFlavour.class);
+			q.setResult("JDOHelper.getObjectId(this)");
+			Collection<ModeOfPaymentFlavourID> c = CollectionUtil.castCollection((Collection<?>) q.execute());
+			return new HashSet<ModeOfPaymentFlavourID>(c);
+//			return ModeOfPaymentFlavour.getAllModeOfPaymentFlavourIDs(pm);
 		} finally {
 			pm.close();
 		}

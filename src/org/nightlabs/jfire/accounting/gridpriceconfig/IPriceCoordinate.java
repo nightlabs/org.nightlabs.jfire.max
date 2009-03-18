@@ -77,4 +77,14 @@ public interface IPriceCoordinate
 	 * Check all dimension's values and throw an {@link IllegalStateException} if one of them is <code>null</code>.
 	 */
 	void assertAllDimensionValuesAssigned();
+
+	/**
+	 * <p>
+	 * Create a copy of this {@link IPriceCoordinate} instance that can be used for price calculation
+	 * (the {@link #getPriceConfig() priceConfig} property should be <code>null</code>). The resulting
+	 * instance will never be persisted and therefore doesn't need a primary key.
+	 * </p>
+	 * @return a copy of this {@link IPriceCoordinate}.
+	 */
+	IPriceCoordinate copyForPriceCalculation();
 }

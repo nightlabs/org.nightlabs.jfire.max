@@ -27,7 +27,6 @@
 package org.nightlabs.jfire.accounting.gridpriceconfig;
 
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -58,7 +57,7 @@ public class CellReflector
 
 	private PriceCalculator priceCalculator;
 	private ProductType packageProductType;
-	
+
 	public CellReflector(
 			PriceCalculator priceCalculator,
 			ProductType packageProductType,
@@ -89,7 +88,7 @@ public class CellReflector
 	 * The absolute coordinate of the cell.
 	 */
 	private IAbsolutePriceCoordinate coordinate;
-	
+
 	/**
 	 * The NestedProductTypeLocal in which we are. <tt>nestedProductTypeLocal.innerProductType</tt>
 	 * is the same as {@link #productType}
@@ -325,68 +324,71 @@ public class CellReflector
 		if (logger.isDebugEnabled())
 			logger.debug("resolvePriceCells (" + address + "): enter");
 
-		Collection<ResolvedPriceCell> priceCells = new LinkedList<ResolvedPriceCell>();
+		priceCalculator.getPriceCalculationStatsTracker().createAccumulationSummary(PriceCalculationStatsTracker.AccumulationSummaryIdentifierConstants.cellReflector_resolvePriceCells).startInvocation();
+		try {
+			Collection<ResolvedPriceCell> priceCells = new LinkedList<ResolvedPriceCell>();
 
-		IAbsolutePriceCoordinate absoluteCoordinate = createAbsolutePriceCoordinate(address);
-		absoluteCoordinate.assertAllDimensionValuesAssigned();
+			IAbsolutePriceCoordinate absoluteCoordinate = createAbsolutePriceCoordinate(address);
+			absoluteCoordinate.assertAllDimensionValuesAssigned();
 
-		IPriceCoordinate localPriceCoordinate = createLocalPriceCoordinate(address);
-		localPriceCoordinate.assertAllDimensionValuesAssigned();
+			IPriceCoordinate localPriceCoordinate = createLocalPriceCoordinate(address);
+			localPriceCoordinate.assertAllDimensionValuesAssigned();
 
-		String productTypePK = absoluteCoordinate.getProductTypePK();
-		String priceFragmentTypePK = absoluteCoordinate.getPriceFragmentTypePK();
-//		String productTypePK = _productTypePK != null ? _productTypePK : coordinate.getProductTypePK();
-//		String priceFragmentTypePK = _priceFragmentTypePK != null ? _priceFragmentTypePK : coordinate.getPriceFragmentTypePK();
+			String productTypePK = absoluteCoordinate.getProductTypePK();
+			String priceFragmentTypePK = absoluteCoordinate.getPriceFragmentTypePK();
+	//		String productTypePK = _productTypePK != null ? _productTypePK : coordinate.getProductTypePK();
+	//		String priceFragmentTypePK = _priceFragmentTypePK != null ? _priceFragmentTypePK : coordinate.getPriceFragmentTypePK();
 
-		// Find all productPKs that inherit the searched one (or are it) and are packaged
-		// in the current package.
-		List foundProductTypePKs = priceCalculator.resolvableProductTypes.get(productTypePK);
-		if (foundProductTypePKs == null)
+			// Find all productPKs that inherit the searched one (or are it) and are packaged
+			// in the current package.
+			List<String> foundProductTypePKs = priceCalculator.resolvableProductTypes.get(productTypePK);
+			if (foundProductTypePKs == null)
+				return priceCells;
+
+			if (logger.isDebugEnabled())
+				logger.debug("resolvePriceCells (" + address + "): foundProductTypePKs.size=" + foundProductTypePKs.size());
+
+			PriceFragmentType priceFragmentType = packageProductType.getInnerPriceConfig().getPriceFragmentType(priceFragmentTypePK, true);
+
+			for (String foundProductTypePK : foundProductTypePKs) {
+				NestedProductTypeLocal packagedProductType = priceCalculator.virtualPackagedProductTypes.get(foundProductTypePK);
+
+				PriceCell priceCell = null;
+				// filter the cell itself out if everything is identical
+				if (!foundProductTypePK.equals(this.getCoordinate().getProductTypePK()) ||
+						!localPriceCoordinate.equals(this.getCoordinate()) ||
+						!priceFragmentTypePK.equals(this.getCoordinate().getPriceFragmentTypePK()))
+				{
+
+	//				String innerProductTypeOrganisationID = packagedProductType.getInnerProductTypeOrganisationID();
+	////				String packageProductTypeOrganisationID = packagedProductType.getPackageProductTypeOrganisationID();
+	//
+	//				IPriceCoordinate realLocalPriceCoordinate = localPriceCoordinate;
+	////				if (!packageProductTypeOrganisationID.equals(innerProductTypeOrganisationID))
+	//				if (!innerProductTypeOrganisationID.equals(localPriceCoordinate.getTariffOrganisationID()))
+	//					realLocalPriceCoordinate = createMappedLocalPriceCoordinateForDifferentOrganisation(localPriceCoordinate, nestedProductTypeLocal);
+
+	//				priceCell = priceCalculator.calculatePriceCell(
+	//						packagedProductType, priceFragmentType, realLocalPriceCoordinate);
+					priceCell = priceCalculator.calculatePriceCell(
+							packagedProductType, priceFragmentType, localPriceCoordinate);
+				}
+
+				if (priceCell != null)
+					priceCells.add(new ResolvedPriceCell(packagedProductType, priceCell));
+			}
+
+	//		if (logger.isDebugEnabled()) {
+	//			logger.debug("resolvePriceCells (" + address + "): priceCells.size=" + priceCells.size());
+	//			for (ResolvedPriceCell cell : priceCells) {
+	//				logger.debug("resolvePriceCells (" + address + "):    cell: nestedInnerPTPK=" + cell.nestedProductTypeLocal.getInnerProductTypePrimaryKey() + " coordinate=" + cell.priceCell.getPriceCoordinate() + " priceFragmentTypePK="+priceFragmentTypePK+" amount=" + cell.priceCell.getPrice().getAmount(priceFragmentTypePK));
+	//			}
+	//		}
+
 			return priceCells;
-
-		if (logger.isDebugEnabled())
-			logger.debug("resolvePriceCells (" + address + "): foundProductTypePKs.size=" + foundProductTypePKs.size());
-
-		PriceFragmentType priceFragmentType = packageProductType
-				.getInnerPriceConfig().getPriceFragmentType(priceFragmentTypePK, true);
-
-		for (Iterator it = foundProductTypePKs.iterator(); it.hasNext(); ) {
-			String foundProductTypePK = (String) it.next();
-			NestedProductTypeLocal packagedProductType = priceCalculator.virtualPackagedProductTypes.get(foundProductTypePK);
-
-			PriceCell priceCell = null;
-			// filter the cell itself out if everything is identical
-			if (!foundProductTypePK.equals(this.getCoordinate().getProductTypePK()) ||
-					!localPriceCoordinate.equals(this.getCoordinate()) ||
-					!priceFragmentTypePK.equals(this.getCoordinate().getPriceFragmentTypePK()))
-			{
-
-//				String innerProductTypeOrganisationID = packagedProductType.getInnerProductTypeOrganisationID();
-////				String packageProductTypeOrganisationID = packagedProductType.getPackageProductTypeOrganisationID();
-//
-//				IPriceCoordinate realLocalPriceCoordinate = localPriceCoordinate;
-////				if (!packageProductTypeOrganisationID.equals(innerProductTypeOrganisationID))
-//				if (!innerProductTypeOrganisationID.equals(localPriceCoordinate.getTariffOrganisationID()))
-//					realLocalPriceCoordinate = createMappedLocalPriceCoordinateForDifferentOrganisation(localPriceCoordinate, nestedProductTypeLocal);
-
-//				priceCell = priceCalculator.calculatePriceCell(
-//						packagedProductType, priceFragmentType, realLocalPriceCoordinate);
-				priceCell = priceCalculator.calculatePriceCell(
-						packagedProductType, priceFragmentType, localPriceCoordinate);
-			}
-
-			if (priceCell != null)
-				priceCells.add(new ResolvedPriceCell(packagedProductType, priceCell));
+		} finally {
+			priceCalculator.getPriceCalculationStatsTracker().createAccumulationSummary(PriceCalculationStatsTracker.AccumulationSummaryIdentifierConstants.cellReflector_resolvePriceCells).stopInvocation();
 		}
-
-		if (logger.isDebugEnabled()) {
-			logger.debug("resolvePriceCells (" + address + "): priceCells.size=" + priceCells.size());
-			for (ResolvedPriceCell cell : priceCells) {
-				logger.debug("resolvePriceCells (" + address + "):    cell: nestedInnerPTPK=" + cell.nestedProductTypeLocal.getInnerProductTypePrimaryKey() + " coordinate=" + cell.priceCell.getPriceCoordinate() + " priceFragmentTypePK="+priceFragmentTypePK+" amount=" + cell.priceCell.getPrice().getAmount(priceFragmentTypePK));
-			}
-		}
-
-		return priceCells;
 	}
 
 //	protected IPriceCoordinate createMappedLocalPriceCoordinateForDifferentOrganisation(IPriceCoordinate priceCoordinate, NestedProductTypeLocal nestedProductTypeLocal)

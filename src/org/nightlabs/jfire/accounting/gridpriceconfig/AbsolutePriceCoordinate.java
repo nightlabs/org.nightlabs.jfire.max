@@ -48,31 +48,6 @@ public class AbsolutePriceCoordinate extends PriceCoordinate implements IAbsolut
 	{
 	}
 
-//	/**
-//	 * Every parameter - except <tt>priceCoordinate</tt> can be <tt>null</tt>. If a parameter
-//	 * is null, the value from <tt>priceCoordinate</tt> is taken - otherwise the given value
-//	 * overrides.
-//	 *
-//	 * @param priceCoordinate
-//	 * @param customerGroupPK
-//	 * @param tariffPK
-//	 * @param currencyID
-//	 * @param productTypePK
-//	 * @param priceFragmentTypeID
-//	 *
-//	 * @deprecated
-//	 */
-//	public AbsolutePriceCoordinate(
-//			IAbsolutePriceCoordinate priceCoordinate,
-//			String customerGroupPK, String tariffPK,
-//			String currencyID,
-//			String productTypePK, String priceFragmentTypePK)
-//	{
-//		super(priceCoordinate, customerGroupPK, tariffPK,
-//				currencyID);
-//		this.productTypePK = productTypePK != null ? productTypePK : priceCoordinate.getProductTypePK();
-//		this.priceFragmentTypePK = priceFragmentTypePK != null ? priceFragmentTypePK : priceCoordinate.getPriceFragmentTypePK();
-//	}
 	/**
 	 * <strong>WARNING:</strong> When using this constructor in java code, one of the
 	 * arguments <b>must</b> be the PriceConfig to which this coordinate belongs!
@@ -109,19 +84,6 @@ public class AbsolutePriceCoordinate extends PriceCoordinate implements IAbsolut
 			this.priceFragmentTypePK = priceFragmentTypeID.getPrimaryKey();
 	}
 
-//	/**
-//	 * @deprecated Use {@link #AbsolutePriceCoordinate(Object[])} instead!
-//	 */
-//	@Deprecated
-//	public AbsolutePriceCoordinate(
-//			String customerGroupPK, String tariffPK, String currencyID,
-//			String productTypePK, String priceFragmentTypePK)
-//	{
-//		super(customerGroupPK, tariffPK, currencyID);
-//		this.productTypePK = productTypePK;
-//		this.priceFragmentTypePK = priceFragmentTypePK;
-//	}
-
 	public AbsolutePriceCoordinate(
 			IAbsolutePriceCoordinate currentCell, IAbsolutePriceCoordinate address)
 	{
@@ -134,69 +96,35 @@ public class AbsolutePriceCoordinate extends PriceCoordinate implements IAbsolut
 					address.getPriceFragmentTypePK() : currentCell.getPriceFragmentTypePK();
 	}
 
-//	public AbsolutePriceCoordinate(
-//			IPriceCoordinate priceCoordinate, ProductType productType,
-//			PriceFragmentType priceFragmentType)
-//	{
-//		super(priceCoordinate);
-//		this.productTypePK = productType.getPrimaryKey();
-//		this.priceFragmentTypePK = priceFragmentType.getPrimaryKey();
-//	}
-
-//	public AbsolutePriceCoordinate(PriceConfig priceConfig,
-//			CustomerGroup customerGroup, Tariff tariff,
-//			Currency currency, ProductType productType,
-//			PriceFragmentType priceFragmentType)
-//	{
-//		super(priceConfig, customerGroup, tariff, currency);
-//		this.productTypePK = productType.getPrimaryKey();
-//		this.priceFragmentTypePK = priceFragmentType.getPrimaryKey();
-//	}
-
+	@Override
 	public String getPriceFragmentTypePK()
 	{
 		return priceFragmentTypePK;
 	}
 
+	@Override
 	public String getProductTypePK()
 	{
 		return productTypePK;
 	}
 
-//	/**
-//	 * @jdo.field persistence-modifier="none"
-//	 */
-//	private transient String productTypeOrganisationID = null;
-//
-//	public String getProductTypeOrganisationID()
-//	{
-//		if (productTypeOrganisationID == null)
-//			productTypeOrganisationID = getFirstPartOfPrimaryKeyString(productTypePK);
-//
-//		return productTypeOrganisationID;
-//	}
-
 	@Override
 	public String toString()
 	{
-//		if (thisString == null) {
-			StringBuilder sb = new StringBuilder();
-			sb.append(this.getClass().getName());
-			sb.append('[');
-			sb.append(this.getCustomerGroupPK());
-			sb.append(',');
-			sb.append(this.getTariffPK());
-			sb.append(',');
-			sb.append(this.getCurrencyID());
-			sb.append(',');
-			sb.append(this.productTypePK);
-			sb.append(',');
-			sb.append(this.priceFragmentTypePK);
-			sb.append(']');
-			return sb.toString();
-//			thisString = sb.toString();
-//		}
-//		return thisString;
+		StringBuilder sb = new StringBuilder();
+		sb.append(this.getClass().getName());
+		sb.append('[');
+		sb.append(this.getCustomerGroupPK());
+		sb.append(',');
+		sb.append(this.getTariffPK());
+		sb.append(',');
+		sb.append(this.getCurrencyID());
+		sb.append(',');
+		sb.append(this.productTypePK);
+		sb.append(',');
+		sb.append(this.priceFragmentTypePK);
+		sb.append(']');
+		return sb.toString();
 	}
 
 	@Override
@@ -231,5 +159,10 @@ public class AbsolutePriceCoordinate extends PriceCoordinate implements IAbsolut
 
 		if (priceFragmentTypePK == null)
 			throw new IllegalStateException("priceFragmentTypePK == null");
+	}
+
+	@Override
+	public IPriceCoordinate copyForPriceCalculation() {
+		throw new UnsupportedOperationException("NYI"); // I think that's not necessary in absolute coordinates. Marco
 	}
 }

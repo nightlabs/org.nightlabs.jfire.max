@@ -26,6 +26,7 @@
 
 package org.nightlabs.jfire.accounting.gridpriceconfig;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -61,7 +62,6 @@ import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.trade.CustomerGroup;
 import org.nightlabs.jfire.trade.CustomerGroupMapper;
 import org.nightlabs.jfire.trade.id.CustomerGroupID;
-import org.nightlabs.util.Util;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -96,8 +96,8 @@ public class PriceCalculator
 		return tariffMapper;
 	}
 
-	PersistenceManager pm; // TODO JPOX WORKAROUND only needed for some workarounds! Will be removed again, soon.
-	
+	private PersistenceManager pm; // TODO JPOX WORKAROUND only needed for some workarounds! Will be removed again, soon.
+
 	public IResultPriceConfig getPackagePriceConfig() {
 		return packagePriceConfig;
 	}
@@ -189,14 +189,14 @@ public class PriceCalculator
 //			}
 //		}
 //	}
-	
+
 	protected IResultPriceConfig createResultPriceConfig(IPriceConfig innerPriceConfig)
 	{
 		return new StablePriceConfig(
 				IDGenerator.getOrganisationID(),
 				PriceConfig.createPriceConfigID());
 	}
-	
+
 
 	/**
 	 * This method creates an instance of IResultPriceConfig
@@ -209,6 +209,8 @@ public class PriceCalculator
 	 */
 	public void preparePriceCalculation_createPackagedResultPriceConfigs()
 	{
+		priceCalculationStatsTracker.createAccumulationSummary(PriceCalculationStatsTracker.AccumulationSummaryIdentifierConstants.preparePriceCalculation_createPackagedResultPriceConfigs).startInvocation();
+
 		// Create an instance of StablePriceConfig for each FormulaPriceConfig
 		// (if not yet existing) to store the results of the FormulaPriceConfig.
 		for (NestedProductTypeLocal nestedProductTypeLocal : virtualPackagedProductTypes.values()) {
@@ -260,6 +262,8 @@ public class PriceCalculator
 				}
 			}
 		}
+
+		priceCalculationStatsTracker.createAccumulationSummary(PriceCalculationStatsTracker.AccumulationSummaryIdentifierConstants.preparePriceCalculation_createPackagedResultPriceConfigs).stopInvocation();
 	}
 
 	/**
@@ -270,6 +274,8 @@ public class PriceCalculator
 	 */
 	public void preparePriceCalculation_createResolvableProductTypesMap()
 	{
+		priceCalculationStatsTracker.createAccumulationSummary(PriceCalculationStatsTracker.AccumulationSummaryIdentifierConstants.preparePriceCalculation_createResolvableProductTypesMap).startInvocation();
+
 //		IPriceConfig packagePriceConfig = packageProductType.getPackagePriceConfig();
 
 		// Populate the Map resolvableProductTypes to allow referencing of anchestors
@@ -296,8 +302,10 @@ public class PriceCalculator
 		for (NestedProductTypeLocal packagedProductType : virtualPackagedProductTypes.values()) {
 			_resolvableProductTypes_registerWithAnchestors(packagedProductType.getInnerProductTypeLocal().getProductType());
 		} // for (Iterator it = getPackagedProductInfos().iterator(); it.hasNext(); ) {
+
+		priceCalculationStatsTracker.createAccumulationSummary(PriceCalculationStatsTracker.AccumulationSummaryIdentifierConstants.preparePriceCalculation_createResolvableProductTypesMap).stopInvocation();
 	}
-	
+
 	protected void _resolvableProductTypes_registerWithAnchestors(ProductType packagedProductType)
 	{
 		// We map the productTypePK to itself, so we have it easier when resolving
@@ -315,8 +323,9 @@ public class PriceCalculator
 			extendedProductType = extendedProductType.getExtendedProductType();
 		}
 	}
-	
-	
+
+	private Context javaScriptContext = null;
+
 	/**
 	 * This method calculates the prices and populates the <tt>StablePriceConfig</tt>
 	 * which is assigned to this <tt>AssemblyPackageProductInfo</tt>. This method can
@@ -336,118 +345,128 @@ public class PriceCalculator
 		if (resolvableProductTypes == null)
 			throw new IllegalStateException("The method prepareResolvableProductTypes(..) has not been called!");
 
-//		StablePriceConfig packagePriceConfig = (StablePriceConfig) packagegetPriceConfig();
-		
-		// set all PriceCells to the status dirty
-		// TODO do we really want to always recalculate all cells if sth. changed?
-		// To keep track over dependencies is too complicated...
-		packagePriceConfig.resetPriceFragmentCalculationStatus();
-		for (NestedProductTypeLocal nestedProductTypeLocal : virtualPackagedProductTypes.values()) {
-			ProductType innerProductType = nestedProductTypeLocal.getInnerProductTypeLocal().getProductType();
-			IPriceConfig priceConfig = innerProductType.getPriceConfigInPackage(
-					packageProductType.getPrimaryKey());
+		if (javaScriptContext != null)
+			throw new IllegalStateException("javaScriptContext != null");
 
-//			if (innerProductType.isPackage() && innerProductType != packageProductType)
-//				priceConfig = innerProductType.getPackagePriceConfig();
-//			else {
-//				priceConfig = innerProductType.getInnerPriceConfig();
-			if (priceConfig instanceof IFormulaPriceConfig) {
-				IFormulaPriceConfig fpc = (IFormulaPriceConfig)priceConfig;
-				IResultPriceConfig resultPriceConfig = (IResultPriceConfig) fpc.getPackagingResultPriceConfig(
-						innerProductType.getPrimaryKey(), packageProductType.getPrimaryKey(), true);
+		priceCalculationStatsTracker.createAccumulationSummary(PriceCalculationStatsTracker.AccumulationSummaryIdentifierConstants.calculatePrices).startInvocation();
+		javaScriptContext = Context.enter();
+		try {
+	//		StablePriceConfig packagePriceConfig = (StablePriceConfig) packagegetPriceConfig();
 
-				resultPriceConfig.resetPriceFragmentCalculationStatus();
+			// set all PriceCells to the status dirty
+			// TODO do we really want to always recalculate all cells if sth. changed?
+			// To keep track over dependencies is too complicated...
+			packagePriceConfig.resetPriceFragmentCalculationStatus();
+			for (NestedProductTypeLocal nestedProductTypeLocal : virtualPackagedProductTypes.values()) {
+				ProductType innerProductType = nestedProductTypeLocal.getInnerProductTypeLocal().getProductType();
+				IPriceConfig priceConfig = innerProductType.getPriceConfigInPackage(packageProductType.getPrimaryKey());
+				if (priceConfig instanceof IFormulaPriceConfig) {
+					IFormulaPriceConfig fpc = (IFormulaPriceConfig)priceConfig;
+					IResultPriceConfig resultPriceConfig = (IResultPriceConfig) fpc.getPackagingResultPriceConfig(
+							innerProductType.getPrimaryKey(), packageProductType.getPrimaryKey(), true);
+
+					resultPriceConfig.resetPriceFragmentCalculationStatus();
+				}
 			}
-		}
-		
-//		GridPriceConfig aipipc = (GridPriceConfig) packageProductType.getInnerProductType().getPriceConfig();
-//
-//		// We need to assign all the parameters from the inner PriceConfig to our
-//		// packagePriceConfig, because it is the inner PConfig that defines which
-//		// cells we have (which possible parameters exist).
-//		// The PriceFragmentType s are NOT touched by this! Hence we merged it above.
-//		packagePriceConfig.adoptParameters(aipipc);
-//		// Now our packagePriceConfig should have exactly the same parameters like the
-//		// FormulaPriceConfig of the AssemblyInnerProductInfo.
-//		// The necessary cells (formula and price) are automatically created if missing and
-//		// unnecessary cells removed.
 
-//		// Create an instance of StablePriceConfig for each FormulaPriceConfig
-//		// (if not yet existing) to store the results of the FormulaPriceConfig.
-//		for (Iterator it = virtualPackagedProductTypes.iterator(); it.hasNext(); ) {
-//			ProductType innerProductType = (ProductType)it.next();
-//			IPriceConfig priceConfig;
-//
-//			if (innerProductType.isPackage() && innerProductType != packageProductType)
-//				priceConfig = innerProductType.getPackagePriceConfig();
-//			else {
-//				priceConfig = innerProductType.getInnerPriceConfig();
-//
-////			if (priceConfig instanceof FormulaPriceConfig) { // should now always be the case
-//				FormulaPriceConfig fpc = (FormulaPriceConfig)priceConfig;
-//				StablePriceConfig resultPriceConfig = fpc.getPackagingResultPriceConfig(
-//						innerProductType.getPrimaryKey(), packageProductType.getPrimaryKey(), false);
-//
-//				if (resultPriceConfig != null) {
-//					resultPriceConfig.resetPriceFragmentCalculationStati();
-//				}
-//				else {
-//					resultPriceConfig = new StablePriceConfig(
-//							priceConfigIDProvider.getOrganisationID(),
-//							priceConfigIDProvider.createPriceConfigID());
-////							this.getOrganisationID(),
-////							this.getProductID()
-////							+ '-'
-////							+ innerProductInfo.getOrganisationID()
-////							+ '-'
-////							+ innerProductInfo.getProductID());
-//
-//					fpc.setPackagingResultPriceConfig(
-//							innerProductType.getPrimaryKey(), packageProductType.getPrimaryKey(),
-//							resultPriceConfig);
-//				}
-//
-//				resultPriceConfig.adoptParameters(packagePriceConfig);
-//			}
-//
-//			// We need to merge the PriceFragmentTypes of all packaged PriceConfigs into
-//			// the package PriceConfig. To speed it all up, we do it here instead of a second
-//			// iteration.
-//			for (Iterator itpft = innerProductType.getInnerPriceConfig().getPriceFragmentTypes().iterator(); itpft.hasNext(); ) {
-//				PriceFragmentType pft = (PriceFragmentType) itpft.next();
-//				if (!packagePriceConfig.containsPriceFragmentType(pft))
-//					packagePriceConfig.addPriceFragmentType(pft);
-//			}
-//		}
+	//		GridPriceConfig aipipc = (GridPriceConfig) packageProductType.getInnerProductType().getPriceConfig();
+	//
+	//		// We need to assign all the parameters from the inner PriceConfig to our
+	//		// packagePriceConfig, because it is the inner PConfig that defines which
+	//		// cells we have (which possible parameters exist).
+	//		// The PriceFragmentType s are NOT touched by this! Hence we merged it above.
+	//		packagePriceConfig.adoptParameters(aipipc);
+	//		// Now our packagePriceConfig should have exactly the same parameters like the
+	//		// FormulaPriceConfig of the AssemblyInnerProductInfo.
+	//		// The necessary cells (formula and price) are automatically created if missing and
+	//		// unnecessary cells removed.
 
-		// Now, all preparation is done and we can start calculation:
-		for (PriceCell outerPriceCell : packagePriceConfig.getPriceCells()) {
-			PriceCoordinate priceCoordinate = outerPriceCell.getPriceCoordinate();
-			if (!getPriceCoordinateClass().isInstance(priceCoordinate))
-				throw new IllegalStateException("outerPriceCell.getPriceCoordinate() returned a PriceCoordinate of an invalid type! expectedPriceCoordinateClass=" + getPriceCoordinateClass() + " priceCoordinate="+ priceCoordinate +" outerPriceCell=" + outerPriceCell + " packagePriceConfig=" + packagePriceConfig);
+	//		// Create an instance of StablePriceConfig for each FormulaPriceConfig
+	//		// (if not yet existing) to store the results of the FormulaPriceConfig.
+	//		for (Iterator it = virtualPackagedProductTypes.iterator(); it.hasNext(); ) {
+	//			ProductType innerProductType = (ProductType)it.next();
+	//			IPriceConfig priceConfig;
+	//
+	//			if (innerProductType.isPackage() && innerProductType != packageProductType)
+	//				priceConfig = innerProductType.getPackagePriceConfig();
+	//			else {
+	//				priceConfig = innerProductType.getInnerPriceConfig();
+	//
+	////			if (priceConfig instanceof FormulaPriceConfig) { // should now always be the case
+	//				FormulaPriceConfig fpc = (FormulaPriceConfig)priceConfig;
+	//				StablePriceConfig resultPriceConfig = fpc.getPackagingResultPriceConfig(
+	//						innerProductType.getPrimaryKey(), packageProductType.getPrimaryKey(), false);
+	//
+	//				if (resultPriceConfig != null) {
+	//					resultPriceConfig.resetPriceFragmentCalculationStati();
+	//				}
+	//				else {
+	//					resultPriceConfig = new StablePriceConfig(
+	//							priceConfigIDProvider.getOrganisationID(),
+	//							priceConfigIDProvider.createPriceConfigID());
+	////							this.getOrganisationID(),
+	////							this.getProductID()
+	////							+ '-'
+	////							+ innerProductInfo.getOrganisationID()
+	////							+ '-'
+	////							+ innerProductInfo.getProductID());
+	//
+	//					fpc.setPackagingResultPriceConfig(
+	//							innerProductType.getPrimaryKey(), packageProductType.getPrimaryKey(),
+	//							resultPriceConfig);
+	//				}
+	//
+	//				resultPriceConfig.adoptParameters(packagePriceConfig);
+	//			}
+	//
+	//			// We need to merge the PriceFragmentTypes of all packaged PriceConfigs into
+	//			// the package PriceConfig. To speed it all up, we do it here instead of a second
+	//			// iteration.
+	//			for (Iterator itpft = innerProductType.getInnerPriceConfig().getPriceFragmentTypes().iterator(); itpft.hasNext(); ) {
+	//				PriceFragmentType pft = (PriceFragmentType) itpft.next();
+	//				if (!packagePriceConfig.containsPriceFragmentType(pft))
+	//					packagePriceConfig.addPriceFragmentType(pft);
+	//			}
+	//		}
 
-			priceCoordinate.assertAllDimensionValuesAssigned();
+			// Now, all preparation is done and we can start calculation:
+			priceCalculationStatsTracker.createAccumulationSummary(PriceCalculationStatsTracker.AccumulationSummaryIdentifierConstants.packagePriceConfig_getPriceCells).startInvocation();
+			Collection<PriceCell> priceCells = packagePriceConfig.getPriceCells();
+			priceCalculationStatsTracker.createAccumulationSummary(PriceCalculationStatsTracker.AccumulationSummaryIdentifierConstants.packagePriceConfig_getPriceCells).stopInvocation();
 
-			for (PriceFragmentType priceFragmentType : packagePriceConfig.getPriceFragmentTypes()) {
-				long outerPriceCellAmount = 0;
+			for (PriceCell outerPriceCell : priceCells) {
+				PriceCoordinate priceCoordinate = outerPriceCell.getPriceCoordinate();
+				if (!getPriceCoordinateClass().isInstance(priceCoordinate))
+					throw new IllegalStateException("outerPriceCell.getPriceCoordinate() returned a PriceCoordinate of an invalid type! expectedPriceCoordinateClass=" + getPriceCoordinateClass() + " priceCoordinate="+ priceCoordinate +" outerPriceCell=" + outerPriceCell + " packagePriceConfig=" + packagePriceConfig);
 
-				for (NestedProductTypeLocal nestedProductTypeLocal : virtualPackagedProductTypes.values()) {
-//					ProductType innerProductType = nestedProductTypeLocal.getInnerProductType();
+				priceCoordinate.assertAllDimensionValuesAssigned();
 
-//					if (innerProductType.isPackageInner() || innerProductType == packageProductType) {
-//						IPriceConfig innerPriceConfig = innerProductType.getInnerPriceConfig();
-						PriceCell innerPriceCell = calculatePriceCell(nestedProductTypeLocal, priceFragmentType, priceCoordinate);
-	
-						if (innerPriceCell != null) { // it might be null, because the packaging is quite free and cells might be missing
-							long amount = innerPriceCell.getPrice().getAmount(priceFragmentType);
-							amount *= nestedProductTypeLocal.getQuantity();
-							outerPriceCellAmount += amount;
-						}
-//					}
-				} // for (Iterator itPackagedPIs = getPackagedProductInfos().iterator(); itPackagedPIs.hasNext(); ) {
+				for (PriceFragmentType priceFragmentType : packagePriceConfig.getPriceFragmentTypes()) {
+					long outerPriceCellAmount = 0;
 
-				outerPriceCell.getPrice().setAmount(priceFragmentType, outerPriceCellAmount);
+					for (NestedProductTypeLocal nestedProductTypeLocal : virtualPackagedProductTypes.values()) {
+	//					ProductType innerProductType = nestedProductTypeLocal.getInnerProductType();
+
+	//					if (innerProductType.isPackageInner() || innerProductType == packageProductType) {
+	//						IPriceConfig innerPriceConfig = innerProductType.getInnerPriceConfig();
+							PriceCell innerPriceCell = calculatePriceCell(nestedProductTypeLocal, priceFragmentType, priceCoordinate);
+
+							if (innerPriceCell != null) { // it might be null, because the packaging is quite free and cells might be missing
+								long amount = innerPriceCell.getPrice().getAmount(priceFragmentType);
+								amount *= nestedProductTypeLocal.getQuantity();
+								outerPriceCellAmount += amount;
+							}
+	//					}
+					} // for (Iterator itPackagedPIs = getPackagedProductInfos().iterator(); itPackagedPIs.hasNext(); ) {
+
+					outerPriceCell.getPrice().setAmount(priceFragmentType, outerPriceCellAmount);
+				}
 			}
+		} finally {
+			javaScriptContext.exit();
+			javaScriptContext = null;
+
+			priceCalculationStatsTracker.createAccumulationSummary(PriceCalculationStatsTracker.AccumulationSummaryIdentifierConstants.calculatePrices).stopInvocation();
 		}
 	}
 
@@ -467,15 +486,40 @@ public class PriceCalculator
 		if (nestedProductTypeLocal.getPackageProductTypeOrganisationID().equals(nestedProductTypeLocal.getInnerProductTypeOrganisationID())) // TODO or better check the organisationIDs of the price-configs?
 			return localPriceCoordinate;
 
+		priceCalculationStatsTracker.createAccumulationSummary(PriceCalculationStatsTracker.AccumulationSummaryIdentifierConstants.createMappedLocalPriceCoordinate).startInvocation();
+
 		CustomerGroupID orgCustomerGroupID = CustomerGroupID.create(localPriceCoordinate.getCustomerGroupPK());
+		priceCalculationStatsTracker.createAccumulationSummary(PriceCalculationStatsTracker.AccumulationSummaryIdentifierConstants.createMappedLocalPriceCoordinate_customerGroupMapper_getPartnerCustomerGroupID).startInvocation();
 		CustomerGroupID newCustomerGroupID = getCustomerGroupMapper().getPartnerCustomerGroupID(orgCustomerGroupID, nestedProductTypeLocal.getInnerProductTypeOrganisationID(), true);
+		priceCalculationStatsTracker.createAccumulationSummary(PriceCalculationStatsTracker.AccumulationSummaryIdentifierConstants.createMappedLocalPriceCoordinate_customerGroupMapper_getPartnerCustomerGroupID).stopInvocation();
 
 		TariffID orgTariffID = TariffID.create(localPriceCoordinate.getTariffPK());
+		priceCalculationStatsTracker.createAccumulationSummary(PriceCalculationStatsTracker.AccumulationSummaryIdentifierConstants.createMappedLocalPriceCoordinate_tariffMapper_getPartnerTariffID).startInvocation();
 		TariffID newTariffID = getTariffMapper().getPartnerTariffID(orgTariffID, nestedProductTypeLocal.getInnerProductTypeOrganisationID(), true);
+		priceCalculationStatsTracker.createAccumulationSummary(PriceCalculationStatsTracker.AccumulationSummaryIdentifierConstants.createMappedLocalPriceCoordinate_tariffMapper_getPartnerTariffID).stopInvocation();
 
-		IPriceCoordinate res = Util.cloneSerializable(localPriceCoordinate);
+		// Using Util.cloneSerializable(...) takes in average 20 msec (even though the minimum is 0 msec). Since this
+		// code here is called a few thousand times, this is too much and the main reason for the price calculation
+		// to take sometimes even longer than one minute! After implementing Cloneable and calling localPriceCoordinate.clone(),
+		// the price calculation now takes only 6 to 11 seconds (instead of 45 to 70 seconds before). Marco.
+		priceCalculationStatsTracker.createAccumulationSummary(PriceCalculationStatsTracker.AccumulationSummaryIdentifierConstants.createMappedLocalPriceCoordinate_cloneLocalPriceCoordinate).startInvocation();
+//		IPriceCoordinate res = Util.cloneSerializable(localPriceCoordinate);
+		IPriceCoordinate res = localPriceCoordinate.copyForPriceCalculation();
+		if (res == null)
+			throw new IllegalStateException("localPriceCoordinate.copyForPriceCalculation() returned null! localPriceCoordinate.class=" + localPriceCoordinate.getClass().getName() + " localPriceCoordinate=" + localPriceCoordinate);
+
+		if (res.getClass() != localPriceCoordinate.getClass())
+			throw new IllegalStateException("localPriceCoordinate.copyForPriceCalculation() returned an instance of class " + res.getClass().getName() + " but it must be the same type as the localPriceCoordinate! localPriceCoordinate.class=" + localPriceCoordinate.getClass().getName() + " localPriceCoordinate=" + localPriceCoordinate);
+
+		if (!localPriceCoordinate.equals(res))
+			throw new IllegalStateException("localPriceCoordinate.copyForPriceCalculation() returned an object which is not equal to the localPriceCoordinate! Either the equals(...) or the copyForPriceCalculation() method is not implemented correctly! localPriceCoordinate.class=" + localPriceCoordinate.getClass().getName() + " localPriceCoordinate=" + localPriceCoordinate);
+
+		priceCalculationStatsTracker.createAccumulationSummary(PriceCalculationStatsTracker.AccumulationSummaryIdentifierConstants.createMappedLocalPriceCoordinate_cloneLocalPriceCoordinate).stopInvocation();
 		res.setTariffPK(Tariff.getPrimaryKey(newTariffID.organisationID, newTariffID.tariffID));
 		res.setCustomerGroupPK(CustomerGroup.getPrimaryKey(newCustomerGroupID.organisationID, newCustomerGroupID.customerGroupID));
+
+		priceCalculationStatsTracker.createAccumulationSummary(PriceCalculationStatsTracker.AccumulationSummaryIdentifierConstants.createMappedLocalPriceCoordinate).stopInvocation();
+
 		return res;
 	}
 
@@ -502,9 +546,14 @@ public class PriceCalculator
 				IResultPriceConfig stablePriceConfig = (IResultPriceConfig) innerFPC.getPackagingResultPriceConfig(
 						innerProductType.getPrimaryKey(), packageProductType.getPrimaryKey(), true);
 
+				priceCalculationStatsTracker.createAccumulationSummary(PriceCalculationStatsTracker.AccumulationSummaryIdentifierConstants.packagingResultPriceConfig_createPriceCell).startInvocation();
 				PriceCell innerPriceCell = stablePriceConfig.createPriceCell(localPriceCoordinate);
+				priceCalculationStatsTracker.createAccumulationSummary(PriceCalculationStatsTracker.AccumulationSummaryIdentifierConstants.packagingResultPriceConfig_createPriceCell).stopInvocation();
 
+				priceCalculationStatsTracker.createAccumulationSummary(PriceCalculationStatsTracker.AccumulationSummaryIdentifierConstants.innerFormulaPriceConfig_getFormulaCell).startInvocation();
 				FormulaCell innerFormulaCell = innerFPC.getFormulaCell(localPriceCoordinate, false);
+				priceCalculationStatsTracker.createAccumulationSummary(PriceCalculationStatsTracker.AccumulationSummaryIdentifierConstants.innerFormulaPriceConfig_getFormulaCell).stopInvocation();
+
 				if (innerFormulaCell != null && innerFormulaCell.getFormula(priceFragmentType) == null)
 					innerFormulaCell = null;
 
@@ -538,7 +587,7 @@ public class PriceCalculator
 		return new AbsolutePriceCoordinate(
 				priceCoordinate, productType, priceFragmentType);
 	}
-	
+
 	protected CellReflector createCellReflector(
 			IAbsolutePriceCoordinate absolutePriceCoordinate,
 			NestedProductTypeLocal nestedProductTypeLocal)
@@ -670,7 +719,7 @@ public class PriceCalculator
 			throw new NullPointerException("nestedProductTypeLocal");
 		if (priceFragmentType == null)
 			throw new NullPointerException("priceFragmentType");
-		
+
 		String formula = null;
 
 		ProductType productType = nestedProductTypeLocal.getInnerProductTypeLocal().getProductType();
@@ -697,6 +746,8 @@ public class PriceCalculator
 						"PriceCell \""+priceCell.getPriceCoordinate()+"\" has a circular reference in priceFragmentType \""+priceFragmentType.getPrimaryKey()+"\" in productType \""+productType.getPrimaryKey()+"\"!");
 
 			if (PriceCell.CALCULATIONSTATUS_DIRTY.equals(status)) {
+				priceCalculationStatsTracker.createAccumulationSummary(PriceCalculationStatsTracker.AccumulationSummaryIdentifierConstants.calculatePriceCell_dirtyStatus).startInvocation();
+
 				priceCell.setPriceFragmentCalculationStatus(
 						priceFragmentType.getPrimaryKey(), PriceCell.CALCULATIONSTATUS_INPROCESS);
 
@@ -707,8 +758,14 @@ public class PriceCalculator
 					priceCell.getPrice().setAmount(priceFragmentType, 0);
 				}
 				else {
-					Context context = Context.enter();
-					try {
+					Context context = javaScriptContext;
+					if (context == null)
+						throw new IllegalStateException("javaScriptContext == null");
+//					priceCalculationStatsTracker.createAccumulationSummary(PriceCalculationStatsTracker.AccumulationSummaryIdentifierConstants.contextEnter).startInvocation();
+//					Context context = Context.enter();
+//					try {
+//						priceCalculationStatsTracker.createAccumulationSummary(PriceCalculationStatsTracker.AccumulationSummaryIdentifierConstants.contextEnter).stopInvocation();
+
 						// Scriptable scope = context.initStandardObjects();
 						Scriptable scope = new ImporterTopLevel(context);
 
@@ -756,14 +813,17 @@ public class PriceCalculator
 							logger.debug("calculatePriceCell (" + absolutePriceCoordinate + "): result=" + res + " writingToPriceCell: " + priceCell);
 
 						priceCell.getPrice().setAmount(priceFragmentType, res);
-					} finally {
-						Context.exit();
-					}
+//					} finally {
+//						priceCalculationStatsTracker.createAccumulationSummary(PriceCalculationStatsTracker.AccumulationSummaryIdentifierConstants.contextExit).startInvocation();
+//						Context.exit();
+//						priceCalculationStatsTracker.createAccumulationSummary(PriceCalculationStatsTracker.AccumulationSummaryIdentifierConstants.contextExit).stopInvocation();
+//					}
 				}
 
 				priceCell.setPriceFragmentCalculationStatus(
 						priceFragmentType.getPrimaryKey(), PriceCell.CALCULATIONSTATUS_CLEAN);
 
+				priceCalculationStatsTracker.createAccumulationSummary(PriceCalculationStatsTracker.AccumulationSummaryIdentifierConstants.calculatePriceCell_dirtyStatus).stopInvocation();
 				return;
 			} // status is invalid => perform calculation
 
@@ -782,4 +842,9 @@ public class PriceCalculator
 		}
 	}
 
+	private PriceCalculationStatsTracker priceCalculationStatsTracker = new PriceCalculationStatsTracker();
+
+	public PriceCalculationStatsTracker getPriceCalculationStatsTracker() {
+		return priceCalculationStatsTracker;
+	}
 }

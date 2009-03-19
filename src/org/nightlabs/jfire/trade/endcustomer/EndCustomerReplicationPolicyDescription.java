@@ -45,7 +45,7 @@ import org.nightlabs.i18n.I18nText;
  * @jdo.create-objectid-class
  *		field-order="organisationID, endCustomerReplicationPolicyID"
  *
- * @jdo.fetch-group description="EndCustomerReplicationPolicy.description" fields="endCustomerReplicationPolicy, descriptions"
+ * @jdo.fetch-group name="EndCustomerReplicationPolicy.description" fields="endCustomerReplicationPolicy, texts"
  */
 public class EndCustomerReplicationPolicyDescription extends I18nText
 {

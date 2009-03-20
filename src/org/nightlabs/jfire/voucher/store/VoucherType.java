@@ -1,6 +1,8 @@
 package org.nightlabs.jfire.voucher.store;
 
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
@@ -11,6 +13,8 @@ import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.ProductTypeLocal;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.voucher.scripting.VoucherLayout;
+import org.nightlabs.jfire.voucher.scripting.id.VoucherLayoutID;
+import org.nightlabs.util.CollectionUtil;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -40,6 +44,10 @@ import org.nightlabs.jfire.voucher.scripting.VoucherLayout;
  *		  PARAMETERS String parentProductTypeOrganisationID, String parentProductTypeProductTypeID
  *		  import java.lang.String"
  *
+ * @jdo.query
+ * 		name="getVoucherTypeIdsByVoucherLayoutId"
+ * 		query="SELECT JDOHelper.getObjectId(this) WHERE :voucherLayoutId == JDOHelper.getObjectId(this.voucherLayout)"
+ *
  * @jdo.fetch-group name="VoucherType.voucherLayout" fields="voucherLayout"
  */
 public class VoucherType
@@ -54,7 +62,6 @@ extends ProductType
 		public static final String voucherLayout = "voucherLayout";
 	};
 
-	@SuppressWarnings("unchecked")
 	public static Collection<VoucherType> getChildVoucherTypes(PersistenceManager pm, ProductTypeID parentVoucherTypeID)
 	{
 		if (parentVoucherTypeID == null) {
@@ -170,5 +177,17 @@ extends ProductType
 	@Override
 	public IPriceConfig getPriceConfigInPackage(String packageProductTypePK) {
 		return getPackagePriceConfig();
+	}
+
+	/**
+	 * Returns a set of the IDs of all {@link VoucherType}s that share the {@link VoucherLayout} with the given ID.
+	 * @param pm The persistence manager to use to execute the query.
+	 * @param voucherLayoutId The ID of the {@link VoucherLayout} that all returned {@link VoucherType}s should share.
+	 * @return a set of the IDs of all {@link VoucherType}s that share the {@link VoucherLayout} with the given ID.
+	 */
+	public static Set<ProductTypeID> getVoucherTypeIdsByVoucherLayoutId(PersistenceManager pm, VoucherLayoutID voucherLayoutId) {
+		Query query = pm.newNamedQuery(VoucherType.class, "getVoucherTypeIdsByVoucherLayoutId");
+		Collection<ProductTypeID> result = CollectionUtil.castCollection((Collection<ProductTypeID>) query.execute(voucherLayoutId));
+		return new HashSet<ProductTypeID>(result);
 	}
 }

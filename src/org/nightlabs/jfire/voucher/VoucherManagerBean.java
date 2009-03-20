@@ -31,6 +31,7 @@ import org.apache.log4j.Logger;
 import org.nightlabs.ModuleException;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.ObjectIDUtil;
+import org.nightlabs.jdo.QueryOption;
 import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
 import org.nightlabs.jfire.accounting.Account;
 import org.nightlabs.jfire.accounting.AccountType;
@@ -50,7 +51,6 @@ import org.nightlabs.jfire.person.Person;
 import org.nightlabs.jfire.person.PersonStruct;
 import org.nightlabs.jfire.prop.IStruct;
 import org.nightlabs.jfire.prop.PropertySet;
-import org.nightlabs.jfire.prop.StructLocal;
 import org.nightlabs.jfire.scripting.Script;
 import org.nightlabs.jfire.scripting.ScriptRegistry;
 import org.nightlabs.jfire.scripting.ScriptRegistryItem;
@@ -1235,6 +1235,66 @@ implements SessionBean
 			pm.close();
 		}
 	}
+	
+	/**
+	 * Returns a set of the Object-IDs of all {@link VoucherLayout}s.
+	 * 
+	 * @return a set of the Object-IDs of all {@link VoucherLayout}s.
+	 * 
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="org.nightlabs.jfire.voucher.editVoucherLayout"
+	 */
+	public Set<VoucherLayoutID> getAllVoucherLayoutIds() {
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			Query query = pm.newQuery("SELECT JDOHelper.getObjectId(this) FROM org.nightlabs.jfire.voucher.scripting.VoucherLayout");
+			return new HashSet<VoucherLayoutID>((Collection<VoucherLayoutID>) query.execute());
+		} finally {
+			pm.close();
+		}
+	}
+	
+	/**
+	 * Replaces the voucherlayout identified by oldVoucherLayoutID with the given voucher layout and deletes the old voucher layout afterwards.
+	 * 
+	 * @ejb.interface-method
+	 * @ejb.transaction type="Required"
+	 * @ejb.permission role-name="org.nightlabs.jfire.voucher.editVoucherLayout"
+	 */
+	public void replaceVoucherLayout(VoucherLayoutID oldVoucherLayoutId, VoucherLayout newVoucherLayout) {
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			pm.makePersistent(newVoucherLayout);
+			
+			Set<ProductTypeID> voucherTypeIDs = VoucherType.getVoucherTypeIdsByVoucherLayoutId(pm, oldVoucherLayoutId);
+			Set<VoucherType> voucherTypes = NLJDOHelper.getObjectSet(pm, voucherTypeIDs, VoucherType.class, (QueryOption[]) null);
+			
+			for (VoucherType voucherType : voucherTypes) {
+				voucherType.setVoucherLayout(newVoucherLayout);
+			}
+			
+			pm.deletePersistent(pm.getObjectById(oldVoucherLayoutId));
+		} finally {
+			pm.close();
+		}
+	}
+	
+	/**
+	 * @ejb.interface-method
+	 * @ejb.transaction type="Required"
+	 * @ejb.permission role-name="org.nightlabs.jfire.voucher.editVoucherLayout"
+	 */
+	public void deleteVoucherLayout(VoucherLayoutID voucherLayoutID) {
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			if (!VoucherType.getVoucherTypeIdsByVoucherLayoutId(pm, voucherLayoutID).isEmpty()) {
+				throw new IllegalStateException("Cannot delete voucher layout that is assigned to at least one voucher type.");
+			}
+			pm.deletePersistent(pm.getObjectById(voucherLayoutID));
+		} finally {
+			pm.close();
+		}
+	}
 
 	/**
 	 * Get {@link VoucherLayout}s specified by their object-ids.
@@ -1243,7 +1303,6 @@ implements SessionBean
 	 * </p>
 	 *
 	 * @ejb.interface-method
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="org.nightlabs.jfire.voucher.editVoucherLayout"
 	 */
 	public List<VoucherLayout> getVoucherLayouts(Set<VoucherLayoutID> voucherLayoutIDs, String[] fetchGroups, int maxFetchDepth)
@@ -1255,6 +1314,57 @@ implements SessionBean
 				pm.getFetchPlan().setGroups(fetchGroups);
 
 			return NLJDOHelper.getDetachedObjectList(pm, voucherLayoutIDs, VoucherLayout.class, fetchGroups, maxFetchDepth);
+		} finally {
+			pm.close();
+		}
+	}
+	
+	/**
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="org.nightlabs.jfire.voucher.editVoucherLayout"
+	 */
+	public Set<VoucherLayoutID> getVoucherLayoutIdsByFileName(String fileName)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			return VoucherLayout.getVoucherLayoutIdsByFilename(pm, fileName);
+		} finally {
+			pm.close();
+		}
+	}
+	
+	/**
+	 * @ejb.interface-method
+	 * @ejb.transaction type="Required"
+	 * @ejb.permission role-name="org.nightlabs.jfire.voucher.editVoucherLayout"
+	 */
+	public VoucherLayout storeVoucherLayout(VoucherLayout voucherLayout, boolean get, String[] fetchGroups, int maxFetchDepth) {
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			voucherLayout = pm.makePersistent(voucherLayout);
+			
+			if (!get)
+				return null;
+			
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+			if (fetchGroups != null)
+				pm.getFetchPlan().setGroups(fetchGroups);
+
+			return pm.detachCopy(voucherLayout);
+		} finally {
+			pm.close();
+		}
+	}
+	
+	/**
+	 * @ejb.interface-method
+	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+	 * @ejb.permission role-name="org.nightlabs.jfire.voucher.editVoucherLayout"
+	 */
+	public Set<ProductTypeID> getVoucherTypeIdsByVoucherLayoutId(VoucherLayoutID voucherLayoutId) {
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			return VoucherType.getVoucherTypeIdsByVoucherLayoutId(pm, voucherLayoutId);
 		} finally {
 			pm.close();
 		}

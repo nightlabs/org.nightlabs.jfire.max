@@ -4,11 +4,19 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.jdo.PersistenceManager;
+import javax.jdo.Query;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.io.DataBuffer;
 import org.nightlabs.jfire.trade.ILayout;
+import org.nightlabs.jfire.voucher.scripting.id.VoucherLayoutID;
 
 /**
  * @author Daniel.Mazurek [at] NightLabs [dot] de
@@ -161,5 +169,29 @@ implements Serializable, ILayout
 			fout.close();
 		}
 		f.setLastModified(timestamp);
+	}
+	
+	/**
+	 * Returns a set of the IDs of all {@link VoucherLayout}s that share the given fileName.
+	 * 
+	 * @param pm The persistence manager to use to execute the query.
+	 * @param fileName The fileName of the {@link VoucherLayout}s to retrieve
+	 * @return a set of the IDs of all {@link VoucherLayout}s that share the given fileName.
+	 */
+	public static Set<VoucherLayoutID> getVoucherLayoutIdsByFilename(PersistenceManager pm, String fileName) {
+		Query query = pm.newNamedQuery(VoucherLayout.class, "getVoucherLayoutIdsByFileName");
+		Collection<VoucherLayoutID> queryResult = (Collection<VoucherLayoutID>) query.execute(fileName);
+		return new HashSet<VoucherLayoutID>(queryResult);
+	}
+
+	/**
+	 * Fills the value fields of this instance with the values in the given source object.
+	 * 
+	 * @param source The source instance to copy the values from.
+	 */
+	public void copyValuesFrom(VoucherLayout source) {
+		this.fileData = Arrays.copyOf(source.fileData, source.fileData.length);
+		this.fileName = source.fileName;
+		this.fileTimestamp = (Date) source.fileTimestamp.clone();
 	}
 }

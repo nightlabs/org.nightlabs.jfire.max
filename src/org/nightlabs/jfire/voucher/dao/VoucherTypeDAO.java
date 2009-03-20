@@ -11,6 +11,7 @@ import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.store.StoreManager;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.voucher.VoucherManager;
+import org.nightlabs.jfire.voucher.scripting.id.VoucherLayoutID;
 import org.nightlabs.jfire.voucher.store.VoucherType;
 import org.nightlabs.progress.ProgressMonitor;
 
@@ -29,7 +30,6 @@ implements IJDOObjectDAO<VoucherType>
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	protected Collection<VoucherType> retrieveJDOObjects(
 			Set<ProductTypeID> voucherTypeIDs, String[] fetchGroups, int maxFetchDepth,
 			ProgressMonitor monitor)
@@ -95,6 +95,21 @@ implements IJDOObjectDAO<VoucherType>
 		try {
 			VoucherManager vm = JFireEjbFactory.getBean(VoucherManager.class, SecurityReflector.getInitialContextProperties());
 			return vm.storeVoucherType(jdoObject, get, fetchGroups, maxFetchDepth);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
+	/**
+	 * Returns the events that share the given ticket layout.
+	 * 
+	 * @see Event#getEventIdsByTicketLayoutId(javax.jdo.PersistenceManager, TicketLayoutID)
+	 */
+	public List<VoucherType> getVoucherTypesByVoucherLayoutId(VoucherLayoutID voucherLayoutId, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) {
+		try {
+			VoucherManager voucherManager = JFireEjbFactory.getBean(VoucherManager.class, SecurityReflector.getInitialContextProperties());
+			Set<ProductTypeID> voucherTypeIds = voucherManager.getVoucherTypeIdsByVoucherLayoutId(voucherLayoutId);
+			return getJDOObjects(null, voucherTypeIds, fetchGroups, maxFetchDepth, monitor);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

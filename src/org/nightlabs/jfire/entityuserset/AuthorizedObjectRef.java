@@ -175,23 +175,9 @@ implements Serializable
 			decReferenceCount();
 	}
 
-	/**
-	 * TODO this is a DataNucleus workaround. Sometimes entries in the map are not found. Remove this workaround as soon as this bug is fixed. TODO Need to open an issue and have a test-case.
-	 */
-	private static void ensureMapLoaded(Map<?, ?> map)
-	{
-//		map.entrySet().iterator();
-//		for (Map.Entry<?, ?> me : map.entrySet()) {
-//			// nothing real to do
-//			me.getKey();
-//			me.getValue();
-//		}
-	}
-
 	protected EntityRef<Entity> createEntityRef(Entity entity)
 	{
 		String entityObjectIDString = entityUserSet.getEntityObjectIDString(entity);
-		ensureMapLoaded(entityRefs);
 		EntityRef<Entity> entityRef = entityRefs.get(entityObjectIDString);
 		if (entityRef == null) {
 			entityRef = entityUserSet.createEntityRef(this, entity);
@@ -203,7 +189,6 @@ implements Serializable
 	public EntityRef<Entity> getEntityRef(Entity entity)
 	{
 		String entityObjectIDString = entityUserSet.getEntityObjectIDString(entity);
-		ensureMapLoaded(entityRefs);
 		EntityRef<Entity> entityRef = entityRefs.get(entityObjectIDString);
 		return entityRef;
 	}
@@ -228,7 +213,6 @@ implements Serializable
 	private void removeEntityIndirectly(Entity entity)
 	{
 		String entityObjectIDString = entityUserSet.getEntityObjectIDString(entity);
-		ensureMapLoaded(entityRefs);
 		EntityRef<Entity> entityRef = entityRefs.get(entityObjectIDString);
 		if (entityRef == null)
 			return;
@@ -308,7 +292,6 @@ implements Serializable
 	public void removeEntity(Entity entity)
 	{
 		String entityObjectIDString = entityUserSet.getEntityObjectIDString(entity);
-		ensureMapLoaded(entityRefs);
 		EntityRef<Entity> entityRef = entityRefs.get(entityObjectIDString);
 		if (entityRef == null)
 			return;
@@ -345,7 +328,6 @@ implements Serializable
 
 		String entityObjectIDString = entityUserSet.getEntityObjectIDString(entityRef.getEntity());
 
-		ensureMapLoaded(entityRefs);
 		EntityRef<Entity> internalEntityRef = entityRefs.remove(entityObjectIDString);
 		if (internalEntityRef == null)
 			throw new IllegalStateException("EntityRef not found! " + entityRef);

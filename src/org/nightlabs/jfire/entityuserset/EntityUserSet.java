@@ -167,39 +167,12 @@ implements Serializable, IEntityUserSet<Entity>
 		return description;
 	}
 
-	/**
-	 * TODO this is a DataNucleus workaround. Sometimes entries in the map are not found. Remove this workaround as soon as this bug is fixed. TODO Need to open an issue and have a test-case.
-	 */
-	private static void ensureMapLoaded(Map<?, ?> map)
-	{
-//		map.entrySet().iterator();
-//		for (Map.Entry<?, ?> me : map.entrySet()) {
-//			// nothing real to do
-//			me.getKey();
-//			me.getValue();
-//		}
-	}
-
-	/**
-	 * TODO this is a DataNucleus workaround. Without it, I get duplicate-key-exceptions.
-	 */
-	private <T> T persist(T object)
-	{
-		return object;
-//		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
-//		if (pm == null)
-//			return object;
-//		else
-//			return pm.makePersistent(object);
-	}
-
 	protected AuthorizedObjectRef<Entity> createOrGetAuthorizedObjectRef(AuthorizedObjectID authorizedObjectID)
 	{
 		String authorizedObjectIDAsString = authorizedObjectID.toString();
-		ensureMapLoaded(authorizedObjectRefs);
 		AuthorizedObjectRef<Entity> authorizedObjectRef = authorizedObjectRefs.get(authorizedObjectIDAsString);
 		if (authorizedObjectRef == null) {
-			authorizedObjectRef = persist(createAuthorizedObjectRef(authorizedObjectID));
+			authorizedObjectRef = createAuthorizedObjectRef(authorizedObjectID);
 			authorizedObjectRefs.put(authorizedObjectIDAsString, authorizedObjectRef);
 		};
 		return authorizedObjectRef;
@@ -223,7 +196,6 @@ implements Serializable, IEntityUserSet<Entity>
 	private void removeAuthorizedObjectIndirectly(AuthorizedObjectID authorizedObjectID)
 	{
 		String authorizedObjectIDAsString = authorizedObjectID.toString();
-		ensureMapLoaded(authorizedObjectRefs);
 		AuthorizedObjectRef<Entity> authorizedObjectRef = authorizedObjectRefs.get(authorizedObjectIDAsString);
 		if (authorizedObjectRef == null)
 			return;
@@ -301,7 +273,6 @@ implements Serializable, IEntityUserSet<Entity>
 	public void removeAuthorizedObject(AuthorizedObjectID authorizedObjectID)
 	{
 		String authorizedObjectIDAsString = authorizedObjectID.toString();
-		ensureMapLoaded(authorizedObjectRefs);
 		AuthorizedObjectRef<Entity> authorizedObjectRef = authorizedObjectRefs.get(authorizedObjectIDAsString);
 		if (authorizedObjectRef == null)
 			return;
@@ -332,7 +303,6 @@ implements Serializable, IEntityUserSet<Entity>
 	public AuthorizedObjectRef<Entity> getAuthorizedObjectRef(AuthorizedObjectID authorizedObjectID)
 	{
 		String authorizedObjectIDAsString = authorizedObjectID.toString();
-		ensureMapLoaded(authorizedObjectRefs);
 		AuthorizedObjectRef<Entity> authorizedObjectRef = authorizedObjectRefs.get(authorizedObjectIDAsString);
 		return authorizedObjectRef;
 	}

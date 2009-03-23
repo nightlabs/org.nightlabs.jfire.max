@@ -19,7 +19,7 @@ import org.nightlabs.util.Util;
  * @jdo.inheritance-discriminator strategy="class-name"
  *
  * @jdo.create-objectid-class
- *		field-order="entityUserSetOrganisationID, entityUserSetID, authorizedObjectID, entityObjectIDString"
+ *		field-order="entityUserSetOrganisationID, entityClassName, entityUserSetID, authorizedObjectID, entityObjectIDString"
  *
  * @jdo.fetch-group name="AuthorizedObjectRef.entityRefs" fields="entityUserSet, authorizedObjectRef"
  *
@@ -28,13 +28,18 @@ import org.nightlabs.util.Util;
 public abstract class EntityRef<Entity>
 implements Serializable
 {
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 2L;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
 	private String entityUserSetOrganisationID;
+	/**
+	 * @jdo.field primary-key="true"
+	 * @jdo.column length="100"
+	 */
+	private String entityClassName;
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
@@ -83,18 +88,25 @@ implements Serializable
 
 	public EntityRef(AuthorizedObjectRef<Entity> authorizedObjectRef, Entity entity) {
 		this.entityUserSet = authorizedObjectRef.getEntityUserSet();
-		this.authorizedObjectRef = authorizedObjectRef;
-		this.authorizedObjectID = authorizedObjectRef.getAuthorizedObjectID();
-		this.setEntity(entity);
+
 		this.entityUserSetOrganisationID = entityUserSet.getOrganisationID();
+		this.entityClassName = entityUserSet.getEntityClassName();
 		this.entityUserSetID = entityUserSet.getEntityUserSetID();
 		this.entityObjectIDString = entityUserSet.getEntityObjectIDString(entity);
+
+		this.authorizedObjectRef = authorizedObjectRef;
+		this.authorizedObjectID = authorizedObjectRef.getAuthorizedObjectID();
+
+		this.setEntity(entity);
 	}
 
 	protected abstract void setEntity(Entity entity);
 
 	public String getEntityUserSetOrganisationID() {
 		return entityUserSetOrganisationID;
+	}
+	public String getEntityClassName() {
+		return entityClassName;
 	}
 	public String getEntityUserSetID() {
 		return entityUserSetID;
@@ -170,6 +182,7 @@ implements Serializable
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((entityUserSetOrganisationID == null) ? 0 : entityUserSetOrganisationID.hashCode());
+		result = prime * result + ((entityClassName == null) ? 0 : entityClassName.hashCode());
 		result = prime * result + ((entityUserSetID == null) ? 0 : entityUserSetID.hashCode());
 		result = prime * result + ((authorizedObjectID == null) ? 0 : authorizedObjectID.hashCode());
 		result = prime * result + ((entityObjectIDString == null) ? 0 : entityObjectIDString.hashCode());
@@ -188,12 +201,13 @@ implements Serializable
 				Util.equals(this.entityObjectIDString, other.entityObjectIDString) &&
 				Util.equals(this.authorizedObjectID, other.authorizedObjectID) &&
 				Util.equals(this.entityUserSetID, other.entityUserSetID) &&
+				Util.equals(this.entityClassName, other.entityClassName) &&
 				Util.equals(this.entityUserSetOrganisationID, other.entityUserSetOrganisationID)
 		);
 	}
 
 	@Override
 	public String toString() {
-		return getClass().getName() + '@' + Integer.toHexString(System.identityHashCode(this)) + '[' + entityUserSetOrganisationID + ',' + entityUserSetID + ',' + authorizedObjectID + ',' + entityObjectIDString + ']';
+		return getClass().getName() + '@' + Integer.toHexString(System.identityHashCode(this)) + '[' + entityUserSetOrganisationID + ',' + entityClassName + ',' + entityUserSetID + ',' + authorizedObjectID + ',' + entityObjectIDString + ']';
 	}
 }

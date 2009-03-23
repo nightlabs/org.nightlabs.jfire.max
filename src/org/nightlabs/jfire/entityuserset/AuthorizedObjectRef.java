@@ -30,7 +30,7 @@ import org.nightlabs.util.Util;
  * @jdo.inheritance strategy = "new-table"
  *
  * @jdo.create-objectid-class
- *		field-order="entityUserSetOrganisationID, entityUserSetID, authorizedObjectID"
+ *		field-order="entityUserSetOrganisationID, entityClassName, entityUserSetID, authorizedObjectID"
  *
  * @jdo.query
  *		name="getAuthorizedObjectRefsForAuthorizedObjectID"
@@ -45,7 +45,7 @@ import org.nightlabs.util.Util;
 public class AuthorizedObjectRef<Entity>
 implements Serializable
 {
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 2L;
 
 	public static final String FETCH_GROUP_ENTITY_REFS = "AuthorizedObjectRef.entityRefs";
 
@@ -60,6 +60,13 @@ implements Serializable
 	 * @jdo.column length="100"
 	 */
 	private String entityUserSetOrganisationID;
+
+	/**
+	 * @jdo.field primary-key="true"
+	 * @jdo.column length="100"
+	 */
+	private String entityClassName;
+
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
@@ -112,6 +119,7 @@ implements Serializable
 	{
 		this.entityUserSet = entityUserSet;
 		this.entityUserSetOrganisationID = entityUserSet.getOrganisationID();
+		this.entityClassName = entityUserSet.getEntityClassName();
 		this.entityUserSetID = entityUserSet.getEntityUserSetID();
 		this.authorizedObjectID = authorizedObjectID.toString();
 		entityRefs = new HashMap<String, EntityRef<Entity>>();
@@ -119,6 +127,9 @@ implements Serializable
 
 	public String getEntityUserSetOrganisationID() {
 		return entityUserSetOrganisationID;
+	}
+	public String getEntityClassName() {
+		return entityClassName;
 	}
 	public String getEntityUserSetID() {
 		return entityUserSetID;
@@ -164,9 +175,23 @@ implements Serializable
 			decReferenceCount();
 	}
 
+	/**
+	 * TODO this is a DataNucleus workaround. Sometimes entries in the map are not found. Remove this workaround as soon as this bug is fixed. TODO Need to open an issue and have a test-case.
+	 */
+	private static void ensureMapLoaded(Map<?, ?> map)
+	{
+//		map.entrySet().iterator();
+//		for (Map.Entry<?, ?> me : map.entrySet()) {
+//			// nothing real to do
+//			me.getKey();
+//			me.getValue();
+//		}
+	}
+
 	protected EntityRef<Entity> createEntityRef(Entity entity)
 	{
 		String entityObjectIDString = entityUserSet.getEntityObjectIDString(entity);
+		ensureMapLoaded(entityRefs);
 		EntityRef<Entity> entityRef = entityRefs.get(entityObjectIDString);
 		if (entityRef == null) {
 			entityRef = entityUserSet.createEntityRef(this, entity);
@@ -178,6 +203,7 @@ implements Serializable
 	public EntityRef<Entity> getEntityRef(Entity entity)
 	{
 		String entityObjectIDString = entityUserSet.getEntityObjectIDString(entity);
+		ensureMapLoaded(entityRefs);
 		EntityRef<Entity> entityRef = entityRefs.get(entityObjectIDString);
 		return entityRef;
 	}
@@ -202,6 +228,7 @@ implements Serializable
 	private void removeEntityIndirectly(Entity entity)
 	{
 		String entityObjectIDString = entityUserSet.getEntityObjectIDString(entity);
+		ensureMapLoaded(entityRefs);
 		EntityRef<Entity> entityRef = entityRefs.get(entityObjectIDString);
 		if (entityRef == null)
 			return;
@@ -281,6 +308,7 @@ implements Serializable
 	public void removeEntity(Entity entity)
 	{
 		String entityObjectIDString = entityUserSet.getEntityObjectIDString(entity);
+		ensureMapLoaded(entityRefs);
 		EntityRef<Entity> entityRef = entityRefs.get(entityObjectIDString);
 		if (entityRef == null)
 			return;
@@ -317,6 +345,7 @@ implements Serializable
 
 		String entityObjectIDString = entityUserSet.getEntityObjectIDString(entityRef.getEntity());
 
+		ensureMapLoaded(entityRefs);
 		EntityRef<Entity> internalEntityRef = entityRefs.remove(entityObjectIDString);
 		if (internalEntityRef == null)
 			throw new IllegalStateException("EntityRef not found! " + entityRef);
@@ -333,6 +362,7 @@ implements Serializable
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((entityUserSetOrganisationID == null) ? 0 : entityUserSetOrganisationID.hashCode());
+		result = prime * result + ((entityClassName == null) ? 0 : entityClassName.hashCode());
 		result = prime * result + ((entityUserSetID == null) ? 0 : entityUserSetID.hashCode());
 		result = prime * result + ((authorizedObjectID == null) ? 0 : authorizedObjectID.hashCode());
 		return result;
@@ -348,6 +378,7 @@ implements Serializable
 		return (
 				Util.equals(this.authorizedObjectID, other.authorizedObjectID) &&
 				Util.equals(this.entityUserSetID, other.entityUserSetID) &&
+				Util.equals(this.entityClassName, other.entityClassName) &&
 				Util.equals(this.entityUserSetOrganisationID, other.entityUserSetOrganisationID)
 		);
 	}

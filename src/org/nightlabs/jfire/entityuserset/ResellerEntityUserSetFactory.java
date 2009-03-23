@@ -13,6 +13,7 @@ import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
+import org.apache.log4j.Logger;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.security.User;
@@ -39,6 +40,7 @@ import org.nightlabs.util.reflect.ReflectUtil;
 public abstract class ResellerEntityUserSetFactory<Entity>
 {
 	private static final long serialVersionUID = 1L;
+	private static final Logger logger = Logger.getLogger(ResellerEntityUserSetFactory.class);
 
 	public static <T> ResellerEntityUserSetFactory<T> getResellerEntityUserSetFactory(PersistenceManager pm, Class<T> entityClass, boolean throwExceptionIfNotFound)
 	{
@@ -155,6 +157,13 @@ public abstract class ResellerEntityUserSetFactory<Entity>
 		if (resellerEntityUserSet == null) {
 			resellerEntityUserSet = createResellerEntityUserSetForBackendEntityUserSet(backendEntityUserSet);
 			resellerEntityUserSet = pm.makePersistent(resellerEntityUserSet);
+		}
+		for (AuthorizedObjectRef<Entity> authorizedObjectRef : resellerEntityUserSet.getAuthorizedObjectRefs()) {
+			logger.info("configureResellerEntityUserSetForBackendEntityUserSet: " + authorizedObjectRef);
+		}
+		pm.refresh(resellerEntityUserSet);
+		for (AuthorizedObjectRef<Entity> authorizedObjectRef : resellerEntityUserSet.getAuthorizedObjectRefs()) {
+			logger.info("configureResellerEntityUserSetForBackendEntityUserSet: " + authorizedObjectRef);
 		}
 
 		if (backendEntityUserSet.getOrganisationID().equals(resellerEntityUserSet.getOrganisationID()))

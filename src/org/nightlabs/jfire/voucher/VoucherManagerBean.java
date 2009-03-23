@@ -715,7 +715,6 @@ implements SessionBean
 	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.queryLocalAccountantDelegates"
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
-	@SuppressWarnings("unchecked")
 	public Set<LocalAccountantDelegateID> getVoucherLocalAccountantDelegateIDs() {
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -814,7 +813,6 @@ implements SessionBean
 	// TODO we need to pass ArticleIDs instead of ProductIDs, because products can be resold
 	// after having been reversed and we should be able to print duplicates at any time with
 	// the correct data.
-	@SuppressWarnings("unchecked")
 	protected Map<ProductID, Map<ScriptRegistryItemID, Object>> getVoucherScriptingResults(
 			PersistenceManager pm, Collection<ProductID> voucherIDs,
 			boolean allScripts)

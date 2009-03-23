@@ -112,11 +112,9 @@ implements IJDOObjectDAO<VoucherLayout>
 	public Collection<VoucherLayoutID> getVoucherLayoutIdsByFileName(String fileName) {
 		VoucherManager voucherManager = JFireEjbFactory.getBean(VoucherManager.class, SecurityReflector.getInitialContextProperties());
 		try {
-			voucherManager.getVoucherLayoutIdsByFileName(fileName);
+			return voucherManager.getVoucherLayoutIdsByFileName(fileName);
 		} catch (RemoteException e) {
 			throw new RuntimeException(e);
 		}
-		
-		return null;
 	}
 }

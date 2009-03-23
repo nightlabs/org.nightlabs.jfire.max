@@ -17,6 +17,7 @@ import org.apache.log4j.Logger;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.asyncinvoke.AsyncInvoke;
 import org.nightlabs.jfire.asyncinvoke.Invocation;
+import org.nightlabs.jfire.organisation.LocalOrganisation;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.security.Authority;
 import org.nightlabs.jfire.security.AuthorizedObject;
@@ -111,6 +112,11 @@ extends SecurityChangeListener
 		if (!interestingRoleIDs.contains(roleID))
 			return;
 
+		// ignore foreign users (e.g. the own UserLocal at a remote organisation is usually synced for self-information - see JFireSecurityManagerBean.getAuthoritiesSelfInformation(...))
+		String localOrganisationID = LocalOrganisation.getLocalOrganisation(getPersistenceManager()).getOrganisationID();
+		if (!localOrganisationID.equals(userLocal.getOrganisationID()))
+			return;
+
 		if (User.USER_ID_OTHER.equals(userLocal.getUserID())) {
 			for (UserLocal userLocalManagedViaOther : authority.getUserLocalsManagedViaOther())
 				backupRoleGranted(userLocalManagedViaOther, authority, roleID);
@@ -191,6 +197,7 @@ extends SecurityChangeListener
 		for (Map.Entry<AuthorizedObject, Map<Authority, Map<RoleID, Boolean>>> me1 : roleGrantedBackupMap.entrySet()) {
 			AuthorizedObject authorizedObject = me1.getKey();
 			UserLocal userLocal = (UserLocal) authorizedObject;
+
 			UserLocalID userLocalID = (UserLocalID) JDOHelper.getObjectId(userLocal);
 			UserID userID = UserID.create(userLocalID);
 

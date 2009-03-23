@@ -375,7 +375,7 @@ implements IPackagePriceConfig, IResultPriceConfig
 	public boolean addCustomerGroup(CustomerGroup customerGroup)
 	{
 		boolean res = super.addCustomerGroup(customerGroup);
-		if (customerGroup != null)
+		if (res)
 			createPriceCells(customerGroup, null, null);
 		return res;
 	}
@@ -384,7 +384,7 @@ implements IPackagePriceConfig, IResultPriceConfig
 	public boolean addTariff(Tariff tariff)
 	{
 		boolean res = super.addTariff(tariff);
-		if (tariff != null)
+		if (res)
 			createPriceCells(null, tariff, null);
 		return res;
 	}
@@ -393,7 +393,7 @@ implements IPackagePriceConfig, IResultPriceConfig
 	public boolean addCurrency(Currency currency)
 	{
 		boolean res = super.addCurrency(currency);
-		if (currency != null)
+		if (res)
 			createPriceCells(null, null, currency);
 		return res;
 	}

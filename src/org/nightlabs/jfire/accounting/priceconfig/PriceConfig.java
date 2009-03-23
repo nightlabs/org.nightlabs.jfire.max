@@ -28,6 +28,7 @@ package org.nightlabs.jfire.accounting.priceconfig;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -111,7 +112,7 @@ public abstract class PriceConfig implements Serializable, StoreCallback, Attach
 	 * @jdo.field persistence-modifier="persistent" dependent="true" mapped-by="priceConfig"
 	 */
 	private PriceConfigName name;
-	
+
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
@@ -140,6 +141,8 @@ public abstract class PriceConfig implements Serializable, StoreCallback, Attach
 		this.primaryKey = getPrimaryKey(organisationID, priceConfigID);
 		this.name = new PriceConfigName(this);
 		this.managedBy = null;
+		this.currencies = new HashMap<String, Currency>();
+		this.priceFragmentTypes = new HashMap<String, PriceFragmentType>();
 	}
 
 	/**
@@ -194,11 +197,11 @@ public abstract class PriceConfig implements Serializable, StoreCallback, Attach
 	 *
 	 * @jdo.join
 	 */
-	private Map currencies = new HashMap();
+	private Map<String, Currency> currencies;
 
 	public Collection<Currency> getCurrencies()
 	{
-		return currencies.values();
+		return Collections.unmodifiableCollection(currencies.values());
 	}
 
 	/**
@@ -209,7 +212,11 @@ public abstract class PriceConfig implements Serializable, StoreCallback, Attach
 	 */
 	public boolean addCurrency(Currency currency)
 	{
-		return null == currencies.put(currency.getCurrencyID(), currency);
+		if (currencies.containsKey(currency.getCurrencyID()))
+			return false;
+
+		currencies.put(currency.getCurrencyID(), currency);
+		return true;
 	}
 	public Currency getCurrency(CurrencyID currencyID, boolean throwExceptionIfNotRegistered)
 	{
@@ -221,7 +228,7 @@ public abstract class PriceConfig implements Serializable, StoreCallback, Attach
 	 */
 	public Currency getCurrency(String currencyID, boolean throwExceptionIfNotRegistered)
 	{
-		Currency res = (Currency) currencies.get(currencyID);
+		Currency res = currencies.get(currencyID);
 		if (res == null && throwExceptionIfNotRegistered)
 			throw new IndexOutOfBoundsException("There is no Currency registered in this PriceConfig with the currencyID "+currencyID);
 		return res;
@@ -239,7 +246,7 @@ public abstract class PriceConfig implements Serializable, StoreCallback, Attach
 	@Override
 	public Currency removeCurrency(String currencyID)
 	{
-		return (Currency) currencies.remove(currencyID);
+		return currencies.remove(currencyID);
 	}
 
 	/**
@@ -256,17 +263,21 @@ public abstract class PriceConfig implements Serializable, StoreCallback, Attach
 	 *
 	 * @jdo.join
 	 */
-	private Map priceFragmentTypes = new HashMap();
+	private Map<String, PriceFragmentType> priceFragmentTypes;
 
 	@Override
 	public Collection<PriceFragmentType> getPriceFragmentTypes()
 	{
-		return priceFragmentTypes.values();
+		return Collections.unmodifiableCollection(priceFragmentTypes.values());
 	}
 	@Override
 	public boolean addPriceFragmentType(PriceFragmentType priceFragmentType)
 	{
-		return null == priceFragmentTypes.put(priceFragmentType.getPrimaryKey(), priceFragmentType);
+		if (priceFragmentTypes.containsKey(priceFragmentType.getPrimaryKey()))
+			return false;
+
+		priceFragmentTypes.put(priceFragmentType.getPrimaryKey(), priceFragmentType);
+		return true;
 	}
 	@Override
 	public PriceFragmentType getPriceFragmentType(String organisationID, String priceFragmentTypeID, boolean throwExceptionIfNotExistent)
@@ -278,7 +289,7 @@ public abstract class PriceConfig implements Serializable, StoreCallback, Attach
 	@Override
 	public PriceFragmentType getPriceFragmentType(String priceFragmentTypePK, boolean throwExceptionIfNotExistent)
 	{
-		PriceFragmentType res = (PriceFragmentType) priceFragmentTypes.get(priceFragmentTypePK);
+		PriceFragmentType res = priceFragmentTypes.get(priceFragmentTypePK);
 		if (throwExceptionIfNotExistent && res == null)
 			throw new IllegalArgumentException("No PriceFragmentType registered with \""+priceFragmentTypePK+"\"!");
 		return res;
@@ -325,7 +336,7 @@ public abstract class PriceConfig implements Serializable, StoreCallback, Attach
 	@Override
 	public PriceFragmentType removePriceFragmentType(String priceFragmentTypePK)
 	{
-		return (PriceFragmentType) priceFragmentTypes.remove(priceFragmentTypePK);
+		return priceFragmentTypes.remove(priceFragmentTypePK);
 	}
 
 //	/**
@@ -376,6 +387,7 @@ public abstract class PriceConfig implements Serializable, StoreCallback, Attach
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@SuppressWarnings("unused")
 	private boolean dependentOnOffer;
 
 	@Override
@@ -387,6 +399,7 @@ public abstract class PriceConfig implements Serializable, StoreCallback, Attach
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@SuppressWarnings("unused")
 	private boolean requiresProductTypePackageInternal;
 
 	/**
@@ -455,11 +468,11 @@ public abstract class PriceConfig implements Serializable, StoreCallback, Attach
 			this.requiresProductTypePackageInternal = requiresProductTypePackageInternal();
 		}
 	}
-	
+
 	@Override
 	public void jdoPreAttach() {
 	}
-	
+
 	@Override
 	public void jdoPostAttach(Object detached) {
 	}
@@ -487,12 +500,12 @@ public abstract class PriceConfig implements Serializable, StoreCallback, Attach
 			throw new IllegalStateException("setManagedBy can only be set for attached instances of " + this.getClass().getSimpleName());
 		this.managedBy = managedBy;
 	}
-	
+
 	/**
-	 * Checks if the given {@link PriceConfig} is tagged with a non-<code>null</code> managed-by property. 
+	 * Checks if the given {@link PriceConfig} is tagged with a non-<code>null</code> managed-by property.
 	 * This method will throw an {@link ManagedPriceConfigModficationException}
 	 * if the given {@link PriceConfig} is found to be tagged with a manged-by flag.
-	 * 
+	 *
 	 * @param pm The {@link PersistenceManager} to use.
 	 * @param priceConfigID The id of the {@link PriceConfig} to check, this might also be <code>null</code> (the result of JDOHelper.getObjectId() of a new object).
 	 */
@@ -509,7 +522,7 @@ public abstract class PriceConfig implements Serializable, StoreCallback, Attach
 	 * This might occur if the given {@link PriceConfigID} is of a {@link PriceConfig} not yet in the given datastore,
 	 * or <code>null</code>.
 	 * </p>
-	 * 
+	 *
 	 * @param pm The {@link PersistenceManager} to use.
 	 * @param priceConfigID The id of the {@link PriceConfig} to check, this might also be <code>null</code> (the result of JDOHelper.getObjectId() of a new object).
 	 * @return <code>true</code> if the given {@link PriceConfig} is found to be tagged with the managed-by flag, <code>false</code> otherwise.
@@ -517,8 +530,8 @@ public abstract class PriceConfig implements Serializable, StoreCallback, Attach
 	public static boolean isPriceConfigManaged(PersistenceManager pm, PriceConfigID priceConfigID) {
 		PriceConfig priceConfig = (PriceConfig) pm.getObjectById(priceConfigID);
 		return priceConfig.getManagedBy() != null;
-	}	
-	
+	}
+
 	@Override
 	public boolean equals(Object obj)
 	{

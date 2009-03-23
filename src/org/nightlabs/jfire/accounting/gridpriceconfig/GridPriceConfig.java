@@ -27,6 +27,7 @@
 package org.nightlabs.jfire.accounting.gridpriceconfig;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -131,13 +132,17 @@ public abstract class GridPriceConfig extends PriceConfig implements IGridPriceC
 	@Override
 	public Collection<CustomerGroup> getCustomerGroups()
 	{
-		return customerGroups.values();
+		return Collections.unmodifiableCollection(customerGroups.values());
 	}
 
 	@Override
 	public boolean addCustomerGroup(CustomerGroup customerGroup)
 	{
-		return null == customerGroups.put(customerGroup.getPrimaryKey(), customerGroup);
+		if (customerGroups.containsKey(customerGroup.getPrimaryKey()))
+			return false;
+
+		customerGroups.put(customerGroup.getPrimaryKey(), customerGroup);
+		return true;
 	}
 
 	@Override
@@ -171,13 +176,17 @@ public abstract class GridPriceConfig extends PriceConfig implements IGridPriceC
 	@Override
 	public Collection<Tariff> getTariffs()
 	{
-		return tariffs.values();
+		return Collections.unmodifiableCollection(tariffs.values());
 	}
 
 	@Override
 	public boolean addTariff(Tariff tariff)
 	{
-		return null == tariffs.put(tariff.getPrimaryKey(), tariff);
+		if (tariffs.containsKey(tariff.getPrimaryKey()))
+			return false;
+
+		tariffs.put(tariff.getPrimaryKey(), tariff);
+		return true;
 	}
 
 	@Override

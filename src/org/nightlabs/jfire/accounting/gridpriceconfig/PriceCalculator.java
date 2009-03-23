@@ -62,6 +62,7 @@ import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.trade.CustomerGroup;
 import org.nightlabs.jfire.trade.CustomerGroupMapper;
 import org.nightlabs.jfire.trade.id.CustomerGroupID;
+import org.nightlabs.util.Stopwatch;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -209,7 +210,7 @@ public class PriceCalculator
 	 */
 	public void preparePriceCalculation_createPackagedResultPriceConfigs()
 	{
-		priceCalculationStatsTracker.createAccumulationSummary(PriceCalculationStatsTracker.AccumulationSummaryIdentifierConstants.preparePriceCalculation_createPackagedResultPriceConfigs).startInvocation();
+		stopwatch.start(StopwatchConstants.preparePriceCalculation_createPackagedResultPriceConfigs);
 
 		// Create an instance of StablePriceConfig for each FormulaPriceConfig
 		// (if not yet existing) to store the results of the FormulaPriceConfig.
@@ -263,7 +264,7 @@ public class PriceCalculator
 			}
 		}
 
-		priceCalculationStatsTracker.createAccumulationSummary(PriceCalculationStatsTracker.AccumulationSummaryIdentifierConstants.preparePriceCalculation_createPackagedResultPriceConfigs).stopInvocation();
+		stopwatch.stop(StopwatchConstants.preparePriceCalculation_createPackagedResultPriceConfigs);
 	}
 
 	/**
@@ -274,7 +275,7 @@ public class PriceCalculator
 	 */
 	public void preparePriceCalculation_createResolvableProductTypesMap()
 	{
-		priceCalculationStatsTracker.createAccumulationSummary(PriceCalculationStatsTracker.AccumulationSummaryIdentifierConstants.preparePriceCalculation_createResolvableProductTypesMap).startInvocation();
+		stopwatch.start(StopwatchConstants.preparePriceCalculation_createResolvableProductTypesMap);
 
 //		IPriceConfig packagePriceConfig = packageProductType.getPackagePriceConfig();
 
@@ -303,7 +304,7 @@ public class PriceCalculator
 			_resolvableProductTypes_registerWithAnchestors(packagedProductType.getInnerProductTypeLocal().getProductType());
 		} // for (Iterator it = getPackagedProductInfos().iterator(); it.hasNext(); ) {
 
-		priceCalculationStatsTracker.createAccumulationSummary(PriceCalculationStatsTracker.AccumulationSummaryIdentifierConstants.preparePriceCalculation_createResolvableProductTypesMap).stopInvocation();
+		stopwatch.stop(StopwatchConstants.preparePriceCalculation_createResolvableProductTypesMap);
 	}
 
 	protected void _resolvableProductTypes_registerWithAnchestors(ProductType packagedProductType)
@@ -348,7 +349,7 @@ public class PriceCalculator
 		if (javaScriptContext != null)
 			throw new IllegalStateException("javaScriptContext != null");
 
-		priceCalculationStatsTracker.createAccumulationSummary(PriceCalculationStatsTracker.AccumulationSummaryIdentifierConstants.calculatePrices).startInvocation();
+		stopwatch.start(StopwatchConstants.calculatePrices);
 		javaScriptContext = Context.enter();
 		try {
 	//		StablePriceConfig packagePriceConfig = (StablePriceConfig) packagegetPriceConfig();
@@ -430,9 +431,9 @@ public class PriceCalculator
 	//		}
 
 			// Now, all preparation is done and we can start calculation:
-			priceCalculationStatsTracker.createAccumulationSummary(PriceCalculationStatsTracker.AccumulationSummaryIdentifierConstants.packagePriceConfig_getPriceCells).startInvocation();
+			stopwatch.start(StopwatchConstants.packagePriceConfig_getPriceCells);
 			Collection<PriceCell> priceCells = packagePriceConfig.getPriceCells();
-			priceCalculationStatsTracker.createAccumulationSummary(PriceCalculationStatsTracker.AccumulationSummaryIdentifierConstants.packagePriceConfig_getPriceCells).stopInvocation();
+			stopwatch.stop(StopwatchConstants.packagePriceConfig_getPriceCells);
 
 			for (PriceCell outerPriceCell : priceCells) {
 				PriceCoordinate priceCoordinate = outerPriceCell.getPriceCoordinate();
@@ -466,7 +467,7 @@ public class PriceCalculator
 			javaScriptContext.exit();
 			javaScriptContext = null;
 
-			priceCalculationStatsTracker.createAccumulationSummary(PriceCalculationStatsTracker.AccumulationSummaryIdentifierConstants.calculatePrices).stopInvocation();
+			stopwatch.stop(StopwatchConstants.calculatePrices);
 		}
 	}
 
@@ -486,23 +487,23 @@ public class PriceCalculator
 		if (nestedProductTypeLocal.getPackageProductTypeOrganisationID().equals(nestedProductTypeLocal.getInnerProductTypeOrganisationID())) // TODO or better check the organisationIDs of the price-configs?
 			return localPriceCoordinate;
 
-		priceCalculationStatsTracker.createAccumulationSummary(PriceCalculationStatsTracker.AccumulationSummaryIdentifierConstants.createMappedLocalPriceCoordinate).startInvocation();
+		stopwatch.start(StopwatchConstants.createMappedLocalPriceCoordinate);
 
 		CustomerGroupID orgCustomerGroupID = CustomerGroupID.create(localPriceCoordinate.getCustomerGroupPK());
-		priceCalculationStatsTracker.createAccumulationSummary(PriceCalculationStatsTracker.AccumulationSummaryIdentifierConstants.createMappedLocalPriceCoordinate_customerGroupMapper_getPartnerCustomerGroupID).startInvocation();
+		stopwatch.start(StopwatchConstants.createMappedLocalPriceCoordinate_customerGroupMapper_getPartnerCustomerGroupID);
 		CustomerGroupID newCustomerGroupID = getCustomerGroupMapper().getPartnerCustomerGroupID(orgCustomerGroupID, nestedProductTypeLocal.getInnerProductTypeOrganisationID(), true);
-		priceCalculationStatsTracker.createAccumulationSummary(PriceCalculationStatsTracker.AccumulationSummaryIdentifierConstants.createMappedLocalPriceCoordinate_customerGroupMapper_getPartnerCustomerGroupID).stopInvocation();
+		stopwatch.stop(StopwatchConstants.createMappedLocalPriceCoordinate_customerGroupMapper_getPartnerCustomerGroupID);
 
 		TariffID orgTariffID = TariffID.create(localPriceCoordinate.getTariffPK());
-		priceCalculationStatsTracker.createAccumulationSummary(PriceCalculationStatsTracker.AccumulationSummaryIdentifierConstants.createMappedLocalPriceCoordinate_tariffMapper_getPartnerTariffID).startInvocation();
+		stopwatch.start(StopwatchConstants.createMappedLocalPriceCoordinate_tariffMapper_getPartnerTariffID);
 		TariffID newTariffID = getTariffMapper().getPartnerTariffID(orgTariffID, nestedProductTypeLocal.getInnerProductTypeOrganisationID(), true);
-		priceCalculationStatsTracker.createAccumulationSummary(PriceCalculationStatsTracker.AccumulationSummaryIdentifierConstants.createMappedLocalPriceCoordinate_tariffMapper_getPartnerTariffID).stopInvocation();
+		stopwatch.stop(StopwatchConstants.createMappedLocalPriceCoordinate_tariffMapper_getPartnerTariffID);
 
 		// Using Util.cloneSerializable(...) takes in average 20 msec (even though the minimum is 0 msec). Since this
 		// code here is called a few thousand times, this is too much and the main reason for the price calculation
 		// to take sometimes even longer than one minute! After implementing Cloneable and calling localPriceCoordinate.clone(),
 		// the price calculation now takes only 6 to 11 seconds (instead of 45 to 70 seconds before). Marco.
-		priceCalculationStatsTracker.createAccumulationSummary(PriceCalculationStatsTracker.AccumulationSummaryIdentifierConstants.createMappedLocalPriceCoordinate_cloneLocalPriceCoordinate).startInvocation();
+		stopwatch.start(StopwatchConstants.createMappedLocalPriceCoordinate_cloneLocalPriceCoordinate);
 //		IPriceCoordinate res = Util.cloneSerializable(localPriceCoordinate);
 		IPriceCoordinate res = localPriceCoordinate.copyForPriceCalculation();
 		if (res == null)
@@ -514,11 +515,12 @@ public class PriceCalculator
 		if (!localPriceCoordinate.equals(res))
 			throw new IllegalStateException("localPriceCoordinate.copyForPriceCalculation() returned an object which is not equal to the localPriceCoordinate! Either the equals(...) or the copyForPriceCalculation() method is not implemented correctly! localPriceCoordinate.class=" + localPriceCoordinate.getClass().getName() + " localPriceCoordinate=" + localPriceCoordinate);
 
-		priceCalculationStatsTracker.createAccumulationSummary(PriceCalculationStatsTracker.AccumulationSummaryIdentifierConstants.createMappedLocalPriceCoordinate_cloneLocalPriceCoordinate).stopInvocation();
+		stopwatch.stop(StopwatchConstants.createMappedLocalPriceCoordinate_cloneLocalPriceCoordinate);
+
 		res.setTariffPK(Tariff.getPrimaryKey(newTariffID.organisationID, newTariffID.tariffID));
 		res.setCustomerGroupPK(CustomerGroup.getPrimaryKey(newCustomerGroupID.organisationID, newCustomerGroupID.customerGroupID));
 
-		priceCalculationStatsTracker.createAccumulationSummary(PriceCalculationStatsTracker.AccumulationSummaryIdentifierConstants.createMappedLocalPriceCoordinate).stopInvocation();
+		stopwatch.stop(StopwatchConstants.createMappedLocalPriceCoordinate);
 
 		return res;
 	}
@@ -546,13 +548,13 @@ public class PriceCalculator
 				IResultPriceConfig stablePriceConfig = (IResultPriceConfig) innerFPC.getPackagingResultPriceConfig(
 						innerProductType.getPrimaryKey(), packageProductType.getPrimaryKey(), true);
 
-				priceCalculationStatsTracker.createAccumulationSummary(PriceCalculationStatsTracker.AccumulationSummaryIdentifierConstants.packagingResultPriceConfig_createPriceCell).startInvocation();
+				stopwatch.start(StopwatchConstants.packagingResultPriceConfig_createPriceCell);
 				PriceCell innerPriceCell = stablePriceConfig.createPriceCell(localPriceCoordinate);
-				priceCalculationStatsTracker.createAccumulationSummary(PriceCalculationStatsTracker.AccumulationSummaryIdentifierConstants.packagingResultPriceConfig_createPriceCell).stopInvocation();
+				stopwatch.stop(StopwatchConstants.packagingResultPriceConfig_createPriceCell);
 
-				priceCalculationStatsTracker.createAccumulationSummary(PriceCalculationStatsTracker.AccumulationSummaryIdentifierConstants.innerFormulaPriceConfig_getFormulaCell).startInvocation();
+				stopwatch.start(StopwatchConstants.innerFormulaPriceConfig_getFormulaCell);
 				FormulaCell innerFormulaCell = innerFPC.getFormulaCell(localPriceCoordinate, false);
-				priceCalculationStatsTracker.createAccumulationSummary(PriceCalculationStatsTracker.AccumulationSummaryIdentifierConstants.innerFormulaPriceConfig_getFormulaCell).stopInvocation();
+				stopwatch.stop(StopwatchConstants.innerFormulaPriceConfig_getFormulaCell);
 
 				if (innerFormulaCell != null && innerFormulaCell.getFormula(priceFragmentType) == null)
 					innerFormulaCell = null;
@@ -746,7 +748,7 @@ public class PriceCalculator
 						"PriceCell \""+priceCell.getPriceCoordinate()+"\" has a circular reference in priceFragmentType \""+priceFragmentType.getPrimaryKey()+"\" in productType \""+productType.getPrimaryKey()+"\"!");
 
 			if (PriceCell.CALCULATIONSTATUS_DIRTY.equals(status)) {
-				priceCalculationStatsTracker.createAccumulationSummary(PriceCalculationStatsTracker.AccumulationSummaryIdentifierConstants.calculatePriceCell_dirtyStatus).startInvocation();
+				stopwatch.start(StopwatchConstants.calculatePriceCell_dirtyStatus);
 
 				priceCell.setPriceFragmentCalculationStatus(
 						priceFragmentType.getPrimaryKey(), PriceCell.CALCULATIONSTATUS_INPROCESS);
@@ -761,10 +763,10 @@ public class PriceCalculator
 					Context context = javaScriptContext;
 					if (context == null)
 						throw new IllegalStateException("javaScriptContext == null");
-//					priceCalculationStatsTracker.createAccumulationSummary(PriceCalculationStatsTracker.AccumulationSummaryIdentifierConstants.contextEnter).startInvocation();
+//					stopwatch.createAccumulationSummary(Stopwatch.AccumulationSummaryIdentifierConstants.contextEnter).startInvocation();
 //					Context context = Context.enter();
 //					try {
-//						priceCalculationStatsTracker.createAccumulationSummary(PriceCalculationStatsTracker.AccumulationSummaryIdentifierConstants.contextEnter).stopInvocation();
+//						stopwatch.createAccumulationSummary(Stopwatch.AccumulationSummaryIdentifierConstants.contextEnter).stopInvocation();
 
 						// Scriptable scope = context.initStandardObjects();
 						Scriptable scope = new ImporterTopLevel(context);
@@ -814,16 +816,16 @@ public class PriceCalculator
 
 						priceCell.getPrice().setAmount(priceFragmentType, res);
 //					} finally {
-//						priceCalculationStatsTracker.createAccumulationSummary(PriceCalculationStatsTracker.AccumulationSummaryIdentifierConstants.contextExit).startInvocation();
+//						stopwatch.createAccumulationSummary(Stopwatch.AccumulationSummaryIdentifierConstants.contextExit).startInvocation();
 //						Context.exit();
-//						priceCalculationStatsTracker.createAccumulationSummary(PriceCalculationStatsTracker.AccumulationSummaryIdentifierConstants.contextExit).stopInvocation();
+//						stopwatch.createAccumulationSummary(Stopwatch.AccumulationSummaryIdentifierConstants.contextExit).stopInvocation();
 //					}
 				}
 
 				priceCell.setPriceFragmentCalculationStatus(
 						priceFragmentType.getPrimaryKey(), PriceCell.CALCULATIONSTATUS_CLEAN);
 
-				priceCalculationStatsTracker.createAccumulationSummary(PriceCalculationStatsTracker.AccumulationSummaryIdentifierConstants.calculatePriceCell_dirtyStatus).stopInvocation();
+				stopwatch.stop(StopwatchConstants.calculatePriceCell_dirtyStatus);
 				return;
 			} // status is invalid => perform calculation
 
@@ -842,9 +844,9 @@ public class PriceCalculator
 		}
 	}
 
-	private PriceCalculationStatsTracker priceCalculationStatsTracker = new PriceCalculationStatsTracker();
+	private Stopwatch stopwatch = new Stopwatch();
 
-	public PriceCalculationStatsTracker getPriceCalculationStatsTracker() {
-		return priceCalculationStatsTracker;
+	public Stopwatch getStopwatch() {
+		return stopwatch;
 	}
 }

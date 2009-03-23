@@ -324,7 +324,7 @@ public class CellReflector
 		if (logger.isDebugEnabled())
 			logger.debug("resolvePriceCells (" + address + "): enter");
 
-		priceCalculator.getPriceCalculationStatsTracker().createAccumulationSummary(PriceCalculationStatsTracker.AccumulationSummaryIdentifierConstants.cellReflector_resolvePriceCells).startInvocation();
+		priceCalculator.getStopwatch().start(StopwatchConstants.cellReflector_resolvePriceCells);
 		try {
 			Collection<ResolvedPriceCell> priceCells = new LinkedList<ResolvedPriceCell>();
 
@@ -387,7 +387,7 @@ public class CellReflector
 
 			return priceCells;
 		} finally {
-			priceCalculator.getPriceCalculationStatsTracker().createAccumulationSummary(PriceCalculationStatsTracker.AccumulationSummaryIdentifierConstants.cellReflector_resolvePriceCells).stopInvocation();
+			priceCalculator.getStopwatch().stop(StopwatchConstants.cellReflector_resolvePriceCells);
 		}
 	}
 

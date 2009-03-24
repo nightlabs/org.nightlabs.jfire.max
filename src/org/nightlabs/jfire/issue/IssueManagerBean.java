@@ -66,6 +66,7 @@ import org.nightlabs.jfire.issue.query.IssueQuery;
 import org.nightlabs.jfire.jbpm.JbpmLookup;
 import org.nightlabs.jfire.jbpm.graph.def.State;
 import org.nightlabs.jfire.person.PersonStruct;
+import org.nightlabs.jfire.person.PersonStructValidationInitialiser;
 import org.nightlabs.jfire.prop.datafield.TextDataField;
 import org.nightlabs.jfire.query.store.BaseQueryStore;
 import org.nightlabs.jfire.security.SecurityReflector;
@@ -1257,52 +1258,61 @@ implements SessionBean
 			pm.makePersistent(new ModuleMetaData(
 					JFireIssueTrackingEAR.MODULE_NAME, "0.9.5.0.0.beta", "0.9.5.0.0.beta")
 			);
-
+			
+			String baseName = "org.nightlabs.jfire.issue.IssueManagerBean.messages";
+			ClassLoader loader = IssueManagerBean.class.getClassLoader();
+			
 			IssueType issueTypeDefault = new IssueType(getOrganisationID(), IssueType.DEFAULT_ISSUE_TYPE_ID);
-			issueTypeDefault.getName().setText(Locale.ENGLISH.getLanguage(), "Default");
-			issueTypeDefault.getName().setText(Locale.GERMAN.getLanguage(), "Standard");
+			issueTypeDefault.getName().readFromProperties(baseName, loader,
+			"org.nightlabs.jfire.issue.IssueManagerBean.issueTypeDefault"); //$NON-NLS-1$
 			issueTypeDefault = pm.makePersistent(issueTypeDefault);
 
 			// Create the statuses
 			IssueSeverityType issueSeverityTypeMinor = new IssueSeverityType(getOrganisationID(), IssueSeverityType.ISSUE_SEVERITY_TYPE_MINOR);
-			issueSeverityTypeMinor.getIssueSeverityTypeText().setText(Locale.ENGLISH.getLanguage(), "Minor");
-			issueSeverityTypeMinor.getIssueSeverityTypeText().setText(Locale.GERMAN.getLanguage(), "Gering");
+			issueSeverityTypeMinor.getIssueSeverityTypeText().readFromProperties(baseName, loader,
+			"org.nightlabs.jfire.issue.IssueManagerBean.issueSeverityTypeMinor"); //$NON-NLS-1$
 			issueSeverityTypeMinor = pm.makePersistent(issueSeverityTypeMinor);
 			issueTypeDefault.getIssueSeverityTypes().add(issueSeverityTypeMinor);
 
 			IssueSeverityType issueSeverityTypeMajor = new IssueSeverityType(getOrganisationID(), IssueSeverityType.ISSUE_SEVERITY_TYPE_MAJOR);
-			issueSeverityTypeMajor.getIssueSeverityTypeText().setText(Locale.ENGLISH.getLanguage(), "Major");
-			issueSeverityTypeMajor.getIssueSeverityTypeText().setText(Locale.GERMAN.getLanguage(), "Wichtig");
+			issueSeverityTypeMajor.getIssueSeverityTypeText().readFromProperties(baseName, loader,
+			"org.nightlabs.jfire.issue.IssueManagerBean.issueSeverityTypeMajor"); //$NON-NLS-1$
 			issueSeverityTypeMajor = pm.makePersistent(issueSeverityTypeMajor);
 			issueTypeDefault.getIssueSeverityTypes().add(issueSeverityTypeMajor);
 
 			IssueSeverityType issueSeverityTypeCrash = new IssueSeverityType(getOrganisationID(), IssueSeverityType.ISSUE_SEVERITY_TYPE_CRASH);
-			issueSeverityTypeCrash.getIssueSeverityTypeText().setText(Locale.ENGLISH.getLanguage(), "Crash");
+			issueSeverityTypeCrash.getIssueSeverityTypeText().readFromProperties(baseName, loader,
+			"org.nightlabs.jfire.issue.IssueManagerBean.issueSeverityTypeCrash"); //$NON-NLS-1$	
 			issueSeverityTypeCrash = pm.makePersistent(issueSeverityTypeCrash);
 			issueTypeDefault.getIssueSeverityTypes().add(issueSeverityTypeCrash);
 
 			IssueSeverityType issueSeverityTypeBlock = new IssueSeverityType(getOrganisationID(), IssueSeverityType.ISSUE_SEVERITY_TYPE_BLOCK);
-			issueSeverityTypeBlock.getIssueSeverityTypeText().setText(Locale.ENGLISH.getLanguage(), "Block");
+			issueSeverityTypeBlock.getIssueSeverityTypeText().readFromProperties(baseName, loader,
+			"org.nightlabs.jfire.issue.IssueManagerBean.issueSeverityTypeBlock"); //$NON-NLS-1$	
 			issueSeverityTypeBlock = pm.makePersistent(issueSeverityTypeBlock);
 			issueTypeDefault.getIssueSeverityTypes().add(issueSeverityTypeBlock);
 
 			IssueSeverityType issueSeverityTypeFeature = new IssueSeverityType(getOrganisationID(), IssueSeverityType.ISSUE_SEVERITY_TYPE_FEATURE);
-			issueSeverityTypeFeature.getIssueSeverityTypeText().setText(Locale.ENGLISH.getLanguage(), "Feature");
+			issueSeverityTypeFeature.getIssueSeverityTypeText().readFromProperties(baseName, loader,
+			"org.nightlabs.jfire.issue.IssueManagerBean.issueSeverityTypeFeature"); //$NON-NLS-1$	
 			issueSeverityTypeFeature = pm.makePersistent(issueSeverityTypeFeature);
 			issueTypeDefault.getIssueSeverityTypes().add(issueSeverityTypeFeature);
 
 			IssueSeverityType issueSeverityTypeTrivial = new IssueSeverityType(getOrganisationID(), IssueSeverityType.ISSUE_SEVERITY_TYPE_TRIVIAL);
-			issueSeverityTypeTrivial.getIssueSeverityTypeText().setText(Locale.ENGLISH.getLanguage(), "Trivial");
+			issueSeverityTypeTrivial.getIssueSeverityTypeText().readFromProperties(baseName, loader,
+			"org.nightlabs.jfire.issue.IssueManagerBean.issueSeverityTypeTrivial"); //$NON-NLS-1$		
 			issueSeverityTypeTrivial = pm.makePersistent(issueSeverityTypeTrivial);
 			issueTypeDefault.getIssueSeverityTypes().add(issueSeverityTypeTrivial);
 
 			IssueSeverityType issueSeverityTypeText = new IssueSeverityType(getOrganisationID(), IssueSeverityType.ISSUE_SEVERITY_TYPE_TEXT);
-			issueSeverityTypeText.getIssueSeverityTypeText().setText(Locale.ENGLISH.getLanguage(), "Text");
+			issueSeverityTypeText.getIssueSeverityTypeText().readFromProperties(baseName, loader,
+			"org.nightlabs.jfire.issue.IssueManagerBean.issueSeverityTypeText"); //$NON-NLS-1$	
 			issueSeverityTypeText = pm.makePersistent(issueSeverityTypeText);
 			issueTypeDefault.getIssueSeverityTypes().add(issueSeverityTypeText);
 
 			IssueSeverityType issueSeverityTypeTweak = new IssueSeverityType(getOrganisationID(), IssueSeverityType.ISSUE_SEVERITY_TYPE_TWEAK);
-			issueSeverityTypeTweak.getIssueSeverityTypeText().setText(Locale.ENGLISH.getLanguage(), "Tweak");
+			issueSeverityTypeTweak.getIssueSeverityTypeText().readFromProperties(baseName, loader,
+			"org.nightlabs.jfire.issue.IssueManagerBean.issueSeverityTypeTweak"); //$NON-NLS-1$	
 			issueSeverityTypeTweak = pm.makePersistent(issueSeverityTypeTweak);
 			issueTypeDefault.getIssueSeverityTypes().add(issueSeverityTypeTweak);
 
@@ -1310,75 +1320,75 @@ implements SessionBean
 			// Create the priorities
 			// check, whether the datastore is already initialized
 			IssuePriority issuePriorityNone = new IssuePriority(getOrganisationID(), "None");
-			issuePriorityNone.getIssuePriorityText().setText(Locale.ENGLISH.getLanguage(), "None");
-			issuePriorityNone.getIssuePriorityText().setText(Locale.GERMAN.getLanguage(), "Keine");
+			issuePriorityNone.getIssuePriorityText().readFromProperties(baseName, loader,
+			"org.nightlabs.jfire.issue.IssueManagerBean.issuePriorityNone"); //$NON-NLS-1$			
 			issuePriorityNone = pm.makePersistent(issuePriorityNone);
 			issueTypeDefault.getIssuePriorities().add(issuePriorityNone);
 
 			IssuePriority issuePriorityLow = new IssuePriority(getOrganisationID(), "Low");
-			issuePriorityLow.getIssuePriorityText().setText(Locale.ENGLISH.getLanguage(), "Low");
-			issuePriorityLow.getIssuePriorityText().setText(Locale.GERMAN.getLanguage(), "Gering");
+			issuePriorityLow.getIssuePriorityText().readFromProperties(baseName, loader,
+			"org.nightlabs.jfire.issue.IssueManagerBean.issuePriorityLow"); //$NON-NLS-1$	
 			issuePriorityLow = pm.makePersistent(issuePriorityLow);
 			issueTypeDefault.getIssuePriorities().add(issuePriorityLow);
 
 			IssuePriority issuePriorityNormal = new IssuePriority(getOrganisationID(), "Normal");
-			issuePriorityNormal.getIssuePriorityText().setText(Locale.ENGLISH.getLanguage(), "Normal");
-			issuePriorityNormal.getIssuePriorityText().setText(Locale.GERMAN.getLanguage(), "Normal");
+			issuePriorityNormal.getIssuePriorityText().readFromProperties(baseName, loader,
+			"org.nightlabs.jfire.issue.IssueManagerBean.issuePriorityNormal"); //$NON-NLS-1$	
 			issuePriorityNormal = pm.makePersistent(issuePriorityNormal);
 			issueTypeDefault.getIssuePriorities().add(issuePriorityNormal);
 
 			IssuePriority issuePriorityHigh = new IssuePriority(getOrganisationID(), "High");
-			issuePriorityHigh.getIssuePriorityText().setText(Locale.ENGLISH.getLanguage(), "High");
-			issuePriorityHigh.getIssuePriorityText().setText(Locale.GERMAN.getLanguage(), "Hoch");
+			issuePriorityHigh.getIssuePriorityText().readFromProperties(baseName, loader,
+			"org.nightlabs.jfire.issue.IssueManagerBean.issuePriorityHigh"); //$NON-NLS-1$		
 			issuePriorityHigh = pm.makePersistent(issuePriorityHigh);
 			issueTypeDefault.getIssuePriorities().add(issuePriorityHigh);
 
 			IssuePriority issuePriorityUrgent = new IssuePriority(getOrganisationID(), "Urgent");
-			issuePriorityUrgent.getIssuePriorityText().setText(Locale.ENGLISH.getLanguage(), "Urgent");
-			issuePriorityUrgent.getIssuePriorityText().setText(Locale.GERMAN.getLanguage(), "Dringend");
+			issuePriorityUrgent.getIssuePriorityText().readFromProperties(baseName, loader,
+			"org.nightlabs.jfire.issue.IssueManagerBean.issuePriorityUrgent"); //$NON-NLS-1$	
 			issuePriorityUrgent = pm.makePersistent(issuePriorityUrgent);
 			issueTypeDefault.getIssuePriorities().add(issuePriorityUrgent);
 
 			IssuePriority issuePriorityImmediate = new IssuePriority(getOrganisationID(), "Immediate");
-			issuePriorityImmediate.getIssuePriorityText().setText(Locale.ENGLISH.getLanguage(), "Immediate");
-			issuePriorityImmediate.getIssuePriorityText().setText(Locale.GERMAN.getLanguage(), "Umgehend");
+			issuePriorityImmediate.getIssuePriorityText().readFromProperties(baseName, loader,
+			"org.nightlabs.jfire.issue.IssueManagerBean.issuePriorityImmediate"); //$NON-NLS-1$	
 			issuePriorityImmediate = pm.makePersistent(issuePriorityImmediate);
 			issueTypeDefault.getIssuePriorities().add(issuePriorityImmediate);
 
 			// Create the resolutions
 			IssueResolution issueResolutionNotAssigned = new IssueResolution(getOrganisationID(), IssueResolution.ISSUE_RESOLUTION_ID_NOT_ASSIGNED.issueResolutionID);
-			issueResolutionNotAssigned.getName().setText(Locale.ENGLISH.getLanguage(), "Not assigned");
-			issueResolutionNotAssigned.getName().setText(Locale.GERMAN.getLanguage(), "Nicht zugewiesen");
+			issueResolutionNotAssigned.getName().readFromProperties(baseName, loader,
+			"org.nightlabs.jfire.issue.IssueManagerBean.issueResolutionNotAssigned"); //$NON-NLS-1$	
 			issueResolutionNotAssigned = pm.makePersistent(issueResolutionNotAssigned);
 			issueTypeDefault.getIssueResolutions().add(issueResolutionNotAssigned);
 
 			IssueResolution issueResolutionOpen = new IssueResolution(getOrganisationID(), "Open");
-			issueResolutionOpen.getName().setText(Locale.ENGLISH.getLanguage(), "Open");
-			issueResolutionOpen.getName().setText(Locale.GERMAN.getLanguage(), "Offen");
+			issueResolutionOpen.getName().readFromProperties(baseName, loader,
+			"org.nightlabs.jfire.issue.IssueManagerBean.issueResolutionOpen"); //$NON-NLS-1$	
 			issueResolutionOpen = pm.makePersistent(issueResolutionOpen);
 			issueTypeDefault.getIssueResolutions().add(issueResolutionOpen);
 
 			IssueResolution issueResolutionFixed = new IssueResolution(getOrganisationID(), "Fixed");
-			issueResolutionFixed.getName().setText(Locale.ENGLISH.getLanguage(), "Fixed");
-			issueResolutionFixed.getName().setText(Locale.GERMAN.getLanguage(), "Gelöst");
+			issueResolutionFixed.getName().readFromProperties(baseName, loader,
+			"org.nightlabs.jfire.issue.IssueManagerBean.issueResolutionFixed"); //$NON-NLS-1$	
 			issueResolutionFixed = pm.makePersistent(issueResolutionFixed);
 			issueTypeDefault.getIssueResolutions().add(issueResolutionFixed);
 
 			IssueResolution issueResolutionReopened = new IssueResolution(getOrganisationID(), "Reopened");
-			issueResolutionReopened.getName().setText(Locale.ENGLISH.getLanguage(), "Reopened");
-			issueResolutionReopened.getName().setText(Locale.GERMAN.getLanguage(), "Wiedereröffnet");
+			issueResolutionReopened.getName().readFromProperties(baseName, loader,
+			"org.nightlabs.jfire.issue.IssueManagerBean.issueResolutionReopened"); //$NON-NLS-1$	
 			issueResolutionReopened = pm.makePersistent(issueResolutionReopened);
 			issueTypeDefault.getIssueResolutions().add(issueResolutionReopened);
 
 			IssueResolution issueResolutionNotFixable = new IssueResolution(getOrganisationID(), "NotFixable");
-			issueResolutionNotFixable.getName().setText(Locale.ENGLISH.getLanguage(), "Not Fixable");
-			issueResolutionNotFixable.getName().setText(Locale.GERMAN.getLanguage(), "Nicht lösbar");
+			issueResolutionNotFixable.getName().readFromProperties(baseName, loader,
+			"org.nightlabs.jfire.issue.IssueManagerBean.issueResolutionNotFixable"); //$NON-NLS-1$	
 			issueResolutionNotFixable = pm.makePersistent(issueResolutionNotFixable);
 			issueTypeDefault.getIssueResolutions().add(issueResolutionNotFixable);
 
 			IssueResolution issueResolutionWillNotFix = new IssueResolution(getOrganisationID(), "WillNotFix");
-			issueResolutionWillNotFix.getName().setText(Locale.ENGLISH.getLanguage(), "Will not fix");
-			issueResolutionWillNotFix.getName().setText(Locale.GERMAN.getLanguage(), "Wird nicht gelöst");
+			issueResolutionWillNotFix.getName().readFromProperties(baseName, loader,
+			"org.nightlabs.jfire.issue.IssueManagerBean.issueResolutionWillNotFix"); //$NON-NLS-1$	
 			issueResolutionWillNotFix = pm.makePersistent(issueResolutionWillNotFix);
 			issueTypeDefault.getIssueResolutions().add(issueResolutionWillNotFix);
 
@@ -1386,8 +1396,8 @@ implements SessionBean
 			issueTypeDefault.readProcessDefinition(IssueType.class.getResource("jbpm/status/"));
 
 			IssueType issueTypeCustomer = new IssueType(getOrganisationID(), "Customer");
-			issueTypeCustomer.getName().setText(Locale.ENGLISH.getLanguage(), "Customer");
-			issueTypeCustomer.getName().setText(Locale.GERMAN.getLanguage(), "Kunde");
+			issueTypeCustomer.getName().readFromProperties(baseName, loader,
+			"org.nightlabs.jfire.issue.IssueManagerBean.issueTypeCustomer"); //$NON-NLS-1$		
 			issueTypeCustomer = pm.makePersistent(issueTypeCustomer);
 
 			// Create the process definitions.
@@ -1395,26 +1405,29 @@ implements SessionBean
 
 			// Create the issueLinkTypes
 			IssueLinkType issueLinkTypeRelated = new IssueLinkType(IssueLinkType.ISSUE_LINK_TYPE_ID_RELATED);
-			issueLinkTypeRelated.getName().setText(Locale.ENGLISH.getLanguage(), "Related");
-			issueLinkTypeRelated.getName().setText(Locale.GERMAN.getLanguage(), "Zugehörig");
+			issueLinkTypeRelated.getName().readFromProperties(baseName, loader,
+			"org.nightlabs.jfire.issue.IssueManagerBean.issueLinkTypeRelated"); //$NON-NLS-1$	
 			issueLinkTypeRelated.addLinkedObjectClass(Object.class);
 			issueLinkTypeRelated = pm.makePersistent(issueLinkTypeRelated);
 
 			IssueLinkType issueLinkTypeParent = new IssueLinkTypeParentChild(IssueLinkTypeParentChild.ISSUE_LINK_TYPE_ID_PARENT);
-			issueLinkTypeParent.getName().setText(Locale.ENGLISH.getLanguage(), "Parent of");
-			issueLinkTypeParent.getName().setText(Locale.GERMAN.getLanguage(), "Übergeordnet zu");
+			issueLinkTypeParent.getName().readFromProperties(baseName, loader,
+			"org.nightlabs.jfire.issue.IssueManagerBean.issueLinkTypeParent"); //$NON-NLS-1$	
+
 			issueLinkTypeParent.addLinkedObjectClass(Issue.class);
 			issueLinkTypeParent = pm.makePersistent(issueLinkTypeParent);
 
 			IssueLinkType issueLinkTypeChild = new IssueLinkTypeParentChild(IssueLinkTypeParentChild.ISSUE_LINK_TYPE_ID_CHILD);
-			issueLinkTypeChild.getName().setText(Locale.ENGLISH.getLanguage(), "Child of");
-			issueLinkTypeChild.getName().setText(Locale.GERMAN.getLanguage(), "Untergeordnet zu");
+			issueLinkTypeChild.getName().readFromProperties(baseName, loader,
+			"org.nightlabs.jfire.issue.IssueManagerBean.issueLinkTypeChild"); //$NON-NLS-1$	
+
 			issueLinkTypeChild.addLinkedObjectClass(Issue.class);
 			issueLinkTypeChild = pm.makePersistent(issueLinkTypeChild);
 
 			IssueLinkType issueLinkTypeDuplicate = new IssueLinkTypeDuplicate(IssueLinkTypeDuplicate.ISSUE_LINK_TYPE_ID_DUPLICATE);
-			issueLinkTypeDuplicate.getName().setText(Locale.ENGLISH.getLanguage(), "Duplicate");
-			issueLinkTypeDuplicate.getName().setText(Locale.GERMAN.getLanguage(), "Duplikat");
+			issueLinkTypeDuplicate.getName().readFromProperties(baseName, loader,
+			"org.nightlabs.jfire.issue.IssueManagerBean.issueLinkTypeDuplicate"); //$NON-NLS-1$	
+
 			issueLinkTypeDuplicate.addLinkedObjectClass(Issue.class);
 			issueLinkTypeDuplicate = pm.makePersistent(issueLinkTypeDuplicate);
 
@@ -1422,24 +1435,30 @@ implements SessionBean
 			pm.getExtent(ProjectType.class);
 
 			ProjectType projectTypeDefault = new ProjectType(ProjectType.PROJECT_TYPE_ID_DEFAULT);
-			projectTypeDefault.getName().setText(Locale.ENGLISH.getLanguage(), "Default");
-			projectTypeDefault.getName().setText(Locale.GERMAN.getLanguage(), "Standard");
+			projectTypeDefault.getName().readFromProperties(baseName, loader,
+			"org.nightlabs.jfire.issue.IssueManagerBean.projectTypeDefault"); //$NON-NLS-1$	
+
 			projectTypeDefault = pm.makePersistent(projectTypeDefault);
 
 			ProjectType projectTypeDemo1 = new ProjectType(IDGenerator.getOrganisationID(), "cross ticket");
-			projectTypeDemo1.getName().setText(Locale.ENGLISH.getLanguage(), "Cross Ticket");
+			projectTypeDemo1.getName().readFromProperties(baseName, loader,
+			"org.nightlabs.jfire.issue.IssueManagerBean.projectTypeDemo1"); //$NON-NLS-1$	
+
 			projectTypeDemo1 = pm.makePersistent(projectTypeDemo1);
 
 			ProjectType projectTypeDemo2 = new ProjectType(IDGenerator.getOrganisationID(), "jfire");
-			projectTypeDemo2.getName().setText(Locale.ENGLISH.getLanguage(), "JFire");
+			projectTypeDemo2.getName().readFromProperties(baseName, loader,
+			"org.nightlabs.jfire.issue.IssueManagerBean.projectTypeDemo2"); //$NON-NLS-1$	
+
 			projectTypeDemo2 = pm.makePersistent(projectTypeDemo2);
 
 			// Create the projects
 			pm.getExtent(Project.class);
 
 			Project projectDefault = new Project(Project.PROJECT_ID_DEFAULT);
-			projectDefault.getName().setText(Locale.ENGLISH.getLanguage(), "Default");
-			projectDefault.getName().setText(Locale.GERMAN.getLanguage(), "Standard");
+			projectDefault.getName().readFromProperties(baseName, loader,
+			"org.nightlabs.jfire.issue.IssueManagerBean.projectDefault"); //$NON-NLS-1$	
+
 			projectDefault.setProjectType(projectTypeDefault);
 			projectDefault = pm.makePersistent(projectDefault);
 
@@ -1515,19 +1534,23 @@ implements SessionBean
 			pm.getExtent(ProjectPhase.class);
 
 			ProjectPhase projectPhase = new ProjectPhase(IDGenerator.getOrganisationID(), "phase1");
-			projectPhase.getName().setText(Locale.ENGLISH.getLanguage(), "Phase 1");
+			projectPhase.getName().readFromProperties(baseName, loader,
+			"org.nightlabs.jfire.issue.IssueManagerBean.projectPhase1"); //$NON-NLS-1$	
 			projectPhase = pm.makePersistent(projectPhase);
 
 			projectPhase = new ProjectPhase(IDGenerator.getOrganisationID(), "phase2");
-			projectPhase.getName().setText(Locale.ENGLISH.getLanguage(), "Phase 2");
+			projectPhase.getName().readFromProperties(baseName, loader,
+			"org.nightlabs.jfire.issue.IssueManagerBean.projectPhase2"); //$NON-NLS-1$	
 			projectPhase = pm.makePersistent(projectPhase);
 
 			projectPhase = new ProjectPhase(IDGenerator.getOrganisationID(), "phase3");
-			projectPhase.getName().setText(Locale.ENGLISH.getLanguage(), "Phase 3");
+			projectPhase.getName().readFromProperties(baseName, loader,
+			"org.nightlabs.jfire.issue.IssueManagerBean.projectPhase3"); //$NON-NLS-1$	
 			projectPhase = pm.makePersistent(projectPhase);
 
 			projectPhase = new ProjectPhase(IDGenerator.getOrganisationID(), "phase4");
-			projectPhase.getName().setText(Locale.ENGLISH.getLanguage(), "Phase 4");
+			projectPhase.getName().readFromProperties(baseName, loader,
+			"org.nightlabs.jfire.issue.IssueManagerBean.projectPhase4"); //$NON-NLS-1$	
 			projectPhase = pm.makePersistent(projectPhase);
 
 			//Issues
@@ -1538,7 +1561,8 @@ implements SessionBean
 			issue1.setIssueResolution(issueResolutionOpen);
 			issue1.setIssueSeverityType(issueSeverityTypeMinor);
 			IssueSubject subject1 = new IssueSubject(issue1);
-			subject1.setText(Locale.ENGLISH.getLanguage(), "Subject 1");
+			subject1.readFromProperties(baseName, loader,
+			"org.nightlabs.jfire.issue.IssueManagerBean.subject1"); //$NON-NLS-1$	
 			issue1.setSubject(subject1);
 			
 			storeIssue(issue1, false, new String[0], NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
@@ -1548,7 +1572,8 @@ implements SessionBean
 			issue2.setIssueResolution(issueResolutionOpen);
 			issue2.setIssueSeverityType(issueSeverityTypeMinor);
 			IssueSubject subject2 = new IssueSubject(issue2);
-			subject2.setText(Locale.ENGLISH.getLanguage(), "Subject 2");
+			subject2.readFromProperties(baseName, loader,
+			"org.nightlabs.jfire.issue.IssueManagerBean.subject2"); //$NON-NLS-1$	
 			issue2.setSubject(subject2);
 			
 			storeIssue(issue2, false, new String[0], NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
@@ -1558,7 +1583,8 @@ implements SessionBean
 			issue3.setIssueResolution(issueResolutionOpen);
 			issue3.setIssueSeverityType(issueSeverityTypeMinor);
 			IssueSubject subject3 = new IssueSubject(issue3);
-			subject3.setText(Locale.ENGLISH.getLanguage(), "Subject 3");
+			subject3.readFromProperties(baseName, loader,
+			"org.nightlabs.jfire.issue.IssueManagerBean.subject3"); //$NON-NLS-1$	
 			issue3.setSubject(subject3);
 			
 			storeIssue(issue3, false, new String[0], NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
@@ -1568,7 +1594,8 @@ implements SessionBean
 			issue4.setIssueResolution(issueResolutionOpen);
 			issue4.setIssueSeverityType(issueSeverityTypeMinor);
 			IssueSubject subject4 = new IssueSubject(issue4);
-			subject4.setText(Locale.ENGLISH.getLanguage(), "Subject 4");
+			subject4.readFromProperties(baseName, loader,
+			"org.nightlabs.jfire.issue.IssueManagerBean.subject4"); //$NON-NLS-1$	
 			issue4.setSubject(subject4);
 			
 			storeIssue(issue4, false, new String[0], NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
@@ -1578,7 +1605,8 @@ implements SessionBean
 			issue5.setIssueResolution(issueResolutionOpen);
 			issue5.setIssueSeverityType(issueSeverityTypeMinor);
 			IssueSubject subject5 = new IssueSubject(issue5);
-			subject5.setText(Locale.ENGLISH.getLanguage(), "Subject 5");
+			subject5.readFromProperties(baseName, loader,
+			"org.nightlabs.jfire.issue.IssueManagerBean.subject5"); //$NON-NLS-1$	
 			issue5.setSubject(subject5);
 			
 			storeIssue(issue5, false, new String[0], NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
@@ -1606,7 +1634,9 @@ implements SessionBean
 			
 			queryStore.setQueryCollection(queryCollection);
 			queryStore.setPubliclyAvailable(true);
-			queryStore.getName().setText(Locale.ENGLISH.getLanguage(), "Unassigned");
+	//		queryStore.getName().setText(Locale.ENGLISH.getLanguage(), "Unassigned");
+			queryStore.getName().readFromProperties(baseName, loader,
+			"org.nightlabs.jfire.issue.IssueManagerBean.queryStoreUnassigned"); //$NON-NLS-1$	
 			queryStore.serialiseCollection();
 			queryStore = pm.makePersistent(queryStore);
 
@@ -1619,7 +1649,9 @@ implements SessionBean
 			
 			queryStore.setQueryCollection(queryCollection);
 			queryStore.setPubliclyAvailable(true);
-			queryStore.getName().setText(Locale.ENGLISH.getLanguage(), "Resolved");
+//			queryStore.getName().setText(Locale.ENGLISH.getLanguage(), "Resolved");
+			queryStore.getName().readFromProperties(baseName, loader,
+			"org.nightlabs.jfire.issue.IssueManagerBean.queryStoreResolved"); //$NON-NLS-1$	
 			queryStore.serialiseCollection();
 			queryStore = pm.makePersistent(queryStore);
 			

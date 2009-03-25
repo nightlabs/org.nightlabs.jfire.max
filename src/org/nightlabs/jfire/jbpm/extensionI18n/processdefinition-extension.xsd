@@ -34,7 +34,7 @@
 
 	<xsd:element name="transition">
 		<xsd:complexType>
-			<xsd:choice>
+			<xsd:choice minOccurs="0" maxOccurs="unbounded">
 				<xsd:element ref="description" />
 				<xsd:element ref="icon" />
 				<xsd:element ref="name" />
@@ -47,7 +47,7 @@
 
 	<xsd:element name="node">
 		<xsd:complexType>
-			<xsd:choice>
+			<xsd:choice minOccurs="0" maxOccurs="unbounded">
 				<xsd:element ref="description" />
 				<xsd:element ref="icon" />
 				<xsd:element ref="name" />
@@ -61,7 +61,7 @@
 
 	<xsd:element name="start-state">
 		<xsd:complexType>
-			<xsd:choice>
+			<xsd:choice minOccurs="0" maxOccurs="unbounded">
 				<xsd:element ref="description" />
 				<xsd:element ref="icon" />
 				<xsd:element ref="name" />
@@ -74,7 +74,7 @@
 	
 	<xsd:element name="state">
 		<xsd:complexType>
-			<xsd:choice>
+			<xsd:choice minOccurs="0" maxOccurs="unbounded">
 				<xsd:element ref="description" />
 				<xsd:element ref="icon" />
 				<xsd:element ref="name" />
@@ -87,7 +87,7 @@
 
 	<xsd:element name="end-state">
 		<xsd:complexType>
-			<xsd:choice>
+			<xsd:choice minOccurs="0" maxOccurs="unbounded">
 				<xsd:element ref="description" />
 				<xsd:element ref="icon" />
 				<xsd:element ref="name" />
@@ -99,7 +99,7 @@
 
 	<xsd:element name="process-definition-extension">
 		<xsd:complexType>
-			<xsd:choice>
+			<xsd:choice minOccurs="0" maxOccurs="unbounded">
 				<xsd:element ref="node" />
 				<xsd:element ref="start-state" />
 				<xsd:element ref="state" />

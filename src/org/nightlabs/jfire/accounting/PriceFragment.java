@@ -34,9 +34,9 @@ import java.io.Serializable;
  * less or equal the total price. It may theoretically happen that a fragment
  * is negative and therefore the sum of the known fragments might be greater
  * than the total price.
- * 
+ *
  * @author Marco Schulze - marco at nightlabs dot de
- * 
+ *
  * @jdo.persistence-capable
  *		identity-type="application"
  *		objectid-class="org.nightlabs.jfire.accounting.id.PriceFragmentID"
@@ -44,16 +44,20 @@ import java.io.Serializable;
  *		table="JFireTrade_PriceFragment"
  *
  * @jdo.inheritance strategy = "new-table"
- * 
+ *
  * @jdo.create-objectid-class
  *		field-order="organisationID, priceConfigID, priceID, priceFragmentTypePK"
  *
  * @jdo.fetch-group name="PriceFragment.price" fields="price"
  * @jdo.fetch-group name="PriceFragment.currency" fields="currency"
  * @jdo.fetch-group name="PriceFragment.priceFragmentType" fields="priceFragmentType"
- * @jdo.fetch-group name="PriceFragment.this" fields="priceFragmentType, price, currency"
+ * @!jdo.fetch-group name="PriceFragment.this" fields="priceFragmentType, price, currency"
  *
  * @jdo.fetch-group name="Price.fragments" fields="price"
+ *
+ * @jdo.fetch-group
+ * 		name="FetchGroupsTrade.articleCrossTradeReplication"
+ * 		fields="price, priceFragmentType, currency"
  *
  * @jdo.fetch-group name="FetchGroupsPriceConfig.edit" fetch-groups="default" fields="price, currency, priceFragmentType"
  */
@@ -65,10 +69,11 @@ public class PriceFragment
 	public static final String FETCH_GROUP_PRICE = "PriceFragment.price";
 	public static final String FETCH_GROUP_CURRENCY = "PriceFragment.currency";
 	public static final String FETCH_GROUP_PRICE_FRAGMENT_TYPE = "PriceFragment.priceFragmentType";
-	/**
-	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon! 
-	 */
-	public static final String FETCH_GROUP_THIS_PRICE_FRAGMENT = "PriceFragment.this";
+//	/**
+//	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon!
+//	 */
+//	@Deprecated
+//	public static final String FETCH_GROUP_THIS_PRICE_FRAGMENT = "PriceFragment.this";
 
 	/**
 	 * @jdo.field primary-key="true"
@@ -129,7 +134,7 @@ public class PriceFragment
 	 * @jdo.field persistence-modifier="none"
 	 */
 	private boolean virtual = false;
-	
+
 	protected PriceFragment() { }
 
 	public PriceFragment(Price price, PriceFragmentType priceFragmentType)
@@ -235,16 +240,16 @@ public class PriceFragment
 	public Currency getCurrency() {
 		return currency;
 	}
-	
+
 
 	public Price getPrice() {
 		return price;
 	}
-	
+
 	public boolean isVirtual() {
 		return virtual;
 	}
-	
+
 	void setVirtual(boolean virtual) {
 		this.virtual = virtual;
 	}

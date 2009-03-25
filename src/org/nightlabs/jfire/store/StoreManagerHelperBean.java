@@ -52,6 +52,7 @@ import org.nightlabs.jfire.store.deliver.CrossTradeDeliveryCoordinator;
 import org.nightlabs.jfire.store.id.DeliveryNoteID;
 import org.nightlabs.jfire.store.id.ProductID;
 import org.nightlabs.jfire.trade.Article;
+import org.nightlabs.jfire.trade.FetchGroupsTrade;
 import org.nightlabs.jfire.trade.Offer;
 import org.nightlabs.jfire.trade.OfferLocal;
 import org.nightlabs.jfire.trade.TradeManager;
@@ -60,6 +61,7 @@ import org.nightlabs.jfire.trade.id.ArticleID;
 import org.nightlabs.jfire.trade.id.OfferID;
 import org.nightlabs.jfire.trade.jbpm.ProcessDefinitionAssignment;
 import org.nightlabs.jfire.trade.jbpm.id.ProcessDefinitionAssignmentID;
+import org.nightlabs.util.CollectionUtil;
 
 /**
  * @ejb.bean name="jfire/ejb/JFireTrade/StoreManagerHelper"
@@ -207,7 +209,15 @@ implements SessionBean
 				if (!partnerArticles.isEmpty()) {
 					TradeManager tm = JFireEjbFactory.getBean(TradeManager.class, Lookup.getInitialContextProperties(pm, partnerOrganisationID));
 					Set<ArticleID> articleIDs = NLJDOHelper.getObjectIDSet(partnerArticles);
-					tm.releaseArticles(articleIDs, true, false, null, 1);
+					Collection<? extends Article> articlesToReplicate = CollectionUtil.castCollection(tm.releaseArticles(
+							articleIDs, true, true,
+							new String[] {
+									FetchPlan.DEFAULT, FetchGroupsTrade.FETCH_GROUP_ARTICLE_CROSS_TRADE_REPLICATION
+							},
+							NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT
+					));
+					NLJDOHelper.makeDirtyAllFieldsRecursively(articlesToReplicate);
+					articlesToReplicate = pm.makePersistentAll(articlesToReplicate);
 				}
 			} // for (Map.Entry<String, List<Product>> me : organisationID2partnerNestedProducts.entrySet()) {
 

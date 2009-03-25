@@ -48,7 +48,7 @@ import org.nightlabs.jdo.ObjectIDUtil;
  *		table="JFireTrade_Price"
  *
  * @jdo.inheritance strategy="new-table"
- * 
+ *
  * @jdo.create-objectid-class
  *		field-order="organisationID, priceConfigID, priceID"
  *
@@ -62,6 +62,10 @@ import org.nightlabs.jdo.ObjectIDUtil;
  * @jdo.fetch-group name="FetchGroupsTrade.articleInOfferEditor" fetch-groups="default" fields="currency"
  * @jdo.fetch-group name="FetchGroupsTrade.articleInInvoiceEditor" fetch-groups="default" fields="currency"
  * @jdo.fetch-group name="FetchGroupsTrade.articleInDeliveryNoteEditor" fetch-groups="default" fields="currency"
+ *
+ * @jdo.fetch-group
+ * 		name="FetchGroupsTrade.articleCrossTradeReplication"
+ * 		fields="currency, fragments"
  */
 public class Price
 	implements Serializable
@@ -71,8 +75,9 @@ public class Price
 	public static final String FETCH_GROUP_CURRENCY = "Price.currency"; //$NON-NLS-1$
 	public static final String FETCH_GROUP_FRAGMENTS = "Price.fragments"; //$NON-NLS-1$
 	/**
-	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon! 
+	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon!
 	 */
+	@Deprecated
 	public static final String FETCH_GROUP_THIS_PRICE = "Price.this"; //$NON-NLS-1$
 
 	/**
@@ -136,11 +141,11 @@ public class Price
 	 * A Price can contain virtual fragments. Virtual fragments
 	 * are not stored persitently, they are for example calculated/used
 	 * by the book process.
-	 * 
+	 *
 	 * @jdo.field persistence-modifier="none"
 	 */
 	protected Map<String, PriceFragment> virtualFragments = new HashMap<String, PriceFragment>();
-	
+
 	/////// end normal fields ////////
 
 	/**
@@ -152,7 +157,7 @@ public class Price
 	/**
 	 * This constructor is used to create a price within a TariffPrice object
 	 * in the general price grid.
-	 * 
+	 *
 	 * @param tariffPrice
 	 * @param currency
 	 */
@@ -181,7 +186,7 @@ public class Price
 		this.currency = currency;
 		this.fragments = new HashMap<String, PriceFragment>();
 	}
-	
+
 	public static String getPrimaryKey(String organisationID, String priceConfigID, long priceID)
 	{
 		return organisationID + '/' + priceConfigID + '/' + ObjectIDUtil.longObjectIDFieldToString(priceID);
@@ -230,11 +235,11 @@ public class Price
 	{
 		return getFragments(true);
 	}
-	
+
 	/**
 	 * Returns the list of PriceFragments where the caller can
 	 * decide whether to include the virtual fragments or not.
-	 * 
+	 *
 	 * @param includeVirtual Whether to include the virtual fragments.
 	 * @return A Colleciton of PriceFragments.
 	 */
@@ -244,14 +249,14 @@ public class Price
 			result.addAll(virtualFragments.values());
 		return result;
 	}
-	
+
 	/**
 	 * @return The list of virtual (non-persistent) PriceFragments.
 	 */
 	public Collection<PriceFragment> getVirtualFragments() {
 		return new HashSet(virtualFragments.values());
 	}
-	
+
 	/**
 	 * This is a convenience method for JSTL
 	 * @return Returns the amount as a double.
@@ -260,7 +265,7 @@ public class Price
 	{
 		return getCurrency().toDouble(amount);
 	}
-	
+
 	/**
 	 * @return Returns the amount.
 	 */
@@ -296,7 +301,7 @@ public class Price
 	{
 		this.amount = amount;
 	}
-	
+
 	/**
 	 * Returns the mathematical absolute value of this price's amount.
 	 */
@@ -307,7 +312,7 @@ public class Price
 	/**
 	 * Returns the PriceFragment for the given PriceFragmentType primary key.
 	 * The fragment is searched in the persistent and in the virtual fragments.
-	 * 
+	 *
 	 * @param priceFragmentTypePK The primary key of the PriceFragmentType the PriceFragment should be searched for.
 	 * @param throwExceptionIfNotExistent Whether to throw an {@link IllegalArgumentException} when the fragment for the desired type was not found.
 	 * @return The PriceFragment for the given PriceFragmentType primary key
@@ -317,12 +322,12 @@ public class Price
 	{
 		return getPriceFragment(priceFragmentTypePK, throwExceptionIfNotExistent, true);
 	}
-	
+
 	/**
 	 * Returns the PriceFragment for the given PriceFragmentType primary key.
 	 * The caller can decide whether the fragment is searched in the persistent fragments only,
 	 * or whether the search includes the virtual fragments as well.
-	 * 
+	 *
 	 * @param priceFragmentTypePK The primary key of the PriceFragmentType the PriceFragment should be searched for.
 	 * @param throwExceptionIfNotExistent Whether to throw an {@link IllegalArgumentException} when the fragment for the desired type was not found.
 	 * @param includeVirtual Whether to extend the search to the virtual PriceFragments
@@ -343,7 +348,7 @@ public class Price
 	/**
 	 * Returns the PriceFragment for the given PriceFragmentType primary key.
 	 * The fragment is searched in the persistent and in the virtual fragments.
-	 * 
+	 *
 	 * @param priceFragmentTypeOrganisationID The organisationID of the primary key of the PriceFragmentType the PriceFragment should be searched for.
 	 * @param priceFragmentTypeID The priceFragmentTypeID of the primary key of the PriceFragmentType the PriceFragment should be searched for.
 	 * @param throwExceptionIfNotExistent Whether to throw an {@link IllegalArgumentException} when the fragment for the desired type was not found.
@@ -355,12 +360,12 @@ public class Price
 	{
 		return getPriceFragment(priceFragmentTypeOrganisationID, priceFragmentTypeID, throwExceptionIfNotExistent, true);
 	}
-	
+
 	/**
 	 * Returns the PriceFragment for the given PriceFragmentType primary key.
 	 * The caller can decide whether the fragment is searched in the persistent fragments only,
 	 * or whether the search includes the virtual fragments as well.
-	 * 
+	 *
 	 * @param priceFragmentTypeOrganisationID The organisationID The primary key of the PriceFragmentType the PriceFragment should be searched for.
 	 * @param priceFragmentTypeID The priceFragmentTypeID The primary key of the PriceFragmentType the PriceFragment should be searched for.
 	 * @param throwExceptionIfNotExistent Whether to throw an {@link IllegalArgumentException} when the fragment for the desired type was not found.
@@ -378,7 +383,7 @@ public class Price
 	 * Creates a new PriceFragment for the given PriceFragmentType if it is not already
 	 * part of the list of fragments of this Price. If could be found in the list, this
 	 * one is returned.
-	 * 
+	 *
 	 * @param priceFragmentType The PriceFragmentType a fragment should be created for.
 	 * @return The PriceFragment for the given PriceFragmentType (a new one will be created if it is not already there).
 	 */
@@ -399,7 +404,7 @@ public class Price
 	 * Creates a new virtual (non-persistent) PriceFragment for the given PriceFragmentType if it is not already
 	 * part of the list of virtual fragments of this Price. If it could be found in the list, this
 	 * one is returned.
-	 * 
+	 *
 	 * @param priceFragmentType The PriceFragmentType a fragment should be created for.
 	 * @return The virtual PriceFragment for the given PriceFragmentType (a new one will be created if it is not already there).
 	 */
@@ -416,7 +421,7 @@ public class Price
 		}
 		return fragment;
 	}
-	
+
 	/**
 	 * Returns the amount of the PriceFragment for the given PriceFragmentType in this Price.
 	 * If the corresponding fragment cannot be found, <code>0</code> is returned.
@@ -430,7 +435,7 @@ public class Price
 	{
 		return getAmount(priceFragmentType.getOrganisationID(), priceFragmentType.getPriceFragmentTypeID());
 	}
-	
+
 	/**
 	 * Returns the amount of the PriceFragment for the given PriceFragmentType in this Price.
 	 * If the corresponding fragment cannot be found, <code>0</code> is returned.
@@ -455,7 +460,7 @@ public class Price
 
 	/**
 	 * Adds the given PriceFragment to the list of fragments of this Price.
-	 * 
+	 *
 	 * @param priceFragment The PriceFragment to add.
 	 */
 	protected void addPriceFragment(PriceFragment priceFragment)
@@ -477,7 +482,7 @@ public class Price
 	{
 		return getAmount(priceFragmentTypeOrganisationID, priceFragmentTypeID, true);
 	}
-	
+
 	/**
 	 * Returns the amount of the PriceFragment for the given PriceFragmentType in this Price.
 	 * If the corresponding fragment cannot be found, <code>0</code> is returned.
@@ -509,7 +514,7 @@ public class Price
 
 		return 0;
 	}
-	
+
 	/**
 	 * Set the amount of the persistent PriceFragment corresponding to the given PriceFragmentType.
 	 * <p>
@@ -521,7 +526,7 @@ public class Price
 	public void setAmount(PriceFragmentType priceFragmentType, long amount) {
 		setAmount(priceFragmentType, amount, false);
 	}
-	
+
 	/**
 	 * Set the amount of the persistent PriceFragment corresponding to the given PriceFragmentType.
 	 * <p>
@@ -561,14 +566,14 @@ public class Price
 		if (includeVirtual)
 			virtualFragments.clear();
 	}
-	
+
 	/**
 	 * Remove the virtual fragments from this Price.
 	 */
 	public void clearVirtualFragments() {
 		virtualFragments.clear();
 	}
-	
+
 	/**
 	 * This method finds the local PriceFragment with the same priceFragmentID and
 	 * adds the amount of the given PriceFragment to it. If there is no local PriceFragment
@@ -589,7 +594,7 @@ public class Price
 		}
 		localPriceFragment.setAmount(localPriceFragment.getAmount() + priceFragment.getAmount());
 	}
-	
+
 	public void sumPrice(Price price)
 	{
 		this.amount += price.getAmount();

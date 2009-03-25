@@ -64,9 +64,13 @@ import org.nightlabs.jfire.store.ProductType;
  * @jdo.fetch-group name="ArticlePrice.packageProductType" fields="packageProductType"
  * @jdo.fetch-group name="ArticlePrice.product" fields="product"
  * @jdo.fetch-group name="ArticlePrice.article" fields="article"
- * @jdo.fetch-group name="ArticlePrice.this" fetch-groups="default" fields="origPrice, nestedArticlePrices, packageArticlePrice, productType, packageProductType, product"
+ * @!jdo.fetch-group name="ArticlePrice.this" fetch-groups="default" fields="origPrice, nestedArticlePrices, packageArticlePrice, productType, packageProductType, product"
  *
  * @jdo.fetch-group name="Article.price" fields="article"
+ *
+ * @jdo.fetch-group
+ * 		name="FetchGroupsTrade.articleCrossTradeReplication"
+ * 		fields="packageArticlePrice, article, productType, product, packageProductType"
  */
 public class ArticlePrice extends org.nightlabs.jfire.accounting.Price
 {
@@ -77,10 +81,11 @@ public class ArticlePrice extends org.nightlabs.jfire.accounting.Price
 	public static final String FETCH_GROUP_NESTED_ARTICLE_PRICES_NO_LIMIT = "ArticlePrice.nestedArticlePrices[-1]";
 	public static final String FETCH_GROUP_ORIG_PRICE = "ArticlePrice.origPrice";
 	public static final String FETCH_GROUP_ARTICLE = "ArticlePrice.article";
-	/**
-	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon! 
-	 */
-	public static final String FETCH_GROUP_THIS_ARTICLE_PRICE = "ArticlePrice.this";
+//	/**
+//	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon!
+//	 */
+//	@Deprecated
+//	public static final String FETCH_GROUP_THIS_ARTICLE_PRICE = "ArticlePrice.this";
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -107,7 +112,7 @@ public class ArticlePrice extends org.nightlabs.jfire.accounting.Price
 
 	/**
 	 * This is to map entries in nestedArticlePrices.
-	 * 
+	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private ArticlePrice packageArticlePrice;
@@ -158,7 +163,7 @@ public class ArticlePrice extends org.nightlabs.jfire.accounting.Price
 	/**
 	 * This points always to the <tt>ProductType</tt> for which this price has been
 	 * created.
-	 * 
+	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private ProductType productType;
@@ -282,9 +287,9 @@ public class ArticlePrice extends org.nightlabs.jfire.accounting.Price
 
 		if (origPrice.getPriceID() >= 0)
 			this.origPrice = origPrice;
-		
+
 		this.virtualInner = virtualInner;
-		
+
 		this.nestedArticlePrices = new HashMap<String, ArticlePrice>();
 		assign(origPrice, refund);
 
@@ -453,7 +458,7 @@ public class ArticlePrice extends org.nightlabs.jfire.accounting.Price
 
 	/**
 	 * Returns the packaged ArticlePrice for the given productType.
-	 * 
+	 *
 	 * @param productType
 	 * @param throwException
 	 * @return The packaged ArticlePrice for the given productType.

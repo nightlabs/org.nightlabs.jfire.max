@@ -38,7 +38,7 @@ import org.nightlabs.jfire.trade.Article;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
- * 
+ *
  * @jdo.persistence-capable
  *		identity-type="application"
  *		objectid-class="org.nightlabs.jfire.store.id.ProductID"
@@ -55,6 +55,10 @@ import org.nightlabs.jfire.trade.Article;
  *
  * @jdo.fetch-group name="Product.productLocal" fields="productLocal"
  * @jdo.fetch-group name="Product.productType" fields="productType"
+ *
+ * @jdo.fetch-group
+ * 		name="FetchGroupsTrade.articleCrossTradeReplication"
+ * 		fields="productType"
  */
 public abstract class Product
 implements Serializable
@@ -64,8 +68,8 @@ implements Serializable
 	public static final String FETCH_GROUP_PRODUCT_TYPE = "Product.productType";
 
 	/**
-	 * This class defines constants for the field names to avoid the use 
-	 * of "hardcoded" Strings for field names.  
+	 * This class defines constants for the field names to avoid the use
+	 * of "hardcoded" Strings for field names.
 	 * In the future the JFire project will probably autogenerate this class,
 	 * but until then you should implement it manually.
 	 */
@@ -76,7 +80,7 @@ implements Serializable
 		public static final String productLocal = "productLocal";
 		public static final String productType = "productType";
 	};
-	
+
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"

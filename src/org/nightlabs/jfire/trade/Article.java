@@ -117,6 +117,14 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="FetchGroupsTrade.articleInInvoiceEditor" fields="articleLocal, segment, productType, product, tariff, price"
  * @jdo.fetch-group name="FetchGroupsTrade.articleInDeliveryNoteEditor" fields="articleLocal, segment, productType, product, tariff, price"
  *
+ * @jdo.fetch-group
+ * 		name="FetchGroupsTrade.articleCrossTradeReplication"
+ * 		fields="
+ * 			order, offer, invoice, deliveryNote, receptionNote,
+ * 			price, currency, tariff, reversedArticle, reversingArticle,
+ * 			segment, productType, product, createUser
+ * 		"
+ *
  * @!jdo.fetch-group name="FetchGroupsTrade.articleInOrderEditor" fields="segment, productType, product, tariff, price, order, offer, invoice, deliveryNote"
  * @!jdo.fetch-group name="FetchGroupsTrade.articleInOfferEditor" fields="segment, productType, product, tariff, price, order, invoice, deliveryNote"
  * @!jdo.fetch-group name="FetchGroupsTrade.articleInInvoiceEditor" fields="segment, productType, product, tariff, price, order, offer, deliveryNote"

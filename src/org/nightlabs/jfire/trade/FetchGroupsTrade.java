@@ -42,4 +42,6 @@ public class FetchGroupsTrade
 	// The following fetch-groups are used to retrieve the ArticleContainer when it has been changed - in this case it will
 	// not detach the articles, since they are managed separately (to improve speed).
 	public static final String FETCH_GROUP_ARTICLE_CONTAINER_IN_EDITOR = "FetchGroupsTrade.articleContainerInEditor";
+
+	public static final String FETCH_GROUP_ARTICLE_CROSS_TRADE_REPLICATION= "FetchGroupsTrade.articleCrossTradeReplication";
 }

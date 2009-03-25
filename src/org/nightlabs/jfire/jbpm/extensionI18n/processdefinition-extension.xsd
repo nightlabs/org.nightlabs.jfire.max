@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="urn:jfire.org:processdefinition-extension"
+	xmlns:tns="http://www.example.org/processdefinition-extension"
+	elementFormDefault="qualified">
+	
+	<xsd:annotation>
+		<xsd:documentation xml:lang="en">
+			this is a schema to define the process definition extension file used to 
+			extend the process
+			definition JBPM file.
+  </xsd:documentation>
+	</xsd:annotation>
+
+	<xsd:element name="description">
+		<xsd:complexType>
+			<xsd:attribute name="language" type="xsd:string" use="required">
+			</xsd:attribute>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="icon">
+		<xsd:complexType>
+			<xsd:attribute name="file" type="xsd:string" use="required" />
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="name">
+		<xsd:complexType>
+			<xsd:attribute name="language" type="xsd:string" use="required">
+			</xsd:attribute>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="transition">
+		<xsd:complexType>
+			<xsd:choice>
+				<xsd:element ref="description" />
+				<xsd:element ref="icon" />
+				<xsd:element ref="name" />
+			</xsd:choice>
+			<xsd:attribute name="name" type="xsd:string" use="required" />
+			<xsd:attribute name="userExecutable" type="xsd:boolean" use="optional" />
+		</xsd:complexType>
+	</xsd:element>
+
+
+	<xsd:element name="node">
+		<xsd:complexType>
+			<xsd:choice>
+				<xsd:element ref="description" />
+				<xsd:element ref="icon" />
+				<xsd:element ref="name" />
+				<xsd:element ref="transition" />
+			</xsd:choice>
+			<xsd:attribute name="name" type="xsd:string" use="required" />
+			<xsd:attribute name="publicState" type="xsd:boolean" use="optional" />
+		</xsd:complexType>
+	</xsd:element>
+
+
+	<xsd:element name="start-state">
+		<xsd:complexType>
+			<xsd:choice>
+				<xsd:element ref="description" />
+				<xsd:element ref="icon" />
+				<xsd:element ref="name" />
+				<xsd:element ref="transition" />
+			</xsd:choice>
+			<xsd:attribute name="name" type="xsd:string" use="required" />
+			<xsd:attribute name="publicState" type="xsd:boolean" use="optional" />
+		</xsd:complexType>
+	</xsd:element>
+	
+	<xsd:element name="state">
+		<xsd:complexType>
+			<xsd:choice>
+				<xsd:element ref="description" />
+				<xsd:element ref="icon" />
+				<xsd:element ref="name" />
+				<xsd:element ref="transition" />
+			</xsd:choice>
+			<xsd:attribute name="name" type="xsd:string" use="required" />
+			<xsd:attribute name="publicState" type="xsd:boolean" use="optional" />
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="end-state">
+		<xsd:complexType>
+			<xsd:choice>
+				<xsd:element ref="description" />
+				<xsd:element ref="icon" />
+				<xsd:element ref="name" />
+			</xsd:choice>
+			<xsd:attribute name="publicState" type="xsd:boolean" use="optional" />
+			<xsd:attribute name="name" type="xsd:string" use="required" />
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="process-definition-extension">
+		<xsd:complexType>
+			<xsd:choice>
+				<xsd:element ref="node" />
+				<xsd:element ref="start-state" />
+				<xsd:element ref="state" />
+				<xsd:element ref="end-state" />
+			</xsd:choice>
+			<xsd:attribute name="name" type="xsd:string" use="required" />
+		</xsd:complexType>
+	</xsd:element>
+
+
+</xsd:schema>

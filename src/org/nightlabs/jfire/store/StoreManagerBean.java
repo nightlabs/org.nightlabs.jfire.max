@@ -2998,4 +2998,28 @@ implements SessionBean
 			pm.close();
 		}
 	}
+	
+	/**
+	 * @ejb.interface-method
+	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+	 * @ejb.permission role-name="org.nightlabs.jfire.store.seeProductType"
+	 */
+	public Set<ProductTypeID> getChildProductTypeIDs(ProductTypeID parentProductTypeID) {
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			Collection<? extends ProductType> productTypes = ProductType.getChildProductTypes(pm, parentProductTypeID);
+
+			productTypes = Authority.filterIndirectlySecuredObjects(
+					pm,
+					productTypes,
+					getPrincipal(),
+					RoleConstants.seeProductType,
+					ResolveSecuringAuthorityStrategy.allow
+			);
+
+			return NLJDOHelper.getObjectIDSet(productTypes);
+		} finally {
+			pm.close();
+		}
+	}	
 }

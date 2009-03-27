@@ -53,8 +53,17 @@ extends BaseJDOObjectDAO<ProductTypeID, ProductType>
 	protected ProductTypeDAO() {
 	}
 
+	/**
+	 * The static singleton instance member.
+	 */
 	private static ProductTypeDAO sharedInstance;
-
+	
+	private StoreManager storeManager;
+	
+	/**
+	 * Returns the static singleton (shared instance) of {@link ProductTypeDAO}.
+	 * @return the static singleton (shared instance)
+	 */
 	public static ProductTypeDAO sharedInstance() {
 		if (sharedInstance == null)
 			sharedInstance = new ProductTypeDAO();
@@ -101,7 +110,6 @@ extends BaseJDOObjectDAO<ProductTypeID, ProductType>
 		return getJDOObject(null, productTypeID, fetchGroups, maxFetchDepth, progressMonitor);
 	}
 
-	// TODO: Implement Authority checking (needs to be in the EJB!)
 	@Override
 	protected Collection<ProductType> retrieveJDOObjects(Set<ProductTypeID> objectIDs, String[] fetchGroups,
 	int maxFetchDepth, ProgressMonitor progressMonitor)
@@ -118,14 +126,11 @@ extends BaseJDOObjectDAO<ProductTypeID, ProductType>
 		return productTypes;
 	}
 
-	private StoreManager storeManager;
-
 
 	//Optimized method that returns the ProductTypes using the QueryCollection
 	//and retrieving the Products Id
-
 	public synchronized List<ProductType> getProductTypes(QueryCollection<?> queryCollection, String[] fetchGroups,
-	int maxFetchDepth, ProgressMonitor progressMonitor)throws Exception
+	int maxFetchDepth, ProgressMonitor progressMonitor) throws Exception
 	{
 		storeManager = JFireEjbFactory.getBean(StoreManager.class, SecurityReflector.getInitialContextProperties());
 		try {	
@@ -133,14 +138,47 @@ extends BaseJDOObjectDAO<ProductTypeID, ProductType>
 			return getJDOObjects(null, productTypeIDs, fetchGroups, maxFetchDepth, progressMonitor);
 		} finally {
 			storeManager = null;
+			progressMonitor.done();
 		}
 	}
 
-	// TODO: Implement authority checking - should be done in the server!
+	/**
+	 * Returns a List of {@link ProductType}s for the given {@link ProductTypeID}s.
+	 * @param productTypeIDs the {@link Set} of {@link ProductTypeID} to get the {@link ProductType}s for.
+	 * @param fetchGroups the fetchGroups which control which fields should be detached.
+	 * @param maxFetchDepth the maximum fetch depth of the detached object graph.
+	 * @param progressMonitor the {@link ProgressMonitor} which display the progress of loading.
+	 * @return the List of {@link ProductType}s for the given {@link ProductTypeID}s.
+	 */
 	public List<ProductType> getProductTypes(Set<ProductTypeID> productTypeIDs, String[] fetchGroups,
 	int maxFetchDepth, ProgressMonitor progressMonitor)
 	{
 		return getJDOObjects(null, productTypeIDs, fetchGroups, maxFetchDepth, progressMonitor);
+	}
+	
+	/**
+	 * Returns a List of child {@link ProductType}s for the given {@link ProductTypeID}. 
+	 * @param parentProductTypeID the {@link ProductTypeID} of the parent {@link ProductType} to get the children for.
+	 * @param fetchGroups the fetchGroups which control which fields should be detached.
+	 * @param maxFetchDepth the maximum fetch depth of the detached object graph.
+	 * @param monitor the {@link ProgressMonitor} which display the progress of loading.
+	 * @return a List of child {@link ProductType}s for the given {@link ProductTypeID}.
+	 */
+	public synchronized List<ProductType> getChildProductTypes(ProductTypeID parentProductTypeID,
+			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
+	{
+		try {
+			storeManager = JFireEjbFactory.getBean(StoreManager.class, SecurityReflector.getInitialContextProperties());
+			try {
+				Collection<ProductTypeID> productTypeIDs = storeManager.getChildProductTypeIDs(parentProductTypeID);
+				return getJDOObjects(null, productTypeIDs, fetchGroups, maxFetchDepth, monitor);
+			} finally {
+				storeManager = null;
+				monitor.done();
+			}
+		} catch (Exception x) {
+			throw new RuntimeException(x);
+		}
 	}
 
 }

@@ -1,4 +1,4 @@
-package org.nightlabs.jfire.jbpm.extensionI18n;
+package org.nightlabs.jfire.jbpm.extension;
 
 import org.nightlabs.i18n.I18nTextBuffer;
 

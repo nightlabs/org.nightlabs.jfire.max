@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.nightlabs.jfire.jbpm.extensionI18n;
+package org.nightlabs.jfire.jbpm.extension;
 
 import java.util.Collection;
 import java.util.Collections;

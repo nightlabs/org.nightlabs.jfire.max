@@ -20,9 +20,9 @@ import org.jbpm.JbpmContext;
 import org.jbpm.graph.def.Node;
 import org.jbpm.jpdl.xml.JpdlXmlReader;
 import org.nightlabs.jfire.jbpm.JbpmLookup;
-import org.nightlabs.jfire.jbpm.extensionI18n.ExtendedNodeDescriptor;
-import org.nightlabs.jfire.jbpm.extensionI18n.ExtendedProcessDefinitionDescriptor;
-import org.nightlabs.jfire.jbpm.extensionI18n.JpdlXmlExtensionReader;
+import org.nightlabs.jfire.jbpm.extension.ExtendedNodeDescriptor;
+import org.nightlabs.jfire.jbpm.extension.ExtendedProcessDefinitionDescriptor;
+import org.nightlabs.jfire.jbpm.extension.JpdlXmlExtensionReader;
 import org.nightlabs.jfire.jbpm.graph.def.id.ProcessDefinitionID;
 
 

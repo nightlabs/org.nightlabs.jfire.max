@@ -1,4 +1,4 @@
-package org.nightlabs.jfire.jbpm.extensionI18n;
+package org.nightlabs.jfire.jbpm.extension;
 
 import java.io.IOException;
 import java.io.InputStream;

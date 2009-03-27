@@ -2,9 +2,8 @@
 <xsd:schema 
 	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
 	targetNamespace="urn:jfire.org:processdefinition-extension_1_0"
-	elementFormDefault="qualified">
+	elementFormDefault="qualified" xmlns:extension="urn:jfire.org:processdefinition-extension_1_0">
 	
-
 	<xsd:annotation>
 		<xsd:documentation xml:lang="en">
 			this is a schema to define the process definition extension file used to
@@ -32,85 +31,19 @@
 		</xsd:complexType>
 	</xsd:element>
 
-	<xsd:element name="transition">
-	<xsd:annotation>
-		<xsd:documentation xml:lang="en">
-			the UserExecutube Attribute define if the Transition node is executable
-			The default value of 'userExecutable' should be true if not defined.
-		</xsd:documentation>
-	</xsd:annotation>
-		<xsd:complexType>
-			<xsd:choice minOccurs="0" maxOccurs="unbounded">
-				<xsd:element ref="description" />
-				<xsd:element ref="name" />
-				<xsd:element ref="icon" maxOccurs="1"/>
-			</xsd:choice>
-			<xsd:attribute name="name" type="xsd:string" use="required" />			
-			<xsd:attribute name="userExecutable" type="xsd:boolean" use="optional" />
-		</xsd:complexType>
-	</xsd:element>
-
-	
-	<xsd:element name="node">
-	<xsd:annotation>
-	<xsd:documentation xml:lang="en">
-	 Each node contains a I18I name, I18I Description, and a graphical icon.
-	
-	 If a state definition is marked as publicState, it will be exposed to other organisations
-	 by storing it in both the OfferLocal and the Offer instance. If it is not public,
-	 it is only stored in the OfferLocal, it s true, if it shall be registered in the non-local instance and therefore published to business partners.
-	 The default value of 'publicState' should be false if not defined.
-	</xsd:documentation>
-	</xsd:annotation>
-		<xsd:complexType>
-			<xsd:choice minOccurs="0" maxOccurs="unbounded">
-				<xsd:element ref="description" />
-				<xsd:element ref="name" />
-				<xsd:element ref="icon" maxOccurs="1"/>
-				<xsd:element ref="transition" />
-			</xsd:choice>
-			<xsd:attribute name="name" type="xsd:string" use="required" />
-			<xsd:attribute name="publicState" type="xsd:boolean" use="optional" />
-		</xsd:complexType>
-	</xsd:element>
-
-
-	<xsd:element name="start-state">
-		<xsd:complexType>
-			<xsd:choice minOccurs="0" maxOccurs="unbounded">
-				<xsd:element ref="description" />
-				<xsd:element ref="name" />
-				<xsd:element ref="icon" maxOccurs="1"/>
-				<xsd:element ref="transition" />
-			</xsd:choice>
-			<xsd:attribute name="name" type="xsd:string" use="required" />
-			<xsd:attribute name="publicState" type="xsd:boolean" use="optional" />
-		</xsd:complexType>
+	<xsd:element name="transition" type="extension:extensionDataTransition">
 	</xsd:element>
 	
-	<xsd:element name="state">
-		<xsd:complexType>
-			<xsd:choice minOccurs="0" maxOccurs="unbounded">
-				<xsd:element ref="description" />
-				<xsd:element ref="name" />
-				<xsd:element ref="transition" />
-				<xsd:element ref="icon" maxOccurs="1"/>
-			</xsd:choice>
-			<xsd:attribute name="name" type="xsd:string" use="required" />
-			<xsd:attribute name="publicState" type="xsd:boolean" use="optional" />
-		</xsd:complexType>
+	<xsd:element name="node" type="extension:extensionDataNode">
 	</xsd:element>
 
-	<xsd:element name="end-state">
-		<xsd:complexType>
-			<xsd:choice minOccurs="0" maxOccurs="unbounded">
-				<xsd:element ref="description" />
-				<xsd:element ref="name" />
-				<xsd:element ref="icon" maxOccurs="1"/>
-			</xsd:choice>
-			<xsd:attribute name="publicState" type="xsd:boolean" use="optional" />
-			<xsd:attribute name="name" type="xsd:string" use="required" />
-		</xsd:complexType>
+	<xsd:element name="start-state" type="extension:extensionDataNode">
+	</xsd:element>
+	
+	<xsd:element name="state" type="extension:extensionDataNode">
+	</xsd:element>
+
+	<xsd:element name="end-state" type="extension:extensionDataNode">
 	</xsd:element>
 
 	<xsd:element name="process-definition-extension">
@@ -130,5 +63,48 @@
 		</xsd:complexType>
 	</xsd:element>
 
+	<xsd:complexType name="extensionDataNode">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">
+				Each node contains a I18I name, I18I Description, and a graphical icon.
+
+				If a state definition is marked as publicState, it will be exposed
+				to other organisations
+				by storing it in both the OfferLocal and the Offer instance. If it is
+				not public,
+				it is only stored in the OfferLocal, it s true, if it shall be
+				registered in the non-local instance and therefore published to
+				business partners.
+				The default value of 'publicState' should be false if not defined.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:choice minOccurs="0" maxOccurs="unbounded">
+			<xsd:element ref="extension:description" />
+			<xsd:element ref="extension:name" />
+			<xsd:element ref="extension:icon" maxOccurs="1" />
+			<xsd:element ref="transition" />
+		</xsd:choice>
+		<xsd:attribute name="name" type="xsd:string" use="required" />
+		<xsd:attribute name="publicState" type="xsd:boolean" use="optional" />
+	</xsd:complexType>
+
+	<xsd:complexType name="extensionDataTransition">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">
+				the UserExecutube Attribute define if the Transition node is executable
+				The default value of 'userExecutable' should be true if not defined.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:choice minOccurs="0" maxOccurs="unbounded">
+			<xsd:element ref="description" />
+			<xsd:element ref="name" />
+			<xsd:element ref="icon" maxOccurs="1" />
+		</xsd:choice>
+		<xsd:attribute name="name" type="xsd:string" use="required" />
+		<xsd:attribute name="userExecutable" type="xsd:boolean" use="optional" />
+	</xsd:complexType>
 
 </xsd:schema>
+
+
+

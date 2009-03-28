@@ -122,7 +122,7 @@ implements SessionBean
 	};
 
 	/**
-	 * @ejb.interface-method view-type="local"
+	 * @!ejb.interface-method view-type="local"
 	 * @ejb.transaction type="RequiresNew"
 	 * @ejb.permission role-name="_Guest_"
 	 */
@@ -178,7 +178,7 @@ implements SessionBean
 	}
 
 	/**
-	 * @ejb.interface-method view-type="local"
+	 * @!ejb.interface-method view-type="local"
 	 * @ejb.transaction type="RequiresNew"
 	 * @ejb.permission role-name="_Guest_"
 	 */
@@ -227,7 +227,7 @@ implements SessionBean
 	}
 
 	/**
-	 * @ejb.interface-method view-type="local"
+	 * @!ejb.interface-method view-type="local"
 	 * @ejb.transaction type="RequiresNew"
 	 * @ejb.permission role-name="_Guest_"
 	 */
@@ -288,7 +288,7 @@ implements SessionBean
 	}
 
 	/**
-	 * @ejb.interface-method view-type="local"
+	 * @!ejb.interface-method view-type="local"
 	 * @ejb.transaction type="RequiresNew"
 	 * @ejb.permission role-name="_Guest_"
 	 */
@@ -297,6 +297,8 @@ implements SessionBean
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
+			User user = User.getUser(pm, getPrincipal());
+
 			for (Map.Entry<String, ? extends Collection<ProductID>> me1 : organisationID2productIDs.entrySet()) {
 //				String partnerOrganisationID = me1.getKey();
 				List<Product> products = NLJDOHelper.getObjectList(pm, me1.getValue(), Product.class);
@@ -318,7 +320,7 @@ implements SessionBean
 				}
 
 				for (Map.Entry<CrossTradeDeliveryCoordinator, Set<Article>> me2 : crossTradeDeliveryCoordinator2reversingArticles.entrySet())
-					me2.getKey().performCrossTradeDelivery(me2.getValue());
+					me2.getKey().performCrossTradeDelivery(user, me2.getValue());
 
 			} // for (Map.Entry<String, ? extends Collection<ProductID>> me1 : organisationID2productIDs.entrySet()) {
 		} finally {

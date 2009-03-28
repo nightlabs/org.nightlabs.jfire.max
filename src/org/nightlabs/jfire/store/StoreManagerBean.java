@@ -61,6 +61,7 @@ import org.nightlabs.jfire.accounting.Accounting;
 import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.accounting.id.InvoiceID;
 import org.nightlabs.jfire.asyncinvoke.AsyncInvoke;
+import org.nightlabs.jfire.asyncinvoke.AsyncInvokeEnqueueException;
 import org.nightlabs.jfire.asyncinvoke.Invocation;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.config.ConfigSetup;
@@ -83,6 +84,7 @@ import org.nightlabs.jfire.store.deliver.CrossTradeDeliveryCoordinator;
 import org.nightlabs.jfire.store.deliver.Delivery;
 import org.nightlabs.jfire.store.deliver.DeliveryData;
 import org.nightlabs.jfire.store.deliver.DeliveryException;
+import org.nightlabs.jfire.store.deliver.DeliveryHelperBean;
 import org.nightlabs.jfire.store.deliver.DeliveryHelperLocal;
 import org.nightlabs.jfire.store.deliver.DeliveryHelperUtil;
 import org.nightlabs.jfire.store.deliver.DeliveryQueue;
@@ -96,6 +98,7 @@ import org.nightlabs.jfire.store.deliver.ServerDeliveryProcessorJFire;
 import org.nightlabs.jfire.store.deliver.ServerDeliveryProcessorMailingPhysicalDefault;
 import org.nightlabs.jfire.store.deliver.ServerDeliveryProcessorManual;
 import org.nightlabs.jfire.store.deliver.ServerDeliveryProcessorNonDelivery;
+import org.nightlabs.jfire.store.deliver.DeliveryHelperBean.ConsolidateProductReferencesInvocation;
 import org.nightlabs.jfire.store.deliver.ModeOfDeliveryFlavour.ModeOfDeliveryFlavourProductTypeGroup;
 import org.nightlabs.jfire.store.deliver.ModeOfDeliveryFlavour.ModeOfDeliveryFlavourProductTypeGroupCarrier;
 import org.nightlabs.jfire.store.deliver.config.ModeOfDeliveryConfigModule;
@@ -1185,13 +1188,93 @@ implements SessionBean
 		}
 	}
 
+
+	/**
+	 * Perform all delivery-steps in one single transaction. This is used for fast
+	 * cross-organisation-deliveries (internally within the JFire network).
+	 * @throws DeliveryException if the delivery fails. Note that this (like any other exception) causes the complete transaction
+	 * 		to be rolled back and (in contrast to the usual multi-step-delivery) all traces in the database to be deleted.
+	 *
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="org.nightlabs.jfire.store.deliver"
+	 */
+	public DeliveryResult[] deliverInSingleTransaction(DeliveryData deliveryData)
+	throws DeliveryException
+	{
+		if (deliveryData == null)
+			throw new IllegalArgumentException("deliveryData == null");
+
+		{
+			Delivery delivery = deliveryData.getDelivery();
+			if (delivery == null)
+				throw new IllegalArgumentException("deliveryData.getDelivery() == null");
+
+			if (delivery.getDeliverBeginClientResult() == null)
+				throw new IllegalArgumentException("deliveryData.getDelivery().getDeliverBeginClientResult() == null");
+
+			if (delivery.getDeliverDoWorkClientResult() == null)
+				throw new IllegalArgumentException("deliveryData.getDelivery().getDeliverDoWorkClientResult() == null");
+
+			if (delivery.getDeliverEndClientResult() == null)
+				throw new IllegalArgumentException("deliveryData.getDelivery().getDeliverEndClientResult() == null");
+		}
+
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			DeliveryResult[] result = new DeliveryResult[3];
+
+			User user = User.getUser(pm, getPrincipal());
+			deliveryData = DeliveryHelperBean.deliverBegin_storeDeliveryData(pm, user, deliveryData);
+			DeliveryID deliveryID = (DeliveryID) JDOHelper.getObjectId(deliveryData.getDelivery());
+			if (deliveryID == null)
+				throw new IllegalStateException("JDOHelper.getObjectId(deliveryData.getDelivery()) returned null!");
+
+			DeliveryResult deliverBeginServerResult = Store.getStore(pm).deliverBegin(user, deliveryData);
+			deliverBeginServerResult = pm.makePersistent(deliverBeginServerResult);
+			deliveryData.getDelivery().setDeliverBeginServerResult(deliverBeginServerResult);
+			result[0] = deliverBeginServerResult;
+			if (deliverBeginServerResult.isFailed())
+				throw new DeliveryException(deliverBeginServerResult);
+
+			DeliveryResult deliverDoWorkServerResult = Store.getStore(pm).deliverDoWork(user, deliveryData);
+			deliverDoWorkServerResult = pm.makePersistent(deliverDoWorkServerResult);
+			deliveryData.getDelivery().setDeliverDoWorkServerResult(deliverDoWorkServerResult);
+			result[1] = deliverDoWorkServerResult;
+			if (deliverDoWorkServerResult.isFailed())
+				throw new DeliveryException(deliverDoWorkServerResult);
+
+			DeliveryResult deliverEndServerResult = Store.getStore(pm).deliverEnd(user, deliveryData);
+
+			if (deliveryData.getDelivery().isFailed()) { // FIXME this is already called within deliverEnd - should it really be called twice?!?! Marco.
+				Store.getStore(pm).deliverRollback(user, deliveryData);
+			}
+
+			deliverEndServerResult = pm.makePersistent(deliverEndServerResult);
+			deliveryData.getDelivery().setDeliverEndServerResult(deliverEndServerResult);
+			result[2] = deliverEndServerResult;
+			if (deliverEndServerResult.isFailed())
+				throw new DeliveryException(deliverEndServerResult);
+
+			Collection<DeliveryNoteID> deliveryNoteIDs = deliveryData.getDelivery().getDeliveryNoteIDs();
+			try {
+				AsyncInvoke.exec(new CrossTradeDeliverInvocation(deliveryID), true);
+				AsyncInvoke.exec(new ConsolidateProductReferencesInvocation(deliveryNoteIDs, 5000), true);
+			} catch (AsyncInvokeEnqueueException e) {
+				throw new RuntimeException(e);
+			}
+
+			return result;
+		} finally {
+			pm.close();
+		}
+	}
+
+
 	/**
 	 * @param serverDeliveryProcessorID Might be <tt>null</tt>.
 	 * @param deliveryDirection Either
 	 *		{@link ServerDeliveryProcessor#DELIVERY_DIRECTION_INCOMING}
 	 *		or {@link ServerDeliveryProcessor#DELIVERY_DIRECTION_OUTGOING}.
-	 *
-	 * @throws ModuleException
 	 *
 	 * @see Store#deliverBegin(User, DeliveryData)
 	 *
@@ -1593,6 +1676,7 @@ implements SessionBean
 			PersistenceManager pm = getPersistenceManager();
 			try {
 				String localOrganisationID = getOrganisationID();
+				User user = User.getUser(pm, getPrincipal());
 
 				//			Map<Class, Map<String, Map<Boolean, Set<Article>>>> productTypeClass2organisationID2articleSet = null;
 				Map<CrossTradeDeliveryCoordinator, Map<String, Map<Boolean, Set<Article>>>> productTypeClass2organisationID2articleSet = null;
@@ -1675,7 +1759,7 @@ implements SessionBean
 								if (backhandOffer == null)
 									throw new IllegalStateException("Cannot find backhand-Offer for local Article \"" + article.getPrimaryKey() + "\" + and nestedProductLocal \"" + nestedProductLocal.getPrimaryKey() + "\" and partnerLegalEntity \"" + partner.getPrimaryKey() + "\"");
 
-								Article backhandArticle = Article.getArticle(pm, backhandOffer, nestedProductLocal.getProduct());
+								Article backhandArticle = Article.getAllocatedArticle(pm, backhandOffer, nestedProductLocal.getProduct());
 								if (backhandArticle == null)
 									throw new IllegalStateException("Cannot find backhand-Article for local Article \"" + article.getPrimaryKey() + "\" + and nestedProductLocal \"" + nestedProductLocal.getPrimaryKey() + "\"");
 
@@ -1704,7 +1788,7 @@ implements SessionBean
 								// Because of transactional problems, crossTradeDeliveryCoordinator.performCrossTradeDelivery(...) will spawn an additional AsyncInvoke
 								// In the long run, we should implement a special "fast-track-delivery" which will be used between organisations and work within one
 								// transaction. See javadoc of the performCrossTradeDelivery method.
-								crossTradeDeliveryCoordinator.performCrossTradeDelivery(backhandArticles);
+								crossTradeDeliveryCoordinator.performCrossTradeDelivery(user, backhandArticles);
 							}
 						}
 					}

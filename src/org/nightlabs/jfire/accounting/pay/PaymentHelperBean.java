@@ -27,7 +27,6 @@
 package org.nightlabs.jfire.accounting.pay;
 
 import java.rmi.RemoteException;
-import java.util.Collection;
 
 import javax.ejb.CreateException;
 import javax.ejb.EJBException;
@@ -86,7 +85,7 @@ implements SessionBean
 	}
 	/**
 	 * @see javax.ejb.SessionBean#ejbRemove()
-	 * 
+	 *
 	 * @ejb.permission unchecked="true"
 	 */
 	public void ejbRemove() throws EJBException, RemoteException
@@ -116,7 +115,7 @@ implements SessionBean
 
 			// PaymentLocal registers itself with Payment
 			new PaymentLocal(paymentData.getPayment());
-			
+
 			paymentData.getPayment().initUser(User.getUser(pm, getPrincipal()));
 			paymentData = pm.makePersistent(paymentData);
 
@@ -158,8 +157,9 @@ implements SessionBean
 			PaymentResult payBeginServerResult = Accounting.getAccounting(pm).payBegin(
 					user, paymentData);
 
-			if (!JDOHelper.isPersistent(payBeginServerResult))
-				payBeginServerResult = pm.makePersistent(payBeginServerResult);
+//			if (!JDOHelper.isPersistent(payBeginServerResult))
+//				payBeginServerResult = pm.makePersistent(payBeginServerResult);
+			payBeginServerResult = pm.makePersistent(payBeginServerResult);
 			paymentData.getPayment().setPayBeginServerResult(payBeginServerResult);
 
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
@@ -195,7 +195,7 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * @ejb.interface-method view-type="local"
 	 * @ejb.transaction type="RequiresNew"
@@ -217,8 +217,9 @@ implements SessionBean
 					paymentData
 					);
 
-			if (!JDOHelper.isPersistent(payDoWorkServerResult))
-				payDoWorkServerResult = pm.makePersistent(payDoWorkServerResult);
+//			if (!JDOHelper.isPersistent(payDoWorkServerResult))
+//				payDoWorkServerResult = pm.makePersistent(payDoWorkServerResult);
+			payDoWorkServerResult = pm.makePersistent(payDoWorkServerResult);
 			paymentData.getPayment().setPayDoWorkServerResult(payDoWorkServerResult);
 
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
@@ -259,11 +260,12 @@ implements SessionBean
 				Accounting.getAccounting(pm).payRollback(user, paymentData);
 			}
 
-			if (!JDOHelper.isPersistent(payEndServerResult))
-				payEndServerResult = pm.makePersistent(payEndServerResult);
+//			if (!JDOHelper.isPersistent(payEndServerResult))
+//				payEndServerResult = pm.makePersistent(payEndServerResult);
+
+			payEndServerResult = pm.makePersistent(payEndServerResult);
 			paymentData.getPayment().setPayEndServerResult(payEndServerResult);
-			// get InvoiceIDs
-			Collection invoiceIDs = paymentData.getPayment().getInvoiceIDs();
+			paymentData.getPayment().getInvoiceIDs();
 
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
@@ -340,7 +342,7 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * @ejb.interface-method view-type="local"
 	 * @ejb.transaction type="RequiresNew"

@@ -36,7 +36,6 @@ import java.util.Set;
 
 import javax.jdo.JDODetachedFieldAccessException;
 import javax.jdo.JDOHelper;
-import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 import javax.jdo.listener.DeleteCallback;
@@ -58,7 +57,6 @@ import org.nightlabs.jfire.store.Product;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.ReceptionNote;
 import org.nightlabs.jfire.store.id.DeliveryNoteID;
-import org.nightlabs.jfire.store.id.ProductID;
 import org.nightlabs.jfire.store.id.ReceptionNoteID;
 import org.nightlabs.jfire.trade.id.ArticleID;
 import org.nightlabs.jfire.trade.id.OfferID;
@@ -131,8 +129,8 @@ import org.nightlabs.util.Util;
  * @!jdo.fetch-group name="FetchGroupsTrade.articleInDeliveryNoteEditor" fields="segment, productType, product, tariff, price, order, offer, invoice"
  *
  * @jdo.query
- *		name="getArticleByOfferAndProduct"
- *		query="SELECT UNIQUE WHERE this.offer == :offer && this.product == :product"
+ *		name="getAllocatedArticleByOfferAndProduct"
+ *		query="SELECT UNIQUE WHERE this.offer == :offer && this.product == :product && this.allocated"
  *
  * @jdo.query
  *		name="getArticlesByProduct"
@@ -172,37 +170,37 @@ implements Serializable, DeleteCallback, DetachCallback, StoreCallback
 	public static final String FETCH_GROUP_VENDOR_ID = "Article.vendorID";
 	public static final String FETCH_GROUP_CUSTOMER_ID = "Article.customerID";
 
-	/**
-	 * @param pm The {@link PersistenceManager} used to access the datastore.
-	 * @param offerID The ID of the {@link Offer}.
-	 * @param productID The ID of the {@link Product}.
-	 * @return Either <code>null</code>, if the specified IDs don't match an {@link Article} or the {@link Article} which references the
-	 *		specified <code>Product</code> within the specified <code>Offer</code>. Note, that <code>null</code> is returned, too, if no
-	 *		<code>Offer</code> with the specified <code>offerID</code> exists, or no <code>Product</code> with the specified <code>productID</code> exists.
-	 */
-	public static Article getArticle(PersistenceManager pm, OfferID offerID, ProductID productID)
-	{
-		pm.getExtent(Offer.class); pm.getExtent(Product.class);
-		Offer offer; Product product;
-		try {
-			offer = (Offer) pm.getObjectById(offerID);
-			product = (Product) pm.getObjectById(productID);
-		} catch (JDOObjectNotFoundException x) {
-			return null;
-		}
-		return getArticle(pm, offer, product);
-	}
+//	/**
+//	 * @param pm The {@link PersistenceManager} used to access the datastore.
+//	 * @param offerID The ID of the {@link Offer}.
+//	 * @param productID The ID of the {@link Product}.
+//	 * @return Either <code>null</code>, if the specified IDs don't match an {@link Article} or the {@link Article} which references the
+//	 *		specified <code>Product</code> within the specified <code>Offer</code>. Note, that <code>null</code> is returned, too, if no
+//	 *		<code>Offer</code> with the specified <code>offerID</code> exists, or no <code>Product</code> with the specified <code>productID</code> exists.
+//	 */
+//	public static Article getArticle(PersistenceManager pm, OfferID offerID, ProductID productID)
+//	{
+//		pm.getExtent(Offer.class); pm.getExtent(Product.class);
+//		Offer offer; Product product;
+//		try {
+//			offer = (Offer) pm.getObjectById(offerID);
+//			product = (Product) pm.getObjectById(productID);
+//		} catch (JDOObjectNotFoundException x) {
+//			return null;
+//		}
+//		return getArticle(pm, offer, product);
+//	}
 
 	/**
 	 * @param pm The {@link PersistenceManager} used to access the datastore.
 	 * @param offer The {@link Offer} containing the searched <code>Article</code>.
 	 * @param product The {@link Product} referenced by the searched <code>Article</code>.
-	 * @return Either <code>null</code>, if no {@link Article} can be found matching the
+	 * @return Either <code>null</code>, if no allocated {@link Article} can be found matching the
 	 *		specified <code>Product</code> within the specified <code>Offer</code>.
 	 */
-	public static Article getArticle(PersistenceManager pm, Offer offer, Product product)
+	public static Article getAllocatedArticle(PersistenceManager pm, Offer offer, Product product)
 	{
-		Query q = pm.newNamedQuery(Article.class, "getArticleByOfferAndProduct");
+		Query q = pm.newNamedQuery(Article.class, "getAllocatedArticleByOfferAndProduct");
 		return (Article) q.execute(offer, product);
 	}
 

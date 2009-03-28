@@ -75,7 +75,7 @@ extends BaseSessionBeanImpl
 implements SessionBean
 {
 	private static final long serialVersionUID = 1L;
-	
+
 	private static final Logger logger = Logger.getLogger(DeliveryHelperBean.class);
 
 	@Override
@@ -100,6 +100,28 @@ implements SessionBean
 	public void ejbRemove() throws EJBException, RemoteException
 	{
 		logger.debug(this.getClass().getName() + ".ejbRemove()");
+	}
+
+	public static DeliveryData deliverBegin_storeDeliveryData(PersistenceManager pm, User user, DeliveryData deliveryData)
+	{
+		// DeliveryLocal registers itself with the Delivery
+		new DeliveryLocal(deliveryData.getDelivery());
+
+		deliveryData.getDelivery().initUser(user);
+		deliveryData = pm.makePersistent(deliveryData);
+
+		if (deliveryData.getDelivery().getPartner() == null) {
+			String mandatorPK = Store.getStore(pm).getMandator().getPrimaryKey();
+			DeliveryNote deliveryNote = deliveryData.getDelivery().getDeliveryNotes().iterator().next();
+
+			LegalEntity partner = deliveryNote.getCustomer();
+			if (mandatorPK.equals(partner.getPrimaryKey()))
+				partner = deliveryNote.getVendor();
+
+			deliveryData.getDelivery().setPartner(partner);
+		}
+
+		return deliveryData;
 	}
 
 	/**
@@ -128,23 +150,23 @@ implements SessionBean
 //				deliveryData = (DeliveryData) pm.attachCopy(deliveryData, false);
 //			else
 
-			// DeliveryLocal registers itself with the Delivery
-			new DeliveryLocal(deliveryData.getDelivery());
-			
-			deliveryData.getDelivery().initUser(User.getUser(pm, getPrincipal()));
-			deliveryData = pm.makePersistent(deliveryData);
-
-			if (deliveryData.getDelivery().getPartner() == null) {
-				String mandatorPK = Store.getStore(pm).getMandator().getPrimaryKey();
-				DeliveryNote deliveryNote = deliveryData.getDelivery().getDeliveryNotes().iterator().next();
-
-				LegalEntity partner = deliveryNote.getCustomer();
-				if (mandatorPK.equals(partner.getPrimaryKey()))
-					partner = deliveryNote.getVendor();
-
-				deliveryData.getDelivery().setPartner(partner);
-			}
-
+//			// DeliveryLocal registers itself with the Delivery
+//			new DeliveryLocal(deliveryData.getDelivery());
+//
+//			deliveryData.getDelivery().initUser(User.getUser(pm, getPrincipal()));
+//			deliveryData = pm.makePersistent(deliveryData);
+//
+//			if (deliveryData.getDelivery().getPartner() == null) {
+//				String mandatorPK = Store.getStore(pm).getMandator().getPrimaryKey();
+//				DeliveryNote deliveryNote = deliveryData.getDelivery().getDeliveryNotes().iterator().next();
+//
+//				LegalEntity partner = deliveryNote.getCustomer();
+//				if (mandatorPK.equals(partner.getPrimaryKey()))
+//					partner = deliveryNote.getVendor();
+//
+//				deliveryData.getDelivery().setPartner(partner);
+//			}
+			deliveryData = deliverBegin_storeDeliveryData(pm, User.getUser(pm, getPrincipal()), deliveryData);
 			return (DeliveryDataID) JDOHelper.getObjectId(deliveryData);
 		} finally {
 			pm.close();
@@ -154,7 +176,7 @@ implements SessionBean
 		}
 	}
 
-	
+
 	/**
 	 * @ejb.interface-method view-type="local"
 	 * @ejb.transaction type="RequiresNew"
@@ -173,11 +195,12 @@ implements SessionBean
 			DeliveryData deliveryData = (DeliveryData) pm.getObjectById(deliveryDataID);
 
 			// delegate to Store
-			DeliveryResult deliverBeginServerResult = Store.getStore(pm).deliverBegin(
-					user, deliveryData);
+			DeliveryResult deliverBeginServerResult = Store.getStore(pm).deliverBegin(user, deliveryData);
 
-			if (!JDOHelper.isPersistent(deliverBeginServerResult))
-				deliverBeginServerResult = pm.makePersistent(deliverBeginServerResult);
+//			if (!JDOHelper.isPersistent(deliverBeginServerResult))
+//				deliverBeginServerResult = pm.makePersistent(deliverBeginServerResult);
+
+			deliverBeginServerResult = pm.makePersistent(deliverBeginServerResult);
 			deliveryData.getDelivery().setDeliverBeginServerResult(deliverBeginServerResult);
 
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
@@ -234,8 +257,9 @@ implements SessionBean
 					deliveryData
 					);
 
-			if (!JDOHelper.isPersistent(deliverDoWorkServerResult))
-				deliverDoWorkServerResult = pm.makePersistent(deliverDoWorkServerResult);
+//			if (!JDOHelper.isPersistent(deliverDoWorkServerResult))
+//				deliverDoWorkServerResult = pm.makePersistent(deliverDoWorkServerResult);
+			deliverDoWorkServerResult = pm.makePersistent(deliverDoWorkServerResult);
 			deliveryData.getDelivery().setDeliverDoWorkServerResult(deliverDoWorkServerResult);
 
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
@@ -275,8 +299,9 @@ implements SessionBean
 				Store.getStore(pm).deliverRollback(user, deliveryData);
 			}
 
-			if (!JDOHelper.isPersistent(deliverEndServerResult))
-				deliverEndServerResult = pm.makePersistent(deliverEndServerResult);
+//			if (!JDOHelper.isPersistent(deliverEndServerResult))
+//				deliverEndServerResult = pm.makePersistent(deliverEndServerResult);
+			deliverEndServerResult = pm.makePersistent(deliverEndServerResult);
 			deliveryData.getDelivery().setDeliverEndServerResult(deliverEndServerResult);
 
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
@@ -423,7 +448,7 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * @ejb.interface-method view-type="local"
 	 * @ejb.transaction type="RequiresNew"

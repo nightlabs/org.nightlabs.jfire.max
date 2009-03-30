@@ -66,7 +66,6 @@ import org.nightlabs.jfire.issue.query.IssueQuery;
 import org.nightlabs.jfire.jbpm.JbpmLookup;
 import org.nightlabs.jfire.jbpm.graph.def.State;
 import org.nightlabs.jfire.person.PersonStruct;
-import org.nightlabs.jfire.person.PersonStructValidationInitialiser;
 import org.nightlabs.jfire.prop.datafield.TextDataField;
 import org.nightlabs.jfire.query.store.BaseQueryStore;
 import org.nightlabs.jfire.security.SecurityReflector;
@@ -1242,6 +1241,9 @@ implements SessionBean
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
+			UserID systemUserID = UserID.create(getOrganisationID(), getUserID());
+			User systemUser = (User)pm.getObjectById(systemUserID);
+			
 			// WORKAROUND JPOX Bug to avoid problems with creating workflows as State.statable is defined as interface and has subclassed implementations
 			pm.getExtent(Issue.class);
 
@@ -1560,6 +1562,7 @@ implements SessionBean
 			issue1.setIssuePriority(issuePriorityHigh);
 			issue1.setIssueResolution(issueResolutionOpen);
 			issue1.setIssueSeverityType(issueSeverityTypeMinor);
+			issue1.setReporter(systemUser);
 			IssueSubject subject1 = new IssueSubject(issue1);
 			subject1.readFromProperties(baseName, loader,
 			"org.nightlabs.jfire.issue.IssueManagerBean.subject1"); //$NON-NLS-1$	
@@ -1571,6 +1574,7 @@ implements SessionBean
 			issue2.setIssuePriority(issuePriorityHigh);
 			issue2.setIssueResolution(issueResolutionOpen);
 			issue2.setIssueSeverityType(issueSeverityTypeMinor);
+			issue2.setReporter(systemUser);
 			IssueSubject subject2 = new IssueSubject(issue2);
 			subject2.readFromProperties(baseName, loader,
 			"org.nightlabs.jfire.issue.IssueManagerBean.subject2"); //$NON-NLS-1$	
@@ -1582,6 +1586,7 @@ implements SessionBean
 			issue3.setIssuePriority(issuePriorityHigh);
 			issue3.setIssueResolution(issueResolutionOpen);
 			issue3.setIssueSeverityType(issueSeverityTypeMinor);
+			issue3.setReporter(systemUser);
 			IssueSubject subject3 = new IssueSubject(issue3);
 			subject3.readFromProperties(baseName, loader,
 			"org.nightlabs.jfire.issue.IssueManagerBean.subject3"); //$NON-NLS-1$	
@@ -1593,6 +1598,7 @@ implements SessionBean
 			issue4.setIssuePriority(issuePriorityHigh);
 			issue4.setIssueResolution(issueResolutionOpen);
 			issue4.setIssueSeverityType(issueSeverityTypeMinor);
+			issue4.setReporter(systemUser);
 			IssueSubject subject4 = new IssueSubject(issue4);
 			subject4.readFromProperties(baseName, loader,
 			"org.nightlabs.jfire.issue.IssueManagerBean.subject4"); //$NON-NLS-1$	
@@ -1604,6 +1610,7 @@ implements SessionBean
 			issue5.setIssuePriority(issuePriorityHigh);
 			issue5.setIssueResolution(issueResolutionOpen);
 			issue5.setIssueSeverityType(issueSeverityTypeMinor);
+			issue5.setReporter(systemUser);
 			IssueSubject subject5 = new IssueSubject(issue5);
 			subject5.readFromProperties(baseName, loader,
 			"org.nightlabs.jfire.issue.IssueManagerBean.subject5"); //$NON-NLS-1$	
@@ -1620,11 +1627,8 @@ implements SessionBean
 
 			IssueQuery modifiedIssueIssueQuery = new IssueQuery();
 
-			//1
+			//1 Unassigned Issues
 			pm.getExtent(BaseQueryStore.class);
-			
-			UserID systemUserID = UserID.create(getOrganisationID(), getUserID());
-			User systemUser = (User)pm.getObjectById(systemUserID);
 			
 			QueryCollection<IssueQuery> queryCollection = new QueryCollection<IssueQuery>(Issue.class);
 			queryCollection.add(unassignedIssueIssueQuery);
@@ -1640,7 +1644,7 @@ implements SessionBean
 			queryStore.serialiseCollection();
 			queryStore = pm.makePersistent(queryStore);
 
-			//2
+			//2 Resolved Issues
 			queryCollection = new QueryCollection<IssueQuery>(Issue.class);
 			queryCollection.add(resolvedIssueIssueQuery);
 			

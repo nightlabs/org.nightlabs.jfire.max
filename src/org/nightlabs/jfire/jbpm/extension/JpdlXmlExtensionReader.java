@@ -11,6 +11,7 @@ import java.util.List;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.apache.log4j.Logger;
 import org.jbpm.graph.def.Transition;
 import org.jbpm.graph.node.NodeTypes;
 import org.jbpm.jpdl.JpdlException;
@@ -22,8 +23,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
-
-import org.apache.log4j.Logger;
 
 /**
  * this class reads and parse an XML process definition Extension file, it does loads the
@@ -49,7 +48,7 @@ public class JpdlXmlExtensionReader implements ProblemListener {
 	private static final List<String> PUBLIC_STATE_NODE_NAMES = Arrays.asList(new String[] {
 			"start-state", "end-state", "state", "node"
 	});
-	
+
 	public ExtendedProcessDefinitionDescriptor getExtendedProcessDefinitionDescriptor() {
 		ExtendedProcessDefinitionDescriptor descriptor = new ExtendedProcessDefinitionDescriptor();
 		readProcessDefinitionExtension(descriptor);
@@ -176,11 +175,11 @@ public class JpdlXmlExtensionReader implements ProblemListener {
 		String nodeAttr = element.getAttribute(attribute);
 		if (nodeAttr == null || nodeAttr.isEmpty())
 			return false;
-		
+
 		return Boolean.parseBoolean(nodeAttr);
 	}
-	
-	
+
+
 	/**
 	 * Reads the extensions of the given element (uses {@link #parseElementExtensions(Element, String)})
 	 * and recurses to read the extensions of sub-elements.
@@ -216,57 +215,73 @@ public class JpdlXmlExtensionReader implements ProblemListener {
 		}
 	}
 
-	
+
 	/**
 	 * Builds the {@link ExtendedNodeDescriptor} from the extension nodes
 	 * found in the given element and puts it into the map under the given nodeID.
 	 * 
-	 * @param element The element to create the descriptor for.
+	 * @param parentElement The element to create the descriptor for.
 	 * @param nodeID The id the descriptor should be stored under.
 	 */
-	private ExtendedNodeDescriptor parseElementExtensions(Element element, String nodeID) {
-		I18nTextBuffer buffer = new I18nTextBuffer();
-		I18nTextBuffer name = new I18nTextBuffer();
-		String iconFile = "";		
-		
-		// create descriptor
-		ExtendedNodeDescriptor nodeDescriptor = new ExtendedNodeDescriptor(nodeID, name, buffer);
-		
+	private ExtendedNodeDescriptor parseElementExtensions(Element parentElement, String nodeID) {
+		I18nTextBuffer descriptionBuffer = new I18nTextBuffer();
+		I18nTextBuffer nameBuffer = new I18nTextBuffer();
+		String iconFileName = "";		
+
 		// read names
-		NodeList nameElements = element.getElementsByTagName("name");
+		NodeList nameElements = parentElement.getElementsByTagName("name");
 		for (int i = 0; i < nameElements.getLength(); i++) {
 			Element nameElement = (Element) nameElements.item(i);
-			String languageID = nameElement.getAttribute("language");
-			if (languageID == null || languageID.isEmpty()) {
-				throw new IllegalStateException("Found name element with invalid/no language attribute for element " + element.getNodeName() + "(name=" + element.getAttribute("name") + ").");
-			}
-			String value = nameElement.getTextContent();
-			name.setText(languageID, value);
-		}
+			// add the child elements only and not the sub children
+			if(nameElement.getParentNode() == parentElement) 
+			{
+				String languageID = nameElement.getAttribute("language");
+				if (languageID == null || languageID.isEmpty()) {
+					throw new IllegalStateException("Found name element with invalid/no language attribute for element " + parentElement.getNodeName() + "(name=" + parentElement.getAttribute("name") + ").");
+				}
+				// prevent the duplication of names of the same lanuage ID
+				if(nameBuffer.getLanguageIDs().contains(languageID))
+					throw new IllegalStateException("you cant have a duplicate name of the same lanuage ID "
+							+ parentElement.getNodeName() + "(name=" + parentElement.getAttribute("name") + ").");
 
+				String value = nameElement.getTextContent();
+				nameBuffer.setText(languageID, value);
+
+			}
+		}
 		// read descriptions
-		NodeList descriptionElements = element.getElementsByTagName("description");
+		NodeList descriptionElements = parentElement.getElementsByTagName("description");
 		for (int i = 0; i < descriptionElements.getLength(); i++) {
 			Element descriptionElement = (Element) descriptionElements.item(i);
-			String languageID = descriptionElement.getAttribute("language");
-			if (languageID == null || languageID.isEmpty()) {
-				throw new IllegalStateException("Found name element with invalid/no language attribute for element " + element.getNodeName() + "(name=" + element.getAttribute("name") + ").");
+			// add the child elements only and not the sub children
+			if(descriptionElement.getParentNode() == parentElement)
+			{
+				String languageID = descriptionElement.getAttribute("language");
+				if (languageID == null || languageID.isEmpty()) {
+					throw new IllegalStateException("Found name element with invalid/no language attribute for element " + parentElement.getNodeName() + "(name=" + parentElement.getAttribute("name") + ").");
+				}
+				// prevent the duplication of description of the same lanuage ID
+				if(descriptionBuffer.getLanguageIDs().contains(languageID))
+					throw new IllegalStateException("you cant have a duplicate description of the same lanuage ID "
+							+ parentElement.getNodeName() + "(name=" + parentElement.getAttribute("name") + ").");
+
+				String value = descriptionElement.getTextContent();
+				descriptionBuffer.setText(languageID, value);
 			}
-			String value = descriptionElement.getTextContent();
-			buffer.setText(languageID, value);
 		}
-
 		// read icon file name 
-		Element iconElement = (Element) NLDOMUtil.findSingleNode(element, "icon");
+		Element iconElement = (Element) NLDOMUtil.findSingleNode(parentElement, "icon");
 		if (iconElement != null) {
-			iconFile = iconElement.getAttribute("file");
+			iconFileName = iconElement.getAttribute("file");
 		}
+		// create descriptor
+		ExtendedNodeDescriptor nodeDescriptor = new ExtendedNodeDescriptor(nodeID, nameBuffer, descriptionBuffer);
+		nodeDescriptor.setIconFile(iconFileName); // set the icon file
 
-		nodeDescriptor.setIconFile(iconFile); // set the icon file
 		// set the userExecutable attribute for a transition.
-		if(element.getNodeName().equals("transition"))	
+		if(parentElement.getNodeName().equals("transition"))	
 		{	
-			String userExecutable = element.getAttribute( "userExecutable");
+			String userExecutable = parentElement.getAttribute( "userExecutable");
 			if (userExecutable == null || userExecutable.isEmpty()) 
 				// The default value of 'userExecutable' should be true if not defined.
 				nodeDescriptor.setUserExecutable(true);  
@@ -275,10 +290,10 @@ public class JpdlXmlExtensionReader implements ProblemListener {
 		}
 		else
 		{	
-			if(PUBLIC_STATE_NODE_NAMES.contains(element.getNodeName()))
+			if(PUBLIC_STATE_NODE_NAMES.contains(parentElement.getNodeName()))
 			{
 				// set publicState for the node 
-				String publicState = element.getAttribute( "publicState");
+				String publicState = parentElement.getAttribute( "publicState");
 				if (publicState == null || publicState.isEmpty()) 
 					// The default value of 'publicState' should be false if not defined.
 					nodeDescriptor.setPublicState(false);

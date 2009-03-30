@@ -561,15 +561,10 @@ implements Serializable, DeleteCallback, DetachCallback, StoreCallback
 	 */
 	private boolean reversingArticleID_detached = false;
 
-	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 */
-	private Article referencedArticle = null;
-
 //	/**
 //	 * @jdo.field persistence-modifier="persistent"
 //	 */
-//	private Date autoReleaseDT = null;
+//	private Article referencedArticle = null;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -678,27 +673,27 @@ implements Serializable, DeleteCallback, DetachCallback, StoreCallback
 		this.currency = offer.getCurrency();
 	}
 
-	/**
-	 * This constructor creates a referencing article. This is used to cancel
-	 * an Invoice or a DeliveryNote. In this case, all Articles within the cancelled
-	 * Invoice/DeliveryNote are replaced by referencingArticles.
-	 *
-	 * @see #createReferencingArticle(User)
-	 */
-	protected Article(User user, long articleID, Article referencedArticle)
-	{
-		init(user, referencedArticle.getOffer(), referencedArticle.getSegment(), articleID);
-
-		this.setReferencedArticle(referencedArticle);
-		this.productType = referencedArticle.getProductType();
-		this.product = referencedArticle.getProduct();
-		this.tariff = referencedArticle.getTariff();
-		this.price = referencedArticle.getPrice(); // the price is immutable, so we can share it
-
-		this.allocated = referencedArticle.isAllocated();
-		this.allocationPending = referencedArticle.isAllocationPending();
-		this.releasePending = referencedArticle.isReleasePending();
-	}
+//	/**
+//	 * This constructor creates a referencing article. This is used to cancel
+//	 * an Invoice or a DeliveryNote. In this case, all Articles within the cancelled
+//	 * Invoice/DeliveryNote are replaced by referencingArticles.
+//	 *
+//	 * @see #createReferencingArticle(User)
+//	 */
+//	protected Article(User user, long articleID, Article referencedArticle)
+//	{
+//		init(user, referencedArticle.getOffer(), referencedArticle.getSegment(), articleID);
+//
+//		this.setReferencedArticle(referencedArticle);
+//		this.productType = referencedArticle.getProductType();
+//		this.product = referencedArticle.getProduct();
+//		this.tariff = referencedArticle.getTariff();
+//		this.price = referencedArticle.getPrice(); // the price is immutable, so we can share it
+//
+//		this.allocated = referencedArticle.isAllocated();
+//		this.allocationPending = referencedArticle.isAllocationPending();
+//		this.releasePending = referencedArticle.isReleasePending();
+//	}
 
 	/**
 	 * This constructor is used to create a new Article which reverses a previously
@@ -1168,23 +1163,23 @@ implements Serializable, DeleteCallback, DetachCallback, StoreCallback
 		this.reversed = reversingArticle != null;
 	}
 
-	protected void setReferencedArticle(Article referencedArticle)
-	{
-		if (this.referencedArticle != null)
-			throw new IllegalStateException("this.referencedArticle != null !!! Cannot re-assign.");
-
-		this.referencedArticle = referencedArticle;
-	}
-
-	public Article createReferencingArticle(User user)
-	{
-		return new Article(user, IDGenerator.nextID(Article.class), this);
-	}
-
-	public Article getReferencedArticle()
-	{
-		return referencedArticle;
-	}
+//	protected void setReferencedArticle(Article referencedArticle)
+//	{
+//		if (this.referencedArticle != null)
+//			throw new IllegalStateException("this.referencedArticle != null !!! Cannot re-assign.");
+//
+//		this.referencedArticle = referencedArticle;
+//	}
+//
+//	public Article createReferencingArticle(User user)
+//	{
+//		return new Article(user, IDGenerator.nextID(Article.class), this);
+//	}
+//
+//	public Article getReferencedArticle()
+//	{
+//		return referencedArticle;
+//	}
 
 	/**
 	 * @return Whether or not this Article has already been reversed. Returns <code>true</code>,

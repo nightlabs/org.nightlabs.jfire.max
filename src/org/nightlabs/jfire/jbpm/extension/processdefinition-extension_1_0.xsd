@@ -31,39 +31,47 @@
 		</xsd:complexType>
 	</xsd:element>
 
-	<xsd:element name="transition" type="extension:extensionDataTransition">
+	<xsd:element name="transition" type="extension:extensionTransitionElements">
 	</xsd:element>
 	
-	<xsd:element name="node" type="extension:extensionDataNode">
+	<xsd:element name="node" type="extension:extensionNodeElements">
 	</xsd:element>
 
-	<xsd:element name="start-state" type="extension:extensionDataNode">
+	<xsd:element name="start-state" type="extension:extensionNodeElements">
 	</xsd:element>
 	
-	<xsd:element name="state" type="extension:extensionDataNode">
+	<xsd:element name="state" type="extension:extensionNodeElements">
 	</xsd:element>
 
-	<xsd:element name="end-state" type="extension:extensionDataNode">
+	<xsd:element name="end-state" type="extension:extensionNodeElements">
 	</xsd:element>
 
+	<xsd:group name="node-elements">
+		<xsd:choice>
+			<xsd:element ref="extension:node" />
+			<xsd:element ref="extension:state" />
+			<xsd:element ref="extension:end-state" />
+		</xsd:choice>
+	</xsd:group>
+	
 	<xsd:element name="process-definition-extension">
-	<xsd:annotation>
-		<xsd:documentation xml:lang="en">
-			the Process definition Document can contain only one start state node
-		</xsd:documentation>
-	</xsd:annotation>
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">
+				the Process definition Document can contain only one start state node
+			</xsd:documentation>
+		</xsd:annotation>
 		<xsd:complexType>
 			<xsd:choice minOccurs="0" maxOccurs="unbounded">
-				<xsd:element ref="node" />
-				<xsd:element ref="start-state" maxOccurs="1" />
-				<xsd:element ref="state" />
-				<xsd:element ref="end-state" />
+				<xsd:element ref="extension:start-state" maxOccurs="1" />
+				<xsd:group   ref="extension:node-elements" />
 			</xsd:choice>
 			<xsd:attribute name="name" type="xsd:string" use="required" />
 		</xsd:complexType>
 	</xsd:element>
+	
 
-	<xsd:complexType name="extensionDataNode">
+
+	<xsd:complexType name="extensionNodeElements">
 		<xsd:annotation>
 			<xsd:documentation xml:lang="en">
 				Each node contains a I18I name, I18I Description, and a graphical icon.
@@ -82,13 +90,13 @@
 			<xsd:element ref="extension:description" />
 			<xsd:element ref="extension:name" />
 			<xsd:element ref="extension:icon" maxOccurs="1" />
-			<xsd:element ref="transition" />
+			<xsd:element ref="extension:transition" />
 		</xsd:choice>
 		<xsd:attribute name="name" type="xsd:string" use="required" />
 		<xsd:attribute name="publicState" type="xsd:boolean" use="optional" />
 	</xsd:complexType>
 
-	<xsd:complexType name="extensionDataTransition">
+	<xsd:complexType name="extensionTransitionElements">
 		<xsd:annotation>
 			<xsd:documentation xml:lang="en">
 				the UserExecutube Attribute define if the Transition node is executable
@@ -96,13 +104,15 @@
 			</xsd:documentation>
 		</xsd:annotation>
 		<xsd:choice minOccurs="0" maxOccurs="unbounded">
-			<xsd:element ref="description" />
-			<xsd:element ref="name" />
-			<xsd:element ref="icon" maxOccurs="1" />
+			<xsd:element ref="extension:description" />
+			<xsd:element ref="extension:name" />
+			<xsd:element ref="extension:icon" maxOccurs="1" />
 		</xsd:choice>
 		<xsd:attribute name="name" type="xsd:string" use="required" />
 		<xsd:attribute name="userExecutable" type="xsd:boolean" use="optional" />
 	</xsd:complexType>
+
+
 
 </xsd:schema>
 

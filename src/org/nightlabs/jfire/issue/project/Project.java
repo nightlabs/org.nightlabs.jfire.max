@@ -14,8 +14,6 @@ import javax.jdo.PersistenceManager;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
-import org.nightlabs.jfire.issue.Issue;
-import org.nightlabs.jfire.issue.history.IssueHistory;
 import org.nightlabs.jfire.issue.project.id.ProjectID;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.prop.PropertySet;
@@ -25,7 +23,7 @@ import org.nightlabs.jfire.security.User;
 import org.nightlabs.util.Util;
 
 /**
- * The {@link IssueHistory} class represents a history which recorded the change of each {@link Issue}.
+ * The {@link Project} class represents a project.
  * <p>
  * The {@link Project} class can contain many sub-projects.
  * </p>

@@ -7,7 +7,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -55,9 +54,11 @@ import org.nightlabs.jfire.issue.id.IssueResolutionID;
 import org.nightlabs.jfire.issue.id.IssueSeverityTypeID;
 import org.nightlabs.jfire.issue.id.IssueTypeID;
 import org.nightlabs.jfire.issue.jbpm.JbpmConstants;
+import org.nightlabs.jfire.issue.project.Department;
 import org.nightlabs.jfire.issue.project.Project;
 import org.nightlabs.jfire.issue.project.ProjectPhase;
 import org.nightlabs.jfire.issue.project.ProjectType;
+import org.nightlabs.jfire.issue.project.id.DepartmentID;
 import org.nightlabs.jfire.issue.project.id.ProjectID;
 import org.nightlabs.jfire.issue.project.id.ProjectPhaseID;
 import org.nightlabs.jfire.issue.project.id.ProjectTypeID;
@@ -155,7 +156,6 @@ implements SessionBean
 	//IssueFileAttachment//
 	/**
 	 * @ejb.interface-method
-	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public Set<IssueFileAttachmentID> getIssueFileAttachmentIDs()
@@ -172,7 +172,6 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public List<IssueFileAttachment> getIssueFileAttachments(Collection<IssueFileAttachmentID> issueFileAttachmentIDs, String[] fetchGroups, int maxFetchDepth)
@@ -188,7 +187,6 @@ implements SessionBean
 	//IssueWorkTimeRange//
 	/**
 	 * @ejb.interface-method
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public List<IssueWorkTimeRange> getIssueWorkTimeRanges(Collection<IssueWorkTimeRange> issueWorkTimeRangeIDs, String[] fetchGroups, int maxFetchDepth)
@@ -246,7 +244,6 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method
-	 * @!ejb.transaction type="Supports"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@SuppressWarnings("unchecked")
@@ -262,7 +259,6 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method
-	 * @!ejb.transaction type="Supports"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@SuppressWarnings("unchecked")
@@ -321,8 +317,6 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method
-	 * @!ejb.transaction type="Supports"
-	 * @ejb.permission role-name="_Guest_"
 	 */
 	@SuppressWarnings("unchecked")
 	public List<Project> getProjects(Collection<ProjectID> projectIDs, String[] fetchGroups, int maxFetchDepth)
@@ -337,7 +331,6 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method
-	 * @!ejb.transaction type="Supports"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@SuppressWarnings("unchecked")
@@ -355,7 +348,6 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method
-	 * @!ejb.transaction type="Supports"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@SuppressWarnings("unchecked")
@@ -374,7 +366,6 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method
-	 * @!ejb.transaction type="Supports"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@SuppressWarnings("unchecked")
@@ -394,7 +385,6 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method
-	 * @!ejb.transaction type="Supports"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@SuppressWarnings("unchecked")
@@ -432,7 +422,6 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method
-	 * @!ejb.transaction type="Supports"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@SuppressWarnings("unchecked")
@@ -450,7 +439,6 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method
-	 * @!ejb.transaction type="Supports"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@SuppressWarnings("unchecked")
@@ -464,10 +452,58 @@ implements SessionBean
 		}
 	}
 
+	//Department//
+	/**
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	@SuppressWarnings("unchecked")
+	public List<Department> getDepartments(Collection<DepartmentID> departmentIDs, String[] fetchGroups, int maxFetchDepth)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			return NLJDOHelper.getDetachedObjectList(pm, departmentIDs, Department.class, fetchGroups, maxFetchDepth);
+		} finally {
+			pm.close();
+		}
+	}
+	
+	/**
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	@SuppressWarnings("unchecked")
+	public Set<DepartmentID> getDepartmentIDs()
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			Query q = pm.newQuery(Department.class);
+			q.setResult("JDOHelper.getObjectId(this)");
+			return new HashSet<DepartmentID>((Collection<? extends DepartmentID>) q.execute());
+		} finally {
+			pm.close();
+		}
+	}
+	
+	/**
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type="Required"
+	 */
+	public Department storeDepartment(Department department, boolean get, String[] fetchGroups, int maxFetchDepth)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			return NLJDOHelper.storeJDO(pm, department, get, fetchGroups, maxFetchDepth);
+		}//try
+		finally {
+			pm.close();
+		}//finally
+	}
+
 	//IssueComment//
 	/**
 	 * @ejb.interface-method
-	 * @!ejb.transaction type="Supports"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@SuppressWarnings("unchecked")
@@ -499,7 +535,6 @@ implements SessionBean
 	//IssueLinkType//
 	/**
 	 * @ejb.interface-method
-	 * @!ejb.transaction type="Supports"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@SuppressWarnings("unchecked")
@@ -515,7 +550,6 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method
-	 * @!ejb.transaction type="Supports"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public Set<IssueLinkTypeID> getIssueLinkTypeIDs(Class<? extends Object> linkedObjectClass)
@@ -534,7 +568,6 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method
-	 * @!ejb.transaction type="Supports"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public Set<IssueLinkTypeID> getIssueLinkTypeIDs()
@@ -552,7 +585,6 @@ implements SessionBean
 	//IssueLink//
 	/**
 	 * @ejb.interface-method
-	 * @!ejb.transaction type="Supports"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@SuppressWarnings("unchecked")
@@ -568,7 +600,6 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method
-	 * @!ejb.transaction type="Supports"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@SuppressWarnings("unchecked")
@@ -586,7 +617,6 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method
-	 * @!ejb.transaction type="Supports"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@SuppressWarnings("unchecked")
@@ -811,7 +841,6 @@ implements SessionBean
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
 	public Set<IssueID> getIssueIDs(QueryCollection<? extends AbstractJDOQuery> queries)
 	{
@@ -850,7 +879,6 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@SuppressWarnings("unchecked")
@@ -866,7 +894,6 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public Set<IssueID> getIssueIDs()
@@ -881,6 +908,10 @@ implements SessionBean
 		}
 	}
 
+	/**
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 */
 	public Set<Issue> getIssueByProjectID(ProjectID projectID) {
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -894,6 +925,10 @@ implements SessionBean
 		}
 	}
 
+	/**
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 */
 	public Set<Issue> getIssueByProjectTypeID(ProjectTypeID projectTypeID) {
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -926,7 +961,6 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method
-	 * @!ejb.transaction type="Supports"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@SuppressWarnings("unchecked")
@@ -942,7 +976,6 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method
-	 * @!ejb.transaction type="Supports"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@SuppressWarnings("unchecked")
@@ -975,7 +1008,6 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method
-	 * @!ejb.transaction type="Supports"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@SuppressWarnings("unchecked")
@@ -991,7 +1023,6 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method
-	 * @!ejb.transaction type="Supports"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@SuppressWarnings("unchecked")
@@ -1025,7 +1056,6 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@SuppressWarnings("unchecked")
@@ -1043,7 +1073,6 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@SuppressWarnings("unchecked")
@@ -1076,7 +1105,6 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public Set<IssueSeverityTypeID> getIssueSeverityTypeIDs()
@@ -1093,7 +1121,6 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method
-	 * @!ejb.transaction type="Supports"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@SuppressWarnings("unchecked")
@@ -1149,7 +1176,6 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@SuppressWarnings("unchecked")

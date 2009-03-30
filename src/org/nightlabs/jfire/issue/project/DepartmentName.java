@@ -6,7 +6,7 @@ import java.util.Map;
 import org.nightlabs.i18n.I18nText;
 
 /**
- *  An extended class of {@link I18nText} that represents the {@link Project}'s name. 
+ *  An extended class of {@link I18nText} that represents the {@link Department}'s name. 
  * <p>
  * </p>
  * 
@@ -14,17 +14,17 @@ import org.nightlabs.i18n.I18nText;
  *
  * @jdo.persistence-capable
  *		identity-type="application"
- *		objectid-class="org.nightlabs.jfire.issue.project.id.ProjectNameID"
+ *		objectid-class="org.nightlabs.jfire.issue.project.id.DepartmentNameID"
  *		detachable="true"
- *		table="JFireIssueTracking_ProjectName"
+ *		table="JFireIssueTracking_DepartmentName"
  *
  * @jdo.inheritance strategy="new-table"
  *
- * @jdo.create-objectid-class field-order="organisationID, projectID"
+ * @jdo.create-objectid-class field-order="organisationID, departmentID"
  *
- * @jdo.fetch-group name="Project.name" fetch-groups="default" fields="project, names"
+ * @jdo.fetch-group name="Department.name" fetch-groups="default" fields="department, names"
  */
-public class ProjectName
+public class DepartmentName
 extends I18nText{
 	/**
 	 * The serial version of this class.
@@ -32,8 +32,8 @@ extends I18nText{
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * This is the organisationID to which the project's name belongs. Within one organisation,
-	 * all the project's names have their organisation's ID stored here, thus it's the same
+	 * This is the organisationID to which the department's name belongs. Within one organisation,
+	 * all the department's names have their organisation's ID stored here, thus it's the same
 	 * value for all of them.
 	 * 
 	 * @jdo.field primary-key="true"
@@ -44,12 +44,12 @@ extends I18nText{
 	/**
 	 * @jdo.field primary-key="true"
 	 */
-	private long projectID;
+	private String departmentID;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
-	private Project project;
+	private Department department;
 
 	/**
 	 * key: String languageID<br/>
@@ -61,7 +61,7 @@ extends I18nText{
 	 *		key-type="java.lang.String"
 	 *		default-fetch-group="true"
 	 *		value-type="java.lang.String"
-	 *		table="JFireIssueTracking_ProjectName_names"
+	 *		table="JFireIssueTracking_DepartmentName_names"
 	 *		null-value="exception"
 	 *
 	 * @jdo.join
@@ -72,15 +72,15 @@ extends I18nText{
 	 * @deprecated Only for JDO!
 	 */
 	@Deprecated
-	protected ProjectName()
+	protected DepartmentName()
 	{
 	}
 
-	public ProjectName(Project project)
+	public DepartmentName(Department department)
 	{
-		this.project = project;
-		this.organisationID = project.getOrganisationID();
-		projectID = project.getProjectID();
+		this.department = department;
+		this.organisationID = department.getOrganisationID();
+		departmentID = department.getDepartmentID();
 	}
 
 	/**
@@ -96,12 +96,12 @@ extends I18nText{
 		return organisationID;
 	}
 
-	public Project getProject() {
-		return project;
+	public Department getDepartment() {
+		return department;
 	}
 
-	public long getProjectID() {
-		return projectID;
+	public String getDepartmentID() {
+		return departmentID;
 	}
 
 	/**
@@ -110,6 +110,6 @@ extends I18nText{
 	@Override
 	protected String getFallBackValue(String languageID)
 	{
-		return projectID == 0 ? languageID : Long.toString(projectID);
+		return departmentID.equals("") ? languageID : departmentID;
 	}
 }

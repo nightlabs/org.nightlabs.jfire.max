@@ -317,6 +317,7 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
 	 */
 	@SuppressWarnings("unchecked")
 	public List<Project> getProjects(Collection<ProjectID> projectIDs, String[] fetchGroups, int maxFetchDepth)

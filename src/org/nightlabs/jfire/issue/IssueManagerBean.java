@@ -1261,7 +1261,7 @@ implements SessionBean
 					JFireIssueTrackingEAR.MODULE_NAME, "0.9.5.0.0.beta", "0.9.5.0.0.beta")
 			);
 			
-			String baseName = "org.nightlabs.jfire.issue.IssueManagerBean.messages";
+			String baseName = "org.nightlabs.jfire.issue.resource.messages";
 			ClassLoader loader = IssueManagerBean.class.getClassLoader();
 			
 			IssueType issueTypeDefault = new IssueType(getOrganisationID(), IssueType.DEFAULT_ISSUE_TYPE_ID);

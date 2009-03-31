@@ -7,6 +7,7 @@ import java.util.Set;
 import org.nightlabs.jfire.base.JFireEjbFactory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.issue.IssueManager;
+import org.nightlabs.jfire.issue.IssueManagerUtil;
 import org.nightlabs.jfire.issue.project.id.DepartmentID;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.progress.ProgressMonitor;
@@ -17,7 +18,7 @@ import org.nightlabs.progress.ProgressMonitor;
  * @author Chairat Kongarayawetchakun - chairat [AT] nightlabs [DOT] de
  */
 public class DepartmentDAO
-		extends BaseJDOObjectDAO<DepartmentID, Department>
+extends BaseJDOObjectDAO<DepartmentID, Department>
 {
 	private DepartmentDAO() {}
 
@@ -33,7 +34,7 @@ public class DepartmentDAO
 		}
 		return sharedInstance;
 	}
-	
+
 	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	@Override
 	/**
@@ -42,7 +43,7 @@ public class DepartmentDAO
 	protected Collection<Department> retrieveJDOObjects(Set<DepartmentID> objectIDs,
 			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 			throws Exception
-	{
+			{
 		monitor.beginTask("Fetching "+objectIDs.size()+" department information", 1);
 		Collection<Department> departments;
 		try {
@@ -53,16 +54,33 @@ public class DepartmentDAO
 			monitor.done();
 			throw new RuntimeException("Failed downloading departments information!", e);
 		}
-		
+
 		monitor.done();
 		return departments;
-	}
+			}
 
 	public synchronized Department getDepartment(DepartmentID departmentID, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
 		return getJDOObject(null, departmentID, fetchGroups, maxFetchDepth, monitor);
 	}
-	
+
+	@SuppressWarnings("unchecked")
+	public synchronized List<Department> getDepartments(String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) {
+		Set<DepartmentID> departmentIDs;
+		IssueManager issueManager;
+		try {
+			try {
+				issueManager = IssueManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+				departmentIDs = issueManager.getDepartmentIDs();
+			} catch (Exception x) {
+				throw new RuntimeException(x);
+			}
+			return getJDOObjects(null, departmentIDs, fetchGroups, maxFetchDepth, monitor);
+		} finally {
+			issueManager = null;
+		}
+	}
+
 	public List<Department> getDepartments(Set<DepartmentID> departmentIDs, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
 		return getJDOObjects(null, departmentIDs, fetchGroups, maxFetchDepth, monitor);

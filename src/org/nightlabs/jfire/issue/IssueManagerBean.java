@@ -1581,7 +1581,25 @@ implements SessionBean
 			projectPhase.getName().readFromProperties(baseName, loader,
 			"org.nightlabs.jfire.issue.IssueManagerBean.projectPhase4"); //$NON-NLS-1$	
 			projectPhase = pm.makePersistent(projectPhase);
+			
+			//
+			pm.getExtent(Department.class);
 
+			Department department = new Department(IDGenerator.getOrganisationID(), "Department1");
+			department.getName().readFromProperties(baseName, loader,
+			"org.nightlabs.jfire.issue.IssueManagerBean.department1"); //$NON-NLS-1$	
+			department = pm.makePersistent(department);
+
+			department = new Department(IDGenerator.getOrganisationID(), "Department2");
+			department.getName().readFromProperties(baseName, loader,
+			"org.nightlabs.jfire.issue.IssueManagerBean.department2"); //$NON-NLS-1$	
+			department = pm.makePersistent(department);
+			
+			department = new Department(IDGenerator.getOrganisationID(), "Department3");
+			department.getName().readFromProperties(baseName, loader,
+			"org.nightlabs.jfire.issue.IssueManagerBean.department3"); //$NON-NLS-1$	
+			department = pm.makePersistent(department);
+			
 			//Issues
 			pm.getExtent(Issue.class);
 			

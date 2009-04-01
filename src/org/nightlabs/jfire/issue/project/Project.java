@@ -1,12 +1,10 @@
 package org.nightlabs.jfire.issue.project;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import javax.jdo.JDOHelper;
@@ -140,16 +138,16 @@ implements Serializable, Comparable<Project>
 	 */
 	private Set<User> members;
 
-	/**
-	 * @jdo.field
-	 *		persistence-modifier="persistent"
-	 *		collection-type="collection"
-	 *		element-type="ProjectPhase"
-	 *		table="JFireIssueTracking_Project_projectPhases"
-	 *
-	 * @jdo.join
-	 */
-	private List<ProjectPhase> projectPhases;
+//	/**
+//	 * @jdo.field
+//	 *		persistence-modifier="persistent"
+//	 *		collection-type="collection"
+//	 *		element-type="ProjectPhase"
+//	 *		table="JFireIssueTracking_Project_projectPhases"
+//	 *
+//	 * @jdo.join
+//	 */
+//	private List<ProjectPhase> projectPhases;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -267,7 +265,7 @@ implements Serializable, Comparable<Project>
 
 		subProjects = new HashSet<Project>();
 		members = new HashSet<User>();
-		projectPhases = new ArrayList<ProjectPhase>();
+//		projectPhases = new ArrayList<ProjectPhase>();
 
 //		this.currency = currency;
 		this.createTimestamp = new Date();
@@ -382,9 +380,9 @@ implements Serializable, Comparable<Project>
 		return members.removeAll(users);
 	}
 
-	public List<ProjectPhase> getProjectPhases() {
-		return Collections.unmodifiableList(projectPhases);
-	}
+//	public List<ProjectPhase> getProjectPhases() {
+//		return Collections.unmodifiableList(projectPhases);
+//	}
 
 	public boolean isActive() {
 		return active;
@@ -394,29 +392,29 @@ implements Serializable, Comparable<Project>
 		this.active = active;
 	}
 
-	public void addProjectPhase(ProjectPhase phase) {
-		if (phase == null)
-			throw new IllegalArgumentException("phase must not be null!");
-
-		if (!phase.getOrganisationID().equals(this.getOrganisationID()))
-			throw new IllegalArgumentException("this.organisationID != phase.organisationID");
-
-		projectPhases.add(phase);
-	}
-
-	public void addProjectPhases(Collection<ProjectPhase> phases) {
-		for (ProjectPhase phase : phases) {
-			addProjectPhase(phase);
-		}
-	}
-
-	public boolean removeProjectPhase(ProjectPhase phase) {
-		return projectPhases.remove(phase);
-	}
-
-	public boolean removeProjectPhases(Collection<ProjectPhase> phases) {
-		return projectPhases.removeAll(phases);
-	}
+//	public void addProjectPhase(ProjectPhase phase) {
+//		if (phase == null)
+//			throw new IllegalArgumentException("phase must not be null!");
+//
+//		if (!phase.getOrganisationID().equals(this.getOrganisationID()))
+//			throw new IllegalArgumentException("this.organisationID != phase.organisationID");
+//
+//		projectPhases.add(phase);
+//	}
+//
+//	public void addProjectPhases(Collection<ProjectPhase> phases) {
+//		for (ProjectPhase phase : phases) {
+//			addProjectPhase(phase);
+//		}
+//	}
+//
+//	public boolean removeProjectPhase(ProjectPhase phase) {
+//		return projectPhases.remove(phase);
+//	}
+//
+//	public boolean removeProjectPhases(Collection<ProjectPhase> phases) {
+//		return projectPhases.removeAll(phases);
+//	}
 
 	public void setProjectManager(User user) {
 		this.projectManager = user;

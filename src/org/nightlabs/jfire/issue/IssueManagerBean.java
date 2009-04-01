@@ -56,11 +56,9 @@ import org.nightlabs.jfire.issue.id.IssueTypeID;
 import org.nightlabs.jfire.issue.jbpm.JbpmConstants;
 import org.nightlabs.jfire.issue.project.Department;
 import org.nightlabs.jfire.issue.project.Project;
-import org.nightlabs.jfire.issue.project.ProjectPhase;
 import org.nightlabs.jfire.issue.project.ProjectType;
 import org.nightlabs.jfire.issue.project.id.DepartmentID;
 import org.nightlabs.jfire.issue.project.id.ProjectID;
-import org.nightlabs.jfire.issue.project.id.ProjectPhaseID;
 import org.nightlabs.jfire.issue.project.id.ProjectTypeID;
 import org.nightlabs.jfire.issue.prop.IssueStruct;
 import org.nightlabs.jfire.issue.query.IssueQuery;
@@ -403,55 +401,55 @@ implements SessionBean
 		}
 	}
 
-	//ProjectPhase//
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Required"
-	 */
-	public ProjectPhase storeProjectPhase(ProjectPhase projectPhase, boolean get, String[] fetchGroups, int maxFetchDepth)
-	{
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			//			boolean isNew = !JDOHelper.isDetached(projectPhase);
-			return NLJDOHelper.storeJDO(pm, projectPhase, get, fetchGroups, maxFetchDepth);
-		}//try
-		finally {
-			pm.close();
-		}//finally
-	}
-
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 */
-	@SuppressWarnings("unchecked")
-	public Set<ProjectPhaseID> getProjectPhaseIDs()
-	{
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			Query q = pm.newQuery(ProjectPhase.class);
-			q.setResult("JDOHelper.getObjectId(this)");
-			return new HashSet<ProjectPhaseID>((Collection<? extends ProjectPhaseID>) q.execute());
-		} finally {
-			pm.close();
-		}
-	}
-
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 */
-	@SuppressWarnings("unchecked")
-	public List<ProjectPhase> getProjectPhases(Collection<ProjectPhaseID> projectPhaseIDs, String[] fetchGroups, int maxFetchDepth)
-	{
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			return NLJDOHelper.getDetachedObjectList(pm, projectPhaseIDs, ProjectPhase.class, fetchGroups, maxFetchDepth);
-		} finally {
-			pm.close();
-		}
-	}
+//	//ProjectPhase//
+//	/**
+//	 * @ejb.interface-method
+//	 * @ejb.permission role-name="_Guest_"
+//	 * @ejb.transaction type="Required"
+//	 */
+//	public ProjectPhase storeProjectPhase(ProjectPhase projectPhase, boolean get, String[] fetchGroups, int maxFetchDepth)
+//	{
+//		PersistenceManager pm = getPersistenceManager();
+//		try {
+//			//			boolean isNew = !JDOHelper.isDetached(projectPhase);
+//			return NLJDOHelper.storeJDO(pm, projectPhase, get, fetchGroups, maxFetchDepth);
+//		}//try
+//		finally {
+//			pm.close();
+//		}//finally
+//	}
+//
+//	/**
+//	 * @ejb.interface-method
+//	 * @ejb.permission role-name="_Guest_"
+//	 */
+//	@SuppressWarnings("unchecked")
+//	public Set<ProjectPhaseID> getProjectPhaseIDs()
+//	{
+//		PersistenceManager pm = getPersistenceManager();
+//		try {
+//			Query q = pm.newQuery(ProjectPhase.class);
+//			q.setResult("JDOHelper.getObjectId(this)");
+//			return new HashSet<ProjectPhaseID>((Collection<? extends ProjectPhaseID>) q.execute());
+//		} finally {
+//			pm.close();
+//		}
+//	}
+//
+//	/**
+//	 * @ejb.interface-method
+//	 * @ejb.permission role-name="_Guest_"
+//	 */
+//	@SuppressWarnings("unchecked")
+//	public List<ProjectPhase> getProjectPhases(Collection<ProjectPhaseID> projectPhaseIDs, String[] fetchGroups, int maxFetchDepth)
+//	{
+//		PersistenceManager pm = getPersistenceManager();
+//		try {
+//			return NLJDOHelper.getDetachedObjectList(pm, projectPhaseIDs, ProjectPhase.class, fetchGroups, maxFetchDepth);
+//		} finally {
+//			pm.close();
+//		}
+//	}
 
 	//Department//
 	/**
@@ -1469,17 +1467,11 @@ implements SessionBean
 
 			projectTypeDefault = pm.makePersistent(projectTypeDefault);
 
-			ProjectType projectTypeDemo1 = new ProjectType(IDGenerator.getOrganisationID(), "cross ticket");
-			projectTypeDemo1.getName().readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.IssueManagerBean.projectTypeDemo1"); //$NON-NLS-1$	
+			ProjectType projectTypeSoftware = new ProjectType(IDGenerator.getOrganisationID(), "software");
+			projectTypeSoftware.getName().readFromProperties(baseName, loader,
+			"org.nightlabs.jfire.issue.IssueManagerBean.software"); //$NON-NLS-1$	
 
-			projectTypeDemo1 = pm.makePersistent(projectTypeDemo1);
-
-			ProjectType projectTypeDemo2 = new ProjectType(IDGenerator.getOrganisationID(), "jfire");
-			projectTypeDemo2.getName().readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.IssueManagerBean.projectTypeDemo2"); //$NON-NLS-1$	
-
-			projectTypeDemo2 = pm.makePersistent(projectTypeDemo2);
+			projectTypeSoftware = pm.makePersistent(projectTypeSoftware);
 
 			// Create the projects
 			pm.getExtent(Project.class);
@@ -1491,10 +1483,11 @@ implements SessionBean
 			projectDefault.setProjectType(projectTypeDefault);
 			projectDefault = pm.makePersistent(projectDefault);
 
-//			project = new Project(IDGenerator.getOrganisationID(), IDGenerator.nextID(Project.class));
-//			project.getName().setText(Locale.ENGLISH.getLanguage(), "Project 1");
-//			project.setProjectType(projectType1);
-//			project = pm.makePersistent(project);
+			Project jfireProject = new Project(IDGenerator.getOrganisationID(), IDGenerator.nextID(Project.class));
+			jfireProject.getName().readFromProperties(baseName, loader,
+			"org.nightlabs.jfire.issue.IssueManagerBean.jfireProject"); //$NON-NLS-1$	
+			jfireProject.setProjectType(projectTypeSoftware);
+			jfireProject = pm.makePersistent(jfireProject);
 //
 //			//--
 //			Project subProject = new Project(IDGenerator.getOrganisationID(), IDGenerator.nextID(Project.class));
@@ -1559,28 +1552,28 @@ implements SessionBean
 //			projectDefault.setProjectType(projectTypeDefault);
 //			projectDefault = pm.makePersistent(projectDefault);
 
-			// Create the project phases
-			pm.getExtent(ProjectPhase.class);
-
-			ProjectPhase projectPhase = new ProjectPhase(IDGenerator.getOrganisationID(), "phase1");
-			projectPhase.getName().readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.IssueManagerBean.projectPhase1"); //$NON-NLS-1$	
-			projectPhase = pm.makePersistent(projectPhase);
-
-			projectPhase = new ProjectPhase(IDGenerator.getOrganisationID(), "phase2");
-			projectPhase.getName().readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.IssueManagerBean.projectPhase2"); //$NON-NLS-1$	
-			projectPhase = pm.makePersistent(projectPhase);
-
-			projectPhase = new ProjectPhase(IDGenerator.getOrganisationID(), "phase3");
-			projectPhase.getName().readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.IssueManagerBean.projectPhase3"); //$NON-NLS-1$	
-			projectPhase = pm.makePersistent(projectPhase);
-
-			projectPhase = new ProjectPhase(IDGenerator.getOrganisationID(), "phase4");
-			projectPhase.getName().readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.IssueManagerBean.projectPhase4"); //$NON-NLS-1$	
-			projectPhase = pm.makePersistent(projectPhase);
+//			// Create the project phases
+//			pm.getExtent(ProjectPhase.class);
+//
+//			ProjectPhase projectPhase = new ProjectPhase(IDGenerator.getOrganisationID(), "phase1");
+//			projectPhase.getName().readFromProperties(baseName, loader,
+//			"org.nightlabs.jfire.issue.IssueManagerBean.projectPhase1"); //$NON-NLS-1$	
+//			projectPhase = pm.makePersistent(projectPhase);
+//
+//			projectPhase = new ProjectPhase(IDGenerator.getOrganisationID(), "phase2");
+//			projectPhase.getName().readFromProperties(baseName, loader,
+//			"org.nightlabs.jfire.issue.IssueManagerBean.projectPhase2"); //$NON-NLS-1$	
+//			projectPhase = pm.makePersistent(projectPhase);
+//
+//			projectPhase = new ProjectPhase(IDGenerator.getOrganisationID(), "phase3");
+//			projectPhase.getName().readFromProperties(baseName, loader,
+//			"org.nightlabs.jfire.issue.IssueManagerBean.projectPhase3"); //$NON-NLS-1$	
+//			projectPhase = pm.makePersistent(projectPhase);
+//
+//			projectPhase = new ProjectPhase(IDGenerator.getOrganisationID(), "phase4");
+//			projectPhase.getName().readFromProperties(baseName, loader,
+//			"org.nightlabs.jfire.issue.IssueManagerBean.projectPhase4"); //$NON-NLS-1$	
+//			projectPhase = pm.makePersistent(projectPhase);
 			
 			//
 			pm.getExtent(Department.class);

@@ -91,7 +91,7 @@ implements Serializable
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
-	private Double duration;
+	private long duration;
 	
 	/**
 	 * @jdo.field 
@@ -171,7 +171,7 @@ implements Serializable
 	 * 
 	 * @return
 	 */
-	public Double getDuration() {
+	public long getDuration() {
 		return duration;
 	}
 	
@@ -197,7 +197,7 @@ implements Serializable
 	 */
 	public void setTo(Date to) {
 		this.to = to;
-		this.duration = new Double(to.getTime() - from.getTime());
+		this.duration = to.getTime() - from.getTime();
 	}
 	
 	/**

@@ -31,6 +31,13 @@ implements Serializable{
 
 	private static final long serialVersionUID = 1L;
 	
+	public static final String ISSUE_PRIORITY_NONE = "None";
+	public static final String ISSUE_PRIORITY_LOW = "Low";
+	public static final String ISSUE_PRIORITY_NORMAL = "Normal";
+	public static final String ISSUE_PRIORITY_HIGH = "High";
+	public static final String ISSUE_PRIORITY_URGENT = "Urgent";
+	public static final String ISSUE_PRIORITY_IMMEDIATE = "Immediate";
+	
 	/**
 	 * This is the organisationID to which the issue priority belongs. Within one organisation,
 	 * all the issue priorities have their organisation's ID stored here, thus it's the same

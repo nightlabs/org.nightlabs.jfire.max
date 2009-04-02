@@ -1346,37 +1346,37 @@ implements SessionBean
 			////////////////////////////////////////////////////////
 			// Create the priorities
 			// check, whether the datastore is already initialized
-			IssuePriority issuePriorityNone = new IssuePriority(getOrganisationID(), "None");
+			IssuePriority issuePriorityNone = new IssuePriority(getOrganisationID(), IssuePriority.ISSUE_PRIORITY_NONE);
 			issuePriorityNone.getIssuePriorityText().readFromProperties(baseName, loader,
 			"org.nightlabs.jfire.issue.IssueManagerBean.issuePriorityNone"); //$NON-NLS-1$			
 			issuePriorityNone = pm.makePersistent(issuePriorityNone);
 			issueTypeDefault.getIssuePriorities().add(issuePriorityNone);
 
-			IssuePriority issuePriorityLow = new IssuePriority(getOrganisationID(), "Low");
+			IssuePriority issuePriorityLow = new IssuePriority(getOrganisationID(), IssuePriority.ISSUE_PRIORITY_LOW);
 			issuePriorityLow.getIssuePriorityText().readFromProperties(baseName, loader,
 			"org.nightlabs.jfire.issue.IssueManagerBean.issuePriorityLow"); //$NON-NLS-1$	
 			issuePriorityLow = pm.makePersistent(issuePriorityLow);
 			issueTypeDefault.getIssuePriorities().add(issuePriorityLow);
 
-			IssuePriority issuePriorityNormal = new IssuePriority(getOrganisationID(), "Normal");
+			IssuePriority issuePriorityNormal = new IssuePriority(getOrganisationID(), IssuePriority.ISSUE_PRIORITY_NORMAL);
 			issuePriorityNormal.getIssuePriorityText().readFromProperties(baseName, loader,
 			"org.nightlabs.jfire.issue.IssueManagerBean.issuePriorityNormal"); //$NON-NLS-1$	
 			issuePriorityNormal = pm.makePersistent(issuePriorityNormal);
 			issueTypeDefault.getIssuePriorities().add(issuePriorityNormal);
 
-			IssuePriority issuePriorityHigh = new IssuePriority(getOrganisationID(), "High");
+			IssuePriority issuePriorityHigh = new IssuePriority(getOrganisationID(), IssuePriority.ISSUE_PRIORITY_HIGH);
 			issuePriorityHigh.getIssuePriorityText().readFromProperties(baseName, loader,
 			"org.nightlabs.jfire.issue.IssueManagerBean.issuePriorityHigh"); //$NON-NLS-1$		
 			issuePriorityHigh = pm.makePersistent(issuePriorityHigh);
 			issueTypeDefault.getIssuePriorities().add(issuePriorityHigh);
 
-			IssuePriority issuePriorityUrgent = new IssuePriority(getOrganisationID(), "Urgent");
+			IssuePriority issuePriorityUrgent = new IssuePriority(getOrganisationID(), IssuePriority.ISSUE_PRIORITY_URGENT);
 			issuePriorityUrgent.getIssuePriorityText().readFromProperties(baseName, loader,
 			"org.nightlabs.jfire.issue.IssueManagerBean.issuePriorityUrgent"); //$NON-NLS-1$	
 			issuePriorityUrgent = pm.makePersistent(issuePriorityUrgent);
 			issueTypeDefault.getIssuePriorities().add(issuePriorityUrgent);
 
-			IssuePriority issuePriorityImmediate = new IssuePriority(getOrganisationID(), "Immediate");
+			IssuePriority issuePriorityImmediate = new IssuePriority(getOrganisationID(), IssuePriority.ISSUE_PRIORITY_IMMEDIATE);
 			issuePriorityImmediate.getIssuePriorityText().readFromProperties(baseName, loader,
 			"org.nightlabs.jfire.issue.IssueManagerBean.issuePriorityImmediate"); //$NON-NLS-1$	
 			issuePriorityImmediate = pm.makePersistent(issuePriorityImmediate);
@@ -1389,31 +1389,31 @@ implements SessionBean
 			issueResolutionNotAssigned = pm.makePersistent(issueResolutionNotAssigned);
 			issueTypeDefault.getIssueResolutions().add(issueResolutionNotAssigned);
 
-			IssueResolution issueResolutionOpen = new IssueResolution(getOrganisationID(), "Open");
+			IssueResolution issueResolutionOpen = new IssueResolution(getOrganisationID(), IssueResolution.ISSUE_RESOLUTION_OPEN);
 			issueResolutionOpen.getName().readFromProperties(baseName, loader,
 			"org.nightlabs.jfire.issue.IssueManagerBean.issueResolutionOpen"); //$NON-NLS-1$	
 			issueResolutionOpen = pm.makePersistent(issueResolutionOpen);
 			issueTypeDefault.getIssueResolutions().add(issueResolutionOpen);
 
-			IssueResolution issueResolutionFixed = new IssueResolution(getOrganisationID(), "Fixed");
+			IssueResolution issueResolutionFixed = new IssueResolution(getOrganisationID(), IssueResolution.ISSUE_RESOLUTION_FIXED);
 			issueResolutionFixed.getName().readFromProperties(baseName, loader,
 			"org.nightlabs.jfire.issue.IssueManagerBean.issueResolutionFixed"); //$NON-NLS-1$	
 			issueResolutionFixed = pm.makePersistent(issueResolutionFixed);
 			issueTypeDefault.getIssueResolutions().add(issueResolutionFixed);
 
-			IssueResolution issueResolutionReopened = new IssueResolution(getOrganisationID(), "Reopened");
+			IssueResolution issueResolutionReopened = new IssueResolution(getOrganisationID(), IssueResolution.ISSUE_RESOLUTION_REOPENED);
 			issueResolutionReopened.getName().readFromProperties(baseName, loader,
 			"org.nightlabs.jfire.issue.IssueManagerBean.issueResolutionReopened"); //$NON-NLS-1$	
 			issueResolutionReopened = pm.makePersistent(issueResolutionReopened);
 			issueTypeDefault.getIssueResolutions().add(issueResolutionReopened);
 
-			IssueResolution issueResolutionNotFixable = new IssueResolution(getOrganisationID(), "NotFixable");
+			IssueResolution issueResolutionNotFixable = new IssueResolution(getOrganisationID(), IssueResolution.ISSUE_RESOLUTION_NOTFIXABLE);
 			issueResolutionNotFixable.getName().readFromProperties(baseName, loader,
 			"org.nightlabs.jfire.issue.IssueManagerBean.issueResolutionNotFixable"); //$NON-NLS-1$	
 			issueResolutionNotFixable = pm.makePersistent(issueResolutionNotFixable);
 			issueTypeDefault.getIssueResolutions().add(issueResolutionNotFixable);
 
-			IssueResolution issueResolutionWillNotFix = new IssueResolution(getOrganisationID(), "WillNotFix");
+			IssueResolution issueResolutionWillNotFix = new IssueResolution(getOrganisationID(), IssueResolution.ISSUE_RESOLUTION_WILLNOTFIX);
 			issueResolutionWillNotFix.getName().readFromProperties(baseName, loader,
 			"org.nightlabs.jfire.issue.IssueManagerBean.issueResolutionWillNotFix"); //$NON-NLS-1$	
 			issueResolutionWillNotFix = pm.makePersistent(issueResolutionWillNotFix);

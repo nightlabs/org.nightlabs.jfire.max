@@ -36,6 +36,13 @@ implements Serializable
 
 	public static final IssueResolutionID ISSUE_RESOLUTION_ID_NOT_ASSIGNED = IssueResolutionID.create(Organisation.DEV_ORGANISATION_ID, "NotAssigned");
 
+	public static final String ISSUE_RESOLUTION_OPEN = "Open";
+	public static final String ISSUE_RESOLUTION_FIXED = "Fixed";
+	public static final String ISSUE_RESOLUTION_REOPENED = "Reopened";
+	public static final String ISSUE_RESOLUTION_NOTFIXABLE = "NotFixable";
+	public static final String ISSUE_RESOLUTION_WILLNOTFIX = "WillNotFix";
+	public static final String ISSUE_RESOLUTION_IMMEDIATE = "Immediate";
+	
 	private static final long serialVersionUID = 1L;
 
 	/**

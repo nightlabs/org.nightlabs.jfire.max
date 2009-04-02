@@ -40,9 +40,12 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.listener.AttachCallback;
 import javax.jdo.listener.DeleteCallback;
 
+import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
+import org.nightlabs.jfire.issue.dao.IssueTypeDAO;
+import org.nightlabs.jfire.issue.id.IssueTypeID;
 import org.nightlabs.jfire.issue.project.Department;
 import org.nightlabs.jfire.issue.project.Project;
 import org.nightlabs.jfire.jbpm.graph.def.Statable;
@@ -53,6 +56,7 @@ import org.nightlabs.jfire.prop.PropertySet;
 import org.nightlabs.jfire.prop.Struct;
 import org.nightlabs.jfire.prop.StructLocal;
 import org.nightlabs.jfire.security.User;
+import org.nightlabs.progress.NullProgressMonitor;
 import org.nightlabs.util.CollectionUtil;
 import org.nightlabs.util.Util;
 
@@ -382,6 +386,8 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 				IDGenerator.getOrganisationID(), IDGenerator.nextID(PropertySet.class),
 				Organisation.DEV_ORGANISATION_ID,
 				Issue.class.getName(), structScope, structLocalScope);
+		
+		
 	}
 
 	/**

@@ -35,11 +35,13 @@ implements Serializable
 	 * @jdo.column length="100"
 	 */
 	private String entityUserSetOrganisationID;
+	
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
 	private String entityClassName;
+	
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
@@ -99,15 +101,27 @@ implements Serializable
 
 		this.setEntity(entity);
 	}
-
+	
+	/**
+	 * Sets your kind of Entity, the subclass normally has a member of this type which is set by this method.
+	 * @param entity the Entity to set.
+	 */
 	protected abstract void setEntity(Entity entity);
 
+	/**
+	 * Returns the Entity, which was previously set by the method {@link #setEntity(Object)}.
+	 * @return the Entity, previously set by the method {@link #setEntity(Object)}
+	 */
+	public abstract Entity getEntity();
+	
 	public String getEntityUserSetOrganisationID() {
 		return entityUserSetOrganisationID;
 	}
+	
 	public String getEntityClassName() {
 		return entityClassName;
 	}
+	
 	public String getEntityUserSetID() {
 		return entityUserSetID;
 	}
@@ -115,6 +129,7 @@ implements Serializable
 	public String getAuthorizedObjectID() {
 		return authorizedObjectID;
 	}
+	
 	public AuthorizedObjectID getAuthorizedObjectIDAsOID() {
 		return (AuthorizedObjectID) ObjectIDUtil.createObjectID(authorizedObjectID);
 	}
@@ -134,8 +149,6 @@ implements Serializable
 	public AuthorizedObjectRef<Entity> getAuthorizedObjectRef() {
 		return authorizedObjectRef;
 	}
-
-	public abstract Entity getEntity();
 
 	public int getReferenceCount() {
 		return referenceCount;

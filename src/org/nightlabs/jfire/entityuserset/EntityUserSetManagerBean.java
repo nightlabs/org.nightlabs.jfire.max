@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -160,7 +161,7 @@ implements SessionBean
 			pm.close();
 		}
 	}
-
+	
 	/**
 	 * @ejb.interface-method
 	 * @!ejb.transaction type="Supports"
@@ -206,5 +207,51 @@ implements SessionBean
 	@Override
 	public String ping(String message) {
 		return super.ping(message);
+	}
+	
+	/**
+	 * @ejb.interface-method
+	 * @!ejb.transaction type="Supports"
+	 * @ejb.permission role-name="_Guest_"
+	 */	
+	public List<EntityUserSet<?>> getEntityUserSets(Set<EntityUserSetID> entityUserSetsIDs, String[] fetchGroups, int maxFetchDepth) 
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+			if (fetchGroups != null)
+				pm.getFetchPlan().setGroups(fetchGroups);
+
+			// Do we need security checks?
+//			List<EntityUserSet<?>> entityUserSets = NLJDOHelper.getObjectList(pm, entityUserSetsIDs, EntityUserSet.class);
+//			entityUserSets = Authority.filterIndirectlySecuredObjects(
+//					pm,
+//					entityUserSets,
+//					getPrincipal(),
+//					RoleConstants.seeProductType,
+//					ResolveSecuringAuthorityStrategy.allow);
+//			entityUserSets = (List<EntityUserSet<?>>) pm.detachCopyAll(entityUserSets);
+//			return entityUserSets;
+
+			return NLJDOHelper.getDetachedObjectList(pm, entityUserSetsIDs, EntityUserSet.class, fetchGroups, maxFetchDepth);
+		} finally {
+			pm.close();
+		}
+	}
+	
+	/**
+	 * @ejb.interface-method
+	 * @ejb.transaction type="Required"
+	 * @ejb.permission role-name="_Guest_"
+	 */	
+	public EntityUserSet<?> storeEntityUserSet(EntityUserSet<?> entityUserSet, boolean get, String[] fetchGroups, int maxFetchDepth)
+	{
+		// TODO Do we need a new right for storing EntityUserSets?
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			return NLJDOHelper.storeJDO(pm, entityUserSet, get, fetchGroups, maxFetchDepth);
+		} finally {
+			pm.close();
+		}
 	}
 }

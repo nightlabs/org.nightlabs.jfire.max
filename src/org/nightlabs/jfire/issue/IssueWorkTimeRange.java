@@ -41,7 +41,7 @@ import org.nightlabs.util.Util;
  *
  **/
 public class IssueWorkTimeRange
-implements Serializable 
+implements Serializable, Comparable<IssueWorkTimeRange> 
 {
 	private static final long serialVersionUID = 1L;
 //	private static final Logger logger = Logger.getLogger(IssueWorkTimeRange.class);
@@ -201,6 +201,13 @@ implements Serializable
 	}
 	
 	/**
+	 * 
+	 */
+	public void setDuration(long duration) {
+		this.duration = duration;
+	}
+	
+	/**
 	 * Internal method.
 	 * @return The PersistenceManager associated with this object. 
 	 */
@@ -237,5 +244,10 @@ implements Serializable
 			(31 * Util.hashCode(organisationID)) +
 			Util.hashCode(issueID) ^
 			Util.hashCode(issueWorkTimeRangeID);
+	}
+
+	@Override
+	public int compareTo(IssueWorkTimeRange o) {
+		return this.from.compareTo(o.from);
 	}
 }

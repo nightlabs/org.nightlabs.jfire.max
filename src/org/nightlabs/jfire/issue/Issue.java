@@ -587,6 +587,10 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 		return comments;
 	}
 
+	public void addIssueWorkTimeRange(IssueWorkTimeRange issueWorkTimeRange) {
+		this.issueWorkTimeRanges.add(issueWorkTimeRange);
+	}
+	
 	/**
 	 * Returns the collection of {@link IssueWorkTimeRange}s.
 	 * @return a collection of {@link IssueWorkTimeRange}s.

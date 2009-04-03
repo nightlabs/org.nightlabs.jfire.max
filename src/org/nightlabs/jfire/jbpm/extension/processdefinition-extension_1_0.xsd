@@ -3,7 +3,6 @@
 	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
 	targetNamespace="urn:jfire.org:processdefinition-extension_1_0"
 	elementFormDefault="qualified" xmlns:extension="urn:jfire.org:processdefinition-extension_1_0">
-	
 	<xsd:annotation>
 		<xsd:documentation xml:lang="en">
 			this is a schema to define the process definition extension file used to
@@ -36,6 +35,7 @@
 
 	<xsd:element name="process-definition-extension">
 		<xsd:annotation>
+
 			<xsd:documentation xml:lang="en">
 				the Process definition
 				Document can contain only one start state node
@@ -43,12 +43,18 @@
 		</xsd:annotation>
 		<xsd:complexType>
 			<xsd:choice minOccurs="0" maxOccurs="unbounded">
-				<xsd:element type="extension:ExtensionNodeElement" />
+				<xsd:element name="node" type="extension:ExtensionNodeElement">
+				</xsd:element>
+				<xsd:element name="start-state" type="extension:ExtensionNodeElement">
+				</xsd:element>
+				<xsd:element name="state" type="extension:ExtensionNodeElement">
+				</xsd:element>
+				<xsd:element name="end-state" type="extension:ExtensionNodeElement">
+				</xsd:element>
 			</xsd:choice>
-			<xsd:attribute name="name" type="xsd:string" use="required" />
+		<xsd:attribute name="name" type="xsd:string" use="required" />
 		</xsd:complexType>
 	</xsd:element>
-	
 
 
 	<xsd:complexType name="ExtensionNodeElement">

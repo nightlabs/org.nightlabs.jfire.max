@@ -219,91 +219,87 @@ implements SessionBean
 					// ensure that transaction handling is done correctly.
 					File tmpFolder = IOUtil.createUniqueIncrementalFolder(
 							IOUtil.getTempDir(), "jBPM-hibernate-" + Base36Coder.sharedInstance(false).encode(System.currentTimeMillis(), 1) + '-');
-
-					File hibernateMainConfigTemplateFile = new File(jfireJbpmEarDirectory, "hibernate-cfg.template.xml");
-					Map<String, File> hibernateConfigTemplateIncludeFiles = new HashMap<String, File>();
-
-
-					// Create the 1st descriptor TEMPLATE (which will be processed again) for SchemaExport in the tmp dir.
-					hibernateConfigTemplateIncludeFiles.clear();
-					hibernateConfigTemplateIncludeFiles.put("DATASOURCE", new File(jfireJbpmEarDirectory, "hibernate-" + HibernateEnvironmentMode.SCHEMA_EXPORT + '-' + cfmod.getDatabase().getDatabaseDriverName_noTx() + "-cfg.template.xml.inc"));
-					File hibernateConfigTemplateSchemaExport = new File(tmpFolder, "hibernate-"+ HibernateEnvironmentMode.SCHEMA_EXPORT +"-cfg.template.xml");
-					createHibernateConfigTemplate(hibernateConfigTemplateSchemaExport, hibernateMainConfigTemplateFile, hibernateConfigTemplateIncludeFiles);
-
-					deploymentJarItems.add(
-							new DeploymentJarItem(
-									new File(JbpmLookup.getHibernateConfigFileName(getOrganisationID(), HibernateEnvironmentMode.SCHEMA_EXPORT)),
-									hibernateConfigTemplateSchemaExport,
-									null));
+					try {
+						File hibernateMainConfigTemplateFile = new File(jfireJbpmEarDirectory, "hibernate-cfg.template.xml");
+						Map<String, File> hibernateConfigTemplateIncludeFiles = new HashMap<String, File>();
 
 
-					// Create the 2nd descriptor TEMPLATE for Runtime.
-					hibernateConfigTemplateIncludeFiles.clear();
-					hibernateConfigTemplateIncludeFiles.put("DATASOURCE", new File(jfireJbpmEarDirectory, "hibernate-" + HibernateEnvironmentMode.RUNTIME + '-' + cfmod.getDatabase().getDatabaseDriverName_xa() + "-cfg.template.xml.inc"));
-//					hibernateConfigTemplateIncludeFiles.put("DATASOURCE", new File(jfireJbpmEarDirectory, "hibernate-" + HibernateEnvironmentMode.RUNTIME + '-' + cfmod.getDatabase().getDatabaseDriverName_localTx() + "-cfg.template.xml.inc"));
-					File hibernateConfigTemplateRuntime = new File(tmpFolder, "hibernate-"+ HibernateEnvironmentMode.RUNTIME +"-cfg.template.xml");
-					createHibernateConfigTemplate(hibernateConfigTemplateRuntime, hibernateMainConfigTemplateFile, hibernateConfigTemplateIncludeFiles);
+						// Create the 1st descriptor TEMPLATE (which will be processed again) for SchemaExport in the tmp dir.
+						hibernateConfigTemplateIncludeFiles.clear();
+						hibernateConfigTemplateIncludeFiles.put("DATASOURCE", new File(jfireJbpmEarDirectory, "hibernate-" + HibernateEnvironmentMode.SCHEMA_EXPORT + '-' + cfmod.getDatabase().getDatabaseDriverName_noTx() + "-cfg.template.xml.inc"));
+						File hibernateConfigTemplateSchemaExport = new File(tmpFolder, "hibernate-"+ HibernateEnvironmentMode.SCHEMA_EXPORT +"-cfg.template.xml");
+						createHibernateConfigTemplate(hibernateConfigTemplateSchemaExport, hibernateMainConfigTemplateFile, hibernateConfigTemplateIncludeFiles);
 
-					deploymentJarItems.add(
-							new DeploymentJarItem(
-									new File(JbpmLookup.getHibernateConfigFileName(getOrganisationID(), HibernateEnvironmentMode.RUNTIME)),
-									hibernateConfigTemplateRuntime,
-									null));
-
-
-//					deploymentJarItems.add(
-//					new DeploymentJarItem(
-//					new File(JbpmLookup.getHibernateConfigFileName(getOrganisationID())),
-//					new File(jfireJbpmEarDirectory, "hibernate-"+cfmod.getDatabase().getDatabaseDriverName()+"-cfg.template.xml"),
-//					null));
-
-					deploymentStarted = true;
-					jfireServerManager.createDeploymentJar(
-							new File(jbpmDeploymentSubDir, "jbpm-"+getOrganisationID()+"-cfg.jar"),
-							deploymentJarItems,
-							DeployOverwriteBehaviour.EXCEPTION);
+						deploymentJarItems.add(
+								new DeploymentJarItem(
+										new File(JbpmLookup.getHibernateConfigFileName(getOrganisationID(), HibernateEnvironmentMode.SCHEMA_EXPORT)),
+										hibernateConfigTemplateSchemaExport,
+										null));
 
 
-					ClassLoader cl = this.getClass().getClassLoader();
+						// Create the 2nd descriptor TEMPLATE for Runtime.
+						hibernateConfigTemplateIncludeFiles.clear();
+						hibernateConfigTemplateIncludeFiles.put("DATASOURCE", new File(jfireJbpmEarDirectory, "hibernate-" + HibernateEnvironmentMode.RUNTIME + '-' + cfmod.getDatabase().getDatabaseDriverName_xa() + "-cfg.template.xml.inc"));
+//						hibernateConfigTemplateIncludeFiles.put("DATASOURCE", new File(jfireJbpmEarDirectory, "hibernate-" + HibernateEnvironmentMode.RUNTIME + '-' + cfmod.getDatabase().getDatabaseDriverName_localTx() + "-cfg.template.xml.inc"));
+						File hibernateConfigTemplateRuntime = new File(tmpFolder, "hibernate-"+ HibernateEnvironmentMode.RUNTIME +"-cfg.template.xml");
+						createHibernateConfigTemplate(hibernateConfigTemplateRuntime, hibernateMainConfigTemplateFile, hibernateConfigTemplateIncludeFiles);
 
-					// wait until the stuff is deployed
-					URL hibernateConfigFileResourceSchemaExport = null;
-					long startDT = System.currentTimeMillis();
-					boolean deploymentComplete;
-					do {
-						deploymentComplete = true;
-						if (cl.getResource(JbpmLookup.getEhCacheConfigFileName(getOrganisationID())) == null)
-							deploymentComplete = false;
+						deploymentJarItems.add(
+								new DeploymentJarItem(
+										new File(JbpmLookup.getHibernateConfigFileName(getOrganisationID(), HibernateEnvironmentMode.RUNTIME)),
+										hibernateConfigTemplateRuntime,
+										null));
 
-						if (cl.getResource(JbpmLookup.getJbpmConfigFileName(getOrganisationID())) == null)
-							deploymentComplete = false;
+						deploymentStarted = true;
+						jfireServerManager.createDeploymentJar(
+								new File(jbpmDeploymentSubDir, "jbpm-"+getOrganisationID()+"-cfg.jar"),
+								deploymentJarItems,
+								DeployOverwriteBehaviour.EXCEPTION);
 
-						hibernateConfigFileResourceSchemaExport = cl.getResource(
-								JbpmLookup.getHibernateConfigFileName(getOrganisationID(), HibernateEnvironmentMode.SCHEMA_EXPORT));
 
-						if (hibernateConfigFileResourceSchemaExport == null)
-							deploymentComplete = false;
+						ClassLoader cl = this.getClass().getClassLoader();
 
-						if (!deploymentComplete) {
-							if (System.currentTimeMillis() - startDT > 60000)
-								throw new IllegalStateException("The deployed files did not pop up within the timeout!");
+						// wait until the stuff is deployed
+						URL hibernateConfigFileResourceSchemaExport = null;
+						long startDT = System.currentTimeMillis();
+						boolean deploymentComplete;
+						do {
+							deploymentComplete = true;
+							if (cl.getResource(JbpmLookup.getEhCacheConfigFileName(getOrganisationID())) == null)
+								deploymentComplete = false;
 
-							logger.info("The deployed files didn't pop up yet => Will wait a few seconds...");
-							try { Thread.sleep(1000); } catch (InterruptedException x) { /* ignored */ }
+							if (cl.getResource(JbpmLookup.getJbpmConfigFileName(getOrganisationID())) == null)
+								deploymentComplete = false;
+
+							hibernateConfigFileResourceSchemaExport = cl.getResource(
+									JbpmLookup.getHibernateConfigFileName(getOrganisationID(), HibernateEnvironmentMode.SCHEMA_EXPORT));
+
+							if (hibernateConfigFileResourceSchemaExport == null)
+								deploymentComplete = false;
+
+							if (!deploymentComplete) {
+								if (System.currentTimeMillis() - startDT > 60000)
+									throw new IllegalStateException("The deployed files did not pop up within the timeout!");
+
+								logger.info("The deployed files didn't pop up yet => Will wait a few seconds...");
+								try { Thread.sleep(1000); } catch (InterruptedException x) { /* ignored */ }
+							}
+						} while (!deploymentComplete);
+
+						logger.info("Deployment complete!");
+
+						if (firstRun) {
+							logger.info("Starting Schema Creation...");
+
+							Configuration configuration = new Configuration();
+							configuration.configure(hibernateConfigFileResourceSchemaExport);
+							SchemaExport schemaExport = new SchemaExport(configuration);
+							schemaExport.create(true, true);
+
+							logger.info("Schema Creation complete!");
 						}
-					} while (!deploymentComplete);
-
-					logger.info("Deployment complete!");
-
-					if (firstRun) {
-						logger.info("Starting Schema Creation...");
-
-						Configuration configuration = new Configuration();
-						configuration.configure(hibernateConfigFileResourceSchemaExport);
-						SchemaExport schemaExport = new SchemaExport(configuration);
-						schemaExport.create(true, true);
-
-						logger.info("Schema Creation complete!");
+					} finally {
+						IOUtil.deleteDirectoryRecursively(tmpFolder);
 					}
 				} // if (moduleMetaData == null) {
 

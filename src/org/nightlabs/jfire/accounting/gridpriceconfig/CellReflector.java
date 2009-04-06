@@ -158,10 +158,28 @@ public class CellReflector
 		return new AbsolutePriceCoordinate(dimensionValues);
 	}
 
+	/**
+	 * This method calls <tt>resolvePriceCells(..)</tt> and sums all values.
+	 *
+	 * @param dimensionValues either instances of various JDO-object-IDs referencing some parameters or
+	 *		an instance of {@link IAbsolutePriceCoordinate}.
+	 * @return the sum of all price cells referenced by the given <code>dimensionValues</code>.
+	 * @throws PriceCalculationException if an exception occurs during price calculation.
+	 */
 	public long resolvePriceCellsAmount(Object ... dimensionValues)
 	throws PriceCalculationException
 	{
-		return resolvePriceCellsAmount(createAbsolutePriceCoordinate(dimensionValues));
+		// To workaround the bug https://www.jfire.org/modules/bugs/view.php?id=1062 I renamed the
+		// overloaded method resolvePriceCellsAmount(IAbsolutePriceCoordinate) to
+		// internal_resolvePriceCellsAmount(IAbsolutePriceCoordinate) and added the following
+		// case differentiations. Marco.
+		if (dimensionValues == null)
+			return 0;
+
+		if (dimensionValues.length == 1 && (dimensionValues[0] instanceof IAbsolutePriceCoordinate))
+			return internal_resolvePriceCellsAmount((IAbsolutePriceCoordinate) dimensionValues[0]);
+
+		return internal_resolvePriceCellsAmount(createAbsolutePriceCoordinate(dimensionValues));
 	}
 
 	/**
@@ -173,17 +191,11 @@ public class CellReflector
 	 *
 	 * @see #resolvePriceCells(IAbsolutePriceCoordinate)
 	 */
-	public long resolvePriceCellsAmount(
-			IAbsolutePriceCoordinate address)
-//			String _customerGroupPK,
-//			String _tariffPK,
-//			String _currencyID,
-//			String _productTypePK,
-//			String _priceFragmentTypePK)
-		throws PriceCalculationException
+	private long internal_resolvePriceCellsAmount(IAbsolutePriceCoordinate address)
+	throws PriceCalculationException
 	{
 		if (logger.isDebugEnabled())
-			logger.debug("resolvePriceCellsAmount (" + address + "): enter");
+			logger.debug("internal_resolvePriceCellsAmount (" + address + "): enter");
 
 		Collection<ResolvedPriceCell> resolvedPriceCells = resolvePriceCells(address);
 //				_customerGroupPK,
@@ -211,7 +223,7 @@ public class CellReflector
 		}
 
 		if (logger.isDebugEnabled())
-			logger.debug("resolvePriceCellsAmount (" + address + "): sumAmount=" + sumAmount);
+			logger.debug("internal_resolvePriceCellsAmount (" + address + "): sumAmount=" + sumAmount);
 
 		return sumAmount;
 	}

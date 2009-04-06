@@ -38,7 +38,7 @@ import org.nightlabs.util.Util;
  *
  * @jdo.fetch-group name="AuthorizedObjectRef.entityRefs" fields="entityRefs"
  *
- * @jdo.fetch-group name="EntityUserSet.authorizedObjectRefs" fields="entityUserSet"
+ * @jdo.fetch-group name="IEntityUserSet.authorizedObjectRefs" fields="entityUserSet"
  *
  * @jdo.fetch-group name="FetchGroupsEntityUserSet.replicateToReseller" fields="entityUserSet, entityRefs"
  */
@@ -48,7 +48,7 @@ implements Serializable
 	private static final long serialVersionUID = 2L;
 
 	public static final String FETCH_GROUP_ENTITY_REFS = "AuthorizedObjectRef.entityRefs";
-
+	
 	public static Collection<? extends AuthorizedObjectRef<?>> getAuthorizedObjectRefs(PersistenceManager pm, AuthorizedObjectID authorizedObjectID)
 	{
 		Query q = pm.newNamedQuery(AuthorizedObjectRef.class, "getAuthorizedObjectRefsForAuthorizedObjectID");

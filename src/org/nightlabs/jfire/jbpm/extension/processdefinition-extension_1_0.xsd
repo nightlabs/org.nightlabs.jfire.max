@@ -37,8 +37,7 @@
 		<xsd:annotation>
 
 			<xsd:documentation xml:lang="en">
-				the Process definition
-				Document can contain only one start state node
+				The process definition document can contain only one start state node.
 			</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexType>
@@ -60,13 +59,13 @@
 	<xsd:complexType name="ExtensionNodeElement">
 		<xsd:annotation>
 			<xsd:documentation xml:lang="en">
-				Each node contains a I18I name, I18I Description, and a graphical icon.
+				Each node contains an i18n name, i18n description, and a graphical icon.
 
-				If a state definition is marked as publicState, it will be exposed
+				If a state/node is marked as publicState, it will be exposed
 				to other organisations
-				by storing it in both the OfferLocal and the Offer instance. If it is
+				by storing it in both the StatableLocal and the Statable instance. If it is
 				not public,
-				it is only stored in the OfferLocal, it s true, if it shall be
+				it is only stored in the StatableLocal only. It's true, if it shall be
 				registered in the non-local instance and therefore published to
 				business partners.
 				The default value of 'publicState' should be false if not defined.

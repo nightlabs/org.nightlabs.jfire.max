@@ -88,29 +88,21 @@ extends Initialiser
 		FormulaCell fallbackFormulaCell = priceConfig.createFallbackFormulaCell();
 		fallbackFormulaCell.setFormula(dataCreator.getPriceFragmentTypeTotal(),
 				"cell.resolvePriceCellsAmount(\n" +
-				"	new Array(\n" +
-				"		PriceFragmentTypeID.create(\"" + vatNet.getOrganisationID() + "\", \"" + vatNet.getPriceFragmentTypeID() + "\")\n" +
-				"	)\n" +
+				"	PriceFragmentTypeID.create(\"" + vatNet.getOrganisationID() + "\", \"" + vatNet.getPriceFragmentTypeID() + "\")\n" +
 				")\n" +
 				"+\n" +
 				"cell.resolvePriceCellsAmount(\n" +
-				"	new Array(\n" +
-				"		PriceFragmentTypeID.create(\"" + vatVal.getOrganisationID() + "\", \"" + vatVal.getPriceFragmentTypeID() + "\")\n" +
-				"	)\n" +
+				"	PriceFragmentTypeID.create(\"" + vatVal.getOrganisationID() + "\", \"" + vatVal.getPriceFragmentTypeID() + "\")\n" +
 				")");
 
 		fallbackFormulaCell.setFormula(vatNet,
 				"cell.resolvePriceCellsAmount(\n" +
-				"	new Array(\n" +
-				"		CustomerGroupID.create(\"" + organisationID + "\", \"CustomerGroup-anonymous\")\n" +
-				"	)\n" +
+				"	CustomerGroupID.create(\"" + organisationID + "\", \"CustomerGroup-anonymous\")\n" +
 				");");
 
 		fallbackFormulaCell.setFormula(vatVal,
 				"cell.resolvePriceCellsAmount(\n" +
-				"	new Array(\n" +
-				"		PriceFragmentTypeID.create(\"" + vatNet.getOrganisationID() + "\", \"" + vatNet.getPriceFragmentTypeID() + "\")\n" +
-				"	)\n" +
+				"	PriceFragmentTypeID.create(\"" + vatNet.getOrganisationID() + "\", \"" + vatNet.getPriceFragmentTypeID() + "\")\n" +
 				") * 0.19");
 
 

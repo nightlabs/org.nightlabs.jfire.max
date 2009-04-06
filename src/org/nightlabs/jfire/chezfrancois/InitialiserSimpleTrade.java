@@ -166,15 +166,11 @@ extends Initialiser
 		IInnerPriceConfig priceConfigBox6Bottles90Percent = dataCreator.createFormulaPriceConfig(
 				new Tariff[] {tariffNormalPrice, tariffGoldCard}, new String[] {
 						"cell.resolvePriceCellsAmount(\n" +
-						"	new Array(\n" +
-						"		ProductTypeID.create(\""+bottle.getOrganisationID()+"\", \""+bottle.getProductTypeID()+"\")\n" +
-						"	)\n" +
+						"	ProductTypeID.create(\""+bottle.getOrganisationID()+"\", \""+bottle.getProductTypeID()+"\")\n" +
 						") * -0.1;"
 						,
 						"cell.resolvePriceCellsAmount(\n" +
-						"	new Array(\n" +
-						"		ProductTypeID.create(\""+bottle.getOrganisationID()+"\", \""+bottle.getProductTypeID()+"\")\n" +
-						"	)\n" +
+						"	ProductTypeID.create(\""+bottle.getOrganisationID()+"\", \""+bottle.getProductTypeID()+"\")\n" +
 						") * -0.1;"
 				},
 				"Box (6 bottles, 90%)", "Karton (6 Flaschen, 90%)", "Caisse (6 bouteilles, 90%)"

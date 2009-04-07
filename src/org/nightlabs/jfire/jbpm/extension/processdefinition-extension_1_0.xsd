@@ -37,8 +37,7 @@
 		<xsd:annotation>
 
 			<xsd:documentation xml:lang="en">
-				the Process definition
-				Document can contain only one start state node
+				The process definition document can contain only one start state node.
 			</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexType>

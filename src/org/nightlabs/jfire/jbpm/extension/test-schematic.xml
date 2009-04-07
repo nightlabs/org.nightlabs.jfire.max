@@ -8,7 +8,7 @@ to quickly debug the schematic or extend it
 
 <process-definition-extension
 	xmlns="urn:jfire.org:processdefinition-extension_1_0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="urn:jfire.org:processdefinition-extension_1_0 processdefinition-extension_1_0.xsd "
+	xsi:schemaLocation="urn:jfire.org:processdefinition-extension_1_0 http://www.jfire.org/schema/processdefinition-extension_1_0.xsd"
 	name="dev.jfire.org:Offer.Vendor">
 
 	<start-state name="dev.jfire.org:created"  publicState="true">
@@ -47,6 +47,9 @@ to quickly debug the schematic or extend it
 			<icon file="" />
 		</transition>
 	</start-state>
+	
+	
+
 	<end-state name="dev.jfire.org:rejected" publicState="true">
 		<name language="de">abgelehnt</name>
 		<description language="de">abgelehnt</description>

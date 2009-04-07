@@ -54,10 +54,8 @@ import org.nightlabs.jfire.issue.id.IssueResolutionID;
 import org.nightlabs.jfire.issue.id.IssueSeverityTypeID;
 import org.nightlabs.jfire.issue.id.IssueTypeID;
 import org.nightlabs.jfire.issue.jbpm.JbpmConstants;
-import org.nightlabs.jfire.issue.project.Department;
 import org.nightlabs.jfire.issue.project.Project;
 import org.nightlabs.jfire.issue.project.ProjectType;
-import org.nightlabs.jfire.issue.project.id.DepartmentID;
 import org.nightlabs.jfire.issue.project.id.ProjectID;
 import org.nightlabs.jfire.issue.project.id.ProjectTypeID;
 import org.nightlabs.jfire.issue.prop.IssueStruct;
@@ -451,54 +449,7 @@ implements SessionBean
 //		}
 //	}
 
-	//Department//
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 */
-	@SuppressWarnings("unchecked")
-	public List<Department> getDepartments(Collection<DepartmentID> departmentIDs, String[] fetchGroups, int maxFetchDepth)
-	{
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			return NLJDOHelper.getDetachedObjectList(pm, departmentIDs, Department.class, fetchGroups, maxFetchDepth);
-		} finally {
-			pm.close();
-		}
-	}
 	
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 */
-	@SuppressWarnings("unchecked")
-	public Set<DepartmentID> getDepartmentIDs()
-	{
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			Query q = pm.newQuery(Department.class);
-			q.setResult("JDOHelper.getObjectId(this)");
-			return new HashSet<DepartmentID>((Collection<? extends DepartmentID>) q.execute());
-		} finally {
-			pm.close();
-		}
-	}
-	
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Required"
-	 */
-	public Department storeDepartment(Department department, boolean get, String[] fetchGroups, int maxFetchDepth)
-	{
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			return NLJDOHelper.storeJDO(pm, department, get, fetchGroups, maxFetchDepth);
-		}//try
-		finally {
-			pm.close();
-		}//finally
-	}
 
 	//IssueComment//
 	/**
@@ -1283,7 +1234,7 @@ implements SessionBean
 			logger.info("Initialization of " + JFireIssueTrackingEAR.MODULE_NAME + " started...");
 
 			pm.makePersistent(new ModuleMetaData(
-					JFireIssueTrackingEAR.MODULE_NAME, "0.9.5.0.0.beta", "0.9.5.0.0.beta")
+					JFireIssueTrackingEAR.MODULE_NAME, "0.9.7-0-beta", "0.9.7-0-beta")
 			);
 			
 			String baseName = "org.nightlabs.jfire.issue.resource.messages";
@@ -1574,24 +1525,6 @@ implements SessionBean
 //			projectPhase.getName().readFromProperties(baseName, loader,
 //			"org.nightlabs.jfire.issue.IssueManagerBean.projectPhase4"); //$NON-NLS-1$	
 //			projectPhase = pm.makePersistent(projectPhase);
-			
-			//
-			pm.getExtent(Department.class);
-
-			Department department = new Department(IDGenerator.getOrganisationID(), "Department1");
-			department.getName().readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.IssueManagerBean.department1"); //$NON-NLS-1$	
-			department = pm.makePersistent(department);
-
-			department = new Department(IDGenerator.getOrganisationID(), "Department2");
-			department.getName().readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.IssueManagerBean.department2"); //$NON-NLS-1$	
-			department = pm.makePersistent(department);
-			
-			department = new Department(IDGenerator.getOrganisationID(), "Department3");
-			department.getName().readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.IssueManagerBean.department3"); //$NON-NLS-1$	
-			department = pm.makePersistent(department);
 			
 			//Issues
 			pm.getExtent(Issue.class);

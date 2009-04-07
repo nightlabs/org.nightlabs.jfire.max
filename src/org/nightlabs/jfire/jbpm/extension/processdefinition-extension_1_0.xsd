@@ -37,19 +37,16 @@
 		<xsd:annotation>
 
 			<xsd:documentation xml:lang="en">
-				The process definition document can contain only one start state node.
+				the Process definition
+				Document can contain only one start state node
 			</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexType>
 			<xsd:choice minOccurs="0" maxOccurs="unbounded">
-				<xsd:element name="node" type="extension:ExtensionNodeElement">
-				</xsd:element>
-				<xsd:element name="start-state" type="extension:ExtensionNodeElement">
-				</xsd:element>
-				<xsd:element name="state" type="extension:ExtensionNodeElement">
-				</xsd:element>
-				<xsd:element name="end-state" type="extension:ExtensionNodeElement">
-				</xsd:element>
+				<xsd:element name="start-state" type="extension:ExtensionNodeElement"/>
+				<xsd:element name="node" type="extension:ExtensionNodeElement"/>
+				<xsd:element name="state" type="extension:ExtensionNodeElement"/>
+				<xsd:element name="end-state" type="extension:ExtensionNodeElement"/>
 			</xsd:choice>
 		<xsd:attribute name="name" type="xsd:string" use="required" />
 		</xsd:complexType>
@@ -59,13 +56,13 @@
 	<xsd:complexType name="ExtensionNodeElement">
 		<xsd:annotation>
 			<xsd:documentation xml:lang="en">
-				Each node contains an i18n name, i18n description, and a graphical icon.
+				Each node contains a I18I name, I18I Description, and a graphical icon.
 
-				If a state/node is marked as publicState, it will be exposed
+				If a state definition is marked as publicState, it will be exposed
 				to other organisations
-				by storing it in both the StatableLocal and the Statable instance. If it is
+				by storing it in both the OfferLocal and the Offer instance. If it is
 				not public,
-				it is only stored in the StatableLocal only. It's true, if it shall be
+				it is only stored in the OfferLocal, it s true, if it shall be
 				registered in the non-local instance and therefore published to
 				business partners.
 				The default value of 'publicState' should be false if not defined.

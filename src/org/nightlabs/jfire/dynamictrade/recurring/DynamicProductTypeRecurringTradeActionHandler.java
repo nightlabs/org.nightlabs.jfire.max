@@ -76,7 +76,7 @@ public class DynamicProductTypeRecurringTradeActionHandler extends RecurringTrad
 			TariffID tariffID = (TariffID) JDOHelper.getObjectId(recurringArticle.getTariff());				
 			I18nText name = null; 			
 			Article article;
-			// sets the in the Script Engine.
+			// sets the Article name in the Script Engine.
 			script.getTextScriptContent().copyFrom(recurringArticle.getName());	
 			try {
 				name = script.execute();	

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE nightlybuild PUBLIC "-//NightLabs//DTD NightlyBuild V 0.20//EN" "http://www.nightlabs.de/dtd/nightlybuild_0_20.dtd">
+
+<nightlybuild>
+  <project name="JFireDepartment">
+    <ant path="JFireDepartment" file="build-nightlabs.xml" target="deploy"/>
+    <requires/>
+    <provides/>
+    <publishes location="JFireDepartment/dist/JFireDepartment.jar"/>
+    <javadoc path="JFireDepartment/src"/>
+    <javadoc path="JFireDepartment/ejbsrc"/>
+  </project>
+</nightlybuild>

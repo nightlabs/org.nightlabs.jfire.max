@@ -13,6 +13,7 @@ import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jfire.reporting.JFireReportingHelper;
 import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
 import org.nightlabs.jfire.reporting.textpart.ReportTextPart.Type;
+import org.nightlabs.script.JSHTMLParser;
 
 /**
  * Static helper class that helps to build evaluation strings for {@link ReportTextPart}s inside a report layout.
@@ -102,7 +103,7 @@ public class ReportTextPartHelper {
 	public static String getEvalString(ReportTextPart reportTextPart, Locale locale) {
 		String contentStr = reportTextPart.getContent().getText(locale);
 		if (reportTextPart.getType() == Type.JSHTML) {
-			ReportTextPartJSHTMLParser parser = new ReportTextPartJSHTMLParser(contentStr, "context", "print");
+			JSHTMLParser parser = new JSHTMLParser(contentStr, "context", "print");
 			parser.parse();
 			String result = "var context = new Packages." + ReportTextPartContext.class.getName() + "();\n" +
 				parser.getParsedText() + "\n" + 

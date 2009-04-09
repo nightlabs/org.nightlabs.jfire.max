@@ -40,5 +40,7 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/NightLabsQuery"/>
 	<classpathentry kind="var" path="JBOSS/server/default/lib/mail.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireQueryStore"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/JFireDepartment"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/JFireIssueTimeTracking"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

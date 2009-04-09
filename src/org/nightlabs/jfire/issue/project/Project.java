@@ -13,6 +13,7 @@ import javax.jdo.PersistenceManager;
 import org.apache.log4j.Logger;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.issue.project.id.ProjectID;
+import org.nightlabs.jfire.issuetimetracking.ProjectCost;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.prop.PropertySet;
 import org.nightlabs.jfire.prop.Struct;
@@ -68,7 +69,6 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="Project.propertySet" fields="propertySet"
  * @jdo.fetch-group name="Project.projectManager" fields="projectManager"
  * @jdo.fetch-group name="Project.members" fields="members"
- * @jdo.fetch-group name="Project.projectPhases" fields="projectPhases"
  *
  * @jdo.fetch-group name="Issue.project" fields="name"
  *
@@ -88,7 +88,6 @@ implements Serializable, Comparable<Project>
 	public static final String FETCH_GROUP_PROJECT_TYPE = "Project.projectType";
 	public static final String FETCH_GROUP_PROJECT_MANAGER = "Project.projectManager";
 	public static final String FETCH_GROUP_MEMBERS = "Project.members";
-	public static final String FETCH_GROUP_PROJECT_PHASES = "Project.projectPhases";
 
 	public static final ProjectID PROJECT_ID_DEFAULT = ProjectID.create(Organisation.DEV_ORGANISATION_ID, -1);
 
@@ -138,17 +137,6 @@ implements Serializable, Comparable<Project>
 	 */
 	private Set<User> members;
 
-//	/**
-//	 * @jdo.field
-//	 *		persistence-modifier="persistent"
-//	 *		collection-type="collection"
-//	 *		element-type="ProjectPhase"
-//	 *		table="JFireIssueTracking_Project_projectPhases"
-//	 *
-//	 * @jdo.join
-//	 */
-//	private List<ProjectPhase> projectPhases;
-
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
@@ -194,11 +182,11 @@ implements Serializable, Comparable<Project>
 	 */
 	private Date finishDate;
 
-//	/**
-//	 * @jdo.field persistence-modifier="persistent"
-//	 */
-//	private Currency currency;
-
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private ProjectCost projectCost;
+	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
@@ -250,11 +238,11 @@ implements Serializable, Comparable<Project>
 	@Deprecated
 	protected Project() { }
 
-	public Project(ProjectID projectID/*, Currency currency*/) {
-		this(projectID.organisationID, projectID.projectID/*, currency*/);
+	public Project(ProjectID projectID) {
+		this(projectID.organisationID, projectID.projectID);
 	}
 
-	public Project(String organisationID, long projectID/*, Currency currency*/)
+	public Project(String organisationID, long projectID)
 	{
 		Organisation.assertValidOrganisationID(organisationID);
 		this.organisationID = organisationID;
@@ -262,12 +250,11 @@ implements Serializable, Comparable<Project>
 
 		this.name = new ProjectName(this);
 		this.description = new ProjectDescription(this);
-
+		this.projectCost = new ProjectCost(organisationID, IDGenerator.nextID(ProjectCost.class));
+		
 		subProjects = new HashSet<Project>();
 		members = new HashSet<User>();
-//		projectPhases = new ArrayList<ProjectPhase>();
 
-//		this.currency = currency;
 		this.createTimestamp = new Date();
 
 		this.structScope = Struct.DEFAULT_SCOPE;
@@ -380,10 +367,6 @@ implements Serializable, Comparable<Project>
 		return members.removeAll(users);
 	}
 
-//	public List<ProjectPhase> getProjectPhases() {
-//		return Collections.unmodifiableList(projectPhases);
-//	}
-
 	public boolean isActive() {
 		return active;
 	}
@@ -392,30 +375,6 @@ implements Serializable, Comparable<Project>
 		this.active = active;
 	}
 
-//	public void addProjectPhase(ProjectPhase phase) {
-//		if (phase == null)
-//			throw new IllegalArgumentException("phase must not be null!");
-//
-//		if (!phase.getOrganisationID().equals(this.getOrganisationID()))
-//			throw new IllegalArgumentException("this.organisationID != phase.organisationID");
-//
-//		projectPhases.add(phase);
-//	}
-//
-//	public void addProjectPhases(Collection<ProjectPhase> phases) {
-//		for (ProjectPhase phase : phases) {
-//			addProjectPhase(phase);
-//		}
-//	}
-//
-//	public boolean removeProjectPhase(ProjectPhase phase) {
-//		return projectPhases.remove(phase);
-//	}
-//
-//	public boolean removeProjectPhases(Collection<ProjectPhase> phases) {
-//		return projectPhases.removeAll(phases);
-//	}
-
 	public void setProjectManager(User user) {
 		this.projectManager = user;
 	}
@@ -423,14 +382,6 @@ implements Serializable, Comparable<Project>
 	public User getProjectManager() {
 		return projectManager;
 	}
-
-//	/**
-//	 * @return Returns the currency.
-//	 */
-//	public Currency getCurrency()
-//	{
-//		return currency;
-//	}
 
 	public void setCreateTimestamp(Date createTimestamp) {
 		this.createTimestamp = createTimestamp;

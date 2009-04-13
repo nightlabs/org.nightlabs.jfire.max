@@ -2,8 +2,13 @@ package org.nightlabs.jfire.issuetimetracking;
 
 import java.io.Serializable;
 
+import javax.jdo.JDOObjectNotFoundException;
+import javax.jdo.PersistenceManager;
+
 import org.nightlabs.jfire.accounting.Price;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
+import org.nightlabs.jfire.issue.project.Project;
+import org.nightlabs.jfire.issuetimetracking.id.ProjectCostID;
 
 /**
  * The {@link ProjectCost} class represents an cost information of each {@link Project}s. 
@@ -18,20 +23,28 @@ import org.nightlabs.jfire.idgenerator.IDGenerator;
  *		detachable = "true"
  *		table="JFireIssueTimeTracking_ProjectCost"
  *
- * @jdo.create-objectid-class field-order="organisationID, projectCostID"
+ * @jdo.create-objectid-class field-order="organisationID, projectID"
  *
  * @jdo.inheritance strategy="new-table"
- * 
  */
 public class ProjectCost 
 implements Serializable
 {
 	private static final long serialVersionUID = 1L;
+	
+	public static ProjectCost createProjectCost(PersistenceManager pm, Project project)
+	{
+		ProjectCostID projectCostID = ProjectCostID.create(project.getOrganisationID(), project.getProjectID());
+		try {
+			return (ProjectCost) pm.getObjectById(projectCostID);
+		} catch (JDOObjectNotFoundException x) {
+			ProjectCost projectCost = new ProjectCost(project);
+			projectCost = pm.makePersistent(projectCost);
+			return projectCost; 
+		}
+	}
+	
 	/**
-	 * This is the organisationID to which the information belongs. Within one organisation,
-	 * all the project information have their organisation's ID stored here, thus it's the same
-	 * value for all of them.
-	 * 
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
@@ -40,7 +53,12 @@ implements Serializable
 	/**
 	 * @jdo.field primary-key="true"
 	 */
-	private long projectCostID;
+	private long projectID;
+	
+	/**
+	 * @jdo.field persistence-modifier="persistent" unique="true"
+	 */
+	private Project project;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -64,9 +82,10 @@ implements Serializable
 	 * @param organisationID the first part of the composite primary key - referencing the organisation which owns this <code>IssuePriority</code>.
 	 * @param projectCostID the second part of the composite primary key. Use {@link IDGenerator#nextID(Class)} with <code>ProjectCost.class</code> to create an id.
 	 */
-	public ProjectCost(String organisationID, long projectCostID){
-		this.organisationID = organisationID;
-		this.projectCostID = projectCostID;
+	public ProjectCost(Project project){
+		this.project = project;
+		this.organisationID = project.getOrganisationID();
+		this.projectID = project.getProjectID();
 	}
 	
 	/**
@@ -77,12 +96,12 @@ implements Serializable
 		return organisationID;
 	}
 	
-	/**
-	 * Returns long.
-	 * @return the long
-	 */
-	public long getProjectCostID() {
-		return projectCostID;
+	public long getProjectID() {
+		return projectID;
+	}
+	
+	public Project getProject() {
+		return project;
 	}
 	
 	/**

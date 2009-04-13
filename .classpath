@@ -16,5 +16,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireBaseClientLib"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/NightLabsBase"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireIssueTracking"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/JFireDepartment"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

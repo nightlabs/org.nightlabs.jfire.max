@@ -42,7 +42,6 @@ import javax.jdo.listener.DeleteCallback;
 
 import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jdo.ObjectIDUtil;
-import org.nightlabs.jfire.department.Department;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.issue.project.Project;
 import org.nightlabs.jfire.jbpm.graph.def.Statable;
@@ -179,10 +178,10 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	 */
 	private Project project;
 	
-	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 */
-	private Department department;
+//	/**
+//	 * @jdo.field persistence-modifier="persistent"
+//	 */
+//	private Department department;
 
 	/**
 	 * Instances of {@link IssueFileAttachment}.
@@ -925,21 +924,21 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 		return project;
 	}
 	
-	/**
-	 * Sets the {@link Department}.
-	 * @param department the department that this issue is created on
-	 */
-	public void setDepartment(Department department) {
-		this.department = department;
-	}
-
-	/**
-	 * Gets the {@link Department}.
-	 * @return a department
-	 */
-	public Department getDepartment() {
-		return department;
-	}
+//	/**
+//	 * Sets the {@link Department}.
+//	 * @param department the department that this issue is created on
+//	 */
+//	public void setDepartment(Department department) {
+//		this.department = department;
+//	}
+//
+//	/**
+//	 * Gets the {@link Department}.
+//	 * @return a department
+//	 */
+//	public Department getDepartment() {
+//		return department;
+//	}
 
 	/**
 	 * Adds an {@link IssueFileAttachment} to issue.

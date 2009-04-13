@@ -24,6 +24,8 @@ import org.nightlabs.util.Util;
  * 
  * @jdo.fetch-group name="Department.description" fields="description"
  * @jdo.fetch-group name="Department.name" fetch-groups="default" fields="name"
+ * 
+ * @jdo.fetch-group name="FetchGroupsProp.fullData" fields="name"
  */
 public class Department 
 implements Serializable

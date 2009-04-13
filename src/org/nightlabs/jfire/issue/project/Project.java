@@ -13,7 +13,6 @@ import javax.jdo.PersistenceManager;
 import org.apache.log4j.Logger;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.issue.project.id.ProjectID;
-import org.nightlabs.jfire.issuetimetracking.ProjectCost;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.prop.PropertySet;
 import org.nightlabs.jfire.prop.Struct;
@@ -182,10 +181,10 @@ implements Serializable, Comparable<Project>
 	 */
 	private Date finishDate;
 
-	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 */
-	private ProjectCost projectCost;
+//	/**
+//	 * @jdo.field persistence-modifier="persistent"
+//	 */
+//	private ProjectCost projectCost;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -250,7 +249,7 @@ implements Serializable, Comparable<Project>
 
 		this.name = new ProjectName(this);
 		this.description = new ProjectDescription(this);
-		this.projectCost = new ProjectCost(organisationID, IDGenerator.nextID(ProjectCost.class));
+//		this.projectCost = new ProjectCost(organisationID, IDGenerator.nextID(ProjectCost.class));
 		
 		subProjects = new HashSet<Project>();
 		members = new HashSet<User>();

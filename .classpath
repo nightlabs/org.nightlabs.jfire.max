@@ -8,6 +8,7 @@
 	<classpathentry kind="var" path="ASM"/>
 	<classpathentry kind="var" path="DATANUCLEUS_ENHANCER"/>
 	<classpathentry kind="src" path="ejbsrc"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/JFireDepartment"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireBase"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireBaseBean"/>
 	<classpathentry kind="var" path="LOG4J" sourcepath="/LOG4J_SRC"/>
@@ -16,6 +17,5 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireBaseClientLib"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/NightLabsBase"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireIssueTracking"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/JFireDepartment"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

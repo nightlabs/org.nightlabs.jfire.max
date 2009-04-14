@@ -18,9 +18,9 @@ import org.nightlabs.jfire.issuetimetracking.id.ProjectCostID;
  * @author Chairat Kongarayawetchakun - chairat [AT] nightlabs [DOT] de
  *
  * @jdo.persistence-capable
- *		identity-type = "application"
- *		objectid-class = "org.nightlabs.jfire.issuetimetracking.id.ProjectCostID"
- *		detachable = "true"
+ *		identity-type="application"
+ *		objectid-class="org.nightlabs.jfire.issuetimetracking.id.ProjectCostID"
+ *		detachable="true"
  *		table="JFireIssueTimeTracking_ProjectCost"
  *
  * @jdo.create-objectid-class field-order="organisationID, projectID"

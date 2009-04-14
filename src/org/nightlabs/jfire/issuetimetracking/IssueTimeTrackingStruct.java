@@ -91,6 +91,6 @@ public class IssueTimeTrackingStruct
 
 	public static final String DEV_ORGANISATION_ID = Organisation.DEV_ORGANISATION_ID;
 
-	public static final StructBlockID DEPARTMENT_BLOCK = StructBlockID.create(DEV_ORGANISATION_ID,"IssueTimeTracking.department");
+	public static final StructBlockID DEPARTMENT_BLOCK = StructBlockID.create(DEV_ORGANISATION_ID,"Department");
 	public static final StructFieldID DEPARTMENT_FIELD = StructFieldID.create(DEPARTMENT_BLOCK,"Department");
 }

@@ -60,7 +60,7 @@ public class DepartmentDescription
 	 * @jdo.field
 	 *		persistence-modifier="persistent"
 	 *		default-fetch-group="true"
-	 *		table="JFireDepartmentTracking_DepartmentDescription_descriptions"
+	 *		table="JFireDepartment_DepartmentDescription_descriptions"
 	 *		null-value="exception"
 	 *
 	 * @jdo.join

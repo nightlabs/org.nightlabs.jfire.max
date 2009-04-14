@@ -178,11 +178,6 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	 */
 	private Project project;
 	
-//	/**
-//	 * @jdo.field persistence-modifier="persistent"
-//	 */
-//	private Department department;
-
 	/**
 	 * Instances of {@link IssueFileAttachment}.
 	 *
@@ -320,34 +315,6 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	}
 
 	/**
-	 * The scope of the {@link StructLocal} by which the propertySet is build from.
-	 * @jdo.field persistence-modifier="persistent" null-value="exception" indexed="true"
-	 */
-	private String structLocalScope;
-
-	/**
-	 * Returns the scope of the StructLocal by which the propertySet is build from.
-	 * @return The scope of the StructLocal by which the propertySet is build from
-	 */
-	public String getStructLocalScope() {
-		return structLocalScope;
-	}
-
-	/**
-	 * The scope of the {@link Struct} by which the propertySet is build from.
-	 * @jdo.field persistence-modifier="persistent" null-value="exception" indexed="true"
-	 */
-	private String structScope;
-
-	/**
-	 * Returns the scope of the {@link Struct} by which the propertySet is build from.
-	 * @return The scope of the {@link Struct} by which the propertySet is build from
-	 */
-	public String getStructScope() {
-		return structScope;
-	}
-
-	/**
 	 * @deprecated Constructor exists only for JDO!
 	 */
 	@Deprecated
@@ -375,14 +342,10 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 		issueWorkTimeRanges = new ArrayList<IssueWorkTimeRange>();
 
 		this.issueLocal = new IssueLocal(this);
-		this.structScope = Struct.DEFAULT_SCOPE;
-		this.structLocalScope = StructLocal.DEFAULT_SCOPE;
 		this.propertySet = new PropertySet(
 				IDGenerator.getOrganisationID(), IDGenerator.nextID(PropertySet.class),
 				Organisation.DEV_ORGANISATION_ID,
-				Issue.class.getName(), structScope, structLocalScope);
-		
-		
+				Issue.class.getName(), Struct.DEFAULT_SCOPE, StructLocal.DEFAULT_SCOPE);		
 	}
 
 	/**
@@ -924,22 +887,6 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 		return project;
 	}
 	
-//	/**
-//	 * Sets the {@link Department}.
-//	 * @param department the department that this issue is created on
-//	 */
-//	public void setDepartment(Department department) {
-//		this.department = department;
-//	}
-//
-//	/**
-//	 * Gets the {@link Department}.
-//	 * @return a department
-//	 */
-//	public Department getDepartment() {
-//		return department;
-//	}
-
 	/**
 	 * Adds an {@link IssueFileAttachment} to issue.
 	 * @param issueFileAttachment the issueFileAttachment to be added

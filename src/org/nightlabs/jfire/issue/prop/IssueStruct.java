@@ -31,10 +31,11 @@ public class IssueStruct {
 			issueStruct = Struct.getStruct(devOrganisationID, Issue.class, Struct.DEFAULT_SCOPE, pm);
 		} catch (JDOObjectNotFoundException e) {
 			issueStruct = new Struct(devOrganisationID, Issue.class.getName(), Struct.DEFAULT_SCOPE);
-//			createDefaultStructure(issueStruct);
+			createDefaultStructure(issueStruct);
 			issueStruct.getName().setText(Locale.ENGLISH.getLanguage(), "Issues");
 			issueStruct.getName().setText(Locale.GERMAN.getLanguage(), "Issues");
 			issueStruct = pm.makePersistent(issueStruct);
+			
 			issueStructLocal = new StructLocal(issueStruct, StructLocal.DEFAULT_SCOPE);
 			issueStructLocal.getName().setText(Locale.ENGLISH.getLanguage(), "Default Issue Structure");
 			issueStructLocal.getName().setText(Locale.GERMAN.getLanguage(), "Standardstruktur für Issues");
@@ -46,29 +47,6 @@ public class IssueStruct {
 	private static void createDefaultStructure(IStruct issueStruct) {
 		try {
 
-//			StructBlock sb = PropHelper.createStructBlock(issueStruct, DESCRIPTION, "Description", "Beschreibung");
-//			sb.setUnique(false);
-//			I18nTextStructField descShort = PropHelper.createI18nTextField(sb, DESCRIPTION_SHORT, "Short description", "Kurzbeschreibung");
-//			descShort.setLineCount(1);
-//			I18nTextStructField descLong = PropHelper.createI18nTextField(sb, DESCRIPTION_LONG, "Long description", "Ausführliche Beschreibung");
-//			descLong.setLineCount(10);
-//
-//			sb.addStructField(descShort);
-//			sb.addStructField(descLong);
-//
-//			issueStruct.addStructBlock(sb);
-//
-//			// --------
-//
-//			sb = PropHelper.createStructBlock(issueStruct, SUBJECT, "Subject", "Bilder");
-//			sb.setUnique(false);
-//			I18nTextStructField subject = PropHelper.createI18nTextField(sb, SUBJECT_SUBJECT, "Subject", "Lehrfach");
-//			subject.setLineCount(1);
-//
-//			sb.addStructField(subject);
-//
-//			issueStruct.addStructBlock(sb);
-
 		} catch (Throwable t) {
 			throw new RuntimeException(t);
 		}
@@ -78,11 +56,4 @@ public class IssueStruct {
 	// *************** DEFAULT StructBlocks StructField IDs ***************************
 
 	public static final String DEV_ORGANISATION_ID = Organisation.DEV_ORGANISATION_ID;
-
-//	public static final StructBlockID DESCRIPTION = StructBlockID.create(DEV_ORGANISATION_ID,"Issue.description");
-//	public static final StructFieldID DESCRIPTION_SHORT = StructFieldID.create(DESCRIPTION,"Short");
-//	public static final StructFieldID DESCRIPTION_LONG = StructFieldID.create(DESCRIPTION,"Long");
-//
-//	public static final StructBlockID SUBJECT = StructBlockID.create(DEV_ORGANISATION_ID,"Issue.subject");
-//	public static final StructFieldID SUBJECT_SUBJECT = StructFieldID.create(SUBJECT,"Subject");
 }

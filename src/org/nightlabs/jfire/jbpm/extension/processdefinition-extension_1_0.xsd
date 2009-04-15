@@ -30,6 +30,15 @@
 		</xsd:complexType>
 	</xsd:element>
 
+	<xsd:element name="action">
+		<xsd:complexType>
+			<xsd:attribute name="name" type="xsd:string" use="required"/>
+			<xsd:attribute name="eventType" type="xsd:string" use="required"/>
+			<xsd:attribute name="actionHandlerClass" type="xsd:string" use="required"/>
+		</xsd:complexType>
+	</xsd:element>
+
+		
 	<xsd:element name="transition" type="extension:ExtensionTransitionElement">
 	</xsd:element>
 
@@ -71,10 +80,12 @@
 			<xsd:element ref="extension:description" />
 			<xsd:element ref="extension:name" />
 			<xsd:element ref="extension:icon" maxOccurs="1" />
+			<xsd:element ref="extension:action"/>			
 			<xsd:element ref="extension:transition" />
 		</xsd:choice>
-		<xsd:attribute name="name" type="xsd:string" use="required" />
-		<xsd:attribute name="publicState" type="xsd:boolean" use="optional" />
+		<xsd:attribute name="name" type="xsd:string" use="required"/>
+		<xsd:attribute name="publicState" type="xsd:boolean" use="optional"/>
+		<xsd:attribute name="actionHandlerNode" type="xsd:boolean" use="optional"/>
 	</xsd:complexType>
 
 	<xsd:complexType name="ExtensionTransitionElement">

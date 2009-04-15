@@ -21,7 +21,7 @@ import org.nightlabs.jfire.trade.id.OfferID;
 import org.nightlabs.jfire.trade.id.SegmentID;
 import org.nightlabs.jfire.trade.recurring.RecurredOffer;
 import org.nightlabs.jfire.trade.recurring.RecurringTradeProductTypeActionHandler;
-import org.nightlabs.util.ScriptParser;
+import org.nightlabs.script.ScriptParser;
 
 /**
  * @jdo.persistence-capable

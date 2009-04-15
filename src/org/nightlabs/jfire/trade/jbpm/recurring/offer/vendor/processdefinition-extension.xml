@@ -217,8 +217,7 @@ name="dev.jfire.org:RecurringOffer.Vendor">
 			<description language="en">stopRecurrence</description>
 			<icon file="" />
 		</transition>
-		<transition name="dev.jfire.org:startRecurrence"
-			userExecutable="false">
+		<transition name="dev.jfire.org:startRecurrence">
 			<name language="de">Wiederkehr-starten</name>
 			<description language="de">Wiederkehr-starten</description>
 			<name language="en">startRecurrence</name>
@@ -232,15 +231,14 @@ name="dev.jfire.org:RecurringOffer.Vendor">
 		<name language="en">recurrenceStarted</name>
 		<description language="en">recurrenceStarted</description>
 		<icon file="" />
-		<transition name="dev.jfire.org:stopRecurrence"
-			userExecutable="false">
+		<transition name="dev.jfire.org:stopRecurrence">
 			<name language="de">Wiederkehr-stoppen</name>
 			<description language="de">Wiederkehr-stoppen</description>
 			<name language="en">stopRecurrence</name>
 			<description language="en">stopRecurrence</description>
 			<icon file="" />
 		</transition>
-		<transition name="dev.jfire.org:pauseRecurrence" userExecutable="false">
+		<transition name="dev.jfire.org:pauseRecurrence">
 			<name language="de">Wiederkehr-pausieren</name>
 			<description language="de">Wiederkehr-pausieren</description>
 			<name language="en">pauseRecurrence</name>

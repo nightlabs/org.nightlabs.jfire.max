@@ -47,8 +47,8 @@ extends BaseJDOObjectDAO<DepartmentID, Department>
 		monitor.beginTask("Fetching "+objectIDs.size()+" department information", 1);
 		Collection<Department> departments = null;
 		try {
-			DepartmentManager dm = JFireEjbFactory.getBean(DepartmentManager.class, SecurityReflector.getInitialContextProperties());
-			departments = dm.getDepartments(objectIDs, fetchGroups, maxFetchDepth);
+			DepartmentManager departmentManager = JFireEjbFactory.getBean(DepartmentManager.class, SecurityReflector.getInitialContextProperties());
+			departments = departmentManager.getDepartments(objectIDs, fetchGroups, maxFetchDepth);
 			monitor.worked(1);
 		} catch (Exception e) {
 			monitor.done();
@@ -68,10 +68,10 @@ extends BaseJDOObjectDAO<DepartmentID, Department>
 	public synchronized List<Department> getDepartments(String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) {
 		monitor.beginTask("Loading departments", 1);
 		try {
-			DepartmentManager im = JFireEjbFactory.getBean(DepartmentManager.class, SecurityReflector.getInitialContextProperties());
-			Set<DepartmentID> is = im.getDepartmentIDs();
+			DepartmentManager departmentManager = JFireEjbFactory.getBean(DepartmentManager.class, SecurityReflector.getInitialContextProperties());
+			Set<DepartmentID> departmentIDs = departmentManager.getDepartmentIDs();
 			monitor.done();
-			return getJDOObjects(null, is, fetchGroups, maxFetchDepth, monitor);
+			return getJDOObjects(null, departmentIDs, fetchGroups, maxFetchDepth, monitor);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -88,10 +88,10 @@ extends BaseJDOObjectDAO<DepartmentID, Department>
 			throw new NullPointerException("Department to save must not be null");
 		monitor.beginTask("Storing department: "+ department.getDepartmentID(), 3);
 		try {
-			DepartmentManager dm = JFireEjbFactory.getBean(DepartmentManager.class, SecurityReflector.getInitialContextProperties());
+			DepartmentManager departmentManager = JFireEjbFactory.getBean(DepartmentManager.class, SecurityReflector.getInitialContextProperties());
 			monitor.worked(1);
 
-			Department result = dm.storeDepartment(department, get, fetchGroups, maxFetchDepth);
+			Department result = departmentManager.storeDepartment(department, get, fetchGroups, maxFetchDepth);
 			if (result != null)
 				getCache().put(null, result, fetchGroups, maxFetchDepth);
 

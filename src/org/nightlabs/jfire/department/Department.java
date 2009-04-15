@@ -28,7 +28,7 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="FetchGroupsProp.fullData" fields="name"
  */
 public class Department 
-implements Serializable
+implements Serializable, Comparable<Department>
 {
 	private static final long serialVersionUID = 1L;
 
@@ -157,5 +157,10 @@ implements Serializable
 	public int hashCode()
 	{
 		return (31 * Util.hashCode(organisationID)) + Util.hashCode(departmentID);
+	}
+
+	@Override
+	public int compareTo(Department o) {
+		return this.name.getText().compareTo(o.getName().getText());
 	}
 }

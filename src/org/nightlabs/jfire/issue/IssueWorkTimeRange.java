@@ -1,6 +1,7 @@
 package org.nightlabs.jfire.issue;
 
 import java.io.Serializable;
+import java.util.Calendar;
 import java.util.Date;
 
 import javax.jdo.JDOHelper;
@@ -9,6 +10,7 @@ import javax.jdo.PersistenceManager;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.security.User;
+import org.nightlabs.util.NLLocale;
 import org.nightlabs.util.Util;
 
 /**
@@ -204,6 +206,11 @@ implements Serializable, Comparable<IssueWorkTimeRange>
 	 * 
 	 */
 	public void setDuration(long duration) {
+		if (to == null) {
+			Calendar c = Calendar.getInstance(NLLocale.getDefault());
+			c.setTime(from);
+			c.add(Calendar.MILLISECOND, (int)duration);
+		}
 		this.duration = duration;
 	}
 	

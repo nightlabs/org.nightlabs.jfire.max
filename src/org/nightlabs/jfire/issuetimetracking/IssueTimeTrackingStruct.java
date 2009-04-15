@@ -31,11 +31,10 @@ import org.nightlabs.jfire.prop.id.StructFieldID;
 public class IssueTimeTrackingStruct 
 {
 	private static final Logger logger = Logger.getLogger(IssueTimeTrackingStruct.class);
+	
 	public static IStruct getIssueTimeTrackingStruct(PersistenceManager pm) {
-		String devOrganisationID = Organisation.DEV_ORGANISATION_ID;
 		Struct issueStruct = null;
-		
-		issueStruct = Struct.getStruct(devOrganisationID, Issue.class, Struct.DEFAULT_SCOPE, pm);
+		issueStruct = Struct.getStruct(DEV_ORGANISATION_ID, Issue.class, Struct.DEFAULT_SCOPE, pm);
 		try {
 			logger.debug("Found Struct............");
 			StructBlock departmentStructBlock = issueStruct.getStructBlock(DEPARTMENT_BLOCK);
@@ -62,13 +61,12 @@ public class IssueTimeTrackingStruct
 		
 		StructBlock structBlock = PropHelper.createStructBlock(issueStruct, DEPARTMENT_BLOCK, blockNameMap);
 		structBlock.setUnique(true);		
+		createDepartmentStructField(structBlock);
 		try {
 			issueStruct.addStructBlock(structBlock);
 		} catch (DuplicateKeyException e) {
 			throw new RuntimeException(e);
 		}
-		
-		createDepartmentStructField(structBlock);
 	}
 	
 	private static void createDepartmentStructField(StructBlock issueStructBlock) {
@@ -81,10 +79,9 @@ public class IssueTimeTrackingStruct
 		DepartmentStructField departmentStructField = PropHelper.createDepartmentField(issueStructBlock, DEPARTMENT_FIELD, fieldNameMap);
 		try {
 			issueStructBlock.addStructField(departmentStructField);
-		} catch (Exception e) {
+		} catch (DuplicateKeyException e) {
 			throw new RuntimeException(e);
 		}
-	
 	}
 
 	// *************** DEFAULT StructBlocks StructField IDs ***************************

@@ -3,6 +3,7 @@ package org.nightlabs.jfire.department.prop;
 import org.nightlabs.jfire.prop.DataBlock;
 import org.nightlabs.jfire.prop.StructBlock;
 import org.nightlabs.jfire.prop.StructField;
+import org.nightlabs.jfire.prop.id.StructFieldID;
 
 /**
  * @author Chairat Kongarayawetchakun chairat[at]nightlabs[dot]de
@@ -19,10 +20,14 @@ public class DepartmentStructField extends StructField<DepartmentDataField>
 
 	protected DepartmentStructField() { }
 
+	public DepartmentStructField(StructBlock structBlock, StructFieldID structFieldID) {
+		super(structBlock, structFieldID);
+	}
+
 	public DepartmentStructField(StructBlock structBlock) {
 		super(structBlock);
 	}
-
+	
 	@Override
 	protected DepartmentDataField createDataFieldInstanceInternal(DataBlock dataBlock) {
 		return new DepartmentDataField(dataBlock, this);

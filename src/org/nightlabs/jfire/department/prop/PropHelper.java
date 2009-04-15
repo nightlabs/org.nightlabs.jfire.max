@@ -23,7 +23,7 @@ public class PropHelper {
 	}
 	
 	public static DepartmentStructField createDepartmentField(StructBlock sb, StructFieldID structFieldID, Map<String, String> texts) {
-		DepartmentStructField field = new DepartmentStructField(sb);
+		DepartmentStructField field = new DepartmentStructField(sb, structFieldID);
 		for (String lang : texts.keySet()) {
 			field.getName().setText(lang, texts.get(lang));
 		}

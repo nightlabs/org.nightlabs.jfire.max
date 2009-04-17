@@ -118,6 +118,7 @@ implements Serializable, Comparable<Project>
 	 */
 	private ProjectDescription description;
 
+	
 	/**
 	 * @jdo.field
 	 * 		persistence-modifier="persistent"
@@ -181,11 +182,6 @@ implements Serializable, Comparable<Project>
 	 */
 	private Date finishDate;
 
-//	/**
-//	 * @jdo.field persistence-modifier="persistent"
-//	 */
-//	private ProjectCost projectCost;
-	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */

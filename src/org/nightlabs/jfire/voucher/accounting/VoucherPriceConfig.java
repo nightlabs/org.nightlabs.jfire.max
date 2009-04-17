@@ -52,14 +52,6 @@ implements IPackagePriceConfig
 	 */
 	private Map<Currency, Long> prices;
 
-// First: This should not be here! If you really need this in your web shop, please implement it there - noone else never needed it before => makes no sense to bloat this class with it.
-// Second: Why do you write "pricesAsDouble" when the Map is still containing Long instances????
-// Marco.
-//	/**
-//	 * @jdo.field persistence-modifier="none"
-//	 */
-//	private Map<Currency, Long> pricesAsDouble;
-
 	/**
 	 * @deprecated Only for JDO!
 	 */
@@ -92,7 +84,7 @@ implements IPackagePriceConfig
 		PriceFragmentType priceFragmentTypeTotal = getPriceFragmentType(
 				PriceFragmentType.PRICE_FRAGMENT_TYPE_ID_TOTAL.organisationID, PriceFragmentType.PRICE_FRAGMENT_TYPE_ID_TOTAL.priceFragmentTypeID, true);
 
-		Price price = new Price("", "", -1, article.getCurrency());
+		Price price = new Price("", -1, article.getCurrency());
 		if (amount != null)
 			price.setAmount(priceFragmentTypeTotal, amount);
 
@@ -111,7 +103,7 @@ implements IPackagePriceConfig
 		PriceFragmentType priceFragmentTypeTotal = getPriceFragmentType(
 				PriceFragmentType.PRICE_FRAGMENT_TYPE_ID_TOTAL.organisationID, PriceFragmentType.PRICE_FRAGMENT_TYPE_ID_TOTAL.priceFragmentTypeID, true);
 
-		Price origPrice = new Price("", "", -1, article.getCurrency());
+		Price origPrice = new Price("", -1, article.getCurrency());
 		if (amount != null)
 			origPrice.setAmount(priceFragmentTypeTotal, amount);
 
@@ -134,7 +126,7 @@ implements IPackagePriceConfig
 		PriceFragmentType priceFragmentTypeTotal = getPriceFragmentType(
 				PriceFragmentType.PRICE_FRAGMENT_TYPE_ID_TOTAL.organisationID, PriceFragmentType.PRICE_FRAGMENT_TYPE_ID_TOTAL.priceFragmentTypeID, true);
 
-		Price origPrice = new Price("", "", -1, article.getCurrency());
+		Price origPrice = new Price("", -1, article.getCurrency());
 		if (amount != null)
 			origPrice.setAmount(priceFragmentTypeTotal, amount);
 

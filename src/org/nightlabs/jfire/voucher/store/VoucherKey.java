@@ -15,6 +15,7 @@ import org.nightlabs.jfire.accounting.Price;
 import org.nightlabs.jfire.accounting.PriceFragmentType;
 import org.nightlabs.jfire.accounting.pay.Payment;
 import org.nightlabs.jfire.accounting.priceconfig.PriceConfig;
+import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.Product;
 import org.nightlabs.jfire.trade.Article;
@@ -236,8 +237,9 @@ implements Serializable
 		this.validity = VALIDITY_NOT_YET_VALID;
 		this.redemptions = new HashSet<VoucherRedemption>();
 
-		long priceID = PriceConfig.createPriceID(nominalValue.getOrganisationID(), nominalValue.getPriceConfigID());
-		restValue = new Price(nominalValue.getOrganisationID(), nominalValue.getPriceConfigID(), priceID, nominalValue.getCurrency());
+//		long priceID = PriceConfig.createPriceID(nominalValue.getOrganisationID(), nominalValue.getPriceConfigID());
+//		restValue = new Price(nominalValue.getOrganisationID(), nominalValue.getPriceConfigID(), priceID, nominalValue.getCurrency());
+		restValue = new Price(IDGenerator.getOrganisationID(), IDGenerator.nextID(Price.class), nominalValue.getCurrency());
 		restValue.createPriceFragment(
 				nominalValue.getPriceFragment(PriceFragmentType.PRICE_FRAGMENT_TYPE_ID_TOTAL.organisationID, PriceFragmentType.PRICE_FRAGMENT_TYPE_ID_TOTAL.priceFragmentTypeID, true).getPriceFragmentType()).
 				setAmount(nominalValue.getAmount());

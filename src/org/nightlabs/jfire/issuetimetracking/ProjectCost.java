@@ -1,11 +1,18 @@
 package org.nightlabs.jfire.issuetimetracking;
 
 import java.io.Serializable;
+import java.util.Map;
+
+import javax.security.auth.spi.LoginModule;
 
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.Price;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.issue.project.Project;
+import org.nightlabs.jfire.security.User;
+import org.nightlabs.jfire.security.id.UserID;
+
+import com.sun.org.apache.bcel.internal.generic.IFNULL;
 
 /**
  * The {@link ProjectCost} class represents an cost information of each {@link Project}s. 
@@ -63,19 +70,29 @@ implements Serializable
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
-	private Price cost;
+	private Currency currency;
 	
 	/**
-	 * @jdo.field persistence-modifier="persistent"
+	 * This field defines the project cost per user. The default value is the entry {@value User#USER_ID_OTHER}.
+	 * 
+	 * key: String {@link UserID#userID}<br/>
+	 * value: {@link ProjectCostValue}
+	 * 
+	 * @jdo.field
+	 *		persistence-modifier="persistent"
+	 *		default-fetch-group="true"
+	 *		table="JFireIssueTimeTracking_ProjectCost_user2ProjectCostMap"
+	 *		null-value="exception"
+	 *		dependent-value="true"
+	 * 
+	 * @jdo.join
 	 */
-	private Price revenue;
+	private Map<String, ProjectCostValue> user2ProjectCostMap;
 	
 	/**
 	 * @deprecated Only for JDO!!!!
 	 */
-	protected ProjectCost()
-	{
-	}
+	protected ProjectCost()	{}
 
 	/**
 	 * Constructs a new project cost.
@@ -84,11 +101,9 @@ implements Serializable
 	 */
 	public ProjectCost(Project project, Currency currency){
 		this.project = project;
+		
 		this.organisationID = project.getOrganisationID();
 		this.projectID = project.getProjectID();
-		
-		this.cost = new Price(project.getOrganisationID(), IDGenerator.nextID(Price.class), currency);
-		this.revenue = new Price(project.getOrganisationID(), IDGenerator.nextID(Price.class), currency);
 	}
 	
 	/**
@@ -106,36 +121,26 @@ implements Serializable
 	public Project getProject() {
 		return project;
 	}
-	
-	/**
-	 * Sets the {@link Price}.
-	 * @param cost the cost
-	 */
-	public void setCost(Price cost) {
-		this.cost = cost;
+
+	public Currency getCurrency() {
+		return currency;
 	}
 	
-	/**
-	 * Returns the {@link Price}.
-	 * @return the {@link Price}
-	 */
-	public Price getCost() {
-		return cost;
+	public double getTotalCostDoubleVale() {
+		double result = 0;
+		for (String userID : user2ProjectCostMap.keySet()) {
+			ProjectCostValue projectCostValue = user2ProjectCostMap.get(userID);
+			result += projectCostValue.getCost().getAmountAsDouble();
+		}
+		return result;
 	}
 	
-	/**
-	 * Sets the revenue.
-	 * @param revenue the revenue
-	 */
-	public void setRevenue(Price revenue) {
-		this.revenue = revenue;
-	}
-	
-	/**
-	 * Returns the {@link Price}.
-	 * @return the {@link Price}
-	 */
-	public Price getRevenue() {
-		return revenue;
+	public double getTotalRevenueDoubleVale() {
+		double result = 0;
+		for (String userID : user2ProjectCostMap.keySet()) {
+			ProjectCostValue projectCostValue = user2ProjectCostMap.get(userID);
+			result += projectCostValue.getRevenue().getAmountAsDouble();
+		}
+		return result;
 	}
 }

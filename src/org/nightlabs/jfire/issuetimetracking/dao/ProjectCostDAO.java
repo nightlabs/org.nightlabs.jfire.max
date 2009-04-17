@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.nightlabs.jfire.accounting.Currency;
+import org.nightlabs.jfire.accounting.Price;
 import org.nightlabs.jfire.base.JFireEjbFactory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.issue.dao.IssueDAO;

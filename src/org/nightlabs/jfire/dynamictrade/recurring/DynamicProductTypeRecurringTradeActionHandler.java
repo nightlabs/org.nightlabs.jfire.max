@@ -21,7 +21,7 @@ import org.nightlabs.jfire.trade.id.OfferID;
 import org.nightlabs.jfire.trade.id.SegmentID;
 import org.nightlabs.jfire.trade.recurring.RecurredOffer;
 import org.nightlabs.jfire.trade.recurring.RecurringTradeProductTypeActionHandler;
-import org.nightlabs.script.ScriptParser;
+import org.nightlabs.script.JSHTMLExecuter;
 
 /**
  * @jdo.persistence-capable
@@ -64,7 +64,7 @@ public class DynamicProductTypeRecurringTradeActionHandler extends RecurringTrad
 
 		PersistenceManager pm = getPersistenceManager();
 		DynamicTrader dtm = DynamicTrader.getDynamicTrader(pm);
-		ScriptParser script = new ScriptParser();
+		JSHTMLExecuter script = new JSHTMLExecuter();
 		
 		for (Iterator<Article> it = recurringArticles.iterator(); it.hasNext(); ) 
 		{	

@@ -58,10 +58,10 @@ implements IPackagePriceConfig
 			productInfo = (DynamicProductInfo) article;
 		
 		Price singlePrice = productInfo.getSinglePrice();
-		long priceID = PriceConfig.createPriceID(singlePrice.getOrganisationID(), singlePrice.getPriceConfigID());
+//		long priceID = PriceConfig.createPriceID(singlePrice.getOrganisationID(), singlePrice.getPriceConfigID());
 		ArticlePrice articlePrice = new ArticlePrice(
 				article, singlePrice,
-				singlePrice.getOrganisationID(), singlePrice.getPriceConfigID(), priceID,
+				IDGenerator.getOrganisationID(), IDGenerator.nextID(Price.class),
 				false);
 		for (PriceFragment pf : articlePrice.getFragments()) {
 			articlePrice.setAmount(pf.getPriceFragmentType(), (long) (pf.getAmount() * productInfo.getQuantityAsDouble()));

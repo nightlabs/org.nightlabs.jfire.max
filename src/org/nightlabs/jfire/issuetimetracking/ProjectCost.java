@@ -2,13 +2,10 @@ package org.nightlabs.jfire.issuetimetracking;
 
 import java.io.Serializable;
 
-import javax.jdo.JDOObjectNotFoundException;
-import javax.jdo.PersistenceManager;
-
+import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.Price;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.issue.project.Project;
-import org.nightlabs.jfire.issuetimetracking.id.ProjectCostID;
 
 /**
  * The {@link ProjectCost} class represents an cost information of each {@link Project}s. 
@@ -26,23 +23,26 @@ import org.nightlabs.jfire.issuetimetracking.id.ProjectCostID;
  * @jdo.create-objectid-class field-order="organisationID, projectID"
  *
  * @jdo.inheritance strategy="new-table"
+ * 
+ * @jdo.query
+ *		name="getProjectCostsByProjectID"
+ *		query="SELECT
+ *			WHERE
+ *				this.project.organisationID == :organisationID &&
+ *				this.project.projectID == :projectID"
+ *
+ * @jdo.fetch-group name="ProjectCost.cost" fields="cost"
+ * @jdo.fetch-group name="ProjectCost.revenue" fields="revenue"
+ * @jdo.fetch-group name="ProjectCost.project" fields="project"
  */
 public class ProjectCost 
 implements Serializable
 {
 	private static final long serialVersionUID = 1L;
 	
-	public static ProjectCost createProjectCost(PersistenceManager pm, Project project)
-	{
-		ProjectCostID projectCostID = ProjectCostID.create(project.getOrganisationID(), project.getProjectID());
-		try {
-			return (ProjectCost) pm.getObjectById(projectCostID);
-		} catch (JDOObjectNotFoundException x) {
-			ProjectCost projectCost = new ProjectCost(project);
-			projectCost = pm.makePersistent(projectCost);
-			return projectCost; 
-		}
-	}
+	public static final String FETCH_GROUP_COST = "ProjectCost.cost";
+	public static final String FETCH_GROUP_REVENUE = "ProjectCost.revenue";
+	public static final String FETCH_GROUP_PROJECT = "ProjectCost.project";
 	
 	/**
 	 * @jdo.field primary-key="true"
@@ -82,10 +82,13 @@ implements Serializable
 	 * @param organisationID the first part of the composite primary key - referencing the organisation which owns this <code>IssuePriority</code>.
 	 * @param projectCostID the second part of the composite primary key. Use {@link IDGenerator#nextID(Class)} with <code>ProjectCost.class</code> to create an id.
 	 */
-	public ProjectCost(Project project){
+	public ProjectCost(Project project, Currency currency){
 		this.project = project;
 		this.organisationID = project.getOrganisationID();
 		this.projectID = project.getProjectID();
+		
+		this.cost = new Price(project.getOrganisationID(), IDGenerator.nextID(Price.class), currency);
+		this.revenue = new Price(project.getOrganisationID(), IDGenerator.nextID(Price.class), currency);
 	}
 	
 	/**

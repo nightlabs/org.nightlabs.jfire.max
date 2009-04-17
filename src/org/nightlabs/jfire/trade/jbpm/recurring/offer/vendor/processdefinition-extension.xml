@@ -246,9 +246,4 @@ name="dev.jfire.org:RecurringOffer.Vendor">
 			<icon file="" />
 		</transition>
 	</state>
-	<node name="vendorOfferRecurringActions" actionHandlerNode="true">
-		<action name="ActionHandlerNodeEnter" eventType="node-enter"
-			actionHandlerClass="org.nightlabs.jfire.jbpm.graph.def.ActionHandlerNodeEnter">
-		</action>
-	</node>
 </process-definition-extension>

@@ -439,21 +439,21 @@ public abstract class PriceConfig implements Serializable, StoreCallback, Attach
 		return ObjectIDUtil.longObjectIDFieldToString(IDGenerator.nextID(PriceConfig.class));
 	}
 
-	public static long createPriceID(String priceConfigOrganisationID, String priceConfigID)
-	{
-		if (IDGenerator.getOrganisationID().equals(priceConfigOrganisationID))
-			return IDGenerator.nextID(Price.class, getPrimaryKey(priceConfigOrganisationID, priceConfigID));
+//	public static long createPriceID(String priceConfigOrganisationID, String priceConfigID)
+//	{
+//		if (IDGenerator.getOrganisationID().equals(priceConfigOrganisationID))
+//			return IDGenerator.nextID(Price.class, getPrimaryKey(priceConfigOrganisationID, priceConfigID));
+//
+//		// TODO On the long run, we must be able to obtain the ID from another organisation if we cooperate with it because
+//		// we might do price calculations "abroad" - but currently, this doesn't happen.
+//		throw new UnsupportedOperationException("This method does not yet support to generate a priceID when called outside its organisation!");
+//	}
 
-		// TODO On the long run, we must be able to obtain the ID from another organisation if we cooperate with it because
-		// we might do price calculations "abroad" - but currently, this doesn't happen.
-		throw new UnsupportedOperationException("This method does not yet support to generate a priceID when called outside its organisation!");
-	}
-
-	@Override
-	public long createPriceID()
-	{
-		return createPriceID(organisationID, priceConfigID);
-	}
+//	@Override
+//	public long createPriceID()
+//	{
+//		return createPriceID(organisationID, priceConfigID);
+//	}
 
 	@Override
 	public void jdoPreStore()

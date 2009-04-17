@@ -231,10 +231,10 @@ implements SessionBean
 
 				// TODO currencySymbol (second "EUR") should be €,
 				// but this doesn't work yet because of a charset problem with the db
-				currency = new Currency("EUR", "EUR", 2);
+				currency = new Currency(CurrencyConstants.EUR.currencyID, "EUR", 2);
 				pm.makePersistent(currency);
 
-				currency = new Currency("CHF", "CHF", 2);
+				currency = new Currency(CurrencyConstants.CHF.currencyID, "CHF", 2);
 				pm.makePersistent(currency);
 			}
 

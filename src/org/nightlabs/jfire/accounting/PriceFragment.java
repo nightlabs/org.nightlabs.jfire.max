@@ -46,7 +46,7 @@ import java.io.Serializable;
  * @jdo.inheritance strategy = "new-table"
  *
  * @jdo.create-objectid-class
- *		field-order="organisationID, priceConfigID, priceID, priceFragmentTypePK"
+ *		field-order="organisationID, priceID, priceFragmentTypePK"
  *
  * @jdo.fetch-group name="PriceFragment.price" fields="price"
  * @jdo.fetch-group name="PriceFragment.currency" fields="currency"
@@ -81,11 +81,11 @@ public class PriceFragment
 	 */
 	private String organisationID;
 
-	/**
-	 * @jdo.field primary-key="true"
-	 * @jdo.column length="100"
-	 */
-	private String priceConfigID;
+//	/**
+//	 * @jdo.field primary-key="true"
+//	 * @jdo.column length="100"
+//	 */
+//	private String priceConfigID;
 
 	/**
 	 * @jdo.field primary-key="true"
@@ -141,7 +141,7 @@ public class PriceFragment
 	{
 		this.price = price;
 		this.organisationID = price.getOrganisationID();
-		this.priceConfigID = price.getPriceConfigID();
+//		this.priceConfigID = price.getPriceConfigID();
 		this.priceID = price.getPriceID();
 		this.currency = price.getCurrency();
 //		this.priceFragmentTypeOrganisationID = priceFragmentType.getOrganisationID();
@@ -154,7 +154,7 @@ public class PriceFragment
 	{
 		this.price = price;
 		this.organisationID = price.getOrganisationID();
-		this.priceConfigID = price.getPriceConfigID();
+//		this.priceConfigID = price.getPriceConfigID();
 		this.priceID = price.getPriceID();
 		this.currency = price.getCurrency();
 //		this.priceFragmentTypeOrganisationID = origPriceFragment.priceFragmentTypeOrganisationID;
@@ -171,13 +171,13 @@ public class PriceFragment
 	{
 		return organisationID;
 	}
-	/**
-	 * @return Returns the priceConfigID.
-	 */
-	public String getPriceConfigID()
-	{
-		return priceConfigID;
-	}
+//	/**
+//	 * @return Returns the priceConfigID.
+//	 */
+//	public String getPriceConfigID()
+//	{
+//		return priceConfigID;
+//	}
 	/**
 	 * @return Returns the priceID.
 	 */

@@ -61,9 +61,9 @@ public class OfferPrice extends org.nightlabs.jfire.accounting.Price
 	 * @deprecated test
 	 */
 	@Deprecated
-	public OfferPrice(Offer offer, String organisationID, String priceConfigID, long priceID)
+	public OfferPrice(Offer offer, String organisationID, long priceID)
 	{
-		super(organisationID, priceConfigID, priceID, offer.getCurrency());
+		super(organisationID, priceID, offer.getCurrency());
 		this.offer = offer;
 
 		calculatePrice();

@@ -50,7 +50,7 @@ import org.nightlabs.jdo.ObjectIDUtil;
  * @jdo.inheritance strategy="new-table"
  *
  * @jdo.create-objectid-class
- *		field-order="organisationID, priceConfigID, priceID"
+ *		field-order="organisationID, priceID"
  *
  * @jdo.fetch-group name="Price.currency" fields="currency"
  * @jdo.fetch-group name="Price.fragments" fields="fragments"
@@ -86,11 +86,11 @@ public class Price
 	 */
 	private String organisationID;
 
-	/**
-	 * @jdo.field primary-key="true"
-	 * @jdo.column length="100"
-	 */
-	private String priceConfigID;
+//	/**
+//	 * @jdo.field primary-key="true"
+//	 * @jdo.column length="100"
+//	 */
+//	private String priceConfigID;
 
 	/**
 	 * @jdo.field primary-key="true"
@@ -161,25 +161,30 @@ public class Price
 	 * @param tariffPrice
 	 * @param currency
 	 */
-	public Price(String organisationID, String priceConfigID, long priceID, Currency currency)
+	public Price(
+			String organisationID,
+//			String priceConfigID,
+			long priceID,
+			Currency currency
+	)
 	{
 		if (priceID < 0) {
 			if (!"".equals(organisationID)) //$NON-NLS-1$
 				throw new IllegalArgumentException("organisationID must be empty if priceID < 0! organisationID: " + organisationID); //$NON-NLS-1$
 
-			if (!"".equals(priceConfigID)) //$NON-NLS-1$
-				throw new IllegalArgumentException("priceConfigID must be empty if priceID < 0! priceConfigID: " + priceConfigID); //$NON-NLS-1$
+//			if (!"".equals(priceConfigID)) //$NON-NLS-1$
+//				throw new IllegalArgumentException("priceConfigID must be empty if priceID < 0! priceConfigID: " + priceConfigID); //$NON-NLS-1$
 		}
 		else {
 			if (!ObjectIDUtil.isValidIDString(organisationID))
 				throw new IllegalArgumentException("organisationID must a valid ID, if priceID >= 0! organisationID: " + organisationID); //$NON-NLS-1$
 
-			if (!ObjectIDUtil.isValidIDString(priceConfigID))
-				throw new IllegalArgumentException("priceConfigID must a valid ID, if priceID >= 0! priceConfigID: " + priceConfigID); //$NON-NLS-1$
+//			if (!ObjectIDUtil.isValidIDString(priceConfigID))
+//				throw new IllegalArgumentException("priceConfigID must a valid ID, if priceID >= 0! priceConfigID: " + priceConfigID); //$NON-NLS-1$
 		}
 
 		this.organisationID = organisationID;
-		this.priceConfigID = priceConfigID;
+//		this.priceConfigID = priceConfigID;
 		this.priceID = priceID;
 		if (currency == null)
 			throw new NullPointerException("currency"); //$NON-NLS-1$
@@ -187,14 +192,14 @@ public class Price
 		this.fragments = new HashMap<String, PriceFragment>();
 	}
 
-	public static String getPrimaryKey(String organisationID, String priceConfigID, long priceID)
+	public static String getPrimaryKey(String organisationID, long priceID)
 	{
-		return organisationID + '/' + priceConfigID + '/' + ObjectIDUtil.longObjectIDFieldToString(priceID);
+		return organisationID + '/' + ObjectIDUtil.longObjectIDFieldToString(priceID);
 	}
 
 	public String getPrimaryKey()
 	{
-		return getPrimaryKey(organisationID, priceConfigID, priceID);
+		return getPrimaryKey(organisationID, priceID);
 	}
 
 	/**
@@ -204,13 +209,13 @@ public class Price
 	{
 		return organisationID;
 	}
-	/**
-	 * @return Returns the priceConfigID.
-	 */
-	public String getPriceConfigID()
-	{
-		return priceConfigID;
-	}
+//	/**
+//	 * @return Returns the priceConfigID.
+//	 */
+//	public String getPriceConfigID()
+//	{
+//		return priceConfigID;
+//	}
 	/**
 	 * @return Returns the priceID.
 	 */

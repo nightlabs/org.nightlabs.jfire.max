@@ -35,7 +35,9 @@ import javax.jdo.PersistenceManager;
 
 import org.nightlabs.jfire.accounting.Accounting;
 import org.nightlabs.jfire.accounting.AccountingPriceConfig;
+import org.nightlabs.jfire.accounting.Price;
 import org.nightlabs.jfire.accounting.PriceFragment;
+import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.store.NestedProductTypeLocal;
 import org.nightlabs.jfire.store.Product;
 import org.nightlabs.jfire.store.ProductType;
@@ -217,7 +219,7 @@ public class ArticlePrice extends org.nightlabs.jfire.accounting.Price
 	public ArticlePrice(
 			Article article,
 			org.nightlabs.jfire.accounting.Price origPrice,
-			String organisationID, String priceConfigID,
+			String organisationID, // String priceConfigID,
 			long priceID,
 			ArticlePrice packageArticlePrice,
 			NestedProductTypeLocal nestedProductTypeLocal,
@@ -229,7 +231,7 @@ public class ArticlePrice extends org.nightlabs.jfire.accounting.Price
 		this(
 				article,
 				origPrice,
-				organisationID, priceConfigID,
+				organisationID, // priceConfigID,
 				priceID,
 				packageArticlePrice,
 				(
@@ -251,7 +253,7 @@ public class ArticlePrice extends org.nightlabs.jfire.accounting.Price
 	public ArticlePrice(
 			Article article,
 			org.nightlabs.jfire.accounting.Price origPrice,
-			String organisationID, String priceConfigID,
+			String organisationID, // String priceConfigID,
 			long priceID,
 			ArticlePrice packageArticlePrice,
 			ProductType packageProductType,
@@ -261,7 +263,7 @@ public class ArticlePrice extends org.nightlabs.jfire.accounting.Price
 			boolean virtualInner,
 			boolean refund)
 	{
-		super(organisationID, priceConfigID, priceID, origPrice.getCurrency());
+		super(organisationID, priceID, origPrice.getCurrency());
 		if (article == null)
 			throw new NullPointerException("article");
 
@@ -330,11 +332,14 @@ public class ArticlePrice extends org.nightlabs.jfire.accounting.Price
 	public ArticlePrice(
 			Article article,
 			org.nightlabs.jfire.accounting.Price origPrice,
-			String organisationID, String priceConfigID,
+			String organisationID, // String priceConfigID,
 			long priceID, boolean refund)
 	{
-		this(article, origPrice, organisationID, priceConfigID, priceID,
-				null, null, article.getProductType(), article.getProduct(), false, refund);
+		this(
+				article, origPrice, organisationID, // priceConfigID,
+				priceID,
+				null, null, article.getProductType(), article.getProduct(), false, refund
+		);
 	}
 
 	/**
@@ -365,16 +370,18 @@ public class ArticlePrice extends org.nightlabs.jfire.accounting.Price
 
 		if (origPrice instanceof ArticlePrice) {
 			ArticlePrice origArticlePrice = (ArticlePrice)origPrice;
-			PersistenceManager pm = JDOHelper.getPersistenceManager(origArticlePrice);
-			AccountingPriceConfig accountingPriceConfig = Accounting.getAccounting(pm).getAccountingPriceConfig();
+//			PersistenceManager pm = JDOHelper.getPersistenceManager(origArticlePrice);
+//			AccountingPriceConfig accountingPriceConfig = Accounting.getAccounting(pm).getAccountingPriceConfig();
 
 			for (ArticlePrice origNestedArticlePrice : origArticlePrice.getNestedArticlePrices()) {
 				new ArticlePrice(
 						origArticlePrice.article,
 						origNestedArticlePrice,
-						accountingPriceConfig.getOrganisationID(),
-						accountingPriceConfig.getPriceConfigID(),
-						accountingPriceConfig.createPriceID(),
+						IDGenerator.getOrganisationID(),
+						IDGenerator.nextID(Price.class),
+//						accountingPriceConfig.getOrganisationID(),
+//						accountingPriceConfig.getPriceConfigID(),
+//						accountingPriceConfig.createPriceID(),
 						this,
 						origNestedArticlePrice.packageProductType,
 						origNestedArticlePrice.innerProductTypeQuantity,
@@ -422,15 +429,17 @@ public class ArticlePrice extends org.nightlabs.jfire.accounting.Price
 		if (reversingArticle == null)
 			throw new IllegalStateException("this.article.getReversingArticle() returned null, even though this.article.isReversed() returned true!");
 
-		Accounting accounting = Accounting.getAccounting(pm);
-		AccountingPriceConfig accountingPriceConfig = accounting.getAccountingPriceConfig();
+//		Accounting accounting = Accounting.getAccounting(pm);
+//		AccountingPriceConfig accountingPriceConfig = accounting.getAccountingPriceConfig();
 
 		ArticlePrice articlePrice = new ArticlePrice(
 				reversingArticle,
 				this,
-				accounting.getOrganisationID(),
-				accountingPriceConfig.getPriceConfigID(),
-				accountingPriceConfig.createPriceID(),
+				IDGenerator.getOrganisationID(),
+				IDGenerator.nextID(Price.class),
+//				accounting.getOrganisationID(),
+//				accountingPriceConfig.getPriceConfigID(),
+//				accountingPriceConfig.createPriceID(),
 				true
 			);
 		return articlePrice;

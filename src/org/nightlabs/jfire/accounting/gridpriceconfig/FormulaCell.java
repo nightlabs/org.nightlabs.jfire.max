@@ -31,9 +31,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.nightlabs.jdo.ObjectIDUtil;
+import org.nightlabs.jfire.accounting.Price;
 import org.nightlabs.jfire.accounting.PriceFragmentType;
 import org.nightlabs.jfire.accounting.id.PriceFragmentTypeID;
 import org.nightlabs.jfire.accounting.priceconfig.PriceConfig;
+import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.util.Util;
 
 /**
@@ -47,7 +49,7 @@ import org.nightlabs.util.Util;
  *
  * @jdo.inheritance strategy="new-table"
  *
- * @jdo.create-objectid-class field-order="organisationID, priceConfigID, formulaID"
+ * @jdo.create-objectid-class field-order="organisationID, formulaCellID"
  *
  * @jdo.fetch-group name="FormulaCell.priceConfig" fields="priceConfig"
  * @jdo.fetch-group name="FormulaCell.priceCoordinate" fields="priceCoordinate"
@@ -88,16 +90,16 @@ public class FormulaCell implements Serializable
 	 */
 	private String organisationID;
 
-	/**
-	 * @jdo.field primary-key="true"
-	 * @jdo.column length="100"
-	 */
-	private String priceConfigID;
+//	/**
+//	 * @jdo.field primary-key="true"
+//	 * @jdo.column length="100"
+//	 */
+//	private String priceConfigID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 */
-	private long formulaID;
+	private long formulaCellID;
 
 	/**
 	 * @!jdo.field persistence-modifier="persistent" null-value="exception"
@@ -154,8 +156,14 @@ public class FormulaCell implements Serializable
 			throw new IllegalArgumentException("priceConfig must be an instance of IFormulaPriceConfig but is not! " + this.priceConfig);
 
 		this.organisationID = priceConfig.getOrganisationID();
-		this.priceConfigID = priceConfig.getPriceConfigID();
-		this.formulaID = priceConfig.createPriceID();
+//		this.priceConfigID = priceConfig.getPriceConfigID();
+//		this.formulaID = priceConfig.createPriceID();
+		
+		if (!IDGenerator.getOrganisationID().equals(this.organisationID))
+			throw new IllegalStateException("IDGenerator.organisationID != this.organisationID :: " + IDGenerator.getOrganisationID() + " != " + this.organisationID);
+
+		this.formulaCellID = IDGenerator.nextID(FormulaCell.class);
+		
 		this.priceCoordinate = null;
 		this.priceFragmentFormulas = new HashMap<String, String>();
 	}
@@ -167,8 +175,13 @@ public class FormulaCell implements Serializable
 			throw new IllegalArgumentException("priceCoordinate.priceConfig must be an instance of IFormulaPriceConfig but is not! " + this.priceConfig);
 
 		this.organisationID = priceConfig.getOrganisationID();
-		this.priceConfigID = priceConfig.getPriceConfigID();
-		this.formulaID = priceConfig.createPriceID();
+//		this.priceConfigID = priceConfig.getPriceConfigID();
+//		this.formulaID = priceConfig.createPriceID();
+		if (!IDGenerator.getOrganisationID().equals(this.organisationID))
+			throw new IllegalStateException("IDGenerator.organisationID != this.organisationID :: " + IDGenerator.getOrganisationID() + " != " + this.organisationID);
+
+		this.formulaCellID = IDGenerator.nextID(FormulaCell.class);
+		
 		this.priceCoordinate = priceCoordinate;
 		this.priceFragmentFormulas = new HashMap<String, String>();
 	}
@@ -179,20 +192,25 @@ public class FormulaCell implements Serializable
 	{
 		return organisationID;
 	}
-	/**
-	 * @return Returns the priceConfigID.
-	 */
-	public String getPriceConfigID()
-	{
-		return priceConfigID;
+//	/**
+//	 * @return Returns the priceConfigID.
+//	 */
+//	public String getPriceConfigID()
+//	{
+//		return priceConfigID;
+//	}
+//	/**
+//	 * @return Returns the formulaID.
+//	 */
+//	public long getFormulaID()
+//	{
+//		return formulaID;
+//	}
+	
+	public long getFormulaCellID() {
+		return formulaCellID;
 	}
-	/**
-	 * @return Returns the formulaID.
-	 */
-	public long getFormulaID()
-	{
-		return formulaID;
-	}
+	
 	/**
 	 * @return Returns the priceConfig.
 	 */
@@ -265,8 +283,8 @@ public class FormulaCell implements Serializable
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((organisationID == null) ? 0 : organisationID.hashCode());
-		result = prime * result + ((priceConfigID == null) ? 0 : priceConfigID.hashCode());
-		result = prime * result + (int) (formulaID ^ (formulaID >>> 32));
+//		result = prime * result + ((priceConfigID == null) ? 0 : priceConfigID.hashCode());
+		result = prime * result + (int) (formulaCellID ^ (formulaCellID >>> 32));
 		return result;
 	}
 
@@ -279,13 +297,13 @@ public class FormulaCell implements Serializable
 		final FormulaCell other = (FormulaCell) obj;
 		return (
 				Util.equals(this.organisationID, other.organisationID) &&
-				Util.equals(this.priceConfigID, other.priceConfigID) &&
-				Util.equals(this.formulaID, other.formulaID)
+//				Util.equals(this.priceConfigID, other.priceConfigID) &&
+				Util.equals(this.formulaCellID, other.formulaCellID)
 		);
 	}
 
 	@Override
 	public String toString() {
-		return this.getClass().getName() + '@' + Integer.toHexString(System.identityHashCode(this)) + '[' + organisationID + ',' + priceConfigID + ',' + ObjectIDUtil.longObjectIDFieldToString(formulaID) + ']';
+		return this.getClass().getName() + '@' + Integer.toHexString(System.identityHashCode(this)) + '[' + organisationID + ',' + ObjectIDUtil.longObjectIDFieldToString(formulaCellID) + ']';
 	}
 }

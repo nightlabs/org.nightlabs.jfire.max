@@ -44,6 +44,7 @@ import javax.jdo.listener.DetachCallback;
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.accounting.id.InvoiceID;
 import org.nightlabs.jfire.accounting.jbpm.ActionHandlerFinalizeInvoice;
+import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.jbpm.graph.def.ActionHandlerNodeEnter;
 import org.nightlabs.jfire.jbpm.graph.def.Statable;
 import org.nightlabs.jfire.jbpm.graph.def.StatableLocal;
@@ -251,8 +252,8 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 		if (pm == null)
 			throw new IllegalStateException("vendor is not persistent! Could not get a PersistenceManager from it!");
 
-		Accounting accounting = Accounting.getAccounting(pm);
-		AccountingPriceConfig accountingPriceConfig = accounting.getAccountingPriceConfig();
+//		Accounting accounting = Accounting.getAccounting(pm);
+//		AccountingPriceConfig accountingPriceConfig = accounting.getAccountingPriceConfig();
 
 		this.organisationID = vendor.getOrganisationID();
 		this.invoiceIDPrefix = invoiceIDPrefix;
@@ -264,9 +265,9 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 		this.currency = currency;
 		this.primaryKey = getPrimaryKey(this.organisationID, this.invoiceIDPrefix, this.invoiceID);
 //		this.desiredModeOfPaymentFlavour = desiredModeOfPaymentFlavour;
-		this.price = new Price(
-				accountingPriceConfig.getOrganisationID(), accountingPriceConfig.getPriceConfigID(),
-				accountingPriceConfig.createPriceID(), currency);
+		this.price = new Price(IDGenerator.getOrganisationID(), IDGenerator.nextID(Price.class), currency);
+//				accountingPriceConfig.getOrganisationID(), accountingPriceConfig.getPriceConfigID(),
+//				accountingPriceConfig.createPriceID(), currency);
 
 		articles = new HashSet<Article>();
 	}

@@ -41,6 +41,7 @@ import javax.jdo.Query;
 
 import org.nightlabs.jfire.accounting.Price;
 import org.nightlabs.jfire.accounting.priceconfig.id.PriceConfigID;
+import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.store.NestedProductTypeLocal;
 import org.nightlabs.jfire.store.Product;
 import org.nightlabs.jfire.store.ProductLocal;
@@ -76,9 +77,11 @@ public class PriceConfigUtil
 		ArticlePrice packageArticlePrice = new ArticlePrice(
 				article,
 				origPrice,
-				packagePriceConfig.getOrganisationID(),
-				packagePriceConfig.getPriceConfigID(),
-				packagePriceConfig.createPriceID(),
+				IDGenerator.getOrganisationID(),
+				IDGenerator.nextID(Price.class),
+//				packagePriceConfig.getOrganisationID(),
+//				packagePriceConfig.getPriceConfigID(),
+//				packagePriceConfig.createPriceID(),
 				false);
 
 		return packageArticlePrice;
@@ -219,9 +222,11 @@ public class PriceConfigUtil
 		ArticlePrice articlePrice = new ArticlePrice(
 				article,
 				origPrice,
-				topLevelPriceConfig.getOrganisationID(),
-				topLevelPriceConfig.getPriceConfigID(),
-				topLevelPriceConfig.createPriceID(),
+				IDGenerator.getOrganisationID(),
+				IDGenerator.nextID(Price.class),
+//				topLevelPriceConfig.getOrganisationID(),
+//				topLevelPriceConfig.getPriceConfigID(),
+//				topLevelPriceConfig.createPriceID(),
 				nextLevelArticlePrice,
 				nestedProductTypeLocal,
 				nestedProduct.getProductType(),
@@ -298,9 +303,11 @@ public class PriceConfigUtil
 		ArticlePrice articlePrice = new ArticlePrice(
 				article,
 				origPrice,
-				topLevelPriceConfig.getOrganisationID(),
-				topLevelPriceConfig.getPriceConfigID(),
-				topLevelPriceConfig.createPriceID(),
+				IDGenerator.getOrganisationID(),
+				IDGenerator.nextID(Price.class),
+//				topLevelPriceConfig.getOrganisationID(),
+//				topLevelPriceConfig.getPriceConfigID(),
+//				topLevelPriceConfig.createPriceID(),
 				nextLevelArticlePrice,
 				nestedProductTypeLocal,
 				nestedProductTypeLocal.getInnerProductTypeLocal().getProductType(),

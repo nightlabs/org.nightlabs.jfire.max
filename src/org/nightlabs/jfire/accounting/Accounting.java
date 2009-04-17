@@ -136,7 +136,7 @@ implements StoreCallback
 		String organisationID = LocalOrganisation.getLocalOrganisation(pm).getOrganisationID();
 		accounting.organisationID = organisationID;
 		accounting.mandator = OrganisationLegalEntity.getOrganisationLegalEntity(pm, organisationID); // new OrganisationLegalEntity(localOrganisation.getOrganisation());
-		accounting.accountingPriceConfig = new AccountingPriceConfig(IDGenerator.getOrganisationID(), PriceConfig.createPriceConfigID());
+//		accounting.accountingPriceConfig = new AccountingPriceConfig(IDGenerator.getOrganisationID(), PriceConfig.createPriceConfigID());
 		accounting.localAccountant = new LocalAccountant(accounting.mandator, LocalAccountant.class.getName());
 		accounting.mandator.setAccountant(accounting.localAccountant);
 		accounting.partnerAccountant = new PartnerAccountant(organisationID, PartnerAccountant.class.getName());
@@ -156,10 +156,10 @@ implements StoreCallback
 	 */
 	private OrganisationLegalEntity mandator;
 
-	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 */
-	private AccountingPriceConfig accountingPriceConfig;
+//	/**
+//	 * @jdo.field persistence-modifier="persistent"
+//	 */
+//	private AccountingPriceConfig accountingPriceConfig;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -211,13 +211,13 @@ implements StoreCallback
 	}
 
 
-	/**
-	 * @return Returns the accountingPriceConfig.
-	 */
-	public AccountingPriceConfig getAccountingPriceConfig()
-	{
-		return accountingPriceConfig;
-	}
+//	/**
+//	 * @return Returns the accountingPriceConfig.
+//	 */
+//	public AccountingPriceConfig getAccountingPriceConfig()
+//	{
+//		return accountingPriceConfig;
+//	}
 
 //	/**
 //	 * @jdo.field persistence-modifier="persistent"

@@ -15,6 +15,7 @@ import org.nightlabs.jfire.base.JFireEjbFactory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.progress.ProgressMonitor;
+import org.nightlabs.progress.SubProgressMonitor;
 
 public class CurrencyDAO extends BaseJDOObjectDAO<CurrencyID, Currency>
 {
@@ -62,4 +63,10 @@ public class CurrencyDAO extends BaseJDOObjectDAO<CurrencyID, Currency>
 		}
 	}
 
+	public Currency getCurrency(CurrencyID currencyID, ProgressMonitor monitor) {
+		monitor.beginTask("Loading currency "+ currencyID.currencyID, 1);
+		Currency currency = getJDOObject(null, currencyID, FETCH_GROUPS, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT, new SubProgressMonitor(monitor, 1));
+		monitor.done();
+		return currency;	
+	}
 }

@@ -34,6 +34,7 @@ import org.apache.log4j.Logger;
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.accounting.Price;
 import org.nightlabs.jfire.accounting.priceconfig.IPriceConfig;
+import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.util.Util;
 
 /**
@@ -47,7 +48,7 @@ import org.nightlabs.util.Util;
  *
  * @jdo.inheritance strategy="new-table"
  *
- * @jdo.create-objectid-class field-order="organisationID, priceConfigID, priceID"
+ * @jdo.create-objectid-class field-order="organisationID, priceCellID"
  *
  * @jdo.fetch-group name="PriceCell.price" fields="price"
  * @jdo.fetch-group name="PriceCell.priceConfig" fields="priceConfig"
@@ -83,16 +84,20 @@ public class PriceCell implements Serializable
 	 */
 	private String organisationID;
 
+//	/**
+//	 * @jdo.field primary-key="true"
+//	 * @jdo.column length="100"
+//	 */
+//	private String priceConfigID;
+//
+//	/**
+//	 * @jdo.field primary-key="true"
+//	 */
+//	private long priceID;
 	/**
 	 * @jdo.field primary-key="true"
-	 * @jdo.column length="100"
 	 */
-	private String priceConfigID;
-
-	/**
-	 * @jdo.field primary-key="true"
-	 */
-	private long priceID;
+	private long priceCellID;
 
 	/**
 	 * @!jdo.field persistence-modifier="persistent" null-value="exception"
@@ -129,8 +134,14 @@ public class PriceCell implements Serializable
 	{
 		this.priceConfig = (StablePriceConfig) priceCoordinate.getPriceConfig();
 		this.organisationID = priceConfig.getOrganisationID();
-		this.priceConfigID = priceConfig.getPriceConfigID();
-		this.priceID = priceConfig.createPriceID();
+//		this.priceConfigID = priceConfig.getPriceConfigID();
+//		this.priceID = priceConfig.createPriceID();
+		if (!IDGenerator.getOrganisationID().equals(this.organisationID))
+			throw new IllegalStateException("IDGenerator.organisationID != this.organisationID :: " + IDGenerator.getOrganisationID() + " != " + this.organisationID);
+
+		// Even though the priceCellID is named differently, we use the same value as the priceID (of the Price instance created below) because
+		// that makes looking up things in the database easier. Thus, the following use of Price.class is *NOT* a mistake, but absolutely correct.
+		this.priceCellID = IDGenerator.nextID(Price.class);
 
 		if (logger.isDebugEnabled())
 			logger.debug("PriceCell manual-constructor: " + this + " priceCoordinate=" + priceCoordinate);
@@ -140,8 +151,9 @@ public class PriceCell implements Serializable
 
 		this.priceCoordinate = (PriceCoordinate)priceCoordinate;
 		this.price = new Price(
-				organisationID, priceConfigID, priceID,
-				priceConfig.getCurrency(priceCoordinate.getCurrencyID(), true));
+				organisationID, priceCellID, // priceID,
+				priceConfig.getCurrency(priceCoordinate.getCurrencyID(), true)
+		);
 	}
 
 	/**
@@ -165,13 +177,13 @@ public class PriceCell implements Serializable
 	{
 		return priceConfig;
 	}
-	/**
-	 * @return Returns the priceConfigID.
-	 */
-	public String getPriceConfigID()
-	{
-		return priceConfigID;
-	}
+//	/**
+//	 * @return Returns the priceConfigID.
+//	 */
+//	public String getPriceConfigID()
+//	{
+//		return priceConfigID;
+//	}
 	/**
 	 * @return Returns the priceCoordinate.
 	 */
@@ -187,12 +199,15 @@ public class PriceCell implements Serializable
 				throw new RuntimeException(x);
 		}
 	}
-	/**
-	 * @return Returns the formulaID.
-	 */
-	public long getPriceID()
-	{
-		return priceID;
+//	/**
+//	 * @return Returns the formulaID.
+//	 */
+//	public long getPriceID()
+//	{
+//		return priceID;
+//	}
+	public long getPriceCellID() {
+		return priceCellID;
 	}
 
 	/**
@@ -270,8 +285,8 @@ public class PriceCell implements Serializable
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((organisationID == null) ? 0 : organisationID.hashCode());
-		result = prime * result + ((priceConfigID == null) ? 0 : priceConfigID.hashCode());
-		result = prime * result + (int) (priceID ^ (priceID >>> 32));
+//		result = prime * result + ((priceConfigID == null) ? 0 : priceConfigID.hashCode());
+		result = prime * result + (int) (priceCellID ^ (priceCellID >>> 32));
 		return result;
 	}
 
@@ -283,13 +298,13 @@ public class PriceCell implements Serializable
 		final PriceCell other = (PriceCell) obj;
 		return (
 				Util.equals(this.organisationID, other.organisationID) &&
-				Util.equals(this.priceConfigID, other.priceConfigID) &&
-				Util.equals(this.priceID, other.priceID)
+//				Util.equals(this.priceConfigID, other.priceConfigID) &&
+				Util.equals(this.priceCellID, other.priceCellID)
 		);
 	}
 
 	@Override
 	public String toString() {
-		return this.getClass().getName() + '@' + Integer.toHexString(System.identityHashCode(this)) + '[' + organisationID + ',' + priceConfigID + ',' + ObjectIDUtil.longObjectIDFieldToString(priceID) + ']';
+		return this.getClass().getName() + '@' + Integer.toHexString(System.identityHashCode(this)) + '[' + organisationID + ',' + ObjectIDUtil.longObjectIDFieldToString(priceCellID) + ']';
 	}
 }

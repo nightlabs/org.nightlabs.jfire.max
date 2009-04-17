@@ -47,6 +47,7 @@ import org.nightlabs.jfire.accounting.Accounting;
 import org.nightlabs.jfire.accounting.AccountingPriceConfig;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.Price;
+import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.jbpm.graph.def.ActionHandlerNodeEnter;
 import org.nightlabs.jfire.jbpm.graph.def.Statable;
 import org.nightlabs.jfire.jbpm.graph.def.StatableLocal;
@@ -381,7 +382,7 @@ implements
 		if (pm == null)
 			throw new IllegalStateException("order is not persistent! Could not get a PersistenceManager from it!");
 
-		Accounting accounting = Accounting.getAccounting(pm);
+//		Accounting accounting = Accounting.getAccounting(pm);
 
 		this.order = order;
 		this.organisationID = order.getOrganisationID();
@@ -392,10 +393,10 @@ implements
 		this.createDT = new Date();
 		this.createUser = user;
 
-		AccountingPriceConfig accountingPriceConfig = accounting.getAccountingPriceConfig();
-		this.price = new Price(
-				accountingPriceConfig.getOrganisationID(), accountingPriceConfig.getPriceConfigID(),
-				accountingPriceConfig.createPriceID(), order.getCurrency());
+//		AccountingPriceConfig accountingPriceConfig = accounting.getAccountingPriceConfig();
+		this.price = new Price(IDGenerator.getOrganisationID(), IDGenerator.nextID(Price.class), order.getCurrency());
+//				accountingPriceConfig.getOrganisationID(), accountingPriceConfig.getPriceConfigID(),
+//				accountingPriceConfig.createPriceID(), order.getCurrency());
 
 		articles = new HashSet<Article>();
 	}

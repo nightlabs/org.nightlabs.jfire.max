@@ -115,14 +115,14 @@ public interface IPriceConfig
 	 */
 	PriceFragmentType removePriceFragmentType(String priceFragmentTypePK);
 
-	/**
-	 * Creates a <tt>priceID</tt> by incrementing the member nextPriceID.
-	 * The new ID is unique within the context of this <tt>PriceConfig</tt>
-	 * (<tt>organisationID</tt> & <tt>priceConfigID</tt>).
-	 *
-	 * @return Returns a price id, which is unique within the context of this <tt>PriceConfig</tt>.
-	 */
-	long createPriceID();
+//	/**
+//	 * Creates a <tt>priceID</tt> by incrementing the member nextPriceID.
+//	 * The new ID is unique within the context of this <tt>PriceConfig</tt>
+//	 * (<tt>organisationID</tt> & <tt>priceConfigID</tt>).
+//	 *
+//	 * @return Returns a price id, which is unique within the context of this <tt>PriceConfig</tt>.
+//	 */
+//	long createPriceID();
 
 	/**
 	 * @return Returns the name.

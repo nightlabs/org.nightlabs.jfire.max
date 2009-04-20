@@ -1,18 +1,15 @@
 package org.nightlabs.jfire.issuetimetracking;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.Map;
-
-import javax.security.auth.spi.LoginModule;
+import java.util.Set;
 
 import org.nightlabs.jfire.accounting.Currency;
-import org.nightlabs.jfire.accounting.Price;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.issue.project.Project;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.security.id.UserID;
-
-import com.sun.org.apache.bcel.internal.generic.IFNULL;
 
 /**
  * The {@link ProjectCost} class represents an cost information of each {@link Project}s. 
@@ -38,18 +35,16 @@ import com.sun.org.apache.bcel.internal.generic.IFNULL;
  *				this.project.organisationID == :organisationID &&
  *				this.project.projectID == :projectID"
  *
- * @jdo.fetch-group name="ProjectCost.cost" fields="cost"
- * @jdo.fetch-group name="ProjectCost.revenue" fields="revenue"
  * @jdo.fetch-group name="ProjectCost.project" fields="project"
+ * @jdo.fetch-group name="ProjectCost.currency" fields="currency"
  */
 public class ProjectCost 
 implements Serializable
 {
 	private static final long serialVersionUID = 1L;
 	
-	public static final String FETCH_GROUP_COST = "ProjectCost.cost";
-	public static final String FETCH_GROUP_REVENUE = "ProjectCost.revenue";
 	public static final String FETCH_GROUP_PROJECT = "ProjectCost.project";
+	public static final String FETCH_GROUP_CURRENCY = "ProjectCost.currency";
 	
 	/**
 	 * @jdo.field primary-key="true"
@@ -97,13 +92,18 @@ implements Serializable
 	/**
 	 * Constructs a new project cost.
 	 * @param organisationID the first part of the composite primary key - referencing the organisation which owns this <code>IssuePriority</code>.
-	 * @param projectCostID the second part of the composite primary key. Use {@link IDGenerator#nextID(Class)} with <code>ProjectCost.class</code> to create an id.
+	 * @param projectCostID the second part of the composite primary key. Use {@link IDGenerator#nextID(Class)} with <code>Project.class</code> to create an id.
 	 */
 	public ProjectCost(Project project, Currency currency){
-		this.project = project;
-		
 		this.organisationID = project.getOrganisationID();
 		this.projectID = project.getProjectID();
+		this.project = project;
+
+		this.currency = currency;
+		
+		this.user2ProjectCostMap = new HashMap<String, ProjectCostValue>();
+		ProjectCostValue projectCostValue = new ProjectCostValue(this, IDGenerator.nextID(ProjectCostValue.class));
+		user2ProjectCostMap.put(User.USER_ID_OTHER, projectCostValue);
 	}
 	
 	/**
@@ -125,6 +125,15 @@ implements Serializable
 	public Currency getCurrency() {
 		return currency;
 	}
+
+	public ProjectCostValue getProjectCostValue(String userID) {
+		ProjectCostValue projectCostValue = user2ProjectCostMap.get(userID);
+		if (projectCostValue == null) {
+			projectCostValue = new ProjectCostValue(this, IDGenerator.nextID(ProjectCostValue.class));
+			user2ProjectCostMap.put(userID, projectCostValue);
+		}
+		return projectCostValue;
+	}
 	
 	public double getTotalCostDoubleVale() {
 		double result = 0;
@@ -142,5 +151,9 @@ implements Serializable
 			result += projectCostValue.getRevenue().getAmountAsDouble();
 		}
 		return result;
+	}
+	
+	public Set<String> getUserIDs() {
+		return user2ProjectCostMap.keySet();
 	}
 }

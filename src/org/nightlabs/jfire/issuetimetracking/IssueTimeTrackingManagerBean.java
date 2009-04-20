@@ -116,23 +116,6 @@ implements SessionBean
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			ProjectCost projectCost = new ProjectCost(project, currency);
-			projectCost = pm.makePersistent(projectCost);
-			return projectCost; 
-		}//try
-		finally {
-			pm.close();
-		}//finally
-	}
-	
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Required"
-	 */
-	public ProjectCost storeProjectCost(ProjectCost projectCost, boolean get, String[] fetchGroups, int maxFetchDepth)
-	{
-		PersistenceManager pm = getPersistenceManager();
-		try {
 			return NLJDOHelper.storeJDO(pm, projectCost, get, fetchGroups, maxFetchDepth);
 		}//try
 		finally {

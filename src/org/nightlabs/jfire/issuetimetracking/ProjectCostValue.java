@@ -123,4 +123,3 @@ implements Serializable
 		return revenue;
 	}
 }
-

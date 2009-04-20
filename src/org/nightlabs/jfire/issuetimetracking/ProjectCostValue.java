@@ -19,7 +19,7 @@ import org.nightlabs.jfire.issue.project.Project;
  *		detachable="true"
  *		table="JFireIssueTimeTracking_ProjectCostValue"
  *
- * @jdo.create-objectid-class field-order="organisationID, projectID"
+ * @jdo.create-objectid-class field-order="organisationID, projectCostValueID"
  *
  * @jdo.inheritance strategy="new-table"
  * 

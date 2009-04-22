@@ -17,6 +17,9 @@ import org.nightlabs.jfire.issuetimetracking.id.ProjectCostID;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.progress.ProgressMonitor;
 
+/** 
+ * @author Chairat Kongarayawetchakun - chairat [AT] nightlabs [DOT] de
+ */
 public class ProjectCostDAO  
 extends BaseJDOObjectDAO<ProjectCostID, ProjectCost>
 {

@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.nightlabs.jfire.accounting.Currency;
+import org.nightlabs.jfire.accounting.Price;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.issue.project.Project;
 import org.nightlabs.jfire.security.User;
@@ -37,6 +38,8 @@ import org.nightlabs.jfire.security.id.UserID;
  *
  * @jdo.fetch-group name="ProjectCost.project" fields="project"
  * @jdo.fetch-group name="ProjectCost.currency" fields="currency"
+ * @jdo.fetch-group name="ProjectCost.defaultCost" fields="defaultCost"
+ * @jdo.fetch-group name="ProjectCost.defaultRevenue" fields="defaultRevenue"
  */
 public class ProjectCost 
 implements Serializable
@@ -45,6 +48,8 @@ implements Serializable
 	
 	public static final String FETCH_GROUP_PROJECT = "ProjectCost.project";
 	public static final String FETCH_GROUP_CURRENCY = "ProjectCost.currency";
+	public static final String FETCH_GROUP_DEFAULT_COST = "ProjectCost.defaultCost";
+	public static final String FETCH_GROUP_DEFAULT_REVENUE = "ProjectCost.defaultRevenue";
 	
 	/**
 	 * @jdo.field primary-key="true"
@@ -85,6 +90,16 @@ implements Serializable
 	private Map<String, ProjectCostValue> user2ProjectCostMap;
 	
 	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private Price defaultCost;
+	
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private Price defaultRevenue;
+	
+	/**
 	 * @deprecated Only for JDO!!!!
 	 */
 	protected ProjectCost()	{}
@@ -104,6 +119,9 @@ implements Serializable
 		this.user2ProjectCostMap = new HashMap<String, ProjectCostValue>();
 		ProjectCostValue projectCostValue = new ProjectCostValue(this, IDGenerator.nextID(ProjectCostValue.class));
 		user2ProjectCostMap.put(User.USER_ID_OTHER, projectCostValue);
+		
+		this.defaultCost = new Price(project.getOrganisationID(), IDGenerator.nextID(Price.class), currency);
+		this.defaultRevenue = new Price(project.getOrganisationID(), IDGenerator.nextID(Price.class), currency);
 	}
 	
 	/**
@@ -130,6 +148,8 @@ implements Serializable
 		ProjectCostValue projectCostValue = user2ProjectCostMap.get(userID);
 		if (projectCostValue == null) {
 			projectCostValue = new ProjectCostValue(this, IDGenerator.nextID(ProjectCostValue.class));
+			projectCostValue.getCost().setAmount(defaultCost.getAmount());
+			projectCostValue.getRevenue().setAmount(defaultCost.getAmount());
 			user2ProjectCostMap.put(userID, projectCostValue);
 		}
 		return projectCostValue;
@@ -155,5 +175,13 @@ implements Serializable
 	
 	public Set<String> getUserIDs() {
 		return user2ProjectCostMap.keySet();
+	}
+	
+	public Price getDefaultCost() {
+		return defaultCost;
+	}
+	
+	public Price getDefaultRevenue() {
+		return defaultRevenue;
 	}
 }

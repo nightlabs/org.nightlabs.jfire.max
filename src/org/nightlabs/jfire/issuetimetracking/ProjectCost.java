@@ -1,6 +1,8 @@
 package org.nightlabs.jfire.issuetimetracking;
 
 import java.io.Serializable;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -144,14 +146,12 @@ implements Serializable
 		return currency;
 	}
 
+	public void addProjectCostValue(String userID, ProjectCostValue projectCostValue) {
+		user2ProjectCostMap.put(userID, projectCostValue);
+	}
+	
 	public ProjectCostValue getProjectCostValue(String userID) {
 		ProjectCostValue projectCostValue = user2ProjectCostMap.get(userID);
-		if (projectCostValue == null) {
-			projectCostValue = new ProjectCostValue(this, IDGenerator.nextID(ProjectCostValue.class));
-			projectCostValue.getCost().setAmount(defaultCost.getAmount());
-			projectCostValue.getRevenue().setAmount(defaultCost.getAmount());
-			user2ProjectCostMap.put(userID, projectCostValue);
-		}
 		return projectCostValue;
 	}
 	
@@ -183,5 +183,9 @@ implements Serializable
 	
 	public Price getDefaultRevenue() {
 		return defaultRevenue;
+	}
+	
+	public Collection<ProjectCostValue> getProjectCostValues() {
+		return Collections.unmodifiableCollection(user2ProjectCostMap.values());
 	}
 }

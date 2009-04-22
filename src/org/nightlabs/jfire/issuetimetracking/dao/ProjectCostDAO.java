@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.base.JFireEjbFactory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
@@ -89,6 +90,24 @@ extends BaseJDOObjectDAO<ProjectCostID, ProjectCost>
 			return result;
 		} catch (Exception e) {
 			monitor.done();
+			throw new RuntimeException(e);
+		}
+	}
+	
+	/**
+	 * Store a project cost.
+	 * @param fetchGroups Wich fetch groups to use
+	 * @param maxFetchDepth Fetch depth or {@link NLJDOHelper#MAX_FETCH_DEPTH_NO_LIMIT} 
+	 * @param monitor The progress monitor for this action. For every downloaded
+	 * 					object, <code>monitor.worked(1)</code> will be called.
+	 * @return The project cost.
+	 */
+	public synchronized ProjectCost storeProjectCost(ProjectCost projectCost, String[] fetchgroups, int maxFetchDepth, ProgressMonitor monitor) 
+	{
+		try {
+			IssueTimeTrackingManager im = JFireEjbFactory.getBean(IssueTimeTrackingManager.class, SecurityReflector.getInitialContextProperties());
+			return im.storeProjectCost(projectCost, true, fetchgroups, maxFetchDepth);
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}

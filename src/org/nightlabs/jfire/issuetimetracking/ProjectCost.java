@@ -135,20 +135,20 @@ implements Serializable
 		return projectCostValue;
 	}
 	
-	public double getTotalCostDoubleVale() {
-		double result = 0;
+	public long getTotalCost() {
+		long result = 0;
 		for (String userID : user2ProjectCostMap.keySet()) {
 			ProjectCostValue projectCostValue = user2ProjectCostMap.get(userID);
-			result += projectCostValue.getCost().getAmountAsDouble();
+			result += projectCostValue.getCost().getAmount();
 		}
 		return result;
 	}
 	
-	public double getTotalRevenueDoubleVale() {
-		double result = 0;
+	public long getTotalRevenue() {
+		long result = 0;
 		for (String userID : user2ProjectCostMap.keySet()) {
 			ProjectCostValue projectCostValue = user2ProjectCostMap.get(userID);
-			result += projectCostValue.getRevenue().getAmountAsDouble();
+			result += projectCostValue.getRevenue().getAmount();
 		}
 		return result;
 	}

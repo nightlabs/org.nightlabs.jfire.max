@@ -124,6 +124,28 @@ implements SessionBean
 	}
 	
 	/**
+	 * Stores a project cost to the datastore.
+	 * @param projectCost the project cost to store
+	 * @param get true if you want to get the stored project type
+	 * @param fetchGroups the fetchGroups that used for specify fields to be detached from the datastore
+	 * @param maxFetchDepth specifies the number of level of the object to be fetched
+	 *
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type="Required"
+	 */
+	public ProjectCost storeProjectCost(ProjectCost projectCost, boolean get, String[] fetchGroups, int maxFetchDepth)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			return NLJDOHelper.storeJDO(pm, projectCost, get, fetchGroups, maxFetchDepth);
+		}//try
+		finally {
+			pm.close();
+		}//finally
+	}
+	
+	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 */

@@ -1,6 +1,7 @@
 package org.nightlabs.jfire.issuetimetracking;
 
 import java.io.Serializable;
+import java.util.Date;
 
 import org.nightlabs.jfire.accounting.Price;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
@@ -70,6 +71,11 @@ implements Serializable
 	private Price revenue;
 
 	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private Date date;
+
+	/**
 	 * @deprecated Only for JDO!!!!
 	 */
 	protected ProjectCostValue()
@@ -121,5 +127,9 @@ implements Serializable
 	 */
 	public Price getRevenue() {
 		return revenue;
+	}
+	
+	public Date getDate() {
+		return date;
 	}
 }

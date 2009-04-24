@@ -17,9 +17,7 @@ import javax.jdo.Query;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.jdo.NLJDOHelper;
-import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
-import org.nightlabs.jfire.issue.project.Project;
 import org.nightlabs.jfire.issue.project.id.ProjectID;
 import org.nightlabs.jfire.issuetimetracking.id.ProjectCostID;
 
@@ -106,22 +104,22 @@ implements SessionBean
 		}
 	}
 	
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Required"
-	 */
-	public ProjectCost createProjectCost(Project project, Currency currency, boolean get, String[] fetchGroups, int maxFetchDepth)
-	{
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			ProjectCost projectCost = new ProjectCost(project, currency);
-			return NLJDOHelper.storeJDO(pm, projectCost, get, fetchGroups, maxFetchDepth);
-		}//try
-		finally {
-			pm.close();
-		}//finally
-	}
+//	/**
+//	 * @ejb.interface-method
+//	 * @ejb.permission role-name="_Guest_"
+//	 * @ejb.transaction type="Required"
+//	 */
+//	public ProjectCost createProjectCost(Project project, Currency currency, boolean get, String[] fetchGroups, int maxFetchDepth)
+//	{
+//		PersistenceManager pm = getPersistenceManager();
+//		try {
+//			ProjectCost projectCost = new ProjectCost(project, currency);
+//			return NLJDOHelper.storeJDO(pm, projectCost, get, fetchGroups, maxFetchDepth);
+//		}//try
+//		finally {
+//			pm.close();
+//		}//finally
+//	}
 	
 	/**
 	 * Stores a project cost to the datastore.

@@ -5,11 +5,9 @@ import java.util.List;
 import java.util.Set;
 
 import org.nightlabs.jdo.NLJDOHelper;
-import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.base.JFireEjbFactory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.issue.dao.IssueDAO;
-import org.nightlabs.jfire.issue.project.Project;
 import org.nightlabs.jfire.issue.project.id.ProjectID;
 import org.nightlabs.jfire.issuetimetracking.IssueTimeTrackingManager;
 import org.nightlabs.jfire.issuetimetracking.ProjectCost;
@@ -72,30 +70,30 @@ extends BaseJDOObjectDAO<ProjectCostID, ProjectCost>
 		}
 	}
 	
-	public synchronized ProjectCost createProjectCost(
-			Project project, Currency currency, boolean get, String[] fetchGroups, 
-			int maxFetchDepth, ProgressMonitor monitor){
-		if(project == null)
-			throw new NullPointerException("Project must not be null");
-		if(currency == null)
-			throw new NullPointerException("Currency must not be null");
-		monitor.beginTask("Creating project costs for project: "+ project.getProjectID(), 3);
-		try {
-			IssueTimeTrackingManager it = JFireEjbFactory.getBean(IssueTimeTrackingManager.class, SecurityReflector.getInitialContextProperties());
-			monitor.worked(1);
-
-			ProjectCost result = it.createProjectCost(project, currency, get, fetchGroups, maxFetchDepth);
-			if (result != null)
-				getCache().put(null, result, fetchGroups, maxFetchDepth);
-
-			monitor.worked(1);
-			monitor.done();
-			return result;
-		} catch (Exception e) {
-			monitor.done();
-			throw new RuntimeException(e);
-		}
-	}
+//	public synchronized ProjectCost createProjectCost(
+//			Project project, Currency currency, boolean get, String[] fetchGroups, 
+//			int maxFetchDepth, ProgressMonitor monitor){
+//		if(project == null)
+//			throw new NullPointerException("Project must not be null");
+//		if(currency == null)
+//			throw new NullPointerException("Currency must not be null");
+//		monitor.beginTask("Creating project costs for project: "+ project.getProjectID(), 3);
+//		try {
+//			IssueTimeTrackingManager it = JFireEjbFactory.getBean(IssueTimeTrackingManager.class, SecurityReflector.getInitialContextProperties());
+//			monitor.worked(1);
+//
+//			ProjectCost result = it.storeProjectCost(projectCost, get, fetchGroups, maxFetchDepth)(project, currency, get, fetchGroups, maxFetchDepth);
+//			if (result != null)
+//				getCache().put(null, result, fetchGroups, maxFetchDepth);
+//
+//			monitor.worked(1);
+//			monitor.done();
+//			return result;
+//		} catch (Exception e) {
+//			monitor.done();
+//			throw new RuntimeException(e);
+//		}
+//	}
 	
 	/**
 	 * Store a project cost.
@@ -107,9 +105,22 @@ extends BaseJDOObjectDAO<ProjectCostID, ProjectCost>
 	 */
 	public synchronized ProjectCost storeProjectCost(ProjectCost projectCost, String[] fetchgroups, int maxFetchDepth, ProgressMonitor monitor) 
 	{
+		if(projectCost.getProject() == null)
+			throw new NullPointerException("Project must not be null");
+		if(projectCost.getCurrency() == null)
+			throw new NullPointerException("Currency must not be null");
+		monitor.beginTask("Creating project costs for project: "+ projectCost.getProjectID(), 3);
 		try {
-			IssueTimeTrackingManager im = JFireEjbFactory.getBean(IssueTimeTrackingManager.class, SecurityReflector.getInitialContextProperties());
-			return im.storeProjectCost(projectCost, true, fetchgroups, maxFetchDepth);
+			IssueTimeTrackingManager it = JFireEjbFactory.getBean(IssueTimeTrackingManager.class, SecurityReflector.getInitialContextProperties());
+			monitor.worked(1);
+
+			ProjectCost result = it.storeProjectCost(projectCost, true, fetchgroups, maxFetchDepth);
+			if (result != null)
+				getCache().put(null, result, fetchgroups, maxFetchDepth);
+
+			monitor.worked(1);
+			monitor.done();
+			return result;
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

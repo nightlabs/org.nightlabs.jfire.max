@@ -3,6 +3,6 @@
 		"http://www.nightlabs.de/dtd/organisation-init_1_0.dtd">
 <organisation-initialisation>
 
-	<init bean="jfire/ejb/JFireEntityUserSet/EntityUserSetManager" method="initialise" />
+	<init bean="org.nightlabs.jfire.entityuserset.EntityUserSetManagerRemote" method="initialise" />
 
 </organisation-initialisation>

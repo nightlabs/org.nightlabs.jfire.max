@@ -4,6 +4,6 @@
 		"http://www.nightlabs.de/dtd/cross-organisation-registration-init_1_0.dtd">
 <cross-organisation-registration-initialisation>
   <init
-		bean="jfire/ejb/JFireEntityUserSet/EntityUserSetManager"
+		bean="org.nightlabs.jfire.entityuserset.EntityUserSetManagerRemote"
 		method="importEntityUserSetsOnCrossOrganisationRegistration" />
 </cross-organisation-registration-initialisation>

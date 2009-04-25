@@ -4,9 +4,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import javax.ejb.Remote;
+
 import org.nightlabs.jfire.crossorganisationregistrationinit.Context;
 import org.nightlabs.jfire.entityuserset.id.EntityUserSetID;
 
+@Remote
 public interface EntityUserSetManagerRemote {
 
 	void initialise() throws Exception;

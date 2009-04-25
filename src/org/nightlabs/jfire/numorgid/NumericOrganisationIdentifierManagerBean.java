@@ -1,11 +1,11 @@
 package org.nightlabs.jfire.numorgid;
 
-import java.rmi.RemoteException;
-
-import javax.ejb.CreateException;
-import javax.ejb.EJBException;
-import javax.ejb.SessionBean;
-import javax.ejb.SessionContext;
+import javax.annotation.security.RolesAllowed;
+import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
+import javax.ejb.TransactionManagement;
+import javax.ejb.TransactionManagementType;
 import javax.jdo.FetchPlan;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
@@ -25,24 +25,23 @@ import org.nightlabs.jfire.security.User;
  *    jndi-name="jfire/ejb/JFireNumericOrganisationID/NumericOrganisationIdentifierManager"
  *    type="Stateless"
  *    transaction-type="Container"
- * 
+ *
  * @ejb.util
  * 		generate="physical"
  */
-public abstract class NumericOrganisationIdentifierManagerBean
+@TransactionManagement(TransactionManagementType.CONTAINER)
+@Stateless
+public class NumericOrganisationIdentifierManagerBean
 extends BaseSessionBeanImpl
-implements SessionBean
+implements NumericOrganisationIdentifierManagerRemote
 {
 	private static final long serialVersionUID = 1L;
 
-	/**
-	 * Returns a numeric organisation ID for the current organisation if called for the root organisation.<br />
-	 * This method should only be called by organisation users.
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Required"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.numorgid.NumericOrganisationIdentifierManagerRemote#getNumericOrganisationIdentifier(java.lang.String, java.lang.Integer)
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("_Guest_")
 	public NumericOrganisationIdentifier getNumericOrganisationIdentifier(String organisationID, Integer numericOrganisationID)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -89,7 +88,7 @@ implements SessionBean
 				NumericOrganisationIdentifier numericOrganisationIdentifier = new NumericOrganisationIdentifier(organisationID, (int) id);
 				numericOrganisationIdentifier = pm.makePersistent(numericOrganisationIdentifier);
 
-				// We call the following method in order to ensure that we have no duplicate value (the UNIQUE query would throw an exception). 
+				// We call the following method in order to ensure that we have no duplicate value (the UNIQUE query would throw an exception).
 				NumericOrganisationIdentifier.getNumericOrganisationIdentifierByNumericID(pm, numericOrganisationIdentifier.getNumericOrganisationID());
 
 				return pm.detachCopy(numericOrganisationIdentifier);
@@ -111,6 +110,8 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Required"
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("_Guest_")
 	public NumericOrganisationIdentifier getNumericOrganisationIdentifier(NumericOrganisationIdentifierID numericOrganisationIdentifierID)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -121,11 +122,11 @@ implements SessionBean
 		}
 	}
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Required"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.numorgid.NumericOrganisationIdentifierManagerRemote#getNumericOrganisationIdentifier(int)
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("_Guest_")
 	public NumericOrganisationIdentifier getNumericOrganisationIdentifier(int numericOrganisationID)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -136,13 +137,11 @@ implements SessionBean
 		}
 	}
 
-	/**
-	 * Initialises an organisation datastore to be used with numeric organisation IDs.
-	 * 
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_System_"
-	 * @ejb.transaction type="Required"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.numorgid.NumericOrganisationIdentifierManagerRemote#initialise()
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("_System_")
 	public void initialise()
 	throws Exception
 	{
@@ -178,7 +177,7 @@ implements SessionBean
 				idNamespace.setCacheSizeClient(0);
 				idNamespace.setCacheSizeServer(0);
 				idNamespace.setNextID(1);
-				
+
 				idNamespace = pm.makePersistent(idNamespace);
 			}
 
@@ -195,27 +194,4 @@ implements SessionBean
 			pm.close();
 		}
 	}
-
-	@Override
-	public void setSessionContext(SessionContext sessionContext)
-	throws EJBException, RemoteException
-	{
-		super.setSessionContext(sessionContext);
-	}
-	@Override
-	public void unsetSessionContext() {
-		super.unsetSessionContext();
-	}
-
-	/**
-	 * @ejb.create-method
-	 * @ejb.permission role-name="_Guest_"
-	 */
-	public void ejbCreate() throws CreateException { }
-
-	/**
-	 * @ejb.permission unchecked="true"
-	 */
-	@Override
-	public void ejbRemove() throws EJBException, RemoteException { }
 }

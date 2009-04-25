@@ -6,9 +6,16 @@ import java.util.Hashtable;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.Queries;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
+import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.Lookup;
 import org.nightlabs.jfire.numorgid.id.NumericOrganisationIdentifierID;
 import org.nightlabs.jfire.organisation.LocalOrganisation;
@@ -31,18 +38,33 @@ import org.nightlabs.math.Base62Coder;
  *		name="getNumericOrganisationIdentifierByNumericID"
  *		query="SELECT UNIQUE WHERE numericOrganisationID == :numericOrganisationID"
  */
+@PersistenceCapable(
+	objectIdClass=NumericOrganisationIdentifierID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireNumericOrganisationID_NumericOrganisationIdentifier")
+@Queries(
+	@javax.jdo.annotations.Query(
+		name="getNumericOrganisationIdentifierByNumericID",
+		value="SELECT UNIQUE WHERE numericOrganisationID == :numericOrganisationID")
+)
 public class NumericOrganisationIdentifier
 implements Serializable
 {
+	private static final long serialVersionUID = 1L;
+
 	/** @jdo.field primary-key="true" */
+	@PrimaryKey
 	private String organisationID;
-	
+
 	/** @jdo.field persistence-modifier="persistent" */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private int numericOrganisationID;
 
 	/**
 	 * This ({@value #MAX_NUMERIC_ORGANISATION_ID }) is the highest 4 digit number in the base-62-system,
 	 * i.e. "zzzz" => {@link Base62Coder}) and defines the highest possible value for a numeric organisation ID.
+	 * The reason for this is the use of the numeric organisationID in CODE128-barcodes, where the base62-encoding is used.
 	 */
 	public static final int MAX_NUMERIC_ORGANISATION_ID = 14776335;
 
@@ -63,7 +85,7 @@ implements Serializable
 	 */
 	@Deprecated
 	protected NumericOrganisationIdentifier() { }
-	
+
 	/**
 	 * Constructor that creates a new {@link NumericOrganisationIdentifier} using the given parameters.
 	 * @param organisationID The organisation ID to be assigned.
@@ -114,6 +136,7 @@ implements Serializable
 	/**
 	 * @deprecated Use {@link #getLocalNumericOrganisationID(PersistenceManager)} or {@link #getNumericOrganisationIdentifier(PersistenceManager, String)} instead!
 	 */
+	@Deprecated
 	public static int getNumericOrganisationID(PersistenceManager pm)
 	{
 		return getLocalNumericOrganisationID(pm);
@@ -148,7 +171,7 @@ implements Serializable
 			}
 
 			try {
-				NumericOrganisationIdentifierManager noim = NumericOrganisationIdentifierManagerUtil.getHome(rootOrganisationInitialContextProperties).create();
+				NumericOrganisationIdentifierManagerRemote noim = JFireEjb3Factory.getRemoteBean(NumericOrganisationIdentifierManagerRemote.class, rootOrganisationInitialContextProperties);
 				numericOrganisationIdentifier = noim.getNumericOrganisationIdentifier(organisationID, null);
 			} catch (Exception x) {
 				throw new RuntimeException("Communication with root-organisation failed!", x);
@@ -186,7 +209,7 @@ implements Serializable
 			}
 
 			try {
-				NumericOrganisationIdentifierManager noim = NumericOrganisationIdentifierManagerUtil.getHome(rootOrganisationInitialContextProperties).create();
+				NumericOrganisationIdentifierManagerRemote noim = JFireEjb3Factory.getRemoteBean(NumericOrganisationIdentifierManagerRemote.class, rootOrganisationInitialContextProperties);
 				numericOrganisationIdentifier = noim.getNumericOrganisationIdentifier(null, numericOrganisationID);
 			} catch (Exception x) {
 				throw new RuntimeException("Communication with root-organisation failed!", x);

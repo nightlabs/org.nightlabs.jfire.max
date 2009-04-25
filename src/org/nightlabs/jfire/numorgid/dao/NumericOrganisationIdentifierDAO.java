@@ -3,10 +3,10 @@ package org.nightlabs.jfire.numorgid.dao;
 import java.util.Collection;
 import java.util.Set;
 
+import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.numorgid.NumericOrganisationIdentifier;
-import org.nightlabs.jfire.numorgid.NumericOrganisationIdentifierManager;
-import org.nightlabs.jfire.numorgid.NumericOrganisationIdentifierManagerUtil;
+import org.nightlabs.jfire.numorgid.NumericOrganisationIdentifierManagerRemote;
 import org.nightlabs.jfire.numorgid.UnknownNumericOrganisationIdentifierException;
 import org.nightlabs.jfire.numorgid.UnknownOrganisationException;
 import org.nightlabs.jfire.numorgid.id.NumericOrganisationIdentifierID;
@@ -42,7 +42,7 @@ public class NumericOrganisationIdentifierDAO extends BaseJDOObjectDAO<NumericOr
 	{
 		monitor.beginTask("Loading numeric organisation identifier", 100);
 		try {
-			NumericOrganisationIdentifierManager m = NumericOrganisationIdentifierManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			NumericOrganisationIdentifierManagerRemote m = JFireEjb3Factory.getRemoteBean(NumericOrganisationIdentifierManagerRemote.class, SecurityReflector.getInitialContextProperties());
 			monitor.worked(50);
 			return m.getNumericOrganisationIdentifier(objectID);
 		} finally {
@@ -86,9 +86,9 @@ public class NumericOrganisationIdentifierDAO extends BaseJDOObjectDAO<NumericOr
 			if (numericOrganisationIdentifier != null)
 				monitor.worked(50);
 			else {
-				NumericOrganisationIdentifierManager m;
+				NumericOrganisationIdentifierManagerRemote m;
 				try {
-					m = NumericOrganisationIdentifierManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+					m = JFireEjb3Factory.getRemoteBean(NumericOrganisationIdentifierManagerRemote.class, SecurityReflector.getInitialContextProperties());
 					monitor.worked(50);
 					numericOrganisationIdentifier = m.getNumericOrganisationIdentifier(numericOrganisationID);
 				} catch (Exception e) {

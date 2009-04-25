@@ -2,8 +2,13 @@
 <!DOCTYPE application PUBLIC "-//Sun Microsystems, Inc.//DTD J2EE Application 1.3//EN" "http://java.sun.com/dtd/application_1_3.dtd">
 
 <application>
-  <display-name>JFireHTMLProp</display-name>
+	<display-name>JFireHTMLProp</display-name>
+	<module>
+		<java>JFireHTMLProp.jar</java>
+	</module>
+<!-- It was type "ejb" before (see below), but I think it should more correctly be a module of type "java". Marco.
   <module>
     <ejb>JFireHTMLProp.jar</ejb>
   </module>
+-->
 </application>

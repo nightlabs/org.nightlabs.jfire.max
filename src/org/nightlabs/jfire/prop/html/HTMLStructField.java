@@ -5,6 +5,13 @@ import org.nightlabs.jfire.prop.StructBlock;
 import org.nightlabs.jfire.prop.StructField;
 import org.nightlabs.jfire.prop.id.StructFieldID;
 
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+
 /**
  * @jdo.persistence-capable identity-type="application"
  *                          persistence-capable-superclass="org.nightlabs.jfire.prop.StructField"
@@ -18,6 +25,17 @@ import org.nightlabs.jfire.prop.id.StructFieldID;
  *
  * @author Marc Klinger - marc[at]nightlabs[dot]de
  */
+@PersistenceCapable(
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireHTMLProp_HTMLStructField")
+@FetchGroups(
+	@FetchGroup(
+		fetchGroups={"default"},
+		name="IStruct.fullData",
+		members={})
+)
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class HTMLStructField extends StructField<HTMLDataField>
 {
 	/**

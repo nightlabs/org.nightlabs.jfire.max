@@ -15,6 +15,17 @@ import org.nightlabs.jfire.prop.PropertySet;
 import org.nightlabs.jfire.prop.StructField;
 import org.nightlabs.util.NLLocale;
 
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+
 /**
  * @jdo.persistence-capable identity-type="application"
  *                          persistence-capable-superclass="org.nightlabs.jfire.prop.DataField"
@@ -27,6 +38,17 @@ import org.nightlabs.util.NLLocale;
  *
  * @author Marc Klinger - marc[at]nightlabs[dot]de
  */
+@PersistenceCapable(
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireHTMLProp_HTMLDataField")
+@FetchGroups(
+	@FetchGroup(
+		fetchGroups={"default"},
+		name="FetchGroupsProp.fullData",
+		members={@Persistent(name="texts"), @Persistent(name="files")})
+)
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class HTMLDataField extends DataField
 {
 	/**
@@ -48,6 +70,10 @@ public class HTMLDataField extends DataField
 	 * @jdo.join
 	 * @jdo.value-column sql-type="CLOB"
 	 */
+	@Join
+	@Persistent(
+		table="JFireHTMLProp_HTMLDataField_Texts",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Map<String, String> texts;
 
 	/**
@@ -61,6 +87,12 @@ public class HTMLDataField extends DataField
 	 *
 	 * @jdo.join
 	 */
+	@Join
+	@Persistent(
+		dependentElement="true",
+		nullValue=NullValue.EXCEPTION,
+		table="JFireHTMLProp_HTMLDataField_Files",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private List<IFCKEditorContentFile> files;
 
 	/**

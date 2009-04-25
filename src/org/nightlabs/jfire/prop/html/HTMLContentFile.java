@@ -6,6 +6,16 @@ import java.util.Date;
 import org.nightlabs.htmlcontent.IFCKEditorContentFile;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 
+import javax.jdo.annotations.Persistent;
+import org.nightlabs.jfire.prop.html.id.HTMLContentFileID;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+
 /**
  * @jdo.persistence-capable identity-type="application"
  *                          detachable="true"
@@ -18,6 +28,17 @@ import org.nightlabs.jfire.idgenerator.IDGenerator;
  * 
  * @author Marc Klinger - marc[at]nightlabs[dot]de
  */
+@PersistenceCapable(
+	objectIdClass=HTMLContentFileID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireHTMLProp_HTMLContentFile")
+@FetchGroups(
+	@FetchGroup(
+		fetchGroups={"default"},
+		name="FetchGroupsProp.fullData",
+		members={@Persistent(name="data"), @Persistent(name="changeDT")})
+)
 public class HTMLContentFile implements IFCKEditorContentFile, Serializable
 {
 	/**
@@ -29,37 +50,46 @@ public class HTMLContentFile implements IFCKEditorContentFile, Serializable
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 */
+	@PrimaryKey
 	private long fileId;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Date changeDT;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private String contentType;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 * @jdo.column sql-type="BLOB"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+	@Column(sqlType="BLOB")
 	private byte[] data;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private String description;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private String name;
 	
 	/**

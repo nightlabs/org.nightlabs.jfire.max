@@ -35,6 +35,9 @@ import java.util.Map;
 import javax.jdo.Extent;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
 import javax.jdo.spi.PersistenceCapable;
 
 import org.apache.log4j.Logger;
@@ -47,7 +50,7 @@ import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
  * takes the resultClass of the script with the given ScriptRegistryItemID
  * and returns all instances of the same class as possible
  * values, from the datastore.
- * 
+ *
  * @author Daniel.Mazurek [at] NightLabs [dot] de
  *
  * @jdo.persistence-capable
@@ -56,13 +59,13 @@ import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
  *		detachable="true"
  *
  * @jdo.inheritance strategy="superclass-table"
- */
+ */@javax.jdo.annotations.PersistenceCapable(
+	identityType=IdentityType.APPLICATION,
+	detachable="true")
+@Inheritance(strategy=InheritanceStrategy.SUPERCLASS_TABLE)
 public class DefaultPossibleValueProvider
 extends PossibleValueProvider
 {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger = Logger.getLogger(DefaultPossibleValueProvider.class);
 
@@ -70,7 +73,7 @@ extends PossibleValueProvider
 	{
 		super(script);
 	}
-		
+
 	@Override
 	public List<Object> getPossibleValues(Map<String, Object> parameterValues, int limit)
 	{
@@ -107,5 +110,5 @@ extends PossibleValueProvider
 		}
 		return Collections.emptyList();
 	}
-	 
+
 }

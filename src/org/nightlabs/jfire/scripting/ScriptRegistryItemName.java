@@ -29,12 +29,26 @@ package org.nightlabs.jfire.scripting;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
+
 import org.nightlabs.i18n.I18nText;
+import org.nightlabs.jfire.scripting.id.ScriptRegistryItemNameID;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
- * 
+ *
  * @jdo.persistence-capable
  *		identity-type="application"
  *		objectid-class="org.nightlabs.jfire.scripting.id.ScriptRegistryItemNameID"
@@ -47,6 +61,17 @@ import org.nightlabs.i18n.I18nText;
  *
  * @jdo.fetch-group name="ScriptRegistryItem.name" fields="scriptRegistryItem, names"
  */
+@PersistenceCapable(
+	objectIdClass=ScriptRegistryItemNameID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireScripting_ScriptRegistryItemName")
+@FetchGroups(
+	@FetchGroup(
+		name="ScriptRegistryItem.name",
+		members={@Persistent(name="scriptRegistryItem"), @Persistent(name="names")})
+)
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class ScriptRegistryItemName
 extends I18nText
 {
@@ -56,22 +81,29 @@ extends I18nText
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String scriptRegistryItemType;
-	
+
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String scriptRegistryItemID;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private ScriptRegistryItem scriptRegistryItem;
 
 	/**
@@ -88,7 +120,12 @@ extends I18nText
 	 *
 	 * @jdo.join
 	 */
-	protected Map names = new HashMap();
+	@Join
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		table="JFireScripting_ScriptRegistryItemName_names",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
+	protected Map<String, String> names;
 
 	/**
 	 * @deprecated Only for JDO!
@@ -104,20 +141,15 @@ extends I18nText
 		this.organisationID = scriptRegistryItem.getOrganisationID();
 		this.scriptRegistryItemType = scriptRegistryItem.getScriptRegistryItemType();
 		this.scriptRegistryItemID = scriptRegistryItem.getScriptRegistryItemID();
+		names = new HashMap<String, String>();
 	}
 
-	/**
-	 * @see org.nightlabs.i18n.I18nText#getI18nMap()
-	 */
 	@Override
-	protected Map getI18nMap()
+	protected Map<String, String> getI18nMap()
 	{
 		return names;
 	}
 
-	/**
-	 * @see org.nightlabs.i18n.I18nText#getFallBackValue(java.lang.String)
-	 */
 	@Override
 	protected String getFallBackValue(String languageID)
 	{

@@ -1,13 +1,13 @@
 package org.nightlabs.jfire.scripting.dao;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
-import org.nightlabs.jfire.scripting.ScriptManager;
-import org.nightlabs.jfire.scripting.ScriptManagerUtil;
+import org.nightlabs.jfire.scripting.ScriptManagerRemote;
 import org.nightlabs.jfire.scripting.ScriptRegistry;
 import org.nightlabs.jfire.scripting.id.ScriptRegistryID;
 import org.nightlabs.jfire.security.SecurityReflector;
@@ -46,20 +46,19 @@ public class ScriptRegistryDAO extends BaseJDOObjectDAO<ScriptRegistryID, Script
 	@Override
 	protected Collection<ScriptRegistry> retrieveJDOObjects(Set<ScriptRegistryID> objectIDs, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) throws Exception
 	{
-		ScriptManager scriptManager = ScriptManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
-		List<ScriptRegistry> l = new ArrayList<ScriptRegistry>(1);
-		l.add(scriptManager.getScriptRegistry());
+		ScriptManagerRemote sm = JFireEjb3Factory.getRemoteBean(ScriptManagerRemote.class, SecurityReflector.getInitialContextProperties());
+		List<ScriptRegistry> l = Collections.singletonList(sm.getScriptRegistry());
 		return l;
 	}
 
 	public ScriptRegistry getScriptRegistry(String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
 		try {
-			ScriptManager scriptManager = ScriptManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
-			return scriptManager.getScriptRegistry();
+			ScriptManagerRemote sm = JFireEjb3Factory.getRemoteBean(ScriptManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			return sm.getScriptRegistry();
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
-	
+
 }

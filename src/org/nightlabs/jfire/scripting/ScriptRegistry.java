@@ -47,6 +47,19 @@ import org.nightlabs.jfire.scripting.id.ScriptRegistryID;
 import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 import org.nightlabs.util.IOUtil;
 
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+
 /**
  * <p>
  * This class is the entry point for the management of scripts. Scripts
@@ -70,6 +83,18 @@ import org.nightlabs.util.IOUtil;
  * 
  * @jdo.fetch-group name="ScriptRegistry.this" fetch-groups="default" fields="fileExtension2Language, language2ScriptExecutorClassName"
  */
+@PersistenceCapable(
+	objectIdClass=ScriptRegistryID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireScripting_ScriptRegistry")
+@FetchGroups(
+	@FetchGroup(
+		fetchGroups={"default"},
+		name=ScriptRegistry.FETCH_GROUP_THIS_SCRIPT_REGISTRY,
+		members={@Persistent(name="fileExtension2Language"), @Persistent(name="language2ScriptExecutorClassName")})
+)
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class ScriptRegistry
 implements Serializable
 {
@@ -84,6 +109,7 @@ implements Serializable
 	/**
 	 * @jdo.field primary-key="true"
 	 */
+	@PrimaryKey
 	private int scriptRegistryID;
 
 	public static final ScriptRegistryID SINGLETON_ID = ScriptRegistryID.create(0);
@@ -123,6 +149,11 @@ implements Serializable
 	 *
 	 * @jdo.join
 	 */
+	@Join
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		table="JFireScripting_ScriptRegistry_language2ScriptExecutorClassName",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Map<String, String> language2ScriptExecutorClassName;
 
 	/**
@@ -139,12 +170,19 @@ implements Serializable
 	 *
 	 * @jdo.join
 	 */
+	@Join
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		table="JFireScripting_ScriptRegistry_fileExtension2Language",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Map<String, String> fileExtension2Language;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 * @jdo.column length="100"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+	@Column(length=100)
 	private String organisationID;
 
 	/**

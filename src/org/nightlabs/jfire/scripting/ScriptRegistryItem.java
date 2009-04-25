@@ -39,6 +39,19 @@ import javax.jdo.listener.StoreCallback;
 import org.apache.log4j.Logger;
 import org.nightlabs.util.Util;
 
+import javax.jdo.annotations.Persistent;
+import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.Queries;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+
 /**
  * Base class for objects in the JFire scripting tree and provides the
  * common properties of these objects like a name, a description and
@@ -98,6 +111,44 @@ import org.nightlabs.util.Util;
  *			import java.lang.String"
  *
  */
+@PersistenceCapable(
+	objectIdClass=ScriptRegistryItemID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireScripting_ScriptRegistryItem")
+@FetchGroups({
+	@FetchGroup(
+		fetchGroups={"default"},
+		name="ScriptRegistryItem.parent",
+		members=@Persistent(name="parent")),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name=ScriptRegistryItem.FETCH_GROUP_NAME,
+		members=@Persistent(name="name")),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name=ScriptRegistryItem.FETCH_GROUP_DESCRIPTION,
+		members=@Persistent(name="description")),
+	@FetchGroup(
+		fetchGroups={"default", ScriptRegistryItem.FETCH_GROUP_NAME, ScriptRegistryItem.FETCH_GROUP_DESCRIPTION},
+		name=ScriptRegistryItem.FETCH_GROUP_THIS_SCRIPT_REGISTRY_ITEM,
+		members={@Persistent(name="parent"), @Persistent(name="name"), @Persistent(name="description")})
+})
+@Queries({
+	@javax.jdo.annotations.Query(
+		name=ScriptRegistryItem.QUERY_GET_TOPLEVEL_SCRIPT_REGISTRY_ITEMS_BY_ORGANISATION_ID,
+		value="SELECT WHERE this.organisationID == paramOrganisationID && this.parent == null PARAMETERS String paramOrganisationID import java.lang.String"),
+	@javax.jdo.annotations.Query(
+		name=ScriptRegistryItem.QUERY_GET_TOPLEVEL_SCRIPT_REGISTRY_ITEMS,
+		value="SELECT WHERE this.parent == null import java.lang.String"),
+	@javax.jdo.annotations.Query(
+		name=ScriptRegistryItem.QUERY_GET_TOPLEVEL_SCRIPT_REGISTRY_ITEMS_BY_TYPE,
+		value="SELECT WHERE this.parent == null && this.scriptRegistryItemType == pScriptRegistryItemType PARAMETERS String pScriptRegistryItemType import java.lang.String"),
+	@javax.jdo.annotations.Query(
+		name=ScriptRegistryItem.QUERY_GET_TOPLEVEL_SCRIPT_REGISTRY_ITEMS_BY_ORGANISATION_ID_AND_TYPE,
+		value="SELECT WHERE this.parent == null && this.organisationID == pOrganisationID && this.scriptRegistryItemType == pScriptRegistryItemType PARAMETERS String pOrganisationID, String pScriptRegistryItemType import java.lang.String")
+})
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public abstract class ScriptRegistryItem
 		implements Serializable, StoreCallback
 {
@@ -121,37 +172,51 @@ public abstract class ScriptRegistryItem
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String scriptRegistryItemType;
 	
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String scriptRegistryItemID;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private ScriptCategory parent;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private ScriptParameterSet parameterSet;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent" mapped-by="scriptRegistryItem"
 	 */
+	@Persistent(
+		mappedBy="scriptRegistryItem",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private ScriptRegistryItemName name;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"  mapped-by="scriptRegistryItem"
 	 */
+	@Persistent(
+		mappedBy="scriptRegistryItem",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private ScriptRegistryItemDescription description;
 	
 	/**

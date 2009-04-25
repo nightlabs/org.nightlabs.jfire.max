@@ -26,7 +26,6 @@
 
 package org.nightlabs.jfire.scripting;
 
-import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -34,14 +33,15 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import javax.ejb.CreateException;
-import javax.ejb.EJBException;
-import javax.ejb.SessionBean;
-import javax.ejb.SessionContext;
+import javax.annotation.security.RolesAllowed;
+import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
+import javax.ejb.TransactionManagement;
+import javax.ejb.TransactionManagementType;
 import javax.jdo.PersistenceManager;
 
 import org.apache.log4j.Logger;
-import org.nightlabs.ModuleException;
 import org.nightlabs.i18n.I18nText;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
@@ -62,9 +62,12 @@ import org.nightlabs.version.Version;
  * @ejb.util generate="physical"
  * @ejb.transaction type="Required"
  */
-public abstract class ScriptManagerBean
+@TransactionAttribute(TransactionAttributeType.REQUIRED)
+@TransactionManagement(TransactionManagementType.CONTAINER)
+@Stateless
+public class ScriptManagerBean
 extends BaseSessionBeanImpl
-implements SessionBean
+implements ScriptManagerRemote
 {
 	private static final long serialVersionUID = 1L;
 	/**
@@ -72,57 +75,22 @@ implements SessionBean
 	 */
 	private static final Logger logger = Logger.getLogger(ScriptManagerBean.class);
 
-	/**
-	 * @see com.nightlabs.jfire.base.BaseSessionBeanImpl#setSessionContext(javax.ejb.SessionContext)
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.scripting.ScriptManagerRemote#ping(java.lang.String)
 	 */
-	@Override
-	public void setSessionContext(SessionContext sessionContext)
-	throws EJBException, RemoteException
-	{
-		super.setSessionContext(sessionContext);
-	}
-	/**
-	 * @see com.nightlabs.jfire.base.BaseSessionBeanImpl#unsetSessionContext()
-	 */
-	@Override
-	public void unsetSessionContext() {
-		super.unsetSessionContext();
-	}
-
-	/**
-	 * @ejb.create-method
-	 * @ejb.permission role-name="_Guest_"
-	 */
-	public void ejbCreate() throws CreateException
-	{
-	}
-	/**
-	 * @see javax.ejb.SessionBean#ejbRemove()
-	 *
-	 * @ejb.permission unchecked="true"
-	 */
-	public void ejbRemove() throws EJBException, RemoteException { }
-
-	/**
-	 * @ejb.interface-method
-	 * @ejb.transaction type="Supports"
-	 * @ejb.permission role-name="_Guest_"
-	 */
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	@RolesAllowed("_Guest_")
 	@Override
 	public String ping(String message) {
 		return super.ping(message);
 	}
 
 
-	/**
-	 * This method is called by the datastore initialisation mechanism.
-	 *
-	 * @throws ModuleException
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_System_"
-	 * @ejb.transaction type="Required"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.scripting.ScriptManagerRemote#initialise()
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("_System_")
 	public void initialise()
 	{
 		PersistenceManager pm;
@@ -143,13 +111,11 @@ implements SessionBean
 		}
 	}
 
-	/**
-	 * @throws ModuleException
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Required"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.scripting.ScriptManagerRemote#getScriptRegistryItem(org.nightlabs.jfire.scripting.id.ScriptRegistryItemID, java.lang.String[], int)
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("_Guest_")
 	public ScriptRegistryItem getScriptRegistryItem (
 			ScriptRegistryItemID scriptRegistryItemID,
 			String[] fetchGroups, int maxFetchDepth
@@ -170,13 +136,11 @@ implements SessionBean
 		}
 	}
 
-	/**
-	 * @throws ModuleException
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Required"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.scripting.ScriptManagerRemote#getScriptRegistryItems(java.util.List, java.lang.String[], int)
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("_Guest_")
 	public List<ScriptRegistryItem> getScriptRegistryItems (
 			List<ScriptRegistryItemID> scriptRegistryItemIDs,
 			String[] fetchGroups, int maxFetchDepth
@@ -201,13 +165,11 @@ implements SessionBean
 		}
 	}
 
-	/**
-	 * @throws ModuleException
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Required"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.scripting.ScriptManagerRemote#getTopLevelScriptRegistryItems(java.lang.String, java.lang.String[], int)
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("_Guest_")
 	public Collection getTopLevelScriptRegistryItems (
 			String organisationID,
 			String[] fetchGroups, int maxFetchDepth
@@ -228,15 +190,11 @@ implements SessionBean
 		}
 	}
 
-	/**
-	 *
-	 * @param organisationID The organisationID the carriers should be searched for. If null top level carriers for all organisations are returned.
-	 * @throws ModuleException
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Required"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.scripting.ScriptManagerRemote#getTopLevelScriptRegistryItemCarriers(java.lang.String)
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("_Guest_")
 	public Collection<ScriptRegistryItemCarrier> getTopLevelScriptRegistryItemCarriers (String organisationID)
 	{
 		PersistenceManager pm;
@@ -282,13 +240,11 @@ implements SessionBean
 //		}
 //	}
 
-	/**
-	 * @throws ModuleException
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Required"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.scripting.ScriptManagerRemote#storeRegistryItem(org.nightlabs.jfire.scripting.ScriptRegistryItem, boolean, java.lang.String[], int)
 	 */
+@TransactionAttribute(TransactionAttributeType.REQUIRED)
+@RolesAllowed("_Guest_")
 	public ScriptRegistryItem storeRegistryItem (
 			ScriptRegistryItem reportRegistryItem,
 			boolean get,
@@ -304,13 +260,11 @@ implements SessionBean
 		}
 	}
 
-	/**
-	 * @throws ModuleException
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Required"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.scripting.ScriptManagerRemote#getScriptParameterSets(java.lang.String, java.lang.String[], int)
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("_Guest_")
 	public Collection<ScriptParameterSet> getScriptParameterSets(
 			String organisationID, String[] fetchGroups, int maxFetchDepth)
 	{
@@ -333,13 +287,11 @@ implements SessionBean
 		}
 	}
 
-	/**
-	 * @throws ModuleException
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Required"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.scripting.ScriptManagerRemote#getAllScriptParameterSetIDs(java.lang.String)
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("_Guest_")
 	public Set<ScriptParameterSetID> getAllScriptParameterSetIDs(String organisationID)
 	{
 		PersistenceManager pm;
@@ -352,13 +304,11 @@ implements SessionBean
 		}
 	}
 
-	/**
-	 * @throws ModuleException
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Required"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.scripting.ScriptManagerRemote#getScriptParameterSet(org.nightlabs.jfire.scripting.id.ScriptParameterSetID, java.lang.String[], int)
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("_Guest_")
 	public ScriptParameterSet getScriptParameterSet(
 			ScriptParameterSetID scriptParameterSetID,
 			String[] fetchGroups, int maxFetchDepth
@@ -377,16 +327,11 @@ implements SessionBean
 		}
 	}
 
-	/**
-	 * Returns the {@link ScriptParameterSet}s associated with the
-	 * {@link ScriptRegistryItem}s referenced by the given {@link ScriptRegistryItemID}s.
-	 *
-	 * @throws ModuleException
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Required"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.scripting.ScriptManagerRemote#getScriptParameterSetsForScriptRegistryItemIDs(java.util.Collection, java.lang.String[], int)
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("_Guest_")
 	@SuppressWarnings("unchecked")
 	public Collection<ScriptParameterSet> getScriptParameterSetsForScriptRegistryItemIDs(
 			Collection<ScriptRegistryItemID> scriptParameterSetID,
@@ -411,14 +356,11 @@ implements SessionBean
 		}
 	}
 
-	/**
-	 * Returns the {@link ScriptParameterSet}s for the given {@link ScriptParameterSetID}s.
-	 * @throws ModuleException
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Required"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.scripting.ScriptManagerRemote#getScriptParameterSets(java.util.Collection, java.lang.String[], int)
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("_Guest_")
 	@SuppressWarnings("unchecked")
 	public Collection<ScriptParameterSet> getScriptParameterSets(
 			Collection<ScriptParameterSetID> scriptParameterSetIDs,
@@ -436,13 +378,11 @@ implements SessionBean
 		}
 	}
 
-	/**
-	 * @throws ModuleException
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Required"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.scripting.ScriptManagerRemote#createParameterSet(org.nightlabs.i18n.I18nText, java.lang.String[], int)
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("_Guest_")
 	public ScriptParameterSet createParameterSet (I18nText name, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm;
@@ -462,13 +402,11 @@ implements SessionBean
 		}
 	}
 
-	/**
-	 * @throws ModuleException
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Required"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.scripting.ScriptManagerRemote#storeParameterSet(org.nightlabs.jfire.scripting.ScriptParameterSet, boolean, java.lang.String[], int)
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("_Guest_")
 	public ScriptParameterSet storeParameterSet (
 			ScriptParameterSet scriptParameterSet,
 			boolean get,
@@ -484,17 +422,11 @@ implements SessionBean
 		}
 	}
 
-	/**
-	 *
-	 * @param organisationID The organisationID the carriers should be searched for.
-	 * If null top level carriers for all organisations are returned.
-	 * @param scriptRegistryItemType the scriptRegistryItemType to search for
-	 * @throws ModuleException
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Required"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.scripting.ScriptManagerRemote#getTopLevelScriptRegistryItemCarriers(java.lang.String, java.lang.String)
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("_Guest_")
 	public Collection<ScriptRegistryItemCarrier> getTopLevelScriptRegistryItemCarriers (
 			String organisationID, String scriptRegistryItemType)
 	{
@@ -514,13 +446,11 @@ implements SessionBean
 		}
 	}
 
-	/**
-	 * returns the detached {@link ScriptRegistry}
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Required"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.scripting.ScriptManagerRemote#getScriptRegistry(java.lang.String[], int)
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("_Guest_")
 	public ScriptRegistry getScriptRegistry(String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm;
@@ -536,20 +466,18 @@ implements SessionBean
 		}
 	}
 
-	/**
-	 * returns the detached {@link ScriptRegistry}
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Required"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.scripting.ScriptManagerRemote#getScriptRegistry()
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("_Guest_")
 	public ScriptRegistry getScriptRegistry()
 	{
 		PersistenceManager pm;
 		pm = getPersistenceManager();
 		try {
 			pm.getFetchPlan().setGroup(ScriptRegistry.FETCH_GROUP_THIS_SCRIPT_REGISTRY);
-			pm.getFetchPlan().setMaxFetchDepth(NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
+			pm.getFetchPlan().setMaxFetchDepth(NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT); // TODO really? Marco.
 			ScriptRegistry scriptRegistry = (ScriptRegistry) pm.getObjectById(ScriptRegistry.SINGLETON_ID);
 			scriptRegistry = pm.detachCopy(scriptRegistry);
 			return scriptRegistry;

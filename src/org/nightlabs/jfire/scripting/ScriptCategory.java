@@ -31,35 +31,59 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.jdo.JDODetachedFieldAccessException;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
 
 import org.apache.log4j.Logger;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
- * 
+ *
  * @jdo.persistence-capable
  *		identity-type="application"
  *		persistence-capable-superclass="org.nightlabs.jfire.scripting.ScriptRegistryItem"
  *		detachable="true"
  *		table="JFireScripting_ScriptCategory"
- * 
+ *
  * @jdo.inheritance strategy="new-table"
- * 
+ *
  * @jdo.fetch-group name="ScriptCategory.children" fetch-groups="default" fields="children"
  * @jdo.fetch-group name="ScriptCategory.this" fetch-groups="default, ScriptRegistryItem.this" fields="children"
- * 
+ *
  */
+@PersistenceCapable(
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireScripting_ScriptCategory")
+@FetchGroups({
+	@FetchGroup(
+		fetchGroups={"default"},
+		name=ScriptCategory.FETCH_GROUP_CHILDREN,
+		members=@Persistent(name="children")),
+	@FetchGroup(
+		fetchGroups={"default", "ScriptRegistryItem.this"},
+		name=ScriptCategory.FETCH_GROUP_THIS_SCRIPT_CATEGORY,
+		members=@Persistent(name="children"))
+})
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class ScriptCategory
 		extends ScriptRegistryItem
 		implements NestableScriptRegistryItem
 {
 	private static final long serialVersionUID = 1L;
-	
+
 	public static final String FETCH_GROUP_CHILDREN = "ScriptCategory.children";
 	/**
-	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon! 
+	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon!
 	 */
+	@Deprecated
 	public static final String FETCH_GROUP_THIS_SCRIPT_CATEGORY = "ScriptCategory.this";
 
 	/**
@@ -72,7 +96,11 @@ public class ScriptCategory
 	 *		mapped-by="parent"
 	 *		dependent-element="true"
 	 */
-	private Set children;
+	@Persistent(
+		dependentElement="true",
+		mappedBy="parent",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
+	private Set<ScriptRegistryItem> children;
 
 	/**
 	 * @deprecated Only for JDO!
@@ -117,7 +145,7 @@ public class ScriptCategory
 
 		return parent.getScriptRegistryItemType();
 	}
-	
+
 	/**
 	 * @param organisationID The owner-organisation.
 	 * @param scriptRegistryItemType The type of the ScriptCategory
@@ -176,7 +204,7 @@ public class ScriptCategory
 
 	/**
 	 * Add the given child to the set of sub-elements.
-	 * 
+	 *
 	 * @param child The new child to add.
 	 */
 	public void addChild(ScriptRegistryItem child)

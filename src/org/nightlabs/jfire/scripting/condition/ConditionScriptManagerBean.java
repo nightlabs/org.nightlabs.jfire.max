@@ -25,7 +25,6 @@
  ******************************************************************************/
 package org.nightlabs.jfire.scripting.condition;
 
-import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -33,10 +32,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.ejb.CreateException;
-import javax.ejb.EJBException;
-import javax.ejb.SessionBean;
-import javax.ejb.SessionContext;
+import javax.annotation.security.RolesAllowed;
+import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
+import javax.ejb.TransactionManagement;
+import javax.ejb.TransactionManagementType;
 import javax.jdo.FetchPlan;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
@@ -50,11 +51,9 @@ import org.nightlabs.jfire.scripting.condition.id.ConditionContextProviderID;
 import org.nightlabs.jfire.scripting.condition.id.PossibleValueProviderID;
 import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 
-
-
 /**
  * @author Daniel.Mazurek [at] NightLabs [dot] de
- * 
+ *
  * @ejb.bean name="jfire/ejb/JFireScripting/condition/ConditionScriptManager"
  *					 jndi-name="jfire/ejb/JFireScripting/condition/ConditionScriptManager"
  *					 type="Stateless"
@@ -62,49 +61,16 @@ import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
  *
  * @ejb.util generate="physical"
  * @ejb.transaction type="Required"
- */
-public abstract class ConditionScriptManagerBean
+ */@TransactionAttribute(TransactionAttributeType.REQUIRED)
+@TransactionManagement(TransactionManagementType.CONTAINER)
+@Stateless
+public class ConditionScriptManagerBean
 extends BaseSessionBeanImpl
-implements SessionBean
+implements ConditionScriptManagerRemote
 {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger = Logger.getLogger(ConditionScriptManagerBean.class);
-	
-	/**
-	 * @ejb.create-method
-	 * @ejb.permission role-name="_Guest_"
-	 */
-	public void ejbCreate() throws CreateException
-	{
-	}
-	
-	/**
-	 * @see javax.ejb.SessionBean#ejbRemove()
-	 *
-	 * @ejb.permission unchecked="true"
-	 */
-	public void ejbRemove() throws EJBException, RemoteException { }
-	
-	/**
-	 * @see com.nightlabs.jfire.base.BaseSessionBeanImpl#setSessionContext(javax.ejb.SessionContext)
-	 */
-	@Override
-	public void setSessionContext(SessionContext sessionContext)
-	throws EJBException, RemoteException
-	{
-		super.setSessionContext(sessionContext);
-	}
-	/**
-	 * @see com.nightlabs.jfire.base.BaseSessionBeanImpl#unsetSessionContext()
-	 */
-	@Override
-	public void unsetSessionContext() {
-		super.unsetSessionContext();
-	}
-		
+
 	private static ScriptConditioner getScriptConditioner(PersistenceManager pm,
 			ScriptRegistryItemID scriptRegistryItemID,
 			Map<String, Object> parameterValues, int valueLimit)
@@ -120,11 +86,11 @@ implements SessionBean
 		} catch (ClassNotFoundException e) {
 			logger.error("script resultClass "+script.getResultClassName()+" of script with scriptRegistryItemID "+scriptRegistryItemID+" could not be found", e);
 		}
-		
+
 		// TODO: must come from client
 		String variableName = scriptRegistryItemID.scriptRegistryItemID;
 //		String variableName = script.getName().getText();
-		
+
 		Collection possibleValues = Collections.EMPTY_LIST;
 		String valueLabelProviderClassName = LabelProvider.class.getName();
 		PossibleValueProviderID valueProviderID = PossibleValueProviderID.create(
@@ -140,16 +106,16 @@ implements SessionBean
 		catch (JDOObjectNotFoundException e) {
 			// If no valueprovider is registered use the default
 			PossibleValueProvider provider = PossibleValueProvider.getDefaultPossibleValueProvider(pm, script);
-			possibleValues = provider.getPossibleValues(parameterValues, valueLimit);			
+			possibleValues = provider.getPossibleValues(parameterValues, valueLimit);
 			logger.info("No possible values found for ScriptRegistryItemID "+scriptRegistryItemID+", use DefaultPossibleValueProvider!");
 		}
-		
+
 		pm.getFetchPlan().setGroups(new String[] {FetchPlan.DEFAULT, ScriptRegistryItem.FETCH_GROUP_NAME});
 		script = pm.detachCopy(script);
 		ScriptConditioner sc = new ScriptConditioner(scriptRegistryItemID, script,
 				variableName, compareOperators, possibleValues, valueLabelProviderClassName);
 //		sc.setPossibleValuesAreObjectIDs(script.isNeedsDetach());
-		
+
 		if (logger.isDebugEnabled()) {
 			logger.debug("scriptRegistryItemID = "+scriptRegistryItemID);
 			logger.debug("variableName = "+variableName);
@@ -161,11 +127,10 @@ implements SessionBean
 		return sc;
 	}
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Required" @!Is required because {@link #getScriptConditioner(PersistenceManager, ScriptRegistryItemID, Map, int)} can persist data
-	 */
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.scripting.condition.ConditionScriptManagerRemote#getScriptConditioner(org.nightlabs.jfire.scripting.id.ScriptRegistryItemID, java.util.Map, int)
+	 */	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("_Guest_")
 	public ScriptConditioner getScriptConditioner(ScriptRegistryItemID scriptRegistryItemID,
 			Map<String, Object> parameterValues, int valueLimit)
 	{
@@ -176,12 +141,12 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Required" @!Is required because {@link #getScriptConditioner(PersistenceManager, ScriptRegistryItemID, Map, int)} can persist data
-	 */
+
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.scripting.condition.ConditionScriptManagerRemote#getScriptConditioner(java.util.Map, int)
+	 */	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("_Guest_")
+
 	public Map<ScriptRegistryItemID, ScriptConditioner> getScriptConditioner(
 			Map<ScriptRegistryItemID, Map<String, Object>> scriptID2Paramters, int valueLimit)
 	{
@@ -206,11 +171,11 @@ implements SessionBean
 		return scriptID2ScriptConditioner;
 	}
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Required" @!Is required because {@link #getScriptConditioner(PersistenceManager, ScriptRegistryItemID, Map, int)} can persist data
-	 */
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.scripting.condition.ConditionScriptManagerRemote#getConditionContextScriptIDs(org.nightlabs.jfire.scripting.condition.id.ConditionContextProviderID)
+	 */	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("_Guest_")
+
 	public Set<ScriptRegistryItemID> getConditionContextScriptIDs(ConditionContextProviderID providerID)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -221,5 +186,5 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 }

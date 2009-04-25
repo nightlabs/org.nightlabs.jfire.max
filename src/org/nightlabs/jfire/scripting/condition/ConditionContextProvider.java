@@ -35,6 +35,19 @@ import javax.jdo.Query;
 
 import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.FetchGroups;
+import org.nightlabs.jfire.scripting.condition.id.ConditionContextProviderID;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.Queries;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+
 /**
  * @author Daniel.Mazurek [at] NightLabs [dot] de
  * 
@@ -59,7 +72,28 @@ import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
  *				this.organisationID == pOrganisationID
  *			PARAMETERS String pConditionContextProviderID, String pOrganisationID
  *			import java.lang.String"
- */
+ */@PersistenceCapable(
+	objectIdClass=ConditionContextProviderID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireScripting_ConditionContextProvider")
+@FetchGroups({
+	@FetchGroup(
+		fetchGroups={"default"},
+		name=ConditionContextProvider.FETCH_GROUP_SCRIPT_REGISTRY_ITEM_IDS,
+		members=@Persistent(name="scriptRegistryItemIDs")),
+	@FetchGroup(
+		fetchGroups={"default", ConditionContextProvider.FETCH_GROUP_THIS_CONDITION_CONTEXT_PROVIDER},
+		name=ConditionContextProvider.FETCH_GROUP_THIS_CONDITION_CONTEXT_PROVIDER,
+		members=@Persistent(name="scriptRegistryItemIDs"))
+})
+@Queries(
+	@javax.jdo.annotations.Query(
+		name="getConditionProviderByOrganisationIDAndProviderID",
+		value="SELECT WHERE this.conditionContextProviderID == pConditionContextProviderID && this.organisationID == pOrganisationID PARAMETERS String pConditionContextProviderID, String pOrganisationID import java.lang.String")
+)
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
+
 public class ConditionContextProvider
 //implements IConditionContextProvider
 implements Serializable
@@ -83,13 +117,17 @@ implements Serializable
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
-	 */
+	 */	@PrimaryKey
+	@Column(length=100)
+
 	private String organisationID;
 	
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
-	 */
+	 */	@PrimaryKey
+	@Column(length=100)
+
 	private String conditionContextProviderID;
 
 	/**
@@ -134,7 +172,8 @@ implements Serializable
 	 *		persistence-modifier="persistent"
 	 *		collection-type="collection"
 	 *		element-type="org.nightlabs.jfire.scripting.id.ScriptRegistryItemID"
-	 */
+	 */	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+
 	private Set<ScriptRegistryItemID> scriptRegistryItemIDs = new HashSet<ScriptRegistryItemID>();
 
 	/**

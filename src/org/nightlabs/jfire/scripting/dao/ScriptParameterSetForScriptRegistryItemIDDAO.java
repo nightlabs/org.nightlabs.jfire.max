@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.nightlabs.jfire.scripting.dao;
 
@@ -9,9 +9,9 @@ import java.util.Set;
 import javax.jdo.FetchPlan;
 
 import org.nightlabs.jdo.NLJDOHelper;
+import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
-import org.nightlabs.jfire.scripting.ScriptManager;
-import org.nightlabs.jfire.scripting.ScriptManagerUtil;
+import org.nightlabs.jfire.scripting.ScriptManagerRemote;
 import org.nightlabs.jfire.scripting.ScriptParameterSet;
 import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 import org.nightlabs.jfire.security.SecurityReflector;
@@ -21,15 +21,15 @@ import org.nightlabs.progress.ProgressMonitor;
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
  *
  */
-public class ScriptParameterSetForScriptRegistryItemIDDAO 
-extends BaseJDOObjectDAO<ScriptRegistryItemID, ScriptParameterSet> 
+public class ScriptParameterSetForScriptRegistryItemIDDAO
+extends BaseJDOObjectDAO<ScriptRegistryItemID, ScriptParameterSet>
 {
 	public static final String[] DEFAULT_FETCH_GROUPS = new String[] {
 		FetchPlan.DEFAULT,
 		ScriptParameterSet.FETCH_GROUP_PARAMETERS,
 		ScriptParameterSet.FETCH_GROUP_NAME
 	};
-	
+
 	/**
 	 * A static instance of ScriptParameterSetDAO.
 	 */
@@ -51,7 +51,7 @@ extends BaseJDOObjectDAO<ScriptRegistryItemID, ScriptParameterSet>
 		}
 		return sharedInstance;
 	}
-	
+
 	private ScriptParameterSetForScriptRegistryItemIDDAO() {}
 
 	/* (non-Javadoc)
@@ -62,10 +62,10 @@ extends BaseJDOObjectDAO<ScriptRegistryItemID, ScriptParameterSet>
 	protected Collection<ScriptParameterSet> retrieveJDOObjects(
 			Set<ScriptRegistryItemID> objectIDs, String[] fetchGroups,
 			int maxFetchDepth, ProgressMonitor monitor) throws Exception {
-		ScriptManager sm = ScriptManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+		ScriptManagerRemote sm = JFireEjb3Factory.getRemoteBean(ScriptManagerRemote.class, SecurityReflector.getInitialContextProperties());
 		return sm.getScriptParameterSetsForScriptRegistryItemIDs(objectIDs, fetchGroups, maxFetchDepth);
 	}
-	
+
 	public ScriptParameterSet getScriptParameterSet(ScriptRegistryItemID scriptRegistryItemID, String[] fetchGroups, ProgressMonitor monitor) {
 		return getJDOObject(null, scriptRegistryItemID, fetchGroups, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT, monitor);
 	}

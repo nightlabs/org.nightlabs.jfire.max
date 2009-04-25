@@ -31,6 +31,18 @@ import java.util.Map;
 
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.Discriminator;
+import javax.jdo.annotations.DiscriminatorStrategy;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.jfire.scripting.Script;
@@ -38,7 +50,7 @@ import org.nightlabs.jfire.scripting.condition.id.PossibleValueProviderID;
 
 /**
  * @author Daniel.Mazurek [at] NightLabs [dot] de
- * 
+ *
  * @jdo.persistence-capable
  *		identity-type="application"
  *		objectid-class="org.nightlabs.jfire.scripting.condition.id.PossibleValueProviderID"
@@ -47,26 +59,39 @@ import org.nightlabs.jfire.scripting.condition.id.PossibleValueProviderID;
  *
  * @jdo.inheritance strategy="new-table"
  * @jdo.inheritance-discriminator strategy="class-name"
- * 
+ *
  * @jdo.create-objectid-class field-order="organisationID, scriptRegistryItemType, scriptRegistryItemID"
  *
  * @jdo.fetch-group name="PossibleValueProvider.this" fetch-groups="default" fields="organisationID, scriptRegistryItemID, scriptRegistryItemType, labelProviderClassName"
- */
+ */@PersistenceCapable(
+	objectIdClass=PossibleValueProviderID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireScripting_PossibleValueProvider")
+@FetchGroups(
+	@FetchGroup(
+		fetchGroups={"default"},
+		name=PossibleValueProvider.FETCH_GROUP_THIS_POSSIBLE_VALUE_PROVIDER,
+		members={@Persistent(name="organisationID"), @Persistent(name="scriptRegistryItemID"), @Persistent(name="scriptRegistryItemType"), @Persistent(name="labelProviderClassName")})
+)
+@Discriminator(strategy=DiscriminatorStrategy.CLASS_NAME)
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public abstract class PossibleValueProvider
 implements Serializable
 {
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 1L;
 
 	private static final Logger logger = Logger.getLogger(PossibleValueProvider.class);
 
 	/**
-	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon! 
+	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon!
 	 */
+	@Deprecated
 	public static final String FETCH_GROUP_THIS_POSSIBLE_VALUE_PROVIDER = "PossibleValueProvider.this";
-	
+
 	public static final int LIMIT_UNLIMITED = -1;
 
 	/**
@@ -93,7 +118,7 @@ implements Serializable
 			return provider;
 		}
 	}
-		
+
 	/**
 	 * @deprecated for JDO only
 	 */
@@ -112,27 +137,33 @@ implements Serializable
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
-	 */
+	 */	@PrimaryKey
+	@Column(length=100)
+
 	private String organisationID;
-	
+
 	protected String getOrganisationID() {
 		return organisationID;
 	}
-	
+
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
-	 */
+	 */	@PrimaryKey
+	@Column(length=100)
+
 	private String scriptRegistryItemType;
-	
+
 	protected String getScriptRegistryItemType() {
 		return scriptRegistryItemType;
 	}
-	
+
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
-	 */
+	 */	@PrimaryKey
+	@Column(length=100)
+
 	private String scriptRegistryItemID;
 
 	protected String getScriptRegistryItemID() {
@@ -141,36 +172,39 @@ implements Serializable
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
-	 */
+	 */	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+
 	private Script script;
 
 	public Script getScript() {
 		return script;
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @return a {@link Collection} of possible values for the result of the {@link Script}
 	 * returned from {@link PossibleValueProvider#getScript()}
 	 * based on given the parameterValues, the limit flag can be determined to limit the results
-	 * 
+	 *
 	 */
 	public abstract Collection getPossibleValues(Map<String, Object> parameterValues, int limit);
-	
+
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 * @jdo.column length="100"
-	 */
+	 */	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+	@Column(length=100)
+
 	private String labelProviderClassName = LabelProvider.class.getName();
-	
+
 	public String getLabelProviderClassName() {
 		return labelProviderClassName;
 	}
-	
+
 	public void setLabelProviderClassName(String labelProviderClassName) {
 		this.labelProviderClassName = labelProviderClassName;
 	}
-	
+
 //	private ILabelProvider labelProvider;
 //	/**
 //	 * returns a {@link ILabelProvider} for the possibleValues,
@@ -203,5 +237,5 @@ implements Serializable
 //		this.labelProvider = labelProvider;
 //		labelProviderClassName = labelProvider.getClass().getName();
 //	}
-	
+
 }

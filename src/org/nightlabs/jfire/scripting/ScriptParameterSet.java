@@ -41,6 +41,19 @@ import javax.jdo.Query;
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.util.CollectionUtil;
 
+import javax.jdo.annotations.Value;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.Key;
+import org.nightlabs.jfire.scripting.id.ScriptParameterSetID;
+import javax.jdo.annotations.Queries;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+
 /**
  * A ScriptParameterSet can only be manipulated by the owner organisation. Hence, it contains
  * always (in all datastores) the same parameters and is everywhere (except in its "home" datastore)
@@ -69,6 +82,30 @@ import org.nightlabs.util.CollectionUtil;
  *			import java.lang.String"
  * 
  */
+@PersistenceCapable(
+	objectIdClass=ScriptParameterSetID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireScripting_ScriptParameterSet")
+@FetchGroups({
+	@FetchGroup(
+		fetchGroups={"default"},
+		name=ScriptParameterSet.FETCH_GROUP_PARAMETERS,
+		members=@Persistent(name="parameters")),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name=ScriptParameterSet.FETCH_GROUP_NAME,
+		members=@Persistent(name="name")),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name=ScriptParameterSet.FETCH_THIS_SCRIPT_PARAMETER_SET,
+		members={@Persistent(name="parameters"), @Persistent(name="name")})
+})
+@Queries(
+	@javax.jdo.annotations.Query(
+		name=ScriptParameterSet.QUERY_GET_PARAMETER_SETS_BY_ORGANISATION,
+		value="SELECT WHERE this.organisationID == paramOrganisationID PARAMETERS String paramOrganisationID import java.lang.String")
+)
  public class ScriptParameterSet
 		implements Serializable, IScriptParameterSet //, StoreCallback
 {
@@ -84,10 +121,13 @@ import org.nightlabs.util.CollectionUtil;
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 	/**
 	 * @jdo.field primary-key="true"
 	 */
+	@PrimaryKey
 	private long scriptParameterSetID;
 
 	/**
@@ -102,6 +142,11 @@ import org.nightlabs.util.CollectionUtil;
 	 *
 	 * @jdo.key mapped-by="scriptParameterID"
 	 */
+	@Persistent(
+		mappedBy="scriptParameterSet",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
+	@Key(mappedBy="scriptParameterID")
+	@Value(dependent="true")
 	private Map<String, ScriptParameter> parameters;
 
 //	/**
@@ -118,11 +163,16 @@ import org.nightlabs.util.CollectionUtil;
 	/**
 	 * @jdo.field persistence-modifier="persistent" mapped-by="scriptParameterSet" dependent="true"
 	 */
+@Persistent(
+	dependent="true",
+	mappedBy="scriptParameterSet",
+	persistenceModifier=PersistenceModifier.PERSISTENT)
 	private ScriptParameterSetName name;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private int nextParameterOrderNumber;
 
 	/**

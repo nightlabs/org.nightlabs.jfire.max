@@ -32,6 +32,17 @@ import javax.jdo.JDODetachedFieldAccessException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Queries;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  *
@@ -61,6 +72,19 @@ import javax.jdo.Query;
  *			PARAMETERS String pScriptRegistryItemType, String pResultClassName
  *			import java.lang.String"
  */
+@PersistenceCapable(
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireScripting_Script")
+@Queries({
+	@javax.jdo.annotations.Query(
+		name=Script.QUERY_GET_SCRIPTS_BY_TYPE_AND_ID,
+		value="SELECT WHERE this.scriptRegistryItemType == pScriptRegistryItemType && this.scriptRegistryItemID == pScriptRegistryItemID PARAMETERS String pScriptRegistryItemType, String pScriptRegistryItemID import java.lang.String"),
+	@javax.jdo.annotations.Query(
+		name=Script.QUERY_GET_SCRIPTS_BY_TYPE_AND_RESULT_CLASS,
+		value="SELECT WHERE this.scriptRegistryItemType == pScriptRegistryItemType && this.resultClassName == pResultClassName PARAMETERS String pScriptRegistryItemType, String pResultClassName import java.lang.String")
+})
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class Script
 		extends ScriptRegistryItem
 		implements IScript
@@ -92,6 +116,7 @@ public class Script
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private String language;
 
 	/**
@@ -100,6 +125,7 @@ public class Script
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private String resultClassName = Object.class.getName();
 
 	/**
@@ -108,6 +134,8 @@ public class Script
 	 * @jdo.field persistence-modifier="persistent"
 	 * @jdo.column sql-type="CLOB"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+	@Column(sqlType="CLOB")
 	private String text;
 
 	/**
@@ -225,6 +253,11 @@ public class Script
 	 *
 	 * @jdo.join
 	 */
+	@Join
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		table="JFireScripting_Script_fetchGroups",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private String[] fetchGroups;
 
 	public String[] getFetchGroups() {
@@ -237,6 +270,7 @@ public class Script
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private int maxFetchDepth = 1;
 	
 	public int getMaxFetchDepth() {
@@ -249,6 +283,7 @@ public class Script
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private boolean needsDetach = false;
 	
 	public void setNeedsDetach(boolean needsDetach) {

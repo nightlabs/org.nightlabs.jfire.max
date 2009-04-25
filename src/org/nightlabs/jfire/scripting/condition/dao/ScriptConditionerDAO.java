@@ -3,8 +3,8 @@ package org.nightlabs.jfire.scripting.condition.dao;
 import java.util.Map;
 import java.util.Set;
 
-import org.nightlabs.jfire.scripting.condition.ConditionScriptManager;
-import org.nightlabs.jfire.scripting.condition.ConditionScriptManagerUtil;
+import org.nightlabs.jfire.base.JFireEjb3Factory;
+import org.nightlabs.jfire.scripting.condition.ConditionScriptManagerRemote;
 import org.nightlabs.jfire.scripting.condition.ScriptConditioner;
 import org.nightlabs.jfire.scripting.condition.id.ConditionContextProviderID;
 import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
@@ -24,18 +24,17 @@ public class ScriptConditionerDAO
 			scriptConditionerDAO = new ScriptConditionerDAO();
 		return scriptConditionerDAO;
 	}
-	
+
 	protected ScriptConditionerDAO() {
-		
+
 	}
 
 	public Map<ScriptRegistryItemID, ScriptConditioner> getScriptConditioners(Map<ScriptRegistryItemID, Map<String, Object>> scriptID2Paramters, int valueLimit,
 			ProgressMonitor monitor)
 	{
 		try {
-			monitor.beginTask("Getting ScriptContitioners", // TODO: How to localize this, ResouceBundles for the server/ per user ?!?
-					1);
-			ConditionScriptManager csm = ConditionScriptManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			monitor.beginTask("Getting ScriptContitioners", 1); // TODO: How to localize this, ResouceBundles for the server/ per user ?!?
+			ConditionScriptManagerRemote csm = JFireEjb3Factory.getRemoteBean(ConditionScriptManagerRemote.class, SecurityReflector.getInitialContextProperties());
 			Map<ScriptRegistryItemID, ScriptConditioner> scriptID2ScriptConditioner = csm.getScriptConditioner(scriptID2Paramters, valueLimit);
 			monitor.worked(1);
 			return scriptID2ScriptConditioner;
@@ -47,9 +46,8 @@ public class ScriptConditionerDAO
 	public Set<ScriptRegistryItemID> getConditionContextScriptIDs(ConditionContextProviderID conditionContextProviderID, ProgressMonitor monitor)
 	{
 		try {
-			monitor.beginTask("Getting ScriptConditioners",
-					1);
-			ConditionScriptManager csm = ConditionScriptManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			monitor.beginTask("Getting ScriptConditioners", 1);
+			ConditionScriptManagerRemote csm = JFireEjb3Factory.getRemoteBean(ConditionScriptManagerRemote.class, SecurityReflector.getInitialContextProperties());
 			Set<ScriptRegistryItemID> scriptIDs = csm.getConditionContextScriptIDs(conditionContextProviderID);
 			monitor.worked(1);
 			return scriptIDs;

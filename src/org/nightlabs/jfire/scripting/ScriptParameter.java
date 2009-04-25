@@ -30,6 +30,17 @@ import java.io.Serializable;
 
 import org.nightlabs.util.Util;
 
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.NullValue;
+import org.nightlabs.jfire.scripting.id.ScriptParameterID;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+
 /**
  * 
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
@@ -46,6 +57,21 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="ScriptParameter.this" fetch-groups="default" fields="scriptParameterSet"
  * 
  */
+@PersistenceCapable(
+	objectIdClass=ScriptParameterID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireScripting_ScriptParameter")
+@FetchGroups({
+	@FetchGroup(
+		fetchGroups={"default"},
+		name="ScriptParameter.scriptParameterSet",
+		members=@Persistent(name="scriptParameterSet")),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name="ScriptParameter.this",
+		members=@Persistent(name="scriptParameterSet"))
+})
 public class ScriptParameter
 		implements Serializable, Comparable, IScriptParameter
 {
@@ -55,30 +81,42 @@ public class ScriptParameter
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 	/**
 	 * @jdo.field primary-key="true"
 	 */
+	@PrimaryKey
 	private long scriptParameterSetID;
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String scriptParameterID;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" null-value="exception"
 	 */
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private ScriptParameterSet scriptParameterSet;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" null-value="exception"
 	 */
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private String scriptParameterClassName;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private int orderNumber;
 	
 	/**

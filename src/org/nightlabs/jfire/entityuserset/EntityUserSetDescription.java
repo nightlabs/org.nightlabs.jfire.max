@@ -31,6 +31,20 @@ import java.util.Map;
 
 import org.nightlabs.i18n.I18nText;
 
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import org.nightlabs.jfire.entityuserset.id.EntityUserSetDescriptionID;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+
 /**
  * @author marco schulze - marco at nightlabs dot de
  *
@@ -49,6 +63,20 @@ import org.nightlabs.i18n.I18nText;
  *
  * @jdo.fetch-group name="FetchGroupsEntityUserSet.replicateToReseller" fields="entityUserSet, texts"
  */
+@PersistenceCapable(
+	objectIdClass=EntityUserSetDescriptionID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireEntityUserSet_EntityUserSetDescription")
+@FetchGroups({
+	@FetchGroup(
+		name="EntityUserSet.description",
+		members={@Persistent(name="entityUserSet"), @Persistent(name="texts")}),
+	@FetchGroup(
+		name="FetchGroupsEntityUserSet.replicateToReseller",
+		members={@Persistent(name="entityUserSet"), @Persistent(name="texts")})
+})
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class EntityUserSetDescription extends I18nText
 {
 	private static final long serialVersionUID = 1L;
@@ -56,23 +84,30 @@ public class EntityUserSetDescription extends I18nText
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String entityClassName;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String entityUserSetID;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private EntityUserSet<?> entityUserSet;
 
 	/**
@@ -106,6 +141,12 @@ public class EntityUserSetDescription extends I18nText
 	 * @jdo.join
 	 * @jdo.value-column sql-type="CLOB"
 	 */
+	@Join
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		table="JFireEntityUserSet_EntityUserSetDescription_texts",
+		defaultFetchGroup="true",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Map<String, String> texts;
 
 	@Override

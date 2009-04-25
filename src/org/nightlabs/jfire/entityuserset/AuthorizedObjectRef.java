@@ -17,6 +17,21 @@ import org.nightlabs.jfire.security.id.AuthorizedObjectID;
 import org.nightlabs.util.CollectionUtil;
 import org.nightlabs.util.Util;
 
+import javax.jdo.annotations.Value;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import org.nightlabs.jfire.entityuserset.id.AuthorizedObjectRefID;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.Key;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Queries;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+
 /**
  *
  * @author marco schulze - marco at nightlabs dot de
@@ -42,6 +57,28 @@ import org.nightlabs.util.Util;
  *
  * @jdo.fetch-group name="FetchGroupsEntityUserSet.replicateToReseller" fields="entityUserSet, entityRefs"
  */
+@PersistenceCapable(
+	objectIdClass=AuthorizedObjectRefID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireEntityUserSet_AuthorizedObjectRef")
+@FetchGroups({
+	@FetchGroup(
+		name=AuthorizedObjectRef.FETCH_GROUP_ENTITY_REFS,
+		members=@Persistent(name="entityRefs")),
+	@FetchGroup(
+		name="IEntityUserSet.authorizedObjectRefs",
+		members=@Persistent(name="entityUserSet")),
+	@FetchGroup(
+		name="FetchGroupsEntityUserSet.replicateToReseller",
+		members={@Persistent(name="entityUserSet"), @Persistent(name="entityRefs")})
+})
+@Queries(
+	@javax.jdo.annotations.Query(
+		name="getAuthorizedObjectRefsForAuthorizedObjectID",
+		value="SELECT WHERE this.authorizedObjectID == :authorizedObjectID")
+)
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class AuthorizedObjectRef<Entity>
 implements Serializable
 {
@@ -59,29 +96,38 @@ implements Serializable
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String entityUserSetOrganisationID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String entityClassName;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String entityUserSetID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="255"
 	 */
+	@PrimaryKey
+	@Column(length=255)
 	private String authorizedObjectID;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private EntityUserSet<Entity> entityUserSet;
 
 	/**
@@ -89,11 +135,13 @@ implements Serializable
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private int referenceCount;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private boolean directlyReferenced;
 
 	/**
@@ -107,6 +155,11 @@ implements Serializable
 	 *
 	 * @jdo.key mapped-by="entityObjectIDString"
 	 */
+	@Persistent(
+		mappedBy="authorizedObjectRef",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
+	@Key(mappedBy="entityObjectIDString")
+	@Value(dependent="true")
 	private Map<String, EntityRef<Entity>> entityRefs;
 
 	/**

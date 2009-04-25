@@ -21,6 +21,19 @@ import org.nightlabs.jfire.security.UserLocal;
 import org.nightlabs.jfire.security.id.UserLocalID;
 import org.nightlabs.util.reflect.ReflectUtil;
 
+import javax.jdo.annotations.Inheritance;
+import org.nightlabs.jfire.entityuserset.id.ResellerEntityUserSetFactoryID;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Discriminator;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Queries;
+import javax.jdo.annotations.Element;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.DiscriminatorStrategy;
+import javax.jdo.annotations.IdentityType;
+
 /**
  * @author marco schulze - marco at nightlabs dot de
  *
@@ -37,6 +50,18 @@ import org.nightlabs.util.reflect.ReflectUtil;
  *
  * @jdo.query name="getResellerEntityUserSetFactoryForEntityClassName" query="SELECT UNIQUE WHERE this.entityClassName == :entityClassName"
  */
+@PersistenceCapable(
+	objectIdClass=ResellerEntityUserSetFactoryID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireEntityUserSet_ResellerEntityUserSetFactory")
+@Discriminator(strategy=DiscriminatorStrategy.CLASS_NAME)
+@Queries(
+	@javax.jdo.annotations.Query(
+		name="getResellerEntityUserSetFactoryForEntityClassName",
+		value="SELECT UNIQUE WHERE this.entityClassName == :entityClassName")
+)
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public abstract class ResellerEntityUserSetFactory<Entity>
 {
 	private static final long serialVersionUID = 1L;
@@ -61,16 +86,20 @@ public abstract class ResellerEntityUserSetFactory<Entity>
 	/**
 	 * @jdo.field primary-key="true"
 	 */
+	@PrimaryKey
 	private String organisationID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 */
+	@PrimaryKey
 	private String resellerEntityUserSetFactoryID;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" unique="true"
 	 */
+	@Element(unique="true")
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private String entityClassName;
 
 	protected ResellerEntityUserSetFactory() { }

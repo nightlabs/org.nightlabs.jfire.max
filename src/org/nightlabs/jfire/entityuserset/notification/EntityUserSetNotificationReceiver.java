@@ -9,13 +9,17 @@ import java.util.Set;
 import javax.ejb.CreateException;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.PersistenceCapable;
 import javax.naming.NamingException;
 
 import org.nightlabs.jdo.NLJDOHelper;
-import org.nightlabs.jfire.base.JFireEjbFactory;
+import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.Lookup;
 import org.nightlabs.jfire.entityuserset.EntityUserSet;
-import org.nightlabs.jfire.entityuserset.EntityUserSetManager;
+import org.nightlabs.jfire.entityuserset.EntityUserSetManagerRemote;
 import org.nightlabs.jfire.entityuserset.ResellerEntityUserSetFactory;
 import org.nightlabs.jfire.entityuserset.id.EntityUserSetID;
 import org.nightlabs.jfire.jdo.notification.DirtyObjectID;
@@ -34,6 +38,10 @@ import org.nightlabs.util.CollectionUtil;
  *
  * @jdo.inheritance strategy="superclass-table"
  */
+@PersistenceCapable(
+	identityType=IdentityType.APPLICATION,
+	detachable="true")
+@Inheritance(strategy=InheritanceStrategy.SUPERCLASS_TABLE)
 public class EntityUserSetNotificationReceiver extends NotificationReceiver
 {
 	/**
@@ -92,7 +100,7 @@ public class EntityUserSetNotificationReceiver extends NotificationReceiver
 		PersistenceManager pm = getPersistenceManager();
 
 		Hashtable<?,?> initialContextProperties = Lookup.getInitialContextProperties(pm, emitterOrganisationID);
-		EntityUserSetManager entityUserSetManager = JFireEjbFactory.getBean(EntityUserSetManager.class, initialContextProperties);
+		EntityUserSetManagerRemote entityUserSetManager = JFireEjb3Factory.getRemoteBean(EntityUserSetManagerRemote.class, initialContextProperties);
 		Collection<EntityUserSet<Object>> backendEntityUserSets = CollectionUtil.castCollection(
 				entityUserSetManager.getEntityUserSetsForReseller(entityUserSetIDs_load)
 		);

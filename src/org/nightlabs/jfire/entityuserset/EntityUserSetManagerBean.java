@@ -1,6 +1,5 @@
 package org.nightlabs.jfire.entityuserset;
 
-import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -9,22 +8,24 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.ejb.CreateException;
-import javax.ejb.EJBException;
-import javax.ejb.SessionBean;
-import javax.ejb.SessionContext;
+import javax.annotation.security.RolesAllowed;
+import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
+import javax.ejb.TransactionManagement;
+import javax.ejb.TransactionManagementType;
 import javax.jdo.FetchPlan;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
+import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.crossorganisationregistrationinit.Context;
 import org.nightlabs.jfire.entityuserset.id.EntityUserSetID;
 import org.nightlabs.jfire.entityuserset.notification.EntityUserSetNotificationFilter;
 import org.nightlabs.jfire.entityuserset.notification.EntityUserSetNotificationReceiver;
-import org.nightlabs.jfire.jdo.notification.persistent.PersistentNotificationEJB;
-import org.nightlabs.jfire.jdo.notification.persistent.PersistentNotificationEJBUtil;
+import org.nightlabs.jfire.jdo.notification.persistent.PersistentNotificationEJBRemote;
 import org.nightlabs.jfire.jdo.notification.persistent.SubscriptionUtil;
 import org.nightlabs.jfire.security.id.UserLocalID;
 import org.nightlabs.util.CollectionUtil;
@@ -38,36 +39,14 @@ import org.nightlabs.util.CollectionUtil;
  * @ejb.util generate="physical"
  * @ejb.transaction type="Required"
  */
-public abstract class EntityUserSetManagerBean
+@TransactionAttribute(TransactionAttributeType.REQUIRED)
+@TransactionManagement(TransactionManagementType.CONTAINER)
+@Stateless
+public class EntityUserSetManagerBean
 extends BaseSessionBeanImpl
-implements SessionBean
+implements EntityUserSetManagerRemote
 {
 	private static final long serialVersionUID = 1L;
-
-	@Override
-	public void setSessionContext(SessionContext sessionContext)
-	throws EJBException, RemoteException
-	{
-		super.setSessionContext(sessionContext);
-	}
-	@Override
-	public void unsetSessionContext() {
-		super.unsetSessionContext();
-	}
-
-	/**
-	 * @ejb.create-method
-	 * @ejb.permission role-name="_Guest_"
-	 */
-	public void ejbCreate() throws CreateException { }
-
-	/**
-	 * {@inheritDoc}
-	 *
-	 * @ejb.permission unchecked="true"
-	 */
-	@Override
-	public void ejbRemove() throws EJBException, RemoteException { }
 
 	/**
 	 * This method is called by the organisation initialisation mechanism.
@@ -76,6 +55,9 @@ implements SessionBean
 	 * @ejb.permission role-name="_System_"
 	 * @ejb.transaction type="Required"
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("_System_")
+	@Override
 	public void initialise() throws Exception
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -91,6 +73,9 @@ implements SessionBean
 	 * @ejb.permission role-name="_System_"
 	 * @ejb.transaction type="Required"
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("_System_")
+	@Override
 	public void importEntityUserSetsOnCrossOrganisationRegistration(Context context) throws Exception
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -104,7 +89,7 @@ implements SessionBean
 			EntityUserSetNotificationReceiver entityUserSetNotificationReceiver = new EntityUserSetNotificationReceiver(entityUserSetNotificationFilter);
 			entityUserSetNotificationReceiver = pm.makePersistent(entityUserSetNotificationReceiver);
 
-			PersistentNotificationEJB persistentNotificationEJB = PersistentNotificationEJBUtil.getHome(initialContextProperties).create();
+			PersistentNotificationEJBRemote persistentNotificationEJB = JFireEjb3Factory.getRemoteBean(PersistentNotificationEJBRemote.class, initialContextProperties);
 			persistentNotificationEJB.storeNotificationFilter(entityUserSetNotificationFilter, false, null, 1);
 
 // We don't do this, because not all of them are used and especially with the ResellerEntityUserSets, we cause
@@ -126,6 +111,8 @@ implements SessionBean
 	 * @!ejb.transaction type="Supports"
 	 * @ejb.permission role-name="_Guest_"
 	 */
+	@RolesAllowed("_Guest_")
+	@Override
 	public Set<EntityUserSetID> getEntityUserSetIDs(String organisationID, Class<?> entityClass)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -161,12 +148,14 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * @ejb.interface-method
 	 * @!ejb.transaction type="Supports"
 	 * @ejb.permission role-name="_Guest_"
 	 */
+	@RolesAllowed("_Guest_")
+	@Override
 	public Collection<? extends EntityUserSet<?>> getEntityUserSetsForReseller(Collection<EntityUserSetID> entityUserSetIDs)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -204,17 +193,21 @@ implements SessionBean
 	 * @ejb.transaction type="Supports"
 	 * @ejb.permission role-name="_Guest_"
 	 */
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	@RolesAllowed("_Guest_")
 	@Override
 	public String ping(String message) {
 		return super.ping(message);
 	}
-	
+
 	/**
 	 * @ejb.interface-method
 	 * @!ejb.transaction type="Supports"
 	 * @ejb.permission role-name="_Guest_"
-	 */	
-	public List<EntityUserSet<?>> getEntityUserSets(Set<EntityUserSetID> entityUserSetsIDs, String[] fetchGroups, int maxFetchDepth) 
+	 */
+	@RolesAllowed("_Guest_")
+	@Override
+	public List<EntityUserSet<?>> getEntityUserSets(Set<EntityUserSetID> entityUserSetsIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -238,12 +231,15 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
-	 */	
+	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("_Guest_")
+	@Override
 	public EntityUserSet<?> storeEntityUserSet(EntityUserSet<?> entityUserSet, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
 		// TODO Do we need a new right for storing EntityUserSets?

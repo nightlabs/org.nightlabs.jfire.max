@@ -21,6 +21,24 @@ import org.nightlabs.jfire.security.id.AuthorizedObjectID;
 import org.nightlabs.jfire.security.id.UserLocalID;
 import org.nightlabs.util.Util;
 
+import javax.jdo.annotations.Value;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.VersionStrategy;
+import javax.jdo.annotations.Version;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Discriminator;
+import org.nightlabs.jfire.entityuserset.id.EntityUserSetID;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.Key;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.DiscriminatorStrategy;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+
 /**
  * Base-class for assignments of some entities to users or
  * user-groups (more precisely {@link UserLocal}s or {@link UserSecurityGroup}s).
@@ -49,6 +67,28 @@ import org.nightlabs.util.Util;
  *
  * @jdo.fetch-group name="FetchGroupsEntityUserSet.replicateToReseller" fields="authorizedObjectRefs, name, description"
  */
+@PersistenceCapable(
+	objectIdClass=EntityUserSetID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireEntityUserSet_EntityUserSet")
+@Version(strategy=VersionStrategy.VERSION_NUMBER)
+@FetchGroups({
+	@FetchGroup(
+		name="IEntityUserSet.authorizedObjectRefs",
+		members=@Persistent(name="authorizedObjectRefs")),
+	@FetchGroup(
+		name="IEntityUserSet.name",
+		members=@Persistent(name="name")),
+	@FetchGroup(
+		name="IEntityUserSet.description",
+		members=@Persistent(name="description")),
+	@FetchGroup(
+		name="FetchGroupsEntityUserSet.replicateToReseller",
+		members={@Persistent(name="authorizedObjectRefs"), @Persistent(name="name"), @Persistent(name="description")})
+})
+@Discriminator(strategy=DiscriminatorStrategy.CLASS_NAME)
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public abstract class EntityUserSet<Entity>
 implements Serializable, IEntityUserSet<Entity>
 {
@@ -58,18 +98,24 @@ implements Serializable, IEntityUserSet<Entity>
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String entityClassName;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String entityUserSetID;
 
 	/**
@@ -83,20 +129,34 @@ implements Serializable, IEntityUserSet<Entity>
 	 *
 	 * @jdo.key mapped-by="authorizedObjectID"
 	 */
+	@Persistent(
+		mappedBy="entityUserSet",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
+	@Key(mappedBy="authorizedObjectID")
+	@Value(dependent="true")
 	private Map<String, AuthorizedObjectRef<Entity>> authorizedObjectRefs;
 
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private transient EntityUserSetController entityUserSetController;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" mapped-by="entityUserSet" dependent="true"
 	 */
+	@Persistent(
+		dependent="true",
+		mappedBy="entityUserSet",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private EntityUserSetName name;
 	/**
 	 * @jdo.field persistence-modifier="persistent" mapped-by="entityUserSet" dependent="true"
 	 */
+	@Persistent(
+		dependent="true",
+		mappedBy="entityUserSet",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private EntityUserSetDescription description;
 
 	/**

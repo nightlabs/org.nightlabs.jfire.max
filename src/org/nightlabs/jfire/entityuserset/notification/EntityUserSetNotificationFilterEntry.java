@@ -4,19 +4,19 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 
-import org.nightlabs.jfire.jdo.notification.DirtyObjectID;
-
-import javax.jdo.annotations.Persistent;
-import javax.jdo.annotations.InheritanceStrategy;
-import javax.jdo.annotations.Inheritance;
-import javax.jdo.annotations.PrimaryKey;
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.DiscriminatorStrategy;
 import javax.jdo.annotations.Column;
-import org.nightlabs.jfire.entityuserset.notification.id.EntityUserSetNotificationFilterEntryID;
-import javax.jdo.annotations.IdentityType;
-import javax.jdo.annotations.PersistenceModifier;
 import javax.jdo.annotations.Discriminator;
+import javax.jdo.annotations.DiscriminatorStrategy;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
+
+import org.nightlabs.jfire.entityuserset.notification.id.EntityUserSetNotificationFilterEntryID;
+import org.nightlabs.jfire.jdo.notification.DirtyObjectID;
 
 /**
  * @author marco schulze - marco at nightlabs dot de

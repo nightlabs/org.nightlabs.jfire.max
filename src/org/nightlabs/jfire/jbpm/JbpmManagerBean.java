@@ -3,7 +3,6 @@ package org.nightlabs.jfire.jbpm;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -13,10 +12,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import javax.ejb.CreateException;
-import javax.ejb.EJBException;
-import javax.ejb.SessionBean;
-import javax.ejb.SessionContext;
+import javax.annotation.security.RolesAllowed;
+import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
+import javax.ejb.TransactionManagement;
+import javax.ejb.TransactionManagementType;
 import javax.jdo.FetchPlan;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
@@ -46,6 +47,7 @@ import org.nightlabs.jfire.servermanager.config.JFireServerConfigModule;
 import org.nightlabs.jfire.servermanager.deploy.DeployOverwriteBehaviour;
 import org.nightlabs.jfire.servermanager.deploy.DeploymentJarItem;
 import org.nightlabs.math.Base36Coder;
+import org.nightlabs.util.CollectionUtil;
 import org.nightlabs.util.IOUtil;
 
 /**
@@ -60,59 +62,21 @@ import org.nightlabs.util.IOUtil;
  * @author Marco Schulze
  * @author Marc Klinger - marc[at]nightlabs[dot]de
  */
+@TransactionAttribute(TransactionAttributeType.REQUIRED)
+@TransactionManagement(TransactionManagementType.CONTAINER)
+@Stateless
 public abstract class JbpmManagerBean
 extends BaseSessionBeanImpl
-implements SessionBean
+implements JbpmManagerRemote
 {
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger = Logger.getLogger(JbpmManagerBean.class);
 
-	@Override
-	public void setSessionContext(SessionContext sessionContext)
-			throws EJBException, RemoteException
-	{
-		logger.debug(this.getClass().getName() + ".setSessionContext("+sessionContext+")");
-		super.setSessionContext(sessionContext);
-	}
-	/**
-	 * @ejb.create-method
-	 * @ejb.permission role-name="_Guest_"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.jbpm.JbpmManagerRemote#ping(java.lang.String)
 	 */
-	public void ejbCreate()
-	throws CreateException
-	{
-		logger.debug(this.getClass().getName() + ".ejbCreate()");
-	}
-	/**
-	 * @see javax.ejb.SessionBean#ejbRemove()
-	 *
-	 * @ejb.permission unchecked="true"
-	 */
-	public void ejbRemove() throws EJBException, RemoteException
-	{
-		logger.debug(this.getClass().getName() + ".ejbRemove()");
-	}
-
-	/**
-	 * @see javax.ejb.SessionBean#ejbActivate()
-	 */
-	public void ejbActivate() throws EJBException, RemoteException
-	{
-		logger.debug(this.getClass().getName() + ".ejbActivate()");
-	}
-	/**
-	 * @see javax.ejb.SessionBean#ejbPassivate()
-	 */
-	public void ejbPassivate() throws EJBException, RemoteException
-	{
-		logger.debug(this.getClass().getName() + ".ejbPassivate()");
-	}
-
-	/**
-	 * @ejb.interface-method
-	 * @ejb.transaction type="Supports"
-	 * @ejb.permission role-name="_Guest_"
-	 */
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	@RolesAllowed("_Guest_")
 	@Override
 	public String ping(String message) {
 		return super.ping(message);
@@ -145,11 +109,11 @@ implements SessionBean
 		IOUtil.writeTextFile(hibernateConfigTemplateOutputFile, mainConfigText);
 	}
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="_System_"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.jbpm.JbpmManagerRemote#initialise()
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("_System_")
 	public void initialise()
 	throws Exception
 	{
@@ -323,11 +287,10 @@ implements SessionBean
 		}
 	}
 
-	/**
-	 * @ejb.interface-method
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 * @ejb.permission role-name="_Guest_"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.jbpm.JbpmManagerRemote#getStates(java.util.Set, java.lang.String[], int)
 	 */
+	@RolesAllowed("_Guest_")
 	public List<State> getStates(Set<StateID> stateIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -338,11 +301,10 @@ implements SessionBean
 		}
 	}
 
-	/**
-	 * @ejb.interface-method
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 * @ejb.permission role-name="_Guest_"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.jbpm.JbpmManagerRemote#getStateIDs(org.nightlabs.jdo.ObjectID)
 	 */
+	@RolesAllowed("_Guest_")
 	public Set<StateID> getStateIDs(ObjectID statableID)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -353,13 +315,10 @@ implements SessionBean
 		}
 	}
 
-	/**
-	 * @param userExecutable If <code>null</code>, it is ignored. If not <code>null</code>, the query filters only transitions where userExecutable has this value.
-	 *
-	 * @ejb.interface-method
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 * @ejb.permission role-name="_Guest_"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.jbpm.JbpmManagerRemote#getTransitionIDs(org.nightlabs.jfire.jbpm.graph.def.id.StateID, java.lang.Boolean)
 	 */
+	@RolesAllowed("_Guest_")
 	public Set<TransitionID> getTransitionIDs(StateID stateID, Boolean userExecutable)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -378,20 +337,17 @@ implements SessionBean
 			Map<String, Object> params = new HashMap<String, Object>();
 			params.put("stateDefinition", state.getStateDefinition());
 			params.put("userExecutable", userExecutable);
-			return new HashSet<TransitionID>((Collection<? extends TransitionID>) q.executeWithMap(params));
+			Collection<TransitionID> c = CollectionUtil.castCollection((Collection<?>) q.executeWithMap(params));
+			return new HashSet<TransitionID>(c);
 		} finally {
 			pm.close();
 		}
 	}
 
-	/**
-	 * @param stateDefinitionID The StateDefinition from which the transitions leave.
-	 * @param userExecutable If <code>null</code>, it is ignored. If not <code>null</code>, the query filters only transitions where userExecutable has this value.
-	 *
-	 * @ejb.interface-method
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 * @ejb.permission role-name="_Guest_"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.jbpm.JbpmManagerRemote#getTransitionIDs(org.nightlabs.jfire.jbpm.graph.def.id.StateDefinitionID, java.lang.Boolean)
 	 */
+	@RolesAllowed("_Guest_")
 	public Set<TransitionID> getTransitionIDs(StateDefinitionID stateDefinitionID, Boolean userExecutable)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -410,17 +366,17 @@ implements SessionBean
 			Map<String, Object> params = new HashMap<String, Object>();
 			params.put("stateDefinition", stateDefinition);
 			params.put("userExecutable", userExecutable);
-			return new HashSet<TransitionID>((Collection<? extends TransitionID>) q.executeWithMap(params));
+			Collection<TransitionID> c = CollectionUtil.castCollection((Collection<?>) q.executeWithMap(params));
+			return new HashSet<TransitionID>(c);
 		} finally {
 			pm.close();
 		}
 	}
 
-	/**
-	 * @ejb.interface-method
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 * @ejb.permission role-name="_Guest_"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.jbpm.JbpmManagerRemote#getTransitions(java.util.Set, java.lang.String[], int)
 	 */
+	@RolesAllowed("_Guest_")
 	public List<Transition> getTransitions(Set<TransitionID> transitionIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -449,11 +405,11 @@ implements SessionBean
 //		}
 //	}
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="_Guest_"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.jbpm.JbpmManagerRemote#getStateDefinitionIDs(org.nightlabs.jfire.jbpm.graph.def.ProcessDefinition)
 	 */
+@TransactionAttribute(TransactionAttributeType.REQUIRED)
+@RolesAllowed("_Guest_")
 	public Set<StateDefinitionID> getStateDefinitionIDs(ProcessDefinition processDefinition)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -464,11 +420,11 @@ implements SessionBean
 		}
 	}
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="_Guest_"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.jbpm.JbpmManagerRemote#getStateDefinitions(java.util.Set, java.lang.String[], int)
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("_Guest_")
 	public Collection<StateDefinition> getStateDefinitions(Set<StateDefinitionID> objectIDs,
 			String[] fetchGroups, int maxFetchDepth)
 	{
@@ -481,11 +437,11 @@ implements SessionBean
 		}
 	}
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="_Guest_"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.jbpm.JbpmManagerRemote#getProcessDefinitions(java.util.Set, java.lang.String[], int)
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("_Guest_")
 	public Collection<ProcessDefinition> getProcessDefinitions(Set<ProcessDefinitionID> objectIDs,
 			String[] fetchGroups, int maxFetchDepth)
 	{
@@ -498,12 +454,10 @@ implements SessionBean
 		}
 	}
 
-	/**
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.jbpm.JbpmManagerRemote#getStatables(org.nightlabs.jdo.query.QueryCollection)
 	 */
+	@RolesAllowed("_Guest_")
 	@SuppressWarnings("unchecked")
 	public Set<Statable> getStatables(QueryCollection<? extends StatableQuery> statableQueries)
 	{

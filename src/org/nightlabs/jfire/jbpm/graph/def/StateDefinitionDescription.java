@@ -31,6 +31,20 @@ import java.util.Map;
 
 import org.nightlabs.i18n.I18nText;
 
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.Column;
+import org.nightlabs.jfire.jbpm.graph.def.id.StateDefinitionDescriptionID;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  *
@@ -47,6 +61,17 @@ import org.nightlabs.i18n.I18nText;
  *
  * @jdo.fetch-group name="StateDefinition.description" fields="stateDefinition, descriptions"
  */
+@PersistenceCapable(
+	objectIdClass=StateDefinitionDescriptionID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireJbpm_StateDefinitionDescription")
+@FetchGroups(
+	@FetchGroup(
+		name="StateDefinition.description",
+		members={@Persistent(name="stateDefinition"), @Persistent(name="descriptions")})
+)
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class StateDefinitionDescription extends I18nText
 {
 	private static final long serialVersionUID = 1L;
@@ -57,6 +82,8 @@ public class StateDefinitionDescription extends I18nText
 	 * 
 	 * FIXME Check the use of this field and remove it if not used or indented to be used.
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	@SuppressWarnings("unused")
 	private String processDefinitionOrganisationID;
 
@@ -66,6 +93,8 @@ public class StateDefinitionDescription extends I18nText
 	 * 
 	 * FIXME Check the use of this field and remove it if not used or indented to be used.
 	 */
+	@PrimaryKey
+	@Column(length=50)
 	@SuppressWarnings("unused")
 	private String processDefinitionID;
 
@@ -75,6 +104,8 @@ public class StateDefinitionDescription extends I18nText
 	 * 
 	 * FIXME Check the use of this field and remove it if not used or indented to be used.
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	@SuppressWarnings("unused")
 	private String stateDefinitionOrganisationID;
 
@@ -82,6 +113,8 @@ public class StateDefinitionDescription extends I18nText
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="50"
 	 */
+	@PrimaryKey
+	@Column(length=50)
 	private String stateDefinitionID;
 
 	/**
@@ -102,11 +135,18 @@ public class StateDefinitionDescription extends I18nText
 	 *
 	 * @jdo.join
 	 */
+	@Join
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		table="JFireJbpm_StateDefinitionDescription_descriptions",
+		defaultFetchGroup="true",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	protected Map<String, String> descriptions = new HashMap<String, String>();
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private StateDefinition stateDefinition;
 
 	/**

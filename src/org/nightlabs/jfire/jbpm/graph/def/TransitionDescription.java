@@ -5,6 +5,20 @@ import java.util.Map;
 
 import org.nightlabs.i18n.I18nText;
 
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.Column;
+import org.nightlabs.jfire.jbpm.graph.def.id.TransitionDescriptionID;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+
 /**
  * @author Fitas Amine - fitas at nightlabs dot de
  *
@@ -23,7 +37,18 @@ import org.nightlabs.i18n.I18nText;
  *				transitionOrganisationID, transitionID"
  *
  * @jdo.fetch-group name="Transition.description" fields="transition, descriptions"
- */
+ */@PersistenceCapable(
+	objectIdClass=TransitionDescriptionID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireJbpm_TransitionDescription")
+@FetchGroups(
+	@FetchGroup(
+		name="Transition.description",
+		members={@Persistent(name="transition"), @Persistent(name="descriptions")})
+)
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
+
 public class TransitionDescription extends I18nText
 {
 	private static final long serialVersionUID = 1L;
@@ -31,37 +56,49 @@ public class TransitionDescription extends I18nText
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
-	 */
+	 */	@PrimaryKey
+	@Column(length=100)
+
 	private String processDefinitionOrganisationID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="50"
-	 */
+	 */	@PrimaryKey
+	@Column(length=50)
+
 	private String processDefinitionID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
-	 */
+	 */	@PrimaryKey
+	@Column(length=100)
+
 	private String stateDefinitionOrganisationID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="50"
-	 */
+	 */	@PrimaryKey
+	@Column(length=50)
+
 	private String stateDefinitionID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
-	 */
+	 */	@PrimaryKey
+	@Column(length=100)
+
 	private String transitionOrganisationID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="50"
-	 */
+	 */	@PrimaryKey
+	@Column(length=50)
+
 	private String transitionID;
 
 	/**
@@ -78,12 +115,19 @@ public class TransitionDescription extends I18nText
 	 *		null-value="exception"
 	 *
 	 * @jdo.join
-	 */
+	 */	@Join
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		table="JFireJbpm_TransitionDescription_descriptions",
+		defaultFetchGroup="true",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
+
 	private Map<String, String> descriptions = new HashMap<String, String>();
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
-	 */
+	 */	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+
 	private Transition transition;
 
 	/**

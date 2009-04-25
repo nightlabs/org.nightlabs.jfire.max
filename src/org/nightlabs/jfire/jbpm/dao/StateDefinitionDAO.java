@@ -3,9 +3,9 @@ package org.nightlabs.jfire.jbpm.dao;
 import java.util.Collection;
 import java.util.Set;
 
+import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
-import org.nightlabs.jfire.jbpm.JbpmManager;
-import org.nightlabs.jfire.jbpm.JbpmManagerUtil;
+import org.nightlabs.jfire.jbpm.JbpmManagerRemote;
 import org.nightlabs.jfire.jbpm.graph.def.StateDefinition;
 import org.nightlabs.jfire.jbpm.graph.def.id.StateDefinitionID;
 import org.nightlabs.jfire.security.SecurityReflector;
@@ -28,7 +28,7 @@ extends BaseJDOObjectDAO<StateDefinitionID, StateDefinition>
 		}
 		return sharedInstance;
 	}
-	
+
 	protected StateDefinitionDAO() {
 		super();
 	}
@@ -41,12 +41,12 @@ extends BaseJDOObjectDAO<StateDefinitionID, StateDefinition>
 	{
 		monitor.beginTask("Loading StateDefintions", 2);
 		monitor.worked(1);
-		JbpmManager jbpmManager = JbpmManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+		JbpmManagerRemote jbpmManager = JFireEjb3Factory.getRemoteBean(JbpmManagerRemote.class, SecurityReflector.getInitialContextProperties());
 		Collection<StateDefinition> stateDefintions = jbpmManager.getStateDefinitions(objectIDs, fetchGroups, maxFetchDepth);
 		monitor.worked(1);
 		return stateDefintions;
 	}
-	
+
 	public Collection<StateDefinition> getStateDefintions(
 			Set<StateDefinitionID> objectIDs, String[] fetchGroups,
 			int maxFetchDepth, ProgressMonitor monitor)

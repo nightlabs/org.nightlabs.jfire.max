@@ -3,9 +3,9 @@ package org.nightlabs.jfire.jbpm.dao;
 import java.util.Collection;
 import java.util.Set;
 
+import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
-import org.nightlabs.jfire.jbpm.JbpmManager;
-import org.nightlabs.jfire.jbpm.JbpmManagerUtil;
+import org.nightlabs.jfire.jbpm.JbpmManagerRemote;
 import org.nightlabs.jfire.jbpm.graph.def.ProcessDefinition;
 import org.nightlabs.jfire.jbpm.graph.def.id.ProcessDefinitionID;
 import org.nightlabs.jfire.security.SecurityReflector;
@@ -28,7 +28,7 @@ extends BaseJDOObjectDAO<ProcessDefinitionID, ProcessDefinition>
 		}
 		return sharedInstance;
 	}
-	
+
 	protected ProcessDefinitionDAO() {
 		super();
 	}
@@ -44,7 +44,7 @@ extends BaseJDOObjectDAO<ProcessDefinitionID, ProcessDefinition>
 	{
 		monitor.beginTask("Loading ProcessDefintions", 2);
 		monitor.worked(1);
-		JbpmManager jbpmManager = JbpmManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+		JbpmManagerRemote jbpmManager = JFireEjb3Factory.getRemoteBean(JbpmManagerRemote.class, SecurityReflector.getInitialContextProperties());
 		Collection<ProcessDefinition> processDefintions = jbpmManager.getProcessDefinitions(objectIDs, fetchGroups, maxFetchDepth);
 		monitor.worked(1);
 		return processDefintions;

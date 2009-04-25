@@ -3,6 +3,6 @@
 		"http://www.nightlabs.de/dtd/organisation-init_1_0.dtd">
 <organisation-initialisation>
 
-	<init bean="jfire/ejb/JFireJbpm/JbpmManager" method="initialise" priority="5"/>
+	<init bean="org.nightlabs.jfire.jbpm.JbpmManagerRemote" method="initialise" priority="5"/>
 
 </organisation-initialisation>

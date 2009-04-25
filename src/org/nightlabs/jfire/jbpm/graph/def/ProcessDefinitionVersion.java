@@ -9,6 +9,19 @@ import org.jbpm.JbpmContext;
 import org.nightlabs.io.DataBuffer;
 import org.nightlabs.util.IOUtil;
 
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.Element;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.DiscriminatorStrategy;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+import org.nightlabs.jfire.jbpm.graph.def.id.ProcessDefinitionVersionID;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Discriminator;
+
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  *
@@ -24,6 +37,13 @@ import org.nightlabs.util.IOUtil;
  * @jdo.create-objectid-class
  *		field-order="organisationID, processDefinitionID, jbpmProcessDefinitionId"
  */
+@PersistenceCapable(
+	objectIdClass=ProcessDefinitionVersionID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireJbpm_ProcessDefinitionVersion")
+@Discriminator(strategy=DiscriminatorStrategy.CLASS_NAME)
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class ProcessDefinitionVersion
 		implements Serializable
 {
@@ -33,45 +53,59 @@ public class ProcessDefinitionVersion
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="50"
 	 */
+	@PrimaryKey
+	@Column(length=50)
 	private String processDefinitionID;
 
 	/**
 	 * @jdo.field primary-key="true" indexed="true"
 	 */
+	@Element(indexed="true")
+	@PrimaryKey
 	private long jbpmProcessDefinitionId;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private ProcessDefinition processDefinition;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 * @jdo.column sql-type="CLOB"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+	@Column(sqlType="CLOB")
 	private String processDefinitionXml;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 * @jdo.column sql-type="CLOB"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+	@Column(sqlType="CLOB")
 	private String gpdXml;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private String processImageType;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 * @jdo.column sql-type="BLOB"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+	@Column(sqlType="BLOB")
 	private byte[] processImageData;
 
 	/**

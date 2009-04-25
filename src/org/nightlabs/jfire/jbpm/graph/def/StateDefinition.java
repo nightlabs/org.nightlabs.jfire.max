@@ -14,6 +14,21 @@ import org.nightlabs.jfire.jbpm.graph.def.id.StateDefinitionID;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.util.Util;
 
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Discriminator;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Queries;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.DiscriminatorStrategy;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  *
@@ -40,6 +55,29 @@ import org.nightlabs.util.Util;
  * @jdo.query name="getStateDefinitionsForProcessDefinition"
  *		query="SELECT WHERE this.processDefinition == :processDefinition"
  */
+@PersistenceCapable(
+	objectIdClass=StateDefinitionID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireJbpm_StateDefinition")
+@FetchGroups({
+	@FetchGroup(
+		name=StateDefinition.FETCH_GROUP_NAME,
+		members=@Persistent(name="name")),
+	@FetchGroup(
+		name=StateDefinition.FETCH_GROUP_DESCRIPTION,
+		members=@Persistent(name="description"))
+})
+@Discriminator(strategy=DiscriminatorStrategy.CLASS_NAME)
+@Queries({
+	@javax.jdo.annotations.Query(
+		name="getStateDefinitionByProcessDefinitionAndJbpmNodeName",
+		value="SELECT UNIQUE WHERE this.processDefinition == :processDefinition && this.jbpmNodeName == :jbpmNodeName"),
+	@javax.jdo.annotations.Query(
+		name="getStateDefinitionsForProcessDefinition",
+		value="SELECT WHERE this.processDefinition == :processDefinition")
+})
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class StateDefinition
 implements Serializable
 {
@@ -92,54 +130,76 @@ implements Serializable
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String processDefinitionOrganisationID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="50"
 	 */
+	@PrimaryKey
+	@Column(length=50)
 	private String processDefinitionID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String stateDefinitionOrganisationID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="50"
 	 */
+	@PrimaryKey
+	@Column(length=50)
 	private String stateDefinitionID;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private ProcessDefinition processDefinition;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" null-value="exception" 
 	 */
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private String jbpmNodeName;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" mapped-by="stateDefinition" dependent="true"
 	 */
+	@Persistent(
+		dependent="true",
+		mappedBy="stateDefinition",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private StateDefinitionName name;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" mapped-by="stateDefinition" dependent="true"
 	 */
+	@Persistent(
+		dependent="true",
+		mappedBy="stateDefinition",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private StateDefinitionDescription description;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private boolean publicState = false;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private boolean endState = false;
 
 	/**

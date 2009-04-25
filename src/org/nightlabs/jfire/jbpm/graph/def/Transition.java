@@ -12,6 +12,19 @@ import org.nightlabs.jfire.jbpm.graph.def.id.ProcessDefinitionID;
 import org.nightlabs.jfire.jbpm.graph.def.id.StateDefinitionID;
 import org.nightlabs.jfire.jbpm.graph.def.id.TransitionID;
 
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.Queries;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  *
@@ -45,6 +58,25 @@ import org.nightlabs.jfire.jbpm.graph.def.id.TransitionID;
  *			this.processDefinitionID == :processDefinitionID &&
  *			this.jbpmTransitionName == :jbpmTransitionName"
  */
+@PersistenceCapable(
+	objectIdClass=TransitionID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireJbpm_Transition")
+@FetchGroups(
+	@FetchGroup(
+		name=Transition.FETCH_GROUP_NAME,
+		members=@Persistent(name="name"))
+)
+@Queries({
+	@javax.jdo.annotations.Query(
+		name="getTransitionByStateDefinitionAndTransitionName",
+		value="SELECT UNIQUE WHERE this.processDefinitionOrganisationID == :processDefinitionOrganisationID && this.processDefinitionID == :processDefinitionID && this.stateDefinitionOrganisationID == :stateDefinitionOrganisationID && this.stateDefinitionID == :stateDefinitionID && this.jbpmTransitionName == :jbpmTransitionName"),
+	@javax.jdo.annotations.Query(
+		name="getTransitionsByTransitionName",
+		value="SELECT WHERE this.processDefinitionOrganisationID == :processDefinitionOrganisationID && this.processDefinitionID == :processDefinitionID && this.jbpmTransitionName == :jbpmTransitionName")
+})
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class Transition
 		implements Serializable
 {
@@ -104,61 +136,86 @@ public class Transition
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String processDefinitionOrganisationID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="50"
 	 */
+	@PrimaryKey
+	@Column(length=50)
 	private String processDefinitionID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String stateDefinitionOrganisationID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="50"
 	 */
+	@PrimaryKey
+	@Column(length=50)
 	private String stateDefinitionID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String transitionOrganisationID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="50"
 	 */
+	@PrimaryKey
+	@Column(length=50)
 	private String transitionID;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" null-value="exception"
 	 */
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private String jbpmTransitionName;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private boolean userExecutable = true;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" mapped-by="transition" dependent="true"
 	 */
+	@Persistent(
+		dependent="true",
+		mappedBy="transition",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private TransitionName name;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" mapped-by="transition" dependent="true"
 	 */
+	@Persistent(
+		dependent="true",
+		mappedBy="transition",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private TransitionDescription description;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private StateDefinition fromStateDefinition;
 
 	protected Transition() { }

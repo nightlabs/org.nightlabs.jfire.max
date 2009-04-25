@@ -28,7 +28,17 @@ package org.nightlabs.jfire.jbpm.logging;
 import java.io.Serializable;
 import java.util.Date;
 
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
+
 import org.nightlabs.jfire.idgenerator.IDGenerator;
+import org.nightlabs.jfire.jbpm.logging.id.LogEntryID;
 import org.nightlabs.jfire.security.User;
 
 /**
@@ -36,14 +46,20 @@ import org.nightlabs.jfire.security.User;
  *
  * @jdo.persistence-capable
  *		identity-type = "application"
- *		objectid-class = "org.nightlabs.jfire.jbpm.logging.id.logEntryID"
+ *		objectid-class = "org.nightlabs.jfire.jbpm.logging.id.LogEntryID"
  *		detachable = "true"
- *		table = "JFireJbpm_Log"
+ *		table = "JFireJbpm_LogEntry"
  *
  * @jdo.inheritance strategy = "new-table"
  *
  * @jdo.create-objectid-class field-order = "organisationID, logEntryID"
  */
+@PersistenceCapable(
+	objectIdClass=LogEntryID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireJbpm_LogEntry")
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class LogEntry implements Serializable {
 	private static final long serialVersionUID = 1L;
 
@@ -52,52 +68,61 @@ public class LogEntry implements Serializable {
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
-	
+
 	/**
 	 * @jdo.field primary-key="true"
 	 */
+	@PrimaryKey
 	private long logEntryID;
 	////////END OF PRIMARY KEY(S) //////////////
-	
+
 	/**
 	 * The date the workflow transition took place.
-	 * 
+	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Date date;
-	
+
 	/**
 	 * The name of the Transition from source to destination node.
-	 * 
+	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private String transitionName;
-	
+
 	/**
 	 * The user who initiated the workflow transition.
-	 * 
+	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private User user;
-	
+
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private long processInstanceID;
-	
+
 	/**
 	 * The node where the token was before the transition.
-	 * 
+	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private String sourceNode;
-	
+
 	/**
 	 * The node where the token has traveld to.
-	 * 
+	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private String destinationNode;
 
 	//////// BEGIN OF CONSTRUCTORS /////////////
@@ -106,10 +131,10 @@ public class LogEntry implements Serializable {
 	 */
 	@Deprecated
 	protected LogEntry() { }
-	
+
 	/**
 	 * Default constructor
-	 * 
+	 *
 	 * @param organisationID - The ID of the organisation in which the workflow transition takes place.
 	 * @param date - The Date the start of the workflow transition takes place.
 	 * @param sourceNode - The Workflow node from which the transition originates (Where the token started).
@@ -136,11 +161,11 @@ public class LogEntry implements Serializable {
 	}
 
 	//////END OF CONSTRUCTORS /////////////////
-	
+
 	public static long createLogEntryID() {
 		return IDGenerator.nextID(LogEntry.class);
 	}
-	
+
 	public Date getDate() {
 		return date;
 	}

@@ -13,6 +13,22 @@ import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.jbpm.graph.def.id.StateID;
 import org.nightlabs.jfire.security.User;
 
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.Query;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Discriminator;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Queries;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.DiscriminatorStrategy;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  *
@@ -35,6 +51,29 @@ import org.nightlabs.jfire.security.User;
  * @jdo.query name="getStateIDsForStatable" query="SELECT JDOHelper.getObjectId(this)
  *		WHERE this.statable == :statable"
  */
+@PersistenceCapable(
+	objectIdClass=StateID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireJbpm_State")
+@FetchGroups({
+	@FetchGroup(
+		name=State.FETCH_GROUP_USER,
+		members=@Persistent(name="user")),
+	@FetchGroup(
+		name=State.FETCH_GROUP_STATABLE,
+		members=@Persistent(name="statable")),
+	@FetchGroup(
+		name=State.FETCH_GROUP_STATE_DEFINITION,
+		members=@Persistent(name="stateDefinition"))
+})
+@Discriminator(strategy=DiscriminatorStrategy.CLASS_NAME)
+@Queries(
+	@Query(
+		name="getStateIDsForStatable",
+		value="SELECT JDOHelper.getObjectId(this) WHERE this.statable == :statable")
+)
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class State
 implements Serializable
 {
@@ -87,11 +126,14 @@ implements Serializable
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 */
+	@PrimaryKey
 	private long stateID;
 
 
@@ -100,6 +142,7 @@ implements Serializable
 	 * @!jdo.field persistence-modifier="persistent" null-value="exception"
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private User user;
 
 	/**
@@ -107,6 +150,7 @@ implements Serializable
 	 * @!jdo.field persistence-modifier="persistent" null-value="exception"
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Statable statable;
 
 	/**
@@ -114,11 +158,15 @@ implements Serializable
 	 * @!jdo.field persistence-modifier="persistent" null-value="exception"
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private StateDefinition stateDefinition;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" null-value="exception"
 	 */
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Date createDT;
 
 	/**

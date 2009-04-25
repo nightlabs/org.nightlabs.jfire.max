@@ -68,10 +68,11 @@ implements IJDOObjectDAO<EntityUserSet<?>>
 	 * @param monitor the {@link ProgressMonitor} to display the progress.
 	 * @return the detached {@link EntityUserSet}s.
 	 */
-	public List<EntityUserSet<?>> getEntityUserSets(Set<EntityUserSetID> entityUserSetsIDs, String[] fetchGroups,
+	@SuppressWarnings("unchecked")
+	public <EUS extends EntityUserSet<?>> List<EUS> getEntityUserSets(Set<EntityUserSetID> entityUserSetsIDs, String[] fetchGroups,
 			int maxFetchDepth, ProgressMonitor monitor)
 	{
-		return getJDOObjects(null, entityUserSetsIDs, fetchGroups, maxFetchDepth, monitor);
+		return (List<EUS>) getJDOObjects(null, entityUserSetsIDs, fetchGroups, maxFetchDepth, monitor);
 	}
 
 	/**
@@ -83,10 +84,11 @@ implements IJDOObjectDAO<EntityUserSet<?>>
 	 * @param monitor the {@link ProgressMonitor} to display the progress.
 	 * @return the detached {@link EntityUserSet}.
 	 */
-	public EntityUserSet<?> getEntityUserSet(EntityUserSetID entityUserSetID, String[] fetchGroups,
+	@SuppressWarnings("unchecked")
+	public <E> EntityUserSet<E> getEntityUserSet(EntityUserSetID entityUserSetID, String[] fetchGroups,
 			int maxFetchDepth, ProgressMonitor monitor)
 	{
-		return getJDOObject(null, entityUserSetID, fetchGroups, maxFetchDepth, monitor);
+		return (EntityUserSet<E>) getJDOObject(null, entityUserSetID, fetchGroups, maxFetchDepth, monitor);
 	}
 
 	/**
@@ -99,14 +101,15 @@ implements IJDOObjectDAO<EntityUserSet<?>>
 	 * @param monitor the {@link ProgressMonitor} to display the progress.
 	 * @return the stored EntityUserSet if get is true or null if get is false
 	 */
-	public EntityUserSet<?> storeEntityUserSet(EntityUserSet<?> entityUserSet, boolean get, String[] fetchGroups,
+	@SuppressWarnings("unchecked")
+	public <E> EntityUserSet<E> storeEntityUserSet(EntityUserSet<?> entityUserSet, boolean get, String[] fetchGroups,
 			int maxFetchDepth, ProgressMonitor monitor)
 	{
 		monitor.beginTask("Saving EntityUserSet", 100);
 		try {
 			EntityUserSetManagerRemote entityUserSetManager = JFireEjb3Factory.getRemoteBean(EntityUserSetManagerRemote.class,
 					SecurityReflector.getInitialContextProperties());
-			return entityUserSetManager.storeEntityUserSet(entityUserSet, get, fetchGroups, maxFetchDepth);
+			return (EntityUserSet<E>) entityUserSetManager.storeEntityUserSet(entityUserSet, get, fetchGroups, maxFetchDepth);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		} finally {

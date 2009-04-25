@@ -5,6 +5,18 @@ import java.io.Serializable;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.util.Util;
 
+import javax.jdo.annotations.Persistent;
+import org.nightlabs.jfire.department.id.DepartmentID;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+
 /**
  * The {@link Department} class represents a department. 
  * <p>
@@ -27,6 +39,24 @@ import org.nightlabs.util.Util;
  * 
  * @jdo.fetch-group name="FetchGroupsProp.fullData" fields="name"
  */
+@PersistenceCapable(
+	objectIdClass=DepartmentID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireDepartment_Department")
+@FetchGroups({
+	@FetchGroup(
+		name=Department.FETCH_GROUP_DESCRIPTION,
+		members=@Persistent(name="description")),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name=Department.FETCH_GROUP_NAME,
+		members=@Persistent(name="name")),
+	@FetchGroup(
+		name="FetchGroupsProp.fullData",
+		members=@Persistent(name="name"))
+})
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class Department 
 implements Serializable, Comparable<Department>
 {
@@ -43,16 +73,23 @@ implements Serializable, Comparable<Department>
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 */
+	@PrimaryKey
 	private long departmentID;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" dependent="true" mapped-by="department"
 	 */
+	@Persistent(
+		dependent="true",
+		mappedBy="department",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private DepartmentName name;
 
 	/**
@@ -61,6 +98,10 @@ implements Serializable, Comparable<Department>
 	 * 		dependent="true"
 	 * 		mapped-by="department"
 	 */
+	@Persistent(
+		dependent="true",
+		mappedBy="department",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private DepartmentDescription description;
 	
 	/**

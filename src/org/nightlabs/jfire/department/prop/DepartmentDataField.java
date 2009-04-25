@@ -6,6 +6,14 @@ import org.nightlabs.jfire.prop.DataField;
 import org.nightlabs.jfire.prop.PropertySet;
 import org.nightlabs.jfire.prop.StructField;
 
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.IdentityType;
+
 /**
  * {@link DataField} that stores a department. 
  * 
@@ -20,6 +28,16 @@ import org.nightlabs.jfire.prop.StructField;
  *
  * @jdo.fetch-group name="FetchGroupsProp.fullData" fields="department"
  */
+@PersistenceCapable(
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireDepartment_Prop_DepartmentDataField")
+@FetchGroups(
+	@FetchGroup(
+		name="FetchGroupsProp.fullData",
+		members=@Persistent(name="department"))
+)
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class DepartmentDataField extends DataField
 {
 	/**

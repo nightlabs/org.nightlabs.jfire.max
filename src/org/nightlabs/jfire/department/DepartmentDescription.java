@@ -5,6 +5,20 @@ import java.util.Map;
 
 import org.nightlabs.i18n.I18nText;
 
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import org.nightlabs.jfire.department.id.DepartmentDescriptionID;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+
 /**
  * An extended class of {@link I18nText} that represents the description created in an {@link Department}. 
  * <p>
@@ -24,7 +38,18 @@ import org.nightlabs.i18n.I18nText;
  * 		field-order="organisationID, departmentID"
  * 
  * @jdo.fetch-group name="Department.description" fields="department, descriptions"
- */ 
+ */ @PersistenceCapable(
+	objectIdClass=DepartmentDescriptionID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireDepartment_DepartmentDescription")
+@FetchGroups(
+	@FetchGroup(
+		name="Department.description",
+		members={@Persistent(name="department"), @Persistent(name="descriptions")})
+)
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
+
 public class DepartmentDescription 
 	extends I18nText
 {
@@ -41,16 +66,20 @@ public class DepartmentDescription
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 	
 	/**
 	 * @jdo.field primary-key="true"
 	 */
+	@PrimaryKey
 	private long departmentID;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Department department;
 
 	/**
@@ -66,6 +95,12 @@ public class DepartmentDescription
 	 * @jdo.join
 	 * @jdo.value-column sql-type="CLOB"
 	 */
+	@Join
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		table="JFireDepartment_DepartmentDescription_descriptions",
+		defaultFetchGroup="true",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	protected Map<String, String> descriptions = new HashMap<String, String>();
 
 	/**

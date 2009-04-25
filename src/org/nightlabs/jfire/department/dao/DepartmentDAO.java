@@ -4,17 +4,17 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import org.nightlabs.jfire.base.JFireEjbFactory;
+import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.department.Department;
-import org.nightlabs.jfire.department.DepartmentManager;
+import org.nightlabs.jfire.department.DepartmentManagerRemote;
 import org.nightlabs.jfire.department.id.DepartmentID;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.progress.ProgressMonitor;
 
 /**
  * Data access object for {@link Department}s.
- * 
+ *
  * @author Chairat Kongarayawetchakun - chairat [AT] nightlabs [DOT] de
  */
 public class DepartmentDAO
@@ -24,7 +24,7 @@ extends BaseJDOObjectDAO<DepartmentID, Department>
 
 	private static DepartmentDAO sharedInstance = null;
 
-	public static DepartmentDAO sharedInstance() 
+	public static DepartmentDAO sharedInstance()
 	{
 		if (sharedInstance == null) {
 			synchronized (DepartmentDAO.class) {
@@ -35,11 +35,7 @@ extends BaseJDOObjectDAO<DepartmentID, Department>
 		return sharedInstance;
 	}
 
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	@Override
-	/**
-	 * {@inheritDoc}
-	 */
 	protected Collection<Department> retrieveJDOObjects(Set<DepartmentID> objectIDs,
 			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 			throws Exception
@@ -47,7 +43,7 @@ extends BaseJDOObjectDAO<DepartmentID, Department>
 		monitor.beginTask("Fetching "+objectIDs.size()+" department information", 1);
 		Collection<Department> departments = null;
 		try {
-			DepartmentManager departmentManager = JFireEjbFactory.getBean(DepartmentManager.class, SecurityReflector.getInitialContextProperties());
+			DepartmentManagerRemote departmentManager = JFireEjb3Factory.getRemoteBean(DepartmentManagerRemote.class, SecurityReflector.getInitialContextProperties());
 			departments = departmentManager.getDepartments(objectIDs, fetchGroups, maxFetchDepth);
 			monitor.worked(1);
 		} catch (Exception e) {
@@ -64,18 +60,17 @@ extends BaseJDOObjectDAO<DepartmentID, Department>
 		return getJDOObject(null, departmentID, fetchGroups, maxFetchDepth, monitor);
 	}
 
-	@SuppressWarnings("unchecked")
 	public synchronized List<Department> getDepartments(String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) {
 		monitor.beginTask("Loading departments", 1);
 		try {
-			DepartmentManager departmentManager = JFireEjbFactory.getBean(DepartmentManager.class, SecurityReflector.getInitialContextProperties());
+			DepartmentManagerRemote departmentManager = JFireEjb3Factory.getRemoteBean(DepartmentManagerRemote.class, SecurityReflector.getInitialContextProperties());
 			Set<DepartmentID> departmentIDs = departmentManager.getDepartmentIDs();
 			monitor.done();
 			return getJDOObjects(null, departmentIDs, fetchGroups, maxFetchDepth, monitor);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-	} 
+	}
 
 	public List<Department> getDepartments(Set<DepartmentID> departmentIDs, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
@@ -88,7 +83,7 @@ extends BaseJDOObjectDAO<DepartmentID, Department>
 			throw new NullPointerException("Department to save must not be null");
 		monitor.beginTask("Storing department: "+ department.getDepartmentID(), 3);
 		try {
-			DepartmentManager departmentManager = JFireEjbFactory.getBean(DepartmentManager.class, SecurityReflector.getInitialContextProperties());
+			DepartmentManagerRemote departmentManager = JFireEjb3Factory.getRemoteBean(DepartmentManagerRemote.class, SecurityReflector.getInitialContextProperties());
 			monitor.worked(1);
 
 			Department result = departmentManager.storeDepartment(department, get, fetchGroups, maxFetchDepth);

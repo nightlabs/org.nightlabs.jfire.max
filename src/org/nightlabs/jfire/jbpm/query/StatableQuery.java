@@ -219,10 +219,21 @@ public class StatableQuery
 		return Statable.class;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	protected Class<? extends Statable> getCandidateClass()
 	{
-		return (Class<? extends Statable>) (statableClass != null ? statableClass : super.getCandidateClass());
+		if (statableClass != null)
+			return statableClass;
+
+		Class<?> cc = super.getCandidateClass();
+		if (cc == null) // FIXME is this allowed?
+			return null;
+
+		if (!Statable.class.isAssignableFrom(cc))
+			throw new ClassCastException("super.getCandidateClass() returned " + cc + " which does not implement " + Statable.class + "!!!");
+
+		return (Class<? extends Statable>) cc;
 	}
 
 	/**

@@ -6,28 +6,28 @@ import java.util.List;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.Discriminator;
+import javax.jdo.annotations.DiscriminatorStrategy;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.Queries;
 
 import org.jbpm.graph.node.EndState;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.jbpm.graph.def.id.ProcessDefinitionID;
 import org.nightlabs.jfire.jbpm.graph.def.id.StateDefinitionID;
 import org.nightlabs.jfire.security.User;
+import org.nightlabs.util.CollectionUtil;
 import org.nightlabs.util.Util;
-
-import javax.jdo.annotations.FetchGroups;
-import javax.jdo.annotations.NullValue;
-import javax.jdo.annotations.Inheritance;
-import javax.jdo.annotations.PrimaryKey;
-import javax.jdo.annotations.FetchGroup;
-import javax.jdo.annotations.PersistenceModifier;
-import javax.jdo.annotations.Discriminator;
-import javax.jdo.annotations.Persistent;
-import javax.jdo.annotations.InheritanceStrategy;
-import javax.jdo.annotations.Queries;
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.DiscriminatorStrategy;
-import javax.jdo.annotations.Column;
-import javax.jdo.annotations.IdentityType;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -89,7 +89,7 @@ implements Serializable
 	public static List<StateDefinition> getStateDefinitions(PersistenceManager pm, ProcessDefinition processDefinition)
 	{
 		Query q = pm.newNamedQuery(StateDefinition.class, "getStateDefinitionsForProcessDefinition");
-		return (List<StateDefinition>) q.execute(processDefinition);
+		return CollectionUtil.castList((List<?>) q.execute(processDefinition));
 	}
 
 	public static StateDefinition getStateDefinition(
@@ -165,7 +165,7 @@ implements Serializable
 	private ProcessDefinition processDefinition;
 
 	/**
-	 * @jdo.field persistence-modifier="persistent" null-value="exception" 
+	 * @jdo.field persistence-modifier="persistent" null-value="exception"
 	 */
 	@Persistent(
 		nullValue=NullValue.EXCEPTION,
@@ -235,7 +235,7 @@ implements Serializable
 			this.stateDefinitionOrganisationID = parts[0];
 			this.stateDefinitionID = parts[1];
 		}
-		
+
 //		this.stateDefinitionOrganisationID = stateDefinitionOrganisationID;
 //		this.stateDefinitionID = stateDefinitionID;
 		this.name = new StateDefinitionName(this);
@@ -364,10 +364,10 @@ implements Serializable
 	{
 		if (obj == null)
 			return false;
-		
+
 		if (!(obj instanceof StateDefinition))
 			return false;
-		
+
 		StateDefinition stateDefinition = (StateDefinition) obj;
 
 		return
@@ -376,7 +376,7 @@ implements Serializable
 			Util.equals(stateDefinition.stateDefinitionOrganisationID, this.stateDefinitionOrganisationID) &&
 			Util.equals(stateDefinition.stateDefinitionID, this.stateDefinitionID);
 	}
-		
+
 	@Override
 	public int hashCode()
 	{

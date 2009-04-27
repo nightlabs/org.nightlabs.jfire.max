@@ -34,6 +34,17 @@ import java.util.Set;
 import org.nightlabs.jfire.geography.id.DistrictID;
 import org.nightlabs.util.Util;
 
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  *
@@ -47,6 +58,13 @@ import org.nightlabs.util.Util;
  *
  * @jdo.create-objectid-class field-order="countryID, organisationID, districtID"
  */
+@PersistenceCapable(
+	objectIdClass=DistrictID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireGeography_District")
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
+
 public class District implements Serializable // , StoreCallback
 {
 	/**
@@ -61,43 +79,61 @@ public class District implements Serializable // , StoreCallback
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
+
 	private String countryID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
+
 	private String organisationID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 */
+	@PrimaryKey
+
 	private String districtID;
 	/////// end primary key ///////
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+
 	private String primaryKey;
 
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
+
 	protected transient Geography geography;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+
 	private City city;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+
 	private double latitude;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+
 	private double longitude;
 
 	/**
@@ -111,11 +147,20 @@ public class District implements Serializable // , StoreCallback
 	 *
 	 * @jdo.join
 	 */
+	@Join
+	@Persistent(
+		dependentElement="true",
+		nullValue=NullValue.EXCEPTION,
+		table="JFireGeography_District_zips",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
+
 	protected Set<String> zips = new HashSet<String>();
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+
 	private String name;
 
 	/**

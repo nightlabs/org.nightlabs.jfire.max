@@ -8,6 +8,10 @@ import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 
 import org.nightlabs.jdo.ObjectID;
+import org.nightlabs.jfire.geography.id.CityID;
+import org.nightlabs.jfire.geography.id.CountryID;
+import org.nightlabs.jfire.geography.id.LocationID;
+import org.nightlabs.jfire.geography.id.RegionID;
 
 @Remote
 public interface GeographyManagerRemote {

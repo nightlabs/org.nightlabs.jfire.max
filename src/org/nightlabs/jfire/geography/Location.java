@@ -33,6 +33,17 @@ import javax.jdo.JDOHelper;
 import org.nightlabs.jfire.geography.id.LocationID;
 import org.nightlabs.util.Util;
 
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  *
@@ -54,6 +65,21 @@ import org.nightlabs.util.Util;
  * @!jdo.fetch-group name="Location.this" fields="city, district, name"
  *
  */
+@PersistenceCapable(
+	objectIdClass=LocationID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireGeography_Location")
+@FetchGroups({
+	@FetchGroup(
+		name=Location.FETCH_GROUP_NAME,
+		members=@Persistent(name="name")),
+	@FetchGroup(
+		name=Location.FETCH_GROUP_CITY,
+		members=@Persistent(name="city"))
+})
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
+
 public class Location implements Serializable
 {
 	/**
@@ -75,43 +101,64 @@ public class Location implements Serializable
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+@PrimaryKey
+@Column(length=100)
+
 	private String countryID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
+
 	private String organisationID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
+
 	private String locationID;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+
 	private String primaryKey;
 
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
+
 	protected transient Geography geography;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+
 	private City city;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+
 	private District district;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" mapped-by="location"
 	 */
+	@Persistent(
+		mappedBy="location",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
+
 	private LocationName name;
 
 	/**

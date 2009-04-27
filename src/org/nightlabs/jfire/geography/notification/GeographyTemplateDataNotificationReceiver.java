@@ -7,14 +7,18 @@ import java.util.Set;
 import javax.jdo.FetchPlan;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.PersistenceCapable;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.jdo.NLJDOHelper;
+import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.Lookup;
 import org.nightlabs.jfire.geography.CSV;
 import org.nightlabs.jfire.geography.Geography;
-import org.nightlabs.jfire.geography.GeographyTemplateDataManager;
-import org.nightlabs.jfire.geography.GeographyTemplateDataManagerUtil;
+import org.nightlabs.jfire.geography.GeographyTemplateDataManagerRemote;
 import org.nightlabs.jfire.geography.id.CSVID;
 import org.nightlabs.jfire.jdo.notification.DirtyObjectID;
 import org.nightlabs.jfire.jdo.notification.JDOLifecycleState;
@@ -33,6 +37,10 @@ import org.nightlabs.jfire.security.SecurityReflector;
  *
  * @jdo.inheritance strategy="superclass-table"
  */
+@PersistenceCapable(
+	identityType=IdentityType.APPLICATION,
+	detachable="true")
+@Inheritance(strategy=InheritanceStrategy.SUPERCLASS_TABLE)
 public class GeographyTemplateDataNotificationReceiver
 extends NotificationReceiver
 {
@@ -64,8 +72,8 @@ extends NotificationReceiver
 			PersistenceManager pm = getPersistenceManager();
 			pm.getExtent(CSV.class);
 
-			GeographyTemplateDataManager gm = GeographyTemplateDataManagerUtil.getHome(
-					Lookup.getInitialContextProperties(pm, getOrganisationID())).create();
+			GeographyTemplateDataManagerRemote gm = JFireEjb3Factory.getRemoteBean(GeographyTemplateDataManagerRemote.class,
+					Lookup.getInitialContextProperties(pm, getOrganisationID()));
 			Set<CSV> csvSet = gm.getCSVs(csvIDs, FETCH_GROUPS_CSV, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
 			for (Iterator<CSV> it = csvSet.iterator(); it.hasNext();) {
 				CSV csv = it.next();

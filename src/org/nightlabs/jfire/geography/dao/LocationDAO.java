@@ -8,10 +8,10 @@ import java.util.List;
 import java.util.Set;
 
 import org.nightlabs.jdo.NLJDOHelper;
+import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.geography.City;
-import org.nightlabs.jfire.geography.GeographyManager;
-import org.nightlabs.jfire.geography.GeographyManagerUtil;
+import org.nightlabs.jfire.geography.GeographyManagerRemote;
 import org.nightlabs.jfire.geography.Location;
 import org.nightlabs.jfire.geography.id.CityID;
 import org.nightlabs.jfire.geography.id.LocationID;
@@ -33,7 +33,7 @@ extends BaseJDOObjectDAO<LocationID, Location>
 
 	private LocationDAO() {}
 
-	private GeographyManager geographyManager;
+	private GeographyManagerRemote geographyManager;
 
 	public Location getLocation(LocationID locationID, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
@@ -62,7 +62,7 @@ extends BaseJDOObjectDAO<LocationID, Location>
 	{
 		monitor.beginTask("Getting locations", 100);
 		try {
-			geographyManager = GeographyManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			geographyManager = JFireEjb3Factory.getRemoteBean(GeographyManagerRemote.class, SecurityReflector.getInitialContextProperties());
 			monitor.worked(10);
 
 			Collection<LocationID> locationIDs = geographyManager.getLocationIDs(cityID);
@@ -81,7 +81,7 @@ extends BaseJDOObjectDAO<LocationID, Location>
 	{
 		monitor.beginTask("Importing location", 100);
 		try {
-			GeographyManager gm = GeographyManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			GeographyManagerRemote gm = JFireEjb3Factory.getRemoteBean(GeographyManagerRemote.class, SecurityReflector.getInitialContextProperties());
 			monitor.worked(10);
 
 			Location location = gm.importLocation(locationID, get, fetchGroups, maxFetchDepth);
@@ -106,9 +106,9 @@ extends BaseJDOObjectDAO<LocationID, Location>
 	{
 		monitor.beginTask("Loading Locations", 100);
 		try {
-			GeographyManager gm = geographyManager;
+			GeographyManagerRemote gm = geographyManager;
 			if (gm == null)
-				gm = GeographyManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+				gm = JFireEjb3Factory.getRemoteBean(GeographyManagerRemote.class, SecurityReflector.getInitialContextProperties());
 
 			monitor.worked(50);
 			Collection<Location> locations = gm.getLocations(objectIDs, fetchGroups, maxFetchDepth);

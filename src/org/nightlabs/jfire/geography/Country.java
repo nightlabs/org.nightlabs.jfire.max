@@ -38,6 +38,20 @@ import javax.jdo.PersistenceManager;
 
 import org.nightlabs.util.Util;
 
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.Key;
+import javax.jdo.annotations.Value;
+import org.nightlabs.jfire.geography.id.CountryID;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  *
@@ -57,6 +71,21 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="Country.regions" fields="regions"
  *
  */
+@PersistenceCapable(
+	objectIdClass=CountryID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireGeography_Country")
+@FetchGroups({
+	@FetchGroup(
+		name=Country.FETCH_GROUP_NAME,
+		members=@Persistent(name="name")),
+	@FetchGroup(
+		name=Country.FETCH_GROUP_REGIONS,
+		members=@Persistent(name="regions"))
+})
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
+
 public class Country implements Serializable
 {
 	private static final long serialVersionUID = 1L;
@@ -71,6 +100,9 @@ public class Country implements Serializable
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
+
 	private String countryID;
 	/////// end primary key ///////
 
@@ -79,11 +111,17 @@ public class Country implements Serializable
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
+
 	protected transient Geography geography;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" mapped-by="country"
 	 */
+	@Persistent(
+		mappedBy="country",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
+
 	private CountryName name;
 
 	/**
@@ -102,6 +140,12 @@ public class Country implements Serializable
 	 *
 	 * @!jdo.map-vendor-extension vendor-name="jpox" key="key-field" value="primaryKey"
 	 */
+	@Persistent(
+		mappedBy="country",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
+	@Key(mappedBy="primaryKey")
+	@Value(dependent="true")
+
 	protected Map<String, Region> regions = new HashMap<String, Region>();
 	/////// end normal fields ///////
 

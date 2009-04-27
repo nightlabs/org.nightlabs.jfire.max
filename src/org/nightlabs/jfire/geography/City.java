@@ -38,6 +38,19 @@ import javax.jdo.JDOHelper;
 import org.nightlabs.jfire.geography.id.CityID;
 import org.nightlabs.util.Util;
 
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.Key;
+import javax.jdo.annotations.Value;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  * @author Marc Klinger - marc[at]nightlabs[dot]de
@@ -60,6 +73,24 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="City.region" fields="region"
  *
  */
+@PersistenceCapable(
+	objectIdClass=CityID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireGeography_City")
+@FetchGroups({
+	@FetchGroup(
+		name=City.FETCH_GROUP_NAME,
+		members=@Persistent(name="name")),
+	@FetchGroup(
+		name=City.FETCH_GROUP_LOCATIONS,
+		members=@Persistent(name="locations")),
+	@FetchGroup(
+		name=City.FETCH_GROUP_REGION,
+		members=@Persistent(name="region"))
+})
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
+
 public class City implements Serializable
 {
 	/**
@@ -78,23 +109,33 @@ public class City implements Serializable
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
+
 	private String countryID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
+
 	private String organisationID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 */
+	@PrimaryKey
+
 	private String cityID;
 	/////// end primary key ///////
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+
 	private String primaryKey;
 
 	public static final String DEFAULT_LANGUAGEID = Locale.ENGLISH.getLanguage();
@@ -104,16 +145,24 @@ public class City implements Serializable
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
+
 	protected transient Geography geography;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+
 	private Region region;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" mapped-by="city"
 	 */
+	@Persistent(
+		mappedBy="city",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
+
 	private CityName name;
 
 	/**
@@ -132,6 +181,12 @@ public class City implements Serializable
 	 *
 	 * @!jdo.map-vendor-extension vendor-name="jpox" key="key-field" value="primaryKey"
 	 */
+	@Persistent(
+		mappedBy="city",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
+	@Key(mappedBy="primaryKey")
+	@Value(dependent="true")
+
 	private Map<String, Location> locations = new HashMap<String, Location>();
 
 	/**
@@ -150,6 +205,12 @@ public class City implements Serializable
 	 *
 	 * @!jdo.map-vendor-extension vendor-name="jpox" key="key-field" value="primaryKey"
 	 */
+	@Persistent(
+		mappedBy="city",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
+	@Key(mappedBy="primaryKey")
+	@Value(dependent="true")
+
 	private Map<String, District> districts = new HashMap<String, District>();
 	/////// end normal fields ///////
 

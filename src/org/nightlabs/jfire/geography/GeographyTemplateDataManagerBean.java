@@ -31,16 +31,17 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Serializable;
 import java.io.Writer;
-import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.zip.DeflaterOutputStream;
 
-import javax.ejb.CreateException;
-import javax.ejb.EJBException;
-import javax.ejb.SessionBean;
-import javax.ejb.SessionContext;
+import javax.annotation.security.RolesAllowed;
+import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
+import javax.ejb.TransactionManagement;
+import javax.ejb.TransactionManagementType;
 import javax.jdo.FetchPlan;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
@@ -54,6 +55,7 @@ import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
 import org.nightlabs.jfire.asyncinvoke.AsyncInvoke;
 import org.nightlabs.jfire.asyncinvoke.Invocation;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
+import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.crossorganisationregistrationinit.Context;
 import org.nightlabs.jfire.geography.id.CSVID;
 import org.nightlabs.jfire.geography.id.CityID;
@@ -63,8 +65,7 @@ import org.nightlabs.jfire.geography.id.RegionID;
 import org.nightlabs.jfire.geography.notification.GeographyTemplateDataNotificationFilter;
 import org.nightlabs.jfire.geography.notification.GeographyTemplateDataNotificationReceiver;
 import org.nightlabs.jfire.idgenerator.IDNamespace;
-import org.nightlabs.jfire.jdo.notification.persistent.PersistentNotificationEJB;
-import org.nightlabs.jfire.jdo.notification.persistent.PersistentNotificationEJBUtil;
+import org.nightlabs.jfire.jdo.notification.persistent.PersistentNotificationEJBRemote;
 import org.nightlabs.jfire.jdo.notification.persistent.SubscriptionUtil;
 import org.nightlabs.jfire.jdo.notification.persistent.id.NotificationReceiverID;
 import org.nightlabs.jfire.organisation.Organisation;
@@ -82,9 +83,13 @@ import org.nightlabs.version.MalformedVersionException;
  * @ejb.util generate="physical"
  * @ejb.transaction type="Required"
  */
-public abstract class GeographyTemplateDataManagerBean
+@TransactionAttribute(TransactionAttributeType.REQUIRED)
+@TransactionManagement(TransactionManagementType.CONTAINER)
+@Stateless
+
+public class GeographyTemplateDataManagerBean
 extends BaseSessionBeanImpl
-implements SessionBean
+implements GeographyTemplateDataManagerRemote
 {
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger = Logger.getLogger(GeographyTemplateDataManagerBean.class);
@@ -95,65 +100,23 @@ implements SessionBean
 	private static final String LOCATION_CSV_HEADER = "CountryID;LocationID;CityID;DistrictID;LanguageID;LocationName\n";
 	private static final String DISTRICT_CSV_HEADER = "CountryID;CityID;DistrictID;LanguageID;DistrictName;Latitute;Longitude\n";
 
-	@Override
-	public void setSessionContext(SessionContext sessionContext)
-	throws EJBException, RemoteException
-	{
-		logger.debug(this.getClass().getName() + ".setSessionContext("+sessionContext+")");
-		super.setSessionContext(sessionContext);
-	}
-	@Override
-	public void unsetSessionContext() {
-		super.unsetSessionContext();
-	}
-	/**
-	 * @ejb.create-method
-	 * @ejb.permission role-name="_Guest_"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.geography.GeographyTemplateDataManagerRemote#ping(java.lang.String)
 	 */
-	public void ejbCreate()
-	throws CreateException
-	{
-		logger.debug(this.getClass().getName() + ".ejbCreate()");
-	}
-	/**
-	 * @ejb.permission unchecked="true"
-	 */
-	@Override
-	public void ejbRemove() throws EJBException, RemoteException
-	{
-		logger.debug(this.getClass().getName() + ".ejbRemove()");
-	}
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	@RolesAllowed("_Guest_")
 
-	@Override
-	public void ejbActivate() throws EJBException, RemoteException
-	{
-		logger.debug(this.getClass().getName() + ".ejbActivate()");
-	}
-	@Override
-	public void ejbPassivate() throws EJBException, RemoteException
-	{
-		logger.debug(this.getClass().getName() + ".ejbPassivate()");
-	}
-
-	/**
-	 * @ejb.interface-method
-	 * @ejb.transaction type="Supports"
-	 * @ejb.permission role-name="_Guest_"
-	 */
 	@Override
 	public String ping(String message) {
 		return super.ping(message);
 	}
 
-	/**
-	 * This cross-organisation-registration-init is executed every time the organisation
-	 * registers another organisation, but it only does sth. if the other organisation
-	 * is the root-organisation. In this case, it executes {@link #initialiseJDOLifecycleListeners()}.
-	 *
-	 * @ejb.interface-method
-	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="_System_"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.geography.GeographyTemplateDataManagerRemote#initialiseJDOLifecycleListeners(org.nightlabs.jfire.crossorganisationregistrationinit.Context)
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("_System_")
+
 	public void initialiseJDOLifecycleListeners(Context context)
 	throws Exception
 	{
@@ -163,15 +126,12 @@ implements SessionBean
 			logger.info("initialiseJDOLifecycleListeners: Other organisation is not the root organisation => nothing to do.");
 	}
 
-	/**
-	 * This organisation-init method is executed on every startup in case the Geography module has been deployed
-	 * into an existing server and the organisation is already registered at the root-organisation. In this
-	 * case {@link #initialiseJDOLifecycleListeners(Context)} is never called.
-	 *
-	 * @ejb.interface-method
-	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="_System_"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.geography.GeographyTemplateDataManagerRemote#initialiseJDOLifecycleListeners()
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("_System_")
+
 	public void initialiseJDOLifecycleListeners()
 	throws Exception
 	{
@@ -205,10 +165,10 @@ implements SessionBean
 			GeographyTemplateDataNotificationFilter notificationFilter = new GeographyTemplateDataNotificationFilter(
 					rootOrganisationID, SubscriptionUtil.SUBSCRIBER_TYPE_ORGANISATION, subscriberOrganisationID,
 					GeographyTemplateDataNotificationFilter.class.getName());
-			PersistentNotificationEJB persistentNotificationEJB;
+			PersistentNotificationEJBRemote persistentNotificationEJB;
 
 			try {
-				persistentNotificationEJB = PersistentNotificationEJBUtil.getHome(getInitialContextProperties(rootOrganisationID)).create();
+				persistentNotificationEJB = JFireEjb3Factory.getRemoteBean(PersistentNotificationEJBRemote.class, getInitialContextProperties(rootOrganisationID));
 			} catch (JDOObjectNotFoundException x) {
 				logger.warn("Creating JDO lifecycle listeners for CSV instances in the root organisation failed. Reason: Root organisation " + rootOrganisationID + " does not exist.");
 				return;
@@ -225,11 +185,12 @@ implements SessionBean
 		}
 	}
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="_System_"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.geography.GeographyTemplateDataManagerRemote#initialise()
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("_System_")
+
 	public void initialise()
 	throws MalformedVersionException
 	{
@@ -333,11 +294,12 @@ implements SessionBean
 		throw new SecurityException("Writing geography template data is exclusively allowed to the root-organisation (" + rootOrganisationID + ") when using JFire in network mode (with a root-organisation present). Your organisation (" + getOrganisationID() + ") cannot modify the network-wide geography data!");
 	}
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="_Guest_"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.geography.GeographyTemplateDataManagerRemote#storeGeographyTemplateCountryData(org.nightlabs.jfire.geography.Country)
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("_Guest_")
+
 	public void storeGeographyTemplateCountryData(Country storedCountry)
 	throws IOException, SecurityException
 	{
@@ -408,11 +370,12 @@ implements SessionBean
 		}//finally
 	}
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="_Guest_"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.geography.GeographyTemplateDataManagerRemote#storeGeographyTemplateRegionData(org.nightlabs.jfire.geography.Region)
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("_Guest_")
+
 	public void storeGeographyTemplateRegionData(Region storedRegion)
 	throws IOException, SecurityException
 	{
@@ -484,11 +447,12 @@ implements SessionBean
 		}//finally
 	}
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="_Guest_"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.geography.GeographyTemplateDataManagerRemote#storeGeographyTemplateCityData(org.nightlabs.jfire.geography.City)
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("_Guest_")
+
 	public void storeGeographyTemplateCityData(City storedCity)
 	throws IOException, SecurityException
 	{
@@ -562,11 +526,12 @@ implements SessionBean
 		}//finally
 	}
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="_Guest_"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.geography.GeographyTemplateDataManagerRemote#storeGeographyTemplateLocationData(org.nightlabs.jfire.geography.Location)
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("_Guest_")
+
 	public void storeGeographyTemplateLocationData(Location storedLocation)
 	throws IOException, SecurityException
 	{
@@ -645,11 +610,12 @@ implements SessionBean
 		}
 	}
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="_Guest_"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.geography.GeographyTemplateDataManagerRemote#storeGeographyTemplateDistrictData(org.nightlabs.jfire.geography.District)
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("_Guest_")
+
 	public void storeGeographyTemplateDistrictData(District storedDistrict)
 	throws IOException, SecurityException
 	{
@@ -712,6 +678,8 @@ implements SessionBean
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 */
+	@RolesAllowed("_Guest_")
+
 	public Set<CSVID> getCSVIDs()
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -729,6 +697,8 @@ implements SessionBean
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 */
+	@RolesAllowed("_Guest_")
+
 	public Set<CSV> getCSVs(Set<CSVID> csvIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();

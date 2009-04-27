@@ -38,6 +38,19 @@ import javax.jdo.PersistenceManager;
 import org.nightlabs.jfire.geography.id.RegionID;
 import org.nightlabs.util.Util;
 
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.Key;
+import javax.jdo.annotations.Value;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  *
@@ -59,6 +72,24 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="Region.cities" fields="cities"
  *
  */
+@PersistenceCapable(
+	objectIdClass=RegionID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireGeography_Region")
+@FetchGroups({
+	@FetchGroup(
+		name=Region.FETCH_GROUP_COUNTRY,
+		members=@Persistent(name="country")),
+	@FetchGroup(
+		name=Region.FETCH_GROUP_NAME,
+		members=@Persistent(name="name")),
+	@FetchGroup(
+		name=Region.FETCH_GROUP_CITIES,
+		members=@Persistent(name="cities"))
+})
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
+
 public class Region implements Serializable
 {
 	/**
@@ -75,24 +106,35 @@ public class Region implements Serializable
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
+
 	private String countryID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
+
 	private String organisationID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
+
 	private String regionID;
 	/////// end primary key ///////
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+
 	private String primaryKey;
 
 	/////// begin normal fields ///////
@@ -100,16 +142,24 @@ public class Region implements Serializable
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
+
 	protected transient Geography geography;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+
 	private Country country;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" mapped-by="region"
 	 */
+	@Persistent(
+		mappedBy="region",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
+
 	private RegionName name;
 
 	/**
@@ -128,6 +178,12 @@ public class Region implements Serializable
 	 *
 	 * @!jdo.map-vendor-extension vendor-name="jpox" key="key-field" value="primaryKey"
 	 */
+	@Persistent(
+		mappedBy="region",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
+	@Key(mappedBy="primaryKey")
+	@Value(dependent="true")
+
 	protected Map<String, City> cities = new HashMap<String, City>();
 	/////// end normal fields ///////
 

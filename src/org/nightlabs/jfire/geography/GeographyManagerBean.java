@@ -46,6 +46,10 @@ import org.apache.log4j.Logger;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
+import org.nightlabs.jfire.geography.id.CityID;
+import org.nightlabs.jfire.geography.id.CountryID;
+import org.nightlabs.jfire.geography.id.LocationID;
+import org.nightlabs.jfire.geography.id.RegionID;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.util.CollectionUtil;
 

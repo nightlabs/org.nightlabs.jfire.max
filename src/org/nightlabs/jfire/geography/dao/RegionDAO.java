@@ -8,10 +8,10 @@ import java.util.List;
 import java.util.Set;
 
 import org.nightlabs.jdo.NLJDOHelper;
+import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.geography.Country;
-import org.nightlabs.jfire.geography.GeographyManager;
-import org.nightlabs.jfire.geography.GeographyManagerUtil;
+import org.nightlabs.jfire.geography.GeographyManagerRemote;
 import org.nightlabs.jfire.geography.Region;
 import org.nightlabs.jfire.geography.id.CountryID;
 import org.nightlabs.jfire.geography.id.RegionID;
@@ -33,7 +33,7 @@ extends BaseJDOObjectDAO<RegionID, Region>
 
 	private RegionDAO() {}
 
-	private GeographyManager geographyManager;
+	private GeographyManagerRemote geographyManager;
 
 	public Region getRegion(RegionID regionID, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
@@ -62,7 +62,7 @@ extends BaseJDOObjectDAO<RegionID, Region>
 	{
 		monitor.beginTask("Getting regions", 100);
 		try {
-			geographyManager = GeographyManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			geographyManager = JFireEjb3Factory.getRemoteBean(GeographyManagerRemote.class, SecurityReflector.getInitialContextProperties());
 			monitor.worked(10);
 
 			Collection<RegionID> regionIDs = geographyManager.getRegionIDs(countryID);
@@ -81,7 +81,7 @@ extends BaseJDOObjectDAO<RegionID, Region>
 	{
 		monitor.beginTask("Importing region", 100);
 		try {
-			GeographyManager gm = GeographyManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			GeographyManagerRemote gm = JFireEjb3Factory.getRemoteBean(GeographyManagerRemote.class, SecurityReflector.getInitialContextProperties());
 			monitor.worked(10);
 
 			Region region = gm.importRegion(regionID, get, fetchGroups, maxFetchDepth);
@@ -106,9 +106,9 @@ extends BaseJDOObjectDAO<RegionID, Region>
 	{
 		monitor.beginTask("Loading Regions", 100);
 		try {
-			GeographyManager gm = geographyManager;
+			GeographyManagerRemote gm = geographyManager;
 			if (gm == null)
-				gm = GeographyManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+				gm = JFireEjb3Factory.getRemoteBean(GeographyManagerRemote.class, SecurityReflector.getInitialContextProperties());
 
 			monitor.worked(50);
 			Collection<Region> regions = gm.getRegions(objectIDs, fetchGroups, maxFetchDepth);

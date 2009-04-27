@@ -13,6 +13,17 @@ import org.apache.log4j.Logger;
 import org.nightlabs.jfire.geography.id.CSVID;
 import org.nightlabs.util.IOUtil;
 
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  * 
@@ -28,6 +39,17 @@ import org.nightlabs.util.IOUtil;
  *
  * @jdo.fetch-group name="CSV.data" fields="data"
  */
+@PersistenceCapable(
+	objectIdClass=CSVID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireGeography_CSV")
+@FetchGroups(
+	@FetchGroup(
+		name=CSV.FETCH_GROUP_DATA,
+		members=@Persistent(name="data"))
+)
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class CSV
 implements Serializable
 {
@@ -108,12 +130,16 @@ implements Serializable
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String csvType;
 
 	/**
@@ -122,6 +148,8 @@ implements Serializable
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String countryID;
 
 	/**
@@ -132,6 +160,8 @@ implements Serializable
 	 * @jdo.field persistence-modifier="persistent"
 	 * @jdo.column sql-type="BLOB"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+	@Column(sqlType="BLOB")
 	private byte[] data;
 
 	/**

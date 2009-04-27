@@ -27,16 +27,17 @@
 package org.nightlabs.jfire.store.deliver;
 
 import java.io.Serializable;
-import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import javax.ejb.CreateException;
-import javax.ejb.EJBException;
-import javax.ejb.SessionBean;
-import javax.ejb.SessionContext;
+import javax.annotation.security.RolesAllowed;
+import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
+import javax.ejb.TransactionManagement;
+import javax.ejb.TransactionManagementType;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 
@@ -70,37 +71,16 @@ import org.nightlabs.jfire.trade.LegalEntity;
  * @ejb.util generate="physical"
  * @ejb.transaction type="Required"
  */
-public abstract class DeliveryHelperBean
+@TransactionAttribute(TransactionAttributeType.REQUIRED)
+@TransactionManagement(TransactionManagementType.CONTAINER)
+@Stateless
+public class DeliveryHelperBean
 extends BaseSessionBeanImpl
-implements SessionBean
+implements DeliveryHelperLocal
 {
 	private static final long serialVersionUID = 1L;
 
 	private static final Logger logger = Logger.getLogger(DeliveryHelperBean.class);
-
-	@Override
-	public void setSessionContext(SessionContext sessionContext)
-			throws EJBException, RemoteException
-	{
-		logger.debug(this.getClass().getName() + ".setSessionContext("+sessionContext+")");
-		super.setSessionContext(sessionContext);
-	}
-	/**
-	 * @ejb.create-method
-	 * @ejb.permission role-name="_Guest_"
-	 */
-	public void ejbCreate()
-	throws CreateException
-	{
-		logger.debug(this.getClass().getName() + ".ejbCreate()");
-	}
-	/**
-	 * @ejb.permission unchecked="true"
-	 */
-	public void ejbRemove() throws EJBException, RemoteException
-	{
-		logger.debug(this.getClass().getName() + ".ejbRemove()");
-	}
 
 	public static DeliveryData deliverBegin_storeDeliveryData(PersistenceManager pm, User user, DeliveryData deliveryData)
 	{
@@ -124,15 +104,11 @@ implements SessionBean
 		return deliveryData;
 	}
 
-	/**
-	 * @param deliveryData The <tt>DeliveryData</tt> to be stored.
-	 * @return Returns the JDO objectID of the newly persisted <tt>deliveryData</tt>
-	 * @throws ModuleException
-	 *
-	 * @ejb.interface-method view-type="local"
-	 * @ejb.transaction type="RequiresNew"
-	 * @ejb.permission role-name="_Guest_"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.store.deliver.DeliveryHelperLocal#deliverBegin_storeDeliveryData(org.nightlabs.jfire.store.deliver.DeliveryData)
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+	@RolesAllowed("_Guest_")
 	public DeliveryDataID deliverBegin_storeDeliveryData(DeliveryData deliveryData)
 	throws ModuleException
 	{
@@ -177,11 +153,11 @@ implements SessionBean
 	}
 
 
-	/**
-	 * @ejb.interface-method view-type="local"
-	 * @ejb.transaction type="RequiresNew"
-	 * @ejb.permission role-name="_Guest_"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.store.deliver.DeliveryHelperLocal#deliverBegin_internal(org.nightlabs.jfire.store.deliver.id.DeliveryDataID, java.lang.String[], int)
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+	@RolesAllowed("_Guest_")
 	public DeliveryResult deliverBegin_internal(
 			DeliveryDataID deliveryDataID,
 			String[] fetchGroups, int maxFetchDepth)
@@ -216,11 +192,11 @@ implements SessionBean
 		}
 	}
 
-	/**
-	 * @ejb.interface-method view-type="local"
-	 * @ejb.transaction type="RequiresNew"
-	 * @ejb.permission role-name="_Guest_"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.store.deliver.DeliveryHelperLocal#deliverDoWork_storeDeliverDoWorkClientResult(org.nightlabs.jfire.store.deliver.id.DeliveryID, org.nightlabs.jfire.store.deliver.DeliveryResult, boolean)
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+	@RolesAllowed("_Guest_")
 	public void deliverDoWork_storeDeliverDoWorkClientResult(DeliveryID deliveryID, DeliveryResult deliverDoWorkClientResult, boolean forceRollback)
 	throws ModuleException
 	{
@@ -236,11 +212,11 @@ implements SessionBean
 		}
 	}
 
-	/**
-	 * @ejb.interface-method view-type="local"
-	 * @ejb.transaction type="RequiresNew"
-	 * @ejb.permission role-name="_Guest_"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.store.deliver.DeliveryHelperLocal#deliverDoWork_internal(org.nightlabs.jfire.store.deliver.id.DeliveryID, java.lang.String[], int)
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+	@RolesAllowed("_Guest_")
 	public DeliveryResult deliverDoWork_internal(DeliveryID deliveryID, String[] fetchGroups, int maxFetchDepth)
 	throws DeliveryException
 	{
@@ -274,11 +250,11 @@ implements SessionBean
 		}
 	}
 
-	/**
-	 * @ejb.interface-method view-type="local"
-	 * @ejb.transaction type="RequiresNew"
-	 * @ejb.permission role-name="_Guest_"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.store.deliver.DeliveryHelperLocal#deliverEnd_internal(org.nightlabs.jfire.store.deliver.id.DeliveryID, java.lang.String[], int)
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+	@RolesAllowed("_Guest_")
 	public DeliveryResult deliverEnd_internal(DeliveryID deliveryID, String[] fetchGroups, int maxFetchDepth)
 	throws DeliveryException, AsyncInvokeEnqueueException
 	{
@@ -388,11 +364,11 @@ implements SessionBean
 	}
 
 
-	/**
-	 * @ejb.interface-method view-type="local"
-	 * @ejb.transaction type="RequiresNew"
-	 * @ejb.permission role-name="_Guest_"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.store.deliver.DeliveryHelperLocal#deliverEnd_storeDeliverEndClientResult(org.nightlabs.jfire.store.deliver.id.DeliveryID, org.nightlabs.jfire.store.deliver.DeliveryResult, boolean)
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+	@RolesAllowed("_Guest_")
 	public void deliverEnd_storeDeliverEndClientResult(
 			DeliveryID deliveryID, DeliveryResult deliverEndClientResult, boolean forceRollback)
 	throws ModuleException
@@ -409,11 +385,11 @@ implements SessionBean
 		}
 	}
 
-	/**
-	 * @ejb.interface-method view-type="local"
-	 * @ejb.transaction type="RequiresNew"
-	 * @ejb.permission role-name="_Guest_"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.store.deliver.DeliveryHelperLocal#deliverBegin_storeDeliverBeginServerResult(org.nightlabs.jfire.store.deliver.id.DeliveryID, org.nightlabs.jfire.store.deliver.DeliveryResult, boolean, java.lang.String[], int)
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+	@RolesAllowed("_Guest_")
 	public DeliveryResult deliverBegin_storeDeliverBeginServerResult(
 			DeliveryID deliveryID, DeliveryResult deliverBeginServerResult,
 			boolean get, String[] fetchGroups, int maxFetchDepth)
@@ -449,11 +425,11 @@ implements SessionBean
 		}
 	}
 
-	/**
-	 * @ejb.interface-method view-type="local"
-	 * @ejb.transaction type="RequiresNew"
-	 * @ejb.permission role-name="_Guest_"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.store.deliver.DeliveryHelperLocal#deliverDoWork_storeDeliverDoWorkServerResult(org.nightlabs.jfire.store.deliver.id.DeliveryID, org.nightlabs.jfire.store.deliver.DeliveryResult, boolean, java.lang.String[], int)
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+	@RolesAllowed("_Guest_")
 	public DeliveryResult deliverDoWork_storeDeliverDoWorkServerResult(
 			DeliveryID deliveryID, DeliveryResult deliverDoWorkServerResult,
 			boolean get, String[] fetchGroups, int maxFetchDepth)
@@ -487,11 +463,11 @@ implements SessionBean
 		}
 	}
 
-	/**
-	 * @ejb.interface-method view-type="local"
-	 * @ejb.transaction type="RequiresNew"
-	 * @ejb.permission role-name="_Guest_"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.store.deliver.DeliveryHelperLocal#deliverEnd_storeDeliverEndServerResult(org.nightlabs.jfire.store.deliver.id.DeliveryID, org.nightlabs.jfire.store.deliver.DeliveryResult, boolean, java.lang.String[], int)
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+	@RolesAllowed("_Guest_")
 	public DeliveryResult deliverEnd_storeDeliverEndServerResult(
 			DeliveryID deliveryID, DeliveryResult deliverEndServerResult,
 			boolean get, String[] fetchGroups, int maxFetchDepth)
@@ -526,11 +502,11 @@ implements SessionBean
 	}
 
 
-	/**
-	 * @ejb.interface-method view-type="local"
-	 * @ejb.transaction type="RequiresNew"
-	 * @ejb.permission role-name="_Guest_"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.store.deliver.DeliveryHelperLocal#deliverRollback(org.nightlabs.jfire.store.deliver.id.DeliveryID)
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+	@RolesAllowed("_Guest_")
 	public void deliverRollback(DeliveryID deliveryID)
 	throws ModuleException
 	{

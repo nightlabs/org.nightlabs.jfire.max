@@ -7,12 +7,12 @@ import java.util.Set;
 
 import org.nightlabs.jdo.query.AbstractJDOQuery;
 import org.nightlabs.jdo.query.QueryCollection;
-import org.nightlabs.jfire.base.JFireEjbFactory;
+import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.trade.Offer;
-import org.nightlabs.jfire.trade.TradeManager;
+import org.nightlabs.jfire.trade.TradeManagerRemote;
 import org.nightlabs.jfire.trade.id.OfferID;
 import org.nightlabs.jfire.trade.query.OfferQuery;
 import org.nightlabs.progress.ProgressMonitor;
@@ -31,12 +31,11 @@ public class OfferDAO
 	}
 
 	@Override
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	protected Collection<Offer> retrieveJDOObjects(Set<OfferID> offerIDs,
 			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 			throws Exception
 	{
-		TradeManager tm = JFireEjbFactory.getBean(TradeManager.class, SecurityReflector.getInitialContextProperties());
+		TradeManagerRemote tm = JFireEjb3Factory.getRemoteBean(TradeManagerRemote.class, SecurityReflector.getInitialContextProperties());
 		return tm.getOffers(offerIDs, fetchGroups, maxFetchDepth);
 	}
 
@@ -56,7 +55,7 @@ public class OfferDAO
 	{
 		try
 		{
-			TradeManager tm = JFireEjbFactory.getBean(TradeManager.class, SecurityReflector.getInitialContextProperties());
+			TradeManagerRemote tm = JFireEjb3Factory.getRemoteBean(TradeManagerRemote.class, SecurityReflector.getInitialContextProperties());
 			Set<OfferID> offerIDs = tm.getOfferIDs(queries);
 
 			return getJDOObjects(null, offerIDs, fetchGroups, maxFetchDepth, monitor);
@@ -76,7 +75,7 @@ public class OfferDAO
 		Offer offer;
 		monitor.beginTask("Set offer expiry", 100);
 		try {
-			TradeManager tm = JFireEjbFactory.getBean(TradeManager.class, SecurityReflector.getInitialContextProperties());
+			TradeManagerRemote tm = JFireEjb3Factory.getRemoteBean(TradeManagerRemote.class, SecurityReflector.getInitialContextProperties());
 			monitor.worked(20);
 			offer = tm.setOfferExpiry(
 					offerID,
@@ -101,7 +100,7 @@ public class OfferDAO
 	{
 		monitor.beginTask("Signal Offer", 100);
 		try {
-			TradeManager tm = JFireEjbFactory.getBean(TradeManager.class, SecurityReflector.getInitialContextProperties());
+			TradeManagerRemote tm = JFireEjb3Factory.getRemoteBean(TradeManagerRemote.class, SecurityReflector.getInitialContextProperties());
 			monitor.worked(20);
 			tm.signalOffer(offerID, jbpmTransitionName);
 			monitor.worked(80);

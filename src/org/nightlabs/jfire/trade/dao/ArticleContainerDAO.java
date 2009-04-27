@@ -4,16 +4,16 @@ import java.util.Collection;
 import java.util.Set;
 
 import org.nightlabs.jdo.query.QueryCollection;
-import org.nightlabs.jfire.accounting.AccountingManager;
+import org.nightlabs.jfire.accounting.AccountingManagerRemote;
 import org.nightlabs.jfire.accounting.id.InvoiceID;
-import org.nightlabs.jfire.base.JFireEjbFactory;
+import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.security.SecurityReflector;
-import org.nightlabs.jfire.store.StoreManager;
+import org.nightlabs.jfire.store.StoreManagerRemote;
 import org.nightlabs.jfire.store.id.DeliveryNoteID;
 import org.nightlabs.jfire.store.id.ReceptionNoteID;
 import org.nightlabs.jfire.trade.ArticleContainer;
-import org.nightlabs.jfire.trade.TradeManager;
+import org.nightlabs.jfire.trade.TradeManagerRemote;
 import org.nightlabs.jfire.trade.id.ArticleContainerID;
 import org.nightlabs.jfire.trade.id.OfferID;
 import org.nightlabs.jfire.trade.id.OrderID;
@@ -44,7 +44,7 @@ extends BaseJDOObjectDAO<ArticleContainerID, ArticleContainer>
 	}
 
 	@Override
-	protected Collection<ArticleContainer> retrieveJDOObjects(
+	protected Collection<? extends ArticleContainer> retrieveJDOObjects(
 			Set<ArticleContainerID> articleContainerIDs, String[] fetchGroups,
 			int maxFetchDepth, ProgressMonitor monitor)
 	throws Exception
@@ -57,24 +57,29 @@ extends BaseJDOObjectDAO<ArticleContainerID, ArticleContainer>
 			if (!articleContainerIDs.isEmpty()) {
 				ArticleContainerID articleContainerID = articleContainerIDs.iterator().next();
 				if (articleContainerID instanceof DeliveryNoteID) {
-					StoreManager sm = JFireEjbFactory.getBean(StoreManager.class, SecurityReflector.getInitialContextProperties());
-					return sm.getDeliveryNotes(articleContainerIDs, fetchGroups, maxFetchDepth);
+					StoreManagerRemote sm = JFireEjb3Factory.getRemoteBean(StoreManagerRemote.class, SecurityReflector.getInitialContextProperties());
+					Set<DeliveryNoteID> deliveryNoteIDs = CollectionUtil.castSet(articleContainerIDs);
+					return sm.getDeliveryNotes(deliveryNoteIDs, fetchGroups, maxFetchDepth);
 				}
 				if (articleContainerID instanceof InvoiceID) {
-					AccountingManager am = JFireEjbFactory.getBean(AccountingManager.class, SecurityReflector.getInitialContextProperties());
-					return am.getInvoices(articleContainerIDs, fetchGroups, maxFetchDepth);
+					AccountingManagerRemote am = JFireEjb3Factory.getRemoteBean(AccountingManagerRemote.class, SecurityReflector.getInitialContextProperties());
+					Set<InvoiceID> invoiceIDs = CollectionUtil.castSet(articleContainerIDs);
+					return am.getInvoices(invoiceIDs, fetchGroups, maxFetchDepth);
 				}
 				if (articleContainerID instanceof OfferID) {
-					TradeManager tm = JFireEjbFactory.getBean(TradeManager.class, SecurityReflector.getInitialContextProperties());
-					return tm.getOffers(articleContainerIDs, fetchGroups, maxFetchDepth);
+					TradeManagerRemote tm = JFireEjb3Factory.getRemoteBean(TradeManagerRemote.class, SecurityReflector.getInitialContextProperties());
+					Set<OfferID> offerIDs = CollectionUtil.castSet(articleContainerIDs);
+					return tm.getOffers(offerIDs, fetchGroups, maxFetchDepth);
 				}
 				if (articleContainerID instanceof OrderID) {
-					TradeManager tm = JFireEjbFactory.getBean(TradeManager.class, SecurityReflector.getInitialContextProperties());
-					return tm.getOrders(articleContainerIDs, fetchGroups, maxFetchDepth);
+					TradeManagerRemote tm = JFireEjb3Factory.getRemoteBean(TradeManagerRemote.class, SecurityReflector.getInitialContextProperties());
+					Set<OrderID> orderIDs = CollectionUtil.castSet(articleContainerIDs);
+					return tm.getOrders(orderIDs, fetchGroups, maxFetchDepth);
 				}
 				if (articleContainerID instanceof ReceptionNoteID) {
-					StoreManager sm = JFireEjbFactory.getBean(StoreManager.class, SecurityReflector.getInitialContextProperties());
-					return sm.getReceptionNotes(articleContainerIDs, fetchGroups, maxFetchDepth);
+					StoreManagerRemote sm = JFireEjb3Factory.getRemoteBean(StoreManagerRemote.class, SecurityReflector.getInitialContextProperties());
+					Set<ReceptionNoteID> receptionNoteIDs = CollectionUtil.castSet(articleContainerIDs);
+					return sm.getReceptionNotes(receptionNoteIDs, fetchGroups, maxFetchDepth);
 				}
 			}
 			return null;
@@ -101,7 +106,7 @@ extends BaseJDOObjectDAO<ArticleContainerID, ArticleContainer>
 			int maxFetchDepth, ProgressMonitor monitor)
 	{
 		try {
-			TradeManager tm = JFireEjbFactory.getBean(TradeManager.class, SecurityReflector.getInitialContextProperties());
+			TradeManagerRemote tm = JFireEjb3Factory.getRemoteBean(TradeManagerRemote.class, SecurityReflector.getInitialContextProperties());
 			Collection<ArticleContainerID> articleContainerIDs = tm.getArticleContainerIDs(queries);
 			return CollectionUtil.castCollection(
 				getJDOObjects(null, articleContainerIDs, fetchGroups, maxFetchDepth, monitor)

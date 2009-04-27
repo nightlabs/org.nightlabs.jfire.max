@@ -4,11 +4,11 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import org.nightlabs.jfire.base.JFireEjbFactory;
+import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.store.RepositoryType;
-import org.nightlabs.jfire.store.StoreManager;
+import org.nightlabs.jfire.store.StoreManagerRemote;
 import org.nightlabs.jfire.store.id.RepositoryTypeID;
 import org.nightlabs.progress.ProgressMonitor;
 
@@ -36,13 +36,13 @@ extends BaseJDOObjectDAO<RepositoryTypeID, RepositoryType>
 	{
 		monitor.beginTask("Loading RepositoryTypes", 1);
 		try {
-			StoreManager sm = JFireEjbFactory.getBean(StoreManager.class, SecurityReflector.getInitialContextProperties());
+			StoreManagerRemote sm = JFireEjb3Factory.getRemoteBean(StoreManagerRemote.class, SecurityReflector.getInitialContextProperties());
 			return sm.getRepositoryTypes(objectIDs, fetchGroups, maxFetchDepth);
-			
+
 		} catch (Exception e) {
 			monitor.setCanceled(true);
 			throw e;
-			
+
 		} finally {
 			monitor.worked(1);
 			monitor.done();
@@ -54,7 +54,7 @@ extends BaseJDOObjectDAO<RepositoryTypeID, RepositoryType>
 			int maxFetchDepth, ProgressMonitor monitor)
 	{
 		try {
-			StoreManager sm = JFireEjbFactory.getBean(StoreManager.class, SecurityReflector.getInitialContextProperties());
+			StoreManagerRemote sm = JFireEjb3Factory.getRemoteBean(StoreManagerRemote.class, SecurityReflector.getInitialContextProperties());
 			Set<RepositoryTypeID> repositoryTypeIDs = sm.getRepositoryTypeIDs();
 			return getJDOObjects(null, repositoryTypeIDs, fetchGroups, maxFetchDepth, monitor);
 		} catch (Exception x) {
@@ -67,7 +67,7 @@ extends BaseJDOObjectDAO<RepositoryTypeID, RepositoryType>
 	{
 		return getJDOObjects(null, repositoryTypeIDs, fetchGroups, maxFetchDepth, monitor);
 	}
-	
+
 	public RepositoryType getRepositoryType(RepositoryTypeID repositoryTypeID, String[] fetchGroups,
 			int maxFetchDepth, ProgressMonitor monitor)
 	{

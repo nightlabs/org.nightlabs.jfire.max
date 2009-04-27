@@ -12,12 +12,12 @@ import javax.jdo.JDOHelper;
 
 import org.nightlabs.jdo.query.AbstractJDOQuery;
 import org.nightlabs.jdo.query.QueryCollection;
-import org.nightlabs.jfire.base.JFireEjbFactory;
+import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.trade.Order;
-import org.nightlabs.jfire.trade.TradeManager;
+import org.nightlabs.jfire.trade.TradeManagerRemote;
 import org.nightlabs.jfire.trade.id.OrderID;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 import org.nightlabs.progress.ProgressMonitor;
@@ -53,11 +53,10 @@ public class OrderDAO extends BaseJDOObjectDAO<OrderID, Order> {
 	 * @see org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO#retrieveJDOObjects(java.util.Set, java.lang.String[], int, org.nightlabs.progress.ProgressMonitor)
 	 */
 	@Override
-	@SuppressWarnings("unchecked")//$NON-NLS-1$
 	protected Collection<Order> retrieveJDOObjects(Set<OrderID> orderIDs,
 			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 			throws Exception {
-		TradeManager tm = JFireEjbFactory.getBean(TradeManager.class, SecurityReflector.getInitialContextProperties());
+		TradeManagerRemote tm = JFireEjb3Factory.getRemoteBean(TradeManagerRemote.class, SecurityReflector.getInitialContextProperties());
 		return tm.getOrders(orderIDs, fetchGroups, maxFetchDepth);
 	}
 
@@ -102,7 +101,7 @@ public class OrderDAO extends BaseJDOObjectDAO<OrderID, Order> {
 			QueryCollection<? extends AbstractJDOQuery> queries,
 			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) {
 		try {
-			TradeManager tm = JFireEjbFactory.getBean(TradeManager.class, SecurityReflector.getInitialContextProperties());
+			TradeManagerRemote tm  = JFireEjb3Factory.getRemoteBean(TradeManagerRemote.class, SecurityReflector.getInitialContextProperties());
 			Set<OrderID> orderIDs = CollectionUtil.castSet(tm.getOrderIDs(queries));
 
 			return getJDOObjects(null, orderIDs, fetchGroups, maxFetchDepth, monitor);
@@ -151,12 +150,11 @@ public class OrderDAO extends BaseJDOObjectDAO<OrderID, Order> {
 	 * @param monitor The monitor to use to report progress.
 	 * @return The {@link Order}s (of the given class) for the given vendor and owner.
 	 */
-	@SuppressWarnings("unchecked")//$NON-NLS-1$
 	public List<Order> getOrders(Class<? extends Order> orderClass, boolean subclasses, AnchorID vendorID, AnchorID customerID,
 			AnchorID endCustomerID, long rangeBeginIdx, long rangeEndIdx,
 			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) {
 		try {
-			TradeManager tm = JFireEjbFactory.getBean(TradeManager.class, SecurityReflector.getInitialContextProperties());
+			TradeManagerRemote tm = JFireEjb3Factory.getRemoteBean(TradeManagerRemote.class, SecurityReflector.getInitialContextProperties());
 			List<OrderID> orderIDList = tm.getOrderIDs(orderClass, subclasses, vendorID, customerID, endCustomerID, rangeBeginIdx, rangeEndIdx);
 			Set<OrderID> orderIDs = new HashSet<OrderID>(orderIDList);
 

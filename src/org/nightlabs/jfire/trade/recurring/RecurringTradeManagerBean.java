@@ -31,10 +31,16 @@ import java.rmi.RemoteException;
 import java.util.List;
 import java.util.Set;
 
+import javax.annotation.security.RolesAllowed;
 import javax.ejb.CreateException;
 import javax.ejb.EJBException;
 import javax.ejb.SessionBean;
 import javax.ejb.SessionContext;
+import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
+import javax.ejb.TransactionManagement;
+import javax.ejb.TransactionManagementType;
 import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
@@ -76,9 +82,12 @@ import org.nightlabs.version.MalformedVersionException;
  * @ejb.util generate="physical"
  * @ejb.transaction type="Required"
  */
-public abstract class RecurringTradeManagerBean
+@TransactionAttribute(TransactionAttributeType.REQUIRED)
+@TransactionManagement(TransactionManagementType.CONTAINER)
+@Stateless
+public class RecurringTradeManagerBean
 extends BaseSessionBeanImpl
-implements SessionBean
+implements RecurringTradeManagerRemote, RecurringTradeManagerLocal
 {
 	private static final long serialVersionUID = 1L;
 	/**
@@ -88,52 +97,21 @@ implements SessionBean
 
 	private static final String RECURRING_OFFER_PROCESS_DEFINITION_NAME_VENDOR = "RecurringOffer.Vendor";
 
-	////////////////////// EJB "constuctor" ////////////////////////////
-
-	/**
-	 * @ejb.create-method
-	 * @ejb.permission role-name="_Guest_"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.trade.recurring.RecurringTradeManagerRemote#ping(java.lang.String)
 	 */
-	public void ejbCreate()
-	throws CreateException
-	{
-		logger.debug(this.getClass().getName() + ".ejbCreate()");
-	}
-
-	/**
-	 * {@inheritDoc}
-	 *
-	 * @ejb.permission unchecked="true"
-	 */
-	public void ejbRemove() throws EJBException, RemoteException
-	{
-		logger.debug(this.getClass().getName() + ".ejbRemove()");
-	}
-
-	/**
-	 * @ejb.interface-method
-	 * @ejb.transaction type="Supports"
-	 * @ejb.permission role-name="_Guest_"
-	 */
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	@RolesAllowed("_Guest_")
 	@Override
 	public String ping(String message) {
 		return super.ping(message);
 	}
 
-	// //// begin EJB stuff ////
-	@Override
-	public void setSessionContext(SessionContext ctx)
-	throws EJBException, RemoteException
-	{
-		super.setSessionContext(ctx);
-	}
-	// //// end EJB stuff ////
-
-	/**
-	 * @ejb.interface-method
-	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="_System_"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.trade.recurring.RecurringTradeManagerRemote#initialise()
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("_System_")
 	public void initialise()
 	throws IOException, MalformedVersionException
 	{
@@ -178,14 +156,10 @@ implements SessionBean
 		}
 	}
 
-	/**
-	 * This is the EJB method called by the {@link Task} of a {@link RecurringOfferConfiguration}
-	 * in order to process its associated {@link RecurringOffer}.
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission unchecked="true" @! permissions are checked in the RecurringTrader.processRecurringOffer method.
-	 * @ejb.transaction type="Required"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.trade.recurring.RecurringTradeManagerRemote#processRecurringOfferTimed(org.nightlabs.jfire.timer.id.TaskID)
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public void processRecurringOfferTimed(TaskID taskID)
 	throws Exception
 	{
@@ -261,19 +235,11 @@ implements SessionBean
 
 
 
-	/**
-	 * Creates a new Sale Recurring order. This method is intended to be called by a user (not another
-	 * organisation).
-	 *
-	 * @param customerID An <tt>Order</tt> is defined between a vendor (this <tt>Organisation</tt>) and a customer. This ID defines the customer.
-	 * @param currencyID What <tt>Currency</tt> to use for the new <tt>Order</tt>.
-	 * @param segmentTypeIDs May be <tt>null</tt>. If it is not <tt>null</tt>, a {@link Segment} will be created for each defined {@link SegmentType}. For each <tt>null</tt> entry within the array, a <tt>Segment</tt> with the {@link SegmentType#DEFAULT_SEGMENT_TYPE_ID} will be created.
-	 * @param fetchGroups What fields should be detached.
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="org.nightlabs.jfire.trade.editOrder"
-	 * @ejb.transaction type="Required"
-	 **/
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.trade.recurring.RecurringTradeManagerRemote#createSaleRecurringOrder(org.nightlabs.jfire.transfer.id.AnchorID, java.lang.String, org.nightlabs.jfire.accounting.id.CurrencyID, org.nightlabs.jfire.trade.id.SegmentTypeID[], java.lang.String[], int)
+	 */
+@TransactionAttribute(TransactionAttributeType.REQUIRED)
+@RolesAllowed("org.nightlabs.jfire.trade.editOrder")
 	public RecurringOrder createSaleRecurringOrder(
 			AnchorID customerID, String orderIDPrefix, CurrencyID currencyID,
 			SegmentTypeID[] segmentTypeIDs, String[] fetchGroups, int maxFetchDepth)
@@ -316,16 +282,11 @@ implements SessionBean
 	}
 
 
-	/**
-	 * Creates a new {@link RecurringOffer} within a given {@link RecurringOrder}.
-	 *
-	 * @param orderID The orderID defining the Order in which to create a new Offer.
-	 * @throws ModuleException
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="org.nightlabs.jfire.trade.editOffer"
-	 * @ejb.transaction type="Required"
-	 **/
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.trade.recurring.RecurringTradeManagerRemote#createRecurringOffer(org.nightlabs.jfire.trade.id.OrderID, java.lang.String, java.lang.String[], int)
+	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("org.nightlabs.jfire.trade.editOffer")
 	public RecurringOffer createRecurringOffer(OrderID orderID, String offerIDPrefix, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
@@ -352,13 +313,11 @@ implements SessionBean
 		}
 	}
 
-	/**
-	 * Stores the given {@link RecurringOfferConfiguration}.
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="org.nightlabs.jfire.trade.editOffer"
-	 * @ejb.transaction type="Required"
-	 **/
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.trade.recurring.RecurringTradeManagerRemote#storeRecurringOfferConfiguration(org.nightlabs.jfire.trade.recurring.RecurringOfferConfiguration, boolean, java.lang.String[], int)
+	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("org.nightlabs.jfire.trade.editOffer")
 	public RecurringOfferConfiguration storeRecurringOfferConfiguration(RecurringOfferConfiguration configuration, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -371,11 +330,10 @@ implements SessionBean
 		}
 	}
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="org.nightlabs.jfire.trade.queryOrders"
-	 * @!ejb.transaction type="Supports"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.trade.recurring.RecurringTradeManagerRemote#getRecurringOrders(java.util.Set, java.lang.String[], int)
 	 */
+	@RolesAllowed("org.nightlabs.jfire.trade.queryOrders")
 	public List<RecurringOrder> getRecurringOrders(Set<OrderID> orderIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -386,11 +344,10 @@ implements SessionBean
 		}
 	}
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="org.nightlabs.jfire.trade.queryOffers"
-	 * @!ejb.transaction type="Supports"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.trade.recurring.RecurringTradeManagerRemote#getRecurringOffers(java.util.Set, java.lang.String[], int)
 	 */
+	@RolesAllowed("org.nightlabs.jfire.trade.queryOffers")
 	public List<RecurringOffer> getRecurringOffers(Set<OfferID> offerIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();

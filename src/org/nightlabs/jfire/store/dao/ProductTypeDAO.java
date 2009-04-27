@@ -35,12 +35,13 @@ import java.util.Set;
 import javax.jdo.FetchPlan;
 
 import org.nightlabs.jdo.query.QueryCollection;
-import org.nightlabs.jfire.base.JFireEjbFactory;
+import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.store.ProductType;
-import org.nightlabs.jfire.store.StoreManager;
+import org.nightlabs.jfire.store.StoreManagerRemote;
 import org.nightlabs.jfire.store.id.ProductTypeID;
+import org.nightlabs.jfire.store.search.AbstractProductTypeQuery;
 import org.nightlabs.progress.ProgressMonitor;
 
 /**
@@ -48,7 +49,7 @@ import org.nightlabs.progress.ProgressMonitor;
  *
  */
 public class ProductTypeDAO
-extends BaseJDOObjectDAO<ProductTypeID, ProductType> 
+extends BaseJDOObjectDAO<ProductTypeID, ProductType>
 {
 	protected ProductTypeDAO() {
 	}
@@ -57,9 +58,9 @@ extends BaseJDOObjectDAO<ProductTypeID, ProductType>
 	 * The static singleton instance member.
 	 */
 	private static ProductTypeDAO sharedInstance;
-	
-	private StoreManager storeManager;
-	
+
+	private StoreManagerRemote storeManager;
+
 	/**
 	 * Returns the static singleton (shared instance) of {@link ProductTypeDAO}.
 	 * @return the static singleton (shared instance)
@@ -69,7 +70,7 @@ extends BaseJDOObjectDAO<ProductTypeID, ProductType>
 			sharedInstance = new ProductTypeDAO();
 		return sharedInstance;
 	}
-	
+
 	/**
 	 * This method returns a new instance of <tt>Set</tt> with those
 	 * fetch groups that should always be used as a minimum.
@@ -116,9 +117,9 @@ extends BaseJDOObjectDAO<ProductTypeID, ProductType>
 	throws Exception
 	{
 		progressMonitor.beginTask("Loading ProductTypes", 200);
-		StoreManager sm = storeManager;
+		StoreManagerRemote sm = storeManager;
 		if (sm == null)
-			sm = JFireEjbFactory.getBean(StoreManager.class, SecurityReflector.getInitialContextProperties());
+			sm = JFireEjb3Factory.getRemoteBean(StoreManagerRemote.class, SecurityReflector.getInitialContextProperties());
 
 		progressMonitor.worked(100);
 		Collection<ProductType> productTypes = sm.getProductTypes(objectIDs, fetchGroups, maxFetchDepth);
@@ -129,12 +130,13 @@ extends BaseJDOObjectDAO<ProductTypeID, ProductType>
 
 	//Optimized method that returns the ProductTypes using the QueryCollection
 	//and retrieving the Products Id
-	public synchronized List<ProductType> getProductTypes(QueryCollection<?> queryCollection, String[] fetchGroups,
+	public synchronized List<ProductType> getProductTypes(QueryCollection<?> queryCollection, String[] fetchGroups, // TODO correct type for QueryCollection!
 	int maxFetchDepth, ProgressMonitor progressMonitor) throws Exception
 	{
-		storeManager = JFireEjbFactory.getBean(StoreManager.class, SecurityReflector.getInitialContextProperties());
-		try {	
-			Set<ProductTypeID> productTypeIDs = storeManager.getProductTypeIDs(queryCollection);
+		storeManager = JFireEjb3Factory.getRemoteBean(StoreManagerRemote.class, SecurityReflector.getInitialContextProperties());
+		try {
+			QueryCollection<? extends AbstractProductTypeQuery> productTypeQueries = (QueryCollection<? extends AbstractProductTypeQuery>) queryCollection;
+			Set<ProductTypeID> productTypeIDs = storeManager.getProductTypeIDs(productTypeQueries);
 			return getJDOObjects(null, productTypeIDs, fetchGroups, maxFetchDepth, progressMonitor);
 		} finally {
 			storeManager = null;
@@ -155,9 +157,9 @@ extends BaseJDOObjectDAO<ProductTypeID, ProductType>
 	{
 		return getJDOObjects(null, productTypeIDs, fetchGroups, maxFetchDepth, progressMonitor);
 	}
-	
+
 	/**
-	 * Returns a List of child {@link ProductType}s for the given {@link ProductTypeID}. 
+	 * Returns a List of child {@link ProductType}s for the given {@link ProductTypeID}.
 	 * @param parentProductTypeID the {@link ProductTypeID} of the parent {@link ProductType} to get the children for.
 	 * @param fetchGroups the fetchGroups which control which fields should be detached.
 	 * @param maxFetchDepth the maximum fetch depth of the detached object graph.
@@ -168,7 +170,7 @@ extends BaseJDOObjectDAO<ProductTypeID, ProductType>
 			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
 		try {
-			storeManager = JFireEjbFactory.getBean(StoreManager.class, SecurityReflector.getInitialContextProperties());
+			storeManager = JFireEjb3Factory.getRemoteBean(StoreManagerRemote.class, SecurityReflector.getInitialContextProperties());
 			try {
 				Collection<ProductTypeID> productTypeIDs = storeManager.getChildProductTypeIDs(parentProductTypeID);
 				return getJDOObjects(null, productTypeIDs, fetchGroups, maxFetchDepth, monitor);

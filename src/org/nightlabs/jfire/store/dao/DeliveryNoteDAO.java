@@ -12,11 +12,11 @@ import javax.jdo.JDOHelper;
 
 import org.nightlabs.jdo.query.AbstractJDOQuery;
 import org.nightlabs.jdo.query.QueryCollection;
-import org.nightlabs.jfire.base.JFireEjbFactory;
+import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.store.DeliveryNote;
-import org.nightlabs.jfire.store.StoreManager;
+import org.nightlabs.jfire.store.StoreManagerRemote;
 import org.nightlabs.jfire.store.id.DeliveryNoteID;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 import org.nightlabs.progress.ProgressMonitor;
@@ -37,7 +37,7 @@ public class DeliveryNoteDAO extends BaseJDOObjectDAO<DeliveryNoteID, DeliveryNo
 	protected Collection<DeliveryNote> retrieveJDOObjects(
 			Set<DeliveryNoteID> deliveryNoteIDs, String[] fetchGroups,
 			int maxFetchDepth, ProgressMonitor monitor) throws Exception {
-		StoreManager sm = JFireEjbFactory.getBean(StoreManager.class, SecurityReflector.getInitialContextProperties());
+		StoreManagerRemote sm = JFireEjb3Factory.getRemoteBean(StoreManagerRemote.class, SecurityReflector.getInitialContextProperties());
 		return CollectionUtil.castCollection(sm.getDeliveryNotes(deliveryNoteIDs, fetchGroups, maxFetchDepth));
 	}
 
@@ -56,7 +56,7 @@ public class DeliveryNoteDAO extends BaseJDOObjectDAO<DeliveryNoteID, DeliveryNo
 			AnchorID customerID, AnchorID endCustomerID, long rangeBeginIdx, long rangeEndIdx,
 			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) {
 		try {
-			StoreManager sm = JFireEjbFactory.getBean(StoreManager.class, SecurityReflector.getInitialContextProperties());
+			StoreManagerRemote sm = JFireEjb3Factory.getRemoteBean(StoreManagerRemote.class, SecurityReflector.getInitialContextProperties());
 			List<DeliveryNoteID> deliveryNoteIDList = CollectionUtil.castList(
 					sm.getDeliveryNoteIDs(vendorID, customerID, endCustomerID, rangeBeginIdx, rangeEndIdx)
 			);
@@ -86,7 +86,7 @@ public class DeliveryNoteDAO extends BaseJDOObjectDAO<DeliveryNoteID, DeliveryNo
 			QueryCollection<? extends AbstractJDOQuery> queries,
 			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) {
 		try {
-			StoreManager sm = JFireEjbFactory.getBean(StoreManager.class, SecurityReflector.getInitialContextProperties());
+			StoreManagerRemote sm = JFireEjb3Factory.getRemoteBean(StoreManagerRemote.class, SecurityReflector.getInitialContextProperties());
 			Set<DeliveryNoteID> deliveryNoteIDs = CollectionUtil.castSet(sm.getDeliveryNoteIDs(queries));
 
 			return getJDOObjects(null, deliveryNoteIDs, fetchGroups, maxFetchDepth, monitor);

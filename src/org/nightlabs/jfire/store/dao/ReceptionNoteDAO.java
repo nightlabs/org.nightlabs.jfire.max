@@ -5,11 +5,11 @@ import java.util.Set;
 
 import org.nightlabs.jdo.query.AbstractJDOQuery;
 import org.nightlabs.jdo.query.QueryCollection;
-import org.nightlabs.jfire.base.JFireEjbFactory;
+import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.store.ReceptionNote;
-import org.nightlabs.jfire.store.StoreManager;
+import org.nightlabs.jfire.store.StoreManagerRemote;
 import org.nightlabs.jfire.store.id.ReceptionNoteID;
 import org.nightlabs.progress.ProgressMonitor;
 
@@ -39,7 +39,7 @@ extends BaseJDOObjectDAO<ReceptionNoteID, ReceptionNote>
 			int maxFetchDepth, ProgressMonitor monitor)
 	throws Exception
 	{
-		StoreManager sm = JFireEjbFactory.getBean(StoreManager.class, SecurityReflector.getInitialContextProperties());
+		StoreManagerRemote sm = JFireEjb3Factory.getRemoteBean(StoreManagerRemote.class, SecurityReflector.getInitialContextProperties());
 		return sm.getReceptionNotes(objectIDs, fetchGroups, maxFetchDepth);
 	}
 
@@ -56,7 +56,7 @@ extends BaseJDOObjectDAO<ReceptionNoteID, ReceptionNote>
 	{
 		try
 		{
-			StoreManager sm = JFireEjbFactory.getBean(StoreManager.class, SecurityReflector.getInitialContextProperties());
+			StoreManagerRemote sm = JFireEjb3Factory.getRemoteBean(StoreManagerRemote.class, SecurityReflector.getInitialContextProperties());
 			Set<ReceptionNoteID> receptionNoteIDs = sm.getReceptionNoteIDs(queries);
 			return getJDOObjects(null, receptionNoteIDs, fetchGroups, maxFetchDepth, monitor);
 		}

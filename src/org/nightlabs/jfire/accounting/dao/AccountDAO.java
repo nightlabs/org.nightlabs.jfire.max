@@ -7,9 +7,9 @@ import java.util.Set;
 import org.nightlabs.jdo.query.QueryCollection;
 import org.nightlabs.jfire.accounting.Account;
 import org.nightlabs.jfire.accounting.AccountSearchFilter;
-import org.nightlabs.jfire.accounting.AccountingManager;
+import org.nightlabs.jfire.accounting.AccountingManagerRemote;
 import org.nightlabs.jfire.accounting.query.AccountQuery;
-import org.nightlabs.jfire.base.JFireEjbFactory;
+import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.base.jdo.cache.Cache;
 import org.nightlabs.jfire.security.SecurityReflector;
@@ -33,14 +33,13 @@ extends BaseJDOObjectDAO<AnchorID, Account>
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	protected Collection<Account> retrieveJDOObjects(Set<AnchorID> objectIDs, String[] fetchGroups,
 			int maxFetchDepth, ProgressMonitor monitor)
 			throws Exception
 	{
 		monitor.beginTask("Loading Accounts", 1);
 		try {
-			AccountingManager am = JFireEjbFactory.getBean(AccountingManager.class, SecurityReflector.getInitialContextProperties());
+			AccountingManagerRemote am = JFireEjb3Factory.getRemoteBean(AccountingManagerRemote.class, SecurityReflector.getInitialContextProperties());
 			return am.getAccounts(objectIDs, fetchGroups, maxFetchDepth);
 
 		} catch (Exception e) {
@@ -53,12 +52,11 @@ extends BaseJDOObjectDAO<AnchorID, Account>
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<Account> getAccounts(AccountSearchFilter accountSearchFilter, String[] fetchGroups,
 			int maxFetchDepth, ProgressMonitor monitor)
 	{
 		try {
-			AccountingManager am = JFireEjbFactory.getBean(AccountingManager.class, SecurityReflector.getInitialContextProperties());
+			AccountingManagerRemote am = JFireEjb3Factory.getRemoteBean(AccountingManagerRemote.class, SecurityReflector.getInitialContextProperties());
 			Set<AnchorID> accountIDs = am.getAccountIDs(accountSearchFilter);
 			return getJDOObjects(null, accountIDs, fetchGroups, maxFetchDepth, monitor);
 		} catch (Exception x) {
@@ -66,13 +64,12 @@ extends BaseJDOObjectDAO<AnchorID, Account>
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<Account> getAccountsForQueries(
 		QueryCollection<? extends AccountQuery> queries,	String[] fetchGroups,
 		int maxFetchDepth, ProgressMonitor monitor)
 	{
 		try {
-			AccountingManager am = JFireEjbFactory.getBean(AccountingManager.class, SecurityReflector.getInitialContextProperties());
+			AccountingManagerRemote am = JFireEjb3Factory.getRemoteBean(AccountingManagerRemote.class, SecurityReflector.getInitialContextProperties());
 			Set<AnchorID> accountIDs = am.getAccountIDs(queries);
 			return getJDOObjects(null, accountIDs, fetchGroups, maxFetchDepth, monitor);
 		} catch (Exception x) {
@@ -97,7 +94,7 @@ extends BaseJDOObjectDAO<AnchorID, Account>
 	{
 		monitor.beginTask("Save Account", 1);
 		try {
-			AccountingManager am = JFireEjbFactory.getBean(AccountingManager.class, SecurityReflector.getInitialContextProperties());
+			AccountingManagerRemote am = JFireEjb3Factory.getRemoteBean(AccountingManagerRemote.class, SecurityReflector.getInitialContextProperties());
 			account = am.storeAccount(account, get, fetchGroups, maxFetchDepth);
 			if (account != null)
 				Cache.sharedInstance().put(null, account, fetchGroups, maxFetchDepth);

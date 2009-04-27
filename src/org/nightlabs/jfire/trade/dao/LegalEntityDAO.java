@@ -33,7 +33,7 @@ import javax.jdo.FetchPlan;
 import javax.jdo.JDODetachedFieldAccessException;
 
 import org.nightlabs.jdo.NLJDOHelper;
-import org.nightlabs.jfire.base.JFireEjbFactory;
+import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.base.jdo.IJDOObjectDAO;
 import org.nightlabs.jfire.person.Person;
@@ -43,7 +43,7 @@ import org.nightlabs.jfire.prop.dao.StructLocalDAO;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.trade.OrganisationLegalEntity;
-import org.nightlabs.jfire.trade.TradeManager;
+import org.nightlabs.jfire.trade.TradeManagerRemote;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 import org.nightlabs.progress.NullProgressMonitor;
 import org.nightlabs.progress.ProgressMonitor;
@@ -104,7 +104,7 @@ implements IJDOObjectDAO<LegalEntity>
 	protected Collection<LegalEntity> retrieveJDOObjects(
 			Set<AnchorID> objectIDs, String[] fetchGroups, int maxFetchDepth,
 			ProgressMonitor monitor) throws Exception {
-		TradeManager tradeManager = JFireEjbFactory.getBean(TradeManager.class, SecurityReflector.getInitialContextProperties());
+		TradeManagerRemote tradeManager = JFireEjb3Factory.getRemoteBean(TradeManagerRemote.class, SecurityReflector.getInitialContextProperties());
 		Collection<LegalEntity> legalEntities = tradeManager.getLegalEntities(objectIDs, fetchGroups, maxFetchDepth);
 
 //		IStruct struct = StructLocalDAO.sharedInstance().getStructLocal(
@@ -229,7 +229,7 @@ implements IJDOObjectDAO<LegalEntity>
 	public LegalEntity storeJDOObject(LegalEntity jdoObject, boolean get,
 			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) {
 		try {
-			TradeManager tradeManager = JFireEjbFactory.getBean(TradeManager.class, SecurityReflector.getInitialContextProperties());
+			TradeManagerRemote tradeManager = JFireEjb3Factory.getRemoteBean(TradeManagerRemote.class, SecurityReflector.getInitialContextProperties());
 			LegalEntity le = tradeManager.storeLegalEntity(jdoObject, get, fetchGroups, maxFetchDepth);
 			if (le != null)
 				getCache().put(null, le, fetchGroups, maxFetchDepth);
@@ -263,7 +263,7 @@ implements IJDOObjectDAO<LegalEntity>
 			if (le != null)
 				return le;
 
-			TradeManager tradeManager = JFireEjbFactory.getBean(TradeManager.class, SecurityReflector.getInitialContextProperties());
+			TradeManagerRemote tradeManager = JFireEjb3Factory.getRemoteBean(TradeManagerRemote.class, SecurityReflector.getInitialContextProperties());
 			le = tradeManager.getOrganisationLegalEntity(organisationID, throwExceptionIfNotExistent, fetchGroups, maxFetchDepth);
 			if (le != null) {
 				getCache().put(null, objectID, le, fetchGroups, maxFetchDepth);

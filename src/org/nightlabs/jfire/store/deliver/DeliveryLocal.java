@@ -11,7 +11,7 @@ import java.util.Set;
  *
  * @jdo.persistence-capable
  *		identity-type="application"
- *		objectid-class="org.nightlabs.jfire.store.deliver.DeliveryLocalID"
+ *		objectid-class="org.nightlabs.jfire.store.deliver.id.DeliveryLocalID"
  *		detachable="true"
  *		table="JFireTrade_DeliveryLocal"
  *
@@ -20,9 +20,9 @@ import java.util.Set;
  * @jdo.create-objectid-class field-order="organisationID, deliveryID"
  */
 public class DeliveryLocal implements Serializable {
-	
+
 	private static final long serialVersionUID = 1L;
-	
+
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
@@ -32,7 +32,7 @@ public class DeliveryLocal implements Serializable {
 	 * @jdo.field primary-key="true"
 	 */
 	private long deliveryID;
-	
+
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
@@ -49,12 +49,12 @@ public class DeliveryLocal implements Serializable {
 	 * @jdo.join
 	 */
 	private Set<DeliveryActionHandler> deliveryActionHandlers = new HashSet<DeliveryActionHandler>();
-	
+
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
 	private transient Set<DeliveryActionHandler> _deliveryActionHandlers;
-	
+
 	public DeliveryLocal(Delivery delivery) {
 		super();
 		this.organisationID = delivery.getOrganisationID();
@@ -70,7 +70,7 @@ public class DeliveryLocal implements Serializable {
 	public void addDeliveryActionHandler(DeliveryActionHandler deliveryActionHandler) {
 		deliveryActionHandlers.add(deliveryActionHandler);
 	}
-	
+
 	/**
 	 * Removes a {@link DeliveryActionHandler} from this delivery.
 	 * @param deliveryActionHandler The {@link DeliveryActionHandler} to be removed.
@@ -78,7 +78,7 @@ public class DeliveryLocal implements Serializable {
 	public void removeDeliveryActionHandler(DeliveryActionHandler deliveryActionHandler) {
 		deliveryActionHandlers.remove(deliveryActionHandler);
 	}
-	
+
 	/**
 	 * Returns the set of {@link DeliveryActionHandler}s associated with this delivery.
 	 * @return The set of {@link DeliveryActionHandler}s associated with this delivery.
@@ -86,7 +86,7 @@ public class DeliveryLocal implements Serializable {
 	public Set<DeliveryActionHandler> getDeliveryActionHandlers() {
 		if (_deliveryActionHandlers == null)
 			_deliveryActionHandlers = Collections.unmodifiableSet(deliveryActionHandlers);
-		
+
 		return _deliveryActionHandlers;
 	}
 }

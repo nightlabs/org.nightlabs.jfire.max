@@ -4,11 +4,11 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import org.nightlabs.jfire.accounting.AccountingManager;
+import org.nightlabs.jfire.accounting.AccountingManagerRemote;
 import org.nightlabs.jfire.accounting.TariffMapping;
 import org.nightlabs.jfire.accounting.id.TariffID;
 import org.nightlabs.jfire.accounting.id.TariffMappingID;
-import org.nightlabs.jfire.base.JFireEjbFactory;
+import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.base.jdo.cache.Cache;
 import org.nightlabs.jfire.security.SecurityReflector;
@@ -29,27 +29,25 @@ public class TariffMappingDAO
 
 	protected TariffMappingDAO() { }
 
-	@SuppressWarnings("unchecked")
 	@Override
 	protected Collection<TariffMapping> retrieveJDOObjects(
 			Set<TariffMappingID> tariffMappingIDs, String[] fetchGroups, int maxFetchDepth,
 			ProgressMonitor monitor)
 			throws Exception
 	{
-		AccountingManager am = accountingManager;
+		AccountingManagerRemote am = accountingManager;
 		if (am == null)
-			am = JFireEjbFactory.getBean(AccountingManager.class, SecurityReflector.getInitialContextProperties());
+			am = JFireEjb3Factory.getRemoteBean(AccountingManagerRemote.class, SecurityReflector.getInitialContextProperties());
 
 		return am.getTariffMappings(tariffMappingIDs, fetchGroups, maxFetchDepth);
 	}
 
-	private AccountingManager accountingManager;
+	private AccountingManagerRemote accountingManager;
 
-	@SuppressWarnings("unchecked")
 	public synchronized List<TariffMapping> getTariffMappings(String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
 		try {
-			accountingManager = JFireEjbFactory.getBean(AccountingManager.class, SecurityReflector.getInitialContextProperties());
+			accountingManager = JFireEjb3Factory.getRemoteBean(AccountingManagerRemote.class, SecurityReflector.getInitialContextProperties());
 			try {
 				Set<TariffMappingID> tariffMappingIDs = accountingManager.getTariffMappingIDs();
 				return getJDOObjects(null, tariffMappingIDs, fetchGroups, maxFetchDepth, monitor);
@@ -69,7 +67,7 @@ public class TariffMappingDAO
 	public TariffMapping createTariffMapping(TariffID localTariffID, TariffID partnerTariffID, boolean get, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
 		try {
-			AccountingManager am = JFireEjbFactory.getBean(AccountingManager.class, SecurityReflector.getInitialContextProperties());
+			AccountingManagerRemote am = JFireEjb3Factory.getRemoteBean(AccountingManagerRemote.class, SecurityReflector.getInitialContextProperties());
 			TariffMapping tm = am.createTariffMapping(localTariffID, partnerTariffID, get, fetchGroups, maxFetchDepth);
 
 			if (tm != null)

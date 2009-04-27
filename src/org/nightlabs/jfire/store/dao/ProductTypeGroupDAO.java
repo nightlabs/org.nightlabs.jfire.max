@@ -13,14 +13,14 @@ import javax.jdo.JDOHelper;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.jdo.query.QueryCollection;
-import org.nightlabs.jfire.base.JFireEjbFactory;
+import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.ProductTypeGroup;
 import org.nightlabs.jfire.store.ProductTypeGroupIDSearchResult;
 import org.nightlabs.jfire.store.ProductTypeGroupSearchResult;
-import org.nightlabs.jfire.store.StoreManager;
+import org.nightlabs.jfire.store.StoreManagerRemote;
 import org.nightlabs.jfire.store.id.ProductTypeGroupID;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.store.search.AbstractProductTypeQuery;
@@ -60,7 +60,7 @@ extends BaseJDOObjectDAO<ProductTypeGroupID, ProductTypeGroup>
 	{
 		monitor.beginTask("Loading ProductTypeGroups", 1);
 		try {
-			StoreManager sm = JFireEjbFactory.getBean(StoreManager.class, SecurityReflector.getInitialContextProperties());
+			StoreManagerRemote sm = JFireEjb3Factory.getRemoteBean(StoreManagerRemote.class, SecurityReflector.getInitialContextProperties());
 			return sm.getProductTypeGroups(productTypeGroupIDs, fetchGroups, maxFetchDepth);
 		} catch (Exception e) {
 			monitor.setCanceled(true);
@@ -115,7 +115,7 @@ extends BaseJDOObjectDAO<ProductTypeGroupID, ProductTypeGroup>
 //			String[] fetchGroups, int maxFetchDepth, ProgressMonitor progressMonitor)throws Exception
 //	{
 //		progressMonitor.beginTask("Load ProductTypeGroups", 100);
-//		StoreManager storeManager = JFireEjbFactory.getBean(StoreManager.class, SecurityReflector.getInitialContextProperties());
+//		StoreManagerRemote = JFireEjb3Factory.getRemoteBean(StoreManagerRemote.class, SecurityReflector.getInitialContextProperties());
 //		try {
 //			Set<ProductTypeGroupID> productTypeGroupIDs = storeManager.getProductTypeGroupIDs(queryCollection);
 //			progressMonitor.worked(50);
@@ -142,7 +142,7 @@ extends BaseJDOObjectDAO<ProductTypeGroupID, ProductTypeGroup>
 //			String[] fetchGroups, int maxFetchDepth, ProgressMonitor progressMonitor)throws Exception
 //	{
 //		progressMonitor.beginTask("Load ProductTypeGroups", 100);
-//		StoreManager storeManager = JFireEjbFactory.getBean(StoreManager.class, SecurityReflector.getInitialContextProperties());
+//		StoreManagerRemote = JFireEjb3Factory.getRemoteBean(StoreManagerRemote.class, SecurityReflector.getInitialContextProperties());
 //		try {
 //			progressMonitor.worked(50);
 //			ProductTypeGroupIDSearchResult result = storeManager.getProductTypeGroupSearchResult(queryCollection, fetchGroups, maxFetchDepth);
@@ -154,7 +154,7 @@ extends BaseJDOObjectDAO<ProductTypeGroupID, ProductTypeGroup>
 //		}
 //	}
 
-	private StoreManager storeManager = null;
+	private StoreManagerRemote storeManager = null;
 
 //	/**
 //	 * Returns a {@link ProductTypeGroupSearchResult} which contains all {@link ProductTypeGroup}s
@@ -184,7 +184,7 @@ extends BaseJDOObjectDAO<ProductTypeGroupID, ProductTypeGroup>
 //			Map<ProductTypeGroupID, ProductTypeGroup> productTypeGroupID2ProductTypeGroup = new HashMap<ProductTypeGroupID, ProductTypeGroup>();
 //			synchronized (this) {
 //				try {
-//					storeManager = JFireEjbFactory.getBean(StoreManager.class, SecurityReflector.getInitialContextProperties());
+//					storeManager = JFireEjb3Factory.getBean(StoreManager.class, SecurityReflector.getInitialContextProperties());
 //					resultIDs = storeManager.getProductTypeGroupSearchResult(queryCollection);
 //					progressMonitor.worked(50);
 //					Set<ProductTypeGroupID> productTypeGroupIDs = resultIDs.getProductTypesGroupIDs();
@@ -245,7 +245,7 @@ extends BaseJDOObjectDAO<ProductTypeGroupID, ProductTypeGroup>
 			Map<ProductTypeGroupID, ProductTypeGroup> productTypeGroupID2ProductTypeGroup = new HashMap<ProductTypeGroupID, ProductTypeGroup>();
 			synchronized (this) {
 				try {
-					storeManager = JFireEjbFactory.getBean(StoreManager.class, SecurityReflector.getInitialContextProperties());
+					storeManager = JFireEjb3Factory.getRemoteBean(StoreManagerRemote.class, SecurityReflector.getInitialContextProperties());
 					resultIDs = storeManager.getProductTypeGroupIDSearchResultForProductTypeQueries(queryCollection);
 					progressMonitor.worked(50);
 					Set<ProductTypeGroupID> productTypeGroupIDs = resultIDs.getProductTypesGroupIDs();

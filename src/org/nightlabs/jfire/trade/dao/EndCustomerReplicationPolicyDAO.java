@@ -1,14 +1,13 @@
 package org.nightlabs.jfire.trade.dao;
 
-import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import org.nightlabs.jfire.base.JFireEjbFactory;
+import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.security.SecurityReflector;
-import org.nightlabs.jfire.trade.TradeManager;
+import org.nightlabs.jfire.trade.TradeManagerRemote;
 import org.nightlabs.jfire.trade.endcustomer.EndCustomerReplicationPolicy;
 import org.nightlabs.jfire.trade.endcustomer.id.EndCustomerReplicationPolicyID;
 import org.nightlabs.progress.ProgressMonitor;
@@ -35,9 +34,9 @@ extends BaseJDOObjectDAO<EndCustomerReplicationPolicyID, EndCustomerReplicationP
 			Set<EndCustomerReplicationPolicyID> endCustomerReplicationPolicyIDs, String[] fetchGroups,
 			int maxFetchDepth, ProgressMonitor monitor) throws Exception
 	{
-		TradeManager tm = tradeManager;
+		TradeManagerRemote tm = tradeManager;
 		if (tm == null)
-			tm = JFireEjbFactory.getBean(TradeManager.class, SecurityReflector.getInitialContextProperties());
+			tm = JFireEjb3Factory.getRemoteBean(TradeManagerRemote.class, SecurityReflector.getInitialContextProperties());
 
 		return CollectionUtil.castCollection(
 				tm.getEndCustomerReplicationPolicies(endCustomerReplicationPolicyIDs, fetchGroups, maxFetchDepth)
@@ -60,20 +59,18 @@ extends BaseJDOObjectDAO<EndCustomerReplicationPolicyID, EndCustomerReplicationP
 		return getJDOObjects(null, endCustomerReplicationPolicyIDs, fetchGroups, maxFetchDepth, monitor);
 	}
 
-	private TradeManager tradeManager = null;
+	private TradeManagerRemote tradeManager = null;
 
 	public synchronized List<EndCustomerReplicationPolicy> getEndCustomerReplicationPolicies(
 			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor
 	)
 	{
-		tradeManager = JFireEjbFactory.getBean(TradeManager.class, SecurityReflector.getInitialContextProperties());
+		tradeManager = JFireEjb3Factory.getRemoteBean(TradeManagerRemote.class, SecurityReflector.getInitialContextProperties());
 		try {
 			Collection<EndCustomerReplicationPolicyID> endCustomerReplicationPolicyIDs = CollectionUtil.castCollection(
 					tradeManager.getEndCustomerReplicationPolicyIDs()
 			);
 			return getJDOObjects(null, endCustomerReplicationPolicyIDs, fetchGroups, maxFetchDepth, monitor);
-		} catch (RemoteException e) {
-			throw new RuntimeException(e);
 		} finally {
 			tradeManager = null;
 		}

@@ -4,16 +4,16 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import org.nightlabs.jfire.base.JFireEjbFactory;
+import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.security.SecurityReflector;
-import org.nightlabs.jfire.store.StoreManager;
+import org.nightlabs.jfire.store.StoreManagerRemote;
 import org.nightlabs.jfire.store.deliver.ModeOfDelivery;
 import org.nightlabs.jfire.store.deliver.id.ModeOfDeliveryID;
 import org.nightlabs.progress.ProgressMonitor;
 
 /**
- * 
+ *
  * @author Alexander Bieber
  * @version $Revision$, $Date$
  */
@@ -30,32 +30,30 @@ public class ModeOfDeliveryDAO
 		return sharedInstance;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	protected Collection<ModeOfDelivery> retrieveJDOObjects(
 			Set<ModeOfDeliveryID> ModeOfDeliveryIDs, String[] fetchGroups, int maxFetchDepth,
 			ProgressMonitor monitor)
 			throws Exception
 	{
-		StoreManager am = accountingManager;
-		if (am == null)
-			am = JFireEjbFactory.getBean(StoreManager.class, SecurityReflector.getInitialContextProperties());
+		StoreManagerRemote sm = storeManager;
+		if (sm == null)
+			sm = JFireEjb3Factory.getRemoteBean(StoreManagerRemote.class, SecurityReflector.getInitialContextProperties());
 
-		return am.getModeOfDeliverys(ModeOfDeliveryIDs, fetchGroups, maxFetchDepth);
+		return sm.getModeOfDeliverys(ModeOfDeliveryIDs, fetchGroups, maxFetchDepth);
 	}
 
-	private StoreManager accountingManager;
+	private StoreManagerRemote storeManager;
 
-	@SuppressWarnings("unchecked")
 	public synchronized List<ModeOfDelivery> getModeOfDeliverys(String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
 		try {
-			accountingManager = JFireEjbFactory.getBean(StoreManager.class, SecurityReflector.getInitialContextProperties());
+			storeManager = JFireEjb3Factory.getRemoteBean(StoreManagerRemote.class, SecurityReflector.getInitialContextProperties());
 			try {
-				Set<ModeOfDeliveryID> ModeOfDeliveryIDs = accountingManager.getAllModeOfDeliveryIDs();
+				Set<ModeOfDeliveryID> ModeOfDeliveryIDs = storeManager.getAllModeOfDeliveryIDs();
 				return getJDOObjects(null, ModeOfDeliveryIDs, fetchGroups, maxFetchDepth, monitor);
 			} finally {
-				accountingManager = null;
+				storeManager = null;
 			}
 		} catch (Exception x) {
 			throw new RuntimeException(x);

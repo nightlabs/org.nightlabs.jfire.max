@@ -40,6 +40,7 @@ import javax.naming.NamingException;
 import org.apache.log4j.Logger;
 import org.nightlabs.ModuleException;
 import org.nightlabs.jdo.NLJDOHelper;
+import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.Lookup;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.organisation.Organisation;
@@ -47,8 +48,7 @@ import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.DeliveryNote;
 import org.nightlabs.jfire.store.DeliveryNoteLocal;
 import org.nightlabs.jfire.store.Store;
-import org.nightlabs.jfire.store.StoreManager;
-import org.nightlabs.jfire.store.StoreManagerUtil;
+import org.nightlabs.jfire.store.StoreManagerRemote;
 import org.nightlabs.jfire.store.deliver.id.CrossTradeDeliveryCoordinatorID;
 import org.nightlabs.jfire.store.deliver.id.ModeOfDeliveryFlavourID;
 import org.nightlabs.jfire.store.deliver.id.ServerDeliveryProcessorID;
@@ -493,9 +493,10 @@ public class CrossTradeDeliveryCoordinator implements Serializable
 				throw new IllegalArgumentException("OrganisationID mismatch! All articles need to be from the same organisation! " + partnerOrganisationID + " != " + articleID.organisationID);
 		}
 
-		StoreManager remoteStoreManager = StoreManagerUtil.getHome(
+		StoreManagerRemote remoteStoreManager = JFireEjb3Factory.getRemoteBean(
+				StoreManagerRemote.class,
 				Lookup.getInitialContextProperties(pm, partnerOrganisationID)
-		).create();
+		);
 
 		DeliveryNote deliveryNote;
 		deliveryNote = remoteStoreManager.createDeliveryNote(
@@ -607,8 +608,8 @@ public class CrossTradeDeliveryCoordinator implements Serializable
 				throw new IllegalStateException(
 						"Neither from-LegalEntity nor to-LegalEntity is the local organisation!");
 
-			StoreManager localStoreManager = createStoreManager(null);
-			StoreManager remoteStoreManager = createStoreManager(partner.getOrganisationID());
+			StoreManagerRemote localStoreManager = createStoreManager(null);
+			StoreManagerRemote remoteStoreManager = createStoreManager(partner.getOrganisationID());
 
 			Set<Article> articlesMissingDeliveryNote = new HashSet<Article>(articles.size());
 			for (Article article : articles) {
@@ -828,21 +829,18 @@ public class CrossTradeDeliveryCoordinator implements Serializable
 		}
 	}
 
-	protected StoreManager createStoreManager(String organisationID)
+	protected StoreManagerRemote createStoreManager(String organisationID)
 			throws RemoteException, CreateException, NamingException
 	{
 		if (organisationID == null
 				|| IDGenerator.getOrganisationID().equals(organisationID)) {
-// TO DO Workaround: The CascadedAuthentication stuff seems to fail (i.e. the StoreManager proxy created here does not point to the local organisation anymore after the remote one has been used) // I think, it works again. If this proves correct, remove these outcommented lines.
-			return StoreManagerUtil.getHome().create();
-//			return StoreManagerUtil.getHome(
-//					Lookup.getInitialContextProperties(getPersistenceManager(),
-//							IDGenerator.getOrganisationID())).create();
+			return JFireEjb3Factory.getRemoteBean(StoreManagerRemote.class, null);
 		}
 
-		return StoreManagerUtil.getHome(
-				Lookup.getInitialContextProperties(getPersistenceManager(),
-						organisationID)).create();
+		return JFireEjb3Factory.getRemoteBean(
+				StoreManagerRemote.class,
+				Lookup.getInitialContextProperties(getPersistenceManager(), organisationID)
+		);
 	}
 
 	/**

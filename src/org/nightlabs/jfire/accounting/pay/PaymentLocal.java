@@ -10,7 +10,7 @@ import java.util.Set;
  *
  * @jdo.persistence-capable
  *		identity-type="application"
- *		objectid-class="org.nightlabs.jfire.accounting.pay.PaymentLocalID"
+ *		objectid-class="org.nightlabs.jfire.accounting.pay.id.PaymentLocalID"
  *		detachable="true"
  *		table="JFireTrade_PaymentLocal"
  *
@@ -19,9 +19,9 @@ import java.util.Set;
  * @jdo.create-objectid-class field-order="organisationID, paymentID"
  */
 public class PaymentLocal implements Serializable {
-	
+
 	private static final long serialVersionUID = 1L;
-	
+
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
@@ -31,7 +31,7 @@ public class PaymentLocal implements Serializable {
 	 * @jdo.field primary-key="true"
 	 */
 	private long paymentID;
-	
+
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
@@ -48,12 +48,12 @@ public class PaymentLocal implements Serializable {
 	 * @jdo.join
 	 */
 	private Set<PaymentActionHandler> paymentActionHandlers = new HashSet<PaymentActionHandler>();
-	
+
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
 	private transient Set<PaymentActionHandler> _paymentActionHandlers;
-	
+
 	public PaymentLocal(Payment payment) {
 		super();
 		this.organisationID = payment.getOrganisationID();
@@ -69,7 +69,7 @@ public class PaymentLocal implements Serializable {
 	public void addPaymentActionHandler(PaymentActionHandler paymentActionHandler) {
 		paymentActionHandlers.add(paymentActionHandler);
 	}
-	
+
 	/**
 	 * Removes a {@link PaymentActionHandler} from this payment.
 	 * @param paymentActionHandler The {@link PaymentActionHandler} to be removed.
@@ -77,7 +77,7 @@ public class PaymentLocal implements Serializable {
 	public void removePaymentActionHandler(PaymentActionHandler paymentActionHandler) {
 		paymentActionHandlers.remove(paymentActionHandler);
 	}
-	
+
 	/**
 	 * Returns the set of {@link PaymentActionHandler}s associated with this payment.
 	 * @return The set of {@link PaymentActionHandler}s associated with this payment.
@@ -85,7 +85,7 @@ public class PaymentLocal implements Serializable {
 	public Set<PaymentActionHandler> getPaymentActionHandlers() {
 		if (_paymentActionHandlers == null)
 			_paymentActionHandlers = Collections.unmodifiableSet(paymentActionHandlers);
-		
+
 		return _paymentActionHandlers;
 	}
 }

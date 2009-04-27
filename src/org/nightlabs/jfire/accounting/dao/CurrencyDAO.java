@@ -8,10 +8,10 @@ import java.util.Set;
 import javax.jdo.FetchPlan;
 
 import org.nightlabs.jdo.NLJDOHelper;
-import org.nightlabs.jfire.accounting.AccountingManager;
+import org.nightlabs.jfire.accounting.AccountingManagerRemote;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.id.CurrencyID;
-import org.nightlabs.jfire.base.JFireEjbFactory;
+import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.progress.ProgressMonitor;
@@ -32,8 +32,7 @@ public class CurrencyDAO extends BaseJDOObjectDAO<CurrencyID, Currency>
 		}
 		return sharedInstance;
 	}
-	
-	@SuppressWarnings("unchecked")
+
 	@Override
 	protected Collection<Currency> retrieveJDOObjects(Set<CurrencyID> objectIDs,
 			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
@@ -41,7 +40,7 @@ public class CurrencyDAO extends BaseJDOObjectDAO<CurrencyID, Currency>
 	{
 		monitor.beginTask("Fetching Currencies...", 1); //$NON-NLS-1$
 		try {
-			AccountingManager am = JFireEjbFactory.getBean(AccountingManager.class, SecurityReflector.getInitialContextProperties());
+			AccountingManagerRemote am = JFireEjb3Factory.getRemoteBean(AccountingManagerRemote.class, SecurityReflector.getInitialContextProperties());
 			monitor.worked(1);
 			return am.getCurrencies(fetchGroups, maxFetchDepth);
 		} catch (Exception e) {
@@ -67,6 +66,6 @@ public class CurrencyDAO extends BaseJDOObjectDAO<CurrencyID, Currency>
 		monitor.beginTask("Loading currency "+ currencyID.currencyID, 1);
 		Currency currency = getJDOObject(null, currencyID, FETCH_GROUPS, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT, new SubProgressMonitor(monitor, 1));
 		monitor.done();
-		return currency;	
+		return currency;
 	}
 }

@@ -51,7 +51,7 @@ import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.asyncinvoke.AsyncInvoke;
 import org.nightlabs.jfire.asyncinvoke.Invocation;
 import org.nightlabs.jfire.base.JFireBaseEAR;
-import org.nightlabs.jfire.base.JFireEjbFactory;
+import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.JFirePrincipal;
 import org.nightlabs.jfire.base.Lookup;
 import org.nightlabs.jfire.organisation.Organisation;
@@ -78,8 +78,7 @@ import org.nightlabs.jfire.trade.OrderRequirement;
 import org.nightlabs.jfire.trade.OrganisationLegalEntity;
 import org.nightlabs.jfire.trade.Segment;
 import org.nightlabs.jfire.trade.SegmentType;
-import org.nightlabs.jfire.trade.TradeManager;
-import org.nightlabs.jfire.trade.TradeManagerUtil;
+import org.nightlabs.jfire.trade.TradeManagerRemote;
 import org.nightlabs.jfire.trade.TradeSide;
 import org.nightlabs.jfire.trade.Trader;
 import org.nightlabs.jfire.trade.id.ArticleID;
@@ -360,7 +359,7 @@ public abstract class ProductTypeActionHandler
 			OrganisationLegalEntity partner = OrganisationLegalEntity.getOrganisationLegalEntity(pm, partnerOrganisationID);
 
 			Hashtable<?, ?> initialContextProperties = Lookup.getInitialContextProperties(pm, partnerOrganisationID);
-			TradeManager tradeManager = JFireEjbFactory.getBean(TradeManager.class, initialContextProperties);
+			TradeManagerRemote tradeManager = JFireEjb3Factory.getRemoteBean(TradeManagerRemote.class, initialContextProperties);
 
 //			Set segmentTypeIDs = Segment.getSegmentTypeIDs(pm, localOrder);
 
@@ -678,7 +677,7 @@ public abstract class ProductTypeActionHandler
 //	) throws Exception
 //	{
 //		PersistenceManager pm = getPersistenceManager();
-//		TradeManager tm = JFireEjbFactory.getBean(TradeManager.class, Lookup.getInitialContextProperties(pm, partnerOrganisationID));
+//		TradeManagerRemote = JFireEjb3Factory.getRemoteBean(TradeManagerRemote.class, Lookup.getInitialContextProperties(pm, partnerOrganisationID));
 //		Set<ArticleID> articleIDs = NLJDOHelper.getObjectIDSet(partnerArticles);
 //		tm.releaseArticles(articleIDs, true, false, null, 1);
 //	}
@@ -718,7 +717,7 @@ public abstract class ProductTypeActionHandler
 				}
 
 				if (!partnerArticles.isEmpty()) {
-					TradeManager tm = JFireEjbFactory.getBean(TradeManager.class, Lookup.getInitialContextProperties(pm, partnerOrganisationID));
+					TradeManagerRemote tm = JFireEjb3Factory.getRemoteBean(TradeManagerRemote.class, Lookup.getInitialContextProperties(pm, partnerOrganisationID));
 					Set<ArticleID> articleIDs = NLJDOHelper.getObjectIDSet(partnerArticles);
 					Collection<? extends Article> articlesToReplicate = CollectionUtil.castCollection(tm.releaseArticles(
 							articleIDs, true, true,
@@ -768,7 +767,7 @@ public abstract class ProductTypeActionHandler
 					if (JFireBaseEAR.JPOX_WORKAROUND_FLUSH_ENABLED)
 						pm.flush(); // TODO JPOX WORKAROUND - maybe it helps against the update-problem (see 2nd workaround below)
 
-					TradeManager tradeManager = JFireEjbFactory.getBean(TradeManager.class, Lookup.getInitialContextProperties(pm, partnerOrganisationID));
+					TradeManagerRemote tradeManager = JFireEjb3Factory.getRemoteBean(TradeManagerRemote.class, Lookup.getInitialContextProperties(pm, partnerOrganisationID));
 					Offer offer = tradeManager.createCrossTradeReverseOffer(reversedArticleIDs, null);
 					NLJDOHelper.makeDirtyAllFieldsRecursively(offer);
 					//					offer.makeAllDirty();

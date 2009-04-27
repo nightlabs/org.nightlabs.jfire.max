@@ -8,13 +8,13 @@ import javax.naming.NamingException;
 import javax.security.auth.login.LoginException;
 
 import org.nightlabs.jdo.ObjectID;
-import org.nightlabs.jfire.accounting.AccountingManager;
+import org.nightlabs.jfire.accounting.AccountingManagerRemote;
 import org.nightlabs.jfire.accounting.pay.PaymentController;
 import org.nightlabs.jfire.accounting.pay.PaymentResult;
 import org.nightlabs.jfire.accounting.pay.id.PaymentID;
-import org.nightlabs.jfire.base.JFireEjbFactory;
+import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.security.SecurityReflector;
-import org.nightlabs.jfire.store.StoreManager;
+import org.nightlabs.jfire.store.StoreManagerRemote;
 import org.nightlabs.jfire.store.deliver.DeliveryController;
 import org.nightlabs.jfire.store.deliver.DeliveryResult;
 import org.nightlabs.jfire.store.deliver.id.DeliveryID;
@@ -132,16 +132,16 @@ public abstract class AbstractTransferController<D extends TransferData, ID exte
 	 * Returns the {@link StoreManager}.
 	 * @return The {@link StoreManager}
 	 */
-	public StoreManager getStoreManager() throws RemoteException, LoginException, CreateException, NamingException {
-		return JFireEjbFactory.getBean(StoreManager.class, SecurityReflector.getInitialContextProperties());
+	public StoreManagerRemote getStoreManager() throws RemoteException, LoginException, CreateException, NamingException {
+		return JFireEjb3Factory.getRemoteBean(StoreManagerRemote.class, SecurityReflector.getInitialContextProperties());
 	}
 
 	/**
 	 * Returns the {@link AccountingManager}.
 	 * @return The {@link AccountingManager}
 	 */
-	public AccountingManager getAccountingManager() throws RemoteException, LoginException, CreateException, NamingException {
-		return JFireEjbFactory.getBean(AccountingManager.class, SecurityReflector.getInitialContextProperties());
+	public AccountingManagerRemote getAccountingManager() throws RemoteException, LoginException, CreateException, NamingException {
+		return JFireEjb3Factory.getRemoteBean(AccountingManagerRemote.class, SecurityReflector.getInitialContextProperties());
 	}
 
 	private boolean isInServer() {

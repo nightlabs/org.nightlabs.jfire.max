@@ -4,10 +4,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import org.nightlabs.jfire.base.JFireEjbFactory;
+import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.security.SecurityReflector;
-import org.nightlabs.jfire.store.StoreManager;
+import org.nightlabs.jfire.store.StoreManagerRemote;
 import org.nightlabs.jfire.store.Unit;
 import org.nightlabs.jfire.store.id.UnitID;
 import org.nightlabs.progress.ProgressMonitor;
@@ -29,13 +29,12 @@ extends BaseJDOObjectDAO<UnitID, Unit>
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	protected Collection<Unit> retrieveJDOObjects(Set<UnitID> unitIDs, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 			throws Exception
 	{
-		StoreManager stm = storeManager;
+		StoreManagerRemote stm = storeManager;
 		if (stm == null)
-			stm = JFireEjbFactory.getBean(StoreManager.class, SecurityReflector.getInitialContextProperties());
+			stm = JFireEjb3Factory.getRemoteBean(StoreManagerRemote.class, SecurityReflector.getInitialContextProperties());
 
 		return stm.getUnits(unitIDs, fetchGroups, maxFetchDepth);
 	}
@@ -48,13 +47,12 @@ extends BaseJDOObjectDAO<UnitID, Unit>
 		return getJDOObjects(null, unitIDs, fetchGroups, maxFetchDepth, monitor);
 	}
 
-	private StoreManager storeManager = null;
+	private StoreManagerRemote storeManager = null;
 
-	@SuppressWarnings("unchecked")
 	public List<Unit> getUnits(String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
 		try {
-			storeManager = JFireEjbFactory.getBean(StoreManager.class, SecurityReflector.getInitialContextProperties());
+			storeManager = JFireEjb3Factory.getRemoteBean(StoreManagerRemote.class, SecurityReflector.getInitialContextProperties());
 			try {
 				Set<UnitID> unitIDs = storeManager.getUnitIDs();
 				return getJDOObjects(null, unitIDs, fetchGroups, maxFetchDepth, monitor);

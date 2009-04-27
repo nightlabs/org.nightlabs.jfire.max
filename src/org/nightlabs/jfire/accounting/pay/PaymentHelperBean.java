@@ -26,16 +26,15 @@
 
 package org.nightlabs.jfire.accounting.pay;
 
-import java.rmi.RemoteException;
-
-import javax.ejb.CreateException;
-import javax.ejb.EJBException;
-import javax.ejb.SessionBean;
-import javax.ejb.SessionContext;
+import javax.annotation.security.RolesAllowed;
+import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
+import javax.ejb.TransactionManagement;
+import javax.ejb.TransactionManagementType;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 
-import org.apache.log4j.Logger;
 import org.nightlabs.ModuleException;
 import org.nightlabs.jfire.accounting.Accounting;
 import org.nightlabs.jfire.accounting.Invoice;
@@ -56,52 +55,22 @@ import org.nightlabs.jfire.trade.LegalEntity;
  * @ejb.util generate="physical"
  * @ejb.transaction type="Required"
  */
-public abstract class PaymentHelperBean
+@TransactionAttribute(TransactionAttributeType.REQUIRED)
+@TransactionManagement(TransactionManagementType.CONTAINER)
+@Stateless
+public class PaymentHelperBean
 extends BaseSessionBeanImpl
-implements SessionBean
+implements PaymentHelperLocal
 {
 	private static final long serialVersionUID = 1L;
 
-	private static final Logger logger = Logger.getLogger(PaymentHelperBean.class);
+//	private static final Logger logger = Logger.getLogger(PaymentHelperBean.class);
 
-	/**
-	 * @see org.nightlabs.jfire.base.BaseSessionBeanImpl#setSessionContext(javax.ejb.SessionContext)
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.accounting.pay.PaymentHelperLocal#payBegin_storePaymentData(org.nightlabs.jfire.accounting.pay.PaymentData)
 	 */
-	@Override
-	public void setSessionContext(SessionContext sessionContext)
-			throws EJBException, RemoteException
-	{
-		logger.debug(this.getClass().getName() + ".setSessionContext("+sessionContext+")");
-		super.setSessionContext(sessionContext);
-	}
-	/**
-	 * @ejb.create-method
-	 * @ejb.permission role-name="_Guest_"
-	 */
-	public void ejbCreate()
-	throws CreateException
-	{
-		logger.debug(this.getClass().getName() + ".ejbCreate()");
-	}
-	/**
-	 * @see javax.ejb.SessionBean#ejbRemove()
-	 *
-	 * @ejb.permission unchecked="true"
-	 */
-	public void ejbRemove() throws EJBException, RemoteException
-	{
-		logger.debug(this.getClass().getName() + ".ejbRemove()");
-	}
-
-	/**
-	 * @param paymentData The <tt>PaymentData</tt> to be stored.
-	 * @return Returns the JDO objectID of the newly persisted <tt>paymentData</tt>
-	 * @throws ModuleException
-	 *
-	 * @ejb.interface-method view-type="local"
-	 * @ejb.transaction type="RequiresNew"
-	 * @ejb.permission role-name="_Guest_"
-	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+	@RolesAllowed("_Guest_")
 	public PaymentDataID payBegin_storePaymentData(PaymentData paymentData)
 	throws ModuleException
 	{
@@ -136,11 +105,11 @@ implements SessionBean
 		}
 	}
 
-	/**
-	 * @ejb.interface-method view-type="local"
-	 * @ejb.transaction type="RequiresNew"
-	 * @ejb.permission role-name="_Guest_"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.accounting.pay.PaymentHelperLocal#payBegin_internal(org.nightlabs.jfire.accounting.pay.id.PaymentDataID, java.lang.String[], int)
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+	@RolesAllowed("_Guest_")
 	public PaymentResult payBegin_internal(
 			PaymentDataID paymentDataID,
 			String[] fetchGroups, int maxFetchDepth)
@@ -176,11 +145,11 @@ implements SessionBean
 
 	}
 
-	/**
-	 * @ejb.interface-method view-type="local"
-	 * @ejb.transaction type="RequiresNew"
-	 * @ejb.permission role-name="_Guest_"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.accounting.pay.PaymentHelperLocal#payDoWork_storePayDoWorkClientResult(org.nightlabs.jfire.accounting.pay.id.PaymentID, org.nightlabs.jfire.accounting.pay.PaymentResult, boolean)
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+	@RolesAllowed("_Guest_")
 	public void payDoWork_storePayDoWorkClientResult(PaymentID paymentID, PaymentResult payDoWorkClientResult, boolean forceRollback)
 	throws ModuleException
 	{
@@ -196,11 +165,11 @@ implements SessionBean
 		}
 	}
 
-	/**
-	 * @ejb.interface-method view-type="local"
-	 * @ejb.transaction type="RequiresNew"
-	 * @ejb.permission role-name="_Guest_"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.accounting.pay.PaymentHelperLocal#payDoWork_internal(org.nightlabs.jfire.accounting.pay.id.PaymentID, java.lang.String[], int)
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+	@RolesAllowed("_Guest_")
 	public PaymentResult payDoWork_internal(PaymentID paymentID, String[] fetchGroups, int maxFetchDepth)
 	throws PaymentException
 	{
@@ -235,11 +204,11 @@ implements SessionBean
 	}
 
 
-	/**
-	 * @ejb.interface-method view-type="local"
-	 * @ejb.transaction type="RequiresNew"
-	 * @ejb.permission role-name="_Guest_"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.accounting.pay.PaymentHelperLocal#payEnd_internal(org.nightlabs.jfire.accounting.pay.id.PaymentID, java.lang.String[], int)
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+	@RolesAllowed("_Guest_")
 	public PaymentResult payEnd_internal(PaymentID paymentID, String[] fetchGroups, int maxFetchDepth)
 	throws PaymentException
 	{
@@ -281,11 +250,11 @@ implements SessionBean
 	}
 
 
-	/**
-	 * @ejb.interface-method view-type="local"
-	 * @ejb.transaction type="RequiresNew"
-	 * @ejb.permission role-name="_Guest_"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.accounting.pay.PaymentHelperLocal#payEnd_storePayEndClientResult(org.nightlabs.jfire.accounting.pay.id.PaymentID, org.nightlabs.jfire.accounting.pay.PaymentResult, boolean)
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+	@RolesAllowed("_Guest_")
 	public void payEnd_storePayEndClientResult(PaymentID paymentID, PaymentResult payEndClientResult, boolean forceRollback)
 	throws ModuleException
 	{
@@ -301,11 +270,11 @@ implements SessionBean
 		}
 	}
 
-	/**
-	 * @ejb.interface-method view-type="local"
-	 * @ejb.transaction type="RequiresNew"
-	 * @ejb.permission role-name="_Guest_"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.accounting.pay.PaymentHelperLocal#payBegin_storePayBeginServerResult(org.nightlabs.jfire.accounting.pay.id.PaymentID, org.nightlabs.jfire.accounting.pay.PaymentResult, boolean, java.lang.String[], int)
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+	@RolesAllowed("_Guest_")
 	public PaymentResult payBegin_storePayBeginServerResult(
 			PaymentID paymentID, PaymentResult payBeginServerResult,
 			boolean get, String[] fetchGroups, int maxFetchDepth)
@@ -343,11 +312,11 @@ implements SessionBean
 		}
 	}
 
-	/**
-	 * @ejb.interface-method view-type="local"
-	 * @ejb.transaction type="RequiresNew"
-	 * @ejb.permission role-name="_Guest_"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.accounting.pay.PaymentHelperLocal#payDoWork_storePayDoWorkServerResult(org.nightlabs.jfire.accounting.pay.id.PaymentID, org.nightlabs.jfire.accounting.pay.PaymentResult, boolean, java.lang.String[], int)
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+	@RolesAllowed("_Guest_")
 	public PaymentResult payDoWork_storePayDoWorkServerResult(
 			PaymentID paymentID, PaymentResult payDoWorkServerResult,
 			boolean get, String[] fetchGroups, int maxFetchDepth)
@@ -381,11 +350,11 @@ implements SessionBean
 		}
 	}
 
-	/**
-	 * @ejb.interface-method view-type="local"
-	 * @ejb.transaction type="RequiresNew"
-	 * @ejb.permission role-name="_Guest_"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.accounting.pay.PaymentHelperLocal#payEnd_storePayEndServerResult(org.nightlabs.jfire.accounting.pay.id.PaymentID, org.nightlabs.jfire.accounting.pay.PaymentResult, boolean, java.lang.String[], int)
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+	@RolesAllowed("_Guest_")
 	public PaymentResult payEnd_storePayEndServerResult(
 			PaymentID paymentID, PaymentResult payEndServerResult,
 			boolean get, String[] fetchGroups, int maxFetchDepth)
@@ -420,11 +389,11 @@ implements SessionBean
 	}
 
 
-	/**
-	 * @ejb.interface-method view-type="local"
-	 * @ejb.transaction type="RequiresNew"
-	 * @ejb.permission role-name="_Guest_"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.accounting.pay.PaymentHelperLocal#payRollback(org.nightlabs.jfire.accounting.pay.id.PaymentID)
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+	@RolesAllowed("_Guest_")
 	public void payRollback(PaymentID paymentID)
 	throws ModuleException
 	{

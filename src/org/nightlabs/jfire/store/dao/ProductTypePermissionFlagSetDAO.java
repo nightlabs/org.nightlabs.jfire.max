@@ -6,11 +6,11 @@ import java.util.Set;
 import javax.jdo.FetchPlan;
 
 import org.nightlabs.jdo.NLJDOHelper;
-import org.nightlabs.jfire.base.JFireEjbFactory;
+import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.store.ProductTypePermissionFlagSet;
-import org.nightlabs.jfire.store.StoreManager;
+import org.nightlabs.jfire.store.StoreManagerRemote;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.store.id.ProductTypePermissionFlagSetID;
 import org.nightlabs.progress.ProgressMonitor;
@@ -32,7 +32,7 @@ extends BaseJDOObjectDAO<ProductTypePermissionFlagSetID, ProductTypePermissionFl
 		return _sharedInstance;
 	}
 
-	private StoreManager storeManager;
+	private StoreManagerRemote storeManager;
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -41,9 +41,9 @@ extends BaseJDOObjectDAO<ProductTypePermissionFlagSetID, ProductTypePermissionFl
 			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 			throws Exception
 	{
-		StoreManager sm = storeManager;
+		StoreManagerRemote sm = storeManager;
 		if (sm == null)
-			sm = JFireEjbFactory.getBean(StoreManager.class, SecurityReflector.getInitialContextProperties());
+			sm = JFireEjb3Factory.getRemoteBean(StoreManagerRemote.class, SecurityReflector.getInitialContextProperties());
 
 		return sm.getProductTypePermissionFlagSets(productTypePermissionFlagSetIDs);
 	}
@@ -58,7 +58,7 @@ extends BaseJDOObjectDAO<ProductTypePermissionFlagSetID, ProductTypePermissionFl
 	{
 		monitor.beginTask("Fetching ProductTypePermissionFlagSets", 100);
 		try {
-			storeManager = JFireEjbFactory.getBean(StoreManager.class, SecurityReflector.getInitialContextProperties());
+			storeManager = JFireEjb3Factory.getRemoteBean(StoreManagerRemote.class, SecurityReflector.getInitialContextProperties());
 			try {
 				monitor.worked(10);
 				Collection<ProductTypePermissionFlagSetID> productTypePermissionFlagSetIDs = storeManager.getMyProductTypePermissionFlagSetIDs(productTypeIDs);

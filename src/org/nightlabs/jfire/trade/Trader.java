@@ -65,17 +65,14 @@ import org.nightlabs.jfire.asyncinvoke.Invocation;
 import org.nightlabs.jfire.asyncinvoke.InvocationError;
 import org.nightlabs.jfire.asyncinvoke.UndeliverableCallback;
 import org.nightlabs.jfire.asyncinvoke.UndeliverableCallbackResult;
-import org.nightlabs.jfire.base.JFireEjbFactory;
+import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.Lookup;
 import org.nightlabs.jfire.config.Config;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.jbpm.JbpmLookup;
-import org.nightlabs.jfire.jbpm.graph.def.ActionHandlerNodeEnter;
 import org.nightlabs.jfire.jbpm.graph.def.ProcessDefinition;
 import org.nightlabs.jfire.jbpm.graph.def.State;
 import org.nightlabs.jfire.jbpm.graph.def.StateDefinition;
-import org.nightlabs.jfire.jbpm.graph.def.Transition;
-import org.nightlabs.jfire.jbpm.graph.def.id.ProcessDefinitionID;
 import org.nightlabs.jfire.organisation.LocalOrganisation;
 import org.nightlabs.jfire.person.Person;
 import org.nightlabs.jfire.security.SecurityReflector;
@@ -102,11 +99,7 @@ import org.nightlabs.jfire.trade.id.OfferID;
 import org.nightlabs.jfire.trade.id.OfferLocalID;
 import org.nightlabs.jfire.trade.id.OrderID;
 import org.nightlabs.jfire.trade.jbpm.ActionHandlerAcceptOffer;
-import org.nightlabs.jfire.trade.jbpm.ActionHandlerAcceptOfferImplicitelyVendor;
 import org.nightlabs.jfire.trade.jbpm.ActionHandlerFinalizeOffer;
-import org.nightlabs.jfire.trade.jbpm.ActionHandlerFinalizeOfferForCrossTrade;
-import org.nightlabs.jfire.trade.jbpm.ActionHandlerRejectOffer;
-import org.nightlabs.jfire.trade.jbpm.ActionHandlerSendOffer;
 import org.nightlabs.jfire.trade.jbpm.JbpmConstantsOffer;
 import org.nightlabs.jfire.trade.jbpm.ProcessDefinitionAssignment;
 import org.nightlabs.jfire.trade.jbpm.id.ProcessDefinitionAssignmentID;
@@ -1891,7 +1884,7 @@ public class Trader
 
 					String partnerOrganisationID = vendor.getOrganisationID();
 
-					TradeManager tradeManager = JFireEjbFactory.getBean(TradeManager.class, Lookup.getInitialContextProperties(pm, partnerOrganisationID));
+					TradeManagerRemote tradeManager = JFireEjb3Factory.getRemoteBean(TradeManagerRemote.class, Lookup.getInitialContextProperties(pm, partnerOrganisationID));
 					tradeManager.signalOffer((OfferID) JDOHelper.getObjectId(partnerOffer), JbpmConstantsOffer.Vendor.TRANSITION_NAME_ACCEPT_FOR_CROSS_TRADE);
 					// TODO we have to do sth. with the local workflow!
 				} // for (Iterator itO = offerRequirement.getPartnerOffers().iterator(); itO.hasNext(); ) {
@@ -1932,7 +1925,7 @@ public class Trader
 
 					String partnerOrganisationID = vendor.getOrganisationID();
 
-					TradeManager tradeManager = JFireEjbFactory.getBean(TradeManager.class, Lookup.getInitialContextProperties(pm, partnerOrganisationID));
+					TradeManagerRemote tradeManager = JFireEjb3Factory.getRemoteBean(TradeManagerRemote.class, Lookup.getInitialContextProperties(pm, partnerOrganisationID));
 					tradeManager.signalOffer((OfferID) JDOHelper.getObjectId(partnerOffer), JbpmConstantsOffer.Vendor.TRANSITION_NAME_FINALIZE_FOR_CROSS_TRADE);
 					// TODO we have to do sth. with the local workflow!
 				} // for (Iterator itO = offerRequirement.getPartnerOffers().iterator(); itO.hasNext(); ) {
@@ -2010,7 +2003,7 @@ public class Trader
 				LegalEntity detachedEndCustomer = EndCustomerReplicationPolicy.detachLegalEntity(pm, endCustomer, endCustomerReplicationPolicies);
 
 				String partnerOrganisationID = vendor.getOrganisationID();
-				TradeManager tradeManager = JFireEjbFactory.getBean(TradeManager.class, Lookup.getInitialContextProperties(pm, partnerOrganisationID));
+				TradeManagerRemote tradeManager = JFireEjb3Factory.getRemoteBean(TradeManagerRemote.class, Lookup.getInitialContextProperties(pm, partnerOrganisationID));
 
 				Set<OrderID> orderIDs = NLJDOHelper.getObjectIDSet(orders);
 				tradeManager.storeEndCustomer(detachedEndCustomer, orderIDs);
@@ -2096,7 +2089,7 @@ public class Trader
 	{
 		PersistenceManager pm = getPersistenceManager();
 		org.jbpm.graph.def.ProcessDefinition jbpmProcessDefinition = ProcessDefinition.readProcessDefinition(jbpmProcessDefinitionURL);
-// all the actions are defined and registered now in the process definition extension file 		
+// all the actions are defined and registered now in the process definition extension file
 //		// we add the events+actionhandlers
 //		ActionHandlerNodeEnter.register(jbpmProcessDefinition);
 //		if (TradeSide.vendor == tradeSide || TradeSide.customerLocal == tradeSide) {
@@ -2334,7 +2327,7 @@ public class Trader
 //	OrganisationLegalEntity partner = OrganisationLegalEntity.getOrganisationLegalEntity(pm, partnerOrganisationID, OrganisationLegalEntity.ANCHOR_TYPE_ID_ORGANISATION, true);
 
 //	Hashtable initialContextProperties = Lookup.getInitialContextProperties(pm, partnerOrganisationID);
-//	TradeManager tradeManager = JFireEjbFactory.getBean(TradeManager.class, initialContextProperties);
+//	TradeManagerRemote = JFireEjb3Factory.getRemoteBean(TradeManagerRemote.class, initialContextProperties);
 
 ////	Set segmentTypeIDs = Segment.getSegmentTypeIDs(pm, localOrder);
 

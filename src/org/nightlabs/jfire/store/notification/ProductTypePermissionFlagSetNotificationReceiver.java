@@ -15,15 +15,14 @@ import javax.naming.NamingException;
 
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.asyncinvoke.AsyncInvoke;
-import org.nightlabs.jfire.base.JFireEjbFactory;
+import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.Lookup;
 import org.nightlabs.jfire.jdo.notification.DirtyObjectID;
 import org.nightlabs.jfire.jdo.notification.JDOLifecycleState;
 import org.nightlabs.jfire.jdo.notification.persistent.NotificationBundle;
 import org.nightlabs.jfire.jdo.notification.persistent.NotificationFilter;
 import org.nightlabs.jfire.jdo.notification.persistent.NotificationReceiver;
-import org.nightlabs.jfire.jdo.notification.persistent.PersistentNotificationEJB;
-import org.nightlabs.jfire.jdo.notification.persistent.PersistentNotificationEJBUtil;
+import org.nightlabs.jfire.jdo.notification.persistent.PersistentNotificationEJBRemote;
 import org.nightlabs.jfire.jdo.notification.persistent.SubscriptionUtil;
 import org.nightlabs.jfire.jdo.notification.persistent.id.NotificationReceiverID;
 import org.nightlabs.jfire.organisation.LocalOrganisation;
@@ -32,7 +31,7 @@ import org.nightlabs.jfire.store.ProductTypeActionHandler;
 import org.nightlabs.jfire.store.ProductTypePermissionFlagSet;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.store.id.ProductTypePermissionFlagSetID;
-import org.nightlabs.jfire.trade.TradeManager;
+import org.nightlabs.jfire.trade.TradeManagerRemote;
 import org.nightlabs.util.CollectionUtil;
 
 /**
@@ -66,7 +65,7 @@ extends NotificationReceiver
 
 		Hashtable<?, ?> initialContextProperties = Lookup.getInitialContextProperties(pm, emitterOrganisationID);
 
-		PersistentNotificationEJB persistentNotificationEJB = PersistentNotificationEJBUtil.getHome(initialContextProperties).create();
+		PersistentNotificationEJBRemote persistentNotificationEJB = JFireEjb3Factory.getRemoteBean(PersistentNotificationEJBRemote.class, initialContextProperties);
 
 		ProductTypePermissionFlagSetNotificationFilter productTypePermissionFlagSetNotificationFilter = new ProductTypePermissionFlagSetNotificationFilter(
 				emitterOrganisationID, SubscriptionUtil.SUBSCRIBER_TYPE_ORGANISATION, localOrganisationID,
@@ -130,7 +129,7 @@ extends NotificationReceiver
 //		PersistenceManager pm = getPersistenceManager();
 
 		Hashtable<?,?> initialContextProperties = Lookup.getInitialContextProperties(pm, emitterOrganisationID);
-		TradeManager tradeManager = JFireEjbFactory.getBean(TradeManager.class, initialContextProperties);
+		TradeManagerRemote tradeManager = JFireEjb3Factory.getRemoteBean(TradeManagerRemote.class, initialContextProperties);
 		Collection<ProductTypePermissionFlagSet> productTypePermissionFlagSets = CollectionUtil.castCollection(tradeManager.getProductTypePermissionFlagSets(
 				productTypePermissionFlagSetIDs_load,
 				new String[] {

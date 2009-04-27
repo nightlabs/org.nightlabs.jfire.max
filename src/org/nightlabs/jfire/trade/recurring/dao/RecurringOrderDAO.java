@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.trade.LegalEntity;
@@ -11,8 +12,7 @@ import org.nightlabs.jfire.trade.Order;
 import org.nightlabs.jfire.trade.dao.OrderDAO;
 import org.nightlabs.jfire.trade.id.OrderID;
 import org.nightlabs.jfire.trade.recurring.RecurringOrder;
-import org.nightlabs.jfire.trade.recurring.RecurringTradeManager;
-import org.nightlabs.jfire.trade.recurring.RecurringTradeManagerUtil;
+import org.nightlabs.jfire.trade.recurring.RecurringTradeManagerRemote;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 import org.nightlabs.progress.ProgressMonitor;
 import org.nightlabs.util.CollectionUtil;
@@ -38,7 +38,7 @@ extends BaseJDOObjectDAO<OrderID, RecurringOrder>
 			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 			throws Exception
 	{
-		RecurringTradeManager tm = RecurringTradeManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+		RecurringTradeManagerRemote tm = JFireEjb3Factory.getRemoteBean(RecurringTradeManagerRemote.class, SecurityReflector.getInitialContextProperties());
 		return CollectionUtil.castCollection(tm.getRecurringOrders(orderIDs, fetchGroups, maxFetchDepth));
 	}
 
@@ -103,7 +103,7 @@ extends BaseJDOObjectDAO<OrderID, RecurringOrder>
 //			long rangeBeginIdx, long rangeEndIdx, String[] fetchGroups,
 //			int maxFetchDepth, ProgressMonitor monitor) {
 //		try {
-//			TradeManager tm = JFireEjbFactory.getBean(TradeManager.class, SecurityReflector.getInitialContextProperties());
+//			TradeManagerRemote = JFireEjb3Factory.getRemoteBean(TradeManagerRemote.class, SecurityReflector.getInitialContextProperties());
 //			List<OrderID> orderIDList = tm.getOrderIDs(orderClass, subclasses, vendorID, customerID, rangeBeginIdx, rangeEndIdx);
 //			Set<OrderID> orderIDs = new HashSet<OrderID>(orderIDList);
 //

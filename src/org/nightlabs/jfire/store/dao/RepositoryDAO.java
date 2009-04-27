@@ -5,12 +5,12 @@ import java.util.List;
 import java.util.Set;
 
 import org.nightlabs.jdo.query.QueryCollection;
-import org.nightlabs.jfire.base.JFireEjbFactory;
+import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.base.jdo.cache.Cache;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.store.Repository;
-import org.nightlabs.jfire.store.StoreManager;
+import org.nightlabs.jfire.store.StoreManagerRemote;
 import org.nightlabs.jfire.store.query.RepositoryQuery;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 import org.nightlabs.progress.ProgressMonitor;
@@ -39,13 +39,13 @@ extends BaseJDOObjectDAO<AnchorID, Repository>
 	{
 		monitor.beginTask("Loading Repositories", 1);
 		try {
-			StoreManager am = JFireEjbFactory.getBean(StoreManager.class, SecurityReflector.getInitialContextProperties());
-			return am.getRepositories(objectIDs, fetchGroups, maxFetchDepth);
-			
+			StoreManagerRemote sm = JFireEjb3Factory.getRemoteBean(StoreManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			return sm.getRepositories(objectIDs, fetchGroups, maxFetchDepth);
+
 		} catch (Exception e) {
 			monitor.setCanceled(true);
 			throw e;
-			
+
 		} finally {
 			monitor.worked(1);
 			monitor.done();
@@ -58,7 +58,7 @@ extends BaseJDOObjectDAO<AnchorID, Repository>
 			int maxFetchDepth, ProgressMonitor monitor)
 	{
 		try {
-			StoreManager sm = JFireEjbFactory.getBean(StoreManager.class, SecurityReflector.getInitialContextProperties());
+			StoreManagerRemote sm = JFireEjb3Factory.getRemoteBean(StoreManagerRemote.class, SecurityReflector.getInitialContextProperties());
 			Set<AnchorID> repositoryIDs = sm.getRepositoryIDs(queries);
 			return getJDOObjects(null, repositoryIDs, fetchGroups, maxFetchDepth, monitor);
 		} catch (Exception x) {
@@ -71,7 +71,7 @@ extends BaseJDOObjectDAO<AnchorID, Repository>
 	{
 		return getJDOObjects(null, repositoryIDs, fetchGroups, maxFetchDepth, monitor);
 	}
-	
+
 	public Repository getRepository(AnchorID repositoryID, String[] fetchGroups,
 			int maxFetchDepth, ProgressMonitor monitor)
 	{
@@ -81,9 +81,9 @@ extends BaseJDOObjectDAO<AnchorID, Repository>
 	public Repository storeRepository(Repository repository, boolean get, String[] fetchGroups,
 			int maxFetchDepth, ProgressMonitor monitor)
 	{
-		StoreManager sm;
+		StoreManagerRemote sm;
 		try {
-			sm = JFireEjbFactory.getBean(StoreManager.class, SecurityReflector.getInitialContextProperties());
+			sm = JFireEjb3Factory.getRemoteBean(StoreManagerRemote.class, SecurityReflector.getInitialContextProperties());
 			repository = sm.storeRepository(repository, get, fetchGroups, maxFetchDepth);
 			if (repository != null)
 				Cache.sharedInstance().put(null, repository, fetchGroups, maxFetchDepth);

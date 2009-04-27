@@ -26,7 +26,6 @@
 
 package org.nightlabs.jfire.store;
 
-import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -34,10 +33,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.ejb.CreateException;
-import javax.ejb.EJBException;
+import javax.annotation.security.RolesAllowed;
 import javax.ejb.SessionBean;
-import javax.ejb.SessionContext;
+import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
+import javax.ejb.TransactionManagement;
+import javax.ejb.TransactionManagementType;
 import javax.jdo.FetchPlan;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
@@ -45,7 +47,7 @@ import javax.jdo.PersistenceManager;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.base.JFireBaseEAR;
-import org.nightlabs.jfire.base.JFireEjbFactory;
+import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.Lookup;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.deliver.CrossTradeDeliveryCoordinator;
@@ -55,7 +57,7 @@ import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.FetchGroupsTrade;
 import org.nightlabs.jfire.trade.Offer;
 import org.nightlabs.jfire.trade.OfferLocal;
-import org.nightlabs.jfire.trade.TradeManager;
+import org.nightlabs.jfire.trade.TradeManagerRemote;
 import org.nightlabs.jfire.trade.TradeSide;
 import org.nightlabs.jfire.trade.id.ArticleID;
 import org.nightlabs.jfire.trade.id.OfferID;
@@ -72,41 +74,14 @@ import org.nightlabs.util.CollectionUtil;
  * @ejb.util generate="physical"
  * @ejb.transaction type="Required"
  */
-public abstract class StoreManagerHelperBean
+@TransactionAttribute(TransactionAttributeType.REQUIRED)
+@TransactionManagement(TransactionManagementType.CONTAINER)
+@Stateless
+public abstract class StoreManagerHelperBean // I think this class is not used anymore, but I'm not sure and don't have time to check it now. Marco.
 extends BaseSessionBeanImpl
 implements SessionBean
 {
-	////////////////////// EJB "constuctor" ////////////////////////////
 	private static final long serialVersionUID = 1L;
-
-	/**
-	 * @ejb.create-method
-	 * @ejb.permission role-name="_Guest_"
-	 */
-	public void ejbCreate()
-	throws CreateException
-	{
-	}
-
-	/**
-	 * @ejb.permission unchecked="true"
-	 */
-	@Override
-	public void ejbRemove() throws EJBException, RemoteException
-	{
-	}
-
-	@Override
-	public void setSessionContext(SessionContext sessionContext)
-	throws EJBException, RemoteException
-	{
-		super.setSessionContext(sessionContext);
-	}
-	@Override
-	public void unsetSessionContext()
-	{
-		super.unsetSessionContext();
-	}
 
 	private static final String[] FETCH_GROUPS_DELIVERY_NOTE = new String[] {
 		FetchPlan.DEFAULT,
@@ -126,6 +101,8 @@ implements SessionBean
 	 * @ejb.transaction type="RequiresNew"
 	 * @ejb.permission role-name="_Guest_"
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+	@RolesAllowed("_Guest_")
 	public DeliveryNoteID createAndReplicateVendorDeliveryNote(Set<ArticleID> articleIDs)
 	throws Exception
 	{
@@ -142,9 +119,9 @@ implements SessionBean
 					throw new IllegalArgumentException("OrganisationID mismatch! All articles need to be from the same organisation! " + partnerOrganisationID + " != " + articleID.organisationID);
 			}
 
-			StoreManager remoteStoreManager = StoreManagerUtil.getHome(
+			StoreManagerRemote remoteStoreManager = JFireEjb3Factory.getRemoteBean(StoreManagerRemote.class,
 					Lookup.getInitialContextProperties(getPersistenceManager(), partnerOrganisationID)
-			).create();
+			);
 
 			DeliveryNote deliveryNote;
 			deliveryNote = remoteStoreManager.createDeliveryNote(
@@ -182,6 +159,8 @@ implements SessionBean
 	 * @ejb.transaction type="RequiresNew"
 	 * @ejb.permission role-name="_Guest_"
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+	@RolesAllowed("_Guest_")
 	public void findAndReleaseCrossTradeArticlesForProductIDs(Map<String, ? extends Collection<ProductID>> organisationID2productIDs)
 	throws Exception
 	{
@@ -207,7 +186,7 @@ implements SessionBean
 				}
 
 				if (!partnerArticles.isEmpty()) {
-					TradeManager tm = JFireEjbFactory.getBean(TradeManager.class, Lookup.getInitialContextProperties(pm, partnerOrganisationID));
+					TradeManagerRemote tm = JFireEjb3Factory.getRemoteBean(TradeManagerRemote.class, Lookup.getInitialContextProperties(pm, partnerOrganisationID));
 					Set<ArticleID> articleIDs = NLJDOHelper.getObjectIDSet(partnerArticles);
 					Collection<? extends Article> articlesToReplicate = CollectionUtil.castCollection(tm.releaseArticles(
 							articleIDs, true, true,
@@ -231,6 +210,8 @@ implements SessionBean
 	 * @ejb.transaction type="RequiresNew"
 	 * @ejb.permission role-name="_Guest_"
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+	@RolesAllowed("_Guest_")
 	public void createReversingCrossTradeArticlesForProductIDs(Map<String, ? extends Collection<ProductID>> organisationID2productIDs)
 	throws Exception
 	{
@@ -254,7 +235,7 @@ implements SessionBean
 					if (JFireBaseEAR.JPOX_WORKAROUND_FLUSH_ENABLED)
 						pm.flush(); // TODO JPOX WORKAROUND - maybe it helps against the update-problem (see 2nd workaround below)
 
-					TradeManager tradeManager = JFireEjbFactory.getBean(TradeManager.class, Lookup.getInitialContextProperties(pm, partnerOrganisationID));
+					TradeManagerRemote tradeManager = JFireEjb3Factory.getRemoteBean(TradeManagerRemote.class, Lookup.getInitialContextProperties(pm, partnerOrganisationID));
 					Offer offer = tradeManager.createCrossTradeReverseOffer(reversedArticleIDs, null);
 					NLJDOHelper.makeDirtyAllFieldsRecursively(offer);
 //					offer.makeAllDirty();
@@ -292,6 +273,8 @@ implements SessionBean
 	 * @ejb.transaction type="RequiresNew"
 	 * @ejb.permission role-name="_Guest_"
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+	@RolesAllowed("_Guest_")
 	public void deliverReversingCrossTradeArticlesForProductIDs(Map<String, ? extends Collection<ProductID>> organisationID2productIDs)
 	throws Exception
 	{

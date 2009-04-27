@@ -11,10 +11,10 @@ import java.util.Set;
 import javax.jdo.JDOHelper;
 
 import org.nightlabs.jdo.query.QueryCollection;
-import org.nightlabs.jfire.accounting.AccountingManager;
+import org.nightlabs.jfire.accounting.AccountingManagerRemote;
 import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.accounting.id.InvoiceID;
-import org.nightlabs.jfire.base.JFireEjbFactory;
+import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.trade.query.InvoiceQuery;
@@ -43,7 +43,7 @@ public class InvoiceDAO
 			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 			throws Exception
 	{
-		AccountingManager am = JFireEjbFactory.getBean(AccountingManager.class, SecurityReflector.getInitialContextProperties());
+		AccountingManagerRemote am = JFireEjb3Factory.getRemoteBean(AccountingManagerRemote.class, SecurityReflector.getInitialContextProperties());
 		return CollectionUtil.castCollection(am.getInvoices(invoiceIDs, fetchGroups, maxFetchDepth));
 	}
 
@@ -63,7 +63,7 @@ public class InvoiceDAO
 			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
 		try {
-			AccountingManager am = JFireEjbFactory.getBean(AccountingManager.class, SecurityReflector.getInitialContextProperties());
+			AccountingManagerRemote am = JFireEjb3Factory.getRemoteBean(AccountingManagerRemote.class, SecurityReflector.getInitialContextProperties());
 			List<InvoiceID> invoiceIDList = CollectionUtil.castList(am.getInvoiceIDs(vendorID, customerID, endCustomerID, rangeBeginIdx, rangeEndIdx));
 			Set<InvoiceID> invoiceIDs = new HashSet<InvoiceID>(invoiceIDList);
 
@@ -88,7 +88,7 @@ public class InvoiceDAO
 		String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
 		try {
-			AccountingManager accountingManager = JFireEjbFactory.getBean(AccountingManager.class, SecurityReflector.getInitialContextProperties());
+			AccountingManagerRemote accountingManager = JFireEjb3Factory.getRemoteBean(AccountingManagerRemote.class, SecurityReflector.getInitialContextProperties());
 			Set<InvoiceID> invoiceIDs = CollectionUtil.castSet(accountingManager.getInvoiceIDs(queries));
 			return InvoiceDAO.sharedInstance().getInvoices(
 				invoiceIDs,

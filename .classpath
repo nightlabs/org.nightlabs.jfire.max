@@ -3,39 +3,20 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="ejbsrc"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="var" path="JBOSS/bin/run.jar"/>
-	<classpathentry kind="var" path="JBOSS/bin/shutdown.jar"/>
-	<classpathentry kind="var" path="JBOSS/client/jboss-j2ee.jar"/>
-	<classpathentry kind="var" path="JBOSS/lib/concurrent.jar"/>
-	<classpathentry kind="var" path="JBOSS/lib/jboss-system.jar"/>
-	<classpathentry kind="var" path="JBOSS/server/default/lib/bcel.jar"/>
-	<classpathentry kind="var" path="JBOSS/server/default/lib/jboss.jar"/>
-	<classpathentry kind="var" path="JBOSS/server/default/lib/jboss-transaction.jar"/>
-	<classpathentry kind="var" path="JBOSS/server/default/lib/jnpserver.jar"/>
-	<classpathentry kind="var" path="JBOSS/server/default/lib/jpl-pattern.jar"/>
-	<classpathentry kind="var" path="JBOSS/server/default/lib/jpl-util.jar"/>
-	<classpathentry kind="var" path="LOG4J"/>
-	<classpathentry kind="var" path="JDO2" sourcepath="/JDO2_SRC">
-		<attributes>
-			<attribute name="javadoc_location" value="http://db.apache.org/jdo/api22/apidocs/"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="var" path="DATANUCLEUS_CORE"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/NightLabsBase"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/NightLabsJDO"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/JFireBase"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/org.nightlabs.jdo"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/org.nightlabs.jfire.base"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireBaseBean"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireServerManager"/>
-	<classpathentry kind="var" path="RHINO" sourcepath="/RHINO_SRC"/>
-	<classpathentry kind="var" path="DATANUCLEUS_ENHANCER"/>
-	<classpathentry kind="var" path="APACHE_COMMONS/commons-lang.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireJbpm"/>
-	<classpathentry kind="var" path="WORKSPACE/JFireJbpm/lib/jbpm/jbpm-3.1.4.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireBaseClientLib"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireBaseDAO"/>
-	<classpathentry kind="var" path="ASM"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/NightLabsQueryJDO"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/NightLabsQuery"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/org.nightlabs.query.jdo"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/org.nightlabs.query"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireEntityUserSet"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/org.nightlabs.base"/>
+	<classpathentry kind="con" path="org.eclipse.jst.server.core.container/org.eclipse.jst.server.generic.runtimeTarget/JBoss v4.2"/>
+	<classpathentry kind="con" path="org.nightlabs.eclipse.sdk.jdo.JDO_CONTAINER"/>
+	<classpathentry kind="var" path="RHINO"/>
+	<classpathentry kind="lib" path="/JFireJbpm/lib/jbpm/jbpm-3.1.4.jar" sourcepath="/JFireJbpm/lib/jbpm/jbpm-3.1.4.zip"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

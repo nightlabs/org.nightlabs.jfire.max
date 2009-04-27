@@ -15,11 +15,8 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/org.nightlabs.jdo"/>
 	<classpathentry kind="lib" path="dist/birt/lib/dataadapterapi.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireBaseClientLib"/>
-	<classpathentry kind="var" path="APACHE_COMMONS/commons-lang.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.nightlabs.query.jdo"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.nightlabs.query"/>
-	<classpathentry kind="var" path="APACHE_COMMONS/commons-logging.jar"/>
-	<classpathentry kind="var" path="APACHE_COMMONS/commons-pool.jar"/>
 	<classpathentry kind="lib" path="dist/birt/lib/com.ibm.icu_3.8.1.v20080530.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.nightlabs.base"/>
 	<classpathentry kind="con" path="org.eclipse.jst.server.core.container/org.eclipse.jst.server.generic.runtimeTarget/JBoss v4.2"/>

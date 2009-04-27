@@ -39,7 +39,12 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import javax.ejb.SessionBean;
+import javax.annotation.security.RolesAllowed;
+import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
+import javax.ejb.TransactionManagement;
+import javax.ejb.TransactionManagementType;
 import javax.jdo.FetchPlan;
 import javax.jdo.JDODetachedFieldAccessException;
 import javax.jdo.JDOHelper;
@@ -65,15 +70,19 @@ import org.nightlabs.jfire.accounting.gridpriceconfig.PriceCalculatorFactory;
 import org.nightlabs.jfire.accounting.gridpriceconfig.PriceCell;
 import org.nightlabs.jfire.accounting.gridpriceconfig.StablePriceConfig;
 import org.nightlabs.jfire.accounting.gridpriceconfig.TariffPricePair;
+import org.nightlabs.jfire.accounting.id.CurrencyID;
+import org.nightlabs.jfire.accounting.id.TariffID;
 import org.nightlabs.jfire.accounting.priceconfig.AffectedProductType;
 import org.nightlabs.jfire.accounting.priceconfig.FetchGroupsPriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.PriceConfigUtil;
+import org.nightlabs.jfire.accounting.priceconfig.id.PriceConfigID;
 import org.nightlabs.jfire.accounting.tariffuserset.TariffUserSet;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.base.JFireBaseEAR;
-import org.nightlabs.jfire.base.JFireEjbFactory;
+import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.JFireException;
 import org.nightlabs.jfire.entityuserset.AuthorizedObjectRef;
+import org.nightlabs.jfire.jdo.notification.persistent.PersistentNotificationEJBRemote;
 import org.nightlabs.jfire.jdo.notification.persistent.SubscriptionUtil;
 import org.nightlabs.jfire.organisation.LocalOrganisation;
 import org.nightlabs.jfire.organisation.Organisation;
@@ -101,6 +110,7 @@ import org.nightlabs.jfire.store.deliver.CrossTradeDeliveryCoordinator;
 import org.nightlabs.jfire.store.deliver.DeliveryConfiguration;
 import org.nightlabs.jfire.store.deliver.ModeOfDelivery;
 import org.nightlabs.jfire.store.deliver.ModeOfDeliveryConst;
+import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.store.notification.ProductTypePermissionFlagSetNotificationReceiver;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.ArticleCreator;
@@ -112,18 +122,15 @@ import org.nightlabs.jfire.trade.Order;
 import org.nightlabs.jfire.trade.OrganisationLegalEntity;
 import org.nightlabs.jfire.trade.Segment;
 import org.nightlabs.jfire.trade.Trader;
+import org.nightlabs.jfire.trade.id.ArticleID;
+import org.nightlabs.jfire.trade.id.CustomerGroupID;
+import org.nightlabs.jfire.trade.id.OfferID;
+import org.nightlabs.jfire.trade.id.SegmentID;
 import org.nightlabs.jfire.trade.recurring.RecurringOrder;
 import org.nightlabs.jfire.trade.recurring.RecurringTrader;
 import org.nightlabs.util.CollectionUtil;
 import org.nightlabs.util.Util;
 import org.nightlabs.version.Version;
-
-import javax.ejb.TransactionAttribute;
-import javax.ejb.TransactionAttributeType;
-import javax.ejb.Stateless;
-import javax.ejb.TransactionManagement;
-import javax.ejb.TransactionManagementType;
-import javax.annotation.security.RolesAllowed;
 
 /**
  * @ejb.bean name="jfire/ejb/JFireSimpleTrade/SimpleTradeManager"
@@ -956,7 +963,7 @@ implements SimpleTradeManagerRemote
 			try {
 				Hashtable<?, ?> initialContextProperties = getInitialContextProperties(emitterOrganisationID);
 
-				PersistentNotificationEJB persistentNotificationEJB = PersistentNotificationEJBUtil.getHome(initialContextProperties).create();
+				PersistentNotificationEJBRemote persistentNotificationEJB = JFireEjb3Factory.getRemoteBean(PersistentNotificationEJBRemote.class, initialContextProperties);
 
 				SimpleProductTypeNotificationFilter simpleProductTypeNotificationFilter = new SimpleProductTypeNotificationFilter(
 						emitterOrganisationID, SubscriptionUtil.SUBSCRIBER_TYPE_ORGANISATION, getOrganisationID(),
@@ -979,7 +986,7 @@ implements SimpleTradeManagerRemote
 //				ArrayList<ProductTypeID> productTypeIDs = new ArrayList<ProductTypeID>(1);
 //				productTypeIDs.add(productTypeID);
 
-				SimpleTradeManager simpleTradeManager = JFireEjbFactory.getBean(SimpleTradeManager.class, initialContextProperties);
+				SimpleTradeManagerRemote simpleTradeManager = JFireEjb3Factory.getRemoteBean(SimpleTradeManagerRemote.class, initialContextProperties);
 
 				Set<ProductTypeID> productTypeIDs = simpleTradeManager.getPublishedSimpleProductTypeIDs();
 				// never used

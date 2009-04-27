@@ -10,13 +10,17 @@ import java.util.Set;
 import javax.ejb.CreateException;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.PersistenceCapable;
 import javax.naming.NamingException;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.accounting.gridpriceconfig.GridPriceConfigUtil;
 import org.nightlabs.jfire.accounting.priceconfig.id.PriceConfigID;
-import org.nightlabs.jfire.base.JFireEjbFactory;
+import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.Lookup;
 import org.nightlabs.jfire.jdo.notification.DirtyObjectID;
 import org.nightlabs.jfire.jdo.notification.JDOLifecycleState;
@@ -25,20 +29,15 @@ import org.nightlabs.jfire.jdo.notification.persistent.NotificationFilter;
 import org.nightlabs.jfire.jdo.notification.persistent.NotificationReceiver;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.security.User;
-import org.nightlabs.jfire.simpletrade.SimpleTradeManager;
+import org.nightlabs.jfire.simpletrade.SimpleTradeManagerRemote;
 import org.nightlabs.jfire.simpletrade.store.SimpleProductType;
 import org.nightlabs.jfire.store.ProductTypeLocal;
 import org.nightlabs.jfire.store.Store;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.store.id.ProductTypePermissionFlagSetID;
 import org.nightlabs.jfire.store.notification.ProductTypePermissionFlagSetNotificationReceiver;
-import org.nightlabs.jfire.trade.TradeManager;
+import org.nightlabs.jfire.trade.TradeManagerRemote;
 import org.nightlabs.util.CollectionUtil;
-
-import javax.jdo.annotations.Inheritance;
-import javax.jdo.annotations.InheritanceStrategy;
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.IdentityType;
 
 /**
  * @author Marco Schulze - Marco at NightLabs dot de
@@ -105,13 +104,13 @@ extends NotificationReceiver
 		PersistenceManager pm = getPersistenceManager();
 
 		Hashtable<?,?> initialContextProperties = Lookup.getInitialContextProperties(pm, emitterOrganisationID);
-		SimpleTradeManager simpleTradeManager = JFireEjbFactory.getBean(SimpleTradeManager.class, initialContextProperties);
+		SimpleTradeManagerRemote simpleTradeManager = JFireEjb3Factory.getRemoteBean(SimpleTradeManagerRemote.class, initialContextProperties);
 		Collection<SimpleProductType> productTypes = CollectionUtil.castCollection(
 				simpleTradeManager.getSimpleProductTypesForReseller(productTypeIDs_load)
 		);
 		Set<ProductTypeID> productTypeIDs = NLJDOHelper.getObjectIDSet(productTypes);
 
-		TradeManager tradeManager = JFireEjbFactory.getBean(TradeManager.class, initialContextProperties);
+		TradeManagerRemote tradeManager = JFireEjb3Factory.getRemoteBean(TradeManagerRemote.class, initialContextProperties);
 		Set<ProductTypePermissionFlagSetID> productTypePermissionFlagSetIDs = CollectionUtil.castSet(
 				tradeManager.getMyProductTypePermissionFlagSetIDs(productTypeIDs)
 		);

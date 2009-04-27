@@ -25,6 +25,19 @@ import org.nightlabs.io.DataBuffer;
 import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
 import org.nightlabs.util.IOUtil;
 
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import org.nightlabs.jfire.reporting.layout.id.ReportLayoutLocalisationDataID;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Queries;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+
 /**
  * Holds the contents of a properties file that is used in report localisation.
  * 
@@ -47,7 +60,24 @@ import org.nightlabs.util.IOUtil;
  *		query="SELECT
  *			WHERE this.reportLayout == :paramReportLayout"
  *
- */
+ */@PersistenceCapable(
+	objectIdClass=ReportLayoutLocalisationDataID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireReporting_ReportLayoutLocalisationData")
+@FetchGroups(
+	@FetchGroup(
+		fetchGroups={"default"},
+		name=ReportLayoutLocalisationData.FETCH_GROUP_LOCALISATOIN_DATA,
+		members=@Persistent(name="localisationData"))
+)
+@Queries(
+	@javax.jdo.annotations.Query(
+		name="getReportLayoutLocalisationBundle",
+		value="SELECT WHERE this.reportLayout == :paramReportLayout")
+)
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
+
 public class ReportLayoutLocalisationData implements StoreCallback, Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -62,36 +92,47 @@ public class ReportLayoutLocalisationData implements StoreCallback, Serializable
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
-	 */
+	 */	@PrimaryKey
+	@Column(length=100)
+
 	private String organisationID;
 	
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
-	 */
+	 */	@PrimaryKey
+	@Column(length=100)
+
 	private String reportRegistryItemType;
 	
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
-	 */
+	 */	@PrimaryKey
+	@Column(length=100)
+
 	private String reportRegistryItemID;
 	
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="10"
-	 */
+	 */	@PrimaryKey
+	@Column(length=10)
+
 	private String locale;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
-	 */
+	 */	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+
 	private ReportLayout reportLayout;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 * @jdo.column sql-type="BLOB"
-	 */
+	 */	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+	@Column(sqlType="BLOB")
+
 	private byte[] localisationData;
 	
 	/**

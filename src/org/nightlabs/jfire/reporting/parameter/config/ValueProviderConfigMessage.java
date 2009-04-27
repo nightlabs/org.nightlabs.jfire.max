@@ -33,6 +33,18 @@ import java.util.Map;
 import org.nightlabs.i18n.I18nText;
 import org.nightlabs.jfire.reporting.parameter.ValueProvider;
 
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.Join;
+import org.nightlabs.jfire.reporting.parameter.config.id.ValueProviderConfigMessageID;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+
 /**
  * Description i18n text for {@link ValueProvider}s.
  * 
@@ -50,7 +62,18 @@ import org.nightlabs.jfire.reporting.parameter.ValueProvider;
  * @jdo.create-objectid-class field-order="organisationID, valueAcquisitionSetupID, valueProviderOrganisationID, valueProviderCategoryID, valueProviderID, valueProviderConfigID"
  * 
  * @jdo.fetch-group name="ValueProviderConfig.message" fetch-groups="default" fields="names"
- */
+ */@PersistenceCapable(
+	objectIdClass=ValueProviderConfigMessageID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireReporting_ValueProviderConfigMessage")
+@FetchGroups(
+	@FetchGroup(
+		fetchGroups={"default"},
+		name="ValueProviderConfig.message",
+		members=@Persistent(name="names"))
+)
+
 public class ValueProviderConfigMessage extends I18nText implements Serializable {
 	
 	/**
@@ -62,41 +85,52 @@ public class ValueProviderConfigMessage extends I18nText implements Serializable
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
-	 */
+	 */	@PrimaryKey
+	@Column(length=100)
+
 	private String organisationID;
 	
 	/**
 	 * @jdo.field primary-key="true"
-	 */
+	 */	@PrimaryKey
+
 	private long valueAcquisitionSetupID;
 	
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
-	 */
+	 */	@PrimaryKey
+	@Column(length=100)
+
 	private String valueProviderOrganisationID;
 	
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
-	 */
+	 */	@PrimaryKey
+	@Column(length=100)
+
 	private String valueProviderCategoryID;
 	
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
-	 */
+	 */	@PrimaryKey
+	@Column(length=100)
+
 	private String valueProviderID;
 	
 	/**
 	 * @jdo.field primary-key="true"
-	 */
+	 */	@PrimaryKey
+
 	private long valueProviderConfigID;
 	
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
-	 */
+	 */	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+
 	private ValueProviderConfig valueProviderConfig;
 	
 	/**
@@ -135,7 +169,13 @@ public class ValueProviderConfigMessage extends I18nText implements Serializable
 	 *		null-value="exception"
 	 *
 	 * @jdo.join
-	 */
+	 */	@Join
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		table="JFireReporting_ValueProviderConfigMessage_names",
+		defaultFetchGroup="true",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
+
 	protected Map<String, String> names;
 	
 	/**

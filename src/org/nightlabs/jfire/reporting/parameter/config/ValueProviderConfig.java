@@ -8,6 +8,16 @@ import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.reporting.parameter.ValueProvider;
 import org.nightlabs.jfire.reporting.parameter.id.ValueProviderID;
 
+import javax.jdo.annotations.Persistent;
+import org.nightlabs.jfire.reporting.parameter.config.id.ValueProviderConfigID;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+
 /**
  * 
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
@@ -25,7 +35,18 @@ import org.nightlabs.jfire.reporting.parameter.id.ValueProviderID;
  *	
  * @jdo.fetch-group name="ValueProviderConfig.message" fetch-groups="default" fields="message"
  *
- */
+ */@PersistenceCapable(
+	objectIdClass=ValueProviderConfigID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireReporting_ValueProviderConfig")
+@FetchGroups(
+	@FetchGroup(
+		fetchGroups={"default"},
+		name=ValueProviderConfig.FETCH_GROUP_MESSAGE,
+		members=@Persistent(name="message"))
+)
+
 public class ValueProviderConfig
 implements ValueConsumer, Serializable, IGraphicalInfoProvider, DeleteCallback
 {
@@ -37,83 +58,105 @@ implements ValueConsumer, Serializable, IGraphicalInfoProvider, DeleteCallback
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
-	 */
+	 */	@PrimaryKey
+	@Column(length=100)
+
 	private String organisationID;
 	
 	/**
 	 * @jdo.field primary-key="true"
-	 */
+	 */	@PrimaryKey
+
 	private long valueAcquisitionSetupID;
 	
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
-	 */
+	 */	@PrimaryKey
+	@Column(length=100)
+
 	private String valueProviderOrganisationID;
 	
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
-	 */
+	 */	@PrimaryKey
+	@Column(length=100)
+
 	private String valueProviderCategoryID;
 	
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
-	 */
+	 */	@PrimaryKey
+	@Column(length=100)
+
 	private String valueProviderID;
 	
 	/**
 	 * @jdo.field primary-key="true"
-	 */
+	 */	@PrimaryKey
+
 	private long valueProviderConfigID;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
-	 */
+	 */	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+
 	private int pageIndex;
 	/**
 	 * @jdo.field persistence-modifier="persistent"
-	 */
+	 */	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+
 	private int pageRow;
 	/**
 	 * @jdo.field persistence-modifier="persistent"
-	 */
+	 */	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+
 	private int pageColumn;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
-	 */
+	 */	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+
 	private ValueAcquisitionSetup setup;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
-	 */
+	 */	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+
 	private boolean allowNullOutputValue;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
-	 */
+	 */	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+
 	private boolean showMessageInHeader;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
-	 */
+	 */	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+
 	private boolean growVertically;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
-	 */
+	 */	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+
 	private int x;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
-	 */
+	 */	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+
 	private int y;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent" mapped-by="valueProviderConfig"
-	 */
+	 */	@Persistent(
+		mappedBy="valueProviderConfig",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
+
 	private ValueProviderConfigMessage message;
 	
 	

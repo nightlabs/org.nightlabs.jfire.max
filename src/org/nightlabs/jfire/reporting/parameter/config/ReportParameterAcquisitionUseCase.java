@@ -7,6 +7,16 @@ import java.io.Serializable;
 
 import org.nightlabs.util.Util;
 
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.Column;
+import org.nightlabs.jfire.reporting.parameter.config.id.ReportParameterAcquisitionUseCaseID;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+
 /**
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
  *
@@ -22,7 +32,26 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="ReportParameterAcquisitionUseCase.description" fetch-groups="default" fields="description"
  * @jdo.fetch-group name="ReportParameterAcquisitionUseCase.this" fetch-groups="default" fields="name, description"
  *
- */
+ */@PersistenceCapable(
+	objectIdClass=ReportParameterAcquisitionUseCaseID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireReporting_ReportParameterAcquisitionUseCase")
+@FetchGroups({
+	@FetchGroup(
+		fetchGroups={"default"},
+		name=ReportParameterAcquisitionUseCase.FETCH_GROUP_NAME,
+		members=@Persistent(name="name")),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name=ReportParameterAcquisitionUseCase.FETCH_GROUP_DESCRIPTION,
+		members=@Persistent(name="description")),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name=ReportParameterAcquisitionUseCase.FETCH_GROUP_THIS_REPORT_PARAMETER_ACQUISITION_USE_CASE,
+		members={@Persistent(name="name"), @Persistent(name="description")})
+})
+
 public class ReportParameterAcquisitionUseCase implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -40,18 +69,23 @@ public class ReportParameterAcquisitionUseCase implements Serializable {
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
-	 */
+	 */	@PrimaryKey
+	@Column(length=100)
+
 	private String organisationID;
 	
 	/**
 	 * @jdo.field primary-key="true"
-	 */
+	 */	@PrimaryKey
+
 	private long reportParameterAcquisitionSetupID;
 	
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
-	 */
+	 */	@PrimaryKey
+	@Column(length=100)
+
 	private String reportParameterAcquisitionUseCaseID;
 
 //	/**
@@ -64,7 +98,11 @@ public class ReportParameterAcquisitionUseCase implements Serializable {
 	 *		persistence-modifier="persistent"
 	 *		mapped-by="useCase"
 	 *		dependent="true"
-	 */
+	 */@Persistent(
+	dependent="true",
+	mappedBy="useCase",
+	persistenceModifier=PersistenceModifier.PERSISTENT)
+
 	private ReportParameterAcquisitionUseCaseName name;
 
 	/**
@@ -72,7 +110,11 @@ public class ReportParameterAcquisitionUseCase implements Serializable {
 	 *		persistence-modifier="persistent"
 	 *		mapped-by="useCase"
 	 *		dependent="true"
-	 */
+	 */	@Persistent(
+		dependent="true",
+		mappedBy="useCase",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
+
 	private ReportParameterAcquisitionUseCaseDescription description;
 
 	/**

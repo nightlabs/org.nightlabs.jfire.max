@@ -36,6 +36,16 @@ import org.nightlabs.jfire.reporting.Birt.OutputFormat;
 import org.nightlabs.jfire.reporting.layout.id.ReportRegistryID;
 import org.nightlabs.jfire.reporting.layout.render.ReportLayoutRenderer;
 
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+
 /**
  * Singleton to hold the id of next new {@link org.nightlabs.jfire.reporting.layout.ReportRegistryItem}
  * and registrations of {@link ReportLayoutRenderer} to {@link OutputFormat}.
@@ -52,17 +62,25 @@ import org.nightlabs.jfire.reporting.layout.render.ReportLayoutRenderer;
  * 
  * @jdo.inheritance strategy="new-table"
  */
+@PersistenceCapable(
+	objectIdClass=ReportRegistryID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireReporting_ReportRegistry")
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class ReportRegistry {
 
 	/**
 	 * @jdo.field primary-key="true"
 	 */
+	@PrimaryKey
 	private int reportRegistryID = 0;
 	
 	// TODO: Change to use IDGenerator.
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private long newReportItemID = 0;
 	
 	/**
@@ -79,6 +97,11 @@ public class ReportRegistry {
 	 *
 	 * @jdo.join
 	 */
+	@Join
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		table="JFireReporting_ReportRegistry_format2ReportRendererClassName",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Map<String, String> format2ReportRendererClassName;
 	
 	/**

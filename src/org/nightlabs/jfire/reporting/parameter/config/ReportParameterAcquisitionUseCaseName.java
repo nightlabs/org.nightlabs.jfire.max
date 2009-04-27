@@ -32,6 +32,20 @@ import java.util.Map;
 
 import org.nightlabs.i18n.I18nText;
 
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.NullValue;
+import org.nightlabs.jfire.reporting.parameter.config.id.ReportParameterAcquisitionUseCaseNameID;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+
 /**
  * Name i18n text for {@link ReportParameterAcquisitionUseCase}s.
  * 
@@ -48,7 +62,18 @@ import org.nightlabs.i18n.I18nText;
  * @jdo.create-objectid-class field-order="organisationID, reportParameterAcquisitionSetupID, reportParameterAcquisitionUseCaseID"
  *
  * @jdo.fetch-group name="ReportParameterAcquisitionUseCase.name" fields="useCase, names"
- */
+ */@PersistenceCapable(
+	objectIdClass=ReportParameterAcquisitionUseCaseNameID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireReporting_ReportParameterAcquisitionUseCaseName")
+@FetchGroups(
+	@FetchGroup(
+		name="ReportParameterAcquisitionUseCase.name",
+		members={@Persistent(name="useCase"), @Persistent(name="names")})
+)
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
+
 public class ReportParameterAcquisitionUseCaseName extends I18nText implements Serializable {
 	
 	/**
@@ -60,23 +85,29 @@ public class ReportParameterAcquisitionUseCaseName extends I18nText implements S
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
-	 */
+	 */	@PrimaryKey
+	@Column(length=100)
+
 	private String organisationID;
 	
 	/**
 	 * @jdo.field primary-key="true"
-	 */
+	 */	@PrimaryKey
+
 	private long reportParameterAcquisitionSetupID;
 	
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
-	 */
+	 */	@PrimaryKey
+	@Column(length=100)
+
 	private String reportParameterAcquisitionUseCaseID;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
-	 */
+	 */	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+
 	private ReportParameterAcquisitionUseCase useCase;
 	
 	/**
@@ -108,7 +139,13 @@ public class ReportParameterAcquisitionUseCaseName extends I18nText implements S
 	 *		null-value="exception"
 	 *
 	 * @jdo.join
-	 */
+	 */	@Join
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		table="JFireReporting_ReportParameterAcquisitionUseCaseName_names",
+		defaultFetchGroup="true",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
+
 	protected Map<String, String> names;
 	
 	/**

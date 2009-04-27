@@ -4,6 +4,16 @@ import java.io.Serializable;
 
 import org.nightlabs.jfire.reporting.parameter.id.ValueProviderID;
 
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+import org.nightlabs.jfire.reporting.parameter.config.id.ValueConsumerBindingID;
+
 
 /**
  * {@link ValueConsumerBinding} define a binding from a {@link ValueProviderConfig}
@@ -30,7 +40,26 @@ import org.nightlabs.jfire.reporting.parameter.id.ValueProviderID;
  * @jdo.fetch-group name="ValueConsumerBinding.provider" fetch-groups="default" fields="provider"
  * @jdo.fetch-group name="ValueConsumerBinding.this" fetch-groups="default" fields="consumer, provider"
  * 
- */
+ */@PersistenceCapable(
+	objectIdClass=ValueConsumerBindingID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireReporting_ValueConsumerBinding")
+@FetchGroups({
+	@FetchGroup(
+		fetchGroups={"default"},
+		name=ValueConsumerBinding.FETCH_GROUP_CONSUMER,
+		members=@Persistent(name="consumer")),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name=ValueConsumerBinding.FETCH_GROUP_PROVIDER,
+		members=@Persistent(name="provider")),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name=ValueConsumerBinding.FETCH_GROUP_THIS_VALUE_CONSUMER_BINDING,
+		members={@Persistent(name="consumer"), @Persistent(name="provider")})
+})
+
 public class ValueConsumerBinding implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
@@ -45,30 +74,37 @@ public class ValueConsumerBinding implements Serializable {
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
-	 */
+	 */	@PrimaryKey
+	@Column(length=100)
+
 	private String organisationID;
 	
 	/**
 	 * @jdo.field primary-key="true"
-	 */
+	 */	@PrimaryKey
+
 	private long valueConsumerBindingID;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
-	 */
+	 */	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+
 	private ValueConsumer consumer;
 	/**
 	 * @jdo.field persistence-modifier="persistent"
-	 */
+	 */	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+
 	private String parameterID;
 	/**
 	 * @jdo.field persistence-modifier="persistent"
-	 */
+	 */	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+
 	private ValueProviderConfig provider;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
-	 */
+	 */	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+
 	private ValueAcquisitionSetup setup;
 	
 	/**

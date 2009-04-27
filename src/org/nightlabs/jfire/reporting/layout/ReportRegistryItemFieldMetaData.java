@@ -36,6 +36,20 @@ import org.nightlabs.inheritance.NotWritableException;
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.util.Util;
 
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.DiscriminatorStrategy;
+import javax.jdo.annotations.Column;
+import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemFieldMetaDataID;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Discriminator;
+
 /**
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
  *
@@ -52,6 +66,19 @@ import org.nightlabs.util.Util;
  *
  * @jdo.fetch-group name="ReportRegistryItem.fieldMetaDataMap" fields="reportRegistryItem" fetch-groups="default"
  */
+@PersistenceCapable(
+	objectIdClass=ReportRegistryItemFieldMetaDataID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireReporting_ReportRegistryItemFieldMetaData")
+@FetchGroups(
+	@FetchGroup(
+		fetchGroups={"default"},
+		name="ReportRegistryItem.fieldMetaDataMap",
+		members=@Persistent(name="reportRegistryItem"))
+)
+@Discriminator(strategy=DiscriminatorStrategy.CLASS_NAME)
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class ReportRegistryItemFieldMetaData
 implements org.nightlabs.inheritance.FieldMetaData, Serializable
 {
@@ -63,28 +90,37 @@ implements org.nightlabs.inheritance.FieldMetaData, Serializable
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String reportRegistryItemType;
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String reportRegistryItemID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String fieldName;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private ReportRegistryItem reportRegistryItem;
 
 	/**
@@ -92,6 +128,7 @@ implements org.nightlabs.inheritance.FieldMetaData, Serializable
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private byte writableByChildren = FieldMetaData.WRITABLEBYCHILDREN_YES;
 
 	/**
@@ -100,6 +137,7 @@ implements org.nightlabs.inheritance.FieldMetaData, Serializable
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private boolean writable = true;
 
 	/**
@@ -108,6 +146,7 @@ implements org.nightlabs.inheritance.FieldMetaData, Serializable
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private boolean valueInherited = true;
 
 	/**

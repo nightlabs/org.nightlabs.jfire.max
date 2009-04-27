@@ -9,6 +9,17 @@ import java.util.Map;
 
 import org.nightlabs.i18n.I18nText;
 
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.FetchGroups;
+import org.nightlabs.jfire.reporting.textpart.id.ReportTextPartContentID;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+
 /**
  * {@link I18nText} holding the content of an {@link ReportTextPart}.
  * 
@@ -24,6 +35,16 @@ import org.nightlabs.i18n.I18nText;
  * 
  * @jdo.fetch-group name="ReportTextPart.content" fields="reportTextPart, contents" 
  */
+@PersistenceCapable(
+	objectIdClass=ReportTextPartContentID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireReporting_ReportTextPartContent")
+@FetchGroups(
+	@FetchGroup(
+		name="ReportTextPart.content",
+		members={@Persistent(name="reportTextPart"), @Persistent(name="contents")})
+)
 public class ReportTextPartContent extends I18nText implements Serializable {
 	
 	private static final long serialVersionUID = 20080821L;
@@ -32,22 +53,28 @@ public class ReportTextPartContent extends I18nText implements Serializable {
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 	
 	/**
 	 * @jdo.field primary-key="true"
 	 */
+	@PrimaryKey
 	private long reportTextPartConfigurationID;
 	
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String reportTextPartID;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private ReportTextPart reportTextPart;
 	
 	/**
@@ -62,6 +89,11 @@ public class ReportTextPartContent extends I18nText implements Serializable {
 	 * @jdo.join
 	 * @jdo.value-column sql-type="CLOB"
 	 */
+	@Join
+	@Persistent(
+		table="JFireReporting_ReportTextPartContent_contents",
+		defaultFetchGroup="true",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	protected Map<String, String> contents = new HashMap<String, String>();
 	
 	

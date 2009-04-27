@@ -31,6 +31,20 @@ import java.util.Map;
 
 import org.nightlabs.i18n.I18nText;
 
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.Column;
+import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemDescriptionID;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+
 /**
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  * 
@@ -45,7 +59,18 @@ import org.nightlabs.i18n.I18nText;
  * @jdo.create-objectid-class field-order="organisationID, reportRegistryItemType, reportRegistryItemID"
  *
  * @jdo.fetch-group name="ReportRegistryItem.description" fields="reportRegistryItem, texts"
- */
+ */@PersistenceCapable(
+	objectIdClass=ReportRegistryItemDescriptionID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireReporting_ReportRegistryItemDescription")
+@FetchGroups(
+	@FetchGroup(
+		name="ReportRegistryItem.description",
+		members={@Persistent(name="reportRegistryItem"), @Persistent(name="texts")})
+)
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
+
 public class ReportRegistryItemDescription extends I18nText {
 	
 	/**
@@ -57,24 +82,31 @@ public class ReportRegistryItemDescription extends I18nText {
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
-	 */
+	 */	@PrimaryKey
+	@Column(length=100)
+
 	private String organisationID;
 	
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
-	 */
+	 */	@PrimaryKey
+	@Column(length=100)
+
 	private String reportRegistryItemType;
 	
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
-	 */
+	 */	@PrimaryKey
+	@Column(length=100)
+
 	private String reportRegistryItemID;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
-	 */
+	 */	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+
 	private ReportRegistryItem reportRegistryItem;
 	
 	
@@ -109,7 +141,13 @@ public class ReportRegistryItemDescription extends I18nText {
 	 * @jdo.join
 	 * 
 	 * @jdo.value-column sql-type="CLOB"
-	 */
+	 */	@Join
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		table="JFireReporting_ReportRegistryItemDescription_texts",
+		defaultFetchGroup="true",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
+
 	protected Map<String, String> texts;
 	
 	/**

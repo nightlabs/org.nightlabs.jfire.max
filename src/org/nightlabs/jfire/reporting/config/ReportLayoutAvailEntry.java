@@ -30,12 +30,24 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashSet;
 
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
+
+import org.nightlabs.jfire.reporting.config.id.ReportLayoutAvailEntryID;
 import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
 
 /**
  * ConfigModule to store all available and one default
  * ReportLayouts for one reportCategoryType.
- * 
+ *
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  *
  * @jdo.persistence-capable
@@ -45,60 +57,81 @@ import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
  *		table="JFireReporting_ReportLayoutAvailEntry"
  *
  * @jdo.create-objectid-class
- * 
+ *
  * @jdo.fetch-group name="ReportLayoutAvailEntry.availableReportLayoutKeys" fields="availableReportLayoutKeys"
  */
+@PersistenceCapable(
+	objectIdClass=ReportLayoutAvailEntryID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireReporting_ReportLayoutAvailEntry")
+@FetchGroups(
+	@FetchGroup(
+		name=ReportLayoutAvailEntry.FETCH_GROUP_AVAILABLE_REPORT_LAYOUT_KEYS,
+		members=@Persistent(name="availableReportLayoutKeys"))
+)
 public class ReportLayoutAvailEntry
 implements Serializable
 {
 	public static final String FETCH_GROUP_AVAILABLE_REPORT_LAYOUT_KEYS = "ReportLayoutAvailEntry.availableReportLayoutKeys";
-	
+
 	private static final long serialVersionUID = 1L;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private ReportLayoutConfigModule reportLayoutConfigModule;
-	
+
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String reportRegistryItemType;
-	
+
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
-	
+
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String configKey;
-	
+
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	protected String configType;
-	
+
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="150"
 	 */
+	@PrimaryKey
+	@Column(length=150)
 	private String cfModKey;
-	
+
 	/**
 	 * The default ReportLayoutID for this categoryType
 	 */
 	private String defaultReportLayoutKey;
-	
+
 	/**
 	 * Collection of all ReportLayoutIDs available
 	 * for this categoryType.
-	 * 
+	 *
 	 * @jdo.field
 	 *		persistence-modifier="persistent"
 	 *		collection-type="collection"
@@ -108,15 +141,20 @@ implements Serializable
 	 *
 	 * @jdo.join
 	 */
+	@Join
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		table="JFireReporting_ReportLayoutAvailEntry_availableReportLayoutKeys",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Collection<String> availableReportLayoutKeys;
-	
+
 	public ReportLayoutAvailEntry() {
 		defaultReportLayoutKey = null;
 		availableReportLayoutKeys = new HashSet<String>();
 	}
-	
+
 	/**
-	 * 
+	 *
 	 */
 	public ReportLayoutAvailEntry(String reportRegistryItemType, ReportLayoutConfigModule configModule) {
 		this();
@@ -127,14 +165,14 @@ implements Serializable
 		this.configType = configModule.getConfigType();
 		this.cfModKey = configModule.getCfModKey();
 	}
-	
+
 	/**
 	 * @return Returns the organisationID.
 	 */
 	public String getOrganisationID() {
 		return organisationID;
 	}
-	
+
 	/**
 	 * @param organisationID The organisationID to set.
 	 */
@@ -142,28 +180,28 @@ implements Serializable
 		this.organisationID = organisationID;
 	}
 
-	
+
 	/**
 	 * @return Returns the reportRegistryItemType.
 	 */
 	public String getReportRegistryItemType() {
 		return reportRegistryItemType;
 	}
-	
+
 	/**
 	 * @param reportRegistryItemType The reportRegistryItemType to set.
 	 */
 	public void setReportRegistryItemType(String reportRegistryItemType) {
 		this.reportRegistryItemType = reportRegistryItemType;
 	}
-	
+
 	/**
 	 * @return Returns the reportLayoutConfigModule.
 	 */
 	public ReportLayoutConfigModule getReportLayoutConfigModule() {
 		return reportLayoutConfigModule;
 	}
-	
+
 	/**
 	 * @param reportLayoutConfigModule The reportLayoutConfigModule to set.
 	 */
@@ -171,35 +209,35 @@ implements Serializable
 			ReportLayoutConfigModule reportLayoutConfigModule) {
 		this.reportLayoutConfigModule = reportLayoutConfigModule;
 	}
-	
+
 	/**
 	 * @return Returns the availableReportLayouts.
 	 */
 	public Collection<String> getAvailableReportLayoutKeys() {
 		return availableReportLayoutKeys;
 	}
-	
+
 	/**
 	 * @param availableReportLayouts The availableReportLayouts to set.
 	 */
 	public void setAvailableReportLayoutKeys(Collection<String> availableReportLayoutKeys) {
 		this.availableReportLayoutKeys = availableReportLayoutKeys;
 	}
-	
+
 	/**
 	 * @return Returns the defaultReportLayoutKey.
 	 */
 	public String getDefaultReportLayoutKey() {
 		return defaultReportLayoutKey;
 	}
-	
+
 	/**
 	 * @param defaultReportLayoutID The defaultReportLayoutID to set.
 	 */
 	public void setDefaultReportLayoutKey(String defaultReportLayoutKey) {
 		this.defaultReportLayoutKey = defaultReportLayoutKey;
 	}
-	
+
 	/**
 	 * Returns either the ReportRegistryItemID configured as default for
 	 * this entry or null if none is set.
@@ -213,7 +251,7 @@ implements Serializable
 			throw new IllegalStateException("Could not create ReportRegistryItemID instance out of string-key: "+defaultReportLayoutKey, e);
 		}
 	}
-	
+
 	/**
 	 * Converts the stored Collection of strings into a Collection
 	 * of ReportRegistryItemIDs representing the available
@@ -281,5 +319,5 @@ implements Serializable
 		}
 		return clone;
 	}
-	
+
 }

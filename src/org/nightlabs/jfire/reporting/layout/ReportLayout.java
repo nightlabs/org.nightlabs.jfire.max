@@ -41,6 +41,16 @@ import org.apache.log4j.Logger;
 import org.nightlabs.io.DataBuffer;
 import org.nightlabs.util.Util;
 
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+
 /**
  * A ReportLayout holds the BIRT report definition.
  *
@@ -60,6 +70,21 @@ import org.nightlabs.util.Util;
  * @!jdo.fetch-group name="ReportLayout.localisationData" fetch-groups="default" fields="localisationData"
  * @jdo.fetch-group name="ReportLayout.this" fetch-groups="default, ReportRegistryItem.this" fields="reportDesign"
  */
+@PersistenceCapable(
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireReporting_ReportLayout")
+@FetchGroups({
+	@FetchGroup(
+		fetchGroups={"default"},
+		name=ReportLayout.FETCH_GROUP_REPORT_DESIGN,
+		members=@Persistent(name="reportDesign")),
+	@FetchGroup(
+		fetchGroups={"default", "ReportRegistryItem.this"},
+		name=ReportLayout.FETCH_GROUP_THIS_REPORT_LAYOUT,
+		members=@Persistent(name="reportDesign"))
+})
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class ReportLayout extends ReportRegistryItem {
 
 	/**
@@ -132,16 +157,20 @@ public class ReportLayout extends ReportRegistryItem {
 	 * @jdo.field persistence-modifier="persistent"
 	 * @jdo.column sql-type="BLOB"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+	@Column(sqlType="BLOB")
 	private byte[] reportDesign;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Date fileTimestamp;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private String fileName;
 
 

@@ -15,6 +15,20 @@ import javax.jdo.listener.DetachCallback;
 
 import org.nightlabs.jfire.reporting.parameter.id.ValueProviderCategoryID;
 
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.Queries;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.DiscriminatorStrategy;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Discriminator;
+
 /**
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
  * 
@@ -46,7 +60,44 @@ import org.nightlabs.jfire.reporting.parameter.id.ValueProviderCategoryID;
  *		query="SELECT JDOHelper.getObjectId(this)
  *			WHERE this.parent == :parentCategory
  *			"
- */
+ */@PersistenceCapable(
+	objectIdClass=ValueProviderCategoryID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireReporting_ValueProviderCategory")
+@FetchGroups({
+	@FetchGroup(
+		fetchGroups={"default"},
+		name=ValueProviderCategory.FETCH_GROUP_VALUE_PROVIDERS,
+		members=@Persistent(name="valueProviders")),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name=ValueProviderCategory.FETCH_GROUP_PARENT,
+		members=@Persistent(name="parent")),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name=ValueProviderCategory.FETCH_GROUP_CHILD_CATEGORIES,
+		members=@Persistent(name="childCategories")),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name=ValueProviderCategory.FETCH_GROUP_NAME,
+		members=@Persistent(name="name")),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name=ValueProviderCategory.FETCH_GROUP_THIS_VALUE_PROVIDER_CATEGORY,
+		members={@Persistent(name="name"), @Persistent(name="parent"), @Persistent(name="childCategories")})
+})
+@Discriminator(strategy=DiscriminatorStrategy.CLASS_NAME)
+@Queries({
+	@javax.jdo.annotations.Query(
+		name="getValueProviderCategoriesForParent",
+		value="SELECT WHERE this.parent == :parentCategory "),
+	@javax.jdo.annotations.Query(
+		name="getValueProviderCategoryIDsForParent",
+		value="SELECT JDOHelper.getObjectId(this) WHERE this.parent == :parentCategory ")
+})
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
+
 public class ValueProviderCategory implements Serializable, DetachCallback {
 
 	private static final long serialVersionUID = 1L;
@@ -64,12 +115,15 @@ public class ValueProviderCategory implements Serializable, DetachCallback {
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
-	 */
+	 */	@PrimaryKey
+	@Column(length=100)
+
 	private String organisationID;
 	
 	/**
 	 * @jdo.field primary-key="true" @jdo.column length="100"
-	 */
+	 */	@PrimaryKey
+
 	private String valueProviderCategoryID;
 	
 	/**
@@ -79,12 +133,17 @@ public class ValueProviderCategory implements Serializable, DetachCallback {
 	 *		element-type="org.nightlabs.jfire.reporting.parameter.ValueProvider"
 	 *		mapped-by="category"
 	 *		dependent-element="true"
-	 */
+	 */	@Persistent(
+		dependentElement="true",
+		mappedBy="category",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
+
 	private Set<ValueProvider> valueProviders;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
-	 */
+	 */	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+
 	private ValueProviderCategory parent;
 	
 	/**
@@ -94,20 +153,30 @@ public class ValueProviderCategory implements Serializable, DetachCallback {
 	 *		element-type="org.nightlabs.jfire.reporting.parameter.ValueProviderCategory"
 	 *		mapped-by="parent"
 	 *		dependent-element="true"
-	 */
+	 */	@Persistent(
+		dependentElement="true",
+		mappedBy="parent",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
+
 	private Set<ValueProviderCategory> childCategories;
 	
 	/**
 	 * @jdo.field
 	 * 		persistence-modifier="persistent"
 	 * 		mapped-by="valueProviderCategory"
-	 */
+	 */	@Persistent(
+		mappedBy="valueProviderCategory",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
+
 	private ValueProviderCategoryName name;
 	
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 * 		mapped-by="valueProviderCategory"
-	 */
+	 */	@Persistent(
+		mappedBy="valueProviderCategory",
+		persistenceModifier=PersistenceModifier.NONE)
+
 	private ValueProviderCategoryID parentID;
 	
 	/**

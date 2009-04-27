@@ -25,6 +25,16 @@ import org.nightlabs.jfire.reporting.parameter.ValueProvider;
 import org.nightlabs.jfire.reporting.parameter.ValueProviderInputParameter;
 import org.nightlabs.util.Util;
 
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.PersistenceModifier;
+import org.nightlabs.jfire.reporting.parameter.config.id.ValueAcquisitionSetupID;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+
 /**
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
  *
@@ -44,7 +54,34 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="ValueAcquisitionSetup.valueConsumerBindings" fetch-groups="default" fields="valueConsumerBindings"
  * @jdo.fetch-group name="ValueAcquisitionSetup.useCase" fetch-groups="default" fields="useCase"
  * @jdo.fetch-group name="ValueAcquisitionSetup.this" fetch-groups="default" fields="parameterConfigs, valueProviderConfigs, valueConsumerBindings, useCase"
- */
+ */@PersistenceCapable(
+	objectIdClass=ValueAcquisitionSetupID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireReporting_ValueAcquisitionSetup")
+@FetchGroups({
+	@FetchGroup(
+		fetchGroups={"default"},
+		name=ValueAcquisitionSetup.FETCH_GROUP_PARAMETER_CONFIGS,
+		members=@Persistent(name="parameterConfigs")),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name=ValueAcquisitionSetup.FETCH_GROUP_VALUE_PROVIDER_CONFIGS,
+		members=@Persistent(name="valueProviderConfigs")),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name=ValueAcquisitionSetup.FETCH_GROUP_VALUE_CONSUMER_BINDINGS,
+		members=@Persistent(name="valueConsumerBindings")),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name="ValueAcquisitionSetup.useCase",
+		members=@Persistent(name="useCase")),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name=ValueAcquisitionSetup.FETCH_GROUP_THIS_VALUE_ACQUISITION_SETUP,
+		members={@Persistent(name="parameterConfigs"), @Persistent(name="valueProviderConfigs"), @Persistent(name="valueConsumerBindings"), @Persistent(name="useCase")})
+})
+
 public class ValueAcquisitionSetup
 implements Serializable
 {
@@ -62,12 +99,15 @@ implements Serializable
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
-	 */
+	 */	@PrimaryKey
+	@Column(length=100)
+
 	private String organisationID;
 
 	/**
 	 * @jdo.field primary-key="true"
-	 */
+	 */	@PrimaryKey
+
 	private long valueAcquisitionSetupID;
 
 	/**
@@ -77,7 +117,11 @@ implements Serializable
 	 *		element-type="org.nightlabs.jfire.reporting.parameter.config.AcquisitionParameterConfig"
 	 *		mapped-by="setup"
 	 *		dependent-element="true"
-	 */
+	 */	@Persistent(
+		dependentElement="true",
+		mappedBy="setup",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
+
 	private List<AcquisitionParameterConfig> parameterConfigs;
 
 	/**
@@ -87,7 +131,11 @@ implements Serializable
 	 *		element-type="org.nightlabs.jfire.reporting.parameter.config.ValueProviderConfig"
 	 *		mapped-by="setup"
 	 *		dependent-element="true"
-	 */
+	 */	@Persistent(
+		dependentElement="true",
+		mappedBy="setup",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
+
 	private Set<ValueProviderConfig> valueProviderConfigs;
 
 	/**
@@ -97,31 +145,41 @@ implements Serializable
 	 *		element-type="org.nightlabs.jfire.reporting.parameter.config.ValueConsumerBinding"
 	 *		mapped-by="setup"
 	 *		dependent-element="true"
-	 */
+	 */	@Persistent(
+		dependentElement="true",
+		mappedBy="setup",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
+
 	private Set<ValueConsumerBinding> valueConsumerBindings;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
-	 */
+	 */	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+
 	private ReportParameterAcquisitionSetup parameterAcquisitionSetup;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" dependent="true"
-	 */
+	 */	@Persistent(
+		dependent="true",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
+
 	private ReportParameterAcquisitionUseCase useCase;
 
 	/**
 	 * Used internally to provide bindings.
 	 * 
 	 * @jdo.field persistence-modifier="none"
-	 **/
+	 **/	@Persistent(persistenceModifier=PersistenceModifier.NONE)
+
 	private transient Map<String, Map<String, ValueConsumerBinding>> consumer2Binding = null;
 
 	/**
 	 * Used internally to provide bindings.
 	 * 
 	 * @jdo.field persistence-modifier="none"
-	 **/
+	 **/	@Persistent(persistenceModifier=PersistenceModifier.NONE)
+
 	private transient Map<String, ValueConsumerBinding> provider2Binding = null;
 
 	/**

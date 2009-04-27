@@ -32,6 +32,16 @@ import java.util.Set;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Queries;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+
 
 /**
  * ReportCategories are used to organise reports on the server.
@@ -62,6 +72,26 @@ import javax.jdo.Query;
  *		import java.lang.String"
  *
  */
+@PersistenceCapable(
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireReporting_ReportCategory")
+@FetchGroups({
+	@FetchGroup(
+		fetchGroups={"default"},
+		name=ReportCategory.FETCH_GROUP_CHILD_ITEMS,
+		members=@Persistent(name="childItems")),
+	@FetchGroup(
+		fetchGroups={"default", "ReportRegistryItem.this"},
+		name=ReportCategory.FETCH_GROUP_THIS_REPORT_CATEGORY,
+		members=@Persistent(name="childItems"))
+})
+@Queries(
+	@javax.jdo.annotations.Query(
+		name=ReportCategory.QUERY_GET_REPORT_CATEGORY,
+		value="SELECT UNIQUE WHERE this.organisationID == paramOrganisationID && this.reportRegistryItemType == paramCategoryType PARAMETERS String paramOrganisationID, String paramCategoryType import java.lang.String")
+)
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class ReportCategory extends ReportRegistryItem implements NestableReportRegistryItem {
 
 //	public static final String INTERNAL_CATEGORY_TYPE_ORDER = "OrderLayout";
@@ -90,6 +120,7 @@ public class ReportCategory extends ReportRegistryItem implements NestableReport
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private boolean internal;
 
 	/**
@@ -102,6 +133,10 @@ public class ReportCategory extends ReportRegistryItem implements NestableReport
 	 *		mapped-by="parentCategory"
 	 *		dependent-element="true"
 	 */
+	@Persistent(
+		dependentElement="true",
+		mappedBy="parentCategory",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Set<ReportRegistryItem> childItems;
 
 	/**

@@ -30,6 +30,17 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Key;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.Value;
+
 import org.apache.log4j.Logger;
 import org.nightlabs.jfire.config.ConfigModule;
 import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
@@ -46,13 +57,23 @@ import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
  * @jdo.inheritance strategy="new-table"
  * @jdo.fetch-group name="ReportLayoutConfigModule.availEntries" fields="availEntries"
  */
+@PersistenceCapable(
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireReporting_ReportLayoutConfigModule")
+@FetchGroups(
+	@FetchGroup(
+		name=ReportLayoutConfigModule.FETCH_GROUP_AVAILABLE_LAYOUTS,
+		members=@Persistent(name="availEntries"))
+)
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class ReportLayoutConfigModule extends ConfigModule {
 
 	/**
 	 * Log4J Logger for this class
 	 */
 	private static final Logger logger = Logger.getLogger(ReportLayoutConfigModule.class);
-	
+
 	private static final long serialVersionUID = 1L;
 
 	public static final String FETCH_GROUP_AVAILABLE_LAYOUTS = "ReportLayoutConfigModule.availEntries";
@@ -64,7 +85,7 @@ public class ReportLayoutConfigModule extends ConfigModule {
 	public void init() {
 		availEntries = new HashMap<String, ReportLayoutAvailEntry>();
 	}
-	
+
 	/**
 	 * key: String reportRegistryItemType
 	 * value: ReportLayoutAvailEntry available entries for this itemType
@@ -79,9 +100,14 @@ public class ReportLayoutConfigModule extends ConfigModule {
 	 *
 	 * @jdo.key mapped-by="reportRegistryItemType"
 	 */
+	@Persistent(
+		mappedBy="reportLayoutConfigModule",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
+	@Key(mappedBy="reportRegistryItemType")
+	@Value(dependent="true")
 	private Map<String, ReportLayoutAvailEntry> availEntries;
-	
-	
+
+
 	/**
 	 * The Map of available entries per reportRegistryItemType
 	 * @return
@@ -89,11 +115,11 @@ public class ReportLayoutConfigModule extends ConfigModule {
 	public Map<String, ReportLayoutAvailEntry> getAvailEntries() {
 		return availEntries;
 	}
-	
+
 	public void setAvailEntries(Map<String, ReportLayoutAvailEntry> availEntries) {
 		this.availEntries = availEntries;
 	}
-	
+
 	public ReportLayoutAvailEntry getAvailEntry(String reportRegistryItemType) {
 		if (availEntries == null) // WORKAROUND: This should never happen, still it was the case, although set in init()
 			availEntries = new HashMap<String, ReportLayoutAvailEntry>();
@@ -104,7 +130,7 @@ public class ReportLayoutConfigModule extends ConfigModule {
 		}
 		return result;
 	}
-	
+
 	@Override
 	public Object clone() {
 		ReportLayoutConfigModule clone = new ReportLayoutConfigModule();
@@ -119,7 +145,7 @@ public class ReportLayoutConfigModule extends ConfigModule {
 		}
 		return clone;
 	}
-	
+
 	public void assignTo(ReportLayoutConfigModule configModule) {
 		configModule.getAvailEntries().clear();
 		for (ReportLayoutAvailEntry entry : getAvailEntries().values()) {
@@ -129,7 +155,7 @@ public class ReportLayoutConfigModule extends ConfigModule {
 				);
 		}
 	}
-	
+
 	public void copyFrom(ReportLayoutConfigModule configModule) {
 		for (ReportLayoutAvailEntry availEntry : configModule.getAvailEntries().values()) {
 			ReportLayoutAvailEntry thisEntry = getAvailEntry(availEntry.getReportRegistryItemType());
@@ -142,14 +168,14 @@ public class ReportLayoutConfigModule extends ConfigModule {
 			thisEntry.setDefaultReportLayoutKey(availEntry.getDefaultReportLayoutKey());
 		}
 	}
-	
+
 	public ReportRegistryItemID getDefaultAvailEntry(String reportRegistryItemType) {
 		ReportLayoutAvailEntry availEntry = getAvailEntry(reportRegistryItemType);
 		if (availEntry == null)
 			throw new IllegalStateException("Could not get ReportLayoutAvailEntry even with auto-create");
 		return availEntry.getDefaultReportLayoutID();
 	}
-	
+
 	public Collection<ReportRegistryItemID> getAvailEntries(String reportRegistryItemType) {
 		ReportLayoutAvailEntry availEntry = getAvailEntry(reportRegistryItemType);
 		if (availEntry == null)

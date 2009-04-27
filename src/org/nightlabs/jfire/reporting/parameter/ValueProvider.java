@@ -15,6 +15,20 @@ import org.nightlabs.jfire.reporting.parameter.config.ValueProviderConfig;
 import org.nightlabs.jfire.reporting.parameter.id.ValueProviderCategoryID;
 import org.nightlabs.jfire.reporting.parameter.id.ValueProviderID;
 
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Discriminator;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Queries;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.DiscriminatorStrategy;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+
 /**
  * ValueProviders are used to declare the process of acquiring
  * report parameters from the user. They are registered on the
@@ -52,7 +66,45 @@ import org.nightlabs.jfire.reporting.parameter.id.ValueProviderID;
  *			WHERE this.category == :parentCategory
  *			"
  *
- */
+ */@PersistenceCapable(
+	objectIdClass=ValueProviderID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireReporting_ValueProvider")
+@FetchGroups({
+	@FetchGroup(
+		fetchGroups={"default"},
+		name=ValueProvider.FETCH_GROUP_NAME,
+		members=@Persistent(name="name")),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name=ValueProvider.FETCH_GROUP_DESCRIPTION,
+		members=@Persistent(name="description")),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name=ValueProvider.FETCH_GROUP_DEFAULT_MESSAGE,
+		members=@Persistent(name="defaultMessage")),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name=ValueProvider.FETCH_GROUP_CATEGORY,
+		members=@Persistent(name="category")),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name=ValueProvider.FETCH_GROUP_INPUT_PARAMETERS,
+		members=@Persistent(name="inputParameters")),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name=ValueProvider.FETCH_GROUP_THIS_VALUE_PROVIDER,
+		members={@Persistent(name="name"), @Persistent(name="description"), @Persistent(name="category"), @Persistent(name="inputParameters")})
+})
+@Discriminator(strategy=DiscriminatorStrategy.CLASS_NAME)
+@Queries(
+	@javax.jdo.annotations.Query(
+		name="getValueProviderIDsForParent",
+		value="SELECT JDOHelper.getObjectId(this) WHERE this.category == :parentCategory ")
+)
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
+
 public class ValueProvider implements Serializable, DetachCallback {
 
 	private static final long serialVersionUID = 1L;
@@ -71,29 +123,37 @@ public class ValueProvider implements Serializable, DetachCallback {
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
-	 */
+	 */	@PrimaryKey
+	@Column(length=100)
+
 	private String organisationID;
 	
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
-	 */
+	 */	@PrimaryKey
+	@Column(length=100)
+
 	private String valueProviderCategoryID;
 	
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
-	 */
+	 */	@PrimaryKey
+	@Column(length=100)
+
 	private String valueProviderID;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
-	 */
+	 */	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+
 	private String outputType;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
-	 */
+	 */	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+
 	private ValueProviderCategory category;
 	
 	/**
@@ -103,33 +163,47 @@ public class ValueProvider implements Serializable, DetachCallback {
 	 *		element-type="org.nightlabs.jfire.reporting.parameter.ValueProviderInputParameter"
 	 *		mapped-by="valueProvider"
 	 *		dependent-element="true"
-	 */
+	 */	@Persistent(
+		dependentElement="true",
+		mappedBy="valueProvider",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
+
 	private List<ValueProviderInputParameter> inputParameters;
 	
 	/**
 	 * @jdo.field
 	 * 		persistence-modifier="persistent"
 	 * 		mapped-by="valueProvider"
-	 */
+	 */	@Persistent(
+		mappedBy="valueProvider",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
+
 	private ValueProviderName name;
 
 	/**
 	 * @jdo.field
 	 * 		persistence-modifier="persistent"
 	 * 		mapped-by="valueProvider"
-	 */
+	 */	@Persistent(
+		mappedBy="valueProvider",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
+
 	private ValueProviderDescription description;
 	
 	/**
 	 * @jdo.field
 	 * 		persistence-modifier="persistent"
 	 * 		mapped-by="valueProvider"
-	 */
+	 */	@Persistent(
+		mappedBy="valueProvider",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
+
 	private ValueProviderDefaultMessage defaultMessage;
 	
 	/**
 	 * @jdo.field persistence-modifier="none"
-	 */
+	 */	@Persistent(persistenceModifier=PersistenceModifier.NONE)
+
 	private ValueProviderCategoryID categoryID;
 	
 	protected ValueProvider() {

@@ -8,6 +8,18 @@ import java.util.Map;
 
 import org.nightlabs.i18n.I18nText;
 
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.NullValue;
+import org.nightlabs.jfire.reporting.textpart.id.ReportTextPartNameID;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+
 /**
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
  *
@@ -23,6 +35,19 @@ import org.nightlabs.i18n.I18nText;
  * @jdo.fetch-group name="ReportTextPart.name" fields="reportTextPart, names"
  * 
  */
+@PersistenceCapable(
+	objectIdClass=ReportTextPartNameID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireReporting_ReportTextPartName")
+@FetchGroups({
+	@FetchGroup(
+		name="ReportTextPartName.names",
+		members=@Persistent(name="names")),
+	@FetchGroup(
+		name="ReportTextPart.name",
+		members={@Persistent(name="reportTextPart"), @Persistent(name="names")})
+})
 public class ReportTextPartName extends I18nText {
 
 	private static final long serialVersionUID = 20080821L;
@@ -31,22 +56,28 @@ public class ReportTextPartName extends I18nText {
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 	
 	/**
 	 * @jdo.field primary-key="true"
 	 */
+	@PrimaryKey
 	private long reportTextPartConfigurationID;
 	
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String reportTextPartID;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private ReportTextPart reportTextPart;
 	
 	/**
@@ -61,6 +92,12 @@ public class ReportTextPartName extends I18nText {
 	 *
 	 * @jdo.join
 	 */
+	@Join
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		table="JFireReporting_ReportTextPartName_names",
+		defaultFetchGroup="true",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	protected Map<String, String> names = new HashMap<String, String>();
 	
 	

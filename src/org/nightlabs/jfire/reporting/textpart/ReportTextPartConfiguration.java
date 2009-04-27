@@ -23,6 +23,17 @@ import org.nightlabs.jfire.reporting.layout.ReportRegistryItem;
 import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
 import org.nightlabs.util.Util;
 
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.FetchGroup;
+import org.nightlabs.jfire.reporting.textpart.id.ReportTextPartConfigurationID;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.Queries;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+
 /**
  * {@link ReportTextPartConfiguration}s are a list of {@link ReportTextPart}s that
  * can be linked to a report category or a report layout. Additionally they can be
@@ -75,6 +86,29 @@ import org.nightlabs.util.Util;
  *			this.linkedObjectID == null"
  *
  */
+@PersistenceCapable(
+	objectIdClass=ReportTextPartConfigurationID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireReporting_ReportTextPartConfiguration")
+@FetchGroups({
+	@FetchGroup(
+		fetchGroups={"default"},
+		name=ReportTextPartConfiguration.FETCH_GROUP_REPORT_REGISTRY_ITEM,
+		members=@Persistent(name="reportRegistryItem")),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name=ReportTextPartConfiguration.FETCH_GROUP_REPORT_TEXT_PARTS,
+		members=@Persistent(name="reportTextParts"))
+})
+@Queries({
+	@javax.jdo.annotations.Query(
+		name="getReportTextPartConfigurationByLinkedObject",
+		value="SELECT this WHERE this.linkedObjectID == :paramLinkedObjectID && (this.reportRegistryItem == :paramReportRegistryItem || this.reportRegistryItem == null)"),
+	@javax.jdo.annotations.Query(
+		name="getReportTextPartConfigurationByReportRegistryItem",
+		value="SELECT this WHERE this.reportRegistryItem == :paramReportRegistryItem && this.linkedObjectID == null")
+})
 public class ReportTextPartConfiguration implements Serializable {
 	
 	private static final long serialVersionUID = 20080929L;
@@ -89,26 +123,32 @@ public class ReportTextPartConfiguration implements Serializable {
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 	
 	/**
 	 * @jdo.field primary-key="true"
 	 */
+	@PrimaryKey
 	private long reportTextPartConfigurationID;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private ReportRegistryItem reportRegistryItem;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private String linkedObjectID;
 	
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private transient ObjectID linkedObjectIDObj;
 	
 	/**
@@ -119,16 +159,22 @@ public class ReportTextPartConfiguration implements Serializable {
 	 *		mapped-by="reportTextPartConfiguration"
 	 *		dependent-element="true"
 	 */
+	@Persistent(
+		dependentElement="true",
+		mappedBy="reportTextPartConfiguration",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private List<ReportTextPart> reportTextParts;
 	
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private boolean synthetic = false;
 	
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private ReportRegistryItemID synthesizeTemplateReportRegistryItemID;
 	
 	/**

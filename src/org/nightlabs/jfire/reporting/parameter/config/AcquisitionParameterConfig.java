@@ -9,6 +9,18 @@ import javax.jdo.listener.DeleteCallback;
 
 import org.nightlabs.jfire.reporting.parameter.ValueProvider;
 
+import javax.jdo.annotations.Persistent;
+import org.nightlabs.jfire.reporting.parameter.config.id.AcquisitionParameterConfigID;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.DiscriminatorStrategy;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Discriminator;
+
 /**
  * This is used to represent a BIRT parameter within a {@link ValueAcquisitionSetup}.
  * These objects are always the end of the {@link ValueProvider} chain when
@@ -32,7 +44,14 @@ import org.nightlabs.jfire.reporting.parameter.ValueProvider;
  * 
  * @jdo.implements name="org.nightlabs.jfire.reporting.parameter.config.ValueConsumer"
  * 
- */
+ */@PersistenceCapable(
+	objectIdClass=AcquisitionParameterConfigID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireReporting_AcquisitionParameterConfig")
+@Discriminator(strategy=DiscriminatorStrategy.CLASS_NAME)
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
+
 public class AcquisitionParameterConfig
 implements ValueConsumer, Serializable, IGraphicalInfoProvider, DeleteCallback
 {
@@ -41,38 +60,47 @@ implements ValueConsumer, Serializable, IGraphicalInfoProvider, DeleteCallback
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
-	 */
+	 */	@PrimaryKey
+	@Column(length=100)
+
 	private String organisationID;
 	
 	/**
 	 * @jdo.field primary-key="true"
-	 */
+	 */	@PrimaryKey
+
 	private long valueAcquisitionSetupID;
 	
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
-	 */
+	 */	@PrimaryKey
+	@Column(length=100)
+
 	private String parameterID;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
-	 */
+	 */	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+
 	private String parameterType;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
-	 */
+	 */	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+
 	private ValueAcquisitionSetup setup;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
-	 */
+	 */	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+
 	private int x;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
-	 */
+	 */	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+
 	private int y;
 	
 	// Maybe need to add x,y for GEF editor

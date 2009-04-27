@@ -54,6 +54,24 @@ import org.nightlabs.jfire.security.id.AuthorityID;
 import org.nightlabs.jfire.security.id.AuthorityTypeID;
 import org.nightlabs.util.Util;
 
+import javax.jdo.annotations.Value;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.VersionStrategy;
+import javax.jdo.annotations.Version;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Discriminator;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.Key;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Queries;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.DiscriminatorStrategy;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+
 /**
  * Common type for report registry item (ReportCategory, ReportLayout).
  *
@@ -117,6 +135,56 @@ import org.nightlabs.util.Util;
  *	query="SELECT JDOHelper.getObjectId(this)
  *		WHERE this.parentCategory == :paramParent"
  */
+@PersistenceCapable(
+	objectIdClass=ReportRegistryItemID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireReporting_ReportRegistryItem")
+@Version(strategy=VersionStrategy.VERSION_NUMBER)
+@FetchGroups({
+	@FetchGroup(
+		fetchGroups={"default"},
+		name=ReportRegistryItem.FETCH_GROUP_PARENT_CATEGORY,
+		members=@Persistent(name="parentCategory")),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name=ReportRegistryItem.FETCH_GROUP_NAME,
+		members=@Persistent(name="name")),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name=ReportRegistryItem.FETCH_GROUP_DESCRIPTION,
+		members=@Persistent(name="description")),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name=ReportRegistryItem.FETCH_GROUP_THIS_REPORT_REGISTRY_ITEM,
+		members={@Persistent(name="parentCategory"), @Persistent(name="name")}),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name=ReportRegistryItem.FETCH_GROUP_FIELD_META_DATA,
+		members=@Persistent(name="fieldMetaDataMap"))
+})
+@Discriminator(strategy=DiscriminatorStrategy.CLASS_NAME)
+@Queries({
+	@javax.jdo.annotations.Query(
+		name=ReportRegistryItem.QUERY_GET_REPORT_REGISTRY_ITEM_BY_TYPE,
+		value="SELECT WHERE this.organisationID == :paramOrganisationID && this.reportRegistryItemType == :paramReportRegistryItemType import java.lang.String"),
+	@javax.jdo.annotations.Query(
+		name=ReportRegistryItem.QUERY_TOP_LEVEL_GET_REPORT_REGISTRY_ITEM_BY_TYPE,
+		value="SELECT UNIQUE WHERE this.organisationID == paramOrganisationID && this.reportRegistryItemType == paramReportRegistryItemType && this.parentCategory == null PARAMETERS String paramOrganisationID, String reportRegistryItemType import java.lang.String"),
+	@javax.jdo.annotations.Query(
+		name=ReportRegistryItem.QUERY_TOP_LEVEL_GET_REPORT_REGISTRY_ITEMS_BY_ORGANISATION,
+		value="SELECT WHERE this.organisationID == paramOrganisationID && this.parentCategory == null PARAMETERS String paramOrganisationID import java.lang.String"),
+	@javax.jdo.annotations.Query(
+		name=ReportRegistryItem.QUERY_TOP_LEVEL_GET_REPORT_REGISTRY_ITEMS,
+		value="SELECT WHERE this.parentCategory == null import java.lang.String"),
+	@javax.jdo.annotations.Query(
+		name="getReportRegistryItemsForParent",
+		value="SELECT WHERE this.parentCategory == :paramParent"),
+	@javax.jdo.annotations.Query(
+		name="getReportRegistryItemIDsForParent",
+		value="SELECT JDOHelper.getObjectId(this) WHERE this.parentCategory == :paramParent")
+})
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public abstract class ReportRegistryItem
 implements Serializable, DetachCallback, SecuredObject, Inheritable, InheritanceCallbacks
 {
@@ -170,38 +238,52 @@ implements Serializable, DetachCallback, SecuredObject, Inheritable, Inheritance
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String reportRegistryItemType;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String reportRegistryItemID;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" mapped-by="reportRegistryItem"
 	 */
+	@Persistent(
+		mappedBy="reportRegistryItem",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private ReportRegistryItemName name;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" mapped-by="reportRegistryItem"
 	 */
+	@Persistent(
+		mappedBy="reportRegistryItem",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private ReportRegistryItemDescription description;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private ReportCategory parentCategory;
 
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private ReportRegistryItemID parentCategoryID;
 
 	/**
@@ -213,11 +295,13 @@ implements Serializable, DetachCallback, SecuredObject, Inheritable, Inheritance
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private String securingAuthorityTypeID;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private String securingAuthorityID;
 
 
@@ -398,6 +482,11 @@ implements Serializable, DetachCallback, SecuredObject, Inheritable, Inheritance
 	 *
 	 * @jdo.key mapped-by="fieldName"
 	 */
+	@Persistent(
+		mappedBy="reportRegistryItem",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
+	@Key(mappedBy="fieldName")
+	@Value(dependent="true")
 	protected Map<String, ReportRegistryItemFieldMetaData> fieldMetaDataMap;
 
 	/**
@@ -633,6 +722,7 @@ implements Serializable, DetachCallback, SecuredObject, Inheritable, Inheritance
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private boolean parentCategoryIDDetached = false;
 	/**
 	 * {@inheritDoc}

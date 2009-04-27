@@ -5,6 +5,16 @@ package org.nightlabs.jfire.reporting.textpart;
 
 import java.io.Serializable;
 
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.Column;
+import org.nightlabs.jfire.reporting.textpart.id.ReportTextPartID;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+
 /**
  * {@link ReportTextPart}s can be considered as parts of report layouts that can be changed without
  * changing the the report layout (or without having the right to edit reports).
@@ -38,6 +48,25 @@ import java.io.Serializable;
  * @jdo.fetch-group name="ReportTextPartConfiguration.reportTextParts" fields="reportTextPartConfiguration" 
  * 
  */
+@PersistenceCapable(
+	objectIdClass=ReportTextPartID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireReporting_ReportTextPart")
+@FetchGroups({
+	@FetchGroup(
+		name=ReportTextPart.FETCH_GROUP_CONTENT,
+		members=@Persistent(name="content")),
+	@FetchGroup(
+		name=ReportTextPart.FETCH_GROUP_NAME,
+		members=@Persistent(name="name")),
+	@FetchGroup(
+		name=ReportTextPart.FETCH_GROUP_REPORT_TEXT_PART_CONIGURATION,
+		members=@Persistent(name="reportTextPartConfiguration")),
+	@FetchGroup(
+		name="ReportTextPartConfiguration.reportTextParts",
+		members=@Persistent(name="reportTextPartConfiguration"))
+})
 public class ReportTextPart implements Serializable {
 	
 	private static final long serialVersionUID = 20080821L;
@@ -73,37 +102,52 @@ public class ReportTextPart implements Serializable {
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 	
 	/**
 	 * @jdo.field primary-key="true"
 	 */
+	@PrimaryKey
 	private long reportTextPartConfigurationID;
 	
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String reportTextPartID;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private ReportTextPartConfiguration reportTextPartConfiguration;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Type type;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent" mapped-by="reportTextPart" dependent="true"
 	 */
+	@Persistent(
+		dependent="true",
+		mappedBy="reportTextPart",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private ReportTextPartName name;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent" mapped-by="reportTextPart" dependent="true"
 	 */
+	@Persistent(
+		dependent="true",
+		mappedBy="reportTextPart",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private ReportTextPartContent content;
 
 	/**

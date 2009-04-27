@@ -32,6 +32,20 @@ import java.util.Map;
 
 import org.nightlabs.i18n.I18nText;
 
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+import org.nightlabs.jfire.reporting.parameter.id.ValueProviderCategoryNameID;
+
 /**
  * Name i18n text for {@link ValueProvider}s.
  * 
@@ -48,7 +62,18 @@ import org.nightlabs.i18n.I18nText;
  * @jdo.create-objectid-class field-order="organisationID, valueProviderCategoryID"
  *
  * @jdo.fetch-group name="ValueProvider.name" fields="valueProviderCategory, names"
- */
+ */@PersistenceCapable(
+	objectIdClass=ValueProviderCategoryNameID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireReporting_ValueProviderCategoryName")
+@FetchGroups(
+	@FetchGroup(
+		name="ValueProvider.name",
+		members={@Persistent(name="valueProviderCategory"), @Persistent(name="names")})
+)
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
+
 public class ValueProviderCategoryName extends I18nText implements Serializable {
 	
 	/**
@@ -60,17 +85,21 @@ public class ValueProviderCategoryName extends I18nText implements Serializable 
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
-	 */
+	 */	@PrimaryKey
+	@Column(length=100)
+
 	private String organisationID;
 	
 	/**
 	 * @jdo.field primary-key="true" @jdo.column length="100"
-	 */
+	 */	@PrimaryKey
+
 	private String valueProviderCategoryID;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
-	 */
+	 */	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+
 	private ValueProviderCategory valueProviderCategory;
 	
 	/**
@@ -101,7 +130,13 @@ public class ValueProviderCategoryName extends I18nText implements Serializable 
 	 *		null-value="exception"
 	 *
 	 * @jdo.join
-	 */
+	 */	@Join
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		table="JFireReporting_ValueProviderCategoryName_names",
+		defaultFetchGroup="true",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
+
 	protected Map<String, String> names;
 	
 	/**

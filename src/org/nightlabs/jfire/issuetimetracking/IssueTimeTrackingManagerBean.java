@@ -52,7 +52,6 @@ implements IssueTimeTrackingManagerRemote
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@RolesAllowed("_Guest_")
-	@SuppressWarnings("unchecked")
 	@Override
 	public List<ProjectCost> getProjectCosts(Collection<ProjectCostID> projectCostIDs, String[] fetchGroups, int maxFetchDepth)
 	{
@@ -105,11 +104,16 @@ implements IssueTimeTrackingManagerRemote
 	public Set<ProjectCostID> getProjectCostIDsByProjectID(ProjectID projectID) {
 		PersistenceManager pm = getPersistenceManager();
 		try {
+			// FIXME: NEVER reference a named query outside of the class where it is declared!!!
+			// Instead use a static method inside the class that provides the functionality!
+			// See  ServerPaymentProcessor#getServerPaymentProcessorsForOneModeOfPaymentFlavour(...) as example.
+			// And please remove this fixme when you moved the code.
+			// Marco.
 			Query q = pm.newNamedQuery(ProjectCost.class, "getProjectCostsByProjectID");
 			Map<String, Object> params = new HashMap<String, Object>(2);
 			params.put("organisationID", projectID.organisationID);
 			params.put("projectID", projectID.projectID);
-			return NLJDOHelper.getObjectIDSet((Collection<ProjectCostID>) q.executeWithMap(params));
+			return NLJDOHelper.getObjectIDSet((Collection<?>) q.executeWithMap(params));
 		} finally {
 			pm.close();
 		}

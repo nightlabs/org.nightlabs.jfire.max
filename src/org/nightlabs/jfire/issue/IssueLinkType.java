@@ -9,6 +9,21 @@ import java.util.Set;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.Discriminator;
+import javax.jdo.annotations.DiscriminatorStrategy;
+import javax.jdo.annotations.Element;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.Queries;
 
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
@@ -16,27 +31,11 @@ import org.nightlabs.jfire.issue.id.IssueLinkTypeID;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.util.Util;
 
-import javax.jdo.annotations.Join;
-import javax.jdo.annotations.Value;
-import javax.jdo.annotations.FetchGroups;
-import javax.jdo.annotations.Inheritance;
-import javax.jdo.annotations.PrimaryKey;
-import javax.jdo.annotations.FetchGroup;
-import javax.jdo.annotations.PersistenceModifier;
-import javax.jdo.annotations.Discriminator;
-import javax.jdo.annotations.Persistent;
-import javax.jdo.annotations.InheritanceStrategy;
-import javax.jdo.annotations.Queries;
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.DiscriminatorStrategy;
-import javax.jdo.annotations.Column;
-import javax.jdo.annotations.IdentityType;
-
 /**
- * The {@link IssueLinkType} class represents a relation between {@link Issue}s or between {@link Issue} and the other object. 
+ * The {@link IssueLinkType} class represents a relation between {@link Issue}s or between {@link Issue} and the other object.
  * <p>
  * </p>
- * 
+ *
  * @author Chairat Kongarayawetchakun - chairat [AT] nightlabs [DOT] de
  *
  * @jdo.persistence-capable
@@ -120,20 +119,20 @@ implements Serializable
 	 * This is the organisationID to which the issue link type belongs. Within one organisation,
 	 * all the issue link types have their organisation's ID stored here, thus it's the same
 	 * value for all of them.
-	 * 
+	 *
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */	@PrimaryKey
 	@Column(length=100)
 
 	private String organisationID;
-	
+
 	/**
 	 * @jdo.field primary-key="true"
 	 */	@PrimaryKey
 
 	private String issueLinkTypeID;
-	
+
 	/**
 	 * String of the referenced object class names.
 	 *
@@ -141,7 +140,7 @@ implements Serializable
 	 *		persistence-modifier="persistent"
 	 *		collection-type="collection"
 	 *		element-type="String"
-	 *		dependent-value="true"
+	 *		dependent-value="true" // this is IMHO wrong. Changed it to @Element (instead of @Value) below.
 	 *		table="JFireIssueTracking_IssueLinkType_linkedObjectClassNames"
 	 *
 	 * @jdo.join
@@ -149,10 +148,9 @@ implements Serializable
 	@Persistent(
 		table="JFireIssueTracking_IssueLinkType_linkedObjectClassNames",
 		persistenceModifier=PersistenceModifier.PERSISTENT)
-	@Value(dependent="true")
-
+	@Element(dependent="true")
 	private Set<String> linkedObjectClassNames;
-	
+
 	/**
 	 * @jdo.field persistence-modifier="persistent" dependent="true" mapped-by="issueLinkType"
 	 */	@Persistent(
@@ -164,6 +162,7 @@ implements Serializable
 	/**
 	 * @deprecated Only for JDO!!!!
 	 */
+	@Deprecated
 	protected IssueLinkType() {}
 
 	/**
@@ -184,13 +183,13 @@ implements Serializable
 		ObjectIDUtil.assertValidIDString(issueLinkTypeID, "issueLinkTypeID");
 		this.organisationID = organisationID;
 		this.issueLinkTypeID = issueLinkTypeID;
-		
+
 		this.linkedObjectClassNames = new HashSet<String>();
 		this.name = new IssueLinkTypeName(this);
 	}
 
 	/**
-	 * 
+	 *
 	 * @return
 	 */
 	public Set<String> getLinkedObjectClassNames() {
@@ -204,7 +203,7 @@ implements Serializable
 	private transient Set<Class<?>> linkedObjectClasses;
 
 	/**
-	 * 
+	 *
 	 * @return
 	 * @throws ClassNotFoundException
 	 */
@@ -222,7 +221,7 @@ implements Serializable
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	public void clearLinkedObjectClasses()
 	{
@@ -231,7 +230,7 @@ implements Serializable
 	}
 
 	/**
-	 * 
+	 *
 	 * @param linkedObjectClass
 	 * @return
 	 */
@@ -243,7 +242,7 @@ implements Serializable
 	}
 
 	/**
-	 * 
+	 *
 	 * @param linkedObjectClass
 	 * @return
 	 */
@@ -255,15 +254,15 @@ implements Serializable
 	}
 
 	/**
-	 * 
+	 *
 	 * @return
 	 */
 	public String getOrganisationID() {
 		return organisationID;
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @return
 	 */
 	public String getIssueLinkTypeID() {
@@ -271,7 +270,7 @@ implements Serializable
 	}
 
 	/**
-	 * 
+	 *
 	 * @return
 	 */
 	public IssueLinkTypeName getName() {
@@ -292,7 +291,7 @@ implements Serializable
 
 	/**
 	 * Callback method triggered before an {@link IssueLink} instance has been deleted from the datastore.
-	 * 
+	 *
 	 * @param issueLinkToBeDeleted the <code>IssueLink</code> that is about to be deleted.
 	 * @see #postCreateIssueLink(IssueLink)
 	 */

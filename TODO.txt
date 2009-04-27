@@ -1,0 +1,4 @@
+
+Quickfixes:
+ - added a dependency on the JBPM lib due to problems with the classpath of the Enhancer-builder.
+ -> Remove dependency once this problem is solved.

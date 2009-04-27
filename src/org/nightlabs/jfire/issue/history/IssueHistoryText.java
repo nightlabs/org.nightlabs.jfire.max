@@ -3,26 +3,26 @@ package org.nightlabs.jfire.issue.history;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.nightlabs.i18n.I18nText;
-import org.nightlabs.jfire.issue.Issue;
-
-import javax.jdo.annotations.Join;
-import org.nightlabs.jfire.issue.id.IssueHistoryTextID;
-import javax.jdo.annotations.Persistent;
-import javax.jdo.annotations.NullValue;
-import javax.jdo.annotations.InheritanceStrategy;
-import javax.jdo.annotations.Inheritance;
-import javax.jdo.annotations.PrimaryKey;
-import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Column;
 import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
+
+import org.nightlabs.i18n.I18nText;
+import org.nightlabs.jfire.issue.Issue;
+import org.nightlabs.jfire.issue.id.IssueHistoryTextID;
 
 /**
- * An extended class of {@link I18nText} that represents the changed text of each change that made to an {@link Issue}. 
+ * An extended class of {@link I18nText} that represents the changed text of each change that made to an {@link Issue}.
  * <p>
  * </p>
- * 
+ *
  * @author Chairat Kongarayawetchakun - chairatk at nightlabs dot de
  *
  * @jdo.persistence-capable
@@ -43,14 +43,14 @@ import javax.jdo.annotations.PersistenceModifier;
 	table="JFireIssueTracking_IssueHistoryText")
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 @SuppressWarnings("serial")
-public class IssueHistoryText 
+public class IssueHistoryText
 extends I18nText
 {
 	/**
 	 * This is the organisationID to which the issue history's text belongs. Within one organisation,
 	 * all the issue history's texts have their organisation's ID stored here, thus it's the same
 	 * value for all of them.
-	 * 
+	 *
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
@@ -66,14 +66,14 @@ extends I18nText
 	@Column(length=100)
 	@SuppressWarnings("unused")
 	private long issueHistoryID;
-	
+
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	@SuppressWarnings("unused")
 	private IssueHistory issueHistory;
-	
+
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
@@ -85,7 +85,7 @@ extends I18nText
 	/**
 	 * key: String languageID<br/>
 	 * value: String description
-	 * 
+	 *
 	 * @jdo.field
 	 *		persistence-modifier="persistent"
 	 *		collection-type="map"
@@ -103,8 +103,7 @@ extends I18nText
 		table="JFireIssueTracking_IssueHistoryText_texts",
 		defaultFetchGroup="true",
 		persistenceModifier=PersistenceModifier.PERSISTENT)
-	@SuppressWarnings("unchecked")
-	private Map texts = new HashMap();
+	private Map<String, String> texts = new HashMap<String, String>();
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -115,6 +114,7 @@ extends I18nText
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected IssueHistoryText()
 	{
 	}
@@ -129,6 +129,7 @@ extends I18nText
 	/**
 	 * @see org.nightlabs.i18n.I18nText#getI18nMap()
 	 */
+	@Override
 	@SuppressWarnings("unchecked")
 	protected Map getI18nMap()
 	{
@@ -138,6 +139,7 @@ extends I18nText
 	/**
 	 * @see org.nightlabs.i18n.I18nText#getFallBackValue(java.lang.String)
 	 */
+	@Override
 	protected String getFallBackValue(String languageID)
 	{
 		return Issue.getPrimaryKey(organisationID, issue.getIssueID());

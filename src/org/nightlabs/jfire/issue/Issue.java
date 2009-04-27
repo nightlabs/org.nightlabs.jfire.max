@@ -37,12 +37,27 @@ import java.util.Set;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.Element;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.Queries;
+import javax.jdo.annotations.Query;
 import javax.jdo.listener.AttachCallback;
 import javax.jdo.listener.DeleteCallback;
 
 import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
+import org.nightlabs.jfire.issue.id.IssueID;
 import org.nightlabs.jfire.issue.project.Project;
 import org.nightlabs.jfire.jbpm.graph.def.Statable;
 import org.nightlabs.jfire.jbpm.graph.def.StatableLocal;
@@ -54,22 +69,6 @@ import org.nightlabs.jfire.prop.StructLocal;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.util.CollectionUtil;
 import org.nightlabs.util.Util;
-
-import org.nightlabs.jfire.issue.id.IssueID;
-import javax.jdo.annotations.Join;
-import javax.jdo.annotations.Value;
-import javax.jdo.annotations.FetchGroups;
-import javax.jdo.annotations.Inheritance;
-import javax.jdo.annotations.PrimaryKey;
-import javax.jdo.annotations.FetchGroup;
-import javax.jdo.annotations.Query;
-import javax.jdo.annotations.PersistenceModifier;
-import javax.jdo.annotations.Persistent;
-import javax.jdo.annotations.InheritanceStrategy;
-import javax.jdo.annotations.Queries;
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.Column;
-import javax.jdo.annotations.IdentityType;
 
 /**
  * The {@link Issue} class represents an issue in JFire.
@@ -275,7 +274,7 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	 */
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Project project;
-	
+
 	/**
 	 * Instances of {@link IssueFileAttachment}.
 	 *
@@ -283,13 +282,13 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	 *		persistence-modifier="persistent"
 	 *		collection-type="collection"
 	 *		element-type="IssueFileAttachment"
-	 *		dependent-value="true"
+	 *		dependent-value="true"  // this is IMHO wrong. Changed it to @Element (instead of @Value) below.
 	 *		mapped-by="issue"
 	 */
 	@Persistent(
 		mappedBy="issue",
 		persistenceModifier=PersistenceModifier.PERSISTENT)
-	@Value(dependent="true")
+	@Element(dependent="true")
 	private List<IssueFileAttachment> issueFileAttachments;
 
 	/**
@@ -315,13 +314,13 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	 *		persistence-modifier="persistent"
 	 *		collection-type="collection"
 	 *		element-type="IssueComment"
-	 *		dependent-value="true"
+	 *		dependent-value="true" // this is IMHO wrong. Changed it to @Element (instead of @Value) below.
 	 *		mapped-by="issue"
 	 */
 	@Persistent(
 		mappedBy="issue",
 		persistenceModifier=PersistenceModifier.PERSISTENT)
-	@Value(dependent="true")
+	@Element(dependent="true")
 	private List<IssueComment> comments;
 
 	/**
@@ -485,7 +484,7 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 		this.propertySet = new PropertySet(
 				IDGenerator.getOrganisationID(), IDGenerator.nextID(PropertySet.class),
 				Organisation.DEV_ORGANISATION_ID,
-				Issue.class.getName(), Struct.DEFAULT_SCOPE, StructLocal.DEFAULT_SCOPE);		
+				Issue.class.getName(), Struct.DEFAULT_SCOPE, StructLocal.DEFAULT_SCOPE);
 	}
 
 	/**
@@ -688,7 +687,7 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	public void addIssueWorkTimeRange(IssueWorkTimeRange issueWorkTimeRange) {
 		this.issueWorkTimeRanges.add(issueWorkTimeRange);
 	}
-	
+
 	/**
 	 * Returns the collection of {@link IssueWorkTimeRange}s.
 	 * @return a collection of {@link IssueWorkTimeRange}s.
@@ -1027,7 +1026,7 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	public Project getProject() {
 		return project;
 	}
-	
+
 	/**
 	 * Adds an {@link IssueFileAttachment} to issue.
 	 * @param issueFileAttachment the issueFileAttachment to be added

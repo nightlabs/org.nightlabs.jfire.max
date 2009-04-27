@@ -5,9 +5,9 @@ import java.util.List;
 import java.util.Set;
 
 import org.nightlabs.jfire.accounting.priceconfig.id.PriceConfigID;
-import org.nightlabs.jfire.base.JFireEjbFactory;
+import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
-import org.nightlabs.jfire.dynamictrade.DynamicTradeManager;
+import org.nightlabs.jfire.dynamictrade.DynamicTradeManagerRemote;
 import org.nightlabs.jfire.dynamictrade.accounting.priceconfig.DynamicTradePriceConfig;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.progress.ProgressMonitor;
@@ -28,7 +28,6 @@ extends BaseJDOObjectDAO<PriceConfigID, DynamicTradePriceConfig>
 		return sharedInstance;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	protected Collection<DynamicTradePriceConfig> retrieveJDOObjects(
 			Set<PriceConfigID> dynamicTradePriceConfigIDs, String[] fetchGroups, int maxFetchDepth,
@@ -37,9 +36,9 @@ extends BaseJDOObjectDAO<PriceConfigID, DynamicTradePriceConfig>
 	{
 		monitor.beginTask("Loading DynamicTradePriceConfigs", 1);
 		try {
-			DynamicTradeManager vm = dynamicTradeManager;
+			DynamicTradeManagerRemote vm = dynamicTradeManager;
 			if (vm == null)
-				vm = JFireEjbFactory.getBean(DynamicTradeManager.class, SecurityReflector.getInitialContextProperties());
+				vm = JFireEjb3Factory.getRemoteBean(DynamicTradeManagerRemote.class, SecurityReflector.getInitialContextProperties());
 
 			return vm.getDynamicTradePriceConfigs(dynamicTradePriceConfigIDs, fetchGroups, maxFetchDepth);
 		} finally {
@@ -47,14 +46,13 @@ extends BaseJDOObjectDAO<PriceConfigID, DynamicTradePriceConfig>
 		}
 	}
 
-	private DynamicTradeManager dynamicTradeManager;
+	private DynamicTradeManagerRemote dynamicTradeManager;
 
-	@SuppressWarnings("unchecked")
 	public List<DynamicTradePriceConfig> getDynamicTradePriceConfigs(String[] fetchGroups, int maxFetchDepth,
 			ProgressMonitor monitor)
 	{
 		try {
-			dynamicTradeManager = JFireEjbFactory.getBean(DynamicTradeManager.class, SecurityReflector.getInitialContextProperties());
+			dynamicTradeManager = JFireEjb3Factory.getRemoteBean(DynamicTradeManagerRemote.class, SecurityReflector.getInitialContextProperties());
 			try {
 				Collection<PriceConfigID> dynamicTradePriceConfigIDs = dynamicTradeManager.getDynamicTradePriceConfigIDs();
 				return getJDOObjects(null, dynamicTradePriceConfigIDs, fetchGroups, maxFetchDepth, monitor);

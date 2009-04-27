@@ -37,9 +37,12 @@ import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
 import org.nightlabs.jfire.accounting.Account;
 import org.nightlabs.jfire.accounting.AccountType;
 import org.nightlabs.jfire.accounting.Currency;
+import org.nightlabs.jfire.accounting.book.id.LocalAccountantDelegateID;
+import org.nightlabs.jfire.accounting.id.CurrencyID;
 import org.nightlabs.jfire.accounting.pay.ModeOfPayment;
 import org.nightlabs.jfire.accounting.pay.ModeOfPaymentFlavour;
 import org.nightlabs.jfire.accounting.priceconfig.PriceConfig;
+import org.nightlabs.jfire.accounting.priceconfig.id.PriceConfigID;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.base.JFireBaseEAR;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
@@ -73,6 +76,11 @@ import org.nightlabs.jfire.store.deliver.ModeOfDelivery;
 import org.nightlabs.jfire.store.deliver.ModeOfDeliveryConst;
 import org.nightlabs.jfire.store.deliver.ModeOfDeliveryFlavour;
 import org.nightlabs.jfire.store.deliver.ServerDeliveryProcessorManual;
+import org.nightlabs.jfire.store.deliver.id.DeliveryConfigurationID;
+import org.nightlabs.jfire.store.deliver.id.ModeOfDeliveryFlavourID;
+import org.nightlabs.jfire.store.deliver.id.ServerDeliveryProcessorID;
+import org.nightlabs.jfire.store.id.ProductID;
+import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.ArticleCreator;
 import org.nightlabs.jfire.trade.CustomerGroup;
@@ -84,6 +92,9 @@ import org.nightlabs.jfire.trade.OrganisationLegalEntity;
 import org.nightlabs.jfire.trade.Segment;
 import org.nightlabs.jfire.trade.SegmentType;
 import org.nightlabs.jfire.trade.Trader;
+import org.nightlabs.jfire.trade.id.ArticleID;
+import org.nightlabs.jfire.trade.id.OfferID;
+import org.nightlabs.jfire.trade.id.SegmentID;
 import org.nightlabs.jfire.trade.recurring.RecurringOrder;
 import org.nightlabs.jfire.trade.recurring.RecurringTrader;
 import org.nightlabs.jfire.voucher.accounting.ModeOfPaymentConst;
@@ -894,7 +905,7 @@ implements VoucherManagerRemote
 	 * @ejb.transaction type="RequiresNew"
 	 * @ejb.permission role-name="org.nightlabs.jfire.voucher.editVoucherLayout"
 	 */
-	@TransactionAttribute(TransactionAttributeType.REQUIRESNEW)
+	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
 	@RolesAllowed("org.nightlabs.jfire.voucher.editVoucherLayout")
 	public PreviewParameterValuesResult getPreviewParameterValues(
 			ProductTypeID voucherTypeID) throws ModuleException {
@@ -1055,7 +1066,7 @@ implements VoucherManagerRemote
 	 * @ejb.transaction type="RequiresNew"
 	 * @ejb.permission role-name="org.nightlabs.jfire.voucher.editVoucherLayout"
 	 */
-	@TransactionAttribute(TransactionAttributeType.REQUIRESNEW)
+	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
 	@RolesAllowed("org.nightlabs.jfire.voucher.editVoucherLayout")
 	public Map<ProductID, Map<ScriptRegistryItemID, Object>> getPreviewVoucherData(PreviewParameterSet previewParameterSet) throws ModuleException
 	{

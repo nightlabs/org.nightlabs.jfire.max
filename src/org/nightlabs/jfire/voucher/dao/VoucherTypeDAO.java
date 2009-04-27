@@ -9,10 +9,12 @@ import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.base.jdo.IJDOObjectDAO;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.store.StoreManagerRemote;
+import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.voucher.VoucherManagerRemote;
 import org.nightlabs.jfire.voucher.scripting.id.VoucherLayoutID;
 import org.nightlabs.jfire.voucher.store.VoucherType;
 import org.nightlabs.progress.ProgressMonitor;
+import org.nightlabs.util.CollectionUtil;
 
 public class VoucherTypeDAO
 extends BaseJDOObjectDAO<ProductTypeID, VoucherType>
@@ -42,7 +44,7 @@ implements IJDOObjectDAO<VoucherType>
 //
 //			return vm.getVoucherTypes(voucherTypeIDs, fetchGroups, maxFetchDepth);
 			StoreManagerRemote sm = JFireEjb3Factory.getRemoteBean(StoreManagerRemote.class, SecurityReflector.getInitialContextProperties());
-			return sm.getProductTypes(voucherTypeIDs, fetchGroups, maxFetchDepth);
+			return CollectionUtil.castCollection(sm.getProductTypes(voucherTypeIDs, fetchGroups, maxFetchDepth));
 		} finally {
 			monitor.worked(1);
 			monitor.done();

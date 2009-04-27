@@ -11,10 +11,17 @@ import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 
 import org.nightlabs.ModuleException;
+import org.nightlabs.jfire.accounting.book.id.LocalAccountantDelegateID;
+import org.nightlabs.jfire.accounting.priceconfig.id.PriceConfigID;
 import org.nightlabs.jfire.scripting.ScriptRegistryItem;
 import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
+import org.nightlabs.jfire.store.id.ProductID;
+import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.LayoutMapForArticleIDSet;
+import org.nightlabs.jfire.trade.id.ArticleID;
+import org.nightlabs.jfire.trade.id.OfferID;
+import org.nightlabs.jfire.trade.id.SegmentID;
 import org.nightlabs.jfire.voucher.accounting.VoucherLocalAccountantDelegate;
 import org.nightlabs.jfire.voucher.accounting.VoucherPriceConfig;
 import org.nightlabs.jfire.voucher.scripting.PreviewParameterSet;
@@ -179,7 +186,7 @@ public interface VoucherManagerRemote {
 	 * @ejb.transaction type="RequiresNew"
 	 * @ejb.permission role-name="org.nightlabs.jfire.voucher.editVoucherLayout"
 	 */
-	@TransactionAttribute(TransactionAttributeType.REQUIRESNEW)
+	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
 	@RolesAllowed("org.nightlabs.jfire.voucher.editVoucherLayout")
 	PreviewParameterValuesResult getPreviewParameterValues(
 			ProductTypeID voucherTypeID) throws ModuleException;
@@ -195,7 +202,7 @@ public interface VoucherManagerRemote {
 	 * @ejb.transaction type="RequiresNew"
 	 * @ejb.permission role-name="org.nightlabs.jfire.voucher.editVoucherLayout"
 	 */
-	@TransactionAttribute(TransactionAttributeType.REQUIRESNEW)
+	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
 	@RolesAllowed("org.nightlabs.jfire.voucher.editVoucherLayout")
 	Map<ProductID, Map<ScriptRegistryItemID, Object>> getPreviewVoucherData(
 			PreviewParameterSet previewParameterSet) throws ModuleException;

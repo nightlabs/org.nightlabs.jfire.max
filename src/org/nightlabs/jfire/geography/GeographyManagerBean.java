@@ -26,14 +26,15 @@
 
 package org.nightlabs.jfire.geography;
 
-import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.HashSet;
 
-import javax.ejb.CreateException;
-import javax.ejb.EJBException;
-import javax.ejb.SessionBean;
-import javax.ejb.SessionContext;
+import javax.annotation.security.RolesAllowed;
+import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
+import javax.ejb.TransactionManagement;
+import javax.ejb.TransactionManagementType;
 import javax.jdo.FetchPlan;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
@@ -45,10 +46,6 @@ import org.apache.log4j.Logger;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
-import org.nightlabs.jfire.geography.id.CityID;
-import org.nightlabs.jfire.geography.id.CountryID;
-import org.nightlabs.jfire.geography.id.LocationID;
-import org.nightlabs.jfire.geography.id.RegionID;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.util.CollectionUtil;
 
@@ -61,76 +58,31 @@ import org.nightlabs.util.CollectionUtil;
  * @ejb.util generate="physical"
  * @ejb.transaction type="Required"
  */
-public abstract class GeographyManagerBean
+@TransactionAttribute(TransactionAttributeType.REQUIRED)
+@TransactionManagement(TransactionManagementType.CONTAINER)
+@Stateless
+public class GeographyManagerBean
 extends BaseSessionBeanImpl
-implements SessionBean
+implements GeographyManagerRemote
 {
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger = Logger.getLogger(GeographyManagerBean.class);
 
-	@Override
-	public void setSessionContext(SessionContext sessionContext)
-	throws EJBException, RemoteException
-	{
-		if (logger.isDebugEnabled())
-			logger.debug(this.getClass().getName() + ".setSessionContext("+sessionContext+")");
-
-		super.setSessionContext(sessionContext);
-	}
-	@Override
-	public void unsetSessionContext() {
-		super.unsetSessionContext();
-	}
-	/**
-	 * @ejb.create-method
-	 * @ejb.permission role-name="_Guest_"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.geography.GeographyManagerRemote#ping(java.lang.String)
 	 */
-	public void ejbCreate()
-	throws CreateException
-	{
-		if (logger.isDebugEnabled())
-			logger.debug(this.getClass().getName() + ".ejbCreate()");
-	}
-	/**
-	 * {@inheritDoc}
-	 *
-	 * @ejb.permission unchecked="true"
-	 */
-	@Override
-	public void ejbRemove() throws EJBException, RemoteException
-	{
-		if (logger.isDebugEnabled())
-			logger.debug(this.getClass().getName() + ".ejbRemove()");
-	}
-
-	/**
-	 * @ejb.interface-method
-	 * @ejb.transaction type="Supports"
-	 * @ejb.permission role-name="_Guest_"
-	 */
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	@RolesAllowed("_Guest_")
 	@Override
 	public String ping(String message) {
 		return super.ping(message);
 	}
 
-	@Override
-	public void ejbActivate() throws EJBException, RemoteException
-	{
-		if (logger.isDebugEnabled())
-			logger.debug(this.getClass().getName() + ".ejbActivate()");
-	}
-	@Override
-	public void ejbPassivate() throws EJBException, RemoteException
-	{
-		if (logger.isDebugEnabled())
-			logger.debug(this.getClass().getName() + ".ejbPassivate()");
-	}
-
-	/**
-	 * @ejb.interface-method
-	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="_System_"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.geography.GeographyManagerRemote#initialise()
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("_System_")
 	public void initialise()
 	{
 //		GeographyImplResourceCSV.register();
@@ -142,6 +94,7 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
+	@RolesAllowed("_Guest_")
 	public Collection<CountryID> getCountryIDs()
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -160,6 +113,7 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
+	@RolesAllowed("_Guest_")
 	public Collection<RegionID> getRegionIDs(CountryID countryID)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -181,6 +135,7 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
+	@RolesAllowed("_Guest_")
 	public Collection<CityID> getCityIDs(RegionID regionID)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -202,6 +157,7 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
+	@RolesAllowed("_Guest_")
 	public Collection<LocationID> getLocationIDs(CityID cityID)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -223,6 +179,7 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
+	@RolesAllowed("_Guest_")
 	public Collection<Country> getCountries(Collection<CountryID> countryIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -238,6 +195,7 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
+	@RolesAllowed("_Guest_")
 	public Collection<Region> getRegions(Collection<RegionID> regionIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -253,6 +211,7 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
+	@RolesAllowed("_Guest_")
 	public Collection<City> getCities(Collection<CityID> cityIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -268,6 +227,7 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
+	@RolesAllowed("_Guest_")
 	public Collection<Location> getLocations(Collection<LocationID> locationIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -282,6 +242,7 @@ implements SessionBean
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 */
+	@RolesAllowed("_Guest_")
 	public Country importCountry(CountryID countryID, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
 		if (countryID == null)
@@ -319,6 +280,7 @@ implements SessionBean
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 */
+	@RolesAllowed("_Guest_")
 	public Region importRegion(RegionID regionID, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -355,6 +317,7 @@ implements SessionBean
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 */
+	@RolesAllowed("_Guest_")
 	public City importCity(CityID cityID, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -391,6 +354,7 @@ implements SessionBean
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 */
+	@RolesAllowed("_Guest_")
 	public Location importLocation(LocationID locationID, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -465,10 +429,10 @@ implements SessionBean
 //		}
 //	}
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.geography.GeographyManagerRemote#getCSVData(java.lang.String, java.lang.String)
 	 */
+	@RolesAllowed("_Guest_")
 	public byte[] getCSVData(String csvType, String countryID)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -500,10 +464,10 @@ implements SessionBean
 		}
 	}
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.geography.GeographyManagerRemote#getGeographyObject(org.nightlabs.jdo.ObjectID, java.lang.String[], int)
 	 */
+	@RolesAllowed("_Guest_")
 	public Object getGeographyObject(ObjectID objectID, String[] fetchGroups, int maxFetchDepth){
 		PersistenceManager pm = getPersistenceManager();
 		try {

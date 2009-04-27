@@ -51,6 +51,16 @@ import org.nightlabs.jfire.trade.CustomerGroupMapper;
 import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.util.CollectionUtil;
 
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Queries;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.IdentityType;
+
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  *
@@ -89,6 +99,32 @@ import org.nightlabs.util.CollectionUtil;
  * !@jdo.fetch-group name="FetchGroupsTrade.articleInInvoiceEditor" fetch-groups="default" fields="name"
  * !@jdo.fetch-group name="FetchGroupsTrade.articleInDeliveryNoteEditor" fetch-groups="default" fields="name"
  */
+@PersistenceCapable(
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireSimpleTrade_SimpleProductType")
+@FetchGroups({
+	@FetchGroup(
+		fetchGroups={"default", "ProductType.this"},
+		name=SimpleProductType.FETCH_GROUP_THIS_SIMPLE_PRODUCT_TYPE,
+		members={}),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name=SimpleProductType.FETCH_GROUP_PROPERTY_SET,
+		members=@Persistent(name="propertySet"))
+})
+@Queries({
+	@javax.jdo.annotations.Query(
+		name="getChildProductTypes_topLevel",
+		value="SELECT WHERE this.extendedProductType == null",
+		language="javax.jdo.query.JDOQL"),
+	@javax.jdo.annotations.Query(
+		name="getChildProductTypes_hasParent",
+		value="SELECT WHERE this.extendedProductType.organisationID == parentProductTypeOrganisationID && this.extendedProductType.productTypeID == parentProductTypeProductTypeID PARAMETERS String parentProductTypeOrganisationID, String parentProductTypeProductTypeID import java.lang.String",
+		language="javax.jdo.query.JDOQL")
+})
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
+
 public class SimpleProductType extends ProductType
 {
 	private static final long serialVersionUID = 20080610L;
@@ -208,6 +244,8 @@ public class SimpleProductType extends ProductType
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+
 	private PropertySet propertySet;
 
 	/**

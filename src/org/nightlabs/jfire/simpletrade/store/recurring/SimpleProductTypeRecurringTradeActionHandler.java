@@ -22,6 +22,11 @@ import org.nightlabs.jfire.trade.Trader;
 import org.nightlabs.jfire.trade.recurring.RecurredOffer;
 import org.nightlabs.jfire.trade.recurring.RecurringTradeProductTypeActionHandler;
 
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.IdentityType;
+
 
 /**
  * {@link SimpleProductTypeRecurringTradeActionHandler} extends the abstract class {@link RecurringTradeProductTypeActionHandler}
@@ -37,6 +42,11 @@ import org.nightlabs.jfire.trade.recurring.RecurringTradeProductTypeActionHandle
  *
  * @jdo.inheritance strategy="superclass-table"
  */
+@PersistenceCapable(
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireSimpleTrade_SimpleRecurringTradeProductTypeActionHandler")
+@Inheritance(strategy=InheritanceStrategy.SUPERCLASS_TABLE)
 public class SimpleProductTypeRecurringTradeActionHandler
 extends RecurringTradeProductTypeActionHandler{
 

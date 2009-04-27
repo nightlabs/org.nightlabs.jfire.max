@@ -26,7 +26,6 @@
 
 package org.nightlabs.jfire.simpletrade;
 
-import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -40,10 +39,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import javax.ejb.CreateException;
-import javax.ejb.EJBException;
 import javax.ejb.SessionBean;
-import javax.ejb.SessionContext;
 import javax.jdo.FetchPlan;
 import javax.jdo.JDODetachedFieldAccessException;
 import javax.jdo.JDOHelper;
@@ -69,20 +65,15 @@ import org.nightlabs.jfire.accounting.gridpriceconfig.PriceCalculatorFactory;
 import org.nightlabs.jfire.accounting.gridpriceconfig.PriceCell;
 import org.nightlabs.jfire.accounting.gridpriceconfig.StablePriceConfig;
 import org.nightlabs.jfire.accounting.gridpriceconfig.TariffPricePair;
-import org.nightlabs.jfire.accounting.id.CurrencyID;
-import org.nightlabs.jfire.accounting.id.TariffID;
 import org.nightlabs.jfire.accounting.priceconfig.AffectedProductType;
 import org.nightlabs.jfire.accounting.priceconfig.FetchGroupsPriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.PriceConfigUtil;
-import org.nightlabs.jfire.accounting.priceconfig.id.PriceConfigID;
 import org.nightlabs.jfire.accounting.tariffuserset.TariffUserSet;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.base.JFireBaseEAR;
 import org.nightlabs.jfire.base.JFireEjbFactory;
 import org.nightlabs.jfire.base.JFireException;
 import org.nightlabs.jfire.entityuserset.AuthorizedObjectRef;
-import org.nightlabs.jfire.jdo.notification.persistent.PersistentNotificationEJB;
-import org.nightlabs.jfire.jdo.notification.persistent.PersistentNotificationEJBUtil;
 import org.nightlabs.jfire.jdo.notification.persistent.SubscriptionUtil;
 import org.nightlabs.jfire.organisation.LocalOrganisation;
 import org.nightlabs.jfire.organisation.Organisation;
@@ -110,7 +101,6 @@ import org.nightlabs.jfire.store.deliver.CrossTradeDeliveryCoordinator;
 import org.nightlabs.jfire.store.deliver.DeliveryConfiguration;
 import org.nightlabs.jfire.store.deliver.ModeOfDelivery;
 import org.nightlabs.jfire.store.deliver.ModeOfDeliveryConst;
-import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.store.notification.ProductTypePermissionFlagSetNotificationReceiver;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.ArticleCreator;
@@ -122,15 +112,18 @@ import org.nightlabs.jfire.trade.Order;
 import org.nightlabs.jfire.trade.OrganisationLegalEntity;
 import org.nightlabs.jfire.trade.Segment;
 import org.nightlabs.jfire.trade.Trader;
-import org.nightlabs.jfire.trade.id.ArticleID;
-import org.nightlabs.jfire.trade.id.CustomerGroupID;
-import org.nightlabs.jfire.trade.id.OfferID;
-import org.nightlabs.jfire.trade.id.SegmentID;
 import org.nightlabs.jfire.trade.recurring.RecurringOrder;
 import org.nightlabs.jfire.trade.recurring.RecurringTrader;
 import org.nightlabs.util.CollectionUtil;
 import org.nightlabs.util.Util;
 import org.nightlabs.version.Version;
+
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
+import javax.ejb.Stateless;
+import javax.ejb.TransactionManagement;
+import javax.ejb.TransactionManagementType;
+import javax.annotation.security.RolesAllowed;
 
 /**
  * @ejb.bean name="jfire/ejb/JFireSimpleTrade/SimpleTradeManager"
@@ -141,9 +134,13 @@ import org.nightlabs.version.Version;
  * @ejb.util generate="physical"
  * @ejb.transaction type="Required"
  */
-public abstract class SimpleTradeManagerBean
+@TransactionAttribute(TransactionAttributeType.REQUIRED)
+@TransactionManagement(TransactionManagementType.CONTAINER)
+@Stateless
+
+public class SimpleTradeManagerBean
 extends BaseSessionBeanImpl
-implements SessionBean
+implements SimpleTradeManagerRemote
 {
 	private static final long serialVersionUID = 1L;
 	/**
@@ -151,44 +148,12 @@ implements SessionBean
 	 */
 	private static final Logger logger = Logger.getLogger(SimpleTradeManagerBean.class);
 
-	@Override
-	public void setSessionContext(SessionContext sessionContext)
-	throws EJBException, RemoteException
-	{
-		super.setSessionContext(sessionContext);
-	}
-	@Override
-	public void unsetSessionContext() {
-		super.unsetSessionContext();
-	}
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.simpletrade.SimpleTradeManagerRemote#initialise()
+	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("_System_")
 
-	/**
-	 * @ejb.create-method
-	 * @ejb.permission role-name="_Guest_"
-	 */
-	public void ejbCreate() throws CreateException
-	{
-	}
-	/**
-	 * {@inheritDoc}
-	 *
-	 * @ejb.permission unchecked="true"
-	 */
-	@Override
-	public void ejbRemove() throws EJBException, RemoteException { }
-
-	/**
-	 * This method is called by the datastore initialisation mechanism.
-	 * It creates the root simple product for the organisation itself.
-	 * Simple products of other organisations must be imported.
-	 *
-	 * @throws ModuleException
-	 * @throws CannotPublishProductTypeException
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_System_"
-	 * @ejb.transaction type="Required"
-	 */
 	public void initialise()
 	throws CannotPublishProductTypeException
 	{
@@ -272,6 +237,8 @@ implements SessionBean
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="org.nightlabs.jfire.store.seeProductType"
 	 */
+	@RolesAllowed("org.nightlabs.jfire.store.seeProductType")
+
 	public Set<ProductTypeID> getChildSimpleProductTypeIDs(ProductTypeID parentSimpleProductTypeID) {
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -327,13 +294,12 @@ implements SessionBean
 //		}
 //	}
 
-	/**
-	 * @return Returns a newly detached instance of <tt>SimpleProductType</tt> if <tt>get</tt> is true - otherwise <tt>null</tt>.
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="org.nightlabs.jfire.store.editUnconfirmedProductType"
-	 * @ejb.transaction type="Required"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.simpletrade.SimpleTradeManagerRemote#storeProductType(org.nightlabs.jfire.simpletrade.store.SimpleProductType, boolean, java.lang.String[], int)
 	 */
+@TransactionAttribute(TransactionAttributeType.REQUIRED)
+@RolesAllowed("org.nightlabs.jfire.store.editUnconfirmedProductType")
+
 	public SimpleProductType storeProductType(SimpleProductType productType, boolean get, String[] fetchGroups, int maxFetchDepth)
 	throws PriceCalculationException
 	{
@@ -525,6 +491,9 @@ implements SessionBean
 	 * @ejb.permission role-name="org.nightlabs.jfire.store.seeProductType"
 	 * @ejb.transaction type="Required"
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("org.nightlabs.jfire.store.seeProductType")
+
 	public Map<ProductTypeID, PropertySet> getSimpleProductTypesPropertySets(
 			Set<ProductTypeID> simpleProductTypeIDs,
 			Set<StructFieldID> structFieldIDs,
@@ -562,6 +531,9 @@ implements SessionBean
 	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.queryPriceConfigurations"
 	 * @ejb.transaction type="Required"
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("org.nightlabs.jfire.accounting.queryPriceConfigurations")
+
 	public Set<PriceConfigID> getFormulaPriceConfigIDs()
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -579,6 +551,9 @@ implements SessionBean
 	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.queryPriceConfigurations"
 	 * @ejb.transaction type="Required"
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("org.nightlabs.jfire.accounting.queryPriceConfigurations")
+
 	public List<FormulaPriceConfig> getFormulaPriceConfigs(Collection<PriceConfigID> formulaPriceConfigIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -599,6 +574,9 @@ implements SessionBean
 	 * @ejb.permission role-name="org.nightlabs.jfire.trade.editOffer"
 	 * @ejb.transaction type="Required"
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("org.nightlabs.jfire.trade.editOffer")
+
 	public Collection<? extends Article> createArticles(
 			SegmentID segmentID,
 			OfferID offerID,
@@ -694,6 +672,9 @@ implements SessionBean
 	 * @ejb.permission role-name="org.nightlabs.jfire.trade.editOffer"
 	 * @ejb.transaction type="Required"
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("org.nightlabs.jfire.trade.editOffer")
+
 	public Collection<? extends Article> createArticles(
 			SegmentID segmentID,
 			OfferID offerID,
@@ -858,6 +839,8 @@ implements SessionBean
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
+	@RolesAllowed("_Guest_")
+
 	public Set<ProductTypeID> getPublishedSimpleProductTypeIDs()
 	{
 		if (!userIsOrganisation()) // noone else needs this method - at least at the moment.
@@ -881,6 +864,8 @@ implements SessionBean
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
+	@RolesAllowed("_Guest_")
+
 	public List<SimpleProductType> getSimpleProductTypesForReseller(Collection<ProductTypeID> productTypeIDs)
 	{
 		if (!userIsOrganisation()) // noone else needs this method - at least at the moment.
@@ -957,11 +942,12 @@ implements SessionBean
 		}
 	}
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="org.nightlabs.jfire.store.editUnconfirmedProductType"
-	 * @ejb.transaction type="Required"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.simpletrade.SimpleTradeManagerRemote#importSimpleProductTypesForReselling(java.lang.String)
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("org.nightlabs.jfire.store.editUnconfirmedProductType")
+
 	public void importSimpleProductTypesForReselling(String emitterOrganisationID)
 	throws JFireException
 	{
@@ -1043,6 +1029,8 @@ implements SessionBean
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="org.nightlabs.jfire.trade.sellProductType, org.nightlabs.jfire.accounting.queryPriceConfigurations"
 	 */
+@RolesAllowed({"org.nightlabs.jfire.trade.sellProductType", "org.nightlabs.jfire.accounting.queryPriceConfigurations"})
+
 	public Collection<TariffPricePair> getTariffPricePairs(
 			ProductTypeID productTypeID, CustomerGroupID customerGroupID, CurrencyID currencyID,
 			String[] tariffFetchGroups, String[] priceFetchGroups
@@ -1116,11 +1104,12 @@ implements SessionBean
 		}
 	}
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.editPriceConfiguration"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.simpletrade.SimpleTradeManagerRemote#storePriceConfigs(java.util.Collection, boolean, org.nightlabs.jfire.accounting.gridpriceconfig.AssignInnerPriceConfigCommand)
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("org.nightlabs.jfire.accounting.editPriceConfiguration")
+
 	public Collection<GridPriceConfig> storePriceConfigs(Collection<GridPriceConfig> priceConfigs, boolean get, AssignInnerPriceConfigCommand assignInnerPriceConfigCommand)
 	throws PriceCalculationException
 	{
@@ -1142,18 +1131,12 @@ implements SessionBean
 		}
 	}
 
-	/**
-	 * This method returns {@link OrganisationID}s for all {@link Organisation}s that are known to
-	 * the current organisation, but excluding:
-	 * <ul>
-	 * <li>the current organisation</li>
-	 * <li>all organisations for which already a subscribed root-simple-producttype exists</li>
-	 * </ul>
-	 *
-	 * @ejb.interface-method
-	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="org.nightlabs.jfire.store.editUnconfirmedProductType"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.simpletrade.SimpleTradeManagerRemote#getCandidateOrganisationIDsForCrossTrade()
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("org.nightlabs.jfire.store.editUnconfirmedProductType")
+
 	public Collection<OrganisationID> getCandidateOrganisationIDsForCrossTrade()
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -1179,11 +1162,12 @@ implements SessionBean
 		}
 	}
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.transaction type="Supports"
-	 * @ejb.permission role-name="_Guest_"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.simpletrade.SimpleTradeManagerRemote#ping(java.lang.String)
 	 */
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	@RolesAllowed("_Guest_")
+
 	@Override
 	public String ping(String message) {
 		return super.ping(message);

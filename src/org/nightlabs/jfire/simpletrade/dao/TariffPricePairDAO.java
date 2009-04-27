@@ -33,13 +33,10 @@ import javax.jdo.FetchPlan;
 import org.nightlabs.jfire.accounting.Price;
 import org.nightlabs.jfire.accounting.Tariff;
 import org.nightlabs.jfire.accounting.gridpriceconfig.TariffPricePair;
-import org.nightlabs.jfire.accounting.id.CurrencyID;
-import org.nightlabs.jfire.base.JFireEjbFactory;
+import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.cache.Cache;
 import org.nightlabs.jfire.security.SecurityReflector;
-import org.nightlabs.jfire.simpletrade.SimpleTradeManager;
-import org.nightlabs.jfire.store.id.ProductTypeID;
-import org.nightlabs.jfire.trade.id.CustomerGroupID;
+import org.nightlabs.jfire.simpletrade.SimpleTradeManagerRemote;
 import org.nightlabs.progress.ProgressMonitor;
 import org.nightlabs.util.CollectionUtil;
 
@@ -119,7 +116,7 @@ public class TariffPricePairDAO
 				TariffPricePairDAO.class.getName(), key, (String[])null, -1);
 		if (tppc == null) { // || System.currentTimeMillis() - tppc.loadDT > EXPIRE_MSEC) {
 			try {
-				SimpleTradeManager stm = JFireEjbFactory.getBean(SimpleTradeManager.class, SecurityReflector.getInitialContextProperties());
+				SimpleTradeManagerRemote stm = JFireEjb3Factory.getRemoteBean(SimpleTradeManagerRemote.class, SecurityReflector.getInitialContextProperties());
 				Collection<TariffPricePair> tariffPricePairs = CollectionUtil.castCollection(stm.getTariffPricePairs(productTypeID,
 						customerGroupID,
 						currencyID,

@@ -32,6 +32,11 @@ import org.nightlabs.jfire.store.Product;
 import org.nightlabs.jfire.store.ProductLocator;
 import org.nightlabs.jfire.store.ProductType;
 
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  *
@@ -43,6 +48,12 @@ import org.nightlabs.jfire.store.ProductType;
  *
  * @jdo.inheritance strategy="new-table"
  */
+@PersistenceCapable(
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireSimpleTrade_SimpleProduct")
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
+
 public class SimpleProduct extends Product
 {
 	private static final long serialVersionUID = 1L;

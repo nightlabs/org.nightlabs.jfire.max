@@ -12,6 +12,11 @@ import org.nightlabs.jfire.jdo.notification.persistent.NotificationFilter;
 import org.nightlabs.jfire.simpletrade.store.SimpleProductType;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.IdentityType;
+
 /**
  * @author Marco Schulze - Marco at NightLabs dot de
  *
@@ -21,6 +26,10 @@ import org.nightlabs.jfire.store.id.ProductTypeID;
  *
  * @jdo.inheritance strategy="superclass-table"
  */
+@PersistenceCapable(
+	identityType=IdentityType.APPLICATION,
+	detachable="true")
+@Inheritance(strategy=InheritanceStrategy.SUPERCLASS_TABLE)
 public class SimpleProductTypeNotificationFilter
 		extends NotificationFilter
 {

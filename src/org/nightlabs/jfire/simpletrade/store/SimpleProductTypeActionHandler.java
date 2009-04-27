@@ -33,6 +33,11 @@ import org.nightlabs.jfire.trade.id.OfferID;
 import org.nightlabs.jfire.trade.id.SegmentID;
 import org.nightlabs.util.CollectionUtil;
 
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.IdentityType;
+
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  *
@@ -44,6 +49,11 @@ import org.nightlabs.util.CollectionUtil;
  *
  * @jdo.inheritance strategy="superclass-table"
  */
+@PersistenceCapable(
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireSimpleTrade_SimpleProductTypeActionHandler")
+@Inheritance(strategy=InheritanceStrategy.SUPERCLASS_TABLE)
 public class SimpleProductTypeActionHandler
 		extends ProductTypeActionHandler
 {

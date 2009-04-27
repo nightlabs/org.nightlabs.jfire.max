@@ -5,11 +5,10 @@ import java.util.List;
 import java.util.Set;
 
 import org.nightlabs.jfire.accounting.gridpriceconfig.FormulaPriceConfig;
-import org.nightlabs.jfire.accounting.priceconfig.id.PriceConfigID;
-import org.nightlabs.jfire.base.JFireEjbFactory;
+import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.security.SecurityReflector;
-import org.nightlabs.jfire.simpletrade.SimpleTradeManager;
+import org.nightlabs.jfire.simpletrade.SimpleTradeManagerRemote;
 import org.nightlabs.progress.ProgressMonitor;
 
 public class FormulaPriceConfigDAO
@@ -36,9 +35,9 @@ extends BaseJDOObjectDAO<PriceConfigID, FormulaPriceConfig>
 	{
 		monitor.beginTask("Loading FormulaPriceConfigs", 1);
 		try {
-			SimpleTradeManager vm = simpleTradeManager;
+			SimpleTradeManagerRemote vm = simpleTradeManager;
 			if (vm == null)
-				vm = JFireEjbFactory.getBean(SimpleTradeManager.class, SecurityReflector.getInitialContextProperties());
+				vm = JFireEjb3Factory.getRemoteBean(SimpleTradeManagerRemote.class, SecurityReflector.getInitialContextProperties());
 
 			return vm.getFormulaPriceConfigs(formulaPriceConfigIDs, fetchGroups, maxFetchDepth);
 		} finally {
@@ -46,13 +45,13 @@ extends BaseJDOObjectDAO<PriceConfigID, FormulaPriceConfig>
 		}
 	}
 
-	private SimpleTradeManager simpleTradeManager;
+	private SimpleTradeManagerRemote simpleTradeManager;
 
 	public List<FormulaPriceConfig> getFormulaPriceConfigs(String[] fetchGroups, int maxFetchDepth,
 			ProgressMonitor monitor)
 	{
 		try {
-			simpleTradeManager = JFireEjbFactory.getBean(SimpleTradeManager.class, SecurityReflector.getInitialContextProperties());
+			simpleTradeManager = JFireEjb3Factory.getRemoteBean(SimpleTradeManagerRemote.class, SecurityReflector.getInitialContextProperties());
 			try {
 				Collection<PriceConfigID> formulaPriceConfigIDs = simpleTradeManager.getFormulaPriceConfigIDs();
 				return getJDOObjects(null, formulaPriceConfigIDs, fetchGroups, maxFetchDepth, monitor);

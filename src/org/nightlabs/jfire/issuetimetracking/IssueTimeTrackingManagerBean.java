@@ -17,6 +17,7 @@ import org.apache.log4j.Logger;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.issue.project.id.ProjectID;
+import org.nightlabs.jfire.issuetimetracking.id.ProjectCostID;
 
 /**
  * An EJB session bean provides methods for managing every objects used in the issue time tracking.
@@ -52,6 +53,7 @@ implements IssueTimeTrackingManagerRemote
 	 */
 	@RolesAllowed("_Guest_")
 	@SuppressWarnings("unchecked")
+	@Override
 	public List<ProjectCost> getProjectCosts(Collection<ProjectCostID> projectCostIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -82,8 +84,8 @@ implements IssueTimeTrackingManagerRemote
 	/* (non-Javadoc)
 	 * @see org.nightlabs.jfire.issuetimetracking.IssueTimeTrackingManagerRemote#storeProjectCost(org.nightlabs.jfire.issuetimetracking.ProjectCost, boolean, java.lang.String[], int)
 	 */
-@TransactionAttribute(TransactionAttributeType.REQUIRED)
-@RolesAllowed("_Guest_")
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("_Guest_")
 	public ProjectCost storeProjectCost(ProjectCost projectCost, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();

@@ -4,11 +4,11 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireScripting"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/NightLabsEditor2D"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/NightLabsBase"/>
 	<classpathentry kind="var" path="LOG4J"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/NightLabsJDO"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/org.nightlabs.jdo"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireBaseClientLib"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/JFireBase"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/org.nightlabs.jfire.base"/>
 	<classpathentry kind="lib" path="lib/barbecue-1.5-beta1.jar" sourcepath="E:/Java/Lib/Barbecue/barbecue-1.5-beta1-src/barbecue-1.5-beta1/src"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/org.nightlabs.base"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -27,7 +27,6 @@
 package org.nightlabs.jfire.reporting.parameter;
 
 import java.math.BigDecimal;
-import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -36,14 +35,15 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import javax.ejb.CreateException;
-import javax.ejb.EJBException;
-import javax.ejb.SessionBean;
-import javax.ejb.SessionContext;
+import javax.annotation.security.RolesAllowed;
+import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
+import javax.ejb.TransactionManagement;
+import javax.ejb.TransactionManagementType;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 
-import org.nightlabs.ModuleException;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.organisation.id.OrganisationID;
@@ -52,8 +52,6 @@ import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
 import org.nightlabs.jfire.reporting.parameter.ReportParameterUtil.NameEntry;
 import org.nightlabs.jfire.reporting.parameter.config.ReportParameterAcquisitionSetup;
 import org.nightlabs.jfire.reporting.parameter.config.id.ReportParameterAcquisitionSetupID;
-import org.nightlabs.jfire.reporting.parameter.dao.ReportParameterAcquisitionSetupDAO;
-import org.nightlabs.jfire.reporting.parameter.dao.ValueProviderDAO;
 import org.nightlabs.jfire.reporting.parameter.id.ValueProviderCategoryID;
 import org.nightlabs.jfire.reporting.parameter.id.ValueProviderID;
 import org.nightlabs.jfire.security.id.UserID;
@@ -61,8 +59,8 @@ import org.nightlabs.jfire.workstation.id.WorkstationID;
 import org.nightlabs.util.TimePeriod;
 
 /**
- * Manager giving acces to {@link ValueProvider}s, their categories and complete {@link ReportParameterAcquisitionSetup}s. 
- * 
+ * Manager giving acces to {@link ValueProvider}s, their categories and complete {@link ReportParameterAcquisitionSetup}s.
+ *
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  *
  * @ejb.bean name="jfire/ejb/JFireReporting/ReportParameterManager"
@@ -71,57 +69,18 @@ import org.nightlabs.util.TimePeriod;
  *					 transaction-type="Container"
  *
  * @ejb.util generate="physical"
- */
-public abstract class ReportParameterManagerBean
+ */@TransactionManagement(TransactionManagementType.CONTAINER)
+@Stateless
+public class ReportParameterManagerBean
 extends BaseSessionBeanImpl
-implements SessionBean
+implements ReportParameterManagerRemote
 {
-	/**
-	 *
-	 */
 	private static final long serialVersionUID = 1L;
 
-	/**
-	 * @see com.nightlabs.jfire.base.BaseSessionBeanImpl#setSessionContext(javax.ejb.SessionContext)
-	 */
-	@Override
-	public void setSessionContext(SessionContext sessionContext)
-	throws EJBException, RemoteException
-	{
-		super.setSessionContext(sessionContext);
-	}
-	/**
-	 * @see com.nightlabs.jfire.base.BaseSessionBeanImpl#unsetSessionContext()
-	 */
-	@Override
-	public void unsetSessionContext() {
-		super.unsetSessionContext();
-	}
-
-	/**
-	 * @ejb.create-method
-	 * @ejb.permission role-name="_Guest_"
-	 */
-	public void ejbCreate() throws CreateException
-	{
-	}
-	/**
-	 * @see javax.ejb.SessionBean#ejbRemove()
-	 *
-	 * @ejb.permission unchecked="true"
-	 */
-	public void ejbRemove() throws EJBException, RemoteException { }
-
-	/**
-	 * This method is called by the organisation-init system, it is not intended to be called directly.
-	 * <p>
-	 * This initializes the default value providers for simple data-types.
-	 * </p>
-	 * 
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_System_"
-	 * @ejb.transaction type="Required"
-	 */
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.reporting.parameter.ReportParameterManagerRemote#initDefaultValueProviders()
+	 */	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("_System_")
 	public void initDefaultValueProviders() {
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -165,7 +124,7 @@ implements SessionBean
 					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Query a boolean value from the user")},
 					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Select a boolean")}
 			);
-			
+
 			ReportParameterUtil.createValueProvider(pm, simpleTypes, ReportingConstants.VALUE_PROVIDER_ID_TIME_PERIOD, TimePeriod.class.getName(),
 					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Timeperiod")},
 					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Query a time period from the user")},
@@ -246,14 +205,11 @@ implements SessionBean
 	}
 
 
-	/**
-	 * This method returns detached copies of the {@link ValueProvider}s for the given ids.
-	 * {@link ValueProviderDAO} uses this method, use the dao rather than using this method directly.
-	 * 
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="org.nightlabs.jfire.reporting.renderReport"
-	 * @ejb.transaction type="Supports"
-	 */
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.reporting.parameter.ReportParameterManagerRemote#getValueProviders(java.util.Set, java.lang.String[], int)
+	 */	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	@RolesAllowed("org.nightlabs.jfire.reporting.renderReport")
+
 	public Set<ValueProvider> getValueProviders(
 			Set<ValueProviderID> providerIDs, String[] fetchGroups, int maxFetchDepth
 	) {
@@ -266,19 +222,11 @@ implements SessionBean
 		}
 	}
 
-	/**
-	 * Returns the ids of the {@link ReportParameterAcquisitionSetup}s mapped to the given report layouts.
-	 * Note, that for those report layouts with no {@link ReportParameterAcquisitionSetup} linked to them,
-	 * this report layout id will be returned mapping to <code>null</code>.
-	 * <p>
-	 * This method in combination with {@link #getReportParameterAcquisitionSetups(Set, String[], int)} is
-	 * used by {@link ReportParameterAcquisitionSetupDAO}. Use the dao rather than using this method directly.
-	 * </p>  
-	 * 
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="org.nightlabs.jfire.reporting.renderReport"
-	 * @ejb.transaction type="Supports"
-	 */
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.reporting.parameter.ReportParameterManagerRemote#getReportParameterAcquisitionSetupIDs(java.util.Collection)
+	 */	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	@RolesAllowed("org.nightlabs.jfire.reporting.renderReport")
+
 	public Map<ReportRegistryItemID, ReportParameterAcquisitionSetupID> getReportParameterAcquisitionSetupIDs(Collection<ReportRegistryItemID> reportLayoutIDs) {
 		PersistenceManager pm;
 		pm = getPersistenceManager();
@@ -297,14 +245,11 @@ implements SessionBean
 		}
 	}
 
-	/**
-	 * Returns detached copies of the {@link ReportParameterAcquisitionSetup}s referenced by the given ids.
-	 * This is used by {@link ReportParameterAcquisitionSetupDAO}, use the dao rather than this method directly.
-	 *   
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="org.nightlabs.jfire.reporting.renderReport"
-	 * @ejb.transaction type="Supports"
-	 */
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.reporting.parameter.ReportParameterManagerRemote#getReportParameterAcquisitionSetups(java.util.Set, java.lang.String[], int)
+	 */	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	@RolesAllowed("org.nightlabs.jfire.reporting.renderReport")
+
 	@SuppressWarnings("unchecked")
 	public Set<ReportParameterAcquisitionSetup> getReportParameterAcquisitionSetups(
 			Set<ReportParameterAcquisitionSetupID> setupIDs, String[] fetchGroups, int maxFetchDepth
@@ -319,14 +264,11 @@ implements SessionBean
 	}
 
 
-	/**
-	 * Searches for the ids of the {@link ValueProviderCategory}ies that are children of the category
-	 * referenced by the given valueProviderCategoryID.
-	 * 
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="org.nightlabs.jfire.reporting.renderReport"
-	 * @ejb.transaction type="Supports"
-	 */
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.reporting.parameter.ReportParameterManagerRemote#getValueProviderCategoryIDsForParent(org.nightlabs.jfire.reporting.parameter.id.ValueProviderCategoryID)
+	 */	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	@RolesAllowed("org.nightlabs.jfire.reporting.renderReport")
+
 	public Set<ValueProviderCategoryID> getValueProviderCategoryIDsForParent(ValueProviderCategoryID valueProviderCategoryID) {
 		PersistenceManager pm;
 		pm = getPersistenceManager();
@@ -338,12 +280,11 @@ implements SessionBean
 		}
 	}
 
-	/**
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="org.nightlabs.jfire.reporting.renderReport"
-	 * @ejb.transaction type="Supports"
-	 */
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.reporting.parameter.ReportParameterManagerRemote#getValueProviderCategories(java.util.Set, java.lang.String[], int)
+	 */	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	@RolesAllowed("org.nightlabs.jfire.reporting.renderReport")
+
 	@SuppressWarnings("unchecked")
 	public Set<ValueProviderCategory> getValueProviderCategories(
 			Set<ValueProviderCategoryID> categoryIDs, String[] fetchGroups, int maxFetchDepth
@@ -357,13 +298,11 @@ implements SessionBean
 		}
 	}
 
-	/**
-	 * @throws ModuleException
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="org.nightlabs.jfire.reporting.renderReport"
-	 * @ejb.transaction type="Supports"
-	 */
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.reporting.parameter.ReportParameterManagerRemote#getValueProviderIDsForParent(org.nightlabs.jfire.reporting.parameter.id.ValueProviderCategoryID)
+	 */	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	@RolesAllowed("org.nightlabs.jfire.reporting.renderReport")
+
 	public Set<ValueProviderID> getValueProviderIDsForParent(ValueProviderCategoryID valueProviderCategoryID) {
 		PersistenceManager pm;
 		pm = getPersistenceManager();
@@ -375,13 +314,11 @@ implements SessionBean
 		}
 	}
 
-	/**
-	 * Stores the given {@link ReportParameterAcquisitionSetup}.
-	 * 
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="org.nightlabs.jfire.reporting.editReport"
-	 * @ejb.transaction type="Required"
-	 */
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.reporting.parameter.ReportParameterManagerRemote#storeReportParameterAcquisitionSetup(org.nightlabs.jfire.reporting.parameter.config.ReportParameterAcquisitionSetup, boolean, java.lang.String[], int)
+	 */	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("org.nightlabs.jfire.reporting.editReport")
+
 	public ReportParameterAcquisitionSetup storeReportParameterAcquisitionSetup(
 			ReportParameterAcquisitionSetup setup,
 			boolean get,

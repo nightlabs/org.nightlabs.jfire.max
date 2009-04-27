@@ -36,10 +36,10 @@ import javax.jdo.JDOHelper;
 import javax.naming.NamingException;
 
 import org.nightlabs.jdo.NLJDOHelper;
+import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.base.jdo.cache.Cache;
-import org.nightlabs.jfire.reporting.ReportManager;
-import org.nightlabs.jfire.reporting.ReportManagerUtil;
+import org.nightlabs.jfire.reporting.ReportManagerRemote;
 import org.nightlabs.jfire.reporting.layout.ReportCategory;
 import org.nightlabs.jfire.reporting.layout.ReportLayout;
 import org.nightlabs.jfire.reporting.layout.ReportRegistryItem;
@@ -71,7 +71,7 @@ extends BaseJDOObjectDAO<ReportRegistryItemID, ReportRegistryItem>
 	protected Collection<ReportRegistryItem> retrieveJDOObjects(
 			Set<ReportRegistryItemID> objectIDs, String[] fetchGroups,
 			int maxFetchDepth, ProgressMonitor monitor) throws Exception {
-		ReportManager rm = ReportManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+		ReportManagerRemote rm = JFireEjb3Factory.getRemoteBean(ReportManagerRemote.class, SecurityReflector.getInitialContextProperties());
 		return rm.getReportRegistryItems(new ArrayList<ReportRegistryItemID>(objectIDs), fetchGroups, maxFetchDepth);
 	}
 
@@ -129,7 +129,7 @@ extends BaseJDOObjectDAO<ReportRegistryItemID, ReportRegistryItem>
 			ReportRegistryItem reportRegistryItem, boolean get, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	throws RemoteException, CreateException, NamingException
 	{
-		ReportManager rm = ReportManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+		ReportManagerRemote rm = JFireEjb3Factory.getRemoteBean(ReportManagerRemote.class, SecurityReflector.getInitialContextProperties());
 		if (get) {
 			Cache.sharedInstance().removeByObjectID(JDOHelper.getObjectId(reportRegistryItem), false);
 			ReportRegistryItem item = rm.storeRegistryItem(reportRegistryItem, get, fetchGroups, maxFetchDepth);

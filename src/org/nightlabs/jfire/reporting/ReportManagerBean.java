@@ -26,7 +26,6 @@
 
 package org.nightlabs.jfire.reporting;
 
-import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -36,10 +35,12 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import javax.ejb.CreateException;
-import javax.ejb.EJBException;
-import javax.ejb.SessionBean;
-import javax.ejb.SessionContext;
+import javax.annotation.security.RolesAllowed;
+import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
+import javax.ejb.TransactionManagement;
+import javax.ejb.TransactionManagementType;
 import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
@@ -111,44 +112,22 @@ import org.nightlabs.version.MalformedVersionException;
  * @ejb.util generate="physical"
  * @ejb.transaction type="Required"
  */
-public abstract class ReportManagerBean
+@TransactionAttribute(TransactionAttributeType.REQUIRED)
+@TransactionManagement(TransactionManagementType.CONTAINER)
+@Stateless
+public class ReportManagerBean
 extends BaseSessionBeanImpl
-implements SessionBean
+implements ReportManagerRemote
 {
 	private static final long serialVersionUID = 20080926L;
 
 	private static final Logger logger = Logger.getLogger(ReportManagerBean.class);
 
-	@Override
-	public void setSessionContext(SessionContext sessionContext)
-	throws EJBException, RemoteException
-	{
-		super.setSessionContext(sessionContext);
-	}
-	@Override
-	public void unsetSessionContext() {
-		super.unsetSessionContext();
-	}
-
-	/**
-	 * @ejb.create-method
-	 * @ejb.permission role-name="_Guest_"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.reporting.ReportManagerRemote#ping(java.lang.String)
 	 */
-	public void ejbCreate() throws CreateException
-	{
-	}
-	/**
-	 * {@inheritDoc}
-	 *
-	 * @ejb.permission unchecked="true"
-	 */
-	public void ejbRemove() throws EJBException, RemoteException { }
-
-	/**
-	 * @ejb.interface-method
-	 * @ejb.transaction type="Supports"
-	 * @ejb.permission role-name="_Guest_"
-	 */
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	@RolesAllowed("_Guest_")
 	@Override
 	public String ping(String message) {
 		return super.ping(message);
@@ -182,13 +161,11 @@ implements SessionBean
 		ScriptRegistry.getScriptRegistry(pm).registerScriptExecutorClass(ScriptExecutorJavaClassReporting.class);
 	}
 
-	/**
-	 * This method is called by the organisation-init system and is not intended to be called directly.
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_System_"
-	 * @ejb.transaction type="Required"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.reporting.ReportManagerRemote#initialise()
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("_System_")
 	public void initialise() throws InstantiationException, IllegalAccessException, MalformedVersionException, ScriptingIntialiserException
 	{
 		// TODO: Better check if platform initialized. Propose on birt forum.
@@ -300,7 +277,7 @@ implements SessionBean
 		task = new Task(
 				taskID,
 				User.getUser(pm, getOrganisationID(), User.USER_ID_SYSTEM),
-				ReportManagerHome.JNDI_NAME,
+				ReportManagerRemote.class,
 				"cleanupRenderedReportLayoutFolders"
 			);
 		task.getName().setText(Locale.ENGLISH.getLanguage(), "Cleanup rendered report layout folders");
@@ -321,14 +298,11 @@ implements SessionBean
 		pm.makePersistent(task);
 	}
 
-	/**
-	 * This method is called from a timer-task it is not intended to be called directly.
-	 * The method will clean folders temporarily used for reporting.
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_System_"
-	 * @ejb.transaction type="Required"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.reporting.ReportManagerRemote#cleanupRenderedReportLayoutFolders(org.nightlabs.jfire.timer.id.TaskID)
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("_System_")
 	public void cleanupRenderedReportLayoutFolders(TaskID taskID)
 	throws Exception
 	{
@@ -340,23 +314,11 @@ implements SessionBean
 		}
 	}
 
-	/**
-	 * Returns the result-set meta-data for the query/script referenced by the given {@link JFSQueryPropertySet}
-	 * (its scriptRegistryItemID to be precise). Note, that the properties in the given queryPropertySet might
-	 * be necessary to determine the result-set meta-data, this is why this method does not operate on a
-	 * {@link ScriptRegistryItemID} but on {@link JFSQueryPropertySet}.
-	 * <p>
-	 * This method delegates to {@link ServerJFSQueryProxy} and will be called only for report design-time.
-	 * It therefore is tagged with permission role {@link RoleConstants#editReport}.
-	 * </p>
-	 *
-	 * @throws InstantiationException If instantiating the referenced script fails.
-	 * @throws ScriptException If creating the meta-data fails.
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="org.nightlabs.jfire.reporting.editReport"
-	 * @ejb.transaction type="Supports"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.reporting.ReportManagerRemote#getJFSResultSetMetaData(org.nightlabs.jfire.reporting.oda.jfs.JFSQueryPropertySet)
 	 */
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	@RolesAllowed("org.nightlabs.jfire.reporting.editReport")
 	public IResultSetMetaData getJFSResultSetMetaData(JFSQueryPropertySet queryPropertySet) throws ScriptException, InstantiationException
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -367,20 +329,11 @@ implements SessionBean
 		}
 	}
 
-	/**
-	 * Obtains the {@link IJFSQueryPropertySetMetaData} of the referenced script.
-	 * <p>
-	 * This method delegates to {@link ServerJFSQueryProxy} and will be called only for report desing-time.
-	 * It therefore is tagged with permission role {@link RoleConstants#editReport}.
-	 * </p>
-	 *
-	 * @throws ScriptException If getting the meta-data fails.
-	 * @throws InstantiationException If creating the executor fails.
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="org.nightlabs.jfire.reporting.editReport"
-	 * @ejb.transaction type="Supports"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.reporting.ReportManagerRemote#getJFSQueryPropertySetMetaData(org.nightlabs.jfire.scripting.id.ScriptRegistryItemID)
 	 */
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	@RolesAllowed("org.nightlabs.jfire.reporting.editReport")
 	public IJFSQueryPropertySetMetaData getJFSQueryPropertySetMetaData(ScriptRegistryItemID scriptID) throws ScriptException, InstantiationException
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -391,21 +344,11 @@ implements SessionBean
 		}
 	}
 
-	/**
-	 * Executes the script referenced by the given {@link JFSQueryPropertySet} with
-	 * the given queryPropertySet and the given parameters.
-	 * <p>
-	 * This method delegates to {@link ServerJFSQueryProxy} and will be called only for report desing-time.
-	 * It therefore is tagged with permission role {@link RoleConstants#editReport}.
-	 * </p>
-	 *
-	 * @throws InstantiationException If instantiating the script fails.
-	 * @throws ScriptException If the script execution fails.
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="org.nightlabs.jfire.reporting.editReport"
-	 * @ejb.transaction type="Never" @!This is tagged with Never as we don't want write operations to be performed by the script that will be executed by this call.
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.reporting.ReportManagerRemote#getJFSResultSet(org.nightlabs.jfire.reporting.oda.jfs.JFSQueryPropertySet, java.util.Map)
 	 */
+	@TransactionAttribute(TransactionAttributeType.NEVER)
+	@RolesAllowed("org.nightlabs.jfire.reporting.editReport")
 	public IResultSet getJFSResultSet(
 			JFSQueryPropertySet queryPropertySet,
 			Map<String, Object> parameters
@@ -424,19 +367,11 @@ implements SessionBean
 		}
 	}
 
-	/**
-	 * Returns the parameter meta-data for the referenced script.
-	 * <p>
-	 * This method delegates to {@link ServerJFSQueryProxy} and will be called only for report design-time.
-	 * It therefore is tagged with permission role {@link RoleConstants#editReport}.
-	 * </p>
-	 *
-	 * @throws JFireReportingOdaException
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="org.nightlabs.jfire.reporting.editReport"
-	 * @ejb.transaction type="Supports"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.reporting.ReportManagerRemote#getJFSParameterMetaData(org.nightlabs.jfire.scripting.id.ScriptRegistryItemID)
 	 */
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	@RolesAllowed("org.nightlabs.jfire.reporting.editReport")
 	public IParameterMetaData getJFSParameterMetaData(
 			ScriptRegistryItemID scriptRegistryItemID
 		) throws JFireReportingOdaException
@@ -452,25 +387,11 @@ implements SessionBean
 		}
 	}
 
-	/**
-	 * Returns the {@link ReportRegistryItem}s represented by the given list of {@link ReportRegistryItemID}s.
-	 * All will be detached with the given fetch-groups.
-	 *
-	 * <p>
-	 * This method will filter the result for the given {@link RoleID}, however this is not a real
-	 * security check as a caller could call everything here. The security checks
-	 * are done in the store methods.
-	 * </p>
-	 *
-	 * @param reportRegistryItemIDs The list of id of items to fetch.
-	 * @param filterRoleID The {@link RoleID} to filter the results with.
-	 * @param fetchGroups The fetch-groups to detach the items with.
-	 * @param maxFetchDepth The maximum fetch-depth while detaching.
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="org.nightlabs.jfire.reporting.renderReport"
-	 * @ejb.transaction type="Supports"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.reporting.ReportManagerRemote#getReportRegistryItems(java.util.List, org.nightlabs.jfire.security.id.RoleID, java.lang.String[], int)
 	 */
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	@RolesAllowed("org.nightlabs.jfire.reporting.renderReport")
 	public List<ReportRegistryItem> getReportRegistryItems (
 			List<ReportRegistryItemID> reportRegistryItemIDs, RoleID filterRoleID,
 			String[] fetchGroups, int maxFetchDepth
@@ -494,21 +415,11 @@ implements SessionBean
 		}
 	}
 
-	/**
-	 * Returns the {@link ReportRegistryItem}s represented by the given list of {@link ReportRegistryItemID}s.
-	 * All will be detached with the given fetch-groups.
-	 * <p>
-	 * This method will filter the result for the RoleID {@link RoleConstants#renderReport}
-	 * </p>
-	 *
-	 * @param reportRegistryItemIDs The list of id of items to fetch.
-	 * @param fetchGroups The fetch-groups to detach the items with.
-	 * @param maxFetchDepth The maximum fetch-depth while detaching.
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="org.nightlabs.jfire.reporting.renderReport"
-	 * @ejb.transaction type="Supports"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.reporting.ReportManagerRemote#getReportRegistryItems(java.util.List, java.lang.String[], int)
 	 */
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	@RolesAllowed("org.nightlabs.jfire.reporting.renderReport")
 	public List<ReportRegistryItem> getReportRegistryItems (
 			List<ReportRegistryItemID> reportRegistryItemIDs,
 			String[] fetchGroups, int maxFetchDepth
@@ -516,21 +427,11 @@ implements SessionBean
 	{
 		return getReportRegistryItems(reportRegistryItemIDs, RoleConstants.renderReport, fetchGroups, maxFetchDepth);
 	}
-	/**
-	 * Returns the {@link ReportRegistryItemID}s of all {@link ReportRegistryItem}s
-	 * that are direct children of the given reportRegistryItemID.
-	 * <p>
-	 * This method will filter the result for the given {@link RoleID}, however this is not a real
-	 * security check as a caller could call everything here. The security checks
-	 * are done in the store methods.
-	 * </p>
-	 *
-	 * @param reportRegistryItemID The id of the parent to search the children for.
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="org.nightlabs.jfire.reporting.renderReport"
-	 * @ejb.transaction type="Supports"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.reporting.ReportManagerRemote#getReportRegistryItemIDsForParent(org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID, org.nightlabs.jfire.security.id.RoleID)
 	 */
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	@RolesAllowed("org.nightlabs.jfire.reporting.renderReport")
 	public Collection<ReportRegistryItemID> getReportRegistryItemIDsForParent(ReportRegistryItemID reportRegistryItemID, RoleID filterRoleID) {
 		PersistenceManager pm;
 		pm = getPersistenceManager();
@@ -546,38 +447,20 @@ implements SessionBean
 		}
 	}
 
-	/**
-	 * Returns the {@link ReportRegistryItemID}s of all {@link ReportRegistryItem}s
-	 * that are direct children of the given reportRegistryItemID.
-	 * <p>
-	 * This method will filter the result for the RoleID {@link RoleConstants#renderReport}
-	 * </p>
-	 *
-	 * @param reportRegistryItemID The id of the parent to search the children for.
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="org.nightlabs.jfire.reporting.renderReport"
-	 * @ejb.transaction type="Supports"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.reporting.ReportManagerRemote#getReportRegistryItemIDsForParent(org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID)
 	 */
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	@RolesAllowed("org.nightlabs.jfire.reporting.renderReport")
 	public Collection<ReportRegistryItemID> getReportRegistryItemIDsForParent(ReportRegistryItemID reportRegistryItemID) {
 		return getReportRegistryItemIDsForParent(reportRegistryItemID, RoleConstants.renderReport);
 	}
 
-	/**
-	 * Returns all {@link ReportRegistryItemID}s that do not have a parent.
-	 * These will be only for the organisationID of the calling user.
-	 * <p>
-	 * This method will filter by the given RoleID, however this is not a real
-	 * security check as a caller could call everything here. The security checks
-	 * are done in the store methods.
-	 * </p>
-	 *
-	 * @param filterRoleID The {@link RoleID} to filter the result for.
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="org.nightlabs.jfire.reporting.renderReport"
-	 * @ejb.transaction type="Supports"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.reporting.ReportManagerRemote#getTopLevelReportRegistryItemIDs(org.nightlabs.jfire.security.id.RoleID)
 	 */
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	@RolesAllowed("org.nightlabs.jfire.reporting.renderReport")
 	public Collection<ReportRegistryItemID> getTopLevelReportRegistryItemIDs(RoleID filterRoleID) {
 		PersistenceManager pm;
 		pm = getPersistenceManager();
@@ -594,14 +477,11 @@ implements SessionBean
 		}
 	}
 
-	/**
-	 * Returns all {@link ReportRegistryItemID}s that do not have a parent.
-	 * These will be only for the organisationID of the calling user.
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="org.nightlabs.jfire.reporting.renderReport"
-	 * @ejb.transaction type="Supports"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.reporting.ReportManagerRemote#getTopLevelReportRegistryItemIDs()
 	 */
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	@RolesAllowed("org.nightlabs.jfire.reporting.renderReport")
 	public Collection<ReportRegistryItemID> getTopLevelReportRegistryItemIDs() {
 		return getTopLevelReportRegistryItemIDs(RoleConstants.renderReport);
 	}
@@ -627,21 +507,11 @@ implements SessionBean
 		return ReportEnginePool.getInstance(getInitialContext(getOrganisationID()));
 	}
 
-	/**
-	 * Stores the given {@link ReportRegistryItem} to the datastore
-	 * of the organisation of the calling user.
-	 *
-	 * @param reportRegistryItemToStore The item to store.
-	 * @param get Wheter a detached copy of the stored item should be returned.
-	 * @param fetchGroups If get is <code>true</code>, this defines the fetch-groups the
-	 * 		retuned item will be detached with.
-	 * @param maxFetchDepth If get is <code>true</code>, this defines the maximum fetch-depth
-	 * 		when detaching.
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="org.nightlabs.jfire.reporting.editReport"
-	 * @ejb.transaction type="Required"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.reporting.ReportManagerRemote#storeRegistryItem(org.nightlabs.jfire.reporting.layout.ReportRegistryItem, boolean, java.lang.String[], int)
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("org.nightlabs.jfire.reporting.editReport")
 	public ReportRegistryItem storeRegistryItem (
 			ReportRegistryItem reportRegistryItemToStore,
 			boolean get,
@@ -679,15 +549,11 @@ implements SessionBean
 	}
 
 
-	/**
-	 * Delete the {@link ReportRegistryItem} with the given id.
-	 *
-	 * @param reportRegistryItemID The id of the item to delete.
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="org.nightlabs.jfire.reporting.editReport"
-	 * @ejb.transaction type="Required"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.reporting.ReportManagerRemote#deleteRegistryItem(org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID)
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("org.nightlabs.jfire.reporting.editReport")
 	public void deleteRegistryItem (ReportRegistryItemID reportRegistryItemID)
 	{
 		PersistenceManager pm;
@@ -713,20 +579,11 @@ implements SessionBean
 	}
 
 
-	/**
-	 * Renders the {@link ReportLayout} referenced by the given {@link RenderReportRequest}
-	 * and returns the resulting {@link RenderedReportLayout}.
-	 *
-	 * @param renderReportRequest The request defining which report to render, to which format it
-	 * 		should be rendered and which Locale should be applied etc.
-	 *
-	 * @throws NamingException Might be thrown while resolving the {@link ReportingManagerFactory}.
-	 * @throws RenderReportException Might be thrown if rendering the report fails.
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="org.nightlabs.jfire.reporting.renderReport"
-	 * @ejb.transaction type="Never" @!Tagged with Never, so the data-sources can't perform write operations.
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.reporting.ReportManagerRemote#renderReportLayout(org.nightlabs.jfire.reporting.layout.render.RenderReportRequest)
 	 */
+	@TransactionAttribute(TransactionAttributeType.NEVER)
+	@RolesAllowed("org.nightlabs.jfire.reporting.renderReport")
 	public RenderedReportLayout renderReportLayout(RenderReportRequest renderReportRequest)
 	throws NamingException, RenderReportException
 	{
@@ -761,12 +618,11 @@ implements SessionBean
 		}
 	}
 
-	/**
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="org.nightlabs.jfire.reporting.editReport"
-	 * @ejb.transaction type="Required"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.reporting.ReportManagerRemote#execJDOQL(java.lang.String, java.util.Map, java.lang.String[])
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("org.nightlabs.jfire.reporting.editReport")
 	public Collection execJDOQL (
 			String jdoql,
 			Map params,
@@ -793,18 +649,11 @@ implements SessionBean
 		}
 	}
 
-	/**
-	 * Returns the {@link ReportLayoutLocalisationData} for the given report layout id.
-	 * The localisation data contains localisation labels for the report.
-	 *
-	 * @param reportLayoutID The id of the layout to get the localisation data for.
-	 * @param fetchGroups The fetch-groups to detach the localisation data with.
-	 * @param maxFetchDepth The maximum fetch-depth when detaching.
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="org.nightlabs.jfire.reporting.editReport"
-	 * @ejb.transaction type="Required"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.reporting.ReportManagerRemote#getReportLayoutLocalisationBundle(org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID, java.lang.String[], int)
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("org.nightlabs.jfire.reporting.editReport")
 	public Collection<ReportLayoutLocalisationData> getReportLayoutLocalisationBundle(
 			ReportRegistryItemID reportLayoutID,
 			String[] fetchGroups, int maxFetchDepth
@@ -829,21 +678,11 @@ implements SessionBean
 		}
 	}
 
-	/**
-	 * Stores the given {@link ReportLayoutLocalisationData} to the datastore
-	 * of the organiation of the calling user.
-	 *
-	 * @param bundle The bundle to store.
-	 * @param get Wheter a detached copy of the stored bundle should be returned.
-	 * @param fetchGroups If get is <code>true</code>, this defines the fetch-groups the
-	 * 		retuned bundle will be detached with.
-	 * @param maxFetchDepth If get is <code>true</code>, this defines the maximum fetch-depth
-	 * 		when detaching.
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="org.nightlabs.jfire.reporting.editReport"
-	 * @ejb.transaction type="Required"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.reporting.ReportManagerRemote#storeReportLayoutLocalisationBundle(java.util.Collection, boolean, java.lang.String[], int)
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("org.nightlabs.jfire.reporting.editReport")
 	public Collection<ReportLayoutLocalisationData> storeReportLayoutLocalisationBundle(
 			Collection<ReportLayoutLocalisationData> bundle, boolean get, String[] fetchGroups, int maxFetchDepth
 	) {

@@ -6,9 +6,9 @@ import java.util.List;
 import java.util.Set;
 
 import org.nightlabs.jdo.NLJDOHelper;
-import org.nightlabs.jfire.base.JFireEjbFactory;
+import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
-import org.nightlabs.jfire.issue.IssueManager;
+import org.nightlabs.jfire.issue.IssueManagerRemote;
 import org.nightlabs.jfire.issue.IssuePriority;
 import org.nightlabs.jfire.issue.id.IssuePriorityID;
 import org.nightlabs.jfire.security.SecurityReflector;
@@ -17,7 +17,7 @@ import org.nightlabs.progress.SubProgressMonitor;
 
 /**
  * Data access object for {@link IssuePriority}s.
- * 
+ *
  * @author Chairat Kongarayawetchakun - chairat [AT] nightlabs [DOT] de
  */
 public class IssuePriorityDAO
@@ -37,7 +37,7 @@ extends BaseJDOObjectDAO<IssuePriorityID, IssuePriority>
 		return sharedInstance;
 	}
 
-	private IssueManager issueManager;
+	private IssueManagerRemote issueManager;
 
 	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	@Override
@@ -45,16 +45,16 @@ extends BaseJDOObjectDAO<IssuePriorityID, IssuePriority>
 	 * {@inheritDoc}
 	 */
 	protected Collection<IssuePriority> retrieveJDOObjects(Set<IssuePriorityID> objectIDs, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
-	throws Exception 
+	throws Exception
 	{
 		monitor.beginTask("Fetching IssuePriority...", 1); //$NON-NLS-1$
 		try {
-			IssueManager im = issueManager;
+			IssueManagerRemote im = issueManager;
 			if (im == null)
-				im = JFireEjbFactory.getBean(IssueManager.class, SecurityReflector.getInitialContextProperties());
+				im = JFireEjb3Factory.getRemoteBean(IssueManagerRemote.class, SecurityReflector.getInitialContextProperties());
 
 			monitor.worked(1);
-			return im.getIssuePriorities(objectIDs, fetchGroups, maxFetchDepth);	
+			return im.getIssuePriorities(objectIDs, fetchGroups, maxFetchDepth);
 		} catch (Exception e) {
 			monitor.setCanceled(true);
 			throw e;
@@ -70,14 +70,14 @@ extends BaseJDOObjectDAO<IssuePriorityID, IssuePriority>
 		monitor.done();
 		return issuePriority;
 	}
-	
+
 	public synchronized List<IssuePriority> getIssuePriorities(String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
 		try {
 			return new ArrayList<IssuePriority>(retrieveJDOObjects(null, fetchGroups, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT, monitor));
 		} catch (Exception e) {
 			throw new RuntimeException("Error while fetching issue resolutions: " + e.getMessage(), e); //$NON-NLS-1$
-		} 
+		}
 	}
 
 	public IssuePriority storeIssuePriority(IssuePriority issuePriority, boolean get, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
@@ -86,7 +86,7 @@ extends BaseJDOObjectDAO<IssuePriorityID, IssuePriority>
 			throw new NullPointerException("Issue to save must not be null");
 		monitor.beginTask("Storing issuePriority: "+ issuePriority.getIssuePriorityID(), 3);
 		try {
-			IssueManager im = JFireEjbFactory.getBean(IssueManager.class, SecurityReflector.getInitialContextProperties());
+			IssueManagerRemote im = JFireEjb3Factory.getRemoteBean(IssueManagerRemote.class, SecurityReflector.getInitialContextProperties());
 			IssuePriority result = im.storeIssuePriority(issuePriority, get, fetchGroups, maxFetchDepth);
 			monitor.worked(1);
 			monitor.done();

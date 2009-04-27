@@ -24,6 +24,19 @@ import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.util.Util;
 
+import javax.jdo.annotations.FetchGroups;
+import org.nightlabs.jfire.issue.id.IssueLinkID;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Queries;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+
 /**
  * The {@link IssueLink} class represents a link between an {@link Issue} and the other object. 
  * <p>
@@ -65,7 +78,35 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="IssueLink.issueLinkType" fetch-groups="default" fields="issueLinkType"
  *
  * @jdo.fetch-group name="IssueLink.this" fields="issue, issueLinkType, linkedObjectID"
- */ 
+ */
+@javax.jdo.annotations.PersistenceCapable(
+	objectIdClass=IssueLinkID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireIssueTracking_IssueLink")
+@FetchGroups({
+	@FetchGroup(
+		fetchGroups={"default"},
+		name=IssueLink.FETCH_GROUP_ISSUE,
+		members=@Persistent(name="issue")),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name=IssueLink.FETCH_GROUP_ISSUE_LINK_TYPE,
+		members=@Persistent(name="issueLinkType")),
+	@FetchGroup(
+		name=IssueLink.FETCH_GROUP_THIS_ISSUE_LINK,
+		members={@Persistent(name="issue"), @Persistent(name="issueLinkType"), @Persistent(name="linkedObjectID")})
+})
+@Queries({
+	@javax.jdo.annotations.Query(
+		name="getIssueLinksByIssueAndIssueLinkTypeAndLinkedObjectID",
+		value="SELECT WHERE this.issue == :issue && this.issueLinkType == :issueLinkType && this.linkedObjectID == :linkedObjectID"),
+	@javax.jdo.annotations.Query(
+		name="getIssueLinksByOrganisationIDAndLinkedObjectID",
+		value="SELECT WHERE this.organisationID == :organisationID && this.linkedObjectID == :linkedObjectID")
+})
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
+
 public class IssueLink
 implements Serializable, DetachCallback, StoreCallback, DeleteCallback
 {
@@ -101,41 +142,52 @@ implements Serializable, DetachCallback, StoreCallback, DeleteCallback
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 */
+	@PrimaryKey
 	private long issueLinkID;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Issue issue;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private IssueLinkType issueLinkType;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" null-value="exception"
 	 */
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private String linkedObjectID;
 
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private transient ObjectID _linkedObjectID;
 
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private Object linkedObject;
 
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private Class<?> linkedObjectClass;
 
 	/**

@@ -16,6 +16,19 @@ import org.nightlabs.jfire.jbpm.graph.def.State;
 import org.nightlabs.util.CollectionUtil;
 import org.nightlabs.util.Util;
 
+import javax.jdo.annotations.Join;
+import org.nightlabs.jfire.issue.id.IssueLocalID;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+
 /**
  * This class is created for wrapping the issue with its state. It's intended to be used within an organisation.
  * <p>
@@ -48,6 +61,33 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="StatableLocal.state" fields="state"
  * @jdo.fetch-group name="StatableLocal.states" fields="states"
  */
+@PersistenceCapable(
+	objectIdClass=IssueLocalID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireIssueTracking_IssueLocal")
+@FetchGroups({
+	@FetchGroup(
+		name="IssueLocal.state",
+		members=@Persistent(name="state")),
+	@FetchGroup(
+		name="IssueLocal.states",
+		members=@Persistent(name="states")),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name=IssueLocal.FETCH_GROUP_THIS_ISSUE_LOCAL,
+		members={@Persistent(name="issue"), @Persistent(name="state"), @Persistent(name="states")}),
+	@FetchGroup(
+		name="Issue.issueLocal",
+		members=@Persistent(name="issue")),
+	@FetchGroup(
+		name="StatableLocal.state",
+		members=@Persistent(name="state")),
+	@FetchGroup(
+		name="StatableLocal.states",
+		members=@Persistent(name="states"))
+})
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class IssueLocal 
 implements Serializable, StatableLocal
 {
@@ -69,16 +109,20 @@ implements Serializable, StatableLocal
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 	
 	/**
 	 * @jdo.field primary-key="true"
 	 */
+	@PrimaryKey
 	private long issueID;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent" @!dependent="true"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private State state;
 	
 	/**
@@ -93,22 +137,29 @@ implements Serializable, StatableLocal
 	 *
 	 * @jdo.join
 	 */
+	@Join
+	@Persistent(
+		table="JFireIssueTracking_IssueLocal_states",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private List<State> states;
 	
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private long jbpmProcessInstanceId = -1;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Issue issue;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private boolean processEnded = false;
 
 	/**
@@ -152,6 +203,7 @@ implements Serializable, StatableLocal
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private transient List<State> _states = null;
 
 	/**
@@ -250,6 +302,7 @@ implements Serializable, StatableLocal
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private String primaryKey;
 
 	/**

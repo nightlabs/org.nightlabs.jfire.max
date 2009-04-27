@@ -17,6 +17,19 @@ import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.util.Util;
 
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import org.nightlabs.jfire.issue.history.id.IssueHistoryID;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Queries;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+
 /**
  * The {@link IssueHistory} class represents a history which recorded the change of each {@link Issue}. 
  * <p>
@@ -45,6 +58,25 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="IssueHistory.user" fields="user"
  *
  **/
+@PersistenceCapable(
+	objectIdClass=IssueHistoryID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireIssueTracking_IssueHistory")
+@FetchGroups({
+	@FetchGroup(
+		name=IssueHistory.FETCH_GROUP_ISSUE,
+		members=@Persistent(name="issue")),
+	@FetchGroup(
+		name=IssueHistory.FETCH_GROUP_USER,
+		members=@Persistent(name="user"))
+})
+@Queries(
+	@javax.jdo.annotations.Query(
+		name=IssueHistory.QUERY_ISSUE_HISTORYIDS_BY_ORGANISATION_ID_AND_ISSUE_ID,
+		value="SELECT WHERE this.issueID == :issueID && this.organisationID == :organisationID")
+)
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class IssueHistory
 implements Serializable 
 {
@@ -65,37 +97,46 @@ implements Serializable
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 */
+	@PrimaryKey
 	private long issueID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 */
+	@PrimaryKey
 	private long issueHistoryID;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 * @jdo.column length="255"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+	@Column(length=255)
 	private String change;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private User user;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Issue issue;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Date createTimestamp;
 
 	/**

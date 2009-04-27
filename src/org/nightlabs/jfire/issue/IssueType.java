@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.nightlabs.jfire.issue;
 
 import java.io.IOException;
@@ -24,6 +21,21 @@ import org.nightlabs.jfire.jbpm.graph.def.ProcessDefinition;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.util.Util;
+
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.Query;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import org.nightlabs.jfire.issue.id.IssueTypeID;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Queries;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
 
 /**
  * The {@link IssueType} class defines the valid set of {@link IssuePriority}s and {@link IssueSeverityType}s 
@@ -55,6 +67,43 @@ import org.nightlabs.util.Util;
  * 
  * @jdo.query name="getAllIssueTypeIDs" query="SELECT JDOHelper.getObjectId(this)"
  */
+@PersistenceCapable(
+	objectIdClass=IssueTypeID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireIssueTracking_IssueType")
+@FetchGroups({
+	@FetchGroup(
+		fetchGroups={"default"},
+		name=IssueType.FETCH_GROUP_NAME,
+		members=@Persistent(name="name")),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name=IssueType.FETCH_GROUP_ISSUE_PRIORITIES,
+		members=@Persistent(name="issuePriorities")),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name=IssueType.FETCH_GROUP_ISSUE_SEVERITY_TYPES,
+		members=@Persistent(name="issueSeverityTypes")),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name=IssueType.FETCH_GROUP_ISSUE_RESOLUTIONS,
+		members=@Persistent(name="issueResolutions")),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name=IssueType.FETCH_GROUP_PROCESS_DEFINITION,
+		members=@Persistent(name="processDefinition")),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name=IssueType.FETCH_GROUP_THIS_ISSUE_TYPE,
+		members={@Persistent(name="name"), @Persistent(name="issuePriorities"), @Persistent(name="issueSeverityTypes"), @Persistent(name="issueResolutions"), @Persistent(name="processDefinition")})
+})
+@Queries(
+	@Query(
+		name=IssueType.QUERY_ALL_ISSUETYPE_IDS,
+		value="SELECT JDOHelper.getObjectId(this)")
+)
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class IssueType
 implements Serializable, Comparable<IssueType>
 {
@@ -81,17 +130,25 @@ implements Serializable, Comparable<IssueType>
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String issueTypeID;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" dependent="true" mapped-by="issueType"
 	 */
+	@Persistent(
+		dependent="true",
+		mappedBy="issueType",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private IssueTypeName name;
 
 	/**
@@ -105,6 +162,10 @@ implements Serializable, Comparable<IssueType>
 	 *
 	 * @jdo.join
 	 */
+	@Join
+	@Persistent(
+		table="JFireIssueTracking_IssueType_issueSeverityTypes",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private List<IssueSeverityType> issueSeverityTypes;
 
 	/**
@@ -118,6 +179,10 @@ implements Serializable, Comparable<IssueType>
 	 *
 	 * @jdo.join
 	 */
+	@Join
+	@Persistent(
+		table="JFireIssueTracking_IssueType_issuePriorities",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private List<IssuePriority> issuePriorities;
 
 	/**
@@ -131,6 +196,10 @@ implements Serializable, Comparable<IssueType>
 	 *
 	 * @jdo.join
 	 */
+	@Join
+	@Persistent(
+		table="JFireIssueTracking_IssueType_issueResolutions",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private List<IssueResolution> issueResolutions;
 
 	/**
@@ -139,12 +208,14 @@ implements Serializable, Comparable<IssueType>
 	 * @jdo.field
 	 *		persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private ProcessDefinition processDefinition;
 
 	/**
 	 * @jdo.field
 	 *		persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private boolean isDefault;
 	/**
 	 * @deprecated Only for JDO!!!! 

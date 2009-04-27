@@ -13,6 +13,20 @@ import org.nightlabs.jfire.security.User;
 import org.nightlabs.util.NLLocale;
 import org.nightlabs.util.Util;
 
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.Queries;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.Query;
+import org.nightlabs.jfire.issue.id.IssueWorkTimeRangeID;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+
 /**
  * The {@link IssueWorkTimeRange} class represents a range of working time of each {@link Issue}s. 
  * <p>
@@ -42,6 +56,31 @@ import org.nightlabs.util.Util;
  *			WHERE this.user == :user && this.issueID== :issueID"
  *
  **/
+@PersistenceCapable(
+	objectIdClass=IssueWorkTimeRangeID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireIssueTracking_IssueWorkTimeRange")
+@FetchGroups({
+	@FetchGroup(
+		name=IssueWorkTimeRange.FETCH_GROUP_ISSUE,
+		members=@Persistent(name="issue")),
+	@FetchGroup(
+		name=IssueWorkTimeRange.FETCH_GROUP_USER,
+		members=@Persistent(name="user")),
+	@FetchGroup(
+		name=IssueWorkTimeRange.FETCH_GROUP_FROM,
+		members=@Persistent(name="from")),
+	@FetchGroup(
+		name=IssueWorkTimeRange.FETCH_GROUP_TO,
+		members=@Persistent(name="to"))
+})
+@Queries(
+	@Query(
+		name=IssueWorkTimeRange.QUERY_ISSUE_WORK_TIME_RANGE_BY_USER_AND_ISSUE_ID,
+		value="SELECT WHERE this.user == :user && this.issueID== :issueID")
+)
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class IssueWorkTimeRange
 implements Serializable, Comparable<IssueWorkTimeRange> 
 {
@@ -63,36 +102,44 @@ implements Serializable, Comparable<IssueWorkTimeRange>
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 */
+	@PrimaryKey
 	private long issueID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 */
+	@PrimaryKey
 	private long issueWorkTimeRangeID;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Issue issue;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Date from;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Date to;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private long duration;
 	
 	/**
@@ -100,6 +147,9 @@ implements Serializable, Comparable<IssueWorkTimeRange>
 	 * 		persistence-modifier="persistent"
 	 * 		load-fetch-group="all"
 	 */
+	@Persistent(
+		loadFetchGroup="all",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private User user;
 
 	/**

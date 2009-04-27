@@ -17,6 +17,18 @@ import org.nightlabs.io.DataBuffer;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.util.IOUtil;
 
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.Column;
+import org.nightlabs.jfire.issue.id.IssueFileAttachmentID;
+import javax.jdo.annotations.IdentityType;
+
 /**
  * The {@link IssueFileAttachment} class represents an attached file on an {@link Issue}. 
  * <p>
@@ -38,6 +50,20 @@ import org.nightlabs.util.IOUtil;
  * @jdo.fetch-group name="IssueFileAttachment.data" fields="data"
  * @jdo.fetch-group name="IssueFileAttachment.issue" fields="issue"
  */
+@PersistenceCapable(
+	objectIdClass=IssueFileAttachmentID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireIssueTracking_IssueFileAttachment")
+@FetchGroups({
+	@FetchGroup(
+		name=IssueFileAttachment.FETCH_GROUP_DATA,
+		members=@Persistent(name="data")),
+	@FetchGroup(
+		name="IssueFileAttachment.issue",
+		members=@Persistent(name="issue"))
+})
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class IssueFileAttachment 
 implements Serializable{
 	private static final long serialVersionUID = 1L;
@@ -58,6 +84,8 @@ implements Serializable{
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	@SuppressWarnings("unused")
 	private String organisationID;
 
@@ -70,6 +98,7 @@ implements Serializable{
 	/**
 	 * @jdo.field primary-key="true"
 	 */
+@PrimaryKey
 	@SuppressWarnings("unused")
 	private long issueFileAttachmentID;
 
@@ -77,21 +106,28 @@ implements Serializable{
 	 * @jdo.field persistence-modifier="persistent" serialized="true"
 	 * @jdo.column sql-type="BLOB"
 	 */
+	@Persistent(
+		serialized="true",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
+	@Column(sqlType="BLOB")
 	private byte[] data;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Date fileTimestamp;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private String fileName;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Issue issue;
 
 	

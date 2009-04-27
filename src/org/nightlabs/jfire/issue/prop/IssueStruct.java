@@ -1,6 +1,3 @@
-/**
- *
- */
 package org.nightlabs.jfire.issue.prop;
 
 import java.util.Locale;

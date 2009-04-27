@@ -55,6 +55,22 @@ import org.nightlabs.jfire.security.User;
 import org.nightlabs.util.CollectionUtil;
 import org.nightlabs.util.Util;
 
+import org.nightlabs.jfire.issue.id.IssueID;
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.Value;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.Query;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Queries;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+
 /**
  * The {@link Issue} class represents an issue in JFire.
  * <p>
@@ -117,6 +133,79 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="Statable.state" fields="state"
  * @jdo.fetch-group name="Statable.states" fields="states"
  */
+@PersistenceCapable(
+	objectIdClass=IssueID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireIssueTracking_Issue")
+@FetchGroups({
+	@FetchGroup(
+		name=Issue.FETCH_GROUP_ISSUE_FILELIST,
+		members=@Persistent(name="issueFileAttachments")),
+	@FetchGroup(
+		name=Issue.FETCH_GROUP_DESCRIPTION,
+		members=@Persistent(name="description")),
+	@FetchGroup(
+		name=Issue.FETCH_GROUP_SUBJECT,
+		members=@Persistent(name="subject")),
+	@FetchGroup(
+		name=Issue.FETCH_GROUP_ISSUE_PRIORITY,
+		members=@Persistent(name="issuePriority")),
+	@FetchGroup(
+		name=Issue.FETCH_GROUP_ISSUE_SEVERITY_TYPE,
+		members=@Persistent(name="issueSeverityType")),
+	@FetchGroup(
+		name=Issue.FETCH_GROUP_ISSUE_RESOLUTION,
+		members=@Persistent(name="issueResolution")),
+	@FetchGroup(
+		name=Issue.FETCH_GROUP_STATE,
+		members=@Persistent(name="state")),
+	@FetchGroup(
+		name=Issue.FETCH_GROUP_STATES,
+		members=@Persistent(name="states")),
+	@FetchGroup(
+		name=Issue.FETCH_GROUP_ISSUE_LOCAL,
+		members=@Persistent(name="issueLocal")),
+	@FetchGroup(
+		name=Issue.FETCH_GROUP_ISSUE_TYPE,
+		members=@Persistent(name="issueType")),
+	@FetchGroup(
+		name=Issue.FETCH_GROUP_ISSUE_PROJECT,
+		members=@Persistent(name="project")),
+	@FetchGroup(
+		name=Issue.FETCH_GROUP_ISSUE_COMMENTS,
+		members=@Persistent(name="comments")),
+	@FetchGroup(
+		name=Issue.FETCH_GROUP_ISSUE_LINKS,
+		members=@Persistent(name="issueLinks")),
+	@FetchGroup(
+		name=Issue.FETCH_GROUP_PROPERTY_SET,
+		members=@Persistent(name="propertySet")),
+	@FetchGroup(
+		name=Issue.FETCH_GROUP_ISSUE_REPORTER,
+		members=@Persistent(name="reporter")),
+	@FetchGroup(
+		name=Issue.FETCH_GROUP_ISSUE_ASSIGNEE,
+		members=@Persistent(name="assignee")),
+	@FetchGroup(
+		name=Issue.FETCH_GROUP_ISSUE_WORK_TIME_RANGES,
+		members=@Persistent(name="issueWorkTimeRanges")),
+	@FetchGroup(
+		name="Statable.state",
+		members=@Persistent(name="state")),
+	@FetchGroup(
+		name="Statable.states",
+		members=@Persistent(name="states"))
+})
+@Queries({
+	@Query(
+		name="getIssuesByProjectID",
+		value="SELECT WHERE this.project.organisationID == :organisationID && this.project.projectID == :projectID"),
+	@Query(
+		name="getIssuesByProjectTypeID",
+		value="SELECT WHERE this.project.projectType.organisationID == :organisationID && this.project.projectType.projectTypeID == :projectTypeID")
+})
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class Issue
 implements 	Serializable, AttachCallback, Statable, DeleteCallback
 {
@@ -149,16 +238,20 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 */
+	@PrimaryKey
 	private long issueID;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private IssueType issueType;
 
 	/**
@@ -171,11 +264,16 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	 *		dependent-element="true"
 	 *		mapped-by="issue"
 	 */
+	@Persistent(
+		dependentElement="true",
+		mappedBy="issue",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Set<IssueLink> issueLinks;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Project project;
 	
 	/**
@@ -188,6 +286,10 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	 *		dependent-value="true"
 	 *		mapped-by="issue"
 	 */
+	@Persistent(
+		mappedBy="issue",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
+	@Value(dependent="true")
 	private List<IssueFileAttachment> issueFileAttachments;
 
 	/**
@@ -200,6 +302,10 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	 *		dependent-element="true"
 	 *		mapped-by="issue"
 	 */
+	@Persistent(
+		dependentElement="true",
+		mappedBy="issue",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private List<IssueWorkTimeRange> issueWorkTimeRanges;
 
 	/**
@@ -212,16 +318,22 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	 *		dependent-value="true"
 	 *		mapped-by="issue"
 	 */
+	@Persistent(
+		mappedBy="issue",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
+	@Value(dependent="true")
 	private List<IssueComment> comments;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private IssuePriority issuePriority;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private IssueSeverityType issueSeverityType;
 
 	/**
@@ -230,6 +342,10 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	 * 		dependent="true"
 	 * 		mapped-by="issue"
 	 */
+	@Persistent(
+		dependent="true",
+		mappedBy="issue",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private IssueSubject subject;
 
 	/**
@@ -238,6 +354,10 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	 * 		dependent="true"
 	 * 		mapped-by="issue"
 	 */
+	@Persistent(
+		dependent="true",
+		mappedBy="issue",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private IssueDescription description;
 
 	/**
@@ -245,6 +365,9 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	 * 		persistence-modifier="persistent"
 	 * 		load-fetch-group="all"
 	 */
+	@Persistent(
+		loadFetchGroup="all",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private User reporter;
 
 	/**
@@ -252,26 +375,33 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	 * 		persistence-modifier="persistent"
 	 * 		load-fetch-group="all"
 	 */
+	@Persistent(
+		loadFetchGroup="all",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private User assignee;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private boolean isStarted = false;;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Date createTimestamp;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Date updateTimestamp;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private IssueResolution issueResolution;
 
 	/**
@@ -280,11 +410,16 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	 * 		mapped-by="issue"
 	 * 		dependent="true"
 	 */
+	@Persistent(
+		dependent="true",
+		mappedBy="issue",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private IssueLocal issueLocal;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" @!dependent="true"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private State state;
 
 	/**
@@ -299,11 +434,16 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	 *
 	 * @jdo.join
 	 */
+	@Join
+	@Persistent(
+		table="JFireIssueTracking_Issue_states",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private List<State> states;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private PropertySet propertySet;
 
 	/**
@@ -701,6 +841,7 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private transient List<State> _states = null;
 
 	/**

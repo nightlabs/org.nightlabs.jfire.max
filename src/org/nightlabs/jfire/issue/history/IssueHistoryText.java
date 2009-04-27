@@ -6,6 +6,18 @@ import java.util.Map;
 import org.nightlabs.i18n.I18nText;
 import org.nightlabs.jfire.issue.Issue;
 
+import javax.jdo.annotations.Join;
+import org.nightlabs.jfire.issue.id.IssueHistoryTextID;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+
 /**
  * An extended class of {@link I18nText} that represents the changed text of each change that made to an {@link Issue}. 
  * <p>
@@ -24,6 +36,12 @@ import org.nightlabs.jfire.issue.Issue;
  * @jdo.create-objectid-class field-order="organisationID, issueHistoryID, issueHistoryTextID"
  *
  */
+@PersistenceCapable(
+	objectIdClass=IssueHistoryTextID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireIssueTracking_IssueHistoryText")
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 @SuppressWarnings("serial")
 public class IssueHistoryText 
 extends I18nText
@@ -36,18 +54,23 @@ extends I18nText
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	@SuppressWarnings("unused")
 	private long issueHistoryID;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	@SuppressWarnings("unused")
 	private IssueHistory issueHistory;
 	
@@ -55,6 +78,8 @@ extends I18nText
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String issueHistoryTextID;
 
 	/**
@@ -72,12 +97,19 @@ extends I18nText
 	 *
 	 * @jdo.join
 	 */
+	@Join
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		table="JFireIssueTracking_IssueHistoryText_texts",
+		defaultFetchGroup="true",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	@SuppressWarnings("unchecked")
 	private Map texts = new HashMap();
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Issue issue;
 
 	/**

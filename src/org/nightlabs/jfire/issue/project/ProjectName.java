@@ -5,6 +5,20 @@ import java.util.Map;
 
 import org.nightlabs.i18n.I18nText;
 
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import org.nightlabs.jfire.issue.project.id.ProjectNameID;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+
 /**
  *  An extended class of {@link I18nText} that represents the {@link Project}'s name. 
  * <p>
@@ -24,6 +38,18 @@ import org.nightlabs.i18n.I18nText;
  *
  * @jdo.fetch-group name="Project.name" fetch-groups="default" fields="project, names"
  */
+@PersistenceCapable(
+	objectIdClass=ProjectNameID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireIssueTracking_ProjectName")
+@FetchGroups(
+	@FetchGroup(
+		fetchGroups={"default"},
+		name="Project.name",
+		members={@Persistent(name="project"), @Persistent(name="names")})
+)
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class ProjectName
 extends I18nText{
 	/**
@@ -39,16 +65,20 @@ extends I18nText{
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 */
+	@PrimaryKey
 	private long projectID;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Project project;
 
 	/**
@@ -66,6 +96,12 @@ extends I18nText{
 	 *
 	 * @jdo.join
 	 */
+	@Join
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		table="JFireIssueTracking_ProjectName_names",
+		defaultFetchGroup="true",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	protected Map<String, String> names = new HashMap<String, String>();
 
 	/**

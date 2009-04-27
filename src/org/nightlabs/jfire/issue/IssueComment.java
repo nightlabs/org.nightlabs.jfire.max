@@ -7,6 +7,18 @@ import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.util.Util;
 
+import javax.jdo.annotations.Persistent;
+import org.nightlabs.jfire.issue.id.IssueCommentID;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+
 /**
  * The {@link IssueComment} class represents a comment which is created in an {@link Issue}.
  * <p>
@@ -30,6 +42,21 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="IssueComment.this" fields="text, createTimestamp, user"
  *
  */
+@PersistenceCapable(
+	objectIdClass=IssueCommentID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireIssueTracking_IssueComment")
+@FetchGroups({
+	@FetchGroup(
+		fetchGroups={"default"},
+		name=IssueComment.FETCH_GROUP_USER,
+		members=@Persistent(name="user")),
+	@FetchGroup(
+		name=IssueComment.FETCH_GROUP_THIS_COMMENT,
+		members={@Persistent(name="text"), @Persistent(name="createTimestamp"), @Persistent(name="user")})
+})
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class IssueComment
 implements Serializable
 {
@@ -51,32 +78,42 @@ implements Serializable
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 */
+	@PrimaryKey
 	private long commentID;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Issue issue;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 * @jdo.column sql-type="clob"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+	@Column(sqlType="clob")
 	private String text;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Date createTimestamp;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" load-fetch-group="all"
 	 */
+	@Persistent(
+		loadFetchGroup="all",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private User user;
 
 	/**

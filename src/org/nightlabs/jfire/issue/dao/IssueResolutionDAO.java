@@ -8,9 +8,9 @@ import java.util.Set;
 import javax.jdo.FetchPlan;
 
 import org.nightlabs.jdo.NLJDOHelper;
-import org.nightlabs.jfire.base.JFireEjbFactory;
+import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
-import org.nightlabs.jfire.issue.IssueManager;
+import org.nightlabs.jfire.issue.IssueManagerRemote;
 import org.nightlabs.jfire.issue.IssueResolution;
 import org.nightlabs.jfire.issue.id.IssueResolutionID;
 import org.nightlabs.jfire.security.SecurityReflector;
@@ -19,7 +19,7 @@ import org.nightlabs.progress.SubProgressMonitor;
 
 /**
  * Data access object for {@link IssuResolution}s.
- * 
+ *
  * @author Chairat Kongarayawetchakun - chairat [AT] nightlabs [DOT] de
  */
 public class IssueResolutionDAO
@@ -49,9 +49,9 @@ extends BaseJDOObjectDAO<IssueResolutionID, IssueResolution>
 			throws Exception {
 		monitor.beginTask("Fetching IssueResolution...", 1); //$NON-NLS-1$
 		try {
-			IssueManager im = JFireEjbFactory.getBean(IssueManager.class, SecurityReflector.getInitialContextProperties());
+			IssueManagerRemote im = JFireEjb3Factory.getRemoteBean(IssueManagerRemote.class, SecurityReflector.getInitialContextProperties());
 			monitor.worked(1);
-			return im.getIssueResolutions(objectIDs, fetchGroups, maxFetchDepth);	
+			return im.getIssueResolutions(objectIDs, fetchGroups, maxFetchDepth);
 		} catch (Exception e) {
 			monitor.setCanceled(true);
 			throw e;
@@ -69,13 +69,13 @@ extends BaseJDOObjectDAO<IssueResolutionID, IssueResolution>
 		monitor.done();
 		return issueResolution;
 	}
-	
+
 	public List<IssueResolution> getIssueResolutions(ProgressMonitor monitor) {
 		try {
 			return new ArrayList<IssueResolution>(retrieveJDOObjects(null, FETCH_GROUPS, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT, monitor));
 		} catch (Exception e) {
 			throw new RuntimeException("Error while fetching issue resolutions: " + e.getMessage(), e); //$NON-NLS-1$
-		} 
+		}
 	}
 
 	public IssueResolution storeIssueResolution(IssueResolution issueResolution, boolean get, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) {
@@ -83,7 +83,7 @@ extends BaseJDOObjectDAO<IssueResolutionID, IssueResolution>
 			throw new NullPointerException("Issue Resolution to save must not be null");
 		monitor.beginTask("Storing issuePriority: "+ issueResolution.getIssueResolutionID(), 3);
 		try {
-			IssueManager im = JFireEjbFactory.getBean(IssueManager.class, SecurityReflector.getInitialContextProperties());
+			IssueManagerRemote im = JFireEjb3Factory.getRemoteBean(IssueManagerRemote.class, SecurityReflector.getInitialContextProperties());
 			IssueResolution result = im.storeIssueResolution(issueResolution, get, fetchGroups, maxFetchDepth);
 			monitor.worked(1);
 			monitor.done();

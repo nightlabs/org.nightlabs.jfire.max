@@ -5,9 +5,9 @@ import java.util.List;
 import java.util.Set;
 
 import org.nightlabs.jdo.NLJDOHelper;
-import org.nightlabs.jfire.base.JFireEjbFactory;
+import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
-import org.nightlabs.jfire.issue.IssueManager;
+import org.nightlabs.jfire.issue.IssueManagerRemote;
 import org.nightlabs.jfire.issue.IssueType;
 import org.nightlabs.jfire.issue.id.IssueTypeID;
 import org.nightlabs.jfire.security.SecurityReflector;
@@ -16,7 +16,7 @@ import org.nightlabs.progress.SubProgressMonitor;
 
 /**
  * Data access object for {@link IssueType}s.
- * 
+ *
  * @author Chairat Kongarayawetchakun - chairat [AT] nightlabs [DOT] de
  */
 public class IssueTypeDAO extends BaseJDOObjectDAO<IssueTypeID, IssueType>
@@ -24,16 +24,16 @@ public class IssueTypeDAO extends BaseJDOObjectDAO<IssueTypeID, IssueType>
 	/**
 	 * The shared instance
 	 */
-	
+
 	private static IssueTypeDAO sharedInstance = null;
-	
+
 	/**
 	 * Default constructor.
 	 */
-	public IssueTypeDAO() {	
+	public IssueTypeDAO() {
 		super();
 	}
-	
+
 	/**
 	 * Get the lazily created shared instance.
 	 * @return The shared instance
@@ -47,7 +47,7 @@ public class IssueTypeDAO extends BaseJDOObjectDAO<IssueTypeID, IssueType>
 		}
 		return sharedInstance;
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	@Override
 	/**
@@ -57,7 +57,7 @@ public class IssueTypeDAO extends BaseJDOObjectDAO<IssueTypeID, IssueType>
 		monitor.beginTask("Fetching "+objectIDs.size()+" issue types information", 1);
 		Collection<IssueType> issueTypes;
 		try {
-			IssueManager im = JFireEjbFactory.getBean(IssueManager.class, SecurityReflector.getInitialContextProperties());
+			IssueManagerRemote im = JFireEjb3Factory.getRemoteBean(IssueManagerRemote.class, SecurityReflector.getInitialContextProperties());
 			issueTypes = im.getIssueTypes(objectIDs, fetchGroups, maxFetchDepth);
 			monitor.worked(1);
 		} catch (Exception e) {
@@ -67,12 +67,12 @@ public class IssueTypeDAO extends BaseJDOObjectDAO<IssueTypeID, IssueType>
 		monitor.done();
 		return issueTypes;
 	}
-	
+
 	/**
 	 * Get a single issue type.
 	 * @param issueTypeID The ID of the issue type to get
 	 * @param fetchGroups Wich fetch groups to use
-	 * @param maxFetchDepth Fetch depth or {@link NLJDOHelper#MAX_FETCH_DEPTH_NO_LIMIT} 
+	 * @param maxFetchDepth Fetch depth or {@link NLJDOHelper#MAX_FETCH_DEPTH_NO_LIMIT}
 	 * @param monitor The progress monitor for this action. For every downloaded
 	 * 					object, <code>monitor.worked(1)</code> will be called.
 	 * @return The requested issue object
@@ -84,21 +84,21 @@ public class IssueTypeDAO extends BaseJDOObjectDAO<IssueTypeID, IssueType>
 		monitor.done();
 		return issueType;
 	}
-	
-	public List<IssueType> getIssueTypes(Set<IssueTypeID> issueTypeIDs, String[] fetchgroups, int maxFetchDepth, ProgressMonitor monitor) 
+
+	public List<IssueType> getIssueTypes(Set<IssueTypeID> issueTypeIDs, String[] fetchgroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
 		monitor.beginTask("Loading issueTypes ", 1);
-		List<IssueType> issueTypes = getJDOObjects(null, issueTypeIDs, fetchgroups, maxFetchDepth, new SubProgressMonitor(monitor, 1)); 
+		List<IssueType> issueTypes = getJDOObjects(null, issueTypeIDs, fetchgroups, maxFetchDepth, new SubProgressMonitor(monitor, 1));
 		monitor.done();
 		return issueTypes;
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public List<IssueType> getAllIssueTypes(String[] fetchgroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
 		monitor.beginTask("Fetching all IssueTypes", 100);
 		try {
-			IssueManager im = JFireEjbFactory.getBean(IssueManager.class, SecurityReflector.getInitialContextProperties());
+			IssueManagerRemote im = JFireEjb3Factory.getRemoteBean(IssueManagerRemote.class, SecurityReflector.getInitialContextProperties());
 			monitor.worked(20);
 			Set<IssueTypeID> allTypeIDs = im.getIssueTypeIDs();
 			List<IssueType> allTypes = getIssueTypes(allTypeIDs, fetchgroups, maxFetchDepth, new SubProgressMonitor(monitor, 80));
@@ -109,7 +109,7 @@ public class IssueTypeDAO extends BaseJDOObjectDAO<IssueTypeID, IssueType>
 			monitor.setCanceled(true);
 			if (e instanceof RuntimeException)
 				throw (RuntimeException)e;
-			
+
 			throw new RuntimeException(e);
 		}
 	}
@@ -117,15 +117,15 @@ public class IssueTypeDAO extends BaseJDOObjectDAO<IssueTypeID, IssueType>
 	/**
 	 * Store an issue type.
 	 * @param fetchGroups Wich fetch groups to use
-	 * @param maxFetchDepth Fetch depth or {@link NLJDOHelper#MAX_FETCH_DEPTH_NO_LIMIT} 
+	 * @param maxFetchDepth Fetch depth or {@link NLJDOHelper#MAX_FETCH_DEPTH_NO_LIMIT}
 	 * @param monitor The progress monitor for this action. For every downloaded
 	 * 					object, <code>monitor.worked(1)</code> will be called.
 	 * @return The issue type.
 	 */
-	public synchronized IssueType storeIssueTypes(IssueType issueType, String[] fetchgroups, int maxFetchDepth, ProgressMonitor monitor) 
+	public synchronized IssueType storeIssueTypes(IssueType issueType, String[] fetchgroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
 		try {
-			IssueManager im = JFireEjbFactory.getBean(IssueManager.class, SecurityReflector.getInitialContextProperties());
+			IssueManagerRemote im = JFireEjb3Factory.getRemoteBean(IssueManagerRemote.class, SecurityReflector.getInitialContextProperties());
 			return im.storeIssueType(issueType, true, fetchgroups, maxFetchDepth);
 		} catch (Exception e) {
 			throw new RuntimeException(e);

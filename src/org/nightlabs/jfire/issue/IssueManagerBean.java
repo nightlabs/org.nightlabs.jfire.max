@@ -1,7 +1,5 @@
 package org.nightlabs.jfire.issue;
 
-import java.io.IOException;
-import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -11,10 +9,10 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import javax.ejb.CreateException;
-import javax.ejb.EJBException;
-import javax.ejb.SessionBean;
-import javax.ejb.SessionContext;
+import javax.annotation.security.RolesAllowed;
+import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 import javax.jdo.FetchPlan;
 import javax.jdo.JDODetachedFieldAccessException;
 import javax.jdo.JDOHelper;
@@ -86,9 +84,11 @@ import org.nightlabs.util.Util;
  * @ejb.util generate="physical"
  * @ejb.transaction type="Required"
  */
+@TransactionAttribute(TransactionAttributeType.REQUIRED)
+@Stateless
 public class IssueManagerBean
 extends BaseSessionBeanImpl
-implements SessionBean
+implements IssueManagerRemote
 {
 	private static final long serialVersionUID = 1L;
 	/**
@@ -96,54 +96,11 @@ implements SessionBean
 	 */
 	private static final Logger logger = Logger.getLogger(IssueManagerBean.class);
 
-	@Override
-	public void setSessionContext(SessionContext sessionContext)
-	throws EJBException, RemoteException
-	{
-		logger.debug(this.getClass().getName() + ".setSessionContext("+sessionContext+")");
-		super.setSessionContext(sessionContext);
-	}
-
-	/**
-	 * @ejb.create-method
-	 * @ejb.permission role-name="_Guest_"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.issue.IssueManagerRemote#ping(java.lang.String)
 	 */
-	public void ejbCreate()
-	throws CreateException
-	{
-		logger.debug(this.getClass().getName() + ".ejbCreate()");
-	}
-
-	/**
-	 * @see javax.ejb.SessionBean#ejbRemove()
-	 *
-	 * @ejb.permission unchecked="true"
-	 */
-	public void ejbRemove() throws EJBException, RemoteException
-	{
-		logger.debug(this.getClass().getName() + ".ejbRemove()");
-	}
-
-	/**
-	 * @see javax.ejb.SessionBean#ejbActivate()
-	 */
-	public void ejbActivate() throws EJBException, RemoteException
-	{
-		logger.debug(this.getClass().getName() + ".ejbActivate()");
-	}
-	/**
-	 * @see javax.ejb.SessionBean#ejbPassivate()
-	 */
-	public void ejbPassivate() throws EJBException, RemoteException
-	{
-		logger.debug(this.getClass().getName() + ".ejbPassivate()");
-	}
-
-	/**
-	 * @ejb.interface-method
-	 * @ejb.transaction type="Supports"
-	 * @ejb.permission role-name="_Guest_"
-	 */
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	@RolesAllowed("_Guest_")
 	@Override
 	public String ping(String message) {
 		return super.ping(message);
@@ -154,6 +111,7 @@ implements SessionBean
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 */
+	@RolesAllowed("_Guest_")
 	public Set<IssueFileAttachmentID> getIssueFileAttachmentIDs()
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -170,6 +128,7 @@ implements SessionBean
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 */
+	@RolesAllowed("_Guest_")
 	public List<IssueFileAttachment> getIssueFileAttachments(Collection<IssueFileAttachmentID> issueFileAttachmentIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -181,10 +140,10 @@ implements SessionBean
 	}
 
 	//IssueWorkTimeRange//
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.issue.IssueManagerRemote#getIssueWorkTimeRanges(java.util.Collection, java.lang.String[], int)
 	 */
+	@RolesAllowed("_Guest_")
 	public List<IssueWorkTimeRange> getIssueWorkTimeRanges(Collection<IssueWorkTimeRange> issueWorkTimeRangeIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -196,17 +155,11 @@ implements SessionBean
 	}
 
 	//ProjectType//
-	/**
-	 * Stores a project type to the datastore.
-	 * @param projectType the project type to store
-	 * @param get true if you want to get the stored project type
-	 * @param fetchGroups the fetchGroups that used for specify fields to be detached from the datastore
-	 * @param maxFetchDepth specifies the number of level of the object to be fetched
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Required"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.issue.IssueManagerRemote#storeProjectType(org.nightlabs.jfire.issue.project.ProjectType, boolean, java.lang.String[], int)
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("_Guest_")
 	public ProjectType storeProjectType(ProjectType projectType, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -223,6 +176,8 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Required"
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("_Guest_")
 	public void deleteProjectType(ProjectTypeID projectTypeID)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -242,6 +197,7 @@ implements SessionBean
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 */
+	@RolesAllowed("_Guest_")
 	@SuppressWarnings("unchecked")
 	public List<ProjectType> getProjectTypes(Collection<ProjectTypeID> projectTypeIDs, String[] fetchGroups, int maxFetchDepth)
 	{
@@ -257,6 +213,7 @@ implements SessionBean
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 */
+	@RolesAllowed("_Guest_")
 	@SuppressWarnings("unchecked")
 	public Set<ProjectTypeID> getProjectTypeIDs()
 	{
@@ -271,11 +228,11 @@ implements SessionBean
 	}
 
 	//Project//
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Required"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.issue.IssueManagerRemote#storeProject(org.nightlabs.jfire.issue.project.Project, boolean, java.lang.String[], int)
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("_Guest_")
 	public Project storeProject(Project project, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -296,6 +253,8 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Required"
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("_Guest_")
 	public void deleteProject(ProjectID projectID)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -315,6 +274,7 @@ implements SessionBean
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 */
+	@RolesAllowed("_Guest_")
 	@SuppressWarnings("unchecked")
 	public List<Project> getProjects(Collection<ProjectID> projectIDs, String[] fetchGroups, int maxFetchDepth)
 	{
@@ -330,6 +290,7 @@ implements SessionBean
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 */
+	@RolesAllowed("_Guest_")
 	@SuppressWarnings("unchecked")
 	public Set<ProjectID> getProjectIDs()
 	{
@@ -347,6 +308,7 @@ implements SessionBean
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 */
+	@RolesAllowed("_Guest_")
 	@SuppressWarnings("unchecked")
 	public Collection<ProjectID> getRootProjectIDs(String organisationID)
 	{
@@ -365,6 +327,7 @@ implements SessionBean
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 */
+	@RolesAllowed("_Guest_")
 	@SuppressWarnings("unchecked")
 	public Collection<ProjectID> getProjectIDsByParentProjectID(ProjectID projectID)
 	{
@@ -384,6 +347,7 @@ implements SessionBean
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 */
+	@RolesAllowed("_Guest_")
 	@SuppressWarnings("unchecked")
 	public Collection<ProjectID> getProjectIDsByProjectTypeID(ProjectTypeID projectTypeID)
 	{
@@ -449,13 +413,14 @@ implements SessionBean
 //		}
 //	}
 
-	
+
 
 	//IssueComment//
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 */
+@RolesAllowed("_Guest_")
 	@SuppressWarnings("unchecked")
 	public List<IssueComment> getIssueComments(Collection<IssueCommentID> issueCommentIDs, String[] fetchGroups,int maxFetchDepth) {
 		PersistenceManager pm = getPersistenceManager();
@@ -466,11 +431,11 @@ implements SessionBean
 		}
 	}
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Required"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.issue.IssueManagerRemote#storeIssueComment(org.nightlabs.jfire.issue.IssueComment, boolean, java.lang.String[], int)
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("_Guest_")
 	public IssueComment storeIssueComment(IssueComment issueComment, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -487,6 +452,7 @@ implements SessionBean
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 */
+	@RolesAllowed("_Guest_")
 	@SuppressWarnings("unchecked")
 	public List<IssueLinkType> getIssueLinkTypes(Collection<IssueLinkTypeID> issueLinkTypeIDs, String[] fetchGroups, int maxFetchDepth)
 	{
@@ -502,6 +468,7 @@ implements SessionBean
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 */
+	@RolesAllowed("_Guest_")
 	public Set<IssueLinkTypeID> getIssueLinkTypeIDs(Class<? extends Object> linkedObjectClass)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -520,6 +487,7 @@ implements SessionBean
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 */
+	@RolesAllowed("_Guest_")
 	public Set<IssueLinkTypeID> getIssueLinkTypeIDs()
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -537,6 +505,7 @@ implements SessionBean
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 */
+	@RolesAllowed("_Guest_")
 	@SuppressWarnings("unchecked")
 	public List<IssueLink> getIssueLinks(Collection<IssueLinkID> issueLinkIDs, String[] fetchGroups, int maxFetchDepth)
 	{
@@ -552,6 +521,7 @@ implements SessionBean
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 */
+	@RolesAllowed("_Guest_")
 	@SuppressWarnings("unchecked")
 	public Set<IssueLinkID> getIssueLinkIDs()
 	{
@@ -569,6 +539,7 @@ implements SessionBean
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 */
+	@RolesAllowed("_Guest_")
 	@SuppressWarnings("unchecked")
 	public Collection<IssueLinkID> getIssueLinkIDsByOrganisationIDAndLinkedObjectID(String organisationID, String linkedObjectID)
 	{
@@ -586,19 +557,11 @@ implements SessionBean
 	}
 
 	//Issue//
-	/**
-	 * Stores the given Issue. If the issue is a new issue, do the initializing process instance.
-	 * If not new, do the issue history creation process & check the assignee for doing the
-	 * state assignment.
-	 *
-	 * @param issue The issue to be stored
-	 * @param get If true the created I will be returned else null
-	 * @param fetchGroups The fetchGroups the returned Issue should be detached with
-	 *
-	 * @ejb.interface-method
-	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="_Guest_"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.issue.IssueManagerRemote#storeIssue(org.nightlabs.jfire.issue.Issue, boolean, java.lang.String[], int)
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("_Guest_")
 	public Issue storeIssue(Issue issue, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -709,6 +672,8 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Required"
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("_Guest_")
 	public void deleteIssue(IssueID issueID)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -748,6 +713,8 @@ implements SessionBean
 	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("_Guest_")
 	public Issue signalIssue(IssueID issueID, String jbpmTransitionName, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -792,6 +759,7 @@ implements SessionBean
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 */
+	@RolesAllowed("_Guest_")
 	public Set<IssueID> getIssueIDs(QueryCollection<? extends AbstractJDOQuery> queries)
 	{
 		if (queries == null)
@@ -831,6 +799,7 @@ implements SessionBean
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 */
+	@RolesAllowed("_Guest_")
 	@SuppressWarnings("unchecked")
 	public List<Issue> getIssues(Collection<IssueID> issueIDs, String[] fetchGroups, int maxFetchDepth)
 	{
@@ -846,6 +815,7 @@ implements SessionBean
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 */
+	@RolesAllowed("_Guest_")
 	public Set<IssueID> getIssueIDs()
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -862,6 +832,7 @@ implements SessionBean
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 */
+	@RolesAllowed("_Guest_")
 	public Set<Issue> getIssueByProjectID(ProjectID projectID) {
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -879,6 +850,7 @@ implements SessionBean
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 */
+	@RolesAllowed("_Guest_")
 	public Set<Issue> getIssueByProjectTypeID(ProjectTypeID projectTypeID) {
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -893,11 +865,11 @@ implements SessionBean
 	}
 
 	//IssueHistory//
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Required"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.issue.IssueManagerRemote#storeIssueHistory(org.nightlabs.jfire.issue.history.IssueHistory, boolean, java.lang.String[], int)
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("_Guest_")
 	public IssueHistory storeIssueHistory(IssueHistory issueHistory, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -913,6 +885,7 @@ implements SessionBean
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 */
+	@RolesAllowed("_Guest_")
 	@SuppressWarnings("unchecked")
 	public Collection<IssueHistoryID> getIssueHistoryIDsByIssueID(IssueID issueID)
 	{
@@ -928,6 +901,7 @@ implements SessionBean
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 */
+	@RolesAllowed("_Guest_")
 	@SuppressWarnings("unchecked")
 	public List<IssueHistory> getIssueHistories(Collection<IssueHistoryID> issueHistoryIDs, String[] fetchGroups, int maxFetchDepth)
 	{
@@ -940,11 +914,11 @@ implements SessionBean
 	}
 
 	//IssueType//
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Required"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.issue.IssueManagerRemote#storeIssueType(org.nightlabs.jfire.issue.IssueType, boolean, java.lang.String[], int)
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("_Guest_")
 	public IssueType storeIssueType(IssueType issueType, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -960,6 +934,7 @@ implements SessionBean
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 */
+	@RolesAllowed("_Guest_")
 	@SuppressWarnings("unchecked")
 	public List<IssueType> getIssueTypes(Collection<IssueTypeID> issueTypeIDs, String[] fetchGroups, int maxFetchDepth)
 	{
@@ -975,6 +950,7 @@ implements SessionBean
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 */
+	@RolesAllowed("_Guest_")
 	@SuppressWarnings("unchecked")
 	public Set<IssueTypeID> getIssueTypeIDs()
 	{
@@ -988,11 +964,11 @@ implements SessionBean
 	}
 
 	//IssuePriority//
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Required"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.issue.IssueManagerRemote#storeIssuePriority(org.nightlabs.jfire.issue.IssuePriority, boolean, java.lang.String[], int)
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("_Guest_")
 	public IssuePriority storeIssuePriority(IssuePriority issuePriority, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -1008,6 +984,7 @@ implements SessionBean
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 */
+	@RolesAllowed("_Guest_")
 	@SuppressWarnings("unchecked")
 	public Set<IssuePriorityID> getIssuePriorityIDs()
 	{
@@ -1025,6 +1002,7 @@ implements SessionBean
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 */
+	@RolesAllowed("_Guest_")
 	@SuppressWarnings("unchecked")
 	public List<IssuePriority> getIssuePriorities(Collection<IssuePriorityID> issuePriorityIDs, String[] fetchGroups, int maxFetchDepth)
 	{
@@ -1037,11 +1015,11 @@ implements SessionBean
 	}
 
 	//IssueSeverityType//
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Required"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.issue.IssueManagerRemote#storeIssueSeverityType(org.nightlabs.jfire.issue.IssueSeverityType, boolean, java.lang.String[], int)
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("_Guest_")
 	public IssueSeverityType storeIssueSeverityType(IssueSeverityType issueSeverityType, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -1057,6 +1035,7 @@ implements SessionBean
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 */
+	@RolesAllowed("_Guest_")
 	public Set<IssueSeverityTypeID> getIssueSeverityTypeIDs()
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -1073,6 +1052,7 @@ implements SessionBean
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 */
+	@RolesAllowed("_Guest_")
 	@SuppressWarnings("unchecked")
 	public List<IssueSeverityType> getIssueSeverityTypes(Collection<IssueSeverityTypeID> issueSeverityTypeIDs, String[] fetchGroups, int maxFetchDepth)
 	{
@@ -1085,11 +1065,11 @@ implements SessionBean
 	}
 
 	//IssueResolution//
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Required"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.issue.IssueManagerRemote#storeIssueResolution(org.nightlabs.jfire.issue.IssueResolution, boolean, java.lang.String[], int)
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("_Guest_")
 	public IssueResolution storeIssueResolution(IssueResolution issueResolution, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -1101,13 +1081,11 @@ implements SessionBean
 		}//finally
 	}
 
-	/**
-	 * @throws ModuleException
-	 *
-	 * @ejb.interface-method
-	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="_Guest_"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.issue.IssueManagerRemote#getIssueResolutions(java.lang.String[], int)
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("_Guest_")
 	public Collection getIssueResolutions(String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
@@ -1128,6 +1106,7 @@ implements SessionBean
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 */
+	@RolesAllowed("_Guest_")
 	@SuppressWarnings("unchecked")
 	public List<IssueResolution> getIssueResolutions(Collection<IssueResolutionID> issueResolutionIDs, String[] fetchGroups, int maxFetchDepth)
 	{
@@ -1139,13 +1118,11 @@ implements SessionBean
 		}
 	}
 
-	/**
-	 * @throws ModuleException
-	 *
-	 * @ejb.interface-method
-	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="_Guest_"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.issue.IssueManagerRemote#sendRemindEMail(java.lang.String, java.lang.String, org.nightlabs.jfire.security.id.UserID, java.util.Set)
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("_Guest_")
 	public void sendRemindEMail(String messageString, String subject, UserID senderID, Set<UserID> recipientIDs)
 	{
 		User sender = UserDAO.sharedInstance().getUser(senderID,
@@ -1206,20 +1183,18 @@ implements SessionBean
 	}
 
 	//Bean//
-	/**
-	 * @throws IOException While loading an icon from a local resource, this might happen and we don't care in the initialise method.
-	 *
-	 * @ejb.interface-method
-	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="_System_"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.issue.IssueManagerRemote#initialise()
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("_System_")
 	public void initialise() throws Exception
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			UserID systemUserID = UserID.create(getOrganisationID(), getUserID());
 			User systemUser = (User)pm.getObjectById(systemUserID);
-			
+
 			// WORKAROUND JPOX Bug to avoid problems with creating workflows as State.statable is defined as interface and has subclassed implementations
 			pm.getExtent(Issue.class);
 
@@ -1236,10 +1211,10 @@ implements SessionBean
 			pm.makePersistent(new ModuleMetaData(
 					JFireIssueTrackingEAR.MODULE_NAME, "0.9.7-0-beta", "0.9.7-0-beta")
 			);
-			
+
 			String baseName = "org.nightlabs.jfire.issue.resource.messages";
 			ClassLoader loader = IssueManagerBean.class.getClassLoader();
-			
+
 			IssueType issueTypeDefault = new IssueType(getOrganisationID(), IssueType.DEFAULT_ISSUE_TYPE_ID);
 			issueTypeDefault.getName().readFromProperties(baseName, loader,
 			"org.nightlabs.jfire.issue.IssueManagerBean.issueTypeDefault"); //$NON-NLS-1$
@@ -1260,37 +1235,37 @@ implements SessionBean
 
 			IssueSeverityType issueSeverityTypeCrash = new IssueSeverityType(getOrganisationID(), IssueSeverityType.ISSUE_SEVERITY_TYPE_CRASH);
 			issueSeverityTypeCrash.getIssueSeverityTypeText().readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.IssueManagerBean.issueSeverityTypeCrash"); //$NON-NLS-1$	
+			"org.nightlabs.jfire.issue.IssueManagerBean.issueSeverityTypeCrash"); //$NON-NLS-1$
 			issueSeverityTypeCrash = pm.makePersistent(issueSeverityTypeCrash);
 			issueTypeDefault.getIssueSeverityTypes().add(issueSeverityTypeCrash);
 
 			IssueSeverityType issueSeverityTypeBlock = new IssueSeverityType(getOrganisationID(), IssueSeverityType.ISSUE_SEVERITY_TYPE_BLOCK);
 			issueSeverityTypeBlock.getIssueSeverityTypeText().readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.IssueManagerBean.issueSeverityTypeBlock"); //$NON-NLS-1$	
+			"org.nightlabs.jfire.issue.IssueManagerBean.issueSeverityTypeBlock"); //$NON-NLS-1$
 			issueSeverityTypeBlock = pm.makePersistent(issueSeverityTypeBlock);
 			issueTypeDefault.getIssueSeverityTypes().add(issueSeverityTypeBlock);
 
 			IssueSeverityType issueSeverityTypeFeature = new IssueSeverityType(getOrganisationID(), IssueSeverityType.ISSUE_SEVERITY_TYPE_FEATURE);
 			issueSeverityTypeFeature.getIssueSeverityTypeText().readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.IssueManagerBean.issueSeverityTypeFeature"); //$NON-NLS-1$	
+			"org.nightlabs.jfire.issue.IssueManagerBean.issueSeverityTypeFeature"); //$NON-NLS-1$
 			issueSeverityTypeFeature = pm.makePersistent(issueSeverityTypeFeature);
 			issueTypeDefault.getIssueSeverityTypes().add(issueSeverityTypeFeature);
 
 			IssueSeverityType issueSeverityTypeTrivial = new IssueSeverityType(getOrganisationID(), IssueSeverityType.ISSUE_SEVERITY_TYPE_TRIVIAL);
 			issueSeverityTypeTrivial.getIssueSeverityTypeText().readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.IssueManagerBean.issueSeverityTypeTrivial"); //$NON-NLS-1$		
+			"org.nightlabs.jfire.issue.IssueManagerBean.issueSeverityTypeTrivial"); //$NON-NLS-1$
 			issueSeverityTypeTrivial = pm.makePersistent(issueSeverityTypeTrivial);
 			issueTypeDefault.getIssueSeverityTypes().add(issueSeverityTypeTrivial);
 
 			IssueSeverityType issueSeverityTypeText = new IssueSeverityType(getOrganisationID(), IssueSeverityType.ISSUE_SEVERITY_TYPE_TEXT);
 			issueSeverityTypeText.getIssueSeverityTypeText().readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.IssueManagerBean.issueSeverityTypeText"); //$NON-NLS-1$	
+			"org.nightlabs.jfire.issue.IssueManagerBean.issueSeverityTypeText"); //$NON-NLS-1$
 			issueSeverityTypeText = pm.makePersistent(issueSeverityTypeText);
 			issueTypeDefault.getIssueSeverityTypes().add(issueSeverityTypeText);
 
 			IssueSeverityType issueSeverityTypeTweak = new IssueSeverityType(getOrganisationID(), IssueSeverityType.ISSUE_SEVERITY_TYPE_TWEAK);
 			issueSeverityTypeTweak.getIssueSeverityTypeText().readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.IssueManagerBean.issueSeverityTypeTweak"); //$NON-NLS-1$	
+			"org.nightlabs.jfire.issue.IssueManagerBean.issueSeverityTypeTweak"); //$NON-NLS-1$
 			issueSeverityTypeTweak = pm.makePersistent(issueSeverityTypeTweak);
 			issueTypeDefault.getIssueSeverityTypes().add(issueSeverityTypeTweak);
 
@@ -1299,74 +1274,74 @@ implements SessionBean
 			// check, whether the datastore is already initialized
 			IssuePriority issuePriorityNone = new IssuePriority(getOrganisationID(), IssuePriority.ISSUE_PRIORITY_NONE);
 			issuePriorityNone.getIssuePriorityText().readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.IssueManagerBean.issuePriorityNone"); //$NON-NLS-1$			
+			"org.nightlabs.jfire.issue.IssueManagerBean.issuePriorityNone"); //$NON-NLS-1$
 			issuePriorityNone = pm.makePersistent(issuePriorityNone);
 			issueTypeDefault.getIssuePriorities().add(issuePriorityNone);
 
 			IssuePriority issuePriorityLow = new IssuePriority(getOrganisationID(), IssuePriority.ISSUE_PRIORITY_LOW);
 			issuePriorityLow.getIssuePriorityText().readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.IssueManagerBean.issuePriorityLow"); //$NON-NLS-1$	
+			"org.nightlabs.jfire.issue.IssueManagerBean.issuePriorityLow"); //$NON-NLS-1$
 			issuePriorityLow = pm.makePersistent(issuePriorityLow);
 			issueTypeDefault.getIssuePriorities().add(issuePriorityLow);
 
 			IssuePriority issuePriorityNormal = new IssuePriority(getOrganisationID(), IssuePriority.ISSUE_PRIORITY_NORMAL);
 			issuePriorityNormal.getIssuePriorityText().readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.IssueManagerBean.issuePriorityNormal"); //$NON-NLS-1$	
+			"org.nightlabs.jfire.issue.IssueManagerBean.issuePriorityNormal"); //$NON-NLS-1$
 			issuePriorityNormal = pm.makePersistent(issuePriorityNormal);
 			issueTypeDefault.getIssuePriorities().add(issuePriorityNormal);
 
 			IssuePriority issuePriorityHigh = new IssuePriority(getOrganisationID(), IssuePriority.ISSUE_PRIORITY_HIGH);
 			issuePriorityHigh.getIssuePriorityText().readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.IssueManagerBean.issuePriorityHigh"); //$NON-NLS-1$		
+			"org.nightlabs.jfire.issue.IssueManagerBean.issuePriorityHigh"); //$NON-NLS-1$
 			issuePriorityHigh = pm.makePersistent(issuePriorityHigh);
 			issueTypeDefault.getIssuePriorities().add(issuePriorityHigh);
 
 			IssuePriority issuePriorityUrgent = new IssuePriority(getOrganisationID(), IssuePriority.ISSUE_PRIORITY_URGENT);
 			issuePriorityUrgent.getIssuePriorityText().readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.IssueManagerBean.issuePriorityUrgent"); //$NON-NLS-1$	
+			"org.nightlabs.jfire.issue.IssueManagerBean.issuePriorityUrgent"); //$NON-NLS-1$
 			issuePriorityUrgent = pm.makePersistent(issuePriorityUrgent);
 			issueTypeDefault.getIssuePriorities().add(issuePriorityUrgent);
 
 			IssuePriority issuePriorityImmediate = new IssuePriority(getOrganisationID(), IssuePriority.ISSUE_PRIORITY_IMMEDIATE);
 			issuePriorityImmediate.getIssuePriorityText().readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.IssueManagerBean.issuePriorityImmediate"); //$NON-NLS-1$	
+			"org.nightlabs.jfire.issue.IssueManagerBean.issuePriorityImmediate"); //$NON-NLS-1$
 			issuePriorityImmediate = pm.makePersistent(issuePriorityImmediate);
 			issueTypeDefault.getIssuePriorities().add(issuePriorityImmediate);
 
 			// Create the resolutions
 			IssueResolution issueResolutionNotAssigned = new IssueResolution(getOrganisationID(), IssueResolution.ISSUE_RESOLUTION_ID_NOT_ASSIGNED.issueResolutionID);
 			issueResolutionNotAssigned.getName().readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.IssueManagerBean.issueResolutionNotAssigned"); //$NON-NLS-1$	
+			"org.nightlabs.jfire.issue.IssueManagerBean.issueResolutionNotAssigned"); //$NON-NLS-1$
 			issueResolutionNotAssigned = pm.makePersistent(issueResolutionNotAssigned);
 			issueTypeDefault.getIssueResolutions().add(issueResolutionNotAssigned);
 
 			IssueResolution issueResolutionOpen = new IssueResolution(getOrganisationID(), IssueResolution.ISSUE_RESOLUTION_OPEN);
 			issueResolutionOpen.getName().readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.IssueManagerBean.issueResolutionOpen"); //$NON-NLS-1$	
+			"org.nightlabs.jfire.issue.IssueManagerBean.issueResolutionOpen"); //$NON-NLS-1$
 			issueResolutionOpen = pm.makePersistent(issueResolutionOpen);
 			issueTypeDefault.getIssueResolutions().add(issueResolutionOpen);
 
 			IssueResolution issueResolutionFixed = new IssueResolution(getOrganisationID(), IssueResolution.ISSUE_RESOLUTION_FIXED);
 			issueResolutionFixed.getName().readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.IssueManagerBean.issueResolutionFixed"); //$NON-NLS-1$	
+			"org.nightlabs.jfire.issue.IssueManagerBean.issueResolutionFixed"); //$NON-NLS-1$
 			issueResolutionFixed = pm.makePersistent(issueResolutionFixed);
 			issueTypeDefault.getIssueResolutions().add(issueResolutionFixed);
 
 			IssueResolution issueResolutionReopened = new IssueResolution(getOrganisationID(), IssueResolution.ISSUE_RESOLUTION_REOPENED);
 			issueResolutionReopened.getName().readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.IssueManagerBean.issueResolutionReopened"); //$NON-NLS-1$	
+			"org.nightlabs.jfire.issue.IssueManagerBean.issueResolutionReopened"); //$NON-NLS-1$
 			issueResolutionReopened = pm.makePersistent(issueResolutionReopened);
 			issueTypeDefault.getIssueResolutions().add(issueResolutionReopened);
 
 			IssueResolution issueResolutionNotFixable = new IssueResolution(getOrganisationID(), IssueResolution.ISSUE_RESOLUTION_NOTFIXABLE);
 			issueResolutionNotFixable.getName().readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.IssueManagerBean.issueResolutionNotFixable"); //$NON-NLS-1$	
+			"org.nightlabs.jfire.issue.IssueManagerBean.issueResolutionNotFixable"); //$NON-NLS-1$
 			issueResolutionNotFixable = pm.makePersistent(issueResolutionNotFixable);
 			issueTypeDefault.getIssueResolutions().add(issueResolutionNotFixable);
 
 			IssueResolution issueResolutionWillNotFix = new IssueResolution(getOrganisationID(), IssueResolution.ISSUE_RESOLUTION_WILLNOTFIX);
 			issueResolutionWillNotFix.getName().readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.IssueManagerBean.issueResolutionWillNotFix"); //$NON-NLS-1$	
+			"org.nightlabs.jfire.issue.IssueManagerBean.issueResolutionWillNotFix"); //$NON-NLS-1$
 			issueResolutionWillNotFix = pm.makePersistent(issueResolutionWillNotFix);
 			issueTypeDefault.getIssueResolutions().add(issueResolutionWillNotFix);
 
@@ -1375,7 +1350,7 @@ implements SessionBean
 
 			IssueType issueTypeCustomer = new IssueType(getOrganisationID(), "Customer");
 			issueTypeCustomer.getName().readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.IssueManagerBean.issueTypeCustomer"); //$NON-NLS-1$		
+			"org.nightlabs.jfire.issue.IssueManagerBean.issueTypeCustomer"); //$NON-NLS-1$
 			issueTypeCustomer = pm.makePersistent(issueTypeCustomer);
 
 			// Create the process definitions.
@@ -1384,27 +1359,27 @@ implements SessionBean
 			// Create the issueLinkTypes
 			IssueLinkType issueLinkTypeRelated = new IssueLinkType(IssueLinkType.ISSUE_LINK_TYPE_ID_RELATED);
 			issueLinkTypeRelated.getName().readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.IssueManagerBean.issueLinkTypeRelated"); //$NON-NLS-1$	
+			"org.nightlabs.jfire.issue.IssueManagerBean.issueLinkTypeRelated"); //$NON-NLS-1$
 			issueLinkTypeRelated.addLinkedObjectClass(Object.class);
 			issueLinkTypeRelated = pm.makePersistent(issueLinkTypeRelated);
 
 			IssueLinkType issueLinkTypeParent = new IssueLinkTypeParentChild(IssueLinkTypeParentChild.ISSUE_LINK_TYPE_ID_PARENT);
 			issueLinkTypeParent.getName().readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.IssueManagerBean.issueLinkTypeParent"); //$NON-NLS-1$	
+			"org.nightlabs.jfire.issue.IssueManagerBean.issueLinkTypeParent"); //$NON-NLS-1$
 
 			issueLinkTypeParent.addLinkedObjectClass(Issue.class);
 			issueLinkTypeParent = pm.makePersistent(issueLinkTypeParent);
 
 			IssueLinkType issueLinkTypeChild = new IssueLinkTypeParentChild(IssueLinkTypeParentChild.ISSUE_LINK_TYPE_ID_CHILD);
 			issueLinkTypeChild.getName().readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.IssueManagerBean.issueLinkTypeChild"); //$NON-NLS-1$	
+			"org.nightlabs.jfire.issue.IssueManagerBean.issueLinkTypeChild"); //$NON-NLS-1$
 
 			issueLinkTypeChild.addLinkedObjectClass(Issue.class);
 			issueLinkTypeChild = pm.makePersistent(issueLinkTypeChild);
 
 			IssueLinkType issueLinkTypeDuplicate = new IssueLinkTypeDuplicate(IssueLinkTypeDuplicate.ISSUE_LINK_TYPE_ID_DUPLICATE);
 			issueLinkTypeDuplicate.getName().readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.IssueManagerBean.issueLinkTypeDuplicate"); //$NON-NLS-1$	
+			"org.nightlabs.jfire.issue.IssueManagerBean.issueLinkTypeDuplicate"); //$NON-NLS-1$
 
 			issueLinkTypeDuplicate.addLinkedObjectClass(Issue.class);
 			issueLinkTypeDuplicate = pm.makePersistent(issueLinkTypeDuplicate);
@@ -1414,13 +1389,13 @@ implements SessionBean
 
 			ProjectType projectTypeDefault = new ProjectType(ProjectType.PROJECT_TYPE_ID_DEFAULT);
 			projectTypeDefault.getName().readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.IssueManagerBean.projectTypeDefault"); //$NON-NLS-1$	
+			"org.nightlabs.jfire.issue.IssueManagerBean.projectTypeDefault"); //$NON-NLS-1$
 
 			projectTypeDefault = pm.makePersistent(projectTypeDefault);
 
 			ProjectType projectTypeSoftware = new ProjectType(IDGenerator.getOrganisationID(), "software");
 			projectTypeSoftware.getName().readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.IssueManagerBean.software"); //$NON-NLS-1$	
+			"org.nightlabs.jfire.issue.IssueManagerBean.software"); //$NON-NLS-1$
 
 			projectTypeSoftware = pm.makePersistent(projectTypeSoftware);
 
@@ -1429,14 +1404,14 @@ implements SessionBean
 
 			Project projectDefault = new Project(Project.PROJECT_ID_DEFAULT);
 			projectDefault.getName().readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.IssueManagerBean.projectDefault"); //$NON-NLS-1$	
+			"org.nightlabs.jfire.issue.IssueManagerBean.projectDefault"); //$NON-NLS-1$
 
 			projectDefault.setProjectType(projectTypeDefault);
 			projectDefault = pm.makePersistent(projectDefault);
 
 			Project jfireProject = new Project(IDGenerator.getOrganisationID(), IDGenerator.nextID(Project.class));
 			jfireProject.getName().readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.IssueManagerBean.jfireProject"); //$NON-NLS-1$	
+			"org.nightlabs.jfire.issue.IssueManagerBean.jfireProject"); //$NON-NLS-1$
 			jfireProject.setProjectType(projectTypeSoftware);
 			jfireProject = pm.makePersistent(jfireProject);
 //
@@ -1508,27 +1483,27 @@ implements SessionBean
 //
 //			ProjectPhase projectPhase = new ProjectPhase(IDGenerator.getOrganisationID(), "phase1");
 //			projectPhase.getName().readFromProperties(baseName, loader,
-//			"org.nightlabs.jfire.issue.IssueManagerBean.projectPhase1"); //$NON-NLS-1$	
+//			"org.nightlabs.jfire.issue.IssueManagerBean.projectPhase1"); //$NON-NLS-1$
 //			projectPhase = pm.makePersistent(projectPhase);
 //
 //			projectPhase = new ProjectPhase(IDGenerator.getOrganisationID(), "phase2");
 //			projectPhase.getName().readFromProperties(baseName, loader,
-//			"org.nightlabs.jfire.issue.IssueManagerBean.projectPhase2"); //$NON-NLS-1$	
+//			"org.nightlabs.jfire.issue.IssueManagerBean.projectPhase2"); //$NON-NLS-1$
 //			projectPhase = pm.makePersistent(projectPhase);
 //
 //			projectPhase = new ProjectPhase(IDGenerator.getOrganisationID(), "phase3");
 //			projectPhase.getName().readFromProperties(baseName, loader,
-//			"org.nightlabs.jfire.issue.IssueManagerBean.projectPhase3"); //$NON-NLS-1$	
+//			"org.nightlabs.jfire.issue.IssueManagerBean.projectPhase3"); //$NON-NLS-1$
 //			projectPhase = pm.makePersistent(projectPhase);
 //
 //			projectPhase = new ProjectPhase(IDGenerator.getOrganisationID(), "phase4");
 //			projectPhase.getName().readFromProperties(baseName, loader,
-//			"org.nightlabs.jfire.issue.IssueManagerBean.projectPhase4"); //$NON-NLS-1$	
+//			"org.nightlabs.jfire.issue.IssueManagerBean.projectPhase4"); //$NON-NLS-1$
 //			projectPhase = pm.makePersistent(projectPhase);
-			
+
 			//Issues
 			pm.getExtent(Issue.class);
-			
+
 			Issue issue1 = new Issue(IDGenerator.getOrganisationID(), IDGenerator.nextID(Issue.class), issueTypeDefault);
 			issue1.setIssuePriority(issuePriorityHigh);
 			issue1.setIssueResolution(issueResolutionOpen);
@@ -1536,11 +1511,11 @@ implements SessionBean
 			issue1.setReporter(systemUser);
 			IssueSubject subject1 = new IssueSubject(issue1);
 			subject1.readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.IssueManagerBean.subject1"); //$NON-NLS-1$	
+			"org.nightlabs.jfire.issue.IssueManagerBean.subject1"); //$NON-NLS-1$
 			issue1.setSubject(subject1);
-			
+
 			storeIssue(issue1, false, new String[0], NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
-			
+
 			Issue issue2 = new Issue(IDGenerator.getOrganisationID(), IDGenerator.nextID(Issue.class), issueTypeDefault);
 			issue2.setIssuePriority(issuePriorityHigh);
 			issue2.setIssueResolution(issueResolutionOpen);
@@ -1548,11 +1523,11 @@ implements SessionBean
 			issue2.setReporter(systemUser);
 			IssueSubject subject2 = new IssueSubject(issue2);
 			subject2.readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.IssueManagerBean.subject2"); //$NON-NLS-1$	
+			"org.nightlabs.jfire.issue.IssueManagerBean.subject2"); //$NON-NLS-1$
 			issue2.setSubject(subject2);
-			
+
 			storeIssue(issue2, false, new String[0], NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
-			
+
 			Issue issue3 = new Issue(IDGenerator.getOrganisationID(), IDGenerator.nextID(Issue.class), issueTypeDefault);
 			issue3.setIssuePriority(issuePriorityHigh);
 			issue3.setIssueResolution(issueResolutionOpen);
@@ -1560,11 +1535,11 @@ implements SessionBean
 			issue3.setReporter(systemUser);
 			IssueSubject subject3 = new IssueSubject(issue3);
 			subject3.readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.IssueManagerBean.subject3"); //$NON-NLS-1$	
+			"org.nightlabs.jfire.issue.IssueManagerBean.subject3"); //$NON-NLS-1$
 			issue3.setSubject(subject3);
-			
+
 			storeIssue(issue3, false, new String[0], NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
-			
+
 			Issue issue4 = new Issue(IDGenerator.getOrganisationID(), IDGenerator.nextID(Issue.class), issueTypeDefault);
 			issue4.setIssuePriority(issuePriorityHigh);
 			issue4.setIssueResolution(issueResolutionOpen);
@@ -1572,11 +1547,11 @@ implements SessionBean
 			issue4.setReporter(systemUser);
 			IssueSubject subject4 = new IssueSubject(issue4);
 			subject4.readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.IssueManagerBean.subject4"); //$NON-NLS-1$	
+			"org.nightlabs.jfire.issue.IssueManagerBean.subject4"); //$NON-NLS-1$
 			issue4.setSubject(subject4);
-			
+
 			storeIssue(issue4, false, new String[0], NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
-			
+
 			Issue issue5 = new Issue(IDGenerator.getOrganisationID(), IDGenerator.nextID(Issue.class), issueTypeDefault);
 			issue5.setIssuePriority(issuePriorityHigh);
 			issue5.setIssueResolution(issueResolutionOpen);
@@ -1584,11 +1559,11 @@ implements SessionBean
 			issue5.setReporter(systemUser);
 			IssueSubject subject5 = new IssueSubject(issue5);
 			subject5.readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.IssueManagerBean.subject5"); //$NON-NLS-1$	
+			"org.nightlabs.jfire.issue.IssueManagerBean.subject5"); //$NON-NLS-1$
 			issue5.setSubject(subject5);
-			
+
 			storeIssue(issue5, false, new String[0], NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
-			
+
 			//Predefined Query Stores
 			IssueQuery unassignedIssueIssueQuery = new IssueQuery();
 			unassignedIssueIssueQuery.setAssigneeID(null);
@@ -1600,36 +1575,36 @@ implements SessionBean
 
 			//1 Unassigned Issues
 			pm.getExtent(BaseQueryStore.class);
-			
+
 			QueryCollection<IssueQuery> queryCollection = new QueryCollection<IssueQuery>(Issue.class);
 			queryCollection.add(unassignedIssueIssueQuery);
-			
+
 			BaseQueryStore queryStore = new BaseQueryStore(systemUser,
 					IDGenerator.nextID(BaseQueryStore.class), queryCollection);
-			
+
 			queryStore.setQueryCollection(queryCollection);
 			queryStore.setPubliclyAvailable(true);
 	//		queryStore.getName().setText(Locale.ENGLISH.getLanguage(), "Unassigned");
 			queryStore.getName().readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.IssueManagerBean.queryStoreUnassigned"); //$NON-NLS-1$	
+			"org.nightlabs.jfire.issue.IssueManagerBean.queryStoreUnassigned"); //$NON-NLS-1$
 			queryStore.serialiseCollection();
 			queryStore = pm.makePersistent(queryStore);
 
 			//2 Resolved Issues
 			queryCollection = new QueryCollection<IssueQuery>(Issue.class);
 			queryCollection.add(resolvedIssueIssueQuery);
-			
-			queryStore = new BaseQueryStore(systemUser, 
+
+			queryStore = new BaseQueryStore(systemUser,
 					IDGenerator.nextID(BaseQueryStore.class), queryCollection);
-			
+
 			queryStore.setQueryCollection(queryCollection);
 			queryStore.setPubliclyAvailable(true);
 //			queryStore.getName().setText(Locale.ENGLISH.getLanguage(), "Resolved");
 			queryStore.getName().readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.IssueManagerBean.queryStoreResolved"); //$NON-NLS-1$	
+			"org.nightlabs.jfire.issue.IssueManagerBean.queryStoreResolved"); //$NON-NLS-1$
 			queryStore.serialiseCollection();
 			queryStore = pm.makePersistent(queryStore);
-			
+
 			EditLockType issueEditLock = new EditLockType(EditLockTypeIssue.EDIT_LOCK_TYPE_ID);
 			issueEditLock = pm.makePersistent(issueEditLock);
 			//------------------------------------------------

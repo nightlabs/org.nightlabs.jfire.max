@@ -7,6 +7,11 @@ import javax.jdo.PersistenceManager;
 
 import org.nightlabs.jfire.issue.id.IssueLinkTypeID;
 
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+
 /**
  * This abstract class extended of {@link IssueLinkType} provides the process for creating the other way round of an {@link IssueLinkTypeIssueToIssue}
  * <p>
@@ -20,7 +25,12 @@ import org.nightlabs.jfire.issue.id.IssueLinkTypeID;
  *		detachable="true"
  *
  * @jdo.inheritance strategy="superclass-table"
- */ 
+ */
+@PersistenceCapable(
+	identityType=IdentityType.APPLICATION,
+	detachable="true")
+@Inheritance(strategy=InheritanceStrategy.SUPERCLASS_TABLE)
+
 public abstract class IssueLinkTypeIssueToIssue 
 extends IssueLinkType
 {

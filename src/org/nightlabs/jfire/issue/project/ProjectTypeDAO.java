@@ -5,9 +5,9 @@ import java.util.List;
 import java.util.Set;
 
 import org.nightlabs.jdo.NLJDOHelper;
-import org.nightlabs.jfire.base.JFireEjbFactory;
+import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
-import org.nightlabs.jfire.issue.IssueManager;
+import org.nightlabs.jfire.issue.IssueManagerRemote;
 import org.nightlabs.jfire.issue.project.id.ProjectTypeID;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.progress.ProgressMonitor;
@@ -15,10 +15,10 @@ import org.nightlabs.progress.SubProgressMonitor;
 
 /**
  * Data access object for {@link ProjectType}s.
- * 
+ *
  * @author Chairat Kongarayawetchakun - chairat [AT] nightlabs [DOT] de
  */
-public class ProjectTypeDAO 
+public class ProjectTypeDAO
 extends BaseJDOObjectDAO<ProjectTypeID, ProjectType>
 {
 	private static ProjectTypeDAO sharedInstance = null;
@@ -45,7 +45,7 @@ extends BaseJDOObjectDAO<ProjectTypeID, ProjectType>
 
 		monitor.beginTask("Loading ProjectTypes", 1);
 		try {
-			IssueManager im = JFireEjbFactory.getBean(IssueManager.class, SecurityReflector.getInitialContextProperties());
+			IssueManagerRemote im = JFireEjb3Factory.getRemoteBean(IssueManagerRemote.class, SecurityReflector.getInitialContextProperties());
 			return im.getProjectTypes(projectTypeIDs, fetchGroups, maxFetchDepth);
 		} catch (Exception e) {
 			monitor.setCanceled(true);
@@ -56,14 +56,14 @@ extends BaseJDOObjectDAO<ProjectTypeID, ProjectType>
 			monitor.done();
 		}
 	}
-	
-	private IssueManager issueManager;
+
+	private IssueManagerRemote issueManager;
 
 	/**
 	 * Get a single projectType.
 	 * @param projectTypeID The ID of the projectType to get
 	 * @param fetchGroups Wich fetch groups to use
-	 * @param maxFetchDepth Fetch depth or {@link NLJDOHelper#MAX_FETCH_DEPTH_NO_LIMIT} 
+	 * @param maxFetchDepth Fetch depth or {@link NLJDOHelper#MAX_FETCH_DEPTH_NO_LIMIT}
 	 * @param monitor The progress monitor for this action. For every downloaded
 	 * 					object, <code>monitor.worked(1)</code> will be called.
 	 * @return The requested projectType object
@@ -75,13 +75,13 @@ extends BaseJDOObjectDAO<ProjectTypeID, ProjectType>
 		monitor.done();
 		return projectType;
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public synchronized List<ProjectType> getProjectTypes(String[] fetchGroups, int maxFetchDepth,
 			ProgressMonitor monitor)
 	{
 		try {
-			issueManager = JFireEjbFactory.getBean(IssueManager.class, SecurityReflector.getInitialContextProperties());
+			issueManager = JFireEjb3Factory.getRemoteBean(IssueManagerRemote.class, SecurityReflector.getInitialContextProperties());
 			try {
 				Collection<ProjectTypeID> projectTypeIDs = issueManager.getProjectTypeIDs();
 				return getJDOObjects(null, projectTypeIDs, fetchGroups, maxFetchDepth, monitor);
@@ -92,19 +92,19 @@ extends BaseJDOObjectDAO<ProjectTypeID, ProjectType>
 			throw new RuntimeException(x);
 		}
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public Collection<ProjectType> getProjectTypes(Collection<ProjectTypeID> projectTypeIDs, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
 		return getJDOObjects(null, projectTypeIDs, fetchGroups, maxFetchDepth, monitor);
 	}
-	
+
 	public synchronized ProjectType storeProjectType(ProjectType projectType, boolean get, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor){
 		if(projectType == null)
 			throw new NullPointerException("ProjectType to save must not be null");
 		monitor.beginTask("Storing projectType: "+ projectType.getProjectTypeID(), 3);
 		try {
-			IssueManager im = JFireEjbFactory.getBean(IssueManager.class, SecurityReflector.getInitialContextProperties());
+			IssueManagerRemote im = JFireEjb3Factory.getRemoteBean(IssueManagerRemote.class, SecurityReflector.getInitialContextProperties());
 			monitor.worked(1);
 
 			ProjectType result = im.storeProjectType(projectType, get, fetchGroups, maxFetchDepth);
@@ -119,11 +119,11 @@ extends BaseJDOObjectDAO<ProjectTypeID, ProjectType>
 			throw new RuntimeException(e);
 		}
 	}
-	
+
 	public synchronized void deleteProjectType(ProjectTypeID projectTypeID, ProgressMonitor monitor) {
 		monitor.beginTask("Deleting projectType: "+ projectTypeID, 3);
 		try {
-			IssueManager im = JFireEjbFactory.getBean(IssueManager.class, SecurityReflector.getInitialContextProperties());
+			IssueManagerRemote im = JFireEjb3Factory.getRemoteBean(IssueManagerRemote.class, SecurityReflector.getInitialContextProperties());
 			im.deleteProjectType(projectTypeID);
 			monitor.worked(1);
 			monitor.done();

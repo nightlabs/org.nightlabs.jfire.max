@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.nightlabs.jfire.issue.jbpm;
 
 import java.util.Locale;

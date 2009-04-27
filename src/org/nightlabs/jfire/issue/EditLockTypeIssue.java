@@ -4,6 +4,11 @@ import org.nightlabs.jfire.editlock.EditLockType;
 import org.nightlabs.jfire.editlock.id.EditLockTypeID;
 import org.nightlabs.jfire.organisation.Organisation;
 
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+
 /**
  * An extended class of {@link EditLockType} that used for an editor in the RCP project.
  * 
@@ -16,6 +21,10 @@ import org.nightlabs.jfire.organisation.Organisation;
  *
  * @jdo.inheritance strategy="superclass-table"
  */
+@PersistenceCapable(
+	identityType=IdentityType.APPLICATION,
+	detachable="true")
+@Inheritance(strategy=InheritanceStrategy.SUPERCLASS_TABLE)
 public class EditLockTypeIssue 
 extends EditLockType
 {

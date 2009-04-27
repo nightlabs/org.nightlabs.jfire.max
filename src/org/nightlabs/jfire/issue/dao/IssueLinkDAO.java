@@ -3,10 +3,10 @@ package org.nightlabs.jfire.issue.dao;
 import java.util.Collection;
 import java.util.Set;
 
-import org.nightlabs.jfire.base.JFireEjbFactory;
+import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.issue.IssueLink;
-import org.nightlabs.jfire.issue.IssueManager;
+import org.nightlabs.jfire.issue.IssueManagerRemote;
 import org.nightlabs.jfire.issue.id.IssueLinkID;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.progress.ProgressMonitor;
@@ -16,7 +16,7 @@ import org.nightlabs.progress.ProgressMonitor;
  *
  * @author Chairat Kongarayawetchakun - chairat [AT] nightlabs [DOT] de
  */
-public class IssueLinkDAO 
+public class IssueLinkDAO
 extends BaseJDOObjectDAO<IssueLinkID, IssueLink>
 {
 	private static IssueLinkDAO sharedInstance = null;
@@ -31,13 +31,13 @@ extends BaseJDOObjectDAO<IssueLinkID, IssueLink>
 		}
 		return sharedInstance;
 	}
-	
+
 	@Override
 	protected Collection<IssueLink> retrieveJDOObjects(Set<IssueLinkID> issueLinkIDs,
 			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) throws Exception {
 		monitor.beginTask("Loading IssueLinks...", 1);
 		try {
-			IssueManager im = JFireEjbFactory.getBean(IssueManager.class, SecurityReflector.getInitialContextProperties());
+			IssueManagerRemote im = JFireEjb3Factory.getRemoteBean(IssueManagerRemote.class, SecurityReflector.getInitialContextProperties());
 			return im.getIssueLinks(issueLinkIDs, fetchGroups, maxFetchDepth);
 		} catch (Exception e) {
 			monitor.setCanceled(true);
@@ -48,13 +48,13 @@ extends BaseJDOObjectDAO<IssueLinkID, IssueLink>
 			monitor.done();
 		}
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public synchronized Collection<IssueLink> getIssueLinksByOrganisationIDAndLinkedObjectID(String organisationID, String linkedObjectID, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
 		try {
-			IssueManager im = JFireEjbFactory.getBean(IssueManager.class, SecurityReflector.getInitialContextProperties());
-			Collection<IssueLink> result = 
+			IssueManagerRemote im = JFireEjb3Factory.getRemoteBean(IssueManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			Collection<IssueLink> result =
 				getJDOObjects(null, im.getIssueLinkIDsByOrganisationIDAndLinkedObjectID(organisationID, linkedObjectID), fetchGroups, maxFetchDepth, monitor);
 			return result;
 		} catch (Exception e) {

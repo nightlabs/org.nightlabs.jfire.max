@@ -10,6 +10,17 @@ import org.nightlabs.jfire.issue.project.id.ProjectTypeID;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.util.Util;
 
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+
 /**
  * The {@link ProjectType} class represents a type of {@link Project}. 
  * <p>
@@ -31,6 +42,17 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="ProjectType.name" fields="name"
  *
  **/
+@PersistenceCapable(
+	objectIdClass=ProjectTypeID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireIssueTracking_ProjectType")
+@FetchGroups(
+	@FetchGroup(
+		name=ProjectType.FETCH_GROUP_NAME,
+		members=@Persistent(name="name"))
+)
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class ProjectType
 implements Serializable , Comparable<ProjectType>
 {
@@ -48,21 +70,29 @@ implements Serializable , Comparable<ProjectType>
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 */
+	@PrimaryKey
 	private String projectTypeID;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" fetch-groups="default" dependent="true" mapped-by="projectType"
 	 */
+	@Persistent(
+		dependent="true",
+		mappedBy="projectType",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private ProjectTypeName name;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private ProjectTypeDescription description;
 
 	public static final ProjectTypeID PROJECT_TYPE_ID_DEFAULT = ProjectTypeID.create(Organisation.DEV_ORGANISATION_ID, "default");

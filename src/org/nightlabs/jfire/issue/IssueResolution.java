@@ -8,6 +8,17 @@ import org.nightlabs.jfire.issue.id.IssueResolutionID;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.util.Util;
 
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+
 /**
  * The {@link IssueResolution} class represents a resolution of each {@link Issue}s. 
  * <p>
@@ -29,6 +40,18 @@ import org.nightlabs.util.Util;
  * 
  * @jdo.fetch-group name="IssueResolution.name" fetch-groups="default" fields="name"
  */
+@PersistenceCapable(
+	objectIdClass=IssueResolutionID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireIssueTracking_IssueResolution")
+@FetchGroups(
+	@FetchGroup(
+		fetchGroups={"default"},
+		name=IssueResolution.FETCH_GROUP_NAME,
+		members=@Persistent(name="name"))
+)
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class IssueResolution
 implements Serializable
 {
@@ -53,17 +76,25 @@ implements Serializable
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 	
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String issueResolutionID;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent" dependent="true" mapped-by="issueResolution"
 	 */
+	@Persistent(
+		dependent="true",
+		mappedBy="issueResolution",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private IssueResolutionName name;
 	
 	/**

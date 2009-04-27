@@ -6,6 +6,19 @@ import java.util.Set;
 
 import org.nightlabs.jfire.security.User;
 
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.InheritanceStrategy;
+import org.nightlabs.jfire.issue.id.IssueReminderID;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+
 /**
  * The {@link IssueReminder} class represents a reminder.
  * <p>
@@ -29,6 +42,21 @@ import org.nightlabs.jfire.security.User;
  * @jdo.fetch-group name="IssueReminder.this" fields="users"
  *
  */
+@PersistenceCapable(
+	objectIdClass=IssueReminderID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireIssueTracking_IssueReminder")
+@FetchGroups({
+	@FetchGroup(
+		fetchGroups={"default"},
+		name="IssueReminder.users",
+		members=@Persistent(name="users")),
+	@FetchGroup(
+		name="IssueReminder.this",
+		members=@Persistent(name="users"))
+})
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class IssueReminder 
 implements Serializable
 {
@@ -42,21 +70,26 @@ implements Serializable
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 */
+	@PrimaryKey
 	private long issueReminderID;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Issue issue;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Date createTimestamp;
 
 	/**
@@ -68,6 +101,10 @@ implements Serializable
 	 *
 	 * @jdo.join
 	 */
+	@Join
+	@Persistent(
+		table="JFireIssueTracking_IssueReminder_users",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Set<User> users;
 
 	/**

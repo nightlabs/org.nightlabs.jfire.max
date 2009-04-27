@@ -5,10 +5,10 @@ import java.util.List;
 import java.util.Set;
 
 import org.nightlabs.jdo.NLJDOHelper;
-import org.nightlabs.jfire.base.JFireEjbFactory;
+import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.issue.IssueLinkType;
-import org.nightlabs.jfire.issue.IssueManager;
+import org.nightlabs.jfire.issue.IssueManagerRemote;
 import org.nightlabs.jfire.issue.id.IssueLinkTypeID;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.progress.ProgressMonitor;
@@ -16,7 +16,7 @@ import org.nightlabs.progress.SubProgressMonitor;
 
 /**
  * Data access object for {@link IssueLinkType}s.
- * 
+ *
  * @author Chairat Kongarayawetchakun - chairat [AT] nightlabs [DOT] de
  */
 public class IssueLinkTypeDAO
@@ -45,15 +45,15 @@ extends BaseJDOObjectDAO<IssueLinkTypeID, IssueLinkType>
 			Set<IssueLinkTypeID> objectIDs,
 			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor
 	)
-	throws Exception 
+	throws Exception
 	{
 		monitor.beginTask("Fetching IssueLinkType...", 1); //$NON-NLS-1$
 		try {
-			IssueManager im = issueManager;
+			IssueManagerRemote im = issueManager;
 			if (im == null)
-				im = JFireEjbFactory.getBean(IssueManager.class, SecurityReflector.getInitialContextProperties());
+				im = JFireEjb3Factory.getRemoteBean(IssueManagerRemote.class, SecurityReflector.getInitialContextProperties());
 
-			return im.getIssueLinkTypes(objectIDs, fetchGroups, maxFetchDepth);	
+			return im.getIssueLinkTypes(objectIDs, fetchGroups, maxFetchDepth);
 		} catch (Exception e) {
 			monitor.setCanceled(true);
 			throw e;
@@ -71,13 +71,13 @@ extends BaseJDOObjectDAO<IssueLinkTypeID, IssueLinkType>
 		return issueLinkType;
 	}
 
-	private IssueManager issueManager;
+	private IssueManagerRemote issueManager;
 
 	@SuppressWarnings("unchecked")
-	public synchronized List<IssueLinkType> getIssueLinkTypes(String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) 
+	public synchronized List<IssueLinkType> getIssueLinkTypes(String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
 		try {
-			issueManager = JFireEjbFactory.getBean(IssueManager.class, SecurityReflector.getInitialContextProperties());
+			issueManager = JFireEjb3Factory.getRemoteBean(IssueManagerRemote.class, SecurityReflector.getInitialContextProperties());
 			Set<IssueLinkTypeID> issueLinkTypeIDs = issueManager.getIssueLinkTypeIDs();
 			return getJDOObjects(null, issueLinkTypeIDs, fetchGroups, maxFetchDepth, monitor);
 		} catch (Exception e) {
@@ -89,11 +89,11 @@ extends BaseJDOObjectDAO<IssueLinkTypeID, IssueLinkType>
 
 	/**
 	 * Get issue link types by link class name.
-	 * @param linkedClass 
+	 * @param linkedClass
 	 * @param fetchGroups Which fetch groups to use
 	 * @param maxFetchDepth Fetch depth or {@link NLJDOHelper#MAX_FETCH_DEPTH_NO_LIMIT}
 	 * @param monitor The progress monitor for this action.
-	 * 
+	 *
 	 * @return The issue link types of the given linkClass.
 	 */
 	@SuppressWarnings("unchecked")
@@ -101,7 +101,7 @@ extends BaseJDOObjectDAO<IssueLinkTypeID, IssueLinkType>
 	{
 		monitor.beginTask("Loading issue link types", 100);
 		try {
-			issueManager = JFireEjbFactory.getBean(IssueManager.class, SecurityReflector.getInitialContextProperties());
+			issueManager = JFireEjb3Factory.getRemoteBean(IssueManagerRemote.class, SecurityReflector.getInitialContextProperties());
 			Set<IssueLinkTypeID> issueLinkTypeIDs = issueManager.getIssueLinkTypeIDs(linkedObjectClass);
 			monitor.worked(30);
 			return getJDOObjects(null, issueLinkTypeIDs, fetchGroups, maxFetchDepth, new SubProgressMonitor(monitor, 70));

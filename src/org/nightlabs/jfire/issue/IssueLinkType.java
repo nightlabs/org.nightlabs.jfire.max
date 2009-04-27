@@ -16,6 +16,22 @@ import org.nightlabs.jfire.issue.id.IssueLinkTypeID;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.util.Util;
 
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.Value;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Discriminator;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Queries;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.DiscriminatorStrategy;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+
 /**
  * The {@link IssueLinkType} class represents a relation between {@link Issue}s or between {@link Issue} and the other object. 
  * <p>
@@ -40,7 +56,28 @@ import org.nightlabs.util.Util;
  * @jdo.query
  *		name="getIssueLinkTypesForLinkedObjectClassName"
  *		query="SELECT WHERE this.linkedObjectClassNames.contains(:linkedObjectClassName)"
- */ 
+ */
+@PersistenceCapable(
+	objectIdClass=IssueLinkTypeID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireIssueTracking_IssueLinkType")
+@FetchGroups({
+	@FetchGroup(
+		name=IssueLinkType.FETCH_GROUP_LINKABLE_OBJECT_CLASS_NAMES,
+		members=@Persistent(name="linkedObjectClassNames")),
+	@FetchGroup(
+		name=IssueLinkType.FETCH_GROUP_NAME,
+		members=@Persistent(name="name"))
+})
+@Discriminator(strategy=DiscriminatorStrategy.CLASS_NAME)
+@Queries(
+	@javax.jdo.annotations.Query(
+		name="getIssueLinkTypesForLinkedObjectClassName",
+		value="SELECT WHERE this.linkedObjectClassNames.contains(:linkedObjectClassName)")
+)
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
+
 public class IssueLinkType
 implements Serializable
 {
@@ -86,12 +123,15 @@ implements Serializable
 	 * 
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
-	 */
+	 */	@PrimaryKey
+	@Column(length=100)
+
 	private String organisationID;
 	
 	/**
 	 * @jdo.field primary-key="true"
-	 */
+	 */	@PrimaryKey
+
 	private String issueLinkTypeID;
 	
 	/**
@@ -105,12 +145,21 @@ implements Serializable
 	 *		table="JFireIssueTracking_IssueLinkType_linkedObjectClassNames"
 	 *
 	 * @jdo.join
-	 */
+	 */	@Join
+	@Persistent(
+		table="JFireIssueTracking_IssueLinkType_linkedObjectClassNames",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
+	@Value(dependent="true")
+
 	private Set<String> linkedObjectClassNames;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent" dependent="true" mapped-by="issueLinkType"
-	 */
+	 */	@Persistent(
+		dependent="true",
+		mappedBy="issueLinkType",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
+
 	private IssueLinkTypeName name;
 	/**
 	 * @deprecated Only for JDO!!!!
@@ -150,7 +199,8 @@ implements Serializable
 
 	/**
 	 * @jdo.field persistence-modifier="none"
-	 */
+	 */	@Persistent(persistenceModifier=PersistenceModifier.NONE)
+
 	private transient Set<Class<?>> linkedObjectClasses;
 
 	/**

@@ -19,6 +19,11 @@ import org.nightlabs.jfire.reporting.layout.ReportLayout;
 import org.nightlabs.jfire.reporting.layout.ReportRegistryItem;
 import org.nightlabs.jfire.reporting.trade.ReportingTradeConstants;
 
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.IdentityType;
+
 /**
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
  *
@@ -28,7 +33,11 @@ import org.nightlabs.jfire.reporting.trade.ReportingTradeConstants;
  *		detachable="true"
  *
  * @jdo.inheritance strategy="superclass-table"
- */
+ */@PersistenceCapable(
+	identityType=IdentityType.APPLICATION,
+	detachable="true")
+@Inheritance(strategy=InheritanceStrategy.SUPERCLASS_TABLE)
+
 public class ReportLayoutCfModInitialiserArticleContainerLayouts extends ConfigModuleInitialiser {
 	
 	/**

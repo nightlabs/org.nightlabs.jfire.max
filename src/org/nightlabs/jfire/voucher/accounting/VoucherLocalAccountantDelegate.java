@@ -21,6 +21,15 @@ import org.nightlabs.jfire.trade.OrganisationLegalEntity;
 import org.nightlabs.jfire.transfer.Anchor;
 import org.nightlabs.jfire.voucher.store.VoucherType;
 
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.IdentityType;
+
 /**
  * {@link VoucherLocalAccountantDelegate} is assigned to ProductTypes of type
  * {@link VoucherType}. It directs money from/to an account defined for
@@ -40,6 +49,11 @@ import org.nightlabs.jfire.voucher.store.VoucherType;
  *		name="getVoucherLocalAccountantDelegateByAccount"
  *		query="SELECT UNIQUE WHERE this.account == :account"
  */
+@PersistenceCapable(
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireVoucher_VoucherLocalAccountantDelegate")
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class VoucherLocalAccountantDelegate
 extends LocalAccountantDelegate
 {
@@ -58,6 +72,11 @@ extends LocalAccountantDelegate
 	 *
 	 * @jdo.join
 	 */
+@Join
+@Persistent(
+	nullValue=NullValue.EXCEPTION,
+	table="JFireVoucher_VoucherLocalAccountantDelegate_accounts",
+	persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Map<String, Account> accounts;
 
 	/**
@@ -92,6 +111,7 @@ extends LocalAccountantDelegate
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private transient Map<String, Account> unmodifiableAccounts = null;
 
 	/**

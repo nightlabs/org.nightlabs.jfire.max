@@ -1,7 +1,6 @@
 package org.nightlabs.jfire.voucher;
 
 import java.io.IOException;
-import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -14,10 +13,12 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import javax.ejb.CreateException;
-import javax.ejb.EJBException;
-import javax.ejb.SessionBean;
-import javax.ejb.SessionContext;
+import javax.annotation.security.RolesAllowed;
+import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
+import javax.ejb.TransactionManagement;
+import javax.ejb.TransactionManagementType;
 import javax.jdo.Extent;
 import javax.jdo.FetchPlan;
 import javax.jdo.JDODetachedFieldAccessException;
@@ -36,12 +37,9 @@ import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
 import org.nightlabs.jfire.accounting.Account;
 import org.nightlabs.jfire.accounting.AccountType;
 import org.nightlabs.jfire.accounting.Currency;
-import org.nightlabs.jfire.accounting.book.id.LocalAccountantDelegateID;
-import org.nightlabs.jfire.accounting.id.CurrencyID;
 import org.nightlabs.jfire.accounting.pay.ModeOfPayment;
 import org.nightlabs.jfire.accounting.pay.ModeOfPaymentFlavour;
 import org.nightlabs.jfire.accounting.priceconfig.PriceConfig;
-import org.nightlabs.jfire.accounting.priceconfig.id.PriceConfigID;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.base.JFireBaseEAR;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
@@ -75,11 +73,6 @@ import org.nightlabs.jfire.store.deliver.ModeOfDelivery;
 import org.nightlabs.jfire.store.deliver.ModeOfDeliveryConst;
 import org.nightlabs.jfire.store.deliver.ModeOfDeliveryFlavour;
 import org.nightlabs.jfire.store.deliver.ServerDeliveryProcessorManual;
-import org.nightlabs.jfire.store.deliver.id.DeliveryConfigurationID;
-import org.nightlabs.jfire.store.deliver.id.ModeOfDeliveryFlavourID;
-import org.nightlabs.jfire.store.deliver.id.ServerDeliveryProcessorID;
-import org.nightlabs.jfire.store.id.ProductID;
-import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.ArticleCreator;
 import org.nightlabs.jfire.trade.CustomerGroup;
@@ -91,9 +84,6 @@ import org.nightlabs.jfire.trade.OrganisationLegalEntity;
 import org.nightlabs.jfire.trade.Segment;
 import org.nightlabs.jfire.trade.SegmentType;
 import org.nightlabs.jfire.trade.Trader;
-import org.nightlabs.jfire.trade.id.ArticleID;
-import org.nightlabs.jfire.trade.id.OfferID;
-import org.nightlabs.jfire.trade.id.SegmentID;
 import org.nightlabs.jfire.trade.recurring.RecurringOrder;
 import org.nightlabs.jfire.trade.recurring.RecurringTrader;
 import org.nightlabs.jfire.voucher.accounting.ModeOfPaymentConst;
@@ -124,43 +114,21 @@ import org.nightlabs.jfire.voucher.store.id.VoucherKeyID;
  * @ejb.util generate="physical"
  * @ejb.transaction type="Required"
  */
-public abstract class VoucherManagerBean
+@TransactionAttribute(TransactionAttributeType.REQUIRED)
+@TransactionManagement(TransactionManagementType.CONTAINER)
+@Stateless
+public class VoucherManagerBean
 extends BaseSessionBeanImpl
-implements SessionBean
+implements VoucherManagerRemote
 {
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger = Logger.getLogger(VoucherManagerBean.class);
 
-	@Override
-	public void setSessionContext(SessionContext sessionContext)
-	throws EJBException, RemoteException {
-		super.setSessionContext(sessionContext);
-	}
-	@Override
-	public void unsetSessionContext() {
-		super.unsetSessionContext();
-	}
-
-	/**
-	 * @ejb.create-method
-	 * @ejb.permission role-name="_Guest_"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.voucher.VoucherManagerRemote#initialise()
 	 */
-	public void ejbCreate() throws CreateException {
-	}
-
-	/**
-	 * {@inheritDoc}
-	 *
-	 * @ejb.permission unchecked="true"
-	 */
-	@Override
-	public void ejbRemove() throws EJBException, RemoteException { }
-
-	/**
-	 * @ejb.interface-method
-	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="_System_"
-	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("_System_")
 	public void initialise() throws Exception {
 		PersistenceManager pm = getPersistenceManager();
 		JFireServerManager jsm = getJFireServerManager();
@@ -384,6 +352,7 @@ implements SessionBean
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="org.nightlabs.jfire.store.seeProductType"
 	 */
+	@RolesAllowed("org.nightlabs.jfire.store.seeProductType")
 	public Set<ProductTypeID> getChildVoucherTypeIDs(ProductTypeID parentVoucherTypeID)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -409,6 +378,7 @@ implements SessionBean
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.queryPriceConfigurations"
 	 */
+	@RolesAllowed("org.nightlabs.jfire.accounting.queryPriceConfigurations")
 	@SuppressWarnings("unchecked")
 	public Set<PriceConfigID> getVoucherPriceConfigIDs()
 	{
@@ -427,6 +397,7 @@ implements SessionBean
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.queryPriceConfigurations"
 	 */
+	@RolesAllowed("org.nightlabs.jfire.accounting.queryPriceConfigurations")
 	public List<VoucherPriceConfig> getVoucherPriceConfigs(Collection<PriceConfigID> voucherPriceConfigIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -438,11 +409,11 @@ implements SessionBean
 		}
 	}
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="org.nightlabs.jfire.store.editUnconfirmedProductType"
-	 * @ejb.transaction type="Required"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.voucher.VoucherManagerRemote#storeVoucherType(org.nightlabs.jfire.voucher.store.VoucherType, boolean, java.lang.String[], int)
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("org.nightlabs.jfire.store.editUnconfirmedProductType")
 	public VoucherType storeVoucherType(VoucherType voucherType, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
 		if (voucherType == null)
@@ -538,6 +509,8 @@ implements SessionBean
 	 * @ejb.permission role-name="org.nightlabs.jfire.trade.editOffer"
 	 * @ejb.transaction type="Required"
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("org.nightlabs.jfire.trade.editOffer")
 	public Collection<? extends Article> createArticles(
 			SegmentID segmentID,
 			OfferID offerID,
@@ -688,6 +661,8 @@ implements SessionBean
 	 * @ejb.permission role-name="org.nightlabs.jfire.trade.editOffer"
 	 * @ejb.transaction type="Required"
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("org.nightlabs.jfire.trade.editOffer")
 	public Collection<? extends Article> createArticles(SegmentID segmentID,
 			OfferID offerID, ProductTypeID productTypeID, int quantity,
 			String[] fetchGroups, int maxFetchDepth
@@ -715,6 +690,7 @@ implements SessionBean
 	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.queryLocalAccountantDelegates"
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
+	@RolesAllowed("org.nightlabs.jfire.accounting.queryLocalAccountantDelegates")
 	public Set<LocalAccountantDelegateID> getVoucherLocalAccountantDelegateIDs() {
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -732,6 +708,7 @@ implements SessionBean
 	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.queryLocalAccountantDelegates"
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
+	@RolesAllowed("org.nightlabs.jfire.accounting.queryLocalAccountantDelegates")
 	public List<VoucherLocalAccountantDelegate> getVoucherLocalAccountantDelegates(
 			Collection<LocalAccountantDelegateID> voucherLocalAccountantDelegateIDs,
 			String[] fetchGroups, int maxFetchDepth) {
@@ -756,6 +733,7 @@ implements SessionBean
 	 * @ejb.permission role-name="org.nightlabs.jfire.voucher.redeemVoucher"
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
+	@RolesAllowed("org.nightlabs.jfire.voucher.redeemVoucher")
 	public VoucherKeyID getVoucherKeyID(String voucherKeyString) {
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -776,6 +754,7 @@ implements SessionBean
 	 * @ejb.permission role-name="org.nightlabs.jfire.voucher.redeemVoucher"
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
+	@RolesAllowed("org.nightlabs.jfire.voucher.redeemVoucher")
 	public List<VoucherKey> getVoucherKeys(
 			Collection<VoucherKeyID> voucherKeyIDs, String[] fetchGroups,
 			int maxFetchDepth
@@ -804,6 +783,7 @@ implements SessionBean
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="org.nightlabs.jfire.trade.sellProductType"
 	 */
+	@RolesAllowed("org.nightlabs.jfire.trade.sellProductType")
 	public Map<ProductID, Map<ScriptRegistryItemID, Object>> getVoucherScriptingResults(
 			Collection<ProductID> voucherIDs, boolean allScripts)
 	{
@@ -914,6 +894,8 @@ implements SessionBean
 	 * @ejb.transaction type="RequiresNew"
 	 * @ejb.permission role-name="org.nightlabs.jfire.voucher.editVoucherLayout"
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRESNEW)
+	@RolesAllowed("org.nightlabs.jfire.voucher.editVoucherLayout")
 	public PreviewParameterValuesResult getPreviewParameterValues(
 			ProductTypeID voucherTypeID) throws ModuleException {
 		try {
@@ -1073,6 +1055,8 @@ implements SessionBean
 	 * @ejb.transaction type="RequiresNew"
 	 * @ejb.permission role-name="org.nightlabs.jfire.voucher.editVoucherLayout"
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRESNEW)
+	@RolesAllowed("org.nightlabs.jfire.voucher.editVoucherLayout")
 	public Map<ProductID, Map<ScriptRegistryItemID, Object>> getPreviewVoucherData(PreviewParameterSet previewParameterSet) throws ModuleException
 	{
 		try {
@@ -1206,6 +1190,7 @@ implements SessionBean
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="org.nightlabs.jfire.trade.sellProductType"
 	 */
+	@RolesAllowed("org.nightlabs.jfire.trade.sellProductType")
 	public LayoutMapForArticleIDSet getVoucherLayoutMapForArticleIDSet(
 			Collection<ArticleID> articleIDs, String[] fetchGroups, int maxFetchDepth)
 	{
@@ -1233,15 +1218,16 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * Returns a set of the Object-IDs of all {@link VoucherLayout}s.
-	 * 
+	 *
 	 * @return a set of the Object-IDs of all {@link VoucherLayout}s.
-	 * 
+	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="org.nightlabs.jfire.voucher.editVoucherLayout"
 	 */
+	@RolesAllowed("org.nightlabs.jfire.voucher.editVoucherLayout")
 	public Set<VoucherLayoutID> getAllVoucherLayoutIds() {
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -1251,37 +1237,41 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * Replaces the voucherlayout identified by oldVoucherLayoutID with the given voucher layout and deletes the old voucher layout afterwards.
-	 * 
+	 *
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="org.nightlabs.jfire.voucher.editVoucherLayout"
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("org.nightlabs.jfire.voucher.editVoucherLayout")
 	public void replaceVoucherLayout(VoucherLayoutID oldVoucherLayoutId, VoucherLayout newVoucherLayout) {
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			pm.makePersistent(newVoucherLayout);
-			
+
 			Set<ProductTypeID> voucherTypeIDs = VoucherType.getVoucherTypeIdsByVoucherLayoutId(pm, oldVoucherLayoutId);
 			Set<VoucherType> voucherTypes = NLJDOHelper.getObjectSet(pm, voucherTypeIDs, VoucherType.class, (QueryOption[]) null);
-			
+
 			for (VoucherType voucherType : voucherTypes) {
 				voucherType.setVoucherLayout(newVoucherLayout);
 			}
-			
+
 			pm.deletePersistent(pm.getObjectById(oldVoucherLayoutId));
 		} finally {
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="org.nightlabs.jfire.voucher.editVoucherLayout"
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("org.nightlabs.jfire.voucher.editVoucherLayout")
 	public void deleteVoucherLayout(VoucherLayoutID voucherLayoutID) {
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -1303,6 +1293,7 @@ implements SessionBean
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="org.nightlabs.jfire.voucher.editVoucherLayout"
 	 */
+	@RolesAllowed("org.nightlabs.jfire.voucher.editVoucherLayout")
 	public List<VoucherLayout> getVoucherLayouts(Set<VoucherLayoutID> voucherLayoutIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -1316,11 +1307,12 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="org.nightlabs.jfire.voucher.editVoucherLayout"
 	 */
+	@RolesAllowed("org.nightlabs.jfire.voucher.editVoucherLayout")
 	public Set<VoucherLayoutID> getVoucherLayoutIdsByFileName(String fileName)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -1330,20 +1322,20 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
-	/**
-	 * @ejb.interface-method
-	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="org.nightlabs.jfire.voucher.editVoucherLayout"
+
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.voucher.VoucherManagerRemote#storeVoucherLayout(org.nightlabs.jfire.voucher.scripting.VoucherLayout, boolean, java.lang.String[], int)
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("org.nightlabs.jfire.voucher.editVoucherLayout")
 	public VoucherLayout storeVoucherLayout(VoucherLayout voucherLayout, boolean get, String[] fetchGroups, int maxFetchDepth) {
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			voucherLayout = pm.makePersistent(voucherLayout);
-			
+
 			if (!get)
 				return null;
-			
+
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
@@ -1353,12 +1345,13 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * @ejb.interface-method
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="org.nightlabs.jfire.voucher.editVoucherLayout"
 	 */
+	@RolesAllowed("org.nightlabs.jfire.voucher.editVoucherLayout")
 	public Set<ProductTypeID> getVoucherTypeIdsByVoucherLayoutId(VoucherLayoutID voucherLayoutId) {
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -1368,11 +1361,11 @@ implements SessionBean
 		}
 	}
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.transaction type="Supports"
-	 * @ejb.permission role-name="_Guest_"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.voucher.VoucherManagerRemote#ping(java.lang.String)
 	 */
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	@RolesAllowed("_Guest_")
 	@Override
 	public String ping(String message) {
 		return super.ping(message);

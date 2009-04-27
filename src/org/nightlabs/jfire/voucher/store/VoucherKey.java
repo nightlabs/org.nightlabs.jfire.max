@@ -24,6 +24,20 @@ import org.nightlabs.jfire.voucher.store.id.VoucherKeyID;
 import org.nightlabs.math.Base62Coder;
 import org.nightlabs.util.Util;
 
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Queries;
+import javax.jdo.annotations.Element;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+
 /**
  * As a {@link Voucher} is a {@link Product} and thus can be refunded and resold to another customer (as
  * long as no money for it is redeemed), it is essential to modify the key. Otherwise the old customer
@@ -62,6 +76,46 @@ import org.nightlabs.util.Util;
  * @jdo.query name="getVoucherKeyByVoucherKeyString"
  *		query="SELECT UNIQUE WHERE this.voucherKey == :voucherKey"
  */
+@PersistenceCapable(
+	objectIdClass=VoucherKeyID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireVoucher_VoucherKey")
+@FetchGroups({
+	@FetchGroup(
+		name=VoucherKey.FETCH_GROUP_VOUCHER,
+		members=@Persistent(name="voucher")),
+	@FetchGroup(
+		name=VoucherKey.FETCH_GROUP_NOMINAL_VALUE,
+		members=@Persistent(name="nominalValue")),
+	@FetchGroup(
+		name=VoucherKey.FETCH_GROUP_REST_VALUE,
+		members=@Persistent(name="restValue")),
+	@FetchGroup(
+		name=VoucherKey.FETCH_GROUP_CREATE_USER,
+		members=@Persistent(name="createUser")),
+	@FetchGroup(
+		name=VoucherKey.FETCH_GROUP_VALID_USER,
+		members=@Persistent(name="validUser")),
+	@FetchGroup(
+		name=VoucherKey.FETCH_GROUP_REVERSED_USER,
+		members=@Persistent(name="reversedUser")),
+	@FetchGroup(
+		name=VoucherKey.FETCH_GROUP_REDEMPTIONS,
+		members=@Persistent(name="redemptions"))
+})
+@Queries({
+	@javax.jdo.annotations.Query(
+		name="getVoucherKeysForVoucherAndValidity",
+		value="SELECT WHERE this.voucher == :voucher && this.validity == :validity"),
+	@javax.jdo.annotations.Query(
+		name="getVoucherKeyIDByVoucherKeyString",
+		value="SELECT UNIQUE JDOHelper.getObjectId(this) WHERE this.voucherKey == :voucherKey"),
+	@javax.jdo.annotations.Query(
+		name="getVoucherKeyByVoucherKeyString",
+		value="SELECT UNIQUE WHERE this.voucherKey == :voucherKey")
+})
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class VoucherKey
 implements Serializable
 {
@@ -96,50 +150,71 @@ implements Serializable
 	/**
 	 * @jdo.field primary-key="true"
 	 */
+	@PrimaryKey
 	private int voucherOrganisationID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 */
+	@PrimaryKey
 	private long voucherNumber;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" null-value="exception"
 	 */
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Date createDT;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" null-value="exception"
 	 */
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private User createUser;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Date validDT;
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private User validUser;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Date reversedDT;
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private User reversedUser;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" unique="true" null-value="exception"
 	 * @jdo.column length="50"
 	 */
+	@Element(unique="true")
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		persistenceModifier=PersistenceModifier.PERSISTENT)
+	@Column(length=50)
 	private String voucherKey;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" null-value="exception" indexed="true"
 	 */
+	@Element(indexed="true")
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Voucher voucher;
 
 	/**
@@ -149,11 +224,15 @@ implements Serializable
 	 *		element-type="VoucherRedemption"
 	 *		mapped-by="voucherKey"
 	 */
+	@Persistent(
+		mappedBy="voucherKey",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Set<VoucherRedemption> redemptions;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private boolean redemptionExisting = false;
 
 	public static final byte VALIDITY_NOT_YET_VALID = 11;
@@ -201,16 +280,21 @@ implements Serializable
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private byte validity;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Price nominalValue;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" dependent="true"
 	 */
+	@Persistent(
+		dependent="true",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Price restValue;
 
 	/**
@@ -477,6 +561,7 @@ implements Serializable
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private transient Set<VoucherRedemption> unmodifiableRedemptions = null;
 
 	public Set<VoucherRedemption> getRedemptions()

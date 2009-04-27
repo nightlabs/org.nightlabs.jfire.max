@@ -5,6 +5,13 @@ import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.ProductTypeLocal;
 
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+
 /**
  * @author Marco Schulze - Marco at NightLabs dot de
  *
@@ -16,6 +23,11 @@ import org.nightlabs.jfire.store.ProductTypeLocal;
  *
  * @jdo.inheritance strategy="new-table"
  */
+@PersistenceCapable(
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireVoucher_VoucherTypeLocal")
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class VoucherTypeLocal
 extends ProductTypeLocal
 {
@@ -28,6 +40,7 @@ extends ProductTypeLocal
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private long maxVoucherCount = -1;
 
 	/**
@@ -37,6 +50,7 @@ extends ProductTypeLocal
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private long createdVoucherCount = 0;
 
 	/**

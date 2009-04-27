@@ -19,6 +19,11 @@ import org.nightlabs.jfire.voucher.accounting.VoucherMoneyTransfer;
 import org.nightlabs.jfire.voucher.accounting.VoucherRedemption;
 import org.nightlabs.jfire.voucher.store.VoucherKey;
 
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.IdentityType;
+
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  *
@@ -29,6 +34,10 @@ import org.nightlabs.jfire.voucher.store.VoucherKey;
  *
  * @jdo.inheritance strategy="superclass-table"
  */
+@PersistenceCapable(
+	identityType=IdentityType.APPLICATION,
+	detachable="true")
+@Inheritance(strategy=InheritanceStrategy.SUPERCLASS_TABLE)
 public class ServerPaymentProcessorVoucher
 		extends ServerPaymentProcessor
 {

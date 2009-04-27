@@ -22,6 +22,11 @@ import org.nightlabs.jfire.trade.recurring.RecurredOffer;
 import org.nightlabs.jfire.trade.recurring.RecurringTradeProductTypeActionHandler;
 import org.nightlabs.jfire.voucher.store.VoucherType;
 
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.IdentityType;
+
 /**
  * @author Fitas Amine - fitas at nightlabs dot de
  *
@@ -36,6 +41,11 @@ import org.nightlabs.jfire.voucher.store.VoucherType;
  *
  * @jdo.inheritance strategy="superclass-table"
  */
+@PersistenceCapable(
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireSimpleTrade_VoucherRecurringTradeProductTypeActionHandler")
+@Inheritance(strategy=InheritanceStrategy.SUPERCLASS_TABLE)
 
 public class VoucherTypeRecurringTradeActionHandler 
 extends	RecurringTradeProductTypeActionHandler

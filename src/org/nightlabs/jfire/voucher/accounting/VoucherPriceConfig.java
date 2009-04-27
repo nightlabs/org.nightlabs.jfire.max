@@ -17,6 +17,17 @@ import org.nightlabs.jfire.store.Product;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.ArticlePrice;
 
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.IdentityType;
+
 /**
  * @author Marco Schulze - Marco at NightLabs dot de
  * @author Attapol Thomprasert - Attapol at NightLabs dot de
@@ -33,6 +44,20 @@ import org.nightlabs.jfire.trade.ArticlePrice;
  *
  * @jdo.fetch-group name="FetchGroupsPriceConfig.edit" fetch-groups="default" fields="prices"
  */
+@PersistenceCapable(
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireVoucher_VoucherPriceConfig")
+@FetchGroups({
+	@FetchGroup(
+		name=VoucherPriceConfig.FETCH_GROUP_PRICES,
+		members=@Persistent(name="prices")),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name="FetchGroupsPriceConfig.edit",
+		members=@Persistent(name="prices"))
+})
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class VoucherPriceConfig
 extends PriceConfig
 implements IPackagePriceConfig
@@ -50,6 +75,11 @@ implements IPackagePriceConfig
 	 *
 	 * @jdo.join
 	 */
+	@Join
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		table="JFireVoucher_VoucherPriceConfig_prices",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Map<Currency, Long> prices;
 
 	/**
@@ -146,6 +176,7 @@ implements IPackagePriceConfig
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private transient Map<Currency, Long> readOnlyPrices = null;
 
 	public Map<Currency, Long> getPrices()

@@ -8,6 +8,15 @@ import org.nightlabs.jfire.store.ProductLocator;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.Repository;
 
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  *
@@ -24,6 +33,29 @@ import org.nightlabs.jfire.store.Repository;
  * @jdo.fetch-group name="FetchGroupsTrade.articleInInvoiceEditor" fetch-groups="default" fields="voucherKey"
  * @jdo.fetch-group name="FetchGroupsTrade.articleInDeliveryNoteEditor" fetch-groups="default" fields="voucherKey"
  */
+@PersistenceCapable(
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireVoucher_Voucher")
+@FetchGroups({
+	@FetchGroup(
+		fetchGroups={"default"},
+		name="FetchGroupsTrade.articleInOrderEditor",
+		members=@Persistent(name="voucherKey")),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name="FetchGroupsTrade.articleInOfferEditor",
+		members=@Persistent(name="voucherKey")),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name="FetchGroupsTrade.articleInInvoiceEditor",
+		members=@Persistent(name="voucherKey")),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name="FetchGroupsTrade.articleInDeliveryNoteEditor",
+		members=@Persistent(name="voucherKey"))
+})
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class Voucher
 extends Product
 {
@@ -38,6 +70,7 @@ extends Product
 	 * @see #getVoucherKey()
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private VoucherKey voucherKey;
 
 	/**

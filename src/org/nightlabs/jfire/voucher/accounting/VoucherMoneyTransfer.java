@@ -9,6 +9,16 @@ import org.nightlabs.jfire.accounting.MoneyTransfer;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.transfer.Anchor;
 
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Queries;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.Element;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+
 /**
  * @author Marco Schulze - Marco at NightLabs dot de
  *
@@ -23,6 +33,16 @@ import org.nightlabs.jfire.transfer.Anchor;
  * @jdo.query name="getVoucherMoneyTransferByArticle"
  *		query="SELECT UNIQUE WHERE this.article == :article"
  */
+@PersistenceCapable(
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireVoucher_VoucherMoneyTransfer")
+@Queries(
+	@javax.jdo.annotations.Query(
+		name="getVoucherMoneyTransferByArticle",
+		value="SELECT UNIQUE WHERE this.article == :article")
+)
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class VoucherMoneyTransfer
 extends InvoiceMoneyTransfer
 {
@@ -37,6 +57,10 @@ extends InvoiceMoneyTransfer
 	/**
 	 * @jdo.field persistence-modifier="persistent" unique="true" null-value="exception"
 	 */
+	@Element(unique="true")
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Article article;
 
 	/**

@@ -18,6 +18,18 @@ import org.nightlabs.io.DataBuffer;
 import org.nightlabs.jfire.trade.ILayout;
 import org.nightlabs.jfire.voucher.scripting.id.VoucherLayoutID;
 
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Queries;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+
 /**
  * @author Daniel.Mazurek [at] NightLabs [dot] de
  *
@@ -36,7 +48,23 @@ import org.nightlabs.jfire.voucher.scripting.id.VoucherLayoutID;
  * @jdo.query
  * 		name="getVoucherLayoutIdsByFileName"
  * 		query="SELECT JDOHelper.getObjectId(this) WHERE fileName == :fileName"
- */
+ */@PersistenceCapable(
+	objectIdClass=VoucherLayoutID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireVoucher_VoucherLayout")
+@FetchGroups(
+	@FetchGroup(
+		name=VoucherLayout.FETCH_GROUP_FILE,
+		members={@Persistent(name="fileName"), @Persistent(name="fileTimestamp"), @Persistent(name="fileData")})
+)
+@Queries(
+	@javax.jdo.annotations.Query(
+		name="getVoucherLayoutIdsByFileName",
+		value="SELECT JDOHelper.getObjectId(this) WHERE fileName == :fileName")
+)
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
+
 public class VoucherLayout
 implements Serializable, ILayout
 {
@@ -49,30 +77,37 @@ implements Serializable, ILayout
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
-	 */
+	 */	@PrimaryKey
+	@Column(length=100)
+
 	private String organisationID;
 
 	/**
 	 * @jdo.field primary-key="true"
-	 */
+	 */	@PrimaryKey
+
 	private long voucherLayoutID;
 
 	/**
 	 * The original file name without path.
 	 *
 	 * @jdo.field persistence-modifier="persistent"
-	 */
+	 */	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+
 	private String fileName = null;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
-	 */
+	 */	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+
 	private Date fileTimestamp = null;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 * @jdo.column sql-type="BLOB"
-	 */
+	 */	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+	@Column(sqlType="BLOB")
+
 	private byte[] fileData = null;
 
 	/**

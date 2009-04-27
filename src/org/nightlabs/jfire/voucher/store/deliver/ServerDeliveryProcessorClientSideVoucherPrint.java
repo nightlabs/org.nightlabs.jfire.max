@@ -19,6 +19,11 @@ import org.nightlabs.jfire.voucher.resource.Messages;
 import org.nightlabs.jfire.voucher.store.VoucherType;
 import org.nightlabs.util.NLLocale;
 
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.IdentityType;
+
 /**
  * This implementation of {@link ServerDeliveryProcessor} is used for client-sided voucher print.
  * The client-sided delivery processor does all the real work - this means this class does
@@ -32,7 +37,11 @@ import org.nightlabs.util.NLLocale;
  *		detachable="true"
  *
  * @jdo.inheritance strategy="superclass-table"
- */
+ */@PersistenceCapable(
+	identityType=IdentityType.APPLICATION,
+	detachable="true")
+@Inheritance(strategy=InheritanceStrategy.SUPERCLASS_TABLE)
+
 public class ServerDeliveryProcessorClientSideVoucherPrint
 extends ServerDeliveryProcessor
 {

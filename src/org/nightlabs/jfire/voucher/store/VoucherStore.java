@@ -8,6 +8,16 @@ import javax.jdo.PersistenceManager;
 import org.nightlabs.jfire.organisation.LocalOrganisation;
 import org.nightlabs.math.Base62Coder;
 
+import javax.jdo.annotations.Persistent;
+import org.nightlabs.jfire.voucher.store.id.VoucherStoreID;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  *
@@ -21,6 +31,12 @@ import org.nightlabs.math.Base62Coder;
  *
  * @jdo.inheritance strategy="new-table"
  */
+@PersistenceCapable(
+	objectIdClass=VoucherStoreID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireVoucher_VoucherStore")
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class VoucherStore
 {
 	public static VoucherStore getVoucherStore(PersistenceManager pm)
@@ -43,6 +59,8 @@ public class VoucherStore
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 
 	/**
@@ -64,6 +82,7 @@ public class VoucherStore
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private int voucherOrganisationID = -1;
 
 	/**

@@ -6,6 +6,19 @@ import org.nightlabs.jfire.accounting.pay.Payment;
 import org.nightlabs.jfire.voucher.store.VoucherKey;
 import org.nightlabs.util.Util;
 
+import org.nightlabs.jfire.voucher.accounting.id.VoucherRedemptionID;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+
 /**
  * @author Marco Schulze - Marco at NightLabs dot de
  *
@@ -22,6 +35,20 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="VoucherRedemption.voucherKey" fields="voucherKey"
  * @jdo.fetch-group name="VoucherRedemption.payment" fields="payment"
  */
+@PersistenceCapable(
+	objectIdClass=VoucherRedemptionID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireVoucher_VoucherRedemption")
+@FetchGroups({
+	@FetchGroup(
+		name=VoucherRedemption.FETCH_GROUP_VOUCHER_KEY,
+		members=@Persistent(name="voucherKey")),
+	@FetchGroup(
+		name=VoucherRedemption.FETCH_GROUP_PAYMENT,
+		members=@Persistent(name="payment"))
+})
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class VoucherRedemption
 implements Serializable
 {
@@ -34,16 +61,22 @@ implements Serializable
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 */
+	@PrimaryKey
 	private long voucherRedemptionID;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" null-value="exception"
 	 */
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private VoucherKey voucherKey;
 
 //	/**
@@ -59,6 +92,9 @@ implements Serializable
 	/**
 	 * @jdo.field persistence-modifier="persistent" null-value="exception"
 	 */
+@Persistent(
+	nullValue=NullValue.EXCEPTION,
+	persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Payment payment;
 
 	/**

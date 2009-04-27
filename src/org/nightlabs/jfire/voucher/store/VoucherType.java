@@ -16,6 +16,16 @@ import org.nightlabs.jfire.voucher.scripting.VoucherLayout;
 import org.nightlabs.jfire.voucher.scripting.id.VoucherLayoutID;
 import org.nightlabs.util.CollectionUtil;
 
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.Queries;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  *
@@ -50,6 +60,29 @@ import org.nightlabs.util.CollectionUtil;
  *
  * @jdo.fetch-group name="VoucherType.voucherLayout" fields="voucherLayout"
  */
+@PersistenceCapable(
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireVoucher_VoucherType")
+@FetchGroups(
+	@FetchGroup(
+		name=VoucherType.FETCH_GROUP_VOUCHER_LAYOUT,
+		members=@Persistent(name="voucherLayout"))
+)
+@Queries({
+	@javax.jdo.annotations.Query(
+		name="getChildVoucherTypes_topLevel",
+		value="SELECT WHERE this.extendedProductType == null",
+		language="javax.jdo.query.JDOQL"),
+	@javax.jdo.annotations.Query(
+		name="getChildVoucherTypes_hasParent",
+		value="SELECT WHERE this.extendedProductType.organisationID == parentProductTypeOrganisationID && this.extendedProductType.productTypeID == parentProductTypeProductTypeID PARAMETERS String parentProductTypeOrganisationID, String parentProductTypeProductTypeID import java.lang.String",
+		language="javax.jdo.query.JDOQL"),
+	@javax.jdo.annotations.Query(
+		name="getVoucherTypeIdsByVoucherLayoutId",
+		value="SELECT JDOHelper.getObjectId(this) WHERE :voucherLayoutId == JDOHelper.getObjectId(this.voucherLayout)")
+})
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class VoucherType
 extends ProductType
 {
@@ -154,6 +187,7 @@ extends ProductType
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private VoucherLayout voucherLayout;
 
 	public VoucherLayout getVoucherLayout()

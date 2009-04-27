@@ -3,6 +3,7 @@ package org.nightlabs.jfire.voucher;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Remote;
@@ -20,8 +21,10 @@ import org.nightlabs.jfire.voucher.scripting.PreviewParameterSet;
 import org.nightlabs.jfire.voucher.scripting.PreviewParameterValuesResult;
 import org.nightlabs.jfire.voucher.scripting.VoucherLayout;
 import org.nightlabs.jfire.voucher.scripting.VoucherScriptingConstants;
+import org.nightlabs.jfire.voucher.scripting.id.VoucherLayoutID;
 import org.nightlabs.jfire.voucher.store.VoucherKey;
 import org.nightlabs.jfire.voucher.store.VoucherType;
+import org.nightlabs.jfire.voucher.store.id.VoucherKeyID;
 
 @Remote
 public interface VoucherManagerRemote {

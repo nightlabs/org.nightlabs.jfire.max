@@ -41,6 +41,10 @@ import javax.jdo.PersistenceManager;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
+import org.nightlabs.jfire.accounting.id.CurrencyID;
+import org.nightlabs.jfire.accounting.id.TariffID;
+import org.nightlabs.jfire.accounting.pay.id.ModeOfPaymentFlavourID;
+import org.nightlabs.jfire.accounting.pay.id.ModeOfPaymentID;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.base.JFireBaseEAR;
 import org.nightlabs.jfire.config.id.ConfigModuleInitialiserID;
@@ -54,7 +58,11 @@ import org.nightlabs.jfire.reporting.parameter.id.ValueProviderCategoryID;
 import org.nightlabs.jfire.reporting.trade.config.ReportLayoutCfModInitialiserArticleContainerLayouts;
 import org.nightlabs.jfire.scripting.ScriptingIntialiserException;
 import org.nightlabs.jfire.servermanager.JFireServerManager;
+import org.nightlabs.jfire.store.deliver.id.ModeOfDeliveryFlavourID;
+import org.nightlabs.jfire.store.deliver.id.ModeOfDeliveryID;
+import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.trade.id.ArticleContainerID;
+import org.nightlabs.jfire.transfer.id.AnchorID;
 
 /**
  * Bean to initialize the default reports and report scripts.

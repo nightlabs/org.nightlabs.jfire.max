@@ -6,6 +6,20 @@ import org.nightlabs.jfire.accounting.Price;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.issue.project.Project;
 
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.Queries;
+import javax.jdo.annotations.PrimaryKey;
+import org.nightlabs.jfire.issuetimetracking.id.ProjectCostValueID;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.Query;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+
 /**
  * The {@link ProjectCostValue} class represents an cost information of each {@link Project}s. 
  * <p>
@@ -34,6 +48,28 @@ import org.nightlabs.jfire.issue.project.Project;
  * @jdo.fetch-group name="ProjectCostValue.revenue" fields="revenue"
  * @jdo.fetch-group name="ProjectCostValue.projectCost" fields="projectCost"
  */
+@PersistenceCapable(
+	objectIdClass=ProjectCostValueID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireIssueTimeTracking_ProjectCostValue")
+@FetchGroups({
+	@FetchGroup(
+		name=ProjectCostValue.FETCH_GROUP_COST,
+		members=@Persistent(name="cost")),
+	@FetchGroup(
+		name=ProjectCostValue.FETCH_GROUP_REVENUE,
+		members=@Persistent(name="revenue")),
+	@FetchGroup(
+		name=ProjectCostValue.FETCH_GROUP_PROJECT_COST,
+		members=@Persistent(name="projectCost"))
+})
+@Queries(
+	@Query(
+		name="getProjectCostValuesByProjectID",
+		value="SELECT WHERE this.projectCost.organisationID == :organisationID && this.projectCost.project.projectID == :projectID")
+)
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class ProjectCostValue
 implements Serializable
 {
@@ -47,26 +83,32 @@ implements Serializable
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 */
+	@PrimaryKey
 	private long projectCostValueID;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private ProjectCost projectCost;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Price cost;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Price revenue;
 
 	/**

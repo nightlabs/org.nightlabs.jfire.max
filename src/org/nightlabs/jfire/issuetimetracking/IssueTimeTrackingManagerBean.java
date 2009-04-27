@@ -1,17 +1,15 @@
 package org.nightlabs.jfire.issuetimetracking;
 
-import java.io.IOException;
-import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.ejb.CreateException;
-import javax.ejb.EJBException;
-import javax.ejb.SessionBean;
-import javax.ejb.SessionContext;
+import javax.annotation.security.RolesAllowed;
+import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
@@ -19,7 +17,6 @@ import org.apache.log4j.Logger;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.issue.project.id.ProjectID;
-import org.nightlabs.jfire.issuetimetracking.id.ProjectCostID;
 
 /**
  * An EJB session bean provides methods for managing every objects used in the issue time tracking.
@@ -35,64 +32,25 @@ import org.nightlabs.jfire.issuetimetracking.id.ProjectCostID;
  * @ejb.util generate="physical"
  * @ejb.transaction type="Required"
  */
+@TransactionAttribute(TransactionAttributeType.REQUIRED)
+@Stateless
 public class IssueTimeTrackingManagerBean
 extends BaseSessionBeanImpl
-implements SessionBean
+implements IssueTimeTrackingManagerRemote
 {
 	private static final long serialVersionUID = 1L;
-	
+
 	/**
 	 * LOG4J logger used by this class
 	 */
 	private static final Logger logger = Logger.getLogger(IssueTimeTrackingManagerBean.class);
-	
-	/**
-	 * @ejb.create-method
-	 * @ejb.permission role-name="_Guest_"
-	 */
-	public void ejbCreate()
-	throws CreateException
-	{
-		logger.debug(this.getClass().getName() + ".ejbCreate()");
-	}
-	
-	/**
-	 * @see javax.ejb.SessionBean#ejbRemove()
-	 *
-	 * @ejb.permission unchecked="true"
-	 */
-	public void ejbRemove() throws EJBException, RemoteException
-	{
-		logger.debug(this.getClass().getName() + ".ejbRemove()");
-	}
 
-	/**
-	 * @see javax.ejb.SessionBean#ejbActivate()
-	 */
-	public void ejbActivate() throws EJBException, RemoteException
-	{
-		logger.debug(this.getClass().getName() + ".ejbActivate()");
-	}
-	/**
-	 * @see javax.ejb.SessionBean#ejbPassivate()
-	 */
-	public void ejbPassivate() throws EJBException, RemoteException
-	{
-		logger.debug(this.getClass().getName() + ".ejbPassivate()");
-	}
-
-	@Override
-	public void setSessionContext(SessionContext sessionContext) throws EJBException,
-			RemoteException {
-		logger.debug(this.getClass().getName() + ".setSessionContext("+sessionContext+")");
-		super.setSessionContext(sessionContext);
-	}
-	
 	//ProjectCost//
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 */
+	@RolesAllowed("_Guest_")
 	@SuppressWarnings("unchecked")
 	public List<ProjectCost> getProjectCosts(Collection<ProjectCostID> projectCostIDs, String[] fetchGroups, int maxFetchDepth)
 	{
@@ -103,7 +61,7 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 //	/**
 //	 * @ejb.interface-method
 //	 * @ejb.permission role-name="_Guest_"
@@ -120,18 +78,12 @@ implements SessionBean
 //			pm.close();
 //		}//finally
 //	}
-	
-	/**
-	 * Stores a project cost to the datastore.
-	 * @param projectCost the project cost to store
-	 * @param get true if you want to get the stored project type
-	 * @param fetchGroups the fetchGroups that used for specify fields to be detached from the datastore
-	 * @param maxFetchDepth specifies the number of level of the object to be fetched
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Required"
+
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.issuetimetracking.IssueTimeTrackingManagerRemote#storeProjectCost(org.nightlabs.jfire.issuetimetracking.ProjectCost, boolean, java.lang.String[], int)
 	 */
+@TransactionAttribute(TransactionAttributeType.REQUIRED)
+@RolesAllowed("_Guest_")
 	public ProjectCost storeProjectCost(ProjectCost projectCost, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -142,11 +94,12 @@ implements SessionBean
 			pm.close();
 		}//finally
 	}
-	
+
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 */
+	@RolesAllowed("_Guest_")
 	public Set<ProjectCostID> getProjectCostIDsByProjectID(ProjectID projectID) {
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -159,15 +112,13 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	//Bean//
-	/**
-	 * @throws IOException While loading an icon from a local resource, this might happen and we don't care in the initialise method.
-	 *
-	 * @ejb.interface-method
-	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="_System_"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.issuetimetracking.IssueTimeTrackingManagerRemote#initialise()
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("_System_")
 	public void initialise() throws Exception
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -176,6 +127,6 @@ implements SessionBean
 		} finally {
 			pm.close();
 		}
-		
+
 	}
 }

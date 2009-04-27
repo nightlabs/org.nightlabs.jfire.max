@@ -14,6 +14,24 @@ import org.nightlabs.jfire.issue.project.Project;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.security.id.UserID;
 
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.Value;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.Query;
+import org.nightlabs.jfire.issuetimetracking.id.ProjectCostID;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Queries;
+import javax.jdo.annotations.Element;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+
 /**
  * The {@link ProjectCost} class represents an cost information of each {@link Project}s. 
  * <p>
@@ -43,6 +61,31 @@ import org.nightlabs.jfire.security.id.UserID;
  * @jdo.fetch-group name="ProjectCost.defaultCost" fields="defaultCost"
  * @jdo.fetch-group name="ProjectCost.defaultRevenue" fields="defaultRevenue"
  */
+@PersistenceCapable(
+	objectIdClass=ProjectCostID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireIssueTimeTracking_ProjectCost")
+@FetchGroups({
+	@FetchGroup(
+		name=ProjectCost.FETCH_GROUP_PROJECT,
+		members=@Persistent(name="project")),
+	@FetchGroup(
+		name=ProjectCost.FETCH_GROUP_CURRENCY,
+		members=@Persistent(name="currency")),
+	@FetchGroup(
+		name=ProjectCost.FETCH_GROUP_DEFAULT_COST,
+		members=@Persistent(name="defaultCost")),
+	@FetchGroup(
+		name=ProjectCost.FETCH_GROUP_DEFAULT_REVENUE,
+		members=@Persistent(name="defaultRevenue"))
+})
+@Queries(
+	@Query(
+		name="getProjectCostsByProjectID",
+		value="SELECT WHERE this.project.organisationID == :organisationID && this.project.projectID == :projectID")
+)
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class ProjectCost 
 implements Serializable
 {
@@ -57,21 +100,27 @@ implements Serializable
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 */
+	@PrimaryKey
 	private long projectID;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent" unique="true"
 	 */
+	@Element(unique="true")
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Project project;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Currency currency;
 	
 	/**
@@ -89,16 +138,25 @@ implements Serializable
 	 * 
 	 * @jdo.join
 	 */
+	@Join
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		table="JFireIssueTimeTracking_ProjectCost_user2ProjectCostMap",
+		defaultFetchGroup="true",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
+	@Value(dependent="true")
 	private Map<String, ProjectCostValue> user2ProjectCostMap;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Price defaultCost;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Price defaultRevenue;
 	
 	/**

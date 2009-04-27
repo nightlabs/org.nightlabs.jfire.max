@@ -1,6 +1,3 @@
-/**
- *
- */
 package org.nightlabs.jfire.issuetimetracking;
 
 import java.util.HashMap;
@@ -28,10 +25,10 @@ import org.nightlabs.jfire.prop.id.StructFieldID;
  * @author Chairat Kongarayawetchakun <!-- chairat [AT] nightlabs [DOT] de -->
  *
  */
-public class IssueTimeTrackingStruct 
+public class IssueTimeTrackingStruct
 {
 	private static final Logger logger = Logger.getLogger(IssueTimeTrackingStruct.class);
-	
+
 	public static IStruct getIssueTimeTrackingStruct(PersistenceManager pm) {
 		Struct issueStruct = null;
 		issueStruct = Struct.getStruct(DEV_ORGANISATION_ID, Issue.class, Struct.DEFAULT_SCOPE, pm);
@@ -46,21 +43,21 @@ public class IssueTimeTrackingStruct
 		} catch (Exception e) {
 			createDepartmentStructBlock(issueStruct);
 		}
-					
+
 		pm.makePersistent(issueStruct);
-		
+
 		return issueStruct;
 	}
 
 	private static void createDepartmentStructBlock(IStruct issueStruct) {
 		logger.debug("Creating Struct Block.....................");
-	
+
 		Map<String, String> blockNameMap = new HashMap<String, String>();
 		blockNameMap.put(Locale.GERMAN.getLanguage(), "Abteilungen");
 		blockNameMap.put(Locale.ENGLISH.getLanguage(), "Department");
-		
+
 		StructBlock structBlock = PropHelper.createStructBlock(issueStruct, DEPARTMENT_BLOCK, blockNameMap);
-		structBlock.setUnique(true);		
+		structBlock.setUnique(true);
 		createDepartmentStructField(structBlock);
 		try {
 			issueStruct.addStructBlock(structBlock);
@@ -68,14 +65,14 @@ public class IssueTimeTrackingStruct
 			throw new RuntimeException(e);
 		}
 	}
-	
+
 	private static void createDepartmentStructField(StructBlock issueStructBlock) {
 		logger.debug("Creating Struct Field.................");
-		
+
 		Map<String, String> fieldNameMap = new HashMap<String, String>();
 		fieldNameMap.put(Locale.GERMAN.getLanguage(), "Abteilungen");
 		fieldNameMap.put(Locale.ENGLISH.getLanguage(), "Department");
-		
+
 		DepartmentStructField departmentStructField = PropHelper.createDepartmentField(issueStructBlock, DEPARTMENT_FIELD, fieldNameMap);
 		try {
 			issueStructBlock.addStructField(departmentStructField);

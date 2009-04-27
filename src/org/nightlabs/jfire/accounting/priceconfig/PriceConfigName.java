@@ -31,6 +31,20 @@ import java.util.Map;
 
 import org.nightlabs.i18n.I18nText;
 
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.Column;
+import org.nightlabs.jfire.accounting.priceconfig.id.PriceConfigNameID;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  *
@@ -48,6 +62,21 @@ import org.nightlabs.i18n.I18nText;
  *
  * @jdo.fetch-group name="FetchGroupsPriceConfig.edit" fetch-groups="default" fields="priceConfig, names"
  */
+@PersistenceCapable(
+	objectIdClass=PriceConfigNameID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_PriceConfigName")
+@FetchGroups({
+	@FetchGroup(
+		name="PriceConfig.name",
+		members={@Persistent(name="priceConfig"), @Persistent(name="names")}),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name="FetchGroupsPriceConfig.edit",
+		members={@Persistent(name="priceConfig"), @Persistent(name="names")})
+})
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class PriceConfigName extends I18nText
 {
 	private static final long serialVersionUID = 1L;
@@ -56,17 +85,22 @@ public class PriceConfigName extends I18nText
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String priceConfigID;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private PriceConfig priceConfig;
 
 	/**
@@ -83,6 +117,11 @@ public class PriceConfigName extends I18nText
 	 *
 	 * @jdo.join
 	 */
+	@Join
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		table="JFireTrade_PriceConfigName_names",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	protected Map<String, String> names;
 
 	/**

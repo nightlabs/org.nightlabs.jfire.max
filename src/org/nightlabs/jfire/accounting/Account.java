@@ -44,6 +44,18 @@ import org.nightlabs.jfire.transfer.Anchor;
 import org.nightlabs.jfire.transfer.Transfer;
 import org.nightlabs.util.NLLocale;
 
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Queries;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.IdentityType;
+
 /**
  * Accounts are the anchors of {@link MoneyTransfer}s. They record the transfer amounts and
  * maintain an account balance ({@link #getBalance()}). 
@@ -71,6 +83,37 @@ import org.nightlabs.util.NLLocale;
  *		query="SELECT
  *				WHERE this.accountType == :accountType && this.owner == :owner && this.currency == :currency"
  */
+@PersistenceCapable(
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_Account")
+@FetchGroups({
+	@FetchGroup(
+		name=Account.FETCH_GROUP_OWNER,
+		members=@Persistent(name="owner")),
+	@FetchGroup(
+		name=Account.FETCH_GROUP_CURRENCY,
+		members=@Persistent(name="currency")),
+	@FetchGroup(
+		name=Account.FETCH_GROUP_NAME,
+		members=@Persistent(name="name")),
+	@FetchGroup(
+		name=Account.FETCH_GROUP_SUMMARY_ACCOUNTS,
+		members=@Persistent(name="summaryAccounts")),
+	@FetchGroup(
+		name=Account.FETCH_GROUP_ACCOUNT_TYPE,
+		members=@Persistent(name="accountType")),
+	@FetchGroup(
+		fetchGroups={"default", "Anchor.this"},
+		name=Account.FETCH_GROUP_THIS_ACCOUNT,
+		members={@Persistent(name="owner"), @Persistent(name="currency"), @Persistent(name="accountType"), @Persistent(name="name"), @Persistent(name="summaryAccounts")})
+})
+@Queries(
+	@javax.jdo.annotations.Query(
+		name="getAccountsForAccountTypeAndOwnerAndCurrency",
+		value="SELECT WHERE this.accountType == :accountType && this.owner == :owner && this.currency == :currency")
+)
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class Account extends Anchor
 {
 	private static final long serialVersionUID = 1L;
@@ -153,19 +196,23 @@ public class Account extends Anchor
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private AccountType accountType;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private LegalEntity owner;
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Currency currency;
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private long balance = 0;
 //	private Accountant accountant = null;
 //	private boolean statistical;
@@ -218,6 +265,10 @@ public class Account extends Anchor
 	/**
 	 * @jdo.field persistence-modifier="persistent" dependent="true" mapped-by="account"
 	 */
+@Persistent(
+	dependent="true",
+	mappedBy="account",
+	persistenceModifier=PersistenceModifier.PERSISTENT)
 	protected AccountName name;
 	
 	public AccountName getName() {
@@ -351,6 +402,7 @@ public class Account extends Anchor
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	protected transient boolean skip_bookAccountMoneyTransfer = false;
 
 	protected void bookSummaryTransfers(User user, MoneyTransfer moneyTransfer, Set<Anchor> involvedAnchors) {
@@ -399,6 +451,11 @@ public class Account extends Anchor
 	 *
 	 * @jdo.join
 	 */
+	@Join
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		table="JFireTrade_Account_summaryAccounts",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	protected Set<SummaryAccount> summaryAccounts;
 
 	public void addSummaryAccount(SummaryAccount summaryAccount) {

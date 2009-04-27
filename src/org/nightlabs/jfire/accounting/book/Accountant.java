@@ -35,6 +35,14 @@ import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.transfer.Anchor;
 import org.nightlabs.jfire.transfer.Transfer;
 
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.PersistenceCapable;
+import org.nightlabs.jfire.accounting.book.id.AccountantID;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+
 /**
  * An Accountant is responsible for splitting money into several accounts and for
  * vetoing if a money transfer cannot be done. One Accountant can be responsible for an
@@ -60,6 +68,12 @@ import org.nightlabs.jfire.transfer.Transfer;
  * @jdo.create-objectid-class
  *		field-order="organisationID, accountantID"
  */
+@PersistenceCapable(
+	objectIdClass=AccountantID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_Accountant")
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public abstract class Accountant implements Serializable
 {
 	private static final long serialVersionUID = 1L;
@@ -67,11 +81,15 @@ public abstract class Accountant implements Serializable
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String accountantID;
 
 	/**

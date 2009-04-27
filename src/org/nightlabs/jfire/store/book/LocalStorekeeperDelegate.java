@@ -42,6 +42,16 @@ import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.OrganisationLegalEntity;
 import org.nightlabs.jfire.transfer.Anchor;
 
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import org.nightlabs.jfire.store.book.id.LocalStorekeeperDelegateID;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.DiscriminatorStrategy;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Discriminator;
+
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  *
@@ -57,6 +67,13 @@ import org.nightlabs.jfire.transfer.Anchor;
  * @jdo.create-objectid-class
  *		field-order="organisationID, localStorekeeperDelegateID"
  */
+@PersistenceCapable(
+	objectIdClass=LocalStorekeeperDelegateID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_LocalStorekeeperDelegate")
+@Discriminator(strategy=DiscriminatorStrategy.CLASS_NAME)
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public abstract class LocalStorekeeperDelegate
 implements Serializable
 {
@@ -65,11 +82,15 @@ implements Serializable
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String localStorekeeperDelegateID;
 
 	/**

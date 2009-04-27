@@ -30,6 +30,18 @@ import java.io.Serializable;
 
 import org.nightlabs.jfire.store.id.ProductTypeID;
 
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.Column;
+import org.nightlabs.jfire.store.id.NestedProductTypeID;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+
 /**
  * This class is a carrier for packaging a {@link org.nightlabs.jfire.store.ProductType}
  * within another. It adds additional information for the <tt>ProductType</tt> within a
@@ -56,6 +68,24 @@ import org.nightlabs.jfire.store.id.ProductTypeID;
  * @!jdo.fetch-group name="FetchGroupsTrade.articleInInvoiceEditor" fetch-groups="default"
  * @!jdo.fetch-group name="FetchGroupsTrade.articleInDeliveryNoteEditor" fetch-groups="default"
  */
+@PersistenceCapable(
+	objectIdClass=NestedProductTypeID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_NestedProductTypeLocal")
+@FetchGroups({
+	@FetchGroup(
+		name=NestedProductTypeLocal.FETCH_GROUP_PACKAGE_PRODUCT_TYPE,
+		members=@Persistent(name="packageProductTypeLocal")),
+	@FetchGroup(
+		name=NestedProductTypeLocal.FETCH_GROUP_INNER_PRODUCT_TYPE,
+		members=@Persistent(name="innerProductTypeLocal")),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name=NestedProductTypeLocal.FETCH_GROUP_THIS_PACKAGED_PRODUCT_TYPE,
+		members={@Persistent(name="packageProductTypeLocal"), @Persistent(name="innerProductTypeLocal")})
+})
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class NestedProductTypeLocal
 implements Serializable
 {
@@ -72,50 +102,64 @@ implements Serializable
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String packageProductTypeOrganisationID = null;
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String packageProductTypeProductTypeID = null;
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String innerProductTypeOrganisationID;
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String innerProductTypeProductTypeID;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private String innerProductTypePrimaryKey;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private ProductTypeLocal packageProductTypeLocal;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private ProductTypeLocal innerProductTypeLocal;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private int quantity = 1;
 
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private transient ProductTypeID packageProductTypeID;
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private transient ProductTypeID innerProductTypeID;
 
 	/**

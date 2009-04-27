@@ -33,11 +33,27 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.Version;
+import javax.jdo.annotations.VersionStrategy;
+
 import org.nightlabs.jfire.jbpm.graph.def.ActionHandlerNodeEnter;
 import org.nightlabs.jfire.jbpm.graph.def.Statable;
 import org.nightlabs.jfire.jbpm.graph.def.StatableLocal;
 import org.nightlabs.jfire.jbpm.graph.def.State;
 import org.nightlabs.jfire.security.User;
+import org.nightlabs.jfire.store.id.DeliveryNoteLocalID;
 import org.nightlabs.util.CollectionUtil;
 
 /**
@@ -70,6 +86,36 @@ import org.nightlabs.util.CollectionUtil;
  * @jdo.fetch-group name="StatableLocal.states" fields="states"
  *
  */
+@PersistenceCapable(
+	objectIdClass=DeliveryNoteLocalID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_DeliveryNoteLocal")
+@Version(strategy=VersionStrategy.VERSION_NUMBER)
+@FetchGroups({
+	@FetchGroup(
+		name="DeliveryNote.deliveryNoteLocal",
+		members=@Persistent(name="deliveryNote")),
+	@FetchGroup(
+		name=DeliveryNoteLocal.FETCH_GROUP_DELIVERY_NOTE,
+		members=@Persistent(name="deliveryNote")),
+	@FetchGroup(
+		name=DeliveryNoteLocal.FETCH_GROUP_BOOK_USER,
+		members=@Persistent(name="bookUser")),
+	@FetchGroup(
+		name=DeliveryNoteLocal.FETCH_GROUP_THIS_DELIVERY_NOTE_LOCAL,
+		members={@Persistent(name="deliveryNote"), @Persistent(name="bookUser"), @Persistent(name="state"), @Persistent(name="states")}),
+	@FetchGroup(
+		name="FetchGroupsTrade.articleContainerInEditor",
+		members={@Persistent(name="deliveryNote"), @Persistent(name="bookUser"), @Persistent(name="state"), @Persistent(name="states")}),
+	@FetchGroup(
+		name="StatableLocal.state",
+		members=@Persistent(name="state")),
+	@FetchGroup(
+		name="StatableLocal.states",
+		members=@Persistent(name="states"))
+})
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class DeliveryNoteLocal
 implements Serializable, StatableLocal
 {
@@ -78,28 +124,35 @@ implements Serializable, StatableLocal
 	public static final String FETCH_GROUP_DELIVERY_NOTE = "DeliveryNoteLocal.deliveryNote";
 	public static final String FETCH_GROUP_BOOK_USER = "DeliveryNoteLocal.bookUser";
 	/**
-	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon! 
+	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon!
 	 */
+	@Deprecated
 	public static final String FETCH_GROUP_THIS_DELIVERY_NOTE_LOCAL = "DeliveryNoteLocal.this";
 
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="50"
 	 */
+	@PrimaryKey
+	@Column(length=50)
 	private String deliveryNoteIDPrefix;
 	/**
 	 * @jdo.field primary-key="true"
 	 */
+	@PrimaryKey
 	private long deliveryNoteID;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private DeliveryNote deliveryNote;
 
 //	/**
@@ -110,6 +163,7 @@ implements Serializable, StatableLocal
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private int deliveredArticleCount = 0;
 
 	/**
@@ -117,18 +171,21 @@ implements Serializable, StatableLocal
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private User bookUser = null;
-	
+
 	/**
 	 * This member stores when this DeliveryNote was booked.
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Date bookDT  = null;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private State state;
 
 	/**
@@ -143,11 +200,17 @@ implements Serializable, StatableLocal
 	 *
 	 * @jdo.join
 	 */
+	@Join
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		table="JFireTrade_DeliveryNoteLocal_states",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private List<State> states;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private boolean processEnded = false;
 
 	@Override
@@ -227,11 +290,17 @@ implements Serializable, StatableLocal
 	 *
 	 * @jdo.join
 	 */
+	@Join
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		table="JFireTrade_DeliveryNoteLocal_deliveryNoteActionHandlers",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Set<DeliveryNoteActionHandler> deliveryNoteActionHandlers;
 
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private transient Set<DeliveryNoteActionHandler> _deliveryNoteActionHandlers = null;
 
 	/**
@@ -286,6 +355,7 @@ implements Serializable, StatableLocal
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private transient List<State> _states = null;
 
 	public List<State> getStates()
@@ -299,6 +369,7 @@ implements Serializable, StatableLocal
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private long jbpmProcessInstanceId = -1;
 
 	public long getJbpmProcessInstanceId()
@@ -317,7 +388,7 @@ implements Serializable, StatableLocal
 	}
 
 	/**
-	 * This method is called by {@link DeliveryNote#bookDeliverProductTransfer(org.nightlabs.jfire.store.deliver.DeliverProductTransfer, Map, boolean)}.
+	 * This method is called by {@link DeliveryNote#bookDeliverProductTransfer(org.nightlabs.jfire.store.deliver.DeliverProductTransfer, java.util.Map, boolean)}.
 	 *
 	 * @return the new value after incrementing it
 	 */
@@ -336,7 +407,7 @@ implements Serializable, StatableLocal
 	}
 
 	/**
-	 * This method is called by {@link DeliveryNote#bookDeliverProductTransfer(org.nightlabs.jfire.store.deliver.DeliverProductTransfer, Map, boolean)}.
+	 * This method is called by {@link DeliveryNote#bookDeliverProductTransfer(org.nightlabs.jfire.store.deliver.DeliverProductTransfer, java.util.Map, boolean)}.
 	 *
 	 * @return the new value after decrementing it
 	 */

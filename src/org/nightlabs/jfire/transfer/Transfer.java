@@ -39,6 +39,20 @@ import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.security.User;
 
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.DiscriminatorStrategy;
+import javax.jdo.annotations.Column;
+import org.nightlabs.jfire.transfer.id.TransferID;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Discriminator;
+
 /**
  * A {@link Transfer} is used to describe the transfer of something (money or products)
  * form one {@link Anchor} to another.
@@ -63,6 +77,30 @@ import org.nightlabs.jfire.security.User;
  * @jdo.fetch-group name="Transfer.initiator" fields="initiator"
  * @jdo.fetch-group name="Transfer.this" fields="container, from, to, initiator"
  */
+@PersistenceCapable(
+	objectIdClass=TransferID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_Transfer")
+@FetchGroups({
+	@FetchGroup(
+		name=Transfer.FETCH_GROUP_CONTAINER,
+		members=@Persistent(name="container")),
+	@FetchGroup(
+		name=Transfer.FETCH_GROUP_FROM,
+		members=@Persistent(name="from")),
+	@FetchGroup(
+		name=Transfer.FETCH_GROUP_TO,
+		members=@Persistent(name="to")),
+	@FetchGroup(
+		name=Transfer.FETCH_GROUP_INITIATOR,
+		members=@Persistent(name="initiator")),
+	@FetchGroup(
+		name=Transfer.FETCH_GROUP_THIS_TRANSFER,
+		members={@Persistent(name="container"), @Persistent(name="from"), @Persistent(name="to"), @Persistent(name="initiator")})
+})
+@Discriminator(strategy=DiscriminatorStrategy.CLASS_NAME)
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public abstract class Transfer
 implements Serializable, DetachCallback
 {
@@ -85,27 +123,34 @@ implements Serializable, DetachCallback
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String transferTypeID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 */
+	@PrimaryKey
 	private long transferID;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Transfer container;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Anchor from;
 
 	/**
@@ -114,11 +159,13 @@ implements Serializable, DetachCallback
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private boolean bookedFrom = false;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Anchor to;
 
 	/**
@@ -127,16 +174,19 @@ implements Serializable, DetachCallback
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private boolean bookedTo = false;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private User initiator;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Date timestamp;
 
 	protected Transfer() { }
@@ -409,11 +459,13 @@ implements Serializable, DetachCallback
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private String description = null;
 	
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private boolean description_detached = false;
 	
 	/**

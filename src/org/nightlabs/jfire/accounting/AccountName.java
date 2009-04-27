@@ -31,6 +31,20 @@ import java.util.Map;
 
 import org.nightlabs.i18n.I18nText;
 
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.NullValue;
+import org.nightlabs.jfire.accounting.id.AccountNameID;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+
 /**
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  * 
@@ -47,6 +61,17 @@ import org.nightlabs.i18n.I18nText;
  *
  * @jdo.fetch-group name="Account.name" fields="account, names"
  */
+@PersistenceCapable(
+	objectIdClass=AccountNameID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_AccountName")
+@FetchGroups(
+	@FetchGroup(
+		name="Account.name",
+		members={@Persistent(name="account"), @Persistent(name="names")})
+)
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class AccountName extends I18nText
 {
 	private static final long serialVersionUID = 1L;
@@ -55,21 +80,28 @@ public class AccountName extends I18nText
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String anchorTypeID;
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String anchorID;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Account account;
 	
 	
@@ -103,6 +135,12 @@ public class AccountName extends I18nText
 	 *
 	 * @jdo.join
 	 */
+	@Join
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		table="JFireTrade_AccountName_names",
+		defaultFetchGroup="true",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	protected Map<String, String> names;
 
 	@Override

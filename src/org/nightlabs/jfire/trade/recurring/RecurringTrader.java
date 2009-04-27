@@ -55,6 +55,14 @@ import org.nightlabs.jfire.trade.jbpm.ProcessDefinitionAssignment;
 import org.nightlabs.jfire.trade.jbpm.id.ProcessDefinitionAssignmentID;
 import org.nightlabs.jfire.trade.recurring.jbpm.JbpmConstantsRecurringOffer;
 
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import org.nightlabs.jfire.trade.recurring.id.RecurringTraderID;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+
 
 /**
  * RecurringTrader is responsible for the purchase and the sale of the {@link RecurringOrder}  {@link RecurringOffer} , {@link RecurredOffer}
@@ -74,6 +82,12 @@ import org.nightlabs.jfire.trade.recurring.jbpm.JbpmConstantsRecurringOffer;
  *
  * @jdo.inheritance strategy="new-table"
  */
+@PersistenceCapable(
+	objectIdClass=RecurringTraderID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_RecurringTrader")
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class RecurringTrader {
 
 	private static final Logger logger = Logger.getLogger(RecurringTrader.class);
@@ -82,6 +96,8 @@ public class RecurringTrader {
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 
 

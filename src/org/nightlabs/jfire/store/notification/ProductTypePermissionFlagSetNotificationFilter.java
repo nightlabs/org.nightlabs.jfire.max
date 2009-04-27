@@ -11,6 +11,11 @@ import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.ProductTypePermissionFlagSet;
 import org.nightlabs.jfire.store.id.ProductTypePermissionFlagSetID;
 
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.IdentityType;
+
 /**
  * @author Marco Schulze - Marco at NightLabs dot de
  *
@@ -21,6 +26,11 @@ import org.nightlabs.jfire.store.id.ProductTypePermissionFlagSetID;
  *
  * @jdo.inheritance strategy="superclass-table"
  */
+@PersistenceCapable(
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_ProductTypePermissionFlagSetNotificationFilter")
+@Inheritance(strategy=InheritanceStrategy.SUPERCLASS_TABLE)
 public class ProductTypePermissionFlagSetNotificationFilter
 extends NotificationFilter
 {

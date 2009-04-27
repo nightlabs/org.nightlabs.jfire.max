@@ -64,6 +64,20 @@ import org.nightlabs.jfire.trade.id.OrderID;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 import org.nightlabs.util.Util;
 
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.Version;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.VersionStrategy;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Queries;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+
 /**
  * An instance of <tt>Article</tt> occurs in the context of a {@link Segment}. It represents a
  * {@link Product} or a {@link ProductType} within an {@link Order}, an {@link Offer},
@@ -136,6 +150,95 @@ import org.nightlabs.util.Util;
  *		name="getArticlesByProduct"
  *		query="SELECT WHERE this.product == :product"
  */
+@PersistenceCapable(
+	objectIdClass=ArticleID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_Article")
+@Version(strategy=VersionStrategy.VERSION_NUMBER)
+@FetchGroups({
+	@FetchGroup(
+		name=Article.FETCH_GROUP_ARTICLE_LOCAL,
+		members=@Persistent(name="articleLocal")),
+	@FetchGroup(
+		name=Article.FETCH_GROUP_SEGMENT,
+		members=@Persistent(name="segment")),
+	@FetchGroup(
+		name=Article.FETCH_GROUP_CURRENCY,
+		members=@Persistent(name="currency")),
+	@FetchGroup(
+		name=Article.FETCH_GROUP_PRODUCT_TYPE,
+		members=@Persistent(name="productType")),
+	@FetchGroup(
+		name=Article.FETCH_GROUP_PRODUCT,
+		members=@Persistent(name="product")),
+	@FetchGroup(
+		name=Article.FETCH_GROUP_TARIFF,
+		members=@Persistent(name="tariff")),
+	@FetchGroup(
+		name=Article.FETCH_GROUP_PRICE,
+		members=@Persistent(name="price")),
+	@FetchGroup(
+		name=Article.FETCH_GROUP_REVERSED_ARTICLE,
+		members=@Persistent(name="reversedArticle")),
+	@FetchGroup(
+		name=Article.FETCH_GROUP_REVERSING_ARTICLE,
+		members=@Persistent(name="reversingArticle")),
+	@FetchGroup(
+		name=Article.FETCH_GROUP_ORDER,
+		members=@Persistent(name="order")),
+	@FetchGroup(
+		name=Article.FETCH_GROUP_OFFER,
+		members=@Persistent(name="offer")),
+	@FetchGroup(
+		name=Article.FETCH_GROUP_INVOICE,
+		members=@Persistent(name="invoice")),
+	@FetchGroup(
+		name=Article.FETCH_GROUP_DELIVERY_NOTE,
+		members=@Persistent(name="deliveryNote")),
+	@FetchGroup(
+		name=Article.FETCH_GROUP_RECEPTION_NOTE,
+		members=@Persistent(name="receptionNote")),
+	@FetchGroup(
+		name="Order.articles",
+		members=@Persistent(name="order")),
+	@FetchGroup(
+		name="Offer.articles",
+		members=@Persistent(name="offer")),
+	@FetchGroup(
+		name="Invoice.articles",
+		members=@Persistent(name="invoice")),
+	@FetchGroup(
+		name="DeliveryNote.articles",
+		members=@Persistent(name="deliveryNote")),
+	@FetchGroup(
+		name="ReceptionNote.articles",
+		members=@Persistent(name="receptionNote")),
+	@FetchGroup(
+		name="FetchGroupsTrade.articleInOrderEditor",
+		members={@Persistent(name="articleLocal"), @Persistent(name="segment"), @Persistent(name="productType"), @Persistent(name="product"), @Persistent(name="tariff"), @Persistent(name="price")}),
+	@FetchGroup(
+		name="FetchGroupsTrade.articleInOfferEditor",
+		members={@Persistent(name="articleLocal"), @Persistent(name="segment"), @Persistent(name="productType"), @Persistent(name="product"), @Persistent(name="tariff"), @Persistent(name="price")}),
+	@FetchGroup(
+		name="FetchGroupsTrade.articleInInvoiceEditor",
+		members={@Persistent(name="articleLocal"), @Persistent(name="segment"), @Persistent(name="productType"), @Persistent(name="product"), @Persistent(name="tariff"), @Persistent(name="price")}),
+	@FetchGroup(
+		name="FetchGroupsTrade.articleInDeliveryNoteEditor",
+		members={@Persistent(name="articleLocal"), @Persistent(name="segment"), @Persistent(name="productType"), @Persistent(name="product"), @Persistent(name="tariff"), @Persistent(name="price")}),
+	@FetchGroup(
+		name="FetchGroupsTrade.articleCrossTradeReplication",
+		members={@Persistent(name="order"), @Persistent(name="offer"), @Persistent(name="invoice"), @Persistent(name="deliveryNote"), @Persistent(name="receptionNote"), @Persistent(name="price"), @Persistent(name="currency"), @Persistent(name="tariff"), @Persistent(name="reversedArticle"), @Persistent(name="reversingArticle"), @Persistent(name="segment"), @Persistent(name="productType"), @Persistent(name="product"), @Persistent(name="createUser")})
+})
+@Queries({
+	@javax.jdo.annotations.Query(
+		name="getAllocatedArticleByOfferAndProduct",
+		value="SELECT UNIQUE WHERE this.offer == :offer && this.product == :product && this.allocated"),
+	@javax.jdo.annotations.Query(
+		name="getArticlesByProduct",
+		value="SELECT WHERE this.product == :product")
+})
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class Article
 implements Serializable, DeleteCallback, DetachCallback, StoreCallback
 {
@@ -257,11 +360,14 @@ implements Serializable, DeleteCallback, DetachCallback, StoreCallback
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 */
+	@PrimaryKey
 	private long articleID;
 
 	public static long createArticleID()
@@ -272,26 +378,33 @@ implements Serializable, DeleteCallback, DetachCallback, StoreCallback
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private String primaryKey;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" mapped-by="article"
 	 */
+	@Persistent(
+		mappedBy="article",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private ArticleLocal articleLocal;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Segment segment;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Order order;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Offer offer;
 
 	/**
@@ -299,6 +412,7 @@ implements Serializable, DeleteCallback, DetachCallback, StoreCallback
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Invoice invoice = null;
 
 	/**
@@ -309,21 +423,25 @@ implements Serializable, DeleteCallback, DetachCallback, StoreCallback
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private DeliveryNote deliveryNote = null;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private ReceptionNote receptionNote = null;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private ProductType productType;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Product product = null;
 
 	/**
@@ -331,6 +449,7 @@ implements Serializable, DeleteCallback, DetachCallback, StoreCallback
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Date createDT;
 
 	/**
@@ -338,48 +457,59 @@ implements Serializable, DeleteCallback, DetachCallback, StoreCallback
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private User createUser = null;
 
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private OrderID orderID = null;
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private boolean orderID_detached = false;
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private OfferID offerID = null;
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private boolean offerID_detached = false;
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private InvoiceID invoiceID = null;
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private boolean invoiceID_detached = false;
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private DeliveryNoteID deliveryNoteID = null;
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private boolean deliveryNoteID_detached = false;
 
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private ReceptionNoteID receptionNoteID = null;
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private boolean receptionNoteID_detached = false;
 
 	public OrderID getOrderID()
@@ -437,19 +567,23 @@ implements Serializable, DeleteCallback, DetachCallback, StoreCallback
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private AnchorID vendorID = null;
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private boolean vendorID_detached = false;
 
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private AnchorID customerID = null;
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private boolean customerID_detached = false;
 
 	/**
@@ -479,11 +613,15 @@ implements Serializable, DeleteCallback, DetachCallback, StoreCallback
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Currency currency;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" dependent="true"
 	 */
+	@Persistent(
+		dependent="true",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private ArticlePrice price = null;
 
 	/**
@@ -491,11 +629,13 @@ implements Serializable, DeleteCallback, DetachCallback, StoreCallback
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private boolean priceDependentOnOffer;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Tariff tariff = null;
 
 	/**
@@ -504,6 +644,7 @@ implements Serializable, DeleteCallback, DetachCallback, StoreCallback
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private boolean reversed = false;
 
 	/**
@@ -512,6 +653,7 @@ implements Serializable, DeleteCallback, DetachCallback, StoreCallback
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private boolean reversing = false;
 
 	/**
@@ -519,6 +661,7 @@ implements Serializable, DeleteCallback, DetachCallback, StoreCallback
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private boolean isReversingAborted = false;
 
 	/**
@@ -530,6 +673,7 @@ implements Serializable, DeleteCallback, DetachCallback, StoreCallback
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Article reversedArticle = null;
 
 	/**
@@ -541,24 +685,29 @@ implements Serializable, DeleteCallback, DetachCallback, StoreCallback
 	 * @jdo.field persistence-modifier="persistent"
 	 * @! mapped-by="reversedArticle"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Article reversingArticle = null;
 
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private ArticleID reversedArticleID = null;
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private boolean reversedArticleID_detached = false;
 
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private ArticleID reversingArticleID = null;
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private boolean reversingArticleID_detached = false;
 
 //	/**
@@ -569,16 +718,19 @@ implements Serializable, DeleteCallback, DetachCallback, StoreCallback
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private boolean allocationPending = false;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private boolean releasePending = false;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private boolean allocated = false;
 
 	/**
@@ -587,6 +739,8 @@ implements Serializable, DeleteCallback, DetachCallback, StoreCallback
 	 * @jdo.field persistence-modifier="persistent"
 	 * @jdo.column length="255"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+	@Column(length=255)
 	private String allocationExceptionClass = null;
 
 	/**
@@ -595,6 +749,10 @@ implements Serializable, DeleteCallback, DetachCallback, StoreCallback
 	 * @jdo.field persistence-modifier="persistent" default-fetch-group="false"
 	 * @jdo.column sql-type="CLOB"
 	 */
+	@Persistent(
+		defaultFetchGroup="false",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
+	@Column(sqlType="CLOB")
 	private String allocationExceptionMessage = null;
 
 	/**
@@ -604,11 +762,16 @@ implements Serializable, DeleteCallback, DetachCallback, StoreCallback
 	 * @jdo.field persistence-modifier="persistent" default-fetch-group="false"
 	 * @jdo.column sql-type="CLOB"
 	 */
+	@Persistent(
+		defaultFetchGroup="false",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
+	@Column(sqlType="CLOB")
 	private String allocationExceptionStackTrace = null;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private boolean allocationAbandoned = false;
 
 	/**
@@ -617,6 +780,8 @@ implements Serializable, DeleteCallback, DetachCallback, StoreCallback
 	 * @jdo.field persistence-modifier="persistent"
 	 * @jdo.column length="255"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+	@Column(length=255)
 	private String releaseExceptionClass = null;
 
 	/**
@@ -625,6 +790,10 @@ implements Serializable, DeleteCallback, DetachCallback, StoreCallback
 	 * @jdo.field persistence-modifier="persistent" default-fetch-group="false"
 	 * @jdo.column sql-type="CLOB"
 	 */
+	@Persistent(
+		defaultFetchGroup="false",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
+	@Column(sqlType="CLOB")
 	private String releaseExceptionMessage = null;
 
 	/**
@@ -634,11 +803,16 @@ implements Serializable, DeleteCallback, DetachCallback, StoreCallback
 	 * @jdo.field persistence-modifier="persistent" default-fetch-group="false"
 	 * @jdo.column sql-type="CLOB"
 	 */
+	@Persistent(
+		defaultFetchGroup="false",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
+	@Column(sqlType="CLOB")
 	private String releaseExceptionStackTrace = null;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private boolean releaseAbandoned = false;
 
 	/**

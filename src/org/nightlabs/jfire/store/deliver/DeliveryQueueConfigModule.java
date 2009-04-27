@@ -8,6 +8,17 @@ import java.util.Set;
 
 import org.nightlabs.jfire.config.ConfigModule;
 
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+
 /**
  * @author Tobias Langner <!-- tobias[dot]langner[at]nightlabs[dot]de -->
  *
@@ -22,6 +33,20 @@ import org.nightlabs.jfire.config.ConfigModule;
  * 
  * @jdo.inheritance strategy="new-table"
  */
+@PersistenceCapable(
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_DeliveryQueueConfigModule")
+@FetchGroups({
+	@FetchGroup(
+		name=DeliveryQueueConfigModule.FETCH_GROUP_VISIBLE_DELIVERY_QUEUES,
+		members=@Persistent(name="visibleDeliveryQueues")),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name="DeliveryQueueConfigModule.this",
+		members=@Persistent(name="visibleDeliveryQueues"))
+})
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class DeliveryQueueConfigModule extends ConfigModule {
 
 	private static final long serialVersionUID = 1L;
@@ -42,6 +67,12 @@ public class DeliveryQueueConfigModule extends ConfigModule {
 	 * 
 	 * @jdo.join
 	 */
+	@Join
+	@Persistent(
+		dependentElement="false",
+		nullValue=NullValue.EXCEPTION,
+		table="JFireTrade_DeliveryQueueConfigModule_visibleDeliveryQueues",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Set<DeliveryQueue> visibleDeliveryQueues;
 	
 	@Override

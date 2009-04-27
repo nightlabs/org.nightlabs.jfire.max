@@ -4,12 +4,21 @@ import org.nightlabs.jfire.accounting.Tariff;
 import org.nightlabs.jfire.entityuserset.IEntityUserSet;
 import org.nightlabs.jfire.entityuserset.ResellerEntityUserSetFactory;
 
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+
 /**
  * @author marco schulze - marco at nightlabs dot de
  *
  * @jdo.persistence-capable identity-type="application" detachable="true"
  * @jdo.inheritance strategy="superclass-table"
  */
+@PersistenceCapable(
+	identityType=IdentityType.APPLICATION,
+	detachable="true")
+@Inheritance(strategy=InheritanceStrategy.SUPERCLASS_TABLE)
 public class ResellerTariffUserSetFactory extends ResellerEntityUserSetFactory<Tariff>
 {
 	/**

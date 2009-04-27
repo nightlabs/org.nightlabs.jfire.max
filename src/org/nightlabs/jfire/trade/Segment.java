@@ -42,6 +42,18 @@ import org.nightlabs.jfire.trade.id.SegmentID;
 import org.nightlabs.jfire.trade.id.SegmentTypeID;
 import org.nightlabs.util.Util;
 
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Queries;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+
 /**
  * One {@link Order}, {@link Offer}, {@link Invoice} or {@link DeliveryNote} may contain
  * many <tt>Segment</tt>s. Each <tt>Segment</tt> knows its {@link SegmentType}. This layer
@@ -74,6 +86,38 @@ import org.nightlabs.util.Util;
  * @jdo.query name="getSegmentTypeIDsOfOrder" query="SELECT JDOHelper.getObjectId(this.segmentType) WHERE this.order == :order"
  * @jdo.query name="getSegmentIDsOfOrderAndSegmentType" query="SELECT JDOHelper.getObjectId(this) WHERE this.order == :order && this.segmentType == :segmentType"
  */
+@PersistenceCapable(
+	objectIdClass=SegmentID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_Segment")
+@FetchGroups({
+	@FetchGroup(
+		name=Segment.FETCH_GROUP_ORDER,
+		members=@Persistent(name="order")),
+	@FetchGroup(
+		name=Segment.FETCH_GROUP_SEGMENT_TYPE,
+		members=@Persistent(name="segmentType")),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name=Segment.FETCH_GROUP_THIS_SEGMENT,
+		members={@Persistent(name="order"), @Persistent(name="segmentType")}),
+	@FetchGroup(
+		name="FetchGroupsTrade.articleInInvoiceEditor",
+		members=@Persistent(name="segmentType")),
+	@FetchGroup(
+		name="FetchGroupsTrade.articleInDeliveryNoteEditor",
+		members=@Persistent(name="segmentType"))
+})
+@Queries({
+	@javax.jdo.annotations.Query(
+		name="getSegmentTypeIDsOfOrder",
+		value="SELECT JDOHelper.getObjectId(this.segmentType) WHERE this.order == :order"),
+	@javax.jdo.annotations.Query(
+		name="getSegmentIDsOfOrderAndSegmentType",
+		value="SELECT JDOHelper.getObjectId(this) WHERE this.order == :order && this.segmentType == :segmentType")
+})
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class Segment implements Serializable
 {
 	private static final long serialVersionUID = 1L;
@@ -101,11 +145,14 @@ public class Segment implements Serializable
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 */
+	@PrimaryKey
 	private long segmentID;
 
 	public static long createSegmentID()
@@ -116,16 +163,19 @@ public class Segment implements Serializable
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private String primaryKey;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private SegmentType segmentType;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Order order;
 
 	protected Segment()

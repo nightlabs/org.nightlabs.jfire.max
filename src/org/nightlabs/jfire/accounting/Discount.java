@@ -28,6 +28,16 @@ package org.nightlabs.jfire.accounting;
 
 import java.util.Date;
 
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.Column;
+import org.nightlabs.jfire.accounting.id.DiscountID;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+
 /**
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  *
@@ -42,6 +52,12 @@ import java.util.Date;
  * @jdo.create-objectid-class
  *		field-order="organisationID, discountID"
  */
+@PersistenceCapable(
+	objectIdClass=DiscountID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_Discount")
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public abstract class Discount {
 
 	/**
@@ -68,20 +84,25 @@ public abstract class Discount {
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 	/**
 	 * @jdo.field primary-key="true"
 	 */
+	@PrimaryKey
 	private long discountID;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Invoice invoice;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private boolean booked;
 	
 	/**

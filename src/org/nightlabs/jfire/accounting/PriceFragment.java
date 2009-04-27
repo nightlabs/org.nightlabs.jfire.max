@@ -28,6 +28,18 @@ package org.nightlabs.jfire.accounting;
 
 import java.io.Serializable;
 
+import org.nightlabs.jfire.accounting.id.PriceFragmentID;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+
 
 /**
  * PriceFragments are optional, that means the sum of all priceFragments is usually
@@ -61,6 +73,33 @@ import java.io.Serializable;
  *
  * @jdo.fetch-group name="FetchGroupsPriceConfig.edit" fetch-groups="default" fields="price, currency, priceFragmentType"
  */
+@PersistenceCapable(
+	objectIdClass=PriceFragmentID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_PriceFragment")
+@FetchGroups({
+	@FetchGroup(
+		name=PriceFragment.FETCH_GROUP_PRICE,
+		members=@Persistent(name="price")),
+	@FetchGroup(
+		name=PriceFragment.FETCH_GROUP_CURRENCY,
+		members=@Persistent(name="currency")),
+	@FetchGroup(
+		name=PriceFragment.FETCH_GROUP_PRICE_FRAGMENT_TYPE,
+		members=@Persistent(name="priceFragmentType")),
+	@FetchGroup(
+		name="Price.fragments",
+		members=@Persistent(name="price")),
+	@FetchGroup(
+		name="FetchGroupsTrade.articleCrossTradeReplication",
+		members={@Persistent(name="price"), @Persistent(name="priceFragmentType"), @Persistent(name="currency")}),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name="FetchGroupsPriceConfig.edit",
+		members={@Persistent(name="price"), @Persistent(name="currency"), @Persistent(name="priceFragmentType")})
+})
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class PriceFragment
 	implements Serializable
 {
@@ -79,6 +118,8 @@ public class PriceFragment
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+@PrimaryKey
+@Column(length=100)
 	private String organisationID;
 
 //	/**
@@ -90,6 +131,7 @@ public class PriceFragment
 	/**
 	 * @jdo.field primary-key="true"
 	 */
+@PrimaryKey
 	private long priceID;
 
 //	/**
@@ -108,31 +150,38 @@ public class PriceFragment
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="201"
 	 */
+@PrimaryKey
+@Column(length=201)
 	private String priceFragmentTypePK;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private PriceFragmentType priceFragmentType;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Price price;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Currency currency;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private long amount = 0;
 
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private boolean virtual = false;
 
 	protected PriceFragment() { }

@@ -1,9 +1,12 @@
 package org.nightlabs.jfire.store;
 
+import javax.ejb.Local;
+
 import org.nightlabs.jfire.store.deliver.DeliveryData;
 import org.nightlabs.jfire.store.deliver.DeliveryResult;
 import org.nightlabs.jfire.store.deliver.id.DeliveryID;
 
+@Local
 public interface StoreManagerLocal {
 
 	/**

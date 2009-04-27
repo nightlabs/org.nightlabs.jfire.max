@@ -12,6 +12,16 @@ import org.nightlabs.jfire.accounting.pay.ServerPaymentProcessor;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.util.Util;
 
+import org.nightlabs.jfire.accounting.id.InvoiceActionHandlerID;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.DiscriminatorStrategy;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Discriminator;
+
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  *
@@ -26,6 +36,13 @@ import org.nightlabs.util.Util;
  *
  * @jdo.create-objectid-class field-order="organisationID, invoiceActionHandlerID"
  */
+@PersistenceCapable(
+	objectIdClass=InvoiceActionHandlerID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_InvoiceActionHandler")
+@Discriminator(strategy=DiscriminatorStrategy.CLASS_NAME)
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class InvoiceActionHandler
 implements Serializable
 {
@@ -33,11 +50,15 @@ implements Serializable
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String invoiceActionHandlerID; // TODO: Tobias: Why is this field a string? Shouldn't it rather be a long so that it can be generated using the IDGenerator?
 
 	/**

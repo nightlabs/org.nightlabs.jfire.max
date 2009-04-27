@@ -44,6 +44,16 @@ import org.nightlabs.jfire.store.id.ProductReferenceID;
 import org.nightlabs.jfire.transfer.Anchor;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Queries;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+
 /**
  * This class makes asynchronous deliveries possible. Instead of waiting until all the necessary products have
  * been delivered to an organisation, before this one can deliver it further, a
@@ -95,12 +105,33 @@ import org.nightlabs.jfire.transfer.id.AnchorID;
  *		PARAMETERS ProductReferenceGroup pProductReferenceGroup
  *		import org.nightlabs.jfire.store.ProductReferenceGroup"
  */
+@PersistenceCapable(
+	objectIdClass=ProductReferenceID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_ProductReference")
+@Queries({
+	@javax.jdo.annotations.Query(
+		name="getProductReferencesForAnchor",
+		value="SELECT WHERE anchor == pAnchor PARAMETERS Anchor pAnchor import org.nightlabs.jfire.transfer.Anchor"),
+	@javax.jdo.annotations.Query(
+		name="getProductReferencesForProduct",
+		value="SELECT WHERE product == pProduct PARAMETERS Product pProduct import org.nightlabs.jfire.store.Product"),
+	@javax.jdo.annotations.Query(
+		name="getProductReferencesForProductAndQuantity",
+		value="SELECT WHERE product == pProduct && quantity == pQuantity PARAMETERS Product pProduct, int pQuantity import org.nightlabs.jfire.store.Product"),
+	@javax.jdo.annotations.Query(
+		name="getProductReferenceCountForProductReferenceGroup",
+		value="SELECT count(productProductID) WHERE productReferenceGroup == pProductReferenceGroup PARAMETERS ProductReferenceGroup pProductReferenceGroup import org.nightlabs.jfire.store.ProductReferenceGroup")
+})
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class ProductReference
 implements Serializable, DeleteCallback
 {
 	private static final long serialVersionUID = 1L;
 
 	/** @jdo.field persistence-modifier="none" */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private final Logger logger = Logger.getLogger(ProductReference.class);
 
 	/**
@@ -195,39 +226,50 @@ implements Serializable, DeleteCallback
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String anchorOrganisationID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String anchorAnchorTypeID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String anchorAnchorID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String productOrganisationID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 */
+	@PrimaryKey
 	private long productProductID;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Anchor anchor;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Product product;
 
 	/**
@@ -235,16 +277,19 @@ implements Serializable, DeleteCallback
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private ProductReferenceGroup productReferenceGroup = null;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Date createDT;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private int quantity = 0;
 
 	/**

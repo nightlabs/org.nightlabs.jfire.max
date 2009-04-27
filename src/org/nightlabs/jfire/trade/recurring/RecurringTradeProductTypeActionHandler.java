@@ -15,6 +15,21 @@ import org.nightlabs.jfire.store.ProductTypeActionHandlerNotFoundException;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.Segment;
 
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Discriminator;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Queries;
+import javax.jdo.annotations.Element;
+import org.nightlabs.jfire.trade.recurring.id.RecurringTradeProductTypeActionHandlerID;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.DiscriminatorStrategy;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+
 /**
  * {@link RecurringTradeProductTypeActionHandler}s are used by the {@link RecurringTrader}
  * to create {@link Article}s for {@link RecurredOffer}s on the basis of Articles in a {@link RecurringOffer}.
@@ -43,12 +58,26 @@ import org.nightlabs.jfire.trade.Segment;
  *		import java.lang.String"
  *
  */
+@PersistenceCapable(
+	objectIdClass=RecurringTradeProductTypeActionHandlerID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_RecurringTradeProductTypeActionHandler")
+@Discriminator(strategy=DiscriminatorStrategy.CLASS_NAME)
+@Queries(
+	@javax.jdo.annotations.Query(
+		name="getRecurringTradeProductTypeActionHandlerByProductTypeClassName",
+		value=" SELECT UNIQUE WHERE this.productTypeClassName == :productTypeClassName import java.lang.String")
+)
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public abstract class RecurringTradeProductTypeActionHandler {
 
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 
 
@@ -56,11 +85,17 @@ public abstract class RecurringTradeProductTypeActionHandler {
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String recurringTradeProductTypeActionHandlerID;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" unique="true" null-value="exception"
 	 */
+	@Element(unique="true")
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private String productTypeClassName;
 
 

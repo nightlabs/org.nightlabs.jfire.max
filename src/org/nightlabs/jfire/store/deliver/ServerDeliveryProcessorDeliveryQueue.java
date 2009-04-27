@@ -15,6 +15,13 @@ import org.nightlabs.jfire.store.resource.Messages;
 import org.nightlabs.jfire.transfer.Anchor;
 import org.nightlabs.jfire.transfer.RequirementCheckResult;
 
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+
 /**
  * This implementation of {@link org.nightlabs.jfire.store.deliver.ServerDeliveryProcessor}
  * represents delivery to a delivery queue. These deliveries can be then processed later.
@@ -30,6 +37,11 @@ import org.nightlabs.jfire.transfer.RequirementCheckResult;
  *
  * @jdo.inheritance strategy="superclass-table"
  */
+@PersistenceCapable(
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_ServerDeliveryProcessorDeliveryQueue")
+@Inheritance(strategy=InheritanceStrategy.SUPERCLASS_TABLE)
 public class ServerDeliveryProcessorDeliveryQueue
 extends ServerDeliveryProcessor
 {
@@ -40,6 +52,7 @@ extends ServerDeliveryProcessor
 	private static final long serialVersionUID = 1L;
 
 	/** @jdo.field persistence-modifier="none" */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private DeliveryQueueConfigModule deliveryQueueConfigModule;
 
 	public static ServerDeliveryProcessorDeliveryQueue getServerDeliveryProcessorDeliveryQueue(PersistenceManager pm) {

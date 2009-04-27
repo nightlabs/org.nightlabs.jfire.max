@@ -53,6 +53,23 @@ import org.nightlabs.jfire.transfer.RequirementCheckResult;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 import org.nightlabs.util.Util;
 
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Discriminator;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Queries;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.DiscriminatorStrategy;
+import javax.jdo.annotations.Column;
+import org.nightlabs.jfire.accounting.pay.id.ServerPaymentProcessorID;
+import javax.jdo.annotations.IdentityType;
+
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  * 
@@ -127,6 +144,32 @@ import org.nightlabs.util.Util;
  *            	import java.lang.String;
  *            	import org.nightlabs.jfire.accounting.pay.ModeOfPaymentFlavour"
  */
+@PersistenceCapable(
+	objectIdClass=ServerPaymentProcessorID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_ServerPaymentProcessor")
+@FetchGroups({
+	@FetchGroup(
+		name=ServerPaymentProcessor.FETCH_GROUP_NAME,
+		members=@Persistent(name="name")),
+	@FetchGroup(
+		name=ServerPaymentProcessor.FETCH_GROUP_MODE_OF_PAYMENTS,
+		members=@Persistent(name="modeOfPayments")),
+	@FetchGroup(
+		name=ServerPaymentProcessor.FETCH_GROUP_MODE_OF_PAYMENT_FLAVOURS,
+		members=@Persistent(name="modeOfPaymentFlavours"))
+})
+@Discriminator(strategy=DiscriminatorStrategy.CLASS_NAME)
+@Queries({
+	@javax.jdo.annotations.Query(
+		name="getServerPaymentProcessorsForOneModeOfPaymentFlavour_WORKAROUND1",
+		value="SELECT WHERE modeOfPaymentFlavour.organisationID == paramOrganisationID && modeOfPaymentFlavour.modeOfPaymentFlavourID == paramModeOfPaymentFlavourID && this.modeOfPaymentFlavours.containsValue(modeOfPaymentFlavour) VARIABLES ModeOfPaymentFlavour modeOfPaymentFlavour PARAMETERS String paramOrganisationID, String paramModeOfPaymentFlavourID import java.lang.String; import org.nightlabs.jfire.accounting.pay.ModeOfPaymentFlavour"),
+	@javax.jdo.annotations.Query(
+		name="getServerPaymentProcessorsForOneModeOfPaymentFlavour_WORKAROUND2",
+		value="SELECT WHERE modeOfPaymentFlavour.organisationID == paramOrganisationID && modeOfPaymentFlavour.modeOfPaymentFlavourID == paramModeOfPaymentFlavourID && this.modeOfPayments.containsValue(modeOfPaymentFlavour.modeOfPayment) VARIABLES ModeOfPaymentFlavour modeOfPaymentFlavour PARAMETERS String paramOrganisationID, String paramModeOfPaymentFlavourID import java.lang.String; import org.nightlabs.jfire.accounting.pay.ModeOfPaymentFlavour")
+})
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public abstract class ServerPaymentProcessor
 implements Serializable, DetachCallback
 {
@@ -209,22 +252,31 @@ implements Serializable, DetachCallback
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String serverPaymentProcessorID;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private String primaryKey;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" dependent="true" mapped-by="serverPaymentProcessor"
 	 */
+	@Persistent(
+		dependent="true",
+		mappedBy="serverPaymentProcessor",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private ServerPaymentProcessorName name;
 
 	/**
@@ -246,6 +298,11 @@ implements Serializable, DetachCallback
 	 *
 	 * @jdo.join
 	 */
+	@Join
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		table="JFireTrade_ServerPaymentProcessor_modeOfPayments",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Map<String, ModeOfPayment> modeOfPayments;
 
 	/**
@@ -267,6 +324,11 @@ implements Serializable, DetachCallback
 	 *
 	 * @jdo.join
 	 */
+	@Join
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		table="JFireTrade_ServerPaymentProcessor_modeOfPaymentFlavours",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Map<String, ModeOfPaymentFlavour> modeOfPaymentFlavours;
 
 	/**
@@ -752,6 +814,7 @@ public PayMoneyTransfer payBegin(PayParams payParams)
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private RequirementCheckResult requirementCheckResult;
 	
 	/**

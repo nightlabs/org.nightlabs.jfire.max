@@ -7,6 +7,13 @@ import javax.jdo.listener.StoreCallback;
 
 import org.nightlabs.jfire.store.deliver.id.DeliveryQueueID;
 
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+
 /**
  * @author Tobias Langner (tobias[dot]langner[at]nightlabs[dot]de)
  *
@@ -18,17 +25,24 @@ import org.nightlabs.jfire.store.deliver.id.DeliveryQueueID;
  *
  * @jdo.inheritance strategy="new-table"
  */
+@PersistenceCapable(
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_DeliveryDataDeliveryQueue")
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class DeliveryDataDeliveryQueue extends DeliveryData implements StoreCallback, AttachCallback {
 	private static final long serialVersionUID = 1L;
 
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private DeliveryQueueID targetQueueID;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private DeliveryQueue targetQueue;
 
 	public DeliveryDataDeliveryQueue(Delivery delivery) {

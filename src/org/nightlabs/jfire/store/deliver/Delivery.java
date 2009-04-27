@@ -59,6 +59,20 @@ import org.nightlabs.jfire.transfer.Transfer;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 import org.nightlabs.util.Util;
 
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Queries;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  *
@@ -82,6 +96,23 @@ import org.nightlabs.util.Util;
  *
  * @jdo.fetch-group name="DeliveryTableData" fetch-groups="default" fields="user, endDT, partner, articles, articleIDs, deliveryNotes"
  */
+@PersistenceCapable(
+	objectIdClass=DeliveryID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_Delivery")
+@FetchGroups(
+	@FetchGroup(
+		fetchGroups={"default"},
+		name=Delivery.FETCH_GROUP_DELIVERY_TABLE_DATA,
+		members={@Persistent(name="user"), @Persistent(name="endDT"), @Persistent(name="partner"), @Persistent(name="articles"), @Persistent(name="articleIDs"), @Persistent(name="deliveryNotes")})
+)
+@Queries(
+	@javax.jdo.annotations.Query(
+		name="getDeliveriesForDeliveryNote",
+		value="SELECT WHERE this.deliveryNotes.contains(:deliveryNote)")
+)
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class Delivery
 implements Serializable, StoreCallback, DetachCallback
 {
@@ -108,10 +139,13 @@ implements Serializable, StoreCallback, DetachCallback
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 	/**
 	 * @jdo.field primary-key="true"
 	 */
+	@PrimaryKey
 	private long deliveryID;
 
 	/**
@@ -129,6 +163,11 @@ implements Serializable, StoreCallback, DetachCallback
 	 *
 	 * @jdo.join
 	 */
+	@Join
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		table="JFireTrade_Delivery_precursorDeliveries",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Set<Delivery> precursorSet = null;
 
 	/**
@@ -136,6 +175,7 @@ implements Serializable, StoreCallback, DetachCallback
 	 *
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private Set<DeliveryID> precursorIDSet = null;
 
 //	Tobias: Since a delivery may have several follow up deliveries, this field is removed. Relations between
@@ -157,21 +197,27 @@ implements Serializable, StoreCallback, DetachCallback
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private User user = null;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" mapped-by="delivery"
 	 */
+	@Persistent(
+		mappedBy="delivery",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private DeliveryLocal deliveryLocal = null;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private String clientDeliveryProcessorFactoryID;
 
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private transient ServerDeliveryProcessorID serverDeliveryProcessorID = null;
 
 	/**
@@ -195,46 +241,67 @@ implements Serializable, StoreCallback, DetachCallback
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private String serverDeliveryProcessorIDStrKey;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private String deliveryDirection = null;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Date beginDT;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" dependent="true"
 	 */
+	@Persistent(
+		dependent="true",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private DeliveryResult deliverBeginClientResult = null;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" dependent="true"
 	 */
+	@Persistent(
+		dependent="true",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private DeliveryResult deliverBeginServerResult = null;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" dependent="true"
 	 */
+	@Persistent(
+		dependent="true",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private DeliveryResult deliverDoWorkClientResult = null;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" dependent="true"
 	 */
+	@Persistent(
+		dependent="true",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private DeliveryResult deliverDoWorkServerResult = null;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" dependent="true"
 	 */
+	@Persistent(
+		dependent="true",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private DeliveryResult deliverEndClientResult = null;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" dependent="true"
 	 */
+	@Persistent(
+		dependent="true",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private DeliveryResult deliverEndServerResult = null;
 
 	/**
@@ -263,6 +330,7 @@ implements Serializable, StoreCallback, DetachCallback
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private boolean postponed = false;
 
 	/**
@@ -278,6 +346,7 @@ implements Serializable, StoreCallback, DetachCallback
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private boolean pending = true;
 
 	/**
@@ -286,6 +355,7 @@ implements Serializable, StoreCallback, DetachCallback
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private boolean externalDeliveryApproved = false;
 
 	/**
@@ -293,11 +363,13 @@ implements Serializable, StoreCallback, DetachCallback
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private boolean externalDeliveryDone = false;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private boolean failed = false;
 
 	/**
@@ -305,11 +377,13 @@ implements Serializable, StoreCallback, DetachCallback
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Date endDT = null;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private boolean forceRollback = false;
 
 	/**
@@ -353,6 +427,7 @@ implements Serializable, StoreCallback, DetachCallback
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private byte rollbackStatus = ROLLBACK_STATUS_NOT_DONE;
 
 	public Delivery(String organisationID, long deliveryID)
@@ -788,6 +863,11 @@ implements Serializable, StoreCallback, DetachCallback
 	 *
 	 * @jdo.join
 	 */
+@Join
+@Persistent(
+	nullValue=NullValue.EXCEPTION,
+	table="JFireTrade_Delivery_articles",
+	persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Set<Article> articles = null;
 
 	/**
@@ -800,11 +880,17 @@ implements Serializable, StoreCallback, DetachCallback
 	 *
 	 * @jdo.join
 	 */
+	@Join
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		table="JFireTrade_Delivery_deliveryNotes",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Set<DeliveryNote> deliveryNotes = null;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private ModeOfDeliveryFlavour modeOfDeliveryFlavour = null;
 
 //	/**
@@ -815,6 +901,7 @@ implements Serializable, StoreCallback, DetachCallback
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private LegalEntity partner = null;
 
 //	/**
@@ -838,6 +925,7 @@ implements Serializable, StoreCallback, DetachCallback
 	/**
 	 * @jdo.field persistence-modifier="transactional"
 	 */
+@Persistent(persistenceModifier=PersistenceModifier.TRANSACTIONAL)
 	private Set<ArticleID> articleIDs = null;
 
 //	/**
@@ -853,6 +941,7 @@ implements Serializable, StoreCallback, DetachCallback
 	/**
 	 * @jdo.field persistence-modifier="transactional"
 	 */
+@Persistent(persistenceModifier=PersistenceModifier.TRANSACTIONAL)
 	private ModeOfDeliveryFlavourID modeOfDeliveryFlavourID = null;
 
 //	/**
@@ -863,6 +952,7 @@ implements Serializable, StoreCallback, DetachCallback
 	/**
 	 * @jdo.field persistence-modifier="transactional"
 	 */
+@Persistent(persistenceModifier=PersistenceModifier.TRANSACTIONAL)
 	private AnchorID partnerID = null;
 
 //	/**
@@ -881,6 +971,7 @@ implements Serializable, StoreCallback, DetachCallback
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private Set<DeliveryNoteID> deliveryNoteIDs = null;
 
 	public Set<DeliveryNoteID> getDeliveryNoteIDs()

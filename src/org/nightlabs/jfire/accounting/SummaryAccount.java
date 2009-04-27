@@ -36,6 +36,17 @@ import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.transfer.Anchor;
 import org.nightlabs.jfire.transfer.Transfer;
 
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+
 /**
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  *
@@ -50,6 +61,20 @@ import org.nightlabs.jfire.transfer.Transfer;
  * @jdo.fetch-group name="SummaryAccount.summedAccounts" fields="summedAccounts"
  * @jdo.fetch-group name="SummaryAccount.this" fetch-groups="default, Account.this" fields="summedAccounts"
  */
+@PersistenceCapable(
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_SummaryAccount")
+@FetchGroups({
+	@FetchGroup(
+		name=SummaryAccount.FETCH_GROUP_SUMMED_ACCOUNTS,
+		members=@Persistent(name="summedAccounts")),
+	@FetchGroup(
+		fetchGroups={"default", "Account.this"},
+		name=SummaryAccount.FETCH_GROUP_THIS_SUMMARY_ACCOUNT,
+		members=@Persistent(name="summedAccounts"))
+})
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class SummaryAccount extends Account
 {
 	private static final long serialVersionUID = 1L;
@@ -82,6 +107,11 @@ public class SummaryAccount extends Account
 	 *
 	 * @jdo.join
 	 */
+	@Join
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		table="JFireTrade_SummaryAccount_summedAccounts",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	protected Set<Account> summedAccounts;
 
 	public void addSummedAccount(Account account) {

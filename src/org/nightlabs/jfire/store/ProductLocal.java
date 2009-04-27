@@ -38,6 +38,22 @@ import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.transfer.Anchor;
 
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.VersionStrategy;
+import javax.jdo.annotations.Version;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Discriminator;
+import org.nightlabs.jfire.store.id.ProductLocalID;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.DiscriminatorStrategy;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+
 /**
  * An instance of this class holds data related to the product, but different in each
  * datastore.
@@ -59,6 +75,19 @@ import org.nightlabs.jfire.transfer.Anchor;
  *
  * @jdo.fetch-group name="ProductLocal.saleArticle" fields="saleArticle"
  */
+@PersistenceCapable(
+	objectIdClass=ProductLocalID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_ProductLocal")
+@Version(strategy=VersionStrategy.VERSION_NUMBER)
+@FetchGroups(
+	@FetchGroup(
+		name=ProductLocal.FETCH_GROUP_ARTICLE,
+		members=@Persistent(name="saleArticle"))
+)
+@Discriminator(strategy=DiscriminatorStrategy.CLASS_NAME)
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class ProductLocal
 implements Serializable
 {
@@ -109,16 +138,20 @@ implements Serializable
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+@PrimaryKey
+@Column(length=100)
 	private String organisationID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 */
+	@PrimaryKey
 	private long productID;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Product product;
 
 	/**
@@ -131,6 +164,7 @@ implements Serializable
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Article saleArticle = null;
 
 	/**
@@ -144,6 +178,7 @@ implements Serializable
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private boolean available = false;
 
 	/**
@@ -151,6 +186,7 @@ implements Serializable
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private boolean allocationPending = false;
 
 	/**
@@ -158,6 +194,7 @@ implements Serializable
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private boolean releasePending = false;
 
 	/**
@@ -174,6 +211,7 @@ implements Serializable
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private boolean allocated = false;
 
 	/**
@@ -185,6 +223,7 @@ implements Serializable
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private boolean assembled = false;
 
 	/**
@@ -194,6 +233,7 @@ implements Serializable
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private ProductLocal packageProductLocal = null;
 
 	/**
@@ -201,6 +241,7 @@ implements Serializable
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private boolean nested = false;
 
 	/**
@@ -222,6 +263,9 @@ implements Serializable
 	 *
 	 * @!jdo.join
 	 */
+	@Persistent(
+		mappedBy="packageProductLocal",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Set<ProductLocal> nestedProductLocals = new HashSet<ProductLocal>();
 
 	/**
@@ -270,6 +314,7 @@ implements Serializable
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Anchor anchor;
 
 	/**
@@ -285,6 +330,7 @@ implements Serializable
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private int quantity = 0;
 
 	/**

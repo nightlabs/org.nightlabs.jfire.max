@@ -30,6 +30,16 @@ import java.io.Serializable;
 
 import org.nightlabs.jfire.transfer.TransferData;
 
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.Persistent;
+import org.nightlabs.jfire.store.deliver.id.DeliveryDataID;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+
 /**
  * Subclass in order to hold specific data for your delivery process.
  * This additional data can be defined by the client delivery processor (gathered by
@@ -55,6 +65,12 @@ import org.nightlabs.jfire.transfer.TransferData;
  *		include-body="id/DeliveryDataID.body.inc"
  *
  */
+@PersistenceCapable(
+	objectIdClass=DeliveryDataID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_DeliveryData")
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class DeliveryData
 implements Serializable, TransferData
 {
@@ -63,21 +79,26 @@ implements Serializable, TransferData
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 	/**
 	 * @jdo.field primary-key="true"
 	 * @!jdo.column length="100"
 	 */
+	@PrimaryKey
 	private long deliveryID;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Delivery delivery;
 
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private transient Delivery deliveryBackupForUpload = null;
 
 	/**

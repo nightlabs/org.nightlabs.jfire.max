@@ -150,7 +150,7 @@ import org.nightlabs.util.CollectionUtil;
  */
 @TransactionAttribute(TransactionAttributeType.REQUIRED)
 @TransactionManagement(TransactionManagementType.CONTAINER)
-@Stateless(name="jfire/ejb/JFireTrade/StoreManager")
+@Stateless
 public class StoreManagerBean
 extends BaseSessionBeanImpl
 implements StoreManagerRemote, StoreManagerLocal

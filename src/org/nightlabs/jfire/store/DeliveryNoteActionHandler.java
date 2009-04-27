@@ -12,6 +12,16 @@ import org.nightlabs.jfire.store.deliver.DeliveryException;
 import org.nightlabs.jfire.store.deliver.ServerDeliveryProcessor;
 import org.nightlabs.util.Util;
 
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.DiscriminatorStrategy;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Discriminator;
+import org.nightlabs.jfire.store.id.DeliveryNoteActionHandlerID;
+
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -27,6 +37,13 @@ import org.nightlabs.util.Util;
  *
  * @jdo.create-objectid-class field-order="organisationID, deliveryNoteActionHandlerID"
  */
+@PersistenceCapable(
+	objectIdClass=DeliveryNoteActionHandlerID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_DeliveryNoteActionHandler")
+@Discriminator(strategy=DiscriminatorStrategy.CLASS_NAME)
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class DeliveryNoteActionHandler implements Serializable
 {
 	private static final long serialVersionUID = 1L;
@@ -35,11 +52,15 @@ public class DeliveryNoteActionHandler implements Serializable
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String deliveryNoteActionHandlerID;
 
 	/**

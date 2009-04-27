@@ -107,6 +107,16 @@ import org.nightlabs.jfire.workstation.Workstation;
 import org.nightlabs.jfire.workstation.WorkstationResolveStrategy;
 import org.nightlabs.l10n.NumberFormatter;
 
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.PersistenceCapable;
+import org.nightlabs.jfire.trade.id.TraderID;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+
 /**
  * Trader is responsible for purchase and sale. It manages orders, offers and
  * delegates to the Store and to the Accounting.
@@ -124,6 +134,12 @@ import org.nightlabs.l10n.NumberFormatter;
  *
  * @jdo.inheritance strategy="new-table"
  */
+@PersistenceCapable(
+	objectIdClass=TraderID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_Trader")
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class Trader
 {
 	/**
@@ -195,16 +211,20 @@ public class Trader
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Accounting accounting;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Store store;
 
 	/**
@@ -258,11 +278,13 @@ public class Trader
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private CustomerGroup defaultCustomerGroupForKnownCustomer;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private CustomerGroup defaultCustomerGroupForReseller;
 
 	/**

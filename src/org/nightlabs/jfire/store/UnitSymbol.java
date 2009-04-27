@@ -31,6 +31,20 @@ import java.util.Map;
 
 import org.nightlabs.i18n.I18nText;
 
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+import org.nightlabs.jfire.store.id.UnitSymbolID;
+
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
@@ -53,6 +67,37 @@ import org.nightlabs.i18n.I18nText;
  * @jdo.fetch-group name="FetchGroupsTrade.articleInDeliveryNoteEditor" fetch-groups="default" fields="unit, names"
  * @jdo.fetch-group name="FetchGroupsTrade.articleInReceptionNoteEditor" fetch-groups="default" fields="unit, names"
  */
+@PersistenceCapable(
+	objectIdClass=UnitSymbolID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_UnitSymbol")
+@FetchGroups({
+	@FetchGroup(
+		name="Unit.symbol",
+		members={@Persistent(name="unit"), @Persistent(name="names")}),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name="FetchGroupsTrade.articleInOrderEditor",
+		members={@Persistent(name="unit"), @Persistent(name="names")}),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name="FetchGroupsTrade.articleInOfferEditor",
+		members={@Persistent(name="unit"), @Persistent(name="names")}),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name="FetchGroupsTrade.articleInInvoiceEditor",
+		members={@Persistent(name="unit"), @Persistent(name="names")}),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name="FetchGroupsTrade.articleInDeliveryNoteEditor",
+		members={@Persistent(name="unit"), @Persistent(name="names")}),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name="FetchGroupsTrade.articleInReceptionNoteEditor",
+		members={@Persistent(name="unit"), @Persistent(name="names")})
+})
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class UnitSymbol
 extends I18nText
 {
@@ -62,16 +107,20 @@ extends I18nText
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 */
+	@PrimaryKey
 	private long unitID;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Unit unit;
 
 	/**
@@ -88,6 +137,11 @@ extends I18nText
 	 *
 	 * @jdo.join
 	 */
+	@Join
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		table="JFireTrade_UnitSymbol_names",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	protected Map<String, String> names = new HashMap<String, String>();
 
 	/**

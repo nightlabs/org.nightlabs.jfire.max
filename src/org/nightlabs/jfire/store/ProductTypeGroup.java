@@ -44,6 +44,19 @@ import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.store.id.ProductTypeGroupID;
 import org.nightlabs.util.Util;
 
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Discriminator;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.DiscriminatorStrategy;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  *
@@ -61,6 +74,21 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="ProductTypeGroup.name" fields="name"
  * @jdo.fetch-group name="ProductTypeGroup.managedByProductType" fields="managedByProductType"
  */
+@PersistenceCapable(
+	objectIdClass=ProductTypeGroupID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_ProductTypeGroup")
+@FetchGroups({
+	@FetchGroup(
+		name=ProductTypeGroup.FETCH_GROUP_NAME,
+		members=@Persistent(name="name")),
+	@FetchGroup(
+		name=ProductTypeGroup.FETCH_GROUP_MANAGED_BY_PRODUCT_TYPE,
+		members=@Persistent(name="managedByProductType"))
+})
+@Discriminator(strategy=DiscriminatorStrategy.CLASS_NAME)
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class ProductTypeGroup
 implements Serializable, DetachCallback
 {
@@ -95,26 +123,36 @@ implements Serializable, DetachCallback
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String productTypeGroupID;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private String primaryKey;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" dependent="true" mapped-by="productTypeGroup"
 	 */
+	@Persistent(
+		dependent="true",
+		mappedBy="productTypeGroup",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private ProductTypeGroupName name;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private ProductType managedByProductType = null;
 
 	/**
@@ -125,6 +163,7 @@ implements Serializable, DetachCallback
 	 *
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private Collection<ProductType> productTypes = null;
 
 	/**

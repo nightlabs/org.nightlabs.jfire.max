@@ -28,6 +28,13 @@ package org.nightlabs.jfire.accounting.pay;
 
 import java.util.Date;
 
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  *
@@ -39,6 +46,11 @@ import java.util.Date;
  *
  * @jdo.inheritance strategy="new-table"
  */
+@PersistenceCapable(
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_PaymentDataBankTransferGermany")
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class PaymentDataBankTransferGermany extends PaymentData
 {
 	private static final long serialVersionUID = 1L;
@@ -46,11 +58,13 @@ public class PaymentDataBankTransferGermany extends PaymentData
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Date moneyInDT = null;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Date moneyOutDT = null;
 
 	/**

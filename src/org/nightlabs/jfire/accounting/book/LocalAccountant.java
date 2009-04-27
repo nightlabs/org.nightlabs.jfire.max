@@ -45,6 +45,13 @@ import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.trade.OrganisationLegalEntity;
 import org.nightlabs.jfire.transfer.Anchor;
 
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+
 /**
  * A {@link LocalAccountant} is responsible to split money to the {@link Organisation}s
  * own accounts when payments are received/booked and to collect money from the correct
@@ -60,6 +67,11 @@ import org.nightlabs.jfire.transfer.Anchor;
  *
  * @jdo.inheritance strategy = "new-table"
  */
+@PersistenceCapable(
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_LocalAccountant")
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class LocalAccountant extends Accountant {
 	private static final long serialVersionUID = 1L;
 
@@ -83,6 +95,7 @@ public class LocalAccountant extends Accountant {
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private OrganisationLegalEntity mandator;
 
 		

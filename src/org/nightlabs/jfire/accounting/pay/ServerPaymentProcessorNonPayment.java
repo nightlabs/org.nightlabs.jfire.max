@@ -34,6 +34,11 @@ import org.nightlabs.jfire.accounting.pay.id.ServerPaymentProcessorID;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.transfer.Anchor;
 
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+
 
 /**
  * This payment processor handles non-payments. This means, it doesn't
@@ -49,6 +54,11 @@ import org.nightlabs.jfire.transfer.Anchor;
  *
  * @jdo.inheritance strategy="superclass-table"
  */
+@PersistenceCapable(
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_ServerPaymentProcessorNonPayment")
+@Inheritance(strategy=InheritanceStrategy.SUPERCLASS_TABLE)
 public class ServerPaymentProcessorNonPayment
 extends ServerPaymentProcessor
 {

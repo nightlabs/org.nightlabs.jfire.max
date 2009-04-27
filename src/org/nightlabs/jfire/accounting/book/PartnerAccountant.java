@@ -48,6 +48,11 @@ import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.transfer.Anchor;
 import org.nightlabs.jfire.transfer.Transfer;
 
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.IdentityType;
+
 /**
  * One instance of PartnerAccountant exists per organisation.
  * It handles Transfers for trade partners that can be other
@@ -63,6 +68,11 @@ import org.nightlabs.jfire.transfer.Transfer;
  *
  * @jdo.inheritance strategy = "new-table"
  */
+@PersistenceCapable(
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_PartnerAccountant")
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class PartnerAccountant extends Accountant
 {
 	private static final long serialVersionUID = 1L;

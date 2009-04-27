@@ -20,6 +20,20 @@ import org.nightlabs.jfire.store.DeliveryNote;
 import org.nightlabs.jfire.trade.Offer;
 import org.nightlabs.jfire.trade.TradeSide;
 
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import org.nightlabs.jfire.trade.jbpm.id.ProcessDefinitionAssignmentID;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Discriminator;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Queries;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.DiscriminatorStrategy;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+
 /**
  * Instances of this class control which ProcessDefinition will be instantiated for new
  * {@link Statable} instances (e.g. new {@link Offer}s).
@@ -45,6 +59,21 @@ import org.nightlabs.jfire.trade.TradeSide;
  *
  * @author Marco Schulze - marco at nightlabs dot de
  */
+@PersistenceCapable(
+	objectIdClass=ProcessDefinitionAssignmentID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_ProcessDefinitionAssignment")
+@Discriminator(strategy=DiscriminatorStrategy.CLASS_NAME)
+@Queries({
+	@javax.jdo.annotations.Query(
+		name="getProcessDefinitionsForStatableClass",
+		value="SELECT processDefinition WHERE this.statableClass == :statableClass"),
+	@javax.jdo.annotations.Query(
+		name="getProcessDefinitionsForStatableClassAndTradeSide",
+		value="SELECT processDefinition WHERE this.statableClass == :statableClass AND this.tradeSide == :tradeSide")
+})
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class ProcessDefinitionAssignment
 implements Serializable
 {
@@ -85,6 +114,7 @@ implements Serializable
 	 *
 	 * @jdo.field primary-key="true"
 	 */
+	@PrimaryKey
 	private String statableClass;
 
 //	/**
@@ -111,16 +141,25 @@ implements Serializable
 	 * @jdo.field primary-key="true" persistence-modifier="persistent"
 	 * @jdo.column length="50"
 	 */
+@PrimaryKey
+@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+@Column(length=50)
 	private String tradeSide;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" null-value="exception"
 	 */
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private ProcessDefinition processDefinition;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" null-value="exception"
 	 */
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private String jbpmProcessDefinitionName;
 
 	protected ProcessDefinitionAssignment()

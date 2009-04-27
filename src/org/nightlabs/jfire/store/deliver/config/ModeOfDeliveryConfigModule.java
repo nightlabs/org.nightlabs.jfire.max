@@ -19,6 +19,17 @@ import org.nightlabs.jfire.config.ConfigModule;
 import org.nightlabs.jfire.store.deliver.ModeOfDeliveryFlavour;
 import org.nightlabs.jfire.store.deliver.id.ModeOfDeliveryFlavourID;
 
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+
 /**
  * ConfigModule for a set of {@link ModeOfDeliveryFlavour}s.
  * Use the API for {@link ModeOfDeliveryFlavourID}s on detached instances.
@@ -44,6 +55,19 @@ import org.nightlabs.jfire.store.deliver.id.ModeOfDeliveryFlavourID;
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
  * @version $Revision$, $Date$
  */
+@PersistenceCapable(
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_ModeOfDeliveryConfigModule")
+@FetchGroups({
+	@FetchGroup(
+		name="ModeOfDeliveryConfigModule.ModeOfDeliveryFlavours",
+		members=@Persistent(name="ModeOfDeliveryFlavours")),
+	@FetchGroup(
+		name="ConfigModule.this",
+		members=@Persistent(name="personStructFields"))
+})
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class ModeOfDeliveryConfigModule extends ConfigModule implements DetachCallback, AttachCallback {
 
 	private static final long serialVersionUID = 20080112L;
@@ -68,14 +92,21 @@ public class ModeOfDeliveryConfigModule extends ConfigModule implements DetachCa
 	 *
 	 * @jdo.join
 	 */
+	@Join
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		table="JFireTrade_ModeOfDeliveryConfigModule_modeOfDeliveryFlavours",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Set<ModeOfDeliveryFlavour> modeOfDeliveryFlavours;
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private boolean modeOfDeliveryFlavourIDsDetached;
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private Set<ModeOfDeliveryFlavourID> modeOfDeliveryFlavourIDs;
 	
 	/**

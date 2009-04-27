@@ -37,6 +37,20 @@ import org.nightlabs.jfire.accounting.priceconfig.IPriceConfig;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.util.Util;
 
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.Queries;
+import org.nightlabs.jfire.accounting.gridpriceconfig.id.PriceCellID;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.Query;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  *
@@ -65,6 +79,38 @@ import org.nightlabs.util.Util;
  *		PARAMETERS StablePriceConfig paramPriceConfig, String paramCustomerGroupPK, String paramCurrencyID
  *		import java.lang.String; import org.nightlabs.jfire.accounting.gridpriceconfig.StablePriceConfig"
  */
+@PersistenceCapable(
+	objectIdClass=PriceCellID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_PriceCell")
+@FetchGroups({
+	@FetchGroup(
+		name=PriceCell.FETCH_GROUP_PRICE,
+		members=@Persistent(name="price")),
+	@FetchGroup(
+		name=PriceCell.FETCH_GROUP_PRICE_CONFIG,
+		members=@Persistent(name="priceConfig")),
+	@FetchGroup(
+		name=PriceCell.FETCH_GROUP_PRICE_COORDINATE,
+		members=@Persistent(name="priceCoordinate")),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name="FetchGroupsPriceConfig.edit",
+		members={@Persistent(
+			name="priceConfig",
+			recursionDepth=-1), @Persistent(
+			name="price",
+			recursionDepth=-1), @Persistent(
+			name="priceCoordinate",
+			recursionDepth=-1)})
+})
+@Queries(
+	@Query(
+		name="getPriceCellsForCustomerGroupAndCurrency",
+		value="SELECT WHERE this.priceConfig == paramPriceConfig && this.priceCoordinate.customerGroupPK == paramCustomerGroupPK && this.priceCoordinate.currencyID == paramCurrencyID PARAMETERS StablePriceConfig paramPriceConfig, String paramCustomerGroupPK, String paramCurrencyID import java.lang.String; import org.nightlabs.jfire.accounting.gridpriceconfig.StablePriceConfig")
+)
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class PriceCell implements Serializable
 {
 	private static final long serialVersionUID = 1L;
@@ -82,6 +128,8 @@ public class PriceCell implements Serializable
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+@PrimaryKey
+@Column(length=100)
 	private String organisationID;
 
 //	/**
@@ -97,6 +145,7 @@ public class PriceCell implements Serializable
 	/**
 	 * @jdo.field primary-key="true"
 	 */
+@PrimaryKey
 	private long priceCellID;
 
 	/**
@@ -104,6 +153,7 @@ public class PriceCell implements Serializable
 	 * TODO DataNucleus workaround: the above null-value="exception" is correct but causes exceptions during cross-datastore-replication 
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private StablePriceConfig priceConfig;
 
 	/**
@@ -111,6 +161,9 @@ public class PriceCell implements Serializable
 	 * TODO DataNucleus workaround: the above null-value="exception" is correct but causes exceptions during cross-datastore-replication 
 	 * @jdo.field persistence-modifier="persistent" dependent="true"
 	 */
+	@Persistent(
+		dependent="true",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private PriceCoordinate priceCoordinate;
 
 	/**
@@ -118,6 +171,7 @@ public class PriceCell implements Serializable
 	 * TODO DataNucleus workaround: the above null-value="exception" is correct but causes exceptions during cross-datastore-replication 
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Price price;
 
 	/**
@@ -244,6 +298,7 @@ public class PriceCell implements Serializable
 	 *
 	 * @see org.nightlabs.jfire.accounting.PriceFragmentType#PRICEFRAGMENTTYPEID_TOTAL
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	protected transient Map<String, String> priceFragmentsCalculationStatus = null;
 
 	/**

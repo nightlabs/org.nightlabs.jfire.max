@@ -46,6 +46,20 @@ import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.ArticlePrice;
 import org.nightlabs.jfire.trade.CustomerGroup;
 
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.Value;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Discriminator;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.DiscriminatorStrategy;
+import javax.jdo.annotations.IdentityType;
+
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  *
@@ -65,6 +79,30 @@ import org.nightlabs.jfire.trade.CustomerGroup;
  *
  * @jdo.fetch-group name="FetchGroupsPriceConfig.edit" fetch-groups="default" fields="fallbackFormulaCell, formulaCells, packagingResultPriceConfigs, productTypes"
  */
+@PersistenceCapable(
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_FormulaPriceConfig")
+@FetchGroups({
+	@FetchGroup(
+		name=FormulaPriceConfig.FETCH_GROUP_FALLBACK_FORMULA_CELL,
+		members=@Persistent(name="fallbackFormulaCell")),
+	@FetchGroup(
+		name=FormulaPriceConfig.FETCH_GROUP_FORMULA_CELLS,
+		members=@Persistent(name="formulaCells")),
+	@FetchGroup(
+		name=FormulaPriceConfig.FETCH_GROUP_PACKAGING_RESULT_PRICE_CONFIGS,
+		members=@Persistent(name="packagingResultPriceConfigs")),
+	@FetchGroup(
+		name=FormulaPriceConfig.FETCH_GROUP_PRODUCT_TYPES,
+		members=@Persistent(name="productTypes")),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name="FetchGroupsPriceConfig.edit",
+		members={@Persistent(name="fallbackFormulaCell"), @Persistent(name="formulaCells"), @Persistent(name="packagingResultPriceConfigs"), @Persistent(name="productTypes")})
+})
+@Discriminator(strategy=DiscriminatorStrategy.CLASS_NAME)
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class FormulaPriceConfig
 extends GridPriceConfig
 implements IFormulaPriceConfig
@@ -94,6 +132,12 @@ implements IFormulaPriceConfig
 	 *
 	 * @jdo.join
 	 */
+	@Join
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		table="JFireTrade_FormulaPriceConfig_packagingResultPriceConfigs",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
+	@Value(dependent="true")
 	private Map<String, GridPriceConfig> packagingResultPriceConfigs = new HashMap<String, GridPriceConfig>();
 
 	public void setPackagingResultPriceConfig(String innerProductTypePK, String packageProductTypePK, IPriceConfig resultPriceConfig)
@@ -140,11 +184,16 @@ implements IFormulaPriceConfig
 	 *		dependent-element="true"
 	 *		mapped-by="mapOwner"
 	 */
+@Persistent(
+	dependentElement="true",
+	mappedBy="mapOwner",
+	persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Set<FormulaCell> formulaCells;
 
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private transient Map<IPriceCoordinate, FormulaCell> priceCoordinate2formulaCell;
 
 	protected Map<IPriceCoordinate, FormulaCell> getPriceCoordinate2formulaCell() {
@@ -167,6 +216,9 @@ implements IFormulaPriceConfig
 	 *
 	 * @jdo.field persistence-modifier="persistent" dependent="true"
 	 */
+	@Persistent(
+		dependent="true",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	protected FormulaCell fallbackFormulaCell;
 
 	/**
@@ -246,6 +298,11 @@ implements IFormulaPriceConfig
 	 *
 	 * @jdo.join
 	 */
+	@Join
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		table="JFireTrade_FormulaPriceConfig_productTypes",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Map<String, ProductType> productTypes = new HashMap<String, ProductType>();
 
 	public Collection<ProductType> getProductTypes()

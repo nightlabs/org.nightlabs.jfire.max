@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Set;
 
 import javax.annotation.security.RolesAllowed;
+import javax.ejb.Remote;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 import javax.jdo.FetchPlan;
@@ -51,6 +52,7 @@ import org.nightlabs.jfire.trade.id.OfferID;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 import org.nightlabs.jfire.transfer.id.TransferID;
 
+@Remote
 public interface StoreManagerRemote {
 
 	/**

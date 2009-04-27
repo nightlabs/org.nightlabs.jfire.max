@@ -36,6 +36,11 @@ import org.nightlabs.jfire.store.Product;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.ArticlePrice;
 
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.IdentityType;
+
 /**
  * This is a pseudo <tt>PriceConfig</tt> which manages <tt>Price</tt> instances
  * whenever a <tt>Price</tt> is needed outside of a real <tt>PriceConfig</tt>
@@ -51,6 +56,11 @@ import org.nightlabs.jfire.trade.ArticlePrice;
  *
  * @jdo.inheritance strategy = "new-table"
  */
+@PersistenceCapable(
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_AccountingPriceConfig")
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class AccountingPriceConfig extends PriceConfig
 {
 	private static final long serialVersionUID = 1L;

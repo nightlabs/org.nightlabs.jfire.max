@@ -54,6 +54,20 @@ import org.nightlabs.jfire.transfer.Transfer;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 import org.nightlabs.util.Util;
 
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Queries;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+
 /**
  * {@link Payment}s are created when invoices or parts of invoices are paid. Therefore
  * a {@link Payment} is linked to one or more invoices ({@link Payment#getInvoices()}).
@@ -98,6 +112,61 @@ import org.nightlabs.util.Util;
  *			WHERE
  *				this.invoices.contains(:invoice)"
  */
+@PersistenceCapable(
+	objectIdClass=PaymentID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_Payment")
+@FetchGroups({
+	@FetchGroup(
+		name=Payment.FETCH_GROUP_PRECURSOR,
+		members=@Persistent(name="precursor")),
+	@FetchGroup(
+		name=Payment.FETCH_GROUP_FOLLOW_UP,
+		members=@Persistent(name="followUp")),
+	@FetchGroup(
+		name=Payment.FETCH_GROUP_USER,
+		members=@Persistent(name="user")),
+	@FetchGroup(
+		name=Payment.FETCH_GROUP_PAY_BEGIN_CLIENT_RESULT,
+		members=@Persistent(name="payBeginClientResult")),
+	@FetchGroup(
+		name=Payment.FETCH_GROUP_PAY_BEGIN_SERVER_RESULT,
+		members=@Persistent(name="payBeginServerResult")),
+	@FetchGroup(
+		name=Payment.FETCH_GROUP_PAY_DO_WORK_CLIENT_RESULT,
+		members=@Persistent(name="payDoWorkClientResult")),
+	@FetchGroup(
+		name=Payment.FETCH_GROUP_PAY_DO_WORK_SERVER_RESULT,
+		members=@Persistent(name="payDoWorkServerResult")),
+	@FetchGroup(
+		name=Payment.FETCH_GROUP_PAY_END_CLIENT_RESULT,
+		members=@Persistent(name="payEndClientResult")),
+	@FetchGroup(
+		name=Payment.FETCH_GROUP_PAY_END_SERVER_RESULT,
+		members=@Persistent(name="payEndServerResult")),
+	@FetchGroup(
+		name=Payment.FETCH_GROUP_CURRENCY,
+		members=@Persistent(name="currency")),
+	@FetchGroup(
+		name=Payment.FETCH_GROUP_INVOICES,
+		members=@Persistent(name="invoices")),
+	@FetchGroup(
+		name=Payment.FETCH_GROUP_PARTNER,
+		members=@Persistent(name="partner")),
+	@FetchGroup(
+		name=Payment.FETCH_GROUP_PARTNER_ACCOUNT,
+		members=@Persistent(name="partnerAccount")),
+	@FetchGroup(
+		name=Payment.FETCH_GROUP_MODE_OF_PAYMENT_FLAVOUR,
+		members=@Persistent(name="modeOfPaymentFlavour"))
+})
+@Queries(
+	@javax.jdo.annotations.Query(
+		name="getPaymentsForInvoice",
+		value="SELECT WHERE this.invoices.contains(:invoice)")
+)
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class Payment
 implements Serializable, StoreCallback
 {
@@ -132,11 +201,14 @@ implements Serializable, StoreCallback
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 */
+	@PrimaryKey
 	private long paymentID;
 
 	/**
@@ -149,6 +221,7 @@ implements Serializable, StoreCallback
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Payment precursor = null;
 
 	/**
@@ -156,6 +229,7 @@ implements Serializable, StoreCallback
 	 *
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private PaymentID precursorID = null;
 
 	/**
@@ -169,26 +243,33 @@ implements Serializable, StoreCallback
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Payment followUp = null;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private User user = null;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private String clientPaymentProcessorFactoryID;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" mapped-by="payment"
 	 */
+	@Persistent(
+		mappedBy="payment",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private PaymentLocal paymentLocal;
 
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private transient ServerPaymentProcessorID serverPaymentProcessorID = null;
 
 	/**
@@ -212,46 +293,67 @@ implements Serializable, StoreCallback
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private String serverPaymentProcessorIDStrKey;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private String paymentDirection = null;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Date beginDT;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" dependent="true"
 	 */
+	@Persistent(
+		dependent="true",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private PaymentResult payBeginClientResult = null;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" dependent="true"
 	 */
+	@Persistent(
+		dependent="true",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private PaymentResult payBeginServerResult = null;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" dependent="true"
 	 */
+	@Persistent(
+		dependent="true",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private PaymentResult payDoWorkClientResult = null;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" dependent="true"
 	 */
+	@Persistent(
+		dependent="true",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private PaymentResult payDoWorkServerResult = null;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" dependent="true"
 	 */
+	@Persistent(
+		dependent="true",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private PaymentResult payEndClientResult = null;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" dependent="true"
 	 */
+	@Persistent(
+		dependent="true",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private PaymentResult payEndServerResult = null;
 
 	/**
@@ -280,6 +382,7 @@ implements Serializable, StoreCallback
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private boolean postponed = false;
 
 	/**
@@ -295,6 +398,7 @@ implements Serializable, StoreCallback
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private boolean pending = true;
 
 	/**
@@ -303,6 +407,7 @@ implements Serializable, StoreCallback
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private boolean externalPaymentApproved = false;
 
 	/**
@@ -310,11 +415,13 @@ implements Serializable, StoreCallback
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private boolean externalPaymentDone = false;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private boolean failed = false;
 
 	/**
@@ -322,11 +429,13 @@ implements Serializable, StoreCallback
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Date endDT = null;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private boolean forceRollback = false;
 
 	/**
@@ -370,6 +479,7 @@ implements Serializable, StoreCallback
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private byte rollbackStatus = ROLLBACK_STATUS_NOT_DONE;
 
 	public Payment(String organisationID, long paymentID, PaymentID precursorID)
@@ -779,6 +889,7 @@ implements Serializable, StoreCallback
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private String reasonForPayment = null;
 
 // The following fields are not transferred to the server - only their IDs are.
@@ -792,32 +903,42 @@ implements Serializable, StoreCallback
 	 *
 	 * @jdo.join
 	 */
+@Join
+@Persistent(
+	nullValue=NullValue.EXCEPTION,
+	table="JFireTrade_Payment_invoices",
+	persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Set<Invoice> invoices = null;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private ModeOfPaymentFlavour modeOfPaymentFlavour = null;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Currency currency = null;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private LegalEntity partner = null;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Account partnerAccount = null;
 // The above fields are not transferred to the server - only their IDs are.
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private long amount = 0;
 
 // IDs for the transfer to the server - the following fields are not stored in the DB
@@ -825,26 +946,31 @@ implements Serializable, StoreCallback
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private Set<InvoiceID> invoiceIDs = null;
 
 	/**
 	 * @jdo.field persistence-modifier="transactional"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.TRANSACTIONAL)
 	private ModeOfPaymentFlavourID modeOfPaymentFlavourID = null;
 
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private CurrencyID currencyID = null;
 
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private AnchorID partnerID = null;
 
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private AnchorID partnerAccountID = null;
 
 	/**

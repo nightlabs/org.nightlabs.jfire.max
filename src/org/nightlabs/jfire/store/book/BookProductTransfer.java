@@ -41,6 +41,11 @@ import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.transfer.Anchor;
 
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.IdentityType;
+
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  *
@@ -52,6 +57,11 @@ import org.nightlabs.jfire.transfer.Anchor;
  *
  * @jdo.inheritance strategy="new-table"
  */
+@PersistenceCapable(
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_BookProductTransfer")
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class BookProductTransfer extends DeliveryNoteProductTransfer
 {
 	private static final long serialVersionUID = 1L;

@@ -7,6 +7,16 @@ import java.util.Map;
 
 import org.nightlabs.jfire.config.ConfigModule;
 
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+
 /**
  * @author Tobias Langner <!-- tobias[dot]langner[at]nightlabs[dot]de -->
  *
@@ -20,6 +30,17 @@ import org.nightlabs.jfire.config.ConfigModule;
  * 
  * @jdo.fetch-group name="TariffOrderConfigModule.this" fetch-groups="default" fields="tariffOrderMap"
  */
+@PersistenceCapable(
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_TariffOrderConfigModule")
+@FetchGroups(
+	@FetchGroup(
+		fetchGroups={"default"},
+		name=TariffOrderConfigModule.FETCH_GROUP_TARIFF_ORDER_CONFIG_MODULE,
+		members=@Persistent(name="tariffOrderMap"))
+)
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class TariffOrderConfigModule extends ConfigModule {
 	
 	private static final long serialVersionUID = 1L;
@@ -31,6 +52,10 @@ public class TariffOrderConfigModule extends ConfigModule {
 	 * 
 	 * @jdo.join
 	 */
+	@Join
+	@Persistent(
+		table="JFireTrade_TariffOrderConfigModule_tariffOrderMap",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Map<Tariff, Integer> tariffOrderMap = null;
 	
 	public static final String FETCH_GROUP_TARIFF_ORDER_CONFIG_MODULE = "TariffOrderConfigModule.this"; //$NON-NLS-1$

@@ -10,6 +10,18 @@ import java.util.Set;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
 import javax.jdo.listener.AttachCallback;
 import javax.jdo.listener.DetachCallback;
 
@@ -19,6 +31,7 @@ import org.nightlabs.jfire.jbpm.graph.def.Statable;
 import org.nightlabs.jfire.jbpm.graph.def.StatableLocal;
 import org.nightlabs.jfire.jbpm.graph.def.State;
 import org.nightlabs.jfire.security.User;
+import org.nightlabs.jfire.store.id.ReceptionNoteID;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.ArticleContainer;
 import org.nightlabs.jfire.trade.ArticleContainerException;
@@ -58,6 +71,37 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="ReceptionNote.articles" fields="articles"
  * @jdo.fetch-group name="ReceptionNote.this" fetch-groups="default" fields="receptionNoteLocal, articles, createDT, createUser, state, states";
  */
+@PersistenceCapable(
+	objectIdClass=ReceptionNoteID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_ReceptionNote")
+@FetchGroups({
+	@FetchGroup(
+		name="Statable.state",
+		members=@Persistent(name="state")),
+	@FetchGroup(
+		name="Statable.states",
+		members=@Persistent(name="states")),
+	@FetchGroup(
+		name="ArticleContainer.customer",
+		members=@Persistent(name="customer")),
+	@FetchGroup(
+		name="ArticleContainer.vendor",
+		members=@Persistent(name="vendor")),
+	@FetchGroup(
+		name="ArticleContainer.endCustomer",
+		members=@Persistent(name="endCustomer")),
+	@FetchGroup(
+		name="ReceptionNote.articles",
+		members=@Persistent(name="articles"))
+//	,
+//	@FetchGroup(
+//		fetchGroups={"default"},
+//		name=ReceptionNote.FETCH_GROUP_THIS_RECEPTION_NOTE,
+//		members={})
+})
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class ReceptionNote
 implements
 		Serializable,
@@ -80,30 +124,38 @@ implements
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="50"
 	 */
+	@PrimaryKey
+	@Column(length=50)
 	private String receptionNoteIDPrefix;
 	/**
 	 * @jdo.field primary-key="true"
 	 */
+	@PrimaryKey
 	private long receptionNoteID;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private DeliveryNote deliveryNote;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Date createDT;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private User createUser;
 
 	/**
@@ -113,70 +165,89 @@ implements
 	 *		element-type="org.nightlabs.jfire.trade.Article"
 	 *		mapped-by="receptionNote"
 	 */
+	@Persistent(
+		mappedBy="receptionNote",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Set<Article> articles;
 
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private LegalEntity vendor = null;
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private boolean vendor_detached = false;
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private LegalEntity customer = null;
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private boolean customer_detached = false;
 
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private LegalEntity endCustomer = null;
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private boolean endCustomer_detached = false;
 
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private AnchorID vendorID = null;
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private boolean vendorID_detached = false;
 
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private AnchorID customerID = null;
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private boolean customerID_detached = false;
 
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private AnchorID endCustomerID = null;
 
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private boolean endCustomerID_detached = false;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" mapped-by="receptionNote"
 	 */
+	@Persistent(
+		mappedBy="receptionNote",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private ReceptionNoteLocal receptionNoteLocal;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private int articleCount = 0;
 
 	/**
@@ -265,6 +336,7 @@ implements
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private transient Set<Article> _articles = null;
 
 	@Override
@@ -421,6 +493,7 @@ implements
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private State state;
 
 	/**
@@ -435,6 +508,11 @@ implements
 	 *
 	 * @jdo.join
 	 */
+	@Join
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		table="JFireTrade_ReceptionNote_states",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private List<State> states;
 
 	/**
@@ -462,6 +540,7 @@ implements
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private transient List<State> _states = null;
 
 	public List<State> getStates()

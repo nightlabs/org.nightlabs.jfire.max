@@ -32,6 +32,16 @@ import org.nightlabs.jfire.accounting.pay.ServerPaymentProcessor.PayParams;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.util.Util;
 
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+import org.nightlabs.jfire.accounting.pay.id.PaymentResultID;
+import javax.jdo.annotations.PersistenceModifier;
+
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  *
@@ -45,6 +55,12 @@ import org.nightlabs.util.Util;
  *
  * @jdo.create-objectid-class field-order="organisationID, paymentResultID"
  */
+@PersistenceCapable(
+	objectIdClass=PaymentResultID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_PaymentResult")
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class PaymentResult
 implements Serializable
 {
@@ -54,10 +70,13 @@ implements Serializable
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 	/**
 	 * @jdo.field primary-key="true"
 	 */
+	@PrimaryKey
 	private long paymentResultID;
 
 	/**
@@ -209,6 +228,8 @@ implements Serializable
 	 * @jdo.field persistence-modifier="persistent"
 	 * @jdo.column length="30"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+	@Column(length=30)
 	private String code = null;
 
 	/**
@@ -217,6 +238,8 @@ implements Serializable
 	 * @jdo.field persistence-modifier="persistent"
 	 * @jdo.column length="255"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+	@Column(length=255)
 	private String text = null;
 
 	/**
@@ -225,12 +248,15 @@ implements Serializable
 	 *
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private Throwable error = null;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 * @jdo.column sql-type="CLOB"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+	@Column(sqlType="CLOB")
 	private String errorStackTrace = null;
 
 	/**
@@ -239,6 +265,7 @@ implements Serializable
 	 *
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private Object object = null;
 
 	/**

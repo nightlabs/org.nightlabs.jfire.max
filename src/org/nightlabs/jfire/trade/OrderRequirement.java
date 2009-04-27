@@ -32,6 +32,16 @@ import java.util.Map;
 
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
 
 import org.nightlabs.jfire.trade.id.OrderRequirementID;
 
@@ -54,6 +64,12 @@ import org.nightlabs.jfire.trade.id.OrderRequirementID;
  *
  * @jdo.create-objectid-class field-order="organisationID, orderIDPrefix, orderID"
  */
+@PersistenceCapable(
+	objectIdClass=OrderRequirementID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_OrderRequirement")
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class OrderRequirement
 	implements Serializable
 {
@@ -62,20 +78,26 @@ public class OrderRequirement
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="50"
 	 */
+	@PrimaryKey
+	@Column(length=50)
 	private String orderIDPrefix;
 	/**
 	 * @jdo.field primary-key="true"
 	 */
+	@PrimaryKey
 	private long orderID;
-	
+
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Order order;
 
 	/**
@@ -106,6 +128,7 @@ public class OrderRequirement
 		this.organisationID = order.getOrganisationID();
 		this.orderIDPrefix = order.getOrderIDPrefix();
 		this.orderID = order.getOrderID();
+		vendor2order = new HashMap<LegalEntity, Order>();
 	}
 
 	public Order getOrder()
@@ -128,12 +151,17 @@ public class OrderRequirement
 	 *
 	 * @jdo.join
 	 */
-	private Map vendor2order = new HashMap();
+	@Join
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		table="JFireTrade_OrderRequirement_vendor2order",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
+	private Map<LegalEntity, Order> vendor2order;
 
 	public void addPartnerOrder(Order order) {
 		LegalEntity vendor = order.getVendor();
 
-		Order other = (Order) vendor2order.get(vendor);
+		Order other = vendor2order.get(vendor);
 		if (order.equals(other))
 			return; // nothing to do
 
@@ -142,7 +170,7 @@ public class OrderRequirement
 
 		vendor2order.put(vendor, order);
 	}
-	
+
 	/**
 	 * This method returns the Order for the given vendor or null,
 	 * if it does not exist.
@@ -152,6 +180,16 @@ public class OrderRequirement
 	 */
 	public Order getPartnerOrder(LegalEntity vendor)
 	{
-		return (Order)vendor2order.get(vendor);
+		return vendor2order.get(vendor);
+	}
+
+	public String getOrganisationID() {
+		return organisationID;
+	}
+	public String getOrderIDPrefix() {
+		return orderIDPrefix;
+	}
+	public long getOrderID() {
+		return orderID;
 	}
 }

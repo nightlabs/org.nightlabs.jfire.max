@@ -48,6 +48,21 @@ import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.ArticlePrice;
 import org.nightlabs.util.Util;
 
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Discriminator;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.DiscriminatorStrategy;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+
 /**
  * A <tt>PriceConfig</tt> is a complete set of prices which can be assigned to a product by setting
  * it's <tt>ProductInfo.priceConfig</tt>. This class may be inherited thus, the PriceConfig can be
@@ -76,6 +91,27 @@ import org.nightlabs.util.Util;
  *
  * @jdo.fetch-group name="FetchGroupsPriceConfig.edit" fields="currencies, name, priceFragmentTypes"
  */
+@PersistenceCapable(
+	objectIdClass=PriceConfigID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_PriceConfig")
+@FetchGroups({
+	@FetchGroup(
+		name=PriceConfig.FETCH_GROUP_CURRENCIES,
+		members=@Persistent(name="currencies")),
+	@FetchGroup(
+		name=PriceConfig.FETCH_GROUP_NAME,
+		members=@Persistent(name="name")),
+	@FetchGroup(
+		name=PriceConfig.FETCH_GROUP_PRICE_FRAGMENT_TYPES,
+		members=@Persistent(name="priceFragmentTypes")),
+	@FetchGroup(
+		name="FetchGroupsPriceConfig.edit",
+		members={@Persistent(name="currencies"), @Persistent(name="name"), @Persistent(name="priceFragmentTypes")})
+})
+@Discriminator(strategy=DiscriminatorStrategy.CLASS_NAME)
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public abstract class PriceConfig implements Serializable, StoreCallback, AttachCallback, IPriceConfig
 {
 	private static final long serialVersionUID = 1L;
@@ -91,6 +127,8 @@ public abstract class PriceConfig implements Serializable, StoreCallback, Attach
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+@PrimaryKey
+@Column(length=100)
 	private String organisationID = null;
 
 //	/**
@@ -101,21 +139,29 @@ public abstract class PriceConfig implements Serializable, StoreCallback, Attach
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+@PrimaryKey
+@Column(length=100)
 	private String priceConfigID = null;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private String primaryKey;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" dependent="true" mapped-by="priceConfig"
 	 */
+	@Persistent(
+		dependent="true",
+		mappedBy="priceConfig",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private PriceConfigName name;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private String managedBy;
 
 //	protected PriceConfig extendedPriceConfig = null;
@@ -197,6 +243,11 @@ public abstract class PriceConfig implements Serializable, StoreCallback, Attach
 	 *
 	 * @jdo.join
 	 */
+	@Join
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		table="JFireTrade_PriceConfig_currencies",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Map<String, Currency> currencies;
 
 	public Collection<Currency> getCurrencies()
@@ -263,6 +314,11 @@ public abstract class PriceConfig implements Serializable, StoreCallback, Attach
 	 *
 	 * @jdo.join
 	 */
+	@Join
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		table="JFireTrade_PriceConfig_priceFragmentTypes",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Map<String, PriceFragmentType> priceFragmentTypes;
 
 	@Override
@@ -387,6 +443,7 @@ public abstract class PriceConfig implements Serializable, StoreCallback, Attach
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	@SuppressWarnings("unused")
 	private boolean dependentOnOffer;
 
@@ -399,6 +456,7 @@ public abstract class PriceConfig implements Serializable, StoreCallback, Attach
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	@SuppressWarnings("unused")
 	private boolean requiresProductTypePackageInternal;
 

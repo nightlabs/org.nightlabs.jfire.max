@@ -51,6 +51,15 @@ import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.ArticlePrice;
 import org.nightlabs.jfire.trade.CustomerGroup;
 
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.IdentityType;
+
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  *
@@ -75,6 +84,20 @@ import org.nightlabs.jfire.trade.CustomerGroup;
  *
  * @jdo.fetch-group name="FetchGroupsPriceConfig.edit" fetch-groups="default" fields="priceCells"
  */
+@PersistenceCapable(
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_StablePriceConfig")
+@FetchGroups({
+	@FetchGroup(
+		name=StablePriceConfig.FETCH_GROUP_PRICE_CELLS,
+		members=@Persistent(name="priceCells")),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name="FetchGroupsPriceConfig.edit",
+		members=@Persistent(name="priceCells"))
+})
+@Inheritance(strategy=InheritanceStrategy.SUPERCLASS_TABLE)
 public class StablePriceConfig
 extends GridPriceConfig
 implements IPackagePriceConfig, IResultPriceConfig
@@ -128,11 +151,16 @@ implements IPackagePriceConfig, IResultPriceConfig
 	 *		mapped-by="priceConfig"
 	 *		dependent-element="true"
 	 */
+@Persistent(
+	dependentElement="true",
+	mappedBy="priceConfig",
+	persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Set<PriceCell> priceCells;
 
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private transient Map<IPriceCoordinate, PriceCell> priceCoordinate2priceCell;
 
 	protected Map<IPriceCoordinate, PriceCell> getPriceCoordinate2priceCell()

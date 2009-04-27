@@ -31,6 +31,20 @@ import java.util.Map;
 
 import org.nightlabs.i18n.I18nText;
 
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import org.nightlabs.jfire.store.id.RepositoryTypeNameID;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+
 /**
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  * @author marco schulze - marco at nightlabs dot de
@@ -48,6 +62,17 @@ import org.nightlabs.i18n.I18nText;
  *
  * @jdo.fetch-group name="RepositoryType.name" fields="repositoryType, names"
  */
+@PersistenceCapable(
+	objectIdClass=RepositoryTypeNameID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_RepositoryTypeName")
+@FetchGroups(
+	@FetchGroup(
+		name="RepositoryType.name",
+		members={@Persistent(name="repositoryType"), @Persistent(name="names")})
+)
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class RepositoryTypeName extends I18nText
 {
 	private static final long serialVersionUID = 1L;
@@ -55,16 +80,21 @@ public class RepositoryTypeName extends I18nText
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String repositoryTypeID;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private RepositoryType repositoryType;
 
 	/**
@@ -96,6 +126,12 @@ public class RepositoryTypeName extends I18nText
 	 *
 	 * @jdo.join
 	 */
+	@Join
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		table="JFireTrade_RepositoryTypeName_names",
+		defaultFetchGroup="true",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	protected Map<String, String> names;
 	
 	/**

@@ -26,6 +26,17 @@ import org.nightlabs.jfire.store.id.ProductTypePermissionFlagSetID;
 import org.nightlabs.util.CollectionUtil;
 import org.nightlabs.util.Util;
 
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.VersionStrategy;
+import javax.jdo.annotations.Version;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+
 /**
  * Holds a set of flags that give quick information about access rights a certain
  * {@link User} has to a certain {@link ProductType}.
@@ -47,6 +58,20 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="ProductTypePermissionFlagSet.productType" fields="productType"
  * @jdo.fetch-group name="ProductTypePermissionFlagSet.user" fields="user"
  */
+@PersistenceCapable(
+	objectIdClass=ProductTypePermissionFlagSetID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_ProductTypePermissionFlagSet")
+@Version(strategy=VersionStrategy.VERSION_NUMBER)
+@FetchGroups({
+	@FetchGroup(
+		name=ProductTypePermissionFlagSet.FETCH_GROUP_PRODUCT_TYPE,
+		members=@Persistent(name="productType")),
+	@FetchGroup(
+		name=ProductTypePermissionFlagSet.FETCH_GROUP_USER,
+		members=@Persistent(name="user"))
+})
 public class ProductTypePermissionFlagSet
 implements Serializable
 {
@@ -502,22 +527,30 @@ implements Serializable
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String productTypeOrganisationID;
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String productTypeID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String userOrganisationID;
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String userID;
 
 	/**
@@ -525,45 +558,54 @@ implements Serializable
 	 * @!jdo.field persistence-modifier="persistent" null-value="exception"
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private ProductType productType;
 	/**
 	 * TODO report DataNucleus bug when replicating with null-value="exception" and re-enable it once the bug is fixed!
 	 * @!jdo.field persistence-modifier="persistent" null-value="exception"
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private User user;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private int flagsSeeProductType;
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private int flagsSellProductType;
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private int flagsReverseProductType;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private boolean closed;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private boolean expired;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private double availabilityPercentage;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Date availabilityPercentageTimestamp;
 
 	/**

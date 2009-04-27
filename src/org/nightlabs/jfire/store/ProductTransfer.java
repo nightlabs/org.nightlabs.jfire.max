@@ -43,6 +43,19 @@ import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.transfer.Anchor;
 import org.nightlabs.jfire.transfer.Transfer;
 
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.Query;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Queries;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.IdentityType;
+
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  *
@@ -82,6 +95,27 @@ import org.nightlabs.jfire.transfer.Transfer;
  *				VARIABLES org.nightlabs.jfire.store.Product product
  *		"
  */
+@PersistenceCapable(
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_ProductTransfer")
+@FetchGroups(
+	@FetchGroup(
+		name=ProductTransfer.FETCH_GROUP_PRODUCTS,
+		members=@Persistent(name="products"))
+)
+@Queries({
+	@Query(
+		name="getProductType2productCount",
+		value=" SELECT product.productType, count(product) WHERE this == :productTransfer && this.products.contains(product) VARIABLES org.nightlabs.jfire.store.Product product GROUP BY product.productType "),
+	@Query(
+		name="WORKAROUND_getProductTypesForProducts",
+		value=" SELECT product.productType WHERE this == :productTransfer && this.products.contains(product) VARIABLES org.nightlabs.jfire.store.Product product "),
+	@Query(
+		name="WORKAROUND_getProductCountForProductType",
+		value=" SELECT count(product.productID) WHERE this == :productTransfer && this.products.contains(product) && product.productType == :productType VARIABLES org.nightlabs.jfire.store.Product product ")
+})
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class ProductTransfer
 extends Transfer
 implements Serializable, DetachCallback
@@ -115,12 +149,19 @@ implements Serializable, DetachCallback
 	 *
 	 * @jdo.join
 	 */
+	@Join
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		table="JFireTrade_ProductTransfer_products",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Set<Product> products = null;
 
 	/** @jdo.field persistence-modifier="none" */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private Integer productCount = null;
 
 	/** @jdo.field persistence-modifier="none" */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private Map<ProductType, Integer> productType2productCountMap = null;
 
 	/**

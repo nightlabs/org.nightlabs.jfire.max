@@ -34,6 +34,20 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.Column;
+import org.nightlabs.jfire.store.deliver.id.DeliveryConfigurationID;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+
 /**
  * An instance of this class is assigned to a
  * {@link org.nightlabs.jfire.store.ProductType}. It will then be
@@ -65,6 +79,41 @@ import java.util.Set;
  *
  * @jdo.fetch-group name="DeliveryConfiguration.this" fields="name, modeOfDeliveries, modeOfDeliveryFlavours, includedServerDeliveryProcessors, excludedServerDeliveryProcessors, includedClientDeliveryProcessorFactoryIDs, excludedClientDeliveryProcessorFactoryIDs, crossTradeDeliveryCoordinator"
  */
+@PersistenceCapable(
+	objectIdClass=DeliveryConfigurationID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_DeliveryConfiguration")
+@FetchGroups({
+	@FetchGroup(
+		name=DeliveryConfiguration.FETCH_GROUP_NAME,
+		members=@Persistent(name="name")),
+	@FetchGroup(
+		name=DeliveryConfiguration.FETCH_GROUP_MODE_OF_DELIVERIES,
+		members=@Persistent(name="modeOfDeliveries")),
+	@FetchGroup(
+		name=DeliveryConfiguration.FETCH_GROUP_MODE_OF_DELIVERY_FLAVOURS,
+		members=@Persistent(name="modeOfDeliveryFlavours")),
+	@FetchGroup(
+		name=DeliveryConfiguration.FETCH_GROUP_INCLUDED_SERVER_DELIVERY_PROCESSORS,
+		members=@Persistent(name="includedServerDeliveryProcessors")),
+	@FetchGroup(
+		name=DeliveryConfiguration.FETCH_GROUP_EXCLUDED_SERVER_DELIVERY_PROCESSORS,
+		members=@Persistent(name="excludedServerDeliveryProcessors")),
+	@FetchGroup(
+		name=DeliveryConfiguration.FETCH_GROUP_INCLUDED_CLIENT_DELIVERY_PROCESSOR_FACTORY_IDS,
+		members=@Persistent(name="includedClientDeliveryProcessorFactoryIDs")),
+	@FetchGroup(
+		name=DeliveryConfiguration.FETCH_GROUP_EXCLUDED_CLIENT_DELIVERY_PROCESSOR_FACTORY_IDS,
+		members=@Persistent(name="excludedClientDeliveryProcessorFactoryIDs")),
+	@FetchGroup(
+		name=DeliveryConfiguration.FETCH_GROUP_CROSS_TRADE_DELIVERY_COORDINATOR,
+		members=@Persistent(name="crossTradeDeliveryCoordinator")),
+	@FetchGroup(
+		name=DeliveryConfiguration.FETCH_GROUP_THIS_DELIVERY_CONFIGURATION,
+		members={@Persistent(name="name"), @Persistent(name="modeOfDeliveries"), @Persistent(name="modeOfDeliveryFlavours"), @Persistent(name="includedServerDeliveryProcessors"), @Persistent(name="excludedServerDeliveryProcessors"), @Persistent(name="includedClientDeliveryProcessorFactoryIDs"), @Persistent(name="excludedClientDeliveryProcessorFactoryIDs"), @Persistent(name="crossTradeDeliveryCoordinator")})
+})
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class DeliveryConfiguration
 implements Serializable
 {
@@ -87,12 +136,16 @@ implements Serializable
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String deliveryConfigurationID;
 
 	/**
@@ -109,6 +162,11 @@ implements Serializable
 	 *
 	 * @jdo.join
 	 */
+	@Join
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		table="JFireTrade_DeliveryConfiguration_modeOfDeliveries",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Map<String, ModeOfDelivery> modeOfDeliveries;
 
 	/**
@@ -125,6 +183,11 @@ implements Serializable
 	 *
 	 * @jdo.join
 	 */
+	@Join
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		table="JFireTrade_DeliveryConfiguration_modeOfDeliveryFlavours",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Map<String, ModeOfDeliveryFlavour> modeOfDeliveryFlavours;
 
 
@@ -164,6 +227,7 @@ implements Serializable
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private byte serverDeliveryProcessorSupportMode = SERVER_DELIVERY_PROCESSOR_SUPPORT_MODE_ALL;
 
 
@@ -203,6 +267,7 @@ implements Serializable
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private byte clientDeliveryProcessorSupportMode = CLIENT_DELIVERY_PROCESSOR_SUPPORT_MODE_ALL;
 
 
@@ -225,6 +290,11 @@ implements Serializable
 	 *
 	 * @jdo.join
 	 */
+	@Join
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		table="JFireTrade_DeliveryConfiguration_includedServerDeliveryProcessors",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Map<String, ServerDeliveryProcessor> includedServerDeliveryProcessors;
 
 	/**
@@ -246,6 +316,11 @@ implements Serializable
 	 *
 	 * @jdo.join
 	 */
+	@Join
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		table="JFireTrade_DeliveryConfiguration_excludedServerDeliveryProcessors",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Map<String, ServerDeliveryProcessor> excludedServerDeliveryProcessors;
 
 	/**
@@ -263,6 +338,11 @@ implements Serializable
 	 *
 	 * @jdo.join
 	 */
+	@Join
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		table="JFireTrade_DeliveryConfiguration_includedClientDeliveryProcessorFactoryIDs",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Set<String> includedClientDeliveryProcessorFactoryIDs;
 
 	/**
@@ -280,16 +360,26 @@ implements Serializable
 	 *
 	 * @jdo.join
 	 */
+	@Join
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		table="JFireTrade_DeliveryConfiguration_excludedClientDeliveryProcessorFactoryIDs",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Set<String> excludedClientDeliveryProcessorFactoryIDs;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" dependent="true" mapped-by="deliveryConfiguration"
 	 */
+	@Persistent(
+		dependent="true",
+		mappedBy="deliveryConfiguration",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private DeliveryConfigurationName name;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private CrossTradeDeliveryCoordinator crossTradeDeliveryCoordinator = null;
 
 	/**

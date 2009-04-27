@@ -30,6 +30,16 @@ import java.io.Serializable;
 
 import org.nightlabs.jdo.ObjectIDUtil;
 
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.InheritanceStrategy;
+import org.nightlabs.jfire.store.id.ProductReferenceGroupID;
+import javax.jdo.annotations.Inheritance;
+
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  *
@@ -44,6 +54,12 @@ import org.nightlabs.jdo.ObjectIDUtil;
  * @jdo.create-objectid-class
  *		field-order="organisationID, anchorTypeID, productReferenceGroupID, productOrganisationID, productProductID"
  */
+@PersistenceCapable(
+	objectIdClass=ProductReferenceGroupID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_ProductReferenceGroup")
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class ProductReferenceGroup
 implements Serializable
 {
@@ -52,27 +68,36 @@ implements Serializable
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String anchorTypeID;
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="201"
 	 */
+	@PrimaryKey
+	@Column(length=201)
 	private String productReferenceGroupID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String productOrganisationID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 */
+	@PrimaryKey
 	private long productProductID;
 
 	/**
@@ -81,6 +106,7 @@ implements Serializable
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private int quantity = 0;
 
 	private ProductReference significantProductReference = null;

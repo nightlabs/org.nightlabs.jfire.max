@@ -37,6 +37,14 @@ import org.nightlabs.jfire.store.ProductTransfer;
 import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.transfer.Anchor;
 
+import org.nightlabs.jfire.store.book.id.StorekeeperID;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+
 /**
  * The <code>Storekeeper</code> does a similar job in the store as the
  * {@link org.nightlabs.jfire.accounting.book.Accountant} does in the
@@ -57,6 +65,12 @@ import org.nightlabs.jfire.transfer.Anchor;
  * @jdo.create-objectid-class
  *		field-order="organisationID, storekeeperID"
  */
+@PersistenceCapable(
+	objectIdClass=StorekeeperID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_Storekeeper")
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public abstract class Storekeeper
 implements Serializable
 {
@@ -65,11 +79,15 @@ implements Serializable
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String storekeeperID;
 
 	/**

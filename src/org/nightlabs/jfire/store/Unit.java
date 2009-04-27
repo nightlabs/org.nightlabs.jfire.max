@@ -7,6 +7,18 @@ import javax.jdo.listener.StoreCallback;
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.util.Util;
 
+import javax.jdo.annotations.Persistent;
+import org.nightlabs.jfire.store.id.UnitID;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+
 /**
  * @author Marco Schulze - Marco at NightLabs dot de
  *
@@ -29,6 +41,40 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="FetchGroupsTrade.articleInDeliveryNoteEditor" fetch-groups="default" fields="name, symbol"
  * @jdo.fetch-group name="FetchGroupsTrade.articleInReceptionNoteEditor" fetch-groups="default" fields="name, symbol"
  */
+@PersistenceCapable(
+	objectIdClass=UnitID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_Unit")
+@FetchGroups({
+	@FetchGroup(
+		name=Unit.FETCH_GROUP_NAME,
+		members=@Persistent(name="name")),
+	@FetchGroup(
+		name=Unit.FETCH_GROUP_SYMBOL,
+		members=@Persistent(name="symbol")),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name="FetchGroupsTrade.articleInOrderEditor",
+		members={@Persistent(name="name"), @Persistent(name="symbol")}),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name="FetchGroupsTrade.articleInOfferEditor",
+		members={@Persistent(name="name"), @Persistent(name="symbol")}),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name="FetchGroupsTrade.articleInInvoiceEditor",
+		members={@Persistent(name="name"), @Persistent(name="symbol")}),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name="FetchGroupsTrade.articleInDeliveryNoteEditor",
+		members={@Persistent(name="name"), @Persistent(name="symbol")}),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name="FetchGroupsTrade.articleInReceptionNoteEditor",
+		members={@Persistent(name="name"), @Persistent(name="symbol")})
+})
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class Unit
 implements Serializable, StoreCallback
 {
@@ -41,25 +87,35 @@ implements Serializable, StoreCallback
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 	/**
 	 * @jdo.field primary-key="true"
 	 */
+	@PrimaryKey
 	private long unitID;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" mapped-by="unit"
 	 */
+	@Persistent(
+		mappedBy="unit",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private UnitName name;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" mapped-by="unit"
 	 */
+	@Persistent(
+		mappedBy="unit",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private UnitSymbol symbol;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private int decimalDigitCount;
 
 	/**

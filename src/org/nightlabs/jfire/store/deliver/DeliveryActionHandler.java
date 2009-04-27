@@ -3,6 +3,16 @@ package org.nightlabs.jfire.store.deliver;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.DiscriminatorStrategy;
+import javax.jdo.annotations.Column;
+import org.nightlabs.jfire.store.deliver.id.DeliveryActionHandlerID;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Discriminator;
+import javax.jdo.annotations.Inheritance;
+
 /**
  * @author Tobias Langner <!-- tobias[dot]langner[at]nightlabs[dot]de -->
  *
@@ -17,16 +27,27 @@ import javax.jdo.PersistenceManager;
  *
  * @jdo.create-objectid-class field-order="organisationID, deliveryActionHandlerID"
  */
+@PersistenceCapable(
+	objectIdClass=DeliveryActionHandlerID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_DeliveryActionHandler")
+@Discriminator(strategy=DiscriminatorStrategy.CLASS_NAME)
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class DeliveryActionHandler {
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String deliveryActionHandlerID;
 	
 	protected DeliveryActionHandler() {

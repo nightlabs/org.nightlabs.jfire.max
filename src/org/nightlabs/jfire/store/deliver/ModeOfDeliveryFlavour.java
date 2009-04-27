@@ -57,6 +57,18 @@ import org.nightlabs.jfire.trade.id.CustomerGroupID;
 import org.nightlabs.util.IOUtil;
 import org.nightlabs.util.Util;
 
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Queries;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+
 /**
  * A <tt>ModeOfDeliveryFlavour</tt> is a subkind of <tt>ModeOfDelivery</tt>. An example
  * might be "Physical Mail" as <tt>ModeOfDelivery</tt> and "UPS" or "DHL" as
@@ -143,6 +155,38 @@ import org.nightlabs.util.Util;
  *		name="getAllModeOfDeliveryFlavourIDs"
  *		query="SELECT JDOHelper.getObjectId(this)"
  */
+@PersistenceCapable(
+	objectIdClass=ModeOfDeliveryFlavourID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_ModeOfDeliveryFlavour")
+@FetchGroups({
+	@FetchGroup(
+		name=ModeOfDeliveryFlavour.FETCH_GROUP_NAME,
+		members=@Persistent(name="name")),
+	@FetchGroup(
+		name=ModeOfDeliveryFlavour.FETCH_GROUP_MODE_OF_DELIVERY,
+		members=@Persistent(name="modeOfDelivery")),
+	@FetchGroup(
+		name=ModeOfDeliveryFlavour.FETCH_GROUP_ICON_16X16_DATA,
+		members=@Persistent(name="icon16x16Data")),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name=ModeOfDeliveryFlavour.FETCH_GROUP_THIS_MODE_OF_DELIVERY_FLAVOUR,
+		members={@Persistent(name="modeOfDelivery"), @Persistent(name="name")})
+})
+@Queries({
+	@javax.jdo.annotations.Query(
+		name="getAvailableModeOfDeliveryFlavoursForOneCustomerGroup_WORKAROUND1",
+		value="SELECT WHERE customerGroup.organisationID == paramOrganisationID && customerGroup.customerGroupID == paramCustomerGroupID && customerGroup.modeOfDeliveryFlavours.containsValue(this) VARIABLES CustomerGroup customerGroup PARAMETERS String paramOrganisationID, String paramCustomerGroupID import java.lang.String; import org.nightlabs.jfire.trade.CustomerGroup"),
+	@javax.jdo.annotations.Query(
+		name="getAvailableModeOfDeliveryFlavoursForOneCustomerGroup_WORKAROUND2",
+		value="SELECT WHERE customerGroup.organisationID == paramOrganisationID && customerGroup.customerGroupID == paramCustomerGroupID && customerGroup.modeOfDeliveries.containsValue(modeOfDelivery) && modeOfDelivery.flavours.containsValue(this) VARIABLES CustomerGroup customerGroup; ModeOfDelivery modeOfDelivery PARAMETERS String paramOrganisationID, String paramCustomerGroupID import java.lang.String; import org.nightlabs.jfire.trade.CustomerGroup; import org.nightlabs.jfire.store.deliver.ModeOfDelivery"),
+	@javax.jdo.annotations.Query(
+		name="getAllModeOfDeliveryFlavourIDs",
+		value="SELECT JDOHelper.getObjectId(this)")
+})
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class ModeOfDeliveryFlavour
 implements Serializable
 {
@@ -559,27 +603,37 @@ implements Serializable
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+@PrimaryKey
+@Column(length=100)
 	private String organisationID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String modeOfDeliveryFlavourID;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private String primaryKey;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private ModeOfDelivery modeOfDelivery;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" dependent="true" mapped-by="modeOfDeliveryFlavour"
 	 */
+	@Persistent(
+		dependent="true",
+		mappedBy="modeOfDeliveryFlavour",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private ModeOfDeliveryFlavourName name;
 
 //	/**
@@ -591,6 +645,8 @@ implements Serializable
 	 * @jdo.field persistence-modifier="persistent"
 	 * @jdo.column sql-type="BLOB"
 	 */
+@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+@Column(sqlType="BLOB")
 	private byte[] icon16x16Data;
 
 	/**

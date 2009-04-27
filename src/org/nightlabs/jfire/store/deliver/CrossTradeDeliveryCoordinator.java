@@ -62,6 +62,12 @@ import org.nightlabs.jfire.trade.jbpm.ProcessDefinitionAssignment;
 import org.nightlabs.jfire.trade.jbpm.id.ProcessDefinitionAssignmentID;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.IdentityType;
+
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  *
@@ -74,6 +80,12 @@ import org.nightlabs.jfire.transfer.id.AnchorID;
  *
  * @jdo.create-objectid-class field-order="organisationID, crossTradeDeliveryCoordinatorID"
  */
+@PersistenceCapable(
+	objectIdClass=CrossTradeDeliveryCoordinatorID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_CrossTradeDeliveryCoordinator")
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class CrossTradeDeliveryCoordinator implements Serializable
 {
 	private static final long serialVersionUID = 1L;
@@ -106,11 +118,13 @@ public class CrossTradeDeliveryCoordinator implements Serializable
 	/**
 	 * @jdo.field primary-key="true"
 	 */
+	@PrimaryKey
 	private String organisationID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 */
+	@PrimaryKey
 	private String crossTradeDeliveryCoordinatorID;
 
 	private ModeOfDeliveryFlavour modeOfDeliveryFlavour;

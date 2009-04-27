@@ -7,6 +7,17 @@ import org.nightlabs.jfire.accounting.id.AccountTypeID;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.util.Util;
 
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  * @author Alexander Bieber <alex [AT] nightlabs [DOT] de>
@@ -24,6 +35,17 @@ import org.nightlabs.util.Util;
  *
  * @jdo.fetch-group name="AccountType.name" fields="name"
  */
+@PersistenceCapable(
+	objectIdClass=AccountTypeID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_AccountType")
+@FetchGroups(
+	@FetchGroup(
+		name=AccountType.FETCH_GROUP_NAME,
+		members=@Persistent(name="name"))
+)
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class AccountType
 implements Serializable
 {
@@ -71,17 +93,24 @@ implements Serializable
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String accountTypeID;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" mapped-by="accountType"
 	 */
+	@Persistent(
+		mappedBy="accountType",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private AccountTypeName name;
 
 	/**
@@ -89,6 +118,7 @@ implements Serializable
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private boolean outside;
 
 	/**

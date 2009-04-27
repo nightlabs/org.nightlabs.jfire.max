@@ -29,7 +29,21 @@ package org.nightlabs.jfire.store.deliver;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
+
 import org.nightlabs.i18n.I18nText;
+import org.nightlabs.jfire.store.deliver.id.DeliveryConfigurationNameID;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -43,9 +57,20 @@ import org.nightlabs.i18n.I18nText;
  * @jdo.create-objectid-class field-order="organisationID, deliveryConfigurationID"
  *
  * @jdo.inheritance strategy="new-table"
- * 
+ *
  * @jdo.fetch-group name="DeliveryConfiguration.name" fields="deliveryConfiguration, names"
  */
+@PersistenceCapable(
+	objectIdClass=DeliveryConfigurationNameID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_DeliveryConfigurationName")
+@FetchGroups(
+	@FetchGroup(
+		name="DeliveryConfiguration.name",
+		members={@Persistent(name="deliveryConfiguration"), @Persistent(name="names")})
+)
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class DeliveryConfigurationName extends I18nText
 {
 	private static final long serialVersionUID = 1L;
@@ -54,18 +79,22 @@ public class DeliveryConfigurationName extends I18nText
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String deliveryConfigurationID;
 
 	/**
 	 * key: String languageID<br/>
 	 * value: String name
-	 * 
+	 *
 	 * @jdo.field
 	 *		persistence-modifier="persistent"
 	 *		collection-type="map"
@@ -77,11 +106,18 @@ public class DeliveryConfigurationName extends I18nText
 	 *
 	 * @jdo.join
 	 */
-	protected Map names = new HashMap();
+	@Join
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		table="JFireTrade_DeliveryConfigurationName_names",
+		defaultFetchGroup="true",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
+	protected Map<String, String> names;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private DeliveryConfiguration deliveryConfiguration;
 
 	/**
@@ -89,19 +125,20 @@ public class DeliveryConfigurationName extends I18nText
 	 */
 	@Deprecated
 	protected DeliveryConfigurationName() { }
-	
+
 	public DeliveryConfigurationName(DeliveryConfiguration deliveryConfiguration)
 	{
 		this.deliveryConfiguration = deliveryConfiguration;
 		this.organisationID = deliveryConfiguration.getOrganisationID();
 		this.deliveryConfigurationID = deliveryConfiguration.getDeliveryConfigurationID();
+		names = new HashMap<String, String>();
 	}
 
 	/**
 	 * @see org.nightlabs.i18n.I18nText#getI18nMap()
 	 */
 	@Override
-	protected Map getI18nMap()
+	protected Map<String, String> getI18nMap()
 	{
 		return names;
 	}

@@ -38,6 +38,20 @@ import org.nightlabs.jfire.accounting.InvoiceLocal;
 import org.nightlabs.jfire.store.deliver.Delivery;
 import org.nightlabs.jfire.store.deliver.id.DeliveryID;
 
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.VersionStrategy;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.Version;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+import org.nightlabs.jfire.trade.id.ArticleLocalID;
+
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  *
@@ -60,6 +74,30 @@ import org.nightlabs.jfire.store.deliver.id.DeliveryID;
  * @jdo.fetch-group name="FetchGroupsTrade.articleInInvoiceEditor" fields="article"
  * @jdo.fetch-group name="FetchGroupsTrade.articleInDeliveryNoteEditor" fields="article"
  */
+@PersistenceCapable(
+	objectIdClass=ArticleLocalID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_ArticleLocal")
+@Version(strategy=VersionStrategy.VERSION_NUMBER)
+@FetchGroups({
+	@FetchGroup(
+		name="ArticleLocal.article",
+		members=@Persistent(name="article")),
+	@FetchGroup(
+		name="FetchGroupsTrade.articleInOrderEditor",
+		members=@Persistent(name="article")),
+	@FetchGroup(
+		name="FetchGroupsTrade.articleInOfferEditor",
+		members=@Persistent(name="article")),
+	@FetchGroup(
+		name="FetchGroupsTrade.articleInInvoiceEditor",
+		members=@Persistent(name="article")),
+	@FetchGroup(
+		name="FetchGroupsTrade.articleInDeliveryNoteEditor",
+		members=@Persistent(name="article"))
+})
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class ArticleLocal
 implements Serializable, DetachCallback
 {
@@ -72,41 +110,50 @@ implements Serializable, DetachCallback
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 */
+	@PrimaryKey
 	private long articleID;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Article article;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Delivery delivery = null;
 
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private DeliveryID deliveryID = null;
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private boolean deliveryID_detached = false;
 	/**
 	 * This is <code>true</code>, if {@link #delivery} is assigned.
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private boolean delivered = false;
 
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private Boolean invoicePaid = null;
 
 	public void setDelivery(Delivery delivery)
@@ -127,6 +174,7 @@ implements Serializable, DetachCallback
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private String allocateReleaseExecID;
 
 	/**

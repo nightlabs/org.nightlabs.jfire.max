@@ -30,6 +30,17 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.Key;
+import javax.jdo.annotations.Value;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  *
@@ -42,6 +53,16 @@ import java.util.Map;
  *
  * @jdo.fetch-group name="ProductType.fieldMetaDataMap" fields="mapEntryMetaDataMap" fetch-groups="default"
  */
+@PersistenceCapable(
+	identityType=IdentityType.APPLICATION,
+	detachable="true")
+@FetchGroups(
+	@FetchGroup(
+		fetchGroups={"default"},
+		name="ProductType.fieldMetaDataMap",
+		members=@Persistent(name="mapEntryMetaDataMap"))
+)
+@Inheritance(strategy=InheritanceStrategy.SUPERCLASS_TABLE)
 public class ProductTypeMapFieldMetaData
 	extends ProductTypeFieldMetaData
 	implements org.nightlabs.inheritance.MapFieldMetaData, Serializable
@@ -59,6 +80,11 @@ public class ProductTypeMapFieldMetaData
 	 *
 	 * @jdo.key mapped-by="key"
 	 */
+	@Persistent(
+		mappedBy="mapFieldMetaData",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
+	@Key(mappedBy="key")
+	@Value(dependent="true")
 	protected Map<String, ProductTypeMapEntryMetaData> mapEntryMetaDataMap;
 
 	protected ProductTypeMapFieldMetaData() { }

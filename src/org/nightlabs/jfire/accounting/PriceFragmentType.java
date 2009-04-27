@@ -37,6 +37,17 @@ import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.util.Util;
 
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+
 /**
  * A PriceFragmentType defines a part out of which a <tt>Price</tt> may consist.
  * Normally, these are taxes. Examples are: vat-de-19, vat-de-7 or vat-ch-6_5
@@ -65,6 +76,23 @@ import org.nightlabs.util.Util;
  *
  * @jdo.fetch-group name="FetchGroupsPriceConfig.edit" fields="name"
  */
+@PersistenceCapable(
+	objectIdClass=PriceFragmentTypeID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_PriceFragmentType")
+@FetchGroups({
+	@FetchGroup(
+		name=PriceFragmentType.FETCH_GROUP_NAME,
+		members=@Persistent(name="name")),
+	@FetchGroup(
+		name=PriceFragmentType.FETCH_GROUP_CONTAINER_PRICE_FRAGMENT_TYPE,
+		members=@Persistent(name="containerPriceFragmentType")),
+	@FetchGroup(
+		name="FetchGroupsPriceConfig.edit",
+		members=@Persistent(name="name"))
+})
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class PriceFragmentType
 	implements Serializable
 {
@@ -82,12 +110,16 @@ public class PriceFragmentType
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String priceFragmentTypeID;
 
 	protected PriceFragmentType() { }
@@ -169,6 +201,10 @@ public class PriceFragmentType
 	/**
 	 * @jdo.field persistence-modifier="persistent" dependent="true" mapped-by="priceFragmentType"
 	 */
+	@Persistent(
+		dependent="true",
+		mappedBy="priceFragmentType",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private PriceFragmentTypeName name;
 
 	/**
@@ -182,6 +218,7 @@ public class PriceFragmentType
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private PriceFragmentType containerPriceFragmentType;
 
 	/**

@@ -34,6 +34,20 @@ import org.nightlabs.inheritance.NotWritableException;
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.util.Util;
 
+import org.nightlabs.jfire.store.id.ProductTypeFieldMetaDataID;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.DiscriminatorStrategy;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Discriminator;
+
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  *
@@ -50,6 +64,19 @@ import org.nightlabs.util.Util;
  *
  * @jdo.fetch-group name="ProductType.fieldMetaDataMap" fields="productType" fetch-groups="default"
  */
+@PersistenceCapable(
+	objectIdClass=ProductTypeFieldMetaDataID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_ProductTypeFieldMetaData")
+@FetchGroups(
+	@FetchGroup(
+		fetchGroups={"default"},
+		name="ProductType.fieldMetaDataMap",
+		members=@Persistent(name="productType"))
+)
+@Discriminator(strategy=DiscriminatorStrategy.CLASS_NAME)
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class ProductTypeFieldMetaData
 implements org.nightlabs.inheritance.FieldMetaData, Serializable
 {
@@ -60,23 +87,30 @@ implements org.nightlabs.inheritance.FieldMetaData, Serializable
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String productTypeID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String fieldName;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private ProductType productType;
 
 	/**
@@ -84,6 +118,7 @@ implements org.nightlabs.inheritance.FieldMetaData, Serializable
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private byte writableByChildren = FieldMetaData.WRITABLEBYCHILDREN_YES;
 
 	/**
@@ -92,6 +127,7 @@ implements org.nightlabs.inheritance.FieldMetaData, Serializable
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private boolean writable = true;
 
 	/**
@@ -100,6 +136,7 @@ implements org.nightlabs.inheritance.FieldMetaData, Serializable
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private boolean valueInherited = true;
 
 	protected ProductTypeFieldMetaData() {

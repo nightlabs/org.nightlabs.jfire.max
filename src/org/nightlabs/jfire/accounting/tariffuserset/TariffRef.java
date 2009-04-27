@@ -4,6 +4,15 @@ import org.nightlabs.jfire.accounting.Tariff;
 import org.nightlabs.jfire.entityuserset.AuthorizedObjectRef;
 import org.nightlabs.jfire.entityuserset.EntityRef;
 
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+
 /**
  * @author marco schulze - marco at nightlabs dot de
  *
@@ -14,6 +23,19 @@ import org.nightlabs.jfire.entityuserset.EntityRef;
  *
  * @jdo.fetch-group name="FetchGroupsEntityUserSet.replicateToReseller" fields="tariff"
  */
+@PersistenceCapable(
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_TariffRef")
+@FetchGroups({
+	@FetchGroup(
+		name="AuthorizedObjectRef.entityRefs",
+		members=@Persistent(name="tariff")),
+	@FetchGroup(
+		name="FetchGroupsEntityUserSet.replicateToReseller",
+		members=@Persistent(name="tariff"))
+})
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class TariffRef extends EntityRef<Tariff>
 {
 	private static final long serialVersionUID = 2L;
@@ -21,6 +43,7 @@ public class TariffRef extends EntityRef<Tariff>
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Tariff tariff;
 
 	/**

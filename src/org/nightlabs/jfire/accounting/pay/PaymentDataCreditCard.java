@@ -28,6 +28,13 @@ package org.nightlabs.jfire.accounting.pay;
 
 import java.util.Calendar;
 
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  *
@@ -39,6 +46,11 @@ import java.util.Calendar;
  *
  * @jdo.inheritance strategy="new-table"
  */
+@PersistenceCapable(
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_PaymentDataCreditCard")
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class PaymentDataCreditCard
 extends PaymentData
 {
@@ -46,6 +58,7 @@ extends PaymentData
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private String nameOnCard = null;
 ////	/**
 ////	 * @jdo.field persistence-modifier="persistent"
@@ -54,10 +67,12 @@ extends PaymentData
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private String cardNumber = null;
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private String cvc = null;
 
 	/**
@@ -65,6 +80,7 @@ extends PaymentData
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private int expiryYear = -1;
 
 	/**
@@ -72,6 +88,7 @@ extends PaymentData
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private int expiryMonth = -1;
 
 	/**

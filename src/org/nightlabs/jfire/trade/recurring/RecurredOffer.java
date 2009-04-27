@@ -5,6 +5,16 @@ import org.nightlabs.jfire.timer.Task;
 import org.nightlabs.jfire.trade.Offer;
 import org.nightlabs.jfire.trade.Order;
 
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+
 
 /**
  * {@link RecurredOffer}s are created by a {@link Task} and will be built 
@@ -29,6 +39,16 @@ import org.nightlabs.jfire.trade.Order;
  * @jdo.fetch-group name="RecurringOffer.recurringOffer" fields="recurringOffer"
  * 
  */
+@PersistenceCapable(
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_RecurredOffer")
+@FetchGroups(
+	@FetchGroup(
+		name="RecurringOffer.recurringOffer",
+		members=@Persistent(name="recurringOffer"))
+)
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class RecurredOffer extends Offer {
 
 	private static final long serialVersionUID = 1L;
@@ -36,6 +56,9 @@ public class RecurredOffer extends Offer {
 	/**
 	 * @jdo.field persistence-modifier="persistent" null-value="exception"
 	 */
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private RecurringOffer recurringOffer;
 
 	/**

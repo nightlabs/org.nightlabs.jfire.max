@@ -36,6 +36,13 @@ import java.util.Set;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.Queries;
 
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.DeliveryNote;
@@ -73,6 +80,16 @@ import org.nightlabs.jfire.transfer.id.TransferID;
  *					this.delivery.deliveryID == :paramDeliveryID
  *				import java.lang.String; import java.lang.Long"
  */
+@PersistenceCapable(
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_DeliverProductTransfer")
+@Queries(
+	@javax.jdo.annotations.Query(
+		name="getDeliverProductTransferForDelivery",
+		value="SELECT UNIQUE WHERE this.delivery.organisationID == :paramOrganisationID && this.delivery.deliveryID == :paramDeliveryID import java.lang.String; import java.lang.Long")
+)
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class DeliverProductTransfer extends ProductTransfer
 {
 	private static final long serialVersionUID = 1L;
@@ -141,6 +158,7 @@ public class DeliverProductTransfer extends ProductTransfer
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Delivery delivery;
 
 	/**
@@ -214,7 +232,7 @@ public class DeliverProductTransfer extends ProductTransfer
 		bookAtDeliveryNotes(user, involvedAnchors, true);
 		super.rollbackTransfer(user, involvedAnchors);
 	}
-	
+
 	@Override
 	protected String internalGetDescription() {
 		return String.format(

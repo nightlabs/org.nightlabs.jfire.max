@@ -26,6 +26,13 @@
 
 package org.nightlabs.jfire.trade;
 
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
@@ -38,6 +45,11 @@ package org.nightlabs.jfire.trade;
  *
  * @jdo.inheritance strategy="new-table"
  */
+@PersistenceCapable(
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_OfferPrice")
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class OfferPrice extends org.nightlabs.jfire.accounting.Price
 {
 	private static final long serialVersionUID = 1L;
@@ -45,6 +57,7 @@ public class OfferPrice extends org.nightlabs.jfire.accounting.Price
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Offer offer;
 
 	/**

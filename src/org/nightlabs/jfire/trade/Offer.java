@@ -38,13 +38,27 @@ import javax.jdo.JDODetachedFieldAccessException;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.Element;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.Queries;
+import javax.jdo.annotations.Version;
+import javax.jdo.annotations.VersionStrategy;
 import javax.jdo.listener.AttachCallback;
 import javax.jdo.listener.DetachCallback;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.jdo.ObjectIDUtil;
-import org.nightlabs.jfire.accounting.Accounting;
-import org.nightlabs.jfire.accounting.AccountingPriceConfig;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.Price;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
@@ -54,6 +68,7 @@ import org.nightlabs.jfire.jbpm.graph.def.StatableLocal;
 import org.nightlabs.jfire.jbpm.graph.def.State;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.ProductType;
+import org.nightlabs.jfire.trade.id.OfferID;
 import org.nightlabs.jfire.trade.jbpm.ActionHandlerFinalizeOffer;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 import org.nightlabs.util.Util;
@@ -102,6 +117,53 @@ import org.nightlabs.util.Util;
  *
  * @jdo.fetch-group name="FetchGroupsTrade.articleContainerInEditor" fields="offerLocal, segments, createUser, currency, finalizeUser, order, price, state, states"
  */
+@PersistenceCapable(
+	objectIdClass=OfferID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_Offer")
+@Version(strategy=VersionStrategy.VERSION_NUMBER)
+@FetchGroups({
+	@FetchGroup(
+		name=Offer.FETCH_GROUP_OFFER_LOCAL,
+		members=@Persistent(name="offerLocal")),
+	@FetchGroup(
+		name=Offer.FETCH_GROUP_PRICE,
+		members=@Persistent(name="price")),
+	@FetchGroup(
+		name=Offer.FETCH_GROUP_ARTICLES,
+		members=@Persistent(name="articles")),
+	@FetchGroup(
+		name=Offer.FETCH_GROUP_CURRENCY,
+		members=@Persistent(name="currency")),
+	@FetchGroup(
+		name=Offer.FETCH_GROUP_ORDER,
+		members=@Persistent(name="order")),
+	@FetchGroup(
+		name=Offer.FETCH_GROUP_CREATE_USER,
+		members=@Persistent(name="createUser")),
+	@FetchGroup(
+		name=Offer.FETCH_GROUP_FINALIZE_USER,
+		members=@Persistent(name="finalizeUser")),
+	@FetchGroup(
+		name=Offer.FETCH_GROUP_SEGMENTS,
+		members=@Persistent(name="segments")),
+	@FetchGroup(
+		name="Statable.state",
+		members=@Persistent(name="state")),
+	@FetchGroup(
+		name="Statable.states",
+		members=@Persistent(name="states")),
+	@FetchGroup(
+		name="FetchGroupsTrade.articleContainerInEditor",
+		members={@Persistent(name="offerLocal"), @Persistent(name="segments"), @Persistent(name="createUser"), @Persistent(name="currency"), @Persistent(name="finalizeUser"), @Persistent(name="order"), @Persistent(name="price"), @Persistent(name="state"), @Persistent(name="states")})
+})
+@Queries(
+	@javax.jdo.annotations.Query(
+		name="getNonFinalizedNonEndedOffersForOrder",
+		value="SELECT WHERE this.order == :order && this.finalizeDT == null && this.offerLocal.processEnded == false ORDER BY offerID DESCENDING")
+)
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class Offer
 implements
 		Serializable,
@@ -138,37 +200,49 @@ implements
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="50"
 	 */
+	@PrimaryKey
+	@Column(length=50)
 	private String offerIDPrefix;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 */
+	@PrimaryKey
 	private long offerID;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private String primaryKey;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" mapped-by="offer" dependent="true"
 	 */
+	@Persistent(
+		dependent="true",
+		mappedBy="offer",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private OfferLocal offerLocal;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Order order;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Currency currency;
 
 	/**
@@ -180,6 +254,10 @@ implements
 	 *
 	 * @jdo.join
 	 */
+	@Join
+	@Persistent(
+		table="JFireTrade_Offer_segments",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Set<Segment> segments;
 
 	/**
@@ -189,6 +267,7 @@ implements
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private boolean stable;
 
 	/**
@@ -197,16 +276,19 @@ implements
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private boolean valid = false;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Date createDT;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private User createUser;
 
 	/**
@@ -216,11 +298,13 @@ implements
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Date finalizeDT = null;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private User finalizeUser = null;
 
 //	/**
@@ -249,6 +333,11 @@ implements
 	 *		dependent-value="true"
 	 *		mapped-by="offer"
 	 */
+	@Persistent(
+			mappedBy="offer",
+			persistenceModifier=PersistenceModifier.PERSISTENT
+	)
+	@Element(dependent="true")
 	private Set<Article> articles;
 
 	/**
@@ -256,69 +345,84 @@ implements
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Price price;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private boolean containsPricesDependentOnOffer = false;
 
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private LegalEntity vendor = null;
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private boolean vendor_detached = false;
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private LegalEntity customer = null;
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private boolean customer_detached = false;
 
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private LegalEntity endCustomer = null;
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private boolean endCustomer_detached = false;
 
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private AnchorID vendorID = null;
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private boolean vendorID_detached = false;
 
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private AnchorID customerID = null;
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private boolean customerID_detached = false;
 
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private AnchorID endCustomerID = null;
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private boolean endCustomerID_detached = false;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private State state;
 
 	/**
@@ -333,16 +437,23 @@ implements
 	 *
 	 * @jdo.join
 	 */
+	@Join
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		table="JFireTrade_Offer_states",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private List<State> states;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private int articleCount = 0;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Date expiryTimestampUnfinalized;
 
 	private boolean expiryTimestampUnfinalizedAutoManaged = true;
@@ -350,6 +461,7 @@ implements
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Date expiryTimestampFinalized;
 
 	private boolean expiryTimestampFinalizedAutoManaged = true;
@@ -771,6 +883,7 @@ implements
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private transient Set<Article> _articles = null;
 
 	/**
@@ -866,6 +979,7 @@ implements
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private boolean attachable = true;
 
 	protected PersistenceManager getPersistenceManager()

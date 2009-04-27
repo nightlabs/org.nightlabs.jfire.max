@@ -29,9 +29,22 @@ package org.nightlabs.jfire.accounting;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
 import javax.jdo.listener.StoreCallback;
 
 import org.nightlabs.i18n.I18nText;
+import org.nightlabs.jfire.accounting.id.TariffNameID;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -59,6 +72,39 @@ import org.nightlabs.i18n.I18nText;
  *
  * @jdo.fetch-group name="FetchGroupsEntityUserSet.replicateToReseller" fields="tariff, names"
  */
+@PersistenceCapable(
+	objectIdClass=TariffNameID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_TariffName")
+@FetchGroups({
+	@FetchGroup(
+		name="Tariff.name",
+		members={@Persistent(name="tariff"), @Persistent(name="names")}),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name="PriceCell.this",
+		members={@Persistent(name="price"), @Persistent(name="priceConfig"), @Persistent(name="priceCoordinate")}),
+	@FetchGroup(
+		name="FetchGroupsTrade.articleInOrderEditor",
+		members={@Persistent(name="tariff"), @Persistent(name="names")}),
+	@FetchGroup(
+		name="FetchGroupsTrade.articleInOfferEditor",
+		members={@Persistent(name="tariff"), @Persistent(name="names")}),
+	@FetchGroup(
+		name="FetchGroupsTrade.articleInInvoiceEditor",
+		members={@Persistent(name="tariff"), @Persistent(name="names")}),
+	@FetchGroup(
+		name="FetchGroupsTrade.articleInDeliveryNoteEditor",
+		members={@Persistent(name="tariff"), @Persistent(name="names")}),
+	@FetchGroup(
+		name="FetchGroupsPriceConfig.edit",
+		members={@Persistent(name="tariff"), @Persistent(name="names")}),
+	@FetchGroup(
+		name="FetchGroupsEntityUserSet.replicateToReseller",
+		members={@Persistent(name="tariff"), @Persistent(name="names")})
+})
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class TariffName extends I18nText
 implements StoreCallback
 {
@@ -68,6 +114,8 @@ implements StoreCallback
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 
 //	/**
@@ -78,6 +126,8 @@ implements StoreCallback
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String tariffID;
 
 	public TariffName()
@@ -89,11 +139,13 @@ implements StoreCallback
 		this.tariff = tariff;
 		this.organisationID = tariff.getOrganisationID();
 		this.tariffID = tariff.getTariffID();
+		names = new HashMap<String, String>();
 	}
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Tariff tariff;
 
 	/**
@@ -110,7 +162,12 @@ implements StoreCallback
 	 *
 	 * @jdo.join
 	 */
-	protected Map names = new HashMap();
+	@Join
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		table="JFireTrade_TariffName_names",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
+	protected Map<String, String> names;
 
 	/**
 	 * @return Returns the organisationID.
@@ -151,7 +208,7 @@ implements StoreCallback
 	 * @see org.nightlabs.i18n.I18nText#getI18nMap()
 	 */
 	@Override
-	protected Map getI18nMap()
+	protected Map<String, String> getI18nMap()
 	{
 		return names;
 	}

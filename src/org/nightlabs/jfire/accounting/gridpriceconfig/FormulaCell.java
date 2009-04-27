@@ -38,6 +38,20 @@ import org.nightlabs.jfire.accounting.priceconfig.PriceConfig;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.util.Util;
 
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.Column;
+import org.nightlabs.jfire.accounting.gridpriceconfig.id.FormulaCellID;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  *
@@ -57,6 +71,33 @@ import org.nightlabs.util.Util;
  *
  * @jdo.fetch-group name="FetchGroupsPriceConfig.edit" fetch-groups="default" fields="priceConfig[-1], priceCoordinate[-1], priceFragmentFormulas[-1]"
  */
+@PersistenceCapable(
+	objectIdClass=FormulaCellID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_FormulaCell")
+@FetchGroups({
+	@FetchGroup(
+		name=FormulaCell.FETCH_GROUP_PRICE_CONFIG,
+		members=@Persistent(name="priceConfig")),
+	@FetchGroup(
+		name=FormulaCell.FETCH_GROUP_PRICE_COORDINATE,
+		members=@Persistent(name="priceCoordinate")),
+	@FetchGroup(
+		name=FormulaCell.FETCH_GROUP_PRICE_FRAGMENT_FORMULAS,
+		members=@Persistent(name="priceFragmentFormulas")),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name="FetchGroupsPriceConfig.edit",
+		members={@Persistent(
+			name="priceConfig",
+			recursionDepth=-1), @Persistent(
+			name="priceCoordinate",
+			recursionDepth=-1), @Persistent(
+			name="priceFragmentFormulas",
+			recursionDepth=-1)})
+})
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class FormulaCell implements Serializable
 {
 	private static final long serialVersionUID = 1L;
@@ -82,12 +123,19 @@ public class FormulaCell implements Serializable
 	 *
 	 * @jdo.join
 	 */
+	@Join
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		table="JFireTrade_FormulaCell_priceFragmentFormulas",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Map<String, String> priceFragmentFormulas;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 
 //	/**
@@ -99,6 +147,7 @@ public class FormulaCell implements Serializable
 	/**
 	 * @jdo.field primary-key="true"
 	 */
+@PrimaryKey
 	private long formulaCellID;
 
 	/**
@@ -106,6 +155,7 @@ public class FormulaCell implements Serializable
 	 * TODO DataNucleus workaround: the above null-value="exception" is correct but causes exceptions during cross-datastore-replication 
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private PriceConfig priceConfig;
 
 	/**
@@ -113,6 +163,7 @@ public class FormulaCell implements Serializable
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private PriceConfig mapOwner;
 
 	/**
@@ -134,6 +185,9 @@ public class FormulaCell implements Serializable
 	 *
 	 * @jdo.field persistence-modifier="persistent" dependent="true"
 	 */
+	@Persistent(
+		dependent="true",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private PriceCoordinate priceCoordinate;
 
 	/**

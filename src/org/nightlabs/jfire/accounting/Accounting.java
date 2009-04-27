@@ -42,6 +42,14 @@ import java.util.Set;
 import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
 import javax.jdo.listener.StoreCallback;
 
 import org.apache.log4j.Logger;
@@ -52,11 +60,10 @@ import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.accounting.book.BookMoneyTransfer;
 import org.nightlabs.jfire.accounting.book.LocalAccountant;
 import org.nightlabs.jfire.accounting.book.PartnerAccountant;
+import org.nightlabs.jfire.accounting.id.AccountingID;
 import org.nightlabs.jfire.accounting.id.InvoiceID;
 import org.nightlabs.jfire.accounting.id.InvoiceLocalID;
 import org.nightlabs.jfire.accounting.jbpm.ActionHandlerBookInvoice;
-import org.nightlabs.jfire.accounting.jbpm.ActionHandlerBookInvoiceImplicitely;
-import org.nightlabs.jfire.accounting.jbpm.ActionHandlerFinalizeInvoice;
 import org.nightlabs.jfire.accounting.jbpm.JbpmConstantsInvoice;
 import org.nightlabs.jfire.accounting.pay.ModeOfPaymentFlavour;
 import org.nightlabs.jfire.accounting.pay.PayMoneyTransfer;
@@ -69,16 +76,12 @@ import org.nightlabs.jfire.accounting.pay.PaymentResult;
 import org.nightlabs.jfire.accounting.pay.ServerPaymentProcessor;
 import org.nightlabs.jfire.accounting.pay.ServerPaymentProcessor.PayParams;
 import org.nightlabs.jfire.accounting.pay.id.ServerPaymentProcessorID;
-import org.nightlabs.jfire.accounting.priceconfig.PriceConfig;
 import org.nightlabs.jfire.config.Config;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.jbpm.JbpmLookup;
-import org.nightlabs.jfire.jbpm.graph.def.ActionHandlerNodeEnter;
 import org.nightlabs.jfire.jbpm.graph.def.ProcessDefinition;
 import org.nightlabs.jfire.jbpm.graph.def.State;
 import org.nightlabs.jfire.jbpm.graph.def.StateDefinition;
-import org.nightlabs.jfire.jbpm.graph.def.Transition;
-import org.nightlabs.jfire.jbpm.graph.def.id.ProcessDefinitionID;
 import org.nightlabs.jfire.organisation.LocalOrganisation;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.ProductTypeActionHandler;
@@ -99,7 +102,7 @@ import org.nightlabs.jfire.transfer.Transfer;
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
- * 
+ *
  * @jdo.persistence-capable
  *		identity-type="application"
  *		objectid-class="org.nightlabs.jfire.accounting.id.AccountingID"
@@ -110,6 +113,12 @@ import org.nightlabs.jfire.transfer.Transfer;
  *
  * @jdo.inheritance strategy="new-table"
  */
+@PersistenceCapable(
+	objectIdClass=AccountingID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_Accounting")
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class Accounting
 implements StoreCallback
 {
@@ -149,11 +158,14 @@ implements StoreCallback
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private OrganisationLegalEntity mandator;
 
 //	/**
@@ -164,11 +176,13 @@ implements StoreCallback
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private LocalAccountant localAccountant;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private PartnerAccountant partnerAccountant;
 
 	/**
@@ -205,7 +219,7 @@ implements StoreCallback
 
 		return accountingPM;
 	}
-	
+
 	public OrganisationLegalEntity getMandator() {
 		return mandator;
 	}
@@ -257,7 +271,7 @@ implements StoreCallback
 				InvoiceEditException.REASON_NO_ARTICLES,
 				"Cannot create an Invoice without Articles!"
 			);
-		
+
 		// Make sure all offerItems are not yet in an invoice.
 		// all offers have the same vendor and customer
 		// and all offers have the same currency
@@ -281,7 +295,7 @@ implements StoreCallback
 
 			Offer articleOffer = article.getOffer();
 			Order articleOrder = articleOffer.getOrder();
-			
+
 			if (!articleOffer.getOfferLocal().isAccepted()) {
 				throw new InvoiceEditException(
 					InvoiceEditException.REASON_OFFER_NOT_ACCEPTED,
@@ -337,7 +351,7 @@ implements StoreCallback
 			throw new IllegalArgumentException("The mandator is neither involved as vendor nor as customer!");
 
 		if (invoiceIDPrefix == null) {
-			TradeConfigModule tradeConfigModule = (TradeConfigModule) Config.getConfig(
+			TradeConfigModule tradeConfigModule = Config.getConfig(
 						getPersistenceManager(), organisationID, user).createConfigModule(TradeConfigModule.class);
 			invoiceIDPrefix = tradeConfigModule.getActiveIDPrefixCf(Invoice.class.getName()).getDefaultIDPrefix();
 		}
@@ -379,7 +393,7 @@ implements StoreCallback
 			al.add(article);
 		}
 		for (Map.Entry<ProductTypeActionHandler, List<Article>> me : productTypeActionHandler2Articles.entrySet()) {
-			((ProductTypeActionHandler) me.getKey()).onAddArticlesToInvoice(user, this, invoice, me.getValue());
+			(me.getKey()).onAddArticlesToInvoice(user, this, invoice, me.getValue());
 		}
 	}
 
@@ -435,7 +449,7 @@ implements StoreCallback
 	/**
 	 * Books the given Invoice. You must NOT call this method directly. It is called
 	 * by {@link ActionHandlerBookInvoice}.
-	 * 
+	 *
 	 * @param user The {@link User} who is responsible for booking.
 	 * @param invoice The {@link Invoice} that should be booked.
 	 * @param finalizeIfNecessary An invoice can only be booked, if finalized. Shall this method finalize,
@@ -513,7 +527,7 @@ implements StoreCallback
 		boolean failed = true;
 		try {
 			bookMoneyTransfer.bookTransfer(user, involvedAnchors);
-	
+
 			// check consistence
 			Anchor.checkIntegrity(containers, involvedAnchors);
 
@@ -587,7 +601,7 @@ implements StoreCallback
 							"Calling InvoiceActionHandler.onPayDoWork failed!",
 							x));
 		}
-		
+
 		try {
 			for (PaymentActionHandler paymentActionHandler : paymentData.getPayment().getPaymentLocal().getPaymentActionHandlers()) {
 				paymentActionHandler.onPayDoWork(paymentData);
@@ -682,7 +696,7 @@ implements StoreCallback
 							"Calling InvoiceActionHandler.onPayEnd failed!",
 							x));
 		}
-		
+
 		try {
 			for (PaymentActionHandler paymentActionHandler : paymentData.getPayment().getPaymentLocal().getPaymentActionHandlers()) {
 				paymentActionHandler.onPayEnd(paymentData);
@@ -736,7 +750,7 @@ implements StoreCallback
 			User user, PaymentData paymentData)
 	{
 		Payment payment = paymentData.getPayment();
-		
+
 		PayMoneyTransfer payMoneyTransfer = PayMoneyTransfer.getPayMoneyTransferForPayment(
 				getPersistenceManager(), payment);
 
@@ -849,7 +863,7 @@ implements StoreCallback
 
 		if (partner.getAccountant() == null)
 			partner.setAccountant(getPartnerAccountant());
-		
+
 //	The PaymentLocal object is normally created in PaymentHelperBean#payBegin_storePaymentData(PaymentData).
 //	But some use cases do not use this API, this is why we create it here if it does not exist yet.
 		if (paymentData.getPayment().getPaymentLocal() == null)
@@ -889,7 +903,7 @@ implements StoreCallback
 							"Calling InvoiceActionHandler.onPayBegin failed!",
 							x));
 		}
-		
+
 		try {
 			for (PaymentActionHandler paymentActionHandler : paymentData.getPayment().getPaymentLocal().getPaymentActionHandlers()) {
 				paymentActionHandler.onPayBegin(paymentData);
@@ -1101,7 +1115,7 @@ implements StoreCallback
 
 	/**
 	 * Finds (and creates if neccessary) the right Account for the given LegalEntity and Currency.
-	 * 
+	 *
 	 * @param accountType See {@link Account} for static anchorTypeID definitions
 	 * @param partner The legal entity the account should be searched for.
 	 * @param currency The currency the account should record.
@@ -1223,7 +1237,7 @@ implements StoreCallback
 		boolean failed = true;
 		try {
 			manualMoneyTransfer.bookTransfer(user, involvedAnchors);
-	
+
 			// check consistence
 			Anchor.checkIntegrity(containers, involvedAnchors);
 
@@ -1235,12 +1249,12 @@ implements StoreCallback
 
 		return manualMoneyTransfer;
 	}
-	
-	
-	
+
+
+
 	/**
-	 * 
-	 * signal a given Jbpm transition to the invoice. 
+	 *
+	 * signal a given Jbpm transition to the invoice.
 	 */
 	public void signalInvoice(InvoiceID invoiceID, String jbpmTransitionName)
 	{
@@ -1256,5 +1270,5 @@ implements StoreCallback
 		}
 	}
 
-	
+
 }

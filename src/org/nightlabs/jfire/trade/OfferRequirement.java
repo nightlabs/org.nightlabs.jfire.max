@@ -36,6 +36,17 @@ import javax.jdo.PersistenceManager;
 
 import org.nightlabs.jfire.trade.id.OfferRequirementID;
 
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+
 /**
  * One instance of OfferRequirement exists for each Offer on the side of the vendor.
  * The OfferRequirement bundles all other offers that the vendor needs to create to
@@ -53,6 +64,12 @@ import org.nightlabs.jfire.trade.id.OfferRequirementID;
  *
  * @jdo.create-objectid-class field-order="organisationID, offerIDPrefix, offerID"
  */
+@PersistenceCapable(
+	objectIdClass=OfferRequirementID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_OfferRequirement")
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class OfferRequirement
 	implements Serializable
 {
@@ -100,15 +117,20 @@ public class OfferRequirement
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="50"
 	 */
+	@PrimaryKey
+	@Column(length=50)
 	private String offerIDPrefix;
 	/**
 	 * @jdo.field primary-key="true"
 	 */
+	@PrimaryKey
 	private long offerID;
 
 	private Offer offer;
@@ -128,6 +150,11 @@ public class OfferRequirement
 	 *
 	 * @jdo.join
 	 */
+	@Join
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		table="JFireTrade_OfferRequirement_vendor2offer",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Map<LegalEntity, Offer> vendor2offer = new HashMap<LegalEntity, Offer>();
 
 	public OfferRequirement() { }

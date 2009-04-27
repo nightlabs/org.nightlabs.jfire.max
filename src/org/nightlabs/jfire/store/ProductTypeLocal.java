@@ -63,6 +63,23 @@ import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.store.id.ProductTypeLocalID;
 import org.nightlabs.util.Util;
 
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.Version;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Discriminator;
+import javax.jdo.annotations.Key;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.DiscriminatorStrategy;
+import javax.jdo.annotations.Value;
+import javax.jdo.annotations.VersionStrategy;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  *
@@ -89,6 +106,40 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="ProductType.productTypeLocal" fields="productType"
  * @jdo.fetch-group name="ProductType.this" fields="productType"
  */
+@PersistenceCapable(
+	objectIdClass=ProductTypeLocalID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_ProductTypeLocal")
+@Version(strategy=VersionStrategy.VERSION_NUMBER)
+@FetchGroups({
+	@FetchGroup(
+		name=ProductTypeLocal.FETCH_GROUP_PRODUCT_TYPE,
+		members=@Persistent(name="productType")),
+	@FetchGroup(
+		name=ProductTypeLocal.FETCH_GROUP_HOME,
+		members=@Persistent(name="home")),
+	@FetchGroup(
+		name=ProductTypeLocal.FETCH_GROUP_LOCAL_ACCOUNTANT_DELEGATE,
+		members=@Persistent(name="localAccountantDelegate")),
+	@FetchGroup(
+		name=ProductTypeLocal.FETCH_GROUP_LOCAL_STOREKEEPER_DELEGATE,
+		members=@Persistent(name="localStorekeeperDelegate")),
+	@FetchGroup(
+		name=ProductTypeLocal.FETCH_GROUP_NESTED_PRODUCT_TYPE_LOCALS,
+		members=@Persistent(name="nestedProductTypeLocals")),
+	@FetchGroup(
+		name=ProductTypeLocal.FETCH_GROUP_FIELD_METADATA_MAP,
+		members=@Persistent(name="fieldMetaDataMap")),
+	@FetchGroup(
+		name="ProductType.productTypeLocal",
+		members=@Persistent(name="productType")),
+	@FetchGroup(
+		name="ProductType.this",
+		members=@Persistent(name="productType"))
+})
+@Discriminator(strategy=DiscriminatorStrategy.CLASS_NAME)
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class ProductTypeLocal
 implements Serializable, Inheritable, InheritanceCallbacks, SecuredObject
 {
@@ -144,27 +195,34 @@ implements Serializable, Inheritable, InheritanceCallbacks, SecuredObject
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String productTypeID;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private ProductType productType;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private LocalAccountantDelegate localAccountantDelegate = null;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private LocalStorekeeperDelegate localStorekeeperDelegate = null;
 
 	/**
@@ -181,6 +239,11 @@ implements Serializable, Inheritable, InheritanceCallbacks, SecuredObject
 	 *
 	 * @jdo.key mapped-by="innerProductTypePrimaryKey"
 	 */
+	@Persistent(
+		mappedBy="packageProductTypeLocal",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
+	@Key(mappedBy="innerProductTypePrimaryKey")
+	@Value(dependent="true")
 	private Map<String, NestedProductTypeLocal> nestedProductTypeLocals;
 
 	/**
@@ -194,6 +257,11 @@ implements Serializable, Inheritable, InheritanceCallbacks, SecuredObject
 	 *
 	 * @jdo.key mapped-by="fieldName"
 	 */
+	@Persistent(
+		mappedBy="productTypeLocal",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
+	@Key(mappedBy="fieldName")
+	@Value(dependent="true")
 	protected Map<String, ProductTypeLocalFieldMetaData> fieldMetaDataMap;
 
 	/**
@@ -203,16 +271,19 @@ implements Serializable, Inheritable, InheritanceCallbacks, SecuredObject
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private String securingAuthorityTypeID;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private String securingAuthorityID;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private String managedBy = null;
 
 	/**
@@ -346,15 +417,18 @@ implements Serializable, Inheritable, InheritanceCallbacks, SecuredObject
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private transient PriceConfigID tmpInherit_innerPriceConfigID = null;
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private transient Map<String, NestedProductTypeLocal> tmpInherit_nestedProductTypes = null;
 
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private transient String tmpInherit_securingAuthorityIDString;
 
 	public void preInherit(Inheritable mother, Inheritable child)
@@ -522,6 +596,7 @@ implements Serializable, Inheritable, InheritanceCallbacks, SecuredObject
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	protected transient NestedProductTypeLocal selfForVirtualSelfPackaging = null;
 
 	/**

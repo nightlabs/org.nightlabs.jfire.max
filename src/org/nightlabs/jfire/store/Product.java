@@ -36,6 +36,20 @@ import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.trade.Article;
 
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.FetchGroup;
+import org.nightlabs.jfire.store.id.ProductID;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.VersionStrategy;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.Version;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  *
@@ -60,6 +74,24 @@ import org.nightlabs.jfire.trade.Article;
  * 		name="FetchGroupsTrade.articleCrossTradeReplication"
  * 		fields="productType"
  */
+@PersistenceCapable(
+	objectIdClass=ProductID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_Product")
+@Version(strategy=VersionStrategy.VERSION_NUMBER)
+@FetchGroups({
+	@FetchGroup(
+		name=Product.FETCH_GROUP_PRODUCT_LOCAL,
+		members=@Persistent(name="productLocal")),
+	@FetchGroup(
+		name=Product.FETCH_GROUP_PRODUCT_TYPE,
+		members=@Persistent(name="productType")),
+	@FetchGroup(
+		name="FetchGroupsTrade.articleCrossTradeReplication",
+		members=@Persistent(name="productType"))
+})
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public abstract class Product
 implements Serializable
 {
@@ -85,11 +117,14 @@ implements Serializable
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 */
+	@PrimaryKey
 	private long productID;
 
 	public static long createProductID()
@@ -106,12 +141,16 @@ implements Serializable
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private ProductType productType;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" mapped-by="product"
 	 * @! mapped-by="product" // TODO this mapped-by should be here, but there seems to be a bug in JPOX
 	 */
+	@Persistent(
+		mappedBy="product",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private ProductLocal productLocal = null;
 
 	/**

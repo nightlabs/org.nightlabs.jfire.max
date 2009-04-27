@@ -35,6 +35,17 @@ import org.nightlabs.jfire.language.id.LanguageID;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.trade.id.SegmentTypeID;
 
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+
 
 /**
  * A <tt>SegmentType</tt> declares additional logic that should apply on a certain
@@ -65,6 +76,21 @@ import org.nightlabs.jfire.trade.id.SegmentTypeID;
  * @jdo.fetch-group name="SegmentType.name" fields="name"
  * @jdo.fetch-group name="SegmentType.this" fetch-groups="default" fields="name"
  */
+@PersistenceCapable(
+	objectIdClass=SegmentTypeID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_SegmentType")
+@FetchGroups({
+	@FetchGroup(
+		name=SegmentType.FETCH_GROUP_NAME,
+		members=@Persistent(name="name")),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name=SegmentType.FETCH_GROUP_THIS_SEGMENT_TYPE,
+		members=@Persistent(name="name"))
+})
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class SegmentType implements Serializable
 {
 	private static final long serialVersionUID = 1L;
@@ -85,22 +111,31 @@ public class SegmentType implements Serializable
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String segmentTypeID;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private String primaryKey;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" dependent="true" mapped-by="segmentType"
 	 */
+	@Persistent(
+		dependent="true",
+		mappedBy="segmentType",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private SegmentTypeName name;
 
 	/**

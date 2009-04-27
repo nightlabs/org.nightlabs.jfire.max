@@ -52,6 +52,11 @@ import org.nightlabs.jfire.trade.OrganisationLegalEntity;
 import org.nightlabs.jfire.transfer.Anchor;
 import org.nightlabs.jfire.transfer.Transfer;
 
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.IdentityType;
+
 /**
  * An instance of this class is automatically created and stored into the datastore
  * when necessary. This happens, when a {@link org.nightlabs.jfire.store.ProductType}
@@ -76,6 +81,10 @@ import org.nightlabs.jfire.transfer.Transfer;
  *
  * @jdo.inheritance strategy="superclass-table"
  */
+@PersistenceCapable(
+	identityType=IdentityType.APPLICATION,
+	detachable="true")
+@Inheritance(strategy=InheritanceStrategy.SUPERCLASS_TABLE)
 public class DefaultLocalStorekeeperDelegate extends LocalStorekeeperDelegate
 {
 	private static final long serialVersionUID = 1L;

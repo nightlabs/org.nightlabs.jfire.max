@@ -41,6 +41,14 @@ import java.util.Set;
 import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
 import javax.jdo.listener.StoreCallback;
 
 import org.apache.log4j.Logger;
@@ -75,6 +83,7 @@ import org.nightlabs.jfire.store.id.DeliveryNoteID;
 import org.nightlabs.jfire.store.id.DeliveryNoteLocalID;
 import org.nightlabs.jfire.store.id.ProductID;
 import org.nightlabs.jfire.store.id.ProductTypeID;
+import org.nightlabs.jfire.store.id.StoreID;
 import org.nightlabs.jfire.store.jbpm.ActionHandlerBookDeliveryNote;
 import org.nightlabs.jfire.store.jbpm.JbpmConstantsDeliveryNote;
 import org.nightlabs.jfire.trade.Article;
@@ -107,6 +116,12 @@ import org.nightlabs.jfire.transfer.Transfer;
  *
  * @jdo.inheritance strategy="new-table"
  */
+@PersistenceCapable(
+	objectIdClass=StoreID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_Store")
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class Store
 implements StoreCallback
 {
@@ -155,22 +170,27 @@ implements StoreCallback
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private LocalStorekeeper localStorekeeper;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private PartnerStorekeeper partnerStorekeeper;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private OrganisationLegalEntity mandator;
 
 	protected Store() { }

@@ -5,6 +5,16 @@ import javax.jdo.PersistenceManager;
 
 import org.nightlabs.jfire.accounting.Accounting;
 
+import org.nightlabs.jfire.accounting.pay.id.PaymentActionHandlerID;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.DiscriminatorStrategy;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Discriminator;
+
 /**
  * @author Tobias Langner <!-- tobias[dot]langner[at]nightlabs[dot]de -->
  *
@@ -19,16 +29,27 @@ import org.nightlabs.jfire.accounting.Accounting;
  *
  * @jdo.create-objectid-class field-order="organisationID, paymentActionHandlerID"
  */
+@PersistenceCapable(
+	objectIdClass=PaymentActionHandlerID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_PaymentActionHandler")
+@Discriminator(strategy=DiscriminatorStrategy.CLASS_NAME)
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class PaymentActionHandler {
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String paymentActionHandlerID;
 	
 	protected PaymentActionHandler() {

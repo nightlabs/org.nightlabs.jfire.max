@@ -8,6 +8,11 @@ import javax.jdo.PersistenceManager;
 import org.nightlabs.jfire.config.ConfigModule;
 import org.nightlabs.jfire.trade.Offer;
 
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  *
@@ -19,6 +24,11 @@ import org.nightlabs.jfire.trade.Offer;
  *
  * @jdo.inheritance strategy = "new-table"
  */
+@PersistenceCapable(
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_OfferConfigModule")
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class OfferConfigModule
 		extends ConfigModule
 {

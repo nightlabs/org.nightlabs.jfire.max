@@ -50,6 +50,23 @@ import org.nightlabs.jfire.transfer.Anchor;
 import org.nightlabs.jfire.transfer.RequirementCheckResult;
 import org.nightlabs.util.Util;
 
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.FetchGroup;
+import org.nightlabs.jfire.store.deliver.id.ServerDeliveryProcessorID;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Discriminator;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Queries;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.DiscriminatorStrategy;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  *
@@ -105,6 +122,32 @@ import org.nightlabs.util.Util;
  *            	import org.nightlabs.jfire.store.deliver.ModeOfDeliveryFlavour;
  *            	import org.nightlabs.jfire.store.deliver.ModeOfDelivery"
  */
+@PersistenceCapable(
+	objectIdClass=ServerDeliveryProcessorID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_ServerDeliveryProcessor")
+@FetchGroups({
+	@FetchGroup(
+		name=ServerDeliveryProcessor.FETCH_GROUP_NAME,
+		members=@Persistent(name="name")),
+	@FetchGroup(
+		name=ServerDeliveryProcessor.FETCH_GROUP_MODE_OF_DELIVERIES,
+		members=@Persistent(name="modeOfDeliveries")),
+	@FetchGroup(
+		name=ServerDeliveryProcessor.FETCH_GROUP_MODE_OF_DELIVERY_FLAVOURS,
+		members=@Persistent(name="modeOfDeliveryFlavours"))
+})
+@Discriminator(strategy=DiscriminatorStrategy.CLASS_NAME)
+@Queries({
+	@javax.jdo.annotations.Query(
+		name="getServerDeliveryProcessorsForOneModeOfDeliveryFlavour_WORKAROUND1",
+		value="SELECT WHERE modeOfDeliveryFlavour.organisationID == paramOrganisationID && modeOfDeliveryFlavour.modeOfDeliveryFlavourID == paramModeOfDeliveryFlavourID && this.modeOfDeliveryFlavours.containsValue(modeOfDeliveryFlavour) VARIABLES ModeOfDeliveryFlavour modeOfDeliveryFlavour PARAMETERS String paramOrganisationID, String paramModeOfDeliveryFlavourID import java.lang.String; import org.nightlabs.jfire.store.deliver.ModeOfDeliveryFlavour"),
+	@javax.jdo.annotations.Query(
+		name="getServerDeliveryProcessorsForOneModeOfDeliveryFlavour_WORKAROUND2",
+		value="SELECT WHERE modeOfDeliveryFlavour.organisationID == paramOrganisationID && modeOfDeliveryFlavour.modeOfDeliveryFlavourID == paramModeOfDeliveryFlavourID && modeOfDelivery == modeOfDeliveryFlavour.modeOfDelivery && this.modeOfDeliveries.containsValue(modeOfDelivery) VARIABLES ModeOfDeliveryFlavour modeOfDeliveryFlavour; ModeOfDelivery modeOfDelivery PARAMETERS String paramOrganisationID, String paramModeOfDeliveryFlavourID import java.lang.String; import org.nightlabs.jfire.store.deliver.ModeOfDeliveryFlavour; import org.nightlabs.jfire.store.deliver.ModeOfDelivery")
+})
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public abstract class ServerDeliveryProcessor
 implements Serializable, DetachCallback
 {
@@ -171,22 +214,31 @@ implements Serializable, DetachCallback
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String serverDeliveryProcessorID;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private String primaryKey;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" dependent="true" mapped-by="serverDeliveryProcessor"
 	 */
+	@Persistent(
+		dependent="true",
+		mappedBy="serverDeliveryProcessor",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private ServerDeliveryProcessorName name;
 
 	/**
@@ -207,6 +259,11 @@ implements Serializable, DetachCallback
 	 *
 	 * @jdo.join
 	 */
+	@Join
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		table="JFireTrade_ServerDeliveryProcessor_modeOfDeliveries",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Map<String, ModeOfDelivery> modeOfDeliveries;
 
 	/**
@@ -228,6 +285,11 @@ implements Serializable, DetachCallback
 	 *
 	 * @jdo.join
 	 */
+	@Join
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		table="JFireTrade_ServerDeliveryProcessor_modeOfDeliveryFlavours",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Map<String, ModeOfDeliveryFlavour> modeOfDeliveryFlavours;
 
 	/**
@@ -692,6 +754,7 @@ implements Serializable, DetachCallback
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private RequirementCheckResult requirementCheckResult;
 
 	/**

@@ -16,6 +16,19 @@ import org.nightlabs.jfire.accounting.id.TariffMappingID;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.util.Util;
 
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Queries;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+
 /**
  * <p>
  * The <code>TariffMapping</code>s define how a local {@link Tariff} is mapped to a foreign (partner) one. This
@@ -51,6 +64,25 @@ import org.nightlabs.util.Util;
  *					this.localTariffOrganisationID == :localTariffOrganisationID &&
  *					this.localTariffTariffID == :localTariffTariffID"
  */
+@PersistenceCapable(
+	objectIdClass=TariffMappingID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_TariffMapping")
+@FetchGroups({
+	@FetchGroup(
+		name=TariffMapping.FETCH_GROUP_LOCAL_TARIFF,
+		members=@Persistent(name="localTariff")),
+	@FetchGroup(
+		name=TariffMapping.FETCH_GROUP_PARTNER_TARIFF,
+		members=@Persistent(name="partnerTariff"))
+})
+@Queries(
+	@javax.jdo.annotations.Query(
+		name="getTariffMappingForLocalTariffAndPartner",
+		value="SELECT UNIQUE WHERE this.partnerTariffOrganisationID == :partnerTariffOrganisationID && this.localTariffOrganisationID == :localTariffOrganisationID && this.localTariffTariffID == :localTariffTariffID")
+)
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class TariffMapping
 implements Serializable
 {
@@ -119,49 +151,67 @@ implements Serializable
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String localTariffOrganisationID;
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String localTariffTariffID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String partnerTariffOrganisationID;
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String partnerTariffTariffID;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" null-value="exception"
 	 */
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Tariff localTariff;
 	/**
 	 * @jdo.field persistence-modifier="persistent" null-value="exception"
 	 */
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Tariff partnerTariff;
 
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private transient TariffID localTariffID = null;
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private transient TariffID partnerTariffID = null;
 
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private transient String localTariffPK = null;
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private transient String partnerTariffPK = null;
 
 	/**

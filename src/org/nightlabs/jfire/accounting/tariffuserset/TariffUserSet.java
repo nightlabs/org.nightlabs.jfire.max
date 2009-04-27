@@ -6,6 +6,11 @@ import org.nightlabs.jfire.entityuserset.EntityRef;
 import org.nightlabs.jfire.entityuserset.EntityUserSet;
 import org.nightlabs.jfire.security.id.AuthorizedObjectID;
 
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  *
@@ -15,6 +20,10 @@ import org.nightlabs.jfire.security.id.AuthorizedObjectID;
  *
  * @jdo.inheritance strategy="superclass-table"
  */
+@PersistenceCapable(
+	identityType=IdentityType.APPLICATION,
+	detachable="true")
+@Inheritance(strategy=InheritanceStrategy.SUPERCLASS_TABLE)
 public class TariffUserSet
 extends EntityUserSet<Tariff>
 {

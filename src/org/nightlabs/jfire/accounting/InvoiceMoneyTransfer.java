@@ -36,6 +36,14 @@ import org.nightlabs.jfire.accounting.pay.Payment;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.transfer.Anchor;
 
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Queries;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+
 /**
  * A {@link MoneyTransfer} is associated to one {@link Invoice}. It is 
  * used for the transfers made when an {@link Invoice} is booked as well as for
@@ -61,6 +69,16 @@ import org.nightlabs.jfire.transfer.Anchor;
  *			"
  * 
  */
+@PersistenceCapable(
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_InvoiceMoneyTransfer")
+@Queries(
+	@javax.jdo.annotations.Query(
+		name="getInvoiceMoneyTransfersForInvoice",
+		value="SELECT WHERE this.invoice == :pInvoice && this.bookType == :pBookType ")
+)
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class InvoiceMoneyTransfer
 extends MoneyTransfer
 {
@@ -78,11 +96,13 @@ extends MoneyTransfer
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Invoice invoice;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private String bookType;
 
 	/**

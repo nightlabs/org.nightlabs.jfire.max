@@ -35,6 +35,20 @@ import java.util.List;
 import java.util.Set;
 
 import javax.jdo.JDOHelper;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.Version;
+import javax.jdo.annotations.VersionStrategy;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.jfire.jbpm.graph.def.ActionHandlerNodeEnter;
@@ -42,6 +56,7 @@ import org.nightlabs.jfire.jbpm.graph.def.Statable;
 import org.nightlabs.jfire.jbpm.graph.def.StatableLocal;
 import org.nightlabs.jfire.jbpm.graph.def.State;
 import org.nightlabs.jfire.security.User;
+import org.nightlabs.jfire.trade.id.OfferLocalID;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -74,6 +89,39 @@ import org.nightlabs.jfire.security.User;
  * @jdo.fetch-group name="StatableLocal.states" fields="states"
  *
  */
+@PersistenceCapable(
+	objectIdClass=OfferLocalID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_OfferLocal")
+@Version(strategy=VersionStrategy.VERSION_NUMBER)
+@FetchGroups({
+	@FetchGroup(
+		name="Offer.offerLocal",
+		members=@Persistent(name="offer")),
+	@FetchGroup(
+		name=OfferLocal.FETCH_GROUP_OFFER,
+		members=@Persistent(name="offer")),
+	@FetchGroup(
+		name=OfferLocal.FETCH_GROUP_ACCEPT_USER,
+		members=@Persistent(name="acceptUser")),
+	@FetchGroup(
+		name=OfferLocal.FETCH_GROUP_REJECT_USER,
+		members=@Persistent(name="rejectUser")),
+	@FetchGroup(
+		name=OfferLocal.FETCH_GROUP_THIS_OFFER_LOCAL,
+		members={@Persistent(name="offer"), @Persistent(name="acceptUser"), @Persistent(name="rejectUser"), @Persistent(name="state"), @Persistent(name="states")}),
+	@FetchGroup(
+		name="FetchGroupsTrade.articleContainerInEditor",
+		members={@Persistent(name="offer"), @Persistent(name="acceptUser"), @Persistent(name="rejectUser"), @Persistent(name="state"), @Persistent(name="states")}),
+	@FetchGroup(
+		name="StatableLocal.state",
+		members=@Persistent(name="state")),
+	@FetchGroup(
+		name="StatableLocal.states",
+		members=@Persistent(name="states"))
+})
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class OfferLocal
 implements Serializable, StatableLocal
 {
@@ -86,28 +134,35 @@ implements Serializable, StatableLocal
 	public static final String FETCH_GROUP_REJECT_USER = "OfferLocal.rejectUser";
 	public static final String FETCH_GROUP_CONFIRM_USER = "OfferLocal.confirmUser";
 	/**
-	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon! 
+	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon!
 	 */
+	@Deprecated
 	public static final String FETCH_GROUP_THIS_OFFER_LOCAL = "OfferLocal.this";
 
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="50"
 	 */
+	@PrimaryKey
+	@Column(length=50)
 	private String offerIDPrefix;
 	/**
 	 * @jdo.field primary-key="true"
 	 */
+	@PrimaryKey
 	private long offerID;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Offer offer;
 
 	/**
@@ -115,11 +170,13 @@ implements Serializable, StatableLocal
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Date acceptDT = null;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private User acceptUser = null;
 
 	/**
@@ -127,11 +184,13 @@ implements Serializable, StatableLocal
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Date rejectDT = null;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private User rejectUser = null;
 
 //	/**
@@ -150,6 +209,7 @@ implements Serializable, StatableLocal
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private State state;
 
 	/**
@@ -165,11 +225,17 @@ implements Serializable, StatableLocal
 	 *
 	 * @jdo.join
 	 */
+	@Join
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		table="JFireTrade_OfferLocal_states",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private List<State> states;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private boolean processEnded = false;
 
 	@Override
@@ -364,11 +430,17 @@ implements Serializable, StatableLocal
 	 *
 	 * @jdo.join
 	 */
+@Join
+@Persistent(
+	nullValue=NullValue.EXCEPTION,
+	table="JFireTrade_OfferLocal_offerActionHandlers",
+	persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Set<OfferActionHandler> offerActionHandlers;
 
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private transient Set<OfferActionHandler> _offerActionHandlers = null;
 
 	/**
@@ -437,6 +509,7 @@ implements Serializable, StatableLocal
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private long jbpmProcessInstanceId = -1;
 
 	public long getJbpmProcessInstanceId()
@@ -450,6 +523,6 @@ implements Serializable, StatableLocal
 	}
 
 	public String getPrimaryKey() {
-		return Offer.getPrimaryKey(organisationID, offerIDPrefix, offerID); 
+		return Offer.getPrimaryKey(organisationID, offerIDPrefix, offerID);
 	}
 }

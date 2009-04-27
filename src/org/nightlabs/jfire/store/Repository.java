@@ -41,6 +41,15 @@ import org.nightlabs.jfire.transfer.Transfer;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 import org.nightlabs.util.NLLocale;
 
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  *
@@ -57,6 +66,26 @@ import org.nightlabs.util.NLLocale;
  * @jdo.fetch-group name="Repository.repositoryType" fields="repositoryType"
  * @jdo.fetch-group name="Repository.this" fetch-groups="default, Anchor.this" fields="owner, name, repositoryType"
  */
+@PersistenceCapable(
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_Repository")
+@FetchGroups({
+	@FetchGroup(
+		name=Repository.FETCH_GROUP_OWNER,
+		members=@Persistent(name="owner")),
+	@FetchGroup(
+		name=Repository.FETCH_GROUP_NAME,
+		members=@Persistent(name="name")),
+	@FetchGroup(
+		name=Repository.FETCH_GROUP_REPOSITORY_TYPE,
+		members=@Persistent(name="repositoryType")),
+	@FetchGroup(
+		fetchGroups={"default", "Anchor.this"},
+		name=Repository.FETCH_GROUP_THIS_REPOSITORY,
+		members={@Persistent(name="owner"), @Persistent(name="name"), @Persistent(name="repositoryType")})
+})
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class Repository extends Anchor
 {
 	private static final long serialVersionUID = 1L;
@@ -116,16 +145,22 @@ public class Repository extends Anchor
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private LegalEntity owner;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" dependent="true" mapped-by="repository"
 	 */
+	@Persistent(
+		dependent="true",
+		mappedBy="repository",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private RepositoryName name;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private RepositoryType repositoryType;
 
 //	/**

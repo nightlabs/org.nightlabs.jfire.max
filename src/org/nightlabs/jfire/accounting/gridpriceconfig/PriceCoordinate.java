@@ -47,6 +47,19 @@ import org.nightlabs.jfire.trade.CustomerGroup;
 import org.nightlabs.jfire.trade.id.CustomerGroupID;
 import org.nightlabs.util.Util;
 
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import org.nightlabs.jfire.accounting.gridpriceconfig.id.PriceCoordinateID;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  *
@@ -65,6 +78,24 @@ import org.nightlabs.util.Util;
  *
  * @jdo.fetch-group name="FetchGroupsPriceConfig.edit" fields="priceConfig"
  */
+@PersistenceCapable(
+	objectIdClass=PriceCoordinateID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_PriceCoordinate")
+@FetchGroups({
+	@FetchGroup(
+		name=PriceCoordinate.FETCH_GROUP_PRICE_CONFIG,
+		members=@Persistent(name="priceConfig")),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name=PriceCoordinate.FETCH_GROUP_THIS_PRICE_COORDINATE,
+		members=@Persistent(name="priceConfig")),
+	@FetchGroup(
+		name="FetchGroupsPriceConfig.edit",
+		members=@Persistent(name="priceConfig"))
+})
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class PriceCoordinate implements Serializable, StoreCallback, IPriceCoordinate
 {
 	private static final long serialVersionUID = 1L;
@@ -82,25 +113,37 @@ public class PriceCoordinate implements Serializable, StoreCallback, IPriceCoord
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID = null;
 	/**
 	 * @jdo.field primary-key="true"
 	 */
+	@PrimaryKey
 	private long priceCoordinateID = -1;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" null-value="exception"
 	 */
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private String customerGroupPK;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" null-value="exception"
 	 */
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private String tariffPK;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" null-value="exception"
 	 */
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private String currencyID;
 
 	/**
@@ -108,6 +151,7 @@ public class PriceCoordinate implements Serializable, StoreCallback, IPriceCoord
 	 * TODO the above null-value="exception" is correct but causes a problem when replicating to another datastore due to a jpox bug
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private PriceConfig priceConfig;
 
 	public PriceCoordinate() { }
@@ -303,6 +347,7 @@ public class PriceCoordinate implements Serializable, StoreCallback, IPriceCoord
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private transient String tariffOrganisationID = null;
 
 	protected String getFirstPartOfPrimaryKeyString(String pk)

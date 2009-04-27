@@ -18,6 +18,18 @@ import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.store.deliver.id.DeliveryID;
 import org.nightlabs.jfire.store.deliver.id.DeliveryQueueID;
 
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.Queries;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+
 
 /**
  * @author Tobias Langner <!-- tobias[dot]langner[at]nightlabs[dot]de -->
@@ -48,6 +60,37 @@ import org.nightlabs.jfire.store.deliver.id.DeliveryQueueID;
  * 		name="getDeliveryQueueForDelivery"
  * 		query="SELECT WHERE pendingDeliverySet.contains(:delivery)"
  */
+@PersistenceCapable(
+	objectIdClass=DeliveryQueueID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_DeliveryQueue")
+@FetchGroups({
+	@FetchGroup(
+		name=DeliveryQueue.FETCH_GROUP_NAME,
+		members=@Persistent(name="name")),
+	@FetchGroup(
+		name=DeliveryQueue.FETCH_GROUP_DELIVERY_SET,
+		members=@Persistent(name="deliverySet")),
+	@FetchGroup(
+		name=DeliveryQueue.FETCH_GROUP_PENDING_DELIVERY_SET,
+		members=@Persistent(name="pendingDeliverySet")),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name=DeliveryQueue.FETCH_GROUP_DELIVERY_QUEUE,
+		members={@Persistent(name="name"), @Persistent(name="deliverySet"), @Persistent(name="pendingDeliverySet")})
+})
+@Queries({
+	@javax.jdo.annotations.Query(
+		name="getDeliveryQueues",
+		value="SELECT WHERE !defunct || defunct == :includeDefunct"),
+	@javax.jdo.annotations.Query(
+		name="getDeliveryQueueIDs",
+		value="SELECT JDOHelper.getObjectId(this) WHERE !defunct || defunct == :includeDefunct import javax.jdo.JDOHelper"),
+	@javax.jdo.annotations.Query(
+		name="getDeliveryQueueForDelivery",
+		value="SELECT WHERE pendingDeliverySet.contains(:delivery)")
+})
 public class DeliveryQueue implements Serializable, AttachCallback, DetachCallback {
 	
 //	private static final Logger logger = Logger.getLogger(DeliveryQueue.class);
@@ -66,9 +109,12 @@ public class DeliveryQueue implements Serializable, AttachCallback, DetachCallba
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 	
 	/** @jdo.field primary-key="true" */
+	@PrimaryKey
 	private long deliveryQueueID;
 	
 	/**
@@ -78,6 +124,9 @@ public class DeliveryQueue implements Serializable, AttachCallback, DetachCallba
 	 * 		persistence-modifier="persistent"
 	 * 		mapped-by="deliveryQueue"
 	 */
+	@Persistent(
+		mappedBy="deliveryQueue",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private DeliveryQueueName name;
 	
 	/**
@@ -93,6 +142,12 @@ public class DeliveryQueue implements Serializable, AttachCallback, DetachCallba
 	 * 
 	 * @jdo.join
 	 */
+	@Join
+	@Persistent(
+		dependentElement="false",
+		nullValue=NullValue.EXCEPTION,
+		table="JFireTrade_DeliveryQueue_deliverySet",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Set<Delivery> deliverySet;
 	
 	/**
@@ -108,6 +163,12 @@ public class DeliveryQueue implements Serializable, AttachCallback, DetachCallba
 	 * 
 	 * @jdo.join
 	 */
+	@Join
+	@Persistent(
+		dependentElement="false",
+		nullValue=NullValue.EXCEPTION,
+		table="JFireTrade_DeliveryQueue_outstandingDeliverySet",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Set<Delivery> pendingDeliverySet;
 	
 	/**
@@ -116,12 +177,14 @@ public class DeliveryQueue implements Serializable, AttachCallback, DetachCallba
 	 * 
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private boolean defunct = false;
 	
 	/**
 	 * This field is set during via detach callback.
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private Boolean hasPendingDeliveries;
 	
 	/** @deprecated Only for JDO! */

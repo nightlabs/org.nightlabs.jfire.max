@@ -33,6 +33,13 @@ import org.nightlabs.jfire.security.listener.SecurityChangeListener;
 import org.nightlabs.jfire.security.listener.id.SecurityChangeListenerID;
 import org.nightlabs.util.CollectionUtil;
 
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.IdentityType;
+
 /**
  *
  * @author marco schulze - marco at nightlabs dot de
@@ -43,6 +50,10 @@ import org.nightlabs.util.CollectionUtil;
  *
  * @jdo.inheritance strategy="superclass-table"
  */
+@PersistenceCapable(
+	identityType=IdentityType.APPLICATION,
+	detachable="true")
+@Inheritance(strategy=InheritanceStrategy.SUPERCLASS_TABLE)
 public class SecurityChangeListenerProductTypePermission
 extends SecurityChangeListener
 {
@@ -74,6 +85,7 @@ extends SecurityChangeListener
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private Map<AuthorizedObject, Map<Authority, Map<RoleID, Boolean>>> roleGrantedBackupMap = new HashMap<AuthorizedObject, Map<Authority,Map<RoleID,Boolean>>>();
 
 	private static final Set<RoleID> interestingRoleIDs;

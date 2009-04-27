@@ -41,6 +41,20 @@ import java.util.Set;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.Element;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.Queries;
+import javax.jdo.annotations.Version;
+import javax.jdo.annotations.VersionStrategy;
 import javax.jdo.listener.DetachCallback;
 
 import org.nightlabs.jdo.ObjectIDUtil;
@@ -147,6 +161,66 @@ import org.nightlabs.util.Util;
  *
  * @jdo.fetch-group name="FetchGroupsTrade.articleContainerInEditor" fields="vendor, currency, customer, endCustomer, customerGroup, segments, offers, createUser, changeUser"
  */
+@PersistenceCapable(
+	objectIdClass=OrderID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_Order")
+@Version(strategy=VersionStrategy.VERSION_NUMBER)
+@FetchGroups({
+	@FetchGroup(
+		name=Order.FETCH_GROUP_CURRENCY,
+		members=@Persistent(name="currency")),
+	@FetchGroup(
+		name=Order.FETCH_GROUP_CUSTOMER_GROUP,
+		members=@Persistent(name="customerGroup")),
+	@FetchGroup(
+		name=Order.FETCH_GROUP_ARTICLES,
+		members=@Persistent(name="articles")),
+	@FetchGroup(
+		name=Order.FETCH_GROUP_SEGMENTS,
+		members=@Persistent(name="segments")),
+	@FetchGroup(
+		name=Order.FETCH_GROUP_OFFERS,
+		members=@Persistent(name="offers")),
+	@FetchGroup(
+		name=Order.FETCH_GROUP_CREATE_USER,
+		members=@Persistent(name="createUser")),
+	@FetchGroup(
+		name=Order.FETCH_GROUP_CHANGE_USER,
+		members=@Persistent(name="changeUser")),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name=Order.FETCH_GROUP_THIS_ORDER,
+		members={@Persistent(name="vendor"), @Persistent(name="currency"), @Persistent(name="customer"), @Persistent(name="customerGroup"), @Persistent(name="articles"), @Persistent(name="segments"), @Persistent(name="offers"), @Persistent(name="createUser"), @Persistent(name="changeUser")}),
+	@FetchGroup(
+		name="ArticleContainer.vendor",
+		members=@Persistent(name="vendor")),
+	@FetchGroup(
+		name="ArticleContainer.customer",
+		members=@Persistent(name="customer")),
+	@FetchGroup(
+		name="ArticleContainer.endCustomer",
+		members=@Persistent(name="endCustomer")),
+	@FetchGroup(
+		name="FetchGroupsTrade.articleContainerInEditor",
+		members={@Persistent(name="vendor"), @Persistent(name="currency"), @Persistent(name="customer"), @Persistent(name="endCustomer"), @Persistent(name="customerGroup"), @Persistent(name="segments"), @Persistent(name="offers"), @Persistent(name="createUser"), @Persistent(name="changeUser")})
+})
+@Queries({
+	@javax.jdo.annotations.Query(
+		name="getOrderIDsByVendorAndCustomer",
+		value="SELECT JDOHelper.getObjectId(this) WHERE JDOHelper.getObjectId(vendor) == :vendorID && JDOHelper.getObjectId(customer) == :customerID ORDER BY orderID DESC"),
+	@javax.jdo.annotations.Query(
+		name="getOrderIDsByVendorAndEndCustomer",
+		value="SELECT JDOHelper.getObjectId(this) WHERE JDOHelper.getObjectId(vendor) == :vendorID && JDOHelper.getObjectId(endCustomer) == :customerID ORDER BY orderID DESC"),
+	@javax.jdo.annotations.Query(
+		name="getOrderIDsByVendorAndCustomerAndEndCustomer",
+		value="SELECT JDOHelper.getObjectId(this) WHERE JDOHelper.getObjectId(vendor) == :vendorID && JDOHelper.getObjectId(customer) == :customerID && JDOHelper.getObjectId(endCustomer) == :endCustomerID ORDER BY orderID DESC"),
+	@javax.jdo.annotations.Query(
+		name="getQuickSaleWorkOrderIDCandidates_WORKAROUND",
+		value="SELECT WHERE this.quickSaleWorkOrder && this.orderIDPrefix == :orderIDPrefix && this.currency.currencyID == :currencyID && this.vendor.organisationID == :paramVendorID_organisationID && this.vendor.anchorID == :paramVendorID_anchorID && this.customer.organisationID == :paramCustomerID_organisationID && this.customer.anchorID == :paramCustomerID_anchorID ORDER BY orderID ASC")
+})
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class Order
 implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 {
@@ -386,35 +460,44 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="50"
 	 */
+	@PrimaryKey
+	@Column(length=50)
 	private String orderIDPrefix;
 	/**
 	 * @jdo.field primary-key="true"
 	 */
+	@PrimaryKey
 	private long orderID;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Currency currency;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private LegalEntity vendor;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private LegalEntity customer;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private LegalEntity endCustomer;
 
 	/**
@@ -423,6 +506,7 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private CustomerGroup customerGroup;
 
 	/**
@@ -434,6 +518,7 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private boolean quickSaleWorkOrder;
 
 //	/**
@@ -464,6 +549,11 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 	 *		mapped-by="order"
 	 *		dependent-value="true"
 	 */
+	@Persistent(
+			mappedBy="order",
+			persistenceModifier=PersistenceModifier.PERSISTENT
+	)
+	@Element(dependent="true")
 	private Set<Article> articles;
 
 //	/**
@@ -491,6 +581,10 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 	 *		element-type="Offer"
 	 *		mapped-by="order"
 	 */
+	@Persistent(
+			mappedBy="order",
+			persistenceModifier=PersistenceModifier.PERSISTENT
+	)
 	private Set<Offer> offers;
 
 //	/**
@@ -518,60 +612,74 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 	 *		element-type="Segment"
 	 *		mapped-by="order"
 	 */
+@Persistent(
+	mappedBy="order",
+	persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Set<Segment> segments;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Date createDT;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private User createUser;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Date changeDT;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private User changeUser;
 
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private AnchorID vendorID = null;
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private boolean vendorID_detached = false;
 
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private AnchorID customerID = null;
 
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private boolean customerID_detached = false;
 
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private AnchorID endCustomerID = null;
 
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private boolean endCustomerID_detached = false;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private int articleCount = 0;
 
 	/**
@@ -792,6 +900,7 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private transient Set<Article> _articles = null;
 
 	public Collection<Article> getArticles()
@@ -805,6 +914,7 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private transient Set<Offer> _offers = null;
 
 	/**
@@ -821,6 +931,7 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private transient Set<Segment> _segments = null;
 
 	/**

@@ -19,6 +19,17 @@ import org.nightlabs.jfire.accounting.pay.ModeOfPaymentFlavour;
 import org.nightlabs.jfire.accounting.pay.id.ModeOfPaymentFlavourID;
 import org.nightlabs.jfire.config.ConfigModule;
 
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+
 /**
  * ConfigModule for a set of {@link ModeOfPaymentFlavour}s.
  * Use the API for {@link ModeOfPaymentFlavourID}s on detached instances.
@@ -44,6 +55,19 @@ import org.nightlabs.jfire.config.ConfigModule;
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
  * @version $Revision$, $Date$
  */
+@PersistenceCapable(
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_ModeOfPaymentConfigModule")
+@FetchGroups({
+	@FetchGroup(
+		name="ModeOfPaymentConfigModule.modeOfPaymentFlavours",
+		members=@Persistent(name="modeOfPaymentFlavours")),
+	@FetchGroup(
+		name="ConfigModule.this",
+		members=@Persistent(name="personStructFields"))
+})
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class ModeOfPaymentConfigModule extends ConfigModule implements DetachCallback, AttachCallback {
 
 	private static final long serialVersionUID = 20080109L;
@@ -68,14 +92,21 @@ public class ModeOfPaymentConfigModule extends ConfigModule implements DetachCal
 	 *
 	 * @jdo.join
 	 */
+	@Join
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		table="JFireTrade_ModeOfPaymentConfigModule_modeOfPaymentFlavours",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Set<ModeOfPaymentFlavour> modeOfPaymentFlavours;
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private boolean modeOfPaymentFlavourIDsDetached;
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private Set<ModeOfPaymentFlavourID> modeOfPaymentFlavourIDs;
 	
 	/**

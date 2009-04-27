@@ -40,6 +40,20 @@ import org.nightlabs.jfire.store.deliver.id.ModeOfDeliveryFlavourID;
 import org.nightlabs.jfire.store.deliver.id.ModeOfDeliveryID;
 import org.nightlabs.util.Util;
 
+import javax.jdo.annotations.Value;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.Key;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Queries;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  * 
@@ -62,6 +76,29 @@ import org.nightlabs.util.Util;
  *		query="SELECT JDOHelper.getObjectId(this)"
  * 
  */
+@PersistenceCapable(
+	objectIdClass=ModeOfDeliveryID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_ModeOfDelivery")
+@FetchGroups({
+	@FetchGroup(
+		name=ModeOfDelivery.FETCH_GROUP_NAME,
+		members=@Persistent(name="name")),
+	@FetchGroup(
+		name=ModeOfDelivery.FETCH_GROUP_FLAVOURS,
+		members=@Persistent(name="flavours")),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name=ModeOfDelivery.FETCH_GROUP_THIS_MODE_OF_DELIVERY,
+		members={@Persistent(name="flavours"), @Persistent(name="name")})
+})
+@Queries(
+	@javax.jdo.annotations.Query(
+		name="getAllModeOfDeliveryFlavourIDs",
+		value="SELECT JDOHelper.getObjectId(this)")
+)
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class ModeOfDelivery
 implements Serializable
 {
@@ -78,22 +115,31 @@ implements Serializable
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String modeOfDeliveryID;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private String primaryKey;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" dependent="true" mapped-by="modeOfDelivery"
 	 */
+	@Persistent(
+		dependent="true",
+		mappedBy="modeOfDelivery",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private ModeOfDeliveryName name;
 
 	/**
@@ -112,6 +158,11 @@ implements Serializable
 	 *
 	 * @!jdo.map-vendor-extension vendor-name="jpox" key="key-field" value="primaryKey"
 	 */
+	@Persistent(
+		mappedBy="modeOfDelivery",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
+	@Key(mappedBy="primaryKey")
+	@Value(dependent="true")
 	private Map<String, ModeOfDeliveryFlavour> flavours = new HashMap<String, ModeOfDeliveryFlavour>();
 
 	/**

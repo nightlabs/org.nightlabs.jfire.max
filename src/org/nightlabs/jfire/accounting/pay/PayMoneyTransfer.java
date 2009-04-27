@@ -41,6 +41,14 @@ import org.nightlabs.jfire.transfer.Anchor;
 import org.nightlabs.jfire.transfer.Transfer;
 import org.nightlabs.jfire.transfer.id.TransferID;
 
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.Queries;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+
 /**
  * PayMoneyTransfers are generated on payments. One anchor of PayMoneyTransfer is
  * always a "treasury", which is a special
@@ -77,6 +85,16 @@ import org.nightlabs.jfire.transfer.id.TransferID;
  *				PARAMETERS String paramOrganisationID, Long paramPaymentID
  *				import java.lang.String; import java.lang.Long"
  */
+@PersistenceCapable(
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_PayMoneyTransfer")
+@Queries(
+	@javax.jdo.annotations.Query(
+		name="getPayMoneyTransferForPayment",
+		value="SELECT UNIQUE WHERE this.payment.organisationID == paramOrganisationID && this.payment.paymentID == paramPaymentID PARAMETERS String paramOrganisationID, Long paramPaymentID import java.lang.String; import java.lang.Long")
+)
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class PayMoneyTransfer extends MoneyTransfer
 {
 	private static final long serialVersionUID = 1L;
@@ -145,6 +163,7 @@ public class PayMoneyTransfer extends MoneyTransfer
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Payment payment;
 
 	/**

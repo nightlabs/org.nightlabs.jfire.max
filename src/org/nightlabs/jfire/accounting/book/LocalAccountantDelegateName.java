@@ -29,9 +29,23 @@ package org.nightlabs.jfire.accounting.book;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
+
 import org.nightlabs.i18n.I18nText;
+import org.nightlabs.jfire.accounting.book.id.LocalAccountantDelegateNameID;
 /**
- * 
+ *
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  *
  * @jdo.persistence-capable
@@ -41,12 +55,23 @@ import org.nightlabs.i18n.I18nText;
  *		table="JFireTrade_LocalAccountantDelegateName"
  *
  * @jdo.inheritance strategy="new-table"
- * 
+ *
  * @jdo.create-objectid-class
  *		field-order="organisationID, localAccountantDelegateID"
  *
  * @jdo.fetch-group name="LocalAccountantDelegate.name" fields="localAccountantDelegate, names"
  */
+@PersistenceCapable(
+	objectIdClass=LocalAccountantDelegateNameID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_LocalAccountantDelegateName")
+@FetchGroups(
+	@FetchGroup(
+		name="LocalAccountantDelegate.name",
+		members={@Persistent(name="localAccountantDelegate"), @Persistent(name="names")})
+)
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class LocalAccountantDelegateName
 extends I18nText
 {
@@ -55,36 +80,42 @@ extends I18nText
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String localAccountantDelegateID;
-	
-	
+
+
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private LocalAccountantDelegate localAccountantDelegate;
-	
+
 	/**
 	 * @deprecated Only for JDO!
 	 */
 	@Deprecated
 	protected LocalAccountantDelegateName() {
 	}
-	
+
 	public LocalAccountantDelegateName(LocalAccountantDelegate localAccountantDelegate) {
 		this.localAccountantDelegate = localAccountantDelegate;
 		this.organisationID = localAccountantDelegate.getOrganisationID();
 		this.localAccountantDelegateID = localAccountantDelegate.getLocalAccountantDelegateID();
+		names = new HashMap<String, String>();
 	}
 
 	/**
 	 * key: String languageID<br/>
 	 * value: String name
-	 * 
+	 *
 	 * @jdo.field
 	 *		persistence-modifier="persistent"
 	 *		collection-type="map"
@@ -96,13 +127,19 @@ extends I18nText
 	 *
 	 * @jdo.join
 	 */
-	protected Map names = new HashMap();
-	
+	@Join
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		table="JFireTrade_LocalAccountantDelegateName_names",
+		defaultFetchGroup="true",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
+	protected Map<String, String> names;
+
 	/**
 	 * @see org.nightlabs.i18n.I18nText#getI18nMap()
 	 */
 	@Override
-	protected Map getI18nMap() {
+	protected Map<String, String> getI18nMap() {
 		return names;
 	}
 
@@ -117,11 +154,11 @@ extends I18nText
 	public String getOrganisationID() {
 		return organisationID;
 	}
-	
+
 	public String getLocalAccountantDelegateID() {
 		return localAccountantDelegateID;
 	}
-	
+
 	public LocalAccountantDelegate getLocalAccountantDelegate() {
 		return localAccountantDelegate;
 	}

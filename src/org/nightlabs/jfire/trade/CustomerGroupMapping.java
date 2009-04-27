@@ -16,6 +16,19 @@ import org.nightlabs.jfire.trade.id.CustomerGroupID;
 import org.nightlabs.jfire.trade.id.CustomerGroupMappingID;
 import org.nightlabs.util.Util;
 
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Queries;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+
 /**
  * <p>
  * The <code>CustomerGroupMapping</code>s define how a local {@link CustomerGroup} is mapped to a foreign (partner) one. This
@@ -52,6 +65,25 @@ import org.nightlabs.util.Util;
  *					this.localCustomerGroupOrganisationID == :localCustomerGroupOrganisationID &&
  *					this.localCustomerGroupCustomerGroupID == :localCustomerGroupCustomerGroupID"
  */
+@PersistenceCapable(
+	objectIdClass=CustomerGroupMappingID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_CustomerGroupMapping")
+@FetchGroups({
+	@FetchGroup(
+		name=CustomerGroupMapping.FETCH_GROUP_PARTNER_CUSTOMER_GROUP,
+		members=@Persistent(name="partnerCustomerGroup")),
+	@FetchGroup(
+		name=CustomerGroupMapping.FETCH_GROUP_LOCAL_CUSTOMER_GROUP,
+		members=@Persistent(name="localCustomerGroup"))
+})
+@Queries(
+	@javax.jdo.annotations.Query(
+		name="getCustomerGroupMappingForLocalCustomerGroupAndPartner",
+		value="SELECT UNIQUE WHERE this.partnerCustomerGroupOrganisationID == :partnerCustomerGroupOrganisationID && this.localCustomerGroupOrganisationID == :localCustomerGroupOrganisationID && this.localCustomerGroupCustomerGroupID == :localCustomerGroupCustomerGroupID")
+)
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class CustomerGroupMapping
 implements Serializable
 {
@@ -130,30 +162,44 @@ implements Serializable
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String partnerCustomerGroupOrganisationID;
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String partnerCustomerGroupCustomerGroupID;
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String localCustomerGroupOrganisationID;
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String localCustomerGroupCustomerGroupID;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" null-value="exception"
 	 */
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private CustomerGroup partnerCustomerGroup;
 	/**
 	 * @jdo.field persistence-modifier="persistent" null-value="exception"
 	 */
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private CustomerGroup localCustomerGroup;
 
 	/**
@@ -204,18 +250,22 @@ implements Serializable
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private transient CustomerGroupID localCustomerGroupID;
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private transient CustomerGroupID partnerCustomerGroupID;
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private transient String localCustomerGroupPK;
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private transient String partnerCustomerGroupPK;
 
 	public CustomerGroupID getLocalCustomerGroupID()

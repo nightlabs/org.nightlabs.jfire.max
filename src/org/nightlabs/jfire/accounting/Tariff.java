@@ -27,13 +27,19 @@
 package org.nightlabs.jfire.accounting;
 
 import java.io.Serializable;
-import java.util.Collection;
-import java.util.Locale;
 
 import javax.jdo.JDODetachedFieldAccessException;
 import javax.jdo.JDOHelper;
-import javax.jdo.PersistenceManager;
-import javax.jdo.Query;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
 
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.accounting.id.TariffID;
@@ -81,8 +87,44 @@ import org.nightlabs.util.Util;
  *			WHERE
  *				this.name.names.get(paramLanguageID)==paramName
  *		PARAMETERS String paramLanguageID, String paramName
- *		import java.lang.String;
+ *		import java.lang.String;"
  */
+@PersistenceCapable(
+	objectIdClass=TariffID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_Tariff")
+@FetchGroups({
+	@FetchGroup(
+		name=Tariff.FETCH_GROUP_NAME,
+		members=@Persistent(name="name")),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name=Tariff.FETCH_GROUP_THIS_TARIFF,
+		members=@Persistent(name="name")),
+	@FetchGroup(
+		name="FetchGroupsTrade.articleInOrderEditor",
+		members=@Persistent(name="name")),
+	@FetchGroup(
+		name="FetchGroupsTrade.articleInOfferEditor",
+		members=@Persistent(name="name")),
+	@FetchGroup(
+		name="FetchGroupsTrade.articleInInvoiceEditor",
+		members=@Persistent(name="name")),
+	@FetchGroup(
+		name="FetchGroupsTrade.articleInDeliveryNoteEditor",
+		members=@Persistent(name="name")),
+	@FetchGroup(
+		name="FetchGroupsPriceConfig.edit",
+		members=@Persistent(name="name")),
+	@FetchGroup(
+		name="FetchGroupsEntityUserSet.replicateToReseller",
+		members=@Persistent(name="name"))
+})
+//@Queries(
+//	@javax.jdo.annotations.Query(name="getTariffByName", value="SELECT WHERE this.name.names.get(:paramLanguageID) == :paramName")
+//)
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class Tariff
 implements Serializable
 {
@@ -99,23 +141,25 @@ implements Serializable
 	@Deprecated
 	public static final String FETCH_GROUP_THIS_TARIFF = "Tariff.this"; //$NON-NLS-1$
 
-	/**
-	 * Return a {@link Collection} of Tariffs with the given name in the given Locale language.
-	 * @param pm the PersistenceManager to use
-	 * @param name the name in the given locale language
-	 * @param locale the Locale to search with its language in the I18nText of the tariff
-	 * @return a {@link Collection} of Tariffs with the given name in the given Locale language
-	 */
-	@SuppressWarnings("unchecked")
-	public static Collection<Tariff> getTariffByName(PersistenceManager pm, String name, Locale locale) {
-		Query q = pm.newNamedQuery(Tariff.class, "getTariffByName"); //$NON-NLS-1$
-		return (Collection<Tariff>)q.execute(locale.getLanguage(), name);
-	}
+//	/**
+//	 * Return a {@link Collection} of Tariffs with the given name in the given Locale language.
+//	 * @param pm the PersistenceManager to use
+//	 * @param name the name in the given locale language
+//	 * @param locale the Locale to search with its language in the I18nText of the tariff
+//	 * @return a {@link Collection} of Tariffs with the given name in the given Locale language
+//	 */
+//	@SuppressWarnings("unchecked")
+//	public static Collection<Tariff> getTariffByName(PersistenceManager pm, String name, Locale locale) {
+//		Query q = pm.newNamedQuery(Tariff.class, "getTariffByName"); //$NON-NLS-1$
+//		return (Collection<Tariff>)q.execute(locale.getLanguage(), name);
+//	}
 
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 
 //	/**
@@ -126,19 +170,27 @@ implements Serializable
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+@PrimaryKey
+@Column(length=100)
 	private String tariffID;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private String primaryKey;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" dependent="true" mapped-by="tariff"
 	 */
+	@Persistent(
+		dependent="true",
+		mappedBy="tariff",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private TariffName name;
 
 	/** @jdo.field persistence-modifier="persistent" */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private int tariffIndex;
 
 	public Tariff() { }

@@ -31,6 +31,18 @@ import java.io.Serializable;
 import org.nightlabs.inheritance.FieldMetaData;
 import org.nightlabs.inheritance.NotWritableException;
 
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+import org.nightlabs.jfire.store.id.ProductTypeMapEntryMetaDataID;
+import javax.jdo.annotations.PersistenceModifier;
+
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  * 
@@ -46,6 +58,18 @@ import org.nightlabs.inheritance.NotWritableException;
  *
  * @jdo.fetch-group name="ProductType.fieldMetaDataMap" fields="mapFieldMetaData" fetch-groups="default"
  */
+@PersistenceCapable(
+	objectIdClass=ProductTypeMapEntryMetaDataID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_ProductTypeMapEntryMetaData")
+@FetchGroups(
+	@FetchGroup(
+		fetchGroups={"default"},
+		name="ProductType.fieldMetaDataMap",
+		members=@Persistent(name="mapFieldMetaData"))
+)
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class ProductTypeMapEntryMetaData
 	implements org.nightlabs.inheritance.MapEntryMetaData, Serializable
 {
@@ -55,24 +79,32 @@ public class ProductTypeMapEntryMetaData
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String productTypeID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String fieldName;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String key;
 
 	/**
@@ -80,6 +112,7 @@ public class ProductTypeMapEntryMetaData
 	 * 
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private byte writableByChildren = FieldMetaData.WRITABLEBYCHILDREN_YES;
 
 	/**
@@ -88,6 +121,7 @@ public class ProductTypeMapEntryMetaData
 	 * 
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private boolean writable = true;
 
 	/**
@@ -96,11 +130,13 @@ public class ProductTypeMapEntryMetaData
 	 * 
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private boolean valueInherited = true;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private ProductTypeMapFieldMetaData mapFieldMetaData;
 
 	protected ProductTypeMapEntryMetaData() { }

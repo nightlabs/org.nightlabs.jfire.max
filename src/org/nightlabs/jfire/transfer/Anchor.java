@@ -32,6 +32,14 @@ import java.util.Set;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
 import javax.jdo.listener.DetachCallback;
 
 import org.nightlabs.jdo.ObjectIDUtil;
@@ -62,35 +70,53 @@ import org.nightlabs.util.Util;
  * @!jdo.fetch-group name="Anchor.transfers" fields="transfers"
  * @jdo.fetch-group name="Anchor.this" fetch-groups="default"
  */
+@PersistenceCapable(
+	objectIdClass=AnchorID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_Anchor")
+//@FetchGroups(
+//	@FetchGroup(
+//		fetchGroups={"default"},
+//		name=Anchor.FETCH_GROUP_THIS_ANCHOR,
+//		members={})
+//)
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public abstract class Anchor
 	implements Serializable, DetachCallback
 {
 	private static final long serialVersionUID = 1L;
 
 	//	public static final String FETCH_GROUP_TRANSFERS = "Anchor.transfers";
-	/**
-	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon!
-	 */
-	@Deprecated
-	public static final String FETCH_GROUP_THIS_ANCHOR = "Anchor.this";
+//	/**
+//	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon!
+//	 */
+//	@Deprecated
+//	public static final String FETCH_GROUP_THIS_ANCHOR = "Anchor.this";
 	public static final String FETCH_GROUP_DESCRIPTION = "Anchor.description";
 
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String anchorTypeID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String anchorID;
 
 
@@ -344,11 +370,13 @@ public abstract class Anchor
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private String description = null;
 
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private boolean description_detached = false;
 
 	/**

@@ -29,6 +29,18 @@ import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.util.CollectionUtil;
 import org.nightlabs.util.Util;
 
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.FetchGroups;
+import org.nightlabs.jfire.trade.endcustomer.id.EndCustomerReplicationPolicyID;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.IdentityType;
+
 /**
  * An instance of this class specifies how an end-customer will be transferred from
  * the reseller to the supplier. It is specified by the supplier and assigned to a
@@ -52,6 +64,26 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="EndCustomerReplicationPolicy.structBlocks" fields="structBlocks"
  * @jdo.fetch-group name="EndCustomerReplicationPolicy.structFields" fields="structFields"
  */
+@PersistenceCapable(
+	objectIdClass=EndCustomerReplicationPolicyID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_EndCustomerReplicationPolicy")
+@FetchGroups({
+	@FetchGroup(
+		name=EndCustomerReplicationPolicy.FETCH_GROUP_NAME,
+		members=@Persistent(name="name")),
+	@FetchGroup(
+		name=EndCustomerReplicationPolicy.FETCH_GROUP_DESCRIPTION,
+		members=@Persistent(name="description")),
+	@FetchGroup(
+		name=EndCustomerReplicationPolicy.FETCH_GROUP_STRUCT_BLOCKS,
+		members=@Persistent(name="structBlocks")),
+	@FetchGroup(
+		name=EndCustomerReplicationPolicy.FETCH_GROUP_STRUCT_FIELDS,
+		members=@Persistent(name="structFields"))
+})
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class EndCustomerReplicationPolicy
 implements Serializable
 {
@@ -65,21 +97,29 @@ implements Serializable
 	/**
 	 * @jdo.field primary-key="true"
 	 */
+	@PrimaryKey
 	private String organisationID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 */
+	@PrimaryKey
 	private long endCustomerReplicationPolicyID;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" mapped-by="endCustomerReplicationPolicy"
 	 */
+	@Persistent(
+		mappedBy="endCustomerReplicationPolicy",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private EndCustomerReplicationPolicyName name;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" mapped-by="endCustomerReplicationPolicy"
 	 */
+	@Persistent(
+		mappedBy="endCustomerReplicationPolicy",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private EndCustomerReplicationPolicyDescription description;
 
 	/**
@@ -90,6 +130,10 @@ implements Serializable
 	 *		table="JFireTrade_EndCustomerReplicationPolicy_structBlocks"
 	 * @jdo.join
 	 */
+	@Join
+	@Persistent(
+		table="JFireTrade_EndCustomerReplicationPolicy_structBlocks",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Set<StructBlock> structBlocks;
 
 	/**
@@ -100,6 +144,10 @@ implements Serializable
 	 *		table="JFireTrade_EndCustomerReplicationPolicy_structFields"
 	 * @jdo.join
 	 */
+	@Join
+	@Persistent(
+		table="JFireTrade_EndCustomerReplicationPolicy_structFields",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Set<StructField<? extends DataField>> structFields;
 
 	/**

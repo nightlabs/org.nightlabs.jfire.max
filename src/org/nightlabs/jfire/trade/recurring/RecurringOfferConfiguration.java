@@ -11,6 +11,20 @@ import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.timer.Task;
 import org.nightlabs.jfire.timer.id.TaskID;
 
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import org.nightlabs.jfire.trade.recurring.id.RecurringOfferConfigurationID;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.VersionStrategy;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.Version;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+
 
 /**
  * An instance of {@link RecurringOfferConfiguration} is created for each {@link RecurringOffer}.
@@ -40,6 +54,18 @@ import org.nightlabs.jfire.timer.id.TaskID;
  *
  * @jdo.fetch-group name="RecurringOfferConfiguration.creatorTask" fields="creatorTask"
  */
+@PersistenceCapable(
+	objectIdClass=RecurringOfferConfigurationID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_RecurringOfferConfiguration")
+@Version(strategy=VersionStrategy.VERSION_NUMBER)
+@FetchGroups(
+	@FetchGroup(
+		name=RecurringOfferConfiguration.FETCH_GROUP_CREATOR_TASK,
+		members=@Persistent(name="creatorTask"))
+)
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class RecurringOfferConfiguration implements Serializable{
 
 	private static final long serialVersionUID = 20080818L;
@@ -51,11 +77,14 @@ public class RecurringOfferConfiguration implements Serializable{
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 */
+	@PrimaryKey
 	private long recurringOfferConfigurationID;
 
 	/**
@@ -96,11 +125,13 @@ public class RecurringOfferConfiguration implements Serializable{
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private boolean createInvoice;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Date suspendDate;
 
 
@@ -110,11 +141,13 @@ public class RecurringOfferConfiguration implements Serializable{
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private boolean bookInvoice;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private RecurringOffer recurringOffer;
 
 	/**
@@ -122,6 +155,7 @@ public class RecurringOfferConfiguration implements Serializable{
 	 *
 	 * create a delivery note
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private boolean createDelivery;
 
 	/**
@@ -130,6 +164,7 @@ public class RecurringOfferConfiguration implements Serializable{
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Task creatorTask;
 
 	/**

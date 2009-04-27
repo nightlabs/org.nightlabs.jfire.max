@@ -5,6 +5,11 @@ import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.trade.Order;
 
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+
 
 /**
  *
@@ -19,6 +24,11 @@ import org.nightlabs.jfire.trade.Order;
  *
  * @jdo.inheritance strategy="new-table"
  */
+@PersistenceCapable(
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_RecurringOrder")
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class RecurringOrder
 extends Order
 implements RecurringArticleContainer

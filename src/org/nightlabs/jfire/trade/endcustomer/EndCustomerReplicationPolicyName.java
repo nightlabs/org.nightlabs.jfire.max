@@ -32,6 +32,18 @@ import java.util.Map;
 import org.nightlabs.i18n.I18nText;
 import org.nightlabs.jdo.ObjectIDUtil;
 
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.InheritanceStrategy;
+import org.nightlabs.jfire.trade.endcustomer.id.EndCustomerReplicationPolicyNameID;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  *
@@ -48,6 +60,17 @@ import org.nightlabs.jdo.ObjectIDUtil;
  *
  * @jdo.fetch-group name="EndCustomerReplicationPolicy.name" fields="endCustomerReplicationPolicy, names"
  */
+@PersistenceCapable(
+	objectIdClass=EndCustomerReplicationPolicyNameID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_EndCustomerReplicationPolicyName")
+@FetchGroups(
+	@FetchGroup(
+		name="EndCustomerReplicationPolicy.name",
+		members={@Persistent(name="endCustomerReplicationPolicy"), @Persistent(name="names")})
+)
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class EndCustomerReplicationPolicyName extends I18nText
 {
 	private static final long serialVersionUID = 1L;
@@ -55,16 +78,19 @@ public class EndCustomerReplicationPolicyName extends I18nText
 	/**
 	 * @jdo.field primary-key="true"
 	 */
+	@PrimaryKey
 	private String organisationID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 */
+	@PrimaryKey
 	private long endCustomerReplicationPolicyID;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private EndCustomerReplicationPolicy endCustomerReplicationPolicy;
 
 	/**
@@ -94,6 +120,11 @@ public class EndCustomerReplicationPolicyName extends I18nText
 	 *
 	 * @jdo.join
 	 */
+	@Join
+	@Persistent(
+		table="JFireTrade_EndCustomerReplicationPolicyName_names",
+		defaultFetchGroup="true",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	protected Map<String, String> names;
 
 	@Override

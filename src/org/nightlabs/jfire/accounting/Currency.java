@@ -30,6 +30,17 @@ import java.io.Serializable;
 
 import org.nightlabs.util.Util;
 
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.Column;
+import org.nightlabs.jfire.accounting.id.CurrencyID;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  * 
@@ -43,6 +54,12 @@ import org.nightlabs.util.Util;
  *
  * @jdo.inheritance strategy = "new-table"
  */
+@PersistenceCapable(
+	objectIdClass=CurrencyID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_Currency")
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class Currency
 implements Serializable, org.nightlabs.l10n.Currency
 {
@@ -54,16 +71,22 @@ implements Serializable, org.nightlabs.l10n.Currency
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String currencyID;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" null-value="exception"
 	 */
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private String currencySymbol;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private int decimalDigitCount = -1;
 
 	protected Currency() { }

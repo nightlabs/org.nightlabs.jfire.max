@@ -34,7 +34,22 @@ import java.util.List;
 import java.util.Set;
 
 import javax.jdo.JDOHelper;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.Version;
+import javax.jdo.annotations.VersionStrategy;
 
+import org.nightlabs.jfire.accounting.id.InvoiceLocalID;
 import org.nightlabs.jfire.jbpm.graph.def.ActionHandlerNodeEnter;
 import org.nightlabs.jfire.jbpm.graph.def.Statable;
 import org.nightlabs.jfire.jbpm.graph.def.StatableLocal;
@@ -73,6 +88,36 @@ import org.nightlabs.util.CollectionUtil;
  * @jdo.fetch-group name="StatableLocal.states" fields="states"
  *
  */
+@PersistenceCapable(
+	objectIdClass=InvoiceLocalID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_InvoiceLocal")
+@Version(strategy=VersionStrategy.VERSION_NUMBER)
+@FetchGroups({
+	@FetchGroup(
+		name="Invoice.invoiceLocal",
+		members=@Persistent(name="invoice")),
+	@FetchGroup(
+		name=InvoiceLocal.FETCH_GROUP_INVOICE,
+		members=@Persistent(name="invoice")),
+	@FetchGroup(
+		name=InvoiceLocal.FETCH_GROUP_BOOK_USER,
+		members=@Persistent(name="bookUser")),
+	@FetchGroup(
+		name=InvoiceLocal.FETCH_GROUP_THIS_INVOICE_LOCAL,
+		members={@Persistent(name="invoice"), @Persistent(name="bookUser"), @Persistent(name="state"), @Persistent(name="states")}),
+	@FetchGroup(
+		name="FetchGroupsTrade.articleContainerInEditor",
+		members={@Persistent(name="invoice"), @Persistent(name="bookUser"), @Persistent(name="state"), @Persistent(name="states")}),
+	@FetchGroup(
+		name="StatableLocal.state",
+		members=@Persistent(name="state")),
+	@FetchGroup(
+		name="StatableLocal.states",
+		members=@Persistent(name="states"))
+})
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class InvoiceLocal
 implements Serializable, StatableLocal
 {
@@ -90,20 +135,26 @@ implements Serializable, StatableLocal
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="50"
 	 */
+	@PrimaryKey
+	@Column(length=50)
 	private String invoiceIDPrefix;
 	/**
 	 * @jdo.field primary-key="true"
 	 */
+	@PrimaryKey
 	private long invoiceID;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Invoice invoice;
 
 	/**
@@ -111,6 +162,7 @@ implements Serializable, StatableLocal
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private long amountPaid;
 
 	/**
@@ -120,6 +172,7 @@ implements Serializable, StatableLocal
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private boolean outstanding = true;
 
 	/**
@@ -127,6 +180,7 @@ implements Serializable, StatableLocal
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private User bookUser = null;
 
 	/**
@@ -134,11 +188,13 @@ implements Serializable, StatableLocal
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Date bookDT  = null;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private State state;
 
 	/**
@@ -154,11 +210,17 @@ implements Serializable, StatableLocal
 	 *
 	 * @jdo.join
 	 */
+	@Join
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		table="JFireTrade_InvoiceLocal_states",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private List<State> states;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private boolean processEnded = false;
 
 	@Override
@@ -275,11 +337,17 @@ implements Serializable, StatableLocal
 	 *
 	 * @jdo.join
 	 */
+	@Join
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		table="JFireTrade_InvoiceLocal_invoiceActionHandlers",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Set<InvoiceActionHandler> invoiceActionHandlers;
 
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private transient Set<InvoiceActionHandler> _invoiceActionHandlers = null;
 
 	/**
@@ -326,6 +394,7 @@ implements Serializable, StatableLocal
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private transient List<State> _states = null;
 
 	public List<State> getStates()
@@ -339,6 +408,7 @@ implements Serializable, StatableLocal
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private long jbpmProcessInstanceId = -1;
 
 	public long getJbpmProcessInstanceId()

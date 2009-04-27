@@ -32,6 +32,17 @@ import java.util.List;
 import org.nightlabs.jfire.config.ConfigModule;
 import org.nightlabs.jfire.person.PersonStruct;
 
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+
 /**
  * ConfigModule for the LegalEntity view. Wich Fields to display in
  * wich order etc.
@@ -49,6 +60,19 @@ import org.nightlabs.jfire.person.PersonStruct;
  *
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  */
+@PersistenceCapable(
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_LegalEntityViewConfigModule")
+@FetchGroups({
+	@FetchGroup(
+		name=LegalEntityViewConfigModule.FETCH_GROUP_PERSONSTRUCTFIELDS,
+		members=@Persistent(name="personStructFields")),
+	@FetchGroup(
+		name="ConfigModule.this",
+		members=@Persistent(name="personStructFields"))
+})
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class LegalEntityViewConfigModule extends ConfigModule {
 
 	private static final long serialVersionUID = 1L;
@@ -65,6 +89,11 @@ public class LegalEntityViewConfigModule extends ConfigModule {
 	 *
 	 * @jdo.join
 	 */
+	@Join
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		table="JFireTrade_LegalEntityViewConfigModule_personStructFields",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private List<String> personStructFields;
 	
 	public List<String> getStructFields() {

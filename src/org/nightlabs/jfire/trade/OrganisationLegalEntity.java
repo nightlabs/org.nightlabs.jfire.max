@@ -37,6 +37,15 @@ import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.transfer.Anchor;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+
 /**
  * All organisations known by a JFire organisation are represented in its datastore
  * with instances of this class. Note, that this also includes the local organisation.
@@ -62,6 +71,20 @@ import org.nightlabs.jfire.transfer.id.AnchorID;
  * @jdo.fetch-group name="OrganisationLegalEntity.organisation" fields="organisation"
  * @jdo.fetch-group name="OrganisationLegalEntity.this" fetch-groups="default" fields="organisation"
  */
+@PersistenceCapable(
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_OrganisationLegalEntity")
+@FetchGroups({
+	@FetchGroup(
+		name=OrganisationLegalEntity.FETCH_GROUP_ORGANISATION,
+		members=@Persistent(name="organisation")),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name=OrganisationLegalEntity.FETCH_GROUP_THIS_ORGANISATION_LEGAL_ENTITY,
+		members=@Persistent(name="organisation"))
+})
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class OrganisationLegalEntity extends LegalEntity
 implements StoreCallback
 {
@@ -119,6 +142,7 @@ implements StoreCallback
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Organisation organisation;
 
 	/**

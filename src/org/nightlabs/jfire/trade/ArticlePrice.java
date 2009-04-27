@@ -42,6 +42,17 @@ import org.nightlabs.jfire.store.NestedProductTypeLocal;
 import org.nightlabs.jfire.store.Product;
 import org.nightlabs.jfire.store.ProductType;
 
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.Key;
+import javax.jdo.annotations.Value;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+
 
 /**
  * This ArticlePrice is used within OfferItemS. On creation, it copies all data from the original
@@ -74,6 +85,45 @@ import org.nightlabs.jfire.store.ProductType;
  * 		name="FetchGroupsTrade.articleCrossTradeReplication"
  * 		fields="packageArticlePrice, article, productType, product, packageProductType"
  */
+@PersistenceCapable(
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_ArticlePrice")
+@FetchGroups({
+	@FetchGroup(
+		name=ArticlePrice.FETCH_GROUP_PACKAGE_ARTICLE_PRICE,
+		members=@Persistent(name="packageArticlePrice")),
+	@FetchGroup(
+		name=ArticlePrice.FETCH_GROUP_NESTED_ARTICLE_PRICES,
+		members=@Persistent(name="nestedArticlePrices")),
+	@FetchGroup(
+		name=ArticlePrice.FETCH_GROUP_NESTED_ARTICLE_PRICES_NO_LIMIT,
+		members=@Persistent(
+			name="nestedArticlePrices",
+			recursionDepth=-1)),
+	@FetchGroup(
+		name=ArticlePrice.FETCH_GROUP_ORIG_PRICE,
+		members=@Persistent(name="origPrice")),
+	@FetchGroup(
+		name="ArticlePrice.productType",
+		members=@Persistent(name="productType")),
+	@FetchGroup(
+		name="ArticlePrice.packageProductType",
+		members=@Persistent(name="packageProductType")),
+	@FetchGroup(
+		name="ArticlePrice.product",
+		members=@Persistent(name="product")),
+	@FetchGroup(
+		name=ArticlePrice.FETCH_GROUP_ARTICLE,
+		members=@Persistent(name="article")),
+	@FetchGroup(
+		name="Article.price",
+		members=@Persistent(name="article")),
+	@FetchGroup(
+		name="FetchGroupsTrade.articleCrossTradeReplication",
+		members={@Persistent(name="packageArticlePrice"), @Persistent(name="article"), @Persistent(name="productType"), @Persistent(name="product"), @Persistent(name="packageProductType")})
+})
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class ArticlePrice extends org.nightlabs.jfire.accounting.Price
 {
 	private static final long serialVersionUID = 1L;
@@ -92,6 +142,7 @@ public class ArticlePrice extends org.nightlabs.jfire.accounting.Price
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private org.nightlabs.jfire.accounting.Price origPrice;
 
 	/**
@@ -110,6 +161,11 @@ public class ArticlePrice extends org.nightlabs.jfire.accounting.Price
 	 *
 	 * @!jdo.map-vendor-extension vendor-name="jpox" key="key-field" value="nestKey"
 	 */
+	@Persistent(
+		mappedBy="packageArticlePrice",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
+	@Key(mappedBy="nestKey")
+	@Value(dependent="true")
 	protected Map<String, ArticlePrice> nestedArticlePrices;
 
 	/**
@@ -117,6 +173,7 @@ public class ArticlePrice extends org.nightlabs.jfire.accounting.Price
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private ArticlePrice packageArticlePrice;
 
 	/**
@@ -127,6 +184,7 @@ public class ArticlePrice extends org.nightlabs.jfire.accounting.Price
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Article article;
 
 	/**
@@ -135,6 +193,7 @@ public class ArticlePrice extends org.nightlabs.jfire.accounting.Price
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private String nestKey;
 
 //	/**
@@ -153,6 +212,7 @@ public class ArticlePrice extends org.nightlabs.jfire.accounting.Price
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private ProductType packageProductType;
 
 	/**
@@ -160,6 +220,7 @@ public class ArticlePrice extends org.nightlabs.jfire.accounting.Price
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private int innerProductTypeQuantity = 0;
 
 	/**
@@ -168,6 +229,7 @@ public class ArticlePrice extends org.nightlabs.jfire.accounting.Price
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private ProductType productType;
 
 	/**
@@ -177,11 +239,13 @@ public class ArticlePrice extends org.nightlabs.jfire.accounting.Price
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Product product = null;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private boolean virtualInner;
 
 	/**

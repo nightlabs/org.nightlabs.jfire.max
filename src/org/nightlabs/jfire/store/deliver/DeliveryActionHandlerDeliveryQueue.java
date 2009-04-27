@@ -10,6 +10,11 @@ import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.store.deliver.id.DeliveryActionHandlerID;
 import org.nightlabs.jfire.trade.Article;
 
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+
 /**
  * This {@link DeliveryActionHandler} handles deliveries in {@link DeliveryQueue}. When all articles in such a delivery are delivered,
  * the delivery in the delivery queue is removed since it is now completely processed.
@@ -23,6 +28,10 @@ import org.nightlabs.jfire.trade.Article;
  *
  * @jdo.inheritance strategy="superclass-table"
  */
+@PersistenceCapable(
+	identityType=IdentityType.APPLICATION,
+	detachable="true")
+@Inheritance(strategy=InheritanceStrategy.SUPERCLASS_TABLE)
 public class DeliveryActionHandlerDeliveryQueue extends DeliveryActionHandler implements Serializable {
 	
 	private static final long serialVersionUID = 1L;

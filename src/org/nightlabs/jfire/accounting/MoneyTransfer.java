@@ -34,6 +34,15 @@ import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.transfer.Anchor;
 import org.nightlabs.jfire.transfer.Transfer;
 
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+
 /**
  * A {@link MoneyTransfer} is used to describe the transfer of money from one {@link Anchor}
  * to another. When booked by an {@link Account}, its balance will be adjusted accordingly
@@ -51,6 +60,16 @@ import org.nightlabs.jfire.transfer.Transfer;
  * 
  * @jdo.fetch-group name="MoneyTransfer.currency" fields="currency"
  */
+@PersistenceCapable(
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_MoneyTransfer")
+@FetchGroups(
+	@FetchGroup(
+		name=MoneyTransfer.FETCH_GROUP_CURRENCY,
+		members=@Persistent(name="currency"))
+)
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class MoneyTransfer extends Transfer
 {
 	private static final long serialVersionUID = 1L;
@@ -63,20 +82,24 @@ public class MoneyTransfer extends Transfer
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Currency currency;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private long amount;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private long fromBalanceBeforeTransfer;
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private long toBalanceBeforeTransfer;
 	
 	

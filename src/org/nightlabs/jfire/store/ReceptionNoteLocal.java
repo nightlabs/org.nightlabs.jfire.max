@@ -10,6 +10,18 @@ import org.nightlabs.jfire.jbpm.graph.def.StatableLocal;
 import org.nightlabs.jfire.jbpm.graph.def.State;
 import org.nightlabs.util.CollectionUtil;
 
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import org.nightlabs.jfire.store.id.ReceptionNoteLocalID;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+
 /**
  * @author Marco Schulze - Marco at NightLabs dot de
  *
@@ -26,6 +38,12 @@ import org.nightlabs.util.CollectionUtil;
  * @jdo.create-objectid-class
  *		field-order="organisationID, receptionNoteIDPrefix, receptionNoteID"
  */
+@PersistenceCapable(
+	objectIdClass=ReceptionNoteLocalID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_ReceptionNoteLocal")
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class ReceptionNoteLocal
 implements
 		Serializable,
@@ -37,25 +55,32 @@ implements
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="50"
 	 */
+	@PrimaryKey
+	@Column(length=50)
 	private String receptionNoteIDPrefix;
 	/**
 	 * @jdo.field primary-key="true"
 	 */
+	@PrimaryKey
 	private long receptionNoteID;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private ReceptionNote receptionNote;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private boolean processEnded = false;
 
 	@Override
@@ -101,6 +126,7 @@ implements
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private State state;
 
 	/**
@@ -115,6 +141,11 @@ implements
 	 *
 	 * @jdo.join
 	 */
+	@Join
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		table="JFireTrade_ReceptionNoteLocal_states",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private List<State> states;
 
 	public ReceptionNote getReceptionNote()
@@ -148,6 +179,7 @@ implements
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private transient List<State> _states = null;
 
 	public List<State> getStates()
@@ -161,6 +193,7 @@ implements
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private long jbpmProcessInstanceId = -1;
 
 	public long getJbpmProcessInstanceId()

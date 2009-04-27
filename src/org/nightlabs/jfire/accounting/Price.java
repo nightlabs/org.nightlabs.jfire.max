@@ -38,6 +38,20 @@ import javax.jdo.PersistenceManager;
 
 import org.nightlabs.jdo.ObjectIDUtil;
 
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.Key;
+import javax.jdo.annotations.Value;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.Column;
+import org.nightlabs.jfire.accounting.id.PriceID;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  *
@@ -67,6 +81,47 @@ import org.nightlabs.jdo.ObjectIDUtil;
  * 		name="FetchGroupsTrade.articleCrossTradeReplication"
  * 		fields="currency, fragments"
  */
+@PersistenceCapable(
+	objectIdClass=PriceID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_Price")
+@FetchGroups({
+	@FetchGroup(
+		name=Price.FETCH_GROUP_CURRENCY,
+		members=@Persistent(name="currency")),
+	@FetchGroup(
+		name=Price.FETCH_GROUP_FRAGMENTS,
+		members=@Persistent(name="fragments")),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name=Price.FETCH_GROUP_THIS_PRICE,
+		members={@Persistent(name="currency"), @Persistent(name="fragments")}),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name="FetchGroupsPriceConfig.edit",
+		members={@Persistent(name="currency"), @Persistent(name="fragments")}),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name="FetchGroupsTrade.articleInOrderEditor",
+		members=@Persistent(name="currency")),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name="FetchGroupsTrade.articleInOfferEditor",
+		members=@Persistent(name="currency")),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name="FetchGroupsTrade.articleInInvoiceEditor",
+		members=@Persistent(name="currency")),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name="FetchGroupsTrade.articleInDeliveryNoteEditor",
+		members=@Persistent(name="currency")),
+	@FetchGroup(
+		name="FetchGroupsTrade.articleCrossTradeReplication",
+		members={@Persistent(name="currency"), @Persistent(name="fragments")})
+})
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class Price
 	implements Serializable
 {
@@ -84,6 +139,8 @@ public class Price
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 
 //	/**
@@ -95,6 +152,7 @@ public class Price
 	/**
 	 * @jdo.field primary-key="true"
 	 */
+@PrimaryKey
 	private long priceID = -1;
 	/////// end PK /////
 
@@ -103,11 +161,13 @@ public class Price
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Currency currency;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private long amount = 0;
 
 	/**
@@ -135,6 +195,11 @@ public class Price
 	 *
 	 * @jdo.key mapped-by="priceFragmentTypePK"
 	 */
+	@Persistent(
+		mappedBy="price",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
+	@Key(mappedBy="priceFragmentTypePK")
+	@Value(dependent="true")
 	protected Map<String, PriceFragment> fragments;
 
 	/**
@@ -144,6 +209,7 @@ public class Price
 	 *
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	protected Map<String, PriceFragment> virtualFragments = new HashMap<String, PriceFragment>();
 
 	/////// end normal fields ////////

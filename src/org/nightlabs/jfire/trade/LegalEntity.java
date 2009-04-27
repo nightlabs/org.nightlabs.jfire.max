@@ -61,6 +61,18 @@ import org.nightlabs.jfire.transfer.Anchor;
 import org.nightlabs.jfire.transfer.Transfer;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Queries;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.IdentityType;
+
 /**
  * A JFire organisation manages all its business partners as instances of {@link LegalEntity}.
  * This includes local customers and vendors/suppliers that are not other JFire organisations.
@@ -94,6 +106,39 @@ import org.nightlabs.jfire.transfer.id.AnchorID;
  *
  * @jdo.query name="getLegalEntityForPerson" query="SELECT UNIQUE WHERE this.person == :person"
  */
+@PersistenceCapable(
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_LegalEntity")
+@FetchGroups({
+	@FetchGroup(
+		name=LegalEntity.FETCH_GROUP_ACCOUNTANT,
+		members=@Persistent(name="accountant")),
+	@FetchGroup(
+		name=LegalEntity.FETCH_GROUP_STOREKEEPER,
+		members=@Persistent(name="storekeeper")),
+	@FetchGroup(
+		name=LegalEntity.FETCH_GROUP_PERSON,
+		members=@Persistent(
+			name="person",
+			recursionDepth=-1)),
+	@FetchGroup(
+		name=LegalEntity.FETCH_GROUP_CUSTOMER_GROUPS,
+		members=@Persistent(name="customerGroups")),
+	@FetchGroup(
+		name=LegalEntity.FETCH_GROUP_DEFAULT_CUSTOMER_GROUP,
+		members=@Persistent(name="defaultCustomerGroup")),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name=LegalEntity.FETCH_GROUP_THIS_LEGAL_ENTITY,
+		members={@Persistent(name="person"), @Persistent(name="accountant")})
+})
+@Queries(
+	@javax.jdo.annotations.Query(
+		name="getLegalEntityForPerson",
+		value="SELECT UNIQUE WHERE this.person == :person")
+)
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class LegalEntity extends Anchor
 {
 	private static final long serialVersionUID = 1L;
@@ -188,6 +233,7 @@ public class LegalEntity extends Anchor
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private boolean anonymous = false;
 
 	/**
@@ -198,6 +244,7 @@ public class LegalEntity extends Anchor
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private CustomerGroup defaultCustomerGroup;
 
 //	/**
@@ -233,6 +280,11 @@ public class LegalEntity extends Anchor
 	 *
 	 * @jdo.join
 	 */
+@Join
+@Persistent(
+	nullValue=NullValue.EXCEPTION,
+	table="JFireTrade_LegalEntity_customerGroups",
+	persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Set<CustomerGroup> customerGroups;
 
 	public LegalEntity() { }
@@ -249,16 +301,19 @@ public class LegalEntity extends Anchor
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Person person;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Accountant accountant;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Storekeeper storekeeper;
 
 	protected static class Balance
@@ -618,6 +673,7 @@ public class LegalEntity extends Anchor
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private transient Set<CustomerGroup> unmodifiableCustomerGroups = null;
 
 	/**

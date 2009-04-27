@@ -94,6 +94,21 @@ import org.nightlabs.jfire.transfer.id.AnchorID;
 import org.nightlabs.util.CollectionUtil;
 import org.nightlabs.util.Util;
 
+import org.nightlabs.jfire.store.id.ProductTypeActionHandlerID;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Discriminator;
+import javax.jdo.annotations.Element;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.DiscriminatorStrategy;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Queries;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+
 /**
  * <p>
  * This class provides logic about how certain {@link ProductType}-related operations
@@ -129,6 +144,18 @@ import org.nightlabs.util.Util;
  *		PARAMETERS String pProductTypeClassName
  *		import java.lang.String"
  */
+@PersistenceCapable(
+	objectIdClass=ProductTypeActionHandlerID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_ProductTypeActionHandler")
+@Discriminator(strategy=DiscriminatorStrategy.CLASS_NAME)
+@Queries(
+	@javax.jdo.annotations.Query(
+		name="getProductTypeActionHandlerByProductTypeClassName",
+		value=" SELECT UNIQUE WHERE this.productTypeClassName == pProductTypeClassName PARAMETERS String pProductTypeClassName import java.lang.String")
+)
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public abstract class ProductTypeActionHandler
 {
 	private static final Logger logger = Logger.getLogger(ProductTypeActionHandler.class);
@@ -197,11 +224,15 @@ public abstract class ProductTypeActionHandler
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String productTypeActionHandlerID;
 
 	/**
@@ -209,6 +240,10 @@ public abstract class ProductTypeActionHandler
 	 *
 	 * @jdo.field persistence-modifier="persistent" unique="true" null-value="exception"
 	 */
+	@Element(unique="true")
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private String productTypeClassName;
 
 	/**

@@ -10,6 +10,20 @@ import org.nightlabs.inheritance.Inheritable;
 import org.nightlabs.inheritance.StaticFieldMetaData;
 import org.nightlabs.jdo.inheritance.JDOSimpleFieldInheriter;
 
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.InheritanceStrategy;
+import org.nightlabs.jfire.trade.store.id.ProductTypeNameID;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+
 /**
  * @jdo.persistence-capable
  *		identity-type="application"
@@ -29,7 +43,34 @@ import org.nightlabs.jdo.inheritance.JDOSimpleFieldInheriter;
  * @jdo.fetch-group name="FetchGroupsTrade.articleInDeliveryNoteEditor" fetch-groups="default" fields="names"
  *
  * @author Daniel.Mazurek [at] NightLabs [dot] de
- */
+ */@PersistenceCapable(
+	objectIdClass=ProductTypeNameID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_ProductTypeName")
+@FetchGroups({
+	@FetchGroup(
+		name="ProductType.name",
+		members={@Persistent(name="productType"), @Persistent(name="names")}),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name="FetchGroupsTrade.articleInOrderEditor",
+		members=@Persistent(name="names")),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name="FetchGroupsTrade.articleInOfferEditor",
+		members=@Persistent(name="names")),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name="FetchGroupsTrade.articleInInvoiceEditor",
+		members=@Persistent(name="names")),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name="FetchGroupsTrade.articleInDeliveryNoteEditor",
+		members=@Persistent(name="names"))
+})
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
+
 public class ProductTypeName
 extends I18nText
 implements Inheritable
@@ -39,18 +80,23 @@ implements Inheritable
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
-	 */
+	 */	@PrimaryKey
+	@Column(length=100)
+
 	private String organisationID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
-	 */
+	 */	@PrimaryKey
+	@Column(length=100)
+
 	private String productTypeID;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
-	 */
+	 */	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+
 	private ProductType productType;
 	
 	/**
@@ -66,7 +112,12 @@ implements Inheritable
 	 *		null-value="exception"
 	 *
 	 * @jdo.join
-	 */
+	 */	@Join
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		table="JFireTrade_ProductTypeName_names",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
+
 	protected Map<String, String> names;
 
 	/**

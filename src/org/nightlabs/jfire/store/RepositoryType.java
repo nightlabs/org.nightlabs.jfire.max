@@ -7,6 +7,17 @@ import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.store.id.RepositoryTypeID;
 import org.nightlabs.util.Util;
 
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  * @author Alexander Bieber <alex [AT] nightlabs [DOT] de>
@@ -24,6 +35,17 @@ import org.nightlabs.util.Util;
  *
  * @jdo.fetch-group name="RepositoryType.name" fields="name"
  */
+@PersistenceCapable(
+	objectIdClass=RepositoryTypeID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_RepositoryType")
+@FetchGroups(
+	@FetchGroup(
+		name=RepositoryType.FETCH_GROUP_NAME,
+		members=@Persistent(name="name"))
+)
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class RepositoryType
 implements Serializable
 {
@@ -101,17 +123,24 @@ implements Serializable
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String repositoryTypeID;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" mapped-by="repositoryType"
 	 */
+	@Persistent(
+		mappedBy="repositoryType",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private RepositoryTypeName name;
 
 	/**
@@ -119,6 +148,7 @@ implements Serializable
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private boolean outside;
 
 	/**

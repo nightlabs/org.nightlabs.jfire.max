@@ -30,6 +30,16 @@ import java.io.Serializable;
 
 import org.nightlabs.jfire.transfer.TransferData;
 
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.Column;
+import org.nightlabs.jfire.accounting.pay.id.PaymentDataID;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+
 /**
  * Subclass in order to hold specific data for your payment process.
  * This additional data can be defined by the client payment processor (gathered by
@@ -56,6 +66,12 @@ import org.nightlabs.jfire.transfer.TransferData;
  *		field-order="organisationID, paymentID"
  *		include-body="id/PaymentDataID.body.inc"
  */
+@PersistenceCapable(
+	objectIdClass=PaymentDataID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_PaymentData")
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class PaymentData
 implements Serializable, TransferData
 {
@@ -65,21 +81,26 @@ implements Serializable, TransferData
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 	
 	/**
 	 * @jdo.field primary-key="true"
 	 */
+	@PrimaryKey
 	private long paymentID;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Payment payment;
 
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private transient Payment paymentBackupForUpload = null;
 
 	/**

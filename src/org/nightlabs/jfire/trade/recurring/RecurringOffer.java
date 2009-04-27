@@ -9,6 +9,15 @@ import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.Offer;
 
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+
 
 /**
  * A {@link RecurringOffer} is an offer that serves as a template for the recurring/timed
@@ -41,6 +50,16 @@ import org.nightlabs.jfire.trade.Offer;
  * @jdo.fetch-group name="RecurringOffer.recurringOfferConfiguration" fields="recurringOfferConfiguration"
  *
  */
+@PersistenceCapable(
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_RecurringOffer")
+@FetchGroups(
+	@FetchGroup(
+		name=RecurringOffer.FETCH_GROUP_RECURRING_OFFER_CONFIGURATION,
+		members=@Persistent(name="recurringOfferConfiguration"))
+)
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class RecurringOffer
 extends Offer
 implements RecurringArticleContainer
@@ -70,17 +89,22 @@ implements RecurringArticleContainer
 	/**
 	 * @jdo.field persistence-modifier="persistent" mapped-by="recurringOffer"
 	 */
+	@Persistent(
+		mappedBy="recurringOffer",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private RecurringOfferConfiguration recurringOfferConfiguration;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private String statusKey;
 
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private int recurredOfferCount;
 
 

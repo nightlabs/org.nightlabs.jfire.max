@@ -49,6 +49,17 @@ import org.nightlabs.jfire.trade.CustomerGroup;
 import org.nightlabs.jfire.trade.CustomerGroupMapping;
 import org.nightlabs.jfire.trade.id.CustomerGroupID;
 
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.IdentityType;
+
 /**
  * This implementation of <tt>PriceConfig</tt> manages cells
  * that are dependent on <tt>CustomerGroup</tt> and <tt>Tariff</tt>.
@@ -70,6 +81,23 @@ import org.nightlabs.jfire.trade.id.CustomerGroupID;
  *
  * @jdo.fetch-group name="FetchGroupsPriceConfig.edit" fetch-groups="default" fields="customerGroups, tariffs"
  */
+@PersistenceCapable(
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_GridPriceConfig")
+@FetchGroups({
+	@FetchGroup(
+		name=GridPriceConfig.FETCH_GROUP_CUSTOMER_GROUPS,
+		members=@Persistent(name="customerGroups")),
+	@FetchGroup(
+		name=GridPriceConfig.FETCH_GROUP_TARIFFS,
+		members=@Persistent(name="tariffs")),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name="FetchGroupsPriceConfig.edit",
+		members={@Persistent(name="customerGroups"), @Persistent(name="tariffs")})
+})
+@Inheritance(strategy=InheritanceStrategy.SUPERCLASS_TABLE)
 public abstract class GridPriceConfig extends PriceConfig implements IGridPriceConfig
 {
 	private static final long serialVersionUID = 1L;
@@ -90,6 +118,11 @@ public abstract class GridPriceConfig extends PriceConfig implements IGridPriceC
 	 *
 	 * @jdo.join
 	 */
+	@Join
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		table="JFireTrade_GridPriceConfig_customerGroups",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Map<String, CustomerGroup> customerGroups = new HashMap<String, CustomerGroup>();
 
 	/**
@@ -106,6 +139,11 @@ public abstract class GridPriceConfig extends PriceConfig implements IGridPriceC
 	 *
 	 * @jdo.join
 	 */
+	@Join
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		table="JFireTrade_GridPriceConfig_tariffs",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Map<String, Tariff> tariffs = new HashMap<String, Tariff>();
 
 	/**

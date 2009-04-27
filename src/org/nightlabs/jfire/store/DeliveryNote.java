@@ -64,6 +64,22 @@ import org.nightlabs.jfire.transfer.id.AnchorID;
 import org.nightlabs.util.CollectionUtil;
 import org.nightlabs.util.Util;
 
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.Version;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.VersionStrategy;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Queries;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+
 /**
  * @author Alexander Bieber <!-- alex at nightlabs dot de -->
  * @author Marco Schulze - Marco at NightLabs dot de
@@ -141,6 +157,63 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="Statable.states" fields="states"
  *
  */
+@PersistenceCapable(
+	objectIdClass=DeliveryNoteID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_DeliveryNote")
+@Version(strategy=VersionStrategy.VERSION_NUMBER)
+@FetchGroups({
+	@FetchGroup(
+		name=DeliveryNote.FETCH_GROUP_DELIVERY_NOTE_LOCAL,
+		members=@Persistent(name="deliveryNoteLocal")),
+	@FetchGroup(
+		name=DeliveryNote.FETCH_GROUP_ARTICLES,
+		members=@Persistent(name="articles")),
+	@FetchGroup(
+		name=DeliveryNote.FETCH_GROUP_CREATE_USER,
+		members=@Persistent(name="createUser")),
+	@FetchGroup(
+		name=DeliveryNote.FETCH_GROUP_FINALIZE_USER,
+		members=@Persistent(name="finalizeUser")),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name=DeliveryNote.FETCH_GROUP_THIS_DELIVERY_NOTE,
+		members={@Persistent(name="deliveryNoteLocal"), @Persistent(name="articles"), @Persistent(name="createUser"), @Persistent(name="customer"), @Persistent(name="finalizeUser"), @Persistent(name="vendor"), @Persistent(name="state"), @Persistent(name="states")}),
+	@FetchGroup(
+		name=DeliveryNote.FETCH_GROUP_VENDOR,
+		members=@Persistent(name="vendor")),
+	@FetchGroup(
+		name=DeliveryNote.FETCH_GROUP_CUSTOMER,
+		members=@Persistent(name="customer")),
+	@FetchGroup(
+		name="ArticleContainer.endCustomer",
+		members=@Persistent(name="endCustomer")),
+	@FetchGroup(
+		name="FetchGroupsTrade.articleContainerInEditor",
+		members={@Persistent(name="deliveryNoteLocal"), @Persistent(name="articles"), @Persistent(name="createUser"), @Persistent(name="customer"), @Persistent(name="endCustomer"), @Persistent(name="finalizeUser"), @Persistent(name="vendor"), @Persistent(name="state"), @Persistent(name="states")}),
+	@FetchGroup(
+		name="Statable.state",
+		members=@Persistent(name="state")),
+	@FetchGroup(
+		name="Statable.states",
+		members=@Persistent(name="states"))
+})
+@Queries({
+	@javax.jdo.annotations.Query(
+		name="getDeliveryNoteIDsByVendorAndCustomer",
+		value="SELECT JDOHelper.getObjectId(this) WHERE JDOHelper.getObjectId(vendor) == :vendorID && JDOHelper.getObjectId(customer) == :customerID ORDER BY deliveryNoteID DESC"),
+	@javax.jdo.annotations.Query(
+		name="getDeliveryNoteIDsByVendorAndEndCustomer",
+		value="SELECT JDOHelper.getObjectId(this) WHERE JDOHelper.getObjectId(vendor) == :vendorID && JDOHelper.getObjectId(endCustomer) == :customerID ORDER BY deliveryNoteID DESC"),
+	@javax.jdo.annotations.Query(
+		name="getDeliveryNoteIDsByVendorAndCustomerAndEndCustomer",
+		value="SELECT JDOHelper.getObjectId(this) WHERE JDOHelper.getObjectId(vendor) == :vendorID && JDOHelper.getObjectId(customer) == :customerID && JDOHelper.getObjectId(endCustomer) == :endCustomerID ORDER BY deliveryNoteID DESC"),
+	@javax.jdo.annotations.Query(
+		name="getNonFinalizedDeliveryNotesByVendorAndCustomer",
+		value="SELECT WHERE vendor.organisationID == paramVendorID_organisationID && vendor.anchorID == paramVendorID_anchorID && customer.organisationID == paramCustomerID_organisationID && customer.anchorID == paramCustomerID_anchorID && finalizeDT == null PARAMETERS String paramVendorID_organisationID, String paramVendorID_anchorID, String paramCustomerID_organisationID, String paramCustomerID_anchorID import java.lang.String ORDER BY deliveryNoteID DESC")
+})
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class DeliveryNote
 implements Serializable, ArticleContainer, Statable, DetachCallback
 {
@@ -264,73 +337,93 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="50"
 	 */
+	@PrimaryKey
+	@Column(length=50)
 	private String deliveryNoteIDPrefix;
 	/**
 	 * @jdo.field primary-key="true"
 	 */
+	@PrimaryKey
 	private long deliveryNoteID;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private String primaryKey;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" mapped-by="deliveryNote" dependent="true"
 	 */
+	@Persistent(
+		dependent="true",
+		mappedBy="deliveryNote",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private DeliveryNoteLocal deliveryNoteLocal;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private LegalEntity vendor;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private LegalEntity customer;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private LegalEntity endCustomer;
 
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private AnchorID vendorID = null;
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private boolean vendorID_detached = false;
 
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private AnchorID customerID = null;
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private boolean customerID_detached = false;
 
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private AnchorID endCustomerID = null;
 
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private boolean endCustomerID_detached = false;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private State state;
 
 	/**
@@ -345,6 +438,11 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	 *
 	 * @jdo.join
 	 */
+	@Join
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		table="JFireTrade_DeliveryNote_states",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private List<State> states;
 
 //	/**
@@ -369,6 +467,7 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private int articleCount = 0;
 
 	/**
@@ -378,6 +477,9 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	 *		element-type="org.nightlabs.jfire.trade.Article"
 	 *		mapped-by="deliveryNote"
 	 */
+	@Persistent(
+		mappedBy="deliveryNote",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Set<Article> articles;
 
 	/**
@@ -387,11 +489,15 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	 *		element-type="ReceptionNote"
 	 *		mapped-by="deliveryNote"
 	 */
+	@Persistent(
+		mappedBy="deliveryNote",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Set<ReceptionNote> receptionNotes;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Date createDT;
 
 	/**
@@ -399,6 +505,7 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private User createUser = null;
 
 	public String getOrganisationID() {
@@ -509,6 +616,7 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private transient Set<Article> _articles = null;
 
 	@Override
@@ -531,6 +639,7 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private boolean valid = false;
 
 	/**
@@ -538,6 +647,7 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private User finalizeUser = null;
 
 	/**
@@ -545,6 +655,7 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Date finalizeDT  = null;
 
 	/**
@@ -774,6 +885,7 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private transient List<State> _states = null;
 
 	public List<State> getStates()
@@ -797,6 +909,7 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private transient Set<ReceptionNote> _receptionNotes = null;
 
 	public Set<ReceptionNote> getReceptionNotes()

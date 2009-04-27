@@ -61,6 +61,22 @@ import org.nightlabs.jfire.transfer.id.AnchorID;
 import org.nightlabs.util.CollectionUtil;
 import org.nightlabs.util.Util;
 
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.VersionStrategy;
+import javax.jdo.annotations.Version;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Queries;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+
 /**
  * @author Alexander Bieber <!-- alex at nightlabs dot de -->
  * @author Marco Schulze - Marco at NightLabs dot de
@@ -140,6 +156,72 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="Statable.states" fields="states"
  *
  */
+@PersistenceCapable(
+	objectIdClass=InvoiceID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_Invoice")
+@Version(strategy=VersionStrategy.VERSION_NUMBER)
+@FetchGroups({
+	@FetchGroup(
+		name=Invoice.FETCH_GROUP_INVOICE_LOCAL,
+		members=@Persistent(name="invoiceLocal")),
+	@FetchGroup(
+		name=Invoice.FETCH_GROUP_ARTICLES,
+		members=@Persistent(name="articles")),
+	@FetchGroup(
+		name=Invoice.FETCH_GROUP_CREATE_USER,
+		members=@Persistent(name="createUser")),
+	@FetchGroup(
+		name=Invoice.FETCH_GROUP_CURRENCY,
+		members=@Persistent(name="currency")),
+	@FetchGroup(
+		name=Invoice.FETCH_GROUP_DISCOUNT,
+		members=@Persistent(name="discount")),
+	@FetchGroup(
+		name=Invoice.FETCH_GROUP_FINALIZE_USER,
+		members=@Persistent(name="finalizeUser")),
+	@FetchGroup(
+		name=Invoice.FETCH_GROUP_PRICE,
+		members=@Persistent(name="price")),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name=Invoice.FETCH_GROUP_THIS_INVOICE,
+		members={@Persistent(name="invoiceLocal"), @Persistent(name="articles"), @Persistent(name="createUser"), @Persistent(name="currency"), @Persistent(name="customer"), @Persistent(name="discount"), @Persistent(name="finalizeUser"), @Persistent(name="price"), @Persistent(name="vendor"), @Persistent(name="state"), @Persistent(name="states")}),
+	@FetchGroup(
+		name="ArticleContainer.customer",
+		members=@Persistent(name="customer")),
+	@FetchGroup(
+		name="ArticleContainer.vendor",
+		members=@Persistent(name="vendor")),
+	@FetchGroup(
+		name="ArticleContainer.endCustomer",
+		members=@Persistent(name="endCustomer")),
+	@FetchGroup(
+		name="FetchGroupsTrade.articleContainerInEditor",
+		members={@Persistent(name="invoiceLocal"), @Persistent(name="createUser"), @Persistent(name="currency"), @Persistent(name="customer"), @Persistent(name="endCustomer"), @Persistent(name="discount"), @Persistent(name="finalizeUser"), @Persistent(name="price"), @Persistent(name="vendor"), @Persistent(name="state"), @Persistent(name="states")}),
+	@FetchGroup(
+		name="Statable.state",
+		members=@Persistent(name="state")),
+	@FetchGroup(
+		name="Statable.states",
+		members=@Persistent(name="states"))
+})
+@Queries({
+	@javax.jdo.annotations.Query(
+		name="getInvoiceIDsByVendorAndCustomer",
+		value="SELECT JDOHelper.getObjectId(this) WHERE JDOHelper.getObjectId(vendor) == :vendorID && JDOHelper.getObjectId(customer) == :customerID ORDER BY invoiceID DESC"),
+	@javax.jdo.annotations.Query(
+		name="getInvoiceIDsByVendorAndEndCustomer",
+		value="SELECT JDOHelper.getObjectId(this) WHERE JDOHelper.getObjectId(vendor) == :vendorID && JDOHelper.getObjectId(endCustomer) == :customerID ORDER BY invoiceID DESC"),
+	@javax.jdo.annotations.Query(
+		name="getInvoiceIDsByVendorAndCustomerAndEndCustomer",
+		value="SELECT JDOHelper.getObjectId(this) WHERE JDOHelper.getObjectId(vendor) == :vendorID && JDOHelper.getObjectId(customer) == :customerID && JDOHelper.getObjectId(endCustomer) == :endCustomerID ORDER BY invoiceID DESC"),
+	@javax.jdo.annotations.Query(
+		name="getNonFinalizedInvoicesByVendorAndCustomer",
+		value="SELECT WHERE vendor.organisationID == paramVendorID_organisationID && vendor.anchorID == paramVendorID_anchorID && customer.organisationID == paramCustomerID_organisationID && customer.anchorID == paramCustomerID_anchorID && finalizeDT == null PARAMETERS String paramVendorID_organisationID, String paramVendorID_anchorID, String paramCustomerID_organisationID, String paramCustomerID_anchorID import java.lang.String ORDER BY invoiceID DESC")
+})
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class Invoice
 implements Serializable, ArticleContainer, Statable, DetachCallback
 {
@@ -210,15 +292,20 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="50"
 	 */
+	@PrimaryKey
+	@Column(length=50)
 	private String invoiceIDPrefix;
 	/**
 	 * @jdo.field primary-key="true"
 	 */
+	@PrimaryKey
 	private long invoiceID;
 
 	/**
@@ -275,59 +362,74 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private String primaryKey;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" mapped-by="invoice" dependent="true"
 	 */
+	@Persistent(
+		dependent="true",
+		mappedBy="invoice",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private InvoiceLocal invoiceLocal;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private LegalEntity vendor;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private LegalEntity customer;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private LegalEntity endCustomer;
 
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private AnchorID vendorID = null;
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private boolean vendorID_detached = false;
 
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private AnchorID customerID = null;
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private boolean customerID_detached = false;
 
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private AnchorID endCustomerID = null;
 
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private boolean endCustomerID_detached = false;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private State state;
 
 	/**
@@ -342,6 +444,11 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	 *
 	 * @jdo.join
 	 */
+	@Join
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		table="JFireTrade_Invoice_states",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private List<State> states;
 
 //	/**
@@ -368,11 +475,15 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	 *		element-type="org.nightlabs.jfire.trade.Article"
 	 *		mapped-by="invoice"
 	 */
+@Persistent(
+	mappedBy="invoice",
+	persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Set<Article> articles;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private int articleCount = 0;
 
 	/**
@@ -491,6 +602,7 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Discount discount;
 
 	/**
@@ -498,6 +610,7 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Date createDT;
 
 	/**
@@ -505,6 +618,7 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private User createUser = null;
 
 	/**
@@ -512,6 +626,7 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Price price;
 
 	/**
@@ -519,6 +634,7 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private boolean valid = false;
 
 	/**
@@ -553,6 +669,7 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private User finalizeUser = null;
 
 	/**
@@ -560,6 +677,7 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Date finalizeDT  = null;
 
 	/**
@@ -698,6 +816,7 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private transient Set<Article> _articles = null;
 
 	public Set<Article> getArticles()
@@ -853,6 +972,7 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private transient List<State> _states = null;
 
 	public List<State> getStates()

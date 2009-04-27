@@ -42,6 +42,19 @@ import org.nightlabs.jfire.trade.ArticlePrice;
 import org.nightlabs.jfire.trade.OrganisationLegalEntity;
 import org.nightlabs.jfire.transfer.Anchor;
 
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Discriminator;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.Queries;
+import org.nightlabs.jfire.accounting.book.id.LocalAccountantDelegateID;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.DiscriminatorStrategy;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+
 /**
  * LocalAccountantDelegates are used by {@link org.nightlabs.jfire.accounting.book.LocalAccountant}
  * to assist in the booking procedure. A delegate is registered per ProductType
@@ -76,6 +89,29 @@ import org.nightlabs.jfire.transfer.Anchor;
  * @jdo.fetch-group name="LocalAccountantDelegate.this" fetch-groups="default" fields="name, extendedAccountantDelegate"
  *
  */
+@PersistenceCapable(
+	objectIdClass=LocalAccountantDelegateID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_LocalAccountantDelegate")
+@FetchGroups({
+	@FetchGroup(
+		name=LocalAccountantDelegate.FETCH_GROUP_NAME,
+		members=@Persistent(name="name")),
+	@FetchGroup(
+		name=LocalAccountantDelegate.FETCH_GROUP_EXTENDED_ACCOUNTANT_DELEGATE,
+		members=@Persistent(name="extendedAccountantDelegate")),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name=LocalAccountantDelegate.FETCH_GROUP_THIS_LOCAL_ACCOUNTANT_DELEGATE,
+		members={@Persistent(name="name"), @Persistent(name="extendedAccountantDelegate")})
+})
+@Discriminator(strategy=DiscriminatorStrategy.CLASS_NAME)
+@Queries(
+	@javax.jdo.annotations.Query(
+		name=LocalAccountantDelegate.QUERY_GET_CHILD_DELEGATES,
+		value="SELECT WHERE this.extendedAccountantDelegate != null && this.extendedAccountantDelegate.organisationID == paramOrganisationID && this.extendedAccountantDelegate.localAccountantDelegateID == paramLocalAccountantDelegateID PARAMETERS String paramOrganisationID, String paramLocalAccountantDelegateID import java.lang.String")
+)
 public abstract class LocalAccountantDelegate implements Serializable {
 	private static final long serialVersionUID = 1L;
 //	private static final Logger logger = Logger.getLogger(LocalAccountantDelegate.class);
@@ -101,16 +137,24 @@ public abstract class LocalAccountantDelegate implements Serializable {
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String localAccountantDelegateID;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" dependent="true" mapped-by="localAccountantDelegate"
 	 */
+	@Persistent(
+		dependent="true",
+		mappedBy="localAccountantDelegate",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private LocalAccountantDelegateName name;
 
 
@@ -119,6 +163,7 @@ public abstract class LocalAccountantDelegate implements Serializable {
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private LocalAccountantDelegate extendedAccountantDelegate;
 
 	public LocalAccountantDelegate(String organisationID, String localAccountantDelegateID) {

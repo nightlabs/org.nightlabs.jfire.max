@@ -78,6 +78,26 @@ import org.nightlabs.jfire.trade.endcustomer.EndCustomerReplicationPolicy;
 import org.nightlabs.util.CollectionUtil;
 import org.nightlabs.util.Util;
 
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.Version;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Discriminator;
+import javax.jdo.annotations.Key;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.DiscriminatorStrategy;
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.Value;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.VersionStrategy;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Queries;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+
 /**
  * <p>
  * This is the base class for all product-types in the ERP. You subclass it in order to implement
@@ -187,6 +207,101 @@ import org.nightlabs.util.Util;
  *				VARIABLES org.nightlabs.jfire.store.NestedProductTypeLocal nestedProductTypeLocal"
  *
  */
+@PersistenceCapable(
+	objectIdClass=ProductTypeID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_ProductType")
+@Version(strategy=VersionStrategy.VERSION_NUMBER)
+@FetchGroups({
+	@FetchGroup(
+		name=ProductType.FETCH_GROUP_EXTENDED_PRODUCT_TYPE,
+		members=@Persistent(name="extendedProductType")),
+	@FetchGroup(
+		name=ProductType.FETCH_GROUP_EXTENDED_PRODUCT_TYPE_2,
+		members=@Persistent(
+			name="extendedProductType",
+			recursionDepth=2)),
+	@FetchGroup(
+		name=ProductType.FETCH_GROUP_EXTENDED_PRODUCT_TYPE_NO_LIMIT,
+		members=@Persistent(
+			name="extendedProductType",
+			recursionDepth=-1)),
+	@FetchGroup(
+		name=ProductType.FETCH_GROUP_FIELD_METADATA_MAP,
+		members=@Persistent(name="fieldMetaDataMap")),
+	@FetchGroup(
+		name=ProductType.FETCH_GROUP_INNER_PRICE_CONFIG,
+		members=@Persistent(name="innerPriceConfig")),
+	@FetchGroup(
+		name=ProductType.FETCH_GROUP_PACKAGE_PRICE_CONFIG,
+		members=@Persistent(name="packagePriceConfig")),
+	@FetchGroup(
+		name=ProductType.FETCH_GROUP_OWNER,
+		members=@Persistent(name="owner")),
+	@FetchGroup(
+		name=ProductType.FETCH_GROUP_VENDOR,
+		members=@Persistent(name="vendor")),
+	@FetchGroup(
+		name=ProductType.FETCH_GROUP_DELIVERY_CONFIGURATION,
+		members=@Persistent(name="deliveryConfiguration")),
+	@FetchGroup(
+		name=ProductType.FETCH_GROUP_PRODUCT_TYPE_GROUPS,
+		members=@Persistent(name="productTypeGroups")),
+	@FetchGroup(
+		name=ProductType.FETCH_GROUP_MANAGED_PRODUCT_TYPE_GROUP,
+		members=@Persistent(name="managedProductTypeGroup")),
+	@FetchGroup(
+		name=ProductType.FETCH_GROUP_PRODUCT_TYPE_LOCAL,
+		members=@Persistent(name="productTypeLocal")),
+	@FetchGroup(
+		name=ProductType.FETCH_GROUP_NAME,
+		members=@Persistent(name="name")),
+	@FetchGroup(
+		name=ProductType.FETCH_GROUP_TARIFF_USER_SET,
+		members=@Persistent(name="tariffUserSet")),
+	@FetchGroup(
+		name=ProductType.FETCH_GROUP_END_CUSTOMER_TRANSFER_POLICY,
+		members=@Persistent(name="endCustomerReplicationPolicy")),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name=ProductType.FETCH_GROUP_THIS_PRODUCT_TYPE,
+		members={@Persistent(name="deliveryConfiguration"), @Persistent(name="extendedProductType"), @Persistent(name="fieldMetaDataMap"), @Persistent(name="innerPriceConfig"), @Persistent(name="managedProductTypeGroup"), @Persistent(name="name"), @Persistent(name="owner"), @Persistent(name="packagePriceConfig"), @Persistent(name="productTypeGroups"), @Persistent(name="productTypeLocal")}),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name="FetchGroupsTrade.articleInOrderEditor",
+		members={@Persistent(name="name"), @Persistent(name="vendor")}),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name="FetchGroupsTrade.articleInOfferEditor",
+		members={@Persistent(name="name"), @Persistent(name="vendor")}),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name="FetchGroupsTrade.articleInInvoiceEditor",
+		members={@Persistent(name="name"), @Persistent(name="vendor")}),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name="FetchGroupsTrade.articleInDeliveryNoteEditor",
+		members={@Persistent(name="name"), @Persistent(name="vendor")})
+})
+@Discriminator(strategy=DiscriminatorStrategy.CLASS_NAME)
+@Queries({
+	@javax.jdo.annotations.Query(
+		name="getProductTypesOfProductTypeGroup",
+		value=" SELECT WHERE this.productTypeGroups.containsValue(productTypeGroup) && productTypeGroup.organisationID == paramOrganisationID && productTypeGroup.productTypeGroupID == paramProductTypeGroupID VARIABLES ProductTypeGroup productTypeGroup PARAMETERS String paramOrganisationID, String paramProductTypeGroupID import java.lang.String; import org.nightlabs.jfire.store.ProductTypeGroup"),
+	@javax.jdo.annotations.Query(
+		name="getChildProductTypes_topLevel",
+		value="SELECT WHERE this.extendedProductType == null",
+		language="javax.jdo.query.JDOQL"),
+	@javax.jdo.annotations.Query(
+		name="getChildProductTypes_hasParent",
+		value="SELECT WHERE this.extendedProductType.organisationID == parentProductTypeOrganisationID && this.extendedProductType.productTypeID == parentProductTypeProductTypeID PARAMETERS String parentProductTypeOrganisationID, String parentProductTypeProductTypeID import java.lang.String",
+		language="javax.jdo.query.JDOQL"),
+	@javax.jdo.annotations.Query(
+		name="getProductTypesNestingThis",
+		value="SELECT WHERE this.productTypeLocal.nestedProductTypeLocals.containsValue(nestedProductTypeLocal) && nestedProductTypeLocal.innerProductTypeLocal.productType == :productType VARIABLES org.nightlabs.jfire.store.NestedProductTypeLocal nestedProductTypeLocal")
+})
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public abstract class ProductType
 implements
 		Inheritable,
@@ -345,12 +460,16 @@ implements
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String productTypeID;
 
 //	/**
@@ -363,37 +482,44 @@ implements
 	 * @jdo.field persistence-modifier="persistent"
 	 * // TODO JPOX WORKAROUND should be null-value="exception", but causes problems in replication
 	 */
+@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private LegalEntity owner;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 * // TODO JPOX WORKAROUND should be null-value="exception", but causes problems in replication
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private LegalEntity vendor;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private ProductType extendedProductType;
 
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private ProductTypeID extendedProductTypeID = null;
 
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private boolean extendedProductTypeID_detached = false;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private PriceConfig innerPriceConfig = null;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private PriceConfig packagePriceConfig = null;
 
 // These fields are in ProductTypeLocal now.
@@ -421,16 +547,27 @@ implements
 	 *
 	 * @jdo.join
 	 */
+@Join
+@Persistent(
+	nullValue=NullValue.EXCEPTION,
+	table="JFireTrade_ProductType_productTypeGroups",
+	persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Map<String, ProductTypeGroup> productTypeGroups;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" mapped-by="managedByProductType"
 	 */
+	@Persistent(
+		mappedBy="managedByProductType",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private ProductTypeGroup managedProductTypeGroup = null;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" mapped-by="productType"
 	 */
+	@Persistent(
+		mappedBy="productType",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private ProductTypeLocal productTypeLocal;
 
 //	public static final String NATURE_TYPE = "type";
@@ -552,6 +689,7 @@ implements
 	 * @see #INHERITANCE_NATURE_BRANCH
 	 * @see #INHERITANCE_NATURE_LEAF
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private byte inheritanceNature;
 
 	/**
@@ -588,6 +726,7 @@ implements
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private byte packageNature;
 
 	/**
@@ -595,6 +734,7 @@ implements
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private boolean published = false;
 
 	/**
@@ -602,6 +742,7 @@ implements
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private boolean confirmed = false;
 
 	/**
@@ -609,6 +750,7 @@ implements
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private boolean saleable = false;
 
 	/**
@@ -616,21 +758,25 @@ implements
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Date closeTimestamp = null;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private DeliveryConfiguration deliveryConfiguration = null;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private TariffUserSet tariffUserSet = null;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private EndCustomerReplicationPolicy endCustomerReplicationPolicy = null;
 
 	/**
@@ -972,6 +1118,11 @@ implements
 	 *
 	 * @jdo.key mapped-by="fieldName"
 	 */
+	@Persistent(
+		mappedBy="productType",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
+	@Key(mappedBy="fieldName")
+	@Value(dependent="true")
 	protected Map<String, ProductTypeFieldMetaData> fieldMetaDataMap;
 
 	/**
@@ -1253,6 +1404,7 @@ implements
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private boolean productAvailable = true;
 
 	public boolean isProductAvailable() {
@@ -1617,6 +1769,10 @@ implements
 	/**
 	 * @jdo.field persistence-modifier="persistent" mapped-by="productType" dependent="true"
 	 */
+@Persistent(
+	dependent="true",
+	mappedBy="productType",
+	persistenceModifier=PersistenceModifier.PERSISTENT)
 	private ProductTypeName name;
 	/**
 	 * return the multilanguage capable name of the productType

@@ -7,6 +7,16 @@ import javax.jdo.JDOHelper;
 
 import org.nightlabs.jdo.ObjectIDUtil;
 
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.Column;
+import org.nightlabs.jfire.trade.id.IDPrefixCfID;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  *
@@ -20,6 +30,12 @@ import org.nightlabs.jdo.ObjectIDUtil;
  *
  * @jdo.create-objectid-class field-order="organisationID, idPrefixCfID"
  */
+@PersistenceCapable(
+	objectIdClass=IDPrefixCfID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_IDPrefixCf")
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class IDPrefixCf
 implements Serializable
 {
@@ -47,10 +63,13 @@ implements Serializable
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 	/**
 	 * @jdo.field primary-key="true"
 	 */
+	@PrimaryKey
 	private long idPrefixCfID;
 
 	/**
@@ -84,6 +103,8 @@ implements Serializable
 	 * @jdo.field persistence-modifier="persistent"
 	 * @jdo.column length="50"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+	@Column(length=50)
 	private String defaultValue = null;
 
 	public static final String ARTICLE_CONTAINER_CLASS_NAME_GLOBAL = "global";
@@ -92,11 +113,14 @@ implements Serializable
 	 * @jdo.field persistence-modifier="persistent"
 	 * @jdo.column length="100"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+	@Column(length=100)
 	private String articleContainerClassName;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private TradeConfigModule tradeConfigModule;
 
 //	/**

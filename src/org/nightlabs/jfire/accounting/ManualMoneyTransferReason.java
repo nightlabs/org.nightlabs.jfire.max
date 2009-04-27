@@ -31,6 +31,20 @@ import java.util.Map;
 
 import org.nightlabs.i18n.I18nText;
 
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import org.nightlabs.jfire.accounting.id.ManualMoneyTransferReasonID;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+
 /**
  * @author Chairat Kongarayawetchakun - chairatk at nightlabs dot de
  * @author Marco Schulze - Marco at NightLabs dot de
@@ -47,6 +61,17 @@ import org.nightlabs.i18n.I18nText;
  *
  * @jdo.fetch-group name="ManualMoneyTransfer.reason" fields="manualMoneyTransfer, texts"
  */
+@PersistenceCapable(
+	objectIdClass=ManualMoneyTransferReasonID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_ManualMoneyTransferReason")
+@FetchGroups(
+	@FetchGroup(
+		name="ManualMoneyTransfer.reason",
+		members={@Persistent(name="manualMoneyTransfer"), @Persistent(name="texts")})
+)
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class ManualMoneyTransferReason extends I18nText
 {
 	private static final long serialVersionUID = 1L; // Added this field. Marco.
@@ -81,22 +106,28 @@ public class ManualMoneyTransferReason extends I18nText
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String transferTypeID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 */
+	@PrimaryKey
 	private long transferID;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private ManualMoneyTransfer manualMoneyTransfer;
 
 	/**
@@ -113,6 +144,11 @@ public class ManualMoneyTransferReason extends I18nText
 	 *
 	 * @jdo.join
 	 */
+	@Join
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		table="JFireTrade_ManualMoneyTransferReason_texts",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	protected Map<String, String> texts;
 
 	/**

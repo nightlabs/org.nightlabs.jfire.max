@@ -28,13 +28,28 @@ package org.nightlabs.jfire.trade;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
 
 import org.nightlabs.jfire.accounting.pay.ModeOfPayment;
 import org.nightlabs.jfire.accounting.pay.ModeOfPaymentFlavour;
 import org.nightlabs.jfire.store.deliver.ModeOfDelivery;
 import org.nightlabs.jfire.store.deliver.ModeOfDeliveryFlavour;
+import org.nightlabs.jfire.trade.id.CustomerGroupID;
 import org.nightlabs.util.Util;
 
 
@@ -58,6 +73,23 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="FetchGroupsPriceConfig.edit" fields="name"
  * @jdo.fetch-group name="FetchGroupsPriceConfig.this" fields="name, modeOfPayments, modeOfPaymentFlavours, modeOfDeliveries, modeOfDeliveryFlavours"
  */
+@PersistenceCapable(
+	objectIdClass=CustomerGroupID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_CustomerGroup")
+@FetchGroups({
+	@FetchGroup(
+		name=CustomerGroup.FETCH_GROUP_NAME,
+		members=@Persistent(name="name")),
+	@FetchGroup(
+		name="FetchGroupsPriceConfig.edit",
+		members=@Persistent(name="name")),
+	@FetchGroup(
+		name="FetchGroupsPriceConfig.this",
+		members={@Persistent(name="name"), @Persistent(name="modeOfPayments"), @Persistent(name="modeOfPaymentFlavours"), @Persistent(name="modeOfDeliveries"), @Persistent(name="modeOfDeliveryFlavours")})
+})
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class CustomerGroup implements Serializable
 {
 	private static final long serialVersionUID = 1L;
@@ -68,8 +100,9 @@ public class CustomerGroup implements Serializable
 
 	public static final String FETCH_GROUP_NAME = "CustomerGroup.name";
 	/**
-	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon! 
+	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon!
 	 */
+	@Deprecated
 	public static final String FETCH_GROUP_THIS_CUSTOMER_GROUP = "CustomerGroup.this";
 
 //	public static final String DEFAULT_CUSTOMER_GROUP_ID = "default";
@@ -95,22 +128,31 @@ public class CustomerGroup implements Serializable
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String customerGroupID;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private String primaryKey;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" dependent="true" mapped-by="customerGroup"
 	 */
+	@Persistent(
+		dependent="true",
+		mappedBy="customerGroup",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private CustomerGroupName name;
 
 	/**
@@ -132,7 +174,12 @@ public class CustomerGroup implements Serializable
 	 *
 	 * @jdo.join
 	 */
-	private Map modeOfPayments = new HashMap();
+	@Join
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		table="JFireTrade_CustomerGroup_modeOfPayments",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
+		private Map<String, ModeOfPayment> modeOfPayments;
 
 	/**
 	 * Unlike {@link #modeOfPayments}, this <tt>Map</tt> allows to provide a subset of the
@@ -152,7 +199,12 @@ public class CustomerGroup implements Serializable
 	 *
 	 * @jdo.join
 	 */
-	private Map modeOfPaymentFlavours = new HashMap();
+	@Join
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		table="JFireTrade_CustomerGroup_modeOfPaymentFlavours",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
+	private Map<String, ModeOfPaymentFlavour> modeOfPaymentFlavours;
 
 	/**
 	 * This <tt>Map</tt> stores all {@link ModeOfDelivery}s which are available for this
@@ -173,7 +225,12 @@ public class CustomerGroup implements Serializable
 	 *
 	 * @jdo.join
 	 */
-	private Map modeOfDeliveries = new HashMap();
+	@Join
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		table="JFireTrade_CustomerGroup_modeOfDeliveries",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
+	private Map<String, ModeOfDelivery> modeOfDeliveries;
 
 	/**
 	 * Unlike {@link #modeOfDeliveries}, this <tt>Map</tt> allows to provide a subset of the
@@ -193,7 +250,12 @@ public class CustomerGroup implements Serializable
 	 *
 	 * @jdo.join
 	 */
-	private Map modeOfDeliveryFlavours = new HashMap();
+	@Join
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		table="JFireTrade_CustomerGroup_modeOfDeliveryFlavours",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
+	private Map<String, ModeOfDeliveryFlavour> modeOfDeliveryFlavours;
 
 //	/**
 //	 * key: String tariffPK<br/>
@@ -218,6 +280,10 @@ public class CustomerGroup implements Serializable
 		this.customerGroupID = customerGroupID;
 		this.primaryKey = getPrimaryKey(organisationID, customerGroupID);
 		this.name = new CustomerGroupName(this);
+		modeOfPayments = new HashMap<String, ModeOfPayment>();
+		modeOfPaymentFlavours = new HashMap<String, ModeOfPaymentFlavour>();
+		modeOfDeliveries = new HashMap<String, ModeOfDelivery>();
+		modeOfDeliveryFlavours = new HashMap<String, ModeOfDeliveryFlavour>();
 	}
 
 	/**
@@ -254,16 +320,16 @@ public class CustomerGroup implements Serializable
 	/**
 	 * @return Returns the modeOfPaymentFlavours.
 	 */
-	public Collection getModeOfPaymentFlavours()
+	public Collection<ModeOfPaymentFlavour> getModeOfPaymentFlavours()
 	{
-		return modeOfPaymentFlavours.values();
+		return Collections.unmodifiableCollection(modeOfPaymentFlavours.values());
 	}
 	/**
 	 * @return Returns the modeOfPayments.
 	 */
-	public Collection getModeOfPayments()
+	public Collection<ModeOfPayment> getModeOfPayments()
 	{
-		return modeOfPayments.values();
+		return Collections.unmodifiableCollection(modeOfPayments.values());
 	}
 
 	public void addModeOfPayment(ModeOfPayment modeOfPayment)
@@ -295,16 +361,16 @@ public class CustomerGroup implements Serializable
 	/**
 	 * @return Returns the modeOfDeliveryFlavours.
 	 */
-	public Collection getModeOfDeliveryFlavours()
+	public Collection<ModeOfDeliveryFlavour> getModeOfDeliveryFlavours()
 	{
-		return modeOfDeliveryFlavours.values();
+		return Collections.unmodifiableCollection(modeOfDeliveryFlavours.values());
 	}
 	/**
 	 * @return Returns the modeOfDeliverys.
 	 */
-	public Collection getModeOfDeliveries()
+	public Collection<ModeOfDelivery> getModeOfDeliveries()
 	{
-		return modeOfDeliveries.values();
+		return Collections.unmodifiableCollection(modeOfDeliveries.values());
 	}
 
 	public void addModeOfDelivery(ModeOfDelivery modeOfDelivery)

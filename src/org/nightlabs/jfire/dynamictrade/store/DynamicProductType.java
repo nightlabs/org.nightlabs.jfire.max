@@ -8,6 +8,12 @@ import javax.jdo.Query;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.Queries;
+
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  * 
@@ -36,6 +42,21 @@ import org.nightlabs.jfire.store.id.ProductTypeID;
  *		  PARAMETERS String parentProductTypeOrganisationID, String parentProductTypeProductTypeID
  *		  import java.lang.String"
  */
+@PersistenceCapable(
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireDynamicTrade_DynamicProductType")
+@Queries({
+	@javax.jdo.annotations.Query(
+		name="getChildProductTypes_topLevel",
+		value="SELECT WHERE this.extendedProductType == null",
+		language="javax.jdo.query.JDOQL"),
+	@javax.jdo.annotations.Query(
+		name="getChildProductTypes_hasParent",
+		value="SELECT WHERE this.extendedProductType.organisationID == parentProductTypeOrganisationID && this.extendedProductType.productTypeID == parentProductTypeProductTypeID PARAMETERS String parentProductTypeOrganisationID, String parentProductTypeProductTypeID import java.lang.String",
+		language="javax.jdo.query.JDOQL")
+})
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class DynamicProductType
 extends ProductType
 {

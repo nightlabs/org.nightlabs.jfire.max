@@ -37,6 +37,14 @@ import org.nightlabs.jfire.trade.id.SegmentID;
 import org.nightlabs.jfire.trade.recurring.RecurringOrder;
 import org.nightlabs.jfire.trade.recurring.RecurringTrader;
 
+import org.nightlabs.jfire.dynamictrade.id.DynamicTraderID;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+
 /**
  *
  *
@@ -52,12 +60,20 @@ import org.nightlabs.jfire.trade.recurring.RecurringTrader;
  *
  * @jdo.inheritance strategy="new-table"
  */
+@PersistenceCapable(
+	objectIdClass=DynamicTraderID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireDynamicTrade_DynamicTrader")
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class DynamicTrader {
 
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 
 

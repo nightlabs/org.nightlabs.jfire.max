@@ -19,6 +19,11 @@ import org.nightlabs.jfire.trade.Offer;
 import org.nightlabs.jfire.trade.id.OfferID;
 import org.nightlabs.jfire.trade.id.SegmentID;
 
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.IdentityType;
+
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  *
@@ -30,6 +35,11 @@ import org.nightlabs.jfire.trade.id.SegmentID;
  *
  * @jdo.inheritance strategy="superclass-table"
  */
+@PersistenceCapable(
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireDynamicTrade_DynamicProductTypeActionHandler")
+@Inheritance(strategy=InheritanceStrategy.SUPERCLASS_TABLE)
 public class DynamicProductTypeActionHandler
 		extends ProductTypeActionHandler
 {

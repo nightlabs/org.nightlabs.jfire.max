@@ -9,6 +9,17 @@ import javax.jdo.JDODetachedFieldAccessException;
 import org.nightlabs.jfire.accounting.PriceFragmentType;
 import org.nightlabs.jfire.accounting.gridpriceconfig.FormulaPriceConfig;
 
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  *
@@ -25,6 +36,20 @@ import org.nightlabs.jfire.accounting.gridpriceconfig.FormulaPriceConfig;
  *
  * @jdo.fetch-group name="FetchGroupsPriceConfig.edit" fetch-groups="default" fields="inputPriceFragmentTypes"
  */
+@PersistenceCapable(
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireDynamicTrade_DynamicTradePriceConfig")
+@FetchGroups({
+	@FetchGroup(
+		name="DynamicTradePriceConfig.inputPriceFragmentTypes",
+		members=@Persistent(name="inputPriceFragmentTypes")),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name="FetchGroupsPriceConfig.edit",
+		members=@Persistent(name="inputPriceFragmentTypes"))
+})
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class DynamicTradePriceConfig
 extends FormulaPriceConfig
 {
@@ -47,11 +72,17 @@ extends FormulaPriceConfig
 	 *
 	 * @jdo.join
 	 */
+	@Join
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		table="JFireDynamicTrade_DynamicTradePriceConfig_inputPriceFragmentTypes",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Set<PriceFragmentType> inputPriceFragmentTypes;
 
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private transient Set<PriceFragmentType> inputPriceFragmentTypes_readonly = null;
 
 	/**

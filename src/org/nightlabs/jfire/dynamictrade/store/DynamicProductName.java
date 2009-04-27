@@ -32,6 +32,20 @@ import java.util.Map;
 import org.nightlabs.i18n.I18nText;
 import org.nightlabs.jfire.store.Product;
 
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.NullValue;
+import org.nightlabs.jfire.dynamictrade.store.id.DynamicProductNameID;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
@@ -54,6 +68,37 @@ import org.nightlabs.jfire.store.Product;
  * @jdo.fetch-group name="FetchGroupsTrade.articleInDeliveryNoteEditor" fetch-groups="default, DynamicProduct.name"
  * @jdo.fetch-group name="FetchGroupsTrade.articleInReceptionNoteEditor" fetch-groups="default, DynamicProduct.name"
  */
+@PersistenceCapable(
+	objectIdClass=DynamicProductNameID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireDynamicTrade_DynamicProductName")
+@FetchGroups({
+	@FetchGroup(
+		name="DynamicProduct.name",
+		members={@Persistent(name="dynamicProduct"), @Persistent(name="names")}),
+	@FetchGroup(
+		fetchGroups={"default", "DynamicProduct.name"},
+		name="FetchGroupsTrade.articleInOrderEditor",
+		members={}),
+	@FetchGroup(
+		fetchGroups={"default", "DynamicProduct.name"},
+		name="FetchGroupsTrade.articleInOfferEditor",
+		members={}),
+	@FetchGroup(
+		fetchGroups={"default", "DynamicProduct.name"},
+		name="FetchGroupsTrade.articleInInvoiceEditor",
+		members={}),
+	@FetchGroup(
+		fetchGroups={"default", "DynamicProduct.name"},
+		name="FetchGroupsTrade.articleInDeliveryNoteEditor",
+		members={}),
+	@FetchGroup(
+		fetchGroups={"default", "DynamicProduct.name"},
+		name="FetchGroupsTrade.articleInReceptionNoteEditor",
+		members={})
+})
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class DynamicProductName
 extends I18nText
 {
@@ -63,16 +108,20 @@ extends I18nText
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 */
+	@PrimaryKey
 	private long productID;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private DynamicProduct dynamicProduct;
 
 	/**
@@ -89,6 +138,11 @@ extends I18nText
 	 *
 	 * @jdo.join
 	 */
+	@Join
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		table="JFireDynamicTrade_DynamicProductName_names",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	protected Map<String, String> names = new HashMap<String, String>();
 
 	/**

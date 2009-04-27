@@ -5,6 +5,20 @@ import java.util.Map;
 
 import org.nightlabs.i18n.I18nText;
 
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.Column;
+import org.nightlabs.jfire.dynamictrade.recurring.id.DynamicProductTypeRecurringArticleNameID;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+
 
 /**
  * @author Fitas Amine - fitas at nightlabs dot de
@@ -23,6 +37,23 @@ import org.nightlabs.i18n.I18nText;
  * @jdo.fetch-group name="FetchGroupsTrade.articleInOrderEditor" fields="dynamicProductTypeRecurringArticle, names"
  * @jdo.fetch-group name="FetchGroupsTrade.articleInOfferEditor" fields="dynamicProductTypeRecurringArticle, names"
  */
+@PersistenceCapable(
+	objectIdClass=DynamicProductTypeRecurringArticleNameID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireDynamicTrade_DynamicProductTypeRecurringArticleName")
+@FetchGroups({
+	@FetchGroup(
+		name="DynamicProductTypeRecurringArticle.name",
+		members={@Persistent(name="dynamicProductTypeRecurringArticle"), @Persistent(name="names")}),
+	@FetchGroup(
+		name="FetchGroupsTrade.articleInOrderEditor",
+		members={@Persistent(name="dynamicProductTypeRecurringArticle"), @Persistent(name="names")}),
+	@FetchGroup(
+		name="FetchGroupsTrade.articleInOfferEditor",
+		members={@Persistent(name="dynamicProductTypeRecurringArticle"), @Persistent(name="names")})
+})
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class DynamicProductTypeRecurringArticleName extends I18nText {
 
 	/**
@@ -34,17 +65,21 @@ public class DynamicProductTypeRecurringArticleName extends I18nText {
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 	
 	/**
 	 * @jdo.field primary-key="true"
 	 */
+	@PrimaryKey
 	private long  dynamicProductTypeRecurringArticleID; 
 	
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private DynamicProductTypeRecurringArticle dynamicProductTypeRecurringArticle;
 
 
@@ -63,6 +98,12 @@ public class DynamicProductTypeRecurringArticleName extends I18nText {
 	 *
 	 * @jdo.join
 	 */
+	@Join
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		table="JFireDynamicTrade_DynamicProductTypeRecurringArticleName_names",
+		defaultFetchGroup="true",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	protected Map<String, String> names = new HashMap<String, String>();
 
 	public DynamicProductTypeRecurringArticleName(DynamicProductTypeRecurringArticle dynamicProductTypeRecurringArticle)

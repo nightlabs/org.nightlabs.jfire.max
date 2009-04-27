@@ -23,6 +23,11 @@ import org.nightlabs.jfire.trade.recurring.RecurredOffer;
 import org.nightlabs.jfire.trade.recurring.RecurringTradeProductTypeActionHandler;
 import org.nightlabs.script.JSHTMLExecuter;
 
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.IdentityType;
+
 /**
  * @jdo.persistence-capable
  *		identity-type="application"
@@ -35,6 +40,11 @@ import org.nightlabs.script.JSHTMLExecuter;
  * @author Fitas Amine - fitas at nightlabs dot de
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
  */
+@PersistenceCapable(
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireDynamicTrade_DynamicProductTypeRecurringTradeActionHandler")
+@Inheritance(strategy=InheritanceStrategy.SUPERCLASS_TABLE)
 public class DynamicProductTypeRecurringTradeActionHandler extends RecurringTradeProductTypeActionHandler
 {
 

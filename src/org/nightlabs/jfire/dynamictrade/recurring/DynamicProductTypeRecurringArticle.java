@@ -13,6 +13,15 @@ import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.Offer;
 import org.nightlabs.jfire.trade.Segment;
 
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+
 /**
  *
  * @author Fitas Amine <fitas@nightlabs.de>
@@ -31,6 +40,25 @@ import org.nightlabs.jfire.trade.Segment;
  * @jdo.fetch-group name="FetchGroupsTrade.articleInOrderEditor" fields="quantity, unit, name, singlePrice"
  * @jdo.fetch-group name="FetchGroupsTrade.articleInOfferEditor" fields="quantity, unit, name, singlePrice"
  */
+@PersistenceCapable(
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireDynamicTrade_DynamicProductTypeRecurringArticle")
+@FetchGroups({
+	@FetchGroup(
+		name=DynamicProductTypeRecurringArticle.FETCH_GROUP_DYNAMIC_PRODUCT_TYPE_RECURRING_ARTICLE_NAME,
+		members=@Persistent(name="name")),
+	@FetchGroup(
+		name=DynamicProductTypeRecurringArticle.FETCH_GROUP_DYNAMIC_PRODUCT_TYPE_RECURRING_ARTICLE_SINGLEPRICE,
+		members=@Persistent(name="singlePrice")),
+	@FetchGroup(
+		name="FetchGroupsTrade.articleInOrderEditor",
+		members={@Persistent(name="quantity"), @Persistent(name="unit"), @Persistent(name="name"), @Persistent(name="singlePrice")}),
+	@FetchGroup(
+		name="FetchGroupsTrade.articleInOfferEditor",
+		members={@Persistent(name="quantity"), @Persistent(name="unit"), @Persistent(name="name"), @Persistent(name="singlePrice")})
+})
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class DynamicProductTypeRecurringArticle extends Article implements DynamicProductInfo {
 
 
@@ -48,21 +76,27 @@ public class DynamicProductTypeRecurringArticle extends Article implements Dynam
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private long quantity;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Unit unit;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" mapped-by="dynamicProductTypeRecurringArticle"
 	 */
+	@Persistent(
+		mappedBy="dynamicProductTypeRecurringArticle",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private DynamicProductTypeRecurringArticleName 	name;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Price singlePrice;
 	
 	public DynamicProductTypeRecurringArticle(User user, Offer offer, Segment segment, long articleID, ProductType productType, Tariff tariff)

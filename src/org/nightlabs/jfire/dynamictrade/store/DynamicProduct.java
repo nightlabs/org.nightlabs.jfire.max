@@ -10,6 +10,15 @@ import org.nightlabs.jfire.store.ProductLocator;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.Unit;
 
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  * 
@@ -31,6 +40,42 @@ import org.nightlabs.jfire.store.Unit;
  * @jdo.fetch-group name="FetchGroupsTrade.articleInDeliveryNoteEditor" fetch-groups="default" fields="name, unit, singlePrice"
  * @jdo.fetch-group name="FetchGroupsTrade.articleInReceptionNoteEditor" fetch-groups="default" fields="name, unit, singlePrice"
  */
+@PersistenceCapable(
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireDynamicTrade_DynamicProduct")
+@FetchGroups({
+	@FetchGroup(
+		name=DynamicProduct.FETCH_GROUP_NAME,
+		members=@Persistent(name="name")),
+	@FetchGroup(
+		name=DynamicProduct.FETCH_GROUP_UNIT,
+		members=@Persistent(name="unit")),
+	@FetchGroup(
+		name=DynamicProduct.FETCH_GROUP_SINGLE_PRICE,
+		members=@Persistent(name="singlePrice")),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name="FetchGroupsTrade.articleInOrderEditor",
+		members={@Persistent(name="name"), @Persistent(name="unit"), @Persistent(name="singlePrice")}),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name="FetchGroupsTrade.articleInOfferEditor",
+		members={@Persistent(name="name"), @Persistent(name="unit"), @Persistent(name="singlePrice")}),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name="FetchGroupsTrade.articleInInvoiceEditor",
+		members={@Persistent(name="name"), @Persistent(name="unit"), @Persistent(name="singlePrice")}),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name="FetchGroupsTrade.articleInDeliveryNoteEditor",
+		members={@Persistent(name="name"), @Persistent(name="unit"), @Persistent(name="singlePrice")}),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name="FetchGroupsTrade.articleInReceptionNoteEditor",
+		members={@Persistent(name="name"), @Persistent(name="unit"), @Persistent(name="singlePrice")})
+})
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class DynamicProduct
 extends Product
 implements BundleProduct, DynamicProductInfo
@@ -44,21 +89,30 @@ implements BundleProduct, DynamicProductInfo
 	/**
 	 * @jdo.field persistence-modifier="persistent" mapped-by="dynamicProduct" dependent="true"
 	 */
+	@Persistent(
+		dependent="true",
+		mappedBy="dynamicProduct",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private DynamicProductName name;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private long quantity;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Unit unit;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" dependent="true"
 	 */
+	@Persistent(
+		dependent="true",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Price singlePrice;
 
 	/**

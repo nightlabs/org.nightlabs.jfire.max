@@ -1,21 +1,22 @@
 package org.nightlabs.jfire.dynamictrade;
 
-import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
-import javax.ejb.CreateException;
-import javax.ejb.EJBException;
-import javax.ejb.SessionBean;
-import javax.ejb.SessionContext;
+import javax.annotation.security.RolesAllowed;
+import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
+import javax.ejb.TransactionManagement;
+import javax.ejb.TransactionManagementType;
 import javax.jdo.FetchPlan;
 import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
-import javax.jdo.Query;
+import javax.management.Query;
 
 import org.nightlabs.ModuleException;
 import org.nightlabs.i18n.I18nText;
@@ -25,11 +26,9 @@ import org.nightlabs.jfire.accounting.Price;
 import org.nightlabs.jfire.accounting.Tariff;
 import org.nightlabs.jfire.accounting.gridpriceconfig.AssignInnerPriceConfigCommand;
 import org.nightlabs.jfire.accounting.gridpriceconfig.PriceCalculationException;
-import org.nightlabs.jfire.accounting.id.TariffID;
 import org.nightlabs.jfire.accounting.priceconfig.FetchGroupsPriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.IInnerPriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.PriceConfig;
-import org.nightlabs.jfire.accounting.priceconfig.id.PriceConfigID;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.base.JFireBaseEAR;
 import org.nightlabs.jfire.dynamictrade.accounting.priceconfig.DynamicTradePriceConfig;
@@ -51,15 +50,10 @@ import org.nightlabs.jfire.store.Unit;
 import org.nightlabs.jfire.store.deliver.DeliveryConfiguration;
 import org.nightlabs.jfire.store.deliver.ModeOfDelivery;
 import org.nightlabs.jfire.store.deliver.ModeOfDeliveryConst;
-import org.nightlabs.jfire.store.id.ProductTypeID;
-import org.nightlabs.jfire.store.id.UnitID;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.ArticlePrice;
 import org.nightlabs.jfire.trade.Offer;
 import org.nightlabs.jfire.trade.Trader;
-import org.nightlabs.jfire.trade.id.ArticleID;
-import org.nightlabs.jfire.trade.id.OfferID;
-import org.nightlabs.jfire.trade.id.SegmentID;
 import org.nightlabs.util.Util;
 
 /**
@@ -71,47 +65,20 @@ import org.nightlabs.util.Util;
  * @ejb.util generate="physical"
  * @ejb.transaction type="Required"
  */
+@TransactionAttribute(TransactionAttributeType.REQUIRED)
+@TransactionManagement(TransactionManagementType.CONTAINER)
+@Stateless
 public abstract class DynamicTradeManagerBean
 extends BaseSessionBeanImpl
-implements SessionBean
+implements DynamicTradeManagerRemote
 {
 	private static final long serialVersionUID = 1L;
 
-	@Override
-	public void setSessionContext(SessionContext sessionContext)
-	throws EJBException, RemoteException
-	{
-		super.setSessionContext(sessionContext);
-	}
-	@Override
-	public void unsetSessionContext() {
-		super.unsetSessionContext();
-	}
-
-	/**
-	 * @ejb.create-method
-	 * @ejb.permission role-name="_Guest_"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.dynamictrade.DynamicTradeManagerRemote#initialise()
 	 */
-	public void ejbCreate() throws CreateException { }
-
-	/**
-	 * {@inheritDoc}
-	 *
-	 * @ejb.permission unchecked="true"
-	 */
-	@Override
-	public void ejbRemove() throws EJBException, RemoteException { }
-
-	/**
-	 * This method is called by the datastore initialisation mechanism.
-	 * It creates the root DynamicProductType for the organisation itself.
-	 * DynamicProductTypes of other organisations cannot be imported or
-	 * traded as reseller.
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_System_"
-	 * @ejb.transaction type="Required"
-	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("_System_")
 	public void initialise() throws Exception
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -187,6 +154,7 @@ implements SessionBean
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="org.nightlabs.jfire.store.seeProductType"
 	 */
+	@RolesAllowed("org.nightlabs.jfire.store.seeProductType")
 	public Set<ProductTypeID> getChildDynamicProductTypeIDs(ProductTypeID parentDynamicProductTypeID)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -256,11 +224,11 @@ implements SessionBean
 //	}
 //	}
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="org.nightlabs.jfire.store.editUnconfirmedProductType"
-	 * @ejb.transaction type="Required"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.dynamictrade.DynamicTradeManagerRemote#storeDynamicProductType(org.nightlabs.jfire.dynamictrade.store.DynamicProductType, boolean, java.lang.String[], int)
 	 */
+@TransactionAttribute(TransactionAttributeType.REQUIRED)
+@RolesAllowed("org.nightlabs.jfire.store.editUnconfirmedProductType")
 	public DynamicProductType storeDynamicProductType(DynamicProductType dynamicProductType, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
 		if (dynamicProductType == null)
@@ -404,11 +372,11 @@ implements SessionBean
 		}
 	}
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.editPriceConfiguration"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.dynamictrade.DynamicTradeManagerRemote#storeDynamicTradePriceConfigs(java.util.Collection, boolean, org.nightlabs.jfire.accounting.gridpriceconfig.AssignInnerPriceConfigCommand)
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("org.nightlabs.jfire.accounting.editPriceConfiguration")
 	public Collection<DynamicTradePriceConfig> storeDynamicTradePriceConfigs(Collection<DynamicTradePriceConfig> priceConfigs, boolean get, AssignInnerPriceConfigCommand assignInnerPriceConfigCommand)
 	throws PriceCalculationException
 	{
@@ -463,6 +431,7 @@ implements SessionBean
 	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.queryPriceConfigurations"
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
+	@RolesAllowed("org.nightlabs.jfire.accounting.queryPriceConfigurations")
 	@SuppressWarnings("unchecked")
 	public Set<PriceConfigID> getDynamicTradePriceConfigIDs()
 	{
@@ -481,6 +450,7 @@ implements SessionBean
 	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.queryPriceConfigurations"
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
+	@RolesAllowed("org.nightlabs.jfire.accounting.queryPriceConfigurations")
 	public List<DynamicTradePriceConfig> getDynamicTradePriceConfigs(Collection<PriceConfigID> dynamicTradePriceConfigIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -498,6 +468,8 @@ implements SessionBean
 	 * @ejb.permission role-name="org.nightlabs.jfire.trade.editOffer"
 	 * @ejb.transaction type="Required"
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("org.nightlabs.jfire.trade.editOffer")
 	public	Article createRecurringArticle(SegmentID segmentID,
 			OfferID offerID,
 			ProductTypeID productTypeID,
@@ -533,6 +505,8 @@ implements SessionBean
 	 * @ejb.permission role-name="org.nightlabs.jfire.trade.editOffer"
 	 * @ejb.transaction type="Required"
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("org.nightlabs.jfire.trade.editOffer")
 	public Article createArticle(
 			SegmentID segmentID,
 			OfferID offerID,
@@ -576,6 +550,8 @@ implements SessionBean
 	 * @ejb.permission role-name="org.nightlabs.jfire.trade.editOffer"
 	 * @ejb.transaction type="Required"
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("org.nightlabs.jfire.trade.editOffer")
 	public Article modifyArticle(
 			ArticleID articleID,
 			Long quantity,
@@ -679,11 +655,11 @@ implements SessionBean
 		}
 	}
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.transaction type="Supports"
-	 * @ejb.permission role-name="_Guest_"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.dynamictrade.DynamicTradeManagerRemote#ping(java.lang.String)
 	 */
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	@RolesAllowed("_Guest_")
 	@Override
 	public String ping(String message) {
 		return super.ping(message);

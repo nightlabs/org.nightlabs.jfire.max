@@ -72,7 +72,6 @@ implements PaymentHelperLocal
 	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
 	@RolesAllowed("_Guest_")
 	public PaymentDataID payBegin_storePaymentData(PaymentData paymentData)
-	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {

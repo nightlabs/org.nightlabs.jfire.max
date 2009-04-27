@@ -110,7 +110,6 @@ implements DeliveryHelperLocal
 	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
 	@RolesAllowed("_Guest_")
 	public DeliveryDataID deliverBegin_storeDeliveryData(DeliveryData deliveryData)
-	throws ModuleException
 	{
 		if (logger.isDebugEnabled()) {
 			logger.debug("deliverBegin_storeDeliveryData: *** begin ******************************************* ");

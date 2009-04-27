@@ -12,8 +12,7 @@ public interface DeliveryHelperLocal {
 	 * @return Returns the JDO objectID of the newly persisted <tt>deliveryData</tt>
 	 * @throws ModuleException
 	 */
-	DeliveryDataID deliverBegin_storeDeliveryData(DeliveryData deliveryData)
-			throws ModuleException;
+	DeliveryDataID deliverBegin_storeDeliveryData(DeliveryData deliveryData);
 
 	DeliveryResult deliverBegin_internal(DeliveryDataID deliveryDataID,
 			String[] fetchGroups, int maxFetchDepth) throws DeliveryException;

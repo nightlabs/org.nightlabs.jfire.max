@@ -21,8 +21,7 @@ public interface PaymentHelperLocal {
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
 	@RolesAllowed("_Guest_")
-	PaymentDataID payBegin_storePaymentData(PaymentData paymentData)
-			throws ModuleException;
+	PaymentDataID payBegin_storePaymentData(PaymentData paymentData);
 
 	/**
 	 * @ejb.interface-method view-type="local"

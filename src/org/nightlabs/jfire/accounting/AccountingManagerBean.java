@@ -1298,14 +1298,7 @@ implements AccountingManagerRemote
 
 		// Store paymentData into the database within a NEW TRANSACTION to prevent it
 		// from being deleted (if this method fails later and causes a rollback).
-		PaymentDataID paymentDataID;
-		try {
-			paymentDataID = paymentHelperLocal.payBegin_storePaymentData(paymentData);
-		} catch (RuntimeException x) {
-			throw x;
-		} catch (Exception x) {
-			throw new RuntimeException(x);
-		}
+		PaymentDataID paymentDataID = paymentHelperLocal.payBegin_storePaymentData(paymentData);
 
 		String[] fetchGroups = new String[] {FetchPlan.DEFAULT};
 

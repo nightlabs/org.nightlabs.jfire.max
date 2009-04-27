@@ -1189,14 +1189,7 @@ implements StoreManagerRemote, StoreManagerLocal
 
 		// Store deliveryData into the database within a NEW TRANSACTION to prevent it
 		// from being deleted (if this method fails later and causes a rollback).
-		DeliveryDataID deliveryDataID;
-		try {
-			deliveryDataID = deliveryHelperLocal.deliverBegin_storeDeliveryData(deliveryData);
-		} catch (RuntimeException x) {
-			throw x;
-		} catch (Exception x) {
-			throw new RuntimeException(x);
-		}
+		DeliveryDataID deliveryDataID = deliveryHelperLocal.deliverBegin_storeDeliveryData(deliveryData);
 
 		String[] fetchGroups = new String[] {FetchPlan.DEFAULT};
 

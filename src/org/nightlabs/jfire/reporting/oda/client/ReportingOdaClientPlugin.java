@@ -1,9 +1,9 @@
 package org.nightlabs.jfire.reporting.oda.client;
 
 import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.ui.login.Login;
-import org.nightlabs.jfire.reporting.ReportManager;
-import org.nightlabs.jfire.reporting.ReportManagerUtil;
+import org.nightlabs.jfire.reporting.ReportManagerRemote;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -16,7 +16,7 @@ public class ReportingOdaClientPlugin extends AbstractUIPlugin {
 
 	// The shared instance
 	private static ReportingOdaClientPlugin plugin;
-	
+
 	/**
 	 * The constructor
 	 */
@@ -52,18 +52,17 @@ public class ReportingOdaClientPlugin extends AbstractUIPlugin {
 		return plugin;
 	}
 
-	
 	/**
 	 * Returns a new ReportManager bean.
 	 */
-	public static ReportManager getReportManager() {
+	public static ReportManagerRemote getReportManager() {
 		try {
-			return ReportManagerUtil.getHome(
+			return JFireEjb3Factory.getRemoteBean(ReportManagerRemote.class,
 					Login.getLogin().getInitialContextProperties()
-				).create();
+				);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
-	
+
 }

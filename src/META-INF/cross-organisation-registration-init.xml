@@ -4,6 +4,6 @@
 		"http://www.nightlabs.de/dtd/cross-organisation-registration-init_1_0.dtd">
 <cross-organisation-registration-initialisation>
   <init
-		bean="jfire/ejb/JFireGeography/GeographyTemplateDataManager"
+		bean="org.nightlabs.jfire.geography.GeographyTemplateDataManagerRemote"
 		method="initialiseJDOLifecycleListeners" />
 </cross-organisation-registration-initialisation>

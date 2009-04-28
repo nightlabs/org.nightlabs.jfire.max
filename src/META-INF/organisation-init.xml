@@ -2,8 +2,8 @@
 		PUBLIC "-//NightLabs GmbH//DTD Organisation Initialisation 1.0//EN"
 		"http://www.nightlabs.de/dtd/organisation-init_1_0.dtd">
 <organisation-initialisation>
-	<init bean="jfire/ejb/JFireGeography/GeographyManager" method="initialise"/>
-	<init bean="jfire/ejb/JFireGeography/GeographyTemplateDataManager" method="initialise">
+	<init bean="org.nightlabs.jfire.geography.GeographyManagerRemote" method="initialise"/>
+	<init bean="org.nightlabs.jfire.geography.GeographyTemplateDataManagerRemote" method="initialise">
 		<depends
 			module="JFireGeography.ear"
 			archive="JFireGeography.jar"
@@ -12,6 +12,6 @@
 		/>
 	</init>
 	<init
-		bean="jfire/ejb/JFireGeography/GeographyTemplateDataManager"
+		bean="org.nightlabs.jfire.geography.GeographyTemplateDataManagerRemote"
 		method="initialiseJDOLifecycleListeners" />
 </organisation-initialisation>

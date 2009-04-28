@@ -3,17 +3,18 @@
  */
 package org.nightlabs.jfire.web.webshop;
 
-import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.ejb.CreateException;
-import javax.ejb.EJBException;
-import javax.ejb.SessionBean;
-import javax.ejb.SessionContext;
+import javax.annotation.security.RolesAllowed;
+import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
+import javax.ejb.TransactionManagement;
+import javax.ejb.TransactionManagementType;
 import javax.jdo.FetchPlan;
 import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
@@ -53,10 +54,13 @@ import org.nightlabs.jfire.webshop.id.WebCustomerID;
  *
  * @ejb.util generate="physical"
  * @ejb.transaction type="Required"
- */
-public abstract class WebShopBean
+ */@TransactionAttribute(TransactionAttributeType.REQUIRED)
+@TransactionManagement(TransactionManagementType.CONTAINER)
+@Stateless
+
+public class WebShopBean
 extends BaseSessionBeanImpl
-implements SessionBean
+implements WebShopRemote
 {
 	/**
 	 * The serial version of this class.
@@ -71,54 +75,12 @@ implements SessionBean
 	 */
 	private static final Logger logger = Logger.getLogger(WebShopBean.class);
 
-	@Override
-	public void setSessionContext(SessionContext sessionContext)
-	throws EJBException, RemoteException
-	{
-		super.setSessionContext(sessionContext);
-	}
-	@Override
-	public void unsetSessionContext() {
-		super.unsetSessionContext();
-	}
-
-	/**
-	 * @ejb.create-method
-	 * @ejb.permission role-name="_Guest_"
-	 */
-	public void ejbCreate()
-	throws CreateException
-	{
-		if (logger.isDebugEnabled())
-			logger.debug(this.getClass().getName() + ".ejbCreate()");
-	}
-
-	/**
-	 * @ejb.permission unchecked="true"
-	 */
-	public void ejbRemove() throws EJBException, RemoteException
-	{
-		if (logger.isDebugEnabled())
-			logger.debug(this.getClass().getName() + ".ejbRemove()");
-	}
-
-	public void ejbActivate() throws EJBException, RemoteException
-	{
-		if (logger.isDebugEnabled())
-			logger.debug(this.getClass().getName() + ".ejbActivate()");
-	}
-
-	public void ejbPassivate() throws EJBException, RemoteException
-	{
-		if (logger.isDebugEnabled())
-			logger.debug(this.getClass().getName() + ".ejbPassivate()");
-	}
-
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 */
+	 */	@RolesAllowed("_Guest_")
+
 	public List<WebCustomer> getWebCustomers(Set<WebCustomerID> webCustomerIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -133,7 +95,8 @@ implements SessionBean
 	 * @ejb.interface-method
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
-	 */
+	 */	@RolesAllowed("_Guest_")
+
 	public Set<WebCustomerID> getWebCustomerIDs()
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -150,7 +113,8 @@ implements SessionBean
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 */
+	 */	@RolesAllowed("_Guest_")
+
 	public WebCustomer getWebCustomer(WebCustomerID webCustomerID, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -168,7 +132,8 @@ implements SessionBean
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 */
+	 */	@RolesAllowed("_Guest_")
+
 	public WebCustomer getPerson(WebCustomerID webCustomerID, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -187,7 +152,8 @@ implements SessionBean
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 */
+	 */	@RolesAllowed("_Guest_")
+
 	public AnchorID getWebCustomerLegalEntityID(WebCustomerID webCustomerID)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -216,7 +182,9 @@ implements SessionBean
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Required"
-	 */
+	 */	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("_Guest_")
+
 	public WebCustomer createWebCustomer(WebCustomerID webCustomerID, String password, Person person, boolean get, String[] fetchGroups, int maxFetchDepth) throws DuplicateIDException
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -246,7 +214,8 @@ implements SessionBean
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 */
+	 */	@RolesAllowed("_Guest_")
+
 	public boolean isWebCustomerIDExisting(WebCustomerID webCustomerID, PersistenceManager pm)
 	{
 		try {
@@ -256,12 +225,10 @@ implements SessionBean
 		}
 		return true;
 	}
-	/**
-	 * @throws Exception
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 */
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.web.webshop.WebShopRemote#getWebCustomerByEmail(java.lang.String)
+	 */	@RolesAllowed("_Guest_")
+
 	public Collection<WebCustomer> getWebCustomerByEmail(String email)
 	{
 		return WebCustomer.getWebCustomerWithEmail(getPersistenceManager(), email);
@@ -277,7 +244,9 @@ implements SessionBean
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Required"
-	 */
+	 */	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("_Guest_")
+
 	public boolean tryCustomerLogin(WebCustomerID webCustomerID, String password)
 	{
 		logger.debug("Trying authentication for web customer: "+webCustomerID);
@@ -334,7 +303,8 @@ implements SessionBean
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 */
+	 */	@RolesAllowed("_Guest_")
+
 	public boolean checkEmailConfirmation(WebCustomerID webCustomerID, String checkString)
 	{
 		if(checkString == null ) return false;
@@ -358,7 +328,8 @@ implements SessionBean
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 */
+	 */	@RolesAllowed("_Guest_")
+
 	public boolean hasEmailConfirmationExpired(WebCustomerID webCustomerID) throws JDOObjectNotFoundException
 	{
 		long expirationTime = 1000 * 60 * 60 * confirmationStringExpirationTimeInHours;
@@ -379,7 +350,8 @@ implements SessionBean
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 */
+	 */	@RolesAllowed("_Guest_")
+
 	public boolean isWebCustomerIDExisting(WebCustomerID webCustomerID)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -393,11 +365,10 @@ implements SessionBean
 		}
 	}
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 */
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.web.webshop.WebShopRemote#isEmailExisting(java.lang.String)
+	 */	@RolesAllowed("_Guest_")
+
 	public boolean isEmailExisting(String email)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -410,11 +381,11 @@ implements SessionBean
 		}
 	}
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="_Guest_"
-	 */
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.web.webshop.WebShopRemote#storeWebCustomer(org.nightlabs.jfire.web.webshop.WebCustomer, boolean, java.lang.String[], int)
+	 */	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("_Guest_")
+
 	public WebCustomer storeWebCustomer(WebCustomer webCustomer, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -424,12 +395,14 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
-	 */
+	 */	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("_Guest_")
+
 	public void storeWebCustomerPassword(WebCustomerID webCustomerID, String newPassword)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -512,7 +485,9 @@ implements SessionBean
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
-	 */
+	 */	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("_Guest_")
+
 	public void createPassword(WebCustomerID webCustomerID) throws DataBlockGroupNotFoundException
 	{
 		String newPassword = UserLocal.createHumanPassword(8,10);
@@ -536,7 +511,9 @@ implements SessionBean
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
-	 */
+	 */	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("_Guest_")
+
 	public void storeAndSendConfirmation(WebCustomerID webCustomerID, String subject, String messageText, String confirmationString) throws Exception
 	{
 			if(sendBlockGroupMails(webCustomerID, subject, messageText))
@@ -551,7 +528,9 @@ implements SessionBean
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
-	 */
+	 */	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("_Guest_")
+
 	public void setConfirmationString(WebCustomerID webCustomerID, String confirmationString)
 	{
 		PersistenceManager pm = getPersistenceManager();

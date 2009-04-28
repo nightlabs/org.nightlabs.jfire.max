@@ -15,6 +15,19 @@ import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.person.PersonStruct;
 import org.nightlabs.jfire.trade.LegalEntity;
 
+import javax.jdo.annotations.Persistent;
+import org.nightlabs.jfire.webshop.id.WebCustomerID;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.Queries;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+
 /**
  * The WebCustomer assembles datas like username and password that are only used for the web
  * and a legalEntity within the core system.
@@ -54,7 +67,32 @@ import org.nightlabs.jfire.trade.LegalEntity;
  * 			)
  * 		VARIABLES org.nightlabs.jfire.prop.datafield.RegexDataField regexField
  * "
- */
+ */@PersistenceCapable(
+	objectIdClass=WebCustomerID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireWebShopBase_WebCustomer")
+@FetchGroups({
+	@FetchGroup(
+		name=WebCustomer.FETCH_GROUP_LEGAL_ENTITY,
+		members=@Persistent(name="legalEntity")),
+	@FetchGroup(
+		name=WebCustomer.FETCH_GROUP_WEB_CUSTOMER_ID,
+		members=@Persistent(name="webCustomerID")),
+	@FetchGroup(
+		name=WebCustomer.FETCH_GROUP_PASSWORD,
+		members=@Persistent(name="password")),
+	@FetchGroup(
+		name=WebCustomer.FETCH_GROUP_THIS_WEB_CUSTOMER,
+		members=@Persistent(name="legalEntity"))
+})
+@Queries(
+	@javax.jdo.annotations.Query(
+		name="getWebCustomerWithRegexField",
+		value=" SELECT DISTINCT this WHERE this.legalEntity != null && this.legalEntity.person != null && this.legalEntity.person.dataFields.contains(regexField) && ( regexField.structBlockOrganisationID == :regexFieldStructBlockOrganisationID && regexField.structBlockID == :regexFieldStructBlockID && regexField.structFieldOrganisationID == :regexFieldStructFieldOrganisationID && regexField.structFieldID == :regexFieldStructFieldID && regexField.text.toLowerCase() == :regexFieldValue ) VARIABLES org.nightlabs.jfire.prop.datafield.RegexDataField regexField ")
+)
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
+
 public class WebCustomer
 {
 	
@@ -90,7 +128,9 @@ public class WebCustomer
 	 * 
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
-	 */
+	 */	@PrimaryKey
+	@Column(length=100)
+
 	private String organisationID;
 	
 	/**
@@ -98,13 +138,15 @@ public class WebCustomer
 	 * 
 	 * @jdo.field primary-key="true"
 	 * jdo.column length="100"
-	 */
+	 */	@PrimaryKey
+
 	private String webCustomerID;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 * jdo.column length="100"
-	 */
+	 */	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+
 	private String password;
 	
 	/**
@@ -112,31 +154,36 @@ public class WebCustomer
 	 * the lostPassword procedure
 	 * @jdo.field persistence-modifier="persistent"
 	 * jdo.column length="100"
-	 */
+	 */	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+
 	private String secondPassword;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 * jdo.column length="100"
-	 */
+	 */	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+
 	private Date secondPasswordDate ;
 	
 	/**
 	 * The confirmation String that will be sent to the customer via E-mail
 	 * @jdo.field persistence-modifier="persistent"
 	 * jdo.column length="100"
-	 */
+	 */	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+
 	private String confirmationString ;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 * jdo.column length="100"
-	 */
+	 */	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+
 	private Date confirmationStringDate ;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
-	 */
+	 */	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+
 	private LegalEntity legalEntity = null;
 
 	/**

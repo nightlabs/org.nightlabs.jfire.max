@@ -332,7 +332,6 @@ implements ScriptManagerRemote
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("_Guest_")
-	@SuppressWarnings("unchecked")
 	public Collection<ScriptParameterSet> getScriptParameterSetsForScriptRegistryItemIDs(
 			Collection<ScriptRegistryItemID> scriptParameterSetID,
 			String[] fetchGroups, int maxFetchDepth
@@ -361,7 +360,6 @@ implements ScriptManagerRemote
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("_Guest_")
-	@SuppressWarnings("unchecked")
 	public Collection<ScriptParameterSet> getScriptParameterSets(
 			Collection<ScriptParameterSetID> scriptParameterSetIDs,
 			String[] fetchGroups, int maxFetchDepth)

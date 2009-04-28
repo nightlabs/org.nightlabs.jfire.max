@@ -57,7 +57,6 @@ extends BaseJDOObjectDAO<ScriptRegistryItemID, ScriptParameterSet>
 	/* (non-Javadoc)
 	 * @see org.nightlabs.jfire.base.jdo.JDOObjectDAO#retrieveJDOObjects(java.util.Set, java.lang.String[], int, org.eclipse.core.runtime.IProgressMonitor)
 	 */
-	@SuppressWarnings("unchecked")
 	@Override
 	protected Collection<ScriptParameterSet> retrieveJDOObjects(
 			Set<ScriptRegistryItemID> objectIDs, String[] fetchGroups,

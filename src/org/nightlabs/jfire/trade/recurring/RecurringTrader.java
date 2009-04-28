@@ -15,6 +15,12 @@ import javax.ejb.CreateException;
 import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PrimaryKey;
 import javax.naming.NamingException;
 
 import org.apache.log4j.Logger;
@@ -28,11 +34,8 @@ import org.nightlabs.jfire.accounting.id.InvoiceID;
 import org.nightlabs.jfire.accounting.jbpm.JbpmConstantsInvoice;
 import org.nightlabs.jfire.config.Config;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
-import org.nightlabs.jfire.jbpm.graph.def.ActionHandlerNodeEnter;
 import org.nightlabs.jfire.jbpm.graph.def.ProcessDefinition;
 import org.nightlabs.jfire.jbpm.graph.def.StateDefinition;
-import org.nightlabs.jfire.jbpm.graph.def.Transition;
-import org.nightlabs.jfire.jbpm.graph.def.id.ProcessDefinitionID;
 import org.nightlabs.jfire.security.Authority;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.security.User;
@@ -50,18 +53,10 @@ import org.nightlabs.jfire.trade.TradeSide;
 import org.nightlabs.jfire.trade.Trader;
 import org.nightlabs.jfire.trade.config.TradeConfigModule;
 import org.nightlabs.jfire.trade.id.OfferID;
-import org.nightlabs.jfire.trade.jbpm.JbpmConstantsOffer;
 import org.nightlabs.jfire.trade.jbpm.ProcessDefinitionAssignment;
 import org.nightlabs.jfire.trade.jbpm.id.ProcessDefinitionAssignmentID;
-import org.nightlabs.jfire.trade.recurring.jbpm.JbpmConstantsRecurringOffer;
-
-import javax.jdo.annotations.Inheritance;
-import javax.jdo.annotations.PrimaryKey;
 import org.nightlabs.jfire.trade.recurring.id.RecurringTraderID;
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.InheritanceStrategy;
-import javax.jdo.annotations.Column;
-import javax.jdo.annotations.IdentityType;
+import org.nightlabs.jfire.trade.recurring.jbpm.JbpmConstantsRecurringOffer;
 
 
 /**
@@ -184,21 +179,21 @@ public class RecurringTrader {
 		// check if the recurring task is past the stop / suspend date
 		Date stopDate =  recurringOffer.getRecurringOfferConfiguration().getSuspendDate();
 
-		if(stopDate != null)		
-		{				
+		if(stopDate != null)
+		{
 			Date localDate = new Date();
 			if(localDate.after(stopDate)|| localDate.equals(stopDate))
 			{
 				recurringOffer.setStatusKey(RecurringOffer.STATUS_KEY_SUSPENDED);
-				Trader.getTrader(getPersistenceManager()).signalOffer((OfferID) JDOHelper.getObjectId(recurringOffer), JbpmConstantsRecurringOffer.Vendor.TRANSITION_NAME_STOP_RECURRENCE);	
+				Trader.getTrader(getPersistenceManager()).signalOffer((OfferID) JDOHelper.getObjectId(recurringOffer), JbpmConstantsRecurringOffer.Vendor.TRANSITION_NAME_STOP_RECURRENCE);
 				return null;
 			}
 		}
 
 		String nodeName = recurringOffer.getState().getStateDefinition().getJbpmNodeName();
 
-		if (!JbpmConstantsRecurringOffer.Vendor.NODE_NAME_RECURRENCE_STARTED.equals(nodeName)) 
-		{		
+		if (!JbpmConstantsRecurringOffer.Vendor.NODE_NAME_RECURRENCE_STARTED.equals(nodeName))
+		{
 			recurringOffer.getRecurringOfferConfiguration().getCreatorTask().setEnabled(false);
 			return null;
 		}
@@ -224,12 +219,12 @@ public class RecurringTrader {
 		User user = SecurityReflector.getUserDescriptor().getUser(pm);
 
 		String offerIDPrefix = recurringOffer.getOfferIDPrefix();
-		
+
 		Collection<Segment> recurringSegments = new HashSet<Segment>();
 		for (Article article : recurringOffer.getArticles()) {
 			recurringSegments.add(article.getSegment());
 		}
-		
+
 		// create the new segment for the order
 		for (Segment segment : recurringSegments) {
 			trader.createSegment(order, segment.getSegmentType());
@@ -272,7 +267,7 @@ public class RecurringTrader {
 				}
 			}
 		}
-		
+
 		// loop over the segments added to the order
 		for (Segment segment : order.getSegments()) {
 			logger.debug("Creating articles for RecurredOffer for SegmentType " + JDOHelper.getObjectId(segment.getSegmentType()));
@@ -301,12 +296,12 @@ public class RecurringTrader {
 								"RecurringTradeProductTypeActionHandler " + handler.getClass().getName() +
 								" created " + recurredArticles.size() + " recurred articles for " + articles.size() +
 								" template/recurring articles");
-					
+
 					for (Map.Entry<Article, Article> articleEntry : recurredArticles.entrySet()) {
 						//	Compare Prices to check if they the Differ
 						Price recurringPrice = articleEntry.getValue().getPrice();
 						Price recurredPrice = articleEntry.getKey().getPrice();
-						// if amount or currency differs 
+						// if amount or currency differs
 						if (recurredPrice.getAmount() != recurringPrice.getAmount() || !recurredPrice.getCurrency().equals(recurringPrice.getCurrency()))
 							priceDiffer = true;
 

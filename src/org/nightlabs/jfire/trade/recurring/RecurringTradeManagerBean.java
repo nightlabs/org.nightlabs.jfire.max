@@ -27,15 +27,10 @@
 package org.nightlabs.jfire.trade.recurring;
 
 import java.io.IOException;
-import java.rmi.RemoteException;
 import java.util.List;
 import java.util.Set;
 
 import javax.annotation.security.RolesAllowed;
-import javax.ejb.CreateException;
-import javax.ejb.EJBException;
-import javax.ejb.SessionBean;
-import javax.ejb.SessionContext;
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;

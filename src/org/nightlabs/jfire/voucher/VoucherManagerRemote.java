@@ -59,7 +59,6 @@ public interface VoucherManagerRemote {
 	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.queryPriceConfigurations"
 	 */
 	@RolesAllowed("org.nightlabs.jfire.accounting.queryPriceConfigurations")
-	@SuppressWarnings("unchecked")
 	Set<PriceConfigID> getVoucherPriceConfigIDs();
 
 	/**

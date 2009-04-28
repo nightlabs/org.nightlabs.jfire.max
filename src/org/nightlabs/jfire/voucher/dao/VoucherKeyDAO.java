@@ -28,7 +28,6 @@ extends BaseJDOObjectDAO<VoucherKeyID, VoucherKey>
 		return sharedInstance;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	protected Collection<VoucherKey> retrieveJDOObjects(
 			Set<VoucherKeyID> voucherKeyIDs, String[] fetchGroups, int maxFetchDepth,

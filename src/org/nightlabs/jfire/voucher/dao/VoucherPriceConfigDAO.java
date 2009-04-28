@@ -31,7 +31,6 @@ extends BaseJDOObjectDAO<PriceConfigID, VoucherPriceConfig>
 	private VoucherManagerRemote voucherManager;
 
 	@Override
-	@SuppressWarnings("unchecked")
 	protected Collection<VoucherPriceConfig> retrieveJDOObjects(
 			Set<PriceConfigID> objectIDs, String[] fetchGroups, int maxFetchDepth,
 			ProgressMonitor monitor)
@@ -47,7 +46,6 @@ extends BaseJDOObjectDAO<PriceConfigID, VoucherPriceConfig>
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	public synchronized List<VoucherPriceConfig> getVoucherPriceConfigs(
 			String[] fetchGroups, int maxFetchDepth,
 			ProgressMonitor monitor)

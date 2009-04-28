@@ -29,7 +29,6 @@ extends BaseJDOObjectDAO<LocalAccountantDelegateID, VoucherLocalAccountantDelega
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	protected Collection<VoucherLocalAccountantDelegate> retrieveJDOObjects(
 			Set<LocalAccountantDelegateID> objectIDs, String[] fetchGroups,
 			int maxFetchDepth, ProgressMonitor monitor)
@@ -42,7 +41,6 @@ extends BaseJDOObjectDAO<LocalAccountantDelegateID, VoucherLocalAccountantDelega
 
 	private VoucherManagerRemote voucherManager;
 
-	@SuppressWarnings("unchecked")
 	public synchronized List<VoucherLocalAccountantDelegate> getVoucherLocalAccountantDelegates(
 			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{

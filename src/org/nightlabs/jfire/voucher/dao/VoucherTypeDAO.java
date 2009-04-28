@@ -53,7 +53,6 @@ implements IJDOObjectDAO<VoucherType>
 
 	private VoucherManagerRemote voucherManager;
 
-	@SuppressWarnings("unchecked")
 	public synchronized List<VoucherType> getChildVoucherTypes(ProductTypeID parentVoucherTypeID,
 			String[] fetchGroups, int maxFetchDepth,
 			ProgressMonitor monitor)

@@ -11,7 +11,8 @@ import java.util.StringTokenizer;
 
 import javax.annotation.Generated;
 
-import org.nightlabs.jdo.ObjectID;
+import org.nightlabs.jdo.ObjectIDUtil;
+import org.nightlabs.jfire.trade.id.ArticleContainerID;
 
 
 /**
@@ -20,7 +21,7 @@ import org.nightlabs.jdo.ObjectID;
  */
 @Generated("org.nightlabs.eclipse.sdk.jdo.ObjectIdGenerator")
 public class DeliveryNoteID
-implements ObjectID
+implements ArticleContainerID
 {
 	/**
 	 * The serial version uid of this class.
@@ -344,5 +345,25 @@ implements ObjectID
 		n.deliveryNoteIDPrefix = deliveryNoteIDPrefix;
 		n.deliveryNoteID = deliveryNoteID;
 		return n;
+	}
+
+	@Override
+	public String getOrganisationID() {
+		return organisationID;
+	}
+
+	@Override
+	public String getArticleContainerIDPrefix() {
+		return getArticleContainerIDPrefix();
+	}
+
+	@Override
+	public long getArticleContainerID() {
+		return deliveryNoteID;
+	}
+
+	@Override
+	public String getArticleContainerIDAsString() {
+		return ObjectIDUtil.longObjectIDFieldToString(deliveryNoteID);
 	}
 }

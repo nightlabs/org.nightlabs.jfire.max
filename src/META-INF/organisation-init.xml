@@ -1,0 +1,16 @@
+<!DOCTYPE organisation-initialisation
+		PUBLIC "-//NightLabs GmbH//DTD Datastore Initialization 1.1//EN"
+		"http://www.nightlabs.de/dtd/datastoreinit_1_1.dtd">
+<organisation-initialisation>
+	<init bean="org.nightlabs.jfire.reporting.trade.ReportManagerTradeRemote" method="initializeScripting">
+		<depends module="JFireReportingEAR.ear"/>
+	</init>
+
+	<init bean="org.nightlabs.jfire.reporting.trade.ReportManagerTradeRemote" method="initializeReporting">
+		<depends
+			module="JFireReportingTradeEAR.ear"
+			archive="JFireReportingTrade.jar"
+			bean="org.nightlabs.jfire.reporting.trade.ReportManagerTradeRemote"
+			method="initializeScripting" />
+	</init>
+</organisation-initialisation>

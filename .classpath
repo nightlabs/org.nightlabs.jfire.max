@@ -6,5 +6,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireReporting"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireScripting"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.nightlabs.jfire.base"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/JFireBaseBean"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

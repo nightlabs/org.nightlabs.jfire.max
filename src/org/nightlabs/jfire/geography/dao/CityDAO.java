@@ -57,7 +57,6 @@ extends BaseJDOObjectDAO<CityID, City>
 	 * @param monitor the monitor for progress feedback.
 	 * @return the cities.
 	 */
-	@SuppressWarnings("unchecked")
 	public synchronized List<City> getCities(RegionID regionID, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
 		monitor.beginTask("Getting cities", 100);
@@ -98,7 +97,6 @@ extends BaseJDOObjectDAO<CityID, City>
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	protected Collection<City> retrieveJDOObjects(Set<CityID> objectIDs,
 			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)

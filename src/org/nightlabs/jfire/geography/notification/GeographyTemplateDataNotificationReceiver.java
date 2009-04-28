@@ -55,7 +55,6 @@ extends NotificationReceiver
 		super(notificationFilter);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public void onReceiveNotificationBundle(NotificationBundle notificationBundle) throws Exception {
 		try {

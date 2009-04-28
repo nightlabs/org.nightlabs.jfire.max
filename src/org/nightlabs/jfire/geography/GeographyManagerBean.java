@@ -42,7 +42,6 @@ import javax.jdo.Query;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
-import org.apache.log4j.Logger;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
@@ -70,7 +69,7 @@ extends BaseSessionBeanImpl
 implements GeographyManagerRemote
 {
 	private static final long serialVersionUID = 1L;
-	private static final Logger logger = Logger.getLogger(GeographyManagerBean.class);
+//	private static final Logger logger = Logger.getLogger(GeographyManagerBean.class);
 
 	/* (non-Javadoc)
 	 * @see org.nightlabs.jfire.geography.GeographyManagerRemote#ping(java.lang.String)

@@ -45,7 +45,6 @@ extends BaseJDOObjectDAO<CountryID, Country>
 		return getJDOObjects(null, countryIDs, fetchGroups, maxFetchDepth, monitor);
 	}
 
-	@SuppressWarnings("unchecked")
 	public synchronized List<Country> getCountries(String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
 		monitor.beginTask("Getting regions", 100);
@@ -86,7 +85,6 @@ extends BaseJDOObjectDAO<CountryID, Country>
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	protected Collection<Country> retrieveJDOObjects(Set<CountryID> objectIDs,
 			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)

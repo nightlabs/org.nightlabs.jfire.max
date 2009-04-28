@@ -3,7 +3,7 @@
 		"http://www.nightlabs.de/dtd/organisation-init_1_0.dtd">
 <organisation-initialisation>
 
-	<init bean="jfire/ejb/JFireDynamicTrade/DynamicTradeManager" method="initialise">
+	<init bean="org.nightlabs.jfire.dynamictrade.DynamicTradeManagerRemote" method="initialise">
 			<depends module="JFireTrade.ear" />
 	</init>
 

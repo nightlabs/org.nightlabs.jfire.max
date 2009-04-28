@@ -51,7 +51,6 @@ extends BaseJDOObjectDAO<ProjectCostID, ProjectCost>
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	public synchronized ProjectCost getProjectCost(ProjectID projectID,
 			String[] fetchGroups, int maxFetchDepth,
 			ProgressMonitor monitor)

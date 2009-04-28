@@ -13,7 +13,6 @@ import javax.ejb.TransactionAttributeType;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
-import org.apache.log4j.Logger;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.issue.project.id.ProjectID;
@@ -41,10 +40,10 @@ implements IssueTimeTrackingManagerRemote
 {
 	private static final long serialVersionUID = 1L;
 
-	/**
-	 * LOG4J logger used by this class
-	 */
-	private static final Logger logger = Logger.getLogger(IssueTimeTrackingManagerBean.class);
+//	/**
+//	 * LOG4J logger used by this class
+//	 */
+//	private static final Logger logger = Logger.getLogger(IssueTimeTrackingManagerBean.class);
 
 	//ProjectCost//
 	/**

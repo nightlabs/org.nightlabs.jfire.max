@@ -250,7 +250,6 @@ implements ReportParameterManagerRemote
 	 */	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	@RolesAllowed("org.nightlabs.jfire.reporting.renderReport")
 
-	@SuppressWarnings("unchecked")
 	public Set<ReportParameterAcquisitionSetup> getReportParameterAcquisitionSetups(
 			Set<ReportParameterAcquisitionSetupID> setupIDs, String[] fetchGroups, int maxFetchDepth
 	) {
@@ -285,7 +284,6 @@ implements ReportParameterManagerRemote
 	 */	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	@RolesAllowed("org.nightlabs.jfire.reporting.renderReport")
 
-	@SuppressWarnings("unchecked")
 	public Set<ValueProviderCategory> getValueProviderCategories(
 			Set<ValueProviderCategoryID> categoryIDs, String[] fetchGroups, int maxFetchDepth
 	) {

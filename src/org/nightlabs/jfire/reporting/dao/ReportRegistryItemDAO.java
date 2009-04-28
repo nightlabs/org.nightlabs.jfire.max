@@ -67,7 +67,6 @@ extends BaseJDOObjectDAO<ReportRegistryItemID, ReportRegistryItem>
 	 * @see org.nightlabs.jfire.base.jdo.JDOObjectDAO#retrieveJDOObjects(java.util.Set, java.lang.String[], int, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
-	@SuppressWarnings("unchecked")
 	protected Collection<ReportRegistryItem> retrieveJDOObjects(
 			Set<ReportRegistryItemID> objectIDs, String[] fetchGroups,
 			int maxFetchDepth, ProgressMonitor monitor) throws Exception {

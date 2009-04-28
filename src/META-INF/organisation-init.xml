@@ -1,0 +1,18 @@
+<!DOCTYPE organisation-initialisation
+		PUBLIC "-//NightLabs GmbH//DTD Organisation Initialisation 1.0//EN"
+		"http://www.nightlabs.de/dtd/organisation-init_1_0.dtd">
+<organisation-initialisation>
+	<init bean="org.nightlabs.jfire.reporting.ReportManagerRemote" method="initialise">
+		<depends
+			module="JFireBaseEAR.ear"
+			archive="JFireBaseBean.jar" />
+		<depends
+			module="JFireScriptingEAR.ear"
+			archive="JFireScripting.jar" />
+	</init>
+	<init bean="org.nightlabs.jfire.reporting.parameter.ReportParameterManagerRemote" method="initDefaultValueProviders">
+		<depends
+			module="JFireReportingEAR.ear" 
+			archive="JFireReporting.jar" />
+	</init>
+</organisation-initialisation>

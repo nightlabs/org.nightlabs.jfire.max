@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jfire-security
+	xmlns="urn:jfire.org:jfire-security_1_0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="urn:jfire.org:jfire-security_1_0 https://www.jfire.org/schema/jfire-security_1_0.xsd "
+>
+	<authority-type id="org.nightlabs.jfire.reporting.layout.ReportRegistryItem">
+		<name>Report registry items</name>
+		<name language="de">Berichte</name>
+		<description>
+			Authorities of this type control the access rights for report registry items (report categories and layouts).
+		</description>
+		<description language="de">
+			Vollmachten dieses Typs kontrollieren den Zugriff auf Berichtkategorien und Berichtlayouts.
+		</description>
+
+		<role-group id="org.nightlabs.jfire.reporting.editReport"/>
+		<role-group id="org.nightlabs.jfire.reporting.renderReport"/>
+	</authority-type>
+
+	<role-group id="org.nightlabs.jfire.reporting.editReport">
+		<name>Edit reports</name>
+		<name language="de">Berichte editieren</name>
+		<description>Create or modify report categories and layouts.</description>
+		<description language="de">Berichtekategorien und -layouts erzeugen oder ändern.</description>
+
+		<role id="org.nightlabs.jfire.reporting.editReport"/>
+		<role id="org.nightlabs.jfire.reporting.renderReport"/>
+	</role-group>
+	
+	<role-group id="org.nightlabs.jfire.reporting.renderReport">
+		<name>Render reports</name>
+		<name language="de">Berichte generieren und anzeigen</name>
+		<description>Execute a report's queries and display/print the report with the collected data.</description>
+		<description>Die Daten für einen Bericht abfragen und diesen mit den gesammelten Daten anzeigen/drucken.</description>
+
+		<role id="org.nightlabs.jfire.reporting.renderReport"/>
+	</role-group>
+</jfire-security>

@@ -49,7 +49,6 @@ extends BaseJDOObjectDAO<IssueLinkID, IssueLink>
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	public synchronized Collection<IssueLink> getIssueLinksByOrganisationIDAndLinkedObjectID(String organisationID, String linkedObjectID, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
 		try {

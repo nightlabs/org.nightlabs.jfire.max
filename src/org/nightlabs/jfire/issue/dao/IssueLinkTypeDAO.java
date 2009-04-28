@@ -36,7 +36,6 @@ extends BaseJDOObjectDAO<IssueLinkTypeID, IssueLinkType>
 		return sharedInstance;
 	}
 
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	@Override
 	/**
 	 * {@inheritDoc}
@@ -73,7 +72,6 @@ extends BaseJDOObjectDAO<IssueLinkTypeID, IssueLinkType>
 
 	private IssueManagerRemote issueManager;
 
-	@SuppressWarnings("unchecked")
 	public synchronized List<IssueLinkType> getIssueLinkTypes(String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
 		try {
@@ -96,7 +94,6 @@ extends BaseJDOObjectDAO<IssueLinkTypeID, IssueLinkType>
 	 *
 	 * @return The issue link types of the given linkClass.
 	 */
-	@SuppressWarnings("unchecked")
 	public synchronized Collection<IssueLinkType> getIssueLinkTypes(Class<?> linkedObjectClass, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
 		monitor.beginTask("Loading issue link types", 100);

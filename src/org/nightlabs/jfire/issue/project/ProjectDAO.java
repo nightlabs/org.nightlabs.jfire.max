@@ -40,7 +40,6 @@ public class ProjectDAO extends BaseJDOObjectDAO<ProjectID, Project>{
 	/**
 	 * {@inheritDoc}
 	 */
-	@SuppressWarnings("unchecked")
 	@Override
 	protected synchronized Collection<Project> retrieveJDOObjects(Set<ProjectID> projectIDs,
 			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
@@ -79,7 +78,6 @@ public class ProjectDAO extends BaseJDOObjectDAO<ProjectID, Project>{
 		return project;
 	}
 
-	@SuppressWarnings("unchecked")
 	public synchronized List<Project> getProjects(String[] fetchGroups, int maxFetchDepth,
 			ProgressMonitor monitor)
 			{
@@ -96,7 +94,6 @@ public class ProjectDAO extends BaseJDOObjectDAO<ProjectID, Project>{
 		}
 			}
 
-	@SuppressWarnings("unchecked")
 	public Collection<Project> getProjects(Collection<ProjectID> projectIDs, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
 		return getJDOObjects(null, projectIDs, fetchGroups, maxFetchDepth, monitor);
@@ -147,7 +144,6 @@ public class ProjectDAO extends BaseJDOObjectDAO<ProjectID, Project>{
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	public synchronized Collection<Project> getRootProjects(String organisationID, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
 		if(organisationID == null)
@@ -162,7 +158,6 @@ public class ProjectDAO extends BaseJDOObjectDAO<ProjectID, Project>{
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	public synchronized Collection<Project> getProjectsByParentProjectID(ProjectID projectID, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
 		try {
@@ -174,7 +169,6 @@ public class ProjectDAO extends BaseJDOObjectDAO<ProjectID, Project>{
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	public synchronized Collection<Project> getProjectsByProjectTypeID(ProjectTypeID projectTypeID, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
 		try {

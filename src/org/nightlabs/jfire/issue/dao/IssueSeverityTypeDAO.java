@@ -35,7 +35,6 @@ public class IssueSeverityTypeDAO
 		return sharedInstance;
 	}
 
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	@Override
 	/**
 	 * {@inheritDoc}

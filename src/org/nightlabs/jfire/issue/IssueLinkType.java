@@ -104,7 +104,6 @@ implements Serializable
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	public static Set<IssueLinkType> getIssueLinkTypes(PersistenceManager pm, Class<?> linkedObjectClass)
 	{
 		Query q = pm.newNamedQuery(IssueLinkType.class, "getIssueLinkTypesForLinkedObjectClassName");

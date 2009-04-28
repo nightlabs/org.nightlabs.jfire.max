@@ -34,7 +34,6 @@ extends BaseJDOObjectDAO<ProjectTypeID, ProjectType>
 		return sharedInstance;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	/**
 	 * {@inheritDoc}
@@ -76,7 +75,6 @@ extends BaseJDOObjectDAO<ProjectTypeID, ProjectType>
 		return projectType;
 	}
 
-	@SuppressWarnings("unchecked")
 	public synchronized List<ProjectType> getProjectTypes(String[] fetchGroups, int maxFetchDepth,
 			ProgressMonitor monitor)
 	{
@@ -93,7 +91,6 @@ extends BaseJDOObjectDAO<ProjectTypeID, ProjectType>
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	public Collection<ProjectType> getProjectTypes(Collection<ProjectTypeID> projectTypeIDs, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
 		return getJDOObjects(null, projectTypeIDs, fetchGroups, maxFetchDepth, monitor);

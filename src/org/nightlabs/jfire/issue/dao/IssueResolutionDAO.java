@@ -39,7 +39,6 @@ extends BaseJDOObjectDAO<IssueResolutionID, IssueResolution>
 		return sharedInstance;
 	}
 
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	@Override
 	/**
 	 * {@inheritDoc}

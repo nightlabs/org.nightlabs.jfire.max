@@ -48,7 +48,6 @@ public class IssueTypeDAO extends BaseJDOObjectDAO<IssueTypeID, IssueType>
 		return sharedInstance;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	/**
 	 * {@inheritDoc}
@@ -93,7 +92,6 @@ public class IssueTypeDAO extends BaseJDOObjectDAO<IssueTypeID, IssueType>
 		return issueTypes;
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<IssueType> getAllIssueTypes(String[] fetchgroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
 		monitor.beginTask("Fetching all IssueTypes", 100);

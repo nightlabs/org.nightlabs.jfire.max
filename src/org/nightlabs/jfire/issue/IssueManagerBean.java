@@ -198,7 +198,6 @@ implements IssueManagerRemote
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@RolesAllowed("_Guest_")
-	@SuppressWarnings("unchecked")
 	public List<ProjectType> getProjectTypes(Collection<ProjectTypeID> projectTypeIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -214,7 +213,6 @@ implements IssueManagerRemote
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@RolesAllowed("_Guest_")
-	@SuppressWarnings("unchecked")
 	public Set<ProjectTypeID> getProjectTypeIDs()
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -275,7 +273,6 @@ implements IssueManagerRemote
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@RolesAllowed("_Guest_")
-	@SuppressWarnings("unchecked")
 	public List<Project> getProjects(Collection<ProjectID> projectIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -291,7 +288,6 @@ implements IssueManagerRemote
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@RolesAllowed("_Guest_")
-	@SuppressWarnings("unchecked")
 	public Set<ProjectID> getProjectIDs()
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -309,7 +305,6 @@ implements IssueManagerRemote
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@RolesAllowed("_Guest_")
-	@SuppressWarnings("unchecked")
 	public Collection<ProjectID> getRootProjectIDs(String organisationID)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -328,7 +323,6 @@ implements IssueManagerRemote
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@RolesAllowed("_Guest_")
-	@SuppressWarnings("unchecked")
 	public Collection<ProjectID> getProjectIDsByParentProjectID(ProjectID projectID)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -348,7 +342,6 @@ implements IssueManagerRemote
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@RolesAllowed("_Guest_")
-	@SuppressWarnings("unchecked")
 	public Collection<ProjectID> getProjectIDsByProjectTypeID(ProjectTypeID projectTypeID)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -421,7 +414,6 @@ implements IssueManagerRemote
 	 * @ejb.permission role-name="_Guest_"
 	 */
 @RolesAllowed("_Guest_")
-	@SuppressWarnings("unchecked")
 	public List<IssueComment> getIssueComments(Collection<IssueCommentID> issueCommentIDs, String[] fetchGroups,int maxFetchDepth) {
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -453,7 +445,6 @@ implements IssueManagerRemote
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@RolesAllowed("_Guest_")
-	@SuppressWarnings("unchecked")
 	public List<IssueLinkType> getIssueLinkTypes(Collection<IssueLinkTypeID> issueLinkTypeIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -506,7 +497,6 @@ implements IssueManagerRemote
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@RolesAllowed("_Guest_")
-	@SuppressWarnings("unchecked")
 	public List<IssueLink> getIssueLinks(Collection<IssueLinkID> issueLinkIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -522,7 +512,6 @@ implements IssueManagerRemote
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@RolesAllowed("_Guest_")
-	@SuppressWarnings("unchecked")
 	public Set<IssueLinkID> getIssueLinkIDs()
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -540,7 +529,6 @@ implements IssueManagerRemote
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@RolesAllowed("_Guest_")
-	@SuppressWarnings("unchecked")
 	public Collection<IssueLinkID> getIssueLinkIDsByOrganisationIDAndLinkedObjectID(String organisationID, String linkedObjectID)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -800,7 +788,6 @@ implements IssueManagerRemote
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@RolesAllowed("_Guest_")
-	@SuppressWarnings("unchecked")
 	public List<Issue> getIssues(Collection<IssueID> issueIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -886,7 +873,6 @@ implements IssueManagerRemote
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@RolesAllowed("_Guest_")
-	@SuppressWarnings("unchecked")
 	public Collection<IssueHistoryID> getIssueHistoryIDsByIssueID(IssueID issueID)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -902,7 +888,6 @@ implements IssueManagerRemote
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@RolesAllowed("_Guest_")
-	@SuppressWarnings("unchecked")
 	public List<IssueHistory> getIssueHistories(Collection<IssueHistoryID> issueHistoryIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -935,7 +920,6 @@ implements IssueManagerRemote
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@RolesAllowed("_Guest_")
-	@SuppressWarnings("unchecked")
 	public List<IssueType> getIssueTypes(Collection<IssueTypeID> issueTypeIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -951,7 +935,6 @@ implements IssueManagerRemote
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@RolesAllowed("_Guest_")
-	@SuppressWarnings("unchecked")
 	public Set<IssueTypeID> getIssueTypeIDs()
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -985,7 +968,6 @@ implements IssueManagerRemote
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@RolesAllowed("_Guest_")
-	@SuppressWarnings("unchecked")
 	public Set<IssuePriorityID> getIssuePriorityIDs()
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -1003,7 +985,6 @@ implements IssueManagerRemote
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@RolesAllowed("_Guest_")
-	@SuppressWarnings("unchecked")
 	public List<IssuePriority> getIssuePriorities(Collection<IssuePriorityID> issuePriorityIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -1053,7 +1034,6 @@ implements IssueManagerRemote
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@RolesAllowed("_Guest_")
-	@SuppressWarnings("unchecked")
 	public List<IssueSeverityType> getIssueSeverityTypes(Collection<IssueSeverityTypeID> issueSeverityTypeIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -1107,7 +1087,6 @@ implements IssueManagerRemote
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@RolesAllowed("_Guest_")
-	@SuppressWarnings("unchecked")
 	public List<IssueResolution> getIssueResolutions(Collection<IssueResolutionID> issueResolutionIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();

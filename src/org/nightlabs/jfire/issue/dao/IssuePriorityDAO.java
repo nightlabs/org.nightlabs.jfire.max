@@ -39,7 +39,6 @@ extends BaseJDOObjectDAO<IssuePriorityID, IssuePriority>
 
 	private IssueManagerRemote issueManager;
 
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	@Override
 	/**
 	 * {@inheritDoc}

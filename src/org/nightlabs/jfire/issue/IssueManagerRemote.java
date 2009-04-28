@@ -71,7 +71,6 @@ public interface IssueManagerRemote {
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@RolesAllowed("_Guest_")
-	@SuppressWarnings("unchecked")
 	List<ProjectType> getProjectTypes(Collection<ProjectTypeID> projectTypeIDs,
 			String[] fetchGroups, int maxFetchDepth);
 
@@ -80,7 +79,6 @@ public interface IssueManagerRemote {
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@RolesAllowed("_Guest_")
-	@SuppressWarnings("unchecked")
 	Set<ProjectTypeID> getProjectTypeIDs();
 
 	//Project//
@@ -108,7 +106,6 @@ public interface IssueManagerRemote {
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@RolesAllowed("_Guest_")
-	@SuppressWarnings("unchecked")
 	List<Project> getProjects(Collection<ProjectID> projectIDs,
 			String[] fetchGroups, int maxFetchDepth);
 
@@ -117,7 +114,6 @@ public interface IssueManagerRemote {
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@RolesAllowed("_Guest_")
-	@SuppressWarnings("unchecked")
 	Set<ProjectID> getProjectIDs();
 
 	/**
@@ -125,7 +121,6 @@ public interface IssueManagerRemote {
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@RolesAllowed("_Guest_")
-	@SuppressWarnings("unchecked")
 	Collection<ProjectID> getRootProjectIDs(String organisationID);
 
 	/**
@@ -133,7 +128,6 @@ public interface IssueManagerRemote {
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@RolesAllowed("_Guest_")
-	@SuppressWarnings("unchecked")
 	Collection<ProjectID> getProjectIDsByParentProjectID(ProjectID projectID);
 
 	/**
@@ -141,7 +135,6 @@ public interface IssueManagerRemote {
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@RolesAllowed("_Guest_")
-	@SuppressWarnings("unchecked")
 	Collection<ProjectID> getProjectIDsByProjectTypeID(
 			ProjectTypeID projectTypeID);
 
@@ -151,7 +144,6 @@ public interface IssueManagerRemote {
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@RolesAllowed("_Guest_")
-	@SuppressWarnings("unchecked")
 	List<IssueComment> getIssueComments(
 			Collection<IssueCommentID> issueCommentIDs, String[] fetchGroups,
 			int maxFetchDepth);
@@ -172,7 +164,6 @@ public interface IssueManagerRemote {
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@RolesAllowed("_Guest_")
-	@SuppressWarnings("unchecked")
 	List<IssueLinkType> getIssueLinkTypes(
 			Collection<IssueLinkTypeID> issueLinkTypeIDs, String[] fetchGroups,
 			int maxFetchDepth);
@@ -198,7 +189,6 @@ public interface IssueManagerRemote {
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@RolesAllowed("_Guest_")
-	@SuppressWarnings("unchecked")
 	List<IssueLink> getIssueLinks(Collection<IssueLinkID> issueLinkIDs,
 			String[] fetchGroups, int maxFetchDepth);
 
@@ -207,7 +197,6 @@ public interface IssueManagerRemote {
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@RolesAllowed("_Guest_")
-	@SuppressWarnings("unchecked")
 	Set<IssueLinkID> getIssueLinkIDs();
 
 	/**
@@ -215,7 +204,6 @@ public interface IssueManagerRemote {
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@RolesAllowed("_Guest_")
-	@SuppressWarnings("unchecked")
 	Collection<IssueLinkID> getIssueLinkIDsByOrganisationIDAndLinkedObjectID(
 			String organisationID, String linkedObjectID);
 
@@ -283,7 +271,6 @@ public interface IssueManagerRemote {
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@RolesAllowed("_Guest_")
-	@SuppressWarnings("unchecked")
 	List<Issue> getIssues(Collection<IssueID> issueIDs, String[] fetchGroups,
 			int maxFetchDepth);
 
@@ -324,7 +311,6 @@ public interface IssueManagerRemote {
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@RolesAllowed("_Guest_")
-	@SuppressWarnings("unchecked")
 	Collection<IssueHistoryID> getIssueHistoryIDsByIssueID(IssueID issueID);
 
 	/**
@@ -332,7 +318,6 @@ public interface IssueManagerRemote {
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@RolesAllowed("_Guest_")
-	@SuppressWarnings("unchecked")
 	List<IssueHistory> getIssueHistories(
 			Collection<IssueHistoryID> issueHistoryIDs, String[] fetchGroups,
 			int maxFetchDepth);
@@ -353,7 +338,6 @@ public interface IssueManagerRemote {
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@RolesAllowed("_Guest_")
-	@SuppressWarnings("unchecked")
 	List<IssueType> getIssueTypes(Collection<IssueTypeID> issueTypeIDs,
 			String[] fetchGroups, int maxFetchDepth);
 
@@ -362,7 +346,6 @@ public interface IssueManagerRemote {
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@RolesAllowed("_Guest_")
-	@SuppressWarnings("unchecked")
 	Set<IssueTypeID> getIssueTypeIDs();
 
 	//IssuePriority//
@@ -381,7 +364,6 @@ public interface IssueManagerRemote {
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@RolesAllowed("_Guest_")
-	@SuppressWarnings("unchecked")
 	Set<IssuePriorityID> getIssuePriorityIDs();
 
 	/**
@@ -389,7 +371,6 @@ public interface IssueManagerRemote {
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@RolesAllowed("_Guest_")
-	@SuppressWarnings("unchecked")
 	List<IssuePriority> getIssuePriorities(
 			Collection<IssuePriorityID> issuePriorityIDs, String[] fetchGroups,
 			int maxFetchDepth);
@@ -418,7 +399,6 @@ public interface IssueManagerRemote {
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@RolesAllowed("_Guest_")
-	@SuppressWarnings("unchecked")
 	List<IssueSeverityType> getIssueSeverityTypes(
 			Collection<IssueSeverityTypeID> issueSeverityTypeIDs,
 			String[] fetchGroups, int maxFetchDepth);
@@ -451,7 +431,6 @@ public interface IssueManagerRemote {
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@RolesAllowed("_Guest_")
-	@SuppressWarnings("unchecked")
 	List<IssueResolution> getIssueResolutions(
 			Collection<IssueResolutionID> issueResolutionIDs,
 			String[] fetchGroups, int maxFetchDepth);

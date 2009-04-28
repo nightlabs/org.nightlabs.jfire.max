@@ -35,7 +35,6 @@ public class IssueFileAttachmentDAO extends BaseJDOObjectDAO<IssueFileAttachment
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	/**
 	 * {@inheritDoc}
 	 */
@@ -87,7 +86,6 @@ public class IssueFileAttachmentDAO extends BaseJDOObjectDAO<IssueFileAttachment
 	 * 					object, <code>monitor.worked(1)</code> will be called.
 	 * @return The issueFileAttachments.
 	 */
-	@SuppressWarnings("unchecked")
 	public synchronized Collection<IssueFileAttachment> getIssueFileAttachments(String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
 		try {

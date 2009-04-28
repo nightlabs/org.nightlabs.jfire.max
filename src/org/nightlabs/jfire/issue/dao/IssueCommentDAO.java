@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.Set;
 
 import org.nightlabs.jfire.base.JFireEjb3Factory;
-import org.nightlabs.jfire.base.JFireEjbFactory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.issue.IssueComment;
 import org.nightlabs.jfire.issue.IssueManagerRemote;
@@ -14,7 +13,7 @@ import org.nightlabs.progress.ProgressMonitor;
 
 /**
  * Data access object for {@link IssueComment}s.
- * 
+ *
  * @author Chairat Kongarayawetchakun - chairat [AT] nightlabs [DOT] de
  *
  */
@@ -34,11 +33,10 @@ public class IssueCommentDAO extends BaseJDOObjectDAO<IssueCommentID, IssueComme
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	/**
 	 * {@inheritDoc}
 	 */
-	protected Collection<IssueComment> retrieveJDOObjects(Set<IssueCommentID> commentIDs, 
+	protected Collection<IssueComment> retrieveJDOObjects(Set<IssueCommentID> commentIDs,
 			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) throws Exception {
 		monitor.beginTask("Loading IssueComments", 1);
 		try {
@@ -54,8 +52,8 @@ public class IssueCommentDAO extends BaseJDOObjectDAO<IssueCommentID, IssueComme
 			monitor.done();
 		}
 	}
-	
-	public synchronized IssueComment storeIssueComment(IssueComment issueComment, String[] fetchgroups, int maxFetchDepth, ProgressMonitor monitor) 
+
+	public synchronized IssueComment storeIssueComment(IssueComment issueComment, String[] fetchgroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
 		try {
 			IssueManagerRemote im = JFireEjb3Factory.getRemoteBean(IssueManagerRemote.class, SecurityReflector.getInitialContextProperties());

@@ -32,7 +32,6 @@ public class IssueHistoryDAO extends BaseJDOObjectDAO<IssueHistoryID, IssueHisto
 		return sharedInstance;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	/**
 	 * {@inheritDoc}
@@ -57,7 +56,6 @@ public class IssueHistoryDAO extends BaseJDOObjectDAO<IssueHistoryID, IssueHisto
 
 	private IssueManagerRemote issueManager;
 
-	@SuppressWarnings("unchecked")
 	public synchronized List<IssueHistory> getIssueHistories(IssueID issueID,
 			String[] fetchGroups, int maxFetchDepth,
 			ProgressMonitor monitor)
@@ -75,7 +73,6 @@ public class IssueHistoryDAO extends BaseJDOObjectDAO<IssueHistoryID, IssueHisto
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	public Collection<IssueHistory> getIssueHistories(Collection<IssueHistoryID> issueHistoryIDs, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
 		monitor.beginTask("Loading issue histories...", 1);

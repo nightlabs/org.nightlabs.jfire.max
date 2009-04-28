@@ -7,7 +7,6 @@ import java.util.Set;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.query.QueryCollection;
 import org.nightlabs.jfire.base.JFireEjb3Factory;
-import org.nightlabs.jfire.base.JFireEjbFactory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.issue.Issue;
 import org.nightlabs.jfire.issue.IssueManagerRemote;
@@ -19,7 +18,7 @@ import org.nightlabs.progress.SubProgressMonitor;
 
 /**
  * Data access object for {@link Issue}s.
- * 
+ *
  * @author Chairat Kongarayawetchakun - chairat [AT] nightlabs [DOT] de
  */
 public class IssueDAO extends BaseJDOObjectDAO<IssueID, Issue>{
@@ -38,7 +37,6 @@ public class IssueDAO extends BaseJDOObjectDAO<IssueID, Issue>{
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	/**
 	 * {@inheritDoc}
 	 */
@@ -80,7 +78,7 @@ public class IssueDAO extends BaseJDOObjectDAO<IssueID, Issue>{
 			throw new RuntimeException(e);
 		}
 	}
-	
+
 	public synchronized void deleteIssue(IssueID issueID, ProgressMonitor monitor) {
 		monitor.beginTask("Deleting issue: "+ issueID, 3);
 		try {
@@ -93,12 +91,12 @@ public class IssueDAO extends BaseJDOObjectDAO<IssueID, Issue>{
 			throw new RuntimeException("Error while deleting Issue!\n" ,e);
 		}
 	}
-	
+
 	/**
 	 * Get a single issue.
 	 * @param issueID The ID of the issue to get
 	 * @param fetchGroups Wich fetch groups to use
-	 * @param maxFetchDepth Fetch depth or {@link NLJDOHelper#MAX_FETCH_DEPTH_NO_LIMIT} 
+	 * @param maxFetchDepth Fetch depth or {@link NLJDOHelper#MAX_FETCH_DEPTH_NO_LIMIT}
 	 * @param monitor The progress monitor for this action. For every downloaded
 	 * 					object, <code>monitor.worked(1)</code> will be called.
 	 * @return The requested issue object
@@ -111,7 +109,7 @@ public class IssueDAO extends BaseJDOObjectDAO<IssueID, Issue>{
 		return issue;
 	}
 
-	public synchronized List<Issue> getIssues(Set<IssueID> issueIDs, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) 
+	public synchronized List<Issue> getIssues(Set<IssueID> issueIDs, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
 		return getJDOObjects(null, issueIDs, fetchGroups, maxFetchDepth, monitor);
 	}
@@ -119,13 +117,12 @@ public class IssueDAO extends BaseJDOObjectDAO<IssueID, Issue>{
 	/**
 	 * Get all issues.
 	 * @param fetchGroups Wich fetch groups to use
-	 * @param maxFetchDepth Fetch depth or {@link NLJDOHelper#MAX_FETCH_DEPTH_NO_LIMIT} 
+	 * @param maxFetchDepth Fetch depth or {@link NLJDOHelper#MAX_FETCH_DEPTH_NO_LIMIT}
 	 * @param monitor The progress monitor for this action. For every downloaded
 	 * 					object, <code>monitor.worked(1)</code> will be called.
 	 * @return The issues.
 	 */
-	@SuppressWarnings("unchecked")
-	public synchronized Collection<Issue> getIssues(String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) 
+	public synchronized Collection<Issue> getIssues(String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
 		monitor.beginTask("Loading issues", 1);
 		try {
@@ -137,15 +134,14 @@ public class IssueDAO extends BaseJDOObjectDAO<IssueID, Issue>{
 			throw new RuntimeException(e);
 		}
 	}
-	
-	@SuppressWarnings("unchecked")
+
 	public List<Issue> getIssuesForQueries(QueryCollection<? extends IssueQuery> queries,
 		String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
 		try {
 			IssueManagerRemote im = JFireEjb3Factory.getRemoteBean(IssueManagerRemote.class, SecurityReflector.getInitialContextProperties());
 			Set<IssueID> issueIDs = im.getIssueIDs(queries);
-			return getJDOObjects(null, issueIDs, fetchGroups, maxFetchDepth, monitor);			
+			return getJDOObjects(null, issueIDs, fetchGroups, maxFetchDepth, monitor);
 		} catch (Exception x) {
 			throw new RuntimeException(x);
 		}
@@ -160,7 +156,7 @@ public class IssueDAO extends BaseJDOObjectDAO<IssueID, Issue>{
 		try {
 			IssueManagerRemote im = JFireEjb3Factory.getRemoteBean(IssueManagerRemote.class, SecurityReflector.getInitialContextProperties());
 			monitor.worked(1);
-			
+
 			Issue result = im.signalIssue(issueID, jbpmTransitionName, get, fetchGroups, maxFetchDepth);
 			if (result != null)
 				getCache().put(null, result, fetchGroups, maxFetchDepth);

@@ -1,8 +1,0 @@
-<!DOCTYPE organisation-initialisation
-		PUBLIC "-//NightLabs GmbH//DTD Organisation Initialisation 1.0//EN"
-		"http://www.nightlabs.de/dtd/organisation-init_1_0.dtd">
-<organisation-initialisation>
-	<init bean="jfire/ejb/JFireVoucher/VoucherManager" method="initialise">
-		<depends module="JFireTrade.ear"/>
-	</init>
-</organisation-initialisation>

@@ -17,6 +17,6 @@
 	<classpathentry kind="lib" path="/JFireJbpm/lib/jbpm/jbpm-3.1.4.jar" sourcepath="/JFireJbpm/lib/jbpm/jbpm-3.1.4.zip"/>
 	<classpathentry kind="lib" path="/target-jee-jfire-jboss-libs/src/jboss-server/deploy/rhino_js.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.module.container"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jre6"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

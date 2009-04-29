@@ -144,7 +144,6 @@ import org.nightlabs.version.Version;
 @TransactionAttribute(TransactionAttributeType.REQUIRED)
 @TransactionManagement(TransactionManagementType.CONTAINER)
 @Stateless
-
 public class SimpleTradeManagerBean
 extends BaseSessionBeanImpl
 implements SimpleTradeManagerRemote
@@ -160,7 +159,6 @@ implements SimpleTradeManagerRemote
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("_System_")
-
 	public void initialise()
 	throws CannotPublishProductTypeException
 	{
@@ -245,7 +243,6 @@ implements SimpleTradeManagerRemote
 	 * @ejb.permission role-name="org.nightlabs.jfire.store.seeProductType"
 	 */
 	@RolesAllowed("org.nightlabs.jfire.store.seeProductType")
-
 	public Set<ProductTypeID> getChildSimpleProductTypeIDs(ProductTypeID parentSimpleProductTypeID) {
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -304,9 +301,8 @@ implements SimpleTradeManagerRemote
 	/* (non-Javadoc)
 	 * @see org.nightlabs.jfire.simpletrade.SimpleTradeManagerRemote#storeProductType(org.nightlabs.jfire.simpletrade.store.SimpleProductType, boolean, java.lang.String[], int)
 	 */
-@TransactionAttribute(TransactionAttributeType.REQUIRED)
-@RolesAllowed("org.nightlabs.jfire.store.editUnconfirmedProductType")
-
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("org.nightlabs.jfire.store.editUnconfirmedProductType")
 	public SimpleProductType storeProductType(SimpleProductType productType, boolean get, String[] fetchGroups, int maxFetchDepth)
 	throws PriceCalculationException
 	{
@@ -500,7 +496,6 @@ implements SimpleTradeManagerRemote
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("org.nightlabs.jfire.store.seeProductType")
-
 	public Map<ProductTypeID, PropertySet> getSimpleProductTypesPropertySets(
 			Set<ProductTypeID> simpleProductTypeIDs,
 			Set<StructFieldID> structFieldIDs,
@@ -540,14 +535,17 @@ implements SimpleTradeManagerRemote
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("org.nightlabs.jfire.accounting.queryPriceConfigurations")
-
 	public Set<PriceConfigID> getFormulaPriceConfigIDs()
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			Query q = pm.newQuery(pm.getExtent(FormulaPriceConfig.class, false));
 			q.setResult("JDOHelper.getObjectId(this)");
-			return new HashSet<PriceConfigID>((Collection<? extends PriceConfigID>) q.execute());
+
+			@SuppressWarnings("unchecked")
+			Collection<? extends PriceConfigID> c = (Collection<? extends PriceConfigID>) q.execute();
+
+			return new HashSet<PriceConfigID>(c);
 		} finally {
 			pm.close();
 		}
@@ -560,7 +558,6 @@ implements SimpleTradeManagerRemote
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("org.nightlabs.jfire.accounting.queryPriceConfigurations")
-
 	public List<FormulaPriceConfig> getFormulaPriceConfigs(Collection<PriceConfigID> formulaPriceConfigIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -583,7 +580,6 @@ implements SimpleTradeManagerRemote
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("org.nightlabs.jfire.trade.editOffer")
-
 	public Collection<? extends Article> createArticles(
 			SegmentID segmentID,
 			OfferID offerID,
@@ -681,7 +677,6 @@ implements SimpleTradeManagerRemote
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("org.nightlabs.jfire.trade.editOffer")
-
 	public Collection<? extends Article> createArticles(
 			SegmentID segmentID,
 			OfferID offerID,
@@ -847,7 +842,6 @@ implements SimpleTradeManagerRemote
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@RolesAllowed("_Guest_")
-
 	public Set<ProductTypeID> getPublishedSimpleProductTypeIDs()
 	{
 		if (!userIsOrganisation()) // noone else needs this method - at least at the moment.
@@ -872,7 +866,6 @@ implements SimpleTradeManagerRemote
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@RolesAllowed("_Guest_")
-
 	public List<SimpleProductType> getSimpleProductTypesForReseller(Collection<ProductTypeID> productTypeIDs)
 	{
 		if (!userIsOrganisation()) // noone else needs this method - at least at the moment.
@@ -954,7 +947,6 @@ implements SimpleTradeManagerRemote
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("org.nightlabs.jfire.store.editUnconfirmedProductType")
-
 	public void importSimpleProductTypesForReselling(String emitterOrganisationID)
 	throws JFireException
 	{
@@ -1036,8 +1028,7 @@ implements SimpleTradeManagerRemote
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="org.nightlabs.jfire.trade.sellProductType, org.nightlabs.jfire.accounting.queryPriceConfigurations"
 	 */
-@RolesAllowed({"org.nightlabs.jfire.trade.sellProductType", "org.nightlabs.jfire.accounting.queryPriceConfigurations"})
-
+	@RolesAllowed({"org.nightlabs.jfire.trade.sellProductType", "org.nightlabs.jfire.accounting.queryPriceConfigurations"})
 	public Collection<TariffPricePair> getTariffPricePairs(
 			ProductTypeID productTypeID, CustomerGroupID customerGroupID, CurrencyID currencyID,
 			String[] tariffFetchGroups, String[] priceFetchGroups
@@ -1116,7 +1107,6 @@ implements SimpleTradeManagerRemote
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("org.nightlabs.jfire.accounting.editPriceConfiguration")
-
 	public Collection<GridPriceConfig> storePriceConfigs(Collection<GridPriceConfig> priceConfigs, boolean get, AssignInnerPriceConfigCommand assignInnerPriceConfigCommand)
 	throws PriceCalculationException
 	{
@@ -1143,7 +1133,6 @@ implements SimpleTradeManagerRemote
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("org.nightlabs.jfire.store.editUnconfirmedProductType")
-
 	public Collection<OrganisationID> getCandidateOrganisationIDsForCrossTrade()
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -1152,7 +1141,11 @@ implements SimpleTradeManagerRemote
 
 			Query q = pm.newQuery(Organisation.class);
 			q.setResult("JDOHelper.getObjectId(this)");
-			for (OrganisationID organisationID : (Collection<OrganisationID>)q.execute()) {
+
+			@SuppressWarnings("unchecked")
+			Collection<OrganisationID> organisationIDs = (Collection<OrganisationID>) q.execute();
+
+			for (OrganisationID organisationID : organisationIDs) {
 				if (getOrganisationID().equals(organisationID.organisationID))
 					continue;
 
@@ -1174,7 +1167,6 @@ implements SimpleTradeManagerRemote
 	 */
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	@RolesAllowed("_Guest_")
-
 	@Override
 	public String ping(String message) {
 		return super.ping(message);

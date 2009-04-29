@@ -147,7 +147,7 @@ import org.nightlabs.util.CollectionUtil;
 @Stateless
 public class AccountingManagerBean
 extends BaseSessionBeanImpl
-implements AccountingManagerRemote
+implements AccountingManagerRemote, AccountingManagerLocal
 {
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger = Logger.getLogger(AccountingManagerBean.class);

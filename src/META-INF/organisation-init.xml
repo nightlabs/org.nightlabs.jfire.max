@@ -4,13 +4,8 @@
 <organisation-initialisation>
 
 	<init bean="org.nightlabs.jfire.simpletrade.SimpleTradeManagerRemote" method="initialise">
-			<depends module="JFireTradeEAR.ear" />
-
-<!--
-		<depends
-					module="JFireTradeEAR.ear"
-					archive="JFireTrade.jar" />
--->
+			<depends module="JFireTradeEAR.ear" 
+					 archive="JFireTrade.jar"/>
 	</init>
 
 </organisation-initialisation>

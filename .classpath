@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireBaseBean"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireServerManager"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireJbpm"/>
@@ -18,5 +17,7 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/org.nightlabs.query"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.nightlabs.query.jdo"/>
 	<classpathentry kind="lib" path="/JFireJbpm/lib/jbpm/jbpm-3.1.4.jar" sourcepath="/JFireJbpm/lib/jbpm/jbpm-3.1.4.zip"/>
+	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.module.container"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jre6"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

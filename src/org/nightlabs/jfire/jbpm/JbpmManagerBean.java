@@ -42,6 +42,7 @@ import org.nightlabs.jfire.jbpm.graph.def.id.StateDefinitionID;
 import org.nightlabs.jfire.jbpm.graph.def.id.StateID;
 import org.nightlabs.jfire.jbpm.graph.def.id.TransitionID;
 import org.nightlabs.jfire.jbpm.query.StatableQuery;
+import org.nightlabs.jfire.server.data.dir.JFireServerDataDirectory;
 import org.nightlabs.jfire.servermanager.JFireServerManager;
 import org.nightlabs.jfire.servermanager.config.JFireServerConfigModule;
 import org.nightlabs.jfire.servermanager.deploy.DeployOverwriteBehaviour;
@@ -143,10 +144,10 @@ implements JbpmManagerRemote
 
 
 					// perform deployment
-					File jfireJbpmEarDirectory;
+					File jfireJbpmTemplateDirectory;
 
 					JFireServerConfigModule cfmod = jfireServerManager.getJFireServerConfigModule();
-					jfireJbpmEarDirectory = new File(cfmod.getJ2ee().getJ2eeDeployBaseDirectory(), "JFireJbpm.ear");
+					jfireJbpmTemplateDirectory = new File(new File(JFireServerDataDirectory.getJFireServerDataDirFile(), "template"), "jbpm");
 
 					// the ehcache.xml seems to be global in all cases :-( as I didn't find how to specify its name somewhere - this is solved, right? ehcache-config is created per organisation now?!
 					List<DeploymentJarItem> deploymentJarItems = new LinkedList<DeploymentJarItem>();
@@ -166,13 +167,13 @@ implements JbpmManagerRemote
 					deploymentJarItems.add(
 							new DeploymentJarItem(
 									new File(JbpmLookup.getEhCacheConfigFileName(getOrganisationID())),
-									new File(jfireJbpmEarDirectory, "ehcache.template.xml"),
+									new File(jfireJbpmTemplateDirectory, "ehcache.template.xml"),
 									null));
 
 					deploymentJarItems.add(
 							new DeploymentJarItem(
 									new File(JbpmLookup.getJbpmConfigFileName(getOrganisationID())),
-									new File(jfireJbpmEarDirectory, "jbpm.cfg.template.xml"),
+									new File(jfireJbpmTemplateDirectory, "jbpm.cfg.template.xml"),
 									null));
 
 
@@ -184,13 +185,13 @@ implements JbpmManagerRemote
 					File tmpFolder = IOUtil.createUniqueIncrementalFolder(
 							IOUtil.getTempDir(), "jBPM-hibernate-" + Base36Coder.sharedInstance(false).encode(System.currentTimeMillis(), 1) + '-');
 					try {
-						File hibernateMainConfigTemplateFile = new File(jfireJbpmEarDirectory, "hibernate-cfg.template.xml");
+						File hibernateMainConfigTemplateFile = new File(jfireJbpmTemplateDirectory, "hibernate-cfg.template.xml");
 						Map<String, File> hibernateConfigTemplateIncludeFiles = new HashMap<String, File>();
 
 
 						// Create the 1st descriptor TEMPLATE (which will be processed again) for SchemaExport in the tmp dir.
 						hibernateConfigTemplateIncludeFiles.clear();
-						hibernateConfigTemplateIncludeFiles.put("DATASOURCE", new File(jfireJbpmEarDirectory, "hibernate-" + HibernateEnvironmentMode.SCHEMA_EXPORT + '-' + cfmod.getDatabase().getDatabaseDriverName_noTx() + "-cfg.template.xml.inc"));
+						hibernateConfigTemplateIncludeFiles.put("DATASOURCE", new File(jfireJbpmTemplateDirectory, "hibernate-" + HibernateEnvironmentMode.SCHEMA_EXPORT + '-' + cfmod.getDatabase().getDatabaseDriverName_noTx() + "-cfg.template.xml.inc"));
 						File hibernateConfigTemplateSchemaExport = new File(tmpFolder, "hibernate-"+ HibernateEnvironmentMode.SCHEMA_EXPORT +"-cfg.template.xml");
 						createHibernateConfigTemplate(hibernateConfigTemplateSchemaExport, hibernateMainConfigTemplateFile, hibernateConfigTemplateIncludeFiles);
 
@@ -203,7 +204,7 @@ implements JbpmManagerRemote
 
 						// Create the 2nd descriptor TEMPLATE for Runtime.
 						hibernateConfigTemplateIncludeFiles.clear();
-						hibernateConfigTemplateIncludeFiles.put("DATASOURCE", new File(jfireJbpmEarDirectory, "hibernate-" + HibernateEnvironmentMode.RUNTIME + '-' + cfmod.getDatabase().getDatabaseDriverName_xa() + "-cfg.template.xml.inc"));
+						hibernateConfigTemplateIncludeFiles.put("DATASOURCE", new File(jfireJbpmTemplateDirectory, "hibernate-" + HibernateEnvironmentMode.RUNTIME + '-' + cfmod.getDatabase().getDatabaseDriverName_xa() + "-cfg.template.xml.inc"));
 //						hibernateConfigTemplateIncludeFiles.put("DATASOURCE", new File(jfireJbpmEarDirectory, "hibernate-" + HibernateEnvironmentMode.RUNTIME + '-' + cfmod.getDatabase().getDatabaseDriverName_localTx() + "-cfg.template.xml.inc"));
 						File hibernateConfigTemplateRuntime = new File(tmpFolder, "hibernate-"+ HibernateEnvironmentMode.RUNTIME +"-cfg.template.xml");
 						createHibernateConfigTemplate(hibernateConfigTemplateRuntime, hibernateMainConfigTemplateFile, hibernateConfigTemplateIncludeFiles);

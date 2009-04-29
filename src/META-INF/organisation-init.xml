@@ -3,8 +3,7 @@
 		"http://www.nightlabs.de/dtd/organisation-init_1_0.dtd">
 <organisation-initialisation>
 	<init bean="org.nightlabs.jfire.issuetimetracking.IssueTimeTrackingManagerRemote" method="initialise">
-		<depends module="JFireBaseEAR.ear" />
-		<depends module="JFireIssueTrackingEAR.ear" 
-			archive="JFireIssueTracking.jar" />
+		<depends module="JFireBaseEAR.ear" archive="JFireBaseBean.jar"/>
+		<depends module="JFireIssueTrackingEAR.ear" archive="JFireIssueTracking.jar"/>
 	</init>
 </organisation-initialisation>

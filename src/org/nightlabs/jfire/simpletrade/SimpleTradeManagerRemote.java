@@ -8,7 +8,6 @@ import java.util.Set;
 import javax.ejb.Remote;
 import javax.jdo.PersistenceManager;
 
-import org.nightlabs.ModuleException;
 import org.nightlabs.jfire.accounting.gridpriceconfig.AssignInnerPriceConfigCommand;
 import org.nightlabs.jfire.accounting.gridpriceconfig.FormulaPriceConfig;
 import org.nightlabs.jfire.accounting.gridpriceconfig.GridPriceConfig;
@@ -68,7 +67,7 @@ public interface SimpleTradeManagerRemote {
 	Collection<? extends Article> createArticles(SegmentID segmentID,
 			OfferID offerID, Collection<ProductTypeID> productTypeIDs,
 			TariffID tariffID, String[] fetchGroups, int maxFetchDepth)
-			throws ModuleException, NotAvailableException;
+			throws NotAvailableException;
 
 	/**
 	 * @return <tt>Collection</tt> of {@link org.nightlabs.jfire.trade.Article}
@@ -77,7 +76,7 @@ public interface SimpleTradeManagerRemote {
 	Collection<? extends Article> createArticles(SegmentID segmentID,
 			OfferID offerID, ProductTypeID productTypeID, int quantity,
 			TariffID tariffID, boolean allocate, boolean allocateSynchronously,
-			String[] fetchGroups, int maxFetchDepth) throws ModuleException, NotAvailableException;
+			String[] fetchGroups, int maxFetchDepth) throws NotAvailableException;
 
 	Set<ProductTypeID> getPublishedSimpleProductTypeIDs();
 

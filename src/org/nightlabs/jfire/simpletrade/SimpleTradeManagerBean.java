@@ -53,7 +53,6 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
 import org.apache.log4j.Logger;
-import org.nightlabs.ModuleException;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
 import org.nightlabs.jfire.accounting.Price;
@@ -101,6 +100,7 @@ import org.nightlabs.jfire.simpletrade.store.prop.SimpleProductTypeStruct;
 import org.nightlabs.jfire.simpletrade.store.recurring.SimpleProductTypeRecurringTradeActionHandler;
 import org.nightlabs.jfire.store.CannotPublishProductTypeException;
 import org.nightlabs.jfire.store.NestedProductTypeLocal;
+import org.nightlabs.jfire.store.NotAvailableException;
 import org.nightlabs.jfire.store.Product;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.ProductTypeLocal;
@@ -587,7 +587,7 @@ implements SimpleTradeManagerRemote
 			TariffID tariffID,
 			String[] fetchGroups, int maxFetchDepth
 	)
-	throws ModuleException
+	throws NotAvailableException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -687,7 +687,7 @@ implements SimpleTradeManagerRemote
 			boolean allocateSynchronously,
 			String[] fetchGroups, int maxFetchDepth
 	)
-	throws ModuleException
+	throws NotAvailableException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {

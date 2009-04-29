@@ -127,7 +127,7 @@ public class ArticleSegmentGroupSet
 		}
 	}
 
-	public Collection<ArticleCarrier> addArticles(Collection<Article> articles, boolean filterExisting)
+	public Collection<ArticleCarrier> addArticles(Collection<? extends Article> articles, boolean filterExisting)
 	{
 		ArrayList<ArticleCarrier> res = new ArrayList<ArticleCarrier>(articles.size());
 		for (Article article : articles) {

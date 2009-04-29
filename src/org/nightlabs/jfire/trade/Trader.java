@@ -44,6 +44,14 @@ import java.util.Set;
 import javax.ejb.CreateException;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
 import javax.naming.NamingException;
 
 import org.apache.log4j.Logger;
@@ -98,6 +106,7 @@ import org.nightlabs.jfire.trade.id.ArticleID;
 import org.nightlabs.jfire.trade.id.OfferID;
 import org.nightlabs.jfire.trade.id.OfferLocalID;
 import org.nightlabs.jfire.trade.id.OrderID;
+import org.nightlabs.jfire.trade.id.TraderID;
 import org.nightlabs.jfire.trade.jbpm.ActionHandlerAcceptOffer;
 import org.nightlabs.jfire.trade.jbpm.ActionHandlerFinalizeOffer;
 import org.nightlabs.jfire.trade.jbpm.JbpmConstantsOffer;
@@ -106,16 +115,6 @@ import org.nightlabs.jfire.trade.jbpm.id.ProcessDefinitionAssignmentID;
 import org.nightlabs.jfire.workstation.Workstation;
 import org.nightlabs.jfire.workstation.WorkstationResolveStrategy;
 import org.nightlabs.l10n.NumberFormatter;
-
-import javax.jdo.annotations.Inheritance;
-import javax.jdo.annotations.PrimaryKey;
-import javax.jdo.annotations.PersistenceModifier;
-import javax.jdo.annotations.PersistenceCapable;
-import org.nightlabs.jfire.trade.id.TraderID;
-import javax.jdo.annotations.Persistent;
-import javax.jdo.annotations.InheritanceStrategy;
-import javax.jdo.annotations.Column;
-import javax.jdo.annotations.IdentityType;
 
 /**
  * Trader is responsible for purchase and sale. It manages orders, offers and
@@ -748,10 +747,10 @@ public class Trader
 	 * @param productTypes
 	 *          Instances of {@link ProductType}.
 	 */
-	public Collection<? extends Article>  createArticles(User user, Offer offer, Segment segment,
-			Collection<ProductType> productTypes, ArticleCreator articleCreator)
-			throws ModuleException
-			{
+	public Collection<? extends Article> createArticles(User user, Offer offer, Segment segment,
+			Collection<ProductType> productTypes, ArticleCreator articleCreator
+	)
+	{
 		if (!segment.getOrder().equals(offer.getOrder()))
 			throw new IllegalArgumentException("segment.order != offer.order :: " + segment.getOrder().getPrimaryKey() + " != " + offer.getOrder().getPrimaryKey());
 
@@ -781,7 +780,7 @@ public class Trader
 		setOfferExpiry(offer);
 
 		return articles;
-			}
+	}
 
 	/**
 	 * This method creates an <tt>Article</tt> with a specific <tt>Product</tt>.

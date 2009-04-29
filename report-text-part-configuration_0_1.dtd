@@ -31,7 +31,7 @@
 <!ELEMENT reportTextPart ( name*, content+ ) >
 <!ATTLIST reportTextPart 
 	id NMTOKEN #REQUIRED
-	type  #REQUIRED
+	type CDATA #REQUIRED
 >
 
 <!-- 
@@ -50,5 +50,5 @@
 Some content, either javascript or html  
 	]]></content>
 -->
-<!ELEMENT content ( #CDATA ) >
+<!ELEMENT content (#PCDATA) >
 <!ATTLIST content language NMTOKEN #REQUIRED >

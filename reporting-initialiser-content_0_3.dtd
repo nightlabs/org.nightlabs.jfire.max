@@ -129,7 +129,7 @@
 	id NMTOKEN #REQUIRED
 	organisationID NMTOKEN #REQUIRED
 	categoryID NMTOKEN #REQUIRED
-	valueProviderID NMTOKEN #REQUIRED
+	valueProviderID CDATA #REQUIRED
 	pageIndex NMTOKEN #IMPLIED
 	pageRow NMTOKEN #IMPLIED
 	pageColumn NMTOKEN #IMPLIED
@@ -139,7 +139,8 @@
 	x NMTOKEN #IMPLIED
 	y NMTOKEN #IMPLIED
 >
-
+ <!-- valueProviderID was NMTOKEN, but doesn't include '<' which is used in the content.xml of JFireReportingTrade (marius) -->
+ 
 <!--
   the <message> element is used like the <name> element to define
   the message of a <value-provider-config>

@@ -1,0 +1,26 @@
+<!DOCTYPE organisation-initialisation
+		PUBLIC "-//NightLabs GmbH//DTD Organisation Initialisation 1.0//EN"
+		"http://www.nightlabs.de/dtd/organisation-init_1_0.dtd">
+<organisation-initialisation>
+	<init bean="org.nightlabs.jfire.accounting.AccountingManagerRemote" method="initialise">
+		<depends module="JFireJbpmEAR.ear"/>
+		<depends module="JFireBaseEAR.ear"
+			archive="JFireBaseBean.jar"/>
+	</init>
+	<init bean="org.nightlabs.jfire.store.StoreManagerRemote" method="initialise">
+		<depends module="JFireJbpmEAR.ear"/>
+		<depends module="JFireBaseEAR.ear"
+			archive="JFireBaseBean.jar"/>
+	</init>
+	<init bean="org.nightlabs.jfire.trade.TradeManagerRemote" method="initialise">
+		<depends module="JFireJbpmEAR.ear"/>
+		<depends module="JFireBaseEAR.ear"
+			archive="JFireBaseBean.jar"/>
+	</init>
+	<init bean="org.nightlabs.jfire.trade.recurring.RecurringTradeManagerRemote" method="initialise">
+		<depends module="JFireTradeEAR.ear"
+			archive="JFireTrade.jar"
+			bean="org.nightlabs.jfire.trade.TradeManagerRemote"
+			method="initialise" />
+	</init>
+</organisation-initialisation>

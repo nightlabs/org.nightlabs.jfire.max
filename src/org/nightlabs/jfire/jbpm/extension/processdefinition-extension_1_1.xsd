@@ -73,6 +73,20 @@
 	
 	<xsd:complexType name="Icon" mixed="false">
 		<xsd:attribute name="file" type="xsd:string" use="required" />
+		<xsd:attribute name="size" use="optional"> <!-- Only temporarily optional! This will soon become required! Marco. -->
+            <xsd:annotation>
+            	<xsd:documentation>The size of the image. This is currently optional, but will soon become required!</xsd:documentation>
+            </xsd:annotation>
+            <xsd:simpleType>
+				<xsd:restriction base="xsd:string">
+					<xsd:enumeration value="8x8"></xsd:enumeration>
+					<xsd:enumeration value="12x12"></xsd:enumeration>
+					<xsd:enumeration value="16x16"></xsd:enumeration>
+					<xsd:enumeration value="24x24"></xsd:enumeration>
+					<xsd:enumeration value="75x70"></xsd:enumeration>
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:attribute>
 	</xsd:complexType>
 
 	<xsd:complexType name="I18nText" mixed="true">

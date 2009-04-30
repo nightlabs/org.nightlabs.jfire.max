@@ -2,6 +2,9 @@
 <project-modules id="moduleCoreId" project-version="1.5.0">
     <wb-module deploy-name="NightLabsEditor2DEAR">
         <wb-resource deploy-path="/" source-path="/EarContent"/>
+        <dependent-module archiveName="NightLabsEditor2D.jar" deploy-path="/" handle="module:/resource/NightLabsEditor2D/NightLabsEditor2D">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>        
         <dependent-module deploy-path="/lib" handle="module:/classpath/lib/NightLabsEditor2D/dist/lib/batik-awt-util.jar">
             <dependency-type>uses</dependency-type>
         </dependent-module>

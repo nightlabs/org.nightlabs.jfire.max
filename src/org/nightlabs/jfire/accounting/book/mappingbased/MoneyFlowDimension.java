@@ -28,23 +28,33 @@ package org.nightlabs.jfire.accounting.book.mappingbased;
 
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.Queries;
 
+import org.nightlabs.jfire.accounting.book.mappingbased.id.MoneyFlowDimensionID;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.trade.Article;
 
 /**
  * Abstract Dimension for MoneyFlowMappings.
- * 
+ *
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  *
  * @jdo.persistence-capable
  *		identity-type="application"
- *		objectid-class="org.nightlabs.jfire.accounting.book.id.MoneyFlowDimensionID"
+ *		objectid-class="org.nightlabs.jfire.accounting.book.mappingbased.id.MoneyFlowDimensionID"
  *		detachable="true"
  *		table="JFireTrade_MoneyFlowDimension"
  *
  * @jdo.inheritance strategy="new-table"
- * 
+ *
  * @jdo.create-objectid-class
  *
  * @jdo.query
@@ -54,20 +64,34 @@ import org.nightlabs.jfire.trade.Article;
  *			PARAMETERS String paramMoneyFlowDimensionID
  *			import java.lang.String"
  */
+@PersistenceCapable(
+	objectIdClass=MoneyFlowDimensionID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_MoneyFlowDimension")
+@Queries(
+	@javax.jdo.annotations.Query(
+		name=MoneyFlowDimension.FETCH_GROUP_GET_MONEY_FLOW_DIMENSION,
+		value="SELECT UNIQUE this WHERE moneyFlowDimensionID == paramMoneyFlowDimensionID PARAMETERS String paramMoneyFlowDimensionID import java.lang.String")
+)
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public abstract class MoneyFlowDimension {
 
 	private static final String FETCH_GROUP_GET_MONEY_FLOW_DIMENSION = "getMoneyFlowDimension";
-	
+
 	/**
 	 * @jdo.field persistence-modifier="persistent" primary-key="true"
 	 * @jdo.column length="200"
 	 */
+	@PrimaryKey
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+	@Column(length=200)
 	private String moneyFlowDimensionID;
-	
+
 	public MoneyFlowDimension() {
 		this.moneyFlowDimensionID = getMoneyFlowDimensionID();
 	}
-	
+
 	/**
 	 * Returns the ID of this MoneyFlowDimension.
 	 */
@@ -78,12 +102,12 @@ public abstract class MoneyFlowDimension {
 	 * @param bookArticle TODO
 	 */
 	public abstract String[] getValues(ProductType productType, Article bookArticle);
-	
-	
+
+
 	/**
 	 * Returns the MoneyFlowDimension with the given organisationID and
 	 * moneyFlowDimensionID.
-	 * 
+	 *
 	 * @param pm The PersistenceManager to use.
 	 * @param organisationID The organisationID of the dimension.
 	 * @param moneyFlowDimensionID The moneyFlowDimensionID of the dimension.
@@ -93,5 +117,5 @@ public abstract class MoneyFlowDimension {
 		Query q = pm.newNamedQuery(MoneyFlowDimension.class, FETCH_GROUP_GET_MONEY_FLOW_DIMENSION);
 		return (MoneyFlowDimension)q.execute(moneyFlowDimensionID);
 	}
-	
+
 }

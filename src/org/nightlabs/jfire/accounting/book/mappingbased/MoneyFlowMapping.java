@@ -31,29 +31,41 @@ import java.util.Map;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
 
 import org.nightlabs.jfire.accounting.Account;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.book.LocalAccountantDelegate;
+import org.nightlabs.jfire.accounting.book.mappingbased.id.MoneyFlowMappingID;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.trade.ArticlePrice;
 import org.nightlabs.util.Util;
 
 /**
- * Abstract mapping to an revenue and expense accounts. This class has the productType the package-type 
+ * Abstract mapping to an revenue and expense accounts. This class has the productType the package-type
  * and a currency as matching-condition. Subclasses may add conditions on which money
  * should be transfered to the accounts of this mapping.
- * 
+ *
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
- * 
+ *
  * @jdo.persistence-capable
  *		identity-type="application"
- *		objectid-class="org.nightlabs.jfire.accounting.book.id.MoneyFlowMappingID"
+ *		objectid-class="org.nightlabs.jfire.accounting.book.mappingbased.id.MoneyFlowMappingID"
  *		detachable="true"
  *		table="JFireTrade_MoneyFlowMapping"
  *
  * @jdo.inheritance strategy="new-table"
- * 
+ *
  * @jdo.create-objectid-class
  *		field-order="organisationID, moneyFlowMappingID"
  *
@@ -67,6 +79,39 @@ import org.nightlabs.util.Util;
  *
  * @jdo.fetch-group name="MoneyFlowMapping.allDimensions" fetch-groups="default" fields="productType, currency, revenueAccount, expenseAccount, reverseRevenueAccount, reverseExpenseAccount"
  */
+@PersistenceCapable(
+	objectIdClass=MoneyFlowMappingID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_MoneyFlowMapping")
+@FetchGroups({
+	@FetchGroup(
+		name=MoneyFlowMapping.FETCH_GROUP_LOCAL_ACCOUNTANT_DELEGATE,
+		members=@Persistent(name="localAccountantDelegate")),
+	@FetchGroup(
+		name=MoneyFlowMapping.FETCH_GROUP_PRODUCT_TYPE,
+		members=@Persistent(name="productType")),
+	@FetchGroup(
+		name=MoneyFlowMapping.FETCH_GROUP_CURRENCY,
+		members=@Persistent(name="currency")),
+	@FetchGroup(
+		name=MoneyFlowMapping.fETCH_GROUP_REVENUE_ACCOUNT,
+		members=@Persistent(name="revenueAccount")),
+	@FetchGroup(
+		name=MoneyFlowMapping.FETCH_GROUP_EXPENSE_ACCOUNT,
+		members=@Persistent(name="expenseAccount")),
+	@FetchGroup(
+		name=MoneyFlowMapping.FETCH_GROUP_REVERSE_REVENUE_ACCOUNT,
+		members=@Persistent(name="reverseRevenueAccount")),
+	@FetchGroup(
+		name=MoneyFlowMapping.FETCH_GROUP_REVERSE_EXPENSE_ACCOUNT,
+		members=@Persistent(name="reverseExpenseAccount")),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name=MoneyFlowMapping.FETCH_GROUP_ALL_DIMENSIONS,
+		members={@Persistent(name="productType"), @Persistent(name="currency"), @Persistent(name="revenueAccount"), @Persistent(name="expenseAccount"), @Persistent(name="reverseRevenueAccount"), @Persistent(name="reverseExpenseAccount")})
+})
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public abstract class MoneyFlowMapping implements Serializable {
 	private static final long serialVersionUID = 1L;
 	public static final String PACKAGE_TYPE_PACKAGE = "package-outer";
@@ -81,7 +126,7 @@ public abstract class MoneyFlowMapping implements Serializable {
 	public static final String FETCH_GROUP_REVERSE_EXPENSE_ACCOUNT = "MoneyFlowMapping.reverseExpenseAccount";
 
 	public static final String FETCH_GROUP_ALL_DIMENSIONS = "MoneyFlowMapping.allDimensions";
-	
+
 //	public static interface Registry {
 //		public String getOrganisationID();
 //		public int createMoneyFlowMappingID(); // String organisationID);
@@ -91,30 +136,36 @@ public abstract class MoneyFlowMapping implements Serializable {
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+@PrimaryKey
+@Column(length=100)
 	private String organisationID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 */
+	@PrimaryKey
 	private long moneyFlowMappingID;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private ProductType productType;
 
 	/**
 	 * Defines if this mapping is for the ProductType as packaged product
 	 * within another product {@link #PACKAGE_TYPE_INNER} or weather it
 	 * is for the productType as saleable product itself {@link #PACKAGE_TYPE_PACKAGE}.
-	 * 
+	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private String packageType;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Currency currency;
 
 //	/**
@@ -125,26 +176,35 @@ public abstract class MoneyFlowMapping implements Serializable {
 	/**
 	 * @jdo.field persistence-modifier="persistent" null-value="exception"
 	 */
+@Persistent(
+	nullValue=NullValue.EXCEPTION,
+	persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Account revenueAccount;
 	/**
 	 * @jdo.field persistence-modifier="persistent" null-value="exception"
 	 */
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Account expenseAccount;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Account reverseRevenueAccount;
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Account reverseExpenseAccount;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private LocalAccountantDelegate localAccountantDelegate;
-	
+
 	/**
 	 * @deprecated Only for JDO!
 	 */
@@ -155,14 +215,14 @@ public abstract class MoneyFlowMapping implements Serializable {
 		this.organisationID = organisationID;
 		this.moneyFlowMappingID = moneyFlowMappingID;
 	}
-	
+
 	/**
 	 * @return Returns the productType.
 	 */
 	public ProductType getProductType() {
 		return productType;
 	}
-	
+
 
 	/**
 	 * @param productType The productType to set.
@@ -170,7 +230,7 @@ public abstract class MoneyFlowMapping implements Serializable {
 	public void setProductType(ProductType productType) {
 		this.productType = productType;
 	}
-	
+
 
 	/**
 	 * @return Returns the productTypePK.
@@ -178,9 +238,9 @@ public abstract class MoneyFlowMapping implements Serializable {
 	public String getProductTypePK() {
 		return productType.getPrimaryKey();
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @return The packageType
 	 */
 	public String getPackageType() {
@@ -194,12 +254,12 @@ public abstract class MoneyFlowMapping implements Serializable {
 	public void setPackageType(String packageType) {
 		this.packageType = packageType;
 	}
-	
+
 	public Currency getCurrency() {
 		return currency;
-		
+
 	}
-	
+
 	public String getCurrencyID() {
 		return currency != null ? currency.getCurrencyID() : null;
 	}
@@ -207,8 +267,8 @@ public abstract class MoneyFlowMapping implements Serializable {
 	public void setCurrency(Currency currency) {
 		this.currency = currency;
 	}
-	
-	
+
+
 //	/**
 //	 * @return Returns the account.
 //	 */
@@ -232,7 +292,7 @@ public abstract class MoneyFlowMapping implements Serializable {
 
 	/**
 	 * @return The Account money should be transfered to when the ProductType of this mapping is sold.
-	 */	
+	 */
 	public Account getRevenueAccount()
 	{
 		return revenueAccount;
@@ -244,10 +304,10 @@ public abstract class MoneyFlowMapping implements Serializable {
 //	public String getRevenueAccountPK() {
 //		return revenueAccount == null ? null : revenueAccount.getPrimaryKey();
 //	}
-	
+
 	/**
 	 * @return The Account money should be transfered from when the ProductType of this mapping is purchased.
-	 */	
+	 */
 	public Account getExpenseAccount()
 	{
 		return expenseAccount;
@@ -310,7 +370,7 @@ public abstract class MoneyFlowMapping implements Serializable {
 			LocalAccountantDelegate localAccountantDelegate) {
 		this.localAccountantDelegate = localAccountantDelegate;
 	}
-	
+
 	/**
 	 * Get an unique key for identifying this mapping, but for the given
 	 * ProductType. This can be used to simulate that a mapping was
@@ -321,21 +381,21 @@ public abstract class MoneyFlowMapping implements Serializable {
 	public String simulateMappingKeyForProductType(ProductType productType) {
 		return getMappingKey(productType.getPrimaryKey(), packageType, getCurrencyID())+"/"+getMappingConditionKey(productType);
 	}
-	
+
 	protected String simulateMappingKeyPartForProductType(ProductType productType) {
 		return getMappingKey(productType.getPrimaryKey(), packageType, getCurrencyID())+"/";
 	}
-	
+
 	/**
 	 * Subclasses should return an unique key for the additional condition
 	 * (beside product-type, package-type and currency) that the bring
 	 * to the mapping. As an example, mappings based on price-fragments
 	 * would return the price-fragments primary key here.
-	 * 
+	 *
 	 * @return An unique key for the additional condition
 	 */
 	public abstract String getMappingConditionKey(ProductType productType);
-	
+
 	/**
 	 * Subclasses should add themselves to the given map but with a key
 	 * simulating that the mapping was made for the given ProductType
@@ -344,17 +404,17 @@ public abstract class MoneyFlowMapping implements Serializable {
 	 * for creating the simulated key.
 	 * The rest of the key should be the values of the dimensions of
 	 * the mapping for the given product-type. This is used later
-	 * to lookup a mapping for a given set of dimension values. 
-	 * 
+	 * to lookup a mapping for a given set of dimension values.
+	 *
 	 * @param productType The productType to simulate the mapping for.
 	 * @param resolvedMappings The map to add the mapping to.
 	 */
 	public abstract void addMappingsToMap(ProductType productType, Map<String, MoneyFlowMapping> resolvedMappings);
-	
+
 	/**
 	 * Get an unique key identifying a mapping.
-	 *  
-	 * @param productTypePK The productTypes primary key of the mapping. 
+	 *
+	 * @param productTypePK The productTypes primary key of the mapping.
 	 * @param packageType The package-type set for the mapping
 	 * @param currencyID The currencyID of the mapping.
 	 * @return An unique key identifying a mapping.
@@ -367,10 +427,10 @@ public abstract class MoneyFlowMapping implements Serializable {
 	{
 		return productTypePK+"/"+packageType+"/"+currencyID;
 	}
-	
+
 	/**
 	 * Return the amount of money this mapping takes from the given {@link ArticlePrice}
-	 * according to the given dimension values. 
+	 * according to the given dimension values.
 	 * An example is for example a mapping based on price-fragments that will extract and return
 	 * the amount of that price-fragment out of the {@link ArticlePrice}.
 	 * @return The amount from the given {@link ArticlePrice} this mapping is responsible for.
@@ -384,21 +444,21 @@ public abstract class MoneyFlowMapping implements Serializable {
 //		setCurrency((Currency)getPersistenceManager().getObjectById(CurrencyID.create(getCurrencyID())));
 //		validateMapping();
 //	}
-	
+
 	/**
 	 * Check and validate this mappings state/properties.
 	 */
 	public abstract void validateMapping();
-	
+
 	protected PersistenceManager getPersistenceManager() {
 		return JDOHelper.getPersistenceManager(this);
 	}
 	/**
 	 * Check if this mapping was made for the given {@link ProductType} and
 	 * the given package-type.
-	 * 
+	 *
 	 * @param productType The {@link ProductType} to check.
-	 * @param packageType The package-type to check. 
+	 * @param packageType The package-type to check.
 	 * @return Whether this mapping matches.
 	 */
 	public abstract boolean matches(ProductType productType, String packageType);

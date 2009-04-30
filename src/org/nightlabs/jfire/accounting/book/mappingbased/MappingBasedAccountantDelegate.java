@@ -60,6 +60,15 @@ import org.nightlabs.jfire.trade.OrganisationLegalEntity;
 import org.nightlabs.jfire.transfer.Anchor;
 import org.nightlabs.util.CollectionUtil;
 
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.IdentityType;
+
 /**
  * 
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
@@ -76,6 +85,19 @@ import org.nightlabs.util.CollectionUtil;
  * @jdo.fetch-group name="MappingBasedAccountantDelegate.this"
  *                  fields="moneyFlowMappings"
  */
+@PersistenceCapable(
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_PFMappingAccountantDelegate")
+@FetchGroups({
+	@FetchGroup(
+		name=MappingBasedAccountantDelegate.FETCH_GROUP_MONEY_FLOW_MAPPINGS,
+		members=@Persistent(name="moneyFlowMappings")),
+	@FetchGroup(
+		name=MappingBasedAccountantDelegate.FETCH_GROUP_THIS_MAPPING_BASED_ACCOUNTANT_DELEGATE,
+		members=@Persistent(name="moneyFlowMappings"))
+})
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class MappingBasedAccountantDelegate
 		extends LocalAccountantDelegate
 {
@@ -90,6 +112,9 @@ public class MappingBasedAccountantDelegate
 	 *            mapped-by="localAccountantDelegate"
 	 * 
 	 */
+	@Persistent(
+		mappedBy="localAccountantDelegate",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Set<MoneyFlowMapping> moneyFlowMappings;
 	private static final long serialVersionUID = 1L;
 
@@ -587,6 +612,7 @@ public class MappingBasedAccountantDelegate
 	 * 
 	 * @jdo.field persistence-modifier="none"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private Map<Invoice, Map<ResolvedMapKey, ResolvedMapEntry>> resolvedPTypeMappings = new HashMap<Invoice, Map<ResolvedMapKey, ResolvedMapEntry>>();
 
 	/**

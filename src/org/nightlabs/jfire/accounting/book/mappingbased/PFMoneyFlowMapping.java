@@ -34,6 +34,15 @@ import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.trade.ArticlePrice;
 import org.nightlabs.jfire.trade.LegalEntity;
 
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
+
 /**
  * Defines a mapping of ProductType, PriceFragmentTypes
  * and a PackageType (package-product, inner-product) to an Account.
@@ -49,6 +58,17 @@ import org.nightlabs.jfire.trade.LegalEntity;
  * @jdo.inheritance strategy="new-table"
  * @jdo.fetch-group name="MoneyFlowMapping.allDimensions" fetch-groups="default" fields="owner, priceFragmentType, sourceOrganisationID"
  */
+@PersistenceCapable(
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireTrade_PFMoneyFlowMapping")
+@FetchGroups(
+	@FetchGroup(
+		fetchGroups={"default"},
+		name="MoneyFlowMapping.allDimensions",
+		members={@Persistent(name="owner"), @Persistent(name="priceFragmentType"), @Persistent(name="sourceOrganisationID")})
+)
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class PFMoneyFlowMapping extends MoneyFlowMapping
 {
 	private static final long serialVersionUID = 1L;
@@ -74,16 +94,19 @@ public class PFMoneyFlowMapping extends MoneyFlowMapping
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private PriceFragmentType priceFragmentType;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private String sourceOrganisationID;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private LegalEntity owner;
 	
 	/**

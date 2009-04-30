@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <process-definition-extension 
-xmlns="urn:jfire.org:processdefinition-extension_1_0" 
-xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-xsi:schemaLocation="urn:jfire.org:processdefinition-extension_1_0 http://www.jfire.org/schema/processdefinition-extension_1_0.xsd"
-name="dev.jfire.org:Offer.CustomerCrossOrganisation">
+	xmlns="urn:jfire.org:processdefinition-extension_1_1"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="urn:jfire.org:processdefinition-extension_1_1 http://www.jfire.org/schema/processdefinition-extension_1_1.xsd"
+	name="dev.jfire.org:Offer.CustomerCrossOrganisation"
+>
 	<start-state name="dev.jfire.org:created">
 		<name language="de">erzeugt</name>
 		<description language="de">erzeugt</description>

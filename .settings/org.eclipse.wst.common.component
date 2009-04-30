@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project-modules id="moduleCoreId" project-version="1.5.0">
+    <wb-module deploy-name="JFireReportingEAR">
+        <wb-resource deploy-path="/" source-path="/EarContent"/>
+        <dependent-module archiveName="JFireReporting.jar" deploy-path="/" handle="module:/resource/JFireReporting/JFireReporting">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+		<dependent-module deploy-path="/birt/lib" handle="module:/classpath/lib/JFireReporting/dist/birt/lib/chartengineapi.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module deploy-path="/birt/lib" handle="module:/classpath/lib/JFireReporting/dist/birt/lib/com.ibm.icu_3.8.1.v20080530.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>        
+        <dependent-module deploy-path="/birt/lib" handle="module:/classpath/lib/JFireReporting/dist/birt/lib/commons-cli-1.0.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>        
+        <dependent-module deploy-path="/birt/lib" handle="module:/classpath/lib/JFireReporting/dist/birt/lib/coreapi.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module deploy-path="/birt/lib" handle="module:/classpath/lib/JFireReporting/dist/birt/lib/crosstabcoreapi.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>          
+        <dependent-module deploy-path="/birt/lib" handle="module:/classpath/lib/JFireReporting/dist/birt/lib/dataadapterapi.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>  
+		<dependent-module deploy-path="/birt/lib" handle="module:/classpath/lib/JFireReporting/dist/birt/lib/dataaggregationapi.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module> 
+		<dependent-module deploy-path="/birt/lib" handle="module:/classpath/lib/JFireReporting/dist/birt/lib/dataextraction.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>         
+		<dependent-module deploy-path="/birt/lib" handle="module:/classpath/lib/JFireReporting/dist/birt/lib/dteapi.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>         
+		<dependent-module deploy-path="/birt/lib" handle="module:/classpath/lib/JFireReporting/dist/birt/lib/engineapi.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>   
+		<dependent-module deploy-path="/birt/lib" handle="module:/classpath/lib/JFireReporting/dist/birt/lib/flute.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module> 
+		<dependent-module deploy-path="/birt/lib" handle="module:/classpath/lib/JFireReporting/dist/birt/lib/js.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>     
+		<dependent-module deploy-path="/birt/lib" handle="module:/classpath/lib/JFireReporting/dist/birt/lib/modelapi.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+		<dependent-module deploy-path="/birt/lib" handle="module:/classpath/lib/JFireReporting/dist/birt/lib/modelodaapi.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>      
+		<dependent-module deploy-path="/birt/lib" handle="module:/classpath/lib/JFireReporting/dist/birt/lib/oda.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>  
+		<dependent-module deploy-path="/birt/lib" handle="module:/classpath/lib/JFireReporting/dist/birt/lib/odadesignapi.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>       
+        <dependent-module deploy-path="/birt/lib" handle="module:/classpath/lib/JFireReporting/dist/birt/lib/org.apache.commons.codec_1.3.0.v20080530-1600.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module deploy-path="/birt/lib" handle="module:/classpath/lib/JFireReporting/dist/birt/lib/org.eclipse.emf.common_2.4.0.v200808251517.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>  
+        <dependent-module deploy-path="/birt/lib" handle="module:/classpath/lib/JFireReporting/dist/birt/lib/org.eclipse.emf.ecore.xmi_2.4.1.v200808251517.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>   
+		<dependent-module deploy-path="/birt/lib" handle="module:/classpath/lib/JFireReporting/dist/birt/lib/org.eclipse.emf.ecore_2.4.1.v200808251517.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>  
+		<dependent-module deploy-path="/birt/lib" handle="module:/classpath/lib/JFireReporting/dist/birt/lib/org.w3c.css.sac_1.3.0.v200805290154.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>         
+		<dependent-module deploy-path="/birt/lib" handle="module:/classpath/lib/JFireReporting/dist/birt/lib/scriptapi.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>     
+    </wb-module>
+</project-modules>

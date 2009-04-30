@@ -13,6 +13,7 @@
 	<init bean="org.nightlabs.jfire.reporting.parameter.ReportParameterManagerRemote" method="initDefaultValueProviders">
 		<depends
 			module="JFireReportingEAR.ear" 
-			archive="JFireReporting.jar" />
+			archive="JFireReporting.jar" 
+			bean="org.nightlabs.jfire.reporting.ReportManagerRemote"/>
 	</init>
 </organisation-initialisation>

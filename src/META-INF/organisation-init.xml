@@ -4,7 +4,7 @@
 <organisation-initialisation>
 
 	<init bean="org.nightlabs.jfire.dynamictrade.DynamicTradeManagerRemote" method="initialise">
-			<depends module="JFireTrade.ear" />
+			<depends module="JFireTradeEAR.ear" />
 	</init>
 
 </organisation-initialisation>

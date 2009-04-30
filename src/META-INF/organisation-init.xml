@@ -3,6 +3,6 @@
 		"http://www.nightlabs.de/dtd/organisation-init_1_0.dtd">
 <organisation-initialisation>
 	<init bean="org.nightlabs.jfire.department.DepartmentManagerRemote" method="initialise">
-		<depends module="JFireBase.ear" archive="JFireBaseBean.jar"/>
+		<depends module="JFireBaseEAR.ear" archive="JFireBaseBean.jar"/>
 	</init>
 </organisation-initialisation>

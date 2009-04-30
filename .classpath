@@ -9,6 +9,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/org.nightlabs.jfire.base"/>
 	<classpathentry kind="lib" path="lib/barbecue-1.5-beta1.jar" sourcepath="E:/Java/Lib/Barbecue/barbecue-1.5-beta1-src/barbecue-1.5-beta1/src"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.nightlabs.base"/>
-	<classpathentry kind="con" path="org.eclipse.jst.server.core.container/org.eclipse.jst.server.generic.runtimeTarget/JBoss v4.2"/>
+	<classpathentry kind="con" path="org.eclipse.jst.server.core.container/org.eclipse.jst.server.generic.runtimeTarget/JFire-JBoss v4.2"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

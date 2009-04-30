@@ -4,9 +4,9 @@
 <organisation-initialisation>
 
 	<init bean="org.nightlabs.jfire.chezfrancois.ChezFrancoisDatastoreInitialiserRemote" method="initialise">
-		<depends module="JFireSimpleTrade.ear" resolution="optional" />
-		<depends module="JFireVoucher.ear" resolution="optional" />
-		<depends module="JFireDynamicTrade.ear" resolution="optional" />
+		<depends module="JFireSimpleTradeEAR.ear" resolution="optional" />
+		<depends module="JFireVoucherEAR.ear" resolution="optional" />
+		<depends module="JFireDynamicTradeEAR.ear" resolution="optional" />
 	</init>
 
 </organisation-initialisation>

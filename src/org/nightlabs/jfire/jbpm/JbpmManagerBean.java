@@ -66,7 +66,7 @@ import org.nightlabs.util.IOUtil;
 @TransactionAttribute(TransactionAttributeType.REQUIRED)
 @TransactionManagement(TransactionManagementType.CONTAINER)
 @Stateless
-public abstract class JbpmManagerBean
+public class JbpmManagerBean
 extends BaseSessionBeanImpl
 implements JbpmManagerRemote
 {

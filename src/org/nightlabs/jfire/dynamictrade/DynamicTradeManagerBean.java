@@ -75,7 +75,7 @@ import org.nightlabs.util.Util;
 @TransactionAttribute(TransactionAttributeType.REQUIRED)
 @TransactionManagement(TransactionManagementType.CONTAINER)
 @Stateless
-public abstract class DynamicTradeManagerBean
+public class DynamicTradeManagerBean
 extends BaseSessionBeanImpl
 implements DynamicTradeManagerRemote
 {

@@ -3,7 +3,8 @@
 		"http://www.nightlabs.de/dtd/datastoreinit_1_1.dtd">
 <organisation-initialisation>
 	<init bean="org.nightlabs.jfire.reporting.trade.ReportManagerTradeRemote" method="initializeScripting">
-		<depends module="JFireReportingEAR.ear"/>
+		<depends module="JFireReportingEAR.ear"
+				 archive="JFireReporting.jar"/>
 	</init>
 
 	<init bean="org.nightlabs.jfire.reporting.trade.ReportManagerTradeRemote" method="initializeReporting">

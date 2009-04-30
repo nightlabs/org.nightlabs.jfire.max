@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Set;
 
 import javax.annotation.security.RolesAllowed;
+import javax.ejb.Remote;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 
@@ -18,6 +19,7 @@ import org.nightlabs.jfire.trade.id.SegmentTypeID;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 import org.nightlabs.version.MalformedVersionException;
 
+@Remote
 public interface RecurringTradeManagerRemote {
 
 	/**

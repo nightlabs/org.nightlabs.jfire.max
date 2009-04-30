@@ -5,7 +5,7 @@
 	<init bean="org.nightlabs.jfire.geography.GeographyManagerRemote" method="initialise"/>
 	<init bean="org.nightlabs.jfire.geography.GeographyTemplateDataManagerRemote" method="initialise">
 		<depends
-			module="JFireGeography.ear"
+			module="JFireGeographyEAR.ear"
 			archive="JFireGeography.jar"
 			bean="jfire/ejb/JFireGeography/GeographyManager"
 			method="initialise"

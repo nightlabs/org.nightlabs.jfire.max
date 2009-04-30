@@ -7,7 +7,7 @@
 		<depends
 			module="JFireGeographyEAR.ear"
 			archive="JFireGeography.jar"
-			bean="jfire/ejb/JFireGeography/GeographyManager"
+			bean="org.nightlabs.jfire.geography.GeographyManagerRemote"
 			method="initialise"
 		/>
 	</init>

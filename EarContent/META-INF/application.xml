@@ -41,6 +41,6 @@
     <ejb>lib/jai_core.jar</ejb>
   </module>
   <module>
-    <java>itext-1.4.8.jar</java>
+    <java>lib/itext-1.4.8.jar</java>
   </module>
 </application>

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<application xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:application="http://java.sun.com/xml/ns/javaee/application_5.xsd" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/application_5.xsd" id="Application_ID" version="5">
+  <display-name>NightLabs Editor2D Framework</display-name>
+  <module>
+    <java>NightLabsEditor2D.jar</java>
+  </module>
+  <module>
+    <ejb>lib/batik-awt-util.jar</ejb>
+  </module>
+  <module>
+    <ejb>lib/batik-css.jar</ejb>
+  </module>
+  <module>
+    <ejb>lib/batik-dom.jar</ejb>
+  </module>
+  <module>
+    <ejb>lib/batik-ext.jar</ejb>
+  </module>
+  <module>
+    <ejb>lib/batik-extension.jar</ejb>
+  </module>
+  <module>
+    <ejb>lib/batik-svg-dom.jar</ejb>
+  </module>
+  <module>
+    <ejb>lib/batik-svggen.jar</ejb>
+  </module>
+  <module>
+    <ejb>lib/batik-svggen.jar</ejb>
+  </module>
+  <module>
+    <ejb>lib/batik-util.jar</ejb>
+  </module>
+  <module>
+    <ejb>lib/batik-xml.jar</ejb>
+  </module>
+  <module>
+    <ejb>lib/jai_codec.jar</ejb>
+  </module>
+  <module>
+    <ejb>lib/jai_core.jar</ejb>
+  </module>
+  <module>
+    <java>itext-1.4.8.jar</java>
+  </module>
+</application>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project-modules id="moduleCoreId" project-version="1.5.0">
+    <wb-module deploy-name="NightLabsEditor2DEAR">
+        <wb-resource deploy-path="/" source-path="/EarContent"/>
+        <dependent-module deploy-path="/lib" handle="module:/classpath/lib/NightLabsEditor2D/dist/lib/batik-awt-util.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module deploy-path="/lib" handle="module:/classpath/lib/NightLabsEditor2D/dist/lib/batik-css.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module deploy-path="/lib" handle="module:/classpath/lib/NightLabsEditor2D/dist/lib/batik-dom.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module deploy-path="/lib" handle="module:/classpath/lib/NightLabsEditor2D/dist/lib/batik-ext.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module deploy-path="/lib" handle="module:/classpath/lib/NightLabsEditor2D/dist/lib/batik-extension.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module deploy-path="/lib" handle="module:/classpath/lib/NightLabsEditor2D/dist/lib/batik-svg-dom.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module deploy-path="/lib" handle="module:/classpath/lib/NightLabsEditor2D/dist/lib/batik-svggen.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module deploy-path="/lib" handle="module:/classpath/lib/NightLabsEditor2D/dist/lib/batik-util.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module deploy-path="/lib" handle="module:/classpath/lib/NightLabsEditor2D/dist/lib/batik-xml.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module deploy-path="/lib" handle="module:/classpath/lib/NightLabsEditor2D/dist/lib/itext-1.4.8.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module deploy-path="/lib" handle="module:/classpath/lib/NightLabsEditor2D/dist/lib/jai_codec.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module deploy-path="/lib" handle="module:/classpath/lib/NightLabsEditor2D/dist/lib/jai_core.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+    </wb-module>
+</project-modules>

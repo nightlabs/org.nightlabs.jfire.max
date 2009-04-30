@@ -38,7 +38,6 @@ import java.util.Locale;
 import java.util.Set;
 
 import javax.annotation.security.RolesAllowed;
-import javax.ejb.SessionBean;
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
@@ -137,9 +136,9 @@ import org.nightlabs.version.MalformedVersionException;
 @TransactionAttribute(TransactionAttributeType.REQUIRED)
 @TransactionManagement(TransactionManagementType.CONTAINER)
 @Stateless
-public abstract class TradeManagerBean
+public class TradeManagerBean
 extends BaseSessionBeanImpl
-implements SessionBean, TradeManagerRemote, TradeManagerLocal
+implements TradeManagerRemote, TradeManagerLocal
 {
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger = Logger.getLogger(TradeManagerBean.class);

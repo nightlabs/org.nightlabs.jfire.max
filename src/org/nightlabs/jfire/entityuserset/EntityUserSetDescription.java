@@ -29,21 +29,22 @@ package org.nightlabs.jfire.entityuserset;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.nightlabs.i18n.I18nText;
-
-import javax.jdo.annotations.Join;
-import javax.jdo.annotations.Persistent;
-import javax.jdo.annotations.FetchGroups;
-import javax.jdo.annotations.NullValue;
-import javax.jdo.annotations.InheritanceStrategy;
-import javax.jdo.annotations.Inheritance;
-import org.nightlabs.jfire.entityuserset.id.EntityUserSetDescriptionID;
-import javax.jdo.annotations.PrimaryKey;
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.FetchGroup;
 import javax.jdo.annotations.Column;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.FetchGroups;
 import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.Value;
+
+import org.nightlabs.i18n.I18nText;
+import org.nightlabs.jfire.entityuserset.id.EntityUserSetDescriptionID;
 
 /**
  * @author marco schulze - marco at nightlabs dot de
@@ -146,7 +147,11 @@ public class EntityUserSetDescription extends I18nText
 		nullValue=NullValue.EXCEPTION,
 		table="JFireEntityUserSet_EntityUserSetDescription_texts",
 		defaultFetchGroup="true",
-		persistenceModifier=PersistenceModifier.PERSISTENT)
+		persistenceModifier=PersistenceModifier.PERSISTENT
+	)
+	@Value(
+			columns={@Column(sqlType="CLOB")}
+	)
 	private Map<String, String> texts;
 
 	@Override

@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.nightlabs.jfire.reporting.trade;
 
@@ -32,25 +32,18 @@ public class ReportingInitialiser {
 			);
 		rootCategory.getName().setText(Locale.ENGLISH.getLanguage(), "JFire Trade Reports");
 		rootCategory.getName().setText(Locale.GERMAN.getLanguage(), "JFire Trade Berichte");
-		
-		
+
+
 		String j2eeBaseDir = jfireServerManager.getJFireServerConfigModule().getJ2ee().getJ2eeDeployBaseDirectory();
-		String reportDirSuffix = JFireReportingTradeEAR.MODULE_NAME+".ear"+File.separator+"report";
-		File reportDir = new File(j2eeBaseDir, reportDirSuffix);
-		File[] subDirs = reportDir.listFiles();
-		for (int i = 0; i < subDirs.length; i++) {
-			if (subDirs[i].isDirectory()) {
-				new org.nightlabs.jfire.reporting.ReportingInitialiser(
-						reportDirSuffix+File.separator+subDirs[i].getName(),
-						rootCategory,
-						ScriptingTradeConstants.SCRIPT_REGISTRY_ITEM_TYPE_SCRIPT_TRADE,
-						jfireServerManager,
-						pm,
-						organisationID
-					).initialise();
-			}
-		}
-		
+		File ear = new File(j2eeBaseDir, JFireReportingTradeEAR.MODULE_NAME+".ear");
+		String reportDirSuffix = "report";
+		new org.nightlabs.jfire.reporting.ReportingInitialiser(
+				ear,
+				reportDirSuffix,
+				rootCategory,
+				pm,
+				organisationID
+		).initialise();
 	}
-	
+
 }

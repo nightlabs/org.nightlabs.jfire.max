@@ -26,11 +26,6 @@
 
 package org.nightlabs.jfire.reporting.trade;
 
-import java.io.File;
-
-import org.nightlabs.ModuleException;
-import org.nightlabs.jfire.servermanager.JFireServerManager;
-import org.nightlabs.jfire.servermanager.JFireServerManagerUtil;
 
 /**
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
@@ -39,27 +34,27 @@ import org.nightlabs.jfire.servermanager.JFireServerManagerUtil;
 public class JFireReportingTradeEAR {
 
 	protected JFireReportingTradeEAR() {}
-	
-	public static final String MODULE_NAME = "JFireReportingTrade";
-	
-	public static File getEARDir()
-	throws ModuleException
-	{
-		JFireServerManager jFireServerManager;
-		try {
-			jFireServerManager = JFireServerManagerUtil.getJFireServerManager();
-		} catch (Exception e) {
-			throw new ModuleException("Could not get JFireServerManager!", e);
-		}
-		try {
-			File earDir = new File(
-					jFireServerManager.getJFireServerConfigModule()
-					.getJ2ee().getJ2eeDeployBaseDirectory()+
-					MODULE_NAME+".ear"
-				);
-			return earDir;
-		} finally {
-			jFireServerManager.close();
-		}
-	}
+
+	public static final String MODULE_NAME = JFireReportingTradeEAR.class.getSimpleName();
+
+//	public static File getEARDir()
+//	throws ModuleException
+//	{
+//		JFireServerManager jFireServerManager;
+//		try {
+//			jFireServerManager = JFireServerManagerUtil.getJFireServerManager();
+//		} catch (Exception e) {
+//			throw new ModuleException("Could not get JFireServerManager!", e);
+//		}
+//		try {
+//			File earDir = new File(
+//					jFireServerManager.getJFireServerConfigModule()
+//					.getJ2ee().getJ2eeDeployBaseDirectory()+
+//					MODULE_NAME+".ear"
+//				);
+//			return earDir;
+//		} finally {
+//			jFireServerManager.close();
+//		}
+//	}
 }

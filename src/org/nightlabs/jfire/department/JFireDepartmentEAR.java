@@ -4,5 +4,5 @@ public class JFireDepartmentEAR
 {
 	private JFireDepartmentEAR() { }
 
-	public static final String MODULE_NAME = "JFireDepartment";
+	public static final String MODULE_NAME = JFireDepartmentEAR.class.getSimpleName();
 }

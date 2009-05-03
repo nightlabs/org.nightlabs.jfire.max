@@ -3,27 +3,28 @@ package org.nightlabs.jfire.department;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.nightlabs.i18n.I18nText;
-
-import javax.jdo.annotations.Persistent;
-import javax.jdo.annotations.Join;
-import javax.jdo.annotations.FetchGroups;
-import javax.jdo.annotations.NullValue;
-import javax.jdo.annotations.InheritanceStrategy;
-import javax.jdo.annotations.Inheritance;
-import org.nightlabs.jfire.department.id.DepartmentDescriptionID;
-import javax.jdo.annotations.PrimaryKey;
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.FetchGroup;
 import javax.jdo.annotations.Column;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.FetchGroups;
 import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.Value;
+
+import org.nightlabs.i18n.I18nText;
+import org.nightlabs.jfire.department.id.DepartmentDescriptionID;
 
 /**
- * An extended class of {@link I18nText} that represents the description created in an {@link Department}. 
+ * An extended class of {@link I18nText} that represents the description created in an {@link Department}.
  * <p>
  * </p>
- * 
+ *
  * @author Chairat Kongarayawetchakun - chairat at nightlabs dot de
  *
  * @jdo.persistence-capable
@@ -36,7 +37,7 @@ import javax.jdo.annotations.PersistenceModifier;
  *
  * @jdo.create-objectid-class
  * 		field-order="organisationID, departmentID"
- * 
+ *
  * @jdo.fetch-group name="Department.description" fields="department, descriptions"
  */ @PersistenceCapable(
 	objectIdClass=DepartmentDescriptionID.class,
@@ -50,7 +51,7 @@ import javax.jdo.annotations.PersistenceModifier;
 )
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 
-public class DepartmentDescription 
+public class DepartmentDescription
 	extends I18nText
 {
 	/**
@@ -62,20 +63,20 @@ public class DepartmentDescription
 	 * This is the organisationID to which the department description belongs. Within one organisation,
 	 * all the department descriptions have their organisation's ID stored here, thus it's the same
 	 * value for all of them.
-	 * 
+	 *
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
 	@PrimaryKey
 	@Column(length=100)
 	private String organisationID;
-	
+
 	/**
 	 * @jdo.field primary-key="true"
 	 */
 	@PrimaryKey
 	private long departmentID;
-	
+
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
@@ -85,7 +86,7 @@ public class DepartmentDescription
 	/**
 	 * key: String languageID<br/>
 	 * value: String description
-	 * 
+	 *
 	 * @jdo.field
 	 *		persistence-modifier="persistent"
 	 *		default-fetch-group="true"
@@ -100,8 +101,12 @@ public class DepartmentDescription
 		nullValue=NullValue.EXCEPTION,
 		table="JFireDepartment_DepartmentDescription_descriptions",
 		defaultFetchGroup="true",
-		persistenceModifier=PersistenceModifier.PERSISTENT)
-	protected Map<String, String> descriptions = new HashMap<String, String>();
+		persistenceModifier=PersistenceModifier.PERSISTENT
+	)
+	@Value(
+			columns={@Column(sqlType="CLOB")}
+	)
+	private Map<String, String> descriptions = new HashMap<String, String>();
 
 	/**
 	 * @deprecated Only for JDO!
@@ -113,7 +118,7 @@ public class DepartmentDescription
 
 	/**
 	 * Constructs a new DepartmentDescription.
-	 * @param department the department that this department description is made in 
+	 * @param department the department that this department description is made in
 	 */
 	public DepartmentDescription(String organisationID, long departmentID, Department department)
 	{

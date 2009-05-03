@@ -93,16 +93,6 @@ implements RecurringTradeManagerRemote, RecurringTradeManagerLocal
 	private static final String RECURRING_OFFER_PROCESS_DEFINITION_NAME_VENDOR = "RecurringOffer.Vendor";
 
 	/* (non-Javadoc)
-	 * @see org.nightlabs.jfire.trade.recurring.RecurringTradeManagerRemote#ping(java.lang.String)
-	 */
-	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	@RolesAllowed("_Guest_")
-	@Override
-	public String ping(String message) {
-		return super.ping(message);
-	}
-
-	/* (non-Javadoc)
 	 * @see org.nightlabs.jfire.trade.recurring.RecurringTradeManagerRemote#initialise()
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)

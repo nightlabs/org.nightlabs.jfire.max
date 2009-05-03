@@ -30,27 +30,27 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.Value;
+
 import org.nightlabs.jdo.ObjectIDUtil;
-import org.nightlabs.jfire.accounting.Price;
 import org.nightlabs.jfire.accounting.PriceFragmentType;
+import org.nightlabs.jfire.accounting.gridpriceconfig.id.FormulaCellID;
 import org.nightlabs.jfire.accounting.id.PriceFragmentTypeID;
 import org.nightlabs.jfire.accounting.priceconfig.PriceConfig;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.util.Util;
-
-import javax.jdo.annotations.Join;
-import javax.jdo.annotations.Persistent;
-import javax.jdo.annotations.FetchGroups;
-import javax.jdo.annotations.NullValue;
-import javax.jdo.annotations.InheritanceStrategy;
-import javax.jdo.annotations.Inheritance;
-import javax.jdo.annotations.PrimaryKey;
-import javax.jdo.annotations.FetchGroup;
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.Column;
-import org.nightlabs.jfire.accounting.gridpriceconfig.id.FormulaCellID;
-import javax.jdo.annotations.IdentityType;
-import javax.jdo.annotations.PersistenceModifier;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -127,7 +127,11 @@ public class FormulaCell implements Serializable
 	@Persistent(
 		nullValue=NullValue.EXCEPTION,
 		table="JFireTrade_FormulaCell_priceFragmentFormulas",
-		persistenceModifier=PersistenceModifier.PERSISTENT)
+		persistenceModifier=PersistenceModifier.PERSISTENT
+	)
+	@Value(
+			columns={@Column(sqlType="CLOB")}
+	)
 	private Map<String, String> priceFragmentFormulas;
 
 	/**
@@ -152,7 +156,7 @@ public class FormulaCell implements Serializable
 
 	/**
 	 * @!jdo.field persistence-modifier="persistent" null-value="exception"
-	 * TODO DataNucleus workaround: the above null-value="exception" is correct but causes exceptions during cross-datastore-replication 
+	 * TODO DataNucleus workaround: the above null-value="exception" is correct but causes exceptions during cross-datastore-replication
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
@@ -212,18 +216,18 @@ public class FormulaCell implements Serializable
 		this.organisationID = priceConfig.getOrganisationID();
 //		this.priceConfigID = priceConfig.getPriceConfigID();
 //		this.formulaID = priceConfig.createPriceID();
-		
+
 		if (!IDGenerator.getOrganisationID().equals(this.organisationID))
 			throw new IllegalStateException("IDGenerator.organisationID != this.organisationID :: " + IDGenerator.getOrganisationID() + " != " + this.organisationID);
 
 		this.formulaCellID = IDGenerator.nextID(FormulaCell.class);
-		
+
 		this.priceCoordinate = null;
 		this.priceFragmentFormulas = new HashMap<String, String>();
 	}
 	public FormulaCell(PriceCoordinate priceCoordinate)
 	{
-		this.priceConfig = (FormulaPriceConfig) priceCoordinate.getPriceConfig();
+		this.priceConfig = priceCoordinate.getPriceConfig();
 
 		if (!(this.priceConfig instanceof IFormulaPriceConfig))
 			throw new IllegalArgumentException("priceCoordinate.priceConfig must be an instance of IFormulaPriceConfig but is not! " + this.priceConfig);
@@ -235,7 +239,7 @@ public class FormulaCell implements Serializable
 			throw new IllegalStateException("IDGenerator.organisationID != this.organisationID :: " + IDGenerator.getOrganisationID() + " != " + this.organisationID);
 
 		this.formulaCellID = IDGenerator.nextID(FormulaCell.class);
-		
+
 		this.priceCoordinate = priceCoordinate;
 		this.priceFragmentFormulas = new HashMap<String, String>();
 	}
@@ -260,11 +264,11 @@ public class FormulaCell implements Serializable
 //	{
 //		return formulaID;
 //	}
-	
+
 	public long getFormulaCellID() {
 		return formulaCellID;
 	}
-	
+
 	/**
 	 * @return Returns the priceConfig.
 	 */
@@ -323,7 +327,7 @@ public class FormulaCell implements Serializable
 
 		if (priceFragmentTypeID == null)
 			throw new NullPointerException("priceFragmentTypeID");
-		
+
 		String priceFragmentTypePK = PriceFragmentType.getPrimaryKey(priceFragmentTypeOrganisationID, priceFragmentTypeID);
 
 		if (formula == null || "".equals(formula))

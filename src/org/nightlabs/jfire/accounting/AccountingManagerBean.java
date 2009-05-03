@@ -2022,13 +2022,4 @@ implements AccountingManagerRemote, AccountingManagerLocal
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.nightlabs.jfire.accounting.AccountingManagerRemote#ping(java.lang.String)
-	 */
-	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	@RolesAllowed("_Guest_")
-	@Override
-	public String ping(String message) {
-		return super.ping(message);
-	}
 }

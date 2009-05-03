@@ -2106,15 +2106,5 @@ implements TradeManagerRemote, TradeManagerLocal
 			pm.close();
 		}
 	}
-
-	/* (non-Javadoc)
-	 * @see org.nightlabs.jfire.trade.TradeManagerRemote#ping(java.lang.String)
-	 */
-	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	@RolesAllowed("_Guest_")
-	@Override
-	public String ping(String message) {
-		return super.ping(message);
-	}
 }
 

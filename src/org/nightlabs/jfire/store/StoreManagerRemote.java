@@ -5,14 +5,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import javax.annotation.security.RolesAllowed;
 import javax.ejb.Remote;
-import javax.ejb.TransactionAttribute;
-import javax.ejb.TransactionAttributeType;
 import javax.jdo.FetchPlan;
 import javax.jdo.PersistenceManager;
 
-import org.nightlabs.ModuleException;
 import org.nightlabs.jdo.query.AbstractJDOQuery;
 import org.nightlabs.jdo.query.QueryCollection;
 import org.nightlabs.jfire.accounting.Accounting;
@@ -61,13 +57,7 @@ public interface StoreManagerRemote {
 	 * @throws Exception While loading an icon from a local resource, an {@link IOException} might happen; in
 	 *	{@link #initTimerTaskCalculateProductTypeAvailabilityPercentage(PersistenceManager)} timepattern-related
 	 *	exceptions might occur; and we don't care in the initialise method.
-	 *
-	 * @ejb.interface-method
-	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="_System_"
 	 */
-	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	@RolesAllowed("_System_")
 	void initialise() throws Exception;
 
 	/**
@@ -75,12 +65,7 @@ public interface StoreManagerRemote {
 	 * <p>
 	 * This method can be called by everyone, because the object-ids are not confidential.
 	 * </p>
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
-	@RolesAllowed("_Guest_")
 	Set<UnitID> getUnitIDs();
 
 	/**
@@ -88,94 +73,34 @@ public interface StoreManagerRemote {
 	 * <p>
 	 * This method can be called by everyone, because {@link Unit}s are not confidential.
 	 * </p>
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
-	@RolesAllowed("_Guest_")
-	List<Unit> getUnits(Collection<UnitID> unitIDs, String[] fetchGroups,
-			int maxFetchDepth);
+	List<Unit> getUnits(Collection<UnitID> unitIDs, String[] fetchGroups, int maxFetchDepth);
 
 	/**
 	 * Get the {@link DeliveryNote}s for the specified object-ids.
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="org.nightlabs.jfire.store.queryDeliveryNotes"
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
-	@RolesAllowed("org.nightlabs.jfire.store.queryDeliveryNotes")
-	List<DeliveryNote> getDeliveryNotes(Set<DeliveryNoteID> deliveryNoteIDs,
-			String[] fetchGroups, int maxFetchDepth);
+	List<DeliveryNote> getDeliveryNotes(Set<DeliveryNoteID> deliveryNoteIDs, String[] fetchGroups, int maxFetchDepth);
 
 	/**
 	 * Get the {@link DeliveryNote}s' object-ids that match the criteria specified by the given queries.
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="org.nightlabs.jfire.store.queryDeliveryNotes"
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
-	@RolesAllowed("org.nightlabs.jfire.store.queryDeliveryNotes")
-	@SuppressWarnings("unchecked")
-	Set<DeliveryNoteID> getDeliveryNoteIDs(
-			QueryCollection<? extends AbstractJDOQuery> queries);
+	Set<DeliveryNoteID> getDeliveryNoteIDs(QueryCollection<? extends AbstractJDOQuery> queries);
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="org.nightlabs.jfire.store.seeProductType"
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 */
-	@RolesAllowed("org.nightlabs.jfire.store.seeProductType")
-	List<ProductType> getProductTypes(Set<ProductTypeID> productTypeIDs,
-			String[] fetchGroups, int maxFetchDepth);
+	List<ProductType> getProductTypes(Set<ProductTypeID> productTypeIDs, String[] fetchGroups, int maxFetchDepth);
 
-	/**
-	 * @throws CannotPublishProductTypeException
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="org.nightlabs.jfire.store.editUnconfirmedProductType, org.nightlabs.jfire.store.editConfirmedProductType"
-	 * @ejb.transaction type="Required"
-	 */
-	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	@RolesAllowed( { "org.nightlabs.jfire.store.editUnconfirmedProductType",
-			"org.nightlabs.jfire.store.editConfirmedProductType" })
 	ProductTypeStatusHistoryItem setProductTypeStatus_published(
 			ProductTypeID productTypeID, boolean get, String[] fetchGroups,
 			int maxFetchDepth) throws CannotPublishProductTypeException;
 
-	/**
-	 * @throws CannotConfirmProductTypeException
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="org.nightlabs.jfire.store.editUnconfirmedProductType, org.nightlabs.jfire.store.editConfirmedProductType"
-	 * @ejb.transaction type="Required"
-	 */
-	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	@RolesAllowed( { "org.nightlabs.jfire.store.editUnconfirmedProductType",
-			"org.nightlabs.jfire.store.editConfirmedProductType" })
 	ProductTypeStatusHistoryItem setProductTypeStatus_confirmed(
 			ProductTypeID productTypeID, boolean get, String[] fetchGroups,
 			int maxFetchDepth) throws CannotConfirmProductTypeException;
 
-	/**
-	 * @throws CannotMakeProductTypeSaleableException
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="org.nightlabs.jfire.store.editUnconfirmedProductType, org.nightlabs.jfire.store.editConfirmedProductType"
-	 * @ejb.transaction type="Required"
-	 */
-	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	@RolesAllowed( { "org.nightlabs.jfire.store.editUnconfirmedProductType",
-			"org.nightlabs.jfire.store.editConfirmedProductType" })
 	ProductTypeStatusHistoryItem setProductTypeStatus_saleable(
 			ProductTypeID productTypeID, boolean saleable, boolean get,
 			String[] fetchGroups, int maxFetchDepth)
 			throws CannotMakeProductTypeSaleableException;
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="org.nightlabs.jfire.store.editConfirmedProductType"
-	 * @ejb.transaction type="Required"
-	 */
-	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	@RolesAllowed("org.nightlabs.jfire.store.editConfirmedProductType")
 	ProductTypeStatusHistoryItem setProductTypeStatus_closed(
 			ProductTypeID productTypeID, boolean get, String[] fetchGroups,
 			int maxFetchDepth);
@@ -193,13 +118,7 @@ public interface StoreManagerRemote {
 	 * 		If this is <code>true</code> the flavours available found for the given product-types and customer-groups will also be filtered by the
 	 * 		intersection of the entries configured in the {@link ModeOfDeliveryConfigModule} for the current user and the
 	 * 		workstation he is currently loggen on.
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Required"
 	 */
-	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	@RolesAllowed("_Guest_")
 	ModeOfDeliveryFlavourProductTypeGroupCarrier getModeOfDeliveryFlavourProductTypeGroupCarrier(
 			Collection<ProductTypeID> productTypeIDs,
 			Collection<CustomerGroupID> customerGroupIDs, byte mergeMode,
@@ -211,12 +130,7 @@ public interface StoreManagerRemote {
 	 * This method can be called by everyone, because modes of delivery are not considered confidential.
 	 * </p>
 	 * @param fetchGroups Either <tt>null</tt> or all desired fetch groups.
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
-	@RolesAllowed("_Guest_")
 	Collection<ModeOfDelivery> getModeOfDeliverys(
 			Set<ModeOfDeliveryID> modeOfDeliveryIDs, String[] fetchGroups,
 			int maxFetchDepth);
@@ -226,12 +140,7 @@ public interface StoreManagerRemote {
 	 * <p>
 	 * This method can be called by everyone, because the returned object-ids are not confidential.
 	 * </p>
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
-	@RolesAllowed("_Guest_")
 	Set<ModeOfDeliveryFlavourID> getAllModeOfDeliveryFlavourIDs();
 
 	/**
@@ -239,12 +148,7 @@ public interface StoreManagerRemote {
 	 * <p>
 	 * This method can be called by everyone, because the returned object-ids are not confidential.
 	 * </p>
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
-	@RolesAllowed("_Guest_")
 	Set<ModeOfDeliveryID> getAllModeOfDeliveryIDs();
 
 	/**
@@ -253,12 +157,7 @@ public interface StoreManagerRemote {
 	 * This method can be called by everyone, because mode of delivery flavours are not considered confidential.
 	 * </p>
 	 * @param fetchGroups Either <tt>null</tt> or all desired fetch groups.
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
-	@RolesAllowed("_Guest_")
 	Collection<ModeOfDeliveryFlavour> getModeOfDeliveryFlavours(
 			Set<ModeOfDeliveryFlavourID> modeOfDeliveryFlavourIDs,
 			String[] fetchGroups, int maxFetchDepth);
@@ -270,12 +169,7 @@ public interface StoreManagerRemote {
 	 * </p>
 	 *
 	 * @param fetchGroups Either <tt>null</tt> or all desired fetch groups.
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
-	@RolesAllowed("_Guest_")
 	Collection<ServerDeliveryProcessor> getServerDeliveryProcessorsForOneModeOfDeliveryFlavour(
 			ModeOfDeliveryFlavourID modeOfDeliveryFlavourID,
 			CheckRequirementsEnvironment checkRequirementsEnvironment,
@@ -291,14 +185,7 @@ public interface StoreManagerRemote {
 	 * @return Detached DeliveryNote or null.
 	 * @throws DeliveryNoteEditException
 	 *
-	 * @throws ModuleException
-	 *
-	 * @ejb.interface-method
-	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="org.nightlabs.jfire.store.editDeliveryNote"
 	 */
-	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	@RolesAllowed("org.nightlabs.jfire.store.editDeliveryNote")
 	DeliveryNote createDeliveryNote(Collection<ArticleID> articleIDs,
 			String deliveryNoteIDPrefix, boolean get, String[] fetchGroups,
 			int maxFetchDepth) throws DeliveryNoteEditException;
@@ -313,42 +200,16 @@ public interface StoreManagerRemote {
 	 * @param fetchGroups Array ouf fetch-groups the deliveryNote should be detached with.
 	 * @return Detached DeliveryNote or null.
 	 * @throws DeliveryNoteEditException
-	 *
-	 * @throws ModuleException
-	 *
-	 * @ejb.interface-method
-	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="org.nightlabs.jfire.store.editDeliveryNote"
 	 */
-	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	@RolesAllowed("org.nightlabs.jfire.store.editDeliveryNote")
 	DeliveryNote createDeliveryNote(ArticleContainerID articleContainerID,
 			String deliveryNoteIDPrefix, boolean get, String[] fetchGroups,
 			int maxFetchDepth) throws DeliveryNoteEditException;
 
-	/**
-	 * @throws DeliveryNoteEditException
-	 *
-	 * @ejb.interface-method
-	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="org.nightlabs.jfire.store.editDeliveryNote"
-	 */
-	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	@RolesAllowed("org.nightlabs.jfire.store.editDeliveryNote")
 	DeliveryNote addArticlesToDeliveryNote(DeliveryNoteID deliveryNoteID,
 			Collection<ArticleID> articleIDs, boolean validate, boolean get,
 			String[] fetchGroups, int maxFetchDepth)
 			throws DeliveryNoteEditException;
 
-	/**
-	 * @throws DeliveryNoteEditException
-	 *
-	 * @ejb.interface-method
-	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="org.nightlabs.jfire.store.editDeliveryNote"
-	 */
-	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	@RolesAllowed("org.nightlabs.jfire.store.editDeliveryNote")
 	DeliveryNote removeArticlesFromDeliveryNote(DeliveryNoteID deliveryNoteID,
 			Collection<ArticleID> articleIDs, boolean validate, boolean get,
 			String[] fetchGroups, int maxFetchDepth)
@@ -359,12 +220,7 @@ public interface StoreManagerRemote {
 	 * @return A <tt>List</tt> with instances of {@link DeliveryResult} in the same
 	 *		order as and corresponding to the {@link DeliveryData} objects passed in
 	 *		<tt>deliveryDataList</tt>.
-	 *
-	 * @ejb.interface-method
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 * @ejb.permission role-name="org.nightlabs.jfire.store.deliver"
 	 */
-	@RolesAllowed("org.nightlabs.jfire.store.deliver")
 	List<DeliveryResult> deliverBegin(List<DeliveryData> deliveryDataList);
 
 	/**
@@ -372,11 +228,7 @@ public interface StoreManagerRemote {
 	 * cross-organisation-deliveries (internally within the JFire network).
 	 * @throws DeliveryException if the delivery fails. Note that this (like any other exception) causes the complete transaction
 	 * 		to be rolled back and (in contrast to the usual multi-step-delivery) all traces in the database to be deleted.
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="org.nightlabs.jfire.store.deliver"
 	 */
-	@RolesAllowed("org.nightlabs.jfire.store.deliver")
 	DeliveryResult[] deliverInSingleTransaction(DeliveryData deliveryData)
 			throws DeliveryException;
 
@@ -387,12 +239,7 @@ public interface StoreManagerRemote {
 	 *		or {@link ServerDeliveryProcessor#DELIVERY_DIRECTION_OUTGOING}.
 	 *
 	 * @see Store#deliverBegin(User, DeliveryData)
-	 *
-	 * @ejb.interface-method
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 * @ejb.permission role-name="org.nightlabs.jfire.store.deliver"
 	 */
-	@RolesAllowed("org.nightlabs.jfire.store.deliver")
 	DeliveryResult deliverBegin(DeliveryData deliveryData);
 
 	/**
@@ -407,12 +254,7 @@ public interface StoreManagerRemote {
 	 * @return A <tt>List</tt> with instances of {@link DeliveryResult} in the same
 	 *		order as and corresponding to the {@link DeliveryID} objects passed in
 	 *		<tt>deliveryIDs</tt>.
-	 *
-	 * @ejb.interface-method
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 * @ejb.permission role-name="_Guest_"
 	 */
-	@RolesAllowed("_Guest_")
 	List<DeliveryResult> deliverEnd(List<DeliveryID> deliveryIDs,
 			List<DeliveryResult> deliverEndClientResults, boolean forceRollback);
 
@@ -428,12 +270,7 @@ public interface StoreManagerRemote {
 	 * @return A <tt>List</tt> with instances of {@link DeliveryResult} in the same
 	 *		order as and corresponding to the {@link DeliveryID} objects passed in
 	 *		<tt>deliveryIDs</tt>.
-	 *
-	 * @ejb.interface-method
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 * @ejb.permission role-name="_Guest_"
 	 */
-	@RolesAllowed("_Guest_")
 	List<DeliveryResult> deliverDoWork(List<DeliveryID> deliveryIDs,
 			List<DeliveryResult> deliverDoWorkClientResults,
 			boolean forceRollback);
@@ -442,15 +279,8 @@ public interface StoreManagerRemote {
 	 * This method does not require access right control, because it can only be performed, if <code>deliverBegin</code> was
 	 * called before, which is restricted.
 	 *
-	 * @throws ModuleException
-	 *
 	 * @see Accounting#deliverEnd(User, DeliveryData)
-	 *
-	 * @ejb.interface-method
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 * @ejb.permission role-name="_Guest_"
 	 */
-	@RolesAllowed("_Guest_")
 	DeliveryResult deliverDoWork(DeliveryID deliveryID,
 			DeliveryResult deliverEndClientResult, boolean forceRollback);
 
@@ -458,15 +288,8 @@ public interface StoreManagerRemote {
 	 * This method does not require access right control, because it can only be performed, if <code>deliverBegin</code> was
 	 * called before, which is restricted.
 	 *
-	 * @throws ModuleException
-	 *
 	 * @see Accounting#deliverEnd(User, DeliveryData)
-	 *
-	 * @ejb.interface-method
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 * @ejb.permission role-name="_Guest_"
 	 */
-	@RolesAllowed("_Guest_")
 	DeliveryResult deliverEnd(DeliveryID deliveryID,
 			DeliveryResult deliverEndClientResult, boolean forceRollback);
 
@@ -479,13 +302,7 @@ public interface StoreManagerRemote {
 	 * @param rangeBeginIdx Either -1, if no range shall be specified, or a positive number (incl. 0) defining the index where the range shall begin (inclusive).
 	 * @param rangeEndIdx Either -1, if no range shall be specified, or a positive number (incl. 0) defining the index where the range shall end (exclusive).
 	 * @return Returns instances of {@link DeliveryNote}.
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="org.nightlabs.jfire.store.queryDeliveryNotes"
-	 * @ejb.transaction type="Required"
 	 */
-	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	@RolesAllowed("org.nightlabs.jfire.store.queryDeliveryNotes")
 	List<DeliveryNoteID> getDeliveryNoteIDs(AnchorID vendorID,
 			AnchorID customerID, AnchorID endCustomerID, long rangeBeginIdx,
 			long rangeEndIdx);
@@ -501,57 +318,19 @@ public interface StoreManagerRemote {
 	 * @param fetchGroups The fetch groups to be used.
 	 * @param maxFetchDepth The max fetch depth to be used.
 	 * @return A detached copy of the delivery with the respective ID.
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="org.nightlabs.jfire.store.deliver"
-	 * @ejb.transaction type="Required"
 	 */
-	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	@RolesAllowed("org.nightlabs.jfire.store.deliver")
-	Delivery getDelivery(DeliveryID deliveryID, String[] fetchGroups,
-			int maxFetchDepth);
+	Delivery getDelivery(DeliveryID deliveryID, String[] fetchGroups, int maxFetchDepth);
 
 	/**
 	 * This method queries all <code>Invoice</code>s which exist between the given vendor and customer and
 	 * are not yet finalized. They are ordered by invoiceID descending (means newest first).
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="org.nightlabs.jfire.store.queryDeliveryNotes"
-	 * @ejb.transaction type="Required"
 	 */
-	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	@RolesAllowed("org.nightlabs.jfire.store.queryDeliveryNotes")
-	List<DeliveryNote> getNonFinalizedDeliveryNotes(AnchorID vendorID,
-			AnchorID customerID, String[] fetchGroups, int maxFetchDepth);
+	List<DeliveryNote> getNonFinalizedDeliveryNotes(AnchorID vendorID, AnchorID customerID, String[] fetchGroups, int maxFetchDepth);
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="org.nightlabs.jfire.store.editDeliveryNote"
-	 */
-	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	@RolesAllowed("org.nightlabs.jfire.store.editDeliveryNote")
-	void signalDeliveryNote(DeliveryNoteID deliveryNoteID,
-			String jbpmTransitionName);
+	void signalDeliveryNote(DeliveryNoteID deliveryNoteID, String jbpmTransitionName);
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="org.nightlabs.jfire.store.seeProductType"
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 */
-	@RolesAllowed("org.nightlabs.jfire.store.seeProductType")
-	@SuppressWarnings("unchecked")
-	Set<ProductTypeID> getProductTypeIDs(
-			QueryCollection<? extends AbstractProductTypeQuery> productTypeQueries);
+	Set<ProductTypeID> getProductTypeIDs(QueryCollection<? extends AbstractProductTypeQuery> productTypeQueries);
 
-	/**
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 */
-	@RolesAllowed("_Guest_")
-	@SuppressWarnings("unchecked")
 	ProductTypeGroupIDSearchResult getProductTypeGroupIDSearchResultForProductTypeQueries(
 			QueryCollection<? extends AbstractProductTypeQuery> productTypeQueries);
 
@@ -568,11 +347,7 @@ public interface StoreManagerRemote {
 	 * @param fetchGroups The fetch groups to be used to detach the DeliveryQueues
 	 * @param fetchDepth The fetch depth to be used to detach the DeliveryQueues (-1 for unlimited)
 	 * @return the {@link DeliveryQueue}s identified by the given IDs.
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
 	 */
-	@RolesAllowed("_Guest_")
 	Collection<DeliveryQueue> getDeliveryQueuesById(
 			Set<DeliveryQueueID> deliveryQueueIds, String[] fetchGroups,
 			int fetchDepth);
@@ -585,11 +360,7 @@ public interface StoreManagerRemote {
 	 * @param fetchGroups The fetchGroups to be used when get == true
 	 * @param fetchDepth The fetchDepth to be used when get == true
 	 * @return A collection of the detached copies of the stored {@link DeliveryQueue}s
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="org.nightlabs.jfire.store.editDeliveryQueue"
 	 */
-	@RolesAllowed("org.nightlabs.jfire.store.editDeliveryQueue")
 	Collection<DeliveryQueue> storeDeliveryQueues(
 			Collection<DeliveryQueue> deliveryQueues, boolean get,
 			String[] fetchGroups, int fetchDepth);
@@ -599,41 +370,14 @@ public interface StoreManagerRemote {
 	 * @return The {@link DeliveryQueueID}s of all {@link DeliveryQueue}s available.
 	 *
 	 * @param includeDefunct Sets whether defunct delivery queues should be included in the returned collection.
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
 	 */
-	@RolesAllowed("_Guest_")
-	Collection<DeliveryQueueID> getAvailableDeliveryQueueIDs(
-			boolean includeDefunct);
+	Collection<DeliveryQueueID> getAvailableDeliveryQueueIDs(boolean includeDefunct);
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="org.nightlabs.jfire.store.queryRepositories"
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 */
-	@RolesAllowed("org.nightlabs.jfire.store.queryRepositories")
-	@SuppressWarnings("unchecked")
-	Set<AnchorID> getRepositoryIDs(
-			QueryCollection<? extends AbstractJDOQuery> queries);
+	Set<AnchorID> getRepositoryIDs(QueryCollection<? extends AbstractJDOQuery> queries);
 
-	/**
-	 * @ejb.interface-method
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 * @ejb.permission role-name="org.nightlabs.jfire.store.queryRepositories"
-	 */
-	@RolesAllowed("org.nightlabs.jfire.store.queryRepositories")
-	List<Repository> getRepositories(Collection<AnchorID> repositoryIDs,
-			String[] fetchGroups, int maxFetchDepth);
+	List<Repository> getRepositories(Collection<AnchorID> repositoryIDs, String[] fetchGroups, int maxFetchDepth);
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="org.nightlabs.jfire.store.editRepository"
-	 */
-	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	@RolesAllowed("org.nightlabs.jfire.store.editRepository")
-	Repository storeRepository(Repository repository, boolean get,
-			String[] fetchGroups, int maxFetchDepth);
+	Repository storeRepository(Repository repository, boolean get, String[] fetchGroups, int maxFetchDepth);
 
 	/**
 	 * Unlike {@link #getProductTransferIDs(ProductTransferIDQuery)}, this method allows
@@ -643,21 +387,9 @@ public interface StoreManagerRemote {
 	 * @param productTransferQueries A <code>Collection</code> of {@link ProductTransferQuery}. They will be executed
 	 *		in the given order (if it's a <code>List</code>) and the result of the previous query will be passed as candidates
 	 *		to the next query.
-	 *
-	 * @ejb.interface-method
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 * @ejb.permission role-name="org.nightlabs.jfire.store.queryProductTransfers"
 	 */
-	@RolesAllowed("org.nightlabs.jfire.store.queryProductTransfers")
-	List<TransferID> getProductTransferIDs(
-			QueryCollection<? extends ProductTransferQuery> productTransferQueries);
+	List<TransferID> getProductTransferIDs(QueryCollection<? extends ProductTransferQuery> productTransferQueries);
 
-	/**
-	 * @ejb.interface-method
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 * @ejb.permission role-name="org.nightlabs.jfire.store.queryProductTransfers"
-	 */
-	@RolesAllowed("org.nightlabs.jfire.store.queryProductTransfers")
 	List<ProductTransfer> getProductTransfers(
 			Collection<TransferID> productTransferIDs, String[] fetchGroups,
 			int maxFetchDepth);
@@ -667,13 +399,7 @@ public interface StoreManagerRemote {
 	 * <p>
 	 * This method can be called by everyone, because the object-ids are not confidential.
 	 * </p>
-	 *
-	 * @ejb.interface-method
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 * @ejb.permission role-name="_Guest_"
 	 */
-	@RolesAllowed("_Guest_")
-	@SuppressWarnings("unchecked")
 	Set<RepositoryTypeID> getRepositoryTypeIDs();
 
 	/**
@@ -681,12 +407,7 @@ public interface StoreManagerRemote {
 	 * <p>
 	 * This method can be called by everyone, because the <code>RepositoryType</code>s are not confidential.
 	 * </p>
-	 *
-	 * @ejb.interface-method
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 * @ejb.permission role-name="_Guest_"
 	 */
-	@RolesAllowed("_Guest_")
 	List<RepositoryType> getRepositoryTypes(
 			Collection<RepositoryTypeID> repositoryTypeIDs,
 			String[] fetchGroups, int maxFetchDepth);
@@ -694,13 +415,7 @@ public interface StoreManagerRemote {
 	/**
 	 * @param productTypeGroupIDs Either <code>null</code> in order to return all or instances of {@link ProductTypeGroupID}
 	 *		specifying a subset.
-	 *
-	 * @ejb.interface-method
-	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="org.nightlabs.jfire.store.seeProductType"
 	 */
-	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	@RolesAllowed("org.nightlabs.jfire.store.seeProductType")
 	Collection<ProductTypeGroup> getProductTypeGroups(
 			Collection<ProductTypeGroupID> productTypeGroupIDs,
 			String[] fetchGroups, int maxFetchDepth);
@@ -709,41 +424,9 @@ public interface StoreManagerRemote {
 
 	List<ReceptionNote> getReceptionNotes(Set<ReceptionNoteID> receptionNoteIDs, String[] fetchGroups, int maxFetchDepth);
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="org.nightlabs.jfire.store.seeProductType"
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 */
-	@RolesAllowed("org.nightlabs.jfire.store.seeProductType")
-	Set<OfferID> getReservations(ProductTypeID productTypeID,
-			String fetchGroups, int maxFetchDepth);
+	Set<OfferID> getReservations(ProductTypeID productTypeID, String fetchGroups, int maxFetchDepth);
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.transaction type="Supports"
-	 * @ejb.permission role-name="_Guest_"
-	 */
-	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	@RolesAllowed("_Guest_")
-	String ping(String message);
-
-//	/**
-//	 * @ejb.interface-method
-//	 * @ejb.permission role-name="_System_"
-//	 */
-//	@RolesAllowed("_System_")
-//	void calculateProductTypeAvailabilityPercentage(TaskID taskID)
-//			throws Exception;
-
-	/**
-	 * @ejb.interface-method
-	 * @ejb.transaction type="Supports"
-	 * @ejb.permission role-name="_Guest_"
-	 */
-	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	@RolesAllowed("_Guest_")
-	Set<ProductTypePermissionFlagSetID> getMyProductTypePermissionFlagSetIDs(
-			Collection<? extends ProductTypeID> productTypeIDs);
+	Set<ProductTypePermissionFlagSetID> getMyProductTypePermissionFlagSetIDs(Collection<? extends ProductTypeID> productTypeIDs);
 
 	/**
 	 * We allow this method to be executed by everyone, because it currently filters out (silently!) all {@link ProductTypePermissionFlagSet}s
@@ -756,22 +439,9 @@ public interface StoreManagerRemote {
 	 * (use {@link ProductTypePermissionFlagSet#getProductTypeObjectID()} and {@link ProductTypePermissionFlagSet#getUserObjectID()}
 	 * instead!).
 	 * </p>
-	 *
-	 * @ejb.interface-method
-	 * @ejb.transaction type="Supports"
-	 * @ejb.permission role-name="_Guest_"
 	 */
-	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	@RolesAllowed("_Guest_")
-	Collection<ProductTypePermissionFlagSet> getProductTypePermissionFlagSets(
-			Collection<? extends ProductTypePermissionFlagSetID> productTypePermissionFlagSetIDs);
+	Collection<ProductTypePermissionFlagSet> getProductTypePermissionFlagSets(Collection<? extends ProductTypePermissionFlagSetID> productTypePermissionFlagSetIDs);
 
-	/**
-	 * @ejb.interface-method
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 * @ejb.permission role-name="org.nightlabs.jfire.store.seeProductType"
-	 */
-	@RolesAllowed("org.nightlabs.jfire.store.seeProductType")
 	Set<ProductTypeID> getChildProductTypeIDs(ProductTypeID parentProductTypeID);
 
 }

@@ -2529,16 +2529,6 @@ implements StoreManagerRemote, StoreManagerLocal
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.nightlabs.jfire.store.StoreManagerRemote#ping(java.lang.String)
-	 */
-	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	@RolesAllowed("_Guest_")
-	@Override
-	public String ping(String message) {
-		return super.ping(message);
-	}
-
 	private static final String calculateProductTypeAvailabilityPercentage_multiTxJobID = "calculateProductTypeAvailabilityPercentage";
 	private static final int calculateProductTypeAvailabilityPercentage_chunkProductTypeQty = 3;
 
@@ -2552,6 +2542,7 @@ implements StoreManagerRemote, StoreManagerLocal
 	 * @see org.nightlabs.jfire.store.StoreManagerRemote#calculateProductTypeAvailabilityPercentage(org.nightlabs.jfire.timer.id.TaskID)
 	 */
 	@RolesAllowed("_System_")
+	@Override
 	public void calculateProductTypeAvailabilityPercentage(TaskID taskID)
 	throws Exception
 	{

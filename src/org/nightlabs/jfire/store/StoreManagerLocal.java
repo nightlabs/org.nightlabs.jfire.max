@@ -5,6 +5,7 @@ import javax.ejb.Local;
 import org.nightlabs.jfire.store.deliver.DeliveryData;
 import org.nightlabs.jfire.store.deliver.DeliveryResult;
 import org.nightlabs.jfire.store.deliver.id.DeliveryID;
+import org.nightlabs.jfire.timer.id.TaskID;
 
 @Local
 public interface StoreManagerLocal {
@@ -26,4 +27,6 @@ public interface StoreManagerLocal {
 	 * called before, which is restricted.
 	 */
 	DeliveryResult _deliverEnd(DeliveryID deliveryID, DeliveryResult deliverEndClientResult, boolean forceRollback);
+
+	void calculateProductTypeAvailabilityPercentage(TaskID taskID) throws Exception;
 }

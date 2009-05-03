@@ -36,9 +36,9 @@ import org.nightlabs.jfire.store.ProductType;
  *
  */
 public class JFireTradeEAR {
-	
-	public static final String MODULE_NAME = "JFireTrade";
-	
+
+	public static final String MODULE_NAME = JFireTradeEAR.class.getSimpleName();
+
 	/**
 	 * {@link EditLockType} for {@link ProductType}s. Used in the TradeAdminPrespective.
 	 */

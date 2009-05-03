@@ -101,22 +101,10 @@ implements GeographyTemplateDataManagerRemote
 	private static final String DISTRICT_CSV_HEADER = "CountryID;CityID;DistrictID;LanguageID;DistrictName;Latitute;Longitude\n";
 
 	/* (non-Javadoc)
-	 * @see org.nightlabs.jfire.geography.GeographyTemplateDataManagerRemote#ping(java.lang.String)
-	 */
-	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	@RolesAllowed("_Guest_")
-
-	@Override
-	public String ping(String message) {
-		return super.ping(message);
-	}
-
-	/* (non-Javadoc)
 	 * @see org.nightlabs.jfire.geography.GeographyTemplateDataManagerRemote#initialiseJDOLifecycleListeners(org.nightlabs.jfire.crossorganisationregistrationinit.Context)
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("_System_")
-
 	public void initialiseJDOLifecycleListeners(Context context)
 	throws Exception
 	{
@@ -131,7 +119,6 @@ implements GeographyTemplateDataManagerRemote
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("_System_")
-
 	public void initialiseJDOLifecycleListeners()
 	throws Exception
 	{
@@ -190,7 +177,6 @@ implements GeographyTemplateDataManagerRemote
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("_System_")
-
 	public void initialise()
 	throws MalformedVersionException
 	{
@@ -299,7 +285,6 @@ implements GeographyTemplateDataManagerRemote
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("_Guest_")
-
 	public void storeGeographyTemplateCountryData(Country storedCountry)
 	throws IOException, SecurityException
 	{
@@ -375,7 +360,6 @@ implements GeographyTemplateDataManagerRemote
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("_Guest_")
-
 	public void storeGeographyTemplateRegionData(Region storedRegion)
 	throws IOException, SecurityException
 	{
@@ -452,7 +436,6 @@ implements GeographyTemplateDataManagerRemote
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("_Guest_")
-
 	public void storeGeographyTemplateCityData(City storedCity)
 	throws IOException, SecurityException
 	{
@@ -531,7 +514,6 @@ implements GeographyTemplateDataManagerRemote
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("_Guest_")
-
 	public void storeGeographyTemplateLocationData(Location storedLocation)
 	throws IOException, SecurityException
 	{
@@ -615,7 +597,6 @@ implements GeographyTemplateDataManagerRemote
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("_Guest_")
-
 	public void storeGeographyTemplateDistrictData(District storedDistrict)
 	throws IOException, SecurityException
 	{
@@ -698,7 +679,6 @@ implements GeographyTemplateDataManagerRemote
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@RolesAllowed("_Guest_")
-
 	public Set<CSV> getCSVs(Set<CSVID> csvIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();

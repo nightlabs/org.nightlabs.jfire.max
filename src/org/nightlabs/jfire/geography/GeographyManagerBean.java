@@ -72,16 +72,6 @@ implements GeographyManagerRemote
 //	private static final Logger logger = Logger.getLogger(GeographyManagerBean.class);
 
 	/* (non-Javadoc)
-	 * @see org.nightlabs.jfire.geography.GeographyManagerRemote#ping(java.lang.String)
-	 */
-	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	@RolesAllowed("_Guest_")
-	@Override
-	public String ping(String message) {
-		return super.ping(message);
-	}
-
-	/* (non-Javadoc)
 	 * @see org.nightlabs.jfire.geography.GeographyManagerRemote#initialise()
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)

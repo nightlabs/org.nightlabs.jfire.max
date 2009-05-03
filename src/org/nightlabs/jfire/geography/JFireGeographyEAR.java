@@ -5,5 +5,5 @@ package org.nightlabs.jfire.geography;
  */
 public class JFireGeographyEAR
 {
-	public static final String MODULE_NAME = "JFireGeography";
+	public static final String MODULE_NAME = JFireGeographyEAR.class.getSimpleName();
 }

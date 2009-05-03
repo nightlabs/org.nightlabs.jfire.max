@@ -150,6 +150,9 @@ implements NumericOrganisationIdentifierManagerRemote
 			String localOrganisationID = getOrganisationID();
 			String rootOrganisationID = getRootOrganisationID();
 
+			pm.getExtent(NumericOrganisationIdentifier.class);
+			pm.getExtent(IDNamespace.class);
+
 			if (!hasRootOrganisation()) {
 				// For test systems it's good to have a valid value
 				try {

@@ -4,5 +4,5 @@ public class JFireNumericOrganisationIDEAR {
 
 	private JFireNumericOrganisationIDEAR() { }
 
-	public static final String MODULE_NAME = "JFireNumericOrganisationID";
+	public static final String MODULE_NAME = JFireNumericOrganisationIDEAR.class.getSimpleName();
 }

@@ -32,11 +32,8 @@ package org.nightlabs.jfire.scripting;
  */
 public class JFireScriptingEAR {
 
-	/**
-	 * 
-	 */
-	protected JFireScriptingEAR() {}
+	private JFireScriptingEAR() {}
 
-	public static final String MODULE_NAME = "JFireScripting";
-	
+	public static final String MODULE_NAME = JFireScriptingEAR.class.getSimpleName();
+
 }

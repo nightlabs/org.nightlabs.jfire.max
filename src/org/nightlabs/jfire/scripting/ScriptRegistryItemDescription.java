@@ -41,6 +41,7 @@ import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.PersistenceModifier;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.Value;
 
 import org.nightlabs.i18n.I18nText;
 import org.nightlabs.jfire.scripting.id.ScriptRegistryItemDescriptionID;
@@ -126,8 +127,12 @@ extends I18nText
 	@Persistent(
 		nullValue=NullValue.EXCEPTION,
 		table="JFireScripting_ScriptRegistryItemDescription_texts",
-		persistenceModifier=PersistenceModifier.PERSISTENT)
-	protected Map<String, String> texts;
+		persistenceModifier=PersistenceModifier.PERSISTENT
+	)
+	@Value(
+			columns={@Column(sqlType="CLOB")}
+	)
+	private Map<String, String> texts;
 
 	/**
 	 * @deprecated Only for JDO!

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE reporting_initialiser PUBLIC "-//NightLabs//Reporting Initialiser DTD V 0.1//EN" "http://www.nightlabs.de/dtd/reporting-initialiser-content_0_1.dtd">
+<report-category 
+	id="Invoice-Root"
+	type="JFireReportingTrade-Reporting-Invoice"
+>
+    <!-- id is optional and defaults to the directory-name -->
+    <!-- type is optional and defaults to the value programatically set -->
+	<name language="de">Rechnungs-Layouts</name>
+	<name language="en">Invoice-Layouts</name>
+
+	<report
+		file="Default-InvoiceLayout.rptdesign" 
+		id="Default-InvoiceLayout"
+		overwriteOnInit="true"
+	>
+	<!-- id is optional and defaults to the value of file without extension -->
+	<!-- overwriteOnInit is optional and defaults to true -->
+		<name language="de">Standard-Rechnung</name>
+		<name language="en">Default-Invoice</name>
+		<description language="de">Dies ist das Standard Rechnungslayout.
+Es kann mit allen Produkttypen verwendet werden:
+SimpleProductType, DynamicProductType and VoucherType		
+		</description>
+		<description language="en">This is the default invoice layout.
+It can be used with all ProductTypes:
+SimpleProductType, DynamicProductType and VoucherType		
+		</description>
+		
+		<parameter-acquisition>
+			<use-case id="DefaultUseCase" default="true">
+				<name language="en">Default Usecase</name>
+				<description language="en">DefaultUseCase</description>
+				<parameters>
+					<parameter id="0" name="articleContainerID" type="org.nightlabs.jfire.trade.id.ArticleContainerID" x="550" y="20" />
+				</parameters>
+				<value-provider-configs>
+					<provider-config id="1" organisationID="dev.jfire.org" categoryID="JFireReportingTrade-ValueProviderCategory-TradeDocuments-Invoice" valueProviderID="ByCustomer" pageIndex="1" pageOrder="0" allowNullOutputValue="false" showMessageInHeader="true" x="275" y="20" >
+						<message language="de">Wählen Sie eine der Rechnungen</message>
+						<message language="en">Select one of the customers invoices</message>
+					</provider-config>
+					<provider-config id="2" organisationID="dev.jfire.org" categoryID="JFireReportingTrade-ValueProviderCategory-LegalEntity" valueProviderID="Search" pageIndex="0" pageOrder="0" allowNullOutputValue="false" showMessageInHeader="true" x="0" y="20" >
+						<message language="de">Suchen Sie den Rechnungs-Kunden</message>
+						<message language="en">Search the invoice customer</message>
+					</provider-config>
+				</value-provider-configs>
+				<value-consumer-bindings>
+					<value-consumer-binding>
+						<binding-provider id="2"/>
+						<binding-parameter name="customer"/>
+						<binding-consumer id="1"/>
+					</value-consumer-binding>
+					<value-consumer-binding>
+						<binding-provider id="1"/>
+						<binding-parameter name="articleContainerID"/>
+						<binding-consumer id="0"/>
+					</value-consumer-binding>
+				</value-consumer-bindings>
+			</use-case>
+		</parameter-acquisition>
+	</report>
+	<report file="test">
+	</report>
+</report-category>

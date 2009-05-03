@@ -1,0 +1,76 @@
+<!DOCTYPE script-category PUBLIC "-//NightLabs//DTD ScriptingInitializer V 1.0//EN" "http://www.nightlabs.de/dtd/scripting-initializer-content_1_0.dtd">
+<script-category 
+	id="MoneyTransfer"
+	type="JFireReportingTrade-MoneyTransfer"
+>
+	<name language="de">Geldtransfers</name>
+	<name language="en">Money transfers</name>
+
+	<script 
+		file="MoneyTransferList.javaclass" 
+		id="MoneyTransferList"
+		resultClass="org.eclipse.datatools.connectivity.oda.IResultSet"
+	>
+		<name language="de">Geldtransfers: Liste</name>
+		<name language="en">Money transfers: list</name>
+		<parameter-set>
+			<name language="de">ParameterSet: Geldtransferliste</name>
+			<name language="en">ParameterSet: Moeny transfer list</name>
+			<parameter name="timePeriod" type="org.nightlabs.util.TimePeriod"/>	
+			<parameter name="accountIDs" type="java.util.Collection"/>	
+			<parameter name="initiatorIDs" type="java.util.Collection"/>	
+		</parameter-set>
+	</script>
+	
+	<script 
+		file="BookMoneyTransferList.javaclass" 
+		id="BookMoneyTransferList"
+		resultClass="org.eclipse.datatools.connectivity.oda.IResultSet"
+	>
+		<name language="de">Rechnungsbuchungen: Liste</name>
+		<name language="en">Invoice bookings: list</name>
+		<parameter-set>
+			<name language="de">ParameterSet: BookMoneyTransferList</name>
+			<name language="en">ParameterSet: BookMoneyTransferList</name>
+			<parameter name="timePeriod" type="org.nightlabs.util.TimePeriod"/>	
+			<parameter name="initiatorIDs" type="java.util.Collection"/>	
+			<parameter name="showOnlyOutstanding" type="java.lang.Boolean"/>	
+		</parameter-set>
+	</script>
+	
+	<script 
+		file="BookedArticles.javaclass" 
+		id="BookedArticles"
+		resultClass="org.eclipse.datatools.connectivity.oda.IResultSet"
+	>
+		<name language="de">Rechnungsbuchungen: Liste gebuchter Artikel</name>
+		<name language="en">Invoice bookings: booked articles</name>
+		<parameter-set>
+			<name language="de">ParameterSet: BookedArticles</name>
+			<name language="en">ParameterSet: BookedArticles</name>
+			<parameter name="groupResults" type="java.lang.Boolean"/>	
+			<parameter name="timePeriod" type="org.nightlabs.util.TimePeriod"/>	
+			<parameter name="bookUserIDs" type="java.util.Collection"/>	
+			<parameter name="productTypeIDs" type="java.util.Collection"/>
+			<parameter name="productTypeOwnerIDs" type="java.util.Collection"/>	
+		</parameter-set>
+	</script>
+	
+	<script 
+		file="BookedArticlesWithPaymentInfo.javaclass" 
+		id="BookedArticlesWithPaymentInfo"
+		resultClass="org.eclipse.datatools.connectivity.oda.IResultSet"
+	>
+		<name language="de">Rechnungsbuchungen: Liste gebuchter Artikel + Zahlungsinformationen</name>
+		<name language="en">Invoice bookings: booked articles + payment info</name>
+		<parameter-set>
+			<name language="de">ParameterSet: BookedArticlesWithPaymentInfo</name>
+			<name language="en">ParameterSet: BookedArticlesWithPaymentInfo</name>
+			<parameter name="timePeriod" type="org.nightlabs.util.TimePeriod"/>	
+			<parameter name="bookUserIDs" type="java.util.Collection"/>	
+			<parameter name="productTypeIDs" type="java.util.Collection"/>
+			<parameter name="productTypeOwnerIDs" type="java.util.Collection"/>	
+		</parameter-set>
+	</script>
+	
+</script-category>

@@ -1,0 +1,1209 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.14" id="1">
+    <property name="createdBy">Eclipse BIRT Designer Version 2.2.0.v20070620 Build &lt;@BUILD@></property>
+    <property name="units">in</property>
+    <property name="includeResource">reportMessages</property>
+    <html-property name="description">WizardTemplateChoicePage.message.BlankReport</html-property>
+    <method name="initialize"><![CDATA[importClass(Packages.org.nightlabs.jfire.reporting.JFireReportingHelper);
+importClass(Packages.org.nightlabs.jfire.accounting.pay.Payment);
+
+function isParamSet(param) {
+  return !("".equals(param) || ""+param == "null" || null == param);
+}]]></method>
+    <text-property name="displayName">WizardTemplateChoicePage.title.BlankReport</text-property>
+    <property name="iconFile">/templates/blank_report.gif</property>
+    <parameters>
+        <scalar-parameter name="timePeriod" id="488">
+            <property name="valueType">static</property>
+            <property name="dataType">string</property>
+            <property name="isRequired">false</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="accountIDs" id="489">
+            <property name="valueType">static</property>
+            <property name="dataType">string</property>
+            <property name="concealValue">false</property>
+            <property name="isRequired">false</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="initiatorIDs" id="490">
+            <property name="valueType">static</property>
+            <property name="dataType">string</property>
+            <property name="isRequired">false</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+    </parameters>
+    <data-sources>
+        <oda-data-source extensionID="org.nightlabs.jfire.reporting.oda.jfs.JFSDriver" name="JFSDataSource" id="4"/>
+    </data-sources>
+    <data-sets>
+        <oda-data-set extensionID="org.nightlabs.jfire.reporting.oda.jfs.JFSDataSet" name="Data Set" id="491">
+            <list-property name="computedColumns">
+                <structure>
+                    <property name="name">balanceAfterTransfer</property>
+                    <expression name="expression">balance = 0;
+if (row["fromAnchorJDOID"] == row["queryAccountJDOID"])
+  balance = row["fromBalanceBeforeTransfer"] - row["amount"];
+else
+  balance = row["toBalanceBeforeTransfer"] + row["amount"];
+  
+currency = JFireReportingHelper.getJDOObject(row["currencyJDOID"]) ;
+currency.toDouble(balance)</expression>
+                    <property name="dataType">decimal</property>
+                </structure>
+            </list-property>
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure>
+                        <property name="position">1</property>
+                        <property name="name">queryAccountJDOID</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">2</property>
+                        <property name="name">anchorJDOID</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">3</property>
+                        <property name="name">organisationID</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">4</property>
+                        <property name="name">transferTypeID</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">5</property>
+                        <property name="name">transferID</property>
+                        <property name="dataType">decimal</property>
+                    </structure>
+                    <structure>
+                        <property name="position">6</property>
+                        <property name="name">containerJDOID</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">7</property>
+                        <property name="name">fromAnchorJDOID</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">8</property>
+                        <property name="name">toAnchorJDOID</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">9</property>
+                        <property name="name">fromBalanceBeforeTransfer</property>
+                        <property name="dataType">decimal</property>
+                    </structure>
+                    <structure>
+                        <property name="position">10</property>
+                        <property name="name">toBalanceBeforeTransfer</property>
+                        <property name="dataType">decimal</property>
+                    </structure>
+                    <structure>
+                        <property name="position">11</property>
+                        <property name="name">initiatorJDOID</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">12</property>
+                        <property name="name">timeStamp</property>
+                        <property name="dataType">date-time</property>
+                    </structure>
+                    <structure>
+                        <property name="position">13</property>
+                        <property name="name">currencyJDOID</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">14</property>
+                        <property name="name">amount</property>
+                        <property name="dataType">decimal</property>
+                    </structure>
+                    <structure>
+                        <property name="position">15</property>
+                        <property name="name">transferDescription</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">16</property>
+                        <property name="name">balanceAfterTransfer</property>
+                        <property name="dataType">decimal</property>
+                    </structure>
+                </list-property>
+            </structure>
+            <property name="dataSource">JFSDataSource</property>
+            <list-property name="parameters">
+                <structure>
+                    <property name="name">timePeriod</property>
+                    <property name="nativeName">timePeriod</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">1</property>
+                    <property name="position">1</property>
+                    <expression name="defaultValue">'__DUMMY_DEFAULT_PARAMETER_VALUE__'</expression>
+                    <property name="isOptional">false</property>
+                    <property name="allowNull">true</property>
+                    <property name="isInput">true</property>
+                </structure>
+                <structure>
+                    <property name="name">accountIDs</property>
+                    <property name="nativeName">accountIDs</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">1</property>
+                    <property name="position">2</property>
+                    <expression name="defaultValue">'__DUMMY_DEFAULT_PARAMETER_VALUE__'</expression>
+                    <property name="isOptional">false</property>
+                    <property name="allowNull">true</property>
+                    <property name="isInput">true</property>
+                </structure>
+                <structure>
+                    <property name="name">initiatorIDs</property>
+                    <property name="nativeName">initiatorIDs</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">1</property>
+                    <property name="position">3</property>
+                    <expression name="defaultValue">'__DUMMY_DEFAULT_PARAMETER_VALUE__'</expression>
+                    <property name="isOptional">false</property>
+                    <property name="allowNull">true</property>
+                    <property name="isInput">true</property>
+                </structure>
+            </list-property>
+            <list-property name="resultSet">
+                <structure>
+                    <property name="position">1</property>
+                    <property name="name">queryAccountJDOID</property>
+                    <property name="nativeName">queryAccountJDOID</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">1</property>
+                </structure>
+                <structure>
+                    <property name="position">2</property>
+                    <property name="name">anchorJDOID</property>
+                    <property name="nativeName">anchorJDOID</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">1</property>
+                </structure>
+                <structure>
+                    <property name="position">3</property>
+                    <property name="name">organisationID</property>
+                    <property name="nativeName">organisationID</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">1</property>
+                </structure>
+                <structure>
+                    <property name="position">4</property>
+                    <property name="name">transferTypeID</property>
+                    <property name="nativeName">transferTypeID</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">1</property>
+                </structure>
+                <structure>
+                    <property name="position">5</property>
+                    <property name="name">transferID</property>
+                    <property name="nativeName">transferID</property>
+                    <property name="dataType">decimal</property>
+                    <property name="nativeDataType">6</property>
+                </structure>
+                <structure>
+                    <property name="position">6</property>
+                    <property name="name">containerJDOID</property>
+                    <property name="nativeName">containerJDOID</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">1</property>
+                </structure>
+                <structure>
+                    <property name="position">7</property>
+                    <property name="name">fromAnchorJDOID</property>
+                    <property name="nativeName">fromAnchorJDOID</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">1</property>
+                </structure>
+                <structure>
+                    <property name="position">8</property>
+                    <property name="name">toAnchorJDOID</property>
+                    <property name="nativeName">toAnchorJDOID</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">1</property>
+                </structure>
+                <structure>
+                    <property name="position">9</property>
+                    <property name="name">fromBalanceBeforeTransfer</property>
+                    <property name="nativeName">fromBalanceBeforeTransfer</property>
+                    <property name="dataType">decimal</property>
+                    <property name="nativeDataType">6</property>
+                </structure>
+                <structure>
+                    <property name="position">10</property>
+                    <property name="name">toBalanceBeforeTransfer</property>
+                    <property name="nativeName">toBalanceBeforeTransfer</property>
+                    <property name="dataType">decimal</property>
+                    <property name="nativeDataType">6</property>
+                </structure>
+                <structure>
+                    <property name="position">11</property>
+                    <property name="name">initiatorJDOID</property>
+                    <property name="nativeName">initiatorJDOID</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">1</property>
+                </structure>
+                <structure>
+                    <property name="position">12</property>
+                    <property name="name">timeStamp</property>
+                    <property name="nativeName">timeStamp</property>
+                    <property name="dataType">date-time</property>
+                    <property name="nativeDataType">93</property>
+                </structure>
+                <structure>
+                    <property name="position">13</property>
+                    <property name="name">currencyJDOID</property>
+                    <property name="nativeName">currencyJDOID</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">1</property>
+                </structure>
+                <structure>
+                    <property name="position">14</property>
+                    <property name="name">amount</property>
+                    <property name="nativeName">amount</property>
+                    <property name="dataType">decimal</property>
+                    <property name="nativeDataType">6</property>
+                </structure>
+                <structure>
+                    <property name="position">15</property>
+                    <property name="name">transferDescription</property>
+                    <property name="nativeName">transferDescription</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">1</property>
+                </structure>
+            </list-property>
+            <property name="queryText">&lt;queryPropertySet>&lt;org.nightlabs.jfire.reporting.oda.jfs.JFSQueryPropertySet>
+  &lt;scriptRegistryItemID>
+    &lt;organisationID>dev.jfire.org&lt;/organisationID>
+    &lt;scriptRegistryItemType>JFireReportingTrade-MoneyTransfer&lt;/scriptRegistryItemType>
+    &lt;scriptRegistryItemID>MoneyTransferList&lt;/scriptRegistryItemID>
+  &lt;/scriptRegistryItemID>
+  &lt;properties class="tree-map">
+    &lt;no-comparator/>
+  &lt;/properties>
+&lt;/org.nightlabs.jfire.reporting.oda.jfs.JFSQueryPropertySet>&lt;/queryPropertySet></property>
+            <xml-property name="designerValues"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<model:DesignValues xmlns:design="http://www.eclipse.org/datatools/connectivity/oda/design" xmlns:model="http://www.eclipse.org/birt/report/model/adapter/odaModel">
+  <Version>1.0</Version>
+  <design:DataSetParameters>
+    <design:parameterDefinitions>
+      <design:inOutMode>In</design:inOutMode>
+      <design:attributes>
+        <design:name>timePeriod</design:name>
+        <design:position>1</design:position>
+        <design:nativeDataTypeCode>1</design:nativeDataTypeCode>
+        <design:precision>0</design:precision>
+        <design:scale>0</design:scale>
+        <design:nullability>Nullable</design:nullability>
+      </design:attributes>
+      <design:inputAttributes>
+        <design:elementAttributes>
+          <design:defaultScalarValue>__DUMMY_DEFAULT_PARAMETER_VALUE__</design:defaultScalarValue>
+        </design:elementAttributes>
+      </design:inputAttributes>
+    </design:parameterDefinitions>
+    <design:parameterDefinitions>
+      <design:inOutMode>In</design:inOutMode>
+      <design:attributes>
+        <design:name>accountIDs</design:name>
+        <design:position>2</design:position>
+        <design:nativeDataTypeCode>1</design:nativeDataTypeCode>
+        <design:precision>0</design:precision>
+        <design:scale>0</design:scale>
+        <design:nullability>Nullable</design:nullability>
+      </design:attributes>
+      <design:inputAttributes>
+        <design:elementAttributes>
+          <design:defaultScalarValue>__DUMMY_DEFAULT_PARAMETER_VALUE__</design:defaultScalarValue>
+        </design:elementAttributes>
+      </design:inputAttributes>
+    </design:parameterDefinitions>
+    <design:parameterDefinitions>
+      <design:inOutMode>In</design:inOutMode>
+      <design:attributes>
+        <design:name>initiatorIDs</design:name>
+        <design:position>3</design:position>
+        <design:nativeDataTypeCode>1</design:nativeDataTypeCode>
+        <design:precision>0</design:precision>
+        <design:scale>0</design:scale>
+        <design:nullability>Nullable</design:nullability>
+      </design:attributes>
+      <design:inputAttributes>
+        <design:elementAttributes>
+          <design:defaultScalarValue>__DUMMY_DEFAULT_PARAMETER_VALUE__</design:defaultScalarValue>
+        </design:elementAttributes>
+      </design:inputAttributes>
+    </design:parameterDefinitions>
+  </design:DataSetParameters>
+  <design:ResultSets derivedMetaData="true">
+    <design:resultSetDefinitions>
+      <design:resultSetColumns>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:name>queryAccountJDOID</design:name>
+            <design:position>1</design:position>
+            <design:nativeDataTypeCode>1</design:nativeDataTypeCode>
+            <design:precision>0</design:precision>
+            <design:scale>2</design:scale>
+            <design:nullability>Nullable</design:nullability>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>queryAccountJDOID</design:label>
+            <design:formattingHints>
+              <design:displaySize>0</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:name>anchorJDOID</design:name>
+            <design:position>2</design:position>
+            <design:nativeDataTypeCode>1</design:nativeDataTypeCode>
+            <design:precision>0</design:precision>
+            <design:scale>2</design:scale>
+            <design:nullability>Nullable</design:nullability>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>anchorJDOID</design:label>
+            <design:formattingHints>
+              <design:displaySize>0</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:name>organisationID</design:name>
+            <design:position>3</design:position>
+            <design:nativeDataTypeCode>1</design:nativeDataTypeCode>
+            <design:precision>0</design:precision>
+            <design:scale>2</design:scale>
+            <design:nullability>Nullable</design:nullability>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>organisationID</design:label>
+            <design:formattingHints>
+              <design:displaySize>0</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:name>transferTypeID</design:name>
+            <design:position>4</design:position>
+            <design:nativeDataTypeCode>1</design:nativeDataTypeCode>
+            <design:precision>0</design:precision>
+            <design:scale>2</design:scale>
+            <design:nullability>Nullable</design:nullability>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>transferTypeID</design:label>
+            <design:formattingHints>
+              <design:displaySize>0</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:name>transferID</design:name>
+            <design:position>5</design:position>
+            <design:nativeDataTypeCode>6</design:nativeDataTypeCode>
+            <design:precision>0</design:precision>
+            <design:scale>2</design:scale>
+            <design:nullability>Nullable</design:nullability>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>transferID</design:label>
+            <design:formattingHints>
+              <design:displaySize>0</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:name>containerJDOID</design:name>
+            <design:position>6</design:position>
+            <design:nativeDataTypeCode>1</design:nativeDataTypeCode>
+            <design:precision>0</design:precision>
+            <design:scale>2</design:scale>
+            <design:nullability>Nullable</design:nullability>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>containerJDOID</design:label>
+            <design:formattingHints>
+              <design:displaySize>0</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:name>fromAnchorJDOID</design:name>
+            <design:position>7</design:position>
+            <design:nativeDataTypeCode>1</design:nativeDataTypeCode>
+            <design:precision>0</design:precision>
+            <design:scale>2</design:scale>
+            <design:nullability>Nullable</design:nullability>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>fromAnchorJDOID</design:label>
+            <design:formattingHints>
+              <design:displaySize>0</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:name>toAnchorJDOID</design:name>
+            <design:position>8</design:position>
+            <design:nativeDataTypeCode>1</design:nativeDataTypeCode>
+            <design:precision>0</design:precision>
+            <design:scale>2</design:scale>
+            <design:nullability>Nullable</design:nullability>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>toAnchorJDOID</design:label>
+            <design:formattingHints>
+              <design:displaySize>0</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:name>fromBalanceBeforeTransfer</design:name>
+            <design:position>9</design:position>
+            <design:nativeDataTypeCode>6</design:nativeDataTypeCode>
+            <design:precision>0</design:precision>
+            <design:scale>2</design:scale>
+            <design:nullability>Nullable</design:nullability>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>fromBalanceBeforeTransfer</design:label>
+            <design:formattingHints>
+              <design:displaySize>0</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:name>toBalanceBeforeTransfer</design:name>
+            <design:position>10</design:position>
+            <design:nativeDataTypeCode>6</design:nativeDataTypeCode>
+            <design:precision>0</design:precision>
+            <design:scale>2</design:scale>
+            <design:nullability>Nullable</design:nullability>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>toBalanceBeforeTransfer</design:label>
+            <design:formattingHints>
+              <design:displaySize>0</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:name>initiatorJDOID</design:name>
+            <design:position>11</design:position>
+            <design:nativeDataTypeCode>1</design:nativeDataTypeCode>
+            <design:precision>0</design:precision>
+            <design:scale>2</design:scale>
+            <design:nullability>Nullable</design:nullability>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>initiatorJDOID</design:label>
+            <design:formattingHints>
+              <design:displaySize>0</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:name>timeStamp</design:name>
+            <design:position>12</design:position>
+            <design:nativeDataTypeCode>93</design:nativeDataTypeCode>
+            <design:precision>0</design:precision>
+            <design:scale>2</design:scale>
+            <design:nullability>Nullable</design:nullability>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>timeStamp</design:label>
+            <design:formattingHints>
+              <design:displaySize>0</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:name>currencyJDOID</design:name>
+            <design:position>13</design:position>
+            <design:nativeDataTypeCode>1</design:nativeDataTypeCode>
+            <design:precision>0</design:precision>
+            <design:scale>2</design:scale>
+            <design:nullability>Nullable</design:nullability>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>currencyJDOID</design:label>
+            <design:formattingHints>
+              <design:displaySize>0</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:name>amount</design:name>
+            <design:position>14</design:position>
+            <design:nativeDataTypeCode>6</design:nativeDataTypeCode>
+            <design:precision>0</design:precision>
+            <design:scale>2</design:scale>
+            <design:nullability>Nullable</design:nullability>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>amount</design:label>
+            <design:formattingHints>
+              <design:displaySize>0</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:name>transferDescription</design:name>
+            <design:position>15</design:position>
+            <design:nativeDataTypeCode>1</design:nativeDataTypeCode>
+            <design:precision>0</design:precision>
+            <design:scale>2</design:scale>
+            <design:nullability>Nullable</design:nullability>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>transferDescription</design:label>
+            <design:formattingHints>
+              <design:displaySize>0</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+      </design:resultSetColumns>
+    </design:resultSetDefinitions>
+  </design:ResultSets>
+</model:DesignValues>]]></xml-property>
+        </oda-data-set>
+    </data-sets>
+    <page-setup>
+        <simple-master-page name="Simple MasterPage" id="2">
+            <property name="type">a4</property>
+            <property name="orientation">landscape</property>
+            <property name="topMargin">0.5in</property>
+            <property name="leftMargin">0.5in</property>
+            <property name="bottomMargin">0.5in</property>
+            <property name="rightMargin">0.5in</property>
+            <property name="fontSize">medium</property>
+            <property name="textIndent">0em</property>
+            <property name="showHeaderOnFirst">false</property>
+            <property name="headerHeight">0.5in</property>
+            <property name="footerHeight">0.5in</property>
+            <page-footer>
+                <text id="3">
+                    <property name="contentType">html</property>
+                    <text-property name="content"><![CDATA[<value-of>new Date()</value-of>]]></text-property>
+                </text>
+            </page-footer>
+        </simple-master-page>
+    </page-setup>
+    <body>
+        <grid id="355">
+            <property name="height">1.71875in</property>
+            <property name="width">10.6666666667in</property>
+            <column id="356"/>
+            <column id="357"/>
+            <row id="361">
+                <cell id="362">
+                    <text id="471">
+                        <property name="fontFamily">"Arial"</property>
+                        <property name="fontWeight">bold</property>
+                        <property name="contentType">auto</property>
+                        <text-property name="content"><![CDATA[Parameters:]]></text-property>
+                    </text>
+                    <grid id="472">
+                        <property name="width">100%</property>
+                        <column id="473"/>
+                        <column id="474"/>
+                        <row id="475">
+                            <cell id="476">
+                                <property name="paddingTop">1pt</property>
+                                <property name="paddingLeft">5pt</property>
+                                <property name="paddingBottom">1pt</property>
+                                <text-data id="681">
+                                    <expression name="valueExpr">text = reportContext.getMessage("parameterListing.timePeriod", reportContext.getLocale());
+if (JFireReportingHelper.getParameter("timePeriod") == null) {
+  text + reportContext.getMessage("parameterListing.timePeriod.none", reportContext.getLocale());
+} else {
+  timePeriod = JFireReportingHelper.getParameter("timePeriod");
+  text = text + "&lt;br>&amp;nbsp;" + reportContext.getMessage("parameterListing.timePeriod.from", reportContext.getLocale());
+  if (timePeriod.getFrom() == null) {  
+    text = text + reportContext.getMessage("parameterListing.timePeriod.none", reportContext.getLocale());
+  } else {
+    text = text + (new Date(timePeriod.getFrom().getTime())).toLocaleString();
+  }
+  text = text + "&lt;br>&amp;nbsp;" + reportContext.getMessage("parameterListing.timePeriod.to", reportContext.getLocale());
+  if (timePeriod.getTo() == null) {  
+    text = text + reportContext.getMessage("parameterListing.timePeriod.none", reportContext.getLocale())
+  } else {
+    text = text + (new Date(timePeriod.getTo().getTime())).toLocaleString()
+  }
+}</expression>
+                                    <property name="contentType">html</property>
+                                </text-data>
+                            </cell>
+                            <cell id="477">
+                                <property name="paddingTop">1pt</property>
+                                <property name="paddingLeft">5pt</property>
+                            </cell>
+                        </row>
+                        <row id="478">
+                            <cell id="479"/>
+                            <cell id="480"/>
+                        </row>
+                        <row id="481">
+                            <cell id="482"/>
+                            <cell id="483"/>
+                        </row>
+                    </grid>
+                </cell>
+                <cell id="363">
+                    <property name="textAlign">right</property>
+                    <image id="213">
+                        <property name="source">embed</property>
+                        <property name="imageName">JFire-Logo.jpg</property>
+                    </image>
+                    <text id="354">
+                        <property name="fontFamily">"Arial"</property>
+                        <property name="contentType">html</property>
+                        <text-property name="content"><![CDATA[<H2>
+JFire Transfer List
+</H2>]]></text-property>
+                    </text>
+                </cell>
+            </row>
+            <row id="364">
+                <property name="height">0.3541666667in</property>
+                <cell id="365"/>
+                <cell id="366"/>
+            </row>
+        </grid>
+        <table id="492">
+            <property name="marginTop">0pt</property>
+            <property name="height">3.25in</property>
+            <property name="width">10.6979166667in</property>
+            <property name="dataSet">Data Set</property>
+            <list-property name="paramBindings">
+                <structure>
+                    <property name="paramName">accountIDs</property>
+                    <expression name="expression">if (JFireReportingHelper.getParameter("accountIDs") != null)
+    JFireReportingHelper.createDataSetParam(JFireReportingHelper.getParameter("accountIDs"))</expression>
+                </structure>
+                <structure>
+                    <property name="paramName">timePeriod</property>
+                    <expression name="expression">if (JFireReportingHelper.getParameter("timePeriod") != null)
+    JFireReportingHelper.createDataSetParam(JFireReportingHelper.getParameter("timePeriod"))</expression>
+                </structure>
+                <structure>
+                    <property name="paramName">initiatorIDs</property>
+                    <expression name="expression">if (JFireReportingHelper.getParameter("initiatorIDs") != null)
+    JFireReportingHelper.createDataSetParam(JFireReportingHelper.getParameter("initiatorIDs"))</expression>
+                </structure>
+            </list-property>
+            <list-property name="boundDataColumns">
+                <structure>
+                    <property name="name">queryAccountJDOID</property>
+                    <expression name="expression">dataSetRow["queryAccountJDOID"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">anchorJDOID</property>
+                    <expression name="expression">dataSetRow["anchorJDOID"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">organisationID</property>
+                    <expression name="expression">dataSetRow["organisationID"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">transferTypeID</property>
+                    <expression name="expression">dataSetRow["transferTypeID"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">transferID</property>
+                    <expression name="expression">dataSetRow["transferID"]</expression>
+                    <property name="dataType">decimal</property>
+                </structure>
+                <structure>
+                    <property name="name">containerJDOID</property>
+                    <expression name="expression">dataSetRow["containerJDOID"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">fromAnchorJDOID</property>
+                    <expression name="expression">dataSetRow["fromAnchorJDOID"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">toAnchorJDOID</property>
+                    <expression name="expression">dataSetRow["toAnchorJDOID"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">fromBalanceBeforeTransfer</property>
+                    <expression name="expression">dataSetRow["fromBalanceBeforeTransfer"]</expression>
+                    <property name="dataType">decimal</property>
+                </structure>
+                <structure>
+                    <property name="name">toBalanceBeforeTransfer</property>
+                    <expression name="expression">dataSetRow["toBalanceBeforeTransfer"]</expression>
+                    <property name="dataType">decimal</property>
+                </structure>
+                <structure>
+                    <property name="name">initiatorJDOID</property>
+                    <expression name="expression">dataSetRow["initiatorJDOID"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">timeStamp</property>
+                    <expression name="expression">dataSetRow["timeStamp"]</expression>
+                    <property name="dataType">date-time</property>
+                </structure>
+                <structure>
+                    <property name="name">currencyJDOID</property>
+                    <expression name="expression">dataSetRow["currencyJDOID"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">amount</property>
+                    <expression name="expression">dataSetRow["amount"]</expression>
+                    <property name="dataType">decimal</property>
+                </structure>
+                <structure>
+                    <property name="name">transferDescription</property>
+                    <expression name="expression">dataSetRow["transferDescription"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">TransferAmount</property>
+                    <expression name="expression">currency = JFireReportingHelper.getJDOObject(dataSetRow["currencyJDOID"]);
+currency.toDouble(row["amount"])</expression>
+                    <property name="dataType">float</property>
+                </structure>
+                <structure>
+                    <property name="name">balanceAfterTransfer</property>
+                    <expression name="expression">dataSetRow["balanceAfterTransfer"]</expression>
+                    <property name="dataType">decimal</property>
+                </structure>
+            </list-property>
+            <list-property name="sort">
+                <structure>
+                    <expression name="key">row["timeStamp"]</expression>
+                    <property name="direction">asc</property>
+                </structure>
+            </list-property>
+            <column id="635">
+                <property name="width">3.2cm</property>
+            </column>
+            <column id="577">
+                <property name="width">5cm</property>
+            </column>
+            <column id="578">
+                <property name="width">5cm</property>
+            </column>
+            <column id="584">
+                <property name="width">2.5cm</property>
+            </column>
+            <column id="660">
+                <property name="width">2.5cm</property>
+            </column>
+            <column id="585"/>
+            <header>
+                <row id="493">
+                    <cell id="630">
+                        <property name="paddingTop">1pt</property>
+                    </cell>
+                    <cell id="506">
+                        <property name="paddingTop">1pt</property>
+                    </cell>
+                    <cell id="508">
+                        <property name="paddingTop">1pt</property>
+                    </cell>
+                    <cell id="520">
+                        <property name="paddingTop">1pt</property>
+                    </cell>
+                    <cell id="655">
+                        <property name="paddingTop">1pt</property>
+                    </cell>
+                    <cell id="522">
+                        <property name="paddingTop">1pt</property>
+                    </cell>
+                </row>
+            </header>
+            <group id="586">
+                <property name="groupName">AnchorGroup</property>
+                <property name="interval">none</property>
+                <property name="sortDirection">asc</property>
+                <expression name="keyExpr">row["queryAccountJDOID"]</expression>
+                <structure name="toc">
+                    <expression name="expressionValue">account = JFireReportingHelper.getJDOObject(row["queryAccountJDOID"]);
+account.getDescription()</expression>
+                </structure>
+                <property name="repeatHeader">true</property>
+                <property name="hideDetail">false</property>
+                <property name="pageBreakAfter">avoid</property>
+                <property name="pageBreakBefore">auto</property>
+                <property name="pageBreakInside">avoid</property>
+                <header>
+                    <row id="587">
+                        <property name="backgroundColor">#C0C0C0</property>
+                        <cell id="631">
+                            <property name="colSpan">6</property>
+                            <property name="rowSpan">1</property>
+                            <property name="borderLeftColor">#000000</property>
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">thin</property>
+                            <property name="borderRightColor">#000000</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">thin</property>
+                            <property name="borderTopColor">#000000</property>
+                            <property name="borderTopStyle">solid</property>
+                            <property name="borderTopWidth">thin</property>
+                            <property name="paddingTop">1pt</property>
+                            <text-data id="620">
+                                <property name="fontFamily">"Arial Narrow"</property>
+                                <expression name="valueExpr">account = JFireReportingHelper.getJDOObject(row["queryAccountJDOID"]);
+account.getDescription() + " (" + account.getPrimaryKey() + ")";</expression>
+                                <property name="contentType">html</property>
+                            </text-data>
+                        </cell>
+                    </row>
+                    <row id="663">
+                        <property name="backgroundColor">#C0C0C0</property>
+                        <property name="borderBottomColor">#000000</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderTopColor">#000000</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <cell id="664">
+                            <property name="borderLeftColor">#000000</property>
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">thin</property>
+                            <property name="paddingTop">1pt</property>
+                            <label id="517">
+                                <property name="fontFamily">"Arial Narrow"</property>
+                                <text-property name="text" key="header.timestamp">header.timestamp</text-property>
+                            </label>
+                        </cell>
+                        <cell id="666">
+                            <property name="paddingTop">1pt</property>
+                            <label id="507">
+                                <property name="fontFamily">"Arial Narrow"</property>
+                                <text-property name="text" key="header.from">header.from</text-property>
+                            </label>
+                        </cell>
+                        <cell id="667">
+                            <property name="paddingTop">1pt</property>
+                            <label id="509">
+                                <property name="fontFamily">"Arial Narrow"</property>
+                                <text-property name="text" key="header.to">header.to</text-property>
+                            </label>
+                        </cell>
+                        <cell id="669">
+                            <property name="paddingTop">1pt</property>
+                            <property name="textAlign">right</property>
+                            <label id="521">
+                                <property name="fontFamily">"Arial Narrow"</property>
+                                <text-property name="text" key="header.amount">header.amount</text-property>
+                            </label>
+                        </cell>
+                        <cell id="670">
+                            <property name="paddingTop">1pt</property>
+                            <property name="textAlign">right</property>
+                            <label id="661">
+                                <property name="fontFamily">"Arial Narrow"</property>
+                                <text-property name="text" key="header.balance">header.balance</text-property>
+                            </label>
+                        </cell>
+                        <cell id="671">
+                            <property name="borderRightColor">#000000</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">thin</property>
+                            <property name="paddingTop">1pt</property>
+                            <property name="paddingLeft">5pt</property>
+                            <label id="523">
+                                <property name="fontFamily">"Arial Narrow"</property>
+                                <text-property name="text" key="header.description">header.description</text-property>
+                            </label>
+                        </cell>
+                    </row>
+                </header>
+                <footer>
+                    <row id="672">
+                        <property name="height">1mm</property>
+                        <cell id="673">
+                            <property name="borderBottomColor">#000000</property>
+                            <property name="borderBottomStyle">solid</property>
+                            <property name="borderBottomWidth">thin</property>
+                            <property name="borderLeftColor">#000000</property>
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">thin</property>
+                            <property name="paddingTop">1pt</property>
+                        </cell>
+                        <cell id="675">
+                            <property name="borderBottomColor">#000000</property>
+                            <property name="borderBottomStyle">solid</property>
+                            <property name="borderBottomWidth">thin</property>
+                            <property name="paddingTop">1pt</property>
+                        </cell>
+                        <cell id="676">
+                            <property name="borderBottomColor">#000000</property>
+                            <property name="borderBottomStyle">solid</property>
+                            <property name="borderBottomWidth">thin</property>
+                            <property name="paddingTop">1pt</property>
+                        </cell>
+                        <cell id="678">
+                            <property name="borderBottomColor">#000000</property>
+                            <property name="borderBottomStyle">solid</property>
+                            <property name="borderBottomWidth">thin</property>
+                            <property name="paddingTop">1pt</property>
+                        </cell>
+                        <cell id="679">
+                            <property name="borderBottomColor">#000000</property>
+                            <property name="borderBottomStyle">solid</property>
+                            <property name="borderBottomWidth">thin</property>
+                            <property name="paddingTop">1pt</property>
+                        </cell>
+                        <cell id="680">
+                            <property name="borderBottomColor">#000000</property>
+                            <property name="borderBottomStyle">solid</property>
+                            <property name="borderBottomWidth">thin</property>
+                            <property name="borderRightColor">#000000</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">thin</property>
+                            <property name="paddingTop">1pt</property>
+                        </cell>
+                    </row>
+                    <row id="603">
+                        <property name="height">0.3541666667in</property>
+                        <cell id="633">
+                            <property name="paddingTop">1pt</property>
+                        </cell>
+                        <cell id="610">
+                            <property name="paddingTop">1pt</property>
+                        </cell>
+                        <cell id="611">
+                            <property name="paddingTop">1pt</property>
+                        </cell>
+                        <cell id="617">
+                            <property name="paddingTop">1pt</property>
+                        </cell>
+                        <cell id="658">
+                            <property name="paddingTop">1pt</property>
+                        </cell>
+                        <cell id="618">
+                            <property name="paddingTop">1pt</property>
+                        </cell>
+                    </row>
+                </footer>
+            </group>
+            <detail>
+                <row id="524">
+                    <cell id="632">
+                        <property name="borderLeftColor">#000000</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="paddingTop">1pt</property>
+                        <data id="548">
+                            <property name="fontFamily">"Arial Narrow"</property>
+                            <structure name="dateTimeFormat">
+                                <property name="category">Custom</property>
+                                <property name="pattern">dd. MM: yyyy HH:mm:ss</property>
+                            </structure>
+                            <property name="resultSetColumn">timeStamp</property>
+                        </data>
+                    </cell>
+                    <cell id="537">
+                        <property name="paddingTop">1pt</property>
+                        <text-data id="621">
+                            <property name="fontFamily">"Arial Narrow"</property>
+                            <expression name="valueExpr">if (row["queryAccountJDOID"] == row["fromAnchorJDOID"])
+ ""
+else {
+  account = JFireReportingHelper.getJDOObject(row["fromAnchorJDOID"]);
+  account.getDescription()
+}</expression>
+                            <property name="contentType">html</property>
+                        </text-data>
+                    </cell>
+                    <cell id="539">
+                        <property name="paddingTop">1pt</property>
+                        <text-data id="622">
+                            <property name="fontFamily">"Arial Narrow"</property>
+                            <expression name="valueExpr">if (row["queryAccountJDOID"] == row["toAnchorJDOID"])
+ ""
+else {
+  account = JFireReportingHelper.getJDOObject(row["toAnchorJDOID"]);
+  account.getDescription()
+}</expression>
+                            <property name="contentType">html</property>
+                        </text-data>
+                    </cell>
+                    <cell id="551">
+                        <property name="paddingTop">1pt</property>
+                        <property name="textAlign">right</property>
+                        <data id="654">
+                            <property name="fontFamily">"Arial Narrow"</property>
+                            <structure name="numberFormat">
+                                <property name="category">Currency</property>
+                                <property name="pattern">###0.00</property>
+                            </structure>
+                            <property name="resultSetColumn">TransferAmount</property>
+                        </data>
+                    </cell>
+                    <cell id="657">
+                        <property name="paddingTop">1pt</property>
+                        <property name="textAlign">right</property>
+                        <data id="662">
+                            <property name="fontFamily">"Arial Narrow"</property>
+                            <structure name="numberFormat">
+                                <property name="category">Currency</property>
+                                <property name="pattern">###0.00</property>
+                            </structure>
+                            <property name="resultSetColumn">balanceAfterTransfer</property>
+                        </data>
+                    </cell>
+                    <cell id="553">
+                        <property name="borderRightColor">#000000</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="paddingTop">1pt</property>
+                        <property name="paddingLeft">5pt</property>
+                        <data id="554">
+                            <property name="fontFamily">"Arial Narrow"</property>
+                            <property name="resultSetColumn">transferDescription</property>
+                        </data>
+                    </cell>
+                </row>
+            </detail>
+            <footer>
+                <row id="555">
+                    <property name="height">0.4479166667in</property>
+                    <cell id="634">
+                        <property name="paddingTop">1pt</property>
+                    </cell>
+                    <cell id="562">
+                        <property name="paddingTop">1pt</property>
+                    </cell>
+                    <cell id="563">
+                        <property name="paddingTop">1pt</property>
+                    </cell>
+                    <cell id="569">
+                        <property name="paddingTop">1pt</property>
+                    </cell>
+                    <cell id="659">
+                        <property name="paddingTop">1pt</property>
+                    </cell>
+                    <cell id="570">
+                        <property name="paddingTop">1pt</property>
+                    </cell>
+                </row>
+            </footer>
+        </table>
+    </body>
+    <list-property name="images">
+        <structure>
+            <property name="name">JFire-Logo.jpg</property>
+            <property name="data">
+                /9j/4AAQSkZJRgABAQEASABIAAD/4QAWRXhpZgAATU0AKgAAAAgAAAAAAAD/2wBDAAUDBAQEAwUEBAQF
+                BQUGBwwIBwcHBw8LCwkMEQ8SEhEPERETFhwXExQaFRERGCEYGh0dHx8fExciJCIeJBweHx7/2wBDAQUF
+                BQcGBw4ICA4eFBEUHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4e
+                Hh7/wAARCABPAOsDASIAAhEBAxEB/8QAHAAAAgIDAQEAAAAAAAAAAAAAAAYFBwEECAID/8QARxAAAQIF
+                AQMHBwkHAQkAAAAAAQIDAAQFBhEHEiExE0FRYXGBkRQWIpSh0dIIFRcyQlaEkrFSVWJygpOi4SQlMzVG
+                U3ODwf/EABoBAQACAwEAAAAAAAAAAAAAAAAFBgECBAP/xAAuEQABAwIEAgoDAQEAAAAAAAABAAMEAhEF
+                EiExQZEGEyJRYXGBscHhMtHwM6H/2gAMAwEAAhEDEQA/AOy4IIIIiCCCCIggggiIIIIIiCCCCIggggiI
+                IIIIiCCMbSc42hntgizBBBBEQQQQREEfKXmGZgLLLiVhCyhRHAKHER9YwCDqFki26I8uuNstlx1aUISM
+                lSjgAQsXfe9KoKVMpUJud5mW1fV/mPN+sVDct0VevukzkwUs59Fhvcgd3P2mIXEMdjw70jtVdw+SpiBg
+                j8u1R7NPefgK1K7qPQacpTUspc+8N2GtyQf5j/8AMwuM33dlcmDL0Kksp6wkrKe1RISIr+miQS5y1QLi
+                208GWjhTnVn7I698WTaKrmrbCUUxti36OnclTLWVr7CeJ64hGMSlz3MprIHdSNeZ28yfRTT+GxYLeYUg
+                nvqOnIb+QHqt+Vod/TuF1C40SQP2GUgqHgAPbEizataa9IXlUyv+JAUPAmJum0tySWlXzpPzO70hMLCw
+                r2bu6JKLIzhzYF681/Go/BVcdnuE2py28KR8hQkmxckmQHZ2TqLQ47bZac8RkHwiZbUpSApSCgniknhH
+                qCO5tvqxYE+uv2uKtw1m5A9NPpEEEEei0RBBBBEQQQQREEEEERBBBBEQQQQRELd9XZLW1Jp9APzjoPJN
+                Z/yPVDJFJ11ldy6prp7zhS2ZjkOxCAc48D4xE4vMcjtClr86jYeqlMJiNyHSXfxpFz6LyzM3zeDq1yzs
+                yWM4PJq5JpPVnn9sbCtOrt2dvyiXUro8pVn9Idqzd9v2mtujoYeUplAHJMIGEDG7JJG+Jq2rhptwSin6
+                e6SUHDjaxhaD1iItrC4j1ZbeeNTnHVSbuJy2qOsZZFLfDT3VSP06/qECsGppbTvJadLiB3AmPchqRc0o
+                diYWxNAbiHWsHxGIu6IC5bRotdbUZmWDUwR6L7Q2Vjt6e+PR3BJDIvEeI8Cf72Xm1jMd42lsg+IH97pG
+                TqzOBGFUZgq6Q8QPDEQ9b1Gr9RaUyypqRbVuPIj0sfzHh3YjRu+z6pbzhW4nyiTJ9F9A3dihzGFyK5Lx
+                HEqCWnqyOQ9lYouH4dWA6zQCOfurSo+oFBolDl5CTlp2ZcbR6SlJCQpZ3kk5PEwvXHqHXKolTMsRT2Fb
+                ilo+mR1q4+GIToI83cZluNhsVWpGlhp9r0aweI3WXDTc766/SFEqUVKJJO8k88EABJAAyTFg2Hp/MTrr
+                dQrbSmJRJCksK3Ld7ege2OWJDeluZGhf4811S5jMRvO4bfPkvOm9jmqFFVqzZTJA5aaO4vdZ/h/WLgab
+                Q02lttCUISMJSkYAEQ9ZuOhUFsNTc402pKcJZb9JWOjA4Qpv6pS7j4Zp1GmZkk4TtKAJ7hmL1GqgYVR1
+                RrGbjxJ5KjyBOxSvrBQcvDgBzVjQQpSF01p1sOzNoVJDZ521BR/KcGJuTrDMwBtSs/LqP2XpVY9oGIlG
+                pjTv4nmCPcKMciut7jkQfZSUEYQoKTkcIzHSudEEEEERBBBBEQRqP1OmsOll+oSjTg4oW8lJHcTHtifk
+                ZhYQxOS7qjwCHQonwMEWxBBEdPV6hyD3Iz1Zp0q5+w9NIQrwJgikYIhvOy1vvLRvXm/ijIuq1zwuSjn8
+                c38UEUxBER502x946P66374Bc9tHhcNIP41v3wRS8VBqLS5yh3YLjppC0FxLq8by2vn2h0Hp6zFrU+oS
+                FQbU5ITstNoSdlSmHUrAPQSDGhccpb8+15PWFSoJHolx0IWOw5zEbikQSmcoNqgbg7WKkMNlmM9mtcHQ
+                jvCRpmu2BXFNVWrsusz6ACtsIX6ZHNu3EduI+ml4XP3hVq3KSypanOJKUoxgFRUCP0J74k6fYFnrmdtp
+                5ybA38n5SFD2b4bx83UengFUtIyjQxlRDaE953RwRIElx2l1/KLG/ZGpO2pXdKnR22qmmMxuLdrYDfQL
+                bgiG87LW+8tG9eb+KAXXa5OBclHP45v4osKgVLutodQptxCVoUMFKhkEQhXLpnTp5an6U6ZF07+TIy2T
+                2cRDR502x946P66374yLnto8LhpB7J1v3xyyoTEqnK7TddMaW9FqzNVWVNVWxLmp5JNPMy2PtsKC893H
+                2QvzEnNy6tmYlX2lDmW2Un2x0jIVGn1FClSE9KzaUnCiw6lYHbgxsLQhScLSlQ6xmK+90VZqN26yPPX9
+                KfZ6UPUizlAPlp+1zbR5yep84mYkEjlx9UloLI7Mg4MNzCNR6+nY255tlXFSiGE49hMWTMXFaVPmFNPV
+                qjSzw+skzDaVDtGYBeNpfeaj+ut++PSP0dqbGWp6rL3DT9rzkdIKXDmpZpv3nX9JPoulidsPVqoKdJOS
+                2xuz2qO/2Q+0ei0ukNcnT5JpgYwVJT6R7TxMafnjaX3mo/rrfvjPnfan3mo3rrfviYi4bGi/5Ua9+55q
+                IlYhIlf6VXHdw5KbgiE877U+81G9db98SdPn5Goy/lFPnJebZzs8ow6lac9GQcZjuXEtiCCCCIghOvzU
+                WgWdOMSVRTNPzLqOU5OXQCUpyQCckDfgxE0HWK2azWJSly0nVEPzbyWkFbSNkEnAzhR3QsisePnNPNy0
+                s7MOqCW2kFayeYAZMfSEfXKsfNGnM/sL2XpvZlW/6j6X+IVBFzJclScrFfn6o6TtTUwt3fzAkkDuEOXy
+                fae5PakSrqSQiTacfWR2bIHioRXsX58l6kclS6pW3E+k+4mXbP8ACkZV7SPCNjssKV+UBec7btLlqVSn
+                ixOTwUpbyT6TbY3bugk8/UY5xWpx50qWpbjizvJOSow9a9Vb501HnEJVtNSSUyyO0DKv8iYSJCZdkp5i
+                cYKQ6w4l1G0MjaScjI5+EAinm7DvNxAWi2amUkZB5AiPY0+vYjItmo/2oZhrdeY4ppp/Dn4oz9N95f8A
+                apn9g/FDVEtDTu9yM+bU/wDk/wBY9DTi+D/01O+A98Mg1wvEDezSz/6FfFGzTNZ70nqjLSTUtS1OPupa
+                SORVvKiAPtdcNUVkaOUGYs2wH3quz5PNOLXMvoJBKUgYAPXgZ74qmpTsxUJ56cmXFLddWVEk5480XPq5
+                UTI2etjaAdm1pa3dHFX6Y74pCKL0pkmp6lkHYX9T/f8AVdujEbK1U8eJsPIJ+0SklvXFMToJDcuxsnHA
+                lR3ewGFf5SlecnLsaobTyvJ5FpJcQDuLihnJ6wkjxMWlpJJt0yzHKk/hHLqU8tR5kJGB+hPfHM90VNyt
+                XHUKq6TtTT63B1AncO4YEWLAY/UwqAdzrz+lX8bf66bWRsNOX2vFDotVrk0qVpEg/OvJTtqQ0nJA6TE2
+                dOr3Az5tT/cge+H/AEaqVIsayn7nrhdSanNeTy4bRtKUhA4gdGdrwENa9cLOTwYqiuxhPxRMXUSuf67b
+                tcoQaNYpkzJB7PJ8qnG1jjjxERcM+pN3TV43G5UHQpqWQNiVZJ/4aOvrPExKaN2Qq768XZsEUuTIVMHO
+                Cs8yB28/VGUVifJqtmdkZKauObK2251Aal2ju2kg5Kz37h3xpfKGvmflZ4WrSphUukNhc442rClbW8Iz
+                zDG89ORF1nyeRkiQlDMvLt8AMBCUj9ABHG93VZdcuao1Zwn/AGl9S055k59EdwxGo1RaEpLzM7Nty0qy
+                4/MOq2UNoSVKUTzAc8T4sG9Dwtiqf2DEZbNbnrerTFXpxbEyxnYLiNobwQd3YYeBrXeoP16efw/+sbao
+                lvzAvX7s1P8AsmMjT69iM+bNR/tQyfTbevTTvV/9YyrW29CMAU4dYlz74xqiWxp5exIHmzUN/S3HSOlN
+                vO2zY8jTZlCUTRBdmADnC1HOM9QwO6Ky031OvO5L0p9JdEkuXdUS/ssYIQASTnO6L3jBugRBBBGFlcn6
+                2VBVR1LqyicpYcEunqCAAfbmIax621bt0yNaelPK0yqyrktvZycEA5weGcxauoejlcqdyz9Xo85JutTb
+                xeLTyihSCo5IzggjMLf0J3t0U31k+6NlhNh1/l+a13T2zo+CETVXUV690SbCaf5BLSxUvYL3KFazuznA
+                4D9TEgNEb1PE0wdswfhjI0RvT9ql+sH4YaIqyjrSwJRq1NL5IzA2BLyZmn88ckFas+OO6K0s/Q+pN1hi
+                ZuKclBKNLC1MsKKlO4+ySQMCLevmjzVbtCoUaQfblnplnk0rXnZAyMg45iMiMEoFyBUpp2eqExOvnLr7
+                qnFnrUcmLS+T9ZNKuL5xqdbkxNSzBSyy2okJKyMqJxxwNnxj5/QVdO1j5wpWOnlF/DFz6ZWv5o2mxSVu
+                oef21OvuIGApaujsAA7oySi+A02sYHPm3J/5e+PQ04sccLake9J98NcEarKVhp3ZA4W1T+9vMbNPsm0q
+                fNtTcnb9PZmGlbTbiWhtJPSOuGCCCKndbKj5RX2KchWUyrWVD+JW/wDTHjCJKsrmJlqXbGVurCEjpJOI
+                si79Pq7U7inKhLPSq2n17SdtwhQGBu4c0fSzdO6nT6/LVCpuSvIy6tsIbUVFSsbubp390UCXhsyXOqqq
+                oNid/Db2V8iYjEiwqaaaxcDbx391v6uTyLY0nekmVBK3WUSLWOJyMKP5QqOYWGnH322WkFbjiglCRxJJ
+                wBHTms1k1u9BTmabOyjEvLbanEPFQ2lnAB3A8AD4wp2Jo1VqTdkhU6tOSDsrKucqUNFRUpQ+rxA58Hui
+                /wBAFFIA4Kh1E1G5TfU9LKNWLeolLn5qdZFLl+TSJdaQFKOConKTvyIihoTaeP8AmFYz/wCVv4ItaCF0
+                XGt7UNy27pn6M4VKEu5htSuKkHek94Ih3+TlXzTLyVSXV4YqTewMng4nJT4jI7xFg6x6Zzt3VWVqlJfl
+                WJhLXJPh4kBQBykggHfvI8ISqXoxedOqctPS8/Skuy7yXEKDq9xBz+zG11hWbrpWvmbTydDa9l+dxKt/
+                1fW/xBjlaOtNUrNVelutyCZsSsyw6HWllOUE4III6N8VF9BV05P+8KX+dfwwCFaumlW0xptB2bmprk1U
+                1OKK1OS5cSE82zvwN0NAubREnfQmx+BPviB+gq6f3hS/zr+GMjQm5+epUsf1r+GGiKd84tDv3Kj1Jfvj
+                Kbi0Ozn5mbHbJLMQX0E3N+86X+ZfwwDQi5uep0sf1L+GGiK2tN27JnpRytWjS5eXTtlhToly2okAEjfv
+                xvEOEQdh283a9qyVGQsOKZSS64BgLWTlR8YnI1WUQQQQRf/Z
+            </property>
+        </structure>
+    </list-property>
+</report>

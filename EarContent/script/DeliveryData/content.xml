@@ -1,0 +1,26 @@
+<!DOCTYPE script-category PUBLIC "-//NightLabs//DTD ScriptingInitializer V 1.0//EN" "http://www.nightlabs.de/dtd/scripting-initializer-content_1_0.dtd">
+<script-category 
+	id="DeliveryData"
+	type="JFireReportingTrade-DeliveryData"
+>
+	<name language="de">Lieferungs-Daten</name>
+	<name language="en">Delivery-Data</name>
+
+	<script 
+		file="DeliveryList.javaclass" 
+		id="DeliveryList"
+		resultClass="org.eclipse.datatools.connectivity.oda.IResultSet"
+	>
+		<name language="de">Lieferungen: Liste</name>
+		<name language="en">Deliveries: List</name>
+		<parameter-set>
+			<name language="de">ParameterSet: Lieferungen-Liste</name>
+			<name language="en">ParameterSet: Order-List</name>
+			<parameter name="createUserID" type="org.nightlabs.jfire.security.id.UserID"/>	
+			<parameter name="createGroupID" type="org.nightlabs.jfire.security.id.UserID"/>	
+			<parameter name="createTimePeriod" type="org.nightlabs.timepattern.TimePattern"/>	
+			<parameter name="deliveryTimePeriod" type="org.nightlabs.timepattern.TimePattern"/>	
+		</parameter-set>
+	</script>
+	
+</script-category>

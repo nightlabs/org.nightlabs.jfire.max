@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE reporting_initialiser PUBLIC "-//NightLabs//Reporting Initialiser DTD V 0.3//EN" "http://www.nightlabs.de/dtd/reporting-initialiser-content_0_3.dtd">
+<report-category 
+	id="Payment-Root"
+	type="JFireReportingTrade-FinancialAnalysis-Payment"
+>
+	<name language="de">Analyse von Zahlungen</name>
+	<name language="en">Payments analysis</name>
+	
+	<report
+		file="PaymentReport.rptdesign" 
+		id="PaymentReport"
+		overwriteOnInit="true"
+	>
+		<name language="de">Zahlungsbericht</name>
+		<name language="en">Payment report</name>
+		<description language="de">Ein Bericht, der Zahlungen auflistet.</description>
+		<description language="en">A report that lists payments</description>
+		
+		<parameter-acquisition>
+			<use-case id="DefaultUseCase" default="true">
+				<name language="de">Standard</name>
+				<name language="en">Standard</name>
+				<description language="de">Enthält alle Möglichkeiten</description>
+				<description language="en">Contains all possibilities</description>
+				<parameters>
+					<parameter id="0" name="userIDs" type="java.util.Collection&lt;org.nightlabs.jfire.security.id.UserID&gt;" x="386" y="30" />
+					<parameter id="1" name="userGroupIDs" type="string" x="386" y="105" />
+					<parameter id="2" name="partnerIDs" type="java.util.Collection&lt;org.nightlabs.jfire.transfer.id.AnchorID&gt;" x="386" y="180" />
+					<parameter id="3" name="modeOfPaymentFlavourIDs" type="java.util.Collection&lt;org.nightlabs.jfire.accounting.pay.id.ModeOfPaymentFlavourID&gt;" x="386" y="255" />
+					<parameter id="4" name="beginTimePeriod" type="org.nightlabs.util.TimePeriod" x="386" y="330" />
+					<parameter id="5" name="endTimePeriod" type="string" x="386" y="405" />
+				</parameters>
+				<value-provider-configs>
+					<provider-config id="6" organisationID="dev.jfire.org" categoryID="JFireReporting-ValueProviderCategory-JFireObjects" valueProviderID="java.util.Collection&lt;org.nightlabs.jfire.security.User&gt;" pageIndex="0" pageRow="1" pageColumn="0" allowNullOutputValue="true" showMessageInHeader="true" x="17" y="80" >
+						<message language="de">Wählen Sie die Benutzer deren Zahlungen gelistet werden sollen</message>
+						<message language="en">Select the users whose payments should be listed</message>
+					</provider-config>
+					<provider-config id="7" organisationID="dev.jfire.org" categoryID="JFireReporting-ValueProviderCategory-SimpleTypes" valueProviderID="org.nightlabs.util.TimePeriod" pageIndex="0" pageRow="0" pageColumn="0" allowNullOutputValue="true" showMessageInHeader="true" growVertically="false" x="29" y="332" >
+						<message language="de">Wählen Sie den Zeitraum in dem Zahlungen gelistet werden sollen</message>
+						<message language="en">Select the timeperiod in which payments should be listed</message>
+					</provider-config>
+					<provider-config id="8" organisationID="dev.jfire.org" categoryID="JFireReportingTrade-ValueProviderCategory-Accounting" valueProviderID="ModeOfPaymentFlavours" pageIndex="1" pageRow="0" pageColumn="0" allowNullOutputValue="true" showMessageInHeader="true" x="75" y="247" >
+						<message language="de">Wählen Sie die Zahlungsarten in denen Zahlungen gelistet werden sollen</message>
+						<message language="en">Select a the mode of payment flavours to list payments in</message>
+					</provider-config>
+					<provider-config id="9" organisationID="dev.jfire.org" categoryID="JFireReportingTrade-ValueProviderCategory-LegalEntity" valueProviderID="SearchMultiple" pageIndex="2" pageRow="0" pageColumn="0" allowNullOutputValue="true" showMessageInHeader="true" x="129" y="171" >
+						<message language="de">Wählen Sie einen oder mehrere Kunden aus deren Zahlung aufgelistet werden sollen</message>
+						<message language="en">Select one or more customers whose payments should be listed</message>
+					</provider-config>
+				</value-provider-configs>
+				<value-consumer-bindings>
+					<value-consumer-binding>
+						<binding-provider id="9"/>
+						<binding-parameter name="partnerIDs"/>
+						<binding-consumer id="2"/>
+					</value-consumer-binding>
+					<value-consumer-binding>
+						<binding-provider id="6"/>
+						<binding-parameter name="userIDs"/>
+						<binding-consumer id="0"/>
+					</value-consumer-binding>
+					<value-consumer-binding>
+						<binding-provider id="7"/>
+						<binding-parameter name="beginTimePeriod"/>
+						<binding-consumer id="4"/>
+					</value-consumer-binding>
+					<value-consumer-binding>
+						<binding-provider id="8"/>
+						<binding-parameter name="modeOfPaymentFlavourIDs"/>
+						<binding-consumer id="3"/>
+					</value-consumer-binding>
+				</value-consumer-bindings>
+			</use-case>
+		</parameter-acquisition>
+	</report>
+	
+	<report
+		file="BookedArticlesWithPaymentInfo.rptdesign" 
+		id="BookedArticlesWithPaymentInfo"
+		overwriteOnInit="true"
+	>
+		<name language="de">Gebuchte Artikel mit Zahlungen</name>
+		<name language="en">Booked articles with payments</name>
+		<description language="de">Ein Bericht, der die gebuchenten Artikel in Summen auflistet zusammen mit Zahlungsinformationen (Zahlungsart) dazu.</description>
+		<description language="en">A report that lists booked articles (summed) along with payment information.</description>
+		<parameter-acquisition>
+			<use-case id="DefaultUseCase" default="true">
+				<parameters>
+					<parameter id="0" name="bookUserIDs" type="java.util.Collection&lt;org.nightlabs.jfire.security.id.UserID&gt;" x="650" y="46" />
+					<parameter id="1" name="productTypeOwnerIDs" type="string" x="650" y="121" />
+					<parameter id="2" name="productTypeIDs" type="string" x="650" y="196" />
+					<parameter id="3" name="timePeriod" type="org.nightlabs.util.TimePeriod" x="650" y="271" />
+				</parameters>
+				<value-provider-configs>
+					<provider-config id="4" organisationID="dev.jfire.org" categoryID="JFireReporting-ValueProviderCategory-SimpleTypes" valueProviderID="org.nightlabs.util.TimePeriod" pageIndex="0" pageRow="0" pageColumn="0" allowNullOutputValue="true" showMessageInHeader="true" growVertically="false" x="97" y="207" >
+						<message language="en">Select a time period</message>
+					</provider-config>
+					<provider-config id="5" organisationID="dev.jfire.org" categoryID="JFireReporting-ValueProviderCategory-JFireObjects" valueProviderID="java.util.Collection&lt;org.nightlabs.jfire.security.User&gt;" pageIndex="0" pageRow="1" pageColumn="0" allowNullOutputValue="true" showMessageInHeader="true" growVertically="true" x="155" y="87" >
+						<message language="en">Select a list of users</message>
+					</provider-config>
+				</value-provider-configs>
+				<value-consumer-bindings>
+					<value-consumer-binding>
+						<binding-provider id="4"/>
+						<binding-parameter name="timePeriod"/>
+						<binding-consumer id="3"/>
+					</value-consumer-binding>
+					<value-consumer-binding>
+						<binding-provider id="5"/>
+						<binding-parameter name="bookUserIDs"/>
+						<binding-consumer id="0"/>
+					</value-consumer-binding>
+				</value-consumer-bindings>
+			</use-case>
+		</parameter-acquisition>
+	</report>		
+	
+
+</report-category>

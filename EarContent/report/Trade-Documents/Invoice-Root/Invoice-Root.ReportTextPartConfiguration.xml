@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<reportTextPartConfiguration>
+	<reportTextPart id="salutation" type="jshtml">
+		<name language="en">Salutation text</name>
+		<content language="en"><![CDATA[
+Dear <?=row["Salutation"]?> <?=row["Name"]?>   		
+<br/><br/>
+thank you for your purchase, see below a list of your purchased items:
+<br/>
+]]>
+		</content>
+		<content language="de"><![CDATA[
+Sehr geehrte(r) <?=row["Salutation"]?> <?=row["Name"]?>   		
+<br/><br/>
+vielen Dank für Ihren Einkauf. Im Folgenden finden sie die Liste Ihrer gekaufen Artikel:
+<br/>
+]]>
+		</content>
+	</reportTextPart>
+	<reportTextPart id="finish" type="jshtml">
+		<name language="en">Finish text</name>
+		<content language="en"><![CDATA[
+We aks you to transfer the outstanding amount to our bank account within 14 days.
+<br/>
+<br/>
+Your <b>JFire</b> team.  
+]]>
+		</content>
+	</reportTextPart>
+</reportTextPartConfiguration>

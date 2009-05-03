@@ -3,5 +3,5 @@ package org.nightlabs.jfire.dynamictrade;
 public class JFireDynamicTradeEAR {
 	private JFireDynamicTradeEAR() { }
 
-	public static final String MODULE_NAME = "JFireDynamicTrade";
+	public static final String MODULE_NAME = JFireDynamicTradeEAR.class.getSimpleName();
 }

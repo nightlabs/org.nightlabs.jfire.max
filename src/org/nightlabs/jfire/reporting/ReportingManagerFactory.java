@@ -54,10 +54,10 @@ import org.nightlabs.util.Util;
  * Currently the factory allows access to a configured BIRT {@link ReportEngine} that
  * should be used to create new engine tasks. Additionally the factory can serve
  * {@link RenderManager} that help rendering reports according to user-given parameters.
- * 
- * 
- * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  *
+ *
+ * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
+ * FIXME: Is this still used? What about {@link ReportEnginePool}? Marco.
  */
 public class ReportingManagerFactory implements Serializable {
 	/**
@@ -67,15 +67,15 @@ public class ReportingManagerFactory implements Serializable {
 	private static final long serialVersionUID = 20081031L;
 
 	public static final String JNDI_PREFIX = "java:/jfire/reportingManagerFactory/";
-	
+
 	private String organisationID;
 	private ReportEngine reportEngine;
-	
-	
+
+
 	/**
 	 * Creates a new ReportingManagerFactory and binds it into JNDI with
 	 * {@link #JNDI_PREFIX} followed by the given organisatinID as name.
-	 * 
+	 *
 	 * @param ctx The initial context to use.
 	 * @param organisationID The organisationID this factory should be used for
 	 * @throws NamingException
@@ -118,10 +118,10 @@ public class ReportingManagerFactory implements Serializable {
 				hc.setImageHandler( imageHandler );
 //				Associate the configuration with the HTML output format.
 				config.setEmitterConfiguration( IRenderOption.OUTPUT_FORMAT_HTML, hc );
-				File organisationLogDir = new File(JFireReportingEAR.getEARDir(), "log" + File.separator + organisationID);
-				if (!organisationLogDir.exists()) {
-					organisationLogDir.mkdirs();
-				}
+//				File organisationLogDir = new File(JFireReportingEAR.getEARDir(), "log" + File.separator + organisationID);
+//				if (!organisationLogDir.exists()) {
+//					organisationLogDir.mkdirs();
+//				}
 				reportEngine = new ReportEngine(config);
 				reportEngine.getConfig().setResourceLocator(new ServerResourceLocator());
 //				reportEngine.setLogger();
@@ -132,17 +132,17 @@ public class ReportingManagerFactory implements Serializable {
 		}
 		return reportEngine;
 	}
-	
+
 //	/**
 //	 * Obtain a new instance of {@link RenderManager} as a helper to render reports.
-//	 * 
+//	 *
 //	 * @return A new instance of {@link RenderManager}.
 //	 */
 //	public RenderManager createRenderManager() {
 //		return new RenderManager(this);
 //	}
-	
-	
+
+
 	/**
 	 * Returns the JNDI prefix of the ReportingManagerFactory for the given organisationID.
 	 */
@@ -154,7 +154,7 @@ public class ReportingManagerFactory implements Serializable {
 	/**
 	 * Returns the ReportingManagerFactory for the given organisationID out of the JNDI
 	 * if one was bound.
-	 * 
+	 *
 	 * @param ctx The InitialContext to use
 	 * @param organisationID The organisationID the engine should be looked up for
 	 * @return The ReportingManagerFactory for the given organisationID out of JNDI
@@ -188,5 +188,5 @@ public class ReportingManagerFactory implements Serializable {
 		reportEngine.getConfig().setResourceLocator(new ServerResourceLocator());
 		System.out.println(Util.getTimeDiffString(time));
 	}
-	
+
 }

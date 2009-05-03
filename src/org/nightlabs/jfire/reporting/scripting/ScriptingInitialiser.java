@@ -55,20 +55,14 @@ public class ScriptingInitialiser {
 		String j2eeBaseDir = jfireServerManager.getJFireServerConfigModule().getJ2ee().getJ2eeDeployBaseDirectory();
 		File ear = new File(j2eeBaseDir, JFireReportingEAR.MODULE_NAME + ".ear");
 		String scriptDirSuffix = "script";
-		File scriptDir = new File(j2eeBaseDir, scriptDirSuffix);
-		File[] subDirs = scriptDir.listFiles();
-		for (int i = 0; i < subDirs.length; i++) {
-			if (subDirs[i].isDirectory()) {
-				new org.nightlabs.jfire.scripting.ScriptingInitialiser(
-						ear,
-						scriptDirSuffix+File.separator+subDirs[i].getName(),
-						baseCategory,
-						ScriptingConstants.SCRIPT_REGISTRY_ITEM_ID_CATEGORY_BASE,
-						pm,
-						organisationID
-					).initialise();
-			}
-		}
+		new org.nightlabs.jfire.scripting.ScriptingInitialiser(
+				ear,
+				scriptDirSuffix,
+				baseCategory,
+				pm,
+				organisationID
+		).initialise();
+
 	}
 
 }

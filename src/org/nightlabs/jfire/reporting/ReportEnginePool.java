@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.nightlabs.jfire.reporting;
 
@@ -22,15 +22,15 @@ import org.nightlabs.jfire.reporting.platform.ServerPlatformContext;
 import org.nightlabs.jfire.reporting.platform.ServerResourceLocator;
 
 /**
- * A pool of {@link ReportEngine}s. This pool is put into JNDI and is accessible via {@link #getInstance(InitialContext)}. 
- * 
- * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de --> 
+ * A pool of {@link ReportEngine}s. This pool is put into JNDI and is accessible via {@link #getInstance(InitialContext)}.
  *
+ * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
+ * FIXME: Can {@link ReportingManagerFactory} be removed now that there is the ReportEnginePool? Marco.
  */
 public class ReportEnginePool implements Serializable {
-	
+
 	private static final long serialVersionUID = 20081104L;
-	
+
 	private static Logger logger = Logger.getLogger(ReportEnginePool.class);
 	public static final String JNDI_NAME = "java:/jfire/reportEnginePool";
 
@@ -65,35 +65,35 @@ public class ReportEnginePool implements Serializable {
 				throw e;
 			}
 		}
-		
+
 		@Override
 		public void destroyObject(Object obj) throws Exception {
 			logger.debug("Destroying ReportEngine " + obj);
 			super.destroyObject(obj);
 		}
-		
+
 	}
-	
+
 	private GenericObjectPool enginePool;
-	
+
 	/**
-	 * Lazily get/create the object pool. 
+	 * Lazily get/create the object pool.
 	 */
 	protected GenericObjectPool getEnginePool() {
 		if (enginePool == null) {
 			synchronized (this) {
 				if (enginePool == null) {
-					enginePool = createGenericObjectPool(); 
+					enginePool = createGenericObjectPool();
 				}
 			}
 		}
 		return enginePool;
 	}
-	
+
 	/**
 	 * Create the object pool.
 	 * TODO: Make its parameters (maxIdle etc.) configurable.
-	 * 
+	 *
 	 * @return A new {@link GenericObjectPool}.
 	 */
 	protected GenericObjectPool createGenericObjectPool() {
@@ -109,18 +109,18 @@ public class ReportEnginePool implements Serializable {
 		logger.debug(pool.toString());
 		return pool;
 	}
-	
+
 	/**
 	 * Protected, no foreign instantiation.
 	 */
 	protected ReportEnginePool() {
 	}
-	
+
 	/**
 	 * Borrow a {@link ReportEngine} from the pool for exclusive usage.
 	 * Make sure you return the engine after you finished using it ({@link #returnReportEngine(ReportEngine)}).
-	 * 
-	 * @return A {@link ReportEngine} for exclusive usage. 
+	 *
+	 * @return A {@link ReportEngine} for exclusive usage.
 	 * @throws Exception If an error occurs getting/creating the engine.
 	 */
 	public ReportEngine borrowReportEngine() throws Exception {
@@ -129,7 +129,7 @@ public class ReportEnginePool implements Serializable {
 		logger.debug("lend object: " + engine);
 		return engine;
 	}
-	
+
 	/**
 	 * Return a {@link ReportEngine} to the pool after usage.
 	 * @param engine The engine to return.
@@ -142,7 +142,7 @@ public class ReportEnginePool implements Serializable {
 
 	/**
 	 * Get the instance of {@link ReportEnginePool} from JNDI.
-	 * 
+	 *
 	 * @param ctx The initial context to use.
 	 * @return The instance of {@link ReportEnginePool} from JNDI.
 	 * @throws NamingException If an error occurs.
@@ -156,7 +156,7 @@ public class ReportEnginePool implements Serializable {
 		}
 		if (pool == null) {
 			pool = new ReportEnginePool();
-			
+
 			try {
 				ctx.createSubcontext("java:/jfire");
 			} catch (NameAlreadyBoundException e) {
@@ -164,7 +164,7 @@ public class ReportEnginePool implements Serializable {
 			}
 
 			ctx.bind(JNDI_NAME, pool);
-			pool = (ReportEnginePool) ctx.lookup(JNDI_NAME); 
+			pool = (ReportEnginePool) ctx.lookup(JNDI_NAME);
 		}
 		return pool;
 	}

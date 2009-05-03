@@ -54,7 +54,7 @@ import org.nightlabs.jfire.reporting.textpart.ReportTextPart;
 import org.nightlabs.jfire.reporting.textpart.ReportTextPartConfiguration;
 import org.nightlabs.jfire.scripting.ScriptRegistry;
 import org.nightlabs.jfire.security.SecurityReflector;
-import org.nightlabs.jfire.servermanager.JFireServerManager;
+import org.nightlabs.util.CacheDirTag;
 import org.nightlabs.util.IOUtil;
 import org.nightlabs.xml.DOMParser;
 import org.nightlabs.xml.NLDOMUtil;
@@ -90,7 +90,7 @@ import org.xml.sax.SAXParseException;
  * <p>
  * The recommended usage is
  * <ul>
- * <li><b>Create the initializer</b>: Use {@link #ReportingInitialiser(String, ReportCategory, String, JFireServerManager, PersistenceManager, String)} to create the initializer and set the
+ * <li><b>Create the initializer</b>: Use {@link #ReportingInitialiser(File, String, ReportCategory, PersistenceManager, String)} to create the initializer and set the
  * base category, root directory and fallback values for ids</li>
  * <li><b>Initialise (sub)directories</b>: Use {@link #initialise()} to start the initialisation</li>
  * </p>
@@ -102,12 +102,13 @@ public class ReportingInitialiser {
 
 	protected static Logger logger = Logger.getLogger(ReportingInitialiser.class);
 
-	private String scriptSubDir;
+	private File ear;
+	private String reportSubDir;
 	private ReportCategory baseCategory;
-	private JFireServerManager jfsm;
+//	private JFireServerManager jfsm;
 	private PersistenceManager pm;
 	private String organisationID;
-	private String reportRegistryItemType;
+//	private String reportRegistryItemType;
 
 //	private SAXException parseException;
 	private Map<File, Document> categoryDescriptors = new HashMap<File, Document>();
@@ -154,25 +155,37 @@ public class ReportingInitialiser {
 
 	/**
 	 * Creates a new ReportingInitialiser with the given parameters.
-	 *
-	 * @param scriptSubDir This is the relative directory under the deploy base directory (e.g. "JFireReporting.ear/script/General")
+	 * @param ear the EAR-directory or EAR-file within which to look for the scripts.
+	 * @param reportSubDir the relative directory within the EAR-directory/-file (e.g. "report/Financial-Analysis").
 	 * @param baseCategory The base category from where the category-tree will be build.
-	 * @param jfsm The JFireServerManager to use
 	 * @param pm The PersistenceManager to use.
-	 * @param registryItemType is the type (identifier) for the reports in categories, sub-categories get the scriptRegistryItemType from their parent
 	 * @param organisationID If you're writing a JFire Community Project, this is {@link Organisation#DEV_ORGANISATION_ID}.
+	 * @!param registryItemType is the type (identifier) for the reports in categories, sub-categories get the scriptRegistryItemType from their parent
 	 */
 	public ReportingInitialiser(
-			String scriptSubDir, ReportCategory baseCategory, String reportRegistryItemType,
-			JFireServerManager jfsm, PersistenceManager pm, String organisationID
+			File ear, String reportSubDir, ReportCategory baseCategory,
+			PersistenceManager pm, String organisationID
 		)
 	{
-		this.scriptSubDir = scriptSubDir;
+		if (ear == null)
+			throw new IllegalArgumentException("ear must not be null!");
+
+		if (reportSubDir == null)
+			throw new IllegalArgumentException("scriptSubDir must not be null!");
+
+		if (baseCategory == null)
+			throw new IllegalArgumentException("baseCategory must not be null!");
+
+		if (!ear.exists())
+			throw new IllegalArgumentException("The file or directory referenced by the 'ear' argument does not exist: " + ear.getAbsolutePath());
+
+		this.ear = ear;
+		this.reportSubDir = reportSubDir;
 		this.baseCategory = baseCategory;
-		this.jfsm = jfsm;
+//		this.jfsm = jfsm;
 		this.pm = pm;
 		this.organisationID = organisationID;
-		this.reportRegistryItemType = reportRegistryItemType;
+//		this.reportRegistryItemType = reportRegistryItemType;
 	}
 
 	private ScriptRegistry scriptRegistry = null;
@@ -192,8 +205,39 @@ public class ReportingInitialiser {
 	public void initialise()
 	throws ReportingInitialiserException
 	{
-		String j2eeBaseDir = jfsm.getJFireServerConfigModule().getJ2ee().getJ2eeDeployBaseDirectory();
-		File reportInitDir = new File(j2eeBaseDir, scriptSubDir);
+//		String j2eeBaseDir = jfsm.getJFireServerConfigModule().getJ2ee().getJ2eeDeployBaseDirectory();
+//		File reportInitDir = new File(j2eeBaseDir, reportSubDir);
+		File reportInitDir;
+		if (ear.isDirectory())
+			reportInitDir = new File(ear, reportSubDir);
+		else {
+			File tmpBaseDir;
+			try {
+				tmpBaseDir = new File(IOUtil.createUserTempDir("jfire_server.", null), "ear");
+				if (!tmpBaseDir.isDirectory())
+					tmpBaseDir.mkdirs();
+
+				if (!tmpBaseDir.isDirectory())
+					throw new IOException("Could not create directory: " + tmpBaseDir.getAbsolutePath());
+			} catch (IOException e) {
+				throw new ReportingInitialiserException(e);
+			}
+
+			CacheDirTag cacheDirTag = new CacheDirTag(tmpBaseDir);
+			try {
+				cacheDirTag.tag("JFire - http://www.jfire.org", true, false);
+			} catch (IOException e) {
+				logger.warn("initialise: " + e, e);
+			}
+
+			File tmpEarDir = new File(tmpBaseDir, ear.getName());
+			try {
+				IOUtil.unzipArchiveIfModified(ear, tmpEarDir);
+			} catch (IOException e) {
+				throw new ReportingInitialiserException(e);
+			}
+			reportInitDir = new File(tmpEarDir, reportSubDir);
+		}
 
 		if (!reportInitDir.exists())
 			throw new IllegalStateException("Report initialisation directory does not exist: " + reportInitDir.getAbsolutePath());
@@ -210,7 +254,10 @@ public class ReportingInitialiser {
 		pm.getExtent(ValueProvider.class);
 		pm.getExtent(ValueAcquisitionSetup.class);
 
-		createReportCategories(reportInitDir, baseCategory);
+		for (File file : reportInitDir.listFiles()) {
+			if (file.isDirectory())
+				createReportCategories(file, baseCategory);
+		}
 	}
 
 	private Document parseFile(final File xmlFile)
@@ -322,7 +369,7 @@ public class ReportingInitialiser {
 	{
 		try {
 			String categoryID = dir.getName();
-			String itemType = parent != null ? parent.getReportRegistryItemType() : reportRegistryItemType;
+			String itemType = parent != null ? parent.getReportRegistryItemType() : null; //reportRegistryItemType;
 			boolean internal = false;
 			Document catDocument = getCategoryDescriptor(dir);
 			Node catNode = null;
@@ -342,6 +389,9 @@ public class ReportingInitialiser {
 						internal = Boolean.parseBoolean(internalAttr.getTextContent());
 				}
 			}
+
+			if (itemType == null)
+				throw new IllegalStateException("itemType has not been set - either a parent-category needs to be specified or the item-type must be specified in the content.xml!");
 
 			// Create the category
 			ReportCategory category = createCategory(pm, parent, organisationID, itemType, categoryID, internal);

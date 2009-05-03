@@ -29,25 +29,26 @@ package org.nightlabs.jfire.reporting.layout;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.nightlabs.i18n.I18nText;
-
-import javax.jdo.annotations.Join;
-import javax.jdo.annotations.Persistent;
-import javax.jdo.annotations.FetchGroups;
-import javax.jdo.annotations.NullValue;
-import javax.jdo.annotations.InheritanceStrategy;
-import javax.jdo.annotations.Inheritance;
-import javax.jdo.annotations.PrimaryKey;
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.FetchGroup;
 import javax.jdo.annotations.Column;
-import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemDescriptionID;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.FetchGroups;
 import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.Value;
+
+import org.nightlabs.i18n.I18nText;
+import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemDescriptionID;
 
 /**
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
- * 
+ *
  * @jdo.persistence-capable
  *		identity-type="application"
  *		objectid-class="org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemDescriptionID"
@@ -72,13 +73,13 @@ import javax.jdo.annotations.PersistenceModifier;
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 
 public class ReportRegistryItemDescription extends I18nText {
-	
+
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 1L;
-	
-	
+
+
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
@@ -86,7 +87,7 @@ public class ReportRegistryItemDescription extends I18nText {
 	@Column(length=100)
 
 	private String organisationID;
-	
+
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
@@ -94,7 +95,7 @@ public class ReportRegistryItemDescription extends I18nText {
 	@Column(length=100)
 
 	private String reportRegistryItemType;
-	
+
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
@@ -102,14 +103,14 @@ public class ReportRegistryItemDescription extends I18nText {
 	@Column(length=100)
 
 	private String reportRegistryItemID;
-	
+
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 
 	private ReportRegistryItem reportRegistryItem;
-	
-	
+
+
 	/**
 	 * @deprecated Only for JDO!
 	 */
@@ -128,7 +129,7 @@ public class ReportRegistryItemDescription extends I18nText {
 	/**
 	 * key: String languageID<br/>
 	 * value: String text
-	 * 
+	 *
 	 * @jdo.field
 	 *		persistence-modifier="persistent"
 	 *		collection-type="map"
@@ -139,17 +140,20 @@ public class ReportRegistryItemDescription extends I18nText {
 	 *		null-value="exception"
 	 *
 	 * @jdo.join
-	 * 
+	 *
 	 * @jdo.value-column sql-type="CLOB"
 	 */	@Join
 	@Persistent(
 		nullValue=NullValue.EXCEPTION,
 		table="JFireReporting_ReportRegistryItemDescription_texts",
 		defaultFetchGroup="true",
-		persistenceModifier=PersistenceModifier.PERSISTENT)
+		persistenceModifier=PersistenceModifier.PERSISTENT
+	)
+	@Value(
+			columns={@Column(sqlType="CLOB")}
+	)
+	private Map<String, String> texts;
 
-	protected Map<String, String> texts;
-	
 	/**
 	 * @see com.nightlabs.i18n.I18nText#getI18nMap()
 	 */
@@ -177,9 +181,9 @@ public class ReportRegistryItemDescription extends I18nText {
 	public String getReportRegistryItemType() {
 		return reportRegistryItemType;
 	}
-	
+
 	public ReportRegistryItem getReportRegistryItem() {
 		return reportRegistryItem;
 	}
-	
+
 }

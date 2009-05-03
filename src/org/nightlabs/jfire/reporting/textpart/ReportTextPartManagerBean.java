@@ -64,15 +64,6 @@ implements ReportTextPartManagerRemote
 	private static final long serialVersionUID = 20080927L;
 
 	/* (non-Javadoc)
-	 * @see org.nightlabs.jfire.reporting.textpart.ReportTextPartManagerRemote#ping(java.lang.String)
-	 */	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	@RolesAllowed("_Guest_")
-	@Override
-	public String ping(String message) {
-		return super.ping(message);
-	}
-
-	/* (non-Javadoc)
 	 * @see org.nightlabs.jfire.reporting.textpart.ReportTextPartManagerRemote#getReportTextPartConfiguration(org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID, boolean, java.lang.String[], int)
 	 */	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	@RolesAllowed("org.nightlabs.jfire.reporting.editReport")

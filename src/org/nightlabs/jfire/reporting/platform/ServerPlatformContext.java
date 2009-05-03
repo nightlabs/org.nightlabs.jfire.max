@@ -29,27 +29,27 @@ package org.nightlabs.jfire.reporting.platform;
 import java.io.File;
 
 import org.eclipse.birt.core.framework.IPlatformContext;
-import org.nightlabs.ModuleException;
-import org.nightlabs.jfire.reporting.JFireReportingEAR;
+import org.nightlabs.jfire.server.data.dir.JFireServerDataDirectory;
 
 /**
  * {@link IPlatformContext} for BIRT within the JFire Server.
- * 
+ *
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  *
  */
 public class ServerPlatformContext implements IPlatformContext {
 
 	private String root;
-	
+
 	public ServerPlatformContext() {
-		try {
-			this.root = new File(JFireReportingEAR.getEARDir(), JFireReportingEAR.BIRT_RUNTIME_SUBDIR).getAbsolutePath();
-		} catch (ModuleException e) {
-			throw new IllegalStateException("Could not instantiate ServerPlatformContext");
-		}
+		this.root = new File(JFireServerDataDirectory.getJFireServerDataDirFile(), "birt").getAbsolutePath();
+//		try {
+//			this.root = new File(JFireReportingEAR.getEARDir(), JFireReportingEAR.BIRT_RUNTIME_SUBDIR).getAbsolutePath();
+//		} catch (ModuleException e) {
+//			throw new IllegalStateException("Could not instantiate ServerPlatformContext");
+//		}
 	}
-	
+
 	public String getPlatform() {
 		return root;
 	}

@@ -26,11 +26,6 @@
 
 package org.nightlabs.jfire.reporting;
 
-import java.io.File;
-
-import org.nightlabs.ModuleException;
-import org.nightlabs.jfire.servermanager.JFireServerManager;
-import org.nightlabs.jfire.servermanager.JFireServerManagerUtil;
 
 /**
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
@@ -39,29 +34,29 @@ import org.nightlabs.jfire.servermanager.JFireServerManagerUtil;
 public class JFireReportingEAR {
 
 	protected JFireReportingEAR() {}
-	
-	public static final String MODULE_NAME = "JFireReporting";
-	public static final String BIRT_RUNTIME_SUBDIR = "birt";
-	
-	public static File getEARDir()
-	throws ModuleException
-	{
-		JFireServerManager jFireServerManager;
-		try {
-			jFireServerManager = JFireServerManagerUtil.getJFireServerManager();
-		} catch (Exception e) {
-			throw new ModuleException("Could not get JFireServerManager!", e);
-		}
-		try {
-			File earDir = new File(
-						new File(jFireServerManager.getJFireServerConfigModule()
-								.getJ2ee().getJ2eeDeployBaseDirectory()
-							),
-					"JFireReporting.ear"
-				);
-			return earDir;
-		} finally {
-			jFireServerManager.close();
-		}
-	}
+
+	public static final String MODULE_NAME = JFireReportingEAR.class.getSimpleName();
+//	public static final String BIRT_RUNTIME_SUBDIR = "birt";
+
+//	public static File getEARDir()
+//	throws ModuleException
+//	{
+//		JFireServerManager jFireServerManager;
+//		try {
+//			jFireServerManager = JFireServerManagerUtil.getJFireServerManager();
+//		} catch (Exception e) {
+//			throw new ModuleException("Could not get JFireServerManager!", e);
+//		}
+//		try {
+//			File earDir = new File(
+//						new File(jFireServerManager.getJFireServerConfigModule()
+//								.getJ2ee().getJ2eeDeployBaseDirectory()
+//							),
+//							MODULE_NAME + ".ear"
+//				);
+//			return earDir;
+//		} finally {
+//			jFireServerManager.close();
+//		}
+//	}
 }

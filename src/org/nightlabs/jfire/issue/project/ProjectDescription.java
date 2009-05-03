@@ -3,24 +3,25 @@ package org.nightlabs.jfire.issue.project;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.nightlabs.i18n.I18nText;
-
-import javax.jdo.annotations.Persistent;
-import javax.jdo.annotations.Join;
-import org.nightlabs.jfire.issue.project.id.ProjectDescriptionID;
-import javax.jdo.annotations.FetchGroups;
-import javax.jdo.annotations.NullValue;
-import javax.jdo.annotations.InheritanceStrategy;
-import javax.jdo.annotations.Inheritance;
-import javax.jdo.annotations.PrimaryKey;
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.FetchGroup;
 import javax.jdo.annotations.Column;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.FetchGroups;
 import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.Value;
+
+import org.nightlabs.i18n.I18nText;
+import org.nightlabs.jfire.issue.project.id.ProjectDescriptionID;
 
 /**
- * An extended class of {@link I18nText} that represents the description created in an {@link Project}. 
+ * An extended class of {@link I18nText} that represents the description created in an {@link Project}.
  * <p>
  * </p>
  * @author Chairat Kongarayawetchakun - chairat at nightlabs dot de
@@ -35,7 +36,7 @@ import javax.jdo.annotations.PersistenceModifier;
  *
  * @jdo.create-objectid-class
  * 		field-order="organisationID, projectID"
- * 
+ *
  * @jdo.fetch-group name="Project.description" fields="project, descriptions"
  */ @PersistenceCapable(
 	objectIdClass=ProjectDescriptionID.class,
@@ -49,7 +50,7 @@ import javax.jdo.annotations.PersistenceModifier;
 )
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 
-public class ProjectDescription 
+public class ProjectDescription
 	extends I18nText
 {
 	/**
@@ -61,20 +62,20 @@ public class ProjectDescription
 	 * This is the organisationID to which the project description belongs. Within one organisation,
 	 * all the project descriptions have their organisation's ID stored here, thus it's the same
 	 * value for all of them.
-	 * 
+	 *
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
 	@PrimaryKey
 	@Column(length=100)
 	private String organisationID;
-	
+
 	/**
 	 * @jdo.field primary-key="true"
 	 */
 	@PrimaryKey
 	private long projectID;
-	
+
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
@@ -84,7 +85,7 @@ public class ProjectDescription
 	/**
 	 * key: String languageID<br/>
 	 * value: String description
-	 * 
+	 *
 	 * @jdo.field
 	 *		persistence-modifier="persistent"
 	 *		default-fetch-group="true"
@@ -99,8 +100,12 @@ public class ProjectDescription
 		nullValue=NullValue.EXCEPTION,
 		table="JFireProjectTracking_ProjectDescription_descriptions",
 		defaultFetchGroup="true",
-		persistenceModifier=PersistenceModifier.PERSISTENT)
-	protected Map<String, String> descriptions = new HashMap<String, String>();
+		persistenceModifier=PersistenceModifier.PERSISTENT
+	)
+	@Value(
+			columns={@Column(sqlType="CLOB")}
+	)
+	private Map<String, String> descriptions = new HashMap<String, String>();
 
 	/**
 	 * @deprecated Only for JDO!

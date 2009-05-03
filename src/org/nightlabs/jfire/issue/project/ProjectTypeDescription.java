@@ -15,6 +15,7 @@ import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.PersistenceModifier;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.Value;
 
 import org.nightlabs.i18n.I18nText;
 import org.nightlabs.jfire.issue.project.id.ProjectTypeDescriptionID;
@@ -100,8 +101,12 @@ public class ProjectTypeDescription
 		nullValue=NullValue.EXCEPTION,
 		table="JFireProjectTypeTracking_ProjectTypeDescription_descriptions",
 		defaultFetchGroup="true",
-		persistenceModifier=PersistenceModifier.PERSISTENT)
-	protected Map<String, String> descriptions = new HashMap<String, String>();
+		persistenceModifier=PersistenceModifier.PERSISTENT
+	)
+	@Value(
+			columns={@Column(sqlType="CLOB")}
+	)
+	private Map<String, String> descriptions = new HashMap<String, String>();
 
 	/**
 	 * @deprecated Only for JDO!

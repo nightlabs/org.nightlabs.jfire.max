@@ -3,27 +3,28 @@ package org.nightlabs.jfire.issue;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.nightlabs.i18n.I18nText;
-
-import javax.jdo.annotations.Join;
-import javax.jdo.annotations.Persistent;
-import javax.jdo.annotations.FetchGroups;
-import javax.jdo.annotations.NullValue;
-import javax.jdo.annotations.InheritanceStrategy;
-import javax.jdo.annotations.Inheritance;
-import org.nightlabs.jfire.issue.id.IssueDescriptionID;
-import javax.jdo.annotations.PrimaryKey;
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.FetchGroup;
 import javax.jdo.annotations.Column;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.FetchGroups;
 import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.Value;
+
+import org.nightlabs.i18n.I18nText;
+import org.nightlabs.jfire.issue.id.IssueDescriptionID;
 
 /**
- * An extended class of {@link I18nText} that represents the description created in an {@link Issue}. 
+ * An extended class of {@link I18nText} that represents the description created in an {@link Issue}.
  * <p>
  * </p>
- * 
+ *
  * @author Chairat Kongarayawetchakun - chairat at nightlabs dot de
  *
  * @jdo.persistence-capable
@@ -36,7 +37,7 @@ import javax.jdo.annotations.PersistenceModifier;
  *
  * @jdo.create-objectid-class
  * 		field-order="organisationID, issueID"
- * 
+ *
  * @jdo.fetch-group name="Issue.description" fields="issue, descriptions"
  */
 @PersistenceCapable(
@@ -51,7 +52,7 @@ import javax.jdo.annotations.PersistenceModifier;
 )
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 
-public class IssueDescription 
+public class IssueDescription
 	extends I18nText
 {
 	/**
@@ -63,20 +64,20 @@ public class IssueDescription
 	 * This is the organisationID to which the issue description belongs. Within one organisation,
 	 * all the issue descriptions have their organisation's ID stored here, thus it's the same
 	 * value for all of them.
-	 * 
+	 *
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
 	@PrimaryKey
 	@Column(length=100)
 	private String organisationID;
-	
+
 	/**
 	 * @jdo.field primary-key="true"
 	 */
 	@PrimaryKey
 	private long issueID;
-	
+
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
@@ -86,7 +87,7 @@ public class IssueDescription
 	/**
 	 * key: String languageID<br/>
 	 * value: String description
-	 * 
+	 *
 	 * @jdo.field
 	 *		persistence-modifier="persistent"
 	 *		default-fetch-group="true"
@@ -101,8 +102,12 @@ public class IssueDescription
 		nullValue=NullValue.EXCEPTION,
 		table="JFireIssueTracking_IssueDescription_descriptions",
 		defaultFetchGroup="true",
-		persistenceModifier=PersistenceModifier.PERSISTENT)
-	protected Map<String, String> descriptions = new HashMap<String, String>();
+		persistenceModifier=PersistenceModifier.PERSISTENT
+	)
+	@Value(
+			columns={@Column(sqlType="CLOB")}
+	)
+	private Map<String, String> descriptions = new HashMap<String, String>();
 
 	/**
 	 * @deprecated Only for JDO!
@@ -114,7 +119,7 @@ public class IssueDescription
 
 	/**
 	 * Constructs a new IssueDescription.
-	 * @param issue the issue that this issue description is made in 
+	 * @param issue the issue that this issue description is made in
 	 */
 	public IssueDescription(String organisationID, long issueID, Issue issue)
 	{

@@ -96,16 +96,6 @@ implements IssueManagerRemote
 	 */
 	private static final Logger logger = Logger.getLogger(IssueManagerBean.class);
 
-	/* (non-Javadoc)
-	 * @see org.nightlabs.jfire.issue.IssueManagerRemote#ping(java.lang.String)
-	 */
-	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	@RolesAllowed("_Guest_")
-	@Override
-	public String ping(String message) {
-		return super.ping(message);
-	}
-
 	//IssueFileAttachment//
 	/**
 	 * @ejb.interface-method

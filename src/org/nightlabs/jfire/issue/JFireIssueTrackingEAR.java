@@ -4,5 +4,5 @@ public class JFireIssueTrackingEAR
 {
 	private JFireIssueTrackingEAR() { }
 
-	public static final String MODULE_NAME = "JFireIssueTracking";
+	public static final String MODULE_NAME = JFireIssueTrackingEAR.class.getSimpleName();
 }

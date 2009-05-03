@@ -6,6 +6,19 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.Value;
+
 import org.nightlabs.htmlcontent.IFCKEditorContent;
 import org.nightlabs.htmlcontent.IFCKEditorContentFile;
 import org.nightlabs.htmlcontent.IFCKEditorContentFileFactory;
@@ -14,17 +27,6 @@ import org.nightlabs.jfire.prop.DataField;
 import org.nightlabs.jfire.prop.PropertySet;
 import org.nightlabs.jfire.prop.StructField;
 import org.nightlabs.util.NLLocale;
-
-import javax.jdo.annotations.Join;
-import javax.jdo.annotations.Persistent;
-import javax.jdo.annotations.FetchGroups;
-import javax.jdo.annotations.NullValue;
-import javax.jdo.annotations.InheritanceStrategy;
-import javax.jdo.annotations.Inheritance;
-import javax.jdo.annotations.FetchGroup;
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.IdentityType;
-import javax.jdo.annotations.PersistenceModifier;
 
 /**
  * @jdo.persistence-capable identity-type="application"
@@ -72,8 +74,12 @@ public class HTMLDataField extends DataField
 	 */
 	@Join
 	@Persistent(
-		table="JFireHTMLProp_HTMLDataField_Texts",
-		persistenceModifier=PersistenceModifier.PERSISTENT)
+		table="JFireHTMLProp_HTMLDataField_texts",
+		persistenceModifier=PersistenceModifier.PERSISTENT
+	)
+	@Value(
+			columns={@Column(sqlType="CLOB")}
+	)
 	private Map<String, String> texts;
 
 	/**

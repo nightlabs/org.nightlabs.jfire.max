@@ -51,6 +51,8 @@ import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 import org.nightlabs.jfire.servermanager.JFireServerManager;
+import org.nightlabs.util.CacheDirTag;
+import org.nightlabs.util.IOUtil;
 import org.nightlabs.util.Util;
 import org.nightlabs.xml.DOMParser;
 import org.nightlabs.xml.NLDOMUtil;
@@ -66,12 +68,12 @@ import org.xml.sax.SAXParseException;
  * Helper class to initialize default scripts. The ScriptInitializer will
  * recusursively scan a given directory and create a tree of {@link ScriptCategory}s
  * and {@link Script}s according to the directory structure it finds.<br/>
- * 
+ *
  * For each folder the initializer finds a category will be created as child of
  * the upper directory's one. A descriptor file 'content.xml' can be placed in
  * the directory to define in detail what id and names and parameter-sets
  * the created categories and scripts should have.
- * 
+ *
  * Each file found will cause a {@link Script} to be created. Depending on the
  * file extension some assumptions will be made:
  * <ul>
@@ -81,13 +83,13 @@ import org.xml.sax.SAXParseException;
  * </ul>
  * For more detailed information consult the the dtd of the scriping initializer content.xml at
  * <a href="http://www.nightlabs.de/dtd/scripting-initializer-content_1_0.dtd">http://www.nightlabs.de/dtd/scripting-initializer-content_1_0.dtd</a>
- * 
+ *
  * The recommended usage is
  * <ul>
  * <li><b>Create the initializer</b>: Use {@link #ScriptingInitializer(String, ScriptCategory, String, JFireServerManager, PersistenceManager, String)}
  * to create the initializer and set the base category, root directory and fallback values for ids</li>
  * <li><b>Initialize from (sub)directories</b>: Use {@link #initialise()} to start the initialization</li>
- * 
+ *
  * @author Alexander Bieber <alex [AT] nightlabs [DOT] de>
  *
  */
@@ -98,20 +100,21 @@ public class ScriptingInitialiser
 	 */
 	private static final Logger logger = Logger.getLogger(ScriptingInitialiser.class);
 
+	private File ear;
 	private String scriptSubDir;
 	private ScriptCategory baseCategory;
-	private JFireServerManager jfsm;
+//	private JFireServerManager jfsm;
 	private PersistenceManager pm;
 	private String organisationID;
 	private String scriptRegistryItemType;
-	
+
 	private SAXException parseException;
 	private Map<File, Document> categoryDescriptors = new HashMap<File, Document>();
 
 	/**
 	 * Returns the ScriptCategory for the given primary key either out of the datastore
 	 * or after creating it.
-	 * 
+	 *
 	 * @param parent optional may be null
 	 * @param organisationID the organisation ID
 	 * @param scriptRegistryItemType The category's item type.
@@ -135,22 +138,35 @@ public class ScriptingInitialiser
 		}
 		return category;
 	}
-	
+
 	/**
-	 * @param scriptSubDir This is the relative directory under the deploy base directory (e.g. "CrossTicketTrade.ear/script/Ticket")
+	 * @param ear the EAR-directory or EAR-file within which to look for the scripts.
+	 * @param scriptSubDir the relative directory within the EAR-directory/-file (e.g. "script/Ticket").
 	 * @param baseCategory All directories/files within the scriptSubDir will be created as sub-categories/scripts of this category.
-	 * @param jfsm
-	 * @param pm
 	 * @param scriptRegistryItemType is the type (identifier) for the scripts in categories, categories get the scriptRegistryItemType from their parent
+	 * @param pm
 	 * @param organisationID If you're writing a JFire Community Project, this is {@link Organisation#DEV_ORGANISATION_ID}.
 	 */
 	public ScriptingInitialiser(
-			String scriptSubDir, ScriptCategory baseCategory, String scriptRegistryItemType,
-			JFireServerManager jfsm, PersistenceManager pm, String organisationID)
+			File ear, String scriptSubDir, ScriptCategory baseCategory,
+			String scriptRegistryItemType, PersistenceManager pm, String organisationID)
 	{
+		if (ear == null)
+			throw new IllegalArgumentException("ear must not be null!");
+
+		if (scriptSubDir == null)
+			throw new IllegalArgumentException("scriptSubDir must not be null!");
+
+		if (baseCategory == null)
+			throw new IllegalArgumentException("baseCategory must not be null!");
+
+		if (!ear.exists())
+			throw new IllegalArgumentException("The file or directory referenced by the 'ear' argument does not exist: " + ear.getAbsolutePath());
+
+		this.ear = ear;
 		this.scriptSubDir = scriptSubDir;
 		this.baseCategory = baseCategory;
-		this.jfsm = jfsm;
+//		this.jfsm = jfsm;
 		this.pm = pm;
 		this.organisationID = organisationID;
 		this.scriptRegistryItemType = scriptRegistryItemType;
@@ -181,8 +197,28 @@ public class ScriptingInitialiser
 	public void initialise()
 	throws ScriptingIntialiserException
 	{
-		String j2eeBaseDir = jfsm.getJFireServerConfigModule().getJ2ee().getJ2eeDeployBaseDirectory();
-		File scriptDir = new File(j2eeBaseDir, scriptSubDir);
+//		String j2eeBaseDir = jfsm.getJFireServerConfigModule().getJ2ee().getJ2eeDeployBaseDirectory();
+//		File scriptDir = new File(j2eeBaseDir, scriptSubDir);
+		File scriptDir;
+		if (ear.isDirectory())
+			scriptDir = new File(ear, scriptSubDir);
+		else {
+			File tmpBaseDir = IOUtil.getUserTempDir("JFireScriptingInitialiser.", null);
+			CacheDirTag cacheDirTag = new CacheDirTag(tmpBaseDir);
+			try {
+				cacheDirTag.tag("JFire - http://www.jfire.org - JFireScriptingInitialiser", true, false);
+			} catch (IOException e) {
+				logger.warn("initialise: " + e, e);
+			}
+
+			File tmpEarDir = new File(tmpBaseDir, ear.getName());
+			try {
+				IOUtil.unzipArchiveIfModified(ear, tmpEarDir);
+			} catch (IOException e) {
+				throw new ScriptingIntialiserException(e);
+			}
+			scriptDir = new File(tmpEarDir, scriptSubDir);
+		}
 
 		if (!scriptDir.exists())
 			throw new IllegalStateException("Script directory does not exist: " + scriptDir.getAbsolutePath());
@@ -238,7 +274,7 @@ public class ScriptingInitialiser
 		}
 		return doc;
 	}
-	
+
 	private Node getScriptDescriptor(File scriptFile, Document categoryDocument)
 	throws TransformerException
 	{
@@ -250,7 +286,7 @@ public class ScriptingInitialiser
 		}
 		return null;
 	}
-	
+
 	private ScriptParameterSet createParameterSet(
 			PersistenceManager pm,
 			String organisationID,
@@ -266,7 +302,7 @@ public class ScriptingInitialiser
 		ScriptCategory parent = registryItem.getParent();
 		if (parent != null && parent.getParameterSet() != null && parent.getParameterSet().equals(parameterSet))
 			parameterSet = null;
-		
+
 		if (parameterSet == null) {
 			parameterSet = new ScriptParameterSet(organisationID, IDGenerator.nextID(ScriptParameterSet.class));
 			pm.makePersistent(parameterSet);
@@ -288,7 +324,7 @@ public class ScriptingInitialiser
 		}
 		return parameterSet;
 	}
-	
+
 	private void createElementName(Node elementNode, I18nText name, String def, String elementName)
 	{
 		if (name == null) {
@@ -311,7 +347,7 @@ public class ScriptingInitialiser
 		if (!nameSet && def != null)
 			name.setText(Locale.ENGLISH.getLanguage(), def);
 	}
-	
+
 	private void createScriptCategories(File dir, ScriptCategory parent)
 	throws ScriptingIntialiserException
 	{
@@ -371,7 +407,7 @@ public class ScriptingInitialiser
 			createElementName(catNode, category.getName(), categoryID, "name");
 			createElementName(catNode, category.getDescription(), null, "description");
 			logger.debug("create Script Category = "+itemType + "/" + categoryID);
-			
+
 
 			// Create scripts
 			File[] scripts = dir.listFiles(scriptFileNameFilter);
@@ -379,7 +415,7 @@ public class ScriptingInitialiser
 				File scriptFile = scripts[j];
 
 				Node scriptNode = getScriptDescriptor(scriptFile, catDocument);
-				
+
 				String scriptID = Util.getFileNameWithoutExtension(scriptFile.getName());
 				String scriptItemType = scriptRegistryItemType;
 				String scriptResultClass = "java.lang.Object";
@@ -387,12 +423,12 @@ public class ScriptingInitialiser
 				String[] fetchGroups = null;
 				int maxFetchDepth = 1;
 				boolean needsDetach = false;
-				
+
 				if (category != null) {
 					if (category.getScriptRegistryItemType() != null)
 						scriptItemType = category.getScriptRegistryItemType();
 				}
-				
+
 				if (scriptNode != null) {
 					logger.debug("Have script element");
 					Node idNode = scriptNode.getAttributes().getNamedItem("id");
@@ -431,7 +467,7 @@ public class ScriptingInitialiser
 						needsDetach = Boolean.parseBoolean(needsDetachNode.getTextContent());
 					}
 				}
-				
+
 				try {
 					logger.debug("create Script = "+scriptRegistryItemType + "/" + scriptID);
 					String scriptContent = Util.readTextFile(scriptFile);
@@ -454,7 +490,7 @@ public class ScriptingInitialiser
 					script.setMaxFetchDepth(maxFetchDepth);
 					script.setFetchGroups(fetchGroups);
 					script.setNeedsDetach(needsDetach);
-					
+
 					// script name and parameters
 					if (scriptNode != null) {
 						ScriptParameterSet parameterSet = createParameterSet(pm, organisationID, script, scriptNode);
@@ -463,13 +499,13 @@ public class ScriptingInitialiser
 					}
 					createElementName(scriptNode, script.getName(), scriptID, "name");
 					createElementName(scriptNode, script.getDescription(), null, "description");
-					
+
 				} catch (Exception e) {
 					logger.warn("could NOT create script "+scriptID+"!", e);
 				}
 			}
 
-			
+
 			// recurse
 			File[] subDirs = dir.listFiles(dirFileFilter);
 			for (int i=0; i<subDirs.length; i++) {
@@ -503,7 +539,7 @@ public class ScriptingInitialiser
 		}
 		return fetchGroups.toArray(new String[fetchGroups.size()]);
 	}
-	
+
 	protected FileFilter dirFileFilter = new FileFilter() {
 		public boolean accept(File pathname) {
 			return pathname.isDirectory();
@@ -523,6 +559,6 @@ public class ScriptingInitialiser
 			return false;
 		}
 	};
-	
+
 }
 

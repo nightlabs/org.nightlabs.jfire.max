@@ -73,16 +73,6 @@ implements JbpmManagerRemote
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger = Logger.getLogger(JbpmManagerBean.class);
 
-	/* (non-Javadoc)
-	 * @see org.nightlabs.jfire.jbpm.JbpmManagerRemote#ping(java.lang.String)
-	 */
-	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	@RolesAllowed("_Guest_")
-	@Override
-	public String ping(String message) {
-		return super.ping(message);
-	}
-
 	/**
 	 * @param hibernateConfigTemplateOutputFile This file is created by this method. If it exists, it will be overwritten.
 	 * @param hibernateMainConfigTemplateFile This file is the main config template containing $INCLUDE comments.

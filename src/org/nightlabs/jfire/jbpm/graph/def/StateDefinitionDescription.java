@@ -29,21 +29,22 @@ package org.nightlabs.jfire.jbpm.graph.def;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.nightlabs.i18n.I18nText;
-
-import javax.jdo.annotations.Join;
-import javax.jdo.annotations.Persistent;
-import javax.jdo.annotations.FetchGroups;
-import javax.jdo.annotations.NullValue;
-import javax.jdo.annotations.InheritanceStrategy;
-import javax.jdo.annotations.Inheritance;
-import javax.jdo.annotations.PrimaryKey;
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.FetchGroup;
 import javax.jdo.annotations.Column;
-import org.nightlabs.jfire.jbpm.graph.def.id.StateDefinitionDescriptionID;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.FetchGroups;
 import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.Value;
+
+import org.nightlabs.i18n.I18nText;
+import org.nightlabs.jfire.jbpm.graph.def.id.StateDefinitionDescriptionID;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -79,7 +80,7 @@ public class StateDefinitionDescription extends I18nText
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
-	 * 
+	 *
 	 * FIXME Check the use of this field and remove it if not used or indented to be used.
 	 */
 	@PrimaryKey
@@ -90,7 +91,7 @@ public class StateDefinitionDescription extends I18nText
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="50"
-	 * 
+	 *
 	 * FIXME Check the use of this field and remove it if not used or indented to be used.
 	 */
 	@PrimaryKey
@@ -101,7 +102,7 @@ public class StateDefinitionDescription extends I18nText
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
-	 * 
+	 *
 	 * FIXME Check the use of this field and remove it if not used or indented to be used.
 	 */
 	@PrimaryKey
@@ -120,7 +121,7 @@ public class StateDefinitionDescription extends I18nText
 	/**
 	 * key: String languageID<br/>
 	 * value: String description
-	 * 
+	 *
 	 * @jdo.field
 	 *		persistence-modifier="persistent"
 	 *		collection-type="map"
@@ -140,8 +141,12 @@ public class StateDefinitionDescription extends I18nText
 		nullValue=NullValue.EXCEPTION,
 		table="JFireJbpm_StateDefinitionDescription_descriptions",
 		defaultFetchGroup="true",
-		persistenceModifier=PersistenceModifier.PERSISTENT)
-	protected Map<String, String> descriptions = new HashMap<String, String>();
+		persistenceModifier=PersistenceModifier.PERSISTENT
+	)
+	@Value(
+			columns={@Column(sqlType="CLOB")}
+	)
+	private Map<String, String> descriptions = new HashMap<String, String>();
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"

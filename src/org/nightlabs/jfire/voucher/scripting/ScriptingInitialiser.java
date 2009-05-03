@@ -1,5 +1,6 @@
 package org.nightlabs.jfire.voucher.scripting;
 
+import java.io.File;
 import java.util.Locale;
 
 import javax.jdo.PersistenceManager;
@@ -74,10 +75,16 @@ public class ScriptingInitialiser
 			baseCategory.setParameterSet(paramSet);
 		}
 
+		File ear = new File(
+				jfsm.getJFireServerConfigModule().getJ2ee().getJ2eeDeployBaseDirectory(),
+				"JFireVoucher.ear"
+		);
+
 		new org.nightlabs.jfire.scripting.ScriptingInitialiser(
-				"JFireVoucher.ear/script/Voucher",
+				ear,
+				// "script/Voucher",
+				"script",
 				baseCategory,
-				VoucherScriptingConstants.SCRIPT_REGISTRY_ITEM_TYPE_TRADE_VOUCHER,
-				jfsm, pm, Organisation.DEV_ORGANISATION_ID).initialise(); // this is a throw-away-instance
+				pm, Organisation.DEV_ORGANISATION_ID).initialise(); // this is a throw-away-instance
 	}
 }

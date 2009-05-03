@@ -11,7 +11,7 @@ import org.nightlabs.jfire.store.deliver.id.ModeOfDeliveryID;
  */
 public class JFireVoucherEAR
 {
-	public static final String MODULE_NAME = "JFireVoucher"; //$NON-NLS-1$
+	public static final String MODULE_NAME = JFireVoucherEAR.class.getSimpleName();
 	public static final String DEFAULT_DELIVERY_CONFIGURATION_ID = "JFireVoucher.default"; //$NON-NLS-1$
 	public static final ModeOfDeliveryID MODE_OF_DELIVERY_ID_VOUCHER_PRINT =
 		ModeOfDeliveryID.create(Organisation.DEV_ORGANISATION_ID, "voucherPrint"); //$NON-NLS-1$

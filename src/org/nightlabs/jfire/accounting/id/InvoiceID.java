@@ -354,7 +354,7 @@ implements ArticleContainerID
 
 	@Override
 	public String getArticleContainerIDPrefix() {
-		return getArticleContainerIDPrefix();
+		return invoiceIDPrefix;
 	}
 
 	@Override

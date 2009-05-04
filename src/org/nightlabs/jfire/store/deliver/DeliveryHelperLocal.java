@@ -1,10 +1,13 @@
 package org.nightlabs.jfire.store.deliver;
 
+import javax.ejb.Local;
+
 import org.nightlabs.ModuleException;
 import org.nightlabs.jfire.asyncinvoke.AsyncInvokeEnqueueException;
 import org.nightlabs.jfire.store.deliver.id.DeliveryDataID;
 import org.nightlabs.jfire.store.deliver.id.DeliveryID;
 
+@Local
 public interface DeliveryHelperLocal {
 
 	/**

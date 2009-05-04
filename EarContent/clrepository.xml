@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE classloader-repository
+PUBLIC "-//NightLabs GmbH//DTD ClassLoader Repository 1.1//EN"
+"http://www.nightlabs.de/dtd/clrepository_1_1.dtd">
+
+<classloader-repository>
+        <publish>
+                <!-- publish the contents of RXTXcomm.jar -->
+                <resources>gnu\/io\/.*</resources>
+        </publish>
+</classloader-repository>

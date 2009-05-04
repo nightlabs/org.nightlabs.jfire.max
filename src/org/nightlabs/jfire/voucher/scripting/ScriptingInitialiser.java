@@ -12,6 +12,7 @@ import org.nightlabs.jfire.scripting.ScriptCategory;
 import org.nightlabs.jfire.scripting.ScriptParameterSet;
 import org.nightlabs.jfire.scripting.ScriptingIntialiserException;
 import org.nightlabs.jfire.servermanager.JFireServerManager;
+import org.nightlabs.jfire.voucher.JFireVoucherEAR;
 import org.nightlabs.jfire.voucher.store.id.VoucherKeyID;
 
 /**
@@ -75,10 +76,13 @@ public class ScriptingInitialiser
 			baseCategory.setParameterSet(paramSet);
 		}
 
-		File ear = new File(
-				jfsm.getJFireServerConfigModule().getJ2ee().getJ2eeDeployBaseDirectory(),
-				"JFireVoucher.ear"
-		);
+//		File ear = new File(
+//				jfsm.getJFireServerConfigModule().getJ2ee().getJ2eeDeployBaseDirectory(),
+//				"JFireVoucher.ear"
+//		);
+
+		String j2eeBaseDir = jfsm.getJFireServerConfigModule().getJ2ee().getJ2eeDeployBaseDirectory();
+		File ear = new File(j2eeBaseDir, JFireVoucherEAR.MODULE_NAME + ".ear");
 
 		new org.nightlabs.jfire.scripting.ScriptingInitialiser(
 				ear,

@@ -67,7 +67,7 @@ public class HTMLDataField extends DataField
 	 *		collection-type="map"
 	 *		key-type="java.lang.String"
 	 *		value-type="java.lang.String"
-	 *		table="JFireHTMLProp_HTMLDataField_Texts"
+	 *		table="JFireHTMLProp_HTMLDataField_texts"
 	 *
 	 * @jdo.join
 	 * @jdo.value-column sql-type="CLOB"
@@ -89,7 +89,7 @@ public class HTMLDataField extends DataField
 	 * 		dependent-element="true"
 	 *		null-value="exception"
 	 *		element-type="org.nightlabs.jfire.prop.html.HTMLContentFile"
-	 *		table="JFireHTMLProp_HTMLDataField_Files"
+	 *		table="JFireHTMLProp_HTMLDataField_files"
 	 *
 	 * @jdo.join
 	 */
@@ -97,7 +97,7 @@ public class HTMLDataField extends DataField
 	@Persistent(
 		dependentElement="true",
 		nullValue=NullValue.EXCEPTION,
-		table="JFireHTMLProp_HTMLDataField_Files",
+		table="JFireHTMLProp_HTMLDataField_files",
 		persistenceModifier=PersistenceModifier.PERSISTENT,
 		types=HTMLContentFile.class)
 	private List<IFCKEditorContentFile> files;

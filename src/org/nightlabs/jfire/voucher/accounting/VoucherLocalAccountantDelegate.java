@@ -8,6 +8,16 @@ import java.util.Set;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
 
 import org.nightlabs.jfire.accounting.Account;
 import org.nightlabs.jfire.accounting.Invoice;
@@ -20,15 +30,6 @@ import org.nightlabs.jfire.trade.ArticlePrice;
 import org.nightlabs.jfire.trade.OrganisationLegalEntity;
 import org.nightlabs.jfire.transfer.Anchor;
 import org.nightlabs.jfire.voucher.store.VoucherType;
-
-import javax.jdo.annotations.Join;
-import javax.jdo.annotations.NullValue;
-import javax.jdo.annotations.Inheritance;
-import javax.jdo.annotations.PersistenceModifier;
-import javax.jdo.annotations.Persistent;
-import javax.jdo.annotations.InheritanceStrategy;
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.IdentityType;
 
 /**
  * {@link VoucherLocalAccountantDelegate} is assigned to ProductTypes of type
@@ -45,6 +46,8 @@ import javax.jdo.annotations.IdentityType;
  *
  * @jdo.inheritance strategy="new-table"
  *
+ * @jdo.fetch-group name="VoucherLocalAccountantDelegate.accounts" fields="accounts"
+ *
  * @!jdo.query
  *		name="getVoucherLocalAccountantDelegateByAccount"
  *		query="SELECT UNIQUE WHERE this.account == :account"
@@ -54,12 +57,19 @@ import javax.jdo.annotations.IdentityType;
 	detachable="true",
 	table="JFireVoucher_VoucherLocalAccountantDelegate")
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
+@FetchGroups({
+	@FetchGroup(
+		name=VoucherLocalAccountantDelegate.FETCH_GROUP_VOUCHER_LOCAL_ACCOUNTS,
+		members=@Persistent(name="accounts"))
+})
 public class VoucherLocalAccountantDelegate
 extends LocalAccountantDelegate
 {
 	private static final long serialVersionUID = 1L;
 
 //	public static final String ACCOUNT_ANCHOR_TYPE_ID_VOUCHER = "Account.Voucher";
+
+	public static final String FETCH_GROUP_VOUCHER_LOCAL_ACCOUNTS = "VoucherLocalAccountantDelegate.accounts";
 
 	/**
 	 * @jdo.field

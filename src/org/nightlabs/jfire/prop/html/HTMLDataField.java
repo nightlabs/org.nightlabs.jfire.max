@@ -98,7 +98,8 @@ public class HTMLDataField extends DataField
 		dependentElement="true",
 		nullValue=NullValue.EXCEPTION,
 		table="JFireHTMLProp_HTMLDataField_Files",
-		persistenceModifier=PersistenceModifier.PERSISTENT)
+		persistenceModifier=PersistenceModifier.PERSISTENT,
+		types=HTMLContentFile.class)
 	private List<IFCKEditorContentFile> files;
 
 	/**

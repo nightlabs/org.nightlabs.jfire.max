@@ -1,6 +1,7 @@
 package org.nightlabs.jfire.accounting.pay;
 
 import javax.annotation.security.RolesAllowed;
+import javax.ejb.Local;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 
@@ -8,6 +9,7 @@ import org.nightlabs.ModuleException;
 import org.nightlabs.jfire.accounting.pay.id.PaymentDataID;
 import org.nightlabs.jfire.accounting.pay.id.PaymentID;
 
+@Local
 public interface PaymentHelperLocal {
 
 	/**

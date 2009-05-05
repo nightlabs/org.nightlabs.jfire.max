@@ -180,8 +180,8 @@
 			<icon file="" />
 		</transition>
 		<transition name="dev.jfire.org:pay">
-			<name language="de">pay</name>
-			<description language="pay">doubt</description>
+			<name language="de">bezahlen</name>
+			<description language="de">bezahlen</description>
 			<name language="en">pay</name>
 			<description language="en">pay</description>
 			<icon file="" />

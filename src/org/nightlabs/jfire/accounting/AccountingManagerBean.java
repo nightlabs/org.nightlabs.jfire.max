@@ -157,6 +157,7 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("_System_")
+	@Override
 	public void initialise()
 	throws IOException
 	{

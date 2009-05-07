@@ -30,27 +30,26 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
-
-import org.nightlabs.jdo.ObjectIDUtil;
-
-import javax.jdo.annotations.Persistent;
-import javax.jdo.annotations.Key;
-import javax.jdo.annotations.Value;
-import javax.jdo.annotations.FetchGroups;
-import javax.jdo.annotations.InheritanceStrategy;
-import javax.jdo.annotations.Inheritance;
-import javax.jdo.annotations.PrimaryKey;
-import javax.jdo.annotations.FetchGroup;
-import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Column;
-import org.nightlabs.jfire.accounting.id.PriceID;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.FetchGroups;
 import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Key;
+import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.Value;
+
+import org.apache.log4j.Logger;
+import org.nightlabs.jdo.ObjectIDUtil;
+import org.nightlabs.jfire.accounting.id.PriceID;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -127,6 +126,8 @@ public class Price
 {
 	private static final long serialVersionUID = 1L;
 
+	private static final Logger logger = Logger.getLogger(Price.class);
+
 	public static final String FETCH_GROUP_CURRENCY = "Price.currency"; //$NON-NLS-1$
 	public static final String FETCH_GROUP_FRAGMENTS = "Price.fragments"; //$NON-NLS-1$
 	/**
@@ -152,7 +153,7 @@ public class Price
 	/**
 	 * @jdo.field primary-key="true"
 	 */
-@PrimaryKey
+	@PrimaryKey
 	private long priceID = -1;
 	/////// end PK /////
 
@@ -200,7 +201,7 @@ public class Price
 		persistenceModifier=PersistenceModifier.PERSISTENT)
 	@Key(mappedBy="priceFragmentTypePK")
 	@Value(dependent="true")
-	protected Map<String, PriceFragment> fragments;
+	private Map<String, PriceFragment> fragments;
 
 	/**
 	 * A Price can contain virtual fragments. Virtual fragments
@@ -210,7 +211,7 @@ public class Price
 	 * @jdo.field persistence-modifier="none"
 	 */
 	@Persistent(persistenceModifier=PersistenceModifier.NONE)
-	protected Map<String, PriceFragment> virtualFragments = new HashMap<String, PriceFragment>();
+	private Map<String, PriceFragment> virtualFragments = new HashMap<String, PriceFragment>();
 
 	/////// end normal fields ////////
 
@@ -315,7 +316,7 @@ public class Price
 	 * @return A Colleciton of PriceFragments.
 	 */
 	public Collection<PriceFragment> getFragments(boolean includeVirtual) {
-		HashSet result = new HashSet(fragments.values());
+		HashSet<PriceFragment> result = new HashSet<PriceFragment>(fragments.values());
 		if (includeVirtual)
 			result.addAll(virtualFragments.values());
 		return result;
@@ -325,7 +326,7 @@ public class Price
 	 * @return The list of virtual (non-persistent) PriceFragments.
 	 */
 	public Collection<PriceFragment> getVirtualFragments() {
-		return new HashSet(virtualFragments.values());
+		return new HashSet<PriceFragment>(virtualFragments.values());
 	}
 
 	/**
@@ -412,7 +413,7 @@ public class Price
 			fragment = virtualFragments.get(priceFragmentTypePK);
 		}
 		if (fragment == null && throwExceptionIfNotExistent)
-			throw new IllegalArgumentException("No PriceFragment registered with priceFragmentTypePK=\""+priceFragmentTypePK+"\"!"); //$NON-NLS-1$ //$NON-NLS-2$
+			throw new IllegalArgumentException("No PriceFragment registered with priceFragmentTypePK=\""+priceFragmentTypePK+"\" for "+this.getClass().getSimpleName()+" "+this.getPrimaryKey()+", the following fragments are contained "+fragments); //$NON-NLS-1$ //$NON-NLS-2$
 		return fragment;
 	}
 
@@ -467,6 +468,9 @@ public class Price
 		if (fragment == null) {
 			fragment = new PriceFragment(this, priceFragmentType);
 			fragments.put(priceFragmentType.getPrimaryKey(), fragment);
+			if (logger.isDebugEnabled()) {
+				logger.debug("Created PriceFragment "+fragment.getPriceFragmentTypePK()+" and added to price "+getPrimaryKey());
+			}
 		}
 		return fragment;
 	}
@@ -537,6 +541,9 @@ public class Price
 	protected void addPriceFragment(PriceFragment priceFragment)
 	{
 		fragments.put(priceFragment.getPriceFragmentTypePK(), priceFragment);
+		if (logger.isDebugEnabled()) {
+			logger.debug("Added PriceFragment "+priceFragment.getPriceFragmentTypePK()+" to price "+getPrimaryKey());
+		}
 	}
 
 	/**
@@ -669,8 +676,7 @@ public class Price
 	public void sumPrice(Price price)
 	{
 		this.amount += price.getAmount();
-		for (Iterator it = price.getFragments().iterator(); it.hasNext(); ) {
-			PriceFragment fragment = (PriceFragment) it.next();
+		for (PriceFragment fragment : price.getFragments()) {
 			sumPriceFragment(fragment);
 		}
 	}

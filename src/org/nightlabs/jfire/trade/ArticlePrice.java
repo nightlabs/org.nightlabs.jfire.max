@@ -32,26 +32,23 @@ import java.util.Map;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Key;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.Value;
 
-import org.nightlabs.jfire.accounting.Accounting;
-import org.nightlabs.jfire.accounting.AccountingPriceConfig;
 import org.nightlabs.jfire.accounting.Price;
 import org.nightlabs.jfire.accounting.PriceFragment;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.store.NestedProductTypeLocal;
 import org.nightlabs.jfire.store.Product;
 import org.nightlabs.jfire.store.ProductType;
-
-import javax.jdo.annotations.Persistent;
-import javax.jdo.annotations.Key;
-import javax.jdo.annotations.Value;
-import javax.jdo.annotations.FetchGroups;
-import javax.jdo.annotations.InheritanceStrategy;
-import javax.jdo.annotations.Inheritance;
-import javax.jdo.annotations.FetchGroup;
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.IdentityType;
-import javax.jdo.annotations.PersistenceModifier;
 
 
 /**
@@ -142,7 +139,7 @@ public class ArticlePrice extends org.nightlabs.jfire.accounting.Price
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
-@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private org.nightlabs.jfire.accounting.Price origPrice;
 
 	/**
@@ -212,7 +209,7 @@ public class ArticlePrice extends org.nightlabs.jfire.accounting.Price
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
-@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private ProductType packageProductType;
 
 	/**

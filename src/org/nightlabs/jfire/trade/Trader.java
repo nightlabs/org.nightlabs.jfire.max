@@ -63,6 +63,7 @@ import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.accounting.Accounting;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.Invoice;
+import org.nightlabs.jfire.accounting.PriceFragment;
 import org.nightlabs.jfire.accounting.Tariff;
 import org.nightlabs.jfire.accounting.pay.Payment;
 import org.nightlabs.jfire.accounting.priceconfig.IPackagePriceConfig;
@@ -825,10 +826,10 @@ public class Trader
 
 		createArticleLocals(user, articles);
 
-		// WORKAROUND begin
+//		// WORKAROUND begin
 		PersistenceManager pm = getPersistenceManager();
 		articles = pm.makePersistentAll(articles);
-		// WORKAROUND end
+//		// WORKAROUND end
 
 		offer.addArticles(articles);
 
@@ -836,13 +837,25 @@ public class Trader
 			// allocateArticle (re)creates the price already => no need to create the
 			// price.
 			allocateArticles(user, articles, allocateSynchronously);
+			if (logger.isDebugEnabled()) {
+				for (Article article : articles) {
+					logger.debug("Price "+article.getPrice().getPrimaryKey()+" for allocated article "+article.getPrimaryKey()+" contains the following PriceFragments:");
+					for (PriceFragment pf : article.getPrice().getFragments()) {
+						logger.debug("PriceFragment "+pf.getPriceFragmentTypePK()+" priceID "+pf.getPriceID());
+					}
+				}
+			}
 		}
 		else {
 			// create the Articles' prices
 			for (Article article : articles) {
 				IPackagePriceConfig packagePriceConfig = article.getProductType()
-				.getPackagePriceConfig();
-				article.setPrice(packagePriceConfig.createArticlePrice(article));
+					.getPackagePriceConfig();
+				ArticlePrice articlePrice = packagePriceConfig.createArticlePrice(article);
+				if (logger.isDebugEnabled()) {
+					logger.debug("PriceFragments for articlePrice "+articlePrice.getPrimaryKey()+" = "+articlePrice.getFragments());
+				}
+				article.setPrice(articlePrice);
 			}
 		}
 
@@ -851,7 +864,7 @@ public class Trader
 		setOfferExpiry(offer);
 
 		return articles;
-			}
+	}
 
 	/**
 	 * @param user
@@ -1671,22 +1684,15 @@ public class Trader
 			article.setAllocationException(null);
 			IPackagePriceConfig packagePriceConfig = product.getProductType().getPackagePriceConfig();
 
-//			pm.flush();
-
 //			// TODO remove this JPOX Workaround - getting:
 //			// com.mysql.jdbc.exceptions.MySQLIntegrityConstraintViolationException: Duplicate entry 'chezfrancois.jfire.org-9-8' for key 1
 			ArticlePrice articlePrice = packagePriceConfig.createArticlePrice(article);
-//			for (int tryCounter = 0; tryCounter < 10; ++tryCounter) {
-//			try {
-//			articlePrice = pm.makePersistent(articlePrice);
-//			break;
-//			} catch (Exception x) {
-//			logger.warn("Persisting articlePrice instance failed! Trying it again. tryCounter=" + tryCounter, x);
-//			}
-//			}
+			// WORKAROUND begin DataNucleus for not existing priceFragment
+			articlePrice = pm.makePersistent(articlePrice);
+			pm.flush();
+			articlePrice = (ArticlePrice) pm.getObjectById(JDOHelper.getObjectId(articlePrice));
+			// WORKAROUND end DataNucleus for not existing priceFragment
 			article.setPrice(articlePrice);
-
-//			pm.flush();
 
 //			ProductTypeActionHandler productTypeActionHandler = ProductTypeActionHandler.getProductTypeActionHandler(
 //			getPersistenceManager(), article.getProductType().getClass());

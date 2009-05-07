@@ -4,6 +4,10 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.jdo.PersistenceManager;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.PersistenceCapable;
 
 import org.nightlabs.jfire.editlock.EditLock;
 import org.nightlabs.jfire.editlock.EditLockType;
@@ -12,11 +16,6 @@ import org.nightlabs.jfire.editlock.id.EditLockTypeID;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.security.User;
-
-import javax.jdo.annotations.InheritanceStrategy;
-import javax.jdo.annotations.Inheritance;
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.IdentityType;
 
 /**
  * @author Marco Schulze - Marco at NightLabs dot de
@@ -88,11 +87,11 @@ extends EditLockType
 								; // nothing, we can directly delete it
 //								articles_nonAllocated_nothingPending.add(article);
 							else if (article.isReleasePending())
-								throw new IllegalStateException("Article is in state 'release pending' - have to retry later: " + article);
+								throw new IllegalStateException("Article " + article + " is in state 'release pending' - have to retry later: " + article);
 							else if (article.isAllocationPending())
-								throw new IllegalStateException("Article is in state 'allocation pending' - have to retry later: " + article);
+								throw new IllegalStateException("Article " + article + " is in state 'allocation pending' - have to retry later: " + article);
 							else
-								throw new IllegalStateException("Article is in unexpected state!!! " + article);
+								throw new IllegalStateException("Article " + article + " is in unexpected state!!! " + article);
 						}
 
 						trader.releaseArticles(user, articles_allocated_nothingPending, true, false);

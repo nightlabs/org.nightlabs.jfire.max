@@ -729,6 +729,10 @@ implements
 			} // if (all || offerItem.isPriceDependentOnOffer()) {
 			price.sumPrice(article.getPrice());
 		}
+//		// TODO WORKAROUND DataNucleus Begin
+//		pm.refresh(price);
+//		pm.flush();
+//		// TODO WORKAROUND DataNucleus End
 	}
 
 	/**

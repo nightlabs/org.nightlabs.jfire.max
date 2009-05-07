@@ -28,17 +28,18 @@ package org.nightlabs.jfire.accounting;
 
 import java.io.Serializable;
 
-import org.nightlabs.jfire.accounting.id.PriceFragmentID;
-import javax.jdo.annotations.Persistent;
-import javax.jdo.annotations.FetchGroups;
-import javax.jdo.annotations.InheritanceStrategy;
-import javax.jdo.annotations.Inheritance;
-import javax.jdo.annotations.PrimaryKey;
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.FetchGroup;
 import javax.jdo.annotations.Column;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.FetchGroups;
 import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
+
+import org.nightlabs.jfire.accounting.id.PriceFragmentID;
 
 
 /**
@@ -118,8 +119,8 @@ public class PriceFragment
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
-@PrimaryKey
-@Column(length=100)
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 
 //	/**
@@ -131,7 +132,7 @@ public class PriceFragment
 	/**
 	 * @jdo.field primary-key="true"
 	 */
-@PrimaryKey
+	@PrimaryKey
 	private long priceID;
 
 //	/**
@@ -150,8 +151,8 @@ public class PriceFragment
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="201"
 	 */
-@PrimaryKey
-@Column(length=201)
+	@PrimaryKey
+	@Column(length=201)
 	private String priceFragmentTypePK;
 
 	/**

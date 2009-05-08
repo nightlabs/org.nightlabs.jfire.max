@@ -166,6 +166,7 @@ implements StoreManagerRemote, StoreManagerLocal
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("_System_")
+	@Override
 	public void initialise() throws Exception
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -407,6 +408,7 @@ implements StoreManagerRemote, StoreManagerLocal
 	 * @see org.nightlabs.jfire.store.StoreManagerRemote#getUnitIDs()
 	 */
 	@RolesAllowed("_Guest_")
+	@Override
 	public Set<UnitID> getUnitIDs()
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -424,6 +426,7 @@ implements StoreManagerRemote, StoreManagerLocal
 	 * @see org.nightlabs.jfire.store.StoreManagerRemote#getUnits(java.util.Collection, java.lang.String[], int)
 	 */
 	@RolesAllowed("_Guest_")
+	@Override
 	public List<Unit> getUnits(Collection<UnitID> unitIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -438,6 +441,7 @@ implements StoreManagerRemote, StoreManagerLocal
 	 * @see org.nightlabs.jfire.store.StoreManagerRemote#getDeliveryNotes(java.util.Set, java.lang.String[], int)
 	 */
 	@RolesAllowed("org.nightlabs.jfire.store.queryDeliveryNotes")
+	@Override
 	public List<DeliveryNote> getDeliveryNotes(Set<DeliveryNoteID> deliveryNoteIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -470,8 +474,9 @@ implements StoreManagerRemote, StoreManagerLocal
 	/* (non-Javadoc)
 	 * @see org.nightlabs.jfire.store.StoreManagerRemote#getDeliveryNoteIDs(org.nightlabs.jdo.query.QueryCollection)
 	 */
-@RolesAllowed("org.nightlabs.jfire.store.queryDeliveryNotes")
+	@RolesAllowed("org.nightlabs.jfire.store.queryDeliveryNotes")
 	@SuppressWarnings("unchecked")
+	@Override
 	public Set<DeliveryNoteID> getDeliveryNoteIDs(QueryCollection<? extends AbstractJDOQuery> queries)
 	{
 		if (queries == null)
@@ -510,6 +515,7 @@ implements StoreManagerRemote, StoreManagerLocal
 	 * @see org.nightlabs.jfire.store.StoreManagerRemote#getProductTypes(java.util.Set, java.lang.String[], int)
 	 */
 	@RolesAllowed("org.nightlabs.jfire.store.seeProductType")
+	@Override
 	public List<ProductType> getProductTypes(Set<ProductTypeID> productTypeIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -568,6 +574,7 @@ implements StoreManagerRemote, StoreManagerLocal
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed({"org.nightlabs.jfire.store.editUnconfirmedProductType", "org.nightlabs.jfire.store.editConfirmedProductType"})
+	@Override
 	public ProductTypeStatusHistoryItem setProductTypeStatus_published(ProductTypeID productTypeID, boolean get, String[] fetchGroups, int maxFetchDepth)
 	throws CannotPublishProductTypeException
 	{
@@ -598,6 +605,7 @@ implements StoreManagerRemote, StoreManagerLocal
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed({"org.nightlabs.jfire.store.editUnconfirmedProductType", "org.nightlabs.jfire.store.editConfirmedProductType"})
+	@Override
 	public ProductTypeStatusHistoryItem setProductTypeStatus_confirmed(ProductTypeID productTypeID, boolean get, String[] fetchGroups, int maxFetchDepth)
 	throws CannotConfirmProductTypeException
 	{
@@ -628,6 +636,7 @@ implements StoreManagerRemote, StoreManagerLocal
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed({"org.nightlabs.jfire.store.editUnconfirmedProductType", "org.nightlabs.jfire.store.editConfirmedProductType"})
+	@Override
 	public ProductTypeStatusHistoryItem setProductTypeStatus_saleable(ProductTypeID productTypeID, boolean saleable, boolean get, String[] fetchGroups, int maxFetchDepth)
 	throws CannotMakeProductTypeSaleableException
 	{
@@ -658,6 +667,7 @@ implements StoreManagerRemote, StoreManagerLocal
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("org.nightlabs.jfire.store.editConfirmedProductType")
+	@Override
 	public ProductTypeStatusHistoryItem setProductTypeStatus_closed(ProductTypeID productTypeID, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -687,6 +697,7 @@ implements StoreManagerRemote, StoreManagerLocal
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("_Guest_")
+	@Override
 	public ModeOfDeliveryFlavourProductTypeGroupCarrier
 			getModeOfDeliveryFlavourProductTypeGroupCarrier(
 					Collection<ProductTypeID> productTypeIDs,
@@ -727,6 +738,7 @@ implements StoreManagerRemote, StoreManagerLocal
 	 * @see org.nightlabs.jfire.store.StoreManagerRemote#getModeOfDeliverys(java.util.Set, java.lang.String[], int)
 	 */
 	@RolesAllowed("_Guest_")
+	@Override
 	public Collection<ModeOfDelivery> getModeOfDeliverys(Set<ModeOfDeliveryID> modeOfDeliveryIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -741,6 +753,7 @@ implements StoreManagerRemote, StoreManagerLocal
 	 * @see org.nightlabs.jfire.store.StoreManagerRemote#getAllModeOfDeliveryFlavourIDs()
 	 */
 	@RolesAllowed("_Guest_")
+	@Override
 	public Set<ModeOfDeliveryFlavourID> getAllModeOfDeliveryFlavourIDs() {
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -754,6 +767,7 @@ implements StoreManagerRemote, StoreManagerLocal
 	 * @see org.nightlabs.jfire.store.StoreManagerRemote#getAllModeOfDeliveryIDs()
 	 */
 	@RolesAllowed("_Guest_")
+	@Override
 	public Set<ModeOfDeliveryID> getAllModeOfDeliveryIDs() {
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -767,6 +781,7 @@ implements StoreManagerRemote, StoreManagerLocal
 	 * @see org.nightlabs.jfire.store.StoreManagerRemote#getModeOfDeliveryFlavours(java.util.Set, java.lang.String[], int)
 	 */
 	@RolesAllowed("_Guest_")
+	@Override
 	public Collection<ModeOfDeliveryFlavour> getModeOfDeliveryFlavours(Set<ModeOfDeliveryFlavourID> modeOfDeliveryFlavourIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -781,6 +796,7 @@ implements StoreManagerRemote, StoreManagerLocal
 	 * @see org.nightlabs.jfire.store.StoreManagerRemote#getServerDeliveryProcessorsForOneModeOfDeliveryFlavour(org.nightlabs.jfire.store.deliver.id.ModeOfDeliveryFlavourID, org.nightlabs.jfire.store.deliver.CheckRequirementsEnvironment, java.lang.String[], int)
 	 */
 	@RolesAllowed("_Guest_")
+	@Override
 	public Collection<ServerDeliveryProcessor> getServerDeliveryProcessorsForOneModeOfDeliveryFlavour(
 			ModeOfDeliveryFlavourID modeOfDeliveryFlavourID,
 			CheckRequirementsEnvironment checkRequirementsEnvironment,
@@ -815,6 +831,7 @@ implements StoreManagerRemote, StoreManagerLocal
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("org.nightlabs.jfire.store.editDeliveryNote")
+	@Override
 	public DeliveryNote createDeliveryNote(
 			Collection<ArticleID> articleIDs, String deliveryNoteIDPrefix,
 			boolean get, String[] fetchGroups, int maxFetchDepth)
@@ -863,6 +880,7 @@ implements StoreManagerRemote, StoreManagerLocal
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("org.nightlabs.jfire.store.editDeliveryNote")
+	@Override
 	public DeliveryNote createDeliveryNote(
 			ArticleContainerID articleContainerID, String deliveryNoteIDPrefix,
 			boolean get, String[] fetchGroups, int maxFetchDepth)
@@ -932,6 +950,7 @@ implements StoreManagerRemote, StoreManagerLocal
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("org.nightlabs.jfire.store.editDeliveryNote")
+	@Override
 	public DeliveryNote addArticlesToDeliveryNote(
 			DeliveryNoteID deliveryNoteID, Collection<ArticleID> articleIDs,
 			boolean validate, boolean get, String[] fetchGroups, int maxFetchDepth)
@@ -972,6 +991,7 @@ implements StoreManagerRemote, StoreManagerLocal
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("org.nightlabs.jfire.store.editDeliveryNote")
+	@Override
 	public DeliveryNote removeArticlesFromDeliveryNote(
 			DeliveryNoteID deliveryNoteID, Collection<ArticleID> articleIDs,
 			boolean validate, boolean get, String[] fetchGroups, int maxFetchDepth)
@@ -1014,6 +1034,7 @@ implements StoreManagerRemote, StoreManagerLocal
 	 * @see org.nightlabs.jfire.store.StoreManagerRemote#deliverBegin(java.util.List)
 	 */
 	@RolesAllowed("org.nightlabs.jfire.store.deliver")
+	@Override
 	public List<DeliveryResult> deliverBegin(List<DeliveryData> deliveryDataList)
 	{
 		try {
@@ -1055,6 +1076,7 @@ implements StoreManagerRemote, StoreManagerLocal
 	 * @see org.nightlabs.jfire.store.StoreManagerRemote#deliverInSingleTransaction(org.nightlabs.jfire.store.deliver.DeliveryData)
 	 */
 	@RolesAllowed("org.nightlabs.jfire.store.deliver")
+	@Override
 	public DeliveryResult[] deliverInSingleTransaction(DeliveryData deliveryData)
 	throws DeliveryException
 	{
@@ -1131,6 +1153,7 @@ implements StoreManagerRemote, StoreManagerLocal
 	 * @see org.nightlabs.jfire.store.StoreManagerRemote#deliverBegin(org.nightlabs.jfire.store.deliver.DeliveryData)
 	 */
 	@RolesAllowed("org.nightlabs.jfire.store.deliver")
+	@Override
 	public DeliveryResult deliverBegin(DeliveryData deliveryData)
 	{
 		return _deliverBegin(deliveryData);
@@ -1144,6 +1167,7 @@ implements StoreManagerRemote, StoreManagerLocal
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
 	@RolesAllowed("_Guest_")
+	@Override
 	public DeliveryResult _deliverBegin(DeliveryData deliveryData)
 	{
 		if (logger.isDebugEnabled()) {
@@ -1216,6 +1240,7 @@ implements StoreManagerRemote, StoreManagerLocal
 	 * @see org.nightlabs.jfire.store.StoreManagerRemote#deliverEnd(java.util.List, java.util.List, boolean)
 	 */
 	@RolesAllowed("_Guest_")
+	@Override
 	public List<DeliveryResult> deliverEnd(List<DeliveryID> deliveryIDs, List<DeliveryResult> deliverEndClientResults, boolean forceRollback)
 	{
 		try {
@@ -1262,6 +1287,7 @@ implements StoreManagerRemote, StoreManagerLocal
 	 * @see org.nightlabs.jfire.store.StoreManagerRemote#deliverDoWork(java.util.List, java.util.List, boolean)
 	 */
 	@RolesAllowed("_Guest_")
+	@Override
 	public List<DeliveryResult> deliverDoWork(List<DeliveryID> deliveryIDs, List<DeliveryResult> deliverDoWorkClientResults, boolean forceRollback)
 	{
 		if (deliveryIDs.size() != deliverDoWorkClientResults.size())
@@ -1302,6 +1328,7 @@ implements StoreManagerRemote, StoreManagerLocal
 	 * @see org.nightlabs.jfire.store.StoreManagerRemote#deliverDoWork(org.nightlabs.jfire.store.deliver.id.DeliveryID, org.nightlabs.jfire.store.deliver.DeliveryResult, boolean)
 	 */
 	@RolesAllowed("_Guest_")
+	@Override
 	public DeliveryResult deliverDoWork(
 			DeliveryID deliveryID,
 			DeliveryResult deliverEndClientResult,
@@ -1315,6 +1342,7 @@ implements StoreManagerRemote, StoreManagerLocal
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
 	@RolesAllowed("_Guest_")
+	@Override
 	public DeliveryResult _deliverDoWork(
 			DeliveryID deliveryID,
 			DeliveryResult deliverDoWorkClientResult,
@@ -1365,6 +1393,7 @@ implements StoreManagerRemote, StoreManagerLocal
 	 * @see org.nightlabs.jfire.store.StoreManagerRemote#deliverEnd(org.nightlabs.jfire.store.deliver.id.DeliveryID, org.nightlabs.jfire.store.deliver.DeliveryResult, boolean)
 	 */
 	@RolesAllowed("_Guest_")
+	@Override
 	public DeliveryResult deliverEnd(
 			DeliveryID deliveryID,
 			DeliveryResult deliverEndClientResult,
@@ -1378,6 +1407,7 @@ implements StoreManagerRemote, StoreManagerLocal
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
 	@RolesAllowed("_Guest_")
+	@Override
 	public DeliveryResult _deliverEnd(
 			DeliveryID deliveryID,
 			DeliveryResult deliverEndClientResult,
@@ -1587,6 +1617,7 @@ implements StoreManagerRemote, StoreManagerLocal
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("org.nightlabs.jfire.store.queryDeliveryNotes")
+	@Override
 	public List<DeliveryNoteID> getDeliveryNoteIDs(AnchorID vendorID, AnchorID customerID, AnchorID endCustomerID, long rangeBeginIdx, long rangeEndIdx)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -1602,6 +1633,7 @@ implements StoreManagerRemote, StoreManagerLocal
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("org.nightlabs.jfire.store.deliver")
+	@Override
 	public Delivery getDelivery(DeliveryID deliveryID, String[] fetchGroups, int maxFetchDepth) {
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -1620,6 +1652,7 @@ implements StoreManagerRemote, StoreManagerLocal
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("org.nightlabs.jfire.store.queryDeliveryNotes")
+	@Override
 	public List<DeliveryNote> getNonFinalizedDeliveryNotes(AnchorID vendorID, AnchorID customerID, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -1638,6 +1671,7 @@ implements StoreManagerRemote, StoreManagerLocal
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("org.nightlabs.jfire.store.editDeliveryNote")
+	@Override
 	public void signalDeliveryNote(DeliveryNoteID deliveryNoteID, String jbpmTransitionName)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -1690,8 +1724,9 @@ implements StoreManagerRemote, StoreManagerLocal
 	/* (non-Javadoc)
 	 * @see org.nightlabs.jfire.store.StoreManagerRemote#getProductTypeIDs(org.nightlabs.jdo.query.QueryCollection)
 	 */
-@RolesAllowed("org.nightlabs.jfire.store.seeProductType")
+	@RolesAllowed("org.nightlabs.jfire.store.seeProductType")
 	@SuppressWarnings("unchecked")
+	@Override
 	public Set<ProductTypeID> getProductTypeIDs(QueryCollection<? extends AbstractProductTypeQuery> productTypeQueries)
 	{
 		if (productTypeQueries == null)
@@ -1899,8 +1934,9 @@ implements StoreManagerRemote, StoreManagerLocal
 	/* (non-Javadoc)
 	 * @see org.nightlabs.jfire.store.StoreManagerRemote#getProductTypeGroupIDSearchResultForProductTypeQueries(org.nightlabs.jdo.query.QueryCollection)
 	 */
-@RolesAllowed("_Guest_")
+	@RolesAllowed("_Guest_")
 	@SuppressWarnings("unchecked")
+	@Override
 	public ProductTypeGroupIDSearchResult getProductTypeGroupIDSearchResultForProductTypeQueries(
 			QueryCollection<? extends AbstractProductTypeQuery> productTypeQueries)
 	{
@@ -1961,6 +1997,7 @@ implements StoreManagerRemote, StoreManagerLocal
 	 * @see org.nightlabs.jfire.store.StoreManagerRemote#getDeliveryQueuesById(java.util.Set, java.lang.String[], int)
 	 */
 	@RolesAllowed("_Guest_")
+	@Override
 	public Collection<DeliveryQueue> getDeliveryQueuesById(Set<DeliveryQueueID> deliveryQueueIds, String[] fetchGroups, int fetchDepth) {
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -1979,6 +2016,7 @@ implements StoreManagerRemote, StoreManagerLocal
 	 * @see org.nightlabs.jfire.store.StoreManagerRemote#storeDeliveryQueues(java.util.Collection, boolean, java.lang.String[], int)
 	 */
 	@RolesAllowed("org.nightlabs.jfire.store.editDeliveryQueue")
+	@Override
 	public Collection<DeliveryQueue> storeDeliveryQueues(Collection<DeliveryQueue> deliveryQueues, boolean get, String[] fetchGroups, int fetchDepth) {
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -2025,7 +2063,8 @@ implements StoreManagerRemote, StoreManagerLocal
 	/* (non-Javadoc)
 	 * @see org.nightlabs.jfire.store.StoreManagerRemote#getAvailableDeliveryQueueIDs(boolean)
 	 */
-@RolesAllowed("_Guest_")
+	@RolesAllowed("_Guest_")
+	@Override
 	public Collection<DeliveryQueueID> getAvailableDeliveryQueueIDs(boolean includeDefunct) {
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -2096,8 +2135,9 @@ implements StoreManagerRemote, StoreManagerLocal
 	/* (non-Javadoc)
 	 * @see org.nightlabs.jfire.store.StoreManagerRemote#getRepositoryIDs(org.nightlabs.jdo.query.QueryCollection)
 	 */
-@RolesAllowed("org.nightlabs.jfire.store.queryRepositories")
+	@RolesAllowed("org.nightlabs.jfire.store.queryRepositories")
 	@SuppressWarnings("unchecked")
+	@Override
 	public Set<AnchorID> getRepositoryIDs(QueryCollection<? extends AbstractJDOQuery> queries)
 	{
 		if (queries == null)
@@ -2135,6 +2175,7 @@ implements StoreManagerRemote, StoreManagerLocal
 	 * @see org.nightlabs.jfire.store.StoreManagerRemote#getRepositories(java.util.Collection, java.lang.String[], int)
 	 */
 	@RolesAllowed("org.nightlabs.jfire.store.queryRepositories")
+	@Override
 	public List<Repository> getRepositories(Collection<AnchorID> repositoryIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -2150,6 +2191,7 @@ implements StoreManagerRemote, StoreManagerLocal
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("org.nightlabs.jfire.store.editRepository")
+	@Override
 	public Repository storeRepository(Repository repository, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -2185,7 +2227,8 @@ implements StoreManagerRemote, StoreManagerLocal
 	/* (non-Javadoc)
 	 * @see org.nightlabs.jfire.store.StoreManagerRemote#getProductTransferIDs(org.nightlabs.jdo.query.QueryCollection)
 	 */
-@RolesAllowed("org.nightlabs.jfire.store.queryProductTransfers")
+	@RolesAllowed("org.nightlabs.jfire.store.queryProductTransfers")
+	@Override
 	public List<TransferID> getProductTransferIDs(QueryCollection<? extends ProductTransferQuery> productTransferQueries)
 	{
 		if (productTransferQueries == null)
@@ -2229,6 +2272,7 @@ implements StoreManagerRemote, StoreManagerLocal
 	 * @see org.nightlabs.jfire.store.StoreManagerRemote#getProductTransfers(java.util.Collection, java.lang.String[], int)
 	 */
 	@RolesAllowed("org.nightlabs.jfire.store.queryProductTransfers")
+	@Override
 	public List<ProductTransfer> getProductTransfers(Collection<TransferID> productTransferIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -2244,6 +2288,7 @@ implements StoreManagerRemote, StoreManagerLocal
 	 */
 	@RolesAllowed("_Guest_")
 	@SuppressWarnings("unchecked")
+	@Override
 	public Set<RepositoryTypeID> getRepositoryTypeIDs()
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -2260,6 +2305,7 @@ implements StoreManagerRemote, StoreManagerLocal
 	 * @see org.nightlabs.jfire.store.StoreManagerRemote#getRepositoryTypes(java.util.Collection, java.lang.String[], int)
 	 */
 	@RolesAllowed("_Guest_")
+	@Override
 	public List<RepositoryType> getRepositoryTypes(Collection<RepositoryTypeID> repositoryTypeIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -2296,8 +2342,9 @@ implements StoreManagerRemote, StoreManagerLocal
 	/* (non-Javadoc)
 	 * @see org.nightlabs.jfire.store.StoreManagerRemote#getProductTypeGroups(java.util.Collection, java.lang.String[], int)
 	 */
-@TransactionAttribute(TransactionAttributeType.REQUIRED)
-@RolesAllowed("org.nightlabs.jfire.store.seeProductType")
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("org.nightlabs.jfire.store.seeProductType")
+	@Override
 	public Collection<ProductTypeGroup> getProductTypeGroups(Collection<ProductTypeGroupID>
 		productTypeGroupIDs, String[] fetchGroups, int maxFetchDepth)
 	{
@@ -2432,6 +2479,7 @@ implements StoreManagerRemote, StoreManagerLocal
 	 */
 	@RolesAllowed("org.nightlabs.jfire.store.queryReceptionNotes")
 	@SuppressWarnings("unchecked")
+	@Override
 	public Set<ReceptionNoteID> getReceptionNoteIDs(QueryCollection<? extends AbstractJDOQuery> queries)
 	{
 		if (queries == null)
@@ -2473,6 +2521,7 @@ implements StoreManagerRemote, StoreManagerLocal
 	 * @see org.nightlabs.jfire.store.StoreManagerRemote#getReceptionNotes(java.util.Set, java.lang.String[], int)
 	 */
 	@RolesAllowed("org.nightlabs.jfire.store.queryReceptionNotes")
+	@Override
 	public List<ReceptionNote> getReceptionNotes(Set<ReceptionNoteID> receptionNoteIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -2487,6 +2536,7 @@ implements StoreManagerRemote, StoreManagerLocal
 	 * @see org.nightlabs.jfire.store.StoreManagerRemote#getReservations(org.nightlabs.jfire.store.id.ProductTypeID, java.lang.String, int)
 	 */
 	@RolesAllowed("org.nightlabs.jfire.store.seeProductType")
+	@Override
 	public Set<OfferID> getReservations(ProductTypeID productTypeID, String fetchGroups, int maxFetchDepth)
 	{
 		// TODO; Maybe needs other role
@@ -2714,6 +2764,7 @@ implements StoreManagerRemote, StoreManagerLocal
 	 */
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	@RolesAllowed("_Guest_")
+	@Override
 	public Set<ProductTypePermissionFlagSetID> getMyProductTypePermissionFlagSetIDs(Collection<? extends ProductTypeID> productTypeIDs)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -2741,6 +2792,7 @@ implements StoreManagerRemote, StoreManagerLocal
 	 */
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	@RolesAllowed("_Guest_")
+	@Override
 	public Collection<ProductTypePermissionFlagSet> getProductTypePermissionFlagSets(Collection<? extends ProductTypePermissionFlagSetID> productTypePermissionFlagSetIDs)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -2763,10 +2815,32 @@ implements StoreManagerRemote, StoreManagerLocal
 		}
 	}
 
+	@RolesAllowed("org.nightlabs.jfire.store.seeProductType")
+	@Override
+	public Set<ProductTypeID> getRootProductTypeIDs(Class<? extends ProductType> productTypeClass, boolean subclasses) {
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			Collection<? extends ProductType> productTypes = ProductType.getRootProductTypes(pm, productTypeClass, subclasses);
+
+			productTypes = Authority.filterIndirectlySecuredObjects(
+					pm,
+					productTypes,
+					getPrincipal(),
+					RoleConstants.seeProductType,
+					ResolveSecuringAuthorityStrategy.allow
+			);
+
+			return NLJDOHelper.getObjectIDSet(productTypes);
+		} finally {
+			pm.close();
+		}
+	}
+
 	/* (non-Javadoc)
 	 * @see org.nightlabs.jfire.store.StoreManagerRemote#getChildProductTypeIDs(org.nightlabs.jfire.store.id.ProductTypeID)
 	 */
 	@RolesAllowed("org.nightlabs.jfire.store.seeProductType")
+	@Override
 	public Set<ProductTypeID> getChildProductTypeIDs(ProductTypeID parentProductTypeID) {
 		PersistenceManager pm = getPersistenceManager();
 		try {

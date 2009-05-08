@@ -442,6 +442,8 @@ public interface StoreManagerRemote {
 	 */
 	Collection<ProductTypePermissionFlagSet> getProductTypePermissionFlagSets(Collection<? extends ProductTypePermissionFlagSetID> productTypePermissionFlagSetIDs);
 
+	Set<ProductTypeID> getRootProductTypeIDs(Class<? extends ProductType> productTypeClass, boolean subclasses);
+
 	Set<ProductTypeID> getChildProductTypeIDs(ProductTypeID parentProductTypeID);
 
 }

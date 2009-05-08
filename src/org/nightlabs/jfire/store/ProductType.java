@@ -40,6 +40,25 @@ import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.Discriminator;
+import javax.jdo.annotations.DiscriminatorStrategy;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.Key;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.Queries;
+import javax.jdo.annotations.Value;
+import javax.jdo.annotations.Version;
+import javax.jdo.annotations.VersionStrategy;
 import javax.jdo.listener.AttachCallback;
 import javax.jdo.listener.DetachCallback;
 import javax.jdo.listener.StoreCallback;
@@ -77,26 +96,6 @@ import org.nightlabs.jfire.trade.OrganisationLegalEntity;
 import org.nightlabs.jfire.trade.endcustomer.EndCustomerReplicationPolicy;
 import org.nightlabs.util.CollectionUtil;
 import org.nightlabs.util.Util;
-
-import javax.jdo.annotations.FetchGroups;
-import javax.jdo.annotations.Inheritance;
-import javax.jdo.annotations.PrimaryKey;
-import javax.jdo.annotations.FetchGroup;
-import javax.jdo.annotations.Version;
-import javax.jdo.annotations.PersistenceModifier;
-import javax.jdo.annotations.Discriminator;
-import javax.jdo.annotations.Key;
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.DiscriminatorStrategy;
-import javax.jdo.annotations.Join;
-import javax.jdo.annotations.Value;
-import javax.jdo.annotations.NullValue;
-import javax.jdo.annotations.VersionStrategy;
-import javax.jdo.annotations.Persistent;
-import javax.jdo.annotations.InheritanceStrategy;
-import javax.jdo.annotations.Queries;
-import javax.jdo.annotations.Column;
-import javax.jdo.annotations.IdentityType;
 
 /**
  * <p>
@@ -449,6 +448,14 @@ implements
 						parentProductTypeID.organisationID, parentProductTypeID.productTypeID
 				)
 		);
+	}
+
+	@SuppressWarnings("unchecked")
+	public static Collection<? extends ProductType> getRootProductTypes(PersistenceManager pm, Class<? extends ProductType> productTypeClass, boolean subclasses)
+	{
+		Query q = pm.newQuery(pm.getExtent(productTypeClass, subclasses));
+		q.setFilter(FieldName.extendedProductType + " == null");
+		return (Collection<? extends ProductType>) q.execute();
 	}
 
 	public static String createProductTypeID()

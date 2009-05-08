@@ -135,6 +135,7 @@ extends BaseJDOObjectDAO<ProductTypeID, ProductType>
 	{
 		storeManager = JFireEjb3Factory.getRemoteBean(StoreManagerRemote.class, SecurityReflector.getInitialContextProperties());
 		try {
+			@SuppressWarnings("unchecked")
 			QueryCollection<? extends AbstractProductTypeQuery> productTypeQueries = (QueryCollection<? extends AbstractProductTypeQuery>) queryCollection;
 			Set<ProductTypeID> productTypeIDs = storeManager.getProductTypeIDs(productTypeQueries);
 			return getJDOObjects(null, productTypeIDs, fetchGroups, maxFetchDepth, progressMonitor);
@@ -156,6 +157,25 @@ extends BaseJDOObjectDAO<ProductTypeID, ProductType>
 	int maxFetchDepth, ProgressMonitor progressMonitor)
 	{
 		return getJDOObjects(null, productTypeIDs, fetchGroups, maxFetchDepth, progressMonitor);
+	}
+
+	public synchronized List<ProductType> getRootProductTypes(
+			Class<? extends ProductType> productTypeClass, boolean subclasses,
+			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor
+	)
+	{
+		try {
+			storeManager = JFireEjb3Factory.getRemoteBean(StoreManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			try {
+				Collection<ProductTypeID> productTypeIDs = storeManager.getRootProductTypeIDs(productTypeClass, subclasses);
+				return getJDOObjects(null, productTypeIDs, fetchGroups, maxFetchDepth, monitor);
+			} finally {
+				storeManager = null;
+				monitor.done();
+			}
+		} catch (Exception x) {
+			throw new RuntimeException(x);
+		}
 	}
 
 	/**

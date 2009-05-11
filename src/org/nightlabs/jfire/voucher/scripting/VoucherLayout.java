@@ -15,7 +15,7 @@ import javax.jdo.Query;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.io.DataBuffer;
-import org.nightlabs.jfire.trade.ILayout;
+import org.nightlabs.jfire.trade.editor2d.ILayout;
 import org.nightlabs.jfire.voucher.scripting.id.VoucherLayoutID;
 
 import javax.jdo.annotations.FetchGroups;

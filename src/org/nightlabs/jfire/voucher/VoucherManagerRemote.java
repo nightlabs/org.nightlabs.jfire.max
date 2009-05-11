@@ -18,7 +18,7 @@ import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 import org.nightlabs.jfire.store.id.ProductID;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.trade.Article;
-import org.nightlabs.jfire.trade.LayoutMapForArticleIDSet;
+import org.nightlabs.jfire.trade.editor2d.LayoutMapForArticleIDSet;
 import org.nightlabs.jfire.trade.id.ArticleID;
 import org.nightlabs.jfire.trade.id.OfferID;
 import org.nightlabs.jfire.trade.id.SegmentID;

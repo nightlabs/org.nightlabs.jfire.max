@@ -33,15 +33,16 @@ import org.nightlabs.jfire.security.id.UserID;
 @Remote
 public interface IssueManagerRemote {
 
-	String ping(String message);
-
+	@RolesAllowed("_Guest_")
 	Set<IssueFileAttachmentID> getIssueFileAttachmentIDs();
 
+	@RolesAllowed("_Guest_")
 	List<IssueFileAttachment> getIssueFileAttachments(
 			Collection<IssueFileAttachmentID> issueFileAttachmentIDs,
 			String[] fetchGroups, int maxFetchDepth);
 
 	//IssueWorkTimeRange//
+	@RolesAllowed("_Guest_")
 	List<IssueWorkTimeRange> getIssueWorkTimeRanges(
 			Collection<IssueWorkTimeRange> issueWorkTimeRangeIDs,
 			String[] fetchGroups, int maxFetchDepth);
@@ -54,6 +55,8 @@ public interface IssueManagerRemote {
 	 * @param fetchGroups the fetchGroups that used for specify fields to be detached from the datastore
 	 * @param maxFetchDepth specifies the number of level of the object to be fetched
 	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("_Guest_")
 	ProjectType storeProjectType(ProjectType projectType, boolean get,
 			String[] fetchGroups, int maxFetchDepth);
 

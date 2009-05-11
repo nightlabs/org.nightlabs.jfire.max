@@ -159,7 +159,7 @@ implements ScriptManagerRemote
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("_Guest_")
-	public Collection getTopLevelScriptRegistryItems (
+	public Collection<ScriptRegistryItem> getTopLevelScriptRegistryItems (
 			String organisationID,
 			String[] fetchGroups, int maxFetchDepth
 		)
@@ -171,8 +171,8 @@ implements ScriptManagerRemote
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 
-			Collection topLevelItems = ScriptRegistryItem.getTopScriptRegistryItemsByOrganisationID(pm, organisationID);
-			Collection result = pm.detachCopyAll(topLevelItems);
+			Collection<ScriptRegistryItem> topLevelItems = ScriptRegistryItem.getTopScriptRegistryItemsByOrganisationID(pm, organisationID);
+			Collection<ScriptRegistryItem> result = pm.detachCopyAll(topLevelItems);
 			return result;
 		} finally {
 			pm.close();
@@ -189,10 +189,10 @@ implements ScriptManagerRemote
 		PersistenceManager pm;
 		pm = getPersistenceManager();
 		try {
-			Collection topLevelItems = ScriptRegistryItem.getTopScriptRegistryItemsByOrganisationID(pm, organisationID);
+			Collection<ScriptRegistryItem> topLevelItems = ScriptRegistryItem.getTopScriptRegistryItemsByOrganisationID(pm, organisationID);
 			Collection<ScriptRegistryItemCarrier> result = new HashSet<ScriptRegistryItemCarrier>();
-			for (Iterator iter = topLevelItems.iterator(); iter.hasNext();) {
-				ScriptRegistryItem item = (ScriptRegistryItem) iter.next();
+			for (Iterator<ScriptRegistryItem> iter = topLevelItems.iterator(); iter.hasNext();) {
+				ScriptRegistryItem item = iter.next();
 				result.add(new ScriptRegistryItemCarrier(null, item, true));
 			}
 			return result;
@@ -263,11 +263,11 @@ implements ScriptManagerRemote
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
-			Collection paramSets = ScriptParameterSet.getParameterSetsByOrganisation(pm, organisationID);
-			Collection pSets = pm.detachCopyAll(paramSets);
+			Collection<ScriptParameterSet> paramSets = ScriptParameterSet.getParameterSetsByOrganisation(pm, organisationID);
+			Collection<ScriptParameterSet> pSets = pm.detachCopyAll(paramSets);
 			Collection<ScriptParameterSet> result = new HashSet<ScriptParameterSet>();
-			for (Iterator iter = pSets.iterator(); iter.hasNext();) {
-				ScriptParameterSet paramSet = (ScriptParameterSet) iter.next();
+			for (Iterator<ScriptParameterSet> iter = pSets.iterator(); iter.hasNext();) {
+				ScriptParameterSet paramSet = iter.next();
 				result.add(paramSet);
 			}
 			return result;
@@ -286,7 +286,7 @@ implements ScriptManagerRemote
 		PersistenceManager pm;
 		pm = getPersistenceManager();
 		try {
-			Collection paramSets = ScriptParameterSet.getParameterSetsByOrganisation(pm, organisationID);
+			Collection<ScriptParameterSet> paramSets = ScriptParameterSet.getParameterSetsByOrganisation(pm, organisationID);
 			return NLJDOHelper.getObjectIDSet(paramSets);
 		} finally {
 			pm.close();
@@ -375,7 +375,7 @@ implements ScriptManagerRemote
 		PersistenceManager pm;
 		pm = getPersistenceManager();
 		try {
-			ScriptRegistry registry = ScriptRegistry.getScriptRegistry(pm);
+			ScriptRegistry.getScriptRegistry(pm);
 			long setID = IDGenerator.nextID(ScriptParameterSet.class);
 			ScriptParameterSet set = new ScriptParameterSet(getOrganisationID(), setID);
 			set.getName().copyFrom(name);
@@ -420,11 +420,11 @@ implements ScriptManagerRemote
 		PersistenceManager pm;
 		pm = getPersistenceManager();
 		try {
-			Collection topLevelItems = ScriptRegistryItem.getTopScriptRegistryItemsByOrganisationIDAndType(
+			Collection<ScriptRegistryItem> topLevelItems = ScriptRegistryItem.getTopScriptRegistryItemsByOrganisationIDAndType(
 					pm, organisationID, scriptRegistryItemType);
 			Collection<ScriptRegistryItemCarrier> result = new HashSet<ScriptRegistryItemCarrier>();
-			for (Iterator iter = topLevelItems.iterator(); iter.hasNext();) {
-				ScriptRegistryItem item = (ScriptRegistryItem) iter.next();
+			for (Iterator<ScriptRegistryItem> iter = topLevelItems.iterator(); iter.hasNext();) {
+				ScriptRegistryItem item = iter.next();
 				result.add(new ScriptRegistryItemCarrier(null, item, true));
 			}
 			return result;

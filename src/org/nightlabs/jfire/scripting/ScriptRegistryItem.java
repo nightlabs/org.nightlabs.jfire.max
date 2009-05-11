@@ -34,23 +34,22 @@ import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.Queries;
 import javax.jdo.listener.StoreCallback;
 
 import org.apache.log4j.Logger;
-import org.nightlabs.util.Util;
-
-import javax.jdo.annotations.Persistent;
 import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
-import javax.jdo.annotations.FetchGroups;
-import javax.jdo.annotations.InheritanceStrategy;
-import javax.jdo.annotations.Inheritance;
-import javax.jdo.annotations.Queries;
-import javax.jdo.annotations.PrimaryKey;
-import javax.jdo.annotations.FetchGroup;
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.Column;
-import javax.jdo.annotations.IdentityType;
-import javax.jdo.annotations.PersistenceModifier;
+import org.nightlabs.util.Util;
 
 /**
  * Base class for objects in the JFire scripting tree and provides the
@@ -60,7 +59,7 @@ import javax.jdo.annotations.PersistenceModifier;
  * Subclasses are {@link ScriptCategory} that is a container for other categories and
  * {@link Script} the actual script.
  * </p>
- * 
+ *
  * @author Marco Schulze - marco at nightlabs dot de
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  *
@@ -73,12 +72,12 @@ import javax.jdo.annotations.PersistenceModifier;
  * @jdo.inheritance strategy="new-table"
  *
  * @jdo.create-objectid-class field-order="organisationID, scriptRegistryItemType, scriptRegistryItemID"
- * 
+ *
  * @jdo.fetch-group name="ScriptRegistryItem.parent" fetch-groups="default" fields="parent"
  * @jdo.fetch-group name="ScriptRegistryItem.name" fetch-groups="default" fields="name"
  * @jdo.fetch-group name="ScriptRegistryItem.description" fetch-groups="default" fields="description"
  * @jdo.fetch-group name="ScriptRegistryItem.this" fetch-groups="default, ScriptRegistryItem.name, ScriptRegistryItem.description" fields="parent, name, description"
- * 
+ *
  * @jdo.query
  *		name="getTopLevelScriptRegistryItemsByOrganisationID"
  *		query="SELECT
@@ -86,7 +85,7 @@ import javax.jdo.annotations.PersistenceModifier;
  *            this.parent == null
  *			PARAMETERS String paramOrganisationID
  *			import java.lang.String"
- * 
+ *
  * @jdo.query
  *		name="getTopLevelScriptRegistryItems"
  *		query="SELECT
@@ -153,7 +152,7 @@ public abstract class ScriptRegistryItem
 		implements Serializable, StoreCallback
 {
 	private static final long serialVersionUID = 9221181132208442543L;
-	
+
 	private static final String QUERY_GET_TOPLEVEL_SCRIPT_REGISTRY_ITEMS_BY_ORGANISATION_ID_AND_TYPE = "getTopLevelScriptRegistryItemsByOrganisationIDAndType";
 	private static final String QUERY_GET_TOPLEVEL_SCRIPT_REGISTRY_ITEMS_BY_TYPE = "getTopLevelScriptRegistryItemsByType";
 	private static final String QUERY_GET_TOPLEVEL_SCRIPT_REGISTRY_ITEMS_BY_ORGANISATION_ID = "getTopLevelScriptRegistryItemsByOrganisationID";
@@ -163,11 +162,12 @@ public abstract class ScriptRegistryItem
 	public static final String FETCH_GROUP_NAME = "ScriptRegistryItem.name";
 	public static final String FETCH_GROUP_DESCRIPTION = "ScriptRegistryItem.description";
 	/**
-	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon! 
+	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon!
 	 */
+	@Deprecated
 	public static final String FETCH_GROUP_THIS_SCRIPT_REGISTRY_ITEM = "ScriptRegistryItem.this";
-	
-	
+
+
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
@@ -182,7 +182,7 @@ public abstract class ScriptRegistryItem
 	@PrimaryKey
 	@Column(length=100)
 	private String scriptRegistryItemType;
-	
+
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
@@ -202,7 +202,7 @@ public abstract class ScriptRegistryItem
 	 */
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private ScriptParameterSet parameterSet;
-	
+
 	/**
 	 * @jdo.field persistence-modifier="persistent" mapped-by="scriptRegistryItem"
 	 */
@@ -218,7 +218,7 @@ public abstract class ScriptRegistryItem
 		mappedBy="scriptRegistryItem",
 		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private ScriptRegistryItemDescription description;
-	
+
 	/**
 	 * @deprecated Only for JDO!
 	 */
@@ -228,7 +228,7 @@ public abstract class ScriptRegistryItem
 	/**
 	 * Create a new {@link ScriptRegistryItem} with the given primary key parameters.
 	 * This is intended to be used as superconstructor of extending classes.
-	 * 
+	 *
 	 * @param organisationID The organisationID.
 	 * @param scriptRegistryItemType The scriptRegistryItemType.
 	 * @param scriptRegistryItemID The scriptRegistryItemID.
@@ -246,7 +246,7 @@ public abstract class ScriptRegistryItem
 	 * Returns the String representation of the primary key of the item
 	 * represented by the given parameters. It is the "/" separated
 	 * concatenation of the given parameters.
-	 * 
+	 *
 	 * @param organisationID The organisationID.
 	 * @param scriptRegistryItemType The scriptRegistryItemType.
 	 * @param scriptRegistryItemID The scriptRegistryItemID.
@@ -261,18 +261,18 @@ public abstract class ScriptRegistryItem
 	/**
 	 * Returns the organisationID of this item.
 	 * This is part of the primary key.
-	 * 
+	 *
 	 * @return The organisationID of this item.
 	 */
 	public String getOrganisationID()
 	{
 		return organisationID;
 	}
-	
+
 	/**
 	 * Returns the scriptRegistryItemType of this item.
 	 * This is part of the primary key.
-	 * 
+	 *
 	 * @return The scriptRegistryItemType of this item.
 	 */
 	public String getScriptRegistryItemType()
@@ -283,7 +283,7 @@ public abstract class ScriptRegistryItem
 	/**
 	 * Returns the scriptRegistryItemID of this item.
 	 * This is part of the primary key.
-	 * 
+	 *
 	 * @return The scriptRegistryItemID of this item.
 	 */
 	public String getScriptRegistryItemID()
@@ -294,17 +294,17 @@ public abstract class ScriptRegistryItem
 	/**
 	 * Returns the parent of this item.
 	 * Parents always are {@link ScriptCategory}s.
-	 * 
+	 *
 	 * @return The parent of this item.
 	 */
 	protected ScriptCategory getParent()
 	{
 		return parent;
 	}
-	
+
 	/**
 	 * Sets the parent of this item.
-	 * 
+	 *
 	 * @param parent The parent of this item.
 	 */
 	protected void setParent(ScriptCategory parent)
@@ -318,17 +318,17 @@ public abstract class ScriptRegistryItem
 	 * {@link ScriptCategory} this parameter-set is
 	 * applied to {@link Script}s created with this as
 	 * parent.
-	 * 
+	 *
 	 * @return the {@link ScriptParameterSet} of this {@link ScriptRegistryItem}
 	 */
 	public ScriptParameterSet getParameterSet()
 	{
 		return parameterSet;
 	}
-	
+
 	/**
 	 * Returns the name of this {@link ScriptRegistryItem}.
-	 * 
+	 *
 	 * @return The name of this {@link ScriptRegistryItem}.
 	 */
 	public ScriptRegistryItemName getName() {
@@ -337,16 +337,16 @@ public abstract class ScriptRegistryItem
 
 	/**
 	 * Returns the desciption of this {@link ScriptRegistryItem}.
-	 * 
+	 *
 	 * @return The desciption of this {@link ScriptRegistryItem}.
 	 */
 	public ScriptRegistryItemDescription getDescription() {
 		return description;
 	}
-	
+
 	/**
 	 * Set the {@link ScriptParameterSet} of this item.
-	 * 
+	 *
 	 * @param parameterSet The parameterSet to set for this item.
 	 */
 	public void setParameterSet(ScriptParameterSet parameterSet)
@@ -392,11 +392,11 @@ public abstract class ScriptRegistryItem
 	 * Returns all top level (parent == null) ScriptRegistryItems for the given organisationID
 	 * If organisation is null the top level registry items
 	 * for all organisation are returned.
-	 * 
+	 *
 	 * @param pm The PersistenceManager to use.
 	 * @param organisationID The organisationID to use.
 	 */
-	public static Collection getTopScriptRegistryItemsByOrganisationID(PersistenceManager pm,
+	public static Collection<ScriptRegistryItem> getTopScriptRegistryItemsByOrganisationID(PersistenceManager pm,
 			String organisationID)
 	{
 		if (organisationID == null || "".equals(organisationID))
@@ -408,40 +408,40 @@ public abstract class ScriptRegistryItem
 	/**
 	 * Returns all top level (parent == null) ScriptRegistryItems for all
 	 * organisations
-	 * 
+	 *
 	 * @param pm The PersistenceManager to use.
 	 */
-	public static Collection getTopScriptRegistryItems(PersistenceManager pm)
+	public static Collection<ScriptRegistryItem> getTopScriptRegistryItems(PersistenceManager pm)
 	{
 		Query q = pm.newNamedQuery(ScriptRegistryItem.class, QUERY_GET_TOPLEVEL_SCRIPT_REGISTRY_ITEMS);
 		return (Collection)q.execute();
 	}
-	
+
 	/**
 	 * Returns all top level (parent == null) ScriptRegistryItems with the given
 	 * scriptRegistryItemType
-	 * 
+	 *
 	 * @param pm The PersistenceManager to use.
 	 * @param scriptRegistryItemType the ScriptRegistryItemType to filter
 	 */
-	public static Collection getTopScriptRegistryItemsByType(PersistenceManager pm,
+	public static Collection<ScriptRegistryItem> getTopScriptRegistryItemsByType(PersistenceManager pm,
 			String scriptRegistryItemType)
 	{
 		Query q = pm.newNamedQuery(ScriptRegistryItem.class, QUERY_GET_TOPLEVEL_SCRIPT_REGISTRY_ITEMS_BY_TYPE);
 		return (Collection)q.execute(scriptRegistryItemType);
 	}
-	
+
 	/**
 	 * Returns all top level (parent == null) ScriptRegistryItems for the given organisationID
 	 * and scriptRegistryItemType
 	 * If organisation is null the top level registry items
 	 * for all organisation are returned.
-	 * 
+	 *
 	 * @param pm The PersistenceManager to use.
 	 * @param organisationID The organisationID to use.
 	 * @param scriptRegistryItemType the scriptRegistryItemType to use
 	 */
-	public static Collection getTopScriptRegistryItemsByOrganisationIDAndType(
+	public static Collection<ScriptRegistryItem> getTopScriptRegistryItemsByOrganisationIDAndType(
 			PersistenceManager pm, String organisationID, String scriptRegistryItemType)
 	{
 		if (organisationID == null || "".equals(organisationID))
@@ -449,7 +449,7 @@ public abstract class ScriptRegistryItem
 		Query q = pm.newNamedQuery(ScriptRegistryItem.class, QUERY_GET_TOPLEVEL_SCRIPT_REGISTRY_ITEMS_BY_ORGANISATION_ID_AND_TYPE);
 		return (Collection)q.execute(organisationID, scriptRegistryItemType);
 	}
-	
+
 	public void jdoPreStore()
 	{
 		if (!JDOHelper.isNew(this))
@@ -482,5 +482,5 @@ public abstract class ScriptRegistryItem
 			}
 		}
 	}
-	
+
 }

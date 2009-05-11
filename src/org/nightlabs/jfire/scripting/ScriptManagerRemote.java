@@ -29,7 +29,7 @@ public interface ScriptManagerRemote {
 
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("_Guest_")
-	Collection getTopLevelScriptRegistryItems(String organisationID, String[] fetchGroups, int maxFetchDepth);
+	Collection<ScriptRegistryItem> getTopLevelScriptRegistryItems(String organisationID, String[] fetchGroups, int maxFetchDepth);
 
 	/**
 	 * @param organisationID The organisationID the carriers should be searched for. If null top level carriers for all organisations are returned.

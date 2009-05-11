@@ -92,9 +92,9 @@ extends PossibleValueProvider
 				Object result = results.get(itemID);
 				if (result instanceof PersistenceCapable) {
 					// TODO: write as query to determine a limit
-					Extent extent = pm.getExtent(result.getClass());
+					Extent<?> extent = pm.getExtent(result.getClass());
 					List<Object> possibleValues = new LinkedList<Object>();
-					for (Iterator it = extent.iterator(); it.hasNext(); ) {
+					for (Iterator<?> it = extent.iterator(); it.hasNext(); ) {
 						possibleValues.add(it.next());
 //						possibleValues.add(pm.getObjectId(it.next()));
 					}

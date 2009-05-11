@@ -37,22 +37,21 @@ import java.util.TreeSet;
 
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
-
-import org.nightlabs.jdo.ObjectIDUtil;
-import org.nightlabs.util.CollectionUtil;
-
-import javax.jdo.annotations.Value;
-import javax.jdo.annotations.FetchGroups;
-import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.Column;
 import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Key;
+import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.PersistenceModifier;
 import javax.jdo.annotations.Persistent;
-import javax.jdo.annotations.Key;
-import org.nightlabs.jfire.scripting.id.ScriptParameterSetID;
+import javax.jdo.annotations.PrimaryKey;
 import javax.jdo.annotations.Queries;
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.Column;
-import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Value;
+
+import org.nightlabs.jdo.ObjectIDUtil;
+import org.nightlabs.jfire.scripting.id.ScriptParameterSetID;
+import org.nightlabs.util.CollectionUtil;
 
 /**
  * A ScriptParameterSet can only be manipulated by the owner organisation. Hence, it contains
@@ -61,7 +60,7 @@ import javax.jdo.annotations.IdentityType;
  *
  * @author Marco Schulze - marco at nightlabs dot de
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
- * 
+ *
  * @jdo.persistence-capable
  *		identity-type="application"
  *		objectid-class="org.nightlabs.jfire.scripting.id.ScriptParameterSetID"
@@ -69,18 +68,18 @@ import javax.jdo.annotations.IdentityType;
  *		table="JFireScripting_ScriptParameterSet"
  *
  * @jdo.create-objectid-class field-order="organisationID, scriptParameterSetID"
- * 
+ *
  * @jdo.fetch-group name="ScriptParameterSet.parameters" fetch-groups="default" fields="parameters"
  * @jdo.fetch-group name="ScriptParameterSet.name" fetch-groups="default" fields="name"
  * @jdo.fetch-group name="ScriptParameterSet.this" fetch-groups="default" fields="parameters, name"
- * 
+ *
  * @jdo.query
  *		name="getParameterSetsByOrganisation"
  *		query="SELECT
  *			WHERE this.organisationID == paramOrganisationID
  *			PARAMETERS String paramOrganisationID
  *			import java.lang.String"
- * 
+ *
  */
 @PersistenceCapable(
 	objectIdClass=ScriptParameterSetID.class,
@@ -110,11 +109,11 @@ import javax.jdo.annotations.IdentityType;
 		implements Serializable, IScriptParameterSet //, StoreCallback
 {
 	private static final long serialVersionUID = 1L;
-	
+
 	public static final String FETCH_GROUP_PARAMETERS = "ScriptParameterSet.parameters";
 	public static final String FETCH_GROUP_NAME = "ScriptParameterSet.name";
 	public static final String FETCH_THIS_SCRIPT_PARAMETER_SET = "ScriptParameterSet.this";
-	
+
 	public static final String QUERY_GET_PARAMETER_SETS_BY_ORGANISATION = "getParameterSetsByOrganisation";
 
 	/**
@@ -210,7 +209,7 @@ import javax.jdo.annotations.IdentityType;
 		Collection<IScriptParameter> params = CollectionUtil.castCollection(parameters.values());
 		return Collections.unmodifiableCollection(params);
 	}
-	
+
 	public SortedSet<IScriptParameter> getSortedParameters() {
 		SortedSet<IScriptParameter> sortedParams = new TreeSet<IScriptParameter>(parameters.values());
 		return Collections.unmodifiableSortedSet(sortedParams);
@@ -265,7 +264,7 @@ import javax.jdo.annotations.IdentityType;
 		parameters.clear();
 		nextParameterOrderNumber = 0;
 	}
-	
+
 	public static String getPrimaryKey(String organisationID, long scriptParameterSetID)
 	{
 		return organisationID + '/' + ObjectIDUtil.longObjectIDFieldToString(scriptParameterSetID);
@@ -308,12 +307,12 @@ import javax.jdo.annotations.IdentityType;
 
 	/**
 	 * Get all ParameterSets of an organisation.
-	 * 
+	 *
 	 * @param pm The PersistenceManager to use.
 	 * @param organisationID The organisation
 	 * @return
 	 */
-	public static Collection getParameterSetsByOrganisation(PersistenceManager pm, String organisationID) {
+	public static Collection<ScriptParameterSet> getParameterSetsByOrganisation(PersistenceManager pm, String organisationID) {
 		Query q = pm.newNamedQuery(ScriptParameterSet.class, QUERY_GET_PARAMETER_SETS_BY_ORGANISATION);
 		return (Collection)q.execute(organisationID);
 	}

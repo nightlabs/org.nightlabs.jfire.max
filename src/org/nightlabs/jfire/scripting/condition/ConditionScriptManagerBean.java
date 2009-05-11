@@ -78,7 +78,7 @@ implements ConditionScriptManagerRemote
 		Script script = ScriptRegistry.getScriptRegistry(pm).getScript(
 				scriptRegistryItemID.scriptRegistryItemType,
 				scriptRegistryItemID.scriptRegistryItemID);
-		Class scriptResultClass;
+		Class<?> scriptResultClass;
 		List<CompareOperator> compareOperators = DefaultCompareOperatorProvider.sharedInstance().getEqualOperators();
 		try {
 			scriptResultClass = script.getResultClass();

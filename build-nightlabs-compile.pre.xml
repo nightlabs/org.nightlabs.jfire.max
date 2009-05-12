@@ -1,9 +1,0 @@
-<project>
-	<target name="compile.pre">
-		<!-- 
-		<copy file="../NightLabsHTMLContent/dist/NightLabsHTMLContent.jar" todir="${project.dir}/${lib.dir}" failonerror="false"/>
-		-->
-		<untar compression="gzip" src="${project.dir}/birt-deployment/birt-runtime.tar.gz" dest="${project.dir}/dist/"/>
-		<copydir dest="${project.dir}/dist/birt/plugins/org.nightlabs.jfire.reporting.oda.server" src="${project.dir}/birt-deployment/org.nightlabs.jfire.reporting.oda.server"/>
-	</target>
-</project>

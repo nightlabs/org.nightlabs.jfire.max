@@ -5,8 +5,6 @@
 	<init bean="org.nightlabs.jfire.issuetimetracking.IssueTimeTrackingManagerRemote" method="initialise">
 		<depends module="JFireBaseEAR.ear" archive="JFireBaseBean.jar"/>
 		<depends module="JFireIssueTrackingEAR.ear" 
-				 archive="JFireIssueTracking.jar"
-				 bean="org.nightlabs.jfire.reporting.trade.ReportManagerTradeRemote"
-				 method="initialise"/>
+				 archive="JFireIssueTracking.jar"/>
 	</init>
 </organisation-initialisation>

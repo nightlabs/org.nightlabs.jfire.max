@@ -5,40 +5,40 @@
     <java>NightLabsEditor2D.jar</java>
   </module>
   <module>
-    <ejb>lib/batik-awt-util.jar</ejb>
+    <java>lib/batik-awt-util.jar</java>
   </module>
   <module>
-    <ejb>lib/batik-css.jar</ejb>
+    <java>lib/batik-css.jar</java>
   </module>
   <module>
-    <ejb>lib/batik-dom.jar</ejb>
+    <java>lib/batik-dom.jar</java>
   </module>
   <module>
-    <ejb>lib/batik-ext.jar</ejb>
+    <java>lib/batik-ext.jar</java>
   </module>
   <module>
-    <ejb>lib/batik-extension.jar</ejb>
+    <java>lib/batik-extension.jar</java>
   </module>
   <module>
-    <ejb>lib/batik-svg-dom.jar</ejb>
+    <java>lib/batik-svg-dom.jar</java>
   </module>
   <module>
-    <ejb>lib/batik-svggen.jar</ejb>
+    <java>lib/batik-svggen.jar</java>
   </module>
   <module>
-    <ejb>lib/batik-svggen.jar</ejb>
+    <java>lib/batik-svggen.jar</java>
   </module>
   <module>
-    <ejb>lib/batik-util.jar</ejb>
+    <java>lib/batik-util.jar</java>
   </module>
   <module>
-    <ejb>lib/batik-xml.jar</ejb>
+    <java>lib/batik-xml.jar</java>
   </module>
   <module>
-    <ejb>lib/jai_codec.jar</ejb>
+    <java>lib/jai_codec.jar</java>
   </module>
   <module>
-    <ejb>lib/jai_core.jar</ejb>
+    <java>lib/jai_core.jar</java>
   </module>
   <module>
     <java>lib/itext-1.4.8.jar</java>

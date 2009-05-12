@@ -1,0 +1,44 @@
+<!DOCTYPE script-category PUBLIC "-//NightLabs//DTD ScriptingInitializer V 1.0//EN" "http://www.nightlabs.de/dtd/scripting-initializer-content_1_0.dtd">
+<script-category 
+	id="Voucher"
+	type="JFireTrade-Type-Voucher"
+>
+    <!-- id is optional and defaults to the directory-name -->
+    <!-- id is optional and overwrites the type set to the initializer. 
+		Note that all sub-categories and scripts will get this type
+		when they do not specify a different one
+		 -->
+	<name language="de">Voucher</name>
+	<name language="en">Gutschein</name>
+	
+	<script 
+		file="VoucherName.javaclass" 
+		id="VoucherName"
+		resultClass="java.lang.String"
+	>
+	<!-- id is optional and defaults to the value of file -->
+		<name language="de">Name</name>
+		<name language="en">Name</name>
+	</script>
+
+	<script 
+		file="VoucherPrice.javaclass" 
+		id="VoucherPrice"
+		resultClass="java.lang.String"
+	>
+	<!-- id is optional and defaults to the value of file -->
+		<name language="de">Wert</name>
+		<name language="en">Value</name>
+	</script>
+		
+	<script 
+		file="VoucherKey.javaclass" 
+		id="VoucherKey"
+		resultClass="java.lang.String"
+	>
+	<!-- id is optional and defaults to the value of file -->
+		<name language="de">Schlüssel</name>
+		<name language="en">Key</name>
+	</script>
+		
+</script-category>

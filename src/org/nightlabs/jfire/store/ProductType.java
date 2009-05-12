@@ -63,6 +63,7 @@ import javax.jdo.listener.AttachCallback;
 import javax.jdo.listener.DetachCallback;
 import javax.jdo.listener.StoreCallback;
 
+import org.apache.log4j.Logger;
 import org.nightlabs.i18n.I18nText;
 import org.nightlabs.inheritance.FieldInheriter;
 import org.nightlabs.inheritance.FieldMetaData;
@@ -95,6 +96,7 @@ import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.trade.OrganisationLegalEntity;
 import org.nightlabs.jfire.trade.endcustomer.EndCustomerReplicationPolicy;
 import org.nightlabs.util.CollectionUtil;
+import org.nightlabs.util.NLLocale;
 import org.nightlabs.util.Util;
 
 /**
@@ -286,19 +288,37 @@ import org.nightlabs.util.Util;
 @Discriminator(strategy=DiscriminatorStrategy.CLASS_NAME)
 @Queries({
 	@javax.jdo.annotations.Query(
-		name="getProductTypesOfProductTypeGroup",
-		value=" SELECT WHERE this.productTypeGroups.containsValue(productTypeGroup) && productTypeGroup.organisationID == paramOrganisationID && productTypeGroup.productTypeGroupID == paramProductTypeGroupID VARIABLES ProductTypeGroup productTypeGroup PARAMETERS String paramOrganisationID, String paramProductTypeGroupID import java.lang.String; import org.nightlabs.jfire.store.ProductTypeGroup"),
+			name="getProductTypesOfProductTypeGroup",
+			value="SELECT WHERE this.productTypeGroups.containsValue(productTypeGroup) && productTypeGroup.organisationID == paramOrganisationID && productTypeGroup.productTypeGroupID == paramProductTypeGroupID VARIABLES ProductTypeGroup productTypeGroup PARAMETERS String paramOrganisationID, String paramProductTypeGroupID import java.lang.String; import org.nightlabs.jfire.store.ProductTypeGroup"
+	),
 	@javax.jdo.annotations.Query(
-		name="getChildProductTypes_topLevel",
-		value="SELECT WHERE this.extendedProductType == null",
-		language="javax.jdo.query.JDOQL"),
+			name="getChildProductTypes_topLevel",
+			value="SELECT WHERE this.extendedProductType == null",
+			language="javax.jdo.query.JDOQL"
+	),
 	@javax.jdo.annotations.Query(
-		name="getChildProductTypes_hasParent",
-		value="SELECT WHERE this.extendedProductType.organisationID == parentProductTypeOrganisationID && this.extendedProductType.productTypeID == parentProductTypeProductTypeID PARAMETERS String parentProductTypeOrganisationID, String parentProductTypeProductTypeID import java.lang.String",
-		language="javax.jdo.query.JDOQL"),
+			name="getChildProductTypes_hasParent",
+			value="SELECT " +
+					"WHERE" +
+					"  this.extendedProductType.organisationID == parentProductTypeOrganisationID && " +
+					"  this.extendedProductType.productTypeID == parentProductTypeProductTypeID " +
+					"PARAMETERS String parentProductTypeOrganisationID, String parentProductTypeProductTypeID, String languageID " +
+					"import java.lang.String " +
+					"ORDER BY this.name.names.get(languageID) ASCENDING ",
+			language="javax.jdo.query.JDOQL"
+	),
 	@javax.jdo.annotations.Query(
-		name="getProductTypesNestingThis",
-		value="SELECT WHERE this.productTypeLocal.nestedProductTypeLocals.containsValue(nestedProductTypeLocal) && nestedProductTypeLocal.innerProductTypeLocal.productType == :productType VARIABLES org.nightlabs.jfire.store.NestedProductTypeLocal nestedProductTypeLocal")
+			name="getChildProductTypeCount_topLevel",
+			value="SELECT count(this) WHERE this.extendedProductType == null"
+	),
+	@javax.jdo.annotations.Query(
+			name="getChildProductTypeCount_hasParent",
+			value="SELECT count(this) WHERE this.extendedProductType.organisationID == parentProductTypeOrganisationID && this.extendedProductType.productTypeID == parentProductTypeProductTypeID PARAMETERS String parentProductTypeOrganisationID, String parentProductTypeProductTypeID import java.lang.String"
+	),
+	@javax.jdo.annotations.Query(
+			name="getProductTypesNestingThis",
+			value="SELECT WHERE this.productTypeLocal.nestedProductTypeLocals.containsValue(nestedProductTypeLocal) && nestedProductTypeLocal.innerProductTypeLocal.productType == :productType VARIABLES org.nightlabs.jfire.store.NestedProductTypeLocal nestedProductTypeLocal"
+	)
 })
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public abstract class ProductType
@@ -313,7 +333,7 @@ implements
 {
 	private static final long serialVersionUID = 1L;
 
-//	private static final Logger logger = Logger.getLogger(ProductType.class);
+	private static final Logger logger = Logger.getLogger(ProductType.class);
 
 	/**
 	 * This class defines constants for the field names of implementation of
@@ -443,11 +463,26 @@ implements
 		}
 
 		Query q = pm.newNamedQuery(ProductType.class, "getChildProductTypes_hasParent");
+		String languageID = NLLocale.getDefault().getLanguage();
+		if (logger.isDebugEnabled())
+			logger.debug("getChildProductTypes: languageID=" + languageID);
+
 		return CollectionUtil.castCollection(
 				(Collection<?>) q.execute(
-						parentProductTypeID.organisationID, parentProductTypeID.productTypeID
+						parentProductTypeID.organisationID, parentProductTypeID.productTypeID, languageID
 				)
 		);
+	}
+
+	public static long getChildProductTypeCount(PersistenceManager pm, ProductTypeID parentProductTypeID)
+	{
+		if (parentProductTypeID == null) {
+			Query q = pm.newNamedQuery(ProductType.class, "getChildProductTypeCount_topLevel");
+			return ((Long)q.execute()).longValue();
+		}
+
+		Query q = pm.newNamedQuery(ProductType.class, "getChildProductTypeCount_hasParent");
+		return ((Long) q.execute(parentProductTypeID.organisationID, parentProductTypeID.productTypeID)).longValue();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -456,6 +491,14 @@ implements
 		Query q = pm.newQuery(pm.getExtent(productTypeClass, subclasses));
 		q.setFilter(FieldName.extendedProductType + " == null");
 		return (Collection<? extends ProductType>) q.execute();
+	}
+
+	public static long getRootProductTypeCount(PersistenceManager pm, Class<? extends ProductType> productTypeClass, boolean subclasses)
+	{
+		Query q = pm.newQuery(pm.getExtent(productTypeClass, subclasses));
+		q.setResult("count(this)");
+		q.setFilter(FieldName.extendedProductType + " == null");
+		return ((Long) q.execute()).longValue();
 	}
 
 	public static String createProductTypeID()

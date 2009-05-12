@@ -2817,6 +2817,17 @@ implements StoreManagerRemote, StoreManagerLocal
 
 	@RolesAllowed("org.nightlabs.jfire.store.seeProductType")
 	@Override
+	public long getRootProductTypeCount(Class<? extends ProductType> productTypeClass, boolean subclasses) {
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			return ProductType.getRootProductTypeCount(pm, productTypeClass, subclasses);
+		} finally {
+			pm.close();
+		}
+	}
+
+	@RolesAllowed("org.nightlabs.jfire.store.seeProductType")
+	@Override
 	public Set<ProductTypeID> getRootProductTypeIDs(Class<? extends ProductType> productTypeClass, boolean subclasses) {
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -2836,12 +2847,28 @@ implements StoreManagerRemote, StoreManagerLocal
 		}
 	}
 
+	@RolesAllowed("org.nightlabs.jfire.store.seeProductType")
+	@Override
+	public Map<ProductTypeID, Long> getChildProductTypeCounts(Collection<ProductTypeID> parentProductTypeIDs) {
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			Map<ProductTypeID, Long> result = new HashMap<ProductTypeID, Long>(parentProductTypeIDs.size());
+			for (ProductTypeID parentProductTypeID : parentProductTypeIDs) {
+				long count = ProductType.getChildProductTypeCount(pm, parentProductTypeID);
+				result.put(parentProductTypeID, count);
+			}
+			return result;
+		} finally {
+			pm.close();
+		}
+	}
+
 	/* (non-Javadoc)
 	 * @see org.nightlabs.jfire.store.StoreManagerRemote#getChildProductTypeIDs(org.nightlabs.jfire.store.id.ProductTypeID)
 	 */
 	@RolesAllowed("org.nightlabs.jfire.store.seeProductType")
 	@Override
-	public Set<ProductTypeID> getChildProductTypeIDs(ProductTypeID parentProductTypeID) {
+	public Collection<ProductTypeID> getChildProductTypeIDs(ProductTypeID parentProductTypeID) {
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			Collection<? extends ProductType> productTypes = ProductType.getChildProductTypes(pm, parentProductTypeID);
@@ -2854,7 +2881,7 @@ implements StoreManagerRemote, StoreManagerLocal
 					ResolveSecuringAuthorityStrategy.allow
 			);
 
-			return NLJDOHelper.getObjectIDSet(productTypes);
+			return NLJDOHelper.getObjectIDList(productTypes);
 		} finally {
 			pm.close();
 		}

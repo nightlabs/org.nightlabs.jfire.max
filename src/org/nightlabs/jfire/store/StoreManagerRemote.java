@@ -3,6 +3,7 @@ package org.nightlabs.jfire.store;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.ejb.Remote;
@@ -442,8 +443,10 @@ public interface StoreManagerRemote {
 	 */
 	Collection<ProductTypePermissionFlagSet> getProductTypePermissionFlagSets(Collection<? extends ProductTypePermissionFlagSetID> productTypePermissionFlagSetIDs);
 
+	long getRootProductTypeCount(Class<? extends ProductType> productTypeClass, boolean subclasses);
 	Set<ProductTypeID> getRootProductTypeIDs(Class<? extends ProductType> productTypeClass, boolean subclasses);
 
-	Set<ProductTypeID> getChildProductTypeIDs(ProductTypeID parentProductTypeID);
+	Map<ProductTypeID, Long> getChildProductTypeCounts(Collection<ProductTypeID> parentProductTypeIDs);
+	Collection<ProductTypeID> getChildProductTypeIDs(ProductTypeID parentProductTypeID);
 
 }

@@ -30,6 +30,15 @@ import java.util.Collection;
 
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.Queries;
 
 import org.nightlabs.inheritance.FieldInheriter;
 import org.nightlabs.inheritance.FieldMetaData;
@@ -50,16 +59,6 @@ import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.trade.CustomerGroupMapper;
 import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.util.CollectionUtil;
-
-import javax.jdo.annotations.FetchGroups;
-import javax.jdo.annotations.Inheritance;
-import javax.jdo.annotations.FetchGroup;
-import javax.jdo.annotations.PersistenceModifier;
-import javax.jdo.annotations.Persistent;
-import javax.jdo.annotations.InheritanceStrategy;
-import javax.jdo.annotations.Queries;
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.IdentityType;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -244,8 +243,7 @@ public class SimpleProductType extends ProductType
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
-@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
-
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private PropertySet propertySet;
 
 	/**

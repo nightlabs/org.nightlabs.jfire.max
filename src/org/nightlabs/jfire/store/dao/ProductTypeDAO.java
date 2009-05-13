@@ -130,14 +130,14 @@ extends BaseJDOObjectDAO<ProductTypeID, ProductType>
 
 	//Optimized method that returns the ProductTypes using the QueryCollection
 	//and retrieving the Products Id
-	public synchronized List<ProductType> getProductTypes(QueryCollection<?> queryCollection, String[] fetchGroups, // TODO correct type for QueryCollection!
+	public synchronized List<ProductType> queryProductTypes(QueryCollection<?> queryCollection, String[] fetchGroups, // TODO correct type for QueryCollection!
 	int maxFetchDepth, ProgressMonitor progressMonitor) throws Exception
 	{
 		storeManager = JFireEjb3Factory.getRemoteBean(StoreManagerRemote.class, SecurityReflector.getInitialContextProperties());
 		try {
 			@SuppressWarnings("unchecked")
 			QueryCollection<? extends AbstractProductTypeQuery> productTypeQueries = (QueryCollection<? extends AbstractProductTypeQuery>) queryCollection;
-			Set<ProductTypeID> productTypeIDs = storeManager.getProductTypeIDs(productTypeQueries);
+			Collection<ProductTypeID> productTypeIDs = storeManager.getProductTypeIDs(productTypeQueries);
 			return getJDOObjects(null, productTypeIDs, fetchGroups, maxFetchDepth, progressMonitor);
 		} finally {
 			storeManager = null;
@@ -153,7 +153,7 @@ extends BaseJDOObjectDAO<ProductTypeID, ProductType>
 	 * @param progressMonitor the {@link ProgressMonitor} which display the progress of loading.
 	 * @return the List of {@link ProductType}s for the given {@link ProductTypeID}s.
 	 */
-	public List<ProductType> getProductTypes(Set<ProductTypeID> productTypeIDs, String[] fetchGroups,
+	public List<ProductType> getProductTypes(Collection<ProductTypeID> productTypeIDs, String[] fetchGroups,
 	int maxFetchDepth, ProgressMonitor progressMonitor)
 	{
 		return getJDOObjects(null, productTypeIDs, fetchGroups, maxFetchDepth, progressMonitor);

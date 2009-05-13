@@ -40,6 +40,7 @@ import org.nightlabs.jfire.store.id.UnitID;
 import org.nightlabs.jfire.store.query.ProductTransferIDQuery;
 import org.nightlabs.jfire.store.query.ProductTransferQuery;
 import org.nightlabs.jfire.store.search.AbstractProductTypeQuery;
+import org.nightlabs.jfire.store.search.ProductTypeIDTreeNode;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.trade.id.ArticleContainerID;
@@ -330,7 +331,8 @@ public interface StoreManagerRemote {
 
 	void signalDeliveryNote(DeliveryNoteID deliveryNoteID, String jbpmTransitionName);
 
-	Set<ProductTypeID> getProductTypeIDs(QueryCollection<? extends AbstractProductTypeQuery> productTypeQueries);
+	Collection<ProductTypeID> getProductTypeIDs(QueryCollection<? extends AbstractProductTypeQuery> productTypeQueries);
+	Collection<ProductTypeIDTreeNode> getProductTypeIDTree(QueryCollection<? extends AbstractProductTypeQuery> productTypeQueries);
 
 	ProductTypeGroupIDSearchResult getProductTypeGroupIDSearchResultForProductTypeQueries(
 			QueryCollection<? extends AbstractProductTypeQuery> productTypeQueries);

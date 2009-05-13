@@ -114,6 +114,7 @@ import org.nightlabs.jfire.store.id.RepositoryTypeID;
 import org.nightlabs.jfire.store.id.UnitID;
 import org.nightlabs.jfire.store.query.ProductTransferQuery;
 import org.nightlabs.jfire.store.search.AbstractProductTypeQuery;
+import org.nightlabs.jfire.store.search.ProductTypeIDTreeNode;
 import org.nightlabs.jfire.timer.Task;
 import org.nightlabs.jfire.timer.id.TaskID;
 import org.nightlabs.jfire.trade.Article;
@@ -1725,9 +1726,8 @@ implements StoreManagerRemote, StoreManagerLocal
 	 * @see org.nightlabs.jfire.store.StoreManagerRemote#getProductTypeIDs(org.nightlabs.jdo.query.QueryCollection)
 	 */
 	@RolesAllowed("org.nightlabs.jfire.store.seeProductType")
-	@SuppressWarnings("unchecked")
 	@Override
-	public Set<ProductTypeID> getProductTypeIDs(QueryCollection<? extends AbstractProductTypeQuery> productTypeQueries)
+	public Collection<ProductTypeID> getProductTypeIDs(QueryCollection<? extends AbstractProductTypeQuery> productTypeQueries)
 	{
 		if (productTypeQueries == null)
 			return null;
@@ -1747,11 +1747,13 @@ implements StoreManagerRemote, StoreManagerLocal
 			{
 				productTypeQueries = new JDOQueryCollectionDecorator<AbstractProductTypeQuery>(productTypeQueries);
 			}
+			@SuppressWarnings("unchecked")
 			JDOQueryCollectionDecorator<AbstractProductTypeQuery> queries =
 				(JDOQueryCollectionDecorator<AbstractProductTypeQuery>) productTypeQueries;
 
 			queries.setPersistenceManager(pm);
 
+			@SuppressWarnings("unchecked")
 			Collection<ProductType> productTypes = (Collection<ProductType>) queries.executeQueries();
 
 // Commented out the following filtering, because that's already done by the query using the ProductTypePermissionFlagSets. Marco.
@@ -1762,7 +1764,45 @@ implements StoreManagerRemote, StoreManagerLocal
 //					RoleConstants.seeProductType,
 //					ResolveSecuringAuthorityStrategy.allow);
 
-			return NLJDOHelper.getObjectIDSet(productTypes);
+			return NLJDOHelper.getObjectIDList(productTypes);
+		} finally {
+			pm.close();
+		}
+	}
+
+	@RolesAllowed("org.nightlabs.jfire.store.seeProductType")
+	@Override
+	public Collection<ProductTypeIDTreeNode> getProductTypeIDTree(QueryCollection<? extends AbstractProductTypeQuery> productTypeQueries)
+	{
+		if (productTypeQueries == null)
+			return null;
+
+		if (! ProductType.class.isAssignableFrom(productTypeQueries.getResultClass()))
+		{
+			throw new RuntimeException("Given QueryCollection has invalid return type! Invalid return type= "+ productTypeQueries.getResultClassName());
+		}
+
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			pm.getFetchPlan().setMaxFetchDepth(1);
+			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
+
+			if (! (productTypeQueries instanceof JDOQueryCollectionDecorator))
+			{
+				productTypeQueries = new JDOQueryCollectionDecorator<AbstractProductTypeQuery>(productTypeQueries);
+			}
+
+			@SuppressWarnings("unchecked")
+			JDOQueryCollectionDecorator<AbstractProductTypeQuery> queries =
+				(JDOQueryCollectionDecorator<AbstractProductTypeQuery>) productTypeQueries;
+
+			queries.setPersistenceManager(pm);
+
+			@SuppressWarnings("unchecked")
+			Collection<ProductType> productTypes = (Collection<ProductType>) queries.executeQueries();
+			Collection<ProductTypeID> productTypeIDs = NLJDOHelper.getObjectIDList(productTypes);
+
+			return ProductTypeIDTreeNode.buildTree(pm, productTypeIDs);
 		} finally {
 			pm.close();
 		}

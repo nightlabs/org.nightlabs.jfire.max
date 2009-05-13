@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE classloader-repository
+PUBLIC "-//NightLabs GmbH//DTD ClassLoader Repository 1.1//EN"
+"http://www.nightlabs.de/dtd/clrepository_1_1.dtd">
+
+<classloader-repository>
+<!--  Commented because nested jars are not supported (is the case with new ear structure)   
+	<publish target="org.nightlabs.htmlcontent.jar" inherit="false" ignore="true"/>
+
+	Instead we suppress everything except the jfireProp-packages.
+-->
+	<publish target="." inherit="false">
+		<resources>org\/nightlabs\/jfire\/.*</resources>
+	</publish>
+</classloader-repository>

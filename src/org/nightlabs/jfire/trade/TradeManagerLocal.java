@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Set;
 
 import javax.annotation.security.RolesAllowed;
+import javax.ejb.Local;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 import javax.jdo.PersistenceManager;
@@ -43,6 +44,7 @@ import org.nightlabs.jfire.transfer.id.AnchorID;
 import org.nightlabs.timepattern.TimePatternFormatException;
 import org.nightlabs.version.MalformedVersionException;
 
+@Local
 public interface TradeManagerLocal {
 
 	/**

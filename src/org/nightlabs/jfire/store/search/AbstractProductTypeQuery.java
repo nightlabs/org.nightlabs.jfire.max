@@ -50,7 +50,7 @@ implements ISaleAccessQuery
 	private Boolean saleable = null;
 	private Boolean closed = null;
 
-//	private Boolean permissionGrantedToSee = Boolean.TRUE;
+	private Boolean permissionGrantedToSee = Boolean.TRUE;
 	private Boolean permissionGrantedToSell = null;
 	private Boolean permissionGrantedToReverse = null;
 
@@ -82,7 +82,12 @@ implements ISaleAccessQuery
 		public static final String organisationID = "organisationID";
 		public static final String inheritanceNature = "inheritanceNature";
 
-//		public static final String permissionGrantedToSee = "permissionGrantedToSee";
+		// This query is now used in the administration perspective as well and there,
+		// the user must be able to see everything - no matter whether the permissions
+		// where already calculated or not. Additionally, permissions are only
+		// calculated for leafs (not for branches = categories) and we therefore
+		// need to skip the check for the them anyway.
+		public static final String permissionGrantedToSee = "permissionGrantedToSee";
 		public static final String permissionGrantedToSell = "permissionGrantedToSell";
 		public static final String permissionGrantedToReverse = "permissionGrantedToReverse";
 	}
@@ -312,6 +317,12 @@ implements ISaleAccessQuery
 			throw new IllegalStateException("userID is null! Was prepareQuery(...) not called before?!");
 
 		iterateProductTypes: for (ProductType productType : rawProductTypes) {
+			// If I remember correctly, branches never have permissions calculated. Marco.
+			if (ProductType.INHERITANCE_NATURE_BRANCH == productType.getInheritanceNature()) {
+				filteredProductTypes.add(productType);
+				continue iterateProductTypes;
+			}
+
 			ProductTypePermissionFlagSet ptpfs;
 			try {
 				ptpfs = (ProductTypePermissionFlagSet) pm.getObjectById(
@@ -323,8 +334,10 @@ implements ISaleAccessQuery
 
 
 			if (!User.USER_ID_SYSTEM.equals(userID.userID)) { // the system user is allowed to see/do everything and has no ProductTypePermissionFlagSet. TODO maybe we should give him ProductTypePermissionFlagSet entries?!
-				if (ptpfs.getFlags(org.nightlabs.jfire.store.RoleConstants.seeProductType) != 0)
-					continue iterateProductTypes;
+				if (isFieldEnabled(FieldName.permissionGrantedToSee) && permissionGrantedToSee != null) {
+					if (ptpfs.getFlags(org.nightlabs.jfire.store.RoleConstants.seeProductType) != 0)
+						continue iterateProductTypes;
+				}
 			}
 
 			if (isFieldEnabled(FieldName.permissionGrantedToSell) && permissionGrantedToSell != null) {

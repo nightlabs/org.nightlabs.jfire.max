@@ -508,6 +508,16 @@ implements VoucherManagerRemote
 			if (!get)
 				return null;
 
+			// In order to ensure the fetch-groups have not been modified
+			// inbetween by some callbacks or other reasons, we set them again
+			// *directly* before detaching. The first setting of fetch-groups above
+			// is still useful to help DataNucleus optimize its queries. Marco.
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+			if (fetchGroups == null)
+				pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
+			else
+				pm.getFetchPlan().setGroups(fetchGroups);
+
 			VoucherType detachedVoucherType = pm.detachCopy(voucherType);
 			return detachedVoucherType;
 		} finally {

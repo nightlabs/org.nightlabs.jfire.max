@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -47,10 +48,12 @@ import org.nightlabs.jfire.issue.id.IssueID;
 import org.nightlabs.jfire.issue.id.IssueLinkID;
 import org.nightlabs.jfire.issue.id.IssueLinkTypeID;
 import org.nightlabs.jfire.issue.id.IssueLocalID;
+import org.nightlabs.jfire.issue.id.IssueMarkerID;
 import org.nightlabs.jfire.issue.id.IssuePriorityID;
 import org.nightlabs.jfire.issue.id.IssueResolutionID;
 import org.nightlabs.jfire.issue.id.IssueSeverityTypeID;
 import org.nightlabs.jfire.issue.id.IssueTypeID;
+import org.nightlabs.jfire.issue.issueMarker.IssueMarker;
 import org.nightlabs.jfire.issue.jbpm.JbpmConstants;
 import org.nightlabs.jfire.issue.project.Project;
 import org.nightlabs.jfire.issue.project.ProjectType;
@@ -68,6 +71,7 @@ import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.security.dao.UserDAO;
 import org.nightlabs.jfire.security.id.UserID;
 import org.nightlabs.progress.NullProgressMonitor;
+import org.nightlabs.util.CollectionUtil;
 import org.nightlabs.util.Util;
 
 /**
@@ -428,6 +432,56 @@ implements IssueManagerRemote
 			pm.close();
 		}//finally
 	}
+
+
+
+	// --- 8< --- KaiExperiments: since 14.05.2009 ------------------
+	// --[IssueMarker]--
+	@RolesAllowed("_Guest_")
+	public List<IssueMarker> getIssueMarkers(Collection<IssueMarkerID> issueMarkerIDs, String[] fetchGroups, int maxFetchDepth) {
+		PersistenceManager pm = getPersistenceManager();
+		try     { return NLJDOHelper.getDetachedObjectList(pm, issueMarkerIDs, IssueMarker.class, fetchGroups, maxFetchDepth); }
+		finally { pm.close(); }
+	}
+
+	@RolesAllowed("_Guest_")
+	public Set<IssueMarkerID> getIssueMarkerIDs() {
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			Query q = pm.newQuery(IssueLinkType.class);
+			q.setResult("JDOHelper.getObjectId(this)");
+			Collection<IssueMarkerID> c = CollectionUtil.castCollection((Collection<?>) q.execute());
+			return new HashSet<IssueMarkerID>(c);
+		} finally {
+			pm.close();
+		}
+	}
+
+	@RolesAllowed("_Guest_")
+	public Set<IssueMarkerID> getIssueMarkerIDs(IssueID issueID) {
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			Query q = pm.newQuery(IssueLinkType.class);
+			q.setResult("JDOHelper.getObjectId(this)");
+			q.setFilter("JDOHelper.getObjectId(this.Issue) == :issueID");
+			Collection<IssueMarkerID> c = CollectionUtil.castCollection((Collection<?>) q.execute(issueID));
+			return new HashSet<IssueMarkerID>(c);
+		} finally {
+			pm.close();
+		}
+	}
+
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("_Guest_")
+	public IssueMarker storeIssueMarker(IssueMarker issueMarker, boolean get, String[] fetchGroups, int maxFetchDepth) {
+		assert issueMarker != null;
+		PersistenceManager pm = getPersistenceManager();
+		try     { return NLJDOHelper.storeJDO(pm, issueMarker, get, fetchGroups, maxFetchDepth); }
+		finally { pm.close(); }
+	}
+	// ------ KaiExperiments ----- >8 -------------------------------
+
+
 
 	//IssueLinkType//
 	/**
@@ -1478,10 +1532,25 @@ implements IssueManagerRemote
 			issue1.setIssueResolution(issueResolutionOpen);
 			issue1.setIssueSeverityType(issueSeverityTypeMinor);
 			issue1.setReporter(systemUser);
-			IssueSubject subject1 = new IssueSubject(issue1);
+			IssueSubject subject1 = issue1.getSubject(); //new IssueSubject(issue1);
 			subject1.readFromProperties(baseName, loader,
 			"org.nightlabs.jfire.issue.IssueManagerBean.subject1"); //$NON-NLS-1$
-			issue1.setSubject(subject1);
+//			issue1.setSubject(subject1);
+
+			// --- 8< --- KaiExperiments: since 14.05.2009 ------------------
+			// --[ In preparation for an IssueMarker ]--
+			IssueMarker issueMarker1 = new IssueMarker(false);
+			issueMarker1.getName().setText(Locale.ENGLISH.getLanguage(), "Email follow-up");								// }<-- FIXME Language is only for Testing.
+			issueMarker1.getDescription().setText(Locale.ENGLISH.getLanguage(), "Forwarded email to Herr Schneider");	// }
+			issueMarker1 = pm.makePersistent(issueMarker1);
+			issue1.addIssueMarker(issueMarker1);
+
+			IssueMarker issueMarker2 = new IssueMarker(false);
+			issueMarker2.getName().setText(Locale.ENGLISH.getLanguage(), "Phone follow-up");
+			issueMarker2.getDescription().setText(Locale.ENGLISH.getLanguage(), "To call Frau Weiss @0171 8888 9999 for confirmation");
+			issueMarker2 = pm.makePersistent(issueMarker2);
+			issue1.addIssueMarker(issueMarker2);
+			// ------ KaiExperiments ----- >8 -------------------------------
 
 			storeIssue(issue1, false, new String[0], NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
 
@@ -1490,10 +1559,10 @@ implements IssueManagerRemote
 			issue2.setIssueResolution(issueResolutionOpen);
 			issue2.setIssueSeverityType(issueSeverityTypeMinor);
 			issue2.setReporter(systemUser);
-			IssueSubject subject2 = new IssueSubject(issue2);
+			IssueSubject subject2 = issue2.getSubject(); // new IssueSubject(issue2);
 			subject2.readFromProperties(baseName, loader,
 			"org.nightlabs.jfire.issue.IssueManagerBean.subject2"); //$NON-NLS-1$
-			issue2.setSubject(subject2);
+//			issue2.setSubject(subject2);
 
 			storeIssue(issue2, false, new String[0], NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
 
@@ -1502,10 +1571,10 @@ implements IssueManagerRemote
 			issue3.setIssueResolution(issueResolutionOpen);
 			issue3.setIssueSeverityType(issueSeverityTypeMinor);
 			issue3.setReporter(systemUser);
-			IssueSubject subject3 = new IssueSubject(issue3);
+			IssueSubject subject3 = issue3.getSubject(); // new IssueSubject(issue3);
 			subject3.readFromProperties(baseName, loader,
 			"org.nightlabs.jfire.issue.IssueManagerBean.subject3"); //$NON-NLS-1$
-			issue3.setSubject(subject3);
+//			issue3.setSubject(subject3);
 
 			storeIssue(issue3, false, new String[0], NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
 
@@ -1514,10 +1583,10 @@ implements IssueManagerRemote
 			issue4.setIssueResolution(issueResolutionOpen);
 			issue4.setIssueSeverityType(issueSeverityTypeMinor);
 			issue4.setReporter(systemUser);
-			IssueSubject subject4 = new IssueSubject(issue4);
+			IssueSubject subject4 = issue4.getSubject(); // new IssueSubject(issue4);
 			subject4.readFromProperties(baseName, loader,
 			"org.nightlabs.jfire.issue.IssueManagerBean.subject4"); //$NON-NLS-1$
-			issue4.setSubject(subject4);
+//			issue4.setSubject(subject4);
 
 			storeIssue(issue4, false, new String[0], NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
 
@@ -1526,10 +1595,10 @@ implements IssueManagerRemote
 			issue5.setIssueResolution(issueResolutionOpen);
 			issue5.setIssueSeverityType(issueSeverityTypeMinor);
 			issue5.setReporter(systemUser);
-			IssueSubject subject5 = new IssueSubject(issue5);
+			IssueSubject subject5 = issue5.getSubject(); // new IssueSubject(issue5);
 			subject5.readFromProperties(baseName, loader,
 			"org.nightlabs.jfire.issue.IssueManagerBean.subject5"); //$NON-NLS-1$
-			issue5.setSubject(subject5);
+//			issue5.setSubject(subject5);
 
 			storeIssue(issue5, false, new String[0], NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
 

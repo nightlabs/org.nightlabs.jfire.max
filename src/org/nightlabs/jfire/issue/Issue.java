@@ -58,6 +58,7 @@ import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.issue.id.IssueID;
+import org.nightlabs.jfire.issue.issueMarker.IssueMarker;
 import org.nightlabs.jfire.issue.project.Project;
 import org.nightlabs.jfire.jbpm.graph.def.Statable;
 import org.nightlabs.jfire.jbpm.graph.def.StatableLocal;
@@ -128,6 +129,7 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="Issue.reporter" fields="reporter"
  * @jdo.fetch-group name="Issue.assignee" fields="assignee"
  * @jdo.fetch-group name="Issue.issueWorkTimeRanges" fields="issueWorkTimeRanges"
+ * @jdo.fetch-group name="Issue.issueMarkers" fields="issueMarkers"
  *
  * @jdo.fetch-group name="Statable.state" fields="state"
  * @jdo.fetch-group name="Statable.states" fields="states"
@@ -190,6 +192,9 @@ import org.nightlabs.util.Util;
 		name=Issue.FETCH_GROUP_ISSUE_WORK_TIME_RANGES,
 		members=@Persistent(name="issueWorkTimeRanges")),
 	@FetchGroup(
+		name=Issue.FETCH_GROUP_ISSUE_MARKERS,
+		members=@Persistent(name="issueMarkers")),
+	@FetchGroup(
 		name="Statable.state",
 		members=@Persistent(name="state")),
 	@FetchGroup(
@@ -228,6 +233,8 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	public static final String FETCH_GROUP_ISSUE_PROJECT = "Issue.project";
 
 	public static final String FETCH_GROUP_PROPERTY_SET = "Issue.propertySet";
+
+	public static final String FETCH_GROUP_ISSUE_MARKERS = "Issue.issueMarkers";
 
 	/**
 	 * This is the organisationID to which the issue belongs. Within one organisation,
@@ -453,6 +460,51 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 		return propertySet;
 	}
 
+
+	// --- 8< --- KaiExperiments: since 14.05.2009 ------------------
+	// --[ In preparation for an IssueMarker ]--
+	// TODO Methods to add (and later remove?) IssueMarkers.
+	@Join
+	@Persistent(
+		table="JFireIssueTracking_Issue_issueMarkers",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
+	private Set<IssueMarker> issueMarkers;
+
+	/**
+	 * @return the IssueMarkers corresponding to this {@link Issue};
+	 */
+	public Set<IssueMarker> getIssueMarkers() { return Collections.unmodifiableSet(issueMarkers); }
+
+	public void addIssueMarker(IssueMarker issueMarker) {
+		issueMarkers.add(issueMarker);
+	}
+
+	public void removeIssueMarker(IssueMarker issueMarker) {
+		issueMarkers.remove(issueMarker);
+	}
+
+//	/**
+//	 * Adds a new IssueMarker to this Issue.
+//	 * @return the newly created IssueMarker.
+//	 * FIXME Note that this method is still UNDER TEST!
+//	 * FIXME Revise the language option.
+//	 * TODO The icon part is still not handled.
+//	 */
+//	public IssueMarker addIssueMarker(String issueMarkerNameStr, String issueMarkerDescriptionStr) {
+//		IssueMarker issueMarker = new IssueMarker(IDGenerator.getOrganisationID(), IDGenerator.nextID(IssueMarker.class));
+//		issueMarker.getName().setText(Locale.ENGLISH.getLanguage(), issueMarkerNameStr);				// }<-- FIXME Language is only for Testing.
+//		issueMarker.getDescription().setText(Locale.ENGLISH.getLanguage(), issueMarkerDescriptionStr);	// }
+//
+//		issueMarkers.add( issueMarker );
+//		return issueMarker;
+//	}
+//	// ------ KaiExperiments ----- >8 -------------------------------
+
+
+
+
+
+
 	/**
 	 * @deprecated Constructor exists only for JDO!
 	 */
@@ -479,6 +531,11 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 		comments = new ArrayList<IssueComment>();
 		issueLinks = new HashSet<IssueLink>();
 		issueWorkTimeRanges = new ArrayList<IssueWorkTimeRange>();
+
+		// --- 8< --- KaiExperiments: since 14.05.2009 ------------------
+		// --[ In preparation for an IssueMarker ]--
+		issueMarkers = new HashSet<IssueMarker>();
+		// ------ KaiExperiments ----- >8 -------------------------------
 
 		this.issueLocal = new IssueLocal(this);
 		this.propertySet = new PropertySet(
@@ -572,13 +629,13 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 		return description;
 	}
 
-	/**
-	 * Sets the {@link IssueDescription}.
-	 * @param description the description to set
-	 */
-	public void setDescription(IssueDescription description) {
-		this.description = description;
-	}
+//	/**
+//	 * Sets the {@link IssueDescription}.
+//	 * @param description the description to set
+//	 */
+//	public void setDescription(IssueDescription description) {
+//		this.description = description;
+//	}
 
 	/**
 	 * Returns the {@link IssueSubject}.
@@ -588,13 +645,13 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 		return subject;
 	}
 
-	/**
-	 * Sets the {@link IssueSubject}.
-	 * @param subject the subject to set
-	 */
-	public void setSubject(IssueSubject subject) {
-		this.subject = subject;
-	}
+//	/**
+//	 * Sets the {@link IssueSubject}.
+//	 * @param subject the subject to set
+//	 */
+//	public void setSubject(IssueSubject subject) {
+//		this.subject = subject;
+//	}
 
 	/**
 	 * Returns the {@link User} who reports the issue.

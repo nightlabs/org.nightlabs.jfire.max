@@ -20,10 +20,12 @@ import org.nightlabs.jfire.issue.id.IssueFileAttachmentID;
 import org.nightlabs.jfire.issue.id.IssueID;
 import org.nightlabs.jfire.issue.id.IssueLinkID;
 import org.nightlabs.jfire.issue.id.IssueLinkTypeID;
+import org.nightlabs.jfire.issue.id.IssueMarkerID;
 import org.nightlabs.jfire.issue.id.IssuePriorityID;
 import org.nightlabs.jfire.issue.id.IssueResolutionID;
 import org.nightlabs.jfire.issue.id.IssueSeverityTypeID;
 import org.nightlabs.jfire.issue.id.IssueTypeID;
+import org.nightlabs.jfire.issue.issueMarker.IssueMarker;
 import org.nightlabs.jfire.issue.project.Project;
 import org.nightlabs.jfire.issue.project.ProjectType;
 import org.nightlabs.jfire.issue.project.id.ProjectID;
@@ -160,6 +162,18 @@ public interface IssueManagerRemote {
 	@RolesAllowed("_Guest_")
 	IssueComment storeIssueComment(IssueComment issueComment, boolean get,
 			String[] fetchGroups, int maxFetchDepth);
+
+
+	//IssueMarker//
+	List<IssueMarker> getIssueMarkers(Collection<IssueMarkerID> issueMarkerIDs, String[] fetchGroups, int maxFetchDepth);
+
+	Set<IssueMarkerID> getIssueMarkerIDs();
+
+	Set<IssueMarkerID> getIssueMarkerIDs(IssueID issueID);
+
+	IssueMarker storeIssueMarker(IssueMarker issueMarker, boolean get, String[] fetchGroups, int maxFetchDepth);
+
+
 
 	//IssueLinkType//
 	/**

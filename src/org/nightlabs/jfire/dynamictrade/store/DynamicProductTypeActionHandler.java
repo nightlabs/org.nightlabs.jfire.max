@@ -5,6 +5,10 @@ import java.util.Collection;
 import java.util.Hashtable;
 
 import javax.jdo.PersistenceManager;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.PersistenceCapable;
 
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.security.id.AuthorityTypeID;
@@ -18,11 +22,6 @@ import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.Offer;
 import org.nightlabs.jfire.trade.id.OfferID;
 import org.nightlabs.jfire.trade.id.SegmentID;
-
-import javax.jdo.annotations.InheritanceStrategy;
-import javax.jdo.annotations.Inheritance;
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.IdentityType;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -61,15 +60,14 @@ public class DynamicProductTypeActionHandler
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public Collection<? extends Product> findProducts(User user,
 			ProductType productType, NestedProductTypeLocal nestedProductTypeLocal, ProductLocator productLocator)
 	{
 		DynamicProductType spt = (DynamicProductType) productType;
 		PersistenceManager pm = getPersistenceManager();
 		Store store = Store.getStore(pm);
-		ArrayList res = new ArrayList();
 		int qty = nestedProductTypeLocal == null ? 1 : nestedProductTypeLocal.getQuantity();
+		ArrayList<DynamicProduct> res = new ArrayList<DynamicProduct>(qty);
 		for (int i = 0; i < qty; ++i) {
 			DynamicProduct product = new DynamicProduct(spt, Product.createProductID());
 			product = (DynamicProduct) store.addProduct(user, product); // , (Repository)spt.getProductTypeLocal().getHome());

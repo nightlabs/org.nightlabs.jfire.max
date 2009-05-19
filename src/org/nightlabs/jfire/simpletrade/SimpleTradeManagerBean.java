@@ -159,6 +159,7 @@ implements SimpleTradeManagerRemote
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("_System_")
+	@Override
 	public void initialise()
 	throws CannotPublishProductTypeException
 	{
@@ -243,6 +244,7 @@ implements SimpleTradeManagerRemote
 	 * @ejb.permission role-name="org.nightlabs.jfire.store.seeProductType"
 	 */
 	@RolesAllowed("org.nightlabs.jfire.store.seeProductType")
+	@Override
 	public Set<ProductTypeID> getChildSimpleProductTypeIDs(ProductTypeID parentSimpleProductTypeID) {
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -303,6 +305,7 @@ implements SimpleTradeManagerRemote
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("org.nightlabs.jfire.store.editUnconfirmedProductType")
+	@Override
 	public SimpleProductType storeProductType(SimpleProductType productType, boolean get, String[] fetchGroups, int maxFetchDepth)
 	throws PriceCalculationException
 	{
@@ -496,6 +499,7 @@ implements SimpleTradeManagerRemote
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("org.nightlabs.jfire.store.seeProductType")
+	@Override
 	public Map<ProductTypeID, PropertySet> getSimpleProductTypesPropertySets(
 			Set<ProductTypeID> simpleProductTypeIDs,
 			Set<StructFieldID> structFieldIDs,
@@ -535,6 +539,7 @@ implements SimpleTradeManagerRemote
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("org.nightlabs.jfire.accounting.queryPriceConfigurations")
+	@Override
 	public Set<PriceConfigID> getFormulaPriceConfigIDs()
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -558,6 +563,7 @@ implements SimpleTradeManagerRemote
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("org.nightlabs.jfire.accounting.queryPriceConfigurations")
+	@Override
 	public List<FormulaPriceConfig> getFormulaPriceConfigs(Collection<PriceConfigID> formulaPriceConfigIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -580,6 +586,7 @@ implements SimpleTradeManagerRemote
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("org.nightlabs.jfire.trade.editOffer")
+	@Override
 	public Collection<? extends Article> createArticles(
 			SegmentID segmentID,
 			OfferID offerID,
@@ -677,6 +684,7 @@ implements SimpleTradeManagerRemote
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("org.nightlabs.jfire.trade.editOffer")
+	@Override
 	public Collection<? extends Article> createArticles(
 			SegmentID segmentID,
 			OfferID offerID,
@@ -842,6 +850,7 @@ implements SimpleTradeManagerRemote
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@RolesAllowed("_Guest_")
+	@Override
 	public Set<ProductTypeID> getPublishedSimpleProductTypeIDs()
 	{
 		if (!userIsOrganisation()) // noone else needs this method - at least at the moment.
@@ -866,6 +875,7 @@ implements SimpleTradeManagerRemote
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@RolesAllowed("_Guest_")
+	@Override
 	public List<SimpleProductType> getSimpleProductTypesForReseller(Collection<ProductTypeID> productTypeIDs)
 	{
 		if (!userIsOrganisation()) // noone else needs this method - at least at the moment.
@@ -947,6 +957,7 @@ implements SimpleTradeManagerRemote
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("org.nightlabs.jfire.store.editUnconfirmedProductType")
+	@Override
 	public void importSimpleProductTypesForReselling(String emitterOrganisationID)
 	throws JFireException
 	{
@@ -1029,6 +1040,7 @@ implements SimpleTradeManagerRemote
 	 * @ejb.permission role-name="org.nightlabs.jfire.trade.sellProductType, org.nightlabs.jfire.accounting.queryPriceConfigurations"
 	 */
 	@RolesAllowed({"org.nightlabs.jfire.trade.sellProductType", "org.nightlabs.jfire.accounting.queryPriceConfigurations"})
+	@Override
 	public Collection<TariffPricePair> getTariffPricePairs(
 			ProductTypeID productTypeID, CustomerGroupID customerGroupID, CurrencyID currencyID,
 			String[] tariffFetchGroups, String[] priceFetchGroups
@@ -1107,6 +1119,7 @@ implements SimpleTradeManagerRemote
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("org.nightlabs.jfire.accounting.editPriceConfiguration")
+	@Override
 	public Collection<GridPriceConfig> storePriceConfigs(Collection<GridPriceConfig> priceConfigs, boolean get, AssignInnerPriceConfigCommand assignInnerPriceConfigCommand)
 	throws PriceCalculationException
 	{
@@ -1133,6 +1146,7 @@ implements SimpleTradeManagerRemote
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("org.nightlabs.jfire.store.editUnconfirmedProductType")
+	@Override
 	public Collection<OrganisationID> getCandidateOrganisationIDsForCrossTrade()
 	{
 		PersistenceManager pm = getPersistenceManager();

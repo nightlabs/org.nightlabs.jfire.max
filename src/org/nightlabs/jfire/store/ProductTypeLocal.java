@@ -38,6 +38,22 @@ import javax.jdo.FetchPlan;
 import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.Discriminator;
+import javax.jdo.annotations.DiscriminatorStrategy;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Key;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.Value;
+import javax.jdo.annotations.Version;
+import javax.jdo.annotations.VersionStrategy;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.inheritance.FieldInheriter;
@@ -62,23 +78,6 @@ import org.nightlabs.jfire.store.book.LocalStorekeeperDelegate;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.store.id.ProductTypeLocalID;
 import org.nightlabs.util.Util;
-
-import javax.jdo.annotations.FetchGroups;
-import javax.jdo.annotations.Inheritance;
-import javax.jdo.annotations.PrimaryKey;
-import javax.jdo.annotations.FetchGroup;
-import javax.jdo.annotations.Version;
-import javax.jdo.annotations.PersistenceModifier;
-import javax.jdo.annotations.Discriminator;
-import javax.jdo.annotations.Key;
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.DiscriminatorStrategy;
-import javax.jdo.annotations.Value;
-import javax.jdo.annotations.VersionStrategy;
-import javax.jdo.annotations.Persistent;
-import javax.jdo.annotations.InheritanceStrategy;
-import javax.jdo.annotations.Column;
-import javax.jdo.annotations.IdentityType;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -414,14 +413,9 @@ implements Serializable, Inheritable, InheritanceCallbacks, SecuredObject
 		return fmd;
 	}
 
-	/**
-	 * @jdo.field persistence-modifier="none"
-	 */
-	@Persistent(persistenceModifier=PersistenceModifier.NONE)
-	private transient PriceConfigID tmpInherit_innerPriceConfigID = null;
-	/**
-	 * @jdo.field persistence-modifier="none"
-	 */
+//	@Persistent(persistenceModifier=PersistenceModifier.NONE)
+//	private transient PriceConfigID tmpInherit_innerPriceConfigID = null;
+
 	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private transient Map<String, NestedProductTypeLocal> tmpInherit_nestedProductTypes = null;
 
@@ -453,8 +447,8 @@ implements Serializable, Inheritable, InheritanceCallbacks, SecuredObject
 				NLJDOHelper.restoreFetchPlan(pm.getFetchPlan(), fetchPlanBackup);
 			}
 
-			// additionally, we need to check, whether the innerPriceConfig is replaced, which would cause recalculation, too
-			tmpInherit_innerPriceConfigID = (PriceConfigID) JDOHelper.getObjectId(getProductType().getInnerPriceConfig());
+//			// additionally, we need to check, whether the innerPriceConfig is replaced, which would cause recalculation, too
+//			tmpInherit_innerPriceConfigID = (PriceConfigID) JDOHelper.getObjectId(getProductType().getInnerPriceConfig());
 		}
 
 		// ensure that these fields are loaded
@@ -492,6 +486,8 @@ implements Serializable, Inheritable, InheritanceCallbacks, SecuredObject
 	{
 		if (child == this) {
 			PersistenceManager pm = getPersistenceManager();
+
+			PriceConfigID tmpInherit_innerPriceConfigID = getProductType().getTmpInherit_innerPriceConfigID();
 
 			if (!Util.equals(tmpInherit_innerPriceConfigID, JDOHelper.getObjectId(getProductType().getInnerPriceConfig())) ||
 					!compareNestedProductTypeLocals(nestedProductTypeLocals.values(), tmpInherit_nestedProductTypes))
@@ -802,12 +798,12 @@ implements Serializable, Inheritable, InheritanceCallbacks, SecuredObject
 		}
 		return productTypeLocal.getManagedBy();
 	}
-	
+
 	/**
 	 * Checks if the {@link ProductTypeLocal} corresponding to the given {@link ProductTypeID} is tagged with a
 	 * non-<code>null</code> managed-by property. This method will throw an {@link ManagedProductTypeModficationException}
 	 * if the given {@link ProductTypeLocal} is found to be tagged with a manged-by flag.
-	 * 
+	 *
 	 * @param pm The {@link PersistenceManager} to use.
 	 * @param productTypeID The id of the {@link ProductType} to check, this might also be <code>null</code> (the result of JDOHelper.getObjectId() of a new object).
 	 */
@@ -825,7 +821,7 @@ implements Serializable, Inheritable, InheritanceCallbacks, SecuredObject
 	 * This might occur if the given ProductTypeID is of a {@link ProductType} not yet in the given datastore,
 	 * or <code>null</code>.
 	 * </p>
-	 * 
+	 *
 	 * @param pm The {@link PersistenceManager} to use.
 	 * @param productTypeID The id of the {@link ProductType} to check, this might also be <code>null</code> (the result of JDOHelper.getObjectId() of a new object).
 	 * @return <code>true</code> if the given {@link ProductType} is found to be tagged with the managed-by flag, <code>false</code> otherwise.
@@ -833,7 +829,7 @@ implements Serializable, Inheritable, InheritanceCallbacks, SecuredObject
 	public static boolean isProductTypeManaged(PersistenceManager pm, ProductTypeID productTypeID) {
 		return getProductTypeManagedBy(pm, productTypeID) != null;
 	}
-	
+
 
 	@Override
 	public int hashCode()

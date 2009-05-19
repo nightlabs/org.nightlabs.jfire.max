@@ -30,26 +30,26 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.Queries;
+import javax.jdo.annotations.Query;
+
 import org.apache.log4j.Logger;
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.accounting.Price;
+import org.nightlabs.jfire.accounting.gridpriceconfig.id.PriceCellID;
 import org.nightlabs.jfire.accounting.priceconfig.IPriceConfig;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.util.Util;
-
-import javax.jdo.annotations.Persistent;
-import javax.jdo.annotations.FetchGroups;
-import javax.jdo.annotations.InheritanceStrategy;
-import javax.jdo.annotations.Inheritance;
-import javax.jdo.annotations.Queries;
-import org.nightlabs.jfire.accounting.gridpriceconfig.id.PriceCellID;
-import javax.jdo.annotations.PrimaryKey;
-import javax.jdo.annotations.FetchGroup;
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.Column;
-import javax.jdo.annotations.Query;
-import javax.jdo.annotations.IdentityType;
-import javax.jdo.annotations.PersistenceModifier;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -120,7 +120,7 @@ public class PriceCell implements Serializable
 	public static final String FETCH_GROUP_PRICE_CONFIG = "PriceCell.priceConfig";
 	public static final String FETCH_GROUP_PRICE_COORDINATE = "PriceCell.priceCoordinate";
 //	/**
-//	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon! 
+//	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon!
 //	 */
 //	public static final String FETCH_GROUP_THIS_PRICE_CELL = "PriceCell.this";
 
@@ -128,8 +128,8 @@ public class PriceCell implements Serializable
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
-@PrimaryKey
-@Column(length=100)
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID;
 
 //	/**
@@ -145,12 +145,12 @@ public class PriceCell implements Serializable
 	/**
 	 * @jdo.field primary-key="true"
 	 */
-@PrimaryKey
+	@PrimaryKey
 	private long priceCellID;
 
 	/**
 	 * @!jdo.field persistence-modifier="persistent" null-value="exception"
-	 * TODO DataNucleus workaround: the above null-value="exception" is correct but causes exceptions during cross-datastore-replication 
+	 * TODO DataNucleus workaround: the above null-value="exception" is correct but causes exceptions during cross-datastore-replication
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
@@ -158,7 +158,7 @@ public class PriceCell implements Serializable
 
 	/**
 	 * @!jdo.field persistence-modifier="persistent" dependent="true" null-value="exception"
-	 * TODO DataNucleus workaround: the above null-value="exception" is correct but causes exceptions during cross-datastore-replication 
+	 * TODO DataNucleus workaround: the above null-value="exception" is correct but causes exceptions during cross-datastore-replication
 	 * @jdo.field persistence-modifier="persistent" dependent="true"
 	 */
 	@Persistent(
@@ -168,7 +168,7 @@ public class PriceCell implements Serializable
 
 	/**
 	 * @!jdo.field persistence-modifier="persistent" null-value="exception"
-	 * TODO DataNucleus workaround: the above null-value="exception" is correct but causes exceptions during cross-datastore-replication 
+	 * TODO DataNucleus workaround: the above null-value="exception" is correct but causes exceptions during cross-datastore-replication
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
@@ -243,7 +243,7 @@ public class PriceCell implements Serializable
 	 */
 	public PriceCoordinate getPriceCoordinate()
 	{
-		try {	
+		try {
 			return priceCoordinate;
 		} catch (Exception x) {
 			logger.info("getPriceCoordinate: " + this, x);
@@ -315,7 +315,7 @@ public class PriceCell implements Serializable
 		if (priceFragmentsCalculationStatus == null)
 			return CALCULATIONSTATUS_DIRTY;
 
-		String status = (String) priceFragmentsCalculationStatus.get(priceFragmentTypePK);
+		String status = priceFragmentsCalculationStatus.get(priceFragmentTypePK);
 		if (status == null)
 			return CALCULATIONSTATUS_DIRTY;
 

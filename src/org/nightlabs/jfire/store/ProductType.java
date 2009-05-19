@@ -82,6 +82,7 @@ import org.nightlabs.jfire.accounting.priceconfig.IInnerPriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.IPackagePriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.IPriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.PriceConfig;
+import org.nightlabs.jfire.accounting.priceconfig.id.PriceConfigID;
 import org.nightlabs.jfire.accounting.tariffuserset.TariffUserSet;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.organisation.LocalOrganisation;
@@ -1300,6 +1301,9 @@ implements
 		return new JDOSimpleFieldInheriter();
 	}
 
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
+	private transient PriceConfigID tmpInherit_innerPriceConfigID = null;
+
 	@Override
 	public void preInherit(Inheritable mother, Inheritable child)
 	{
@@ -1316,6 +1320,12 @@ implements
 		name.getI18nMap();
 		if (endCustomerReplicationPolicy == null);
 		if (tariffUserSet == null);
+
+		tmpInherit_innerPriceConfigID = (PriceConfigID) JDOHelper.getObjectId(getInnerPriceConfig());
+	}
+
+	protected PriceConfigID getTmpInherit_innerPriceConfigID() {
+		return tmpInherit_innerPriceConfigID;
 	}
 
 	@Override

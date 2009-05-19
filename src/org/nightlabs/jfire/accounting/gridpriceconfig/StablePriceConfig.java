@@ -38,6 +38,14 @@ import java.util.Set;
 
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.jfire.accounting.Currency;
@@ -50,15 +58,6 @@ import org.nightlabs.jfire.store.Product;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.ArticlePrice;
 import org.nightlabs.jfire.trade.CustomerGroup;
-
-import javax.jdo.annotations.FetchGroups;
-import javax.jdo.annotations.Inheritance;
-import javax.jdo.annotations.FetchGroup;
-import javax.jdo.annotations.PersistenceModifier;
-import javax.jdo.annotations.Persistent;
-import javax.jdo.annotations.InheritanceStrategy;
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.IdentityType;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -151,10 +150,11 @@ implements IPackagePriceConfig, IResultPriceConfig
 	 *		mapped-by="priceConfig"
 	 *		dependent-element="true"
 	 */
-@Persistent(
-	dependentElement="true",
-	mappedBy="priceConfig",
-	persistenceModifier=PersistenceModifier.PERSISTENT)
+	@Persistent(
+			dependentElement="true",
+			mappedBy="priceConfig",
+			persistenceModifier=PersistenceModifier.PERSISTENT
+	)
 	private Set<PriceCell> priceCells;
 
 	/**

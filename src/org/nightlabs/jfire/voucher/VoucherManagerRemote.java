@@ -11,6 +11,7 @@ import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 
 import org.nightlabs.ModuleException;
+import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jfire.accounting.book.id.LocalAccountantDelegateID;
 import org.nightlabs.jfire.accounting.priceconfig.id.PriceConfigID;
 import org.nightlabs.jfire.scripting.ScriptRegistryItem;
@@ -287,6 +288,16 @@ public interface VoucherManagerRemote {
 	@RolesAllowed("org.nightlabs.jfire.voucher.editVoucherLayout")
 	Set<ProductTypeID> getVoucherTypeIdsByVoucherLayoutId(
 			VoucherLayoutID voucherLayoutId);
+	
+	/**
+	 * @ejb.interface-method
+	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+	 * @ejb.permission role-name="org.nightlabs.jfire.voucher.editVoucherLayout"
+	 */	
+	@RolesAllowed("org.nightlabs.jfire.voucher.editVoucherLayout")
+	Set<ProductTypeID> getVoucherTypeIdsByLocalAccountantDelegateId(ObjectID LocalAccountantDelegateId);
+
+	
 
 	/**
 	 * @ejb.interface-method

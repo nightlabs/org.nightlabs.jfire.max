@@ -31,6 +31,7 @@ import javax.naming.NamingException;
 import org.apache.log4j.Logger;
 import org.nightlabs.ModuleException;
 import org.nightlabs.jdo.NLJDOHelper;
+import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jdo.QueryOption;
 import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
@@ -1381,4 +1382,22 @@ implements VoucherManagerRemote
 			pm.close();
 		}
 	}
+	
+	
+	/**
+	 * @ejb.interface-method
+	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+	 * @ejb.permission role-name="org.nightlabs.jfire.voucher.editVoucherLayout"
+	 */
+	@RolesAllowed("org.nightlabs.jfire.voucher.editVoucherLayout")
+	public Set<ProductTypeID> getVoucherTypeIdsByLocalAccountantDelegateId(ObjectID LocalAccountantDelegateId) {
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			return VoucherType.getVoucherTypeIdsByLocalAccountantDelegateId(pm, LocalAccountantDelegateId);
+		} finally {
+			pm.close();
+		}
+	}
+	
+	
 }

@@ -6,7 +6,18 @@ import java.util.Set;
 
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.Queries;
 
+import org.nightlabs.jdo.ObjectID;
+import org.nightlabs.jfire.accounting.book.LocalAccountantDelegate;
 import org.nightlabs.jfire.accounting.priceconfig.IPriceConfig;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.ProductType;
@@ -15,16 +26,6 @@ import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.voucher.scripting.VoucherLayout;
 import org.nightlabs.jfire.voucher.scripting.id.VoucherLayoutID;
 import org.nightlabs.util.CollectionUtil;
-
-import javax.jdo.annotations.Persistent;
-import javax.jdo.annotations.FetchGroups;
-import javax.jdo.annotations.InheritanceStrategy;
-import javax.jdo.annotations.Inheritance;
-import javax.jdo.annotations.Queries;
-import javax.jdo.annotations.FetchGroup;
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.IdentityType;
-import javax.jdo.annotations.PersistenceModifier;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -58,6 +59,10 @@ import javax.jdo.annotations.PersistenceModifier;
  * 		name="getVoucherTypeIdsByVoucherLayoutId"
  * 		query="SELECT JDOHelper.getObjectId(this) WHERE :voucherLayoutId == JDOHelper.getObjectId(this.voucherLayout)"
  *
+ * @jdo.query
+ * 		name="getVoucherTypeIdsByLocalAccountantDelegateId"
+ * 		query="SELECT JDOHelper.getObjectId(this) WHERE :localAccountantDelegateID == JDOHelper.getObjectId(this.productTypeLocal.localAccountantDelegate)"
+ *
  * @jdo.fetch-group name="VoucherType.voucherLayout" fields="voucherLayout"
  */
 @PersistenceCapable(
@@ -80,7 +85,10 @@ import javax.jdo.annotations.PersistenceModifier;
 		language="javax.jdo.query.JDOQL"),
 	@javax.jdo.annotations.Query(
 		name="getVoucherTypeIdsByVoucherLayoutId",
-		value="SELECT JDOHelper.getObjectId(this) WHERE :voucherLayoutId == JDOHelper.getObjectId(this.voucherLayout)")
+		value="SELECT JDOHelper.getObjectId(this) WHERE :voucherLayoutId == JDOHelper.getObjectId(this.voucherLayout)"),
+	@javax.jdo.annotations.Query(
+				name="getVoucherTypeIdsByLocalAccountantDelegateId",
+				value="SELECT JDOHelper.getObjectId(this) WHERE :localAccountantDelegateID == JDOHelper.getObjectId(this.productTypeLocal.localAccountantDelegate)")
 })
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class VoucherType
@@ -224,4 +232,24 @@ extends ProductType
 		Collection<ProductTypeID> result = CollectionUtil.castCollection((Collection<ProductTypeID>) query.execute(voucherLayoutId));
 		return new HashSet<ProductTypeID>(result);
 	}
+
+	/**
+	 * Returns a set of the IDs of all {@link VoucherType}s that share the {@link org.nightlabs.jfire.accounting.book.LocalAccountantDelegate} with the given ID.
+	 * @param pm The persistence manager to use to execute the query.
+	 * @param localAccountantDelegateId The ID of the {@link LocalAccountantDelegate} that all returned {@link VoucherType}s should share.
+	 * @return a set of the IDs of all {@link VoucherType}s that share the {@link  org.nightlabs.jfire.accounting.book.LocalAccountantDelegate} with the given ID.
+	 */
+	public static Set<ProductTypeID> getVoucherTypeIdsByLocalAccountantDelegateId(PersistenceManager pm, ObjectID localAccountantDelegateId) {
+		Query query = pm.newNamedQuery(VoucherType.class, "getVoucherTypeIdsByLocalAccountantDelegateId");
+		Collection<ProductTypeID> result = CollectionUtil.castCollection((Collection<ProductTypeID>) query.execute(localAccountantDelegateId));
+		return new HashSet<ProductTypeID>(result);
+	
+	}
+
+
+
+
+
+
+
 }

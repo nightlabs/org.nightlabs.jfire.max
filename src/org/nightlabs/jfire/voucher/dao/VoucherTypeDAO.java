@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.base.jdo.IJDOObjectDAO;
@@ -100,6 +101,24 @@ implements IJDOObjectDAO<VoucherType>
 		}
 	}
 
+	/**
+	 * Returns the events that share the given ticket layout.
+	 *
+	 * @see Event#getEventIdsByTicketLayoutId(javax.jdo.PersistenceManager, TicketLayoutID)
+	 */
+	public List<VoucherType> getVoucherTypesByLocalAccountantDelegateId(ObjectID  localAccountantDelegateId, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) {
+		try {
+			VoucherManagerRemote voucherManager = JFireEjb3Factory.getRemoteBean(VoucherManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			Set<ProductTypeID> voucherTypeIds = voucherManager.getVoucherTypeIdsByLocalAccountantDelegateId(localAccountantDelegateId);
+			return getJDOObjects(null, voucherTypeIds, fetchGroups, maxFetchDepth, monitor);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
+	
+	
+	
 	/**
 	 * Returns the events that share the given ticket layout.
 	 *

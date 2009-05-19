@@ -1545,11 +1545,11 @@ implements IssueManagerRemote
 			issueMarker1 = pm.makePersistent(issueMarker1);
 			issue1.addIssueMarker(issueMarker1);
 
-			IssueMarker issueMarker2 = new IssueMarker(false);
-			issueMarker2.getName().setText(Locale.ENGLISH.getLanguage(), "Phone follow-up");
-			issueMarker2.getDescription().setText(Locale.ENGLISH.getLanguage(), "To call Frau Weiss @0171 8888 9999 for confirmation");
-			issueMarker2 = pm.makePersistent(issueMarker2);
-			issue1.addIssueMarker(issueMarker2);
+			IssueMarker issueMarker3 = new IssueMarker(false);
+			issueMarker3.getName().setText(Locale.ENGLISH.getLanguage(), "Phone follow-up");
+			issueMarker3.getDescription().setText(Locale.ENGLISH.getLanguage(), "To call reception @0171 8888 9999 at the Le Meridien to cancel the Rosemary Suite reservation.");
+			issueMarker3 = pm.makePersistent(issueMarker3);
+			issue1.addIssueMarker(issueMarker3);
 			// ------ KaiExperiments ----- >8 -------------------------------
 
 			storeIssue(issue1, false, new String[0], NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
@@ -1599,6 +1599,21 @@ implements IssueManagerRemote
 			subject5.readFromProperties(baseName, loader,
 			"org.nightlabs.jfire.issue.IssueManagerBean.subject5"); //$NON-NLS-1$
 //			issue5.setSubject(subject5);
+
+			// --- 8< --- KaiExperiments: since 14.05.2009 ------------------
+			// --[ In preparation for an IssueMarker ]--
+			IssueMarker issueMarker2 = new IssueMarker(false);
+			issueMarker2.getName().setText(Locale.ENGLISH.getLanguage(), "Email follow-up");
+			issueMarker2.getDescription().setText(Locale.ENGLISH.getLanguage(), "To sort all other related emails.");
+			issueMarker2 = pm.makePersistent(issueMarker2);
+			issue5.addIssueMarker(issueMarker2);
+
+			IssueMarker issueMarker4 = new IssueMarker(false);
+			issueMarker4.getName().setText(Locale.ENGLISH.getLanguage(), "Email follow-up");
+			issueMarker4.getDescription().setText(Locale.ENGLISH.getLanguage(), "To send email broadcast to the whole department.");
+			issueMarker4= pm.makePersistent(issueMarker4);
+			issue5.addIssueMarker(issueMarker4);
+			// ------ KaiExperiments ----- >8 -------------------------------
 
 			storeIssue(issue5, false, new String[0], NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
 

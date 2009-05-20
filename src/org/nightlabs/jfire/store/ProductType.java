@@ -27,11 +27,15 @@
 package org.nightlabs.jfire.store;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -297,15 +301,26 @@ import org.nightlabs.util.Util;
 			value="SELECT WHERE this.extendedProductType == null",
 			language="javax.jdo.query.JDOQL"
 	),
+//TODO DataNucleus WORKAROUND: Sorting in JDOQL causes objects to be skipped (not found) when they do not have a name!
+//	@javax.jdo.annotations.Query(
+//			name="getChildProductTypes_hasParent",
+//			value="SELECT " +
+//					"WHERE" +
+//					"  this.extendedProductType.organisationID == parentProductTypeOrganisationID && " +
+//					"  this.extendedProductType.productTypeID == parentProductTypeProductTypeID " +
+//					"PARAMETERS String parentProductTypeOrganisationID, String parentProductTypeProductTypeID, String languageID " +
+//					"import java.lang.String " +
+//					"ORDER BY this.name.names.get(languageID) ASCENDING ",
+//			language="javax.jdo.query.JDOQL"
+//	),
 	@javax.jdo.annotations.Query(
 			name="getChildProductTypes_hasParent",
 			value="SELECT " +
 					"WHERE" +
 					"  this.extendedProductType.organisationID == parentProductTypeOrganisationID && " +
 					"  this.extendedProductType.productTypeID == parentProductTypeProductTypeID " +
-					"PARAMETERS String parentProductTypeOrganisationID, String parentProductTypeProductTypeID, String languageID " +
-					"import java.lang.String " +
-					"ORDER BY this.name.names.get(languageID) ASCENDING ",
+					"PARAMETERS String parentProductTypeOrganisationID, String parentProductTypeProductTypeID " +
+					"import java.lang.String",
 			language="javax.jdo.query.JDOQL"
 	),
 	@javax.jdo.annotations.Query(
@@ -458,21 +473,40 @@ implements
 	 */
 	public static Collection<? extends ProductType> getChildProductTypes(PersistenceManager pm, ProductTypeID parentProductTypeID)
 	{
+		final String languageID = NLLocale.getDefault().getLanguage();
+
+		Collection<ProductType> result;
 		if (parentProductTypeID == null) {
 			Query q = pm.newNamedQuery(ProductType.class, "getChildProductTypes_topLevel");
-			return CollectionUtil.castCollection((Collection<?>)q.execute());
+			result = CollectionUtil.castCollection((Collection<?>)q.execute());
+		}
+		else {
+			Query q = pm.newNamedQuery(ProductType.class, "getChildProductTypes_hasParent");
+
+			result = CollectionUtil.castCollection(
+					(Collection<?>) q.execute(
+							parentProductTypeID.organisationID, parentProductTypeID.productTypeID
+					)
+			);
 		}
 
-		Query q = pm.newNamedQuery(ProductType.class, "getChildProductTypes_hasParent");
-		String languageID = NLLocale.getDefault().getLanguage();
-		if (logger.isDebugEnabled())
-			logger.debug("getChildProductTypes: languageID=" + languageID);
+		// TODO DataNucleus WORKAROUND: Sorting in JDOQL causes objects to be skipped (not found) when they do not have a name!
+		// sort
+		long loadStart = System.currentTimeMillis();
+		result = new ArrayList<ProductType>(result);
+		long loadDuration = System.currentTimeMillis() - loadStart;
 
-		return CollectionUtil.castCollection(
-				(Collection<?>) q.execute(
-						parentProductTypeID.organisationID, parentProductTypeID.productTypeID, languageID
-				)
-		);
+		long sortStart = System.currentTimeMillis();
+		Collections.sort((List<ProductType>)result, new Comparator<ProductType>() {
+			@Override
+			public int compare(ProductType o1, ProductType o2) {
+				return o1.getName().getText(languageID).compareTo(o2.getName().getText(languageID));
+			}
+		});
+		if (logger.isDebugEnabled())
+			logger.debug("getChildProductTypes: Loading " + result.size() + " product types took " + loadDuration + " msec and sorting with languageID=" + languageID + " took " + (System.currentTimeMillis() - sortStart) + " msec.");
+
+		return result;
 	}
 
 	public static long getChildProductTypeCount(PersistenceManager pm, ProductTypeID parentProductTypeID)

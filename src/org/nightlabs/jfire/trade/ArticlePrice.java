@@ -83,42 +83,53 @@ import org.nightlabs.jfire.store.ProductType;
  * 		fields="packageArticlePrice, article, productType, product, packageProductType"
  */
 @PersistenceCapable(
-	identityType=IdentityType.APPLICATION,
-	detachable="true",
-	table="JFireTrade_ArticlePrice")
+		identityType=IdentityType.APPLICATION,
+		detachable="true",
+		table="JFireTrade_ArticlePrice"
+)
 @FetchGroups({
 	@FetchGroup(
-		name=ArticlePrice.FETCH_GROUP_PACKAGE_ARTICLE_PRICE,
-		members=@Persistent(name="packageArticlePrice")),
+			name=ArticlePrice.FETCH_GROUP_PACKAGE_ARTICLE_PRICE,
+			members=@Persistent(name="packageArticlePrice")
+	),
 	@FetchGroup(
-		name=ArticlePrice.FETCH_GROUP_NESTED_ARTICLE_PRICES,
-		members=@Persistent(name="nestedArticlePrices")),
+			name=ArticlePrice.FETCH_GROUP_NESTED_ARTICLE_PRICES,
+			members=@Persistent(name="nestedArticlePrices")
+	),
 	@FetchGroup(
-		name=ArticlePrice.FETCH_GROUP_NESTED_ARTICLE_PRICES_NO_LIMIT,
-		members=@Persistent(
-			name="nestedArticlePrices",
-			recursionDepth=-1)),
+			name=ArticlePrice.FETCH_GROUP_NESTED_ARTICLE_PRICES_NO_LIMIT,
+			members=@Persistent(
+					name="nestedArticlePrices",
+					recursionDepth=-1)
+	),
+//	@FetchGroup(
+//			name=ArticlePrice.FETCH_GROUP_ORIG_PRICE,
+//			members=@Persistent(name="origPrice")
+//	),
 	@FetchGroup(
-		name=ArticlePrice.FETCH_GROUP_ORIG_PRICE,
-		members=@Persistent(name="origPrice")),
+			name="ArticlePrice.productType",
+			members=@Persistent(name="productType")
+	),
 	@FetchGroup(
-		name="ArticlePrice.productType",
-		members=@Persistent(name="productType")),
+			name="ArticlePrice.packageProductType",
+			members=@Persistent(name="packageProductType")
+	),
 	@FetchGroup(
-		name="ArticlePrice.packageProductType",
-		members=@Persistent(name="packageProductType")),
+			name="ArticlePrice.product",
+			members=@Persistent(name="product")
+	),
 	@FetchGroup(
-		name="ArticlePrice.product",
-		members=@Persistent(name="product")),
+			name=ArticlePrice.FETCH_GROUP_ARTICLE,
+			members=@Persistent(name="article")
+	),
 	@FetchGroup(
-		name=ArticlePrice.FETCH_GROUP_ARTICLE,
-		members=@Persistent(name="article")),
+			name="Article.price",
+			members=@Persistent(name="article")
+	),
 	@FetchGroup(
-		name="Article.price",
-		members=@Persistent(name="article")),
-	@FetchGroup(
-		name="FetchGroupsTrade.articleCrossTradeReplication",
-		members={@Persistent(name="packageArticlePrice"), @Persistent(name="article"), @Persistent(name="productType"), @Persistent(name="product"), @Persistent(name="packageProductType")})
+			name="FetchGroupsTrade.articleCrossTradeReplication",
+			members={@Persistent(name="packageArticlePrice"), @Persistent(name="article"), @Persistent(name="productType"), @Persistent(name="product"), @Persistent(name="packageProductType")}
+	)
 })
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class ArticlePrice extends org.nightlabs.jfire.accounting.Price
@@ -128,19 +139,14 @@ public class ArticlePrice extends org.nightlabs.jfire.accounting.Price
 	public static final String FETCH_GROUP_PACKAGE_ARTICLE_PRICE = "ArticlePrice.packageArticlePrice";
 	public static final String FETCH_GROUP_NESTED_ARTICLE_PRICES = "ArticlePrice.nestedArticlePrices";
 	public static final String FETCH_GROUP_NESTED_ARTICLE_PRICES_NO_LIMIT = "ArticlePrice.nestedArticlePrices[-1]";
-	public static final String FETCH_GROUP_ORIG_PRICE = "ArticlePrice.origPrice";
+//	public static final String FETCH_GROUP_ORIG_PRICE = "ArticlePrice.origPrice";
 	public static final String FETCH_GROUP_ARTICLE = "ArticlePrice.article";
-//	/**
-//	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon!
-//	 */
-//	@Deprecated
-//	public static final String FETCH_GROUP_THIS_ARTICLE_PRICE = "ArticlePrice.this";
 
-	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 */
-	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
-	private org.nightlabs.jfire.accounting.Price origPrice;
+//	/**
+//	 * @jdo.field persistence-modifier="persistent"
+//	 */
+//	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+//	private org.nightlabs.jfire.accounting.Price origPrice;
 
 	/**
 	 * key: String productTypePK<br/>
@@ -259,9 +265,8 @@ public class ArticlePrice extends org.nightlabs.jfire.accounting.Price
 	 * @param article The <tt>Article</tt> for which this <tt>ArticlePrice</tt> is
 	 *		created. Note: <tt>Article.articlePrice</tt> points always to the root <tt>ArticlePrice</tt>
 	 *		and might therefore point to another instance of <tt>ArticlePrice</tt>.
-	 * @param origPrice The original price from which to copy all data. If
-	 *		<tt>origPrice.priceID >= 0</tt>, the origPrice will be stored as reference
-	 *		within the new <tt>ArticlePrice</tt>.
+	 * @param origPrice The original price from which to copy all data. This origPrice will <b>not</b> be stored as reference
+	 *		within the new <tt>ArticlePrice</tt> anymore (changed on 2009-05-20).
 	 * @param organisationID The organisationID of the <tt>IPriceConfig</tt> which
 	 *		provides the <tt>priceID</tt>. This must be equal to <tt>Accounting.organisationID</tt>,
 	 *		because <tt>Article</tt>s cannot be created in a foreign datastore.
@@ -348,8 +353,8 @@ public class ArticlePrice extends org.nightlabs.jfire.accounting.Price
 		else
 			nestKey = productType.getPrimaryKey();
 
-		if (origPrice.getPriceID() >= 0)
-			this.origPrice = origPrice;
+//		if (origPrice.getPriceID() >= 0)
+//			this.origPrice = origPrice;
 
 		this.virtualInner = virtualInner;
 
@@ -591,28 +596,11 @@ public class ArticlePrice extends org.nightlabs.jfire.accounting.Price
 		return innerProductTypeQuantity;
 	}
 //	/**
-//	 * @return Returns the nestedProductTypeLocal.
+//	 * @return Returns the origPrice.
 //	 */
-//	public NestedProductTypeLocal getNestedProductType()
+//	public org.nightlabs.jfire.accounting.Price getOrigPrice()
 //	{
-//		return nestedProductTypeLocal;
-//	}
-	/**
-	 * @return Returns the origPrice.
-	 */
-	public org.nightlabs.jfire.accounting.Price getOrigPrice()
-	{
-		return origPrice;
-	}
-//	/**
-//	 * <b>Warning!</b> You should never call this method! It is called during replication to a reseller-organisation.
-//	 * <p>
-//	 * This method sets the <code>origPrice</code> to <code>null</code>.
-//	 * </p>
-//	 */
-//	public void __clearOrigPrice()
-//	{
-//		this.origPrice = null;
+//		return origPrice;
 //	}
 	/**
 	 * @return Returns the product.

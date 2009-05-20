@@ -39,6 +39,21 @@ import java.util.Set;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.Queries;
+import javax.jdo.annotations.Version;
+import javax.jdo.annotations.VersionStrategy;
 import javax.jdo.listener.DetachCallback;
 
 import org.nightlabs.jdo.ObjectIDUtil;
@@ -49,6 +64,10 @@ import org.nightlabs.jfire.jbpm.graph.def.ActionHandlerNodeEnter;
 import org.nightlabs.jfire.jbpm.graph.def.Statable;
 import org.nightlabs.jfire.jbpm.graph.def.StatableLocal;
 import org.nightlabs.jfire.jbpm.graph.def.State;
+import org.nightlabs.jfire.organisation.Organisation;
+import org.nightlabs.jfire.prop.PropertySet;
+import org.nightlabs.jfire.prop.Struct;
+import org.nightlabs.jfire.prop.StructLocal;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.ArticleContainer;
@@ -60,22 +79,6 @@ import org.nightlabs.jfire.transfer.Transfer;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 import org.nightlabs.util.CollectionUtil;
 import org.nightlabs.util.Util;
-
-import javax.jdo.annotations.Join;
-import javax.jdo.annotations.FetchGroups;
-import javax.jdo.annotations.NullValue;
-import javax.jdo.annotations.Inheritance;
-import javax.jdo.annotations.PrimaryKey;
-import javax.jdo.annotations.FetchGroup;
-import javax.jdo.annotations.VersionStrategy;
-import javax.jdo.annotations.Version;
-import javax.jdo.annotations.PersistenceModifier;
-import javax.jdo.annotations.Persistent;
-import javax.jdo.annotations.InheritanceStrategy;
-import javax.jdo.annotations.Queries;
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.Column;
-import javax.jdo.annotations.IdentityType;
 
 /**
  * @author Alexander Bieber <!-- alex at nightlabs dot de -->
@@ -205,7 +208,10 @@ import javax.jdo.annotations.IdentityType;
 		members=@Persistent(name="state")),
 	@FetchGroup(
 		name="Statable.states",
-		members=@Persistent(name="states"))
+		members=@Persistent(name="states")),
+	@FetchGroup(
+		name="ArticleContainer.propertySet",
+		members=@Persistent(name="propertySet"))
 })
 @Queries({
 	@javax.jdo.annotations.Query(
@@ -295,6 +301,7 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	@PrimaryKey
 	@Column(length=100)
 	private String organisationID;
+
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="50"
@@ -302,6 +309,7 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	@PrimaryKey
 	@Column(length=50)
 	private String invoiceIDPrefix;
+
 	/**
 	 * @jdo.field primary-key="true"
 	 */
@@ -357,6 +365,13 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 //				accountingPriceConfig.createPriceID(), currency);
 
 		articles = new HashSet<Article>();
+
+		String structScope = Struct.DEFAULT_SCOPE;
+		String structLocalScope = StructLocal.DEFAULT_SCOPE;
+		this.propertySet = new PropertySet(
+				organisationID, IDGenerator.nextID(PropertySet.class),
+				Organisation.DEV_ORGANISATION_ID,
+				Invoice.class.getName(), structScope, structLocalScope);
 	}
 
 	/**
@@ -451,23 +466,6 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private List<State> states;
 
-//	/**
-//	 * key: String articlePK (organisationID/articleID)<br/>
-//	 * value: Article article
-//	 *
-//	 * @jdo.field
-//	 *		persistence-modifier="persistent"
-//	 *		collection-type="map"
-//	 *		key-type="java.lang.String"
-//	 *		value-type="org.nightlabs.jfire.trade.Article"
-//	 *		mapped-by="invoice"
-//	 *
-//	 * @jdo.key mapped-by="primaryKey"
-//	 *
-//	 * @!jdo.map-vendor-extension vendor-name="jpox" key="key-field" value="primaryKey"
-//	 */
-//	private Map articles = new HashMap();
-
 	/**
 	 * @jdo.field
 	 *		persistence-modifier="persistent"
@@ -475,7 +473,7 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	 *		element-type="org.nightlabs.jfire.trade.Article"
 	 *		mapped-by="invoice"
 	 */
-@Persistent(
+	@Persistent(
 	mappedBy="invoice",
 	persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Set<Article> articles;
@@ -487,16 +485,81 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	private int articleCount = 0;
 
 	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+	private Discount discount;
+
+	/**
+	 * Creation date of this Invoice.
+	 *
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+	private Date createDT;
+
+	/**
+	 * The user who created this Invoice.
+	 *
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+	private User createUser = null;
+
+	/**
+	 * This member represents the sum of all prices of all invoice items.
+	 *
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+	private Price price;
+
+	/**
+	 * An Invoice is only valid after {@link #validate()} has been called.
+	 *
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+	private boolean valid = false;
+
+	/**
+	 * This member stores the user who finilized this Invoice.
+	 *
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+	private User finalizeUser = null;
+
+	/**
+	 * This member stores when this <tt>Invoice</tt> was finalized.
+	 *
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+	private Date finalizeDT  = null;
+
+	/**
+	 * Represents the currency of all offerItems within this invoice.
+	 * An Invoice can only contain offerItems with the same currency.
+	 */
+	private Currency currency;
+
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+	private PropertySet propertySet;
+
+	/**
 	 * @return the same as {@link #getStatableLocal()}
 	 */
 	public InvoiceLocal getInvoiceLocal()
 	{
 		return invoiceLocal;
 	}
+
 	public StatableLocal getStatableLocal()
 	{
 		return invoiceLocal;
 	}
+
 	protected void setInvoiceLocal(InvoiceLocal invoiceLocal)
 	{
 		this.invoiceLocal = invoiceLocal;
@@ -600,44 +663,6 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	}
 
 	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 */
-	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
-	private Discount discount;
-
-	/**
-	 * Creation date of this Invoice.
-	 *
-	 * @jdo.field persistence-modifier="persistent"
-	 */
-	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
-	private Date createDT;
-
-	/**
-	 * The user who created this Invoice.
-	 *
-	 * @jdo.field persistence-modifier="persistent"
-	 */
-	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
-	private User createUser = null;
-
-	/**
-	 * This member represents the sum of all prices of all invoice items.
-	 *
-	 * @jdo.field persistence-modifier="persistent"
-	 */
-	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
-	private Price price;
-
-	/**
-	 * An Invoice is only valid after {@link #validate()} has been called.
-	 *
-	 * @jdo.field persistence-modifier="persistent"
-	 */
-	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
-	private boolean valid = false;
-
-	/**
 	 * This method calculates the price and does some checks. Before the <tt>Invoice</tt>
 	 * can be finalized, it must be validated. If it is already valid, it returns without any action.
 	 * <p>
@@ -663,28 +688,6 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 			price.sumPrice(article.getPrice());
 		}
 	}
-
-	/**
-	 * This member stores the user who finilized this Invoice.
-	 *
-	 * @jdo.field persistence-modifier="persistent"
-	 */
-	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
-	private User finalizeUser = null;
-
-	/**
-	 * This member stores when this <tt>Invoice</tt> was finalized.
-	 *
-	 * @jdo.field persistence-modifier="persistent"
-	 */
-	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
-	private Date finalizeDT  = null;
-
-	/**
-	 * Represents the currency of all offerItems within this invoice.
-	 * An Invoice can only contain offerItems with the same currency.
-	 */
-	private Currency currency;
 
 	public static String getPrimaryKey(String organisationID, String invoiceIDPrefix, long invoiceID)
 	{
@@ -830,18 +833,23 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	public String getOrganisationID() {
 		return organisationID;
 	}
+
 	public Price getPrice() {
 		return price;
 	}
+
 	public LegalEntity getVendor() {
 		return vendor;
 	}
+
 //	protected void setCurrency(Currency currency) {
 //		this.currency = currency;
 //	}
+
 	public Currency getCurrency() {
 		return currency;
 	}
+
 	/**
 	 * @return Returns the valid.
 	 */
@@ -870,15 +878,19 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	public boolean isFinalized() {
 		return finalizeDT != null;
 	}
+
 	public User getFinalizeUser() {
 		return finalizeUser;
 	}
+
 	public Date getFinalizeDT() {
 		return finalizeDT;
 	}
+
 	public Discount getDiscount() {
 		return discount;
 	}
+
 	public void setDiscount(Discount discount) {
 		this.discount = discount;
 	}
@@ -894,6 +906,7 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	public void jdoPreDetach()
 	{
 	}
+
 	public void jdoPostDetach(Object _attached)
 	{
 		Invoice attached = (Invoice)_attached;
@@ -989,5 +1002,10 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	 */
 	public int getArticleCount() {
 		return articleCount;
+	}
+
+	@Override
+	public PropertySet getPropertySet() {
+		return propertySet;
 	}
 }

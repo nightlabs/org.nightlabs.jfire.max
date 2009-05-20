@@ -97,6 +97,7 @@ import org.nightlabs.jfire.accounting.pay.id.PaymentID;
 import org.nightlabs.jfire.accounting.priceconfig.AffectedProductType;
 import org.nightlabs.jfire.accounting.priceconfig.PriceConfigUtil;
 import org.nightlabs.jfire.accounting.priceconfig.id.PriceConfigID;
+import org.nightlabs.jfire.accounting.prop.InvoiceStruct;
 import org.nightlabs.jfire.accounting.query.MoneyTransferIDQuery;
 import org.nightlabs.jfire.accounting.query.MoneyTransferQuery;
 import org.nightlabs.jfire.accounting.tariffuserset.ResellerTariffUserSetFactory;
@@ -206,6 +207,9 @@ implements AccountingManagerRemote, AccountingManagerLocal
 				currency = new Currency(CurrencyConstants.CHF.currencyID, "CHF", 2);
 				pm.makePersistent(currency);
 			}
+
+			// Initalise standard property set structures for articleContainers
+			InvoiceStruct.getInvoiceStructLocal(pm);
 
 			pm.makePersistent(
 					new ResellerTariffUserSetFactory(Organisation.DEV_ORGANISATION_ID, ResellerTariffUserSetFactory.class.getName(), Tariff.class)

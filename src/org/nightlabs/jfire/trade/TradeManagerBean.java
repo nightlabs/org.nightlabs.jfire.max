@@ -114,6 +114,8 @@ import org.nightlabs.jfire.trade.id.OrderID;
 import org.nightlabs.jfire.trade.id.SegmentTypeID;
 import org.nightlabs.jfire.trade.jbpm.JbpmConstantsOffer;
 import org.nightlabs.jfire.trade.jbpm.ProcessDefinitionAssignment;
+import org.nightlabs.jfire.trade.prop.OfferStruct;
+import org.nightlabs.jfire.trade.prop.OrderStruct;
 import org.nightlabs.jfire.trade.query.AbstractArticleContainerQuery;
 import org.nightlabs.jfire.trade.recurring.RecurredOffer;
 import org.nightlabs.jfire.trade.recurring.RecurringOffer;
@@ -1162,6 +1164,10 @@ implements TradeManagerRemote, TradeManagerLocal
 			moduleMetaData = new ModuleMetaData(
 					JFireTradeEAR.MODULE_NAME, "0.9.7.0.beta", "0.9.7.0.beta");
 			pm.makePersistent(moduleMetaData);
+
+			// Initalise standard property set structures for articleContainers
+			OfferStruct.getOfferStructLocal(pm);
+			OrderStruct.getOrderStructLocal(pm);
 
 			ConfigSetup userConfigSetup = ConfigSetup.getConfigSetup(
 					pm,

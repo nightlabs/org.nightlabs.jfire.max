@@ -66,6 +66,10 @@ import org.nightlabs.jfire.jbpm.graph.def.ActionHandlerNodeEnter;
 import org.nightlabs.jfire.jbpm.graph.def.Statable;
 import org.nightlabs.jfire.jbpm.graph.def.StatableLocal;
 import org.nightlabs.jfire.jbpm.graph.def.State;
+import org.nightlabs.jfire.organisation.Organisation;
+import org.nightlabs.jfire.prop.PropertySet;
+import org.nightlabs.jfire.prop.Struct;
+import org.nightlabs.jfire.prop.StructLocal;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.trade.id.OfferID;
@@ -156,7 +160,10 @@ import org.nightlabs.util.Util;
 		members=@Persistent(name="states")),
 	@FetchGroup(
 		name="FetchGroupsTrade.articleContainerInEditor",
-		members={@Persistent(name="offerLocal"), @Persistent(name="segments"), @Persistent(name="createUser"), @Persistent(name="currency"), @Persistent(name="finalizeUser"), @Persistent(name="order"), @Persistent(name="price"), @Persistent(name="state"), @Persistent(name="states")})
+		members={@Persistent(name="offerLocal"), @Persistent(name="segments"), @Persistent(name="createUser"), @Persistent(name="currency"), @Persistent(name="finalizeUser"), @Persistent(name="order"), @Persistent(name="price"), @Persistent(name="state"), @Persistent(name="states")}),
+	@FetchGroup(
+		name="ArticleContainer.propertySet",
+		members=@Persistent(name="propertySet"))
 })
 @Queries(
 	@javax.jdo.annotations.Query(
@@ -307,22 +314,6 @@ implements
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private User finalizeUser = null;
 
-//	/**
-//	 * key: String articlePK<br/>
-//	 * value: Article article
-//	 *
-//	 * @jdo.field
-//	 *		persistence-modifier="persistent"
-//	 *		collection-type="map"
-//	 *		key-type="String"
-//	 *		value-type="Article"
-//	 *		dependent-value="true"
-//	 *		mapped-by="offer"
-//	 *
-//	 * @jdo.key mapped-by="primaryKey"
-//	 */
-//	private Map articles;
-
 	/**
 	 * Instances of {@link Article}.
 	 *
@@ -359,16 +350,19 @@ implements
 	 */
 	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private LegalEntity vendor = null;
+
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
 	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private boolean vendor_detached = false;
+
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
 	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private LegalEntity customer = null;
+
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
@@ -380,6 +374,7 @@ implements
 	 */
 	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private LegalEntity endCustomer = null;
+
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
@@ -391,6 +386,7 @@ implements
 	 */
 	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private AnchorID vendorID = null;
+
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
@@ -402,6 +398,7 @@ implements
 	 */
 	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private AnchorID customerID = null;
+
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
@@ -413,6 +410,7 @@ implements
 	 */
 	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private AnchorID endCustomerID = null;
+
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
@@ -466,6 +464,9 @@ implements
 
 	private boolean expiryTimestampFinalizedAutoManaged = true;
 
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+	private PropertySet propertySet;
+
 	/**
 	 * @deprecated This constructor exists only for JDO!
 	 */
@@ -511,6 +512,13 @@ implements
 //				accountingPriceConfig.createPriceID(), order.getCurrency());
 
 		articles = new HashSet<Article>();
+
+		String structScope = Struct.DEFAULT_SCOPE;
+		String structLocalScope = StructLocal.DEFAULT_SCOPE;
+		this.propertySet = new PropertySet(
+				organisationID, IDGenerator.nextID(PropertySet.class),
+				Organisation.DEV_ORGANISATION_ID,
+				Offer.class.getName(), structScope, structLocalScope);
 	}
 
 	/**
@@ -520,14 +528,17 @@ implements
 	{
 		return organisationID;
 	}
+
 	public String getOfferIDPrefix()
 	{
 		return offerIDPrefix;
 	}
+
 	public String getArticleContainerIDPrefix()
 	{
 		return getOfferIDPrefix();
 	}
+
 	/**
 	 * @return Returns the offerID.
 	 */
@@ -535,6 +546,7 @@ implements
 	{
 		return offerID;
 	}
+
 	public long getArticleContainerID()
 	{
 		return getOfferID();
@@ -544,6 +556,7 @@ implements
 	{
 		return ObjectIDUtil.longObjectIDFieldToString(offerID);
 	}
+
 	public String getArticleContainerIDAsString()
 	{
 		return getOfferIDAsString();
@@ -566,10 +579,12 @@ implements
 	{
 		return offerLocal;
 	}
+
 	public StatableLocal getStatableLocal()
 	{
 		return offerLocal;
 	}
+
 	protected void setOfferLocal(OfferLocal offerLocal)
 	{
 		this.offerLocal = offerLocal;
@@ -729,10 +744,6 @@ implements
 			} // if (all || offerItem.isPriceDependentOnOffer()) {
 			price.sumPrice(article.getPrice());
 		}
-//		// TODO WORKAROUND DataNucleus Begin
-//		pm.refresh(price);
-//		pm.flush();
-//		// TODO WORKAROUND DataNucleus End
 	}
 
 	/**
@@ -772,6 +783,7 @@ implements
 
 		return vendorID;
 	}
+
 	/**
 	 * Returns the customer {@link LegalEntity} of this Offer.
 	 * <p>
@@ -827,6 +839,7 @@ implements
 	{
 		return createDT;
 	}
+
 	/**
 	 * @return The {@link User} that created this {@link Offer}.
 	 */
@@ -965,6 +978,7 @@ implements
 	{
 		this.valid = valid;
 	}
+
 	/**
 	 * @return The date and time this {@link Offer} was finalized, or <code>null</code> if it was not finalized yet.
 	 */
@@ -972,6 +986,7 @@ implements
 	{
 		return finalizeDT;
 	}
+
 	/**
 	 * @return The {@link User} that finilized this {@link Offer}, or <code>null</code> if it was not finalized yet.
 	 */
@@ -1238,6 +1253,7 @@ implements
 	public Date getExpiryTimestampUnfinalized() {
 		return expiryTimestampUnfinalized;
 	}
+
 	/**
 	 * Set the timestamp after which this <code>Offer</code> will expire, if it has not yet been finalized.
 	 * @param expiryTimestampUnfinalized the timestamp or <code>null</code>.
@@ -1259,9 +1275,11 @@ implements
 	public boolean isExpiryTimestampUnfinalizedAutoManaged() {
 		return expiryTimestampUnfinalizedAutoManaged;
 	}
+
 	public void setExpiryTimestampUnfinalizedAutoManaged(boolean expiryTimestampUnfinalizedAutoManaged) {
 		this.expiryTimestampUnfinalizedAutoManaged = expiryTimestampUnfinalizedAutoManaged;
 	}
+
 	/**
 	 * Is the property {@link #getExpiryTimestampFinalized()} managed automatically? If yes,
 	 * the timestamp is updated when the <code>Offer</code> is finalized.
@@ -1274,10 +1292,16 @@ implements
 	public boolean isExpiryTimestampFinalizedAutoManaged() {
 		return expiryTimestampFinalizedAutoManaged;
 	}
+
 	public void setExpiryTimestampFinalizedAutoManaged(boolean expiryTimestampFinalizedAutoManaged) {
 		if (isFinalized())
 			throw new IllegalStateException("This offer is already finalized! Cannot set expiryTimestampFinalizedAutoManaged! " + this);
 
 		this.expiryTimestampFinalizedAutoManaged = expiryTimestampFinalizedAutoManaged;
+	}
+
+	@Override
+	public PropertySet getPropertySet() {
+		return propertySet;
 	}
 }

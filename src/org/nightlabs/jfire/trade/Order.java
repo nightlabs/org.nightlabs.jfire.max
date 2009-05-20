@@ -60,6 +60,11 @@ import javax.jdo.listener.DetachCallback;
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.id.CurrencyID;
+import org.nightlabs.jfire.idgenerator.IDGenerator;
+import org.nightlabs.jfire.organisation.Organisation;
+import org.nightlabs.jfire.prop.PropertySet;
+import org.nightlabs.jfire.prop.Struct;
+import org.nightlabs.jfire.prop.StructLocal;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.security.id.UserID;
 import org.nightlabs.jfire.trade.id.OrderID;
@@ -204,7 +209,10 @@ import org.nightlabs.util.Util;
 		members=@Persistent(name="endCustomer")),
 	@FetchGroup(
 		name="FetchGroupsTrade.articleContainerInEditor",
-		members={@Persistent(name="vendor"), @Persistent(name="currency"), @Persistent(name="customer"), @Persistent(name="endCustomer"), @Persistent(name="customerGroup"), @Persistent(name="segments"), @Persistent(name="offers"), @Persistent(name="createUser"), @Persistent(name="changeUser")})
+		members={@Persistent(name="vendor"), @Persistent(name="currency"), @Persistent(name="customer"), @Persistent(name="endCustomer"), @Persistent(name="customerGroup"), @Persistent(name="segments"), @Persistent(name="offers"), @Persistent(name="createUser"), @Persistent(name="changeUser")}),
+	@FetchGroup(
+		name="ArticleContainer.propertySet",
+		members=@Persistent(name="propertySet"))
 })
 @Queries({
 	@javax.jdo.annotations.Query(
@@ -463,6 +471,7 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 	@PrimaryKey
 	@Column(length=100)
 	private String organisationID;
+
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="50"
@@ -470,6 +479,7 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 	@PrimaryKey
 	@Column(length=50)
 	private String orderIDPrefix;
+
 	/**
 	 * @jdo.field primary-key="true"
 	 */
@@ -521,26 +531,6 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private boolean quickSaleWorkOrder;
 
-//	/**
-//	 * key: String articlePK<br/>
-//	 * value: Article article
-//	 * <br/><br/>
-//	 *
-//	 * @jdo.field
-//	 *		persistence-modifier="persistent"
-//	 *		collection-type="map"
-//	 *		key-type="java.lang.String"
-//	 *		value-type="Article"
-//	 *		mapped-by="order"
-//	 *		dependent-value="true"
-//	 *
-//	 * @jdo.key mapped-by="primaryKey"
-//	 *
-//	 * @!jdo.join
-//	 * @!jdo.map-vendor-extension vendor-name="jpox" key="key-field" value="primaryKey"
-//	 */
-//	private Map articles = new HashMap();
-
 	/**
 	 * @jdo.field
 	 *		persistence-modifier="persistent"
@@ -556,24 +546,6 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 	@Element(dependent="true")
 	private Set<Article> articles;
 
-//	/**
-//	 * key: String offerPK<br/>
-//	 * value: Offer offer
-//	 * <br/><br/>
-//	 *
-//	 * @jdo.field
-//	 *		persistence-modifier="persistent"
-//	 *		collection-type="map"
-//	 *		key-type="java.lang.String"
-//	 *		value-type="Offer"
-//	 *		mapped-by="order"
-//	 *
-//	 * @jdo.key mapped-by="primaryKey"
-//	 *
-//	 * @!jdo.map-vendor-extension vendor-name="jpox" key="key-field" value="primaryKey"
-//	 */
-//	private Map offers = new HashMap();
-
 	/**
 	 * @jdo.field
 	 *		persistence-modifier="persistent"
@@ -587,24 +559,6 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 	)
 	private Set<Offer> offers;
 
-//	/**
-//	 * key: String segmentPK<br/>
-//	 * value: Segment segment
-//	 * <br/><br/>
-//	 *
-//	 * @jdo.field
-//	 *		persistence-modifier="persistent"
-//	 *		collection-type="map"
-//	 *		key-type="java.lang.String"
-//	 *		value-type="Segment"
-//	 *		mapped-by="order"
-//	 *
-//	 * @jdo.key mapped-by="primaryKey"
-//	 *
-//	 * @!jdo.map-vendor-extension vendor-name="jpox" key="key-field" value="primaryKey"
-//	 */
-//	private Map segments = new HashMap();
-
 	/**
 	 * @jdo.field
 	 *		persistence-modifier="persistent"
@@ -612,7 +566,7 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 	 *		element-type="Segment"
 	 *		mapped-by="order"
 	 */
-@Persistent(
+	@Persistent(
 	mappedBy="order",
 	persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Set<Segment> segments;
@@ -646,6 +600,7 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 	 */
 	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private AnchorID vendorID = null;
+
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
@@ -681,6 +636,9 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 	 */
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private int articleCount = 0;
+
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+	private PropertySet propertySet;
 
 	/**
 	 * @deprecated Only for JDO!
@@ -723,6 +681,13 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 		articles = new HashSet<Article>();
 		offers = new HashSet<Offer>();
 		segments = new HashSet<Segment>();
+
+		String structScope = Struct.DEFAULT_SCOPE;
+		String structLocalScope = StructLocal.DEFAULT_SCOPE;
+		this.propertySet = new PropertySet(
+				organisationID, IDGenerator.nextID(PropertySet.class),
+				Organisation.DEV_ORGANISATION_ID,
+				Order.class.getName(), structScope, structLocalScope);
 	}
 
 	/**
@@ -732,14 +697,17 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 	{
 		return organisationID;
 	}
+
 	public String getOrderIDPrefix()
 	{
 		return orderIDPrefix;
 	}
+
 	public String getArticleContainerIDPrefix()
 	{
 		return getOrderIDPrefix();
 	}
+
 	/**
 	 * @return Returns the orderID.
 	 */
@@ -747,14 +715,17 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 	{
 		return orderID;
 	}
+
 	public long getArticleContainerID()
 	{
 		return getOrderID();
 	}
+
 	public String getOrderIDAsString()
 	{
 		return ObjectIDUtil.longObjectIDFieldToString(orderID);
 	}
+
 	public String getArticleContainerIDAsString()
 	{
 		return getOrderIDAsString();
@@ -764,6 +735,7 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 	{
 		return organisationID +'/' + orderIDPrefix + '/' + ObjectIDUtil.longObjectIDFieldToString(orderID);
 	}
+
 	public String getPrimaryKey()
 	{
 		return organisationID + '/' + orderIDPrefix + '/' + ObjectIDUtil.longObjectIDFieldToString(orderID);
@@ -776,6 +748,7 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 	{
 		return currency;
 	}
+
 	/**
 	 * @return Returns the vendor.
 	 */
@@ -784,6 +757,7 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 	{
 		return vendor;
 	}
+
 	/**
 	 * @return Returns the customer.
 	 */
@@ -844,6 +818,7 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 		this.customerID = null;
 		this.customerID_detached = false;
 	}
+
 	/**
 	 * After the first <tt>Offer</tt> has been finalized, the <tt>Order</tt>'s <tt>customer</tt>
 	 * and <tt>customerGroup</tt> cannot be changed anymore.
@@ -855,6 +830,7 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 	{
 		return customerChangeable;
 	}
+
 	/**
 	 * @return Returns the customerGroup.
 	 */
@@ -862,6 +838,7 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 	{
 		return customerGroup;
 	}
+
 	/**
 	 * @param customerGroup The customerGroup to set.
 	 */
@@ -872,6 +849,7 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 
 		this.customerGroup = customerGroup;
 	}
+
 	/**
 	 * @return Returns the changeDT.
 	 */
@@ -879,6 +857,7 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 	{
 		return changeDT;
 	}
+
 	/**
 	 * @return Returns the changeUser.
 	 */
@@ -966,7 +945,6 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 	 *
 	 * @see ArticleContainer#addArticle(Article)
 	 */
-	@SuppressWarnings("unchecked")
 	public void addArticle(Article article)
 	{
 		articles.add(article);
@@ -991,6 +969,7 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 	{
 		return quickSaleWorkOrder;
 	}
+
 	public void setQuickSaleWorkOrder(boolean quickSaleWorkOrder)
 	{
 		this.quickSaleWorkOrder = quickSaleWorkOrder;
@@ -999,6 +978,7 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 	public void jdoPreDetach()
 	{
 	}
+
 	public void jdoPostDetach(Object _attached)
 	{
 		Order attached = (Order)_attached;
@@ -1058,5 +1038,10 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 	 */
 	public int getArticleCount() {
 		return articleCount;
+	}
+
+	@Override
+	public PropertySet getPropertySet() {
+		return propertySet;
 	}
 }

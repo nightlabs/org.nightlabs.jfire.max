@@ -112,6 +112,8 @@ import org.nightlabs.jfire.store.id.ProductTypePermissionFlagSetID;
 import org.nightlabs.jfire.store.id.ReceptionNoteID;
 import org.nightlabs.jfire.store.id.RepositoryTypeID;
 import org.nightlabs.jfire.store.id.UnitID;
+import org.nightlabs.jfire.store.prop.DeliveryNoteStruct;
+import org.nightlabs.jfire.store.prop.ReceptionNoteStruct;
 import org.nightlabs.jfire.store.query.ProductTransferQuery;
 import org.nightlabs.jfire.store.search.AbstractProductTypeQuery;
 import org.nightlabs.jfire.store.search.ProductTypeIDTreeNode;
@@ -191,6 +193,10 @@ implements StoreManagerRemote, StoreManagerLocal
 			SecurityChangeListenerProductTypePermission.register(pm);
 
 			DefaultLocalStorekeeperDelegate.getDefaultLocalStorekeeperDelegate(pm);
+
+			// Initalise standard property set structures for articleContainers
+			DeliveryNoteStruct.getDeliveryNoteStructLocal(pm);
+			ReceptionNoteStruct.getReceptionNoteStructLocal(pm);
 
 			// create & persist instances of RepositoryType
 			RepositoryType repositoryType;

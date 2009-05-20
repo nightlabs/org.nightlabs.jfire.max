@@ -26,10 +26,15 @@ import javax.jdo.listener.AttachCallback;
 import javax.jdo.listener.DetachCallback;
 
 import org.nightlabs.jdo.ObjectIDUtil;
+import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.jbpm.graph.def.ActionHandlerNodeEnter;
 import org.nightlabs.jfire.jbpm.graph.def.Statable;
 import org.nightlabs.jfire.jbpm.graph.def.StatableLocal;
 import org.nightlabs.jfire.jbpm.graph.def.State;
+import org.nightlabs.jfire.organisation.Organisation;
+import org.nightlabs.jfire.prop.PropertySet;
+import org.nightlabs.jfire.prop.Struct;
+import org.nightlabs.jfire.prop.StructLocal;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.id.ReceptionNoteID;
 import org.nightlabs.jfire.trade.Article;
@@ -94,7 +99,10 @@ import org.nightlabs.util.Util;
 		members=@Persistent(name="endCustomer")),
 	@FetchGroup(
 		name="ReceptionNote.articles",
-		members=@Persistent(name="articles"))
+		members=@Persistent(name="articles")),
+	@FetchGroup(
+		name="ArticleContainer.propertySet",
+		members=@Persistent(name="propertySet"))
 //	,
 //	@FetchGroup(
 //		fetchGroups={"default"},
@@ -118,8 +126,6 @@ implements
 	@Deprecated
 	public static final String FETCH_GROUP_THIS_RECEPTION_NOTE = "ReceptionNote.this";
 
-
-
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
@@ -127,6 +133,7 @@ implements
 	@PrimaryKey
 	@Column(length=100)
 	private String organisationID;
+
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="50"
@@ -134,6 +141,7 @@ implements
 	@PrimaryKey
 	@Column(length=50)
 	private String receptionNoteIDPrefix;
+
 	/**
 	 * @jdo.field primary-key="true"
 	 */
@@ -175,16 +183,19 @@ implements
 	 */
 	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private LegalEntity vendor = null;
+
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
 	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private boolean vendor_detached = false;
+
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
 	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private LegalEntity customer = null;
+
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
@@ -196,6 +207,7 @@ implements
 	 */
 	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private LegalEntity endCustomer = null;
+
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
@@ -207,6 +219,7 @@ implements
 	 */
 	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private AnchorID vendorID = null;
+
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
@@ -218,6 +231,7 @@ implements
 	 */
 	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private AnchorID customerID = null;
+
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
@@ -250,6 +264,9 @@ implements
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private int articleCount = 0;
 
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+	private PropertySet propertySet;
+
 	/**
 	 * @deprecated Only for JDO!
 	 */
@@ -267,36 +284,50 @@ implements
 
 		createDT = new Date();
 		articles = new HashSet<Article>();
+
+		String structScope = Struct.DEFAULT_SCOPE;
+		String structLocalScope = StructLocal.DEFAULT_SCOPE;
+		this.propertySet = new PropertySet(
+				organisationID, IDGenerator.nextID(PropertySet.class),
+				Organisation.DEV_ORGANISATION_ID,
+				ReceptionNote.class.getName(), structScope, structLocalScope);
 	}
 
 	public String getOrganisationID()
 	{
 		return organisationID;
 	}
+
 	public String getReceptionNoteIDPrefix()
 	{
 		return receptionNoteIDPrefix;
 	}
+
 	public String getArticleContainerIDPrefix()
 	{
 		return getReceptionNoteIDPrefix();
 	}
+
 	public long getReceptionNoteID()
 	{
 		return receptionNoteID;
 	}
+
 	public long getArticleContainerID()
 	{
 		return getReceptionNoteID();
 	}
+
 	public String getReceptionNoteIDAsString()
 	{
 		return ObjectIDUtil.longObjectIDFieldToString(receptionNoteID);
 	}
+
 	public String getArticleContainerIDAsString()
 	{
 		return getReceptionNoteIDAsString();
 	}
+
 	public DeliveryNote getDeliveryNote()
 	{
 		return deliveryNote;
@@ -418,15 +449,11 @@ implements
 	{
 		return receptionNoteLocal;
 	}
+
 	protected void setReceptionNoteLocal(ReceptionNoteLocal receptionNoteLocal)
 	{
 		this.receptionNoteLocal = receptionNoteLocal;
 	}
-
-//	/**
-//	 * @jdo.field persistence-modifier="none"
-//	 */
-//	private boolean attachable = true;
 
 	protected PersistenceManager getPersistenceManager()
 	{
@@ -476,14 +503,10 @@ implements
 			detached.endCustomerID = attached.getEndCustomerID();
 			detached.endCustomerID_detached = true;
 		}
-
-//		detached.attachable = true;
 	}
 
 	public void jdoPreAttach()
 	{
-//		if (!attachable)
-//			throw new IllegalStateException("This offer became non-attachable!");
 	}
 
 	public void jdoPostAttach(Object arg0)
@@ -569,4 +592,8 @@ implements
 		return this.getClass().getName() + '@' + Integer.toHexString(System.identityHashCode(this)) + '[' + organisationID + ',' + receptionNoteIDPrefix + ',' + ObjectIDUtil.longObjectIDFieldToString(receptionNoteID) + ']';
 	}
 
+	@Override
+	public PropertySet getPropertySet() {
+		return propertySet;
+	}
 }

@@ -30,6 +30,7 @@ import java.util.Collection;
 import java.util.Date;
 
 import org.nightlabs.jdo.ObjectIDUtil;
+import org.nightlabs.jfire.prop.PropertySet;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 
@@ -46,6 +47,8 @@ public interface ArticleContainer
 	static final String FETCH_GROUP_VENDOR_ID = "ArticleContainer.vendorID";
 	static final String FETCH_GROUP_CUSTOMER_ID = "ArticleContainer.customerID";
 	static final String FETCH_GROUP_END_CUSTOMER_ID = "ArticleContainer.endCustomerID";
+
+	static final String FETCH_GROUP_PROPERTY_SET = "ArticleContainer.propertySet";
 
 	AnchorID getCustomerID();
 	AnchorID getEndCustomerID();
@@ -119,4 +122,10 @@ public interface ArticleContainer
 	 * @return the number of the articles in this article container.
 	 */
 	int getArticleCount();
+
+	/**
+	 * Returns the {@link PropertySet} of this article container.
+	 * @return the {@link PropertySet} of this article container.
+	 */
+	PropertySet getPropertySet();
 }

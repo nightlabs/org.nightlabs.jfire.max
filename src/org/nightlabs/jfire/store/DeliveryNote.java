@@ -40,13 +40,33 @@ import java.util.Set;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.Queries;
+import javax.jdo.annotations.Version;
+import javax.jdo.annotations.VersionStrategy;
 import javax.jdo.listener.DetachCallback;
 
 import org.nightlabs.jdo.ObjectIDUtil;
+import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.jbpm.graph.def.ActionHandlerNodeEnter;
 import org.nightlabs.jfire.jbpm.graph.def.Statable;
 import org.nightlabs.jfire.jbpm.graph.def.StatableLocal;
 import org.nightlabs.jfire.jbpm.graph.def.State;
+import org.nightlabs.jfire.organisation.Organisation;
+import org.nightlabs.jfire.prop.PropertySet;
+import org.nightlabs.jfire.prop.Struct;
+import org.nightlabs.jfire.prop.StructLocal;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.deliver.DeliverProductTransfer;
 import org.nightlabs.jfire.store.deliver.Delivery;
@@ -63,22 +83,6 @@ import org.nightlabs.jfire.transfer.Transfer;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 import org.nightlabs.util.CollectionUtil;
 import org.nightlabs.util.Util;
-
-import javax.jdo.annotations.FetchGroups;
-import javax.jdo.annotations.Inheritance;
-import javax.jdo.annotations.PrimaryKey;
-import javax.jdo.annotations.FetchGroup;
-import javax.jdo.annotations.Version;
-import javax.jdo.annotations.PersistenceModifier;
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.Join;
-import javax.jdo.annotations.NullValue;
-import javax.jdo.annotations.VersionStrategy;
-import javax.jdo.annotations.Persistent;
-import javax.jdo.annotations.InheritanceStrategy;
-import javax.jdo.annotations.Queries;
-import javax.jdo.annotations.Column;
-import javax.jdo.annotations.IdentityType;
 
 /**
  * @author Alexander Bieber <!-- alex at nightlabs dot de -->
@@ -197,7 +201,10 @@ import javax.jdo.annotations.IdentityType;
 		members=@Persistent(name="state")),
 	@FetchGroup(
 		name="Statable.states",
-		members=@Persistent(name="states"))
+		members=@Persistent(name="states")),
+	@FetchGroup(
+		name="ArticleContainer.propertySet",
+		members=@Persistent(name="propertySet"))
 })
 @Queries({
 	@javax.jdo.annotations.Query(
@@ -331,6 +338,13 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 		articles = new HashSet<Article>();
 		states = new ArrayList<State>();
 		receptionNotes = new HashSet<ReceptionNote>();
+
+		String structScope = Struct.DEFAULT_SCOPE;
+		String structLocalScope = StructLocal.DEFAULT_SCOPE;
+		this.propertySet = new PropertySet(
+				organisationID, IDGenerator.nextID(PropertySet.class),
+				Organisation.DEV_ORGANISATION_ID,
+				DeliveryNote.class.getName(), structScope, structLocalScope);
 	}
 
 	/**
@@ -340,6 +354,7 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	@PrimaryKey
 	@Column(length=100)
 	private String organisationID;
+
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="50"
@@ -347,6 +362,7 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	@PrimaryKey
 	@Column(length=50)
 	private String deliveryNoteIDPrefix;
+
 	/**
 	 * @jdo.field primary-key="true"
 	 */
@@ -445,29 +461,10 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private List<State> states;
 
-//	/**
-//	 * key: String articlePK (organisationID/articleID)<br/>
-//	 * value: Article article
-//	 *
-//	 * @jdo.field
-//	 *		persistence-modifier="persistent"
-//	 *		collection-type="map"
-//	 *		key-type="java.lang.String"
-//	 *		value-type="org.nightlabs.jfire.trade.Article"
-//	 *		mapped-by="deliveryNote"
-//	 *
-//	 * @jdo.key mapped-by="primaryKey"
-//	 *
-//	 * @!jdo.join
-//	 *
-//	 * @!jdo.map-vendor-extension vendor-name="jpox" key="key-field" value="primaryKey"
-//	 */
-//	private Map articles = new HashMap();
-
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
-@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private int articleCount = 0;
 
 	/**
@@ -508,27 +505,78 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private User createUser = null;
 
+	/**
+	 * A DeliveryNote is only valid after {@link #validate()} has been called.
+	 *
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+	private boolean valid = false;
+
+	/**
+	 * This member stores the user who finilized this DeliveryNote.
+	 *
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+	private User finalizeUser = null;
+
+	/**
+	 * This member stores when this <tt>DeliveryNote</tt> was finalized.
+	 *
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+	private Date finalizeDT  = null;
+
+	/**
+	 * @jdo.field persistence-modifier="none"
+	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
+	private transient Set<ReceptionNote> _receptionNotes = null;
+
+	/**
+	 * @jdo.field persistence-modifier="none"
+	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
+	private transient List<State> _states = null;
+
+	/**
+	 * @jdo.field persistence-modifier="none"
+	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
+	private transient Set<Article> _articles = null;
+
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+	private PropertySet propertySet;
+
 	public String getOrganisationID() {
 		return organisationID;
 	}
+
 	public String getDeliveryNoteIDPrefix()
 	{
 		return deliveryNoteIDPrefix;
 	}
+
 	public String getArticleContainerIDPrefix()
 	{
 		return getDeliveryNoteIDPrefix();
 	}
+
 	public long getDeliveryNoteID() {
 		return deliveryNoteID;
 	}
+
 	public long getArticleContainerID()
 	{
 		return getDeliveryNoteID();
 	}
+
 	public String getDeliveryNoteIDAsString() {
 		return ObjectIDUtil.longObjectIDFieldToString(deliveryNoteID);
 	}
+
 	public String getArticleContainerIDAsString()
 	{
 		return getDeliveryNoteIDAsString();
@@ -538,6 +586,7 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	{
 		return organisationID + '/' + deliveryNoteIDPrefix + '/' + ObjectIDUtil.longObjectIDFieldToString(deliveryNoteID);
 	}
+
 	public String getPrimaryKey()
 	{
 		return primaryKey;
@@ -613,12 +662,6 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 		return endCustomerID;
 	}
 
-	/**
-	 * @jdo.field persistence-modifier="none"
-	 */
-	@Persistent(persistenceModifier=PersistenceModifier.NONE)
-	private transient Set<Article> _articles = null;
-
 	@Override
 	public Collection<Article> getArticles()
 	{
@@ -633,30 +676,6 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	{
 		return articleCount;
 	}
-
-	/**
-	 * A DeliveryNote is only valid after {@link #validate()} has been called.
-	 *
-	 * @jdo.field persistence-modifier="persistent"
-	 */
-	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
-	private boolean valid = false;
-
-	/**
-	 * This member stores the user who finilized this DeliveryNote.
-	 *
-	 * @jdo.field persistence-modifier="persistent"
-	 */
-	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
-	private User finalizeUser = null;
-
-	/**
-	 * This member stores when this <tt>DeliveryNote</tt> was finalized.
-	 *
-	 * @jdo.field persistence-modifier="persistent"
-	 */
-	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
-	private Date finalizeDT  = null;
 
 	/**
 	 * Adds an Article, if this DeliveryNote is not yet finalized,
@@ -778,6 +797,7 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 		this.finalizeUser = finalizer;
 		this.finalizeDT = new Date(System.currentTimeMillis());
 	}
+
 	/**
 	 * This member is set to true as soon as all desired
 	 * {@link Article}s were added to this delivery note. A finalized
@@ -786,9 +806,11 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	public boolean isFinalized() {
 		return finalizeDT != null;
 	}
+
 	public User getFinalizeUser() {
 		return finalizeUser;
 	}
+
 	public Date getFinalizeDT() {
 		return finalizeDT;
 	}
@@ -882,12 +904,6 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 		return state;
 	}
 
-	/**
-	 * @jdo.field persistence-modifier="none"
-	 */
-	@Persistent(persistenceModifier=PersistenceModifier.NONE)
-	private transient List<State> _states = null;
-
 	public List<State> getStates()
 	{
 		if (_states == null)
@@ -895,22 +911,6 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 
 		return _states;
 	}
-
-//	/**
-//	 * @jdo.field persistence-modifier="persistent"
-//	 */
-//	private int nextReceptionNoteID = 0;
-//
-//	public int createReceptionNoteID()
-//	{
-//		return nextReceptionNoteID++;
-//	}
-
-	/**
-	 * @jdo.field persistence-modifier="none"
-	 */
-@Persistent(persistenceModifier=PersistenceModifier.NONE)
-	private transient Set<ReceptionNote> _receptionNotes = null;
 
 	public Set<ReceptionNote> getReceptionNotes()
 	{
@@ -925,6 +925,7 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 //		if (!DeliveryNoteProductTransfer.BOOK_TYPE_DELIVER.equals(transfer.getBookType()))
 //			return;
 	}
+
 	public void bookDeliverProductTransfer(DeliverProductTransfer transfer, Set<Anchor> involvedAnchors, boolean rollback)
 	{
 		boolean vendorIsFrom = transfer.getAnchorType(vendor) == Transfer.ANCHORTYPE_FROM;
@@ -950,5 +951,10 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 			deliveryNoteLocal.decDeliveredArticleCount(articleCount);
 		else
 			deliveryNoteLocal.incDeliveredArticleCount(articleCount);
+	}
+
+	@Override
+	public PropertySet getPropertySet() {
+		return propertySet;
 	}
 }

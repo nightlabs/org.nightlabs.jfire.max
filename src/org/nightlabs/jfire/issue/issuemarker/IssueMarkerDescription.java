@@ -1,4 +1,4 @@
-package org.nightlabs.jfire.issue.issueMarker;
+package org.nightlabs.jfire.issue.issuemarker;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -59,7 +59,7 @@ public class IssueMarkerDescription extends I18nText {
 
 	public IssueMarkerDescription(IssueMarker issueMarker) {
 		this.organisationID = issueMarker.getOrganisationID();
-		this.issueMarkerID = issueMarker.getID();
+		this.issueMarkerID = issueMarker.getIssueMarkerID();
 		this.issueMarker = issueMarker;
 		descriptions = new HashMap<String, String>();
 	}

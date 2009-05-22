@@ -1,4 +1,4 @@
-package org.nightlabs.jfire.issue.issueMarker;
+package org.nightlabs.jfire.issue.issuemarker;
 
 import java.util.Collection;
 import java.util.Set;

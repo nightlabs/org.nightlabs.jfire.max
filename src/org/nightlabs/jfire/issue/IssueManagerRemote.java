@@ -25,7 +25,7 @@ import org.nightlabs.jfire.issue.id.IssuePriorityID;
 import org.nightlabs.jfire.issue.id.IssueResolutionID;
 import org.nightlabs.jfire.issue.id.IssueSeverityTypeID;
 import org.nightlabs.jfire.issue.id.IssueTypeID;
-import org.nightlabs.jfire.issue.issueMarker.IssueMarker;
+import org.nightlabs.jfire.issue.issuemarker.IssueMarker;
 import org.nightlabs.jfire.issue.project.Project;
 import org.nightlabs.jfire.issue.project.ProjectType;
 import org.nightlabs.jfire.issue.project.id.ProjectID;

@@ -16,7 +16,7 @@ import org.nightlabs.jdo.ObjectID;
 
 
 /**
- * The JDO object id class for {@link org.nightlabs.jfire.issue.issueMarker.IssueMarker}.
+ * The JDO object id class for {@link org.nightlabs.jfire.issue.issuemarker.IssueMarker}.
  * <p>This class was auto-generated.</p>
  */
 @Generated("org.nightlabs.eclipse.sdk.jdo.ObjectIdGenerator")
@@ -79,14 +79,14 @@ implements Serializable, ObjectID
 
 	/**
 	 * Primary key field issueMarkerID.
-	 * Declared as primary key field in {@link org.nightlabs.jfire.issue.issueMarker.IssueMarker}.
+	 * Declared as primary key field in {@link org.nightlabs.jfire.issue.issuemarker.IssueMarker}.
 	 */
 	@Generated("org.nightlabs.eclipse.sdk.jdo.ObjectIdGenerator")
 	public long issueMarkerID;
 
 	/**
 	 * Primary key field organisationID.
-	 * Declared as primary key field in {@link org.nightlabs.jfire.issue.issueMarker.IssueMarker}.
+	 * Declared as primary key field in {@link org.nightlabs.jfire.issue.issuemarker.IssueMarker}.
 	 */
 	@Generated("org.nightlabs.eclipse.sdk.jdo.ObjectIdGenerator")
 	public java.lang.String organisationID;

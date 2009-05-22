@@ -1,4 +1,4 @@
-package org.nightlabs.jfire.issue.issueMarker;
+package org.nightlabs.jfire.issue.issuemarker;
 
 import java.io.Serializable;
 
@@ -122,7 +122,7 @@ public class IssueMarker implements Serializable {
 	/**
 	 * @return the ID of this IssueMarker.
 	 */
-	public long getID()                            { return issueMarkerID; }
+	public long getIssueMarkerID()                 { return issueMarkerID; }
 
 	/**
 	 * @return the name of the IssueMarker.

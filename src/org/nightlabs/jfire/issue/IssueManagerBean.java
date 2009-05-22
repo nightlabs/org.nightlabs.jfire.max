@@ -1,5 +1,8 @@
 package org.nightlabs.jfire.issue;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -53,7 +56,7 @@ import org.nightlabs.jfire.issue.id.IssuePriorityID;
 import org.nightlabs.jfire.issue.id.IssueResolutionID;
 import org.nightlabs.jfire.issue.id.IssueSeverityTypeID;
 import org.nightlabs.jfire.issue.id.IssueTypeID;
-import org.nightlabs.jfire.issue.issueMarker.IssueMarker;
+import org.nightlabs.jfire.issue.issuemarker.IssueMarker;
 import org.nightlabs.jfire.issue.jbpm.JbpmConstants;
 import org.nightlabs.jfire.issue.project.Project;
 import org.nightlabs.jfire.issue.project.ProjectType;
@@ -61,6 +64,7 @@ import org.nightlabs.jfire.issue.project.id.ProjectID;
 import org.nightlabs.jfire.issue.project.id.ProjectTypeID;
 import org.nightlabs.jfire.issue.prop.IssueStruct;
 import org.nightlabs.jfire.issue.query.IssueQuery;
+import org.nightlabs.jfire.issue.resource.Messages;
 import org.nightlabs.jfire.jbpm.JbpmLookup;
 import org.nightlabs.jfire.jbpm.graph.def.State;
 import org.nightlabs.jfire.person.PersonStruct;
@@ -72,6 +76,7 @@ import org.nightlabs.jfire.security.dao.UserDAO;
 import org.nightlabs.jfire.security.id.UserID;
 import org.nightlabs.progress.NullProgressMonitor;
 import org.nightlabs.util.CollectionUtil;
+import org.nightlabs.util.IOUtil;
 import org.nightlabs.util.Util;
 
 /**
@@ -1537,11 +1542,16 @@ implements IssueManagerRemote
 			"org.nightlabs.jfire.issue.IssueManagerBean.subject1"); //$NON-NLS-1$
 //			issue1.setSubject(subject1);
 
+			// TODO Some IssueMarkers are DEFAULT DATA rather than DEMO DATA. The DEFAULT DATA needs to be created here, while the DEMO DATA needs to be created
+			// by one of the demo-data-creation-modules (e.g. JFireChezFrancois). Hence, the following needs to be refactored as demo data and default data.
+
 			// --- 8< --- KaiExperiments: since 14.05.2009 ------------------
 			// --[ In preparation for an IssueMarker ]--
 			IssueMarker issueMarker1 = new IssueMarker(false);
-			issueMarker1.getName().setText(Locale.ENGLISH.getLanguage(), "Email follow-up");								// }<-- FIXME Language is only for Testing.
-			issueMarker1.getDescription().setText(Locale.ENGLISH.getLanguage(), "Forwarded email to Herr Schneider");	// }
+			assignIssueMarkerIcon16x16(issueMarker1, "IssueMarker-email.16x16.png");
+
+			issueMarker1.getName().setText(Locale.ENGLISH.getLanguage(), "Email");								// }<-- FIXME Language is only for Testing.
+			issueMarker1.getDescription().setText(Locale.ENGLISH.getLanguage(), "Log an email conversation.");	// }
 			issueMarker1 = pm.makePersistent(issueMarker1);
 			issue1.addIssueMarker(issueMarker1);
 
@@ -1664,5 +1674,19 @@ implements IssueManagerRemote
 		} finally {
 			pm.close();
 		}
+	}
+
+	private static void assignIssueMarkerIcon16x16(IssueMarker issueMarker, String iconFileName) throws IOException
+	{
+		InputStream in = Messages.class.getResourceAsStream(iconFileName);
+		if (in == null)
+			throw new IllegalArgumentException("There is no resource named \"" + iconFileName + "\" in the package " + Messages.class.getPackage().getName() + "!");
+
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		IOUtil.transferStreamData(in, out);
+		in.close();
+		out.close();
+
+		issueMarker.setIcon16x16Data(out.toByteArray());
 	}
 }

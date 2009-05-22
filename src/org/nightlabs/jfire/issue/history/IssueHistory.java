@@ -9,33 +9,32 @@ import java.util.Map;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.Queries;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.jfire.issue.Issue;
+import org.nightlabs.jfire.issue.history.id.IssueHistoryID;
 import org.nightlabs.jfire.issue.id.IssueID;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.util.Util;
 
-import javax.jdo.annotations.FetchGroups;
-import javax.jdo.annotations.Inheritance;
-import javax.jdo.annotations.PrimaryKey;
-import javax.jdo.annotations.FetchGroup;
-import javax.jdo.annotations.PersistenceModifier;
-import javax.jdo.annotations.Persistent;
-import org.nightlabs.jfire.issue.history.id.IssueHistoryID;
-import javax.jdo.annotations.InheritanceStrategy;
-import javax.jdo.annotations.Queries;
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.Column;
-import javax.jdo.annotations.IdentityType;
-
 /**
- * The {@link IssueHistory} class represents a history which recorded the change of each {@link Issue}. 
+ * The {@link IssueHistory} class represents a history which recorded the change of each {@link Issue}.
  * <p>
  * </p>
- * 
- * 
+ *
+ *
  * @author Chairat Kongarayawetchakun <!-- chairat at nightlabs dot de -->
  *
  * @jdo.persistence-capable
@@ -52,7 +51,7 @@ import javax.jdo.annotations.IdentityType;
  * @jdo.query
  *		name="getIssueHistoryIDsByOrganisationIDAndIssueID"
  *		query="SELECT
- *			WHERE this.issueID == :issueID && this.organisationID == :organisationID"                    
+ *			WHERE this.issueID == :issueID && this.organisationID == :organisationID"
  *
  * @jdo.fetch-group name="IssueHistory.issue" fields="issue"
  * @jdo.fetch-group name="IssueHistory.user" fields="user"
@@ -78,7 +77,7 @@ import javax.jdo.annotations.IdentityType;
 )
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class IssueHistory
-implements Serializable 
+implements Serializable
 {
 	private static final long serialVersionUID = 1L;
 	@SuppressWarnings("unused")
@@ -86,14 +85,14 @@ implements Serializable
 
 	public static final String FETCH_GROUP_ISSUE = "IssueHistory.issue";
 	public static final String FETCH_GROUP_USER = "IssueHistory.user";
-	
+
 	public static final String QUERY_ISSUE_HISTORYIDS_BY_ORGANISATION_ID_AND_ISSUE_ID = "getIssueHistoryIDsByOrganisationIDAndIssueID";
-	
+
 	/**
 	 * This is the organisationID to which the issue history belongs. Within one organisation,
 	 * all the issue histories have their organisation's ID stored here, thus it's the same
 	 * value for all of them.
-	 * 
+	 *
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
@@ -126,7 +125,7 @@ implements Serializable
 	 */
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private User user;
-	
+
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
@@ -140,7 +139,7 @@ implements Serializable
 	private Date createTimestamp;
 
 	/**
-	 * @deprecated Constructor exists only for JDO! 
+	 * @deprecated Constructor exists only for JDO!
 	 */
 	@Deprecated
 	protected IssueHistory() { }
@@ -201,7 +200,7 @@ implements Serializable
 	public Date getCreateTimestamp() {
 		return createTimestamp;
 	}
-	
+
 	/**
 	 * Gets the string of change.
 	 * @return the string of change.
@@ -209,7 +208,7 @@ implements Serializable
 	public String getChange() {
 		return change;
 	}
-	
+
 	/**
 	 * Gets the {@link User}.
 	 * @return the {@link User}.
@@ -226,19 +225,19 @@ implements Serializable
 	public static Collection<IssueHistory> getIssueHistoryByIssue(PersistenceManager pm, IssueID issueID)
 	{
 		Query q = pm.newNamedQuery(IssueHistory.class, IssueHistory.QUERY_ISSUE_HISTORYIDS_BY_ORGANISATION_ID_AND_ISSUE_ID);
-		
+
 		Map<String, Object> params = new HashMap<String, Object>(2);
 		params.put("issueID", issueID.issueID);
 		params.put("organisationID", issueID.organisationID);
-		
+
 		return (Collection<IssueHistory>)q.executeWithMap(params);
 	}
-	
+
 	private void generateHistory(Issue oldIssue, Issue newIssue)
 	{
 		StringBuffer changeText = new StringBuffer();
-		
-		if (!Util.equals(oldIssue.getDescription().getText(), newIssue.getDescription().getText())) 
+
+		if (!Util.equals(oldIssue.getDescription().getText(), newIssue.getDescription().getText()))
 		{
 			changeText.append("Changed description");
 			changeText.append(" from ");
@@ -246,10 +245,10 @@ implements Serializable
 			changeText.append(" ---> ");
 			changeText.append(newIssue.getDescription().getText());
 			changeText.append("\n");
-			
+
 		}
-		
-		if (!Util.equals(oldIssue.getSubject().getText(), newIssue.getSubject().getText())) 
+
+		if (!Util.equals(oldIssue.getSubject().getText(), newIssue.getSubject().getText()))
 		{
 			changeText.append("Changed subject");
 			changeText.append(" from ");
@@ -258,8 +257,8 @@ implements Serializable
 			changeText.append(newIssue.getSubject().getText());
 			changeText.append("\n");
 		}
-		
-		if (!Util.equals(oldIssue.getComments(), newIssue.getComments())) 
+
+		if (!Util.equals(oldIssue.getComments(), newIssue.getComments()))
 		{
 			changeText.append("Add Comment(s)");
 //			changeText.append(" from ");
@@ -269,7 +268,7 @@ implements Serializable
 			changeText.append("\n");
 		}
 
-		if (!Util.equals(oldIssue.getAssignee(), newIssue.getAssignee())) 
+		if (!Util.equals(oldIssue.getAssignee(), newIssue.getAssignee()))
 		{
 			changeText.append("Changed assignee");
 			changeText.append(" from ");
@@ -279,7 +278,7 @@ implements Serializable
 			changeText.append("\n");
 		}
 
-		if (!Util.equals(oldIssue.getReporter(), newIssue.getReporter())) 
+		if (!Util.equals(oldIssue.getReporter(), newIssue.getReporter()))
 		{
 			changeText.append("Changed reporter");
 			changeText.append(" from ");
@@ -289,7 +288,7 @@ implements Serializable
 			changeText.append("\n");
 		}
 
-		if (!Util.equals(oldIssue.getIssueFileAttachments().size(), newIssue.getIssueFileAttachments().size())) 
+		if (!Util.equals(oldIssue.getIssueFileAttachments().size(), newIssue.getIssueFileAttachments().size()))
 		{
 			changeText.append("Changed file attachments");
 //			changeText.append(" from ");
@@ -299,7 +298,7 @@ implements Serializable
 			changeText.append("\n");
 		}
 
-//		if (!Util.equals(oldIssue.getIssueLinks(), newIssue.getIssueLinks())) 
+//		if (!Util.equals(oldIssue.getIssueLinks(), newIssue.getIssueLinks()))
 //		{
 //			changeText.append("Changed issue links");
 ////			changeText.append(" from ");
@@ -309,7 +308,19 @@ implements Serializable
 //			changeText.append("\n");
 //		}
 
-		if (!Util.equals(oldIssue.getIssuePriority(), newIssue.getIssuePriority())) 
+
+		// --- 8< --- KaiExperiments: since 14.05.2009 ------------------
+		if (!Util.equals(oldIssue.getIssueMarkers().size(), newIssue.getIssueMarkers().size())) {
+			int oldSize = oldIssue.getIssueMarkers().size();
+			int newSize = newIssue.getIssueMarkers().size();
+
+			if (oldSize < newSize)	changeText.append("A new issue marker was added.");
+			if (oldSize > newSize)	changeText.append("An old issue marker was deleted.");
+		}
+		// ------ KaiExperiments ----- >8 -------------------------------
+
+
+		if (!Util.equals(oldIssue.getIssuePriority(), newIssue.getIssuePriority()))
 		{
 			changeText.append("Changed priority");
 			changeText.append(" from ");
@@ -318,8 +329,8 @@ implements Serializable
 			changeText.append(newIssue.getIssuePriority().getIssuePriorityText().getText());
 			changeText.append("\n");
 		}
-		
-		if (!Util.equals(oldIssue.getIssueSeverityType(), newIssue.getIssueSeverityType())) 
+
+		if (!Util.equals(oldIssue.getIssueSeverityType(), newIssue.getIssueSeverityType()))
 		{
 			changeText.append("Changed severity type");
 			changeText.append(" from ");
@@ -328,8 +339,8 @@ implements Serializable
 			changeText.append(newIssue.getIssueSeverityType().getIssueSeverityTypeText().getText());
 			changeText.append("\n");
 		}
-		
-		if (!Util.equals(oldIssue.getIssueResolution(), newIssue.getIssueResolution())) 
+
+		if (!Util.equals(oldIssue.getIssueResolution(), newIssue.getIssueResolution()))
 		{
 			changeText.append("Changed resolution");
 			changeText.append(" from ");
@@ -338,8 +349,8 @@ implements Serializable
 			changeText.append(newIssue.getIssueResolution().getName().getText());
 			changeText.append("\n");
 		}
-		
-		if (!Util.equals(oldIssue.getIssueType(), newIssue.getIssueType())) 
+
+		if (!Util.equals(oldIssue.getIssueType(), newIssue.getIssueType()))
 		{
 			changeText.append("Changed issue type");
 			changeText.append(" from ");
@@ -348,8 +359,8 @@ implements Serializable
 			changeText.append(newIssue.getIssueType().getName().getText());
 			changeText.append("\n");
 		}
-		
-		if (!Util.equals(oldIssue.getState().getStateDefinition(), newIssue.getState().getStateDefinition())) 
+
+		if (!Util.equals(oldIssue.getState().getStateDefinition(), newIssue.getState().getStateDefinition()))
 		{
 			changeText.append("Changed state");
 			changeText.append(" from ");
@@ -358,8 +369,8 @@ implements Serializable
 			changeText.append(newIssue.getState().getStateDefinition().getName().getText());
 			changeText.append("\n");
 		}
-		
-		if (!Util.equals(oldIssue.isStarted(), newIssue.isStarted())) 
+
+		if (!Util.equals(oldIssue.isStarted(), newIssue.isStarted()))
 		{
 			changeText.append("Changed status");
 			changeText.append(" from ");
@@ -367,13 +378,13 @@ implements Serializable
 			changeText.append(" ---> ");
 			changeText.append(newIssue.isStarted() ? "Working" : "Stopped");
 		}
-		
+
 		this.change = changeText.toString();
 	}
-	
+
 	/**
 	 * Internal method.
-	 * @return The PersistenceManager associated with this object. 
+	 * @return The PersistenceManager associated with this object.
 	 */
 	protected PersistenceManager getPersistenceManager() {
 		PersistenceManager issueHistoryPM = JDOHelper.getPersistenceManager(this);
@@ -381,8 +392,8 @@ implements Serializable
 			throw new IllegalStateException("This instance of " + this.getClass().getName() + " is not persistent, can not get a PersistenceManager!");
 
 		return issueHistoryPM;
-	}	
-	
+	}
+
 	@Override
 	/**
 	 * {@inheritDoc}
@@ -393,7 +404,7 @@ implements Serializable
 		if (!(obj instanceof IssueHistory)) return false;
 		IssueHistory o = (IssueHistory) obj;
 		return
-			Util.equals(this.organisationID, o.organisationID) && 
+			Util.equals(this.organisationID, o.organisationID) &&
 			Util.equals(this.issueID, o.issueID) &&
 			Util.equals(this.issueHistoryID, o.issueHistoryID);
 	}
@@ -404,7 +415,7 @@ implements Serializable
 	 */
 	public int hashCode()
 	{
-		return 
+		return
 			(31 * Util.hashCode(organisationID)) +
 			Util.hashCode(issueID) ^
 			Util.hashCode(issueHistoryID);

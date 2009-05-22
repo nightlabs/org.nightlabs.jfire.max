@@ -58,7 +58,7 @@ import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.issue.id.IssueID;
-import org.nightlabs.jfire.issue.issueMarker.IssueMarker;
+import org.nightlabs.jfire.issue.issuemarker.IssueMarker;
 import org.nightlabs.jfire.issue.project.Project;
 import org.nightlabs.jfire.jbpm.graph.def.Statable;
 import org.nightlabs.jfire.jbpm.graph.def.StatableLocal;
@@ -84,6 +84,7 @@ import org.nightlabs.util.Util;
  *
  * @author Chairat Kongarayawetchakun <!-- chairat [AT] nightlabs [DOT] de -->
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
+ * @author Khaireel Mohamed - khaireel at nightlabs dot de
  *
  * @jdo.persistence-capable
  *		identity-type="application"

@@ -18,5 +18,7 @@
 	<classpathentry kind="lib" path="/target-jee-jfire-jboss-libs/src/jboss-server/deploy/rhino_js.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.module.container"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/org.nightlabs.concurrent"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/org.nightlabs.config"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

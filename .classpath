@@ -23,5 +23,7 @@
 	<classpathentry kind="lib" path="/JFireJbpm/lib/jbpm/jbpm-3.1.4.jar" sourcepath="/JFireJbpm/lib/jbpm/jbpm-3.1.4.zip"/>
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.module.container"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/org.nightlabs.concurrent"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/org.nightlabs.config"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

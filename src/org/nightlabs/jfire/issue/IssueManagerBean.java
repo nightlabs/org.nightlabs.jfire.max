@@ -453,7 +453,7 @@ implements IssueManagerRemote
 	public Set<IssueMarkerID> getIssueMarkerIDs() {
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			Query q = pm.newQuery(IssueLinkType.class);
+			Query q = pm.newQuery(IssueMarker.class);
 			q.setResult("JDOHelper.getObjectId(this)");
 			Collection<IssueMarkerID> c = CollectionUtil.castCollection((Collection<?>) q.execute());
 			return new HashSet<IssueMarkerID>(c);
@@ -462,6 +462,7 @@ implements IssueManagerRemote
 		}
 	}
 
+	// TODO This is not necessary. Will remove this later. Kai.
 	@RolesAllowed("_Guest_")
 	public Set<IssueMarkerID> getIssueMarkerIDs(IssueID issueID) {
 		PersistenceManager pm = getPersistenceManager();
@@ -1529,6 +1530,23 @@ implements IssueManagerRemote
 //			"org.nightlabs.jfire.issue.IssueManagerBean.projectPhase4"); //$NON-NLS-1$
 //			projectPhase = pm.makePersistent(projectPhase);
 
+
+			// --- 8< --- KaiExperiments: since 14.05.2009 ------------------
+			// --[ In preparation for an IssueMarker ]--
+			IssueMarker issueMarker_Email = new IssueMarker(false);
+			assignIssueMarkerIcon16x16(issueMarker_Email, "IssueMarker-email.16x16.png");
+			issueMarker_Email.getName().setText(Locale.ENGLISH.getLanguage(), "Email");								// }<-- FIXME Language is only for Testing.
+			issueMarker_Email.getDescription().setText(Locale.ENGLISH.getLanguage(), "Log an email conversation.");	// }    And use the cleanup with the method: readFromProperties(blah).
+			issueMarker_Email = pm.makePersistent(issueMarker_Email);
+
+			IssueMarker issueMarker_Phone = new IssueMarker(false);
+			assignIssueMarkerIcon16x16(issueMarker_Phone, "IssueMarker-phone.16x16.png");
+			issueMarker_Phone.getName().setText(Locale.ENGLISH.getLanguage(), "Phone");
+			issueMarker_Phone.getDescription().setText(Locale.ENGLISH.getLanguage(), "Log a telephone conversation.");
+			issueMarker_Phone = pm.makePersistent(issueMarker_Phone);
+			// ------ KaiExperiments ----- >8 -------------------------------
+
+
 			//Issues
 			pm.getExtent(Issue.class);
 
@@ -1547,19 +1565,8 @@ implements IssueManagerRemote
 
 			// --- 8< --- KaiExperiments: since 14.05.2009 ------------------
 			// --[ In preparation for an IssueMarker ]--
-			IssueMarker issueMarker1 = new IssueMarker(false);
-			assignIssueMarkerIcon16x16(issueMarker1, "IssueMarker-email.16x16.png");
-
-			issueMarker1.getName().setText(Locale.ENGLISH.getLanguage(), "Email");								// }<-- FIXME Language is only for Testing.
-			issueMarker1.getDescription().setText(Locale.ENGLISH.getLanguage(), "Log an email conversation.");	// }
-			issueMarker1 = pm.makePersistent(issueMarker1);
-			issue1.addIssueMarker(issueMarker1);
-
-			IssueMarker issueMarker3 = new IssueMarker(false);
-			issueMarker3.getName().setText(Locale.ENGLISH.getLanguage(), "Phone follow-up");
-			issueMarker3.getDescription().setText(Locale.ENGLISH.getLanguage(), "To call reception @0171 8888 9999 at the Le Meridien to cancel the Rosemary Suite reservation.");
-			issueMarker3 = pm.makePersistent(issueMarker3);
-			issue1.addIssueMarker(issueMarker3);
+			issue1.addIssueMarker(issueMarker_Email);
+			issue1.addIssueMarker(issueMarker_Phone);
 			// ------ KaiExperiments ----- >8 -------------------------------
 
 			storeIssue(issue1, false, new String[0], NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
@@ -1573,6 +1580,12 @@ implements IssueManagerRemote
 			subject2.readFromProperties(baseName, loader,
 			"org.nightlabs.jfire.issue.IssueManagerBean.subject2"); //$NON-NLS-1$
 //			issue2.setSubject(subject2);
+
+			// --- 8< --- KaiExperiments: since 14.05.2009 ------------------
+			// --[ In preparation for an IssueMarker ]--
+			issue2.addIssueMarker(issueMarker_Phone);	// <-- Test order; reversed from issue1.
+			issue2.addIssueMarker(issueMarker_Email);
+			// ------ KaiExperiments ----- >8 -------------------------------
 
 			storeIssue(issue2, false, new String[0], NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
 
@@ -1598,6 +1611,11 @@ implements IssueManagerRemote
 			"org.nightlabs.jfire.issue.IssueManagerBean.subject4"); //$NON-NLS-1$
 //			issue4.setSubject(subject4);
 
+			// --- 8< --- KaiExperiments: since 14.05.2009 ------------------
+			// --[ In preparation for an IssueMarker ]--
+			issue4.addIssueMarker(issueMarker_Phone);
+			// ------ KaiExperiments ----- >8 -------------------------------
+
 			storeIssue(issue4, false, new String[0], NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
 
 			Issue issue5 = new Issue(IDGenerator.getOrganisationID(), IDGenerator.nextID(Issue.class), issueTypeDefault);
@@ -1612,17 +1630,7 @@ implements IssueManagerRemote
 
 			// --- 8< --- KaiExperiments: since 14.05.2009 ------------------
 			// --[ In preparation for an IssueMarker ]--
-			IssueMarker issueMarker2 = new IssueMarker(false);
-			issueMarker2.getName().setText(Locale.ENGLISH.getLanguage(), "Email follow-up");
-			issueMarker2.getDescription().setText(Locale.ENGLISH.getLanguage(), "To sort all other related emails.");
-			issueMarker2 = pm.makePersistent(issueMarker2);
-			issue5.addIssueMarker(issueMarker2);
-
-			IssueMarker issueMarker4 = new IssueMarker(false);
-			issueMarker4.getName().setText(Locale.ENGLISH.getLanguage(), "Email follow-up");
-			issueMarker4.getDescription().setText(Locale.ENGLISH.getLanguage(), "To send email broadcast to the whole department.");
-			issueMarker4= pm.makePersistent(issueMarker4);
-			issue5.addIssueMarker(issueMarker4);
+			issue5.addIssueMarker(issueMarker_Email);
 			// ------ KaiExperiments ----- >8 -------------------------------
 
 			storeIssue(issue5, false, new String[0], NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
@@ -1686,6 +1694,9 @@ implements IssueManagerRemote
 		IOUtil.transferStreamData(in, out);
 		in.close();
 		out.close();
+
+		if (logger.isDebugEnabled())
+			logger.debug("--> Received: iconFilename: " + iconFileName);
 
 		issueMarker.setIcon16x16Data(out.toByteArray());
 	}

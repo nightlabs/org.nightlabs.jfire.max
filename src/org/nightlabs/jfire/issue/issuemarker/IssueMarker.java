@@ -102,6 +102,42 @@ public class IssueMarker implements Serializable {
 	@Column(sqlType="BLOB")
 	private byte[] icon16x16Data;
 
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ (int) (issueMarkerID ^ (issueMarkerID >>> 32));
+		result = prime * result
+				+ ((organisationID == null) ? 0 : organisationID.hashCode());
+		return result;
+	}
+
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		IssueMarker other = (IssueMarker) obj;
+		if (issueMarkerID != other.issueMarkerID)
+			return false;
+		if (organisationID == null) {
+			if (other.organisationID != null)
+				return false;
+		} else if (!organisationID.equals(other.organisationID))
+			return false;
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		return this.getClass().getName() + '@' + Integer.toHexString(System.identityHashCode(this)) + '[' + organisationID + ',' + issueMarkerID + ']';
+	}
+
 	/**
 	 * @return the 16x16 icon of this IssueMarker.
 	 */

@@ -76,6 +76,8 @@ import org.nightlabs.util.Util;
 		value="SELECT WHERE this.issueID == :issueID && this.organisationID == :organisationID")
 )
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
+//@Discriminator(strategy=DiscriminatorStrategy.CLASS_NAME)
+//public abstract class IssueHistory
 public class IssueHistory
 implements Serializable
 {

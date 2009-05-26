@@ -3,10 +3,10 @@ package org.nightlabs.jfire.transfer;
 import java.rmi.RemoteException;
 import java.util.List;
 
-import javax.ejb.CreateException;
 import javax.naming.NamingException;
 import javax.security.auth.login.LoginException;
 
+import org.datanucleus.store.StoreManager;
 import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jfire.accounting.AccountingManagerRemote;
 import org.nightlabs.jfire.accounting.pay.PaymentController;
@@ -132,7 +132,7 @@ public abstract class AbstractTransferController<D extends TransferData, ID exte
 	 * Returns the {@link StoreManager}.
 	 * @return The {@link StoreManager}
 	 */
-	public StoreManagerRemote getStoreManager() throws RemoteException, LoginException, CreateException, NamingException {
+	public StoreManagerRemote getStoreManager() throws RemoteException, LoginException, NamingException {
 		return JFireEjb3Factory.getRemoteBean(StoreManagerRemote.class, SecurityReflector.getInitialContextProperties());
 	}
 
@@ -140,7 +140,7 @@ public abstract class AbstractTransferController<D extends TransferData, ID exte
 	 * Returns the {@link AccountingManager}.
 	 * @return The {@link AccountingManager}
 	 */
-	public AccountingManagerRemote getAccountingManager() throws RemoteException, LoginException, CreateException, NamingException {
+	public AccountingManagerRemote getAccountingManager() throws RemoteException, LoginException, NamingException {
 		return JFireEjb3Factory.getRemoteBean(AccountingManagerRemote.class, SecurityReflector.getInitialContextProperties());
 	}
 

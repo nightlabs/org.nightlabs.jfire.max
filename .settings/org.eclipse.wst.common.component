@@ -2,8 +2,5 @@
 <project-modules id="moduleCoreId" project-version="1.5.0">
     <wb-module deploy-name="JFireIssueTrackingEAR">
         <wb-resource deploy-path="/" source-path="/EarContent"/>
-        <dependent-module archiveName="JFireIssueTracking.jar" deploy-path="/" handle="module:/resource/JFireIssueTracking/JFireIssueTracking">
-            <dependency-type>uses</dependency-type>
-        </dependent-module>
     </wb-module>
 </project-modules>

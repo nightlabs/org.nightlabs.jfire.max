@@ -3,7 +3,6 @@
 	<name>JFireIssueTrackingEAR</name>
 	<comment></comment>
 	<projects>
-		<project>JFireIssueTracking</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

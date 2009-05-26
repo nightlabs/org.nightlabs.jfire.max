@@ -523,7 +523,8 @@ implements StoreManagerRemote, StoreManagerLocal
 	 */
 	@RolesAllowed("org.nightlabs.jfire.store.seeProductType")
 	@Override
-	public List<ProductType> getProductTypes(Set<ProductTypeID> productTypeIDs, String[] fetchGroups, int maxFetchDepth)
+//	public List<ProductType> getProductTypes(Set<ProductTypeID> productTypeIDs, String[] fetchGroups, int maxFetchDepth)
+	public List<ProductType> getProductTypes(Collection<ProductTypeID> productTypeIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {

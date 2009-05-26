@@ -88,7 +88,8 @@ public interface StoreManagerRemote {
 	 */
 	Set<DeliveryNoteID> getDeliveryNoteIDs(QueryCollection<? extends AbstractJDOQuery> queries);
 
-	List<ProductType> getProductTypes(Set<ProductTypeID> productTypeIDs, String[] fetchGroups, int maxFetchDepth);
+//	List<ProductType> getProductTypes(Set<ProductTypeID> productTypeIDs, String[] fetchGroups, int maxFetchDepth);
+	List<ProductType> getProductTypes(Collection<ProductTypeID> productTypeIDs, String[] fetchGroups, int maxFetchDepth);
 
 	ProductTypeStatusHistoryItem setProductTypeStatus_published(
 			ProductTypeID productTypeID, boolean get, String[] fetchGroups,

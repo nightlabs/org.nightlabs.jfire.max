@@ -6,7 +6,6 @@ import java.util.List;
 import javax.naming.NamingException;
 import javax.security.auth.login.LoginException;
 
-import org.datanucleus.store.StoreManager;
 import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jfire.accounting.AccountingManagerRemote;
 import org.nightlabs.jfire.accounting.pay.PaymentController;

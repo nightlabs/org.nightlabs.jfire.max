@@ -2,7 +2,6 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireScripting"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/JFireSimpleTrade"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireTrade"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireServerManager"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireBaseBean"/>

@@ -16,34 +16,35 @@ import javax.jdo.annotations.PrimaryKey;
 
 import org.nightlabs.i18n.I18nText;
 import org.nightlabs.jfire.issue.Issue;
-import org.nightlabs.jfire.issue.id.IssueHistoryTextID;
+import org.nightlabs.jfire.issue.id.IssueHistoryItemTextID;
 
 /**
+ * !!!!!! !!!!!! ---->>> This class is not used anywhere. Consider deleting? Kai
+ *
+ *
  * An extended class of {@link I18nText} that represents the changed text of each change that made to an {@link Issue}.
- * <p>
- * </p>
  *
  * @author Chairat Kongarayawetchakun - chairatk at nightlabs dot de
  *
  * @jdo.persistence-capable
  *		identity-type="application"
- *		objectid-class="org.nightlabs.jfire.issue.id.IssueHistoryTextID"
+ *		objectid-class="org.nightlabs.jfire.issue.id.IssueHistoryItemTextID"
  *		detachable="true"
- *		table="JFireIssueTracking_IssueHistoryText"
+ *		table="JFireIssueTracking_IssueHistoryItemText"
  *
  * @jdo.inheritance strategy="new-table"
  *
- * @jdo.create-objectid-class field-order="organisationID, issueHistoryID, issueHistoryTextID"
+ * @jdo.create-objectid-class field-order="organisationID, issueHistoryItemID, issueHistoryItemTextID"
  *
  */
 @PersistenceCapable(
-	objectIdClass=IssueHistoryTextID.class,
+	objectIdClass=IssueHistoryItemTextID.class,
 	identityType=IdentityType.APPLICATION,
 	detachable="true",
-	table="JFireIssueTracking_IssueHistoryText")
+	table="JFireIssueTracking_IssueHistoryItemText")
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 @SuppressWarnings("serial")
-public class IssueHistoryText
+public class IssueHistoryItemText
 extends I18nText
 {
 	/**
@@ -65,14 +66,14 @@ extends I18nText
 	@PrimaryKey
 	@Column(length=100)
 	@SuppressWarnings("unused")
-	private long issueHistoryID;
+	private long issueHistoryItemID;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	@SuppressWarnings("unused")
-	private IssueHistory issueHistory;
+	private IssueHistoryItem issueHistoryItem;
 
 	/**
 	 * @jdo.field primary-key="true"
@@ -80,7 +81,7 @@ extends I18nText
 	 */
 	@PrimaryKey
 	@Column(length=100)
-	private String issueHistoryTextID;
+	private String issueHistoryItemTextID;
 
 	/**
 	 * key: String languageID<br/>
@@ -92,7 +93,7 @@ extends I18nText
 	 *		key-type="java.lang.String"
 	 *		value-type="java.lang.String"
 	 *		default-fetch-group="true"
-	 *		table="JFireIssueTracking_IssueHistoryText_texts"
+	 *		table="JFireIssueTracking_IssueHistoryItemText_texts"
 	 *		null-value="exception"
 	 *
 	 * @jdo.join
@@ -100,7 +101,7 @@ extends I18nText
 	@Join
 	@Persistent(
 		nullValue=NullValue.EXCEPTION,
-		table="JFireIssueTracking_IssueHistoryText_texts",
+		table="JFireIssueTracking_IssueHistoryItemText_texts",
 		defaultFetchGroup="true",
 		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Map<String, String> texts = new HashMap<String, String>();
@@ -115,15 +116,15 @@ extends I18nText
 	 * @deprecated Only for JDO!
 	 */
 	@Deprecated
-	protected IssueHistoryText()
+	protected IssueHistoryItemText()
 	{
 	}
 
-	public IssueHistoryText(IssueHistory issueHistory)
+	public IssueHistoryItemText(IssueHistoryItem issueHistoryItem)
 	{
-		this.organisationID = issueHistory.getOrganisationID();
-		this.issueHistoryID = issueHistory.getIssueHistoryID();
-		this.issueHistory = issueHistory;
+		this.organisationID = issueHistoryItem.getOrganisationID();
+		this.issueHistoryItemID = issueHistoryItem.getIssueHistoryItemID();
+		this.issueHistoryItem = issueHistoryItem;
 	}
 
 	/**
@@ -151,7 +152,7 @@ extends I18nText
 	}
 	public String getIssueHistoryTextID()
 	{
-		return issueHistoryTextID;
+		return issueHistoryItemTextID;
 	}
 
 	public Issue getIssue()

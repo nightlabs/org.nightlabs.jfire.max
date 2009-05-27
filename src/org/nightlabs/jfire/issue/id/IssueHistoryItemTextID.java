@@ -15,11 +15,11 @@ import org.nightlabs.jdo.ObjectID;
 
 
 /**
- * The JDO object id class for {@link org.nightlabs.jfire.issue.history.IssueHistoryText}.
+ * The JDO object id class for {@link org.nightlabs.jfire.issue.history.IssueHistoryItemText}.
  * <p>This class was auto-generated.</p>
  */
 @Generated("org.nightlabs.eclipse.sdk.jdo.ObjectIdGenerator")
-public class IssueHistoryTextID
+public class IssueHistoryItemTextID
 implements ObjectID
 {
 	/**
@@ -78,52 +78,52 @@ implements ObjectID
 
 	/**
 	 * Primary key field organisationID.
-	 * Declared as primary key field in {@link org.nightlabs.jfire.issue.history.IssueHistoryText}.
+	 * Declared as primary key field in {@link org.nightlabs.jfire.issue.history.IssueHistoryItemText}.
 	 */
 	@Generated("org.nightlabs.eclipse.sdk.jdo.ObjectIdGenerator")
 	public java.lang.String organisationID;
 
 	/**
-	 * Primary key field issueHistoryID.
-	 * Declared as primary key field in {@link org.nightlabs.jfire.issue.history.IssueHistoryText}.
+	 * Primary key field issueHistoryItemID.
+	 * Declared as primary key field in {@link org.nightlabs.jfire.issue.history.IssueHistoryItemText}.
 	 */
 	@Generated("org.nightlabs.eclipse.sdk.jdo.ObjectIdGenerator")
-	public long issueHistoryID;
+	public long issueHistoryItemID;
 
 	/**
-	 * Primary key field issueHistoryTextID.
-	 * Declared as primary key field in {@link org.nightlabs.jfire.issue.history.IssueHistoryText}.
+	 * Primary key field issueHistoryItemTextID.
+	 * Declared as primary key field in {@link org.nightlabs.jfire.issue.history.IssueHistoryItemText}.
 	 */
 	@Generated("org.nightlabs.eclipse.sdk.jdo.ObjectIdGenerator")
-	public java.lang.String issueHistoryTextID;
+	public java.lang.String issueHistoryItemTextID;
 
 	/**
-	 * Create a new empty instance of IssueHistoryTextID.
+	 * Create a new empty instance of IssueHistoryItemTextID.
 	 */
 	@Generated("org.nightlabs.eclipse.sdk.jdo.ObjectIdGenerator")
-	public IssueHistoryTextID()
+	public IssueHistoryItemTextID()
 	{
 	}
 
 	/**
-	 * Create a new instance of IssueHistoryTextID.
+	 * Create a new instance of IssueHistoryItemTextID.
 	 * This is done by parsing the <code>keyStr</code> that has been created
 	 * by {@link #toString()} and setting all fields to the values from the string.
 	 * <p>
 	 * This means, the following code will create a copy of this class:<br/><br/>
-	 * <code>IssueHistoryTextID newIssueHistoryTextID = new IssueHistoryTextID(oldIssueHistoryTextID.toString());</code>
+	 * <code>IssueHistoryItemTextID newIssueHistoryTextID = new IssueHistoryItemTextID(oldIssueHistoryTextID.toString());</code>
 	 * </p>
 	 * @param keyStr A String formatted as "jdo/{className}?{field0}={value0}&amp;{field1}={value1}...&amp;{fieldN}={valueN}"
 	 *     where all values are url encoded using {@link #ENCODING}.
 	 */
 	@Generated("org.nightlabs.eclipse.sdk.jdo.ObjectIdGenerator")
-	public IssueHistoryTextID(final String keyStr)
+	public IssueHistoryItemTextID(final String keyStr)
 	throws ParseException, SecurityException,
 			NoSuchFieldException, IllegalArgumentException,
 			IllegalAccessException, NoSuchMethodException,
 			InstantiationException, InvocationTargetException
 	{
-		Class<? extends IssueHistoryTextID> clazz = this.getClass();
+		Class<? extends IssueHistoryItemTextID> clazz = this.getClass();
 
 		StringTokenizer st = new StringTokenizer(keyStr, SEPARATORS_FOR_TOKENIZER, true);
 		String jdoPrefix = st.nextToken();
@@ -244,7 +244,7 @@ implements ObjectID
 	 * Create a string representation of this object id.
 	 * <p>
 	 * JDO expects the result of this method to be compatible with the constructor
-	 * {@link #IssueHistoryTextID(String)}.
+	 * {@link #IssueHistoryItemTextID(String)}.
 	 * This method takes all the primary-key-fields and encodes them with their name
 	 * and their value.
 	 * </p>
@@ -264,11 +264,11 @@ implements ObjectID
 			sb.append("organisationID="); //$NON-NLS-1$
 			sb.append(URLEncoder.encode(String.valueOf(organisationID), ENCODING));
 			sb.append('&');
-			sb.append("issueHistoryID="); //$NON-NLS-1$
-			sb.append(URLEncoder.encode(Long.toString(issueHistoryID, RADIX), ENCODING));
+			sb.append("issueHistoryItemID="); //$NON-NLS-1$
+			sb.append(URLEncoder.encode(Long.toString(issueHistoryItemID, RADIX), ENCODING));
 			sb.append('&');
-			sb.append("issueHistoryTextID="); //$NON-NLS-1$
-			sb.append(URLEncoder.encode(String.valueOf(issueHistoryTextID), ENCODING));
+			sb.append("issueHistoryItemTextID="); //$NON-NLS-1$
+			sb.append(URLEncoder.encode(String.valueOf(issueHistoryItemTextID), ENCODING));
 		} catch (UnsupportedEncodingException e) {
 			throw new RuntimeException(
 					"Encoding failed with encoding " + //$NON-NLS-1$
@@ -293,18 +293,18 @@ implements ObjectID
 			return false;
 		if(getClass() != obj.getClass())
 			return false;
-		IssueHistoryTextID other = (IssueHistoryTextID) obj;
+		IssueHistoryItemTextID other = (IssueHistoryItemTextID) obj;
 		if(organisationID == null) {
 			if(other.organisationID != null)
 				return false;
 		} else if(!organisationID.equals(other.organisationID))
 			return false;
-		if(issueHistoryID != other.issueHistoryID)
+		if(issueHistoryItemID != other.issueHistoryItemID)
 			return false;
-		if(issueHistoryTextID == null) {
-			if(other.issueHistoryTextID != null)
+		if(issueHistoryItemTextID == null) {
+			if(other.issueHistoryItemTextID != null)
 				return false;
-		} else if(!issueHistoryTextID.equals(other.issueHistoryTextID))
+		} else if(!issueHistoryItemTextID.equals(other.issueHistoryItemTextID))
 			return false;
 		return true;
 	}
@@ -323,26 +323,26 @@ implements ObjectID
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((organisationID == null) ? 0 : organisationID.hashCode());
-		result = prime * result + (int) (issueHistoryID ^ (issueHistoryID >>> 32));
-		result = prime * result + ((issueHistoryTextID == null) ? 0 : issueHistoryTextID.hashCode());
+		result = prime * result + (int) (issueHistoryItemID ^ (issueHistoryItemID >>> 32));
+		result = prime * result + ((issueHistoryItemTextID == null) ? 0 : issueHistoryItemTextID.hashCode());
 		return result;
 	}
 
 	/**
 	 * Create a new object id instance.
 	 * @param organisationID The primary key field organisationID.
-	 * @param issueHistoryID The primary key field issueHistoryID.
-	 * @param issueHistoryTextID The primary key field issueHistoryTextID.
-	 * @return a newly created instance of <code>IssueHistoryTextID</code>
+	 * @param issueHistoryItemID The primary key field issueHistoryItemID.
+	 * @param issueHistoryItemTextID The primary key field issueHistoryItemTextID.
+	 * @return a newly created instance of <code>IssueHistoryItemTextID</code>
 	 *     with the primary-key fields set to the given parameters.
 	 */
 	@Generated("org.nightlabs.eclipse.sdk.jdo.ObjectIdGenerator")
-	public static IssueHistoryTextID create(String organisationID, long issueHistoryID, String issueHistoryTextID)
+	public static IssueHistoryItemTextID create(String organisationID, long issueHistoryItemID, String issueHistoryItemTextID)
 	{
-		IssueHistoryTextID n = new IssueHistoryTextID();
+		IssueHistoryItemTextID n = new IssueHistoryItemTextID();
 		n.organisationID = organisationID;
-		n.issueHistoryID = issueHistoryID;
-		n.issueHistoryTextID = issueHistoryTextID;
+		n.issueHistoryItemID = issueHistoryItemID;
+		n.issueHistoryItemTextID = issueHistoryItemTextID;
 		return n;
 	}
 }

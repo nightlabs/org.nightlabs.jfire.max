@@ -13,8 +13,8 @@ import javax.ejb.TransactionAttributeType;
 import org.nightlabs.ModuleException;
 import org.nightlabs.jdo.query.AbstractJDOQuery;
 import org.nightlabs.jdo.query.QueryCollection;
-import org.nightlabs.jfire.issue.history.IssueHistory;
-import org.nightlabs.jfire.issue.history.id.IssueHistoryID;
+import org.nightlabs.jfire.issue.history.IssueHistoryItem;
+import org.nightlabs.jfire.issue.history.id.IssueHistoryItemID;
 import org.nightlabs.jfire.issue.id.IssueCommentID;
 import org.nightlabs.jfire.issue.id.IssueFileAttachmentID;
 import org.nightlabs.jfire.issue.id.IssueID;
@@ -312,32 +312,18 @@ public interface IssueManagerRemote {
 	@RolesAllowed("_Guest_")
 	Set<Issue> getIssueByProjectTypeID(ProjectTypeID projectTypeID);
 
-	//IssueHistory//
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Required"
-	 */
-	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	@RolesAllowed("_Guest_")
-	IssueHistory storeIssueHistory(IssueHistory issueHistory, boolean get,
-			String[] fetchGroups, int maxFetchDepth);
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 */
-	@RolesAllowed("_Guest_")
-	Collection<IssueHistoryID> getIssueHistoryIDsByIssueID(IssueID issueID);
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 */
-	@RolesAllowed("_Guest_")
-	List<IssueHistory> getIssueHistories(
-			Collection<IssueHistoryID> issueHistoryIDs, String[] fetchGroups,
-			int maxFetchDepth);
+
+	//IssueHistoryItem//
+	IssueHistoryItem storeIssueHistoryItem(IssueHistoryItem issueHistory, boolean get, String[] fetchGroups, int maxFetchDepth);
+
+	Collection<IssueHistoryItemID> getIssueHistoryItemIDsByIssueID(IssueID issueID);
+
+	List<IssueHistoryItem> getIssueHistoryItems(Collection<IssueHistoryItemID> issueHistoryIDs, String[] fetchGroups, int maxFetchDepth);
+
+
+
 
 	//IssueType//
 	/**

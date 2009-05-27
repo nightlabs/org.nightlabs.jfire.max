@@ -10,6 +10,8 @@ import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 import javax.jdo.annotations.Column;
+import javax.jdo.annotations.Discriminator;
+import javax.jdo.annotations.DiscriminatorStrategy;
 import javax.jdo.annotations.FetchGroup;
 import javax.jdo.annotations.FetchGroups;
 import javax.jdo.annotations.IdentityType;
@@ -22,132 +24,95 @@ import javax.jdo.annotations.PrimaryKey;
 import javax.jdo.annotations.Queries;
 
 import org.apache.log4j.Logger;
+import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.issue.Issue;
-import org.nightlabs.jfire.issue.history.id.IssueHistoryID;
+import org.nightlabs.jfire.issue.history.id.IssueHistoryItemID;
 import org.nightlabs.jfire.issue.id.IssueID;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.util.Util;
 
 /**
- * The {@link IssueHistory} class represents a history which recorded the change of each {@link Issue}.
- * <p>
- * </p>
- *
+ * The {@link IssueHistoryItem} class represents a history which recorded the change of each {@link Issue}.
  *
  * @author Chairat Kongarayawetchakun <!-- chairat at nightlabs dot de -->
- *
- * @jdo.persistence-capable
- *		identity-type="application"
- *		objectid-class="org.nightlabs.jfire.issue.history.id.IssueHistoryID"
- *		detachable="true"
- *		table="JFireIssueTracking_IssueHistory"
- *
- * @jdo.inheritance strategy="new-table"
- *
- * @jdo.create-objectid-class
- *		field-order="organisationID, issueID, issueHistoryID"
- *
- * @jdo.query
- *		name="getIssueHistoryIDsByOrganisationIDAndIssueID"
- *		query="SELECT
- *			WHERE this.issueID == :issueID && this.organisationID == :organisationID"
- *
- * @jdo.fetch-group name="IssueHistory.issue" fields="issue"
- * @jdo.fetch-group name="IssueHistory.user" fields="user"
- *
+ * @author Khaireel Mohamed - khaireel at nightlabs dot de
  **/
 @PersistenceCapable(
-	objectIdClass=IssueHistoryID.class,
+	objectIdClass=IssueHistoryItemID.class,
 	identityType=IdentityType.APPLICATION,
 	detachable="true",
-	table="JFireIssueTracking_IssueHistory")
+	table="JFireIssueTracking_IssueHistoryItem")
 @FetchGroups({
 	@FetchGroup(
-		name=IssueHistory.FETCH_GROUP_ISSUE,
+		name=IssueHistoryItem.FETCH_GROUP_ISSUE,
 		members=@Persistent(name="issue")),
 	@FetchGroup(
-		name=IssueHistory.FETCH_GROUP_USER,
+		name=IssueHistoryItem.FETCH_GROUP_USER,
 		members=@Persistent(name="user"))
 })
 @Queries(
 	@javax.jdo.annotations.Query(
-		name=IssueHistory.QUERY_ISSUE_HISTORYIDS_BY_ORGANISATION_ID_AND_ISSUE_ID,
+		name=IssueHistoryItem.QUERY_ISSUE_HISTORYIDS_BY_ORGANISATION_ID_AND_ISSUE_ID,
 		value="SELECT WHERE this.issueID == :issueID && this.organisationID == :organisationID")
 )
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
-//@Discriminator(strategy=DiscriminatorStrategy.CLASS_NAME)
-//public abstract class IssueHistory
-public class IssueHistory
+@Discriminator(strategy=DiscriminatorStrategy.CLASS_NAME)
+//public abstract class IssueHistoryItem
+public class IssueHistoryItem
 implements Serializable
 {
 	private static final long serialVersionUID = 1L;
 	@SuppressWarnings("unused")
-	private static final Logger logger = Logger.getLogger(IssueHistory.class);
+	private static final Logger logger = Logger.getLogger(IssueHistoryItem.class);
 
-	public static final String FETCH_GROUP_ISSUE = "IssueHistory.issue";
-	public static final String FETCH_GROUP_USER = "IssueHistory.user";
+	public static final String FETCH_GROUP_ISSUE = "IssueHistoryItem.issue";
+	public static final String FETCH_GROUP_USER = "IssueHistoryItem.user";
 
-	public static final String QUERY_ISSUE_HISTORYIDS_BY_ORGANISATION_ID_AND_ISSUE_ID = "getIssueHistoryIDsByOrganisationIDAndIssueID";
+	public static final String QUERY_ISSUE_HISTORYIDS_BY_ORGANISATION_ID_AND_ISSUE_ID = "getIssueHistoryIDsByOrganisationIDAndIssueID";	// <-- FIXME See notes.
 
 	/**
 	 * This is the organisationID to which the issue history belongs. Within one organisation,
 	 * all the issue histories have their organisation's ID stored here, thus it's the same
 	 * value for all of them.
-	 *
-	 * @jdo.field primary-key="true"
-	 * @jdo.column length="100"
 	 */
 	@PrimaryKey
 	@Column(length=100)
 	private String organisationID;
 
-	/**
-	 * @jdo.field primary-key="true"
-	 */
 	@PrimaryKey
 	private long issueID;
 
-	/**
-	 * @jdo.field primary-key="true"
-	 */
 	@PrimaryKey
-	private long issueHistoryID;
+	private long issueHistoryItemID;
 
-	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 * @jdo.column length="255"
-	 */
+
+
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
-	@Column(length=255)
-	private String change;
+	@Column(sqlType="CLOB")
+	private String change; // TODO remove this field. Marco.
 
-	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 */
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private User user;
 
-	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 */
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Issue issue;
 
-	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 */
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Date createTimestamp;
+
+
 
 	/**
 	 * @deprecated Constructor exists only for JDO!
 	 */
 	@Deprecated
-	protected IssueHistory() { }
+	protected IssueHistoryItem() { }
 
-	public IssueHistory(String organisationID, User user, Issue oldIssue, Issue newIssue, long issueHistoryID)
-	{
+	/**
+	 * Creates a new instance of an IssueHistoryItem.
+	 */
+	public IssueHistoryItem(String organisationID, User user, Issue oldIssue, Issue newIssue, long issueHistoryItemID) {
 		Organisation.assertValidOrganisationID(organisationID);
 		if (oldIssue == null)
 			throw new NullPointerException("newIssue");
@@ -156,12 +121,23 @@ implements Serializable
 		this.issueID = oldIssue.getIssueID();
 
 		this.issue = oldIssue;
-		this.issueHistoryID = issueHistoryID;
+		this.issueHistoryItemID = issueHistoryItemID;
 
 		this.createTimestamp = new Date();
 		this.user = user;
-		generateHistory(oldIssue, newIssue);
+
+
+		generateHistory(oldIssue, newIssue); // <-- FIXME Marked for removal. See notes 25 May 2009. Kai.
 	}
+
+	/**
+	 * Creates a new instance of an IssueHistoryItem.
+	 * The dummy constructor for testings...
+	 */
+	public IssueHistoryItem(boolean dummy, User user, Issue oldPersistentIssue, Issue newDetachedIssue) {
+		this(IDGenerator.getOrganisationID(), user, oldPersistentIssue, newDetachedIssue, IDGenerator.nextID(IssueHistoryItem.class));
+	}
+
 
 	/**
 	 * Gets the organisation id.
@@ -183,8 +159,8 @@ implements Serializable
 	 * Gets the issue history id.
 	 * @return
 	 */
-	public long getIssueHistoryID() {
-		return issueHistoryID;
+	public long getIssueHistoryItemID() {
+		return issueHistoryItemID;
 	}
 
 	/**
@@ -221,20 +197,45 @@ implements Serializable
 	/**
 	 * @param pm The <code>PersistenceManager</code> that should be used to access the datastore.
 	 * @param issue
-	 * @return Returns instances of <code>IssueHistory</code>.
+	 * @return Returns instances of <code>IssueHistoryItem</code>.
 	 */
 	@SuppressWarnings("unchecked")
-	public static Collection<IssueHistory> getIssueHistoryByIssue(PersistenceManager pm, IssueID issueID)
+	public static Collection<IssueHistoryItem> getIssueHistoryItemsByIssue(PersistenceManager pm, IssueID issueID)
 	{
-		Query q = pm.newNamedQuery(IssueHistory.class, IssueHistory.QUERY_ISSUE_HISTORYIDS_BY_ORGANISATION_ID_AND_ISSUE_ID);
+		Query q = pm.newNamedQuery(IssueHistoryItem.class, IssueHistoryItem.QUERY_ISSUE_HISTORYIDS_BY_ORGANISATION_ID_AND_ISSUE_ID);
 
 		Map<String, Object> params = new HashMap<String, Object>(2);
 		params.put("issueID", issueID.issueID);
 		params.put("organisationID", issueID.organisationID);
 
-		return (Collection<IssueHistory>)q.executeWithMap(params);
+		return (Collection<IssueHistoryItem>)q.executeWithMap(params);
 	}
 
+
+
+
+
+
+
+	// TODO Once this class has been made ABSTRACT, the following two methods should be declared abstract. Kai.
+	/**
+	 * This is to be generated on the fly, and as such, makes it more flexible and easier to control when we desire
+	 * any special 'textual' condition(s) for displaying the information related to the history of an Issue.
+	 * @return the text description of the change history pertaining to the corresponding IssueHistoryItem.
+	 */
+	public String getDescription() { return null; }  //	public abstract String getDescription();
+
+	/**
+	 * This method can be used to assist in displaying the icon information of an IssueHistoryItem appearing on the
+	 * description cell in the {@link IssueHistoryTable}, in addition to the method {@link IssueHistoryItem.#getDescription()}.
+	 * @return the 16x16 icon image of the corresponding IssueHistoryItem.
+	 */
+	public byte[] getImage16x16Data() { return null; }  //	public abstract byte[] getImage16x16Data();
+
+
+
+	// TODO Rewrite in favour of utilizing the IssueHistoryItemFactory. See notes 15 May 2009. Kai.
+	@Deprecated
 	private void generateHistory(Issue oldIssue, Issue newIssue)
 	{
 		StringBuffer changeText = new StringBuffer();
@@ -389,37 +390,31 @@ implements Serializable
 	 * @return The PersistenceManager associated with this object.
 	 */
 	protected PersistenceManager getPersistenceManager() {
-		PersistenceManager issueHistoryPM = JDOHelper.getPersistenceManager(this);
-		if (issueHistoryPM == null)
+		PersistenceManager issueHistoryItemPM = JDOHelper.getPersistenceManager(this);
+		if (issueHistoryItemPM == null)
 			throw new IllegalStateException("This instance of " + this.getClass().getName() + " is not persistent, can not get a PersistenceManager!");
 
-		return issueHistoryPM;
+		return issueHistoryItemPM;
 	}
 
 	@Override
-	/**
-	 * {@inheritDoc}
-	 */
 	public boolean equals(Object obj)
 	{
 		if (obj == this) return true;
-		if (!(obj instanceof IssueHistory)) return false;
-		IssueHistory o = (IssueHistory) obj;
+		if (!(obj instanceof IssueHistoryItem)) return false;
+		IssueHistoryItem o = (IssueHistoryItem) obj;
 		return
 			Util.equals(this.organisationID, o.organisationID) &&
 			Util.equals(this.issueID, o.issueID) &&
-			Util.equals(this.issueHistoryID, o.issueHistoryID);
+			Util.equals(this.issueHistoryItemID, o.issueHistoryItemID);
 	}
 
 	@Override
-	/**
-	 * {@inheritDoc}
-	 */
 	public int hashCode()
 	{
 		return
 			(31 * Util.hashCode(organisationID)) +
 			Util.hashCode(issueID) ^
-			Util.hashCode(issueHistoryID);
+			Util.hashCode(issueHistoryItemID);
 	}
 }

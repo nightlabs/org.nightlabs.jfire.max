@@ -15,11 +15,11 @@ import org.nightlabs.jdo.ObjectID;
 
 
 /**
- * The JDO object id class for {@link org.nightlabs.jfire.issue.history.IssueHistory}.
+ * The JDO object id class for {@link org.nightlabs.jfire.issue.history.IssueHistoryItem}.
  * <p>This class was auto-generated.</p>
  */
 @Generated("org.nightlabs.eclipse.sdk.jdo.ObjectIdGenerator")
-public class IssueHistoryID
+public class IssueHistoryItemID
 implements ObjectID
 {
 	/**
@@ -78,52 +78,52 @@ implements ObjectID
 
 	/**
 	 * Primary key field organisationID.
-	 * Declared as primary key field in {@link org.nightlabs.jfire.issue.history.IssueHistory}.
+	 * Declared as primary key field in {@link org.nightlabs.jfire.issue.history.IssueHistoryItem}.
 	 */
 	@Generated("org.nightlabs.eclipse.sdk.jdo.ObjectIdGenerator")
 	public java.lang.String organisationID;
 
 	/**
 	 * Primary key field issueID.
-	 * Declared as primary key field in {@link org.nightlabs.jfire.issue.history.IssueHistory}.
+	 * Declared as primary key field in {@link org.nightlabs.jfire.issue.history.IssueHistoryItem}.
 	 */
 	@Generated("org.nightlabs.eclipse.sdk.jdo.ObjectIdGenerator")
 	public long issueID;
 
 	/**
-	 * Primary key field issueHistoryID.
-	 * Declared as primary key field in {@link org.nightlabs.jfire.issue.history.IssueHistory}.
+	 * Primary key field issueHistoryItemID.
+	 * Declared as primary key field in {@link org.nightlabs.jfire.issue.history.IssueHistoryItem}.
 	 */
 	@Generated("org.nightlabs.eclipse.sdk.jdo.ObjectIdGenerator")
-	public long issueHistoryID;
+	public long issueHistoryItemID;
 
 	/**
-	 * Create a new empty instance of IssueHistoryID.
+	 * Create a new empty instance of IssueHistoryItemID.
 	 */
 	@Generated("org.nightlabs.eclipse.sdk.jdo.ObjectIdGenerator")
-	public IssueHistoryID()
+	public IssueHistoryItemID()
 	{
 	}
 
 	/**
-	 * Create a new instance of IssueHistoryID.
+	 * Create a new instance of IssueHistoryItemID.
 	 * This is done by parsing the <code>keyStr</code> that has been created
 	 * by {@link #toString()} and setting all fields to the values from the string.
 	 * <p>
 	 * This means, the following code will create a copy of this class:<br/><br/>
-	 * <code>IssueHistoryID newIssueHistoryID = new IssueHistoryID(oldIssueHistoryID.toString());</code>
+	 * <code>IssueHistoryItemID newIssueHistoryID = new IssueHistoryItemID(oldIssueHistoryID.toString());</code>
 	 * </p>
 	 * @param keyStr A String formatted as "jdo/{className}?{field0}={value0}&amp;{field1}={value1}...&amp;{fieldN}={valueN}"
 	 *     where all values are url encoded using {@link #ENCODING}.
 	 */
 	@Generated("org.nightlabs.eclipse.sdk.jdo.ObjectIdGenerator")
-	public IssueHistoryID(final String keyStr)
+	public IssueHistoryItemID(final String keyStr)
 	throws ParseException, SecurityException,
 			NoSuchFieldException, IllegalArgumentException,
 			IllegalAccessException, NoSuchMethodException,
 			InstantiationException, InvocationTargetException
 	{
-		Class<? extends IssueHistoryID> clazz = this.getClass();
+		Class<? extends IssueHistoryItemID> clazz = this.getClass();
 
 		StringTokenizer st = new StringTokenizer(keyStr, SEPARATORS_FOR_TOKENIZER, true);
 		String jdoPrefix = st.nextToken();
@@ -244,7 +244,7 @@ implements ObjectID
 	 * Create a string representation of this object id.
 	 * <p>
 	 * JDO expects the result of this method to be compatible with the constructor
-	 * {@link #IssueHistoryID(String)}.
+	 * {@link #IssueHistoryItemID(String)}.
 	 * This method takes all the primary-key-fields and encodes them with their name
 	 * and their value.
 	 * </p>
@@ -267,8 +267,8 @@ implements ObjectID
 			sb.append("issueID="); //$NON-NLS-1$
 			sb.append(URLEncoder.encode(Long.toString(issueID, RADIX), ENCODING));
 			sb.append('&');
-			sb.append("issueHistoryID="); //$NON-NLS-1$
-			sb.append(URLEncoder.encode(Long.toString(issueHistoryID, RADIX), ENCODING));
+			sb.append("issueHistoryItemID="); //$NON-NLS-1$
+			sb.append(URLEncoder.encode(Long.toString(issueHistoryItemID, RADIX), ENCODING));
 		} catch (UnsupportedEncodingException e) {
 			throw new RuntimeException(
 					"Encoding failed with encoding " + //$NON-NLS-1$
@@ -293,7 +293,7 @@ implements ObjectID
 			return false;
 		if(getClass() != obj.getClass())
 			return false;
-		IssueHistoryID other = (IssueHistoryID) obj;
+		IssueHistoryItemID other = (IssueHistoryItemID) obj;
 		if(organisationID == null) {
 			if(other.organisationID != null)
 				return false;
@@ -301,7 +301,7 @@ implements ObjectID
 			return false;
 		if(issueID != other.issueID)
 			return false;
-		if(issueHistoryID != other.issueHistoryID)
+		if(issueHistoryItemID != other.issueHistoryItemID)
 			return false;
 		return true;
 	}
@@ -321,7 +321,7 @@ implements ObjectID
 		int result = 1;
 		result = prime * result + ((organisationID == null) ? 0 : organisationID.hashCode());
 		result = prime * result + (int) (issueID ^ (issueID >>> 32));
-		result = prime * result + (int) (issueHistoryID ^ (issueHistoryID >>> 32));
+		result = prime * result + (int) (issueHistoryItemID ^ (issueHistoryItemID >>> 32));
 		return result;
 	}
 
@@ -329,17 +329,17 @@ implements ObjectID
 	 * Create a new object id instance.
 	 * @param organisationID The primary key field organisationID.
 	 * @param issueID The primary key field issueID.
-	 * @param issueHistoryID The primary key field issueHistoryID.
-	 * @return a newly created instance of <code>IssueHistoryID</code>
+	 * @param issueHistoryItemID The primary key field issueHistoryID.
+	 * @return a newly created instance of <code>IssueHistoryItemID</code>
 	 *     with the primary-key fields set to the given parameters.
 	 */
 	@Generated("org.nightlabs.eclipse.sdk.jdo.ObjectIdGenerator")
-	public static IssueHistoryID create(String organisationID, long issueID, long issueHistoryID)
+	public static IssueHistoryItemID create(String organisationID, long issueID, long issueHistoryItemID)
 	{
-		IssueHistoryID n = new IssueHistoryID();
+		IssueHistoryItemID n = new IssueHistoryItemID();
 		n.organisationID = organisationID;
 		n.issueID = issueID;
-		n.issueHistoryID = issueHistoryID;
+		n.issueHistoryItemID = issueHistoryItemID;
 		return n;
 	}
 }

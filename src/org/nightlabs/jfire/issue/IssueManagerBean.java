@@ -43,8 +43,8 @@ import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.base.JFireBaseEAR;
 import org.nightlabs.jfire.editlock.EditLockType;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
-import org.nightlabs.jfire.issue.history.IssueHistory;
-import org.nightlabs.jfire.issue.history.id.IssueHistoryID;
+import org.nightlabs.jfire.issue.history.IssueHistoryItem;
+import org.nightlabs.jfire.issue.history.id.IssueHistoryItemID;
 import org.nightlabs.jfire.issue.id.IssueCommentID;
 import org.nightlabs.jfire.issue.id.IssueFileAttachmentID;
 import org.nightlabs.jfire.issue.id.IssueID;
@@ -85,6 +85,7 @@ import org.nightlabs.util.Util;
  *
  * </p>
  * @author Chairat Kongarayawetchakun - chairat [AT] nightlabs [DOT] de
+ * @author Khaireel Mohamed - khaireel at nightlabs dot de
  *
  * @ejb.bean name="jfire/ejb/JFireIssueTracking/IssueManager"
  *           jndi-name="jfire/ejb/JFireIssueTracking/IssueManager"
@@ -637,10 +638,15 @@ implements IssueManagerRemote
 
 				IssueID issueID = (IssueID) JDOHelper.getObjectId(issue);
 				Issue oldPersistentIssue = (Issue) pm.getObjectById(issueID);
-
 				User user = SecurityReflector.getUserDescriptor().getUser(pm);
-				IssueHistory issueHistory = new IssueHistory(oldPersistentIssue.getOrganisationID(), user, oldPersistentIssue, issue, IDGenerator.nextID(IssueHistory.class));
-				storeIssueHistory(issueHistory, false, new String[]{FetchPlan.DEFAULT}, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
+
+
+				// --- 8< --- KaiExperiments: since 27.05.2009 ------------------[In stitching in the functionalities of IssueHistoryItems]
+				// ------ KaiExperiments ----- >8 -------------------------------
+
+
+				IssueHistoryItem issueHistory = new IssueHistoryItem(oldPersistentIssue.getOrganisationID(), user, oldPersistentIssue, issue, IDGenerator.nextID(IssueHistoryItem.class));
+				storeIssueHistoryItem(issueHistory, false, new String[]{FetchPlan.DEFAULT}, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
 				if (issue.getCreateTimestamp() != null) {
 					issue.setUpdateTimestamp(new Date());
 				}
@@ -901,13 +907,13 @@ implements IssueManagerRemote
 		}
 	}
 
-	//IssueHistory//
+	//IssueHistoryItem//
 	/* (non-Javadoc)
-	 * @see org.nightlabs.jfire.issue.IssueManagerRemote#storeIssueHistory(org.nightlabs.jfire.issue.history.IssueHistory, boolean, java.lang.String[], int)
+	 * @see org.nightlabs.jfire.issue.IssueManagerRemote#storeIssueHistory(org.nightlabs.jfire.issue.history.IssueHistoryItem, boolean, java.lang.String[], int)
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("_Guest_")
-	public IssueHistory storeIssueHistory(IssueHistory issueHistory, boolean get, String[] fetchGroups, int maxFetchDepth)
+	public IssueHistoryItem storeIssueHistoryItem(IssueHistoryItem issueHistory, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -923,11 +929,11 @@ implements IssueManagerRemote
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@RolesAllowed("_Guest_")
-	public Collection<IssueHistoryID> getIssueHistoryIDsByIssueID(IssueID issueID)
+	public Collection<IssueHistoryItemID> getIssueHistoryItemIDsByIssueID(IssueID issueID)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			return NLJDOHelper.getObjectIDSet(IssueHistory.getIssueHistoryByIssue(pm, issueID));
+			return NLJDOHelper.getObjectIDSet(IssueHistoryItem.getIssueHistoryItemsByIssue(pm, issueID));
 		} finally {
 			pm.close();
 		}
@@ -938,11 +944,11 @@ implements IssueManagerRemote
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@RolesAllowed("_Guest_")
-	public List<IssueHistory> getIssueHistories(Collection<IssueHistoryID> issueHistoryIDs, String[] fetchGroups, int maxFetchDepth)
+	public List<IssueHistoryItem> getIssueHistoryItems(Collection<IssueHistoryItemID> issueHistoryIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			return NLJDOHelper.getDetachedObjectList(pm, issueHistoryIDs, IssueHistory.class, fetchGroups, maxFetchDepth);
+			return NLJDOHelper.getDetachedObjectList(pm, issueHistoryIDs, IssueHistoryItem.class, fetchGroups, maxFetchDepth);
 		} finally {
 			pm.close();
 		}

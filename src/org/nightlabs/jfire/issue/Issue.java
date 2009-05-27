@@ -85,55 +85,6 @@ import org.nightlabs.util.Util;
  * @author Chairat Kongarayawetchakun <!-- chairat [AT] nightlabs [DOT] de -->
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
  * @author Khaireel Mohamed - khaireel at nightlabs dot de
- *
- * @jdo.persistence-capable
- *		identity-type="application"
- *		objectid-class="org.nightlabs.jfire.issue.id.IssueID"
- *		detachable="true"
- *		table="JFireIssueTracking_Issue"
- *
- * @jdo.inheritance strategy="new-table"
- *
- * @jdo.implements name="org.nightlabs.jfire.jbpm.graph.def.Statable"
- *
- * @jdo.create-objectid-class
- *		field-order="organisationID, issueID"
- *
- * @jdo.query
- *		name="getIssuesByProjectID"
- *		query="SELECT
- *			WHERE
- *				this.project.organisationID == :organisationID &&
- *				this.project.projectID == :projectID"
- *
- * @jdo.query
- *		name="getIssuesByProjectTypeID"
- *		query="SELECT
- *			WHERE
- *				this.project.projectType.organisationID == :organisationID &&
- *				this.project.projectType.projectTypeID == :projectTypeID"
- *
- * @jdo.fetch-group name="Issue.issueFileAttachments" fields="issueFileAttachments"
- * @jdo.fetch-group name="Issue.description" fields="description"
- * @jdo.fetch-group name="Issue.subject" fields="subject"
- * @jdo.fetch-group name="Issue.issuePriority" fields="issuePriority"
- * @jdo.fetch-group name="Issue.issueSeverityType" fields="issueSeverityType"
- * @jdo.fetch-group name="Issue.issueResolution" fields="issueResolution"
- * @jdo.fetch-group name="Issue.state" fields="state"
- * @jdo.fetch-group name="Issue.states" fields="states"
- * @jdo.fetch-group name="Issue.issueLocal" fields="issueLocal"
- * @jdo.fetch-group name="Issue.issueType" fields="issueType"
- * @jdo.fetch-group name="Issue.project" fields="project"
- * @jdo.fetch-group name="Issue.comments" fields="comments"
- * @jdo.fetch-group name="Issue.issueLinks" fields="issueLinks"
- * @jdo.fetch-group name="Issue.propertySet" fields="propertySet"
- * @jdo.fetch-group name="Issue.reporter" fields="reporter"
- * @jdo.fetch-group name="Issue.assignee" fields="assignee"
- * @jdo.fetch-group name="Issue.issueWorkTimeRanges" fields="issueWorkTimeRanges"
- * @jdo.fetch-group name="Issue.issueMarkers" fields="issueMarkers"
- *
- * @jdo.fetch-group name="Statable.state" fields="state"
- * @jdo.fetch-group name="Statable.states" fields="states"
  */
 @PersistenceCapable(
 	objectIdClass=IssueID.class,
@@ -462,9 +413,7 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	}
 
 
-	// --- 8< --- KaiExperiments: since 14.05.2009 ------------------
-	// --[ In preparation for an IssueMarker ]--
-	// TODO Methods to add (and later remove?) IssueMarkers.
+	// --- 8< --- KaiExperiments: since 14.05.2009 ------------------[Concluded: 19.05.2009]
 	@Join
 	@Persistent(
 		table="JFireIssueTracking_Issue_issueMarkers",
@@ -483,22 +432,6 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	public void removeIssueMarker(IssueMarker issueMarker) {
 		issueMarkers.remove(issueMarker);
 	}
-
-//	/**
-//	 * Adds a new IssueMarker to this Issue.
-//	 * @return the newly created IssueMarker.
-//	 * FIXME Note that this method is still UNDER TEST!
-//	 * FIXME Revise the language option.
-//	 * TODO The icon part is still not handled.
-//	 */
-//	public IssueMarker addIssueMarker(String issueMarkerNameStr, String issueMarkerDescriptionStr) {
-//		IssueMarker issueMarker = new IssueMarker(IDGenerator.getOrganisationID(), IDGenerator.nextID(IssueMarker.class));
-//		issueMarker.getName().setText(Locale.ENGLISH.getLanguage(), issueMarkerNameStr);				// }<-- FIXME Language is only for Testing.
-//		issueMarker.getDescription().setText(Locale.ENGLISH.getLanguage(), issueMarkerDescriptionStr);	// }
-//
-//		issueMarkers.add( issueMarker );
-//		return issueMarker;
-//	}
 	// ------ KaiExperiments ----- >8 -------------------------------
 
 

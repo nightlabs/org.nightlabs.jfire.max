@@ -7,26 +7,26 @@ import java.util.Set;
 import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.issue.IssueManagerRemote;
-import org.nightlabs.jfire.issue.history.id.IssueHistoryID;
+import org.nightlabs.jfire.issue.history.id.IssueHistoryItemID;
 import org.nightlabs.jfire.issue.id.IssueID;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.progress.ProgressMonitor;
 
 /**
- * Data access object for {@link IssueHistory}s.
+ * Data access object for {@link IssueHistoryItem}s.
  *
  * @author Chairat Kongarayawetchakun - chairat [AT] nightlabs [DOT] de
  */
-public class IssueHistoryDAO extends BaseJDOObjectDAO<IssueHistoryID, IssueHistory>{
+public class IssueHistoryItemDAO extends BaseJDOObjectDAO<IssueHistoryItemID, IssueHistoryItem>{
 
-	private static IssueHistoryDAO sharedInstance = null;
+	private static IssueHistoryItemDAO sharedInstance = null;
 
-	public static IssueHistoryDAO sharedInstance()
+	public static IssueHistoryItemDAO sharedInstance()
 	{
 		if (sharedInstance == null) {
-			synchronized (IssueHistoryDAO.class) {
+			synchronized (IssueHistoryItemDAO.class) {
 				if (sharedInstance == null)
-					sharedInstance = new IssueHistoryDAO();
+					sharedInstance = new IssueHistoryItemDAO();
 			}
 		}
 		return sharedInstance;
@@ -36,14 +36,14 @@ public class IssueHistoryDAO extends BaseJDOObjectDAO<IssueHistoryID, IssueHisto
 	/**
 	 * {@inheritDoc}
 	 */
-	protected synchronized Collection<IssueHistory> retrieveJDOObjects(Set<IssueHistoryID> issueHistoryIDs,
+	protected synchronized Collection<IssueHistoryItem> retrieveJDOObjects(Set<IssueHistoryItemID> issueHistoryIDs,
 			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 			throws Exception {
 
 		monitor.beginTask("Loading Issue Histories", 1);
 		try {
 			IssueManagerRemote im = JFireEjb3Factory.getRemoteBean(IssueManagerRemote.class, SecurityReflector.getInitialContextProperties());
-			return im.getIssueHistories(issueHistoryIDs, fetchGroups, maxFetchDepth);
+			return im.getIssueHistoryItems(issueHistoryIDs, fetchGroups, maxFetchDepth);
 		} catch (Exception e) {
 			monitor.setCanceled(true);
 			throw e;
@@ -56,15 +56,13 @@ public class IssueHistoryDAO extends BaseJDOObjectDAO<IssueHistoryID, IssueHisto
 
 	private IssueManagerRemote issueManager;
 
-	public synchronized List<IssueHistory> getIssueHistories(IssueID issueID,
-			String[] fetchGroups, int maxFetchDepth,
-			ProgressMonitor monitor)
-	{
+	public synchronized List<IssueHistoryItem> getIssueHistoryItems
+	(IssueID issueID, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) {
 		try {
 			issueManager = JFireEjb3Factory.getRemoteBean(IssueManagerRemote.class, SecurityReflector.getInitialContextProperties());
 			try {
-				Collection<IssueHistoryID> issueHistoryIDs = issueManager.getIssueHistoryIDsByIssueID(issueID);
-				return getJDOObjects(null, issueHistoryIDs, fetchGroups, maxFetchDepth, monitor);
+				Collection<IssueHistoryItemID> issueHistoryItemIDs = issueManager.getIssueHistoryItemIDsByIssueID(issueID);
+				return getJDOObjects(null, issueHistoryItemIDs, fetchGroups, maxFetchDepth, monitor);
 			} finally {
 				issueManager = null;
 			}
@@ -73,14 +71,14 @@ public class IssueHistoryDAO extends BaseJDOObjectDAO<IssueHistoryID, IssueHisto
 		}
 	}
 
-	public Collection<IssueHistory> getIssueHistories(Collection<IssueHistoryID> issueHistoryIDs, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
-	{
+	public Collection<IssueHistoryItem> getIssueHistoryItems
+	(Collection<IssueHistoryItemID> issueHistoryItemIDs, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) {
 		monitor.beginTask("Loading issue histories...", 1);
 		try {
 			IssueManagerRemote im = JFireEjb3Factory.getRemoteBean(IssueManagerRemote.class, SecurityReflector.getInitialContextProperties());
-			Collection<IssueHistory> issueHistories = im.getIssueHistories(issueHistoryIDs, fetchGroups, maxFetchDepth);
+			Collection<IssueHistoryItem> issueHistoryItems = im.getIssueHistoryItems(issueHistoryItemIDs, fetchGroups, maxFetchDepth);
 			monitor.done();
-			return issueHistories;
+			return issueHistoryItems;
 		} catch (Exception x) {
 			throw new RuntimeException(x);
 		}

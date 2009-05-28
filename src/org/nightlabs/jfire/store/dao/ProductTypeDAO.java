@@ -30,10 +30,10 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.jdo.FetchPlan;
-
 import org.nightlabs.jdo.query.QueryCollection;
 import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
@@ -202,5 +202,48 @@ extends BaseJDOObjectDAO<ProductTypeID, ProductType>
 			throw new RuntimeException(x);
 		}
 	}
-
+	
+	
+	/**
+	 * Returns a List of child {@link ProductTypeIDs}s for the given {@link ProductTypeID}.
+	 * @param parentProductTypeID the {@link ProductTypeID} of the parent {@link ProductType} to get the children for.
+	 * @param fetchGroups the fetchGroups which control which fields should be detached.
+	 * @param maxFetchDepth the maximum fetch depth of the detached object graph.
+	 * @param monitor the {@link ProgressMonitor} which display the progress of loading.
+	 * @return a List of child {@link ProductType}s for the given {@link ProductTypeID}.
+	 */
+	public synchronized Collection<ProductTypeID> getChildProductTypesIDs(ProductTypeID parentProductTypeID,
+			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
+	{
+		try {
+			storeManager = JFireEjb3Factory.getRemoteBean(StoreManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			try {
+				Collection<ProductTypeID> productTypeIDs = storeManager.getChildProductTypeIDs(parentProductTypeID);
+				return productTypeIDs;
+			} finally {
+				storeManager = null;
+				monitor.done();
+			}
+		} catch (Exception x) {
+			throw new RuntimeException(x);
+		}
+	}
+	
+	
+	public Map<ProductTypeID, Long> getChildProductTypeCounts(Collection<ProductTypeID> parentProductTypeIDs, ProgressMonitor monitor)	
+	{	
+		try {
+			storeManager = JFireEjb3Factory.getRemoteBean(StoreManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			try {
+				
+				return storeManager.getChildProductTypeCounts(parentProductTypeIDs);			
+			} finally {
+				storeManager = null;
+				monitor.done();
+			}
+		} catch (Exception x) {
+			throw new RuntimeException(x);
+		}
+		
+	}
 }

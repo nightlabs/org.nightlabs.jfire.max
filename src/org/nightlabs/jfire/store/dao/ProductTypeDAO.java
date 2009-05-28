@@ -205,12 +205,12 @@ extends BaseJDOObjectDAO<ProductTypeID, ProductType>
 	
 	
 	/**
-	 * Returns a List of child {@link ProductTypeIDs}s for the given {@link ProductTypeID}.
+	 * Returns a List of child {@link ProductTypeIDs}s for the given Parent {@link ProductTypeID}.
 	 * @param parentProductTypeID the {@link ProductTypeID} of the parent {@link ProductType} to get the children for.
 	 * @param fetchGroups the fetchGroups which control which fields should be detached.
 	 * @param maxFetchDepth the maximum fetch depth of the detached object graph.
 	 * @param monitor the {@link ProgressMonitor} which display the progress of loading.
-	 * @return a List of child {@link ProductType}s for the given {@link ProductTypeID}.
+	 * @return a List of child IDs {@link ProductTypeID}s for the given Parent {@link ProductTypeID}.
 	 */
 	public synchronized Collection<ProductTypeID> getChildProductTypesIDs(ProductTypeID parentProductTypeID,
 			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
@@ -229,13 +229,17 @@ extends BaseJDOObjectDAO<ProductTypeID, ProductType>
 		}
 	}
 	
-	
+	/**
+	 * Returns the total number of Child count.
+	 * @param parentProductTypeID the {@link ProductTypeID} of the parent {@link ProductType} to get the children for.
+	 * @param monitor the {@link ProgressMonitor} which display the progress of loading.
+	 * @return the total number of Child count{@link ProductTypeID}s for the given Parent {@link ProductTypeID}.
+	 */	   
 	public Map<ProductTypeID, Long> getChildProductTypeCounts(Collection<ProductTypeID> parentProductTypeIDs, ProgressMonitor monitor)	
 	{	
 		try {
 			storeManager = JFireEjb3Factory.getRemoteBean(StoreManagerRemote.class, SecurityReflector.getInitialContextProperties());
-			try {
-				
+			try {			
 				return storeManager.getChildProductTypeCounts(parentProductTypeIDs);			
 			} finally {
 				storeManager = null;

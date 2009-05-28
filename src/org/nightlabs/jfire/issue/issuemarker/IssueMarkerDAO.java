@@ -56,6 +56,13 @@ public class IssueMarkerDAO extends BaseJDOObjectDAO<IssueMarkerID, IssueMarker>
 	}
 
 	/**
+	 * @return the IssueMarker with the given issueMarkerID.
+	 */
+	public IssueMarker getIssueMarker(IssueMarkerID issueMarkerID, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) {
+		return getJDOObject(null, issueMarkerID, fetchGroups, maxFetchDepth, monitor);
+	}
+
+	/**
 	 * Get all {@link IssueMarker}s belonging to a given {@link Issue} specified by its OID.
 	 */
 	public Collection<IssueMarker> getIssueMarkers(IssueID issueID, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) {

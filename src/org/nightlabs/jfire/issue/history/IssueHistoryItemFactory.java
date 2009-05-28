@@ -9,6 +9,7 @@ import javax.jdo.PersistenceManager;
 
 import org.nightlabs.jfire.issue.Issue;
 import org.nightlabs.jfire.issue.issuemarker.IssueMarkerHistoryItem;
+import org.nightlabs.jfire.issue.issuemarker.IssueMarkerHistoryItemFactory;
 import org.nightlabs.jfire.security.User;
 
 public abstract class IssueHistoryItemFactory {
@@ -17,22 +18,22 @@ public abstract class IssueHistoryItemFactory {
 	 * whenever an {@link Issue} is saved.
 	 */
 	private static final Class<?>[] factories = {
-		IssueMarkerHistoryItem.class,
+		IssueMarkerHistoryItemFactory.class,
 
 		// Retrieved the following from the previous handling of tracking historical changes in an Issue
 		// from the original class IssueHistoryItem.generateHistory():
-//		IssueDescriptionHistoryItemFactoryName.class,
-//		IssueCommentHistoryItemFactoryName.class,
-//		IssueSubjectHistoryItemFactoryName.class,
-//		IssueAssigneeHistoryItemFactoryName.class,
-//		IssueReporterHistoryItemFactoryName.class,
-//		IssueFileAttachmentsHistoryItemFactoryName.class,
-//		IssuePriorityHistoryItemFactoryName.class,
-//		IssueSeverityTypeHistoryItemFactoryName.class,
-//		IssueResolutionHistoryItemFactoryName.class,
-//		IssueTypeHistoryItemFactoryName.class,
-//		IssueStateDefinitionHistoryItemFactoryName.class,
-//		IssueStatusHistoryItemFactoryName.class,
+//		IssueDescriptionHistoryItemFactory.class,
+//		IssueCommentHistoryItemFactory.class,
+//		IssueSubjectHistoryItemFactory.class,
+//		IssueAssigneeHistoryItemFactory.class,
+//		IssueReporterHistoryItemFactory.class,
+//		IssueFileAttachmentsHistoryItemFactory.class,
+//		IssuePriorityHistoryItemFactory.class,
+//		IssueSeverityTypeHistoryItemFactory.class,
+//		IssueResolutionHistoryItemFactory.class,
+//		IssueTypeHistoryItemFactory.class,
+//		IssueStateDefinitionHistoryItemFactory.class,
+//		IssueStatusHistoryItemFactory.class,
 
 		// QN: Is every single one of the above necessary?
 	};

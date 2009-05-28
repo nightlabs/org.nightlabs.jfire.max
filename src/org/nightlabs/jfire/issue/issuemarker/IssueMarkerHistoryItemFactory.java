@@ -9,7 +9,6 @@ import javax.jdo.JDODetachedFieldAccessException;
 import org.nightlabs.jfire.issue.Issue;
 import org.nightlabs.jfire.issue.history.IssueHistoryItem;
 import org.nightlabs.jfire.issue.history.IssueHistoryItemFactory;
-import org.nightlabs.jfire.issue.issuemarker.IssueMarkerHistoryItem.HistoryActionIssueMarker;
 import org.nightlabs.jfire.security.User;
 
 /**
@@ -30,6 +29,8 @@ public class IssueMarkerHistoryItemFactory extends IssueHistoryItemFactory {
 	@Override
 	public Collection<IssueHistoryItem> createIssueHistoryItems(User user, Issue oldPersistentIssue, Issue newDetachedIssue)
 	throws JDODetachedFieldAccessException {
+		Collection<IssueHistoryItem> issueMarkerHistoryItems = new ArrayList<IssueHistoryItem>();
+
 		// Check and see what new IssueMarker has been added, and what current IssueMarkers have been added.
 		// Note: There are cases of no effects; eg. a new IssueMarker was added, and then removed before the Issue was saved (and vice-versa).
 		Set<IssueMarker> oldIssueMarkers = oldPersistentIssue.getIssueMarkers();
@@ -56,12 +57,11 @@ public class IssueMarkerHistoryItemFactory extends IssueHistoryItemFactory {
 
 
 		// (iii) Collate them all, and generate the necessary IssueMarkerHistoryItem
-		Collection<IssueHistoryItem> issueMarkerHistoryItems = new ArrayList<IssueHistoryItem>();
 		for(IssueMarker issueMarker : addedIssueMarkers)
-			issueMarkerHistoryItems.add( new IssueMarkerHistoryItem(user, issueMarker, HistoryActionIssueMarker.ADDED, oldPersistentIssue, newDetachedIssue) );
+			issueMarkerHistoryItems.add( new IssueMarkerHistoryItem(user, issueMarker, IssueMarkerHistoryItemAction.ADDED, oldPersistentIssue, newDetachedIssue) );
 
 		for(IssueMarker issueMarker : removedIssueMarkers)
-			issueMarkerHistoryItems.add( new IssueMarkerHistoryItem(user, issueMarker, HistoryActionIssueMarker.REMOVED, oldPersistentIssue, newDetachedIssue) );
+			issueMarkerHistoryItems.add( new IssueMarkerHistoryItem(user, issueMarker, IssueMarkerHistoryItemAction.REMOVED, oldPersistentIssue, newDetachedIssue) );
 
 
 		return issueMarkerHistoryItems;

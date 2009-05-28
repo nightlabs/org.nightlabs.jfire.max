@@ -318,6 +318,8 @@ public interface IssueManagerRemote {
 	//IssueHistoryItem//
 	IssueHistoryItem storeIssueHistoryItem(IssueHistoryItem issueHistory, boolean get, String[] fetchGroups, int maxFetchDepth);
 
+	Collection<IssueHistoryItem> storeIssueHistoryItems(Collection<IssueHistoryItem> issueHistoryItems, boolean get, String[] fetchGroups, int maxFetchDepth);
+
 	Collection<IssueHistoryItemID> getIssueHistoryItemIDsByIssueID(IssueID issueID);
 
 	List<IssueHistoryItem> getIssueHistoryItems(Collection<IssueHistoryItemID> issueHistoryIDs, String[] fetchGroups, int maxFetchDepth);

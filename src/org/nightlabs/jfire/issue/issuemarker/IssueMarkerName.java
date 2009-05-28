@@ -17,6 +17,7 @@ import javax.jdo.annotations.PrimaryKey;
 
 import org.nightlabs.i18n.I18nText;
 import org.nightlabs.jdo.ObjectIDUtil;
+import org.nightlabs.jfire.issue.history.FetchGroupsIssueHistoryItem;
 import org.nightlabs.jfire.issue.id.IssueMarkerNameID;
 
 /**
@@ -30,12 +31,16 @@ import org.nightlabs.jfire.issue.id.IssueMarkerNameID;
 	detachable="true",
 	table="JFireIssueTracking_IssueMarkerName"
 )
-@FetchGroups(
+@FetchGroups({
 	@FetchGroup(
 		name="IssueMarker.name",
 		members={@Persistent(name="issueMarker"), @Persistent(name="names")}
+	),
+	@FetchGroup(
+			name=FetchGroupsIssueHistoryItem.FETCH_GROUP_LIST,
+			members={@Persistent(name="issueMarker"), @Persistent(name="names")}
 	)
-)
+})
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class IssueMarkerName extends I18nText {
 	private static final long serialVersionUID = 1L;

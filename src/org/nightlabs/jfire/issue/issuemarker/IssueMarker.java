@@ -16,6 +16,7 @@ import javax.jdo.annotations.Version;
 import javax.jdo.annotations.VersionStrategy;
 
 import org.nightlabs.jfire.idgenerator.IDGenerator;
+import org.nightlabs.jfire.issue.history.FetchGroupsIssueHistoryItem;
 import org.nightlabs.jfire.issue.id.IssueMarkerID;
 import org.nightlabs.jfire.organisation.Organisation;
 
@@ -36,13 +37,20 @@ import org.nightlabs.jfire.organisation.Organisation;
 @FetchGroups({
 	@FetchGroup(
 			name=IssueMarker.FETCH_GROUP_NAME,
-			members=@Persistent(name="name") ),
+			members=@Persistent(name="name")
+	),
 	@FetchGroup(
 			name=IssueMarker.FETCH_GROUP_DESCRIPTION,
-			members=@Persistent(name="description") ),
+			members=@Persistent(name="description")
+	),
 	@FetchGroup(
 			name=IssueMarker.FETCH_GROUP_ICON_16X16_DATA,
-			members=@Persistent(name="icon16x16Data") )
+			members=@Persistent(name="icon16x16Data")
+	),
+	@FetchGroup(
+			name=FetchGroupsIssueHistoryItem.FETCH_GROUP_LIST,
+			members={@Persistent(name="name"), @Persistent(name="icon16x16Data")}
+	)
 })
 @Version(strategy=VersionStrategy.VERSION_NUMBER)
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
@@ -94,10 +102,6 @@ public class IssueMarker implements Serializable {
 
 
 	// :: --- [ ICONs ] ------------------------------------------------------------------------------------|
-	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 * @jdo.column sql-type="BLOB"
-	 */
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	@Column(sqlType="BLOB")
 	private byte[] icon16x16Data;

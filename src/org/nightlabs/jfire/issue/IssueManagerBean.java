@@ -44,6 +44,7 @@ import org.nightlabs.jfire.base.JFireBaseEAR;
 import org.nightlabs.jfire.editlock.EditLockType;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.issue.history.IssueHistoryItem;
+import org.nightlabs.jfire.issue.history.IssueHistoryItemFactory;
 import org.nightlabs.jfire.issue.history.id.IssueHistoryItemID;
 import org.nightlabs.jfire.issue.id.IssueCommentID;
 import org.nightlabs.jfire.issue.id.IssueFileAttachmentID;
@@ -642,11 +643,19 @@ implements IssueManagerRemote
 
 
 				// --- 8< --- KaiExperiments: since 27.05.2009 ------------------[In stitching in the functionalities of IssueHistoryItems]
+				// ~~ Original codes ~~
+//				IssueHistoryItem issueHistory = new IssueHistoryItem(oldPersistentIssue.getOrganisationID(), user, oldPersistentIssue, issue, IDGenerator.nextID(IssueHistoryItem.class));
+//				storeIssueHistoryItem(issueHistory, false, new String[]{FetchPlan.DEFAULT}, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
+
+				// ~~ New codes ~~
+				Collection<IssueHistoryItem> issueHistoryItems = IssueHistoryItemFactory.createIssueHistoryItems(pm, user, oldPersistentIssue, issue); // <-- Seems OK.
+				storeIssueHistoryItems(issueHistoryItems, false, new String[]{FetchPlan.DEFAULT}, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
+//				for(IssueHistoryItem issueHistoryItem : issueHistoryItems)
+//					storeIssueHistoryItem(issueHistoryItem, false, new String[]{FetchPlan.DEFAULT}, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
 				// ------ KaiExperiments ----- >8 -------------------------------
 
 
-				IssueHistoryItem issueHistory = new IssueHistoryItem(oldPersistentIssue.getOrganisationID(), user, oldPersistentIssue, issue, IDGenerator.nextID(IssueHistoryItem.class));
-				storeIssueHistoryItem(issueHistory, false, new String[]{FetchPlan.DEFAULT}, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
+
 				if (issue.getCreateTimestamp() != null) {
 					issue.setUpdateTimestamp(new Date());
 				}
@@ -913,15 +922,18 @@ implements IssueManagerRemote
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("_Guest_")
-	public IssueHistoryItem storeIssueHistoryItem(IssueHistoryItem issueHistory, boolean get, String[] fetchGroups, int maxFetchDepth)
-	{
+	public IssueHistoryItem storeIssueHistoryItem(IssueHistoryItem issueHistoryItem, boolean get, String[] fetchGroups, int maxFetchDepth) {
 		PersistenceManager pm = getPersistenceManager();
-		try {
-			return NLJDOHelper.storeJDO(pm, issueHistory, get, fetchGroups, maxFetchDepth);
-		}//try
-		finally {
-			pm.close();
-		}//finally
+		try     { return NLJDOHelper.storeJDO(pm, issueHistoryItem, get, fetchGroups, maxFetchDepth); }
+		finally { pm.close(); }
+	}
+
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("_Guest_")
+	public Collection<IssueHistoryItem> storeIssueHistoryItems(Collection<IssueHistoryItem> issueHistoryItems, boolean get, String[] fetchGroups, int maxFetchDepth) {
+		PersistenceManager pm = getPersistenceManager();
+		try     { return NLJDOHelper.storeJDOCollection(pm, issueHistoryItems, get, fetchGroups, maxFetchDepth); }
+		finally { pm.close(); }
 	}
 
 	/**

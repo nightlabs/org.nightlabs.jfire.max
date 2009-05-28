@@ -46,10 +46,22 @@ import org.nightlabs.util.Util;
 @FetchGroups({
 	@FetchGroup(
 		name=IssueHistoryItem.FETCH_GROUP_ISSUE,
-		members=@Persistent(name="issue")),
+		members=@Persistent(name="issue")
+	),
 	@FetchGroup(
 		name=IssueHistoryItem.FETCH_GROUP_USER,
-		members=@Persistent(name="user"))
+		members=@Persistent(name="user")
+	),
+	@FetchGroup(
+			name=FetchGroupsIssueHistoryItem.FETCH_GROUP_LIST,
+			members=@Persistent(name="user")
+	),
+//	@FetchGroup(
+//		name=IssueHistoryItem.FETCH_GROUP_ICON_16X16_DATA,
+//		members=@Persistent(name="icon16x16Data")),
+//	@FetchGroup(
+//		name=IssueHistoryItem.FETCH_GROUP_HISTORY_ACTION,
+//		members=@Persistent(name="issueHistoryAction")),
 })
 @Queries(
 	@javax.jdo.annotations.Query(
@@ -58,10 +70,7 @@ import org.nightlabs.util.Util;
 )
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 @Discriminator(strategy=DiscriminatorStrategy.CLASS_NAME)
-//public abstract class IssueHistoryItem
-public class IssueHistoryItem
-implements Serializable
-{
+public abstract class IssueHistoryItem implements Serializable {
 	private static final long serialVersionUID = 1L;
 	@SuppressWarnings("unused")
 	private static final Logger logger = Logger.getLogger(IssueHistoryItem.class);
@@ -70,6 +79,14 @@ implements Serializable
 	public static final String FETCH_GROUP_USER = "IssueHistoryItem.user";
 
 	public static final String QUERY_ISSUE_HISTORYIDS_BY_ORGANISATION_ID_AND_ISSUE_ID = "getIssueHistoryIDsByOrganisationIDAndIssueID";	// <-- FIXME See notes.
+
+
+
+//	// --- 8< --- KaiExperiments: since 27.05.2009 ------------------
+//	public static final String FETCH_GROUP_ICON_16X16_DATA = "IssueHistoryItem.icon16x16Data";
+//	public static final String FETCH_GROUP_HISTORY_ACTION = "IssueHistoryItem.issueHistoryAction";
+//	// ------ KaiExperiments ----- >8 -------------------------------
+
 
 	/**
 	 * This is the organisationID to which the issue history belongs. Within one organisation,
@@ -89,10 +106,6 @@ implements Serializable
 
 
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
-	@Column(sqlType="CLOB")
-	private String change; // TODO remove this field. Marco.
-
-	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private User user;
 
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
@@ -100,6 +113,22 @@ implements Serializable
 
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Date createTimestamp;
+
+//	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+//	@Column(sqlType="CLOB")
+//	private String description; // TODO Revise this field.
+//
+//
+//
+//	// --- 8< --- KaiExperiments: since 27.05.2009 ------------------
+//	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+//	@Column(sqlType="BLOB")
+//	private byte[] icon16x16Data;
+//
+//	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+//	private IssueHistoryAction issueHistoryAction;	// <-- May need to revise this naming convention...
+//	// ------ KaiExperiments ----- >8 -------------------------------
+
 
 
 
@@ -127,7 +156,7 @@ implements Serializable
 		this.user = user;
 
 
-		generateHistory(oldIssue, newIssue); // <-- FIXME Marked for removal. See notes 25 May 2009. Kai.
+//		generateHistory(oldIssue, newIssue); // <-- FIXME Marked for removal. See notes 25 May 2009. Kai.
 	}
 
 	/**
@@ -179,13 +208,13 @@ implements Serializable
 		return createTimestamp;
 	}
 
-	/**
-	 * Gets the string of change.
-	 * @return the string of change.
-	 */
-	public String getChange() {
-		return change;
-	}
+//	/**
+//	 * Gets the string of change.
+//	 * @return the string of change.
+//	 */
+//	public String getChange() {
+//		return change;
+//	}
 
 	/**
 	 * Gets the {@link User}.
@@ -217,173 +246,200 @@ implements Serializable
 
 
 
-	// TODO Once this class has been made ABSTRACT, the following two methods should be declared abstract. Kai.
+	// -------------------------------------------------------------------------------------------------------------------------|
 	/**
 	 * This is to be generated on the fly, and as such, makes it more flexible and easier to control when we desire
 	 * any special 'textual' condition(s) for displaying the information related to the history of an Issue.
 	 * @return the text description of the change history pertaining to the corresponding IssueHistoryItem.
 	 */
-	public String getDescription() { return null; }  //	public abstract String getDescription();
+//	public String getDescription() { return description; } // <-- [Make abstract?]
+	public abstract String getDescription();
 
 	/**
 	 * This method can be used to assist in displaying the icon information of an IssueHistoryItem appearing on the
 	 * description cell in the {@link IssueHistoryTable}, in addition to the method {@link IssueHistoryItem.#getDescription()}.
 	 * @return the 16x16 icon image of the corresponding IssueHistoryItem.
 	 */
-	public byte[] getImage16x16Data() { return null; }  //	public abstract byte[] getImage16x16Data();
+//	public byte[] getIcon16x16Data() { return icon16x16Data; } // <-- [Make abstract?]
+	public abstract byte[] getIcon16x16Data();
 
 
 
-	// TODO Rewrite in favour of utilizing the IssueHistoryItemFactory. See notes 15 May 2009. Kai.
-	@Deprecated
-	private void generateHistory(Issue oldIssue, Issue newIssue)
-	{
-		StringBuffer changeText = new StringBuffer();
+//	// -------------------------------------------------------------------------------------------------------------------------|
+//	/**
+//	 * Sets the description text for this {@link IssueHistoryItem}.
+//	 */
+//	public void setDescription(String description) { this.description = description; }
+//
+//	/**
+//	 * @param icon16x16Data the icon to set for this {@link IssueHistoryItem}.
+//	 */
+//	public void setIcon16x16Data(byte[] icon16x16Data) { this.icon16x16Data = icon16x16Data; }
+//
+//	/**
+//	 * @return the 'action' affected for this corresponding {@link IssueHistoryItem}.
+//	 */
+//	public IssueHistoryAction getIssueHistoryAction() { return issueHistoryAction; }
+//
+//	/**
+//	 * @param issueHistoryAction sets the 'action' affected for this corresponding {@link IssueHistoryItem}.
+//	 */
+//	public void setIssueHistoryAction(IssueHistoryAction issueHistoryAction) { this.issueHistoryAction = issueHistoryAction; }
 
-		if (!Util.equals(oldIssue.getDescription().getText(), newIssue.getDescription().getText()))
-		{
-			changeText.append("Changed description");
-			changeText.append(" from ");
-			changeText.append(oldIssue.getDescription().getText());
-			changeText.append(" ---> ");
-			changeText.append(newIssue.getDescription().getText());
-			changeText.append("\n");
 
-		}
 
-		if (!Util.equals(oldIssue.getSubject().getText(), newIssue.getSubject().getText()))
-		{
-			changeText.append("Changed subject");
-			changeText.append(" from ");
-			changeText.append(oldIssue.getSubject().getText());
-			changeText.append(" ---> ");
-			changeText.append(newIssue.getSubject().getText());
-			changeText.append("\n");
-		}
 
-		if (!Util.equals(oldIssue.getComments(), newIssue.getComments()))
-		{
-			changeText.append("Add Comment(s)");
-//			changeText.append(" from ");
-//			changeText.append();
-//			changeText.append(" ---> ");
-//			changeText.append();
-			changeText.append("\n");
-		}
-
-		if (!Util.equals(oldIssue.getAssignee(), newIssue.getAssignee()))
-		{
-			changeText.append("Changed assignee");
-			changeText.append(" from ");
-			changeText.append(oldIssue.getAssignee() == null? " - " : oldIssue.getAssignee().getName());
-			changeText.append(" ---> ");
-			changeText.append(newIssue.getAssignee() == null? " - " : newIssue.getAssignee().getName());
-			changeText.append("\n");
-		}
-
-		if (!Util.equals(oldIssue.getReporter(), newIssue.getReporter()))
-		{
-			changeText.append("Changed reporter");
-			changeText.append(" from ");
-			changeText.append(oldIssue.getReporter().getName());
-			changeText.append(" ---> ");
-			changeText.append(newIssue.getReporter().getName());
-			changeText.append("\n");
-		}
-
-		if (!Util.equals(oldIssue.getIssueFileAttachments().size(), newIssue.getIssueFileAttachments().size()))
-		{
-			changeText.append("Changed file attachments");
-//			changeText.append(" from ");
-//			changeText.append();
-//			changeText.append(" ---> ");
-//			changeText.append();
-			changeText.append("\n");
-		}
-
-//		if (!Util.equals(oldIssue.getIssueLinks(), newIssue.getIssueLinks()))
+//	// -------------------------------------------------------------------------------------------------------------------------|
+//	// TODO Rewrite in favour of utilizing the IssueHistoryItemFactory. See notes 15 May 2009. Kai.
+//	@Deprecated
+//	private void generateHistory(Issue oldIssue, Issue newIssue)
+//	{
+//		StringBuffer changeText = new StringBuffer();
+//
+//		if (!Util.equals(oldIssue.getDescription().getText(), newIssue.getDescription().getText()))
 //		{
-//			changeText.append("Changed issue links");
+//			changeText.append("Changed description");
+//			changeText.append(" from ");
+//			changeText.append(oldIssue.getDescription().getText());
+//			changeText.append(" ---> ");
+//			changeText.append(newIssue.getDescription().getText());
+//			changeText.append("\n");
+//
+//		}
+//
+//		if (!Util.equals(oldIssue.getSubject().getText(), newIssue.getSubject().getText()))
+//		{
+//			changeText.append("Changed subject");
+//			changeText.append(" from ");
+//			changeText.append(oldIssue.getSubject().getText());
+//			changeText.append(" ---> ");
+//			changeText.append(newIssue.getSubject().getText());
+//			changeText.append("\n");
+//		}
+//
+//		if (!Util.equals(oldIssue.getComments(), newIssue.getComments()))
+//		{
+//			changeText.append("Add Comment(s)");
 ////			changeText.append(" from ");
 ////			changeText.append();
 ////			changeText.append(" ---> ");
 ////			changeText.append();
 //			changeText.append("\n");
 //		}
-
-
-		// --- 8< --- KaiExperiments: since 14.05.2009 ------------------
-		if (!Util.equals(oldIssue.getIssueMarkers().size(), newIssue.getIssueMarkers().size())) {
-			int oldSize = oldIssue.getIssueMarkers().size();
-			int newSize = newIssue.getIssueMarkers().size();
-
-			if (oldSize < newSize)	changeText.append("A new issue marker was added.");
-			if (oldSize > newSize)	changeText.append("An old issue marker was deleted.");
-		}
-		// ------ KaiExperiments ----- >8 -------------------------------
-
-
-		if (!Util.equals(oldIssue.getIssuePriority(), newIssue.getIssuePriority()))
-		{
-			changeText.append("Changed priority");
-			changeText.append(" from ");
-			changeText.append(oldIssue.getIssuePriority().getIssuePriorityText().getText());
-			changeText.append(" ---> ");
-			changeText.append(newIssue.getIssuePriority().getIssuePriorityText().getText());
-			changeText.append("\n");
-		}
-
-		if (!Util.equals(oldIssue.getIssueSeverityType(), newIssue.getIssueSeverityType()))
-		{
-			changeText.append("Changed severity type");
-			changeText.append(" from ");
-			changeText.append(oldIssue.getIssueSeverityType().getIssueSeverityTypeText().getText());
-			changeText.append(" ---> ");
-			changeText.append(newIssue.getIssueSeverityType().getIssueSeverityTypeText().getText());
-			changeText.append("\n");
-		}
-
-		if (!Util.equals(oldIssue.getIssueResolution(), newIssue.getIssueResolution()))
-		{
-			changeText.append("Changed resolution");
-			changeText.append(" from ");
-			changeText.append(oldIssue.getIssueResolution() == null?"None":oldIssue.getIssueResolution().getName().getText());
-			changeText.append(" ---> ");
-			changeText.append(newIssue.getIssueResolution().getName().getText());
-			changeText.append("\n");
-		}
-
-		if (!Util.equals(oldIssue.getIssueType(), newIssue.getIssueType()))
-		{
-			changeText.append("Changed issue type");
-			changeText.append(" from ");
-			changeText.append(oldIssue.getIssueType().getName().getText());
-			changeText.append(" ---> ");
-			changeText.append(newIssue.getIssueType().getName().getText());
-			changeText.append("\n");
-		}
-
-		if (!Util.equals(oldIssue.getState().getStateDefinition(), newIssue.getState().getStateDefinition()))
-		{
-			changeText.append("Changed state");
-			changeText.append(" from ");
-			changeText.append(oldIssue.getState().getStateDefinition().getName().getText());
-			changeText.append(" ---> ");
-			changeText.append(newIssue.getState().getStateDefinition().getName().getText());
-			changeText.append("\n");
-		}
-
-		if (!Util.equals(oldIssue.isStarted(), newIssue.isStarted()))
-		{
-			changeText.append("Changed status");
-			changeText.append(" from ");
-			changeText.append(oldIssue.isStarted() ? "Working" : "Stopped");
-			changeText.append(" ---> ");
-			changeText.append(newIssue.isStarted() ? "Working" : "Stopped");
-		}
-
-		this.change = changeText.toString();
-	}
+//
+//		if (!Util.equals(oldIssue.getAssignee(), newIssue.getAssignee()))
+//		{
+//			changeText.append("Changed assignee");
+//			changeText.append(" from ");
+//			changeText.append(oldIssue.getAssignee() == null? " - " : oldIssue.getAssignee().getName());
+//			changeText.append(" ---> ");
+//			changeText.append(newIssue.getAssignee() == null? " - " : newIssue.getAssignee().getName());
+//			changeText.append("\n");
+//		}
+//
+//		if (!Util.equals(oldIssue.getReporter(), newIssue.getReporter()))
+//		{
+//			changeText.append("Changed reporter");
+//			changeText.append(" from ");
+//			changeText.append(oldIssue.getReporter().getName());
+//			changeText.append(" ---> ");
+//			changeText.append(newIssue.getReporter().getName());
+//			changeText.append("\n");
+//		}
+//
+//		if (!Util.equals(oldIssue.getIssueFileAttachments().size(), newIssue.getIssueFileAttachments().size()))
+//		{
+//			changeText.append("Changed file attachments");
+////			changeText.append(" from ");
+////			changeText.append();
+////			changeText.append(" ---> ");
+////			changeText.append();
+//			changeText.append("\n");
+//		}
+//
+////		if (!Util.equals(oldIssue.getIssueLinks(), newIssue.getIssueLinks()))
+////		{
+////			changeText.append("Changed issue links");
+//////			changeText.append(" from ");
+//////			changeText.append();
+//////			changeText.append(" ---> ");
+//////			changeText.append();
+////			changeText.append("\n");
+////		}
+//
+//
+//		// --- 8< --- KaiExperiments: since 14.05.2009 ------------------
+//		if (!Util.equals(oldIssue.getIssueMarkers().size(), newIssue.getIssueMarkers().size())) {
+//			int oldSize = oldIssue.getIssueMarkers().size();
+//			int newSize = newIssue.getIssueMarkers().size();
+//
+//			if (oldSize < newSize)	changeText.append("A new issue marker was added.");
+//			if (oldSize > newSize)	changeText.append("An old issue marker was deleted.");
+//		}
+//		// ------ KaiExperiments ----- >8 -------------------------------
+//
+//
+//		if (!Util.equals(oldIssue.getIssuePriority(), newIssue.getIssuePriority()))
+//		{
+//			changeText.append("Changed priority");
+//			changeText.append(" from ");
+//			changeText.append(oldIssue.getIssuePriority().getIssuePriorityText().getText());
+//			changeText.append(" ---> ");
+//			changeText.append(newIssue.getIssuePriority().getIssuePriorityText().getText());
+//			changeText.append("\n");
+//		}
+//
+//		if (!Util.equals(oldIssue.getIssueSeverityType(), newIssue.getIssueSeverityType()))
+//		{
+//			changeText.append("Changed severity type");
+//			changeText.append(" from ");
+//			changeText.append(oldIssue.getIssueSeverityType().getIssueSeverityTypeText().getText());
+//			changeText.append(" ---> ");
+//			changeText.append(newIssue.getIssueSeverityType().getIssueSeverityTypeText().getText());
+//			changeText.append("\n");
+//		}
+//
+//		if (!Util.equals(oldIssue.getIssueResolution(), newIssue.getIssueResolution()))
+//		{
+//			changeText.append("Changed resolution");
+//			changeText.append(" from ");
+//			changeText.append(oldIssue.getIssueResolution() == null?"None":oldIssue.getIssueResolution().getName().getText());
+//			changeText.append(" ---> ");
+//			changeText.append(newIssue.getIssueResolution().getName().getText());
+//			changeText.append("\n");
+//		}
+//
+//		if (!Util.equals(oldIssue.getIssueType(), newIssue.getIssueType()))
+//		{
+//			changeText.append("Changed issue type");
+//			changeText.append(" from ");
+//			changeText.append(oldIssue.getIssueType().getName().getText());
+//			changeText.append(" ---> ");
+//			changeText.append(newIssue.getIssueType().getName().getText());
+//			changeText.append("\n");
+//		}
+//
+//		if (!Util.equals(oldIssue.getState().getStateDefinition(), newIssue.getState().getStateDefinition()))
+//		{
+//			changeText.append("Changed state");
+//			changeText.append(" from ");
+//			changeText.append(oldIssue.getState().getStateDefinition().getName().getText());
+//			changeText.append(" ---> ");
+//			changeText.append(newIssue.getState().getStateDefinition().getName().getText());
+//			changeText.append("\n");
+//		}
+//
+//		if (!Util.equals(oldIssue.isStarted(), newIssue.isStarted()))
+//		{
+//			changeText.append("Changed status");
+//			changeText.append(" from ");
+//			changeText.append(oldIssue.isStarted() ? "Working" : "Stopped");
+//			changeText.append(" ---> ");
+//			changeText.append(newIssue.isStarted() ? "Working" : "Stopped");
+//		}
+//
+//		this.description = changeText.toString();
+//	}
 
 	/**
 	 * Internal method.

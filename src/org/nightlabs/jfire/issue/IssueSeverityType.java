@@ -2,26 +2,27 @@ package org.nightlabs.jfire.issue;
 
 import java.io.Serializable;
 
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
+
 import org.nightlabs.jfire.idgenerator.IDGenerator;
+import org.nightlabs.jfire.issue.history.FetchGroupsIssueHistoryItem;
+import org.nightlabs.jfire.issue.id.IssueSeverityTypeID;
 import org.nightlabs.util.Util;
 
-import javax.jdo.annotations.Persistent;
-import javax.jdo.annotations.FetchGroups;
-import javax.jdo.annotations.InheritanceStrategy;
-import javax.jdo.annotations.Inheritance;
-import javax.jdo.annotations.PrimaryKey;
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.FetchGroup;
-import javax.jdo.annotations.Column;
-import org.nightlabs.jfire.issue.id.IssueSeverityTypeID;
-import javax.jdo.annotations.IdentityType;
-import javax.jdo.annotations.PersistenceModifier;
-
 /**
- * The {@link IssueSeverityType} class represents a severity of each {@link Issue}s. 
+ * The {@link IssueSeverityType} class represents a severity of each {@link Issue}s.
  * <p>
  * </p>
- * 
+ *
  * @author Chairat Kongarayawetchakun - chairat [AT] nightlabs [DOT] de
  *
  * @jdo.persistence-capable
@@ -33,7 +34,7 @@ import javax.jdo.annotations.PersistenceModifier;
  * @jdo.create-objectid-class field-order="organisationID, issueSeverityTypeID"
  *
  * @jdo.inheritance strategy = "new-table"
- * 
+ *
  * @jdo.fetch-group name="IssueSeverityType.name" fetch-groups="default" fields="name"
  * @jdo.fetch-group name="IssueSeverityType.this" fetch-groups="default" fields="name"
  */
@@ -46,11 +47,17 @@ import javax.jdo.annotations.PersistenceModifier;
 	@FetchGroup(
 		fetchGroups={"default"},
 		name=IssueSeverityType.FETCH_GROUP_NAME,
-		members=@Persistent(name="name")),
+		members=@Persistent(name="name")
+	),
 	@FetchGroup(
 		fetchGroups={"default"},
 		name=IssueSeverityType.FETCH_GROUP_THIS_ISSUE_SEVERITY_TYPE,
-		members=@Persistent(name="name"))
+		members=@Persistent(name="name")
+	),
+	@FetchGroup(
+		name=FetchGroupsIssueHistoryItem.FETCH_GROUP_LIST,
+		members=@Persistent(name="name")
+	)
 })
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class IssueSeverityType
@@ -58,8 +65,9 @@ implements Serializable{
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon! 
+	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon!
 	 */
+	@Deprecated
 	public static final String FETCH_GROUP_THIS_ISSUE_SEVERITY_TYPE = "IssueSeverityType.this";
 
 	public static final String FETCH_GROUP_NAME = "IssueSeverityType.name";
@@ -77,7 +85,7 @@ implements Serializable{
 	 * This is the organisationID to which the issue severity type belongs. Within one organisation,
 	 * all the issue severity types have their organisation's ID stored here, thus it's the same
 	 * value for all of them.
-	 * 
+	 *
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
@@ -105,6 +113,7 @@ implements Serializable{
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected IssueSeverityType(){}
 
 	/**
@@ -121,7 +130,7 @@ implements Serializable{
 	}
 
 	/**
-	 * 
+	 *
 	 * @return
 	 */
 	public String getOrganisationID() {
@@ -129,7 +138,7 @@ implements Serializable{
 	}
 
 	/**
-	 * 
+	 *
 	 * @param organisationID
 	 */
 	public void setOrganisationID(String organisationID) {
@@ -137,7 +146,7 @@ implements Serializable{
 	}
 
 	/**
-	 * 
+	 *
 	 * @param issueSeverityTypeID
 	 */
 	public void setIssueSeverityTypeID(String issueSeverityTypeID) {
@@ -163,21 +172,21 @@ implements Serializable{
 
 	@Override
 	/*
-	 * 
+	 *
 	 */
 	public boolean equals(Object obj)
 	{
 		if (obj == this) return true;
 		if (!(obj instanceof IssueSeverityType)) return false;
 		IssueSeverityType o = (IssueSeverityType) obj;
-		return 
+		return
 		Util.equals(o.organisationID, this.organisationID) &&
 		Util.equals(o.issueSeverityTypeID, this.issueSeverityTypeID);
 	}
 
 	@Override
 	/*
-	 * 
+	 *
 	 */
 	public int hashCode()
 	{

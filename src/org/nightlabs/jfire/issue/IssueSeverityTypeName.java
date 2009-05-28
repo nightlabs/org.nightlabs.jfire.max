@@ -3,27 +3,28 @@ package org.nightlabs.jfire.issue;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.nightlabs.i18n.I18nText;
-
-import javax.jdo.annotations.Join;
-import javax.jdo.annotations.Persistent;
-import javax.jdo.annotations.FetchGroups;
-import javax.jdo.annotations.NullValue;
-import javax.jdo.annotations.InheritanceStrategy;
-import javax.jdo.annotations.Inheritance;
-import javax.jdo.annotations.PrimaryKey;
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.FetchGroup;
 import javax.jdo.annotations.Column;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.FetchGroups;
 import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
+
+import org.nightlabs.i18n.I18nText;
+import org.nightlabs.jfire.issue.history.FetchGroupsIssueHistoryItem;
 import org.nightlabs.jfire.issue.id.IssueSeverityTypeNameID;
 
 /**
- *  An extended class of {@link I18nText} that represents the {@link IssueSeverityType}'s name. 
+ *  An extended class of {@link I18nText} that represents the {@link IssueSeverityType}'s name.
  * <p>
  * </p>
- * 
+ *
  * @author Chairat Kongarayawetchakun - chairat [AT] nightlabs [DOT] de
  *
  * @jdo.persistence-capable
@@ -43,33 +44,38 @@ import org.nightlabs.jfire.issue.id.IssueSeverityTypeNameID;
 	identityType=IdentityType.APPLICATION,
 	detachable="true",
 	table="JFireIssueTracking_IssueSeverityTypeName")
-@FetchGroups(
+@FetchGroups({
 	@FetchGroup(
 		fetchGroups={"default"},
 		name="IssueSeverityType.name",
-		members={@Persistent(name="issueSeverityType"), @Persistent(name="names")})
-)
+		members={@Persistent(name="issueSeverityType"), @Persistent(name="names")}
+	),
+	@FetchGroup(
+		name=FetchGroupsIssueHistoryItem.FETCH_GROUP_LIST,
+		members={@Persistent(name="issueSeverityType"), @Persistent(name="names")}
+	)
+})
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 
-public class IssueSeverityTypeName 
+public class IssueSeverityTypeName
 extends I18nText{
 	/**
 	 * The serial version of this class.
 	 */
 	private static final long serialVersionUID = 1L;
-	
+
 	/**
 	 * This is the organisationID to which the issue severity type's name belongs. Within one organisation,
 	 * all the issue severity type's names have their organisation's ID stored here, thus it's the same
 	 * value for all of them.
-	 * 
+	 *
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
 	@PrimaryKey
 	@Column(length=100)
 	private String organisationID;
-	
+
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
@@ -77,7 +83,7 @@ extends I18nText{
 	@PrimaryKey
 	@Column(length=100)
 	private String issueSeverityTypeID;
-	
+
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
@@ -87,7 +93,7 @@ extends I18nText{
 	/**
 	 * key: String languageID<br/>
 	 * value: String description
-	 * 
+	 *
 	 * @jdo.field
 	 *		persistence-modifier="persistent"
 	 *		collection-type="map"
@@ -110,12 +116,13 @@ extends I18nText{
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected IssueSeverityTypeName()
 	{
 	}
 
 	/**
-	 * 
+	 *
 	 * @param issueSeverityType
 	 */
 	public IssueSeverityTypeName(IssueSeverityType issueSeverityType)
@@ -128,38 +135,40 @@ extends I18nText{
 	/**
 	 * @see org.nightlabs.i18n.I18nText#getI18nMap()
 	 */
+	@Override
 	protected Map<String, String> getI18nMap()
 	{
 		return names;
 	}
 
 	/**
-	 * 
+	 *
 	 * @return
 	 */
 	public String getOrganisationID() {
 		return organisationID;
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @return
 	 */
 	public IssueSeverityType getIssueSeverityType() {
 		return issueSeverityType;
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @return
 	 */
 	public String getIssueSeverityTypeID() {
 		return issueSeverityTypeID;
 	}
-	
+
 	/**
 	 * @see org.nightlabs.i18n.I18nText#getFallBackValue(java.lang.String)
 	 */
+	@Override
 	protected String getFallBackValue(String languageID)
 	{
 		return issueSeverityTypeID == null ? languageID : issueSeverityTypeID;

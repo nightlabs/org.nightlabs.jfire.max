@@ -2,28 +2,29 @@ package org.nightlabs.jfire.issue;
 
 import java.io.Serializable;
 
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
+
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
+import org.nightlabs.jfire.issue.history.FetchGroupsIssueHistoryItem;
 import org.nightlabs.jfire.issue.id.IssueResolutionID;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.util.Util;
 
-import javax.jdo.annotations.Persistent;
-import javax.jdo.annotations.FetchGroups;
-import javax.jdo.annotations.InheritanceStrategy;
-import javax.jdo.annotations.Inheritance;
-import javax.jdo.annotations.PrimaryKey;
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.FetchGroup;
-import javax.jdo.annotations.Column;
-import javax.jdo.annotations.IdentityType;
-import javax.jdo.annotations.PersistenceModifier;
-
 /**
- * The {@link IssueResolution} class represents a resolution of each {@link Issue}s. 
+ * The {@link IssueResolution} class represents a resolution of each {@link Issue}s.
  * <p>
  * </p>
- * 
+ *
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
  * @author Chairat Kongarayawetchakun - chairat [AT] nightlabs [DOT] de
  * @author Marco Schulze - marco at nightlabs dot de
@@ -37,7 +38,7 @@ import javax.jdo.annotations.PersistenceModifier;
  * @jdo.create-objectid-class field-order="organisationID, issueResolutionID"
  *
  * @jdo.inheritance strategy = "new-table"
- * 
+ *
  * @jdo.fetch-group name="IssueResolution.name" fetch-groups="default" fields="name"
  */
 @PersistenceCapable(
@@ -45,12 +46,17 @@ import javax.jdo.annotations.PersistenceModifier;
 	identityType=IdentityType.APPLICATION,
 	detachable="true",
 	table="JFireIssueTracking_IssueResolution")
-@FetchGroups(
+@FetchGroups({
 	@FetchGroup(
 		fetchGroups={"default"},
 		name=IssueResolution.FETCH_GROUP_NAME,
-		members=@Persistent(name="name"))
-)
+		members=@Persistent(name="name")
+	),
+	@FetchGroup(
+		name=FetchGroupsIssueHistoryItem.FETCH_GROUP_LIST,
+		members=@Persistent(name="name")
+	)
+})
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class IssueResolution
 implements Serializable
@@ -65,21 +71,21 @@ implements Serializable
 	public static final String ISSUE_RESOLUTION_NOTFIXABLE = "NotFixable";
 	public static final String ISSUE_RESOLUTION_WILLNOTFIX = "WillNotFix";
 	public static final String ISSUE_RESOLUTION_IMMEDIATE = "Immediate";
-	
+
 	private static final long serialVersionUID = 1L;
 
 	/**
 	 * This is the organisationID to which the issue resolution belongs. Within one organisation,
 	 * all the issue resolutions have their organisation's ID stored here, thus it's the same
 	 * value for all of them.
-	 * 
+	 *
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
 	@PrimaryKey
 	@Column(length=100)
 	private String organisationID;
-	
+
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
@@ -87,7 +93,7 @@ implements Serializable
 	@PrimaryKey
 	@Column(length=100)
 	private String issueResolutionID;
-	
+
 	/**
 	 * @jdo.field persistence-modifier="persistent" dependent="true" mapped-by="issueResolution"
 	 */
@@ -96,10 +102,11 @@ implements Serializable
 		mappedBy="issueResolution",
 		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private IssueResolutionName name;
-	
+
 	/**
 	 * @deprecated Only for JDO!!!!
 	 */
+	@Deprecated
 	protected IssueResolution()
 	{
 	}
@@ -119,7 +126,7 @@ implements Serializable
 	}
 
 	/**
-	 * 
+	 *
 	 * @return
 	 */
 	public String getOrganisationID() {
@@ -135,7 +142,7 @@ implements Serializable
 	}
 
 	/**
-	 * 
+	 *
 	 * @return
 	 */
 	public IssueResolutionName getName()
@@ -145,7 +152,7 @@ implements Serializable
 
 	@Override
 	/*
-	 * 
+	 *
 	 */
 	public boolean equals(Object obj)
 	{
@@ -161,7 +168,7 @@ implements Serializable
 
 	@Override
 	/*
-	 * 
+	 *
 	 */
 	public int hashCode()
 	{
@@ -170,7 +177,7 @@ implements Serializable
 
 	@Override
 	/*
-	 * 
+	 *
 	 */
 	public String toString() {
 		return this.getClass().getName() + '@' + Integer.toHexString(System.identityHashCode(this)) + '[' + organisationID + ',' + issueResolutionID + ']';

@@ -12,34 +12,26 @@ import org.nightlabs.jfire.issue.history.IssueHistoryItemFactory;
 import org.nightlabs.jfire.security.User;
 
 /**
- * This is the {@link IssueHistoryItemFactory} that generates {@link IssueMarkerHistoryItem}s, based on information
+ * This is the {@link IssueHistoryItemFactory} that generates {@link IssuePriorityHistoryItem}s, based on information
  * between an old {@link Issue} and a newly saved {@link Issue}.
  *
  * @author Khaireel Mohamed - khaireel at nightlabs dot de
  */
 public class IssueMarkerHistoryItemFactory extends IssueHistoryItemFactory {
-	/**
-	 * Creates an instance of an IssueMarkerHistoryItemFactory.
-	 */
-	public IssueMarkerHistoryItemFactory() {}
-
 	/* (non-Javadoc)
 	 * @see org.nightlabs.jfire.issue.history.IssueHistoryItemFactory#createIssueHistoryItems(org.nightlabs.jfire.security.User, org.nightlabs.jfire.issue.Issue, org.nightlabs.jfire.issue.Issue)
 	 */
 	@Override
 	public Collection<IssueHistoryItem> createIssueHistoryItems(User user, Issue oldPersistentIssue, Issue newDetachedIssue)
 	throws JDODetachedFieldAccessException {
-		Collection<IssueHistoryItem> issueMarkerHistoryItems = new ArrayList<IssueHistoryItem>();
-
 		// Check and see what new IssueMarker has been added, and what current IssueMarkers have been added.
 		// Note: There are cases of no effects; eg. a new IssueMarker was added, and then removed before the Issue was saved (and vice-versa).
 		Set<IssueMarker> oldIssueMarkers = oldPersistentIssue.getIssueMarkers();
 		Set<IssueMarker> newIssueMarkers = newDetachedIssue.getIssueMarkers();
 
-		Collection<IssueMarker> addedIssueMarkers = new ArrayList<IssueMarker>();
-		Collection<IssueMarker> removedIssueMarkers = new ArrayList<IssueMarker>();
 
 		// (i) Check for newly ADDED IssueMarkers.
+		Collection<IssueMarker> addedIssueMarkers = new ArrayList<IssueMarker>();
 		if (oldIssueMarkers.isEmpty())	addedIssueMarkers.addAll( newIssueMarkers );
 		else {
 			for (IssueMarker issueMarker : newIssueMarkers) {
@@ -48,6 +40,7 @@ public class IssueMarkerHistoryItemFactory extends IssueHistoryItemFactory {
 		}
 
 		// (ii) Check for IssueMarkers that have been REMOVED.
+		Collection<IssueMarker> removedIssueMarkers = new ArrayList<IssueMarker>();
 		if (newIssueMarkers.isEmpty())	removedIssueMarkers.addAll( oldIssueMarkers );
 		else {
 			for (IssueMarker issueMarker : oldIssueMarkers) {
@@ -55,13 +48,13 @@ public class IssueMarkerHistoryItemFactory extends IssueHistoryItemFactory {
 			}
 		}
 
-
-		// (iii) Collate them all, and generate the necessary IssueMarkerHistoryItem
+		// (iii) Collate them all, and generate the necessary IssuePriorityHistoryItem
+		Collection<IssueHistoryItem> issueMarkerHistoryItems = new ArrayList<IssueHistoryItem>();
 		for(IssueMarker issueMarker : addedIssueMarkers)
-			issueMarkerHistoryItems.add( new IssueMarkerHistoryItem(user, issueMarker, IssueMarkerHistoryItemAction.ADDED, oldPersistentIssue, newDetachedIssue) );
+			issueMarkerHistoryItems.add( new IssueMarkerHistoryItem(user, issueMarker, IssueMarkerHistoryItemAction.ADDED, oldPersistentIssue) );
 
 		for(IssueMarker issueMarker : removedIssueMarkers)
-			issueMarkerHistoryItems.add( new IssueMarkerHistoryItem(user, issueMarker, IssueMarkerHistoryItemAction.REMOVED, oldPersistentIssue, newDetachedIssue) );
+			issueMarkerHistoryItems.add( new IssueMarkerHistoryItem(user, issueMarker, IssueMarkerHistoryItemAction.REMOVED, oldPersistentIssue) );
 
 
 		return issueMarkerHistoryItems;

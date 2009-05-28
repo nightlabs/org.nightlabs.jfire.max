@@ -8,34 +8,35 @@ import javax.jdo.JDODetachedFieldAccessException;
 import javax.jdo.PersistenceManager;
 
 import org.nightlabs.jfire.issue.Issue;
-import org.nightlabs.jfire.issue.issuemarker.IssueMarkerHistoryItem;
 import org.nightlabs.jfire.issue.issuemarker.IssueMarkerHistoryItemFactory;
 import org.nightlabs.jfire.security.User;
 
 public abstract class IssueHistoryItemFactory {
 	/**
-	 * Quick reference: This lists down all known {@link IssueMarkerHistoryItem}s that should be generated
+	 * Quick reference: This lists down all known {@link IssuePriorityHistoryItem}s that should be generated
 	 * whenever an {@link Issue} is saved.
 	 */
 	private static final Class<?>[] factories = {
 		IssueMarkerHistoryItemFactory.class,
+		IssueDescriptionHistoryItemFactory.class,
+		IssueSubjectHistoryItemFactory.class,
+		IssueCommentHistoryItemFactory.class,
+		IssueAssigneeHistoryItemFactory.class,
+		IssuePriorityHistoryItemFactory.class,
+		IssueSeverityTypeHistoryItemFactory.class,
+		IssueResolutionHistoryItemFactory.class,
 
 		// Retrieved the following from the previous handling of tracking historical changes in an Issue
 		// from the original class IssueHistoryItem.generateHistory():
-//		IssueDescriptionHistoryItemFactory.class,
-//		IssueCommentHistoryItemFactory.class,
-//		IssueSubjectHistoryItemFactory.class,
-//		IssueAssigneeHistoryItemFactory.class,
-//		IssueReporterHistoryItemFactory.class,
 //		IssueFileAttachmentsHistoryItemFactory.class,
-//		IssuePriorityHistoryItemFactory.class,
-//		IssueSeverityTypeHistoryItemFactory.class,
-//		IssueResolutionHistoryItemFactory.class,
 //		IssueTypeHistoryItemFactory.class,
 //		IssueStateDefinitionHistoryItemFactory.class,
 //		IssueStatusHistoryItemFactory.class,
 
+		// What about Project?
+
 		// QN: Is every single one of the above necessary?
+//		IssueReporterHistoryItemFactory.class,  // <-- Can/should we change Reporter?
 	};
 
 	private static Collection<IssueHistoryItemFactory> getIssueHistoryItemFactories() {
@@ -82,6 +83,15 @@ public abstract class IssueHistoryItemFactory {
 	}
 
 
+	/**
+	 * A static method for convenience, when we need to return a collection of {@link IssueHistoryItem}s, but we
+	 * know we only have ONE.
+	 */
+	public static Collection<IssueHistoryItem> makeItemIntoCollection(IssueHistoryItem issueHistoryItem) {
+		Collection<IssueHistoryItem> issueHistoryItems = new ArrayList<IssueHistoryItem>(1);
+		issueHistoryItems.add(issueHistoryItem);
+		return issueHistoryItems;
+	}
 
 
 	// -------------------------------------------------------------------------------------------------------------------------|

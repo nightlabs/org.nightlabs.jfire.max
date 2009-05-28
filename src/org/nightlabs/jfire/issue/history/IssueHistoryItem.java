@@ -6,7 +6,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 import javax.jdo.annotations.Column;
@@ -53,15 +52,9 @@ import org.nightlabs.util.Util;
 		members=@Persistent(name="user")
 	),
 	@FetchGroup(
-			name=FetchGroupsIssueHistoryItem.FETCH_GROUP_LIST,
-			members=@Persistent(name="user")
+		name=FetchGroupsIssueHistoryItem.FETCH_GROUP_LIST,
+		members=@Persistent(name="user")
 	),
-//	@FetchGroup(
-//		name=IssueHistoryItem.FETCH_GROUP_ICON_16X16_DATA,
-//		members=@Persistent(name="icon16x16Data")),
-//	@FetchGroup(
-//		name=IssueHistoryItem.FETCH_GROUP_HISTORY_ACTION,
-//		members=@Persistent(name="issueHistoryAction")),
 })
 @Queries(
 	@javax.jdo.annotations.Query(
@@ -79,13 +72,6 @@ public abstract class IssueHistoryItem implements Serializable {
 	public static final String FETCH_GROUP_USER = "IssueHistoryItem.user";
 
 	public static final String QUERY_ISSUE_HISTORYIDS_BY_ORGANISATION_ID_AND_ISSUE_ID = "getIssueHistoryIDsByOrganisationIDAndIssueID";	// <-- FIXME See notes.
-
-
-
-//	// --- 8< --- KaiExperiments: since 27.05.2009 ------------------
-//	public static final String FETCH_GROUP_ICON_16X16_DATA = "IssueHistoryItem.icon16x16Data";
-//	public static final String FETCH_GROUP_HISTORY_ACTION = "IssueHistoryItem.issueHistoryAction";
-//	// ------ KaiExperiments ----- >8 -------------------------------
 
 
 	/**
@@ -114,22 +100,6 @@ public abstract class IssueHistoryItem implements Serializable {
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Date createTimestamp;
 
-//	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
-//	@Column(sqlType="CLOB")
-//	private String description; // TODO Revise this field.
-//
-//
-//
-//	// --- 8< --- KaiExperiments: since 27.05.2009 ------------------
-//	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
-//	@Column(sqlType="BLOB")
-//	private byte[] icon16x16Data;
-//
-//	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
-//	private IssueHistoryAction issueHistoryAction;	// <-- May need to revise this naming convention...
-//	// ------ KaiExperiments ----- >8 -------------------------------
-
-
 
 
 	/**
@@ -141,30 +111,27 @@ public abstract class IssueHistoryItem implements Serializable {
 	/**
 	 * Creates a new instance of an IssueHistoryItem.
 	 */
-	public IssueHistoryItem(String organisationID, User user, Issue oldIssue, Issue newIssue, long issueHistoryItemID) {
+	public IssueHistoryItem(String organisationID, User user, Issue oldPersistentIssue, long issueHistoryItemID) {
 		Organisation.assertValidOrganisationID(organisationID);
-		if (oldIssue == null)
+		if (oldPersistentIssue == null)
 			throw new NullPointerException("newIssue");
 
 		this.organisationID = organisationID;
-		this.issueID = oldIssue.getIssueID();
+		this.issueID = oldPersistentIssue.getIssueID();
 
-		this.issue = oldIssue;
+		this.issue = oldPersistentIssue;
 		this.issueHistoryItemID = issueHistoryItemID;
 
 		this.createTimestamp = new Date();
 		this.user = user;
-
-
-//		generateHistory(oldIssue, newIssue); // <-- FIXME Marked for removal. See notes 25 May 2009. Kai.
 	}
 
 	/**
 	 * Creates a new instance of an IssueHistoryItem.
 	 * The dummy constructor for testings...
 	 */
-	public IssueHistoryItem(boolean dummy, User user, Issue oldPersistentIssue, Issue newDetachedIssue) {
-		this(IDGenerator.getOrganisationID(), user, oldPersistentIssue, newDetachedIssue, IDGenerator.nextID(IssueHistoryItem.class));
+	public IssueHistoryItem(boolean dummy, User user, Issue oldPersistentIssue) {
+		this(IDGenerator.getOrganisationID(), user, oldPersistentIssue, IDGenerator.nextID(IssueHistoryItem.class));
 	}
 
 
@@ -208,14 +175,6 @@ public abstract class IssueHistoryItem implements Serializable {
 		return createTimestamp;
 	}
 
-//	/**
-//	 * Gets the string of change.
-//	 * @return the string of change.
-//	 */
-//	public String getChange() {
-//		return change;
-//	}
-
 	/**
 	 * Gets the {@link User}.
 	 * @return the {@link User}.
@@ -252,7 +211,6 @@ public abstract class IssueHistoryItem implements Serializable {
 	 * any special 'textual' condition(s) for displaying the information related to the history of an Issue.
 	 * @return the text description of the change history pertaining to the corresponding IssueHistoryItem.
 	 */
-//	public String getDescription() { return description; } // <-- [Make abstract?]
 	public abstract String getDescription();
 
 	/**
@@ -260,7 +218,6 @@ public abstract class IssueHistoryItem implements Serializable {
 	 * description cell in the {@link IssueHistoryTable}, in addition to the method {@link IssueHistoryItem.#getDescription()}.
 	 * @return the 16x16 icon image of the corresponding IssueHistoryItem.
 	 */
-//	public byte[] getIcon16x16Data() { return icon16x16Data; } // <-- [Make abstract?]
 	public abstract byte[] getIcon16x16Data();
 
 
@@ -441,17 +398,17 @@ public abstract class IssueHistoryItem implements Serializable {
 //		this.description = changeText.toString();
 //	}
 
-	/**
-	 * Internal method.
-	 * @return The PersistenceManager associated with this object.
-	 */
-	protected PersistenceManager getPersistenceManager() {
-		PersistenceManager issueHistoryItemPM = JDOHelper.getPersistenceManager(this);
-		if (issueHistoryItemPM == null)
-			throw new IllegalStateException("This instance of " + this.getClass().getName() + " is not persistent, can not get a PersistenceManager!");
-
-		return issueHistoryItemPM;
-	}
+//	/**
+//	 * Internal method.
+//	 * @return The PersistenceManager associated with this object.
+//	 */
+//	protected PersistenceManager getPersistenceManager() {
+//		PersistenceManager issueHistoryItemPM = JDOHelper.getPersistenceManager(this);
+//		if (issueHistoryItemPM == null)
+//			throw new IllegalStateException("This instance of " + this.getClass().getName() + " is not persistent, can not get a PersistenceManager!");
+//
+//		return issueHistoryItemPM;
+//	}
 
 	@Override
 	public boolean equals(Object obj)

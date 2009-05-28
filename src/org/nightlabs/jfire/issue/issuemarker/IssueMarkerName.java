@@ -37,8 +37,8 @@ import org.nightlabs.jfire.issue.id.IssueMarkerNameID;
 		members={@Persistent(name="issueMarker"), @Persistent(name="names")}
 	),
 	@FetchGroup(
-			name=FetchGroupsIssueHistoryItem.FETCH_GROUP_LIST,
-			members={@Persistent(name="issueMarker"), @Persistent(name="names")}
+		name=FetchGroupsIssueHistoryItem.FETCH_GROUP_LIST,
+		members={@Persistent(name="issueMarker"), @Persistent(name="names")}
 	)
 })
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)

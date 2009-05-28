@@ -29,30 +29,19 @@ import org.nightlabs.jfire.security.User;
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 @FetchGroups({
 	@FetchGroup(
-			name=FetchGroupsIssueHistoryItem.FETCH_GROUP_LIST,
-			members={@Persistent(name="issueMarker")}
+		name=FetchGroupsIssueHistoryItem.FETCH_GROUP_LIST,
+		members={@Persistent(name="issueMarker")}
 	)
 })
-public class IssueMarkerHistoryItem extends IssueHistoryItem
-//implements DetachCallback
-{
+public class IssueMarkerHistoryItem extends IssueHistoryItem {
 	private static final long serialVersionUID = 8377733072628534413L;
 
-	// Ugghhh... still not sure how to get this one going. Requires a bit more thinking -- or simply ask someone!!
-	// Should I persist this?
 	@Persistent(nullValue=NullValue.EXCEPTION)
 	private IssueMarker issueMarker;
 
-	// And zees?
 	@Persistent(nullValue=NullValue.EXCEPTION)
 	private IssueMarkerHistoryItemAction historyActionIssueMarker;
 
-
-//	// !!!!!! !!!!!! Marked for REVISION !!!! See notes 25 May 2009 !!!!!! !!!!!!
-//	public IssueMarkerHistoryItem(String organisationID, User user, Issue oldIssue, Issue newIssue, long issueHistoryItemID) { // <-- FIXME Requires revision. Kai.
-//		super(organisationID, user, oldIssue, newIssue, issueHistoryItemID);
-//		// TODO Auto-generated constructor stub
-//	}
 
 	/**
 	 * @deprecated Only for JDO!
@@ -61,33 +50,30 @@ public class IssueMarkerHistoryItem extends IssueHistoryItem
 	protected IssueMarkerHistoryItem() {}
 
 	/**
-	 * Creates a new instance of an IssueMarkerHistoryItem.
+	 * Creates a new instance of an IssuePriorityHistoryItem.
 	 */
-	public IssueMarkerHistoryItem(User user, IssueMarker issueMarker, IssueMarkerHistoryItemAction historyActionIssueMarker, Issue oldPersistentIssue, Issue newDetachedIssue) {
-		super(true, user, oldPersistentIssue, newDetachedIssue);
+	public IssueMarkerHistoryItem(User user, IssueMarker issueMarker, IssueMarkerHistoryItemAction historyActionIssueMarker, Issue issue) {
+		super(true, user, issue);
 		this.issueMarker = issueMarker;
 		this.historyActionIssueMarker = historyActionIssueMarker;
-
-//		// Now generate the description (and icon image) specifically for this IssueHistoryItem.
-//		setDescription( String.format("%s IssueMarker: %s", issueHistoryAction.toString(), issueMarker.getName().getText()) );
-//		setIcon16x16Data( issueMarker.getIcon16x16Data() );
 	}
 
 
 	// ---[ Abstract methods defined ]----------------------------------------------------------------------|
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.issue.history.IssueHistoryItem#getIcon16x16Data()
+	 */
 	@Override
 	public byte[] getIcon16x16Data() {
+		// TODO Consider incorporating a '+' (or '-') onto the display icon.
 		return issueMarker.getIcon16x16Data();
 	}
 
-//	@Persistent(persistenceModifier=PersistenceModifier.NONE)
-//	private String description;
-
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.issue.history.IssueHistoryItem#getDescription()
+	 */
 	@Override
 	public String getDescription() {
-//		if (description != null)
-//			return description;
-
 		switch (historyActionIssueMarker) {
 			case ADDED:
 				return String.format("Issue marker %s was ADDED.", issueMarker.getName().getText());
@@ -98,19 +84,4 @@ public class IssueMarkerHistoryItem extends IssueHistoryItem
 		}
 	}
 
-//	@Override
-//	public void jdoPostDetach(Object o) {
-//		IssueMarkerHistoryItem detached = this;
-//		IssueMarkerHistoryItem attached = (IssueMarkerHistoryItem) o;
-//
-//		PersistenceManager pm = JDOHelper.getPersistenceManager(attached);
-//		if (pm.getFetchPlan().getGroups().contains(FetchGroupsIssueHistoryItem.FETCH_GROUP_LIST))
-//			detached.description = attached.getDescription();
-//	}
-//
-//	@Override
-//	public void jdoPreDetach() {
-//		// TODO Auto-generated method stub
-//
-//	}
 }

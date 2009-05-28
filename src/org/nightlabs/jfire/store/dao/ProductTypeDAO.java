@@ -34,6 +34,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.jdo.FetchPlan;
+
 import org.nightlabs.jdo.query.QueryCollection;
 import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
@@ -164,17 +165,13 @@ extends BaseJDOObjectDAO<ProductTypeID, ProductType>
 			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor
 	)
 	{
+		storeManager = JFireEjb3Factory.getRemoteBean(StoreManagerRemote.class, SecurityReflector.getInitialContextProperties());
 		try {
-			storeManager = JFireEjb3Factory.getRemoteBean(StoreManagerRemote.class, SecurityReflector.getInitialContextProperties());
-			try {
-				Collection<ProductTypeID> productTypeIDs = storeManager.getRootProductTypeIDs(productTypeClass, subclasses);
-				return getJDOObjects(null, productTypeIDs, fetchGroups, maxFetchDepth, monitor);
-			} finally {
-				storeManager = null;
-				monitor.done();
-			}
-		} catch (Exception x) {
-			throw new RuntimeException(x);
+			Collection<ProductTypeID> productTypeIDs = storeManager.getRootProductTypeIDs(productTypeClass, subclasses);
+			return getJDOObjects(null, productTypeIDs, fetchGroups, maxFetchDepth, monitor);
+		} finally {
+			storeManager = null;
+			monitor.done();
 		}
 	}
 
@@ -189,21 +186,17 @@ extends BaseJDOObjectDAO<ProductTypeID, ProductType>
 	public synchronized List<ProductType> getChildProductTypes(ProductTypeID parentProductTypeID,
 			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
+		storeManager = JFireEjb3Factory.getRemoteBean(StoreManagerRemote.class, SecurityReflector.getInitialContextProperties());
 		try {
-			storeManager = JFireEjb3Factory.getRemoteBean(StoreManagerRemote.class, SecurityReflector.getInitialContextProperties());
-			try {
-				Collection<ProductTypeID> productTypeIDs = storeManager.getChildProductTypeIDs(parentProductTypeID);
-				return getJDOObjects(null, productTypeIDs, fetchGroups, maxFetchDepth, monitor);
-			} finally {
-				storeManager = null;
-				monitor.done();
-			}
-		} catch (Exception x) {
-			throw new RuntimeException(x);
+			Collection<ProductTypeID> productTypeIDs = storeManager.getChildProductTypeIDs(parentProductTypeID);
+			return getJDOObjects(null, productTypeIDs, fetchGroups, maxFetchDepth, monitor);
+		} finally {
+			storeManager = null;
+			monitor.done();
 		}
 	}
-	
-	
+
+
 	/**
 	 * Returns a List of child {@link ProductTypeIDs}s for the given Parent {@link ProductTypeID}.
 	 * @param parentProductTypeID the {@link ProductTypeID} of the parent {@link ProductType} to get the children for.
@@ -215,39 +208,30 @@ extends BaseJDOObjectDAO<ProductTypeID, ProductType>
 	public synchronized Collection<ProductTypeID> getChildProductTypesIDs(ProductTypeID parentProductTypeID,
 			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
+		storeManager = JFireEjb3Factory.getRemoteBean(StoreManagerRemote.class, SecurityReflector.getInitialContextProperties());
 		try {
-			storeManager = JFireEjb3Factory.getRemoteBean(StoreManagerRemote.class, SecurityReflector.getInitialContextProperties());
-			try {
-				Collection<ProductTypeID> productTypeIDs = storeManager.getChildProductTypeIDs(parentProductTypeID);
-				return productTypeIDs;
-			} finally {
-				storeManager = null;
-				monitor.done();
-			}
-		} catch (Exception x) {
-			throw new RuntimeException(x);
+			Collection<ProductTypeID> productTypeIDs = storeManager.getChildProductTypeIDs(parentProductTypeID);
+			return productTypeIDs;
+		} finally {
+			storeManager = null;
+			monitor.done();
 		}
 	}
-	
+
 	/**
 	 * Returns the total number of Child count.
 	 * @param parentProductTypeID the {@link ProductTypeID} of the parent {@link ProductType} to get the children for.
 	 * @param monitor the {@link ProgressMonitor} which display the progress of loading.
 	 * @return the total number of Child count{@link ProductTypeID}s for the given Parent {@link ProductTypeID}.
-	 */	   
-	public Map<ProductTypeID, Long> getChildProductTypeCounts(Collection<ProductTypeID> parentProductTypeIDs, ProgressMonitor monitor)	
-	{	
+	 */
+	public synchronized Map<ProductTypeID, Long> getChildProductTypeCounts(Collection<ProductTypeID> parentProductTypeIDs, ProgressMonitor monitor)
+	{
+		storeManager = JFireEjb3Factory.getRemoteBean(StoreManagerRemote.class, SecurityReflector.getInitialContextProperties());
 		try {
-			storeManager = JFireEjb3Factory.getRemoteBean(StoreManagerRemote.class, SecurityReflector.getInitialContextProperties());
-			try {			
-				return storeManager.getChildProductTypeCounts(parentProductTypeIDs);			
-			} finally {
-				storeManager = null;
-				monitor.done();
-			}
-		} catch (Exception x) {
-			throw new RuntimeException(x);
+			return storeManager.getChildProductTypeCounts(parentProductTypeIDs);
+		} finally {
+			storeManager = null;
+			monitor.done();
 		}
-		
 	}
 }

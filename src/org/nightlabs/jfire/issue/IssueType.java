@@ -8,11 +8,26 @@ import java.util.List;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.Queries;
+import javax.jdo.annotations.Query;
 
 import org.jbpm.JbpmContext;
 import org.jbpm.graph.exe.ProcessInstance;
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
+import org.nightlabs.jfire.issue.history.FetchGroupsIssueHistoryItem;
+import org.nightlabs.jfire.issue.id.IssueTypeID;
 import org.nightlabs.jfire.issue.jbpm.JbpmConstants;
 import org.nightlabs.jfire.jbpm.JbpmLookup;
 import org.nightlabs.jfire.jbpm.graph.def.AbstractActionHandler;
@@ -22,29 +37,14 @@ import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.util.Util;
 
-import javax.jdo.annotations.Join;
-import javax.jdo.annotations.FetchGroups;
-import javax.jdo.annotations.Inheritance;
-import javax.jdo.annotations.PrimaryKey;
-import javax.jdo.annotations.FetchGroup;
-import javax.jdo.annotations.Query;
-import javax.jdo.annotations.PersistenceModifier;
-import javax.jdo.annotations.Persistent;
-import org.nightlabs.jfire.issue.id.IssueTypeID;
-import javax.jdo.annotations.InheritanceStrategy;
-import javax.jdo.annotations.Queries;
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.Column;
-import javax.jdo.annotations.IdentityType;
-
 /**
- * The {@link IssueType} class defines the valid set of {@link IssuePriority}s and {@link IssueSeverityType}s 
+ * The {@link IssueType} class defines the valid set of {@link IssuePriority}s and {@link IssueSeverityType}s
  * and {@link IssueResolution}s for an {@link Issue} of a given type.
  * <p>
  * Additionally, an {@link IssueType} holds the ProcessDefinition for the workflow of the state transitions
  * of an Issue.
  * </p>
- * 
+ *
  * @author Chairat Kongarayawetchakun - chairat [AT] nightlabs [DOT] de
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
  *
@@ -57,14 +57,14 @@ import javax.jdo.annotations.IdentityType;
  * @jdo.create-objectid-class field-order="organisationID, issueTypeID"
  *
  * @jdo.inheritance strategy = "new-table"
- * 
+ *
  * @jdo.fetch-group name="IssueType.name" fetch-groups="default" fields="name"
  * @jdo.fetch-group name="IssueType.issuePriorities" fetch-groups="default" fields="issuePriorities"
  * @jdo.fetch-group name="IssueType.issueSeverityTypes" fetch-groups="default" fields="issueSeverityTypes"
  * @jdo.fetch-group name="IssueType.issueResolutions" fetch-groups="default" fields="issueResolutions"
  * @jdo.fetch-group name="IssueType.processDefinition" fetch-groups="default" fields="processDefinition"
  * @jdo.fetch-group name="IssueType.this" fetch-groups="default" fields="name, issuePriorities, issueSeverityTypes, issueResolutions, processDefinition"
- * 
+ *
  * @jdo.query name="getAllIssueTypeIDs" query="SELECT JDOHelper.getObjectId(this)"
  */
 @PersistenceCapable(
@@ -76,27 +76,37 @@ import javax.jdo.annotations.IdentityType;
 	@FetchGroup(
 		fetchGroups={"default"},
 		name=IssueType.FETCH_GROUP_NAME,
-		members=@Persistent(name="name")),
+		members=@Persistent(name="name")
+	),
 	@FetchGroup(
 		fetchGroups={"default"},
 		name=IssueType.FETCH_GROUP_ISSUE_PRIORITIES,
-		members=@Persistent(name="issuePriorities")),
+		members=@Persistent(name="issuePriorities")
+	),
 	@FetchGroup(
 		fetchGroups={"default"},
 		name=IssueType.FETCH_GROUP_ISSUE_SEVERITY_TYPES,
-		members=@Persistent(name="issueSeverityTypes")),
+		members=@Persistent(name="issueSeverityTypes")
+	),
 	@FetchGroup(
 		fetchGroups={"default"},
 		name=IssueType.FETCH_GROUP_ISSUE_RESOLUTIONS,
-		members=@Persistent(name="issueResolutions")),
+		members=@Persistent(name="issueResolutions")
+	),
 	@FetchGroup(
 		fetchGroups={"default"},
 		name=IssueType.FETCH_GROUP_PROCESS_DEFINITION,
-		members=@Persistent(name="processDefinition")),
+		members=@Persistent(name="processDefinition")
+	),
 	@FetchGroup(
 		fetchGroups={"default"},
 		name=IssueType.FETCH_GROUP_THIS_ISSUE_TYPE,
-		members={@Persistent(name="name"), @Persistent(name="issuePriorities"), @Persistent(name="issueSeverityTypes"), @Persistent(name="issueResolutions"), @Persistent(name="processDefinition")})
+		members={@Persistent(name="name"), @Persistent(name="issuePriorities"), @Persistent(name="issueSeverityTypes"), @Persistent(name="issueResolutions"), @Persistent(name="processDefinition")}
+	),
+	@FetchGroup(
+		name=FetchGroupsIssueHistoryItem.FETCH_GROUP_LIST,
+		members=@Persistent(name="name")
+	)
 })
 @Queries(
 	@Query(
@@ -109,8 +119,9 @@ implements Serializable, Comparable<IssueType>
 {
 	private static final long serialVersionUID = 1L;
 	/**
-	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon! 
+	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon!
 	 */
+	@Deprecated
 	public static final String FETCH_GROUP_THIS_ISSUE_TYPE = "IssueType.this";
 	public static final String FETCH_GROUP_NAME = "IssueType.name";
 	public static final String FETCH_GROUP_ISSUE_PRIORITIES = "IssueType.issuePriorities";
@@ -119,14 +130,14 @@ implements Serializable, Comparable<IssueType>
 	public static final String FETCH_GROUP_PROCESS_DEFINITION = "IssueType.processDefinition";
 
 	public static final String QUERY_ALL_ISSUETYPE_IDS = "getAllIssueTypeIDs";
-	
-	public static final String DEFAULT_ISSUE_TYPE_ID = "Default"; 
+
+	public static final String DEFAULT_ISSUE_TYPE_ID = "Default";
 
 	/**
 	 * This is the organisationID to which the issue type belongs. Within one organisation,
 	 * all the issue types have their organisation's ID stored here, thus it's the same
 	 * value for all of them.
-	 * 
+	 *
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
@@ -218,7 +229,7 @@ implements Serializable, Comparable<IssueType>
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private boolean isDefault;
 	/**
-	 * @deprecated Only for JDO!!!! 
+	 * @deprecated Only for JDO!!!!
 	 */
 	@Deprecated
 	protected IssueType() { }
@@ -287,7 +298,7 @@ implements Serializable, Comparable<IssueType>
 	}
 
 	/**
-	 * 
+	 *
 	 * @return The {@link ProcessDefinition} assigned to this IssueType.
 	 */
 	public ProcessDefinition getProcessDefinition() {
@@ -298,7 +309,7 @@ implements Serializable, Comparable<IssueType>
 	 * Read a {@link ProcessDefinition} from the given URL and store it as new Version
 	 * of the {@link ProcessDefinition} of this IssueType.
 	 * <p>
-	 * New Issues created with this IssueType will have and Process instance according 
+	 * New Issues created with this IssueType will have and Process instance according
 	 * to the newly read definition.
 	 * </p>
 	 * @param jbpmProcessDefinitionURL An URL pointing to a folder containing the definitions 'processdefinition.xml' file.
@@ -333,7 +344,7 @@ implements Serializable, Comparable<IssueType>
 
 	/**
 	 * Internal method.
-	 * @return The PersistenceManager associated with this object. 
+	 * @return The PersistenceManager associated with this object.
 	 */
 	protected PersistenceManager getPersistenceManager() {
 		PersistenceManager issueTypePM = JDOHelper.getPersistenceManager(this);
@@ -341,7 +352,7 @@ implements Serializable, Comparable<IssueType>
 			throw new IllegalStateException("This instance of " + this.getClass().getName() + " is not persistent, can not get a PersistenceManager!");
 
 		return issueTypePM;
-	}	
+	}
 
 	@Override
 	public boolean equals(Object obj)
@@ -350,7 +361,7 @@ implements Serializable, Comparable<IssueType>
 		if (!(obj instanceof IssueType)) return false;
 		IssueType o = (IssueType) obj;
 		return
-		Util.equals(this.organisationID, o.organisationID) && 
+		Util.equals(this.organisationID, o.organisationID) &&
 		Util.equals(this.issueTypeID, o.issueTypeID);
 	}
 

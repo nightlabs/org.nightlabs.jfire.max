@@ -27,7 +27,7 @@ public class IssueResolutionHistoryItemFactory extends IssueHistoryItemFactory {
 		IssueResolution oldIssueResolution = oldPersistentIssue.getIssueResolution();
 		IssueResolution newIssueResolution = newDetachedIssue.getIssueResolution();
 
-		// So, we only to check whether the IssuePriorities have changed or not.
+		// So, we only to check whether the IssueResolution have changed or not.
 		if ( !oldIssueResolution.equals(newIssueResolution) )
 			return IssueHistoryItemFactory.makeItemIntoCollection( new IssueResolutionHistoryItem(user, oldPersistentIssue, oldIssueResolution, newIssueResolution) );
 

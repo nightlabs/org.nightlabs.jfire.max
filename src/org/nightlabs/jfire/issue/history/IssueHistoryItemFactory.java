@@ -17,6 +17,7 @@ public abstract class IssueHistoryItemFactory {
 	 * whenever an {@link Issue} is saved.
 	 */
 	private static final Class<?>[] factories = {
+		// Revived, renewed, revitalised!
 		IssueMarkerHistoryItemFactory.class,
 		IssueDescriptionHistoryItemFactory.class,
 		IssueSubjectHistoryItemFactory.class,
@@ -25,18 +26,21 @@ public abstract class IssueHistoryItemFactory {
 		IssuePriorityHistoryItemFactory.class,
 		IssueSeverityTypeHistoryItemFactory.class,
 		IssueResolutionHistoryItemFactory.class,
+		IssueWorkingStatusHistoryItemFactory.class,
+//		IssueStateDefinitionHistoryItemFactory.class, // <-- oldIssue.getState().getStateDefinition().getName().getText()
 
 		// Retrieved the following from the previous handling of tracking historical changes in an Issue
 		// from the original class IssueHistoryItem.generateHistory():
-//		IssueFileAttachmentsHistoryItemFactory.class,
-//		IssueTypeHistoryItemFactory.class,
-//		IssueStateDefinitionHistoryItemFactory.class,
-//		IssueStatusHistoryItemFactory.class,
+//		IssueFileAttachmentsHistoryItemFactory.class, // <-- oldIssue.getIssueFileAttachments().size()
 
-		// What about Project?
+
+		// QN: There are fields from the Editor page that allow modifications but are not included in the
+		//     original codes in IssueHistoryItem; do we add them?
+		IssueProjectHistoryItemFactory.class, // <-- Currently, the drop-down combo allows changes for 'Standard' and 'JFire'.
 
 		// QN: Is every single one of the above necessary?
 //		IssueReporterHistoryItemFactory.class,  // <-- Can/should we change Reporter?
+		IssueTypeHistoryItemFactory.class, // <-- However, it seems that we CANNOT change this field from the UI...??
 	};
 
 	private static Collection<IssueHistoryItemFactory> getIssueHistoryItemFactories() {

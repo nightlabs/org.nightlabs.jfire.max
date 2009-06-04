@@ -22,22 +22,8 @@ import org.nightlabs.jfire.issue.id.IssueResolutionNameID;
 
 /**
  * An extended class of {@link I18nText} that represents the {@link IssueResolution}'s name.
- * <p>
- * </p>
  *
  * @author Chairat Kongarayawetchakun - chairat [AT] nightlabs [DOT] de
- *
- * @jdo.persistence-capable
- *		identity-type="application"
- *		objectid-class="org.nightlabs.jfire.issue.id.IssueResolutionNameID"
- *		detachable="true"
- *		table="JFireIssueTracking_IssueResolutionName"
- *
- * @jdo.inheritance strategy="new-table"
- *
- * @jdo.create-objectid-class
- *
- * @jdo.fetch-group name="IssueResolutionName.name" fetch-groups="default" fields="issueResolution, names"
  */
 @PersistenceCapable(
 	objectIdClass=IssueResolutionNameID.class,
@@ -68,42 +54,21 @@ extends I18nText{
 	 * This is the organisationID to which the issue resolution's name belongs. Within one organisation,
 	 * all the issue resolution's names have their organisation's ID stored here, thus it's the same
 	 * value for all of them.
-	 *
-	 * @jdo.field primary-key="true"
-	 * @jdo.column length="100"
 	 */
 	@PrimaryKey
 	@Column(length=100)
 	private String organisationID;
 
-	/**
-	 * @jdo.field primary-key="true"
-	 * @jdo.column length="100"
-	 */
 	@PrimaryKey
 	@Column(length=100)
 	private String issueResolutionID;
 
-	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 */
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private IssueResolution issueResolution;
 
 	/**
 	 * key: String languageID<br/>
 	 * value: String description
-	 *
-	 * @jdo.field
-	 *		persistence-modifier="persistent"
-	 *		collection-type="map"
-	 *		key-type="java.lang.String"
-	 *		default-fetch-group="true"
-	 *		value-type="java.lang.String"
-	 *		table="JFireIssueTracking_IssueResolutionName_names"
-	 *		null-value="exception"
-	 *
-	 * @jdo.join
 	 */
 	@Join
 	@Persistent(

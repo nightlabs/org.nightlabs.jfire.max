@@ -9,9 +9,25 @@ import java.util.Set;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.Element;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.Queries;
+import javax.jdo.annotations.Query;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
+import org.nightlabs.jfire.issue.history.FetchGroupsIssueHistoryItem;
 import org.nightlabs.jfire.issue.project.id.ProjectID;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.prop.PropertySet;
@@ -20,22 +36,6 @@ import org.nightlabs.jfire.prop.StructLocal;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.util.Util;
 
-import javax.jdo.annotations.Join;
-import javax.jdo.annotations.FetchGroups;
-import javax.jdo.annotations.NullValue;
-import javax.jdo.annotations.Inheritance;
-import javax.jdo.annotations.PrimaryKey;
-import javax.jdo.annotations.FetchGroup;
-import javax.jdo.annotations.Query;
-import javax.jdo.annotations.PersistenceModifier;
-import javax.jdo.annotations.Persistent;
-import javax.jdo.annotations.InheritanceStrategy;
-import javax.jdo.annotations.Queries;
-import javax.jdo.annotations.Element;
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.Column;
-import javax.jdo.annotations.IdentityType;
-
 /**
  * The {@link Project} class represents a project.
  * <p>
@@ -43,50 +43,6 @@ import javax.jdo.annotations.IdentityType;
  * </p>
  *
  * @author Chairat Kongarayawetchakun <!-- chairat at nightlabs dot de -->
- *
- * @jdo.persistence-capable
- *		identity-type="application"
- *		objectid-class="org.nightlabs.jfire.issue.project.id.ProjectID"
- *		detachable="true"
- *		table="JFireIssueTracking_Project"
- *
- * @jdo.inheritance strategy="new-table"
- *
- * @jdo.create-objectid-class
- *		field-order="organisationID, projectID"
- *
- * @jdo.query
- *		name="getRootProjects"
- *		query="SELECT
- *			WHERE
- *				this.organisationID == :organisationID &&
- *				this.parentProject == null"
- *
- * @jdo.query
- *		name="getProjectsByParentProjectID"
- *		query="SELECT
- *			WHERE
- *				this.organisationID == :organisationID &&
- *				this.parentProject.projectID == :parentProjectID"
- *
- * @jdo.query
- *		name="getProjectsByProjectTypeID"
- *		query="SELECT
- *			WHERE
- *				this.projectType.organisationID == :organisationID &&
- *				this.projectType.projectTypeID == :projectTypeID"
- *
- * @jdo.fetch-group name="Project.name" fields="name"
- * @jdo.fetch-group name="Project.description" fields="description"
- * @jdo.fetch-group name="Project.parentProject" fields="parentProject"
- * @jdo.fetch-group name="Project.subProjects" fields="subProjects"
- * @jdo.fetch-group name="Project.projectType" fields="projectType"
- * @jdo.fetch-group name="Project.propertySet" fields="propertySet"
- * @jdo.fetch-group name="Project.projectManager" fields="projectManager"
- * @jdo.fetch-group name="Project.members" fields="members"
- *
- * @jdo.fetch-group name="Issue.project" fields="name"
- *
  **/@PersistenceCapable(
 	objectIdClass=ProjectID.class,
 	identityType=IdentityType.APPLICATION,
@@ -95,31 +51,44 @@ import javax.jdo.annotations.IdentityType;
 @FetchGroups({
 	@FetchGroup(
 		name=Project.FETCH_GROUP_NAME,
-		members=@Persistent(name="name")),
+		members=@Persistent(name="name")
+	),
 	@FetchGroup(
 		name=Project.FETCH_GROUP_DESCRIPTION,
-		members=@Persistent(name="description")),
+		members=@Persistent(name="description")
+	),
 	@FetchGroup(
 		name=Project.FETCH_GROUP_PARENT_PROJECT,
-		members=@Persistent(name="parentProject")),
+		members=@Persistent(name="parentProject")
+	),
 	@FetchGroup(
 		name=Project.FETCH_GROUP_SUBPROJECTS,
-		members=@Persistent(name="subProjects")),
+		members=@Persistent(name="subProjects")
+	),
 	@FetchGroup(
 		name=Project.FETCH_GROUP_PROJECT_TYPE,
-		members=@Persistent(name="projectType")),
+		members=@Persistent(name="projectType")
+	),
 	@FetchGroup(
 		name=Project.FETCH_GROUP_PROPERTY_SET,
-		members=@Persistent(name="propertySet")),
+		members=@Persistent(name="propertySet")
+	),
 	@FetchGroup(
 		name=Project.FETCH_GROUP_PROJECT_MANAGER,
-		members=@Persistent(name="projectManager")),
+		members=@Persistent(name="projectManager")
+	),
 	@FetchGroup(
 		name=Project.FETCH_GROUP_MEMBERS,
-		members=@Persistent(name="members")),
+		members=@Persistent(name="members")
+	),
 	@FetchGroup(
 		name="Issue.project",
-		members=@Persistent(name="name"))
+		members=@Persistent(name="name")
+	),
+	@FetchGroup(
+		name=FetchGroupsIssueHistoryItem.FETCH_GROUP_LIST,
+		members=@Persistent(name="name")
+	)
 })
 @Queries({
 	@Query(
@@ -156,127 +125,53 @@ implements Serializable, Comparable<Project>
 	 * This is the organisationID to which the project belongs. Within one organisation,
 	 * all the projects have their organisation's ID stored here, thus it's the same
 	 * value for all of them.
-	 *
-	 * @jdo.field primary-key="true"
-	 * @jdo.column length="100"
 	 */	@PrimaryKey
 	@Column(length=100)
 
 	private String organisationID;
 
-	/**
-	 * @jdo.field primary-key="true"
-	 */	@PrimaryKey
-
+	@PrimaryKey
 	private long projectID;
 
-	/**
-	 * @jdo.field persistence-modifier="persistent" fetch-groups="default"  dependent="true" mapped-by="project"
-	 */	@Persistent(
-		dependent="true",
-		mappedBy="project",
-		persistenceModifier=PersistenceModifier.PERSISTENT)
-
+	@Persistent(dependent="true", mappedBy="project", persistenceModifier=PersistenceModifier.PERSISTENT)
 	private ProjectName name;
 
-	/**
-	 * @jdo.field
-	 * 		persistence-modifier="persistent"
-	 * 		dependent="true"
-	 * 		mapped-by="project"
-	 */	@Persistent(
-		dependent="true",
-		mappedBy="project",
-		persistenceModifier=PersistenceModifier.PERSISTENT)
-
+	@Persistent(dependent="true", mappedBy="project", persistenceModifier=PersistenceModifier.PERSISTENT)
 	private ProjectDescription description;
 
-	
-	/**
-	 * @jdo.field
-	 * 		persistence-modifier="persistent"
-	 * 		load-fetch-group="all"
-	 */	@Persistent(
-		loadFetchGroup="all",
-		persistenceModifier=PersistenceModifier.PERSISTENT)
 
+	@Persistent(loadFetchGroup="all", persistenceModifier=PersistenceModifier.PERSISTENT)
 	private User projectManager;
 
-	/**
-	 * @jdo.field
-	 *		persistence-modifier="persistent"
-	 *		collection-type="collection"
-	 *		element-type="User"
-	 *		table="JFireIssueTracking_Project_members"
-	 *
-	 * @jdo.join
-	 */	@Join
-	@Persistent(
-		table="JFireIssueTracking_Project_members",
-		persistenceModifier=PersistenceModifier.PERSISTENT)
-
+	@Persistent(table="JFireIssueTracking_Project_members", persistenceModifier=PersistenceModifier.PERSISTENT)
+	@Join
 	private Set<User> members;
 
-	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 */	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
-
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Project parentProject;
 
-	/**
-	 * @jdo.field
-	 *		persistence-modifier="persistent"
-	 *		collection-type="collection"
-	 *		element-type="Project"
-	 *		dependent-element="true"
-	 *		mapped-by="parentProject"
-	 */	@Persistent(
-		dependentElement="true",
-		mappedBy="parentProject",
-		persistenceModifier=PersistenceModifier.PERSISTENT)
-
+	@Persistent(dependentElement="true", mappedBy="parentProject", persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Collection<Project> subProjects;
 
-	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 */	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
-
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private ProjectType projectType;
 
-	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 */	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
-
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private boolean active = true;
 
-	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 */	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
-
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Date createTimestamp;
 
-	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 */	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
-
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Date updateTimestamp;
 
-	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 */	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
-
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Date contractDate;
 
-	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 */	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
-
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Date finishDate;
 
-	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 */	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
-
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private PropertySet propertySet;
 
 
@@ -291,8 +186,6 @@ implements Serializable, Comparable<Project>
 
 	/**
 	 * The scope of the StructLocal by which the propertySet is build from.
-	 *
-	 * @jdo.field persistence-modifier="persistent" null-value="exception" indexed="true"
 	 */	@Element(indexed="true")
 	@Persistent(
 		nullValue=NullValue.EXCEPTION,
@@ -310,8 +203,6 @@ implements Serializable, Comparable<Project>
 
 	/**
 	 * The scope of the Struct by which the propertySet is build from.
-	 *
-	 * @jdo.field persistence-modifier="persistent" null-value="exception" indexed="true"
 	 */	@Element(indexed="true")
 	@Persistent(
 		nullValue=NullValue.EXCEPTION,
@@ -346,7 +237,7 @@ implements Serializable, Comparable<Project>
 		this.name = new ProjectName(this);
 		this.description = new ProjectDescription(this);
 //		this.projectCost = new ProjectCost(organisationID, IDGenerator.nextID(ProjectCost.class));
-		
+
 		subProjects = new HashSet<Project>();
 		members = new HashSet<User>();
 

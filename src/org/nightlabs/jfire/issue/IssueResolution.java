@@ -22,24 +22,10 @@ import org.nightlabs.util.Util;
 
 /**
  * The {@link IssueResolution} class represents a resolution of each {@link Issue}s.
- * <p>
- * </p>
  *
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
  * @author Chairat Kongarayawetchakun - chairat [AT] nightlabs [DOT] de
  * @author Marco Schulze - marco at nightlabs dot de
- *
- * @jdo.persistence-capable
- *		identity-type = "application"
- *		objectid-class = "org.nightlabs.jfire.issue.id.IssueResolutionID"
- *		detachable = "true"
- *		table="JFireIssueTracking_IssueResolution"
- *
- * @jdo.create-objectid-class field-order="organisationID, issueResolutionID"
- *
- * @jdo.inheritance strategy = "new-table"
- *
- * @jdo.fetch-group name="IssueResolution.name" fetch-groups="default" fields="name"
  */
 @PersistenceCapable(
 	objectIdClass=IssueResolutionID.class,
@@ -78,25 +64,15 @@ implements Serializable
 	 * This is the organisationID to which the issue resolution belongs. Within one organisation,
 	 * all the issue resolutions have their organisation's ID stored here, thus it's the same
 	 * value for all of them.
-	 *
-	 * @jdo.field primary-key="true"
-	 * @jdo.column length="100"
 	 */
 	@PrimaryKey
 	@Column(length=100)
 	private String organisationID;
 
-	/**
-	 * @jdo.field primary-key="true"
-	 * @jdo.column length="100"
-	 */
 	@PrimaryKey
 	@Column(length=100)
 	private String issueResolutionID;
 
-	/**
-	 * @jdo.field persistence-modifier="persistent" dependent="true" mapped-by="issueResolution"
-	 */
 	@Persistent(
 		dependent="true",
 		mappedBy="issueResolution",

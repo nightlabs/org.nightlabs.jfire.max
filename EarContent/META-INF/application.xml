@@ -2,9 +2,13 @@
 <application xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:application="http://java.sun.com/xml/ns/javaee/application_5.xsd" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/application_5.xsd" id="Application_ID" version="5">
 	<display-name>NightLabs JFire Reporting</display-name>
 	<module>
-		<ejb>JFireReporting.jar</ejb></module>	
+		<ejb>JFireReporting.jar</ejb>
+	</module>
+<!--
 	<module>
-		<java>birt/lib/chartengineapi.jar</java></module>		
+		<ejb>org.nightlabs.jfire.reporting.birt.jar</ejb></module>		
+	<module>
+		<java>birt/lib/chartengineapi.jar</java></module>
 	<module>
 		<java>birt/lib/com.ibm.icu_3.8.1.v20080530.jar</java></module>
 	<module>
@@ -25,7 +29,7 @@
 		<java>birt/lib/engineapi.jar</java></module>
 	<module>
 		<java>birt/lib/flute.jar</java></module>
-	<module>
+	<module>	
 		<java>birt/lib/js.jar</java></module>
 	<module>
 		<java>birt/lib/modelapi.jar</java></module>
@@ -47,4 +51,19 @@
 		<java>birt/lib/org.w3c.css.sac_1.3.0.v200805290154.jar</java></module>		
 	<module>
 		<java>birt/lib/scriptapi.jar</java></module>
+
+	<module>
+		<java>birt/lib/com.ibm.icu_3.8.1.v20080530.jar</java></module>
+	<module>
+		<java>birt/lib/coreapi.jar</java></module>
+	<module>
+		<java>birt/lib/engineapi.jar</java></module>
+	<module>
+		<java>birt/lib/modelapi.jar</java></module>
+-->		
+	<module>
+		<java>birt/lib/oda.jar</java>
+	</module>
+
+  
 </application>

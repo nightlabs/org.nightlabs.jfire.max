@@ -5,6 +5,7 @@
         <dependent-module archiveName="JFireReporting.jar" deploy-path="/" handle="module:/resource/JFireReporting/JFireReporting">
             <dependency-type>uses</dependency-type>
         </dependent-module>
+<!--        
 		<dependent-module deploy-path="/birt/lib" handle="module:/classpath/lib/target-jee-jfire-jboss-birt/src/birt-deployment/birt-runtime/birt/lib/chartengineapi.jar">
             <dependency-type>uses</dependency-type>
         </dependent-module>
@@ -47,9 +48,6 @@
 		<dependent-module deploy-path="/birt/lib" handle="module:/classpath/lib/target-jee-jfire-jboss-birt/src/birt-deployment/birt-runtime/birt/lib/modelodaapi.jar">
             <dependency-type>uses</dependency-type>
         </dependent-module>      
-		<dependent-module deploy-path="/birt/lib" handle="module:/classpath/lib/target-jee-jfire-jboss-birt/src/birt-deployment/birt-runtime/birt/lib/oda.jar">
-            <dependency-type>uses</dependency-type>
-        </dependent-module>  
 		<dependent-module deploy-path="/birt/lib" handle="module:/classpath/lib/target-jee-jfire-jboss-birt/src/birt-deployment/birt-runtime/birt/lib/odadesignapi.jar">
             <dependency-type>uses</dependency-type>
         </dependent-module>       
@@ -70,6 +68,14 @@
         </dependent-module>         
 		<dependent-module deploy-path="/birt/lib" handle="module:/classpath/lib/target-jee-jfire-jboss-birt/src/birt-deployment/birt-runtime/birt/lib/scriptapi.jar">
             <dependency-type>uses</dependency-type>
-        </dependent-module>     
+        </dependent-module>
+ -->        
+        <dependent-module deploy-path="/birt/lib" handle="module:/classpath/lib/target-jee-jfire-jboss-birt/src/birt-deployment/birt-runtime/birt/lib/oda.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="org.nightlabs.jfire.reporting.birt.jar" deploy-path="/" handle="module:/resource/org.nightlabs.jfire.reporting.birt/org.nightlabs.jfire.reporting.birt">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+             
     </wb-module>
 </project-modules>

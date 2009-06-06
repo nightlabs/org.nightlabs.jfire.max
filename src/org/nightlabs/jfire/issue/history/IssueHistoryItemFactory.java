@@ -18,20 +18,21 @@ public abstract class IssueHistoryItemFactory {
 	 */
 	private static final Class<?>[] factories = {
 		// Revived, renewed, revitalised!
-		IssueMarkerHistoryItemFactory.class,
-		IssueDescriptionHistoryItemFactory.class,
-		IssueSubjectHistoryItemFactory.class,
-		IssueCommentHistoryItemFactory.class,
-		IssueAssigneeHistoryItemFactory.class,
-		IssuePriorityHistoryItemFactory.class,
-		IssueSeverityTypeHistoryItemFactory.class,
-		IssueResolutionHistoryItemFactory.class,
-		IssueWorkingStatusHistoryItemFactory.class,
-//		IssueStateDefinitionHistoryItemFactory.class, // <-- oldIssue.getState().getStateDefinition().getName().getText()
+		IssueMarkerHistoryItemFactory.class, // [OK]
+		IssueDescriptionHistoryItemFactory.class, // [OK]
+		IssueSubjectHistoryItemFactory.class, // [OK]
+		IssueCommentHistoryItemFactory.class, // [OK]
+		IssueAssigneeHistoryItemFactory.class, // [OK]
+		IssuePriorityHistoryItemFactory.class, // [OK]
+		IssueSeverityTypeHistoryItemFactory.class, // [OK]
+		IssueResolutionHistoryItemFactory.class, // [OK]
+		IssueWorkingStatusHistoryItemFactory.class, // [OK]
+		IssueFileAttachmentHistoryItemFactory.class, // [OK]
 
-		// Retrieved the following from the previous handling of tracking historical changes in an Issue
-		// from the original class IssueHistoryItem.generateHistory():
-//		IssueFileAttachmentsHistoryItemFactory.class, // <-- oldIssue.getIssueFileAttachments().size()
+//		IssueStateDefinitionHistoryItemFactory.class, // <-- oldIssue.getState().getStateDefinition().getName().getText()
+		                                              // Main problem: StateDefinition is in the JFireJbpm project, which is being referred to by this project (and not vice-versa).
+		                                              // I cannot place FetchGroupIssueHistoryItem among the fetch-groups in the related StateDefinition classes.
+		                                              // TODO Think of a solution. Soon.
 
 
 		// QN: There are fields from the Editor page that allow modifications but are not included in the

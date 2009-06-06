@@ -9,6 +9,7 @@ import javax.jdo.JDODetachedFieldAccessException;
 import org.nightlabs.jfire.issue.Issue;
 import org.nightlabs.jfire.issue.history.IssueHistoryItem;
 import org.nightlabs.jfire.issue.history.IssueHistoryItemFactory;
+import org.nightlabs.jfire.issue.history.IssuePriorityHistoryItem;
 import org.nightlabs.jfire.security.User;
 
 /**
@@ -24,7 +25,7 @@ public class IssueMarkerHistoryItemFactory extends IssueHistoryItemFactory {
 	@Override
 	public Collection<IssueHistoryItem> createIssueHistoryItems(User user, Issue oldPersistentIssue, Issue newDetachedIssue)
 	throws JDODetachedFieldAccessException {
-		// Check and see what new IssueMarker has been added, and what current IssueMarkers have been added.
+		// Check and see what new IssueMarker has been added, and what current IssueMarkers have been removed.
 		// Note: There are cases of no effects; eg. a new IssueMarker was added, and then removed before the Issue was saved (and vice-versa).
 		Set<IssueMarker> oldIssueMarkers = oldPersistentIssue.getIssueMarkers();
 		Set<IssueMarker> newIssueMarkers = newDetachedIssue.getIssueMarkers();

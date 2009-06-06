@@ -29,7 +29,7 @@ package org.nightlabs.jfire.scripting;
 import javax.jdo.JDOHelper;
 
 /**
- * 
+ *
  * @author Marco Schulze - marco at nightlabs dot de
  */
 public class ScriptExecutorJavaClass
@@ -49,7 +49,7 @@ public class ScriptExecutorJavaClass
 			return delegate;
 
 		try {
-			Class delegateClass = Class.forName(delegateClassName);
+			Class<?> delegateClass = loadDelegateClass(delegateClassName);
 			Object delegateInstance = delegateClass.newInstance();
 			if (!(delegateInstance instanceof ScriptExecutorJavaClassDelegate))
 				throw new ClassCastException(
@@ -66,6 +66,12 @@ public class ScriptExecutorJavaClass
 		} catch (IllegalAccessException e) {
 			throw new ScriptException(e);
 		}
+	}
+
+	protected Class<?> loadDelegateClass(String className)
+	throws ClassNotFoundException
+	{
+		return Class.forName(className);
 	}
 
 	@Override

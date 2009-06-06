@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.nightlabs.jfire.reporting.oda;
 
@@ -14,7 +14,6 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.birt.report.engine.api.IResultMetaData;
 import org.eclipse.datatools.connectivity.oda.IBlob;
 import org.eclipse.datatools.connectivity.oda.IClob;
 import org.eclipse.datatools.connectivity.oda.IResultSet;
@@ -27,25 +26,25 @@ import org.eclipse.datatools.connectivity.oda.OdaException;
  * <p>
  * It imposes only one constraint on the ResultSets used:
  * They need to be {@link Serializable}.
- * 
+ *
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
  */
 public class SQLResultSet implements IResultSet, Serializable {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	private ResultSet resultSet;
 //	private int currentResultSetIdx = 0;
 	private List<ResultSet> resultSets = new ArrayList<ResultSet>(1);
-	
+
 	/**
-	 * 
+	 *
 	 */
 	public SQLResultSet(ResultSet resultSet) {
 		this.resultSet = resultSet;
 		resultSets.add(resultSet);
 	}
-	
+
 	public void addResultSet(ResultSet newResultSet) {
 		resultSets.add(newResultSet);
 	}
@@ -200,7 +199,7 @@ public class SQLResultSet implements IResultSet, Serializable {
 	}
 
 	private IResultSetMetaData metaData;
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.datatools.connectivity.oda.IResultSet#getMetaData()
 	 */
@@ -313,7 +312,7 @@ public class SQLResultSet implements IResultSet, Serializable {
 			throw new OdaException(e);
 		}
 	}
-	
+
 	public Object getObject(String columnName) throws OdaException {
 		try {
 			return resultSet.getObject(columnName);
@@ -329,7 +328,7 @@ public class SQLResultSet implements IResultSet, Serializable {
 			throw new OdaException(e);
 		}
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.datatools.connectivity.oda.IResultSet#next()
 	 */
@@ -384,11 +383,11 @@ public class SQLResultSet implements IResultSet, Serializable {
 			throw new OdaException(e);
 		}
 	}
-	
+
 	/**
 	 * Returns the currently active resultSet
 	 * in the list of resultSets managed by this one.
-	 * 
+	 *
 	 * @return The currently active resultSet.
 	 */
 	public ResultSet getActiveResultSet() {
@@ -402,7 +401,7 @@ public class SQLResultSet implements IResultSet, Serializable {
 	 * This method will make the first resultSet
 	 * in the list the active one and will set
 	 * all contained sets to beforeFirst();
-	 * 
+	 *
 	 * @throws SQLException
 	 */
 	public void init() throws SQLException {
@@ -416,11 +415,11 @@ public class SQLResultSet implements IResultSet, Serializable {
 			}
 		}
 	}
-	
+
 	/**
 	 * Creates an Implementation of {@link IResultSetMetaData} based
 	 * on the meta data of the given SQL resultSet.
-	 * 
+	 *
 	 * @param resultSet The resultSet to map.
 	 * @return A new {@link ResultSetMetaData} with columns mapped from the given resultSet.
 	 * @throws SQLException
@@ -438,5 +437,5 @@ public class SQLResultSet implements IResultSet, Serializable {
 		}
 		return metaData;
 	}
-	
+
 }

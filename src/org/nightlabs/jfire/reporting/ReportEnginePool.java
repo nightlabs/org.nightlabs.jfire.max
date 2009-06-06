@@ -13,13 +13,6 @@ import javax.naming.NamingException;
 import org.apache.commons.pool.BasePoolableObjectFactory;
 import org.apache.commons.pool.impl.GenericObjectPool;
 import org.apache.log4j.Logger;
-import org.eclipse.birt.report.engine.api.EngineConfig;
-import org.eclipse.birt.report.engine.api.HTMLCompleteImageHandler;
-import org.eclipse.birt.report.engine.api.HTMLEmitterConfig;
-import org.eclipse.birt.report.engine.api.IRenderOption;
-import org.eclipse.birt.report.engine.api.ReportEngine;
-import org.nightlabs.jfire.reporting.platform.ServerPlatformContext;
-import org.nightlabs.jfire.reporting.platform.ServerResourceLocator;
 
 /**
  * A pool of {@link ReportEngine}s. This pool is put into JNDI and is accessible via {@link #getInstance(InitialContext)}.
@@ -41,25 +34,33 @@ public class ReportEnginePool implements Serializable {
 		@Override
 		public Object makeObject() throws Exception {
 			try {
-				EngineConfig config = new EngineConfig( );
-				config.setPlatformContext(new ServerPlatformContext());
-				// TODO: Add configuration for other formats/emitters as well -> the appropriate ReportLayoutRenderer configure it
-
-//				Create the emitter configuration.
-				HTMLEmitterConfig hc = new HTMLEmitterConfig( );
-//				Use the "HTML complete" image handler to write the files to disk.
-				HTMLCompleteImageHandler imageHandler = new HTMLCompleteImageHandler( );
-				hc.setImageHandler( imageHandler );
-//				Associate the configuration with the HTML output format.
-				config.setEmitterConfiguration( IRenderOption.OUTPUT_FORMAT_HTML, hc );
-//				File organisationLogDir = new File(JFireReportingEAR.getEARDir(), "log" + File.separator + organisationID);
-//				if (!organisationLogDir.exists()) {
-//					organisationLogDir.mkdirs();
-//				}
-				ReportEngine reportEngine = new ReportEngine(config);
-				reportEngine.getConfig().setResourceLocator(new ServerResourceLocator());
-//				reportEngine.setLogger();
-				return reportEngine;
+				// Load BIRT classes by our wrapper classloader
+//				ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+//				ReportingClassLoader warpperClassLoader = ReportManagerBean.getClassLoader(ReportManagerBean.class.getClassLoader(), null);
+//				Thread.currentThread().setContextClassLoader(warpperClassLoader);
+//
+//				ClassLoader cl = Platform.getContextClassLoader();
+//				cl.loadClass("org.eclipse.birt.report.engine.api.EngineConfig");
+//
+//				EngineConfig config = new EngineConfig( );
+////				config.setPlatformContext(new ServerPlatformContext());
+//				// TODO: Add configuration for other formats/emitters as well -> the appropriate ReportLayoutRenderer configure it
+//
+//				//  Create the emitter configuration.
+//				HTMLEmitterConfig hc = new HTMLEmitterConfig( );
+//				//	Use the "HTML complete" image handler to write the files to disk.
+//				HTMLCompleteImageHandler imageHandler = new HTMLCompleteImageHandler( );
+//				hc.setImageHandler( imageHandler );
+//				//	Associate the configuration with the HTML output format.
+//				config.setEmitterConfiguration( IRenderOption.OUTPUT_FORMAT_HTML, hc );
+//				ReportEngine reportEngine = new ReportEngine(config);
+////				reportEngine.getConfig().setResourceLocator(new ServerResourceLocator());
+//
+//				// set before (wrapper)PlatformContextClassLoader to avoid loading of JBoss Mozilla Rhino
+//				config.getAppContext().put(EngineConstants.APPCONTEXT_CLASSLOADER_KEY, cl);
+//
+//				return reportEngine;
+				return null;
 			} catch (Exception e) {
 				logger.error("Could not create ReportEngine", e);
 				throw e;
@@ -116,29 +117,29 @@ public class ReportEnginePool implements Serializable {
 	protected ReportEnginePool() {
 	}
 
-	/**
-	 * Borrow a {@link ReportEngine} from the pool for exclusive usage.
-	 * Make sure you return the engine after you finished using it ({@link #returnReportEngine(ReportEngine)}).
-	 *
-	 * @return A {@link ReportEngine} for exclusive usage.
-	 * @throws Exception If an error occurs getting/creating the engine.
-	 */
-	public ReportEngine borrowReportEngine() throws Exception {
-		GenericObjectPool pool = getEnginePool();
-		ReportEngine engine = (ReportEngine) pool.borrowObject();
-		logger.debug("lend object: " + engine);
-		return engine;
-	}
+//	/**
+//	 * Borrow a {@link ReportEngine} from the pool for exclusive usage.
+//	 * Make sure you return the engine after you finished using it ({@link #returnReportEngine(ReportEngine)}).
+//	 *
+//	 * @return A {@link ReportEngine} for exclusive usage.
+//	 * @throws Exception If an error occurs getting/creating the engine.
+//	 */
+//	public ReportEngine borrowReportEngine() throws Exception {
+//		GenericObjectPool pool = getEnginePool();
+//		ReportEngine engine = (ReportEngine) pool.borrowObject();
+//		logger.debug("lend object: " + engine);
+//		return engine;
+//	}
 
-	/**
-	 * Return a {@link ReportEngine} to the pool after usage.
-	 * @param engine The engine to return.
-	 * @throws Exception If an error occurs.
-	 */
-	public void returnReportEngine(ReportEngine engine) throws Exception {
-		logger.debug("Received object back: " + engine);
-		getEnginePool().returnObject(engine);
-	}
+//	/**
+//	 * Return a {@link ReportEngine} to the pool after usage.
+//	 * @param engine The engine to return.
+//	 * @throws Exception If an error occurs.
+//	 */
+//	public void returnReportEngine(ReportEngine engine) throws Exception {
+//		logger.debug("Received object back: " + engine);
+//		getEnginePool().returnObject(engine);
+//	}
 
 	/**
 	 * Get the instance of {@link ReportEnginePool} from JNDI.

@@ -36,7 +36,7 @@ import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
 
 /**
  * Holds the format and the content of a report rendered by BIRT.
- * 
+ *
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  *
  */
@@ -56,7 +56,7 @@ public class RenderedReportLayout implements Serializable {
 		private boolean zipped;
 		private String entryFileName;
 		private Collection<Throwable> renderingErrors;
-		
+
 		public Header(ReportRegistryItemID reportRegistryItemID, OutputFormat outputFormat, Date timestamp) {
 			this.reportRegistryItemID = reportRegistryItemID;
 			this.timestamp = timestamp;
@@ -126,7 +126,7 @@ public class RenderedReportLayout implements Serializable {
 		/**
 		 * Returns whether the data of the {@link RenderedReportLayout}
 		 * is zipped (compressed).
-		 * 
+		 *
 		 * @return the zipped
 		 */
 		public boolean isZipped() {
@@ -139,17 +139,17 @@ public class RenderedReportLayout implements Serializable {
 		public void setZipped(boolean zipped) {
 			this.zipped = zipped;
 		}
-		
+
 		/**
 		 * Returns the collection of BIRT errors that occurred
 		 * during the rendering of the referenced layout.
-		 * 
+		 *
 		 * @return The collection of BIRT errors that occurred during rendering.
 		 */
 		public Collection<Throwable> getRenderingErrors() {
 			return renderingErrors;
 		}
-		
+
 		/**
 		 * Set the rendering errors.
 		 * @param renderingErrors The rendering errors to set.
@@ -157,12 +157,12 @@ public class RenderedReportLayout implements Serializable {
 		public void setRenderingErrors(Collection<Throwable> renderingErrors) {
 			this.renderingErrors = renderingErrors;
 		}
-		
+
 		/**
 		 * Returns whether the rendering of the associated layout
 		 * produced BIRT errors. If this returns <code>true</code>
 		 * the errors can be accessed via {@link #getRenderingErrors()}.
-		 * 
+		 *
 		 * @return Returns whether the rendering of the associated layout
 		 * 		produced BIRT errors
 		 */
@@ -170,20 +170,20 @@ public class RenderedReportLayout implements Serializable {
 			return renderingErrors != null && renderingErrors.size() > 0;
 		}
 	}
-	
+
 	private Header header;
-	
+
 	private Serializable data;
 
 	/**
-	 * 
+	 *
 	 */
 	public RenderedReportLayout(ReportRegistryItemID itemID, OutputFormat format, Date timestamp) {
 		super();
 		header = new Header(itemID, format, timestamp);
 	}
-	
-	
+
+
 	/**
 	 * @return the header
 	 */
@@ -199,13 +199,13 @@ public class RenderedReportLayout implements Serializable {
 	}
 
 	/**
-	 * 
+	 *
 	 * @return Returns the data of this RenderedReportLayout
 	 */
 	public Serializable getData() {
 		return data;
 	}
-	
+
 	/**
 	 * Set the data
 	 */

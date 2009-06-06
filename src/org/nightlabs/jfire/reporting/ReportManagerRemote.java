@@ -36,8 +36,7 @@ public interface ReportManagerRemote {
 	/**
 	 * This method is called by the organisation-init system and is not intended to be called directly.
 	 */
-	void initialise() throws InstantiationException, IllegalAccessException,
-			MalformedVersionException, ScriptingIntialiserException;
+	void initialise() throws Exception;
 
 	/**
 	 * This method is called from a timer-task it is not intended to be called directly.

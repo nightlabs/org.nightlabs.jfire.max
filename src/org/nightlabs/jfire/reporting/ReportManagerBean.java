@@ -26,6 +26,9 @@
 
 package org.nightlabs.jfire.reporting;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -48,11 +51,7 @@ import javax.jdo.Query;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.eclipse.birt.core.framework.Platform;
-import org.eclipse.birt.report.engine.api.EngineConfig;
-import org.eclipse.birt.report.engine.api.ReportEngine;
 import org.eclipse.datatools.connectivity.oda.IParameterMetaData;
 import org.eclipse.datatools.connectivity.oda.IResultSet;
 import org.eclipse.datatools.connectivity.oda.IResultSetMetaData;
@@ -62,6 +61,7 @@ import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.config.ConfigSetup;
 import org.nightlabs.jfire.config.UserConfigSetup;
 import org.nightlabs.jfire.organisation.Organisation;
+import org.nightlabs.jfire.reporting.classloader.ReportingClassLoader;
 import org.nightlabs.jfire.reporting.config.ReportLayoutConfigModule;
 import org.nightlabs.jfire.reporting.layout.ReportCategory;
 import org.nightlabs.jfire.reporting.layout.ReportLayout;
@@ -69,20 +69,16 @@ import org.nightlabs.jfire.reporting.layout.ReportLayoutLocalisationData;
 import org.nightlabs.jfire.reporting.layout.ReportRegistry;
 import org.nightlabs.jfire.reporting.layout.ReportRegistryItem;
 import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
-import org.nightlabs.jfire.reporting.layout.render.RenderManager;
+import org.nightlabs.jfire.reporting.layout.render.IRenderManager;
 import org.nightlabs.jfire.reporting.layout.render.RenderReportException;
 import org.nightlabs.jfire.reporting.layout.render.RenderReportRequest;
 import org.nightlabs.jfire.reporting.layout.render.RenderedReportLayout;
-import org.nightlabs.jfire.reporting.layout.render.ReportLayoutRendererGeneric;
-import org.nightlabs.jfire.reporting.layout.render.ReportLayoutRendererHTML;
-import org.nightlabs.jfire.reporting.layout.render.ReportLayoutRendererPDF;
 import org.nightlabs.jfire.reporting.layout.render.ReportLayoutRendererUtil;
 import org.nightlabs.jfire.reporting.oda.JFireReportingOdaException;
 import org.nightlabs.jfire.reporting.oda.jfs.IJFSQueryPropertySetMetaData;
 import org.nightlabs.jfire.reporting.oda.jfs.JFSQueryPropertySet;
 import org.nightlabs.jfire.reporting.oda.jfs.ScriptExecutorJavaClassReporting;
 import org.nightlabs.jfire.reporting.oda.server.jfs.ServerJFSQueryProxy;
-import org.nightlabs.jfire.reporting.platform.ServerPlatformContext;
 import org.nightlabs.jfire.reporting.scripting.ScriptingInitialiser;
 import org.nightlabs.jfire.scripting.ScriptException;
 import org.nightlabs.jfire.scripting.ScriptRegistry;
@@ -96,7 +92,8 @@ import org.nightlabs.jfire.servermanager.JFireServerManager;
 import org.nightlabs.jfire.timer.Task;
 import org.nightlabs.jfire.timer.id.TaskID;
 import org.nightlabs.timepattern.TimePatternFormatException;
-import org.nightlabs.version.MalformedVersionException;
+import org.nightlabs.util.CacheDirTag;
+import org.nightlabs.util.IOUtil;
 
 /**
  * Manager that gives access to {@link ReportRegistryItem}s and other objects linked to them.
@@ -139,16 +136,29 @@ implements ReportManagerRemote
 		ConfigSetup.ensureAllPrerequisites(pm);
 	}
 
-	/**
-	 *
-	 * @param pm
-	 * @param jfireServerManager
-	 * @throws InstantiationException
-	 * @throws IllegalAccessException
-	 */
-	private void initRegisterScripts(PersistenceManager pm, JFireServerManager jfireServerManager) throws InstantiationException, IllegalAccessException
-	{
-		ScriptRegistry.getScriptRegistry(pm).registerScriptExecutorClass(ScriptExecutorJavaClassReporting.class);
+	private static IReportEngineInitaliser reportEngineInitaliser;
+
+	private static IReportEngineInitaliser createReportInitialiser(URL[] urls) {
+		Class<?> clazz;
+		String className = "org.nightlabs.jfire.reporting.birt.BirtReportEngineInitaliser";
+		try {
+			clazz = ReportingClassLoader.createSharedInstance(urls).loadClass(className);
+			IReportEngineInitaliser reportEngineInitaliser = (IReportEngineInitaliser) clazz.newInstance();
+			return reportEngineInitaliser;
+		} catch (ClassNotFoundException e) {
+			logger.error("Could not load class "+className);
+			return null;
+		} catch (InstantiationException e) {
+			logger.error("Could not instantiate class "+className);
+			return null;
+		} catch (IllegalAccessException e) {
+			logger.error("Could not access class "+className);
+			return null;
+		}
+	}
+
+	private IReportEngineInitaliser getReportEngineInitaliser() {
+		return reportEngineInitaliser;
 	}
 
 	/* (non-Javadoc)
@@ -156,30 +166,45 @@ implements ReportManagerRemote
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("_System_")
-	public void initialise() throws InstantiationException, IllegalAccessException, MalformedVersionException, ScriptingIntialiserException
+	public void initialise()
+	throws Exception
 	{
-		// TODO: Better check if platform initialized. Propose on birt forum.
-		if (false) {
-			JFireServerManager jfireServerManager = getJFireServerManager();
-			try {
-				try {
-
-					ServerPlatformContext platformContext = new ServerPlatformContext();
-					System.setProperty(Platform.PROPERTY_BIRT_HOME, platformContext.getPlatform());
-					EngineConfig config = new EngineConfig();
-					config.setEngineHome(platformContext.getPlatform());
-					config.setLogConfig(platformContext.getPlatform(), java.util.logging.Level.ALL);
-
-					config.setPlatformContext(platformContext);
-					Platform.startup(config);
-//					Platform.initialize(platformContext);
-				} catch (Throwable t) {
-					logger.log(Level.ERROR, "Initializing BIRT Platform failed!", t);
-				}
-			} finally {
-				jfireServerManager.close();
-			}
-		}
+//		// TODO: Better check if platform initialized. Propose on birt forum.
+//		if (false) { // it seems this block is not necessary at all - the engine seems to start OSGI itself. Marco.
+//			JFireServerManager jfireServerManager = getJFireServerManager();
+//			try {
+//				try {
+//					// Classloader wrapper to avoid loading of Mozilla Rhino deployed in JBoss (1.7)
+//					ReportingClassLoader wrapperClassLoader = getClassLoader(ReportManagerBean.class.getClassLoader(), null);
+//					Thread.currentThread().setContextClassLoader(wrapperClassLoader);
+//
+////					wrapperClassLoader.loadClass("org.nightlabs.jfire.reporting.platform.ServerPlatformContext");
+////					wrapperClassLoader.loadClass("org.eclipse.birt.report.engine.api.EngineConfig");
+////					wrapperClassLoader.loadClass("org.eclipse.birt.core.framework.Platform");
+//
+//					ServerPlatformContext platformContext = new ServerPlatformContext();
+//					System.setProperty(Platform.PROPERTY_BIRT_HOME, platformContext.getPlatform());
+//					EngineConfig config = new EngineConfig();
+//					config.setEngineHome(platformContext.getPlatform());
+//					config.setLogConfig(platformContext.getPlatform(), java.util.logging.Level.ALL);
+//					config.setPlatformContext(platformContext);
+//
+//					config.getAppContext().put(EngineConstants.APPCONTEXT_CLASSLOADER_KEY, wrapperClassLoader);
+//					Platform.setContextClassLoader(wrapperClassLoader);
+//
+//					Platform.startup(config);
+//
+//					ClassLoader osgiClassLoader = Platform.getContextClassLoader();
+//					wrapperClassLoader.setOsgiClassLoader(osgiClassLoader);
+//					config.getAppContext().put(EngineConstants.APPCONTEXT_CLASSLOADER_KEY, wrapperClassLoader);
+//					Platform.setContextClassLoader(wrapperClassLoader);
+//				} catch (Throwable t) {
+//					logger.log(Level.ERROR, "Initializing BIRT Platform failed!", t);
+//				}
+//			} finally {
+//				jfireServerManager.close();
+//			}
+//		}
 
 		try {
 			InitialContext initialContext = new InitialContext();
@@ -196,23 +221,64 @@ implements ReportManagerRemote
 		pm = getPersistenceManager();
 		JFireServerManager jfireServerManager = getJFireServerManager();
 		try {
+			String earName = "JFireReportingEAR.ear";
+			File jfReportingEarFile = new File(jfireServerManager.getJFireServerConfigModule().getJ2ee().getJ2eeDeployBaseDirectory(), earName);
+
+			File tmpBaseDir;
+			try {
+				tmpBaseDir = new File(IOUtil.createUserTempDir("jfire_server.", null), "ear");
+				if (!tmpBaseDir.isDirectory())
+					tmpBaseDir.mkdirs();
+
+				if (!tmpBaseDir.isDirectory())
+					throw new IOException("Could not create directory: " + tmpBaseDir.getAbsolutePath());
+			} catch (IOException e) {
+				throw new ScriptingIntialiserException(e);
+			}
+
+			CacheDirTag cacheDirTag = new CacheDirTag(tmpBaseDir);
+			try {
+				cacheDirTag.tag("JFire - http://www.jfire.org", true, false);
+			} catch (IOException e) {
+				logger.warn("initialise: " + e, e);
+			}
+
+			File tmpEarDir = new File(tmpBaseDir, earName);
+			IOUtil.unzipArchiveIfModified(jfReportingEarFile, tmpEarDir);
+
+			List<URL> urls = new ArrayList<URL>();
+			for (File f : tmpEarDir.listFiles()) {
+				if (f.getName().startsWith("org.nightlabs.jfire.reporting.birt")) {
+					urls.add(f.toURI().toURL());
+				}
+			}
+			reportEngineInitaliser = createReportInitialiser(urls.toArray(new URL[urls.size()]));
 
 			// init layout renderer
 			ReportRegistry registry = ReportRegistry.getReportRegistry(pm);
 			try {
-				registry.registerReportRenderer(Birt.OutputFormat.html.toString(), ReportLayoutRendererHTML.class);
-				registry.registerReportRenderer(Birt.OutputFormat.pdf.toString(), ReportLayoutRendererPDF.class);
-				for (Birt.OutputFormat format : Birt.OutputFormat.values()) {
-					if (format != Birt.OutputFormat.html && format != Birt.OutputFormat.pdf) {
-						registry.registerReportRenderer(format.toString(), ReportLayoutRendererGeneric.class);
-					}
+				IReportEngineInitaliser initaliser = getReportEngineInitaliser();
+				if (initaliser != null) {
+					initaliser.registerReportRenderer(registry);
 				}
+//				registry.registerReportRenderer(Birt.OutputFormat.html.toString(), ReportLayoutRendererHTML.class);
+//				registry.registerReportRenderer(Birt.OutputFormat.pdf.toString(), ReportLayoutRendererPDF.class);
+//				for (Birt.OutputFormat format : Birt.OutputFormat.values()) {
+//					if (format != Birt.OutputFormat.html && format != Birt.OutputFormat.pdf) {
+//						registry.registerReportRenderer(format.toString(), ReportLayoutRendererGeneric.class);
+//					}
+//				}
 			} catch (Exception e) {
 				logger.warn("Could not initially register HTML ReportLayoutRenderer when initializing ReportRegistry.", e);
 			}
 
-			// Init scripts before module metat data check
-			initRegisterScripts(pm, jfireServerManager);
+			// Init scripts before module meta data check
+			ScriptRegistry.getScriptRegistry(pm).registerScriptExecutorClass(ScriptExecutorJavaClassReporting.class);
+
+//			IReportEngineInitaliser initaliser = getReportEngineInitaliser();
+//			if (initaliser != null) {
+//				initaliser.initRegisterScripts(pm);
+//			}
 
 			ModuleMetaData moduleMetaData = ModuleMetaData.getModuleMetaData(pm, JFireReportingEAR.MODULE_NAME);
 			if (moduleMetaData == null) {
@@ -476,27 +542,6 @@ implements ReportManagerRemote
 		return getTopLevelReportRegistryItemIDs(RoleConstants.renderReport);
 	}
 
-
-//	/**
-//	 * Get the {@link ReportingManagerFactory} for the actual organisationID.
-//	 *
-//	 * @return The {@link ReportingManagerFactory} for the actual organisationID.
-//	 */
-//	protected ReportingManagerFactory getReportingManagerFactory() throws NamingException
-//	{
-//		return ReportingManagerFactory.getReportingManagerFactory(getInitialContext(getOrganisationID()), getOrganisationID());
-//	}
-
-	/**
-	 * Get the {@link ReportEnginePool} of this server.
-	 *
-	 * @return The {@link ReportEnginePool} of this server.
-	 */
-	protected ReportEnginePool getReportEnginePool() throws NamingException
-	{
-		return ReportEnginePool.getInstance(getInitialContext(getOrganisationID()));
-	}
-
 	/* (non-Javadoc)
 	 * @see org.nightlabs.jfire.reporting.ReportManagerRemote#storeRegistryItem(org.nightlabs.jfire.reporting.layout.ReportRegistryItem, boolean, java.lang.String[], int)
 	 */
@@ -568,6 +613,25 @@ implements ReportManagerRemote
 		}
 	}
 
+	/**
+	 * Get the {@link ReportingManagerFactory} for the actual organisationID.
+	 *
+	 * @return The {@link ReportingManagerFactory} for the actual organisationID.
+	 */
+	protected ReportingManagerFactory getReportingManagerFactory() throws NamingException
+	{
+		return ReportingManagerFactory.getReportingManagerFactory(getInitialContext(getOrganisationID()), getOrganisationID());
+	}
+
+//	/**
+//	 * Get the {@link ReportEnginePool} of this server.
+//	 *
+//	 * @return The {@link ReportEnginePool} of this server.
+//	 */
+//	protected ReportEnginePool getReportEnginePool() throws NamingException
+//	{
+//		return ReportEnginePool.getInstance(getInitialContext(getOrganisationID()));
+//	}
 
 	/* (non-Javadoc)
 	 * @see org.nightlabs.jfire.reporting.ReportManagerRemote#renderReportLayout(org.nightlabs.jfire.reporting.layout.render.RenderReportRequest)
@@ -585,24 +649,33 @@ implements ReportManagerRemote
 			Authority.resolveSecuringAuthority(pm, registryItem, ResolveSecuringAuthorityStrategy.organisation)
 				.assertContainsRoleRef(getPrincipal(), RoleConstants.renderReport);
 
-//			RenderManager rm = getReportingManagerFactory().createRenderManager();
-			ReportEnginePool enginePool = getReportEnginePool();
-			ReportEngine engine;
-			try {
-				engine = enginePool.borrowReportEngine();
-			} catch (Exception e) {
-				throw new RenderReportException("Could not borrow ReportEngine.", e);
-			}
-			try {
-				RenderManager rm = new RenderManager(engine);
+			IReportEngineInitaliser initaliser = getReportEngineInitaliser();
+			if (initaliser != null) {
+				initaliser.initReportEngine();
+				IRenderManager rm = initaliser.createRenderManager();
 				return rm.renderReport(pm, renderReportRequest);
-			} finally {
-				try {
-					enginePool.returnReportEngine(engine);
-				} catch (Exception e) {
-					throw new RenderReportException("Could not return ReportEngine", e);
-				}
 			}
+			else
+				return null;
+
+//			ReportEngine engine;
+//			engine = getReportingManagerFactory().getReportEngine();
+//			ReportEnginePool enginePool = getReportEnginePool();
+//			try {
+//				engine = enginePool.borrowReportEngine();
+//			} catch (Exception e) {
+//				throw new RenderReportException("Could not borrow ReportEngine.", e);
+//			}
+//			try {
+//				RenderManager rm = new RenderManager(engine);
+//				return rm.renderReport(pm, renderReportRequest);
+//			} finally {
+//				try {
+//					enginePool.returnReportEngine(engine);
+//				} catch (Exception e) {
+//					throw new RenderReportException("Could not return ReportEngine", e);
+//				}
+//			}
 		} finally {
 			pm.close();
 		}

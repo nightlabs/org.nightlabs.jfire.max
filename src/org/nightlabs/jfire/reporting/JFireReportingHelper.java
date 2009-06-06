@@ -41,7 +41,6 @@ import org.eclipse.datatools.connectivity.oda.IQuery;
 import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.reporting.layout.ReportLayout;
-import org.nightlabs.jfire.reporting.layout.render.RenderManager;
 import org.nightlabs.jfire.reporting.oda.jfs.JFSParameterUtil;
 
 import com.thoughtworks.xstream.XStream;
@@ -56,7 +55,7 @@ import com.thoughtworks.xstream.io.xml.XppDriver;
  * <p>
  * Additionally it serves as a storage for global report values
  * that are also accessible for the ODA drivers.
- * 
+ *
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
  *
  */
@@ -66,7 +65,7 @@ public class JFireReportingHelper {
 	 * The Logger used by this class.
 	 */
 	private static Logger logger = Logger.getLogger(JFireReportingHelper.class);
-	
+
 	/**
 	 * Private class that keeps the helper per thread.
 	 */
@@ -76,17 +75,17 @@ public class JFireReportingHelper {
 		private Map<String, Object> vars = new HashMap<String, Object>();
 		private Map<String, Object> parameters = new HashMap<String, Object>();
 		private Locale locale;
-	
+
 		private ReportLayout reportLayout;
-		
+
 		public PersistenceManager getPersistenceManager() {
 			return pm;
 		}
-		
+
 		public void setPersistenceManager(PersistenceManager pm) {
 			this.pm = pm;
 		}
-		
+
 		public Map<String, Object> getVars() {
 			return vars;
 		}
@@ -94,20 +93,20 @@ public class JFireReportingHelper {
 		public Map<String, Object> getParameters() {
 			return parameters;
 		}
-		
+
 		public Locale getLocale() {
 			return locale;
 		}
-		
+
 		public ReportLayout getReportLayout() {
 			return reportLayout;
 		}
-		
+
 		public void open(
-				PersistenceManager pm, boolean closePM, 
-				Map<String, Object> params, 
+				PersistenceManager pm, boolean closePM,
+				Map<String, Object> params,
 				Locale locale, ReportLayout reportLayout) {
-			
+
 			JFireReportingHelper.logger.debug("Opening (JFireReporting)Helper with pm = "+pm+" and closePM="+closePM);
 			this.closePM = closePM;
 			this.locale = locale;
@@ -119,7 +118,7 @@ public class JFireReportingHelper {
 			getParameters().clear();
 			getParameters().putAll(params);
 		}
-		
+
 		public void close() {
 			JFireReportingHelper.logger.debug("Closing (JFireReporting)Helper with pm = "+pm+" and closePM="+closePM);
 			if (pm != null && closePM) {
@@ -130,15 +129,15 @@ public class JFireReportingHelper {
 			getParameters().clear();
 		}
 	}
-	
+
 	private static ThreadLocal<Helper> helpers = new ThreadLocal<Helper>() {
 		@Override
 		protected Helper initialValue() {
 			return new Helper();
 		}
 	};
-	
-	
+
+
 	/**
 	 * Protected constructor. Class is for static use.
 	 */
@@ -150,7 +149,7 @@ public class JFireReportingHelper {
 	 * thread (currently rendered report).
 	 * <p>
 	 * Do not call this method direcly, it is called by the {@link RenderManager}.+
-	 * 
+	 *
 	 * @param pm The PersistenceManager to use
 	 * @param params The report params set for the next execution.
 	 * @param locale The Locale used by this helper for the next run.
@@ -158,13 +157,13 @@ public class JFireReportingHelper {
 	 * @param reportLayout The currently executed {@link ReportLayout}.
 	 */
 	public static void open(
-			PersistenceManager pm, boolean closePM, 
-			Map<String, Object> params, 
+			PersistenceManager pm, boolean closePM,
+			Map<String, Object> params,
 			Locale locale, ReportLayout reportLayout) {
-			
+
 		helpers.get().open(pm, closePM, params, locale, reportLayout);
 	}
-	
+
 	/**
 	 * Close the Helper after the report has been rendered.
 	 * <p>
@@ -177,18 +176,18 @@ public class JFireReportingHelper {
 	/**
 	 * Get the {@link PersistenceManager} associated to the current thread
 	 * (execution of the current report).
-	 * 
+	 *
 	 * @return The {@link PersistenceManager} associated to the current thread
 	 * (execution of the current report).
 	 */
 	public static PersistenceManager getPersistenceManager() {
 		return helpers.get().getPersistenceManager();
 	}
-	
+
 	/**
 	 * Get the value of a named variable associated to the current thread
 	 * (execution of the current report).
-	 * 
+	 *
 	 * @param varName The variable name.
 	 * @return The value of a named variable associated to the current thread
 	 * (execution of the current report).
@@ -196,28 +195,28 @@ public class JFireReportingHelper {
 	public static Object getVar(String varName) {
 		return helpers.get().getVars().get(varName);
 	}
-	
+
 	/**
 	 * Get the map of all named variables associated to the current thread
 	 * (execution of the current report).
-	 * 
+	 *
 	 * @return The map of all named variables associated to the current thread
 	 * (execution of the current report).
 	 */
 	public static Map<String, Object> getVars() {
 		return helpers.get().getVars();
 	}
-	
+
 	/**
 	 * Get the map of all parameters of the currently running report.
 	 * This will be set by {@link RenderManager} before starting rendering the report.
-	 * 
+	 *
 	 * @return The map named parameters for the currently running report.
 	 */
 	public static Map<String, Object> getParameters() {
 		return helpers.get().getParameters();
 	}
-	
+
 	/**
 	 * Get the parameter with the given name for the currently running report.
 	 * <p>
@@ -231,7 +230,7 @@ public class JFireReportingHelper {
 	public static Object getParameter(String name) {
 		return helpers.get().getParameters().get(name);
 	}
-	
+
 	/**
 	 * Returns the locale the report for this helper currently runs with.
 	 * @return The locale the report for this helper currently runs with.
@@ -239,20 +238,20 @@ public class JFireReportingHelper {
 	public static Locale getLocale() {
 		return helpers.get().getLocale();
 	}
-	
+
 	/**
-	 * Returns the currently executed/rendered {@link ReportLayout}. 
+	 * Returns the currently executed/rendered {@link ReportLayout}.
 	 * @return The currently executed/rendered {@link ReportLayout}.
 	 */
 	public static ReportLayout getReportLayout() {
 		return helpers.get().getReportLayout();
 	}
-	
+
 	/**
 	 * Returns the JDO object with the given jdo id. Assumes that the given
 	 * {@link String} parameter is the string representation of an {@link ObjectID}
 	 * and tries to get this Object from the datastore.
-	 * 
+	 *
 	 * @param jdoIDString The {@link String} representation of the {@link ObjectID} of the object to retrieve.	 *
 	 * @return The persistent object of with the given id or null if this can not be found.
 	 */
@@ -266,11 +265,11 @@ public class JFireReportingHelper {
 		}
 		return result;
 	}
-	
+
 	private static final Pattern dataSetParamPattern = Pattern.compile("^<dataSetParameter");
 	private static final String dataSetparameterOpenTag = "<dataSetParameter>";
 	private static final String dataSetparameterCloseTag = "</dataSetParameter>";
-	
+
 	/**
 	 * Creates a String representation of the given object that
 	 * can be used as parameter for JFS data sets.
@@ -317,15 +316,15 @@ public class JFireReportingHelper {
 		} else
 			return obj;
 	}
-	
+
 	/**
 	 * Pattern used for {@link #setBRLineBreaks(String)}
 	 */
 	private static final Pattern patLineBreak = Pattern.compile("\\r?\\n");
-	
+
 	/**
 	 * Returns the given Sting with all occurrences of the Pattern \r?\n with &lt;br/&gt;.
-	 * 
+	 *
 	 * @param str The String to replace the linebreaks in.
 	 * @return The given Sting with all occurrences of the Pattern \r?\n with &lt;br/&gt;.
 	 */

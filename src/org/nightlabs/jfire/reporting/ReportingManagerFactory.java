@@ -26,7 +26,6 @@
 
 package org.nightlabs.jfire.reporting;
 
-import java.io.File;
 import java.io.Serializable;
 
 import javax.naming.InitialContext;
@@ -34,17 +33,7 @@ import javax.naming.NameAlreadyBoundException;
 import javax.naming.NamingException;
 
 import org.apache.log4j.Logger;
-import org.eclipse.birt.core.framework.IPlatformContext;
-import org.eclipse.birt.report.engine.api.EngineConfig;
-import org.eclipse.birt.report.engine.api.HTMLCompleteImageHandler;
-import org.eclipse.birt.report.engine.api.HTMLEmitterConfig;
-import org.eclipse.birt.report.engine.api.IRenderOption;
-import org.eclipse.birt.report.engine.api.ReportEngine;
 import org.nightlabs.jfire.reporting.layout.ReportLayout;
-import org.nightlabs.jfire.reporting.layout.render.RenderManager;
-import org.nightlabs.jfire.reporting.platform.ServerPlatformContext;
-import org.nightlabs.jfire.reporting.platform.ServerResourceLocator;
-import org.nightlabs.util.Util;
 
 /**
  * {@link ReportingManagerFactory} is the entry point for operations with
@@ -69,7 +58,7 @@ public class ReportingManagerFactory implements Serializable {
 	public static final String JNDI_PREFIX = "java:/jfire/reportingManagerFactory/";
 
 	private String organisationID;
-	private ReportEngine reportEngine;
+//	private ReportEngine reportEngine;
 
 
 	/**
@@ -99,39 +88,49 @@ public class ReportingManagerFactory implements Serializable {
 		ctx.bind(getJNDIName(organisationID), this);
 	}
 
-	/**
-	 * Get (and create if necessary) the ReportEngine for this factory (organisation).
-	 * {@link ReportEngine}'s methods hopefully are threadsafe and can be called without
-	 * any additional care.
-	 */
-	public ReportEngine getReportEngine() {
-		if (reportEngine == null) {
-			try {
-				EngineConfig config = new EngineConfig( );
-				config.setPlatformContext(new ServerPlatformContext());
-				// TODO: Add configuration for other formats/emitters as well -> the appropriate ReportLayoutRenderer configure it
-
-//				Create the emitter configuration.
-				HTMLEmitterConfig hc = new HTMLEmitterConfig( );
-//				Use the "HTML complete" image handler to write the files to disk.
-				HTMLCompleteImageHandler imageHandler = new HTMLCompleteImageHandler( );
-				hc.setImageHandler( imageHandler );
-//				Associate the configuration with the HTML output format.
-				config.setEmitterConfiguration( IRenderOption.OUTPUT_FORMAT_HTML, hc );
-//				File organisationLogDir = new File(JFireReportingEAR.getEARDir(), "log" + File.separator + organisationID);
-//				if (!organisationLogDir.exists()) {
-//					organisationLogDir.mkdirs();
+//	/**
+//	 * Get (and create if necessary) the ReportEngine for this factory (organisation).
+//	 * {@link ReportEngine}'s methods hopefully are threadsafe and can be called without
+//	 * any additional care.
+//	 */
+//	public ReportEngine getReportEngine() {
+//		if (reportEngine == null) {
+//			try {
+//				ReportingClassLoader wrapperClassLoader = ReportingClassLoader.sharedInstance();
+//				ClassLoader origContextClassLoader = Thread.currentThread().getContextClassLoader();
+//				try {
+//					Thread.currentThread().setContextClassLoader(wrapperClassLoader);
+//
+//					// TODO FIXME XXX replace with interface for initalising report engine
+////					EngineConfig config = new EngineConfig( );
+////					config.setPlatformContext(new ServerPlatformContext());
+////					config.getAppContext().put(EngineConstants.APPCONTEXT_CLASSLOADER_KEY, wrapperClassLoader);
+////					// TODO: Add configuration for other formats/emitters as well -> the appropriate ReportLayoutRenderer configure it
+////
+////					//				Create the emitter configuration.
+////					HTMLEmitterConfig hc = new HTMLEmitterConfig( );
+////					//				Use the "HTML complete" image handler to write the files to disk.
+////					HTMLCompleteImageHandler imageHandler = new HTMLCompleteImageHandler( );
+////					hc.setImageHandler( imageHandler );
+////					//				Associate the configuration with the HTML output format.
+////					config.setEmitterConfiguration( IRenderOption.OUTPUT_FORMAT_HTML, hc );
+////					//				File organisationLogDir = new File(JFireReportingEAR.getEARDir(), "log" + File.separator + organisationID);
+////					//				if (!organisationLogDir.exists()) {
+////					//					organisationLogDir.mkdirs();
+////					//				}
+////					reportEngine = new ReportEngine(config);
+////					reportEngine.getConfig().setResourceLocator(new ServerResourceLocator());
+//					//				reportEngine.setLogger();
+//				} finally {
+//					Thread.currentThread().setContextClassLoader(origContextClassLoader);
 //				}
-				reportEngine = new ReportEngine(config);
-				reportEngine.getConfig().setResourceLocator(new ServerResourceLocator());
-//				reportEngine.setLogger();
-			} catch (Exception e) {
-				logger.error("Could not create ReportEngine", e);
-				reportEngine = null;
-			}
-		}
-		return reportEngine;
-	}
+//			} catch (Exception e) {
+//				logger.error("Could not create ReportEngine", e);
+//				reportEngine = null;
+//			}
+//		}
+//		return reportEngine;
+//	}
 
 //	/**
 //	 * Obtain a new instance of {@link RenderManager} as a helper to render reports.
@@ -166,27 +165,27 @@ public class ReportingManagerFactory implements Serializable {
 		return (ReportingManagerFactory) ctx.lookup(getJNDIName(organisationID));
 	}
 
-	public static void main(String[] args) {
-		EngineConfig config = new EngineConfig( );
-//		config.setPlatformContext(new ServerPlatformContext());
-		config.setPlatformContext(new IPlatformContext() {
-			public String getPlatform() {
-				return (new File("dist/birt")).getAbsolutePath();
-			}
-		});
-
-		// TODO: Add configuration for other formats/emitters as well -> the appropriate ReportLayoutRenderer configure it
-		long time = System.currentTimeMillis();
-//		Create the emitter configuration.
-		HTMLEmitterConfig hc = new HTMLEmitterConfig( );
-//		Use the "HTML complete" image handler to write the files to disk.
-		HTMLCompleteImageHandler imageHandler = new HTMLCompleteImageHandler( );
-		hc.setImageHandler( imageHandler );
-//		Associate the configuration with the HTML output format.
-		config.setEmitterConfiguration( IRenderOption.OUTPUT_FORMAT_HTML, hc );
-		ReportEngine reportEngine = new ReportEngine(config);
-		reportEngine.getConfig().setResourceLocator(new ServerResourceLocator());
-		System.out.println(Util.getTimeDiffString(time));
-	}
+//	public static void main(String[] args) {
+//		EngineConfig config = new EngineConfig( );
+////		config.setPlatformContext(new ServerPlatformContext());
+//		config.setPlatformContext(new IPlatformContext() {
+//			public String getPlatform() {
+//				return (new File("dist/birt")).getAbsolutePath();
+//			}
+//		});
+//
+//		// TODO: Add configuration for other formats/emitters as well -> the appropriate ReportLayoutRenderer configure it
+//		long time = System.currentTimeMillis();
+////		Create the emitter configuration.
+//		HTMLEmitterConfig hc = new HTMLEmitterConfig( );
+////		Use the "HTML complete" image handler to write the files to disk.
+//		HTMLCompleteImageHandler imageHandler = new HTMLCompleteImageHandler( );
+//		hc.setImageHandler( imageHandler );
+////		Associate the configuration with the HTML output format.
+//		config.setEmitterConfiguration( IRenderOption.OUTPUT_FORMAT_HTML, hc );
+//		ReportEngine reportEngine = new ReportEngine(config);
+//		reportEngine.getConfig().setResourceLocator(new ServerResourceLocator());
+//		System.out.println(Util.getTimeDiffString(time));
+//	}
 
 }

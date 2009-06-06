@@ -8,6 +8,7 @@ import java.util.Map.Entry;
 import org.eclipse.datatools.connectivity.oda.IResultSet;
 import org.eclipse.datatools.connectivity.oda.IResultSetMetaData;
 import org.nightlabs.jfire.reporting.JFireReportingHelper;
+import org.nightlabs.jfire.reporting.classloader.ReportingClassLoader;
 import org.nightlabs.jfire.reporting.oda.server.jfs.ServerJFSQueryProxy;
 import org.nightlabs.jfire.scripting.Script;
 import org.nightlabs.jfire.scripting.ScriptException;
@@ -22,7 +23,7 @@ import org.nightlabs.jfire.scripting.ScriptRegistry;
  * <p>
  * It implements the {@link ReportingScriptExecutor} interface and serves as helper
  * for the JFS ODA Driver. See {@link ServerJFSQueryProxy} for an the usage of this executor.
- * 
+ *
  * @author Alexander Bieber <alex [AT] nightlabs [DOT] de>
  *
  */
@@ -40,7 +41,7 @@ implements ReportingScriptExecutor
 
 	/**
 	 * Returns the ready casted delegate.
-	 * 
+	 *
 	 * @throws ScriptException when the delegate can't be casted to {@link ScriptExecutorJavaClassReportingDelegate}
 	 */
 	protected ScriptExecutorJavaClassReportingDelegate getReportingDelegate(JFSQueryPropertySet queryPropertySet)
@@ -67,7 +68,7 @@ implements ReportingScriptExecutor
 	 * <p>
 	 * After preparation the {@link ScriptExecutorJavaClassReportingDelegate#getResultSetMetaData()}
 	 * method will be called for the delegate to obtain the meta data.
-	 * 
+	 *
 	 * @see org.nightlabs.jfire.reporting.oda.jfs.ReportingScriptExecutor#getResultSetMetaData(org.nightlabs.jfire.scripting.Script, JFSQueryPropertySet)
 	 */
 	@Override
@@ -83,7 +84,7 @@ implements ReportingScriptExecutor
 	 * Calls {@link #prepare(org.nightlabs.jfire.scripting.IScript, Map)} with
 	 * faked parameters, i.e. the right parameter names but with 'this' as value
 	 * for all parameter entries.
-	 * 
+	 *
 	 * @param script The script to prepare.
 	 * @throws ScriptException If preparing fails.
 	 */
@@ -99,19 +100,19 @@ implements ReportingScriptExecutor
 		}
 		prepare(script, fakeParams);
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.nightlabs.jfire.reporting.oda.jfs.ReportingScriptExecutor#getJFSQueryPropertySetMetaData(org.nightlabs.jfire.scripting.Script)
 	 */
 	@Override
-	public IJFSQueryPropertySetMetaData getJFSQueryPropertySetMetaData(Script script) throws ScriptException	
+	public IJFSQueryPropertySetMetaData getJFSQueryPropertySetMetaData(Script script) throws ScriptException
 	{
 		prepareWithFakeParams(script);
 		ScriptExecutorJavaClassReportingDelegate reportingDelegate = getReportingDelegate(null);
 		return reportingDelegate.getJFSQueryPropertySetMetaData();
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 * <p>
@@ -124,10 +125,10 @@ implements ReportingScriptExecutor
 	 * order to provide the scripts with the actual object parameters instead of
 	 * its String representation.
 	 * </p>
-	 * 
+	 *
 	 * @throws ScriptException Not only when execution fails, but also if the returned result is
 	 * 	not of type {@link IResultSet}.
-	 * 
+	 *
 	 * @see org.nightlabs.jfire.reporting.oda.jfs.ReportingScriptExecutor#getResultSet(org.nightlabs.jfire.scripting.Script, java.util.Map, JFSQueryPropertySet)
 	 */
 	@Override
@@ -144,12 +145,12 @@ implements ReportingScriptExecutor
 			throw new ScriptException("The delegate of type "+getDelegate().getClass().getName()+" did not return an implementation of "+IResultSet.class.getName()+" upon execution but "+result.getClass().getName(), e);
 		}
 	}
-	
+
 	/**
 	 * Converts the parameters given (eventually the data-set-parameters binded to a use of a BIRT dataset).
 	 * It will check if it either finds {@link JFSParameterUtil#DUMMY_DEFAULT_PARAMETER_VALUE} or a serialized
 	 * Object parameter.
-	 * 
+	 *
 	 * @param parameters The parameters to convert.
 	 * @return The converted parameters.
 	 */
@@ -162,5 +163,12 @@ implements ReportingScriptExecutor
 				convertedParams.put(entry.getKey(), JFireReportingHelper.getDataSetParamObject(entry.getValue()));
 		}
 		return convertedParams;
+	}
+
+	@Override
+	protected Class<?> loadDelegateClass(String className)
+	throws ClassNotFoundException
+	{
+		return ReportingClassLoader.sharedInstance().loadClass(className);
 	}
 }

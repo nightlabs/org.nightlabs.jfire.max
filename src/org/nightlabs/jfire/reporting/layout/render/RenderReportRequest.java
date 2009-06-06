@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.nightlabs.jfire.reporting.layout.render;
 
@@ -14,19 +14,19 @@ import org.nightlabs.util.NLLocale;
 
 /**
  * Used as parameter for rendering methods.
- * 
+ *
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
  *
  */
 public class RenderReportRequest implements Serializable {
 	private static final long serialVersionUID = 1L;
-	
-	
+
+
 	private ReportRegistryItemID reportRegistryItemID;
 	private OutputFormat outputFormat;
 	private Locale locale;
 	private Map<String,Object> parameters;
-	
+
 	/**
 	 * This constructor must only be used in conjunction with ALL the setters (except for the locale) - otherwise the resulting object cannot be used.
 	 */
@@ -35,7 +35,7 @@ public class RenderReportRequest implements Serializable {
 
 	/**
 	 * Creates a new {@link RenderReportRequest} with the given parameters and the default locale (of the current java runtime).
-	 * 
+	 *
 	 * @param reportRegistryItemID the id of the report which shall be rendered - must NOT be <code>null</code>.
 	 * @param parameters the parameters - can be <code>null</code> (<code>null</code> will be converted to an empty <code>Map</code>)
 	 * @param outputFormat the desired output-format - must NOT be <code>null</code>.
@@ -51,10 +51,10 @@ public class RenderReportRequest implements Serializable {
 		this.setOutputFormat(outputFormat);
 		this.locale = NLLocale.getDefault();
 	}
-	
+
 	/**
 	 * Creates a new {@link RenderReportRequest} with the given parameters.
-	 * 
+	 *
 	 * @param reportRegistryItemID the id of the report which shall be rendered - must NOT be <code>null</code>.
 	 * @param parameters the parameters - can be <code>null</code> (<code>null</code> will be converted to an empty <code>Map</code>)
 	 * @param outputFormat the desired output-format - must NOT be <code>null</code>.
@@ -72,7 +72,7 @@ public class RenderReportRequest implements Serializable {
 		this.setOutputFormat(outputFormat);
 		this.locale = locale;
 	}
-	
+
 	/**
 	 * @return the outputFormat - should never be <code>null</code>
 	 */

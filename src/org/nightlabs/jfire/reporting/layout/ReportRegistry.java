@@ -30,26 +30,26 @@ import java.util.Iterator;
 import java.util.Map;
 
 import javax.jdo.PersistenceManager;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
 
 import org.nightlabs.jfire.reporting.Birt;
 import org.nightlabs.jfire.reporting.Birt.OutputFormat;
+import org.nightlabs.jfire.reporting.classloader.ReportingClassLoader;
 import org.nightlabs.jfire.reporting.layout.id.ReportRegistryID;
 import org.nightlabs.jfire.reporting.layout.render.ReportLayoutRenderer;
-
-import javax.jdo.annotations.Join;
-import javax.jdo.annotations.Persistent;
-import javax.jdo.annotations.NullValue;
-import javax.jdo.annotations.InheritanceStrategy;
-import javax.jdo.annotations.Inheritance;
-import javax.jdo.annotations.PrimaryKey;
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.IdentityType;
-import javax.jdo.annotations.PersistenceModifier;
 
 /**
  * Singleton to hold the id of next new {@link org.nightlabs.jfire.reporting.layout.ReportRegistryItem}
  * and registrations of {@link ReportLayoutRenderer} to {@link OutputFormat}.
- * 
+ *
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  *
  * @jdo.persistence-capable
@@ -59,7 +59,7 @@ import javax.jdo.annotations.PersistenceModifier;
  *		table="JFireReporting_ReportRegistry"
  *
  * @jdo.create-objectid-class
- * 
+ *
  * @jdo.inheritance strategy="new-table"
  */
 @PersistenceCapable(
@@ -75,14 +75,14 @@ public class ReportRegistry {
 	 */
 	@PrimaryKey
 	private int reportRegistryID = 0;
-	
+
 	// TODO: Change to use IDGenerator.
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private long newReportItemID = 0;
-	
+
 	/**
 	 * key: String format (see {@link Birt.OutputFormat})<br/>
 	 * value: String reportRendererClassName (fully qualified name of a class extending {@link ReportLayoutRenderer})
@@ -103,7 +103,7 @@ public class ReportRegistry {
 		table="JFireReporting_ReportRegistry_format2ReportRendererClassName",
 		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Map<String, String> format2ReportRendererClassName;
-	
+
 	/**
 	 * @deprecated Only for JDO
 	 */
@@ -111,23 +111,23 @@ public class ReportRegistry {
 	protected ReportRegistry() {
 		super();
 	}
-	
+
 	public ReportRegistry(int reportRegistryID) {
 		this.reportRegistryID = reportRegistryID;
 	}
-	
+
 	public long getNewReportItemID() {
 		return newReportItemID;
 	}
-	
+
 	public int getReportRegistryID() {
 		return reportRegistryID;
 	}
-	
+
 	/**
 	 * Register the given ReportRender class to a Birt OutputFormat.
 	 * The ReportLayoutRenderer will be instantiated and asked for the format.
-	 * 
+	 *
 	 * @param clazz The class to register.
 	 * @throws InstantiationException When instantiating fails.
 	 * @throws IllegalAccessException When instantiating fails.
@@ -147,17 +147,17 @@ public class ReportRegistry {
 
 	/**
 	 * Unbinds the registration of a class-name to the given Birt OutputFormat.
-	 * 
+	 *
 	 * @param format The format to unbind.
 	 */
 	public void unbindFormat(String format) {
 		format2ReportRendererClassName.remove(format.toString());
 	}
-	
-	
+
+
 	/**
 	 * Returns the class registered to the given Birt OutputFormat.
-	 * 
+	 *
 	 * @param format The format to search the class for.
 	 * @param throwExceptionIfNotFound If true and no format can be found an {@link IllegalArgumentException} will be thrown
 	 * @return The class registered to the given Birt OutputFormat.
@@ -175,13 +175,14 @@ public class ReportRegistry {
 			return null;
 		}
 
-		return (Class<? extends ReportLayoutRenderer>) Class.forName(className);
+//		return (Class<? extends ReportLayoutRenderer>) Class.forName(className);
+		return (Class<? extends ReportLayoutRenderer>) ReportingClassLoader.sharedInstance().loadClass(className);
 	}
 
 	/**
 	 * Creates a new instance of the {@link ReportLayoutRenderer} implementation registered
 	 * to the given format and returns it.
-	 * 
+	 *
 	 * @param format The format the renderer should be searched for.
 	 * @return A new instance of the registered {@link ReportLayoutRenderer}
 	 * @throws IllegalArgumentException When no registration could be found.
@@ -192,7 +193,7 @@ public class ReportRegistry {
 	public ReportLayoutRenderer createReportRenderer(OutputFormat format)
 	throws IllegalArgumentException, ClassNotFoundException, InstantiationException, IllegalAccessException
 	{
-		return (ReportLayoutRenderer) getReportRendererClass(format, true).newInstance();
+		return getReportRendererClass(format, true).newInstance();
 	}
 
 	/**
@@ -205,13 +206,13 @@ public class ReportRegistry {
 		newReportItemID = result + 1;
 		return result;
 	}
-	
-	
-	
+
+
+
 
 	public static final int SINGLETON_REGISTRY_ID = 0;
 	public static final ReportRegistryID SINGLETON_ID = ReportRegistryID.create(SINGLETON_REGISTRY_ID);
-	
+
 	public static ReportRegistry getReportRegistry(PersistenceManager pm) {
 		Iterator it = pm.getExtent(ReportRegistry.class).iterator();
 		ReportRegistry registry;

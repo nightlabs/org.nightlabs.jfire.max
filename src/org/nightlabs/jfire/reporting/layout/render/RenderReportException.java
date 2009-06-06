@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.nightlabs.jfire.reporting.layout.render;
 
@@ -12,7 +12,7 @@ import org.nightlabs.util.reflect.ReflectUtil;
  * are not required to know BIRT when rendering reports.
  *
  * TODO: Need to wrap possible causes in simple exceptions.
- * 
+ *
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
  */
 public class RenderReportException extends Exception {
@@ -20,7 +20,7 @@ public class RenderReportException extends Exception {
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * 
+	 *
 	 */
 	public RenderReportException() {
 	}
@@ -48,7 +48,7 @@ public class RenderReportException extends Exception {
 		super(message);
 		initCause(cause);
 	}
-	
+
 	@Override
 	public synchronized Throwable initCause(Throwable cause) {
 		System.err.println("Init cause of " + RenderReportException.class.getSimpleName() + " called with " + cause);

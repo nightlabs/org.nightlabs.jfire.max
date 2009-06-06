@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.nightlabs.jfire.reporting.layout.render;
 
@@ -17,7 +17,7 @@ import org.nightlabs.util.IOUtil;
 
 /**
  * Helper class for {@link ReportLayoutRenderer} to unify their behaviour.
- * 
+ *
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
  *
  */
@@ -52,7 +52,7 @@ public class ReportLayoutRendererUtil {
 		}
 		return renderedRoot;
 	}
-	
+
 	/**
 	 * @return A folder where the a report for the calling session can safely be placed in.
 	 */
@@ -61,11 +61,11 @@ public class ReportLayoutRendererUtil {
 		layoutRoot = new File(layoutRoot, SecurityReflector.getUserDescriptor().getSessionID()+"-"+Long.toHexString(Thread.currentThread().getId()));
 		return layoutRoot;
 	}
-	
+
 	/**
 	 * Retruns after asuring that a folder exists, that can be uniquely addressed
 	 * using the sessionID of the actual user.
-	 * 
+	 *
 	 * @return The root folder for renderedReportLayouts of the actual session.
 	 */
 	public static File prepareRenderedLayoutOutputFolder() {
@@ -103,12 +103,12 @@ public class ReportLayoutRendererUtil {
 		}
 		return protectionFile;
 	}
-	
+
 	/**
 	 * Takes the root Folder of a rendered BIRT Layout and populates the given {@link RenderedReportLayout}'s
 	 * data with its contents. If doZip is true, the whole folder will be zipped and set as data. If it is false
 	 * this method tries to locate [entryFileName].[OUTPUTFORMAT] and set this as data (not zipped of course).
-	 * 
+	 *
 	 * @param layoutRoot The root folder for the rendered layout (e.g. containig one html file and several images, or a single pdf).
 	 * @param reportLayout The {@link RenderedReportLayout} with a valid header. The data member of this instance will be manipulated (populated with the file data).
 	 * @param doZip Whether to zip contents or not. (Note, that if not ziped, only one entry can be added: renderedReport.[OUTPUTFORMAT])
@@ -116,7 +116,7 @@ public class ReportLayoutRendererUtil {
 	public static void prepareRenderedLayoutForTransfer(File layoutRoot, RenderedReportLayout reportLayout, String entryFileName, boolean doZip) {
 		// zip the complete folder
 		File transferFile = null;
-		
+
 		if (doZip) {
 			reportLayout.getHeader().setZipped(true);
 			transferFile = new File(layoutRoot, entryFileName+".zip");
@@ -130,10 +130,10 @@ public class ReportLayoutRendererUtil {
 			reportLayout.getHeader().setZipped(false);
 			transferFile = new File(layoutRoot, entryFileName+"."+reportLayout.getHeader().getOutputFormat().toString());
 		}
-		
+
 		// set the header information
 		reportLayout.getHeader().setEntryFileName(entryFileName+"."+reportLayout.getHeader().getOutputFormat().toString());
-		
+
 		// read the data into the result RenderedReportLayout
 		BufferedInputStream buf;
 		try {
@@ -171,7 +171,7 @@ public class ReportLayoutRendererUtil {
 			}
 		}
 	}
-	
+
 	/**
 	 * Cleans up the folder with the rendered report layouts.
 	 * (Deletes all output directories, that are not protected by a protection file any more).

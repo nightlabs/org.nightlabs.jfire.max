@@ -1,0 +1,8 @@
+<project default="build">
+	<target name="build">
+		<jar destfile="org.nightlabs.jfire.reporting.birt_0.9.7.jar">
+			<fileset dir="../org.nightlabs.jfire.reporting.birt/bin" includes="**/*">
+			</fileset>
+		</jar>
+	</target>
+</project>

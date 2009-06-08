@@ -39,6 +39,9 @@ public class FetchGroupsTrade
 	public static final String FETCH_GROUP_ARTICLE_IN_DELIVERY_NOTE_EDITOR = "FetchGroupsTrade.articleInDeliveryNoteEditor";
 	public static final String FETCH_GROUP_ARTICLE_IN_RECEPTION_NOTE_EDITOR = "FetchGroupsTrade.articleInReceptionNoteEditor";
 
+	// I think the above fetch-groups are in mist cases not necessary and maybe we replace them by the following one. Currently, they are combined. Marco.
+	public static final String FETCH_GROUP_ARTICLE_IN_ARTICLE_CONTAINER_EDITOR = "FetchGroupsTrade.articleInArticleContainerEditor";
+
 	// The following fetch-groups are used to retrieve the ArticleContainer when it has been changed - in this case it will
 	// not detach the articles, since they are managed separately (to improve speed).
 	public static final String FETCH_GROUP_ARTICLE_CONTAINER_IN_EDITOR = "FetchGroupsTrade.articleContainerInEditor";

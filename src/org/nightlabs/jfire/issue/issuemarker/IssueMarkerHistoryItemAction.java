@@ -8,6 +8,8 @@ import org.nightlabs.jfire.issue.Issue;
  *
  * @author Khaireel Mohamed - khaireel at nightlabs dot de
  */
+@Deprecated
 public enum IssueMarkerHistoryItemAction {
+	// Use instead the more general org.nightlabs.jfire.issue.history.IssueHistoryItemAction.
 	ADDED, REMOVED
 }

@@ -27,6 +27,7 @@ import javax.jdo.annotations.Queries;
 
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
+import org.nightlabs.jfire.issue.history.FetchGroupsIssueHistoryItem;
 import org.nightlabs.jfire.issue.id.IssueLinkTypeID;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.util.Util;
@@ -64,10 +65,16 @@ import org.nightlabs.util.Util;
 @FetchGroups({
 	@FetchGroup(
 		name=IssueLinkType.FETCH_GROUP_LINKABLE_OBJECT_CLASS_NAMES,
-		members=@Persistent(name="linkedObjectClassNames")),
+		members=@Persistent(name="linkedObjectClassNames")
+	),
 	@FetchGroup(
 		name=IssueLinkType.FETCH_GROUP_NAME,
-		members=@Persistent(name="name"))
+		members=@Persistent(name="name")
+	),
+	@FetchGroup(
+		name=FetchGroupsIssueHistoryItem.FETCH_GROUP_LIST,
+		members=@Persistent(name="name")
+	)
 })
 @Discriminator(strategy=DiscriminatorStrategy.CLASS_NAME)
 @Queries(

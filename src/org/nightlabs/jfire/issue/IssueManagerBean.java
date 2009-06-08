@@ -648,10 +648,8 @@ implements IssueManagerRemote
 //				storeIssueHistoryItem(issueHistory, false, new String[]{FetchPlan.DEFAULT}, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
 
 				// ~~ New codes ~~
-				Collection<IssueHistoryItem> issueHistoryItems = IssueHistoryItemFactory.createIssueHistoryItems(pm, user, oldPersistentIssue, issue); // <-- Seems OK.
+				Collection<IssueHistoryItem> issueHistoryItems = IssueHistoryItemFactory.createIssueHistoryItems(pm, user, oldPersistentIssue, issue); // <-- Seems OK and holding.
 				storeIssueHistoryItems(issueHistoryItems, false, new String[]{FetchPlan.DEFAULT}, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
-//				for(IssueHistoryItem issueHistoryItem : issueHistoryItems)
-//					storeIssueHistoryItem(issueHistoryItem, false, new String[]{FetchPlan.DEFAULT}, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
 				// ------ KaiExperiments ----- >8 -------------------------------
 
 

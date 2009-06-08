@@ -8,6 +8,7 @@ import javax.jdo.JDODetachedFieldAccessException;
 
 import org.nightlabs.jfire.issue.Issue;
 import org.nightlabs.jfire.issue.history.IssueHistoryItem;
+import org.nightlabs.jfire.issue.history.IssueHistoryItemAction;
 import org.nightlabs.jfire.issue.history.IssueHistoryItemFactory;
 import org.nightlabs.jfire.issue.history.IssuePriorityHistoryItem;
 import org.nightlabs.jfire.security.User;
@@ -49,13 +50,13 @@ public class IssueMarkerHistoryItemFactory extends IssueHistoryItemFactory {
 			}
 		}
 
-		// (iii) Collate them all, and generate the necessary IssuePriorityHistoryItem
+		// (iii) Collate them all, and generate the necessary IssueHistoryItem.
 		Collection<IssueHistoryItem> issueMarkerHistoryItems = new ArrayList<IssueHistoryItem>();
 		for(IssueMarker issueMarker : addedIssueMarkers)
-			issueMarkerHistoryItems.add( new IssueMarkerHistoryItem(user, issueMarker, IssueMarkerHistoryItemAction.ADDED, oldPersistentIssue) );
+			issueMarkerHistoryItems.add( new IssueMarkerHistoryItem(user, oldPersistentIssue, issueMarker, IssueHistoryItemAction.ADDED) );
 
 		for(IssueMarker issueMarker : removedIssueMarkers)
-			issueMarkerHistoryItems.add( new IssueMarkerHistoryItem(user, issueMarker, IssueMarkerHistoryItemAction.REMOVED, oldPersistentIssue) );
+			issueMarkerHistoryItems.add( new IssueMarkerHistoryItem(user, oldPersistentIssue, issueMarker, IssueHistoryItemAction.REMOVED) );
 
 
 		return issueMarkerHistoryItems;

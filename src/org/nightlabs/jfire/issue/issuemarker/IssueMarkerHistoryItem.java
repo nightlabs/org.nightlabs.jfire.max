@@ -12,6 +12,7 @@ import javax.jdo.annotations.Persistent;
 import org.nightlabs.jfire.issue.Issue;
 import org.nightlabs.jfire.issue.history.FetchGroupsIssueHistoryItem;
 import org.nightlabs.jfire.issue.history.IssueHistoryItem;
+import org.nightlabs.jfire.issue.history.IssueHistoryItemAction;
 import org.nightlabs.jfire.security.User;
 
 /**
@@ -40,7 +41,7 @@ public class IssueMarkerHistoryItem extends IssueHistoryItem {
 	private IssueMarker issueMarker;
 
 	@Persistent(nullValue=NullValue.EXCEPTION)
-	private IssueMarkerHistoryItemAction historyActionIssueMarker;
+	private IssueHistoryItemAction issueHistoryItemAction;
 
 
 	/**
@@ -52,10 +53,10 @@ public class IssueMarkerHistoryItem extends IssueHistoryItem {
 	/**
 	 * Creates a new instance of an IssuePriorityHistoryItem.
 	 */
-	public IssueMarkerHistoryItem(User user, IssueMarker issueMarker, IssueMarkerHistoryItemAction historyActionIssueMarker, Issue issue) {
+	public IssueMarkerHistoryItem(User user, Issue issue, IssueMarker issueMarker, IssueHistoryItemAction issueHistoryItemAction) {
 		super(true, user, issue);
 		this.issueMarker = issueMarker;
-		this.historyActionIssueMarker = historyActionIssueMarker;
+		this.issueHistoryItemAction = issueHistoryItemAction;
 	}
 
 
@@ -74,13 +75,13 @@ public class IssueMarkerHistoryItem extends IssueHistoryItem {
 	 */
 	@Override
 	public String getDescription() {
-		switch (historyActionIssueMarker) {
+		switch (issueHistoryItemAction) {
 			case ADDED:
 				return String.format("Issue marker %s was ADDED.", issueMarker.getName().getText());
 			case REMOVED:
 				return String.format("Issue marker %s was REMOVED.", issueMarker.getName().getText());
 			default:
-				throw new IllegalStateException("Unknown historyActionIssueMarker: " + historyActionIssueMarker);
+				throw new IllegalStateException("Unknown issueHistoryItemAction: " + issueHistoryItemAction);
 		}
 	}
 

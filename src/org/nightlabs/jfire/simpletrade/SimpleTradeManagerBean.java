@@ -163,7 +163,7 @@ implements SimpleTradeManagerRemote
 	public void initialise()
 	throws CannotPublishProductTypeException
 	{
-		PersistenceManager pm = this.getPersistenceManager();
+		PersistenceManager pm = this.createPersistenceManager();
 		try {
 			String organisationID = getOrganisationID();
 
@@ -246,7 +246,7 @@ implements SimpleTradeManagerRemote
 	@RolesAllowed("org.nightlabs.jfire.store.seeProductType")
 	@Override
 	public Set<ProductTypeID> getChildSimpleProductTypeIDs(ProductTypeID parentSimpleProductTypeID) {
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			Collection<SimpleProductType> productTypes = SimpleProductType.getChildProductTypes(pm, parentSimpleProductTypeID);
 
@@ -320,7 +320,7 @@ implements SimpleTradeManagerRemote
 		// temporarily do below. Marco.
 		productType = Util.cloneSerializable(productType);
 
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups == null)
@@ -507,7 +507,7 @@ implements SimpleTradeManagerRemote
 	)
 	{
 		Map<ProductTypeID, PropertySet> result = new HashMap<ProductTypeID, PropertySet>(simpleProductTypeIDs.size());
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			for (ProductTypeID productTypeID : simpleProductTypeIDs) {
 				SimpleProductType productType = (SimpleProductType) pm.getObjectById(productTypeID);
@@ -542,7 +542,7 @@ implements SimpleTradeManagerRemote
 	@Override
 	public Set<PriceConfigID> getFormulaPriceConfigIDs()
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			Query q = pm.newQuery(pm.getExtent(FormulaPriceConfig.class, false));
 			q.setResult("JDOHelper.getObjectId(this)");
@@ -566,7 +566,7 @@ implements SimpleTradeManagerRemote
 	@Override
 	public List<FormulaPriceConfig> getFormulaPriceConfigs(Collection<PriceConfigID> formulaPriceConfigIDs, String[] fetchGroups, int maxFetchDepth)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			return NLJDOHelper.getDetachedObjectList(pm, formulaPriceConfigIDs, FormulaPriceConfig.class, fetchGroups, maxFetchDepth);
 		} finally {
@@ -596,7 +596,7 @@ implements SimpleTradeManagerRemote
 	)
 	throws NotAvailableException
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			Trader trader = Trader.getTrader(pm);
 			RecurringTrader recurringTrader = RecurringTrader.getRecurringTrader(pm);
@@ -697,7 +697,7 @@ implements SimpleTradeManagerRemote
 	)
 	throws NotAvailableException
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			Trader trader = Trader.getTrader(pm);
 			Store store = Store.getStore(pm);
@@ -856,7 +856,7 @@ implements SimpleTradeManagerRemote
 		if (!userIsOrganisation()) // noone else needs this method - at least at the moment.
 			throw new IllegalStateException("For security reasons, this method can only be called by partner organisations! You are not an organisation!");
 
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			Query q = pm.newQuery(SimpleProductType.class);
 			q.setResult("JDOHelper.getObjectId(this)");
@@ -887,7 +887,7 @@ implements SimpleTradeManagerRemote
 	// only in normal sales UI, because in the admin UI, we probably have to see the nested product types, even when they're
 	// not "visible" anymore. This definitely needs further thoughts. Marco.
 
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			pm.getExtent(SimpleProductType.class);
 			pm.getFetchPlan().setGroups(new String[] {
@@ -961,7 +961,7 @@ implements SimpleTradeManagerRemote
 	public void importSimpleProductTypesForReselling(String emitterOrganisationID)
 	throws JFireException
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			try {
 				Hashtable<?, ?> initialContextProperties = getInitialContextProperties(emitterOrganisationID);
@@ -1046,7 +1046,7 @@ implements SimpleTradeManagerRemote
 			String[] tariffFetchGroups, String[] priceFetchGroups
 	)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 //			StablePriceConfig priceConfig = (StablePriceConfig) pm.getObjectById(priceConfigID);
 
@@ -1123,7 +1123,7 @@ implements SimpleTradeManagerRemote
 	public Collection<GridPriceConfig> storePriceConfigs(Collection<GridPriceConfig> priceConfigs, boolean get, AssignInnerPriceConfigCommand assignInnerPriceConfigCommand)
 	throws PriceCalculationException
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			final CustomerGroupMapper cgm = new CustomerGroupMapper(pm);
 			final TariffMapper tm = new TariffMapper(pm);
@@ -1149,7 +1149,7 @@ implements SimpleTradeManagerRemote
 	@Override
 	public Collection<OrganisationID> getCandidateOrganisationIDsForCrossTrade()
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			Set<OrganisationID> res = new HashSet<OrganisationID>();
 

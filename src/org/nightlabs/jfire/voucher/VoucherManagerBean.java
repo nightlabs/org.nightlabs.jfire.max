@@ -142,7 +142,7 @@ implements VoucherManagerRemote
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("_System_")
 	public void initialise() throws Exception {
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		JFireServerManager jsm = getJFireServerManager();
 		try {
 			// init scripts
@@ -367,7 +367,7 @@ implements VoucherManagerRemote
 	@RolesAllowed("org.nightlabs.jfire.store.seeProductType")
 	public Set<ProductTypeID> getChildVoucherTypeIDs(ProductTypeID parentVoucherTypeID)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			Collection<VoucherType> voucherTypes = VoucherType.getChildVoucherTypes(pm, parentVoucherTypeID);
 
@@ -394,7 +394,7 @@ implements VoucherManagerRemote
 	@SuppressWarnings("unchecked")
 	public Set<PriceConfigID> getVoucherPriceConfigIDs()
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			Query q = pm.newQuery(VoucherPriceConfig.class);
 			q.setResult("JDOHelper.getObjectId(this)");
@@ -412,7 +412,7 @@ implements VoucherManagerRemote
 	@RolesAllowed("org.nightlabs.jfire.accounting.queryPriceConfigurations")
 	public List<VoucherPriceConfig> getVoucherPriceConfigs(Collection<PriceConfigID> voucherPriceConfigIDs, String[] fetchGroups, int maxFetchDepth)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			return NLJDOHelper.getDetachedObjectList(pm, voucherPriceConfigIDs,
 					VoucherPriceConfig.class, fetchGroups, maxFetchDepth);
@@ -431,7 +431,7 @@ implements VoucherManagerRemote
 		if (voucherType == null)
 			throw new IllegalArgumentException("voucherType must not be null!");
 
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups == null)
@@ -540,7 +540,7 @@ implements VoucherManagerRemote
 			String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException {
 
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 
 		try {
 			Trader trader = Trader.getTrader(pm);
@@ -690,7 +690,7 @@ implements VoucherManagerRemote
 			String[] fetchGroups, int maxFetchDepth
 	) throws ModuleException
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			Collection<? extends Article> articles = createArticles(
 					pm, segmentID, offerID,
@@ -714,7 +714,7 @@ implements VoucherManagerRemote
 	 */
 	@RolesAllowed("org.nightlabs.jfire.accounting.queryLocalAccountantDelegates")
 	public Set<LocalAccountantDelegateID> getVoucherLocalAccountantDelegateIDs() {
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			Query q = pm.newQuery(VoucherLocalAccountantDelegate.class);
 			q.setResult("JDOHelper.getObjectId(this)");
@@ -734,7 +734,7 @@ implements VoucherManagerRemote
 	public List<VoucherLocalAccountantDelegate> getVoucherLocalAccountantDelegates(
 			Collection<LocalAccountantDelegateID> voucherLocalAccountantDelegateIDs,
 			String[] fetchGroups, int maxFetchDepth) {
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			return NLJDOHelper.getDetachedObjectList(pm,
 					voucherLocalAccountantDelegateIDs,
@@ -757,7 +757,7 @@ implements VoucherManagerRemote
 	 */
 	@RolesAllowed("org.nightlabs.jfire.voucher.redeemVoucher")
 	public VoucherKeyID getVoucherKeyID(String voucherKeyString) {
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			return VoucherKey.getVoucherKeyID(pm, voucherKeyString);
 		} finally {
@@ -782,7 +782,7 @@ implements VoucherManagerRemote
 			int maxFetchDepth
 	)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			return NLJDOHelper.getDetachedObjectList(pm, voucherKeyIDs, VoucherKey.class, fetchGroups, maxFetchDepth);
 		} finally {
@@ -825,7 +825,7 @@ implements VoucherManagerRemote
 			boolean closePM = false;
 			if (pm == null) {
 				closePM = true;
-				pm = getPersistenceManager();
+				pm = createPersistenceManager();
 			}
 			try {
 				ScriptRegistry scriptRegistry = ScriptRegistry.getScriptRegistry(pm);
@@ -922,7 +922,7 @@ implements VoucherManagerRemote
 			ProductTypeID voucherTypeID) throws ModuleException {
 		try {
 			try {
-				PersistenceManager pm = getPersistenceManager();
+				PersistenceManager pm = createPersistenceManager();
 				try {
 //					Variables are never used locally
 //					User user = User.getUser(pm, getPrincipal());
@@ -1082,7 +1082,7 @@ implements VoucherManagerRemote
 	public Map<ProductID, Map<ScriptRegistryItemID, Object>> getPreviewVoucherData(PreviewParameterSet previewParameterSet) throws ModuleException
 	{
 		try {
-			PersistenceManager pm = getPersistenceManager();
+			PersistenceManager pm = createPersistenceManager();
 			try {
 				pm.getFetchPlan().setMaxFetchDepth(1);
 				pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
@@ -1216,7 +1216,7 @@ implements VoucherManagerRemote
 	public LayoutMapForArticleIDSet getVoucherLayoutMapForArticleIDSet(
 			Collection<ArticleID> articleIDs, String[] fetchGroups, int maxFetchDepth)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			LayoutMapForArticleIDSet res = new LayoutMapForArticleIDSet();
 
@@ -1251,7 +1251,7 @@ implements VoucherManagerRemote
 	 */
 	@RolesAllowed("org.nightlabs.jfire.voucher.editVoucherLayout")
 	public Set<VoucherLayoutID> getAllVoucherLayoutIds() {
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			Query query = pm.newQuery("SELECT JDOHelper.getObjectId(this) FROM org.nightlabs.jfire.voucher.scripting.VoucherLayout");
 			return new HashSet<VoucherLayoutID>((Collection<VoucherLayoutID>) query.execute());
@@ -1270,7 +1270,7 @@ implements VoucherManagerRemote
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("org.nightlabs.jfire.voucher.editVoucherLayout")
 	public void replaceVoucherLayout(VoucherLayoutID oldVoucherLayoutId, VoucherLayout newVoucherLayout) {
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			pm.makePersistent(newVoucherLayout);
 
@@ -1295,7 +1295,7 @@ implements VoucherManagerRemote
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("org.nightlabs.jfire.voucher.editVoucherLayout")
 	public void deleteVoucherLayout(VoucherLayoutID voucherLayoutID) {
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			if (!VoucherType.getVoucherTypeIdsByVoucherLayoutId(pm, voucherLayoutID).isEmpty()) {
 				throw new IllegalStateException("Cannot delete voucher layout that is assigned to at least one voucher type.");
@@ -1318,7 +1318,7 @@ implements VoucherManagerRemote
 	@RolesAllowed("org.nightlabs.jfire.voucher.editVoucherLayout")
 	public List<VoucherLayout> getVoucherLayouts(Set<VoucherLayoutID> voucherLayoutIDs, String[] fetchGroups, int maxFetchDepth)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
@@ -1337,7 +1337,7 @@ implements VoucherManagerRemote
 	@RolesAllowed("org.nightlabs.jfire.voucher.editVoucherLayout")
 	public Set<VoucherLayoutID> getVoucherLayoutIdsByFileName(String fileName)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			return VoucherLayout.getVoucherLayoutIdsByFilename(pm, fileName);
 		} finally {
@@ -1351,7 +1351,7 @@ implements VoucherManagerRemote
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("org.nightlabs.jfire.voucher.editVoucherLayout")
 	public VoucherLayout storeVoucherLayout(VoucherLayout voucherLayout, boolean get, String[] fetchGroups, int maxFetchDepth) {
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			voucherLayout = pm.makePersistent(voucherLayout);
 
@@ -1375,7 +1375,7 @@ implements VoucherManagerRemote
 	 */
 	@RolesAllowed("org.nightlabs.jfire.voucher.editVoucherLayout")
 	public Set<ProductTypeID> getVoucherTypeIdsByVoucherLayoutId(VoucherLayoutID voucherLayoutId) {
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			return VoucherType.getVoucherTypeIdsByVoucherLayoutId(pm, voucherLayoutId);
 		} finally {
@@ -1391,7 +1391,7 @@ implements VoucherManagerRemote
 	 */
 	@RolesAllowed("org.nightlabs.jfire.voucher.editVoucherLayout")
 	public Set<ProductTypeID> getVoucherTypeIdsByLocalAccountantDelegateId(ObjectID LocalAccountantDelegateId) {
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			return VoucherType.getVoucherTypeIdsByLocalAccountantDelegateId(pm, LocalAccountantDelegateId);
 		} finally {

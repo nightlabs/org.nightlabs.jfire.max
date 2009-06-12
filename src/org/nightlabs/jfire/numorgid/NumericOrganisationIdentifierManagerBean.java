@@ -44,7 +44,7 @@ implements NumericOrganisationIdentifierManagerRemote
 	@RolesAllowed("_Guest_")
 	public NumericOrganisationIdentifier getNumericOrganisationIdentifier(String organisationID, Integer numericOrganisationID)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			String clientOrganisationID = getUserID();
 			if (!clientOrganisationID.startsWith(User.USER_ID_PREFIX_TYPE_ORGANISATION))
@@ -114,7 +114,7 @@ implements NumericOrganisationIdentifierManagerRemote
 	@RolesAllowed("_Guest_")
 	public NumericOrganisationIdentifier getNumericOrganisationIdentifier(NumericOrganisationIdentifierID numericOrganisationIdentifierID)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			return NumericOrganisationIdentifier.getNumericOrganisationIdentifier(pm, numericOrganisationIdentifierID.organisationID);
 		} finally {
@@ -129,7 +129,7 @@ implements NumericOrganisationIdentifierManagerRemote
 	@RolesAllowed("_Guest_")
 	public NumericOrganisationIdentifier getNumericOrganisationIdentifier(int numericOrganisationID)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			return NumericOrganisationIdentifier.getNumericOrganisationIdentifier(pm, numericOrganisationID);
 		} finally {
@@ -145,7 +145,7 @@ implements NumericOrganisationIdentifierManagerRemote
 	public void initialise()
 	throws Exception
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			String localOrganisationID = getOrganisationID();
 			String rootOrganisationID = getRootOrganisationID();

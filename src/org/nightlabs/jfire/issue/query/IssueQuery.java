@@ -72,7 +72,7 @@ extends AbstractJDOQuery
 	private Date issueWorkTimeRangeTo;
 	private Set<ProjectID> projectIDs;
 	
-	private String stateDefinitionName;
+	private String jbpmNodeName;
 	private boolean isSetCurrentUserAsAssignee;
 	private boolean isSetCurrentUserAsReporter;
 	
@@ -101,7 +101,7 @@ extends AbstractJDOQuery
 		public static final String issueWorkTimeRangeTo = "issueWorkTimeRangeTo";
 		public static final String projectIDs = "projectIDs";
 		
-		public static final String stateDefinitionName = "stateDefinitionName";
+		public static final String jbpmNodeName = "jbpmNodeName";
 	}
 
 	/**
@@ -194,8 +194,8 @@ extends AbstractJDOQuery
 			filter.append("\n || (this.issueWorkTimeRanges.contains(varIssueWorkTimeRange) && !((varIssueWorkTimeRange.to <= :issueWorkTimeRangeFrom) && (varIssueWorkTimeRange.from < :issueWorkTimeRangeFrom))) ");
 		}
 
-		if (isFieldEnabled(FieldName.stateDefinitionName) && stateDefinitionName != null) {
-			filter.append("\n && this.state.stateDefinition.processDefinitionID == :stateDefinitionName ");
+		if (jbpmNodeName != null) {
+			filter.append("\n && (this.state.stateDefinition.jbpmNodeName == :jbpmNodeName)");
 		}
 		
 		if (isFieldEnabled(FieldName.projectIDs) && projectIDs != null && projectIDs.size() > 0) {
@@ -642,18 +642,18 @@ extends AbstractJDOQuery
 	 * 
 	 * @return
 	 */
-	public String getStateDefinitionName() {
-		return stateDefinitionName;
+	public String getJbpmNodeName() {
+		return jbpmNodeName;
 	}
 	
 	/**
 	 * 
-	 * @param stateDefinitionName
+	 * @param jbpmNodeName
 	 */
-	public void setStateDefinitionName(String stateDefinitionName) {
-		final String oldStateDefinitionName = this.stateDefinitionName;
-		this.stateDefinitionName = stateDefinitionName;
-		notifyListeners(FieldName.stateDefinitionName, oldStateDefinitionName, stateDefinitionName);
+	public void setJbpmNodeName(String jbpmNodeName) {
+		final String oldJbpmNodeName = this.jbpmNodeName;
+		this.jbpmNodeName = jbpmNodeName;
+		notifyListeners(FieldName.jbpmNodeName, oldJbpmNodeName, jbpmNodeName);
 	}
 	@Override
 	/**

@@ -1660,13 +1660,28 @@ implements IssueManagerRemote
 
 			//Predefined Query Stores
 			IssueQuery unassignedIssueIssueQuery = new IssueQuery();
-			unassignedIssueIssueQuery.setStateDefinitionName(JbpmConstants.NODE_NAME_OPEN);
-
+			unassignedIssueIssueQuery.setAllFieldsDisabled();
+			unassignedIssueIssueQuery.setJbpmNodeName(JbpmConstants.NODE_NAME_OPEN);
+			
 			IssueQuery resolvedIssueIssueQuery = new IssueQuery();
-			resolvedIssueIssueQuery.setStateDefinitionName(JbpmConstants.NODE_NAME_RESOLVED);
+			resolvedIssueIssueQuery.setAllFieldsDisabled();
+			resolvedIssueIssueQuery.setJbpmNodeName(JbpmConstants.NODE_NAME_RESOLVED);
 
-			IssueQuery modifiedIssueIssueQuery = new IssueQuery();
-
+			IssueQuery acknowledgedIssueIssueQuery = new IssueQuery();
+			acknowledgedIssueIssueQuery.setAllFieldsDisabled();
+			acknowledgedIssueIssueQuery.setJbpmNodeName(JbpmConstants.NODE_NAME_ACKNOWLEDGED);
+			
+			IssueQuery closedIssueIssueQuery = new IssueQuery();
+			closedIssueIssueQuery.setAllFieldsDisabled();
+			closedIssueIssueQuery.setJbpmNodeName(JbpmConstants.NODE_NAME_CLOSED);
+			
+			IssueQuery confirmedIssueIssueQuery = new IssueQuery();
+			confirmedIssueIssueQuery.setAllFieldsDisabled();
+			confirmedIssueIssueQuery.setJbpmNodeName(JbpmConstants.NODE_NAME_CONFIRMED);
+			
+			IssueQuery rejectedIssueIssueQuery = new IssueQuery();
+			rejectedIssueIssueQuery.setAllFieldsDisabled();
+			rejectedIssueIssueQuery.setJbpmNodeName(JbpmConstants.NODE_NAME_REJECTED);
 			//1 Unassigned Issues
 			pm.getExtent(BaseQueryStore.class);
 
@@ -1678,7 +1693,6 @@ implements IssueManagerRemote
 
 			queryStore.setQueryCollection(queryCollection);
 			queryStore.setPubliclyAvailable(true);
-	//		queryStore.getName().setText(Locale.ENGLISH.getLanguage(), "Unassigned");
 			queryStore.getName().readFromProperties(baseName, loader,
 			"org.nightlabs.jfire.issue.IssueManagerBean.queryStoreUnassigned"); //$NON-NLS-1$
 			queryStore.serialiseCollection();
@@ -1693,12 +1707,68 @@ implements IssueManagerRemote
 
 			queryStore.setQueryCollection(queryCollection);
 			queryStore.setPubliclyAvailable(true);
-//			queryStore.getName().setText(Locale.ENGLISH.getLanguage(), "Resolved");
 			queryStore.getName().readFromProperties(baseName, loader,
 			"org.nightlabs.jfire.issue.IssueManagerBean.queryStoreResolved"); //$NON-NLS-1$
 			queryStore.serialiseCollection();
 			queryStore = pm.makePersistent(queryStore);
 
+			//3 Acknowledged Issues
+			queryCollection = new QueryCollection<IssueQuery>(Issue.class);
+			queryCollection.add(acknowledgedIssueIssueQuery);
+
+			queryStore = new BaseQueryStore(systemUser,
+					IDGenerator.nextID(BaseQueryStore.class), queryCollection);
+
+			queryStore.setQueryCollection(queryCollection);
+			queryStore.setPubliclyAvailable(true);
+			queryStore.getName().readFromProperties(baseName, loader,
+			"org.nightlabs.jfire.issue.IssueManagerBean.queryStoreAcknowledged"); //$NON-NLS-1$
+			queryStore.serialiseCollection();
+			queryStore = pm.makePersistent(queryStore);
+
+			//4 Closed Issues
+			queryCollection = new QueryCollection<IssueQuery>(Issue.class);
+			queryCollection.add(closedIssueIssueQuery);
+
+			queryStore = new BaseQueryStore(systemUser,
+					IDGenerator.nextID(BaseQueryStore.class), queryCollection);
+
+			queryStore.setQueryCollection(queryCollection);
+			queryStore.setPubliclyAvailable(true);
+			queryStore.getName().readFromProperties(baseName, loader,
+			"org.nightlabs.jfire.issue.IssueManagerBean.queryStoreclosed"); //$NON-NLS-1$
+			queryStore.serialiseCollection();
+			queryStore = pm.makePersistent(queryStore);
+
+			//5 Confirmed Issues
+			queryCollection = new QueryCollection<IssueQuery>(Issue.class);
+			queryCollection.add(confirmedIssueIssueQuery);
+
+			queryStore = new BaseQueryStore(systemUser,
+					IDGenerator.nextID(BaseQueryStore.class), queryCollection);
+
+			queryStore.setQueryCollection(queryCollection);
+			queryStore.setPubliclyAvailable(true);
+			queryStore.getName().readFromProperties(baseName, loader,
+			"org.nightlabs.jfire.issue.IssueManagerBean.queryStoreConfirmed"); //$NON-NLS-1$
+			queryStore.serialiseCollection();
+			queryStore = pm.makePersistent(queryStore);
+
+			//6 Rejected Issues
+			queryCollection = new QueryCollection<IssueQuery>(Issue.class);
+			queryCollection.add(rejectedIssueIssueQuery);
+
+			queryStore = new BaseQueryStore(systemUser,
+					IDGenerator.nextID(BaseQueryStore.class), queryCollection);
+
+			queryStore.setQueryCollection(queryCollection);
+			queryStore.setPubliclyAvailable(true);
+			queryStore.getName().readFromProperties(baseName, loader,
+			"org.nightlabs.jfire.issue.IssueManagerBean.queryStoreRejected"); //$NON-NLS-1$
+			queryStore.serialiseCollection();
+			queryStore = pm.makePersistent(queryStore);
+
+			//EditLock
 			EditLockType issueEditLock = new EditLockType(EditLockTypeIssue.EDIT_LOCK_TYPE_ID);
 			issueEditLock = pm.makePersistent(issueEditLock);
 			//------------------------------------------------

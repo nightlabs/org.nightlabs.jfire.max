@@ -60,7 +60,7 @@ implements EntityUserSetManagerRemote
 	@Override
 	public void initialise() throws Exception
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			SecurityChangeListenerEntityUserSet.register(pm);
 		} finally {
@@ -78,7 +78,7 @@ implements EntityUserSetManagerRemote
 	@Override
 	public void importEntityUserSetsOnCrossOrganisationRegistration(Context context) throws Exception
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			String emitterOrganisationID = context.getOtherOrganisationID();
 			Hashtable<?, ?> initialContextProperties = getInitialContextProperties(emitterOrganisationID);
@@ -115,7 +115,7 @@ implements EntityUserSetManagerRemote
 	@Override
 	public Set<EntityUserSetID> getEntityUserSetIDs(String organisationID, Class<?> entityClass)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			Query q = pm.newQuery(EntityUserSet.class);
 			q.setResult("JDOHelper.getObjectId(this)");
@@ -158,7 +158,7 @@ implements EntityUserSetManagerRemote
 	@Override
 	public Collection<? extends EntityUserSet<?>> getEntityUserSetsForReseller(Collection<EntityUserSetID> entityUserSetIDs)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			UserLocalID principalUserLocalID = UserLocalID.create(
 				getPrincipal().getOrganisationID(),
@@ -197,7 +197,7 @@ implements EntityUserSetManagerRemote
 	@Override
 	public List<EntityUserSet<?>> getEntityUserSets(Set<EntityUserSetID> entityUserSetsIDs, String[] fetchGroups, int maxFetchDepth)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
@@ -231,7 +231,7 @@ implements EntityUserSetManagerRemote
 	public EntityUserSet<?> storeEntityUserSet(EntityUserSet<?> entityUserSet, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
 		// TODO Do we need a new right for storing EntityUserSets?
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			return NLJDOHelper.storeJDO(pm, entityUserSet, get, fetchGroups, maxFetchDepth);
 		} finally {

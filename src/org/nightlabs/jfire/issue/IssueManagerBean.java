@@ -634,13 +634,16 @@ implements IssueManagerRemote
 					issue.setProject((Project)pm.getObjectById(Project.PROJECT_ID_DEFAULT));
 				}
 				pIssue = pm.makePersistent(issue);
+				// TODO BEGIN WORKAROUND - see Issue.jdoPreStore()
+				issue.ensureIntegrity();
+				// END WORKAROUND
 
 //				IssueType type;
 //
 //				if (JFireBaseEAR.JPOX_WORKAROUND_FLUSH_ENABLED) {
 //					pm.flush();
 //					// create the ProcessInstance for new Issues
-//					// TODO: WORKAROUND: Calling createProcessInstanceForIssue on pIssue.getIssueType() says that this IssueType is not persistent ?!?
+//					// TO DO: WORKAROUND: Calling createProcessInstanceForIssue on pIssue.getIssueType() says that this IssueType is not persistent ?!?
 //					type = (IssueType) pm.getObjectById(JDOHelper.getObjectId(pIssue.getIssueType()));
 //					if (type == null) {
 //						throw new IllegalStateException("Could not create ProcessInstance for new Issue as its type is null");

@@ -54,9 +54,7 @@ import javax.jdo.annotations.Queries;
 import javax.jdo.annotations.Query;
 import javax.jdo.listener.AttachCallback;
 import javax.jdo.listener.DeleteCallback;
-import javax.jdo.listener.InstanceLifecycleEvent;
 import javax.jdo.listener.StoreCallback;
-import javax.jdo.listener.StoreLifecycleListener;
 
 import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jdo.ObjectIDUtil;
@@ -862,7 +860,7 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback, StoreCallbac
 	 * Checks, if the issue has a jBPM process instance already and all necessary fields are assigned (i.e. not <code>null</code>).
 	 * If anything is missing, it is fixed by setting default values.
 	 */
-	protected void ensureIssueIntegrity() {
+	public void ensureIntegrity() {
 		try {
 			if (this.getStatableLocal().getJbpmProcessInstanceId() < 0) {
 				if (this.getIssueType() == null)
@@ -900,21 +898,32 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback, StoreCallbac
 
 	@Override
 	public void jdoPreStore() {
-		final Issue thisIssue = this;
-		final PersistenceManager pm = getPersistenceManager();
-		pm.addInstanceLifecycleListener(new StoreLifecycleListener() {
-			@Override
-			public void preStore(InstanceLifecycleEvent event) {
-			}
-			@Override
-			public void postStore(InstanceLifecycleEvent event) {
-				if (!event.getPersistentInstance().equals(thisIssue))
-					return;
-
-				pm.removeInstanceLifecycleListener(this);
-				ensureIssueIntegrity();
-			}
-		}, this.getClass());
+		// This code unfortunately doesn't work due to a DataNucleus bug: the field Issue.state is null in the database :-(
+		// We therefore call ensureIntegrity() now explicitely *AFTER* persisting the instance. Marco.
+//		final Issue thisIssue = this;
+//		final PersistenceManager pm = getPersistenceManager();
+//		pm.addInstanceLifecycleListener(new StoreLifecycleListener() {
+//			@Override
+//			public void preStore(InstanceLifecycleEvent event) {
+//			}
+//			@Override
+//			public void postStore(InstanceLifecycleEvent event) {
+//				if (!event.getPersistentInstance().equals(thisIssue))
+//					return;
+//
+//				pm.removeInstanceLifecycleListener(this);
+//
+////				pm.flush();
+////				((Issue)event.getPersistentInstance()).ensureIntegrity();
+////				pm.refresh(event.getPersistentInstance());
+////
+////				if (thisIssue != event.getPersistentInstance())
+////					pm.refresh(thisIssue);
+//
+//				thisIssue.ensureIntegrity();
+//				JDOHelper.makeDirty(thisIssue, "state");
+//			}
+//		}, this.getClass());
 	}
 
 	/**
@@ -923,13 +932,13 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback, StoreCallbac
 	 * Checks, if the issue has a jBPM process instance already and all necessary fields are assigned (i.e. not <code>null</code>).
 	 * If anything is missing, it is fixed by setting default values.
 	 * <p>
-	 * This method delegates to {@link #ensureIssueIntegrity()}
+	 * This method delegates to {@link #ensureIntegrity()}
 	 * </p>
 	 *
 	 * @see javax.jdo.listener.AttachCallback#jdoPostAttach(java.lang.Object)
 	 */
 	public void jdoPostAttach(Object attached) {
-		ensureIssueIntegrity();
+		ensureIntegrity();
 	}
 
 	/*

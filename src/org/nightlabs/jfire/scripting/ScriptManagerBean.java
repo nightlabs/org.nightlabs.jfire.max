@@ -83,7 +83,7 @@ implements ScriptManagerRemote
 	public void initialise()
 	{
 		PersistenceManager pm;
-		pm = getPersistenceManager();
+		pm = createPersistenceManager();
 		try {
 			ModuleMetaData moduleMetaData = ModuleMetaData.getModuleMetaData(pm, JFireScriptingEAR.MODULE_NAME);
 			if (moduleMetaData == null) {
@@ -111,7 +111,7 @@ implements ScriptManagerRemote
 		)
 	{
 		PersistenceManager pm;
-		pm = getPersistenceManager();
+		pm = createPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
@@ -136,7 +136,7 @@ implements ScriptManagerRemote
 		)
 	{
 		PersistenceManager pm;
-		pm = getPersistenceManager();
+		pm = createPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
@@ -165,7 +165,7 @@ implements ScriptManagerRemote
 		)
 	{
 		PersistenceManager pm;
-		pm = getPersistenceManager();
+		pm = createPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
@@ -187,7 +187,7 @@ implements ScriptManagerRemote
 	public Collection<ScriptRegistryItemCarrier> getTopLevelScriptRegistryItemCarriers (String organisationID)
 	{
 		PersistenceManager pm;
-		pm = getPersistenceManager();
+		pm = createPersistenceManager();
 		try {
 			Collection<ScriptRegistryItem> topLevelItems = ScriptRegistryItem.getTopScriptRegistryItemsByOrganisationID(pm, organisationID);
 			Collection<ScriptRegistryItemCarrier> result = new HashSet<ScriptRegistryItemCarrier>();
@@ -241,7 +241,7 @@ implements ScriptManagerRemote
 		)
 	{
 		PersistenceManager pm;
-		pm = getPersistenceManager();
+		pm = createPersistenceManager();
 		try {
 			return NLJDOHelper.storeJDO(pm, reportRegistryItem, get, fetchGroups, maxFetchDepth);
 		} finally {
@@ -258,7 +258,7 @@ implements ScriptManagerRemote
 			String organisationID, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm;
-		pm = getPersistenceManager();
+		pm = createPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
@@ -284,7 +284,7 @@ implements ScriptManagerRemote
 	public Set<ScriptParameterSetID> getAllScriptParameterSetIDs(String organisationID)
 	{
 		PersistenceManager pm;
-		pm = getPersistenceManager();
+		pm = createPersistenceManager();
 		try {
 			Collection<ScriptParameterSet> paramSets = ScriptParameterSet.getParameterSetsByOrganisation(pm, organisationID);
 			return NLJDOHelper.getObjectIDSet(paramSets);
@@ -304,7 +304,7 @@ implements ScriptManagerRemote
 		)
 	{
 		PersistenceManager pm;
-		pm = getPersistenceManager();
+		pm = createPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
@@ -327,7 +327,7 @@ implements ScriptManagerRemote
 		)
 	{
 		PersistenceManager pm;
-		pm = getPersistenceManager();
+		pm = createPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
@@ -354,7 +354,7 @@ implements ScriptManagerRemote
 			String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm;
-		pm = getPersistenceManager();
+		pm = createPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
@@ -373,7 +373,7 @@ implements ScriptManagerRemote
 	public ScriptParameterSet createParameterSet (I18nText name, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm;
-		pm = getPersistenceManager();
+		pm = createPersistenceManager();
 		try {
 			ScriptRegistry.getScriptRegistry(pm);
 			long setID = IDGenerator.nextID(ScriptParameterSet.class);
@@ -401,7 +401,7 @@ implements ScriptManagerRemote
 		)
 	{
 		PersistenceManager pm;
-		pm = getPersistenceManager();
+		pm = createPersistenceManager();
 		try {
 			return NLJDOHelper.storeJDO(pm, scriptParameterSet, get, fetchGroups, maxFetchDepth);
 		} finally {
@@ -418,7 +418,7 @@ implements ScriptManagerRemote
 			String organisationID, String scriptRegistryItemType)
 	{
 		PersistenceManager pm;
-		pm = getPersistenceManager();
+		pm = createPersistenceManager();
 		try {
 			Collection<ScriptRegistryItem> topLevelItems = ScriptRegistryItem.getTopScriptRegistryItemsByOrganisationIDAndType(
 					pm, organisationID, scriptRegistryItemType);
@@ -441,7 +441,7 @@ implements ScriptManagerRemote
 	public ScriptRegistry getScriptRegistry(String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm;
-		pm = getPersistenceManager();
+		pm = createPersistenceManager();
 		try {
 			pm.getFetchPlan().setGroups(fetchGroups);
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
@@ -461,7 +461,7 @@ implements ScriptManagerRemote
 	public ScriptRegistry getScriptRegistry()
 	{
 		PersistenceManager pm;
-		pm = getPersistenceManager();
+		pm = createPersistenceManager();
 		try {
 			pm.getFetchPlan().setGroup(ScriptRegistry.FETCH_GROUP_THIS_SCRIPT_REGISTRY);
 			pm.getFetchPlan().setMaxFetchDepth(NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT); // TODO really? Marco.

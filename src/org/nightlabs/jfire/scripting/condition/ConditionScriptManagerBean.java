@@ -134,7 +134,7 @@ implements ConditionScriptManagerRemote
 	public ScriptConditioner getScriptConditioner(ScriptRegistryItemID scriptRegistryItemID,
 			Map<String, Object> parameterValues, int valueLimit)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			return getScriptConditioner(pm, scriptRegistryItemID, parameterValues, valueLimit);
 		} finally {
@@ -150,7 +150,7 @@ implements ConditionScriptManagerRemote
 	public Map<ScriptRegistryItemID, ScriptConditioner> getScriptConditioner(
 			Map<ScriptRegistryItemID, Map<String, Object>> scriptID2Paramters, int valueLimit)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			return getScriptConditioner(pm, scriptID2Paramters, valueLimit);
 		} finally {
@@ -178,7 +178,7 @@ implements ConditionScriptManagerRemote
 
 	public Set<ScriptRegistryItemID> getConditionContextScriptIDs(ConditionContextProviderID providerID)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			ConditionContextProvider provider = (ConditionContextProvider) pm.getObjectById(providerID);
 			return provider.getScriptRegistryItemIDs();

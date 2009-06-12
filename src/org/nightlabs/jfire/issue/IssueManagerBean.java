@@ -31,9 +31,9 @@ import javax.mail.internet.MimeMessage;
 import org.apache.log4j.Logger;
 import org.jbpm.JbpmContext;
 import org.jbpm.graph.exe.ProcessInstance;
-import org.nightlabs.ModuleException;
 import org.nightlabs.jdo.FetchPlanBackup;
 import org.nightlabs.jdo.NLJDOHelper;
+import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
 import org.nightlabs.jdo.query.AbstractJDOQuery;
 import org.nightlabs.jdo.query.AbstractSearchQuery;
@@ -581,16 +581,22 @@ implements IssueManagerRemote
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@RolesAllowed("_Guest_")
-	public Collection<IssueLinkID> getIssueLinkIDsByOrganisationIDAndLinkedObjectID(String organisationID, String linkedObjectID)
+	public Collection<IssueLinkID> getIssueLinkIDsByOrganisationIDAndLinkedObjectID(String organisationID, ObjectID linkedObjectID)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			Query q = pm.newNamedQuery(IssueLink.class, "getIssueLinksByOrganisationIDAndLinkedObjectID");
-			Map<String, Object> params = new HashMap<String, Object>(2);
-			params.put("organisationID", organisationID);
-			params.put("linkedObjectID", linkedObjectID);
+			// NEVER DO THIS!!! Never reference a query outside the class which declared it! Use a public static method in that class instead!
+			// I refactored the code below and commented the old stuff out. Marco.
+//			Query q = pm.newNamedQuery(IssueLink.class, "getIssueLinksByOrganisationIDAndLinkedObjectID");
+//			Map<String, Object> params = new HashMap<String, Object>(2);
+//			params.put("organisationID", organisationID);
+//			params.put("linkedObjectID", linkedObjectID);
+//
+//			return NLJDOHelper.getObjectIDSet((Collection<IssueLink>) q.executeWithMap(params));
+			if (organisationID == null)
+				organisationID = getOrganisationID();
 
-			return NLJDOHelper.getObjectIDSet((Collection<IssueLink>) q.executeWithMap(params));
+			return NLJDOHelper.getObjectIDSet(IssueLink.getIssueLinksByOrganisationIDAndLinkedObjectID(pm, organisationID, linkedObjectID));
 		} finally {
 			pm.close();
 		}
@@ -1132,8 +1138,7 @@ implements IssueManagerRemote
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("_Guest_")
-	public Collection getIssueResolutions(String[] fetchGroups, int maxFetchDepth)
-	throws ModuleException
+	public Collection<IssueResolution> getIssueResolutions(String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -1142,7 +1147,9 @@ implements IssueManagerRemote
 				pm.getFetchPlan().setGroups(fetchGroups);
 
 			Query q = pm.newQuery(IssueResolution.class);
-			return pm.detachCopyAll((Collection)q.execute());
+			@SuppressWarnings("unchecked")
+			Collection<IssueResolution> c = pm.detachCopyAll((Collection<IssueResolution>)q.execute());
+			return c;
 		} finally {
 			pm.close();
 		}

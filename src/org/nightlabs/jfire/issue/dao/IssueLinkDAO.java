@@ -3,6 +3,7 @@ package org.nightlabs.jfire.issue.dao;
 import java.util.Collection;
 import java.util.Set;
 
+import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.issue.IssueLink;
@@ -49,7 +50,7 @@ extends BaseJDOObjectDAO<IssueLinkID, IssueLink>
 		}
 	}
 
-	public synchronized Collection<IssueLink> getIssueLinksByOrganisationIDAndLinkedObjectID(String organisationID, String linkedObjectID, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
+	public synchronized Collection<IssueLink> getIssueLinksByOrganisationIDAndLinkedObjectID(String organisationID, ObjectID linkedObjectID, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
 		try {
 			IssueManagerRemote im = JFireEjb3Factory.getRemoteBean(IssueManagerRemote.class, SecurityReflector.getInitialContextProperties());

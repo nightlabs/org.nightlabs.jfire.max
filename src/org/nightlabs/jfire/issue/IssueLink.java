@@ -9,6 +9,17 @@ import java.util.Set;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.Queries;
 import javax.jdo.listener.DeleteCallback;
 import javax.jdo.listener.DetachCallback;
 import javax.jdo.listener.InstanceLifecycleEvent;
@@ -21,29 +32,17 @@ import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
+import org.nightlabs.jfire.issue.id.IssueLinkID;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.util.Util;
 
-import javax.jdo.annotations.FetchGroups;
-import org.nightlabs.jfire.issue.id.IssueLinkID;
-import javax.jdo.annotations.NullValue;
-import javax.jdo.annotations.Inheritance;
-import javax.jdo.annotations.PrimaryKey;
-import javax.jdo.annotations.FetchGroup;
-import javax.jdo.annotations.PersistenceModifier;
-import javax.jdo.annotations.Persistent;
-import javax.jdo.annotations.InheritanceStrategy;
-import javax.jdo.annotations.Queries;
-import javax.jdo.annotations.Column;
-import javax.jdo.annotations.IdentityType;
-
 /**
- * The {@link IssueLink} class represents a link between an {@link Issue} and the other object. 
+ * The {@link IssueLink} class represents a link between an {@link Issue} and the other object.
  * <p>
- * The IssueLink is normally a relation that holds the information that 
- * the issue is be related with which object and what kind of relation it is. 
+ * The IssueLink is normally a relation that holds the information that
+ * the issue is be related with which object and what kind of relation it is.
  * </p>
- * 
+ *
  * @author Chairat Kongarayawetchakun - chairat [AT] nightlabs [DOT] de
  *
  * @jdo.persistence-capable
@@ -69,7 +68,7 @@ import javax.jdo.annotations.IdentityType;
  *		name="getIssueLinksByOrganisationIDAndLinkedObjectID"
  *		query="SELECT
  *			WHERE
- *				this.organisationID == :organisationID && 
+ *				this.organisationID == :organisationID &&
  *				this.linkedObjectID == :linkedObjectID"
  *
  * jdo.fetch-group name="IssueLink.linkedObjectID" fetch-groups="default" fields="linkedObjectID"
@@ -113,8 +112,9 @@ implements Serializable, DetachCallback, StoreCallback, DeleteCallback
 	private static final Logger logger = Logger.getLogger(IssueLink.class);
 
 	/**
-	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon! 
+	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon!
 	 */
+	@Deprecated
 	public static final String FETCH_GROUP_THIS_ISSUE_LINK = "IssueLink.this";
 	public static final String FETCH_GROUP_ISSUE_LINK_TYPE = "IssueLink.issueLinkType";
 	public static final String FETCH_GROUP_ISSUE = "IssueLink.issue";
@@ -128,17 +128,28 @@ implements Serializable, DetachCallback, StoreCallback, DeleteCallback
 
 	/**
 	 * Virtual fetch-group to obtain the class of the non-persistent property {@link #getLinkedObject()} -
-	 * i.e. the property 
+	 * i.e. the property
 	 */
 	public static final String FETCH_GROUP_LINKED_OBJECT_CLASS = "IssueLink.linkedObjectClass";
-	
+
+	public static Collection<IssueLink> getIssueLinksByOrganisationIDAndLinkedObjectID(PersistenceManager pm, String organisationID, ObjectID linkedObjectID)
+	{
+		Query q = pm.newNamedQuery(IssueLink.class, "getIssueLinksByOrganisationIDAndLinkedObjectID");
+		Map<String, Object> params = new HashMap<String, Object>(2);
+		params.put("organisationID", organisationID);
+		params.put("linkedObjectID", linkedObjectID.toString());
+		@SuppressWarnings("unchecked")
+		Collection<IssueLink> c = (Collection<IssueLink>) q.executeWithMap(params);
+		return c;
+	}
+
 	private static final long serialVersionUID = 1L;
 
 	/**
 	 * This is the organisationID to which the issue link belongs. Within one organisation,
 	 * all the issue links have their organisation's ID stored here, thus it's the same
 	 * value for all of them.
-	 * 
+	 *
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
@@ -169,7 +180,8 @@ implements Serializable, DetachCallback, StoreCallback, DeleteCallback
 	 */
 	@Persistent(
 		nullValue=NullValue.EXCEPTION,
-		persistenceModifier=PersistenceModifier.PERSISTENT)
+		persistenceModifier=PersistenceModifier.PERSISTENT
+	)
 	private String linkedObjectID;
 
 	/**
@@ -198,7 +210,7 @@ implements Serializable, DetachCallback, StoreCallback, DeleteCallback
 
 	/**
 	 * Create an instance of <code>IssueLink</code>.
-	 * 
+	 *
 	 * @param organisationID the first part of the composite primary key - referencing the organisation which owns this <code>IssueLink</code>.
 	 * @param issueLinkID the second part of the composite primary key. Use {@link IDGenerator#nextID(Class)} with <code>IssueLink.class</code> to create an id.
 	 * @param issue the {@link Issue} to which this IssueLink belongs. Must not be <code>null</code>.
@@ -207,7 +219,7 @@ implements Serializable, DetachCallback, StoreCallback, DeleteCallback
 	 */
 	protected IssueLink(String organisationID, long issueLinkID, Issue issue, IssueLinkType issueLinkType, Object linkedObject) {
 		Organisation.assertValidOrganisationID(organisationID);
-		
+
 		if (issueLinkID < 0)
 			throw new IllegalArgumentException("issueLinkID < 0");
 
@@ -232,10 +244,10 @@ implements Serializable, DetachCallback, StoreCallback, DeleteCallback
 		this.linkedObject = linkedObject;
 		this.issueLinkType = issueLinkType;
 	}
-	
+
 	/**
 	 * Create an instance of <code>IssueLink</code>.
-	 * 
+	 *
 	 * @param organisationID the first part of the composite primary key - referencing the organisation which owns this <code>IssueLink</code>.
 	 * @param issueLinkID the second part of the composite primary key. Use {@link IDGenerator#nextID(Class)} with <code>IssueLink.class</code> to create an id.
 	 * @param issue the {@link Issue} to which this IssueLink belongs. Must not be <code>null</code>.
@@ -261,7 +273,7 @@ implements Serializable, DetachCallback, StoreCallback, DeleteCallback
 		this.issueLinkID = issueLinkID;
 		this.linkedObjectID = linkedObjectID.toString();
 		this.issueLinkType = issueLinkType;
-		
+
 		this._linkedObjectID = linkedObjectID;
 		this.linkedObjectClass = linkedObjectClass;
 	}
@@ -341,7 +353,7 @@ implements Serializable, DetachCallback, StoreCallback, DeleteCallback
 		params.put("linkedObjectID", linkedObjectID);
 		return (Collection<IssueLink>)q.executeWithMap(params);
 	}
-	
+
 	@Override
 	public void jdoPostDetach(Object object) {
 		IssueLink detached = this;
@@ -410,7 +422,7 @@ implements Serializable, DetachCallback, StoreCallback, DeleteCallback
 				logger.debug("jdoPreStore: the IssueLink " + getPrimaryKey() + " already exists - no need to call the IssueLinkType's postCreateIssueLink callback method.");
 		}
 		else {
-			if (logger.isDebugEnabled()) 
+			if (logger.isDebugEnabled())
 				logger.debug("jdoPreStore: the IssueLink " + getPrimaryKey() + " does NOT yet exist - registering StoreLifecycleListener in order to react on postStore.");
 
 			Collection<IssueLink> issueLinks = IssueLink.getIssueLinksByIssueAndIssueLinkTypeAndLinkedObjectID(getPersistenceManager(), issue, issueLinkType, linkedObjectID);
@@ -430,21 +442,21 @@ implements Serializable, DetachCallback, StoreCallback, DeleteCallback
 							// nothing to do
 						}
 						@Override
-						public void postStore(InstanceLifecycleEvent event) 
+						public void postStore(InstanceLifecycleEvent event)
 						{
 							if (!IssueLink.this.equals(event.getPersistentInstance())) {
-								if (logger.isDebugEnabled()) 
+								if (logger.isDebugEnabled())
 									logger.debug("jdoPreStore: StoreLifecycleListener.postStore: triggered for the wrong object (" + JDOHelper.getObjectId(event.getPersistentInstance()) + ") instead of the IssueLink " + getPrimaryKey() + ". Thus, we silently ignore it.");
 
 								// sth. else has been persisted => return and ignore it.
 								return;
 							}
 
-							// Since the listener is triggered for the right object, it has done what it is supposed to do and should be 
+							// Since the listener is triggered for the right object, it has done what it is supposed to do and should be
 							// removed *before* anything can go wrong.
 							getPersistenceManager().removeInstanceLifecycleListener(this);
 
-							if (logger.isDebugEnabled()) 
+							if (logger.isDebugEnabled())
 								logger.debug("jdoPreStore: StoreLifecycleListener.postStore: the IssueLink " + getPrimaryKey() + " does NOT yet exist - calling the IssueLinkType's postCreateIssueLink callback method.");
 
 							getIssueLinkType().postCreateIssueLink(getPersistenceManager(), IssueLink.this);

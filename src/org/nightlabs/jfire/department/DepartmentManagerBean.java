@@ -55,7 +55,7 @@ implements DepartmentManagerRemote
 	@RolesAllowed("_Guest_")
 	public Department storeDepartment(Department department, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			return NLJDOHelper.storeJDO(pm, department, get, fetchGroups, maxFetchDepth);
 		}//try
@@ -70,7 +70,7 @@ implements DepartmentManagerRemote
 	@RolesAllowed("_Guest_")
 	public List<Department> getDepartments(Collection<DepartmentID> departmentIDs, String[] fetchGroups, int maxFetchDepth)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			return NLJDOHelper.getDetachedObjectList(pm, departmentIDs, Department.class, fetchGroups, maxFetchDepth);
 		} finally {
@@ -85,7 +85,7 @@ implements DepartmentManagerRemote
 	@SuppressWarnings("unchecked")
 	public Set<DepartmentID> getDepartmentIDs()
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			Query q = pm.newQuery(Department.class);
 			q.setResult("JDOHelper.getObjectId(this)");
@@ -103,7 +103,7 @@ implements DepartmentManagerRemote
 	@RolesAllowed("_System_")
 	public void initialise() throws Exception
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 //			UserID systemUserID = UserID.create(getOrganisationID(), getUserID());
 //			User systemUser = (User)pm.getObjectById(systemUserID);

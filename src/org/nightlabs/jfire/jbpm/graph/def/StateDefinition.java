@@ -356,6 +356,9 @@ implements Serializable
 		if (this.isPublicState())
 				statable.setState(state);
 
+		if (pm != null)
+			pm.flush();
+
 		return state;
 	}
 

@@ -29,7 +29,6 @@ import org.nightlabs.jfire.issue.history.id.IssueHistoryItemID;
 import org.nightlabs.jfire.issue.id.IssueID;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.security.User;
-import org.nightlabs.util.CollectionUtil;
 import org.nightlabs.util.Util;
 
 /**
@@ -196,7 +195,9 @@ public abstract class IssueHistoryItem implements Serializable {
 		params.put("issueID", issueID.issueID);
 		params.put("organisationID", issueID.organisationID);
 
-		return CollectionUtil.castCollection( q.executeWithMap(params) ); //(Collection<IssueHistoryItem>)q.executeWithMap(params);
+		@SuppressWarnings("unchecked")
+		Collection<IssueHistoryItem> c = (Collection<IssueHistoryItem>)q.executeWithMap(params);
+		return c;
 	}
 
 

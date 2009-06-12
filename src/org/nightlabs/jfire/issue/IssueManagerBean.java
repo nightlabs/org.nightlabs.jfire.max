@@ -81,9 +81,7 @@ import org.nightlabs.util.Util;
 
 /**
  * An EJB session bean provides methods for managing every objects used in the issue tracking.
- * <p>
  *
- * </p>
  * @author Chairat Kongarayawetchakun - chairat [AT] nightlabs [DOT] de
  * @author Khaireel Mohamed - khaireel at nightlabs dot de
  *
@@ -96,8 +94,7 @@ import org.nightlabs.util.Util;
  */
 @TransactionAttribute(TransactionAttributeType.REQUIRED)
 @Stateless
-public class IssueManagerBean
-extends BaseSessionBeanImpl
+public class IssueManagerBean extends BaseSessionBeanImpl
 implements IssueManagerRemote
 {
 	private static final long serialVersionUID = 1L;
@@ -105,6 +102,7 @@ implements IssueManagerRemote
 	 * LOG4J logger used by this class
 	 */
 	private static final Logger logger = Logger.getLogger(IssueManagerBean.class);
+
 
 	//IssueFileAttachment//
 	/**
@@ -118,7 +116,9 @@ implements IssueManagerRemote
 		try {
 			Query q = pm.newQuery(IssueFileAttachment.class);
 			q.setResult("JDOHelper.getObjectId(this)");
-			return new HashSet<IssueFileAttachmentID>((Collection<? extends IssueFileAttachmentID>) q.execute());
+
+			return CollectionUtil.createHashSetFromCollection( q.execute() );
+//			return new HashSet<IssueFileAttachmentID>((Collection<? extends IssueFileAttachmentID>) q.execute());
 		} finally {
 			pm.close();
 		}
@@ -219,7 +219,9 @@ implements IssueManagerRemote
 		try {
 			Query q = pm.newQuery(ProjectType.class);
 			q.setResult("JDOHelper.getObjectId(this)");
-			return new HashSet<ProjectTypeID>((Collection<? extends ProjectTypeID>) q.execute());
+
+			return CollectionUtil.createHashSetFromCollection( q.execute() );
+			//return new HashSet<ProjectTypeID>((Collection<? extends ProjectTypeID>) q.execute());
 		} finally {
 			pm.close();
 		}
@@ -294,7 +296,9 @@ implements IssueManagerRemote
 		try {
 			Query q = pm.newQuery(Project.class);
 			q.setResult("JDOHelper.getObjectId(this)");
-			return new HashSet<ProjectID>((Collection<? extends ProjectID>) q.execute());
+
+			return CollectionUtil.createHashSetFromCollection( q.execute() );
+//			return new HashSet<ProjectID>((Collection<? extends ProjectID>) q.execute());
 		} finally {
 			pm.close();
 		}
@@ -312,7 +316,9 @@ implements IssueManagerRemote
 			Query q = pm.newNamedQuery(Project.class, "getRootProjects");
 			Map<String, Object> params = new HashMap<String, Object>(1);
 			params.put("organisationID", organisationID);
-			return NLJDOHelper.getObjectIDSet((Collection<Project>) q.executeWithMap(params));
+
+			return NLJDOHelper.getObjectIDSet(CollectionUtil.castCollection( q.executeWithMap(params) ));
+//			return NLJDOHelper.getObjectIDSet((Collection<Project>) q.executeWithMap(params));
 		} finally {
 			pm.close();
 		}
@@ -331,7 +337,9 @@ implements IssueManagerRemote
 			Map<String, Object> params = new HashMap<String, Object>(2);
 			params.put("organisationID", projectID.organisationID);
 			params.put("parentProjectID", projectID.projectID);
-			return NLJDOHelper.getObjectIDSet((Collection<Project>) q.executeWithMap(params));
+
+			return NLJDOHelper.getObjectIDSet(CollectionUtil.castCollection( q.executeWithMap(params) ));
+//			return NLJDOHelper.getObjectIDSet((Collection<Project>) q.executeWithMap(params));
 		} finally {
 			pm.close();
 		}
@@ -350,7 +358,9 @@ implements IssueManagerRemote
 			Map<String, Object> params = new HashMap<String, Object>(2);
 			params.put("organisationID", projectTypeID.organisationID);
 			params.put("projectTypeID", projectTypeID.projectTypeID);
-			return NLJDOHelper.getObjectIDSet((Collection<Project>) q.executeWithMap(params));
+
+			return NLJDOHelper.getObjectIDSet(CollectionUtil.castCollection( q.executeWithMap(params) ));
+//			return NLJDOHelper.getObjectIDSet((Collection<Project>) q.executeWithMap(params));
 		} finally {
 			pm.close();
 		}
@@ -536,7 +546,9 @@ implements IssueManagerRemote
 		try {
 			Query q = pm.newQuery(IssueLinkType.class);
 			q.setResult("JDOHelper.getObjectId(this)");
-			return new HashSet<IssueLinkTypeID>((Collection)q.execute());
+
+			return CollectionUtil.createHashSetFromCollection( q.execute() );
+//			return new HashSet<IssueLinkTypeID>((Collection)q.execute());
 		} finally {
 			pm.close();
 		}
@@ -569,7 +581,9 @@ implements IssueManagerRemote
 		try {
 			Query q = pm.newQuery(IssueLink.class);
 			q.setResult("JDOHelper.getObjectId(this)");
-			return new HashSet<IssueLinkID>((Collection)q.execute());
+
+			return CollectionUtil.createHashSetFromCollection( q.execute() );
+//			return new HashSet<IssueLinkID>((Collection)q.execute());
 		} finally {
 			pm.close();
 		}
@@ -638,50 +652,62 @@ implements IssueManagerRemote
 //				type.createProcessInstanceForIssue(pIssue); // already done in StoreCallback
 			}
 			else {
-				if (issue.getCreateTimestamp() != null) {
+				// --[ On Timestamp ]-------------------------------------------------------------------------------------------|
+				if (issue.getCreateTimestamp() != null)
 					issue.setUpdateTimestamp(new Date());
-				}
 
+
+				// --[ Obtain references: oldIssue, User ]----------------------------------------------------------------------|
 				IssueID issueID = (IssueID) JDOHelper.getObjectId(issue);
 				Issue oldPersistentIssue = (Issue) pm.getObjectById(issueID);
 				User user = SecurityReflector.getUserDescriptor().getUser(pm);
 
 
-				// --- 8< --- KaiExperiments: since 27.05.2009 ------------------[In stitching in the functionalities of IssueHistoryItems]
-				// ~~ Original codes ~~
-//				IssueHistoryItem issueHistory = new IssueHistoryItem(oldPersistentIssue.getOrganisationID(), user, oldPersistentIssue, issue, IDGenerator.nextID(IssueHistoryItem.class));
-//				storeIssueHistoryItem(issueHistory, false, new String[]{FetchPlan.DEFAULT}, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
-
-				// ~~ New codes ~~
+				// --[ On IssueHistoryItems ]-----------------------------------------------------------------------------------|
 				Collection<IssueHistoryItem> issueHistoryItems = IssueHistoryItemFactory.createIssueHistoryItems(pm, user, oldPersistentIssue, issue); // <-- Seems OK and holding.
 				storeIssueHistoryItems(issueHistoryItems, false, new String[]{FetchPlan.DEFAULT}, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
-				// ------ KaiExperiments ----- >8 -------------------------------
+
+
+//				// --[ On Timestamp ]-------------------------------------------------------------------------------------------|
+//				if (issue.getCreateTimestamp() != null)   }
+//					issue.setUpdateTimestamp(new Date()); } <-- Why are these lines repeated?
 
 
 
-				if (issue.getCreateTimestamp() != null) {
-					issue.setUpdateTimestamp(new Date());
+				// --[ On Assignees ]-------------------------------------------------------------------------------------------|
+				boolean doUnassign = false;
+				if (oldPersistentIssue != null) {
+					try { doUnassign = oldPersistentIssue.getAssignee() != null && issue.getAssignee() == null; }
+					catch (JDODetachedFieldAccessException x) { doUnassign = false; }
 				}
 
-				boolean doUnassign;
-				if (oldPersistentIssue == null)
-					doUnassign = false;
-				else {
-					try {
-						doUnassign = oldPersistentIssue.getAssignee() != null && issue.getAssignee() == null;
-					} catch (JDODetachedFieldAccessException x) {
-						doUnassign = false;
-					}
+//				boolean doUnassign;
+//				if (oldPersistentIssue == null)
+//					doUnassign = false;
+//				else {
+//					try {
+//						doUnassign = oldPersistentIssue.getAssignee() != null && issue.getAssignee() == null;
+//					} catch (JDODetachedFieldAccessException x) {
+//						doUnassign = false;
+//					}
+//				}
+
+				boolean doAssign = false;
+				if (oldPersistentIssue != null) {
+					try { if (issue.getAssignee() != null) doAssign = !Util.equals(issue.getAssignee(), oldPersistentIssue.getAssignee()); }
+					catch (JDODetachedFieldAccessException x) { doUnassign = false; }
 				}
 
-				boolean doAssign;
-				try {
-					doAssign = issue.getAssignee() != null;
-					if (doAssign && oldPersistentIssue != null)
-						doAssign = !Util.equals(issue.getAssignee(), oldPersistentIssue.getAssignee());
-				} catch (JDODetachedFieldAccessException x) {
-					doAssign = false;
-				}
+//				boolean doAssign;
+//				try {
+//					doAssign = issue.getAssignee() != null;
+//					if (doAssign && oldPersistentIssue != null)
+//						doAssign = !Util.equals(issue.getAssignee(), oldPersistentIssue.getAssignee());
+//				} catch (JDODetachedFieldAccessException x) {
+//					doAssign = false;
+//				}
+
+
 
 				String jbpmTransitionName = null;
 				if (doAssign)
@@ -843,9 +869,9 @@ implements IssueManagerRemote
 			}
 
 			decoratedCollection.setPersistenceManager(pm);
-			Collection<? extends Issue> issues = (Collection<? extends Issue>) decoratedCollection.executeQueries();
-
-			return NLJDOHelper.getObjectIDSet(issues);
+			return NLJDOHelper.getObjectIDSet( CollectionUtil.castCollection(decoratedCollection.executeQueries()) );
+//			Collection<? extends Issue> issues = (Collection<? extends Issue>) decoratedCollection.executeQueries();
+//			return NLJDOHelper.getObjectIDSet(issues);
 		} finally {
 			pm.close();
 		}
@@ -877,7 +903,9 @@ implements IssueManagerRemote
 		try {
 			Query q = pm.newQuery(Issue.class);
 			q.setResult("JDOHelper.getObjectId(this)");
-			return new HashSet<IssueID>((Collection<? extends IssueID>) q.execute());
+
+			return CollectionUtil.createHashSetFromCollection( q.execute() );
+//			return new HashSet<IssueID>((Collection<? extends IssueID>) q.execute());
 		} finally {
 			pm.close();
 		}
@@ -895,7 +923,9 @@ implements IssueManagerRemote
 			Map<String, Object> params = new HashMap<String, Object>(2);
 			params.put("organisationID", projectID.organisationID);
 			params.put("projectID", projectID.projectID);
-			return NLJDOHelper.getObjectIDSet((Collection<Issue>) q.executeWithMap(params));
+
+			return NLJDOHelper.getObjectIDSet( CollectionUtil.castCollection(q.executeWithMap(params)) );
+//			return NLJDOHelper.getObjectIDSet((Collection<Issue>) q.executeWithMap(params));
 		} finally {
 			pm.close();
 		}
@@ -913,7 +943,9 @@ implements IssueManagerRemote
 			Map<String, Object> params = new HashMap<String, Object>(2);
 			params.put("organisationID", projectTypeID.organisationID);
 			params.put("projectTypeID", projectTypeID.projectTypeID);
-			return NLJDOHelper.getObjectIDSet((Collection<Issue>) q.executeWithMap(params));
+
+			return NLJDOHelper.getObjectIDSet( CollectionUtil.castCollection(q.executeWithMap(params)) );
+//			return NLJDOHelper.getObjectIDSet((Collection<Issue>) q.executeWithMap(params));
 		} finally {
 			pm.close();
 		}
@@ -1011,7 +1043,9 @@ implements IssueManagerRemote
 		PersistenceManager pm = createPersistenceManager();
 		try {
 			final Query allIDsQuery = pm.newNamedQuery(IssueType.class, IssueType.QUERY_ALL_ISSUETYPE_IDS);
-			return new HashSet<IssueTypeID>((Collection<? extends IssueTypeID>)allIDsQuery.execute());
+
+			return CollectionUtil.createHashSetFromCollection( allIDsQuery.execute() );
+//			return new HashSet<IssueTypeID>((Collection<? extends IssueTypeID>)allIDsQuery.execute());
 		} finally {
 			pm.close();
 		}
@@ -1045,7 +1079,9 @@ implements IssueManagerRemote
 		try {
 			Query q = pm.newQuery(IssuePriority.class);
 			q.setResult("JDOHelper.getObjectId(this)");
-			return new HashSet<IssuePriorityID>((Collection)q.execute());
+
+			return CollectionUtil.createHashSetFromCollection( q.execute() );
+//			return new HashSet<IssuePriorityID>((Collection)q.execute());
 		} finally {
 			pm.close();
 		}
@@ -1094,7 +1130,9 @@ implements IssueManagerRemote
 		try {
 			Query q = pm.newQuery(IssueSeverityType.class);
 			q.setResult("JDOHelper.getObjectId(this)");
-			return new HashSet<IssueSeverityTypeID>((Collection<? extends IssueSeverityTypeID>) q.execute());
+
+			return CollectionUtil.createHashSetFromCollection( q.execute() );
+//			return new HashSet<IssueSeverityTypeID>((Collection<? extends IssueSeverityTypeID>) q.execute());
 		} finally {
 			pm.close();
 		}

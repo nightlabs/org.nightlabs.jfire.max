@@ -34,6 +34,7 @@ import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.issue.id.IssueLinkID;
 import org.nightlabs.jfire.organisation.Organisation;
+import org.nightlabs.util.CollectionUtil;
 import org.nightlabs.util.Util;
 
 /**
@@ -343,7 +344,6 @@ implements Serializable, DetachCallback, StoreCallback, DeleteCallback
 	 * @param linkedObjectID
 	 * @return Returns instances of <code>IssueLink</code>.
 	 */
-	@SuppressWarnings("unchecked")
 	protected static Collection<IssueLink> getIssueLinksByIssueAndIssueLinkTypeAndLinkedObjectID(PersistenceManager pm, Issue issue, IssueLinkType issueLinkType, String linkedObjectID)
 	{
 		Query q = pm.newNamedQuery(IssueLink.class, "getIssueLinksByIssueAndIssueLinkTypeAndLinkedObjectID");
@@ -351,7 +351,8 @@ implements Serializable, DetachCallback, StoreCallback, DeleteCallback
 		params.put("issue", issue);
 		params.put("issueLinkType", issueLinkType);
 		params.put("linkedObjectID", linkedObjectID);
-		return (Collection<IssueLink>)q.executeWithMap(params);
+
+		return CollectionUtil.castCollection( q.executeWithMap(params) );
 	}
 
 	@Override

@@ -115,7 +115,7 @@ implements IssueManagerRemote
 	@RolesAllowed("_Guest_")
 	public Set<IssueFileAttachmentID> getIssueFileAttachmentIDs()
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			Query q = pm.newQuery(IssueFileAttachment.class);
 			q.setResult("JDOHelper.getObjectId(this)");
@@ -132,7 +132,7 @@ implements IssueManagerRemote
 	@RolesAllowed("_Guest_")
 	public List<IssueFileAttachment> getIssueFileAttachments(Collection<IssueFileAttachmentID> issueFileAttachmentIDs, String[] fetchGroups, int maxFetchDepth)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			return NLJDOHelper.getDetachedObjectList(pm, issueFileAttachmentIDs, IssueFileAttachment.class, fetchGroups, maxFetchDepth);
 		} finally {
@@ -147,7 +147,7 @@ implements IssueManagerRemote
 	@RolesAllowed("_Guest_")
 	public List<IssueWorkTimeRange> getIssueWorkTimeRanges(Collection<IssueWorkTimeRange> issueWorkTimeRangeIDs, String[] fetchGroups, int maxFetchDepth)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			return NLJDOHelper.getDetachedObjectList(pm, issueWorkTimeRangeIDs, IssueWorkTimeRange.class, fetchGroups, maxFetchDepth);
 		} finally {
@@ -163,7 +163,7 @@ implements IssueManagerRemote
 	@RolesAllowed("_Guest_")
 	public ProjectType storeProjectType(ProjectType projectType, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			return NLJDOHelper.storeJDO(pm, projectType, get, fetchGroups, maxFetchDepth);
 		}//try
@@ -181,7 +181,7 @@ implements IssueManagerRemote
 	@RolesAllowed("_Guest_")
 	public void deleteProjectType(ProjectTypeID projectTypeID)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
 			pm.getExtent(ProjectType.class, true);
@@ -201,7 +201,7 @@ implements IssueManagerRemote
 	@RolesAllowed("_Guest_")
 	public List<ProjectType> getProjectTypes(Collection<ProjectTypeID> projectTypeIDs, String[] fetchGroups, int maxFetchDepth)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			return NLJDOHelper.getDetachedObjectList(pm, projectTypeIDs, ProjectType.class, fetchGroups, maxFetchDepth);
 		} finally {
@@ -216,7 +216,7 @@ implements IssueManagerRemote
 	@RolesAllowed("_Guest_")
 	public Set<ProjectTypeID> getProjectTypeIDs()
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			Query q = pm.newQuery(ProjectType.class);
 			q.setResult("JDOHelper.getObjectId(this)");
@@ -234,7 +234,7 @@ implements IssueManagerRemote
 	@RolesAllowed("_Guest_")
 	public Project storeProject(Project project, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			boolean isNew = !JDOHelper.isDetached(project);
 			if (!isNew) {
@@ -256,7 +256,7 @@ implements IssueManagerRemote
 	@RolesAllowed("_Guest_")
 	public void deleteProject(ProjectID projectID)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
 			pm.getExtent(Project.class, true);
@@ -276,7 +276,7 @@ implements IssueManagerRemote
 	@RolesAllowed("_Guest_")
 	public List<Project> getProjects(Collection<ProjectID> projectIDs, String[] fetchGroups, int maxFetchDepth)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			return NLJDOHelper.getDetachedObjectList(pm, projectIDs, Project.class, fetchGroups, maxFetchDepth);
 		} finally {
@@ -291,7 +291,7 @@ implements IssueManagerRemote
 	@RolesAllowed("_Guest_")
 	public Set<ProjectID> getProjectIDs()
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			Query q = pm.newQuery(Project.class);
 			q.setResult("JDOHelper.getObjectId(this)");
@@ -308,7 +308,7 @@ implements IssueManagerRemote
 	@RolesAllowed("_Guest_")
 	public Collection<ProjectID> getRootProjectIDs(String organisationID)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			Query q = pm.newNamedQuery(Project.class, "getRootProjects");
 			Map<String, Object> params = new HashMap<String, Object>(1);
@@ -326,7 +326,7 @@ implements IssueManagerRemote
 	@RolesAllowed("_Guest_")
 	public Collection<ProjectID> getProjectIDsByParentProjectID(ProjectID projectID)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			Query q = pm.newNamedQuery(Project.class, "getProjectsByParentProjectID");
 			Map<String, Object> params = new HashMap<String, Object>(2);
@@ -345,7 +345,7 @@ implements IssueManagerRemote
 	@RolesAllowed("_Guest_")
 	public Collection<ProjectID> getProjectIDsByProjectTypeID(ProjectTypeID projectTypeID)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			Query q = pm.newNamedQuery(Project.class, "getProjectsByProjectTypeID");
 			Map<String, Object> params = new HashMap<String, Object>(2);
@@ -416,7 +416,7 @@ implements IssueManagerRemote
 	 */
 @RolesAllowed("_Guest_")
 	public List<IssueComment> getIssueComments(Collection<IssueCommentID> issueCommentIDs, String[] fetchGroups,int maxFetchDepth) {
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			return NLJDOHelper.getDetachedObjectList(pm, issueCommentIDs, IssueComment.class, fetchGroups, maxFetchDepth);
 		} finally {
@@ -431,7 +431,7 @@ implements IssueManagerRemote
 	@RolesAllowed("_Guest_")
 	public IssueComment storeIssueComment(IssueComment issueComment, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			return NLJDOHelper.storeJDO(pm, issueComment, get, fetchGroups, maxFetchDepth);
 		}//try
@@ -446,14 +446,14 @@ implements IssueManagerRemote
 	// --[IssueMarker]--
 	@RolesAllowed("_Guest_")
 	public List<IssueMarker> getIssueMarkers(Collection<IssueMarkerID> issueMarkerIDs, String[] fetchGroups, int maxFetchDepth) {
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try     { return NLJDOHelper.getDetachedObjectList(pm, issueMarkerIDs, IssueMarker.class, fetchGroups, maxFetchDepth); }
 		finally { pm.close(); }
 	}
 
 	@RolesAllowed("_Guest_")
 	public Set<IssueMarkerID> getIssueMarkerIDs() {
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			Query q = pm.newQuery(IssueMarker.class);
 			q.setResult("JDOHelper.getObjectId(this)");
@@ -467,7 +467,7 @@ implements IssueManagerRemote
 	// TODO This is not necessary. Will remove this later. Kai.
 	@RolesAllowed("_Guest_")
 	public Set<IssueMarkerID> getIssueMarkerIDs(IssueID issueID) {
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			Query q = pm.newQuery(IssueLinkType.class);
 			q.setResult("JDOHelper.getObjectId(this)");
@@ -483,7 +483,7 @@ implements IssueManagerRemote
 	@RolesAllowed("_Guest_")
 	public IssueMarker storeIssueMarker(IssueMarker issueMarker, boolean get, String[] fetchGroups, int maxFetchDepth) {
 		assert issueMarker != null;
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try     { return NLJDOHelper.storeJDO(pm, issueMarker, get, fetchGroups, maxFetchDepth); }
 		finally { pm.close(); }
 	}
@@ -499,7 +499,7 @@ implements IssueManagerRemote
 	@RolesAllowed("_Guest_")
 	public List<IssueLinkType> getIssueLinkTypes(Collection<IssueLinkTypeID> issueLinkTypeIDs, String[] fetchGroups, int maxFetchDepth)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			return NLJDOHelper.getDetachedObjectList(pm, issueLinkTypeIDs, IssueLinkType.class, fetchGroups, maxFetchDepth);
 		} finally {
@@ -514,7 +514,7 @@ implements IssueManagerRemote
 	@RolesAllowed("_Guest_")
 	public Set<IssueLinkTypeID> getIssueLinkTypeIDs(Class<? extends Object> linkedObjectClass)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			if (linkedObjectClass == null) {
 				linkedObjectClass = Object.class;
@@ -533,7 +533,7 @@ implements IssueManagerRemote
 	@RolesAllowed("_Guest_")
 	public Set<IssueLinkTypeID> getIssueLinkTypeIDs()
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			Query q = pm.newQuery(IssueLinkType.class);
 			q.setResult("JDOHelper.getObjectId(this)");
@@ -551,7 +551,7 @@ implements IssueManagerRemote
 	@RolesAllowed("_Guest_")
 	public List<IssueLink> getIssueLinks(Collection<IssueLinkID> issueLinkIDs, String[] fetchGroups, int maxFetchDepth)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			return NLJDOHelper.getDetachedObjectList(pm, issueLinkIDs, IssueLink.class, fetchGroups, maxFetchDepth);
 		} finally {
@@ -566,7 +566,7 @@ implements IssueManagerRemote
 	@RolesAllowed("_Guest_")
 	public Set<IssueLinkID> getIssueLinkIDs()
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			Query q = pm.newQuery(IssueLink.class);
 			q.setResult("JDOHelper.getObjectId(this)");
@@ -583,7 +583,7 @@ implements IssueManagerRemote
 	@RolesAllowed("_Guest_")
 	public Collection<IssueLinkID> getIssueLinkIDsByOrganisationIDAndLinkedObjectID(String organisationID, ObjectID linkedObjectID)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			// NEVER DO THIS!!! Never reference a query outside the class which declared it! Use a public static method in that class instead!
 			// I refactored the code below and commented the old stuff out. Marco.
@@ -610,7 +610,7 @@ implements IssueManagerRemote
 	@RolesAllowed("_Guest_")
 	public Issue storeIssue(Issue issue, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		Issue pIssue = null;
 		try {
 			//check if the issue is new.
@@ -733,7 +733,7 @@ implements IssueManagerRemote
 	@RolesAllowed("_Guest_")
 	public void deleteIssue(IssueID issueID)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
 			pm.getExtent(Issue.class, true);
@@ -774,7 +774,7 @@ implements IssueManagerRemote
 	@RolesAllowed("_Guest_")
 	public Issue signalIssue(IssueID issueID, String jbpmTransitionName, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			IssueLocal issueLocal = (IssueLocal) pm.getObjectById(IssueLocalID.create(issueID));
 			JbpmContext jbpmContext = JbpmLookup.getJbpmConfiguration().createJbpmContext();
@@ -828,7 +828,7 @@ implements IssueManagerRemote
 					"Invalid return type= "+ queries.getResultClassName());
 		}
 
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(1);
 			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
@@ -859,7 +859,7 @@ implements IssueManagerRemote
 	@RolesAllowed("_Guest_")
 	public List<Issue> getIssues(Collection<IssueID> issueIDs, String[] fetchGroups, int maxFetchDepth)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			return NLJDOHelper.getDetachedObjectList(pm, issueIDs, Issue.class, fetchGroups, maxFetchDepth);
 		} finally {
@@ -874,7 +874,7 @@ implements IssueManagerRemote
 	@RolesAllowed("_Guest_")
 	public Set<IssueID> getIssueIDs()
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			Query q = pm.newQuery(Issue.class);
 			q.setResult("JDOHelper.getObjectId(this)");
@@ -890,7 +890,7 @@ implements IssueManagerRemote
 	 */
 	@RolesAllowed("_Guest_")
 	public Set<Issue> getIssueByProjectID(ProjectID projectID) {
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			Query q = pm.newNamedQuery(Project.class, "getIssuesByProjectID");
 			Map<String, Object> params = new HashMap<String, Object>(2);
@@ -908,7 +908,7 @@ implements IssueManagerRemote
 	 */
 	@RolesAllowed("_Guest_")
 	public Set<Issue> getIssueByProjectTypeID(ProjectTypeID projectTypeID) {
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			Query q = pm.newNamedQuery(Project.class, "getIssuesByProjectTypeID");
 			Map<String, Object> params = new HashMap<String, Object>(2);
@@ -927,7 +927,7 @@ implements IssueManagerRemote
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("_Guest_")
 	public IssueHistoryItem storeIssueHistoryItem(IssueHistoryItem issueHistoryItem, boolean get, String[] fetchGroups, int maxFetchDepth) {
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try     { return NLJDOHelper.storeJDO(pm, issueHistoryItem, get, fetchGroups, maxFetchDepth); }
 		finally { pm.close(); }
 	}
@@ -935,7 +935,7 @@ implements IssueManagerRemote
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("_Guest_")
 	public Collection<IssueHistoryItem> storeIssueHistoryItems(Collection<IssueHistoryItem> issueHistoryItems, boolean get, String[] fetchGroups, int maxFetchDepth) {
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try     { return NLJDOHelper.storeJDOCollection(pm, issueHistoryItems, get, fetchGroups, maxFetchDepth); }
 		finally { pm.close(); }
 	}
@@ -947,7 +947,7 @@ implements IssueManagerRemote
 	@RolesAllowed("_Guest_")
 	public Collection<IssueHistoryItemID> getIssueHistoryItemIDsByIssueID(IssueID issueID)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			return NLJDOHelper.getObjectIDSet(IssueHistoryItem.getIssueHistoryItemsByIssue(pm, issueID));
 		} finally {
@@ -962,7 +962,7 @@ implements IssueManagerRemote
 	@RolesAllowed("_Guest_")
 	public List<IssueHistoryItem> getIssueHistoryItems(Collection<IssueHistoryItemID> issueHistoryIDs, String[] fetchGroups, int maxFetchDepth)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			return NLJDOHelper.getDetachedObjectList(pm, issueHistoryIDs, IssueHistoryItem.class, fetchGroups, maxFetchDepth);
 		} finally {
@@ -978,7 +978,7 @@ implements IssueManagerRemote
 	@RolesAllowed("_Guest_")
 	public IssueType storeIssueType(IssueType issueType, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			return NLJDOHelper.storeJDO(pm, issueType, get, fetchGroups, maxFetchDepth);
 		}//try
@@ -994,7 +994,7 @@ implements IssueManagerRemote
 	@RolesAllowed("_Guest_")
 	public List<IssueType> getIssueTypes(Collection<IssueTypeID> issueTypeIDs, String[] fetchGroups, int maxFetchDepth)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			return NLJDOHelper.getDetachedObjectList(pm, issueTypeIDs, IssueType.class, fetchGroups, maxFetchDepth);
 		} finally {
@@ -1009,7 +1009,7 @@ implements IssueManagerRemote
 	@RolesAllowed("_Guest_")
 	public Set<IssueTypeID> getIssueTypeIDs()
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			final Query allIDsQuery = pm.newNamedQuery(IssueType.class, IssueType.QUERY_ALL_ISSUETYPE_IDS);
 			return new HashSet<IssueTypeID>((Collection<? extends IssueTypeID>)allIDsQuery.execute());
@@ -1026,7 +1026,7 @@ implements IssueManagerRemote
 	@RolesAllowed("_Guest_")
 	public IssuePriority storeIssuePriority(IssuePriority issuePriority, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			return NLJDOHelper.storeJDO(pm, issuePriority, get, fetchGroups, maxFetchDepth);
 		}//try
@@ -1042,7 +1042,7 @@ implements IssueManagerRemote
 	@RolesAllowed("_Guest_")
 	public Set<IssuePriorityID> getIssuePriorityIDs()
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			Query q = pm.newQuery(IssuePriority.class);
 			q.setResult("JDOHelper.getObjectId(this)");
@@ -1059,7 +1059,7 @@ implements IssueManagerRemote
 	@RolesAllowed("_Guest_")
 	public List<IssuePriority> getIssuePriorities(Collection<IssuePriorityID> issuePriorityIDs, String[] fetchGroups, int maxFetchDepth)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			return NLJDOHelper.getDetachedObjectList(pm, issuePriorityIDs, IssuePriority.class, fetchGroups, maxFetchDepth);
 		} finally {
@@ -1075,7 +1075,7 @@ implements IssueManagerRemote
 	@RolesAllowed("_Guest_")
 	public IssueSeverityType storeIssueSeverityType(IssueSeverityType issueSeverityType, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try{
 			return NLJDOHelper.storeJDO(pm, issueSeverityType, get, fetchGroups, maxFetchDepth);
 		}//try
@@ -1091,7 +1091,7 @@ implements IssueManagerRemote
 	@RolesAllowed("_Guest_")
 	public Set<IssueSeverityTypeID> getIssueSeverityTypeIDs()
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			Query q = pm.newQuery(IssueSeverityType.class);
 			q.setResult("JDOHelper.getObjectId(this)");
@@ -1108,7 +1108,7 @@ implements IssueManagerRemote
 	@RolesAllowed("_Guest_")
 	public List<IssueSeverityType> getIssueSeverityTypes(Collection<IssueSeverityTypeID> issueSeverityTypeIDs, String[] fetchGroups, int maxFetchDepth)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			return NLJDOHelper.getDetachedObjectList(pm, issueSeverityTypeIDs, IssueSeverityType.class, fetchGroups, maxFetchDepth);
 		} finally {
@@ -1124,7 +1124,7 @@ implements IssueManagerRemote
 	@RolesAllowed("_Guest_")
 	public IssueResolution storeIssueResolution(IssueResolution issueResolution, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			return NLJDOHelper.storeJDO(pm, issueResolution, get, fetchGroups, maxFetchDepth);
 		}//try
@@ -1140,7 +1140,7 @@ implements IssueManagerRemote
 	@RolesAllowed("_Guest_")
 	public Collection<IssueResolution> getIssueResolutions(String[] fetchGroups, int maxFetchDepth)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
@@ -1162,7 +1162,7 @@ implements IssueManagerRemote
 	@RolesAllowed("_Guest_")
 	public List<IssueResolution> getIssueResolutions(Collection<IssueResolutionID> issueResolutionIDs, String[] fetchGroups, int maxFetchDepth)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			return NLJDOHelper.getDetachedObjectList(pm, issueResolutionIDs, IssueResolution.class, fetchGroups, maxFetchDepth);
 		} finally {
@@ -1242,7 +1242,7 @@ implements IssueManagerRemote
 	@RolesAllowed("_System_")
 	public void initialise() throws Exception
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			UserID systemUserID = UserID.create(getOrganisationID(), getUserID());
 			User systemUser = (User)pm.getObjectById(systemUserID);

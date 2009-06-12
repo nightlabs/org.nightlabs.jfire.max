@@ -154,7 +154,7 @@ implements TradeManagerRemote, TradeManagerLocal
 			SegmentTypeID[] segmentTypeIDs)
 	throws ModuleException
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
 			pm.getFetchPlan().setGroups(new String[] {
@@ -218,7 +218,7 @@ implements TradeManagerRemote, TradeManagerLocal
 		if (currencyID == null)
 			throw new IllegalArgumentException("currencyID must not be null!");
 
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			Trader trader = Trader.getTrader(pm);
 
@@ -269,7 +269,7 @@ implements TradeManagerRemote, TradeManagerLocal
 		if (currencyID == null)
 			throw new IllegalArgumentException("currencyID must not be null!");
 
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			Trader trader = Trader.getTrader(pm);
 
@@ -324,7 +324,7 @@ implements TradeManagerRemote, TradeManagerLocal
 	@RolesAllowed("org.nightlabs.jfire.trade.editOrder")
 	public Collection<Segment> createCrossTradeSegments(OrderID orderID, Collection<SegmentTypeID> segmentTypeIDs)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			pm.getExtent(Order.class);
 			Order order = (Order) pm.getObjectById(orderID);
@@ -353,7 +353,7 @@ implements TradeManagerRemote, TradeManagerLocal
 		if (!getPrincipal().userIsOrganisation())
 			throw new IllegalStateException("This method cannot be called by a user who is not an organisation!");
 
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			Trader trader = Trader.getTrader(pm);
 			pm.getExtent(Currency.class);
@@ -406,7 +406,7 @@ implements TradeManagerRemote, TradeManagerLocal
 		if (!getPrincipal().userIsOrganisation())
 			throw new IllegalStateException("This method cannot be called by a user who is not an organisation!");
 
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			Trader trader = Trader.getTrader(pm);
 			pm.getExtent(Order.class);
@@ -437,7 +437,7 @@ implements TradeManagerRemote, TradeManagerLocal
 		if (!getPrincipal().userIsOrganisation())
 			throw new IllegalStateException("This method cannot be called by a user who is not an organisation!");
 
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			User user = User.getUser(pm, getPrincipal());
 			Trader trader = Trader.getTrader(pm);
@@ -475,7 +475,7 @@ implements TradeManagerRemote, TradeManagerLocal
 	public Offer createOffer(OrderID orderID, String offerIDPrefix, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			Trader trader = Trader.getTrader(pm);
 			pm.getExtent(Order.class);
@@ -540,7 +540,7 @@ implements TradeManagerRemote, TradeManagerLocal
 	@RolesAllowed("org.nightlabs.jfire.trade.queryOffers")
 	public List<Offer> getNonFinalizedNonEndedOffers(OrderID orderID, String[] fetchGroups, int maxFetchDepth)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			pm.getExtent(Order.class);
 			Order order = (Order) pm.getObjectById(orderID);
@@ -563,7 +563,7 @@ implements TradeManagerRemote, TradeManagerLocal
 	public Collection<Article> reverseArticles(OfferID offerID, Collection<ArticleID> reversedArticleIDs, boolean get, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			pm.getExtent(Offer.class);
 			Offer offer = (Offer) pm.getObjectById(offerID);
@@ -622,7 +622,7 @@ implements TradeManagerRemote, TradeManagerLocal
 			boolean get, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			Set<Article> reversedArticles = NLJDOHelper.getObjectSet(pm, reversedArticleIDs, Article.class);
 			User user = User.getUser(pm, getPrincipal());
@@ -667,7 +667,7 @@ implements TradeManagerRemote, TradeManagerLocal
 	public LegalEntity getAnonymousLegalEntity(String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
@@ -688,7 +688,7 @@ implements TradeManagerRemote, TradeManagerLocal
 	public OrganisationLegalEntity getOrganisationLegalEntity(
 			String organisationID, boolean throwExceptionIfNotExistent, String[] fetchGroups, int maxFetchDepth)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
@@ -709,7 +709,7 @@ implements TradeManagerRemote, TradeManagerLocal
 	@RolesAllowed("org.nightlabs.jfire.trade.queryOrders")
 	public List<OrderID> getOrderIDs(Class<? extends Order> orderClass, boolean subclasses, AnchorID vendorID, AnchorID customerID, AnchorID endCustomerID, long rangeBeginIdx, long rangeEndIdx)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			return new ArrayList<OrderID>(Order.getOrderIDs(pm, orderClass, subclasses,vendorID, customerID, endCustomerID, rangeBeginIdx, rangeEndIdx));
 		} finally {
@@ -723,7 +723,7 @@ implements TradeManagerRemote, TradeManagerLocal
 	@RolesAllowed("org.nightlabs.jfire.trade.queryOrders")
 	public List<Order> getOrders(Set<OrderID> orderIDs, String[] fetchGroups, int maxFetchDepth)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			return NLJDOHelper.getDetachedObjectList(pm, orderIDs, Order.class, fetchGroups, maxFetchDepth);
 		} finally {
@@ -738,7 +738,7 @@ implements TradeManagerRemote, TradeManagerLocal
 	@RolesAllowed("_Guest_")
 	public LegalEntity storePersonAsLegalEntity(Person person, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
@@ -769,7 +769,7 @@ implements TradeManagerRemote, TradeManagerLocal
 		if (personID == null)
 			throw new IllegalArgumentException("personID must not be null!");
 
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		Person person = (Person) pm.getObjectById(personID);
 		LegalEntity legalEntity = LegalEntity.getLegalEntity(pm, person);
 
@@ -789,7 +789,7 @@ implements TradeManagerRemote, TradeManagerLocal
 	@RolesAllowed("_Guest_")
 	public LegalEntity storeLegalEntity(LegalEntity legalEntity, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			if (legalEntity.isAnonymous())
 				throw new IllegalArgumentException("Attempt to change anonymous LegalEntity");
@@ -806,7 +806,7 @@ implements TradeManagerRemote, TradeManagerLocal
 	@RolesAllowed("org.nightlabs.jfire.trade.queryOrders")
 	public Order getOrder(OrderID orderID, String[] fetchGroups, int maxFetchDepth)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
@@ -880,7 +880,7 @@ implements TradeManagerRemote, TradeManagerLocal
 	@RolesAllowed("_Guest_")
 	public Collection<LegalEntity> getLegalEntities(Set<AnchorID> anchorIDs, String[] fetchGroups, int maxFetchDepth)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			Collection<LegalEntity> les = new LinkedList<LegalEntity>();
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
@@ -908,7 +908,7 @@ implements TradeManagerRemote, TradeManagerLocal
 	@RolesAllowed("org.nightlabs.jfire.trade.queryOffers")
 	public Offer getOffer(OfferID offerID, String[] fetchGroups, int maxFetchDepth)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
@@ -928,7 +928,7 @@ implements TradeManagerRemote, TradeManagerLocal
 	@SuppressWarnings("unchecked")
 	public List<Offer> getOffers(Set<OfferID> offerIDs, String[] fetchGroups, int maxFetchDepth)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			return NLJDOHelper.getDetachedObjectList(pm, offerIDs, Offer.class, fetchGroups, maxFetchDepth);
 		} finally {
@@ -943,7 +943,7 @@ implements TradeManagerRemote, TradeManagerLocal
 	@RolesAllowed({"org.nightlabs.jfire.trade.queryOrders", "org.nightlabs.jfire.trade.queryOffers", "org.nightlabs.jfire.store.queryDeliveryNotes", "org.nightlabs.jfire.accounting.queryInvoices"})
 	public Collection<Article> getArticles(Collection<ArticleID> articleIDs, String[] fetchGroups, int maxFetchDepth)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 
 			// TODO WORKAROUND experimental: Maybe this helps to get no outdated data anymore?! Marco.
@@ -998,7 +998,7 @@ implements TradeManagerRemote, TradeManagerLocal
 	public Segment createSegment(
 			OrderID orderID, SegmentTypeID segmentTypeID, String[] fetchGroups, int maxFetchDepth)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			pm.getExtent(Order.class);
 			Order order = (Order) pm.getObjectById(orderID);
@@ -1042,7 +1042,7 @@ implements TradeManagerRemote, TradeManagerLocal
 	public Collection<Article> deleteArticles(Collection<ArticleID> articleIDs, boolean get, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			Set<Article> articles;
 			NLJDOHelper.enableTransactionSerializeReadObjects(pm);
@@ -1097,7 +1097,7 @@ implements TradeManagerRemote, TradeManagerLocal
 	public Collection<Article> releaseArticles(Collection<ArticleID> articleIDs, boolean synchronously, boolean get, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			Collection<Article> articles = NLJDOHelper.getObjectList(pm, articleIDs, Article.class);
 
@@ -1124,7 +1124,7 @@ implements TradeManagerRemote, TradeManagerLocal
 	@RolesAllowed("org.nightlabs.jfire.trade.editOffer")
 	public void signalOffer(OfferID offerID, String jbpmTransitionName)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			Trader.getTrader(pm).signalOffer(offerID, jbpmTransitionName);
 		} finally {
@@ -1140,7 +1140,7 @@ implements TradeManagerRemote, TradeManagerLocal
 	public void initialise()
 	throws IOException, MalformedVersionException, TimePatternFormatException
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			// WORKAROUND JPOX Bug to avoid problems with creating workflows as State.statable is defined as interface and has subclassed implementations
 			// http://www.jpox.org/servlet/jira/browse/NUCCORE-93
@@ -1276,7 +1276,7 @@ implements TradeManagerRemote, TradeManagerLocal
 	public void releaseExpiredUnfinalizedOffers(TaskID taskID)
 	throws Exception
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			Trader trader = null;
 			User user = null;
@@ -1324,7 +1324,7 @@ implements TradeManagerRemote, TradeManagerLocal
 	@RolesAllowed("_System_")
 	public void releaseExpiredFinalizedOffers(TaskID taskID)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			OrganisationLegalEntity localOrganisationLegalEntity = OrganisationLegalEntity.getOrganisationLegalEntity(pm, getOrganisationID());
 			Query q = pm.newQuery(Offer.class);
@@ -1367,7 +1367,7 @@ implements TradeManagerRemote, TradeManagerLocal
 	@RolesAllowed("org.nightlabs.jfire.trade.editOrder")
 	public Order assignCustomer(OrderID orderID, AnchorID customerID, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
@@ -1401,7 +1401,7 @@ implements TradeManagerRemote, TradeManagerLocal
 			Date expiryTimestampFinalized, boolean expiryTimestampFinalizedAutoManaged,
 			boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
@@ -1435,7 +1435,7 @@ implements TradeManagerRemote, TradeManagerLocal
 	@SuppressWarnings("unchecked")
 	public Set<CustomerGroupMappingID> getCustomerGroupMappingIDs()
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			Query q = pm.newQuery(CustomerGroupMapping.class);
 			q.setResult("JDOHelper.getObjectId(this)");
@@ -1452,7 +1452,7 @@ implements TradeManagerRemote, TradeManagerLocal
 	@SuppressWarnings("unchecked")
 	public Collection<CustomerGroupMapping> getCustomerGroupMappings(Collection<CustomerGroupMappingID> customerGroupMappingIDs, String[] fetchGroups, int maxFetchDepth)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			return NLJDOHelper.getDetachedObjectList(pm, customerGroupMappingIDs, CustomerGroupMapping.class, fetchGroups, maxFetchDepth);
 		} finally {
@@ -1467,7 +1467,7 @@ implements TradeManagerRemote, TradeManagerLocal
 	@RolesAllowed("org.nightlabs.jfire.trade.editCustomerGroupMapping")
 	public CustomerGroupMapping createCustomerGroupMapping(CustomerGroupID localCustomerGroupID, CustomerGroupID partnerCustomerGroupID, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
@@ -1490,7 +1490,7 @@ implements TradeManagerRemote, TradeManagerLocal
 	@SuppressWarnings("unchecked")
 	public Set<CustomerGroupID> getCustomerGroupIDs(String organisationID, boolean inverse)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			Query q = pm.newQuery(CustomerGroup.class);
 			q.setResult("JDOHelper.getObjectId(this)");
@@ -1510,7 +1510,7 @@ implements TradeManagerRemote, TradeManagerLocal
 	@SuppressWarnings("unchecked")
 	public Collection<CustomerGroup> getCustomerGroups(Collection<CustomerGroupID> customerGroupIDs, String[] fetchGroups, int maxFetchDepth)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			return NLJDOHelper.getDetachedObjectList(pm, customerGroupIDs, CustomerGroup.class, fetchGroups, maxFetchDepth);
 		} finally {
@@ -1525,7 +1525,7 @@ implements TradeManagerRemote, TradeManagerLocal
 	@RolesAllowed("org.nightlabs.jfire.trade.editCustomerGroup")
 	public CustomerGroup storeCustomerGroup(CustomerGroup customerGroup, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			return NLJDOHelper.storeJDO(pm, customerGroup, get, fetchGroups, maxFetchDepth);
 		} finally {
@@ -1540,7 +1540,7 @@ implements TradeManagerRemote, TradeManagerLocal
 	@RolesAllowed("_Guest_")
 	public Set<ProcessDefinitionID> getProcessDefinitionIDs(String statableClassName)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			return NLJDOHelper.getObjectIDSet(ProcessDefinitionAssignment.getProcessDefinitions(pm, statableClassName));
 		} finally {
@@ -1564,7 +1564,7 @@ implements TradeManagerRemote, TradeManagerLocal
 					"Invalid return type= "+ queries.getResultClassName());
 		}
 
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(1);
 			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
@@ -1695,7 +1695,7 @@ implements TradeManagerRemote, TradeManagerLocal
 					"Invalid return type= "+ queries.getResultClassName());
 		}
 
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(1);
 			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
@@ -1737,7 +1737,7 @@ implements TradeManagerRemote, TradeManagerLocal
 					"Invalid return type= "+ queries.getResultClassName());
 		}
 
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(1);
 			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
@@ -1770,7 +1770,7 @@ implements TradeManagerRemote, TradeManagerLocal
 	@RolesAllowed("org.nightlabs.jfire.trade.editOffer")
 	public Collection<Article> assignTariff(Set<ArticleID> articleIDs, TariffID tariffID, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			Tariff tariff = (Tariff) pm.getObjectById(tariffID);
 			Set<Article> articles = NLJDOHelper.getObjectSet(pm, articleIDs, Article.class);
@@ -1797,7 +1797,7 @@ implements TradeManagerRemote, TradeManagerLocal
 	@RolesAllowed("_System_")
 	public void crossOrganisationRegistrationCallback(Context context) throws Exception
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			// I think it's not necessary to ask the other organisation for its OrganisationLegalEntity. We have the person already
 			// here, thus we can simply create it.
@@ -1828,7 +1828,7 @@ implements TradeManagerRemote, TradeManagerLocal
 	)
 	throws ReverseProductException
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			Product product = null;
 			try {
@@ -1957,7 +1957,7 @@ implements TradeManagerRemote, TradeManagerLocal
 	@RolesAllowed("_Guest_")
 	public Set<ProcessDefinitionID> getProcessDefinitionIDs(String statableClassName, TradeSide tradeSide)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			return NLJDOHelper.getObjectIDSet(ProcessDefinitionAssignment.getProcessDefinitions(pm, statableClassName, tradeSide));
 		} finally {
@@ -1973,7 +1973,7 @@ implements TradeManagerRemote, TradeManagerLocal
 	public void createReservation(OrderID orderID, AnchorID customerID)
 	{
 		// TODO: check/add rightsmanagement
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			// check if reservation is tried to be done for anonymous customer
 			LegalEntity anonymousLegalEntity = LegalEntity.getAnonymousLegalEntity(pm);
@@ -2004,7 +2004,7 @@ implements TradeManagerRemote, TradeManagerLocal
 	@RolesAllowed("_Guest_")
 	public Set<ProductTypePermissionFlagSetID> getMyProductTypePermissionFlagSetIDs(Set<ProductTypeID> productTypeIDs)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			User user = User.getUser(pm, getPrincipal());
 			Collection<ProductType> productTypes = CollectionUtil.castCollection(pm.getObjectsById(productTypeIDs));
@@ -2030,7 +2030,7 @@ implements TradeManagerRemote, TradeManagerLocal
 			int maxFetchDepth
 	)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
@@ -2065,7 +2065,7 @@ implements TradeManagerRemote, TradeManagerLocal
 	@RolesAllowed("_Guest_")
 	public Set<EndCustomerReplicationPolicyID> getEndCustomerReplicationPolicyIDs()
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			Query q = pm.newQuery(EndCustomerReplicationPolicy.class);
 			q.setResult("JDOHelper.getObjectId(this)");
@@ -2086,7 +2086,7 @@ implements TradeManagerRemote, TradeManagerLocal
 			int maxFetchDepth
 	)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			return NLJDOHelper.getDetachedObjectList(pm, endCustomerReplicationPolicyIDs, EndCustomerReplicationPolicy.class, fetchGroups, maxFetchDepth);
 		} finally {
@@ -2101,7 +2101,7 @@ implements TradeManagerRemote, TradeManagerLocal
 	@RolesAllowed("_Guest_")
 	public void storeEndCustomer(LegalEntity endCustomer, Set<OrderID> assignOrderIDs)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			LegalEntity attachedEndCustomer = EndCustomerReplicationPolicy.attachLegalEntity(pm, endCustomer);
 			Set<Order> orders = NLJDOHelper.getObjectSet(pm, assignOrderIDs, Order.class, QueryOption.throwExceptionOnMissingObject);

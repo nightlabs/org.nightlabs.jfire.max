@@ -117,7 +117,7 @@ implements DeliveryHelperLocal
 			logger.debug("deliverBegin_storeDeliveryData: this.getOrganisationID()=" + this.getOrganisationID());
 		}
 
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 //			if (!JDOHelper.isNew(deliveryData))
 //				throw new IllegalStateException("deliveryData is not new! this method must be called with a brand new DeliveryData object.");
@@ -162,7 +162,7 @@ implements DeliveryHelperLocal
 			String[] fetchGroups, int maxFetchDepth)
 	throws DeliveryException
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			User user = User.getUser(pm, getPrincipal());
 
@@ -199,7 +199,7 @@ implements DeliveryHelperLocal
 	public void deliverDoWork_storeDeliverDoWorkClientResult(DeliveryID deliveryID, DeliveryResult deliverDoWorkClientResult, boolean forceRollback)
 	throws ModuleException
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			pm.getExtent(Delivery.class);
 			Delivery delivery = (Delivery) pm.getObjectById(deliveryID);
@@ -219,7 +219,7 @@ implements DeliveryHelperLocal
 	public DeliveryResult deliverDoWork_internal(DeliveryID deliveryID, String[] fetchGroups, int maxFetchDepth)
 	throws DeliveryException
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			DeliveryDataID deliveryDataID = DeliveryDataID.create(deliveryID);
 			pm.getExtent(DeliveryData.class);
@@ -257,7 +257,7 @@ implements DeliveryHelperLocal
 	public DeliveryResult deliverEnd_internal(DeliveryID deliveryID, String[] fetchGroups, int maxFetchDepth)
 	throws DeliveryException, AsyncInvokeEnqueueException
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			DeliveryDataID deliveryDataID = DeliveryDataID.create(deliveryID);
 			pm.getExtent(DeliveryData.class);
@@ -372,7 +372,7 @@ implements DeliveryHelperLocal
 			DeliveryID deliveryID, DeliveryResult deliverEndClientResult, boolean forceRollback)
 	throws ModuleException
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			pm.getExtent(Delivery.class);
 			Delivery delivery = (Delivery) pm.getObjectById(deliveryID);
@@ -394,7 +394,7 @@ implements DeliveryHelperLocal
 			boolean get, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			pm.getExtent(Delivery.class);
 			Delivery delivery = (Delivery) pm.getObjectById(deliveryID);
@@ -434,7 +434,7 @@ implements DeliveryHelperLocal
 			boolean get, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			pm.getExtent(Delivery.class);
 			Delivery delivery = (Delivery) pm.getObjectById(deliveryID);
@@ -472,7 +472,7 @@ implements DeliveryHelperLocal
 			boolean get, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			pm.getExtent(Delivery.class);
 			Delivery delivery = (Delivery) pm.getObjectById(deliveryID);
@@ -509,7 +509,7 @@ implements DeliveryHelperLocal
 	public void deliverRollback(DeliveryID deliveryID)
 	throws ModuleException
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			pm.getExtent(Delivery.class);
 			// check whether the Delivery exists

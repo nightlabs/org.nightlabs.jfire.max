@@ -100,7 +100,7 @@ implements RecurringTradeManagerRemote, RecurringTradeManagerLocal
 	public void initialise()
 	throws IOException, MalformedVersionException
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			RecurringTrader recurringTrader = RecurringTrader.getRecurringTrader(pm);
 
@@ -148,7 +148,7 @@ implements RecurringTradeManagerRemote, RecurringTradeManagerLocal
 	public void processRecurringOfferTimed(TaskID taskID)
 	throws Exception
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			Task task = (Task) pm.getObjectById(taskID);
 			RecurringOffer recurringOffer =  (RecurringOffer) task.getParam();
@@ -235,7 +235,7 @@ implements RecurringTradeManagerRemote, RecurringTradeManagerLocal
 		if (currencyID == null)
 			throw new IllegalArgumentException("currencyID must not be null!");
 
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			RecurringTrader recurringTrader = RecurringTrader.getRecurringTrader(pm);
 			Trader trader = Trader.getTrader(pm);
@@ -275,7 +275,7 @@ implements RecurringTradeManagerRemote, RecurringTradeManagerLocal
 	public RecurringOffer createRecurringOffer(OrderID orderID, String offerIDPrefix, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			RecurringTrader trader =  RecurringTrader.getRecurringTrader(pm);
 			pm.getExtent(RecurringOrder.class);
@@ -305,7 +305,7 @@ implements RecurringTradeManagerRemote, RecurringTradeManagerLocal
 	@RolesAllowed("org.nightlabs.jfire.trade.editOffer")
 	public RecurringOfferConfiguration storeRecurringOfferConfiguration(RecurringOfferConfiguration configuration, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			// The store storeRecurringOfferConfiguration of RecurringTrader
 			// obtains its own PersistenceManager, that will also be the one here
@@ -321,7 +321,7 @@ implements RecurringTradeManagerRemote, RecurringTradeManagerLocal
 	@RolesAllowed("org.nightlabs.jfire.trade.queryOrders")
 	public List<RecurringOrder> getRecurringOrders(Set<OrderID> orderIDs, String[] fetchGroups, int maxFetchDepth)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			return NLJDOHelper.getDetachedObjectList(pm, orderIDs, RecurringOrder.class, fetchGroups, maxFetchDepth);
 		} finally {
@@ -335,7 +335,7 @@ implements RecurringTradeManagerRemote, RecurringTradeManagerLocal
 	@RolesAllowed("org.nightlabs.jfire.trade.queryOffers")
 	public List<RecurringOffer> getRecurringOffers(Set<OfferID> offerIDs, String[] fetchGroups, int maxFetchDepth)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			return NLJDOHelper.getDetachedObjectList(pm, offerIDs, RecurringOffer.class, fetchGroups, maxFetchDepth);
 		} finally {

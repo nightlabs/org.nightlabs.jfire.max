@@ -172,7 +172,7 @@ implements StoreManagerRemote, StoreManagerLocal
 	@Override
 	public void initialise() throws Exception
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			initRegisterConfigModules(pm);
 
@@ -418,7 +418,7 @@ implements StoreManagerRemote, StoreManagerLocal
 	@Override
 	public Set<UnitID> getUnitIDs()
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			Query q = pm.newQuery(Unit.class);
 			q.setResult("JDOHelper.getObjectId(this)");
@@ -436,7 +436,7 @@ implements StoreManagerRemote, StoreManagerLocal
 	@Override
 	public List<Unit> getUnits(Collection<UnitID> unitIDs, String[] fetchGroups, int maxFetchDepth)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			return NLJDOHelper.getDetachedObjectList(pm, unitIDs, Unit.class, fetchGroups, maxFetchDepth);
 		} finally {
@@ -451,7 +451,7 @@ implements StoreManagerRemote, StoreManagerLocal
 	@Override
 	public List<DeliveryNote> getDeliveryNotes(Set<DeliveryNoteID> deliveryNoteIDs, String[] fetchGroups, int maxFetchDepth)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			return NLJDOHelper.getDetachedObjectList(pm, deliveryNoteIDs, DeliveryNote.class, fetchGroups, maxFetchDepth);
 		} finally {
@@ -495,7 +495,7 @@ implements StoreManagerRemote, StoreManagerLocal
 					"Invalid return type= "+ queries.getResultClassName());
 		}
 
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(1);
 			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
@@ -526,7 +526,7 @@ implements StoreManagerRemote, StoreManagerLocal
 //	public List<ProductType> getProductTypes(Set<ProductTypeID> productTypeIDs, String[] fetchGroups, int maxFetchDepth)
 	public List<ProductType> getProductTypes(Collection<ProductTypeID> productTypeIDs, String[] fetchGroups, int maxFetchDepth)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
@@ -586,7 +586,7 @@ implements StoreManagerRemote, StoreManagerLocal
 	public ProductTypeStatusHistoryItem setProductTypeStatus_published(ProductTypeID productTypeID, boolean get, String[] fetchGroups, int maxFetchDepth)
 	throws CannotPublishProductTypeException
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			if (get) {
 				pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
@@ -617,7 +617,7 @@ implements StoreManagerRemote, StoreManagerLocal
 	public ProductTypeStatusHistoryItem setProductTypeStatus_confirmed(ProductTypeID productTypeID, boolean get, String[] fetchGroups, int maxFetchDepth)
 	throws CannotConfirmProductTypeException
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			if (get) {
 				pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
@@ -648,7 +648,7 @@ implements StoreManagerRemote, StoreManagerLocal
 	public ProductTypeStatusHistoryItem setProductTypeStatus_saleable(ProductTypeID productTypeID, boolean saleable, boolean get, String[] fetchGroups, int maxFetchDepth)
 	throws CannotMakeProductTypeSaleableException
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			if (get) {
 				pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
@@ -678,7 +678,7 @@ implements StoreManagerRemote, StoreManagerLocal
 	@Override
 	public ProductTypeStatusHistoryItem setProductTypeStatus_closed(ProductTypeID productTypeID, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			if (get) {
 				pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
@@ -713,7 +713,7 @@ implements StoreManagerRemote, StoreManagerLocal
 					byte mergeMode, boolean filterByConfig,
 					String[] fetchGroups, int maxFetchDepth)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			ModeOfDeliveryFlavourProductTypeGroupCarrier res =
 				ModeOfDeliveryFlavour.getModeOfDeliveryFlavourProductTypeGroupCarrier(
@@ -749,7 +749,7 @@ implements StoreManagerRemote, StoreManagerLocal
 	@Override
 	public Collection<ModeOfDelivery> getModeOfDeliverys(Set<ModeOfDeliveryID> modeOfDeliveryIDs, String[] fetchGroups, int maxFetchDepth)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			return NLJDOHelper.getDetachedObjectList(pm, modeOfDeliveryIDs, ModeOfDelivery.class, fetchGroups, maxFetchDepth);
 		} finally {
@@ -763,7 +763,7 @@ implements StoreManagerRemote, StoreManagerLocal
 	@RolesAllowed("_Guest_")
 	@Override
 	public Set<ModeOfDeliveryFlavourID> getAllModeOfDeliveryFlavourIDs() {
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			return ModeOfDeliveryFlavour.getAllModeOfDeliveryFlavourIDs(pm);
 		} finally {
@@ -777,7 +777,7 @@ implements StoreManagerRemote, StoreManagerLocal
 	@RolesAllowed("_Guest_")
 	@Override
 	public Set<ModeOfDeliveryID> getAllModeOfDeliveryIDs() {
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			return ModeOfDelivery.getAllModeOfDeliveryIDs(pm);
 		} finally {
@@ -792,7 +792,7 @@ implements StoreManagerRemote, StoreManagerLocal
 	@Override
 	public Collection<ModeOfDeliveryFlavour> getModeOfDeliveryFlavours(Set<ModeOfDeliveryFlavourID> modeOfDeliveryFlavourIDs, String[] fetchGroups, int maxFetchDepth)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			return NLJDOHelper.getDetachedObjectList(pm, modeOfDeliveryFlavourIDs, ModeOfDeliveryFlavour.class, fetchGroups, maxFetchDepth);
 		} finally {
@@ -810,7 +810,7 @@ implements StoreManagerRemote, StoreManagerLocal
 			CheckRequirementsEnvironment checkRequirementsEnvironment,
 			String[] fetchGroups, int maxFetchDepth)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
@@ -845,7 +845,7 @@ implements StoreManagerRemote, StoreManagerLocal
 			boolean get, String[] fetchGroups, int maxFetchDepth)
 	throws DeliveryNoteEditException
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			pm.getExtent(Article.class);
 			User user = User.getUser(pm, getPrincipal());
@@ -894,7 +894,7 @@ implements StoreManagerRemote, StoreManagerLocal
 			boolean get, String[] fetchGroups, int maxFetchDepth)
 	throws DeliveryNoteEditException
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			if (articleContainerID == null)
 				throw new IllegalArgumentException("articleContainerID must not be null!");
@@ -964,7 +964,7 @@ implements StoreManagerRemote, StoreManagerLocal
 			boolean validate, boolean get, String[] fetchGroups, int maxFetchDepth)
 	throws DeliveryNoteEditException
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			pm.getExtent(DeliveryNote.class);
 			pm.getExtent(Article.class);
@@ -1005,7 +1005,7 @@ implements StoreManagerRemote, StoreManagerLocal
 			boolean validate, boolean get, String[] fetchGroups, int maxFetchDepth)
 	throws DeliveryNoteEditException
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			pm.getExtent(DeliveryNote.class);
 			pm.getExtent(Article.class);
@@ -1106,7 +1106,7 @@ implements StoreManagerRemote, StoreManagerLocal
 				throw new IllegalArgumentException("deliveryData.getDelivery().getDeliverEndClientResult() == null");
 		}
 
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			DeliveryResult[] result = new DeliveryResult[3];
 
@@ -1628,7 +1628,7 @@ implements StoreManagerRemote, StoreManagerLocal
 	@Override
 	public List<DeliveryNoteID> getDeliveryNoteIDs(AnchorID vendorID, AnchorID customerID, AnchorID endCustomerID, long rangeBeginIdx, long rangeEndIdx)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			return new ArrayList<DeliveryNoteID>(DeliveryNote.getDeliveryNoteIDs(pm, vendorID, customerID, endCustomerID, rangeBeginIdx, rangeEndIdx));
 		} finally {
@@ -1643,7 +1643,7 @@ implements StoreManagerRemote, StoreManagerLocal
 	@RolesAllowed("org.nightlabs.jfire.store.deliver")
 	@Override
 	public Delivery getDelivery(DeliveryID deliveryID, String[] fetchGroups, int maxFetchDepth) {
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
@@ -1663,7 +1663,7 @@ implements StoreManagerRemote, StoreManagerLocal
 	@Override
 	public List<DeliveryNote> getNonFinalizedDeliveryNotes(AnchorID vendorID, AnchorID customerID, String[] fetchGroups, int maxFetchDepth)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
@@ -1682,7 +1682,7 @@ implements StoreManagerRemote, StoreManagerLocal
 	@Override
 	public void signalDeliveryNote(DeliveryNoteID deliveryNoteID, String jbpmTransitionName)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			Store.getStore(pm).signalDeliveryNote(deliveryNoteID, jbpmTransitionName);
 		} finally {
@@ -1745,7 +1745,7 @@ implements StoreManagerRemote, StoreManagerLocal
 					"Invalid return type= "+ productTypeQueries.getResultClassName());
 		}
 
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(1);
 			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
@@ -1789,7 +1789,7 @@ implements StoreManagerRemote, StoreManagerLocal
 			throw new RuntimeException("Given QueryCollection has invalid return type! Invalid return type= "+ productTypeQueries.getResultClassName());
 		}
 
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(1);
 			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
@@ -2000,7 +2000,7 @@ implements StoreManagerRemote, StoreManagerLocal
 					"Invalid return type= "+ productTypeQueries.getResultClassName());
 		}
 
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			pm.getFetchPlan().setGroups(FetchPlan.DEFAULT);
 
@@ -2046,7 +2046,7 @@ implements StoreManagerRemote, StoreManagerLocal
 	@RolesAllowed("_Guest_")
 	@Override
 	public Collection<DeliveryQueue> getDeliveryQueuesById(Set<DeliveryQueueID> deliveryQueueIds, String[] fetchGroups, int fetchDepth) {
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			pm.getFetchPlan().setFetchSize(fetchDepth);
 			if (fetchGroups != null)
@@ -2065,7 +2065,7 @@ implements StoreManagerRemote, StoreManagerLocal
 	@RolesAllowed("org.nightlabs.jfire.store.editDeliveryQueue")
 	@Override
 	public Collection<DeliveryQueue> storeDeliveryQueues(Collection<DeliveryQueue> deliveryQueues, boolean get, String[] fetchGroups, int fetchDepth) {
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			pm.getFetchPlan().setFetchSize(fetchDepth);
 			if (fetchGroups != null)
@@ -2113,7 +2113,7 @@ implements StoreManagerRemote, StoreManagerLocal
 	@RolesAllowed("_Guest_")
 	@Override
 	public Collection<DeliveryQueueID> getAvailableDeliveryQueueIDs(boolean includeDefunct) {
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 //			return NLJDOHelper.getDetachedQueryResultAsList(pm, DeliveryQueue.getDeliveryQueueIDs(pm, includeDefunct));
 			return new ArrayList<DeliveryQueueID>(DeliveryQueue.getDeliveryQueueIDs(pm, includeDefunct));
@@ -2196,7 +2196,7 @@ implements StoreManagerRemote, StoreManagerLocal
 					"Invalid return type= "+ queries.getResultClassName());
 		}
 
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(1);
 			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
@@ -2225,7 +2225,7 @@ implements StoreManagerRemote, StoreManagerLocal
 	@Override
 	public List<Repository> getRepositories(Collection<AnchorID> repositoryIDs, String[] fetchGroups, int maxFetchDepth)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			return NLJDOHelper.getDetachedObjectList(pm, repositoryIDs, Repository.class, fetchGroups, maxFetchDepth);
 		} finally {
@@ -2241,7 +2241,7 @@ implements StoreManagerRemote, StoreManagerLocal
 	@Override
 	public Repository storeRepository(Repository repository, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			return NLJDOHelper.storeJDO(pm, repository, get, fetchGroups, maxFetchDepth);
 		} finally {
@@ -2284,7 +2284,7 @@ implements StoreManagerRemote, StoreManagerLocal
 		if (productTransferQueries.isEmpty())
 			return new ArrayList<TransferID>(0);
 
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			if (ProductTransfer.class.isAssignableFrom(productTransferQueries.getResultClass())) {
 //				Collection<ProductTransfer> productTransfers = null;
@@ -2322,7 +2322,7 @@ implements StoreManagerRemote, StoreManagerLocal
 	@Override
 	public List<ProductTransfer> getProductTransfers(Collection<TransferID> productTransferIDs, String[] fetchGroups, int maxFetchDepth)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			return NLJDOHelper.getDetachedObjectList(pm, productTransferIDs, ProductTransfer.class, fetchGroups, maxFetchDepth);
 		} finally {
@@ -2338,7 +2338,7 @@ implements StoreManagerRemote, StoreManagerLocal
 	@Override
 	public Set<RepositoryTypeID> getRepositoryTypeIDs()
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			Query q = pm.newQuery(RepositoryType.class);
 			q.setResult("JDOHelper.getObjectId(this)");
@@ -2355,7 +2355,7 @@ implements StoreManagerRemote, StoreManagerLocal
 	@Override
 	public List<RepositoryType> getRepositoryTypes(Collection<RepositoryTypeID> repositoryTypeIDs, String[] fetchGroups, int maxFetchDepth)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			return NLJDOHelper.getDetachedObjectList(pm, repositoryTypeIDs, RepositoryType.class, fetchGroups, maxFetchDepth);
 		} finally {
@@ -2395,7 +2395,7 @@ implements StoreManagerRemote, StoreManagerLocal
 	public Collection<ProductTypeGroup> getProductTypeGroups(Collection<ProductTypeGroupID>
 		productTypeGroupIDs, String[] fetchGroups, int maxFetchDepth)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
@@ -2538,7 +2538,7 @@ implements StoreManagerRemote, StoreManagerLocal
 					"Invalid return type= "+ queries.getResultClassName());
 		}
 
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(1);
 			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
@@ -2571,7 +2571,7 @@ implements StoreManagerRemote, StoreManagerLocal
 	@Override
 	public List<ReceptionNote> getReceptionNotes(Set<ReceptionNoteID> receptionNoteIDs, String[] fetchGroups, int maxFetchDepth)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			return NLJDOHelper.getDetachedObjectList(pm, receptionNoteIDs, ReceptionNote.class, fetchGroups, maxFetchDepth);
 		} finally {
@@ -2587,7 +2587,7 @@ implements StoreManagerRemote, StoreManagerLocal
 	public Set<OfferID> getReservations(ProductTypeID productTypeID, String fetchGroups, int maxFetchDepth)
 	{
 		// TODO; Maybe needs other role
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(1);
 			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
@@ -2645,7 +2645,7 @@ implements StoreManagerRemote, StoreManagerLocal
 	{
 		long startTimestamp = System.currentTimeMillis();
 		boolean forceAtLeastOneChunk = true;
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			Map<Class<? extends ProductType>, ProductTypeActionHandler> productTypeClass2productTypeActionHandler = new HashMap<Class<? extends ProductType>, ProductTypeActionHandler>();
 
@@ -2814,7 +2814,7 @@ implements StoreManagerRemote, StoreManagerLocal
 	@Override
 	public Set<ProductTypePermissionFlagSetID> getMyProductTypePermissionFlagSetIDs(Collection<? extends ProductTypeID> productTypeIDs)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			User user = User.getUser(pm, getPrincipal());
 
@@ -2842,7 +2842,7 @@ implements StoreManagerRemote, StoreManagerLocal
 	@Override
 	public Collection<ProductTypePermissionFlagSet> getProductTypePermissionFlagSets(Collection<? extends ProductTypePermissionFlagSetID> productTypePermissionFlagSetIDs)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			User user = User.getUser(pm, getPrincipal());
 
@@ -2865,7 +2865,7 @@ implements StoreManagerRemote, StoreManagerLocal
 	@RolesAllowed("org.nightlabs.jfire.store.seeProductType")
 	@Override
 	public long getRootProductTypeCount(Class<? extends ProductType> productTypeClass, boolean subclasses) {
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			return ProductType.getRootProductTypeCount(pm, productTypeClass, subclasses);
 		} finally {
@@ -2876,7 +2876,7 @@ implements StoreManagerRemote, StoreManagerLocal
 	@RolesAllowed("org.nightlabs.jfire.store.seeProductType")
 	@Override
 	public Set<ProductTypeID> getRootProductTypeIDs(Class<? extends ProductType> productTypeClass, boolean subclasses) {
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			Collection<? extends ProductType> productTypes = ProductType.getRootProductTypes(pm, productTypeClass, subclasses);
 
@@ -2897,7 +2897,7 @@ implements StoreManagerRemote, StoreManagerLocal
 	@RolesAllowed("org.nightlabs.jfire.store.seeProductType")
 	@Override
 	public Map<ProductTypeID, Long> getChildProductTypeCounts(Collection<ProductTypeID> parentProductTypeIDs) {
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			Map<ProductTypeID, Long> result = new HashMap<ProductTypeID, Long>(parentProductTypeIDs.size());
 			for (ProductTypeID parentProductTypeID : parentProductTypeIDs) {
@@ -2916,7 +2916,7 @@ implements StoreManagerRemote, StoreManagerLocal
 	@RolesAllowed("org.nightlabs.jfire.store.seeProductType")
 	@Override
 	public Collection<ProductTypeID> getChildProductTypeIDs(ProductTypeID parentProductTypeID) {
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			Collection<? extends ProductType> productTypes = ProductType.getChildProductTypes(pm, parentProductTypeID);
 

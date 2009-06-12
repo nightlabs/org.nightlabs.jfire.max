@@ -106,7 +106,7 @@ implements SessionBean
 	public DeliveryNoteID createAndReplicateVendorDeliveryNote(Set<ArticleID> articleIDs)
 	throws Exception
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			if (articleIDs.isEmpty())
 				throw new IllegalArgumentException("articleIDs is empty!");
@@ -120,7 +120,7 @@ implements SessionBean
 			}
 
 			StoreManagerRemote remoteStoreManager = JFireEjb3Factory.getRemoteBean(StoreManagerRemote.class,
-					Lookup.getInitialContextProperties(getPersistenceManager(), partnerOrganisationID)
+					Lookup.getInitialContextProperties(createPersistenceManager(), partnerOrganisationID)
 			);
 
 			DeliveryNote deliveryNote;
@@ -142,7 +142,7 @@ implements SessionBean
 			new DeliveryNoteLocal(deliveryNote); // self-registering
 
 			// create a Jbpm ProcessInstance
-			ProcessDefinitionAssignment processDefinitionAssignment = (ProcessDefinitionAssignment) getPersistenceManager().getObjectById(
+			ProcessDefinitionAssignment processDefinitionAssignment = (ProcessDefinitionAssignment) createPersistenceManager().getObjectById(
 					ProcessDefinitionAssignmentID.create(DeliveryNote.class, TradeSide.customerCrossOrganisation));
 			processDefinitionAssignment.createProcessInstance(null, user, deliveryNote);
 
@@ -164,7 +164,7 @@ implements SessionBean
 	public void findAndReleaseCrossTradeArticlesForProductIDs(Map<String, ? extends Collection<ProductID>> organisationID2productIDs)
 	throws Exception
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 
 			for (Map.Entry<String, ? extends Collection<ProductID>> me : organisationID2productIDs.entrySet()) {
@@ -215,7 +215,7 @@ implements SessionBean
 	public void createReversingCrossTradeArticlesForProductIDs(Map<String, ? extends Collection<ProductID>> organisationID2productIDs)
 	throws Exception
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			User user = User.getUser(pm, getPrincipal());
 
@@ -278,7 +278,7 @@ implements SessionBean
 	public void deliverReversingCrossTradeArticlesForProductIDs(Map<String, ? extends Collection<ProductID>> organisationID2productIDs)
 	throws Exception
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			User user = User.getUser(pm, getPrincipal());
 

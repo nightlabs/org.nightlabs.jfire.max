@@ -73,7 +73,7 @@ implements PaymentHelperLocal
 	@RolesAllowed("_Guest_")
 	public PaymentDataID payBegin_storePaymentData(PaymentData paymentData)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 //			if (!JDOHelper.isNew(paymentData))
 //				throw new IllegalStateException("paymentData is not new! this method must be called with a brand new PaymentData object.");
@@ -114,7 +114,7 @@ implements PaymentHelperLocal
 			String[] fetchGroups, int maxFetchDepth)
 	throws PaymentException
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			User user = User.getUser(pm, getPrincipal());
 
@@ -152,7 +152,7 @@ implements PaymentHelperLocal
 	public void payDoWork_storePayDoWorkClientResult(PaymentID paymentID, PaymentResult payDoWorkClientResult, boolean forceRollback)
 	throws ModuleException
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			pm.getExtent(Payment.class);
 			Payment payment = (Payment) pm.getObjectById(paymentID);
@@ -172,7 +172,7 @@ implements PaymentHelperLocal
 	public PaymentResult payDoWork_internal(PaymentID paymentID, String[] fetchGroups, int maxFetchDepth)
 	throws PaymentException
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			PaymentDataID paymentDataID = PaymentDataID.create(paymentID);
 			pm.getExtent(PaymentData.class);
@@ -211,7 +211,7 @@ implements PaymentHelperLocal
 	public PaymentResult payEnd_internal(PaymentID paymentID, String[] fetchGroups, int maxFetchDepth)
 	throws PaymentException
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			PaymentDataID paymentDataID = PaymentDataID.create(paymentID);
 			pm.getExtent(PaymentData.class);
@@ -257,7 +257,7 @@ implements PaymentHelperLocal
 	public void payEnd_storePayEndClientResult(PaymentID paymentID, PaymentResult payEndClientResult, boolean forceRollback)
 	throws ModuleException
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			pm.getExtent(Payment.class);
 			Payment payment = (Payment) pm.getObjectById(paymentID);
@@ -279,7 +279,7 @@ implements PaymentHelperLocal
 			boolean get, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			pm.getExtent(Payment.class);
 			Payment payment = (Payment) pm.getObjectById(paymentID);
@@ -321,7 +321,7 @@ implements PaymentHelperLocal
 			boolean get, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			pm.getExtent(Payment.class);
 			Payment payment = (Payment) pm.getObjectById(paymentID);
@@ -359,7 +359,7 @@ implements PaymentHelperLocal
 			boolean get, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			pm.getExtent(Payment.class);
 			Payment payment = (Payment) pm.getObjectById(paymentID);
@@ -396,7 +396,7 @@ implements PaymentHelperLocal
 	public void payRollback(PaymentID paymentID)
 	throws ModuleException
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			pm.getExtent(Payment.class);
 			Payment payment = (Payment) pm.getObjectById(paymentID);

@@ -71,7 +71,7 @@ implements ReportTextPartManagerRemote
 			ReportRegistryItemID reportRegistryItemID,
 			boolean synthesize, String[] fetchGroups, int maxFetchDepth) {
 		PersistenceManager pm;
-		pm = getPersistenceManager();
+		pm = createPersistenceManager();
 		try {
 			ReportRegistryItem reportRegistryItem = (ReportRegistryItem) pm.getObjectById(reportRegistryItemID);
 			ReportTextPartConfiguration configuration = ReportTextPartConfiguration.getReportTextPartConfiguration(
@@ -97,7 +97,7 @@ implements ReportTextPartManagerRemote
 	@RolesAllowed("org.nightlabs.jfire.reporting.editReport")
 	public ReportTextPartConfigurationID getReportTextPartConfigurationID(ReportRegistryItemID reportRegistryItemID) {
 		PersistenceManager pm;
-		pm = getPersistenceManager();
+		pm = createPersistenceManager();
 		try {
 			ReportRegistryItem reportRegistryItem = (ReportRegistryItem) pm.getObjectById(reportRegistryItemID);
 			ReportTextPartConfiguration config = ReportTextPartConfiguration.getReportTextPartConfiguration(pm, reportRegistryItem);
@@ -117,7 +117,7 @@ implements ReportTextPartManagerRemote
 			Set<ReportTextPartConfigurationID> configurationIDs, String[] fetchGroups, int maxFetchDepth
 	) {
 		PersistenceManager pm;
-		pm = getPersistenceManager();
+		pm = createPersistenceManager();
 		try {
 			return NLJDOHelper.getDetachedObjectSet(pm, configurationIDs, ReportTextPartConfiguration.class, fetchGroups, maxFetchDepth);
 		} finally {
@@ -132,7 +132,7 @@ implements ReportTextPartManagerRemote
 	public ReportTextPartConfiguration getReportTextPartConfiguration(
 			ReportRegistryItemID reportRegistryItemID, ObjectID linkedObjectID,
 			boolean synthesize, String[] fetchGroups, int maxFetchDepth) {
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			ReportTextPartConfiguration configuration = ReportTextPartConfiguration.getReportTextPartConfiguration(
 					pm, reportRegistryItemID, linkedObjectID, synthesize, fetchGroups, maxFetchDepth);
@@ -162,7 +162,7 @@ implements ReportTextPartManagerRemote
 			ReportTextPartConfiguration reportTextPartConfiguration,
 			boolean get, String[] fetchGroups, int maxFetchDepth) {
 
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			if (reportTextPartConfiguration.getLinkedObjectID() == null) {
 				throw new IllegalStateException("This method can't store a ReportTextPartConfiguration that is not linked to an object (linkedObjectID == null).");
@@ -181,7 +181,7 @@ implements ReportTextPartManagerRemote
 			ReportTextPartConfiguration reportTextPartConfiguration,
 			boolean get, String[] fetchGroups, int maxFetchDepth) {
 
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			return NLJDOHelper.storeJDO(pm, reportTextPartConfiguration, get, fetchGroups, maxFetchDepth);
 		} finally {

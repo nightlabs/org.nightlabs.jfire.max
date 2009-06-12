@@ -218,7 +218,7 @@ implements ReportManagerRemote
 		}
 
 		PersistenceManager pm;
-		pm = getPersistenceManager();
+		pm = createPersistenceManager();
 		JFireServerManager jfireServerManager = getJFireServerManager();
 		try {
 			String earName = "JFireReportingEAR.ear";
@@ -362,7 +362,7 @@ implements ReportManagerRemote
 	public void cleanupRenderedReportLayoutFolders(TaskID taskID)
 	throws Exception
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			ReportLayoutRendererUtil.cleanupRenderedReportLayoutFolders();
 		} finally {
@@ -377,7 +377,7 @@ implements ReportManagerRemote
 	@RolesAllowed("org.nightlabs.jfire.reporting.editReport")
 	public IResultSetMetaData getJFSResultSetMetaData(JFSQueryPropertySet queryPropertySet) throws ScriptException, InstantiationException
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			return ServerJFSQueryProxy.getJFSResultSetMetaData(pm, queryPropertySet.getScriptRegistryItemID(), queryPropertySet);
 		} finally {
@@ -392,7 +392,7 @@ implements ReportManagerRemote
 	@RolesAllowed("org.nightlabs.jfire.reporting.editReport")
 	public IJFSQueryPropertySetMetaData getJFSQueryPropertySetMetaData(ScriptRegistryItemID scriptID) throws ScriptException, InstantiationException
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			return ServerJFSQueryProxy.getJFSQueryPropertySetMetaData(pm, scriptID);
 		} finally {
@@ -410,7 +410,7 @@ implements ReportManagerRemote
 			Map<String, Object> parameters
 		) throws ScriptException, InstantiationException
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			return ServerJFSQueryProxy.getJFSResultSet(
 					pm,
@@ -432,7 +432,7 @@ implements ReportManagerRemote
 			ScriptRegistryItemID scriptRegistryItemID
 		) throws JFireReportingOdaException
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			return ServerJFSQueryProxy.getScriptParameterMetaData(
 					pm,
@@ -454,7 +454,7 @@ implements ReportManagerRemote
 		)
 	{
 		PersistenceManager pm;
-		pm = getPersistenceManager();
+		pm = createPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
@@ -490,7 +490,7 @@ implements ReportManagerRemote
 	@RolesAllowed("org.nightlabs.jfire.reporting.renderReport")
 	public Collection<ReportRegistryItemID> getReportRegistryItemIDsForParent(ReportRegistryItemID reportRegistryItemID, RoleID filterRoleID) {
 		PersistenceManager pm;
-		pm = getPersistenceManager();
+		pm = createPersistenceManager();
 		try {
 			ReportRegistryItem item = (ReportRegistryItem) pm.getObjectById(reportRegistryItemID);
 			Collection<ReportRegistryItemID> result = Collections.emptyList();
@@ -519,7 +519,7 @@ implements ReportManagerRemote
 	@RolesAllowed("org.nightlabs.jfire.reporting.renderReport")
 	public Collection<ReportRegistryItemID> getTopLevelReportRegistryItemIDs(RoleID filterRoleID) {
 		PersistenceManager pm;
-		pm = getPersistenceManager();
+		pm = createPersistenceManager();
 		try {
 			Collection<ReportRegistryItem> topLevelItems = ReportRegistryItem.getTopReportRegistryItems(pm, getOrganisationID());
 			Collection<ReportRegistryItemID> result = new HashSet<ReportRegistryItemID>(topLevelItems.size());
@@ -554,7 +554,7 @@ implements ReportManagerRemote
 		)
 	{
 		PersistenceManager pm;
-		pm = getPersistenceManager();
+		pm = createPersistenceManager();
 		try {
 			// first check if user is allowed to store the registry item
 			// check if user is allowed to render
@@ -592,7 +592,7 @@ implements ReportManagerRemote
 	public void deleteRegistryItem (ReportRegistryItemID reportRegistryItemID)
 	{
 		PersistenceManager pm;
-		pm = getPersistenceManager();
+		pm = createPersistenceManager();
 		try {
 			ReportRegistryItem item = null;
 			try {
@@ -642,7 +642,7 @@ implements ReportManagerRemote
 	throws NamingException, RenderReportException
 	{
 		PersistenceManager pm;
-		pm = getPersistenceManager();
+		pm = createPersistenceManager();
 		try {
 			// check if user is allowed to render
 			ReportRegistryItem registryItem = (ReportRegistryItem) pm.getObjectById(renderReportRequest.getReportRegistryItemID());
@@ -693,7 +693,7 @@ implements ReportManagerRemote
 		)
 	{
 		PersistenceManager pm;
-		pm = getPersistenceManager();
+		pm = createPersistenceManager();
 		try {
 			Query q = pm.newQuery(jdoql);
 			logger.info("Excecuting JDOQL : ");
@@ -722,7 +722,7 @@ implements ReportManagerRemote
 			String[] fetchGroups, int maxFetchDepth
 	) {
 		PersistenceManager pm;
-		pm = getPersistenceManager();
+		pm = createPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
@@ -750,7 +750,7 @@ implements ReportManagerRemote
 			Collection<ReportLayoutLocalisationData> bundle, boolean get, String[] fetchGroups, int maxFetchDepth
 	) {
 		PersistenceManager pm;
-		pm = getPersistenceManager();
+		pm = createPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)

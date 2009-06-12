@@ -82,7 +82,7 @@ implements ReportParameterManagerRemote
 	 */	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("_System_")
 	public void initDefaultValueProviders() {
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			ValueProviderCategoryID categoryID = ReportingConstants.VALUE_PROVIDER_CATEGORY_ID_SIMPLE_TYPES;
 			ValueProviderCategory simpleTypes = ReportParameterUtil.createValueProviderCategory(pm, null, categoryID, new NameEntry[] {
@@ -214,7 +214,7 @@ implements ReportParameterManagerRemote
 			Set<ValueProviderID> providerIDs, String[] fetchGroups, int maxFetchDepth
 	) {
 		PersistenceManager pm;
-		pm = getPersistenceManager();
+		pm = createPersistenceManager();
 		try {
 			return NLJDOHelper.getDetachedObjectSet(pm, providerIDs, ValueProvider.class, fetchGroups, maxFetchDepth);
 		} finally {
@@ -229,7 +229,7 @@ implements ReportParameterManagerRemote
 
 	public Map<ReportRegistryItemID, ReportParameterAcquisitionSetupID> getReportParameterAcquisitionSetupIDs(Collection<ReportRegistryItemID> reportLayoutIDs) {
 		PersistenceManager pm;
-		pm = getPersistenceManager();
+		pm = createPersistenceManager();
 		try {
 			Map<ReportRegistryItemID, ReportParameterAcquisitionSetupID> result = new HashMap<ReportRegistryItemID, ReportParameterAcquisitionSetupID>();
 			for (ReportRegistryItemID itemID : reportLayoutIDs) {
@@ -254,7 +254,7 @@ implements ReportParameterManagerRemote
 			Set<ReportParameterAcquisitionSetupID> setupIDs, String[] fetchGroups, int maxFetchDepth
 	) {
 		PersistenceManager pm;
-		pm = getPersistenceManager();
+		pm = createPersistenceManager();
 		try {
 			return NLJDOHelper.getDetachedObjectSet(pm, setupIDs, ReportParameterAcquisitionSetup.class, fetchGroups, maxFetchDepth);
 		} finally {
@@ -270,7 +270,7 @@ implements ReportParameterManagerRemote
 
 	public Set<ValueProviderCategoryID> getValueProviderCategoryIDsForParent(ValueProviderCategoryID valueProviderCategoryID) {
 		PersistenceManager pm;
-		pm = getPersistenceManager();
+		pm = createPersistenceManager();
 		try {
 			ValueProviderCategory category = valueProviderCategoryID != null ? (ValueProviderCategory) pm.getObjectById(valueProviderCategoryID) : null;
 			return new HashSet<ValueProviderCategoryID>(ValueProviderCategory.getValueProviderCategoryIDsForParent(pm, category));
@@ -288,7 +288,7 @@ implements ReportParameterManagerRemote
 			Set<ValueProviderCategoryID> categoryIDs, String[] fetchGroups, int maxFetchDepth
 	) {
 		PersistenceManager pm;
-		pm = getPersistenceManager();
+		pm = createPersistenceManager();
 		try {
 			return NLJDOHelper.getDetachedObjectSet(pm, categoryIDs, ValueProviderCategory.class, fetchGroups, maxFetchDepth);
 		} finally {
@@ -303,7 +303,7 @@ implements ReportParameterManagerRemote
 
 	public Set<ValueProviderID> getValueProviderIDsForParent(ValueProviderCategoryID valueProviderCategoryID) {
 		PersistenceManager pm;
-		pm = getPersistenceManager();
+		pm = createPersistenceManager();
 		try {
 			ValueProviderCategory category = (ValueProviderCategory) pm.getObjectById(valueProviderCategoryID);
 			return new HashSet<ValueProviderID>(ValueProvider.getValueProviderIDsForParent(pm, category));
@@ -325,7 +325,7 @@ implements ReportParameterManagerRemote
 		if (setup == null)
 			throw new IllegalArgumentException("ReportParameterAcquisitionSetup must not be null!");
 
-		return NLJDOHelper.storeJDO(getPersistenceManager(),
+		return NLJDOHelper.storeJDO(createPersistenceManager(),
 				setup, get, fetchGroups, maxFetchDepth);
 	}
 }

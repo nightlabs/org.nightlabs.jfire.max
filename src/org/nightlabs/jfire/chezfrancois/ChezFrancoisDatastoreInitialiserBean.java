@@ -108,7 +108,7 @@ implements ChezFrancoisDatastoreInitialiserRemote, ChezFrancoisDatastoreInitiali
 	{
 		logger.trace("createModuleMetaData: begin");
 
-		PersistenceManager pm = this.getPersistenceManager();
+		PersistenceManager pm = this.createPersistenceManager();
 		try {
 			ModuleMetaData moduleMetaData = ModuleMetaData.getModuleMetaData(pm, "JFireChezFrancois");
 			if (moduleMetaData != null)
@@ -141,7 +141,7 @@ implements ChezFrancoisDatastoreInitialiserRemote, ChezFrancoisDatastoreInitiali
 	{
 		logger.trace("createModuleMetaData: begin");
 
-		PersistenceManager pm = this.getPersistenceManager();
+		PersistenceManager pm = this.createPersistenceManager();
 		try {
 			ModuleMetaData moduleMetaData = ModuleMetaData.getModuleMetaData(pm, "JFireChezFrancois");
 			if (moduleMetaData != null)
@@ -201,7 +201,7 @@ implements ChezFrancoisDatastoreInitialiserRemote, ChezFrancoisDatastoreInitiali
 			return;
 		}
 
-		PersistenceManager pm = this.getPersistenceManager();
+		PersistenceManager pm = this.createPersistenceManager();
 		try {
 			boolean successful = false;
 			SecurityChangeController.beginChanging();
@@ -231,7 +231,7 @@ implements ChezFrancoisDatastoreInitialiserRemote, ChezFrancoisDatastoreInitiali
 			return;
 		}
 
-		PersistenceManager pm = this.getPersistenceManager();
+		PersistenceManager pm = this.createPersistenceManager();
 		try {
 			boolean successful = false;
 			SecurityChangeController.beginChanging();
@@ -261,7 +261,7 @@ implements ChezFrancoisDatastoreInitialiserRemote, ChezFrancoisDatastoreInitiali
 			return;
 		}
 
-		PersistenceManager pm = this.getPersistenceManager();
+		PersistenceManager pm = this.createPersistenceManager();
 		try {
 			boolean successful = false;
 			SecurityChangeController.beginChanging();

@@ -88,7 +88,7 @@ implements DynamicTradeManagerRemote
 	@RolesAllowed("_System_")
 	public void initialise() throws Exception
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			String organisationID = getOrganisationID();
 
@@ -164,7 +164,7 @@ implements DynamicTradeManagerRemote
 	@RolesAllowed("org.nightlabs.jfire.store.seeProductType")
 	public Set<ProductTypeID> getChildDynamicProductTypeIDs(ProductTypeID parentDynamicProductTypeID)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			Collection<DynamicProductType> productTypes = DynamicProductType.getChildProductTypes(pm, parentDynamicProductTypeID);
 
@@ -241,7 +241,7 @@ implements DynamicTradeManagerRemote
 		if (dynamicProductType == null)
 			throw new IllegalArgumentException("dynamicProductType must not be null!");
 
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups == null)
@@ -387,7 +387,7 @@ implements DynamicTradeManagerRemote
 	public Collection<DynamicTradePriceConfig> storeDynamicTradePriceConfigs(Collection<DynamicTradePriceConfig> priceConfigs, boolean get, AssignInnerPriceConfigCommand assignInnerPriceConfigCommand)
 	throws PriceCalculationException
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			if (get) {
 				pm.getFetchPlan().setMaxFetchDepth(NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
@@ -442,7 +442,7 @@ implements DynamicTradeManagerRemote
 	@SuppressWarnings("unchecked")
 	public Set<PriceConfigID> getDynamicTradePriceConfigIDs()
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			Query q = pm.newQuery(DynamicTradePriceConfig.class);
 			q.setResult("JDOHelper.getObjectId(this)");
@@ -460,7 +460,7 @@ implements DynamicTradeManagerRemote
 	@RolesAllowed("org.nightlabs.jfire.accounting.queryPriceConfigurations")
 	public List<DynamicTradePriceConfig> getDynamicTradePriceConfigs(Collection<PriceConfigID> dynamicTradePriceConfigIDs, String[] fetchGroups, int maxFetchDepth)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			return NLJDOHelper.getDetachedObjectList(pm, dynamicTradePriceConfigIDs, DynamicTradePriceConfig.class, fetchGroups, maxFetchDepth);
 		} finally {
@@ -488,7 +488,7 @@ implements DynamicTradeManagerRemote
 			String[] fetchGroups, int maxFetchDepth) throws ModuleException
 			{
 
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			DynamicTrader dynamicTrader = DynamicTrader.getDynamicTrader(pm);
 			Article article= dynamicTrader.createRecurringArticle(segmentID, offerID, productTypeID, quantity, unitID, tariffID, productName,singlePrice);
@@ -528,7 +528,7 @@ implements DynamicTradeManagerRemote
 			String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			DynamicTrader dynamicTrader = DynamicTrader.getDynamicTrader(pm);
 			Article article= dynamicTrader.createArticle(segmentID, offerID, productTypeID, quantity, unitID, tariffID, productName, singlePrice, allocate, allocateSynchronously);
@@ -569,7 +569,7 @@ implements DynamicTradeManagerRemote
 			boolean get,
 			String[] fetchGroups, int maxFetchDepth)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			Article article = (Article) pm.getObjectById(articleID);
 			Offer offer = article.getOffer();

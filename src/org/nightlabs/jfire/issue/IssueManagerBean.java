@@ -1660,7 +1660,7 @@ implements IssueManagerRemote
 
 			//Predefined Query Stores
 			IssueQuery unassignedIssueIssueQuery = new IssueQuery();
-			unassignedIssueIssueQuery.setAssigneeID(null);
+			unassignedIssueIssueQuery.setStateDefinitionName(JbpmConstants.NODE_NAME_OPEN);
 
 			IssueQuery resolvedIssueIssueQuery = new IssueQuery();
 			resolvedIssueIssueQuery.setStateDefinitionName(JbpmConstants.NODE_NAME_RESOLVED);

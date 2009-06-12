@@ -64,7 +64,7 @@ implements ActionHandler
 
 		if (persistenceManager == null) {
 			String currentOrganisationID = SecurityReflector.getUserDescriptor().getOrganisationID();
-			persistenceManager = new Lookup(currentOrganisationID).getPersistenceManager();
+			persistenceManager = new Lookup(currentOrganisationID).createPersistenceManager();
 		}
 
 		return persistenceManager;

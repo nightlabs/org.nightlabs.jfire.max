@@ -57,7 +57,7 @@ public class JFireLoggingService implements LoggingService {
 		//Get the ID of the current organisation
 		this.OrganisationID = SecurityReflector.getUserDescriptor().getOrganisationID();
 		//Obtain a persistency manager for the current organisation
-		this.pm = new Lookup(OrganisationID).getPersistenceManager();
+		this.pm = new Lookup(OrganisationID).createPersistenceManager();
 	}
 
 	public void log(ProcessLog processLog) {

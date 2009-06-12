@@ -112,7 +112,7 @@ implements JbpmManagerRemote
 
 		JFireServerManager jfireServerManager = getJFireServerManager();
 		try {
-			PersistenceManager pm = getPersistenceManager();
+			PersistenceManager pm = createPersistenceManager();
 			boolean successful = false; boolean deploymentStarted = false;
 			try {
 				// Unfortunately, the JbpmService didn't accept the attribute "JbpmCfgResource".
@@ -284,7 +284,7 @@ implements JbpmManagerRemote
 	@RolesAllowed("_Guest_")
 	public List<State> getStates(Set<StateID> stateIDs, String[] fetchGroups, int maxFetchDepth)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			return NLJDOHelper.getDetachedObjectList(pm, stateIDs, State.class, fetchGroups, maxFetchDepth);
 		} finally {
@@ -298,7 +298,7 @@ implements JbpmManagerRemote
 	@RolesAllowed("_Guest_")
 	public Set<StateID> getStateIDs(ObjectID statableID)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			return State.getStateIDsForStatableID(pm, statableID);
 		} finally {
@@ -312,7 +312,7 @@ implements JbpmManagerRemote
 	@RolesAllowed("_Guest_")
 	public Set<TransitionID> getTransitionIDs(StateID stateID, Boolean userExecutable)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			Query q = pm.newQuery(Transition.class);
 			q.setResult("JDOHelper.getObjectId(this)");
@@ -341,7 +341,7 @@ implements JbpmManagerRemote
 	@RolesAllowed("_Guest_")
 	public Set<TransitionID> getTransitionIDs(StateDefinitionID stateDefinitionID, Boolean userExecutable)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			Query q = pm.newQuery(Transition.class);
 			q.setResult("JDOHelper.getObjectId(this)");
@@ -370,7 +370,7 @@ implements JbpmManagerRemote
 	@RolesAllowed("_Guest_")
 	public List<Transition> getTransitions(Set<TransitionID> transitionIDs, String[] fetchGroups, int maxFetchDepth)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			return NLJDOHelper.getDetachedObjectList(pm, transitionIDs, Transition.class, fetchGroups, maxFetchDepth);
 		} finally {
@@ -403,7 +403,7 @@ implements JbpmManagerRemote
 @RolesAllowed("_Guest_")
 	public Set<StateDefinitionID> getStateDefinitionIDs(ProcessDefinition processDefinition)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			return NLJDOHelper.getObjectIDSet(StateDefinition.getStateDefinitions(pm, processDefinition));
 		} finally {
@@ -419,7 +419,7 @@ implements JbpmManagerRemote
 	public Collection<StateDefinition> getStateDefinitions(Set<StateDefinitionID> objectIDs,
 			String[] fetchGroups, int maxFetchDepth)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			return NLJDOHelper.getDetachedObjectList(pm, objectIDs, StateDefinition.class,
 					fetchGroups, maxFetchDepth);
@@ -436,7 +436,7 @@ implements JbpmManagerRemote
 	public Collection<ProcessDefinition> getProcessDefinitions(Set<ProcessDefinitionID> objectIDs,
 			String[] fetchGroups, int maxFetchDepth)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			return NLJDOHelper.getDetachedObjectList(pm, objectIDs, ProcessDefinition.class,
 					fetchGroups, maxFetchDepth);
@@ -455,7 +455,7 @@ implements JbpmManagerRemote
 		if (statableQueries == null)
 			return null;
 
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(1);
 			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);

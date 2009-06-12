@@ -95,7 +95,7 @@ implements ReportManagerTradeRemote
 	public void initializeScripting() throws ScriptingIntialiserException
 	{
 		PersistenceManager pm;
-		pm = getPersistenceManager();
+		pm = createPersistenceManager();
 		JFireServerManager jfireServerManager = getJFireServerManager();
 		try {
 
@@ -115,7 +115,7 @@ implements ReportManagerTradeRemote
 	public void initializeReporting() throws Exception
 	{
 		PersistenceManager pm;
-		pm = getPersistenceManager();
+		pm = createPersistenceManager();
 		JFireServerManager jfireServerManager = getJFireServerManager();
 		try {
 			ModuleMetaData moduleMetaData = ModuleMetaData.getModuleMetaData(pm, JFireReportingTradeEAR.MODULE_NAME);

@@ -1,6 +1,7 @@
 package org.nightlabs.jfire.issue.query;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -194,7 +195,7 @@ extends AbstractJDOQuery
 		}
 
 		if (isFieldEnabled(FieldName.stateDefinitionName) && stateDefinitionName != null) {
-			filter.append("\n && this.stateDefinitionName == :stateDefinitionName ");
+			filter.append("\n && this.state.stateDefinition.processDefinitionID == :stateDefinitionName ");
 		}
 		
 		if (isFieldEnabled(FieldName.projectIDs) && projectIDs != null && projectIDs.size() > 0) {
@@ -620,6 +621,9 @@ extends AbstractJDOQuery
 	 * @return a {@link Set} of {@link ProjectID}
 	 */
 	public Set<ProjectID> getProjectIDs() {
+		if (projectIDs == null) {
+			projectIDs = new HashSet<ProjectID>();
+		}
 		return projectIDs;
 	}
 

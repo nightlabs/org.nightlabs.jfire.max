@@ -40,7 +40,6 @@ import org.nightlabs.jdo.query.AbstractSearchQuery;
 import org.nightlabs.jdo.query.JDOQueryCollectionDecorator;
 import org.nightlabs.jdo.query.QueryCollection;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
-import org.nightlabs.jfire.base.JFireBaseEAR;
 import org.nightlabs.jfire.editlock.EditLockType;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.issue.history.IssueHistoryItem;
@@ -622,21 +621,21 @@ implements IssueManagerRemote
 				}
 				pIssue = pm.makePersistent(issue);
 
-				IssueType type;
-
-				if (JFireBaseEAR.JPOX_WORKAROUND_FLUSH_ENABLED) {
-					pm.flush();
-					// create the ProcessInstance for new Issues
-					// TODO: WORKAROUND: Calling createProcessInstanceForIssue on pIssue.getIssueType() says that this IssueType is not persistent ?!?
-					type = (IssueType) pm.getObjectById(JDOHelper.getObjectId(pIssue.getIssueType()));
-					if (type == null) {
-						throw new IllegalStateException("Could not create ProcessInstance for new Issue as its type is null");
-					}
-				}
-				else
-					type = pIssue.getIssueType();
-
-				type.createProcessInstanceForIssue(pIssue);
+//				IssueType type;
+//
+//				if (JFireBaseEAR.JPOX_WORKAROUND_FLUSH_ENABLED) {
+//					pm.flush();
+//					// create the ProcessInstance for new Issues
+//					// TODO: WORKAROUND: Calling createProcessInstanceForIssue on pIssue.getIssueType() says that this IssueType is not persistent ?!?
+//					type = (IssueType) pm.getObjectById(JDOHelper.getObjectId(pIssue.getIssueType()));
+//					if (type == null) {
+//						throw new IllegalStateException("Could not create ProcessInstance for new Issue as its type is null");
+//					}
+//				}
+//				else
+//					type = pIssue.getIssueType();
+//
+//				type.createProcessInstanceForIssue(pIssue); // already done in StoreCallback
 			}
 			else {
 				if (issue.getCreateTimestamp() != null) {
@@ -1662,7 +1661,7 @@ implements IssueManagerRemote
 			IssueQuery unassignedIssueIssueQuery = new IssueQuery();
 			unassignedIssueIssueQuery.setAllFieldsDisabled();
 			unassignedIssueIssueQuery.setJbpmNodeName(JbpmConstants.NODE_NAME_OPEN);
-			
+
 			IssueQuery resolvedIssueIssueQuery = new IssueQuery();
 			resolvedIssueIssueQuery.setAllFieldsDisabled();
 			resolvedIssueIssueQuery.setJbpmNodeName(JbpmConstants.NODE_NAME_RESOLVED);
@@ -1670,15 +1669,15 @@ implements IssueManagerRemote
 			IssueQuery acknowledgedIssueIssueQuery = new IssueQuery();
 			acknowledgedIssueIssueQuery.setAllFieldsDisabled();
 			acknowledgedIssueIssueQuery.setJbpmNodeName(JbpmConstants.NODE_NAME_ACKNOWLEDGED);
-			
+
 			IssueQuery closedIssueIssueQuery = new IssueQuery();
 			closedIssueIssueQuery.setAllFieldsDisabled();
 			closedIssueIssueQuery.setJbpmNodeName(JbpmConstants.NODE_NAME_CLOSED);
-			
+
 			IssueQuery confirmedIssueIssueQuery = new IssueQuery();
 			confirmedIssueIssueQuery.setAllFieldsDisabled();
 			confirmedIssueIssueQuery.setJbpmNodeName(JbpmConstants.NODE_NAME_CONFIRMED);
-			
+
 			IssueQuery rejectedIssueIssueQuery = new IssueQuery();
 			rejectedIssueIssueQuery.setAllFieldsDisabled();
 			rejectedIssueIssueQuery.setJbpmNodeName(JbpmConstants.NODE_NAME_REJECTED);

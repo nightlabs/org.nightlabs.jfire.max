@@ -1,6 +1,7 @@
 package org.nightlabs.jfire.issue;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -8,33 +9,32 @@ import java.util.Set;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
 
 import org.apache.log4j.Logger;
+import org.nightlabs.jfire.issue.id.IssueLocalID;
 import org.nightlabs.jfire.jbpm.graph.def.Statable;
 import org.nightlabs.jfire.jbpm.graph.def.StatableLocal;
 import org.nightlabs.jfire.jbpm.graph.def.State;
 import org.nightlabs.util.CollectionUtil;
 import org.nightlabs.util.Util;
 
-import javax.jdo.annotations.Join;
-import org.nightlabs.jfire.issue.id.IssueLocalID;
-import javax.jdo.annotations.FetchGroups;
-import javax.jdo.annotations.Inheritance;
-import javax.jdo.annotations.PrimaryKey;
-import javax.jdo.annotations.FetchGroup;
-import javax.jdo.annotations.PersistenceModifier;
-import javax.jdo.annotations.Persistent;
-import javax.jdo.annotations.InheritanceStrategy;
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.Column;
-import javax.jdo.annotations.IdentityType;
-
 /**
  * This class is created for wrapping the issue with its state. It's intended to be used within an organisation.
  * <p>
  * It's based on the design pattern called <a href="https://www.jfire.org/modules/phpwiki/index.php/Design%20Pattern%20XyzLocal">Design Pattern XyzLocal</a>
  * </p>
- * 
+ *
  * @author Chairat Kongarayawetchakun - chairat [AT] nightlabs [DOT] de
  *
  * @jdo.persistence-capable
@@ -46,8 +46,8 @@ import javax.jdo.annotations.IdentityType;
  * @jdo.inheritance strategy="new-table"
  *
  * @jdo.implements name="org.nightlabs.jfire.jbpm.graph.def.StatableLocal"
- * 
- * @jdo.create-objectid-class 
+ *
+ * @jdo.create-objectid-class
  * 		field-order="organisationID, issueID"
  * 		include-body="id/IssueLocalID.body.inc"
  *
@@ -88,43 +88,44 @@ import javax.jdo.annotations.IdentityType;
 		members=@Persistent(name="states"))
 })
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
-public class IssueLocal 
+public class IssueLocal
 implements Serializable, StatableLocal
 {
 	private static final long serialVersionUID = 1L;
-	
+
 	@SuppressWarnings("unused")
 	private static final Logger logger = Logger.getLogger(IssueLocal.class);
 
 	/**
-	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon! 
+	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon!
 	 */
+	@Deprecated
 	public static final String FETCH_GROUP_THIS_ISSUE_LOCAL = "IssueLocal.this";
-	
+
 	/**
 	 * This is the organisationID to which the issue local belongs. Within one organisation,
 	 * all the issue locals have their organisation's ID stored here, thus it's the same
 	 * value for all of them.
-	 * 
+	 *
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
 	@PrimaryKey
 	@Column(length=100)
 	private String organisationID;
-	
+
 	/**
 	 * @jdo.field primary-key="true"
 	 */
 	@PrimaryKey
 	private long issueID;
-	
+
 	/**
 	 * @jdo.field persistence-modifier="persistent" @!dependent="true"
 	 */
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private State state;
-	
+
 	/**
 	 * This is the history of <b>ALL</b> {@link State}s with the newest last and the oldest first.
 	 *
@@ -142,14 +143,14 @@ implements Serializable, StatableLocal
 		table="JFireIssueTracking_IssueLocal_states",
 		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private List<State> states;
-	
+
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private long jbpmProcessInstanceId = -1;
-	
+
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
@@ -163,12 +164,13 @@ implements Serializable, StatableLocal
 	private boolean processEnded = false;
 
 	/**
-	 * @deprecated Constructor exists only for JDO! 
+	 * @deprecated Constructor exists only for JDO!
 	 */
+	@Deprecated
 	protected IssueLocal() { }
 
 	/**
-	 * 
+	 *
 	 * @param issue
 	 */
 	public IssueLocal(Issue issue)
@@ -176,8 +178,9 @@ implements Serializable, StatableLocal
 		this.issue = issue;
 		this.organisationID = issue.getOrganisationID();
 		this.issueID = issue.getIssueID();
+		this.states = new ArrayList<State>();
 	}
-	
+
 	/**
 	 * @return Returns the organisationID.
 	 */
@@ -207,7 +210,7 @@ implements Serializable, StatableLocal
 	private transient List<State> _states = null;
 
 	/**
-	 * 
+	 *
 	 */
 	public List<State> getStates()
 	{
@@ -216,16 +219,16 @@ implements Serializable, StatableLocal
 
 		return _states;
 	}
-	
+
 	/**
-	 * 
+	 *
 	 */
 	public void setJbpmProcessInstanceId(long jbpmProcessInstanceId) {
 		this.jbpmProcessInstanceId = jbpmProcessInstanceId;
 	}
-	
+
 	/**
-	 * 
+	 *
 	 */
 	public void setState(State state) {
 		this.state = state;
@@ -233,12 +236,12 @@ implements Serializable, StatableLocal
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	public State getState() {
 		return state;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 */
@@ -264,7 +267,7 @@ implements Serializable, StatableLocal
 
 		IssueLocal o = (IssueLocal) obj;
 
-		return 
+		return
 			Util.equals(this.organisationID, o.organisationID) &&
 			Util.equals(this.issueID, o.issueID);
 	}
@@ -275,24 +278,24 @@ implements Serializable, StatableLocal
 	 */
 	public int hashCode()
 	{
-		return 
+		return
 			Util.hashCode(this.organisationID) ^
 			Util.hashCode(this.issueID);
-		
+
 	}
 
 	@Override
 	/**
-	 * 
+	 *
 	 */
 	public boolean isProcessEnded()
 	{
 		return processEnded;
 	}
-	
+
 	@Override
 	/**
-	 * 
+	 *
 	 */
 	public void setProcessEnded()
 	{
@@ -306,7 +309,7 @@ implements Serializable, StatableLocal
 	private String primaryKey;
 
 	/**
-	 * 
+	 *
 	 * @param organisationID
 	 * @param issueID
 	 * @return
@@ -315,16 +318,16 @@ implements Serializable, StatableLocal
 	{
 		return organisationID + '/' + Long.toString(issueID);
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @return
 	 */
 	public String getPrimaryKey()
 	{
 		return primaryKey;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 */

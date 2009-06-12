@@ -35,6 +35,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.jdo.JDODetachedFieldAccessException;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.annotations.Column;
@@ -53,6 +54,9 @@ import javax.jdo.annotations.Queries;
 import javax.jdo.annotations.Query;
 import javax.jdo.listener.AttachCallback;
 import javax.jdo.listener.DeleteCallback;
+import javax.jdo.listener.InstanceLifecycleEvent;
+import javax.jdo.listener.StoreCallback;
+import javax.jdo.listener.StoreLifecycleListener;
 
 import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jdo.ObjectIDUtil;
@@ -163,7 +167,7 @@ import org.nightlabs.util.Util;
 })
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class Issue
-implements 	Serializable, AttachCallback, Statable, DeleteCallback
+implements 	Serializable, AttachCallback, Statable, DeleteCallback, StoreCallback
 {
 	private static final long serialVersionUID = 20080610L;
 
@@ -465,6 +469,7 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 		comments = new ArrayList<IssueComment>();
 		issueLinks = new HashSet<IssueLink>();
 		issueWorkTimeRanges = new ArrayList<IssueWorkTimeRange>();
+		states = new ArrayList<State>();
 
 		// --- 8< --- KaiExperiments: since 14.05.2009 ------------------
 		// --[ In preparation for an IssueMarker ]--
@@ -853,24 +858,78 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 		this.states.add(state);
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Checks, if the issue has a jBPM process instance already and all necessary fields are assigned (i.e. not <code>null</code>).
+	 * If anything is missing, it is fixed by setting default values.
 	 */
-	protected void ensureIssueHasProcessInstance() {
-		if (this.getStatableLocal().getJbpmProcessInstanceId() < 0) {
-			if (this.getIssueType() == null)
-				throw new IllegalStateException("Could not create ProcessInstance for Issue as its IssueType is null.");
-			getIssueType().createProcessInstanceForIssue(this);
+	protected void ensureIssueIntegrity() {
+		try {
+			if (this.getStatableLocal().getJbpmProcessInstanceId() < 0) {
+				if (this.getIssueType() == null)
+					throw new IllegalStateException("Could not create ProcessInstance for Issue as its IssueType is null.");
+				getIssueType().createProcessInstanceForIssue(this);
+			}
+		} catch (JDODetachedFieldAccessException x) {
+			// ignore
+		}
+
+		try {
+			// Check priority
+
+			// TODO do it!
+		} catch (JDODetachedFieldAccessException x) {
+			// ignore
+		}
+
+		try {
+			// Check severity
+
+			// TODO do it!
+		} catch (JDODetachedFieldAccessException x) {
+			// ignore
+		}
+
+		try {
+			// Check resolution
+
+			// TODO do it!
+		} catch (JDODetachedFieldAccessException x) {
+			// ignore
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * Checks if the issue has process instance already.
+	@Override
+	public void jdoPreStore() {
+		final Issue thisIssue = this;
+		final PersistenceManager pm = getPersistenceManager();
+		pm.addInstanceLifecycleListener(new StoreLifecycleListener() {
+			@Override
+			public void preStore(InstanceLifecycleEvent event) {
+			}
+			@Override
+			public void postStore(InstanceLifecycleEvent event) {
+				if (!event.getPersistentInstance().equals(thisIssue))
+					return;
+
+				pm.removeInstanceLifecycleListener(this);
+				ensureIssueIntegrity();
+			}
+		}, this.getClass());
+	}
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * Checks, if the issue has a jBPM process instance already and all necessary fields are assigned (i.e. not <code>null</code>).
+	 * If anything is missing, it is fixed by setting default values.
+	 * <p>
+	 * This method delegates to {@link #ensureIssueIntegrity()}
+	 * </p>
+	 *
 	 * @see javax.jdo.listener.AttachCallback#jdoPostAttach(java.lang.Object)
 	 */
 	public void jdoPostAttach(Object attached) {
-		ensureIssueHasProcessInstance();
+		ensureIssueIntegrity();
 	}
 
 	/*

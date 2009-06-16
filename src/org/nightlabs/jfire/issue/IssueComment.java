@@ -53,6 +53,12 @@ import javax.jdo.annotations.PersistenceModifier;
 		name=IssueComment.FETCH_GROUP_USER,
 		members=@Persistent(name="user")),
 	@FetchGroup(
+		name=IssueComment.FETCH_GROUP_TEXT,
+		members=@Persistent(name="text")),
+	@FetchGroup(
+		name=IssueComment.FETCH_GROUP_TIMESTAMP,
+		members=@Persistent(name="createTimestamp")),			
+	@FetchGroup(
 		name=IssueComment.FETCH_GROUP_THIS_COMMENT,
 		members={@Persistent(name="text"), @Persistent(name="createTimestamp"), @Persistent(name="user")})
 })
@@ -67,8 +73,12 @@ implements Serializable
 	 */
 	@Deprecated
 	public static final String FETCH_GROUP_THIS_COMMENT = "IssueComment.this";
-
+	
 	public static final String FETCH_GROUP_USER = "IssueComment.user";
+	public static final String FETCH_GROUP_TEXT = "IssueComment.text";
+	public static final String FETCH_GROUP_TIMESTAMP = "IssueComment.createTimestamp";
+
+	
 	
 	/**
 	 * This is the organisationID to which the issue comment belongs. Within one organisation,

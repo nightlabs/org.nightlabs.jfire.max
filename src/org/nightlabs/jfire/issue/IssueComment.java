@@ -3,26 +3,26 @@ package org.nightlabs.jfire.issue;
 import java.io.Serializable;
 import java.util.Date;
 
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
+
 import org.nightlabs.jfire.idgenerator.IDGenerator;
+import org.nightlabs.jfire.issue.id.IssueCommentID;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.util.Util;
-
-import javax.jdo.annotations.Persistent;
-import org.nightlabs.jfire.issue.id.IssueCommentID;
-import javax.jdo.annotations.FetchGroups;
-import javax.jdo.annotations.InheritanceStrategy;
-import javax.jdo.annotations.Inheritance;
-import javax.jdo.annotations.PrimaryKey;
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.FetchGroup;
-import javax.jdo.annotations.Column;
-import javax.jdo.annotations.IdentityType;
-import javax.jdo.annotations.PersistenceModifier;
 
 /**
  * The {@link IssueComment} class represents a comment which is created in an {@link Issue}.
  * <p>
- * 
+ *
  * </p>
  *
  * @author Chairat Kongarayawetchakun - chairat at nightlabs dot de
@@ -55,9 +55,9 @@ import javax.jdo.annotations.PersistenceModifier;
 	@FetchGroup(
 		name=IssueComment.FETCH_GROUP_TEXT,
 		members=@Persistent(name="text")),
-	@FetchGroup(
+	@FetchGroup( // TODO this fetch-group is *not* necessary!
 		name=IssueComment.FETCH_GROUP_TIMESTAMP,
-		members=@Persistent(name="createTimestamp")),			
+		members=@Persistent(name="createTimestamp")),
 	@FetchGroup(
 		name=IssueComment.FETCH_GROUP_THIS_COMMENT,
 		members={@Persistent(name="text"), @Persistent(name="createTimestamp"), @Persistent(name="user")})
@@ -73,18 +73,24 @@ implements Serializable
 	 */
 	@Deprecated
 	public static final String FETCH_GROUP_THIS_COMMENT = "IssueComment.this";
-	
+
 	public static final String FETCH_GROUP_USER = "IssueComment.user";
 	public static final String FETCH_GROUP_TEXT = "IssueComment.text";
+	/**
+	 * @deprecated This fetch-group is not necessary, because all simple fields including java.util.Date and java.lang.String
+	 * are in the default-fetch-group! Read http://www.datanucleus.org/products/accessplatform_1_1/jdo/fetchgroup.html
+	 * and REMOVE THIS FETCH-GROUP!!! Marco.
+	 */
+	@Deprecated
 	public static final String FETCH_GROUP_TIMESTAMP = "IssueComment.createTimestamp";
 
-	
-	
+
+
 	/**
 	 * This is the organisationID to which the issue comment belongs. Within one organisation,
 	 * all the issue comments have their organisation's ID stored here, thus it's the same
 	 * value for all of them.
-	 * 
+	 *
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
@@ -138,7 +144,7 @@ implements Serializable
 	 * Constructs a new IssueComment.
 	 * @param organisationID the first part of the composite primary key - referencing the organisation which owns this <code>IssueComment</code>.
 	 * @param commentID the second part of the composite primary key. Use {@link IDGenerator#nextID(Class)} with <code>IssueComment.class</code> to create an id.
-	 * @param issue the issue that this issue comment is made in 
+	 * @param issue the issue that this issue comment is made in
 	 * @param text the text of the comment
 	 * @param user the user that created this comment
 	 */
@@ -202,7 +208,7 @@ implements Serializable
 
 	@Override
 	/*
-	 * 
+	 *
 	 */
 	public boolean equals(Object obj)
 	{
@@ -214,7 +220,7 @@ implements Serializable
 
 	@Override
 	/*
-	 * 
+	 *
 	 */
 	public int hashCode()
 	{

@@ -6,10 +6,8 @@ import java.util.Set;
 
 import javax.jdo.JDODetachedFieldAccessException;
 
-import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jfire.issue.Issue;
 import org.nightlabs.jfire.issue.IssueLink;
-import org.nightlabs.jfire.issue.IssueLinkType;
 import org.nightlabs.jfire.security.User;
 
 /**
@@ -36,12 +34,7 @@ public class IssueLinkHistoryItemFactory extends IssueHistoryItemFactory {
 		//   -- Then it should also be reflected in Issue B's history that a link has been created in
 		//      [Issue B] to related to [Issue A] as [Parent of].
 		//
-		// (This information of the links should already be available through the IssueLink, right?)
-		//
-		// Similarly, when a link is removed, we should note the severance of the link of BOTH objects.
-		// FIXME This here is yet another problem found with the current implementation. The removal of one
-		//       link from one Issue, did not remove the link in the other.
-
+		// (This information of the links should already be available through the IssueLink, right?) -- Right. See notes 16.06.2009. Kai.
 		Set<IssueLink> oldIssueLinks = oldPersistentIssue.getIssueLinks();
 		Set<IssueLink> newIssueLinks = newDetachedIssue.getIssueLinks();
 
@@ -63,39 +56,44 @@ public class IssueLinkHistoryItemFactory extends IssueHistoryItemFactory {
 
 
 		// (iii) Collate them all, and generate the necessary IssueHistoryItem.
-		//       --> TRICKY part here:  1. We have to check if the linkedObject is also an Issue
-		//                              2. If so, we have to find that Issue, and also add the appropriate IssueHistoryItem to its historical list.
-		Collection<IssueHistoryItem> issueMarkerHistoryItems = new ArrayList<IssueHistoryItem>();
+		Collection<IssueHistoryItem> issueLinkHistoryItems = new ArrayList<IssueHistoryItem>();
 		for (IssueLink issueLink : addedIssueLinks) {
-			// [Default behaviour] Create a new IssueHistoryItem that a new IssueLink has been created.
-			IssueLinkType issueLinkType = issueLink.getIssueLinkType();	// <-- The relationship between the Issue and the linkedObject is indicated here in the name field.
-			Class<?> linkedObjectClass = issueLink.getLinkedObjectClass();
-			ObjectID linkedObjectID = issueLink.getLinkedObjectID();
+			// [Default behaviour]
+			// Create a new IssueHistoryItem to indicate that a new IssueLink has been created.
+			// Generate the IssueHistoryItem for the forward link.
+			issueLinkHistoryItems.add( new IssueLinkHistoryItem(
+					user, oldPersistentIssue,
+					issueLink.getIssueLinkType(), 	// <-- The relationship between the Issue and the linkedObject is indicated here in the name field.
+					IssueHistoryItemAction.ADDED,
+					issueLink.getLinkedObjectClass().getSimpleName(),
+					issueLink.getLinkedObjectID().toString()
+			));
 
-			// Add it to the IssueHistoryItems collection.
-			issueMarkerHistoryItems.add( new IssueLinkHistoryItem(
-					user, oldPersistentIssue, issueLinkType, IssueHistoryItemAction.ADDED, linkedObjectClass.getName(), linkedObjectID.toString())
-			);
+			// [Additional behaviour]
+			// If the linkedObject indicated by this IssueLink is also an Issue, then we also need to add an appropriate
+			// IssueHistoryItem for it -- based on the relationship. This relationship information should already be available.
+			// --> This is done through the method 'postCreateIssueLink(...)' in IssueLinkTypeIssueToIssue.
+		}
+
+		// Similarly, when a link is removed, we should note the severance of the link of BOTH objects.
+		for (IssueLink issueLink : removedIssueLinks) {
+			// [Default behaviour]
+			issueLinkHistoryItems.add( new IssueLinkHistoryItem(
+					user, oldPersistentIssue,
+					issueLink.getIssueLinkType(),
+					IssueHistoryItemAction.REMOVED,
+					issueLink.getLinkedObjectClass().getSimpleName(),
+					issueLink.getLinkedObjectID().toString()
+			));
 
 
-			// [Additional behaviour] If the linkedObject indicated by this IssueLink is also an Issue, then we also need to add an appropriate
-			//                        IssueHistoryItem for it -- based on the relationship. This relationship information should already be
-			//                        available (yes?).
+			// [Additional behaviour]
+			// If the linkedObject indicated by this IssueLink is also an Issue, then we also need to take care of this.
+			// --> This is done through the method 'preDeleteIssueLink(...)' in IssueLinkTypeIssueToIssue.
 		}
 
 
-		return issueMarkerHistoryItems;
-
-//		// (iii) Collate them all, and generate the necessary IssuePriorityHistoryItem.
-//		Collection<IssueHistoryItem> issueMarkerHistoryItems = new ArrayList<IssueHistoryItem>();
-//		for(IssueMarker issueMarker : addedIssueMarkers)
-//			issueMarkerHistoryItems.add( new IssueLinkHistoryItem(user, oldPersistentIssue, issueMarker, IssueHistoryItemAction.ADDED) );
-//
-//		for(IssueMarker issueMarker : removedIssueMarkers)
-//			issueMarkerHistoryItems.add( new IssueLinkHistoryItem(user, oldPersistentIssue, issueMarker, IssueHistoryItemAction.REMOVED) );
-//
-//
-//		return issueMarkerHistoryItems;
+		return issueLinkHistoryItems;
 	}
 
 }

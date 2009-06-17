@@ -29,6 +29,7 @@ public abstract class IssueHistoryItemFactory {
 		IssueWorkingStatusHistoryItemFactory.class, // [OK]
 		IssueFileAttachmentHistoryItemFactory.class, // [OK]
 		IssueLinkHistoryItemFactory.class, // [... in progress: Problem found when attempting to sever an IssueLink... aarrggg... it never ends!!]
+		                                   // <-- This one requires a different approach. See notes 16.06.2009 on "Handling the Storage of IssueLinks".
 
 //		IssueStateDefinitionHistoryItemFactory.class, // <-- oldIssue.getState().getStateDefinition().getName().getText()
 		                                              // Main problem: StateDefinition is in the JFireJbpm project, which is being referred to by this project (and not vice-versa).

@@ -83,4 +83,27 @@ public class IssueHistoryItemDAO extends BaseJDOObjectDAO<IssueHistoryItemID, Is
 			throw new RuntimeException(x);
 		}
 	}
+
+	/**
+	 * Saves a single IssueHistoryItem to the database.
+	 */
+	public synchronized IssueHistoryItem storeIssueHistoryItem(IssueHistoryItem issueHistoryItem, boolean get, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) {
+		if (issueHistoryItem == null)
+			throw new NullPointerException("The IssueHistoryItem to be saved must not be null!");
+
+		monitor.beginTask("Saving issue history...", 1);
+		try {
+			IssueManagerRemote im = JFireEjb3Factory.getRemoteBean(IssueManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			monitor.worked(1);
+
+			IssueHistoryItem result = im.storeIssueHistoryItem(issueHistoryItem, get, fetchGroups, maxFetchDepth);
+			monitor.worked(1);
+			monitor.done();
+			return result;
+
+		} catch (Exception e) {
+			monitor.done();
+			throw new RuntimeException(e);
+		}
+	}
 }

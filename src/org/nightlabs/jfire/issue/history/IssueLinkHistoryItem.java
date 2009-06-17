@@ -83,9 +83,9 @@ public class IssueLinkHistoryItem extends IssueHistoryItem {
 		String linkedObjInfoTxt = linkedObjectClassName + " [ID: " + linkedObjectID + "]";
 		switch (issueHistoryItemAction) {
 			case ADDED:
-				return String.format("Issue link CREATED: This Issue is now linked to \"%s\" as \"%s\".", linkedObjInfoTxt, issueLinkType.getName().getText());
+				return String.format("Issue link CREATED: This Issue is now \"%s\" to \"%s\".", issueLinkType.getName().getText(), linkedObjInfoTxt);
 			case REMOVED:
-				return String.format("Issue link SEVERED: This Issue is no longer linked to \"%s\" as \"%s\".", linkedObjInfoTxt, issueLinkType.getName().getText());
+				return String.format("Issue link SEVERED: This Issue is no longer \"%s\" to \"%s\".", issueLinkType.getName().getText(), linkedObjInfoTxt);
 			default:
 				throw new IllegalStateException("Unknown issueHistoryItemAction: " + issueHistoryItemAction);
 		}

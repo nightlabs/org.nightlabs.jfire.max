@@ -857,13 +857,21 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback, StoreCallbac
 	}
 
 	/**
+	 * Default values to ensure integrity of the Issue.
+	 */
+	public static final String DEFAULT_ISSUE_PRIORITY_ID = IssuePriority.ISSUE_PRIORITY_NONE;
+	public static final String DEFAULT_ISSUE_SEVERITY_TYPE_ID = IssueSeverityType.ISSUE_SEVERITY_TYPE_FEATURE;
+	public static final String DEFAULT_ISSUE_RESOLUTION_ID = IssueResolution.ISSUE_RESOLUTION_OPEN;
+
+	/**
 	 * Checks, if the issue has a jBPM process instance already and all necessary fields are assigned (i.e. not <code>null</code>).
 	 * If anything is missing, it is fixed by setting default values.
 	 */
 	public void ensureIntegrity() {
+		// --[Check PROCESS INSTANCE]---------------------------------------------------------------------------------|
 		try {
 			if (this.getStatableLocal().getJbpmProcessInstanceId() < 0) {
-				if (this.getIssueType() == null)
+				if (getIssueType() == null)
 					throw new IllegalStateException("Could not create ProcessInstance for Issue as its IssueType is null.");
 				getIssueType().createProcessInstanceForIssue(this);
 			}
@@ -871,26 +879,50 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback, StoreCallbac
 			// ignore
 		}
 
+		// --[Check PRIORITY]-----------------------------------------------------------------------------------------|
 		try {
-			// Check priority
+			if (getIssuePriority() == null) {
+				if (getIssueType() == null)
+					throw new IllegalStateException("IssueType is null. Cannot retrieve IssuePriorities.");
 
-			// TODO do it!
+				for (IssuePriority issuePriority : getIssueType().getIssuePriorities())
+					if (issuePriority.getIssuePriorityID().equals(DEFAULT_ISSUE_PRIORITY_ID)) {
+						setIssuePriority(issuePriority);
+						break;
+					}
+			}
 		} catch (JDODetachedFieldAccessException x) {
 			// ignore
 		}
 
+		// --[Check SEVERITY]-----------------------------------------------------------------------------------------|
 		try {
-			// Check severity
+			if (getIssueSeverityType() == null) {
+				if (getIssueType() == null)
+					throw new IllegalStateException("IssueType is null. Cannot retrieve IssueSeverityTypes.");
 
-			// TODO do it!
+				for (IssueSeverityType issueSeverityType : getIssueType().getIssueSeverityTypes())
+					if (issueSeverityType.getIssueSeverityTypeID().equals(DEFAULT_ISSUE_SEVERITY_TYPE_ID)) {
+						setIssueSeverityType(issueSeverityType);
+						break;
+					}
+			}
 		} catch (JDODetachedFieldAccessException x) {
 			// ignore
 		}
 
+		// --[Check RESOLUTION]---------------------------------------------------------------------------------------|
 		try {
-			// Check resolution
+			if (getIssueResolution() == null) {
+				if (getIssueType() == null)
+					throw new IllegalStateException("IssueType is null. Cannot retrieve IssueSeverityTypes.");
 
-			// TODO do it!
+				for (IssueResolution issueResolution : getIssueType().getIssueResolutions())
+					if (issueResolution.getIssueResolutionID().equals(DEFAULT_ISSUE_RESOLUTION_ID)) {
+						setIssueResolution(issueResolution);
+						break;
+					}
+			}
 		} catch (JDODetachedFieldAccessException x) {
 			// ignore
 		}

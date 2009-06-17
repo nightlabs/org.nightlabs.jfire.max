@@ -466,16 +466,15 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private List<State> states;
 
-	/**
-	 * @jdo.field
-	 *		persistence-modifier="persistent"
-	 *		collection-type="collection"
-	 *		element-type="org.nightlabs.jfire.trade.Article"
-	 *		mapped-by="invoice"
-	 */
+//	@Persistent(
+//			mappedBy="invoice",
+//			persistenceModifier=PersistenceModifier.PERSISTENT
+//	)
 	@Persistent(
-	mappedBy="invoice",
-	persistenceModifier=PersistenceModifier.PERSISTENT)
+			persistenceModifier=PersistenceModifier.PERSISTENT,
+			table="JFireTrade_Invoice_articles"
+	)
+	@Join
 	private Set<Article> articles;
 
 	/**

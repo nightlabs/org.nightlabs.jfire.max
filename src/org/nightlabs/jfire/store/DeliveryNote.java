@@ -467,16 +467,15 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private int articleCount = 0;
 
-	/**
-	 * @jdo.field
-	 *		persistence-modifier="persistent"
-	 *		collection-type="collection"
-	 *		element-type="org.nightlabs.jfire.trade.Article"
-	 *		mapped-by="deliveryNote"
-	 */
+//	@Persistent(
+//			mappedBy="deliveryNote",
+//			persistenceModifier=PersistenceModifier.PERSISTENT
+//	)
 	@Persistent(
-		mappedBy="deliveryNote",
-		persistenceModifier=PersistenceModifier.PERSISTENT)
+			persistenceModifier=PersistenceModifier.PERSISTENT,
+			table="JFireTrade_DeliveryNote_articles"
+	)
+	@Join
 	private Set<Article> articles;
 
 	/**

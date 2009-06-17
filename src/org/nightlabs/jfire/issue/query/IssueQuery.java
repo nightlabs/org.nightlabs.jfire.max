@@ -1,5 +1,6 @@
 package org.nightlabs.jfire.issue.query;
 
+import java.lang.reflect.Field;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -672,5 +673,14 @@ extends AbstractJDOQuery
 	public void setCurrentUserAsReporter() {
 		if (isSetCurrentUserAsReporter)
 			this.reporterID = SecurityReflector.getUserDescriptor().getUserObjectID();
+	}
+	
+	@Override
+	public void clearQuery() {
+		for (String fieldName : getFieldName2FieldMap().keySet()) {
+			Field field = getFieldName2FieldMap().get(fieldName);
+			if (!field.getType().isPrimitive()) 
+				setFieldValue(fieldName, null);
+		}
 	}
 }

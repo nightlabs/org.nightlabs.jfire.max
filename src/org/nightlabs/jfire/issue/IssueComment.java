@@ -55,9 +55,6 @@ import org.nightlabs.util.Util;
 	@FetchGroup(
 		name=IssueComment.FETCH_GROUP_TEXT,
 		members=@Persistent(name="text")),
-	@FetchGroup( // TODO this fetch-group is *not* necessary!
-		name=IssueComment.FETCH_GROUP_TIMESTAMP,
-		members=@Persistent(name="createTimestamp")),
 	@FetchGroup(
 		name=IssueComment.FETCH_GROUP_THIS_COMMENT,
 		members={@Persistent(name="text"), @Persistent(name="createTimestamp"), @Persistent(name="user")})
@@ -76,14 +73,6 @@ implements Serializable
 
 	public static final String FETCH_GROUP_USER = "IssueComment.user";
 	public static final String FETCH_GROUP_TEXT = "IssueComment.text";
-	/**
-	 * @deprecated This fetch-group is not necessary, because all simple fields including java.util.Date and java.lang.String
-	 * are in the default-fetch-group! Read http://www.datanucleus.org/products/accessplatform_1_1/jdo/fetchgroup.html
-	 * and REMOVE THIS FETCH-GROUP!!! Marco.
-	 */
-	@Deprecated
-	public static final String FETCH_GROUP_TIMESTAMP = "IssueComment.createTimestamp";
-
 
 
 	/**

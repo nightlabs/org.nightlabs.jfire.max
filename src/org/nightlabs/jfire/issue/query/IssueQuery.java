@@ -674,13 +674,4 @@ extends AbstractJDOQuery
 		if (isSetCurrentUserAsReporter)
 			this.reporterID = SecurityReflector.getUserDescriptor().getUserObjectID();
 	}
-	
-	@Override
-	public void clearQuery() {
-		for (String fieldName : getFieldName2FieldMap().keySet()) {
-			Field field = getFieldName2FieldMap().get(fieldName);
-			if (!field.getType().isPrimitive()) 
-				setFieldValue(fieldName, null);
-		}
-	}
 }

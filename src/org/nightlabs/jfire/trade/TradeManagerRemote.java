@@ -357,7 +357,7 @@ public interface TradeManagerRemote {
 	 * <p>
 	 * TODO https://www.jfire.org/modules/bugs/view.php?id=896
 	 * </p>
-	 * @param legalEntity The LegalEntity to be stored
+	 * @param newEndCustomer The LegalEntity to be stored
 	 * @param get Whether the stored instance or null should be returned.
 	 * @param fetchGroups The fetchGroups the returned LegalEntity should be detached with
 	 * @return The stored LegalEntity or null

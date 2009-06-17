@@ -55,7 +55,9 @@ import javax.jdo.annotations.PrimaryKey;
 import javax.jdo.annotations.Queries;
 import javax.jdo.annotations.Version;
 import javax.jdo.annotations.VersionStrategy;
+import javax.jdo.listener.AttachCallback;
 import javax.jdo.listener.DetachCallback;
+import javax.jdo.listener.StoreCallback;
 
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.accounting.Currency;
@@ -65,6 +67,7 @@ import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.prop.PropertySet;
 import org.nightlabs.jfire.prop.Struct;
 import org.nightlabs.jfire.prop.StructLocal;
+import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.security.id.UserID;
 import org.nightlabs.jfire.trade.id.OrderID;
@@ -230,7 +233,7 @@ import org.nightlabs.util.Util;
 })
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class Order
-implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
+implements Serializable, ArticleContainer, SegmentContainer, DetachCallback, AttachCallback, StoreCallback
 {
 	private static final long serialVersionUID = 1L;
 
@@ -773,6 +776,15 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 	}
 
 	public void setEndCustomer(LegalEntity endCustomer) {
+		if (Util.equals(this.endCustomer, endCustomer))
+			return;
+
+		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
+		if (pm != null) {
+			User user = SecurityReflector.getUserDescriptor().getUser(pm);
+			pm.makePersistent(new ArticleContainerEndCustomerHistoryItem(this, this.endCustomer, endCustomer, user));
+		}
+
 		this.endCustomer = endCustomer;
 
 		this.endCustomerID = null;
@@ -998,6 +1010,24 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 		if (fetchGroups.contains(FETCH_GROUP_END_CUSTOMER_ID)) {
 			detached.endCustomerID = attached.getEndCustomerID();
 			detached.endCustomerID_detached = true;
+		}
+	}
+
+	@Override
+	public void jdoPreAttach() {
+		// We currently do not attach any ArticleContainer. If we ever do, we have to handle the
+		// creation of ArticleContainerEndCustomerHistoryItems. Marco.
+	}
+
+	@Override
+	public void jdoPostAttach(Object o) { }
+
+	@Override
+	public void jdoPreStore() {
+		if (JDOHelper.isNew(this) && endCustomer != null) {
+			PersistenceManager pm = getPersistenceManager();
+			User user = SecurityReflector.getUserDescriptor().getUser(pm);
+			pm.makePersistent(new ArticleContainerEndCustomerHistoryItem(this, null, endCustomer, user));
 		}
 	}
 

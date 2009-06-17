@@ -353,9 +353,4 @@ public class AccountQuery
 	{
 		return Account.class;
 	}
-
-	@Override
-	public void clearQuery() {
-		
-	}
 }

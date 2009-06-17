@@ -165,9 +165,4 @@ public abstract class AbstractTransferQuery
 		this.toAnchorID = toAnchorID;
 		notifyListeners(FieldName.toAnchorID, oldToAnchorID, toAnchorID);
 	}
-	
-	@Override
-	public void clearQuery() {
-		
-	}
 }

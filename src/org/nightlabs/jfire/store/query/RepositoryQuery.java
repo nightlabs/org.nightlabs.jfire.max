@@ -323,11 +323,4 @@ public class RepositoryQuery
 	{
 		return Repository.class;
 	}
-
-	@Override
-	public void clearQuery() {
-		// TODO Auto-generated method stub
-		
-	}
-
 }

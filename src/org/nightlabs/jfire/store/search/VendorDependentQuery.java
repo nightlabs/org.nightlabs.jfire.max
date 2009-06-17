@@ -55,9 +55,4 @@ public abstract class VendorDependentQuery
 
 		q.setFilter(filter.toString());
 	}
-
-	@Override
-	public void clearQuery() {
-		
-	}
 }

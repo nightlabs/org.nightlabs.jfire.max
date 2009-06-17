@@ -245,8 +245,4 @@ public class StatableQuery
 	{
 		return statableClass != null ? statableClass : super.getResultClass();
 	}
-
-	@Override
-	public void clearQuery() {
-	}
 }

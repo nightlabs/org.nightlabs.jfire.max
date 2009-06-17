@@ -97,4 +97,8 @@ extends AbstractJDOQuery
 		this.productTypeID = productTypeID;
 	}
 
+	@Override
+	public void clearQuery() {
+		
+	}
 }

@@ -546,4 +546,7 @@ public abstract class AbstractArticleContainerQuery
 		this.productTypeID = productTypeID;
 	}
 
+	@Override
+	public void clearQuery() {
+	}
 }

@@ -1,7 +1,5 @@
 package org.nightlabs.jfire.issue;
 
-import java.util.Set;
-
 import javax.jdo.FetchPlan;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
@@ -70,13 +68,13 @@ extends IssueLinkType {
 
 		// Guard: Prevents this from causing an ETERNAL recursion.
 		// => find out, if the other side already has an issue-link of the required type pointing back
-		Set<IssueLink> issueLinksOfIssueOnOtherSide = issue_otherSide.getIssueLinks();
-		for (IssueLink issueLinkOfIssueOnOtherSide : issueLinksOfIssueOnOtherSide) {
-			if (issueLinkOfIssueOnOtherSide.getIssueLinkType().equals(issueLinkType_otherSide)
-					&& issueLinkOfIssueOnOtherSide.getLinkedObject().equals(issue_thisSide)); // issueLink_thisSide.getIssue()))
-				return;
-		}
+		for (IssueLink issueLink_otherSide : issue_otherSide.getIssueLinks())
+			if (issueLink_otherSide.getIssueLinkType().equals(issueLinkType_otherSide)) {
+				if (issueLink_otherSide.getLinkedObject().equals(issue_thisSide))
+					return;
+			}
 
+		// OK to create the link.
 		issue_otherSide.createIssueLink(issueLinkType_otherSide, issue_thisSide);
 
 
@@ -108,15 +106,6 @@ extends IssueLinkType {
 		//    [ issue_thisSide ]                                   [ issue_otherSide ]
 		//    [________________]<<--- issueLinkType_otherSide ----♦[_________________]
 
-		// From previous references:
-		//    A. issueLinkToBeDeleted == issueLink_ThisSide
-		//    B. issueLinkTypeToBeDeleted == issueLinkType_thisSide
-		//    C. issueLinkTypeOnAnotherSide == issueLinkType_otherSide
-		//    D. issueOnOtherSide == issue_otherSide
-		//    E. anotherSideObject == linkedObject_otherSide
-		//    F. thisSideObject == object_thisSide
-		//    G. issueLinkOnOtherSide == issueLink_otherSide
-
 		// -- 1. [Remove the reverse link]--------------------------------------------------------------------------------------|
 		IssueLinkType issueLinkType_thisSide = issueLink_thisSide.getIssueLinkType();
 		IssueLinkTypeID issueLinkTypeIDToBeDeleted = (IssueLinkTypeID) JDOHelper.getObjectId(issueLinkType_thisSide);
@@ -132,8 +121,7 @@ extends IssueLinkType {
 		// Find the correct reverse link to be removed.
 		// --> Aha! There is NO guard to prevent ETERNAL recursion?? Well, that's because we dont need for a guard here.
 		boolean isIssueLinkFound = false;
-		Set<IssueLink> issueLinksOnOtherSide = issue_otherSide.getIssueLinks();
-		for (IssueLink issueLink_otherSide : issueLinksOnOtherSide) {
+		for (IssueLink issueLink_otherSide : issue_otherSide.getIssueLinks()) {
 			Object linkedObject_otherSide = issueLink_otherSide.getLinkedObject();
 			if ( linkedObject_otherSide.equals(issue_thisSide) ) {
 				if (issueLinkType_otherSide.equals(issueLink_otherSide.getIssueLinkType())) {

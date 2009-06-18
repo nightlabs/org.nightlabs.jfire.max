@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.security.RolesAllowed;
@@ -818,4 +819,22 @@ public interface TradeManagerRemote {
 	@RolesAllowed("_Guest_")
 	String ping(String message);
 
+	/**
+	 * Assign deliveryDates to the given articles.
+	 *
+	 * @param articleID2Date the object-ids of the articles with the coreesponding delivery date as map.
+	 * @param DeliveryDateMode indicates whether to set the {@link Article#setDeliveryDateOffer(Date)} or {@link Article#setDeliveryDateDeliveryNote(Date)}.
+	 * @param get <code>false</code> if no result is desired (this method will return <code>null</code>) or <code>true</code> to get the specified articles
+	 * @param fetchGroups the fetch-groups in case the affected articles shall be detached and returned. This is ignored, if <code>get</code> is <code>false</code>.
+	 * @param maxFetchDepth the maximum fetch-depth - ignored, if <code>get</code> is <code>false</code>.
+	 * @return either <code>null</code>, if <code>get</code> is <code>false</code> or the articles identified by <code>articleIDs</code>.
+	 *
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="org.nightlabs.jfire.trade.editOffer"
+	 * @ejb.transaction type="Required"
+	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("org.nightlabs.jfire.trade.editOffer")
+	Collection<Article> assignDeliveryDate(Map<ArticleID, Date> articleID2Date, DeliveryDateMode mode, boolean get, String[] fetchGroups,
+			int maxFetchDepth);
 }

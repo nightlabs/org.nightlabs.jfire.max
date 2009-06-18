@@ -35,6 +35,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.security.RolesAllowed;
@@ -2112,5 +2113,46 @@ implements TradeManagerRemote, TradeManagerLocal
 			pm.close();
 		}
 	}
+
+
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.trade.TradeManagerRemote#assignDeliveryDate(java.util.Map, org.nightlabs.jfire.trade.DeliveryDateMode, boolean, java.lang.String[], int)
+	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("org.nightlabs.jfire.trade.editOffer")
+	@Override
+	public Collection<Article> assignDeliveryDate(
+			Map<ArticleID, Date> articleID2Date, DeliveryDateMode mode,
+			boolean get, String[] fetchGroups, int maxFetchDepth)
+	{
+		PersistenceManager pm = createPersistenceManager();
+		try {
+			Collection<Article> articles = new ArrayList<Article>(articleID2Date.size());
+			for (Map.Entry<ArticleID, Date> entry : articleID2Date.entrySet()) {
+				Article article = (Article) pm.getObjectById(entry.getKey());
+				switch (mode) {
+					case OFFER:
+						article.setDeliveryDateOffer(entry.getValue());
+						break;
+					case DELIVERY_NOTE:
+						article.setDeliveryDateDeliveryNote(entry.getValue());
+						break;
+				}
+				articles.add(article);
+			}
+
+			if (!get)
+				return null;
+
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+			if (fetchGroups != null)
+				pm.getFetchPlan().setGroups(fetchGroups);
+
+			return pm.detachCopyAll(articles);
+		} finally {
+			pm.close();
+		}
+	}
+
 }
 

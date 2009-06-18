@@ -815,6 +815,22 @@ implements Serializable, DeleteCallback, DetachCallback, StoreCallback
 	private boolean releaseAbandoned = false;
 
 	/**
+	 * This field describes the estimated delivery date for the article,
+	 * which can be determined in the offer.
+	 * This field may be null, if no delivery date was specified.
+	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+	private Date deliveryDateOffer = null;
+
+	/**
+	 * This field describes the estimated delivery date for the article,
+	 * which can be determined in the delivery note.
+	 * This field may be null, if no delivery date was specified.
+	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+	private Date deliveryDateDeliveryNote = null;
+
+	/**
 	 * @deprecated Only for JDO!
 	 */
 	@Deprecated
@@ -1598,6 +1614,49 @@ implements Serializable, DeleteCallback, DetachCallback, StoreCallback
 		ArticleLocal al = new ArticleLocal(this);
 		setArticleLocal(al);
 		return al;
+	}
+
+
+	/**
+	 * Returns the estimated delivery date for this article specified in the corresponding {@link Offer}.
+	 * @return the deliveryDateOffer (may be null)
+	 */
+	public Date getDeliveryDateOffer() {
+		return deliveryDateOffer;
+	}
+
+	/**
+	 * Sets the estimated delivery date for this article specified in the corresponding {@link Offer}.
+	 * This may only be set until the corresponding {@link Offer} where this article is contained in, is not yet finalized,
+	 * otherwise an exception is thrown.
+	 * @param deliveryDateOffer the deliveryDateOffer to set
+	 */
+	public void setDeliveryDateOffer(Date deliveryDateOffer) {
+		if (offer.isFinalized()) {
+			throw new IllegalStateException("Once the offer of an article is finalized, the deliveryDateOffer for the article can not be changed anymore!");
+		}
+		this.deliveryDateOffer = deliveryDateOffer;
+	}
+
+	/**
+	 * Returns the estimated delivery date for this article specified in the corresponding {@link DeliveryNote}.
+	 * @return the deliveryDateDeliveryNote (may be null)
+	 */
+	public Date getDeliveryDateDeliveryNote() {
+		return deliveryDateDeliveryNote;
+	}
+
+	/**
+	 * Sets the estimated delivery date for this article specified in the corresponding {@link DeliveryNote}.
+	 * This may only be set until the corresponding {@link DeliveryNote} where this article is contained in, is not yet finalized,
+	 * otherwise an exception is thrown.
+	 * @param deliveryDateDeliveryNote the deliveryDateDeliveryNote to set
+	 */
+	public void setDeliveryDateDeliveryNote(Date deliveryDateDeliveryNote) {
+		if (deliveryNote.isFinalized()) {
+			throw new IllegalStateException("Once the delivery note of an article is finalized, the deliveryDateDeliveryNote for the article can not be changed anymore!");
+		}
+		this.deliveryDateDeliveryNote = deliveryDateDeliveryNote;
 	}
 
 	@Override

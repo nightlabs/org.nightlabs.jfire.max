@@ -130,13 +130,11 @@ implements Serializable
 	 * @jdo.column length="100"
 	 */	@PrimaryKey
 	@Column(length=100)
-
 	private String organisationID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 */	@PrimaryKey
-
 	private String issueLinkTypeID;
 
 	/**
@@ -163,7 +161,6 @@ implements Serializable
 		dependent="true",
 		mappedBy="issueLinkType",
 		persistenceModifier=PersistenceModifier.PERSISTENT)
-
 	private IssueLinkTypeName name;
 	/**
 	 * @deprecated Only for JDO!!!!
@@ -293,7 +290,25 @@ implements Serializable
 	 * @param newIssueLink the newly created and already persisted (in the same transaction) IssueLink.
 	 * @see #preDeleteIssueLink(IssueLink)
 	 */
-	protected void postCreateIssueLink(PersistenceManager pm, IssueLink newIssueLink) { }
+	protected void postCreateIssueLink(PersistenceManager pm, IssueLink newIssueLink) {
+		// [Observation 19.06.2009]: Kai.
+		//   Here is something interesting. This base IssueLinkType class is identified essentially as 'ISSUE_LINK_TYPE_ID_RELATED'.
+		//   And as such, the codes presently do not process the generation of the reverse link between two Issues when they
+		//   are 'Related'. That is, the general codes handling 'ISSUE_LINK_TYPE_ID_PARENT', 'ISSUE_LINK_TYPE_ID_CHILD', and
+		//   'ISSUE_LINK_TYPE_ID_DUPLICATE' are in the subclass IssueLinkTypeIssueToIssue!
+		//
+		//   So, while in the general case, in which an IssueLink is uni-directional linking an Issue to an arbitrary linkedObject,
+		//   the default IssueLinkType is correctly set to 'ISSUE_LINK_TYPE_ID_RELATED' with no need to generate a reverse link, it
+		//   is not true for the case that the linkedObject is also an Issue.
+		//
+		// [Proposed solution to overcome this weird situation]:
+		//   1. Check to see if the linkedObject is an Issue.
+		//   2. If so, then we generate the reverse link.
+
+		Object linkedObject = newIssueLink.getLinkedObject();
+		if (linkedObject instanceof Issue)
+			IssueLinkTypeIssueToIssue.generateIssueToIssueReverseLink(pm, newIssueLink, (Issue)linkedObject);
+	}
 
 	/**
 	 * Callback method triggered before an {@link IssueLink} instance has been deleted from the datastore.
@@ -301,7 +316,14 @@ implements Serializable
 	 * @param issueLinkToBeDeleted the <code>IssueLink</code> that is about to be deleted.
 	 * @see #postCreateIssueLink(IssueLink)
 	 */
-	protected void preDeleteIssueLink(PersistenceManager pm, IssueLink issueLinkToBeDeleted) { }
+	protected void preDeleteIssueLink(PersistenceManager pm, IssueLink issueLinkToBeDeleted) {
+		// See notes in [Observation 19.06.2009] in postCreateIssueLink(). Kai.
+		// The reverse of the argument is also true here.
+
+		Object linkedObject = issueLinkToBeDeleted.getLinkedObject();
+		if (linkedObject instanceof Issue)
+			IssueLinkTypeIssueToIssue.removeIssueToIssueReverseLink(pm, issueLinkToBeDeleted, (Issue)linkedObject);
+	}
 
 	/*
 	 * (non-Javadoc)

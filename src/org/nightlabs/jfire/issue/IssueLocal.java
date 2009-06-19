@@ -20,6 +20,7 @@ import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.PersistenceModifier;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.listener.DeleteCallback;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.jfire.issue.id.IssueLocalID;
@@ -89,7 +90,7 @@ import org.nightlabs.util.Util;
 })
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class IssueLocal
-implements Serializable, StatableLocal
+implements Serializable, StatableLocal, DeleteCallback
 {
 	private static final long serialVersionUID = 1L;
 
@@ -328,14 +329,27 @@ implements Serializable, StatableLocal
 		return primaryKey;
 	}
 
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
+	private transient Set<State> statesToDelete = null;
+
 	/*
 	 * (non-Javadoc)
 	 */
 	protected Set<State> clearStatesBeforeDelete() {
+		if (statesToDelete != null)
+			return statesToDelete;
+
 		Set<State> res = new HashSet<State>(this.states);
 		res.add(this.state);
 		this.state = null;
 		this.states.clear();
+		statesToDelete = res;
 		return res;
+	}
+
+	@Override
+	public void jdoPreDelete() {
+		clearStatesBeforeDelete();
+		getPersistenceManager().flush();
 	}
 }

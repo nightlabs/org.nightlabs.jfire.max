@@ -51,7 +51,12 @@ public abstract class IssueLinkTypeIssueToIssue extends IssueLinkType {
 	}
 
 
-
+//@Kai: It's not nice to have this code here which knows subclasses of this IssueType! This method
+// should have (an) abstract method(s) that provides the information about the mapping. This abstract
+// method could alternatively be non-abstract (i.e. a default implementation) that returns the same
+// type (to reverse the back-reference-issue-link). Only those subclasses that need different values (i.e. parent/child)
+// would override this method to return the "partner" issue-type. Marco.
+//
 	// Note: It seems that the way that this was being utilised, we should have this as a static method instead, and then
 	//       make this a general class(?) to handle IssueToIssue; since nothing in the methods refer to any of the internal
 	//       variables in this class, or in the super class. Kai.

@@ -39,6 +39,8 @@ import org.nightlabs.jfire.dynamictrade.recurring.DynamicProductTypeRecurringTra
 import org.nightlabs.jfire.dynamictrade.store.DynamicProduct;
 import org.nightlabs.jfire.dynamictrade.store.DynamicProductType;
 import org.nightlabs.jfire.dynamictrade.store.DynamicProductTypeActionHandler;
+import org.nightlabs.jfire.dynamictrade.template.DynamicProductTemplate;
+import org.nightlabs.jfire.dynamictrade.template.id.DynamicProductTemplateID;
 import org.nightlabs.jfire.organisation.LocalOrganisation;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.security.Authority;
@@ -86,6 +88,7 @@ implements DynamicTradeManagerRemote
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("_System_")
+	@Override
 	public void initialise() throws Exception
 	{
 		PersistenceManager pm = createPersistenceManager();
@@ -151,9 +154,35 @@ implements DynamicTradeManagerRemote
 			root.setPackagePriceConfig(PackagePriceConfig.getPackagePriceConfig(pm));
 			root.setDeliveryConfiguration(deliveryConfiguration);
 			store.setProductTypeStatus_published(user, root);
+
+			createTestData(pm);
 		} finally {
 			pm.close();
 		}
+	}
+
+	private static void createTestData(PersistenceManager pm) throws Exception
+	{
+		DynamicProductTemplate cat_a = pm.makePersistent(new DynamicProductTemplate(null, true));
+		cat_a.getName().setText(Locale.ENGLISH.getLanguage(), "Cat A");
+
+		DynamicProductTemplate cat_a_a = pm.makePersistent(new DynamicProductTemplate(cat_a, true));
+		cat_a_a.getName().setText(Locale.ENGLISH.getLanguage(), "Cat A/A");
+
+		DynamicProductTemplate cat_a_a_a = pm.makePersistent(new DynamicProductTemplate(cat_a_a, false));
+		cat_a_a_a.getName().setText(Locale.ENGLISH.getLanguage(), "Template A/A/A");
+
+		DynamicProductTemplate cat_a_a_b = pm.makePersistent(new DynamicProductTemplate(cat_a_a, false));
+		cat_a_a_b.getName().setText(Locale.ENGLISH.getLanguage(), "Template A/A/B");
+
+		DynamicProductTemplate cat_a_b = pm.makePersistent(new DynamicProductTemplate(cat_a, true));
+		cat_a_b.getName().setText(Locale.ENGLISH.getLanguage(), "Cat A/B");
+
+		DynamicProductTemplate cat_a_b_a = pm.makePersistent(new DynamicProductTemplate(cat_a_b, false));
+		cat_a_b_a.getName().setText(Locale.ENGLISH.getLanguage(), "Template A/B/A");
+
+		DynamicProductTemplate cat_b = pm.makePersistent(new DynamicProductTemplate(null, true));
+		cat_b.getName().setText(Locale.ENGLISH.getLanguage(), "Cat B");
 	}
 
 	/**
@@ -162,6 +191,7 @@ implements DynamicTradeManagerRemote
 	 * @ejb.permission role-name="org.nightlabs.jfire.store.seeProductType"
 	 */
 	@RolesAllowed("org.nightlabs.jfire.store.seeProductType")
+	@Override
 	public Set<ProductTypeID> getChildDynamicProductTypeIDs(ProductTypeID parentDynamicProductTypeID)
 	{
 		PersistenceManager pm = createPersistenceManager();
@@ -234,8 +264,9 @@ implements DynamicTradeManagerRemote
 	/* (non-Javadoc)
 	 * @see org.nightlabs.jfire.dynamictrade.DynamicTradeManagerRemote#storeDynamicProductType(org.nightlabs.jfire.dynamictrade.store.DynamicProductType, boolean, java.lang.String[], int)
 	 */
-@TransactionAttribute(TransactionAttributeType.REQUIRED)
-@RolesAllowed("org.nightlabs.jfire.store.editUnconfirmedProductType")
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("org.nightlabs.jfire.store.editUnconfirmedProductType")
+	@Override
 	public DynamicProductType storeDynamicProductType(DynamicProductType dynamicProductType, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
 		if (dynamicProductType == null)
@@ -384,6 +415,7 @@ implements DynamicTradeManagerRemote
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("org.nightlabs.jfire.accounting.editPriceConfiguration")
+	@Override
 	public Collection<DynamicTradePriceConfig> storeDynamicTradePriceConfigs(Collection<DynamicTradePriceConfig> priceConfigs, boolean get, AssignInnerPriceConfigCommand assignInnerPriceConfigCommand)
 	throws PriceCalculationException
 	{
@@ -440,6 +472,7 @@ implements DynamicTradeManagerRemote
 	 */
 	@RolesAllowed("org.nightlabs.jfire.accounting.queryPriceConfigurations")
 	@SuppressWarnings("unchecked")
+	@Override
 	public Set<PriceConfigID> getDynamicTradePriceConfigIDs()
 	{
 		PersistenceManager pm = createPersistenceManager();
@@ -458,6 +491,7 @@ implements DynamicTradeManagerRemote
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
 	@RolesAllowed("org.nightlabs.jfire.accounting.queryPriceConfigurations")
+	@Override
 	public List<DynamicTradePriceConfig> getDynamicTradePriceConfigs(Collection<PriceConfigID> dynamicTradePriceConfigIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = createPersistenceManager();
@@ -477,6 +511,7 @@ implements DynamicTradeManagerRemote
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("org.nightlabs.jfire.trade.editOffer")
+	@Override
 	public	Article createRecurringArticle(SegmentID segmentID,
 			OfferID offerID,
 			ProductTypeID productTypeID,
@@ -514,6 +549,7 @@ implements DynamicTradeManagerRemote
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("org.nightlabs.jfire.trade.editOffer")
+	@Override
 	public Article createArticle(
 			SegmentID segmentID,
 			OfferID offerID,
@@ -559,6 +595,7 @@ implements DynamicTradeManagerRemote
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("org.nightlabs.jfire.trade.editOffer")
+	@Override
 	public Article modifyArticle(
 			ArticleID articleID,
 			Long quantity,
@@ -662,4 +699,45 @@ implements DynamicTradeManagerRemote
 		}
 	}
 
+
+	@RolesAllowed("_Guest_")
+	@Override
+	public DynamicProductTemplate storeDynamicProductTemplate(
+			DynamicProductTemplate dynamicProductTemplate,
+			boolean get,
+			String[] fetchGroups, int maxFetchDepth
+	)
+	{
+		PersistenceManager pm = createPersistenceManager();
+		try {
+			return NLJDOHelper.storeJDO(pm, dynamicProductTemplate, get, fetchGroups, maxFetchDepth);
+		} finally {
+			pm.close();
+		}
+	}
+
+	@RolesAllowed("_Guest_")
+	@Override
+	public Collection<DynamicProductTemplateID> getChildDynamicProductTemplateIDs(DynamicProductTemplateID parentCategoryID)
+	{
+		PersistenceManager pm = createPersistenceManager();
+		try {
+			DynamicProductTemplate parentCategory = parentCategoryID == null ? null : (DynamicProductTemplate) pm.getObjectById(parentCategoryID);
+			return NLJDOHelper.getObjectIDList(DynamicProductTemplate.getChildDynamicProductTemplates(pm, parentCategory));
+		} finally {
+			pm.close();
+		}
+	}
+
+	@RolesAllowed("_Guest_")
+	@Override
+	public Collection<DynamicProductTemplate> getDynamicProductTemplates(Collection<DynamicProductTemplateID> dynamicProductTemplateIDs, String[] fetchGroups, int maxFetchDepth)
+	{
+		PersistenceManager pm = createPersistenceManager();
+		try {
+			return NLJDOHelper.getDetachedObjectSet(pm, dynamicProductTemplateIDs, DynamicProductTemplate.class, fetchGroups, maxFetchDepth);
+		} finally {
+			pm.close();
+		}
+	}
 }

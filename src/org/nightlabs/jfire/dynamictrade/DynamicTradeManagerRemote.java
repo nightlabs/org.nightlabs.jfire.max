@@ -15,6 +15,8 @@ import org.nightlabs.jfire.accounting.id.TariffID;
 import org.nightlabs.jfire.accounting.priceconfig.id.PriceConfigID;
 import org.nightlabs.jfire.dynamictrade.accounting.priceconfig.DynamicTradePriceConfig;
 import org.nightlabs.jfire.dynamictrade.store.DynamicProductType;
+import org.nightlabs.jfire.dynamictrade.template.DynamicProductTemplate;
+import org.nightlabs.jfire.dynamictrade.template.id.DynamicProductTemplateID;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.store.id.UnitID;
 import org.nightlabs.jfire.trade.Article;
@@ -81,5 +83,14 @@ public interface DynamicTradeManagerRemote
 			String[] fetchGroups, int maxFetchDepth);
 
 	String ping(String message);
+
+	DynamicProductTemplate storeDynamicProductTemplate(DynamicProductTemplate dynamicProductTemplate, boolean get, String[] fetchGroups, int maxFetchDepth);
+
+	Collection<DynamicProductTemplateID> getChildDynamicProductTemplateIDs(DynamicProductTemplateID parentCategoryID);
+
+	Collection<DynamicProductTemplate> getDynamicProductTemplates(
+			Collection<DynamicProductTemplateID> dynamicProductTemplateIDs, String[] fetchGroups,
+			int maxFetchDepth
+	);
 
 }

@@ -1,5 +1,6 @@
 package org.nightlabs.jfire.issue;
 
+import javax.jdo.JDOHelper;
 import javax.jdo.annotations.IdentityType;
 import javax.jdo.annotations.Inheritance;
 import javax.jdo.annotations.InheritanceStrategy;
@@ -38,6 +39,21 @@ public class IssueLinkTypeParentChild extends IssueLinkTypeIssueToIssue {
 		super(issueLinkTypeID);
 		if (!ISSUE_LINK_TYPE_ID_CHILD.equals(issueLinkTypeID) && !ISSUE_LINK_TYPE_ID_PARENT.equals(issueLinkTypeID))
 			throw new IllegalArgumentException("Illegal issueLinkTypeID! Only ISSUE_LINK_TYPE_ID_PARENT and ISSUE_LINK_TYPE_ID_CHILD are allowed! " + issueLinkTypeID);
+	}
+
+	@Override
+	protected IssueLinkTypeID getReverseIssueLinkTypeID() {
+		IssueLinkTypeID issueLinkTypeID = (IssueLinkTypeID) JDOHelper.getObjectId(this);
+		if (issueLinkTypeID == null)
+			throw new IllegalStateException("JDOHelper.getObjectId(this) returned null! " + this);
+
+		if (ISSUE_LINK_TYPE_ID_PARENT.equals(issueLinkTypeID))
+			return ISSUE_LINK_TYPE_ID_CHILD;
+
+		if (ISSUE_LINK_TYPE_ID_CHILD.equals(issueLinkTypeID))
+			return ISSUE_LINK_TYPE_ID_PARENT;
+
+		throw new IllegalStateException("IssueLinkTypeID of this instance is illegal! " + this);
 	}
 
 //	@Override

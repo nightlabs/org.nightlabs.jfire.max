@@ -13,6 +13,7 @@ import org.nightlabs.jfire.issue.history.FetchGroupsIssueHistoryItem;
 import org.nightlabs.jfire.issue.history.IssueHistoryItemAction;
 import org.nightlabs.jfire.issue.history.IssueLinkHistoryItem;
 import org.nightlabs.jfire.issue.id.IssueLinkTypeID;
+import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.security.User;
 
@@ -33,7 +34,7 @@ import org.nightlabs.jfire.security.User;
 	identityType=IdentityType.APPLICATION,
 	detachable="true")
 @Inheritance(strategy=InheritanceStrategy.SUPERCLASS_TABLE)
-public abstract class IssueLinkTypeIssueToIssue extends IssueLinkType {
+public class IssueLinkTypeIssueToIssue extends IssueLinkType {
 	private static final long serialVersionUID = 3707016637193680759L;
 
 	/**
@@ -50,6 +51,16 @@ public abstract class IssueLinkTypeIssueToIssue extends IssueLinkType {
 		super(issueLinkTypeID);
 	}
 
+	// The following IssueLinkTypes are commonly existing as instances of IssueLinkTypeIssueToIssue - there might,
+	// however, be more (including ones that might have been created in the UI - once we have UI for it).
+//	public static final IssueLinkTypeID ISSUE_LINK_TYPE_ID_DUPLICATE = IssueLinkTypeID.create(Organisation.DEV_ORGANISATION_ID, "duplicate");
+	//We better make duplicate asymmetric, too.
+
+	/**
+	 * This IssueLinkType replaces the generic "related" {@link IssueLinkType#ISSUE_LINK_TYPE_ID_RELATED} for Issues
+	 * (the default "related" is blacklisted of the linked-object-class "Issue").
+	 */
+	public static final IssueLinkTypeID ISSUE_LINK_TYPE_ID_RELATED_ISSUE = IssueLinkTypeID.create(Organisation.DEV_ORGANISATION_ID, "relatedIssue");
 
 //@Kai: It's not nice to have this code here which knows subclasses of this IssueType! This method
 // should have (an) abstract method(s) that provides the information about the mapping. This abstract
@@ -57,24 +68,44 @@ public abstract class IssueLinkTypeIssueToIssue extends IssueLinkType {
 // type (to reverse the back-reference-issue-link). Only those subclasses that need different values (i.e. parent/child)
 // would override this method to return the "partner" issue-type. Marco.
 //
-	// Note: It seems that the way that this was being utilised, we should have this as a static method instead, and then
-	//       make this a general class(?) to handle IssueToIssue; since nothing in the methods refer to any of the internal
-	//       variables in this class, or in the super class. Kai.
-	// --- 8< --- KaiExperiments: since 19.06.2009 ------------------
-	/**
-	 * Given the current {@link IssueLinkTypeID}, return its corresponding reverse symmetric {@link IssueLinkType}.
-	 */
-	public static IssueLinkType getReverseSymmetricIssueLinkType(PersistenceManager pm, IssueLinkTypeID issueLinkTypeID) {
-		if (IssueLinkTypeParentChild.ISSUE_LINK_TYPE_ID_PARENT.equals(issueLinkTypeID))   return (IssueLinkType) pm.getObjectById(IssueLinkTypeParentChild.ISSUE_LINK_TYPE_ID_CHILD);
-		if (IssueLinkTypeParentChild.ISSUE_LINK_TYPE_ID_CHILD.equals(issueLinkTypeID))    return (IssueLinkType) pm.getObjectById(IssueLinkTypeParentChild.ISSUE_LINK_TYPE_ID_PARENT);
-		if (IssueLinkTypeDuplicate.ISSUE_LINK_TYPE_ID_DUPLICATE.equals(issueLinkTypeID))  return (IssueLinkType) pm.getObjectById(IssueLinkTypeDuplicate.ISSUE_LINK_TYPE_ID_DUPLICATE);
-		if (IssueLinkType.ISSUE_LINK_TYPE_ID_RELATED.equals(issueLinkTypeID))             return (IssueLinkType) pm.getObjectById(IssueLinkType.ISSUE_LINK_TYPE_ID_RELATED);
+//	// Note: It seems that the way that this was being utilised, we should have this as a static method instead, and then
+//	//       make this a general class(?) to handle IssueToIssue; since nothing in the methods refer to any of the internal
+//	//       variables in this class, or in the super class. Kai.
+//	// --- 8< --- KaiExperiments: since 19.06.2009 ------------------
+//	/**
+//	 * Given the current {@link IssueLinkTypeID}, return its corresponding reverse symmetric {@link IssueLinkType}.
+//	 */
+//	public static IssueLinkType getReverseSymmetricIssueLinkType(PersistenceManager pm, IssueLinkTypeID issueLinkTypeID) {
+//		if (IssueLinkTypeParentChild.ISSUE_LINK_TYPE_ID_PARENT.equals(issueLinkTypeID))   return (IssueLinkType) pm.getObjectById(IssueLinkTypeParentChild.ISSUE_LINK_TYPE_ID_CHILD);
+//		if (IssueLinkTypeParentChild.ISSUE_LINK_TYPE_ID_CHILD.equals(issueLinkTypeID))    return (IssueLinkType) pm.getObjectById(IssueLinkTypeParentChild.ISSUE_LINK_TYPE_ID_PARENT);
+//		if (IssueLinkTypeDuplicate.ISSUE_LINK_TYPE_ID_DUPLICATE.equals(issueLinkTypeID))  return (IssueLinkType) pm.getObjectById(IssueLinkTypeDuplicate.ISSUE_LINK_TYPE_ID_DUPLICATE);
+//		if (IssueLinkType.ISSUE_LINK_TYPE_ID_RELATED.equals(issueLinkTypeID))             return (IssueLinkType) pm.getObjectById(IssueLinkType.ISSUE_LINK_TYPE_ID_RELATED);
+//
+//		throw new IllegalArgumentException("Illegal issueLinkTypeID " + issueLinkTypeID + "!");
+//	}
+//	// ------ KaiExperiments ----- >8 -------------------------------
 
-		throw new IllegalArgumentException("Illegal issueLinkTypeID " + issueLinkTypeID + "!");
+	protected IssueLinkTypeID getReverseIssueLinkTypeID()
+	{
+		return null;
 	}
-	// ------ KaiExperiments ----- >8 -------------------------------
 
+	private static IssueLinkType getReverseIssueLinkType(PersistenceManager pm, IssueLinkType issueLinkType)
+	{
+		IssueLinkTypeID issueLinkTypeID = (IssueLinkTypeID) JDOHelper.getObjectId(issueLinkType);
+		if (issueLinkTypeID == null)
+			throw new IllegalStateException("JDOHelper.getObjectId(newIssueLink.getIssueLinkType()) returned null!");
 
+		IssueLinkTypeID issueLinkTypeID_reverse = null;
+		if (issueLinkType instanceof IssueLinkTypeIssueToIssue) {
+			issueLinkTypeID_reverse = ((IssueLinkTypeIssueToIssue)issueLinkType).getReverseIssueLinkTypeID();
+		}
+		if (issueLinkTypeID_reverse == null)
+			issueLinkTypeID_reverse = issueLinkTypeID;
+
+		IssueLinkType issueLinkType_reverse = (IssueLinkType) pm.getObjectById(issueLinkTypeID_reverse);
+		return issueLinkType_reverse;
+	}
 
 	/**
 	 * Generates the corresponding (symmetric) reverse link between two {@link Issue}s.
@@ -91,12 +122,9 @@ public abstract class IssueLinkTypeIssueToIssue extends IssueLinkType {
 		// -- 1. [Create the reverse link]--------------------------------------------------------------------------------------|
 		Issue issue_A = issueLink_A.getIssue();
 		IssueLinkType issueLinkType_A = issueLink_A.getIssueLinkType();
-		IssueLinkTypeID issueLinkTypeID = (IssueLinkTypeID) JDOHelper.getObjectId(issueLinkType_A);
-		if (issueLinkTypeID == null)
-			throw new IllegalStateException("JDOHelper.getObjectId(newIssueLink.getIssueLinkType()) returned null!");
 
-		IssueLinkType issueLinkType_B = IssueLinkTypeIssueToIssue.getReverseSymmetricIssueLinkType(pm, issueLinkTypeID);
-
+//		IssueLinkType issueLinkType_B = IssueLinkTypeIssueToIssue.getReverseSymmetricIssueLinkType(pm, issueLinkTypeID);
+		IssueLinkType issueLinkType_B = getReverseIssueLinkType(pm, issueLinkType_A);
 
 		// Guard: Prevents this from causing an ETERNAL recursion.
 		// => find out, if the other side already has an issue-link of the required type pointing back
@@ -145,11 +173,11 @@ public abstract class IssueLinkTypeIssueToIssue extends IssueLinkType {
 		// -- 1. [Remove the reverse link]--------------------------------------------------------------------------------------|
 		Issue issue_A = issueLink_A.getIssue();
 		IssueLinkType issueLinkType_A = issueLink_A.getIssueLinkType();
-		IssueLinkTypeID issueLinkTypeIDToBeDeleted = (IssueLinkTypeID) JDOHelper.getObjectId(issueLinkType_A);
-		if (issueLinkTypeIDToBeDeleted == null)
-			throw new IllegalStateException("JDOHelper.getObjectId(issueLinkToBeDeleted.getIssueLinkType()) returned null!");
+//		IssueLinkTypeID issueLinkTypeIDToBeDeleted = (IssueLinkTypeID) JDOHelper.getObjectId(issueLinkType_A);
+//		if (issueLinkTypeIDToBeDeleted == null)
+//			throw new IllegalStateException("JDOHelper.getObjectId(issueLinkToBeDeleted.getIssueLinkType()) returned null!");
 
-		IssueLinkType issueLinkType_B = IssueLinkTypeIssueToIssue.getReverseSymmetricIssueLinkType(pm, issueLinkTypeIDToBeDeleted);
+		IssueLinkType issueLinkType_B = IssueLinkTypeIssueToIssue.getReverseIssueLinkType(pm, issueLinkType_A);
 
 		// Find the correct reverse link to be removed.
 		// --> Aha! There is NO guard to prevent ETERNAL recursion?? Well, that's because we dont need for a guard here. Kai.
@@ -188,6 +216,17 @@ public abstract class IssueLinkTypeIssueToIssue extends IssueLinkType {
 		}
 	}
 
+	@Override
+	protected void postCreateIssueLink(PersistenceManager pm, IssueLink newIssueLink) {
+		super.postCreateIssueLink(pm, newIssueLink);
+		IssueLinkTypeIssueToIssue.generateIssueToIssueReverseLink(pm, newIssueLink, (Issue)newIssueLink.getLinkedObject());
+	}
+
+	@Override
+	protected void preDeleteIssueLink(PersistenceManager pm, IssueLink issueLinkToBeDeleted) {
+		IssueLinkTypeIssueToIssue.removeIssueToIssueReverseLink(pm, issueLinkToBeDeleted, (Issue)issueLinkToBeDeleted.getLinkedObject());
+		super.preDeleteIssueLink(pm, issueLinkToBeDeleted);
+	}
 
 //	/**
 //	 * Given the current {@link IssueLinkTypeID}, return its reverse symmetric {@link IssueLinkType}.

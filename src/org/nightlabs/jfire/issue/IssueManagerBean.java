@@ -1453,7 +1453,14 @@ implements IssueManagerRemote
 			issueLinkTypeRelated.getName().readFromProperties(baseName, loader,
 			"org.nightlabs.jfire.issue.IssueManagerBean.issueLinkTypeRelated"); //$NON-NLS-1$
 			issueLinkTypeRelated.addLinkedObjectClass(Object.class);
+			issueLinkTypeRelated.addNotLinkedObjectClass(Issue.class);
 			issueLinkTypeRelated = pm.makePersistent(issueLinkTypeRelated);
+
+			IssueLinkType issueLinkTypeRelatedIssue = new IssueLinkTypeIssueToIssue(IssueLinkTypeIssueToIssue.ISSUE_LINK_TYPE_ID_RELATED_ISSUE);
+			issueLinkTypeRelatedIssue.getName().readFromProperties(baseName, loader,
+			"org.nightlabs.jfire.issue.IssueManagerBean.issueLinkTypeRelatedIssue"); //$NON-NLS-1$
+			issueLinkTypeRelatedIssue.addLinkedObjectClass(Issue.class);
+			issueLinkTypeRelatedIssue = pm.makePersistent(issueLinkTypeRelatedIssue);
 
 			IssueLinkType issueLinkTypeParent = new IssueLinkTypeParentChild(IssueLinkTypeParentChild.ISSUE_LINK_TYPE_ID_PARENT);
 			issueLinkTypeParent.getName().readFromProperties(baseName, loader,
@@ -1463,18 +1470,20 @@ implements IssueManagerRemote
 			issueLinkTypeParent = pm.makePersistent(issueLinkTypeParent);
 
 			IssueLinkType issueLinkTypeChild = new IssueLinkTypeParentChild(IssueLinkTypeParentChild.ISSUE_LINK_TYPE_ID_CHILD);
-			issueLinkTypeChild.getName().readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.IssueManagerBean.issueLinkTypeChild"); //$NON-NLS-1$
-
+			issueLinkTypeChild.getName().readFromProperties(baseName, loader, "org.nightlabs.jfire.issue.IssueManagerBean.issueLinkTypeChild" ); //$NON-NLS-1$
 			issueLinkTypeChild.addLinkedObjectClass(Issue.class);
 			issueLinkTypeChild = pm.makePersistent(issueLinkTypeChild);
 
-			IssueLinkType issueLinkTypeDuplicate = new IssueLinkTypeDuplicate(IssueLinkTypeDuplicate.ISSUE_LINK_TYPE_ID_DUPLICATE);
-			issueLinkTypeDuplicate.getName().readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.IssueManagerBean.issueLinkTypeDuplicate"); //$NON-NLS-1$
+			IssueLinkType issueLinkTypeIsDuplicate = new IssueLinkTypeDuplicate(IssueLinkTypeDuplicate.ISSUE_LINK_TYPE_ID_IS_DUPLICATE);
+			issueLinkTypeIsDuplicate.getName().readFromProperties(baseName, loader, "org.nightlabs.jfire.issue.IssueManagerBean.issueLinkTypeIsDuplicate" ); //$NON-NLS-1$
+			issueLinkTypeIsDuplicate.addLinkedObjectClass(Issue.class);
+			issueLinkTypeIsDuplicate = pm.makePersistent(issueLinkTypeIsDuplicate);
 
-			issueLinkTypeDuplicate.addLinkedObjectClass(Issue.class);
-			issueLinkTypeDuplicate = pm.makePersistent(issueLinkTypeDuplicate);
+			IssueLinkType issueLinkTypeHasDuplicate = new IssueLinkTypeDuplicate(IssueLinkTypeDuplicate.ISSUE_LINK_TYPE_ID_HAS_DUPLICATE);
+			issueLinkTypeHasDuplicate.getName().readFromProperties(baseName, loader, "org.nightlabs.jfire.issue.IssueManagerBean.issueLinkTypeHasDuplicate" ); //$NON-NLS-1$
+			issueLinkTypeHasDuplicate.addLinkedObjectClass(Issue.class);
+			issueLinkTypeHasDuplicate = pm.makePersistent(issueLinkTypeHasDuplicate);
+
 
 			// Create the project type
 			pm.getExtent(ProjectType.class);
@@ -1703,7 +1712,7 @@ implements IssueManagerRemote
 			newIssueIssueQuery.clearQuery();
 			newIssueIssueQuery.setAllFieldsDisabled();
 			newIssueIssueQuery.setJbpmNodeName(JbpmConstants.NODE_NAME_NEW);
-			
+
 			IssueQuery unassignedIssueIssueQuery = new IssueQuery();
 			unassignedIssueIssueQuery.clearQuery();
 			unassignedIssueIssueQuery.setAllFieldsDisabled();
@@ -1832,7 +1841,7 @@ implements IssueManagerRemote
 			"org.nightlabs.jfire.issue.IssueManagerBean.queryStoreNew"); //$NON-NLS-1$
 			queryStore.serialiseCollection();
 			queryStore = pm.makePersistent(queryStore);
-			
+
 			//EditLock
 			EditLockType issueEditLock = new EditLockType(EditLockTypeIssue.EDIT_LOCK_TYPE_ID);
 			issueEditLock = pm.makePersistent(issueEditLock);

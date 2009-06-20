@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 import javax.jdo.JDOHelper;
@@ -118,6 +119,33 @@ implements Serializable
 		Set<IssueLinkType> issueLinkTypes = new HashSet<IssueLinkType>();
 		populateIssueLinkTypes(pm, q, linkedObjectClass, issueLinkTypes);
 
+		iterateIssueLinkType : for (Iterator<IssueLinkType> it = issueLinkTypes.iterator(); it.hasNext(); ) {
+			IssueLinkType issueLinkType = it.next();
+
+			Class<?> loc = linkedObjectClass;
+			while (loc != null) {
+				if (issueLinkType.getLinkedObjectClassNames().contains(loc.getName())) {
+					continue iterateIssueLinkType;
+				}
+				if (issueLinkType.getNotLinkedObjectClassNames().contains(loc.getName())) {
+					it.remove();
+					continue iterateIssueLinkType;
+				}
+
+				for (Class<?> locInterface : loc.getInterfaces()) {
+					if (issueLinkType.getLinkedObjectClassNames().contains(locInterface.getName())) {
+						continue iterateIssueLinkType;
+					}
+					if (issueLinkType.getNotLinkedObjectClassNames().contains(locInterface.getName())) {
+						it.remove();
+						continue iterateIssueLinkType;
+					}
+				}
+
+				loc = loc.getSuperclass();
+			}
+		}
+
 		return issueLinkTypes;
 	}
 
@@ -155,6 +183,13 @@ implements Serializable
 	@Element(dependent="true")
 	private Set<String> linkedObjectClassNames;
 
+	@Join
+	@Persistent(
+		table="JFireIssueTracking_IssueLinkType_notLinkedObjectClassNames",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
+	@Element(dependent="true")
+	private Set<String> notLinkedObjectClassNames;
+
 	/**
 	 * @jdo.field persistence-modifier="persistent" dependent="true" mapped-by="issueLinkType"
 	 */	@Persistent(
@@ -188,28 +223,17 @@ implements Serializable
 		this.issueLinkTypeID = issueLinkTypeID;
 
 		this.linkedObjectClassNames = new HashSet<String>();
+		this.notLinkedObjectClassNames = new HashSet<String>();
 		this.name = new IssueLinkTypeName(this);
 	}
 
-	/**
-	 *
-	 * @return
-	 */
 	public Set<String> getLinkedObjectClassNames() {
 		return Collections.unmodifiableSet(linkedObjectClassNames);
 	}
 
-	/**
-	 * @jdo.field persistence-modifier="none"
-	 */	@Persistent(persistenceModifier=PersistenceModifier.NONE)
-
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private transient Set<Class<?>> linkedObjectClasses;
 
-	/**
-	 *
-	 * @return
-	 * @throws ClassNotFoundException
-	 */
 	public Set<Class<?>> getLinkedObjectClasses()
 	throws ClassNotFoundException
 	{
@@ -223,20 +247,12 @@ implements Serializable
 		return linkedObjectClasses;
 	}
 
-	/**
-	 *
-	 */
 	public void clearLinkedObjectClasses()
 	{
 		linkedObjectClassNames.clear();
 		linkedObjectClasses = null;
 	}
 
-	/**
-	 *
-	 * @param linkedObjectClass
-	 * @return
-	 */
 	public boolean addLinkedObjectClass(Class<?> linkedObjectClass)
 	{
 		boolean res = linkedObjectClassNames.add(linkedObjectClass.getName());
@@ -244,15 +260,50 @@ implements Serializable
 		return res;
 	}
 
-	/**
-	 *
-	 * @param linkedObjectClass
-	 * @return
-	 */
 	public boolean removeLinkedObjectClass(Class<?> linkedObjectClass)
 	{
 		boolean res = linkedObjectClassNames.remove(linkedObjectClass.getName());
 		linkedObjectClasses = null;
+		return res;
+	}
+
+	public Set<String> getNotLinkedObjectClassNames() {
+		return Collections.unmodifiableSet(notLinkedObjectClassNames);
+	}
+
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
+	private transient Set<Class<?>> notLinkedObjectClasses;
+
+	public Set<Class<?>> getNotLinkedObjectClasses()
+	throws ClassNotFoundException
+	{
+		if (notLinkedObjectClasses == null) {
+			Set<Class<?>> set = new HashSet<Class<?>>(notLinkedObjectClassNames.size());
+			for (String notLinkedObjectClassName : notLinkedObjectClassNames)
+				set.add(Class.forName(notLinkedObjectClassName));
+
+			notLinkedObjectClasses = Collections.unmodifiableSet(set);
+		}
+		return notLinkedObjectClasses;
+	}
+
+	public void clearNotLinkedObjectClasses()
+	{
+		notLinkedObjectClassNames.clear();
+		notLinkedObjectClasses = null;
+	}
+
+	public boolean addNotLinkedObjectClass(Class<?> notLinkedObjectClass)
+	{
+		boolean res = notLinkedObjectClassNames.add(notLinkedObjectClass.getName());
+		notLinkedObjectClasses = null;
+		return res;
+	}
+
+	public boolean removeNotLinkedObjectClass(Class<?> notLinkedObjectClass)
+	{
+		boolean res = notLinkedObjectClassNames.remove(notLinkedObjectClass.getName());
+		notLinkedObjectClasses = null;
 		return res;
 	}
 
@@ -305,9 +356,38 @@ implements Serializable
 		//   1. Check to see if the linkedObject is an Issue.
 		//   2. If so, then we generate the reverse link.
 
+		// Note [by Marco]: (1) A cleaner solution would be to have separate "action-handlers" registered
+		// (on a IssueType-class+linkedObject-class base) that can then attach functionality from the outside
+		// to existing IssueTypes. In this case, we probably wouldn't even need to subclass IssueLinkType at all.
+		// (2) Alternatively, we could somehow suppress the basic "related"-relationship (=IssueLinkType) for Issue-Issue-
+		// relations. Since the related-issue-type is registered for java.lang.Object (and all sub-classes), it currently
+		// applies to Issue as well. See IssueManagerBean.initialise():
+		//
+		//			issueLinkTypeRelated.addLinkedObjectClass(Object.class);
+		//
+		// (3) Alternatively, we could stop assigning a generic "related" to java.lang.Object and instead register
+		// individual IssueLinkTypes like "related-to-Person", "related-to-ArticleContainer" etc.
+		// (4) Or 4th possibility: these modules simply add their classes in their initialise.
+		// The 3rd and 4th solution has the disadvantage of requiring new modules (JFireTrade must not know JFireIssueTracking,
+		// thus for the registration of o.n.j.trade.ArticleContainer to the "related" IssueLinkType, we'd need a new module
+		// having a dependency on both JFireTrade and JFireIssueTracking).
+		// The solutions (1) and (2) don't require new modules.
+		// (1) renders being able to subclass IssueLinkType meaningless and makes things IMHO more complex.
+		// (2) is IMHO the best solution, though it does require an extension of the resolve mechanism
+		// (resolving which linked-object-class fits which IssueLinkTypes) to allow for blacklisting (and thus we'd only have a
+		// special "related-to-Issue" replacing the generic "related", but use the "related" for all other Objects).
+		// But the concept of blacklisting is pretty easy to understand.
+		// The resolve logic would become quite complex, though, because it should implement the blacklist in a hierarchical way.
+		// That means, if java.lang.Object is included and org.nightlabs.A (extends Object) is blacklisted, then
+		// org.nightlabs.B (extends A) should be blacklisted as well. However, if org.nightlabs.C (extends B) is registered
+		// explicitely, it should not be blacklisted.
+		// Therefore, I recommend that we leave it as it currently is for now - we might refactor this later. Marco.
 		Object linkedObject = newIssueLink.getLinkedObject();
-		if (linkedObject instanceof Issue)
-			IssueLinkTypeIssueToIssue.generateIssueToIssueReverseLink(pm, newIssueLink, (Issue)linkedObject);
+		if (linkedObject instanceof Issue) {
+			if (!(this instanceof IssueLinkTypeIssueToIssue))
+				throw new IllegalStateException("An issue should be linked by an instance of IssueLinkTypeIssueToIssue!");
+//			IssueLinkTypeIssueToIssue.generateIssueToIssueReverseLink(pm, newIssueLink, (Issue)linkedObject);
+		}
 	}
 
 	/**
@@ -321,8 +401,11 @@ implements Serializable
 		// The reverse of the argument is also true here.
 
 		Object linkedObject = issueLinkToBeDeleted.getLinkedObject();
-		if (linkedObject instanceof Issue)
-			IssueLinkTypeIssueToIssue.removeIssueToIssueReverseLink(pm, issueLinkToBeDeleted, (Issue)linkedObject);
+		if (linkedObject instanceof Issue) {
+			if (!(this instanceof IssueLinkTypeIssueToIssue))
+				throw new IllegalStateException("An issue should be linked by an instance of IssueLinkTypeIssueToIssue!");
+//			IssueLinkTypeIssueToIssue.removeIssueToIssueReverseLink(pm, issueLinkToBeDeleted, (Issue)linkedObject);
+		}
 	}
 
 	/*

@@ -41,6 +41,7 @@ import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.PersistenceModifier;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.Value;
 
 import org.nightlabs.i18n.I18nText;
 import org.nightlabs.jfire.dynamictrade.store.id.DynamicProductNameID;
@@ -142,7 +143,11 @@ extends I18nText
 	@Persistent(
 		nullValue=NullValue.EXCEPTION,
 		table="JFireDynamicTrade_DynamicProductName_names",
-		persistenceModifier=PersistenceModifier.PERSISTENT)
+		persistenceModifier=PersistenceModifier.PERSISTENT
+	)
+	@Value(
+			columns=@Column(sqlType="CLOB")
+	)
 	protected Map<String, String> names = new HashMap<String, String>();
 
 	/**

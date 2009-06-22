@@ -61,11 +61,12 @@ public class IssueLinkHistoryItemFactory extends IssueHistoryItemFactory {
 			// [Default behaviour]
 			// Create a new IssueHistoryItem to indicate that a new IssueLink has been created.
 			// Generate the IssueHistoryItem for the forward link.
+			Class<?> linkedObject = getPersistenceManager().getObjectById( issueLink.getLinkedObjectID() ).getClass();
 			issueLinkHistoryItems.add( new IssueLinkHistoryItem(
 					user, oldPersistentIssue,
 					issueLink.getIssueLinkType(), 	// <-- The relationship between the Issue and the linkedObject is indicated here in the name field.
 					IssueHistoryItemAction.ADDED,
-					issueLink.getLinkedObjectClass().getSimpleName(),
+					linkedObject.getSimpleName(),  //issueLink.getLinkedObjectClass().getSimpleName(),
 					issueLink.getLinkedObjectID().toString()
 			));
 
@@ -78,11 +79,12 @@ public class IssueLinkHistoryItemFactory extends IssueHistoryItemFactory {
 		// Similarly, when a link is removed, we should note the severance of the link of BOTH objects.
 		for (IssueLink issueLink : removedIssueLinks) {
 			// [Default behaviour]
+			Class<?> linkedObject = getPersistenceManager().getObjectById( issueLink.getLinkedObjectID() ).getClass();
 			issueLinkHistoryItems.add( new IssueLinkHistoryItem(
 					user, oldPersistentIssue,
 					issueLink.getIssueLinkType(),
 					IssueHistoryItemAction.REMOVED,
-					issueLink.getLinkedObjectClass().getSimpleName(),
+					linkedObject.getSimpleName(),  //issueLink.getLinkedObjectClass().getSimpleName(),
 					issueLink.getLinkedObjectID().toString()
 			));
 

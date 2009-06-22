@@ -73,6 +73,7 @@ public abstract class IssueHistoryItemFactory {
 //		for (Iterator<IssueHistoryItemFactory> it = pm.getExtent(IssueHistoryItemFactory.class).iterator(); it.hasNext(); ) {
 		for (Iterator<IssueHistoryItemFactory> it = getIssueHistoryItemFactories().iterator(); it.hasNext(); ) {
 			IssueHistoryItemFactory factory = it.next();
+			factory.pm = pm;
 
 			Collection<IssueHistoryItem> issueHistoryItems;
 			try {
@@ -118,4 +119,7 @@ public abstract class IssueHistoryItemFactory {
 	 */
 	public abstract Collection<IssueHistoryItem> createIssueHistoryItems(User user, Issue oldPersistentIssue, Issue newDetachedIssue)
 	throws JDODetachedFieldAccessException;
+
+	private PersistenceManager pm;
+	protected PersistenceManager getPersistenceManager() { return pm; }
 }

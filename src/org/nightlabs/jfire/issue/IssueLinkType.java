@@ -342,7 +342,7 @@ implements Serializable
 	 * @see #preDeleteIssueLink(IssueLink)
 	 */
 	protected void postCreateIssueLink(PersistenceManager pm, IssueLink newIssueLink) {
-		// [Observation 19.06.2009]: Kai.
+		// [Observation I, 19.06.2009]: Kai.
 		//   Here is something interesting. This base IssueLinkType class is identified essentially as 'ISSUE_LINK_TYPE_ID_RELATED'.
 		//   And as such, the codes presently do not process the generation of the reverse link between two Issues when they
 		//   are 'Related'. That is, the general codes handling 'ISSUE_LINK_TYPE_ID_PARENT', 'ISSUE_LINK_TYPE_ID_CHILD', and
@@ -382,12 +382,18 @@ implements Serializable
 		// org.nightlabs.B (extends A) should be blacklisted as well. However, if org.nightlabs.C (extends B) is registered
 		// explicitely, it should not be blacklisted.
 		// Therefore, I recommend that we leave it as it currently is for now - we might refactor this later. Marco.
-		Object linkedObject = newIssueLink.getLinkedObject();
-		if (linkedObject instanceof Issue) {
-			if (!(this instanceof IssueLinkTypeIssueToIssue))
-				throw new IllegalStateException("An issue should be linked by an instance of IssueLinkTypeIssueToIssue!");
-//			IssueLinkTypeIssueToIssue.generateIssueToIssueReverseLink(pm, newIssueLink, (Issue)linkedObject);
-		}
+
+//		Object linkedObject = newIssueLink.getLinkedObject();
+//		if (linkedObject instanceof Issue) {
+//			if (!(this instanceof IssueLinkTypeIssueToIssue))
+//				throw new IllegalStateException("An issue should be linked by an instance of IssueLinkTypeIssueToIssue!");
+////			IssueLinkTypeIssueToIssue.generateIssueToIssueReverseLink(pm, newIssueLink, (Issue)linkedObject);
+//		}
+
+		// [Observation II, 22.06.2009]: Kai
+		// --> Mhm... then by the logic of the new approach, as noted (by any of the four solutions) above, it becomes clear that this method 'postCreateIssueLink()'
+		//     in this base class IssueLinkType is self-sufficient without any additional codes. That is, it is sufficient until it becaomes
+		//     necessary to define 'specific' behaviour(s), such as the method in the current subclass IssueLinkTypeIssueToIssue.
 	}
 
 	/**
@@ -400,12 +406,12 @@ implements Serializable
 		// See notes in [Observation 19.06.2009] in postCreateIssueLink(). Kai.
 		// The reverse of the argument is also true here.
 
-		Object linkedObject = issueLinkToBeDeleted.getLinkedObject();
-		if (linkedObject instanceof Issue) {
-			if (!(this instanceof IssueLinkTypeIssueToIssue))
-				throw new IllegalStateException("An issue should be linked by an instance of IssueLinkTypeIssueToIssue!");
-//			IssueLinkTypeIssueToIssue.removeIssueToIssueReverseLink(pm, issueLinkToBeDeleted, (Issue)linkedObject);
-		}
+//		Object linkedObject = issueLinkToBeDeleted.getLinkedObject();
+//		if (linkedObject instanceof Issue) {
+//			if (!(this instanceof IssueLinkTypeIssueToIssue))
+//				throw new IllegalStateException("An issue should be linked by an instance of IssueLinkTypeIssueToIssue!");
+////			IssueLinkTypeIssueToIssue.removeIssueToIssueReverseLink(pm, issueLinkToBeDeleted, (Issue)linkedObject);
+//		}
 	}
 
 	/*

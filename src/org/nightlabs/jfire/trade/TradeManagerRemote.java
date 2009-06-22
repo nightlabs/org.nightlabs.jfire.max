@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.security.RolesAllowed;
@@ -835,6 +834,6 @@ public interface TradeManagerRemote {
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("org.nightlabs.jfire.trade.editOffer")
-	Collection<Article> assignDeliveryDate(Map<ArticleID, Date> articleID2Date, DeliveryDateMode mode, boolean get, String[] fetchGroups,
+	Collection<Article> assignDeliveryDate(ArticleDeliveryDateSet articleDeliveryDateSet, boolean get, String[] fetchGroups,
 			int maxFetchDepth);
 }

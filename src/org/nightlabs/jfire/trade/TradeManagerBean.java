@@ -2122,15 +2122,15 @@ implements TradeManagerRemote, TradeManagerLocal
 	@RolesAllowed("org.nightlabs.jfire.trade.editOffer")
 	@Override
 	public Collection<Article> assignDeliveryDate(
-			Map<ArticleID, Date> articleID2Date, DeliveryDateMode mode,
+			ArticleDeliveryDateSet articleDeliveryDateSet,
 			boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = createPersistenceManager();
 		try {
-			Collection<Article> articles = new ArrayList<Article>(articleID2Date.size());
-			for (Map.Entry<ArticleID, Date> entry : articleID2Date.entrySet()) {
+			Collection<Article> articles = new ArrayList<Article>(articleDeliveryDateSet.getArticleID2DeliveryDate().size());
+			for (Map.Entry<ArticleID, Date> entry : articleDeliveryDateSet.getArticleID2DeliveryDate().entrySet()) {
 				Article article = (Article) pm.getObjectById(entry.getKey());
-				switch (mode) {
+				switch (articleDeliveryDateSet.getMode()) {
 					case OFFER:
 						article.setDeliveryDateOffer(entry.getValue());
 						break;
@@ -2140,15 +2140,7 @@ implements TradeManagerRemote, TradeManagerLocal
 				}
 				articles.add(article);
 			}
-
-			if (!get)
-				return null;
-
-			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
-			if (fetchGroups != null)
-				pm.getFetchPlan().setGroups(fetchGroups);
-
-			return pm.detachCopyAll(articles);
+			return NLJDOHelper.storeJDOCollection(pm, articles, get, fetchGroups, maxFetchDepth);
 		} finally {
 			pm.close();
 		}

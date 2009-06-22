@@ -42,6 +42,24 @@ public class RenderReportRequest implements Serializable {
 	 */
 	public RenderReportRequest(
 			ReportRegistryItemID reportRegistryItemID,
+			Map<String, Object> parameters
+		)
+	{
+		this.setReportRegistryItemID(reportRegistryItemID);
+		this.setParameters(parameters);
+		this.setOutputFormat(OutputFormat.pdf);
+		this.locale = NLLocale.getDefault();
+	}
+	
+	/**
+	 * Creates a new {@link RenderReportRequest} with the given parameters and the default locale (of the current java runtime).
+	 *
+	 * @param reportRegistryItemID the id of the report which shall be rendered - must NOT be <code>null</code>.
+	 * @param parameters the parameters - can be <code>null</code> (<code>null</code> will be converted to an empty <code>Map</code>)
+	 * @param outputFormat the desired output-format - must NOT be <code>null</code>.
+	 */
+	public RenderReportRequest(
+			ReportRegistryItemID reportRegistryItemID,
 			Map<String, Object> parameters,
 			OutputFormat outputFormat
 		)
@@ -138,5 +156,18 @@ public class RenderReportRequest implements Serializable {
 	 */
 	public void setLocale(Locale locale) {
 		this.locale = locale;
+	}
+	
+	public RenderReportRequest clone() {
+		RenderReportRequest newRequest = new RenderReportRequest();
+		newRequest.setReportRegistryItemID(this.getReportRegistryItemID());
+		if (this.getOutputFormat() != null)
+			newRequest.setOutputFormat(this.getOutputFormat());
+		if (this.getLocale() != null)
+			newRequest.setLocale(this.getLocale());
+		if (this.getParameters() != null) 
+			newRequest.setParameters(new HashMap<String, Object>(this.getParameters()));
+		return newRequest;
+		
 	}
 }

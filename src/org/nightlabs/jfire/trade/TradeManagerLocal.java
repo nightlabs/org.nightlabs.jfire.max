@@ -822,7 +822,7 @@ public interface TradeManagerLocal {
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("_Guest_")
-	void storeEndCustomer(LegalEntity endCustomer, Set<OrderID> assignOrderIDs);
+	void storeEndCustomer(LegalEntity endCustomer, Set<ArticleID> assignArticleIDs);
 
 	/**
 	 * @ejb.interface-method

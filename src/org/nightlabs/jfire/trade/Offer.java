@@ -84,42 +84,6 @@ import org.nightlabs.util.Util;
  * @author Niklas Schiffler <nick@nightlabs.de>
  * @author marco schulze - marco at nightlabs dot de
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
- *
- * @jdo.persistence-capable
- *		identity-type="application"
- *		objectid-class="org.nightlabs.jfire.trade.id.OfferID"
- *		detachable="true"
- *		table="JFireTrade_Offer"
- *
- * @jdo.version strategy="version-number"
- *
- * @jdo.implements name="org.nightlabs.jfire.trade.ArticleContainer"
- * @jdo.implements name="org.nightlabs.jfire.jbpm.graph.def.Statable"
- *
- * @jdo.inheritance strategy="new-table"
- *
- * @jdo.create-objectid-class
- *		field-order="organisationID, offerIDPrefix, offerID"
- *		add-interfaces="org.nightlabs.jfire.trade.id.ArticleContainerID"
- *		include-body="id/OfferID.body.inc"
- *
- * @jdo.query name="getNonFinalizedNonEndedOffersForOrder" query="SELECT
- *			WHERE this.order == :order && this.finalizeDT == null && this.offerLocal.processEnded == false
- *			ORDER BY offerID DESCENDING"
- *
- * @jdo.fetch-group name="Offer.offerLocal" fields="offerLocal"
- * @jdo.fetch-group name="Offer.price" fields="price"
- * @jdo.fetch-group name="Offer.articles" fields="articles"
- * @jdo.fetch-group name="Offer.currency" fields="currency"
- * @jdo.fetch-group name="Offer.order" fields="order"
- * @jdo.fetch-group name="Offer.createUser" fields="createUser"
- * @jdo.fetch-group name="Offer.finalizeUser" fields="finalizeUser"
- * @jdo.fetch-group name="Offer.segments" fields="segments"
- *
- * @jdo.fetch-group name="Statable.state" fields="state"
- * @jdo.fetch-group name="Statable.states" fields="states"
- *
- * @jdo.fetch-group name="FetchGroupsTrade.articleContainerInEditor" fields="offerLocal, segments, createUser, currency, finalizeUser, order, price, state, states"
  */
 @PersistenceCapable(
 	objectIdClass=OfferID.class,
@@ -129,46 +93,70 @@ import org.nightlabs.util.Util;
 @Version(strategy=VersionStrategy.VERSION_NUMBER)
 @FetchGroups({
 	@FetchGroup(
-		name=Offer.FETCH_GROUP_OFFER_LOCAL,
-		members=@Persistent(name="offerLocal")),
+			name=Offer.FETCH_GROUP_OFFER_LOCAL,
+			members=@Persistent(name=Offer.FieldName.offerLocal)
+	),
 	@FetchGroup(
-		name=Offer.FETCH_GROUP_PRICE,
-		members=@Persistent(name="price")),
+			name=Offer.FETCH_GROUP_PRICE,
+			members=@Persistent(name=Offer.FieldName.price)
+	),
 	@FetchGroup(
-		name=Offer.FETCH_GROUP_ARTICLES,
-		members=@Persistent(name="articles")),
+			name=Offer.FETCH_GROUP_ARTICLES,
+			members=@Persistent(name=Offer.FieldName.articles)
+	),
 	@FetchGroup(
-		name=Offer.FETCH_GROUP_CURRENCY,
-		members=@Persistent(name="currency")),
+			name=Offer.FETCH_GROUP_CURRENCY,
+			members=@Persistent(name=Offer.FieldName.currency)
+	),
 	@FetchGroup(
-		name=Offer.FETCH_GROUP_ORDER,
-		members=@Persistent(name="order")),
+			name=Offer.FETCH_GROUP_ORDER,
+			members=@Persistent(name=Offer.FieldName.order)
+	),
 	@FetchGroup(
-		name=Offer.FETCH_GROUP_CREATE_USER,
-		members=@Persistent(name="createUser")),
+			name=Offer.FETCH_GROUP_CREATE_USER,
+			members=@Persistent(name=Offer.FieldName.createUser)
+	),
 	@FetchGroup(
-		name=Offer.FETCH_GROUP_FINALIZE_USER,
-		members=@Persistent(name="finalizeUser")),
+			name=Offer.FETCH_GROUP_FINALIZE_USER,
+			members=@Persistent(name=Offer.FieldName.finalizeUser)
+	),
 	@FetchGroup(
-		name=Offer.FETCH_GROUP_SEGMENTS,
-		members=@Persistent(name="segments")),
+			name=Offer.FETCH_GROUP_SEGMENTS,
+			members=@Persistent(name=Offer.FieldName.segments)
+	),
 	@FetchGroup(
-		name="Statable.state",
-		members=@Persistent(name="state")),
+			name=Statable.FETCH_GROUP_STATE,
+			members=@Persistent(name=Offer.FieldName.state)
+	),
 	@FetchGroup(
-		name="Statable.states",
-		members=@Persistent(name="states")),
+			name=Statable.FETCH_GROUP_STATES,
+			members=@Persistent(name=Offer.FieldName.states)
+	),
 	@FetchGroup(
-		name="FetchGroupsTrade.articleContainerInEditor",
-		members={@Persistent(name="offerLocal"), @Persistent(name="segments"), @Persistent(name="createUser"), @Persistent(name="currency"), @Persistent(name="finalizeUser"), @Persistent(name="order"), @Persistent(name="price"), @Persistent(name="state"), @Persistent(name="states")}),
+			name=FetchGroupsTrade.FETCH_GROUP_ARTICLE_CONTAINER_IN_EDITOR,
+			//		name="FetchGroupsTrade.articleContainerInEditor",
+			members={
+					@Persistent(name=Offer.FieldName.offerLocal),
+					@Persistent(name=Offer.FieldName.segments),
+					@Persistent(name=Offer.FieldName.createUser),
+					@Persistent(name=Offer.FieldName.currency),
+					@Persistent(name=Offer.FieldName.finalizeUser),
+					@Persistent(name=Offer.FieldName.order),
+					@Persistent(name=Offer.FieldName.price),
+					@Persistent(name=Offer.FieldName.state),
+					@Persistent(name=Offer.FieldName.states),
+			}
+	),
 	@FetchGroup(
-		name="ArticleContainer.propertySet",
-		members=@Persistent(name="propertySet"))
+			name=ArticleContainer.FETCH_GROUP_PROPERTY_SET,
+			//		name="ArticleContainer.propertySet",
+			members=@Persistent(name=Offer.FieldName.propertySet)
+	),
 })
 @Queries(
-	@javax.jdo.annotations.Query(
-		name="getNonFinalizedNonEndedOffersForOrder",
-		value="SELECT WHERE this.order == :order && this.finalizeDT == null && this.offerLocal.processEnded == false ORDER BY offerID DESCENDING")
+		@javax.jdo.annotations.Query(
+				name="getNonFinalizedNonEndedOffersForOrder",
+				value="SELECT WHERE this.order == :order && this.finalizeDT == null && this.offerLocal.processEnded == false ORDER BY offerID DESCENDING")
 )
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class Offer
@@ -192,6 +180,20 @@ implements
 	public static final String FETCH_GROUP_CREATE_USER = "Offer.createUser";
 	public static final String FETCH_GROUP_FINALIZE_USER = "Offer.finalizeUser";
 	public static final String FETCH_GROUP_SEGMENTS = "Offer.segments";
+
+	public static final class FieldName {
+		public static final String offerLocal = "offerLocal";
+		public static final String price = "price";
+		public static final String articles = "articles";
+		public static final String currency = "currency";
+		public static final String order = "order";
+		public static final String createUser = "createUser";
+		public static final String finalizeUser = "finalizeUser";
+		public static final String segments = "segments";
+		public static final String state = "state";
+		public static final String states = "states";
+		public static final String propertySet = "propertySet";
+	}
 
 	/**
 	 * @return a <tt>Collection</tt> of <tt>Offer</tt>
@@ -369,17 +371,17 @@ implements
 	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private boolean customer_detached = false;
 
-	/**
-	 * @jdo.field persistence-modifier="none"
-	 */
-	@Persistent(persistenceModifier=PersistenceModifier.NONE)
-	private LegalEntity endCustomer = null;
-
-	/**
-	 * @jdo.field persistence-modifier="none"
-	 */
-	@Persistent(persistenceModifier=PersistenceModifier.NONE)
-	private boolean endCustomer_detached = false;
+//	/**
+//	 * @jdo.field persistence-modifier="none"
+//	 */
+//	@Persistent(persistenceModifier=PersistenceModifier.NONE)
+//	private LegalEntity endCustomer = null;
+//
+//	/**
+//	 * @jdo.field persistence-modifier="none"
+//	 */
+//	@Persistent(persistenceModifier=PersistenceModifier.NONE)
+//	private boolean endCustomer_detached = false;
 
 	/**
 	 * @jdo.field persistence-modifier="none"
@@ -405,17 +407,17 @@ implements
 	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private boolean customerID_detached = false;
 
-	/**
-	 * @jdo.field persistence-modifier="none"
-	 */
-	@Persistent(persistenceModifier=PersistenceModifier.NONE)
-	private AnchorID endCustomerID = null;
-
-	/**
-	 * @jdo.field persistence-modifier="none"
-	 */
-	@Persistent(persistenceModifier=PersistenceModifier.NONE)
-	private boolean endCustomerID_detached = false;
+//	/**
+//	 * @jdo.field persistence-modifier="none"
+//	 */
+//	@Persistent(persistenceModifier=PersistenceModifier.NONE)
+//	private AnchorID endCustomerID = null;
+//
+//	/**
+//	 * @jdo.field persistence-modifier="none"
+//	 */
+//	@Persistent(persistenceModifier=PersistenceModifier.NONE)
+//	private boolean endCustomerID_detached = false;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -801,14 +803,14 @@ implements
 		return customer;
 	}
 
-	@Override
-	public LegalEntity getEndCustomer()
-	{
-		if (endCustomer == null && !endCustomer_detached)
-			endCustomer = order.getEndCustomer();
-
-		return endCustomer;
-	}
+//	@Override
+//	public LegalEntity getEndCustomer()
+//	{
+//		if (endCustomer == null && !endCustomer_detached)
+//			endCustomer = order.getEndCustomer();
+//
+//		return endCustomer;
+//	}
 
 	/**
 	 * @return Returns the ID of the customer, which is either obtained via {@link Order#getCustomerID()} or
@@ -823,14 +825,14 @@ implements
 		return customerID;
 	}
 
-	@Override
-	public AnchorID getEndCustomerID()
-	{
-		if (endCustomerID == null && !endCustomerID_detached)
-			endCustomerID = order.getEndCustomerID();
-
-		return endCustomerID;
-	}
+//	@Override
+//	public AnchorID getEndCustomerID()
+//	{
+//		if (endCustomerID == null && !endCustomerID_detached)
+//			endCustomerID = order.getEndCustomerID();
+//
+//		return endCustomerID;
+//	}
 
 	/**
 	 * @return The date and time this {@link Offer} was created.
@@ -1034,10 +1036,10 @@ implements
 			detached.customer_detached = true;
 		}
 
-		if (fetchGroups.contains(FETCH_GROUP_END_CUSTOMER)) {
-			detached.endCustomer = pm.detachCopy(attached.getEndCustomer());
-			detached.endCustomer_detached = true;
-		}
+//		if (fetchGroups.contains(FETCH_GROUP_END_CUSTOMER)) {
+//			detached.endCustomer = pm.detachCopy(attached.getEndCustomer());
+//			detached.endCustomer_detached = true;
+//		}
 
 		if (fetchGroups.contains(FETCH_GROUP_VENDOR_ID)) {
 			detached.vendorID = attached.getVendorID();
@@ -1049,10 +1051,10 @@ implements
 			detached.customerID_detached = true;
 		}
 
-		if (fetchGroups.contains(FETCH_GROUP_END_CUSTOMER_ID)) {
-			detached.endCustomerID = attached.getEndCustomerID();
-			detached.endCustomerID_detached = true;
-		}
+//		if (fetchGroups.contains(FETCH_GROUP_END_CUSTOMER_ID)) {
+//			detached.endCustomerID = attached.getEndCustomerID();
+//			detached.endCustomerID_detached = true;
+//		}
 
 		detached.attachable = true;
 	}

@@ -67,7 +67,6 @@ import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.prop.PropertySet;
 import org.nightlabs.jfire.prop.Struct;
 import org.nightlabs.jfire.prop.StructLocal;
-import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.security.id.UserID;
 import org.nightlabs.jfire.trade.id.OrderID;
@@ -83,91 +82,6 @@ import org.nightlabs.util.Util;
  * @author Niklas Schiffler <nick@nightlabs.de>
  * @author marco schulze - marco at nightlabs dot de
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
- *
- * @jdo.persistence-capable
- *		identity-type="application"
- *		objectid-class="org.nightlabs.jfire.trade.id.OrderID"
- *		detachable="true"
- *		table="JFireTrade_Order"
- *
- * @jdo.version strategy="version-number"
- *
- * @jdo.implements name="org.nightlabs.jfire.trade.ArticleContainer"
- *
- * @jdo.inheritance strategy="new-table"
- *
- * @jdo.create-objectid-class
- *		field-order="organisationID, orderIDPrefix, orderID"
- *		add-interfaces="org.nightlabs.jfire.trade.id.ArticleContainerID"
- *		include-body="id/OrderID.body.inc"
- *
- * @jdo.query
- *		name="getOrderIDsByVendorAndCustomer"
- *		query="SELECT JDOHelper.getObjectId(this)
- *			WHERE JDOHelper.getObjectId(vendor) == :vendorID &&
- *			      JDOHelper.getObjectId(customer) == :customerID
- *			ORDER BY orderID DESC"
- *
- * @jdo.query
- *		name="getOrderIDsByVendorAndEndCustomer"
- *		query="SELECT JDOHelper.getObjectId(this)
- *			WHERE JDOHelper.getObjectId(vendor) == :vendorID &&
- *			      JDOHelper.getObjectId(endCustomer) == :customerID
- *			ORDER BY orderID DESC"
- *
- * @jdo.query
- *		name="getOrderIDsByVendorAndCustomerAndEndCustomer"
- *		query="SELECT JDOHelper.getObjectId(this)
- *			WHERE JDOHelper.getObjectId(vendor) == :vendorID &&
- *			      JDOHelper.getObjectId(customer) == :customerID &&
- *			      JDOHelper.getObjectId(endCustomer) == :endCustomerID
- *			ORDER BY orderID DESC"
- *
- * @!jdo.query
- *		name="getQuickSaleWorkOrderIDCandidates"
- *		query="SELECT JDOHelper.getObjectId(this)
- *			WHERE
- *						quickSaleWorkOrder &&
- *						orderIDPrefix == :orderIDPrefix &&
- *						currency.currencyID == :currencyID &&
- *						vendor.organisationID == :paramVendorID_organisationID &&
- *            vendor.anchorID == :paramVendorID_anchorID &&
- *			      customer.organisationID == :paramCustomerID_organisationID &&
- *            customer.anchorID == :paramCustomerID_anchorID &&
- *            createUser.organisationID == :paramCreateUser_organisationID &&
- *            createUser.userID == :paramCreateUser_userID &&
- *            !offers.contains(finalizedOffer) && finalizedOffer.finalizeDT != null &&
- *            articles.isEmpty()
- *			ORDER BY orderID ASC"
- *
- * // TODO Switch to the code above when the JPOX bug is fixed: as soon as this.offers or this.articles is included in the WHERE block, the criteria above (at least this.quickSaleWorkOrder) are ignored.
- * @jdo.query
- *		name="getQuickSaleWorkOrderIDCandidates_WORKAROUND"
- *		query="SELECT
- *			WHERE
- *						this.quickSaleWorkOrder &&
- *						this.orderIDPrefix == :orderIDPrefix &&
- *						this.currency.currencyID == :currencyID &&
- *						this.vendor.organisationID == :paramVendorID_organisationID &&
- *            this.vendor.anchorID == :paramVendorID_anchorID &&
- *			      this.customer.organisationID == :paramCustomerID_organisationID &&
- *            this.customer.anchorID == :paramCustomerID_anchorID
- *			ORDER BY orderID ASC"
- *
- * @jdo.fetch-group name="Order.currency" fields="currency"
- * @jdo.fetch-group name="Order.customerGroup" fields="customerGroup"
- * @jdo.fetch-group name="Order.articles" fields="articles"
- * @jdo.fetch-group name="Order.segments" fields="segments"
- * @jdo.fetch-group name="Order.offers" fields="offers"
- * @jdo.fetch-group name="Order.createUser" fields="createUser"
- * @jdo.fetch-group name="Order.changeUser" fields="changeUser"
- * @jdo.fetch-group name="Order.this" fetch-groups="default" fields="vendor, currency, customer, customerGroup, articles, segments, offers, createUser, changeUser"
- *
- * @jdo.fetch-group name="ArticleContainer.vendor" fields="vendor"
- * @jdo.fetch-group name="ArticleContainer.customer" fields="customer"
- * @jdo.fetch-group name="ArticleContainer.endCustomer" fields="endCustomer"
- *
- * @jdo.fetch-group name="FetchGroupsTrade.articleContainerInEditor" fields="vendor, currency, customer, endCustomer, customerGroup, segments, offers, createUser, changeUser"
  */
 @PersistenceCapable(
 	objectIdClass=OrderID.class,
@@ -208,11 +122,8 @@ import org.nightlabs.util.Util;
 		name="ArticleContainer.customer",
 		members=@Persistent(name="customer")),
 	@FetchGroup(
-		name="ArticleContainer.endCustomer",
-		members=@Persistent(name="endCustomer")),
-	@FetchGroup(
 		name="FetchGroupsTrade.articleContainerInEditor",
-		members={@Persistent(name="vendor"), @Persistent(name="currency"), @Persistent(name="customer"), @Persistent(name="endCustomer"), @Persistent(name="customerGroup"), @Persistent(name="segments"), @Persistent(name="offers"), @Persistent(name="createUser"), @Persistent(name="changeUser")}),
+		members={@Persistent(name="vendor"), @Persistent(name="currency"), @Persistent(name="customer"), @Persistent(name="customerGroup"), @Persistent(name="segments"), @Persistent(name="offers"), @Persistent(name="createUser"), @Persistent(name="changeUser")}),
 	@FetchGroup(
 		name="ArticleContainer.propertySet",
 		members=@Persistent(name="propertySet"))
@@ -220,16 +131,25 @@ import org.nightlabs.util.Util;
 @Queries({
 	@javax.jdo.annotations.Query(
 		name="getOrderIDsByVendorAndCustomer",
-		value="SELECT JDOHelper.getObjectId(this) WHERE JDOHelper.getObjectId(vendor) == :vendorID && JDOHelper.getObjectId(customer) == :customerID ORDER BY orderID DESC"),
+		value="SELECT JDOHelper.getObjectId(this) WHERE JDOHelper.getObjectId(vendor) == :vendorID && JDOHelper.getObjectId(customer) == :customerID ORDER BY orderID DESC"
+	),
 	@javax.jdo.annotations.Query(
 		name="getOrderIDsByVendorAndEndCustomer",
-		value="SELECT JDOHelper.getObjectId(this) WHERE JDOHelper.getObjectId(vendor) == :vendorID && JDOHelper.getObjectId(endCustomer) == :customerID ORDER BY orderID DESC"),
-	@javax.jdo.annotations.Query(
-		name="getOrderIDsByVendorAndCustomerAndEndCustomer",
-		value="SELECT JDOHelper.getObjectId(this) WHERE JDOHelper.getObjectId(vendor) == :vendorID && JDOHelper.getObjectId(customer) == :customerID && JDOHelper.getObjectId(endCustomer) == :endCustomerID ORDER BY orderID DESC"),
+		value="SELECT JDOHelper.getObjectId(this) " +
+				"WHERE JDOHelper.getObjectId(vendor) == :vendorID && " +
+				"this.articles.contains(article) && " +
+				"JDOHelper.getObjectId(article.endCustomer) == :customerID " +
+				"VARIABLES org.nightlabs.jfire.trade.Article article " +
+				"ORDER BY orderID DESC"
+	),
+//	@javax.jdo.annotations.Query(
+//		name="getOrderIDsByVendorAndCustomerAndEndCustomer",
+//		value="SELECT JDOHelper.getObjectId(this) WHERE JDOHelper.getObjectId(vendor) == :vendorID && JDOHelper.getObjectId(customer) == :customerID && JDOHelper.getObjectId(endCustomer) == :endCustomerID ORDER BY orderID DESC"
+//	),
 	@javax.jdo.annotations.Query(
 		name="getQuickSaleWorkOrderIDCandidates_WORKAROUND",
-		value="SELECT WHERE this.quickSaleWorkOrder && this.orderIDPrefix == :orderIDPrefix && this.currency.currencyID == :currencyID && this.vendor.organisationID == :paramVendorID_organisationID && this.vendor.anchorID == :paramVendorID_anchorID && this.customer.organisationID == :paramCustomerID_organisationID && this.customer.anchorID == :paramCustomerID_anchorID ORDER BY orderID ASC")
+		value="SELECT WHERE this.quickSaleWorkOrder && this.orderIDPrefix == :orderIDPrefix && this.currency.currencyID == :currencyID && this.vendor.organisationID == :paramVendorID_organisationID && this.vendor.anchorID == :paramVendorID_anchorID && this.customer.organisationID == :paramCustomerID_organisationID && this.customer.anchorID == :paramCustomerID_anchorID ORDER BY orderID ASC"
+	),
 })
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class Order
@@ -266,17 +186,18 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback, Att
 	public static List<OrderID> getOrderIDs(PersistenceManager pm, Class<? extends Order> orderClass, boolean subclasses, AnchorID vendorID, AnchorID customerID, AnchorID endCustomerID, long rangeBeginIdx, long rangeEndIdx)
 	{
 		if (customerID != null && endCustomerID != null) {
-			Query query = pm.newNamedQuery(Order.class, "getOrderIDsByVendorAndCustomerAndEndCustomer");
-			query.setCandidates(pm.getExtent(orderClass, subclasses));
-			Map params = new HashMap();
-			params.put("vendorID", vendorID);
-			params.put("customerID", customerID);
-			params.put("endCustomerID", endCustomerID);
-
-			if (rangeBeginIdx >= 0 && rangeEndIdx >= 0)
-				query.setRange(rangeBeginIdx, rangeEndIdx);
-
-			return (List<OrderID>) query.executeWithMap(params);
+			throw new UnsupportedOperationException("NYI");
+//			Query query = pm.newNamedQuery(Order.class, "getOrderIDsByVendorAndCustomerAndEndCustomer");
+//			query.setCandidates(pm.getExtent(orderClass, subclasses));
+//			Map params = new HashMap();
+//			params.put("vendorID", vendorID);
+//			params.put("customerID", customerID);
+//			params.put("endCustomerID", endCustomerID);
+//
+//			if (rangeBeginIdx >= 0 && rangeEndIdx >= 0)
+//				query.setRange(rangeBeginIdx, rangeEndIdx);
+//
+//			return (List<OrderID>) query.executeWithMap(params);
 		}
 
 		Query query = pm.newNamedQuery(Order.class, endCustomerID == null ? "getOrderIDsByVendorAndCustomer" : "getOrderIDsByVendorAndEndCustomer");
@@ -507,11 +428,11 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback, Att
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private LegalEntity customer;
 
-	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 */
-	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
-	private LegalEntity endCustomer;
+//	/**
+//	 * @jdo.field persistence-modifier="persistent"
+//	 */
+//	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+//	private LegalEntity endCustomer;
 
 	/**
 	 * Because the {@link #customer} may have many available <tt>CustomerGroup</tt>s,
@@ -623,16 +544,16 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback, Att
 	private boolean customerID_detached = false;
 
 	/**
-	 * @jdo.field persistence-modifier="none"
-	 */
-	@Persistent(persistenceModifier=PersistenceModifier.NONE)
-	private AnchorID endCustomerID = null;
-
-	/**
-	 * @jdo.field persistence-modifier="none"
-	 */
-	@Persistent(persistenceModifier=PersistenceModifier.NONE)
-	private boolean endCustomerID_detached = false;
+//	 * @jdo.field persistence-modifier="none"
+//	 */
+//	@Persistent(persistenceModifier=PersistenceModifier.NONE)
+//	private AnchorID endCustomerID = null;
+//
+//	/**
+//	 * @jdo.field persistence-modifier="none"
+//	 */
+//	@Persistent(persistenceModifier=PersistenceModifier.NONE)
+//	private boolean endCustomerID_detached = false;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -770,26 +691,26 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback, Att
 		return customer;
 	}
 
-	@Override
-	public LegalEntity getEndCustomer() {
-		return endCustomer;
-	}
-
-	public void setEndCustomer(LegalEntity endCustomer) {
-		if (Util.equals(this.endCustomer, endCustomer))
-			return;
-
-		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
-		if (pm != null) {
-			User user = SecurityReflector.getUserDescriptor().getUser(pm);
-			pm.makePersistent(new ArticleContainerEndCustomerHistoryItem(this, this.endCustomer, endCustomer, user));
-		}
-
-		this.endCustomer = endCustomer;
-
-		this.endCustomerID = null;
-		this.endCustomerID_detached = false;
-	}
+//	@Override
+//	public LegalEntity getEndCustomer() {
+//		return endCustomer;
+//	}
+//
+//	public void setEndCustomer(LegalEntity endCustomer) {
+//		if (Util.equals(this.endCustomer, endCustomer))
+//			return;
+//
+//		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
+//		if (pm != null) {
+//			User user = SecurityReflector.getUserDescriptor().getUser(pm);
+//			pm.makePersistent(new ArticleContainerEndCustomerHistoryItem(this, this.endCustomer, endCustomer, user));
+//		}
+//
+//		this.endCustomer = endCustomer;
+//
+//		this.endCustomerID = null;
+//		this.endCustomerID_detached = false;
+//	}
 
 	@Override
 	public AnchorID getVendorID()
@@ -809,14 +730,14 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback, Att
 		return customerID;
 	}
 
-	@Override
-	public AnchorID getEndCustomerID()
-	{
-		if (endCustomerID == null && !endCustomerID_detached)
-			endCustomerID = (AnchorID) JDOHelper.getObjectId(endCustomer);
-
-		return endCustomerID;
-	}
+//	@Override
+//	public AnchorID getEndCustomerID()
+//	{
+//		if (endCustomerID == null && !endCustomerID_detached)
+//			endCustomerID = (AnchorID) JDOHelper.getObjectId(endCustomer);
+//
+//		return endCustomerID;
+//	}
 
 	/**
 	 * @param customer The customer to set.
@@ -1007,10 +928,10 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback, Att
 			detached.customerID_detached = true;
 		}
 
-		if (fetchGroups.contains(FETCH_GROUP_END_CUSTOMER_ID)) {
-			detached.endCustomerID = attached.getEndCustomerID();
-			detached.endCustomerID_detached = true;
-		}
+//		if (fetchGroups.contains(FETCH_GROUP_END_CUSTOMER_ID)) {
+//			detached.endCustomerID = attached.getEndCustomerID();
+//			detached.endCustomerID_detached = true;
+//		}
 	}
 
 	@Override
@@ -1024,11 +945,11 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback, Att
 
 	@Override
 	public void jdoPreStore() {
-		if (JDOHelper.isNew(this) && endCustomer != null) {
-			PersistenceManager pm = getPersistenceManager();
-			User user = SecurityReflector.getUserDescriptor().getUser(pm);
-			pm.makePersistent(new ArticleContainerEndCustomerHistoryItem(this, null, endCustomer, user));
-		}
+//		if (JDOHelper.isNew(this) && endCustomer != null) {
+//			PersistenceManager pm = getPersistenceManager();
+//			User user = SecurityReflector.getUserDescriptor().getUser(pm);
+//			pm.makePersistent(new ArticleContainerEndCustomerHistoryItem(this, null, endCustomer, user));
+//		}
 	}
 
 	@Override

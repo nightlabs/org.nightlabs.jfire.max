@@ -195,7 +195,7 @@ import org.nightlabs.util.Util;
 		members=@Persistent(name="endCustomer")),
 	@FetchGroup(
 		name="FetchGroupsTrade.articleContainerInEditor",
-		members={@Persistent(name="deliveryNoteLocal"), @Persistent(name="articles"), @Persistent(name="createUser"), @Persistent(name="customer"), @Persistent(name="endCustomer"), @Persistent(name="finalizeUser"), @Persistent(name="vendor"), @Persistent(name="state"), @Persistent(name="states")}),
+		members={@Persistent(name="deliveryNoteLocal"), @Persistent(name="articles"), @Persistent(name="createUser"), @Persistent(name="customer"), @Persistent(name="finalizeUser"), @Persistent(name="vendor"), @Persistent(name="state"), @Persistent(name="states")}),
 	@FetchGroup(
 		name="Statable.state",
 		members=@Persistent(name="state")),
@@ -208,17 +208,26 @@ import org.nightlabs.util.Util;
 })
 @Queries({
 	@javax.jdo.annotations.Query(
-		name="getDeliveryNoteIDsByVendorAndCustomer",
-		value="SELECT JDOHelper.getObjectId(this) WHERE JDOHelper.getObjectId(vendor) == :vendorID && JDOHelper.getObjectId(customer) == :customerID ORDER BY deliveryNoteID DESC"),
+			name="getDeliveryNoteIDsByVendorAndCustomer",
+			value="SELECT JDOHelper.getObjectId(this) WHERE JDOHelper.getObjectId(vendor) == :vendorID && JDOHelper.getObjectId(customer) == :customerID ORDER BY deliveryNoteID DESC"
+	),
 	@javax.jdo.annotations.Query(
-		name="getDeliveryNoteIDsByVendorAndEndCustomer",
-		value="SELECT JDOHelper.getObjectId(this) WHERE JDOHelper.getObjectId(vendor) == :vendorID && JDOHelper.getObjectId(endCustomer) == :customerID ORDER BY deliveryNoteID DESC"),
+			name="getDeliveryNoteIDsByVendorAndEndCustomer",
+			value="SELECT JDOHelper.getObjectId(this) " +
+					"WHERE JDOHelper.getObjectId(vendor) == :vendorID && " +
+					"this.articles.contains(article) && " +
+					"JDOHelper.getObjectId(article.endCustomer) == :customerID " +
+					"VARIABLES org.nightlabs.jfire.trade.Article article " +
+					"ORDER BY deliveryNoteID DESC"
+	),
+//	@javax.jdo.annotations.Query(
+//			name="getDeliveryNoteIDsByVendorAndCustomerAndEndCustomer",
+//			value="SELECT JDOHelper.getObjectId(this) WHERE JDOHelper.getObjectId(vendor) == :vendorID && JDOHelper.getObjectId(customer) == :customerID && JDOHelper.getObjectId(endCustomer) == :endCustomerID ORDER BY deliveryNoteID DESC"
+//	),
 	@javax.jdo.annotations.Query(
-		name="getDeliveryNoteIDsByVendorAndCustomerAndEndCustomer",
-		value="SELECT JDOHelper.getObjectId(this) WHERE JDOHelper.getObjectId(vendor) == :vendorID && JDOHelper.getObjectId(customer) == :customerID && JDOHelper.getObjectId(endCustomer) == :endCustomerID ORDER BY deliveryNoteID DESC"),
-	@javax.jdo.annotations.Query(
-		name="getNonFinalizedDeliveryNotesByVendorAndCustomer",
-		value="SELECT WHERE vendor.organisationID == paramVendorID_organisationID && vendor.anchorID == paramVendorID_anchorID && customer.organisationID == paramCustomerID_organisationID && customer.anchorID == paramCustomerID_anchorID && finalizeDT == null PARAMETERS String paramVendorID_organisationID, String paramVendorID_anchorID, String paramCustomerID_organisationID, String paramCustomerID_anchorID import java.lang.String ORDER BY deliveryNoteID DESC")
+			name="getNonFinalizedDeliveryNotesByVendorAndCustomer",
+			value="SELECT WHERE vendor.organisationID == paramVendorID_organisationID && vendor.anchorID == paramVendorID_anchorID && customer.organisationID == paramCustomerID_organisationID && customer.anchorID == paramCustomerID_anchorID && finalizeDT == null PARAMETERS String paramVendorID_organisationID, String paramVendorID_anchorID, String paramCustomerID_organisationID, String paramCustomerID_anchorID import java.lang.String ORDER BY deliveryNoteID DESC"
+	)
 })
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class DeliveryNote
@@ -257,16 +266,17 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	public static List<DeliveryNoteID> getDeliveryNoteIDs(PersistenceManager pm, AnchorID vendorID, AnchorID customerID, AnchorID endCustomerID, long rangeBeginIdx, long rangeEndIdx)
 	{
 		if (customerID != null && endCustomerID != null) {
-			Query query = pm.newNamedQuery(DeliveryNote.class, "getDeliveryNoteIDsByVendorAndCustomerAndEndCustomer");
-			Map<String, Object> params = new HashMap<String, Object>();
-			params.put("vendorID", vendorID);
-			params.put("customerID", customerID);
-			params.put("endCustomerID", endCustomerID);
-
-			if (rangeBeginIdx >= 0 && rangeEndIdx >= 0)
-				query.setRange(rangeBeginIdx, rangeEndIdx);
-
-			return CollectionUtil.castList((List<?>) query.executeWithMap(params));
+			throw new UnsupportedOperationException("NYI");
+//			Query query = pm.newNamedQuery(DeliveryNote.class, "getDeliveryNoteIDsByVendorAndCustomerAndEndCustomer");
+//			Map<String, Object> params = new HashMap<String, Object>();
+//			params.put("vendorID", vendorID);
+//			params.put("customerID", customerID);
+//			params.put("endCustomerID", endCustomerID);
+//
+//			if (rangeBeginIdx >= 0 && rangeEndIdx >= 0)
+//				query.setRange(rangeBeginIdx, rangeEndIdx);
+//
+//			return CollectionUtil.castList((List<?>) query.executeWithMap(params));
 		}
 
 		Query query = pm.newNamedQuery(DeliveryNote.class, endCustomerID == null ? "getDeliveryNoteIDsByVendorAndCustomer" : "getDeliveryNoteIDsByVendorAndEndCustomer");
@@ -396,11 +406,11 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private LegalEntity customer;
 
-	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 */
-	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
-	private LegalEntity endCustomer;
+//	/**
+//	 * @jdo.field persistence-modifier="persistent"
+//	 */
+//	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+//	private LegalEntity endCustomer;
 
 	/**
 	 * @jdo.field persistence-modifier="none"
@@ -424,17 +434,17 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private boolean customerID_detached = false;
 
-	/**
-	 * @jdo.field persistence-modifier="none"
-	 */
-	@Persistent(persistenceModifier=PersistenceModifier.NONE)
-	private AnchorID endCustomerID = null;
-
-	/**
-	 * @jdo.field persistence-modifier="none"
-	 */
-	@Persistent(persistenceModifier=PersistenceModifier.NONE)
-	private boolean endCustomerID_detached = false;
+//	/**
+//	 * @jdo.field persistence-modifier="none"
+//	 */
+//	@Persistent(persistenceModifier=PersistenceModifier.NONE)
+//	private AnchorID endCustomerID = null;
+//
+//	/**
+//	 * @jdo.field persistence-modifier="none"
+//	 */
+//	@Persistent(persistenceModifier=PersistenceModifier.NONE)
+//	private boolean endCustomerID_detached = false;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -626,10 +636,10 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 		return customer;
 	}
 
-	@Override
-	public LegalEntity getEndCustomer() {
-		return endCustomer;
-	}
+//	@Override
+//	public LegalEntity getEndCustomer() {
+//		return endCustomer;
+//	}
 
 	@Override
 	public LegalEntity getVendor() {
@@ -652,14 +662,14 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 		return customerID;
 	}
 
-	@Override
-	public AnchorID getEndCustomerID()
-	{
-		if (endCustomerID == null && !endCustomerID_detached)
-			endCustomerID = (AnchorID) JDOHelper.getObjectId(endCustomer);
-
-		return endCustomerID;
-	}
+//	@Override
+//	public AnchorID getEndCustomerID()
+//	{
+//		if (endCustomerID == null && !endCustomerID_detached)
+//			endCustomerID = (AnchorID) JDOHelper.getObjectId(endCustomer);
+//
+//		return endCustomerID;
+//	}
 
 	@Override
 	public Collection<Article> getArticles()
@@ -844,10 +854,10 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 			detached.customerID_detached = true;
 		}
 
-		if (fetchGroups.contains(FETCH_GROUP_END_CUSTOMER_ID)) {
-			detached.endCustomerID = attached.getEndCustomerID();
-			detached.endCustomerID_detached = true;
-		}
+//		if (fetchGroups.contains(FETCH_GROUP_END_CUSTOMER_ID)) {
+//			detached.endCustomerID = attached.getEndCustomerID();
+//			detached.endCustomerID_detached = true;
+//		}
 	}
 
 	@Override

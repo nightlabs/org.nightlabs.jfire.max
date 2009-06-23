@@ -202,17 +202,17 @@ implements
 	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private boolean customer_detached = false;
 
-	/**
-	 * @jdo.field persistence-modifier="none"
-	 */
-	@Persistent(persistenceModifier=PersistenceModifier.NONE)
-	private LegalEntity endCustomer = null;
-
-	/**
-	 * @jdo.field persistence-modifier="none"
-	 */
-	@Persistent(persistenceModifier=PersistenceModifier.NONE)
-	private boolean endCustomer_detached = false;
+//	/**
+//	 * @jdo.field persistence-modifier="none"
+//	 */
+//	@Persistent(persistenceModifier=PersistenceModifier.NONE)
+//	private LegalEntity endCustomer = null;
+//
+//	/**
+//	 * @jdo.field persistence-modifier="none"
+//	 */
+//	@Persistent(persistenceModifier=PersistenceModifier.NONE)
+//	private boolean endCustomer_detached = false;
 
 	/**
 	 * @jdo.field persistence-modifier="none"
@@ -238,17 +238,17 @@ implements
 	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private boolean customerID_detached = false;
 
-	/**
-	 * @jdo.field persistence-modifier="none"
-	 */
-	@Persistent(persistenceModifier=PersistenceModifier.NONE)
-	private AnchorID endCustomerID = null;
-
-	/**
-	 * @jdo.field persistence-modifier="none"
-	 */
-	@Persistent(persistenceModifier=PersistenceModifier.NONE)
-	private boolean endCustomerID_detached = false;
+//	/**
+//	 * @jdo.field persistence-modifier="none"
+//	 */
+//	@Persistent(persistenceModifier=PersistenceModifier.NONE)
+//	private AnchorID endCustomerID = null;
+//
+//	/**
+//	 * @jdo.field persistence-modifier="none"
+//	 */
+//	@Persistent(persistenceModifier=PersistenceModifier.NONE)
+//	private boolean endCustomerID_detached = false;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" mapped-by="receptionNote"
@@ -409,14 +409,14 @@ implements
 		return customer;
 	}
 
-	@Override
-	public LegalEntity getEndCustomer()
-	{
-		if (endCustomer == null && !endCustomer_detached)
-			endCustomer = deliveryNote.getEndCustomer();
-
-		return endCustomer;
-	}
+//	@Override
+//	public LegalEntity getEndCustomer()
+//	{
+//		if (endCustomer == null && !endCustomer_detached)
+//			endCustomer = deliveryNote.getEndCustomer();
+//
+//		return endCustomer;
+//	}
 
 	@Override
 	public AnchorID getVendorID()
@@ -436,14 +436,14 @@ implements
 		return customerID;
 	}
 
-	@Override
-	public AnchorID getEndCustomerID()
-	{
-		if (endCustomerID == null && !endCustomerID_detached)
-			endCustomerID = deliveryNote.getEndCustomerID();
-
-		return endCustomerID;
-	}
+//	@Override
+//	public AnchorID getEndCustomerID()
+//	{
+//		if (endCustomerID == null && !endCustomerID_detached)
+//			endCustomerID = deliveryNote.getEndCustomerID();
+//
+//		return endCustomerID;
+//	}
 
 	public ReceptionNoteLocal getReceptionNoteLocal()
 	{
@@ -484,10 +484,10 @@ implements
 			detached.customer_detached = true;
 		}
 
-		if (fetchGroups.contains(FETCH_GROUP_END_CUSTOMER)) {
-			detached.endCustomer = pm.detachCopy(attached.getEndCustomer());
-			detached.endCustomer_detached = true;
-		}
+//		if (fetchGroups.contains(FETCH_GROUP_END_CUSTOMER)) {
+//			detached.endCustomer = pm.detachCopy(attached.getEndCustomer());
+//			detached.endCustomer_detached = true;
+//		}
 
 		if (fetchGroups.contains(FETCH_GROUP_THIS_RECEPTION_NOTE) || fetchGroups.contains(FETCH_GROUP_VENDOR_ID)) {
 			detached.vendorID = attached.getVendorID();
@@ -499,10 +499,10 @@ implements
 			detached.customerID_detached = true;
 		}
 
-		if (fetchGroups.contains(FETCH_GROUP_END_CUSTOMER_ID)) {
-			detached.endCustomerID = attached.getEndCustomerID();
-			detached.endCustomerID_detached = true;
-		}
+//		if (fetchGroups.contains(FETCH_GROUP_END_CUSTOMER_ID)) {
+//			detached.endCustomerID = attached.getEndCustomerID();
+//			detached.endCustomerID_detached = true;
+//		}
 	}
 
 	public void jdoPreAttach()

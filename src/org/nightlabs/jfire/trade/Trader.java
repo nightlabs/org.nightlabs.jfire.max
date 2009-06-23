@@ -106,7 +106,6 @@ import org.nightlabs.jfire.trade.history.ProductHistoryItem.ProductHistoryItemTy
 import org.nightlabs.jfire.trade.id.ArticleID;
 import org.nightlabs.jfire.trade.id.OfferID;
 import org.nightlabs.jfire.trade.id.OfferLocalID;
-import org.nightlabs.jfire.trade.id.OrderID;
 import org.nightlabs.jfire.trade.id.TraderID;
 import org.nightlabs.jfire.trade.jbpm.ActionHandlerAcceptOffer;
 import org.nightlabs.jfire.trade.jbpm.ActionHandlerFinalizeOffer;
@@ -1963,7 +1962,7 @@ public class Trader
 
 			offer.setFinalized(user);
 
-			replicateEndCustomer(offer);
+			replicateEndCustomers(offer);
 
 			// trigger listeners
 			for (OfferActionHandler offerActionHandler : offer.getOfferLocal().getOfferActionHandlers()) {
@@ -1977,17 +1976,29 @@ public class Trader
 		}
 	}
 
+	/**
+	 * @deprecated Use {@link #replicateEndCustomers(Offer)} instead
+	 */
+	@Deprecated
 	public void replicateEndCustomer(Offer offer)
+	throws NamingException, RemoteException
+	{
+		replicateEndCustomers(offer);
+	}
+
+	public void replicateEndCustomers(Offer offer)
 	throws NamingException, RemoteException
 	{
 		PersistenceManager pm = getPersistenceManager();
 
-		LegalEntity endCustomer = offer.getEndCustomer();
-		if (endCustomer == null)
-			endCustomer = offer.getCustomer();
+//		LegalEntity endCustomer = offer.getEndCustomer();
+//		if (endCustomer == null)
+//			endCustomer = offer.getCustomer();
+		Map<OrganisationLegalEntity, Map<LegalEntity, Set<EndCustomerReplicationPolicy>>> vendor2EndCustomer2EndCustomerReplicationPoliciesMap = new HashMap<OrganisationLegalEntity, Map<LegalEntity,Set<EndCustomerReplicationPolicy>>>();
+		Map<OrganisationLegalEntity, Map<LegalEntity, Set<Article>>> vendor2EndCustomer2PartnerArticlesMap = new HashMap<OrganisationLegalEntity, Map<LegalEntity,Set<Article>>>();
 
-		Map<OrganisationLegalEntity, Set<EndCustomerReplicationPolicy>> vendor2EndCustomerReplicationPoliciesMap = new HashMap<OrganisationLegalEntity, Set<EndCustomerReplicationPolicy>>();
-		Map<OrganisationLegalEntity, Set<Order>> vendor2OrdersMap = new HashMap<OrganisationLegalEntity, Set<Order>>();
+//		Map<OrganisationLegalEntity, Set<EndCustomerReplicationPolicy>> vendor2EndCustomerReplicationPoliciesMap = new HashMap<OrganisationLegalEntity, Set<EndCustomerReplicationPolicy>>();
+//		Map<OrganisationLegalEntity, Set<Order>> vendor2OrdersMap = new HashMap<OrganisationLegalEntity, Set<Order>>();
 
 		OfferRequirement offerRequirement = OfferRequirement.getOfferRequirement(pm, offer, false);
 		if (offerRequirement != null) {
@@ -2002,39 +2013,115 @@ public class Trader
 					ProductType productType = partnerArticle.getProductType();
 					EndCustomerReplicationPolicy endCustomerReplicationPolicy = productType.getEndCustomerReplicationPolicy();
 					if (endCustomerReplicationPolicy != null) {
-						Set<EndCustomerReplicationPolicy> endCustomerReplicationPolicies = vendor2EndCustomerReplicationPoliciesMap.get(vendor);
+						// Look up the corresponding article in the local offer.
+						LegalEntity endCustomer = null;
+						Article localArticle = null;
+						Product partnerProduct = partnerArticle.getProduct();
+						if (partnerProduct != null) {
+							iterateLocalArticles: for (Article a : offer.getArticles()) {
+								Product product = a.getProduct();
+								if (product == null)
+									continue;
+
+								for (ProductLocal nestedProductLocal : product.getProductLocal().getNestedProductLocals()) {
+									if (nestedProductLocal.getProduct().equals(partnerProduct)) {
+										localArticle = a;
+										break iterateLocalArticles;
+									}
+								}
+							}
+						}
+
+						if (localArticle == null)
+							endCustomer = offer.getCustomer();
+						else {
+							endCustomer = localArticle.getEndCustomer();
+							if (endCustomer == null)
+								endCustomer = offer.getCustomer();
+						}
+
+						Map<LegalEntity, Set<Article>> endCustomer2PartnerArticlesMap = vendor2EndCustomer2PartnerArticlesMap.get(vendor);
+						if (endCustomer2PartnerArticlesMap == null) {
+							endCustomer2PartnerArticlesMap = new HashMap<LegalEntity, Set<Article>>();
+							vendor2EndCustomer2PartnerArticlesMap.put(vendor, endCustomer2PartnerArticlesMap);
+						}
+
+						Set<Article> partnerArticles = endCustomer2PartnerArticlesMap.get(endCustomer);
+						if (partnerArticles == null) {
+							partnerArticles = new HashSet<Article>();
+							endCustomer2PartnerArticlesMap.put(endCustomer, partnerArticles);
+						}
+						partnerArticles.add(partnerArticle);
+
+
+						Map<LegalEntity, Set<EndCustomerReplicationPolicy>> endCustomer2EndCustomerReplicationPoliciesMap = vendor2EndCustomer2EndCustomerReplicationPoliciesMap.get(vendor);
+						if (endCustomer2EndCustomerReplicationPoliciesMap == null) {
+							endCustomer2EndCustomerReplicationPoliciesMap = new HashMap<LegalEntity, Set<EndCustomerReplicationPolicy>>();
+							vendor2EndCustomer2EndCustomerReplicationPoliciesMap.put(vendor, endCustomer2EndCustomerReplicationPoliciesMap);
+						}
+
+						Set<EndCustomerReplicationPolicy> endCustomerReplicationPolicies = endCustomer2EndCustomerReplicationPoliciesMap.get(endCustomer);
 						if (endCustomerReplicationPolicies == null) {
 							endCustomerReplicationPolicies = new HashSet<EndCustomerReplicationPolicy>();
-							vendor2EndCustomerReplicationPoliciesMap.put(vendor, endCustomerReplicationPolicies);
+							endCustomer2EndCustomerReplicationPoliciesMap.put(endCustomer, endCustomerReplicationPolicies);
 						}
+
+//						Set<EndCustomerReplicationPolicy> endCustomerReplicationPolicies = vendor2EndCustomerReplicationPoliciesMap.get(vendor);
+//						if (endCustomerReplicationPolicies == null) {
+//							endCustomerReplicationPolicies = new HashSet<EndCustomerReplicationPolicy>();
+//							vendor2EndCustomerReplicationPoliciesMap.put(vendor, endCustomerReplicationPolicies);
+//						}
 						endCustomerReplicationPolicies.add(endCustomerReplicationPolicy);
 
-
-						Set<Order> orders = vendor2OrdersMap.get(vendor);
-						if (orders == null) {
-							orders = new HashSet<Order>();
-							vendor2OrdersMap.put(vendor, orders);
-						}
-						orders.add(partnerOffer.getOrder());
+//						Set<Order> orders = vendor2OrdersMap.get(vendor);
+//						if (orders == null) {
+//							orders = new HashSet<Order>();
+//							vendor2OrdersMap.put(vendor, orders);
+//						}
+//						orders.add(partnerOffer.getOrder());
 					}
 				}
 			}
 
-			for (Map.Entry<OrganisationLegalEntity, Set<EndCustomerReplicationPolicy>> me1 : vendor2EndCustomerReplicationPoliciesMap.entrySet()) {
+			for (Map.Entry<OrganisationLegalEntity, Map<LegalEntity, Set<Article>>> me1 : vendor2EndCustomer2PartnerArticlesMap.entrySet()) {
 				OrganisationLegalEntity vendor = me1.getKey();
-				Set<EndCustomerReplicationPolicy> endCustomerReplicationPolicies = me1.getValue();
-				Set<Order> orders = vendor2OrdersMap.get(vendor);
-				if (orders == null)
-					throw new IllegalStateException("vendor2OrdersMap.get(vendor) returned null! " + vendor);
+				Map<LegalEntity, Set<Article>> endCustomer2PartnerArticlesMap = me1.getValue();
+				Map<LegalEntity, Set<EndCustomerReplicationPolicy>> endCustomer2EndCustomerReplicationPoliciesMap = vendor2EndCustomer2EndCustomerReplicationPoliciesMap.get(vendor);
+				if (endCustomer2EndCustomerReplicationPoliciesMap == null)
+					throw new IllegalStateException("vendor2EndCustomer2EndCustomerReplicationPoliciesMap.get(vendor) returned null for: " + vendor);
 
-				LegalEntity detachedEndCustomer = EndCustomerReplicationPolicy.detachLegalEntity(pm, endCustomer, endCustomerReplicationPolicies);
+				for (Map.Entry<LegalEntity, Set<Article>> me2 : endCustomer2PartnerArticlesMap.entrySet()) {
+					LegalEntity endCustomer = me2.getKey();
+					Set<Article> partnerArticles = me2.getValue();
+					Set<EndCustomerReplicationPolicy> endCustomerReplicationPolicies = endCustomer2EndCustomerReplicationPoliciesMap.get(endCustomer);
+					if (endCustomerReplicationPolicies == null)
+						throw new IllegalStateException("endCustomer2EndCustomerReplicationPoliciesMap.get(endCustomer) returnd null! vendor=" + vendor + " endCustomer=" + endCustomer);
 
-				String partnerOrganisationID = vendor.getOrganisationID();
-				TradeManagerRemote tradeManager = JFireEjb3Factory.getRemoteBean(TradeManagerRemote.class, Lookup.getInitialContextProperties(pm, partnerOrganisationID));
+					LegalEntity detachedEndCustomer = EndCustomerReplicationPolicy.detachLegalEntity(pm, endCustomer, endCustomerReplicationPolicies);
 
-				Set<OrderID> orderIDs = NLJDOHelper.getObjectIDSet(orders);
-				tradeManager.storeEndCustomer(detachedEndCustomer, orderIDs);
+					String partnerOrganisationID = vendor.getOrganisationID();
+					TradeManagerRemote tradeManager = JFireEjb3Factory.getRemoteBean(TradeManagerRemote.class, Lookup.getInitialContextProperties(pm, partnerOrganisationID));
+
+					Set<ArticleID> partnerArticleIDs = NLJDOHelper.getObjectIDSet(partnerArticles);
+					tradeManager.storeEndCustomer(detachedEndCustomer, partnerArticleIDs);
+				}
 			}
+
+//			for (Map.Entry<OrganisationLegalEntity, Set<EndCustomerReplicationPolicy>> me1 : vendor2EndCustomerReplicationPoliciesMap.entrySet()) {
+//				OrganisationLegalEntity vendor = me1.getKey();
+//				Set<EndCustomerReplicationPolicy> endCustomerReplicationPolicies = me1.getValue();
+//				Set<Order> orders = vendor2OrdersMap.get(vendor);
+//				if (orders == null)
+//					throw new IllegalStateException("vendor2OrdersMap.get(vendor) returned null! " + vendor);
+//
+//				LegalEntity detachedEndCustomer = EndCustomerReplicationPolicy.detachLegalEntity(pm, endCustomer, endCustomerReplicationPolicies);
+//
+//				String partnerOrganisationID = vendor.getOrganisationID();
+//				TradeManagerRemote tradeManager = JFireEjb3Factory.getRemoteBean(TradeManagerRemote.class, Lookup.getInitialContextProperties(pm, partnerOrganisationID));
+//
+//				Set<OrderID> orderIDs = NLJDOHelper.getObjectIDSet(orders);
+//				tradeManager.storeEndCustomer(detachedEndCustomer, orderIDs);
+//			}
 		} // if (offerRequirement != null) {
 	}
 

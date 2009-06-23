@@ -40,22 +40,22 @@ import org.nightlabs.jfire.transfer.id.AnchorID;
 public interface ArticleContainer
 {
 	static final String FETCH_GROUP_CUSTOMER = "ArticleContainer.customer";
-	static final String FETCH_GROUP_END_CUSTOMER = "ArticleContainer.endCustomer";
+//	static final String FETCH_GROUP_END_CUSTOMER = "ArticleContainer.endCustomer";
 	static final String FETCH_GROUP_VENDOR = "ArticleContainer.vendor";
 	// the following fetch-groups are usually virtual in all implementations of this interface
 	// and processed manually in a detach callback
 	static final String FETCH_GROUP_VENDOR_ID = "ArticleContainer.vendorID";
 	static final String FETCH_GROUP_CUSTOMER_ID = "ArticleContainer.customerID";
-	static final String FETCH_GROUP_END_CUSTOMER_ID = "ArticleContainer.endCustomerID";
+//	static final String FETCH_GROUP_END_CUSTOMER_ID = "ArticleContainer.endCustomerID";
 
 	static final String FETCH_GROUP_PROPERTY_SET = "ArticleContainer.propertySet";
 
 	AnchorID getCustomerID();
-	AnchorID getEndCustomerID();
+//	AnchorID getEndCustomerID();
 	AnchorID getVendorID();
 
 	LegalEntity getCustomer();
-	LegalEntity getEndCustomer();
+//	LegalEntity getEndCustomer();
 	LegalEntity getVendor();
 
 	/**

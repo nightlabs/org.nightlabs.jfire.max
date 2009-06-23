@@ -2095,25 +2095,37 @@ implements TradeManagerRemote, TradeManagerLocal
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.nightlabs.jfire.trade.TradeManagerRemote#storeEndCustomer(org.nightlabs.jfire.trade.LegalEntity, java.util.Set)
-	 */
-	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("_Guest_")
-	public void storeEndCustomer(LegalEntity endCustomer, Set<OrderID> assignOrderIDs)
+	@Override
+	public void assignEndCustomer(AnchorID endCustomerID, Set<ArticleID> assignArticleIDs)
 	{
 		PersistenceManager pm = createPersistenceManager();
 		try {
-			LegalEntity attachedEndCustomer = EndCustomerReplicationPolicy.attachLegalEntity(pm, endCustomer);
-			Set<Order> orders = NLJDOHelper.getObjectSet(pm, assignOrderIDs, Order.class, QueryOption.throwExceptionOnMissingObject);
-			for (Order order : orders) {
-				order.setEndCustomer(attachedEndCustomer);
+			LegalEntity endCustomer = (LegalEntity) pm.getObjectById(endCustomerID);
+			Set<Article> articles = NLJDOHelper.getObjectSet(pm, assignArticleIDs, Article.class, QueryOption.throwExceptionOnMissingObject);
+			for (Article article : articles) {
+				article.setEndCustomer(endCustomer);
 			}
 		} finally {
 			pm.close();
 		}
 	}
 
+	@RolesAllowed("_Guest_")
+	@Override
+	public void storeEndCustomer(LegalEntity endCustomer, Set<ArticleID> assignArticleIDs)
+	{
+		PersistenceManager pm = createPersistenceManager();
+		try {
+			LegalEntity attachedEndCustomer = EndCustomerReplicationPolicy.attachLegalEntity(pm, endCustomer);
+			Set<Article> articles = NLJDOHelper.getObjectSet(pm, assignArticleIDs, Article.class, QueryOption.throwExceptionOnMissingObject);
+			for (Article article : articles) {
+				article.setEndCustomer(attachedEndCustomer);
+			}
+		} finally {
+			pm.close();
+		}
+	}
 
 	/* (non-Javadoc)
 	 * @see org.nightlabs.jfire.trade.TradeManagerRemote#assignDeliveryDate(java.util.Map, org.nightlabs.jfire.trade.DeliveryDateMode, boolean, java.lang.String[], int)

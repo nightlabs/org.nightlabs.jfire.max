@@ -215,16 +215,16 @@ import org.nightlabs.util.Util;
 		members=@Persistent(name="receptionNote")),
 	@FetchGroup(
 		name="FetchGroupsTrade.articleInOrderEditor",
-		members={@Persistent(name="articleLocal"), @Persistent(name="segment"), @Persistent(name="productType"), @Persistent(name="product"), @Persistent(name="tariff"), @Persistent(name="price")}),
+		members={@Persistent(name="articleLocal"), @Persistent(name="segment"), @Persistent(name="productType"), @Persistent(name="product"), @Persistent(name="tariff"), @Persistent(name="price"), @Persistent(name="endCustomer")}),
 	@FetchGroup(
 		name="FetchGroupsTrade.articleInOfferEditor",
-		members={@Persistent(name="articleLocal"), @Persistent(name="segment"), @Persistent(name="productType"), @Persistent(name="product"), @Persistent(name="tariff"), @Persistent(name="price")}),
+		members={@Persistent(name="articleLocal"), @Persistent(name="segment"), @Persistent(name="productType"), @Persistent(name="product"), @Persistent(name="tariff"), @Persistent(name="price"), @Persistent(name="endCustomer")}),
 	@FetchGroup(
 		name="FetchGroupsTrade.articleInInvoiceEditor",
-		members={@Persistent(name="articleLocal"), @Persistent(name="segment"), @Persistent(name="productType"), @Persistent(name="product"), @Persistent(name="tariff"), @Persistent(name="price")}),
+		members={@Persistent(name="articleLocal"), @Persistent(name="segment"), @Persistent(name="productType"), @Persistent(name="product"), @Persistent(name="tariff"), @Persistent(name="price"), @Persistent(name="endCustomer")}),
 	@FetchGroup(
 		name="FetchGroupsTrade.articleInDeliveryNoteEditor",
-		members={@Persistent(name="articleLocal"), @Persistent(name="segment"), @Persistent(name="productType"), @Persistent(name="product"), @Persistent(name="tariff"), @Persistent(name="price")}),
+		members={@Persistent(name="articleLocal"), @Persistent(name="segment"), @Persistent(name="productType"), @Persistent(name="product"), @Persistent(name="tariff"), @Persistent(name="price"), @Persistent(name="endCustomer")}),
 	@FetchGroup(
 		name="FetchGroupsTrade.articleCrossTradeReplication",
 		members={@Persistent(name="order"), @Persistent(name="offer"), @Persistent(name="invoice"), @Persistent(name="deliveryNote"), @Persistent(name="receptionNote"), @Persistent(name="price"), @Persistent(name="currency"), @Persistent(name="tariff"), @Persistent(name="reversedArticle"), @Persistent(name="reversingArticle"), @Persistent(name="segment"), @Persistent(name="productType"), @Persistent(name="product"), @Persistent(name="createUser")})
@@ -271,6 +271,7 @@ implements Serializable, DeleteCallback, DetachCallback, StoreCallback
 	public static final String FETCH_GROUP_REVERSING_ARTICLE_ID = "Article.reversingArticleID";
 	public static final String FETCH_GROUP_VENDOR_ID = "Article.vendorID";
 	public static final String FETCH_GROUP_CUSTOMER_ID = "Article.customerID";
+	public static final String FETCH_GROUP_END_CUSTOMER_ID = "Article.endCustomerID";
 
 //	/**
 //	 * @param pm The {@link PersistenceManager} used to access the datastore.
@@ -459,57 +460,46 @@ implements Serializable, DeleteCallback, DetachCallback, StoreCallback
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private User createUser = null;
 
-	/**
-	 * @jdo.field persistence-modifier="none"
-	 */
 	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private OrderID orderID = null;
-	/**
-	 * @jdo.field persistence-modifier="none"
-	 */
+
 	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private boolean orderID_detached = false;
-	/**
-	 * @jdo.field persistence-modifier="none"
-	 */
+
 	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private OfferID offerID = null;
-	/**
-	 * @jdo.field persistence-modifier="none"
-	 */
+
 	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private boolean offerID_detached = false;
-	/**
-	 * @jdo.field persistence-modifier="none"
-	 */
+
 	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private InvoiceID invoiceID = null;
-	/**
-	 * @jdo.field persistence-modifier="none"
-	 */
+
 	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private boolean invoiceID_detached = false;
-	/**
-	 * @jdo.field persistence-modifier="none"
-	 */
+
 	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private DeliveryNoteID deliveryNoteID = null;
-	/**
-	 * @jdo.field persistence-modifier="none"
-	 */
+
 	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private boolean deliveryNoteID_detached = false;
 
-	/**
-	 * @jdo.field persistence-modifier="none"
-	 */
 	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private ReceptionNoteID receptionNoteID = null;
-	/**
-	 * @jdo.field persistence-modifier="none"
-	 */
+
 	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private boolean receptionNoteID_detached = false;
+
+
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+	private LegalEntity endCustomer;
+
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
+	private AnchorID endCustomerID = null;
+
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
+	private boolean endCustomerID_detached = false;
+
 
 	public OrderID getOrderID()
 	{
@@ -1492,6 +1482,11 @@ implements Serializable, DeleteCallback, DetachCallback, StoreCallback
 			detached.customerID = attached.getCustomerID();
 			detached.customerID_detached = true;
 		}
+
+		if (fetchGroups.contains(FETCH_GROUP_END_CUSTOMER_ID)) {
+			detached.endCustomerID = attached.getEndCustomerID();
+			detached.endCustomerID_detached = true;
+		}
 	}
 
 	public void jdoPreStore()
@@ -1500,6 +1495,13 @@ implements Serializable, DeleteCallback, DetachCallback, StoreCallback
 			primaryKey = getPrimaryKey(organisationID, articleID);
 			logger.info("Seems, the JPOX bug still exists: primaryKey == null! Resetting it to " + primaryKey);
 		}
+
+		// TODO need history! later...
+//		if (JDOHelper.isNew(this) && endCustomer != null) {
+//			PersistenceManager pm = getPersistenceManager();
+//			User user = SecurityReflector.getUserDescriptor().getUser(pm);
+//			pm.makePersistent(new ArticleContainerEndCustomerHistoryItem(this, null, endCustomer, user));
+//		}
 	}
 
 	public void setAllocationException(String allocationExceptionClass, String allocationExceptionMessage, String allocationExceptionStackTrace)
@@ -1769,5 +1771,34 @@ implements Serializable, DeleteCallback, DetachCallback, StoreCallback
 			if (reversedArticle.getReversingArticle() == null)
 				reversedArticle.setReversingArticle(this);
 		}
+	}
+
+	public LegalEntity getEndCustomer() {
+		return endCustomer;
+	}
+
+	public void setEndCustomer(LegalEntity endCustomer) {
+		if (Util.equals(this.endCustomer, endCustomer))
+			return;
+
+		// TODO need history - later!
+//		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
+//		if (pm != null) {
+//			User user = SecurityReflector.getUserDescriptor().getUser(pm);
+//			pm.makePersistent(new ArticleContainerEndCustomerHistoryItem(this, this.endCustomer, endCustomer, user));
+//		}
+
+		this.endCustomer = endCustomer;
+
+		this.endCustomerID = null;
+		this.endCustomerID_detached = false;
+	}
+
+	public AnchorID getEndCustomerID()
+	{
+		if (endCustomerID == null && !endCustomerID_detached)
+			endCustomerID = (AnchorID) JDOHelper.getObjectId(endCustomer);
+
+		return endCustomerID;
 	}
 }

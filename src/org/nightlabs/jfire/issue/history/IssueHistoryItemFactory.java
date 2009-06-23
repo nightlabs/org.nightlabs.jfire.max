@@ -28,18 +28,18 @@ public abstract class IssueHistoryItemFactory {
 		IssueResolutionHistoryItemFactory.class, // [OK]
 		IssueWorkingStatusHistoryItemFactory.class, // [OK]
 		IssueFileAttachmentHistoryItemFactory.class, // [OK]
-		IssueLinkHistoryItemFactory.class, // [... in progress: Problem found when attempting to sever an IssueLink... aarrggg... it never ends!!]
-		                                   // <-- This one requires a different approach. See notes 16.06.2009 on "Handling the Storage of IssueLinks".
+		IssueLinkHistoryItemFactory.class, // [OK]
 
 //		IssueStateDefinitionHistoryItemFactory.class, // <-- oldIssue.getState().getStateDefinition().getName().getText()
 		                                              // Main problem: StateDefinition is in the JFireJbpm project, which is being referred to by this project (and not vice-versa).
 		                                              // I cannot place FetchGroupIssueHistoryItem among the fetch-groups in the related StateDefinition classes.
-		                                              // TODO Think of a solution. Soon.
+		                                              // FIXME Think of a solution. Soon.
 
 
 		// QN: There are fields from the Editor page that allow modifications but are not included in the
 		//     original codes in IssueHistoryItem; do we add them?
-		IssueProjectHistoryItemFactory.class, // <-- Currently, the drop-down combo allows changes for 'Standard' and 'JFire'.
+//		IssueProjectHistoryItemFactory.class, // FIXME [... in progress: Something is still not correct with the Issue--Project ]
+		                                      // <-- Currently, the drop-down combo allows changes for 'Standard' and 'JFire'.
 
 		// QN: Is every single one of the above necessary?
 //		IssueReporterHistoryItemFactory.class,  // <-- Can/should we change Reporter?

@@ -468,11 +468,7 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback, StoreCallbac
 		issueLinks = new HashSet<IssueLink>();
 		issueWorkTimeRanges = new ArrayList<IssueWorkTimeRange>();
 		states = new ArrayList<State>();
-
-		// --- 8< --- KaiExperiments: since 14.05.2009 ------------------
-		// --[ In preparation for an IssueMarker ]--
 		issueMarkers = new HashSet<IssueMarker>();
-		// ------ KaiExperiments ----- >8 -------------------------------
 
 		this.issueLocal = new IssueLocal(this);
 		this.propertySet = new PropertySet(
@@ -492,6 +488,15 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback, StoreCallbac
 		this(organisationID, issueID);
 		this.issueType = issueType;
 	}
+
+	/**
+	 * Constructs a new Issue for test/demo.
+	 */
+	protected Issue(boolean dummy, IssueType issueType) {
+		this(IDGenerator.getOrganisationID(), IDGenerator.nextID(Issue.class));
+		this.issueType = issueType;
+	}
+
 
 	/**
 	 * Returns the organisation id.

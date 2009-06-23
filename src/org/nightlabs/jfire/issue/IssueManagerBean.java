@@ -3,14 +3,15 @@ package org.nightlabs.jfire.issue;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Random;
 import java.util.Set;
 
 import javax.annotation.security.RolesAllowed;
@@ -32,7 +33,6 @@ import org.apache.log4j.Logger;
 import org.jbpm.JbpmContext;
 import org.jbpm.graph.exe.ProcessInstance;
 import org.jbpm.graph.exe.Token;
-import org.nightlabs.jdo.FetchPlanBackup;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
@@ -721,7 +721,7 @@ implements IssueManagerRemote
 					jbpmTransitionName = JbpmConstants.TRANSITION_NAME_UNASSIGN;
 
 				pIssue = pm.makePersistent(issue);
-				
+
 				if (jbpmTransitionName != null) {
 //					FetchPlanBackup fetchPlanBackup = NLJDOHelper.backupFetchPlan(pm.getFetchPlan());
 					JbpmContext jbpmContext = JbpmLookup.getJbpmConfiguration().createJbpmContext();
@@ -734,7 +734,7 @@ implements IssueManagerRemote
 						jbpmContext.close();
 					}
 //						NLJDOHelper.restoreFetchPlan(pm.getFetchPlan(), fetchPlanBackup);
-					
+
 //					// performing a transition might cause the fetch-plan to be modified => backup + restore
 //					FetchPlanBackup fetchPlanBackup = NLJDOHelper.backupFetchPlan(pm.getFetchPlan());
 //					JbpmContext jbpmContext = JbpmLookup.getJbpmConfiguration().createJbpmContext();
@@ -743,14 +743,14 @@ implements IssueManagerRemote
 //						Token token = processInstance.getRootToken();
 //						if (token.getNode().hasLeavingTransition(jbpmTransitionName))
 //							token.signal(jbpmTransitionName);
-//						
+//
 //					} finally {
 //						jbpmContext.close();
 //					}
 //					NLJDOHelper.restoreFetchPlan(pm.getFetchPlan(), fetchPlanBackup);
 				}
-				
-				
+
+
 			}
 
 			if (!get)
@@ -1417,6 +1417,7 @@ implements IssueManagerRemote
 			issuePriorityImmediate = pm.makePersistent(issuePriorityImmediate);
 			issueTypeDefault.getIssuePriorities().add(issuePriorityImmediate);
 
+
 			// Create the resolutions
 			IssueResolution issueResolutionNotAssigned = new IssueResolution(getOrganisationID(), IssueResolution.ISSUE_RESOLUTION_ID_NOT_ASSIGNED.issueResolutionID);
 			issueResolutionNotAssigned.getName().readFromProperties(baseName, loader,
@@ -1465,7 +1466,9 @@ implements IssueManagerRemote
 			// Create the process definitions.
 			issueTypeCustomer.readProcessDefinition(IssueType.class.getResource("jbpm/status/"));
 
-			// Create the issueLinkTypes
+
+
+			// ---[ IssueLinkTypes ]--------------------------------------------------------------------------------------------| Start |---
 			IssueLinkType issueLinkTypeRelated = new IssueLinkType(IssueLinkType.ISSUE_LINK_TYPE_ID_RELATED);
 			issueLinkTypeRelated.getName().readFromProperties(baseName, loader,
 			"org.nightlabs.jfire.issue.IssueManagerBean.issueLinkTypeRelated"); //$NON-NLS-1$
@@ -1500,9 +1503,11 @@ implements IssueManagerRemote
 			issueLinkTypeHasDuplicate.getName().readFromProperties(baseName, loader, "org.nightlabs.jfire.issue.IssueManagerBean.issueLinkTypeHasDuplicate" ); //$NON-NLS-1$
 			issueLinkTypeHasDuplicate.addLinkedObjectClass(Issue.class);
 			issueLinkTypeHasDuplicate = pm.makePersistent(issueLinkTypeHasDuplicate);
+			// ---[ IssueLinkTypes ]----------------------------------------------------------------------------------------------| End |---
 
 
-			// Create the project type
+
+			// ---[ ProjectTypes ]----------------------------------------------------------------------------------------------| Start |---
 			pm.getExtent(ProjectType.class);
 
 			ProjectType projectTypeDefault = new ProjectType(ProjectType.PROJECT_TYPE_ID_DEFAULT);
@@ -1532,199 +1537,77 @@ implements IssueManagerRemote
 			"org.nightlabs.jfire.issue.IssueManagerBean.jfireProject"); //$NON-NLS-1$
 			jfireProject.setProjectType(projectTypeSoftware);
 			jfireProject = pm.makePersistent(jfireProject);
-//
-//			//--
-//			Project subProject = new Project(IDGenerator.getOrganisationID(), IDGenerator.nextID(Project.class));
-//			subProject.getName().setText(Locale.ENGLISH.getLanguage(), "Sub project 1");
-//			project.addSubProject(subProject);
-//
-//			Project subsubProject = new Project(IDGenerator.getOrganisationID(), IDGenerator.nextID(Project.class));
-//			subsubProject.getName().setText(Locale.ENGLISH.getLanguage(), "Sub Sub project 1.1");
-//			subProject.addSubProject(subsubProject);
-//
-//			subsubProject = new Project(IDGenerator.getOrganisationID(), IDGenerator.nextID(Project.class));
-//			subsubProject.getName().setText(Locale.ENGLISH.getLanguage(), "Sub Sub project 1.2");
-//			subProject.addSubProject(subsubProject);
-//
-//			subsubProject = new Project(IDGenerator.getOrganisationID(), IDGenerator.nextID(Project.class));
-//			subsubProject.getName().setText(Locale.ENGLISH.getLanguage(), "Sub Sub project 1.3");
-//			subProject.addSubProject(subsubProject);
-//
-//			//--
-//			subProject = new Project(IDGenerator.getOrganisationID(), IDGenerator.nextID(Project.class));
-//			subProject.getName().setText(Locale.ENGLISH.getLanguage(), "Sub project 2");
-//			project.addSubProject(subProject);
-//
-//			subsubProject = new Project(IDGenerator.getOrganisationID(), IDGenerator.nextID(Project.class));
-//			subsubProject.getName().setText(Locale.ENGLISH.getLanguage(), "Sub Sub project 2.1");
-//			subProject.addSubProject(subsubProject);
-//
-//			subsubProject = new Project(IDGenerator.getOrganisationID(), IDGenerator.nextID(Project.class));
-//			subsubProject.getName().setText(Locale.ENGLISH.getLanguage(), "Sub Sub project 2.2");
-//			subProject.addSubProject(subsubProject);
-//
-//			subsubProject = new Project(IDGenerator.getOrganisationID(), IDGenerator.nextID(Project.class));
-//			subsubProject.getName().setText(Locale.ENGLISH.getLanguage(), "Sub Sub project 2.3");
-//			subProject.addSubProject(subsubProject);
-//			//--
-//			subProject = new Project(IDGenerator.getOrganisationID(), IDGenerator.nextID(Project.class));
-//			subProject.getName().setText(Locale.ENGLISH.getLanguage(), "Sub project 3");
-//			project.addSubProject(subProject);
-//
-//			subProject = new Project(IDGenerator.getOrganisationID(), IDGenerator.nextID(Project.class));
-//			subProject.getName().setText(Locale.ENGLISH.getLanguage(), "Sub project 4");
-//			project.addSubProject(subProject);
-
-			//--
-//			project = new Project(IDGenerator.getOrganisationID(), IDGenerator.nextID(Project.class));
-//			project.getName().setText(Locale.ENGLISH.getLanguage(), "Project 2");
-//			project.setProjectType(projectType1);
-//			project = pm.makePersistent(project);
-//
-//			project = new Project(IDGenerator.getOrganisationID(), IDGenerator.nextID(Project.class));
-//			project.getName().setText(Locale.ENGLISH.getLanguage(), "Project 3");
-//			project.setProjectType(projectType1);
-//			project = pm.makePersistent(project);
-//
-//			project = new Project(IDGenerator.getOrganisationID(), IDGenerator.nextID(Project.class));
-//			project.getName().setText(Locale.ENGLISH.getLanguage(), "Project 4");
-//			project.setProjectType(projectType1);
-//			project = pm.makePersistent(project);
-
-//			projectDefault = new Project(IDGenerator.getOrganisationID(), IDGenerator.nextID(Project.class));
-//			projectDefault.getName().setText(Locale.ENGLISH.getLanguage(), "Project 5");
-//			projectDefault.setProjectType(projectTypeDefault);
-//			projectDefault = pm.makePersistent(projectDefault);
-
-//			// Create the project phases
-//			pm.getExtent(ProjectPhase.class);
-//
-//			ProjectPhase projectPhase = new ProjectPhase(IDGenerator.getOrganisationID(), "phase1");
-//			projectPhase.getName().readFromProperties(baseName, loader,
-//			"org.nightlabs.jfire.issue.IssueManagerBean.projectPhase1"); //$NON-NLS-1$
-//			projectPhase = pm.makePersistent(projectPhase);
-//
-//			projectPhase = new ProjectPhase(IDGenerator.getOrganisationID(), "phase2");
-//			projectPhase.getName().readFromProperties(baseName, loader,
-//			"org.nightlabs.jfire.issue.IssueManagerBean.projectPhase2"); //$NON-NLS-1$
-//			projectPhase = pm.makePersistent(projectPhase);
-//
-//			projectPhase = new ProjectPhase(IDGenerator.getOrganisationID(), "phase3");
-//			projectPhase.getName().readFromProperties(baseName, loader,
-//			"org.nightlabs.jfire.issue.IssueManagerBean.projectPhase3"); //$NON-NLS-1$
-//			projectPhase = pm.makePersistent(projectPhase);
-//
-//			projectPhase = new ProjectPhase(IDGenerator.getOrganisationID(), "phase4");
-//			projectPhase.getName().readFromProperties(baseName, loader,
-//			"org.nightlabs.jfire.issue.IssueManagerBean.projectPhase4"); //$NON-NLS-1$
-//			projectPhase = pm.makePersistent(projectPhase);
+			// ---[ ProjectTypes ]------------------------------------------------------------------------------------------------| End |---
 
 
-			// --- 8< --- KaiExperiments: since 14.05.2009 ------------------
-			// --[ In preparation for an IssueMarker ]--
+
+			// ---[ IssueMarkers ]----------------------------------------------------------------------------------------------| Start |---
 			IssueMarker issueMarker_Email = new IssueMarker(false);
 			assignIssueMarkerIcon16x16(issueMarker_Email, "IssueMarker-email.16x16.png");
-			issueMarker_Email.getName().setText(Locale.ENGLISH.getLanguage(), "Email");								// }<-- FIXME Language is only for Testing.
-			issueMarker_Email.getDescription().setText(Locale.ENGLISH.getLanguage(), "Log an email conversation.");	// }    And use the cleanup with the method: readFromProperties(blah).
+			issueMarker_Email.getName().readFromProperties(baseName, loader, "org.nightlabs.jfire.issue.issuemarker.IssueMarkerEmail.name");
+			issueMarker_Email.getDescription().readFromProperties(baseName, loader, "org.nightlabs.jfire.issue.issuemarker.IssueMarkerEmail.description");
 			issueMarker_Email = pm.makePersistent(issueMarker_Email);
 
 			IssueMarker issueMarker_Phone = new IssueMarker(false);
 			assignIssueMarkerIcon16x16(issueMarker_Phone, "IssueMarker-phone.16x16.png");
-			issueMarker_Phone.getName().setText(Locale.ENGLISH.getLanguage(), "Phone");
-			issueMarker_Phone.getDescription().setText(Locale.ENGLISH.getLanguage(), "Log a telephone conversation.");
+			issueMarker_Phone.getName().readFromProperties(baseName, loader, "org.nightlabs.jfire.issue.issuemarker.IssueMarkerPhone.name");
+			issueMarker_Phone.getDescription().readFromProperties(baseName, loader, "org.nightlabs.jfire.issue.issuemarker.IssueMarkerPhone.description");
 			issueMarker_Phone = pm.makePersistent(issueMarker_Phone);
-			// ------ KaiExperiments ----- >8 -------------------------------
+			// ---[ IssueMarkers ]------------------------------------------------------------------------------------------------| End |---
 
 
-			//Issues
+
+			// ---[ Issues ]----------------------------------------------------------------------------------------------------| Start |---
+			// TODO Move the following DEMO Issues to a demo-data-creation module; yet to be created. Coming soon... stay tuned ;-)
 			pm.getExtent(Issue.class);
 
-			Issue issue1 = new Issue(IDGenerator.getOrganisationID(), IDGenerator.nextID(Issue.class), issueTypeDefault);
-			issue1.setIssuePriority(issuePriorityHigh);
-			issue1.setIssueResolution(issueResolutionOpen);
-			issue1.setIssueSeverityType(issueSeverityTypeMinor);
-			issue1.setReporter(systemUser);
-			IssueSubject subject1 = issue1.getSubject(); //new IssueSubject(issue1);
-			subject1.readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.IssueManagerBean.subject1"); //$NON-NLS-1$
-//			issue1.setSubject(subject1);
+			int totDemoIssueCnt = 22;
+			List<IssuePriority> def_issuePriorities = issueTypeDefault.getIssuePriorities();
+			List<IssueResolution> def_issueResolutions = issueTypeDefault.getIssueResolutions();
+			List<IssueSeverityType> def_issueSeverityTypes = issueTypeDefault.getIssueSeverityTypes();
+			List<Issue> demoIssues = new ArrayList<Issue>(totDemoIssueCnt);
 
-			// TODO Some IssueMarkers are DEFAULT DATA rather than DEMO DATA. The DEFAULT DATA needs to be created here, while the DEMO DATA needs to be created
-			// by one of the demo-data-creation-modules (e.g. JFireChezFrancois). Hence, the following needs to be refactored as demo data and default data.
+			Random rndGen = new Random( System.currentTimeMillis() );
+			for (int i=0; i<totDemoIssueCnt; i++) {
+				Issue demoIssue = new Issue(true, issueTypeDefault);
 
-			// --- 8< --- KaiExperiments: since 14.05.2009 ------------------
-			// --[ In preparation for an IssueMarker ]--
-			issue1.addIssueMarker(issueMarker_Email);
-			issue1.addIssueMarker(issueMarker_Phone);
-			// ------ KaiExperiments ----- >8 -------------------------------
+				// Essential issue settings
+				demoIssue.setReporter(systemUser);
+				demoIssue.setIssuePriority( def_issuePriorities.get( rndGen.nextInt(def_issuePriorities.size()) ) );
+				demoIssue.setIssueResolution( def_issueResolutions.get( rndGen.nextInt(def_issueResolutions.size()) ) );
+				demoIssue.setIssueSeverityType( def_issueSeverityTypes.get( rndGen.nextInt(def_issueSeverityTypes.size()) ) );
 
-			storeIssue(issue1, false, new String[0], NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
+				// Subject and description
+				demoIssue.getSubject().readFromProperties(baseName, loader, "org.nightlabs.jfire.issue.IssueManagerBean.issueSubject" + (i+1)); //$NON-NLS-1$
+				demoIssue.getDescription().readFromProperties(baseName, loader, "org.nightlabs.jfire.issue.IssueManagerBean.issueDescription" + (i+1)); //$NON-NLS-1$
 
-			Issue issue2 = new Issue(IDGenerator.getOrganisationID(), IDGenerator.nextID(Issue.class), issueTypeDefault);
-			issue2.setIssuePriority(issuePriorityHigh);
-			issue2.setIssueResolution(issueResolutionOpen);
-			issue2.setIssueSeverityType(issueSeverityTypeMinor);
-			issue2.setReporter(systemUser);
-			IssueSubject subject2 = issue2.getSubject(); // new IssueSubject(issue2);
-			subject2.readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.IssueManagerBean.subject2"); //$NON-NLS-1$
-//			issue2.setSubject(subject2);
+				// Markers
+				if (rndGen.nextInt(100) < 40)	demoIssue.addIssueMarker(issueMarker_Phone);
+				if (rndGen.nextInt(100) < 65)	demoIssue.addIssueMarker(issueMarker_Email);
 
-			// --- 8< --- KaiExperiments: since 14.05.2009 ------------------
-			// --[ In preparation for an IssueMarker ]--
-			issue2.addIssueMarker(issueMarker_Phone);	// <-- Test order; reversed from issue1.
-			issue2.addIssueMarker(issueMarker_Email);
-			// ------ KaiExperiments ----- >8 -------------------------------
 
-			storeIssue(issue2, false, new String[0], NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
+				// Randomly (and playfully?) create links between Issues.
+				if (demoIssues.size() > 5) {
+					List<Integer> usedIndexRefs = new ArrayList<Integer>();
+					while (rndGen.nextInt(100) < 67 && usedIndexRefs.size() < demoIssues.size()/2) {
+						int index = rndGen.nextInt(demoIssues.size());
+						if ( !usedIndexRefs.contains(index) ) {
+							demoIssue.createIssueLink(issueLinkTypeParent, demoIssues.get(index));
+							usedIndexRefs.add(index);
+						}
+					}
+				}
 
-			Issue issue3 = new Issue(IDGenerator.getOrganisationID(), IDGenerator.nextID(Issue.class), issueTypeDefault);
-			issue3.setIssuePriority(issuePriorityHigh);
-			issue3.setIssueResolution(issueResolutionOpen);
-			issue3.setIssueSeverityType(issueSeverityTypeMinor);
-			issue3.setReporter(systemUser);
-			IssueSubject subject3 = issue3.getSubject(); // new IssueSubject(issue3);
-			subject3.readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.IssueManagerBean.subject3"); //$NON-NLS-1$
-//			issue3.setSubject(subject3);
 
-			storeIssue(issue3, false, new String[0], NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
+				// Done and store.
+				demoIssues.add(demoIssue);
+				storeIssue(demoIssue, false, new String[0], NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
+			}
+			// ---[ Issues ]------------------------------------------------------------------------------------------------------| End |---
 
-			Issue issue4 = new Issue(IDGenerator.getOrganisationID(), IDGenerator.nextID(Issue.class), issueTypeDefault);
-			issue4.setIssuePriority(issuePriorityHigh);
-			issue4.setIssueResolution(issueResolutionOpen);
-			issue4.setIssueSeverityType(issueSeverityTypeMinor);
-			issue4.setReporter(systemUser);
-			IssueSubject subject4 = issue4.getSubject(); // new IssueSubject(issue4);
-			subject4.readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.IssueManagerBean.subject4"); //$NON-NLS-1$
-//			issue4.setSubject(subject4);
 
-			// --- 8< --- KaiExperiments: since 14.05.2009 ------------------
-			// --[ In preparation for an IssueMarker ]--
-			issue4.addIssueMarker(issueMarker_Phone);
-			// ------ KaiExperiments ----- >8 -------------------------------
 
-			storeIssue(issue4, false, new String[0], NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
-
-			Issue issue5 = new Issue(IDGenerator.getOrganisationID(), IDGenerator.nextID(Issue.class), issueTypeDefault);
-			issue5.setIssuePriority(issuePriorityHigh);
-			issue5.setIssueResolution(issueResolutionOpen);
-			issue5.setIssueSeverityType(issueSeverityTypeMinor);
-			issue5.setReporter(systemUser);
-			IssueSubject subject5 = issue5.getSubject(); // new IssueSubject(issue5);
-			subject5.readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.IssueManagerBean.subject5"); //$NON-NLS-1$
-//			issue5.setSubject(subject5);
-
-			// --- 8< --- KaiExperiments: since 14.05.2009 ------------------
-			// --[ In preparation for an IssueMarker ]--
-			issue5.addIssueMarker(issueMarker_Email);
-			// ------ KaiExperiments ----- >8 -------------------------------
-
-			storeIssue(issue5, false, new String[0], NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
-
-			//Predefined Query Stores
+			// ---[ Predefined Query Stores ]-----------------------------------------------------------------------------------| Start |---
 			IssueQuery newIssueIssueQuery = new IssueQuery();
 			newIssueIssueQuery.clearQuery();
 			newIssueIssueQuery.setAllFieldsDisabled();

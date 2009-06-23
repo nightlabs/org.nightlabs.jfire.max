@@ -31,6 +31,7 @@ import javax.mail.internet.MimeMessage;
 import org.apache.log4j.Logger;
 import org.jbpm.JbpmContext;
 import org.jbpm.graph.exe.ProcessInstance;
+import org.jbpm.graph.exe.Token;
 import org.nightlabs.jdo.FetchPlanBackup;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.ObjectID;
@@ -719,21 +720,37 @@ implements IssueManagerRemote
 				if (doUnassign)
 					jbpmTransitionName = JbpmConstants.TRANSITION_NAME_UNASSIGN;
 
+				pIssue = pm.makePersistent(issue);
+				
 				if (jbpmTransitionName != null) {
-					// performing a transition might cause the fetch-plan to be modified => backup + restore
-					FetchPlanBackup fetchPlanBackup = NLJDOHelper.backupFetchPlan(pm.getFetchPlan());
+//					FetchPlanBackup fetchPlanBackup = NLJDOHelper.backupFetchPlan(pm.getFetchPlan());
 					JbpmContext jbpmContext = JbpmLookup.getJbpmConfiguration().createJbpmContext();
 					try {
 						ProcessInstance processInstance = jbpmContext.getProcessInstanceForUpdate(issue.getIssueLocal().getJbpmProcessInstanceId());
-						if (processInstance.getRootToken().getNode().hasLeavingTransition(jbpmTransitionName))
-							processInstance.signal(jbpmTransitionName);
+						Token token = processInstance.getRootToken();
+						if (token.getNode().hasLeavingTransition(jbpmTransitionName))
+							signalIssue(issueID, jbpmTransitionName, get, fetchGroups, maxFetchDepth);
 					} finally {
 						jbpmContext.close();
 					}
-					NLJDOHelper.restoreFetchPlan(pm.getFetchPlan(), fetchPlanBackup);
+//						NLJDOHelper.restoreFetchPlan(pm.getFetchPlan(), fetchPlanBackup);
+					
+//					// performing a transition might cause the fetch-plan to be modified => backup + restore
+//					FetchPlanBackup fetchPlanBackup = NLJDOHelper.backupFetchPlan(pm.getFetchPlan());
+//					JbpmContext jbpmContext = JbpmLookup.getJbpmConfiguration().createJbpmContext();
+//					try {
+//						ProcessInstance processInstance = jbpmContext.getProcessInstanceForUpdate(issue.getIssueLocal().getJbpmProcessInstanceId());
+//						Token token = processInstance.getRootToken();
+//						if (token.getNode().hasLeavingTransition(jbpmTransitionName))
+//							token.signal(jbpmTransitionName);
+//						
+//					} finally {
+//						jbpmContext.close();
+//					}
+//					NLJDOHelper.restoreFetchPlan(pm.getFetchPlan(), fetchPlanBackup);
 				}
-
-				pIssue = pm.makePersistent(issue);
+				
+				
 			}
 
 			if (!get)

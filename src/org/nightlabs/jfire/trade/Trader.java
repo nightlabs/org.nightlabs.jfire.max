@@ -2013,7 +2013,7 @@ public class Trader
 					ProductType productType = partnerArticle.getProductType();
 					EndCustomerReplicationPolicy endCustomerReplicationPolicy = productType.getEndCustomerReplicationPolicy();
 					if (endCustomerReplicationPolicy != null) {
-						// Look up the corresponding article in the local offer.
+						// Look up the corresponding article in the local offer. // TODO might be *multiple* partnerArticles for the same local article! Hmmm... that might already work. Needs testing. Marco.
 						LegalEntity endCustomer = null;
 						Article localArticle = null;
 						Product partnerProduct = partnerArticle.getProduct();

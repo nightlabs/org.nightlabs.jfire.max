@@ -36,6 +36,7 @@ import java.util.Set;
 
 import javax.jdo.JDODetachedFieldAccessException;
 import javax.jdo.JDOHelper;
+import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 import javax.jdo.annotations.Column;
@@ -51,12 +52,14 @@ import javax.jdo.annotations.PrimaryKey;
 import javax.jdo.annotations.Queries;
 import javax.jdo.annotations.Version;
 import javax.jdo.annotations.VersionStrategy;
+import javax.jdo.listener.AttachCallback;
 import javax.jdo.listener.DeleteCallback;
 import javax.jdo.listener.DetachCallback;
 import javax.jdo.listener.StoreCallback;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.log4j.Logger;
+import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.Invoice;
@@ -64,6 +67,8 @@ import org.nightlabs.jfire.accounting.Tariff;
 import org.nightlabs.jfire.accounting.id.InvoiceID;
 import org.nightlabs.jfire.accounting.priceconfig.IPackagePriceConfig;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
+import org.nightlabs.jfire.organisation.LocalOrganisation;
+import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.DeliveryNote;
 import org.nightlabs.jfire.store.Product;
@@ -239,7 +244,7 @@ import org.nightlabs.util.Util;
 })
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class Article
-implements Serializable, DeleteCallback, DetachCallback, StoreCallback
+implements Serializable, DeleteCallback, AttachCallback, DetachCallback, StoreCallback
 {
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger = Logger.getLogger(Article.class);
@@ -1489,6 +1494,37 @@ implements Serializable, DeleteCallback, DetachCallback, StoreCallback
 		}
 	}
 
+	@Override
+	public void jdoPreAttach() {
+		LegalEntity endCustomer;
+		try {
+			endCustomer = this.getEndCustomer();
+		} catch (JDODetachedFieldAccessException x) {
+			endCustomer = null;
+		}
+
+		if (endCustomer != null) {
+			PersistenceManager pm = NLJDOHelper.getThreadPersistenceManager();
+			if (this.organisationID.equals(LocalOrganisation.getLocalOrganisation(pm).getOrganisationID())) {
+				ArticleID articleID = (ArticleID) JDOHelper.getObjectId(this);
+				Article persistentArticle = null;
+				try {
+					persistentArticle = (Article) pm.getObjectById(articleID);
+				} catch (JDOObjectNotFoundException x) {
+					// ignore
+				}
+				if (persistentArticle != null && !endCustomer.equals(persistentArticle.getEndCustomer())) {
+					User user = SecurityReflector.getUserDescriptor().getUser(pm);
+					pm.makePersistent(new ArticleEndCustomerHistoryItem(this, persistentArticle.getEndCustomer(), endCustomer, user));
+				}
+			}
+		}
+	}
+
+	@Override
+	public void jdoPostAttach(Object o) {
+	}
+
 	public void jdoPreStore()
 	{
 		if (primaryKey == null) {
@@ -1496,12 +1532,11 @@ implements Serializable, DeleteCallback, DetachCallback, StoreCallback
 			logger.info("Seems, the JPOX bug still exists: primaryKey == null! Resetting it to " + primaryKey);
 		}
 
-		// TODO need history! later...
-//		if (JDOHelper.isNew(this) && endCustomer != null) {
-//			PersistenceManager pm = getPersistenceManager();
-//			User user = SecurityReflector.getUserDescriptor().getUser(pm);
-//			pm.makePersistent(new ArticleContainerEndCustomerHistoryItem(this, null, endCustomer, user));
-//		}
+		if (JDOHelper.isNew(this) && endCustomer != null) {
+			PersistenceManager pm = getPersistenceManager();
+			User user = SecurityReflector.getUserDescriptor().getUser(pm);
+			pm.makePersistent(new ArticleEndCustomerHistoryItem(this, null, endCustomer, user));
+		}
 	}
 
 	public void setAllocationException(String allocationExceptionClass, String allocationExceptionMessage, String allocationExceptionStackTrace)
@@ -1781,12 +1816,11 @@ implements Serializable, DeleteCallback, DetachCallback, StoreCallback
 		if (Util.equals(this.endCustomer, endCustomer))
 			return;
 
-		// TODO need history - later!
-//		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
-//		if (pm != null) {
-//			User user = SecurityReflector.getUserDescriptor().getUser(pm);
-//			pm.makePersistent(new ArticleContainerEndCustomerHistoryItem(this, this.endCustomer, endCustomer, user));
-//		}
+		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
+		if (pm != null) {
+			User user = SecurityReflector.getUserDescriptor().getUser(pm);
+			pm.makePersistent(new ArticleEndCustomerHistoryItem(this, this.endCustomer, endCustomer, user));
+		}
 
 		this.endCustomer = endCustomer;
 

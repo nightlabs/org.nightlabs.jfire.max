@@ -15,18 +15,18 @@ import org.nightlabs.jdo.ObjectID;
 
 
 /**
- * The JDO object id class for {@link org.nightlabs.jfire.trade.ArticleContainerEndCustomerHistoryItem}.
+ * The JDO object id class for {@link org.nightlabs.jfire.trade.ArticleEndCustomerHistoryItem}.
  * <p>This class was auto-generated.</p>
  */
 @Generated("org.nightlabs.eclipse.sdk.jdo.ObjectIdGenerator")
-public class ArticleContainerEndCustomerHistoryItemID
+public class ArticleEndCustomerHistoryItemID
 implements ObjectID
 {
 	/**
 	 * The serial version uid of this class.
 	 */
 	@Generated("org.nightlabs.eclipse.sdk.jdo.ObjectIdGenerator")
-	private static final long serialVersionUID = -4135297466992591163L;
+	private static final long serialVersionUID = -1803344621L;
 
 	/**
 	 * The values of all fields are URL encoded in UTF-8.
@@ -78,45 +78,45 @@ implements ObjectID
 
 	/**
 	 * Primary key field organisationID.
-	 * Declared as primary key field in {@link org.nightlabs.jfire.trade.ArticleContainerEndCustomerHistoryItem}.
+	 * Declared as primary key field in {@link org.nightlabs.jfire.trade.ArticleEndCustomerHistoryItem}.
 	 */
 	@Generated("org.nightlabs.eclipse.sdk.jdo.ObjectIdGenerator")
 	public java.lang.String organisationID;
 
 	/**
-	 * Primary key field articleContainerEndCustomerHistoryItemID.
-	 * Declared as primary key field in {@link org.nightlabs.jfire.trade.ArticleContainerEndCustomerHistoryItem}.
+	 * Primary key field articleEndCustomerHistoryItemID.
+	 * Declared as primary key field in {@link org.nightlabs.jfire.trade.ArticleEndCustomerHistoryItem}.
 	 */
 	@Generated("org.nightlabs.eclipse.sdk.jdo.ObjectIdGenerator")
-	public long articleContainerEndCustomerHistoryItemID;
+	public long articleEndCustomerHistoryItemID;
 
 	/**
-	 * Create a new empty instance of ArticleContainerEndCustomerHistoryItemID.
+	 * Create a new empty instance of ArticleEndCustomerHistoryItemID.
 	 */
 	@Generated("org.nightlabs.eclipse.sdk.jdo.ObjectIdGenerator")
-	public ArticleContainerEndCustomerHistoryItemID()
+	public ArticleEndCustomerHistoryItemID()
 	{
 	}
 
 	/**
-	 * Create a new instance of ArticleContainerEndCustomerHistoryItemID.
+	 * Create a new instance of ArticleEndCustomerHistoryItemID.
 	 * This is done by parsing the <code>keyStr</code> that has been created
 	 * by {@link #toString()} and setting all fields to the values from the string.
 	 * <p>
 	 * This means, the following code will create a copy of this class:<br/><br/>
-	 * <code>ArticleContainerEndCustomerHistoryItemID newArticleContainerEndCustomerHistoryItemID = new ArticleContainerEndCustomerHistoryItemID(oldArticleContainerEndCustomerHistoryItemID.toString());</code>
+	 * <code>ArticleEndCustomerHistoryItemID newArticleEndCustomerHistoryItemID = new ArticleEndCustomerHistoryItemID(oldArticleEndCustomerHistoryItemID.toString());</code>
 	 * </p>
 	 * @param keyStr A String formatted as "jdo/{className}?{field0}={value0}&amp;{field1}={value1}...&amp;{fieldN}={valueN}"
 	 *     where all values are url encoded using {@link #ENCODING}.
 	 */
 	@Generated("org.nightlabs.eclipse.sdk.jdo.ObjectIdGenerator")
-	public ArticleContainerEndCustomerHistoryItemID(final String keyStr)
+	public ArticleEndCustomerHistoryItemID(final String keyStr)
 	throws ParseException, SecurityException,
 			NoSuchFieldException, IllegalArgumentException,
 			IllegalAccessException, NoSuchMethodException,
 			InstantiationException, InvocationTargetException
 	{
-		Class<? extends ArticleContainerEndCustomerHistoryItemID> clazz = this.getClass();
+		Class<? extends ArticleEndCustomerHistoryItemID> clazz = this.getClass();
 
 		StringTokenizer st = new StringTokenizer(keyStr, SEPARATORS_FOR_TOKENIZER, true);
 		String jdoPrefix = st.nextToken();
@@ -237,7 +237,7 @@ implements ObjectID
 	 * Create a string representation of this object id.
 	 * <p>
 	 * JDO expects the result of this method to be compatible with the constructor
-	 * {@link #ArticleContainerEndCustomerHistoryItemID(String)}.
+	 * {@link #ArticleEndCustomerHistoryItemID(String)}.
 	 * This method takes all the primary-key-fields and encodes them with their name
 	 * and their value.
 	 * </p>
@@ -257,8 +257,8 @@ implements ObjectID
 			sb.append("organisationID="); //$NON-NLS-1$
 			sb.append(URLEncoder.encode(String.valueOf(organisationID), ENCODING));
 			sb.append('&');
-			sb.append("articleContainerEndCustomerHistoryItemID="); //$NON-NLS-1$
-			sb.append(URLEncoder.encode(Long.toString(articleContainerEndCustomerHistoryItemID, RADIX), ENCODING));
+			sb.append("articleEndCustomerHistoryItemID="); //$NON-NLS-1$
+			sb.append(URLEncoder.encode(Long.toString(articleEndCustomerHistoryItemID, RADIX), ENCODING));
 		} catch (UnsupportedEncodingException e) {
 			throw new RuntimeException(
 					"Encoding failed with encoding " + //$NON-NLS-1$
@@ -283,13 +283,13 @@ implements ObjectID
 			return false;
 		if(getClass() != obj.getClass())
 			return false;
-		ArticleContainerEndCustomerHistoryItemID other = (ArticleContainerEndCustomerHistoryItemID) obj;
+		ArticleEndCustomerHistoryItemID other = (ArticleEndCustomerHistoryItemID) obj;
 		if(organisationID == null) {
 			if(other.organisationID != null)
 				return false;
 		} else if(!organisationID.equals(other.organisationID))
 			return false;
-		if(articleContainerEndCustomerHistoryItemID != other.articleContainerEndCustomerHistoryItemID)
+		if(articleEndCustomerHistoryItemID != other.articleEndCustomerHistoryItemID)
 			return false;
 		return true;
 	}
@@ -308,23 +308,23 @@ implements ObjectID
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((organisationID == null) ? 0 : organisationID.hashCode());
-		result = prime * result + (int) (articleContainerEndCustomerHistoryItemID ^ (articleContainerEndCustomerHistoryItemID >>> 32));
+		result = prime * result + (int) (articleEndCustomerHistoryItemID ^ (articleEndCustomerHistoryItemID >>> 32));
 		return result;
 	}
 
 	/**
 	 * Create a new object id instance.
 	 * @param organisationID The primary key field organisationID.
-	 * @param articleContainerEndCustomerHistoryItemID The primary key field articleContainerEndCustomerHistoryItemID.
-	 * @return a newly created instance of <code>ArticleContainerEndCustomerHistoryItemID</code>
+	 * @param articleEndCustomerHistoryItemID The primary key field articleEndCustomerHistoryItemID.
+	 * @return a newly created instance of <code>ArticleEndCustomerHistoryItemID</code>
 	 *     with the primary-key fields set to the given parameters.
 	 */
 	@Generated("org.nightlabs.eclipse.sdk.jdo.ObjectIdGenerator")
-	public static ArticleContainerEndCustomerHistoryItemID create(String organisationID, long articleContainerEndCustomerHistoryItemID)
+	public static ArticleEndCustomerHistoryItemID create(String organisationID, long articleEndCustomerHistoryItemID)
 	{
-		ArticleContainerEndCustomerHistoryItemID n = new ArticleContainerEndCustomerHistoryItemID();
+		ArticleEndCustomerHistoryItemID n = new ArticleEndCustomerHistoryItemID();
 		n.organisationID = organisationID;
-		n.articleContainerEndCustomerHistoryItemID = articleContainerEndCustomerHistoryItemID;
+		n.articleEndCustomerHistoryItemID = articleEndCustomerHistoryItemID;
 		return n;
 	}
 }

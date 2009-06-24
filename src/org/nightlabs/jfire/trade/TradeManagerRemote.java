@@ -29,6 +29,7 @@ import org.nightlabs.jfire.store.reverse.ReverseProductException;
 import org.nightlabs.jfire.trade.endcustomer.EndCustomerReplicationPolicy;
 import org.nightlabs.jfire.trade.endcustomer.id.EndCustomerReplicationPolicyID;
 import org.nightlabs.jfire.trade.id.ArticleContainerID;
+import org.nightlabs.jfire.trade.id.ArticleEndCustomerHistoryItemID;
 import org.nightlabs.jfire.trade.id.ArticleID;
 import org.nightlabs.jfire.trade.id.CustomerGroupID;
 import org.nightlabs.jfire.trade.id.CustomerGroupMappingID;
@@ -488,4 +489,11 @@ public interface TradeManagerRemote {
 	Collection<Article> assignDeliveryDate(ArticleDeliveryDateSet articleDeliveryDateSet, boolean get, String[] fetchGroups, int maxFetchDepth);
 
 	void assignEndCustomer(AnchorID endCustomerID, Set<ArticleID> assignArticleIDs);
+
+	Collection<ArticleEndCustomerHistoryItemID> getArticleEndCustomerHistoryItemIDs(ArticleID articleID);
+
+	Collection<ArticleEndCustomerHistoryItem> getArticleEndCustomerHistoryItems(
+			Collection<ArticleEndCustomerHistoryItemID> articleEndCustomerHistoryItemIDs,
+			String[] fetchGroups, int maxFetchDepth
+	);
 }

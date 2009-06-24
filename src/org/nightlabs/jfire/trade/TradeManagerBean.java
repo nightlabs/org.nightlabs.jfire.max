@@ -107,6 +107,7 @@ import org.nightlabs.jfire.trade.config.TradePrintingConfigModule;
 import org.nightlabs.jfire.trade.endcustomer.EndCustomerReplicationPolicy;
 import org.nightlabs.jfire.trade.endcustomer.id.EndCustomerReplicationPolicyID;
 import org.nightlabs.jfire.trade.id.ArticleContainerID;
+import org.nightlabs.jfire.trade.id.ArticleEndCustomerHistoryItemID;
 import org.nightlabs.jfire.trade.id.ArticleID;
 import org.nightlabs.jfire.trade.id.CustomerGroupID;
 import org.nightlabs.jfire.trade.id.CustomerGroupMappingID;
@@ -2158,5 +2159,31 @@ implements TradeManagerRemote, TradeManagerLocal
 		}
 	}
 
+
+	@RolesAllowed("_Guest_")
+	@Override
+	public Collection<ArticleEndCustomerHistoryItemID> getArticleEndCustomerHistoryItemIDs(ArticleID articleID)
+	{
+		PersistenceManager pm = createPersistenceManager();
+		try {
+			Article article = (Article) pm.getObjectById(articleID);
+			Collection<? extends ArticleEndCustomerHistoryItem> items = ArticleEndCustomerHistoryItem.getArticleContainerEndCustomerHistoryItems(pm, article);
+			return NLJDOHelper.getObjectIDList(items);
+		} finally {
+			pm.close();
+		}
+	}
+
+	@RolesAllowed("_Guest_")
+	@Override
+	public Collection<ArticleEndCustomerHistoryItem> getArticleEndCustomerHistoryItems(Collection<ArticleEndCustomerHistoryItemID> articleEndCustomerHistoryItemIDs, String[] fetchGroups, int maxFetchDepth)
+	{
+		PersistenceManager pm = createPersistenceManager();
+		try {
+			return NLJDOHelper.getDetachedObjectList(pm, articleEndCustomerHistoryItemIDs, ArticleEndCustomerHistoryItem.class, fetchGroups, maxFetchDepth);
+		} finally {
+			pm.close();
+		}
+	}
 }
 

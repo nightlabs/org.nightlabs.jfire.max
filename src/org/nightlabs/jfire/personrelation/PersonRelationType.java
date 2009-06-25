@@ -15,6 +15,7 @@ import javax.jdo.annotations.PersistenceModifier;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 
+import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.person.Person;
 import org.nightlabs.jfire.personrelation.id.PersonRelationTypeID;
 import org.nightlabs.util.Util;
@@ -29,6 +30,26 @@ import org.nightlabs.util.Util;
 @Discriminator(strategy=DiscriminatorStrategy.CLASS_NAME)
 public class PersonRelationType
 {
+	public static final class PredefinedRelationTypes {
+		public static final PersonRelationTypeID friend = PersonRelationTypeID.create(
+				Organisation.DEV_ORGANISATION_ID, "friend"
+		);
+
+		public static final PersonRelationTypeID employing = PersonRelationTypeID.create(
+				Organisation.DEV_ORGANISATION_ID, "employing"
+		);
+		public static final PersonRelationTypeID employed = PersonRelationTypeID.create(
+				Organisation.DEV_ORGANISATION_ID, "employed"
+		);
+
+		public static final PersonRelationTypeID parent = PersonRelationTypeID.create(
+				Organisation.DEV_ORGANISATION_ID, "parent"
+		);
+		public static final PersonRelationTypeID child = PersonRelationTypeID.create(
+				Organisation.DEV_ORGANISATION_ID, "child"
+		);
+	}
+
 	@PrimaryKey
 	@Column(length=100)
 	private String organisationID;
@@ -53,7 +74,17 @@ public class PersonRelationType
 	@Deprecated
 	protected PersonRelationType() { }
 
-	public PersonRelationType(String organisationID, String personRelationTypeID, PersonRelationTypeID reversePersonRelationTypeID) {
+	public PersonRelationType(PersonRelationTypeID personRelationTypeID, PersonRelationTypeID reversePersonRelationTypeID)
+	{
+		this(
+				personRelationTypeID.organisationID,
+				personRelationTypeID.personRelationTypeID,
+				reversePersonRelationTypeID
+		);
+	}
+
+	public PersonRelationType(String organisationID, String personRelationTypeID, PersonRelationTypeID reversePersonRelationTypeID)
+	{
 		this.organisationID = organisationID;
 		this.personRelationTypeID = personRelationTypeID;
 		this.name = new PersonRelationTypeName(this);

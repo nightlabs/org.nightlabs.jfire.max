@@ -47,6 +47,8 @@ import org.nightlabs.jfire.accounting.pay.id.ModeOfPaymentFlavourID;
 import org.nightlabs.jfire.accounting.pay.id.ModeOfPaymentID;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.base.JFireBaseEAR;
+import org.nightlabs.jfire.config.ConfigSetup;
+import org.nightlabs.jfire.config.UserConfigSetup;
 import org.nightlabs.jfire.config.id.ConfigModuleInitialiserID;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.reporting.parameter.ReportParameterUtil;
@@ -56,6 +58,7 @@ import org.nightlabs.jfire.reporting.parameter.ValueProviderInputParameter;
 import org.nightlabs.jfire.reporting.parameter.ReportParameterUtil.NameEntry;
 import org.nightlabs.jfire.reporting.parameter.id.ValueProviderCategoryID;
 import org.nightlabs.jfire.reporting.trade.config.ReportLayoutCfModInitialiserArticleContainerLayouts;
+import org.nightlabs.jfire.reporting.trade.config.TradeDocumentsLocaleConfigModule;
 import org.nightlabs.jfire.scripting.ScriptingIntialiserException;
 import org.nightlabs.jfire.servermanager.JFireServerManager;
 import org.nightlabs.jfire.store.deliver.id.ModeOfDeliveryFlavourID;
@@ -90,19 +93,14 @@ implements ReportManagerTradeRemote
 	/* (non-Javadoc)
 	 * @see org.nightlabs.jfire.reporting.trade.ReportManagerTradeRemote#initializeScripting()
 	 */
-	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	@RolesAllowed("_System_")
-	public void initializeScripting() throws ScriptingIntialiserException
+	private void initializeScripting(PersistenceManager pm) throws ScriptingIntialiserException
 	{
-		PersistenceManager pm;
-		pm = createPersistenceManager();
 		JFireServerManager jfireServerManager = getJFireServerManager();
 		try {
 
 			ScriptingInitialiser.initialize(pm, jfireServerManager, Organisation.DEV_ORGANISATION_ID);
 
 		} finally {
-			pm.close();
 			jfireServerManager.close();
 		}
 	}
@@ -112,10 +110,30 @@ implements ReportManagerTradeRemote
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("_System_")
-	public void initializeReporting() throws Exception
+	public void initialise() throws Exception
 	{
-		PersistenceManager pm;
-		pm = createPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
+		try {
+			initializeReporting(pm);
+			initializeScripting(pm);
+
+			ConfigSetup userConfigSetup = ConfigSetup.getConfigSetup(
+					pm,
+					getOrganisationID(),
+					UserConfigSetup.CONFIG_SETUP_TYPE_USER
+			);
+			if (!userConfigSetup.getConfigModuleClasses().contains(TradeDocumentsLocaleConfigModule.class.getName()))
+				userConfigSetup.getConfigModuleClasses().add(TradeDocumentsLocaleConfigModule.class.getName());
+		} finally {
+			pm.close();
+		}
+		
+	}
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.reporting.trade.ReportManagerTradeRemote#initializeReporting()
+	 */
+	private void initializeReporting(PersistenceManager pm) throws Exception
+	{
 		JFireServerManager jfireServerManager = getJFireServerManager();
 		try {
 			ModuleMetaData moduleMetaData = ModuleMetaData.getModuleMetaData(pm, JFireReportingTradeEAR.MODULE_NAME);
@@ -145,7 +163,6 @@ implements ReportManagerTradeRemote
 			ReportingInitialiser.initialise(pm, jfireServerManager, getOrganisationID());
 
 		} finally {
-			pm.close();
 			jfireServerManager.close();
 		}
 	}

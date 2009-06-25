@@ -1561,7 +1561,7 @@ implements IssueManagerRemote
 			// TODO Move the following DEMO Issues to a demo-data-creation module; yet to be created. Coming soon... stay tuned ;-)
 			pm.getExtent(Issue.class);
 
-			int totDemoIssueCnt = 36;
+			int totDemoIssueCnt = 38;
 			List<IssuePriority> def_issuePriorities = issueTypeDefault.getIssuePriorities();
 			List<IssueResolution> def_issueResolutions = issueTypeDefault.getIssueResolutions();
 			List<IssueSeverityType> def_issueSeverityTypes = issueTypeDefault.getIssueSeverityTypes();

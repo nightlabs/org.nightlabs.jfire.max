@@ -50,6 +50,14 @@ extends BaseJDOObjectDAO<IssueLinkID, IssueLink>
 		}
 	}
 
+	public IssueLink getIssueLink(IssueLinkID issueLinkID, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) {
+		try {
+			return getJDOObject(null, issueLinkID, fetchGroups, maxFetchDepth, monitor);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 	public synchronized Collection<IssueLink> getIssueLinksByOrganisationIDAndLinkedObjectID(String organisationID, ObjectID linkedObjectID, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
 		try {

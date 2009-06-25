@@ -126,7 +126,7 @@ import org.nightlabs.util.CollectionUtil;
 
 public class SimpleProductType extends ProductType
 {
-	private static final long serialVersionUID = 20080610L;
+	private static final long serialVersionUID = 20090625L;
 	/**
 	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon!
 	 */
@@ -137,7 +137,6 @@ public class SimpleProductType extends ProductType
 	public static final class FieldName
 	{
 		public static final String propertySet = "propertySet";
-		public static final String structLocalScope = "structLocalScope";
 	};
 
 	/**

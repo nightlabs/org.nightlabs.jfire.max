@@ -7,10 +7,12 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.nightlabs.jfire.reporting.Birt.OutputFormat;
 import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
 import org.nightlabs.util.NLLocale;
+import org.nightlabs.util.Util;
 
 /**
  * Used as parameter for rendering methods.
@@ -158,6 +160,56 @@ public class RenderReportRequest implements Serializable {
 		this.locale = locale;
 	}
 	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((locale == null) ? 0 : locale.hashCode());
+		result = prime * result
+				+ ((outputFormat == null) ? 0 : outputFormat.hashCode());
+		result = prime * result
+				+ ((parameters == null) ? 0 : parameters.hashCode());
+		result = prime
+				* result
+				+ ((reportRegistryItemID == null) ? 0 : reportRegistryItemID
+						.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof RenderReportRequest) {
+			RenderReportRequest other = (RenderReportRequest)obj;
+			boolean regItemEqual = false;
+			if (other.getReportRegistryItemID() != null && 
+					other.getReportRegistryItemID().equals(getReportRegistryItemID()))
+				regItemEqual = true;
+			boolean paramsEqual =
+				(other.getParameters() != null && getParameters() != null) ||
+				(other.getParameters() == null && getParameters() == null) ;
+			
+			if (other.getParameters() != null) {
+				if (getParameters() != null) {
+					for (Entry<String, Object> oEntry : other.getParameters().entrySet()) {
+						Object thisEntry = getParameters().get(oEntry.getKey());
+						if (thisEntry == null)
+							paramsEqual = false;
+						else
+							paramsEqual = thisEntry.equals(oEntry.getValue());
+						if (!paramsEqual)
+							break;
+					}
+				}
+			}
+			
+			boolean localesEqual = Util.equals(this.getLocale(), other.getLocale());
+			
+			return regItemEqual && paramsEqual && localesEqual && this.outputFormat == other.outputFormat;
+		}
+		else
+			return false;		
+	}
+
 	public RenderReportRequest clone() {
 		RenderReportRequest newRequest = new RenderReportRequest();
 		newRequest.setReportRegistryItemID(this.getReportRegistryItemID());

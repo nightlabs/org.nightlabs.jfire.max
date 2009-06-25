@@ -35,7 +35,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.security.RolesAllowed;
@@ -2135,20 +2134,20 @@ implements TradeManagerRemote, TradeManagerLocal
 	@RolesAllowed("org.nightlabs.jfire.trade.editOffer")
 	@Override
 	public Collection<Article> assignDeliveryDate(
-			ArticleDeliveryDateSet articleDeliveryDateSet,
+			Collection<ArticleDeliveryDateCarrier> articleDeliveryDateCarriers,
 			boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = createPersistenceManager();
 		try {
-			Collection<Article> articles = new ArrayList<Article>(articleDeliveryDateSet.getArticleID2DeliveryDate().size());
-			for (Map.Entry<ArticleID, Date> entry : articleDeliveryDateSet.getArticleID2DeliveryDate().entrySet()) {
-				Article article = (Article) pm.getObjectById(entry.getKey());
-				switch (articleDeliveryDateSet.getMode()) {
+			Collection<Article> articles = new ArrayList<Article>(articleDeliveryDateCarriers.size());
+			for (ArticleDeliveryDateCarrier articleDeliveryDateCarrier : articleDeliveryDateCarriers) {
+				Article article = (Article) pm.getObjectById(articleDeliveryDateCarrier.getArticleID());
+				switch (articleDeliveryDateCarrier.getMode()) {
 					case OFFER:
-						article.setDeliveryDateOffer(entry.getValue());
+						article.setDeliveryDateOffer(articleDeliveryDateCarrier.getDeliveryDate());
 						break;
 					case DELIVERY_NOTE:
-						article.setDeliveryDateDeliveryNote(entry.getValue());
+						article.setDeliveryDateDeliveryNote(articleDeliveryDateCarrier.getDeliveryDate());
 						break;
 				}
 				articles.add(article);

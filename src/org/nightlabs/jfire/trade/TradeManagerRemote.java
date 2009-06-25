@@ -479,15 +479,15 @@ public interface TradeManagerRemote {
 	/**
 	 * Assign deliveryDates to the given articles.
 	 *
-	 * @param articleID2Date the object-ids of the articles with the coreesponding delivery date as map.
-	 * @param DeliveryDateMode indicates whether to set the {@link Article#setDeliveryDateOffer(Date)} or {@link Article#setDeliveryDateDeliveryNote(Date)}.
+	 * @param articleDeliveryDateCarriers the ArticleDeliveryDateCarriers which carry the new delivery dates for the articles.
 	 * @param get <code>false</code> if no result is desired (this method will return <code>null</code>) or <code>true</code> to get the specified articles
 	 * @param fetchGroups the fetch-groups in case the affected articles shall be detached and returned. This is ignored, if <code>get</code> is <code>false</code>.
 	 * @param maxFetchDepth the maximum fetch-depth - ignored, if <code>get</code> is <code>false</code>.
 	 * @return either <code>null</code>, if <code>get</code> is <code>false</code> or the articles identified by <code>articleIDs</code>.
 	 */
-	Collection<Article> assignDeliveryDate(ArticleDeliveryDateSet articleDeliveryDateSet, boolean get, String[] fetchGroups, int maxFetchDepth);
-
+	Collection<Article> assignDeliveryDate(Collection<ArticleDeliveryDateCarrier> articleDeliveryDateCarriers,
+			boolean get, String[] fetchGroups, int maxFetchDepth);
+			
 	void assignEndCustomer(AnchorID endCustomerID, Set<ArticleID> assignArticleIDs);
 
 	Collection<ArticleEndCustomerHistoryItemID> getArticleEndCustomerHistoryItemIDs(ArticleID articleID);

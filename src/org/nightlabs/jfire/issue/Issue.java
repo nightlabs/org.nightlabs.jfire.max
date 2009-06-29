@@ -1081,11 +1081,11 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback, StoreCallbac
 		return issueLocal;
 	}
 
-	@Override
 	/*
 	 * (non-Javadoc)
 	 * @see javax.jdo.listener.DeleteCallback#jdoPreDelete()
 	 */
+	@Override
 	public void jdoPreDelete() {
 		PersistenceManager pm = getPersistenceManager();
 
@@ -1100,11 +1100,12 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback, StoreCallbac
 
 		this.states.clear();
 		this.state = null;
-
 		pm.flush();
 
 		for (State state : statesToDelete)
 			pm.deletePersistent(state);
+
+		pm.flush();
 	}
 
 	/**

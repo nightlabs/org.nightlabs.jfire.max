@@ -67,7 +67,6 @@ import org.nightlabs.jfire.issue.prop.IssueStruct;
 import org.nightlabs.jfire.issue.query.IssueQuery;
 import org.nightlabs.jfire.issue.resource.Messages;
 import org.nightlabs.jfire.jbpm.JbpmLookup;
-import org.nightlabs.jfire.jbpm.graph.def.State;
 import org.nightlabs.jfire.person.PersonStruct;
 import org.nightlabs.jfire.prop.datafield.TextDataField;
 import org.nightlabs.jfire.query.store.BaseQueryStore;
@@ -784,14 +783,21 @@ implements IssueManagerRemote
 			pm.getExtent(Issue.class, true);
 			Issue issue = (Issue) pm.getObjectById(issueID);
 
-			pm.getExtent(State.class, true);
-			for (State state : issue.getStates()) {
-				pm.deletePersistent(state);
-			}
-			pm.flush();
+//			pm.getExtent(State.class, true);
+//			for (State state : issue.getStates()) {
+//				pm.deletePersistent(state);
+//			}
+//			pm.flush();
 
 			pm.getExtent(IssueLocal.class, true);
 			pm.deletePersistent(issue.getStatableLocal());
+			pm.flush();
+
+			pm.getExtent(IssueHistoryItem.class, true);
+			Collection<IssueHistoryItem> historyItems = IssueHistoryItem.getIssueHistoryItemsByIssue(pm, issueID);
+			for (IssueHistoryItem item : historyItems) {
+				pm.deletePersistent(item);
+			}
 			pm.flush();
 
 			pm.getExtent(Issue.class, true);
@@ -1561,7 +1567,8 @@ implements IssueManagerRemote
 			// TODO Move the following DEMO Issues to a demo-data-creation module; yet to be created. Coming soon... stay tuned ;-)
 			pm.getExtent(Issue.class);
 
-			int totDemoIssueCnt = 38;
+			int totDemoIssueCnt = 46;
+			boolean isCreateArbitraryIssueToIssueLinks = !true;
 			List<IssuePriority> def_issuePriorities = issueTypeDefault.getIssuePriorities();
 			List<IssueResolution> def_issueResolutions = issueTypeDefault.getIssueResolutions();
 			List<IssueSeverityType> def_issueSeverityTypes = issueTypeDefault.getIssueSeverityTypes();
@@ -1587,7 +1594,7 @@ implements IssueManagerRemote
 
 
 				// Randomly (and playfully?) create links between Issues.
-				if (demoIssues.size() > 5) {
+				if (isCreateArbitraryIssueToIssueLinks && demoIssues.size() > 5) {
 					List<Integer> usedIndexRefs = new ArrayList<Integer>();
 					while (rndGen.nextInt(100) < 67 && usedIndexRefs.size() < demoIssues.size()/2) {
 						int index = rndGen.nextInt(demoIssues.size());

@@ -149,9 +149,20 @@ import org.nightlabs.util.Util;
 	),
 	@FetchGroup(
 			name=ArticleContainer.FETCH_GROUP_PROPERTY_SET,
-			//		name="ArticleContainer.propertySet",
 			members=@Persistent(name=Offer.FieldName.propertySet)
 	),
+	@FetchGroup(
+			name=ArticleContainer.FETCH_GROUP_ARTICLES,
+			members=@Persistent(name=Offer.FieldName.articles)
+	),
+//	@FetchGroup(
+//			name=ArticleContainer.FETCH_GROUP_CUSTOMER,
+//			members=@Persistent(name=Offer.FieldName.customer)
+//	),
+//	@FetchGroup(
+//			name=ArticleContainer.FETCH_GROUP_VENDOR,
+//			members=@Persistent(name=Offer.FieldName.vendor)
+//	)
 })
 @Queries(
 		@javax.jdo.annotations.Query(
@@ -168,7 +179,7 @@ implements
 		DetachCallback,
 		AttachCallback
 {
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 20090629;
 
 	private static final Logger logger = Logger.getLogger(Offer.class);
 
@@ -186,6 +197,7 @@ implements
 		public static final String price = "price";
 		public static final String articles = "articles";
 		public static final String currency = "currency";
+		public static final String customer = "customer";
 		public static final String order = "order";
 		public static final String createUser = "createUser";
 		public static final String finalizeUser = "finalizeUser";
@@ -193,6 +205,7 @@ implements
 		public static final String state = "state";
 		public static final String states = "states";
 		public static final String propertySet = "propertySet";
+		public static final String vendor = "vendor";
 	}
 
 	/**

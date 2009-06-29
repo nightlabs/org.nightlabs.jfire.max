@@ -116,17 +116,20 @@ import org.nightlabs.util.Util;
 		name=Order.FETCH_GROUP_THIS_ORDER,
 		members={@Persistent(name="vendor"), @Persistent(name="currency"), @Persistent(name="customer"), @Persistent(name="customerGroup"), @Persistent(name="articles"), @Persistent(name="segments"), @Persistent(name="offers"), @Persistent(name="createUser"), @Persistent(name="changeUser")}),
 	@FetchGroup(
-		name="ArticleContainer.vendor",
+		name=ArticleContainer.FETCH_GROUP_VENDOR,
 		members=@Persistent(name="vendor")),
 	@FetchGroup(
-		name="ArticleContainer.customer",
+		name=ArticleContainer.FETCH_GROUP_CUSTOMER,
 		members=@Persistent(name="customer")),
 	@FetchGroup(
 		name="FetchGroupsTrade.articleContainerInEditor",
 		members={@Persistent(name="vendor"), @Persistent(name="currency"), @Persistent(name="customer"), @Persistent(name="customerGroup"), @Persistent(name="segments"), @Persistent(name="offers"), @Persistent(name="createUser"), @Persistent(name="changeUser")}),
 	@FetchGroup(
-		name="ArticleContainer.propertySet",
-		members=@Persistent(name="propertySet"))
+		name=ArticleContainer.FETCH_GROUP_PROPERTY_SET,
+		members=@Persistent(name="propertySet")),
+	@FetchGroup(
+		name=ArticleContainer.FETCH_GROUP_ARTICLES,
+		members=@Persistent(name="articles"))
 })
 @Queries({
 	@javax.jdo.annotations.Query(
@@ -155,7 +158,7 @@ import org.nightlabs.util.Util;
 public class Order
 implements Serializable, ArticleContainer, SegmentContainer, DetachCallback, AttachCallback, StoreCallback
 {
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 20090629;
 
 	public static final String FETCH_GROUP_CUSTOMER_GROUP = "Order.customerGroup";
 	public static final String FETCH_GROUP_CURRENCY = "Order.currency";

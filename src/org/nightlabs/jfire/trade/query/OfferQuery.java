@@ -10,13 +10,20 @@ import org.nightlabs.jfire.trade.Offer;
 public class OfferQuery
 	extends AbstractArticleContainerQuery
 {
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 20090626;
+
+//	public static final class FieldName
+//	{
+//		public static final String articleDeliveryDate = "articleDeliveryDate";
+//	}
 
 	private boolean reserved;
+//	private Date articleDeliveryDate;
 
 	public boolean isReserved() {
 		return reserved;
 	}
+
 	public void setReserved(boolean reserved) {
 		this.reserved = reserved;
 	}
@@ -32,8 +39,7 @@ public class OfferQuery
 	}
 
 	@Override
-	protected void checkVendorName(StringBuilder filter)
-	{
+	protected void checkVendorName(StringBuilder filter) {
 		if (getVendorName() != null)
 			filter.append("\n && (this.order.vendor.person.displayName.toLowerCase().indexOf(\""+getVendorName().toLowerCase()+"\") >= 0)");
 	}
@@ -49,32 +55,18 @@ public class OfferQuery
 	protected void checkCustomer(StringBuilder filter) {
 		if (getCustomerID() != null) {
 			filter.append("\n && JDOHelper.getObjectId(this.order.customer) == :customerID");
-//		// WORKAROUND:
-//		filter.append("\n && (" +
-//				"this.order.customer.organisationID == \""+getCustomerID().organisationID+"\" && " +
-//				"this.order.customer.anchorTypeID == \""+getCustomerID().anchorTypeID+"\" && " +
-//				"this.order.customer.anchorID == \""+getCustomerID().anchorID+"\"" +
-//						")");
 		}
 	}
 
 	@Override
 	protected void checkVendor(StringBuilder filter) {
-		if (getVendorID() != null)
-		{
+		if (getVendorID() != null) {
 			filter.append("\n && JDOHelper.getObjectId(this.vendor) == :vendorID");
-//			// WORKAROUND:
-//			filter.append("\n && (" +
-//					"this.order.vendor.organisationID == \""+getVendorID().organisationID+"\" && " +
-//					"this.order.vendor.anchorTypeID == \""+getVendorID().anchorTypeID+"\" && " +
-//					"this.order.vendor.anchorID == \""+getVendorID().anchorID+"\"" +
-//							")");
 		}
 	}
 
 	@Override
-	protected Class<Offer> initCandidateClass()
-	{
+	protected Class<Offer> initCandidateClass() {
 		return Offer.class;
 	}
 
@@ -87,5 +79,37 @@ public class OfferQuery
 			filter.append(" && this.offerLocal.rejectDT == null");
 			filter.append(" && this.finalizeDT != null");
 		}
+
+//		if (articleDeliveryDate != null) {
+//			String varName = "articleVar";
+//			addVariable(Article.class, varName);
+//			filter.append("\n && (\n" +
+//					"  this."+getArticlesMemberName()+"."+"contains("+varName+")"+"\n" +
+//					"  && "+varName+".deliveryDateOffer >= :articleDeliveryDate" +
+//			" )");
+//		}
 	}
+
+//	protected String getArticlesMemberName() {
+//		return "articles";
+//	}
+//
+//	/**
+//	 * Returns the articleDeliveryDate.
+//	 * @return the articleDeliveryDate
+//	 */
+//	public Date getArticleDeliveryDate() {
+//		return articleDeliveryDate;
+//	}
+//
+//	/**
+//	 * Sets the articleDeliveryDate.
+//	 * @param articleDeliveryDate the articleDeliveryDate to set
+//	 */
+//	public void setArticleDeliveryDate(Date articleDeliveryDate) {
+//		Date oldArticleDeliveryDate = this.articleDeliveryDate;
+//		this.articleDeliveryDate = articleDeliveryDate;
+//		notifyListeners(FieldName.articleDeliveryDate, oldArticleDeliveryDate, articleDeliveryDate);
+//	}
+
 }

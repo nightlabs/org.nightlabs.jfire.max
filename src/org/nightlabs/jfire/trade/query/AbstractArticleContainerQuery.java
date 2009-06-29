@@ -8,15 +8,17 @@ import org.apache.log4j.Logger;
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jdo.query.AbstractJDOQuery;
 import org.nightlabs.jfire.security.id.UserID;
+import org.nightlabs.jfire.store.DeliveryNote;
 import org.nightlabs.jfire.store.id.ProductID;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.ArticleContainer;
+import org.nightlabs.jfire.trade.Offer;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 
 /**
  * {@link AbstractJDOQuery} implementation which can be used to send simple queries to the database
- * retrieving all kinds of ArticleContainers.
+ * retrieving all kinds of {@link ArticleContainer}s.
  *
  * @author Daniel Mazurek - daniel <at> nightlabs <dot> de
  * @author Marius Heinzmann - marius[at]nightlabs[dot]com
@@ -51,6 +53,7 @@ public abstract class AbstractArticleContainerQuery
 		public static final String vendorName = "vendorName";
 		public static final String productID = "productID";
 		public static final String productTypeID = "productTypeID";
+		public static final String articleDeliveryDate = "articleDeliveryDate";
 	}
 
 	@Override
@@ -89,11 +92,12 @@ public abstract class AbstractArticleContainerQuery
 						")");
 		}
 
-	  // own to method to allow override for Offer where it is different
+		// own method to allow override e.g. for Offer where it is different
 		checkVendor(filter);
 		checkCustomer(filter);
 		checkProductID(filter, getArticleContainerArticlesMemberName());
 		checkProductTypeID(filter, getArticleContainerArticlesMemberName());
+		checkArticleDeliveryDate(filter);
 
 		// append filter for the additional fields of the implementing class.
 		checkAdditionalFields(filter);
@@ -544,5 +548,55 @@ public abstract class AbstractArticleContainerQuery
 	 */
 	public void setProductTypeID(ProductTypeID productTypeID) {
 		this.productTypeID = productTypeID;
+	}
+
+	private Date articleDeliveryDate;
+
+	protected void checkArticleDeliveryDate(StringBuilder filter)
+	{
+		if (isFieldEnabled(FieldName.articleDeliveryDate) && articleDeliveryDate != null) {
+			String deliveryDateMember = getArticleDeliveryDateMemberName();
+			if (deliveryDateMember != null) {
+				String varName = "articleVar";
+				addVariable(Article.class, varName);
+				filter.append("\n && (\n" +
+						"  this."+getArticlesMemberName()+"."+"contains("+varName+")"+"\n" +
+						"  && "+varName+"."+deliveryDateMember+" >= :articleDeliveryDate" +
+				" )");
+			}
+		}
+	}
+
+	protected String getArticleDeliveryDateMemberName() {
+		Class<?> candidateClass = getCandidateClass();
+		if (DeliveryNote.class.isAssignableFrom(candidateClass)) {
+			return "deliveryDateDeliveryNote";
+		}
+		else if (Offer.class.isAssignableFrom(candidateClass)) {
+			return "deliveryDateOffer";
+		}
+		return null;
+	}
+
+	protected String getArticlesMemberName() {
+		return "articles";
+	}
+
+	/**
+	 * Returns the articleDeliveryDate.
+	 * @return the articleDeliveryDate
+	 */
+	public Date getArticleDeliveryDate() {
+		return articleDeliveryDate;
+	}
+
+	/**
+	 * Sets the articleDeliveryDate.
+	 * @param articleDeliveryDate the articleDeliveryDate to set
+	 */
+	public void setArticleDeliveryDate(Date articleDeliveryDate) {
+		Date oldArticleDeliveryDate = this.articleDeliveryDate;
+		this.articleDeliveryDate = articleDeliveryDate;
+		notifyListeners(FieldName.articleDeliveryDate, oldArticleDeliveryDate, articleDeliveryDate);
 	}
 }

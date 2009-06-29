@@ -59,42 +59,43 @@ public class InvoiceQuery
 	protected void checkAdditionalFields(StringBuilder filter)
 	{
 		if (currencyID != null) {
-//		filter.append("\n && JDOHelper.getObjectId(this.price.currency) == :currencyID");
-		currency = (Currency) getPersistenceManager().getObjectById(currencyID);
-		filter.append("\n && this.price.currency == :currency");
-	}
+			//		filter.append("\n && JDOHelper.getObjectId(this.price.currency) == :currencyID");
+			currency = (Currency) getPersistenceManager().getObjectById(currencyID);
+			filter.append("\n && this.price.currency == :currency");
+		}
 
-	if (amountToPayMin != null)
-		filter.append("\n && this.price.amount - this.invoiceLocal.amountPaid >= :amountToPayMin");
+		if (amountToPayMin != null)
+			filter.append("\n && this.price.amount - this.invoiceLocal.amountPaid >= :amountToPayMin");
 
-	if (amountToPayMax != null)
-		filter.append("\n && this.price.amount - this.invoiceLocal.amountPaid <= :amountToPayMax");
+		if (amountToPayMax != null)
+			filter.append("\n && this.price.amount - this.invoiceLocal.amountPaid <= :amountToPayMax");
 
-	if (amountPaidMin != null)
-		filter.append("\n && this.invoiceLocal.amountPaid >= :amountPaidMin");
+		if (amountPaidMin != null)
+			filter.append("\n && this.invoiceLocal.amountPaid >= :amountPaidMin");
 
-	if (amountPaidMax != null)
-		filter.append("\n && this.invoiceLocal.amountPaid <= :amountPaidMax");
+		if (amountPaidMax != null)
+			filter.append("\n && this.invoiceLocal.amountPaid <= :amountPaidMax");
 
-	if (bookDTMin == null && bookDTMax == null) {
-		if (booked != null && booked.booleanValue())
-			filter.append("\n && this.invoiceLocal.bookDT != null");
+		if (bookDTMin == null && bookDTMax == null) {
+			if (booked != null && booked.booleanValue())
+				filter.append("\n && this.invoiceLocal.bookDT != null");
 
-		if (booked != null && !booked.booleanValue())
-			filter.append("\n && this.invoiceLocal.bookDT == null");
-	}
+			if (booked != null && !booked.booleanValue())
+				filter.append("\n && this.invoiceLocal.bookDT == null");
+		}
 
-	if (bookDTMin != null)
-		filter.append("\n && this.bookDT >= :bookDTMin");
+		if (bookDTMin != null)
+			filter.append("\n && this.bookDT >= :bookDTMin");
 
-	if (bookDTMax != null)
-		filter.append("\n && this.bookDT >= :bookDTMax");
+		if (bookDTMax != null)
+			filter.append("\n && this.bookDT >= :bookDTMax");
 	}
 
 	public CurrencyID getCurrencyID()
 	{
 		return currencyID;
 	}
+
 	public void setCurrencyID(CurrencyID currencyID)
 	{
 		this.currencyID = currencyID;
@@ -164,6 +165,7 @@ public class InvoiceQuery
 	{
 		return bookDTMax;
 	}
+
 	public void setBookDTMax(Date bookDTMax)
 	{
 		final Date oldBookDTMax = this.bookDTMax;
@@ -175,6 +177,7 @@ public class InvoiceQuery
 	{
 		return bookDTMin;
 	}
+
 	public void setBookDTMin(Date bookDTMin)
 	{
 		final Date oldBookDTMin = this.bookDTMin;

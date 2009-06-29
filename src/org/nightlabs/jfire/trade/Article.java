@@ -232,7 +232,10 @@ import org.nightlabs.util.Util;
 		members={@Persistent(name="articleLocal"), @Persistent(name="segment"), @Persistent(name="productType"), @Persistent(name="product"), @Persistent(name="tariff"), @Persistent(name="price"), @Persistent(name="endCustomer")}),
 	@FetchGroup(
 		name="FetchGroupsTrade.articleCrossTradeReplication",
-		members={@Persistent(name="order"), @Persistent(name="offer"), @Persistent(name="invoice"), @Persistent(name="deliveryNote"), @Persistent(name="receptionNote"), @Persistent(name="price"), @Persistent(name="currency"), @Persistent(name="tariff"), @Persistent(name="reversedArticle"), @Persistent(name="reversingArticle"), @Persistent(name="segment"), @Persistent(name="productType"), @Persistent(name="product"), @Persistent(name="createUser")})
+		members={@Persistent(name="order"), @Persistent(name="offer"), @Persistent(name="invoice"), @Persistent(name="deliveryNote"), @Persistent(name="receptionNote"), @Persistent(name="price"), @Persistent(name="currency"), @Persistent(name="tariff"), @Persistent(name="reversedArticle"), @Persistent(name="reversingArticle"), @Persistent(name="segment"), @Persistent(name="productType"), @Persistent(name="product"), @Persistent(name="createUser")}),
+	@FetchGroup(
+		name=Article.FETCH_GROUP_END_CUSTOMER,
+		members=@Persistent(name="endCustomer"))
 })
 @Queries({
 	@javax.jdo.annotations.Query(
@@ -264,6 +267,7 @@ implements Serializable, DeleteCallback, AttachCallback, DetachCallback, StoreCa
 	public static final String FETCH_GROUP_RECEPTION_NOTE = "Article.receptionNote";
 	public static final String FETCH_GROUP_TARIFF = "Article.tariff";
 //	public static final String FETCH_GROUP_DELIVERY = "Article.delivery";
+	public static final String FETCH_GROUP_END_CUSTOMER = "Article.endCustomer";
 
 	// the following fetch-groups are virtual and processed in the detach callback
 	// all of them are included virtually in the FetchGroupsTrade.articleInXXX fetch-groups

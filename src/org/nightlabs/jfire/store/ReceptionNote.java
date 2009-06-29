@@ -88,21 +88,30 @@ import org.nightlabs.util.Util;
 	@FetchGroup(
 		name="Statable.states",
 		members=@Persistent(name="states")),
-	@FetchGroup(
-		name="ArticleContainer.customer",
-		members=@Persistent(name="customer")),
-	@FetchGroup(
-		name="ArticleContainer.vendor",
-		members=@Persistent(name="vendor")),
-	@FetchGroup(
-		name="ArticleContainer.endCustomer",
-		members=@Persistent(name="endCustomer")),
+//	@FetchGroup(
+//		name="ArticleContainer.customer",
+//		members=@Persistent(name="customer")),
+//	@FetchGroup(
+//		name="ArticleContainer.vendor",
+//		members=@Persistent(name="vendor")),
+//	@FetchGroup(
+//		name="ArticleContainer.endCustomer",
+//		members=@Persistent(name="endCustomer")),
 	@FetchGroup(
 		name="ReceptionNote.articles",
 		members=@Persistent(name="articles")),
 	@FetchGroup(
-		name="ArticleContainer.propertySet",
-		members=@Persistent(name="propertySet"))
+		name=ArticleContainer.FETCH_GROUP_PROPERTY_SET,
+		members=@Persistent(name="propertySet")),
+	@FetchGroup(
+		name=ArticleContainer.FETCH_GROUP_ARTICLES,
+		members=@Persistent(name="articles")),
+//	@FetchGroup(
+//		name=ArticleContainer.FETCH_GROUP_CUSTOMER,
+//		members=@Persistent(name="customer")),
+//	@FetchGroup(
+//		name=ArticleContainer.FETCH_GROUP_VENDOR,
+//		members=@Persistent(name="vendor"))
 //	,
 //	@FetchGroup(
 //		fetchGroups={"default"},

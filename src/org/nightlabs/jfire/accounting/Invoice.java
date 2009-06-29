@@ -192,14 +192,14 @@ import org.nightlabs.util.Util;
 		name=Invoice.FETCH_GROUP_THIS_INVOICE,
 		members={@Persistent(name="invoiceLocal"), @Persistent(name="articles"), @Persistent(name="createUser"), @Persistent(name="currency"), @Persistent(name="customer"), @Persistent(name="discount"), @Persistent(name="finalizeUser"), @Persistent(name="price"), @Persistent(name="vendor"), @Persistent(name="state"), @Persistent(name="states")}),
 	@FetchGroup(
-		name="ArticleContainer.customer",
+		name=ArticleContainer.FETCH_GROUP_CUSTOMER,
 		members=@Persistent(name="customer")),
 	@FetchGroup(
-		name="ArticleContainer.vendor",
+		name=ArticleContainer.FETCH_GROUP_VENDOR,
 		members=@Persistent(name="vendor")),
-	@FetchGroup(
-		name="ArticleContainer.endCustomer",
-		members=@Persistent(name="endCustomer")),
+//	@FetchGroup(
+//		name="ArticleContainer.endCustomer",
+//		members=@Persistent(name="endCustomer")),
 	@FetchGroup(
 		name="FetchGroupsTrade.articleContainerInEditor",
 		members={@Persistent(name="invoiceLocal"), @Persistent(name="createUser"), @Persistent(name="currency"), @Persistent(name="customer"), @Persistent(name="discount"), @Persistent(name="finalizeUser"), @Persistent(name="price"), @Persistent(name="vendor"), @Persistent(name="state"), @Persistent(name="states")}),
@@ -210,8 +210,11 @@ import org.nightlabs.util.Util;
 		name="Statable.states",
 		members=@Persistent(name="states")),
 	@FetchGroup(
-		name="ArticleContainer.propertySet",
-		members=@Persistent(name="propertySet"))
+		name=ArticleContainer.FETCH_GROUP_PROPERTY_SET,
+		members=@Persistent(name="propertySet")),
+	@FetchGroup(
+		name=ArticleContainer.FETCH_GROUP_ARTICLES,
+		members=@Persistent(name="articles"))
 })
 @Queries({
 	@javax.jdo.annotations.Query(

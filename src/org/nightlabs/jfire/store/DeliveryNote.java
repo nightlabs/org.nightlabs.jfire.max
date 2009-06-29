@@ -190,9 +190,9 @@ import org.nightlabs.util.Util;
 	@FetchGroup(
 		name=DeliveryNote.FETCH_GROUP_CUSTOMER,
 		members=@Persistent(name="customer")),
-	@FetchGroup(
-		name="ArticleContainer.endCustomer",
-		members=@Persistent(name="endCustomer")),
+//	@FetchGroup(
+//		name="ArticleContainer.endCustomer",
+//		members=@Persistent(name="endCustomer")),
 	@FetchGroup(
 		name="FetchGroupsTrade.articleContainerInEditor",
 		members={@Persistent(name="deliveryNoteLocal"), @Persistent(name="articles"), @Persistent(name="createUser"), @Persistent(name="customer"), @Persistent(name="finalizeUser"), @Persistent(name="vendor"), @Persistent(name="state"), @Persistent(name="states")}),
@@ -203,8 +203,17 @@ import org.nightlabs.util.Util;
 		name="Statable.states",
 		members=@Persistent(name="states")),
 	@FetchGroup(
-		name="ArticleContainer.propertySet",
-		members=@Persistent(name="propertySet"))
+		name=ArticleContainer.FETCH_GROUP_PROPERTY_SET,
+		members=@Persistent(name="propertySet")),
+	@FetchGroup(
+		name=ArticleContainer.FETCH_GROUP_ARTICLES,
+		members=@Persistent(name="articles")),
+	@FetchGroup(
+		name=ArticleContainer.FETCH_GROUP_CUSTOMER,
+		members=@Persistent(name="customer")),
+	@FetchGroup(
+		name=ArticleContainer.FETCH_GROUP_VENDOR,
+		members=@Persistent(name="vendor"))
 })
 @Queries({
 	@javax.jdo.annotations.Query(

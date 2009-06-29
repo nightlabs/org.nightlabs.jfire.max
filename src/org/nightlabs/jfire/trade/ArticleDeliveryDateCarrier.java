@@ -15,22 +15,6 @@ implements Serializable
 	private ArticleID articleID;
 	private Date deliveryDate;
 	private DeliveryDateMode mode;
-	// must be transient so that it will not be serialized when transmitted
-//	private transient Article article;
-
-//	protected ArticleDeliveryDateCarrier() {}
-
-//	public ArticleDeliveryDateCarrier(ArticleID articleID, Article article) {
-//		this.articleID = articleID;
-//		this.article = article;
-//	}
-//
-//	public ArticleDeliveryDateCarrier(ArticleID articleID, Date deliveryDate, Article article, DeliveryDateMode mode) {
-//		this.articleID = articleID;
-//		this.deliveryDate = deliveryDate;
-//		this.mode = mode;
-//		this.article = article;
-//	}
 
 	public ArticleDeliveryDateCarrier(ArticleID articleID, Date deliveryDate, DeliveryDateMode mode) {
 		this.articleID = articleID;
@@ -69,21 +53,5 @@ implements Serializable
 	public DeliveryDateMode getMode() {
 		return mode;
 	}
-//
-//	/**
-//	 * Sets the mode.
-//	 * @param mode the mode to set
-//	 */
-//	public void setMode(DeliveryDateMode mode) {
-//		this.mode = mode;
-//	}
-
-//	/**
-//	 * Returns the article.
-//	 * @return the article
-//	 */
-//	public Article getArticle() {
-//		return article;
-//	}
 
 }

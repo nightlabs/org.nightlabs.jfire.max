@@ -5,7 +5,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireTrade"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireServerManager"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireBaseBean"/>
-	<classpathentry kind="lib" path="/target-jee-jfire-jboss-birt/src/birt-deployment/birt-runtime/birt/lib/oda.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireReporting"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireJbpm"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.nightlabs.base"/>

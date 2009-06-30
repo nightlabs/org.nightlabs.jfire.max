@@ -1,4 +1,4 @@
-package org.nightlabs.jfire.trade;
+package org.nightlabs.jfire.trade.deliverydate;
 
 /**
  * @author Daniel Mazurek - daniel [at] nightlabs [dot] de

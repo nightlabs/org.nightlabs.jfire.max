@@ -3,6 +3,8 @@ package org.nightlabs.jfire.trade.dao;
 import java.util.Collection;
 import java.util.Set;
 
+import javax.jdo.JDOHelper;
+
 import org.nightlabs.jdo.query.QueryCollection;
 import org.nightlabs.jfire.accounting.AccountingManagerRemote;
 import org.nightlabs.jfire.accounting.id.InvoiceID;
@@ -12,13 +14,17 @@ import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.store.StoreManagerRemote;
 import org.nightlabs.jfire.store.id.DeliveryNoteID;
 import org.nightlabs.jfire.store.id.ReceptionNoteID;
+import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.ArticleContainer;
 import org.nightlabs.jfire.trade.TradeManagerRemote;
+import org.nightlabs.jfire.trade.deliverydate.ArticleContainerDeliveryDateDTO;
 import org.nightlabs.jfire.trade.id.ArticleContainerID;
+import org.nightlabs.jfire.trade.id.ArticleID;
 import org.nightlabs.jfire.trade.id.OfferID;
 import org.nightlabs.jfire.trade.id.OrderID;
 import org.nightlabs.jfire.trade.query.AbstractArticleContainerQuery;
 import org.nightlabs.progress.ProgressMonitor;
+import org.nightlabs.progress.SubProgressMonitor;
 import org.nightlabs.util.CollectionUtil;
 
 /**
@@ -121,5 +127,33 @@ extends BaseJDOObjectDAO<ArticleContainerID, ArticleContainer>
 			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
 		return getJDOObject(null, articleContainerID, fetchGroups, maxFetchDepth, monitor);
+	}
+
+	public Collection<ArticleContainerDeliveryDateDTO> getArticleContainerDeliveryDateDTOs(
+			QueryCollection<? extends AbstractArticleContainerQuery> queries,
+			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
+	{
+		try {
+			monitor.beginTask("Load Delivery Date Information", 500);
+			TradeManagerRemote tm = JFireEjb3Factory.getRemoteBean(TradeManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			Collection<ArticleContainerDeliveryDateDTO> dtos = tm.getArticleContainerDeliveryDateDTOs(queries);
+			for (ArticleContainerDeliveryDateDTO dto : dtos) {
+				ArticleContainer ac = getArticleContainer(dto.getArticleContainerID(), fetchGroups, maxFetchDepth, new SubProgressMonitor(monitor, 100 / dtos.size()));
+				dto.setArticleContainer(ac);
+				Collection<Article> articles = ArticleDAO.sharedInstance().getArticles(dto.getArticleIDs(), fetchGroups, maxFetchDepth, new SubProgressMonitor(monitor, 300 / dtos.size()));
+				for (Article article : articles) {
+					ArticleID articleID = (ArticleID) JDOHelper.getObjectId(article);
+					dto.addArticle(articleID, article);
+				}
+			}
+			monitor.worked(100);
+			monitor.done();
+			return dtos;
+		} catch (Exception e) {
+			monitor.setCanceled(true);
+			throw new RuntimeException(e);
+		} finally {
+			monitor.done();
+		}
 	}
 }

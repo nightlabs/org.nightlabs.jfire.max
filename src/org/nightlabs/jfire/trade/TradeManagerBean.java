@@ -30,11 +30,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.security.RolesAllowed;
@@ -103,6 +105,8 @@ import org.nightlabs.jfire.timer.id.TaskID;
 import org.nightlabs.jfire.trade.config.LegalEntityViewConfigModule;
 import org.nightlabs.jfire.trade.config.OfferConfigModule;
 import org.nightlabs.jfire.trade.config.TradePrintingConfigModule;
+import org.nightlabs.jfire.trade.deliverydate.ArticleContainerDeliveryDateDTO;
+import org.nightlabs.jfire.trade.deliverydate.ArticleDeliveryDateCarrier;
 import org.nightlabs.jfire.trade.endcustomer.EndCustomerReplicationPolicy;
 import org.nightlabs.jfire.trade.endcustomer.id.EndCustomerReplicationPolicyID;
 import org.nightlabs.jfire.trade.id.ArticleContainerID;
@@ -1553,10 +1557,16 @@ implements TradeManagerRemote, TradeManagerLocal
 	 * @see org.nightlabs.jfire.trade.TradeManagerRemote#getArticleContainerIDs(org.nightlabs.jdo.query.QueryCollection)
 	 */
 	@RolesAllowed({"org.nightlabs.jfire.trade.queryOrders", "org.nightlabs.jfire.trade.queryOffers", "org.nightlabs.jfire.store.queryDeliveryNotes", "org.nightlabs.jfire.accounting.queryInvoices"})
-	@SuppressWarnings("unchecked")
 	public <R extends ArticleContainer> Set<ArticleContainerID> getArticleContainerIDs(
 			QueryCollection<? extends AbstractArticleContainerQuery> queries)
-			{
+	{
+			Collection<R> articleContainers = getArticleContainers(queries);
+			return NLJDOHelper.getObjectIDSet(articleContainers);
+	}
+
+	private <R extends ArticleContainer> Collection<R> getArticleContainers(
+			QueryCollection<? extends AbstractArticleContainerQuery> queries)
+	{
 		if (queries == null)
 			return null;
 		if (! ArticleContainer.class.isAssignableFrom(queries.getResultClass()))
@@ -1585,12 +1595,11 @@ implements TradeManagerRemote, TradeManagerLocal
 
 			decoratedCollection.setPersistenceManager(pm);
 			Collection<R> articleContainers = (Collection<R>) decoratedCollection.executeQueries();
-
-			return NLJDOHelper.getObjectIDSet(articleContainers);
+			return articleContainers;
 		} finally {
 			pm.close();
 		}
-			}
+	}
 
 	//	/**
 	//	* @param articleContainerQueries Instances of {@link ArticleContainerQuery}
@@ -2180,6 +2189,45 @@ implements TradeManagerRemote, TradeManagerLocal
 		PersistenceManager pm = createPersistenceManager();
 		try {
 			return NLJDOHelper.getDetachedObjectList(pm, articleEndCustomerHistoryItemIDs, ArticleEndCustomerHistoryItem.class, fetchGroups, maxFetchDepth);
+		} finally {
+			pm.close();
+		}
+	}
+
+	@RolesAllowed({"org.nightlabs.jfire.trade.queryOrders", "org.nightlabs.jfire.trade.queryOffers", "org.nightlabs.jfire.store.queryDeliveryNotes", "org.nightlabs.jfire.accounting.queryInvoices"})
+	@Override
+	public Collection<ArticleContainerDeliveryDateDTO> getArticleContainerDeliveryDateDTOs(
+			QueryCollection<? extends AbstractArticleContainerQuery> queries)
+	{
+		PersistenceManager pm = createPersistenceManager();
+		try {
+			// ask result for each contained query separatly andmerge afterwards,
+			// because otherwise only result which matches all criteria is returned
+			// which is e.g. not wanted in case you want results for offers and deliverynotes
+			Collection<ArticleContainerDeliveryDateDTO> dtos = new ArrayList<ArticleContainerDeliveryDateDTO>();
+			Collection<ArticleContainer> articleContainers = new HashSet<ArticleContainer>();
+			for (AbstractArticleContainerQuery query : queries) {
+				QueryCollection<AbstractArticleContainerQuery> qc =
+					new QueryCollection<AbstractArticleContainerQuery>(ArticleContainer.class);
+				qc.add(query);
+				Collection<ArticleContainer> ac = getArticleContainers(qc);
+				articleContainers.addAll(ac);
+			}
+
+			for (ArticleContainer ac : articleContainers) {
+				ArticleContainerDeliveryDateDTO dto = new ArticleContainerDeliveryDateDTO();
+				dto.setArticleContainerID((ArticleContainerID) JDOHelper.getObjectId(ac));
+				Map<ArticleID, Article> articleID2Article = new HashMap<ArticleID, Article>();
+				for (Article article : ac.getArticles()) {
+					ArticleID articleID = (ArticleID) JDOHelper.getObjectId(article);
+					// we put null here as value to minimize transport traffic, data will be filled up in ArticleContainerDAO
+					// to increase chance that needed data is already cached
+					articleID2Article.put(articleID, null);
+				}
+				dto.setArticleID2Article(articleID2Article);
+				dtos.add(dto);
+			}
+			return dtos;
 		} finally {
 			pm.close();
 		}

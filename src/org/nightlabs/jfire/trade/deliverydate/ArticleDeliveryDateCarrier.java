@@ -1,4 +1,4 @@
-package org.nightlabs.jfire.trade;
+package org.nightlabs.jfire.trade.deliverydate;
 
 import java.io.Serializable;
 import java.util.Date;

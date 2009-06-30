@@ -32,12 +32,16 @@ implements PersonRelationManagerRemote
 	{
 		PersistenceManager pm = createPersistenceManager();
 		try {
+			String baseName = "org.nightlabs.jfire.personrelation.resource.messages"; //$NON-NLS-1$
+			ClassLoader loader = PersonRelationManagerBean.class.getClassLoader();
 			{
 				PersonRelationTypeID personRelationTypeID = PersonRelationType.PredefinedRelationTypes.friend;
 				try {
 					pm.getObjectById(personRelationTypeID);
 				} catch (JDOObjectNotFoundException x) {
-					pm.makePersistent(new PersonRelationType(personRelationTypeID, null));
+					PersonRelationType personRelationType = pm.makePersistent(new PersonRelationType(personRelationTypeID, null));
+					personRelationType.getName().readFromProperties(baseName, loader, "org.nightlabs.jfire.personrelation.PersonRelationType-friend.name"); //$NON-NLS-1$
+					personRelationType.getDescription().readFromProperties(baseName, loader, "org.nightlabs.jfire.personrelation.PersonRelationType-friend.description"); //$NON-NLS-1$
 				}
 			}
 
@@ -46,7 +50,9 @@ implements PersonRelationManagerRemote
 				try {
 					pm.getObjectById(personRelationTypeID);
 				} catch (JDOObjectNotFoundException x) {
-					pm.makePersistent(new PersonRelationType(personRelationTypeID, PersonRelationType.PredefinedRelationTypes.employed));
+					PersonRelationType personRelationType = pm.makePersistent(new PersonRelationType(personRelationTypeID, PersonRelationType.PredefinedRelationTypes.employed));
+					personRelationType.getName().readFromProperties(baseName, loader, "org.nightlabs.jfire.personrelation.PersonRelationType-employing.name"); //$NON-NLS-1$
+					personRelationType.getDescription().readFromProperties(baseName, loader, "org.nightlabs.jfire.personrelation.PersonRelationType-employing.description"); //$NON-NLS-1$
 				}
 			}
 			{
@@ -54,7 +60,9 @@ implements PersonRelationManagerRemote
 				try {
 					pm.getObjectById(personRelationTypeID);
 				} catch (JDOObjectNotFoundException x) {
-					pm.makePersistent(new PersonRelationType(personRelationTypeID, PersonRelationType.PredefinedRelationTypes.employing));
+					PersonRelationType personRelationType = pm.makePersistent(new PersonRelationType(personRelationTypeID, PersonRelationType.PredefinedRelationTypes.employing));
+					personRelationType.getName().readFromProperties(baseName, loader, "org.nightlabs.jfire.personrelation.PersonRelationType-employed.name"); //$NON-NLS-1$
+					personRelationType.getDescription().readFromProperties(baseName, loader, "org.nightlabs.jfire.personrelation.PersonRelationType-employed.description"); //$NON-NLS-1$
 				}
 			}
 
@@ -63,7 +71,9 @@ implements PersonRelationManagerRemote
 				try {
 					pm.getObjectById(personRelationTypeID);
 				} catch (JDOObjectNotFoundException x) {
-					pm.makePersistent(new PersonRelationType(personRelationTypeID, PersonRelationType.PredefinedRelationTypes.child));
+					PersonRelationType personRelationType = pm.makePersistent(new PersonRelationType(personRelationTypeID, PersonRelationType.PredefinedRelationTypes.child));
+					personRelationType.getName().readFromProperties(baseName, loader, "org.nightlabs.jfire.personrelation.PersonRelationType-parent.name"); //$NON-NLS-1$
+					personRelationType.getDescription().readFromProperties(baseName, loader, "org.nightlabs.jfire.personrelation.PersonRelationType-parent.description"); //$NON-NLS-1$
 				}
 			}
 			{
@@ -71,7 +81,9 @@ implements PersonRelationManagerRemote
 				try {
 					pm.getObjectById(personRelationTypeID);
 				} catch (JDOObjectNotFoundException x) {
-					pm.makePersistent(new PersonRelationType(personRelationTypeID, PersonRelationType.PredefinedRelationTypes.parent));
+					PersonRelationType personRelationType = pm.makePersistent(new PersonRelationType(personRelationTypeID, PersonRelationType.PredefinedRelationTypes.parent));
+					personRelationType.getName().readFromProperties(baseName, loader, "org.nightlabs.jfire.personrelation.PersonRelationType-child.name"); //$NON-NLS-1$
+					personRelationType.getDescription().readFromProperties(baseName, loader, "org.nightlabs.jfire.personrelation.PersonRelationType-child.description"); //$NON-NLS-1$
 				}
 			}
 
@@ -159,7 +171,7 @@ implements PersonRelationManagerRemote
 	{
 		PersistenceManager pm = createPersistenceManager();
 		try {
-			return NLJDOHelper.getDetachedObjectList(pm, personRelationIDs, PersonRelationType.class, fetchGroups, maxFetchDepth);
+			return NLJDOHelper.getDetachedObjectList(pm, personRelationIDs, PersonRelation.class, fetchGroups, maxFetchDepth);
 		} finally {
 			pm.close();
 		}

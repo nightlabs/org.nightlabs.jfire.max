@@ -2,6 +2,7 @@ package org.nightlabs.jfire.personrelation;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -30,6 +31,7 @@ import javax.jdo.listener.InstanceLifecycleEvent;
 import javax.jdo.listener.StoreCallback;
 import javax.jdo.listener.StoreLifecycleListener;
 
+import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.organisation.Organisation;
@@ -107,15 +109,17 @@ implements Serializable, AttachCallback, DetachCallback, StoreCallback, DeleteCa
 			if (filter.length() > 0)
 				filter.append(" && ");
 
-			filter.append("this.fromPerson == :fromPerson");
+			filter.append("this.from == :fromPerson");
 		}
 
 		if (toPerson != null) {
 			if (filter.length() > 0)
 				filter.append(" && ");
 
-			filter.append("this.toPerson == :toPerson");
+			filter.append("this.to == :toPerson");
 		}
+		q.setFilter(filter.toString());
+
 		return q;
 	}
 
@@ -251,6 +255,7 @@ implements Serializable, AttachCallback, DetachCallback, StoreCallback, DeleteCa
 	public static final String FETCH_GROUP_TO = "PersonRelation.to";
 	public static final String FETCH_GROUP_FROM_ID = "PersonRelation.fromID";
 	public static final String FETCH_GROUP_TO_ID = "PersonRelation.toID";
+	public static final String FETCH_GROUP_FROM_PERSON_RELATION_IDS = "PersonRelation.fromPersonRelationIDs";
 
 	public static final class FieldName {
 		public static final String personRelationType = "personRelationType";
@@ -258,6 +263,7 @@ implements Serializable, AttachCallback, DetachCallback, StoreCallback, DeleteCa
 		public static final String fromID = "fromID";
 		public static final String to = "to";
 		public static final String toID = "toID";
+		public static final String fromPersonRelationIDs = "fromPersonRelationIDs";
 	}
 
 	@PrimaryKey
@@ -305,6 +311,7 @@ implements Serializable, AttachCallback, DetachCallback, StoreCallback, DeleteCa
 
 		this.organisationID = organisationID;
 		this.personRelationID = personRelationID;
+		this.personRelationType = personRelationType;
 		this.from = from;
 		this.to = to;
 	}
@@ -351,6 +358,23 @@ implements Serializable, AttachCallback, DetachCallback, StoreCallback, DeleteCa
 		return toID;
 	}
 
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
+	private Collection<PersonRelationID> fromPersonRelationIDs;
+
+	public Collection<PersonRelationID> getFromPersonRelationIDs() {
+		if (fromPersonRelationIDs == null) {
+			PersistenceManager pm = JDOHelper.getPersistenceManager(this);
+			if (pm == null)
+				throw new IllegalStateException("Cannot obtain PersistenceManager! This instance is currently not persistent! " + this);
+
+			Collection<? extends PersonRelation> personRelations = PersonRelation.getPersonRelations(pm, null, null, getFrom());
+			fromPersonRelationIDs = NLJDOHelper.getObjectIDSet(personRelations);
+			fromPersonRelationIDs = Collections.unmodifiableCollection(fromPersonRelationIDs);
+		}
+
+		return fromPersonRelationIDs;
+	}
+
 	@Override
 	public void jdoPostDetach(Object o) {
 		PersonRelation detached = this;
@@ -363,6 +387,9 @@ implements Serializable, AttachCallback, DetachCallback, StoreCallback, DeleteCa
 		}
 		if (fetchGroups.contains(FETCH_GROUP_TO_ID)) {
 			detached.toID = attached.getToID();
+		}
+		if (fetchGroups.contains(FETCH_GROUP_FROM_PERSON_RELATION_IDS)) {
+			detached.fromPersonRelationIDs = attached.getFromPersonRelationIDs();
 		}
 	}
 
@@ -382,13 +409,16 @@ implements Serializable, AttachCallback, DetachCallback, StoreCallback, DeleteCa
 		// Prevent duplicate relations. A relation is considered duplicate, if it
 		// is between the same two persons *AND* in the same direction *AND* of the
 		// same type (PersonRelationType).
-		Collection<? extends PersonRelation> reverseRelations = PersonRelation.getPersonRelations(
+		Collection<? extends PersonRelation> relations = PersonRelation.getPersonRelations(
 				pm,
 				getPersonRelationType(),
 				getFrom(),
 				getTo()
 		);
-		for (PersonRelation r : reverseRelations) {
+		for (PersonRelation r : relations) {
+			if (PersonRelation.this.equals(r))
+				continue;
+
 			if (JDOHelper.isDeleted(r))
 				continue;
 

@@ -57,6 +57,40 @@ extends BaseJDOObjectDAO<PersonRelationID, PersonRelation>
 
 	private PersonRelationManagerRemote ejb;
 
+	public List<PersonRelation> getPersonRelations(
+			Collection<PersonRelationID> personRelationIDs,
+			String[] fetchGroups, int maxFetchDepth,
+			ProgressMonitor monitor
+	)
+	{
+		return getJDOObjects(
+				null, personRelationIDs,
+				fetchGroups, maxFetchDepth,
+				monitor
+		);
+	}
+
+	public synchronized Collection<PersonRelationID> getPersonRelationIDs(
+			PersonRelationTypeID personRelationTypeID,
+			PropertySetID fromPersonID,
+			PropertySetID toPersonID,
+			ProgressMonitor monitor
+	)
+	{
+		monitor.beginTask("Loading person relation IDs", 100);
+		try {
+			PersonRelationManagerRemote ejb = JFireEjb3Factory.getRemoteBean(PersonRelationManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			monitor.worked(10);
+			Collection<PersonRelationID> personRelationIDs = ejb.getPersonRelationIDs(
+					personRelationTypeID, fromPersonID, toPersonID
+			);
+			monitor.worked(90);
+			return personRelationIDs;
+		} finally {
+			monitor.done();
+		}
+	}
+
 	/**
 	 * Get all those {@link PersonRelation}s that are of a certain {@link PersonRelationType type}
 	 * (if specified, otherwise all) and between two persons. It is possible to specify only one
@@ -121,22 +155,35 @@ extends BaseJDOObjectDAO<PersonRelationID, PersonRelation>
 	public void createPersonRelation(
 			PersonRelationTypeID personRelationTypeID,
 			PropertySetID fromPersonID,
-			PropertySetID toPersonID
+			PropertySetID toPersonID,
+			ProgressMonitor monitor
 	)
 	{
-		JFireEjb3Factory.getRemoteBean(PersonRelationManagerRemote.class, SecurityReflector.getInitialContextProperties()).createPersonRelation(
-				personRelationTypeID, fromPersonID, toPersonID
-		);
+		monitor.beginTask("Creating person relation", 100);
+		try {
+			JFireEjb3Factory.getRemoteBean(PersonRelationManagerRemote.class, SecurityReflector.getInitialContextProperties()).createPersonRelation(
+					personRelationTypeID, fromPersonID, toPersonID
+			);
+		} finally {
+			monitor.worked(100);
+			monitor.done();
+		}
 	}
 
 	public void deletePersonRelation(
 			PersonRelationTypeID personRelationTypeID,
 			PropertySetID fromPersonID,
-			PropertySetID toPersonID
+			PropertySetID toPersonID, ProgressMonitor monitor
 	)
 	{
-		JFireEjb3Factory.getRemoteBean(PersonRelationManagerRemote.class, SecurityReflector.getInitialContextProperties()).deletePersonRelation(
-				personRelationTypeID, fromPersonID, toPersonID
-		);
+		monitor.beginTask("Deleting person relation", 100);
+		try {
+			JFireEjb3Factory.getRemoteBean(PersonRelationManagerRemote.class, SecurityReflector.getInitialContextProperties()).deletePersonRelation(
+					personRelationTypeID, fromPersonID, toPersonID
+			);
+		} finally {
+			monitor.worked(100);
+			monitor.done();
+		}
 	}
 }

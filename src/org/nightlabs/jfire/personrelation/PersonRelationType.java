@@ -1,5 +1,6 @@
 package org.nightlabs.jfire.personrelation;
 
+import java.io.Serializable;
 import java.util.Collection;
 
 import javax.jdo.JDOHelper;
@@ -7,6 +8,8 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.annotations.Column;
 import javax.jdo.annotations.Discriminator;
 import javax.jdo.annotations.DiscriminatorStrategy;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.FetchGroups;
 import javax.jdo.annotations.IdentityType;
 import javax.jdo.annotations.Inheritance;
 import javax.jdo.annotations.InheritanceStrategy;
@@ -28,8 +31,21 @@ import org.nightlabs.util.Util;
 )
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 @Discriminator(strategy=DiscriminatorStrategy.CLASS_NAME)
+@FetchGroups({
+	@FetchGroup(
+			name=PersonRelationType.FETCH_GROUP_NAME,
+			members=@Persistent(name="name")
+	),
+	@FetchGroup(
+			name=PersonRelationType.FETCH_GROUP_DESCRIPTION,
+			members=@Persistent(name="description")
+	),
+})
 public class PersonRelationType
+implements Serializable
 {
+	private static final long serialVersionUID = 1L;
+
 	public static final class PredefinedRelationTypes {
 		public static final PersonRelationTypeID friend = PersonRelationTypeID.create(
 				Organisation.DEV_ORGANISATION_ID, "friend"
@@ -49,6 +65,9 @@ public class PersonRelationType
 				Organisation.DEV_ORGANISATION_ID, "child"
 		);
 	}
+
+	public static final String FETCH_GROUP_NAME = "PersonRelationType.name";
+	public static final String FETCH_GROUP_DESCRIPTION = "PersonRelationType.description";
 
 	@PrimaryKey
 	@Column(length=100)

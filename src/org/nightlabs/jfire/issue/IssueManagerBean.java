@@ -789,16 +789,25 @@ implements IssueManagerRemote
 //			}
 //			pm.flush();
 
-			pm.getExtent(IssueLocal.class, true);
-			pm.deletePersistent(issue.getStatableLocal());
-			pm.flush();
-
+			// IMHO this should happen before the IssueLocal is deleted, because the IssueLocal might be referenced by an IssueHistoryItem (though this is currently never the case).
+			// Please revert this change, if it breaks deletion, because this is not essential - it's just a little bit cleaner, IMHO. Marco.
 			pm.getExtent(IssueHistoryItem.class, true);
 			Collection<IssueHistoryItem> historyItems = IssueHistoryItem.getIssueHistoryItemsByIssue(pm, issueID);
 			for (IssueHistoryItem item : historyItems) {
 				pm.deletePersistent(item);
 			}
 			pm.flush();
+
+			pm.getExtent(IssueLocal.class, true);
+			pm.deletePersistent(issue.getStatableLocal());
+			pm.flush();
+
+//			pm.getExtent(IssueHistoryItem.class, true);
+//			Collection<IssueHistoryItem> historyItems = IssueHistoryItem.getIssueHistoryItemsByIssue(pm, issueID);
+//			for (IssueHistoryItem item : historyItems) {
+//				pm.deletePersistent(item);
+//			}
+//			pm.flush();
 
 			pm.getExtent(Issue.class, true);
 			pm.deletePersistent(issue);

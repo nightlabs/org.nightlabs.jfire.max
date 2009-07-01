@@ -60,7 +60,7 @@ implements IJDOObjectDAO<LegalEntity>
 
 	private static String[] DEFAULT_FETCH_GROUP_ANONYMOUS = new String[] {FetchPlan.DEFAULT, LegalEntity.FETCH_GROUP_PERSON, PropertySet.FETCH_GROUP_FULL_DATA};
 
-	private AnchorID anonymousAnchorID;
+	private AnchorID _anonymousAnchorID;
 
 //	private LoginStateListener loginStateListener = new LoginStateListener() {
 //
@@ -84,15 +84,25 @@ implements IJDOObjectDAO<LegalEntity>
 	 */
 	public LegalEntityDAO() {
 		super();
-		try {
-			anonymousAnchorID = AnchorID.create(
-					SecurityReflector.getUserDescriptor().getOrganisationID(),
+	}
+
+	public AnchorID getAnonymousLegalEntityID()
+	{
+		String organisationID = SecurityReflector.getUserDescriptor().getOrganisationID();
+		if (_anonymousAnchorID != null) {
+			if (!organisationID.equals(_anonymousAnchorID.organisationID))
+				_anonymousAnchorID = null;
+		}
+
+		if (_anonymousAnchorID == null) {
+			_anonymousAnchorID = AnchorID.create(
+					organisationID,
 					LegalEntity.ANCHOR_TYPE_ID_LEGAL_ENTITY,
 					LegalEntity.ANCHOR_ID_ANONYMOUS
 			);
-		} catch (Exception e) {
-			throw new RuntimeException(e);
 		}
+
+		return _anonymousAnchorID;
 	}
 
 	/**
@@ -177,12 +187,7 @@ implements IJDOObjectDAO<LegalEntity>
 	 * @param monitor The monitor to report progress to.
 	 */
 	public LegalEntity getAnonymousLegalEntity(String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) {
-		anonymousAnchorID = AnchorID.create(
-				SecurityReflector.getUserDescriptor().getOrganisationID(),
-				LegalEntity.ANCHOR_TYPE_ID_LEGAL_ENTITY,
-				LegalEntity.ANCHOR_ID_ANONYMOUS
-		);
-		return getJDOObject(null, anonymousAnchorID, fetchGroups, maxFetchDepth, monitor);
+		return getJDOObject(null, getAnonymousLegalEntityID(), fetchGroups, maxFetchDepth, monitor);
 	}
 
 	/**

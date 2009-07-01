@@ -785,20 +785,15 @@ implements IssueManagerRemote
 			// Note(s):
 			//  1. See Issue.jdoPreDelete() -- routines there include the deletion of States, in both this Issue and its related IssueLocal.
 
-			pm.getExtent(IssueHistoryItem.class, true);
 			//  2. Handle the IssueHistoryItems attached to this Issue. Kai
 			//     IMHO this should happen before the IssueLocal is deleted, because the IssueLocal might be referenced by an IssueHistoryItem (though this is currently never the case).
 			//     Please revert this change, if it breaks deletion, because this is not essential - it's just a little bit cleaner, IMHO. Marco.
-			//
-			// (***) Problem exists here; specifically with IssueLinkHistoryItem.
-			//       --> Cannot delete or update a parent row: a foreign key constraint fails
-			//      (`JFire_chezfrancois_jfire_org`.`jfireissuetracking_issuehistoryitem`,
-			//        CONSTRAINT `jfireissuetracking_issuehistoryitem_fk1` FOREIGN KEY (`issue_issue_id_oid`, `issue_organisation_id_oid`) REFER) ...
+			pm.getExtent(IssueHistoryItem.class, true);
 			Collection<IssueHistoryItem> historyItems = IssueHistoryItem.getIssueHistoryItemsByIssue(pm, issueID);
 			pm.deletePersistentAll(historyItems);
 			pm.flush();
 
-			// 3. Handle the IssueLocal.
+			//   3. Handle the IssueLocal.
 			pm.getExtent(IssueLocal.class, true);
 			pm.deletePersistent(issue.getStatableLocal());
 			pm.flush();

@@ -122,9 +122,7 @@ public class IssueLinkTypeIssueToIssue extends IssueLinkType {
 		// -- 1. [Create the reverse link]--------------------------------------------------------------------------------------|
 		Issue issue_A = issueLink_A.getIssue();
 		IssueLinkType issueLinkType_A = issueLink_A.getIssueLinkType();
-
-//		IssueLinkType issueLinkType_B = IssueLinkTypeIssueToIssue.getReverseSymmetricIssueLinkType(pm, issueLinkTypeID);
-		IssueLinkType issueLinkType_B = getReverseIssueLinkType(pm, issueLinkType_A);
+		IssueLinkType issueLinkType_B = IssueLinkTypeIssueToIssue.getReverseIssueLinkType(pm, issueLinkType_A);
 
 		// Guard: Prevents this from causing an ETERNAL recursion.
 		// => find out, if the other side already has an issue-link of the required type pointing back
@@ -170,29 +168,33 @@ public class IssueLinkTypeIssueToIssue extends IssueLinkType {
 		//    [  issue_A  ]                            [  issue_B  ]
 		//    [___________]<<--- issueLinkType_B -----♦[___________]
 
+		// On 'Delete-Issue' guard:
+		// This prevents 'un-ending' loop when either Issue is persistent; i.e. when we attempt to delete an Issue, the
+		// routine triggers the jdoPreDelete() routine of the IssueLinks. Kai
+		if ( JDOHelper.isDeleted(issue_B) ) return;
+
 		// -- 1. [Remove the reverse link]--------------------------------------------------------------------------------------|
 		Issue issue_A = issueLink_A.getIssue();
-//		// TODO document!
-//		if (! issue_A.removeIssueLink(issueLink_A))
-//			return;
 
-		boolean aa = true;
-//		aa = JDOHelper.isPersistent(issue_B);
-//		aa = JDOHelper.isDetached(issue_B);
-		aa = JDOHelper.isDeleted(issueLink_A);
-		aa = JDOHelper.isTransactional(issueLink_A);
+//		// Les Debourg...
+//		boolean onA_PER = JDOHelper.isPersistent(issue_A);
+//		boolean onA_DET = JDOHelper.isDetached(issue_A);
+//		boolean onA_DEL = JDOHelper.isDeleted(issue_A);
+//		boolean onA_TRA = JDOHelper.isTransactional(issue_A);
+//
+//		boolean onB_PER = JDOHelper.isPersistent(issue_B);
+//		boolean onB_DET = JDOHelper.isDetached(issue_B);
+//		boolean onB_DEL = JDOHelper.isDeleted(issue_B);
+//		boolean onB_TRA = JDOHelper.isTransactional(issue_B);
+
 
 		IssueLinkType issueLinkType_A = issueLink_A.getIssueLinkType();
-//		IssueLinkTypeID issueLinkTypeIDToBeDeleted = (IssueLinkTypeID) JDOHelper.getObjectId(issueLinkType_A);
-//		if (issueLinkTypeIDToBeDeleted == null)
-//			throw new IllegalStateException("JDOHelper.getObjectId(issueLinkToBeDeleted.getIssueLinkType()) returned null!");
-
 		IssueLinkType issueLinkType_B = IssueLinkTypeIssueToIssue.getReverseIssueLinkType(pm, issueLinkType_A);
 
 		// Find the correct reverse link to be removed.
 		// --> Aha! There is NO guard to prevent ETERNAL recursion??
 		//     Well, that's because we dont need for a guard here; since the link would have already been removed. Kai.
-		// --> UNFORTUNATELY, this bit doesnt exactly work when we try to DELETE an Issue.
+		// --> UNFORTUNATELY, this bit doesnt exactly work when we try to DELETE an Issue. <--- WOO HOO!! Solved!!!! Kai.
 		boolean isIssueLinkFound = false;
 		for (IssueLink issueLink_B : issue_B.getIssueLinks()) {
 			Object linkedObject_B = issueLink_B.getLinkedObject();

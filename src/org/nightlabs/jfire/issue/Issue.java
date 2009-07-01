@@ -799,11 +799,11 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback, StoreCallbac
 	 * Removes an issue link.
 	 * @param issueLink The issue link to be removed
 	 */
-	public void removeIssueLink(IssueLink issueLink) {
+	public boolean removeIssueLink(IssueLink issueLink) {
 		if (issueLink == null)
 			throw new IllegalArgumentException("issueLink must not be null!");
 
-		issueLinks.remove(issueLink);
+		return issueLinks.remove(issueLink);
 	}
 
 	/**

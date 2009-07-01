@@ -775,47 +775,42 @@ implements IssueManagerRemote
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("_Guest_")
-	public void deleteIssue(IssueID issueID)
-	{
+	public void deleteIssue(IssueID issueID) {
+
 		PersistenceManager pm = createPersistenceManager();
 		try {
 			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
 			pm.getExtent(Issue.class, true);
 			Issue issue = (Issue) pm.getObjectById(issueID);
+			// Note(s):
+			//  1. See Issue.jdoPreDelete() -- routines there include the deletion of States, in both this Issue and its related IssueLocal.
 
-//			pm.getExtent(State.class, true);
-//			for (State state : issue.getStates()) {
-//				pm.deletePersistent(state);
-//			}
-//			pm.flush();
-
-			// IMHO this should happen before the IssueLocal is deleted, because the IssueLocal might be referenced by an IssueHistoryItem (though this is currently never the case).
-			// Please revert this change, if it breaks deletion, because this is not essential - it's just a little bit cleaner, IMHO. Marco.
 			pm.getExtent(IssueHistoryItem.class, true);
+			//  2. Handle the IssueHistoryItems attached to this Issue. Kai
+			//     IMHO this should happen before the IssueLocal is deleted, because the IssueLocal might be referenced by an IssueHistoryItem (though this is currently never the case).
+			//     Please revert this change, if it breaks deletion, because this is not essential - it's just a little bit cleaner, IMHO. Marco.
+			//
+			// (***) Problem exists here; specifically with IssueLinkHistoryItem.
+			//       --> Cannot delete or update a parent row: a foreign key constraint fails
+			//      (`JFire_chezfrancois_jfire_org`.`jfireissuetracking_issuehistoryitem`,
+			//        CONSTRAINT `jfireissuetracking_issuehistoryitem_fk1` FOREIGN KEY (`issue_issue_id_oid`, `issue_organisation_id_oid`) REFER) ...
 			Collection<IssueHistoryItem> historyItems = IssueHistoryItem.getIssueHistoryItemsByIssue(pm, issueID);
-			for (IssueHistoryItem item : historyItems) {
-				pm.deletePersistent(item);
-			}
+			pm.deletePersistentAll(historyItems);
 			pm.flush();
 
+			// 3. Handle the IssueLocal.
 			pm.getExtent(IssueLocal.class, true);
 			pm.deletePersistent(issue.getStatableLocal());
 			pm.flush();
 
-//			pm.getExtent(IssueHistoryItem.class, true);
-//			Collection<IssueHistoryItem> historyItems = IssueHistoryItem.getIssueHistoryItemsByIssue(pm, issueID);
-//			for (IssueHistoryItem item : historyItems) {
-//				pm.deletePersistent(item);
-//			}
-//			pm.flush();
-
+			// 4. Finally, handle the Issue itself.
 			pm.getExtent(Issue.class, true);
 			pm.deletePersistent(issue);
 			pm.flush();
-		}//try
-		finally {
+
+		} finally {
 			pm.close();
-		}//finally
+		}
 	}
 
 	/**
@@ -1576,7 +1571,7 @@ implements IssueManagerRemote
 			// TODO Move the following DEMO Issues to a demo-data-creation module; yet to be created. Coming soon... stay tuned ;-)
 			pm.getExtent(Issue.class);
 
-			int totDemoIssueCnt = 46;
+			int totDemoIssueCnt = 50;
 			boolean isCreateArbitraryIssueToIssueLinks = !true;
 			List<IssuePriority> def_issuePriorities = issueTypeDefault.getIssuePriorities();
 			List<IssueResolution> def_issueResolutions = issueTypeDefault.getIssueResolutions();

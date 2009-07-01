@@ -172,6 +172,16 @@ public class IssueLinkTypeIssueToIssue extends IssueLinkType {
 
 		// -- 1. [Remove the reverse link]--------------------------------------------------------------------------------------|
 		Issue issue_A = issueLink_A.getIssue();
+//		// TODO document!
+//		if (! issue_A.removeIssueLink(issueLink_A))
+//			return;
+
+		boolean aa = true;
+//		aa = JDOHelper.isPersistent(issue_B);
+//		aa = JDOHelper.isDetached(issue_B);
+		aa = JDOHelper.isDeleted(issueLink_A);
+		aa = JDOHelper.isTransactional(issueLink_A);
+
 		IssueLinkType issueLinkType_A = issueLink_A.getIssueLinkType();
 //		IssueLinkTypeID issueLinkTypeIDToBeDeleted = (IssueLinkTypeID) JDOHelper.getObjectId(issueLinkType_A);
 //		if (issueLinkTypeIDToBeDeleted == null)
@@ -180,7 +190,9 @@ public class IssueLinkTypeIssueToIssue extends IssueLinkType {
 		IssueLinkType issueLinkType_B = IssueLinkTypeIssueToIssue.getReverseIssueLinkType(pm, issueLinkType_A);
 
 		// Find the correct reverse link to be removed.
-		// --> Aha! There is NO guard to prevent ETERNAL recursion?? Well, that's because we dont need for a guard here. Kai.
+		// --> Aha! There is NO guard to prevent ETERNAL recursion??
+		//     Well, that's because we dont need for a guard here; since the link would have already been removed. Kai.
+		// --> UNFORTUNATELY, this bit doesnt exactly work when we try to DELETE an Issue.
 		boolean isIssueLinkFound = false;
 		for (IssueLink issueLink_B : issue_B.getIssueLinks()) {
 			Object linkedObject_B = issueLink_B.getLinkedObject();

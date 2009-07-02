@@ -2,45 +2,12 @@
 <application xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:application="http://java.sun.com/xml/ns/javaee/application_5.xsd" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/application_5.xsd" id="Application_ID" version="5">
   <display-name>NightLabs Editor2D Framework</display-name>
   <module>
-    <java>NightLabsEditor2D.jar</java>
-  </module>
-  <module>
-    <java>lib/batik-awt-util.jar</java>
-  </module>
-  <module>
-    <java>lib/batik-css.jar</java>
-  </module>
-  <module>
-    <java>lib/batik-dom.jar</java>
-  </module>
-  <module>
-    <java>lib/batik-ext.jar</java>
-  </module>
-  <module>
-    <java>lib/batik-extension.jar</java>
-  </module>
-  <module>
-    <java>lib/batik-svg-dom.jar</java>
-  </module>
-  <module>
-    <java>lib/batik-svggen.jar</java>
-  </module>
-  <module>
-    <java>lib/batik-svggen.jar</java>
-  </module>
-  <module>
-    <java>lib/batik-util.jar</java>
-  </module>
-  <module>
-    <java>lib/batik-xml.jar</java>
+    <java>org.nightlabs.editor2d</java>
   </module>
   <module>
     <java>lib/jai_codec.jar</java>
   </module>
   <module>
     <java>lib/jai_core.jar</java>
-  </module>
-  <module>
-    <java>lib/itext-1.4.8.jar</java>
   </module>
 </application>

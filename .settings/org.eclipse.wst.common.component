@@ -2,10 +2,13 @@
 <project-modules id="moduleCoreId" project-version="1.5.0">
     <wb-module deploy-name="NightLabsEditor2DEAR">
         <wb-resource deploy-path="/" source-path="/EarContent"/>
-        <dependent-module archiveName="NightLabsEditor2D.jar" deploy-path="/" handle="module:/resource/NightLabsEditor2D/NightLabsEditor2D">
+        <dependent-module archiveName="org.nightlabs.editor2d.jar" deploy-path="/" handle="module:/resource/org.nightlabs.editor2d/org.nightlabs.editor2d">
             <dependency-type>uses</dependency-type>
-        </dependent-module>        
-        <dependent-module archiveName="NightLabsEditor2D.jar" deploy-path="/" handle="module:/resource/NightLabsEditor2D/NightLabsEditor2D">
+        </dependent-module>
+        <dependent-module deploy-path="/lib" handle="module:/classpath/lib/org.nightlabs.editor2d/lib/jai_codec.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module deploy-path="/lib" handle="module:/classpath/lib/org.nightlabs.editor2d/lib/jai_core.jar">
             <dependency-type>uses</dependency-type>
         </dependent-module>
     </wb-module>

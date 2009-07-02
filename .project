@@ -3,7 +3,7 @@
 	<name>NightLabsEditor2DEAR</name>
 	<comment></comment>
 	<projects>
-		<project>NightLabsEditor2D</project>
+		<project>org.nightlabs.editor2d</project>
 		<project>NightLabsEditor2DEAR</project>
 	</projects>
 	<buildSpec>

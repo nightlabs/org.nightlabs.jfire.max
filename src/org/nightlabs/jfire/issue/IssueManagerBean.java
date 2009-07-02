@@ -1566,7 +1566,7 @@ implements IssueManagerRemote
 			// TODO Move the following DEMO Issues to a demo-data-creation module; yet to be created. Coming soon... stay tuned ;-)
 			pm.getExtent(Issue.class);
 
-			int totDemoIssueCnt = 50;
+			int totDemoIssueCnt = 52;
 			boolean isCreateArbitraryIssueToIssueLinks = !true;
 			List<IssuePriority> def_issuePriorities = issueTypeDefault.getIssuePriorities();
 			List<IssueResolution> def_issueResolutions = issueTypeDefault.getIssueResolutions();

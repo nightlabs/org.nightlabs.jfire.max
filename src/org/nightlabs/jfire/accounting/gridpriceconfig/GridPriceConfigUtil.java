@@ -181,7 +181,7 @@ public class GridPriceConfigUtil
 					}
 				}
 			}
-			
+
 			if (priceConfig instanceof IFormulaPriceConfig) {
 				FormulaCell formulaCell = ((IFormulaPriceConfig)priceConfig).getFallbackFormulaCell(false);
 				if (formulaCell == null)
@@ -403,8 +403,27 @@ public class GridPriceConfigUtil
 				LinkedList<ProductType> productTypes = new LinkedList<ProductType>();
 				productTypes.add(detachedRes);
 
-				for (NestedProductTypeLocal npt : detachedRes.getProductTypeLocal().getNestedProductTypeLocals())
+				int extensionLevel = 0;
+				pt = detachedRes;
+				while (pt != null) {
+					++extensionLevel;
+					pt = pt.getExtendedProductType();
+					if (pt != null)
+						logger.debug("packageProductType (ext-level " + extensionLevel + "): " + pt == null ? null : pt.getPrimaryKey());
+				}
+
+				for (NestedProductTypeLocal npt : detachedRes.getProductTypeLocal().getNestedProductTypeLocals()) {
 					productTypes.add(npt.getInnerProductTypeLocal().getProductType());
+
+					extensionLevel = 0;
+					pt = npt.getInnerProductTypeLocal().getProductType();
+					while (pt != null) {
+						++extensionLevel;
+						pt = pt.getExtendedProductType();
+						if (pt != null)
+							logger.debug("nestedProductType (ext-level " + extensionLevel + "): " + pt == null ? null : pt.getPrimaryKey());
+					}
+				}
 
 				for (ProductType productType : productTypes) {
 					logger.debug("getProductTypeForPriceConfigEditing: productType="+productType.getPrimaryKey());

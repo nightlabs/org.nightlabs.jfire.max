@@ -56,8 +56,8 @@ import org.nightlabs.util.NLLocale;
 
 /**
  * Helper to render reports on the server. Instances of {@link RenderManager}
- * can be obtained by a {@link ReportingManagerFactory} of wich one instance
- * is bound to JNDI for each Organisation.
+ * can be obtained by a {@link ReportingManagerFactory} of which one instance
+ * is bound to JNDI for each organisation.
  *
  *
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>

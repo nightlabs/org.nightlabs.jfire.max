@@ -431,7 +431,7 @@ implements Serializable, DetachCallback, StoreCallback, DeleteCallback
 			// must be empty. If it's not, we throw an exception
 			if (!issueLinks.isEmpty()) {
 				IssueLink otherIssueLink = issueLinks.iterator().next();
-				throw new IllegalStateException("There is already an IssueLink with the same issue and issueLinkType! otherIssueLink=" + otherIssueLink + " thisIssueLink=" + this + " issueLinkType=" + this.issueLinkType + " linkedObjectID=" + linkedObjectID);
+				throw new DuplicateIssueLinkException("There is already an IssueLink with the same issue and issueLinkType! otherIssueLink=" + otherIssueLink + " thisIssueLink=" + this + " issueLinkType=" + this.issueLinkType + " linkedObjectID=" + linkedObjectID);
 			}
 
 			getPersistenceManager().addInstanceLifecycleListener(

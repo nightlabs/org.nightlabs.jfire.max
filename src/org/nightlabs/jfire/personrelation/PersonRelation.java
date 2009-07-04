@@ -25,7 +25,6 @@ import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 import javax.jdo.listener.AttachCallback;
 import javax.jdo.listener.DeleteCallback;
-import javax.jdo.listener.DeleteLifecycleListener;
 import javax.jdo.listener.DetachCallback;
 import javax.jdo.listener.InstanceLifecycleEvent;
 import javax.jdo.listener.StoreCallback;
@@ -444,33 +443,46 @@ implements Serializable, AttachCallback, DetachCallback, StoreCallback, DeleteCa
 		);
 	}
 
+	/**
+	 * This flag is a guard against eternal recursion of jdoPreDelete() methods, because two reverse
+	 * relations try to delete each other forever.
+	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
+	private transient boolean isDeleting = false;
+
 	@Override
 	public void jdoPreDelete() {
-		getPersonRelationType(); // it's not possible to read data in postDelete() - forcing fields to be read here.
-		getFrom();
-		getTo();
-		getFromID();
-		getToID();
+		if (isDeleting)
+			return;
 
-		final PersistenceManager pm = JDOHelper.getPersistenceManager(this);
-		pm.addInstanceLifecycleListener(
-				new DeleteLifecycleListener() {
-					@Override
-					public void preDelete(InstanceLifecycleEvent event) {
-					}
+		isDeleting = true;
 
-					@Override
-					public void postDelete(InstanceLifecycleEvent event) {
-						PersonRelation personRelation = (PersonRelation) event.getPersistentInstance();
-						if (!PersonRelation.this.equals(personRelation))
-							return;
-
-						pm.removeInstanceLifecycleListener(this);
-						getPersonRelationType().postPersonRelationDeleted(personRelation);
-					}
-				},
-				PersonRelation.class
-		);
+		personRelationType.prePersonRelationDelete(this);
+//		final PersonRelationType personRelationType = getPersonRelationType(); // it's not possible to read data in postDelete() - forcing fields to be read here.
+//		getFrom();
+//		getTo();
+//		getFromID();
+//		getToID();
+//
+//		final PersistenceManager pm = JDOHelper.getPersistenceManager(this);
+//		pm.addInstanceLifecycleListener(
+//				new DeleteLifecycleListener() {
+//					@Override
+//					public void preDelete(InstanceLifecycleEvent event) {
+//					}
+//
+//					@Override
+//					public void postDelete(InstanceLifecycleEvent event) {
+//						PersonRelation personRelation = (PersonRelation) event.getPersistentInstance();
+//						if (!PersonRelation.this.equals(personRelation))
+//							return;
+//
+//						pm.removeInstanceLifecycleListener(this);
+//						personRelationType.postPersonRelationDeleted(personRelation);
+//					}
+//				},
+//				PersonRelation.class
+//		);
 	}
 
 	@Override

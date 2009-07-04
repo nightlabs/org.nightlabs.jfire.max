@@ -235,7 +235,7 @@ implements Serializable
 		return personRelation;
 	}
 
-	public void postPersonRelationDeleted(PersonRelation personRelation)
+	public void prePersonRelationDelete(PersonRelation personRelation)
 	{
 		PersistenceManager pm = getPersistenceManager();
 
@@ -251,7 +251,7 @@ implements Serializable
 		);
 
 		for (PersonRelation r : reverseRelations) {
-			if (!JDOHelper.isDeleted(r))
+			if (JDOHelper.isDeleted(r))
 				continue;
 
 			pm.deletePersistent(r);

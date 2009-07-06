@@ -57,6 +57,19 @@ extends BaseJDOObjectDAO<PersonRelationID, PersonRelation>
 
 	private PersonRelationManagerRemote ejb;
 
+	public PersonRelation getPersonRelation(
+			PersonRelationID personRelationID,
+			String[] fetchGroups, int maxFetchDepth,
+			ProgressMonitor monitor
+	)
+	{
+		return getJDOObject(
+				null, personRelationID,
+				fetchGroups, maxFetchDepth,
+				monitor
+		);
+	}
+
 	public List<PersonRelation> getPersonRelations(
 			Collection<PersonRelationID> personRelationIDs,
 			String[] fetchGroups, int maxFetchDepth,

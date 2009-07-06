@@ -1,5 +1,6 @@
 package org.nightlabs.jfire.issue.history;
 
+import javax.jdo.annotations.Column;
 import javax.jdo.annotations.IdentityType;
 import javax.jdo.annotations.Inheritance;
 import javax.jdo.annotations.InheritanceStrategy;
@@ -29,11 +30,12 @@ public class IssueDescriptionHistoryItem extends IssueHistoryItem {
 	private String langID;
 
 	@Persistent(nullValue=NullValue.EXCEPTION)
+	@Column(sqlType="CLOB")
 	private String oldDescriptionTxt;
 
 	@Persistent(nullValue=NullValue.EXCEPTION)
+	@Column(sqlType="CLOB")
 	private String newDescriptionTxt;
-
 
 	/**
 	 * @deprecated Only for JDO!
@@ -50,8 +52,6 @@ public class IssueDescriptionHistoryItem extends IssueHistoryItem {
 		this.oldDescriptionTxt = oldDescriptionTxt;
 		this.newDescriptionTxt = newDescriptionTxt;
 	}
-
-
 
 	// ---[ Abstract methods defined ]----------------------------------------------------------------------|
 	/* (non-Javadoc)

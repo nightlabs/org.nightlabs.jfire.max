@@ -2,7 +2,11 @@ package org.nightlabs.jfire.issue;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Set;
 
+import javax.jdo.FetchPlan;
+import javax.jdo.JDOHelper;
+import javax.jdo.PersistenceManager;
 import javax.jdo.annotations.Column;
 import javax.jdo.annotations.FetchGroup;
 import javax.jdo.annotations.FetchGroups;
@@ -13,9 +17,11 @@ import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.PersistenceModifier;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.listener.DetachCallback;
 
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.issue.id.IssueCommentID;
+import org.nightlabs.jfire.issue.id.IssueID;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.util.Util;
 
@@ -43,25 +49,32 @@ import org.nightlabs.util.Util;
  *
  */
 @PersistenceCapable(
-	objectIdClass=IssueCommentID.class,
-	identityType=IdentityType.APPLICATION,
-	detachable="true",
-	table="JFireIssueTracking_IssueComment")
-@FetchGroups({
-	@FetchGroup(
-		fetchGroups={"default"},
-		name=IssueComment.FETCH_GROUP_USER,
-		members=@Persistent(name="user")),
-	@FetchGroup(
-		name=IssueComment.FETCH_GROUP_TEXT,
-		members=@Persistent(name="text")),
-	@FetchGroup(
-		name=IssueComment.FETCH_GROUP_THIS_COMMENT,
-		members={@Persistent(name="text"), @Persistent(name="createTimestamp"), @Persistent(name="user")})
-})
+		objectIdClass=IssueCommentID.class,
+		identityType=IdentityType.APPLICATION,
+		detachable="true",
+		table="JFireIssueTracking_IssueComment")
+		@FetchGroups({
+			@FetchGroup(
+					fetchGroups={"default"},
+					name=IssueComment.FETCH_GROUP_USER,
+					members=@Persistent(name="user")
+			),
+			@FetchGroup(
+					name=IssueComment.FETCH_GROUP_ISSUE,
+					members=@Persistent(name="issue")
+			),
+			@FetchGroup(
+					name=IssueComment.FETCH_GROUP_TEXT,
+					members=@Persistent(name="text")
+			),
+			@FetchGroup(
+					name=IssueComment.FETCH_GROUP_THIS_COMMENT,
+					members={@Persistent(name="text"), @Persistent(name="createTimestamp"), @Persistent(name="user")}
+			),
+		})
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class IssueComment
-implements Serializable
+implements Serializable, DetachCallback
 {
 	private static final long serialVersionUID = 1L;
 
@@ -72,7 +85,19 @@ implements Serializable
 	public static final String FETCH_GROUP_THIS_COMMENT = "IssueComment.this";
 
 	public static final String FETCH_GROUP_USER = "IssueComment.user";
+	/**
+	 * @deprecated The "text" field is of type String and in the default fetch-group ({@link FetchPlan#DEFAULT}). This fetch-group is thus unnecessary.
+	 */
+	@Deprecated
 	public static final String FETCH_GROUP_TEXT = "IssueComment.text";
+
+	public static final String FETCH_GROUP_ISSUE = "IssueComment.issue";
+
+	/**
+	 * This is a virtual fetch-group manually processed in a JDO callback method in order to make {@link #getIssueID()} work without
+	 * the issue being detached.
+	 */
+	public static final String FETCH_GROUP_ISSUE_ID = "IssueComment.issueID";
 
 
 	/**
@@ -98,6 +123,9 @@ implements Serializable
 	 */
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Issue issue;
+
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
+	private IssueID issueID;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -195,10 +223,14 @@ implements Serializable
 		return issue;
 	}
 
+	public IssueID getIssueID() {
+		if (issueID == null)
+			issueID = IssueID.create(issue.getOrganisationID(), issue.getIssueID());
+
+		return issueID;
+	}
+
 	@Override
-	/*
-	 *
-	 */
 	public boolean equals(Object obj)
 	{
 		if (obj == this) return true;
@@ -208,11 +240,24 @@ implements Serializable
 	}
 
 	@Override
-	/*
-	 *
-	 */
 	public int hashCode()
 	{
 		return (31 * Util.hashCode(organisationID)) + Util.hashCode(commentID);
 	}
+
+	@Override
+	public void jdoPostDetach(Object o) {
+		IssueComment detached = this;
+		IssueComment attached = (IssueComment) o;
+
+		PersistenceManager pm = JDOHelper.getPersistenceManager(attached);
+		Set<?> fetchGroups = pm.getFetchPlan().getGroups();
+
+		if (fetchGroups.contains(FETCH_GROUP_ISSUE_ID)) {
+			detached.issueID = attached.getIssueID();
+		}
+	}
+
+	@Override
+	public void jdoPreDetach() { }
 }

@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -21,6 +22,7 @@ import javax.ejb.TransactionAttributeType;
 import javax.jdo.FetchPlan;
 import javax.jdo.JDODetachedFieldAccessException;
 import javax.jdo.JDOHelper;
+import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 import javax.mail.Message;
@@ -84,13 +86,7 @@ import org.nightlabs.util.Util;
  *
  * @author Chairat Kongarayawetchakun - chairat [AT] nightlabs [DOT] de
  * @author Khaireel Mohamed - khaireel at nightlabs dot de
- *
- * @ejb.bean name="jfire/ejb/JFireIssueTracking/IssueManager"
- *           jndi-name="jfire/ejb/JFireIssueTracking/IssueManager"
- *           type="Stateless"
- *
- * @ejb.util generate="physical"
- * @ejb.transaction type="Required"
+ * @author marco schulze - marco at nightlabs dot de
  */
 @TransactionAttribute(TransactionAttributeType.REQUIRED)
 @Stateless
@@ -105,11 +101,8 @@ implements IssueManagerRemote
 
 
 	//IssueFileAttachment//
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 */
 	@RolesAllowed("_Guest_")
+	@Override
 	public Set<IssueFileAttachmentID> getIssueFileAttachmentIDs()
 	{
 		PersistenceManager pm = createPersistenceManager();
@@ -124,11 +117,8 @@ implements IssueManagerRemote
 		}
 	}
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 */
 	@RolesAllowed("_Guest_")
+	@Override
 	public List<IssueFileAttachment> getIssueFileAttachments(Collection<IssueFileAttachmentID> issueFileAttachmentIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = createPersistenceManager();
@@ -140,10 +130,8 @@ implements IssueManagerRemote
 	}
 
 	//IssueWorkTimeRange//
-	/* (non-Javadoc)
-	 * @see org.nightlabs.jfire.issue.IssueManagerRemote#getIssueWorkTimeRanges(java.util.Collection, java.lang.String[], int)
-	 */
 	@RolesAllowed("_Guest_")
+	@Override
 	public List<IssueWorkTimeRange> getIssueWorkTimeRanges(Collection<IssueWorkTimeRange> issueWorkTimeRangeIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = createPersistenceManager();
@@ -155,11 +143,9 @@ implements IssueManagerRemote
 	}
 
 	//ProjectType//
-	/* (non-Javadoc)
-	 * @see org.nightlabs.jfire.issue.IssueManagerRemote#storeProjectType(org.nightlabs.jfire.issue.project.ProjectType, boolean, java.lang.String[], int)
-	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("_Guest_")
+	@Override
 	public ProjectType storeProjectType(ProjectType projectType, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = createPersistenceManager();
@@ -171,13 +157,9 @@ implements IssueManagerRemote
 		}//finally
 	}
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Required"
-	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("_Guest_")
+	@Override
 	public void deleteProjectType(ProjectTypeID projectTypeID)
 	{
 		PersistenceManager pm = createPersistenceManager();
@@ -193,11 +175,8 @@ implements IssueManagerRemote
 		}//finally
 	}
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 */
 	@RolesAllowed("_Guest_")
+	@Override
 	public List<ProjectType> getProjectTypes(Collection<ProjectTypeID> projectTypeIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = createPersistenceManager();
@@ -208,11 +187,8 @@ implements IssueManagerRemote
 		}
 	}
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 */
 	@RolesAllowed("_Guest_")
+	@Override
 	public Set<ProjectTypeID> getProjectTypeIDs()
 	{
 		PersistenceManager pm = createPersistenceManager();
@@ -228,11 +204,9 @@ implements IssueManagerRemote
 	}
 
 	//Project//
-	/* (non-Javadoc)
-	 * @see org.nightlabs.jfire.issue.IssueManagerRemote#storeProject(org.nightlabs.jfire.issue.project.Project, boolean, java.lang.String[], int)
-	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("_Guest_")
+	@Override
 	public Project storeProject(Project project, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = createPersistenceManager();
@@ -248,13 +222,9 @@ implements IssueManagerRemote
 		}//finally
 	}
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Required"
-	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("_Guest_")
+	@Override
 	public void deleteProject(ProjectID projectID)
 	{
 		PersistenceManager pm = createPersistenceManager();
@@ -270,11 +240,8 @@ implements IssueManagerRemote
 		}//finally
 	}
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 */
 	@RolesAllowed("_Guest_")
+	@Override
 	public List<Project> getProjects(Collection<ProjectID> projectIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = createPersistenceManager();
@@ -285,11 +252,8 @@ implements IssueManagerRemote
 		}
 	}
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 */
 	@RolesAllowed("_Guest_")
+	@Override
 	public Set<ProjectID> getProjectIDs()
 	{
 		PersistenceManager pm = createPersistenceManager();
@@ -304,11 +268,8 @@ implements IssueManagerRemote
 		}
 	}
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 */
 	@RolesAllowed("_Guest_")
+	@Override
 	public Collection<ProjectID> getRootProjectIDs(String organisationID)
 	{
 		PersistenceManager pm = createPersistenceManager();
@@ -324,11 +285,8 @@ implements IssueManagerRemote
 		}
 	}
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 */
 	@RolesAllowed("_Guest_")
+	@Override
 	public Collection<ProjectID> getProjectIDsByParentProjectID(ProjectID projectID)
 	{
 		PersistenceManager pm = createPersistenceManager();
@@ -345,11 +303,8 @@ implements IssueManagerRemote
 		}
 	}
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 */
 	@RolesAllowed("_Guest_")
+	@Override
 	public Collection<ProjectID> getProjectIDsByProjectTypeID(ProjectTypeID projectTypeID)
 	{
 		PersistenceManager pm = createPersistenceManager();
@@ -419,11 +374,8 @@ implements IssueManagerRemote
 
 
 	//IssueComment//
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 */
-@RolesAllowed("_Guest_")
+	@RolesAllowed("_Guest_")
+	@Override
 	public List<IssueComment> getIssueComments(Collection<IssueCommentID> issueCommentIDs, String[] fetchGroups,int maxFetchDepth) {
 		PersistenceManager pm = createPersistenceManager();
 		try {
@@ -433,11 +385,9 @@ implements IssueManagerRemote
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.nightlabs.jfire.issue.IssueManagerRemote#storeIssueComment(org.nightlabs.jfire.issue.IssueComment, boolean, java.lang.String[], int)
-	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("_Guest_")
+	@Override
 	public IssueComment storeIssueComment(IssueComment issueComment, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = createPersistenceManager();
@@ -454,6 +404,7 @@ implements IssueManagerRemote
 	// --- 8< --- KaiExperiments: since 14.05.2009 ------------------
 	// --[IssueMarker]--
 	@RolesAllowed("_Guest_")
+	@Override
 	public List<IssueMarker> getIssueMarkers(Collection<IssueMarkerID> issueMarkerIDs, String[] fetchGroups, int maxFetchDepth) {
 		PersistenceManager pm = createPersistenceManager();
 		try     { return NLJDOHelper.getDetachedObjectList(pm, issueMarkerIDs, IssueMarker.class, fetchGroups, maxFetchDepth); }
@@ -461,6 +412,7 @@ implements IssueManagerRemote
 	}
 
 	@RolesAllowed("_Guest_")
+	@Override
 	public Set<IssueMarkerID> getIssueMarkerIDs() {
 		PersistenceManager pm = createPersistenceManager();
 		try {
@@ -475,6 +427,7 @@ implements IssueManagerRemote
 
 	// TODO This is not necessary. Will remove this later. Kai.
 	@RolesAllowed("_Guest_")
+	@Override
 	public Set<IssueMarkerID> getIssueMarkerIDs(IssueID issueID) {
 		PersistenceManager pm = createPersistenceManager();
 		try {
@@ -490,6 +443,7 @@ implements IssueManagerRemote
 
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("_Guest_")
+	@Override
 	public IssueMarker storeIssueMarker(IssueMarker issueMarker, boolean get, String[] fetchGroups, int maxFetchDepth) {
 		assert issueMarker != null;
 		PersistenceManager pm = createPersistenceManager();
@@ -501,11 +455,8 @@ implements IssueManagerRemote
 
 
 	//IssueLinkType//
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 */
 	@RolesAllowed("_Guest_")
+	@Override
 	public List<IssueLinkType> getIssueLinkTypes(Collection<IssueLinkTypeID> issueLinkTypeIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = createPersistenceManager();
@@ -516,11 +467,8 @@ implements IssueManagerRemote
 		}
 	}
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 */
 	@RolesAllowed("_Guest_")
+	@Override
 	public Set<IssueLinkTypeID> getIssueLinkTypeIDs(Class<? extends Object> linkedObjectClass)
 	{
 		PersistenceManager pm = createPersistenceManager();
@@ -535,11 +483,8 @@ implements IssueManagerRemote
 		}
 	}
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 */
 	@RolesAllowed("_Guest_")
+	@Override
 	public Set<IssueLinkTypeID> getIssueLinkTypeIDs()
 	{
 		PersistenceManager pm = createPersistenceManager();
@@ -555,11 +500,8 @@ implements IssueManagerRemote
 	}
 
 	//IssueLink//
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 */
 	@RolesAllowed("_Guest_")
+	@Override
 	public List<IssueLink> getIssueLinks(Collection<IssueLinkID> issueLinkIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = createPersistenceManager();
@@ -570,11 +512,8 @@ implements IssueManagerRemote
 		}
 	}
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 */
 	@RolesAllowed("_Guest_")
+	@Override
 	public Set<IssueLinkID> getIssueLinkIDs()
 	{
 		PersistenceManager pm = createPersistenceManager();
@@ -590,10 +529,11 @@ implements IssueManagerRemote
 	}
 
 	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
+	 * @deprecated Use {@link #getIssueLinkIDs()} instead! This method will soon be removed!
 	 */
+	@Deprecated
 	@RolesAllowed("_Guest_")
+	@Override
 	public Collection<IssueLinkID> getIssueLinkIDsByOrganisationIDAndLinkedObjectID(String organisationID, ObjectID linkedObjectID)
 	{
 		PersistenceManager pm = createPersistenceManager();
@@ -615,12 +555,39 @@ implements IssueManagerRemote
 		}
 	}
 
+	@RolesAllowed("_Guest_")
+	@Override
+	public Map<ObjectID, Long> getIssueLinkCounts(Collection<? extends ObjectID> linkedObjectIDs)
+	{
+		PersistenceManager pm = createPersistenceManager();
+		try {
+			Map<ObjectID, Long> result = new HashMap<ObjectID, Long>(linkedObjectIDs.size());
+			for (ObjectID linkedObjectID : linkedObjectIDs) {
+				long count = IssueLink.getIssueLinkCount(pm, linkedObjectID);
+				result.put(linkedObjectID, count);
+			}
+			return result;
+		} finally {
+			pm.close();
+		}
+	}
+
+	@RolesAllowed("_Guest_")
+	@Override
+	public Collection<IssueLinkID> getIssueLinkIDs(ObjectID linkedObjectID)
+	{
+		PersistenceManager pm = createPersistenceManager();
+		try {
+			return new HashSet<IssueLinkID>(IssueLink.getIssueLinkIDs(pm, linkedObjectID));
+		} finally {
+			pm.close();
+		}
+	}
+
 	//Issue//
-	/* (non-Javadoc)
-	 * @see org.nightlabs.jfire.issue.IssueManagerRemote#storeIssue(org.nightlabs.jfire.issue.Issue, boolean, java.lang.String[], int)
-	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("_Guest_")
+	@Override
 	public Issue storeIssue(Issue issue, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = createPersistenceManager();
@@ -765,16 +732,9 @@ implements IssueManagerRemote
 		}
 	}
 
-	/**
-	 * Delete an <code>Issue</code> by the given <code>IssueID</code>.
-	 * And also delete its <code>State</code> and <code>IssueLocal</code>.
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Required"
-	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("_Guest_")
+	@Override
 	public void deleteIssue(IssueID issueID) {
 
 		PersistenceManager pm = createPersistenceManager();
@@ -808,20 +768,9 @@ implements IssueManagerRemote
 		}
 	}
 
-	/**
-	 * Signal the issue to change its <code>State</code>.
-	 *
-	 * @param issueID The issueID to be changed
-	 * @param jbpmTransitionName a node name that defined in JbpmConstants
-	 * @param get If true the created I will be returned else null
-	 * @param fetchGroups The fetchGroups the returned Issue should be detached with
-	 *
-	 * @ejb.interface-method
-	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="_Guest_"
-	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("_Guest_")
+	@Override
 	public Issue signalIssue(IssueID issueID, String jbpmTransitionName, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = createPersistenceManager();
@@ -858,15 +807,8 @@ implements IssueManagerRemote
 		return null;
 	}
 
-	/**
-	 * @param queries the QueryCollection containing all queries that shall be chained
-	 *		in order to retrieve the result. The result of one query is passed to the
-	 *		next one using the {@link AbstractJDOQuery#setCandidates(Collection)}.
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 */
 	@RolesAllowed("_Guest_")
+	@Override
 	public Set<IssueID> getIssueIDs(QueryCollection<? extends AbstractJDOQuery> queries)
 	{
 		if (queries == null)
@@ -902,11 +844,8 @@ implements IssueManagerRemote
 		}
 	}
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 */
 	@RolesAllowed("_Guest_")
+	@Override
 	public List<Issue> getIssues(Collection<IssueID> issueIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = createPersistenceManager();
@@ -917,11 +856,8 @@ implements IssueManagerRemote
 		}
 	}
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 */
 	@RolesAllowed("_Guest_")
+	@Override
 	public Set<IssueID> getIssueIDs()
 	{
 		PersistenceManager pm = createPersistenceManager();
@@ -936,11 +872,8 @@ implements IssueManagerRemote
 		}
 	}
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 */
 	@RolesAllowed("_Guest_")
+	@Override
 	public Set<Issue> getIssueByProjectID(ProjectID projectID) {
 		PersistenceManager pm = createPersistenceManager();
 		try {
@@ -956,11 +889,8 @@ implements IssueManagerRemote
 		}
 	}
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 */
 	@RolesAllowed("_Guest_")
+	@Override
 	public Set<Issue> getIssueByProjectTypeID(ProjectTypeID projectTypeID) {
 		PersistenceManager pm = createPersistenceManager();
 		try {
@@ -977,11 +907,9 @@ implements IssueManagerRemote
 	}
 
 	//IssueHistoryItem//
-	/* (non-Javadoc)
-	 * @see org.nightlabs.jfire.issue.IssueManagerRemote#storeIssueHistory(org.nightlabs.jfire.issue.history.IssueHistoryItem, boolean, java.lang.String[], int)
-	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("_Guest_")
+	@Override
 	public IssueHistoryItem storeIssueHistoryItem(IssueHistoryItem issueHistoryItem, boolean get, String[] fetchGroups, int maxFetchDepth) {
 		PersistenceManager pm = createPersistenceManager();
 		try     { return NLJDOHelper.storeJDO(pm, issueHistoryItem, get, fetchGroups, maxFetchDepth); }
@@ -990,17 +918,15 @@ implements IssueManagerRemote
 
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("_Guest_")
+	@Override
 	public Collection<IssueHistoryItem> storeIssueHistoryItems(Collection<IssueHistoryItem> issueHistoryItems, boolean get, String[] fetchGroups, int maxFetchDepth) {
 		PersistenceManager pm = createPersistenceManager();
 		try     { return NLJDOHelper.storeJDOCollection(pm, issueHistoryItems, get, fetchGroups, maxFetchDepth); }
 		finally { pm.close(); }
 	}
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 */
 	@RolesAllowed("_Guest_")
+	@Override
 	public Collection<IssueHistoryItemID> getIssueHistoryItemIDsByIssueID(IssueID issueID)
 	{
 		PersistenceManager pm = createPersistenceManager();
@@ -1011,11 +937,8 @@ implements IssueManagerRemote
 		}
 	}
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 */
 	@RolesAllowed("_Guest_")
+	@Override
 	public List<IssueHistoryItem> getIssueHistoryItems(Collection<IssueHistoryItemID> issueHistoryIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = createPersistenceManager();
@@ -1027,11 +950,9 @@ implements IssueManagerRemote
 	}
 
 	//IssueType//
-	/* (non-Javadoc)
-	 * @see org.nightlabs.jfire.issue.IssueManagerRemote#storeIssueType(org.nightlabs.jfire.issue.IssueType, boolean, java.lang.String[], int)
-	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("_Guest_")
+	@Override
 	public IssueType storeIssueType(IssueType issueType, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = createPersistenceManager();
@@ -1043,11 +964,8 @@ implements IssueManagerRemote
 		}//finally
 	}
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 */
 	@RolesAllowed("_Guest_")
+	@Override
 	public List<IssueType> getIssueTypes(Collection<IssueTypeID> issueTypeIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = createPersistenceManager();
@@ -1058,11 +976,8 @@ implements IssueManagerRemote
 		}
 	}
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 */
 	@RolesAllowed("_Guest_")
+	@Override
 	public Set<IssueTypeID> getIssueTypeIDs()
 	{
 		PersistenceManager pm = createPersistenceManager();
@@ -1077,11 +992,9 @@ implements IssueManagerRemote
 	}
 
 	//IssuePriority//
-	/* (non-Javadoc)
-	 * @see org.nightlabs.jfire.issue.IssueManagerRemote#storeIssuePriority(org.nightlabs.jfire.issue.IssuePriority, boolean, java.lang.String[], int)
-	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("_Guest_")
+	@Override
 	public IssuePriority storeIssuePriority(IssuePriority issuePriority, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = createPersistenceManager();
@@ -1093,11 +1006,8 @@ implements IssueManagerRemote
 		}//finally
 	}
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 */
 	@RolesAllowed("_Guest_")
+	@Override
 	public Set<IssuePriorityID> getIssuePriorityIDs()
 	{
 		PersistenceManager pm = createPersistenceManager();
@@ -1112,11 +1022,8 @@ implements IssueManagerRemote
 		}
 	}
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 */
 	@RolesAllowed("_Guest_")
+	@Override
 	public List<IssuePriority> getIssuePriorities(Collection<IssuePriorityID> issuePriorityIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = createPersistenceManager();
@@ -1128,11 +1035,9 @@ implements IssueManagerRemote
 	}
 
 	//IssueSeverityType//
-	/* (non-Javadoc)
-	 * @see org.nightlabs.jfire.issue.IssueManagerRemote#storeIssueSeverityType(org.nightlabs.jfire.issue.IssueSeverityType, boolean, java.lang.String[], int)
-	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("_Guest_")
+	@Override
 	public IssueSeverityType storeIssueSeverityType(IssueSeverityType issueSeverityType, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = createPersistenceManager();
@@ -1144,11 +1049,8 @@ implements IssueManagerRemote
 		}//finally
 	}
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 */
 	@RolesAllowed("_Guest_")
+	@Override
 	public Set<IssueSeverityTypeID> getIssueSeverityTypeIDs()
 	{
 		PersistenceManager pm = createPersistenceManager();
@@ -1163,11 +1065,8 @@ implements IssueManagerRemote
 		}
 	}
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 */
 	@RolesAllowed("_Guest_")
+	@Override
 	public List<IssueSeverityType> getIssueSeverityTypes(Collection<IssueSeverityTypeID> issueSeverityTypeIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = createPersistenceManager();
@@ -1179,11 +1078,9 @@ implements IssueManagerRemote
 	}
 
 	//IssueResolution//
-	/* (non-Javadoc)
-	 * @see org.nightlabs.jfire.issue.IssueManagerRemote#storeIssueResolution(org.nightlabs.jfire.issue.IssueResolution, boolean, java.lang.String[], int)
-	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("_Guest_")
+	@Override
 	public IssueResolution storeIssueResolution(IssueResolution issueResolution, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = createPersistenceManager();
@@ -1195,11 +1092,9 @@ implements IssueManagerRemote
 		}//finally
 	}
 
-	/* (non-Javadoc)
-	 * @see org.nightlabs.jfire.issue.IssueManagerRemote#getIssueResolutions(java.lang.String[], int)
-	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("_Guest_")
+	@Override
 	public Collection<IssueResolution> getIssueResolutions(String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = createPersistenceManager();
@@ -1217,11 +1112,8 @@ implements IssueManagerRemote
 		}
 	}
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 */
 	@RolesAllowed("_Guest_")
+	@Override
 	public List<IssueResolution> getIssueResolutions(Collection<IssueResolutionID> issueResolutionIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = createPersistenceManager();
@@ -1232,11 +1124,9 @@ implements IssueManagerRemote
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.nightlabs.jfire.issue.IssueManagerRemote#sendRemindEMail(java.lang.String, java.lang.String, org.nightlabs.jfire.security.id.UserID, java.util.Set)
-	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("_Guest_")
+	@Override
 	public void sendRemindEMail(String messageString, String subject, UserID senderID, Set<UserID> recipientIDs)
 	{
 		User sender = UserDAO.sharedInstance().getUser(senderID,
@@ -1297,11 +1187,9 @@ implements IssueManagerRemote
 	}
 
 	//Bean//
-	/* (non-Javadoc)
-	 * @see org.nightlabs.jfire.issue.IssueManagerRemote#initialise()
-	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("_System_")
+	@Override
 	public void initialise() throws Exception
 	{
 		PersistenceManager pm = createPersistenceManager();
@@ -1772,5 +1660,77 @@ implements IssueManagerRemote
 			logger.debug("--> Received: iconFilename: " + iconFileName);
 
 		issueMarker.setIcon16x16Data(out.toByteArray());
+	}
+
+	@Override
+	public List<IssueCommentID> getIssueCommentIDs(IssueID issueID) {
+		PersistenceManager pm = createPersistenceManager();
+		try {
+			Issue issue = (Issue) pm.getObjectById(issueID);
+			return NLJDOHelper.getObjectIDList(issue.getComments());
+		} finally {
+			pm.close();
+		}
+	}
+
+	@Override
+	public List<IssueCommentID> getIssueCommentIDsOfIssueOfIssueLink(IssueLinkID issueLinkID) {
+		PersistenceManager pm = createPersistenceManager();
+		try {
+			IssueLink issueLink = (IssueLink) pm.getObjectById(issueLinkID);
+			return NLJDOHelper.getObjectIDList(issueLink.getIssue().getComments());
+		} finally {
+			pm.close();
+		}
+	}
+
+	@Override
+	public Map<IssueLinkID, Long> getIssueCommentCountsOfIssueOfIssueLinks(Collection<IssueLinkID> issueLinkIDs) {
+		PersistenceManager pm = createPersistenceManager();
+		try {
+			Map<IssueLinkID, Long> result = new HashMap<IssueLinkID, Long>(issueLinkIDs.size());
+			for (IssueLinkID issueLinkID : issueLinkIDs) {
+				IssueLink issueLink = (IssueLink) pm.getObjectById(issueLinkID);
+				result.put(issueLinkID, (long)issueLink.getIssue().getComments().size());
+			}
+			return result;
+		} finally {
+			pm.close();
+		}
+	}
+
+	@Override
+	public Collection<IssueLinkID> getIssueLinkIDsForIssueAndLinkedObjectClasses(IssueID issueID, Set<Class<?>> linkedObjectClasses) {
+		PersistenceManager pm = createPersistenceManager();
+		try {
+			Issue issue;
+			try {
+				issue = (Issue) pm.getObjectById(issueID);
+			} catch (JDOObjectNotFoundException x) {
+				return Collections.emptySet();
+			}
+
+			if (linkedObjectClasses == null) {
+				linkedObjectClasses = new HashSet<Class<?>>(1);
+				linkedObjectClasses.add(Object.class);
+			}
+
+			Collection<IssueLinkID> result = new HashSet<IssueLinkID>();
+			iterateIssueLinks: for (IssueLink issueLink : issue.getIssueLinks()) {
+				for (Class<?> linkedObjectClass : linkedObjectClasses) {
+					if (linkedObjectClass.isAssignableFrom(issueLink.getLinkedObjectClass())) {
+						IssueLinkID issueLinkID = (IssueLinkID) JDOHelper.getObjectId(issueLink);
+						if (issueLinkID == null)
+							throw new IllegalStateException("JDOHelper.getObjectId(issueLinkID) returned null! " + issueLinkID);
+
+						result.add(issueLinkID);
+						continue iterateIssueLinks;
+					}
+				}
+			}
+			return result;
+		} finally {
+			pm.close();
+		}
 	}
 }

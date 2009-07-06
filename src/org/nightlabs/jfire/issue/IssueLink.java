@@ -45,68 +45,53 @@ import org.nightlabs.util.Util;
  * </p>
  *
  * @author Chairat Kongarayawetchakun - chairat [AT] nightlabs [DOT] de
- *
- * @jdo.persistence-capable
- *		identity-type="application"
- *		objectid-class="org.nightlabs.jfire.issue.id.IssueLinkID"
- *		detachable="true"
- *		table="JFireIssueTracking_IssueLink"
- *
- * @jdo.inheritance strategy="new-table"
- *
- * @jdo.create-objectid-class
- * 		field-order="organisationID, issueLinkID"
- *
- * @jdo.query
- *		name="getIssueLinksByIssueAndIssueLinkTypeAndLinkedObjectID"
- *		query="SELECT
- *			WHERE
- *				this.issue == :issue &&
- *				this.issueLinkType == :issueLinkType &&
- *				this.linkedObjectID == :linkedObjectID"
- *
- * @jdo.query
- *		name="getIssueLinksByOrganisationIDAndLinkedObjectID"
- *		query="SELECT
- *			WHERE
- *				this.organisationID == :organisationID &&
- *				this.linkedObjectID == :linkedObjectID"
- *
- * jdo.fetch-group name="IssueLink.linkedObjectID" fetch-groups="default" fields="linkedObjectID"
- * jdo.fetch-group name="IssueLink.linkedObjectClass" fetch-groups="default" fields="linkedObjectClass"
- * @jdo.fetch-group name="IssueLink.issue" fetch-groups="default" fields="issue"
- * @jdo.fetch-group name="IssueLink.issueLinkType" fetch-groups="default" fields="issueLinkType"
- *
- * @jdo.fetch-group name="IssueLink.this" fields="issue, issueLinkType, linkedObjectID"
+ * @author marco schulze - marco at nightlabs dot de
  */
 @javax.jdo.annotations.PersistenceCapable(
-	objectIdClass=IssueLinkID.class,
-	identityType=IdentityType.APPLICATION,
-	detachable="true",
-	table="JFireIssueTracking_IssueLink")
+		objectIdClass=IssueLinkID.class,
+		identityType=IdentityType.APPLICATION,
+		detachable="true",
+		table="JFireIssueTracking_IssueLink"
+)
 @FetchGroups({
 	@FetchGroup(
-		fetchGroups={"default"},
-		name=IssueLink.FETCH_GROUP_ISSUE,
-		members=@Persistent(name="issue")),
+			fetchGroups={"default"},
+			name=IssueLink.FETCH_GROUP_ISSUE,
+			members=@Persistent(name="issue")
+	),
 	@FetchGroup(
-		fetchGroups={"default"},
-		name=IssueLink.FETCH_GROUP_ISSUE_LINK_TYPE,
-		members=@Persistent(name="issueLinkType")),
+			fetchGroups={"default"},
+			name=IssueLink.FETCH_GROUP_ISSUE_LINK_TYPE,
+			members=@Persistent(name="issueLinkType")
+	),
 	@FetchGroup(
-		name=IssueLink.FETCH_GROUP_THIS_ISSUE_LINK,
-		members={@Persistent(name="issue"), @Persistent(name="issueLinkType"), @Persistent(name="linkedObjectID")})
+			name=IssueLink.FETCH_GROUP_THIS_ISSUE_LINK,
+			members={@Persistent(name="issue"), @Persistent(name="issueLinkType"), @Persistent(name="linkedObjectID")}
+	)
 })
 @Queries({
 	@javax.jdo.annotations.Query(
-		name="getIssueLinksByIssueAndIssueLinkTypeAndLinkedObjectID",
-		value="SELECT WHERE this.issue == :issue && this.issueLinkType == :issueLinkType && this.linkedObjectID == :linkedObjectID"),
+			name="getIssueLinksByIssueAndIssueLinkTypeAndLinkedObjectID",
+			value="SELECT WHERE this.issue == :issue && this.issueLinkType == :issueLinkType && this.linkedObjectID == :linkedObjectID"
+	),
+	@javax.jdo.annotations.Query( // deprecated! see below!
+			name="getIssueLinksByOrganisationIDAndLinkedObjectID",
+			value="SELECT WHERE this.organisationID == :organisationID && this.linkedObjectID == :linkedObjectID"
+	),
 	@javax.jdo.annotations.Query(
-		name="getIssueLinksByOrganisationIDAndLinkedObjectID",
-		value="SELECT WHERE this.organisationID == :organisationID && this.linkedObjectID == :linkedObjectID")
+			name="getIssueLinksByLinkedObjectID",
+			value="SELECT WHERE this.linkedObjectID == :linkedObjectID"
+	),
+	@javax.jdo.annotations.Query(
+			name="getIssueLinkIDsByLinkedObjectID",
+			value="SELECT JDOHelper.getObjectId(this) WHERE this.linkedObjectID == :linkedObjectID"
+	),
+	@javax.jdo.annotations.Query(
+			name="getIssueLinkCountByLinkedObjectID",
+			value="SELECT count(this) WHERE this.linkedObjectID == :linkedObjectID"
+	),
 })
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
-
 public class IssueLink
 implements Serializable, DetachCallback, StoreCallback, DeleteCallback
 {
@@ -133,6 +118,10 @@ implements Serializable, DetachCallback, StoreCallback, DeleteCallback
 	 */
 	public static final String FETCH_GROUP_LINKED_OBJECT_CLASS = "IssueLink.linkedObjectClass";
 
+	/**
+	 * @deprecated Use {@link #getIssueLinks(PersistenceManager, ObjectID)} or {@link #getIssueLinkIDs(PersistenceManager, ObjectID)} instead.
+	 */
+	@Deprecated
 	public static Collection<IssueLink> getIssueLinksByOrganisationIDAndLinkedObjectID(PersistenceManager pm, String organisationID, ObjectID linkedObjectID)
 	{
 		Query q = pm.newNamedQuery(IssueLink.class, "getIssueLinksByOrganisationIDAndLinkedObjectID");
@@ -141,6 +130,28 @@ implements Serializable, DetachCallback, StoreCallback, DeleteCallback
 		params.put("linkedObjectID", linkedObjectID.toString());
 		@SuppressWarnings("unchecked")
 		Collection<IssueLink> c = (Collection<IssueLink>) q.executeWithMap(params);
+		return c;
+	}
+
+	public static long getIssueLinkCount(PersistenceManager pm, ObjectID linkedObjectID)
+	{
+		Query q = pm.newNamedQuery(IssueLink.class, "getIssueLinkCountByLinkedObjectID");
+		return (Long) q.execute(linkedObjectID.toString());
+	}
+
+	public static Collection<IssueLink> getIssueLinks(PersistenceManager pm, ObjectID linkedObjectID)
+	{
+		Query q = pm.newNamedQuery(IssueLink.class, "getIssueLinksByLinkedObjectID");
+		@SuppressWarnings("unchecked")
+		Collection<IssueLink> c = (Collection<IssueLink>) q.execute(linkedObjectID.toString());
+		return c;
+	}
+
+	public static Collection<IssueLinkID> getIssueLinkIDs(PersistenceManager pm, ObjectID linkedObjectID)
+	{
+		Query q = pm.newNamedQuery(IssueLink.class, "getIssueLinkIDsByLinkedObjectID");
+		@SuppressWarnings("unchecked")
+		Collection<IssueLinkID> c = (Collection<IssueLinkID>) q.execute(linkedObjectID.toString());
 		return c;
 	}
 

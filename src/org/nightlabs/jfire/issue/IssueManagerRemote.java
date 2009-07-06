@@ -2,6 +2,7 @@ package org.nightlabs.jfire.issue;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.ejb.Remote;
@@ -33,13 +34,9 @@ public interface IssueManagerRemote {
 
 	Set<IssueFileAttachmentID> getIssueFileAttachmentIDs();
 
-	List<IssueFileAttachment> getIssueFileAttachments(
-			Collection<IssueFileAttachmentID> issueFileAttachmentIDs,
-			String[] fetchGroups, int maxFetchDepth);
+	List<IssueFileAttachment> getIssueFileAttachments(Collection<IssueFileAttachmentID> issueFileAttachmentIDs, String[] fetchGroups, int maxFetchDepth);
 
-	List<IssueWorkTimeRange> getIssueWorkTimeRanges(
-			Collection<IssueWorkTimeRange> issueWorkTimeRangeIDs,
-			String[] fetchGroups, int maxFetchDepth);
+	List<IssueWorkTimeRange> getIssueWorkTimeRanges(Collection<IssueWorkTimeRange> issueWorkTimeRangeIDs, String[] fetchGroups, int maxFetchDepth);
 
 	/**
 	 * Stores a project type to the datastore.
@@ -48,23 +45,19 @@ public interface IssueManagerRemote {
 	 * @param fetchGroups the fetchGroups that used for specify fields to be detached from the datastore
 	 * @param maxFetchDepth specifies the number of level of the object to be fetched
 	 */
-	ProjectType storeProjectType(ProjectType projectType, boolean get,
-			String[] fetchGroups, int maxFetchDepth);
+	ProjectType storeProjectType(ProjectType projectType, boolean get, String[] fetchGroups, int maxFetchDepth);
 
 	void deleteProjectType(ProjectTypeID projectTypeID);
 
-	List<ProjectType> getProjectTypes(Collection<ProjectTypeID> projectTypeIDs,
-			String[] fetchGroups, int maxFetchDepth);
+	List<ProjectType> getProjectTypes(Collection<ProjectTypeID> projectTypeIDs, String[] fetchGroups, int maxFetchDepth);
 
 	Set<ProjectTypeID> getProjectTypeIDs();
 
-	Project storeProject(Project project, boolean get, String[] fetchGroups,
-			int maxFetchDepth);
+	Project storeProject(Project project, boolean get, String[] fetchGroups, int maxFetchDepth);
 
 	void deleteProject(ProjectID projectID);
 
-	List<Project> getProjects(Collection<ProjectID> projectIDs,
-			String[] fetchGroups, int maxFetchDepth);
+	List<Project> getProjects(Collection<ProjectID> projectIDs, String[] fetchGroups, int maxFetchDepth);
 
 	Set<ProjectID> getProjectIDs();
 
@@ -72,15 +65,11 @@ public interface IssueManagerRemote {
 
 	Collection<ProjectID> getProjectIDsByParentProjectID(ProjectID projectID);
 
-	Collection<ProjectID> getProjectIDsByProjectTypeID(
-			ProjectTypeID projectTypeID);
+	Collection<ProjectID> getProjectIDsByProjectTypeID(ProjectTypeID projectTypeID);
 
-	List<IssueComment> getIssueComments(
-			Collection<IssueCommentID> issueCommentIDs, String[] fetchGroups,
-			int maxFetchDepth);
+	List<IssueComment> getIssueComments(Collection<IssueCommentID> issueCommentIDs, String[] fetchGroups, int maxFetchDepth);
 
-	IssueComment storeIssueComment(IssueComment issueComment, boolean get,
-			String[] fetchGroups, int maxFetchDepth);
+	IssueComment storeIssueComment(IssueComment issueComment, boolean get, String[] fetchGroups, int maxFetchDepth);
 
 
 	List<IssueMarker> getIssueMarkers(Collection<IssueMarkerID> issueMarkerIDs, String[] fetchGroups, int maxFetchDepth);
@@ -92,22 +81,25 @@ public interface IssueManagerRemote {
 	IssueMarker storeIssueMarker(IssueMarker issueMarker, boolean get, String[] fetchGroups, int maxFetchDepth);
 
 
-	List<IssueLinkType> getIssueLinkTypes(
-			Collection<IssueLinkTypeID> issueLinkTypeIDs, String[] fetchGroups,
-			int maxFetchDepth);
+	List<IssueLinkType> getIssueLinkTypes(Collection<IssueLinkTypeID> issueLinkTypeIDs, String[] fetchGroups, int maxFetchDepth);
 
-	Set<IssueLinkTypeID> getIssueLinkTypeIDs(
-			Class<? extends Object> linkedObjectClass);
+	Set<IssueLinkTypeID> getIssueLinkTypeIDs(Class<? extends Object> linkedObjectClass);
 
 	Set<IssueLinkTypeID> getIssueLinkTypeIDs();
 
-	List<IssueLink> getIssueLinks(Collection<IssueLinkID> issueLinkIDs,
-			String[] fetchGroups, int maxFetchDepth);
+	List<IssueLink> getIssueLinks(Collection<IssueLinkID> issueLinkIDs, String[] fetchGroups, int maxFetchDepth);
 
 	Set<IssueLinkID> getIssueLinkIDs();
 
-	Collection<IssueLinkID> getIssueLinkIDsByOrganisationIDAndLinkedObjectID(
-			String organisationID, ObjectID linkedObjectID);
+	/**
+	 * @deprecated Use {@link #getIssueLinkIDs()} instead! This method will soon be removed!
+	 */
+	@Deprecated
+	Collection<IssueLinkID> getIssueLinkIDsByOrganisationIDAndLinkedObjectID(String organisationID, ObjectID linkedObjectID);
+
+	Map<ObjectID, Long> getIssueLinkCounts(Collection<? extends ObjectID> linkedObjectIDs);
+
+	Collection<IssueLinkID> getIssueLinkIDs(ObjectID linkedObjectID);
 
 	/**
 	 * Stores the given Issue. If the issue is a new issue, do the initializing process instance.
@@ -118,8 +110,7 @@ public interface IssueManagerRemote {
 	 * @param get If true the created I will be returned else null
 	 * @param fetchGroups The fetchGroups the returned Issue should be detached with
 	 */
-	Issue storeIssue(Issue issue, boolean get, String[] fetchGroups,
-			int maxFetchDepth);
+	Issue storeIssue(Issue issue, boolean get, String[] fetchGroups, int maxFetchDepth);
 
 	/**
 	 * Delete an <code>Issue</code> by the given <code>IssueID</code>.
@@ -135,8 +126,7 @@ public interface IssueManagerRemote {
 	 * @param get If true the created I will be returned else null
 	 * @param fetchGroups The fetchGroups the returned Issue should be detached with
 	 */
-	Issue signalIssue(IssueID issueID, String jbpmTransitionName, boolean get,
-			String[] fetchGroups, int maxFetchDepth);
+	Issue signalIssue(IssueID issueID, String jbpmTransitionName, boolean get, String[] fetchGroups, int maxFetchDepth);
 
 	/**
 	 * @param queries the QueryCollection containing all queries that shall be chained
@@ -145,10 +135,9 @@ public interface IssueManagerRemote {
 	 */
 	Set<IssueID> getIssueIDs(QueryCollection<? extends AbstractJDOQuery> queries);
 
-	List<Issue> getIssues(Collection<IssueID> issueIDs, String[] fetchGroups,
-			int maxFetchDepth);
+	List<Issue> getIssues(Collection<IssueID> issueIDs, String[] fetchGroups, int maxFetchDepth);
 
-		Set<IssueID> getIssueIDs();
+	Set<IssueID> getIssueIDs();
 
 	Set<Issue> getIssueByProjectID(ProjectID projectID);
 
@@ -163,45 +152,40 @@ public interface IssueManagerRemote {
 	List<IssueHistoryItem> getIssueHistoryItems(Collection<IssueHistoryItemID> issueHistoryIDs, String[] fetchGroups, int maxFetchDepth);
 
 
-	IssueType storeIssueType(IssueType issueType, boolean get,
-			String[] fetchGroups, int maxFetchDepth);
+	IssueType storeIssueType(IssueType issueType, boolean get, String[] fetchGroups, int maxFetchDepth);
 
-	List<IssueType> getIssueTypes(Collection<IssueTypeID> issueTypeIDs,
-			String[] fetchGroups, int maxFetchDepth);
+	List<IssueType> getIssueTypes(Collection<IssueTypeID> issueTypeIDs, String[] fetchGroups, int maxFetchDepth);
 
 	Set<IssueTypeID> getIssueTypeIDs();
 
-	IssuePriority storeIssuePriority(IssuePriority issuePriority, boolean get,
-			String[] fetchGroups, int maxFetchDepth);
+	IssuePriority storeIssuePriority(IssuePriority issuePriority, boolean get, String[] fetchGroups, int maxFetchDepth);
 
 	Set<IssuePriorityID> getIssuePriorityIDs();
 
-	List<IssuePriority> getIssuePriorities(
-			Collection<IssuePriorityID> issuePriorityIDs, String[] fetchGroups,
-			int maxFetchDepth);
+	List<IssuePriority> getIssuePriorities(Collection<IssuePriorityID> issuePriorityIDs, String[] fetchGroups, int maxFetchDepth);
 
-	IssueSeverityType storeIssueSeverityType(
-			IssueSeverityType issueSeverityType, boolean get,
-			String[] fetchGroups, int maxFetchDepth);
+	IssueSeverityType storeIssueSeverityType(IssueSeverityType issueSeverityType, boolean get, String[] fetchGroups, int maxFetchDepth);
 
 	Set<IssueSeverityTypeID> getIssueSeverityTypeIDs();
 
-	List<IssueSeverityType> getIssueSeverityTypes(
-			Collection<IssueSeverityTypeID> issueSeverityTypeIDs,
-			String[] fetchGroups, int maxFetchDepth);
+	List<IssueSeverityType> getIssueSeverityTypes(Collection<IssueSeverityTypeID> issueSeverityTypeIDs, String[] fetchGroups, int maxFetchDepth);
 
-	IssueResolution storeIssueResolution(IssueResolution issueResolution,
-			boolean get, String[] fetchGroups, int maxFetchDepth);
+	IssueResolution storeIssueResolution(IssueResolution issueResolution, boolean get, String[] fetchGroups, int maxFetchDepth);
 
 	Collection<IssueResolution> getIssueResolutions(String[] fetchGroups, int maxFetchDepth);
 
-	List<IssueResolution> getIssueResolutions(
-			Collection<IssueResolutionID> issueResolutionIDs,
-			String[] fetchGroups, int maxFetchDepth);
+	List<IssueResolution> getIssueResolutions(Collection<IssueResolutionID> issueResolutionIDs, String[] fetchGroups, int maxFetchDepth);
 
-	void sendRemindEMail(String messageString, String subject, UserID senderID,
-			Set<UserID> recipientIDs);
+	void sendRemindEMail(String messageString, String subject, UserID senderID, Set<UserID> recipientIDs);
 
 	void initialise() throws Exception;
+
+	List<IssueCommentID> getIssueCommentIDs(IssueID issueID);
+
+	List<IssueCommentID> getIssueCommentIDsOfIssueOfIssueLink(IssueLinkID issueLinkID);
+
+	Map<IssueLinkID, Long> getIssueCommentCountsOfIssueOfIssueLinks(Collection<IssueLinkID> issueLinkIDs);
+
+	Collection<IssueLinkID> getIssueLinkIDsForIssueAndLinkedObjectClasses(IssueID issueID, Set<Class<?>> linkedObjectClasses);
 
 }

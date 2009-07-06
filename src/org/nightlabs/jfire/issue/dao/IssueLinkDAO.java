@@ -1,6 +1,9 @@
 package org.nightlabs.jfire.issue.dao;
 
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.nightlabs.jdo.ObjectID;
@@ -8,9 +11,11 @@ import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.issue.IssueLink;
 import org.nightlabs.jfire.issue.IssueManagerRemote;
+import org.nightlabs.jfire.issue.id.IssueID;
 import org.nightlabs.jfire.issue.id.IssueLinkID;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.progress.ProgressMonitor;
+import org.nightlabs.progress.SubProgressMonitor;
 
 /**
  * Data access object for {@link IssueLink}s.
@@ -33,17 +38,25 @@ extends BaseJDOObjectDAO<IssueLinkID, IssueLink>
 		return sharedInstance;
 	}
 
+	private IssueManagerRemote issueManagerRemote = null;
+
 	@Override
-	protected Collection<IssueLink> retrieveJDOObjects(Set<IssueLinkID> issueLinkIDs,
-			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) throws Exception {
-		monitor.beginTask("Loading IssueLinks...", 1);
+	protected Collection<IssueLink> retrieveJDOObjects(
+			Set<IssueLinkID> issueLinkIDs,
+			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor
+	)
+	throws Exception
+	{
+		monitor.beginTask("Loading issue links", 1);
 		try {
-			IssueManagerRemote im = JFireEjb3Factory.getRemoteBean(IssueManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			IssueManagerRemote im = issueManagerRemote;
+			if (im == null)
+				im = JFireEjb3Factory.getRemoteBean(IssueManagerRemote.class, SecurityReflector.getInitialContextProperties());
+
 			return im.getIssueLinks(issueLinkIDs, fetchGroups, maxFetchDepth);
 		} catch (Exception e) {
 			monitor.setCanceled(true);
 			throw e;
-
 		} finally {
 			monitor.worked(1);
 			monitor.done();
@@ -51,22 +64,94 @@ extends BaseJDOObjectDAO<IssueLinkID, IssueLink>
 	}
 
 	public IssueLink getIssueLink(IssueLinkID issueLinkID, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) {
+		return getJDOObject(null, issueLinkID, fetchGroups, maxFetchDepth, monitor);
+	}
+
+	public List<IssueLink> getIssueLinks(Collection<IssueLinkID> issueLinkIDs, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) {
+		return getJDOObjects(null, issueLinkIDs, fetchGroups, maxFetchDepth, monitor);
+	}
+
+	/**
+	 * @deprecated Use {@link #getIssueLinkIDs(ObjectID, ProgressMonitor)} or {@link #getIssueLinks(ObjectID, String[], int, ProgressMonitor)} instead!
+	 */
+	@Deprecated
+	public synchronized Collection<IssueLink> getIssueLinksByOrganisationIDAndLinkedObjectID(String organisationID, ObjectID linkedObjectID, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
+	{
+		issueManagerRemote = JFireEjb3Factory.getRemoteBean(IssueManagerRemote.class, SecurityReflector.getInitialContextProperties());
 		try {
-			return getJDOObject(null, issueLinkID, fetchGroups, maxFetchDepth, monitor);
-		} catch (Exception e) {
-			throw new RuntimeException(e);
+			Collection<IssueLinkID> issueLinkIDs = issueManagerRemote.getIssueLinkIDsByOrganisationIDAndLinkedObjectID(organisationID, linkedObjectID);
+			Collection<IssueLink> result = getJDOObjects(null, issueLinkIDs, fetchGroups, maxFetchDepth, monitor);
+			return result;
+		} finally {
+			issueManagerRemote = null;
 		}
 	}
 
-	public synchronized Collection<IssueLink> getIssueLinksByOrganisationIDAndLinkedObjectID(String organisationID, ObjectID linkedObjectID, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
+	public synchronized Collection<IssueLink> getIssueLinks(ObjectID linkedObjectID, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
+		monitor.beginTask("Loading issue links", 100);
+		try {
+			issueManagerRemote = JFireEjb3Factory.getRemoteBean(IssueManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			try {
+				monitor.worked(5);
+
+				Collection<IssueLinkID> issueLinkIDs = issueManagerRemote.getIssueLinkIDs(linkedObjectID);
+				monitor.worked(35);
+
+				Collection<IssueLink> result = getJDOObjects(
+						null, issueLinkIDs, fetchGroups, maxFetchDepth,
+						new SubProgressMonitor(monitor, 60)
+				);
+				return result;
+			} finally {
+				issueManagerRemote = null;
+			}
+		} finally {
+			monitor.done();
+		}
+	}
+
+	public synchronized Collection<IssueLinkID> getIssueLinkIDs(ObjectID linkedObjectID, ProgressMonitor monitor)
+	{
+		monitor.beginTask("Loading issue link IDs", 1);
 		try {
 			IssueManagerRemote im = JFireEjb3Factory.getRemoteBean(IssueManagerRemote.class, SecurityReflector.getInitialContextProperties());
-			Collection<IssueLink> result =
-				getJDOObjects(null, im.getIssueLinkIDsByOrganisationIDAndLinkedObjectID(organisationID, linkedObjectID), fetchGroups, maxFetchDepth, monitor);
-			return result;
-		} catch (Exception e) {
-			throw new RuntimeException(e);
+			return im.getIssueLinkIDs(linkedObjectID);
+		} finally {
+			monitor.worked(1);
+			monitor.done();
+		}
+	}
+
+	public synchronized Map<ObjectID, Long> getIssueLinkCounts(Collection<? extends ObjectID> linkedObjectIDs, ProgressMonitor monitor)
+	{
+		monitor.beginTask("Loading issue link counts", 1);
+		try {
+			IssueManagerRemote im = JFireEjb3Factory.getRemoteBean(IssueManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			return im.getIssueLinkCounts(linkedObjectIDs);
+		} finally {
+			monitor.worked(1);
+			monitor.done();
+		}
+	}
+
+	public synchronized Collection<IssueLinkID> getIssueLinkIDsForIssueAndLinkedObjectClass(IssueID issueID, Class<?> linkedObjectClass, ProgressMonitor monitor) {
+		Set<Class<?>> linkedObjectClasses = null;
+		if (linkedObjectClass != null) {
+			linkedObjectClasses = new HashSet<Class<?>>(1);
+			linkedObjectClasses.add(Object.class);
+		}
+		return getIssueLinkIDsForIssueAndLinkedObjectClasses(issueID, linkedObjectClasses, monitor);
+	}
+
+	public synchronized Collection<IssueLinkID> getIssueLinkIDsForIssueAndLinkedObjectClasses(IssueID issueID, Set<Class<?>> linkedObjectClasses, ProgressMonitor monitor) {
+		monitor.beginTask("Loading issue link IDs", 1);
+		try {
+			IssueManagerRemote im = JFireEjb3Factory.getRemoteBean(IssueManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			return im.getIssueLinkIDsForIssueAndLinkedObjectClasses(issueID, linkedObjectClasses);
+		} finally {
+			monitor.worked(1);
+			monitor.done();
 		}
 	}
 }

@@ -62,8 +62,15 @@ public class IssueLinkHistoryItem extends IssueHistoryItem {
 	/**
 	 * Creates a new instance of an IssueLinkHistoryItem.
 	 */
-	public IssueLinkHistoryItem
-	(User user, Issue issue, IssueLinkType issueLinkType, IssueHistoryItemAction issueHistoryItemAction, String linkedObjectClassName, String linkedObjectID) {
+	public IssueLinkHistoryItem(
+			User user,
+			Issue issue,
+			IssueLinkType issueLinkType,
+			IssueHistoryItemAction issueHistoryItemAction,
+			String linkedObjectClassName,
+			String linkedObjectID
+	)
+	{
 		super(true, user, issue);
 		this.issueLinkType = issueLinkType;
 		this.issueHistoryItemAction = issueHistoryItemAction;

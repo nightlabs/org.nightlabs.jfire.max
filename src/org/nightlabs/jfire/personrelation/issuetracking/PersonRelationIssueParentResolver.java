@@ -32,6 +32,8 @@ implements TreeNodeMultiParentResolver
 	@Override
 	public Collection<ObjectID> getParentObjectIDs(Object jdoObject) {
 		PersistenceManager pm = JDOHelper.getPersistenceManager(jdoObject);
+		IssueID issueID = null;
+		Issue issue = null;
 		if (jdoObject instanceof IssueLink) {
 			IssueLink issueLink = (IssueLink) jdoObject;
 			ObjectID linkedObjectID = issueLink.getLinkedObjectID();
@@ -57,19 +59,39 @@ implements TreeNodeMultiParentResolver
 			}
 		}
 		else if (jdoObject instanceof IssueDescription) {
-			// TO DO return all IssueLinkIDs of all IssueLinks that point to a Person and have the current Issue
-			// ...we ignore this for now, because new IssueDescriptions don't happen, anyway - they are only modified or
-			// created together with an IssueLink (or they more likely already existed when the IssueLink was created). Marco.
+			// Find all IssueLinks of the Issue of this IssueDescription, which point to a Person.
+			IssueDescription issueDescription = (IssueDescription) jdoObject;
+			if (pm != null) {
+				// We are in the server.
+				issueID = IssueID.create(issueDescription.getOrganisationID(), issueDescription.getIssueID());
+				issue = (Issue) pm.getObjectById(issueID);
+			}
+			else {
+				// We are in the client. This implementation isn't efficient, but IMHO this method shouldn't be called that often.
+				issueID = IssueID.create(issueDescription.getOrganisationID(), issueDescription.getIssueID());
+			}
 		}
 		else if (jdoObject instanceof IssueComment) {
 			// Find all IssueLinks of the Issue of this IssueComment, which point to a Person.
 			IssueComment issueComment = (IssueComment) jdoObject;
 			if (pm != null) {
 				// We are in the server.
-				Issue issue = issueComment.getIssue();
-				IssueID issueID = (IssueID) JDOHelper.getObjectId(issue);
+				issue = issueComment.getIssue();
+				issueID = (IssueID) JDOHelper.getObjectId(issue);
 				if (issueID == null)
 					throw new IllegalStateException("JDOHelper.getObjectId(issue) returned null! " + issue);
+			}
+			else {
+				// We are in the client. This implementation isn't efficient, but IMHO this method shouldn't be called that often.
+				issueID = issueComment.getIssueID();
+			}
+		}
+
+		if (issueID != null) {
+			if (pm != null) {
+				// We are in the server.
+				if (issue == null)
+					throw new IllegalStateException("issueID != null but issue == null");
 
 				Collection<ObjectID> result = new LinkedList<ObjectID>();
 				result.add(issueID);
@@ -86,7 +108,6 @@ implements TreeNodeMultiParentResolver
 			}
 			else {
 				// We are in the client. This implementation isn't efficient, but IMHO this method shouldn't be called that often.
-				IssueID issueID = issueComment.getIssueID();
 				Collection<ObjectID> result = new LinkedList<ObjectID>();
 				result.add(issueID);
 				Collection<IssueLinkID> c = IssueLinkDAO.sharedInstance().getIssueLinkIDsForIssueAndLinkedObjectClass(issueID, Person.class, new NullProgressMonitor());

@@ -3,6 +3,8 @@
 	<name>NightLabsRhinoEAR</name>
 	<comment></comment>
 	<projects>
+		<project>NightLabsRhino</project>
+		<project>NightLabsRhinoEAR</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

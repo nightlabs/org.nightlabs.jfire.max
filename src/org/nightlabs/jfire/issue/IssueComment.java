@@ -13,6 +13,7 @@ import javax.jdo.annotations.FetchGroups;
 import javax.jdo.annotations.IdentityType;
 import javax.jdo.annotations.Inheritance;
 import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.NullValue;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.PersistenceModifier;
 import javax.jdo.annotations.Persistent;
@@ -22,6 +23,7 @@ import javax.jdo.listener.DetachCallback;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.issue.id.IssueCommentID;
 import org.nightlabs.jfire.issue.id.IssueID;
+import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.util.Util;
 
@@ -121,7 +123,10 @@ implements Serializable, DetachCallback
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
-	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+	@Persistent(
+			persistenceModifier=PersistenceModifier.PERSISTENT,
+			nullValue=NullValue.EXCEPTION
+	)
 	private Issue issue;
 
 	@Persistent(persistenceModifier=PersistenceModifier.NONE)
@@ -131,7 +136,10 @@ implements Serializable, DetachCallback
 	 * @jdo.field persistence-modifier="persistent"
 	 * @jdo.column sql-type="clob"
 	 */
-	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+	@Persistent(
+			persistenceModifier=PersistenceModifier.PERSISTENT,
+			nullValue=NullValue.EXCEPTION
+	)
 	@Column(sqlType="clob")
 	private String text;
 
@@ -157,6 +165,17 @@ implements Serializable, DetachCallback
 	{
 	}
 
+	public IssueComment(Issue issue, String text, User user)
+	{
+		this(
+				IDGenerator.getOrganisationID(),
+				IDGenerator.nextID(IssueComment.class),
+				issue,
+				text,
+				user
+		);
+	}
+
 	/**
 	 * Constructs a new IssueComment.
 	 * @param organisationID the first part of the composite primary key - referencing the organisation which owns this <code>IssueComment</code>.
@@ -165,7 +184,18 @@ implements Serializable, DetachCallback
 	 * @param text the text of the comment
 	 * @param user the user that created this comment
 	 */
-	public IssueComment(String organisationID, long commentID, Issue issue, String text, User user){
+	public IssueComment(String organisationID, long commentID, Issue issue, String text, User user)
+	{
+		Organisation.assertValidOrganisationID(organisationID);
+		if (issue == null)
+			throw new IllegalArgumentException("issue must not be null!");
+
+		if (text == null)
+			throw new IllegalArgumentException("text must not be null!");
+
+		if (user == null)
+			throw new IllegalArgumentException("user must not be null!");
+
 		this.organisationID = organisationID;
 		this.commentID = commentID;
 		this.issue = issue;

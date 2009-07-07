@@ -333,8 +333,12 @@ implements Serializable, DetachCallback, StoreCallback, DeleteCallback
 	}
 
 	public Class<?> getLinkedObjectClass() {
-		if (this.linkedObjectClass == null)
-			this.linkedObjectClass = getPersistenceManager().getObjectById(getLinkedObjectID()).getClass();
+		if (this.linkedObjectClass == null) {
+			if (linkedObject != null)
+				this.linkedObjectClass = linkedObject.getClass();
+			else
+				this.linkedObjectClass = getPersistenceManager().getObjectById(getLinkedObjectID()).getClass();
+		}
 
 		return linkedObjectClass;
 	}

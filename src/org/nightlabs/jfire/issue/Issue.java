@@ -447,6 +447,14 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback, StoreCallbac
 	@Deprecated
 	protected Issue() { }
 
+	public Issue(boolean dummy)
+	{
+		this(
+				IDGenerator.getOrganisationID(),
+				IDGenerator.nextID(Issue.class)
+		);
+	}
+
 	/**
 	 * Constructs a new issue.
 	 * @param organisationID the first part of the composite primary key - referencing the organisation which owns this <code>Issue</code>.

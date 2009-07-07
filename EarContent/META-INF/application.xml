@@ -62,7 +62,7 @@
 		<java>birt/lib/modelapi.jar</java></module>
 -->		
 
-<!-- is not contained in lib dir of JBoss AS
+<!-- is now contained in lib dir of JBoss AS
 	<module>
 		<java>birt/lib/oda.jar</java>
 	</module>

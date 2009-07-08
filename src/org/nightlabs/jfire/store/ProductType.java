@@ -890,11 +890,8 @@ implements
 			byte inheritanceNature,
 			byte packageNature)
 	{
-		if (!ObjectIDUtil.isValidIDString(organisationID))
-			throw new NullPointerException("organisationID is not a valid ID-String");
-
-		if (!ObjectIDUtil.isValidIDString(productTypeID))
-			throw new IllegalArgumentException("productTypeID is not a valid ID-String!");
+		Organisation.assertValidOrganisationID(organisationID);
+		ObjectIDUtil.assertValidIDString(productTypeID, "productTypeID");
 
 		if (INHERITANCE_NATURE_BRANCH != inheritanceNature &&
 				INHERITANCE_NATURE_LEAF != inheritanceNature)

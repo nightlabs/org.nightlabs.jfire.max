@@ -688,7 +688,23 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback, StoreCallbac
 	 * @return a list of {@link IssueComment}s
 	 */
 	public List<IssueComment> getComments() {
+		// TODO the result of this method should be read-only!
+		// There should be methods to create/add a comment instead of modifying the
+		// result of this method! Marco.
+		//
+		// I just created the method "addComment" below. Further methods are necessary. Marco.
 		return comments;
+	}
+
+	public void addComment(IssueComment issueComment)
+	{
+		if (issueComment == null)
+			throw new IllegalArgumentException("issueComment must not be null!");
+
+		if (!this.equals(issueComment.getIssue()))
+			throw new IllegalArgumentException("this != issueComment.issue");
+
+		comments.add(issueComment);
 	}
 
 	public void addIssueWorkTimeRange(IssueWorkTimeRange issueWorkTimeRange) {

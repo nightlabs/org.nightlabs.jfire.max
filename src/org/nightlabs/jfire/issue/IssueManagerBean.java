@@ -392,11 +392,22 @@ implements IssueManagerRemote
 	{
 		PersistenceManager pm = createPersistenceManager();
 		try {
-			return NLJDOHelper.storeJDO(pm, issueComment, get, fetchGroups, maxFetchDepth);
-		}//try
-		finally {
+			IssueID issueID = issueComment.getIssueID();
+			Issue issue = (Issue) pm.getObjectById(issueID);
+			issueComment = pm.makePersistent(issueComment);
+			issue.addComment(issueComment);
+
+			if (!get)
+				return null;
+
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+			if (fetchGroups != null)
+				pm.getFetchPlan().setGroups(fetchGroups);
+
+			return pm.detachCopy(issueComment);
+		} finally {
 			pm.close();
-		}//finally
+		}
 	}
 
 
@@ -626,12 +637,26 @@ implements IssueManagerRemote
 				if (issue.getCreateTimestamp() != null)
 					issue.setUpdateTimestamp(new Date());
 
-
 				// --[ Obtain references: oldIssue, User ]----------------------------------------------------------------------|
 				IssueID issueID = (IssueID) JDOHelper.getObjectId(issue);
 				Issue oldPersistentIssue = (Issue) pm.getObjectById(issueID);
 				User user = SecurityReflector.getUserDescriptor().getUser(pm);
 
+				// Ensure that we never accidentally delete a IssueComment (e.g. by persisting a
+				// modified Issue which doesn't have all comments as it was not yet updated on the
+				// client side.
+				List<IssueComment> issueComments = null;
+				try {
+					issueComments = issue.getComments();
+				} catch (JDODetachedFieldAccessException x) {
+					// ignore - was not detached
+				}
+				if (issueComments != null) {
+					for (IssueComment issueComment : oldPersistentIssue.getComments()) {
+						if (!issueComments.contains(issueComment))
+							issue.addComment(issueComment);
+					}
+				}
 
 				// --[ On IssueHistoryItems ]-----------------------------------------------------------------------------------|
 				Collection<IssueHistoryItem> issueHistoryItems = IssueHistoryItemFactory.createIssueHistoryItems(pm, user, oldPersistentIssue, issue); // <-- Seems OK and holding.

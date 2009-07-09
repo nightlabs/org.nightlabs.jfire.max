@@ -64,6 +64,13 @@ implements Serializable
 		public static final PersonRelationTypeID child = PersonRelationTypeID.create(
 				Organisation.DEV_ORGANISATION_ID, "child"
 		);
+
+		public static final PersonRelationTypeID companyGroup = PersonRelationTypeID.create(
+				Organisation.DEV_ORGANISATION_ID, "companyGroup"
+		);
+		public static final PersonRelationTypeID subsidiary = PersonRelationTypeID.create(
+				Organisation.DEV_ORGANISATION_ID, "subsidiary"
+		);
 	}
 
 	public static final String FETCH_GROUP_NAME = "PersonRelationType.name";

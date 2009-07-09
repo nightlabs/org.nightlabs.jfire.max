@@ -201,7 +201,7 @@ public class DataCreator
 	private PriceFragmentType priceFragmentTypeVatNet = null;
 	public PriceFragmentType getPriceFragmentTypeVatNet() {
 		if (priceFragmentTypeVatNet == null)
-			priceFragmentTypeVatNet = (PriceFragmentType) pm.getObjectById(PriceFragmentTypeHelper.getDE().VAT_DE_19_NET);
+			priceFragmentTypeVatNet = (PriceFragmentType) pm.getObjectById(new PriceFragmentTypeHelper().getDE().VAT_DE_19_NET);
 
 		return priceFragmentTypeVatNet;
 	}
@@ -209,7 +209,7 @@ public class DataCreator
 	private PriceFragmentType priceFragmentTypeVatVal = null;
 	public PriceFragmentType getPriceFragmentTypeVatVal() {
 		if (priceFragmentTypeVatVal == null)
-			priceFragmentTypeVatVal = (PriceFragmentType) pm.getObjectById(PriceFragmentTypeHelper.getDE().VAT_DE_19_VAL);
+			priceFragmentTypeVatVal = (PriceFragmentType) pm.getObjectById(new PriceFragmentTypeHelper().getDE().VAT_DE_19_VAL);
 
 		return priceFragmentTypeVatVal;
 	}

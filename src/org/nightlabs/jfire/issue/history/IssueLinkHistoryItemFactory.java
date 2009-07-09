@@ -8,7 +8,10 @@ import javax.jdo.JDODetachedFieldAccessException;
 
 import org.nightlabs.jfire.issue.Issue;
 import org.nightlabs.jfire.issue.IssueLink;
+import org.nightlabs.jfire.person.Person;
 import org.nightlabs.jfire.security.User;
+import org.nightlabs.jfire.trade.Offer;
+import org.nightlabs.jfire.trade.Order;
 
 /**
  * This is the {@link IssueHistoryItemFactory} that generates {@link IssueLinkHistoryItem}s, based on information
@@ -61,13 +64,14 @@ public class IssueLinkHistoryItemFactory extends IssueHistoryItemFactory {
 			// [Default behaviour]
 			// Create a new IssueHistoryItem to indicate that a new IssueLink has been created.
 			// Generate the IssueHistoryItem for the forward link.
-			Class<?> linkedObject = getPersistenceManager().getObjectById( issueLink.getLinkedObjectID() ).getClass();
+			Object linkedObject = getPersistenceManager().getObjectById( issueLink.getLinkedObjectID() );
+			Class<?> linkedObjectClass = linkedObject.getClass(); //getPersistenceManager().getObjectById( issueLink.getLinkedObjectID() ).getClass();
 			issueLinkHistoryItems.add( new IssueLinkHistoryItem(
 					user, oldPersistentIssue,
 					issueLink.getIssueLinkType(), 	// <-- The relationship between the Issue and the linkedObject is indicated here in the name field.
 					IssueHistoryItemAction.ADDED,
-					linkedObject.getSimpleName(),  //issueLink.getLinkedObjectClass().getSimpleName(),
-					issueLink.getLinkedObjectID().toString()
+					linkedObjectClass.getSimpleName(),  //issueLink.getLinkedObjectClass().getSimpleName(),
+					getReadableLinkedObjectID(linkedObject, issueLink) //issueLink.getLinkedObjectID().toString()
 			));
 
 			// [Additional behaviour]
@@ -79,13 +83,14 @@ public class IssueLinkHistoryItemFactory extends IssueHistoryItemFactory {
 		// Similarly, when a link is removed, we should note the severance of the link of BOTH objects.
 		for (IssueLink issueLink : removedIssueLinks) {
 			// [Default behaviour]
-			Class<?> linkedObject = getPersistenceManager().getObjectById( issueLink.getLinkedObjectID() ).getClass();
+			Object linkedObject = getPersistenceManager().getObjectById( issueLink.getLinkedObjectID() );
+			Class<?> linkedObjectClass = linkedObject.getClass(); //getPersistenceManager().getObjectById( issueLink.getLinkedObjectID() ).getClass();
 			issueLinkHistoryItems.add( new IssueLinkHistoryItem(
 					user, oldPersistentIssue,
 					issueLink.getIssueLinkType(),
 					IssueHistoryItemAction.REMOVED,
-					linkedObject.getSimpleName(),  //issueLink.getLinkedObjectClass().getSimpleName(),
-					issueLink.getLinkedObjectID().toString()
+					linkedObjectClass.getSimpleName(),  //issueLink.getLinkedObjectClass().getSimpleName(),
+					getReadableLinkedObjectID(linkedObject, issueLink) //issueLink.getLinkedObjectID().toString()
 			));
 
 
@@ -98,4 +103,26 @@ public class IssueLinkHistoryItemFactory extends IssueHistoryItemFactory {
 		return issueLinkHistoryItems;
 	}
 
+	
+	/**
+	 * Specific text to return to indicate the identity of the linked object
+	 * for human-readable display on the IssueHistoryLinks.
+	 * TODO Finish this properly.
+	 */
+	protected String getReadableLinkedObjectID(Object linkedObject, IssueLink issueLink) {
+		if ( linkedObject instanceof Person )
+			return ((Person)linkedObject).getDisplayName();
+		
+		if ( linkedObject instanceof Order )
+			return ((Order)linkedObject).getPrimaryKey();
+		
+		if ( linkedObject instanceof Offer )
+			return ((Offer)linkedObject).getPrimaryKey();
+		
+		if ( linkedObject instanceof Issue )
+			return ((Issue)linkedObject).getPrimaryKey(); //getIssueIDAsString();
+
+		return issueLink.getLinkedObjectID().toString();
+	}
+	
 }

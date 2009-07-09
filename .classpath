@@ -16,5 +16,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireBaseClientLib"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireBaseDAO"/>
 	<classpathentry kind="lib" path="/JFireJbpm/lib/jbpm/jbpm-3.1.4.jar" sourcepath="/JFireJbpm/lib/jbpm/jbpm-3.1.4.zip"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/JFireTrade"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

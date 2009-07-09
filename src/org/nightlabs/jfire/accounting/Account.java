@@ -37,6 +37,17 @@ import java.util.Set;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.Queries;
 
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.trade.LegalEntity;
@@ -44,22 +55,10 @@ import org.nightlabs.jfire.transfer.Anchor;
 import org.nightlabs.jfire.transfer.Transfer;
 import org.nightlabs.util.NLLocale;
 
-import javax.jdo.annotations.Join;
-import javax.jdo.annotations.FetchGroups;
-import javax.jdo.annotations.NullValue;
-import javax.jdo.annotations.Inheritance;
-import javax.jdo.annotations.FetchGroup;
-import javax.jdo.annotations.PersistenceModifier;
-import javax.jdo.annotations.Persistent;
-import javax.jdo.annotations.InheritanceStrategy;
-import javax.jdo.annotations.Queries;
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.IdentityType;
-
 /**
  * Accounts are the anchors of {@link MoneyTransfer}s. They record the transfer amounts and
- * maintain an account balance ({@link #getBalance()}). 
- * 
+ * maintain an account balance ({@link #getBalance()}).
+ *
  * @author Marco Schulze - marco at nightlabs dot de
  * @author Alexander Bieber <alex [AT] nightlabs [DOT] de>
  *
@@ -104,7 +103,8 @@ import javax.jdo.annotations.IdentityType;
 		name=Account.FETCH_GROUP_ACCOUNT_TYPE,
 		members=@Persistent(name="accountType")),
 	@FetchGroup(
-		fetchGroups={"default", "Anchor.this"},
+//		fetchGroups={"default", "Anchor.this"},
+		fetchGroups={"default"},
 		name=Account.FETCH_GROUP_THIS_ACCOUNT,
 		members={@Persistent(name="owner"), @Persistent(name="currency"), @Persistent(name="accountType"), @Persistent(name="name"), @Persistent(name="summaryAccounts")})
 })
@@ -124,8 +124,9 @@ public class Account extends Anchor
 	public static final String FETCH_GROUP_SUMMARY_ACCOUNTS = "Account.summaryAccounts";
 	public static final String FETCH_GROUP_ACCOUNT_TYPE = "Account.accountType";
 	/**
-	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon! 
+	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon!
 	 */
+	@Deprecated
 	public static final String FETCH_GROUP_THIS_ACCOUNT = "Account.this";
 
 	@SuppressWarnings("unchecked")
@@ -192,7 +193,7 @@ public class Account extends Anchor
 //	 */
 //	public static final String ANCHOR_TYPE_ID_OUTSIDE = "Account.Outside";
 ////	public static final String ANCHOR_TYPE_ID_PAYMENT = "Account.Payment";
-	
+
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
@@ -270,7 +271,7 @@ public class Account extends Anchor
 	mappedBy="account",
 	persistenceModifier=PersistenceModifier.PERSISTENT)
 	protected AccountName name;
-	
+
 	public AccountName getName() {
 		return name;
 	}
@@ -290,7 +291,7 @@ public class Account extends Anchor
 	{
 		return balance;
 	}
-	
+
 	/**
 	 * @return Returns the currency.
 	 */
@@ -309,7 +310,7 @@ public class Account extends Anchor
 //	{
 //		return statistical;
 //	}
-	
+
 	protected void adjustBalance(boolean isDebit, long amount) {
 		if (isDebit)
 			this.balance = this.balance - amount;
@@ -361,7 +362,7 @@ public class Account extends Anchor
 
 	/**
 	 * Adjusts the balance according to the Transfer if it is a MoneyTransfer.
-	 * 
+	 *
 	 * @see org.nightlabs.jfire.transfer.Anchor#internalBookTransfer(Transfer, User, Map)
 	 */
 	@Override
@@ -412,7 +413,7 @@ public class Account extends Anchor
 			boolean isDebit = Transfer.ANCHORTYPE_FROM == moneyTransfer.getAnchorType(this);
 			for (Iterator iter = getSummaryAccounts().iterator(); iter.hasNext();) {
 				SummaryAccount summaryAccount = (SummaryAccount) iter.next();
-	
+
 	//			Account from;
 	//			Account to;
 	//			if (isDebit) {
@@ -423,7 +424,7 @@ public class Account extends Anchor
 	//			to = SummaryAccount;
 	//			from = this;
 	//			}
-	
+
 				SummaryMoneyTransfer summaryMoneyTransfer = new SummaryMoneyTransfer(
 						(InvoiceMoneyTransfer)(moneyTransfer.getContainer() == null ? moneyTransfer : moneyTransfer.getContainer()),
 	//					from, to,
@@ -462,16 +463,16 @@ public class Account extends Anchor
 		_addSummaryAccount(summaryAccount);
 		summaryAccount._addSummedAccount(this);
 	}
-	
+
 	protected void _addSummaryAccount(SummaryAccount summaryAccount) {
 		summaryAccounts.add(summaryAccount);
 	}
-	
+
 	public void removeSummaryAccount(SummaryAccount summaryAccount) {
 		_removeSummaryAccount(summaryAccount);
 		summaryAccount._removeSummedAccount(this);
 	}
-	
+
 	public void _removeSummaryAccount(SummaryAccount summaryAccount) {
 		summaryAccounts.remove(summaryAccount);
 	}
@@ -491,7 +492,7 @@ public class Account extends Anchor
 	public LegalEntity getOwner() {
 		return owner;
 	}
-	
+
 	public void setOwner(LegalEntity owner) {
 		this.owner = owner;
 	}
@@ -506,7 +507,7 @@ public class Account extends Anchor
 	public void resetIntegrity(Collection<? extends Transfer> containers)
 	{
 	}
-	
+
 	@Override
 	protected String internalGetDescription() {
 		return getName().getText(NLLocale.getDefault().getLanguage());

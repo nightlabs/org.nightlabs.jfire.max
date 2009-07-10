@@ -6,6 +6,7 @@ import java.util.Set;
 
 import javax.jdo.JDODetachedFieldAccessException;
 
+import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.issue.Issue;
 import org.nightlabs.jfire.issue.IssueLink;
 import org.nightlabs.jfire.person.Person;
@@ -44,18 +45,16 @@ public class IssueLinkHistoryItemFactory extends IssueHistoryItemFactory {
 		// (i) Check for newly created IssueLinks.
 		Collection<IssueLink> addedIssueLinks = new ArrayList<IssueLink>();
 		if (oldIssueLinks.isEmpty()) addedIssueLinks.addAll(newIssueLinks);
-		else {
+		else
 			for (IssueLink issueLink : newIssueLinks)
 				if (!oldIssueLinks.contains(issueLink)) addedIssueLinks.add(issueLink);
-		}
 
 		// (ii) Check for recently severed IssueLinks.
 		Collection<IssueLink> removedIssueLinks = new ArrayList<IssueLink>();
 		if (newIssueLinks.isEmpty()) removedIssueLinks.addAll(oldIssueLinks);
-		else {
+		else
 			for (IssueLink issueLink : oldIssueLinks)
 				if (!newIssueLinks.contains(issueLink)) removedIssueLinks.add(issueLink);
-		}
 
 
 		// (iii) Collate them all, and generate the necessary IssueHistoryItem.
@@ -65,64 +64,70 @@ public class IssueLinkHistoryItemFactory extends IssueHistoryItemFactory {
 			// Create a new IssueHistoryItem to indicate that a new IssueLink has been created.
 			// Generate the IssueHistoryItem for the forward link.
 			Object linkedObject = getPersistenceManager().getObjectById( issueLink.getLinkedObjectID() );
-			Class<?> linkedObjectClass = linkedObject.getClass(); //getPersistenceManager().getObjectById( issueLink.getLinkedObjectID() ).getClass();
+			Class<?> linkedObjectClass = linkedObject.getClass();
 			issueLinkHistoryItems.add( new IssueLinkHistoryItem(
 					user, oldPersistentIssue,
-					issueLink.getIssueLinkType(), 	// <-- The relationship between the Issue and the linkedObject is indicated here in the name field.
+					issueLink.getIssueLinkType(), 	// <-- The relationship between the Issue and the linkedObject.
 					IssueHistoryItemAction.ADDED,
-					linkedObjectClass.getSimpleName(),  //issueLink.getLinkedObjectClass().getSimpleName(),
-					getReadableLinkedObjectID(linkedObject, issueLink) //issueLink.getLinkedObjectID().toString()
+					linkedObjectClass.getSimpleName(),
+					getReadableLinkedObjectID(linkedObject, issueLink) // <-- Reconsider this approach, please. Kai.
 			));
 
-			// [Additional behaviour]
-			// If the linkedObject indicated by this IssueLink is also an Issue, then we also need to add an appropriate
-			// IssueHistoryItem for it -- based on the relationship. This relationship information should already be available.
-			// --> This is done through the method 'postCreateIssueLink(...)' in IssueLinkTypeIssueToIssue.
+			// [Additional behaviour] :: The reverse-symmetric link for Issue-to-Issue.
+			// --> Note: This is done through the method 'postCreateIssueLink(...)' in IssueLinkTypeIssueToIssue.
 		}
 
 		// Similarly, when a link is removed, we should note the severance of the link of BOTH objects.
 		for (IssueLink issueLink : removedIssueLinks) {
 			// [Default behaviour]
 			Object linkedObject = getPersistenceManager().getObjectById( issueLink.getLinkedObjectID() );
-			Class<?> linkedObjectClass = linkedObject.getClass(); //getPersistenceManager().getObjectById( issueLink.getLinkedObjectID() ).getClass();
+			Class<?> linkedObjectClass = linkedObject.getClass();
 			issueLinkHistoryItems.add( new IssueLinkHistoryItem(
 					user, oldPersistentIssue,
 					issueLink.getIssueLinkType(),
 					IssueHistoryItemAction.REMOVED,
-					linkedObjectClass.getSimpleName(),  //issueLink.getLinkedObjectClass().getSimpleName(),
-					getReadableLinkedObjectID(linkedObject, issueLink) //issueLink.getLinkedObjectID().toString()
+					linkedObjectClass.getSimpleName(),
+					getReadableLinkedObjectID(linkedObject, issueLink) // <-- Reconsider this approach, please. Kai.
 			));
 
-
-			// [Additional behaviour]
-			// If the linkedObject indicated by this IssueLink is also an Issue, then we also need to take care of this.
-			// --> This is done through the method 'preDeleteIssueLink(...)' in IssueLinkTypeIssueToIssue.
+			// [Additional behaviour] :: The reverse-symmetric link for Issue-to-Issue.
+			// --> Note: This is done through the method 'postCreateIssueLink(...)' in IssueLinkTypeIssueToIssue.
 		}
 
 
 		return issueLinkHistoryItems;
 	}
 
-	
+
 	/**
 	 * Specific text to return to indicate the identity of the linked object
 	 * for human-readable display on the IssueHistoryLinks.
-	 * TODO Finish this properly.
+	 * TODO Finish this properly; consider the following:
+	 *        1. Person -- Person [OK]
+	 *        2. Trade -- Order [OK]
+	 *        3. Trace -- Offer [OK]
+	 *        4. Issue -- Issue [OK]
+	 *        5. Accounting -- Invoice
+	 *        6. Store -- Delivery Note
+	 *        7. Store -- Reception Note
 	 */
 	protected String getReadableLinkedObjectID(Object linkedObject, IssueLink issueLink) {
 		if ( linkedObject instanceof Person )
 			return ((Person)linkedObject).getDisplayName();
-		
+
 		if ( linkedObject instanceof Order )
 			return ((Order)linkedObject).getPrimaryKey();
-		
+
 		if ( linkedObject instanceof Offer )
 			return ((Offer)linkedObject).getPrimaryKey();
-		
-		if ( linkedObject instanceof Issue )
-			return ((Issue)linkedObject).getPrimaryKey(); //getIssueIDAsString();
+
+		if ( linkedObject instanceof Issue ) {
+			Issue issue = (Issue)linkedObject;
+			return ObjectIDUtil.longObjectIDFieldToString(issue.getIssueID()) + " "
+			+ issue.getSubject().getText();	// <-- Not good. Think of an alternative, please. Kai.
+		}
 
 		return issueLink.getLinkedObjectID().toString();
 	}
-	
+
 }

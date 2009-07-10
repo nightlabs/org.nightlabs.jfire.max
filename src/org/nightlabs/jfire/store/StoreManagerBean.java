@@ -349,22 +349,22 @@ implements StoreManagerRemote, StoreManagerLocal
 			pm.makePersistent(new EditLockTypeDeliveryNote(EditLockTypeDeliveryNote.EDIT_LOCK_TYPE_ID));
 
 
-			Unit unit = new Unit(Organisation.DEV_ORGANISATION_ID, IDGenerator.nextID(Unit.class), 2);
+			Unit unit = new Unit(Organisation.DEV_ORGANISATION_ID, "h", 2);
 			unit.getSymbol().setText(Locale.ENGLISH.getLanguage(), "h");
 			unit.getName().setText(Locale.ENGLISH.getLanguage(), "hour");
 			unit.getName().setText(Locale.GERMAN.getLanguage(), "Stunde");
 			pm.makePersistent(unit);
 
-			unit = new Unit(Organisation.DEV_ORGANISATION_ID, IDGenerator.nextID(Unit.class), 3);
+			unit = new Unit(Organisation.DEV_ORGANISATION_ID, "piece", 3);
 			unit.getSymbol().setText(Locale.ENGLISH.getLanguage(), "pcs.");
 			unit.getName().setText(Locale.ENGLISH.getLanguage(), "pieces");
 			unit.getSymbol().setText(Locale.GERMAN.getLanguage(), "Stk.");
 			unit.getName().setText(Locale.GERMAN.getLanguage(), "Stück");
 			pm.makePersistent(unit);
 
-			unit = new Unit(Organisation.DEV_ORGANISATION_ID, IDGenerator.nextID(Unit.class), 0);
+			unit = new Unit(Organisation.DEV_ORGANISATION_ID, "flatRate", 0);
 			unit.getSymbol().setText(Locale.ENGLISH.getLanguage(), "()");
-			unit.getName().setText(Locale.ENGLISH.getLanguage(), "(spot-rate)");
+			unit.getName().setText(Locale.ENGLISH.getLanguage(), "(flat-rate)");
 			unit.getSymbol().setText(Locale.GERMAN.getLanguage(), "()");
 			unit.getName().setText(Locale.GERMAN.getLanguage(), "(pauschal)");
 			pm.makePersistent(unit);

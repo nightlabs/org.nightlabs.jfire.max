@@ -26,7 +26,7 @@ implements ObjectID
 	 * The serial version uid of this class.
 	 */
 	@Generated("org.nightlabs.eclipse.sdk.jdo.ObjectIdGenerator")
-	private static final long serialVersionUID = 1756443673534381206L;
+	private static final long serialVersionUID = -573000487L;
 
 	/**
 	 * The values of all fields are URL encoded in UTF-8.
@@ -88,7 +88,7 @@ implements ObjectID
 	 * Declared as primary key field in {@link org.nightlabs.jfire.store.Unit}.
 	 */
 	@Generated("org.nightlabs.eclipse.sdk.jdo.ObjectIdGenerator")
-	public long unitID;
+	public java.lang.String unitID;
 
 	/**
 	 * Create a new empty instance of UnitID.
@@ -258,7 +258,7 @@ implements ObjectID
 			sb.append(URLEncoder.encode(String.valueOf(organisationID), ENCODING));
 			sb.append('&');
 			sb.append("unitID="); //$NON-NLS-1$
-			sb.append(URLEncoder.encode(Long.toString(unitID, RADIX), ENCODING));
+			sb.append(URLEncoder.encode(String.valueOf(unitID), ENCODING));
 		} catch (UnsupportedEncodingException e) {
 			throw new RuntimeException(
 					"Encoding failed with encoding " + //$NON-NLS-1$
@@ -289,7 +289,10 @@ implements ObjectID
 				return false;
 		} else if(!organisationID.equals(other.organisationID))
 			return false;
-		if(unitID != other.unitID)
+		if(unitID == null) {
+			if(other.unitID != null)
+				return false;
+		} else if(!unitID.equals(other.unitID))
 			return false;
 		return true;
 	}
@@ -308,7 +311,7 @@ implements ObjectID
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((organisationID == null) ? 0 : organisationID.hashCode());
-		result = prime * result + (int) (unitID ^ (unitID >>> 32));
+		result = prime * result + ((unitID == null) ? 0 : unitID.hashCode());
 		return result;
 	}
 
@@ -320,7 +323,7 @@ implements ObjectID
 	 *     with the primary-key fields set to the given parameters.
 	 */
 	@Generated("org.nightlabs.eclipse.sdk.jdo.ObjectIdGenerator")
-	public static UnitID create(String organisationID, long unitID)
+	public static UnitID create(String organisationID, String unitID)
 	{
 		UnitID n = new UnitID();
 		n.organisationID = organisationID;

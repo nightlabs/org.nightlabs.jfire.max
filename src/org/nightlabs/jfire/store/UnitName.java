@@ -29,37 +29,25 @@ package org.nightlabs.jfire.store;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.nightlabs.i18n.I18nText;
-
-import javax.jdo.annotations.Join;
-import javax.jdo.annotations.Persistent;
-import javax.jdo.annotations.FetchGroups;
-import javax.jdo.annotations.NullValue;
-import javax.jdo.annotations.InheritanceStrategy;
-import javax.jdo.annotations.Inheritance;
-import javax.jdo.annotations.PrimaryKey;
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.FetchGroup;
 import javax.jdo.annotations.Column;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.FetchGroups;
 import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
+
+import org.nightlabs.i18n.I18nText;
 import org.nightlabs.jfire.store.id.UnitNameID;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
- * 
- * @jdo.persistence-capable
- *		identity-type="application"
- *		objectid-class="org.nightlabs.jfire.store.id.UnitNameID"
- *		detachable="true"
- *		table="JFireTrade_UnitName"
- *
- * @jdo.inheritance strategy="new-table"
- *
- * @jdo.create-objectid-class field-order="organisationID, unitID"
- *
- * @jdo.fetch-group name="Unit.name" fields="unit, names"
  */
 @PersistenceCapable(
 	objectIdClass=UnitNameID.class,
@@ -69,7 +57,9 @@ import org.nightlabs.jfire.store.id.UnitNameID;
 @FetchGroups(
 	@FetchGroup(
 		name="Unit.name",
-		members={@Persistent(name="unit"), @Persistent(name="names")})
+		members={@Persistent(name="names")}
+//		members={@Persistent(name="unit"), @Persistent(name="names")}
+	)
 )
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class UnitName
@@ -77,58 +67,38 @@ extends I18nText
 {
 	private static final long serialVersionUID = 1L;
 
-	/**
-	 * @jdo.field primary-key="true"
-	 * @jdo.column length="100"
-	 */
 	@PrimaryKey
 	@Column(length=100)
 	private String organisationID;
 
-	/**
-	 * @jdo.field primary-key="true"
-	 */
 	@PrimaryKey
-	private long unitID;
+	@Column(length=50)
+	private String unitID;
 
-	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 */
-	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
-	private Unit unit;
+//	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+//	private Unit unit;
 
 	/**
 	 * key: String languageID<br/>
 	 * value: String name
-	 *
-	 * @jdo.field
-	 *		persistence-modifier="persistent"
-	 *		collection-type="map"
-	 *		key-type="java.lang.String"
-	 *		value-type="java.lang.String"
-	 *		table="JFireTrade_UnitName_names"
-	 *		null-value="exception"
-	 *
-	 * @jdo.join
 	 */
 	@Join
 	@Persistent(
 		nullValue=NullValue.EXCEPTION,
 		table="JFireTrade_UnitName_names",
-		persistenceModifier=PersistenceModifier.PERSISTENT)
-	protected Map<String, String> names = new HashMap<String, String>();
+		persistenceModifier=PersistenceModifier.PERSISTENT
+	)
+	private Map<String, String> names = new HashMap<String, String>();
 
 	/**
 	 * @deprecated Only for JDO!
 	 */
 	@Deprecated
-	protected UnitName()
-	{
-	}
+	protected UnitName() { }
 
 	public UnitName(Unit unit)
 	{
-		this.unit = unit;
+//		this.unit = unit;
 		this.organisationID = unit.getOrganisationID();
 		this.unitID = unit.getUnitID();
 	}
@@ -153,13 +123,13 @@ extends I18nText
 		return organisationID;
 	}
 
-	public long getUnitID()
+	public String getUnitID()
 	{
 		return unitID;
 	}
 
-	public Unit getUnit()
-	{
-		return unit;
-	}
+//	public Unit getUnit()
+//	{
+//		return unit;
+//	}
 }

@@ -2,44 +2,28 @@ package org.nightlabs.jfire.store;
 
 import java.io.Serializable;
 
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
 import javax.jdo.listener.StoreCallback;
 
 import org.nightlabs.jdo.ObjectIDUtil;
+import org.nightlabs.jfire.organisation.Organisation;
+import org.nightlabs.jfire.store.id.UnitID;
 import org.nightlabs.util.Util;
 
-import javax.jdo.annotations.Persistent;
-import org.nightlabs.jfire.store.id.UnitID;
-import javax.jdo.annotations.FetchGroups;
-import javax.jdo.annotations.InheritanceStrategy;
-import javax.jdo.annotations.Inheritance;
-import javax.jdo.annotations.PrimaryKey;
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.FetchGroup;
-import javax.jdo.annotations.Column;
-import javax.jdo.annotations.IdentityType;
-import javax.jdo.annotations.PersistenceModifier;
-
 /**
+ * Instances of this class specify a measurement unit like hour, kilogram and
+ * the like.
+ *
  * @author Marco Schulze - Marco at NightLabs dot de
- *
- * @jdo.persistence-capable
- *		identity-type="application"
- *		objectid-class="org.nightlabs.jfire.store.id.UnitID"
- *		detachable="true"
- *		table="JFireTrade_Unit"
- *
- * @jdo.inheritance strategy="new-table"
- *
- * @jdo.create-objectid-class field-order="organisationID, unitID"
- *
- * @jdo.fetch-group name="Unit.name" fields="name"
- * @jdo.fetch-group name="Unit.symbol" fields="symbol"
- *
- * @jdo.fetch-group name="FetchGroupsTrade.articleInOrderEditor" fetch-groups="default" fields="name, symbol"
- * @jdo.fetch-group name="FetchGroupsTrade.articleInOfferEditor" fetch-groups="default" fields="name, symbol"
- * @jdo.fetch-group name="FetchGroupsTrade.articleInInvoiceEditor" fetch-groups="default" fields="name, symbol"
- * @jdo.fetch-group name="FetchGroupsTrade.articleInDeliveryNoteEditor" fetch-groups="default" fields="name, symbol"
- * @jdo.fetch-group name="FetchGroupsTrade.articleInReceptionNoteEditor" fetch-groups="default" fields="name, symbol"
  */
 @PersistenceCapable(
 	objectIdClass=UnitID.class,
@@ -83,38 +67,20 @@ implements Serializable, StoreCallback
 	public static final String FETCH_GROUP_NAME = "Unit.name";
 	public static final String FETCH_GROUP_SYMBOL = "Unit.symbol";
 
-	/**
-	 * @jdo.field primary-key="true"
-	 * @jdo.column length="100"
-	 */
 	@PrimaryKey
 	@Column(length=100)
 	private String organisationID;
-	/**
-	 * @jdo.field primary-key="true"
-	 */
-	@PrimaryKey
-	private long unitID;
 
-	/**
-	 * @jdo.field persistence-modifier="persistent" mapped-by="unit"
-	 */
-	@Persistent(
-		mappedBy="unit",
-		persistenceModifier=PersistenceModifier.PERSISTENT)
+	@PrimaryKey
+	@Column(length=50)
+	private String unitID;
+
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private UnitName name;
 
-	/**
-	 * @jdo.field persistence-modifier="persistent" mapped-by="unit"
-	 */
-	@Persistent(
-		mappedBy="unit",
-		persistenceModifier=PersistenceModifier.PERSISTENT)
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private UnitSymbol symbol;
 
-	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 */
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private int decimalDigitCount;
 
@@ -124,8 +90,11 @@ implements Serializable, StoreCallback
 	@Deprecated
 	protected Unit() { }
 
-	public Unit(String organisationID, long unitID, int decimalDigitCount)
+	public Unit(String organisationID, String unitID, int decimalDigitCount)
 	{
+		Organisation.assertValidOrganisationID(organisationID);
+		ObjectIDUtil.assertValidIDString(unitID, "unitID");
+
 		this.organisationID = organisationID;
 		this.unitID = unitID;
 		this.name = new UnitName(this);
@@ -142,7 +111,7 @@ implements Serializable, StoreCallback
 	{
 		return organisationID;
 	}
-	public long getUnitID()
+	public String getUnitID()
 	{
 		return unitID;
 	}
@@ -187,7 +156,7 @@ implements Serializable, StoreCallback
 	 * <p>
 	 *   amount / 10^(decimalDigitCount)
 	 * <p>
-	 * 
+	 *
 	 * @param amount The amount to convert
 	 * @return
 	 */
@@ -199,7 +168,7 @@ implements Serializable, StoreCallback
 	 * <p>
 	 *   amount * 10^(decimalDigitCount)
 	 * <p>
-	 * 
+	 *
 	 * @param amount The amount to convert
 	 * @return the approximate value as long - there might be rounding differences.
 	 */

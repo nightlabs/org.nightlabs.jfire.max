@@ -22,7 +22,7 @@ public class PriceFragmentTypeHelper
 		}
 	}
 
-	public class DE {
+	public static class DE {
 		public final PriceFragmentTypeID VAT_DE_19_NET;
 		public final PriceFragmentTypeID VAT_DE_19_VAL;
 		public final PriceFragmentTypeID VAT_DE_7_NET;
@@ -46,17 +46,17 @@ public class PriceFragmentTypeHelper
 		}
 	}
 
-	private static DE de;
+	private DE de;
 	public DE getDE()
 	{
 		if (de == null)
 			de = new DE();
-		
+
 		return de;
 	}
 
-	private static CH ch;
-	public static CH getCH()
+	private CH ch;
+	public CH getCH()
 	{
 		if (ch == null)
 			ch = new CH();

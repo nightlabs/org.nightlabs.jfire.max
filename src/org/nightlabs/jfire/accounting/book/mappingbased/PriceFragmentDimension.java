@@ -31,16 +31,15 @@ import java.util.Iterator;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.PersistenceCapable;
 
 import org.nightlabs.jfire.accounting.PriceFragmentType;
 import org.nightlabs.jfire.accounting.priceconfig.IPriceConfig;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.trade.Article;
-
-import javax.jdo.annotations.InheritanceStrategy;
-import javax.jdo.annotations.Inheritance;
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.IdentityType;
 
 /**
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
@@ -61,7 +60,7 @@ import javax.jdo.annotations.IdentityType;
 public class PriceFragmentDimension extends MoneyFlowDimension {
 
 	public static final String MONEY_FLOW_DIMENSION_ID = PriceFragmentDimension.class.getName();
-	
+
 	/**
 	 */
 	public PriceFragmentDimension() {
@@ -83,16 +82,24 @@ public class PriceFragmentDimension extends MoneyFlowDimension {
 	public String[] getValues(ProductType productType, Article bookArticle) {
 		ProductType rootType = bookArticle.getProductType();
 		IPriceConfig priceConfig = productType.getPriceConfigInPackage(rootType.getPrimaryKey());
+		if (priceConfig == null) { // TODO @Bieber: Is this correct or should we better take the dimensions from the package price config? Marco.
+			return new String[] {
+					PriceFragmentType.getPrimaryKey(
+							PriceFragmentType.PRICE_FRAGMENT_TYPE_ID_TOTAL.organisationID,
+							PriceFragmentType.PRICE_FRAGMENT_TYPE_ID_TOTAL.priceFragmentTypeID
+					)
+			};
+		}
 		Collection<PriceFragmentType> pfs = priceConfig.getPriceFragmentTypes();
 		String[] result = new String[pfs.size()];
 		int i = 0;
-		for (Iterator iter = pfs.iterator(); iter.hasNext();) {
-			PriceFragmentType pft = (PriceFragmentType) iter.next();
+		for (Iterator<PriceFragmentType> iter = pfs.iterator(); iter.hasNext();) {
+			PriceFragmentType pft = iter.next();
 			result[i++] = pft.getPrimaryKey();
 		}
 		return result;
 	}
-	
+
 	public PersistenceManager getPersistenceManager() {
 		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
 		if (pm == null)

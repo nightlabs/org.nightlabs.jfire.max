@@ -30,21 +30,20 @@ import java.io.Serializable;
 
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
 
 import org.nightlabs.jfire.language.id.LanguageID;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.trade.id.SegmentTypeID;
-
-import javax.jdo.annotations.Persistent;
-import javax.jdo.annotations.FetchGroups;
-import javax.jdo.annotations.InheritanceStrategy;
-import javax.jdo.annotations.Inheritance;
-import javax.jdo.annotations.PrimaryKey;
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.FetchGroup;
-import javax.jdo.annotations.Column;
-import javax.jdo.annotations.IdentityType;
-import javax.jdo.annotations.PersistenceModifier;
 
 
 /**
@@ -95,8 +94,9 @@ public class SegmentType implements Serializable
 {
 	private static final long serialVersionUID = 1L;
 	/**
-	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon! 
+	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon!
 	 */
+	@Deprecated
 	public static final String FETCH_GROUP_THIS_SEGMENT_TYPE = "SegmentType.this";
 	public static final String FETCH_GROUP_NAME = "SegmentType.name";
 
@@ -154,7 +154,7 @@ public class SegmentType implements Serializable
 		} catch (JDOObjectNotFoundException x) {
 			segmentType = new SegmentType(DEFAULT_SEGMENT_TYPE_ID.organisationID, DEFAULT_SEGMENT_TYPE_ID.segmentTypeID);
 			segmentType.getName().setText(LanguageID.SYSTEM, "Default");
-			pm.makePersistent(segmentType);
+			segmentType = pm.makePersistent(segmentType);
 		}
 
 		return segmentType;

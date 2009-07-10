@@ -210,7 +210,7 @@ extends AbstractJDOQuery
 				filter.append("this.project.projectID == " + pid.projectID);
 
 				if (i != projectIDs.size() - 1) {
-					filter.append(" || ");
+					filter.append(") || (");
 				}
 				else {
 					filter.append(")");

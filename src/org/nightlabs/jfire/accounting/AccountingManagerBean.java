@@ -273,12 +273,12 @@ implements AccountingManagerRemote, AccountingManagerLocal
 			priceFragmentType.setContainerPriceFragmentType(PriceFragmentType.getTotalPriceFragmentType(pm));
 			pm.makePersistent(priceFragmentType);
 
-			priceFragmentType = new PriceFragmentType(PriceFragmentTypeHelper.getCH().VAT_CH_7_6_NET);
+			priceFragmentType = new PriceFragmentType(pfth.getCH().VAT_CH_7_6_NET);
 			priceFragmentType.getName().setText(Locale.ENGLISH.getLanguage(), "VAT Switzerland 7.6% Net");
 			priceFragmentType.setContainerPriceFragmentType(PriceFragmentType.getTotalPriceFragmentType(pm));
 			pm.makePersistent(priceFragmentType);
 
-			priceFragmentType = new PriceFragmentType(PriceFragmentTypeHelper.getCH().VAT_CH_7_6_VAL);
+			priceFragmentType = new PriceFragmentType(pfth.getCH().VAT_CH_7_6_VAL);
 			priceFragmentType.getName().setText(Locale.ENGLISH.getLanguage(), "VAT Switzerland 7.6% Value");
 			priceFragmentType.setContainerPriceFragmentType(PriceFragmentType.getTotalPriceFragmentType(pm));
 			pm.makePersistent(priceFragmentType);

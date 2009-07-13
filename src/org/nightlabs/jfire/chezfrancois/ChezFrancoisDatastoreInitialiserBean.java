@@ -96,6 +96,10 @@ implements ChezFrancoisDatastoreInitialiserRemote, ChezFrancoisDatastoreInitiali
 		initialiser.createDemoData_JFireSimpleTrade();
 		initialiser.createDemoData_JFireVoucher();
 		initialiser.createDemoData_JFireDynamicTrade();
+
+		// --- 8< --- KaiExperiments: since 10.07.2009 ---------------------------------------------------------|
+		initialiser.createDemoData_JFireIssueTracking();
+		// ------ KaiExperiments ----- >8 ----------------------------------------------------------------------|
 	}
 
 	/* (non-Javadoc)
@@ -276,4 +280,36 @@ implements ChezFrancoisDatastoreInitialiserRemote, ChezFrancoisDatastoreInitiali
 		}
 	}
 
+
+	// --- 8< --- KaiExperiments: since 10.07.2009 ---------------------------------------------------------|
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.chezfrancois.ChezFrancoisDatastoreInitialiserRemote#createDemoData_JFireIssueTracking()
+	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+	@RolesAllowed("_System_")
+	public void createDemoData_JFireIssueTracking()
+	throws Exception
+	{
+		try {
+			Class.forName("org.nightlabs.jfire.issue.IssueType");
+		} catch (ClassNotFoundException x) {
+			logger.warn("initialise: JFireIssueTracking is not deployed. Cannot create demo data for this module.");
+			return;
+		}
+
+		PersistenceManager pm = this.createPersistenceManager();
+		try {
+			boolean successful = false;
+			SecurityChangeController.beginChanging();
+			try {
+				new InitialiserIssueTracking(pm, getPrincipal()).createDemoData();
+				successful = true;
+			} finally {
+				SecurityChangeController.endChanging(successful);
+			}
+		} finally {
+			pm.close();
+		}
+	}
+	// ------ KaiExperiments ----- >8 ----------------------------------------------------------------------|
 }

@@ -79,4 +79,17 @@ public interface ChezFrancoisDatastoreInitialiserLocal {
 	@RolesAllowed("_System_")
 	void createDemoData_JFireSimpleTrade() throws Exception;
 
+
+
+	// --- 8< --- KaiExperiments: since 10.07.2009 ---------------------------------------------------------|
+	/**
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_System_"
+	 * @ejb.transaction type="RequiresNew"
+	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+	@RolesAllowed("_System_")
+	void createDemoData_JFireIssueTracking() throws Exception;
+	// ------ KaiExperiments ----- >8 ----------------------------------------------------------------------|
+
 }

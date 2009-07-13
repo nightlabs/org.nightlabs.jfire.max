@@ -155,8 +155,7 @@ implements VoucherManagerRemote
 			// modeOfDeliveryFlavour if necessary
 			checkModeOfDeliveryFlavourTicketPrinter(pm);
 
-			ModuleMetaData moduleMetaData = ModuleMetaData.getModuleMetaData(pm,
-			"JFireVoucher");
+			ModuleMetaData moduleMetaData = ModuleMetaData.getModuleMetaData(pm, JFireVoucherEAR.MODULE_NAME);
 			if (moduleMetaData != null)
 				return;
 
@@ -166,9 +165,9 @@ implements VoucherManagerRemote
 			Store store = Store.getStore(pm);
 
 			// version is {major}.{minor}.{release}-{patchlevel}-{suffix}
-			moduleMetaData = new ModuleMetaData("JFireVoucher", "0.9.7-0-beta", // TODO use constant for "JFireVoucher" like in other EARs
-			"0.9.7-0-beta");
-			moduleMetaData = pm.makePersistent(moduleMetaData);
+			moduleMetaData = pm.makePersistent(
+					ModuleMetaData.createModuleMetaDataFromManifest(JFireVoucherEAR.MODULE_NAME, JFireVoucherEAR.class)
+			);
 
 			User user = User.getUser(pm, getPrincipal());
 
@@ -1382,8 +1381,8 @@ implements VoucherManagerRemote
 			pm.close();
 		}
 	}
-	
-	
+
+
 	/**
 	 * @ejb.interface-method
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
@@ -1398,6 +1397,6 @@ implements VoucherManagerRemote
 			pm.close();
 		}
 	}
-	
-	
+
+
 }

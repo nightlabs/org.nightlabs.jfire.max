@@ -110,8 +110,6 @@ implements DepartmentManagerRemote
 
 			pm.getExtent(Department.class);
 
-			ModuleMetaData.createModuleMetaDataFromManifest(JFireDepartmentEAR.MODULE_NAME, JFireDepartmentEAR.class);
-
 			// The complete method is executed in *one* transaction. So if one thing fails, all fail.
 			// => We check once at the beginning, if this module has already been initialised.
 			ModuleMetaData moduleMetaData = ModuleMetaData.getModuleMetaData(pm, JFireDepartmentEAR.MODULE_NAME);
@@ -120,8 +118,8 @@ implements DepartmentManagerRemote
 
 			logger.info("Initialization of " + JFireDepartmentEAR.MODULE_NAME + " started...");
 
-			pm.makePersistent(new ModuleMetaData(
-					JFireDepartmentEAR.MODULE_NAME, "0.9.7-0-beta", "0.9.7-0-beta")
+			moduleMetaData = pm.makePersistent(
+					ModuleMetaData.createModuleMetaDataFromManifest(JFireDepartmentEAR.MODULE_NAME, JFireDepartmentEAR.class)
 			);
 
 //			String baseName = "org.nightlabs.jfire.department.resource.messages";

@@ -1,3 +1,7 @@
 Manifest-Version: 1.0
-Class-Path: 
-
+Implementation-Title: JFireDynamicTradeEAR
+Implementation-Version: 1.0.0
+Implementation-Vendor: NightLabs.com
+Module-ID: JFireDynamicTradeEAR
+Module-Version: 1.0.0
+Schema-Version: 1.0.0

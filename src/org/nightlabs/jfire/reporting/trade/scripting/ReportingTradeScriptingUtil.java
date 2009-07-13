@@ -12,9 +12,11 @@ import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
+import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.Price;
 import org.nightlabs.jfire.accounting.PriceFragment;
 import org.nightlabs.jfire.accounting.PriceFragmentType;
+import org.nightlabs.jfire.reporting.JFireReportingHelper;
 import org.nightlabs.jfire.reporting.oda.DataType;
 import org.nightlabs.jfire.reporting.oda.ResultSetMetaData;
 import org.nightlabs.jfire.trade.Article;
@@ -129,21 +131,20 @@ public class ReportingTradeScriptingUtil {
 		row.add(article.getOrder() == null ? null : JDOHelper.getObjectId(article.getOrder()).toString());
 		row.add(article.getProduct() == null ? null : JDOHelper.getObjectId(article.getProduct()).toString());
 		row.add(JDOHelper.getObjectId(article.getProductType()).toString());
-		row.add(article.getProductType().getName().getText());
+		row.add(article.getProductType().getName().getText(JFireReportingHelper.getLocale()));
 		row.add(article.getReceptionNote() == null ? null : JDOHelper.getObjectId(article.getReceptionNote()).toString());
 		row.add(article.isReversed());
 		row.add(article.getReversingArticle() == null ? null : JDOHelper.getObjectId(article.getReversingArticle()).toString());
 		row.add(article.isReversing());
 		row.add(article.getReversedArticle() == null ? null : JDOHelper.getObjectId(article.getReversedArticle()).toString());
 		row.add(article.getTariff() == null ? null : JDOHelper.getObjectId(article.getTariff()).toString());
-		row.add(article.getTariff() == null ? null : article.getTariff().getName().getText());
+		row.add(article.getTariff() == null ? null : article.getTariff().getName().getText(JFireReportingHelper.getLocale()));
 	}
 	
 	/**
-	 * Returns an instance of {@link Properties} with the content of the given
-	 * Map where in the keys all "." are replaced with "_" and "_" with "__"
+	 * Replaces illegal characters in a column-name. Replaces all "." with "_" and "_" with "__"
 	 * 
-	 * @param mapProps The map to escape.
+	 * @param columnName The name to escape.
 	 */
 	private static String fakeResultColumnName(String columnName) {
 		String key = columnName.replaceAll("_", "__");

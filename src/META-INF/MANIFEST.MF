@@ -1,7 +1,6 @@
 Manifest-Version: 1.0
-Implementation-Title: JFireDynamicTradeEAR
-Implementation-Version: 1.0.0
-Implementation-Vendor: NightLabs.com
-Module-ID: JFireDynamicTradeEAR
-Module-Version: 1.0.0
-Schema-Version: 1.0.0
+EAR-Module-ID: JFireDynamicTradeEAR
+EAR-Module-Version: 1.0.0
+EAR-Schema-Version: 1.0.0
+Bundle-SymbolicName: JFireDynamicTrade
+Bundle-Version: 1.0.0

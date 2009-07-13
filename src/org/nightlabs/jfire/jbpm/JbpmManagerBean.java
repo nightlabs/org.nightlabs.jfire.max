@@ -128,9 +128,9 @@ implements JbpmManagerRemote
 					// this is the first time for the current organisation => deploy configuration
 
 					// version is {major}.{minor}.{release}-{patchlevel}-{suffix}
-					moduleMetaData = new ModuleMetaData(
-							JFireJbpmEAR.MODULE_NAME, "0.9.7-0-beta", "0.9.7-0-beta");
-					pm.makePersistent(moduleMetaData);
+					moduleMetaData = pm.makePersistent(
+							ModuleMetaData.createModuleMetaDataFromManifest(JFireJbpmEAR.MODULE_NAME, JFireJbpmEAR.class)
+					);
 
 
 					// perform deployment

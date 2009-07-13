@@ -98,7 +98,6 @@ import org.nightlabs.jfire.simpletrade.store.SimpleProductType;
 import org.nightlabs.jfire.simpletrade.store.SimpleProductTypeActionHandler;
 import org.nightlabs.jfire.simpletrade.store.prop.SimpleProductTypeStruct;
 import org.nightlabs.jfire.simpletrade.store.recurring.SimpleProductTypeRecurringTradeActionHandler;
-import org.nightlabs.jfire.store.CannotPublishProductTypeException;
 import org.nightlabs.jfire.store.NestedProductTypeLocal;
 import org.nightlabs.jfire.store.NotAvailableException;
 import org.nightlabs.jfire.store.Product;
@@ -130,7 +129,6 @@ import org.nightlabs.jfire.trade.recurring.RecurringOrder;
 import org.nightlabs.jfire.trade.recurring.RecurringTrader;
 import org.nightlabs.util.CollectionUtil;
 import org.nightlabs.util.Util;
-import org.nightlabs.version.Version;
 
 /**
  * @ejb.bean name="jfire/ejb/JFireSimpleTrade/SimpleTradeManager"
@@ -161,7 +159,7 @@ implements SimpleTradeManagerRemote
 	@RolesAllowed("_System_")
 	@Override
 	public void initialise()
-	throws CannotPublishProductTypeException
+	throws Exception
 	{
 		PersistenceManager pm = this.createPersistenceManager();
 		try {
@@ -174,9 +172,9 @@ implements SimpleTradeManagerRemote
 			logger.info("Initialization of JFireSimpleTrade started...");
 
 			// version is {major}.{minor}.{release}-{patchlevel}-{suffix}
-			Version version = new Version(0, 9, 5, 0, "beta");
-			moduleMetaData = new ModuleMetaData(JFireSimpleTradeEAR.MODULE_NAME, version, version);
-			pm.makePersistent(moduleMetaData);
+			moduleMetaData = pm.makePersistent(
+					ModuleMetaData.createModuleMetaDataFromManifest(JFireSimpleTradeEAR.MODULE_NAME, JFireSimpleTradeEAR.class)
+			);
 
 			SimpleProductTypeStruct.getSimpleProductTypeStructLocal(pm);
 

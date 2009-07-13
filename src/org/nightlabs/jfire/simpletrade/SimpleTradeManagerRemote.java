@@ -22,7 +22,6 @@ import org.nightlabs.jfire.organisation.id.OrganisationID;
 import org.nightlabs.jfire.prop.PropertySet;
 import org.nightlabs.jfire.prop.id.StructFieldID;
 import org.nightlabs.jfire.simpletrade.store.SimpleProductType;
-import org.nightlabs.jfire.store.CannotPublishProductTypeException;
 import org.nightlabs.jfire.store.NotAvailableException;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.trade.Article;
@@ -37,10 +36,9 @@ public interface SimpleTradeManagerRemote {
 	 * This method is called by the datastore initialisation mechanism.
 	 * It creates the root simple product for the organisation itself.
 	 * Simple products of other organisations must be imported.
-	 *
-	 * @throws CannotPublishProductTypeException
+	 * @throws Exception TODO
 	 */
-	void initialise() throws CannotPublishProductTypeException;
+	void initialise() throws Exception;
 
 	Set<ProductTypeID> getChildSimpleProductTypeIDs(ProductTypeID parentSimpleProductTypeID);
 

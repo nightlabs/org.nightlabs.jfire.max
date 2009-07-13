@@ -110,6 +110,8 @@ implements DepartmentManagerRemote
 
 			pm.getExtent(Department.class);
 
+			ModuleMetaData.createModuleMetaDataFromManifest(JFireDepartmentEAR.MODULE_NAME, JFireDepartmentEAR.class);
+
 			// The complete method is executed in *one* transaction. So if one thing fails, all fail.
 			// => We check once at the beginning, if this module has already been initialised.
 			ModuleMetaData moduleMetaData = ModuleMetaData.getModuleMetaData(pm, JFireDepartmentEAR.MODULE_NAME);

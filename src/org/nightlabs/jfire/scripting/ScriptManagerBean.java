@@ -49,7 +49,6 @@ import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.scripting.id.ScriptParameterSetID;
 import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
-import org.nightlabs.version.Version;
 
 /**
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
@@ -80,7 +79,7 @@ implements ScriptManagerRemote
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("_System_")
-	public void initialise()
+	public void initialise() throws Exception
 	{
 		PersistenceManager pm;
 		pm = createPersistenceManager();
@@ -90,10 +89,12 @@ implements ScriptManagerRemote
 				logger.info("Initialization of JFireScripting started ...");
 
 				// version is {major}.{minor}.{release}-{patchlevel}-{suffix}
-				Version version = new Version(0, 9, 5, 0, "beta");
-				moduleMetaData = new ModuleMetaData(JFireScriptingEAR.MODULE_NAME, version, version);
-				pm.makePersistent(moduleMetaData);
-				logger.info("Persisted ModuleMetaData for JFireScripting with version 0.9.7-0-beta");
+//				Version version = new Version(0, 9, 5, 0, "beta");
+//				moduleMetaData = new ModuleMetaData(JFireScriptingEAR.MODULE_NAME, version, version);
+				moduleMetaData = pm.makePersistent(
+						ModuleMetaData.createModuleMetaDataFromManifest(JFireScriptingEAR.MODULE_NAME, JFireScriptingEAR.class)
+				);
+				logger.info("Persisted ModuleMetaData for JFireScripting.");
 			}
 		} finally {
 			pm.close();

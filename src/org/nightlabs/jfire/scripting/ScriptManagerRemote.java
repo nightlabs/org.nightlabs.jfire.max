@@ -20,8 +20,9 @@ public interface ScriptManagerRemote {
 
 	/**
 	 * This method is called by the datastore initialisation mechanism.
+	 * @throws Exception TODO
 	 */
-	void initialise();
+	void initialise() throws Exception;
 
 	ScriptRegistryItem getScriptRegistryItem(ScriptRegistryItemID scriptRegistryItemID, String[] fetchGroups, int maxFetchDepth);
 

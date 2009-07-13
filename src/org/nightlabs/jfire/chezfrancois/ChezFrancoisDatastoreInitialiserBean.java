@@ -104,7 +104,7 @@ implements ChezFrancoisDatastoreInitialiserRemote, ChezFrancoisDatastoreInitiali
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("_System_")
 	public void createModuleMetaData()
-	throws MalformedVersionException
+	throws MalformedVersionException, IOException
 	{
 		logger.trace("createModuleMetaData: begin");
 
@@ -117,9 +117,9 @@ implements ChezFrancoisDatastoreInitialiserRemote, ChezFrancoisDatastoreInitiali
 			logger.debug("Initialization of JFireChezFrancois started...");
 
 			// version is {major}.{minor}.{release}-{patchlevel}-{suffix}
-			moduleMetaData = new ModuleMetaData(
-					"JFireChezFrancois", "0.9.7-0-beta", "0.9.7-0-beta");
-			pm.makePersistent(moduleMetaData);
+			moduleMetaData = pm.makePersistent(
+					ModuleMetaData.createModuleMetaDataFromManifest(JFireChezFrancoisEAR.MODULE_NAME, JFireChezFrancoisEAR.class)
+			);
 
 			Workstation ws = new Workstation(getOrganisationID(), "ws00");
 			ws.setDescription("Workstation 00");
@@ -143,7 +143,7 @@ implements ChezFrancoisDatastoreInitialiserRemote, ChezFrancoisDatastoreInitiali
 
 		PersistenceManager pm = this.createPersistenceManager();
 		try {
-			ModuleMetaData moduleMetaData = ModuleMetaData.getModuleMetaData(pm, "JFireChezFrancois");
+			ModuleMetaData moduleMetaData = ModuleMetaData.getModuleMetaData(pm, JFireChezFrancoisEAR.MODULE_NAME);
 			if (moduleMetaData != null)
 				return;
 

@@ -1,5 +1,7 @@
 package org.nightlabs.jfire.chezfrancois;
 
+import java.io.IOException;
+
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Remote;
 import javax.ejb.TransactionAttribute;
@@ -34,10 +36,11 @@ public interface ChezFrancoisDatastoreInitialiserRemote {
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_System_"
 	 * @ejb.transaction type="Required"
+	 * @throws IOException TODO
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("_System_")
-	void createModuleMetaData() throws MalformedVersionException;
+	void createModuleMetaData() throws MalformedVersionException, IOException;
 
 	/**
 	 * @ejb.interface-method

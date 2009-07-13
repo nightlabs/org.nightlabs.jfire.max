@@ -12,7 +12,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Random;
 import java.util.Set;
 
 import javax.annotation.security.RolesAllowed;
@@ -1475,54 +1474,55 @@ implements IssueManagerRemote
 
 
 
-			// ---[ Issues ]----------------------------------------------------------------------------------------------------| Start |---
 			// TODO Move the following DEMO Issues to a demo-data-creation module; yet to be created. Coming soon... stay tuned ;-)
-			pm.getExtent(Issue.class);
-
-			int totDemoIssueCnt = 56;
-			boolean isCreateArbitraryIssueToIssueLinks = !true;
-			List<IssuePriority> def_issuePriorities = issueTypeDefault.getIssuePriorities();
-			List<IssueResolution> def_issueResolutions = issueTypeDefault.getIssueResolutions();
-			List<IssueSeverityType> def_issueSeverityTypes = issueTypeDefault.getIssueSeverityTypes();
-			List<Issue> demoIssues = new ArrayList<Issue>(totDemoIssueCnt);
-
-			Random rndGen = new Random( System.currentTimeMillis() );
-			for (int i=0; i<totDemoIssueCnt; i++) {
-				Issue demoIssue = new Issue(true, issueTypeDefault);
-
-				// Essential issue settings
-				demoIssue.setReporter(systemUser);
-				demoIssue.setIssuePriority( def_issuePriorities.get( rndGen.nextInt(def_issuePriorities.size()) ) );
-				demoIssue.setIssueResolution( def_issueResolutions.get( rndGen.nextInt(def_issueResolutions.size()) ) );
-				demoIssue.setIssueSeverityType( def_issueSeverityTypes.get( rndGen.nextInt(def_issueSeverityTypes.size()) ) );
-
-				// Subject and description
-				demoIssue.getSubject().readFromProperties(baseName, loader, "org.nightlabs.jfire.issue.IssueManagerBean.issueSubject" + (i+1)); //$NON-NLS-1$
-				demoIssue.getDescription().readFromProperties(baseName, loader, "org.nightlabs.jfire.issue.IssueManagerBean.issueDescription" + (i+1)); //$NON-NLS-1$
-
-				// Markers
-				if (rndGen.nextInt(100) < 40)	demoIssue.addIssueMarker(issueMarker_Phone);
-				if (rndGen.nextInt(100) < 65)	demoIssue.addIssueMarker(issueMarker_Email);
-
-
-				// Randomly (and playfully?) create links between Issues.
-				if (isCreateArbitraryIssueToIssueLinks && demoIssues.size() > 5) {
-					List<Integer> usedIndexRefs = new ArrayList<Integer>();
-					while (rndGen.nextInt(100) < 67 && usedIndexRefs.size() < demoIssues.size()/2) {
-						int index = rndGen.nextInt(demoIssues.size());
-						if ( !usedIndexRefs.contains(index) ) {
-							demoIssue.createIssueLink(issueLinkTypeParent, demoIssues.get(index));
-							usedIndexRefs.add(index);
-						}
-					}
-				}
-
-
-				// Done and store.
-				demoIssues.add(demoIssue);
-				storeIssue(demoIssue, false, new String[0], NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
-			}
-			// ---[ Issues ]------------------------------------------------------------------------------------------------------| End |---
+			//      Done. Moved to InitialiserIssueTracking.
+//			// ---[ Issues ]----------------------------------------------------------------------------------------------------| Start |---
+//			pm.getExtent(Issue.class);
+//
+//			int totDemoIssueCnt = 56;
+//			boolean isCreateArbitraryIssueToIssueLinks = !true;
+//			List<IssuePriority> def_issuePriorities = issueTypeDefault.getIssuePriorities();
+//			List<IssueResolution> def_issueResolutions = issueTypeDefault.getIssueResolutions();
+//			List<IssueSeverityType> def_issueSeverityTypes = issueTypeDefault.getIssueSeverityTypes();
+//			List<Issue> demoIssues = new ArrayList<Issue>(totDemoIssueCnt);
+//
+//			Random rndGen = new Random( System.currentTimeMillis() );
+//			for (int i=0; i<totDemoIssueCnt; i++) {
+//				Issue demoIssue = new Issue(true, issueTypeDefault);
+//
+//				// Essential issue settings
+//				demoIssue.setReporter(systemUser);
+//				demoIssue.setIssuePriority( def_issuePriorities.get( rndGen.nextInt(def_issuePriorities.size()) ) );
+//				demoIssue.setIssueResolution( def_issueResolutions.get( rndGen.nextInt(def_issueResolutions.size()) ) );
+//				demoIssue.setIssueSeverityType( def_issueSeverityTypes.get( rndGen.nextInt(def_issueSeverityTypes.size()) ) );
+//
+//				// Subject and description
+//				demoIssue.getSubject().readFromProperties(baseName, loader, "org.nightlabs.jfire.issue.IssueManagerBean.issueSubject" + (i+1)); //$NON-NLS-1$
+//				demoIssue.getDescription().readFromProperties(baseName, loader, "org.nightlabs.jfire.issue.IssueManagerBean.issueDescription" + (i+1)); //$NON-NLS-1$
+//
+//				// Markers
+//				if (rndGen.nextInt(100) < 40)	demoIssue.addIssueMarker(issueMarker_Phone);
+//				if (rndGen.nextInt(100) < 65)	demoIssue.addIssueMarker(issueMarker_Email);
+//
+//
+//				// Randomly (and playfully?) create links between Issues.
+//				if (isCreateArbitraryIssueToIssueLinks && demoIssues.size() > 5) {
+//					List<Integer> usedIndexRefs = new ArrayList<Integer>();
+//					while (rndGen.nextInt(100) < 67 && usedIndexRefs.size() < demoIssues.size()/2) {
+//						int index = rndGen.nextInt(demoIssues.size());
+//						if ( !usedIndexRefs.contains(index) ) {
+//							demoIssue.createIssueLink(issueLinkTypeParent, demoIssues.get(index));
+//							usedIndexRefs.add(index);
+//						}
+//					}
+//				}
+//
+//
+//				// Done and store.
+//				demoIssues.add(demoIssue);
+//				storeIssue(demoIssue, false, new String[0], NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
+//			}
+//			// ---[ Issues ]------------------------------------------------------------------------------------------------------| End |---
 
 
 

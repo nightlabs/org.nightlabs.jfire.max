@@ -252,7 +252,12 @@ implements ReportManagerRemote
 					urls.add(f.toURI().toURL());
 				}
 			}
-			reportEngineInitaliser = createReportInitialiser(urls.toArray(new URL[urls.size()]));
+			if (reportEngineInitaliser == null) {
+				synchronized (ReportManagerBean.class) {
+					if (reportEngineInitaliser == null)
+						reportEngineInitaliser = createReportInitialiser(urls.toArray(new URL[urls.size()]));
+				}
+			}
 
 			// init layout renderer
 			ReportRegistry registry = ReportRegistry.getReportRegistry(pm);

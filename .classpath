@@ -25,5 +25,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/org.nightlabs.concurrent"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.nightlabs.config"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.nightlabs.editor2d"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/JFireIssueTracking"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

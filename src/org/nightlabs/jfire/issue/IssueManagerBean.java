@@ -1235,8 +1235,8 @@ implements IssueManagerRemote
 
 			logger.info("Initialization of " + JFireIssueTrackingEAR.MODULE_NAME + " started...");
 
-			pm.makePersistent(new ModuleMetaData(
-					JFireIssueTrackingEAR.MODULE_NAME, "0.9.7-0-beta", "0.9.7-0-beta")
+			moduleMetaData = pm.makePersistent(
+					ModuleMetaData.createModuleMetaDataFromManifest(JFireIssueTrackingEAR.MODULE_NAME, JFireIssueTrackingEAR.class)
 			);
 
 			String baseName = "org.nightlabs.jfire.issue.resource.messages";

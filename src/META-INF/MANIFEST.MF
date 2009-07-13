@@ -1,3 +1,6 @@
 Manifest-Version: 1.0
-Class-Path: 
-
+EAR-Module-ID: JFireTradeEAR
+EAR-Module-Version: 1.0.0
+EAR-Schema-Version: 1.0.0
+Bundle-SymbolicName: JFireTrade
+Bundle-Version: 1.0.0

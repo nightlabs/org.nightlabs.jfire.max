@@ -242,7 +242,7 @@ public class ReportingInitialiser {
 		if (!reportInitDir.exists())
 			throw new IllegalStateException("Report initialisation directory does not exist: " + reportInitDir.getAbsolutePath());
 
-		logger.debug("BEGIN initialization of ReportLayouts");
+		logger.debug("BEGIN initialization of ReportLayouts from folder " + reportInitDir);
 //		initDefaultParameterSets();
 
 		// initialise meta-data

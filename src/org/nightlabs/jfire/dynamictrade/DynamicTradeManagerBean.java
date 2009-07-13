@@ -95,14 +95,12 @@ implements DynamicTradeManagerRemote
 		try {
 			String organisationID = getOrganisationID();
 
-			ModuleMetaData.createModuleMetaDataFromManifest(JFireDynamicTradeEAR.MODULE_NAME, JFireDynamicTradeEAR.class);
-
 			ModuleMetaData moduleMetaData = ModuleMetaData.getModuleMetaData(pm, JFireDynamicTradeEAR.MODULE_NAME);
 			if (moduleMetaData != null)
 				return;
 
-			pm.makePersistent(new ModuleMetaData(
-					JFireDynamicTradeEAR.MODULE_NAME, "0.9.7.0.0.beta", "0.9.7.0.0.beta")
+			moduleMetaData = pm.makePersistent(
+					ModuleMetaData.createModuleMetaDataFromManifest(JFireDynamicTradeEAR.MODULE_NAME, JFireDynamicTradeEAR.class)
 			);
 
 			// initialise meta-data

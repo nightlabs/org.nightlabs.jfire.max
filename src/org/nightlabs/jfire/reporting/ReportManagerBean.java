@@ -287,10 +287,10 @@ implements ReportManagerRemote
 
 
 				// version is {major}.{minor}.{release}-{patchlevel}-{suffix}
-				moduleMetaData = new ModuleMetaData(
-						JFireReportingEAR.MODULE_NAME, "0.9.7-0-beta", "0.9.7-0-beta");
-				pm.makePersistent(moduleMetaData);
-				logger.info("Persisted ModuleMetaData for JFireReporting with version 0.9.7-0-beta");
+				moduleMetaData =  pm.makePersistent(
+						ModuleMetaData.createModuleMetaDataFromManifest(JFireReportingEAR.MODULE_NAME, JFireReportingEAR.class)
+				);
+				logger.info("Persisted ModuleMetaData for JFireReporting with version " + moduleMetaData.getSchemaVersion());
 
 				initRegisterConfigModules(pm);
 				logger.info("Initialized Reporting ConfigModules");

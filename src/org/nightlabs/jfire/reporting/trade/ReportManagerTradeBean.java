@@ -127,7 +127,7 @@ implements ReportManagerTradeRemote
 		} finally {
 			pm.close();
 		}
-		
+
 	}
 	/* (non-Javadoc)
 	 * @see org.nightlabs.jfire.reporting.trade.ReportManagerTradeRemote#initializeReporting()
@@ -139,8 +139,8 @@ implements ReportManagerTradeRemote
 			ModuleMetaData moduleMetaData = ModuleMetaData.getModuleMetaData(pm, JFireReportingTradeEAR.MODULE_NAME);
 			if (moduleMetaData == null) {
 
-				pm.makePersistent(new ModuleMetaData(
-						JFireReportingTradeEAR.MODULE_NAME, "0.9.7.0.0.beta", "0.9.7.0.0.beta")
+				moduleMetaData = pm.makePersistent(
+						ModuleMetaData.createModuleMetaDataFromManifest(JFireReportingTradeEAR.MODULE_NAME, JFireReportingTradeEAR.class)
 				);
 
 				// initialise meta-data

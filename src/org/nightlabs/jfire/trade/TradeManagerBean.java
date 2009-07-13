@@ -1166,9 +1166,9 @@ implements TradeManagerRemote, TradeManagerLocal
 			logger.info("Initialization of JFireTrade-ConfigModules started...");
 
 			// version is {major}.{minor}.{release}.{patchlevel}.{suffix}
-			moduleMetaData = new ModuleMetaData(
-					JFireTradeEAR.MODULE_NAME, "0.9.7.0.beta", "0.9.7.0.beta");
-			pm.makePersistent(moduleMetaData);
+			pm.makePersistent(
+					ModuleMetaData.createModuleMetaDataFromManifest(JFireTradeEAR.MODULE_NAME, JFireTradeEAR.class)
+			);
 
 			// Initalise standard property set structures for articleContainers
 			OfferStruct.getOfferStructLocal(pm);

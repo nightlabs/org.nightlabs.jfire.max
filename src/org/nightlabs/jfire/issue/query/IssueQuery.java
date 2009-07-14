@@ -218,23 +218,22 @@ extends AbstractJDOQuery
 					filter.append(")");
 				}
 			}
-			logger.info(filter);
 		}
 		
 		if (isFieldEnabled(FieldName.linkedObjectClasses) && linkedObjectClasses != null && !linkedObjectClasses.isEmpty()) {
 			filter.append("\n && (issueLinks.contains(varIssueLink) && (");
 			int i = 0;
 			for (Iterator<Class> it = linkedObjectClasses.iterator(); it.hasNext(); i++) {
-				String linkedObjectClassName = it.next().getName();
+				String linkedObjectClassName = it.next().getSimpleName();
 				linkedObjectClassNameExpr = ".*" + linkedObjectClassName + ".*";
 				
-				filter.append("(varIssueLink.linkedObjectID.toLowerCase().matches(:linkedObjectClassNameExpr.toLowerCase()))");
+				filter.append("(varIssueLink.linkedObjectID.toLowerCase().matches(\""+ linkedObjectClassNameExpr.toLowerCase()+"\"))");
+//				filter.append("(varIssueLink.linkedObjectID.toLowerCase().matches(:linkedObjectClassNameExpr.toLowerCase()))");
 				
 				if (i < linkedObjectClasses.size() - 1)
 					filter.append(" || ");
 			}
 			filter.append("))");
-			logger.info(filter);
 		}
 		// FIXME: chairat please rewrite this part as soon as you have refactored the linkage of objects to Issues. (marius)
 //		if (issueLinks != null && !issueLinks.isEmpty())

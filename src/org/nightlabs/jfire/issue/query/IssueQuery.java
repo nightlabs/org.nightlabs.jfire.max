@@ -1,6 +1,5 @@
 package org.nightlabs.jfire.issue.query;
 
-import java.lang.reflect.Field;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -77,6 +76,8 @@ extends AbstractJDOQuery
 	private boolean isSetCurrentUserAsAssignee;
 	private boolean isSetCurrentUserAsReporter;
 	
+	private Set<Class> linkedObjectClasses;
+	private transient String linkedObjectClassNameExpr;
 	/**
 	 *  A static class contained all parameters that can be set to the query.
 	 *  It's intended to use internally!!
@@ -103,6 +104,7 @@ extends AbstractJDOQuery
 		public static final String projectIDs = "projectIDs";
 		
 		public static final String jbpmNodeName = "jbpmNodeName";
+		public static final String linkedObjectClasses = "linkedObjectClasses";
 	}
 
 	/**
@@ -199,9 +201,9 @@ extends AbstractJDOQuery
 			filter.append("\n && (this.state.stateDefinition.jbpmNodeName == :jbpmNodeName)");
 		}
 		
-		if (isFieldEnabled(FieldName.projectIDs) && projectIDs != null && projectIDs.size() > 0) {
+		if (isFieldEnabled(FieldName.projectIDs) && projectIDs != null && !projectIDs.isEmpty()) {
 			int i = 0;
-			for ( Iterator<ProjectID> it = projectIDs.iterator(); it.hasNext(); i++) {
+			for (Iterator<ProjectID> it = projectIDs.iterator(); it.hasNext(); i++) {
 				ProjectID pid = it.next();
 				if (i == 0) {
 					filter.append("\n && this.project.organisationID == \"" + pid.organisationID + "\" && (");
@@ -216,6 +218,22 @@ extends AbstractJDOQuery
 					filter.append(")");
 				}
 			}
+			logger.info(filter);
+		}
+		
+		if (isFieldEnabled(FieldName.linkedObjectClasses) && linkedObjectClasses != null && !linkedObjectClasses.isEmpty()) {
+			filter.append("\n && (issueLinks.contains(varIssueLink) && (");
+			int i = 0;
+			for (Iterator<Class> it = linkedObjectClasses.iterator(); it.hasNext(); i++) {
+				String linkedObjectClassName = it.next().getName();
+				linkedObjectClassNameExpr = ".*" + linkedObjectClassName + ".*";
+				
+				filter.append("(varIssueLink.linkedObjectID.toLowerCase().matches(:linkedObjectClassNameExpr.toLowerCase()))");
+				
+				if (i < linkedObjectClasses.size() - 1)
+					filter.append(" || ");
+			}
+			filter.append("))");
 			logger.info(filter);
 		}
 		// FIXME: chairat please rewrite this part as soon as you have refactored the linkage of objects to Issues. (marius)
@@ -640,7 +658,7 @@ extends AbstractJDOQuery
 	}
 
 	/**
-	 * 
+	 * Returns the String of the issue state
 	 * @return
 	 */
 	public String getJbpmNodeName() {
@@ -648,7 +666,7 @@ extends AbstractJDOQuery
 	}
 	
 	/**
-	 * 
+	 * Sets the String of the issue state.
 	 * @param jbpmNodeName
 	 */
 	public void setJbpmNodeName(String jbpmNodeName) {
@@ -656,6 +674,25 @@ extends AbstractJDOQuery
 		this.jbpmNodeName = jbpmNodeName;
 		notifyListeners(FieldName.jbpmNodeName, oldJbpmNodeName, jbpmNodeName);
 	}
+	
+	/**
+	 * Returns the {@link Class} of the issue linked object.
+	 * @return
+	 */
+	public Set<Class> getLinkedObjectClasses() {
+		return linkedObjectClasses;
+	}
+	
+	/**
+	 * Sets the {@link Class} of the issue linked object.
+	 * @param linkedObjectClassName
+	 */
+	public void setLinkedObjectClasses(Set<Class> linkedObjectClasses) {
+		final Set<Class> oldLinkedObjectClasses = this.linkedObjectClasses;
+		this.linkedObjectClasses = linkedObjectClasses;
+		notifyListeners(FieldName.linkedObjectClasses, oldLinkedObjectClasses, linkedObjectClasses);
+	}
+	
 	@Override
 	/**
 	 * {@inheritDoc}

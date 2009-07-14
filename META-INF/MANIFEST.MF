@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Reporting Plug-in
 Bundle-SymbolicName: org.nightlabs.jfire.reporting.oda.client;singleton:=true
-Bundle-Version: 0.9.7.qualifier
+Bundle-Version: 1.0.0.qualifier
 Bundle-ClassPath: .
 Bundle-Activator: org.nightlabs.jfire.reporting.oda.client.ReportingOdaClientPlugin
 Bundle-Vendor: NightLabs.org

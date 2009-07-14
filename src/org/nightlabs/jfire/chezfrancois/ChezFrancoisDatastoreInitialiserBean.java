@@ -114,7 +114,7 @@ implements ChezFrancoisDatastoreInitialiserRemote, ChezFrancoisDatastoreInitiali
 
 		PersistenceManager pm = this.createPersistenceManager();
 		try {
-			ModuleMetaData moduleMetaData = ModuleMetaData.getModuleMetaData(pm, "JFireChezFrancois");
+			ModuleMetaData moduleMetaData = ModuleMetaData.getModuleMetaData(pm, JFireChezFrancoisEAR.MODULE_NAME);
 			if (moduleMetaData != null)
 				return;
 

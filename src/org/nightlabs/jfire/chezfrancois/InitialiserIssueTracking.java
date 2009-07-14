@@ -45,46 +45,33 @@ public class InitialiserIssueTracking extends Initialiser {
 	 * TODO The sister classes extending the {@link Initialiser} throw a series of exception here. Go figure what is needed for this scenario. Kai
 	 */
 	public void createDemoData() {
-		// IssueType issueTypeDefault = new IssueType(organisationID, IssueType.DEFAULT_ISSUE_TYPE_ID); // <-- This would have already been created during the initialisation of IssueManagerBean.
-		                                                                                                //     So we only need to search for it, and get its reference.
+		// Get a reference to the IssueManagerBean.
+		IssueManagerRemote issueMgr = JFireEjb3Factory.getRemoteBean(IssueManagerRemote.class, SecurityReflector.getInitialContextProperties());
 
+		// Determine if we need to create the demo data at all.
+		if ( !issueMgr.getIssueIDs().isEmpty() ) {
+			if (logger.isDebugEnabled())
+				logger.info("  ------------------------>> DEMO DATA for Issues already exist; a total of " + issueMgr.getIssueIDs().size() + " in the datastore.");
+			return;
+		}
+
+
+		// ::: Search for IssueType.DEFAULT_ISSUE_TYPE_ID.
 		IssueType issueTypeDefault = null;
 		final Query allIDsQuery = pm.newNamedQuery(IssueType.class, IssueType.QUERY_ALL_ISSUETYPE_IDS);
 		Set<IssueTypeID> issueTypeIDs = CollectionUtil.createHashSetFromCollection( allIDsQuery.execute() );
-		if (logger.isDebugEnabled()) {
-			logger.info("Found IssueTypeIDs:");
 
-			// Search for IssueType.DEFAULT_ISSUE_TYPE_ID.
-			for (IssueTypeID issueTypeID : issueTypeIDs) {
-				logger.info("  --> " + issueTypeID.issueTypeID + ", " + issueTypeID.toString());
-
-				if (issueTypeID.issueTypeID.equals(IssueType.DEFAULT_ISSUE_TYPE_ID)) {
-					issueTypeDefault = (IssueType) pm.getObjectById(issueTypeID);
-					break;
-				}
+		for (IssueTypeID issueTypeID : issueTypeIDs)
+			if (issueTypeID.issueTypeID.equals(IssueType.DEFAULT_ISSUE_TYPE_ID)) {
+				issueTypeDefault = (IssueType) pm.getObjectById(issueTypeID);
+				break;
 			}
-		}
 
 		if (issueTypeDefault == null) return;	// <-- Should throw something here??
 
 
-		// Proceed...
+		// Proceed only if the default IssueType can be found. We should otherwise create one??
 		String organisationID = getOrganisationID();
-		if (logger.isDebugEnabled()) {
-			logger.info("Found default IssueType: " + issueTypeDefault.toString());
-			logger.info("OrganisationID: " + organisationID);
-		}
-
-
-
-		// I need a reference to the IssueManagerBean, to save the newly created demo Issues, since I cannot
-		// just persist them like as for nomally that is being done by the other sister classes.
-		// --> See also: ChezFrancoisDatastoreInitialiserLocal initialiser = JFireEjb3Factory.getLocalBean(ChezFrancoisDatastoreInitialiserLocal.class);
-		//          and: IssueManagerRemote im = JFireEjb3Factory.getRemoteBean(IssueManagerRemote.class, SecurityReflector.getInitialContextProperties());
-		IssueManagerRemote issueMgr = JFireEjb3Factory.getRemoteBean(IssueManagerRemote.class, SecurityReflector.getInitialContextProperties()); // Woo hoo! This works OK :)
-
-
-		// It seems that I can forgo DataCreator??
 		User sysUser = User.getUser(pm, getPrincipal());
 		String baseName = "org.nightlabs.jfire.issue.resource.messages";  // } --> FIXME Change these to read from the appropriate file at the appropriate location! Kai.
 		ClassLoader loader = IssueManagerBean.class.getClassLoader();     // }
@@ -112,7 +99,7 @@ public class InitialiserIssueTracking extends Initialiser {
 			demoIssue.getDescription().readFromProperties(baseName, loader, "org.nightlabs.jfire.issue.IssueManagerBean.issueDescription" + (i+1)); //$NON-NLS-1$
 
 			if (logger.isDebugEnabled()) {
-				logger.info("Creating Issue: (ID:" + demoIssue.getIssueID() + ") "  + demoIssue.getSubject().getText());
+				logger.info(" ::: Creating Issue: (ID:" + demoIssue.getIssueID() + ") "  + demoIssue.getSubject().getText() + " [" + demoIssue.getDescription().getText() + "]");
 			}
 
 			// IssueMarkers.

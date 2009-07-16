@@ -70,7 +70,7 @@ public class JbpmLookup
 					throw new IllegalStateException("JbpmConfigurationCarrier.jbpmConfiguration is null!");
 				return res;
 			} finally {
-				initialContext.close();
+//				initialContext.close(); // https://www.jfire.org/modules/bugs/view.php?id=1178
 			}
 		} catch (NamingException x) {
 			throw new RuntimeException("Could not obtain JbpmConfiguration \""+jndiName+"\" from JNDI!", x);

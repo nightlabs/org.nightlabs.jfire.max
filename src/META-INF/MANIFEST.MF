@@ -1,6 +1,3 @@
 Manifest-Version: 1.0
-EAR-Module-ID: JFireScriptingEditor2DEAR
-EAR-Module-Version: 1.0.0
-EAR-Schema-Version: 1.0.0
 Bundle-SymbolicName: JFireScriptingEditor2D
 Bundle-Version: 1.0.0

@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -1270,5 +1271,88 @@ implements StoreCallback
 		}
 	}
 
+	/**
+	 * Modify an invoice's creation date+time.
+	 * <p>
+	 * <b>Warning!</b> This is not a usual API method but solely meant for import interfaces
+	 * which import data from another system and thus require to manually change the creation
+	 * date+time. It is highly recommended to not use this method if you don't absolutely need it!
+	 * </p>
+	 *
+	 * @param invoice the invoice to be modified.
+	 * @param createDT the new creation-date+time
+	 */
+	public void modifyInvoiceCreateDT(Invoice invoice, Date createDT)
+	{
+		if (invoice == null)
+			throw new IllegalArgumentException("invoice must not be null!");
+
+		if (createDT == null)
+			throw new IllegalStateException("createDT must not be null!");
+
+		invoice.modifyCreateDT(createDT);
+		// TODO we should in the future update the jBPM workflow data, too.
+	}
+
+	/**
+	 * Modify an invoice's finalization date+time.
+	 * <p>
+	 * <b>Warning!</b> This is not a usual API method but solely meant for import interfaces
+	 * which import data from another system and thus require to manually change the finalization
+	 * date+time. It is highly recommended to not use this method if you don't absolutely need it!
+	 * </p>
+	 *
+	 * @param invoice the invoice to be modified.
+	 * @param finalizeDT the new finalization-date+time
+	 */
+	public void modifyInvoiceFinalizeDT(Invoice invoice, Date finalizeDT)
+	{
+		if (invoice == null)
+			throw new IllegalArgumentException("invoice must not be null!");
+
+		if (finalizeDT == null)
+			throw new IllegalStateException("finalizeDT must not be null!");
+
+		invoice.modifyFinalizeDT(finalizeDT);
+		// TODO we should in the future update the jBPM workflow data, too.
+	}
+
+	/**
+	 * Modify an invoice's creation user.
+	 * <p>
+	 * <b>Warning!</b> This is not a usual API method but solely meant for import interfaces
+	 * which import data from another system and thus require to manually change the creation
+	 * user. It is highly recommended to not use this method if you don't absolutely need it!
+	 * </p>
+	 *
+	 * @param invoice the invoice to be modified.
+	 * @param createUser the new creation-user.
+	 */
+	public void modifyInvoiceCreateUser(Invoice invoice, User createUser) {
+		if (invoice == null)
+			throw new IllegalArgumentException("invoice must not be null!");
+
+		invoice.modifyCreateUser(createUser);
+		// TODO we should in the future update the jBPM workflow data, too.
+	}
+
+	/**
+	 * Modify an invoice's finalization user.
+	 * <p>
+	 * <b>Warning!</b> This is not a usual API method but solely meant for import interfaces
+	 * which import data from another system and thus require to manually change the creation
+	 * user. It is highly recommended to not use this method if you don't absolutely need it!
+	 * </p>
+	 *
+	 * @param invoice the invoice to be modified.
+	 * @param createUser the new finalization-user.
+	 */
+	public void modifyInvoiceFinalizeUser(Invoice invoice, User finalizeUser) {
+		if (invoice == null)
+			throw new IllegalArgumentException("invoice must not be null!");
+
+		invoice.modifyFinalizeUser(finalizeUser);
+		// TODO we should in the future update the jBPM workflow data, too.
+	}
 
 }

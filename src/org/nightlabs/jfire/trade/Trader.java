@@ -32,6 +32,7 @@ import java.net.URL;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -2592,5 +2593,118 @@ public class Trader
 		for (OfferActionHandler offerActionHandler : offer.getOfferLocal().getOfferActionHandlers()) {
 			offerActionHandler.onRejectOffer(user, offer);
 		}
+	}
+
+	/**
+	 * Modify an order's creation date+time.
+	 * <p>
+	 * <b>Warning!</b> This is not a usual API method but solely meant for import interfaces
+	 * which import data from another system and thus require to manually change the creation
+	 * date+time. It is highly recommended to not use this method if you don't absolutely need it!
+	 * </p>
+	 *
+	 * @param order the order to be modified.
+	 * @param createDT the new creation date+time.
+	 */
+	public void modifyOrderCreateDT(Order order, Date createDT)
+	{
+		if (order == null)
+			throw new IllegalArgumentException("order must not be null!");
+
+		if (createDT == null)
+			throw new IllegalStateException("createDT must not be null!");
+
+		order.modifyCreateDT(createDT);
+	}
+
+	/**
+	 * Modify an offer's creation date+time.
+	 * <p>
+	 * <b>Warning!</b> This is not a usual API method but solely meant for import interfaces
+	 * which import data from another system and thus require to manually change the creation
+	 * date+time. It is highly recommended to not use this method if you don't absolutely need it!
+	 * </p>
+	 * <p>
+	 * The new creation date/time must not be before the order's creation date+time. You
+	 * might need to call {@link #modifyOrderCreateDT(Order, Date)}, too.
+	 * </p>
+	 *
+	 * @param offer the offer to be modified.
+	 * @param createDT the new creation-date+time
+	 */
+	public void modifyOfferCreateDT(Offer offer, Date createDT)
+	{
+		if (offer == null)
+			throw new IllegalArgumentException("offer must not be null!");
+
+		if (createDT == null)
+			throw new IllegalStateException("createDT must not be null!");
+
+		if (createDT.before(offer.getOrder().getCreateDT()))
+			throw new IllegalArgumentException("createDT is before the order's creation! You must choose a later date or first call Trader.modifyOrderCreateDT(...)! offer=" + offer.getPrimaryKey() + " order=" + offer.getOrder().getPrimaryKey() + " createDT=" + createDT);
+
+		offer.modifyCreateDT(createDT);
+		// TODO we should in the future update the jBPM workflow data, too.
+	}
+
+	/**
+	 * Modify an offer's finalization date+time.
+	 * <p>
+	 * <b>Warning!</b> This is not a usual API method but solely meant for import interfaces
+	 * which import data from another system and thus require to manually change the finalization
+	 * date+time. It is highly recommended to not use this method if you don't absolutely need it!
+	 * </p>
+	 *
+	 * @param offer the offer to be modified.
+	 * @param finalizeDT the new finalization-date+time
+	 */
+	public void modifyOfferFinalizeDT(Offer offer, Date finalizeDT)
+	{
+		if (offer == null)
+			throw new IllegalArgumentException("offer must not be null!");
+
+		if (finalizeDT == null)
+			throw new IllegalStateException("finalizeDT must not be null!");
+
+		offer.modifyFinalizeDT(finalizeDT);
+		// TODO we should in the future update the jBPM workflow data, too.
+	}
+
+	/**
+	 * Modify an offer's creation user.
+	 * <p>
+	 * <b>Warning!</b> This is not a usual API method but solely meant for import interfaces
+	 * which import data from another system and thus require to manually change the creation
+	 * user. It is highly recommended to not use this method if you don't absolutely need it!
+	 * </p>
+	 *
+	 * @param offer the offer to be modified.
+	 * @param createUser the new creation-user.
+	 */
+	public void modifyOfferCreateUser(Offer offer, User createUser) {
+		if (offer == null)
+			throw new IllegalArgumentException("offer must not be null!");
+
+		offer.modifyCreateUser(createUser);
+		// TODO we should in the future update the jBPM workflow data, too.
+	}
+
+	/**
+	 * Modify an offer's finalization user.
+	 * <p>
+	 * <b>Warning!</b> This is not a usual API method but solely meant for import interfaces
+	 * which import data from another system and thus require to manually change the creation
+	 * user. It is highly recommended to not use this method if you don't absolutely need it!
+	 * </p>
+	 *
+	 * @param offer the offer to be modified.
+	 * @param createUser the new finalization-user.
+	 */
+	public void modifyOfferFinalizeUser(Offer offer, User finalizeUser) {
+		if (offer == null)
+			throw new IllegalArgumentException("offer must not be null!");
+
+		offer.modifyFinalizeUser(finalizeUser);
+		// TODO we should in the future update the jBPM workflow data, too.
 	}
 }

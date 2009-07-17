@@ -693,7 +693,7 @@ implements
 	 * indefinite price definition, it does it twice
 	 * (if there's a price config marked as isDependentOnOffer()=true).
 	 */
-	public synchronized void calculatePrice()
+	protected void calculatePrice()
 	{
 //	 TODO put this logic into the bean?! No, but maybe into Trader! Marco.
 		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
@@ -1318,5 +1318,39 @@ implements
 	@Override
 	public PropertySet getPropertySet() {
 		return propertySet;
+	}
+
+	protected void modifyCreateDT(Date createDT) {
+		if (createDT == null)
+			throw new IllegalArgumentException("createDT must not be null!");
+
+		this.createDT = createDT;
+	}
+
+	protected void modifyCreateUser(User createUser) {
+		if (createUser == null)
+			throw new IllegalArgumentException("createUser must not be null!");
+
+		this.createUser = createUser;
+	}
+
+	protected void modifyFinalizeDT(Date finalizeDT) {
+		if (finalizeDT == null)
+			throw new IllegalArgumentException("finalizeDT must not be null!");
+
+		if (this.finalizeDT == null)
+			throw new IllegalStateException("This offer is not finalized! You must finalize it before modifying the finalizeDT!");
+
+		this.finalizeDT = finalizeDT;
+	}
+
+	protected void modifyFinalizeUser(User finalizeUser) {
+		if (finalizeUser == null)
+			throw new IllegalArgumentException("finalizeUser must not be null!");
+
+		if (this.finalizeUser == null)
+			throw new IllegalStateException("This offer is not finalized! You must finalize it before modifying the finalizeDT!");
+
+		this.finalizeUser = finalizeUser;
 	}
 }

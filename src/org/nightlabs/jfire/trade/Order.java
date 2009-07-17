@@ -998,4 +998,18 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback, Att
 	public PropertySet getPropertySet() {
 		return propertySet;
 	}
+
+	protected void modifyCreateDT(Date createDT) {
+		if (createDT == null)
+			throw new IllegalArgumentException("createDT must not be null!");
+
+		this.createDT = createDT;
+	}
+
+	protected void modifyCreateUser(User createUser) {
+		if (createUser == null)
+			throw new IllegalArgumentException("createUser must not be null!");
+
+		this.createUser = createUser;
+	}
 }

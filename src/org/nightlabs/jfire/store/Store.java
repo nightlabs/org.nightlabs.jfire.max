@@ -31,6 +31,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -1775,4 +1776,88 @@ implements StoreCallback
 		}
 	}
 
+
+	/**
+	 * Modify an deliveryNote's creation date+time.
+	 * <p>
+	 * <b>Warning!</b> This is not a usual API method but solely meant for import interfaces
+	 * which import data from another system and thus require to manually change the creation
+	 * date+time. It is highly recommended to not use this method if you don't absolutely need it!
+	 * </p>
+	 *
+	 * @param deliveryNote the deliveryNote to be modified.
+	 * @param createDT the new creation-date+time
+	 */
+	public void modifyDeliveryNoteCreateDT(DeliveryNote deliveryNote, Date createDT)
+	{
+		if (deliveryNote == null)
+			throw new IllegalArgumentException("deliveryNote must not be null!");
+
+		if (createDT == null)
+			throw new IllegalStateException("createDT must not be null!");
+
+		deliveryNote.modifyCreateDT(createDT);
+		// TODO we should in the future update the jBPM workflow data, too.
+	}
+
+	/**
+	 * Modify an deliveryNote's finalization date+time.
+	 * <p>
+	 * <b>Warning!</b> This is not a usual API method but solely meant for import interfaces
+	 * which import data from another system and thus require to manually change the finalization
+	 * date+time. It is highly recommended to not use this method if you don't absolutely need it!
+	 * </p>
+	 *
+	 * @param deliveryNote the deliveryNote to be modified.
+	 * @param finalizeDT the new finalization-date+time
+	 */
+	public void modifyDeliveryNoteFinalizeDT(DeliveryNote deliveryNote, Date finalizeDT)
+	{
+		if (deliveryNote == null)
+			throw new IllegalArgumentException("deliveryNote must not be null!");
+
+		if (finalizeDT == null)
+			throw new IllegalStateException("finalizeDT must not be null!");
+
+		deliveryNote.modifyFinalizeDT(finalizeDT);
+		// TODO we should in the future update the jBPM workflow data, too.
+	}
+
+	/**
+	 * Modify an deliveryNote's creation user.
+	 * <p>
+	 * <b>Warning!</b> This is not a usual API method but solely meant for import interfaces
+	 * which import data from another system and thus require to manually change the creation
+	 * user. It is highly recommended to not use this method if you don't absolutely need it!
+	 * </p>
+	 *
+	 * @param deliveryNote the deliveryNote to be modified.
+	 * @param createUser the new creation-user.
+	 */
+	public void modifyDeliveryNoteCreateUser(DeliveryNote deliveryNote, User createUser) {
+		if (deliveryNote == null)
+			throw new IllegalArgumentException("deliveryNote must not be null!");
+
+		deliveryNote.modifyCreateUser(createUser);
+		// TODO we should in the future update the jBPM workflow data, too.
+	}
+
+	/**
+	 * Modify an deliveryNote's finalization user.
+	 * <p>
+	 * <b>Warning!</b> This is not a usual API method but solely meant for import interfaces
+	 * which import data from another system and thus require to manually change the creation
+	 * user. It is highly recommended to not use this method if you don't absolutely need it!
+	 * </p>
+	 *
+	 * @param deliveryNote the deliveryNote to be modified.
+	 * @param createUser the new finalization-user.
+	 */
+	public void modifyDeliveryNoteFinalizeUser(DeliveryNote deliveryNote, User finalizeUser) {
+		if (deliveryNote == null)
+			throw new IllegalArgumentException("deliveryNote must not be null!");
+
+		deliveryNote.modifyFinalizeUser(finalizeUser);
+		// TODO we should in the future update the jBPM workflow data, too.
+	}
 }

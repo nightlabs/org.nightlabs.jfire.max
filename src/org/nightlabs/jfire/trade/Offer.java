@@ -637,7 +637,7 @@ implements
 			this.order.addArticle(article);
 		}
 
-		this.articleCount = articles.size();
+		this.articleCount = this.articles.size();
 	}
 
 	public void addArticle(Article article)
@@ -659,7 +659,7 @@ implements
 		else
 			this.order.addArticle(article);
 
-		this.articleCount = articles.size();
+		this.articleCount = this.articles.size();
 	}
 
 	public void removeArticle(Article article)

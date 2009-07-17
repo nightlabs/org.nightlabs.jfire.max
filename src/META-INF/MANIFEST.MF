@@ -1,6 +1,3 @@
 Manifest-Version: 1.0
-EAR-Module-ID: JFireScriptingEAR
-EAR-Module-Version: 1.0.0
-EAR-Schema-Version: 1.0.0
 Bundle-SymbolicName: JFireScripting
 Bundle-Version: 1.0.0

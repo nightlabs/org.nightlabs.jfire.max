@@ -1,6 +1,3 @@
 Manifest-Version: 1.0
-EAR-Module-ID: JFireEntityUserSetEAR
-EAR-Module-Version: 1.0.0
-EAR-Schema-Version: 1.0.0
 Bundle-SymbolicName: JFireEntityUserSet
 Bundle-Version: 1.0.0

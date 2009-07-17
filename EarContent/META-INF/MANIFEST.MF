@@ -1,0 +1,3 @@
+Manifest-Version: 1.0
+EAR-Module-ID: JFirePersonRelationIssueTrackingEAR
+EAR-Schema-Version: 1.0.0

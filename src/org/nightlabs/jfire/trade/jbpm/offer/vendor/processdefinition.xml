@@ -32,7 +32,11 @@
 		<transition to="dev.jfire.org:accepted" name="dev.jfire.org:acceptImplicitely"></transition>
 	</state>
 	<end-state name="dev.jfire.org:expired"></end-state>
-	<end-state name="dev.jfire.org:aborted"></end-state>
+	<end-state name="dev.jfire.org:aborted">
+		<event type="node-enter">
+			<action class="org.nightlabs.jfire.trade.jbpm.ActionHandlerAbortOffer"></action>
+		</event>
+	</end-state>
 	<end-state name="dev.jfire.org:revoked"></end-state>
 	<event type="process-end">
 		<action name="org.nightlabs.jfire.trade.jbpm.ActionHandlerOfferProcessEnd" class="org.nightlabs.jfire.trade.jbpm.ActionHandlerOfferProcessEnd"></action>

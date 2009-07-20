@@ -2707,4 +2707,12 @@ public class Trader
 		offer.modifyFinalizeUser(finalizeUser);
 		// TODO we should in the future update the jBPM workflow data, too.
 	}
+
+	public void onAbortOffer(User user, Offer offer) {
+		offer.setAborted(user);
+		// TODO call some method in OfferActionHandler.
+//		for (OfferActionHandler offerActionHandler : offer.getOfferLocal().getOfferActionHandlers()) {
+//			offerActionHandler.onAbortOffer(user, offer);
+//		}
+	}
 }

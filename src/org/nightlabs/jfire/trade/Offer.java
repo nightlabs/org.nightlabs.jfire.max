@@ -73,6 +73,7 @@ import org.nightlabs.jfire.prop.StructLocal;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.trade.id.OfferID;
+import org.nightlabs.jfire.trade.jbpm.ActionHandlerAbortOffer;
 import org.nightlabs.jfire.trade.jbpm.ActionHandlerFinalizeOffer;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 import org.nightlabs.util.Util;
@@ -317,17 +318,19 @@ implements
 	 * An <tt>Offer</tt> is finalized, before it is sent on an asynchronous way (e.g. letter,
 	 * email) to the customer. This avoids communication conflicts as it forces the generation
 	 * of a new <tt>Offer</tt> if the customer requests changes after reception.
-	 *
-	 * @jdo.field persistence-modifier="persistent"
 	 */
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Date finalizeDT = null;
 
-	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 */
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private User finalizeUser = null;
+
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+	private Date abortDT = null;
+
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+	private User abortUser = null;
+
 
 	/**
 	 * Instances of {@link Article}.
@@ -626,6 +629,9 @@ implements
 		if (isFinalized())
 			throw new IllegalStateException("This offer is already finalized! Cannot add a new Article!");
 
+		if (isAborted())
+			throw new IllegalStateException("This offer is already aborted! Cannot add a new Article!");
+
 		// Whenever an Offer is changed, it needs to be marked as not valid to force a new validation!
 		this.valid = false;
 
@@ -645,6 +651,9 @@ implements
 		checkArticles(Collections.singleton(article));
 		if (isFinalized())
 			throw new IllegalStateException("This offer is already finalized! Cannot add a new Article!");
+
+		if (isAborted())
+			throw new IllegalStateException("This offer is already aborted! Cannot add a new Article!");
 
 		// Whenever an Offer is changed, it needs to be marked as not valid to force a new validation!
 		this.valid = false;
@@ -666,6 +675,9 @@ implements
 	{
 		if (isFinalized())
 			throw new IllegalStateException("Offer \""+getPrimaryKey()+"\" is already finalized! Cannot delete the Article \""+article.getPrimaryKey()+"\"!");
+
+		if (isAborted())
+			throw new IllegalStateException("Offer \""+getPrimaryKey()+"\" is already aborted! Cannot delete the Article!");
 
 		if (!article.isReversing() && (article.isAllocated() || article.isAllocationPending()))
 			throw new IllegalStateException("Article \""+article.getPrimaryKey()+"\" is allocated (or allocationPending) and not reversing! Cannot be removed!");
@@ -899,6 +911,9 @@ implements
 
 		if (!isValid())
 			throw new IllegalStateException("This Offer ("+getPrimaryKey()+") cannot be confirmed, because it is not valid! Call 'validate()' first and ensure the Offer is stable!");
+
+		if (isAborted())
+			throw new IllegalStateException("This offer is already aborted! Cannot finalize it!");
 
 		finalizeDT = new Date();
 		finalizeUser = user;
@@ -1352,5 +1367,34 @@ implements
 			throw new IllegalStateException("This offer is not finalized! You must finalize it before modifying the finalizeDT!");
 
 		this.finalizeUser = finalizeUser;
+	}
+
+	public Date getAbortDT() {
+		return abortDT;
+	}
+
+	public User getAbortUser() {
+		return abortUser;
+	}
+
+	public boolean isAborted() {
+		return abortDT != null;
+	}
+
+	/**
+	 * This method must not be called directly! It's called via {@link ActionHandlerAbortOffer}.
+	 */
+	public void setAborted(User user) {
+		if (user == null)
+			throw new IllegalArgumentException("user must not be null!");
+
+		if (isAborted())
+			return;
+
+		if (isFinalized())
+			throw new IllegalStateException("This offer is already finalized! Cannot abort it!");
+
+		this.abortDT = new Date();
+		this.abortUser = user;
 	}
 }

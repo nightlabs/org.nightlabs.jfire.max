@@ -75,6 +75,7 @@ import org.nightlabs.inheritance.Inheritable;
 import org.nightlabs.inheritance.InheritanceCallbacks;
 import org.nightlabs.inheritance.InheritanceManager;
 import org.nightlabs.inheritance.StaticFieldMetaData;
+import org.nightlabs.jdo.FetchPlanBackup;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jdo.inheritance.JDOInheritableFieldInheriter;
@@ -1405,6 +1406,13 @@ implements
 	public void applyInheritance()
 	{
 		PersistenceManager pm = getPersistenceManager();
+
+		// https://www.jfire.org/modules/bugs/view.php?id=1192
+		// Since we delegate to the ProductTypeActionHandler and implementors
+		// might modify the fetch-plan there, it is a good idea to
+		// backup and restore the fetch-plan.
+		FetchPlanBackup fetchPlanBackup = NLJDOHelper.backupFetchPlan(pm.getFetchPlan());
+
 		InheritanceManager im = new JDOInheritanceManager();
 		ProductType extendedProductType = getExtendedProductType();
 		if (extendedProductType != null)
@@ -1413,6 +1421,8 @@ implements
 		applyInheritance(pm, im);
 
 		ProductTypeActionHandler.getProductTypeActionHandler(pm, this.getClass()).postApplyInheritance(this);
+
+		NLJDOHelper.restoreFetchPlan(pm.getFetchPlan(), fetchPlanBackup);
 	}
 	private void applyInheritance(PersistenceManager pm, InheritanceManager im)
 	{

@@ -1470,6 +1470,19 @@ implements IssueManagerRemote
 			issueMarker_Phone.getName().readFromProperties(baseName, loader, "org.nightlabs.jfire.issue.issuemarker.IssueMarkerPhone.name");
 			issueMarker_Phone.getDescription().readFromProperties(baseName, loader, "org.nightlabs.jfire.issue.issuemarker.IssueMarkerPhone.description");
 			issueMarker_Phone = pm.makePersistent(issueMarker_Phone);
+
+
+			IssueMarker issueMarker_EmailTodo = new IssueMarker(false);
+			assignIssueMarkerIcon16x16(issueMarker_EmailTodo, "IssueMarker-email-todo.16x16.png");
+			issueMarker_EmailTodo.getName().readFromProperties(baseName, loader, "org.nightlabs.jfire.issue.issuemarker.IssueMarkerEmailTodo.name");
+			issueMarker_EmailTodo.getDescription().readFromProperties(baseName, loader, "org.nightlabs.jfire.issue.issuemarker.IssueMarkerEmailTodo.description");
+			issueMarker_EmailTodo = pm.makePersistent(issueMarker_EmailTodo);
+
+			IssueMarker issueMarker_PhoneTodo = new IssueMarker(false);
+			assignIssueMarkerIcon16x16(issueMarker_PhoneTodo, "IssueMarker-phone-todo.16x16.png");
+			issueMarker_PhoneTodo.getName().readFromProperties(baseName, loader, "org.nightlabs.jfire.issue.issuemarker.IssueMarkerPhoneTodo.name");
+			issueMarker_PhoneTodo.getDescription().readFromProperties(baseName, loader, "org.nightlabs.jfire.issue.issuemarker.IssueMarkerPhoneTodo.description");
+			issueMarker_PhoneTodo = pm.makePersistent(issueMarker_PhoneTodo);
 			// ---[ IssueMarkers ]------------------------------------------------------------------------------------------------| End |---
 
 

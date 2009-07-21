@@ -1203,7 +1203,7 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback, StoreCallbac
 		}
 
 		isStarted = false;
-		IssueWorkTimeRange wt = getLastestIssueWorkTimeRange();
+		IssueWorkTimeRange wt = getLastIssueWorkTimeRange();
 		wt.setTo(date);
 		return true;
 	}
@@ -1211,8 +1211,17 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback, StoreCallbac
 	/**
 	 * Returns the {@link IssueWorkTimeRange} of the issue.
 	 * @return an issueWorkTimeRange
+	 * @deprecated Use {@link #getLastIssueWorkTimeRange()} instead
 	 */
 	public IssueWorkTimeRange getLastestIssueWorkTimeRange() {
+		return getLastIssueWorkTimeRange();
+	}
+
+	/**
+	 * Returns the {@link IssueWorkTimeRange} of the issue.
+	 * @return an issueWorkTimeRange
+	 */
+	public IssueWorkTimeRange getLastIssueWorkTimeRange() {
 		return issueWorkTimeRanges.size() > 0 ? issueWorkTimeRanges.get(issueWorkTimeRanges.size() -1) : null;
 	}
 }

@@ -21,6 +21,11 @@
 	</state>
 	<end-state name="dev.jfire.org:aborted"></end-state>
 	<end-state name="dev.jfire.org:delivered"></end-state>
+
+
+	<event type="process-end">
+		<action class="org.nightlabs.jfire.store.jbpm.ActionHandlerDeliveryNoteProcessEnd"></action>
+	</event>
 	<node name="dev.jfire.org:sent">
 		<transition name="" to="dev.jfire.org:booked"></transition>
 	</node>

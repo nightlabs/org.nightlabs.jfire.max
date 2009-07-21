@@ -21,6 +21,11 @@
    </state>
    <end-state name="dev.jfire.org:uncollectable"></end-state>
    <end-state name="dev.jfire.org:paid"></end-state>
+
+
+	<event type="process-end">
+		<action class="org.nightlabs.jfire.accounting.jbpm.ActionHandlerInvoiceProcessEnd"></action>
+	</event>
 	<state name="dev.jfire.org:booked">
 		<event type="node-enter">
 			<action class="org.nightlabs.jfire.accounting.jbpm.ActionHandlerBookInvoice" />

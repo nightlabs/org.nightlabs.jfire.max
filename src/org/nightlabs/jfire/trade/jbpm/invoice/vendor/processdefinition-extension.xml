@@ -10,27 +10,23 @@
 		<description language="de">erzeugt</description>
 		<name language="en">created</name>
 		<description language="en">created</description>
-		<icon file="" />
 		<transition name="abort">
 			<name language="de">abbrechen</name>
 			<description language="de">abbrechen</description>
 			<name language="en">abort</name>
 			<description language="en">abort</description>
-			<icon file="" />
 		</transition>
 		<transition name="finalize">
 			<name language="de">finalisieren</name>
 			<description language="de">finalisieren</description>
 			<name language="en">finalize</name>
 			<description language="en">finalize</description>
-			<icon file="" />
 		</transition>
 		<transition name="dev.jfire.org:bookImplicitely" userExecutable="false">
-			<name language="de">buchen-implizit</name>
-			<description language="de">buchen-implizit</description>
-			<name language="en">bookImplicitely</name>
-			<description language="en">bookImplicitely</description>
-			<icon file="" />
+			<name language="de">buchen implizit</name>
+			<description language="de">buchen implizit</description>
+			<name language="en">book implicitely</name>
+			<description language="en">book implicitely</description>
 		</transition>
 	</start-state>
 	<state name="dev.jfire.org:finalized" publicState="true">
@@ -38,13 +34,11 @@
 		<description language="de">finalisiert</description>
 		<name language="en">finalized</name>
 		<description language="en">finalized</description>
-		<icon file="" />
 		<transition name="dev.jfire.org:book">
 			<name language="de">buchen</name>
 			<description language="de">buchen</description>
 			<name language="en">book</name>
 			<description language="en">book</description>
-			<icon file="" />
 		</transition>
 	</state>
 	<end-state name="dev.jfire.org:aborted" publicState="true">
@@ -52,97 +46,79 @@
 		<description language="de">abgebrochen</description>
 		<name language="en">aborted</name>
 		<description language="en">aborted</description>
-		<icon file="" />
 	</end-state>
 	<state name="dev.jfire.org:doubtful" publicState="true">
 		<name language="de">zweifelhaft</name>
 		<description language="de">zweifelhaft</description>
 		<name language="en">doubtful</name>
 		<description language="en">doubtful</description>
-		<icon file="" />
 		<transition name="dev.jfire.org:pay">
 			<name language="de">zahlen</name>
 			<description language="de">zahlen</description>
 			<name language="en">pay</name>
 			<description language="en">pay</description>
-			<icon file="" />
 		</transition>
 		<transition name="bookUnreceivable">
-			<name language="de">buchen-unempfangbar</name>
-			<description language="de">buchen-unempfangbar</description>
-			<name language="en">bookUnreceivable</name>
-			<description language="en">bookUnreceivable</description>
-			<icon file="" />
+			<name language="de">ausbuchen als uneinbringlich</name>
+			<description language="de">ausbuchen als uneinbringlich</description>
+			<name language="en">book out as unreceivable</name>
+			<description language="en">book out as unreceivable</description>
 		</transition>
 		<transition name="trust">
 			<name language="de">vertrauen</name>
 			<description language="de">vertrauen</description>
 			<name language="en">trust</name>
 			<description language="en">trust</description>
-			<icon file="" />
 		</transition>
 	</state>
 	<end-state name="dev.jfire.org:uncollectable">
-		<name language="de">nicht-beitreibbar</name>
-		<description language="de">nicht-beitreibbar</description>
+		<name language="de">nicht beitreibbar</name>
+		<description language="de">nicht beitreibbar</description>
 		<name language="en">uncollectable</name>
 		<description language="en">uncollectable</description>
-		<icon file="" />
 	</end-state>
 	<end-state name="dev.jfire.org:paid" publicState="true">
 		<name language="de">bezahlt</name>
 		<description language="de">bezahlt</description>
 		<name language="en">paid</name>
 		<description language="en">paid</description>
-		<icon file="" />
 	</end-state>
 	<state name="dev.jfire.org:booked" publicState="true">
 		<name language="de">gebucht</name>
 		<description language="de">gebucht</description>
 		<name language="en">booked</name>
 		<description language="en">booked</description>
-		<icon file="" />
 		<transition name="dev.jfire.org:send">
 			<name language="de">gesendet</name>
 			<description language="de">gesendet</description>
 			<name language="en">send</name>
 			<description language="en">send</description>
-			<icon file="" />
 		</transition>
 		<transition name="doubt">
 			<name language="de">bezweifeln</name>
 			<description language="de">bezweifeln</description>
 			<name language="en">doubt</name>
 			<description language="en">doubt</description>
-			<icon file="" />
 		</transition>
 		<transition name="dev.jfire.org:pay">
 			<name language="de">zahlen</name>
 			<description language="de">zahlen</description>
 			<name language="en">pay</name>
 			<description language="en">pay</description>
-			<icon file="" />
 		</transition>
 		<transition name="sendReminder">
-			<name language="de">Mahnung-senden</name>
-			<description language="de">Mahnung-senden</description>
-			<name language="en">sendReminder</name>
-			<description language="en">sendReminder</description>
-			<icon file="" />
+			<name language="de">Mahnung senden</name>
+			<description language="de">Mahnung senden</description>
+			<name language="en">send reminder</name>
+			<description language="en">send reminder</description>
 		</transition>
 	</state>
 	<node name="dev.jfire.org:bookedUnreceivable" publicState="true">
-		<name language="de">booked unreceivable</name>
-		<description language="de">booked unreceivable</description>
+		<name language="de">ausgebucht als uneinbringlich</name>
+		<description language="de">ausgebucht als uneinbringlich</description>
 		<name language="en">booked unreceivable</name>
 		<description language="en">booked unreceivable</description>
-		<icon file="" />
 		<transition name="endAsUncollectable">
-			<name language="de">endAsUncollectable</name>
-			<description language="de">endAsUncollectable</description>
-			<name language="en">endAsUncollectable</name>
-			<description language="en">endAsUncollectable</description>
-			<icon file="" />
 		</transition>
 	</node>
 	<state name="dev.jfire.org:sentPreCollectionLetter" publicState="true">
@@ -150,48 +126,41 @@
 		<description language="de">sent pre-collection letter</description>
 		<name language="en">sent pre-collection letter</name>
 		<description language="en">sent pre-collection letter</description>
-		<icon file="" />
 		<transition name="doubt">
 			<name language="de">doubt</name>
 			<description language="de">doubt</description>
 			<name language="en">doubt</name>
 			<description language="en">doubt</description>
-			<icon file="" />
 		</transition>
 		<transition name="dev.jfire.org:pay">
 			<name language="de">pay</name>
 			<description language="de">pay</description>
 			<name language="en">pay</name>
 			<description language="en">pay</description>
-			<icon file="" />
 		</transition>
 	</state>
 	<state name="dev.jfire.org:sentReminder" publicState="true">
-		<name language="de">sent reminder</name>
-		<description language="de">sent reminder</description>
+		<name language="de">Zahlungserinnerung versandt</name>
+		<description language="de">Zahlungserinnerung versandt</description>
 		<name language="en">sent reminder</name>
 		<description language="en">sent reminder</description>
-		<icon file="" />
 		<transition name="sendPreCollectionLetter">
-			<name language="de">sendPreCollectionLetter</name>
-			<description language="de">sendPreCollectionLetter</description>
-			<name language="en">sendPreCollectionLetter</name>
-			<description language="en">sendPreCollectionLetter</description>
-			<icon file="" />
+			<name language="de">sende letzte Mahnung</name>
+			<description language="de">sende letzte Mahnung</description>
+			<name language="en">send pre-collection letter</name>
+			<description language="en">send pre-collection letter</description>
 		</transition>
 		<transition name="dev.jfire.org:pay">
 			<name language="de">bezahlen</name>
 			<description language="de">bezahlen</description>
 			<name language="en">pay</name>
 			<description language="en">pay</description>
-			<icon file="" />
 		</transition>
 		<transition name="doubt">
-			<name language="de">doubt</name>
-			<description language="de">doubt</description>
+			<name language="de">bezweifeln</name>
+			<description language="de">bezweifeln</description>
 			<name language="en">doubt</name>
 			<description language="en">doubt</description>
-			<icon file="" />
 		</transition>
 	</state>
 	<node name="dev.jfire.org:sent" publicState="true">
@@ -199,6 +168,5 @@
 		<description language="de">gesendet</description>
 		<name language="en">sent</name>
 		<description language="en">sent</description>
-		<icon file="" />
 	</node>
 </process-definition-extension>

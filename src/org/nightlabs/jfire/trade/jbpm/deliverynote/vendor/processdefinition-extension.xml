@@ -26,10 +26,10 @@
 			<icon file="" />
 		</transition>
 		<transition name="dev.jfire.org:bookImplicitely" userExecutable="false">
-			<name language="de">buchen-implizit</name>
-			<description language="de">buchen-implizit</description>
-			<name language="en">bookImplicitely</name>
-			<description language="en">bookImplicitely</description>
+			<name language="de">buchen implizit</name>
+			<description language="de">buchen implizit</description>
+			<name language="en">book implicitely</name>
+			<description language="en">book implicitely</description>
 			<icon file="" />
 		</transition>
 	</start-state>

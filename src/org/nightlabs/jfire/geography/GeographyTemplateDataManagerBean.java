@@ -72,7 +72,6 @@ import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.organisation.id.OrganisationID;
 import org.nightlabs.util.CollectionUtil;
 import org.nightlabs.util.IOUtil;
-import org.nightlabs.version.MalformedVersionException;
 
 /**
  * @ejb.bean name="jfire/ejb/JFireGeography/GeographyTemplateDataManager"
@@ -178,12 +177,12 @@ implements GeographyTemplateDataManagerRemote
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("_System_")
 	public void initialise()
-	throws MalformedVersionException
+	throws Exception
 	{
 		Geography geography = Geography.sharedInstance();
 		String organisationID = getOrganisationID();
 
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			// As the ModuleMetaData is not managed by GeographyManagerBean, we can do it here (this stuff is expensive and we should therefore avoid to
 			// run it on every boot).
@@ -192,8 +191,9 @@ implements GeographyTemplateDataManagerRemote
 				return;
 
 			// version is {major}.{minor}.{release}-{patchlevel}-{suffix}
-			moduleMetaData = new ModuleMetaData(
-					JFireGeographyEAR.MODULE_NAME, "0.9.7-0-beta", "0.9.7-0-beta");
+			moduleMetaData = ModuleMetaData.createModuleMetaDataFromManifest(
+					JFireGeographyEAR.MODULE_NAME, JFireGeographyEAR.class
+			);
 			pm.makePersistent(moduleMetaData);
 
 

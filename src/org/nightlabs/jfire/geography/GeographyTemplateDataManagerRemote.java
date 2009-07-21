@@ -10,7 +10,6 @@ import javax.ejb.TransactionAttributeType;
 
 import org.nightlabs.jfire.crossorganisationregistrationinit.Context;
 import org.nightlabs.jfire.geography.id.CSVID;
-import org.nightlabs.version.MalformedVersionException;
 
 @Remote
 public interface GeographyTemplateDataManagerRemote {
@@ -57,7 +56,7 @@ public interface GeographyTemplateDataManagerRemote {
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("_System_")
-	void initialise() throws MalformedVersionException;
+	void initialise() throws Exception;
 
 	/**
 	 * @ejb.interface-method

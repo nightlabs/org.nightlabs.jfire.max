@@ -28,12 +28,17 @@ package org.nightlabs.jfire.accounting.book;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
 
 import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.accounting.MoneyTransfer;
@@ -45,36 +50,22 @@ import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.trade.OrganisationLegalEntity;
 import org.nightlabs.jfire.transfer.Anchor;
 
-import javax.jdo.annotations.Persistent;
-import javax.jdo.annotations.InheritanceStrategy;
-import javax.jdo.annotations.Inheritance;
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.IdentityType;
-import javax.jdo.annotations.PersistenceModifier;
-
 /**
  * A {@link LocalAccountant} is responsible to split money to the {@link Organisation}s
  * own accounts when payments are received/booked and to collect money from the correct
  * accounts when payments are done by the organisation.
- * 
- * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
- * 
- * @jdo.persistence-capable
- *		identity-type = "application"
- *		persistence-capable-superclass = "org.nightlabs.jfire.accounting.book.Accountant"
- *		detachable = "true"
- *		table="JFireTrade_LocalAccountant"
  *
- * @jdo.inheritance strategy = "new-table"
+ * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  */
 @PersistenceCapable(
-	identityType=IdentityType.APPLICATION,
-	detachable="true",
-	table="JFireTrade_LocalAccountant")
+		identityType=IdentityType.APPLICATION,
+		detachable="true",
+		table="JFireTrade_LocalAccountant"
+)
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
-public class LocalAccountant extends Accountant {
+public class LocalAccountant extends Accountant
+{
 	private static final long serialVersionUID = 1L;
-
 
 	/**
 	 * @deprecated Do not use! Only for JDO!
@@ -83,22 +74,14 @@ public class LocalAccountant extends Accountant {
 	protected LocalAccountant() {
 	}
 
-	/**
-	 * @param mandator
-	 * @param accountantID
-	 */
 	public LocalAccountant(OrganisationLegalEntity mandator, String accountantID) {
 		super(mandator.getOrganisationID(), accountantID);
 		this.mandator = mandator;
 	}
-	
-	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 */
+
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private OrganisationLegalEntity mandator;
 
-		
 	/**
 	 * Takes care of MoneyTransfers. This Accountant only handles
 	 * {@link BookMoneyTransfer}s and silently ignores all other {@link MoneyTransfer}s.
@@ -109,7 +92,7 @@ public class LocalAccountant extends Accountant {
 	 * given {@link BookMoneyTransfer} and delegates the work of creating the correct
 	 * sub-transfers to the according {@link LocalAccountantDelegate} found.
 	 * </p>
-	 * 
+	 *
 	 * @see org.nightlabs.jfire.accounting.book.Accountant#bookTransfer(User, LegalEntity, MoneyTransfer, Map)
 	 */
 	@Override
@@ -122,33 +105,32 @@ public class LocalAccountant extends Accountant {
 		Invoice invoice = bookTransfer.getInvoice();
 
 		// find the delegates
-		Map delegates = new HashMap();
-		for (Iterator iter = invoice.getArticles().iterator(); iter.hasNext();) {
-			Article article = (Article) iter.next();
+		Map<Article, LocalAccountantDelegate> delegates = new HashMap<Article, LocalAccountantDelegate>();
+		for (Article article : invoice.getArticles()) {
 			LocalAccountantDelegate delegate = article.getProductType().getProductTypeLocal().getLocalAccountantDelegate();
 			if (delegate == null) // TODO maybe we should have a default one like there is a DefaultLocalStorekeeperDelegate, too.
 				throw new IllegalStateException("Could not find LocalAccountantDelegate for Article "+JDOHelper.getObjectId(article)+" of productType "+JDOHelper.getObjectId(article.getProductType())+".");
 
 			delegates.put(article, delegate);
 		}
-		Set distinctDelegates = new HashSet(delegates.values());
+
+		Set<LocalAccountantDelegate> distinctDelegates = new HashSet<LocalAccountantDelegate>(delegates.values());
 		// call preBookInvoice
-		for (Iterator iter = distinctDelegates.iterator(); iter.hasNext();) {
-			LocalAccountantDelegate delegate = (LocalAccountantDelegate) iter.next();
+		for (LocalAccountantDelegate delegate : distinctDelegates) {
 			delegate.preBookArticles(getMandator(), user, invoice, bookTransfer, involvedAnchors);
 		}
+
 		// book the individual articles
-		for (Iterator iter = invoice.getArticles().iterator(); iter.hasNext();) {
-			Article article = (Article) iter.next();
-			LocalAccountantDelegate delegate = (LocalAccountantDelegate) delegates.get(article);
+		for (Article article : invoice.getArticles()) {
+			LocalAccountantDelegate delegate = delegates.get(article);
 			if (delegate == null)
 				throw new IllegalStateException("Could not find LocalAccountantDelegate for Article "+JDOHelper.getObjectId(article)+" of productType "+JDOHelper.getObjectId(article.getProductType())+", although already resolved prior.");
 			// let the delegate do the job
 			delegate.bookArticle(getMandator(), user, invoice, article, bookTransfer, involvedAnchors);
 		}
+
 		// call postBookInvoice
-		for (Iterator iter = distinctDelegates.iterator(); iter.hasNext();) {
-			LocalAccountantDelegate delegate = (LocalAccountantDelegate) iter.next();
+		for (LocalAccountantDelegate delegate : distinctDelegates) {
 			delegate.postBookArticles(getMandator(), user, invoice, bookTransfer, involvedAnchors);
 		}
 	}
@@ -163,5 +145,4 @@ public class LocalAccountant extends Accountant {
 	protected OrganisationLegalEntity getMandator() {
 		return mandator;
 	}
-
 }

@@ -1,8 +1,12 @@
 package org.nightlabs.jfire.accounting.jbpm;
 
+import javax.jdo.PersistenceManager;
+
 import org.jbpm.graph.exe.ExecutionContext;
+import org.nightlabs.jfire.accounting.Accounting;
 import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.jbpm.graph.def.AbstractActionHandler;
+import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.trade.Article;
 
 public class ActionHandlerInvoiceProcessEnd
@@ -19,6 +23,12 @@ extends AbstractActionHandler
 			Invoice invoice = (Invoice) getStatable();
 			for (Article article : invoice.getArticles()) {
 				article.setInvoice(null);
+			}
+
+			if (invoice.getInvoiceLocal().isBooked()) {
+				PersistenceManager pm = getPersistenceManager();
+				User user = User.getUser(pm);
+				Accounting.getAccounting(pm).bookUncollectableInvoice(user, invoice);
 			}
 		}
 	}

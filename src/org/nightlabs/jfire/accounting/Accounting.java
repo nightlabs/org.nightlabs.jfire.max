@@ -57,10 +57,11 @@ import org.apache.log4j.Logger;
 import org.jbpm.JbpmContext;
 import org.jbpm.graph.exe.ProcessInstance;
 import org.nightlabs.i18n.I18nText;
-import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.accounting.book.BookMoneyTransfer;
 import org.nightlabs.jfire.accounting.book.LocalAccountant;
 import org.nightlabs.jfire.accounting.book.PartnerAccountant;
+import org.nightlabs.jfire.accounting.book.uncollectable.UncollectableInvoiceBooker;
+import org.nightlabs.jfire.accounting.book.uncollectable.VatUncollectableInvoiceBooker;
 import org.nightlabs.jfire.accounting.id.AccountingID;
 import org.nightlabs.jfire.accounting.id.InvoiceID;
 import org.nightlabs.jfire.accounting.id.InvoiceLocalID;
@@ -152,6 +153,7 @@ implements StoreCallback
 		accounting.partnerAccountant = new PartnerAccountant(organisationID, PartnerAccountant.class.getName());
 
 		accounting = pm.makePersistent(accounting);
+		accounting.getUncollectableInvoiceBooker(); // initialise default value - must be done after persisting!
 		return accounting;
 	}
 
@@ -1115,63 +1117,13 @@ implements StoreCallback
 //	}
 
 	/**
-	 * Finds (and creates if neccessary) the right Account for the given LegalEntity and Currency.
-	 *
-	 * @param accountType See {@link Account} for static anchorTypeID definitions
-	 * @param partner The legal entity the account should be searched for.
-	 * @param currency The currency the account should record.
-	 * @return The found or created acccount. Never null.
+	 * @deprecated Use {@link PartnerAccountant#getPartnerAccount(AccountType, LegalEntity, Currency)} instead!
+	 *		You can obtain the <code>PartnerAccountant</code> via {@link #getPartnerAccountant()}.
+	 *		This method will soon be removed.
 	 */
+	@Deprecated
 	public Account getPartnerAccount(AccountType accountType, LegalEntity partner, Currency currency) {
-		if (partner == null)
-			throw new IllegalArgumentException("Parameter partner must not be null!");
-		if (currency == null)
-			throw new IllegalArgumentException("Parameter currency must not be null!");
-
-		Collection<Account> accounts = (Collection<Account>) Account.getAccounts(getPersistenceManager(), accountType, partner, currency);
-		// there should be only one account, but in case a user later adds one, we don't throw an exception
-		Account account = accounts.isEmpty() ? null : accounts.iterator().next();
-		if (account == null) {
-			// TODO how to generate the IDs here? Give the user the possibility to define rules (e.g. number ranges)
-			account = new Account(
-					this.getOrganisationID(),
-					"partner." + ObjectIDUtil.longObjectIDFieldToString(IDGenerator.nextID(Anchor.class, Account.ANCHOR_TYPE_ID_ACCOUNT + ".partner")),
-					accountType, partner, currency);
-			account = getPersistenceManager().makePersistent(account);
-			account.setOwner(partner);
-		}
-
-//		String searchAccountID = accountType.getOrganisationID() + ':' + accountType.getAccountTypeID() + ':' + partner.getOrganisationID() + ':' + partner.getAnchorID() + ':' + currency.getCurrencyID();
-//		AnchorID anchorID = AnchorID.create(this.getOrganisationID(), Account.ANCHOR_TYPE_ID_ACCOUNT, searchAccountID);
-//
-//		Account account = null;
-//		Object o = null;
-//		try {
-//			o = getPersistenceManager().getObjectById(anchorID);
-//			account = (Account)o;
-//		}
-//		catch (ClassCastException ce)  {
-//			IllegalStateException ill = new IllegalStateException("Found persistent object with oid "+anchorID+" but is not of type Account but "+o.getClass().getName());
-//			ill.initCause(ce);
-//			throw ill;
-//		}
-//		catch (JDOObjectNotFoundException je) {
-//			// account not existing, create it
-//			account = new Account(this.getOrganisationID(), searchAccountID, partner, currency, accountType);
-//			account = getPersistenceManager().makePersistent(account);
-//			account.setOwner(partner);
-//		}
-//
-//		if (account == null)
-//			throw new IllegalStateException("Account with oid "+anchorID+" could neither be found nor created!");
-//
-//		if (!account.getOwner().equals(partner))
-//			throw new IllegalStateException("An account for oid "+anchorID+" could be found, but its owner is not the partner the search was performed for. Owner: "+account.getOwner().getPrimaryKey()+", Partner: "+partner.getPrimaryKey());
-//
-//		if (!account.getAccountType().equals(accountType))
-//			throw new IllegalStateException("An account for oid "+anchorID+" could be found, but its accountType is not the accountType the search was performed for. assignedAccountType: "+JDOHelper.getObjectId(account.getAccountType())+", expectedAccountType: "+JDOHelper.getObjectId(accountType));
-
-		return account;
+		return getPartnerAccountant().getPartnerAccount(accountType, partner, currency);
 	}
 
 	public void jdoPreStore()
@@ -1355,4 +1307,45 @@ implements StoreCallback
 		// TODO we should in the future update the jBPM workflow data, too.
 	}
 
+//	@Persistent(nullValue=NullValue.EXCEPTION) // Commenting this out for downward compatibility reasons.
+	private UncollectableInvoiceBooker uncollectableInvoiceBooker;
+
+	public UncollectableInvoiceBooker getUncollectableInvoiceBooker() {
+		if (uncollectableInvoiceBooker == null) {
+			uncollectableInvoiceBooker = getPersistenceManager().makePersistent(
+					new VatUncollectableInvoiceBooker(
+							this.getOrganisationID(),
+							VatUncollectableInvoiceBooker.class.getName()
+					)
+			);
+		}
+
+		return uncollectableInvoiceBooker;
+	}
+	public void setUncollectableInvoiceAccountantDelegate(UncollectableInvoiceBooker uncollectableInvoiceBooker)
+	{
+		if (uncollectableInvoiceBooker == null)
+			throw new IllegalArgumentException("uncollectableInvoiceBooker must not be null!");
+
+		this.uncollectableInvoiceBooker = uncollectableInvoiceBooker;
+	}
+
+	/**
+	 * Book an invoice as "uncollectable".
+	 * @param invoice the invoice to be booked as uncollectable.
+	 */
+	public void bookUncollectableInvoice(User user, Invoice invoice) {
+		if (invoice == null)
+			throw new IllegalArgumentException("invoice must not be null!");
+
+		if (invoice.getInvoiceLocal().isBookedUncollectable())
+			throw new IllegalStateException("This invoice was already booked as being uncollectable! Why is this method called again for it? " + invoice);
+
+		if (!mandator.equals(invoice.getVendor()))
+			throw new IllegalStateException("The organisation-legal-entity is not the vendor of this invoice! Why is this method called for it? " + invoice);
+//			return; // or should we throw an exception?
+
+		getUncollectableInvoiceBooker().bookUncollectableInvoice(user, invoice);
+		invoice.getInvoiceLocal().setBookUncollectableUser(user);
+	}
 }

@@ -191,6 +191,10 @@ implements Serializable, StatableLocal
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Date bookDT  = null;
 
+	private User bookUncollectableUser = null;
+
+	private Date bookUncollectableDT = null;
+
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
@@ -326,6 +330,29 @@ implements Serializable, StatableLocal
 	public boolean isBooked() {
 		return bookDT != null;
 	}
+
+
+	protected void setBookUncollectableUser(User bookUncollectableUser) {
+		if (this.bookUncollectableDT != null)
+			return;
+
+		this.bookUncollectableUser = bookUncollectableUser;
+		this.bookUncollectableDT = new Date();
+	}
+	public User getBookUncollectableUser() {
+		return bookUncollectableUser;
+	}
+	public Date getBookUncollectableDT() {
+		return bookUncollectableDT;
+	}
+	/**
+	 * This member is set to true as soon as the invoice has been booked
+	 * as being uncollectable.
+	 */
+	public boolean isBookedUncollectable() {
+		return bookUncollectableDT != null;
+	}
+
 
 	/**
 	 * @jdo.field

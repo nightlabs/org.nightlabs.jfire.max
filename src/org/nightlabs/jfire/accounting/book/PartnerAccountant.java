@@ -26,6 +26,7 @@
 
 package org.nightlabs.jfire.accounting.book;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -35,29 +36,31 @@ import java.util.Set;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.PersistenceCapable;
 
+import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.accounting.Account;
 import org.nightlabs.jfire.accounting.AccountType;
 import org.nightlabs.jfire.accounting.Accounting;
+import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.accounting.InvoiceMoneyTransfer;
 import org.nightlabs.jfire.accounting.MoneyTransfer;
 import org.nightlabs.jfire.accounting.pay.PayMoneyTransfer;
+import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.transfer.Anchor;
 import org.nightlabs.jfire.transfer.Transfer;
 
-import javax.jdo.annotations.InheritanceStrategy;
-import javax.jdo.annotations.Inheritance;
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.IdentityType;
-
 /**
  * One instance of PartnerAccountant exists per organisation.
  * It handles Transfers for trade partners that can be other
  * organisations or customers.
- * 
+ *
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  *
  * @jdo.persistence-capable
@@ -108,10 +111,10 @@ public class PartnerAccountant extends Accountant
 	{
 		boolean mandatorIsVendor = transfer.getInvoice().getVendor().getPrimaryKey().equals(mandator.getPrimaryKey());
 		boolean mandatorIsCustomer = !mandatorIsVendor;
-		
+
 		boolean mandatorIsTransferTo = transfer.getTo().getPrimaryKey().equals(mandator.getPrimaryKey());
 		boolean mandatorIsTransferFrom = !mandatorIsTransferTo;
-		
+
 		Anchor createTransferFrom = null;
 		Anchor createTransferTo = null;
 		Accounting accounting = Accounting.getAccounting(getPersistenceManager());
@@ -119,7 +122,7 @@ public class PartnerAccountant extends Accountant
 		// determine the direction
 		if (mandatorIsCustomer) {
 			AccountType accountType = (AccountType) getPersistenceManager().getObjectById(AccountType.ACCOUNT_TYPE_ID_PARTNER_CUSTOMER);
-			Account customerPartnerAccount = accounting.getPartnerAccount(accountType, mandator, transfer.getInvoice().getCurrency());
+			Account customerPartnerAccount = getPartnerAccount(accountType, mandator, transfer.getInvoice().getCurrency());
 			if (mandatorIsTransferFrom) {
 				createTransferFrom = customerPartnerAccount;
 				createTransferTo = mandator;
@@ -132,7 +135,7 @@ public class PartnerAccountant extends Accountant
 		else {
 			// if (mandatorIsVendor)
 			AccountType accountType = (AccountType) getPersistenceManager().getObjectById(AccountType.ACCOUNT_TYPE_ID_PARTNER_VENDOR);
-			Account vendorPartnerAccount = accounting.getPartnerAccount(accountType, mandator, transfer.getInvoice().getCurrency());
+			Account vendorPartnerAccount = getPartnerAccount(accountType, mandator, transfer.getInvoice().getCurrency());
 			if (mandatorIsTransferFrom) {
 				createTransferFrom = vendorPartnerAccount;
 				createTransferTo = mandator;
@@ -154,9 +157,9 @@ public class PartnerAccountant extends Accountant
 //		createTransferTo.bookTransfer(user, moneyTransfer, involvedAnchors);
 		moneyTransfer.bookTransfer(user, involvedAnchors);
 	}
-	
-	
-	
+
+
+
 	private static class TransferInvoiceEntry {
 		private Invoice invoice;
 		private long invoiceBalance;
@@ -176,11 +179,11 @@ public class PartnerAccountant extends Accountant
 			return invoiceBalance;
 		}
 	}
-	
+
 	private static boolean partnerIsInvoiceVendor(LegalEntity partner, Invoice invoice) {
 		return invoice.getVendor().getPrimaryKey().equals(partner.getPrimaryKey());
 	}
-	
+
 	/**
 	 * @param amountToPay I'm pretty sure, this is always the POSITIVE amount involved in this payment.
 	 * @!param amountToPay Is seen from the partner LegalEntity. If it looses money
@@ -212,24 +215,24 @@ public class PartnerAccountant extends Accountant
 			// Local Accounting is paying
 			if (partnerIsInvoiceVendor(partner, invoice)) {
 				AccountType accountType = (AccountType) getPersistenceManager().getObjectById(AccountType.ACCOUNT_TYPE_ID_PARTNER_VENDOR);
-				from = accounting.getPartnerAccount(accountType, partner, transfer.getCurrency());
+				from = getPartnerAccount(accountType, partner, transfer.getCurrency());
 			}
 			else {
 //				amountToPay *= -1; // TODO korrekt?
 				AccountType accountType = (AccountType) getPersistenceManager().getObjectById(AccountType.ACCOUNT_TYPE_ID_PARTNER_CUSTOMER);
-				from = accounting.getPartnerAccount(accountType, partner, transfer.getCurrency());
+				from = getPartnerAccount(accountType, partner, transfer.getCurrency());
 			}
 		}
 		else {
 			from = partner;
 			if (!partnerIsInvoiceVendor(partner, invoice)) {
 				AccountType accountType = (AccountType) getPersistenceManager().getObjectById(AccountType.ACCOUNT_TYPE_ID_PARTNER_CUSTOMER);
-				to = accounting.getPartnerAccount(accountType, partner, transfer.getCurrency());
+				to = getPartnerAccount(accountType, partner, transfer.getCurrency());
 			}
 			else {
 //				amountToPay *= -1; // TODO korrekt?
 				AccountType accountType = (AccountType) getPersistenceManager().getObjectById(AccountType.ACCOUNT_TYPE_ID_PARTNER_VENDOR);
-				to = accounting.getPartnerAccount(accountType, partner, transfer.getCurrency());
+				to = getPartnerAccount(accountType, partner, transfer.getCurrency());
 			}
 		}
 
@@ -343,11 +346,11 @@ public class PartnerAccountant extends Accountant
 		/* allInvoicesBalance is the amount after summarizing all invoices
 		 * It is negative if the local organisation looses money to
 		 * the outside partner and positive if the local organisation receives money.
-		 * 
+		 *
 		 * NEGATIVE amount: When local organisation either creates an
 		 * invoice with a negative price or partner created an invoice with
 		 * a positive amount.
-		 * 
+		 *
 		 * POSITIVE amount: When local organisation either creates an
 		 * invoice with a positive amount or partner created an invoice with
 		 * a negative amount.
@@ -401,7 +404,7 @@ public class PartnerAccountant extends Accountant
 //				invoicesPayMoney.add(new TransferInvoiceEntry(invoice, invoiceBalance));
 //			}
 //		}
-		
+
 //		Account mandatorVendorAccount = accounting.getPartnerAccount(Account.ANCHOR_TYPE_ID_PARTNER_VENDOR,partner,payMoneyTransfer.getCurrency());
 //		Account mandatorCustomerAccount = accounting.getPartnerAccount(Account.ANCHOR_TYPE_ID_PARTNER_CUSTOMER,partner,payMoneyTransfer.getCurrency());
 
@@ -442,8 +445,8 @@ public class PartnerAccountant extends Accountant
 //			partner.bookTransfer(user, moneyTransfer, involvedAnchors);
 //			toAccount.bookTransfer(user, moneyTransfer, involvedAnchors);
 //		}
-		
-		
+
+
 		/* If the overallBalance is positive, the local organisation is receiving
 		 * money in total after all invoices have been summarized. If it's
 		 * negative, the local organisation looses money by the given invoices.
@@ -695,12 +698,12 @@ public class PartnerAccountant extends Accountant
 				amountToTransfer = capital;
 				from = partner;
 				AccountType accountType = (AccountType) getPersistenceManager().getObjectById(AccountType.ACCOUNT_TYPE_ID_PARTNER_NEUTRAL);
-				to = accounting.getPartnerAccount(accountType, partner, payMoneyTransfer.getCurrency());
+				to = getPartnerAccount(accountType, partner, payMoneyTransfer.getCurrency());
 			}
 			else {
 				amountToTransfer = -capital;
 				AccountType accountType = (AccountType) getPersistenceManager().getObjectById(AccountType.ACCOUNT_TYPE_ID_PARTNER_NEUTRAL);
-				from = accounting.getPartnerAccount(accountType, partner, payMoneyTransfer.getCurrency());
+				from = getPartnerAccount(accountType, partner, payMoneyTransfer.getCurrency());
 				to = partner;
 			}
 
@@ -713,9 +716,9 @@ public class PartnerAccountant extends Accountant
 			moneyTransfer.bookTransfer(user, involvedAnchors);
 		}
 	}
-	
+
 //	private PersistenceManager accountantPM = null;
-	
+
 	/**
 	 * Returns the PersitenceManager of this PartnerAccountant. This
 	 * is not cached.
@@ -729,4 +732,63 @@ public class PartnerAccountant extends Accountant
 		return accountantPM;
 	}
 
+	/**
+	 * Finds (and creates if neccessary) the right Account for the given LegalEntity and Currency.
+	 *
+	 * @param accountType See {@link Account} for static anchorTypeID definitions
+	 * @param partner The legal entity the account should be searched for.
+	 * @param currency The currency the account should record.
+	 * @return The found or created acccount. Never null.
+	 */
+	public Account getPartnerAccount(AccountType accountType, LegalEntity partner, Currency currency) {
+		if (partner == null)
+			throw new IllegalArgumentException("Parameter partner must not be null!");
+		if (currency == null)
+			throw new IllegalArgumentException("Parameter currency must not be null!");
+
+		Collection<Account> accounts = (Collection<Account>) Account.getAccounts(getPersistenceManager(), accountType, partner, currency);
+		// there should be only one account, but in case a user later adds one, we don't throw an exception
+		Account account = accounts.isEmpty() ? null : accounts.iterator().next();
+		if (account == null) {
+			// TODO how to generate the IDs here? Give the user the possibility to define rules (e.g. number ranges)
+			account = new Account(
+					this.getOrganisationID(),
+					"partner." + ObjectIDUtil.longObjectIDFieldToString(IDGenerator.nextID(Anchor.class, Account.ANCHOR_TYPE_ID_ACCOUNT + ".partner")),
+					accountType, partner, currency);
+			account = getPersistenceManager().makePersistent(account);
+			account.setOwner(partner);
+		}
+
+//		String searchAccountID = accountType.getOrganisationID() + ':' + accountType.getAccountTypeID() + ':' + partner.getOrganisationID() + ':' + partner.getAnchorID() + ':' + currency.getCurrencyID();
+//		AnchorID anchorID = AnchorID.create(this.getOrganisationID(), Account.ANCHOR_TYPE_ID_ACCOUNT, searchAccountID);
+//
+//		Account account = null;
+//		Object o = null;
+//		try {
+//			o = getPersistenceManager().getObjectById(anchorID);
+//			account = (Account)o;
+//		}
+//		catch (ClassCastException ce)  {
+//			IllegalStateException ill = new IllegalStateException("Found persistent object with oid "+anchorID+" but is not of type Account but "+o.getClass().getName());
+//			ill.initCause(ce);
+//			throw ill;
+//		}
+//		catch (JDOObjectNotFoundException je) {
+//			// account not existing, create it
+//			account = new Account(this.getOrganisationID(), searchAccountID, partner, currency, accountType);
+//			account = getPersistenceManager().makePersistent(account);
+//			account.setOwner(partner);
+//		}
+//
+//		if (account == null)
+//			throw new IllegalStateException("Account with oid "+anchorID+" could neither be found nor created!");
+//
+//		if (!account.getOwner().equals(partner))
+//			throw new IllegalStateException("An account for oid "+anchorID+" could be found, but its owner is not the partner the search was performed for. Owner: "+account.getOwner().getPrimaryKey()+", Partner: "+partner.getPrimaryKey());
+//
+//		if (!account.getAccountType().equals(accountType))
+//			throw new IllegalStateException("An account for oid "+anchorID+" could be found, but its accountType is not the accountType the search was performed for. assignedAccountType: "+JDOHelper.getObjectId(account.getAccountType())+", expectedAccountType: "+JDOHelper.getObjectId(accountType));
+
+		return account;
+	}
 }

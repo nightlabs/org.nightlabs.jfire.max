@@ -184,6 +184,16 @@ implements AccountingManagerRemote, AccountingManagerLocal
 				pm.makePersistent(sourceOrgDimension);
 			}
 
+			pm.getExtent(AccountType.class);
+			try {
+				pm.getObjectById(AccountType.ACCOUNT_TYPE_ID_UNCOLLECTABLE);
+			} catch (JDOObjectNotFoundException x) {
+				AccountType accountType = pm.makePersistent(new AccountType(AccountType.ACCOUNT_TYPE_ID_UNCOLLECTABLE, false));
+				accountType.getName().setText(Locale.ENGLISH.getLanguage(), "Uncollectable");
+				accountType.getName().setText(Locale.GERMAN.getLanguage(), "Uneinbringlich");
+			}
+
+
 			initRegisterConfigModules(pm);
 
 			// check, whether the datastore is already initialized

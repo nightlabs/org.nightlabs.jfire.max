@@ -29,19 +29,21 @@ package org.nightlabs.jfire.accounting.book;
 import java.io.Serializable;
 import java.util.Set;
 
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.Discriminator;
+import javax.jdo.annotations.DiscriminatorStrategy;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PrimaryKey;
+
 import org.nightlabs.jfire.accounting.MoneyTransfer;
+import org.nightlabs.jfire.accounting.book.id.AccountantID;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.transfer.Anchor;
 import org.nightlabs.jfire.transfer.Transfer;
-
-import javax.jdo.annotations.InheritanceStrategy;
-import javax.jdo.annotations.Inheritance;
-import javax.jdo.annotations.PrimaryKey;
-import javax.jdo.annotations.PersistenceCapable;
-import org.nightlabs.jfire.accounting.book.id.AccountantID;
-import javax.jdo.annotations.Column;
-import javax.jdo.annotations.IdentityType;
 
 /**
  * An Accountant is responsible for splitting money into several accounts and for
@@ -56,17 +58,6 @@ import javax.jdo.annotations.IdentityType;
  *
  * @author Marco Schulze - marco at nightlabs dot de
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
- *
- * @jdo.persistence-capable
- *		identity-type="application"
- *		objectid-class="org.nightlabs.jfire.accounting.book.id.AccountantID"
- *		detachable="true"
- *		table="JFireTrade_Accountant"
- *
- * @jdo.inheritance strategy="new-table"
- * 
- * @jdo.create-objectid-class
- *		field-order="organisationID, accountantID"
  */
 @PersistenceCapable(
 	objectIdClass=AccountantID.class,
@@ -74,20 +65,15 @@ import javax.jdo.annotations.IdentityType;
 	detachable="true",
 	table="JFireTrade_Accountant")
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
+@Discriminator(strategy=DiscriminatorStrategy.CLASS_NAME)
 public abstract class Accountant implements Serializable
 {
 	private static final long serialVersionUID = 1L;
-	/**
-	 * @jdo.field primary-key="true"
-	 * @jdo.column length="100"
-	 */
+
 	@PrimaryKey
 	@Column(length=100)
 	private String organisationID;
-	/**
-	 * @jdo.field primary-key="true"
-	 * @jdo.column length="100"
-	 */
+
 	@PrimaryKey
 	@Column(length=100)
 	private String accountantID;
@@ -105,26 +91,26 @@ public abstract class Accountant implements Serializable
 	}
 
 	/**
-	 * @return Returns the organisationID.
+	 * @return the organisationID.
 	 */
 	public String getOrganisationID()
 	{
 		return organisationID;
 	}
 	/**
-	 * @return Returns the accountantID.
+	 * @return the accountantID.
 	 */
 	public String getAccountantID()
 	{
 		return accountantID;
 	}
-	
+
 	/**
-	 * This method is called by {@link LegalEntity} when it books the given 
+	 * This method is called by {@link LegalEntity} when it books the given
 	 * {@link Transfer} itself and gives this Accountant the opportunity to
 	 * perform further action, like creating sub-transfers for the given
 	 * one.
-	 *  
+	 *
 	 * @param user The user that initiated the given transfer.
 	 * @param mandator The mandator this accountant acts on behalf of.
 	 * @param transfer The transfer to book.

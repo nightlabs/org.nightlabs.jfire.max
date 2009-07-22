@@ -2,21 +2,21 @@ package org.nightlabs.jfire.accounting;
 
 import java.io.Serializable;
 
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
+
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.accounting.id.AccountTypeID;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.util.Util;
-
-import javax.jdo.annotations.Persistent;
-import javax.jdo.annotations.FetchGroups;
-import javax.jdo.annotations.InheritanceStrategy;
-import javax.jdo.annotations.Inheritance;
-import javax.jdo.annotations.PrimaryKey;
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.FetchGroup;
-import javax.jdo.annotations.Column;
-import javax.jdo.annotations.IdentityType;
-import javax.jdo.annotations.PersistenceModifier;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -54,6 +54,11 @@ implements Serializable
 	public static final String FETCH_GROUP_NAME = "AccountType.name"; //$NON-NLS-1$
 
 	/**
+	 * anchorTypeID for uncollectable invoices.
+	 */
+	public static final AccountTypeID ACCOUNT_TYPE_ID_UNCOLLECTABLE = AccountTypeID.create(Organisation.DEV_ORGANISATION_ID, "Uncollectable"); //$NON-NLS-1$
+
+	/**
 	 * anchorTypeID for revenue accounts of the local organisation.
 	 */
 	public static final AccountTypeID ACCOUNT_TYPE_ID_LOCAL_REVENUE = AccountTypeID.create(Organisation.DEV_ORGANISATION_ID, "Local.Revenue"); //$NON-NLS-1$
@@ -67,7 +72,7 @@ implements Serializable
 	 * anchorTypeID for accounts of trading partners when they acting as vendor
 	 */
 	public static final AccountTypeID ACCOUNT_TYPE_ID_PARTNER_VENDOR = AccountTypeID.create(Organisation.DEV_ORGANISATION_ID, "Partner.Vendor"); //$NON-NLS-1$
-	
+
 	/**
 	 * anchorTypeID for accounts of trading partners when they acting as customer
 	 */

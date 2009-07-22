@@ -38,6 +38,21 @@ import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.Discriminator;
+import javax.jdo.annotations.DiscriminatorStrategy;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.Queries;
 import javax.jdo.listener.DetachCallback;
 
 import org.nightlabs.jfire.accounting.Account;
@@ -46,6 +61,7 @@ import org.nightlabs.jfire.accounting.Accounting;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.pay.id.ModeOfPaymentFlavourID;
 import org.nightlabs.jfire.accounting.pay.id.ModeOfPaymentID;
+import org.nightlabs.jfire.accounting.pay.id.ServerPaymentProcessorID;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.transfer.Anchor;
@@ -53,26 +69,9 @@ import org.nightlabs.jfire.transfer.RequirementCheckResult;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 import org.nightlabs.util.Util;
 
-import javax.jdo.annotations.Join;
-import javax.jdo.annotations.FetchGroups;
-import javax.jdo.annotations.NullValue;
-import javax.jdo.annotations.Inheritance;
-import javax.jdo.annotations.PrimaryKey;
-import javax.jdo.annotations.FetchGroup;
-import javax.jdo.annotations.PersistenceModifier;
-import javax.jdo.annotations.Discriminator;
-import javax.jdo.annotations.Persistent;
-import javax.jdo.annotations.InheritanceStrategy;
-import javax.jdo.annotations.Queries;
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.DiscriminatorStrategy;
-import javax.jdo.annotations.Column;
-import org.nightlabs.jfire.accounting.pay.id.ServerPaymentProcessorID;
-import javax.jdo.annotations.IdentityType;
-
 /**
  * @author Marco Schulze - marco at nightlabs dot de
- * 
+ *
  * @jdo.persistence-capable
  *		identity-type="application"
  *		objectid-class="org.nightlabs.jfire.accounting.pay.id.ServerPaymentProcessorID"
@@ -521,9 +520,9 @@ implements Serializable, DetachCallback
 					organisationID,
 					accountID,
 					accountType,
-					partner,
+					individualAccount ? partner : payParams.accounting.getMandator(),
 					currency);
-			pm.makePersistent(account);
+			account = pm.makePersistent(account);
 		}
 		return account;
 	}
@@ -541,7 +540,7 @@ implements Serializable, DetachCallback
 	 * obtain your "outside world anchor" to keep the API consistent.
 	 * <p>
 	 * It is a good idea to call {@link #getAccountOutside(PayParams, String)}.
-	 * 
+	 *
 	 * @return Returns the <tt>Anchor</tt> from which or to which the money is
 	 *         flowing outside the organisation.
 	 */
@@ -638,7 +637,7 @@ public PayMoneyTransfer payBegin(PayParams payParams)
 	{
 		Payment payment = payParams.paymentData.getPayment();
 		PaymentResult payDoWorkServerResult = externalPayDoWork(payParams);
-	
+
 		if (payDoWorkServerResult == null) {
 			if (payment.isPostponed()) {
 				payDoWorkServerResult = new PaymentResult(
@@ -701,7 +700,7 @@ public PayMoneyTransfer payBegin(PayParams payParams)
 		PaymentResult payEndServerResult;
 		if (payment.isForceRollback() || payment.isFailed()) {
 			payEndServerResult = externalPayRollback(payParams);
-	
+
 			if (payEndServerResult == null) {
 				payEndServerResult = new PaymentResult(
 						PaymentResult.CODE_ROLLED_BACK_NO_EXTERNAL,
@@ -711,7 +710,7 @@ public PayMoneyTransfer payBegin(PayParams payParams)
 		}
 		else {
 			payEndServerResult = externalPayCommit(payParams);
-			
+
 			if (payEndServerResult == null) {
 				if (payment.isPostponed()) {
 					payEndServerResult = new PaymentResult(
@@ -744,7 +743,7 @@ public PayMoneyTransfer payBegin(PayParams payParams)
 	 */
 	protected abstract PaymentResult externalPayCommit(PayParams payParams)
 	throws PaymentException;
-	
+
 	/**
 	 * In your implementation of this method, you must rollback the payment in
 	 * the external system.
@@ -810,17 +809,17 @@ public PayMoneyTransfer payBegin(PayParams payParams)
 	{
 		return null;
 	}
-	
+
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
 	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private RequirementCheckResult requirementCheckResult;
-	
+
 	/**
 	 * This method returns null if all requirements are met and a descriptive CheckRequirementsResult
 	 * otherwise.
-	 * 
+	 *
 	 * @return null if all requirements are met and a descriptive CheckRequirementsResult otherwise.
 	 */
 	public RequirementCheckResult getRequirementCheckResult() {
@@ -841,7 +840,7 @@ public PayMoneyTransfer payBegin(PayParams payParams)
 	 * it needs to ensure some requirements before it can be used. If everything is ok, this
 	 * method should return null. Otherwise a string describing the failure should be returned.
 	 * @param checkRequirementsEnvironment TODO
-	 * 
+	 *
 	 * @return null if everything is ok, a descriptive CheckRequirementsResult otherwise.
 	 */
 	protected RequirementCheckResult _checkRequirements(CheckRequirementsEnvironment checkRequirementsEnvironment) {

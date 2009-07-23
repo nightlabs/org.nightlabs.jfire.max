@@ -182,9 +182,10 @@ implements Serializable
 	 * @param organisationID the first part of the composite primary key - referencing the organisation which owns this <code>IssuePriority</code>.
 	 * @param projectCostID the second part of the composite primary key. Use {@link IDGenerator#nextID(Class)} with <code>Project.class</code> to create an id.
 	 */
-	public ProjectCost(Project project, Currency currency, long projectCostID){
-		this.organisationID = project.getOrganisationID();
-		this.projectCostID = projectCostID;
+	public ProjectCost(Project project, Currency currency)
+	{
+		this.organisationID = IDGenerator.getOrganisationID();
+		this.projectCostID = IDGenerator.nextID(ProjectCost.class);
 		
 		this.project = project;
 		this.currency = currency;
@@ -212,6 +213,10 @@ implements Serializable
 
 	public Currency getCurrency() {
 		return currency;
+	}
+	
+	public void setCurrency(Currency currency) {
+		this.currency = currency;
 	}
 
 	public void addProjectCostValue(ProjectCostValue projectCostValue) {

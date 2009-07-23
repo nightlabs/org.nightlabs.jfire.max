@@ -108,7 +108,7 @@ extends BaseJDOObjectDAO<ProjectCostID, ProjectCost>
 			throw new NullPointerException("Project must not be null");
 		if(projectCost.getCurrency() == null)
 			throw new NullPointerException("Currency must not be null");
-		monitor.beginTask("Creating project costs for project: "+ projectCost.getProjectID(), 3);
+		monitor.beginTask("Creating project costs for project: "+ projectCost.getProject().getProjectID(), 3);
 		try {
 			IssueTimeTrackingManagerRemote it = JFireEjb3Factory.getRemoteBean(IssueTimeTrackingManagerRemote.class, SecurityReflector.getInitialContextProperties());
 			monitor.worked(1);

@@ -2,23 +2,26 @@ package org.nightlabs.jfire.issuetimetracking;
 
 import java.io.Serializable;
 
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.Element;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.Queries;
+import javax.jdo.annotations.Query;
+
 import org.nightlabs.jfire.accounting.Price;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.issue.project.Project;
-
-import javax.jdo.annotations.Persistent;
-import javax.jdo.annotations.FetchGroups;
-import javax.jdo.annotations.InheritanceStrategy;
-import javax.jdo.annotations.Inheritance;
-import javax.jdo.annotations.Queries;
-import javax.jdo.annotations.PrimaryKey;
 import org.nightlabs.jfire.issuetimetracking.id.ProjectCostValueID;
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.FetchGroup;
-import javax.jdo.annotations.Column;
-import javax.jdo.annotations.Query;
-import javax.jdo.annotations.IdentityType;
-import javax.jdo.annotations.PersistenceModifier;
+import org.nightlabs.jfire.security.User;
+import org.nightlabs.util.Util;
 
 /**
  * The {@link ProjectCostValue} class represents an cost information of each {@link Project}s. 
@@ -47,6 +50,7 @@ import javax.jdo.annotations.PersistenceModifier;
  * @jdo.fetch-group name="ProjectCostValue.cost" fields="cost"
  * @jdo.fetch-group name="ProjectCostValue.revenue" fields="revenue"
  * @jdo.fetch-group name="ProjectCostValue.projectCost" fields="projectCost"
+ * @jdo.fetch-group name="ProjectCostValue.user" fields="user"
  */
 @PersistenceCapable(
 	objectIdClass=ProjectCostValueID.class,
@@ -62,7 +66,10 @@ import javax.jdo.annotations.PersistenceModifier;
 		members=@Persistent(name="revenue")),
 	@FetchGroup(
 		name=ProjectCostValue.FETCH_GROUP_PROJECT_COST,
-		members=@Persistent(name="projectCost"))
+		members=@Persistent(name="projectCost")),
+	@FetchGroup(
+			name=ProjectCostValue.FETCH_GROUP_USER,
+			members=@Persistent(name="user"))
 })
 @Queries(
 	@Query(
@@ -78,6 +85,7 @@ implements Serializable
 	public static final String FETCH_GROUP_COST = "ProjectCostValue.cost";
 	public static final String FETCH_GROUP_REVENUE = "ProjectCostValue.revenue";
 	public static final String FETCH_GROUP_PROJECT_COST = "ProjectCostValue.projectCost";
+	public static final String FETCH_GROUP_USER = "ProjectCostValue.user";
 
 	/**
 	 * @jdo.field primary-key="true"
@@ -99,6 +107,13 @@ implements Serializable
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private ProjectCost projectCost;
 
+	/**
+	 * @jdo.field persistence-modifier="persistent" unique="true"
+	 */
+	@Element(unique="true")
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+	private User user;
+	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
@@ -123,10 +138,11 @@ implements Serializable
 	 * @param organisationID the first part of the composite primary key - referencing the organisation which owns this <code>IssuePriority</code>.
 	 * @param projectCostID the second part of the composite primary key. Use {@link IDGenerator#nextID(Class)} with <code>ProjectCostValue.class</code> to create an id.
 	 */
-	public ProjectCostValue(ProjectCost projectCost, long projectCostValueID){
+	public ProjectCostValue(User user, ProjectCost projectCost, long projectCostValueID){
 		this.organisationID = projectCost.getOrganisationID();
 		this.projectCostValueID = projectCostValueID;
 		
+		this.user = user;
 		this.projectCost = projectCost;
 		
 		this.cost = new Price(projectCost.getOrganisationID(), IDGenerator.nextID(Price.class), projectCost.getCurrency());
@@ -163,5 +179,36 @@ implements Serializable
 	 */
 	public Price getRevenue() {
 		return revenue;
+	}
+	
+	/**
+	 * Returns the {@link Price}.
+	 * @return the {@link Price}
+	 */
+	public User getUser() {
+		return user;
+	}
+	
+	@Override
+	/*
+	 *
+	 */
+	public boolean equals(Object obj)
+	{
+		if (obj == this) return true;
+		if (!(obj instanceof ProjectCostValue)) return false;
+		ProjectCostValue o = (ProjectCostValue) obj;
+		return
+		Util.equals(o.organisationID, this.organisationID) &&
+		Util.equals(o.projectCostValueID, this.projectCostValueID);
+	}
+
+	@Override
+	/*
+	 *
+	 */
+	public int hashCode()
+	{
+		return (31 * Util.hashCode(organisationID)) + Util.hashCode(projectCostValueID);
 	}
 }

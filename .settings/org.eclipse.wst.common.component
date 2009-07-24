@@ -5,5 +5,8 @@
         <dependent-module archiveName="org.nightlabs.connection.jar" deploy-path="/" handle="module:/resource/org.nightlabs.connection/org.nightlabs.connection">
             <dependency-type>uses</dependency-type>
         </dependent-module>
+        <dependent-module deploy-path="/lib" handle="module:/classpath/lib/org.nightlabs.connection/lib/RXTXcomm.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
     </wb-module>
 </project-modules>

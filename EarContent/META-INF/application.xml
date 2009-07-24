@@ -4,7 +4,4 @@
   <module>
     <java>RXTXcomm.jar</java>
   </module>
-  <module>
-    <java>NightLabsConnection.jar</java>
-  </module>
 </application>

@@ -3,8 +3,8 @@
 	<name>NightLabsConnectionEAR</name>
 	<comment></comment>
 	<projects>
-		<project>NightLabsConnection</project>
 		<project>NightLabsConnectionEAR</project>
+		<project>org.nightlabs.connection</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

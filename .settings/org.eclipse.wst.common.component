@@ -2,10 +2,7 @@
 <project-modules id="moduleCoreId" project-version="1.5.0">
     <wb-module deploy-name="NightLabsConnectionEAR">
         <wb-resource deploy-path="/" source-path="/EarContent"/>
-        <dependent-module archiveName="NightLabsConnection.jar" deploy-path="/" handle="module:/resource/NightLabsConnection/NightLabsConnection">
-            <dependency-type>uses</dependency-type>
-        </dependent-module>
-        <dependent-module deploy-path="/" handle="module:/classpath/lib/NightLabsConnection/lib/RXTXcomm.jar">
+        <dependent-module archiveName="org.nightlabs.connection.jar" deploy-path="/" handle="module:/resource/org.nightlabs.connection/org.nightlabs.connection">
             <dependency-type>uses</dependency-type>
         </dependent-module>
     </wb-module>

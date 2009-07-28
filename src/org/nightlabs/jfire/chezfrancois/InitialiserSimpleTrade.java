@@ -1,7 +1,11 @@
 package org.nightlabs.jfire.chezfrancois;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.Set;
 
 import javax.jdo.JDOObjectNotFoundException;
@@ -16,8 +20,8 @@ import org.nightlabs.jfire.accounting.gridpriceconfig.FormulaPriceConfig;
 import org.nightlabs.jfire.accounting.gridpriceconfig.PriceCalculationException;
 import org.nightlabs.jfire.accounting.priceconfig.IInnerPriceConfig;
 import org.nightlabs.jfire.base.JFirePrincipal;
+import org.nightlabs.jfire.chezfrancois.resource.Messages;
 import org.nightlabs.jfire.person.Person;
-import org.nightlabs.jfire.person.PersonStruct;
 import org.nightlabs.jfire.prop.exception.DataBlockGroupNotFoundException;
 import org.nightlabs.jfire.prop.exception.DataBlockNotFoundException;
 import org.nightlabs.jfire.prop.exception.DataFieldNotFoundException;
@@ -363,16 +367,16 @@ extends Initialiser
 			}
 		}
 
-		// create some more users
-		User user00 = dataCreator.createUser("user00", "test", "Chez Francois", "Miller", "Adam", "adam.miller@chezfrancois.co.th");
-		LegalEntity legalEntity00 = dataCreator.createLegalEntity(user00.getPerson());
-		legalEntity00.setDefaultCustomerGroup(customerGroupDefault);
-		User user01 = dataCreator.createUser("user01", "test", "Chez Francois", "Miller", "Eva", "eva.miller@chezfrancois.co.th");
-		LegalEntity legalEntity01 = dataCreator.createLegalEntity(user01.getPerson());
-		legalEntity01.setDefaultCustomerGroup(customerGroupDefault);
-		User user03 = dataCreator.createUser("alex", "test", "NightLabs GmbH", "Bieber", "Alex", "alex@nightlabs.de");
-		LegalEntity legalEntity03 = dataCreator.createLegalEntity(user03.getPerson());
-		legalEntity03.setDefaultCustomerGroup(customerGroupDefault);
+//		// create some more users --> See below for more detailed users. Kai.
+//		User user00 = dataCreator.createUser("user00", "test", "Chez Francois", "Miller", "Adam", "adam.miller@chezfrancois.co.th");
+//		LegalEntity legalEntity00 = dataCreator.createLegalEntity(user00.getPerson());
+//		legalEntity00.setDefaultCustomerGroup(customerGroupDefault);
+//		User user01 = dataCreator.createUser("user01", "test", "Chez Francois", "Miller", "Eva", "eva.miller@chezfrancois.co.th");
+//		LegalEntity legalEntity01 = dataCreator.createLegalEntity(user01.getPerson());
+//		legalEntity01.setDefaultCustomerGroup(customerGroupDefault);
+//		User user03 = dataCreator.createUser("alex", "test", "NightLabs GmbH", "Bieber", "Alex", "alex@nightlabs.de");
+//		LegalEntity legalEntity03 = dataCreator.createLegalEntity(user03.getPerson());
+//		legalEntity03.setDefaultCustomerGroup(customerGroupDefault);
 
 
 		LegalEntity vendor  = dataCreator.createVendor1();
@@ -388,17 +392,26 @@ extends Initialiser
 		bottleMerlotItaly2001.getFieldMetaData(ProductType.FieldName.vendor).setValueInherited(false);
 		bottleMerlotItaly2001.getFieldMetaData(ProductType.FieldName.owner).setValueInherited(false);
 
-		Person person = dataCreator.createPerson("NightLabs GmbH", "Marco", "Schulze", "marco@nightlabs.de", new Date(),
-				PersonStruct.PERSONALDATA_SALUTATION_MR, "Dr.", "Teststrasse", "79100", "Freiburg", "Baden-Württemberg", "Deutschland",
-				"49", "761", "123456789", "49", "761", "987654321", "Marco Schulze", "123456789", "68090000", "TestBank",
-				"Marco Schulze", "1234567890",
-				01, 2008, "Comment for Marco Schulze");
-		User user02 = dataCreator.createUser("marco", "test", person);
+//		Person person = dataCreator.createPerson("NightLabs GmbH", "Marco", "Schulze", "marco@nightlabs.de", new Date(),
+//				PersonStruct.PERSONALDATA_SALUTATION_MR, "Dr.", "Teststrasse", "79100", "Freiburg", "Baden-Württemberg", "Deutschland",
+//				"49", "761", "123456789", "49", "761", "987654321", "Marco Schulze", "123456789", "68090000", "TestBank",
+//				"Marco Schulze", "1234567890",
+//				01, 2008, "Comment for Marco Schulze");
+//		User user02 = dataCreator.createUser("marco", "test", person);
+
+
 
 		userSecurityGroup = new UserSecurityGroup(organisationID, "Administrators");
 		userSecurityGroup.setName("Administrators");
 		userSecurityGroup.setDescription("This group has all access rights within its organisation.");
 		userSecurityGroup = pm.makePersistent(userSecurityGroup);
+
+		Authority authority = (Authority) pm.getObjectById(AuthorityID.create(organisationID, Authority.AUTHORITY_ID_ORGANISATION));
+		UserSecurityGroupRef userGroupRef = (UserSecurityGroupRef) authority.createAuthorizedObjectRef(userSecurityGroup);
+
+//		authority.createAuthorizedObjectRef(user00.getUserLocal());
+//		authority.createAuthorizedObjectRef(user01.getUserLocal());
+
 
 //		{ // TODO WORKAROUND DATANUCLEUS
 //		pm.flush();
@@ -411,16 +424,92 @@ extends Initialiser
 //		user03 = (User) pm.getObjectById(UserID.create(organisationID, "alex"));
 //		}
 
-		userSecurityGroup.addMember(user00.getUserLocal());
-		userSecurityGroup.addMember(user01.getUserLocal());
-		userSecurityGroup.addMember(user02.getUserLocal());
-		userSecurityGroup.addMember(user03.getUserLocal());
+//		userSecurityGroup.addMember(user00.getUserLocal());
+//		userSecurityGroup.addMember(user01.getUserLocal());
+//		userSecurityGroup.addMember(user02.getUserLocal());
+//		userSecurityGroup.addMember(user03.getUserLocal());
 
-		Authority authority = (Authority) pm.getObjectById(AuthorityID.create(organisationID, Authority.AUTHORITY_ID_ORGANISATION));
 
-		UserSecurityGroupRef userGroupRef = (UserSecurityGroupRef) authority.createAuthorizedObjectRef(userSecurityGroup);
-		authority.createAuthorizedObjectRef(user00.getUserLocal());
-		authority.createAuthorizedObjectRef(user01.getUserLocal());
+		// --- 8< --- KaiExperiments: since 27.07.2009 ------------------
+		// Data references.
+		DateFormat formatter = new SimpleDateFormat("dd.MM.yyyy", Locale.ENGLISH);
+		int totDemoPersonCnt = 7;
+
+		// Generate Demo Persons.
+		LegalEntity legalEntity00 = null;	// Marked for later: dataCreator.createOrderForEndcustomer(legalEntity00), from the original codes, see below.
+		for (int i=1; i<=totDemoPersonCnt; i++) {
+			// Retrieve information.
+			String company = Messages.getString("org.nightlabs.jfire.chezfrancois.InitialiserSimpleTrade.person_company_" + i);
+			String name = Messages.getString("org.nightlabs.jfire.chezfrancois.InitialiserSimpleTrade.person_name_" + i);
+			String firstName = Messages.getString("org.nightlabs.jfire.chezfrancois.InitialiserSimpleTrade.person_firstName_" + i);
+			String eMail = Messages.getString("org.nightlabs.jfire.chezfrancois.InitialiserSimpleTrade.person_eMail_" + i);
+			String dateOfBirth = Messages.getString("org.nightlabs.jfire.chezfrancois.InitialiserSimpleTrade.person_dateOfBirth_" + i);
+			String salutation = Messages.getString("org.nightlabs.jfire.chezfrancois.InitialiserSimpleTrade.person_salutation_" + i);
+			String title = Messages.getString("org.nightlabs.jfire.chezfrancois.InitialiserSimpleTrade.person_title_" + i);
+			String postAdress = Messages.getString("org.nightlabs.jfire.chezfrancois.InitialiserSimpleTrade.person_postAdress_" + i);
+			String postCode = Messages.getString("org.nightlabs.jfire.chezfrancois.InitialiserSimpleTrade.person_postCode_" + i);
+			String postCity = Messages.getString("org.nightlabs.jfire.chezfrancois.InitialiserSimpleTrade.person_postCity_" + i);
+			String postRegion = Messages.getString("org.nightlabs.jfire.chezfrancois.InitialiserSimpleTrade.person_postRegion_" + i);
+			String postCountry = Messages.getString("org.nightlabs.jfire.chezfrancois.InitialiserSimpleTrade.person_postCountry_" + i);
+			String phoneCountryCode = Messages.getString("org.nightlabs.jfire.chezfrancois.InitialiserSimpleTrade.person_phoneCountryCode_" + i);
+			String phoneAreaCode = Messages.getString("org.nightlabs.jfire.chezfrancois.InitialiserSimpleTrade.person_phoneAreaCode_" + i);
+			String phoneNumber = Messages.getString("org.nightlabs.jfire.chezfrancois.InitialiserSimpleTrade.person_phoneNumber_" + i);
+			String faxCountryCode = Messages.getString("org.nightlabs.jfire.chezfrancois.InitialiserSimpleTrade.person_faxCountryCode_" + i);
+			String faxAreaCode = Messages.getString("org.nightlabs.jfire.chezfrancois.InitialiserSimpleTrade.person_faxAreaCode_" + i);
+			String faxNumber = Messages.getString("org.nightlabs.jfire.chezfrancois.InitialiserSimpleTrade.person_faxNumber_" + i);
+			String bankAccountHolder = Messages.getString("org.nightlabs.jfire.chezfrancois.InitialiserSimpleTrade.person_bankAccountHolder_" + i);
+			String bankAccountNumber = Messages.getString("org.nightlabs.jfire.chezfrancois.InitialiserSimpleTrade.person_bankAccountNumber_" + i);
+			String bankCode = Messages.getString("org.nightlabs.jfire.chezfrancois.InitialiserSimpleTrade.person_bankCode_" + i);
+			String bankName = Messages.getString("org.nightlabs.jfire.chezfrancois.InitialiserSimpleTrade.person_bankName_" + i);
+			String creditCardHolder = Messages.getString("org.nightlabs.jfire.chezfrancois.InitialiserSimpleTrade.person_creditCardHolder_" + i);
+			String creditCardNumber = Messages.getString("org.nightlabs.jfire.chezfrancois.InitialiserSimpleTrade.person_creditCardNumber_" + i);
+			int creditCardExpiryMonth = Integer.parseInt( Messages.getString("org.nightlabs.jfire.chezfrancois.InitialiserSimpleTrade.person_creditCardExpiryMonth_" + i) );
+			int creditCardExpiryYear = Integer.parseInt( Messages.getString("org.nightlabs.jfire.chezfrancois.InitialiserSimpleTrade.person_creditCardExpiryYear_" + i) );
+			String comment = Messages.getString("org.nightlabs.jfire.chezfrancois.InitialiserSimpleTrade.person_comment_" + i);
+			String userID = Messages.getString("org.nightlabs.jfire.chezfrancois.InitialiserSimpleTrade.person_userID_" + i);
+			String password = Messages.getString("org.nightlabs.jfire.chezfrancois.InitialiserSimpleTrade.person_password_" + i);
+
+			Date dob;
+			try { dob = formatter.parse( dateOfBirth ); }
+			catch (ParseException e) { dob = new Date(); }
+
+
+			// Create the Person (a person in a JFire datastore).
+			Person person = dataCreator.createPerson(
+					           company, name, firstName, eMail, dob, salutation, title, postAdress, postCode,
+					           postCity, postRegion, postCountry, phoneCountryCode, phoneAreaCode, phoneNumber, faxCountryCode,
+					           faxAreaCode, faxNumber, bankAccountHolder, bankAccountNumber, bankCode, bankName, creditCardHolder, creditCardNumber,
+					           creditCardExpiryMonth, creditCardExpiryYear, comment);
+
+			// Create LegalEntity (a business partner to a JFire organisation).
+			LegalEntity legalEntity = dataCreator.createLegalEntity(person);
+			legalEntity.setDefaultCustomerGroup(customerGroupDefault);
+			if (userID.equals("user00")) legalEntity00 = legalEntity;
+
+
+			// Create User.
+			User user = dataCreator.createUser(userID, password, person);
+			userSecurityGroup.addMember(user.getUserLocal());
+
+			// Other operation(s) on specific users.
+			if (userID.equals("user00") || userID.equals("user01"))
+				authority.createAuthorizedObjectRef(user.getUserLocal());
+
+
+			// Done.
+			logger.info(" ::: -------------------------->> Person created: [" + i + "] \"" + person.getDisplayName() + "\""
+					+ " (User ID: " + user.getUserID() + ")"
+					+ " (User type: " + user.getUserType() + ")");
+		}
+		// ------ KaiExperiments ----- >8 -------------------------------
+
+
+
+//		Authority authority = (Authority) pm.getObjectById(AuthorityID.create(organisationID, Authority.AUTHORITY_ID_ORGANISATION));
+//
+//		UserSecurityGroupRef userGroupRef = (UserSecurityGroupRef) authority.createAuthorizedObjectRef(userSecurityGroup);
+//		authority.createAuthorizedObjectRef(user00.getUserLocal());
+//		authority.createAuthorizedObjectRef(user01.getUserLocal());
 
 		for (Iterator<RoleGroup> it = pm.getExtent(RoleGroup.class).iterator(); it.hasNext(); ) {
 			RoleGroup roleGroup = it.next();

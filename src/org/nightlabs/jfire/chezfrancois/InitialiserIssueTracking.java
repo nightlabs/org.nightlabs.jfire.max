@@ -1,6 +1,7 @@
 package org.nightlabs.jfire.chezfrancois;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
@@ -27,6 +28,7 @@ import org.nightlabs.jfire.issue.id.IssueID;
 import org.nightlabs.jfire.issue.id.IssueTypeID;
 import org.nightlabs.jfire.issue.issuemarker.IssueMarker;
 import org.nightlabs.jfire.issue.issuemarker.IssueMarkerHistoryItem;
+import org.nightlabs.jfire.person.Person;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.util.CollectionUtil;
@@ -84,6 +86,25 @@ public class InitialiserIssueTracking extends Initialiser {
 		String organisationID = getOrganisationID();
 		User sysUser = User.getUser(pm, getPrincipal());
 
+		// --- 8< --- KaiExperiments: since 27.07.2009 ------------------
+		Collection<User> _users = User.getUsersByType(pm, "User", sysUser.getUserID());
+
+		// Just put them in some orderly fashion for easy referral and retrieval.
+		List<User> users = new ArrayList<User>(_users.size() + 1);
+		users.add(sysUser);
+		users.addAll(_users);
+
+		int usersCnt = users.size();
+		logger.info(" ------>>> Found " + usersCnt + " Users:");
+		for(User user : users) {
+			Person person = user.getPerson();
+			String nameStr = person == null ? "UserID: \"" + user.getUserID() + "\"" : person.getDisplayName();
+			logger.info("   |--> [UserType: \"" + user.getUserType() + "\"] " + nameStr);
+		}
+		// ------ KaiExperiments ----- >8 -------------------------------
+
+
+
 		// Data references.
 		String baseName = "org.nightlabs.jfire.chezfrancois.resource.messages";
 		ClassLoader loader = InitialiserIssueTracking.class.getClassLoader();
@@ -99,18 +120,22 @@ public class InitialiserIssueTracking extends Initialiser {
 
 		// Load ALL currently known IssueMarkers.
 		List<IssueMarker> issueMarkers = NLJDOHelper.getObjectList(pm, issueMgr.getIssueMarkerIDs(), IssueMarker.class);
-		if (logger.isDebugEnabled()) {
-			logger.info(" ----> Found IssueMarkers");
-			for (IssueMarker issueMarker : issueMarkers)
-				logger.info("   |--> " + issueMarker.getDescription().getText()); //$NON-NLS-1$
-		}
+		logger.info(" ----> Found IssueMarkers");
+		for (IssueMarker issueMarker : issueMarkers)
+			logger.info("   |--> " + issueMarker.getDescription().getText()); //$NON-NLS-1$
 
 		// Load ALL currently known IssueLinkTypes.
 		List<IssueLinkType> issueLinkTypes = NLJDOHelper.getObjectList(pm, issueMgr.getIssueLinkTypeIDs(), IssueLinkType.class);
-		if (logger.isDebugEnabled()) {
-			logger.info(" ----> Found IssueLinkTypes");
-			for (IssueLinkType issueLinkType : issueLinkTypes)
-				logger.info("   |--> " + issueLinkType.getName().getText()); //$NON-NLS-1$
+		int ctr = 0;
+		int indexRelatedIssueLinkType = -1;
+		logger.info(" ----> Found IssueLinkTypes");
+		for (IssueLinkType issueLinkType : issueLinkTypes) {
+			logger.info("   |--> " + issueLinkType.getName().getText()); //$NON-NLS-1$
+
+			if(issueLinkType.getName().getText().equals("Zugehörig")) // <-- Bad bad bad... I know... will fix this later. In a hurry...
+				indexRelatedIssueLinkType = ctr;
+
+			ctr++;
 		}
 
 		// Other simulation settings.
@@ -123,18 +148,25 @@ public class InitialiserIssueTracking extends Initialiser {
 		Random rndGen = new Random(System.currentTimeMillis());
 
 		// Generate demo data.
-		int ctr = 0;
+		ctr = 0;
 		List<Issue> demoIssues = new ArrayList<Issue>(totDemoIssueCnt);
 		List<IssueID> demoIssueIDs = new ArrayList<IssueID>(totDemoIssueCnt);
 		for (int i = 0; i < totDemoIssueCnt; i++) {
 			Issue demoIssue = new Issue(organisationID, IDGenerator
 					.nextID(Issue.class), issueTypeDefault);
 
+			// Randomly pick from known users for use as Reporter and Assignee.
+			User userReporter = users.get( rndGen.nextInt(usersCnt) );
+			User userAssignee = users.get( rndGen.nextInt(usersCnt) );
+
 			// Subject and description.
-			demoIssue.setReporter(sysUser);
+			demoIssue.setReporter(userReporter);
+			if (!userAssignee.getUserID().equals(User.USER_ID_OTHER)) demoIssue.setAssignee(userAssignee);
 			demoIssue.getSubject().readFromProperties(baseName, loader, "org.nightlabs.jfire.chezfrancois.InitialiserIssueTracking.issueSubject" + (i + 1)); //$NON-NLS-1$
 			demoIssue.getDescription().readFromProperties(baseName, loader, "org.nightlabs.jfire.chezfrancois.InitialiserIssueTracking.issueDescription" + (i + 1)); //$NON-NLS-1$
+
 			statString = " ::::: Issue created -- (ID:" + demoIssue.getIssueID() + ") " + demoIssue.getSubject().getText() + " [" + demoIssue.getDescription().getText() + "]";
+			statString += ", reported by \"" + userReporter.getUserID() + "\"";
 
 			// For integrity testings ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~>> START
 			// ~~ I. Randomly assign Priority, Resolution, and Severity Type.
@@ -195,6 +227,13 @@ public class InitialiserIssueTracking extends Initialiser {
 
 
 			// TODO ~~ IV. Randomly create links between demoIssue and Person(s).
+			if (indexRelatedIssueLinkType != -1 && rndGen.nextInt(100) < 35) {
+//				User user = users.get( rndGen.nextInt(usersCnt) );
+//				while (userAssignee.getUserID().equals(User.USER_ID_OTHER) || userAssignee.getUserID().equals(User.USER_ID_SYSTEM))
+//					user = users.get( rndGen.nextInt(usersCnt) );
+
+//				demoIssue.createIssueLink(issueLinkTypes.get(indexRelatedIssueLinkType), user.getPerson());
+			}
 
 			// Report status.
 			if (logger.isDebugEnabled())

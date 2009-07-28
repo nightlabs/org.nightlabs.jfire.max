@@ -10,12 +10,14 @@ import java.util.Locale;
 public class Util {
 
 	public static boolean isValidEmailAddress(String email) {
-		String regex = "^[^@]+@([0-9a-zA-Z\\-]+\\.)+[a-zA-Z]+$";
-		return email.matches(regex);
+		return email.matches("^[^@]+@([0-9a-zA-Z\\-]+\\.)+[a-zA-Z]+$");
 	}
-
+	
+	public static boolean isValidUrl(String url) {
+		return url.matches("(https?|ftp)://(www\\.)?(\\w+\\.)?\\w+");
+	}
 	/**
-     * Convert a string based locale into a Locale Object
+	 * Convert a string based locale into a Locale Object
      * Strings are formatted:
      * language_contry_variant
      *

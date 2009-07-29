@@ -303,6 +303,20 @@ implements ISaleAccessQuery
 		q.declareVariables(getVars());
 	}
 
+	private ProductTypePermissionFlagSet getProductTypePermissionFlagSet(ProductType productType)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		ProductTypePermissionFlagSet ptpfs;
+		try {
+			ptpfs = (ProductTypePermissionFlagSet) pm.getObjectById(
+					ProductTypePermissionFlagSetID.create((ProductTypeID)JDOHelper.getObjectId(productType), userID)
+			);
+		} catch (JDOObjectNotFoundException x) {
+			ptpfs = null;
+		}
+		return ptpfs;
+	}
+
 	// TODO DataNucleus WORKAROUND: remove this temporary workaround (the whole implementation of postProcessQueryResult) and activate the populateFilterPermissionGranted(...) above.
 	@Override
 	protected Object postProcessQueryResult(Object result)
@@ -311,7 +325,6 @@ implements ISaleAccessQuery
 
 		Collection<? extends ProductType> rawProductTypes = CollectionUtil.castCollection((Collection<?>) super.postProcessQueryResult(result));
 		List<ProductType> filteredProductTypes = new ArrayList<ProductType>(rawProductTypes.size());
-		PersistenceManager pm = getPersistenceManager();
 
 		if (userID == null)
 			throw new IllegalStateException("userID is null! Was prepareQuery(...) not called before?!");
@@ -323,33 +336,36 @@ implements ISaleAccessQuery
 				continue iterateProductTypes;
 			}
 
-			ProductTypePermissionFlagSet ptpfs;
-			try {
-				ptpfs = (ProductTypePermissionFlagSet) pm.getObjectById(
-						ProductTypePermissionFlagSetID.create((ProductTypeID)JDOHelper.getObjectId(productType), userID)
-				);
-			} catch (JDOObjectNotFoundException x) {
-				continue iterateProductTypes;
-			}
-
+			// We lazily fetch the ptpfs only if we need it, because it's more efficient to skip it
+			// if it's unused and because the _System_ user doesn't have it at all.
+			ProductTypePermissionFlagSet ptpfs = null;
 
 			if (!User.USER_ID_SYSTEM.equals(userID.userID)) { // the system user is allowed to see/do everything and has no ProductTypePermissionFlagSet. TODO maybe we should give him ProductTypePermissionFlagSet entries?!
 				if (isFieldEnabled(FieldName.permissionGrantedToSee) && permissionGrantedToSee != null) {
-					if (ptpfs.getFlags(org.nightlabs.jfire.store.RoleConstants.seeProductType) != 0)
+					if (ptpfs == null)
+						ptpfs = getProductTypePermissionFlagSet(productType);
+
+					if (ptpfs == null || ptpfs.getFlags(org.nightlabs.jfire.store.RoleConstants.seeProductType) != 0)
 						continue iterateProductTypes;
 				}
 			}
 
 			if (isFieldEnabled(FieldName.permissionGrantedToSell) && permissionGrantedToSell != null) {
 				if (!User.USER_ID_SYSTEM.equals(userID.userID) || !permissionGrantedToSell) { // the system user is allowed to see/do everything and has no ProductTypePermissionFlagSet. TODO maybe we should give him ProductTypePermissionFlagSet entries?!
-					if (ptpfs.getFlags(org.nightlabs.jfire.trade.RoleConstants.sellProductType) != 0)
+					if (ptpfs == null)
+						ptpfs = getProductTypePermissionFlagSet(productType);
+
+					if (ptpfs == null || ptpfs.getFlags(org.nightlabs.jfire.trade.RoleConstants.sellProductType) != 0)
 						continue iterateProductTypes;
 				}
 			}
 
 			if (isFieldEnabled(FieldName.permissionGrantedToReverse) && permissionGrantedToReverse != null) {
 				if (!User.USER_ID_SYSTEM.equals(userID.userID) || !permissionGrantedToReverse) { // the system user is allowed to see/do everything and has no ProductTypePermissionFlagSet. TODO maybe we should give him ProductTypePermissionFlagSet entries?!
-					if (ptpfs.getFlags(org.nightlabs.jfire.trade.RoleConstants.reverseProductType) != 0)
+					if (ptpfs == null)
+						ptpfs = getProductTypePermissionFlagSet(productType);
+
+					if (ptpfs == null || ptpfs.getFlags(org.nightlabs.jfire.trade.RoleConstants.reverseProductType) != 0)
 						continue iterateProductTypes;
 				}
 			}

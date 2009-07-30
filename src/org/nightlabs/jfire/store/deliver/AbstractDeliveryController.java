@@ -9,6 +9,12 @@ import org.nightlabs.jfire.transfer.AbstractTransferController;
 
 public abstract class AbstractDeliveryController extends AbstractTransferController<DeliveryData, DeliveryID, DeliveryResult> implements DeliveryController {
 
+
+	private static final long serialVersionUID = 1L;
+
+	@Deprecated
+	protected AbstractDeliveryController() { }
+	
 	public AbstractDeliveryController(List<DeliveryData> transferDatas) {
 		super(transferDatas, getDeliveryIDs(transferDatas));
 	}

@@ -3,11 +3,7 @@ package org.nightlabs.jfire.accounting.jbpm;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 
-import org.jbpm.graph.def.Action;
-import org.jbpm.graph.def.Event;
-import org.jbpm.graph.def.Node;
 import org.jbpm.graph.exe.ExecutionContext;
-import org.jbpm.instantiation.Delegation;
 import org.nightlabs.jfire.accounting.Accounting;
 import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.accounting.id.InvoiceID;
@@ -21,20 +17,20 @@ extends AbstractActionHandler
 {
 	private static final long serialVersionUID = 1L;
 
-	public static void register(org.jbpm.graph.def.ProcessDefinition jbpmProcessDefinition)
-	{
-		Action action = new Action(new Delegation(ActionHandlerBookInvoice.class.getName()));
-		action.setName(ActionHandlerBookInvoice.class.getName());
-
-		Event event = new Event("node-enter");
-		event.addAction(action);
-
-		Node booked = jbpmProcessDefinition.getNode(JbpmConstantsInvoice.Both.NODE_NAME_BOOKED);
-		if (booked == null)
-			throw new IllegalArgumentException("The node \""+ JbpmConstantsInvoice.Both.NODE_NAME_BOOKED +"\" does not exist in the ProcessDefinition \"" + jbpmProcessDefinition.getName() + "\"!");
-
-		booked.addEvent(event);
-	}
+//	public static void register(org.jbpm.graph.def.ProcessDefinition jbpmProcessDefinition) // This method should be removed as it's not used anymore (all our ActionHandlers are now declared in the process definition). Chairat & Marco.
+//	{
+//		Action action = new Action(new Delegation(ActionHandlerBookInvoice.class.getName()));
+//		action.setName(ActionHandlerBookInvoice.class.getName());
+//
+//		Event event = new Event("node-enter");
+//		event.addAction(action);
+//
+//		Node booked = jbpmProcessDefinition.getNode(JbpmConstantsInvoice.Both.NODE_NAME_BOOKED);
+//		if (booked == null)
+//			throw new IllegalArgumentException("The node \""+ JbpmConstantsInvoice.Both.NODE_NAME_BOOKED +"\" does not exist in the ProcessDefinition \"" + jbpmProcessDefinition.getName() + "\"!");
+//
+//		booked.addEvent(event);
+//	}
 
 	@Override
 	protected void doExecute(ExecutionContext executionContext)

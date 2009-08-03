@@ -31,7 +31,6 @@ import org.nightlabs.jfire.issue.id.IssueTypeID;
 import org.nightlabs.jfire.issue.jbpm.JbpmConstants;
 import org.nightlabs.jfire.jbpm.JbpmLookup;
 import org.nightlabs.jfire.jbpm.graph.def.AbstractActionHandler;
-import org.nightlabs.jfire.jbpm.graph.def.ActionHandlerNodeEnter;
 import org.nightlabs.jfire.jbpm.graph.def.ProcessDefinition;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.security.SecurityReflector;
@@ -317,7 +316,8 @@ implements Serializable, Comparable<IssueType>
 	 */
 	public void readProcessDefinition(URL jbpmProcessDefinitionURL) throws IOException {
 		org.jbpm.graph.def.ProcessDefinition jbpmProcessDefinition = ProcessDefinition.readProcessDefinition(jbpmProcessDefinitionURL);
-		ActionHandlerNodeEnter.register(jbpmProcessDefinition);
+//		ActionHandlerNodeEnter.register(jbpmProcessDefinition); // has been replaced by AOP (see JFireJbpmAOP)
+
 		// Question: This will fail if called more than once, need to add version ?
 		// Answer: No this will not fail, because jBPM saves a new process definition with the same name under a different
 		// ID. When looking for a process definition, it always returns the latest one with the name. This way, it can
@@ -334,8 +334,12 @@ implements Serializable, Comparable<IssueType>
 			ProcessInstance processInstance = jbpmContext.newProcessInstanceForUpdate(getProcessDefinition().getJbpmProcessDefinitionName());
 			issue.getStatableLocal().setJbpmProcessInstanceId(processInstance.getId());
 			processInstance.getContextInstance().setVariable(AbstractActionHandler.VARIABLE_NAME_STATABLE_ID, JDOHelper.getObjectId(issue).toString());
-			ActionHandlerNodeEnter.createStartState(
-					getPersistenceManager(), SecurityReflector.getUserDescriptor().getUser(getPersistenceManager()), issue, processInstance.getProcessDefinition());
+			ProcessDefinition.createStartState(
+					getPersistenceManager(),
+					SecurityReflector.getUserDescriptor().getUser(getPersistenceManager()),
+					issue,
+					processInstance.getProcessDefinition()
+			);
 			return processInstance;
 		} finally {
 			jbpmContext.close();

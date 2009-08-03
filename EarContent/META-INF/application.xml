@@ -11,6 +11,9 @@
     <java>lib/jbpm-identity-3.1.4.jar</java>
   </module>
   <module>
+    <java>JFireJbpmAOP.aop</java>
+  </module>
+  <module>
     <ejb>JFireJbpm.jar</ejb>
   </module>
 </application>

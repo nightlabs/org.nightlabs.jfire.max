@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.nightlabs.jfire.jbpm.graph.def;
 
@@ -19,11 +19,11 @@ import org.jbpm.graph.exe.ExecutionContext;
 public class TransitionPassThroughActionHandler implements ActionHandler {
 
 	private static final long serialVersionUID = 20080816L;
-	
+
 	private static ThreadLocal<String> transitionThreadLocal = new ThreadLocal<String>();
-	
+
 	/**
-	 * 
+	 *
 	 */
 	public TransitionPassThroughActionHandler() {
 	}
@@ -34,17 +34,17 @@ public class TransitionPassThroughActionHandler implements ActionHandler {
 	public void execute(ExecutionContext ctx) throws Exception {
 		leaveNode(ctx);
 	}
-	
+
 	protected void storeEnteringTransition(Transition transition) {
 		transitionThreadLocal.set(transition.getName());
 	}
-	
+
 	protected String getEnteringTransitionName() {
 		return transitionThreadLocal.get();
 	}
-	
+
 	protected void leaveNode(ExecutionContext ctx) {
-		String transitionName = ActionHandlerNodeEnter.getLastNodeEnterTransitionName();
+		String transitionName = AbstractActionHandler.getLastNodeEnterTransitionName();
 		if (transitionName != null && !"".equals(transitionName)) {
 			Transition transition = ctx.getToken().getNode().getLeavingTransition(transitionName);
 			if (transition != null) {
@@ -54,5 +54,4 @@ public class TransitionPassThroughActionHandler implements ActionHandler {
 		}
 		ctx.leaveNode();
 	}
-
 }

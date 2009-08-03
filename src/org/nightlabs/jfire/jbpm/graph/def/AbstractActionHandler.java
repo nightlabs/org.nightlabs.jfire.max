@@ -1,5 +1,8 @@
 package org.nightlabs.jfire.jbpm.graph.def;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.jdo.PersistenceManager;
 
 import org.apache.log4j.Logger;
@@ -9,11 +12,17 @@ import org.jbpm.graph.exe.ProcessInstance;
 import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.base.Lookup;
+import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.security.SecurityReflector;
 
 public abstract class AbstractActionHandler
 implements ActionHandler
 {
+	protected static class LastNodeEnterTransitionCarrier
+	{
+		public String transitionName;
+	}
+
 	private static final long serialVersionUID = 1L;
 
 	/**
@@ -22,6 +31,14 @@ implements ActionHandler
 	 * created.
 	 */
 	public static final String VARIABLE_NAME_STATABLE_ID = "statableID";
+
+	private static ThreadLocal<Map<String,LastNodeEnterTransitionCarrier>> organisationID2lastNodeEnterTransitionCarrier = new ThreadLocal<Map<String,LastNodeEnterTransitionCarrier>>() {
+		@Override
+		protected Map<String,LastNodeEnterTransitionCarrier> initialValue()
+		{
+			return new HashMap<String, LastNodeEnterTransitionCarrier>();
+		}
+	};
 
 ////	// TODO JPOX WORKAROUND: We should get only one real PersistenceManager within one transaction
 ////	// so that every of the "virtual" PersistenceManagers sees the same data. Currently this is not
@@ -34,6 +51,33 @@ implements ActionHandler
 //			return new HashMap<String, PersistenceManager>();
 //		}
 //	};
+
+	private static LastNodeEnterTransitionCarrier getLastNodeEnterTransitionCarrier() {
+		Map<String,LastNodeEnterTransitionCarrier> m = organisationID2lastNodeEnterTransitionCarrier.get();
+		String currentOrganisationID = IDGenerator.getOrganisationID();
+		LastNodeEnterTransitionCarrier lastNodeEnterTransitionCarrier = m.get(currentOrganisationID);
+		if (lastNodeEnterTransitionCarrier == null) {
+			lastNodeEnterTransitionCarrier = new LastNodeEnterTransitionCarrier();
+			m.put(currentOrganisationID, lastNodeEnterTransitionCarrier);
+		}
+		return lastNodeEnterTransitionCarrier;
+	}
+
+	/**
+	 * This method allows to find out which transition was used for the last node-enter event. It is managed
+	 * on a per-Thread base. A typical use case is to leave a Node via a certain transition depending on the
+	 * name of the transition that was used to enter it (e.g. simply the same name).
+	 *
+	 * @return Returns either <code>null</code>, if <code>ActionHandlerNodeEnter</code> was never triggered on
+	 *		the current thread or the name of the last transition that was used to enter a node on the current thread.
+	 */
+	public static String getLastNodeEnterTransitionName() {
+		return getLastNodeEnterTransitionCarrier().transitionName;
+	}
+
+	public static void setLastNodeEnterTransitionName(String transitionName) {
+		getLastNodeEnterTransitionCarrier().transitionName = transitionName;
+	}
 
 	private PersistenceManager persistenceManager = null;
 
@@ -102,7 +146,7 @@ implements ActionHandler
 				Logger.getLogger(AbstractActionHandler.class).error("Exception while closing PersistenceManager!", x);
 			}
 		}
-		
+
 		persistenceManager = null;
 		statableID = null;
 		statable = null;

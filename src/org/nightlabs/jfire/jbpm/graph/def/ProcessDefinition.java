@@ -12,8 +12,22 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.Discriminator;
+import javax.jdo.annotations.DiscriminatorStrategy;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
 
 import org.apache.log4j.Logger;
 import org.jbpm.JbpmContext;
@@ -24,20 +38,7 @@ import org.nightlabs.jfire.jbpm.extension.ExtendedNodeDescriptor;
 import org.nightlabs.jfire.jbpm.extension.ExtendedProcessDefinitionDescriptor;
 import org.nightlabs.jfire.jbpm.extension.JpdlXmlExtensionReader;
 import org.nightlabs.jfire.jbpm.graph.def.id.ProcessDefinitionID;
-
-import javax.jdo.annotations.FetchGroups;
-import javax.jdo.annotations.NullValue;
-import javax.jdo.annotations.Inheritance;
-import javax.jdo.annotations.PrimaryKey;
-import javax.jdo.annotations.FetchGroup;
-import javax.jdo.annotations.PersistenceModifier;
-import javax.jdo.annotations.Discriminator;
-import javax.jdo.annotations.Persistent;
-import javax.jdo.annotations.InheritanceStrategy;
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.DiscriminatorStrategy;
-import javax.jdo.annotations.Column;
-import javax.jdo.annotations.IdentityType;
+import org.nightlabs.jfire.security.User;
 
 
 
@@ -82,6 +83,25 @@ implements Serializable
 	 */
 	@Deprecated
 	public static final String FETCH_GROUP_THIS_PROCESS_DEFINITION = "ProcessDefinition.this";
+
+	public static State createStartState(PersistenceManager pm, User user, Statable statable,
+			org.jbpm.graph.def.ProcessDefinition jbpmProcessDefinition)
+	{
+		if (logger.isDebugEnabled())
+			logger.debug("createStartState: user=" + JDOHelper.getObjectId(user) + " statable=" + JDOHelper.getObjectId(statable) + " jbpmProcessDefinition=" + JDOHelper.getObjectId(jbpmProcessDefinition));
+
+		StateDefinition stateDefinition = (StateDefinition) pm.getObjectById(StateDefinition.getStateDefinitionID(jbpmProcessDefinition.getStartState()));
+
+		if (logger.isDebugEnabled())
+			logger.debug("createStartState: stateDefinition=" + JDOHelper.getObjectId(stateDefinition));
+
+		return stateDefinition.createState(user, statable);
+//		return (State) pm.makePersistent(
+//				new State(
+//						IDGenerator.getOrganisationID(), IDGenerator.nextID(State.class),
+//						user, statable, stateDefinition));
+//		return stateDefinition.createState(user, statable);
+	}
 
 	public static ProcessDefinitionID getProcessDefinitionID(org.jbpm.graph.def.ProcessDefinition jbpmProcessDefinition)
 	{
@@ -148,8 +168,8 @@ implements Serializable
 
 		pm.getExtent(ProcessDefinition.class);
 
-		// register the main action handler ActionHandlerNodeEnter
-		ActionHandlerNodeEnter.register(jbpmProcessDefinition);
+//		// register the main action handler ActionHandlerNodeEnter
+//		ActionHandlerNodeEnter.register(jbpmProcessDefinition);
 
 		boolean closeJbpmContext = false;
 		if (jbpmContext == null) {

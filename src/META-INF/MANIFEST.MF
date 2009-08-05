@@ -1,3 +1,3 @@
 Manifest-Version: 1.0
 Bundle-SymbolicName: JFireTrade
-Bundle-Version: 1.0.8
+Bundle-Version: 1.0.9

@@ -853,16 +853,11 @@ implements StoreManagerRemote, StoreManagerLocal
 			Store store = trader.getStore();
 
 			List<Article> articles = new ArrayList<Article>(articleIDs.size());
-			for (Iterator<ArticleID> it = articleIDs.iterator(); it.hasNext(); ) {
-				ArticleID articleID = it.next();
+			for (ArticleID articleID : articleIDs) {
 				Article article = (Article) pm.getObjectById(articleID);
 				Offer offer = article.getOffer();
-//				OfferLocal offerLocal = offer.getOfferLocal();
 				trader.validateOffer(offer);
 				trader.acceptOfferImplicitely(offer);
-//				trader.finalizeOffer(user, offer);
-//				trader.acceptOffer(user, offerLocal);
-//				trader.confirmOffer(user, offerLocal);
 				articles.add(article);
 			}
 
@@ -968,11 +963,16 @@ implements StoreManagerRemote, StoreManagerLocal
 		try {
 			pm.getExtent(DeliveryNote.class);
 			pm.getExtent(Article.class);
+			Trader trader = Trader.getTrader(pm);
+
 			DeliveryNote deliveryNote = (DeliveryNote) pm.getObjectById(deliveryNoteID);
 			Collection<Article> articles = new ArrayList<Article>(articleIDs.size());
-			for (Iterator<ArticleID> it = articleIDs.iterator(); it.hasNext(); ) {
-				ArticleID articleID = it.next();
-				articles.add((Article)pm.getObjectById(articleID));
+			for (ArticleID articleID : articleIDs) {
+				Article article = (Article) pm.getObjectById(articleID);
+				Offer offer = article.getOffer();
+				trader.validateOffer(offer);
+				trader.acceptOfferImplicitely(offer);
+				articles.add(article);
 			}
 
 			Store store = Store.getStore(pm);

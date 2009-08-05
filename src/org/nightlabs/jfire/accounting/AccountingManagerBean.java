@@ -1043,16 +1043,11 @@ implements AccountingManagerRemote, AccountingManagerLocal
 			Accounting accounting = trader.getAccounting();
 
 			ArrayList<Article> articles = new ArrayList<Article>(articleIDs.size());
-			for (Iterator<ArticleID> it = articleIDs.iterator(); it.hasNext(); ) {
-				ArticleID articleID = it.next();
+			for (ArticleID articleID : articleIDs) {
 				Article article = (Article) pm.getObjectById(articleID);
 				Offer offer = article.getOffer();
-//				OfferLocal offerLocal = offer.getOfferLocal();
 				trader.validateOffer(offer);
 				trader.acceptOfferImplicitely(offer);
-//				trader.finalizeOffer(user, offer);
-//				trader.acceptOffer(user, offerLocal);
-//				trader.confirmOffer(user, offerLocal);
 				articles.add(article);
 			}
 
@@ -1159,10 +1154,16 @@ implements AccountingManagerRemote, AccountingManagerLocal
 		try {
 			pm.getExtent(Invoice.class);
 			pm.getExtent(Article.class);
+			Trader trader = Trader.getTrader(pm);
+
 			Invoice invoice = (Invoice) pm.getObjectById(invoiceID);
 			Collection<Article> articles = new ArrayList<Article>(articleIDs.size());
 			for (ArticleID articleID : articleIDs) {
-				articles.add((Article) pm.getObjectById(articleID));
+				Article article = (Article) pm.getObjectById(articleID);
+				Offer offer = article.getOffer();
+				trader.validateOffer(offer);
+				trader.acceptOfferImplicitely(offer);
+				articles.add(article);
 			}
 
 			Accounting accounting = Accounting.getAccounting(pm);

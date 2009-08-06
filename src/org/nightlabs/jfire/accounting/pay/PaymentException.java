@@ -42,8 +42,7 @@ public class PaymentException extends Exception
 	public PaymentException(PaymentResult paymentResult)
 	{
 		super(paymentResult.getText(), paymentResult.getError());
-		 //WORK AROUND for a datanucleus bug the code is lost to null during persistance.
-		this.paymentResult = new PaymentResult(paymentResult);
+		this.paymentResult = paymentResult;
 	}
 
 //	/**

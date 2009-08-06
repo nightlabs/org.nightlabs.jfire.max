@@ -28,7 +28,6 @@ package org.nightlabs.jfire.store.deliver;
 
 import java.io.Serializable;
 
-import org.nightlabs.jfire.accounting.pay.PaymentResult;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.util.Util;
 
@@ -114,18 +113,7 @@ implements Serializable
 //		this.organisationID = organisationID;
 //		this.deliveryResultID = deliveryResultID;
 //	}
-	
-	/**
-	 * 
-	 *WORK AROUND for a datanucleus bug the code is lost to null during persistance.
-	 */
-	
-	public DeliveryResult(DeliveryResult deliveryResult)
-	{
-		this(deliveryResult.getCode(), deliveryResult.getText(), deliveryResult.getError());
-	}
-	
-	
+
 	public DeliveryResult(String code, String text, Throwable error)
 	{
 		this(

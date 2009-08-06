@@ -10,13 +10,6 @@ import org.nightlabs.jfire.transfer.AbstractTransferController;
 
 public abstract class AbstractPaymentController extends AbstractTransferController<PaymentData, PaymentID, PaymentResult> implements PaymentController {
 
-	private static final long serialVersionUID = 1L;
-
-	@Deprecated
-	protected AbstractPaymentController() {
-	}
-	
-	
 	public AbstractPaymentController(List<PaymentData> transferDatas) {
 		super(transferDatas, getPaymentIDs(transferDatas));
 	}

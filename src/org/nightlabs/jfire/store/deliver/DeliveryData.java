@@ -35,8 +35,6 @@ import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import org.nightlabs.jfire.store.deliver.id.DeliveryDataID;
 import javax.jdo.annotations.Column;
-import javax.jdo.annotations.Discriminator;
-import javax.jdo.annotations.DiscriminatorStrategy;
 import javax.jdo.annotations.IdentityType;
 import javax.jdo.annotations.PersistenceModifier;
 import javax.jdo.annotations.InheritanceStrategy;
@@ -72,7 +70,6 @@ import javax.jdo.annotations.Inheritance;
 	identityType=IdentityType.APPLICATION,
 	detachable="true",
 	table="JFireTrade_DeliveryData")
-@Discriminator(strategy=DiscriminatorStrategy.CLASS_NAME)
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class DeliveryData
 implements Serializable, TransferData

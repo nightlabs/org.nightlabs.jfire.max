@@ -42,8 +42,7 @@ public class DeliveryException extends Exception
 	public DeliveryException(DeliveryResult deliveryResult)
 	{
 		super(deliveryResult.getText(), deliveryResult.getError());
-		 //WORK AROUND for a datanucleus bug the code is lost to null during persistance.
-		this.deliveryResult = new DeliveryResult(deliveryResult);
+		this.deliveryResult = deliveryResult;
 	}
 
 //	/**

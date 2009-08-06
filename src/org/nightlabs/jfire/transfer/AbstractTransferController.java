@@ -1,6 +1,5 @@
 package org.nightlabs.jfire.transfer;
 
-import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.util.List;
 
@@ -31,21 +30,11 @@ import org.nightlabs.util.Util;
  * @param <ID> The type of {@link ObjectID} for the specific transfer ({@link PaymentID} or {@link DeliveryID})
  * @param <R> The type of result for the specific transfer ({@link PaymentResult} or {@link DeliveryResult})
  */
-public abstract class AbstractTransferController<D extends TransferData, ID extends ObjectID, R> implements TransferController<D>, Serializable
-{
-	private static final long serialVersionUID = 1L;
+public abstract class AbstractTransferController<D extends TransferData, ID extends ObjectID, R> implements TransferController<D> {
 	private Stage lastStage = Stage.Initial;
 	boolean forceRollback = false;
 	boolean skipServerStages = false;
 
-	
-	/**
-	 * @deprecated This constructor exists only for JDO and should never be used
-	 *             explicitely!
-	 */
-	@Deprecated
-	protected AbstractTransferController() { }
-	
 	public AbstractTransferController(List<D> transferDatas, List<ID> transferIDs) {
 		setTransferDatas(transferDatas);
 		setTransferIDs(transferIDs);

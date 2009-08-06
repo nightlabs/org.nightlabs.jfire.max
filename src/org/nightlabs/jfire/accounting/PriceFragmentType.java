@@ -30,23 +30,22 @@ import java.io.Serializable;
 
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
 
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.accounting.id.PriceFragmentTypeID;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.util.Util;
-
-import javax.jdo.annotations.Persistent;
-import javax.jdo.annotations.FetchGroups;
-import javax.jdo.annotations.InheritanceStrategy;
-import javax.jdo.annotations.Inheritance;
-import javax.jdo.annotations.PrimaryKey;
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.FetchGroup;
-import javax.jdo.annotations.Column;
-import javax.jdo.annotations.IdentityType;
-import javax.jdo.annotations.PersistenceModifier;
 
 /**
  * A PriceFragmentType defines a part out of which a <tt>Price</tt> may consist.
@@ -104,8 +103,8 @@ public class PriceFragmentType
 	public static String createNextPriceFragmentTypeID()
 	{
 		return ObjectIDUtil.longObjectIDFieldToString(IDGenerator.nextID(PriceFragmentType.class));
-	}	
-	
+	}
+
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
@@ -154,12 +153,12 @@ public class PriceFragmentType
 	 * jdo.field persitence-modifier="persitent"
 	 */
 	protected String primaryKey;
-	
+
 	public String getPrimaryKey()
 	{
 		return primaryKey;
 	}
-	
+
 	public static String getPrimaryKey(String organisationID, String priceFragmentTypeID)
 	{
 		return organisationID + '/' + priceFragmentTypeID;
@@ -190,7 +189,7 @@ public class PriceFragmentType
 	 * This predefined priceFragmentType exists to allow a unified API for accesses
 	 * to the priceFragments and the <tt>Price.amount</tt>. This is necessary e.g. in
 	 * formulas.
-	 * 
+	 *
 	 * @see Price#getAmount(String)
 	 * @see Price#setAmount(String, long)
 	 * @deprecated Use {@link #PRICE_FRAGMENT_TYPE_ID_TOTAL}
@@ -214,7 +213,7 @@ public class PriceFragmentType
 	public PriceFragmentTypeName getName() {
 		return name;
 	}
-	
+
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
@@ -232,10 +231,16 @@ public class PriceFragmentType
 
 	/**
 	 * Set the PriceFragment this one is contained in.
-	 * Currently the setter will only allow null or
-	 * the PriceFragmentType with id {@link #TOTAL_PRICEFRAGMENTTYPEID} or null.
+	 * Currently the setter will only allow <code>null</code> or
+	 * the PriceFragmentType with id {@link #PRICE_FRAGMENT_TYPE_ID_TOTAL}.
 	 */
 	public void setContainerPriceFragmentType(PriceFragmentType containerPriceFragmentType) {
+		if (containerPriceFragmentType != null) {
+			// We create the ID instead of using NLJDOHelper.getObjectId(...) because the containerPriceFragmentType might be a new object.
+			PriceFragmentTypeID containerPriceFragementTypeID = PriceFragmentTypeID.create(containerPriceFragmentType.getOrganisationID(), containerPriceFragmentType.getPriceFragmentTypeID());
+			if (!PRICE_FRAGMENT_TYPE_ID_TOTAL.equals(containerPriceFragementTypeID))
+				throw new IllegalArgumentException("Currently only null or the total price-fragment-type is allowed.");
+		}
 		this.containerPriceFragmentType = containerPriceFragmentType;
 	}
 
@@ -252,7 +257,7 @@ public class PriceFragmentType
 			priceFragmentType = (PriceFragmentType) pm.getObjectById(PRICE_FRAGMENT_TYPE_ID_TOTAL);
 		} catch (JDOObjectNotFoundException x) {
 			priceFragmentType = new PriceFragmentType(PRICE_FRAGMENT_TYPE_ID_TOTAL.organisationID, PRICE_FRAGMENT_TYPE_ID_TOTAL.priceFragmentTypeID);
-			pm.makePersistent(priceFragmentType);
+			priceFragmentType = pm.makePersistent(priceFragmentType);
 		}
 		return priceFragmentType;
 	}

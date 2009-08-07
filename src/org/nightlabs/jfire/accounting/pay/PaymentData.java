@@ -30,6 +30,8 @@ import java.io.Serializable;
 
 import org.nightlabs.jfire.transfer.TransferData;
 
+import javax.jdo.annotations.Discriminator;
+import javax.jdo.annotations.DiscriminatorStrategy;
 import javax.jdo.annotations.PrimaryKey;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
@@ -72,6 +74,7 @@ import javax.jdo.annotations.Inheritance;
 	detachable="true",
 	table="JFireTrade_PaymentData")
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
+@Discriminator(strategy=DiscriminatorStrategy.CLASS_NAME)
 public class PaymentData
 implements Serializable, TransferData
 {

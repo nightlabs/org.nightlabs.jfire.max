@@ -115,6 +115,20 @@ implements Serializable
 //		this.paymentResultID = paymentResultID;
 //	}
 
+	
+
+	/**
+	 * 
+	 *WORK AROUND for a datanucleus bug the code is lost to null during persistance.
+	 */
+	
+	public PaymentResult(PaymentResult paymentResult)
+	{
+		this(paymentResult.getCode(), paymentResult.getText(), paymentResult.getError());
+	}
+	
+	
+	
 	public PaymentResult(String code, String text, Throwable error)
 	{
 		this(

@@ -11,8 +11,6 @@ import org.nightlabs.jfire.issue.Issue;
 import org.nightlabs.jfire.issue.IssueLink;
 import org.nightlabs.jfire.person.Person;
 import org.nightlabs.jfire.security.User;
-import org.nightlabs.jfire.trade.Offer;
-import org.nightlabs.jfire.trade.Order;
 
 /**
  * This is the {@link IssueHistoryItemFactory} that generates {@link IssueLinkHistoryItem}s, based on information
@@ -115,11 +113,14 @@ public class IssueLinkHistoryItemFactory extends IssueHistoryItemFactory {
 		if ( linkedObject instanceof Person )
 			return ((Person)linkedObject).getDisplayName();
 
-		if ( linkedObject instanceof Order )
-			return ((Order)linkedObject).getPrimaryKey();
+		// FIXME commented the following lines as a dependency on trade is not acceptable here.
+		// Think of another way doing this. Marc
+		
+		//if ( linkedObject instanceof Order )
+		//	return ((Order)linkedObject).getPrimaryKey();
 
-		if ( linkedObject instanceof Offer )
-			return ((Offer)linkedObject).getPrimaryKey();
+		//if ( linkedObject instanceof Offer )
+		//	return ((Offer)linkedObject).getPrimaryKey();
 
 		if ( linkedObject instanceof Issue ) {
 			Issue issue = (Issue)linkedObject;

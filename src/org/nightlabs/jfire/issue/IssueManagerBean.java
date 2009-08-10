@@ -3,7 +3,6 @@ package org.nightlabs.jfire.issue;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -600,6 +599,14 @@ implements IssueManagerRemote
 	@Override
 	public Issue storeIssue(Issue issue, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
+		return storeIssue(issue, null, get, fetchGroups, maxFetchDepth);
+	}
+
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("_Guest_")
+	@Override
+	public Issue storeIssue(Issue issue, String signalJbpmTransitionName, boolean get, String[] fetchGroups, int maxFetchDepth)
+	{
 		PersistenceManager pm = createPersistenceManager();
 		Issue pIssue = null;
 		try {
@@ -671,44 +678,32 @@ implements IssueManagerRemote
 				// --[ On Assignees ]-------------------------------------------------------------------------------------------|
 				boolean doUnassign = false;
 				if (oldPersistentIssue != null) {
-					try { doUnassign = oldPersistentIssue.getAssignee() != null && issue.getAssignee() == null; }
+					try
+					{
+						doUnassign = oldPersistentIssue.getAssignee() != null && issue.getAssignee() == null;
+					}
 					catch (JDODetachedFieldAccessException x) { doUnassign = false; }
 				}
-
-//				boolean doUnassign;
-//				if (oldPersistentIssue == null)
-//					doUnassign = false;
-//				else {
-//					try {
-//						doUnassign = oldPersistentIssue.getAssignee() != null && issue.getAssignee() == null;
-//					} catch (JDODetachedFieldAccessException x) {
-//						doUnassign = false;
-//					}
-//				}
 
 				boolean doAssign = false;
-				if (oldPersistentIssue != null) {
-					try { if (issue.getAssignee() != null) doAssign = !Util.equals(issue.getAssignee(), oldPersistentIssue.getAssignee()); }
+				if (oldPersistentIssue != null)
+				{
+					try
+					{
+						if (issue.getAssignee() != null)
+							doAssign = !Util.equals(issue.getAssignee(), oldPersistentIssue.getAssignee());
+					}
 					catch (JDODetachedFieldAccessException x) { doUnassign = false; }
 				}
 
-//				boolean doAssign;
-//				try {
-//					doAssign = issue.getAssignee() != null;
-//					if (doAssign && oldPersistentIssue != null)
-//						doAssign = !Util.equals(issue.getAssignee(), oldPersistentIssue.getAssignee());
-//				} catch (JDODetachedFieldAccessException x) {
-//					doAssign = false;
-//				}
+				String jbpmTransitionName = signalJbpmTransitionName;
+				if (jbpmTransitionName == null) {
+					if (doAssign)
+						jbpmTransitionName = JbpmConstants.TRANSITION_NAME_ASSIGN;
 
-
-
-				String jbpmTransitionName = null;
-				if (doAssign)
-					jbpmTransitionName = JbpmConstants.TRANSITION_NAME_ASSIGN;
-
-				if (doUnassign)
-					jbpmTransitionName = JbpmConstants.TRANSITION_NAME_UNASSIGN;
+					if (doUnassign)
+						jbpmTransitionName = JbpmConstants.TRANSITION_NAME_UNASSIGN;
+				}
 
 				pIssue = pm.makePersistent(issue);
 

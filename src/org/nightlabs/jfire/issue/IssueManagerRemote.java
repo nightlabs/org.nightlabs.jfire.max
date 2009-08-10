@@ -112,6 +112,8 @@ public interface IssueManagerRemote {
 	 */
 	Issue storeIssue(Issue issue, boolean get, String[] fetchGroups, int maxFetchDepth);
 
+	Issue storeIssue(Issue issue, String signalJbpmTransitionName, boolean get, String[] fetchGroups, int maxFetchDepth);
+
 	/**
 	 * Delete an <code>Issue</code> by the given <code>IssueID</code>.
 	 * And also delete its <code>State</code> and <code>IssueLocal</code>.

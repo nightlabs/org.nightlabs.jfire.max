@@ -58,6 +58,27 @@ public class IssueDAO extends BaseJDOObjectDAO<IssueID, Issue>{
 		}
 	}
 
+	public synchronized Issue storeIssue(Issue issue, String jbpmTransitionName, boolean get, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor){
+		if(issue == null)
+			throw new NullPointerException("Issue to save must not be null");
+		monitor.beginTask("Storing issue: "+ issue.getIssueID(), 3);
+		try {
+			IssueManagerRemote im = JFireEjb3Factory.getRemoteBean(IssueManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			monitor.worked(1);
+
+			Issue result = im.storeIssue(issue, jbpmTransitionName, get, fetchGroups, maxFetchDepth);
+			if (result != null)
+				getCache().put(null, result, fetchGroups, maxFetchDepth);
+
+			monitor.worked(1);
+			monitor.done();
+			return result;
+		} catch (Exception e) {
+			monitor.done();
+			throw new RuntimeException(e);
+		}
+	}
+
 	public synchronized Issue storeIssue(Issue issue, boolean get, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor){
 		if(issue == null)
 			throw new NullPointerException("Issue to save must not be null");

@@ -151,7 +151,9 @@ public class ProjectDAO extends BaseJDOObjectDAO<ProjectID, Project>{
 		try {
 			IssueManagerRemote im = JFireEjb3Factory.getRemoteBean(IssueManagerRemote.class, SecurityReflector.getInitialContextProperties());
 			Collection<Project> result = getProjects(im.getRootProjectIDs(organisationID), fetchGroups, maxFetchDepth, monitor);
-			result.add(getProject(Project.PROJECT_ID_DEFAULT, fetchGroups, maxFetchDepth, monitor));
+			Project defaultProject = getProject(Project.PROJECT_ID_DEFAULT, fetchGroups, maxFetchDepth, monitor);
+			if(defaultProject != null)
+				result.add(defaultProject);
 			return result;
 		} catch (Exception e) {
 			throw new RuntimeException(e);

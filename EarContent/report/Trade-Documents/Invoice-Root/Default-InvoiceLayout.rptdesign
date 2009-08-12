@@ -175,32 +175,32 @@ function isDynamicProduct(productJDOID) {
                     </structure>
                     <structure>
                         <property name="position">27</property>
-                        <property name="name">${localOrganisationIDConverted}/vat-ch-7__6-net</property>
+                        <property name="name">${rootOrganisationIDConverted}/vat-ch-7__6-net</property>
                         <property name="dataType">float</property>
                     </structure>
                     <structure>
                         <property name="position">28</property>
-                        <property name="name">${localOrganisationIDConverted}/vat-ch-7__6-val</property>
+                        <property name="name">${rootOrganisationIDConverted}/vat-ch-7__6-val</property>
                         <property name="dataType">float</property>
                     </structure>
                     <structure>
                         <property name="position">29</property>
-                        <property name="name">${localOrganisationIDConverted}/vat-de-19-net</property>
+                        <property name="name">${rootOrganisationIDConverted}/vat-de-19-net</property>
                         <property name="dataType">float</property>
                     </structure>
                     <structure>
                         <property name="position">30</property>
-                        <property name="name">${localOrganisationIDConverted}/vat-de-19-val</property>
+                        <property name="name">${rootOrganisationIDConverted}/vat-de-19-val</property>
                         <property name="dataType">float</property>
                     </structure>
                     <structure>
                         <property name="position">31</property>
-                        <property name="name">${localOrganisationIDConverted}/vat-de-7-net</property>
+                        <property name="name">${rootOrganisationIDConverted}/vat-de-7-net</property>
                         <property name="dataType">float</property>
                     </structure>
                     <structure>
                         <property name="position">32</property>
-                        <property name="name">${localOrganisationIDConverted}/vat-de-7-val</property>
+                        <property name="name">${rootOrganisationIDConverted}/vat-de-7-val</property>
                         <property name="dataType">float</property>
                     </structure>
                 </list-property>
@@ -404,43 +404,43 @@ function isDynamicProduct(productJDOID) {
                 </structure>
                 <structure>
                     <property name="position">27</property>
-                    <property name="name">${localOrganisationIDConverted}/vat-ch-7__6-net</property>
-                    <property name="nativeName">${localOrganisationIDConverted}/vat-ch-7__6-net</property>
+                    <property name="name">${rootOrganisationIDConverted}/vat-ch-7__6-net</property>
+                    <property name="nativeName">${rootOrganisationIDConverted}/vat-ch-7__6-net</property>
                     <property name="dataType">float</property>
                     <property name="nativeDataType">3</property>
                 </structure>
                 <structure>
                     <property name="position">28</property>
-                    <property name="name">${localOrganisationIDConverted}/vat-ch-7__6-val</property>
-                    <property name="nativeName">${localOrganisationIDConverted}/vat-ch-7__6-val</property>
+                    <property name="name">${rootOrganisationIDConverted}/vat-ch-7__6-val</property>
+                    <property name="nativeName">${rootOrganisationIDConverted}/vat-ch-7__6-val</property>
                     <property name="dataType">float</property>
                     <property name="nativeDataType">3</property>
                 </structure>
                 <structure>
                     <property name="position">29</property>
-                    <property name="name">${localOrganisationIDConverted}/vat-de-19-net</property>
-                    <property name="nativeName">${localOrganisationIDConverted}/vat-de-19-net</property>
+                    <property name="name">${rootOrganisationIDConverted}/vat-de-19-net</property>
+                    <property name="nativeName">${rootOrganisationIDConverted}/vat-de-19-net</property>
                     <property name="dataType">float</property>
                     <property name="nativeDataType">3</property>
                 </structure>
                 <structure>
                     <property name="position">30</property>
-                    <property name="name">${localOrganisationIDConverted}/vat-de-19-val</property>
-                    <property name="nativeName">${localOrganisationIDConverted}/vat-de-19-val</property>
+                    <property name="name">${rootOrganisationIDConverted}/vat-de-19-val</property>
+                    <property name="nativeName">${rootOrganisationIDConverted}/vat-de-19-val</property>
                     <property name="dataType">float</property>
                     <property name="nativeDataType">3</property>
                 </structure>
                 <structure>
                     <property name="position">31</property>
-                    <property name="name">${localOrganisationIDConverted}/vat-de-7-net</property>
-                    <property name="nativeName">${localOrganisationIDConverted}/vat-de-7-net</property>
+                    <property name="name">${rootOrganisationIDConverted}/vat-de-7-net</property>
+                    <property name="nativeName">${rootOrganisationIDConverted}/vat-de-7-net</property>
                     <property name="dataType">float</property>
                     <property name="nativeDataType">3</property>
                 </structure>
                 <structure>
                     <property name="position">32</property>
-                    <property name="name">${localOrganisationIDConverted}/vat-de-7-val</property>
-                    <property name="nativeName">${localOrganisationIDConverted}/vat-de-7-val</property>
+                    <property name="name">${rootOrganisationIDConverted}/vat-de-7-val</property>
+                    <property name="nativeName">${rootOrganisationIDConverted}/vat-de-7-val</property>
                     <property name="dataType">float</property>
                     <property name="nativeDataType">3</property>
                 </structure>
@@ -1577,18 +1577,152 @@ result;</expression>
                                     <grid id="99">
                                         <property name="width">100%</property>
                                         <column id="100"/>
+                                        <row id="305">
+                                            <cell id="306">
+                                                <property name="paddingTop">0pt</property>
+                                                <property name="paddingLeft">0pt</property>
+                                                <property name="paddingBottom">0pt</property>
+                                                <property name="paddingRight">0pt</property>
+                                                <text-data id="307">
+                                                    <property name="fontFamily">sans-serif</property>
+                                                    <property name="fontSize">5pt</property>
+                                                    <property name="borderBottomColor">#000000</property>
+                                                    <property name="borderBottomStyle">solid</property>
+                                                    <property name="borderBottomWidth">thin</property>
+                                                    <property name="paddingTop">1pt</property>
+                                                    <property name="textAlign">left</property>
+                                                    <expression name="valueExpr">importClass(Packages.org.nightlabs.jfire.reporting.JFireReportingHelper);
+importClass(Packages.org.nightlabs.jfire.security.SecurityReflector);
+importClass(Packages.org.nightlabs.jfire.trade.OrganisationLegalEntity);
+importClass(Packages.org.nightlabs.jfire.person.PersonStruct);
+orgLE = OrganisationLegalEntity.getOrganisationLegalEntity(
+  JFireReportingHelper.getPersistenceManager(),
+  SecurityReflector.getUserDescriptor().getOrganisationID()
+);
+orgP = orgLE.getPerson();
+
+result = new Array();
+resultIndex = 0;
+result[resultIndex] = "";
+
+//////// Company
+f = orgP.getPersistentDataFieldByIndex(PersonStruct.PERSONALDATA_COMPANY, 0);
+if (f != null &amp;&amp; f.getData() != "") {
+	if (result[resultIndex] != "") result[resultIndex] += " | ";
+	result[resultIndex] += f.getData();
+}
+
+//////// First name + name
+name = "";
+f = orgP.getPersistentDataFieldByIndex(PersonStruct.PERSONALDATA_FIRSTNAME, 0);
+if (f != null &amp;&amp; f.getData() != "") {
+	if (name != "") name += " ";
+	name += f.getData();
+}
+f = orgP.getPersistentDataFieldByIndex(PersonStruct.PERSONALDATA_NAME, 0);
+if (f != null &amp;&amp; f.getData() != "") {
+	if (name != "") name += " ";
+	name += f.getData();
+}
+if (name != "") {
+	if (result[resultIndex] != "") result[resultIndex] += " | ";
+	result[resultIndex] += name;
+}
+
+
+
+++resultIndex; result[resultIndex] = "";
+
+//////// Address
+f = orgP.getPersistentDataFieldByIndex(PersonStruct.POSTADDRESS_ADDRESS, 0);
+if (f != null &amp;&amp; f.getData() != "") {
+	if (result[resultIndex] != "") result[resultIndex] += " | ";
+	result[resultIndex] += f.getData();
+}
+
+//////// Zip + city
+zipCity = "";
+f = orgP.getPersistentDataFieldByIndex(PersonStruct.POSTADDRESS_POSTCODE, 0);
+if (f != null &amp;&amp; f.getData() != "") {
+	if (zipCity != "") zipCity += " ";
+	zipCity += f.getData();
+}
+f = orgP.getPersistentDataFieldByIndex(PersonStruct.POSTADDRESS_CITY, 0);
+if (f != null &amp;&amp; f.getData() != "") {
+	if (zipCity != "") zipCity += " ";
+	zipCity += f.getData();
+}
+if (zipCity != "") {
+	if (result[resultIndex] != "") result[resultIndex] += " | ";
+	result[resultIndex] += zipCity;
+}
+
+//////// Region
+f = orgP.getPersistentDataFieldByIndex(PersonStruct.POSTADDRESS_REGION, 0);
+if (f != null &amp;&amp; f.getData() != "") {
+	if (result[resultIndex] != "") result[resultIndex] += " | ";
+	result[resultIndex] += f.getData();
+}
+
+//////// Country
+f = orgP.getPersistentDataFieldByIndex(PersonStruct.POSTADDRESS_COUNTRY, 0);
+if (f != null &amp;&amp; f.getData() != "") {
+	if (result[resultIndex] != "") result[resultIndex] += " | ";
+	result[resultIndex] += f.getData();
+}
+
+
+resultAll = "";
+
+for (i = 0; i &lt; result.length; ++i) {
+	if (result[i] != "") {
+		if (i > 0) resultAll += "&lt;br/>\n";
+		resultAll += result[i];
+	}
+}
+resultAll;</expression>
+                                                    <property name="contentType">html</property>
+                                                </text-data>
+                                            </cell>
+                                        </row>
+                                        <row id="308">
+                                            <property name="height">3mm</property>
+                                            <cell id="309">
+                                                <property name="paddingTop">0pt</property>
+                                                <property name="paddingLeft">0pt</property>
+                                                <property name="paddingBottom">0pt</property>
+                                                <property name="paddingRight">0pt</property>
+                                            </cell>
+                                        </row>
                                         <row id="102">
                                             <cell id="103">
+                                                <property name="paddingTop">0pt</property>
+                                                <property name="paddingLeft">0pt</property>
+                                                <property name="paddingBottom">0pt</property>
+                                                <property name="paddingRight">0pt</property>
                                                 <data id="172">
                                                     <property name="fontFamily">"Arial"</property>
+                                                    <property name="marginTop">0pt</property>
+                                                    <property name="paddingTop">0pt</property>
+                                                    <property name="paddingLeft">0pt</property>
+                                                    <property name="paddingBottom">0pt</property>
+                                                    <property name="paddingRight">0pt</property>
                                                     <property name="resultSetColumn">Company</property>
                                                 </data>
                                             </cell>
                                         </row>
                                         <row id="107">
                                             <cell id="108">
+                                                <property name="paddingTop">0pt</property>
+                                                <property name="paddingLeft">0pt</property>
+                                                <property name="paddingBottom">0pt</property>
+                                                <property name="paddingRight">0pt</property>
                                                 <text-data id="174">
                                                     <property name="fontFamily">"Arial"</property>
+                                                    <property name="paddingTop">0pt</property>
+                                                    <property name="paddingLeft">0pt</property>
+                                                    <property name="paddingBottom">0pt</property>
+                                                    <property name="paddingRight">0pt</property>
                                                     <expression name="valueExpr">result = "";
 if (!"".equals(row["Name"]))
   result = result + row["Name"] + ", ";
@@ -1599,12 +1733,25 @@ result = result + row["FirstName"]</expression>
                                             </cell>
                                         </row>
                                         <row id="110">
-                                            <cell id="111"/>
+                                            <cell id="111">
+                                                <property name="paddingTop">0pt</property>
+                                                <property name="paddingLeft">0pt</property>
+                                                <property name="paddingBottom">0pt</property>
+                                                <property name="paddingRight">0pt</property>
+                                            </cell>
                                         </row>
                                         <row id="113">
                                             <cell id="114">
+                                                <property name="paddingTop">0pt</property>
+                                                <property name="paddingLeft">0pt</property>
+                                                <property name="paddingBottom">0pt</property>
+                                                <property name="paddingRight">0pt</property>
                                                 <text-data id="175">
                                                     <property name="fontFamily">"Arial"</property>
+                                                    <property name="paddingTop">0pt</property>
+                                                    <property name="paddingLeft">0pt</property>
+                                                    <property name="paddingBottom">0pt</property>
+                                                    <property name="paddingRight">0pt</property>
                                                     <expression name="valueExpr">result = "";
 if (!"".equals(row["PostCode"]))
   result = result + row["PostCode"] + " ";
@@ -1617,10 +1764,27 @@ if (!"".equals(row["City"]))
                                         </row>
                                         <row id="116">
                                             <cell id="117">
+                                                <property name="paddingTop">0pt</property>
+                                                <property name="paddingLeft">0pt</property>
+                                                <property name="paddingBottom">0pt</property>
+                                                <property name="paddingRight">0pt</property>
                                                 <data id="209">
                                                     <property name="fontFamily">"Arial"</property>
+                                                    <property name="paddingTop">0pt</property>
+                                                    <property name="paddingLeft">0pt</property>
+                                                    <property name="paddingBottom">0pt</property>
+                                                    <property name="paddingRight">0pt</property>
                                                     <property name="resultSetColumn">Country</property>
                                                 </data>
+                                            </cell>
+                                        </row>
+                                        <row id="310">
+                                            <property name="height">3mm</property>
+                                            <cell id="311">
+                                                <property name="paddingTop">0pt</property>
+                                                <property name="paddingLeft">0pt</property>
+                                                <property name="paddingBottom">0pt</property>
+                                                <property name="paddingRight">0pt</property>
                                             </cell>
                                         </row>
                                     </grid>
@@ -1841,6 +2005,12 @@ JFireReportingHelper.createDataSetParam(JDOHelper.getObjectId(orgLE.getPerson())
                                                         </header>
                                                         <detail>
                                                             <row id="236">
+                                                                <list-property name="visibility">
+                                                                    <structure>
+                                                                        <property name="format">all</property>
+                                                                        <expression name="valueExpr">row["Phone_PrimaryPhone"] == ""</expression>
+                                                                    </structure>
+                                                                </list-property>
                                                                 <cell id="237">
                                                                     <property name="canShrink">true</property>
                                                                     <text-data id="244">
@@ -1853,12 +2023,24 @@ JFireReportingHelper.createDataSetParam(JDOHelper.getObjectId(orgLE.getPerson())
                                                                     <property name="canShrink">true</property>
                                                                     <text-data id="245">
                                                                         <property name="textAlign">left</property>
+                                                                        <list-property name="visibility">
+                                                                            <structure>
+                                                                                <property name="format">all</property>
+                                                                                <expression name="valueExpr">row["Phone_PrimaryPhone"] == ""</expression>
+                                                                            </structure>
+                                                                        </list-property>
                                                                         <expression name="valueExpr">row["Phone_PrimaryPhone"]</expression>
                                                                         <property name="contentType">html</property>
                                                                     </text-data>
                                                                 </cell>
                                                             </row>
                                                             <row id="246">
+                                                                <list-property name="visibility">
+                                                                    <structure>
+                                                                        <property name="format">all</property>
+                                                                        <expression name="valueExpr">row["Phone_Fax"] == ""</expression>
+                                                                    </structure>
+                                                                </list-property>
                                                                 <cell id="247">
                                                                     <property name="canShrink">true</property>
                                                                     <text-data id="249">
@@ -1876,6 +2058,12 @@ JFireReportingHelper.createDataSetParam(JDOHelper.getObjectId(orgLE.getPerson())
                                                                 </cell>
                                                             </row>
                                                             <row id="254">
+                                                                <list-property name="visibility">
+                                                                    <structure>
+                                                                        <property name="format">all</property>
+                                                                        <expression name="valueExpr">row["Internet_EMail"] == ""</expression>
+                                                                    </structure>
+                                                                </list-property>
                                                                 <cell id="255">
                                                                     <property name="canShrink">true</property>
                                                                     <text-data id="257">
@@ -1893,6 +2081,12 @@ JFireReportingHelper.createDataSetParam(JDOHelper.getObjectId(orgLE.getPerson())
                                                                 </cell>
                                                             </row>
                                                             <row id="251">
+                                                                <list-property name="visibility">
+                                                                    <structure>
+                                                                        <property name="format">all</property>
+                                                                        <expression name="valueExpr">row["Internet_Homepage"] == ""</expression>
+                                                                    </structure>
+                                                                </list-property>
                                                                 <cell id="252">
                                                                     <property name="canShrink">true</property>
                                                                     <text-data id="258">
@@ -1951,7 +2145,7 @@ JFireReportingHelper.createDataSetParam(JDOHelper.getObjectId(orgLE.getPerson())
 articleContainer = JFireReportingHelper.getVar("articleContainer");
 className = articleContainer.getClass().getSimpleName();
 articleContainerType = reportContext.getMessage("articleContainer.name."+className, reportContext.getLocale());
-articleContainerType + " " + articleContainer.getArticleContainerIDPrefix() + " / " + articleContainer.getArticleContainerIDAsString()</expression>
+articleContainerType + " " + articleContainer.getArticleContainerIDPrefix() + "/" + articleContainer.getArticleContainerIDAsString()</expression>
                             <property name="contentType">html</property>
                         </text-data>
                         <text-data id="215">
@@ -2159,41 +2353,6 @@ JFireReportingHelper.createDataSetParam(params["articleContainerID"])</expressio
                 <structure>
                     <property name="name">${devOrganisationIDConverted}/__Total__</property>
                     <expression name="expression">dataSetRow["${devOrganisationIDConverted}/__Total__"]</expression>
-                    <property name="dataType">float</property>
-                </structure>
-                <structure>
-                    <property name="name">${localOrganisationIDConverted}/vat-ch-7__6-net</property>
-                    <expression name="expression">dataSetRow["${localOrganisationIDConverted}/vat-ch-7__6-net"]</expression>
-                    <property name="dataType">float</property>
-                </structure>
-                <structure>
-                    <property name="name">${localOrganisationIDConverted}/vat-ch-7__6-val</property>
-                    <expression name="expression">dataSetRow["${localOrganisationIDConverted}/vat-ch-7__6-val"]</expression>
-                    <property name="dataType">float</property>
-                </structure>
-                <structure>
-                    <property name="name">${localOrganisationIDConverted}/vat-de-19-net</property>
-                    <expression name="expression">dataSetRow["${localOrganisationIDConverted}/vat-de-19-net"]</expression>
-                    <property name="dataType">float</property>
-                </structure>
-                <structure>
-                    <property name="name">${localOrganisationIDConverted}/vat-de-19-val</property>
-                    <expression name="expression">dataSetRow["${localOrganisationIDConverted}/vat-de-19-val"]</expression>
-                    <property name="dataType">float</property>
-                </structure>
-                <structure>
-                    <property name="name">${localOrganisationIDConverted}/vat-de-7-net</property>
-                    <expression name="expression">dataSetRow["${localOrganisationIDConverted}/vat-de-7-net"]</expression>
-                    <property name="dataType">float</property>
-                </structure>
-                <structure>
-                    <property name="name">${localOrganisationIDConverted}/vat-de-7-val</property>
-                    <expression name="expression">dataSetRow["${localOrganisationIDConverted}/vat-de-7-val"]</expression>
-                    <property name="dataType">float</property>
-                </structure>
-                <structure>
-                    <property name="name">SumVAT</property>
-                    <expression name="expression">Total.sum(dataSetRow["${localOrganisationIDConverted}/vat-de-19-val"])</expression>
                     <property name="dataType">float</property>
                 </structure>
                 <structure>
@@ -2606,61 +2765,6 @@ result;</expression>
                         </data>
                     </cell>
                 </row>
-                <row id="77">
-                    <list-property name="visibility">
-                        <structure>
-                            <property name="format">all</property>
-                            <expression name="valueExpr">true</expression>
-                        </structure>
-                    </list-property>
-                    <cell id="78">
-                        <property name="colSpan">3</property>
-                        <property name="rowSpan">1</property>
-                        <property name="borderTopColor">#C0C0C0</property>
-                        <property name="borderTopStyle">solid</property>
-                        <property name="borderTopWidth">thin</property>
-                        <label id="150">
-                            <property name="fontFamily">"Arial"</property>
-                            <property name="fontStyle">italic</property>
-                            <text-property name="text" key="includedVAT">IncludedTax</text-property>
-                        </label>
-                    </cell>
-                    <cell id="190">
-                        <property name="borderTopColor">#C0C0C0</property>
-                        <property name="borderTopStyle">solid</property>
-                        <property name="borderTopWidth">thin</property>
-                    </cell>
-                    <cell id="181">
-                        <property name="borderTopColor">#C0C0C0</property>
-                        <property name="borderTopStyle">solid</property>
-                        <property name="borderTopWidth">thin</property>
-                    </cell>
-                    <cell id="80">
-                        <property name="borderTopColor">#C0C0C0</property>
-                        <property name="borderTopStyle">solid</property>
-                        <property name="borderTopWidth">thin</property>
-                        <data id="151">
-                            <property name="fontFamily">"Arial"</property>
-                            <property name="fontStyle">italic</property>
-                            <structure name="numberFormat">
-                                <property name="category">Currency</property>
-                                <property name="pattern">###0.00</property>
-                            </structure>
-                            <property name="textAlign">right</property>
-                            <property name="resultSetColumn">SumVAT</property>
-                        </data>
-                    </cell>
-                    <cell id="164">
-                        <property name="borderTopColor">#C0C0C0</property>
-                        <property name="borderTopStyle">solid</property>
-                        <property name="borderTopWidth">thin</property>
-                        <data id="169">
-                            <property name="fontFamily">"Arial"</property>
-                            <property name="textAlign">left</property>
-                            <property name="resultSetColumn">currencyID</property>
-                        </data>
-                    </cell>
-                </row>
                 <row id="271">
                     <cell id="272">
                         <property name="colSpan">7</property>
@@ -2736,7 +2840,7 @@ result;</expression>
                                     <cell id="287">
                                         <text-data id="298">
                                             <property name="fontStyle">italic</property>
-                                            <expression name="valueExpr">"Enthalten: " + row["priceFragmentTypeName"]</expression>
+                                            <expression name="valueExpr">reportContext.getMessage("includedVatPrefix", reportContext.getLocale()) + " " + row["priceFragmentTypeName"]</expression>
                                             <property name="contentType">html</property>
                                         </text-data>
                                     </cell>

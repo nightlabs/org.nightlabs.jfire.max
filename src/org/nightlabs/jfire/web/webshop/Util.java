@@ -10,7 +10,7 @@ import java.util.Locale;
 public class Util {
 
 	public static boolean isValidEmailAddress(String email) {
-		return email.matches("^[^@]+@([0-9a-zA-Z\\-]+\\.)+[a-zA-Z]+$");
+		return email != null && !email.isEmpty() && email.matches("^[^@]+@([0-9a-zA-Z\\-]+\\.)+[a-zA-Z]+$");
 	}
 	
 	public static boolean isValidUrl(String url) {

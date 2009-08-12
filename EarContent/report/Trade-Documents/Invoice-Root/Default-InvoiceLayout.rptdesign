@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.14" id="1">
     <property name="createdBy">Eclipse BIRT Designer Version 1.0.1 Build &lt;20051201-1157></property>
-    <property name="units">in</property>
+    <property name="units">mm</property>
     <property name="includeResource">reportMessages</property>
     <method name="initialize"><![CDATA[// Import the JFireReportingHelper
 importClass(Packages.org.nightlabs.jfire.reporting.JFireReportingHelper);
@@ -1293,10 +1293,12 @@ function isDynamicProduct(productJDOID) {
     <page-setup>
         <simple-master-page name="Simple MasterPage" id="2">
             <property name="type">a4</property>
-            <property name="topMargin">0.5in</property>
-            <property name="leftMargin">0.5in</property>
-            <property name="bottomMargin">0.5in</property>
-            <property name="rightMargin">0.5in</property>
+            <property name="topMargin">5mm</property>
+            <property name="leftMargin">10mm</property>
+            <property name="bottomMargin">10mm</property>
+            <property name="rightMargin">10mm</property>
+            <property name="headerHeight">0mm</property>
+            <property name="footerHeight">0mm</property>
         </simple-master-page>
     </page-setup>
     <body>
@@ -1355,7 +1357,106 @@ JFireReportingHelper.createDataSetParam(JDOHelper.getObjectId(customer.getPerson
             <column id="18"/>
             <header>
                 <row id="12">
-                    <cell id="13"/>
+                    <cell id="13">
+                        <text-data id="228">
+                            <property name="fontSize">large</property>
+                            <property name="fontWeight">bold</property>
+                            <property name="textAlign">center</property>
+                            <expression name="valueExpr">importClass(Packages.org.nightlabs.jfire.reporting.JFireReportingHelper);
+importClass(Packages.org.nightlabs.jfire.security.SecurityReflector);
+importClass(Packages.org.nightlabs.jfire.trade.OrganisationLegalEntity);
+importClass(Packages.org.nightlabs.jfire.person.PersonStruct);
+//importClass(Packages.javax.jdo.JDOHelper);
+orgLE = OrganisationLegalEntity.getOrganisationLegalEntity(
+  JFireReportingHelper.getPersistenceManager(),
+  SecurityReflector.getUserDescriptor().getOrganisationID()
+);
+orgP = orgLE.getPerson();
+result = "";
+
+//////// Company
+f = orgP.getPersistentDataFieldByIndex(PersonStruct.PERSONALDATA_COMPANY, 0);
+if (f != null &amp;&amp; f.getData() != "") {
+	if (result != "") result += " | ";
+	result += f.getData();
+}
+
+//////// First name + name
+name = "";
+f = orgP.getPersistentDataFieldByIndex(PersonStruct.PERSONALDATA_FIRSTNAME, 0);
+if (f != null &amp;&amp; f.getData() != "") {
+	if (name != "") name += " ";
+	name += f.getData();
+}
+f = orgP.getPersistentDataFieldByIndex(PersonStruct.PERSONALDATA_NAME, 0);
+if (f != null &amp;&amp; f.getData() != "") {
+	if (name != "") name += " ";
+	name += f.getData();
+}
+if (name != "") {
+	if (result != "") result += " | ";
+	result += name;
+}
+
+
+result;</expression>
+                            <property name="contentType">html</property>
+                        </text-data>
+                        <text-data id="229">
+                            <property name="textAlign">center</property>
+                            <expression name="valueExpr">importClass(Packages.org.nightlabs.jfire.reporting.JFireReportingHelper);
+importClass(Packages.org.nightlabs.jfire.security.SecurityReflector);
+importClass(Packages.org.nightlabs.jfire.trade.OrganisationLegalEntity);
+importClass(Packages.org.nightlabs.jfire.person.PersonStruct);
+orgLE = OrganisationLegalEntity.getOrganisationLegalEntity(
+  JFireReportingHelper.getPersistenceManager(),
+  SecurityReflector.getUserDescriptor().getOrganisationID()
+);
+orgP = orgLE.getPerson();
+result = "";
+
+//////// Address
+f = orgP.getPersistentDataFieldByIndex(PersonStruct.POSTADDRESS_ADDRESS, 0);
+if (f != null &amp;&amp; f.getData() != "") {
+	if (result != "") result += " | ";
+	result += f.getData();
+}
+
+//////// Zip + city
+zipCity = "";
+f = orgP.getPersistentDataFieldByIndex(PersonStruct.POSTADDRESS_POSTCODE, 0);
+if (f != null &amp;&amp; f.getData() != "") {
+	if (zipCity != "") zipCity += " ";
+	zipCity += f.getData();
+}
+f = orgP.getPersistentDataFieldByIndex(PersonStruct.POSTADDRESS_CITY, 0);
+if (f != null &amp;&amp; f.getData() != "") {
+	if (zipCity != "") zipCity += " ";
+	zipCity += f.getData();
+}
+if (zipCity != "") {
+	if (result != "") result += " | ";
+	result += zipCity;
+}
+
+//////// Region
+f = orgP.getPersistentDataFieldByIndex(PersonStruct.POSTADDRESS_REGION, 0);
+if (f != null &amp;&amp; f.getData() != "") {
+	if (result != "") result += " | ";
+	result += f.getData();
+}
+
+//////// Country
+f = orgP.getPersistentDataFieldByIndex(PersonStruct.POSTADDRESS_COUNTRY, 0);
+if (f != null &amp;&amp; f.getData() != "") {
+	if (result != "") result += " | ";
+	result += f.getData();
+}
+
+result;</expression>
+                            <property name="contentType">html</property>
+                        </text-data>
+                    </cell>
                 </row>
             </header>
             <detail>
@@ -1378,6 +1479,14 @@ JFireReportingHelper.createDataSetParam(JDOHelper.getObjectId(customer.getPerson
                                         <column id="100"/>
                                         <row id="102">
                                             <cell id="103">
+                                                <data id="172">
+                                                    <property name="fontFamily">"Arial"</property>
+                                                    <property name="resultSetColumn">Company</property>
+                                                </data>
+                                            </cell>
+                                        </row>
+                                        <row id="107">
+                                            <cell id="108">
                                                 <text-data id="174">
                                                     <property name="fontFamily">"Arial"</property>
                                                     <expression name="valueExpr">result = "";
@@ -1387,14 +1496,6 @@ if (!"".equals(row["Name"]))
 result = result + row["FirstName"]</expression>
                                                     <property name="contentType">html</property>
                                                 </text-data>
-                                            </cell>
-                                        </row>
-                                        <row id="107">
-                                            <cell id="108">
-                                                <data id="172">
-                                                    <property name="fontFamily">"Arial"</property>
-                                                    <property name="resultSetColumn">Company</property>
-                                                </data>
                                             </cell>
                                         </row>
                                         <row id="110">
@@ -1611,17 +1712,121 @@ JFireReportingHelper.createDataSetParam(JDOHelper.getObjectId(orgLE.getPerson())
                                             <row id="220">
                                                 <cell id="221">
                                                     <image id="226">
+                                                        <property name="width">50%</property>
                                                         <property name="source">expr</property>
                                                         <expression name="valueExpr">row["PersonalData_Photo"]</expression>
                                                     </image>
-                                                    <data id="225">
-                                                        <property name="fontFamily">"Arial"</property>
-                                                        <property name="fontSize">larger</property>
-                                                        <property name="paddingTop">10pt</property>
-                                                        <property name="paddingBottom">1pt</property>
-                                                        <property name="paddingRight">8pt</property>
-                                                        <property name="resultSetColumn">DisplayName</property>
-                                                    </data>
+                                                    <table id="232">
+                                                        <column id="242">
+                                                            <property name="textAlign">right</property>
+                                                        </column>
+                                                        <column id="243">
+                                                            <property name="canShrink">true</property>
+                                                        </column>
+                                                        <header>
+                                                            <row id="233">
+                                                                <list-property name="visibility">
+                                                                    <structure>
+                                                                        <property name="format">all</property>
+                                                                        <expression name="valueExpr">true</expression>
+                                                                    </structure>
+                                                                </list-property>
+                                                                <cell id="234">
+                                                                    <property name="canShrink">true</property>
+                                                                </cell>
+                                                                <cell id="235">
+                                                                    <property name="canShrink">true</property>
+                                                                </cell>
+                                                            </row>
+                                                        </header>
+                                                        <detail>
+                                                            <row id="236">
+                                                                <cell id="237">
+                                                                    <property name="canShrink">true</property>
+                                                                    <text-data id="244">
+                                                                        <property name="textAlign">right</property>
+                                                                        <expression name="valueExpr">reportContext.getMessage("header.localOrg.phone", reportContext.getLocale())</expression>
+                                                                        <property name="contentType">html</property>
+                                                                    </text-data>
+                                                                </cell>
+                                                                <cell id="238">
+                                                                    <property name="canShrink">true</property>
+                                                                    <text-data id="245">
+                                                                        <property name="textAlign">left</property>
+                                                                        <expression name="valueExpr">row["Phone_PrimaryPhone"]</expression>
+                                                                        <property name="contentType">html</property>
+                                                                    </text-data>
+                                                                </cell>
+                                                            </row>
+                                                            <row id="246">
+                                                                <cell id="247">
+                                                                    <property name="canShrink">true</property>
+                                                                    <text-data id="249">
+                                                                        <expression name="valueExpr">reportContext.getMessage("header.localOrg.fax", reportContext.getLocale())</expression>
+                                                                        <property name="contentType">html</property>
+                                                                    </text-data>
+                                                                </cell>
+                                                                <cell id="248">
+                                                                    <property name="canShrink">true</property>
+                                                                    <text-data id="250">
+                                                                        <property name="textAlign">left</property>
+                                                                        <expression name="valueExpr">row["Phone_Fax"]</expression>
+                                                                        <property name="contentType">html</property>
+                                                                    </text-data>
+                                                                </cell>
+                                                            </row>
+                                                            <row id="254">
+                                                                <cell id="255">
+                                                                    <property name="canShrink">true</property>
+                                                                    <text-data id="257">
+                                                                        <expression name="valueExpr">reportContext.getMessage("header.localOrg.email", reportContext.getLocale())</expression>
+                                                                        <property name="contentType">html</property>
+                                                                    </text-data>
+                                                                </cell>
+                                                                <cell id="256">
+                                                                    <property name="canShrink">true</property>
+                                                                    <text-data id="259">
+                                                                        <property name="textAlign">left</property>
+                                                                        <expression name="valueExpr">row["Internet_EMail"]</expression>
+                                                                        <property name="contentType">html</property>
+                                                                    </text-data>
+                                                                </cell>
+                                                            </row>
+                                                            <row id="251">
+                                                                <cell id="252">
+                                                                    <property name="canShrink">true</property>
+                                                                    <text-data id="258">
+                                                                        <expression name="valueExpr">reportContext.getMessage("header.localOrg.homepage", reportContext.getLocale())</expression>
+                                                                        <property name="contentType">html</property>
+                                                                    </text-data>
+                                                                </cell>
+                                                                <cell id="253">
+                                                                    <property name="canShrink">true</property>
+                                                                    <text-data id="260">
+                                                                        <property name="textAlign">left</property>
+                                                                        <expression name="valueExpr">row["Internet_Homepage"]</expression>
+                                                                        <property name="contentType">html</property>
+                                                                    </text-data>
+                                                                </cell>
+                                                            </row>
+                                                        </detail>
+                                                        <footer>
+                                                            <row id="239">
+                                                                <list-property name="visibility">
+                                                                    <structure>
+                                                                        <property name="format">all</property>
+                                                                        <expression name="valueExpr">true</expression>
+                                                                    </structure>
+                                                                </list-property>
+                                                                <cell id="240">
+                                                                    <property name="canShrink">true</property>
+                                                                </cell>
+                                                                <cell id="241">
+                                                                    <property name="canShrink">true</property>
+                                                                </cell>
+                                                            </row>
+                                                        </footer>
+                                                    </table>
                                                 </cell>
                                             </row>
                                         </detail>

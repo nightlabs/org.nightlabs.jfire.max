@@ -8,6 +8,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/org.nightlabs.jdo"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.nightlabs.base"/>
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.module.container"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jdk1.6.0_11"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

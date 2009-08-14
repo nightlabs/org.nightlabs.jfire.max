@@ -5,6 +5,7 @@
 	<projects>
 		<project>JFireJbpm</project>
 		<project>JFireJbpmEAR</project>
+		<project>JFireJbpmAOP</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

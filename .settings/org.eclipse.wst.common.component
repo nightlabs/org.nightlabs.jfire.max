@@ -14,6 +14,9 @@
         <dependent-module deploy-path="/lib" handle="module:/classpath/lib/JFireJbpm/lib/jbpm/jbpm-identity-3.1.4.jar">
             <dependency-type>uses</dependency-type>
         </dependent-module>
+        <dependent-module archiveName="JFireJbpmAOP.aop" deploy-path="/" handle="module:/resource/JFireJbpmAOP/JFireJbpmAOP">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
         
     </wb-module>
 </project-modules>

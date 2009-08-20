@@ -4,23 +4,23 @@ import java.util.Iterator;
 import java.util.LinkedList;
 
 import javax.jdo.PersistenceManager;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.PersistenceCapable;
 
 import org.nightlabs.jfire.accounting.Price;
 import org.nightlabs.jfire.accounting.PriceFragment;
 import org.nightlabs.jfire.accounting.priceconfig.IPackagePriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.IPriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.PriceConfig;
+import org.nightlabs.jfire.accounting.priceconfig.PriceConfigUtil;
 import org.nightlabs.jfire.dynamictrade.DynamicProductInfo;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.store.NestedProductTypeLocal;
 import org.nightlabs.jfire.store.Product;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.ArticlePrice;
-
-import javax.jdo.annotations.InheritanceStrategy;
-import javax.jdo.annotations.Inheritance;
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.IdentityType;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -72,9 +72,16 @@ implements IPackagePriceConfig
 				article, singlePrice,
 				IDGenerator.getOrganisationID(), IDGenerator.nextID(Price.class),
 				false);
-		for (PriceFragment pf : articlePrice.getFragments()) {
-			articlePrice.setAmount(pf.getPriceFragmentType(), (long) (pf.getAmount() * productInfo.getQuantityAsDouble()));
-		}
+
+		PriceConfigUtil.multiplyPrice(singlePrice, productInfo.getQuantityAsDouble(), articlePrice);
+		
+//		for (PriceFragment pf : articlePrice.getFragments()) {
+//			// The quantity might be a fraction so we have to round the result here.
+//			// We use Math.round as it implements the german so called "kaufmännisches Runden" (mercantile rounding)
+//			articlePrice.setAmount(pf.getPriceFragmentType(), 
+//					Math.round(pf.getAmount() * productInfo.getQuantityAsDouble()));
+////			articlePrice.setAmount(pf.getPriceFragmentType(), (long) (pf.getAmount() * productInfo.getQuantityAsDouble()));
+//		}
 		return articlePrice;
 	}
 

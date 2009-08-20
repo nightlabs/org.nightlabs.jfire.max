@@ -28,7 +28,10 @@ package org.nightlabs.jfire.accounting.priceconfig;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -40,6 +43,8 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
 import org.nightlabs.jfire.accounting.Price;
+import org.nightlabs.jfire.accounting.PriceFragment;
+import org.nightlabs.jfire.accounting.PriceFragmentType;
 import org.nightlabs.jfire.accounting.priceconfig.id.PriceConfigID;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.store.NestedProductTypeLocal;
@@ -52,6 +57,7 @@ import org.nightlabs.jfire.trade.ArticlePrice;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
+ * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
  */
 public class PriceConfigUtil
 {
@@ -488,5 +494,128 @@ public class PriceConfigUtil
 			res.put(priceConfigID, affectedProductTypes);
 		}
 		return res;
+	}
+	
+	
+	/**
+	 * Use this method to multiply the values of (the price-fragments of) a given Price and store the results in another Price. 
+	 * This method ensures that for each combination of container price-fragment-type and its parts:
+	 * <ul>
+	 * <li>The new total of the container will be the rounded result of the old total multiplied by the given quantity</li>
+	 * <li>The new sum of the containers parts will equal the new container total</li>
+	 * </ul>
+	 * Note, that this method assumes that for the given singlePrice for all container price-fragment-types its parts
+	 * make up the container value. This will be checked and an {@link IllegalStateException} will be thrown if 
+	 * this is found to be false for one container prive-fragment-type.
+	 * 
+	 * @param singlePrice The Price whose values should be multiplied.
+	 * @param quantity The quantity which the given price should be multiplied with. 
+	 * @param resultPrice 
+	 * 		The Price where the result of the multiplication should be stored.
+	 * 		Note, that the resultPrice will be cleared before storing the new values.
+	 */
+	public static void multiplyPrice(Price singlePrice, double quantity, Price resultPrice) {
+		Set<PriceFragmentType> containerPfts = new HashSet<PriceFragmentType>();
+		for (PriceFragment pf : singlePrice.getFragments()) {
+			PriceFragmentType containerPft = pf.getPriceFragmentType().getContainerPriceFragmentType();
+			if (containerPft != null)
+				containerPfts.add(containerPft);
+		}
+		resultPrice.clearFragments();
+		for (PriceFragmentType containerPft : containerPfts) {
+			multiplyRoundKeepSums(singlePrice, quantity, resultPrice, containerPft);
+		}
+		multiplyRoundKeepSums(singlePrice, quantity, resultPrice, null);
+	}
+
+	/**
+	 * Used by {@link #multiplyPrice(Price, double, Price)} and performs the multiplication and
+	 * rounding for the actual value and the values of all parts of a container price-fragment-type.
+	 * This method will ensure that the sum of the parts will be the total value.
+	 * If containerPft is <code>null</code> all values for price-fragments without container will
+	 * be individually rounded. 
+	 *  
+	 * @param singlePrice The single Price.
+	 * @param quantity The quantity to multiply with.
+	 * @param resultPrice Where the resuls should be stored.
+	 * @param containerPft The container
+	 */
+	private static void multiplyRoundKeepSums(Price singlePrice, double quantity, Price resultPrice, PriceFragmentType containerPft) {
+		// We first determine the new total price
+		long newPriceTotal = Math.round(singlePrice.getAmount() * quantity);
+	
+		// These are the price-fragments we make sure we have the partsOfTotal always in the same order
+		List<PriceFragment> priceFragments = new ArrayList<PriceFragment>(3);
+		
+		// split the parts
+		for (PriceFragment pf : singlePrice.getFragments()) {
+			if (containerPft != null) {
+				// If a container is set we search all of its parts
+				if (containerPft.equals(pf.getPriceFragmentType().getContainerPriceFragmentType())) {
+					priceFragments.add(pf);
+				}
+			} else if (pf.getPriceFragmentType().getContainerPriceFragmentType() == null) {
+				// If no container is set we take all price fragments not in a container
+				priceFragments.add(pf);
+			}
+		}
+		
+		// make sure we have the priceFragments always in the same order
+		Collections.sort(priceFragments, new Comparator<PriceFragment>() {
+			@Override
+			public int compare(PriceFragment o1, PriceFragment o2) {
+				return o1.getPriceFragmentTypePK().compareTo(o2.getPriceFragmentTypePK());
+			}
+		});
+		
+		if (containerPft != null) {
+			// We have a container set, so we need to make sure the sum of the rounded parts make the rounded total
+			
+			// First, we validate the given single price to ensure the assumption we base upon is fulfilled: 
+			// The sum of the parts has to result in the amount of the container
+			long containerTotal = singlePrice.getAmount(containerPft);
+			long partSum = 0;
+			for (PriceFragment pf : priceFragments) {
+				partSum += pf.getAmount();
+			}
+			if (containerTotal != partSum) {
+				throw new IllegalStateException(
+						String.format(
+							"The sum of the contained price-fragments for the container price-fragment %s does not make up the total container value: total container value: %d, sum of the parts: %d",
+							String.valueOf(containerPft),
+							containerTotal, partSum
+						));
+			}
+			
+			// we have a container set, so we need to make sure the sum of the rounded parts make the rounded total
+			long roundedTotal = Math.round(singlePrice.getAmount(containerPft) * quantity);
+			// set the total price to the result
+			resultPrice.setAmount(containerPft, roundedTotal);
+			
+			// Now round the parts making up total but make sure the sum of the parts will result in roundedTotal
+			long cummulatedParts = 0;
+			double cummulatedValues = 0;
+			for (int i = 0; i < priceFragments.size() - 1; i++) {
+				PriceFragment pf = priceFragments.get(i);
+				// calculate the rounding error cummulated until now 
+				double cummulatedRoundingError = cummulatedValues - cummulatedParts;
+				// for rounding the current part we add the cummulated rounding error to the current value
+				long currentPartValue = Math.round((pf.getAmount() + cummulatedRoundingError) * quantity);
+				resultPrice.setAmount(pf.getPriceFragmentType(), currentPartValue);
+				// update the cumulated exact and rounded sums for use in next iteration
+				cummulatedValues += pf.getAmount() * quantity;
+				cummulatedParts += currentPartValue;
+			}
+			// now update the last part so the sum will result in roundedTotal
+			if (priceFragments.size() > 0) {
+				PriceFragment pf = priceFragments.get(priceFragments.size() -1);
+				resultPrice.setAmount(pf.getPriceFragmentType(), newPriceTotal - cummulatedParts); 
+			}			
+		} else {
+			// If no container is ste we round the price fragments individually 
+			for (PriceFragment pf : priceFragments) {
+				resultPrice.setAmount(pf.getPriceFragmentType(), Math.round(pf.getAmount() * quantity));
+			}
+		}
 	}
 }

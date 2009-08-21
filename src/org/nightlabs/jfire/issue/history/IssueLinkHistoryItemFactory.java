@@ -113,19 +113,45 @@ public class IssueLinkHistoryItemFactory extends IssueHistoryItemFactory {
 		if ( linkedObject instanceof Person )
 			return ((Person)linkedObject).getDisplayName();
 
+		if ( linkedObject instanceof Issue ) {
+			Issue issue = (Issue)linkedObject;
+			return ObjectIDUtil.longObjectIDFieldToString(issue.getIssueID()) + " "
+			+ issue.getSubject().getText();	// <-- Not good. Think of an alternative, please. Kai.
+		}
+
 		// FIXME commented the following lines as a dependency on trade is not acceptable here.
 		// Think of another way doing this. Marc
-		
+		// -- Not exactly the best of methods, but this should do for now while I think of something better. Kai
+
 		//if ( linkedObject instanceof Order )
 		//	return ((Order)linkedObject).getPrimaryKey();
 
 		//if ( linkedObject instanceof Offer )
 		//	return ((Offer)linkedObject).getPrimaryKey();
 
-		if ( linkedObject instanceof Issue ) {
-			Issue issue = (Issue)linkedObject;
-			return ObjectIDUtil.longObjectIDFieldToString(issue.getIssueID()) + " "
-			+ issue.getSubject().getText();	// <-- Not good. Think of an alternative, please. Kai.
+		// Note: (From current standards)
+		// 1. objClassName: Offer (jdo/org.nightlabs.jfire.trade.id.OfferID?organisationID=chezfrancois.jfire.org&offerIDPrefix=2009&offerID=2)
+		// 2. objClassName: Order (jdo/org.nightlabs.jfire.trade.id.OrderID?organisationID=chezfrancois.jfire.org&orderIDPrefix=2009&orderID=8)
+		// 3. objClassName: Invoice (jdo/org.nightlabs.jfire.accounting.id.InvoiceID?organisationID=chezfrancois.jfire.org&invoiceIDPrefix=2009&invoiceID=3)
+		// 4. objClassName: DeliveryNote (jdo/org.nightlabs.jfire.store.id.DeliveryNoteID?organisationID=chezfrancois.jfire.org&deliveryNoteIDPrefix=2009&deliveryNoteID=5)
+		String objClassName = linkedObject.getClass().getSimpleName();
+		String[] objIDInfos = issueLink.getLinkedObjectID().toString().split("&");
+		if (objClassName.equals("Offer") || objClassName.equals("Order") || objClassName.equals("Invoice") || objClassName.equals("DeliveryNote")) {
+			String objClassNameLC = objClassName.substring(1); //objClassName.toLowerCase();
+			StringBuffer displayName = new StringBuffer();
+			for (String objIDInfo : objIDInfos) {
+				if (objIDInfo.contains(objClassNameLC + "IDPrefix=")) {
+					String[] idPrefix = objIDInfo.split("=");
+					displayName.append(idPrefix[1]);
+				}
+
+				if (objIDInfo.contains(objClassNameLC + "ID=")) {
+					String[] idNum = objIDInfo.split("=");
+					displayName.append("/" + idNum[1]);
+				}
+			}
+
+			return displayName.toString();
 		}
 
 		return issueLink.getLinkedObjectID().toString();

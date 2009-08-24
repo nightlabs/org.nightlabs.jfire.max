@@ -6,14 +6,14 @@
 		<content language="en"><![CDATA[
 Dear <?=row["Salutation"]?> <?=row["Name"]?>,
 <br/><br/>
-thank you for your order! See below the list of your ordered articles:
+thank you for your order! See below the list of delivered articles:
 <br/>
 ]]>
 		</content>
 		<content language="de"><![CDATA[
 Sehr geehrte(r) <?=row["Salutation"]?> <?=row["Name"]?>,
 <br/><br/>
-vielen Dank für Ihren Auftrag. Im Folgenden finden sie die Liste Ihrer bestellten Artikel:
+vielen Dank für Ihren Auftrag. Im Folgenden finden sie die Liste der gelieferten Artikel:
 <br/>
 ]]>
 		</content>

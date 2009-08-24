@@ -6,14 +6,14 @@
 		<content language="en"><![CDATA[
 Dear <?=row["Salutation"]?> <?=row["Name"]?>,
 <br/><br/>
-thank you for your order! See below the list of your ordered articles:
+thank you for your purchase! See below the list of your purchased articles:
 <br/>
 ]]>
 		</content>
 		<content language="de"><![CDATA[
 Sehr geehrte(r) <?=row["Salutation"]?> <?=row["Name"]?>,
 <br/><br/>
-vielen Dank für Ihren Auftrag. Im Folgenden finden sie die Liste Ihrer bestellten Artikel:
+vielen Dank für Ihren Einkauf. Im Folgenden finden sie die Liste Ihrer gekauften Artikel:
 <br/>
 ]]>
 		</content>
@@ -22,10 +22,16 @@ vielen Dank für Ihren Auftrag. Im Folgenden finden sie die Liste Ihrer bestellt
 		<name language="en">Finish text</name>
 		<name language="de">Schlusstext</name>
 		<content language="en"><![CDATA[
+We kindly ask you to transfer the outstanding amount to our bank account within 14 days.
+<br/>
+<br/>
 Your <b>JFire</b> team.  
 ]]>
 		</content>
 		<content language="de"><![CDATA[
+Bitte überweisen Sie den ausstehenden Betrag innerhalb 14 Tagen auf das angegebene Konto.
+<br/>
+<br/>
 Ihr <b>JFire</b>-Team.  
 ]]>
 		</content>

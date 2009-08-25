@@ -689,7 +689,9 @@ extends AbstractJDOQuery
 	}
 
 	public void setProcessDefinitionID(ProcessDefinitionID processDefinitionID) {
+		final ProcessDefinitionID oldProcessDefinitionID = this.processDefinitionID;
 		this.processDefinitionID = processDefinitionID;
+		notifyListeners(FieldName.processDefinitionID, oldProcessDefinitionID, processDefinitionID);
 	}
 
 	/**

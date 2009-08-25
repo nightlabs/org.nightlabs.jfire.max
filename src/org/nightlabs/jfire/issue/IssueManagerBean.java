@@ -1001,10 +1001,7 @@ implements IssueManagerRemote
 	{
 		PersistenceManager pm = createPersistenceManager();
 		try {
-			final Query allIDsQuery = pm.newNamedQuery(IssueType.class, IssueType.QUERY_ALL_ISSUETYPE_IDS);
-
-			return CollectionUtil.createHashSetFromCollection( allIDsQuery.execute() );
-//			return new HashSet<IssueTypeID>((Collection<? extends IssueTypeID>)allIDsQuery.execute());
+			return CollectionUtil.createHashSetFromCollection(IssueType.getIssueTypeIDs(pm));
 		} finally {
 			pm.close();
 		}

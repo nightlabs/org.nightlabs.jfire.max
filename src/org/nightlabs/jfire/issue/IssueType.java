@@ -4,10 +4,12 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
+import javax.jdo.Query;
 import javax.jdo.annotations.Column;
 import javax.jdo.annotations.FetchGroup;
 import javax.jdo.annotations.FetchGroups;
@@ -20,7 +22,6 @@ import javax.jdo.annotations.PersistenceModifier;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 import javax.jdo.annotations.Queries;
-import javax.jdo.annotations.Query;
 
 import org.jbpm.JbpmContext;
 import org.jbpm.graph.exe.ProcessInstance;
@@ -46,25 +47,6 @@ import org.nightlabs.util.Util;
  *
  * @author Chairat Kongarayawetchakun - chairat [AT] nightlabs [DOT] de
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
- *
- * @jdo.persistence-capable
- *		identity-type = "application"
- *		objectid-class = "org.nightlabs.jfire.issue.id.IssueTypeID"
- *		detachable = "true"
- *		table="JFireIssueTracking_IssueType"
- *
- * @jdo.create-objectid-class field-order="organisationID, issueTypeID"
- *
- * @jdo.inheritance strategy = "new-table"
- *
- * @jdo.fetch-group name="IssueType.name" fetch-groups="default" fields="name"
- * @jdo.fetch-group name="IssueType.issuePriorities" fetch-groups="default" fields="issuePriorities"
- * @jdo.fetch-group name="IssueType.issueSeverityTypes" fetch-groups="default" fields="issueSeverityTypes"
- * @jdo.fetch-group name="IssueType.issueResolutions" fetch-groups="default" fields="issueResolutions"
- * @jdo.fetch-group name="IssueType.processDefinition" fetch-groups="default" fields="processDefinition"
- * @jdo.fetch-group name="IssueType.this" fetch-groups="default" fields="name, issuePriorities, issueSeverityTypes, issueResolutions, processDefinition"
- *
- * @jdo.query name="getAllIssueTypeIDs" query="SELECT JDOHelper.getObjectId(this)"
  */
 @PersistenceCapable(
 	objectIdClass=IssueTypeID.class,
@@ -107,11 +89,12 @@ import org.nightlabs.util.Util;
 		members=@Persistent(name="name")
 	)
 })
-@Queries(
-	@Query(
-		name=IssueType.QUERY_ALL_ISSUETYPE_IDS,
-		value="SELECT JDOHelper.getObjectId(this)")
-)
+@Queries({
+	@javax.jdo.annotations.Query(
+		name="getAllIssueTypeIDs",
+		value="SELECT JDOHelper.getObjectId(this)"
+	),
+})
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class IssueType
 implements Serializable, Comparable<IssueType>
@@ -128,7 +111,19 @@ implements Serializable, Comparable<IssueType>
 	public static final String FETCH_GROUP_ISSUE_RESOLUTIONS = "IssueType.issueResolutions";
 	public static final String FETCH_GROUP_PROCESS_DEFINITION = "IssueType.processDefinition";
 
+	/**
+	 * @deprecated Use {@link #getIssueTypeIDs(PersistenceManager)} instead!
+	 */
+	@Deprecated
 	public static final String QUERY_ALL_ISSUETYPE_IDS = "getAllIssueTypeIDs";
+
+	public static Collection<IssueTypeID> getIssueTypeIDs(PersistenceManager pm)
+	{
+		Query q = pm.newNamedQuery(IssueType.class, "getAllIssueTypeIDs");
+		@SuppressWarnings("unchecked")
+		Collection<IssueTypeID> result = (Collection<IssueTypeID>) q.execute();
+		return result;
+	}
 
 	public static final String DEFAULT_ISSUE_TYPE_ID = "Default";
 
@@ -136,41 +131,24 @@ implements Serializable, Comparable<IssueType>
 	 * This is the organisationID to which the issue type belongs. Within one organisation,
 	 * all the issue types have their organisation's ID stored here, thus it's the same
 	 * value for all of them.
-	 *
-	 * @jdo.field primary-key="true"
-	 * @jdo.column length="100"
 	 */
 	@PrimaryKey
 	@Column(length=100)
 	private String organisationID;
 
-	/**
-	 * @jdo.field primary-key="true"
-	 * @jdo.column length="100"
-	 */
 	@PrimaryKey
 	@Column(length=100)
 	private String issueTypeID;
 
-	/**
-	 * @jdo.field persistence-modifier="persistent" dependent="true" mapped-by="issueType"
-	 */
 	@Persistent(
 		dependent="true",
 		mappedBy="issueType",
-		persistenceModifier=PersistenceModifier.PERSISTENT)
+		persistenceModifier=PersistenceModifier.PERSISTENT
+	)
 	private IssueTypeName name;
 
 	/**
 	 * Instances of {@link IssueSeverityType}.
-	 *
-	 * @jdo.field
-	 *		persistence-modifier="persistent"
-	 *		collection-type="collection"
-	 *		element-type="IssueSeverityType"
-	 *		table="JFireIssueTracking_IssueType_issueSeverityTypes"
-	 *
-	 * @jdo.join
 	 */
 	@Join
 	@Persistent(
@@ -180,14 +158,6 @@ implements Serializable, Comparable<IssueType>
 
 	/**
 	 * Instances of {@link IssuePriority}.
-	 *
-	 * @jdo.field
-	 *		persistence-modifier="persistent"
-	 *		collection-type="collection"
-	 *		element-type="IssuePriority"
-	 *		table="JFireIssueTracking_IssueType_issuePriorities"
-	 *
-	 * @jdo.join
 	 */
 	@Join
 	@Persistent(
@@ -197,14 +167,6 @@ implements Serializable, Comparable<IssueType>
 
 	/**
 	 * Instances of {@link IssuePriority}.
-	 *
-	 * @jdo.field
-	 *		persistence-modifier="persistent"
-	 *		collection-type="collection"
-	 *		element-type="IssueResolution"
-	 *		table="JFireIssueTracking_IssueType_issueResolutions"
-	 *
-	 * @jdo.join
 	 */
 	@Join
 	@Persistent(
@@ -214,19 +176,13 @@ implements Serializable, Comparable<IssueType>
 
 	/**
 	 * Instances of {@link ProcessDefinition}.
-	 *
-	 * @jdo.field
-	 *		persistence-modifier="persistent"
 	 */
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private ProcessDefinition processDefinition;
 
-	/**
-	 * @jdo.field
-	 *		persistence-modifier="persistent"
-	 */
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private boolean isDefault;
+
 	/**
 	 * @deprecated Only for JDO!!!!
 	 */

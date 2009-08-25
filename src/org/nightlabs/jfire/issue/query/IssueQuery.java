@@ -18,13 +18,14 @@ import org.nightlabs.jfire.issue.id.IssueResolutionID;
 import org.nightlabs.jfire.issue.id.IssueSeverityTypeID;
 import org.nightlabs.jfire.issue.id.IssueTypeID;
 import org.nightlabs.jfire.issue.project.id.ProjectID;
+import org.nightlabs.jfire.jbpm.graph.def.id.ProcessDefinitionID;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.security.id.UserID;
 
 /**
  * An extended class of {@link AbstractJDOQuery} which intended to allow users setting parameters for querying {@link Issue}.
  * <p>
- * 
+ *
  * </p>
  * @author Chairat Kongarayawetchakun <!-- chairat at nightlabs dot de -->
  * @author Marius Heinzmann - marius[at]nightlabs[dot]com
@@ -71,11 +72,14 @@ extends AbstractJDOQuery
 	private Date issueWorkTimeRangeFrom;
 	private Date issueWorkTimeRangeTo;
 	private Set<ProjectID> projectIDs;
-	
+
 	private String jbpmNodeName;
+
+	private ProcessDefinitionID processDefinitionID;
+
 	private boolean isSetCurrentUserAsAssignee;
 	private boolean isSetCurrentUserAsReporter;
-	
+
 	private Set<Class> linkedObjectClasses;
 	private transient String linkedObjectClassNameExpr;
 	/**
@@ -102,8 +106,9 @@ extends AbstractJDOQuery
 		public static final String issueWorkTimeRangeFrom = "issueWorkTimeRangeFrom";
 		public static final String issueWorkTimeRangeTo = "issueWorkTimeRangeTo";
 		public static final String projectIDs = "projectIDs";
-		
+
 		public static final String jbpmNodeName = "jbpmNodeName";
+		public static final String processDefinitionID = "processDefinitionID";
 		public static final String linkedObjectClasses = "linkedObjectClasses";
 	}
 
@@ -191,16 +196,12 @@ extends AbstractJDOQuery
 			filter.append("\n && (this.issueWorkTimeRanges.contains(varIssueWorkTimeRange) && (varIssueWorkTimeRange.to <= :issueWorkTimeRangeTo)) ");
 		}
 
-		if (isFieldEnabled(FieldName.issueWorkTimeRangeFrom) && isFieldEnabled(FieldName.issueWorkTimeRangeTo) 
+		if (isFieldEnabled(FieldName.issueWorkTimeRangeFrom) && isFieldEnabled(FieldName.issueWorkTimeRangeTo)
 				&& issueWorkTimeRangeFrom != null && issueWorkTimeRangeTo != null) {
 			filter.append("\n && (this.issueWorkTimeRanges.contains(varIssueWorkTimeRange) && !((varIssueWorkTimeRange.from >= :issueWorkTimeRangeTo) && (varIssueWorkTimeRange.to > :issueWorkTimeRangeTo))) ");
 			filter.append("\n || (this.issueWorkTimeRanges.contains(varIssueWorkTimeRange) && !((varIssueWorkTimeRange.to <= :issueWorkTimeRangeFrom) && (varIssueWorkTimeRange.from < :issueWorkTimeRangeFrom))) ");
 		}
 
-		if (jbpmNodeName != null) {
-			filter.append("\n && (this.state.stateDefinition.jbpmNodeName == :jbpmNodeName)");
-		}
-		
 		if (isFieldEnabled(FieldName.projectIDs) && projectIDs != null && !projectIDs.isEmpty()) {
 			int i = 0;
 			for (Iterator<ProjectID> it = projectIDs.iterator(); it.hasNext(); i++) {
@@ -219,17 +220,26 @@ extends AbstractJDOQuery
 				}
 			}
 		}
-		
+
+		if (isFieldEnabled(FieldName.processDefinitionID) && processDefinitionID != null) {
+			filter.append("\n && this.issueType.processDefinition.organisationID == :processDefinitionID.organisationID ");
+			filter.append("\n && this.issueType.processDefinition.processDefinitionID == :processDefinitionID.processDefinitionID ");
+		}
+
+		if (jbpmNodeName != null) {
+			filter.append("\n && (this.state.stateDefinition.jbpmNodeName == :jbpmNodeName)");
+		}
+
 		if (isFieldEnabled(FieldName.linkedObjectClasses) && linkedObjectClasses != null && !linkedObjectClasses.isEmpty()) {
 			filter.append("\n && (issueLinks.contains(varIssueLink) && (");
 			int i = 0;
 			for (Iterator<Class> it = linkedObjectClasses.iterator(); it.hasNext(); i++) {
 				String linkedObjectClassName = it.next().getSimpleName();
 				linkedObjectClassNameExpr = ".*" + linkedObjectClassName + ".*";
-				
+
 				filter.append("(varIssueLink.linkedObjectID.toLowerCase().matches(\""+ linkedObjectClassNameExpr.toLowerCase()+"\"))");
 //				filter.append("(varIssueLink.linkedObjectID.toLowerCase().matches(:linkedObjectClassNameExpr.toLowerCase()))");
-				
+
 				if (i < linkedObjectClasses.size() - 1)
 					filter.append(" || ");
 			}
@@ -322,9 +332,9 @@ extends AbstractJDOQuery
 	}
 
 	/**
-	 * Sets whether the value set with {@link #setIssueSubject(String)} represents a 
+	 * Sets whether the value set with {@link #setIssueSubject(String)} represents a
 	 * regular expression.
-	 * 
+	 *
 	 * @param issueSubjectRegex The issueSubjectRegex to search.
 	 */
 	public void setIssueSubjectRegex(boolean issueSubjectRegex) {
@@ -338,7 +348,7 @@ extends AbstractJDOQuery
 	 * Set the string to search in the issue subject and comments for. This can either be a regular expression
 	 * (set {@link #setIssueSubjectNCommentRegex(boolean)} to <code>true</code> then) or a string
 	 * that should be contained in either the subject or one of the comments of the Issues to find.
-	 *  
+	 *
 	 * @param issueSubjectNComment The issueComment to set
 	 */
 	public void setIssueSubjectNComment(String issueSubjectNComment)
@@ -368,9 +378,9 @@ extends AbstractJDOQuery
 	}
 
 	/**
-	 * Sets whether the value set with {@link #setIssueSubjectNComment(String)} represents a 
+	 * Sets whether the value set with {@link #setIssueSubjectNComment(String)} represents a
 	 * regular expression.
-	 * 
+	 *
 	 * @param issueSubjectNCommentRegex The issueSubjectNCommentRegex to search.
 	 */
 	public void setIssueSubjectNCommentRegex(boolean issueSubjectNCommentRegex) {
@@ -392,7 +402,7 @@ extends AbstractJDOQuery
 	 * Set the string to search in the issue comments for. This can either be a regular expression
 	 * (set {@link #setIssueCommentRegex(boolean)} to <code>true</code> then) or a string
 	 * that should be contained in one of the comments of the Issues to find.
-	 *  
+	 *
 	 * @param issueComment The issueComment to set
 	 */
 	public void setIssueComment(String issueComment)
@@ -414,9 +424,9 @@ extends AbstractJDOQuery
 	}
 
 	/**
-	 * Sets whether the value set with {@link #setIssueComment(String)} represents a 
+	 * Sets whether the value set with {@link #setIssueComment(String)} represents a
 	 * regular expression.
-	 * 
+	 *
 	 * @param issueCommentRegex The issueCommentRegex to search
 	 */
 	public void setIssueCommentRegex(boolean issueCommentRegex) {
@@ -663,7 +673,7 @@ extends AbstractJDOQuery
 	public String getJbpmNodeName() {
 		return jbpmNodeName;
 	}
-	
+
 	/**
 	 * Sets the String of the issue state.
 	 * @param jbpmNodeName
@@ -673,7 +683,15 @@ extends AbstractJDOQuery
 		this.jbpmNodeName = jbpmNodeName;
 		notifyListeners(FieldName.jbpmNodeName, oldJbpmNodeName, jbpmNodeName);
 	}
-	
+
+	public ProcessDefinitionID getProcessDefinitionID() {
+		return processDefinitionID;
+	}
+
+	public void setProcessDefinitionID(ProcessDefinitionID processDefinitionID) {
+		this.processDefinitionID = processDefinitionID;
+	}
+
 	/**
 	 * Returns the {@link Class} of the issue linked object.
 	 * @return
@@ -681,7 +699,7 @@ extends AbstractJDOQuery
 	public Set<Class> getLinkedObjectClasses() {
 		return linkedObjectClasses;
 	}
-	
+
 	/**
 	 * Sets the {@link Class} of the issue linked object.
 	 * @param linkedObjectClassName
@@ -691,7 +709,7 @@ extends AbstractJDOQuery
 		this.linkedObjectClasses = linkedObjectClasses;
 		notifyListeners(FieldName.linkedObjectClasses, oldLinkedObjectClasses, linkedObjectClasses);
 	}
-	
+
 	@Override
 	/**
 	 * {@inheritDoc}
@@ -700,12 +718,12 @@ extends AbstractJDOQuery
 	{
 		return Issue.class;
 	}
-	
+
 	public void setCurrentUserAsAssignee() {
 		if (isSetCurrentUserAsAssignee)
 			this.assigneeID = SecurityReflector.getUserDescriptor().getUserObjectID();
 	}
-	
+
 	public void setCurrentUserAsReporter() {
 		if (isSetCurrentUserAsReporter)
 			this.reporterID = SecurityReflector.getUserDescriptor().getUserObjectID();

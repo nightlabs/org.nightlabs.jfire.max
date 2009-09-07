@@ -58,7 +58,7 @@ import org.nightlabs.jfire.issue.id.IssueResolutionID;
 import org.nightlabs.jfire.issue.id.IssueSeverityTypeID;
 import org.nightlabs.jfire.issue.id.IssueTypeID;
 import org.nightlabs.jfire.issue.issuemarker.IssueMarker;
-import org.nightlabs.jfire.issue.jbpm.JbpmConstants;
+import org.nightlabs.jfire.issue.jbpm.JbpmConstantsIssue;
 import org.nightlabs.jfire.issue.project.Project;
 import org.nightlabs.jfire.issue.project.ProjectType;
 import org.nightlabs.jfire.issue.project.id.ProjectID;
@@ -700,10 +700,10 @@ implements IssueManagerRemote
 				String jbpmTransitionName = signalJbpmTransitionName;
 				if (jbpmTransitionName == null) {
 					if (doAssign)
-						jbpmTransitionName = JbpmConstants.TRANSITION_NAME_ASSIGN;
+						jbpmTransitionName = JbpmConstantsIssue.TRANSITION_NAME_ASSIGN;
 
 					if (doUnassign)
-						jbpmTransitionName = JbpmConstants.TRANSITION_NAME_UNASSIGN;
+						jbpmTransitionName = JbpmConstantsIssue.TRANSITION_NAME_UNASSIGN;
 				}
 
 				pIssue = pm.makePersistent(issue);
@@ -1538,43 +1538,43 @@ implements IssueManagerRemote
 			newIssueIssueQuery.clearQuery();
 			newIssueIssueQuery.setAllFieldsDisabled();
 			newIssueIssueQuery.setProcessDefinitionID(processDefinitionID);
-			newIssueIssueQuery.setJbpmNodeName(JbpmConstants.NODE_NAME_NEW);
+			newIssueIssueQuery.setJbpmNodeName(JbpmConstantsIssue.NODE_NAME_NEW);
 
 			IssueQuery unassignedIssueIssueQuery = new IssueQuery();
 			unassignedIssueIssueQuery.clearQuery();
 			unassignedIssueIssueQuery.setAllFieldsDisabled();
 			unassignedIssueIssueQuery.setProcessDefinitionID(processDefinitionID);
-			unassignedIssueIssueQuery.setJbpmNodeName(JbpmConstants.NODE_NAME_OPEN);
+			unassignedIssueIssueQuery.setJbpmNodeName(JbpmConstantsIssue.NODE_NAME_OPEN);
 
 			IssueQuery resolvedIssueIssueQuery = new IssueQuery();
 			resolvedIssueIssueQuery.clearQuery();
 			resolvedIssueIssueQuery.setAllFieldsDisabled();
 			resolvedIssueIssueQuery.setProcessDefinitionID(processDefinitionID);
-			resolvedIssueIssueQuery.setJbpmNodeName(JbpmConstants.NODE_NAME_RESOLVED);
+			resolvedIssueIssueQuery.setJbpmNodeName(JbpmConstantsIssue.NODE_NAME_RESOLVED);
 
 			IssueQuery acknowledgedIssueIssueQuery = new IssueQuery();
 			acknowledgedIssueIssueQuery.clearQuery();
 			acknowledgedIssueIssueQuery.setAllFieldsDisabled();
 			acknowledgedIssueIssueQuery.setProcessDefinitionID(processDefinitionID);
-			acknowledgedIssueIssueQuery.setJbpmNodeName(JbpmConstants.NODE_NAME_ACKNOWLEDGED);
+			acknowledgedIssueIssueQuery.setJbpmNodeName(JbpmConstantsIssue.NODE_NAME_ACKNOWLEDGED);
 
 			IssueQuery closedIssueIssueQuery = new IssueQuery();
 			closedIssueIssueQuery.clearQuery();
 			closedIssueIssueQuery.setAllFieldsDisabled();
 			closedIssueIssueQuery.setProcessDefinitionID(processDefinitionID);
-			closedIssueIssueQuery.setJbpmNodeName(JbpmConstants.NODE_NAME_CLOSED);
+			closedIssueIssueQuery.setJbpmNodeName(JbpmConstantsIssue.NODE_NAME_CLOSED);
 
 			IssueQuery confirmedIssueIssueQuery = new IssueQuery();
 			confirmedIssueIssueQuery.clearQuery();
 			confirmedIssueIssueQuery.setAllFieldsDisabled();
 			confirmedIssueIssueQuery.setProcessDefinitionID(processDefinitionID);
-			confirmedIssueIssueQuery.setJbpmNodeName(JbpmConstants.NODE_NAME_CONFIRMED);
+			confirmedIssueIssueQuery.setJbpmNodeName(JbpmConstantsIssue.NODE_NAME_CONFIRMED);
 
 			IssueQuery rejectedIssueIssueQuery = new IssueQuery();
 			rejectedIssueIssueQuery.clearQuery();
 			rejectedIssueIssueQuery.setAllFieldsDisabled();
 			rejectedIssueIssueQuery.setProcessDefinitionID(processDefinitionID);
-			rejectedIssueIssueQuery.setJbpmNodeName(JbpmConstants.NODE_NAME_REJECTED);
+			rejectedIssueIssueQuery.setJbpmNodeName(JbpmConstantsIssue.NODE_NAME_REJECTED);
 
 			//1 Unassigned Issues
 			pm.getExtent(BaseQueryStore.class);

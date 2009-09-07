@@ -29,7 +29,7 @@ import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.issue.history.FetchGroupsIssueHistoryItem;
 import org.nightlabs.jfire.issue.id.IssueTypeID;
-import org.nightlabs.jfire.issue.jbpm.JbpmConstants;
+import org.nightlabs.jfire.issue.jbpm.JbpmConstantsIssue;
 import org.nightlabs.jfire.jbpm.JbpmLookup;
 import org.nightlabs.jfire.jbpm.graph.def.AbstractActionHandler;
 import org.nightlabs.jfire.jbpm.graph.def.ProcessDefinition;
@@ -281,7 +281,7 @@ implements Serializable, Comparable<IssueType>
 		// Marco.
 		jbpmProcessDefinition.setName(getOrganisationID() + ":IssueType-" + getIssueTypeID());
 		this.processDefinition = ProcessDefinition.storeProcessDefinition(getPersistenceManager(), null, jbpmProcessDefinition, jbpmProcessDefinitionURL);
-		JbpmConstants.initStandardProcessDefinition(this.processDefinition);
+		JbpmConstantsIssue.initStandardProcessDefinition(this.processDefinition);
 	}
 
 	public ProcessInstance createProcessInstanceForIssue(Issue issue) {

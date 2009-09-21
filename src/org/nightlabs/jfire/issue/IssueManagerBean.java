@@ -67,7 +67,6 @@ import org.nightlabs.jfire.issue.prop.IssueStruct;
 import org.nightlabs.jfire.issue.query.IssueQuery;
 import org.nightlabs.jfire.issue.resource.Messages;
 import org.nightlabs.jfire.jbpm.JbpmLookup;
-import org.nightlabs.jfire.jbpm.graph.def.id.ProcessDefinitionID;
 import org.nightlabs.jfire.person.PersonStruct;
 import org.nightlabs.jfire.prop.datafield.TextDataField;
 import org.nightlabs.jfire.query.store.BaseQueryStore;
@@ -1533,47 +1532,54 @@ implements IssueManagerRemote
 
 
 			// ---[ Predefined Query Stores ]-----------------------------------------------------------------------------------| Start |---
-			ProcessDefinitionID processDefinitionID = (ProcessDefinitionID)JDOHelper.getObjectId(issueTypeDefault.getProcessDefinition());
+//			ProcessDefinitionID processDefinitionID = (ProcessDefinitionID)JDOHelper.getObjectId(issueTypeDefault.getProcessDefinition());
 			IssueQuery newIssueIssueQuery = new IssueQuery();
 			newIssueIssueQuery.clearQuery();
 			newIssueIssueQuery.setAllFieldsDisabled();
-			newIssueIssueQuery.setProcessDefinitionID(processDefinitionID);
+			newIssueIssueQuery.setFieldEnabled(IssueQuery.FieldName.processDefinitionID, true);
+			newIssueIssueQuery.setFieldEnabled(IssueQuery.FieldName.jbpmNodeName, true);
 			newIssueIssueQuery.setJbpmNodeName(JbpmConstantsIssue.NODE_NAME_NEW);
 
 			IssueQuery unassignedIssueIssueQuery = new IssueQuery();
 			unassignedIssueIssueQuery.clearQuery();
 			unassignedIssueIssueQuery.setAllFieldsDisabled();
-			unassignedIssueIssueQuery.setProcessDefinitionID(processDefinitionID);
+			unassignedIssueIssueQuery.setFieldEnabled(IssueQuery.FieldName.processDefinitionID, true);
+			unassignedIssueIssueQuery.setFieldEnabled(IssueQuery.FieldName.jbpmNodeName, true);
 			unassignedIssueIssueQuery.setJbpmNodeName(JbpmConstantsIssue.NODE_NAME_OPEN);
 
 			IssueQuery resolvedIssueIssueQuery = new IssueQuery();
 			resolvedIssueIssueQuery.clearQuery();
 			resolvedIssueIssueQuery.setAllFieldsDisabled();
-			resolvedIssueIssueQuery.setProcessDefinitionID(processDefinitionID);
+			resolvedIssueIssueQuery.setFieldEnabled(IssueQuery.FieldName.processDefinitionID, true);
+			resolvedIssueIssueQuery.setFieldEnabled(IssueQuery.FieldName.jbpmNodeName, true);
 			resolvedIssueIssueQuery.setJbpmNodeName(JbpmConstantsIssue.NODE_NAME_RESOLVED);
 
 			IssueQuery acknowledgedIssueIssueQuery = new IssueQuery();
 			acknowledgedIssueIssueQuery.clearQuery();
 			acknowledgedIssueIssueQuery.setAllFieldsDisabled();
-			acknowledgedIssueIssueQuery.setProcessDefinitionID(processDefinitionID);
+			acknowledgedIssueIssueQuery.setFieldEnabled(IssueQuery.FieldName.processDefinitionID, true);
+			acknowledgedIssueIssueQuery.setFieldEnabled(IssueQuery.FieldName.jbpmNodeName, true);
 			acknowledgedIssueIssueQuery.setJbpmNodeName(JbpmConstantsIssue.NODE_NAME_ACKNOWLEDGED);
 
 			IssueQuery closedIssueIssueQuery = new IssueQuery();
 			closedIssueIssueQuery.clearQuery();
 			closedIssueIssueQuery.setAllFieldsDisabled();
-			closedIssueIssueQuery.setProcessDefinitionID(processDefinitionID);
+			closedIssueIssueQuery.setFieldEnabled(IssueQuery.FieldName.processDefinitionID, true);
+			closedIssueIssueQuery.setFieldEnabled(IssueQuery.FieldName.jbpmNodeName, true);
 			closedIssueIssueQuery.setJbpmNodeName(JbpmConstantsIssue.NODE_NAME_CLOSED);
 
 			IssueQuery confirmedIssueIssueQuery = new IssueQuery();
 			confirmedIssueIssueQuery.clearQuery();
 			confirmedIssueIssueQuery.setAllFieldsDisabled();
-			confirmedIssueIssueQuery.setProcessDefinitionID(processDefinitionID);
+			confirmedIssueIssueQuery.setFieldEnabled(IssueQuery.FieldName.processDefinitionID, true);
+			confirmedIssueIssueQuery.setFieldEnabled(IssueQuery.FieldName.jbpmNodeName, true);
 			confirmedIssueIssueQuery.setJbpmNodeName(JbpmConstantsIssue.NODE_NAME_CONFIRMED);
 
 			IssueQuery rejectedIssueIssueQuery = new IssueQuery();
 			rejectedIssueIssueQuery.clearQuery();
 			rejectedIssueIssueQuery.setAllFieldsDisabled();
-			rejectedIssueIssueQuery.setProcessDefinitionID(processDefinitionID);
+			rejectedIssueIssueQuery.setFieldEnabled(IssueQuery.FieldName.processDefinitionID, true);
+			rejectedIssueIssueQuery.setFieldEnabled(IssueQuery.FieldName.jbpmNodeName, true);
 			rejectedIssueIssueQuery.setJbpmNodeName(JbpmConstantsIssue.NODE_NAME_REJECTED);
 
 			//1 Unassigned Issues
@@ -1589,6 +1595,8 @@ implements IssueManagerRemote
 			queryStore.setPubliclyAvailable(true);
 			queryStore.getName().readFromProperties(baseName, loader,
 			"org.nightlabs.jfire.issue.IssueManagerBean.queryStoreUnassigned"); //$NON-NLS-1$
+			queryStore.getDescription().readFromProperties(baseName, loader,
+			"org.nightlabs.jfire.issue.IssueManagerBean.queryStoreUnassigned"); //$NON-NLS-1$
 			queryStore.serialiseCollection();
 			queryStore = pm.makePersistent(queryStore);
 
@@ -1602,6 +1610,8 @@ implements IssueManagerRemote
 			queryStore.setQueryCollection(queryCollection);
 			queryStore.setPubliclyAvailable(true);
 			queryStore.getName().readFromProperties(baseName, loader,
+			"org.nightlabs.jfire.issue.IssueManagerBean.queryStoreResolved"); //$NON-NLS-1$
+			queryStore.getDescription().readFromProperties(baseName, loader,
 			"org.nightlabs.jfire.issue.IssueManagerBean.queryStoreResolved"); //$NON-NLS-1$
 			queryStore.serialiseCollection();
 			queryStore = pm.makePersistent(queryStore);
@@ -1617,6 +1627,8 @@ implements IssueManagerRemote
 			queryStore.setPubliclyAvailable(true);
 			queryStore.getName().readFromProperties(baseName, loader,
 			"org.nightlabs.jfire.issue.IssueManagerBean.queryStoreAcknowledged"); //$NON-NLS-1$
+			queryStore.getDescription().readFromProperties(baseName, loader,
+			"org.nightlabs.jfire.issue.IssueManagerBean.queryStoreAcknowledged"); //$NON-NLS-1$
 			queryStore.serialiseCollection();
 			queryStore = pm.makePersistent(queryStore);
 
@@ -1630,6 +1642,8 @@ implements IssueManagerRemote
 			queryStore.setQueryCollection(queryCollection);
 			queryStore.setPubliclyAvailable(true);
 			queryStore.getName().readFromProperties(baseName, loader,
+			"org.nightlabs.jfire.issue.IssueManagerBean.queryStoreclosed"); //$NON-NLS-1$
+			queryStore.getDescription().readFromProperties(baseName, loader,
 			"org.nightlabs.jfire.issue.IssueManagerBean.queryStoreclosed"); //$NON-NLS-1$
 			queryStore.serialiseCollection();
 			queryStore = pm.makePersistent(queryStore);
@@ -1645,6 +1659,8 @@ implements IssueManagerRemote
 			queryStore.setPubliclyAvailable(true);
 			queryStore.getName().readFromProperties(baseName, loader,
 			"org.nightlabs.jfire.issue.IssueManagerBean.queryStoreConfirmed"); //$NON-NLS-1$
+			queryStore.getDescription().readFromProperties(baseName, loader,
+			"org.nightlabs.jfire.issue.IssueManagerBean.queryStoreConfirmed"); //$NON-NLS-1$
 			queryStore.serialiseCollection();
 			queryStore = pm.makePersistent(queryStore);
 
@@ -1659,6 +1675,8 @@ implements IssueManagerRemote
 			queryStore.setPubliclyAvailable(true);
 			queryStore.getName().readFromProperties(baseName, loader,
 			"org.nightlabs.jfire.issue.IssueManagerBean.queryStoreRejected"); //$NON-NLS-1$
+			queryStore.getDescription().readFromProperties(baseName, loader,
+			"org.nightlabs.jfire.issue.IssueManagerBean.queryStoreRejected"); //$NON-NLS-1$
 			queryStore.serialiseCollection();
 			queryStore = pm.makePersistent(queryStore);
 
@@ -1672,6 +1690,8 @@ implements IssueManagerRemote
 			queryStore.setQueryCollection(queryCollection);
 			queryStore.setPubliclyAvailable(true);
 			queryStore.getName().readFromProperties(baseName, loader,
+			"org.nightlabs.jfire.issue.IssueManagerBean.queryStoreNew"); //$NON-NLS-1$
+			queryStore.getDescription().readFromProperties(baseName, loader,
 			"org.nightlabs.jfire.issue.IssueManagerBean.queryStoreNew"); //$NON-NLS-1$
 			queryStore.serialiseCollection();
 			queryStore = pm.makePersistent(queryStore);

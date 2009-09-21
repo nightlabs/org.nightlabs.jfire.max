@@ -226,7 +226,7 @@ extends AbstractJDOQuery
 			filter.append("\n && this.issueType.processDefinition.processDefinitionID == :processDefinitionID.processDefinitionID ");
 		}
 
-		if (jbpmNodeName != null) {
+		if (isFieldEnabled(FieldName.jbpmNodeName) && jbpmNodeName != null) {
 			filter.append("\n && (this.state.stateDefinition.jbpmNodeName == :jbpmNodeName)");
 		}
 

@@ -1,6 +1,9 @@
 package org.nightlabs.jfire.issue.jbpm;
 
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Locale;
+import java.util.Set;
 
 import javax.jdo.JDOObjectNotFoundException;
 
@@ -13,7 +16,7 @@ import org.nightlabs.jfire.organisation.Organisation;
  * <p>
  * This class is never instantiated.
  * </p>
- * 
+ *
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
  */
 public class JbpmConstantsIssue
@@ -27,62 +30,62 @@ public class JbpmConstantsIssue
 	// designing process definitions.
 
 	/**
-	 * This constant represents a node that used for assigning <code>NEW</code> state. 
+	 * This constant represents a node that used for assigning <code>NEW</code> state.
 	 */
 	public static final String NODE_NAME_NEW = Organisation.DEV_ORGANISATION_ID + ":new";
-	
+
 	/**
-	 * This constant represents a node that used for assigning <code>OPEN</code> state. 
+	 * This constant represents a node that used for assigning <code>OPEN</code> state.
 	 */
 	public static final String NODE_NAME_OPEN = Organisation.DEV_ORGANISATION_ID + ":open";
-	
+
 	/**
-	 * This constant represents a node that used for assigning <code>ACKNOWLEDGED</code> state. 
+	 * This constant represents a node that used for assigning <code>ACKNOWLEDGED</code> state.
 	 */
 	public static final String NODE_NAME_ACKNOWLEDGED = Organisation.DEV_ORGANISATION_ID + ":acknowledged";
-	
+
 	/**
-	 * This constant represents a node that used for assigning <code>ACKNOWLEDGED IMPLICITELY</code> state. 
+	 * This constant represents a node that used for assigning <code>ACKNOWLEDGED IMPLICITELY</code> state.
 	 */
 	public static final String NODE_NAME_ACKNOWLEDGED_IMPLICITELY = Organisation.DEV_ORGANISATION_ID + ":acknowledgedImplicitely";
-	
+
 	/**
-	 * This constant represents a node that used for assigning <code>CONFIRMED</code> state. 
+	 * This constant represents a node that used for assigning <code>CONFIRMED</code> state.
 	 */
 	public static final String NODE_NAME_CONFIRMED = Organisation.DEV_ORGANISATION_ID + ":confirmed";
-	
+
 	/**
-	 * This constant represents a node that used for assigning <code>COMFIRMED IMPLICITELY</code> state. 
+	 * This constant represents a node that used for assigning <code>COMFIRMED IMPLICITELY</code> state.
 	 */
 	public static final String NODE_NAME_CONFIRMED_IMPLICITELY = Organisation.DEV_ORGANISATION_ID + ":confirmedImplicitely";
-	
+
 	/**
-	 * This constant represents a node that used for assigning <code>ASSIGNED</code> state. 
+	 * This constant represents a node that used for assigning <code>ASSIGNED</code> state.
 	 */
 	public static final String NODE_NAME_ASSIGNED = Organisation.DEV_ORGANISATION_ID + ":assigned";
-	
+
 	/**
-	 * This constant represents a node that used for assigning <code>RESOLVED</code> state. 
+	 * This constant represents a node that used for assigning <code>RESOLVED</code> state.
 	 */
 	public static final String NODE_NAME_RESOLVED = Organisation.DEV_ORGANISATION_ID + ":resolved";
-	
+
 	/**
-	 * This constant represents a node that used for assigning <code>RESOLVED IMPLICITELY</code> state. 
+	 * This constant represents a node that used for assigning <code>RESOLVED IMPLICITELY</code> state.
 	 */
 	public static final String NODE_NAME_RESOLVED_IMPLICITELY = Organisation.DEV_ORGANISATION_ID + ":resolvedImplicitely";
-	
+
 	/**
-	 * This constant represents a node that used for assigning <code>CLOSED</code> state. 
+	 * This constant represents a node that used for assigning <code>CLOSED</code> state.
 	 */
 	public static final String NODE_NAME_CLOSED = Organisation.DEV_ORGANISATION_ID + ":closed";
-	
+
 	/**
-	 * This constant represents a node that used for assigning <code>REOPENED</code> state. 
+	 * This constant represents a node that used for assigning <code>REOPENED</code> state.
 	 */
 	public static final String NODE_NAME_REOPENED = Organisation.DEV_ORGANISATION_ID + ":reopened";
-	
+
 	/**
-	 * This constant represents a node that used for assigning <code>REJECTED</code> state. 
+	 * This constant represents a node that used for assigning <code>REJECTED</code> state.
 	 */
 	public static final String NODE_NAME_REJECTED = Organisation.DEV_ORGANISATION_ID + ":rejected";
 
@@ -115,32 +118,32 @@ public class JbpmConstantsIssue
 	 * @param processDefinition The {@link ProcessDefinition} to use.
 	 */
 	public static void initStandardProcessDefinition(ProcessDefinition processDefinition) {
-		setStateDefinitionProperties(processDefinition, NODE_NAME_NEW, 
+		setStateDefinitionProperties(processDefinition, NODE_NAME_NEW,
 				"New", "Issue has been created", true);
-		setStateDefinitionProperties(processDefinition, NODE_NAME_OPEN, 
+		setStateDefinitionProperties(processDefinition, NODE_NAME_OPEN,
 				"Open", "Issue has been opened", true);
-		setStateDefinitionProperties(processDefinition, NODE_NAME_ACKNOWLEDGED, 
+		setStateDefinitionProperties(processDefinition, NODE_NAME_ACKNOWLEDGED,
 				"Acknowledged", "Issue has been acknowledged", true);
-		setStateDefinitionProperties(processDefinition, NODE_NAME_ACKNOWLEDGED_IMPLICITELY, 
+		setStateDefinitionProperties(processDefinition, NODE_NAME_ACKNOWLEDGED_IMPLICITELY,
 				"Acknowledged implicitely", "Issue has been acknowledged while setting a differen state.", true);
-		setStateDefinitionProperties(processDefinition, NODE_NAME_CONFIRMED, 
+		setStateDefinitionProperties(processDefinition, NODE_NAME_CONFIRMED,
 				"Confirmed", "Issue has been confirmed", true);
-		setStateDefinitionProperties(processDefinition, NODE_NAME_CONFIRMED_IMPLICITELY, 
+		setStateDefinitionProperties(processDefinition, NODE_NAME_CONFIRMED_IMPLICITELY,
 				"Confirmed implicitely", "Issue has been confirmed while setting a different state", true);
-		setStateDefinitionProperties(processDefinition, NODE_NAME_ASSIGNED, 
+		setStateDefinitionProperties(processDefinition, NODE_NAME_ASSIGNED,
 				"Assigned", "Issue has been assigned", true);
-		setStateDefinitionProperties(processDefinition, NODE_NAME_RESOLVED, 
+		setStateDefinitionProperties(processDefinition, NODE_NAME_RESOLVED,
 				"Resolved", "Issue has been resolved", true);
-		setStateDefinitionProperties(processDefinition, NODE_NAME_RESOLVED_IMPLICITELY, 
+		setStateDefinitionProperties(processDefinition, NODE_NAME_RESOLVED_IMPLICITELY,
 				"Resolved implicitely", "Issue has been resolved while closing", true);
-		setStateDefinitionProperties(processDefinition, NODE_NAME_CLOSED, 
+		setStateDefinitionProperties(processDefinition, NODE_NAME_CLOSED,
 				"Closed", "Issue has been closed", true);
-		setStateDefinitionProperties(processDefinition, NODE_NAME_REOPENED, 
+		setStateDefinitionProperties(processDefinition, NODE_NAME_REOPENED,
 				"Reopened", "Issue has been reopened", true);
-		setStateDefinitionProperties(processDefinition, NODE_NAME_REJECTED, 
+		setStateDefinitionProperties(processDefinition, NODE_NAME_REJECTED,
 				"Rejected", "Issue has been rejected", true);
 	}
-	
+
 	private static void setStateDefinitionProperties(
 			ProcessDefinition processDefinition, String jbpmNodeName,
 			String name, String description, boolean publicState)
@@ -154,5 +157,12 @@ public class JbpmConstantsIssue
 		stateDefinition.getName().setText(Locale.ENGLISH.getLanguage(), name);
 		stateDefinition.getDescription().setText(Locale.ENGLISH.getLanguage(), description);
 		stateDefinition.setPublicState(publicState);
+
+		stateDefinitions.add(stateDefinition);
+	}
+
+	private static Set<StateDefinition> stateDefinitions = new HashSet<StateDefinition>();
+	public Set<StateDefinition> getStateDefinitions() {
+		return Collections.unmodifiableSet(stateDefinitions);
 	}
 }

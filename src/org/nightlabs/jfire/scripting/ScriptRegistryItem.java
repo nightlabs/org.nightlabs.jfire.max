@@ -127,7 +127,11 @@ import org.nightlabs.util.Util;
 	@FetchGroup(
 		fetchGroups={"default"},
 		name=ScriptRegistryItem.FETCH_GROUP_DESCRIPTION,
-		members=@Persistent(name="description")),
+		members=@Persistent(name="description")),	
+	@FetchGroup(
+		fetchGroups={"default"},
+		name=ScriptRegistryItem.FETCH_GROUP_PARAMETER_SET,
+		members=@Persistent(name="parameterSet")),		
 	@FetchGroup(
 		fetchGroups={"default", ScriptRegistryItem.FETCH_GROUP_NAME, ScriptRegistryItem.FETCH_GROUP_DESCRIPTION},
 		name=ScriptRegistryItem.FETCH_GROUP_THIS_SCRIPT_REGISTRY_ITEM,
@@ -160,6 +164,7 @@ public abstract class ScriptRegistryItem
 
 	public static final String FETCH_GROUP_PARENT = "ScriptRegistryItem.parentItem";
 	public static final String FETCH_GROUP_NAME = "ScriptRegistryItem.name";
+	public static final String FETCH_GROUP_PARAMETER_SET = "ScriptRegistryItem.parameterSet";
 	public static final String FETCH_GROUP_DESCRIPTION = "ScriptRegistryItem.description";
 	/**
 	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon!

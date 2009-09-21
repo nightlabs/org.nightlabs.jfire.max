@@ -28,23 +28,23 @@ package org.nightlabs.jfire.scripting;
 
 import java.io.Serializable;
 
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
+
+import org.nightlabs.jfire.scripting.id.ScriptParameterID;
 import org.nightlabs.util.Util;
 
-import javax.jdo.annotations.Persistent;
-import javax.jdo.annotations.FetchGroups;
-import javax.jdo.annotations.NullValue;
-import org.nightlabs.jfire.scripting.id.ScriptParameterID;
-import javax.jdo.annotations.PrimaryKey;
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.FetchGroup;
-import javax.jdo.annotations.Column;
-import javax.jdo.annotations.IdentityType;
-import javax.jdo.annotations.PersistenceModifier;
-
 /**
- * 
+ *
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
- * 
+ *
  * @jdo.persistence-capable
  *		identity-type="application"
  *		objectid-class="org.nightlabs.jfire.scripting.id.ScriptParameterID"
@@ -52,10 +52,10 @@ import javax.jdo.annotations.PersistenceModifier;
  *		table="JFireScripting_ScriptParameter"
  *
  * @jdo.create-objectid-class field-order="organisationID, scriptParameterSetID, scriptParameterID"
- * 
+ *
  * @jdo.fetch-group name="ScriptParameter.scriptParameterSet" fetch-groups="default" fields="scriptParameterSet"
  * @jdo.fetch-group name="ScriptParameter.this" fetch-groups="default" fields="scriptParameterSet"
- * 
+ *
  */
 @PersistenceCapable(
 	objectIdClass=ScriptParameterID.class,
@@ -73,7 +73,7 @@ import javax.jdo.annotations.PersistenceModifier;
 		members=@Persistent(name="scriptParameterSet"))
 })
 public class ScriptParameter
-		implements Serializable, Comparable, IScriptParameter
+		implements Serializable, Comparable<IScriptParameter>, IScriptParameter
 {
 	private static final long serialVersionUID = 1L;
 
@@ -118,7 +118,7 @@ public class ScriptParameter
 	 */
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private int orderNumber;
-	
+
 	/**
 	 * @deprecated Only for JDO!
 	 */
@@ -133,7 +133,7 @@ public class ScriptParameter
 		this.scriptParameterID = scriptParameterID;
 		this.scriptParameterClassName = Object.class.getName();
 	}
-	
+
 	public String getOrganisationID()
 	{
 		return organisationID;
@@ -142,20 +142,20 @@ public class ScriptParameter
 	{
 		return scriptParameterSetID;
 	}
-	
+
 	void setScriptParameterSetID(long scriptParameterSetID) {
 		this.scriptParameterSetID = scriptParameterSetID;
 	}
-	
+
 	public String getScriptParameterID()
 	{
 		return scriptParameterID;
 	}
-	
+
 	public void setScriptParameterID(String scriptParameterID) {
 		this.scriptParameterID = scriptParameterID;
 	}
-	
+
 	public ScriptParameterSet getScriptParameterSet()
 	{
 		return scriptParameterSet;
@@ -184,11 +184,11 @@ public class ScriptParameter
 
 		this.scriptParameterClassName = scriptParameterClass.getName();
 	}
-	
+
 	protected void setOrderNumber(int orderNumber) {
 		this.orderNumber = orderNumber;
 	}
-	
+
 	public int getOrderNumber() {
 		return orderNumber;
 	}
@@ -201,17 +201,17 @@ public class ScriptParameter
 			Util.hashCode(scriptParameterSetID) ^
 			Util.hashCode(scriptParameterID);
 	}
-	
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
-		
+
 		if (obj instanceof ScriptParameter)
 			return false;
-		
+
 		ScriptParameter other = (ScriptParameter) obj;
-		
+
 		return
 			Util.equals(this.organisationID, other.organisationID) &&
 			this.scriptParameterSetID == other.scriptParameterSetID &&
@@ -221,10 +221,16 @@ public class ScriptParameter
 	/**
 	 * Comparing Script Parameters by their order number
 	 */
-	public int compareTo(Object o) {
-		if (!(o instanceof ScriptParameter))
+	public int compareTo(IScriptParameter o) {
+		if (!(o instanceof IScriptParameter))
 			return 0;
-		return Integer.valueOf(orderNumber).compareTo(Integer.valueOf(((ScriptParameter)o).orderNumber));
+
+		int otherOrderNumber = (o).getOrderNumber();
+
+		if (this.orderNumber == otherOrderNumber)
+			return 0;
+
+		return this.orderNumber < otherOrderNumber ? -1 : 1;
 	}
-	
+
 }

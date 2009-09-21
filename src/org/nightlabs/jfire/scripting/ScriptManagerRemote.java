@@ -10,6 +10,7 @@ import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 
 import org.nightlabs.i18n.I18nText;
+import org.nightlabs.jfire.scripting.id.ScriptParameterID;
 import org.nightlabs.jfire.scripting.id.ScriptParameterSetID;
 import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 
@@ -51,6 +52,8 @@ public interface ScriptManagerRemote {
 	 */
 	Collection<ScriptParameterSet> getScriptParameterSetsForScriptRegistryItemIDs(Collection<ScriptRegistryItemID> scriptParameterSetID, String[] fetchGroups, int maxFetchDepth);
 
+	
+	List<ScriptParameter> getScriptParameters(Collection<ScriptParameterID> scriptParameterIDs, String[] fetchGroups, int maxFetchDepth);
 	/**
 	 * Returns the {@link ScriptParameterSet}s for the given {@link ScriptParameterSetID}s.
 	 */
@@ -60,6 +63,7 @@ public interface ScriptManagerRemote {
 
 	ScriptParameterSet storeParameterSet(ScriptParameterSet scriptParameterSet, boolean get, String[] fetchGroups, int maxFetchDepth);
 
+    IScriptParameter storeParameter(IScriptParameter scriptParameter,boolean get, String[] fetchGroups, int maxFetchDepth);
 	/**
 	 *
 	 * @param organisationID The organisationID the carriers should be searched for.
@@ -77,4 +81,7 @@ public interface ScriptManagerRemote {
 	 * returns the detached {@link ScriptRegistry}
 	 */
 	ScriptRegistry getScriptRegistry();
+	
+	Collection<String> getLanguages();
+	
 }

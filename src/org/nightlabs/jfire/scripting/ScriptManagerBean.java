@@ -47,6 +47,7 @@ import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
+import org.nightlabs.jfire.scripting.id.ScriptParameterID;
 import org.nightlabs.jfire.scripting.id.ScriptParameterSetID;
 import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 
@@ -79,6 +80,7 @@ implements ScriptManagerRemote
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("_System_")
+	@Override
 	public void initialise() throws Exception
 	{
 		PersistenceManager pm;
@@ -106,6 +108,7 @@ implements ScriptManagerRemote
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("_Guest_")
+	@Override
 	public ScriptRegistryItem getScriptRegistryItem (
 			ScriptRegistryItemID scriptRegistryItemID,
 			String[] fetchGroups, int maxFetchDepth
@@ -131,6 +134,7 @@ implements ScriptManagerRemote
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("_Guest_")
+	@Override
 	public List<ScriptRegistryItem> getScriptRegistryItems (
 			List<ScriptRegistryItemID> scriptRegistryItemIDs,
 			String[] fetchGroups, int maxFetchDepth
@@ -160,6 +164,7 @@ implements ScriptManagerRemote
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("_Guest_")
+	@Override
 	public Collection<ScriptRegistryItem> getTopLevelScriptRegistryItems (
 			String organisationID,
 			String[] fetchGroups, int maxFetchDepth
@@ -185,6 +190,7 @@ implements ScriptManagerRemote
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("_Guest_")
+	@Override
 	public Collection<ScriptRegistryItemCarrier> getTopLevelScriptRegistryItemCarriers (String organisationID)
 	{
 		PersistenceManager pm;
@@ -233,8 +239,9 @@ implements ScriptManagerRemote
 	/* (non-Javadoc)
 	 * @see org.nightlabs.jfire.scripting.ScriptManagerRemote#storeRegistryItem(org.nightlabs.jfire.scripting.ScriptRegistryItem, boolean, java.lang.String[], int)
 	 */
-@TransactionAttribute(TransactionAttributeType.REQUIRED)
-@RolesAllowed("_Guest_")
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("_Guest_")
+	@Override
 	public ScriptRegistryItem storeRegistryItem (
 			ScriptRegistryItem reportRegistryItem,
 			boolean get,
@@ -255,6 +262,7 @@ implements ScriptManagerRemote
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("_Guest_")
+	@Override
 	public Collection<ScriptParameterSet> getScriptParameterSets(
 			String organisationID, String[] fetchGroups, int maxFetchDepth)
 	{
@@ -276,12 +284,24 @@ implements ScriptManagerRemote
 			pm.close();
 		}
 	}
-
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("_Guest_")
+	public List<ScriptParameter> getScriptParameters(Collection<ScriptParameterID> scriptParameterIDs, String[] fetchGroups, int maxFetchDepth)
+	{
+		PersistenceManager pm = createPersistenceManager();
+		try {
+			return NLJDOHelper.getDetachedObjectList(pm, scriptParameterIDs,ScriptParameter.class, fetchGroups, maxFetchDepth);
+		} finally {
+			pm.close();
+		}
+	}
+	
 	/* (non-Javadoc)
 	 * @see org.nightlabs.jfire.scripting.ScriptManagerRemote#getAllScriptParameterSetIDs(java.lang.String)
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("_Guest_")
+	@Override
 	public Set<ScriptParameterSetID> getAllScriptParameterSetIDs(String organisationID)
 	{
 		PersistenceManager pm;
@@ -299,6 +319,7 @@ implements ScriptManagerRemote
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("_Guest_")
+	@Override
 	public ScriptParameterSet getScriptParameterSet(
 			ScriptParameterSetID scriptParameterSetID,
 			String[] fetchGroups, int maxFetchDepth
@@ -316,12 +337,16 @@ implements ScriptManagerRemote
 			pm.close();
 		}
 	}
+	
+	
+	
 
 	/* (non-Javadoc)
 	 * @see org.nightlabs.jfire.scripting.ScriptManagerRemote#getScriptParameterSetsForScriptRegistryItemIDs(java.util.Collection, java.lang.String[], int)
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("_Guest_")
+	@Override
 	public Collection<ScriptParameterSet> getScriptParameterSetsForScriptRegistryItemIDs(
 			Collection<ScriptRegistryItemID> scriptParameterSetID,
 			String[] fetchGroups, int maxFetchDepth
@@ -350,6 +375,7 @@ implements ScriptManagerRemote
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("_Guest_")
+	@Override
 	public Collection<ScriptParameterSet> getScriptParameterSets(
 			Collection<ScriptParameterSetID> scriptParameterSetIDs,
 			String[] fetchGroups, int maxFetchDepth)
@@ -371,6 +397,7 @@ implements ScriptManagerRemote
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("_Guest_")
+	@Override
 	public ScriptParameterSet createParameterSet (I18nText name, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm;
@@ -395,6 +422,7 @@ implements ScriptManagerRemote
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("_Guest_")
+	@Override
 	public ScriptParameterSet storeParameterSet (
 			ScriptParameterSet scriptParameterSet,
 			boolean get,
@@ -409,12 +437,31 @@ implements ScriptManagerRemote
 			pm.close();
 		}
 	}
+	
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("_Guest_")
+	
+	public IScriptParameter storeParameter(
+			IScriptParameter scriptParameter,
+			boolean get,
+			String[] fetchGroups, int maxFetchDepth
+		)
+	{
+		PersistenceManager pm;
+		pm = createPersistenceManager();
+		try{
+			return NLJDOHelper.storeJDO(pm, scriptParameter, get, fetchGroups, maxFetchDepth);
+		}finally{
+			pm.close();
+		}
+	}
 
 	/* (non-Javadoc)
 	 * @see org.nightlabs.jfire.scripting.ScriptManagerRemote#getTopLevelScriptRegistryItemCarriers(java.lang.String, java.lang.String)
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("_Guest_")
+	@Override
 	public Collection<ScriptRegistryItemCarrier> getTopLevelScriptRegistryItemCarriers (
 			String organisationID, String scriptRegistryItemType)
 	{
@@ -439,6 +486,7 @@ implements ScriptManagerRemote
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("_Guest_")
+	@Override
 	public ScriptRegistry getScriptRegistry(String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm;
@@ -459,6 +507,7 @@ implements ScriptManagerRemote
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("_Guest_")
+	@Override
 	public ScriptRegistry getScriptRegistry()
 	{
 		PersistenceManager pm;
@@ -473,4 +522,34 @@ implements ScriptManagerRemote
 			pm.close();
 		}
 	}
+	
+	@RolesAllowed("_Guest_")
+	@Override
+	public Collection<String> getLanguages()
+	{
+		PersistenceManager pm = createPersistenceManager();
+		try {
+			ScriptRegistry scriptRegistry = ScriptRegistry.getScriptRegistry(pm);
+			Collection<String> languages = scriptRegistry.getRegisteredLanguages();
+			return new ArrayList<String>(languages);
+		} finally {
+			pm.close();
+		}
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 }

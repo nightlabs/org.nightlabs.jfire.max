@@ -27,9 +27,11 @@
 package org.nightlabs.jfire.scripting;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
@@ -201,6 +203,8 @@ import org.nightlabs.util.CollectionUtil;
 	public Set<String> getParameterIDs()
 	{
 		return Collections.unmodifiableSet(parameters.keySet());
+
+
 	}
 
 	public Collection<IScriptParameter> getParameters()
@@ -255,6 +259,35 @@ import org.nightlabs.util.CollectionUtil;
 	public void removeParameter(String scriptParameterID)
 	{
 		parameters.remove(scriptParameterID);
+		updateOrderNumbers();
+	}
+
+	private void updateOrderNumbers() {
+		List<ScriptParameter> params = new ArrayList<ScriptParameter>(parameters.values());
+		Collections.sort(params);
+
+		int next = 0;
+		for (ScriptParameter sp : params)
+			sp.setOrderNumber(next++);
+
+		this.nextParameterOrderNumber = next;
+	}
+
+	public void swapParameters(String scriptParameterID1, String scriptParameterID2)
+	{
+		ScriptParameter scriptParameter1 = parameters.get(scriptParameterID1);
+		if (scriptParameter1 == null)
+			throw new IllegalArgumentException("There is no ScriptParameter with the scriptParameterID1 \"" + scriptParameterID1 + "\"!");
+
+		ScriptParameter scriptParameter2 = parameters.get(scriptParameterID2);
+		if (scriptParameter2 == null)
+			throw new IllegalArgumentException("There is no ScriptParameter with the scriptParameterID2 \"" + scriptParameterID1 + "\"!");
+
+		int orderNumber1 = scriptParameter1.getOrderNumber();
+		int orderNumber2 = scriptParameter2.getOrderNumber();
+
+		scriptParameter1.setOrderNumber(orderNumber2);
+		scriptParameter2.setOrderNumber(orderNumber1);
 	}
 
 	/**

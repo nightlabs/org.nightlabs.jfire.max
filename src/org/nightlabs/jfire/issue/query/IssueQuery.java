@@ -231,7 +231,7 @@ extends AbstractJDOQuery
 		}
 
 		if (isFieldEnabled(FieldName.linkedObjectClasses) && linkedObjectClasses != null && !linkedObjectClasses.isEmpty()) {
-			filter.append("\n && (issueLinks.contains(varIssueLink) && (");
+			filter.append("\n && (this.issueLinks.contains(varIssueLink) && (");
 			int i = 0;
 			for (Iterator<Class> it = linkedObjectClasses.iterator(); it.hasNext(); i++) {
 				String linkedObjectClassName = it.next().getSimpleName();

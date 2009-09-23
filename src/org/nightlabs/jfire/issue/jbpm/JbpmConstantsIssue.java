@@ -1,9 +1,6 @@
 package org.nightlabs.jfire.issue.jbpm;
 
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Locale;
-import java.util.Set;
 
 import javax.jdo.JDOObjectNotFoundException;
 
@@ -157,12 +154,5 @@ public class JbpmConstantsIssue
 		stateDefinition.getName().setText(Locale.ENGLISH.getLanguage(), name);
 		stateDefinition.getDescription().setText(Locale.ENGLISH.getLanguage(), description);
 		stateDefinition.setPublicState(publicState);
-
-		stateDefinitions.add(stateDefinition);
-	}
-
-	private static Set<StateDefinition> stateDefinitions = new HashSet<StateDefinition>();
-	public Set<StateDefinition> getStateDefinitions() {
-		return Collections.unmodifiableSet(stateDefinitions);
 	}
 }

@@ -64,6 +64,7 @@ import org.nightlabs.jfire.accounting.book.mappingbased.MappingBasedAccountantDe
 import org.nightlabs.jfire.accounting.book.mappingbased.MoneyFlowDimension;
 import org.nightlabs.jfire.accounting.book.mappingbased.MoneyFlowMapping;
 import org.nightlabs.jfire.accounting.book.mappingbased.OwnerDimension;
+import org.nightlabs.jfire.accounting.book.mappingbased.PFMoneyFlowMapping;
 import org.nightlabs.jfire.accounting.book.mappingbased.PriceFragmentDimension;
 import org.nightlabs.jfire.accounting.book.mappingbased.SourceOrganisationDimension;
 import org.nightlabs.jfire.accounting.book.mappingbased.MappingBasedAccountantDelegate.ResolvedMapEntry;
@@ -165,23 +166,24 @@ implements AccountingManagerRemote, AccountingManagerLocal
 		PersistenceManager pm = createPersistenceManager();
 		try {
 //			SecurityChangeListenerTariffUserSet.register(pm);
+			pm.getExtent(PFMoneyFlowMapping.class);
 
 			MoneyFlowDimension priceFragmentDimension = MoneyFlowDimension.getMoneyFlowDimension(pm, PriceFragmentDimension.MONEY_FLOW_DIMENSION_ID);
 			if (priceFragmentDimension == null) {
 				priceFragmentDimension = new PriceFragmentDimension();
-				pm.makePersistent(priceFragmentDimension);
+				priceFragmentDimension = pm.makePersistent(priceFragmentDimension);
 			}
 
 			MoneyFlowDimension ownerDimension = MoneyFlowDimension.getMoneyFlowDimension(pm, OwnerDimension.MONEY_FLOW_DIMENSION_ID);
 			if (ownerDimension == null) {
 				ownerDimension = new OwnerDimension();
-				pm.makePersistent(ownerDimension);
+				ownerDimension = pm.makePersistent(ownerDimension);
 			}
 
 			MoneyFlowDimension sourceOrgDimension = MoneyFlowDimension.getMoneyFlowDimension(pm, SourceOrganisationDimension.MONEY_FLOW_DIMENSION_ID);
 			if (sourceOrgDimension == null) {
 				sourceOrgDimension = new SourceOrganisationDimension();
-				pm.makePersistent(sourceOrgDimension);
+				sourceOrgDimension = pm.makePersistent(sourceOrgDimension);
 			}
 
 			pm.getExtent(AccountType.class);

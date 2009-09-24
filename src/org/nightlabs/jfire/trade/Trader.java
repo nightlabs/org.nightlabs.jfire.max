@@ -1937,12 +1937,13 @@ public class Trader
 	{
 		boolean error = false;
 		try {
-			PersistenceManager pm = getPersistenceManager();
-
 			if (offer.isFinalized()) // we (might) come here multiple times => do work only first time.
 				return;
 
 			error = true;
+
+			PersistenceManager pm = getPersistenceManager();
+
 			// check whether we have to finalize remote offers as well
 			OfferRequirement offerRequirement = OfferRequirement.getOfferRequirement(pm, offer, false);
 			if (offerRequirement != null) {

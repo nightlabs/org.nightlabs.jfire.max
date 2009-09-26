@@ -199,15 +199,14 @@ implements AccountingManagerRemote, AccountingManagerLocal
 			initRegisterConfigModules(pm);
 
 			// check, whether the datastore is already initialized
-			pm.getExtent(Currency.class);
 			try {
-				pm.getObjectById(CurrencyID.create("EUR"), true);
+				pm.getObjectById(AccountType.ACCOUNT_TYPE_ID_OUTSIDE);
 				return; // already initialized
 			} catch (JDOObjectNotFoundException x) {
 				// datastore not yet initialized
 			}
 
-			// Create the currencies EUR and CHF
+			// Create the currencies EUR and CHF - TODO don't create them here - see https://www.jfire.org/modules/bugs/view.php?id=1248
 			{
 				Currency currency;
 
@@ -219,6 +218,7 @@ implements AccountingManagerRemote, AccountingManagerLocal
 				currency = new Currency(CurrencyConstants.CHF.currencyID, "CHF", 2);
 				pm.makePersistent(currency);
 			}
+			CurrencyOrganisationDefault.getCurrencyOrganisationDefault(pm);
 
 			// Initalise standard property set structures for articleContainers
 			InvoiceStruct.getInvoiceStructLocal(pm);

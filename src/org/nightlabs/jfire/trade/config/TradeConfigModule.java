@@ -1,16 +1,23 @@
 package org.nightlabs.jfire.trade.config;
 
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import javax.jdo.JDOHelper;
-import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
-import javax.jdo.Query;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
 
 import org.nightlabs.jfire.accounting.Currency;
+import org.nightlabs.jfire.accounting.CurrencyOrganisationDefault;
 import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.accounting.id.CurrencyID;
 import org.nightlabs.jfire.config.ConfigModule;
@@ -22,17 +29,6 @@ import org.nightlabs.jfire.trade.Order;
 import org.nightlabs.jfire.trade.recurring.RecurredOffer;
 import org.nightlabs.jfire.trade.recurring.RecurringOffer;
 import org.nightlabs.jfire.trade.recurring.RecurringOrder;
-
-import javax.jdo.annotations.Join;
-import javax.jdo.annotations.FetchGroups;
-import javax.jdo.annotations.NullValue;
-import javax.jdo.annotations.Inheritance;
-import javax.jdo.annotations.FetchGroup;
-import javax.jdo.annotations.PersistenceModifier;
-import javax.jdo.annotations.Persistent;
-import javax.jdo.annotations.InheritanceStrategy;
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.IdentityType;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -111,22 +107,23 @@ public class TradeConfigModule
 
 		idPrefixCfs = new HashMap<String, IDPrefixCf>();
 
-		try {
-			this.currency = (Currency) pm.getObjectById(CurrencyID.create("EUR"));
-		} catch (JDOObjectNotFoundException x) {
-			// EUR does not exist - initialise below with the first one that exists
-		}
-
-		if (this.currency == null) {
-			Query q = pm.newQuery(Currency.class);
-			q.setOrdering("this.currencyID ASCENDING"); // we sort it to ensure that it's always the same
-			Collection<?> c = (Collection<?>) q.execute();
-			Iterator<?> it = c.iterator();
-			if (it.hasNext())
-				this.currency = (Currency) it.next();
-			else
-				throw new IllegalStateException("There is no Currency in the datastore! Cannot initialise TradeConfigModule!");
-		}
+		this.currency = CurrencyOrganisationDefault.getCurrencyOrganisationDefault(pm).getCurrency();
+//		try {
+//			this.currency = (Currency) pm.getObjectById(CurrencyID.create("EUR"));
+//		} catch (JDOObjectNotFoundException x) {
+//			// EUR does not exist - initialise below with the first one that exists
+//		}
+//
+//		if (this.currency == null) {
+//			Query q = pm.newQuery(Currency.class);
+//			q.setOrdering("this.currencyID ASCENDING"); // we sort it to ensure that it's always the same
+//			Collection<?> c = (Collection<?>) q.execute();
+//			Iterator<?> it = c.iterator();
+//			if (it.hasNext())
+//				this.currency = (Currency) it.next();
+//			else
+//				throw new IllegalStateException("There is no Currency in the datastore! Cannot initialise TradeConfigModule!");
+//		}
 	}
 
 	public CurrencyID getCurrencyID()
@@ -192,7 +189,7 @@ public class TradeConfigModule
 	 * Checks if the class with the given name is an implementation of {@link ArticleContainer}.
 	 * This will be done if the class with the given name can be loaded.
 	 * Otherwise this method will check for the known implementations.
-	 * 
+	 *
 	 * @param articleContainerClassName The class name to check
 	 * @return Whether the given class name is valid.
 	 */
@@ -203,7 +200,7 @@ public class TradeConfigModule
 		} catch (ClassNotFoundException e) {
 		}
 		// the class could not be resolved, we check for the known implementations
-		return 
+		return
 			Order.class.getName().equals(articleContainerClassName) ||
 			Offer.class.getName().equals(articleContainerClassName) ||
 			Invoice.class.getName().equals(articleContainerClassName) ||
@@ -212,7 +209,7 @@ public class TradeConfigModule
 			RecurringOffer.class.getName().equals(articleContainerClassName) ||
 			RecurredOffer.class.getName().equals(articleContainerClassName);
 	}
-	
+
 	public IDPrefixCf getIDPrefixCf(String articleContainerClassName, boolean throwExceptionIfNotFound)
 	{
 		if (!IDPrefixCf.ARTICLE_CONTAINER_CLASS_NAME_GLOBAL.equals(articleContainerClassName) &&

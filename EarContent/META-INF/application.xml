@@ -1,71 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <application xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:application="http://java.sun.com/xml/ns/javaee/application_5.xsd" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/application_5.xsd" id="Application_ID" version="5">
-	<display-name>NightLabs JFire Reporting</display-name>
+	<display-name>NightLabs JFireIssueTracking Reporting default layouts and scripts</display-name>
 	<module>
-		<ejb>JFireReporting.jar</ejb>
+		<ejb>JFireReportingIssue.jar</ejb>
 	</module>
-<!--
-	<module>
-		<ejb>org.nightlabs.jfire.reporting.birt.jar</ejb></module>		
-	<module>
-		<java>birt/lib/chartengineapi.jar</java></module>
-	<module>
-		<java>birt/lib/com.ibm.icu_3.8.1.v20080530.jar</java></module>
-	<module>
-		<java>birt/lib/commons-cli-1.0.jar</java></module>
-	<module>
-		<java>birt/lib/coreapi.jar</java></module>
-	<module>
-		<java>birt/lib/crosstabcoreapi.jar</java></module>
-	<module>
-		<java>birt/lib/dataadapterapi.jar</java></module>
-	<module>
-		<java>birt/lib/dataaggregationapi.jar</java></module>
-	<module>
-		<java>birt/lib/dataextraction.jar</java></module>
-	<module>
-		<java>birt/lib/dteapi.jar</java></module>
-	<module>
-		<java>birt/lib/engineapi.jar</java></module>
-	<module>
-		<java>birt/lib/flute.jar</java></module>
-	<module>	
-		<java>birt/lib/js.jar</java></module>
-	<module>
-		<java>birt/lib/modelapi.jar</java></module>
-	<module>
-		<java>birt/lib/modelodaapi.jar</java></module>
-	<module>
-		<java>birt/lib/oda.jar</java></module>
-	<module>
-		<java>birt/lib/odadesignapi.jar</java></module>
-	<module>
-		<java>birt/lib/org.apache.commons.codec_1.3.0.v20080530-1600.jar</java></module>
-	<module>
-		<java>birt/lib/org.eclipse.emf.common_2.4.0.v200808251517.jar</java></module>
-	<module>
-		<java>birt/lib/org.eclipse.emf.ecore.xmi_2.4.1.v200808251517.jar</java></module>
-	<module>
-		<java>birt/lib/org.eclipse.emf.ecore_2.4.1.v200808251517.jar</java></module>
-	<module>
-		<java>birt/lib/org.w3c.css.sac_1.3.0.v200805290154.jar</java></module>		
-	<module>
-		<java>birt/lib/scriptapi.jar</java></module>
-
-	<module>
-		<java>birt/lib/com.ibm.icu_3.8.1.v20080530.jar</java></module>
-	<module>
-		<java>birt/lib/coreapi.jar</java></module>
-	<module>
-		<java>birt/lib/engineapi.jar</java></module>
-	<module>
-		<java>birt/lib/modelapi.jar</java></module>
--->		
-
-<!-- is now contained in lib dir of JBoss AS
-	<module>
-		<java>birt/lib/oda.jar</java>
-	</module>
- -->
-  
 </application>

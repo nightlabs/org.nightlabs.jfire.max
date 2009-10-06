@@ -2824,7 +2824,7 @@ result</expression>
   result = product.getUnit().toDouble(product.getQuantity()) + " " + product.getUnit().getSymbol().getText()
 }
 result</expression>
-                                    <property name="dataType">decimal</property>
+                                    <property name="dataType">string</property>
                                 </structure>
                                 <structure>
                                     <property name="name">Sum_PriceFragmentValues</property>

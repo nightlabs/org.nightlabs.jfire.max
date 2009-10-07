@@ -4,7 +4,17 @@
 		<name language="en">Salutation text</name>
 		<name language="de">Anrede</name>
 		<content language="en"><![CDATA[
-Dear <?=row["Salutation"]?> <?=row["Name"]?>,
+<? 
+var salutationText = "";
+if (row["Name"] == "") {
+	salutationText = "Ladies, dear Sirs"
+}
+else {
+	salutationText = row["Salutation"] + " " + row["Name"];
+}
+?>
+
+Dear <?=salutationText?>,
 <br/><br/>
 thank you for your order! See below the list of delivered articles:
 <br/>

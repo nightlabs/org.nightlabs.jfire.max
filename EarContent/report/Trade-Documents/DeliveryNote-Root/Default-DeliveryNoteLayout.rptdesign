@@ -199,37 +199,37 @@ function getDataFieldString(field) {
                     </structure>
                     <structure>
                         <property name="position">26</property>
-                        <property name="name">dev_jfire_org/__Total__</property>
+                        <property name="name">${devOrganisationIDConverted}/__Total__</property>
                         <property name="dataType">float</property>
                     </structure>
                     <structure>
                         <property name="position">27</property>
-                        <property name="name">test3_jfire_org/vat-ch-7__6-net</property>
+                        <property name="name">${rootOrganisationIDConverted}/vat-ch-7__6-net</property>
                         <property name="dataType">float</property>
                     </structure>
                     <structure>
                         <property name="position">28</property>
-                        <property name="name">test3_jfire_org/vat-ch-7__6-val</property>
+                        <property name="name">${rootOrganisationIDConverted}/vat-ch-7__6-val</property>
                         <property name="dataType">float</property>
                     </structure>
                     <structure>
                         <property name="position">29</property>
-                        <property name="name">test3_jfire_org/vat-de-19-net</property>
+                        <property name="name">${rootOrganisationIDConverted}/vat-de-19-net</property>
                         <property name="dataType">float</property>
                     </structure>
                     <structure>
                         <property name="position">30</property>
-                        <property name="name">test3_jfire_org/vat-de-19-val</property>
+                        <property name="name">${rootOrganisationIDConverted}/vat-de-19-val</property>
                         <property name="dataType">float</property>
                     </structure>
                     <structure>
                         <property name="position">31</property>
-                        <property name="name">test3_jfire_org/vat-de-7-net</property>
+                        <property name="name">${rootOrganisationIDConverted}/vat-de-7-net</property>
                         <property name="dataType">float</property>
                     </structure>
                     <structure>
                         <property name="position">32</property>
-                        <property name="name">test3_jfire_org/vat-de-7-val</property>
+                        <property name="name">${rootOrganisationIDConverted}/vat-de-7-val</property>
                         <property name="dataType">float</property>
                     </structure>
                 </list-property>
@@ -426,50 +426,50 @@ function getDataFieldString(field) {
                 </structure>
                 <structure>
                     <property name="position">26</property>
-                    <property name="name">dev_jfire_org/__Total__</property>
-                    <property name="nativeName">dev_jfire_org/__Total__</property>
+                    <property name="name">${devOrganisationIDConverted}/__Total__</property>
+                    <property name="nativeName">${devOrganisationIDConverted}/__Total__</property>
                     <property name="dataType">float</property>
                     <property name="nativeDataType">3</property>
                 </structure>
                 <structure>
                     <property name="position">27</property>
-                    <property name="name">test3_jfire_org/vat-ch-7__6-net</property>
-                    <property name="nativeName">test3_jfire_org/vat-ch-7__6-net</property>
+                    <property name="name">${rootOrganisationIDConverted}/vat-ch-7__6-net</property>
+                    <property name="nativeName">${rootOrganisationIDConverted}/vat-ch-7__6-net</property>
                     <property name="dataType">float</property>
                     <property name="nativeDataType">3</property>
                 </structure>
                 <structure>
                     <property name="position">28</property>
-                    <property name="name">test3_jfire_org/vat-ch-7__6-val</property>
-                    <property name="nativeName">test3_jfire_org/vat-ch-7__6-val</property>
+                    <property name="name">${rootOrganisationIDConverted}/vat-ch-7__6-val</property>
+                    <property name="nativeName">${rootOrganisationIDConverted}/vat-ch-7__6-val</property>
                     <property name="dataType">float</property>
                     <property name="nativeDataType">3</property>
                 </structure>
                 <structure>
                     <property name="position">29</property>
-                    <property name="name">test3_jfire_org/vat-de-19-net</property>
-                    <property name="nativeName">test3_jfire_org/vat-de-19-net</property>
+                    <property name="name">${rootOrganisationIDConverted}/vat-de-19-net</property>
+                    <property name="nativeName">${rootOrganisationIDConverted}/vat-de-19-net</property>
                     <property name="dataType">float</property>
                     <property name="nativeDataType">3</property>
                 </structure>
                 <structure>
                     <property name="position">30</property>
-                    <property name="name">test3_jfire_org/vat-de-19-val</property>
-                    <property name="nativeName">test3_jfire_org/vat-de-19-val</property>
+                    <property name="name">${rootOrganisationIDConverted}/vat-de-19-val</property>
+                    <property name="nativeName">${rootOrganisationIDConverted}/vat-de-19-val</property>
                     <property name="dataType">float</property>
                     <property name="nativeDataType">3</property>
                 </structure>
                 <structure>
                     <property name="position">31</property>
-                    <property name="name">test3_jfire_org/vat-de-7-net</property>
-                    <property name="nativeName">test3_jfire_org/vat-de-7-net</property>
+                    <property name="name">${rootOrganisationIDConverted}/vat-de-7-net</property>
+                    <property name="nativeName">${rootOrganisationIDConverted}/vat-de-7-net</property>
                     <property name="dataType">float</property>
                     <property name="nativeDataType">3</property>
                 </structure>
                 <structure>
                     <property name="position">32</property>
-                    <property name="name">test3_jfire_org/vat-de-7-val</property>
-                    <property name="nativeName">test3_jfire_org/vat-de-7-val</property>
+                    <property name="name">${rootOrganisationIDConverted}/vat-de-7-val</property>
+                    <property name="nativeName">${rootOrganisationIDConverted}/vat-de-7-val</property>
                     <property name="dataType">float</property>
                     <property name="nativeDataType">3</property>
                 </structure>
@@ -2785,13 +2785,13 @@ JFireReportingHelper.createDataSetParam(params["articleContainerID"])</expressio
                                     <property name="dataType">string</property>
                                 </structure>
                                 <structure>
-                                    <property name="name">dev_jfire_org/__Total__</property>
-                                    <expression name="expression">dataSetRow["dev_jfire_org/__Total__"]</expression>
+                                    <property name="name">${devOrganisationIDConverted}/__Total__</property>
+                                    <expression name="expression">dataSetRow["${devOrganisationIDConverted}/__Total__"]</expression>
                                     <property name="dataType">float</property>
                                 </structure>
                                 <structure>
                                     <property name="name">SumTotal</property>
-                                    <expression name="expression">Total.sum(dataSetRow["dev_jfire_org/__Total__"])</expression>
+                                    <expression name="expression">Total.sum(dataSetRow["${devOrganisationIDConverted}/__Total__"])</expression>
                                     <property name="dataType">float</property>
                                 </structure>
                                 <structure>

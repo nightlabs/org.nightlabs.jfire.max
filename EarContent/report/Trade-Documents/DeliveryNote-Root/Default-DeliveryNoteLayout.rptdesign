@@ -26,7 +26,15 @@ headerFirstRow = true;
  */
 function isDynamicProduct(productJDOID) {
   product = JFireReportingHelper.getJDOObject(productJDOID);
+  // We do not use an instanceof check, because that would cause an exception, if the DynamicTrade
+  // module is not installed. Since there is no subclass of DynamicProduct, we don't need to check
+  // the super-classes.
   return product.getClass().getName() == "org.nightlabs.jfire.dynamictrade.store.DynamicProduct";
+}
+
+function isBundleProduct(productJDOID) {
+  product = JFireReportingHelper.getJDOObject(productJDOID);
+  return product instanceof Packages.org.nightlabs.jfire.store.BundleProduct;
 }
 
 function getLocalizedMessage(key) {
@@ -191,7 +199,7 @@ function getDataFieldString(field) {
                     </structure>
                     <structure>
                         <property name="position">26</property>
-                        <property name="name">${devOrganisationIDConverted}/__Total__</property>
+                        <property name="name">dev_jfire_org/__Total__</property>
                         <property name="dataType">float</property>
                     </structure>
                     <structure>
@@ -418,8 +426,8 @@ function getDataFieldString(field) {
                 </structure>
                 <structure>
                     <property name="position">26</property>
-                    <property name="name">${devOrganisationIDConverted}/__Total__</property>
-                    <property name="nativeName">${devOrganisationIDConverted}/__Total__</property>
+                    <property name="name">dev_jfire_org/__Total__</property>
+                    <property name="nativeName">dev_jfire_org/__Total__</property>
                     <property name="dataType">float</property>
                     <property name="nativeDataType">3</property>
                 </structure>
@@ -468,7 +476,7 @@ function getDataFieldString(field) {
             </list-property>
             <property name="queryText">&lt;queryPropertySet>&lt;org.nightlabs.jfire.reporting.oda.jfs.JFSQueryPropertySet>
   &lt;scriptRegistryItemID>
-    &lt;organisationID>${devOrganisationID}&lt;/organisationID>
+    &lt;organisationID>dev.jfire.org&lt;/organisationID>
     &lt;scriptRegistryItemType>JFireReportingTrade-Scripting-ArticleContainerData&lt;/scriptRegistryItemType>
     &lt;scriptRegistryItemID>ArticleList&lt;/scriptRegistryItemID>
   &lt;/scriptRegistryItemID>
@@ -823,7 +831,7 @@ function getDataFieldString(field) {
             </list-property>
             <property name="queryText">&lt;queryPropertySet>&lt;org.nightlabs.jfire.reporting.oda.jfs.JFSQueryPropertySet>
   &lt;scriptRegistryItemID>
-    &lt;organisationID>${devOrganisationID}&lt;/organisationID>
+    &lt;organisationID>dev.jfire.org&lt;/organisationID>
     &lt;scriptRegistryItemType>JFireReporting-Scripting-PropertySet&lt;/scriptRegistryItemType>
     &lt;scriptRegistryItemID>PropertySet&lt;/scriptRegistryItemID>
   &lt;/scriptRegistryItemID>
@@ -1269,7 +1277,7 @@ function getDataFieldString(field) {
             </list-property>
             <property name="queryText">&lt;queryPropertySet>&lt;org.nightlabs.jfire.reporting.oda.jfs.JFSQueryPropertySet>
   &lt;scriptRegistryItemID>
-    &lt;organisationID>${devOrganisationID}&lt;/organisationID>
+    &lt;organisationID>dev.jfire.org&lt;/organisationID>
     &lt;scriptRegistryItemType>JFireReporting-Scripting-PropertySet&lt;/scriptRegistryItemType>
     &lt;scriptRegistryItemID>PropertySet&lt;/scriptRegistryItemID>
   &lt;/scriptRegistryItemID>
@@ -2777,13 +2785,13 @@ JFireReportingHelper.createDataSetParam(params["articleContainerID"])</expressio
                                     <property name="dataType">string</property>
                                 </structure>
                                 <structure>
-                                    <property name="name">${devOrganisationIDConverted}/__Total__</property>
-                                    <expression name="expression">dataSetRow["${devOrganisationIDConverted}/__Total__"]</expression>
+                                    <property name="name">dev_jfire_org/__Total__</property>
+                                    <expression name="expression">dataSetRow["dev_jfire_org/__Total__"]</expression>
                                     <property name="dataType">float</property>
                                 </structure>
                                 <structure>
                                     <property name="name">SumTotal</property>
-                                    <expression name="expression">Total.sum(dataSetRow["${devOrganisationIDConverted}/__Total__"])</expression>
+                                    <expression name="expression">Total.sum(dataSetRow["dev_jfire_org/__Total__"])</expression>
                                     <property name="dataType">float</property>
                                 </structure>
                                 <structure>
@@ -2819,9 +2827,21 @@ result</expression>
                                 </structure>
                                 <structure>
                                     <property name="name">DynamicProduct_Qty</property>
-                                    <expression name="expression">if (isDynamicProduct(row["productJDOID"])) {
+                                    <expression name="expression">// Note that this must be of type "STRING", because it returns the unit symbol together
+// with the formatted number.
+
+// More correctly, we should test here, if the concrete Product implements
+// org.nightlabs.jfire.store.BundleProduct. ...done ;-)
+if (isBundleProduct(row["productJDOID"])) {
   product = JFireReportingHelper.getJDOObject(row["productJDOID"]);
-  result = product.getUnit().toDouble(product.getQuantity()) + " " + product.getUnit().getSymbol().getText()
+  result = Packages.org.nightlabs.l10n.NumberFormatter.formatFloat(
+    product.getUnit().toDouble(product.getQuantity()),
+    product.getUnit().getDecimalDigitCount()
+  ); //+ " " + product.getUnit().getSymbol().getText()
+}
+else {
+// If it is no BundleProduct, one Product instance always represents a quantity of 1.
+  result = 1;
 }
 result</expression>
                                     <property name="dataType">string</property>
@@ -2879,12 +2899,27 @@ for (it1 = priceFragmentType2currency2sum.entrySet().iterator(); it1.hasNext(); 
 result;</expression>
                                     <property name="dataType">any</property>
                                 </structure>
+                                <structure>
+                                    <property name="name">BundleProduct_QtyUnitSymbol</property>
+                                    <expression name="expression">if (isBundleProduct(row["productJDOID"])) {
+  product = JFireReportingHelper.getJDOObject(row["productJDOID"]);
+  result = product.getUnit().getSymbol().getText()
+}
+else {
+  result = "";
+}
+result</expression>
+                                    <property name="dataType">string</property>
+                                </structure>
                             </list-property>
                             <column id="81">
                                 <property name="width">14mm</property>
                             </column>
                             <column id="82"/>
                             <column id="182">
+                                <property name="width">10mm</property>
+                            </column>
+                            <column id="418">
                                 <property name="width">10mm</property>
                             </column>
                             <header>
@@ -2908,6 +2943,7 @@ result;</expression>
                                             <text-property name="text" key="quantity">Qty</text-property>
                                         </label>
                                     </cell>
+                                    <cell id="413"/>
                                 </row>
                             </header>
                             <detail>
@@ -2941,9 +2977,13 @@ result;</expression>
                                         <text-data id="212">
                                             <property name="style">TableContent</property>
                                             <property name="textAlign">right</property>
-                                            <expression name="valueExpr">1.0</expression>
+                                            <expression name="valueExpr">"1"</expression>
                                             <property name="contentType">html</property>
                                         </text-data>
+                                    </cell>
+                                    <cell id="414">
+                                        <property name="paddingTop">0.25em</property>
+                                        <property name="paddingBottom">0.5em</property>
                                     </cell>
                                 </row>
                                 <row id="193">
@@ -2979,6 +3019,15 @@ result;</expression>
                                             <property name="resultSetColumn">DynamicProduct_Qty</property>
                                         </data>
                                     </cell>
+                                    <cell id="415">
+                                        <property name="paddingTop">0.25em</property>
+                                        <property name="paddingBottom">0.5em</property>
+                                        <data id="419">
+                                            <property name="fontFamily">sans-serif</property>
+                                            <property name="fontSize">10pt</property>
+                                            <property name="resultSetColumn">BundleProduct_QtyUnitSymbol</property>
+                                        </data>
+                                    </cell>
                                 </row>
                                 <row id="261">
                                     <list-property name="visibility">
@@ -3000,6 +3049,10 @@ result;</expression>
                                         <property name="paddingTop">3pt</property>
                                         <property name="paddingBottom">10pt</property>
                                     </cell>
+                                    <cell id="416">
+                                        <property name="paddingTop">3pt</property>
+                                        <property name="paddingBottom">10pt</property>
+                                    </cell>
                                 </row>
                             </detail>
                             <footer>
@@ -3007,6 +3060,7 @@ result;</expression>
                                     <cell id="133"/>
                                     <cell id="134"/>
                                     <cell id="179"/>
+                                    <cell id="417"/>
                                 </row>
                             </footer>
                         </table>

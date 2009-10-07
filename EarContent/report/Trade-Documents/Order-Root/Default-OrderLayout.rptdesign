@@ -26,7 +26,15 @@ headerFirstRow = true;
  */
 function isDynamicProduct(productJDOID) {
   product = JFireReportingHelper.getJDOObject(productJDOID);
+  // We do not use an instanceof check, because that would cause an exception, if the DynamicTrade
+  // module is not installed. Since there is no subclass of DynamicProduct, we don't need to check
+  // the super-classes.
   return product.getClass().getName() == "org.nightlabs.jfire.dynamictrade.store.DynamicProduct";
+}
+
+function isBundleProduct(productJDOID) {
+  product = JFireReportingHelper.getJDOObject(productJDOID);
+  return product instanceof Packages.org.nightlabs.jfire.store.BundleProduct;
 }
 
 function getLocalizedMessage(key) {
@@ -191,7 +199,7 @@ function getDataFieldString(field) {
                     </structure>
                     <structure>
                         <property name="position">26</property>
-                        <property name="name">${devOrganisationIDConverted}/__Total__</property>
+                        <property name="name">dev_jfire_org/__Total__</property>
                         <property name="dataType">float</property>
                     </structure>
                     <structure>
@@ -418,8 +426,8 @@ function getDataFieldString(field) {
                 </structure>
                 <structure>
                     <property name="position">26</property>
-                    <property name="name">${devOrganisationIDConverted}/__Total__</property>
-                    <property name="nativeName">${devOrganisationIDConverted}/__Total__</property>
+                    <property name="name">dev_jfire_org/__Total__</property>
+                    <property name="nativeName">dev_jfire_org/__Total__</property>
                     <property name="dataType">float</property>
                     <property name="nativeDataType">3</property>
                 </structure>
@@ -468,7 +476,7 @@ function getDataFieldString(field) {
             </list-property>
             <property name="queryText">&lt;queryPropertySet>&lt;org.nightlabs.jfire.reporting.oda.jfs.JFSQueryPropertySet>
   &lt;scriptRegistryItemID>
-    &lt;organisationID>${devOrganisationID}&lt;/organisationID>
+    &lt;organisationID>dev.jfire.org&lt;/organisationID>
     &lt;scriptRegistryItemType>JFireReportingTrade-Scripting-ArticleContainerData&lt;/scriptRegistryItemType>
     &lt;scriptRegistryItemID>ArticleList&lt;/scriptRegistryItemID>
   &lt;/scriptRegistryItemID>
@@ -823,7 +831,7 @@ function getDataFieldString(field) {
             </list-property>
             <property name="queryText">&lt;queryPropertySet>&lt;org.nightlabs.jfire.reporting.oda.jfs.JFSQueryPropertySet>
   &lt;scriptRegistryItemID>
-    &lt;organisationID>${devOrganisationID}&lt;/organisationID>
+    &lt;organisationID>dev.jfire.org&lt;/organisationID>
     &lt;scriptRegistryItemType>JFireReporting-Scripting-PropertySet&lt;/scriptRegistryItemType>
     &lt;scriptRegistryItemID>PropertySet&lt;/scriptRegistryItemID>
   &lt;/scriptRegistryItemID>
@@ -1269,7 +1277,7 @@ function getDataFieldString(field) {
             </list-property>
             <property name="queryText">&lt;queryPropertySet>&lt;org.nightlabs.jfire.reporting.oda.jfs.JFSQueryPropertySet>
   &lt;scriptRegistryItemID>
-    &lt;organisationID>${devOrganisationID}&lt;/organisationID>
+    &lt;organisationID>dev.jfire.org&lt;/organisationID>
     &lt;scriptRegistryItemType>JFireReporting-Scripting-PropertySet&lt;/scriptRegistryItemType>
     &lt;scriptRegistryItemID>PropertySet&lt;/scriptRegistryItemID>
   &lt;/scriptRegistryItemID>
@@ -2777,13 +2785,13 @@ JFireReportingHelper.createDataSetParam(params["articleContainerID"])</expressio
                                     <property name="dataType">string</property>
                                 </structure>
                                 <structure>
-                                    <property name="name">${devOrganisationIDConverted}/__Total__</property>
-                                    <expression name="expression">dataSetRow["${devOrganisationIDConverted}/__Total__"]</expression>
+                                    <property name="name">dev_jfire_org/__Total__</property>
+                                    <expression name="expression">dataSetRow["dev_jfire_org/__Total__"]</expression>
                                     <property name="dataType">float</property>
                                 </structure>
                                 <structure>
                                     <property name="name">SumTotal</property>
-                                    <expression name="expression">Total.sum(dataSetRow["${devOrganisationIDConverted}/__Total__"])</expression>
+                                    <expression name="expression">Total.sum(dataSetRow["dev_jfire_org/__Total__"])</expression>
                                     <property name="dataType">float</property>
                                 </structure>
                                 <structure>
@@ -2819,9 +2827,21 @@ result</expression>
                                 </structure>
                                 <structure>
                                     <property name="name">DynamicProduct_Qty</property>
-                                    <expression name="expression">if (isDynamicProduct(row["productJDOID"])) {
+                                    <expression name="expression">// Note that this must be of type "STRING", because it returns the unit symbol together
+// with the formatted number.
+
+// More correctly, we should test here, if the concrete Product implements
+// org.nightlabs.jfire.store.BundleProduct. ...done ;-)
+if (isBundleProduct(row["productJDOID"])) {
   product = JFireReportingHelper.getJDOObject(row["productJDOID"]);
-  result = product.getUnit().toDouble(product.getQuantity()) + " " + product.getUnit().getSymbol().getText()
+  result = Packages.org.nightlabs.l10n.NumberFormatter.formatFloat(
+    product.getUnit().toDouble(product.getQuantity()),
+    product.getUnit().getDecimalDigitCount()
+  ); //+ " " + product.getUnit().getSymbol().getText()
+}
+else {
+// If it is no BundleProduct, one Product instance always represents a quantity of 1.
+  result = 1;
 }
 result</expression>
                                     <property name="dataType">string</property>
@@ -2879,6 +2899,18 @@ for (it1 = priceFragmentType2currency2sum.entrySet().iterator(); it1.hasNext(); 
 result;</expression>
                                     <property name="dataType">any</property>
                                 </structure>
+                                <structure>
+                                    <property name="name">BundleProduct_QtyUnitSymbol</property>
+                                    <expression name="expression">if (isBundleProduct(row["productJDOID"])) {
+  product = JFireReportingHelper.getJDOObject(row["productJDOID"]);
+  result = product.getUnit().getSymbol().getText()
+}
+else {
+  result = "";
+}
+result</expression>
+                                    <property name="dataType">string</property>
+                                </structure>
                             </list-property>
                             <column id="81">
                                 <property name="width">14mm</property>
@@ -2892,6 +2924,9 @@ result;</expression>
                             </column>
                             <column id="182">
                                 <property name="width">10mm</property>
+                            </column>
+                            <column id="420">
+                                <property name="width">7mm</property>
                             </column>
                             <column id="83">
                                 <property name="width">25mm</property>
@@ -2936,6 +2971,7 @@ result;</expression>
                                             <text-property name="text" key="quantity">Qty</text-property>
                                         </label>
                                     </cell>
+                                    <cell id="413"/>
                                     <cell id="68">
                                         <label id="69">
                                             <property name="style">TableHeader</property>
@@ -2996,7 +3032,7 @@ result;</expression>
                                                 <property name="pattern">#,##0.00</property>
                                             </structure>
                                             <property name="textAlign">right</property>
-                                            <property name="resultSetColumn">${devOrganisationIDConverted}/__Total__</property>
+                                            <property name="resultSetColumn">dev_jfire_org/__Total__</property>
                                         </data>
                                     </cell>
                                     <cell id="178">
@@ -3009,6 +3045,10 @@ result;</expression>
                                             <property name="contentType">html</property>
                                         </text-data>
                                     </cell>
+                                    <cell id="414">
+                                        <property name="paddingTop">0.25em</property>
+                                        <property name="paddingBottom">0.5em</property>
+                                    </cell>
                                     <cell id="75">
                                         <property name="paddingTop">0.25em</property>
                                         <property name="paddingBottom">0.5em</property>
@@ -3019,7 +3059,7 @@ result;</expression>
                                                 <property name="pattern">Fixed</property>
                                             </structure>
                                             <property name="textAlign">right</property>
-                                            <property name="resultSetColumn">${devOrganisationIDConverted}/__Total__</property>
+                                            <property name="resultSetColumn">dev_jfire_org/__Total__</property>
                                         </data>
                                     </cell>
                                     <cell id="161">
@@ -3082,6 +3122,15 @@ result;</expression>
                                             <property name="resultSetColumn">DynamicProduct_Qty</property>
                                         </data>
                                     </cell>
+                                    <cell id="415">
+                                        <property name="paddingTop">0.25em</property>
+                                        <property name="paddingBottom">0.5em</property>
+                                        <data id="421">
+                                            <property name="fontFamily">sans-serif</property>
+                                            <property name="fontSize">10pt</property>
+                                            <property name="resultSetColumn">BundleProduct_QtyUnitSymbol</property>
+                                        </data>
+                                    </cell>
                                     <cell id="199">
                                         <property name="paddingTop">0.25em</property>
                                         <property name="paddingBottom">0.5em</property>
@@ -3092,7 +3141,7 @@ result;</expression>
                                                 <property name="pattern">#,##0.00</property>
                                             </structure>
                                             <property name="textAlign">right</property>
-                                            <property name="resultSetColumn">${devOrganisationIDConverted}/__Total__</property>
+                                            <property name="resultSetColumn">dev_jfire_org/__Total__</property>
                                         </data>
                                     </cell>
                                     <cell id="200">
@@ -3136,6 +3185,10 @@ result;</expression>
                                         <property name="paddingTop">3pt</property>
                                         <property name="paddingBottom">10pt</property>
                                     </cell>
+                                    <cell id="416">
+                                        <property name="paddingTop">3pt</property>
+                                        <property name="paddingBottom">10pt</property>
+                                    </cell>
                                     <cell id="267">
                                         <property name="paddingTop">3pt</property>
                                         <property name="paddingBottom">10pt</property>
@@ -3153,6 +3206,7 @@ result;</expression>
                                     <cell id="143"/>
                                     <cell id="188"/>
                                     <cell id="179"/>
+                                    <cell id="417"/>
                                     <cell id="135"/>
                                     <cell id="162"/>
                                 </row>
@@ -3175,6 +3229,11 @@ result;</expression>
                                         <property name="borderTopWidth">thin</property>
                                     </cell>
                                     <cell id="180">
+                                        <property name="borderTopColor">#C0C0C0</property>
+                                        <property name="borderTopStyle">solid</property>
+                                        <property name="borderTopWidth">thin</property>
+                                    </cell>
+                                    <cell id="418">
                                         <property name="borderTopColor">#C0C0C0</property>
                                         <property name="borderTopStyle">solid</property>
                                         <property name="borderTopWidth">thin</property>
@@ -3208,7 +3267,7 @@ result;</expression>
                                 </row>
                                 <row id="271">
                                     <cell id="272">
-                                        <property name="colSpan">7</property>
+                                        <property name="colSpan">8</property>
                                         <property name="rowSpan">1</property>
                                         <property name="borderTopColor">#C0C0C0</property>
                                         <property name="borderTopStyle">solid</property>

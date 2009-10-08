@@ -28,37 +28,48 @@ package org.nightlabs.jfire.accounting;
 
 import java.io.Serializable;
 
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
+
+import org.nightlabs.jfire.accounting.id.CurrencyID;
+import org.nightlabs.l10n.NumberFormatter;
 import org.nightlabs.util.Util;
 
-import javax.jdo.annotations.Persistent;
-import javax.jdo.annotations.NullValue;
-import javax.jdo.annotations.InheritanceStrategy;
-import javax.jdo.annotations.Inheritance;
-import javax.jdo.annotations.PrimaryKey;
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.Column;
-import org.nightlabs.jfire.accounting.id.CurrencyID;
-import javax.jdo.annotations.IdentityType;
-import javax.jdo.annotations.PersistenceModifier;
-
 /**
+ * An instance of this class represents a <a href="http://en.wikipedia.org/wiki/Currency">currency</a>
+ * used for money exchanges. A currency is a measurement unit for money. It is used together with a numeric
+ * value (e.g. 5) to represent a specific monetary amount (e.g. 5 EUR or 5 $US).
+ * <p>
+ * In JFire a monetary value is always stored as <code>long</code> (in contrast to a floating point number) in order to
+ * prevent rounding errors. As most currencies have a fractional part (e.g. 1 Euro has 100 cents), though,
+ * {@link Currency} defines the {@link #getDecimalDigitCount() number of decimal digits}. For example, the
+ * currency "EUR" has 2 decimal digits and therefore a value of 1000 in the database means 10.00 EUR.
+ * </p>
+ * <p>
+ * You can transform the <code>long</code> value of a money-amount to a floating point value by using {@link #toDouble(long)}.
+ * For the opposite direction, you can use {@link #toLong(double)}.
+ * </p>
+ * <p>
+ * To display a monetary value, you should use {@link NumberFormatter#formatCurrency(long, org.nightlabs.l10n.Currency)}
+ * (or one of the other overloaded <code>formatCurrency(...)</code> methods).
+ * </p>
+ *
  * @author Marco Schulze - marco at nightlabs dot de
- * 
- * @jdo.persistence-capable
- *		identity-type = "application"
- *		objectid-class = "org.nightlabs.jfire.accounting.id.CurrencyID"
- *		detachable = "true"
- *		table="JFireTrade_Currency"
- *
- * @jdo.create-objectid-class
- *
- * @jdo.inheritance strategy = "new-table"
+ * @author vince - vince at guinaree dot com
  */
 @PersistenceCapable(
-	objectIdClass=CurrencyID.class,
-	identityType=IdentityType.APPLICATION,
-	detachable="true",
-	table="JFireTrade_Currency")
+		objectIdClass=CurrencyID.class,
+		identityType=IdentityType.APPLICATION,
+		detachable="true",
+		table="JFireTrade_Currency"
+)
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class Currency
 implements Serializable, org.nightlabs.l10n.Currency
@@ -67,25 +78,17 @@ implements Serializable, org.nightlabs.l10n.Currency
 
 	/**
 	 * This is the ISO 4217 identifier for the currency. Usually a two or three-letter-abbreviation.
-	 *
-	 * @jdo.field primary-key="true"
-	 * @jdo.column length="100"
 	 */
 	@PrimaryKey
 	@Column(length=100)
 	private String currencyID;
 
-	/**
-	 * @jdo.field persistence-modifier="persistent" null-value="exception"
-	 */
 	@Persistent(
-		nullValue=NullValue.EXCEPTION,
-		persistenceModifier=PersistenceModifier.PERSISTENT)
+			nullValue=NullValue.EXCEPTION,
+			persistenceModifier=PersistenceModifier.PERSISTENT
+	)
 	private String currencySymbol;
 
-	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 */
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private int decimalDigitCount = -1;
 
@@ -106,25 +109,23 @@ implements Serializable, org.nightlabs.l10n.Currency
 		this.decimalDigitCount = decimalDigitCount;
 	}
 
-	/**
-	 * @return Returns the currencyID.
-	 */
+	@Override
 	public String getCurrencyID()
 	{
 		return currencyID;
 	}
 
-	/**
-	 * @see org.nightlabs.l10n.Currency#getDecimalDigitCount()
-	 */
+	public void setDecimalDigitCount(int decimalDigitCount) {
+		this.decimalDigitCount = decimalDigitCount;
+	}
+
+	@Override
 	public int getDecimalDigitCount()
 	{
 		return decimalDigitCount;
 	}
 
-	/**
-	 * @see org.nightlabs.l10n.Currency#getCurrencySymbol()
-	 */
+	@Override
 	public String getCurrencySymbol()
 	{
 		return currencySymbol;
@@ -157,7 +158,7 @@ implements Serializable, org.nightlabs.l10n.Currency
 	 * <p>
 	 *   amount / 10^(decimalDigitCount)
 	 * <p>
-	 * 
+	 *
 	 * @param amount The amount to convert
 	 * @return the approximate value as double - there might be rounding differences.
 	 */
@@ -170,7 +171,7 @@ implements Serializable, org.nightlabs.l10n.Currency
 	 * <p>
 	 *   amount * 10^(decimalDigitCount)
 	 * <p>
-	 * 
+	 *
 	 * @param amount The amount to convert
 	 * @return the approximate value as long - there might be rounding differences.
 	 */

@@ -492,6 +492,7 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	 */
 	@RolesAllowed("_Guest_")
 	@SuppressWarnings("unchecked")
+	@Override
 	public Set<TariffMappingID> getTariffMappingIDs()
 	{
 		PersistenceManager pm = createPersistenceManager();
@@ -508,6 +509,7 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	 * @see org.nightlabs.jfire.accounting.AccountingManagerRemote#getTariffMappings(java.util.Collection, java.lang.String[], int)
 	 */
 	@RolesAllowed("_Guest_")
+	@Override
 	public Collection<TariffMapping> getTariffMappings(Collection<TariffMappingID> tariffMappingIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = createPersistenceManager();
@@ -523,6 +525,7 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("org.nightlabs.jfire.accounting.editTariffMapping")
+	@Override
 	public TariffMapping createTariffMapping(TariffID localTariffID, TariffID partnerTariffID, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = createPersistenceManager();
@@ -546,6 +549,7 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	 */
 	@RolesAllowed("_Guest_")
 	@SuppressWarnings("unchecked")
+	@Override
 	public Set<TariffID> getTariffIDs(String organisationID, boolean inverse)
 	{
 		PersistenceManager pm = createPersistenceManager();
@@ -565,6 +569,7 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	 * @see org.nightlabs.jfire.accounting.AccountingManagerRemote#getTariffs(java.util.Collection, java.lang.String[], int)
 	 */
 	@RolesAllowed("_Guest_")
+	@Override
 	public Collection<Tariff> getTariffs(Collection<TariffID> tariffIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		// TODO filter Tariffs according to visibility-configuration for the currently logged-in user.
@@ -584,6 +589,7 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("org.nightlabs.jfire.accounting.editTariff")
+	@Override
 	public Tariff storeTariff(Tariff tariff, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = createPersistenceManager();
@@ -600,6 +606,7 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("_Guest_")
 	@SuppressWarnings("unchecked")
+	@Override
 	public Collection<Currency> getCurrencies(String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = createPersistenceManager();
@@ -610,6 +617,18 @@ implements AccountingManagerRemote, AccountingManagerLocal
 
 			Query q = pm.newQuery(Currency.class);
 			return pm.detachCopyAll((Collection<Currency>)q.execute());
+		} finally {
+			pm.close();
+		}
+	}
+
+	@RolesAllowed("_Guest_")
+	@Override
+	public Collection<Currency> getCurrencies(Collection<CurrencyID> currencyIDs, String[] fetchGroups, int maxFetchDepth)
+	{
+		PersistenceManager pm = createPersistenceManager();
+		try {
+			return NLJDOHelper.getDetachedObjectSet(pm, currencyIDs, Currency.class, fetchGroups, maxFetchDepth);
 		} finally {
 			pm.close();
 		}
@@ -644,7 +663,8 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	/* (non-Javadoc)
 	 * @see org.nightlabs.jfire.accounting.AccountingManagerRemote#getAccountIDs(org.nightlabs.jfire.accounting.AccountSearchFilter)
 	 */
-@RolesAllowed("org.nightlabs.jfire.accounting.queryAccounts")
+	@RolesAllowed("org.nightlabs.jfire.accounting.queryAccounts")
+	@Override
 	public Set<AnchorID> getAccountIDs(AccountSearchFilter searchFilter)
 	{
 		PersistenceManager pm = createPersistenceManager();
@@ -660,6 +680,7 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	 * @see org.nightlabs.jfire.accounting.AccountingManagerRemote#getAccounts(java.util.Collection, java.lang.String[], int)
 	 */
 	@RolesAllowed("org.nightlabs.jfire.accounting.queryAccounts")
+	@Override
 	public List<Account> getAccounts(Collection<AnchorID> accountIDs,  String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = createPersistenceManager();
@@ -675,6 +696,7 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("org.nightlabs.jfire.accounting.editAccount")
+	@Override
 	public Account storeAccount(Account account, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = createPersistenceManager();
@@ -694,6 +716,7 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("org.nightlabs.jfire.accounting.editAccount")
+	@Override
 	public void setAccountSummaryAccounts(AnchorID anchorID, Collection<AnchorID> _summaryAccountIDs)
 	{
 		PersistenceManager pm = createPersistenceManager();
@@ -725,6 +748,7 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("org.nightlabs.jfire.accounting.editAccount")
+	@Override
 	public void setSummaryAccountSummedAccounts(AnchorID summaryAccountID, Collection<AnchorID> _summedAccountIDs)
 	{
 		PersistenceManager pm = createPersistenceManager();
@@ -782,8 +806,9 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	/* (non-Javadoc)
 	 * @see org.nightlabs.jfire.accounting.AccountingManagerRemote#getTopLevelAccountantDelegates(java.lang.Class)
 	 */
-@TransactionAttribute(TransactionAttributeType.REQUIRED)
-@RolesAllowed("org.nightlabs.jfire.accounting.queryLocalAccountantDelegates")
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("org.nightlabs.jfire.accounting.queryLocalAccountantDelegates")
+	@Override
 	public Collection<LocalAccountantDelegateID> getTopLevelAccountantDelegates(Class<? extends LocalAccountantDelegate> delegateClass)
 	{
 		PersistenceManager pm = createPersistenceManager();
@@ -800,6 +825,7 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("org.nightlabs.jfire.accounting.queryLocalAccountantDelegates")
+	@Override
 	public Collection<LocalAccountantDelegateID> getChildAccountantDelegates(LocalAccountantDelegateID delegateID)
 	{
 		PersistenceManager pm = createPersistenceManager();
@@ -820,6 +846,7 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("org.nightlabs.jfire.accounting.queryLocalAccountantDelegates")
+	@Override
 	public Collection<LocalAccountantDelegate> getLocalAccountantDelegates(Collection<LocalAccountantDelegateID> delegateIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = createPersistenceManager();
@@ -835,6 +862,7 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("org.nightlabs.jfire.accounting.queryLocalAccountantDelegates")
+	@Override
 	public LocalAccountantDelegate getLocalAccountantDelegate(LocalAccountantDelegateID delegateID, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = createPersistenceManager();
@@ -855,6 +883,7 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("org.nightlabs.jfire.accounting.editLocalAccountantDelegate")
+	@Override
 	public LocalAccountantDelegate storeLocalAccountantDelegate(
 			LocalAccountantDelegate delegate,
 			boolean get,
@@ -874,6 +903,7 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("org.nightlabs.jfire.accounting.editLocalAccountantDelegate")
+	@Override
 	public MoneyFlowMapping storeMoneyFlowMapping(MoneyFlowMapping mapping, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = createPersistenceManager();
@@ -924,6 +954,7 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("org.nightlabs.jfire.accounting.queryLocalAccountantDelegates")
+	@Override
 	public Map<ResolvedMapKey, ResolvedMapEntry> getResolvedMoneyFlowMappings(ProductTypeID productTypeID, String[] mappingFetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = createPersistenceManager();
@@ -945,6 +976,7 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("org.nightlabs.jfire.accounting.queryLocalAccountantDelegates")
+	@Override
 	public Map<ResolvedMapKey, ResolvedMapEntry> getResolvedMoneyFlowMappings(ProductTypeID productTypeID, LocalAccountantDelegateID delegateID, String[] mappingFetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = createPersistenceManager();
@@ -962,6 +994,7 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("_Guest_")
+	@Override
 	public Collection<PriceFragmentType> getPriceFragmentTypes(Collection<PriceFragmentTypeID> priceFragmentTypeIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = createPersistenceManager();
@@ -993,6 +1026,7 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("_Guest_")
+	@Override
 	public Collection<PriceFragmentTypeID> getPriceFragmentTypeIDs()
 	{
 		PersistenceManager pm = createPersistenceManager();
@@ -1030,8 +1064,9 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	/* (non-Javadoc)
 	 * @see org.nightlabs.jfire.accounting.AccountingManagerRemote#createInvoice(java.util.Collection, java.lang.String, boolean, java.lang.String[], int)
 	 */
-@TransactionAttribute(TransactionAttributeType.REQUIRED)
-@RolesAllowed("org.nightlabs.jfire.accounting.editInvoice")
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("org.nightlabs.jfire.accounting.editInvoice")
+	@Override
 	public Invoice createInvoice(
 			Collection<ArticleID> articleIDs, String invoiceIDPrefix,
 			boolean get, String[] fetchGroups, int maxFetchDepth)
@@ -1075,6 +1110,7 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("org.nightlabs.jfire.accounting.editInvoice")
+	@Override
 	public Invoice createInvoice(
 			ArticleContainerID articleContainerID, String invoiceIDPrefix,
 			boolean get, String[] fetchGroups, int maxFetchDepth)
@@ -1147,6 +1183,7 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("org.nightlabs.jfire.accounting.editInvoice")
+	@Override
 	public Invoice addArticlesToInvoice(
 			InvoiceID invoiceID, Collection<ArticleID> articleIDs,
 			boolean validate, boolean get, String[] fetchGroups, int maxFetchDepth)
@@ -1192,6 +1229,7 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("org.nightlabs.jfire.accounting.editInvoice")
+	@Override
 	public Invoice removeArticlesFromInvoice(
 			InvoiceID invoiceID, Collection<ArticleID> articleIDs,
 			boolean validate, boolean get, String[] fetchGroups, int maxFetchDepth)
@@ -1234,6 +1272,7 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	 * @see org.nightlabs.jfire.accounting.AccountingManagerRemote#payBegin(java.util.List)
 	 */
 	@RolesAllowed("org.nightlabs.jfire.accounting.pay")
+	@Override
 	public List<PaymentResult> payBegin(List<PaymentData> paymentDataList)
 	{
 		try {
@@ -1273,6 +1312,7 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	 * @see org.nightlabs.jfire.accounting.AccountingManagerRemote#payBegin(org.nightlabs.jfire.accounting.pay.PaymentData)
 	 */
 	@RolesAllowed("org.nightlabs.jfire.accounting.pay")
+	@Override
 	public PaymentResult payBegin(PaymentData paymentData)
 	{
 		return _payBegin(paymentData);
@@ -1286,6 +1326,7 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
 	@RolesAllowed("_Guest_")
+	@Override
 	public PaymentResult _payBegin(PaymentData paymentData)
 	{
 		if (paymentData == null)
@@ -1345,6 +1386,7 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	 * @see org.nightlabs.jfire.accounting.AccountingManagerRemote#payDoWork(java.util.List, java.util.List, boolean)
 	 */
 	@RolesAllowed("_Guest_")
+	@Override
 	public List<PaymentResult> payDoWork(List<PaymentID> paymentIDs, List<PaymentResult> payDoWorkClientResults, boolean forceRollback)
 	{
 		if (paymentIDs.size() != payDoWorkClientResults.size())
@@ -1385,6 +1427,7 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	 * @see org.nightlabs.jfire.accounting.AccountingManagerRemote#payDoWork(org.nightlabs.jfire.accounting.pay.id.PaymentID, org.nightlabs.jfire.accounting.pay.PaymentResult, boolean)
 	 */
 	@RolesAllowed("_Guest_")
+	@Override
 	public PaymentResult payDoWork(
 			PaymentID paymentID,
 			PaymentResult payEndClientResult,
@@ -1398,6 +1441,7 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
 	@RolesAllowed("_Guest_")
+	@Override
 	public PaymentResult _payDoWork(
 			PaymentID paymentID,
 			PaymentResult payDoWorkClientResult,
@@ -1449,6 +1493,7 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	 * @see org.nightlabs.jfire.accounting.AccountingManagerRemote#payEnd(java.util.List, java.util.List, boolean)
 	 */
 	@RolesAllowed("_Guest_")
+	@Override
 	public List<PaymentResult> payEnd(List<PaymentID> paymentIDs, List<PaymentResult> payEndClientResults, boolean forceRollback)
 	{
 		try {
@@ -1494,6 +1539,7 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	 * @see org.nightlabs.jfire.accounting.AccountingManagerRemote#payEnd(org.nightlabs.jfire.accounting.pay.id.PaymentID, org.nightlabs.jfire.accounting.pay.PaymentResult, boolean)
 	 */
 	@RolesAllowed("_Guest_")
+	@Override
 	public PaymentResult payEnd(
 			PaymentID paymentID,
 			PaymentResult payEndClientResult,
@@ -1507,6 +1553,7 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
 	@RolesAllowed("_Guest_")
+	@Override
 	public PaymentResult _payEnd(
 			PaymentID paymentID,
 			PaymentResult payEndClientResult,
@@ -1560,6 +1607,7 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	 */
 	@RolesAllowed("org.nightlabs.jfire.accounting.queryInvoices")
 	@SuppressWarnings("unchecked")
+	@Override
 	public Set<InvoiceID> getInvoiceIDs(QueryCollection<? extends AbstractJDOQuery> invoiceQueries)
 	{
 		if (invoiceQueries == null)
@@ -1597,6 +1645,7 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	 * @see org.nightlabs.jfire.accounting.AccountingManagerRemote#getInvoices(java.util.Set, java.lang.String[], int)
 	 */
 	@RolesAllowed("org.nightlabs.jfire.accounting.queryInvoices")
+	@Override
 	public List<Invoice> getInvoices(Set<InvoiceID> invoiceIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = createPersistenceManager();
@@ -1611,6 +1660,7 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	 * @see org.nightlabs.jfire.accounting.AccountingManagerRemote#getInvoiceIDs(org.nightlabs.jfire.transfer.id.AnchorID, org.nightlabs.jfire.transfer.id.AnchorID, org.nightlabs.jfire.transfer.id.AnchorID, long, long)
 	 */
 	@RolesAllowed("org.nightlabs.jfire.accounting.queryInvoices")
+	@Override
 	public List<InvoiceID> getInvoiceIDs(AnchorID vendorID, AnchorID customerID, AnchorID endCustomerID, long rangeBeginIdx, long rangeEndIdx)
 	{
 		PersistenceManager pm = createPersistenceManager();
@@ -1629,6 +1679,7 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	 * @see org.nightlabs.jfire.accounting.AccountingManagerRemote#getNonFinalizedInvoices(org.nightlabs.jfire.transfer.id.AnchorID, org.nightlabs.jfire.transfer.id.AnchorID, java.lang.String[], int)
 	 */
 	@RolesAllowed("org.nightlabs.jfire.accounting.queryInvoices")
+	@Override
 	public List<Invoice> getNonFinalizedInvoices(AnchorID vendorID, AnchorID customerID, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = createPersistenceManager();
@@ -1646,6 +1697,7 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	 * @see org.nightlabs.jfire.accounting.AccountingManagerRemote#getAvailableModeOfPaymentFlavoursForAllCustomerGroups(java.util.Collection, byte, boolean, java.lang.String[], int)
 	 */
 	@RolesAllowed("_Guest_")
+	@Override
 	public Collection<ModeOfPaymentFlavour> getAvailableModeOfPaymentFlavoursForAllCustomerGroups(
 			Collection<CustomerGroupID> customerGroupIDs, byte mergeMode, boolean filterByConfig, String[] fetchGroups, int maxFetchDepth)
 			{
@@ -1668,6 +1720,7 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	 * @see org.nightlabs.jfire.accounting.AccountingManagerRemote#getAllModeOfPaymentIDs()
 	 */
 	@RolesAllowed("_Guest_")
+	@Override
 	public Set<ModeOfPaymentID> getAllModeOfPaymentIDs() {
 		PersistenceManager pm = createPersistenceManager();
 		try {
@@ -1685,6 +1738,7 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	 * @see org.nightlabs.jfire.accounting.AccountingManagerRemote#getModeOfPayments(java.util.Set, java.lang.String[], int)
 	 */
 	@RolesAllowed("_Guest_")
+	@Override
 	public Collection<ModeOfPayment> getModeOfPayments(Set<ModeOfPaymentID> modeOfPaymentIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = createPersistenceManager();
@@ -1699,6 +1753,7 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	 * @see org.nightlabs.jfire.accounting.AccountingManagerRemote#getAllModeOfPaymentFlavourIDs()
 	 */
 	@RolesAllowed("_Guest_")
+	@Override
 	public Set<ModeOfPaymentFlavourID> getAllModeOfPaymentFlavourIDs() {
 		PersistenceManager pm = createPersistenceManager();
 		try {
@@ -1716,6 +1771,7 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	 * @see org.nightlabs.jfire.accounting.AccountingManagerRemote#getModeOfPaymentFlavours(java.util.Set, java.lang.String[], int)
 	 */
 	@RolesAllowed("_Guest_")
+	@Override
 	public Collection<ModeOfPaymentFlavour> getModeOfPaymentFlavours(Set<ModeOfPaymentFlavourID> modeOfPaymentFlavourIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = createPersistenceManager();
@@ -1730,6 +1786,7 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	 * @see org.nightlabs.jfire.accounting.AccountingManagerRemote#getServerPaymentProcessorsForOneModeOfPaymentFlavour(org.nightlabs.jfire.accounting.pay.id.ModeOfPaymentFlavourID, org.nightlabs.jfire.accounting.pay.CheckRequirementsEnvironment, java.lang.String[], int)
 	 */
 	@RolesAllowed("_Guest_")
+	@Override
 	public Collection<ServerPaymentProcessor> getServerPaymentProcessorsForOneModeOfPaymentFlavour(
 			ModeOfPaymentFlavourID modeOfPaymentFlavourID,
 			CheckRequirementsEnvironment checkRequirementsEnvironment,
@@ -1764,6 +1821,7 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	 * @see org.nightlabs.jfire.accounting.AccountingManagerRemote#getAvailableModeOfPaymentFlavoursForOneCustomerGroup(org.nightlabs.jfire.trade.id.CustomerGroupID, boolean, java.lang.String[], int)
 	 */
 	@RolesAllowed("_Guest_")
+	@Override
 	public Collection<ModeOfPaymentFlavour> getAvailableModeOfPaymentFlavoursForOneCustomerGroup(CustomerGroupID customerGroupID, boolean filterByConfig, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = createPersistenceManager();
@@ -1785,6 +1843,7 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	 * @see org.nightlabs.jfire.accounting.AccountingManagerRemote#getProductTypeForPriceConfigEditing(org.nightlabs.jfire.store.id.ProductTypeID)
 	 */
 	@RolesAllowed("org.nightlabs.jfire.accounting.editPriceConfiguration")
+	@Override
 	public ProductType getProductTypeForPriceConfigEditing(ProductTypeID productTypeID)
 	{
 		PersistenceManager pm = createPersistenceManager();
@@ -1800,6 +1859,7 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("org.nightlabs.jfire.accounting.editInvoice")
+	@Override
 	public void signalInvoice(InvoiceID invoiceID, String jbpmTransitionName)
 	{
 		PersistenceManager pm = createPersistenceManager();
@@ -1814,6 +1874,7 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	 * @see org.nightlabs.jfire.accounting.AccountingManagerRemote#getAffectedProductTypes(java.util.Set, org.nightlabs.jfire.store.id.ProductTypeID, org.nightlabs.jfire.accounting.priceconfig.id.PriceConfigID)
 	 */
 	@RolesAllowed("org.nightlabs.jfire.accounting.editPriceConfiguration")
+	@Override
 	public Map<PriceConfigID, List<AffectedProductType>> getAffectedProductTypes(Set<PriceConfigID> priceConfigIDs, ProductTypeID productTypeID, PriceConfigID innerPriceConfigID)
 	{
 		PersistenceManager pm = createPersistenceManager();
@@ -1830,6 +1891,7 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	 */
 	@RolesAllowed("org.nightlabs.jfire.accounting.queryAccounts")
 	@SuppressWarnings("unchecked")
+	@Override
 	public Set<AnchorID> getAccountIDs(QueryCollection<? extends AbstractJDOQuery> queries)
 	{
 		if (queries == null)
@@ -1904,8 +1966,9 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	/* (non-Javadoc)
 	 * @see org.nightlabs.jfire.accounting.AccountingManagerRemote#createManualMoneyTransfer(org.nightlabs.jfire.transfer.id.AnchorID, org.nightlabs.jfire.transfer.id.AnchorID, org.nightlabs.jfire.accounting.id.CurrencyID, long, org.nightlabs.i18n.I18nText, boolean, java.lang.String[], int)
 	 */
-@TransactionAttribute(TransactionAttributeType.REQUIRED)
-@RolesAllowed("org.nightlabs.jfire.accounting.manualMoneyTransfer")
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("org.nightlabs.jfire.accounting.manualMoneyTransfer")
+	@Override
 	public ManualMoneyTransfer createManualMoneyTransfer(
 			AnchorID fromID, AnchorID toID, CurrencyID currencyID, long amount, I18nText reason,
 			boolean get, String[] fetchGroups, int maxFetchDepth)
@@ -1948,6 +2011,7 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	 */
 	@RolesAllowed("org.nightlabs.jfire.accounting.queryMoneyTransfers")
 	@SuppressWarnings("unchecked")
+	@Override
 	public List<TransferID> getMoneyTransferIDs(MoneyTransferIDQuery productTransferIDQuery)
 	{
 		PersistenceManager pm = createPersistenceManager();
@@ -1985,6 +2049,7 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	 * @see org.nightlabs.jfire.accounting.AccountingManagerRemote#getMoneyTransfers(java.util.Collection, java.lang.String[], int)
 	 */
 	@RolesAllowed("org.nightlabs.jfire.accounting.queryMoneyTransfers")
+	@Override
 	public List<MoneyTransfer> getMoneyTransfers(Collection<TransferID> moneyTransferIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = createPersistenceManager();
@@ -2000,6 +2065,7 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	 */
 	@RolesAllowed("_Guest_")
 	@SuppressWarnings("unchecked")
+	@Override
 	public Set<AccountTypeID> getAccountTypeIDs()
 	{
 		PersistenceManager pm = createPersistenceManager();
@@ -2016,6 +2082,7 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	 * @see org.nightlabs.jfire.accounting.AccountingManagerRemote#getAccountTypes(java.util.Collection, java.lang.String[], int)
 	 */
 	@RolesAllowed("_Guest_")
+	@Override
 	public List<AccountType> getAccountTypes(Collection<AccountTypeID> accountTypeIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = createPersistenceManager();
@@ -2031,6 +2098,7 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("org.nightlabs.jfire.accounting.editPriceFragmentType")
+	@Override
 	public PriceFragmentType storePriceFragmentType(PriceFragmentType priceFragmentType, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = createPersistenceManager();
@@ -2041,4 +2109,14 @@ implements AccountingManagerRemote, AccountingManagerLocal
 		}
 	}
 
+	@RolesAllowed("_Guest_") // TODO we need a new role for this purpose!
+	@Override
+	public Currency storeCurrency(Currency currency, boolean get,String[] fetchGroups, int maxFetchDepth) {
+		PersistenceManager pm = createPersistenceManager();
+		try {
+             return NLJDOHelper.storeJDO(pm, currency, get, fetchGroups, maxFetchDepth);
+		} finally {
+			pm.close();
+		}
+	}
 }

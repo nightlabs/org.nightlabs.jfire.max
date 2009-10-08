@@ -42,7 +42,7 @@ public class CurrencyDAO extends BaseJDOObjectDAO<CurrencyID, Currency>
 		try {
 			AccountingManagerRemote am = JFireEjb3Factory.getRemoteBean(AccountingManagerRemote.class, SecurityReflector.getInitialContextProperties());
 			monitor.worked(1);
-			return am.getCurrencies(fetchGroups, maxFetchDepth);
+			return am.getCurrencies(objectIDs, fetchGroups, maxFetchDepth);
 		} catch (Exception e) {
 			monitor.setCanceled(true);
 			throw e;
@@ -53,10 +53,18 @@ public class CurrencyDAO extends BaseJDOObjectDAO<CurrencyID, Currency>
 
 	private static final String[] FETCH_GROUPS = { FetchPlan.DEFAULT };
 
+	public List<Currency> getCurrencies(Collection<CurrencyID> currencyIDs, ProgressMonitor monitor)
+	{
+		return getJDOObjects(null, currencyIDs, FETCH_GROUPS, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT, monitor);
+	}
+
 	public List<Currency> getCurrencies(ProgressMonitor monitor)
 	{
 		try {
-			return new ArrayList<Currency>(retrieveJDOObjects(null, FETCH_GROUPS, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT, monitor));
+			// TODO this sucks! Should not call the retrieve method directly! Obtain the IDs instead and then call getJDOObjects(...)!
+			ArrayList<Currency> list = new ArrayList<Currency>(retrieveJDOObjects(null, FETCH_GROUPS, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT, monitor));
+			getCache().putAll(null, list, FETCH_GROUPS, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
+			return list;
 		} catch (Exception e) {
 			throw new RuntimeException("Error while fetching Currencies: " + e.getMessage(), e); //$NON-NLS-1$
 		}
@@ -67,5 +75,24 @@ public class CurrencyDAO extends BaseJDOObjectDAO<CurrencyID, Currency>
 		Currency currency = getJDOObject(null, currencyID, FETCH_GROUPS, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT, new SubProgressMonitor(monitor, 1));
 		monitor.done();
 		return currency;
+	}
+
+	public Currency storeCurrency(Currency currency, boolean get, String[] fetchGroups,
+			int maxFetchDepth, ProgressMonitor monitor){
+
+	//	monitor.beginTask("Save currency", 1);
+
+		try {
+			AccountingManagerRemote am = JFireEjb3Factory.getRemoteBean(AccountingManagerRemote.class, SecurityReflector.getInitialContextProperties());
+		         currency =  am.storeCurrency(currency, get, fetchGroups, maxFetchDepth);
+
+                return currency;
+		} catch (Exception x) {
+			throw new RuntimeException(x);
+		} finally {
+		//	monitor.worked(1);
+		//	monitor.done();
+		}
+
 	}
 }

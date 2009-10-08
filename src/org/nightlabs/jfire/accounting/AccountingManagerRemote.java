@@ -6,10 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.annotation.security.RolesAllowed;
 import javax.ejb.Remote;
-import javax.ejb.TransactionAttribute;
-import javax.ejb.TransactionAttributeType;
 
 import org.nightlabs.ModuleException;
 import org.nightlabs.i18n.I18nText;
@@ -65,13 +62,7 @@ public interface AccountingManagerRemote {
 	 * <p>
 	 * This method can be called by everyone, because it does not reveal critical data.
 	 * </p>
-	 *
-	 * @ejb.interface-method
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 * @ejb.permission role-name="_Guest_"
 	 */
-	@RolesAllowed("_Guest_")
-	@SuppressWarnings("unchecked")
 	Set<TariffMappingID> getTariffMappingIDs();
 
 	/**
@@ -79,23 +70,11 @@ public interface AccountingManagerRemote {
 	 * <p>
 	 * This method can be called by everyone, because it does not reveal critical data.
 	 * </p>
-	 *
-	 * @ejb.interface-method
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 * @ejb.permission role-name="_Guest_"
 	 */
-	@RolesAllowed("_Guest_")
 	Collection<TariffMapping> getTariffMappings(
 			Collection<TariffMappingID> tariffMappingIDs, String[] fetchGroups,
 			int maxFetchDepth);
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.editTariffMapping"
-	 */
-	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	@RolesAllowed("org.nightlabs.jfire.accounting.editTariffMapping")
 	TariffMapping createTariffMapping(TariffID localTariffID,
 			TariffID partnerTariffID, boolean get, String[] fetchGroups,
 			int maxFetchDepth);
@@ -107,16 +86,7 @@ public interface AccountingManagerRemote {
 	 * This method can be called by everyone, because it does not reveal any sensitive information.
 	 * </p>
 	 *
-	 * @param organisationID <code>null</code> in order to get all tariffs (no filtering). non-<code>null</code> to filter by <code>organisationID</code>.
-	 * @param inverse This applies only if <code>organisationID != null</code>. If <code>true</code>, it will return all {@link TariffID}s where the <code>organisationID</code>
-	 *		is NOT the one passed as parameter <code>organisationID</code>.
-	 *
-	 * @ejb.interface-method
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 * @ejb.permission role-name="_Guest_"
 	 */
-	@RolesAllowed("_Guest_")
-	@SuppressWarnings("unchecked")
 	Set<TariffID> getTariffIDs(String organisationID, boolean inverse);
 
 	/**
@@ -125,24 +95,14 @@ public interface AccountingManagerRemote {
 	 * Everyone can call this method. At the moment, all requested {@link Tariff}s will be returned. Later on, this
 	 * method will filter the result and only give the user those <code>Tariff</code>s he is allowed to see.
 	 * </p>
-	 *
-	 * @ejb.interface-method
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 * @ejb.permission role-name="_Guest_"
-	 */
-	@RolesAllowed("_Guest_")
+	  */
 	Collection<Tariff> getTariffs(Collection<TariffID> tariffIDs,
 			String[] fetchGroups, int maxFetchDepth);
 
 	/**
 	 * Save a new or modified <code>Tariff</code> to the server.
 	 *
-	 * @ejb.interface-method
-	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.editTariff"
 	 */
-	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	@RolesAllowed("org.nightlabs.jfire.accounting.editTariff")
 	Tariff storeTariff(Tariff tariff, boolean get, String[] fetchGroups,
 			int maxFetchDepth);
 
@@ -151,66 +111,47 @@ public interface AccountingManagerRemote {
 	 * <p>
 	 * This method can be called by everyone, because currencies are not confidential.
 	 * </p>
-	 *
-	 * @ejb.interface-method
-	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="_Guest_"
 	 */
-	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	@RolesAllowed("_Guest_")
-	@SuppressWarnings("unchecked")
 	Collection<Currency> getCurrencies(String[] fetchGroups, int maxFetchDepth);
 
 	/**
-	 * @ejb.interface-method
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.queryAccounts"
+	 * Get all {@link Currency} instances by Collection of {@link CurrencyID}
+	 * <p>
+	 * This method can be called by everyone, because currencies are not confidential.
+	 * </p>
 	 */
-	@RolesAllowed("org.nightlabs.jfire.accounting.queryAccounts")
+	Collection<Currency> getCurrencies(Collection<CurrencyID> currencyIDs,
+			String[] fetchGroups, int maxFetchDepth);
+
 	Set<AnchorID> getAccountIDs(AccountSearchFilter searchFilter);
 
-	/**
-	 * @ejb.interface-method
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.queryAccounts"
-	 */
-	@RolesAllowed("org.nightlabs.jfire.accounting.queryAccounts")
+
 	List<Account> getAccounts(Collection<AnchorID> accountIDs,
 			String[] fetchGroups, int maxFetchDepth);
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.editAccount"
-	 */
-	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	@RolesAllowed("org.nightlabs.jfire.accounting.editAccount")
 	Account storeAccount(Account account, boolean get, String[] fetchGroups,
 			int maxFetchDepth);
+
+
+
+	Currency storeCurrency(Currency currency, boolean get, String[] fetchGroups,
+			int maxFetchDepth);
+
+
+
+
 
 	/**
 	 * @param anchorID The anchorID of the Account wich SummaryAccounts are to be set
 	 * @param SummaryAccounts A Collection of the AnchorIDs of the SummaryAccounts to be set to the given Account.
-	 *
-	 * @ejb.interface-method
-	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.editAccount"
-	 */
-	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	@RolesAllowed("org.nightlabs.jfire.accounting.editAccount")
+	*/
 	void setAccountSummaryAccounts(AnchorID anchorID,
 			Collection<AnchorID> _summaryAccountIDs);
 
 	/**
 	 * @param summaryAccountID The anchorID of the SummaryAccount wich summedAccounts are to be set
 	 * @param summedAccountIDs A Collection of the AnchorIDs of the Accounts to be summed up by the given SummaryAccount.
-	 *
-	 * @ejb.interface-method
-	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.editAccount"
 	 */
-	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	@RolesAllowed("org.nightlabs.jfire.accounting.editAccount")
 	void setSummaryAccountSummedAccounts(AnchorID summaryAccountID,
 			Collection<AnchorID> _summedAccountIDs);
 
@@ -219,13 +160,7 @@ public interface AccountingManagerRemote {
 	 * delegates.
 	 *
 	 * @param delegateClass The class/type of delegates that should be returned.
-	 *
-	 * @ejb.interface-method
-	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.queryLocalAccountantDelegates"
-	 */
-	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	@RolesAllowed("org.nightlabs.jfire.accounting.queryLocalAccountantDelegates")
+	  */
 	Collection<LocalAccountantDelegateID> getTopLevelAccountantDelegates(
 			Class<? extends LocalAccountantDelegate> delegateClass);
 
@@ -234,13 +169,7 @@ public interface AccountingManagerRemote {
 	 * delegates which have the given delegate as extendedLocalAccountantDelegate
 	 *
 	 * @param delegateID The LocalAccountantDelegateID children should be searched for.
-	 *
-	 * @ejb.interface-method
-	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.queryLocalAccountantDelegates"
 	 */
-	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	@RolesAllowed("org.nightlabs.jfire.accounting.queryLocalAccountantDelegates")
 	Collection<LocalAccountantDelegateID> getChildAccountantDelegates(
 			LocalAccountantDelegateID delegateID);
 
@@ -250,13 +179,7 @@ public interface AccountingManagerRemote {
 	 *
 	 * @param delegateIDs The LocalAccountantDelegateID of the delegates to return.
 	 * @param fetchGroups The fetchGroups to detach the delegates with.
-	 *
-	 * @ejb.interface-method
-	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.queryLocalAccountantDelegates"
-	 */
-	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	@RolesAllowed("org.nightlabs.jfire.accounting.queryLocalAccountantDelegates")
+	*/
 	Collection<LocalAccountantDelegate> getLocalAccountantDelegates(
 			Collection<LocalAccountantDelegateID> delegateIDs,
 			String[] fetchGroups, int maxFetchDepth);
@@ -267,13 +190,7 @@ public interface AccountingManagerRemote {
 	 *
 	 * @param delegateID The LocalAccountantDelegateID of the delegate to return.
 	 * @param fetchGroups The fetchGroups to detach the delegates with.
-	 *
-	 * @ejb.interface-method
-	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.queryLocalAccountantDelegates"
-	 */
-	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	@RolesAllowed("org.nightlabs.jfire.accounting.queryLocalAccountantDelegates")
+	*/
 	LocalAccountantDelegate getLocalAccountantDelegate(
 			LocalAccountantDelegateID delegateID, String[] fetchGroups,
 			int maxFetchDepth);
@@ -285,45 +202,18 @@ public interface AccountingManagerRemote {
 	 * @param delegate The LocalAccountantDelegate to store.
 	 * @param get Whether or not to return the a newly detached version of the stored delegate.
 	 * @param fetchGroups The fetchGroups to detach the stored delegate with.
-	 *
-	 * @ejb.interface-method
-	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.editLocalAccountantDelegate"
-	 */
-	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	@RolesAllowed("org.nightlabs.jfire.accounting.editLocalAccountantDelegate")
+	*/
 	LocalAccountantDelegate storeLocalAccountantDelegate(
 			LocalAccountantDelegate delegate, boolean get,
 			String[] fetchGroups, int maxFetchDepth);
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.editLocalAccountantDelegate"
-	 * @ejb.transaction type="Required"
-	 */
-	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	@RolesAllowed("org.nightlabs.jfire.accounting.editLocalAccountantDelegate")
 	MoneyFlowMapping storeMoneyFlowMapping(MoneyFlowMapping mapping,
 			boolean get, String[] fetchGroups, int maxFetchDepth);
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.queryLocalAccountantDelegates"
-	 */
-	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	@RolesAllowed("org.nightlabs.jfire.accounting.queryLocalAccountantDelegates")
 	Map<ResolvedMapKey, ResolvedMapEntry> getResolvedMoneyFlowMappings(
 			ProductTypeID productTypeID, String[] mappingFetchGroups,
 			int maxFetchDepth);
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.queryLocalAccountantDelegates"
-	 */
-	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	@RolesAllowed("org.nightlabs.jfire.accounting.queryLocalAccountantDelegates")
 	Map<ResolvedMapKey, ResolvedMapEntry> getResolvedMoneyFlowMappings(
 			ProductTypeID productTypeID, LocalAccountantDelegateID delegateID,
 			String[] mappingFetchGroups, int maxFetchDepth);
@@ -336,13 +226,7 @@ public interface AccountingManagerRemote {
 	 * </p>
 	 *
 	 * @param priceFragmentTypeIDs Can be <code>null</code> in order to return ALL {@link PriceFragmentType}s or a collection of {@link PriceFragmentTypeID}s to return only a subset.
-	 *
-	 * @ejb.interface-method
-	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="_Guest_"
 	 */
-	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	@RolesAllowed("_Guest_")
 	Collection<PriceFragmentType> getPriceFragmentTypes(
 			Collection<PriceFragmentTypeID> priceFragmentTypeIDs,
 			String[] fetchGroups, int maxFetchDepth);
@@ -352,13 +236,7 @@ public interface AccountingManagerRemote {
 	 * <p>
 	 * This method can be called by everyone, because the object-ids don't reveal any confidential information.
 	 * </p>
-	 *
-	 * @ejb.interface-method
-	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="_Guest_"
 	 */
-	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	@RolesAllowed("_Guest_")
 	Collection<PriceFragmentTypeID> getPriceFragmentTypeIDs();
 
 	/**
@@ -371,13 +249,7 @@ public interface AccountingManagerRemote {
 	 * @return Detached Invoice or null.
 	 *
 	 * @throws InvoiceEditException if the invoice cannot be created with the given parameters.
-	 *
-	 * @ejb.interface-method
-	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.editInvoice"
 	 */
-	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	@RolesAllowed("org.nightlabs.jfire.accounting.editInvoice")
 	Invoice createInvoice(Collection<ArticleID> articleIDs,
 			String invoiceIDPrefix, boolean get, String[] fetchGroups,
 			int maxFetchDepth) throws InvoiceEditException;
@@ -393,36 +265,17 @@ public interface AccountingManagerRemote {
 	 * @return Detached Invoice or null.
 	 *
 	 * @throws InvoiceEditException if the invoice cannot be created with the given parameters.
-	 *
-	 * @ejb.interface-method
-	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.editInvoice"
-	 */
-	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	@RolesAllowed("org.nightlabs.jfire.accounting.editInvoice")
+	  */
 	Invoice createInvoice(ArticleContainerID articleContainerID,
 			String invoiceIDPrefix, boolean get, String[] fetchGroups,
 			int maxFetchDepth) throws InvoiceEditException;
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.editInvoice"
-	 */
-	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	@RolesAllowed("org.nightlabs.jfire.accounting.editInvoice")
+
 	Invoice addArticlesToInvoice(InvoiceID invoiceID,
 			Collection<ArticleID> articleIDs, boolean validate, boolean get,
 			String[] fetchGroups, int maxFetchDepth)
 			throws InvoiceEditException;
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.editInvoice"
-	 */
-	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	@RolesAllowed("org.nightlabs.jfire.accounting.editInvoice")
 	Invoice removeArticlesFromInvoice(InvoiceID invoiceID,
 			Collection<ArticleID> articleIDs, boolean validate, boolean get,
 			String[] fetchGroups, int maxFetchDepth)
@@ -433,12 +286,7 @@ public interface AccountingManagerRemote {
 	 * @return A <tt>List</tt> with instances of {@link PaymentResult} in the same
 	 *		order as and corresponding to the {@link PaymentData} objects passed in
 	 *		<tt>paymentDataList</tt>.
-	 *
-	 * @ejb.interface-method
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.pay"
 	 */
-	@RolesAllowed("org.nightlabs.jfire.accounting.pay")
 	List<PaymentResult> payBegin(List<PaymentData> paymentDataList);
 
 	/**
@@ -450,12 +298,7 @@ public interface AccountingManagerRemote {
 	 * @throws ModuleException
 	 *
 	 * @see Accounting#payBegin(User, PaymentData)
-	 *
-	 * @ejb.interface-method
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.pay"
 	 */
-	@RolesAllowed("org.nightlabs.jfire.accounting.pay")
 	PaymentResult payBegin(PaymentData paymentData);
 
 	/**
@@ -470,12 +313,7 @@ public interface AccountingManagerRemote {
 	 * @return A <tt>List</tt> with instances of {@link PaymentResult} in the same
 	 *		order as and corresponding to the {@link PaymentID} objects passed in
 	 *		<tt>paymentIDs</tt>.
-	 *
-	 * @ejb.interface-method
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 * @ejb.permission role-name="_Guest_"
 	 */
-	@RolesAllowed("_Guest_")
 	List<PaymentResult> payDoWork(List<PaymentID> paymentIDs,
 			List<PaymentResult> payDoWorkClientResults, boolean forceRollback);
 
@@ -486,12 +324,7 @@ public interface AccountingManagerRemote {
 	 * @throws ModuleException
 	 *
 	 * @see Accounting#payEnd(User, PaymentData)
-	 *
-	 * @ejb.interface-method
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 * @ejb.permission role-name="_Guest_"
 	 */
-	@RolesAllowed("_Guest_")
 	PaymentResult payDoWork(PaymentID paymentID,
 			PaymentResult payEndClientResult, boolean forceRollback);
 
@@ -508,11 +341,7 @@ public interface AccountingManagerRemote {
 	 *		order as and corresponding to the {@link PaymentID} objects passed in
 	 *		<tt>paymentIDs</tt>.
 	 *
-	 * @ejb.interface-method
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 * @ejb.permission role-name="_Guest_"
 	 */
-	@RolesAllowed("_Guest_")
 	List<PaymentResult> payEnd(List<PaymentID> paymentIDs,
 			List<PaymentResult> payEndClientResults, boolean forceRollback);
 
@@ -523,12 +352,7 @@ public interface AccountingManagerRemote {
 	 * @throws ModuleException
 	 *
 	 * @see Accounting#payEnd(User, PaymentData)
-	 *
-	 * @ejb.interface-method
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 * @ejb.permission role-name="_Guest_"
 	 */
-	@RolesAllowed("_Guest_")
 	PaymentResult payEnd(PaymentID paymentID, PaymentResult payEndClientResult,
 			boolean forceRollback);
 
@@ -536,22 +360,13 @@ public interface AccountingManagerRemote {
 	 * @param invoiceQueries Instances of {@link InvoiceQuery} that shall be chained
 	 *		in order to retrieve the result. The result of one query is passed to the
 	 *		next one using the {@link AbstractJDOQuery#setCandidates(Collection)}.
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.queryInvoices"
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
-	@RolesAllowed("org.nightlabs.jfire.accounting.queryInvoices")
-	@SuppressWarnings("unchecked")
 	Set<InvoiceID> getInvoiceIDs(
 			QueryCollection<? extends AbstractJDOQuery> invoiceQueries);
 
 	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.queryInvoices"
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
-	@RolesAllowed("org.nightlabs.jfire.accounting.queryInvoices")
 	List<Invoice> getInvoices(Set<InvoiceID> invoiceIDs, String[] fetchGroups,
 			int maxFetchDepth);
 
@@ -564,12 +379,7 @@ public interface AccountingManagerRemote {
 	 * @param rangeBeginIdx Either -1, if no range shall be specified, or a positive number (incl. 0) defining the index where the range shall begin (inclusive).
 	 * @param rangeEndIdx Either -1, if no range shall be specified, or a positive number (incl. 0) defining the index where the range shall end (exclusive).
 	 * @return Returns instances of {@link Invoice}.
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.queryInvoices"
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
-	@RolesAllowed("org.nightlabs.jfire.accounting.queryInvoices")
 	List<InvoiceID> getInvoiceIDs(AnchorID vendorID, AnchorID customerID,
 			AnchorID endCustomerID, long rangeBeginIdx, long rangeEndIdx);
 
@@ -577,11 +387,7 @@ public interface AccountingManagerRemote {
 	 * This method queries all <code>Invoice</code>s which exist between the given vendor and customer and
 	 * are not yet finalized. They are ordered by invoiceID descending (means newest first).
 	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.queryInvoices"
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
-	@RolesAllowed("org.nightlabs.jfire.accounting.queryInvoices")
 	List<Invoice> getNonFinalizedInvoices(AnchorID vendorID,
 			AnchorID customerID, String[] fetchGroups, int maxFetchDepth);
 
@@ -598,12 +404,7 @@ public interface AccountingManagerRemote {
 	 * 		intersection of the entries configured in the {@link ModeOfPaymentConfigModule} for the current user and the
 	 * 		workstation he is currently loggen on.
 	 * @param fetchGroups Either <tt>null</tt> or all desired fetch groups.
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
-	@RolesAllowed("_Guest_")
 	Collection<ModeOfPaymentFlavour> getAvailableModeOfPaymentFlavoursForAllCustomerGroups(
 			Collection<CustomerGroupID> customerGroupIDs, byte mergeMode,
 			boolean filterByConfig, String[] fetchGroups, int maxFetchDepth);
@@ -613,12 +414,7 @@ public interface AccountingManagerRemote {
 	 * <p>
 	 * This method can be called by everyone, because the returned object-ids are not confidential.
 	 * </p>
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
-	@RolesAllowed("_Guest_")
 	Set<ModeOfPaymentID> getAllModeOfPaymentIDs();
 
 	/**
@@ -628,11 +424,7 @@ public interface AccountingManagerRemote {
 	 * </p>
 	 * @param fetchGroups Either <tt>null</tt> or all desired fetch groups.
 	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
-	@RolesAllowed("_Guest_")
 	Collection<ModeOfPayment> getModeOfPayments(
 			Set<ModeOfPaymentID> modeOfPaymentIDs, String[] fetchGroups,
 			int maxFetchDepth);
@@ -642,13 +434,8 @@ public interface AccountingManagerRemote {
 	 * <p>
 	 * This method can be called by everyone, because the returned object-ids are not confidential.
 	 * </p>
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
-	@RolesAllowed("_Guest_")
-	Set<ModeOfPaymentFlavourID> getAllModeOfPaymentFlavourIDs();
+     Set<ModeOfPaymentFlavourID> getAllModeOfPaymentFlavourIDs();
 
 	/**
 	 * Get the mode of payment flavours that are specified by the given object-ids.
@@ -656,12 +443,7 @@ public interface AccountingManagerRemote {
 	 * This method can be called by everyone, because mode of payment flavours are not considered confidential.
 	 * </p>
 	 * @param fetchGroups Either <tt>null</tt> or all desired fetch groups.
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
-	@RolesAllowed("_Guest_")
 	Collection<ModeOfPaymentFlavour> getModeOfPaymentFlavours(
 			Set<ModeOfPaymentFlavourID> modeOfPaymentFlavourIDs,
 			String[] fetchGroups, int maxFetchDepth);
@@ -673,12 +455,7 @@ public interface AccountingManagerRemote {
 	 * </p>
 	 *
 	 * @param fetchGroups Either <tt>null</tt> or all desired fetch groups.
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
-	@RolesAllowed("_Guest_")
 	Collection<ServerPaymentProcessor> getServerPaymentProcessorsForOneModeOfPaymentFlavour(
 			ModeOfPaymentFlavourID modeOfPaymentFlavourID,
 			CheckRequirementsEnvironment checkRequirementsEnvironment,
@@ -689,12 +466,7 @@ public interface AccountingManagerRemote {
 	 * <p>
 	 * This method can be called by everyone, because the mode of payment flavours are not confidential.
 	 * </p>
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
-	@RolesAllowed("_Guest_")
 	Collection<ModeOfPaymentFlavour> getAvailableModeOfPaymentFlavoursForOneCustomerGroup(
 			CustomerGroupID customerGroupID, boolean filterByConfig,
 			String[] fetchGroups, int maxFetchDepth);
@@ -702,52 +474,25 @@ public interface AccountingManagerRemote {
 	/**
 	 * @param productTypeID The object ID of the desired ProductType.
 	 *
-	 * @ejb.interface-method
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.editPriceConfiguration"
 	 */
-	@RolesAllowed("org.nightlabs.jfire.accounting.editPriceConfiguration")
 	ProductType getProductTypeForPriceConfigEditing(ProductTypeID productTypeID);
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.editInvoice"
-	 */
-	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	@RolesAllowed("org.nightlabs.jfire.accounting.editInvoice")
+
 	void signalInvoice(InvoiceID invoiceID, String jbpmTransitionName);
 
 	/**
 	 * @return The returned Map&lt;PriceConfigID, List&lt;AffectedProductType&gt;&gt; indicates which modified
 	 *		price config would result in which products to have their prices recalculated.
-	 *
-	 * @ejb.interface-method
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.editPriceConfiguration" // This method is AFAIK only called when editing and storing a price config. marco.
 	 */
-	@RolesAllowed("org.nightlabs.jfire.accounting.editPriceConfiguration")
 	Map<PriceConfigID, List<AffectedProductType>> getAffectedProductTypes(
 			Set<PriceConfigID> priceConfigIDs, ProductTypeID productTypeID,
 			PriceConfigID innerPriceConfigID);
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.queryAccounts"
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 */
-	@RolesAllowed("org.nightlabs.jfire.accounting.queryAccounts")
-	@SuppressWarnings("unchecked")
+
 	Set<AnchorID> getAccountIDs(
 			QueryCollection<? extends AbstractJDOQuery> queries);
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.manualMoneyTransfer"
-	 */
-	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	@RolesAllowed("org.nightlabs.jfire.accounting.manualMoneyTransfer")
+
 	ManualMoneyTransfer createManualMoneyTransfer(AnchorID fromID,
 			AnchorID toID, CurrencyID currencyID, long amount, I18nText reason,
 			boolean get, String[] fetchGroups, int maxFetchDepth);
@@ -757,13 +502,7 @@ public interface AccountingManagerRemote {
 	 * it directly queries object-ids.
 	 *
 	 * @param productTransferIDQuery The query to execute.
-	 *
-	 * @ejb.interface-method
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.queryMoneyTransfers"
 	 */
-	@RolesAllowed("org.nightlabs.jfire.accounting.queryMoneyTransfers")
-	@SuppressWarnings("unchecked")
 	List<TransferID> getMoneyTransferIDs(
 			MoneyTransferIDQuery productTransferIDQuery);
 
@@ -775,22 +514,12 @@ public interface AccountingManagerRemote {
 	 * @param moneyTransferQueries A <code>Collection</code> of {@link MoneyTransferQuery}. They will be executed
 	 *		in the given order (if it's a <code>List</code>) and the result of the previous query will be passed as candidates
 	 *		to the next query.
-	 *
-	 * @ejb.interface-method
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.queryMoneyTransfers"
+
 	 */
-	@RolesAllowed("org.nightlabs.jfire.accounting.queryMoneyTransfers")
-	@SuppressWarnings("unchecked")
 	List<TransferID> getMoneyTransferIDs(
 			Collection<MoneyTransferQuery> moneyTransferQueries);
 
-	/**
-	 * @ejb.interface-method
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.queryMoneyTransfers"
-	 */
-	@RolesAllowed("org.nightlabs.jfire.accounting.queryMoneyTransfers")
+
 	List<MoneyTransfer> getMoneyTransfers(
 			Collection<TransferID> moneyTransferIDs, String[] fetchGroups,
 			int maxFetchDepth);
@@ -800,46 +529,23 @@ public interface AccountingManagerRemote {
 	 * <p>
 	 * This method can be called by everyone, because the object-ids are not confidential.
 	 * </p>
-	 *
-	 * @ejb.interface-method
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 * @ejb.permission role-name="_Guest_"
+
 	 */
-	@RolesAllowed("_Guest_")
-	@SuppressWarnings("unchecked")
 	Set<AccountTypeID> getAccountTypeIDs();
 
 	/**
 	 * Get the <code>AccountType</code>s for the specified object-ids.
 	 * <p>
 	 * This method can be called by everyone, because the <code>AccountType</code>s are not confidential.
-	 * </p>
-	 * @ejb.interface-method
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 * @ejb.permission role-name="_Guest_"
 	 */
-	@RolesAllowed("_Guest_")
 	List<AccountType> getAccountTypes(Collection<AccountTypeID> accountTypeIDs,
 			String[] fetchGroups, int maxFetchDepth);
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.editPriceFragmentType"
-	 */
-	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	@RolesAllowed("org.nightlabs.jfire.accounting.editPriceFragmentType")
+
 	PriceFragmentType storePriceFragmentType(
 			PriceFragmentType priceFragmentType, boolean get,
 			String[] fetchGroups, int maxFetchDepth);
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.transaction type="Supports"
-	 * @ejb.permission role-name="_Guest_"
-	 */
-	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	@RolesAllowed("_Guest_")
-	String ping(String message);
 
+	String ping(String message);
 }

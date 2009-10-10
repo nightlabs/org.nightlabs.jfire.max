@@ -429,7 +429,9 @@ implements DynamicTradeManagerRemote
 			}
 
 			for (DynamicTradePriceConfig dynamicTradePriceConfig : priceConfigs) {
-				PriceConfig.assertPriceConfigNotManaged(pm, (PriceConfigID) JDOHelper.getObjectId(dynamicTradePriceConfig));
+				PriceConfigID priceConfigID = (PriceConfigID) JDOHelper.getObjectId(dynamicTradePriceConfig);
+				if (priceConfigID != null)
+					PriceConfig.assertPriceConfigNotManaged(pm, priceConfigID);
 			}
 
 			// Because we do not need to calculate any prices (all prices are dynamic), we

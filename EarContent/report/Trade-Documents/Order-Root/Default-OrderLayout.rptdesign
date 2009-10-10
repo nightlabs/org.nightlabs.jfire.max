@@ -199,32 +199,32 @@ function getDataFieldString(field) {
                     </structure>
                     <structure>
                         <property name="position">26</property>
-                        <property name="name">chezfrancois_jfire_org/vat-ch-7__6-net</property>
+                        <property name="name">${rootOrganisationIDConverted}/vat-ch-7__6-net</property>
                         <property name="dataType">float</property>
                     </structure>
                     <structure>
                         <property name="position">27</property>
-                        <property name="name">chezfrancois_jfire_org/vat-ch-7__6-val</property>
+                        <property name="name">${rootOrganisationIDConverted}/vat-ch-7__6-val</property>
                         <property name="dataType">float</property>
                     </structure>
                     <structure>
                         <property name="position">28</property>
-                        <property name="name">chezfrancois_jfire_org/vat-de-19-net</property>
+                        <property name="name">${rootOrganisationIDConverted}/vat-de-19-net</property>
                         <property name="dataType">float</property>
                     </structure>
                     <structure>
                         <property name="position">29</property>
-                        <property name="name">chezfrancois_jfire_org/vat-de-19-val</property>
+                        <property name="name">${rootOrganisationIDConverted}/vat-de-19-val</property>
                         <property name="dataType">float</property>
                     </structure>
                     <structure>
                         <property name="position">30</property>
-                        <property name="name">chezfrancois_jfire_org/vat-de-7-net</property>
+                        <property name="name">${rootOrganisationIDConverted}/vat-de-7-net</property>
                         <property name="dataType">float</property>
                     </structure>
                     <structure>
                         <property name="position">31</property>
-                        <property name="name">chezfrancois_jfire_org/vat-de-7-val</property>
+                        <property name="name">${rootOrganisationIDConverted}/vat-de-7-val</property>
                         <property name="dataType">float</property>
                     </structure>
                     <structure>
@@ -401,38 +401,38 @@ function getDataFieldString(field) {
                 </structure>
                 <structure>
                     <property name="position">26</property>
-                    <property name="name">chezfrancois_jfire_org/vat-ch-7__6-net</property>
-                    <property name="nativeName">chezfrancois_jfire_org/vat-ch-7__6-net</property>
+                    <property name="name">${rootOrganisationIDConverted}/vat-ch-7__6-net</property>
+                    <property name="nativeName">${rootOrganisationIDConverted}/vat-ch-7__6-net</property>
                     <property name="dataType">float</property>
                 </structure>
                 <structure>
                     <property name="position">27</property>
-                    <property name="name">chezfrancois_jfire_org/vat-ch-7__6-val</property>
-                    <property name="nativeName">chezfrancois_jfire_org/vat-ch-7__6-val</property>
+                    <property name="name">${rootOrganisationIDConverted}/vat-ch-7__6-val</property>
+                    <property name="nativeName">${rootOrganisationIDConverted}/vat-ch-7__6-val</property>
                     <property name="dataType">float</property>
                 </structure>
                 <structure>
                     <property name="position">28</property>
-                    <property name="name">chezfrancois_jfire_org/vat-de-19-net</property>
-                    <property name="nativeName">chezfrancois_jfire_org/vat-de-19-net</property>
+                    <property name="name">${rootOrganisationIDConverted}/vat-de-19-net</property>
+                    <property name="nativeName">${rootOrganisationIDConverted}/vat-de-19-net</property>
                     <property name="dataType">float</property>
                 </structure>
                 <structure>
                     <property name="position">29</property>
-                    <property name="name">chezfrancois_jfire_org/vat-de-19-val</property>
-                    <property name="nativeName">chezfrancois_jfire_org/vat-de-19-val</property>
+                    <property name="name">${rootOrganisationIDConverted}/vat-de-19-val</property>
+                    <property name="nativeName">${rootOrganisationIDConverted}/vat-de-19-val</property>
                     <property name="dataType">float</property>
                 </structure>
                 <structure>
                     <property name="position">30</property>
-                    <property name="name">chezfrancois_jfire_org/vat-de-7-net</property>
-                    <property name="nativeName">chezfrancois_jfire_org/vat-de-7-net</property>
+                    <property name="name">${rootOrganisationIDConverted}/vat-de-7-net</property>
+                    <property name="nativeName">${rootOrganisationIDConverted}/vat-de-7-net</property>
                     <property name="dataType">float</property>
                 </structure>
                 <structure>
                     <property name="position">31</property>
-                    <property name="name">chezfrancois_jfire_org/vat-de-7-val</property>
-                    <property name="nativeName">chezfrancois_jfire_org/vat-de-7-val</property>
+                    <property name="name">${rootOrganisationIDConverted}/vat-de-7-val</property>
+                    <property name="nativeName">${rootOrganisationIDConverted}/vat-de-7-val</property>
                     <property name="dataType">float</property>
                 </structure>
                 <structure>

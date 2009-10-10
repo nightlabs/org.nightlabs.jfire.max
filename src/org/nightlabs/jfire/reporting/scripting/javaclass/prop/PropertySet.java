@@ -26,10 +26,12 @@ import org.nightlabs.jfire.prop.datafield.DateDataField;
 import org.nightlabs.jfire.prop.datafield.II18nTextDataField;
 import org.nightlabs.jfire.prop.datafield.ImageDataField;
 import org.nightlabs.jfire.prop.datafield.NumberDataField;
+import org.nightlabs.jfire.prop.datafield.SelectionDataField;
 import org.nightlabs.jfire.prop.id.PropertySetID;
 import org.nightlabs.jfire.prop.id.StructFieldID;
 import org.nightlabs.jfire.prop.structfield.DateStructField;
 import org.nightlabs.jfire.prop.structfield.NumberStructField;
+import org.nightlabs.jfire.prop.structfield.SelectionStructField;
 import org.nightlabs.jfire.reporting.JFireReportingHelper;
 import org.nightlabs.jfire.reporting.oda.DataType;
 import org.nightlabs.jfire.reporting.oda.jfs.AbstractJFSScriptExecutorDelegate;
@@ -131,6 +133,11 @@ extends AbstractJFSScriptExecutorDelegate
 					}
 					else if (structField instanceof DateStructField) {
 						metaData.addColumn(getColumnName(structField), DataType.DATE);
+					}
+					else if (structField instanceof SelectionStructField) {
+						metaData.addColumn(getColumnName(structField) + "_structFieldValueID", DataType.STRING);
+						metaData.addColumn(getColumnName(structField) + "_text", DataType.STRING);
+						metaData.addColumn(getColumnName(structField), DataType.STRING); // TODO deprecated - for downward compatibility only - should be removed for JFire 1.2
 					}
 					else if (II18nTextDataField.class.isAssignableFrom(structField.getDataFieldClass())) {
 						metaData.addColumn(getColumnName(structField), DataType.STRING);
@@ -240,9 +247,20 @@ extends AbstractJFSScriptExecutorDelegate
 				else if (structField instanceof DateStructField) {
 					elements.add(field != null ? ((DateDataField)field).getDate() : null);
 				}
+				else if (structField instanceof SelectionStructField) {
+					if (field != null) {
+						elements.add(((SelectionDataField) field).getStructFieldValueID());
+						elements.add(((II18nTextDataField) field).getI18nText().getText(locale));
+						elements.add(((II18nTextDataField) field).getI18nText().getText(locale)); // TODO deprecated - should be removed for JFire 1.2 - see above in getResultSetMetaData()
+					} else {
+						elements.add("");
+						elements.add("");
+						elements.add("");
+					}
+				}
 				else if (II18nTextDataField.class.isAssignableFrom(structField.getDataFieldClass())) {
 					if (field != null) {
-						elements.add(((II18nTextDataField) field).getI18nText().getText(JFireReportingHelper.getLocale()));
+						elements.add(((II18nTextDataField) field).getI18nText().getText(locale));
 					} else {
 						elements.add("");
 					}

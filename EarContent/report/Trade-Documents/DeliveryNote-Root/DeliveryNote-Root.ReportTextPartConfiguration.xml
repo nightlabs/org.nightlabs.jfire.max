@@ -5,25 +5,55 @@
 		<name language="de">Anrede</name>
 		<content language="en"><![CDATA[
 <? 
-var salutationText = "";
-if (row["Name"] == "") {
-	salutationText = "Ladies, dear Sirs"
-}
-else {
-	salutationText = row["Salutation"] + " " + row["Name"];
+var salutationText = "Dear Ladies, dear Sirs";
+if (row["Name"] != "") {
+	var title = row["Title"];
+	// In the English language, the academic/official title replaces the social title.
+	if (title == "")
+		salutationText = "Dear " + row["Salutation_Text"] + " " + row["Name"];
+	else
+		salutationText = "Dear " + title + " " + row["Name"];
 }
 ?>
 
-Dear <?=salutationText?>,
+<?=salutationText?>,
 <br/><br/>
-thank you for your order! See below the list of delivered articles:
+thank you for your order! See below the list of your purchased articles:
 <br/>
 ]]>
 		</content>
 		<content language="de"><![CDATA[
-Sehr geehrte(r) <?=row["Salutation"]?> <?=row["Name"]?>,
+<?		
+var salutationText = "Sehr geehrte Damen und Herren";
+if (row["Name"] != "") {
+	// The German language requires declination. Thus, we have to
+	// find the identifier of the salutation, so that we know if the person
+	// is male or female.
+	if (row["Salutation_StructFieldValueID"] == PersonStruct.PERSONALDATA_SALUTATION_MRS)
+		salutationText = "Sehr geehrte ";
+	else if (row["Salutation_StructFieldValueID"] == PersonStruct.PERSONALDATA_SALUTATION_MR)
+		salutationText = "Sehr geehrter ";
+	else // unknown ID in database
+		salutationText = "Sehr geehrte(r) ";
+
+	// Now that we know the sex, we need to get the title.
+	// If we have a title, we use it TOGETHER with the salutation
+	// (e.g. "Sehr geehrter Herr Dr. Schulze") - unlike English.
+	var title = row["Title"];
+	if (title != "")
+		title += " ";
+
+	var salutation = row["Salutation_Text"];
+	if (salutation != "")
+		salutation += " ";
+
+	salutationText = salutationText + salutation + title + row["Name"];
+}
+?>
+
+<?=salutationText?>,
 <br/><br/>
-vielen Dank für Ihren Auftrag. Im Folgenden finden sie die Liste der gelieferten Artikel:
+vielen Dank für Ihren Auftrag! Im Folgenden finden Sie die Liste Ihrer gekauften Artikel:
 <br/>
 ]]>
 		</content>
@@ -32,11 +62,19 @@ vielen Dank für Ihren Auftrag. Im Folgenden finden sie die Liste der gelieferte
 		<name language="en">Finish text</name>
 		<name language="de">Schlusstext</name>
 		<content language="en"><![CDATA[
-Your <b>JFire</b> team.  
+<br/>
+<br/>
+Yours sincerely,
+<br/>
+<?=row["DisplayName"]?>  
 ]]>
 		</content>
 		<content language="de"><![CDATA[
-Ihr <b>JFire</b>-Team.  
+<br/>
+<br/>
+Mit freundlichen Grüßen,
+<br/>
+<?=row["DisplayName"]?> 
 ]]>
 		</content>
 	</reportTextPart>

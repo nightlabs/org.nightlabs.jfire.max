@@ -58,6 +58,25 @@ vielen Dank für Ihren Auftrag! Im Folgenden finden Sie die Liste Ihrer gekaufte
 <br/>
 ]]>
 		</content>
+		<content language="th"><![CDATA[
+<? 
+var salutationText = "เรียนท่านลูกค้า";
+if (row["Name"] != "") {
+	var title = row["Title"];
+	// In the English language, the academic/official title replaces the social title.
+	if (title == "")
+		salutationText = "เรียน " + row["Salutation_Text"] + " " + row["Name"];
+	else
+		salutationText = "เรียน " + title + " " + row["Name"];
+}
+?>
+
+<?=salutationText?>,
+<br/><br/>
+ขอบคุณที่สั่งสินค้าเรา! ท่านได้ซื้อสินค้าดังต่อไปนี้:
+<br/>
+]]>
+		</content>
 	</reportTextPart>
 	<reportTextPart id="finish" type="jshtml">
 		<name language="en">Finish text</name>

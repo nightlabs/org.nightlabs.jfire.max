@@ -104,7 +104,7 @@ implements Serializable
 	 * @jdo.column length="100"
 	 */
 	@PrimaryKey
-	@Column(length=100)
+//	@Column(length=100)
 	private String configKey;
 
 	/**

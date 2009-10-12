@@ -5,6 +5,19 @@
 		xsi:schemaLocation="urn:jfire.org:jfire-security_1_0 https://www.jfire.org/schema/jfire-security_1_0.xsd "
 >
 <!-- BEGIN accounting -->
+
+    <role-group id="org.nightlabs.jfire.accounting.editCurrency">
+		<name>Edit currencies</name>
+		<name language="de">Währungen bearbeiten</name>
+		<description>
+			Edit currency symbol and decimal digit count
+		</description>
+		<description language="de">
+			Editieren von Währungen (Symbol und Dezimalstellenanzahl).
+		</description>
+		<role id="org.nightlabs.jfire.accounting.editCurrency" />
+	</role-group>
+	
 	<role-group id="org.nightlabs.jfire.accounting.editTariffMapping">
 		<name>Edit tariff mappings</name>
 		<name language="de">Tarif-Mappings editieren</name>

@@ -2109,7 +2109,7 @@ implements AccountingManagerRemote, AccountingManagerLocal
 		}
 	}
 
-	@RolesAllowed("_Guest_") // TODO we need a new role for this purpose!
+	@RolesAllowed("org.nightlabs.jfire.accounting.editCurrency")
 	@Override
 	public Currency storeCurrency(Currency currency, boolean get,String[] fetchGroups, int maxFetchDepth) {
 		PersistenceManager pm = createPersistenceManager();

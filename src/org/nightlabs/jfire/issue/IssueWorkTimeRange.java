@@ -6,32 +6,31 @@ import java.util.Date;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.Queries;
+import javax.jdo.annotations.Query;
 
 import org.nightlabs.jfire.idgenerator.IDGenerator;
+import org.nightlabs.jfire.issue.id.IssueWorkTimeRangeID;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.util.NLLocale;
 import org.nightlabs.util.Util;
 
-import javax.jdo.annotations.Persistent;
-import javax.jdo.annotations.FetchGroups;
-import javax.jdo.annotations.InheritanceStrategy;
-import javax.jdo.annotations.Inheritance;
-import javax.jdo.annotations.Queries;
-import javax.jdo.annotations.PrimaryKey;
-import javax.jdo.annotations.FetchGroup;
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.Column;
-import javax.jdo.annotations.Query;
-import org.nightlabs.jfire.issue.id.IssueWorkTimeRangeID;
-import javax.jdo.annotations.IdentityType;
-import javax.jdo.annotations.PersistenceModifier;
-
 /**
- * The {@link IssueWorkTimeRange} class represents a range of working time of each {@link Issue}s. 
+ * The {@link IssueWorkTimeRange} class represents a range of working time of each {@link Issue}s.
  * <p>
  * </p>
- * 
+ *
  * @author Chairat Kongarayawetchakun <!-- chairat [AT] nightlabs [DOT] de -->
  *
  * @jdo.persistence-capable
@@ -49,7 +48,7 @@ import javax.jdo.annotations.PersistenceModifier;
  * @jdo.fetch-group name="IssueWorkTimeRange.user" fields="user"
  * @jdo.fetch-group name="IssueWorkTimeRange.from" fields="from"
  * @jdo.fetch-group name="IssueWorkTimeRange.to" fields="to"
- * 
+ *
  * @jdo.query
  *		name="getIssueWorkTimeRangeByUserAndIssueID"
  *		query="SELECT
@@ -82,7 +81,7 @@ import javax.jdo.annotations.PersistenceModifier;
 )
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class IssueWorkTimeRange
-implements Serializable, Comparable<IssueWorkTimeRange> 
+implements Serializable, Comparable<IssueWorkTimeRange>
 {
 	private static final long serialVersionUID = 1L;
 //	private static final Logger logger = Logger.getLogger(IssueWorkTimeRange.class);
@@ -91,14 +90,14 @@ implements Serializable, Comparable<IssueWorkTimeRange>
 	public static final String FETCH_GROUP_USER = "IssueWorkTimeRange.user";
 	public static final String FETCH_GROUP_FROM = "IssueWorkTimeRange.from";
 	public static final String FETCH_GROUP_TO = "IssueWorkTimeRange.to";
-	
+
 	public static final String QUERY_ISSUE_WORK_TIME_RANGE_BY_USER_AND_ISSUE_ID = "getIssueWorkTimeRangeByUserAndIssueID";
-	
+
 	/**
 	 * This is the organisationID to which the issue work time range belongs. Within one organisation,
 	 * all the issue work time ranges have their organisation's ID stored here, thus it's the same
 	 * value for all of them.
-	 * 
+	 *
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
@@ -129,21 +128,21 @@ implements Serializable, Comparable<IssueWorkTimeRange>
 	 */
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Date from;
-	
+
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Date to;
-	
+
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private long duration;
-	
+
 	/**
-	 * @jdo.field 
+	 * @jdo.field
 	 * 		persistence-modifier="persistent"
 	 * 		load-fetch-group="all"
 	 */
@@ -153,28 +152,28 @@ implements Serializable, Comparable<IssueWorkTimeRange>
 	private User user;
 
 	/**
-	 * @deprecated Constructor exists only for JDO! 
+	 * @deprecated Constructor exists only for JDO!
 	 */
 	@Deprecated
 	protected IssueWorkTimeRange() { }
 
 	/**
-	 * 
+	 *
 	 * @param organisationID the first part of the composite primary key - referencing the organisation which owns this <code>IssueWorkTimeRange</code>
 	 * @param issueWorkTimeRangeID the second part of the composite primary key. Use {@link IDGenerator#nextID(Class)} with <code>IssueWorkTimeRange.class</code> to create an id
 	 * @param user the user who takes this issue
-	 * @param issue the issue 
+	 * @param issue the issue
 	 */
 	public IssueWorkTimeRange(String organisationID, long issueWorkTimeRangeID, User user, Issue issue)
 	{
 		Organisation.assertValidOrganisationID(organisationID);
-		
+
 		if (issue == null)
 			throw new IllegalArgumentException("issue must not be null!");
-		
+
 		if (user == null)
 			throw new IllegalArgumentException("user must not be null!");
-		
+
 		this.organisationID = organisationID;
 		this.issueWorkTimeRangeID = issueWorkTimeRangeID;
 		this.issue = issue;
@@ -189,6 +188,13 @@ implements Serializable, Comparable<IssueWorkTimeRange>
 	}
 
 	/**
+	 *
+	 * @return long
+	 */
+	public long getIssueWorkTimeRangeID() {
+		return issueWorkTimeRangeID;
+	}
+	/**
 	 * @return Returns the issueID.
 	 */
 	public long getIssueID() {
@@ -196,7 +202,7 @@ implements Serializable, Comparable<IssueWorkTimeRange>
 	}
 
 	/**
-	 * 
+	 *
 	 * @return
 	 */
 	public Issue getIssue(){
@@ -204,56 +210,56 @@ implements Serializable, Comparable<IssueWorkTimeRange>
 	}
 
 	/**
-	 * 
+	 *
 	 * @return
 	 */
 	public Date getFrom() {
 		return from;
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @return
 	 */
 	public Date getTo() {
 		return to;
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @return
 	 */
 	public long getDuration() {
 		return duration;
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @return
 	 */
 	public User getUser() {
 		return user;
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @param from
 	 */
 	public void setFrom(Date from) {
 		this.from = from;
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @param to
 	 */
 	public void setTo(Date to) {
 		this.to = to;
 		this.duration = to.getTime() - from.getTime();
 	}
-	
+
 	/**
-	 * 
+	 *
 	 */
 	public void setDuration(long duration) {
 		if (to == null) {
@@ -263,10 +269,10 @@ implements Serializable, Comparable<IssueWorkTimeRange>
 		}
 		this.duration = duration;
 	}
-	
+
 	/**
 	 * Internal method.
-	 * @return The PersistenceManager associated with this object. 
+	 * @return The PersistenceManager associated with this object.
 	 */
 	protected PersistenceManager getPersistenceManager() {
 		PersistenceManager issueWorkTimeRangePM = JDOHelper.getPersistenceManager(this);
@@ -274,11 +280,11 @@ implements Serializable, Comparable<IssueWorkTimeRange>
 			throw new IllegalStateException("This instance of " + this.getClass().getName() + " is not persistent, can not get a PersistenceManager!");
 
 		return issueWorkTimeRangePM;
-	}	
-	
+	}
+
 	@Override
 	/*
-	 * 
+	 *
 	 */
 	public boolean equals(Object obj)
 	{
@@ -286,18 +292,18 @@ implements Serializable, Comparable<IssueWorkTimeRange>
 		if (!(obj instanceof IssueWorkTimeRange)) return false;
 		IssueWorkTimeRange o = (IssueWorkTimeRange) obj;
 		return
-			Util.equals(this.organisationID, o.organisationID) && 
+			Util.equals(this.organisationID, o.organisationID) &&
 			Util.equals(this.issueID, o.issueID) &&
 			Util.equals(this.issueWorkTimeRangeID, o.issueWorkTimeRangeID);
 	}
 
 	@Override
 	/*
-	 * 
+	 *
 	 */
 	public int hashCode()
 	{
-		return 
+		return
 			(31 * Util.hashCode(organisationID)) +
 			Util.hashCode(issueID) ^
 			Util.hashCode(issueWorkTimeRangeID);

@@ -5,11 +5,12 @@ import java.util.Collection;
 import java.util.Set;
 
 import javax.jdo.JDODetachedFieldAccessException;
+import javax.jdo.JDOHelper;
 
-import org.nightlabs.jdo.ObjectIDUtil;
+import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jfire.issue.Issue;
 import org.nightlabs.jfire.issue.IssueLink;
-import org.nightlabs.jfire.person.Person;
+import org.nightlabs.jfire.issue.IssueLinkType;
 import org.nightlabs.jfire.security.User;
 
 /**
@@ -18,7 +19,7 @@ import org.nightlabs.jfire.security.User;
  *
  * @author Khaireel Mohamed - khaireel at nightlabs dot de
  */
-public class IssueLinkHistoryItemFactory extends IssueHistoryItemFactory {
+public /*abstract */class IssueLinkHistoryItemFactory extends IssueHistoryItemFactory {
 	/* (non-Javadoc)
 	 * @see org.nightlabs.jfire.issue.history.IssueHistoryItemFactory#createIssueHistoryItems(org.nightlabs.jfire.security.User, org.nightlabs.jfire.issue.Issue, org.nightlabs.jfire.issue.Issue)
 	 */
@@ -42,18 +43,23 @@ public class IssueLinkHistoryItemFactory extends IssueHistoryItemFactory {
 
 		// (i) Check for newly created IssueLinks.
 		Collection<IssueLink> addedIssueLinks = new ArrayList<IssueLink>();
-		if (oldIssueLinks.isEmpty()) addedIssueLinks.addAll(newIssueLinks);
-		else
+		if (oldIssueLinks.isEmpty()) {
+			addedIssueLinks.addAll(newIssueLinks);
+		}
+		else {
 			for (IssueLink issueLink : newIssueLinks)
 				if (!oldIssueLinks.contains(issueLink)) addedIssueLinks.add(issueLink);
-
+		}
 		// (ii) Check for recently severed IssueLinks.
 		Collection<IssueLink> removedIssueLinks = new ArrayList<IssueLink>();
-		if (newIssueLinks.isEmpty()) removedIssueLinks.addAll(oldIssueLinks);
-		else
+		if (newIssueLinks.isEmpty()) {
+			removedIssueLinks.addAll(oldIssueLinks);
+		}
+		else {
 			for (IssueLink issueLink : oldIssueLinks)
-				if (!newIssueLinks.contains(issueLink)) removedIssueLinks.add(issueLink);
-
+				if (!newIssueLinks.contains(issueLink))
+					removedIssueLinks.add(issueLink);
+		}
 
 		// (iii) Collate them all, and generate the necessary IssueHistoryItem.
 		Collection<IssueHistoryItem> issueLinkHistoryItems = new ArrayList<IssueHistoryItem>();
@@ -63,13 +69,24 @@ public class IssueLinkHistoryItemFactory extends IssueHistoryItemFactory {
 			// Generate the IssueHistoryItem for the forward link.
 			Object linkedObject = getPersistenceManager().getObjectById( issueLink.getLinkedObjectID() );
 			Class<?> linkedObjectClass = linkedObject.getClass();
-			issueLinkHistoryItems.add( new IssueLinkHistoryItem(
+			IssueLinkHistoryItem item = createIssueLinkHistoryItem(
 					user, oldPersistentIssue,
 					issueLink.getIssueLinkType(), 	// <-- The relationship between the Issue and the linkedObject.
 					IssueHistoryItemAction.ADDED,
-					linkedObjectClass.getSimpleName(),
-					getReadableLinkedObjectID(linkedObject, issueLink) // <-- Reconsider this approach, please. Kai.
-			));
+					linkedObjectClass,
+					(ObjectID)JDOHelper.getObjectId(linkedObject)
+			);
+			if (item != null)
+				issueLinkHistoryItems.add(item);
+//			issueLinkHistoryItems.add( new IssueLinkHistoryItem(
+//					user, oldPersistentIssue,
+//					issueLink.getIssueLinkType(), 	// <-- The relationship between the Issue and the linkedObject.
+//					IssueHistoryItemAction.ADDED,
+//					linkedObjectClass,
+//					(ObjectID)JDOHelper.getObjectId(linkedObject)
+////					,
+////					getReadableLinkedObjectID(linkedObject, issueLink) // <-- Reconsider this approach, please. Kai.
+//			));
 
 			// [Additional behaviour] :: The reverse-symmetric link for Issue-to-Issue.
 			// --> Note: This is done through the method 'postCreateIssueLink(...)' in IssueLinkTypeIssueToIssue.
@@ -80,81 +97,102 @@ public class IssueLinkHistoryItemFactory extends IssueHistoryItemFactory {
 			// [Default behaviour]
 			Object linkedObject = getPersistenceManager().getObjectById( issueLink.getLinkedObjectID() );
 			Class<?> linkedObjectClass = linkedObject.getClass();
-			issueLinkHistoryItems.add( new IssueLinkHistoryItem(
+			IssueLinkHistoryItem item = createIssueLinkHistoryItem(
 					user, oldPersistentIssue,
 					issueLink.getIssueLinkType(),
 					IssueHistoryItemAction.REMOVED,
-					linkedObjectClass.getSimpleName(),
-					getReadableLinkedObjectID(linkedObject, issueLink) // <-- Reconsider this approach, please. Kai.
-			));
+					linkedObjectClass,
+					(ObjectID)JDOHelper.getObjectId(linkedObject)
+			);
+			if (item != null)
+				issueLinkHistoryItems.add(item);
+
+//			issueLinkHistoryItems.add( new IssueLinkHistoryItem(
+//					user, oldPersistentIssue,
+//					issueLink.getIssueLinkType(),
+//					IssueHistoryItemAction.REMOVED,
+//					linkedObjectClass,
+//					(ObjectID)JDOHelper.getObjectId(linkedObject)
+////					,
+////					getReadableLinkedObjectID(linkedObject, issueLink) // <-- Reconsider this approach, please. Kai.
+//			));
 
 			// [Additional behaviour] :: The reverse-symmetric link for Issue-to-Issue.
 			// --> Note: This is done through the method 'postCreateIssueLink(...)' in IssueLinkTypeIssueToIssue.
 		}
 
-
 		return issueLinkHistoryItems;
 	}
 
-
-	/**
-	 * Specific text to return to indicate the identity of the linked object
-	 * for human-readable display on the IssueHistoryLinks.
-	 * TODO Finish this properly; consider the following:
-	 *        1. Person -- Person [OK]
-	 *        2. Trade -- Order [OK]
-	 *        3. Trace -- Offer [OK]
-	 *        4. Issue -- Issue [OK]
-	 *        5. Accounting -- Invoice
-	 *        6. Store -- Delivery Note
-	 *        7. Store -- Reception Note
-	 */
-	protected String getReadableLinkedObjectID(Object linkedObject, IssueLink issueLink) {
-		if ( linkedObject instanceof Person )
-			return ((Person)linkedObject).getDisplayName();
-
-		if ( linkedObject instanceof Issue ) {
-			Issue issue = (Issue)linkedObject;
-			return ObjectIDUtil.longObjectIDFieldToString(issue.getIssueID()) + " "
-			+ issue.getSubject().getText();	// <-- Not good. Think of an alternative, please. Kai.
-		}
-
-		// FIXME commented the following lines as a dependency on trade is not acceptable here.
-		// Think of another way doing this. Marc
-		// -- Not exactly the best of methods, but this should do for now while I think of something better. Kai
-
-		//if ( linkedObject instanceof Order )
-		//	return ((Order)linkedObject).getPrimaryKey();
-
-		//if ( linkedObject instanceof Offer )
-		//	return ((Offer)linkedObject).getPrimaryKey();
-
-		// Note: (From current standards)
-		// 1. objClassName: Offer (jdo/org.nightlabs.jfire.trade.id.OfferID?organisationID=chezfrancois.jfire.org&offerIDPrefix=2009&offerID=2)
-		// 2. objClassName: Order (jdo/org.nightlabs.jfire.trade.id.OrderID?organisationID=chezfrancois.jfire.org&orderIDPrefix=2009&orderID=8)
-		// 3. objClassName: Invoice (jdo/org.nightlabs.jfire.accounting.id.InvoiceID?organisationID=chezfrancois.jfire.org&invoiceIDPrefix=2009&invoiceID=3)
-		// 4. objClassName: DeliveryNote (jdo/org.nightlabs.jfire.store.id.DeliveryNoteID?organisationID=chezfrancois.jfire.org&deliveryNoteIDPrefix=2009&deliveryNoteID=5)
-		String objClassName = linkedObject.getClass().getSimpleName();
-		String[] objIDInfos = issueLink.getLinkedObjectID().toString().split("&");
-		if (objClassName.equals("Offer") || objClassName.equals("Order") || objClassName.equals("Invoice") || objClassName.equals("DeliveryNote")) {
-			String objClassNameLC = objClassName.substring(1); //objClassName.toLowerCase();
-			StringBuffer displayName = new StringBuffer();
-			for (String objIDInfo : objIDInfos) {
-				if (objIDInfo.contains(objClassNameLC + "IDPrefix=")) {
-					String[] idPrefix = objIDInfo.split("=");
-					displayName.append(idPrefix[1]);
-				}
-
-				if (objIDInfo.contains(objClassNameLC + "ID=")) {
-					String[] idNum = objIDInfo.split("=");
-					displayName.append("/" + idNum[1]);
-				}
-			}
-
-			return displayName.toString();
-		}
-
-		return issueLink.getLinkedObjectID().toString();
+	protected /*abstract*/ IssueLinkHistoryItem createIssueLinkHistoryItem(User user,
+			Issue issue,
+			IssueLinkType issueLinkType,
+			IssueHistoryItemAction issueHistoryItemAction,
+			Class<?> linkedObjectClass,
+			ObjectID linkedObjectID)
+	{
+		return new IssueLinkHistoryItem(user, issue, issueLinkType, issueHistoryItemAction, linkedObjectClass, linkedObjectID);
 	}
+//	);
+
+//	/**
+//	 * Specific text to return to indicate the identity of the linked object
+//	 * for human-readable display on the IssueHistoryLinks.
+//	 * TODO Finish this properly; consider the following:
+//	 *        1. Person -- Person [OK]
+//	 *        2. Trade -- Order [OK]
+//	 *        3. Trade -- Offer [OK]
+//	 *        4. Issue -- Issue [OK]
+//	 *        5. Accounting -- Invoice
+//	 *        6. Store -- Delivery Note
+//	 *        7. Store -- Reception Note
+//	 */
+//	protected String getReadableLinkedObjectID(Object linkedObject, IssueLink issueLink) {
+//		if ( linkedObject instanceof Person )
+//			return ((Person)linkedObject).getDisplayName();
+//
+//		if ( linkedObject instanceof Issue ) {
+//			Issue issue = (Issue)linkedObject;
+//			return ObjectIDUtil.longObjectIDFieldToString(issue.getIssueID()) + " "
+//			+ issue.getSubject().getText();	// <-- Not good. Think of an alternative, please. Kai.
+//		}
+//
+//		// FIXME commented the following lines as a dependency on trade is not acceptable here.
+//		// Think of another way doing this. Marc
+//		// -- Not exactly the best of methods, but this should do for now while I think of something better. Kai
+//
+//		//if ( linkedObject instanceof Order )
+//		//	return ((Order)linkedObject).getPrimaryKey();
+//
+//		//if ( linkedObject instanceof Offer )
+//		//	return ((Offer)linkedObject).getPrimaryKey();
+//
+//		// Note: (From current standards)
+//		// 1. objClassName: Offer (jdo/org.nightlabs.jfire.trade.id.OfferID?organisationID=chezfrancois.jfire.org&offerIDPrefix=2009&offerID=2)
+//		// 2. objClassName: Order (jdo/org.nightlabs.jfire.trade.id.OrderID?organisationID=chezfrancois.jfire.org&orderIDPrefix=2009&orderID=8)
+//		// 3. objClassName: Invoice (jdo/org.nightlabs.jfire.accounting.id.InvoiceID?organisationID=chezfrancois.jfire.org&invoiceIDPrefix=2009&invoiceID=3)
+//		// 4. objClassName: DeliveryNote (jdo/org.nightlabs.jfire.store.id.DeliveryNoteID?organisationID=chezfrancois.jfire.org&deliveryNoteIDPrefix=2009&deliveryNoteID=5)
+//		String objClassName = linkedObject.getClass().getSimpleName();
+//		String[] objIDInfos = issueLink.getLinkedObjectID().toString().split("&");
+//		if (objClassName.equals("Offer") || objClassName.equals("Order") || objClassName.equals("Invoice") || objClassName.equals("DeliveryNote")) {
+//			String objClassNameLC = objClassName.substring(1); //objClassName.toLowerCase();
+//			StringBuffer displayName = new StringBuffer();
+//			for (String objIDInfo : objIDInfos) {
+//				if (objIDInfo.contains(objClassNameLC + "IDPrefix=")) {
+//					String[] idPrefix = objIDInfo.split("=");
+//					displayName.append(idPrefix[1]);
+//				}
+//
+//				if (objIDInfo.contains(objClassNameLC + "ID=")) {
+//					String[] idNum = objIDInfo.split("=");
+//					displayName.append("/" + idNum[1]);
+//				}
+//			}
+//
+//			return displayName.toString();
+//		}
+//
+//		return issueLink.getLinkedObjectID().toString();
+//	}
 
 }

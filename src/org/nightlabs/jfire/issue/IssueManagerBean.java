@@ -668,13 +668,6 @@ implements IssueManagerRemote
 				Collection<IssueHistoryItem> issueHistoryItems = IssueHistoryItemFactory.createIssueHistoryItems(pm, user, oldPersistentIssue, issue); // <-- Seems OK and holding.
 				storeIssueHistoryItems(issueHistoryItems, false, new String[]{FetchPlan.DEFAULT}, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
 
-
-//				// --[ On Timestamp ]-------------------------------------------------------------------------------------------|
-//				if (issue.getCreateTimestamp() != null)   }
-//					issue.setUpdateTimestamp(new Date()); } <-- Why are these lines repeated?
-
-
-
 				// --[ On Assignees ]-------------------------------------------------------------------------------------------|
 				boolean doUnassign = false;
 				if (oldPersistentIssue != null) {

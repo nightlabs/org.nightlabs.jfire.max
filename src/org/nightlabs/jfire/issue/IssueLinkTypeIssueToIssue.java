@@ -9,6 +9,7 @@ import javax.jdo.annotations.InheritanceStrategy;
 import javax.jdo.annotations.PersistenceCapable;
 
 import org.nightlabs.jdo.NLJDOHelper;
+import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jfire.issue.history.FetchGroupsIssueHistoryItem;
 import org.nightlabs.jfire.issue.history.IssueHistoryItemAction;
 import org.nightlabs.jfire.issue.history.IssueLinkHistoryItem;
@@ -144,8 +145,8 @@ public class IssueLinkTypeIssueToIssue extends IssueLinkType {
 		final IssueLinkHistoryItem ilhItemOtherSide = new IssueLinkHistoryItem(
 				user, issue_B, issueLinkType_B,
 				IssueHistoryItemAction.ADDED,
-				Issue.class.getName(),
-				issue_A.getIssueIDAsString()
+				Issue.class,
+				(ObjectID)JDOHelper.getObjectId(issue_A)
 		);
 
 		// Assuming here that the PersistenceManager is still open && valid.
@@ -217,8 +218,8 @@ public class IssueLinkTypeIssueToIssue extends IssueLinkType {
 			final IssueLinkHistoryItem ilhItemOtherSide = new IssueLinkHistoryItem(
 					user, issue_B, issueLinkType_B,
 					IssueHistoryItemAction.REMOVED,
-					Issue.class.getName(),
-					issue_A.getIssueIDAsString()
+					Issue.class,
+					(ObjectID)JDOHelper.getObjectId(issue_A)
 			);
 
 			// Assuming here that the PersistenceManager is still open && valid.

@@ -113,6 +113,13 @@ implements Serializable{
 	}
 
 	/**
+	 * @return long
+	 */
+	public long getIssueFileAttachmentID() {
+		return issueFileAttachmentID;
+	}
+
+	/**
 	 * Returns the issue that this attachment is created for.
 	 * @return the issue that this attachment is created for
 	 */

@@ -1545,7 +1545,7 @@ return true;]]></method>
                             <text-data id="387">
                                 <property name="style">HeaderText</property>
                                 <property name="paddingTop">1pt</property>
-                                <expression name="valueExpr">importClass(Packages.org.nightlabs.jfire.reporting.JFireReportingHelper);
+                                <expression name="valueExpr"><![CDATA[importClass(Packages.org.nightlabs.jfire.reporting.JFireReportingHelper);
 importClass(Packages.org.nightlabs.jfire.security.SecurityReflector);
 importClass(Packages.org.nightlabs.jfire.trade.OrganisationLegalEntity);
 importClass(Packages.org.nightlabs.jfire.person.PersonStruct);
@@ -1554,57 +1554,83 @@ orgLE = OrganisationLegalEntity.getOrganisationLegalEntity(
   SecurityReflector.getUserDescriptor().getOrganisationID()
 );
 orgP = orgLE.getPerson();
-result = "";
+
+result = new Array();
+resultIndex = 0;
+result[resultIndex] = "";
 
 //////// BankAccount Holder
 f = orgP.getPersistentDataFieldByIndex(PersonStruct.BANKDATA_ACCOUNTHOLDER, 0);
-if (f != null &amp;&amp; f.getData() != null &amp;&amp; f.getData() != "") {
-	if (result != "") result += " | ";
-	result += f.getData();
+if (f != null && f.getData() != null && f.getData() != "") {
+	if (result[resultIndex] != "") result[resultIndex] += " | ";
+	result[resultIndex] += f.getData();
 }
 
 //////// Trade register number
 f = orgP.getPersistentDataFieldByIndex(PersonStruct.GOVERNMENTALDATA_TRADEREGISTERNUMBER, 0);
-if (f != null &amp;&amp; f.getData() != null &amp;&amp; f.getData() != "") {
-	if (result != "") result += " | ";
-	result += getLocalizedMessage("footer.tradeRegisterNumber") + f.getData();
+if (f != null && f.getData() != null && f.getData() != "") {
+	if (result[resultIndex] != "") result[resultIndex] += " | ";
+	result[resultIndex] += getLocalizedMessage("footer.tradeRegisterNumber") + f.getData();
 }
 
 //////// Trade register name
 f = orgP.getPersistentDataFieldByIndex(PersonStruct.GOVERNMENTALDATA_TRADEREGISTERNAME, 0);
-if (f != null &amp;&amp; f.getData() != null &amp;&amp; f.getData() != "") {
-	if (result != "") result += " | ";
-	result += getLocalizedMessage("footer.tradeRegisterName") + f.getData();
+if (f != null && f.getData() != null && f.getData() != "") {
+	if (result[resultIndex] != "") result[resultIndex] += " | ";
+	result[resultIndex] += getLocalizedMessage("footer.tradeRegisterName") + f.getData();
 }
 
 //////// VAT number
 f = orgP.getPersistentDataFieldByIndex(PersonStruct.GOVERNMENTALDATA_VATIN, 0);
-if (f != null &amp;&amp; f.getData() != null &amp;&amp; f.getData() != "") {
-	if (result != "") result += " | ";
-	result += getLocalizedMessage("footer.vatNumber") + f.getData();
+if (f != null && f.getData() != null && f.getData() != "") {
+	if (result[resultIndex] != "") result[resultIndex] += " | ";
+	result[resultIndex] += getLocalizedMessage("footer.vatNumber") + f.getData();
 }
+
+
+// new line
+++resultIndex; result[resultIndex] = "";
 
 //////// BankAccount AccountNumber
 f = orgP.getPersistentDataFieldByIndex(PersonStruct.BANKDATA_ACCOUNTNUMBER, 0);
-if (f != null &amp;&amp; f.getData() != null &amp;&amp; f.getData() != "") {
-	if (result != "") result += "&lt;br/>";
-	result += getLocalizedMessage("footer.accountNumber") + f.getData();
+if (f != null && f.getData() != null && f.getData() != "") {
+	if (result[resultIndex] != "") result[resultIndex] += " | ";
+	result[resultIndex] += getLocalizedMessage("footer.accountNumber") + f.getData();
 }
 
 f = orgP.getPersistentDataFieldByIndex(PersonStruct.BANKDATA_BANKCODE, 0);
-if (f != null &amp;&amp; f.getData() != null &amp;&amp; f.getData() != "") {
-	if (result != "") result += " | ";
-	result += getLocalizedMessage("footer.bankCode") + f.getData();
+if (f != null && f.getData() != null && f.getData() != "") {
+	if (result[resultIndex] != "") result[resultIndex] += " | ";
+	result[resultIndex] += getLocalizedMessage("footer.bankCode") + f.getData();
+}
+
+f = orgP.getPersistentDataFieldByIndex(PersonStruct.BANKDATA_IBAN, 0);
+if (f != null && f.getData() != null && f.getData() != "") {
+	if (result[resultIndex] != "") result[resultIndex] += " | ";
+	result[resultIndex] += getLocalizedMessage("footer.accountIBAN") + f.getData();
+}
+
+f = orgP.getPersistentDataFieldByIndex(PersonStruct.BANKDATA_BIC, 0);
+if (f != null && f.getData() != null && f.getData() != "") {
+	if (result[resultIndex] != "") result[resultIndex] += " | ";
+	result[resultIndex] += getLocalizedMessage("footer.accountBIC") + f.getData();
 }
 
 f = orgP.getPersistentDataFieldByIndex(PersonStruct.BANKDATA_BANKNAME, 0);
-if (f != null &amp;&amp; f.getData() != null &amp;&amp; f.getData() != "") {
-	if (result != "") result += " | ";
-	result += getLocalizedMessage("footer.bankName") + f.getData();
+if (f != null && f.getData() != null && f.getData() != "") {
+	if (result[resultIndex] != "") result[resultIndex] += " | ";
+	result[resultIndex] += getLocalizedMessage("footer.bankName") + f.getData();
 }
 
+resultAll = "";
 
-result;</expression>
+for (i = 0; i < result.length; ++i) {
+	if (result[i] != "") {
+		if (i > 0) resultAll += "<br/>";
+		resultAll += result[i];
+	}
+}
+resultAll;]]></expression>
                                 <property name="contentType">html</property>
                             </text-data>
                         </cell>

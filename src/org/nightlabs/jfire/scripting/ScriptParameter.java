@@ -207,7 +207,10 @@ public class ScriptParameter
 		if (this == obj)
 			return true;
 
-		if (obj instanceof ScriptParameter)
+		if (obj == null)
+			return false;
+
+		if (obj.getClass() != this.getClass())
 			return false;
 
 		ScriptParameter other = (ScriptParameter) obj;

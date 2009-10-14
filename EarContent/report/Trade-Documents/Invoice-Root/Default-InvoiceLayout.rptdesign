@@ -2967,6 +2967,14 @@ JFireReportingHelper.createDataSetParam(params["articleContainerID"])</expressio
                                     <property name="dataType">string</property>
                                 </structure>
                                 <structure>
+                                    <property name="name">DynamicProductType_Type_Name</property>
+                                    <expression name="expression">if (isDynamicProduct(row["productJDOID"]))  {
+  product = JFireReportingHelper.getJDOObject(row["productJDOID"]);
+  product.getProductType().getName().getText();
+}</expression>
+                                    <property name="dataType">string</property>
+                                </structure>
+                                <structure>
                                     <property name="name">Init_pftCurrency2Sum</property>
                                     <expression name="expression">if (JFireReportingHelper.getVar("priceFragmentType2currency2sum") == null) {
   JFireReportingHelper.getVars().put(
@@ -3256,6 +3264,10 @@ result</expression>
                                     <cell id="195">
                                         <property name="paddingTop">0.25em</property>
                                         <property name="paddingBottom">0.5em</property>
+                                        <data id="453">
+                                            <property name="style">TableContent</property>
+                                            <property name="resultSetColumn">DynamicProductType_Type_Name</property>
+                                        </data>
                                         <data id="316">
                                             <property name="style">TableContent</property>
                                             <property name="resultSetColumn">DynamicProductType_Name</property>

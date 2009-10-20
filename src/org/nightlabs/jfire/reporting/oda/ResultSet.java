@@ -230,7 +230,7 @@ public abstract class ResultSet implements IResultSet, Serializable {
 	 */
 	public Date getDate(int index) throws OdaException {
 		java.util.Date date = checkColObject(index, java.util.Date.class);
-		return new Date(date != null ? date.getTime() : 0);
+		return date != null ? new Date(date.getTime()) : null;
 	}
 
 	/* (non-Javadoc)

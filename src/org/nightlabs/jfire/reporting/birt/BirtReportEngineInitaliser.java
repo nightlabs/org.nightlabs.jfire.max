@@ -1,5 +1,8 @@
 package org.nightlabs.jfire.reporting.birt;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.eclipse.birt.core.exception.BirtException;
 import org.eclipse.birt.core.framework.Platform;
 import org.eclipse.birt.report.engine.api.EngineConfig;
@@ -86,6 +89,14 @@ implements IReportEngineInitaliser
 			ReportEngine reportEngine = new ReportEngine(config);
 			reportEngine.getConfig().setResourceLocator(new ServerResourceLocator());
 
+			// setup XLS emitter configuration
+            Map<String, Object> xlsConfig = new HashMap<String, Object>();
+            // Check out constants in XlsEmitterConfig.java for more configuration detail.
+//            xlsConfig.put( "fixed_column_width", new Integer( 50 ) ); //$NON-NLS-1$
+            xlsConfig.put( "export_single_page", Boolean.TRUE ); //$NON-NLS-1$
+            // Associate the configuration with the XLS output format.
+            config.setEmitterConfiguration("xls", xlsConfig );
+			
 			return reportEngine;
 		} finally {
 			Thread.currentThread().setContextClassLoader(originalContextClassLoader);

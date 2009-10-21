@@ -37,7 +37,7 @@ public class Birt {
 	
 
 	public static enum OutputFormat {
-		html, pdf
+		html, pdf, xls
 		// , xls, ppt
 	}
 	

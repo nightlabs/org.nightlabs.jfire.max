@@ -182,6 +182,8 @@ public interface IssueManagerRemote {
 
 	void initialise() throws Exception;
 
+	void convertIssueLinkHistoryItemLinkedObjectID();
+
 	List<IssueCommentID> getIssueCommentIDs(IssueID issueID);
 
 	List<IssueCommentID> getIssueCommentIDsOfIssueOfIssueLink(IssueLinkID issueLinkID);

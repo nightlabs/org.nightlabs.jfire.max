@@ -89,8 +89,6 @@ public abstract class IssueHistoryItem implements Serializable {
 	@PrimaryKey
 	private long issueHistoryItemID;
 
-
-
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private User user;
 
@@ -99,8 +97,6 @@ public abstract class IssueHistoryItem implements Serializable {
 
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Date createTimestamp;
-
-
 
 	/**
 	 * @deprecated Constructor exists only for JDO!
@@ -199,12 +195,6 @@ public abstract class IssueHistoryItem implements Serializable {
 		Collection<IssueHistoryItem> c = (Collection<IssueHistoryItem>)q.executeWithMap(params);
 		return c;
 	}
-
-
-
-
-
-
 
 	// -------------------------------------------------------------------------------------------------------------------------|
 	/**

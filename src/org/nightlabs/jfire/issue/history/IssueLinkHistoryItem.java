@@ -92,7 +92,6 @@ public class IssueLinkHistoryItem extends IssueHistoryItem
 		// ------ KaiExperiments ----- >8 -------------------------------
 	}
 
-
 	// ---[ Abstract methods defined ]----------------------------------------------------------------------|
 	/* (non-Javadoc)
 	 * @see org.nightlabs.jfire.issue.history.IssueHistoryItem#getDescription()
@@ -197,4 +196,7 @@ public class IssueLinkHistoryItem extends IssueHistoryItem
 		return linkedObjectID;
 	}
 
+	public void setLinkedObjectID(String linkedObjectID) {
+		this.linkedObjectID = linkedObjectID;
+	}
 }

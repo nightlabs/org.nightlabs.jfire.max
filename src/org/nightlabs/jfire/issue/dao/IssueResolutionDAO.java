@@ -5,9 +5,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import javax.jdo.FetchPlan;
-
-import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.issue.IssueManagerRemote;
@@ -59,8 +56,6 @@ extends BaseJDOObjectDAO<IssueResolutionID, IssueResolution>
 		}
 	}
 
-	private static final String[] FETCH_GROUPS = { IssueResolution.FETCH_GROUP_NAME, FetchPlan.DEFAULT };
-
 	public synchronized IssueResolution getIssueResolution(IssueResolutionID issueResolutionID, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
 		monitor.beginTask("Loading issueResolution "+issueResolutionID.issueResolutionID, 1);
@@ -69,9 +64,9 @@ extends BaseJDOObjectDAO<IssueResolutionID, IssueResolution>
 		return issueResolution;
 	}
 
-	public List<IssueResolution> getIssueResolutions(ProgressMonitor monitor) {
+	public List<IssueResolution> getIssueResolutions(String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) {
 		try {
-			return new ArrayList<IssueResolution>(retrieveJDOObjects(null, FETCH_GROUPS, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT, monitor));
+			return new ArrayList<IssueResolution>(retrieveJDOObjects(null, fetchGroups, maxFetchDepth, monitor));
 		} catch (Exception e) {
 			throw new RuntimeException("Error while fetching issue resolutions: " + e.getMessage(), e); //$NON-NLS-1$
 		}

@@ -172,24 +172,24 @@ public /*abstract */class IssueLinkHistoryItemFactory extends IssueHistoryItemFa
 //		// 2. objClassName: Order (jdo/org.nightlabs.jfire.trade.id.OrderID?organisationID=chezfrancois.jfire.org&orderIDPrefix=2009&orderID=8)
 //		// 3. objClassName: Invoice (jdo/org.nightlabs.jfire.accounting.id.InvoiceID?organisationID=chezfrancois.jfire.org&invoiceIDPrefix=2009&invoiceID=3)
 //		// 4. objClassName: DeliveryNote (jdo/org.nightlabs.jfire.store.id.DeliveryNoteID?organisationID=chezfrancois.jfire.org&deliveryNoteIDPrefix=2009&deliveryNoteID=5)
-//		String objClassName = linkedObject.getClass().getSimpleName();
-//		String[] objIDInfos = issueLink.getLinkedObjectID().toString().split("&");
+//		String objClassName = linkedObject.getClass().getSimpleName(); ===> Offer
+//		String[] objIDInfos = issueLink.getLinkedObjectID().toString().split("&"); {jdo/org.nightlabs.jfire.trade.id.OfferID?organisationID=chezfrancois.jfire.org, offerIDPrefix=2009, offerID=2}
 //		if (objClassName.equals("Offer") || objClassName.equals("Order") || objClassName.equals("Invoice") || objClassName.equals("DeliveryNote")) {
-//			String objClassNameLC = objClassName.substring(1); //objClassName.toLowerCase();
+//			String objClassNameLC = objClassName.substring(1); //objClassName.toLowerCase(); ==> Offer
 //			StringBuffer displayName = new StringBuffer();
 //			for (String objIDInfo : objIDInfos) {
-//				if (objIDInfo.contains(objClassNameLC + "IDPrefix=")) {
-//					String[] idPrefix = objIDInfo.split("=");
-//					displayName.append(idPrefix[1]);
+//				if (objIDInfo.contains(objClassNameLC + "IDPrefix=")) { offerIDPrefix=
+//					String[] idPrefix = objIDInfo.split("="); {offerIDPrefix, 2009}
+//					displayName.append(idPrefix[1]); 2009
 //				}
 //
-//				if (objIDInfo.contains(objClassNameLC + "ID=")) {
+//				if (objIDInfo.contains(objClassNameLC + "ID=")) { offerID=
 //					String[] idNum = objIDInfo.split("=");
 //					displayName.append("/" + idNum[1]);
 //				}
 //			}
 //
-//			return displayName.toString();
+//			return displayName.toString(); 2009
 //		}
 //
 //		return issueLink.getLinkedObjectID().toString();

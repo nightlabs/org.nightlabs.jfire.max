@@ -6,4 +6,5 @@
 		<depends module="JFireBaseEAR.ear"
 			archive="JFireBaseBean.jar" />
 	</init>
+	<init bean="org.nightlabs.jfire.issue.IssueManagerRemote" method="convertIssueLinkHistoryItemLinkedObjectID"/>
 </organisation-initialisation>

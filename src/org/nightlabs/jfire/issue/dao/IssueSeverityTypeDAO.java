@@ -1,9 +1,11 @@
 package org.nightlabs.jfire.issue.dao;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.issue.IssueManagerRemote;
@@ -68,10 +70,19 @@ public class IssueSeverityTypeDAO
 		return getJDOObjects(null, issueSeverityTypeIDs, fetchGroups, maxFetchDepth, monitor);
 	}
 
+	public List<IssueSeverityType> getIssueSeverityTypes(String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
+	{
+		try {
+			return new ArrayList<IssueSeverityType>(retrieveJDOObjects(null, fetchGroups, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT, monitor));
+		} catch (Exception e) {
+			throw new RuntimeException("Error while fetching issue severity type: " + e.getMessage(), e); //$NON-NLS-1$
+		}
+	}
+
 	public IssueSeverityType storeIssueSeverityType(IssueSeverityType issueSeverityType, boolean get, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
 		if(issueSeverityType == null)
-			throw new NullPointerException("Issue to save must not be null");
+			throw new NullPointerException("Issue severity type to save must not be null");
 		monitor.beginTask("Storing issueSeverityType: "+ issueSeverityType.getIssueSeverityTypeID(), 3);
 		try {
 			IssueManagerRemote im = JFireEjb3Factory.getRemoteBean(IssueManagerRemote.class, SecurityReflector.getInitialContextProperties());

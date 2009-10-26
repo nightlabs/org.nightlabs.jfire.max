@@ -82,7 +82,7 @@ extends BaseJDOObjectDAO<IssuePriorityID, IssuePriority>
 	public IssuePriority storeIssuePriority(IssuePriority issuePriority, boolean get, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
 		if (issuePriority == null)
-			throw new NullPointerException("Issue to save must not be null");
+			throw new NullPointerException("Issue Priority to save must not be null");
 		monitor.beginTask("Storing issuePriority: "+ issuePriority.getIssuePriorityID(), 3);
 		try {
 			IssueManagerRemote im = JFireEjb3Factory.getRemoteBean(IssueManagerRemote.class, SecurityReflector.getInitialContextProperties());

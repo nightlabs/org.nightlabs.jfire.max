@@ -45,6 +45,7 @@ import org.nightlabs.jfire.editlock.EditLockType;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.issue.history.IssueHistoryItem;
 import org.nightlabs.jfire.issue.history.IssueHistoryItemFactory;
+import org.nightlabs.jfire.issue.history.IssueLinkHistoryItem;
 import org.nightlabs.jfire.issue.history.id.IssueHistoryItemID;
 import org.nightlabs.jfire.issue.id.IssueCommentID;
 import org.nightlabs.jfire.issue.id.IssueFileAttachmentID;
@@ -69,6 +70,7 @@ import org.nightlabs.jfire.issue.resource.Messages;
 import org.nightlabs.jfire.jbpm.JbpmLookup;
 import org.nightlabs.jfire.person.PersonStruct;
 import org.nightlabs.jfire.prop.datafield.TextDataField;
+import org.nightlabs.jfire.prop.search.PropSearchFilter;
 import org.nightlabs.jfire.query.store.BaseQueryStore;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.security.User;
@@ -949,6 +951,21 @@ implements IssueManagerRemote
 		}
 	}
 
+//	@RolesAllowed("_Guest_")
+//	@Override
+//	public Set<IssueHistoryItemID> getIssueHistoryItemIDs()
+//	{
+//		PersistenceManager pm = createPersistenceManager();
+//		try {
+//			Query q = pm.newQuery(IssueHistoryItem.class);
+//			q.setResult("JDOHelper.getObjectId(this)");
+//
+//			return CollectionUtil.createHashSetFromCollection( q.execute() );
+//		} finally {
+//			pm.close();
+//		}
+//	}
+
 	@RolesAllowed("_Guest_")
 	@Override
 	public List<IssueHistoryItem> getIssueHistoryItems(Collection<IssueHistoryItemID> issueHistoryIDs, String[] fetchGroups, int maxFetchDepth)
@@ -1696,6 +1713,108 @@ implements IssueManagerRemote
 		} finally {
 			pm.close();
 		}
+	}
+
+	// Note: (From current standards)
+	// 1. objClassName: Offer (jdo/org.nightlabs.jfire.trade.id.OfferID?organisationID=chezfrancois.jfire.org&offerIDPrefix=2009&offerID=2)
+	// 2. objClassName: Order (jdo/org.nightlabs.jfire.trade.id.OrderID?organisationID=chezfrancois.jfire.org&orderIDPrefix=2009&orderID=8)
+	// 3. objClassName: Invoice (jdo/org.nightlabs.jfire.accounting.id.InvoiceID?organisationID=chezfrancois.jfire.org&invoiceIDPrefix=2009&invoiceID=3)
+	// 4. objClassName: DeliveryNote (jdo/org.nightlabs.jfire.store.id.DeliveryNoteID?organisationID=chezfrancois.jfire.org&deliveryNoteIDPrefix=2009&deliveryNoteID=5)
+	// 5. objClassName: Issue (jdo/org.nightlabs.jfire.issue.id.IssueID?organisationID=chezfrancois.jfire.org&issueID=1)
+	// 6. objClassName: PropertySet (jdo/org.nightlabs.jfire.prop.id.PropertySetID?organisationID=chezfrancois.jfire.org&propertySetID=1)
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("_System_")
+	@Override
+	public void convertIssueLinkHistoryItemLinkedObjectID() {
+		PersistenceManager pm = createPersistenceManager();
+		try {
+			Query q = pm.newQuery(IssueHistoryItem.class);
+			q.setResult("JDOHelper.getObjectId(this)");
+			Collection<IssueHistoryItemID> issueHistoryItemIDs = (Collection<IssueHistoryItemID>)q.execute();
+			List<IssueHistoryItem> issueHistoryItems =
+				getIssueHistoryItems(issueHistoryItemIDs, new String[] {FetchPlan.DEFAULT}, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
+
+			for (IssueHistoryItem issueHistoryItem : issueHistoryItems) {
+				if (issueHistoryItem instanceof IssueLinkHistoryItem) {
+					IssueLinkHistoryItem issueLinkHistoryItem = (IssueLinkHistoryItem) issueHistoryItem;
+					StringBuilder newLinkedObjectID = new StringBuilder();
+					String linkedObjectID = issueLinkHistoryItem.getLinkedObjectID();
+					if (!linkedObjectID.toLowerCase().startsWith("jdo")) {
+						String className = issueLinkHistoryItem.getLinkedObjectClassName();
+						if (className.equals("Order")) { //---> organisationID + '/' + orderIDPrefix + '/' + ObjectIDUtil.longObjectIDFieldToString(orderID);
+							String[] primaryKeyStrings = linkedObjectID.split("/");
+							String organisationID = primaryKeyStrings[0];
+							String orderIDPrefix = primaryKeyStrings[1];
+							String longObjectIDString = primaryKeyStrings[2];
+							newLinkedObjectID.append("jdo/org.nightlabs.jfire.trade.id.OrderID?");
+							newLinkedObjectID.append("organisationID=").append(organisationID);
+							newLinkedObjectID.append("orderIDPrefix=").append(orderIDPrefix);
+							newLinkedObjectID.append("offerID=").append(longObjectIDString);
+						}
+						else if (className.equals("Offer")) { //---> organisationID + '/' + offerIDPrefix + '/' + ObjectIDUtil.longObjectIDFieldToString(offerID);
+							String[] primaryKeyStrings = linkedObjectID.split("/");
+							String organisationID = primaryKeyStrings[0];
+							String offerIDPrefix = primaryKeyStrings[1];
+							String longObjectIDString = primaryKeyStrings[2];
+							newLinkedObjectID.append("jdo/org.nightlabs.jfire.trade.id.OfferID?");
+							newLinkedObjectID.append("organisationID=").append(organisationID);
+							newLinkedObjectID.append("offerIDPrefix=").append(offerIDPrefix);
+							newLinkedObjectID.append("offerID=").append(longObjectIDString);
+						}
+						else if (className.equals("Invoice")) { //---> organisationID + '/' + invoiceIDPrefix + '/' + ObjectIDUtil.longObjectIDFieldToString(invoiceID);
+							String[] primaryKeyStrings = linkedObjectID.split("/");
+							String organisationID = primaryKeyStrings[0];
+							String invoiceIDPrefix = primaryKeyStrings[1];
+							String longObjectIDString = primaryKeyStrings[2];
+							newLinkedObjectID.append("jdo/org.nightlabs.jfire.accounting.id.InvoiceID?");
+							newLinkedObjectID.append("organisationID=").append(organisationID);
+							newLinkedObjectID.append("invoiceIDPrefix=").append(invoiceIDPrefix);
+							newLinkedObjectID.append("invoiceID=").append(longObjectIDString);
+						}
+						else if (className.equals("Person")) { //---> ((Person)linkedObject).getDisplayName();
+							String personName = linkedObjectID; //(jdo/org.nightlabs.jfire.prop.id.PropertySetID?organisationID=chezfrancois.jfire.org&propertySetID=1)
+							String organisationID = issueLinkHistoryItem.getOrganisationID();
+							PropSearchFilter searchFilter = new PropSearchFilter();
+							searchFilter.setFieldValue(PersonStruct.PERSONALDATA_NAME.structFieldID, personName);
+						}
+						else if (className.equals("Issue")) { //---> ObjectIDUtil.longObjectIDFieldToString(issue.getIssueID()) + " " + issue.getSubject().getText()
+							String[] primaryKeyStrings = linkedObjectID.split(" ");
+							String organisationID = issueLinkHistoryItem.getOrganisationID();
+							String issueID = primaryKeyStrings[0];
+							newLinkedObjectID.append("jdo/org.nightlabs.jfire.issue.id.IssueID?");
+							newLinkedObjectID.append("organisationID=").append(organisationID);
+							newLinkedObjectID.append("issueID=").append(issueID);
+						}
+						else {
+							//don't know yet!!!
+						}
+
+						issueLinkHistoryItem.setLinkedObjectID(newLinkedObjectID.toString());
+					}
+				}
+			}
+		}
+		finally {
+			pm.close();
+		}
+
+//		List<IssueLink> issueLinks = getIssueLinks(getIssueLinkIDs(), new String[] {FetchPlan.DEFAULT}, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
+//		for (IssueLink issueLink : issueLinks) {
+//			issueLink.getLinkedObject()
+//		}
+//		Query q = pm.newQuery(IssueHistoryItem.class);
+//		q.setResult("JDOHelper.getObjectId(this)");
+//		Set<IssueHistoryItemID> issueHistoryItemIDs = (Set<IssueHistoryItemID>)q.execute();
+
+//		List<IssueHistoryItem> issueHistoryItems = getIssueHistoryItems(issueHistoryItemIDs, new String[] { FetchPlan.DEFAULT }, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
+//		for (IssueHistoryItem issueHistoryItem : issueHistoryItems) {
+//			if (issueHistoryItem instanceof IssueLinkHistoryItem) {
+//				IssueLinkHistoryItem issueLinkHistoryItem = (IssueLinkHistoryItem) issueHistoryItem;
+//				if (!issueLinkHistoryItem.getLinkedObjectID().startsWith("jdo")) {
+//					issueLinkHistoryItem.setLinkedObjectID(issueLinkHistoryItem.get)
+//				}
+//			}
+//		}
 	}
 
 	private static void assignIssueMarkerIcon16x16(IssueMarker issueMarker, String iconFileName) throws IOException

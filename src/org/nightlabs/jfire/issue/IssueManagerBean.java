@@ -888,10 +888,10 @@ implements IssueManagerRemote
 
 	@RolesAllowed("_Guest_")
 	@Override
-	public Set<Issue> getIssueByProjectID(ProjectID projectID) {
+	public Set<IssueID> getIssueByProjectID(ProjectID projectID) {
 		PersistenceManager pm = createPersistenceManager();
 		try {
-			Query q = pm.newNamedQuery(Project.class, "getIssuesByProjectID");
+			Query q = pm.newNamedQuery(Issue.class, "getIssuesByProjectID");
 			Map<String, Object> params = new HashMap<String, Object>(2);
 			params.put("organisationID", projectID.organisationID);
 			params.put("projectID", projectID.projectID);
@@ -905,10 +905,10 @@ implements IssueManagerRemote
 
 	@RolesAllowed("_Guest_")
 	@Override
-	public Set<Issue> getIssueByProjectTypeID(ProjectTypeID projectTypeID) {
+	public Set<IssueID> getIssueByProjectTypeID(ProjectTypeID projectTypeID) {
 		PersistenceManager pm = createPersistenceManager();
 		try {
-			Query q = pm.newNamedQuery(Project.class, "getIssuesByProjectTypeID");
+			Query q = pm.newNamedQuery(Issue.class, "getIssuesByProjectTypeID");
 			Map<String, Object> params = new HashMap<String, Object>(2);
 			params.put("organisationID", projectTypeID.organisationID);
 			params.put("projectTypeID", projectTypeID.projectTypeID);

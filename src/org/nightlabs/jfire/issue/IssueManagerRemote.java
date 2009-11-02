@@ -141,9 +141,9 @@ public interface IssueManagerRemote {
 
 	Set<IssueID> getIssueIDs();
 
-	Set<Issue> getIssueByProjectID(ProjectID projectID);
+	Set<IssueID> getIssueByProjectID(ProjectID projectID);
 
-	Set<Issue> getIssueByProjectTypeID(ProjectTypeID projectTypeID);
+	Set<IssueID> getIssueByProjectTypeID(ProjectTypeID projectTypeID);
 
 	IssueHistoryItem storeIssueHistoryItem(IssueHistoryItem issueHistory, boolean get, String[] fetchGroups, int maxFetchDepth);
 

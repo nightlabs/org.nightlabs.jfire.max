@@ -33,6 +33,8 @@ package org.nightlabs.jfire.accounting.gridpriceconfig;
 public class PriceCalculationException extends Exception
 {
 	private static final long serialVersionUID = 1L;
+	private static final String MOZILLA_EXCEPTION_TAG = "org.mozilla.javascript.EcmaError";
+	
 	private IAbsolutePriceCoordinate absolutePriceCoordinate;
 
 	public PriceCalculationException(IAbsolutePriceCoordinate absolutePriceCoordinate)
@@ -85,9 +87,18 @@ public class PriceCalculationException extends Exception
 	 */
 	public String getShortenedErrorMessage()
 	{
-		String[] str = getMessage().split(":");
-		if(str.length == 3)
-			return  str[2].substring(0, str[2].indexOf("(")); 
+		String  exceptionError = getMessage();
+		if(exceptionError.indexOf(MOZILLA_EXCEPTION_TAG) > -1)
+		{
+			String eclErr = exceptionError.substring(exceptionError.indexOf(
+					MOZILLA_EXCEPTION_TAG), 
+					exceptionError.length());			
+			String[] str = eclErr.split(":");
+			if(str.length == 3)
+				return  str[2].substring(0, str[2].indexOf("("));
+			else
+				return  eclErr; 
+		}
 		else
 			return getMessage();
 	}
@@ -99,9 +110,17 @@ public class PriceCalculationException extends Exception
 	 */
 	public String getTitleErrorMessage()
 	{
-		String[] str = getMessage().split(":");
-		if(str.length == 3)
-			return  str[1];
+		String  exceptionError = getMessage();
+		if(exceptionError.indexOf(MOZILLA_EXCEPTION_TAG) > -1)
+		{
+			String eclErr = exceptionError.substring(exceptionError.indexOf(
+					MOZILLA_EXCEPTION_TAG), exceptionError.length());			
+			String[] str = eclErr.split(":");
+			if(str.length == 3)
+				return  str[1];
+			else
+				return  eclErr; 
+		}
 		else
 			// if the format of the message is diffrent then just trim down to 15 charecters.
 			if(getMessage().length() > 15)

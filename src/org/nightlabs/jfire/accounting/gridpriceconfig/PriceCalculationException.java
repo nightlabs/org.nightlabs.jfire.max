@@ -75,4 +75,39 @@ public class PriceCalculationException extends Exception
 	{
 		return absolutePriceCoordinate;
 	}
+	
+	/**
+	 * This method trims down the exception error string message
+	 * the Mozilla Java script engine throws the message in the format of Classname:TitleError:ErrorMessage(PluginClassName)
+	 * this method tries to extract only the ErrorMessage part and return it.
+	 *
+	 * @return Returns the ErrorMessage.
+	 */
+	public String getShortenedErrorMessage()
+	{
+		String[] str = getMessage().split(":");
+		if(str.length == 3)
+			return  str[2].substring(0, str[2].indexOf("(")); 
+		else
+			return getMessage();
+	}
+
+	/**
+	 * @see #getShortenedErrorMessage()
+	 *
+	 * @return Returns the TitleErrorMessage.
+	 */
+	public String getTitleErrorMessage()
+	{
+		String[] str = getMessage().split(":");
+		if(str.length == 3)
+			return  str[1];
+		else
+			// if the format of the message is diffrent then just trim down to 15 charecters.
+			if(getMessage().length() > 15)
+				return getMessage().substring(0, 15);	
+			else
+				return getMessage();
+	}	
+	
 }

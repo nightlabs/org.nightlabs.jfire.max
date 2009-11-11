@@ -27,13 +27,14 @@
 package org.nightlabs.jfire.accounting.gridpriceconfig;
 
 
+
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  */
 public class PriceCalculationException extends Exception
 {
 	private static final long serialVersionUID = 1L;
-	private static final String MOZILLA_EXCEPTION_TAG = "org.mozilla.javascript.EcmaError";
+	private static final String MOZILLA_EXCEPTION_CLASS = org.mozilla.javascript.EcmaError.class.getName();
 	
 	private IAbsolutePriceCoordinate absolutePriceCoordinate;
 
@@ -88,11 +89,11 @@ public class PriceCalculationException extends Exception
 	public String getShortenedErrorMessage()
 	{
 		String  exceptionError = getMessage();
-		if(exceptionError.indexOf(MOZILLA_EXCEPTION_TAG) > -1)
+		// detects if the exception error thrown is coming from the Mozilla javascript engine
+		int expInd = exceptionError.indexOf(MOZILLA_EXCEPTION_CLASS);
+		if(expInd > -1)
 		{
-			String eclErr = exceptionError.substring(exceptionError.indexOf(
-					MOZILLA_EXCEPTION_TAG), 
-					exceptionError.length());			
+			String eclErr = exceptionError.substring(expInd, exceptionError.length());			
 			String[] str = eclErr.split(":");
 			if(str.length == 3)
 				return  str[2].substring(0, str[2].indexOf("("));
@@ -110,11 +111,11 @@ public class PriceCalculationException extends Exception
 	 */
 	public String getTitleErrorMessage()
 	{
-		String  exceptionError = getMessage();
-		if(exceptionError.indexOf(MOZILLA_EXCEPTION_TAG) > -1)
+		String  exceptionError = getMessage();	
+		int expInd = exceptionError.indexOf(MOZILLA_EXCEPTION_CLASS);
+		if(expInd > -1)
 		{
-			String eclErr = exceptionError.substring(exceptionError.indexOf(
-					MOZILLA_EXCEPTION_TAG), exceptionError.length());			
+			String eclErr = exceptionError.substring(expInd, exceptionError.length());			
 			String[] str = eclErr.split(":");
 			if(str.length == 3)
 				return  str[1];

@@ -34,7 +34,6 @@ package org.nightlabs.jfire.accounting.gridpriceconfig;
 public class PriceCalculationException extends Exception
 {
 	private static final long serialVersionUID = 1L;
-	private static final String MOZILLA_EXCEPTION_CLASS = org.mozilla.javascript.EcmaError.class.getName();
 	
 	private IAbsolutePriceCoordinate absolutePriceCoordinate;
 
@@ -79,9 +78,12 @@ public class PriceCalculationException extends Exception
 		return absolutePriceCoordinate;
 	}
 	
+	private static final String MOZILLA_EXCEPTION_CLASS = "org.mozilla.javascript"; // mozilla javascript engine
+	
+	
 	/**
-	 * This method trims down the exception error string message
-	 * the Mozilla Java script engine throws the message in the format of Classname:TitleError:ErrorMessage(PluginClassName)
+	 * This method trims down the exception error string message to return a meaningfull Error message.
+	 * the Mozilla Java script engine throws the message in the format of MozzilaClassNameException:TitleError:ErrorMessage(PluginClassName)
 	 * this method tries to extract only the ErrorMessage part and return it.
 	 *
 	 * @return Returns the ErrorMessage.
@@ -90,44 +92,30 @@ public class PriceCalculationException extends Exception
 	{
 		String  exceptionError = getMessage();
 		// detects if the exception error thrown is coming from the Mozilla javascript engine
+		int lastInd = 0;
 		int expInd = exceptionError.indexOf(MOZILLA_EXCEPTION_CLASS);
+		// get to the last occurance of the exception to remove the wrapped exceptions.
+		while(lastInd > -1){
+			lastInd = exceptionError.indexOf(MOZILLA_EXCEPTION_CLASS, expInd + MOZILLA_EXCEPTION_CLASS.length());
+			if(lastInd > -1)
+				expInd = lastInd;
+		}
+
 		if(expInd > -1)
 		{
+			// remove all the wrapped exceptions
 			String eclErr = exceptionError.substring(expInd, exceptionError.length());			
 			String[] str = eclErr.split(":");
-			if(str.length == 3)
-				return  str[2].substring(0, str[2].indexOf("("));
+			if(str.length >= 2)
+				if(str[str.length - 1].indexOf("(") > -1)
+					return  str[str.length - 1].substring(0, str[str.length - 1].indexOf("("));
+				else
+					return  str[str.length - 1];
 			else
 				return  eclErr; 
 		}
 		else
 			return getMessage();
 	}
-
-	/**
-	 * @see #getShortenedErrorMessage()
-	 *
-	 * @return Returns the TitleErrorMessage.
-	 */
-	public String getTitleErrorMessage()
-	{
-		String  exceptionError = getMessage();	
-		int expInd = exceptionError.indexOf(MOZILLA_EXCEPTION_CLASS);
-		if(expInd > -1)
-		{
-			String eclErr = exceptionError.substring(expInd, exceptionError.length());			
-			String[] str = eclErr.split(":");
-			if(str.length == 3)
-				return  str[1];
-			else
-				return  eclErr; 
-		}
-		else
-			// if the format of the message is diffrent then just trim down to 15 charecters.
-			if(getMessage().length() > 15)
-				return getMessage().substring(0, 15);	
-			else
-				return getMessage();
-	}	
 	
 }

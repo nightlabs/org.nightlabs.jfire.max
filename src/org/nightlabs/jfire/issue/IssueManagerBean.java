@@ -68,6 +68,7 @@ import org.nightlabs.jfire.issue.prop.IssueStruct;
 import org.nightlabs.jfire.issue.query.IssueQuery;
 import org.nightlabs.jfire.issue.resource.Messages;
 import org.nightlabs.jfire.jbpm.JbpmLookup;
+import org.nightlabs.jfire.person.PersonSearchFilter;
 import org.nightlabs.jfire.person.PersonStruct;
 import org.nightlabs.jfire.prop.datafield.TextDataField;
 import org.nightlabs.jfire.prop.search.PropSearchFilter;
@@ -1774,7 +1775,7 @@ implements IssueManagerRemote
 						else if (className.equals("Person")) { //---> ((Person)linkedObject).getDisplayName();
 							String personName = linkedObjectID; //(jdo/org.nightlabs.jfire.prop.id.PropertySetID?organisationID=chezfrancois.jfire.org&propertySetID=1)
 							String organisationID = issueLinkHistoryItem.getOrganisationID();
-							PropSearchFilter searchFilter = new PropSearchFilter();
+							PropSearchFilter searchFilter = new PersonSearchFilter();
 							searchFilter.setFieldValue(PersonStruct.PERSONALDATA_NAME.structFieldID, personName);
 						}
 						else if (className.equals("Issue")) { //---> ObjectIDUtil.longObjectIDFieldToString(issue.getIssueID()) + " " + issue.getSubject().getText()

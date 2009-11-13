@@ -26,8 +26,14 @@
 
 package org.nightlabs.jfire.chezfrancois;
 
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.Properties;
+import java.util.regex.Pattern;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
@@ -53,7 +59,9 @@ import org.nightlabs.jfire.prop.exception.DataBlockGroupNotFoundException;
 import org.nightlabs.jfire.prop.exception.DataBlockNotFoundException;
 import org.nightlabs.jfire.prop.exception.DataFieldNotFoundException;
 import org.nightlabs.jfire.security.listener.SecurityChangeController;
+import org.nightlabs.jfire.server.data.dir.JFireServerDataDirectory;
 import org.nightlabs.jfire.workstation.Workstation;
+import org.nightlabs.util.IOUtil;
 import org.nightlabs.version.MalformedVersionException;
 
 
@@ -88,6 +96,12 @@ implements ChezFrancoisDatastoreInitialiserRemote, ChezFrancoisDatastoreInitiali
 	{
 		if (hasRootOrganisation() && getOrganisationID().equals(getRootOrganisationID()))
 			return;
+		
+		if (!haveToInitializeOrganisation()) {
+			return;
+		}
+		
+		JFireServerDataDirectory.getJFireServerDataDirFile();
 
 		ChezFrancoisDatastoreInitialiserLocal initialiser = JFireEjb3Factory.getLocalBean(ChezFrancoisDatastoreInitialiserLocal.class);
 		initialiser.configureLocalOrganisation(); // have to do this before createModuleMetaData as it checks for the ModuleMetaData
@@ -312,4 +326,72 @@ implements ChezFrancoisDatastoreInitialiserRemote, ChezFrancoisDatastoreInitiali
 		}
 	}
 	// ------ KaiExperiments ----- >8 ----------------------------------------------------------------------|
+	
+
+	/**
+	 * Check whether the organisation this initializer runs for has to be intialized with demo data.
+	 * This will look in the JFireServerDataDirectory (directory JFireChezFrancois) for a file named
+	 * <code>JFireChezFrancois-initialize.properties</code>. 
+	 * See the default JFireChezFrancois-initialize.properties file for an explanation of its contents. 
+	 */
+	private boolean haveToInitializeOrganisation() {
+		try {
+			return checkInitializeOrganisation(getOrganisationID());
+		} catch (Exception e) {
+			logger.error(
+					"Will not initialize organisation " + getOrganisationID() + 
+					" with JFireChezFrancois demo data because an exception was thrown.", 
+					e);
+			return false;
+		}
+	}
+	
+	private boolean checkInitializeOrganisation(String organisationID) throws IOException {
+		File initConfDir = new File(JFireServerDataDirectory.getJFireServerDataDirFile(), "JFireChezFrancois");
+		File initConfFile = new File(initConfDir, "JFireChezFrancois-initialize.properties");
+		if (!initConfFile.exists()) {
+			if (!initConfDir.mkdirs()) {
+				throw new IOException("Could not create JFireChezFrancois-initialize config directory : " + initConfDir);
+			}
+			IOUtil.copyResource(
+					ChezFrancoisDatastoreInitialiserBean.class, 
+					"resource/JFireChezFrancois-initialize.properties", 
+					initConfFile);
+		}
+		
+		Properties props = new Properties();
+		FileReader propsReader = new FileReader(initConfFile);
+		try {
+			props.load(propsReader);
+		} finally {
+			if (propsReader != null) {
+				propsReader.close();
+			}
+		}
+		
+		Collection<Pattern> checkPatterns = new LinkedList<Pattern>();  
+		int i = 0;
+		String propValue = props.getProperty("initialize.organisationID." + (i++));
+		while (propValue != null) {
+			propValue = propValue.trim();
+			if (propValue.startsWith("/") && propValue.endsWith("/")) {
+				checkPatterns.add(Pattern.compile(propValue.substring(1, propValue.length() - 1)));
+			} else {
+				checkPatterns.add(Pattern.compile(Pattern.quote(propValue)));
+			}
+			propValue = props.getProperty("initialize.organisationID." + (i++));
+		}
+		
+		for (Pattern pattern : checkPatterns) {
+			if (pattern.matcher(organisationID).matches()) {
+				return true;
+			}
+		}
+		logger
+				.info(getClass().getSimpleName() + " checked "
+						+ checkPatterns.size()
+						+ " configuration patterns for organisation " + organisationID + ", none matched, "
+						+ "no demo-data will be created for this organisation.");
+		return false;
+	}
 }

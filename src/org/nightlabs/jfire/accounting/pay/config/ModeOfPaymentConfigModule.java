@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.nightlabs.jfire.accounting.pay.config;
 
 import java.util.Collections;
@@ -11,6 +8,16 @@ import java.util.Set;
 import javax.jdo.JDODetachedFieldAccessException;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
 import javax.jdo.listener.AttachCallback;
 import javax.jdo.listener.DetachCallback;
 
@@ -19,17 +26,6 @@ import org.nightlabs.jfire.accounting.pay.ModeOfPaymentFlavour;
 import org.nightlabs.jfire.accounting.pay.id.ModeOfPaymentFlavourID;
 import org.nightlabs.jfire.config.ConfigModule;
 
-import javax.jdo.annotations.Join;
-import javax.jdo.annotations.Persistent;
-import javax.jdo.annotations.FetchGroups;
-import javax.jdo.annotations.NullValue;
-import javax.jdo.annotations.InheritanceStrategy;
-import javax.jdo.annotations.Inheritance;
-import javax.jdo.annotations.FetchGroup;
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.IdentityType;
-import javax.jdo.annotations.PersistenceModifier;
-
 /**
  * ConfigModule for a set of {@link ModeOfPaymentFlavour}s.
  * Use the API for {@link ModeOfPaymentFlavourID}s on detached instances.
@@ -37,10 +33,10 @@ import javax.jdo.annotations.PersistenceModifier;
  * This is registered for Users and Workstations and the {@link ModeOfPaymentFlavour}s
  * available for a payment can be filtered by the intersection of the entries
  * configured for the current user and the workstation he is currently logged on
- * (see {@link ModeOfPaymentFlavour#getAvailableModeOfPaymentFlavoursForAllCustomerGroups(PersistenceManager, java.util.Collection, byte, boolean)}) 
- * 
+ * (see {@link ModeOfPaymentFlavour#getAvailableModeOfPaymentFlavoursForAllCustomerGroups(PersistenceManager, java.util.Collection, byte, boolean)})
+ *
  * </p>
- * 
+ *
  * @jdo.persistence-capable
  *		identity-type="application"
  * 		persistence-capable-superclass="org.nightlabs.jfire.config.ConfigModule"
@@ -48,7 +44,7 @@ import javax.jdo.annotations.PersistenceModifier;
  *		table="JFireTrade_ModeOfPaymentConfigModule"
  *
  * @jdo.inheritance strategy="new-table"
- * 
+ *
  * @jdo.fetch-group name="ModeOfPaymentConfigModule.modeOfPaymentFlavours" fields="modeOfPaymentFlavours"
  * @jdo.fetch-group name="ConfigModule.this" fields="personStructFields"
  *
@@ -75,13 +71,13 @@ public class ModeOfPaymentConfigModule extends ConfigModule implements DetachCal
 	// No access to the flavours directly
 //	public static final String FETCH_GROUP_MODE_OF_PAYMENT_FLAVOURS = "ModeOfPaymentConfigModule.modeOfPaymentFlavours";
 	public static final String FETCH_GROUP_MODE_OF_PAYMENT_FLAVOURIDS = "ModeOfPaymentConfigModule.modeOfPaymentFlavourIDs";
-	
+
 	public static final class FieldName {
 		public static final String modeOfPaymentFlavours = "modeOfPaymentFlavours";
 		public static final String modeOfPaymentFlavourIDs = "modeOfPaymentFlavourIDs";
 		public static final String modeOfPaymentFlavourIDsDetached = "modeOfPaymentFlavourIDsDetached";
 	}
-	
+
 	/**
 	 * @jdo.field
 	 *		persistence-modifier="persistent"
@@ -108,7 +104,7 @@ public class ModeOfPaymentConfigModule extends ConfigModule implements DetachCal
 	 */
 	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private Set<ModeOfPaymentFlavourID> modeOfPaymentFlavourIDs;
-	
+
 	/**
 	 */
 	public ModeOfPaymentConfigModule() {
@@ -122,7 +118,7 @@ public class ModeOfPaymentConfigModule extends ConfigModule implements DetachCal
 	public void init() {
 		modeOfPaymentFlavours.addAll(ModeOfPaymentFlavour.getAllModeOfPaymentFlavours(JDOHelper.getPersistenceManager(this)));
 	}
-	
+
 	public Set<ModeOfPaymentFlavour> getModeOfPaymentFlavours() {
 		return Collections.unmodifiableSet(modeOfPaymentFlavours);
 	}
@@ -132,7 +128,7 @@ public class ModeOfPaymentConfigModule extends ConfigModule implements DetachCal
 			throw new JDODetachedFieldAccessException("Field " + FieldName.modeOfPaymentFlavourIDs + " was not detached.");
 		return modeOfPaymentFlavourIDs;
 	}
-	
+
 	public void setModeOfPaymentFlavourIDs(Set<ModeOfPaymentFlavourID> modeOfPaymentFlavourIDs) {
 		if (!modeOfPaymentFlavourIDsDetached)
 			throw new JDODetachedFieldAccessException("Field " + FieldName.modeOfPaymentFlavourIDs + " was not detached.");
@@ -184,12 +180,15 @@ public class ModeOfPaymentConfigModule extends ConfigModule implements DetachCal
 	@Override
 	public void jdoPreAttach() {
 	}
-	
+
 	@Override
-	public FieldMetaData getFieldMetaData(String fieldName) {
-		if (FieldName.modeOfPaymentFlavourIDs.equals(fieldName) || FieldName.modeOfPaymentFlavourIDsDetached.equals(fieldName)) {
+	public FieldMetaData getFieldMetaData(String fieldName)
+	{
+		if (FieldName.modeOfPaymentFlavourIDsDetached.equals(fieldName)
+				|| (FieldName.modeOfPaymentFlavours.equals(fieldName) && modeOfPaymentFlavourIDsDetached)
+				|| (FieldName.modeOfPaymentFlavourIDs.equals(fieldName) && ! modeOfPaymentFlavourIDsDetached))
 			return null;
-		}
+
 		return super.getFieldMetaData(fieldName);
 	}
 }

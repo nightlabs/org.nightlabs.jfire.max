@@ -5,6 +5,6 @@ import javax.ejb.Remote;
 @Remote
 public interface PropFileManagerRemote {
 
-	void initialise();
+	void initialise() throws Exception;
 
 }

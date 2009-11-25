@@ -18,6 +18,7 @@ import javax.jdo.annotations.Persistent;
 import org.nightlabs.jfire.prop.DataBlock;
 import org.nightlabs.jfire.prop.StructBlock;
 import org.nightlabs.jfire.prop.StructField;
+import org.nightlabs.jfire.prop.file.resource.Messages;
 import org.nightlabs.jfire.prop.id.StructFieldID;
 
 @PersistenceCapable(
@@ -76,8 +77,8 @@ public class FileStructField extends StructField<FileDataField>
 	 * @param extension The extension to add.
 	 */
 	public void addFileFormat(String extension) {
-		if (!Pattern.matches("(\\w+|\\*)", extension))
-			throw new IllegalArgumentException("Invalid extension specified.");
+		if (!Pattern.matches("(\\w+|\\*)", extension)) //$NON-NLS-1$
+			throw new IllegalArgumentException("Invalid extension specified."); //$NON-NLS-1$
 
 		if (!formats.contains(extension)) {
 			formats.add(extension);
@@ -116,7 +117,7 @@ public class FileStructField extends StructField<FileDataField>
 	public boolean validateData() {
 		resetValidationError();
 		if (formats.isEmpty()) {
-			setValidationError("You have to specify at least one extension.");
+			setValidationError(Messages.getString("org.nightlabs.jfire.prop.file.FileStructField.validationError[formatsEmpty]")); //$NON-NLS-1$
 			return false;
 		}
 		return true;

@@ -140,11 +140,11 @@ implements IContentDataField
 			try {
 				inflater.write(getContent());
 			} catch (IOException e) {
-				throw new RuntimeException("Could not decode image data", e);
+				throw new RuntimeException("Could not decode image data", e); //$NON-NLS-1$
 			}
 			return out.toByteArray();
 		}
-		throw new IllegalStateException("This ImageDataField was encoded with an unknown encoding type " + getContentEncoding() + ". Can't decode the content");
+		throw new IllegalStateException("This ImageDataField was encoded with an unknown encoding type " + getContentEncoding() + ". Can't decode the content"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	/**
@@ -198,10 +198,10 @@ implements IContentDataField
 		String fName = getFileName();
 		if (fName == null) {
 			fName =
-				"no_name_" +
-				getOrganisationID() + "_" + ObjectIDUtil.longObjectIDFieldToString(getPropertySetID()) + "_" +
-				getStructBlockOrganisationID() + "_" + getStructBlockID() + "_" +
-				getStructFieldOrganisationID() + "_" + getStructFieldID() + "." + ContentTypeUtil.getFileExtension(getContentType());
+				"no_name_" + //$NON-NLS-1$
+				getOrganisationID() + "_" + ObjectIDUtil.longObjectIDFieldToString(getPropertySetID()) + "_" + //$NON-NLS-1$ //$NON-NLS-2$
+				getStructBlockOrganisationID() + "_" + getStructBlockID() + "_" + //$NON-NLS-1$ //$NON-NLS-2$
+				getStructFieldOrganisationID() + "_" + getStructFieldID() + "." + ContentTypeUtil.getFileExtension(getContentType()); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		File saveFile = new File(dir, fName);
 		saveToFile(saveFile);

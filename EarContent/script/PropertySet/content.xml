@@ -1,4 +1,4 @@
-<!DOCTYPE script-category PUBLIC "-//NightLabs//DTD ScriptingInitializer V 1.1//EN" "http://www.nightlabs.de/dtd/scripting-initializer-content_1_1.dtd">
+<!DOCTYPE script-category PUBLIC "-//NightLabs//DTD ScriptingInitialiser V 0.2//EN" "http://www.nightlabs.de/dtd/scripting-initialiser-content_0_2.dtd">
 <script-category 
 	id="PropertySetData"
 	type="JFireReporting-Scripting-PropertySet"
@@ -55,16 +55,16 @@ script need to be passed two script-properties:
 		id="LocalOrganisationPropertySet"
 		resultClass="org.nightlabs.jfire.reporting.oda.ResultSet"
 	>
-		<parameter-set>
-			<name language="de">ParameterSet: LocalOrganisationPropertySet</name>
-			<name language="en">ParameterSet: LocalOrganisationPropertySet</name>
-		</parameter-set>
 		<name language="de">PropertySet: Lokale Organisation</name>
 		<name language="en">PropertySet: Local Organisation</name>
 		<description language="de">Dieses Skript ermöglicht die Ausgabe der Eigenschaften der lokalen Organisation.
 		</description>
 		<description language="en">This script enables the output of the properties of the local organisation.
 		</description>
+		<parameter-set>
+			<name language="de">ParameterSet: LocalOrganisationPropertySet</name>
+			<name language="en">ParameterSet: LocalOrganisationPropertySet</name>
+		</parameter-set>
 	</script>	
 	
 </script-category>

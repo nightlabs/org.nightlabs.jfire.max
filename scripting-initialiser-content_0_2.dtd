@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- DTD for the content.xml of ScriptingInitializer - version 1.0 - July 2006--> 
+<!NOTATION ScriptingInitialiser.0_2 PUBLIC
+          "-//NightLabs//DTD ScriptingInitialiser V 0.2//EN">
+
+<!-- DTD for the content.xml of ScriptingInitializer - version 0.2 - November 2009--> 
 	
 <!--
 	The JFireScripting ScriptingInitializer recursively scans directies
@@ -42,7 +45,7 @@
 	to the default one, all sub-categories will have the same type unless
 	they overwrite.
 	-->
-<!ELEMENT script-category (name+,parameter-set?,script*)>
+<!ELEMENT script-category (name+,description*,parameter-set?,script*)>
 <!ATTLIST script-category
 	id NMTOKEN #IMPLIED 
 	type NMTOKEN #IMPLIED
@@ -57,14 +60,14 @@
 	However by defining a <script> element all of this can be overwritten.
 	A <script> element must define a "file" attribute referencing the script file by
 	its file name (including file-extension). The "resultClass" attribute is obligatory
-	as well and defines the result of the Script by its fully qualifed
+	as well and defines the result of the Script by its fully qualified
 	class-name.
 	
 	As for <script-category>s id and type can be overwritten. The only difference
 	is that the overwritten types will not propagate further down the tree
 	like for categories.
 	-->
-<!ELEMENT script (name+,parameter-set?)>
+<!ELEMENT script (name+,description*,parameter-set?)>
 <!ATTLIST script
 	file NMTOKEN #REQUIRED
 	resultClass NMTOKEN #REQUIRED
@@ -82,7 +85,7 @@
 	name is a String to reference the parameter and type is the fully qualified
 	java class-name of the parameter.
 	-->
-<!ELEMENT parameter-set (name+,parameter+)>
+<!ELEMENT parameter-set (name+,parameter*)>
 
 <!ELEMENT parameter EMPTY>
 <!ATTLIST parameter
@@ -91,8 +94,16 @@
 >
 
 <!--
-	Names can be given to categories and scripts. The patter is simple, here is an example:	
+	Names can be given to categories and scripts. The pattern is simple, here is an example:	
 	<name language="en">The english name</name>
 	-->
 <!ELEMENT name (#PCDATA)>
 <!ATTLIST name language NMTOKEN #REQUIRED>
+
+<!--
+	Descriptions can also be given to categories and scripts. The pattern is simple, here is an example:	
+	<description language="en">The english description, that might be very long
+and even have linebreaks</description>
+	-->
+<!ELEMENT description (#PCDATA)>
+<!ATTLIST description language NMTOKEN #REQUIRED>

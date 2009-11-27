@@ -72,7 +72,7 @@ extends GeographyImplResourceCSV
 
 	private PersistenceManager getPersistenceManager()
 	{
-		return new Lookup(getOrganisationID()).getPersistenceManager();
+		return new Lookup(getOrganisationID()).createPersistenceManager();
 	}
 
 	@Override

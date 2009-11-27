@@ -90,7 +90,7 @@ implements GeographyManagerRemote
 	@RolesAllowed("_Guest_")
 	public Collection<CountryID> getCountryIDs()
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			Query q = pm.newQuery(Country.class);
 			q.setResult("JDOHelper.getObjectId(this)");
@@ -109,7 +109,7 @@ implements GeographyManagerRemote
 	@RolesAllowed("_Guest_")
 	public Collection<RegionID> getRegionIDs(CountryID countryID)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			Query q = pm.newQuery(Region.class);
 			q.setResult("JDOHelper.getObjectId(this)");
@@ -131,7 +131,7 @@ implements GeographyManagerRemote
 	@RolesAllowed("_Guest_")
 	public Collection<CityID> getCityIDs(RegionID regionID)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			Query q = pm.newQuery(City.class);
 			q.setResult("JDOHelper.getObjectId(this)");
@@ -153,7 +153,7 @@ implements GeographyManagerRemote
 	@RolesAllowed("_Guest_")
 	public Collection<LocationID> getLocationIDs(CityID cityID)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			Query q = pm.newQuery(Location.class);
 			q.setResult("JDOHelper.getObjectId(this)");
@@ -175,7 +175,7 @@ implements GeographyManagerRemote
 	@RolesAllowed("_Guest_")
 	public Collection<Country> getCountries(Collection<CountryID> countryIDs, String[] fetchGroups, int maxFetchDepth)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			return NLJDOHelper.getDetachedObjectList(pm, countryIDs, Country.class, fetchGroups, maxFetchDepth);
 		} finally {
@@ -191,7 +191,7 @@ implements GeographyManagerRemote
 	@RolesAllowed("_Guest_")
 	public Collection<Region> getRegions(Collection<RegionID> regionIDs, String[] fetchGroups, int maxFetchDepth)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			return NLJDOHelper.getDetachedObjectList(pm, regionIDs, Region.class, fetchGroups, maxFetchDepth);
 		} finally {
@@ -207,7 +207,7 @@ implements GeographyManagerRemote
 	@RolesAllowed("_Guest_")
 	public Collection<City> getCities(Collection<CityID> cityIDs, String[] fetchGroups, int maxFetchDepth)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			return NLJDOHelper.getDetachedObjectList(pm, cityIDs, City.class, fetchGroups, maxFetchDepth);
 		} finally {
@@ -223,7 +223,7 @@ implements GeographyManagerRemote
 	@RolesAllowed("_Guest_")
 	public Collection<Location> getLocations(Collection<LocationID> locationIDs, String[] fetchGroups, int maxFetchDepth)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			return NLJDOHelper.getDetachedObjectList(pm, locationIDs, Location.class, fetchGroups, maxFetchDepth);
 		} finally {
@@ -241,7 +241,7 @@ implements GeographyManagerRemote
 		if (countryID == null)
 			throw new IllegalArgumentException("countryID must not be null!");
 
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			Country country;
 			try {
@@ -276,7 +276,7 @@ implements GeographyManagerRemote
 	@RolesAllowed("_Guest_")
 	public Region importRegion(RegionID regionID, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			Region region;
 			try {
@@ -313,7 +313,7 @@ implements GeographyManagerRemote
 	@RolesAllowed("_Guest_")
 	public City importCity(CityID cityID, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			City city;
 			try {
@@ -350,7 +350,7 @@ implements GeographyManagerRemote
 	@RolesAllowed("_Guest_")
 	public Location importLocation(LocationID locationID, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			Location location;
 			try {
@@ -386,7 +386,7 @@ implements GeographyManagerRemote
 //	 */
 //	public Country storeCountry(Country country, boolean get, String[] fetchGroups, int maxFetchDepth)
 //	{
-//		PersistenceManager pm = getPersistenceManager();
+//		PersistenceManager pm = createPersistenceManager();
 //		try {
 //			return NLJDOHelper.storeJDO(pm, country, get, fetchGroups, maxFetchDepth);
 //		} finally {
@@ -400,7 +400,7 @@ implements GeographyManagerRemote
 //	 */
 //	public Region storeRegion(Region region, boolean get, String[] fetchGroups, int maxFetchDepth)
 //	{
-//		PersistenceManager pm = getPersistenceManager();
+//		PersistenceManager pm = createPersistenceManager();
 //		try {
 //			return NLJDOHelper.storeJDO(pm, region, get, fetchGroups, maxFetchDepth);
 //		} finally {
@@ -414,7 +414,7 @@ implements GeographyManagerRemote
 //	 */
 //	public City storeCity(City city, boolean get, String[] fetchGroups, int maxFetchDepth)
 //	{
-//		PersistenceManager pm = getPersistenceManager();
+//		PersistenceManager pm = createPersistenceManager();
 //		try {
 //			return NLJDOHelper.storeJDO(pm, city, get, fetchGroups, maxFetchDepth);
 //		} finally {
@@ -428,7 +428,7 @@ implements GeographyManagerRemote
 	@RolesAllowed("_Guest_")
 	public byte[] getCSVData(String csvType, String countryID)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		pm.getFetchPlan().setMaxFetchDepth(1);
 		pm.getFetchPlan().setGroup(FetchPlan.ALL);
 
@@ -462,7 +462,7 @@ implements GeographyManagerRemote
 	 */
 	@RolesAllowed("_Guest_")
 	public Object getGeographyObject(ObjectID objectID, String[] fetchGroups, int maxFetchDepth){
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
@@ -487,7 +487,7 @@ implements GeographyManagerRemote
 //	 */
 //	public Country getCountryByName(String countryName, Locale locale)
 //	{
-//		PersistenceManager pm = getPersistenceManager();
+//		PersistenceManager pm = createPersistenceManager();
 //		try {
 //			Collection<Country> countries = Country.getCountryByName(pm, countryName, locale);
 //			if (countries != null && !countries.isEmpty()) {
@@ -510,7 +510,7 @@ implements GeographyManagerRemote
 //	 */
 //	public Region getRegionByName(String regionName, Locale locale)
 //	{
-//		PersistenceManager pm = getPersistenceManager();
+//		PersistenceManager pm = createPersistenceManager();
 //		try {
 //			Collection<Region> regions = Region.getRegionByName(pm, regionName, locale);
 //			if (regions != null && !regions.isEmpty()) {
@@ -533,9 +533,9 @@ implements GeographyManagerRemote
 //	 */
 //	public City getCityByName(String cityName, Locale locale)
 //	{
-//		PersistenceManager pm = getPersistenceManager();
+//		PersistenceManager pm = createPersistenceManager();
 //		try {
-//			Collection<City> cities = City.getCityByName(getPersistenceManager(),
+//			Collection<City> cities = City.getCityByName(createPersistenceManager(),
 //					cityName, locale);
 //			if (cities != null && !cities.isEmpty()) {
 //				return cities.iterator().next();
@@ -557,7 +557,7 @@ implements GeographyManagerRemote
 //	 */
 //	public Location getLocationByName(String locationName, Locale locale)
 //	{
-//		PersistenceManager pm = getPersistenceManager();
+//		PersistenceManager pm = createPersistenceManager();
 //		try {
 //			Collection<Location> locations = Location.getLocationByName(pm, locationName, locale);
 //			if (locations != null && !locations.isEmpty()) {

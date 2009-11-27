@@ -126,7 +126,7 @@ implements GeographyTemplateDataManagerRemote
 		if (subscriberOrganisationID.equals(rootOrganisationID)) // only register in the root organisation, if that's not the local organisation
 			return;
 
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			NotificationReceiverID notificationReceiverID = NotificationReceiverID.create(
 					rootOrganisationID, SubscriptionUtil.SUBSCRIBER_TYPE_ORGANISATION, subscriberOrganisationID,
@@ -290,7 +290,7 @@ implements GeographyTemplateDataManagerRemote
 	{
 		assertWritingAllowed();
 
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(1);
 			pm.getFetchPlan().setGroup(FetchPlan.ALL);
@@ -365,7 +365,7 @@ implements GeographyTemplateDataManagerRemote
 	{
 		assertWritingAllowed();
 
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(1);
 			pm.getFetchPlan().setGroup(FetchPlan.ALL);
@@ -441,7 +441,7 @@ implements GeographyTemplateDataManagerRemote
 	{
 		assertWritingAllowed();
 
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(1);
 			pm.getFetchPlan().setGroup(FetchPlan.ALL);
@@ -519,7 +519,7 @@ implements GeographyTemplateDataManagerRemote
 	{
 		assertWritingAllowed();
 
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			NLJDOHelper.enableTransactionSerializeReadObjects(pm);
 			try {
@@ -602,7 +602,7 @@ implements GeographyTemplateDataManagerRemote
 	{
 		assertWritingAllowed();
 
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(1);
 			pm.getFetchPlan().setGroup(FetchPlan.ALL);
@@ -663,7 +663,7 @@ implements GeographyTemplateDataManagerRemote
 
 	public Set<CSVID> getCSVIDs()
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			Query q = pm.newQuery(CSV.class);
 			q.setResult("JDOHelper.getObjectId(this)");
@@ -681,7 +681,7 @@ implements GeographyTemplateDataManagerRemote
 	@RolesAllowed("_Guest_")
 	public Set<CSV> getCSVs(Set<CSVID> csvIDs, String[] fetchGroups, int maxFetchDepth)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			return NLJDOHelper.getDetachedObjectSet(pm, csvIDs, CSV.class, fetchGroups, maxFetchDepth);
 		} finally{
@@ -699,7 +699,7 @@ implements GeographyTemplateDataManagerRemote
 //	public void storeGeographyTemplateZipData(/*District district*/)
 //	throws IOException
 //	{
-//		PersistenceManager pm = getPersistenceManager();
+//		PersistenceManager pm = createPersistenceManager();
 //		try {
 //			pm.getFetchPlan().setMaxFetchDepth(1);
 //			pm.getFetchPlan().setGroup(FetchPlan.ALL);

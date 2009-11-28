@@ -17,6 +17,7 @@ import javax.jdo.annotations.PrimaryKey;
 
 import org.nightlabs.i18n.I18nText;
 import org.nightlabs.jfire.pbx.id.PhoneSystemNameID;
+import org.nightlabs.jfire.pbx.resource.Messages;
 
 /**
  * An extended class of {@link I18nText} that represents the {@link PhoneSystem}'s name.
@@ -89,6 +90,6 @@ extends I18nText
 	@Override
 	protected String getFallBackValue(String languageID)
 	{
-		return organisationID + "/" + phoneSystemID;
+		return organisationID + "/" + phoneSystemID; //$NON-NLS-1$
 	}
 }

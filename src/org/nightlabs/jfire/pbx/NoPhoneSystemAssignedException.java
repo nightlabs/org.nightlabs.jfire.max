@@ -1,5 +1,6 @@
 package org.nightlabs.jfire.pbx;
 
+import org.nightlabs.jfire.pbx.resource.Messages;
 import org.nightlabs.jfire.workstation.id.WorkstationID;
 
 /**
@@ -12,7 +13,7 @@ public class NoPhoneSystemAssignedException extends PhoneSystemException
 	private WorkstationID workstationID;
 
 	public NoPhoneSystemAssignedException(WorkstationID workstationID) {
-		super("There is no PhoneSystem assigned in the current workstation's configuration.");
+		super("There is no PhoneSystem assigned in the current workstation's configuration."); //$NON-NLS-1$
 		this.workstationID = workstationID;
 	}
 

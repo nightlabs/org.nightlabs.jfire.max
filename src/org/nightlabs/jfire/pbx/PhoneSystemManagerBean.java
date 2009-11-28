@@ -2,7 +2,6 @@ package org.nightlabs.jfire.pbx;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Locale;
 import java.util.Set;
 
 import javax.annotation.security.RolesAllowed;
@@ -96,15 +95,15 @@ implements PhoneSystemManagerRemote
 	public Set<PhoneSystemID> getPhoneSystemIDs(Class<? extends PhoneSystem> phoneSystemClass, boolean includeSubclasses)
 	{
 		if (phoneSystemClass == null)
-			throw new IllegalArgumentException("phoneSystemClass must not be null!");
+			throw new IllegalArgumentException("phoneSystemClass must not be null!"); //$NON-NLS-1$
 
 		if (!PhoneSystem.class.isAssignableFrom(phoneSystemClass))
-			throw new IllegalArgumentException("phoneSystemClass is neither PhoneSystem nor a subclass of PhoneSystem: " + phoneSystemClass.getName());
+			throw new IllegalArgumentException("phoneSystemClass is neither PhoneSystem nor a subclass of PhoneSystem: " + phoneSystemClass.getName()); //$NON-NLS-1$
 
 		PersistenceManager pm = createPersistenceManager();
 		try {
 			Query q = pm.newQuery(pm.getExtent(phoneSystemClass, includeSubclasses));
-			q.setResult("JDOHelper.getObjectId(this)");
+			q.setResult("JDOHelper.getObjectId(this)"); //$NON-NLS-1$
 
 			return CollectionUtil.createHashSetFromCollection( q.execute() );
 		} finally {
@@ -119,7 +118,7 @@ implements PhoneSystemManagerRemote
 		PersistenceManager pm = createPersistenceManager();
 		try {
 			Query q = pm.newQuery(PhoneSystem.class);
-			q.setResult("JDOHelper.getObjectId(this)");
+			q.setResult("JDOHelper.getObjectId(this)"); //$NON-NLS-1$
 
 			return CollectionUtil.createHashSetFromCollection( q.execute() );
 		} finally {
@@ -127,7 +126,7 @@ implements PhoneSystemManagerRemote
 		}
 	}
 
-	public static String CALL_FILE_TEMP_DIRECTORY = "jfire.tmp";
+	public static String CALL_FILE_TEMP_DIRECTORY = "jfire.tmp"; //$NON-NLS-1$
 
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("_Guest_")
@@ -172,7 +171,12 @@ implements PhoneSystemManagerRemote
 				clientOnlyPhoneSystem = pm.makePersistent(new ClientOnlyPhoneSystem(getOrganisationID(), ClientOnlyPhoneSystem.ID_DEFAULT_CLIENT_ONLY_PHONE_SYSTEM));
 				defaultPhoneSystem.setPhoneSystem(clientOnlyPhoneSystem);
 			}
-			clientOnlyPhoneSystem.getName().setText(Locale.ENGLISH, "Client-only phone system");
+
+			clientOnlyPhoneSystem.getName().readFromProperties(
+					"org.nightlabs.jfire.pbx.resource.messages", //$NON-NLS-1$
+					ClientOnlyPhoneSystem.class.getClassLoader(),
+					"org.nightlabs.jfire.pbx.ClientOnlyPhoneSystem.defaultClientOnlyPhoneSystem.name" //$NON-NLS-1$
+			);
 
 			ConfigSetup workstationConfigSetup = ConfigSetup.getConfigSetup(
 					pm,

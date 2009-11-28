@@ -13,6 +13,7 @@ import org.nightlabs.jfire.pbx.PhoneSystem;
 import org.nightlabs.jfire.pbx.PhoneSystemException;
 import org.nightlabs.jfire.pbx.PhoneSystemManagerRemote;
 import org.nightlabs.jfire.pbx.id.PhoneSystemID;
+import org.nightlabs.jfire.pbx.resource.Messages;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.workstation.id.WorkstationID;
 import org.nightlabs.progress.ProgressMonitor;
@@ -44,7 +45,7 @@ extends BaseJDOObjectDAO<PhoneSystemID, PhoneSystem>
 			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 			throws Exception {
 
-		monitor.beginTask("Loading phone systems", 1);
+		monitor.beginTask(Messages.getString("org.nightlabs.jfire.pbx.dao.PhoneSystemDAO.retrievePhoneSystems.monitor.task.name"), 1); //$NON-NLS-1$
 		try {
 			PhoneSystemManagerRemote ejb = JFireEjb3Factory.getRemoteBean(PhoneSystemManagerRemote.class, SecurityReflector.getInitialContextProperties());
 			return ejb.getPhoneSystems(phoneSystemIDs, fetchGroups, maxFetchDepth);
@@ -56,9 +57,9 @@ extends BaseJDOObjectDAO<PhoneSystemID, PhoneSystem>
 
 	public synchronized PhoneSystem storePhoneSystem(PhoneSystem phoneSystem, boolean get, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor){
 		if(phoneSystem == null)
-			throw new NullPointerException("PhoneSystem to save must not be null");
+			throw new NullPointerException("PhoneSystem to save must not be null"); //$NON-NLS-1$
 
-		monitor.beginTask("Storing phone system", 3);
+		monitor.beginTask(Messages.getString("org.nightlabs.jfire.pbx.dao.PhoneSystemDAO.storePhoneSystem.monitor.task.name"), 3); //$NON-NLS-1$
 		try {
 			PhoneSystemManagerRemote ejb = JFireEjb3Factory.getRemoteBean(PhoneSystemManagerRemote.class, SecurityReflector.getInitialContextProperties());
 			monitor.worked(1);
@@ -75,7 +76,7 @@ extends BaseJDOObjectDAO<PhoneSystemID, PhoneSystem>
 	}
 
 	public synchronized void deletePhoneSystem(PhoneSystemID phoneSystemID, ProgressMonitor monitor) {
-		monitor.beginTask("Deleting phone system", 3);
+		monitor.beginTask(Messages.getString("org.nightlabs.jfire.pbx.dao.PhoneSystemDAO.deletePhoneSystem.monitor.task.name"), 3); //$NON-NLS-1$
 		try {
 			PhoneSystemManagerRemote ejb = JFireEjb3Factory.getRemoteBean(PhoneSystemManagerRemote.class, SecurityReflector.getInitialContextProperties());
 			monitor.worked(1);
@@ -98,7 +99,7 @@ extends BaseJDOObjectDAO<PhoneSystemID, PhoneSystem>
 	 */
 	public synchronized PhoneSystem getPhoneSystem(PhoneSystemID phoneSystemID, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
-		monitor.beginTask("Loading phone system", 1);
+		monitor.beginTask(Messages.getString("org.nightlabs.jfire.pbx.dao.PhoneSystemDAO.getPhoneSystem.monitor.task.name"), 1); //$NON-NLS-1$
 		try{
 			PhoneSystem phoneSystem = getJDOObject(null, phoneSystemID, fetchGroups, maxFetchDepth, new SubProgressMonitor(monitor, 1));
 			return phoneSystem;
@@ -115,7 +116,7 @@ extends BaseJDOObjectDAO<PhoneSystemID, PhoneSystem>
 
 	public synchronized <T extends PhoneSystem> Collection<T> getPhoneSystems(Class<T> phoneSystemClass, boolean includeSubclasses, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
-		monitor.beginTask("Loading phone systems", 1);
+		monitor.beginTask(Messages.getString("org.nightlabs.jfire.pbx.dao.PhoneSystemDAO.getPhoneSystems.monitor.task.name"), 1); //$NON-NLS-1$
 		try {
 			PhoneSystemManagerRemote ejb = JFireEjb3Factory.getRemoteBean(PhoneSystemManagerRemote.class, SecurityReflector.getInitialContextProperties());
 			Set<PhoneSystemID> phoneSystemIDs = ejb.getPhoneSystemIDs(phoneSystemClass, includeSubclasses);
@@ -137,7 +138,7 @@ extends BaseJDOObjectDAO<PhoneSystemID, PhoneSystem>
 	 */
 	public synchronized Collection<PhoneSystem> getPhoneSystems(String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
-		monitor.beginTask("Loading phone systems", 1);
+		monitor.beginTask(Messages.getString("org.nightlabs.jfire.pbx.dao.PhoneSystemDAO.getPhoneSystems.monitor.task.name"), 1); //$NON-NLS-1$
 		try {
 			PhoneSystemManagerRemote ejb = JFireEjb3Factory.getRemoteBean(PhoneSystemManagerRemote.class, SecurityReflector.getInitialContextProperties());
 			Set<PhoneSystemID> phoneSystemIDs = ejb.getPhoneSystemIDs();
@@ -154,7 +155,7 @@ extends BaseJDOObjectDAO<PhoneSystemID, PhoneSystem>
 	 */
 	public synchronized PhoneSystem getPhoneSystem(WorkstationID workstationID, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
-		monitor.beginTask("Loading phone systems", 2);
+		monitor.beginTask(Messages.getString("org.nightlabs.jfire.pbx.dao.PhoneSystemDAO.getPhoneSystem.monitor.task.name"), 2); //$NON-NLS-1$
 		try {
 			PhoneSystemManagerRemote ejb = JFireEjb3Factory.getRemoteBean(PhoneSystemManagerRemote.class, SecurityReflector.getInitialContextProperties());
 			PhoneSystemID phoneSystemID = ejb.getPhoneSystemID(workstationID);
@@ -171,7 +172,7 @@ extends BaseJDOObjectDAO<PhoneSystemID, PhoneSystem>
 
 	public synchronized PhoneSystem getPhoneSystem(ConfigID configID, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
-		monitor.beginTask("Loading phone systems", 2);
+		monitor.beginTask(Messages.getString("org.nightlabs.jfire.pbx.dao.PhoneSystemDAO.getPhoneSystem.monitor.task.name"), 2); //$NON-NLS-1$
 		try {
 			PhoneSystemManagerRemote ejb = JFireEjb3Factory.getRemoteBean(PhoneSystemManagerRemote.class, SecurityReflector.getInitialContextProperties());
 			PhoneSystemID phoneSystemID = ejb.getPhoneSystemID(configID);
@@ -189,9 +190,9 @@ extends BaseJDOObjectDAO<PhoneSystemID, PhoneSystem>
 	public synchronized void call(Call call, ProgressMonitor monitor) throws PhoneSystemException
 	{
 		if (call == null)
-			throw new IllegalArgumentException("call must not be null!");
+			throw new IllegalArgumentException("call must not be null!"); //$NON-NLS-1$
 
-		monitor.beginTask("Calling", 2);
+		monitor.beginTask(Messages.getString("org.nightlabs.jfire.pbx.dao.PhoneSystemDAO.call.monitor.task.name"), 2); //$NON-NLS-1$
 		try {
 			PhoneSystemManagerRemote ejb = JFireEjb3Factory.getRemoteBean(PhoneSystemManagerRemote.class, SecurityReflector.getInitialContextProperties());
 			monitor.worked(1);

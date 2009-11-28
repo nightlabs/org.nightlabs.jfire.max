@@ -21,6 +21,7 @@ import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.pbx.id.PhoneSystemID;
+import org.nightlabs.jfire.pbx.resource.Messages;
 import org.nightlabs.util.Util;
 
 /**
@@ -169,7 +170,7 @@ implements Serializable
 	{
 		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
 		if (pm == null)
-			throw new IllegalStateException("This instance of PhoneSystem is currently not persistent! Cannot obtain PersistenceManager! " + this);
+			throw new IllegalStateException("This instance of PhoneSystem is currently not persistent! Cannot obtain PersistenceManager! " + this); //$NON-NLS-1$
 
 		return pm;
 	}

@@ -14,6 +14,7 @@ import org.nightlabs.inheritance.Inheritable;
 import org.nightlabs.jfire.config.ConfigModule;
 import org.nightlabs.jfire.pbx.DefaultPhoneSystem;
 import org.nightlabs.jfire.pbx.PhoneSystem;
+import org.nightlabs.jfire.pbx.resource.Messages;
 
 /**
  * This is a subclass of {@link org.nightlabs.jfire.config.ConfigModule} and
@@ -40,7 +41,7 @@ extends ConfigModule
 {
 	private static final long serialVersionUID = 1L;
 
-	public static final String FETCH_GROUP_PHONE_SYSTEM = "PhoneSystemConfigModule.phoneSystem";
+	public static final String FETCH_GROUP_PHONE_SYSTEM = "PhoneSystemConfigModule.phoneSystem"; //$NON-NLS-1$
 
 	/**
 	 * Which configuration (i.e. which PhoneSystem server) to use.
@@ -52,7 +53,7 @@ extends ConfigModule
 	public void init() {
 		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
 		if (pm == null)
-			throw new IllegalStateException("JDOHelper.getPersistenceManager(this) returned null!");
+			throw new IllegalStateException("JDOHelper.getPersistenceManager(this) returned null!"); //$NON-NLS-1$
 
 		this.phoneSystem = DefaultPhoneSystem.getDefaultPhoneSystem(pm).getPhoneSystem();
 	}
@@ -63,7 +64,7 @@ extends ConfigModule
 
 	public void setPhoneSystem(PhoneSystem phoneSystem) {
 		if (phoneSystem == null)
-			throw new IllegalArgumentException("phoneSystem == null");
+			throw new IllegalArgumentException("phoneSystem == null"); //$NON-NLS-1$
 
 		this.phoneSystem = phoneSystem;
 	}

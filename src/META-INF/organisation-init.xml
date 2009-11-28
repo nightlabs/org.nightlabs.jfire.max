@@ -1,0 +1,8 @@
+<!DOCTYPE organisation-initialisation
+		PUBLIC "-//NightLabs GmbH//DTD Datastore Initialization 1.1//EN"
+		"http://www.nightlabs.de/dtd/datastoreinit_1_1.dtd">
+<organisation-initialisation>
+	<init bean="org.nightlabs.jfire.asterisk.ContactAsteriskManagerRemote" method="initialise">
+		<depends module="JFireContactPBXEAR.ear" />
+	</init>
+</organisation-initialisation>

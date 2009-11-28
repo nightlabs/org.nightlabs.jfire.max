@@ -2,7 +2,6 @@ package org.nightlabs.jfire.asterisk;
 
 import java.io.File;
 import java.util.Iterator;
-import java.util.Locale;
 import java.util.Set;
 
 import javax.annotation.security.RolesAllowed;
@@ -43,37 +42,43 @@ implements AsteriskManagerRemote
 	private void initTimerTaskCleanupCallFiles(PersistenceManager pm)
 	throws Exception
 	{
-		TaskID taskID = TaskID.create(getOrganisationID(), Task.TASK_TYPE_ID_SYSTEM, "cleanupCallFiles");
+		Task task;
+		TaskID taskID = TaskID.create(getOrganisationID(), Task.TASK_TYPE_ID_SYSTEM, "cleanupAsteriskCallFiles"); //$NON-NLS-1$
 		try {
-			pm.getObjectById(taskID);
-			return;
+			task = (Task) pm.getObjectById(taskID);
 		} catch (JDOObjectNotFoundException x) {
-			// Do nothing.
+			task = new Task(
+					taskID,
+					User.getUser(pm, getOrganisationID(), User.USER_ID_SYSTEM),
+					AsteriskManagerRemote.class,
+					taskID.taskID // the EJB method name is the same as the task-identifier
+			);
+			task = pm.makePersistent(task);
+			task.getTimePatternSet().createTimePattern(
+					"*", // year //$NON-NLS-1$
+					"*", // month //$NON-NLS-1$
+					"*", // day //$NON-NLS-1$
+					"*", // dayOfWeek //$NON-NLS-1$
+					"*", //  hour //$NON-NLS-1$
+					"11-59/15" // minute //$NON-NLS-1$
+			);
+			task.setEnabled(true);
 		}
 
-		Task task = new Task(
-				taskID,
-				User.getUser(pm, getOrganisationID(), User.USER_ID_SYSTEM),
-				AsteriskManagerRemote.class, "cleanupCallFiles"
+		task.getName().readFromProperties(
+				"org.nightlabs.jfire.asterisk.resource.messages",
+				AsteriskManagerBean.class.getClassLoader(),
+				"org.nightlabs.jfire.asterisk.AsteriskManagerBean.cleanupCallFilesTask.name"
 		);
-		task = pm.makePersistent(task);
-		task.getTimePatternSet().createTimePattern(
-				"*", // year
-				"*", // month
-				"*", // day
-				"*", // dayOfWeek
-				"*", //  hour
-				"11-59/15" // minute
+		task.getDescription().readFromProperties(
+				"org.nightlabs.jfire.asterisk.resource.messages",
+				AsteriskManagerBean.class.getClassLoader(),
+				"org.nightlabs.jfire.asterisk.AsteriskManagerBean.cleanupCallFilesTask.description"
 		);
-
-		task.getName().setText(Locale.ENGLISH.getLanguage(), "Clean call files");
-		task.getDescription().setText(Locale.ENGLISH.getLanguage(), "This task cleans expired files that were not processed by Asterisk.");
-
-		task.setEnabled(true);
 	}
 
 	@Override
-	public void cleanupCallFiles(TaskID taskID)
+	public void cleanupAsteriskCallFiles(TaskID taskID)
 	throws Exception
 	{
 		PersistenceManager pm = createPersistenceManager();
@@ -88,16 +93,16 @@ implements AsteriskManagerRemote
 				);
 				File tmpDir = new File(callFileDir, AsteriskServer.CALL_FILE_TEMP_SUB_DIRECTORY);
 				if (tmpDir.exists())
-					cleanupCallFileDirectory(asteriskServer, tmpDir);
+					cleanupAsteriskCallFileDirectory(asteriskServer, tmpDir);
 
-				cleanupCallFileDirectory(asteriskServer, callFileDir);
+				cleanupAsteriskCallFileDirectory(asteriskServer, callFileDir);
 			}
 		} finally {
 			pm.close();
 		}
 	}
 
-	private static void cleanupCallFileDirectory(AsteriskServer asteriskServer, File directory)
+	private static void cleanupAsteriskCallFileDirectory(AsteriskServer asteriskServer, File directory)
 	{
 		long maxAgeMSec = 60L * 1000L * asteriskServer.getCallFileExpiryAgeMinutes();
 
@@ -106,42 +111,42 @@ implements AsteriskManagerRemote
 			for (File callFile : callFiles) {
 				if (callFile.isDirectory()) {
 					if (logger.isDebugEnabled())
-						logger.debug("cleanupCallFileDirectory: ignoring sub-directory: " + callFile.getAbsolutePath());
+						logger.debug("cleanupCallFileDirectory: ignoring sub-directory: " + callFile.getAbsolutePath()); //$NON-NLS-1$
 
 					continue;
 				}
 
 				if (!callFile.getName().endsWith(AsteriskServer.CALL_FILE_SUFFIX)) {
 					if (logger.isDebugEnabled())
-						logger.debug("cleanupCallFileDirectory: ignoring file, because it does not end on \"" + AsteriskServer.CALL_FILE_SUFFIX + "\": " + callFile.getAbsolutePath());
+						logger.debug("cleanupCallFileDirectory: ignoring file, because it does not end on \"" + AsteriskServer.CALL_FILE_SUFFIX + "\": " + callFile.getAbsolutePath()); //$NON-NLS-1$ //$NON-NLS-2$
 
 					continue; // ignore files that are not created by us
 				}
 
-				String fileTimeStamp = callFile.getName().split("-")[0];
+				String fileTimeStamp = callFile.getName().split("-")[0]; //$NON-NLS-1$
 
 				long fileTime = Long.MAX_VALUE;
 
 				try {
 					fileTime = Long.valueOf(fileTimeStamp, 36);
 				} catch (NumberFormatException x) {
-					logger.warn("cleanupCallFileDirectory: could not parse timestamp from file name: " + callFile.getAbsolutePath());
+					logger.warn("cleanupCallFileDirectory: could not parse timestamp from file name: " + callFile.getAbsolutePath()); //$NON-NLS-1$
 				}
 
 				long ageMSec = System.currentTimeMillis() - fileTime;
 				if (ageMSec > maxAgeMSec) {
 					if (logger.isDebugEnabled())
-						logger.debug("cleanupCallFileDirectory: deleting file: " + callFile.getAbsolutePath());
+						logger.debug("cleanupCallFileDirectory: deleting file: " + callFile.getAbsolutePath()); //$NON-NLS-1$
 
 					if (!callFile.delete())
-						logger.warn("cleanupCallFileDirectory: Deleting file failed: " + callFile.getAbsolutePath());
+						logger.warn("cleanupCallFileDirectory: Deleting file failed: " + callFile.getAbsolutePath()); //$NON-NLS-1$
 
 					if (logger.isInfoEnabled())
-						logger.info("cleanupCallFileDirectory: deleted file: " + callFile.getAbsolutePath());
+						logger.info("cleanupCallFileDirectory: deleted file: " + callFile.getAbsolutePath()); //$NON-NLS-1$
 				}
 				else {
 					if (logger.isDebugEnabled())
-						logger.debug("cleanupCallFileDirectory: kept not-yet-expired (age=" + ageMSec + ", maxAge=" + maxAgeMSec + ") file: " + callFile.getAbsolutePath());
+						logger.debug("cleanupCallFileDirectory: kept not-yet-expired (age=" + ageMSec + ", maxAge=" + maxAgeMSec + ") file: " + callFile.getAbsolutePath()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				}
 			}
 		}

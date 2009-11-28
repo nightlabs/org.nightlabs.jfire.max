@@ -8,5 +8,5 @@ import org.nightlabs.jfire.timer.id.TaskID;
 public interface AsteriskManagerRemote
 {
 	void initialise() throws Exception;
-	void cleanupCallFiles(TaskID taskID) throws Exception;
+	void cleanupAsteriskCallFiles(TaskID taskID) throws Exception;
 }

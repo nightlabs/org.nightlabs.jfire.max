@@ -23,6 +23,7 @@ import javax.jdo.annotations.Persistent;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.jfire.asterisk.config.AsteriskConfigModule;
+import org.nightlabs.jfire.asterisk.resource.Messages;
 import org.nightlabs.jfire.config.WorkstationConfigSetup;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.organisation.LocalOrganisation;
@@ -260,7 +261,7 @@ extends PhoneSystem
 	throws PhoneSystemException
 	{
 		if (call.getPhoneNumberDataFieldID() == null)
-			throw new UnsupportedCallException(call, "The call must contain a phoneNumberDataFieldID!");
+			throw new UnsupportedCallException(call, "The call must contain a phoneNumberDataFieldID!"); //$NON-NLS-1$
 
 		PersistenceManager pm = getPersistenceManager();
 
@@ -277,7 +278,7 @@ extends PhoneSystem
 
 		Object o = pm.getObjectById(call.getPhoneNumberDataFieldID());
 		if (!(o instanceof PhoneNumberDataField))
-			throw new IllegalArgumentException("call.phoneNumberDataFieldID does not reference an instance of PhoneNumberDataField! Instead, it is: " + o.getClass().getName());
+			throw new IllegalArgumentException("call.phoneNumberDataFieldID does not reference an instance of PhoneNumberDataField! Instead, it is: " + o.getClass().getName()); //$NON-NLS-1$
 
 		PhoneNumberDataField phoneNumberDataField = (PhoneNumberDataField) o;
 		Person person = (Person) pm.getObjectById(
@@ -289,7 +290,7 @@ extends PhoneSystem
 
 		// Pattern to clean all spaces, minuses etc. in order to make the number
 		// an ordinary-phone-callable-number (i.e. purely digits from 0 to 9).
-		Pattern cleanDialPhoneNumberPattern = Pattern.compile("[^0-9]");
+		Pattern cleanDialPhoneNumberPattern = Pattern.compile("[^0-9]"); //$NON-NLS-1$
 
 		//create dial phone number
 		StringBuilder dialPhoneNumberSB = new StringBuilder();
@@ -297,7 +298,7 @@ extends PhoneSystem
 		// First, we clean the country-code individually to decide whether there really is one (might be only spaces).
 		String countryCode = phoneNumberDataField.getCountryCode();
 		if (countryCode != null && !countryCode.isEmpty())
-			countryCode = cleanDialPhoneNumberPattern.matcher(countryCode).replaceAll("");
+			countryCode = cleanDialPhoneNumberPattern.matcher(countryCode).replaceAll(""); //$NON-NLS-1$
 
 		// In order to support local numbers (within the local PBX), we only append the
 		// international-call-prefix, if we have a country code. Otherwise, we omit it.
@@ -312,7 +313,7 @@ extends PhoneSystem
 
 		// Clean all spaces, minuses etc. to make it an ordinary-phone-callable-number
 		// (i.e. purely digits from 0 to 9).
-		String dialPhoneNumber = cleanDialPhoneNumberPattern.matcher(dialPhoneNumberSB.toString()).replaceAll("");
+		String dialPhoneNumber = cleanDialPhoneNumberPattern.matcher(dialPhoneNumberSB.toString()).replaceAll(""); //$NON-NLS-1$
 
 		// Create a map with all variables (and their values) which can be used in the call-file-properties' values.
 		Map<String, String> variables = new HashMap<String, String>();
@@ -353,7 +354,7 @@ extends PhoneSystem
 		File callFileDir = new File(this.getCallFileDirectory());
 		if (!callFileDir.isDirectory())
 			throw new IllegalStateException(
-					"Call file directory does not exist or is no directory: "
+					"Call file directory does not exist or is no directory: " //$NON-NLS-1$
 					+ callFileDir.getAbsolutePath()
 			);
 
@@ -363,7 +364,7 @@ extends PhoneSystem
 
 		if (!tmpDir.isDirectory())
 			throw new IllegalStateException(
-					"Could not create temp directory within call file directory (check permissions!): "
+					"Could not create temp directory within call file directory (check permissions!): " //$NON-NLS-1$
 					+ tmpDir.getAbsolutePath()
 			);
 
@@ -381,10 +382,10 @@ extends PhoneSystem
 		//move to the parent directory
 		boolean isSuccess = callFile.renameTo(new File(tmpDir.getParentFile(), callFile.getName()));
 		if (!isSuccess)
-			logger.warn("Can not move call file to: " + tmpDir.getParentFile().getAbsolutePath());
+			logger.warn("Can not move call file to: " + tmpDir.getParentFile().getAbsolutePath()); //$NON-NLS-1$
 	}
 
-	public static final String CALL_FILE_TEMP_SUB_DIRECTORY = "jfire.tmp";
+	public static final String CALL_FILE_TEMP_SUB_DIRECTORY = "jfire.tmp"; //$NON-NLS-1$
 
-	public static final String CALL_FILE_SUFFIX = ".jfire.call";
+	public static final String CALL_FILE_SUFFIX = ".jfire.call"; //$NON-NLS-1$
 }

@@ -29,16 +29,16 @@ import org.nightlabs.jfire.timer.id.TaskID;
  */
 @TransactionAttribute(TransactionAttributeType.REQUIRED)
 @Stateless
-public class ContactAsteriskManagerBean
+public class AsteriskManagerBean
 extends BaseSessionBeanImpl
-implements ContactAsteriskManagerRemote
+implements AsteriskManagerRemote
 {
 	private static final long serialVersionUID = 1L;
 
 	/**
 	 * LOG4J logger used by this class
 	 */
-	private static final Logger logger = Logger.getLogger(ContactAsteriskManagerBean.class);
+	private static final Logger logger = Logger.getLogger(AsteriskManagerBean.class);
 
 	private void initTimerTaskCleanupCallFiles(PersistenceManager pm)
 	throws Exception
@@ -54,7 +54,7 @@ implements ContactAsteriskManagerRemote
 		Task task = new Task(
 				taskID,
 				User.getUser(pm, getOrganisationID(), User.USER_ID_SYSTEM),
-				ContactAsteriskManagerRemote.class, "cleanupCallFiles"
+				AsteriskManagerRemote.class, "cleanupCallFiles"
 		);
 		task = pm.makePersistent(task);
 		task.getTimePatternSet().createTimePattern(

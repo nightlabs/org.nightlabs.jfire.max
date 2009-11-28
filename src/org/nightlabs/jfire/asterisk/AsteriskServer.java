@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.regex.Pattern;
 
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
@@ -41,15 +42,16 @@ import org.nightlabs.util.IOUtil;
  * @author Marco หงุ่ยตระกูล-Schulze - marco at nightlabs dot de
  */
 @PersistenceCapable(
-	identityType=IdentityType.APPLICATION,
-	detachable="true",
-	table="JFireContactAsterisk_AsteriskServer")
+		identityType=IdentityType.APPLICATION,
+		detachable="true",
+		table="JFireContactAsterisk_AsteriskServer"
+)
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 @FetchGroups({
 	@FetchGroup(
-		name=AsteriskServer.FETCH_GROUP_CALL_FILE_PROPERTIES,
-		members=@Persistent(name="callFileProperties")),
-
+			name=AsteriskServer.FETCH_GROUP_CALL_FILE_PROPERTIES,
+			members=@Persistent(name="callFileProperties")
+	),
 })
 public class AsteriskServer
 extends PhoneSystem
@@ -285,15 +287,32 @@ extends PhoneSystem
 				)
 		);
 
+		// Pattern to clean all spaces, minuses etc. in order to make the number
+		// an ordinary-phone-callable-number (i.e. purely digits from 0 to 9).
+		Pattern cleanDialPhoneNumberPattern = Pattern.compile("[^0-9]");
+
 		//create dial phone number
 		StringBuilder dialPhoneNumberSB = new StringBuilder();
-		dialPhoneNumberSB.append(this.getInternationalCallPrefix());
-		dialPhoneNumberSB.append(phoneNumberDataField.getCountryCode());
+
+		// First, we clean the country-code individually to decide whether there really is one (might be only spaces).
+		String countryCode = phoneNumberDataField.getCountryCode();
+		if (countryCode != null && !countryCode.isEmpty())
+			countryCode = cleanDialPhoneNumberPattern.matcher(countryCode).replaceAll("");
+
+		// In order to support local numbers (within the local PBX), we only append the
+		// international-call-prefix, if we have a country code. Otherwise, we omit it.
+		if (countryCode != null && !countryCode.isEmpty()) {
+			dialPhoneNumberSB.append(this.getInternationalCallPrefix());
+			dialPhoneNumberSB.append(countryCode);
+		}
+
+		// Append the area code and the local number.
 		dialPhoneNumberSB.append(phoneNumberDataField.getAreaCode());
 		dialPhoneNumberSB.append(phoneNumberDataField.getLocalNumber());
 
-		// Clean all spaces, minuses etc. to make it an ordinary-phone-callable-number (purely digits from 0 to 9).
-		String dialPhoneNumber = dialPhoneNumberSB.toString().replaceAll("[^0-9]", "");
+		// Clean all spaces, minuses etc. to make it an ordinary-phone-callable-number
+		// (i.e. purely digits from 0 to 9).
+		String dialPhoneNumber = cleanDialPhoneNumberPattern.matcher(dialPhoneNumberSB.toString()).replaceAll("");
 
 		// Create a map with all variables (and their values) which can be used in the call-file-properties' values.
 		Map<String, String> variables = new HashMap<String, String>();

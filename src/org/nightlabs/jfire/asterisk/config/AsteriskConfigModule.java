@@ -53,19 +53,8 @@ extends ConfigModule
 {
 	private static final long serialVersionUID = 1L;
 
-//	public static final String FETCH_GROUP_ASTERISK_SERVER = "AsteriskConfigModule.asteriskServer";
-	public static final String FETCH_GROUP_CALL_FILE_PROPERTIES = "AsteriskConfigModule.callFileProperties";
-	public static final String FETCH_GROUP_CALL_FILE_OVERRIDE_KEYS = "AsteriskConfigModule.overrideCallFilePropertyKeys";
-
-//	/**
-//	 * Which configuration (i.e. which Asterisk server) to use.
-//	 * This should default to the “default” AsteriskServer.
-//	 */
-////	@Persistent(dependent="true", !!! WRONG !!! This is of course NOT dependent! Dependent means, the AsteriskServer would be deleted when this ConfigModule doesn't reference it. But that should not happen - especially because multiple ConfigModules might reference it! The defaults are fine - we need no @Persistent annotation at all. Marco.
-////			persistenceModifier=PersistenceModifier.PERSISTENT)
-////	@Persistent(nullValue=NullValue.EXCEPTION) // Since there is a default-server, we can declare this field to be required.
-//	@Persistent //This should be able to be NULL!! Becasuse this config module is persisted before the asteriskServer has the value!! See org.nightlabs.jfire.config.Config @ 356&364
-//	private AsteriskServer asteriskServer;
+	public static final String FETCH_GROUP_CALL_FILE_PROPERTIES = "AsteriskConfigModule.callFileProperties"; //$NON-NLS-1$
+	public static final String FETCH_GROUP_CALL_FILE_OVERRIDE_KEYS = "AsteriskConfigModule.overrideCallFilePropertyKeys"; //$NON-NLS-1$
 
 	/**
 	 * The properties that shall be overridden (i.e. the value defined in the assigned asteriskServer should not be used).
@@ -88,27 +77,14 @@ extends ConfigModule
 	public void init() {
 		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
 		if (pm == null)
-			throw new IllegalStateException("JDOHelper.getPersistenceManager(this) returned null!");
-
-//		this.asteriskServer = AsteriskServer.getDefaultAsteriskServer(pm);
+			throw new IllegalStateException("JDOHelper.getPersistenceManager(this) returned null!"); //$NON-NLS-1$
 
 		overrideCallFilePropertyKeys = new HashSet<String>();
-		overrideCallFilePropertyKeys.add(CALL_FILE_PROPERTY_CHANNEL);
+		overrideCallFilePropertyKeys.add(AsteriskServer.CALL_FILE_PROPERTY_CHANNEL);
 
 		callFileProperties = new HashMap<String, String>();
-		callFileProperties.put(CALL_FILE_PROPERTY_CHANNEL, "Local/2110@local");
+		callFileProperties.put(AsteriskServer.CALL_FILE_PROPERTY_CHANNEL, "Local/2110@local"); //$NON-NLS-1$
 	}
-
-//	public AsteriskServer getAsteriskServer() {
-//		return asteriskServer;
-//	}
-//
-//	public void setAsteriskServer(AsteriskServer asteriskServer) {
-//		if (asteriskServer == null)
-//			throw new IllegalArgumentException("asteriskServer == null");
-//
-//		this.asteriskServer = asteriskServer;
-//	}
 
 	/**
 	 * Get a read-only <code>Set</code> of all property-keys that are overridden by
@@ -133,7 +109,7 @@ extends ConfigModule
 	public boolean addOverrideCallFilePropertyKey(String key)
 	{
 		if (key == null)
-			throw new IllegalArgumentException("key must not be null!");
+			throw new IllegalArgumentException("key must not be null!"); //$NON-NLS-1$
 
 		return overrideCallFilePropertyKeys.add(key);
 	}
@@ -193,14 +169,11 @@ extends ConfigModule
 	public String setCallFileProperty(String key, String value)
 	{
 		if (key == null)
-			throw new IllegalArgumentException("key must not be null!");
+			throw new IllegalArgumentException("key must not be null!"); //$NON-NLS-1$
 
 		if (value == null)
 			return callFileProperties.remove(key);
 		else
 			return callFileProperties.put(key, value);
 	}
-
-	//Normal keys
-	public static final String CALL_FILE_PROPERTY_CHANNEL = "Channel";
 }

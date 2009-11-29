@@ -23,7 +23,6 @@ import javax.jdo.annotations.Persistent;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.jfire.asterisk.config.AsteriskConfigModule;
-import org.nightlabs.jfire.asterisk.resource.Messages;
 import org.nightlabs.jfire.config.WorkstationConfigSetup;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.organisation.LocalOrganisation;
@@ -252,6 +251,11 @@ extends PhoneSystem
 	public static final String CALL_FILE_PROPERTY_CONTEXT = "Context"; //$NON-NLS-1$
 	public static final String CALL_FILE_PROPERTY_EXTENSION = "Extension"; //$NON-NLS-1$
 	public static final String CALL_FILE_PROPERTY_PRIORITY = "Priority"; //$NON-NLS-1$
+
+	/**
+	 * The local phone to call.
+	 */
+	public static final String CALL_FILE_PROPERTY_CHANNEL = "Channel"; //$NON-NLS-1$
 
 	//Internal keys
 	public static final String CALL_FILE_PROPERTY_SET_DIAL_PHONE_NUMBER = "_SetDialPhoneNumber_"; //$NON-NLS-1$

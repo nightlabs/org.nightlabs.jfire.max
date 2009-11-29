@@ -13,6 +13,7 @@ import javax.jdo.PersistenceManager;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.jfire.asterisk.config.AsteriskConfigModule;
+import org.nightlabs.jfire.asterisk.resource.Messages;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.config.ConfigSetup;
 import org.nightlabs.jfire.config.WorkstationConfigSetup;
@@ -66,14 +67,14 @@ implements AsteriskManagerRemote
 		}
 
 		task.getName().readFromProperties(
-				"org.nightlabs.jfire.asterisk.resource.messages",
+				"org.nightlabs.jfire.asterisk.resource.messages", //$NON-NLS-1$
 				AsteriskManagerBean.class.getClassLoader(),
-				"org.nightlabs.jfire.asterisk.AsteriskManagerBean.cleanupCallFilesTask.name"
+				"org.nightlabs.jfire.asterisk.AsteriskManagerBean.cleanupCallFilesTask.name" //$NON-NLS-1$
 		);
 		task.getDescription().readFromProperties(
-				"org.nightlabs.jfire.asterisk.resource.messages",
+				"org.nightlabs.jfire.asterisk.resource.messages", //$NON-NLS-1$
 				AsteriskManagerBean.class.getClassLoader(),
-				"org.nightlabs.jfire.asterisk.AsteriskManagerBean.cleanupCallFilesTask.description"
+				"org.nightlabs.jfire.asterisk.AsteriskManagerBean.cleanupCallFilesTask.description" //$NON-NLS-1$
 		);
 	}
 

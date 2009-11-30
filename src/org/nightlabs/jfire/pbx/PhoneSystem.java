@@ -1,6 +1,9 @@
 package org.nightlabs.jfire.pbx;
 
 import java.io.Serializable;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
@@ -21,7 +24,7 @@ import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.pbx.id.PhoneSystemID;
-import org.nightlabs.jfire.pbx.resource.Messages;
+import org.nightlabs.jfire.prop.StructField;
 import org.nightlabs.util.Util;
 
 /**
@@ -41,6 +44,10 @@ import org.nightlabs.util.Util;
 			name="PhoneSystem.name",
 			members=@Persistent(name="name")
 	),
+	@FetchGroup(
+			name="PhoneSystem.callableStructFields",
+			members=@Persistent(name="callableStructFields")
+	),
 })
 public abstract class PhoneSystem
 implements Serializable
@@ -48,6 +55,7 @@ implements Serializable
 	private static final long serialVersionUID = 1L;
 
 	public static final String FETCH_GROUP_NAME = "PhoneSystem.name"; //$NON-NLS-1$
+	public static final String FETCH_GROUP_CALLABLE_STRUCT_FIELDS = "PhoneSystem.callableStructFields"; //$NON-NLS-1$
 
 	@PrimaryKey
 	@Column(length=100)
@@ -77,6 +85,11 @@ implements Serializable
 	@Persistent(nullValue=NullValue.EXCEPTION)
 	private String internationalCallPrefix;
 
+	/**
+	 * A set of {@link StructField} used to specify the phone numbers that allow to be called.
+	 */
+	@Persistent(nullValue=NullValue.EXCEPTION)
+	private Set<StructField> callableStructFields;
 	/**
 	 * @deprecated This constructor exists only for JDO and should never be used directly!
 	 */
@@ -111,6 +124,7 @@ implements Serializable
 		this.phoneSystemID = phoneSystemID;
 		this.internationalCallPrefix = "00"; //$NON-NLS-1$
 		this.name = new PhoneSystemName(this);
+		this.callableStructFields = new HashSet<StructField>();
 	}
 
 	public String getOrganisationID() {
@@ -130,6 +144,18 @@ implements Serializable
 		return internationalCallPrefix;
 	}
 
+	public Set<StructField> getCallableStructFields() {
+		return Collections.unmodifiableSet(callableStructFields);
+	}
+	
+	public boolean addCallableStructField(StructField structField) {
+		return callableStructFields.add(structField);
+	}
+	
+	public boolean removeCallableStructField(StructField structField) {
+		return callableStructFields.remove(structField);
+	}
+	
 	public void setInternationalCallPrefix(String internationalCallPrefix) {
 		if (internationalCallPrefix == null)
 			throw new IllegalArgumentException("internationalCallPrefix == null"); //$NON-NLS-1$

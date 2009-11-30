@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project-modules id="moduleCoreId" project-version="1.5.0">
-    <wb-module deploy-name="JFireContactPBXEAR">
+    <wb-module deploy-name="JFirePBXEAR">
         <wb-resource deploy-path="/" source-path="/EarContent"/>
         <dependent-module archiveName="JFirePBX.jar" deploy-path="/" handle="module:/resource/JFirePBX/JFirePBX">
             <dependency-type>uses</dependency-type>

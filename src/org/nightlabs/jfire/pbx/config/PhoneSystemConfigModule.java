@@ -27,7 +27,7 @@ import org.nightlabs.jfire.pbx.resource.Messages;
 @PersistenceCapable(
 		identityType=IdentityType.APPLICATION,
 		detachable="true",
-		table="JFireContactPhoneSystem_PhoneSystemConfigModule"
+		table="JFirePBX_PhoneSystemConfigModule"
 )
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 @FetchGroups({

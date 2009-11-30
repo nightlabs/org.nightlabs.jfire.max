@@ -32,7 +32,7 @@ import org.nightlabs.util.Util;
 		objectIdClass=PhoneSystemID.class,
 		identityType=IdentityType.APPLICATION,
 		detachable="true",
-		table="JFireContactPBX_PhoneSystem"
+		table="JFirePBX_PhoneSystem"
 )
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 @Discriminator(strategy=DiscriminatorStrategy.CLASS_NAME)

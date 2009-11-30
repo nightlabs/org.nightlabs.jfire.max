@@ -32,7 +32,7 @@ import org.nightlabs.jfire.pbx.id.DefaultPhoneSystemID;
 		objectIdClass=DefaultPhoneSystemID.class,
 		identityType=IdentityType.APPLICATION,
 		detachable="true",
-		table="JFireContactPBX_DefaultPhoneSystem"
+		table="JFirePBX_DefaultPhoneSystem"
 )
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class DefaultPhoneSystem

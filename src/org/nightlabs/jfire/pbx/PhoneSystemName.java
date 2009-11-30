@@ -29,7 +29,7 @@ import org.nightlabs.jfire.pbx.resource.Messages;
 		objectIdClass=PhoneSystemNameID.class,
 		identityType=IdentityType.APPLICATION,
 		detachable="true",
-		table="JFireContactPBX_PhoneSystemName"
+		table="JFirePBX_PhoneSystemName"
 )
 @FetchGroups({
 	@FetchGroup(
@@ -61,7 +61,7 @@ extends I18nText
 	private PhoneSystem phoneSystem;
 
 	@Join
-	@Persistent(table="JFireContactPBX_PhoneSystemName_names", defaultFetchGroup="true")
+	@Persistent(table="JFirePBX_PhoneSystemName_names", defaultFetchGroup="true")
 	private Map<String, String> names;
 
 	/**

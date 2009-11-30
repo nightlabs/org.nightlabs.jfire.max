@@ -12,6 +12,7 @@ import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 
 import org.apache.log4j.Logger;
+import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.asterisk.config.AsteriskConfigModule;
 import org.nightlabs.jfire.asterisk.resource.Messages;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
@@ -181,6 +182,18 @@ implements AsteriskManagerRemote
 			if (!configModuleClasses.contains(AsteriskConfigModule.class.getName())) // DataNucleus workaround: the following add causes an exception, if it's already there. thus, we need to check.
 				configModuleClasses.add(AsteriskConfigModule.class.getName());
 		} finally {
+			pm.close();
+		}
+	}
+
+	@Override
+	public AsteriskServer storeAsteriskServer(AsteriskServer asteriskServer,
+			boolean get, String[] fetchGroups, int maxFetchDepth) {
+		PersistenceManager pm = createPersistenceManager();
+		try {
+			return NLJDOHelper.storeJDO(pm, asteriskServer, get, fetchGroups, maxFetchDepth);
+		}
+		finally {
 			pm.close();
 		}
 	}

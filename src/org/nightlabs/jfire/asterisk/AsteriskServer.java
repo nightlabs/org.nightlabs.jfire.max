@@ -51,7 +51,7 @@ import org.nightlabs.util.IOUtil;
 	@FetchGroup(
 			name=AsteriskServer.FETCH_GROUP_CALL_FILE_PROPERTIES,
 			members=@Persistent(name="callFileProperties")
-	),
+	)
 })
 public class AsteriskServer
 extends PhoneSystem

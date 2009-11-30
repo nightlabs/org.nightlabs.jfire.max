@@ -44,7 +44,7 @@ import org.nightlabs.util.IOUtil;
 @PersistenceCapable(
 		identityType=IdentityType.APPLICATION,
 		detachable="true",
-		table="JFireContactAsterisk_AsteriskServer"
+		table="JFireAsterisk_AsteriskServer"
 )
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 @FetchGroups({
@@ -87,7 +87,7 @@ extends PhoneSystem
 	 *  to prevent Heisenbugs (having always the same order).
 	 */
 	@Join
-	@Persistent(table="JFireContactAsterisk_AsteriskServer_callFileProperties")
+	@Persistent(table="JFireAsterisk_AsteriskServer_callFileProperties")
 	private Map<String, String> callFileProperties;
 
 	/**

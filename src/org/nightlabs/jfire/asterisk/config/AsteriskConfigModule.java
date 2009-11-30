@@ -32,7 +32,7 @@ import org.nightlabs.jfire.config.ConfigModule;
 @PersistenceCapable(
 	identityType=IdentityType.APPLICATION,
 	detachable="true",
-	table="JFireContactAsterisk_AsteriskConfigModule")
+	table="JFireAsterisk_AsteriskConfigModule")
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 @FetchGroups({
 //	@FetchGroup(
@@ -60,7 +60,7 @@ extends ConfigModule
 	 * The properties that shall be overridden (i.e. the value defined in the assigned asteriskServer should not be used).
 	 */
 	@Join
-	@Persistent(table="JFireContactAsterisk_AsteriskConfigModule_overrideCallFilePropertyKeys")
+	@Persistent(table="JFireAsterisk_AsteriskConfigModule_overrideCallFilePropertyKeys")
 	private Set<String> overrideCallFilePropertyKeys;
 
 	/**
@@ -70,7 +70,7 @@ extends ConfigModule
 	 * but not here, the global value is not written to the file at all.
 	 */
 	@Join
-	@Persistent(table="JFireContactAsterisk_AsteriskConfigModule_callFileProperties") // persistenceModifier=PersistenceModifier.PERSISTENT is default - we don't need it (if we don't change the default of the class before).
+	@Persistent(table="JFireAsterisk_AsteriskConfigModule_callFileProperties") // persistenceModifier=PersistenceModifier.PERSISTENT is default - we don't need it (if we don't change the default of the class before).
 	private Map<String, String> callFileProperties;
 
 	@Override

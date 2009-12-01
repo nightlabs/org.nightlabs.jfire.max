@@ -1,6 +1,7 @@
 package org.nightlabs.jfire.pbx;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -15,8 +16,10 @@ import javax.jdo.annotations.FetchGroups;
 import javax.jdo.annotations.IdentityType;
 import javax.jdo.annotations.Inheritance;
 import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Join;
 import javax.jdo.annotations.NullValue;
 import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 
@@ -88,7 +91,11 @@ implements Serializable
 	/**
 	 * A set of {@link StructField} used to specify the phone numbers that allow to be called.
 	 */
-	@Persistent(nullValue=NullValue.EXCEPTION)
+	@Join
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		table="JFirePBX_callableStructFields",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Set<StructField> callableStructFields;
 	/**
 	 * @deprecated This constructor exists only for JDO and should never be used directly!
@@ -152,8 +159,16 @@ implements Serializable
 		return callableStructFields.add(structField);
 	}
 	
+	public boolean addCallableStructFields(Collection<StructField> structFields) {
+		return callableStructFields.addAll(structFields);
+	}
+	
 	public boolean removeCallableStructField(StructField structField) {
 		return callableStructFields.remove(structField);
+	}
+	
+	public boolean removeCallableStructFields(Collection<StructField> structFields) {
+		return callableStructFields.removeAll(structFields);
 	}
 	
 	public void setInternationalCallPrefix(String internationalCallPrefix) {

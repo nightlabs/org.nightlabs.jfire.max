@@ -12,9 +12,7 @@ import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 
 import org.apache.log4j.Logger;
-import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.asterisk.config.AsteriskConfigModule;
-import org.nightlabs.jfire.asterisk.resource.Messages;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.config.ConfigSetup;
 import org.nightlabs.jfire.config.WorkstationConfigSetup;
@@ -186,15 +184,16 @@ implements AsteriskManagerRemote
 		}
 	}
 
-	@Override
-	public AsteriskServer storeAsteriskServer(AsteriskServer asteriskServer,
-			boolean get, String[] fetchGroups, int maxFetchDepth) {
-		PersistenceManager pm = createPersistenceManager();
-		try {
-			return NLJDOHelper.storeJDO(pm, asteriskServer, get, fetchGroups, maxFetchDepth);
-		}
-		finally {
-			pm.close();
-		}
-	}
+// arg!!!
+//	@Override
+//	public AsteriskServer storeAsteriskServer(AsteriskServer asteriskServer,
+//			boolean get, String[] fetchGroups, int maxFetchDepth) {
+//		PersistenceManager pm = createPersistenceManager();
+//		try {
+//			return NLJDOHelper.storeJDO(pm, asteriskServer, get, fetchGroups, maxFetchDepth);
+//		}
+//		finally {
+//			pm.close();
+//		}
+//	}
 }

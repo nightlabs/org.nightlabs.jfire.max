@@ -184,7 +184,7 @@ implements AsteriskManagerRemote
 		}
 	}
 
-// arg!!!
+// Why do you need this method? Didn't you see that AsteriskServer subclasses PhoneSystem?
 //	@Override
 //	public AsteriskServer storeAsteriskServer(AsteriskServer asteriskServer,
 //			boolean get, String[] fetchGroups, int maxFetchDepth) {

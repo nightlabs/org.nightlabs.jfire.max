@@ -10,7 +10,7 @@ public interface AsteriskManagerRemote
 	void initialise() throws Exception;
 	void cleanupAsteriskCallFiles(TaskID taskID) throws Exception;
 
-// arg! I removed this for a reason! AsteriskServer is a subclass of PhoneSystem and PhoneSystems can already be stored.
+// I removed this for a reason. AsteriskServer is a subclass of PhoneSystem and PhoneSystems can already be stored.
 //	AsteriskServer storeAsteriskServer(
 //			AsteriskServer asteriskServer, boolean get, String[] fetchGroups,
 //			int maxFetchDepth);

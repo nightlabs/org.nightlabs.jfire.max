@@ -39,6 +39,7 @@ import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 import javax.ejb.TransactionManagement;
 import javax.ejb.TransactionManagementType;
+import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 
 import org.apache.log4j.Logger;
@@ -119,11 +120,14 @@ implements ScriptManagerRemote
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
-				pm.getFetchPlan().setGroups(fetchGroups);
-
-			ScriptRegistryItem reportRegistryItem = (ScriptRegistryItem)pm.getObjectById(scriptRegistryItemID);
-			ScriptRegistryItem result = pm.detachCopy(reportRegistryItem);
-			return result;
+				pm.getFetchPlan().setGroups(fetchGroups);			
+			try {
+				ScriptRegistryItem reportRegistryItem = (ScriptRegistryItem)pm.getObjectById(scriptRegistryItemID);
+				ScriptRegistryItem result = pm.detachCopy(reportRegistryItem);
+				return result;
+			} catch (JDOObjectNotFoundException e) {
+				return null;
+			}
 		} finally {
 			pm.close();
 		}
@@ -138,7 +142,7 @@ implements ScriptManagerRemote
 	public List<ScriptRegistryItem> getScriptRegistryItems (
 			List<ScriptRegistryItemID> scriptRegistryItemIDs,
 			String[] fetchGroups, int maxFetchDepth
-		)
+			)
 	{
 		PersistenceManager pm;
 		pm = createPersistenceManager();
@@ -147,12 +151,15 @@ implements ScriptManagerRemote
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 
-			List<ScriptRegistryItem> result = new ArrayList<ScriptRegistryItem>();
-			for (ScriptRegistryItemID itemID : scriptRegistryItemIDs) {
-				ScriptRegistryItem item = (ScriptRegistryItem)pm.getObjectById(itemID);
-				result.add(pm.detachCopy(item));
+			List<ScriptRegistryItem> result = new ArrayList<ScriptRegistryItem>();			
+			try {
+				for (ScriptRegistryItemID itemID : scriptRegistryItemIDs) {
+					ScriptRegistryItem item = (ScriptRegistryItem)pm.getObjectById(itemID);
+					result.add(pm.detachCopy(item));
+				}
+			} catch (JDOObjectNotFoundException e) {
+				// ignore it
 			}
-
 			return result;
 		} finally {
 			pm.close();

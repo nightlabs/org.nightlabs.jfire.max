@@ -83,7 +83,7 @@ implements WebShopRemote
 
 	public List<WebCustomer> getWebCustomers(Set<WebCustomerID> webCustomerIDs, String[] fetchGroups, int maxFetchDepth)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			return NLJDOHelper.getDetachedObjectList(pm, webCustomerIDs, WebCustomer.class, fetchGroups, maxFetchDepth);
 		} finally {
@@ -99,7 +99,7 @@ implements WebShopRemote
 
 	public Set<WebCustomerID> getWebCustomerIDs()
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			Query q = pm.newQuery(WebCustomer.class);
 			q.setResult("JDOHelper.getObjectId(this)");
@@ -117,7 +117,7 @@ implements WebShopRemote
 
 	public WebCustomer getWebCustomer(WebCustomerID webCustomerID, String[] fetchGroups, int maxFetchDepth)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
@@ -136,7 +136,7 @@ implements WebShopRemote
 
 	public WebCustomer getPerson(WebCustomerID webCustomerID, String[] fetchGroups, int maxFetchDepth)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
@@ -156,7 +156,7 @@ implements WebShopRemote
 
 	public AnchorID getWebCustomerLegalEntityID(WebCustomerID webCustomerID)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			WebCustomer webCustomer = (WebCustomer)pm.getObjectById(webCustomerID);
 			return (AnchorID) (webCustomer.getLegalEntity() != null ? JDOHelper.getObjectId(webCustomer.getLegalEntity()) : null);
@@ -187,7 +187,7 @@ implements WebShopRemote
 
 	public WebCustomer createWebCustomer(WebCustomerID webCustomerID, String password, Person person, boolean get, String[] fetchGroups, int maxFetchDepth) throws DuplicateIDException
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			if (isWebCustomerIDExisting(webCustomerID, pm))
 				throw new DuplicateIDException("webCustomerID \"" + webCustomerID + "\" already exists!");
@@ -231,7 +231,7 @@ implements WebShopRemote
 
 	public Collection<WebCustomer> getWebCustomerByEmail(String email)
 	{
-		return WebCustomer.getWebCustomerWithEmail(getPersistenceManager(), email);
+		return WebCustomer.getWebCustomerWithEmail(createPersistenceManager(), email);
 	}
 
 	/**
@@ -255,7 +255,7 @@ implements WebShopRemote
 			return false;
 		}
 		String encryptedPassword = UserLocal.encryptPassword(password);
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			WebCustomer wbc = (WebCustomer)pm.getObjectById(webCustomerID);
 			if(wbc.getConfirmationString() != null || wbc.getConfirmationStringDate() != null) {
@@ -308,7 +308,7 @@ implements WebShopRemote
 	public boolean checkEmailConfirmation(WebCustomerID webCustomerID, String checkString)
 	{
 		if(checkString == null ) return false;
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			WebCustomer wbc = (WebCustomer)pm.getObjectById(webCustomerID);
 			// this will avoid a NullPointerException if no Email confirmation is open
@@ -333,7 +333,7 @@ implements WebShopRemote
 	public boolean hasEmailConfirmationExpired(WebCustomerID webCustomerID) throws JDOObjectNotFoundException
 	{
 		long expirationTime = 1000 * 60 * 60 * confirmationStringExpirationTimeInHours;
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			WebCustomer wbc = (WebCustomer)pm.getObjectById(webCustomerID);
 			Date now = new Date();
@@ -354,7 +354,7 @@ implements WebShopRemote
 
 	public boolean isWebCustomerIDExisting(WebCustomerID webCustomerID)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			pm.getObjectById(webCustomerID);
 			return true;
@@ -371,7 +371,7 @@ implements WebShopRemote
 
 	public boolean isEmailExisting(String email)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			Collection<WebCustomer> customer = WebCustomer.getWebCustomerWithEmail(pm, email);
 
@@ -388,7 +388,7 @@ implements WebShopRemote
 
 	public WebCustomer storeWebCustomer(WebCustomer webCustomer, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			return NLJDOHelper.storeJDO(pm, webCustomer, get, fetchGroups, maxFetchDepth);
 		} finally {
@@ -405,7 +405,7 @@ implements WebShopRemote
 
 	public void storeWebCustomerPassword(WebCustomerID webCustomerID, String newPassword)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			WebCustomer wbc = (WebCustomer)pm.getObjectById(webCustomerID);
 			wbc.setPassword(UserLocal.encryptPassword(newPassword));
@@ -496,7 +496,7 @@ implements WebShopRemote
 		// sending the mail
 		boolean atLeastOneMailSent = sendBlockGroupMails(webCustomerID, subject, message);
 		if(atLeastOneMailSent) {
-			PersistenceManager pm = getPersistenceManager();
+			PersistenceManager pm = createPersistenceManager();
 			try {
 				WebCustomer wbc = (WebCustomer)pm.getObjectById(webCustomerID);
 				wbc.setPassword(UserLocal.encryptPassword(newPassword));
@@ -533,7 +533,7 @@ implements WebShopRemote
 
 	public void setConfirmationString(WebCustomerID webCustomerID, String confirmationString)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 		try {
 			WebCustomer wbc = (WebCustomer)pm.getObjectById(webCustomerID);
 			// if the password doesnt get erased we have to set the current Time for a possible expiration

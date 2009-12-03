@@ -1,8 +1,9 @@
 /**
- * 
+ *
  */
 package org.nightlabs.jfire.web.webshop;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -10,68 +11,34 @@ import java.util.Map;
 
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.Queries;
 
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.person.PersonStruct;
 import org.nightlabs.jfire.trade.LegalEntity;
-
-import javax.jdo.annotations.Persistent;
 import org.nightlabs.jfire.webshop.id.WebCustomerID;
-import javax.jdo.annotations.FetchGroups;
-import javax.jdo.annotations.InheritanceStrategy;
-import javax.jdo.annotations.Inheritance;
-import javax.jdo.annotations.Queries;
-import javax.jdo.annotations.PrimaryKey;
-import javax.jdo.annotations.FetchGroup;
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.Column;
-import javax.jdo.annotations.IdentityType;
-import javax.jdo.annotations.PersistenceModifier;
 
 /**
  * The WebCustomer assembles datas like username and password that are only used for the web
  * and a legalEntity within the core system.
- * 
+ *
  * @author Khaled
- *
- * @jdo.persistence-capable
- *		identity-type="application"
- *		detachable="true"
- *		objectid-class="org.nightlabs.jfire.webshop.id.WebCustomerID"
- *		table="JFireWebShopBase_WebCustomer"
- *
- * @jdo.inheritance strategy="new-table"
- * 
- * @jdo.create-objectid-class
- *		field-order="organisationID, webCustomerID"
- *
- * @jdo.fetch-group name="WebCustomer.legalEntity" fields="legalEntity"
- * @jdo.fetch-group name="WebCustomer.webCustomerID" fields="webCustomerID"
- * @jdo.fetch-group name="WebCustomer.password" fields="password"
- * @jdo.fetch-group name="WebCustomer.this" fields="legalEntity"
- * 
- * 
- * @jdo.query name="getWebCustomerWithRegexField" query="
- * 		SELECT
- * 			DISTINCT this
- * 		WHERE
- * 			this.legalEntity != null &&
- * 			this.legalEntity.person != null &&
- * 			this.legalEntity.person.dataFields.contains(regexField) &&
- * 			(
- * 				regexField.structBlockOrganisationID == :regexFieldStructBlockOrganisationID &&
- * 				regexField.structBlockID == :regexFieldStructBlockID &&
- * 				regexField.structFieldOrganisationID == :regexFieldStructFieldOrganisationID &&
- * 				regexField.structFieldID == :regexFieldStructFieldID &&
- * 				regexField.text.toLowerCase() == :regexFieldValue
- * 			)
- * 		VARIABLES org.nightlabs.jfire.prop.datafield.RegexDataField regexField
- * "
  */@PersistenceCapable(
-	objectIdClass=WebCustomerID.class,
 	identityType=IdentityType.APPLICATION,
+	objectIdClass=WebCustomerID.class,
 	detachable="true",
-	table="JFireWebShopBase_WebCustomer")
+	table="JFireWebShopBase_WebCustomer"
+)
 @FetchGroups({
 	@FetchGroup(
 		name=WebCustomer.FETCH_GROUP_LEGAL_ENTITY,
@@ -92,18 +59,21 @@ import javax.jdo.annotations.PersistenceModifier;
 		value=" SELECT DISTINCT this WHERE this.legalEntity != null && this.legalEntity.person != null && this.legalEntity.person.dataFields.contains(regexField) && ( regexField.structBlockOrganisationID == :regexFieldStructBlockOrganisationID && regexField.structBlockID == :regexFieldStructBlockID && regexField.structFieldOrganisationID == :regexFieldStructFieldOrganisationID && regexField.structFieldID == :regexFieldStructFieldID && regexField.text.toLowerCase() == :regexFieldValue ) VARIABLES org.nightlabs.jfire.prop.datafield.RegexDataField regexField ")
 )
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
-
 public class WebCustomer
+implements Serializable
 {
-	
+	private static final long serialVersionUID = 1L;
+
 	public static final String FETCH_GROUP_LEGAL_ENTITY = "WebCustomer.legalEntity";
 	public static final String FETCH_GROUP_WEB_CUSTOMER_ID = "WebCustomer.webCustomerID";
 	public static final String FETCH_GROUP_PASSWORD = "WebCustomer.password";
+
 	/**
-	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon! 
+	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon!
 	 */
+	@Deprecated
 	public static final String FETCH_GROUP_THIS_WEB_CUSTOMER = "WebCustomer.this";
-	
+
 	/**
 	 * @deprecated only for JDO
 	 */
@@ -111,79 +81,55 @@ public class WebCustomer
 	protected WebCustomer() {}
 
 	/**
-	 * 
+	 *
 	 * @param organisationID the organisationID
 	 * @param webCustomerID the webCustomerID
 	 */
-	public WebCustomer(String organisationID, String webCustomerID) {
+	public WebCustomer(String organisationID, String webCustomerID)
+	{
 		ObjectIDUtil.assertValidIDString(organisationID, "organisationID");
 		ObjectIDUtil.assertValidIDString(webCustomerID, "webCustomerID");
-
 		this.organisationID = organisationID;
 		this.webCustomerID = webCustomerID;
 	}
 
 	/**
 	 * This is the organisationID to which the customer belongs.
-	 * 
-	 * @jdo.field primary-key="true"
-	 * @jdo.column length="100"
 	 */	@PrimaryKey
 	@Column(length=100)
-
 	private String organisationID;
-	
+
 	/**
 	 * The webCustomerID of the webcustomer
-	 * 
-	 * @jdo.field primary-key="true"
-	 * jdo.column length="100"
 	 */	@PrimaryKey
-
+	@Column(length=100)
 	private String webCustomerID;
-	
+
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 * jdo.column length="100"
 	 */	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
-
+	@Column(length=100)
 	private String password;
-	
+
 	/**
 	 * The second password used and stored temporarly when the customer triggers
 	 * the lostPassword procedure
-	 * @jdo.field persistence-modifier="persistent"
-	 * jdo.column length="100"
 	 */	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
-
+	@Column(length=100)
 	private String secondPassword;
-	
-	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 * jdo.column length="100"
-	 */	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+	private Date secondPasswordDate;
 
-	private Date secondPasswordDate ;
-	
 	/**
 	 * The confirmation String that will be sent to the customer via E-mail
-	 * @jdo.field persistence-modifier="persistent"
-	 * jdo.column length="100"
 	 */	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
-
 	private String confirmationString ;
-	
-	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 * jdo.column length="100"
-	 */	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Date confirmationStringDate ;
-	
-	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 */	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private LegalEntity legalEntity = null;
 
 	/**
@@ -245,7 +191,7 @@ public class WebCustomer
 	 * @param secondPassword  to set
 	 */
 	public void setSecondPassword(String secondPassword) {
-			
+
 		this.secondPassword = secondPassword;
 	}
 
@@ -272,7 +218,6 @@ public class WebCustomer
 	public void setConfirmationStringDate(Date confirmationStringDate) {
 		this.confirmationStringDate = confirmationStringDate;
 	}
-	
 
 	public static Collection<WebCustomer> getWebCustomerWithEmail(PersistenceManager pm, String email) {
 		Query q = pm.newNamedQuery(WebCustomer.class, "getWebCustomerWithRegexField");

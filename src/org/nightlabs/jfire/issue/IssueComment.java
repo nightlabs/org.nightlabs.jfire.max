@@ -150,6 +150,12 @@ implements Serializable, DetachCallback
 	private Date createTimestamp;
 
 	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+	private Date updateTimestamp;
+	
+	/**
 	 * @jdo.field persistence-modifier="persistent" load-fetch-group="all"
 	 */
 	@Persistent(
@@ -229,6 +235,10 @@ implements Serializable, DetachCallback
 		return text;
 	}
 
+	public void setText(String text) {
+		this.text = text;
+	}
+	
 	/**
 	 * Returns the create time of the comment.
 	 * @return the create time of the comment
@@ -236,7 +246,23 @@ implements Serializable, DetachCallback
 	public Date getCreateTimestamp() {
 		return createTimestamp;
 	}
+	
+	/**
+	 * Returns the update time of the comment.
+	 * @return the update time of the comment
+	 */
+	public Date getUpdateTimestamp() {
+		return updateTimestamp;
+	}
 
+	/**
+	 * Sets the updated time.
+	 * @param timestamp The timestamp to set
+	 */
+	public void setUpdateTimestamp(Date timestamp) {
+		this.updateTimestamp = timestamp;
+	}
+	
 	/**
 	 * Returns the user who created the comment.
 	 * @return the user who created the comment

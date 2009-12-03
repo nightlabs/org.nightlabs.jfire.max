@@ -392,26 +392,21 @@ implements IssueManagerRemote
 	public IssueComment storeIssueComment(IssueComment issueComment, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = createPersistenceManager();
-		try {
-			IssueID issueID = issueComment.getIssueID();
-			Issue issue = (Issue) pm.getObjectById(issueID);
-			issueComment = pm.makePersistent(issueComment);
-			issue.addComment(issueComment);
-
-			if (!get)
-				return null;
-
-			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
-			if (fetchGroups != null)
-				pm.getFetchPlan().setGroups(fetchGroups);
-
-			return pm.detachCopy(issueComment);
-		} finally {
-			pm.close();
+		
+		boolean isNew = !JDOHelper.isDetached(issueComment);
+		if (!isNew) {
+			issueComment.setUpdateTimestamp(new Date());
 		}
+		
+		issueComment = pm.makePersistent(issueComment);
+		if (!get)
+			return null;
+
+		pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+		if (fetchGroups != null)
+			pm.getFetchPlan().setGroups(fetchGroups);
+		return NLJDOHelper.storeJDO(pm, issueComment, get, fetchGroups, maxFetchDepth);
 	}
-
-
 
 	// --- 8< --- KaiExperiments: since 14.05.2009 ------------------
 	// --[IssueMarker]--

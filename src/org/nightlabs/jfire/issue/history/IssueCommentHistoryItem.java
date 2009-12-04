@@ -38,9 +38,14 @@ public class IssueCommentHistoryItem extends IssueHistoryItem {
 	/**
 	 * Creates a new instance of an IssueCommentHistoryItem.
 	 */
-	public IssueCommentHistoryItem(User user, Issue issue, String commentTxt) {
+	public IssueCommentHistoryItem(User user, Issue issue, IssueComment comment, boolean isNew) {
 		super(true, user, issue);
-		this.commentTxt = commentTxt;
+		if (isNew) 
+			this.commentTxt = String.format("ADDED: Issue comment \"%s\".", comment.getText());
+		else {
+			boolean needTrim = comment.getText().split("\n").length > 1;
+			this.commentTxt = String.format("UPDATED: Issue comment(#%s) \"%s\".", comment.getCommentID(), needTrim ? comment.getText().substring(0, comment.getText().indexOf("\n")) + " ... ": comment.getText());
+		}
 	}
 
 
@@ -51,7 +56,7 @@ public class IssueCommentHistoryItem extends IssueHistoryItem {
 	 */
 	@Override
 	public String getDescription() {
-		return String.format("ADDED: Issue comment \"%s\".", commentTxt);
+		return commentTxt;
 	}
 
 	/* (non-Javadoc)

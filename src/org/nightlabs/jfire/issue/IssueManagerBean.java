@@ -43,6 +43,7 @@ import org.nightlabs.jdo.query.QueryCollection;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.editlock.EditLockType;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
+import org.nightlabs.jfire.issue.history.IssueCommentHistoryItem;
 import org.nightlabs.jfire.issue.history.IssueHistoryItem;
 import org.nightlabs.jfire.issue.history.IssueHistoryItemFactory;
 import org.nightlabs.jfire.issue.history.IssueLinkHistoryItem;
@@ -396,6 +397,8 @@ implements IssueManagerRemote
 		boolean isNew = !JDOHelper.isDetached(issueComment);
 		if (!isNew) {
 			issueComment.setUpdateTimestamp(new Date());
+			IssueHistoryItem issueHistoryItem = new IssueCommentHistoryItem(issueComment.getUser(), issueComment.getIssue(), issueComment, false);
+			storeIssueHistoryItem(issueHistoryItem, false, new String[]{FetchPlan.DEFAULT}, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
 		}
 		
 		issueComment = pm.makePersistent(issueComment);

@@ -6,6 +6,7 @@ import java.util.Collection;
 import javax.jdo.JDODetachedFieldAccessException;
 
 import org.nightlabs.jfire.issue.Issue;
+import org.nightlabs.jfire.issue.IssueComment;
 import org.nightlabs.jfire.security.User;
 
 /**
@@ -29,7 +30,7 @@ public class IssueCommentHistoryItemFactory extends IssueHistoryItemFactory {
 			// QN: Can I assume that the List of IssueComments are already sorted according to the times they were created?
 			//     Or at least the new comment(s) is(are) outside the index-range of the old comment's list.
 			for (int i=oldPersistentIssue.getComments().size(); i<newDetachedIssue.getComments().size(); i++)
-				issueCommentHistoryItems.add( new IssueCommentHistoryItem(user, oldPersistentIssue, newDetachedIssue.getComments().get(i).getText()) );
+				issueCommentHistoryItems.add( new IssueCommentHistoryItem(user, oldPersistentIssue, newDetachedIssue.getComments().get(i), true) );
 		}
 
 		return issueCommentHistoryItems;

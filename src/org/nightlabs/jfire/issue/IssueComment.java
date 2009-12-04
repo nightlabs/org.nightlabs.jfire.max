@@ -62,6 +62,7 @@ import org.nightlabs.util.Util;
 					members=@Persistent(name="user")
 			),
 			@FetchGroup(
+					fetchGroups={"default"},
 					name=IssueComment.FETCH_GROUP_ISSUE,
 					members=@Persistent(name="issue")
 			),

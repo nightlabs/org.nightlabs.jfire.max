@@ -40,11 +40,12 @@ public class IssueCommentHistoryItem extends IssueHistoryItem {
 	 */
 	public IssueCommentHistoryItem(User user, Issue issue, IssueComment comment, boolean isNew) {
 		super(true, user, issue);
+		boolean needTrim = comment.getText().split("\n").length > 1;
+		String commentString = needTrim ? comment.getText().substring(0, comment.getText().indexOf("\n")) + " ... ": comment.getText();
 		if (isNew) 
-			this.commentTxt = String.format("ADDED: Issue comment \"%s\".", comment.getText());
+			this.commentTxt = String.format("ADDED: Issue comment \"%s\".", comment.getText(), commentString);
 		else {
-			boolean needTrim = comment.getText().split("\n").length > 1;
-			this.commentTxt = String.format("UPDATED: Issue comment(#%s) \"%s\".", comment.getCommentID(), needTrim ? comment.getText().substring(0, comment.getText().indexOf("\n")) + " ... ": comment.getText());
+			this.commentTxt = String.format("UPDATED: Issue comment(#%s) \"%s\".", comment.getCommentID(), commentString);
 		}
 	}
 

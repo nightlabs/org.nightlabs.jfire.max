@@ -15,9 +15,12 @@ import org.nightlabs.progress.ProgressMonitor;
 
 public class DeliveryQueueDAO extends BaseJDOObjectDAO<DeliveryQueueID, DeliveryQueue>{
 
-	private static final DeliveryQueueDAO sharedInstance = new DeliveryQueueDAO();
+	private static DeliveryQueueDAO sharedInstance;
 
-	public static DeliveryQueueDAO sharedInstance() {
+	public static synchronized DeliveryQueueDAO sharedInstance() {
+		if (sharedInstance == null)
+			sharedInstance = new DeliveryQueueDAO();
+
 		return sharedInstance;
 	}
 

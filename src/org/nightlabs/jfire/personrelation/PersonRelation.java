@@ -122,6 +122,33 @@ implements Serializable, AttachCallback, DetachCallback, StoreCallback, DeleteCa
 		return q;
 	}
 
+	private static Query createPersonRelationQuery(PersistenceManager pm, Set<PersonRelationType> personRelationTypes, Person fromPerson, Person toPerson)
+	{
+		Query q = pm.newQuery(PersonRelation.class);
+
+		StringBuilder filter = new StringBuilder();
+
+		if (personRelationTypes != null && !personRelationTypes.isEmpty())
+			filter.append(":personRelationTypes.contains(this.personRelationType)");
+
+		if (fromPerson != null) {
+			if (filter.length() > 0)
+				filter.append(" && ");
+
+			filter.append("this.from == :fromPerson");
+		}
+
+		if (toPerson != null) {
+			if (filter.length() > 0)
+				filter.append(" && ");
+
+			filter.append("this.to == :toPerson");
+		}
+		q.setFilter(filter.toString());
+
+		return q;
+	}
+
 	public static long getPersonRelationCount(PersistenceManager pm, PersonRelationType personRelationType, Person fromPerson, Person toPerson)
 	{
 		Query q = createPersonRelationQuery(pm, personRelationType, fromPerson, toPerson);
@@ -142,6 +169,21 @@ implements Serializable, AttachCallback, DetachCallback, StoreCallback, DeleteCa
 
 		Map<String, Object> params = new HashMap<String, Object>(3);
 		params.put("personRelationType", personRelationType);
+		params.put("fromPerson", fromPerson);
+		params.put("toPerson", toPerson);
+
+		@SuppressWarnings("unchecked")
+		Collection<? extends PersonRelation> c = (Collection<? extends PersonRelation>) q.executeWithMap(params);
+		return c;
+	}
+
+	public static Collection<? extends PersonRelation> getPersonRelations(PersistenceManager pm,
+			Person fromPerson, Person toPerson, Set<PersonRelationType> personRelationTypes)
+	{
+		Query q = createPersonRelationQuery(pm, personRelationTypes, fromPerson, toPerson);
+
+		Map<String, Object> params = new HashMap<String, Object>(3);
+		params.put("personRelationTypes", personRelationTypes);
 		params.put("fromPerson", fromPerson);
 		params.put("toPerson", toPerson);
 
@@ -366,7 +408,7 @@ implements Serializable, AttachCallback, DetachCallback, StoreCallback, DeleteCa
 			if (pm == null)
 				throw new IllegalStateException("Cannot obtain PersistenceManager! This instance is currently not persistent! " + this);
 
-			Collection<? extends PersonRelation> personRelations = PersonRelation.getPersonRelations(pm, null, null, getFrom());
+			Collection<? extends PersonRelation> personRelations = PersonRelation.getPersonRelations(pm, (PersonRelationType)null, null, getFrom());
 			fromPersonRelationIDs = NLJDOHelper.getObjectIDSet(personRelations);
 			fromPersonRelationIDs = Collections.unmodifiableCollection(fromPersonRelationIDs);
 		}

@@ -1,6 +1,9 @@
 package org.nightlabs.jfire.personrelation;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.Set;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
@@ -8,6 +11,7 @@ import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 import javax.ejb.TransactionManagement;
 import javax.ejb.TransactionManagementType;
+import javax.jdo.FetchPlan;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
@@ -107,6 +111,19 @@ implements PersonRelationManagerRemote
 					personRelationType.getDescription().readFromProperties(baseName, loader, "org.nightlabs.jfire.personrelation.PersonRelationType-subsidiary.description"); //$NON-NLS-1$
 				}
 			}
+
+			{
+				// TODO: do we need an inverse relation for that?
+				PersonRelationTypeID personRelationTypeID = PersonRelationType.PredefinedRelationTypes.branchOffice;
+				try {
+					pm.getObjectById(personRelationTypeID);
+				} catch (JDOObjectNotFoundException x) {
+					PersonRelationType personRelationType = pm.makePersistent(new PersonRelationType(personRelationTypeID, null));
+					personRelationType.getName().readFromProperties(baseName, loader, "org.nightlabs.jfire.personrelation.PersonRelationType-branchOffice.name"); //$NON-NLS-1$
+					personRelationType.getDescription().readFromProperties(baseName, loader, "org.nightlabs.jfire.personrelation.PersonRelationType-branchOffice.description"); //$NON-NLS-1$
+				}
+			}
+
 		} finally {
 			pm.close();
 		}
@@ -254,6 +271,54 @@ implements PersonRelationManagerRemote
 		} finally {
 			pm.close();
 		}
+	}
+
+	@RolesAllowed("_Guest_") // TODO access rights
+	@Override
+	public Set<PropertySetID> getNearestNodes(Set<PersonRelationTypeID> relationTypeIDs, PropertySetID startPoint, int maxDepth)
+	{
+		Set<PropertySetID> result = new HashSet<PropertySetID>();
+		Queue<PropertySetID> tempNodes = new LinkedList<PropertySetID>();
+		tempNodes.add(startPoint);
+		PersistenceManager pm = createPersistenceManager();
+
+		Set<PersonRelationType> relationTypes = new HashSet<PersonRelationType>(
+				getPersonRelationTypes(relationTypeIDs,
+						new String[] { FetchPlan.DEFAULT, PersonRelation.FETCH_GROUP_TO_ID },
+						NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT)
+				);
+
+		getNearestNodes(pm, relationTypes, tempNodes, result, 0, maxDepth);
+		return result;
+	}
+
+	private void getNearestNodes(PersistenceManager pm,
+			Set<PersonRelationType> relationTypes, Queue<PropertySetID> nodesToVisit, Set<PropertySetID> finalNodes, int depth, int maxDepth)
+	{
+		if (depth >= maxDepth || nodesToVisit.isEmpty())
+			return;
+
+		Queue<PropertySetID> currentDepthQueue = new LinkedList<PropertySetID>();
+		do {
+			currentDepthQueue.addAll(nodesToVisit);
+			nodesToVisit.clear();
+			do {
+				final PropertySetID currentNode = currentDepthQueue.poll();
+				Person tmpSource = (Person) pm.getObjectById(currentNode);
+				// TODO: It is assumed that the relationTypes are not bidirectional, hence there are no two nodes n1 and n2 such that n1 <-relationType-> n2 and n2 <-relationType-> n1!
+				Collection<? extends PersonRelation> personRelations = PersonRelation.getPersonRelations(pm, tmpSource, null, relationTypes);
+				if (personRelations.isEmpty())
+					finalNodes.add(currentNode);
+				else
+				{
+					for (PersonRelation personRelation : personRelations)
+					{
+						nodesToVisit.add(personRelation.getToID());
+					}
+				}
+			}  while (! currentDepthQueue.isEmpty());
+			depth++;
+		} while (depth < maxDepth && !nodesToVisit.isEmpty());
 	}
 
 }

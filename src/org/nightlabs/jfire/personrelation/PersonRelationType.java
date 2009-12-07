@@ -71,6 +71,10 @@ implements Serializable
 		public static final PersonRelationTypeID subsidiary = PersonRelationTypeID.create(
 				Organisation.DEV_ORGANISATION_ID, "subsidiary"
 		);
+
+		public static final PersonRelationTypeID branchOffice = PersonRelationTypeID.create(
+				Organisation.DEV_ORGANISATION_ID, "branch"
+		);
 	}
 
 	public static final String FETCH_GROUP_NAME = "PersonRelationType.name";

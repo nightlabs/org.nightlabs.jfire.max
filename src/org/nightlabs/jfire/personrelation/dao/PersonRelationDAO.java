@@ -147,6 +147,37 @@ extends BaseJDOObjectDAO<PersonRelationID, PersonRelation>
 		}
 	}
 
+	/**
+	 *
+	 * @param allowedRelations
+	 * @param ofPerson
+	 * @param maxDepth
+	 * @param monitor
+	 * @return
+	 */
+	public synchronized Set<PropertySetID> getRelationRoots(Set<PersonRelationTypeID> allowedRelations,
+			PropertySetID ofPerson, int maxDepth, ProgressMonitor monitor)
+	{
+		monitor.beginTask("Finding related persons", 10);
+		try
+		{
+			ejb = JFireEjb3Factory.getRemoteBean(PersonRelationManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			monitor.worked(2);
+			Set<PropertySetID> nearestNodes = ejb.getNearestNodes(allowedRelations, ofPerson, maxDepth);
+			monitor.worked(8);
+			monitor.done();
+			return nearestNodes;
+		}
+		catch (Exception e)
+		{
+			monitor.setCanceled(true);
+			if (e instanceof RuntimeException)
+				throw (RuntimeException)e;
+			else
+				throw new RuntimeException("Error finding related persons", e);
+		}
+	}
+
 	public synchronized long getPersonRelationCount(
 			PersonRelationTypeID personRelationTypeID,
 			PropertySetID fromPersonID,

@@ -1,6 +1,7 @@
 package org.nightlabs.jfire.personrelation;
 
 import java.util.Collection;
+import java.util.Set;
 
 import javax.ejb.Remote;
 
@@ -44,4 +45,21 @@ public interface PersonRelationManagerRemote {
 			PersonRelationTypeID personRelationTypeID,
 			PropertySetID fromPersonID, PropertySetID toPersonID
 	);
+
+	/**
+	 * This method traverses the graph of Persons (PropertySetIDs) by following the relations that contained in the set
+	 * of allowed ones (relationTypeIDs) until either the maximum depth (maxDepth) is reached or we encountered a person
+	 * from which there is no other reachable via the allowed relation types.
+	 *
+	 * @param relationTypeIDs The allowed relation types that are used to filter the available relations from any person.
+	 * @param startPoint The person from which the search starts.
+	 * @param maxDepth The maximum depth until which the search continues.
+	 * @return The set of persons that are left after either maxDepth search phases or have no allowed relation to any
+	 * 	other reachable person.
+	 */
+	Set<PropertySetID> getNearestNodes(
+			Set<PersonRelationTypeID> relationTypeIDs,
+			PropertySetID startPoint, int maxDepth
+	);
+
 }

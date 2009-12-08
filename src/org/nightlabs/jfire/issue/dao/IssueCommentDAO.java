@@ -138,4 +138,17 @@ public class IssueCommentDAO extends BaseJDOObjectDAO<IssueCommentID, IssueComme
 			monitor.done();
 		}
 	}
+	
+	public synchronized void deleteIssueComment(IssueCommentID issueCommentID, ProgressMonitor monitor) {
+		monitor.beginTask("Deleting issue comment: "+ issueCommentID, 3);
+		try {
+			IssueManagerRemote im = JFireEjb3Factory.getRemoteBean(IssueManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			im.deleteIssueComment(issueCommentID);
+			monitor.worked(1);
+			monitor.done();
+		} catch (Exception e) {
+			monitor.done();
+			throw new RuntimeException("Error while deleting Issue comment!\n" ,e);
+		}
+	}
 }

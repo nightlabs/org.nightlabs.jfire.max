@@ -411,6 +411,23 @@ implements IssueManagerRemote
 		return NLJDOHelper.storeJDO(pm, issueComment, get, fetchGroups, maxFetchDepth);
 	}
 
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("_Guest_")
+	@Override
+	public void deleteIssueComment(IssueCommentID issueCommentID)
+	{
+		PersistenceManager pm = createPersistenceManager();
+		try {
+			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
+			pm.getExtent(IssueComment.class, true);
+			IssueComment issueComment = (IssueComment) pm.getObjectById(issueCommentID);
+			pm.deletePersistent(issueComment);
+			pm.flush();
+		}//try
+		finally {
+			pm.close();
+		}//finally
+	}
 	// --- 8< --- KaiExperiments: since 14.05.2009 ------------------
 	// --[IssueMarker]--
 	@RolesAllowed("_Guest_")

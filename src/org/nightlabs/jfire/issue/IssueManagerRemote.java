@@ -153,7 +153,6 @@ public interface IssueManagerRemote {
 
 	List<IssueHistoryItem> getIssueHistoryItems(Collection<IssueHistoryItemID> issueHistoryIDs, String[] fetchGroups, int maxFetchDepth);
 
-
 	IssueType storeIssueType(IssueType issueType, boolean get, String[] fetchGroups, int maxFetchDepth);
 
 	List<IssueType> getIssueTypes(Collection<IssueTypeID> issueTypeIDs, String[] fetchGroups, int maxFetchDepth);
@@ -192,4 +191,5 @@ public interface IssueManagerRemote {
 
 	Collection<IssueLinkID> getIssueLinkIDsForIssueAndLinkedObjectClasses(IssueID issueID, Set<Class<?>> linkedObjectClasses);
 
+	void deleteIssueComment(IssueCommentID issueCommentID);
 }

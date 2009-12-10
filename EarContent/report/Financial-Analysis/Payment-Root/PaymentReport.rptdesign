@@ -58,15 +58,6 @@ function isParamSet(param) {
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
-        <scalar-parameter name="endTimePeriod" id="329">
-            <property name="valueType">static</property>
-            <property name="dataType">string</property>
-            <property name="isRequired">false</property>
-            <property name="controlType">text-box</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
     </parameters>
     <data-sources>
         <oda-data-source extensionID="org.nightlabs.jfire.reporting.oda.jfs.JFSDriver" name="JFSDataSource" id="4"/>

@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.nightlabs.jfire.reporting.trade.scripting.javaclass.invoice;
 
@@ -26,7 +26,7 @@ import org.nightlabs.jfire.scripting.ScriptException;
  * BIRT datasource javaclass script that lists the properties of a collection of {@link Invoices}s.
  * It takes the following parameters:
  * <ul>
- * 
+ *   <li>invoiceIDs: Collection&lt;InvoiceID&gt;</li>
  * </ul>
  * @author Alexander Bieber <alex [AT] nightlabs [DOT] de>
  *
@@ -38,7 +38,7 @@ public class InvoiceData extends AbstractJFSScriptExecutorDelegate {
 	}
 
 	private JFSResultSetMetaData metaData;
-	
+
 	/* (non-Javadoc)
 	 * @see org.nightlabs.jfire.reporting.oda.jfs.ScriptExecutorJavaClassReportingDelegate#getResultSetMetaData()
 	 */
@@ -49,7 +49,7 @@ public class InvoiceData extends AbstractJFSScriptExecutorDelegate {
 			metaData.addColumn("invoiceIDPrefix", DataType.STRING);
 			metaData.addColumn("invoiceID", DataType.BIGDECIMAL);
 			metaData.addColumn("invoiceIDAsString", DataType.STRING);
-			metaData.addColumn("createDT", DataType.DATE);
+			metaData.addColumn("createDT", DataType.DATETIME);
 			metaData.addColumn("createUserJDOID", DataType.STRING);
 			metaData.addColumn("vendorJDOID", DataType.STRING);
 			metaData.addColumn("customerJDOID", DataType.STRING);
@@ -59,7 +59,7 @@ public class InvoiceData extends AbstractJFSScriptExecutorDelegate {
 			metaData.addColumn("articleCount", DataType.INTEGER);
 			metaData.addColumn("valid", DataType.BOOLEAN);
 			metaData.addColumn("finalizeUserJDOID", DataType.STRING);
-			metaData.addColumn("finalizeDT", DataType.DATE);
+			metaData.addColumn("finalizeDT", DataType.DATETIME);
 			metaData.addColumn("amountPaid", DataType.BIGDECIMAL);
 			metaData.addColumn("amountToPay", DataType.BIGDECIMAL);
 			metaData.addColumn("outstanding", DataType.BOOLEAN);
@@ -76,7 +76,7 @@ public class InvoiceData extends AbstractJFSScriptExecutorDelegate {
 	public Object doExecute() throws ScriptException {
 		Collection<InvoiceID> invoiceIDs = getObjectParameterValue("invoiceIDs", Collection.class);
 		PersistenceManager pm = getScriptExecutorJavaClass().getPersistenceManager();
-		
+
 		getResultSetMetaData();
 		TableBuffer buffer = null;
 		try {
@@ -123,6 +123,7 @@ public class InvoiceData extends AbstractJFSScriptExecutorDelegate {
 	/* (non-Javadoc)
 	 * @see org.nightlabs.jfire.scripting.ScriptExecutorJavaClassDelegate#doPrepare()
 	 */
+	@Override
 	public void doPrepare() throws ScriptException {
 	}
 

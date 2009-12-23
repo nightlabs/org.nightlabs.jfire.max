@@ -3,8 +3,7 @@
 	<reportTextPart id="salutation" type="jshtml">
 		<name language="en">Salutation text</name>
 		<name language="de">Anrede</name>
-		<content language="en"><![CDATA[
-<? 
+		<content language="en"><![CDATA[<? 
 var salutationText = "Dear Ladies, dear Sirs";
 if (row["Name"] != "") {
 	var title = row["Title"];
@@ -18,12 +17,10 @@ if (row["Name"] != "") {
 
 <?=salutationText?>,
 <br/><br/>
-thank you for your order! See below the list of your purchased articles:
-<br/>
+thank you for your order! We are hereby invoicing you for the following services rendered or goods delivered:
 ]]>
 		</content>
-		<content language="de"><![CDATA[
-<? 
+		<content language="de"><![CDATA[<? 
 var salutationText = "Sehr geehrte Damen und Herren";
 if (row["Name"] != "") {
 	// The German language requires declination. Thus, we have to
@@ -53,23 +50,22 @@ if (row["Name"] != "") {
 
 <?=salutationText?>,
 <br/><br/>
-vielen Dank für Ihren Auftrag! Im Folgenden finden Sie die Liste Ihrer gekauften Artikel:
-<br/>
+vielen Dank für Ihren Auftrag! Die von Ihnen bestellte Ware oder Dienstleistung haben Sie bereits erhalten. Somit erlauben wir uns, wie folgt zu berechnen:
 ]]>
 		</content>
 	</reportTextPart>
 	<reportTextPart id="finish" type="jshtml">
 		<name language="en">Finish text</name>
 		<name language="de">Schlusstext</name>
-		<content language="en"><![CDATA[
+		<content language="en"><![CDATA[We kindly ask for immediate payment to the account specified below. Please quote the invoice number in the transfer description. All goods stay in our possession until complete payment.
 <br/>
 <br/>
 Yours sincerely,
 <br/>
-<?=row["DisplayName"]?>  
+<?=row["DisplayName"]?>
 ]]>
 		</content>
-		<content language="de"><![CDATA[
+		<content language="de"><![CDATA[Wir bitten um sofortigen Ausgleich unter Angabe der Rechnungsnummer auf das unten angegebene Konto. Die Ware bleibt bis zur vollständigen Bezahlung unser Eigentum.
 <br/>
 <br/>
 Mit freundlichen Grüßen,

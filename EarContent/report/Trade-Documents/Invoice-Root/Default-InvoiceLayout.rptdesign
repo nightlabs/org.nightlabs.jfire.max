@@ -1543,7 +1543,7 @@ return true;]]></method>
             <property name="lineHeight">1.5em</property>
         </style>
         <style name="AddressSender" id="399">
-            <property name="fontFamily">"Arial"</property>
+            <property name="fontFamily">sans-serif</property>
             <property name="fontSize">7pt</property>
         </style>
         <style name="AddressRecipient" id="400">
@@ -2415,7 +2415,7 @@ articleContainerType = reportContext.getMessage("articleContainer.name."+classNa
 articleContainerType + reportContext.getMessage("header.articleContainerFrom", reportContext.getLocale())  + df.format(articleContainer.getCreateDT())</expression>
                                     <property name="dataType">string</property>
                                 </structure>
-	                            <structure>
+                                <structure>
                                     <property name="name">Salutation_Text</property>
                                     <expression name="expression">dataSetRow["PersonalData_Salutation_text"]</expression>
                                     <property name="dataType">string</property>
@@ -2429,7 +2429,7 @@ articleContainerType + reportContext.getMessage("header.articleContainerFrom", r
                                     <property name="name">Title</property>
                                     <expression name="expression">dataSetRow["PersonalData_Title"]</expression>
                                     <property name="dataType">string</property>
-                                </structure>    
+                                </structure>
                             </list-property>
                             <column id="18"/>
                             <detail>
@@ -3155,7 +3155,7 @@ result</expression>
                                     </cell>
                                     <cell id="159">
                                         <label id="166">
-                                            <property name="fontFamily">"Arial"</property>
+                                            <property name="fontFamily">sans-serif</property>
                                             <property name="fontWeight">bold</property>
                                             <text-property name="text" key="currency"></text-property>
                                         </label>
@@ -3266,6 +3266,12 @@ result</expression>
                                         <property name="paddingBottom">0.5em</property>
                                         <data id="453">
                                             <property name="style">TableContent</property>
+                                            <list-property name="visibility">
+                                                <structure>
+                                                    <property name="format">all</property>
+                                                    <expression name="valueExpr">true</expression>
+                                                </structure>
+                                            </list-property>
                                             <property name="resultSetColumn">DynamicProductType_Type_Name</property>
                                         </data>
                                         <data id="316">
@@ -3496,6 +3502,12 @@ Packages.org.nightlabs.l10n.NumberFormatter.formatCurrency(
                                                     <property name="dataType">string</property>
                                                 </structure>
                                             </list-property>
+                                            <list-property name="sort">
+                                                <structure>
+                                                    <expression name="key">row["priceFragmentType"].getOrganisationID() + "/" + row["priceFragmentType"].getPriceFragmentTypeID()</expression>
+                                                    <property name="direction">desc</property>
+                                                </structure>
+                                            </list-property>
                                             <column id="294"/>
                                             <column id="295">
                                                 <property name="width">25mm</property>
@@ -3531,8 +3543,9 @@ if (row["priceFragmentTypeSum"] == 0)
 if (!id.startsWith("vat-"))
 	result = true; // hide all non-VAT-items
 
-if (!id.endsWith("-val"))
-	result = true; // hide all non-VAT-*VALUES* (i.e. hide the net prices)
+// if (!id.endsWith("-val"))
+// 	result = true; // hide all non-VAT-*VALUES* (i.e. hide the net prices)
+// In Germany, the net price sum must be shown on an invoice, hence I commented this out. Marco. 2009-12-23
 
 result;</expression>
                                                         </structure>
@@ -3585,7 +3598,7 @@ result;</expression>
                         </table>
                         <text-data id="368">
                             <property name="style">BodyText</property>
-                            <property name="fontFamily">"Arial"</property>
+                            <property name="fontFamily">sans-serif</property>
                             <property name="paddingTop">1em</property>
                             <property name="paddingLeft">0pt</property>
                             <property name="paddingBottom">0pt</property>

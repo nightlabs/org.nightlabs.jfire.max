@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.nightlabs.jfire.reporting.trade.scripting.javaclass.moneytransfer;
 
@@ -47,7 +47,7 @@ public class MoneyTransferList extends AbstractJFSScriptExecutorDelegate {
 	}
 
 	private JFSResultSetMetaData metaData;
-	
+
 	/* (non-Javadoc)
 	 * @see org.nightlabs.jfire.reporting.oda.jfs.ScriptExecutorJavaClassReportingDelegate#getResultSetMetaData()
 	 */
@@ -65,7 +65,7 @@ public class MoneyTransferList extends AbstractJFSScriptExecutorDelegate {
 			metaData.addColumn("fromBalanceBeforeTransfer", DataType.BIGDECIMAL);
 			metaData.addColumn("toBalanceBeforeTransfer", DataType.BIGDECIMAL);
 			metaData.addColumn("initiatorJDOID", DataType.STRING);
-			metaData.addColumn("timeStamp", DataType.TIMESTAMP);
+			metaData.addColumn("timeStamp", DataType.DATETIME);
 			metaData.addColumn("currencyJDOID", DataType.STRING);
 			metaData.addColumn("amount", DataType.BIGDECIMAL);
 			metaData.addColumn("transferDescription", DataType.STRING);
@@ -82,7 +82,7 @@ public class MoneyTransferList extends AbstractJFSScriptExecutorDelegate {
 		if (accountIDs == null || accountIDs.size() < 1)
 			throw new IllegalArgumentException("The parameter 'accountIDs' has to be set and contain at least one entry.");
 		Collection<UserID> initiatorIDs = getObjectParameterValue("initiatorIDs", Collection.class);
-		
+
 		PersistenceManager pm = getScriptExecutorJavaClass().getPersistenceManager();
 
 		// create the result buffer
@@ -93,8 +93,8 @@ public class MoneyTransferList extends AbstractJFSScriptExecutorDelegate {
 		} catch (Exception e) {
 			throw new ScriptException(e);
 		}
-		
-		
+
+
 		// iterate accounts and query per account
 		for (Iterator<AnchorID> iterator = accountIDs.iterator(); iterator.hasNext();) {
 			StringBuffer jdoql = new StringBuffer();
@@ -108,14 +108,14 @@ public class MoneyTransferList extends AbstractJFSScriptExecutorDelegate {
 
 			// filter by time period
 			ReportingScriptUtil.addTimePeriodCondition(jdoql, "this.timestamp", "timePeriod", timePeriod, jdoParams);
-			
+
 			AnchorID accountID = iterator.next();
 			// TODO: WORKAROUND: JPOX Bug
 //			jdoql.append("(JDOHelper.getObjectId(this.from) == :accountID || JDOHelper.getObjectId(this.to) == :accountID)");
 //			jdoParams.put("accountID", accountID);
 			jdoql.append("&& (this.from == :account || this.to == :account)");
 			jdoParams.put("account", pm.getObjectById(accountID));
-			
+
 			// Filter by initiators
 			if (initiatorIDs != null) {
 				jdoql.append("&& ( ");
@@ -164,7 +164,7 @@ public class MoneyTransferList extends AbstractJFSScriptExecutorDelegate {
 				}
 			}
 		}
-		
+
 		SQLResultSet resultSet = new SQLResultSet(buffer);
 		return resultSet;
 	}
@@ -172,6 +172,7 @@ public class MoneyTransferList extends AbstractJFSScriptExecutorDelegate {
 	/* (non-Javadoc)
 	 * @see org.nightlabs.jfire.scripting.ScriptExecutorJavaClassDelegate#doPrepare()
 	 */
+	@Override
 	public void doPrepare() throws ScriptException {
 	}
 

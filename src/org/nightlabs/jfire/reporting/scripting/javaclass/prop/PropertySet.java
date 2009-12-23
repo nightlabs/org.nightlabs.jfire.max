@@ -132,7 +132,7 @@ extends AbstractJFSScriptExecutorDelegate
 							metaData.addColumn(getColumnName(structField), DataType.DOUBLE);
 					}
 					else if (structField instanceof DateStructField) {
-						metaData.addColumn(getColumnName(structField), DataType.DATE);
+						metaData.addColumn(getColumnName(structField), DataType.DATETIME);
 					}
 					else if (structField instanceof SelectionStructField) {
 						metaData.addColumn(getColumnName(structField) + "_structFieldValueID", DataType.STRING);

@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.nightlabs.jfire.reporting.trade.scripting.javaclass.moneytransfer;
 
@@ -47,7 +47,7 @@ public class BookMoneyTransferList extends AbstractJFSScriptExecutorDelegate {
 	}
 
 	private JFSResultSetMetaData metaData;
-	
+
 	/* (non-Javadoc)
 	 * @see org.nightlabs.jfire.reporting.oda.jfs.ScriptExecutorJavaClassReportingDelegate#getResultSetMetaData()
 	 */
@@ -64,7 +64,7 @@ public class BookMoneyTransferList extends AbstractJFSScriptExecutorDelegate {
 			metaData.addColumn("fromBalanceBeforeTransfer", DataType.BIGDECIMAL);
 			metaData.addColumn("toBalanceBeforeTransfer", DataType.BIGDECIMAL);
 			metaData.addColumn("initiatorJDOID", DataType.STRING);
-			metaData.addColumn("timeStamp", DataType.TIMESTAMP);
+			metaData.addColumn("timeStamp", DataType.DATETIME);
 			metaData.addColumn("currencyJDOID", DataType.STRING);
 			metaData.addColumn("amount", DataType.BIGDECIMAL);
 			metaData.addColumn("transferDescription", DataType.STRING);
@@ -82,7 +82,7 @@ public class BookMoneyTransferList extends AbstractJFSScriptExecutorDelegate {
 		if (showOnlyOutstanding == null)
 			showOnlyOutstanding = false;
 		Collection<UserID> initiatorIDs = getObjectParameterValue("initiatorIDs", Collection.class);
-		
+
 		PersistenceManager pm = getScriptExecutorJavaClass().getPersistenceManager();
 
 		// create the result buffer
@@ -93,20 +93,20 @@ public class BookMoneyTransferList extends AbstractJFSScriptExecutorDelegate {
 		} catch (Exception e) {
 			throw new ScriptException(e);
 		}
-		
-		
+
+
 		StringBuffer jdoql = new StringBuffer();
 		jdoql.append("SELECT "+
 				"  this "+
 				"FROM " +
 				"  "+BookMoneyTransfer.class.getName()+" " +
 		"WHERE (1 == 1) ");
-		
+
 		if (showOnlyOutstanding) {
 			jdoql.append("&& this.invoice.invoiceLocal.outstanding");
 		}
-		
-		
+
+
 		Map<String, Object> jdoParams = new HashMap<String, Object>();
 
 		// filter by time period
@@ -163,7 +163,7 @@ public class BookMoneyTransferList extends AbstractJFSScriptExecutorDelegate {
 				throw new ScriptException(e);
 			}
 		}
-		
+
 		SQLResultSet resultSet = new SQLResultSet(buffer);
 		return resultSet;
 	}
@@ -171,6 +171,7 @@ public class BookMoneyTransferList extends AbstractJFSScriptExecutorDelegate {
 	/* (non-Javadoc)
 	 * @see org.nightlabs.jfire.scripting.ScriptExecutorJavaClassDelegate#doPrepare()
 	 */
+	@Override
 	public void doPrepare() throws ScriptException {
 	}
 

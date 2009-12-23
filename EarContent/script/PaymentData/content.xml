@@ -1,6 +1,6 @@
-<!DOCTYPE script-category PUBLIC "-//NightLabs//DTD ScriptingInitializer V 1.0//EN" "http://www.nightlabs.de/dtd/scripting-initializer-content_1_0.dtd">
+<!DOCTYPE script-category PUBLIC "-//NightLabs//DTD ScriptingInitializer V 1.0//EN" "http://www.nightlabs.de/dtd/scripting-initialiser-content_0_2.dtd">
 <script-category 
-	id="DeliveryData"
+	id="PaymentData-Category"
 	type="JFireReportingTrade-PaymentData"
 >
 	<name language="de">Zahlungs-Daten</name>
@@ -13,6 +13,12 @@
 	>
 		<name language="de">Zahlungen: Liste</name>
 		<name language="en">Payments: List</name>
+		<description language="de">Dieses Skript listet Zahlungen auf.
+Mittels der Parameter kann nach Benutzer, Partner oder Zeitraum gefiltert werden.		
+		</description>
+		<description language="en">This script lists payments.
+With the parameters the list can be filtered by user, partner and time period.		
+		</description>
 		<parameter-set>
 			<name language="de">ParameterSet: Zahlungsliste</name>
 			<name language="en">ParameterSet: Paymentlist</name>
@@ -22,14 +28,5 @@
 			<parameter name="beginTimePeriod" type="org.nightlabs.util.TimePeriod"/>	
 			<parameter name="endTimePeriod" type="org.nightlabs.util.TimePeriod"/>
 		</parameter-set>
-		
-		<description language="de">Dieses Skript listet Zahlungen auf.
-Mittels der Parameter kann nach Benutzer, Partner oder Zeitraum gefiltert werden.		
-		</description>
-		<description language="en">This script lists payments.
-With the parameters the list can be filtered by user, partner and time period.		
-		</description>
-		
 	</script>
-	
 </script-category>

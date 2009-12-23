@@ -1,0 +1,25 @@
+<!DOCTYPE script-category PUBLIC "-//NightLabs//DTD ScriptingInitializer V 1.0//EN" "http://www.nightlabs.de/dtd/scripting-initialiser-content_0_2.dtd">
+
+<script-category 
+	id="InvoicePayments-Category"
+	type="JFireReportingTrade-InvoicePayments">
+	
+	<name language="de">Zahlungen zu einer Rechnung</name>
+	<name language="en">Invoice payments</name>
+
+	<parameter-set>
+		<name language="de">ParameterSet: Rechnung</name>
+		<name language="en">ParameterSet: Invoice</name>
+		<parameter name="invoiceID" type="org.nightlabs.jfire.accounting.id.InvoiceID"/>			
+	</parameter-set>
+		
+	<script 
+		file="InvoicePayments.javaclass" 
+		id="InvoicePayments"
+		resultClass="org.nightlabs.jfire.reporting.oda.ResultSet">
+	<!-- id is optional and defaults to the value of file -->
+		<name language="de">Zahlungen zu einer Rechnung</name>
+		<name language="en">Invoice payments</name>
+	</script>
+	
+</script-category>

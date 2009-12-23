@@ -93,7 +93,7 @@ public class ReportingTradeScriptingUtil {
 		metaData.addColumn("delivered", DataType.BOOLEAN);
 		metaData.addColumn("deliveryJDOID", DataType.STRING);
 		metaData.addColumn("deliveryNoteJDOID", DataType.STRING);
-		metaData.addColumn("createDT", DataType.DATE);
+		metaData.addColumn("createDT", DataType.DATETIME);
 		metaData.addColumn("createUserID", DataType.STRING);
 		metaData.addColumn("createUserJDOID", DataType.STRING);
 		metaData.addColumn("currencyID", DataType.STRING);

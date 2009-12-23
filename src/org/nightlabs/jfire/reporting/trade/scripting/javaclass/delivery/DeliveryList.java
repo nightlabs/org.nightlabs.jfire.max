@@ -52,7 +52,7 @@ public class DeliveryList extends AbstractJFSScriptExecutorDelegate {
 			metaData = new JFSResultSetMetaData();
 			metaData.addColumn("articleID", DataType.STRING);
 			metaData.addColumn("createUserID", DataType.STRING);
-			metaData.addColumn("createDT", DataType.DATE);
+			metaData.addColumn("createDT", DataType.DATETIME);
 			metaData.addColumn("productTypeID", DataType.STRING);
 			metaData.addColumn("vendorID", DataType.STRING);
 			metaData.addColumn("customerID", DataType.STRING);

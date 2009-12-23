@@ -37,21 +37,21 @@ import org.eclipse.datatools.connectivity.oda.IBlob;
 
 /**
  * Public declarations concerning BIRT datatypes.
- * 
+ *
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  *
  */
 public class DataType {
 	protected DataType() {}
-	
+
 	public static final int STRING = 1;
 	public static final int INTEGER = 2;
 	public static final int DOUBLE = 3;
 	public static final int BOOLEAN = 4;
-	public static final int DATE = 5;
 	public static final int BIGDECIMAL = 6;
 	public static final int TIME = 92;
-	public static final int TIMESTAMP = 93;
+	public static final int DATETIME = 93;
+//	public static final int TIMESTAMP = 93;
 	public static final int BLOB = 9;
 	public static final int CLOB = 10;
 	public static final int JAVA_OBJECT = 2000;
@@ -68,8 +68,8 @@ public class DataType {
 	public static final String N_BLOB = "Blob";
 	public static final String N_CLOB = "Clob";
 	public static final String N_UNKNOWN = "Unknown";
-	
-	
+
+
 //	public static final Integer K_STRING = new Integer(STRING);;
 //	public static final Integer K_INTEGER = new Integer(INTEGER);
 //	public static final Integer K_DOUBLE = new Integer(DOUBLE);
@@ -80,45 +80,45 @@ public class DataType {
 ////	public static final Integer K_TIMESTAMP = new Integer(TIMESTAMP);
 //	public static final Integer K_BLOB = new Integer(BLOB);
 //	public static final Integer K_CLOB = new Integer(CLOB);
-	
+
 	private static final Map<Integer, Class[]> types2Classes = new HashMap<Integer, Class[]>();
 	private static final Map<Class, Integer> classes2Types = new HashMap<Class, Integer>();
 	private static final Map<Integer, String> types2Names = new HashMap<Integer, String>();
 	private static final Map<Integer, Integer> sqlTypes2dataTypes = new HashMap<Integer, Integer>();
 	private static final Map<Integer, Integer> dataTypes2sqlTypes = new HashMap<Integer, Integer>();
-	
+
 	static {
 		types2Classes.put(STRING, new Class[] {String.class});
 		types2Classes.put(INTEGER, new Class[] {Integer.class});
 		types2Classes.put(DOUBLE, new Class[] {Double.class, Float.class});
-		types2Classes.put(DATE, new Class[] {Date.class});
+		types2Classes.put(DATETIME, new Class[] {Date.class});
 		types2Classes.put(BIGDECIMAL, new Class[] {Long.class, BigDecimal.class});
 		types2Classes.put(BLOB, new Class[] {Serializable.class});
 		types2Classes.put(CLOB, new Class[] {Serializable.class});
 		types2Classes.put(BOOLEAN, new Class[] {Boolean.class});
-		
+
 		classes2Types.put(String.class, STRING);
 		classes2Types.put(Integer.class, INTEGER);
 		classes2Types.put(Double.class, DOUBLE);
-		classes2Types.put(Date.class, DATE);
+		classes2Types.put(Date.class, DATETIME);
 		classes2Types.put(Long.class, BIGDECIMAL);
 		classes2Types.put(Serializable.class, BLOB);
 		classes2Types.put(byte[].class, BLOB);
 		classes2Types.put(Serializable.class, CLOB);
 		classes2Types.put(Boolean.class, BOOLEAN);
 //		classes2Types.put(java.sql..class, CLOB);
-		
+
 		types2Names.put(STRING, N_STRING);
 		types2Names.put(INTEGER, N_INTEGER);
 		types2Names.put(DOUBLE, N_DOUBLE);
-		types2Names.put(DATE, N_DATE);
+		types2Names.put(DATETIME, N_DATE);
 		types2Names.put(TIME, N_TIME);
-		types2Names.put(TIMESTAMP, N_TIMESTAMP);
+//		types2Names.put(TIMESTAMP, N_TIMESTAMP);
 		types2Names.put(BIGDECIMAL, N_BIGDECIMAL);
 		types2Names.put(BOOLEAN, N_BOOLEAN);
 		types2Names.put(BLOB, N_BLOB);
 		types2Names.put(CLOB, N_CLOB);
-		
+
 		indexDataTypeToSQLType(java.sql.Types.BIT, BOOLEAN);
 		indexDataTypeToSQLType(java.sql.Types.TINYINT, INTEGER);
 		indexDataTypeToSQLType(java.sql.Types.SMALLINT, INTEGER);
@@ -132,9 +132,9 @@ public class DataType {
 		indexDataTypeToSQLType(java.sql.Types.CHAR, STRING);
 		indexDataTypeToSQLType(java.sql.Types.VARCHAR, STRING);
 		indexDataTypeToSQLType(java.sql.Types.LONGVARCHAR, STRING);
-		indexDataTypeToSQLType(java.sql.Types.DATE, DATE);
+		indexDataTypeToSQLType(java.sql.Types.DATE, DATETIME);
 		indexDataTypeToSQLType(java.sql.Types.TIME, TIME);
-		indexDataTypeToSQLType(java.sql.Types.TIMESTAMP, TIMESTAMP);
+		indexDataTypeToSQLType(java.sql.Types.TIMESTAMP, DATETIME);
 		indexDataTypeToSQLType(java.sql.Types.BINARY, BLOB);
 		indexDataTypeToSQLType(java.sql.Types.VARBINARY, BLOB);
 		indexDataTypeToSQLType(java.sql.Types.LONGVARBINARY, BLOB);
@@ -149,19 +149,19 @@ public class DataType {
 	}
 
 // TODO Hi fleque, the mapping is bidirectional, but many things are mapped to the same target object (see above) - doesn't that cause problems? Marco.
-	
+
 	private static void indexDataTypeToSQLType(int sqlType, int dataType) {
 		sqlTypes2dataTypes.put(sqlType, dataType);
 		dataTypes2sqlTypes.put(dataType, sqlType);
 	}
-	
+
 	public static Class[] dataTypeToClasses(int dataType) {
 		Class[] types = types2Classes.get(new Integer(dataType));
 		if (types == null)
 			return new Class[] {String.class};
 		return types;
 	}
-	
+
 	/**
 	 * Tries to lookup the datatype definition integer for the given class
 	 * as statically registered in the index of this class.
@@ -191,32 +191,32 @@ public class DataType {
 		}
 		if (type != null)
 			return type.intValue();
-		
+
 //		return UNKNOWN;
 		return STRING;
 	}
-	
+
 	public static String getTypeName(int dataType) {
 		String name = types2Names.get(new Integer(dataType));
 		if (name != null)
 			return name;
 		return N_UNKNOWN;
 	}
-	
+
 	public static int sqlTypeToDataType(int sqlType) {
 		Integer result = sqlTypes2dataTypes.get(sqlType);
 		if (result == null)
 			return UNKNOWN;
 		return result;
 	}
-	
+
 	public static int dataTypeToSQLType(int dataType) {
 		Integer result = dataTypes2sqlTypes.get(dataType);
 		if (result == null)
 			return Types.NULL; // TODO: Find better solution for UNKNOWN sql type
 		return result;
 	}
-	
+
 	public static IBlob getIBlob(Object o) {
 		if (o == null)
 			return null;
@@ -225,6 +225,6 @@ public class DataType {
 		}
 		throw new IllegalArgumentException("The object of class " + o.getClass().getName() + " could not be converted to an IBlob.");
 	}
-	
-	
+
+
 }

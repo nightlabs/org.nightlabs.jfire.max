@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.nightlabs.jfire.reporting.trade.scripting.javaclass.payment;
 
@@ -35,7 +35,7 @@ import org.nightlabs.util.TimePeriod;
  * BIRT datasource javaclass script that lists {@link Payment}s.
  * It takes the following parameters:
  * <ul>
- * 
+ *
  * </ul>
  * @author Alexander Bieber <alex [AT] nightlabs [DOT] de>
  *
@@ -47,7 +47,7 @@ public class PaymentList extends AbstractJFSScriptExecutorDelegate {
 	}
 
 	private JFSResultSetMetaData metaData;
-	
+
 	/* (non-Javadoc)
 	 * @see org.nightlabs.jfire.reporting.oda.jfs.ScriptExecutorJavaClassReportingDelegate#getResultSetMetaData()
 	 */
@@ -64,8 +64,8 @@ public class PaymentList extends AbstractJFSScriptExecutorDelegate {
 			metaData.addColumn("partnerAccountJDOID", DataType.STRING);
 			metaData.addColumn("amount", DataType.BIGDECIMAL);
 			metaData.addColumn("userJDOID", DataType.STRING);
-			metaData.addColumn("beginDT", DataType.TIMESTAMP);
-			metaData.addColumn("endDT", DataType.TIMESTAMP);
+			metaData.addColumn("beginDT", DataType.DATETIME);
+			metaData.addColumn("endDT", DataType.DATETIME);
 			metaData.addColumn("postponed", DataType.BOOLEAN);
 			metaData.addColumn("pending", DataType.BOOLEAN);
 			metaData.addColumn("failed", DataType.BOOLEAN);
@@ -86,7 +86,7 @@ public class PaymentList extends AbstractJFSScriptExecutorDelegate {
 		Collection<ModeOfPaymentFlavourID> modeOfPaymentFlavourIDs = getObjectParameterValue("modeOfPaymentFlavourIDs", Collection.class);;
 		TimePeriod beginTimePeriod = getObjectParameterValue("beginTimePeriod", TimePeriod.class);
 		TimePeriod endTimePeriod = getObjectParameterValue("endTimePeriod", TimePeriod.class);
-		
+
 		PersistenceManager pm = getScriptExecutorJavaClass().getPersistenceManager();
 
 		// translate the given user-groups into users
@@ -106,7 +106,7 @@ public class PaymentList extends AbstractJFSScriptExecutorDelegate {
 //				}
 //			}
 //		}
-		
+
 		StringBuffer jdoql = new StringBuffer();
 		 jdoql.append("SELECT "+
 		 "  this "+
@@ -114,7 +114,7 @@ public class PaymentList extends AbstractJFSScriptExecutorDelegate {
 		"  "+Payment.class.getName()+" " +
 		"WHERE (1 == 1) ");
 		Map<String, Object> jdoParams = new HashMap<String, Object>();
-		
+
 		// Filter by user
 		if (users != null) {
 			jdoql.append("&& ( ");
@@ -131,7 +131,7 @@ public class PaymentList extends AbstractJFSScriptExecutorDelegate {
 			}
 			jdoql.append(") ");
 		}
-		
+
 		// filter by partner
 		if (partnerIDs != null) {
 			jdoql.append("&& ( ");
@@ -149,7 +149,7 @@ public class PaymentList extends AbstractJFSScriptExecutorDelegate {
 			}
 			jdoql.append(") ");
 		}
-		
+
 		// filter by modeOfPayment
 		if (modeOfPaymentFlavourIDs != null && modeOfPaymentFlavourIDs.size() > 0) {
 			jdoql.append("&& ( ");
@@ -167,12 +167,12 @@ public class PaymentList extends AbstractJFSScriptExecutorDelegate {
 			}
 			jdoql.append(") ");
 		}
-		
+
 		// filter by begin time period
 		ReportingScriptUtil.addTimePeriodCondition(jdoql, "this.beginDT", "beginDT", beginTimePeriod, jdoParams);
 		// filter by begin time period
 		ReportingScriptUtil.addTimePeriodCondition(jdoql, "this.endDT", "endDT", endTimePeriod, jdoParams);
-		
+
 		Query q = pm.newQuery(jdoql.toString());
 		Collection<Payment> queryResult = (Collection<Payment>)q.executeWithMap(jdoParams);
 		getResultSetMetaData();
@@ -215,6 +215,7 @@ public class PaymentList extends AbstractJFSScriptExecutorDelegate {
 	/* (non-Javadoc)
 	 * @see org.nightlabs.jfire.scripting.ScriptExecutorJavaClassDelegate#doPrepare()
 	 */
+	@Override
 	public void doPrepare() throws ScriptException {
 	}
 

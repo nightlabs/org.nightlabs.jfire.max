@@ -174,6 +174,7 @@ import org.nightlabs.util.Util;
 public class Offer
 implements
 		Serializable,
+		PricedArticleContainer,
 		ArticleContainer,
 		SegmentContainer,
 		Statable,

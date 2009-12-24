@@ -74,6 +74,7 @@ import org.nightlabs.jfire.trade.ArticleContainer;
 import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.trade.Offer;
 import org.nightlabs.jfire.trade.Order;
+import org.nightlabs.jfire.trade.PricedArticleContainer;
 import org.nightlabs.jfire.trade.id.ArticleID;
 import org.nightlabs.jfire.transfer.Transfer;
 import org.nightlabs.jfire.transfer.id.AnchorID;
@@ -241,7 +242,7 @@ import org.nightlabs.util.Util;
 })
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class Invoice
-implements Serializable, ArticleContainer, Statable, DetachCallback
+implements Serializable, PricedArticleContainer, ArticleContainer, Statable, DetachCallback
 {
 	private static final long serialVersionUID = 1L;
 	public static final String FETCH_GROUP_INVOICE_LOCAL = "Invoice.invoiceLocal";

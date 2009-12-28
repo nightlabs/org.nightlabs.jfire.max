@@ -456,7 +456,7 @@ implements ReportManagerRemote
 	public List<ReportRegistryItem> getReportRegistryItems (
 			List<ReportRegistryItemID> reportRegistryItemIDs, RoleID filterRoleID,
 			String[] fetchGroups, int maxFetchDepth
-		)
+	)
 	{
 		PersistenceManager pm;
 		pm = createPersistenceManager();
@@ -466,11 +466,16 @@ implements ReportManagerRemote
 				pm.getFetchPlan().setGroups(fetchGroups);
 
 			List<ReportRegistryItem> result = new ArrayList<ReportRegistryItem>();
-			for (ReportRegistryItemID itemID : reportRegistryItemIDs) {
-				ReportRegistryItem item = (ReportRegistryItem)pm.getObjectById(itemID);
-				result.add(pm.detachCopy(item));
+			try{
+				for (ReportRegistryItemID itemID : reportRegistryItemIDs) {
+					ReportRegistryItem item = (ReportRegistryItem)pm.getObjectById(itemID);
+					result.add(pm.detachCopy(item));
+				}
 			}
-			return Authority.filterSecuredObjects(pm, result, getPrincipal(), filterRoleID, ResolveSecuringAuthorityStrategy.organisation);
+			catch (JDOObjectNotFoundException e) {
+				// ignore it
+			}
+			return Authority.filterSecuredObjects(pm, result, getPrincipal(), filterRoleID, ResolveSecuringAuthorityStrategy.organisation);	
 		} finally {
 			pm.close();
 		}

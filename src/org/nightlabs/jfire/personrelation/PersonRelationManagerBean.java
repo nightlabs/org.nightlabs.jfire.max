@@ -15,6 +15,7 @@ import javax.jdo.FetchPlan;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
+import javax.management.relation.RelationType;
 
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
@@ -273,6 +274,18 @@ implements PersonRelationManagerRemote
 		}
 	}
 
+	/**
+	 * Returns the PersonIDs that correspond to the nodes in the relation graph that are farthest away from the
+	 * startingPoint and connected via intermediary nodes only by the allowed relationType(ID)s. Or in case the maxDepth
+	 * is reached, the elements of that iteration are returned.
+	 *
+	 * @param relationTypeIDs The ids of the {@link RelationType}s that represent the allowed edges in the graph.
+	 * @param startPoint The source from which to search for the farthest nodes.
+	 * @param maxDepth The maximum depth (distance) until which the search is continued.
+	 * @return the PersonIDs that correspond to the nodes in the relation graph that are farthest away from the
+	 * startingPoint and connected via intermediary nodes only by the allowed relationType(ID)s. Or in case the maxDepth
+	 * is reached, the elements of that iteration are returned.
+	 */
 	@RolesAllowed("_Guest_") // TODO access rights
 	@Override
 	public Set<PropertySetID> getNearestNodes(Set<PersonRelationTypeID> relationTypeIDs, PropertySetID startPoint, int maxDepth)
@@ -288,37 +301,56 @@ implements PersonRelationManagerRemote
 						NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT)
 				);
 
-		getNearestNodes(pm, relationTypes, tempNodes, result, 0, maxDepth);
+		getNearestNodes(pm, relationTypes, tempNodes, result, maxDepth);
 		return result;
 	}
 
-	private void getNearestNodes(PersistenceManager pm,
-			Set<PersonRelationType> relationTypes, Queue<PropertySetID> nodesToVisit, Set<PropertySetID> finalNodes, int depth, int maxDepth)
+	/**
+	 * Helper method to find all nodes lying farthest away from the nodesToVisit, allowed edges are defined by the
+	 * relationTypes. In case the maximum recursion depth is reached the currently available nodes are added.
+	 *
+	 * @param pm The PersistenceManager to use in order to retrieve the Persons corresponding to the PropertySetIDs.
+	 * @param relationTypes The valid relation types according to which the graph will be traversed.
+	 * @param nextLevelQueue The queue containing the starting nodes and later the nodes to visit in the next iteration.
+	 * @param finalNodes The set of nodes from which there exists no allowed edge to another node and/or the nodes
+	 *                   currently examined in the maxDepth iteration.
+	 * @param maxDepth The maximum iteration depth until which to traverse the relation graph.
+	 */
+	private void getNearestNodes(PersistenceManager pm, Set<PersonRelationType> relationTypes,
+			Queue<PropertySetID> nextLevelQueue, Set<PropertySetID> finalNodes, int maxDepth)
 	{
-		if (depth >= maxDepth || nodesToVisit.isEmpty())
+		if (maxDepth < 0 || nextLevelQueue.isEmpty())
 			return;
 
+		int depth = 0;
 		Queue<PropertySetID> currentDepthQueue = new LinkedList<PropertySetID>();
 		do {
-			currentDepthQueue.addAll(nodesToVisit);
-			nodesToVisit.clear();
+			currentDepthQueue.addAll(nextLevelQueue);
+			nextLevelQueue.clear();
 			do {
 				final PropertySetID currentNode = currentDepthQueue.poll();
-				Person tmpSource = (Person) pm.getObjectById(currentNode);
-				// TODO: It is assumed that the relationTypes are not bidirectional, hence there are no two nodes n1 and n2 such that n1 <-relationType-> n2 and n2 <-relationType-> n1!
-				Collection<? extends PersonRelation> personRelations = PersonRelation.getPersonRelations(pm, tmpSource, null, relationTypes);
+				final Person tmpSource = (Person) pm.getObjectById(currentNode);
+				// TODO: It is assumed that the relationTypes are not bidirectional, hence there are no two nodes n1 and n2
+				//       such that n1 <-relationType-> n2 and n2 <-relationType-> n1! (marius)
+				final Collection<? extends PersonRelation> personRelations =
+					PersonRelation.getPersonRelations(pm, tmpSource, null, relationTypes);
+
 				if (personRelations.isEmpty())
 					finalNodes.add(currentNode);
 				else
 				{
 					for (PersonRelation personRelation : personRelations)
 					{
-						nodesToVisit.add(personRelation.getToID());
+						nextLevelQueue.add(personRelation.getToID());
 					}
 				}
 			}  while (! currentDepthQueue.isEmpty());
 			depth++;
-		} while (depth < maxDepth && !nodesToVisit.isEmpty());
+		} while (depth < maxDepth && !nextLevelQueue.isEmpty());
+
+		// In case we reached maximum depth -> add all valid nodes.
+		if (depth == maxDepth && !nextLevelQueue.isEmpty())
+			finalNodes.addAll(nextLevelQueue);
 	}
 
 }

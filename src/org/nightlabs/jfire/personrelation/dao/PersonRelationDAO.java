@@ -176,6 +176,10 @@ extends BaseJDOObjectDAO<PersonRelationID, PersonRelation>
 			else
 				throw new RuntimeException("Error finding related persons", e);
 		}
+		finally
+		{
+			ejb = null;
+		}
 	}
 
 	public synchronized long getPersonRelationCount(

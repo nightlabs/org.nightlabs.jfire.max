@@ -1,5 +1,6 @@
 package org.nightlabs.jfire.personrelation;
 import java.util.Collection;
+import java.util.Deque;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -288,11 +289,13 @@ implements PersonRelationManagerRemote
 	 */
 	@RolesAllowed("_Guest_") // TODO access rights
 	@Override
-	public Set<PropertySetID> getNearestNodes(Set<PersonRelationTypeID> relationTypeIDs, PropertySetID startPoint, int maxDepth)
+	public Set<Deque<PropertySetID>> getNearestNodes(Set<PersonRelationTypeID> relationTypeIDs, PropertySetID startPoint, int maxDepth)
 	{
-		Set<PropertySetID> result = new HashSet<PropertySetID>();
-		Queue<PropertySetID> tempNodes = new LinkedList<PropertySetID>();
-		tempNodes.add(startPoint);
+		Set<Deque<PropertySetID>> result = new HashSet<Deque<PropertySetID>>();
+		Queue< Deque<PropertySetID> > tempNodes = new LinkedList<Deque<PropertySetID>>();
+		Deque<PropertySetID> startPath = new LinkedList<PropertySetID>();
+		startPath.push(startPoint);
+		tempNodes.add(startPath);
 		PersistenceManager pm = createPersistenceManager();
 
 		Set<PersonRelationType> relationTypes = new HashSet<PersonRelationType>(
@@ -317,31 +320,44 @@ implements PersonRelationManagerRemote
 	 * @param maxDepth The maximum iteration depth until which to traverse the relation graph.
 	 */
 	private void getNearestNodes(PersistenceManager pm, Set<PersonRelationType> relationTypes,
-			Queue<PropertySetID> nextLevelQueue, Set<PropertySetID> finalNodes, int maxDepth)
+			Queue< Deque<PropertySetID> > nextLevelQueue, Set< Deque<PropertySetID> > finalNodes, int maxDepth)
 	{
 		if (maxDepth < 0 || nextLevelQueue.isEmpty())
 			return;
 
 		int depth = 0;
-		Queue<PropertySetID> currentDepthQueue = new LinkedList<PropertySetID>();
+		// Queue of the elements that need to be visited along with the paths that are used to get to them.
+		Queue< Deque<PropertySetID> > currentDepthQueue = new LinkedList<Deque<PropertySetID>>();
 		do {
 			currentDepthQueue.addAll(nextLevelQueue);
 			nextLevelQueue.clear();
 			do {
-				final PropertySetID currentNode = currentDepthQueue.poll();
+				Deque<PropertySetID> curNodePath = currentDepthQueue.poll();
+				final PropertySetID currentNode = curNodePath.peek();
 				final Person tmpSource = (Person) pm.getObjectById(currentNode);
-				// TODO: It is assumed that the relationTypes are not bidirectional, hence there are no two nodes n1 and n2
-				//       such that n1 <-relationType-> n2 and n2 <-relationType-> n1! (marius)
+				// It is assumed that the relationTypes are not bidirectional, hence there are no two nodes n1 and n2
+				// such that n1 <-relationType-> n2 and n2 <-relationType-> n1! (marius)
 				final Collection<? extends PersonRelation> personRelations =
 					PersonRelation.getPersonRelations(pm, tmpSource, null, relationTypes);
 
 				if (personRelations.isEmpty())
-					finalNodes.add(currentNode);
+					finalNodes.add(curNodePath);
 				else
 				{
 					for (PersonRelation personRelation : personRelations)
 					{
-						nextLevelQueue.add(personRelation.getToID());
+						final Deque<PropertySetID> tmp = new LinkedList<PropertySetID>( curNodePath );
+						final PropertySetID toID = personRelation.getToID();
+						if (tmp.contains(toID) && !finalNodes.contains(tmp))
+						{
+							// We found a circle to which there is no path yet
+							// -> stop with the last element before completing the circle.
+							finalNodes.add(tmp);
+							continue;
+						}
+
+						tmp.push(toID);
+						nextLevelQueue.add( tmp );
 					}
 				}
 			}  while (! currentDepthQueue.isEmpty());

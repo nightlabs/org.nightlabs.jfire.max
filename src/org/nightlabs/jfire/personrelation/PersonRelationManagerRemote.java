@@ -1,6 +1,7 @@
 package org.nightlabs.jfire.personrelation;
 
 import java.util.Collection;
+import java.util.Deque;
 import java.util.Set;
 
 import javax.ejb.Remote;
@@ -57,7 +58,7 @@ public interface PersonRelationManagerRemote {
 	 * @return The set of persons that are left after either maxDepth search phases or have no allowed relation to any
 	 * 	other reachable person.
 	 */
-	Set<PropertySetID> getNearestNodes(
+	Set<Deque<PropertySetID>> getNearestNodes(
 			Set<PersonRelationTypeID> relationTypeIDs,
 			PropertySetID startPoint, int maxDepth
 	);

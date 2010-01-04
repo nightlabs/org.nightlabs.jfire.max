@@ -796,4 +796,23 @@ implements ReportManagerRemote
 			pm.close();
 		}
 	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.nightlabs.jfire.reporting.ReportManagerRemote#importReportLayoutZipFile(java.io.File)
+	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("org.nightlabs.jfire.reporting.editReport")
+	public boolean importReportLayoutZipFile(File reportLayoutZipFile) {
+		try {
+			File tmpFolder = IOUtil.createUserTempDir("jfire_report.imported.", "." + reportLayoutZipFile.getName());
+			IOUtil.unzipArchive(reportLayoutZipFile, tmpFolder);
+			tmpFolder.deleteOnExit();
+			ReportingInitialiser.importTemplateToLayoutFile(reportLayoutZipFile, tmpFolder);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+   
+		return false;
+	}
 }

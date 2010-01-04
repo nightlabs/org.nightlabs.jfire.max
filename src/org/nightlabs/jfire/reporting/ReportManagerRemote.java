@@ -1,5 +1,6 @@
 package org.nightlabs.jfire.reporting;
 
+import java.io.File;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -22,11 +23,9 @@ import org.nightlabs.jfire.reporting.oda.jfs.IJFSQueryPropertySetMetaData;
 import org.nightlabs.jfire.reporting.oda.jfs.JFSQueryPropertySet;
 import org.nightlabs.jfire.reporting.oda.server.jfs.ServerJFSQueryProxy;
 import org.nightlabs.jfire.scripting.ScriptException;
-import org.nightlabs.jfire.scripting.ScriptingIntialiserException;
 import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 import org.nightlabs.jfire.security.id.RoleID;
 import org.nightlabs.jfire.timer.id.TaskID;
-import org.nightlabs.version.MalformedVersionException;
 
 @Remote
 public interface ReportManagerRemote {
@@ -248,4 +247,10 @@ public interface ReportManagerRemote {
 			Collection<ReportLayoutLocalisationData> bundle, boolean get,
 			String[] fetchGroups, int maxFetchDepth);
 
+	/**
+	 * 
+	 * @param reportLayoutZipFile
+	 * @return
+	 */
+	boolean importReportLayoutZipFile(File reportLayoutZipFile);
 }

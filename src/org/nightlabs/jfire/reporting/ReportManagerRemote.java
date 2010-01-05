@@ -11,6 +11,7 @@ import javax.naming.NamingException;
 import org.eclipse.datatools.connectivity.oda.IParameterMetaData;
 import org.eclipse.datatools.connectivity.oda.IResultSet;
 import org.eclipse.datatools.connectivity.oda.IResultSetMetaData;
+import org.nightlabs.i18n.I18nText;
 import org.nightlabs.jfire.reporting.layout.ReportLayout;
 import org.nightlabs.jfire.reporting.layout.ReportLayoutLocalisationData;
 import org.nightlabs.jfire.reporting.layout.ReportRegistryItem;
@@ -250,7 +251,9 @@ public interface ReportManagerRemote {
 	/**
 	 * 
 	 * @param reportLayoutZipFile
+	 * @param category
+	 * @param name
 	 * @return
 	 */
-	boolean importReportLayoutZipFile(File reportLayoutZipFile);
+	boolean importReportLayoutZipFile(File reportLayoutZipFile, ReportRegistryItemID reportCategoryID, I18nText name);
 }

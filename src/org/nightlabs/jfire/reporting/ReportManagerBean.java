@@ -27,6 +27,8 @@
 package org.nightlabs.jfire.reporting;
 
 import java.io.File;
+import java.io.FileFilter;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -55,11 +57,13 @@ import org.apache.log4j.Logger;
 import org.eclipse.datatools.connectivity.oda.IParameterMetaData;
 import org.eclipse.datatools.connectivity.oda.IResultSet;
 import org.eclipse.datatools.connectivity.oda.IResultSetMetaData;
+import org.nightlabs.i18n.I18nText;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.config.ConfigSetup;
 import org.nightlabs.jfire.config.UserConfigSetup;
+import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.reporting.classloader.ReportingClassLoader;
 import org.nightlabs.jfire.reporting.config.ReportLayoutConfigModule;
@@ -68,6 +72,7 @@ import org.nightlabs.jfire.reporting.layout.ReportLayout;
 import org.nightlabs.jfire.reporting.layout.ReportLayoutLocalisationData;
 import org.nightlabs.jfire.reporting.layout.ReportRegistry;
 import org.nightlabs.jfire.reporting.layout.ReportRegistryItem;
+import org.nightlabs.jfire.reporting.layout.id.ReportLayoutLocalisationDataID;
 import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
 import org.nightlabs.jfire.reporting.layout.render.IRenderManager;
 import org.nightlabs.jfire.reporting.layout.render.RenderReportException;
@@ -803,16 +808,79 @@ implements ReportManagerRemote
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("org.nightlabs.jfire.reporting.editReport")
-	public boolean importReportLayoutZipFile(File reportLayoutZipFile) {
+	public boolean importReportLayoutZipFile(final File reportLayoutZipFile, ReportRegistryItemID reportCategoryID, I18nText name) {
 		try {
-			File tmpFolder = IOUtil.createUserTempDir("jfire_report.imported.", "." + reportLayoutZipFile.getName());
+			//Unzip into tmp folder
+			File tmpFolder = IOUtil.createUserTempDir("jfire_report.imported.", null);
 			IOUtil.unzipArchive(reportLayoutZipFile, tmpFolder);
 			tmpFolder.deleteOnExit();
-			ReportingInitialiser.importTemplateToLayoutFile(reportLayoutZipFile, tmpFolder);
+			
+			//Create tmp layout file
+			File tmpFile = File.createTempFile(IOUtil.getFileNameWithoutExtension(reportLayoutZipFile.getName()), ".rptdesign", tmpFolder);
+			tmpFile.deleteOnExit();
+			
+			//Create template file
+			File[] templateFiles = tmpFolder.listFiles(new FileFilter() {
+				@Override
+				public boolean accept(File pathname) {
+					return pathname.isFile() && IOUtil.getFileNameWithoutExtension(pathname.getName()).equals(IOUtil.getFileNameWithoutExtension(reportLayoutZipFile.getName()));
+				}
+			});
+			
+			if (templateFiles == null) 
+				return false;
+
+			ReportingInitialiser.importTemplateToLayoutFile(templateFiles[0], tmpFile);
+			
+			PersistenceManager pm = createPersistenceManager();
+
+			ReportCategory category = (ReportCategory)pm.getObjectById(reportCategoryID);
+			ReportLayout layout = new ReportLayout(category, category.getOrganisationID(), "REPORT_REGISTRY_ITEM_TYPE_UNKNOWN", reportLayoutZipFile.getName());
+//			layout.getName().copyFrom(name); //TODO: Uncomment this line.
+			layout.getName().setText(Locale.ENGLISH, "Hello");
+			layout.loadFile(templateFiles[0]);
+			layout = pm.makePersistent(layout);
+			category.addChildItem(layout);
+			
+			//From createReportLocalisationData
+			//TODO: Should we do like this?
+			pm.getExtent(ReportLayoutLocalisationData.class);
+
+			File resourceFolder = new File(tmpFolder, "resource");
+			File[] resourceFiles = resourceFolder.listFiles(new FileFilter() {
+				public boolean accept(File pathname) {
+					return pathname.isFile() && pathname.getName().startsWith(reportLayoutZipFile.getName());
+				}
+			});
+			
+			if (resourceFiles == null)
+				return false;
+			for (File resFile : resourceFiles) {
+				String locale = ReportLayoutLocalisationData.extractLocale(resFile.getName());
+				if (locale == null)
+					locale = "";
+				ReportLayoutLocalisationDataID localisationDataID = ReportLayoutLocalisationDataID.create(
+						layout.getOrganisationID(), layout.getReportRegistryItemType(), layout.getReportRegistryItemID(), locale
+				);
+				ReportLayoutLocalisationData localisationData = null;
+				try {
+					localisationData = (ReportLayoutLocalisationData) pm.getObjectById(localisationDataID);
+					localisationData.getLocale();
+				} catch (JDOObjectNotFoundException e) {
+					localisationData = new ReportLayoutLocalisationData(layout, locale);
+					localisationData = pm.makePersistent(localisationData);
+				}
+				try {
+					localisationData.loadFile(resFile);
+				} catch (IOException e) {
+					throw new ReportingInitialiserException("Could not load localisatino file "+resFile, e);
+				}
+			}
+			
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
    
-		return false;
+		return true;
 	}
 }

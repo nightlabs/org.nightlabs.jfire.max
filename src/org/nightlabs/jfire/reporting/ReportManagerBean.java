@@ -835,7 +835,7 @@ implements ReportManagerRemote
 			PersistenceManager pm = createPersistenceManager();
 
 			ReportCategory category = (ReportCategory)pm.getObjectById(reportCategoryID);
-			ReportLayout layout = new ReportLayout(category, category.getOrganisationID(), "REPORT_REGISTRY_ITEM_TYPE_UNKNOWN", reportLayoutZipFile.getName());
+			ReportLayout layout = new ReportLayout(category, category.getOrganisationID(), "REPORT_REGISTRY_ITEM_TYPE_UNKNOWN", IOUtil.getFileNameWithoutExtension(reportLayoutZipFile.getName()));
 //			layout.getName().copyFrom(name); //TODO: Uncomment this line.
 			layout.getName().setText(Locale.ENGLISH, "Hello");
 			layout.loadFile(templateFiles[0]);

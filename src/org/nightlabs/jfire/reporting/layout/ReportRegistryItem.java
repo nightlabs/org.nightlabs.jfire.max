@@ -35,6 +35,24 @@ import java.util.Set;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.Discriminator;
+import javax.jdo.annotations.DiscriminatorStrategy;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Key;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.Queries;
+import javax.jdo.annotations.Value;
+import javax.jdo.annotations.Version;
+import javax.jdo.annotations.VersionStrategy;
+import javax.jdo.listener.DeleteCallback;
 import javax.jdo.listener.DetachCallback;
 
 import org.nightlabs.inheritance.FieldInheriter;
@@ -53,24 +71,6 @@ import org.nightlabs.jfire.security.SecuredObject;
 import org.nightlabs.jfire.security.id.AuthorityID;
 import org.nightlabs.jfire.security.id.AuthorityTypeID;
 import org.nightlabs.util.Util;
-
-import javax.jdo.annotations.Value;
-import javax.jdo.annotations.FetchGroups;
-import javax.jdo.annotations.Inheritance;
-import javax.jdo.annotations.PrimaryKey;
-import javax.jdo.annotations.FetchGroup;
-import javax.jdo.annotations.VersionStrategy;
-import javax.jdo.annotations.Version;
-import javax.jdo.annotations.PersistenceModifier;
-import javax.jdo.annotations.Discriminator;
-import javax.jdo.annotations.Persistent;
-import javax.jdo.annotations.Key;
-import javax.jdo.annotations.InheritanceStrategy;
-import javax.jdo.annotations.Queries;
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.DiscriminatorStrategy;
-import javax.jdo.annotations.Column;
-import javax.jdo.annotations.IdentityType;
 
 /**
  * Common type for report registry item (ReportCategory, ReportLayout).
@@ -186,7 +186,7 @@ import javax.jdo.annotations.IdentityType;
 })
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public abstract class ReportRegistryItem
-implements Serializable, DetachCallback, SecuredObject, Inheritable, InheritanceCallbacks
+implements Serializable, DeleteCallback, DetachCallback, SecuredObject, Inheritable, InheritanceCallbacks
 {
 	private static final long serialVersionUID = 20081212L;
 
@@ -747,6 +747,17 @@ implements Serializable, DetachCallback, SecuredObject, Inheritable, Inheritance
 	 */
 	public void jdoPreDetach() {
 	}
-
-
+	
+	/*
+	 * (non-Javadoc)
+	 * @see javax.jdo.listener.DeleteCallback#jdoPreDelete()
+	 */
+	@Override
+	public void jdoPreDelete() {
+		PersistenceManager pm = getPersistenceManager();
+		pm.deletePersistent(getName());
+		pm.flush();
+		pm.deletePersistent(getDescription());
+		pm.flush();
+	}
 }

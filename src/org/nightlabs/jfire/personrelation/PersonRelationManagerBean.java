@@ -277,7 +277,7 @@ implements PersonRelationManagerRemote
 	}
 
 	/**
-	 * Returns the PersonIDs that correspond to the nodes in the relation graph that are farthest away from the
+	 * Returns the paths to the Persons that correspond to the nodes in the relation graph that are farthest away from the
 	 * startingPoint and connected via intermediary nodes only by the allowed relationType(ID)s. Or in case the maxDepth
 	 * is reached, the elements of that iteration are returned.
 	 *
@@ -290,7 +290,7 @@ implements PersonRelationManagerRemote
 	 */
 	@RolesAllowed("_Guest_") // TODO access rights
 	@Override
-	public Set<Deque<ObjectID>> getNearestNodes(Set<PersonRelationTypeID> relationTypeIDs, PropertySetID startPoint, int maxDepth)
+	public Set<Deque<ObjectID>> getRootNodes(Set<PersonRelationTypeID> relationTypeIDs, PropertySetID startPoint, int maxDepth)
 	{
 		Set<Deque<ObjectID>> result = new HashSet<Deque<ObjectID>>();
 		Queue< Deque<ObjectID> > tempNodes = new LinkedList<Deque<ObjectID>>();
@@ -310,50 +310,65 @@ implements PersonRelationManagerRemote
 	}
 
 	/**
-	 * Helper method to find all nodes lying farthest away from the nodesToVisit, allowed edges are defined by the
-	 * relationTypes. In case the maximum recursion depth is reached the currently available nodes are added.
+	 * Helper method to find all paths to nodes lying farthest away from the nodes in the nextLevelQueue. Allowed edges are defined
+	 * by the given relationTypes. In case the maximum recursion depth is reached the currently processed nodes are added.
+	 * <p><b>Important</b>: <br>
+	 *	 	The resulting Deque is to be treated like a stack. The first element (a PropertySetID of the Person object that
+	 *		is the root of this path) is on top of that stack and the last one is the last edge/arc to the node we started
+	 *		with. <br>
+	 *		It is therefore necessary to treat the Deque as a stack/queue and the elements should be visited in order of the
+	 *		iterator or by calling pop()/poll().
+	 * </p>
+	 * <p>Note: In case there are any cycles in the graph like: X -><sub>1</sub> A -><sub>2</sub> B -><sub>3</sub> C
+	 * 		-><sub>4</sub> A. The	path generated will break the cycle and end at the last node before completing it:
+	 * 		X -><sub>1</sub> A -><sub>2</sub> B -><sub>3</sub> C. It is stored in the heap as follows:
+	 * 		<i>(top)</i> C, -><sub>3</sub>, -><sub>2</sub>, -><sub>1</sub>. <i>(bottom)</i>
+	 * </p>
 	 *
 	 * @param pm The PersistenceManager to use in order to retrieve the Persons corresponding to the PropertySetIDs.
 	 * @param relationTypes The valid relation types according to which the graph will be traversed.
 	 * @param nextLevelQueue The queue containing the starting nodes and later the nodes to visit in the next iteration.
-	 * @param finalNodes The set of nodes from which there exists no allowed edge to another node and/or the nodes
-	 *                   currently examined in the maxDepth iteration.
+	 * @param foundPaths The set of paths to the nodes from which there exists no allowed edge to another node and/or
+	 * 									 the nodes that were examined in the maxDepth iteration.
 	 * @param maxDepth The maximum iteration depth until which to traverse the relation graph.
 	 */
 	private void getNearestNodes(PersistenceManager pm, Set<PersonRelationType> relationTypes,
-			Queue< Deque<ObjectID> > nextLevelQueue, Set< Deque<ObjectID> > finalNodes, int maxDepth)
+			Queue< Deque<ObjectID> > nextLevelQueue, Set< Deque<ObjectID> > foundPaths, int maxDepth)
 	{
 		if (maxDepth < 0 || nextLevelQueue.isEmpty())
 			return;
 
 		int depth = 0;
 		boolean firstRun = true;
-		// Queue of the elements that need to be visited along with the paths that are used to get to them.
+		// Queue of the elements that need to be visited in the next phase of the breadth-first search.
 		Queue< Deque<ObjectID> > currentDepthQueue = new LinkedList<Deque<ObjectID>>();
 		do {
 			currentDepthQueue.addAll(nextLevelQueue);
+			// nextLevel = elements to process in the next step in the breadth-first search.
 			nextLevelQueue.clear();
 			do {
 				Deque<ObjectID> curNodePath = currentDepthQueue.poll();
 				Person source;
 				if (firstRun)
-				{
+				{ // the source element passed to this method is NOT a PersonRelationID but a PropertySetID of the source node.
 					source = (Person) pm.getObjectById(curNodePath.pop());
 					firstRun = false;
 				}
 				else
-				{
+				{ // the standard case
 					PersonRelation currentRelation = (PersonRelation) pm.getObjectById(curNodePath.peek());
 					source = currentRelation.getTo();
 				}
+				// get the filtered relations from the current node
 				final Collection<? extends PersonRelation> personRelations =
 					PersonRelation.getPersonRelations(pm, source, null, relationTypes);
 
-
+				// if there is no connection to other nodes -> we're at the end of the path, hence at the PropertySetID of
+				// that node.
 				if (personRelations.isEmpty())
 				{
 					curNodePath.push((ObjectID) pm.getObjectId(source));
-					finalNodes.add(curNodePath);
+					foundPaths.add(curNodePath);
 				}
 				else
 				{
@@ -361,17 +376,18 @@ implements PersonRelationManagerRemote
 					{
 						final Deque<ObjectID> tmp = new LinkedList<ObjectID>( curNodePath );
 						final ObjectID relationID = (ObjectID) pm.getObjectId(personRelation);
-						if (tmp.contains(relationID) && !finalNodes.contains(tmp))
+						if (tmp.contains(relationID) && !foundPaths.contains(tmp))
 						{
 							// We found a circle to which there is no path yet
 							// -> stop with the last element before completing the circle.
 							ObjectID circleArc = tmp.pop(); // remove the last node of the circle to omit showing it twice.
 							PersonRelation circleCompletingRelation = (PersonRelation) pm.getObjectById(circleArc);
-							tmp.push(circleCompletingRelation.getFromID());
-							finalNodes.add(tmp);
+							tmp.push(circleCompletingRelation.getFromID()); // add the last node before completion as root node
+							foundPaths.add(tmp);
 							continue;
 						}
 
+						// extend the path and add it to the next step of the breadth-first search.
 						tmp.push((ObjectID) pm.getObjectId(personRelation));
 						nextLevelQueue.add( tmp );
 					}
@@ -390,7 +406,7 @@ implements PersonRelationManagerRemote
 				deque.push(lastRelation.getToID());
 			}
 
-			finalNodes.addAll(nextLevelQueue);
+			foundPaths.addAll(nextLevelQueue);
 		}
 	}
 

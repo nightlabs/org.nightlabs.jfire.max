@@ -59,7 +59,7 @@ public interface PersonRelationManagerRemote {
 	 * @return The set of persons that are left after either maxDepth search phases or have no allowed relation to any
 	 * 	other reachable person.
 	 */
-	Set<Deque<ObjectID>> getNearestNodes(
+	Set<Deque<ObjectID>> getRootNodes(
 			Set<PersonRelationTypeID> relationTypeIDs,
 			PropertySetID startPoint, int maxDepth
 	);

@@ -5,6 +5,7 @@ import java.util.Deque;
 import java.util.List;
 import java.util.Set;
 
+import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.person.Person;
@@ -156,7 +157,7 @@ extends BaseJDOObjectDAO<PersonRelationID, PersonRelation>
 	 * @param monitor
 	 * @return
 	 */
-	public synchronized Set<Deque<PropertySetID>> getRelationRoots(Set<PersonRelationTypeID> allowedRelations,
+	public synchronized Set<Deque<ObjectID>> getRelationRoots(Set<PersonRelationTypeID> allowedRelations,
 			PropertySetID ofPerson, int maxDepth, ProgressMonitor monitor)
 	{
 		monitor.beginTask("Finding related persons", 10);
@@ -164,7 +165,7 @@ extends BaseJDOObjectDAO<PersonRelationID, PersonRelation>
 		{
 			ejb = JFireEjb3Factory.getRemoteBean(PersonRelationManagerRemote.class, SecurityReflector.getInitialContextProperties());
 			monitor.worked(2);
-			Set<Deque<PropertySetID>> nearestNodes = ejb.getNearestNodes(allowedRelations, ofPerson, maxDepth);
+			Set<Deque<ObjectID>> nearestNodes = ejb.getNearestNodes(allowedRelations, ofPerson, maxDepth);
 			monitor.worked(8);
 			monitor.done();
 			return nearestNodes;

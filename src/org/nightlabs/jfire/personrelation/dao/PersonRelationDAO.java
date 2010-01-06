@@ -5,9 +5,6 @@ import java.util.Deque;
 import java.util.List;
 import java.util.Set;
 
-import javax.management.relation.RelationType;
-
-import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.person.Person;
@@ -152,19 +149,14 @@ extends BaseJDOObjectDAO<PersonRelationID, PersonRelation>
 	}
 
 	/**
-	 * Returns the paths to the Persons that correspond to the nodes in the relation graph that are farthest away from the
-	 * startingPoint and connected via intermediary nodes only by the allowed relationType(ID)s. Or in case the maxDepth
-	 * is reached, the elements of that iteration are returned.
 	 *
-	 * @param allowedRelations The ids of the {@link RelationType}s that represent the allowed edges in the graph.
-	 * @param ofPerson The source from which to search for the farthest nodes.
-	 * @param maxDepth The maximum depth (distance) until which the search is continued.
-	 * @param monitor the monitor for progress feed-back.
-	 * @return the PersonIDs that correspond to the nodes in the relation graph that are farthest away from the
-	 * startingPoint and connected via intermediary nodes only by the allowed relationType(ID)s. Or in case the maxDepth
-	 * is reached, the elements of that iteration are returned.
+	 * @param allowedRelations
+	 * @param ofPerson
+	 * @param maxDepth
+	 * @param monitor
+	 * @return
 	 */
-	public synchronized Set<Deque<ObjectID>> getRelationRoots(Set<PersonRelationTypeID> allowedRelations,
+	public synchronized Set<Deque<PropertySetID>> getRelationRoots(Set<PersonRelationTypeID> allowedRelations,
 			PropertySetID ofPerson, int maxDepth, ProgressMonitor monitor)
 	{
 		monitor.beginTask("Finding related persons", 10);
@@ -172,7 +164,7 @@ extends BaseJDOObjectDAO<PersonRelationID, PersonRelation>
 		{
 			ejb = JFireEjb3Factory.getRemoteBean(PersonRelationManagerRemote.class, SecurityReflector.getInitialContextProperties());
 			monitor.worked(2);
-			Set<Deque<ObjectID>> nearestNodes = ejb.getRootNodes(allowedRelations, ofPerson, maxDepth);
+			Set<Deque<PropertySetID>> nearestNodes = ejb.getNearestNodes(allowedRelations, ofPerson, maxDepth);
 			monitor.worked(8);
 			monitor.done();
 			return nearestNodes;

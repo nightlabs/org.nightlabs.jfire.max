@@ -33,7 +33,7 @@ public abstract class AbstractProductTypeQuery
 extends VendorDependentQuery
 implements ISaleAccessQuery
 {
-	private static final long serialVersionUID = 20081118L;
+	private static final long serialVersionUID = 20100106L;
 	private static final Logger logger = Logger.getLogger(AbstractProductTypeQuery.class);
 
 	private String fullTextLanguageID = null;
@@ -66,6 +66,8 @@ implements ISaleAccessQuery
 	// the current user's value - this might later be manually assignable and non-transient.
 	private transient UserID userID = null;
 
+	private ProductTypeID extendedProductTypeID;
+
 	public static final class FieldName
 	{
 		public static final String closed = "closed";
@@ -90,6 +92,8 @@ implements ISaleAccessQuery
 		public static final String permissionGrantedToSee = "permissionGrantedToSee";
 		public static final String permissionGrantedToSell = "permissionGrantedToSell";
 		public static final String permissionGrantedToReverse = "permissionGrantedToReverse";
+
+		public static final String extendedProductTypeID = "extendedProductTypeID";
 	}
 
 	@Override
@@ -297,7 +301,8 @@ implements ISaleAccessQuery
 		if (isFieldEnabled(VendorDependentQuery.FieldName.vendorID) && getVendorID() != null)
 			filter.append("\n && JDOHelper.getObjectId(this."+ProductType.FieldName.vendor+") == :vendorID");
 
-
+		if (isFieldEnabled(FieldName.extendedProductTypeID) && extendedProductTypeID != null)
+			filter.append("\n && JDOHelper.getObjectId(this."+ProductType.FieldName.extendedProductType+") == :extendedProductTypeID");
 
 		q.setFilter(filter.toString());
 		q.declareVariables(getVars());
@@ -667,5 +672,12 @@ implements ISaleAccessQuery
 		Boolean oldPermissionGrantedToReverse = this.permissionGrantedToReverse;
 		this.permissionGrantedToReverse = permissionGrantedToReverse;
 		notifyListeners(FieldName.permissionGrantedToReverse, oldPermissionGrantedToReverse, permissionGrantedToReverse);
+	}
+
+	public ProductTypeID getExtendedProductTypeID() {
+		return extendedProductTypeID;
+	}
+	public void setExtendedProductTypeID(ProductTypeID extendedProductTypeID) {
+		this.extendedProductTypeID = extendedProductTypeID;
 	}
 }

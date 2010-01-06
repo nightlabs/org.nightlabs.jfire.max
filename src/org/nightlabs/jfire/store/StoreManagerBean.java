@@ -29,6 +29,8 @@ package org.nightlabs.jfire.store;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -139,6 +141,8 @@ import org.nightlabs.jfire.trade.query.OfferQuery;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 import org.nightlabs.jfire.transfer.id.TransferID;
 import org.nightlabs.util.CollectionUtil;
+import org.nightlabs.util.NLLocale;
+import org.nightlabs.util.Util;
 
 /**
  * @author marco schulze - marco at nightlabs dot de
@@ -2918,19 +2922,118 @@ implements StoreManagerRemote, StoreManagerLocal
 	public Collection<ProductTypeID> getChildProductTypeIDs(ProductTypeID parentProductTypeID) {
 		PersistenceManager pm = createPersistenceManager();
 		try {
-			Collection<? extends ProductType> productTypes = ProductType.getChildProductTypes(pm, parentProductTypeID);
-
-			productTypes = Authority.filterIndirectlySecuredObjects(
-					pm,
-					productTypes,
-					getPrincipal(),
-					RoleConstants.seeProductType,
-					ResolveSecuringAuthorityStrategy.allow
-			);
-
+			Collection<? extends ProductType> productTypes = getChildProductTypes(pm, parentProductTypeID, null, true);
 			return NLJDOHelper.getObjectIDList(productTypes);
 		} finally {
 			pm.close();
 		}
 	}
+
+	private Collection<? extends ProductType> getChildProductTypes(
+			PersistenceManager pm,
+			ProductTypeID parentProductTypeID,
+			QueryCollection<? extends AbstractProductTypeQuery> productTypeQueries,
+			boolean sort
+	)
+	{
+		final String languageID = NLLocale.getDefault().getLanguage();
+		Collection<? extends ProductType> productTypes;
+
+		if (productTypeQueries != null && !productTypeQueries.isEmpty()) {
+			if (! (productTypeQueries instanceof JDOQueryCollectionDecorator<?>))
+			{
+				productTypeQueries = new JDOQueryCollectionDecorator<AbstractProductTypeQuery>(productTypeQueries);
+			}
+			@SuppressWarnings("unchecked")
+			JDOQueryCollectionDecorator<AbstractProductTypeQuery> queries =
+				(JDOQueryCollectionDecorator<AbstractProductTypeQuery>) productTypeQueries;
+
+			queries.setPersistenceManager(pm);
+
+////			queries.setCandidates(productTypes);
+//			// Unfortunately, this doesn't exist and I don't want to start more refactorings in the 1.0 branch now :-(
+//			// I hope, the following (not so clean) workaround works. Marco.
+//			for (AbstractProductTypeQuery q : queries) {
+//				q.setCandidates(productTypes);
+//			}
+
+			for (AbstractProductTypeQuery q : queries) {
+				q.setExtendedProductTypeID(parentProductTypeID);
+				q.setFieldEnabled(AbstractProductTypeQuery.FieldName.extendedProductTypeID, true);
+			}
+
+			@SuppressWarnings("unchecked")
+			Collection<? extends ProductType> pts = (Collection<? extends ProductType>) queries.executeQueries();
+			productTypes = pts;
+		}
+		else {
+			productTypes = ProductType.getChildProductTypes(pm, parentProductTypeID);
+			sort = false; // prevent sorting again - the result of the above method is already sorted.
+		}
+
+		productTypes = Authority.filterIndirectlySecuredObjects(
+				pm,
+				productTypes,
+				getPrincipal(),
+				RoleConstants.seeProductType,
+				ResolveSecuringAuthorityStrategy.allow
+		);
+
+		if (sort) {
+			// TODO DataNucleus WORKAROUND: Sorting in JDOQL causes objects to be skipped (not found) when they do not have a name!
+			// sort
+			long loadStart = System.currentTimeMillis();
+			productTypes = new ArrayList<ProductType>(productTypes);
+			long loadDuration = System.currentTimeMillis() - loadStart;
+
+			long sortStart = System.currentTimeMillis();
+			@SuppressWarnings("unchecked")
+			List<ProductType> pts = (List<ProductType>)productTypes;
+			Collections.sort(pts, new Comparator<ProductType>() {
+				@Override
+				public int compare(ProductType o1, ProductType o2) {
+					return o1.getName().getText(languageID).compareTo(o2.getName().getText(languageID));
+				}
+			});
+			if (logger.isDebugEnabled())
+				logger.debug("getChildProductTypes: Loading " + productTypes.size() + " product types took " + loadDuration + " msec and sorting with languageID=" + languageID + " took " + (System.currentTimeMillis() - sortStart) + " msec.");
+		}
+
+		return productTypes;
+	}
+
+	@RolesAllowed("org.nightlabs.jfire.store.seeProductType")
+	@Override
+	public Map<ProductTypeID, Long> getChildProductTypeCounts(Collection<ProductTypeID> parentProductTypeIDs, QueryCollection<? extends AbstractProductTypeQuery> productTypeQueries)
+	{
+		if (productTypeQueries == null || productTypeQueries.isEmpty())
+			return getChildProductTypeCounts(parentProductTypeIDs);
+
+		PersistenceManager pm = createPersistenceManager();
+		try {
+			Map<ProductTypeID, Long> result = new HashMap<ProductTypeID, Long>(parentProductTypeIDs.size());
+
+			for (ProductTypeID parentProductTypeID : parentProductTypeIDs) {
+				Collection<? extends ProductType> productTypes = getChildProductTypes(pm, parentProductTypeID, Util.cloneSerializable(productTypeQueries), false);
+				result.put(parentProductTypeID, Long.valueOf(productTypes.size()));
+			}
+
+			return result;
+		} finally {
+			pm.close();
+		}
+	}
+
+	@RolesAllowed("org.nightlabs.jfire.store.seeProductType")
+	@Override
+	public Collection<ProductTypeID> getChildProductTypeIDs(ProductTypeID parentProductTypeID, QueryCollection<? extends AbstractProductTypeQuery> productTypeQueries) {
+		PersistenceManager pm = createPersistenceManager();
+		try {
+			Collection<? extends ProductType> productTypes = getChildProductTypes(pm, parentProductTypeID, productTypeQueries, true);
+			return NLJDOHelper.getObjectIDList(productTypes);
+		} finally {
+			pm.close();
+		}
+	}
+
 }

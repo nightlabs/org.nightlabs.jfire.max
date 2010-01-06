@@ -452,4 +452,6 @@ public interface StoreManagerRemote {
 	Map<ProductTypeID, Long> getChildProductTypeCounts(Collection<ProductTypeID> parentProductTypeIDs);
 	Collection<ProductTypeID> getChildProductTypeIDs(ProductTypeID parentProductTypeID);
 
+	Map<ProductTypeID, Long> getChildProductTypeCounts(Collection<ProductTypeID> parentProductTypeIDs, QueryCollection<? extends AbstractProductTypeQuery> productTypeQueries);
+	Collection<ProductTypeID> getChildProductTypeIDs(ProductTypeID parentProductTypeID, QueryCollection<? extends AbstractProductTypeQuery> productTypeQueries);
 }

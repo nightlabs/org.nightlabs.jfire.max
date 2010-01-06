@@ -175,7 +175,6 @@ public class Offer
 implements
 		Serializable,
 		PricedArticleContainer,
-		ArticleContainer,
 		SegmentContainer,
 		Statable,
 		DetachCallback,

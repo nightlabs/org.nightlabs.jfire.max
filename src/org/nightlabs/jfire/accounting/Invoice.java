@@ -242,7 +242,7 @@ import org.nightlabs.util.Util;
 })
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class Invoice
-implements Serializable, PricedArticleContainer, ArticleContainer, Statable, DetachCallback
+implements Serializable, PricedArticleContainer, Statable, DetachCallback
 {
 	private static final long serialVersionUID = 1L;
 	public static final String FETCH_GROUP_INVOICE_LOCAL = "Invoice.invoiceLocal";

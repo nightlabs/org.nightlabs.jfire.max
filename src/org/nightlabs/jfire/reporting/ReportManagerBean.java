@@ -623,6 +623,7 @@ implements ReportManagerRemote
 				parent.getChildItems().remove(item);
 			}
 			pm.deletePersistent(item);
+			pm.flush();
 		} finally {
 			pm.close();
 		}
@@ -651,7 +652,7 @@ implements ReportManagerRemote
 	/* (non-Javadoc)
 	 * @see org.nightlabs.jfire.reporting.ReportManagerRemote#renderReportLayout(org.nightlabs.jfire.reporting.layout.render.RenderReportRequest)
 	 */
-	@TransactionAttribute(TransactionAttributeType.NEVER)
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	@RolesAllowed("org.nightlabs.jfire.reporting.renderReport")
 	public RenderedReportLayout renderReportLayout(RenderReportRequest renderReportRequest)
 	throws NamingException, RenderReportException

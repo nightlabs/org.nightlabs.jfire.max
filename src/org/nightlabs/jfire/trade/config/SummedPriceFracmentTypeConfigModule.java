@@ -1,6 +1,7 @@
 package org.nightlabs.jfire.trade.config;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -63,7 +64,15 @@ extends ConfigModule
 		summedPriceFracmentTypeList.add(priceFracmentType);
 	}
 	
+	public void addPriceFracmentTypes(Collection<PriceFragmentType> priceFracmentTypes) {
+		summedPriceFracmentTypeList.addAll(priceFracmentTypes);
+	}
+	
 	public void removePriceFracmentType(PriceFragmentType priceFracmentType) {
 		summedPriceFracmentTypeList.remove(priceFracmentType);
+	}
+	
+	public void removePriceFracmentTypes(Collection<PriceFragmentType> priceFracmentTypes) {
+		summedPriceFracmentTypeList.removeAll(priceFracmentTypes);
 	}
 }

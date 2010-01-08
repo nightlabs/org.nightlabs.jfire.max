@@ -837,8 +837,7 @@ implements ReportManagerRemote
 
 			ReportCategory category = (ReportCategory)pm.getObjectById(reportCategoryID);
 			ReportLayout layout = new ReportLayout(category, category.getOrganisationID(), "REPORT_REGISTRY_ITEM_TYPE_UNKNOWN", IOUtil.getFileNameWithoutExtension(reportLayoutZipFile.getName()));
-//			layout.getName().copyFrom(name); //TODO: Uncomment this line.
-			layout.getName().setText(Locale.ENGLISH, "Hello");
+			layout.getName().copyFrom(name);
 			layout.loadFile(templateFiles[0]);
 			layout = pm.makePersistent(layout);
 			category.addChildItem(layout);

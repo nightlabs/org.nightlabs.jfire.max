@@ -186,7 +186,7 @@ import org.nightlabs.util.Util;
 })
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public abstract class ReportRegistryItem
-implements Serializable, DeleteCallback, DetachCallback, SecuredObject, Inheritable, InheritanceCallbacks
+implements DeleteCallback, Serializable, DetachCallback, SecuredObject, Inheritable, InheritanceCallbacks
 {
 	private static final long serialVersionUID = 20081212L;
 
@@ -748,10 +748,6 @@ implements Serializable, DeleteCallback, DetachCallback, SecuredObject, Inherita
 	public void jdoPreDetach() {
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * @see javax.jdo.listener.DeleteCallback#jdoPreDelete()
-	 */
 	@Override
 	public void jdoPreDelete() {
 		PersistenceManager pm = getPersistenceManager();
@@ -759,4 +755,5 @@ implements Serializable, DeleteCallback, DetachCallback, SecuredObject, Inherita
 		pm.deletePersistent(getDescription());
 		pm.flush();
 	}
+	
 }

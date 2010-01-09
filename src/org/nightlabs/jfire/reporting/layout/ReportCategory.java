@@ -26,6 +26,7 @@
 
 package org.nightlabs.jfire.reporting.layout;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -41,6 +42,7 @@ import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.FetchGroup;
 import javax.jdo.annotations.IdentityType;
 import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.listener.DeleteCallback;
 
 
 /**
@@ -92,7 +94,7 @@ import javax.jdo.annotations.PersistenceModifier;
 		value="SELECT UNIQUE WHERE this.organisationID == paramOrganisationID && this.reportRegistryItemType == paramCategoryType PARAMETERS String paramOrganisationID, String paramCategoryType import java.lang.String")
 )
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
-public class ReportCategory extends ReportRegistryItem implements NestableReportRegistryItem {
+public class ReportCategory extends ReportRegistryItem implements DeleteCallback, NestableReportRegistryItem {
 
 //	public static final String INTERNAL_CATEGORY_TYPE_ORDER = "OrderLayout";
 //	public static final String INTERNAL_CATEGORY_TYPE_OFFER = "OfferLayout";
@@ -191,4 +193,15 @@ public class ReportCategory extends ReportRegistryItem implements NestableReport
 		childItem.setParentCategory(this);
 		this.childItems.add(childItem);
 	}
+	
+	
+	@Override
+	public void jdoPreDelete() {
+		PersistenceManager pm = getPersistenceManager();
+		if(childItems != null)
+			pm.deletePersistentAll(childItems);
+		pm.deletePersistent(getName());
+		pm.deletePersistent(getDescription());
+		pm.flush();
+	}	
 }

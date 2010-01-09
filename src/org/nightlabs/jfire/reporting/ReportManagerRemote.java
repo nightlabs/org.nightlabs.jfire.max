@@ -205,6 +205,7 @@ public interface ReportManagerRemote {
 	 */
 	void deleteRegistryItem(ReportRegistryItemID reportRegistryItemID);
 
+	
 	/**
 	 * Renders the {@link ReportLayout} referenced by the given {@link RenderReportRequest}
 	 * and returns the resulting {@link RenderedReportLayout}.

@@ -41,6 +41,7 @@ import org.apache.log4j.Logger;
 import org.nightlabs.io.DataBuffer;
 import org.nightlabs.util.Util;
 
+import javax.jdo.PersistenceManager;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.FetchGroups;
 import javax.jdo.annotations.InheritanceStrategy;
@@ -50,6 +51,7 @@ import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Column;
 import javax.jdo.annotations.IdentityType;
 import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.listener.DeleteCallback;
 
 /**
  * A ReportLayout holds the BIRT report definition.
@@ -85,7 +87,7 @@ import javax.jdo.annotations.PersistenceModifier;
 		members=@Persistent(name="reportDesign"))
 })
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
-public class ReportLayout extends ReportRegistryItem {
+public class ReportLayout extends ReportRegistryItem implements DeleteCallback{
 
 	/**
 	 * LOG4J logger used by this class
@@ -254,6 +256,17 @@ public class ReportLayout extends ReportRegistryItem {
 	@Override
 	protected Collection<ReportRegistryItem> getChildItems() {
 		return null;
+	}
+	
+	@Override
+	public void jdoPreDelete() {
+		PersistenceManager pm = getPersistenceManager();
+		Collection<ReportLayoutLocalisationData> bundle = ReportLayoutLocalisationData.getReportLayoutLocalisationBundle(pm, this);
+		if(bundle != null && !bundle.isEmpty())
+			pm.deletePersistentAll(bundle);
+		pm.deletePersistent(getName());
+		pm.deletePersistent(getDescription());
+		pm.flush();
 	}
 
 //	/**

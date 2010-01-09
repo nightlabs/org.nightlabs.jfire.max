@@ -756,7 +756,6 @@ implements Serializable, DeleteCallback, DetachCallback, SecuredObject, Inherita
 	public void jdoPreDelete() {
 		PersistenceManager pm = getPersistenceManager();
 		pm.deletePersistent(getName());
-		pm.flush();
 		pm.deletePersistent(getDescription());
 		pm.flush();
 	}

@@ -104,7 +104,7 @@ import org.nightlabs.jfire.timer.Task;
 import org.nightlabs.jfire.timer.id.TaskID;
 import org.nightlabs.jfire.trade.config.LegalEntityViewConfigModule;
 import org.nightlabs.jfire.trade.config.OfferConfigModule;
-import org.nightlabs.jfire.trade.config.SummedPriceFracmentTypeConfigModule;
+import org.nightlabs.jfire.trade.config.SummedPriceFragmentTypeConfigModule;
 import org.nightlabs.jfire.trade.config.TradePrintingConfigModule;
 import org.nightlabs.jfire.trade.deliverydate.ArticleContainerDeliveryDateDTO;
 import org.nightlabs.jfire.trade.deliverydate.ArticleDeliveryDateCarrier;
@@ -1182,7 +1182,7 @@ implements TradeManagerRemote, TradeManagerLocal
 			);
 			userConfigSetup.getConfigModuleClasses().add(LegalEntityViewConfigModule.class.getName());
 			userConfigSetup.getConfigModuleClasses().add(TariffOrderConfigModule.class.getName());
-			userConfigSetup.getConfigModuleClasses().add(SummedPriceFracmentTypeConfigModule.class.getName()); //Added by Chairat 07012009
+			userConfigSetup.getConfigModuleClasses().add(SummedPriceFragmentTypeConfigModule.class.getName()); //Added by Chairat 07012009
 
 			ConfigSetup workstationConfigSetup = ConfigSetup.getConfigSetup(
 					pm,

@@ -166,7 +166,7 @@ public abstract class ScriptRegistryItem
 	private static final String QUERY_GET_TOPLEVEL_SCRIPT_REGISTRY_ITEMS = "getTopLevelScriptRegistryItems";
 	private static final String QUERY_GET_SCRIPT_REGISTRY_IDPARENT_ITEMS = "getScriptRegistryItemIDsForParent";
 	
-	public static final String FETCH_GROUP_PARENT = "ScriptRegistryItem.parentItem";
+	public static final String FETCH_GROUP_PARENT = "ScriptRegistryItem.parent";
 	public static final String FETCH_GROUP_NAME = "ScriptRegistryItem.name";
 	public static final String FETCH_GROUP_PARAMETER_SET = "ScriptRegistryItem.parameterSet";
 	public static final String FETCH_GROUP_DESCRIPTION = "ScriptRegistryItem.description";
@@ -176,7 +176,7 @@ public abstract class ScriptRegistryItem
 	@Deprecated
 	public static final String FETCH_GROUP_THIS_SCRIPT_REGISTRY_ITEM = "ScriptRegistryItem.this";
 
-
+	
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"

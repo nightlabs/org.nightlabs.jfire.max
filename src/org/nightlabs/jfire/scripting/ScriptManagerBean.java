@@ -28,6 +28,7 @@ package org.nightlabs.jfire.scripting;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -39,6 +40,7 @@ import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 import javax.ejb.TransactionManagement;
 import javax.ejb.TransactionManagementType;
+import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 
@@ -132,7 +134,47 @@ implements ScriptManagerRemote
 			pm.close();
 		}
 	}
+	
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	@RolesAllowed("_Guest_")
+	public Collection<ScriptRegistryItemID> getScriptRegistryItemIDsForParent(ScriptRegistryItemID parentID) {
+		PersistenceManager pm;
+		pm = createPersistenceManager();
+		try {
+			ScriptRegistryItem item = (ScriptRegistryItem) pm.getObjectById(parentID);
+			Collection<ScriptRegistryItemID> result = Collections.emptyList();
+			if (item instanceof ScriptCategory) {
+				result = new ArrayList<ScriptRegistryItemID>(ScriptRegistryItem.getReportRegistryItemIDsForParent(pm, (ScriptCategory) item));
+			}
+			return result;
+		} finally {
+			pm.close();
+		}
+	}
 
+
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.scripting.ScriptManagerRemote#getTopLevelScriptRegistryItemIDs()
+	 */
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	@RolesAllowed("_Guest_")
+	@Override
+	public Collection<ScriptRegistryItemID> getTopLevelScriptRegistryItemIDs()
+	{
+			PersistenceManager pm;
+			pm = createPersistenceManager();
+			try {
+				Collection<ScriptRegistryItem> topLevelItems = ScriptRegistryItem.getTopScriptRegistryItemsByOrganisationID(pm, getOrganisationID());
+				Collection<ScriptRegistryItemID> result = new HashSet<ScriptRegistryItemID>(topLevelItems.size());
+				for (ScriptRegistryItem item : topLevelItems) {
+					result.add((ScriptRegistryItemID) JDOHelper.getObjectId(item));
+				}	
+				return result;
+			} finally {
+				pm.close();
+			}
+	}	
+	
 	/* (non-Javadoc)
 	 * @see org.nightlabs.jfire.scripting.ScriptManagerRemote#getScriptRegistryItems(java.util.List, java.lang.String[], int)
 	 */

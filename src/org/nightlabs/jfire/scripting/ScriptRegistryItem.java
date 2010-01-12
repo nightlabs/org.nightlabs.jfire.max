@@ -148,6 +148,9 @@ import org.nightlabs.util.Util;
 		name=ScriptRegistryItem.QUERY_GET_TOPLEVEL_SCRIPT_REGISTRY_ITEMS_BY_TYPE,
 		value="SELECT WHERE this.parent == null && this.scriptRegistryItemType == pScriptRegistryItemType PARAMETERS String pScriptRegistryItemType import java.lang.String"),
 	@javax.jdo.annotations.Query(
+				name=ScriptRegistryItem.QUERY_GET_SCRIPT_REGISTRY_IDPARENT_ITEMS,
+				value="SELECT JDOHelper.getObjectId(this) WHERE this.parent == :paramParent"),		
+	@javax.jdo.annotations.Query(
 		name=ScriptRegistryItem.QUERY_GET_TOPLEVEL_SCRIPT_REGISTRY_ITEMS_BY_ORGANISATION_ID_AND_TYPE,
 		value="SELECT WHERE this.parent == null && this.organisationID == pOrganisationID && this.scriptRegistryItemType == pScriptRegistryItemType PARAMETERS String pOrganisationID, String pScriptRegistryItemType import java.lang.String")
 })
@@ -161,7 +164,8 @@ public abstract class ScriptRegistryItem
 	private static final String QUERY_GET_TOPLEVEL_SCRIPT_REGISTRY_ITEMS_BY_TYPE = "getTopLevelScriptRegistryItemsByType";
 	private static final String QUERY_GET_TOPLEVEL_SCRIPT_REGISTRY_ITEMS_BY_ORGANISATION_ID = "getTopLevelScriptRegistryItemsByOrganisationID";
 	private static final String QUERY_GET_TOPLEVEL_SCRIPT_REGISTRY_ITEMS = "getTopLevelScriptRegistryItems";
-
+	private static final String QUERY_GET_SCRIPT_REGISTRY_IDPARENT_ITEMS = "getScriptRegistryItemIDsForParent";
+	
 	public static final String FETCH_GROUP_PARENT = "ScriptRegistryItem.parentItem";
 	public static final String FETCH_GROUP_NAME = "ScriptRegistryItem.name";
 	public static final String FETCH_GROUP_PARAMETER_SET = "ScriptRegistryItem.parameterSet";
@@ -392,7 +396,22 @@ public abstract class ScriptRegistryItem
 				Util.hashCode(scriptRegistryItemType) ^
 				Util.hashCode(scriptRegistryItemID);
 	}
-
+	
+	/**
+	 * Returns all {@link ScriptRegistryItem}s that have with the given scriptCategory
+	 * as parent.
+	 *
+	 * @param pm The {@link PersistenceManager} to use.
+	 * @param scriptCategory The {@link scriptCategory} children should be searched for.
+	 * @return all {@link ScriptRegistryItem}s that have with the given scriptCategory
+	 * 		as parent.
+	 */
+	@SuppressWarnings("unchecked")
+	public static Collection<ScriptRegistryItemID> getReportRegistryItemIDsForParent(PersistenceManager pm, ScriptCategory reportCategory) {
+		Query q = pm.newNamedQuery(ScriptRegistryItem.class, QUERY_GET_SCRIPT_REGISTRY_IDPARENT_ITEMS);
+		return (Collection<ScriptRegistryItemID>) q.execute(reportCategory);
+	}
+	
 	/**
 	 * Returns all top level (parent == null) ScriptRegistryItems for the given organisationID
 	 * If organisation is null the top level registry items

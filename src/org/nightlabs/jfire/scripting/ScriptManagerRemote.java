@@ -33,6 +33,11 @@ public interface ScriptManagerRemote {
 	@RolesAllowed("_Guest_")
 	Collection<ScriptRegistryItem> getTopLevelScriptRegistryItems(String organisationID, String[] fetchGroups, int maxFetchDepth);
 
+	Collection<ScriptRegistryItemID> getTopLevelScriptRegistryItemIDs();
+	
+	Collection<ScriptRegistryItemID> getScriptRegistryItemIDsForParent(ScriptRegistryItemID parentID);
+	
+	
 	/**
 	 * @param organisationID The organisationID the carriers should be searched for. If null top level carriers for all organisations are returned.
 	 */

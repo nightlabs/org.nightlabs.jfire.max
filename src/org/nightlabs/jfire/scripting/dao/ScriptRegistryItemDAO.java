@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.ArrayList;
 
+import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.scripting.ScriptManagerRemote;
@@ -34,12 +35,9 @@ public class ScriptRegistryItemDAO extends BaseJDOObjectDAO<ScriptRegistryItemID
 			Set<ScriptRegistryItemID> objectIDs, String[] fetchGroups,
 			int maxFetchDepth, ProgressMonitor monitor) throws Exception {
 		// TODO Auto-generated method stub
-		
 				ScriptManagerRemote sm=JFireEjb3Factory.getRemoteBean(ScriptManagerRemote.class,  SecurityReflector.getInitialContextProperties());
 		              List<ScriptRegistryItemID> ids=new ArrayList<ScriptRegistryItemID>(objectIDs);
 					List<ScriptRegistryItem> l=    sm.getScriptRegistryItems(ids, fetchGroups, maxFetchDepth);
-		
-		
 		return l;
 	}
 
@@ -48,32 +46,55 @@ public class ScriptRegistryItemDAO extends BaseJDOObjectDAO<ScriptRegistryItemID
 		try {
 			ScriptManagerRemote sm = JFireEjb3Factory.getRemoteBean(ScriptManagerRemote.class, SecurityReflector.getInitialContextProperties());
 			return sm.getScriptRegistryItem(id, fetchGroups, maxFetchDepth);
-			
-			
-	
-			
-
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
 	
-	public Collection<ScriptParameterSet> getScriptParameterSet(Collection<ScriptParameterSetID> ids, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor){
-		
+	public Collection<ScriptParameterSet> getScriptParameterSet(Collection<ScriptParameterSetID> ids, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
+	{		
 		try{
-		
 		      ScriptManagerRemote sm =JFireEjb3Factory.getRemoteBean(ScriptManagerRemote.class, SecurityReflector.getInitialContextProperties());
-					return sm.getScriptParameterSets(ids, fetchGroups, maxFetchDepth);
-		
+		      return sm.getScriptParameterSets(ids, fetchGroups, maxFetchDepth);
 		} catch(Exception e){
 			throw new RuntimeException(e);
 		}
 	}
 	
 	
+	public Collection<ScriptRegistryItemID> getTopLevelScriptRegistryItemIDs()
+	{		
+		try {
+			ScriptManagerRemote sm = JFireEjb3Factory.getRemoteBean(ScriptManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			return sm.getTopLevelScriptRegistryItemIDs();
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 	
 	
+	public Collection<ScriptRegistryItemID> getScriptRegistryItemIDsForParent (
+			ScriptRegistryItemID scriptRegistryItemID)
+	{		
+		try {
+			ScriptManagerRemote sm = JFireEjb3Factory.getRemoteBean(ScriptManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			return sm.getScriptRegistryItemIDsForParent(scriptRegistryItemID);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 	
+	
+	public List<ScriptRegistryItem> getScriptRegistryItems(List<ScriptRegistryItemID> scriptRegistryItemIDs, String[] fetchGroups, ProgressMonitor monitor)
+	{
+		try {
+			ScriptManagerRemote sm = JFireEjb3Factory.getRemoteBean(ScriptManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			return sm.getScriptRegistryItems(scriptRegistryItemIDs, fetchGroups,  NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
+
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}	
 	
 	public ScriptRegistryItem storeRegistryItem (
 			ScriptRegistryItem reportRegistryItem,
@@ -83,11 +104,9 @@ public class ScriptRegistryItemDAO extends BaseJDOObjectDAO<ScriptRegistryItemID
 		try {
 			ScriptManagerRemote sm = JFireEjb3Factory.getRemoteBean(ScriptManagerRemote.class, SecurityReflector.getInitialContextProperties());
 			return sm.storeRegistryItem(reportRegistryItem, get, fetchGroups, maxFetchDepth);
-          
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-		
 	}
 	
 	public Collection<String> getlanguages(){
@@ -95,7 +114,6 @@ public class ScriptRegistryItemDAO extends BaseJDOObjectDAO<ScriptRegistryItemID
 		try{
 			ScriptManagerRemote sm=JFireEjb3Factory.getRemoteBean(ScriptManagerRemote.class, SecurityReflector.getInitialContextProperties());
 			return sm.getLanguages();
-		
 		}catch(Exception e){
 			throw new RuntimeException(e);
 		}
@@ -110,5 +128,4 @@ public class ScriptRegistryItemDAO extends BaseJDOObjectDAO<ScriptRegistryItemID
 			throw new RuntimeException(e);
 		}
 	}
-	
 }

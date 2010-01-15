@@ -4,7 +4,6 @@
 	<comment></comment>
 	<projects>
 		<project>JFireReporting</project>
-		<project>org.nightlabs.jfire.reporting.birt</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

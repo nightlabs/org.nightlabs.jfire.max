@@ -126,6 +126,27 @@ implements PersonRelationManagerRemote
 				}
 			}
 
+			{
+				PersonRelationTypeID personRelationTypeID = PersonRelationType.PredefinedRelationTypes.mainLocation;
+				try {
+					pm.getObjectById(personRelationTypeID);
+				} catch (JDOObjectNotFoundException x) {
+					PersonRelationType personRelationType = pm.makePersistent(new PersonRelationType(personRelationTypeID, PersonRelationType.PredefinedRelationTypes.branchLocation));
+					personRelationType.getName().readFromProperties(baseName, loader, "org.nightlabs.jfire.personrelation.PersonRelationType-mainLocation.name"); //$NON-NLS-1$
+					personRelationType.getDescription().readFromProperties(baseName, loader, "org.nightlabs.jfire.personrelation.PersonRelationType-mainLocation.description"); //$NON-NLS-1$
+				}
+			}
+			{
+				PersonRelationTypeID personRelationTypeID = PersonRelationType.PredefinedRelationTypes.branchLocation;
+				try {
+					pm.getObjectById(personRelationTypeID);
+				} catch (JDOObjectNotFoundException x) {
+					PersonRelationType personRelationType = pm.makePersistent(new PersonRelationType(personRelationTypeID, PersonRelationType.PredefinedRelationTypes.mainLocation));
+					personRelationType.getName().readFromProperties(baseName, loader, "org.nightlabs.jfire.personrelation.PersonRelationType-branchLocation.name"); //$NON-NLS-1$
+					personRelationType.getDescription().readFromProperties(baseName, loader, "org.nightlabs.jfire.personrelation.PersonRelationType-branchLocation.description"); //$NON-NLS-1$
+				}
+			}
+
 		} finally {
 			pm.close();
 		}

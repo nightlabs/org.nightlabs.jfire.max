@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE reporting_initialiser PUBLIC "-//NightLabs//Reporting Initialiser DTD V 0.1//EN" "http://www.nightlabs.de/dtd/reporting-initialiser-content_0_3.dtd">
+<!DOCTYPE reporting_initialiser PUBLIC "-//NightLabs//Reporting Initialiser DTD V 0.5//EN" "http://www.nightlabs.de/dtd/reporting-initialiser-content_0_5.dtd">
 <report-category 
 	id="General-Root"
 	type="JFireReportingTrade-Reporting-General"
@@ -10,6 +10,7 @@
 	<report
 		file="General-Sales-Statistic.rptdesign" 
 		id="General-Sales-Statistic"
+		engineType="BIRT"
 		overwriteOnInit="true"
 	>
 	<!-- id is optional and defaults to the value of file without extension -->

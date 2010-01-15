@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE reporting_initialiser PUBLIC "-//NightLabs//Reporting Initialiser DTD V 0.3//EN" "http://www.nightlabs.de/dtd/reporting-initialiser-content_0_3.dtd">
+<!DOCTYPE reporting_initialiser PUBLIC "-//NightLabs//Reporting Initialiser DTD V 0.5//EN" "http://www.nightlabs.de/dtd/reporting-initialiser-content_0_5.dtd">
 <report-category 
 	id="Payment-Root"
 	type="JFireReportingTrade-FinancialAnalysis-Payment"
@@ -10,6 +10,7 @@
 	<report
 		file="PaymentReport.rptdesign" 
 		id="PaymentReport"
+		engineType="BIRT"
 		overwriteOnInit="true"
 	>
 		<name language="de">Zahlungsbericht</name>

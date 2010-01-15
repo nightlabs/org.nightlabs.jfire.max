@@ -24,7 +24,6 @@ Import-Package: org.nightlabs.jfire.organisation,
  org.nightlabs.jfire.security,
  org.nightlabs.jfire.server.data.dir
 Export-Package: org.nightlabs.jfire.reporting.birt,
- org.nightlabs.jfire.reporting.layout.render,
- org.nightlabs.jfire.reporting.oda.jdojs,
- org.nightlabs.jfire.reporting.platform,
- org.nightlabs.jfire.reporting.scripting.javaclass.prop
+ org.nightlabs.jfire.reporting.birt.layout.render,
+ org.nightlabs.jfire.reporting.birt.oda.jdojs,
+ org.nightlabs.jfire.reporting.birt.platform

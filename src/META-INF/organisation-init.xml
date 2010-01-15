@@ -16,4 +16,10 @@
 			archive="JFireReporting.jar" 
 			bean="org.nightlabs.jfire.reporting.ReportManagerRemote"/>
 	</init>
+	<init bean="org.nightlabs.jfire.reporting.scheduled.ScheduledReportManagerRemote" method="initialise">
+		<depends
+			module="JFireReportingEAR.ear" 
+			archive="JFireReporting.jar" 
+			bean="org.nightlabs.jfire.reporting.ReportManagerRemote"/>
+	</init>
 </organisation-initialisation>

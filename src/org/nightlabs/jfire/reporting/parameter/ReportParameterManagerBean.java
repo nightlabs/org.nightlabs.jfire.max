@@ -48,6 +48,7 @@ import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.organisation.id.OrganisationID;
 import org.nightlabs.jfire.reporting.ReportingConstants;
+import org.nightlabs.jfire.reporting.RoleConstants;
 import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
 import org.nightlabs.jfire.reporting.parameter.ReportParameterUtil.NameEntry;
 import org.nightlabs.jfire.reporting.parameter.config.ReportParameterAcquisitionSetup;
@@ -208,7 +209,7 @@ implements ReportParameterManagerRemote
 	/* (non-Javadoc)
 	 * @see org.nightlabs.jfire.reporting.parameter.ReportParameterManagerRemote#getValueProviders(java.util.Set, java.lang.String[], int)
 	 */	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	@RolesAllowed("org.nightlabs.jfire.reporting.renderReport")
+	@RolesAllowed(RoleConstants.renderReport_roleID)
 
 	public Set<ValueProvider> getValueProviders(
 			Set<ValueProviderID> providerIDs, String[] fetchGroups, int maxFetchDepth
@@ -225,7 +226,7 @@ implements ReportParameterManagerRemote
 	/* (non-Javadoc)
 	 * @see org.nightlabs.jfire.reporting.parameter.ReportParameterManagerRemote#getReportParameterAcquisitionSetupIDs(java.util.Collection)
 	 */	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	@RolesAllowed("org.nightlabs.jfire.reporting.renderReport")
+	@RolesAllowed(RoleConstants.renderReport_roleID)
 
 	public Map<ReportRegistryItemID, ReportParameterAcquisitionSetupID> getReportParameterAcquisitionSetupIDs(Collection<ReportRegistryItemID> reportLayoutIDs) {
 		PersistenceManager pm;
@@ -248,7 +249,7 @@ implements ReportParameterManagerRemote
 	/* (non-Javadoc)
 	 * @see org.nightlabs.jfire.reporting.parameter.ReportParameterManagerRemote#getReportParameterAcquisitionSetups(java.util.Set, java.lang.String[], int)
 	 */	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	@RolesAllowed("org.nightlabs.jfire.reporting.renderReport")
+	@RolesAllowed(RoleConstants.renderReport_roleID)
 
 	public Set<ReportParameterAcquisitionSetup> getReportParameterAcquisitionSetups(
 			Set<ReportParameterAcquisitionSetupID> setupIDs, String[] fetchGroups, int maxFetchDepth
@@ -266,7 +267,7 @@ implements ReportParameterManagerRemote
 	/* (non-Javadoc)
 	 * @see org.nightlabs.jfire.reporting.parameter.ReportParameterManagerRemote#getValueProviderCategoryIDsForParent(org.nightlabs.jfire.reporting.parameter.id.ValueProviderCategoryID)
 	 */	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	@RolesAllowed("org.nightlabs.jfire.reporting.renderReport")
+	@RolesAllowed(RoleConstants.renderReport_roleID)
 
 	public Set<ValueProviderCategoryID> getValueProviderCategoryIDsForParent(ValueProviderCategoryID valueProviderCategoryID) {
 		PersistenceManager pm;
@@ -282,7 +283,7 @@ implements ReportParameterManagerRemote
 	/* (non-Javadoc)
 	 * @see org.nightlabs.jfire.reporting.parameter.ReportParameterManagerRemote#getValueProviderCategories(java.util.Set, java.lang.String[], int)
 	 */	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	@RolesAllowed("org.nightlabs.jfire.reporting.renderReport")
+	@RolesAllowed(RoleConstants.renderReport_roleID)
 
 	public Set<ValueProviderCategory> getValueProviderCategories(
 			Set<ValueProviderCategoryID> categoryIDs, String[] fetchGroups, int maxFetchDepth
@@ -299,7 +300,7 @@ implements ReportParameterManagerRemote
 	/* (non-Javadoc)
 	 * @see org.nightlabs.jfire.reporting.parameter.ReportParameterManagerRemote#getValueProviderIDsForParent(org.nightlabs.jfire.reporting.parameter.id.ValueProviderCategoryID)
 	 */	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	@RolesAllowed("org.nightlabs.jfire.reporting.renderReport")
+	@RolesAllowed(RoleConstants.renderReport_roleID)
 
 	public Set<ValueProviderID> getValueProviderIDsForParent(ValueProviderCategoryID valueProviderCategoryID) {
 		PersistenceManager pm;
@@ -315,7 +316,7 @@ implements ReportParameterManagerRemote
 	/* (non-Javadoc)
 	 * @see org.nightlabs.jfire.reporting.parameter.ReportParameterManagerRemote#storeReportParameterAcquisitionSetup(org.nightlabs.jfire.reporting.parameter.config.ReportParameterAcquisitionSetup, boolean, java.lang.String[], int)
 	 */	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	@RolesAllowed("org.nightlabs.jfire.reporting.editReport")
+	@RolesAllowed(RoleConstants.editReport_roleID)
 
 	public ReportParameterAcquisitionSetup storeReportParameterAcquisitionSetup(
 			ReportParameterAcquisitionSetup setup,

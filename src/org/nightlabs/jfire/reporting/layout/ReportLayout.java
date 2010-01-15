@@ -37,21 +37,22 @@ import java.util.Date;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.InflaterInputStream;
 
+import javax.jdo.PersistenceManager;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.listener.DeleteCallback;
+
 import org.apache.log4j.Logger;
 import org.nightlabs.io.DataBuffer;
 import org.nightlabs.util.Util;
 
-import javax.jdo.PersistenceManager;
-import javax.jdo.annotations.Persistent;
-import javax.jdo.annotations.FetchGroups;
-import javax.jdo.annotations.InheritanceStrategy;
-import javax.jdo.annotations.Inheritance;
-import javax.jdo.annotations.FetchGroup;
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.Column;
-import javax.jdo.annotations.IdentityType;
-import javax.jdo.annotations.PersistenceModifier;
-import javax.jdo.listener.DeleteCallback;
 
 /**
  * A ReportLayout holds the BIRT report definition.
@@ -105,7 +106,7 @@ public class ReportLayout extends ReportRegistryItem implements DeleteCallback{
 	/**
 	 * Serial version UID. Don't forget to change after changing members.
 	 */
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 20100106L;
 
 	/**
 	 * @deprecated Only for JDO
@@ -147,14 +148,18 @@ public class ReportLayout extends ReportRegistryItem implements DeleteCallback{
 			ReportCategory parentItem,
 			String organisationID,
 			String reportRegistryItemType,
-			String reportRegistryItemID
+			String reportRegistryItemID,
+			String reportDesignType
 		)
 	{
 		super(parentItem, organisationID, reportRegistryItemType, reportRegistryItemID);
 //		this.localisationData = new HashMap<String, ReportLayoutLocalisationData>();
 	}
 
-
+	/** Defines the report engine that can handle this ReportLayout, i.e. the backend that can edit and render this layout */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+	private String reportEngineType;
+	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 * @jdo.column sql-type="BLOB"
@@ -175,20 +180,6 @@ public class ReportLayout extends ReportRegistryItem implements DeleteCallback{
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private String fileName;
 
-
-//	/**
-//	 * @jdo.field
-//	 *		persistence-modifier="persistent"
-//	 *		collection-type="map"
-//	 *		key-type="java.lang.String"
-//	 *		value-type="org.nightlabs.jfire.reporting.layout.ReportLayoutLocalisationData"
-//	 *		mapped-by="reportLayout"
-//	 *		dependent-value="true"
-//	 *
-//	 * @jdo.key
-//	 * 		mapped-by="locale"
-//	 */
-//	private Map<String, ReportLayoutLocalisationData> localisationData;
 
 	public void loadStream(InputStream in, long length, Date timeStamp, String name)
 	throws IOException
@@ -253,6 +244,17 @@ public class ReportLayout extends ReportRegistryItem implements DeleteCallback{
 		return fileTimestamp;
 	}
 
+	/**
+	 * Returns the engineType of this {@link ReportLayout}. 
+	 * A {@link ReportLayout}s engineType determines which
+	 * report-engine can be used to render the report.
+	 * 
+	 * @return The engineType of this {@link ReportLayout}.
+	 */
+	public String getReportEngineType() {
+		return reportEngineType;
+	}
+
 	@Override
 	protected Collection<ReportRegistryItem> getChildItems() {
 		return null;
@@ -268,25 +270,4 @@ public class ReportLayout extends ReportRegistryItem implements DeleteCallback{
 		pm.deletePersistent(getDescription());
 		pm.flush();
 	}
-
-//	/**
-//	 * Returns the map of localisation data (message files).
-//	 *
-//	 * @return the localisationData
-//	 */
-//	public Map<String, ReportLayoutLocalisationData> getLocalisationData() {
-//		return localisationData;
-//	}
-
-//	@Override
-//	public void jdoPreStore() {
-//		super.jdoPreStore();
-//		ReportRegistryItemID parentID = (ReportRegistryItemID) JDOHelper.getObjectId(this.getParentItem());
-//		if (parentID == null)
-//			throw new IllegalStateException("ReportLayout has to be child of a ReportCategory but is not.");
-//		ReportRegistryItem parent = (ReportRegistryItem) getPersistenceManager().getObjectById(parentID);
-//		ReportCategory.ensureRelationWithParent(parent, this);
-//		logger.info("Called ensureRelationWithParent for ReportLayout");
-//	}
-
 }

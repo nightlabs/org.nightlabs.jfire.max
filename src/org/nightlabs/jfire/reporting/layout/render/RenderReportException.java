@@ -8,8 +8,9 @@ import java.io.Serializable;
 import org.nightlabs.util.reflect.ReflectUtil;
 
 /**
- * Exception to wrap BIRT exceptions, so that clients
- * are not required to know BIRT when rendering reports.
+ * Exception to wrap exceptions thrown while rendering reports, 
+ * so that clients are not required to know the underlying rendering engine
+ * when rendering reports.
  *
  * TODO: Need to wrap possible causes in simple exceptions.
  *

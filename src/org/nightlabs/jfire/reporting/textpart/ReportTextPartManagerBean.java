@@ -40,6 +40,7 @@ import javax.jdo.PersistenceManager;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
+import org.nightlabs.jfire.reporting.RoleConstants;
 import org.nightlabs.jfire.reporting.layout.ReportRegistryItem;
 import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
 import org.nightlabs.jfire.reporting.textpart.id.ReportTextPartConfigurationID;
@@ -66,7 +67,7 @@ implements ReportTextPartManagerRemote
 	/* (non-Javadoc)
 	 * @see org.nightlabs.jfire.reporting.textpart.ReportTextPartManagerRemote#getReportTextPartConfiguration(org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID, boolean, java.lang.String[], int)
 	 */	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	@RolesAllowed("org.nightlabs.jfire.reporting.editReport")
+	@RolesAllowed(RoleConstants.editReport_roleID)
 	public ReportTextPartConfiguration getReportTextPartConfiguration(
 			ReportRegistryItemID reportRegistryItemID,
 			boolean synthesize, String[] fetchGroups, int maxFetchDepth) {
@@ -94,7 +95,7 @@ implements ReportTextPartManagerRemote
 	/* (non-Javadoc)
 	 * @see org.nightlabs.jfire.reporting.textpart.ReportTextPartManagerRemote#getReportTextPartConfigurationID(org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID)
 	 */	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	@RolesAllowed("org.nightlabs.jfire.reporting.editReport")
+	@RolesAllowed(RoleConstants.editReport_roleID)
 	public ReportTextPartConfigurationID getReportTextPartConfigurationID(ReportRegistryItemID reportRegistryItemID) {
 		PersistenceManager pm;
 		pm = createPersistenceManager();
@@ -112,7 +113,7 @@ implements ReportTextPartManagerRemote
 	/* (non-Javadoc)
 	 * @see org.nightlabs.jfire.reporting.textpart.ReportTextPartManagerRemote#getReportTextPartConfigurations(java.util.Set, java.lang.String[], int)
 	 */	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	@RolesAllowed("org.nightlabs.jfire.reporting.editReport")
+	@RolesAllowed(RoleConstants.editReport_roleID)
 	public Set<ReportTextPartConfiguration> getReportTextPartConfigurations(
 			Set<ReportTextPartConfigurationID> configurationIDs, String[] fetchGroups, int maxFetchDepth
 	) {
@@ -128,7 +129,7 @@ implements ReportTextPartManagerRemote
 	/* (non-Javadoc)
 	 * @see org.nightlabs.jfire.reporting.textpart.ReportTextPartManagerRemote#getReportTextPartConfiguration(org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID, org.nightlabs.jdo.ObjectID, boolean, java.lang.String[], int)
 	 */	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	@RolesAllowed("org.nightlabs.jfire.reporting.renderReport")
+	@RolesAllowed(RoleConstants.renderReport_roleID)
 	public ReportTextPartConfiguration getReportTextPartConfiguration(
 			ReportRegistryItemID reportRegistryItemID, ObjectID linkedObjectID,
 			boolean synthesize, String[] fetchGroups, int maxFetchDepth) {
@@ -157,7 +158,7 @@ implements ReportTextPartManagerRemote
 	/* (non-Javadoc)
 	 * @see org.nightlabs.jfire.reporting.textpart.ReportTextPartManagerRemote#storeLinkedObjectReportTextPartConfiguration(org.nightlabs.jfire.reporting.textpart.ReportTextPartConfiguration, boolean, java.lang.String[], int)
 	 */	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	@RolesAllowed("org.nightlabs.jfire.reporting.renderReport")
+	@RolesAllowed(RoleConstants.renderReport_roleID)
 	public ReportTextPartConfiguration storeLinkedObjectReportTextPartConfiguration(
 			ReportTextPartConfiguration reportTextPartConfiguration,
 			boolean get, String[] fetchGroups, int maxFetchDepth) {
@@ -176,7 +177,7 @@ implements ReportTextPartManagerRemote
 	/* (non-Javadoc)
 	 * @see org.nightlabs.jfire.reporting.textpart.ReportTextPartManagerRemote#storeReportTextPartConfiguration(org.nightlabs.jfire.reporting.textpart.ReportTextPartConfiguration, boolean, java.lang.String[], int)
 	 */	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	@RolesAllowed("org.nightlabs.jfire.reporting.editReport")
+	@RolesAllowed(RoleConstants.editReport_roleID)
 	public ReportTextPartConfiguration storeReportTextPartConfiguration(
 			ReportTextPartConfiguration reportTextPartConfiguration,
 			boolean get, String[] fetchGroups, int maxFetchDepth) {

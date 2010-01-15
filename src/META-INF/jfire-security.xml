@@ -36,4 +36,14 @@
 
 		<role id="org.nightlabs.jfire.reporting.renderReport"/>
 	</role-group>
+	
+	<role-group id="org.nightlabs.jfire.reporting.scheduled.editScheduledReport">
+		<name>Edit scheduled reports</name>
+		<name language="de">Geplante Berichte editieren</name>
+		<description>Create or modify report timely scheduled reports.</description>
+		<description language="de">Geplante Berichte erzeugen oder ändern.</description>
+
+		<role id="org.nightlabs.jfire.reporting.scheduled.editScheduledReport"/>
+	</role-group>
+	
 </jfire-security>

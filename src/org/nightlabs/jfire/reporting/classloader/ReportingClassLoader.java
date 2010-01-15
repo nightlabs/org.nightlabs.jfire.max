@@ -95,6 +95,10 @@ extends URLClassLoader
 
 		return sharedInstance;
 	}
+	
+	public synchronized static boolean isSharedInstanceCreated() {
+		return sharedInstance != null;
+	}
 
 	private ReportingClassLoader(URL[] urls, ClassLoader parent) {
 		super(urls, null);

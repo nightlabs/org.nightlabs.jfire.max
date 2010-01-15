@@ -28,9 +28,7 @@ package org.nightlabs.jfire.reporting;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.io.FilenameFilter;
 import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -50,7 +48,6 @@ import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
-import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
 import org.apache.log4j.Logger;
@@ -63,14 +60,11 @@ import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.config.ConfigSetup;
 import org.nightlabs.jfire.config.UserConfigSetup;
-import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.organisation.Organisation;
-import org.nightlabs.jfire.reporting.classloader.ReportingClassLoader;
 import org.nightlabs.jfire.reporting.config.ReportLayoutConfigModule;
 import org.nightlabs.jfire.reporting.layout.ReportCategory;
 import org.nightlabs.jfire.reporting.layout.ReportLayout;
 import org.nightlabs.jfire.reporting.layout.ReportLayoutLocalisationData;
-import org.nightlabs.jfire.reporting.layout.ReportRegistry;
 import org.nightlabs.jfire.reporting.layout.ReportRegistryItem;
 import org.nightlabs.jfire.reporting.layout.id.ReportLayoutLocalisationDataID;
 import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
@@ -87,7 +81,6 @@ import org.nightlabs.jfire.reporting.oda.server.jfs.ServerJFSQueryProxy;
 import org.nightlabs.jfire.reporting.scripting.ScriptingInitialiser;
 import org.nightlabs.jfire.scripting.ScriptException;
 import org.nightlabs.jfire.scripting.ScriptRegistry;
-import org.nightlabs.jfire.scripting.ScriptingIntialiserException;
 import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 import org.nightlabs.jfire.security.Authority;
 import org.nightlabs.jfire.security.ResolveSecuringAuthorityStrategy;
@@ -97,7 +90,6 @@ import org.nightlabs.jfire.servermanager.JFireServerManager;
 import org.nightlabs.jfire.timer.Task;
 import org.nightlabs.jfire.timer.id.TaskID;
 import org.nightlabs.timepattern.TimePatternFormatException;
-import org.nightlabs.util.CacheDirTag;
 import org.nightlabs.util.IOUtil;
 
 /**
@@ -141,31 +133,6 @@ implements ReportManagerRemote
 		ConfigSetup.ensureAllPrerequisites(pm);
 	}
 
-	private static IReportEngineInitaliser reportEngineInitaliser;
-
-	private static IReportEngineInitaliser createReportInitialiser(URL[] urls) {
-		Class<?> clazz;
-		String className = "org.nightlabs.jfire.reporting.birt.BirtReportEngineInitaliser";
-		try {
-			clazz = ReportingClassLoader.createSharedInstance(urls).loadClass(className);
-			IReportEngineInitaliser reportEngineInitaliser = (IReportEngineInitaliser) clazz.newInstance();
-			return reportEngineInitaliser;
-		} catch (ClassNotFoundException e) {
-			logger.error("Could not load class "+className);
-			return null;
-		} catch (InstantiationException e) {
-			logger.error("Could not instantiate class "+className);
-			return null;
-		} catch (IllegalAccessException e) {
-			logger.error("Could not access class "+className);
-			return null;
-		}
-	}
-
-	private IReportEngineInitaliser getReportEngineInitaliser() {
-		return reportEngineInitaliser;
-	}
-
 	/* (non-Javadoc)
 	 * @see org.nightlabs.jfire.reporting.ReportManagerRemote#initialise()
 	 */
@@ -174,121 +141,14 @@ implements ReportManagerRemote
 	public void initialise()
 	throws Exception
 	{
-//		// TODO: Better check if platform initialized. Propose on birt forum.
-//		if (false) { // it seems this block is not necessary at all - the engine seems to start OSGI itself. Marco.
-//			JFireServerManager jfireServerManager = getJFireServerManager();
-//			try {
-//				try {
-//					// Classloader wrapper to avoid loading of Mozilla Rhino deployed in JBoss (1.7)
-//					ReportingClassLoader wrapperClassLoader = getClassLoader(ReportManagerBean.class.getClassLoader(), null);
-//					Thread.currentThread().setContextClassLoader(wrapperClassLoader);
-//
-////					wrapperClassLoader.loadClass("org.nightlabs.jfire.reporting.platform.ServerPlatformContext");
-////					wrapperClassLoader.loadClass("org.eclipse.birt.report.engine.api.EngineConfig");
-////					wrapperClassLoader.loadClass("org.eclipse.birt.core.framework.Platform");
-//
-//					ServerPlatformContext platformContext = new ServerPlatformContext();
-//					System.setProperty(Platform.PROPERTY_BIRT_HOME, platformContext.getPlatform());
-//					EngineConfig config = new EngineConfig();
-//					config.setEngineHome(platformContext.getPlatform());
-//					config.setLogConfig(platformContext.getPlatform(), java.util.logging.Level.ALL);
-//					config.setPlatformContext(platformContext);
-//
-//					config.getAppContext().put(EngineConstants.APPCONTEXT_CLASSLOADER_KEY, wrapperClassLoader);
-//					Platform.setContextClassLoader(wrapperClassLoader);
-//
-//					Platform.startup(config);
-//
-//					ClassLoader osgiClassLoader = Platform.getContextClassLoader();
-//					wrapperClassLoader.setOsgiClassLoader(osgiClassLoader);
-//					config.getAppContext().put(EngineConstants.APPCONTEXT_CLASSLOADER_KEY, wrapperClassLoader);
-//					Platform.setContextClassLoader(wrapperClassLoader);
-//				} catch (Throwable t) {
-//					logger.log(Level.ERROR, "Initializing BIRT Platform failed!", t);
-//				}
-//			} finally {
-//				jfireServerManager.close();
-//			}
-//		}
-
-		try {
-			InitialContext initialContext = new InitialContext();
-			try {
-				new ReportingManagerFactory(initialContext, getOrganisationID()); // registers itself in JNDI
-			} finally {
-				initialContext.close();
-			}
-		} catch (NamingException x) {
-			throw new RuntimeException(x); // local JNDI should always be available!
-		}
-
 		PersistenceManager pm;
 		pm = createPersistenceManager();
 		JFireServerManager jfireServerManager = getJFireServerManager();
 		try {
-			String earName = "JFireReportingEAR.ear";
-			File jfReportingEarFile = new File(jfireServerManager.getJFireServerConfigModule().getJ2ee().getJ2eeDeployBaseDirectory(), earName);
-
-			File tmpBaseDir;
-			try {
-				tmpBaseDir = new File(IOUtil.createUserTempDir("jfire_server.", null), "ear");
-				if (!tmpBaseDir.isDirectory())
-					tmpBaseDir.mkdirs();
-
-				if (!tmpBaseDir.isDirectory())
-					throw new IOException("Could not create directory: " + tmpBaseDir.getAbsolutePath());
-			} catch (IOException e) {
-				throw new ScriptingIntialiserException(e);
-			}
-
-			CacheDirTag cacheDirTag = new CacheDirTag(tmpBaseDir);
-			try {
-				cacheDirTag.tag("JFire - http://www.jfire.org", true, false);
-			} catch (IOException e) {
-				logger.warn("initialise: " + e, e);
-			}
-
-			File tmpEarDir = new File(tmpBaseDir, earName);
-			IOUtil.unzipArchiveIfModified(jfReportingEarFile, tmpEarDir);
-
-			List<URL> urls = new ArrayList<URL>();
-			for (File f : tmpEarDir.listFiles()) {
-				if (f.getName().startsWith("org.nightlabs.jfire.reporting.birt")) {
-					urls.add(f.toURI().toURL());
-				}
-			}
-			if (reportEngineInitaliser == null) {
-				synchronized (ReportManagerBean.class) {
-					if (reportEngineInitaliser == null)
-						reportEngineInitaliser = createReportInitialiser(urls.toArray(new URL[urls.size()]));
-				}
-			}
-
-			// init layout renderer
-			ReportRegistry registry = ReportRegistry.getReportRegistry(pm);
-			try {
-				IReportEngineInitaliser initaliser = getReportEngineInitaliser();
-				if (initaliser != null) {
-					initaliser.registerReportRenderer(registry);
-				}
-//				registry.registerReportRenderer(Birt.OutputFormat.html.toString(), ReportLayoutRendererHTML.class);
-//				registry.registerReportRenderer(Birt.OutputFormat.pdf.toString(), ReportLayoutRendererPDF.class);
-//				for (Birt.OutputFormat format : Birt.OutputFormat.values()) {
-//					if (format != Birt.OutputFormat.html && format != Birt.OutputFormat.pdf) {
-//						registry.registerReportRenderer(format.toString(), ReportLayoutRendererGeneric.class);
-//					}
-//				}
-			} catch (Exception e) {
-				logger.warn("Could not initially register HTML ReportLayoutRenderer when initializing ReportRegistry.", e);
-			}
 
 			// Init scripts before module meta data check
 			ScriptRegistry.getScriptRegistry(pm).registerScriptExecutorClass(ScriptExecutorJavaClassReporting.class);
 
-//			IReportEngineInitaliser initaliser = getReportEngineInitaliser();
-//			if (initaliser != null) {
-//				initaliser.initRegisterScripts(pm);
-//			}
 
 			ModuleMetaData moduleMetaData = ModuleMetaData.getModuleMetaData(pm, JFireReportingEAR.MODULE_NAME);
 			if (moduleMetaData == null) {
@@ -384,7 +244,7 @@ implements ReportManagerRemote
 	 * @see org.nightlabs.jfire.reporting.ReportManagerRemote#getJFSResultSetMetaData(org.nightlabs.jfire.reporting.oda.jfs.JFSQueryPropertySet)
 	 */
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	@RolesAllowed("org.nightlabs.jfire.reporting.editReport")
+	@RolesAllowed(RoleConstants.editReport_roleID)
 	public IResultSetMetaData getJFSResultSetMetaData(JFSQueryPropertySet queryPropertySet) throws ScriptException, InstantiationException
 	{
 		PersistenceManager pm = createPersistenceManager();
@@ -399,7 +259,7 @@ implements ReportManagerRemote
 	 * @see org.nightlabs.jfire.reporting.ReportManagerRemote#getJFSQueryPropertySetMetaData(org.nightlabs.jfire.scripting.id.ScriptRegistryItemID)
 	 */
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	@RolesAllowed("org.nightlabs.jfire.reporting.editReport")
+	@RolesAllowed(RoleConstants.editReport_roleID)
 	public IJFSQueryPropertySetMetaData getJFSQueryPropertySetMetaData(ScriptRegistryItemID scriptID) throws ScriptException, InstantiationException
 	{
 		PersistenceManager pm = createPersistenceManager();
@@ -414,7 +274,7 @@ implements ReportManagerRemote
 	 * @see org.nightlabs.jfire.reporting.ReportManagerRemote#getJFSResultSet(org.nightlabs.jfire.reporting.oda.jfs.JFSQueryPropertySet, java.util.Map)
 	 */
 	@TransactionAttribute(TransactionAttributeType.NEVER)
-	@RolesAllowed("org.nightlabs.jfire.reporting.editReport")
+	@RolesAllowed(RoleConstants.editReport_roleID)
 	public IResultSet getJFSResultSet(
 			JFSQueryPropertySet queryPropertySet,
 			Map<String, Object> parameters
@@ -437,7 +297,7 @@ implements ReportManagerRemote
 	 * @see org.nightlabs.jfire.reporting.ReportManagerRemote#getJFSParameterMetaData(org.nightlabs.jfire.scripting.id.ScriptRegistryItemID)
 	 */
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	@RolesAllowed("org.nightlabs.jfire.reporting.editReport")
+	@RolesAllowed(RoleConstants.editReport_roleID)
 	public IParameterMetaData getJFSParameterMetaData(
 			ScriptRegistryItemID scriptRegistryItemID
 		) throws JFireReportingOdaException
@@ -457,7 +317,7 @@ implements ReportManagerRemote
 	 * @see org.nightlabs.jfire.reporting.ReportManagerRemote#getReportRegistryItems(java.util.List, org.nightlabs.jfire.security.id.RoleID, java.lang.String[], int)
 	 */
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	@RolesAllowed("org.nightlabs.jfire.reporting.renderReport")
+	@RolesAllowed(RoleConstants.renderReport_roleID)
 	public List<ReportRegistryItem> getReportRegistryItems (
 			List<ReportRegistryItemID> reportRegistryItemIDs, RoleID filterRoleID,
 			String[] fetchGroups, int maxFetchDepth
@@ -490,7 +350,7 @@ implements ReportManagerRemote
 	 * @see org.nightlabs.jfire.reporting.ReportManagerRemote#getReportRegistryItems(java.util.List, java.lang.String[], int)
 	 */
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	@RolesAllowed("org.nightlabs.jfire.reporting.renderReport")
+	@RolesAllowed(RoleConstants.renderReport_roleID)
 	public List<ReportRegistryItem> getReportRegistryItems (
 			List<ReportRegistryItemID> reportRegistryItemIDs,
 			String[] fetchGroups, int maxFetchDepth
@@ -502,7 +362,7 @@ implements ReportManagerRemote
 	 * @see org.nightlabs.jfire.reporting.ReportManagerRemote#getReportRegistryItemIDsForParent(org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID, org.nightlabs.jfire.security.id.RoleID)
 	 */
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	@RolesAllowed("org.nightlabs.jfire.reporting.renderReport")
+	@RolesAllowed(RoleConstants.renderReport_roleID)
 	public Collection<ReportRegistryItemID> getReportRegistryItemIDsForParent(ReportRegistryItemID reportRegistryItemID, RoleID filterRoleID) {
 		PersistenceManager pm;
 		pm = createPersistenceManager();
@@ -522,7 +382,7 @@ implements ReportManagerRemote
 	 * @see org.nightlabs.jfire.reporting.ReportManagerRemote#getReportRegistryItemIDsForParent(org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID)
 	 */
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	@RolesAllowed("org.nightlabs.jfire.reporting.renderReport")
+	@RolesAllowed(RoleConstants.renderReport_roleID)
 	public Collection<ReportRegistryItemID> getReportRegistryItemIDsForParent(ReportRegistryItemID reportRegistryItemID) {
 		return getReportRegistryItemIDsForParent(reportRegistryItemID, RoleConstants.renderReport);
 	}
@@ -531,7 +391,7 @@ implements ReportManagerRemote
 	 * @see org.nightlabs.jfire.reporting.ReportManagerRemote#getTopLevelReportRegistryItemIDs(org.nightlabs.jfire.security.id.RoleID)
 	 */
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	@RolesAllowed("org.nightlabs.jfire.reporting.renderReport")
+	@RolesAllowed(RoleConstants.renderReport_roleID)
 	public Collection<ReportRegistryItemID> getTopLevelReportRegistryItemIDs(RoleID filterRoleID) {
 		PersistenceManager pm;
 		pm = createPersistenceManager();
@@ -552,7 +412,7 @@ implements ReportManagerRemote
 	 * @see org.nightlabs.jfire.reporting.ReportManagerRemote#getTopLevelReportRegistryItemIDs()
 	 */
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	@RolesAllowed("org.nightlabs.jfire.reporting.renderReport")
+	@RolesAllowed(RoleConstants.renderReport_roleID)
 	public Collection<ReportRegistryItemID> getTopLevelReportRegistryItemIDs() {
 		return getTopLevelReportRegistryItemIDs(RoleConstants.renderReport);
 	}
@@ -561,7 +421,7 @@ implements ReportManagerRemote
 	 * @see org.nightlabs.jfire.reporting.ReportManagerRemote#storeRegistryItem(org.nightlabs.jfire.reporting.layout.ReportRegistryItem, boolean, java.lang.String[], int)
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	@RolesAllowed("org.nightlabs.jfire.reporting.editReport")
+	@RolesAllowed(RoleConstants.editReport_roleID)
 	public ReportRegistryItem storeRegistryItem (
 			ReportRegistryItem reportRegistryItemToStore,
 			boolean get,
@@ -603,7 +463,7 @@ implements ReportManagerRemote
 	 * @see org.nightlabs.jfire.reporting.ReportManagerRemote#deleteRegistryItem(org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID)
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	@RolesAllowed("org.nightlabs.jfire.reporting.editReport")
+	@RolesAllowed(RoleConstants.editReport_roleID)
 	public void deleteRegistryItem (ReportRegistryItemID reportRegistryItemID)
 	{
 		PersistenceManager pm;
@@ -629,31 +489,11 @@ implements ReportManagerRemote
 		}
 	}
 
-	/**
-	 * Get the {@link ReportingManagerFactory} for the actual organisationID.
-	 *
-	 * @return The {@link ReportingManagerFactory} for the actual organisationID.
-	 */
-	protected ReportingManagerFactory getReportingManagerFactory() throws NamingException
-	{
-		return ReportingManagerFactory.getReportingManagerFactory(getInitialContext(getOrganisationID()), getOrganisationID());
-	}
-
-//	/**
-//	 * Get the {@link ReportEnginePool} of this server.
-//	 *
-//	 * @return The {@link ReportEnginePool} of this server.
-//	 */
-//	protected ReportEnginePool getReportEnginePool() throws NamingException
-//	{
-//		return ReportEnginePool.getInstance(getInitialContext(getOrganisationID()));
-//	}
-
 	/* (non-Javadoc)
 	 * @see org.nightlabs.jfire.reporting.ReportManagerRemote#renderReportLayout(org.nightlabs.jfire.reporting.layout.render.RenderReportRequest)
 	 */
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	@RolesAllowed("org.nightlabs.jfire.reporting.renderReport")
+	@RolesAllowed(RoleConstants.renderReport_roleID)
 	public RenderedReportLayout renderReportLayout(RenderReportRequest renderReportRequest)
 	throws NamingException, RenderReportException
 	{
@@ -665,33 +505,13 @@ implements ReportManagerRemote
 			Authority.resolveSecuringAuthority(pm, registryItem, ResolveSecuringAuthorityStrategy.organisation)
 				.assertContainsRoleRef(getPrincipal(), RoleConstants.renderReport);
 
-			IReportEngineInitaliser initaliser = getReportEngineInitaliser();
-			if (initaliser != null) {
-				initaliser.initReportEngine();
-				IRenderManager rm = initaliser.createRenderManager();
+			ReportingEngine reportingEngine = ReportingEngine.getReportingEngine(pm, null);
+			if (reportingEngine != null) {
+				IRenderManager rm = reportingEngine.createRenderManager(renderReportRequest);
 				return rm.renderReport(pm, renderReportRequest);
+			} else {
+				throw new RenderReportException("Could not obtain ReportingEngine from datastore.", new NullPointerException());
 			}
-			else
-				return null;
-
-//			ReportEngine engine;
-//			engine = getReportingManagerFactory().getReportEngine();
-//			ReportEnginePool enginePool = getReportEnginePool();
-//			try {
-//				engine = enginePool.borrowReportEngine();
-//			} catch (Exception e) {
-//				throw new RenderReportException("Could not borrow ReportEngine.", e);
-//			}
-//			try {
-//				RenderManager rm = new RenderManager(engine);
-//				return rm.renderReport(pm, renderReportRequest);
-//			} finally {
-//				try {
-//					enginePool.returnReportEngine(engine);
-//				} catch (Exception e) {
-//					throw new RenderReportException("Could not return ReportEngine", e);
-//				}
-//			}
 		} finally {
 			pm.close();
 		}
@@ -701,7 +521,7 @@ implements ReportManagerRemote
 	 * @see org.nightlabs.jfire.reporting.ReportManagerRemote#execJDOQL(java.lang.String, java.util.Map, java.lang.String[])
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	@RolesAllowed("org.nightlabs.jfire.reporting.editReport")
+	@RolesAllowed(RoleConstants.editReport_roleID)
 	public Collection execJDOQL (
 			String jdoql,
 			Map params,
@@ -732,7 +552,7 @@ implements ReportManagerRemote
 	 * @see org.nightlabs.jfire.reporting.ReportManagerRemote#getReportLayoutLocalisationBundle(org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID, java.lang.String[], int)
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	@RolesAllowed("org.nightlabs.jfire.reporting.editReport")
+	@RolesAllowed(RoleConstants.editReport_roleID)
 	public Collection<ReportLayoutLocalisationData> getReportLayoutLocalisationBundle(
 			ReportRegistryItemID reportLayoutID,
 			String[] fetchGroups, int maxFetchDepth
@@ -761,7 +581,7 @@ implements ReportManagerRemote
 	 * @see org.nightlabs.jfire.reporting.ReportManagerRemote#storeReportLayoutLocalisationBundle(java.util.Collection, boolean, java.lang.String[], int)
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	@RolesAllowed("org.nightlabs.jfire.reporting.editReport")
+	@RolesAllowed(RoleConstants.editReport_roleID)
 	public Collection<ReportLayoutLocalisationData> storeReportLayoutLocalisationBundle(
 			Collection<ReportLayoutLocalisationData> bundle, boolean get, String[] fetchGroups, int maxFetchDepth
 	) {
@@ -836,7 +656,8 @@ implements ReportManagerRemote
 			PersistenceManager pm = createPersistenceManager();
 
 			ReportCategory category = (ReportCategory)pm.getObjectById(reportCategoryID);
-			ReportLayout layout = new ReportLayout(category, category.getOrganisationID(), "REPORT_REGISTRY_ITEM_TYPE_UNKNOWN", IOUtil.getFileNameWithoutExtension(reportLayoutZipFile.getName()));
+			ReportLayout layout = new ReportLayout(category, category.getOrganisationID(), "REPORT_REGISTRY_ITEM_TYPE_UNKNOWN", IOUtil
+					.getFileNameWithoutExtension(reportLayoutZipFile.getName()), "BIRT");
 			layout.getName().copyFrom(name);
 			layout.loadFile(templateFiles[0]);
 			layout = pm.makePersistent(layout);

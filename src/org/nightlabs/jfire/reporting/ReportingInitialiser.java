@@ -458,6 +458,14 @@ public class ReportingInitialiser {
 			if (overwriteNode != null && !"".equals(overwriteNode.getTextContent()))
 				overwriteOnInit = Boolean.parseBoolean(overwriteNode.getTextContent());
 		}
+		
+		Node engineTypeNode = reportNode.getAttributes().getNamedItem("engineType");
+		String engineType = engineTypeNode != null ? engineTypeNode.getTextContent() : "";
+		if (engineType.isEmpty()) {
+			// Yes, this is not very clean as this code knows about one extension, however we need
+			// some default for old files
+			engineType = "BIRT"; 
+		}
 
 		logger.debug("create ReportLayout = " + reportID);
 		ReportLayout layout;
@@ -470,7 +478,7 @@ public class ReportingInitialiser {
 					reportID)
 			);
 		} catch (JDOObjectNotFoundException e) {
-			layout = new ReportLayout(category, organisationID, reportRegistryItemType, reportID);
+			layout = new ReportLayout(category, organisationID, reportRegistryItemType, reportID, engineType);
 			layout = pm.makePersistent(layout);
 			category.addChildItem(layout);
 			hadToBeCreated = true;

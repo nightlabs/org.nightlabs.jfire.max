@@ -1,0 +1,10 @@
+<!DOCTYPE organisation-initialisation
+		PUBLIC "-//NightLabs GmbH//DTD Organisation Initialisation 1.0//EN"
+		"http://www.nightlabs.de/dtd/organisation-init_1_0.dtd">
+<organisation-initialisation>
+	<init bean="org.nightlabs.jfire.reporting.engine.birt.ReportingEngineBirtManagerRemote" method="initialise">
+		<depends
+			module="JFireReportingEAR.ear"
+			archive="JFireReporting.jar" />
+	</init>
+</organisation-initialisation>

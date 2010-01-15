@@ -1,0 +1,3 @@
+Manifest-Version: 1.0
+Bundle-SymbolicName: JFireReportingEngineBirt
+Bundle-Version: 1.0.0

@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project-modules id="moduleCoreId" project-version="1.5.0">
+    <wb-module deploy-name="JFireReportingEngineBirtEAR">
+        <wb-resource deploy-path="/" source-path="/EarContent"/>
+        <dependent-module archiveName="JFireReportingEngineBirt.jar" deploy-path="/" handle="module:/resource/JFireReportingEngineBirt/JFireReportingEngineBirt">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+<!--        
+		<dependent-module deploy-path="/birt/lib" handle="module:/classpath/lib/target-jee-jfire-jboss-birt/src/birt-deployment/birt-runtime/birt/lib/chartengineapi.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module deploy-path="/birt/lib" handle="module:/classpath/lib/target-jee-jfire-jboss-birt/src/birt-deployment/birt-runtime/birt/lib/com.ibm.icu_3.8.1.v20080530.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>        
+        <dependent-module deploy-path="/birt/lib" handle="module:/classpath/lib/target-jee-jfire-jboss-birt/src/birt-deployment/birt-runtime/birt/lib/commons-cli-1.0.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>        
+        <dependent-module deploy-path="/birt/lib" handle="module:/classpath/lib/target-jee-jfire-jboss-birt/src/birt-deployment/birt-runtime/birt/lib/coreapi.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module deploy-path="/birt/lib" handle="module:/classpath/lib/target-jee-jfire-jboss-birt/src/birt-deployment/birt-runtime/birt/lib/crosstabcoreapi.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>          
+        <dependent-module deploy-path="/birt/lib" handle="module:/classpath/lib/target-jee-jfire-jboss-birt/src/birt-deployment/birt-runtime/birt/lib/dataadapterapi.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>  
+		<dependent-module deploy-path="/birt/lib" handle="module:/classpath/lib/target-jee-jfire-jboss-birt/src/birt-deployment/birt-runtime/birt/lib/dataaggregationapi.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module> 
+		<dependent-module deploy-path="/birt/lib" handle="module:/classpath/lib/target-jee-jfire-jboss-birt/src/birt-deployment/birt-runtime/birt/lib/dataextraction.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>         
+		<dependent-module deploy-path="/birt/lib" handle="module:/classpath/lib/target-jee-jfire-jboss-birt/src/birt-deployment/birt-runtime/birt/lib/dteapi.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>         
+		<dependent-module deploy-path="/birt/lib" handle="module:/classpath/lib/target-jee-jfire-jboss-birt/src/birt-deployment/birt-runtime/birt/lib/engineapi.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>   
+		<dependent-module deploy-path="/birt/lib" handle="module:/classpath/lib/target-jee-jfire-jboss-birt/src/birt-deployment/birt-runtime/birt/lib/flute.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module> 
+		<dependent-module deploy-path="/birt/lib" handle="module:/classpath/lib/target-jee-jfire-jboss-birt/src/birt-deployment/birt-runtime/birt/lib/js.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>     
+		<dependent-module deploy-path="/birt/lib" handle="module:/classpath/lib/target-jee-jfire-jboss-birt/src/birt-deployment/birt-runtime/birt/lib/modelapi.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+		<dependent-module deploy-path="/birt/lib" handle="module:/classpath/lib/target-jee-jfire-jboss-birt/src/birt-deployment/birt-runtime/birt/lib/modelodaapi.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>      
+		<dependent-module deploy-path="/birt/lib" handle="module:/classpath/lib/target-jee-jfire-jboss-birt/src/birt-deployment/birt-runtime/birt/lib/odadesignapi.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>       
+        <dependent-module deploy-path="/birt/lib" handle="module:/classpath/lib/target-jee-jfire-jboss-birt/src/birt-deployment/birt-runtime/birt/lib/org.apache.commons.codec_1.3.0.v20080530-1600.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module deploy-path="/birt/lib" handle="module:/classpath/lib/target-jee-jfire-jboss-birt/src/birt-deployment/birt-runtime/birt/lib/org.eclipse.emf.common_2.4.0.v200808251517.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>  
+        <dependent-module deploy-path="/birt/lib" handle="module:/classpath/lib/target-jee-jfire-jboss-birt/src/birt-deployment/birt-runtime/birt/lib/org.eclipse.emf.ecore.xmi_2.4.1.v200808251517.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>   
+		<dependent-module deploy-path="/birt/lib" handle="module:/classpath/lib/target-jee-jfire-jboss-birt/src/birt-deployment/birt-runtime/birt/lib/org.eclipse.emf.ecore_2.4.1.v200808251517.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>  
+		<dependent-module deploy-path="/birt/lib" handle="module:/classpath/lib/target-jee-jfire-jboss-birt/src/birt-deployment/birt-runtime/birt/lib/org.w3c.css.sac_1.3.0.v200805290154.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>         
+		<dependent-module deploy-path="/birt/lib" handle="module:/classpath/lib/target-jee-jfire-jboss-birt/src/birt-deployment/birt-runtime/birt/lib/scriptapi.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+ -->        
+        <dependent-module deploy-path="/birt/lib" handle="module:/classpath/lib/target-jee-jfire-jboss-birt/src/birt-deployment/birt-runtime/birt/lib/oda.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="org.nightlabs.jfire.reporting.birt.jar" deploy-path="/" handle="module:/resource/org.nightlabs.jfire.reporting.birt/org.nightlabs.jfire.reporting.birt">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+             
+    </wb-module>
+</project-modules>

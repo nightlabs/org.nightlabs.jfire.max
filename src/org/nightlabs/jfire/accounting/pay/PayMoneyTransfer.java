@@ -32,6 +32,13 @@ import java.util.Iterator;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.Queries;
 
 import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.accounting.MoneyTransfer;
@@ -40,14 +47,6 @@ import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.transfer.Anchor;
 import org.nightlabs.jfire.transfer.Transfer;
 import org.nightlabs.jfire.transfer.id.TransferID;
-
-import javax.jdo.annotations.Persistent;
-import javax.jdo.annotations.InheritanceStrategy;
-import javax.jdo.annotations.Inheritance;
-import javax.jdo.annotations.Queries;
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.IdentityType;
-import javax.jdo.annotations.PersistenceModifier;
 
 /**
  * PayMoneyTransfers are generated on payments. One anchor of PayMoneyTransfer is
@@ -59,7 +58,7 @@ import javax.jdo.annotations.PersistenceModifier;
  * or from whom money is transferred.
  * <p>
  * A <tt>PayMoneyTransfer</tt> can be assigned to multiple {@link org.nightlabs.jfire.accounting.Invoice}s
- * by its connecitons to a {@link Payment}.
+ * by its connections to a {@link Payment}.
  * <p>
  * <p>
  * A {@link PayMoneyTransfer} is the container transfer for all sub-transfers made for the
@@ -198,7 +197,7 @@ public class PayMoneyTransfer extends MoneyTransfer
 	{
 		return payment;
 	}
-	
+
 	@Override
 	protected String internalGetDescription() {
 		String invoiceStr = "";

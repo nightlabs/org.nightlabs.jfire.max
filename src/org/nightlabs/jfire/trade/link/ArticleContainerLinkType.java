@@ -22,7 +22,9 @@ import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.PersistenceModifier;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.listener.DeleteCallback;
 
+import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.trade.ArticleContainer;
@@ -50,7 +52,7 @@ import org.nightlabs.util.Util;
 		)
 })
 public class ArticleContainerLinkType
-implements Serializable
+implements Serializable, DeleteCallback
 {
 	private static final long serialVersionUID = 1L;
 
@@ -152,10 +154,10 @@ implements Serializable
 	@Column(length=100)
 	private String articleContainerLinkTypeID;
 
-	@Persistent(nullValue=NullValue.EXCEPTION, dependent="true")
+	@Persistent(nullValue=NullValue.EXCEPTION) // , dependent="true") DATANUCLEUS WORKAROUND: see jdoPreDelete()
 	private ArticleContainerLinkTypeName name;
 
-	@Persistent(nullValue=NullValue.EXCEPTION, dependent="true")
+	@Persistent(nullValue=NullValue.EXCEPTION) // , dependent="true") DATANUCLEUS WORKAROUND: see jdoPreDelete()
 	private ArticleContainerLinkTypeDescription description;
 
 	@Persistent(table="JFireTrade_ArticleContainerLinkType_fromClassesIncluded")
@@ -448,6 +450,12 @@ implements Serializable
 	{
 		PersistenceManager pm = getPersistenceManager();
 
+		if (!isFromClassIncluded(articleContainerLink.getFrom().getClass()))
+			throw new IllegalStateException("From class not included: Cannot create ArticleContainerLink with type '" + getOrganisationID() + '/' + getArticleContainerLinkTypeID() + "' for this 'from': " + articleContainerLink.getFrom());
+
+		if (!isToClassIncluded(articleContainerLink.getTo().getClass()))
+			throw new IllegalStateException("To class not included: Cannot create ArticleContainerLink with type '" + getOrganisationID() + '/' + getArticleContainerLinkTypeID() + "' for this 'to': " + articleContainerLink.getTo());
+
 		ArticleContainerLinkType reverseArticleContainerLinkType = getReverseArticleContainerLinkType();
 		ArticleContainer reverseTo = articleContainerLink.getFrom();
 		ArticleContainer reverseFrom = articleContainerLink.getTo();
@@ -511,5 +519,10 @@ implements Serializable
 
 			pm.deletePersistent(r);
 		}
+	}
+
+	@Override
+	public void jdoPreDelete() {
+		NLJDOHelper.deleteAfterPrimaryObjectDeleted(this, name, description);
 	}
 }

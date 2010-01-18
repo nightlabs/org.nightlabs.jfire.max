@@ -11,6 +11,7 @@ import javax.jdo.PersistenceManager;
 
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
+import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.trade.ArticleContainer;
 import org.nightlabs.jfire.trade.Offer;
 import org.nightlabs.jfire.trade.id.ArticleContainerID;
@@ -55,6 +56,56 @@ implements ArticleContainerLinkManagerRemote
 
 
 			// TODO DEBUG START
+			// Delete old "replacing" and "replaced" links (they only exist specifically for Offer now - not for all ArticleContainer implementations anymore).
+			if (true) {
+				ArticleContainerLinkTypeID[] articleContainerLinkTypeIDsToDelete = {
+						ArticleContainerLinkTypeID.create(Organisation.DEV_ORGANISATION_ID, "replacing"),
+						ArticleContainerLinkTypeID.create(Organisation.DEV_ORGANISATION_ID, "replaced"),
+				};
+
+				for (ArticleContainerLinkTypeID acltIDToDelete : articleContainerLinkTypeIDsToDelete) {
+					ArticleContainerLinkType acltToDelete = null;
+					try {
+						acltToDelete = (ArticleContainerLinkType) pm.getObjectById(acltIDToDelete);
+					} catch (JDOObjectNotFoundException x) { } // ignore
+					if (acltToDelete != null) {
+						Collection<? extends ArticleContainerLink> aclsToDelete = ArticleContainerLink.getArticleContainerLinks(pm, acltToDelete, null, null);
+
+//						pm.deletePersistentAll(aclsToDelete);
+// This is very slow - about 1 deletion (with the following warning) per second. Iterating an deleting them manually
+// causes the same WARN message, but deletes about 50 to 100 per second.
+//						17:23:14,585 WARN  [Persistence] Exception thrown by StateManager.isLoaded
+//						No such database row
+//						org.datanucleus.exceptions.NucleusObjectNotFoundException: No such database row
+//						        at org.datanucleus.store.rdbms.request.FetchRequest2.execute(FetchRequest2.java:328)
+//						        at org.datanucleus.store.rdbms.RDBMSPersistenceHandler.fetchObject(RDBMSPersistenceHandler.java:271)
+//						        at org.datanucleus.state.JDOStateManagerImpl.loadSpecifiedFields(JDOStateManagerImpl.java:1519)
+//						        at org.datanucleus.state.JDOStateManagerImpl.isLoaded(JDOStateManagerImpl.java:1897)
+//						        at org.datanucleus.jdo.JDOAdapter.isLoaded(JDOAdapter.java:1044)
+//						        at org.datanucleus.store.mapped.mapping.PersistenceCapableMapping.preDelete(PersistenceCapableMapping.java:1132)
+//						        at org.datanucleus.store.rdbms.request.DeleteRequest.execute(DeleteRequest.java:175)
+//						        at org.datanucleus.store.rdbms.RDBMSPersistenceHandler.deleteTable(RDBMSPersistenceHandler.java:447)
+//						        at org.datanucleus.store.rdbms.RDBMSPersistenceHandler.deleteObject(RDBMSPersistenceHandler.java:420)
+//						        at org.datanucleus.state.JDOStateManagerImpl.internalDeletePersistent(JDOStateManagerImpl.java:4110)
+//						        at org.datanucleus.state.JDOStateManagerImpl.deletePersistent(JDOStateManagerImpl.java:4078)
+//						        at org.datanucleus.ObjectManagerImpl.deleteObjectInternal(ObjectManagerImpl.java:1473)
+//						        at org.datanucleus.ObjectManagerImpl.deleteObject(ObjectManagerImpl.java:1398)
+//						        at org.datanucleus.jdo.JDOPersistenceManager.jdoDeletePersistent(JDOPersistenceManager.java:754)
+//						        at org.datanucleus.jdo.JDOPersistenceManager.deletePersistentAll(JDOPersistenceManager.java:800)
+//						        at org.datanucleus.jdo.connector.PersistenceManagerImpl.deletePersistentAll(PersistenceManagerImpl.java:735)
+
+						for (ArticleContainerLink aclToDelete : aclsToDelete) {
+							pm.deletePersistent(aclToDelete);
+							pm.flush();
+						}
+
+						pm.flush();
+						pm.deletePersistent(acltToDelete);
+						pm.flush();
+					}
+				}
+			}
+
 			// Creating some test-links from *every* Offer to an arbitrary other offer.
 			if (false) {
 				@SuppressWarnings("unchecked")
@@ -92,7 +143,19 @@ implements ArticleContainerLinkManagerRemote
 			articleContainerLinkType = pm.makePersistent(new ArticleContainerLinkType(articleContainerLinkTypeID));
 		}
 
-		// TODO initialise name + description from resource bundle!
+		// initialise name + description from resource bundle!
+		String articleContainerLinkTypeMessagePrefix = ArticleContainerLinkType.class.getName() + '[' + articleContainerLinkType.getOrganisationID() + '/' + articleContainerLinkType.getArticleContainerLinkTypeID() + "]."; //$NON-NLS-1$
+		ClassLoader loader = ArticleContainerLinkType.class.getClassLoader();
+		articleContainerLinkType.getName().readFromProperties(
+				org.nightlabs.jfire.trade.resource.Messages.BUNDLE_NAME,
+				loader,
+				articleContainerLinkTypeMessagePrefix + "name" //$NON-NLS-1$
+		);
+		articleContainerLinkType.getDescription().readFromProperties(
+				org.nightlabs.jfire.trade.resource.Messages.BUNDLE_NAME,
+				loader,
+				articleContainerLinkTypeMessagePrefix + "description" //$NON-NLS-1$
+		);
 
 		return articleContainerLinkType;
 	}

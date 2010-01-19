@@ -11,6 +11,7 @@ import org.apache.log4j.Logger;
 import org.nightlabs.jdo.query.AbstractJDOQuery;
 import org.nightlabs.jfire.issue.Issue;
 import org.nightlabs.jfire.issue.IssueComment;
+import org.nightlabs.jfire.issue.IssueLink;
 import org.nightlabs.jfire.issue.IssueSubject;
 import org.nightlabs.jfire.issue.id.IssueLinkTypeID;
 import org.nightlabs.jfire.issue.id.IssuePriorityID;
@@ -68,7 +69,6 @@ extends AbstractJDOQuery
 	private Date createTimestamp;
 	private Date updateTimestamp;
 	private IssueLinkTypeID issueLinkTypeID;
-//	private Set<IssueLink> issueLinks;
 	private Date issueWorkTimeRangeFrom;
 	private Date issueWorkTimeRangeTo;
 	private Set<ProjectID> projectIDs;
@@ -80,8 +80,7 @@ extends AbstractJDOQuery
 	private boolean isSetCurrentUserAsAssignee;
 	private boolean isSetCurrentUserAsReporter;
 
-	private Set<Class> linkedObjectClasses;
-	private transient String linkedObjectClassNameExpr;
+	private Set<IssueLink> issueLinks;
 	/**
 	 *  A static class contained all parameters that can be set to the query.
 	 *  It's intended to use internally!!
@@ -109,7 +108,7 @@ extends AbstractJDOQuery
 
 		public static final String jbpmNodeName = "jbpmNodeName";
 		public static final String processDefinitionID = "processDefinitionID";
-		public static final String linkedObjectClasses = "linkedObjectClasses";
+		public static final String issueLinks = "issueLinks";
 	}
 
 	/**
@@ -230,50 +229,18 @@ extends AbstractJDOQuery
 			filter.append("\n && (this.state.stateDefinition.jbpmNodeName == :jbpmNodeName)");
 		}
 
-		if (isFieldEnabled(FieldName.linkedObjectClasses) && linkedObjectClasses != null && !linkedObjectClasses.isEmpty()) {
+		if (isFieldEnabled(FieldName.issueLinks) && issueLinks != null && !issueLinks.isEmpty()) {
 			filter.append("\n && (this.issueLinks.contains(varIssueLink) && (");
 			int i = 0;
-			for (Iterator<Class> it = linkedObjectClasses.iterator(); it.hasNext(); i++) {
-				String linkedObjectClassName = it.next().getSimpleName();
-				linkedObjectClassNameExpr = ".*" + linkedObjectClassName + ".*";
-
-				filter.append("(varIssueLink.linkedObjectID.toLowerCase().matches(\""+ linkedObjectClassNameExpr.toLowerCase()+"\"))");
-//				filter.append("(varIssueLink.linkedObjectID.toLowerCase().matches(:linkedObjectClassNameExpr.toLowerCase()))");
-
-				if (i < linkedObjectClasses.size() - 1)
+			for (Iterator<IssueLink> it = issueLinks.iterator(); it.hasNext(); i++) {
+				IssueLink issueLink = it.next();
+				filter.append("(varIssueLink.linkedObjectID.toLowerCase().matches(\""+ issueLink.getLinkedObjectID().toString().toLowerCase()+"\"))");
+				if (i < issueLinks.size() - 1)
 					filter.append(" || ");
 			}
 			filter.append("))");
 		}
-		// FIXME: chairat please rewrite this part as soon as you have refactored the linkage of objects to Issues. (marius)
-//		if (issueLinks != null && !issueLinks.isEmpty())
-//		{
-//		filter.append("\n && ( ");
-//		filter.append("\n \t this.issueLinks.contains(varIssueLink) && \n \t (");
-//		for (IssueLink issueLink : issueLinks)
-//		{
-//		ObjectID linkedObjectID = issueLink.getLinkedObjectID();
-//		filter.append("\n \t \t varIssueLink.linkedObjectID.matches(" + linkedObjectID + ") ||");
-//		}
-//		filter.delete(filter.length() - 2, filter.length());
-//		filter.append("\n \t )");
-//		filter.append("\n && )");
-//		}
-
-//		if (issueLinks != null && !issueLinks.isEmpty())
-//		{
-//		filter.append("\n && ( ");
-//		filter.append("\n \t this.referencedObjectIDs.contains(varObjectID) && \n \t (");
-//		for (ObjectID objectID : issueLinks)
-//		{
-//		String objectIDString = objectID.toString();
-//		filter.append("\n \t \t varObjectID.matches(" + objectIDString + ") ||");
-//		}
-//		filter.delete(filter.length() - 2, filter.length());
-//		filter.append("\n \t )");
-//		filter.append("\n && )");
-//		}
-
+		
 		logger.info(filter.toString());
 		q.setFilter(filter.toString());
 	}
@@ -694,22 +661,17 @@ extends AbstractJDOQuery
 		notifyListeners(FieldName.processDefinitionID, oldProcessDefinitionID, processDefinitionID);
 	}
 
-	/**
-	 * Returns the {@link Class} of the issue linked object.
-	 * @return
-	 */
-	public Set<Class> getLinkedObjectClasses() {
-		return linkedObjectClasses;
+	public Set<IssueLink> getIssueLinks() {
+		if (issueLinks == null) {
+			issueLinks = new HashSet<IssueLink>();
+		}
+		return issueLinks;
 	}
-
-	/**
-	 * Sets the {@link Class} of the issue linked object.
-	 * @param linkedObjectClassName
-	 */
-	public void setLinkedObjectClasses(Set<Class> linkedObjectClasses) {
-		final Set<Class> oldLinkedObjectClasses = this.linkedObjectClasses;
-		this.linkedObjectClasses = linkedObjectClasses;
-		notifyListeners(FieldName.linkedObjectClasses, oldLinkedObjectClasses, linkedObjectClasses);
+	
+	public void setIssueLinks(Set<IssueLink> issueLinks) {
+		final Set<IssueLink> oldIssueLinks = getIssueLinks();
+		this.issueLinks = issueLinks;
+		notifyListeners(FieldName.issueLinks, oldIssueLinks, issueLinks);
 	}
 
 	@Override

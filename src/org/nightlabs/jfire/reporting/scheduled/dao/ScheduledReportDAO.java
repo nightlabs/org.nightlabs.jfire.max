@@ -53,6 +53,17 @@ implements IJDOObjectDAO<ScheduledReport> {
 	}
 
 	/**
+	 * Deletes the {@link ScheduledReport} with the given id on the server.
+	 * 
+	 * @param scheduledReportID The id of the {@link ScheduledReport} to delete.
+	 * @param monitor TODO
+	 */
+	public void deleteScheduledReport(ScheduledReportID scheduledReportID, ProgressMonitor monitor) {
+		JFireEjb3Factory.getRemoteBean(ScheduledReportManagerRemote.class, SecurityReflector.getInitialContextProperties())
+				.deleteScheduledReport(scheduledReportID);
+	}
+
+	/**
 	 * Returns the {@link ScheduledReport} with the given {@link ScheduledReportID}
 	 * detached with a minimum of the given fetch-groups.
 	 *  

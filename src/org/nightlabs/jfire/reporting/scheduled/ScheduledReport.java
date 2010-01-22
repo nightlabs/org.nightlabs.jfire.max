@@ -3,9 +3,14 @@
  */
 package org.nightlabs.jfire.reporting.scheduled;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.zip.DeflaterOutputStream;
+import java.util.zip.InflaterInputStream;
 
 import javax.jdo.FetchPlan;
 import javax.jdo.JDODetachedFieldAccessException;
@@ -36,6 +41,10 @@ import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.security.id.UserID;
 import org.nightlabs.jfire.timer.Task;
+import org.nightlabs.util.Util;
+
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.XppDriver;
 
 /**
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
@@ -65,12 +74,12 @@ import org.nightlabs.jfire.timer.Task;
 			members=@Persistent(name=ScheduledReport.FieldName.reportLayout)),
 	@FetchGroup(
 			fetchGroups={"default"},
-			name=ScheduledReport.FETCH_GROUP_PARAMETER,
-			members=@Persistent(name=ScheduledReport.FieldName.parameter)),
+			name=ScheduledReport.FETCH_GROUP_RENDER_REPORT_REQUEST,
+			members=@Persistent(name=ScheduledReport.FieldName.renderReportRequest)),
 	@FetchGroup(
 			fetchGroups={"default"},
-			name=ScheduledReport.FETCH_GROUP_DELIVEROPTIONS,
-			members=@Persistent(name=ScheduledReport.FieldName.deliverOptions))
+			name=ScheduledReport.FETCH_GROUP_DELIVERY_DELEGATE,
+			members=@Persistent(name=ScheduledReport.FieldName.deliveryDelegate))
 })
 @Discriminator(strategy=DiscriminatorStrategy.CLASS_NAME)
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
@@ -90,8 +99,8 @@ public class ScheduledReport implements Serializable, DetachCallback, AttachCall
 		public static final String reportLayout = "reportLayout";
 		public static final String reportLayoutID = "reportLayoutID";
 		public static final String task = "task";
-		public static final String parameter = "parameter";
-		public static final String deliverOptions = "deliverOptions";
+		public static final String renderReportRequest = "renderReportRequestRaw";
+		public static final String deliveryDelegate = "deliveryDelegate";
 	};
 
 	private static final String fetchGroupPrefix = "ScheduledReport.";// ScheduledReport.class.getSimpleName() + ".";
@@ -103,8 +112,8 @@ public class ScheduledReport implements Serializable, DetachCallback, AttachCall
 	public static final String FETCH_GROUP_REPORTLAYOUT = fetchGroupPrefix + FieldName.reportLayout;
 	public static final String FETCH_GROUP_REPORTLAYOUT_ID = fetchGroupPrefix + FieldName.reportLayoutID;
 	public static final String FETCH_GROUP_TASK = fetchGroupPrefix + FieldName.task;
-	public static final String FETCH_GROUP_PARAMETER = fetchGroupPrefix + FieldName.parameter;
-	public static final String FETCH_GROUP_DELIVEROPTIONS = fetchGroupPrefix + FieldName.deliverOptions;
+	public static final String FETCH_GROUP_RENDER_REPORT_REQUEST = fetchGroupPrefix + FieldName.renderReportRequest;
+	public static final String FETCH_GROUP_DELIVERY_DELEGATE = fetchGroupPrefix + FieldName.deliveryDelegate;
 	
 	/** pk-part */
 	@PrimaryKey
@@ -127,7 +136,11 @@ public class ScheduledReport implements Serializable, DetachCallback, AttachCall
 	@Persistent(persistenceModifier=PersistenceModifier.NONE)	
 	private boolean userIDDetached = false;	
 	
-	/** ReportLayout that should be rendered, can be changed */
+	/**
+	 * ReportLayout that should be rendered, can be changed, actually this is redundant information,
+	 * because a {@link RenderReportRequest} would have its Id as well, however we store that in
+	 * this way to be able to search for ScheduledReports for a ReportLayout
+	 */
 	@Persistent
 	private ReportLayout reportLayout;
 	
@@ -138,12 +151,14 @@ public class ScheduledReport implements Serializable, DetachCallback, AttachCall
 	private boolean reportLayoutIDDetached = false;	
 	
 	/** Task to configure time schedule for the rendering */
-	@Persistent
+	@Persistent(
+			dependent="true",
+			persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Task task;
 	
 	/** Serialized {@link RenderReportRequest} with output-format, parameters */
 	@Persistent
-	private byte[] renderReportRequest;
+	private byte[] renderReportRequestRaw;
 
 	/** how/where to should the finished report should be delivered */
 	@Persistent
@@ -295,18 +310,67 @@ public class ScheduledReport implements Serializable, DetachCallback, AttachCall
 	 * 
 	 * @return The raw data of the serialized {@link RenderReportRequest} for this scheduled report.
 	 */
-	public byte[] getRenderReportRequest() {
-		return renderReportRequest;
+	protected byte[] getRenderReportRequestRaw() {
+		return renderReportRequestRaw;
 	}
 
 	/**
 	 * Set the raw data of the serialized {@link RenderReportRequest} for this scheduled report.
 	 * This is persisted into the datastore.
 	 * 
-	 * @param renderReportRequest The raw data of the serialized {@link RenderReportRequest} for this scheduled report.
+	 * @param renderReportRequestRaw The raw data of the serialized {@link RenderReportRequest} for this scheduled report.
 	 */
-	public void setRenderReportRequest(byte[] renderReportRequest) {
-		this.renderReportRequest = renderReportRequest;
+	protected void setRenderReportRequestRaw(byte[] renderReportRequest) {
+		this.renderReportRequestRaw = renderReportRequest;
+	}
+
+	/**
+	 * Returns the de-serialized {@link RenderReportRequest} for this {@link ScheduledReport}.
+	 * 
+	 * @return The de-serialized {@link RenderReportRequest} for this {@link ScheduledReport}.
+	 */
+	public RenderReportRequest getRenderReportRequest() {
+		RenderReportRequest deserializedRequest = null;
+		byte[] tmpByteArr = getRenderReportRequestRaw();
+		if (tmpByteArr != null) {
+			XStream xStream = new XStream(new XppDriver());
+			InflaterInputStream in = new InflaterInputStream(new ByteArrayInputStream(tmpByteArr));
+			try {
+				deserializedRequest = (RenderReportRequest) xStream.fromXML(in);
+			} finally {
+				try {
+					in.close();
+				} catch (IOException e) {
+					throw new RuntimeException("Closing inflater-stream failed", e);
+				}
+			}
+		}
+		return deserializedRequest;
+	}
+
+	/**
+	 * Sets the {@link RenderReportRequest} for this {@link ScheduledReport}, this will be
+	 * serialized for storage in zipped xml format.
+	 * 
+	 * @param renderReportRequestRaw The {@link RenderReportRequest} to set.
+	 */
+	public void setRenderReportRequest(RenderReportRequest renderReportRequest) {
+		XStream xStream = new XStream(new XppDriver());
+		ByteArrayOutputStream byteArrStream = new ByteArrayOutputStream();
+		DeflaterOutputStream out = new DeflaterOutputStream(byteArrStream);
+		try {
+			xStream.toXML(renderReportRequest, out);
+			out.close();
+			setRenderReportRequestRaw(byteArrStream.toByteArray());
+		} catch (IOException e) {
+			throw new RuntimeException("Serializing the RenderReportRequest failed", e);
+		} finally {
+			try {
+				out.close();
+			} catch (IOException e) {
+				throw new RuntimeException("Closing the DeflaterStream failed", e);
+			}
+		}
 	}
 
 	/**
@@ -410,6 +474,36 @@ public class ScheduledReport implements Serializable, DetachCallback, AttachCall
 			}
 		}
 	}
+	
+	/**
+	 * {@inheritDoc}
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		return
+			Util.hashCode(organisationID) ^
+			Util.hashCode(scheduledReportID);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * Checks if primary key fields are equal.
+	 *
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!(obj instanceof ScheduledReport))
+			return false;
+		ScheduledReport other = (ScheduledReport) obj;
+		return
+			Util.equals(this.organisationID, other.organisationID) &&
+			Util.equals(this.scheduledReportID, other.scheduledReportID);
+	}
+	
 
 	@Override
 	public void jdoPreAttach() {

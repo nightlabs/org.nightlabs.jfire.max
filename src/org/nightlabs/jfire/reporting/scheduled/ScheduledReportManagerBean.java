@@ -103,5 +103,18 @@ implements ScheduledReportManagerLocal, ScheduledReportManagerRemote
 			pm.close();
 		}
 	}
+	
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed({RoleConstants.editScheduledReport_roleID})
+	@Override
+	public void deleteScheduledReport(ScheduledReportID scheduledReportID) {
+		PersistenceManager pm = createPersistenceManager();
+		try {
+			ScheduledReport scheduledReport = (ScheduledReport) pm.getObjectById(scheduledReportID);
+			pm.deletePersistent(scheduledReport);
+		} finally {
+			pm.close();
+		}
+	}
 
 }

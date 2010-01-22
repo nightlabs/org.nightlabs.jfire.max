@@ -67,4 +67,11 @@ public interface ScheduledReportManagerRemote {
 			String[] fetchGroups, int maxFetchDepth);
 	
 
+	/**
+	 * Deletes the {@link ScheduledReport} with the given {@link ScheduledReportID}.
+	 * 
+	 * @param scheduledReportID The id of the {@link ScheduledReport} to delete.
+	 */
+	void deleteScheduledReport(ScheduledReportID scheduledReportID);
+
 }

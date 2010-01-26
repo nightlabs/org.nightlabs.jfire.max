@@ -92,6 +92,8 @@ extends Initialiser
 				"White", "Weiß", "Blanc");
 		SimpleProductType bottleMerlot = dataCreator.createCategory(bottleRed, "bottle-merlot",
 		"Merlot");
+		SimpleProductType bottleCarmenere = dataCreator.createCategory(bottleRed, "bottle-carmenere",
+		"Carmenere");
 		SimpleProductType bottleCabernetSauvignon = dataCreator.createCategory(bottleRed, "bottle-cabernet-sauvignon",
 		"Cabernet Sauvignon");
 
@@ -108,8 +110,10 @@ extends Initialiser
 				"California", "Kalifornien", "Californie");
 		SimpleProductType bottleMerlotItaly = dataCreator.createCategory(bottleMerlot, "bottle-merlot-italy",
 				"Italy", "Italien", "Italie");
-
-
+		SimpleProductType bottleMerlotChile = dataCreator.createCategory(bottleMerlot, "bottle-merlot-chile",
+				"Chile", "Chile", "Chile");
+		SimpleProductType bottCarmenereChile = dataCreator.createCategory(bottleCarmenere, "bottle-carmenere-chile",
+				"Chile", "Chile", "Chile");
 
 		SimpleProductType bottleCabernetSauvignonFrance = dataCreator.createCategory(bottleCabernetSauvignon, "bottle-cabernet-sauvignon-france",
 				"France", "Frankreich", "France");
@@ -146,7 +150,17 @@ extends Initialiser
 				"Merlot 2001 (Italy)", "Merlot 2001 (Italien)", "Merlot 2001 (Italy)");
 		dataCreator.createWineProperties(pm, bottleMerlotItaly2001, "Merlot from California 2001", "Merlot aus Kalifornien 2001",
 				"Merlot from the south of Italy (vintage 2001)", "Merlot aus dem Süden Kaliforniens (Jahrgang 2001)", "merlot_small.jpg", contentTypeJpeg, "merlot_large.jpg", contentTypeJpeg);
+		SimpleProductType bottleMerlotChile2003 = dataCreator.createLeaf(bottleMerlotChile, "bottle-merlot-chile-2003", priceConfigCheapWines,
+				"Merlot 2003 (Chile)", "Merlot 2003 (Chile)", "Merlot 2003 (Chile)");
+		dataCreator.createWineProperties(pm, bottleMerlotChile2003, "Merlot from Chile 2003", "Merlot aus Chile 2003",
+				"Merlot from the south of Chile (vintage 2003)", "Merlot aus dem Süden Chilenisch (Jahrgang 2003)", "merlot_small.jpg", contentTypeJpeg, "merlot_large.jpg", contentTypeJpeg);
+		SimpleProductType bottleCarmenereChile2000 = dataCreator.createLeaf(bottCarmenereChile, "bottle-carmenere-chile-2000", priceConfigMiddleWines,
+				"Carmenere 2000 (Chile)", "Carmenere 2000 (Chile)", "Carmenere 2003 (Chile)");
+		dataCreator.createWineProperties(pm, bottleCarmenereChile2000, "Carmenere from Chile 2000", "Carmenere aus Chile 2000",
+				"Carmenere from the south of Chile (vintage 2000)", "Carmenere aus dem Süden Chilenisch (Jahrgang 2000)", "merlot_small.jpg", contentTypeJpeg, "merlot_large.jpg", contentTypeJpeg);
 
+		
+		
 
 		SimpleProductType bottleCabernetSauvignonFrance2002 = dataCreator.createLeaf(bottleCabernetSauvignonFrance, "bottle-cabernet-sauvignon-france-2002", priceConfigMiddleWines,
 				"Cabernet Sauvignon 2002 (France)", "Cabernet Sauvignon 2002 (Frankreich)", "Cabernet Sauvignon 2002 (France)");
@@ -164,7 +178,9 @@ extends Initialiser
 				"Red", "Rot", "Rouge");
 		SimpleProductType boxMerlot = dataCreator.createCategory(boxRed, "box-merlot",
 		"Merlot");
-
+		SimpleProductType boxCarmenere = dataCreator.createCategory(boxRed, "box-carmenere",
+		"Carmenere");
+		
 		SimpleProductType boxWhite = dataCreator.createCategory(box, "box-white", "White");
 
 		IInnerPriceConfig priceConfigBox6Bottles90Percent = dataCreator.createFormulaPriceConfig(
@@ -189,8 +205,11 @@ extends Initialiser
 				"California", "Kalifornien", "Californie");
 		SimpleProductType boxMerlotItaly = dataCreator.createCategory(boxMerlot, "box-merlot-italy",
 				"Italy", "Italien", "Italie");
-
-
+		SimpleProductType boxMerlotChile = dataCreator.createCategory(boxMerlot, "box-merlot-chile",
+				"Chile", "Chile", "Chile");
+		SimpleProductType boxCarmenereChile = dataCreator.createCategory(boxCarmenere, "box-carmenere-chile",
+				"Chile", "Chile", "Chile");
+		
 		SimpleProductType boxMerlotAustralia2001 = dataCreator.createLeaf(boxMerlotAustralia, "box-merlot-australia-2001", priceConfigBox6Bottles90Percent,
 				"Box (6): Merlot 2001 (Australia)", "Karton (6): Merlot 2001 (Australien)", "Caisse (6): Merlot 2001 (Australie)");
 		dataCreator.createWineProperties(pm, boxMerlotAustralia2001, "Box (6): Merlot 2001 (Australia) from Australia", "Karton Merlot aus Australien",
@@ -212,19 +231,33 @@ extends Initialiser
 				"Box (6): Merlot 2001 (Italy)", "Karton (6): Merlot 2001 (Italien)", "Caisse (6): Merlot 2001 (Italie)");
 		dataCreator.createWineProperties(pm, boxMerlotItaly2001, "Box (6): Merlot 2001 (Australia) from Italy", "Karton Merlot aus Italien",
 				"Box (6): Merlot 2001 (Italy) from Italy", "Karton Merlot aus Italien", "merlot_box_small.jpg", contentTypeJpeg, "merlot_box_large.jpg", contentTypeJpeg);
-
+		// these products is used in Unit Testing 
+		SimpleProductType boxMerlotChile2003 = dataCreator.createLeaf(boxMerlotChile, "box-merlot-chile-2003", priceConfigBox6Bottles90Percent,
+				"Box (6): Merlot 2003 Chile)", "Karton (6): Merlot 2003 (Chile)", "Caisse (6): Merlot 2001 (Chile)");
+		dataCreator.createWineProperties(pm, boxMerlotChile2003, "Box (6): Merlot 2001 (Chile) from Chile", "Karton Merlot aus Chile",
+				"Box (6): Merlot 2003 (Chile) from Chile", "Karton Merlot aus chile", "merlot_box_small.jpg", contentTypeJpeg, "merlot_box_large.jpg", contentTypeJpeg);
+		SimpleProductType boxCarmenereChile2000 = dataCreator.createLeaf(boxCarmenereChile, "box-carmenere-chile-2000", priceConfigBox6Bottles90Percent,
+				"Box (6): Carmenere 2000 Chile)", "Karton (6): Merlot 2003 (Chile)", "Caisse (6): Carmenere 2000 (Chile)");
+		dataCreator.createWineProperties(pm, boxMerlotChile2003, "Box (6): Carmenere 2000 (Chile) from Chile", "Karton Carmenere aus Chilenisch",
+				"Box (6): Carmenere 2000 (Chile) from Chile", "Karton Carmenere aus Chilenisch", "merlot_box_small.jpg", contentTypeJpeg, "merlot_box_large.jpg", contentTypeJpeg);
+		
+		
 
 		boxMerlotAustralia2001.getProductTypeLocal().createNestedProductTypeLocal(bottleMerlotAustralia2001.getProductTypeLocal()).setQuantity(6);
 		boxMerlotAustralia2004.getProductTypeLocal().createNestedProductTypeLocal(bottleMerlotAustralia2004.getProductTypeLocal()).setQuantity(6);
 		boxMerlotFrance2001.getProductTypeLocal().createNestedProductTypeLocal(bottleMerlotFrance2001.getProductTypeLocal()).setQuantity(6);
 		boxMerlotCalifornia2003.getProductTypeLocal().createNestedProductTypeLocal(bottleMerlotCalifornia2003.getProductTypeLocal()).setQuantity(6);
 		boxMerlotItaly2001.getProductTypeLocal().createNestedProductTypeLocal(bottleMerlotItaly2001.getProductTypeLocal()).setQuantity(6);
+		boxMerlotChile2003.getProductTypeLocal().createNestedProductTypeLocal(bottleMerlotChile2003.getProductTypeLocal()).setQuantity(6);
+		boxCarmenereChile2000.getProductTypeLocal().createNestedProductTypeLocal(bottleCarmenereChile2000.getProductTypeLocal()).setQuantity(6);
 
 		boxMerlotAustralia2001.getProductTypeLocal().getFieldMetaData(ProductTypeLocal.FieldName.nestedProductTypeLocals).setValueInherited(false);
 		boxMerlotAustralia2004.getProductTypeLocal().getFieldMetaData(ProductTypeLocal.FieldName.nestedProductTypeLocals).setValueInherited(false);
 		boxMerlotFrance2001.getProductTypeLocal().getFieldMetaData(ProductTypeLocal.FieldName.nestedProductTypeLocals).setValueInherited(false);
 		boxMerlotCalifornia2003.getProductTypeLocal().getFieldMetaData(ProductTypeLocal.FieldName.nestedProductTypeLocals).setValueInherited(false);
 		boxMerlotItaly2001.getProductTypeLocal().getFieldMetaData(ProductTypeLocal.FieldName.nestedProductTypeLocals).setValueInherited(false);
+		boxMerlotChile2003.getProductTypeLocal().getFieldMetaData(ProductTypeLocal.FieldName.nestedProductTypeLocals).setValueInherited(false);
+		boxCarmenereChile2000.getProductTypeLocal().getFieldMetaData(ProductTypeLocal.FieldName.nestedProductTypeLocals).setValueInherited(false);
 
 		// create ProductTypes: accessories
 		IInnerPriceConfig priceConfigChocolate = dataCreator.createFixPriceConfig(
@@ -392,6 +425,18 @@ extends Initialiser
 		bottleMerlotItaly2001.getFieldMetaData(ProductType.FieldName.vendor).setValueInherited(false);
 		bottleMerlotItaly2001.getFieldMetaData(ProductType.FieldName.owner).setValueInherited(false);
 
+		boxCarmenereChile2000.setVendor(vendor);
+		boxCarmenereChile2000.setOwner(vendor);
+		boxCarmenereChile2000.getFieldMetaData(ProductType.FieldName.vendor).setValueInherited(false);
+		boxCarmenereChile2000.getFieldMetaData(ProductType.FieldName.owner).setValueInherited(false);
+		
+		
+		bottleCarmenereChile2000.setVendor(vendor);
+		bottleCarmenereChile2000.setOwner(vendor);
+		bottleCarmenereChile2000.getFieldMetaData(ProductType.FieldName.vendor).setValueInherited(false);
+		bottleCarmenereChile2000.getFieldMetaData(ProductType.FieldName.owner).setValueInherited(false);
+		
+		
 //		Person person = dataCreator.createPerson("NightLabs GmbH", "Marco", "Schulze", "marco@nightlabs.de", new Date(),
 //				PersonStruct.PERSONALDATA_SALUTATION_MR, "Dr.", "Teststrasse", "79100", "Freiburg", "Baden-Württemberg", "Deutschland",
 //				"49", "761", "123456789", "49", "761", "987654321", "Marco Schulze", "123456789", "68090000", "TestBank",

@@ -252,9 +252,7 @@ public interface ReportManagerRemote {
 	/**
 	 * 
 	 * @param reportLayoutZipFile
-	 * @param category
-	 * @param name
-	 * @return
+	 * @return true if the layout's imported successfully
 	 */
-	boolean importReportLayoutZipFile(File reportLayoutZipFile, ReportRegistryItemID reportCategoryID, I18nText name);
+	boolean importReportLayoutZipFile(File reportLayoutZipFile);
 }

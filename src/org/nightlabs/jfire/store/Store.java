@@ -212,14 +212,15 @@ implements StoreCallback
 
 		// queue recalculation of ProductTypePermissionFlagSets
 		ProductTypeID productTypeID = (ProductTypeID) JDOHelper.getObjectId(productType);
-		ProductTypeActionHandler.CalculateProductTypePermissionFlagSetsInvocation invocation = new ProductTypeActionHandler.CalculateProductTypePermissionFlagSetsInvocation(
-				Collections.singleton(productTypeID)
-		);
-		try {
-			AsyncInvoke.exec(invocation, true);
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
+//		ProductTypeActionHandler.CalculateProductTypePermissionFlagSetsInvocation invocation = new ProductTypeActionHandler.CalculateProductTypePermissionFlagSetsInvocation(
+//				Collections.singleton(productTypeID)
+//		);
+//		try {
+//			AsyncInvoke.exec(invocation, true);
+//		} catch (Exception e) {
+//			throw new RuntimeException(e);
+//		}
+		createCalculateProductTypePermissionFlagSetsInvocation(productTypeID);
 
 		return productTypeStatusHistoryItem;
 	}
@@ -240,14 +241,15 @@ implements StoreCallback
 
 		// queue recalculation of ProductTypePermissionFlagSets
 		ProductTypeID productTypeID = (ProductTypeID) JDOHelper.getObjectId(productType);
-		ProductTypeActionHandler.CalculateProductTypePermissionFlagSetsInvocation invocation = new ProductTypeActionHandler.CalculateProductTypePermissionFlagSetsInvocation(
-				Collections.singleton(productTypeID)
-		);
-		try {
-			AsyncInvoke.exec(invocation, true);
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
+//		ProductTypeActionHandler.CalculateProductTypePermissionFlagSetsInvocation invocation = new ProductTypeActionHandler.CalculateProductTypePermissionFlagSetsInvocation(
+//				Collections.singleton(productTypeID)
+//		);
+//		try {
+//			AsyncInvoke.exec(invocation, true);
+//		} catch (Exception e) {
+//			throw new RuntimeException(e);
+//		}
+		createCalculateProductTypePermissionFlagSetsInvocation(productTypeID);
 
 		return productTypeStatusHistoryItem;
 	}
@@ -265,14 +267,15 @@ implements StoreCallback
 
 		// queue recalculation of ProductTypePermissionFlagSets
 		ProductTypeID productTypeID = (ProductTypeID) JDOHelper.getObjectId(productType);
-		ProductTypeActionHandler.CalculateProductTypePermissionFlagSetsInvocation invocation = new ProductTypeActionHandler.CalculateProductTypePermissionFlagSetsInvocation(
-				Collections.singleton(productTypeID)
-		);
-		try {
-			AsyncInvoke.exec(invocation, true);
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
+//		ProductTypeActionHandler.CalculateProductTypePermissionFlagSetsInvocation invocation = new ProductTypeActionHandler.CalculateProductTypePermissionFlagSetsInvocation(
+//				Collections.singleton(productTypeID)
+//		);
+//		try {
+//			AsyncInvoke.exec(invocation, true);
+//		} catch (Exception e) {
+//			throw new RuntimeException(e);
+//		}
+		createCalculateProductTypePermissionFlagSetsInvocation(productTypeID);
 
 		return productTypeStatusHistoryItem;
 	}
@@ -289,14 +292,15 @@ implements StoreCallback
 
 		// queue recalculation of ProductTypePermissionFlagSets
 		ProductTypeID productTypeID = (ProductTypeID) JDOHelper.getObjectId(productType);
-		ProductTypeActionHandler.CalculateProductTypePermissionFlagSetsInvocation invocation = new ProductTypeActionHandler.CalculateProductTypePermissionFlagSetsInvocation(
-				Collections.singleton(productTypeID)
-		);
-		try {
-			AsyncInvoke.exec(invocation, true);
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
+//		ProductTypeActionHandler.CalculateProductTypePermissionFlagSetsInvocation invocation = new ProductTypeActionHandler.CalculateProductTypePermissionFlagSetsInvocation(
+//				Collections.singleton(productTypeID)
+//		);
+//		try {
+//			AsyncInvoke.exec(invocation, true);
+//		} catch (Exception e) {
+//			throw new RuntimeException(e);
+//		}
+		createCalculateProductTypePermissionFlagSetsInvocation(productTypeID);
 
 		return productTypeStatusHistoryItem;
 	}
@@ -578,17 +582,72 @@ implements StoreCallback
 			if (productTypeID == null)
 				throw new IllegalStateException("JDOHelper.getObjectId(productType) returned null!");
 
-			try {
-				AsyncInvoke.exec(
-						new ProductTypeActionHandler.CalculateProductTypePermissionFlagSetsInvocation(Collections.singleton(productTypeID)),
-						true
-				);
-			} catch (Exception e) {
-				throw new RuntimeException(e);
-			}
+//			try {
+//				AsyncInvoke.exec(
+//						new ProductTypeActionHandler.CalculateProductTypePermissionFlagSetsInvocation(Collections.singleton(productTypeID)),
+//						true
+//				);
+//			} catch (Exception e) {
+//				throw new RuntimeException(e);
+//			}
+			createCalculateProductTypePermissionFlagSetsInvocation(productTypeID);
 		}
 
 		return productType;
+	}
+
+	private static void createCalculateProductTypePermissionFlagSetsInvocation(ProductTypeID productTypeID)
+	{
+		CalculateProductTypePermissionFlagSetsInvocationDeferred calculateProductTypePermissionFlagSetsInvocationDeferred = calculateProductTypePermissionFlagSetsInvocationDeferredThreadLocal.get();
+		if (calculateProductTypePermissionFlagSetsInvocationDeferred != null) {
+			calculateProductTypePermissionFlagSetsInvocationDeferred.productTypeIDs.add(productTypeID);
+			return;
+		}
+
+		try {
+			AsyncInvoke.exec(
+					new ProductTypeActionHandler.CalculateProductTypePermissionFlagSetsInvocation(
+							Collections.singleton(productTypeID)
+					),
+					true
+			);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	private static class CalculateProductTypePermissionFlagSetsInvocationDeferred
+	{
+		public int deferredCounter = 0;
+		public Set<ProductTypeID> productTypeIDs = new HashSet<ProductTypeID>();
+	}
+
+	private static ThreadLocal<CalculateProductTypePermissionFlagSetsInvocationDeferred> calculateProductTypePermissionFlagSetsInvocationDeferredThreadLocal = new ThreadLocal<CalculateProductTypePermissionFlagSetsInvocationDeferred>();
+
+	public static void enableCalculateProductTypePermissionFlagSetsInvocationDeferred()
+	{
+		CalculateProductTypePermissionFlagSetsInvocationDeferred calculateProductTypePermissionFlagSetsInvocationDeferred = calculateProductTypePermissionFlagSetsInvocationDeferredThreadLocal.get();
+		if (calculateProductTypePermissionFlagSetsInvocationDeferred == null) {
+			calculateProductTypePermissionFlagSetsInvocationDeferred = new CalculateProductTypePermissionFlagSetsInvocationDeferred();
+			calculateProductTypePermissionFlagSetsInvocationDeferredThreadLocal.set(calculateProductTypePermissionFlagSetsInvocationDeferred);
+		}
+		calculateProductTypePermissionFlagSetsInvocationDeferred.deferredCounter++;
+	}
+
+	public static Set<ProductTypeID> disableCalculateProductTypePermissionFlagSetsInvocationDeferred()
+	{
+		CalculateProductTypePermissionFlagSetsInvocationDeferred calculateProductTypePermissionFlagSetsInvocationDeferred = calculateProductTypePermissionFlagSetsInvocationDeferredThreadLocal.get();
+		if (calculateProductTypePermissionFlagSetsInvocationDeferred == null)
+			throw new IllegalStateException("enableCalculateProductTypePermissionFlagSetsInvocationDeferred() was not called on this thread or reference counter reached 0 already before.");
+
+		if (--calculateProductTypePermissionFlagSetsInvocationDeferred.deferredCounter < 0)
+			throw new IllegalStateException("calculateProductTypePermissionFlagSetsInvocationDeferred.deferredCounter < 0");
+
+		if (calculateProductTypePermissionFlagSetsInvocationDeferred.deferredCounter == 0) {
+			calculateProductTypePermissionFlagSetsInvocationDeferredThreadLocal.remove();
+			return calculateProductTypePermissionFlagSetsInvocationDeferred.productTypeIDs;
+		}
+		return null;
 	}
 
 	protected Repository getInitialRepositoryForLocalProduct(Product product)

@@ -13,10 +13,17 @@ import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 import javax.jdo.PersistenceManager;
 
+import org.apache.log4j.Logger;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.QueryOption;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
+import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
+import org.nightlabs.jfire.reporting.layout.render.RenderReportException;
+import org.nightlabs.jfire.reporting.layout.render.RenderReportRequest;
+import org.nightlabs.jfire.reporting.layout.render.RenderedReportLayout;
+import org.nightlabs.jfire.reporting.layout.render.ReportLayoutRendererUtil;
 import org.nightlabs.jfire.reporting.scheduled.id.ScheduledReportID;
+import org.nightlabs.jfire.timer.Task;
 import org.nightlabs.jfire.timer.id.TaskID;
 
 /**
@@ -30,6 +37,9 @@ extends BaseSessionBeanImpl
 implements ScheduledReportManagerLocal, ScheduledReportManagerRemote
 {
 
+	/** Logger for this class */
+	private static Logger logger = Logger.getLogger(ScheduledReportManagerBean.class);
+	
 	public ScheduledReportManagerBean() {
 	}
 	
@@ -46,11 +56,54 @@ implements ScheduledReportManagerLocal, ScheduledReportManagerRemote
 		}
 	}
 
-	@TransactionAttribute(TransactionAttributeType.NEVER) // Never begin a transaction for report rendering
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS) // Never begin a transaction for report rendering
 	@RolesAllowed({org.nightlabs.jfire.reporting.RoleConstants.renderReport_roleID})
 	@Override
 	public void processScheduledReport(TaskID taskID) throws Exception {
-		// TODO: processScheduledReport
+		
+		PersistenceManager pm = createPersistenceManager();
+		try {
+			if (logger.isDebugEnabled())
+				logger.debug("processScheduledReport started, determine parameters");
+			Task task = (Task) pm.getObjectById(taskID);
+			ScheduledReport scheduledReport = (ScheduledReport) task.getParam();
+			if (logger.isDebugEnabled())
+				logger.debug("processScheduledReport have " + ScheduledReport.describeScheduledReport(scheduledReport));
+			RenderReportRequest renderReportRequest = scheduledReport.getRenderReportRequest();
+			if (renderReportRequest == null) {
+				throw new RenderReportException("Can not render ScheduledReport as the RenderReportRequest is not set. "
+						+ ScheduledReport.describeScheduledReport(scheduledReport));
+			}
+			ReportRegistryItemID reportLayoutID = scheduledReport.getReportLayoutID();
+			if (reportLayoutID == null) {
+				throw new RenderReportException("Can not render ScheduledReport as no ReportLayout is set for it. "
+						+ ScheduledReport.describeScheduledReport(scheduledReport));
+			}
+			if (logger.isDebugEnabled())
+				logger.debug("processScheduledReport have reportLayoutID " + reportLayoutID);
+			
+			IScheduledReportDeliveryDelegate deliveryDelegate = scheduledReport.getDeliveryDelegate();
+			if (deliveryDelegate == null) {
+				throw new IllegalStateException("Can not render ScheduledReport as no ScheduledReportDeliveryDelegate is set for it. "
+						+ ScheduledReport.describeScheduledReport(scheduledReport));
+			}
+			if (logger.isDebugEnabled())
+				logger.debug("processScheduledReport have deliveryDelegate " + deliveryDelegate);
+			
+			
+			renderReportRequest.setReportRegistryItemID(reportLayoutID);
+			
+			if (logger.isDebugEnabled())
+				logger.debug("processScheduledReport rendering ReportLayout " + reportLayoutID);
+			RenderedReportLayout renderedReportLayout = ReportLayoutRendererUtil.renderReport(pm, renderReportRequest);
+			
+			if (logger.isDebugEnabled())
+				logger.debug("processScheduledReport delivering rendered report.");			
+			deliveryDelegate.deliverReportOutput(scheduledReport, renderedReportLayout);
+			
+		} finally {
+			pm.close();
+		}
 	}
 
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)

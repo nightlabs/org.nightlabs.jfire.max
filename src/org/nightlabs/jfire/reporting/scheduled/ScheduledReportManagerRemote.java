@@ -11,6 +11,8 @@ import javax.ejb.Remote;
 import org.nightlabs.jfire.reporting.scheduled.id.ScheduledReportID;
 
 /**
+ * Local EJB interface for the management of {@link ScheduledReport}s.
+ * 
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
  */
 @Remote

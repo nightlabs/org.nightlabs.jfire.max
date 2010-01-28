@@ -9,8 +9,16 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import javax.jdo.PersistenceManager;
+
 import org.apache.log4j.Logger;
 import org.nightlabs.io.DataBuffer;
+import org.nightlabs.jfire.reporting.ReportingEngine;
+import org.nightlabs.jfire.reporting.RoleConstants;
+import org.nightlabs.jfire.reporting.layout.ReportLayout;
+import org.nightlabs.jfire.reporting.layout.ReportRegistryItem;
+import org.nightlabs.jfire.security.Authority;
+import org.nightlabs.jfire.security.ResolveSecuringAuthorityStrategy;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.util.CacheDirTag;
 import org.nightlabs.util.IOUtil;
@@ -28,6 +36,36 @@ public class ReportLayoutRendererUtil {
 	 */
 	private static final Logger logger = Logger.getLogger(ReportLayoutRendererUtil.class);
 
+	/**
+	 * Renders the {@link ReportLayout} referenced by the given {@link RenderReportRequest}
+	 * and returns the resulting {@link RenderedReportLayout}.
+	 * <p>
+	 * This method checks if the current user has the RoleID {@link RoleConstants#renderReport}
+	 * </p>
+	 *
+	 * @param pm The {@link PersistenceManager} to use to obtain the ReportEngine.
+	 * @param renderReportRequest The request defining which report to render, to which format it
+	 * 		should be rendered and which Locale should be applied etc.
+	 * @return The resulting {@link RenderedReportLayout} that can be used to transfer the report.
+	 * @throws RenderReportException When rendering the report fails.
+	 */
+	public static RenderedReportLayout renderReport(PersistenceManager pm, RenderReportRequest renderReportRequest)
+			throws RenderReportException {
+		
+		// check if user is allowed to render
+		ReportRegistryItem registryItem = (ReportRegistryItem) pm.getObjectById(renderReportRequest.getReportRegistryItemID());
+		Authority.resolveSecuringAuthority(pm, registryItem, ResolveSecuringAuthorityStrategy.organisation).assertContainsRoleRef(
+				SecurityReflector.getUserDescriptor().getUserObjectID(), RoleConstants.renderReport);
+
+		ReportingEngine reportingEngine = ReportingEngine.getReportingEngine(pm, null);
+		if (reportingEngine != null) {
+			IRenderManager rm = reportingEngine.createRenderManager(renderReportRequest);
+			return rm.renderReport(pm, renderReportRequest);
+		} else {
+			throw new RenderReportException("Could not obtain ReportingEngine from datastore.", new NullPointerException());
+		}
+	}
+	
 	/**
 	 * @return the root folder for all temporary rendered report folders.
 	 * 		This is (JFireReporting#earDir/birt/rendered).

@@ -1,5 +1,7 @@
 package org.nightlabs.jfire.reporting.scheduled;
 
+import java.io.Serializable;
+
 import org.nightlabs.jfire.reporting.layout.render.RenderedReportLayout;
 
 /**
@@ -14,7 +16,7 @@ import org.nightlabs.jfire.reporting.layout.render.RenderedReportLayout;
  * 
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
  */
-public interface IScheduledReportDeliveryDelegate {
+public interface IScheduledReportDeliveryDelegate extends Serializable {
 	
-	void deliverReportOutput(ScheduledReport scheduledReport, RenderedReportLayout renderedReportLayout);
+	void deliverReportOutput(ScheduledReport scheduledReport, RenderedReportLayout renderedReportLayout) throws Exception;
 }

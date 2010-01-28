@@ -64,7 +64,6 @@ import org.nightlabs.jfire.reporting.layout.ReportLayout;
 import org.nightlabs.jfire.reporting.layout.ReportLayoutLocalisationData;
 import org.nightlabs.jfire.reporting.layout.ReportRegistryItem;
 import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
-import org.nightlabs.jfire.reporting.layout.render.IRenderManager;
 import org.nightlabs.jfire.reporting.layout.render.RenderReportException;
 import org.nightlabs.jfire.reporting.layout.render.RenderReportRequest;
 import org.nightlabs.jfire.reporting.layout.render.RenderedReportLayout;
@@ -496,18 +495,7 @@ implements ReportManagerRemote
 		PersistenceManager pm;
 		pm = createPersistenceManager();
 		try {
-			// check if user is allowed to render
-			ReportRegistryItem registryItem = (ReportRegistryItem) pm.getObjectById(renderReportRequest.getReportRegistryItemID());
-			Authority.resolveSecuringAuthority(pm, registryItem, ResolveSecuringAuthorityStrategy.organisation)
-				.assertContainsRoleRef(getPrincipal(), RoleConstants.renderReport);
-
-			ReportingEngine reportingEngine = ReportingEngine.getReportingEngine(pm, null);
-			if (reportingEngine != null) {
-				IRenderManager rm = reportingEngine.createRenderManager(renderReportRequest);
-				return rm.renderReport(pm, renderReportRequest);
-			} else {
-				throw new RenderReportException("Could not obtain ReportingEngine from datastore.", new NullPointerException());
-			}
+			return ReportLayoutRendererUtil.renderReport(pm, renderReportRequest);
 		} finally {
 			pm.close();
 		}

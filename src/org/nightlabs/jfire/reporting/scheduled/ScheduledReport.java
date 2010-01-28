@@ -115,6 +115,13 @@ public class ScheduledReport implements Serializable, DetachCallback, AttachCall
 	public static final String FETCH_GROUP_RENDER_REPORT_REQUEST = fetchGroupPrefix + FieldName.renderReportRequest;
 	public static final String FETCH_GROUP_DELIVERY_DELEGATE = fetchGroupPrefix + FieldName.deliveryDelegate;
 	
+	/**
+	 * This fetch-group should be defined by implementations of
+	 * {@link IScheduledReportDeliveryDelegate} when they need data other than than in then default
+	 * fetch-group to be edited correctly.
+	 */
+	public static final String FETCH_GROUP_DELIVERY_DELEGATE_FULL_DATA = fetchGroupPrefix + FieldName.deliveryDelegate + ".fullData";
+	
 	/** pk-part */
 	@PrimaryKey
 	private String organisationID;
@@ -508,6 +515,21 @@ public class ScheduledReport implements Serializable, DetachCallback, AttachCall
 	@Override
 	public void jdoPreAttach() {
 	}
+
+	public static String describeScheduledReport(ScheduledReport scheduledReport) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("ScheduledReport(");
+		if (scheduledReport == null) {
+			sb.append("null");
+		} else {
+			sb.append(JDOHelper.getObjectId(scheduledReport).toString());
+			sb.append("|name=");
+			sb.append(scheduledReport.getName().getText());
+		}
+		sb.append(")");
+		return sb.toString();
+	}
+	
 	
 	/**
 	 * Get the list of {@link ScheduledReportID}s of the current user.

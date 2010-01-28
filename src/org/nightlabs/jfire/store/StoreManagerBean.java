@@ -2252,6 +2252,22 @@ implements StoreManagerRemote, StoreManagerLocal
 			pm.close();
 		}
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.store.StoreManagerRemote#storeUnit(org.nightlabs.jfire.store.Unit, boolean, java.lang.String[], int)
+	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("_Guest_")
+	@Override
+	public Unit storeUnit(Unit unit, boolean get, String[] fetchGroups, int maxFetchDepth)
+	{
+		PersistenceManager pm = createPersistenceManager();
+		try {
+			return NLJDOHelper.storeJDO(pm, unit, get, fetchGroups, maxFetchDepth);
+		} finally {
+			pm.close();
+		}
+	}
 
 //	/**
 //	 * This method is faster than {@link #getProductTransferIDs(Collection)}, because

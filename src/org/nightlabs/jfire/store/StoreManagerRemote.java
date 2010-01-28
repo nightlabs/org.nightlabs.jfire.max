@@ -454,4 +454,6 @@ public interface StoreManagerRemote {
 
 	Map<ProductTypeID, Long> getChildProductTypeCounts(Collection<ProductTypeID> parentProductTypeIDs, QueryCollection<? extends AbstractProductTypeQuery> productTypeQueries);
 	Collection<ProductTypeID> getChildProductTypeIDs(ProductTypeID parentProductTypeID, QueryCollection<? extends AbstractProductTypeQuery> productTypeQueries);
+	
+	Unit storeUnit(Unit unit, boolean get, String[] fetchGroups, int maxFetchDepth);
 }

@@ -261,7 +261,7 @@ public class ReportingInitialiser {
 		}
 	}
 
-	private Document parseFile(final File xmlFile)
+	public static Document parseFile(final File xmlFile)
 	throws SAXException, IOException
 	{
 		if (!xmlFile.exists())

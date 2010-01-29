@@ -11,7 +11,6 @@ import javax.naming.NamingException;
 import org.eclipse.datatools.connectivity.oda.IParameterMetaData;
 import org.eclipse.datatools.connectivity.oda.IResultSet;
 import org.eclipse.datatools.connectivity.oda.IResultSetMetaData;
-import org.nightlabs.i18n.I18nText;
 import org.nightlabs.jfire.reporting.layout.ReportLayout;
 import org.nightlabs.jfire.reporting.layout.ReportLayoutLocalisationData;
 import org.nightlabs.jfire.reporting.layout.ReportRegistryItem;
@@ -250,9 +249,9 @@ public interface ReportManagerRemote {
 			String[] fetchGroups, int maxFetchDepth);
 
 	/**
-	 * 
 	 * @param reportLayoutZipFile
+	 * @param reportCateogoryID
 	 * @return true if the layout's imported successfully
 	 */
-	boolean importReportLayoutZipFile(File reportLayoutZipFile);
+	boolean importReportLayoutZipFile(File reportLayoutZipFile, ReportRegistryItemID reportCateogoryID);
 }

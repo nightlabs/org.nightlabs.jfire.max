@@ -22,7 +22,75 @@ import org.nightlabs.util.TimePeriod;
  *
  */
 public class ReportingConstants {
-
+	
+	public static final String DESCRIPTOR_FILE 						= "content.xml"; //$NON-NLS-1$
+	
+	public static final String DESCRIPTOR_FILE_ENCODING				= "utf-8"; //$NON-NLS-1$
+	public static final String DESCRIPTOR_FILE_DOCTYPE_SYSTEM		= "http://www.nightlabs.de/dtd/reporting-initialiser-content_0_5.dtd"; //$NON-NLS-1$
+	public static final String DESCRIPTOR_FILE_DOCTYPE_PUBLIC		= "-//NightLabs//Reporting Initialiser DTD V 0.5//EN"; //$NON-NLS-1$
+	
+	public static final String REPORT_CATEGORY_ELEMENT 				= "report-category"; //$NON-NLS-1$
+	public static final String REPORT_CATEGORY_ELEMENT_ATTRIBUTE_ID 		= "id"; //$NON-NLS-1$
+	public static final String REPORT_CATEGORY_ELEMENT_ATTRIBUTE_TYPE 		= "type"; //$NON-NLS-1$
+	
+	public static final String REPORT_CATEGORY_ELEMENT_NAME 		= "name"; //$NON-NLS-1$
+	
+	public static final String REPORT_ELEMENT 						= "report"; //$NON-NLS-1$
+	public static final String REPORT_ELEMENT_ATTRIBUTE_FILE 		= "file"; //$NON-NLS-1$
+	public static final String REPORT_ELEMENT_ATTRIBUTE_ID 			= "id"; //$NON-NLS-1$
+	public static final String REPORT_ELEMENT_ATTRIBUTE_ENGINE_TYPE = "engineType"; //$NON-NLS-1$
+	public static final String REPORT_ELEMENT_ATTRIBUTE_OVERWRITE_ON_INIT 	= "overwriteOnInit"; //$NON-NLS-1$
+	
+	public static final String REPORT_ELEMENT_NAME 					= "name"; //$NON-NLS-1$
+	public static final String REPORT_ELEMENT_DESCRIPTION 			= "description"; //$NON-NLS-1$
+	
+	public static final String PARAMETER_ACQUISITION_ELEMENT 		= "parameter-acquisition"; //$NON-NLS-1$
+	public static final String USE_CASE_ELEMENT						= "use-case"; //$NON-NLS-1$
+	public static final String USE_CASE_ATTRIBUTE_ID				= "id"; //$NON-NLS-1$
+	public static final String USE_CASE_ATTRIBUTE_DEFAULT			= "default"; //$NON-NLS-1$
+	
+	public static final String USE_CASE_ELEMENT_NAME				= "name"; //$NON-NLS-1$
+	public static final String USE_CASE_ELEMENT_DESCRIPTION			= "description"; //$NON-NLS-1$
+	
+	public static final String PARAMETER_ELEMENT							= "parameter"; //$NON-NLS-1$
+	public static final String PARAMETER_ELEMENT_ATTRIBUTE_ID				= "id"; //$NON-NLS-1$
+	public static final String PARAMETER_ELEMENT_ATTRIBUTE_NAME				= "name"; //$NON-NLS-1$
+	public static final String PARAMETER_ELEMENT_ATTRIBUTE_TYPE				= "type"; //$NON-NLS-1$
+	public static final String PARAMETER_ELEMENT_ATTRIBUTE_X				= "x"; //$NON-NLS-1$
+	public static final String PARAMETER_ELEMENT_ATTRIBUTE_Y				= "y"; //$NON-NLS-1$
+	
+	public static final String VALUE_PROVIDER_CONFIGS_ELEMENT		= "value-provider-configs"; //$NON-NLS-1$
+	
+	public static final String PROVIDER_CONFIG_ELEMENT								= "provider-config"; //$NON-NLS-1$
+	public static final String PROVIDER_CONFIG_ELEMENT_ATTRIBUTE_ID					= "id"; //$NON-NLS-1$
+	public static final String PROVIDER_CONFIG_ELEMENT_ATTRIBUTE_ORGANISATION_ID	= "organisationID"; //$NON-NLS-1$
+	public static final String PROVIDER_CONFIG_ELEMENT_ATTRIBUTE_CATEGORY_ID		= "categoryID"; //$NON-NLS-1$
+	public static final String PROVIDER_CONFIG_ELEMENT_ATTRIBUTE_VALUE_PROVIDER_ID	= "valueProviderID"; //$NON-NLS-1$
+	public static final String PROVIDER_CONFIG_ELEMENT_ATTRIBUTE_PAGE_INDEX			= "pageIndex"; //$NON-NLS-1$
+	public static final String PROVIDER_CONFIG_ELEMENT_ATTRIBUTE_PAGE_ROW			= "pageRow"; //$NON-NLS-1$
+	public static final String PROVIDER_CONFIG_ELEMENT_ATTRIBUTE_PAGE_COLUMN		= "pageColumn"; //$NON-NLS-1$
+	public static final String PROVIDER_CONFIG_ELEMENT_ATTRIBUTE_ALLOW_NULL_OUTPUT_VALUE	= "allowNullOutputValue"; //$NON-NLS-1$
+	public static final String PROVIDER_CONFIG_ELEMENT_ATTRIBUTE_SHOW_MESSAGE_IN_HEADER 	= "showMessageInHeader"; //$NON-NLS-1$
+	public static final String PROVIDER_CONFIG_ELEMENT_ATTRIBUTE_GROW_VERTICALLY			= "growVertically"; //$NON-NLS-1$
+	public static final String PROVIDER_CONFIG_ELEMENT_ATTRIBUTE_X							= "x"; //$NON-NLS-1$
+	public static final String PROVIDER_CONFIG_ELEMENT_ATTRIBUTE_Y							= "y"; //$NON-NLS-1$
+	
+	public static final String PROVIDER_CONFIG_ELEMENT_MESSAGE						= "message"; //$NON-NLS-1$
+	
+	public static final String VALUE_CONSUMER_BINDINGS_ELEMENT						= "value-consumer-bindings"; //$NON-NLS-1$
+		
+	public static final String VALUE_CONSUMER_BINDING_ELEMENT						= "value-consumer-binding"; //$NON-NLS-1$
+	
+	public static final String BINDING_PROVIDER_ELEMENT								= "binding-provider"; //$NON-NLS-1$
+	public static final String BINDING_PROVIDER_ELEMENT_ATTRIBUTE_ID				= "id"; //$NON-NLS-1$
+	
+	public static final String BINDING_PARAMETER_ELEMENT							= "binding-parameter"; //$NON-NLS-1$
+	public static final String BINDING_PARAMETER_ELEMENT_ATTRIBUTE_NAME				= "name"; //$NON-NLS-1$
+	
+	public static final String BINDING_CONSUMER_ELEMENT								= "binding-consumer"; //$NON-NLS-1$
+	public static final String BINDING_CONSUMER_ELEMENT_ATTRIBUTE_ID				= "id"; //$NON-NLS-1$
+	
+	
 	// TODO: Add things like Geography data
 	// TODO: Also need Collections of all things here
 	

@@ -607,24 +607,35 @@ implements ReportManagerRemote
 		}
 	}
 	
+	private static final String TMP_FOLDER_PREFIX = "jfire_report.imported.";
+	private static final String TMP_FOLDER_SUFFIX = ".report";
 	/*
 	 * (non-Javadoc)
 	 * @see org.nightlabs.jfire.reporting.ReportManagerRemote#importReportLayoutZipFile(java.io.File)
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("org.nightlabs.jfire.reporting.editReport")
-	public boolean importReportLayoutZipFile(final File zipFile) {
+	public boolean importReportLayoutZipFile(File zipFile, ReportRegistryItemID registryItemID) {
 		try {
 			//Unzip into tmp folder
-			File tmpFolder = IOUtil.createUserTempDir("jfire_report.imported.", ".report");
+			File tmpFolder = IOUtil.createUserTempDir(TMP_FOLDER_PREFIX, "TMP_FOLDER_SUFFIX");
 			File reportFolder = new File(tmpFolder, zipFile.getName());
 			reportFolder.mkdir();
 			IOUtil.unzipArchive(zipFile, reportFolder);
 			tmpFolder.deleteOnExit();
 			
+			ReportCategory reportCategory;
+			PersistenceManager pm = createPersistenceManager();
+			try {
+				pm.getFetchPlan().setMaxFetchDepth(NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
+				reportCategory = (ReportCategory)pm.getObjectById(registryItemID);
+			} finally {
+				pm.close();
+			}
+			
 			ReportingInitialiser reportingInitialiser = new ReportingInitialiser(tmpFolder, 
 					"", 
-					null, 
+					reportCategory, 
 					createPersistenceManager(), 
 					getOrganisationID());
 			reportingInitialiser.initialise();

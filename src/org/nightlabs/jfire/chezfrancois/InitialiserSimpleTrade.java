@@ -154,6 +154,10 @@ extends Initialiser
 				"Merlot 2003 (Chile)", "Merlot 2003 (Chile)", "Merlot 2003 (Chile)");
 		dataCreator.createWineProperties(pm, bottleMerlotChile2003, "Merlot from Chile 2003", "Merlot aus Chile 2003",
 				"Merlot from the south of Chile (vintage 2003)", "Merlot aus dem Süden Chilenisch (Jahrgang 2003)", "merlot_small.jpg", contentTypeJpeg, "merlot_large.jpg", contentTypeJpeg);
+		SimpleProductType bottleMerlotChile1995 = dataCreator.createLeaf(bottleMerlotChile, "bottle-merlot-chile-1995", priceConfigExpensiveWines,
+				"Merlot 1995 (Chile)", "Merlot 1995 (Chile)", "Merlot 1995 (Chile)");
+		dataCreator.createWineProperties(pm, bottleMerlotChile1995, "Merlot from Chile 1995", "Merlot aus Chile 1995",
+				"Merlot from the south of Chile (vintage 1995)", "Merlot aus dem Süden Chilenisch (Jahrgang 1995)", "merlot_small.jpg", contentTypeJpeg, "merlot_large.jpg", contentTypeJpeg);	
 		SimpleProductType bottleCarmenereChile2000 = dataCreator.createLeaf(bottCarmenereChile, "bottle-carmenere-chile-2000", priceConfigMiddleWines,
 				"Carmenere 2000 (Chile)", "Carmenere 2000 (Chile)", "Carmenere 2003 (Chile)");
 		dataCreator.createWineProperties(pm, bottleCarmenereChile2000, "Carmenere from Chile 2000", "Carmenere aus Chile 2000",
@@ -237,7 +241,7 @@ extends Initialiser
 		dataCreator.createWineProperties(pm, boxMerlotChile2003, "Box (6): Merlot 2001 (Chile) from Chile", "Karton Merlot aus Chile",
 				"Box (6): Merlot 2003 (Chile) from Chile", "Karton Merlot aus chile", "merlot_box_small.jpg", contentTypeJpeg, "merlot_box_large.jpg", contentTypeJpeg);
 		SimpleProductType boxCarmenereChile2000 = dataCreator.createLeaf(boxCarmenereChile, "box-carmenere-chile-2000", priceConfigBox6Bottles90Percent,
-				"Box (6): Carmenere 2000 Chile)", "Karton (6): Merlot 2003 (Chile)", "Caisse (6): Carmenere 2000 (Chile)");
+				"Box (6): Carmenere 2000 (Chile)", "Karton (6): Merlot 2003 (Chile)", "Caisse (6): Carmenere 2000 (Chile)");
 		dataCreator.createWineProperties(pm, boxMerlotChile2003, "Box (6): Carmenere 2000 (Chile) from Chile", "Karton Carmenere aus Chilenisch",
 				"Box (6): Carmenere 2000 (Chile) from Chile", "Karton Carmenere aus Chilenisch", "merlot_box_small.jpg", contentTypeJpeg, "merlot_box_large.jpg", contentTypeJpeg);
 		

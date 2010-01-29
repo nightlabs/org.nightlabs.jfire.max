@@ -618,7 +618,7 @@ implements ReportManagerRemote
 	public boolean importReportLayoutZipFile(File zipFile, ReportRegistryItemID registryItemID) {
 		try {
 			//Unzip into tmp folder
-			File tmpFolder = IOUtil.createUserTempDir(TMP_FOLDER_PREFIX, TMP_FOLDER_PREFIX);
+			File tmpFolder = IOUtil.createUserTempDir(TMP_FOLDER_PREFIX, TMP_FOLDER_SUFFIX);
 			File reportFolder = new File(tmpFolder, zipFile.getName());
 			reportFolder.mkdir();
 			IOUtil.unzipArchive(zipFile, reportFolder);

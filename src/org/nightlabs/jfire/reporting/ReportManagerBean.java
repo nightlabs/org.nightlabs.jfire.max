@@ -618,7 +618,7 @@ implements ReportManagerRemote
 	public boolean importReportLayoutZipFile(File zipFile, ReportRegistryItemID registryItemID) {
 		try {
 			//Unzip into tmp folder
-			File tmpFolder = IOUtil.createUserTempDir(TMP_FOLDER_PREFIX, "TMP_FOLDER_SUFFIX");
+			File tmpFolder = IOUtil.createUserTempDir(TMP_FOLDER_PREFIX, TMP_FOLDER_PREFIX);
 			File reportFolder = new File(tmpFolder, zipFile.getName());
 			reportFolder.mkdir();
 			IOUtil.unzipArchive(zipFile, reportFolder);
@@ -640,6 +640,7 @@ implements ReportManagerRemote
 					getOrganisationID());
 			reportingInitialiser.initialise();
 			
+			tmpFolder.delete();
 //			//Create tmp layout file
 //			File tmpFile = File.createTempFile(IOUtil.getFileNameWithoutExtension(zipFile.getName()), ".rptdesign", tmpFolder);
 //			tmpFile.deleteOnExit();

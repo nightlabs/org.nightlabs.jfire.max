@@ -139,7 +139,11 @@ public class ScheduledReportDeliveryDelegateEMail implements IScheduledReportDel
 		}
 		message.setFrom(fromAddr);
 		
-		message.setSubject(subject);
+		String subjectToSend = subject;
+		if (subjectToSend == null || subjectToSend.isEmpty()) {
+			subjectToSend = scheduledReport.getName().getText(); 
+		}
+		message.setSubject(subjectToSend);
 		
 		if (logger.isDebugEnabled())
 			logger.debug("Configured mail with toAddresses " + toAddresses + ", fromAddress " + fromAddress + ", subject " + subject);
@@ -157,29 +161,50 @@ public class ScheduledReportDeliveryDelegateEMail implements IScheduledReportDel
 		// now create the attachment part
 		File folder = null;
 		try {
-			folder = IOUtil.createUniqueRandomFolder(IOUtil.createUserTempDir("jfire.scheduleReports", null), null);
+			folder = IOUtil.createUniqueRandomFolder(IOUtil.createUserTempDir("jfire.scheduleReports.", ""), "");
 		} catch (IOException e) {
 			throw new IllegalStateException("Can't send ScheduledReport output because an IOException occured when creating a temporary folder ("
 					+ toAddresses + "). " + ScheduledReport.describeScheduledReport(scheduledReport), e);
 		}
-		if (logger.isDebugEnabled())
-			logger.debug("Write report output to disk: " + folder);
-		File file = RenderedReportLayoutUtil.prepareRenderedReportLayout(folder, renderedReportLayout, new NullProgressMonitor());
-		if (logger.isDebugEnabled())
-			logger.debug("Written: " + file + ", now attaching to mail");
-		messageBodyPart = new MimeBodyPart();
-		DataSource source = new FileDataSource(file);
-		messageBodyPart.setDataHandler(new DataHandler(source));
-		messageBodyPart.setFileName(file.getName());
-		multipart.addBodyPart(messageBodyPart);				
-		message.setContent(multipart);
+		try {
+			if (logger.isDebugEnabled())
+				logger.debug("Write report output to disk: " + folder);
+			File file = null;
+			if (renderedReportLayout.getHeader().isMultipleFiles()) {
+				// if we have multiple files we dump the complete layout file (= zip)
+				file = RenderedReportLayoutUtil.dumpRenderedReportLayout(folder, scheduledReport.getName().getText(), renderedReportLayout,
+						new NullProgressMonitor());
+			} else {
+				// if the report consists only of one file we send only this file, not zipped
+				file = RenderedReportLayoutUtil.prepareRenderedReportLayout(folder, renderedReportLayout,
+						new NullProgressMonitor());
+				File renamedFile = new File(folder, scheduledReport.getName().getText() + "." + IOUtil.getFileExtension(file.getName()));
+				file.renameTo(renamedFile);
+				file = renamedFile;
+			}
 
-		// Send the message
-		if (logger.isDebugEnabled())
-			logger.debug("Sending mail");
-		Transport.send( message );		
-		if (logger.isDebugEnabled())
-			logger.debug("Sending mail done");
+			if (logger.isDebugEnabled())
+				logger.debug("Written: " + file + ", now attaching to mail");
+			messageBodyPart = new MimeBodyPart();
+			DataSource source = new FileDataSource(file);
+			messageBodyPart.setDataHandler(new DataHandler(source));
+			messageBodyPart.setFileName(file.getName());
+			multipart.addBodyPart(messageBodyPart);
+			message.setContent(multipart);
+
+			// Send the message
+			if (logger.isDebugEnabled())
+				logger.debug("Sending mail");
+			Transport.send( message );		
+			if (logger.isDebugEnabled())
+				logger.debug("Sending mail done");
+		} finally {
+			if (folder.exists()) {
+				if (logger.isDebugEnabled())
+					logger.debug("Deleting temporary directory " + folder);
+				IOUtil.deleteDirectoryRecursively(folder);
+			}
+		}
 	}
 
 	/**

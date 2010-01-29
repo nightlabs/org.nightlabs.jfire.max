@@ -5,6 +5,7 @@ package org.nightlabs.jfire.reporting.layout.render;
 
 import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -16,6 +17,7 @@ import org.nightlabs.io.DataBuffer;
 import org.nightlabs.jfire.reporting.ReportingEngine;
 import org.nightlabs.jfire.reporting.RoleConstants;
 import org.nightlabs.jfire.reporting.layout.ReportLayout;
+import org.nightlabs.jfire.reporting.layout.ReportLayoutLocalisationData;
 import org.nightlabs.jfire.reporting.layout.ReportRegistryItem;
 import org.nightlabs.jfire.security.Authority;
 import org.nightlabs.jfire.security.ResolveSecuringAuthorityStrategy;
@@ -31,6 +33,8 @@ import org.nightlabs.util.IOUtil;
  */
 public class ReportLayoutRendererUtil {
 
+	private static final String PROTECTIONFILE_NAME = "protectionfile";
+	
 	/**
 	 * Logger used by this class.
 	 */
@@ -128,7 +132,7 @@ public class ReportLayoutRendererUtil {
 	 * @return The protection file object.
 	 */
 	public static File getLayoutOutputFolderProtectionFile(File layoutRoot, boolean createIfNotExist) {
-		File protectionFile = new File(layoutRoot, "protectionfile");
+		File protectionFile = new File(layoutRoot, PROTECTIONFILE_NAME);
 		if (!protectionFile.exists() && createIfNotExist) {
 			try {
 				if (!protectionFile.createNewFile()) {
@@ -143,15 +147,44 @@ public class ReportLayoutRendererUtil {
 	}
 
 	/**
-	 * Takes the root Folder of a rendered BIRT Layout and populates the given {@link RenderedReportLayout}'s
-	 * data with its contents. If doZip is true, the whole folder will be zipped and set as data. If it is false
-	 * this method tries to locate [entryFileName].[OUTPUTFORMAT] and set this as data (not zipped of course).
-	 *
-	 * @param layoutRoot The root folder for the rendered layout (e.g. containig one html file and several images, or a single pdf).
-	 * @param reportLayout The {@link RenderedReportLayout} with a valid header. The data member of this instance will be manipulated (populated with the file data).
-	 * @param doZip Whether to zip contents or not. (Note, that if not ziped, only one entry can be added: renderedReport.[OUTPUTFORMAT])
+	 * Takes the root Folder of a rendered BIRT Layout and populates the given
+	 * {@link RenderedReportLayout}'s data with its contents.
+	 * <p>
+	 * If doZip is true, the whole folder will be zipped and set as data. If it is false this method
+	 * tries to locate [entryFileName].[OUTPUTFORMAT] and set this as data (not zipped of course).
+	 * </p>
+	 * <p>
+	 * Additionally note, that regardless of the value of doZip, if this method finds the given
+	 * rendered report layout to consist of multiple files the zipping of the whole folder is
+	 * forced.
+	 * </p>
+	 * 
+	 * @param layoutRoot The root folder for the rendered layout (e.g. containig one html file and
+	 *            several images, or a single pdf).
+	 * @param reportLayout The {@link RenderedReportLayout} with a valid header. The data member of
+	 *            this instance will be manipulated (populated with the file data).
+	 * @param doZip Whether to zip contents or not. (Note, that if the contents of the report are
+	 *            found to consist of multiple files zipped is forced to be <code>true</code>).
 	 */
 	public static void prepareRenderedLayoutForTransfer(File layoutRoot, RenderedReportLayout reportLayout, String entryFileName, boolean doZip) {
+		
+		// remove all localisation data needed for the rendering first...
+		ReportLayoutLocalisationData.cleanFolderFromLocalisationData(layoutRoot);
+		
+		File[] layoutFiles = layoutRoot.listFiles(new FileFilter() {
+			@Override
+			public boolean accept(File pathname) {
+				return !pathname.getName().startsWith(PROTECTIONFILE_NAME);
+			}
+		});
+		
+		boolean multipleFiles = layoutFiles != null && layoutFiles.length > 1;
+		reportLayout.getHeader().setMultipleFiles(multipleFiles);
+		if (multipleFiles) {
+			// if we find that the layout consists of multiple files, we force zipping
+			doZip = true;
+		}
+		
 		// zip the complete folder
 		File transferFile = null;
 

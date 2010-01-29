@@ -174,8 +174,9 @@ public class ReportingInitialiser {
 			throw new IllegalArgumentException("scriptSubDir must not be null!");
 
 		//Chairat, Should we remove this? Because it'll have the category after processing the descriptor file.
-//		if (baseCategory == null)
-//			throw new IllegalArgumentException("baseCategory must not be null!");
+		//Alex: No I think the check should be done here as the baseCategory is relied upon in later code
+		if (baseCategory == null)
+			throw new IllegalArgumentException("baseCategory must not be null!");
 
 		if (!ear.exists())
 			throw new IllegalArgumentException("The file or directory referenced by the 'ear' argument does not exist: " + ear.getAbsolutePath());

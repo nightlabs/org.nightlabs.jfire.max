@@ -5,6 +5,7 @@ package org.nightlabs.jfire.reporting.layout;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,24 +20,23 @@ import java.util.zip.InflaterInputStream;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.Queries;
 import javax.jdo.listener.StoreCallback;
 
 import org.nightlabs.io.DataBuffer;
+import org.nightlabs.jfire.reporting.layout.id.ReportLayoutLocalisationDataID;
 import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
 import org.nightlabs.util.IOUtil;
-
-import javax.jdo.annotations.FetchGroups;
-import javax.jdo.annotations.Inheritance;
-import javax.jdo.annotations.PrimaryKey;
-import org.nightlabs.jfire.reporting.layout.id.ReportLayoutLocalisationDataID;
-import javax.jdo.annotations.FetchGroup;
-import javax.jdo.annotations.PersistenceModifier;
-import javax.jdo.annotations.Persistent;
-import javax.jdo.annotations.InheritanceStrategy;
-import javax.jdo.annotations.Queries;
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.Column;
-import javax.jdo.annotations.IdentityType;
 
 /**
  * Holds the contents of a properties file that is used in report localisation.
@@ -306,6 +306,20 @@ public class ReportLayoutLocalisationData implements StoreCallback, Serializable
 			ReportRegistryItemID itemID = ReportRegistryItemID.create(organisationID, reportRegistryItemType, reportRegistryItemID);
 			ReportLayout layout = (ReportLayout) pm.getObjectById(itemID);
 			this.reportLayout = layout;
+		}
+	}
+	
+	public static void cleanFolderFromLocalisationData(File folder) {
+		File[] files = folder.listFiles(new FileFilter() {
+			@Override
+			public boolean accept(File pathname) {
+				return pathname.getName().startsWith(PROPERIES_FILE_PREFIX);
+			}
+		});
+		if (files != null) {
+			for (File file : files) {
+				file.delete();
+			}
 		}
 	}
 	

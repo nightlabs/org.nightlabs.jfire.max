@@ -48,12 +48,13 @@ public class RenderedReportLayout implements Serializable {
 	 * for a {@link RenderedReportLayout}
 	 */
 	public class Header implements Serializable {
-		private static final long serialVersionUID = 2L;
+		private static final long serialVersionUID = 20100129L;
 
 		private ReportRegistryItemID reportRegistryItemID;
 		private Birt.OutputFormat outputFormat;
 		private Date timestamp;
 		private boolean zipped;
+		private boolean multipleFiles;
 		private String entryFileName;
 		private Collection<Throwable> renderingErrors;
 
@@ -62,6 +63,7 @@ public class RenderedReportLayout implements Serializable {
 			this.timestamp = timestamp;
 			this.outputFormat = outputFormat;
 			this.zipped = false;
+			this.multipleFiles = false;
 			this.entryFileName = "renderedLayout."+outputFormat.toString();
 		}
 
@@ -134,10 +136,18 @@ public class RenderedReportLayout implements Serializable {
 		}
 
 		/**
+		 * Set whether the data of the {@link RenderedReportLayout} is/should be zipped.
+		 * <p>
+		 * Note that while {@link #isMultipleFiles()} is <code>true</code> this method will not
+		 * touch the value of zipped.
+		 * </p>
+		 * 
 		 * @param zipped the zipped to set
 		 */
 		public void setZipped(boolean zipped) {
-			this.zipped = zipped;
+			if (!isMultipleFiles()) {
+				this.zipped = zipped;
+			}
 		}
 
 		/**
@@ -168,6 +178,36 @@ public class RenderedReportLayout implements Serializable {
 		 */
 		public boolean hasRenderingErrors() {
 			return renderingErrors != null && renderingErrors.size() > 0;
+		}
+
+		/**
+		 * Returns whether the {@link RenderedReportLayout} consists of multiple files, if
+		 * this is <code>true</code> {@link #isZipped()} has to be <code>true</code> as well, in
+		 * order for a {@link RenderedReportLayout} to be transfered correctly.
+		 * 
+		 * @return Whether the {@link RenderedReportLayout} consists of multiple files.
+		 */
+		public boolean isMultipleFiles() {
+			return multipleFiles;
+		}
+
+		/**
+		 * Define whether this {@link RenderedReportLayout} consists of multiple files (like html
+		 * file with images).
+		 * <p>
+		 * Note, that a value of <code>true</code> forces {@link #isZipped()} to be
+		 * <code>true</code> as well. Setting a value of <code>false</code> here leaves
+		 * {@link #isZipped()} untouched.
+		 * </p>
+		 * 
+		 * @param multipleFiles Whether this {@link RenderedReportLayout} consists of multiple
+		 *            files.
+		 */
+		public void setMultipleFiles(boolean multipleFiles) {
+			this.multipleFiles = multipleFiles;
+			if (multipleFiles) {
+				zipped = true;
+			}
 		}
 	}
 

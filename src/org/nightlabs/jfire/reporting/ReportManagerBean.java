@@ -616,9 +616,10 @@ implements ReportManagerRemote
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("org.nightlabs.jfire.reporting.editReport")
 	public boolean importReportLayoutZipFile(File zipFile, ReportRegistryItemID registryItemID) {
+		File tmpFolder = null;
 		try {
 			//Unzip into tmp folder
-			File tmpFolder = IOUtil.createUserTempDir(TMP_FOLDER_PREFIX, TMP_FOLDER_SUFFIX);
+			tmpFolder = IOUtil.createUserTempDir(TMP_FOLDER_PREFIX, TMP_FOLDER_SUFFIX);
 			File reportFolder = new File(tmpFolder, zipFile.getName());
 			reportFolder.mkdir();
 			IOUtil.unzipArchive(zipFile, reportFolder);
@@ -640,73 +641,12 @@ implements ReportManagerRemote
 					getOrganisationID());
 			reportingInitialiser.initialise();
 			
-			tmpFolder.delete();
-//			//Create tmp layout file
-//			File tmpFile = File.createTempFile(IOUtil.getFileNameWithoutExtension(zipFile.getName()), ".rptdesign", tmpFolder);
-//			tmpFile.deleteOnExit();
-//			
-//			//Create template file
-//			File[] templateFiles = tmpFolder.listFiles(new FileFilter() {
-//				@Override
-//				public boolean accept(File pathname) {
-//					return pathname.isFile() && IOUtil.getFileNameWithoutExtension(pathname.getName()).equals(IOUtil.getFileNameWithoutExtension(zipFile.getName()));
-//				}
-//			});
-//			
-//			if (templateFiles == null) 
-//				return false;
-//
-//			ReportingInitialiser.importTemplateToLayoutFile(templateFiles[0], tmpFile);
-//			
-//			PersistenceManager pm = createPersistenceManager();
-
-//			ReportCategory category = (ReportCategory)pm.getObjectById(reportCategoryID);
-//			ReportLayout layout = new ReportLayout(category, category.getOrganisationID(), "REPORT_REGISTRY_ITEM_TYPE_UNKNOWN", IOUtil
-//					.getFileNameWithoutExtension(zipFile.getName()), "BIRT");
-//			layout.getName().copyFrom(name);
-//			layout.loadFile(templateFiles[0]);
-//			layout = pm.makePersistent(layout);
-//			category.addChildItem(layout);
-			
-			//From createReportLocalisationData
-			//TODO: Should we do like this?
-//			pm.getExtent(ReportLayoutLocalisationData.class);
-
-//			File resourceFolder = new File(tmpFolder, "resource");
-//			File[] resourceFiles = resourceFolder.listFiles(new FileFilter() {
-//				public boolean accept(File pathname) {
-//					return pathname.isFile() && pathname.getName().startsWith(zipFile.getName());
-//				}
-//			});
-//			
-//			if (resourceFiles == null)
-//				return false;
-//			for (File resFile : resourceFiles) {
-//				String locale = ReportLayoutLocalisationData.extractLocale(resFile.getName());
-//				if (locale == null)
-//					locale = "";
-//				ReportLayoutLocalisationDataID localisationDataID = ReportLayoutLocalisationDataID.create(
-//						layout.getOrganisationID(), layout.getReportRegistryItemType(), layout.getReportRegistryItemID(), locale
-//				);
-//				ReportLayoutLocalisationData localisationData = null;
-//				try {
-//					localisationData = (ReportLayoutLocalisationData) pm.getObjectById(localisationDataID);
-//					localisationData.getLocale();
-//				} catch (JDOObjectNotFoundException e) {
-//					localisationData = new ReportLayoutLocalisationData(layout, locale);
-//					localisationData = pm.makePersistent(localisationData);
-//				}
-//				try {
-//					localisationData.loadFile(resFile);
-//				} catch (IOException e) {
-//					throw new ReportingInitialiserException("Could not load localisatino file "+resFile, e);
-//				}
-//			}
-			
 		} catch (Exception e) {
 			throw new RuntimeException(e);
+		} finally {
+			if (tmpFolder != null)
+				tmpFolder.delete();
 		}
-   
 		return true;
 	}
 }

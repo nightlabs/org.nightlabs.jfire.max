@@ -607,7 +607,7 @@ implements ReportManagerRemote
 		}
 	}
 	
-	private static final String TMP_FOLDER_PREFIX = "jfire_report.imported.";
+	private static final String TMP_FOLDER_PREFIX = "jfire_report.server.imported.";
 	private static final String TMP_FOLDER_SUFFIX = ".report";
 	/*
 	 * (non-Javadoc)

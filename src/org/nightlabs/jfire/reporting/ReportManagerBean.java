@@ -27,6 +27,7 @@
 package org.nightlabs.jfire.reporting;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -615,14 +616,17 @@ implements ReportManagerRemote
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("org.nightlabs.jfire.reporting.editReport")
-	public boolean importReportLayoutZipFile(File zipFile, ReportRegistryItemID registryItemID) {
+	public boolean importReportLayoutZipFile(byte[] zipFileData/*File zipFile*/, ReportRegistryItemID registryItemID) {
 		File tmpFolder = null;
 		try {
 			//Unzip into tmp folder
 			tmpFolder = IOUtil.createUserTempDir(TMP_FOLDER_PREFIX, TMP_FOLDER_SUFFIX);
-			File reportFolder = new File(tmpFolder, zipFile.getName());
+			
+			FileOutputStream fos = new FileOutputStream(tmpFolder + "\\data.zip");
+			fos.write(zipFileData);
+			File reportFolder = new File(tmpFolder, "zipData");
 			reportFolder.mkdir();
-			IOUtil.unzipArchive(zipFile, reportFolder);
+			IOUtil.unzipArchive(new File(tmpFolder + "\\data.zip"), reportFolder);
 			tmpFolder.deleteOnExit();
 			
 			ReportCategory reportCategory;

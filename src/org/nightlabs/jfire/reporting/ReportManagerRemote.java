@@ -249,9 +249,9 @@ public interface ReportManagerRemote {
 			String[] fetchGroups, int maxFetchDepth);
 
 	/**
-	 * @param reportLayoutZipFile
+	 * @param zipFileData
 	 * @param reportCateogoryID
 	 * @return true if the layout's imported successfully
 	 */
-	boolean importReportLayoutZipFile(File reportLayoutZipFile, ReportRegistryItemID reportCateogoryID);
+	boolean importReportLayoutZipFile(byte[] zipFileData, ReportRegistryItemID reportCateogoryID);
 }

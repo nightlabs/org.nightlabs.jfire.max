@@ -131,6 +131,10 @@ implements Serializable, StoreCallback
 		return decimalDigitCount;
 	}
 
+	public void setDecimalDigitCount(int decimalDigitCount) {
+		this.decimalDigitCount = decimalDigitCount;
+	}
+	
 	@Override
 	public boolean equals(Object obj)
 	{

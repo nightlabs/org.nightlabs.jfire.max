@@ -176,6 +176,21 @@ implements Serializable, org.nightlabs.l10n.Currency
 	 * @return the approximate value as long - there might be rounding differences.
 	 */
 	public long toLong(double amount) {
-		return (long)(amount * Math.pow(10, getDecimalDigitCount()));
+		return Math.round(amount * Math.pow(10, getDecimalDigitCount()));
+		// 2010-02-03: Switched from (long)(...) cast to Math.round(...), because the following code
+		// otherwise produces a wrong result (4079 instead of 4080). Marco.
+		//				public static void main(String[] args) {
+		//					BigDecimal a = new BigDecimal(10200).setScale(2);
+		//					BigDecimal b = a.divide(new BigDecimal(250));
+		//					System.out.println(b);
+		//					double d = b.doubleValue();
+		//					System.out.println(d);
+		//
+		//					long l = (long) (d * Math.pow(10, 2));
+		//					System.out.println(l);
+		//
+		//					l = (long) (d * 100);
+		//					System.out.println(l);
+		//				}
 	}
 }

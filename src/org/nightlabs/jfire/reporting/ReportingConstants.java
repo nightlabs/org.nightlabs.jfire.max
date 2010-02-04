@@ -24,6 +24,7 @@ import org.nightlabs.util.TimePeriod;
 public class ReportingConstants {
 	
 	public static final String DESCRIPTOR_FILE 						= "content.xml"; //$NON-NLS-1$
+	public static final String TEXT_PART_CONFIGURATION_FILE_SUFFIX	= ".ReportTextPartConfiguration.xml"; //$NON-NLS-1$
 	
 	public static final String DESCRIPTOR_FILE_ENCODING				= "utf-8"; //$NON-NLS-1$
 	public static final String DESCRIPTOR_FILE_DOCTYPE_SYSTEM		= "http://www.nightlabs.de/dtd/reporting-initialiser-content_0_5.dtd"; //$NON-NLS-1$
@@ -89,6 +90,13 @@ public class ReportingConstants {
 	
 	public static final String BINDING_CONSUMER_ELEMENT								= "binding-consumer"; //$NON-NLS-1$
 	public static final String BINDING_CONSUMER_ELEMENT_ATTRIBUTE_ID				= "id"; //$NON-NLS-1$
+	
+	public static final String REPORT_TEXT_PART_CONFIGURATION_ELEMENT				= "reportTextPartConfiguration"; //$NON-NLS-1$
+	public static final String REPORT_TEXT_PART_ELEMENT								= "reportTextPart"; //$NON-NLS-1$
+	public static final String REPORT_TEXT_PART_ELEMENT_ATTRIBUTE_ID				= "id"; //$NON-NLS-1$
+	public static final String REPORT_TEXT_PART_ELEMENT_ATTRIBUTE_TYPE				= "type"; //$NON-NLS-1$
+	public static final String REPORT_TEXT_PART_NAME_ELEMENT						= "name"; //$NON-NLS-1$
+	public static final String REPORT_TEXT_PART_CONTENT_ELEMENT						= "content"; //$NON-NLS-1$
 	
 	
 	// TODO: Add things like Geography data

@@ -616,17 +616,18 @@ implements ReportManagerRemote
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("org.nightlabs.jfire.reporting.editReport")
-	public boolean importReportLayoutZipFile(byte[] zipFileData/*File zipFile*/, ReportRegistryItemID registryItemID) {
+	public boolean importReportLayoutZipFile(byte[] zipFileData, ReportRegistryItemID registryItemID) {
 		File tmpFolder = null;
 		try {
 			//Unzip into tmp folder
 			tmpFolder = IOUtil.createUserTempDir(TMP_FOLDER_PREFIX, TMP_FOLDER_SUFFIX);
 			
-			FileOutputStream fos = new FileOutputStream(tmpFolder + "\\data.zip");
+			File tmpZipFile = new File(tmpFolder, "data.zip");
+			FileOutputStream fos = new FileOutputStream(tmpZipFile);
 			fos.write(zipFileData);
 			File reportFolder = new File(tmpFolder, "zipData");
 			reportFolder.mkdir();
-			IOUtil.unzipArchive(new File(tmpFolder + "\\data.zip"), reportFolder);
+			IOUtil.unzipArchive(tmpZipFile, reportFolder);
 			tmpFolder.deleteOnExit();
 			
 			ReportCategory reportCategory;
@@ -634,17 +635,16 @@ implements ReportManagerRemote
 			try {
 				pm.getFetchPlan().setMaxFetchDepth(NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
 				reportCategory = (ReportCategory)pm.getObjectById(registryItemID);
+				
+				ReportingInitialiser reportingInitialiser = new ReportingInitialiser(tmpFolder, 
+						"", 
+						reportCategory, 
+						pm, 
+						getOrganisationID());
+				reportingInitialiser.initialise();
 			} finally {
 				pm.close();
 			}
-			
-			ReportingInitialiser reportingInitialiser = new ReportingInitialiser(tmpFolder, 
-					"", 
-					reportCategory, 
-					createPersistenceManager(), 
-					getOrganisationID());
-			reportingInitialiser.initialise();
-			
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		} finally {

@@ -132,7 +132,7 @@ implements Serializable, StoreCallback
 	}
 
 	public void setDecimalDigitCount(int decimalDigitCount) {
-		this.decimalDigitCount = decimalDigitCount;
+		throw new IllegalStateException("The decimal digit count has already been set!!");
 	}
 	
 	@Override

@@ -5,6 +5,9 @@ package org.nightlabs.jfire.reporting.scheduled;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.security.RolesAllowed;
@@ -25,6 +28,9 @@ import org.nightlabs.jfire.reporting.layout.render.ReportLayoutRendererUtil;
 import org.nightlabs.jfire.reporting.scheduled.id.ScheduledReportID;
 import org.nightlabs.jfire.timer.Task;
 import org.nightlabs.jfire.timer.id.TaskID;
+import org.nightlabs.timepattern.InputTimePattern;
+import org.nightlabs.timepattern.InputTimePatternPeriod;
+import org.nightlabs.util.TimePeriod;
 
 /**
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
@@ -82,6 +88,10 @@ implements ScheduledReportManagerLocal, ScheduledReportManagerRemote
 			if (logger.isDebugEnabled())
 				logger.debug("processScheduledReport have reportLayoutID " + reportLayoutID);
 			
+			Map<String, Object> newParams = convertScheduledReportParams(scheduledReport, renderReportRequest);
+			renderReportRequest.setParameters(newParams);
+			
+			
 			IScheduledReportDeliveryDelegate deliveryDelegate = scheduledReport.getDeliveryDelegate();
 			if (deliveryDelegate == null) {
 				throw new IllegalStateException("Can not render ScheduledReport as no ScheduledReportDeliveryDelegate is set for it. "
@@ -104,6 +114,45 @@ implements ScheduledReportManagerLocal, ScheduledReportManagerRemote
 		} finally {
 			pm.close();
 		}
+	}
+
+	private Map<String, Object> convertScheduledReportParams(ScheduledReport scheduledReport, RenderReportRequest renderReportRequest)
+			throws Exception {
+		if (logger.isDebugEnabled())
+			logger.debug("Check report parameters for InputTimePatterns and converting to Date");
+		// We make sure we can modify the map
+		Map<String, Object> newParams = new HashMap<String, Object>(renderReportRequest.getParameters());
+		Map<String, Object> convertedParams = new HashMap<String, Object>();
+		Date now = new Date();
+		for (Map.Entry<String, Object> paramEntry : newParams.entrySet()) {
+			Object paramValue = paramEntry.getValue();
+			if (paramValue instanceof InputTimePattern) {
+				if (logger.isDebugEnabled())
+					logger.debug("Have InputTimePattern for parameter " + paramEntry.getKey() + ", converting....");
+				Date convertedParam = null;
+				try {
+					convertedParam = ((InputTimePattern) paramValue).getTime(now);
+					if (logger.isDebugEnabled())
+						logger.debug("InputTimePattern for parameter " + paramEntry.getKey() + ", converted " + paramValue + " to " + convertedParam);
+				} catch (Exception e) {
+					logger.error("Error converting InputTimePattern parameter of schedledReport "
+							+ ScheduledReport.describeScheduledReport(scheduledReport)
+							+ " to a date. Will proceed with un-set parameter.", e);
+					convertedParam = null;
+				}
+				convertedParams.put(paramEntry.getKey(), convertedParam);
+			}
+			if (paramValue instanceof InputTimePatternPeriod) {
+				if (logger.isDebugEnabled())
+					logger.debug("Have InputTimePatternPeriod for parameter " + paramEntry.getKey() + ", converting....");
+				TimePeriod convertedParam = ((InputTimePatternPeriod) paramValue).getTimePeriod(now, false);
+				if (logger.isDebugEnabled())
+					logger.debug("InputTimePattern for parameter " + paramEntry.getKey() + ", converted " + paramValue + " to " + convertedParam);
+				convertedParams.put(paramEntry.getKey(), convertedParam);
+			}
+		}
+		newParams.putAll(convertedParams);
+		return newParams;
 	}
 
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)

@@ -20,20 +20,20 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.Map.Entry;
 
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
+
 import org.apache.log4j.Logger;
 import org.nightlabs.jfire.reporting.parameter.ValueProvider;
 import org.nightlabs.jfire.reporting.parameter.ValueProviderInputParameter;
-import org.nightlabs.util.Util;
-
-import javax.jdo.annotations.FetchGroups;
-import javax.jdo.annotations.PrimaryKey;
-import javax.jdo.annotations.FetchGroup;
-import javax.jdo.annotations.PersistenceModifier;
 import org.nightlabs.jfire.reporting.parameter.config.id.ValueAcquisitionSetupID;
-import javax.jdo.annotations.Persistent;
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.Column;
-import javax.jdo.annotations.IdentityType;
+import org.nightlabs.util.Util;
 
 /**
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
@@ -249,6 +249,25 @@ implements Serializable
 	 */
 	public Set<ValueConsumerBinding> getValueConsumerBindings() {
 		return valueConsumerBindings;
+	}
+	
+	/**
+	 * Returns all {@link ValueConsumerBinding} that have the given {@link ValueProviderConfig} as
+	 * provider.
+	 * 
+	 * @param valueProviderConfig The {@link ValueProviderConfig} for which all consumer-bindings
+	 *            should be searched.
+	 * @return All {@link ValueConsumerBinding} that have the given {@link ValueProviderConfig} as
+	 *         provider.
+	 */
+	public Set<ValueConsumerBinding> getValueConsumerBindingsForProvider(ValueProviderConfig valueProviderConfig) {
+		Set<ValueConsumerBinding> result = new HashSet<ValueConsumerBinding>();
+		for (ValueConsumerBinding binding : getValueConsumerBindings()) {
+			if (valueProviderConfig != null && valueProviderConfig.equals(binding.getProvider())) {
+				result.add(binding);
+			}
+		}
+		return result;
 	}
 
 //	/**

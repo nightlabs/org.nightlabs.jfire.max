@@ -131,10 +131,6 @@ implements Serializable, StoreCallback
 		return decimalDigitCount;
 	}
 
-	public void setDecimalDigitCount(int decimalDigitCount) {
-		throw new IllegalStateException("The decimal digit count has already been set!!");
-	}
-	
 	@Override
 	public boolean equals(Object obj)
 	{

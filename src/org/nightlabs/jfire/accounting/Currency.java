@@ -115,11 +115,6 @@ implements Serializable, org.nightlabs.l10n.Currency
 		return currencyID;
 	}
 
-	public void setDecimalDigitCount(int decimalDigitCount) {
-		throw new IllegalStateException("The decimal digit cound has already been set!!");
-//		this.decimalDigitCount = decimalDigitCount;
-	}
-
 	@Override
 	public int getDecimalDigitCount()
 	{

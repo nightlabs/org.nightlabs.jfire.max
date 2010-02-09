@@ -44,6 +44,7 @@ import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.trade.Trader;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 import org.nightlabs.jfire.webshop.id.WebCustomerID;
+import org.nightlabs.util.CollectionUtil;
 
 /**
  * @author khaled
@@ -184,7 +185,6 @@ implements WebShopRemote
 	 * @ejb.transaction type="Required"
 	 */	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("_Guest_")
-
 	public WebCustomer createWebCustomer(WebCustomerID webCustomerID, String password, Person person, boolean get, String[] fetchGroups, int maxFetchDepth) throws DuplicateIDException
 	{
 		PersistenceManager pm = createPersistenceManager();
@@ -215,7 +215,6 @@ implements WebShopRemote
 	 * @ejb.permission role-name="_Guest_"
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */	@RolesAllowed("_Guest_")
-
 	public boolean isWebCustomerIDExisting(WebCustomerID webCustomerID, PersistenceManager pm)
 	{
 		try {
@@ -228,10 +227,14 @@ implements WebShopRemote
 	/* (non-Javadoc)
 	 * @see org.nightlabs.jfire.web.webshop.WebShopRemote#getWebCustomerByEmail(java.lang.String)
 	 */	@RolesAllowed("_Guest_")
-
-	public Collection<WebCustomer> getWebCustomerByEmail(String email)
+	public Collection<WebCustomerID> getWebCustomerIDsByEmail(String email)
 	{
-		return WebCustomer.getWebCustomerWithEmail(createPersistenceManager(), email);
+		PersistenceManager pm = createPersistenceManager();
+		try {
+			 return NLJDOHelper.getObjectIDList(WebCustomer.getWebCustomerWithEmail(pm, email));
+		} finally {
+			pm.close();
+		}
 	}
 
 	/**
@@ -374,7 +377,6 @@ implements WebShopRemote
 		PersistenceManager pm = createPersistenceManager();
 		try {
 			Collection<WebCustomer> customer = WebCustomer.getWebCustomerWithEmail(pm, email);
-
 			return (customer.size()>0);
 		} finally {
 			pm.close();

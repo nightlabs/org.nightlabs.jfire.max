@@ -102,7 +102,7 @@ public interface WebShopRemote {
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
 	@RolesAllowed("_Guest_")
-	Collection<WebCustomer> getWebCustomerByEmail(String email);
+	Collection<WebCustomerID> getWebCustomerIDsByEmail(String email);
 
 	/**
 	 * Check if a customer can login. This is done by checking

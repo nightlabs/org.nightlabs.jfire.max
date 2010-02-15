@@ -31,16 +31,17 @@ import org.nightlabs.jfire.trade.recurring.RecurringOffer;
 import org.nightlabs.jfire.trade.recurring.RecurringOrder;
 
 /**
+ * This is a user-based {@link ConfigModule} that is used to store the {@link Currency} a JFire-user
+ * utilizes and the prefixes that should be used when creating new {@link ArticleContainer}s.
+ * 
  * @author Marco Schulze - marco at nightlabs dot de
- *
- *  @jdo.persistence-capable
- *		identity-type="application"
- *		persistence-capable-superclass="org.nightlabs.jfire.config.ConfigModule"
- *		detachable="true"
- *		table="JFireTrade_TradeConfigModule"
- *
+ * 
+ * @jdo.persistence-capable identity-type="application"
+ *                          persistence-capable-superclass="org.nightlabs.jfire.config.ConfigModule"
+ *                          detachable="true" table="JFireTrade_TradeConfigModule"
+ * 
  * @jdo.inheritance strategy = "new-table"
- *
+ * 
  * @jdo.fetch-group name="TradeConfigModule.currency" fields="currency"
  * @jdo.fetch-group name="TradeConfigModule.idPrefixCfs" fields="idPrefixCfs"
  */

@@ -2,10 +2,13 @@ package org.nightlabs.jfire.personrelation;
 
 import java.util.Collection;
 import java.util.Deque;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.ejb.Remote;
 
+import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jfire.personrelation.id.PersonRelationID;
 import org.nightlabs.jfire.personrelation.id.PersonRelationTypeID;
 import org.nightlabs.jfire.prop.id.PropertySetID;
@@ -62,5 +65,9 @@ public interface PersonRelationManagerRemote {
 			Set<PersonRelationTypeID> relationTypeIDs,
 			PropertySetID startPoint, int maxDepth
 	);
+
+	Map<Class<? extends ObjectID>, List<Deque<ObjectID>>> getRootNodes(
+			Set<PersonRelationTypeID> relationTypeIDs,
+			PropertySetID startPoint, int maxDepth);
 
 }

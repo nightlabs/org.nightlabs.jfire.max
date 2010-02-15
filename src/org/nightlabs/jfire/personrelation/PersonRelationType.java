@@ -72,17 +72,9 @@ implements Serializable
 				Organisation.DEV_ORGANISATION_ID, "subsidiary"
 		);
 
-		public static final PersonRelationTypeID branchOffice = PersonRelationTypeID.create(
-				Organisation.DEV_ORGANISATION_ID, "branch"
-		);
-		
-		// Handle "@Location" links.
-		public static final PersonRelationTypeID mainLocation = PersonRelationTypeID.create(
-				Organisation.DEV_ORGANISATION_ID, "mainLocation"
-		);
-		public static final PersonRelationTypeID branchLocation = PersonRelationTypeID.create(
-				Organisation.DEV_ORGANISATION_ID, "branchLocation"
-		);
+//		public static final PersonRelationTypeID branchOffice = PersonRelationTypeID.create(
+//				Organisation.DEV_ORGANISATION_ID, "branch"
+//		);
 	}
 
 	public static final String FETCH_GROUP_NAME = "PersonRelationType.name";

@@ -43,6 +43,7 @@ import java.util.Set;
 import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
+import javax.jdo.Query;
 import javax.jdo.annotations.Column;
 import javax.jdo.annotations.IdentityType;
 import javax.jdo.annotations.Inheritance;
@@ -51,6 +52,7 @@ import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.PersistenceModifier;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.Queries;
 import javax.jdo.listener.StoreCallback;
 
 import org.apache.log4j.Logger;
@@ -121,6 +123,9 @@ import org.nightlabs.jfire.transfer.Transfer;
 	detachable="true",
 	table="JFireTrade_Accounting")
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
+@Queries({
+	@javax.jdo.annotations.Query(name="getAccounting", value="SELECT UNIQUE")
+})
 public class Accounting
 implements StoreCallback
 {
@@ -138,11 +143,19 @@ implements StoreCallback
 	 */
 	public static Accounting getAccounting(PersistenceManager pm)
 	{
-		Iterator<Accounting> it = pm.getExtent(Accounting.class).iterator();
-		if (it.hasNext())
-			return it.next();
+		// Unfortunately, DataNucleus creates a new Query instance everytime 'pm.getExtent(...).iterator()' is called and it keeps
+		// this Query instance until the PM is closed :-( Therefore, we now use a simple named query - it seems to exist only once per PM.
+		// Marco. 2010-02-16
+		Query q = pm.newNamedQuery(Accounting.class, "getAccounting");
+		Accounting accounting = (Accounting) q.execute();
+		q.closeAll();
+		if (accounting != null)
+			return accounting;
+//		Iterator<Accounting> it = pm.getExtent(Accounting.class).iterator();
+//		if (it.hasNext())
+//			return it.next();
 
-		Accounting accounting = new Accounting();
+		accounting = new Accounting();
 
 		String organisationID = LocalOrganisation.getLocalOrganisation(pm).getOrganisationID();
 		accounting.organisationID = organisationID;

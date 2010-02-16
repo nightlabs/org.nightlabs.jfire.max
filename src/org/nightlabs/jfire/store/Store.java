@@ -42,6 +42,7 @@ import java.util.Set;
 import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
+import javax.jdo.Query;
 import javax.jdo.annotations.Column;
 import javax.jdo.annotations.IdentityType;
 import javax.jdo.annotations.Inheritance;
@@ -50,6 +51,7 @@ import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.PersistenceModifier;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.Queries;
 import javax.jdo.listener.StoreCallback;
 
 import org.apache.log4j.Logger;
@@ -123,6 +125,9 @@ import org.nightlabs.jfire.transfer.Transfer;
 	detachable="true",
 	table="JFireTrade_Store")
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
+@Queries({
+	@javax.jdo.annotations.Query(name="getStore", value="SELECT UNIQUE")
+})
 public class Store
 implements StoreCallback
 {
@@ -140,9 +145,16 @@ implements StoreCallback
 	 */
 	public static Store getStore(PersistenceManager pm)
 	{
-		Iterator<Store> it = pm.getExtent(Store.class).iterator();
-		if (it.hasNext()) {
-			Store store = it.next();
+		// Unfortunately, DataNucleus creates a new Query instance everytime 'pm.getExtent(...).iterator()' is called and it keeps
+		// this Query instance until the PM is closed :-( Therefore, we now use a simple named query - it seems to exist only once per PM.
+		// Marco. 2010-02-16
+		Query q = pm.newNamedQuery(Store.class, "getStore");
+		Store store = (Store) q.execute();
+		q.closeAll();
+		if (store != null) {
+//		Iterator<Store> it = pm.getExtent(Store.class).iterator();
+//		if (it.hasNext()) {
+//			Store store = it.next();
 
 			// TODO remove this debug stuff
 			String securityReflectorOrganisationID = SecurityReflector.getUserDescriptor().getOrganisationID();
@@ -153,7 +165,7 @@ implements StoreCallback
 			return store;
 		}
 
-		Store store = new Store();
+		store = new Store();
 
 		// initialize the organisationID
 		LocalOrganisation localOrganisation = LocalOrganisation.getLocalOrganisation(pm);

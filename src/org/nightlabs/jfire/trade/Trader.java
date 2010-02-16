@@ -45,6 +45,7 @@ import java.util.Set;
 import javax.ejb.CreateException;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
+import javax.jdo.Query;
 import javax.jdo.annotations.Column;
 import javax.jdo.annotations.IdentityType;
 import javax.jdo.annotations.Inheritance;
@@ -53,6 +54,7 @@ import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.PersistenceModifier;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.Queries;
 import javax.naming.NamingException;
 
 import org.apache.log4j.Logger;
@@ -140,6 +142,9 @@ import org.nightlabs.l10n.NumberFormatter;
 	detachable="true",
 	table="JFireTrade_Trader")
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
+@Queries({
+	@javax.jdo.annotations.Query(name="getTrader", value="SELECT UNIQUE")
+})
 public class Trader
 {
 	/**
@@ -156,9 +161,16 @@ public class Trader
 	 */
 	public static Trader getTrader(PersistenceManager pm)
 	{
-		Iterator<?> it = pm.getExtent(Trader.class).iterator();
-		if (it.hasNext()) {
-			Trader trader = (Trader) it.next();
+		// Unfortunately, DataNucleus creates a new Query instance everytime 'pm.getExtent(...).iterator()' is called and it keeps
+		// this Query instance until the PM is closed :-( Therefore, we now use a simple named query - it seems to exist only once per PM.
+		// Marco. 2010-02-16
+		Query q = pm.newNamedQuery(Trader.class, "getTrader");
+		Trader trader = (Trader) q.execute();
+		q.closeAll();
+		if (trader != null) {
+//		Iterator<?> it = pm.getExtent(Trader.class).iterator();
+//		if (it.hasNext()) {
+//			Trader trader = (Trader) it.next();
 			// TODO remove this debug stuff
 			String securityReflectorOrganisationID = SecurityReflector.getUserDescriptor().getOrganisationID();
 			if (!securityReflectorOrganisationID.equals(trader.getOrganisationID()))
@@ -169,7 +181,7 @@ public class Trader
 
 		logger.info("getTrader: The Trader instance does not yet exist! Creating it...");
 
-		Trader trader = new Trader();
+		trader = new Trader();
 
 		trader.store = Store.getStore(pm);
 		trader.accounting = Accounting.getAccounting(pm);

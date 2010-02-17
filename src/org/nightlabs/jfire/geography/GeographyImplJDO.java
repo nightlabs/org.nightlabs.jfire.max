@@ -75,19 +75,24 @@ extends GeographyImplResourceCSV
 		return new Lookup(getOrganisationID()).createPersistenceManager();
 	}
 
+		
 	@Override
 	protected InputStream createCountryCSVInputStream()
 	{
 		String organisationID = getRootOrganisationID();
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			byte[] data = CSV.getCSVData(pm, organisationID, CSV.CSV_TYPE_COUNTRY, "");
+			byte[] data = CSV.getCSVsData(pm, organisationID,CSV.CSV_TYPE_COUNTRY);
+			// data has been inflated already !!!
+			if(data != null)
+				return new ByteArrayInputStream(data);
 			if (data == null) {
 				data = deflate(super.createCountryCSVInputStream());
 				CSV.setCSVData(pm, organisationID, CSV.CSV_TYPE_COUNTRY, "", data);
 			}
 			return data == null ? null : new InflaterInputStream(new ByteArrayInputStream(data));
-		} finally {
+		} 
+		finally {
 			pm.close();
 		}
 	}

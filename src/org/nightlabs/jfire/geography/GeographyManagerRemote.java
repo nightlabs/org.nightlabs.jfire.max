@@ -141,6 +141,16 @@ public interface GeographyManagerRemote {
 	@RolesAllowed("_Guest_")
 	byte[] getCSVData(String csvType, String countryID);
 
+	
+	/**
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	@RolesAllowed("_Guest_")
+	byte[] getCSVsData(String csvType);
+	
+	
+	
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"

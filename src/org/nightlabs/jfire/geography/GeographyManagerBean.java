@@ -457,6 +457,38 @@ implements GeographyManagerRemote
 		}
 	}
 
+	@RolesAllowed("_Guest_")
+	public byte[] getCSVsData(String csvType)
+	{
+	PersistenceManager pm = createPersistenceManager();
+	pm.getFetchPlan().setMaxFetchDepth(1);
+	pm.getFetchPlan().setGroup(FetchPlan.ALL);
+	try {
+		InitialContext initialContext = new InitialContext();
+		try {
+			byte[] data = CSV.getCSVsData(pm, Organisation.getRootOrganisationID(initialContext), csvType);
+			if (data == null) {
+				Geography.sharedInstance().needCountries();
+				data = CSV.getCSVsData(pm, Organisation.getRootOrganisationID(initialContext), csvType);
+		}
+			return data;
+		} finally {
+			initialContext.close();
+		}
+	} catch (NamingException x) {
+		throw new RuntimeException(x); // it's definitely an unexpected exception if we can't access the local JNDI.
+	}
+	finally {
+		pm.close();
+	}
+}
+	
+	
+	
+	
+	
+	
+	
 	/* (non-Javadoc)
 	 * @see org.nightlabs.jfire.geography.GeographyManagerRemote#getGeographyObject(org.nightlabs.jdo.ObjectID, java.lang.String[], int)
 	 */

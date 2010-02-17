@@ -2,27 +2,33 @@ package org.nightlabs.jfire.geography;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.zip.InflaterInputStream;
 
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.Queries;
+import javax.jdo.annotations.Query;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.jfire.geography.id.CSVID;
+import org.nightlabs.util.CollectionUtil;
 import org.nightlabs.util.IOUtil;
 
-import javax.jdo.annotations.Persistent;
-import javax.jdo.annotations.FetchGroups;
-import javax.jdo.annotations.InheritanceStrategy;
-import javax.jdo.annotations.Inheritance;
-import javax.jdo.annotations.PrimaryKey;
-import javax.jdo.annotations.FetchGroup;
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.Column;
-import javax.jdo.annotations.IdentityType;
-import javax.jdo.annotations.PersistenceModifier;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -48,6 +54,11 @@ import javax.jdo.annotations.PersistenceModifier;
 	@FetchGroup(
 		name=CSV.FETCH_GROUP_DATA,
 		members=@Persistent(name="data"))
+)
+@Queries(
+	@Query(
+		name="getCSVIDsForCSVType",
+		value="SELECT JDOHelper.getObjectId(this) WHERE this.csvType == :csvType")
 )
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class CSV
@@ -86,7 +97,43 @@ implements Serializable
 			return null;
 		}
 	}
-
+	
+	/**
+	 * this method is used to get all the data of the group of single csvType(example all countries, all regions etc..) 
+	 * @param pm The PersistenceManager.
+	 * @param organisationID This <code>must</code> be the root-organisation's ID, because only this organisation is allowed to edit the geography data.
+	 * @param csvType One of the <code>CSV_TYPE_</code>-constants.
+	 * @return the overall inflated data of all CVS based on the chosed CSV_TYPE_.
+	 */
+	public static byte[] getCSVsData(PersistenceManager pm, String organisationID,  String csvType)
+	{		
+		javax.jdo.Query q = pm.newNamedQuery(CSV.class, "getCSVIDsForCSVType");
+		Collection<CSVID> csvcIDs = CollectionUtil.castCollection((Collection<?>) q.execute(csvType));	
+		try{
+			ByteArrayOutputStream out = new ByteArrayOutputStream();
+			for(CSVID csvcID:csvcIDs)
+			{
+				byte[] inData = CSV.getCSVData(pm, organisationID, csvType, csvcID.countryID);
+				InflaterInputStream in = new InflaterInputStream(new ByteArrayInputStream(inData));
+				int c;
+				try {
+					while ((c = in.read())!= -1) 
+						out.write(c);
+				}
+				finally {
+					in.close();
+				}			
+			}
+			byte[] outData = out.toByteArray();
+			out.close();
+			return outData.length > 0  ? outData : null;
+		}
+		catch (IOException x) {
+			return null;
+		}
+	}
+	
+	
 	/**
 	 * @param pm The PersistenceManager.
 	 * @param organisationID This <code>must</code> be the root-organisation's ID, because only this organisation is allowed to edit the geography data.

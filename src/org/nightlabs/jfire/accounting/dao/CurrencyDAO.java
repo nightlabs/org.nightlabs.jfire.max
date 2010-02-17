@@ -1,6 +1,5 @@
 package org.nightlabs.jfire.accounting.dao;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -61,10 +60,9 @@ public class CurrencyDAO extends BaseJDOObjectDAO<CurrencyID, Currency>
 	public List<Currency> getCurrencies(ProgressMonitor monitor)
 	{
 		try {
-			// TODO this sucks! Should not call the retrieve method directly! Obtain the IDs instead and then call getJDOObjects(...)!
-			ArrayList<Currency> list = new ArrayList<Currency>(retrieveJDOObjects(null, FETCH_GROUPS, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT, monitor));
-			getCache().putAll(null, list, FETCH_GROUPS, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
-			return list;
+			AccountingManagerRemote am = JFireEjb3Factory.getRemoteBean(AccountingManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			Collection<CurrencyID> currencyIDs = am.getCurrencyIDs();
+			return getJDOObjects(null, currencyIDs, FETCH_GROUPS, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT, monitor);
 		} catch (Exception e) {
 			throw new RuntimeException("Error while fetching Currencies: " + e.getMessage(), e); //$NON-NLS-1$
 		}

@@ -123,6 +123,8 @@ public interface AccountingManagerRemote {
 	Collection<Currency> getCurrencies(Collection<CurrencyID> currencyIDs,
 			String[] fetchGroups, int maxFetchDepth);
 
+	Collection<CurrencyID> getCurrencyIDs();
+	
 	Set<AnchorID> getAccountIDs(AccountSearchFilter searchFilter);
 
 

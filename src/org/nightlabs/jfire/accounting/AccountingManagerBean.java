@@ -634,6 +634,20 @@ implements AccountingManagerRemote, AccountingManagerLocal
 		}
 	}
 
+	@RolesAllowed("_Guest_")
+	@SuppressWarnings("unchecked")
+	@Override
+	public Collection<CurrencyID> getCurrencyIDs() {
+		PersistenceManager pm = createPersistenceManager();
+		try {
+			Query q = pm.newQuery(Currency.class);
+			q.setResult("JDOHelper.getObjectId(this)");
+			return new HashSet<CurrencyID>((Collection<? extends CurrencyID>) q.execute());
+		} finally {
+			pm.close();
+		}
+	}
+	
 //	/**
 //	* @ejb.interface-method
 //	* @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.

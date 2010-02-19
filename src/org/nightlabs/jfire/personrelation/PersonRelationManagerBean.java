@@ -6,7 +6,6 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -118,42 +117,6 @@ implements PersonRelationManagerRemote
 					personRelationType.getDescription().readFromProperties(baseName, loader, "org.nightlabs.jfire.personrelation.PersonRelationType-subsidiary.description"); //$NON-NLS-1$
 				}
 			}
-
-// Not necessary. This is a subsidiary - and if not (i.e. if some specific customer wants other JFire relation types, then we have to put these
-// into a customer-specific project  not this JFire-generic project! Marco.
-//			{
-//				// TODO: do we need an inverse relation for that?
-//				PersonRelationTypeID personRelationTypeID = PersonRelationType.PredefinedRelationTypes.branchOffice;
-//				try {
-//					pm.getObjectById(personRelationTypeID);
-//				} catch (JDOObjectNotFoundException x) {
-//					PersonRelationType personRelationType = pm.makePersistent(new PersonRelationType(personRelationTypeID, null));
-//					personRelationType.getName().readFromProperties(baseName, loader, "org.nightlabs.jfire.personrelation.PersonRelationType-branchOffice.name"); //$NON-NLS-1$
-//					personRelationType.getDescription().readFromProperties(baseName, loader, "org.nightlabs.jfire.personrelation.PersonRelationType-branchOffice.description"); //$NON-NLS-1$
-//				}
-//			}
-
-// Moved this to BehrJFireTrade, since this is Behr-specific stuff. Marco.
-//			{
-//				PersonRelationTypeID personRelationTypeID = PersonRelationType.PredefinedRelationTypes.mainLocation;
-//				try {
-//					pm.getObjectById(personRelationTypeID);
-//				} catch (JDOObjectNotFoundException x) {
-//					PersonRelationType personRelationType = pm.makePersistent(new PersonRelationType(personRelationTypeID, PersonRelationType.PredefinedRelationTypes.branchLocation));
-//					personRelationType.getName().readFromProperties(baseName, loader, "org.nightlabs.jfire.personrelation.PersonRelationType-mainLocation.name"); //$NON-NLS-1$
-//					personRelationType.getDescription().readFromProperties(baseName, loader, "org.nightlabs.jfire.personrelation.PersonRelationType-mainLocation.description"); //$NON-NLS-1$
-//				}
-//			}
-//			{
-//				PersonRelationTypeID personRelationTypeID = PersonRelationType.PredefinedRelationTypes.branchLocation;
-//				try {
-//					pm.getObjectById(personRelationTypeID);
-//				} catch (JDOObjectNotFoundException x) {
-//					PersonRelationType personRelationType = pm.makePersistent(new PersonRelationType(personRelationTypeID, PersonRelationType.PredefinedRelationTypes.mainLocation));
-//					personRelationType.getName().readFromProperties(baseName, loader, "org.nightlabs.jfire.personrelation.PersonRelationType-branchLocation.name"); //$NON-NLS-1$
-//					personRelationType.getDescription().readFromProperties(baseName, loader, "org.nightlabs.jfire.personrelation.PersonRelationType-branchLocation.description"); //$NON-NLS-1$
-//				}
-//			}
 
 		} finally {
 			pm.close();
@@ -305,108 +268,8 @@ implements PersonRelationManagerRemote
 	}
 
 	/**
-	 * Returns the PersonIDs that correspond to the nodes in the relation graph that are farthest away from the
-	 * startingPoint and connected via intermediary nodes only by the allowed relationType(ID)s. Or in case the maxDepth
-	 * is reached, the elements of that iteration are returned.
+	 * FIXME These comments are outdated. Kai.
 	 *
-	 * @param relationTypeIDs The ids of the {@link RelationType}s that represent the allowed edges in the graph.
-	 * @param startPoint The source from which to search for the farthest nodes.
-	 * @param maxDepth The maximum depth (distance) until which the search is continued.
-	 * @return the PersonIDs that correspond to the nodes in the relation graph that are farthest away from the
-	 * startingPoint and connected via intermediary nodes only by the allowed relationType(ID)s. Or in case the maxDepth
-	 * is reached, the elements of that iteration are returned.
-	 */
-	@RolesAllowed("_Guest_") // TODO access rights
-	@Override
-	public Set<Deque<PropertySetID>> getNearestNodes(Set<PersonRelationTypeID> relationTypeIDs, PropertySetID startPoint, int maxDepth)
-	{
-		Set<Deque<PropertySetID>> result = new HashSet<Deque<PropertySetID>>();
-		Queue< Deque<PropertySetID> > tempNodes = new LinkedList<Deque<PropertySetID>>();
-		Deque<PropertySetID> startPath = new LinkedList<PropertySetID>();
-		startPath.push(startPoint);
-		tempNodes.add(startPath);
-
-		PersistenceManager pm = createPersistenceManager();
-		try {
-			Set<PersonRelationType> relationTypes = new HashSet<PersonRelationType>(
-					getPersonRelationTypes(relationTypeIDs,
-							new String[] { FetchPlan.DEFAULT, PersonRelation.FETCH_GROUP_TO_ID },
-							NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT)
-			);
-
-			getNearestNodes(pm, relationTypes, tempNodes, result, maxDepth);
-			return result;
-
-		} finally {
-			pm.close();
-		}
-	}
-
-	/**
-	 * Helper method to find all nodes lying farthest away from the nodesToVisit, allowed edges are defined by the
-	 * relationTypes. In case the maximum recursion depth is reached the currently available nodes are added.
-	 *
-	 * @param pm The PersistenceManager to use in order to retrieve the Persons corresponding to the PropertySetIDs.
-	 * @param relationTypes The valid relation types according to which the graph will be traversed.
-	 * @param nextLevelQueue The queue containing the starting nodes and later the nodes to visit in the next iteration.
-	 * @param finalNodes The set of nodes from which there exists no allowed edge to another node and/or the nodes
-	 *                   currently examined in the maxDepth iteration.
-	 * @param maxDepth The maximum iteration depth until which to traverse the relation graph.
-	 */
-	private void getNearestNodes(PersistenceManager pm, Set<PersonRelationType> relationTypes,
-			Queue< Deque<PropertySetID> > nextLevelQueue, Set< Deque<PropertySetID> > finalNodes, int maxDepth)
-	{
-		if (maxDepth < 0 || nextLevelQueue.isEmpty())
-			return;
-
-		int depth = 0;
-		// Queue of the elements that need to be visited along with the paths that are used to get to them.
-		Queue< Deque<PropertySetID> > currentDepthQueue = new LinkedList<Deque<PropertySetID>>();
-		do {
-			currentDepthQueue.addAll(nextLevelQueue);
-			nextLevelQueue.clear();
-			do {
-				Deque<PropertySetID> curNodePath = currentDepthQueue.poll();
-				final PropertySetID currentNode = curNodePath.peek();
-				final Person tmpSource = (Person) pm.getObjectById(currentNode);
-				// It is assumed that the relationTypes are not bidirectional, hence there are no two nodes n1 and n2
-				// such that n1 <-relationType-> n2 and n2 <-relationType-> n1! (marius)
-				final Collection<? extends PersonRelation> personRelations =
-					PersonRelation.getPersonRelations(pm, tmpSource, null, relationTypes);
-
-				if (personRelations.isEmpty())
-					finalNodes.add(curNodePath);
-				else
-				{
-					for (PersonRelation personRelation : personRelations)
-					{
-						final Deque<PropertySetID> tmp = new LinkedList<PropertySetID>( curNodePath );
-						final PropertySetID toID = personRelation.getToID();
-						if (tmp.contains(toID) && !finalNodes.contains(tmp))
-						{
-							// We found a circle to which there is no path yet
-							// -> stop with the last element before completing the circle.
-							finalNodes.add(tmp);
-							continue;
-						}
-
-						tmp.push(toID);
-						nextLevelQueue.add( tmp );
-					}
-				}
-			}  while (! currentDepthQueue.isEmpty());
-			depth++;
-		} while (depth < maxDepth && !nextLevelQueue.isEmpty());
-
-		// In case we reached maximum depth -> add all valid nodes.
-		if (depth == maxDepth && !nextLevelQueue.isEmpty())
-			finalNodes.addAll(nextLevelQueue);
-	}
-
-
-
-
-	/**
 	 * Returns the paths to the Persons that correspond to the nodes in the relation graph that are farthest away from the
 	 * startingPoint and connected via intermediary nodes only by the allowed relationType(ID)s. Or in case the maxDepth
 	 * is reached, the elements of that iteration are returned.
@@ -474,31 +337,39 @@ implements PersonRelationManagerRemote
 			return null;
 
 		// Get the initial outgoing PersonRelations from the 'startID'.
-		List<Deque<ObjectID>> propertySetIDpathsFound = new ArrayList<Deque<ObjectID>>(); // <-- PropertySetID only.
-		List<Deque<ObjectID>> objectIDPathsFound = new ArrayList<Deque<ObjectID>>();      // <-- PersonRelationID, PropertySetID (mixed)
+		List<Deque<ObjectID>> foundPPSIDPathList = new ArrayList<Deque<ObjectID>>(); // <-- PropertySetID only.
+		List<Deque<ObjectID>> foundOIDPathList = new ArrayList<Deque<ObjectID>>();   // <-- PersonRelationID, PropertySetID (mixed)
 
-		Deque<ObjectID> foundPPSIDPath = new LinkedList<ObjectID>();
-		propertySetIDpathsFound.add(foundPPSIDPath);
-
-		Deque<ObjectID> foundOIDPath = new LinkedList<ObjectID>();
-		objectIDPathsFound.add(foundOIDPath);
 
 		final Collection<? extends PersonRelation> pRelnsToRoot = PersonRelation.getPersonRelations(pm, (Person) pm.getObjectById(startID), null, relationTypes);
 		if (pRelnsToRoot.isEmpty()) {
-			foundOIDPath.push(startID);
+			Deque<ObjectID> foundPPSIDPath = new LinkedList<ObjectID>();
+			foundPPSIDPathList.add(foundPPSIDPath);
 			foundPPSIDPath.push(startID);
+
+			Deque<ObjectID> foundOIDPath = new LinkedList<ObjectID>();
+			foundOIDPathList.add(foundOIDPath);
+			foundOIDPath.push(startID);
 		}
 		else {
 			// Call the recursive method.
-			for (PersonRelation pRelnToRoot : pRelnsToRoot)
-				getPathsToRoots(pm, maxDepth, pRelnToRoot, relationTypes, foundOIDPath, objectIDPathsFound, foundPPSIDPath, propertySetIDpathsFound);
+			for (PersonRelation pRelnToRoot : pRelnsToRoot) {
+				Deque<ObjectID> foundPPSIDPath = new LinkedList<ObjectID>();
+				foundPPSIDPathList.add(foundPPSIDPath);
+
+				Deque<ObjectID> foundOIDPath = new LinkedList<ObjectID>();
+				foundOIDPathList.add(foundOIDPath);
+
+				// Go gather new paths.
+				getPathsToRoots(pm, maxDepth, pRelnToRoot, relationTypes, foundOIDPath, foundOIDPathList, foundPPSIDPath, foundPPSIDPathList);
+			}
 		}
 
 
 		// An array of only two elements; differentiated by the key classes PropertySetID and PersonRelationID
 		Map<Class<? extends ObjectID>, List<Deque<ObjectID>>> results = new ConcurrentHashMap<Class<? extends ObjectID>, List<Deque<ObjectID>>>(2);
-		results.put(PropertySetID.class, propertySetIDpathsFound);  // <-- PropertySetID only.
-		results.put(PersonRelationID.class, objectIDPathsFound);    // <-- PersonRelationID, PropertySetID (mixed)
+		results.put(PropertySetID.class, foundPPSIDPathList);  // <-- PropertySetID only.
+		results.put(PersonRelationID.class, foundOIDPathList); // <-- PersonRelationID, PropertySetID (mixed)
 
 		return results; //objectIDPathsFound;
 	}

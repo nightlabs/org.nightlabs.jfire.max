@@ -153,41 +153,6 @@ extends BaseJDOObjectDAO<PersonRelationID, PersonRelation>
 	}
 
 	/**
-	 *
-	 * @param allowedRelations
-	 * @param ofPerson
-	 * @param maxDepth
-	 * @param monitor
-	 * @return
-	 */
-	public synchronized Set<Deque<PropertySetID>> getRelationRoots(Set<PersonRelationTypeID> allowedRelations,
-			PropertySetID ofPerson, int maxDepth, ProgressMonitor monitor)
-	{
-		monitor.beginTask("Finding related persons", 10);
-		try
-		{
-			ejb = JFireEjb3Factory.getRemoteBean(PersonRelationManagerRemote.class, SecurityReflector.getInitialContextProperties());
-			monitor.worked(2);
-			Set<Deque<PropertySetID>> nearestNodes = ejb.getNearestNodes(allowedRelations, ofPerson, maxDepth);
-			monitor.worked(8);
-			monitor.done();
-			return nearestNodes;
-		}
-		catch (Exception e)
-		{
-			monitor.setCanceled(true);
-			if (e instanceof RuntimeException)
-				throw (RuntimeException)e;
-			else
-				throw new RuntimeException("Error finding related persons", e);
-		}
-		finally
-		{
-			ejb = null;
-		}
-	}
-
-	/**
 	 * FIXME The comments for this method needs to be updated!
 	 *
 	 * Returns the paths to the Persons that correspond to the nodes in the relation graph that are farthest away from the

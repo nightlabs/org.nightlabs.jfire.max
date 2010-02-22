@@ -9,6 +9,7 @@ import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Locale;
 
 import javax.jdo.PersistenceManager;
 
@@ -24,6 +25,7 @@ import org.nightlabs.jfire.security.ResolveSecuringAuthorityStrategy;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.util.CacheDirTag;
 import org.nightlabs.util.IOUtil;
+import org.nightlabs.util.NLLocale;
 
 /**
  * Helper class for {@link ReportLayoutRenderer} to unify their behaviour.
@@ -34,7 +36,7 @@ import org.nightlabs.util.IOUtil;
 public class ReportLayoutRendererUtil {
 
 	private static final String PROTECTIONFILE_NAME = "protectionfile";
-	
+
 	/**
 	 * Logger used by this class.
 	 */
@@ -55,21 +57,29 @@ public class ReportLayoutRendererUtil {
 	 */
 	public static RenderedReportLayout renderReport(PersistenceManager pm, RenderReportRequest renderReportRequest)
 			throws RenderReportException {
-		
+
 		// check if user is allowed to render
 		ReportRegistryItem registryItem = (ReportRegistryItem) pm.getObjectById(renderReportRequest.getReportRegistryItemID());
 		Authority.resolveSecuringAuthority(pm, registryItem, ResolveSecuringAuthorityStrategy.organisation).assertContainsRoleRef(
 				SecurityReflector.getUserDescriptor().getUserObjectID(), RoleConstants.renderReport);
 
-		ReportingEngine reportingEngine = ReportingEngine.getReportingEngine(pm, null);
-		if (reportingEngine != null) {
-			IRenderManager rm = reportingEngine.createRenderManager(renderReportRequest);
-			return rm.renderReport(pm, renderReportRequest);
-		} else {
-			throw new RenderReportException("Could not obtain ReportingEngine from datastore.", new NullPointerException());
+		Locale locale = renderReportRequest.getLocale();
+		try {
+			NLLocale.setOverrideLocale(locale);
+
+			ReportingEngine reportingEngine = ReportingEngine.getReportingEngine(pm, null);
+			if (reportingEngine != null) {
+				IRenderManager rm = reportingEngine.createRenderManager(renderReportRequest);
+				return rm.renderReport(pm, renderReportRequest);
+			} else {
+				throw new RenderReportException("Could not obtain ReportingEngine from datastore.", new NullPointerException());
+			}
+
+		} finally {
+			NLLocale.setOverrideLocale(null);
 		}
 	}
-	
+
 	/**
 	 * @return the root folder for all temporary rendered report folders.
 	 * 		This is (JFireReporting#earDir/birt/rendered).
@@ -158,7 +168,7 @@ public class ReportLayoutRendererUtil {
 	 * rendered report layout to consist of multiple files the zipping of the whole folder is
 	 * forced.
 	 * </p>
-	 * 
+	 *
 	 * @param layoutRoot The root folder for the rendered layout (e.g. containig one html file and
 	 *            several images, or a single pdf).
 	 * @param reportLayout The {@link RenderedReportLayout} with a valid header. The data member of
@@ -167,24 +177,24 @@ public class ReportLayoutRendererUtil {
 	 *            found to consist of multiple files zipped is forced to be <code>true</code>).
 	 */
 	public static void prepareRenderedLayoutForTransfer(File layoutRoot, RenderedReportLayout reportLayout, String entryFileName, boolean doZip) {
-		
+
 		// remove all localisation data needed for the rendering first...
 		ReportLayoutLocalisationData.cleanFolderFromLocalisationData(layoutRoot);
-		
+
 		File[] layoutFiles = layoutRoot.listFiles(new FileFilter() {
 			@Override
 			public boolean accept(File pathname) {
 				return !pathname.getName().startsWith(PROTECTIONFILE_NAME);
 			}
 		});
-		
+
 		boolean multipleFiles = layoutFiles != null && layoutFiles.length > 1;
 		reportLayout.getHeader().setMultipleFiles(multipleFiles);
 		if (multipleFiles) {
 			// if we find that the layout consists of multiple files, we force zipping
 			doZip = true;
 		}
-		
+
 		// zip the complete folder
 		File transferFile = null;
 

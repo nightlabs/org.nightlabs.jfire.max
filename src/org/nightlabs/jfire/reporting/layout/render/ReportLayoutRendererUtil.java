@@ -63,9 +63,12 @@ public class ReportLayoutRendererUtil {
 		Authority.resolveSecuringAuthority(pm, registryItem, ResolveSecuringAuthorityStrategy.organisation).assertContainsRoleRef(
 				SecurityReflector.getUserDescriptor().getUserObjectID(), RoleConstants.renderReport);
 
+
 		Locale locale = renderReportRequest.getLocale();
-		try {
+		boolean overrideLocale = locale != null;
+		if (overrideLocale)
 			NLLocale.setOverrideLocale(locale);
+		try {
 
 			ReportingEngine reportingEngine = ReportingEngine.getReportingEngine(pm, null);
 			if (reportingEngine != null) {
@@ -76,7 +79,8 @@ public class ReportLayoutRendererUtil {
 			}
 
 		} finally {
-			NLLocale.setOverrideLocale(null);
+			if (overrideLocale)
+				NLLocale.setOverrideLocale(null);
 		}
 	}
 

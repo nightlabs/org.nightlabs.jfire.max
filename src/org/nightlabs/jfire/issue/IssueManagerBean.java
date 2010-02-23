@@ -1259,7 +1259,7 @@ implements IssueManagerRemote
 			String baseName = "org.nightlabs.jfire.issue.resource.messages";
 			ClassLoader loader = IssueManagerBean.class.getClassLoader();
 
-			IssueType issueTypeDefault = new IssueType(getOrganisationID(), IssueType.DEFAULT_ISSUE_TYPE_ID);
+/*			IssueType issueTypeDefault = new IssueType(getOrganisationID(), IssueType.DEFAULT_ISSUE_TYPE_ID);
 			issueTypeDefault.getName().readFromProperties(baseName, loader,
 			"org.nightlabs.jfire.issue.IssueManagerBean.issueTypeDefault"); //$NON-NLS-1$
 			issueTypeDefault = pm.makePersistent(issueTypeDefault);
@@ -1471,7 +1471,7 @@ implements IssueManagerRemote
 			jfireProject.getName().readFromProperties(baseName, loader,
 			"org.nightlabs.jfire.issue.IssueManagerBean.jfireProject"); //$NON-NLS-1$
 			jfireProject.setProjectType(projectTypeSoftware);
-			jfireProject = pm.makePersistent(jfireProject);
+			jfireProject = pm.makePersistent(jfireProject);*/
 			// ---[ ProjectTypes ]------------------------------------------------------------------------------------------------| End |---
 
 

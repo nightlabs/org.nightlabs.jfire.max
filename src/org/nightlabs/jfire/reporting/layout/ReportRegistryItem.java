@@ -49,10 +49,8 @@ import javax.jdo.annotations.PersistenceModifier;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 import javax.jdo.annotations.Queries;
-import javax.jdo.annotations.Value;
 import javax.jdo.annotations.Version;
 import javax.jdo.annotations.VersionStrategy;
-import javax.jdo.listener.DeleteCallback;
 import javax.jdo.listener.DetachCallback;
 
 import org.nightlabs.inheritance.FieldInheriter;
@@ -186,7 +184,7 @@ import org.nightlabs.util.Util;
 })
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public abstract class ReportRegistryItem
-implements DeleteCallback, Serializable, DetachCallback, SecuredObject, Inheritable, InheritanceCallbacks
+implements Serializable, DetachCallback, SecuredObject, Inheritable, InheritanceCallbacks
 {
 	private static final long serialVersionUID = 20081212L;
 
@@ -263,7 +261,9 @@ implements DeleteCallback, Serializable, DetachCallback, SecuredObject, Inherita
 	 */
 	@Persistent(
 		mappedBy="reportRegistryItem",
-		persistenceModifier=PersistenceModifier.PERSISTENT)
+		persistenceModifier=PersistenceModifier.PERSISTENT,
+		dependent="true"
+	)
 	private ReportRegistryItemName name;
 
 	/**
@@ -271,7 +271,9 @@ implements DeleteCallback, Serializable, DetachCallback, SecuredObject, Inherita
 	 */
 	@Persistent(
 		mappedBy="reportRegistryItem",
-		persistenceModifier=PersistenceModifier.PERSISTENT)
+		persistenceModifier=PersistenceModifier.PERSISTENT,
+		dependent="true"
+	)
 	private ReportRegistryItemDescription description;
 
 	/**
@@ -484,9 +486,11 @@ implements DeleteCallback, Serializable, DetachCallback, SecuredObject, Inherita
 	 */
 	@Persistent(
 		mappedBy="reportRegistryItem",
-		persistenceModifier=PersistenceModifier.PERSISTENT)
+		persistenceModifier=PersistenceModifier.PERSISTENT,
+			dependentValue="true"
+	)
 	@Key(mappedBy="fieldName")
-	@Value(dependent="true")
+//	@Value(dependent="true") // Seems not to work :(
 	protected Map<String, ReportRegistryItemFieldMetaData> fieldMetaDataMap;
 
 	/**
@@ -747,13 +751,6 @@ implements DeleteCallback, Serializable, DetachCallback, SecuredObject, Inherita
 	 */
 	public void jdoPreDetach() {
 	}
-	
-	@Override
-	public void jdoPreDelete() {
-		PersistenceManager pm = getPersistenceManager();
-		pm.deletePersistent(getName());
-		pm.deletePersistent(getDescription());
-		pm.flush();
-	}
-	
+
+
 }

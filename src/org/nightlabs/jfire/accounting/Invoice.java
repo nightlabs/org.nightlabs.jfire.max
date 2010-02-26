@@ -220,7 +220,10 @@ import org.nightlabs.util.Util;
 @Queries({
 	@javax.jdo.annotations.Query(
 			name="getInvoiceIDsByVendorAndCustomer",
-			value="SELECT JDOHelper.getObjectId(this) WHERE JDOHelper.getObjectId(vendor) == :vendorID && JDOHelper.getObjectId(customer) == :customerID ORDER BY invoiceID DESC"
+			value="SELECT JDOHelper.getObjectId(this) " +
+					"WHERE JDOHelper.getObjectId(vendor) == :vendorID && " +
+					"JDOHelper.getObjectId(customer) == :customerID " +
+					"ORDER BY createDT DESC"
 	),
 	@javax.jdo.annotations.Query(
 			name="getInvoiceIDsByVendorAndEndCustomer",
@@ -229,7 +232,7 @@ import org.nightlabs.util.Util;
 					"this.articles.contains(article) && " +
 					"JDOHelper.getObjectId(article.endCustomer) == :customerID " +
 					"VARIABLES org.nightlabs.jfire.trade.Article article " +
-					"ORDER BY invoiceID DESC"
+					"ORDER BY createDT DESC"
 	),
 //	@javax.jdo.annotations.Query(
 //			name="getInvoiceIDsByVendorAndCustomerAndEndCustomer",

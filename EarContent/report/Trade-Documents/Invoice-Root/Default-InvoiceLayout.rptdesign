@@ -56,6 +56,7 @@ function getDataFieldString(field) {
             <property name="valueType">static</property>
             <property name="dataType">string</property>
             <property name="controlType">text-box</property>
+            <property name="defaultValue">100</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
             </structure>
@@ -204,32 +205,32 @@ function getDataFieldString(field) {
                     </structure>
                     <structure>
                         <property name="position">27</property>
-                        <property name="name">${rootOrganisationIDConverted}/vat-ch-7__6-net</property>
+                        <property name="name">test01_jfire_org/vat-ch-7__6-net</property>
                         <property name="dataType">float</property>
                     </structure>
                     <structure>
                         <property name="position">28</property>
-                        <property name="name">${rootOrganisationIDConverted}/vat-ch-7__6-val</property>
+                        <property name="name">test01_jfire_org/vat-ch-7__6-val</property>
                         <property name="dataType">float</property>
                     </structure>
                     <structure>
                         <property name="position">29</property>
-                        <property name="name">${rootOrganisationIDConverted}/vat-de-19-net</property>
+                        <property name="name">test01_jfire_org/vat-de-19-net</property>
                         <property name="dataType">float</property>
                     </structure>
                     <structure>
                         <property name="position">30</property>
-                        <property name="name">${rootOrganisationIDConverted}/vat-de-19-val</property>
+                        <property name="name">test01_jfire_org/vat-de-19-val</property>
                         <property name="dataType">float</property>
                     </structure>
                     <structure>
                         <property name="position">31</property>
-                        <property name="name">${rootOrganisationIDConverted}/vat-de-7-net</property>
+                        <property name="name">test01_jfire_org/vat-de-7-net</property>
                         <property name="dataType">float</property>
                     </structure>
                     <structure>
                         <property name="position">32</property>
-                        <property name="name">${rootOrganisationIDConverted}/vat-de-7-val</property>
+                        <property name="name">test01_jfire_org/vat-de-7-val</property>
                         <property name="dataType">float</property>
                     </structure>
                 </list-property>
@@ -433,43 +434,43 @@ function getDataFieldString(field) {
                 </structure>
                 <structure>
                     <property name="position">27</property>
-                    <property name="name">${rootOrganisationIDConverted}/vat-ch-7__6-net</property>
-                    <property name="nativeName">${rootOrganisationIDConverted}/vat-ch-7__6-net</property>
+                    <property name="name">test01_jfire_org/vat-ch-7__6-net</property>
+                    <property name="nativeName">test01_jfire_org/vat-ch-7__6-net</property>
                     <property name="dataType">float</property>
                     <property name="nativeDataType">3</property>
                 </structure>
                 <structure>
                     <property name="position">28</property>
-                    <property name="name">${rootOrganisationIDConverted}/vat-ch-7__6-val</property>
-                    <property name="nativeName">${rootOrganisationIDConverted}/vat-ch-7__6-val</property>
+                    <property name="name">test01_jfire_org/vat-ch-7__6-val</property>
+                    <property name="nativeName">test01_jfire_org/vat-ch-7__6-val</property>
                     <property name="dataType">float</property>
                     <property name="nativeDataType">3</property>
                 </structure>
                 <structure>
                     <property name="position">29</property>
-                    <property name="name">${rootOrganisationIDConverted}/vat-de-19-net</property>
-                    <property name="nativeName">${rootOrganisationIDConverted}/vat-de-19-net</property>
+                    <property name="name">test01_jfire_org/vat-de-19-net</property>
+                    <property name="nativeName">test01_jfire_org/vat-de-19-net</property>
                     <property name="dataType">float</property>
                     <property name="nativeDataType">3</property>
                 </structure>
                 <structure>
                     <property name="position">30</property>
-                    <property name="name">${rootOrganisationIDConverted}/vat-de-19-val</property>
-                    <property name="nativeName">${rootOrganisationIDConverted}/vat-de-19-val</property>
+                    <property name="name">test01_jfire_org/vat-de-19-val</property>
+                    <property name="nativeName">test01_jfire_org/vat-de-19-val</property>
                     <property name="dataType">float</property>
                     <property name="nativeDataType">3</property>
                 </structure>
                 <structure>
                     <property name="position">31</property>
-                    <property name="name">${rootOrganisationIDConverted}/vat-de-7-net</property>
-                    <property name="nativeName">${rootOrganisationIDConverted}/vat-de-7-net</property>
+                    <property name="name">test01_jfire_org/vat-de-7-net</property>
+                    <property name="nativeName">test01_jfire_org/vat-de-7-net</property>
                     <property name="dataType">float</property>
                     <property name="nativeDataType">3</property>
                 </structure>
                 <structure>
                     <property name="position">32</property>
-                    <property name="name">${rootOrganisationIDConverted}/vat-de-7-val</property>
-                    <property name="nativeName">${rootOrganisationIDConverted}/vat-de-7-val</property>
+                    <property name="name">test01_jfire_org/vat-de-7-val</property>
+                    <property name="nativeName">test01_jfire_org/vat-de-7-val</property>
                     <property name="dataType">float</property>
                     <property name="nativeDataType">3</property>
                 </structure>
@@ -1531,6 +1532,316 @@ return true;]]></method>
             <property name="dataSource">JS-Datasource</property>
             <method name="fetch"><![CDATA[return  false;]]></method>
         </script-data-set>
+        <oda-data-set extensionID="org.nightlabs.jfire.reporting.oda.jfs.JFSDataSet" name="Invoice Payments" id="455">
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure>
+                        <property name="position">1</property>
+                        <property name="name">paymentJDOID</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">2</property>
+                        <property name="name">invoiceMoneyTransferJDOID</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">3</property>
+                        <property name="name">transferAmount</property>
+                        <property name="dataType">float</property>
+                    </structure>
+                    <structure>
+                        <property name="position">4</property>
+                        <property name="name">transferCurrencyJDOID</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">5</property>
+                        <property name="name">transferCurrencySymbol</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">6</property>
+                        <property name="name">paymentBeginDT</property>
+                        <property name="dataType">date-time</property>
+                    </structure>
+                    <structure>
+                        <property name="position">7</property>
+                        <property name="name">paymentEndDT</property>
+                        <property name="dataType">date-time</property>
+                    </structure>
+                    <structure>
+                        <property name="position">8</property>
+                        <property name="name">modeOfPaymentFlavourJDOID</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">9</property>
+                        <property name="name">modeOfPaymentFlavourName</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                </list-property>
+            </structure>
+            <property name="dataSource">JFS-Datasource</property>
+            <list-property name="parameters">
+                <structure>
+                    <property name="name">invoiceID</property>
+                    <property name="nativeName">invoiceID</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">1</property>
+                    <property name="position">1</property>
+                    <expression name="defaultValue">'__DUMMY_DEFAULT_PARAMETER_VALUE__'</expression>
+                    <property name="isOptional">false</property>
+                    <property name="allowNull">true</property>
+                    <property name="isInput">true</property>
+                </structure>
+            </list-property>
+            <list-property name="resultSet">
+                <structure>
+                    <property name="position">1</property>
+                    <property name="name">paymentJDOID</property>
+                    <property name="nativeName">paymentJDOID</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">1</property>
+                </structure>
+                <structure>
+                    <property name="position">2</property>
+                    <property name="name">invoiceMoneyTransferJDOID</property>
+                    <property name="nativeName">invoiceMoneyTransferJDOID</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">1</property>
+                </structure>
+                <structure>
+                    <property name="position">3</property>
+                    <property name="name">transferAmount</property>
+                    <property name="nativeName">transferAmount</property>
+                    <property name="dataType">float</property>
+                    <property name="nativeDataType">3</property>
+                </structure>
+                <structure>
+                    <property name="position">4</property>
+                    <property name="name">transferCurrencyJDOID</property>
+                    <property name="nativeName">transferCurrencyJDOID</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">1</property>
+                </structure>
+                <structure>
+                    <property name="position">5</property>
+                    <property name="name">transferCurrencySymbol</property>
+                    <property name="nativeName">transferCurrencySymbol</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">1</property>
+                </structure>
+                <structure>
+                    <property name="position">6</property>
+                    <property name="name">paymentBeginDT</property>
+                    <property name="nativeName">paymentBeginDT</property>
+                    <property name="dataType">date-time</property>
+                    <property name="nativeDataType">93</property>
+                </structure>
+                <structure>
+                    <property name="position">7</property>
+                    <property name="name">paymentEndDT</property>
+                    <property name="nativeName">paymentEndDT</property>
+                    <property name="dataType">date-time</property>
+                    <property name="nativeDataType">93</property>
+                </structure>
+                <structure>
+                    <property name="position">8</property>
+                    <property name="name">modeOfPaymentFlavourJDOID</property>
+                    <property name="nativeName">modeOfPaymentFlavourJDOID</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">1</property>
+                </structure>
+                <structure>
+                    <property name="position">9</property>
+                    <property name="name">modeOfPaymentFlavourName</property>
+                    <property name="nativeName">modeOfPaymentFlavourName</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">1</property>
+                </structure>
+            </list-property>
+            <property name="queryText">&lt;queryPropertySet>&lt;org.nightlabs.jfire.reporting.oda.jfs.JFSQueryPropertySet>
+  &lt;scriptRegistryItemID>
+    &lt;organisationID>${devOrganisationID}&lt;/organisationID>
+    &lt;scriptRegistryItemType>JFireReportingTrade-InvoicePayments&lt;/scriptRegistryItemType>
+    &lt;scriptRegistryItemID>InvoicePayments&lt;/scriptRegistryItemID>
+  &lt;/scriptRegistryItemID>
+  &lt;properties/>
+&lt;/org.nightlabs.jfire.reporting.oda.jfs.JFSQueryPropertySet>&lt;/queryPropertySet></property>
+            <xml-property name="designerValues"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<model:DesignValues xmlns:design="http://www.eclipse.org/datatools/connectivity/oda/design" xmlns:model="http://www.eclipse.org/birt/report/model/adapter/odaModel">
+  <Version>1.0</Version>
+  <design:DataSetParameters>
+    <design:parameterDefinitions>
+      <design:inOutMode>In</design:inOutMode>
+      <design:attributes>
+        <design:name>invoiceID</design:name>
+        <design:position>1</design:position>
+        <design:nativeDataTypeCode>1</design:nativeDataTypeCode>
+        <design:precision>0</design:precision>
+        <design:scale>0</design:scale>
+        <design:nullability>Nullable</design:nullability>
+      </design:attributes>
+      <design:inputAttributes>
+        <design:elementAttributes>
+          <design:defaultScalarValue>__DUMMY_DEFAULT_PARAMETER_VALUE__</design:defaultScalarValue>
+        </design:elementAttributes>
+      </design:inputAttributes>
+    </design:parameterDefinitions>
+  </design:DataSetParameters>
+  <design:ResultSets derivedMetaData="true">
+    <design:resultSetDefinitions>
+      <design:resultSetColumns>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:name>paymentJDOID</design:name>
+            <design:position>1</design:position>
+            <design:nativeDataTypeCode>1</design:nativeDataTypeCode>
+            <design:precision>0</design:precision>
+            <design:scale>2</design:scale>
+            <design:nullability>Nullable</design:nullability>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>paymentJDOID</design:label>
+            <design:formattingHints>
+              <design:displaySize>0</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:name>invoiceMoneyTransferJDOID</design:name>
+            <design:position>2</design:position>
+            <design:nativeDataTypeCode>1</design:nativeDataTypeCode>
+            <design:precision>0</design:precision>
+            <design:scale>2</design:scale>
+            <design:nullability>Nullable</design:nullability>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>invoiceMoneyTransferJDOID</design:label>
+            <design:formattingHints>
+              <design:displaySize>0</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:name>transferAmount</design:name>
+            <design:position>3</design:position>
+            <design:nativeDataTypeCode>3</design:nativeDataTypeCode>
+            <design:precision>0</design:precision>
+            <design:scale>2</design:scale>
+            <design:nullability>Nullable</design:nullability>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>transferAmount</design:label>
+            <design:formattingHints>
+              <design:displaySize>0</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:name>transferCurrencyJDOID</design:name>
+            <design:position>4</design:position>
+            <design:nativeDataTypeCode>1</design:nativeDataTypeCode>
+            <design:precision>0</design:precision>
+            <design:scale>2</design:scale>
+            <design:nullability>Nullable</design:nullability>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>transferCurrencyJDOID</design:label>
+            <design:formattingHints>
+              <design:displaySize>0</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:name>transferCurrencySymbol</design:name>
+            <design:position>5</design:position>
+            <design:nativeDataTypeCode>1</design:nativeDataTypeCode>
+            <design:precision>0</design:precision>
+            <design:scale>2</design:scale>
+            <design:nullability>Nullable</design:nullability>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>transferCurrencySymbol</design:label>
+            <design:formattingHints>
+              <design:displaySize>0</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:name>paymentBeginDT</design:name>
+            <design:position>6</design:position>
+            <design:nativeDataTypeCode>93</design:nativeDataTypeCode>
+            <design:precision>0</design:precision>
+            <design:scale>2</design:scale>
+            <design:nullability>Nullable</design:nullability>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>paymentBeginDT</design:label>
+            <design:formattingHints>
+              <design:displaySize>0</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:name>paymentEndDT</design:name>
+            <design:position>7</design:position>
+            <design:nativeDataTypeCode>93</design:nativeDataTypeCode>
+            <design:precision>0</design:precision>
+            <design:scale>2</design:scale>
+            <design:nullability>Nullable</design:nullability>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>paymentEndDT</design:label>
+            <design:formattingHints>
+              <design:displaySize>0</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:name>modeOfPaymentFlavourJDOID</design:name>
+            <design:position>8</design:position>
+            <design:nativeDataTypeCode>1</design:nativeDataTypeCode>
+            <design:precision>0</design:precision>
+            <design:scale>2</design:scale>
+            <design:nullability>Nullable</design:nullability>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>modeOfPaymentFlavourJDOID</design:label>
+            <design:formattingHints>
+              <design:displaySize>0</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:name>modeOfPaymentFlavourName</design:name>
+            <design:position>9</design:position>
+            <design:nativeDataTypeCode>1</design:nativeDataTypeCode>
+            <design:precision>0</design:precision>
+            <design:scale>2</design:scale>
+            <design:nullability>Nullable</design:nullability>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>modeOfPaymentFlavourName</design:label>
+            <design:formattingHints>
+              <design:displaySize>0</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+      </design:resultSetColumns>
+    </design:resultSetDefinitions>
+  </design:ResultSets>
+</model:DesignValues>]]></xml-property>
+        </oda-data-set>
     </data-sets>
     <styles>
         <style name="HeaderText" id="390">
@@ -1543,7 +1854,7 @@ return true;]]></method>
             <property name="lineHeight">1.5em</property>
         </style>
         <style name="AddressSender" id="399">
-            <property name="fontFamily">sans-serif</property>
+            <property name="fontFamily">"Arial"</property>
             <property name="fontSize">7pt</property>
         </style>
         <style name="AddressRecipient" id="400">
@@ -1653,7 +1964,7 @@ return true;]]></method>
                             <text-data id="387">
                                 <property name="style">HeaderText</property>
                                 <property name="paddingTop">1pt</property>
-                                <expression name="valueExpr"><![CDATA[importClass(Packages.org.nightlabs.jfire.reporting.JFireReportingHelper);
+                                <expression name="valueExpr">importClass(Packages.org.nightlabs.jfire.reporting.JFireReportingHelper);
 importClass(Packages.org.nightlabs.jfire.security.SecurityReflector);
 importClass(Packages.org.nightlabs.jfire.trade.OrganisationLegalEntity);
 importClass(Packages.org.nightlabs.jfire.person.PersonStruct);
@@ -1669,28 +1980,28 @@ result[resultIndex] = "";
 
 //////// BankAccount Holder
 f = orgP.getPersistentDataFieldByIndex(PersonStruct.BANKDATA_ACCOUNTHOLDER, 0);
-if (f != null && f.getData() != null && f.getData() != "") {
+if (f != null &amp;&amp; f.getData() != null &amp;&amp; f.getData() != "") {
 	if (result[resultIndex] != "") result[resultIndex] += " | ";
 	result[resultIndex] += f.getData();
 }
 
 //////// Trade register number
 f = orgP.getPersistentDataFieldByIndex(PersonStruct.GOVERNMENTALDATA_TRADEREGISTERNUMBER, 0);
-if (f != null && f.getData() != null && f.getData() != "") {
+if (f != null &amp;&amp; f.getData() != null &amp;&amp; f.getData() != "") {
 	if (result[resultIndex] != "") result[resultIndex] += " | ";
 	result[resultIndex] += getLocalizedMessage("footer.tradeRegisterNumber") + f.getData();
 }
 
 //////// Trade register name
 f = orgP.getPersistentDataFieldByIndex(PersonStruct.GOVERNMENTALDATA_TRADEREGISTERNAME, 0);
-if (f != null && f.getData() != null && f.getData() != "") {
+if (f != null &amp;&amp; f.getData() != null &amp;&amp; f.getData() != "") {
 	if (result[resultIndex] != "") result[resultIndex] += " | ";
 	result[resultIndex] += getLocalizedMessage("footer.tradeRegisterName") + f.getData();
 }
 
 //////// VAT number
 f = orgP.getPersistentDataFieldByIndex(PersonStruct.GOVERNMENTALDATA_VATIN, 0);
-if (f != null && f.getData() != null && f.getData() != "") {
+if (f != null &amp;&amp; f.getData() != null &amp;&amp; f.getData() != "") {
 	if (result[resultIndex] != "") result[resultIndex] += " | ";
 	result[resultIndex] += getLocalizedMessage("footer.vatNumber") + f.getData();
 }
@@ -1701,44 +2012,44 @@ if (f != null && f.getData() != null && f.getData() != "") {
 
 //////// BankAccount AccountNumber
 f = orgP.getPersistentDataFieldByIndex(PersonStruct.BANKDATA_ACCOUNTNUMBER, 0);
-if (f != null && f.getData() != null && f.getData() != "") {
+if (f != null &amp;&amp; f.getData() != null &amp;&amp; f.getData() != "") {
 	if (result[resultIndex] != "") result[resultIndex] += " | ";
 	result[resultIndex] += getLocalizedMessage("footer.accountNumber") + f.getData();
 }
 
 f = orgP.getPersistentDataFieldByIndex(PersonStruct.BANKDATA_BANKCODE, 0);
-if (f != null && f.getData() != null && f.getData() != "") {
+if (f != null &amp;&amp; f.getData() != null &amp;&amp; f.getData() != "") {
 	if (result[resultIndex] != "") result[resultIndex] += " | ";
 	result[resultIndex] += getLocalizedMessage("footer.bankCode") + f.getData();
 }
 
 f = orgP.getPersistentDataFieldByIndex(PersonStruct.BANKDATA_IBAN, 0);
-if (f != null && f.getData() != null && f.getData() != "") {
+if (f != null &amp;&amp; f.getData() != null &amp;&amp; f.getData() != "") {
 	if (result[resultIndex] != "") result[resultIndex] += " | ";
 	result[resultIndex] += getLocalizedMessage("footer.accountIBAN") + f.getData();
 }
 
 f = orgP.getPersistentDataFieldByIndex(PersonStruct.BANKDATA_BIC, 0);
-if (f != null && f.getData() != null && f.getData() != "") {
+if (f != null &amp;&amp; f.getData() != null &amp;&amp; f.getData() != "") {
 	if (result[resultIndex] != "") result[resultIndex] += " | ";
 	result[resultIndex] += getLocalizedMessage("footer.accountBIC") + f.getData();
 }
 
 f = orgP.getPersistentDataFieldByIndex(PersonStruct.BANKDATA_BANKNAME, 0);
-if (f != null && f.getData() != null && f.getData() != "") {
+if (f != null &amp;&amp; f.getData() != null &amp;&amp; f.getData() != "") {
 	if (result[resultIndex] != "") result[resultIndex] += " | ";
 	result[resultIndex] += getLocalizedMessage("footer.bankName") + f.getData();
 }
 
 resultAll = "";
 
-for (i = 0; i < result.length; ++i) {
+for (i = 0; i &lt; result.length; ++i) {
 	if (result[i] != "") {
-		if (i > 0) resultAll += "<br/>";
+		if (i > 0) resultAll += "&lt;br/>";
 		resultAll += result[i];
 	}
 }
-resultAll;]]></expression>
+resultAll;</expression>
                                 <property name="contentType">html</property>
                             </text-data>
                         </cell>
@@ -2795,17 +3106,17 @@ eval(String(ReportTextPartHelper.getEvalString(
                                 </row>
                             </footer>
                         </table>
-                        <table id="62">
-                            <property name="borderBottomColor">#C0C0C0</property>
+                        <table name="ArticlesTables" id="62">
+                            <property name="borderBottomColor">#808080</property>
                             <property name="borderBottomStyle">solid</property>
                             <property name="borderBottomWidth">thin</property>
-                            <property name="borderLeftColor">#C0C0C0</property>
+                            <property name="borderLeftColor">#808080</property>
                             <property name="borderLeftStyle">solid</property>
                             <property name="borderLeftWidth">thin</property>
-                            <property name="borderRightColor">#C0C0C0</property>
+                            <property name="borderRightColor">#808080</property>
                             <property name="borderRightStyle">solid</property>
                             <property name="borderRightWidth">thin</property>
-                            <property name="borderTopColor">#C0C0C0</property>
+                            <property name="borderTopColor">#808080</property>
                             <property name="borderTopStyle">solid</property>
                             <property name="borderTopWidth">thin</property>
                             <property name="marginTop">0pt</property>
@@ -3084,6 +3395,11 @@ else {
 result</expression>
                                     <property name="dataType">string</property>
                                 </structure>
+                                <structure>
+                                    <property name="name">Skript_SumTotal</property>
+                                    <expression name="expression">JFireReportingHelper.getVars().put("sumTotal", row["SumTotal"]);</expression>
+                                    <property name="dataType">string</property>
+                                </structure>
                             </list-property>
                             <column id="81">
                                 <property name="width">14mm</property>
@@ -3112,6 +3428,7 @@ result</expression>
                                 <row id="63">
                                     <property name="backgroundColor">#C0C0C0</property>
                                     <cell id="64">
+                                        <property name="paddingTop">1pt</property>
                                         <property name="paddingLeft">5pt</property>
                                     </cell>
                                     <cell id="66">
@@ -3155,7 +3472,7 @@ result</expression>
                                     </cell>
                                     <cell id="159">
                                         <label id="166">
-                                            <property name="fontFamily">sans-serif</property>
+                                            <property name="fontFamily">"Arial"</property>
                                             <property name="fontWeight">bold</property>
                                             <text-property name="text" key="currency"></text-property>
                                         </label>
@@ -3227,6 +3544,8 @@ result</expression>
                                         <property name="paddingBottom">0.5em</property>
                                         <data id="148">
                                             <property name="style">TableContent</property>
+                                            <property name="marginTop">0pt</property>
+                                            <property name="paddingTop">1pt</property>
                                             <structure name="numberFormat">
                                                 <property name="category">Fixed</property>
                                                 <property name="pattern">Fixed</property>
@@ -3240,6 +3559,8 @@ result</expression>
                                         <property name="paddingBottom">0.5em</property>
                                         <data id="167">
                                             <property name="style">TableContent</property>
+                                            <property name="marginTop">0pt</property>
+                                            <property name="paddingTop">1pt</property>
                                             <property name="textAlign">left</property>
                                             <property name="resultSetColumn">currencyID</property>
                                         </data>
@@ -3266,12 +3587,6 @@ result</expression>
                                         <property name="paddingBottom">0.5em</property>
                                         <data id="453">
                                             <property name="style">TableContent</property>
-                                            <list-property name="visibility">
-                                                <structure>
-                                                    <property name="format">all</property>
-                                                    <expression name="valueExpr">true</expression>
-                                                </structure>
-                                            </list-property>
                                             <property name="resultSetColumn">DynamicProductType_Type_Name</property>
                                         </data>
                                         <data id="316">
@@ -3284,6 +3599,7 @@ result</expression>
                                         <property name="paddingBottom">0.5em</property>
                                         <data id="203">
                                             <property name="style">TableContent</property>
+                                            <property name="paddingTop">1pt</property>
                                             <property name="resultSetColumn">tariffName</property>
                                         </data>
                                     </cell>
@@ -3420,12 +3736,21 @@ result</expression>
                                         <property name="borderTopColor">#C0C0C0</property>
                                         <property name="borderTopStyle">solid</property>
                                         <property name="borderTopWidth">thin</property>
+                                        <data id="682">
+                                            <list-property name="visibility">
+                                                <structure>
+                                                    <property name="format">all</property>
+                                                    <expression name="valueExpr">true</expression>
+                                                </structure>
+                                            </list-property>
+                                            <property name="resultSetColumn">Skript_SumTotal</property>
+                                        </data>
                                     </cell>
                                     <cell id="156">
                                         <property name="borderTopColor">#C0C0C0</property>
                                         <property name="borderTopStyle">solid</property>
                                         <property name="borderTopWidth">thin</property>
-                                        <data id="158">
+                                        <data name="SumTotal" id="158">
                                             <property name="style">TableContent</property>
                                             <property name="fontWeight">bold</property>
                                             <structure name="numberFormat">
@@ -3456,6 +3781,7 @@ result</expression>
                                         <property name="borderTopStyle">solid</property>
                                         <property name="borderTopWidth">thin</property>
                                         <table id="281">
+                                            <property name="marginTop">0pt</property>
                                             <property name="width">100%</property>
                                             <property name="dataSet">PriceFragmentType2SumDataSet</property>
                                             <list-property name="boundDataColumns">
@@ -3502,12 +3828,6 @@ Packages.org.nightlabs.l10n.NumberFormatter.formatCurrency(
                                                     <property name="dataType">string</property>
                                                 </structure>
                                             </list-property>
-                                            <list-property name="sort">
-                                                <structure>
-                                                    <expression name="key">row["priceFragmentType"].getOrganisationID() + "/" + row["priceFragmentType"].getPriceFragmentTypeID()</expression>
-                                                    <property name="direction">desc</property>
-                                                </structure>
-                                            </list-property>
                                             <column id="294"/>
                                             <column id="295">
                                                 <property name="width">25mm</property>
@@ -3547,7 +3867,7 @@ if (!id.startsWith("vat-"))
 // 	result = true; // hide all non-VAT-*VALUES* (i.e. hide the net prices)
 // In Germany, the net price sum must be shown on an invoice, hence I commented this out. Marco. 2009-12-23
 
-result;</expression>
+result</expression>
                                                         </structure>
                                                     </list-property>
                                                     <cell id="287">
@@ -3596,18 +3916,502 @@ result;</expression>
                                 </row>
                             </footer>
                         </table>
+                        <text-data id="454">
+                            <property name="fontFamily">sans-serif</property>
+                            <property name="fontSize">12pt</property>
+                            <property name="marginTop">0pt</property>
+                            <property name="paddingTop">2em</property>
+                            <property name="paddingLeft">0pt</property>
+                            <property name="paddingBottom">0em</property>
+                            <property name="paddingRight">0pt</property>
+                            <list-property name="visibility">
+                                <structure>
+                                    <property name="format">all</property>
+                                    <expression name="valueExpr">invoice = JFireReportingHelper.getVar("articleContainer");
+invoice.getInvoiceLocal().getAmountPaid() == 0</expression>
+                                </structure>
+                            </list-property>
+                            <expression name="valueExpr">importClass(Packages.org.nightlabs.jfire.reporting.textpart.ReportTextPartHelper);
+eval(String(ReportTextPartHelper.getEvalString(
+  JFireReportingHelper.getDataSetParamObject(params["articleContainerID"]), "paymentsperformed")));</expression>
+                            <property name="contentType">html</property>
+                        </text-data>
+                        <table id="456">
+                            <property name="borderBottomColor">#808080</property>
+                            <property name="borderBottomStyle">solid</property>
+                            <property name="borderBottomWidth">thin</property>
+                            <property name="borderLeftColor">#808080</property>
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">thin</property>
+                            <property name="borderRightColor">#808080</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">thin</property>
+                            <property name="borderTopColor">#808080</property>
+                            <property name="borderTopStyle">solid</property>
+                            <property name="borderTopWidth">thin</property>
+                            <property name="marginTop">10pt</property>
+                            <property name="marginBottom">auto</property>
+                            <property name="width">100%</property>
+                            <property name="dataSet">Invoice Payments</property>
+                            <list-property name="visibility">
+                                <structure>
+                                    <property name="format">all</property>
+                                    <expression name="valueExpr">invoice = JFireReportingHelper.getVar("articleContainer");
+invoice.getInvoiceLocal().getAmountPaid() == 0</expression>
+                                </structure>
+                            </list-property>
+                            <list-property name="paramBindings">
+                                <structure>
+                                    <property name="paramName">invoiceID</property>
+                                    <expression name="expression">importClass(Packages.org.nightlabs.jfire.reporting.JFireReportingHelper);
+JFireReportingHelper.createDataSetParam(params["articleContainerID"])</expression>
+                                </structure>
+                            </list-property>
+                            <list-property name="boundDataColumns">
+                                <structure>
+                                    <property name="name">paymentJDOID</property>
+                                    <expression name="expression">dataSetRow["paymentJDOID"]</expression>
+                                    <property name="dataType">string</property>
+                                </structure>
+                                <structure>
+                                    <property name="name">invoiceMoneyTransferJDOID</property>
+                                    <expression name="expression">dataSetRow["invoiceMoneyTransferJDOID"]</expression>
+                                    <property name="dataType">string</property>
+                                </structure>
+                                <structure>
+                                    <property name="name">transferAmount</property>
+                                    <expression name="expression">dataSetRow["transferAmount"]</expression>
+                                    <property name="dataType">float</property>
+                                </structure>
+                                <structure>
+                                    <property name="name">transferCurrencyJDOID</property>
+                                    <expression name="expression">dataSetRow["transferCurrencyJDOID"]</expression>
+                                    <property name="dataType">string</property>
+                                </structure>
+                                <structure>
+                                    <property name="name">transferCurrencySymbol</property>
+                                    <expression name="expression">dataSetRow["transferCurrencySymbol"]</expression>
+                                    <property name="dataType">string</property>
+                                </structure>
+                                <structure>
+                                    <property name="name">paymentBeginDT</property>
+                                    <expression name="expression">dataSetRow["paymentBeginDT"]</expression>
+                                    <property name="dataType">date-time</property>
+                                </structure>
+                                <structure>
+                                    <property name="name">paymentEndDT</property>
+                                    <expression name="expression">dataSetRow["paymentEndDT"]</expression>
+                                    <property name="dataType">date-time</property>
+                                </structure>
+                                <structure>
+                                    <property name="name">modeOfPaymentFlavourJDOID</property>
+                                    <expression name="expression">dataSetRow["modeOfPaymentFlavourJDOID"]</expression>
+                                    <property name="dataType">string</property>
+                                </structure>
+                                <structure>
+                                    <property name="name">modeOfPaymentFlavourName</property>
+                                    <expression name="expression">dataSetRow["modeOfPaymentFlavourName"]</expression>
+                                    <property name="dataType">string</property>
+                                </structure>
+                                <structure>
+                                    <property name="name">SumOfPayment</property>
+                                    <expression name="expression">dataSetRow["transferAmount"]</expression>
+                                    <property name="dataType">any</property>
+                                    <property name="aggregateFunction">sum</property>
+                                </structure>
+                                <structure>
+                                    <property name="name">remainingAmount</property>
+                                    <expression name="expression">JFireReportingHelper.getVar("sumTotal")-Total.sum(dataSetRow["transferAmount"])</expression>
+                                    <property name="dataType">any</property>
+                                </structure>
+                            </list-property>
+                            <column id="661">
+                                <property name="width">14mm</property>
+                            </column>
+                            <column id="678"/>
+                            <column id="472">
+                                <property name="width">30mm</property>
+                            </column>
+                            <column id="473">
+                                <property name="width">45mm</property>
+                            </column>
+                            <column id="474">
+                                <property name="width">30mm</property>
+                                <property name="marginRight">0pt</property>
+                                <property name="paddingRight">1pt</property>
+                            </column>
+                            <column id="475">
+                                <property name="width">10mm</property>
+                                <property name="paddingLeft">1pt</property>
+                                <property name="paddingRight">1pt</property>
+                            </column>
+                            <header>
+                                <row id="457">
+                                    <property name="backgroundColor">#C0C0C0</property>
+                                    <cell id="657">
+                                        <property name="paddingTop">1pt</property>
+                                    </cell>
+                                    <cell id="674">
+                                        <property name="paddingTop">1pt</property>
+                                        <label id="669">
+                                            <property name="style">TableHeader</property>
+                                            <property name="fontFamily">sans-serif</property>
+                                            <property name="fontWeight">bold</property>
+                                            <text-property name="text" key="payment">Payment date</text-property>
+                                        </label>
+                                    </cell>
+                                    <cell id="458">
+                                        <property name="paddingTop">1pt</property>
+                                    </cell>
+                                    <cell id="459">
+                                        <property name="paddingTop">1pt</property>
+                                        <label id="668">
+                                            <property name="style">TableHeader</property>
+                                            <property name="fontFamily">sans-serif</property>
+                                            <property name="fontSize">10pt</property>
+                                            <property name="fontWeight">bold</property>
+                                            <text-property name="text" key="flavour">Flavour</text-property>
+                                        </label>
+                                    </cell>
+                                    <cell id="460">
+                                        <property name="paddingTop">1pt</property>
+                                        <label id="670">
+                                            <property name="style">TableHeader</property>
+                                            <property name="fontFamily">sans-serif</property>
+                                            <property name="fontSize">10pt</property>
+                                            <property name="fontWeight">bold</property>
+                                            <property name="textAlign">right</property>
+                                            <text-property name="text" key="transferAmount">Transfer amount</text-property>
+                                        </label>
+                                    </cell>
+                                    <cell id="461">
+                                        <property name="paddingTop">1pt</property>
+                                    </cell>
+                                </row>
+                            </header>
+                            <detail>
+                                <row id="462">
+                                    <cell id="658">
+                                        <property name="paddingTop">1pt</property>
+                                    </cell>
+                                    <cell id="675">
+                                        <property name="colSpan">2</property>
+                                        <property name="rowSpan">1</property>
+                                        <property name="paddingTop">1pt</property>
+                                        <data id="624">
+                                            <property name="style">TableContent</property>
+                                            <property name="fontFamily">sans-serif</property>
+                                            <property name="resultSetColumn">paymentEndDT</property>
+                                        </data>
+                                    </cell>
+                                    <cell id="464">
+                                        <property name="paddingTop">1pt</property>
+                                        <data id="625">
+                                            <property name="style">TableContent</property>
+                                            <property name="fontFamily">sans-serif</property>
+                                            <property name="fontSize">10pt</property>
+                                            <property name="resultSetColumn">modeOfPaymentFlavourName</property>
+                                        </data>
+                                    </cell>
+                                    <cell id="465">
+                                        <property name="paddingTop">1pt</property>
+                                        <data id="622">
+                                            <property name="style">TableContent</property>
+                                            <property name="fontFamily">sans-serif</property>
+                                            <property name="fontSize">10pt</property>
+                                            <property name="marginTop">0pt</property>
+                                            <structure name="numberFormat">
+                                                <property name="category">Currency</property>
+                                                <property name="pattern">#,##0.00</property>
+                                            </structure>
+                                            <property name="textAlign">right</property>
+                                            <list-property name="boundDataColumns">
+                                                <structure>
+                                                    <property name="name">paymentJDOID</property>
+                                                    <expression name="expression">dataSetRow["paymentJDOID"]</expression>
+                                                    <property name="dataType">string</property>
+                                                </structure>
+                                                <structure>
+                                                    <property name="name">invoiceMoneyTransferJDOID</property>
+                                                    <expression name="expression">dataSetRow["invoiceMoneyTransferJDOID"]</expression>
+                                                    <property name="dataType">string</property>
+                                                </structure>
+                                                <structure>
+                                                    <property name="name">transferAmount</property>
+                                                    <expression name="expression">dataSetRow["transferAmount"]</expression>
+                                                    <property name="dataType">float</property>
+                                                </structure>
+                                                <structure>
+                                                    <property name="name">transferCurrencyJDOID</property>
+                                                    <expression name="expression">dataSetRow["transferCurrencyJDOID"]</expression>
+                                                    <property name="dataType">string</property>
+                                                </structure>
+                                                <structure>
+                                                    <property name="name">transferCurrencySymbol</property>
+                                                    <expression name="expression">dataSetRow["transferCurrencySymbol"]</expression>
+                                                    <property name="dataType">string</property>
+                                                </structure>
+                                                <structure>
+                                                    <property name="name">paymentBeginDT</property>
+                                                    <expression name="expression">dataSetRow["paymentBeginDT"]</expression>
+                                                    <property name="dataType">date-time</property>
+                                                </structure>
+                                                <structure>
+                                                    <property name="name">paymentEndDT</property>
+                                                    <expression name="expression">dataSetRow["paymentEndDT"]</expression>
+                                                    <property name="dataType">date-time</property>
+                                                </structure>
+                                                <structure>
+                                                    <property name="name">modeOfPaymentFlavourJDOID</property>
+                                                    <expression name="expression">dataSetRow["modeOfPaymentFlavourJDOID"]</expression>
+                                                    <property name="dataType">string</property>
+                                                </structure>
+                                                <structure>
+                                                    <property name="name">modeOfPaymentFlavourName</property>
+                                                    <expression name="expression">dataSetRow["modeOfPaymentFlavourName"]</expression>
+                                                    <property name="dataType">string</property>
+                                                </structure>
+                                            </list-property>
+                                            <property name="resultSetColumn">transferAmount</property>
+                                        </data>
+                                    </cell>
+                                    <cell id="466">
+                                        <property name="paddingTop">1pt</property>
+                                        <data id="623">
+                                            <property name="style">TableContent</property>
+                                            <property name="fontFamily">sans-serif</property>
+                                            <property name="marginTop">1pt</property>
+                                            <property name="marginLeft">1pt</property>
+                                            <property name="marginBottom">1pt</property>
+                                            <property name="marginRight">3pt</property>
+                                            <property name="textAlign">right</property>
+                                            <property name="resultSetColumn">transferCurrencySymbol</property>
+                                        </data>
+                                    </cell>
+                                </row>
+                            </detail>
+                            <footer>
+                                <row id="640">
+                                    <property name="borderBottomColor">#808080</property>
+                                    <property name="borderBottomStyle">solid</property>
+                                    <property name="borderBottomWidth">thin</property>
+                                    <property name="borderTopColor">#808080</property>
+                                    <property name="borderTopStyle">solid</property>
+                                    <property name="borderTopWidth">thin</property>
+                                    <cell id="659">
+                                        <property name="colSpan">3</property>
+                                        <property name="rowSpan">1</property>
+                                        <text id="656">
+                                            <property name="fontFamily">sans-serif</property>
+                                            <property name="fontSize">10pt</property>
+                                            <property name="contentType">auto</property>
+                                            <text-property name="content" key="sumOfPayment"><![CDATA[Sum of payment:]]></text-property>
+                                        </text>
+                                    </cell>
+                                    <cell id="642"/>
+                                    <cell id="643">
+                                        <property name="paddingTop">1pt</property>
+                                        <data id="655">
+                                            <property name="style">TableContent</property>
+                                            <property name="fontFamily">sans-serif</property>
+                                            <property name="fontSize">10pt</property>
+                                            <structure name="numberFormat">
+                                                <property name="category">Currency</property>
+                                                <property name="pattern">#,##0.00</property>
+                                            </structure>
+                                            <property name="textAlign">right</property>
+                                            <property name="resultSetColumn">SumOfPayment</property>
+                                        </data>
+                                    </cell>
+                                    <cell id="644">
+                                        <data id="663">
+                                            <property name="style">TableContent</property>
+                                            <property name="fontFamily">sans-serif</property>
+                                            <property name="fontSize">10pt</property>
+                                            <property name="marginTop">1pt</property>
+                                            <property name="marginLeft">1pt</property>
+                                            <property name="marginBottom">1pt</property>
+                                            <property name="marginRight">3pt</property>
+                                            <property name="textAlign">right</property>
+                                            <property name="resultSetColumn">transferCurrencySymbol</property>
+                                        </data>
+                                    </cell>
+                                </row>
+                                <row id="650">
+                                    <cell id="660">
+                                        <property name="colSpan">3</property>
+                                        <property name="rowSpan">1</property>
+                                        <text id="664">
+                                            <property name="fontFamily">sans-serif</property>
+                                            <property name="fontSize">10pt</property>
+                                            <property name="fontWeight">bold</property>
+                                            <property name="contentType">auto</property>
+                                            <text-property name="content" key="remainingAmount"><![CDATA[Remaining amount:]]></text-property>
+                                        </text>
+                                    </cell>
+                                    <cell id="652"/>
+                                    <cell id="653">
+                                        <data id="683">
+                                            <property name="style">TableContent</property>
+                                            <property name="fontFamily">sans-serif</property>
+                                            <property name="fontSize">10pt</property>
+                                            <property name="fontWeight">bold</property>
+                                            <property name="paddingTop">1pt</property>
+                                            <structure name="numberFormat">
+                                                <property name="category">Currency</property>
+                                                <property name="pattern">#,##0.00</property>
+                                            </structure>
+                                            <property name="textAlign">right</property>
+                                            <property name="resultSetColumn">remainingAmount</property>
+                                        </data>
+                                    </cell>
+                                    <cell id="654">
+                                        <data id="667">
+                                            <property name="style">TableContent</property>
+                                            <property name="fontFamily">sans-serif</property>
+                                            <property name="fontSize">10pt</property>
+                                            <property name="fontWeight">bold</property>
+                                            <property name="marginTop">1pt</property>
+                                            <property name="marginLeft">1pt</property>
+                                            <property name="marginBottom">1pt</property>
+                                            <property name="marginRight">3pt</property>
+                                            <property name="textAlign">right</property>
+                                            <property name="resultSetColumn">transferCurrencySymbol</property>
+                                        </data>
+                                    </cell>
+                                </row>
+                            </footer>
+                        </table>
+                        <text-data id="626">
+                            <property name="fontFamily">sans-serif</property>
+                            <property name="fontSize">12pt</property>
+                            <property name="paddingTop">2em</property>
+                            <property name="paddingLeft">0pt</property>
+                            <property name="paddingBottom">1em</property>
+                            <property name="paddingRight">0pt</property>
+                            <list-property name="visibility">
+                                <structure>
+                                    <property name="format">all</property>
+                                    <expression name="valueExpr">invoice = JFireReportingHelper.getVar("articleContainer");
+invoice.getInvoiceLocal().getAmountPaid() != 0</expression>
+                                </structure>
+                            </list-property>
+                            <expression name="valueExpr">importClass(Packages.org.nightlabs.jfire.reporting.textpart.ReportTextPartHelper);
+eval(String(ReportTextPartHelper.getEvalString(
+  JFireReportingHelper.getDataSetParamObject(params["articleContainerID"]), "remainingamount")));</expression>
+                            <property name="contentType">html</property>
+                        </text-data>
+                        <text-data id="684">
+                            <property name="fontFamily">sans-serif</property>
+                            <property name="fontSize">12pt</property>
+                            <property name="paddingTop">2em</property>
+                            <property name="paddingBottom">1em</property>
+                            <list-property name="visibility">
+                                <structure>
+                                    <property name="format">all</property>
+                                    <expression name="valueExpr">invoice = JFireReportingHelper.getVar("articleContainer");
+invoice.getInvoiceLocal().getAmountPaid() == 0 || invoice.getInvoiceLocal().getAmountToPay() == 0</expression>
+                                </structure>
+                            </list-property>
+                            <expression name="valueExpr">importClass(Packages.org.nightlabs.jfire.reporting.textpart.ReportTextPartHelper);
+eval(String(ReportTextPartHelper.getEvalString(
+  JFireReportingHelper.getDataSetParamObject(params["articleContainerID"]), "remainingamountpart")));</expression>
+                            <property name="contentType">html</property>
+                        </text-data>
                         <text-data id="368">
                             <property name="style">BodyText</property>
                             <property name="fontFamily">sans-serif</property>
-                            <property name="paddingTop">1em</property>
+                            <property name="paddingTop">2em</property>
                             <property name="paddingLeft">0pt</property>
-                            <property name="paddingBottom">0pt</property>
+                            <property name="paddingBottom">1em</property>
                             <property name="paddingRight">0pt</property>
+                            <list-property name="visibility">
+                                <structure>
+                                    <property name="format">all</property>
+                                    <expression name="valueExpr">invoice = JFireReportingHelper.getVar("articleContainer");
+invoice.getInvoiceLocal().getAmountToPay() != 0</expression>
+                                </structure>
+                            </list-property>
                             <expression name="valueExpr">importClass(Packages.org.nightlabs.jfire.reporting.textpart.ReportTextPartHelper);
 eval(String(ReportTextPartHelper.getEvalString(
   JFireReportingHelper.getDataSetParamObject(params["articleContainerID"]), "finish")));</expression>
                             <property name="contentType">html</property>
                         </text-data>
+                        <table id="627">
+                            <property name="width">100%</property>
+                            <property name="dataSet">Invoice Payments</property>
+                            <list-property name="boundDataColumns">
+                                <structure>
+                                    <property name="name">paymentJDOID</property>
+                                    <expression name="expression">dataSetRow["paymentJDOID"]</expression>
+                                    <property name="dataType">string</property>
+                                </structure>
+                                <structure>
+                                    <property name="name">invoiceMoneyTransferJDOID</property>
+                                    <expression name="expression">dataSetRow["invoiceMoneyTransferJDOID"]</expression>
+                                    <property name="dataType">string</property>
+                                </structure>
+                                <structure>
+                                    <property name="name">transferAmount</property>
+                                    <expression name="expression">dataSetRow["transferAmount"]</expression>
+                                    <property name="dataType">float</property>
+                                </structure>
+                                <structure>
+                                    <property name="name">transferCurrencyJDOID</property>
+                                    <expression name="expression">dataSetRow["transferCurrencyJDOID"]</expression>
+                                    <property name="dataType">string</property>
+                                </structure>
+                                <structure>
+                                    <property name="name">transferCurrencySymbol</property>
+                                    <expression name="expression">dataSetRow["transferCurrencySymbol"]</expression>
+                                    <property name="dataType">string</property>
+                                </structure>
+                                <structure>
+                                    <property name="name">paymentBeginDT</property>
+                                    <expression name="expression">dataSetRow["paymentBeginDT"]</expression>
+                                    <property name="dataType">date-time</property>
+                                </structure>
+                                <structure>
+                                    <property name="name">paymentEndDT</property>
+                                    <expression name="expression">dataSetRow["paymentEndDT"]</expression>
+                                    <property name="dataType">date-time</property>
+                                </structure>
+                                <structure>
+                                    <property name="name">modeOfPaymentFlavourJDOID</property>
+                                    <expression name="expression">dataSetRow["modeOfPaymentFlavourJDOID"]</expression>
+                                    <property name="dataType">string</property>
+                                </structure>
+                                <structure>
+                                    <property name="name">modeOfPaymentFlavourName</property>
+                                    <expression name="expression">dataSetRow["modeOfPaymentFlavourName"]</expression>
+                                    <property name="dataType">string</property>
+                                </structure>
+                            </list-property>
+                            <column id="637"/>
+                            <column id="638"/>
+                            <header>
+                                <row id="628">
+                                    <cell id="629"/>
+                                    <cell id="630"/>
+                                </row>
+                            </header>
+                            <detail>
+                                <row id="631">
+                                    <cell id="632">
+                                        <text-data id="639">
+                                            <property name="contentType">html</property>
+                                        </text-data>
+                                    </cell>
+                                    <cell id="633"/>
+                                </row>
+                            </detail>
+                            <footer>
+                                <row id="634">
+                                    <cell id="635"/>
+                                    <cell id="636"/>
+                                </row>
+                            </footer>
+                        </table>
                     </cell>
                 </row>
             </detail>

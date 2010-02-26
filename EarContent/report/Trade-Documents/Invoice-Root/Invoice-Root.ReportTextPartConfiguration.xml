@@ -1,26 +1,10 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE reportTextPartConfiguration PUBLIC "-//NightLabs//Reporting Initialiser DTD V 0.5//EN" "http://www.nightlabs.de/dtd/reporting-initialiser-content_0_5.dtd">
 <reportTextPartConfiguration>
-	<reportTextPart id="salutation" type="jshtml">
-		<name language="en">Salutation text</name>
-		<name language="de">Anrede</name>
-		<content language="en"><![CDATA[<? 
-var salutationText = "Dear Ladies, dear Sirs";
-if (row["Name"] != "") {
-	var title = row["Title"];
-	// In the English language, the academic/official title replaces the social title.
-	if (title == "")
-		salutationText = "Dear " + row["Salutation_Text"] + " " + row["Name"];
-	else
-		salutationText = "Dear " + title + " " + row["Name"];
-}
-?>
-
-<?=salutationText?>,
-<br/><br/>
-thank you for your order! We are hereby invoicing you for the following services rendered or goods delivered:
-]]>
-		</content>
-		<content language="de"><![CDATA[<? 
+<reportTextPart id="salutation" type="JSHTML">
+<name language="de">Anrede</name>
+<name language="en">Salutation text</name>
+<content language="de">&lt;? 
 var salutationText = "Sehr geehrte Damen und Herren";
 if (row["Name"] != "") {
 	// The German language requires declination. Thus, we have to
@@ -46,32 +30,91 @@ if (row["Name"] != "") {
 
 	salutationText = salutationText + salutation + title + row["Name"];
 }
-?>
+?&gt;
 
-<?=salutationText?>,
-<br/><br/>
+&lt;?=salutationText?&gt;,
+&lt;br/&gt;&lt;br/&gt;
 vielen Dank für Ihren Auftrag! Die von Ihnen bestellte Ware oder Dienstleistung haben Sie bereits erhalten. Somit erlauben wir uns, wie folgt zu berechnen:
-]]>
+
 		</content>
-	</reportTextPart>
-	<reportTextPart id="finish" type="jshtml">
-		<name language="en">Finish text</name>
-		<name language="de">Schlusstext</name>
-		<content language="en"><![CDATA[We kindly ask for immediate payment to the account specified below. Please quote the invoice number in the transfer description. All goods stay in our possession until complete payment.
-<br/>
-<br/>
-Yours sincerely,
-<br/>
-<?=row["DisplayName"]?>
-]]>
+<content language="en">&lt;? 
+var salutationText = "Dear Ladies, dear Sirs";
+if (row["Name"] != "") {
+	var title = row["Title"];
+	// In the English language, the academic/official title replaces the social title.
+	if (title == "")
+		salutationText = "Dear " + row["Salutation_Text"] + " " + row["Name"];
+	else
+		salutationText = "Dear " + title + " " + row["Name"];
+}
+?&gt;
+
+&lt;?=salutationText?&gt;,
+&lt;br/&gt;&lt;br/&gt;
+thank you for your order! We are hereby invoicing you for the following services rendered or goods delivered:
+
 		</content>
-		<content language="de"><![CDATA[Wir bitten um sofortigen Ausgleich unter Angabe der Rechnungsnummer auf das unten angegebene Konto. Die Ware bleibt bis zur vollständigen Bezahlung unser Eigentum.
-<br/>
-<br/>
+</reportTextPart>
+<reportTextPart id="finish" type="JSHTML">
+<name language="de">Schlusstext</name>
+<name language="en">Finish text</name>
+<content language="de">&lt;br/&gt;
+&lt;br/&gt;
 Mit freundlichen Grüßen,
-<br/>
-<?=row["DisplayName"]?>
-]]>
+&lt;br/&gt;
+&lt;?=row["DisplayName"]?&gt;
+
 		</content>
-	</reportTextPart>
+<content language="en">&lt;br/&gt;
+&lt;br/&gt;
+Yours sincerely,
+&lt;br/&gt;
+&lt;?=row["DisplayName"]?&gt;
+
+		</content>
+</reportTextPart>
+<reportTextPart id="paymentsperformed" type="JSHTML">
+<name language="de">Getätigte Zahlungen</name>
+<name language="en">Payments performed text</name>
+<content language="de">Die folgenden Zahlungen wurden bereits durchgeführt:</content>
+<content language="en">The following payments have already been performed:</content>
+</reportTextPart>
+<reportTextPart id="remainingamount" type="JSHTML">
+<name language="de">Verbleibender Betrag</name>
+<name language="en">Remaining amount text</name>
+<content language="de">Wir bitten um sofortigen Ausgleich unter Angabe der Rechnungsnummer auf das unten angegebene Konto. Die Ware bleibt bis zur vollständigen Bezahlung unser Eigentum.
+&lt;br/&gt;
+&lt;br/&gt;
+Mit freundlichen Grüßen,
+&lt;br/&gt;
+&lt;?=row["DisplayName"]?&gt;
+
+		</content>
+<content language="en"> We kindly ask for immediate payment to the account specified below. Please quote the invoice number in the transfer description. All goods stay in our possession until complete payment.
+&lt;br/&gt;
+&lt;br/&gt;
+Yours sincerely,
+&lt;br/&gt;
+&lt;?=row["DisplayName"]?&gt;
+
+		</content>
+</reportTextPart>
+<reportTextPart id="remainingamountpart" type="JSHTML">
+<name language="de">Verbleibender Teilbetrag</name>
+<name language="en">Remaining partial amount text</name>
+<content language="de">Wir bitten um sofortigen Ausgleich des noch ausstehenden Betrags unter Angabe der Rechnungsnummer auf das unten angegebene Konto. Die Ware bleibt bis zur vollständigen Bezahlung unser Eigentum.
+&lt;br/&gt;
+&lt;br/&gt;
+Mit freundlichen Grüßen,
+&lt;br/&gt;
+&lt;?=row["DisplayName"]?&gt;</content>
+<content language="en"> We kindly ask for immediate payment of the amount remaining to the account specified below. Please quote the invoice number in the transfer description. All goods stay in our possession until complete payment.
+&lt;br/&gt;
+&lt;br/&gt;
+Yours sincerely,
+&lt;br/&gt;
+&lt;?=row["DisplayName"]?&gt;
+
+		</content>
+</reportTextPart>
 </reportTextPartConfiguration>

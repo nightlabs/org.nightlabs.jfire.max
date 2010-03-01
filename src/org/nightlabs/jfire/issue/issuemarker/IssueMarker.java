@@ -68,10 +68,10 @@ public class IssueMarker implements Serializable {
 	@PrimaryKey
 	private long issueMarkerID;
 
-	@Persistent(mappedBy="issueMarker", persistenceModifier=PersistenceModifier.PERSISTENT)
+	@Persistent(mappedBy="issueMarker", dependent="true")
 	private IssueMarkerName name;
 
-	@Persistent(mappedBy="issueMarker", persistenceModifier=PersistenceModifier.PERSISTENT)
+	@Persistent(mappedBy="issueMarker", dependent="true")
 	private IssueMarkerDescription description;
 
 

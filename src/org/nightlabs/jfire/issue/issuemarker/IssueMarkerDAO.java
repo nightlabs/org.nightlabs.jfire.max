@@ -8,7 +8,7 @@ import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.issue.Issue;
 import org.nightlabs.jfire.issue.IssueManagerRemote;
 import org.nightlabs.jfire.issue.id.IssueID;
-import org.nightlabs.jfire.issue.id.IssueMarkerID;
+import org.nightlabs.jfire.issue.issuemarker.id.IssueMarkerID;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.progress.ProgressMonitor;
 import org.nightlabs.progress.SubProgressMonitor;

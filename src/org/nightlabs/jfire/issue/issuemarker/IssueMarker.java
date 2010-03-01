@@ -17,7 +17,7 @@ import javax.jdo.annotations.VersionStrategy;
 
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.issue.history.FetchGroupsIssueHistoryItem;
-import org.nightlabs.jfire.issue.id.IssueMarkerID;
+import org.nightlabs.jfire.issue.issuemarker.id.IssueMarkerID;
 import org.nightlabs.jfire.organisation.Organisation;
 
 /**

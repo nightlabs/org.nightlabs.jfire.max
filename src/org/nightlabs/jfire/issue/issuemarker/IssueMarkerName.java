@@ -18,7 +18,7 @@ import javax.jdo.annotations.PrimaryKey;
 import org.nightlabs.i18n.I18nText;
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.issue.history.FetchGroupsIssueHistoryItem;
-import org.nightlabs.jfire.issue.id.IssueMarkerNameID;
+import org.nightlabs.jfire.issue.issuemarker.id.IssueMarkerNameID;
 
 /**
  * The name identifier for an {@link IssueMarker}.

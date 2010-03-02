@@ -1,7 +1,14 @@
 package org.nightlabs.jfire.issue.issuemarker;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Locale;
 import java.util.Set;
+
+import javax.jdo.JDODetachedFieldAccessException;
+import javax.jdo.JDOHelper;
 
 import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
@@ -13,10 +20,12 @@ import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.progress.ProgressMonitor;
 import org.nightlabs.progress.SubProgressMonitor;
 import org.nightlabs.util.CollectionUtil;
+import org.nightlabs.util.NLLocale;
 
 /**
- * The companion DAO for the main IssueDAO. *
+ * The companion DAO for the main IssueDAO.
  * @author Khaireel Mohamed - khaireel at nightlabs dot de
+ * @author Marco หงุ่ยตระกูล-Schulze - marco at nightlabs dot de
  */
 public class IssueMarkerDAO extends BaseJDOObjectDAO<IssueMarkerID, IssueMarker> {
 	// :: --- [Statics] -----------------------------------------------------------------
@@ -78,6 +87,48 @@ public class IssueMarkerDAO extends BaseJDOObjectDAO<IssueMarkerID, IssueMarker>
 			monitor.worked(50);
 
 			return getJDOObjects(null, issueMarkerIDs, fetchGroups, maxFetchDepth, new SubProgressMonitor(monitor, 50));
+		} finally {
+			monitor.done();
+		}
+	}
+
+	public synchronized List<IssueMarker> getIssueMarkers(String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
+	{
+		monitor.beginTask("Loading issue markers", 100);
+		try {
+			final Locale locale = NLLocale.getDefault();
+			String resultKey = IssueMarkerDAO.class.getName() + "::ALL::" + locale;
+
+			@SuppressWarnings("unchecked")
+			List<IssueMarker> result = (List<IssueMarker>) getCache().get(resultKey, resultKey, fetchGroups, maxFetchDepth);
+			if (result != null)
+				monitor.worked(100);
+			else {
+				IssueManagerRemote ejb = JFireEjb3Factory.getRemoteBean(IssueManagerRemote.class, SecurityReflector.getInitialContextProperties());
+				Set<IssueMarkerID> issueMarkerIDs = ejb.getIssueMarkerIDs();
+				monitor.worked(20);
+
+				result = getJDOObjects(null, issueMarkerIDs, fetchGroups, maxFetchDepth, new SubProgressMonitor(monitor, 80));
+
+				// Sort according to name and store result in cache (so we don't need to sort every time).
+				Collections.sort(result, new Comparator<IssueMarker>() {
+					@Override
+					public int compare(IssueMarker o1, IssueMarker o2) {
+						String s1 = null;
+						try { s1 = o1.getName().getText(locale); } catch (JDODetachedFieldAccessException x) { } // silently ignored non-detached field
+						if (s1 == null) s1 = '_' + JDOHelper.getObjectId(o1).toString();
+
+						String s2 = null;
+						try { s2 = o2.getName().getText(locale); } catch (JDODetachedFieldAccessException x) { } // silently ignored non-detached field
+						if (s2 == null) s2 = '_' + JDOHelper.getObjectId(o2).toString();
+
+						return s1.compareTo(s2);
+					}
+				});
+
+				getCache().put(resultKey, resultKey, result, fetchGroups, maxFetchDepth);
+			}
+			return result;
 		} finally {
 			monitor.done();
 		}

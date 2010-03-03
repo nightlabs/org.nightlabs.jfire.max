@@ -1,6 +1,7 @@
 package org.nightlabs.jfire.personrelation;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -47,36 +48,6 @@ import org.nightlabs.util.Util;
 )
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 @Discriminator(strategy=DiscriminatorStrategy.CLASS_NAME)
-//@Queries({
-//	@javax.jdo.annotations.Query(
-//			name="getPersonRelationsFromTo",
-//			value="SELECT WHERE this.from == :from && this.to == :to"
-//	),
-//	@javax.jdo.annotations.Query(
-//			name="getPersonRelationsFromToWithType",
-//			value="SELECT WHERE this.personRelationType == :personRelationType && this.from == :from && this.to == :to"
-//	),
-//	@javax.jdo.annotations.Query(
-//			name="getPersonRelationsFrom",
-//			value="SELECT WHERE this.from == :from"
-//	),
-//	@javax.jdo.annotations.Query(
-//			name="getPersonRelationsFromWithType",
-//			value="SELECT WHERE this.personRelationType == :personRelationType && this.from == :from"
-//	),
-//	@javax.jdo.annotations.Query(
-//			name="getPersonRelationsTo",
-//			value="SELECT WHERE this.to == :to"
-//	),
-//	@javax.jdo.annotations.Query(
-//			name="getPersonRelationsToWithType",
-//			value="SELECT WHERE this.personRelationType == :personRelationType && this.to == :to"
-//	),
-//	@javax.jdo.annotations.Query(
-//			name="getPersonRelationsByType",
-//			value="SELECT WHERE this.personRelationType == :personRelationType"
-//	),
-//})
 @FetchGroups({
 	@FetchGroup(
 			name=PersonRelation.FETCH_GROUP_PERSON_RELATION_TYPE,
@@ -152,144 +123,57 @@ implements Serializable, AttachCallback, DetachCallback, StoreCallback, DeleteCa
 	public static long getPersonRelationCount(PersistenceManager pm, PersonRelationType personRelationType, Person fromPerson, Person toPerson)
 	{
 		Query q = createPersonRelationQuery(pm, personRelationType, fromPerson, toPerson);
-		q.setResult("count(this)");
+		try {
+			q.setResult("count(this)");
 
-		Map<String, Object> params = new HashMap<String, Object>(3);
-		params.put("personRelationType", personRelationType);
-		params.put("fromPerson", fromPerson);
-		params.put("toPerson", toPerson);
+			Map<String, Object> params = new HashMap<String, Object>(3);
+			params.put("personRelationType", personRelationType);
+			params.put("fromPerson", fromPerson);
+			params.put("toPerson", toPerson);
 
-		return (Long) q.executeWithMap(params);
+			return (Long) q.executeWithMap(params);
+		} finally {
+			q.closeAll();
+		}
 	}
 
 
 	public static Collection<? extends PersonRelation> getPersonRelations(PersistenceManager pm, PersonRelationType personRelationType, Person fromPerson, Person toPerson)
 	{
 		Query q = createPersonRelationQuery(pm, personRelationType, fromPerson, toPerson);
+		try {
+			Map<String, Object> params = new HashMap<String, Object>(3);
+			params.put("personRelationType", personRelationType);
+			params.put("fromPerson", fromPerson);
+			params.put("toPerson", toPerson);
 
-		Map<String, Object> params = new HashMap<String, Object>(3);
-		params.put("personRelationType", personRelationType);
-		params.put("fromPerson", fromPerson);
-		params.put("toPerson", toPerson);
-
-		@SuppressWarnings("unchecked")
-		Collection<? extends PersonRelation> c = (Collection<? extends PersonRelation>) q.executeWithMap(params);
-		return c;
+			@SuppressWarnings("unchecked")
+			Collection<? extends PersonRelation> c = (Collection<? extends PersonRelation>) q.executeWithMap(params);
+			c = new ArrayList<PersonRelation>(c);
+			return c;
+		} finally {
+			q.closeAll();
+		}
 	}
 
 	public static Collection<? extends PersonRelation> getPersonRelations(PersistenceManager pm,
 			Person fromPerson, Person toPerson, Set<PersonRelationType> personRelationTypes)
 	{
 		Query q = createPersonRelationQuery(pm, personRelationTypes, fromPerson, toPerson);
+		try {
+			Map<String, Object> params = new HashMap<String, Object>(3);
+			params.put("personRelationTypes", personRelationTypes);
+			params.put("fromPerson", fromPerson);
+			params.put("toPerson", toPerson);
 
-		Map<String, Object> params = new HashMap<String, Object>(3);
-		params.put("personRelationTypes", personRelationTypes);
-		params.put("fromPerson", fromPerson);
-		params.put("toPerson", toPerson);
-
-		@SuppressWarnings("unchecked")
-		Collection<? extends PersonRelation> c = (Collection<? extends PersonRelation>) q.executeWithMap(params);
-		return c;
+			@SuppressWarnings("unchecked")
+			Collection<? extends PersonRelation> c = (Collection<? extends PersonRelation>) q.executeWithMap(params);
+			c = new ArrayList<PersonRelation>(c);
+			return c;
+		} finally {
+			q.closeAll();
+		}
 	}
-
-//	public static Collection<? extends PersonRelation> getPersonRelations(PersistenceManager pm, PersonRelationType personRelationType, Person fromPerson, Person toPerson)
-//	{
-//		if (personRelationType == null)
-//			return getPersonRelations(pm, fromPerson, toPerson);
-//
-//		if (fromPerson == null && toPerson == null)
-//			throw new IllegalArgumentException("fromPerson and toPerson must not both be null! At least one must be assigned!");
-//
-//		if (fromPerson == null)
-//			return getPersonRelationsTo(pm, personRelationType, toPerson);
-//
-//		if (toPerson == null)
-//			return getPersonRelationsFrom(pm, personRelationType, fromPerson);
-//
-//		Query q = pm.newNamedQuery(PersonRelation.class, "getPersonRelationsFromToWithType");
-//		@SuppressWarnings("unchecked")
-//		Collection<? extends PersonRelation> c = (Collection<? extends PersonRelation>) q.execute(personRelationType, fromPerson, toPerson);
-//		return c;
-//	}
-//
-//	public static Collection<? extends PersonRelation> getPersonRelations(PersistenceManager pm, Person fromPerson, Person toPerson)
-//	{
-//		if (fromPerson == null && toPerson == null)
-//			throw new IllegalArgumentException("fromPerson and toPerson must not both be null! At least one must be assigned!");
-//
-//		if (fromPerson == null)
-//			return getPersonRelationsTo(pm, toPerson);
-//
-//		if (toPerson == null)
-//			return getPersonRelationsFrom(pm, fromPerson);
-//
-//		Query q = pm.newNamedQuery(PersonRelation.class, "getPersonRelationsFromTo");
-//		@SuppressWarnings("unchecked")
-//		Collection<? extends PersonRelation> c = (Collection<? extends PersonRelation>) q.execute(fromPerson, toPerson);
-//		return c;
-//	}
-//
-//	public static Collection<? extends PersonRelation> getPersonRelationsFrom(PersistenceManager pm, Person fromPerson)
-//	{
-//		if (fromPerson == null)
-//			throw new IllegalArgumentException("fromPerson must not be null!");
-//
-//		Query q = pm.newNamedQuery(PersonRelation.class, "getPersonRelationsFrom");
-//		@SuppressWarnings("unchecked")
-//		Collection<? extends PersonRelation> c = (Collection<? extends PersonRelation>) q.execute(fromPerson);
-//		return c;
-//	}
-//
-//	public static Collection<? extends PersonRelation> getPersonRelationsTo(PersistenceManager pm, Person toPerson)
-//	{
-//		if (toPerson == null)
-//			throw new IllegalArgumentException("toPerson must not be null!");
-//
-//		Query q = pm.newNamedQuery(PersonRelation.class, "getPersonRelationsTo");
-//		@SuppressWarnings("unchecked")
-//		Collection<? extends PersonRelation> c = (Collection<? extends PersonRelation>) q.execute(toPerson);
-//		return c;
-//	}
-//
-//
-//	public static Collection<? extends PersonRelation> getPersonRelationsFrom(PersistenceManager pm, PersonRelationType personRelationType, Person fromPerson)
-//	{
-//		if (personRelationType == null)
-//			return getPersonRelationsFrom(pm, fromPerson);
-//
-//		if (fromPerson == null)
-//			return getPersonRelations(pm, personRelationType);
-//
-//		Query q = pm.newNamedQuery(PersonRelation.class, "getPersonRelationsFromWithType");
-//		@SuppressWarnings("unchecked")
-//		Collection<? extends PersonRelation> c = (Collection<? extends PersonRelation>) q.execute(personRelationType, fromPerson);
-//		return c;
-//	}
-//
-//	public static Collection<? extends PersonRelation> getPersonRelationsTo(PersistenceManager pm, PersonRelationType personRelationType, Person toPerson)
-//	{
-//		if (personRelationType == null)
-//			return getPersonRelationsTo(pm, toPerson);
-//
-//		if (toPerson == null)
-//			return getPersonRelations(pm, personRelationType);
-//
-//		Query q = pm.newNamedQuery(PersonRelation.class, "getPersonRelationsToWithType");
-//		@SuppressWarnings("unchecked")
-//		Collection<? extends PersonRelation> c = (Collection<? extends PersonRelation>) q.execute(personRelationType, toPerson);
-//		return c;
-//	}
-//
-//	public static Collection<? extends PersonRelation> getPersonRelations(PersistenceManager pm, PersonRelationType personRelationType)
-//	{
-//		if (personRelationType == null)
-//			throw new IllegalArgumentException("personRelationType must not be null!");
-//
-//		Query q = pm.newNamedQuery(PersonRelation.class, "getPersonRelationsByType");
-//		@SuppressWarnings("unchecked")
-//		Collection<? extends PersonRelation> c = (Collection<? extends PersonRelation>) q.execute(personRelationType);
-//		return c;
-//	}
 
 	public static final String FETCH_GROUP_PERSON_RELATION_TYPE = "PersonRelation.personRelationType";
 	public static final String FETCH_GROUP_FROM = "PersonRelation.from";

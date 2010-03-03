@@ -1,5 +1,8 @@
 package org.nightlabs.jfire.issue.query;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -11,7 +14,6 @@ import org.apache.log4j.Logger;
 import org.nightlabs.jdo.query.AbstractJDOQuery;
 import org.nightlabs.jfire.issue.Issue;
 import org.nightlabs.jfire.issue.IssueComment;
-import org.nightlabs.jfire.issue.IssueLink;
 import org.nightlabs.jfire.issue.IssueSubject;
 import org.nightlabs.jfire.issue.id.IssueLinkTypeID;
 import org.nightlabs.jfire.issue.id.IssuePriorityID;
@@ -68,6 +70,10 @@ extends AbstractJDOQuery
 	private UserID assigneeID;
 	private Date createTimestamp;
 	private Date updateTimestamp;
+	
+	private Long deadlineTimePeriod;
+	private transient Date deadlineTimeDate;
+	
 	private IssueLinkTypeID issueLinkTypeID;
 	private Date issueWorkTimeRangeFrom;
 	private Date issueWorkTimeRangeTo;
@@ -80,7 +86,8 @@ extends AbstractJDOQuery
 	private boolean isSetCurrentUserAsAssignee;
 	private boolean isSetCurrentUserAsReporter;
 
-	private Set<IssueLink> issueLinks;
+	private Set<IssueLinkQueryElement> issueLinkQueryElements;
+
 	/**
 	 *  A static class contained all parameters that can be set to the query.
 	 *  It's intended to use internally!!
@@ -91,6 +98,9 @@ extends AbstractJDOQuery
 		public static final String assigneeID = "assigneeID";
 		public static final String createTimestamp = "createTimestamp";
 		public static final String updateTimestamp = "updateTimestamp";
+		
+		public static final String deadlineTimePeriod = "deadlineTimePeriod";
+		
 		public static final String issueTypeID = "issueTypeID";
 		public static final String issuePriorityID = "issuePriorityID";
 		public static final String issueResolutionID = "issueResolutionID";
@@ -108,7 +118,14 @@ extends AbstractJDOQuery
 
 		public static final String jbpmNodeName = "jbpmNodeName";
 		public static final String processDefinitionID = "processDefinitionID";
+
+		/**
+		 * @deprecated Remove this field!
+		 */
+		@Deprecated
 		public static final String issueLinks = "issueLinks";
+
+		public static final String issueLinkQueryElements = "issueLinkQueryElements";
 	}
 
 	/**
@@ -182,6 +199,22 @@ extends AbstractJDOQuery
 			filter.append("\n && this.updateTimestamp >= :updateTimestamp ");
 		}
 
+		if (isFieldEnabled(FieldName.deadlineTimePeriod) && deadlineTimePeriod != null) {
+			deadlineTimeDate = new Date(System.currentTimeMillis() + deadlineTimePeriod);
+			filter.append("\n && this.deadlineTimestamp <=  :deadlineTimeDate" );
+		}
+		
+		/*if (
+				(isFieldEnabled(FieldName.deadlineBeforeTimestamp) && deadlineBeforeTimestamp != null) || 
+				(isFieldEnabled(FieldName.deadlineAfterTimestamp) && deadlineAfterTimestamp != null)
+		) 
+		{
+			if (deadlineBeforeTimestamp != null)
+				filter.append("\n && this.deadlineTimestamp <= :deadlineBeforeTimestamp ");
+			if (deadlineAfterTimestamp != null)
+				filter.append("\n && this.deadlineTimestamp >= :deadlineAfterTimestamp ");
+		}*/
+		
 		if (isFieldEnabled(FieldName.issueLinkTypeID) && issueLinkTypeID != null) {
 //			filter.append("\n && (this.issueLinks.contains(varIssueLink) )) ");
 			filter.append("\n && (this.issueLinks.contains(varIssueLink) && (varIssueLink.issueLinkType.organisationID == :issueLinkTypeID.organisationID) && (varIssueLink.issueLinkType.issueLinkTypeID == :issueLinkTypeID.issueLinkTypeID)) ");
@@ -229,18 +262,49 @@ extends AbstractJDOQuery
 			filter.append("\n && (this.state.stateDefinition.jbpmNodeName == :jbpmNodeName)");
 		}
 
-		if (isFieldEnabled(FieldName.issueLinks) && issueLinks != null && !issueLinks.isEmpty()) {
-			filter.append("\n && (this.issueLinks.contains(varIssueLink) && (");
-			int i = 0;
-			for (Iterator<IssueLink> it = issueLinks.iterator(); it.hasNext(); i++) {
-				IssueLink issueLink = it.next();
-				filter.append("(varIssueLink.linkedObjectID.toLowerCase().matches(\""+ issueLink.getLinkedObjectID().toString().toLowerCase()+"\"))");
-				if (i < issueLinks.size() - 1)
-					filter.append(" || ");
+		if (isFieldEnabled(FieldName.issueLinkQueryElements) && issueLinkQueryElements != null) {
+			Collection<IssueLinkQueryElement> queryElements = new ArrayList<IssueLinkQueryElement>(issueLinkQueryElements.size());
+			for (IssueLinkQueryElement issueLinkQueryElement : issueLinkQueryElements) {
+				if (issueLinkQueryElement.getLinkedObjectID() == null && issueLinkQueryElement.getIssueLinkTypeID() == null)
+					continue; // no criteria => silently ignore
+
+				queryElements.add(issueLinkQueryElement);
 			}
-			filter.append("))");
+
+			if (!queryElements.isEmpty()) {
+				int i = 0;
+				filter.append("\n && (");
+				for (Iterator<IssueLinkQueryElement> it = queryElements.iterator(); it.hasNext(); ++i) {
+					IssueLinkQueryElement issueLinkQueryElement = it.next();
+
+					if (issueLinkQueryElement.getLinkedObjectID() == null && issueLinkQueryElement.getIssueLinkTypeID() == null)
+						continue; // no criteria => silently ignore
+
+					String issueLinkVarName = "varIssueLink" + i;
+					addVariable(String.class, issueLinkVarName);
+					filter.append("\n (this.issueLinks.contains(").append(issueLinkVarName).append(")");
+
+					if (issueLinkQueryElement.getIssueLinkTypeID() != null) {
+						String issueLinkTypeIDParamName = "issueLinkTypeID" + i;
+						filter.append(" && JDOHelper.getObjectId(").append(issueLinkVarName).append(".issueLinkType) == :").append(issueLinkTypeIDParamName);
+						addParam(issueLinkTypeIDParamName, issueLinkQueryElement.getIssueLinkTypeID());
+					}
+
+					if (issueLinkQueryElement.getLinkedObjectID() != null) {
+						String linkedObjectIDStringParamName = "linkedObjectIDString" + i;
+						filter.append(" && ").append(issueLinkVarName).append(".linkedObjectID == :").append(linkedObjectIDStringParamName);
+						addParam(linkedObjectIDStringParamName, issueLinkQueryElement.getLinkedObjectID().toString());
+					}
+
+					filter.append(")");
+					if (it.hasNext()) {
+						filter.append("\n || ");
+					}
+				}
+				filter.append("\n)");
+			}
 		}
-		
+
 		logger.info(filter.toString());
 		q.setFilter(filter.toString());
 	}
@@ -602,7 +666,7 @@ extends AbstractJDOQuery
 
 	/**
 	 * Sets the {@link Date}.
-	 * @param issueSubject
+	 * @param updateTimestamp
 	 */
 	public void setUpdateTimestamp(Date updateTimestamp)
 	{
@@ -610,6 +674,62 @@ extends AbstractJDOQuery
 		this.updateTimestamp = updateTimestamp;
 		notifyListeners(FieldName.updateTimestamp, oldUpdateTimestamp, updateTimestamp);
 	}
+	
+	/**
+	 * Returns the {@link Long} of {@link Issue}'s deadline time period
+	 * @return a {@link Long} of {@link Issue}'s deadline time period
+	 */
+	public Long getDeadlineTimePeriod() {
+		return deadlineTimePeriod;
+	}
+
+	/**
+	 * Sets the {@link Long}.
+	 * @param deadlineTimePeriod
+	 */
+	public void setDeadlineTimePeriod(Long deadlineTimePeriod)
+	{
+		final Long oldDeadlineTimePeriod = this.deadlineTimePeriod;
+		this.deadlineTimePeriod = deadlineTimePeriod;
+		notifyListeners(FieldName.deadlineTimePeriod, oldDeadlineTimePeriod, deadlineTimePeriod);
+	}
+//	/**
+//	 * Returns the {@link Date} of {@link Issue}'s deadline time
+//	 * @return a {@link Date} of {@link Issue}'s deadline time
+//	 */
+//	public Date getDeadlineAfterTimestamp() {
+//		return deadlineAfterTimestamp;
+//	}
+//
+//	/**
+//	 * Sets the {@link Date}.
+//	 * @param deadlineTimestamp
+//	 */
+//	public void setDeadlineAfterTimestamp(Date deadlineAfterTimestamp)
+//	{
+//		final Date oldDeadlineAfterTimestamp = this.deadlineAfterTimestamp;
+//		this.deadlineAfterTimestamp = deadlineAfterTimestamp;
+//		notifyListeners(FieldName.deadlineAfterTimestamp, oldDeadlineAfterTimestamp, deadlineAfterTimestamp);
+//	}
+//	
+//	/**
+//	 * Returns the {@link Date} of {@link Issue}'s deadline time
+//	 * @return a {@link Date} of {@link Issue}'s deadline time
+//	 */
+//	public Date getDeadlineBeforeTimestamp() {
+//		return deadlineBeforeTimestamp;
+//	}
+//
+//	/**
+//	 * Sets the {@link Date}.
+//	 * @param deadlineTimestamp
+//	 */
+//	public void setDeadlineBeforeTimestamp(Date deadlineBeforeTimestamp)
+//	{
+//		final Date oldDeadlineBeforeTimestamp = this.deadlineBeforeTimestamp;
+//		this.deadlineBeforeTimestamp = deadlineBeforeTimestamp;
+//		notifyListeners(FieldName.deadlineBeforeTimestamp, oldDeadlineBeforeTimestamp, deadlineBeforeTimestamp);
+//	}
 
 	/**
 	 * Returns the {@link Set} of {@link ProjectID}.
@@ -661,17 +781,32 @@ extends AbstractJDOQuery
 		notifyListeners(FieldName.processDefinitionID, oldProcessDefinitionID, processDefinitionID);
 	}
 
-	public Set<IssueLink> getIssueLinks() {
-		if (issueLinks == null) {
-			issueLinks = new HashSet<IssueLink>();
-		}
-		return issueLinks;
+	public Set<IssueLinkQueryElement> getIssueLinkQueryElements() {
+		if (issueLinkQueryElements == null)
+			issueLinkQueryElements = new HashSet<IssueLinkQueryElement>();
+
+		//  should we copy this? Or maybe make it read-only? IMHO it should not be modified, hence I'll make the result read-only.
+		// You should think about getProjectIDs and setProjectIDs - are they behaving correctly and logically?
+		// Who changes this instance when? If the result of this method is supposed to be modified outside, why is there a setter method?
+		// From Yo, yes you are absolutely correct! ;-) I didn't think about this. So I change this to non-modifiable object.
+		return Collections.unmodifiableSet(issueLinkQueryElements);
 	}
-	
-	public void setIssueLinks(Set<IssueLink> issueLinks) {
-		final Set<IssueLink> oldIssueLinks = getIssueLinks();
-		this.issueLinks = issueLinks;
-		notifyListeners(FieldName.issueLinks, oldIssueLinks, issueLinks);
+
+	public void setIssueLinkQueryElements(Set<IssueLinkQueryElement> issueLinkQueryElements) {
+		// TODO @Chairat: I took the same strategy as in setProjectIDs, but is the linkedObjectIDs- (as well as the projectIDs-) Set
+		// really copied? If not and you simply set the same object that you obtained in getLinkedObjectIDs() again (after modifying it),
+		// IMHO this contract with getters and setters makes no sense. So what's the strategy? Is the object really replaced (who copies it?)
+		// or do you set a reference to the same object?
+		// Marco.
+		final Set<IssueLinkQueryElement> oldIssueLinkQueryElements = this.issueLinkQueryElements;
+		this.issueLinkQueryElements = issueLinkQueryElements;
+		// WARNING: If oldLinkedObjectIDs references the same Set as the one that is passed as linkedObjects, these listeners
+		// might never be triggered (they check, if old and new are equal). See the TODOs above - either it is a contract that getters and setters
+		// are guarantied to be called with different instances of the Set or you must pass oldLinkedObjectIDs == null here.
+		// At the moment, this looks like a contradiction.
+		// Please document the behaviour of the getter+setter and the way a UI is supposed to work with it (imagine
+		// someone else writes UI for this class). Alternatively, you could always copy the set here in the setter, too.
+		notifyListeners(FieldName.issueLinkQueryElements, oldIssueLinkQueryElements, issueLinkQueryElements);
 	}
 
 	@Override

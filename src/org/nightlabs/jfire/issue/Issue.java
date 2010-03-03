@@ -362,6 +362,12 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback, StoreCallbac
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+	private Date deadlineTimestamp;
+	
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private IssueResolution issueResolution;
 
 	/**
@@ -569,6 +575,22 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback, StoreCallbac
 	 */
 	public void setUpdateTimestamp(Date timestamp) {
 		this.updateTimestamp = timestamp;
+	}
+	
+	/**
+	 * Returns the deadline time's {@link Date}.
+	 * @return the deadline time's {@link Date}
+	 */
+	public Date getDeadlineTimestamp() {
+		return deadlineTimestamp;
+	}
+
+	/**
+	 * Sets the deadline time.
+	 * @param timestamp The timestamp to set
+	 */
+	public void setDeadlineTimestamp(Date deadlineTimestamp) {
+		this.deadlineTimestamp = deadlineTimestamp;
 	}
 
 	/**

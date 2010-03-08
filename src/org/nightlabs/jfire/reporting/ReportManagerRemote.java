@@ -254,4 +254,10 @@ public interface ReportManagerRemote {
 	 * @return true if the layout's imported successfully
 	 */
 	boolean importReportLayoutZipFile(byte[] zipFileData, ReportRegistryItemID reportCateogoryID);
+	
+	/**
+	 * @param reportCateogoryID
+	 * @return true if the layout's exported successfully
+	 */
+	boolean exportReportLayout(String layoutName, ReportRegistryItemID layoutID);
 }

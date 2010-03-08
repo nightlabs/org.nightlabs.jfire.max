@@ -3,6 +3,7 @@
  */
 package org.nightlabs.jfire.reporting;
 
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -12,6 +13,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
@@ -602,6 +604,12 @@ public class ReportingInitialiser {
 			throw new RuntimeException(e);
 		}
 	}
+	
+	public static void exportResourceFiles(File reportFile, File exportFile)
+	throws Exception
+	{
+	}
+	
 	/**
 	 * Import the given template file as ReportLayout file
 	 * (variable names replaced by their values: see {@link #getTemplateReplaceVariables()}).

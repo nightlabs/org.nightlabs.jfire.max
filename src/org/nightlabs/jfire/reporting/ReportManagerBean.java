@@ -685,22 +685,26 @@ implements ReportManagerRemote
 		return true;
 	}
 
-	private static final String TMP_FOLDER_EXPORT_PREFIX = "jfire_report.server.exported.";
-	private static final String TMP_FOLDER_EXPORT_SUFFIX = ".report";
-
 	/*
 	 * (non-Javadoc)
 	 * @see org.nightlabs.jfire.reporting.ReportManagerRemote#importReportLayoutZipFile(java.io.File)
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("org.nightlabs.jfire.reporting.editReport")
-	public boolean exportReportLayout(String layoutName, ReportRegistryItemID layoutID) {
+	public byte[] exportReportLayout(String layoutName, ReportRegistryItemID layoutID) {
+		String TMP_FOLDER_EXPORT_PREFIX = "jfire_report.server.exported.";
+		String TMP_FOLDER_EXPORT_SUFFIX = ".report";
+			
+		String ZIP_SUFFIX = ".zip";
+		String REPORT_LAYOUT_SUFFIX = ".rptdesign";
+		
+		//Preparing the ReportParameterAcquisitionSetup
 		ReportParameterAcquisitionSetup parameterSetup = null;
 		Set<ReportRegistryItemID> itemIDs = new HashSet<ReportRegistryItemID>(1);
 		itemIDs.add(layoutID);
 		ReportParameterManagerRemote rpm = JFireEjb3Factory.getRemoteBean(ReportParameterManagerRemote.class, SecurityReflector.getInitialContextProperties());
 		Map<ReportRegistryItemID, ReportParameterAcquisitionSetupID> ids = rpm.getReportParameterAcquisitionSetupIDs(itemIDs);
-		ReportParameterAcquisitionSetupID setupID = ids.get(rpm);
+		ReportParameterAcquisitionSetupID setupID = ids.get(layoutID);
 		Set<ReportParameterAcquisitionSetupID> rpasIDs = new HashSet<ReportParameterAcquisitionSetupID>();
 		rpasIDs.add(setupID);
 		parameterSetup = rpm.getReportParameterAcquisitionSetups(rpasIDs, 
@@ -717,6 +721,7 @@ implements ReportManagerRemote
 				ValueConsumerBinding.FETCH_GROUP_PROVIDER}, 
 				NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT).iterator().next();
 
+		//Preparing the ReportTextPartConfiguration
 		ReportTextPartConfiguration reportTextPartConfiguration = null;
 		ReportTextPartManagerRemote rtpm = JFireEjb3Factory.getRemoteBean(ReportTextPartManagerRemote.class, SecurityReflector.getInitialContextProperties());
 		reportTextPartConfiguration = rtpm.getReportTextPartConfiguration(layoutID, 
@@ -727,8 +732,7 @@ implements ReportManagerRemote
 				ReportTextPart.FETCH_GROUP_NAME }, 
 				NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
 
-		PersistenceManager pm;
-		pm = createPersistenceManager();
+		PersistenceManager pm = createPersistenceManager();
 
 		ReportLayout layout = null;
 
@@ -747,21 +751,28 @@ implements ReportManagerRemote
 		}
 
 
-		File tmpFolder = null;
-		File exportFile = new File(tmpFolder, "ReportLayout_" + layout.getOrganisationID()+ "_" + layout.getReportRegistryItemID() + ".rptdesign");
+		File outputFolder = null;
+		File rptDesignFile = null;
+		
 		try {
 			//Report File
-			tmpFolder = IOUtil.createUserTempDir(TMP_FOLDER_EXPORT_PREFIX, TMP_FOLDER_EXPORT_SUFFIX);
+			outputFolder = IOUtil.getUserTempDir(TMP_FOLDER_EXPORT_PREFIX, TMP_FOLDER_EXPORT_SUFFIX);
+			if (outputFolder.exists()) 
+				IOUtil.deleteDirectoryRecursively(outputFolder);
+			
+			outputFolder = IOUtil.createUserTempDir(TMP_FOLDER_EXPORT_PREFIX, TMP_FOLDER_EXPORT_SUFFIX);
+			
+			rptDesignFile = new File(outputFolder, "ReportLayout_" + layout.getOrganisationID()+ "_" + layout.getReportRegistryItemID() + REPORT_LAYOUT_SUFFIX);
 
-			if (!exportFile.exists()) {
+			if (!rptDesignFile.exists()) {
 				try {
-					exportFile.createNewFile();
+					rptDesignFile.createNewFile();
 				} catch (IOException e) {
-					throw new IllegalStateException("Could not create temporary file for remote layout: "+exportFile.getAbsolutePath(), e); //$NON-NLS-1$
+					throw new IllegalStateException("Could not create temporary file for remote layout: " + rptDesignFile.getAbsolutePath(), e); //$NON-NLS-1$
 				}
 			}
 			try {
-				BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(exportFile));
+				BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(rptDesignFile));
 				try {
 					InputStream in = layout.createReportDesignInputStream();
 					try {
@@ -773,16 +784,13 @@ implements ReportManagerRemote
 					out.close();
 				}
 			} catch (FileNotFoundException e) {
-				throw new IllegalStateException("Could not find temporary file for remote layout: " + exportFile.getAbsolutePath()); //$NON-NLS-1$
+				throw new IllegalStateException("Could not find temporary file for remote layout: " + rptDesignFile.getAbsolutePath()); //$NON-NLS-1$
 			} catch (IOException e) {
-				throw new RuntimeException("Could not write temporary file for remote layout: " + exportFile.getAbsolutePath(), e); //$NON-NLS-1$
+				throw new RuntimeException("Could not write temporary file for remote layout: " + rptDesignFile.getAbsolutePath(), e); //$NON-NLS-1$
 			}
 		} catch (Exception e) {
 			throw new RuntimeException(e);
-		} finally {
-			if (tmpFolder != null)
-				tmpFolder.delete();
-		}
+		} 
 
 		//Properties Files
 		Collection<ReportLayoutLocalisationData> bundle = getReportLayoutLocalisationBundle(
@@ -790,7 +798,7 @@ implements ReportManagerRemote
 				new String[] {FetchPlan.DEFAULT, ReportLayoutLocalisationData.FETCH_GROUP_LOCALISATOIN_DATA},
 				NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT
 		);
-		File resourceFolder = new File(tmpFolder, "resource"); //$NON-NLS-1$
+		File resourceFolder = new File(outputFolder, "resource"); //$NON-NLS-1$
 		resourceFolder.mkdirs();
 		for (ReportLayoutLocalisationData data : bundle) {
 			String l10nFileName = layoutName;
@@ -816,7 +824,7 @@ implements ReportManagerRemote
 		}
 
 		//Generates descriptor file(content.xml)
-		File descriptorFile = new File(tmpFolder, ReportingConstants.DESCRIPTOR_FILE);
+		File descriptorFile = new File(outputFolder, ReportingConstants.DESCRIPTOR_FILE);
 		try {
 			descriptorFile.createNewFile();
 
@@ -833,7 +841,7 @@ implements ReportManagerRemote
 
 			//Report
 			Element reportNode = doc.createElement(ReportingConstants.REPORT_ELEMENT);
-			reportNode.setAttribute(ReportingConstants.REPORT_ELEMENT_ATTRIBUTE_FILE, exportFile.getName());
+			reportNode.setAttribute(ReportingConstants.REPORT_ELEMENT_ATTRIBUTE_FILE, rptDesignFile.getName());
 			reportNode.setAttribute(ReportingConstants.REPORT_ELEMENT_ATTRIBUTE_ID, layoutID.reportRegistryItemID);
 			reportNode.setAttribute(ReportingConstants.REPORT_ELEMENT_ATTRIBUTE_ENGINE_TYPE, "BIRT");
 			reportNode.setAttribute(ReportingConstants.REPORT_ELEMENT_ATTRIBUTE_OVERWRITE_ON_INIT, "true"); //Has to overwrite the old file
@@ -960,7 +968,7 @@ implements ReportManagerRemote
 
 		if (reportTextPartConfiguration != null) {
 			//Generate report text part configuration file (<reportID>.ReportTextPartConfiguration.xml)
-			File textPartConfigurationFile = new File(tmpFolder, layoutName + ReportingConstants.TEXT_PART_CONFIGURATION_FILE_SUFFIX);
+			File textPartConfigurationFile = new File(outputFolder, layoutName + ReportingConstants.TEXT_PART_CONFIGURATION_FILE_SUFFIX);
 			try {
 				textPartConfigurationFile.createNewFile();
 
@@ -1007,8 +1015,29 @@ implements ReportManagerRemote
 			}
 		}
 		//----------End------------------
-
-		return true;
+		File outputZipFile = new File(IOUtil.getTempDir(), layoutName + ZIP_SUFFIX);
+		try {
+			IOUtil.zipFolder(outputZipFile, outputFolder);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+		finally {
+			if (outputFolder != null)
+				IOUtil.deleteDirectoryRecursively(outputFolder);
+		}
+		
+		byte[] fileBytes;
+		try {
+			fileBytes = IOUtil.getBytesFromFile(outputZipFile);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+		finally {
+			if (outputZipFile != null)
+				outputZipFile.delete();
+		}
+		
+		return fileBytes;
 	}
 
 	private void generateI18nElements(Document document, Element parentElement, String elementName, I18nText i18nText) {

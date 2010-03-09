@@ -1,6 +1,5 @@
 package org.nightlabs.jfire.reporting;
 
-import java.io.File;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -259,5 +258,5 @@ public interface ReportManagerRemote {
 	 * @param reportCateogoryID
 	 * @return true if the layout's exported successfully
 	 */
-	boolean exportReportLayout(String layoutName, ReportRegistryItemID layoutID);
+	byte[] exportReportLayout(String layoutName, ReportRegistryItemID layoutID);
 }

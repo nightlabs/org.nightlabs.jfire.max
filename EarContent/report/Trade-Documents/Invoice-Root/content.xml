@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <!DOCTYPE report-category PUBLIC "-//NightLabs//Reporting Initialiser DTD V 0.5//EN" "http://www.nightlabs.de/dtd/reporting-initialiser-content_0_5.dtd">
 <report-category id="Invoice-Root" type="JFireReportingTrade-Reporting-Invoice">
-<report engineType="BIRT" file="InvoicePayments.rptdesign" id="1" overwriteOnInit="true">
+<report engineType="BIRT" file="Default-InvoiceLayout.rptdesign" id="1" overwriteOnInit="true">
 <name language="de">Standard-Rechnung</name>
 <name language="en">Invoice-Payments</name>
 <description language="de">Dies ist das Standard Rechnungslayout.

@@ -1348,6 +1348,9 @@ implements StoreCallback
 	 * @param invoice the invoice to be booked as uncollectable.
 	 */
 	public void bookUncollectableInvoice(User user, Invoice invoice) {
+		if (user == null)
+			throw new IllegalArgumentException("user must not be null!");
+
 		if (invoice == null)
 			throw new IllegalArgumentException("invoice must not be null!");
 

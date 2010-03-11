@@ -331,13 +331,16 @@ implements Serializable, StatableLocal
 		return bookDT != null;
 	}
 
-
 	protected void setBookUncollectableUser(User bookUncollectableUser) {
+		if (bookUncollectableUser == null)
+			throw new IllegalArgumentException("bookUncollectableUser must not be null!");
+
 		if (this.bookUncollectableDT != null)
 			return;
 
 		this.bookUncollectableUser = bookUncollectableUser;
 		this.bookUncollectableDT = new Date();
+		this.setOutstanding(false);
 	}
 	public User getBookUncollectableUser() {
 		return bookUncollectableUser;

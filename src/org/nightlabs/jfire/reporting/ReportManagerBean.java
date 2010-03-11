@@ -27,6 +27,7 @@
 package org.nightlabs.jfire.reporting;
 
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -43,6 +44,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
+import java.util.zip.InflaterInputStream;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;

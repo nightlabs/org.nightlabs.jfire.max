@@ -297,6 +297,9 @@ implements Serializable, StatableLocal
 		return amountPaid;
 	}
 	public long getAmountToPay() {
+		if (isBookedUncollectable()) // If it is already booked out, there is no money outstanding anymore - it's a definite loss. Marco.
+			return 0;
+
 		return getInvoice().getPrice().getAmount() - getAmountPaid();
 	}
 

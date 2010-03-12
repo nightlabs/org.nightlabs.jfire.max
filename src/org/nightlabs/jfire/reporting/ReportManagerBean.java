@@ -649,28 +649,33 @@ implements ReportManagerRemote
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("org.nightlabs.jfire.reporting.editReport")
-	public boolean importReportLayoutZipFile(byte[] zipFileData, ReportRegistryItemID registryItemID) {
-		File tmpFolder = null;
+	public boolean importReportLayoutZipFile(byte[] zipFileData, ReportRegistryItemID reportCateogoryID) {
+		File tmpDir = null;
 		try {
 			//Unzip into tmp folder
-			tmpFolder = IOUtil.createUserTempDir(TMP_FOLDER_IMPORT_PREFIX, TMP_FOLDER_IMPORT_SUFFIX);
+			tmpDir = IOUtil.createUserTempDir(TMP_FOLDER_IMPORT_PREFIX, TMP_FOLDER_IMPORT_SUFFIX);
 
-			File tmpZipFile = new File(tmpFolder, "data.zip");
+			File tmpZipFile = new File(tmpDir, "data.zip");
 			FileOutputStream fos = new FileOutputStream(tmpZipFile);
 			fos.write(zipFileData);
-			File reportFolder = new File(tmpFolder, "zipData");
-			reportFolder.mkdir();
-			IOUtil.unzipArchive(tmpZipFile, reportFolder);
-			tmpFolder.deleteOnExit();
-
+			
+			File reportDir = new File(tmpDir, "report");
+			reportDir.mkdir();
+			
+			File reportUnzipDir = new File(reportDir, reportCateogoryID.reportRegistryItemID);
+			reportUnzipDir.mkdir();
+			IOUtil.unzipArchive(tmpZipFile, reportUnzipDir);
+			tmpZipFile.delete();
+			
 			ReportCategory reportCategory;
 			PersistenceManager pm = createPersistenceManager();
 			try {
 				pm.getFetchPlan().setMaxFetchDepth(NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
-				reportCategory = (ReportCategory)pm.getObjectById(registryItemID);
+				pm.getFetchPlan().setGroups(new String[] {FetchPlan.DEFAULT, ReportRegistryItem.FETCH_GROUP_NAME});
+				reportCategory = (ReportCategory)pm.getObjectById(reportCateogoryID);
 
-				ReportingInitialiser reportingInitialiser = new ReportingInitialiser(tmpFolder, 
-						"", 
+				ReportingInitialiser reportingInitialiser = new ReportingInitialiser(tmpDir, 
+						"report", 
 						reportCategory, 
 						pm, 
 						getOrganisationID());
@@ -681,8 +686,8 @@ implements ReportManagerRemote
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		} finally {
-			if (tmpFolder != null)
-				tmpFolder.delete();
+			if (tmpDir != null)
+				IOUtil.deleteDirectoryRecursively(tmpDir);
 		}
 		return true;
 	}
@@ -694,11 +699,11 @@ implements ReportManagerRemote
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("org.nightlabs.jfire.reporting.editReport")
 	public byte[] exportReportLayout(String layoutName, ReportRegistryItemID layoutID) {
-		String TMP_FOLDER_EXPORT_PREFIX = "jfire_report.server.exported.";
-		String TMP_FOLDER_EXPORT_SUFFIX = ".report";
+		final String TMP_FOLDER_EXPORT_PREFIX = "jfire_report.server.exported.";
+		final String TMP_FOLDER_EXPORT_SUFFIX = ".report";
 			
-		String ZIP_SUFFIX = ".zip";
-		String REPORT_LAYOUT_SUFFIX = ".rptdesign";
+		final String ZIP_SUFFIX = ".zip";
+		final String REPORT_LAYOUT_SUFFIX = ".rptdesign";
 		
 		//Preparing the ReportParameterAcquisitionSetup
 		ReportParameterAcquisitionSetup parameterSetup = null;
@@ -753,18 +758,18 @@ implements ReportManagerRemote
 		}
 
 
-		File outputFolder = null;
+		File outputDir = null;
 		File rptDesignFile = null;
 		
 		try {
 			//Report File
-			outputFolder = IOUtil.getUserTempDir(TMP_FOLDER_EXPORT_PREFIX, TMP_FOLDER_EXPORT_SUFFIX);
-			if (outputFolder.exists()) 
-				IOUtil.deleteDirectoryRecursively(outputFolder);
+			outputDir = IOUtil.getUserTempDir(TMP_FOLDER_EXPORT_PREFIX, TMP_FOLDER_EXPORT_SUFFIX);
+			if (outputDir.exists()) 
+				IOUtil.deleteDirectoryRecursively(outputDir);
 			
-			outputFolder = IOUtil.createUserTempDir(TMP_FOLDER_EXPORT_PREFIX, TMP_FOLDER_EXPORT_SUFFIX);
+			outputDir = IOUtil.createUserTempDir(TMP_FOLDER_EXPORT_PREFIX, TMP_FOLDER_EXPORT_SUFFIX);
 			
-			rptDesignFile = new File(outputFolder, "ReportLayout_" + layout.getOrganisationID()+ "_" + layout.getReportRegistryItemID() + REPORT_LAYOUT_SUFFIX);
+			rptDesignFile = new File(outputDir, layoutName/*"ReportLayout_" + layout.getOrganisationID()+ "_" + layout.getReportRegistryItemID()*/ + REPORT_LAYOUT_SUFFIX);
 
 			if (!rptDesignFile.exists()) {
 				try {
@@ -800,8 +805,8 @@ implements ReportManagerRemote
 				new String[] {FetchPlan.DEFAULT, ReportLayoutLocalisationData.FETCH_GROUP_LOCALISATOIN_DATA},
 				NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT
 		);
-		File resourceFolder = new File(outputFolder, "resource"); //$NON-NLS-1$
-		resourceFolder.mkdirs();
+		File resourceDir = new File(outputDir, "resource"); //$NON-NLS-1$
+		resourceDir.mkdirs();
 		for (ReportLayoutLocalisationData data : bundle) {
 			String l10nFileName = layoutName;
 			if ("".equals(data.getLocale())) //$NON-NLS-1$
@@ -810,7 +815,7 @@ implements ReportManagerRemote
 				l10nFileName = l10nFileName + "_" + data.getLocale() + ".properties";  //$NON-NLS-1$ //$NON-NLS-2$
 
 			try {
-				File dataFile = new File(resourceFolder, l10nFileName);
+				File dataFile = new File(resourceDir, l10nFileName);
 				dataFile.createNewFile();
 				InputStream in = data.createLocalisationDataInputStream();
 				BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(dataFile));
@@ -826,7 +831,7 @@ implements ReportManagerRemote
 		}
 
 		//Generates descriptor file(content.xml)
-		File descriptorFile = new File(outputFolder, ReportingConstants.DESCRIPTOR_FILE);
+		File descriptorFile = new File(outputDir, ReportingConstants.DESCRIPTOR_FILE);
 		try {
 			descriptorFile.createNewFile();
 
@@ -841,6 +846,9 @@ implements ReportManagerRemote
 			reportCategoryNode.setAttribute(ReportingConstants.REPORT_CATEGORY_ELEMENT_ATTRIBUTE_TYPE, layoutID.reportRegistryItemType);
 			doc.appendChild(reportCategoryNode);
 
+			//Report-names
+			generateI18nElements(doc, reportCategoryNode, ReportingConstants.REPORT_CATEGORY_ELEMENT_NAME, layout.getParentCategory().getName());
+			
 			//Report
 			Element reportNode = doc.createElement(ReportingConstants.REPORT_ELEMENT);
 			reportNode.setAttribute(ReportingConstants.REPORT_ELEMENT_ATTRIBUTE_FILE, rptDesignFile.getName());
@@ -970,7 +978,7 @@ implements ReportManagerRemote
 
 		if (reportTextPartConfiguration != null) {
 			//Generate report text part configuration file (<reportID>.ReportTextPartConfiguration.xml)
-			File textPartConfigurationFile = new File(outputFolder, layoutName + ReportingConstants.TEXT_PART_CONFIGURATION_FILE_SUFFIX);
+			File textPartConfigurationFile = new File(outputDir, layout.getParentCategoryID().reportRegistryItemID/*layoutName*/ + ReportingConstants.TEXT_PART_CONFIGURATION_FILE_SUFFIX);
 			try {
 				textPartConfigurationFile.createNewFile();
 
@@ -1019,13 +1027,13 @@ implements ReportManagerRemote
 		//----------End------------------
 		File outputZipFile = new File(IOUtil.getTempDir(), layoutName + ZIP_SUFFIX);
 		try {
-			IOUtil.zipFolder(outputZipFile, outputFolder);
+			IOUtil.zipFolder(outputZipFile, outputDir);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
 		finally {
-			if (outputFolder != null)
-				IOUtil.deleteDirectoryRecursively(outputFolder);
+			if (outputDir != null)
+				IOUtil.deleteDirectoryRecursively(outputDir);
 		}
 		
 		byte[] fileBytes;

@@ -16,6 +16,7 @@ import org.nightlabs.ModuleException;
 import org.nightlabs.jdo.query.AbstractJDOQuery;
 import org.nightlabs.jdo.query.QueryCollection;
 import org.nightlabs.jfire.accounting.id.CurrencyID;
+import org.nightlabs.jfire.accounting.id.PriceID;
 import org.nightlabs.jfire.accounting.id.TariffID;
 import org.nightlabs.jfire.crossorganisationregistrationinit.Context;
 import org.nightlabs.jfire.jbpm.graph.def.id.ProcessDefinitionID;
@@ -832,5 +833,7 @@ public interface TradeManagerLocal {
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	@RolesAllowed("_Guest_")
 	String ping(String message);
+
+	ArticlePrice bugfix_tryRecreatingArticlePrice(PriceID packageArticlePriceID);
 
 }

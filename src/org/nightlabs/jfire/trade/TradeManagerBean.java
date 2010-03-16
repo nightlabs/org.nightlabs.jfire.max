@@ -66,6 +66,7 @@ import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.accounting.Tariff;
 import org.nightlabs.jfire.accounting.TariffOrderConfigModule;
 import org.nightlabs.jfire.accounting.id.CurrencyID;
+import org.nightlabs.jfire.accounting.id.PriceID;
 import org.nightlabs.jfire.accounting.id.TariffID;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.config.ConfigSetup;
@@ -1138,6 +1139,23 @@ implements TradeManagerRemote, TradeManagerLocal
 		}
 	}
 
+	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+	@RolesAllowed("_System_")
+	@Override
+	public ArticlePrice bugfix_tryRecreatingArticlePrice(PriceID packageArticlePriceID)
+	{
+		try {
+			PersistenceManager pm = createPersistenceManager();
+			try {
+				return BugfixArticlePricesWithoutPriceFragments.tryRecreatingArticlePrice(pm, packageArticlePriceID);
+			} finally {
+				pm.close();
+			}
+		} finally {
+			sessionContext.setRollbackOnly();
+		}
+	}
+
 	/* (non-Javadoc)
 	 * @see org.nightlabs.jfire.trade.TradeManagerRemote#initialise()
 	 */
@@ -1158,6 +1176,8 @@ implements TradeManagerRemote, TradeManagerLocal
 			pm.getExtent(RecurringOffer.class);
 			pm.getExtent(RecurredOffer.class);
 			pm.getExtent(RecurringOrder.class);
+
+			BugfixArticlePricesWithoutPriceFragments.fix(pm);
 
 			ModuleMetaData moduleMetaData = ModuleMetaData.getModuleMetaData(pm, JFireTradeEAR.MODULE_NAME);
 
@@ -1182,7 +1202,7 @@ implements TradeManagerRemote, TradeManagerLocal
 			);
 			userConfigSetup.getConfigModuleClasses().add(LegalEntityViewConfigModule.class.getName());
 			userConfigSetup.getConfigModuleClasses().add(TariffOrderConfigModule.class.getName());
-			userConfigSetup.getConfigModuleClasses().add(SummedPriceFragmentTypeConfigModule.class.getName()); //Added by Chairat 07012009
+			userConfigSetup.getConfigModuleClasses().add(SummedPriceFragmentTypeConfigModule.class.getName()); //Added by Chairat 07012009 // TODO This must be added to old organisations, too!!! Not only when initialising a new org. We have customers who update from 1.0 to 1.2!!! Marco.
 
 			ConfigSetup workstationConfigSetup = ConfigSetup.getConfigSetup(
 					pm,

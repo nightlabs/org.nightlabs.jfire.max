@@ -50,6 +50,7 @@ import javax.jdo.annotations.Value;
 import org.apache.log4j.Logger;
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.accounting.id.PriceID;
+import org.nightlabs.util.Util;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -679,5 +680,31 @@ public class Price
 		for (PriceFragment fragment : price.getFragments()) {
 			sumPriceFragment(fragment);
 		}
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((organisationID == null) ? 0 : organisationID.hashCode());
+		result = prime * result + (int) (priceID ^ (priceID >>> 32));
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (getClass() != obj.getClass()) return false;
+		Price other = (Price) obj;
+		return (
+				Util.equals(this.priceID, other.priceID) &&
+				Util.equals(this.organisationID, other.organisationID)
+		);
+	}
+
+	@Override
+	public String toString() {
+		return this.getClass().getName() + '@' + Integer.toHexString(System.identityHashCode(this)) + '[' + organisationID + ',' + priceID + ']';
 	}
 }

@@ -50,6 +50,7 @@ import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.id.ProductID;
 import org.nightlabs.jfire.trade.Article;
+import org.nightlabs.util.Util;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -506,12 +507,6 @@ implements Serializable
 		return pm;
 	}
 
-	@Override
-	public String toString()
-	{
-		return this.getClass().getName() + '{' + getPrimaryKey() + '}';
-	}
-
 	/**
 	 * This method is called by {@link Store#addProduct(User, Product, Repository)} on the new product.
 	 * Override it, if you need a specialized descendant of {@link ProductLocal}.
@@ -519,5 +514,31 @@ implements Serializable
 	protected ProductLocal createProductLocal(User user, Repository initialRepository)
 	{
 		return new ProductLocal(user, this, initialRepository); // self-registering - no pm.makePersistent(...) and no product.setProductLocal necessary
+	}
+
+	@Override
+	public String toString() {
+		return this.getClass().getName() + '@' + Integer.toHexString(System.identityHashCode(this)) + '[' + organisationID + ',' + productID + ']';
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((organisationID == null) ? 0 : organisationID.hashCode());
+		result = prime * result + (int) (productID ^ (productID >>> 32));
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (getClass() != obj.getClass()) return false;
+		Product other = (Product) obj;
+		return (
+				Util.equals(this.productID, other.productID) &&
+				Util.equals(this.organisationID, other.organisationID)
+		);
 	}
 }

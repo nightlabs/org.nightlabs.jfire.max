@@ -43,6 +43,7 @@ import javax.jdo.annotations.PersistenceModifier;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.Value;
 
+import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.accounting.Price;
 import org.nightlabs.jfire.accounting.PriceFragment;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
@@ -141,6 +142,10 @@ public class ArticlePrice extends org.nightlabs.jfire.accounting.Price
 	public static final String FETCH_GROUP_NESTED_ARTICLE_PRICES_NO_LIMIT = "ArticlePrice.nestedArticlePrices[-1]";
 //	public static final String FETCH_GROUP_ORIG_PRICE = "ArticlePrice.origPrice";
 	public static final String FETCH_GROUP_ARTICLE = "ArticlePrice.article";
+
+	public static final String FETCH_GROUP_PRODUCT_TYPE = "ArticlePrice.productType";
+	public static final String FETCH_GROUP_PACKAGE_PRODUCT_TYPE = "ArticlePrice.packageProductType";
+	public static final String FETCH_GROUP_PRODUCT = "ArticlePrice.product";
 
 //	/**
 //	 * @jdo.field persistence-modifier="persistent"
@@ -372,6 +377,17 @@ public class ArticlePrice extends org.nightlabs.jfire.accounting.Price
 	{
 		if (!getPrimaryKey().equals(nestedArticlePrice.getPackageArticlePrice().getPrimaryKey()))
 			throw new IllegalArgumentException("nestedArticlePrice.packageArticlePrice != this!!!");
+
+		// DataNucleus WORKAROUND: The new nestedArticlePrice is persisted without its PriceFragments when not explicitely persisting them here.
+		PersistenceManager pm = NLJDOHelper.getThreadPersistenceManager(false);
+		if (pm != null) {
+			Collection<PriceFragment> tmpFragments = nestedArticlePrice.getFragments(false);
+			nestedArticlePrice.clearFragments();
+			nestedArticlePrice = pm.makePersistent(nestedArticlePrice);
+			for (PriceFragment f : tmpFragments)
+				nestedArticlePrice.addPriceFragment(f);
+		}
+		// end workaround
 
 		nestedArticlePrices.put(nestedArticlePrice.getNestKey(), nestedArticlePrice);
 	}

@@ -29,7 +29,6 @@ package org.nightlabs.jfire.accounting.book;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -208,7 +207,7 @@ public class PartnerAccountant extends Accountant
 		boolean partnerTransferFrom = transfer.getAnchorType(partner) == Transfer.ANCHORTYPE_FROM; // mandator.getPrimaryKey().equals(transfer.getFrom().getPrimaryKey());
 
 		PersistenceManager pm = getPersistenceManager();
-		Accounting accounting = Accounting.getAccounting(pm);
+//		Accounting accounting = Accounting.getAccounting(pm);
 
 		if (partnerTransferFrom) {
 			to = partner;
@@ -303,31 +302,27 @@ public class PartnerAccountant extends Accountant
 			throw new IllegalArgumentException("PayMoneyTransfer \""+payMoneyTransfer.getPrimaryKey()+"\" has no related invoices. Hence, partnerAccount must not be null! payMoneyTransfer.getPayment().getPartnerAccount() is null!!!");
 
 		// Sort Invoices
-		// sort order is finalizeDT, organisationID, invoiceID
+		// sort order is finalizeDT, organisationID, invoiceIDPrefix, invoiceID
 		List<Invoice> sortedInvoices = new LinkedList<Invoice>(payMoneyTransfer.getPayment().getInvoices());
 		Comparator<Invoice> comparator = new Comparator<Invoice>() {
 			public int compare(Invoice inv0, Invoice inv1) {
 				long inv0Time = inv0.getFinalizeDT().getTime();
 				long inv1Time = inv1.getFinalizeDT().getTime();
 
-				if (inv0Time == inv1Time) {
-					if (inv0.getOrganisationID().equals(inv1.getOrganisationID())) {
-						if (inv0.getInvoiceID() < inv1.getInvoiceID())
-							return -1;
-						else if (inv0.getInvoiceID() > inv1.getInvoiceID())
-							return 1;
-						else
-							return 0;
-					}
-					else
-						return inv0.getOrganisationID().compareTo(inv1.getOrganisationID());
-				}
-				else {
-					if (inv0Time > inv1Time)
-						return 1;
-					else
-						return -1;
-				}
+				int result = inv0Time > inv1Time ? 1 : (inv0Time < inv1Time ? -1 : 0);
+				if (result != 0)
+					return result;
+
+				result = inv0.getOrganisationID().compareTo(inv1.getOrganisationID());
+				if (result != 0)
+					return result;
+
+				result = inv0.getInvoiceIDPrefix().compareTo(inv1.getInvoiceIDPrefix());
+				if (result != 0)
+					return result;
+
+				result = inv0.getInvoiceID() > inv1.getInvoiceID() ? 1 : (inv0.getInvoiceID() < inv1.getInvoiceID() ? -1 : 0);
+				return result;
 			}
 		};
 		Collections.sort(sortedInvoices,comparator);
@@ -341,7 +336,7 @@ public class PartnerAccountant extends Accountant
 		List<TransferInvoiceEntry> invoicesPayMoney = new LinkedList<TransferInvoiceEntry>();
 		List<TransferInvoiceEntry> invoicesReceiveMoney = new LinkedList<TransferInvoiceEntry>();
 
-		Accounting accounting = Accounting.getAccounting(pm);
+//		Accounting accounting = Accounting.getAccounting(pm);
 
 		/* allInvoicesBalance is the amount after summarizing all invoices
 		 * It is negative if the local organisation looses money to
@@ -467,7 +462,7 @@ public class PartnerAccountant extends Accountant
 
 		/* restAmount is negative, if after summarizing all invoices and the
 		 * PayMoneyTransfer, still money has to be paid from the local organisation to
-		 * the partner because of open invoices.
+		 * the partner because of open invoices (or because the partner over-paid).
 		 *
 		 * restAmount is positive, if after summarizing and receiving by PayMoneyTransfer
 		 * still a rest is to be expected from the partner.
@@ -492,8 +487,7 @@ public class PartnerAccountant extends Accountant
 				// and pay until money's gone
 
 				// first all receive invoices
-				for (Iterator iter = invoicesReceiveMoney.iterator(); iter.hasNext();) {
-					TransferInvoiceEntry entry = (TransferInvoiceEntry) iter.next();
+				for (TransferInvoiceEntry entry : invoicesReceiveMoney) {
 					Invoice invoice = entry.getInvoice();
 
 					if (entry.getInvoiceBalance() < 0)
@@ -509,8 +503,7 @@ public class PartnerAccountant extends Accountant
 				} // iterate receive-invoices
 
 				// now as many pay-invoices as possible
-				for (Iterator iter = invoicesPayMoney.iterator(); iter.hasNext();) {
-					TransferInvoiceEntry entry = (TransferInvoiceEntry) iter.next();
+				for (TransferInvoiceEntry entry : invoicesPayMoney) {
 					Invoice invoice = entry.getInvoice();
 
 					if (entry.getInvoiceBalance() > 0)
@@ -542,8 +535,7 @@ public class PartnerAccountant extends Accountant
 				// then as many pay invoices as possible
 
 				// first ALL receive-invoices
-				for (Iterator iter = invoicesReceiveMoney.iterator(); iter.hasNext();) {
-					TransferInvoiceEntry entry = (TransferInvoiceEntry) iter.next();
+				for (TransferInvoiceEntry entry : invoicesReceiveMoney) {
 					Invoice invoice = entry.getInvoice();
 
 					if (entry.getInvoiceBalance() < 0)
@@ -559,8 +551,7 @@ public class PartnerAccountant extends Accountant
 				} // iterate receive-invoices
 
 				// now as many pay-invoices as possible
-				for (Iterator iter = invoicesPayMoney.iterator(); iter.hasNext();) {
-					TransferInvoiceEntry entry = (TransferInvoiceEntry) iter.next();
+				for (TransferInvoiceEntry entry : invoicesPayMoney) {
 					Invoice invoice = entry.getInvoice();
 
 					if (entry.getInvoiceBalance() > 0)
@@ -596,8 +587,7 @@ public class PartnerAccountant extends Accountant
 				// and receive as many receive-invoices as possible
 
 				// first all pay-invoices
-				for (Iterator iter = invoicesPayMoney.iterator(); iter.hasNext();) {
-					TransferInvoiceEntry entry = (TransferInvoiceEntry) iter.next();
+				for (TransferInvoiceEntry entry : invoicesPayMoney) {
 					Invoice invoice = entry.getInvoice();
 
 					if (entry.getInvoiceBalance() > 0)
@@ -613,8 +603,7 @@ public class PartnerAccountant extends Accountant
 				} // iterate pay-invoices
 
 				// now as many receive-invoices as possible
-				for (Iterator iter = invoicesReceiveMoney.iterator(); iter.hasNext();) {
-					TransferInvoiceEntry entry = (TransferInvoiceEntry) iter.next();
+				for (TransferInvoiceEntry entry : invoicesReceiveMoney) {
 					Invoice invoice = entry.getInvoice();
 
 					if (entry.getInvoiceBalance() < 0)
@@ -646,8 +635,7 @@ public class PartnerAccountant extends Accountant
 				// then as many receive-invoices as possible
 
 				// first all pay-invoices
-				for (Iterator iter = invoicesPayMoney.iterator(); iter.hasNext();) {
-					TransferInvoiceEntry entry = (TransferInvoiceEntry) iter.next();
+				for (TransferInvoiceEntry entry : invoicesPayMoney) {
 					Invoice invoice = entry.getInvoice();
 
 					if (entry.getInvoiceBalance() > 0)
@@ -662,8 +650,7 @@ public class PartnerAccountant extends Accountant
 				} // iterate pay-invoices
 
 				// now as many receive-invoices as possible
-				for (Iterator iter = invoicesReceiveMoney.iterator(); iter.hasNext();) {
-					TransferInvoiceEntry entry = (TransferInvoiceEntry) iter.next();
+				for (TransferInvoiceEntry entry : invoicesReceiveMoney) {
 					Invoice invoice = entry.getInvoice();
 
 					if (entry.getInvoiceBalance() < 0)

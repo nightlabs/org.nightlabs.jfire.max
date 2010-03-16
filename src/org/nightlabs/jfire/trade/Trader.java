@@ -1706,6 +1706,10 @@ public class Trader
 			// WORKAROUND end DataNucleus for not existing priceFragment
 			article.setPrice(articlePrice);
 
+			// without the following two lines, the price sometimes disappears :-( Marco.
+			pm.flush();
+			article.getPrice();
+
 //			ProductTypeActionHandler productTypeActionHandler = ProductTypeActionHandler.getProductTypeActionHandler(
 //			getPersistenceManager(), article.getProductType().getClass());
 			ProductTypeActionHandler productTypeActionHandler = productTypeClass2ProductTypeActionHandler.get(article.getProductType().getClass());

@@ -55,8 +55,6 @@ import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.log4j.Logger;
 import org.nightlabs.i18n.I18nText;
 import org.nightlabs.jdo.NLJDOHelper;
-import org.nightlabs.jdo.moduleregistry.UpdateHistoryItem;
-import org.nightlabs.jdo.moduleregistry.UpdateNeededHandle;
 import org.nightlabs.jdo.query.AbstractJDOQuery;
 import org.nightlabs.jdo.query.JDOQueryCollectionDecorator;
 import org.nightlabs.jdo.query.QueryCollection;
@@ -120,7 +118,6 @@ import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.ArticleContainer;
 import org.nightlabs.jfire.trade.CustomerGroup;
-import org.nightlabs.jfire.trade.JFireTradeEAR;
 import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.trade.Offer;
 import org.nightlabs.jfire.trade.Order;
@@ -201,32 +198,7 @@ implements AccountingManagerRemote, AccountingManagerLocal
 
 			initRegisterConfigModules(pm);
 
-			{
-				UpdateNeededHandle handle = UpdateHistoryItem.updateNeeded(pm, JFireTradeEAR.MODULE_NAME, Invoice.class.getName() + "#uncollectableStillOutstanding");
-				if (handle != null) {
-					UpdateHistoryItem.updateDone(handle);
-					logger.warn("initialise: Beginning to fix wrong 'outstanding' flags of uncollectable invoices.");
-
-					Query q = pm.newQuery(InvoiceLocal.class);
-					q.setFilter("this.bookUncollectableDT != null && this.outstanding");
-
-					@SuppressWarnings("unchecked")
-					Collection<InvoiceLocal> invoiceLocals = (Collection<InvoiceLocal>) q.execute();
-					for (InvoiceLocal invoiceLocal : invoiceLocals) {
-						if (!invoiceLocal.isBookedUncollectable())
-							throw new IllegalStateException("Found invoice which should not match query filter (it is not booked uncollectable)!!! " + invoiceLocal);
-
-						if (!invoiceLocal.isOutstanding())
-							throw new IllegalStateException("Found invoice which should not match query filter (it is not outstanding)!!! " + invoiceLocal);
-
-						invoiceLocal.setOutstanding(false);
-						logger.warn("initialise: Fixed wrong 'outstanding' flag: Set to 'false', because invoice is already booked as uncollectable: " + invoiceLocal.getOrganisationID() + '/' + invoiceLocal.getInvoiceIDPrefix() + '/' + invoiceLocal.getInvoiceID());
-					}
-
-					logger.warn("initialise: Fixed wrong 'outstanding' flags of " + invoiceLocals.size() + " uncollectable invoices.");
-					q.closeAll();
-				}
-			}
+			BugfixWrongOutstandingFlag.fix(pm);
 
 			// check, whether the datastore is already initialized
 			try {

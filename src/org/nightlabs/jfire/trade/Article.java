@@ -27,16 +27,19 @@
 package org.nightlabs.jfire.trade;
 
 import java.io.Serializable;
+import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import javax.jdo.JDODetachedFieldAccessException;
 import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
+import javax.jdo.JDOUserException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 import javax.jdo.annotations.Column;
@@ -81,6 +84,7 @@ import org.nightlabs.jfire.trade.id.OfferID;
 import org.nightlabs.jfire.trade.id.OrderID;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 import org.nightlabs.util.Util;
+import org.nightlabs.util.reflect.ReflectUtil;
 
 /**
  * An instance of <tt>Article</tt> occurs in the context of a {@link Segment}. It represents a
@@ -908,17 +912,56 @@ implements Serializable, DeleteCallback, AttachCallback, DetachCallback, StoreCa
 		if (reversedArticle.reversedArticle != null)
 			throw new IllegalArgumentException("The passed article (" + reversedArticle.getPrimaryKey() + ") cannot be reversed, because it is itself reversing another Article!");
 
+		// DataNucleus WORKAROUND: Maps/Collections that are populated in the constructor are not properly handled - their contents are not saved in the DB!
+		PersistenceManager pm = NLJDOHelper.getThreadPersistenceManager(false);
+		if (pm != null)
+			pm.makePersistent(this);
+		// end workaround
+
 		this.setReversedArticle(reversedArticle);
 		reversedArticle.setReversingArticle(this);
 		this.productType = reversedArticle.getProductType();
 		this.product = reversedArticle.getProduct();
 		this.tariff = reversedArticle.getTariff();
-		this.price = reversedArticle.getPrice().createReversingArticlePrice();
+
+		ArticlePrice tmpAP = reversedArticle.getPrice().createReversingArticlePrice();
+		if (pm != null)
+			tmpAP = pm.makePersistent(tmpAP);
+
+		this.price = tmpAP;
+
+//		JDOHelper.makeDirty(this, "price"); // DataNucleus WORKAROUND: Without this, the price is not assigned (field is written as null to the DB). Marco.
 
 		// copy status
 		this.allocated = reversedArticle.isAllocated();
 		this.allocationPending = reversedArticle.isAllocationPending();
 		this.releasePending = reversedArticle.isReleasePending();
+
+		// DataNucleus WORKAROUND: Without this, the price is not assigned (field is written as null to the DB) and other fields
+		// are written incompletely/wrong, too. Marco.
+//		NLJDOHelper.makeDirtyAllFieldsRecursively(this); // This fails with an exception, because making things dirty with fully qualified name seems not to work while it is attached (simple names work) :-(
+		// Since we don't need it recursively anyway, we use the following code instead
+		workaround_makeFieldsDirty_noRecursion(this);
+		workaround_handleArticlePriceRecursively(this.price);
+		if (pm != null)
+			pm.flush();
+	}
+
+	private void workaround_handleArticlePriceRecursively(ArticlePrice price)
+	{
+		workaround_makeFieldsDirty_noRecursion(price);
+		for (ArticlePrice nestedPrice : price.getNestedArticlePrices())
+			workaround_handleArticlePriceRecursively(nestedPrice);
+	}
+
+	private void workaround_makeFieldsDirty_noRecursion(Object o)
+	{
+		List<Field> fields = ReflectUtil.collectAllFields(o.getClass(), true);
+		for (Field field : fields) {
+			try {
+				JDOHelper.makeDirty(o, field.getName());
+			} catch (JDOUserException x) { } // silently ignore non-persistent fields causing an exception
+		}
 	}
 
 	/**

@@ -1066,7 +1066,7 @@ implements TradeManagerRemote, TradeManagerLocal
 			for (Article article : articles) {
 				offers.add(article.getOffer());
 
-				if (article.isAllocated() || article.isAllocationPending())
+				if ((article.isAllocated() || article.isAllocationPending()) && !article.isReversing()) // if it is reversing, we don't need to release here. marco.
 					allocatedArticles.add(article);
 				else
 					nonAllocatedArticles.add(article);

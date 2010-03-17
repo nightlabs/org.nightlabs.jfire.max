@@ -26,11 +26,15 @@
 
 package org.nightlabs.jfire.trade;
 
+import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.jdo.JDOHelper;
+import javax.jdo.JDOUserException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.annotations.FetchGroup;
 import javax.jdo.annotations.FetchGroups;
@@ -43,13 +47,13 @@ import javax.jdo.annotations.PersistenceModifier;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.Value;
 
-import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.accounting.Price;
 import org.nightlabs.jfire.accounting.PriceFragment;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.store.NestedProductTypeLocal;
 import org.nightlabs.jfire.store.Product;
 import org.nightlabs.jfire.store.ProductType;
+import org.nightlabs.util.reflect.ReflectUtil;
 
 
 /**
@@ -366,8 +370,36 @@ public class ArticlePrice extends org.nightlabs.jfire.accounting.Price
 		this.nestedArticlePrices = new HashMap<String, ArticlePrice>();
 		assign(origPrice, refund);
 
+		// DataNucleus WORKAROUND:
+		Collection<PriceFragment> tmpFragments = new ArrayList<PriceFragment>(this.getFragments(false));
+		// end workaround
+
 		if (packageArticlePrice != null)
 			packageArticlePrice.addNestedArticlePrice(this);
+
+		// DataNucleus WORKAROUND: The new nestedArticlePrice is persisted without its PriceFragments without this code.
+		// simpler workaround achieving the same goal - the problem really seems to be the dirty flags
+//		NLJDOHelper.makeDirtyAllFieldsRecursively(this); // This fails with an exception, because making things dirty with fully qualified name seems not to work while it is attached (simple names work) :-(
+		// Since we don't need it recursively anyway, we use the following code instead
+		List<Field> fields = ReflectUtil.collectAllFields(this.getClass(), true);
+		for (Field field : fields) {
+			try {
+				JDOHelper.makeDirty(this, field.getName());
+			} catch (JDOUserException x) { } // silently ignore non-persistent fields causing an exception
+		}
+
+		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
+		if (pm != null) pm.flush();
+
+		for (PriceFragment f : tmpFragments) {
+			if (pm != null)
+				f = pm.makePersistent(f);
+
+			this.addPriceFragment(f);
+		}
+
+		if (pm != null) pm.flush();
+		// end workaround
 	}
 
 	/**
@@ -379,15 +411,14 @@ public class ArticlePrice extends org.nightlabs.jfire.accounting.Price
 			throw new IllegalArgumentException("nestedArticlePrice.packageArticlePrice != this!!!");
 
 		// DataNucleus WORKAROUND: The new nestedArticlePrice is persisted without its PriceFragments when not explicitely persisting them here.
-		PersistenceManager pm = NLJDOHelper.getThreadPersistenceManager(false);
-		if (pm != null) {
-			Collection<PriceFragment> tmpFragments = nestedArticlePrice.getFragments(false);
-			nestedArticlePrice.clearFragments();
-			nestedArticlePrice = pm.makePersistent(nestedArticlePrice);
-			for (PriceFragment f : tmpFragments)
-				nestedArticlePrice.addPriceFragment(f);
-		}
-		// end workaround
+//		PersistenceManager pm = NLJDOHelper.getThreadPersistenceManager(false);
+//		if (pm != null) {
+//			Collection<PriceFragment> tmpFragments = nestedArticlePrice.getFragments(false);
+//			nestedArticlePrice = pm.makePersistent(nestedArticlePrice);
+//			for (PriceFragment f : tmpFragments)
+//				nestedArticlePrice.addPriceFragment(pm.makePersistent(f));
+//		}
+		// moved this workaround in a different form to the constructor calling this method. Marco.
 
 		nestedArticlePrices.put(nestedArticlePrice.getNestKey(), nestedArticlePrice);
 	}

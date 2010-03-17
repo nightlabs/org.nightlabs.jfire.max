@@ -29,6 +29,7 @@ package org.nightlabs.jfire.accounting.book;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -40,10 +41,10 @@ import javax.jdo.annotations.Inheritance;
 import javax.jdo.annotations.InheritanceStrategy;
 import javax.jdo.annotations.PersistenceCapable;
 
+import org.apache.log4j.Logger;
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.accounting.Account;
 import org.nightlabs.jfire.accounting.AccountType;
-import org.nightlabs.jfire.accounting.Accounting;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.accounting.InvoiceMoneyTransfer;
@@ -61,14 +62,7 @@ import org.nightlabs.jfire.transfer.Transfer;
  * organisations or customers.
  *
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
- *
- * @jdo.persistence-capable
- *		identity-type="application"
- *		persistence-capable-superclass="org.nightlabs.jfire.accounting.book.Accountant"
- *		detachable="true"
- *		table="JFireTrade_PartnerAccountant"
- *
- * @jdo.inheritance strategy = "new-table"
+ * @author Marco หงุ่ยตระกูล-Schulze - marco at nightlabs dot de
  */
 @PersistenceCapable(
 	identityType=IdentityType.APPLICATION,
@@ -78,6 +72,7 @@ import org.nightlabs.jfire.transfer.Transfer;
 public class PartnerAccountant extends Accountant
 {
 	private static final long serialVersionUID = 1L;
+	private static final Logger logger = Logger.getLogger(PartnerAccountant.class);
 
 	/**
 	 * @deprecated Constructor only existing for JDO!
@@ -96,15 +91,12 @@ public class PartnerAccountant extends Accountant
 			handleBookMoneyTransfer(mandator, (BookMoneyTransfer)transfer, user, involvedAnchors);
 		else if (transfer instanceof PayMoneyTransfer)
 			handlePayMoneyTransfer(user, mandator, (PayMoneyTransfer)transfer, involvedAnchors);
-		// TODO: do something on simple MoneyTransfers ?? - I don't think so ... Marco ;-)
+		// Do something on simple MoneyTransfers? - No, I don't think so! Marco ;-)
 	}
 
 	/**
 	 * Handles MoneyTransfers between LegalEntities by creating one IntraLegalMoneyTransfer for the
 	 * given BookMoneyTransfer.
-	 *
-	 * @param mandator
-	 * @param transfer
 	 */
 	protected void handleBookMoneyTransfer(LegalEntity mandator, BookMoneyTransfer transfer, User user, Set<Anchor> involvedAnchors)
 	{
@@ -116,7 +108,6 @@ public class PartnerAccountant extends Accountant
 
 		Anchor createTransferFrom = null;
 		Anchor createTransferTo = null;
-		Accounting accounting = Accounting.getAccounting(getPersistenceManager());
 		// create IntraLegalEntityMoneyTransfer from PartnerAccount(AsDebitor) to mandator (or <->)
 		// determine the direction
 		if (mandatorIsCustomer) {
@@ -151,13 +142,8 @@ public class PartnerAccountant extends Accountant
 			createTransferTo
 		);
 		moneyTransfer = getPersistenceManager().makePersistent(moneyTransfer);
-
-//		createTransferFrom.bookTransfer(user, moneyTransfer, involvedAnchors);
-//		createTransferTo.bookTransfer(user, moneyTransfer, involvedAnchors);
 		moneyTransfer.bookTransfer(user, involvedAnchors);
 	}
-
-
 
 	private static class TransferInvoiceEntry {
 		private Invoice invoice;
@@ -188,14 +174,21 @@ public class PartnerAccountant extends Accountant
 	 * @!param amountToPay Is seen from the partner LegalEntity. If it looses money
 	 *		(arrow leaving) it is negative.
 	 *
-	 * @return The amount coming from or going to the partner LegalEntity. This
-	 *		is negative if it leaves the partner (and goes to an account) and positive
-	 *		if it comes from an account and goes to the partner legal entity.
+	 * @return the amount coming from or going to the partner-LegalEntity. This
+	 *		is negative, if it leaves the partner (and goes to an inside-partner-account). It is positive
+	 *		if it comes from an inside-partner-account and goes to the partner-legal-entity.
 	 */
 	private long handleSingleInvoicePayment(
-			User user, LegalEntity partner, PayMoneyTransfer transfer,
+			User user, LegalEntity partner, PayMoneyTransfer payMoneyTransfer,
 			Invoice invoice, long amountToPay, Set<Anchor> involvedAnchors)
 	{
+		if (logger.isDebugEnabled()) {
+			logger.debug("handleSingleInvoicePayment: amountToPay=" + amountToPay + " invoice=" + invoice.getPrimaryKey() + " payMoneyTransfer=" + payMoneyTransfer.getPrimaryKey());
+			logger.debug("handleSingleInvoicePayment: payMoneyTransfer.amount=" + payMoneyTransfer.getAmount() + " payMoneyTransfer.currency=" + payMoneyTransfer.getCurrency().getCurrencyID());
+			logger.debug("handleSingleInvoicePayment: payMoneyTransfer.from=" + payMoneyTransfer.getFrom());
+			logger.debug("handleSingleInvoicePayment: payMoneyTransfer.to=" + payMoneyTransfer.getTo());
+		}
+
 		if (amountToPay < 0)
 			throw new IllegalArgumentException("amountToPay=="+amountToPay+"! amountToPay must be positive or zero!");
 
@@ -204,54 +197,60 @@ public class PartnerAccountant extends Accountant
 
 		Anchor from = null;
 		Anchor to = null;
-		boolean partnerTransferFrom = transfer.getAnchorType(partner) == Transfer.ANCHORTYPE_FROM; // mandator.getPrimaryKey().equals(transfer.getFrom().getPrimaryKey());
+		boolean partnerTransferFrom = payMoneyTransfer.getAnchorType(partner) == Transfer.ANCHORTYPE_FROM; // mandator.getPrimaryKey().equals(transfer.getFrom().getPrimaryKey());
 
 		PersistenceManager pm = getPersistenceManager();
-//		Accounting accounting = Accounting.getAccounting(pm);
 
 		if (partnerTransferFrom) {
 			to = partner;
 			// Local Accounting is paying
 			if (partnerIsInvoiceVendor(partner, invoice)) {
 				AccountType accountType = (AccountType) getPersistenceManager().getObjectById(AccountType.ACCOUNT_TYPE_ID_PARTNER_VENDOR);
-				from = getPartnerAccount(accountType, partner, transfer.getCurrency());
+				from = getPartnerAccount(accountType, partner, payMoneyTransfer.getCurrency());
 			}
 			else {
-//				amountToPay *= -1; // TODO korrekt?
+//				amountToPay *= -1; // correct? yes, I think it is correct to *never* negate amountToPay and thus have this line commented-out. Marco.
 				AccountType accountType = (AccountType) getPersistenceManager().getObjectById(AccountType.ACCOUNT_TYPE_ID_PARTNER_CUSTOMER);
-				from = getPartnerAccount(accountType, partner, transfer.getCurrency());
+				from = getPartnerAccount(accountType, partner, payMoneyTransfer.getCurrency());
 			}
 		}
 		else {
 			from = partner;
 			if (!partnerIsInvoiceVendor(partner, invoice)) {
 				AccountType accountType = (AccountType) getPersistenceManager().getObjectById(AccountType.ACCOUNT_TYPE_ID_PARTNER_CUSTOMER);
-				to = getPartnerAccount(accountType, partner, transfer.getCurrency());
+				to = getPartnerAccount(accountType, partner, payMoneyTransfer.getCurrency());
 			}
 			else {
-//				amountToPay *= -1; // TODO korrekt?
+//				amountToPay *= -1; // correct? yes, I think it is correct to *never* negate amountToPay and thus have this line commented-out. Marco.
 				AccountType accountType = (AccountType) getPersistenceManager().getObjectById(AccountType.ACCOUNT_TYPE_ID_PARTNER_VENDOR);
-				to = getPartnerAccount(accountType, partner, transfer.getCurrency());
+				to = getPartnerAccount(accountType, partner, payMoneyTransfer.getCurrency());
 			}
 		}
 
 		// Because of invoice balancing, it might be (against the direction of the
 		// PayMoneyTransfer) that this current invoice is causing a transfer in the
 		// opposite direction.
-		if (amountToPay < 0) {
-			Anchor tmpAnchor = from;
-			from = to;
-			to = tmpAnchor;
-			amountToPay *= -1;
-		}
+//		if (amountToPay < 0) {
+//			Anchor tmpAnchor = from;
+//			from = to;
+//			to = tmpAnchor;
+//			amountToPay *= -1;
+//		}
 		InvoiceMoneyTransfer moneyTransfer = new InvoiceMoneyTransfer(
 				InvoiceMoneyTransfer.BOOK_TYPE_PAY,
-				transfer,
+				payMoneyTransfer,
 				from,
 				to,
 				invoice,
 				amountToPay);
 		moneyTransfer = pm.makePersistent(moneyTransfer);
+
+		if (logger.isDebugEnabled()) {
+			logger.debug("handleSingleInvoicePayment: created new InvoiceMoneyTransfer: " + moneyTransfer.getPrimaryKey());
+			logger.debug("handleSingleInvoicePayment: from: " + from.getPrimaryKey());
+			logger.debug("handleSingleInvoicePayment: to: " + to.getPrimaryKey());
+			logger.debug("handleSingleInvoicePayment: amountToPay: " + amountToPay);
+		}
 
 //		invoice.bookPayInvoiceMoneyTransfer(moneyTransfer, false);
 //		from.bookTransfer(user, moneyTransfer, involvedAnchors);
@@ -264,15 +263,214 @@ public class PartnerAccountant extends Accountant
 			return amountToPay;
 	}
 
+	private static class InvoiceComparator implements Comparator<Invoice>
+	{
+		public int compare(Invoice inv0, Invoice inv1) {
+			long inv0Time = inv0.getFinalizeDT().getTime();
+			long inv1Time = inv1.getFinalizeDT().getTime();
+
+			int result = inv0Time > inv1Time ? 1 : (inv0Time < inv1Time ? -1 : 0);
+			if (result != 0)
+				return result;
+
+			result = inv0.getOrganisationID().compareTo(inv1.getOrganisationID());
+			if (result != 0)
+				return result;
+
+			result = inv0.getInvoiceIDPrefix().compareTo(inv1.getInvoiceIDPrefix());
+			if (result != 0)
+				return result;
+
+			result = inv0.getInvoiceID() > inv1.getInvoiceID() ? 1 : (inv0.getInvoiceID() < inv1.getInvoiceID() ? -1 : 0);
+			return result;
+		}
+	};
+
+	/**
+	 * @param user the current user.
+	 * @param partner the business partner (customer or supplier [= vendor]). The role (customer/vendor) of this business partner
+	 *		might be different for each invoice, but it must be one of them (i.e.
+	 *		the invoice must not involve anyone else besides the local organisation and this partner).
+	 * @param payMoneyTransfer the payment to be distributed (booked on one or more of the given invoices).
+	 * @param invoicesPayMoney all invoices that require the local organisation to pay money to the <code>partner</code>. These
+	 *		are (1) invoices with a positive amount and the partner being the vendor and (2) invoices with a negative amount
+	 *		and the partner being the customer.
+	 * @param involvedAnchors all {@link Anchor} instances (i.e. usually {@link Account} or {@link LegalEntity}) that take part in
+	 *		the money transfers. This is used for sanity checks at the end of the transaction.
+	 * @param stopWhenCapitalReachesZero whether to stop when the capital reaches 0 (<code>true</code>) or to ignore the
+	 *		capital (<code>false</code>). If this is <code>false</code>, always <b>all</b> given invoices will be processed.
+	 *		If it is <code>true</code>, only as many invoices are processed as it is possible with the given capital.
+	 * @param capital the starting capital. This is the money the partner-LegalEntity has in its hands after booking the
+	 *		<code>payMoneyTransfer</code> and before this method did its work. If <code>stopWhenCapitalReachesZero</code>
+	 *		is <code>true</code>, this must be a negative value (or 0)!
+	 * @param containsLastInvoice whether the given <code>invoicesPayMoney</code> contains the last invoice to be processed.
+	 *		This flag is used to decide whether to book all left-over-money to the last invoice in the given <code>Collection</code>
+	 *		(or whether another method call of either this method or
+	 *		{@link #processInvoicesReceiveMoney(User, LegalEntity, PayMoneyTransfer, Collection, Set, boolean, long, boolean)}
+	 *		with another invoices-collection is taking place after this method call).
+	 * @return the new capital after processing.
+	 */
+	protected long processInvoicesPayMoney(
+			User user,
+			LegalEntity partner,
+			PayMoneyTransfer payMoneyTransfer,
+			Collection<TransferInvoiceEntry> invoicesPayMoney,
+			Set<Anchor> involvedAnchors,
+			boolean stopWhenCapitalReachesZero,
+			long capital,
+			boolean containsLastInvoice
+	)
+	{
+		// Sanity check: If capital approaches 0 (and we need to check when it reaches exactly 0), it does so always from
+		// the positive side (i.e. downwards).
+		if (stopWhenCapitalReachesZero) {
+			if (capital > 0)
+				throw new IllegalStateException("capital (" + capital + ") > 0!");
+		}
+
+		for (Iterator<TransferInvoiceEntry> it = invoicesPayMoney.iterator(); it.hasNext(); ) {
+			TransferInvoiceEntry entry = it.next();
+			Invoice invoice = entry.getInvoice();
+			boolean isLastInvoice = containsLastInvoice && !it.hasNext();
+
+			if (entry.getInvoiceBalance() > 0)
+				throw new IllegalStateException("Invoice balance must always be negative in invoicesPayMoney!!");
+
+			// Normally, we pay for each invoice exactly the outstanding money of this invoice.
+			long amountToPay = -1 * entry.getInvoiceBalance();
+
+			// But if this is the last invoice or if we have only limited capital, we might adjust the amount to be paid.
+			if (isLastInvoice || stopWhenCapitalReachesZero) {
+				long positiveCapital = -1 * capital;
+				if (isLastInvoice || positiveCapital < amountToPay)
+					amountToPay = positiveCapital;
+			}
+			// amountToPay must always be positive. The direction of the payment is detected
+			// by handleSingleInvoicePayment(...).
+
+			// handleSingleInvoicePayment(...) returns a negative value, if the money leaves the partner
+			// (and goes to an inside-partner-account). It returns a positive value, if the money comes
+			// from an inside-partner-account and goes to the partner-legal-entity.
+			long val = handleSingleInvoicePayment(
+					user, partner, payMoneyTransfer, invoice,
+					amountToPay, involvedAnchors
+			);
+
+			if (val < 0)
+				throw new IllegalStateException("handleSingleInvoicePayment(...) returned a negative value for a pay-invoice!!!");
+
+			// capital is negative - hence it will approach 0 from below (val is always >= 0)
+			capital += val;
+
+			if (stopWhenCapitalReachesZero) {
+				if (capital == 0)
+					break;
+
+				if (capital > 0)
+					throw new IllegalStateException("capital > 0!!! Why did it not reach exactly 0?");
+			}
+		} // iterate pay-invoices
+
+		return capital;
+	}
+
+	/**
+	 * @param user the current user.
+	 * @param partner the business partner (customer or supplier [= vendor]). The role (customer/vendor) of this business partner
+	 *		might be different for each invoice, but it must be one of them (i.e.
+	 *		the invoice must not involve anyone else besides the local organisation and this partner).
+	 * @param payMoneyTransfer the payment to be distributed (booked on one or more of the given invoices).
+	 * @param invoicesReceiveMoney all invoices that benefit the local organisation, i.e. that require the <code>partner</code>
+	 *		to pay money to the local org. These are (1) invoices with a negative amount and the partner being the vendor and (2)
+	 *		invoices with a positive amount and the partner being the customer.
+	 * @param involvedAnchors all {@link Anchor} instances (i.e. usually {@link Account} or {@link LegalEntity}) that take part in
+	 *		the money transfers. This is used for sanity checks at the end of the transaction.
+	 * @param stopWhenCapitalReachesZero whether to stop when the capital reaches 0 (<code>true</code>) or to ignore the
+	 *		capital (<code>false</code>). If this is <code>false</code>, always <b>all</b> given invoices will be processed.
+	 *		If it is <code>true</code>, only as many invoices are processed as it is possible with the given capital.
+	 * @param capital the starting capital. This is the money the partner-LegalEntity has in its hands after booking the
+	 *		<code>payMoneyTransfer</code> and before this method did its work. If <code>stopWhenCapitalReachesZero</code>
+	 *		is <code>true</code>, this must be a positive value (or 0)!
+	 * @param containsLastInvoice whether the given <code>invoicesReceiveMoney</code> contains the last invoice to be processed.
+	 *		This flag is used to decide whether to book all left-over-money to the last invoice in the given <code>Collection</code>
+	 *		(or whether another method call of either this method or
+	 *		{@link #processInvoicesPayMoney(User, LegalEntity, PayMoneyTransfer, Collection, Set, boolean, long, boolean)}
+	 *		with another invoices-collection is taking place after this method call).
+	 * @return the new capital after processing.
+	 */
+	protected long processInvoicesReceiveMoney(
+			User user,
+			LegalEntity partner,
+			PayMoneyTransfer payMoneyTransfer,
+			Collection<TransferInvoiceEntry> invoicesReceiveMoney,
+			Set<Anchor> involvedAnchors,
+			boolean stopWhenCapitalReachesZero,
+			long capital,
+			boolean containsLastInvoice
+	)
+	{
+		// Sanity check: If capital approaches 0 (and we need to check when it reaches exactly 0), it does so always from
+		// the negative side (i.e. upwards).
+		if (stopWhenCapitalReachesZero) {
+			if (capital < 0)
+				throw new IllegalStateException("capital (" + capital + ") < 0!");
+		}
+
+		for (Iterator<TransferInvoiceEntry> it = invoicesReceiveMoney.iterator(); it.hasNext(); ) {
+			TransferInvoiceEntry entry = it.next();
+			Invoice invoice = entry.getInvoice();
+			boolean isLastInvoice = containsLastInvoice && !it.hasNext();
+
+			if (entry.getInvoiceBalance() < 0)
+				throw new IllegalStateException("Invoice balance must always be positive in invoicesReceiveMoney!!");
+
+			// Normally, we pay for each invoice exactly the outstanding money of this invoice.
+			long amountToPay = entry.getInvoiceBalance();
+
+			// But if this is the last invoice or if we have only limited capital, we might adjust the amount to be paid.
+			if (isLastInvoice || stopWhenCapitalReachesZero) {
+				if (isLastInvoice || capital < amountToPay)
+					amountToPay = capital;
+			}
+			// amountToPay must always be positive. The direction of the payment is detected
+			// by handleSingleInvoicePayment(...).
+
+			// handleSingleInvoicePayment(...) returns a negative value, if the money leaves the partner
+			// (and goes to an inside-partner-account). It returns a positive value, if the money comes
+			// from an inside-partner-account and goes to the partner-legal-entity.
+			long val = handleSingleInvoicePayment(
+						user, partner, payMoneyTransfer, invoice,
+						amountToPay, involvedAnchors
+			);
+
+			if (val > 0)
+				throw new IllegalStateException("handleSingleInvoicePayment(...) returned a positive value for a receive-invoice!!!");
+
+			// capital is positive - hence it will approach 0 from above (val is always <= 0)
+			capital += val;
+
+			if (stopWhenCapitalReachesZero) {
+				if (capital == 0)
+					break;
+
+				if (capital < 0)
+					throw new IllegalStateException("capital < 0!!! Why did it not reach exactly 0?");
+			}
+		} // iterate receive-invoices
+
+		return capital;
+	}
+
+
 	/**
 	 * Handles payments by creating IntraLegalMoneyTransfer.<br/>
 	 * Implements the following:
 	 * <pre>
 	 *   * sort invoices (organisationID / invoiceID)
 	 *   * classify in invoicesPayMoney and invoicesRecieveMoney
-	 *   * balance invoices - negative balance means, we have to pay
+	 *   * balance invoices; negative balance means, we have to pay
 	 *   if (balance >= 0)
-	 *     * clear all invoicesRecieveMoney
+	 *     * clear all invoicesReceiveMoney
 	 *     * clear all possible invoicesPayMoney following the order
 	 *   else
 	 *     if (have invoicesReceiveMoney)
@@ -301,46 +499,82 @@ public class PartnerAccountant extends Accountant
 		if (payMoneyTransfer.getPayment().getInvoices().isEmpty() && partnerAccount == null)
 			throw new IllegalArgumentException("PayMoneyTransfer \""+payMoneyTransfer.getPrimaryKey()+"\" has no related invoices. Hence, partnerAccount must not be null! payMoneyTransfer.getPayment().getPartnerAccount() is null!!!");
 
-		// Sort Invoices
-		// sort order is finalizeDT, organisationID, invoiceIDPrefix, invoiceID
+		// Sort invoices (by finalizeDT, organisationID, invoiceIDPrefix, invoiceID).
+		//
+		// This way JFire guarantees that the booking is the same on vendor and customer side in a multi-organisation-scenario.
+		// Without sorting, it might happen e.g. when paying too little money (underpaying), that the vendor keeps invoice 1001
+		// open, while the customer pays invoice 1001 completely and instead keeps invoice 1002 open.
 		List<Invoice> sortedInvoices = new LinkedList<Invoice>(payMoneyTransfer.getPayment().getInvoices());
-		Comparator<Invoice> comparator = new Comparator<Invoice>() {
-			public int compare(Invoice inv0, Invoice inv1) {
-				long inv0Time = inv0.getFinalizeDT().getTime();
-				long inv1Time = inv1.getFinalizeDT().getTime();
+		Collections.sort(sortedInvoices, new InvoiceComparator());
 
-				int result = inv0Time > inv1Time ? 1 : (inv0Time < inv1Time ? -1 : 0);
-				if (result != 0)
-					return result;
+		// What direction is money flowing by the currently processed payment (payMoneyTransfer)?
+		// From us (local organisation) to our partner or from our partner to us?
+		long payMoneyTransferRealAmount;
+		int partnerAnchorType = payMoneyTransfer.getAnchorType(partner);
+		switch (partnerAnchorType) {
+			case Transfer.ANCHORTYPE_FROM:
+				// This means, the partner is RECEIVING money FROM the local organisation, because
+				// the PayMoneyTransfer goes FROM the partner-LegalEntity to an outside-account.
+				//
+				// In other words, the local organisation is paying money to the partner.
+				//
+				// Transfers:
+				//   inside-partner-accounts (customer/vendor/neutral)
+				//      ||
+				//      || localMoneyTransfers (one per invoice)
+				//     \||/
+				//      \/
+				//   partner-legal-entity
+				//      ||
+				//      || *payMoneyTransfer* (determining ANCHORTYPE_FROM, i.e. from the legal-entity)
+				//     \||/
+				//      \/
+				//   outside-account (depending on PaymentProcessor)
 
-				result = inv0.getOrganisationID().compareTo(inv1.getOrganisationID());
-				if (result != 0)
-					return result;
+				payMoneyTransferRealAmount = -1L * payMoneyTransfer.getAmount();
 
-				result = inv0.getInvoiceIDPrefix().compareTo(inv1.getInvoiceIDPrefix());
-				if (result != 0)
-					return result;
+				if (logger.isDebugEnabled())
+					logger.debug("handlePayMoneyTransfer: localOrg pays money. payMoneyTransfer=" + payMoneyTransfer.getPrimaryKey());
+				break;
+			case Transfer.ANCHORTYPE_TO:
+				// This means, the partner is PAYING money TO the local organisation, because
+				// the PayMoneyTransfer goes TO the partner-LegalEntity from an outside-account.
+				//
+				// In other words, the local organisation is receiving money from the partner.
+				//
+				// Transfers:
+				//   outside-account (depending on PaymentProcessor)
+				//      ||
+				//      || *payMoneyTransfer* (determining ANCHORTYPE_TO, i.e. to the legal-entity)
+				//     \||/
+				//      \/
+				//   partner-legal-entity
+				//      ||
+				//      || localMoneyTransfers (one per invoice)
+				//     \||/
+				//      \/
+				//   inside-partner-accounts (customer/vendor/neutral)
 
-				result = inv0.getInvoiceID() > inv1.getInvoiceID() ? 1 : (inv0.getInvoiceID() < inv1.getInvoiceID() ? -1 : 0);
-				return result;
-			}
-		};
-		Collections.sort(sortedInvoices,comparator);
+				payMoneyTransferRealAmount = payMoneyTransfer.getAmount();
 
+				if (logger.isDebugEnabled())
+					logger.debug("handlePayMoneyTransfer: localOrg receives money. payMoneyTransfer=" + payMoneyTransfer.getPrimaryKey());
+				break;
+			default:
+				throw new UnsupportedOperationException("The partner seems not to be involved in the transfer or there is a new - not supported - anchor type!");
+		}
+		/* Now, payMoneyTransferRealAmount is positive, if the current PayMoneyTransfer
+		 * causes the local organisation to gain money. And it is negative, if the local
+		 * organisation looses money.
+		 */
 
-
-		// classify Invoices and compute overallBalance
-		boolean partnerTransferTo = payMoneyTransfer.getAnchorType(partner) == Transfer.ANCHORTYPE_TO; // (payMoneyTransfer.getTo() != null) && (payMoneyTransfer.getTo().getPrimaryKey().equals(partner.getPrimaryKey()));
-		boolean partnerTransferFrom = !partnerTransferTo;
 
 		List<TransferInvoiceEntry> invoicesPayMoney = new LinkedList<TransferInvoiceEntry>();
 		List<TransferInvoiceEntry> invoicesReceiveMoney = new LinkedList<TransferInvoiceEntry>();
 
-//		Accounting accounting = Accounting.getAccounting(pm);
-
-		/* allInvoicesBalance is the amount after summarizing all invoices
-		 * It is negative if the local organisation looses money to
-		 * the outside partner and positive if the local organisation receives money.
+		/* allInvoicesBalance is the amount after summarizing all invoices.
+		 * It is negative, if we (local organisation) should pay money to
+		 * our partner; and positive, if we should receive money.
 		 *
 		 * NEGATIVE amount: When local organisation either creates an
 		 * invoice with a negative price or partner created an invoice with
@@ -349,6 +583,9 @@ public class PartnerAccountant extends Accountant
 		 * POSITIVE amount: When local organisation either creates an
 		 * invoice with a positive amount or partner created an invoice with
 		 * a negative amount.
+		 *
+		 * Note, that the partner might be a vendor-legal-entity managed by the
+		 * local organisation (i.e. without its own datastore).
 		 */
 		long allInvoicesBalance = 0;
 
@@ -357,14 +594,12 @@ public class PartnerAccountant extends Accountant
 			boolean partnerInvoiceVendor = !partnerInvoiceCustomer;
 
 			long invoiceBalance = 0;
-//			if (partnerTransferFrom && partnerInvoiceVendor)
 			if (partnerInvoiceVendor)
 				invoiceBalance = - invoice.getInvoiceLocal().getAmountToPay();
 			else
 				invoiceBalance = invoice.getInvoiceLocal().getAmountToPay();
 
 			allInvoicesBalance += invoiceBalance;
-
 
 			if (invoiceBalance >= 0) {
 				invoicesReceiveMoney.add(new TransferInvoiceEntry(invoice, invoiceBalance));
@@ -373,92 +608,11 @@ public class PartnerAccountant extends Accountant
 				invoicesPayMoney.add(new TransferInvoiceEntry(invoice, invoiceBalance));
 			}
 		}
-
-//		for (Iterator iter = sortedInvoices.iterator(); iter.hasNext();) {
-//			Invoice invoice = (Invoice) iter.next();
-//			long invoiceBalance = 0;
-//			boolean partnerInvoiceCustomer = invoice.getCustomer().getPrimaryKey().equals(partner.getPrimaryKey());
-//			boolean partnerInvoiceVendor = !partnerInvoiceCustomer;
-//			long factor = 1;
-////			if ( (partnerTransferTo && partnerInvoiceVendor) || (partnerTransferFrom && partnerInvoiceCustomer) )
-//			if ((partnerTransferFrom && partnerInvoiceVendor) ||
-//					(partnerTransferTo && partnerInvoiceCustomer))
-//				factor = -1;
-//			invoiceBalance = invoice.getAmountToPay() * factor;
-//			allInvoicesBalance += invoiceBalance;
-//
-////			if (partnerInvoiceVendor)
-////				amountToGetAsVendor += invoice.getAmountToPay();
-////			else
-////				amountToPayAsCustomer += invoice.getAmountToPay();
-//
-//			if (invoiceBalance >= 0) {
-//				invoicesReceiveMoney.add(new TransferInvoiceEntry(invoice, invoiceBalance));
-//			}
-//			else {
-//				invoicesPayMoney.add(new TransferInvoiceEntry(invoice, invoiceBalance));
-//			}
-//		}
-
-//		Account mandatorVendorAccount = accounting.getPartnerAccount(Account.ANCHOR_TYPE_ID_PARTNER_VENDOR,partner,payMoneyTransfer.getCurrency());
-//		Account mandatorCustomerAccount = accounting.getPartnerAccount(Account.ANCHOR_TYPE_ID_PARTNER_CUSTOMER,partner,payMoneyTransfer.getCurrency());
-
-// we create one InvoiceMoneyTransfer for each Invoice and don't need a general
-// moneytransfer
-//		// create a IntraLegalEntityMoneyTransfer to transfer the money from LE to Account or vice versa
-//		if (partnerTransferFrom) {
-//			//               PayMoneyTransfer
-//			// Mandator   --------------------->  NULL
-//			Account fromAccount = accounting.getPartnerAccount(Account.ANCHOR_TYPE_ID_PARTNER_VENDOR,partner,payMoneyTransfer.getCurrency());
-//			MoneyTransfer moneyTransfer = new MoneyTransfer(
-//				accounting,
-//				payMoneyTransfer,
-//				fromAccount,
-//				partner,
-////				payMoneyTransfer,
-//				payMoneyTransfer.getCurrency(),
-//				payMoneyTransfer.getAmount()
-//			);
-//
-//			fromAccount.bookTransfer(user, moneyTransfer, involvedAnchors);
-//			partner.bookTransfer(user, moneyTransfer, involvedAnchors);
-//		}
-//		else {
-//			//            PayMoneyTransfer
-//			// NULL   --------------------->  Mandator
-//			Account toAccount = accounting.getPartnerAccount(Account.ANCHOR_TYPE_ID_PARTNER_CUSTOMER, partner, payMoneyTransfer.getCurrency());
-//			MoneyTransfer moneyTransfer = new MoneyTransfer(
-//				accounting,
-//				payMoneyTransfer,
-//				partner,
-//				toAccount,
-////				payMoneyTransfer,
-//				payMoneyTransfer.getCurrency(),
-//				payMoneyTransfer.getAmount()
-//			);
-//
-//			partner.bookTransfer(user, moneyTransfer, involvedAnchors);
-//			toAccount.bookTransfer(user, moneyTransfer, involvedAnchors);
-//		}
-
-
-		/* If the overallBalance is positive, the local organisation is receiving
+		/* If the allInvoicesBalance is positive, now, the local organisation is receiving
 		 * money in total after all invoices have been summarized. If it's
-		 * negative, the local organisation looses money by the given invoices.
-		 *
-		 * Hence, the PayMoneyTransfer has partnerTransferFrom, if
-		 * allInvoicesBalance is negative.
+		 * negative, here, the local organisation looses money by the given invoices.
 		 */
-		long payMoneyTransferRealAmount;
-		if (partnerTransferFrom)
-			payMoneyTransferRealAmount = - payMoneyTransfer.getAmount();
-		else
-			payMoneyTransferRealAmount = payMoneyTransfer.getAmount();
 
-		/* Now, payMoneyTransferRealAmount is positive if the current PayMoneyTransfer
-		 * causes the local organisation to gain money and negative, if the local
-		 * organisation looses money.
-		 */
 
 		/* restAmount is negative, if after summarizing all invoices and the
 		 * PayMoneyTransfer, still money has to be paid from the local organisation to
@@ -469,216 +623,68 @@ public class PartnerAccountant extends Accountant
 		 */
 		long restAmount = allInvoicesBalance - payMoneyTransferRealAmount;
 
-		/* The capital is the money that the LegalEntity currently (after the
-		 * PayMoneyTransfer) has. It is negative if the LegalEntity has to pay
-		 * the partner and positive if the LegalEntity receives money. The LegalEntity
-		 * "partner" represents a section within the local organisation, hence the
-		 * directions (point of view) are the same as of the local organisation.
+		/* The capital is the money that the partner-LegalEntity currently (after the
+		 * PayMoneyTransfer) has. It is negative, if the local org has to pay
+		 * the partner and positive if the local org receives money from the partner.
+		 * The LegalEntity "partner" represents a section within the local organisation,
+		 * hence the directions (point of view) are the same as of the local organisation.
 		 *
 		 * in short: capital is negative when paying and postive when receiving
 		 */
 		long capital = payMoneyTransferRealAmount;
 
-		if (restAmount <= 0) {
-			if (partnerTransferFrom) { // capital starts NEGATIVE and stops at 0
-				// underpayment on customer side
+		if (restAmount >= 0) {
+			// We can definitely clear all pay-invoices, because the partner
+			// still owes us money. Hence, first all pay-invoices, then
+			// as many receive-invoices as possible.
 
-				// clear all receive-invoices first
-				// and pay until money's gone
+			// first all pay-invoices
+			capital = processInvoicesPayMoney(
+					user, partner, payMoneyTransfer, invoicesPayMoney, involvedAnchors,
+					false, // ignore the value of capital and process really *all* invoices
+					capital,
+					invoicesReceiveMoney.isEmpty() // indicate that invoicesPayMoney contains the last invoice, if the receive-invoices are empty
+			);
 
-				// first all receive invoices
-				for (TransferInvoiceEntry entry : invoicesReceiveMoney) {
-					Invoice invoice = entry.getInvoice();
+			// At least after all the pay-invoices (if not even before), capital must be positive here.
+			if (capital < 0)
+				throw new IllegalStateException("capital (" + capital + ") < 0 after processing pay-invoices!");
 
-					if (entry.getInvoiceBalance() < 0)
-						throw new IllegalStateException("Invoice balance must always be positive in invoicesReceiveMoney!!");
-
-					if (capital > 0)
-						throw new IllegalStateException("capital=="+capital+"! capital must be negative here!");
-
-					// capital is negative - hence --=+ (let the capital grow = away from 0)
-					capital -= handleSingleInvoicePayment(
-							user, partner, payMoneyTransfer, invoice,
-							entry.getInvoiceBalance(), involvedAnchors);
-				} // iterate receive-invoices
-
-				// now as many pay-invoices as possible
-				for (TransferInvoiceEntry entry : invoicesPayMoney) {
-					Invoice invoice = entry.getInvoice();
-
-					if (entry.getInvoiceBalance() > 0)
-						throw new IllegalStateException("Invoice balance must always be negative in invoicesPayMoney!!");
-
-					if (capital > 0)
-						throw new IllegalStateException("capital=="+capital+"! capital must be negative here!");
-
-					// let the capital shrink (get closer to 0)
-					if (capital <= entry.getInvoiceBalance()) {
-						capital += handleSingleInvoicePayment(
-								user, partner, payMoneyTransfer, invoice,
-								-1 * entry.getInvoiceBalance(), involvedAnchors);
-					}
-					else {
-						capital += handleSingleInvoicePayment(
-								user, partner, payMoneyTransfer, invoice,
-								-1 * capital, involvedAnchors);
-						break;
-					}
-				} // iterate pay-invoices
-
-			} // if (partnerTransferFrom) { // capital negative
-			else {
-				// capital starts POSITIVE and stops at 0 (or never reaches 0)
-				// overpayment on vendor side
-
-				// clear all receive-invoices first
-				// then as many pay invoices as possible
-
-				// first ALL receive-invoices
-				for (TransferInvoiceEntry entry : invoicesReceiveMoney) {
-					Invoice invoice = entry.getInvoice();
-
-					if (entry.getInvoiceBalance() < 0)
-						throw new IllegalStateException("Invoice balance must always be positive in invoicesReceiveMoney!!");
-
-					if (capital < 0)
-						throw new IllegalStateException("capital=="+capital+"! capital must be positive here!");
-
-					// let the capital grow (get away from 0)
-					capital += handleSingleInvoicePayment(
-							user, partner, payMoneyTransfer, invoice,
-							entry.getInvoiceBalance(), involvedAnchors);
-				} // iterate receive-invoices
-
-				// now as many pay-invoices as possible
-				for (TransferInvoiceEntry entry : invoicesPayMoney) {
-					Invoice invoice = entry.getInvoice();
-
-					if (entry.getInvoiceBalance() > 0)
-						throw new IllegalStateException("Invoice balance must always be negative in invoicesPayMoney!!");
-
-					if (capital < 0)
-						throw new IllegalStateException("capital=="+capital+"! capital must be positive here!");
-
-					// let the capital shrink (get closer to 0)
-					if (capital >= -1 * entry.getInvoiceBalance()) {
-						capital -= handleSingleInvoicePayment(
-								user, partner, payMoneyTransfer, invoice,
-								-1 * entry.getInvoiceBalance(), involvedAnchors);
-					}
-					else {
-						capital -= handleSingleInvoicePayment(
-								user, partner, payMoneyTransfer, invoice,
-								capital, involvedAnchors);
-						break;
-					}
-				} // iterate pay-invoices
-
-			} // if (partnerTransferTo) {
-
-		} // if (restAmount <= 0) {
+			// now as many receive-invoices as possible
+			capital = processInvoicesReceiveMoney(
+					user, partner, payMoneyTransfer, invoicesReceiveMoney, involvedAnchors,
+					true, // stop when capital reaches 0
+					capital,
+					true // invoicesReceiveMoney always contains the last invoice, because this is the 2nd (and last) step
+			);
+		}
 		else {
-			// if (restAmount > 0) {
+			// We can definitely clear all receive-invoices, because we still
+			// owe money to the partner. Hence, first all receive-invoices, then
+			// as many pay-invoices as possible.
 
-			if (partnerTransferFrom) { // capital starts NEGATIVE and stops at 0
-				// overpayment on customer side
+			// first all receive-invoices
+			capital = processInvoicesReceiveMoney(
+					user, partner, payMoneyTransfer, invoicesReceiveMoney, involvedAnchors,
+					false, // ignore the value of capital and process really *all* invoices
+					capital,
+					invoicesPayMoney.isEmpty() // indicate that invoicesReceiveMoney contains the last invoice, if the pay-invoices are empty
+			);
 
-				// clear all pay-invoices first
-				// and receive as many receive-invoices as possible
+			// At least after all the receive-invoices (if not even before), capital must be negative here.
+			if (capital > 0)
+				throw new IllegalStateException("capital (" + capital + ") > 0 after processing receive-invoices!");
 
-				// first all pay-invoices
-				for (TransferInvoiceEntry entry : invoicesPayMoney) {
-					Invoice invoice = entry.getInvoice();
+			capital = processInvoicesPayMoney(
+					user, partner, payMoneyTransfer, invoicesPayMoney, involvedAnchors,
+					true, // stop when capital reaches 0
+					capital,
+					true // invoicesPayMoney always contains the last invoice, because this is the 2nd (and last) step
+			);
+		}
 
-					if (entry.getInvoiceBalance() > 0)
-						throw new IllegalStateException("Invoice balance must always be negative in invoicesPayMoney!!");
-
-					if (capital > 0)
-						throw new IllegalStateException("capital=="+capital+"! capital must be negative here!");
-
-					// capital is negative - hence --=+ (let the capital grow)
-					capital += handleSingleInvoicePayment(
-							user, partner, payMoneyTransfer, invoice,
-							-1 * entry.getInvoiceBalance(), involvedAnchors);
-				} // iterate pay-invoices
-
-				// now as many receive-invoices as possible
-				for (TransferInvoiceEntry entry : invoicesReceiveMoney) {
-					Invoice invoice = entry.getInvoice();
-
-					if (entry.getInvoiceBalance() < 0)
-						throw new IllegalStateException("Invoice balance must always be positive in invoicesReceiveMoney!!");
-
-					if (capital > 0)
-						throw new IllegalStateException("capital=="+capital+"! capital must be negative here!");
-
-					// capital is negative - hence --=+ (let the capital grow)
-					if (capital <= entry.getInvoiceBalance()) {
-						capital -= handleSingleInvoicePayment(
-								user, partner, payMoneyTransfer, invoice,
-								entry.getInvoiceBalance(), involvedAnchors);
-					}
-					else {
-						capital -= handleSingleInvoicePayment(
-								user, partner, payMoneyTransfer, invoice,
-								-1 * capital, involvedAnchors);
-						break;
-					}
-				} // iterate receive-invoices
-
-			} // if (partnerTransferFrom) { // capital starts negative and stops at 0
-			else {
-				// capital starts POSITIVE and stops at 0
-				// underpayment on vendor side
-
-				// first all pay-invoices (vendor side!)
-				// then as many receive-invoices as possible
-
-				// first all pay-invoices
-				for (TransferInvoiceEntry entry : invoicesPayMoney) {
-					Invoice invoice = entry.getInvoice();
-
-					if (entry.getInvoiceBalance() > 0)
-						throw new IllegalStateException("Invoice balance must always be negative in invoicesPayMoney!!");
-
-					if (capital < 0)
-						throw new IllegalStateException("capital=="+capital+"! capital must be positive here!");
-
-					capital -= handleSingleInvoicePayment(
-							user, partner, payMoneyTransfer, invoice,
-							-1 * entry.getInvoiceBalance(), involvedAnchors);
-				} // iterate pay-invoices
-
-				// now as many receive-invoices as possible
-				for (TransferInvoiceEntry entry : invoicesReceiveMoney) {
-					Invoice invoice = entry.getInvoice();
-
-					if (entry.getInvoiceBalance() < 0)
-						throw new IllegalStateException("Invoice balance must always be positive in invoicesReceiveMoney!!");
-
-					if (capital < 0)
-						throw new IllegalStateException("capital=="+capital+"! capital must be positive here!");
-
-					if (capital >= entry.getInvoiceBalance()) {
-						capital += handleSingleInvoicePayment(
-								user, partner, payMoneyTransfer, invoice,
-								entry.getInvoiceBalance(), involvedAnchors);
-					}
-					else {
-						capital += handleSingleInvoicePayment(
-								user, partner, payMoneyTransfer, invoice,
-								capital, involvedAnchors);
-						break;
-					}
-				} // iterate receive-invoices
-
-			} // if (partnerTransferTo) {
-
-		} // if (restAmount > 0) {
-
-
+		// If there is any money left, we have to book it onto the NEUTRAL (neither vendor nor customer) account of the business partner.
 		if (capital != 0) {
-//			throw new UnsupportedOperationException("capital=="+capital+"! The case capital != 0 after payment is not yet supported!");
 			Anchor from, to;
 			long amountToTransfer;
 			if (capital > 0) {
@@ -704,18 +710,15 @@ public class PartnerAccountant extends Accountant
 		}
 	}
 
-//	private PersistenceManager accountantPM = null;
-
 	/**
 	 * Returns the PersitenceManager of this PartnerAccountant. This
-	 * is not cached.
+	 * is not cached (which is not necessary, anyway, because it's a fast operation via {@link JDOHelper#getObjectId(Object)}).
 	 */
 	protected PersistenceManager getPersistenceManager() {
-//		if (accountantPM == null) {
 		PersistenceManager accountantPM = JDOHelper.getPersistenceManager(this);
 		if (accountantPM == null)
 			throw new IllegalStateException("This instance of PartnerAccountant is currently not persistent, can not get a PesistenceManager!!");
-//		}
+
 		return accountantPM;
 	}
 
@@ -733,7 +736,7 @@ public class PartnerAccountant extends Accountant
 		if (currency == null)
 			throw new IllegalArgumentException("Parameter currency must not be null!");
 
-		Collection<Account> accounts = (Collection<Account>) Account.getAccounts(getPersistenceManager(), accountType, partner, currency);
+		Collection<? extends Account> accounts = Account.getAccounts(getPersistenceManager(), accountType, partner, currency);
 		// there should be only one account, but in case a user later adds one, we don't throw an exception
 		Account account = accounts.isEmpty() ? null : accounts.iterator().next();
 		if (account == null) {

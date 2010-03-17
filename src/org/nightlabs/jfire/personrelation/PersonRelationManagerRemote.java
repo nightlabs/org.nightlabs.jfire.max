@@ -35,6 +35,32 @@ public interface PersonRelationManagerRemote {
 			PropertySetID fromPersonID, PropertySetID toPersonID
 	);
 
+	// -------------- ++++++++++ ----------------------------------------------------------------------------------------------------------- ++ ----|
+	Collection<PersonRelationID> getPersonRelationIDs(
+			PersonRelationTypeID personRelationTypeID,
+			PropertySetID fromPersonID,
+			PropertySetID toPersonID,
+			boolean isSortByPersonRelationType
+	);
+
+	Collection<PersonRelationID> getFilteredPersonRelationIDs(
+			PersonRelationTypeID personRelationTypeID,
+			PropertySetID fromPersonID,
+			PropertySetID toPersonID,
+			Set<PropertySetID> fromPropertySetIDsToExclude,
+			Set<PropertySetID> toPropertySetIDsToExclude,
+			boolean isSortByPersonRelationType
+	);
+
+	long getFilteredPersonRelationCount(
+			PersonRelationTypeID personRelationTypeID,
+			PropertySetID fromPersonID,
+			PropertySetID toPersonID,
+			Set<PropertySetID> fromPropertySetIDsToExclude,
+			Set<PropertySetID> toPropertySetIDsToExclude
+	);
+	// -------------- ++++++++++ ----------------------------------------------------------------------------------------------------------- ++ ----|
+
 	Collection<PersonRelation> getPersonRelations(
 			Collection<PersonRelationID> personRelationIDs,
 			String[] fetchGroups, int maxFetchDepth

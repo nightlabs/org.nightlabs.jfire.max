@@ -109,6 +109,52 @@ extends BaseJDOObjectDAO<PersonRelationID, PersonRelation>
 		}
 	}
 
+	// -------------- ++++++++++ ----------------------------------------------------------------------------------------------------------- ++ ----|
+	public synchronized Collection<PersonRelationID> getFilteredPersonRelationIDs(
+			PersonRelationTypeID personRelationTypeID,
+			PropertySetID fromPersonID,
+			PropertySetID toPersonID,
+			Set<PropertySetID> fromPropertySetIDsToExclude,
+			Set<PropertySetID> toPropertySetIDsToExclude,
+			boolean isSortByPersonRelationType,
+			ProgressMonitor monitor
+	) {
+		monitor.beginTask("Loading person relation IDs", 100);
+		try {
+			PersonRelationManagerRemote ejb = JFireEjb3Factory.getRemoteBean(PersonRelationManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			monitor.worked(10);
+			Collection<PersonRelationID> personRelationIDs = ejb.getFilteredPersonRelationIDs(
+					personRelationTypeID, fromPersonID, toPersonID, fromPropertySetIDsToExclude, toPropertySetIDsToExclude, isSortByPersonRelationType
+			);
+			monitor.worked(90);
+			return personRelationIDs;
+		} finally {
+			monitor.done();
+		}
+	}
+
+	public synchronized long getFilteredPersonRelationCount(
+			PersonRelationTypeID personRelationTypeID,
+			PropertySetID fromPersonID,
+			PropertySetID toPersonID,
+			Set<PropertySetID> fromPropertySetIDsToExclude,
+			Set<PropertySetID> toPropertySetIDsToExclude,
+			ProgressMonitor monitor
+	) {
+		monitor.beginTask("Loading person relation count", 100);
+		try {
+			PersonRelationManagerRemote ejb = JFireEjb3Factory.getRemoteBean(PersonRelationManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			monitor.worked(10);
+			return ejb.getFilteredPersonRelationCount(personRelationTypeID, fromPersonID, toPersonID, fromPropertySetIDsToExclude, toPropertySetIDsToExclude);
+		} finally {
+			monitor.worked(90);
+			monitor.done();
+		}
+	}
+	// -------------- ++++++++++ ----------------------------------------------------------------------------------------------------------- ++ ----|
+
+
+
 	/**
 	 * Get all those {@link PersonRelation}s that are of a certain {@link PersonRelationType type}
 	 * (if specified, otherwise all) and between two persons. It is possible to specify only one

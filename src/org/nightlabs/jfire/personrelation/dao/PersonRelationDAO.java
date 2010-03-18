@@ -13,6 +13,7 @@ import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.person.Person;
 import org.nightlabs.jfire.personrelation.PersonRelation;
+import org.nightlabs.jfire.personrelation.PersonRelationComparator;
 import org.nightlabs.jfire.personrelation.PersonRelationManagerRemote;
 import org.nightlabs.jfire.personrelation.PersonRelationType;
 import org.nightlabs.jfire.personrelation.id.PersonRelationID;
@@ -116,7 +117,8 @@ extends BaseJDOObjectDAO<PersonRelationID, PersonRelation>
 			PropertySetID toPersonID,
 			Set<PropertySetID> fromPropertySetIDsToExclude,
 			Set<PropertySetID> toPropertySetIDsToExclude,
-			boolean isSortByPersonRelationType,
+			PersonRelationComparator personRelationComparator, // Leave this null to suggest no sorting
+//			boolean isSortByPersonRelationType,
 			ProgressMonitor monitor
 	) {
 		monitor.beginTask("Loading person relation IDs", 100);
@@ -124,7 +126,7 @@ extends BaseJDOObjectDAO<PersonRelationID, PersonRelation>
 			PersonRelationManagerRemote ejb = JFireEjb3Factory.getRemoteBean(PersonRelationManagerRemote.class, SecurityReflector.getInitialContextProperties());
 			monitor.worked(10);
 			Collection<PersonRelationID> personRelationIDs = ejb.getFilteredPersonRelationIDs(
-					personRelationTypeID, fromPersonID, toPersonID, fromPropertySetIDsToExclude, toPropertySetIDsToExclude, isSortByPersonRelationType
+					personRelationTypeID, fromPersonID, toPersonID, fromPropertySetIDsToExclude, toPropertySetIDsToExclude, personRelationComparator
 			);
 			monitor.worked(90);
 			return personRelationIDs;

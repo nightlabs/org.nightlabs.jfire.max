@@ -2,9 +2,7 @@ package org.nightlabs.jfire.personrelation;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Deque;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -183,18 +181,7 @@ implements PersonRelationManagerRemote
 			PropertySetID toPersonID
 	)
 	{
-		return getPersonRelationIDs(personRelationTypeID, fromPersonID, toPersonID, false); // Default (from original): Dont sort?
-//		PersistenceManager pm = createPersistenceManager();
-//		try {
-//			PersonRelationType personRelationType = (PersonRelationType) (personRelationTypeID == null ? null : pm.getObjectById(personRelationTypeID));
-//			Person fromPerson = (Person) (fromPersonID == null ? null : pm.getObjectById(fromPersonID));
-//			Person toPerson = (Person) (toPersonID == null ? null : pm.getObjectById(toPersonID));
-//
-//			Collection<? extends PersonRelation> relations = PersonRelation.getPersonRelations(pm, personRelationType, fromPerson, toPerson);
-//			return NLJDOHelper.getObjectIDList(relations);
-//		} finally {
-//			pm.close();
-//		}
+		return getPersonRelationIDs(personRelationTypeID, fromPersonID, toPersonID, null); // Default (from original): Dont sort?
 	}
 
 
@@ -206,7 +193,7 @@ implements PersonRelationManagerRemote
 			PersonRelationTypeID personRelationTypeID,
 			PropertySetID fromPersonID,
 			PropertySetID toPersonID,
-			boolean isSortByPersonRelationType
+			PersonRelationComparator personRelationComparator // Leave this null to suggest no sorting
 	)
 	{
 		PersistenceManager pm = createPersistenceManager();
@@ -216,47 +203,21 @@ implements PersonRelationManagerRemote
 			Person toPerson = (Person) (toPersonID == null ? null : pm.getObjectById(toPersonID));
 
 			Collection<? extends PersonRelation> relations = PersonRelation.getPersonRelations(pm, personRelationType, fromPerson, toPerson);
-			return (Collection<PersonRelationID>) (isSortByPersonRelationType ? getSortedPersonRelationIDsByPersonRelationType(relations) : NLJDOHelper.getObjectIDList(relations));
+			return (Collection<PersonRelationID>) (personRelationComparator != null ? getSortedPersonRelationIDsByPersonRelationType(relations, personRelationComparator) : NLJDOHelper.getObjectIDList(relations));
+
 		} finally {
 			pm.close();
 		}
 	}
 
-	protected Collection<PersonRelationID> getSortedPersonRelationIDsByPersonRelationType(Collection<? extends PersonRelation> relations) {
+	protected Collection<PersonRelationID> getSortedPersonRelationIDsByPersonRelationType
+	(Collection<? extends PersonRelation> relations, PersonRelationComparator personRelationComparator) {
 		@SuppressWarnings("unchecked")
 		List<PersonRelation> relns = (List<PersonRelation>) relations;
 		Collections.sort(relns, personRelationComparator);
 
 		return NLJDOHelper.getObjectIDList(relns);
 	}
-
-	@SuppressWarnings("serial")
-	private Comparator<PersonRelation> personRelationComparator = new Comparator<PersonRelation>() {
-		// Sort for nodes carrying PersonRelations to appear in the following order:
-		final Map<String, Integer> personRelationTypeOrder = new HashMap<String, Integer>() { {
-			put(PersonRelationType.PredefinedRelationTypes.companyGroup.personRelationTypeID, 1);
-			put(PersonRelationType.PredefinedRelationTypes.subsidiary.personRelationTypeID, 2);
-			put(PersonRelationType.PredefinedRelationTypes.employing.personRelationTypeID, 11);
-			put(PersonRelationType.PredefinedRelationTypes.employed.personRelationTypeID, 12);
-			put(PersonRelationType.PredefinedRelationTypes.parent.personRelationTypeID, 21);
-			put(PersonRelationType.PredefinedRelationTypes.child.personRelationTypeID, 22);
-			put(PersonRelationType.PredefinedRelationTypes.friend.personRelationTypeID, 500);
-		} };
-
-		@Override
-		public int compare(PersonRelation pr1, PersonRelation pr2) {
-			int compVal = personRelationTypeOrder.get(pr1.getPersonRelationType().getReversePersonRelationTypeID().personRelationTypeID)
-			       - personRelationTypeOrder.get(pr2.getPersonRelationType().getReversePersonRelationTypeID().personRelationTypeID);
-
-			if (compVal == 0) {
-				// If the PersonRelationTypes are equal, then we sort according to the displayName.
-				return pr1.getTo().getDisplayName().compareTo( pr2.getTo().getDisplayName() );
-			}
-
-			return compVal;
-		}
-	};
-
 
 	@SuppressWarnings("unchecked")
 	@RolesAllowed("_Guest_") // TODO access rights
@@ -267,7 +228,7 @@ implements PersonRelationManagerRemote
 			PropertySetID toPersonID,
 			Set<PropertySetID> fromPropertySetIDsToExclude,
 			Set<PropertySetID> toPropertySetIDsToExclude,
-			boolean isSortByPersonRelationType
+			PersonRelationComparator personRelationComparator // Leave this null to suggest no sorting
 	)
 	{
 		PersistenceManager pm = createPersistenceManager();
@@ -291,7 +252,7 @@ implements PersonRelationManagerRemote
 			relations.removeAll(relationsMarkedForExclusion);
 
 			// Sort if necessary.
-			return (Collection<PersonRelationID>) (isSortByPersonRelationType ? getSortedPersonRelationIDsByPersonRelationType(relations) : NLJDOHelper.getObjectIDList(relations));
+			return (Collection<PersonRelationID>) (personRelationComparator != null ? getSortedPersonRelationIDsByPersonRelationType(relations, personRelationComparator) : NLJDOHelper.getObjectIDList(relations));
 		} finally {
 			pm.close();
 		}

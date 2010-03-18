@@ -40,7 +40,7 @@ public interface PersonRelationManagerRemote {
 			PersonRelationTypeID personRelationTypeID,
 			PropertySetID fromPersonID,
 			PropertySetID toPersonID,
-			boolean isSortByPersonRelationType
+			PersonRelationComparator personRelationComparator // Leave this null to suggest no sorting
 	);
 
 	Collection<PersonRelationID> getFilteredPersonRelationIDs(
@@ -49,7 +49,7 @@ public interface PersonRelationManagerRemote {
 			PropertySetID toPersonID,
 			Set<PropertySetID> fromPropertySetIDsToExclude,
 			Set<PropertySetID> toPropertySetIDsToExclude,
-			boolean isSortByPersonRelationType
+			PersonRelationComparator personRelationComparator // Leave this null to suggest no sorting
 	);
 
 	long getFilteredPersonRelationCount(

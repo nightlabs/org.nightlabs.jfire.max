@@ -155,6 +155,8 @@ public interface IssueManagerRemote {
 
 	IssueType storeIssueType(IssueType issueType, boolean get, String[] fetchGroups, int maxFetchDepth);
 
+	IssueType storeIssueType(IssueType issueType, byte[] processDefinitionAsZip, boolean get, String[] fetchGroups, int maxFetchDepth);
+	
 	List<IssueType> getIssueTypes(Collection<IssueTypeID> issueTypeIDs, String[] fetchGroups, int maxFetchDepth);
 
 	Set<IssueTypeID> getIssueTypeIDs();

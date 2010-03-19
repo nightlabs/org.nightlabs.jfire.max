@@ -1,8 +1,13 @@
 package org.nightlabs.jfire.issue;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URL;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -1001,14 +1006,74 @@ implements IssueManagerRemote
 	public IssueType storeIssueType(IssueType issueType, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = createPersistenceManager();
-		try {
-			return NLJDOHelper.storeJDO(pm, issueType, get, fetchGroups, maxFetchDepth);
+		try {			
+			return doStoreIssueType(pm, issueType, null, get, fetchGroups, maxFetchDepth);
 		}//try
 		finally {
 			pm.close();
 		}//finally
 	}
 
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("_Guest_")
+	@Override
+	public IssueType storeIssueType(IssueType issueType, byte[] processDefinitionAsZip, boolean get, String[] fetchGroups, int maxFetchDepth)
+	{
+		PersistenceManager pm = createPersistenceManager();
+		try {			
+			return doStoreIssueType(pm, issueType, processDefinitionAsZip, get, fetchGroups, maxFetchDepth);
+		}//try
+		finally {
+			pm.close();
+		}//finally
+	}
+	
+	private IssueType doStoreIssueType(PersistenceManager pm, IssueType issueType, byte[] processDefinitionAsZip, boolean get, String[] fetchGroups, int maxFetchDepth)
+	{
+		URL processDefinitionURL = null;
+		IssueType result = NLJDOHelper.storeJDO(pm, issueType, get, fetchGroups, maxFetchDepth);
+		IssueType attached = (IssueType) pm.getObjectById(JDOHelper.getObjectId(issueType));
+		// if a process definition is given unzip it, assign the URL and persist
+		if (processDefinitionAsZip != null) {
+			File zipFile = null;
+			File unzippedFileDir = null;
+			try {
+				zipFile = File.createTempFile("issuelink-processdefinition-zip", String.valueOf(System.currentTimeMillis()));
+				unzippedFileDir = File.createTempFile("issuelink-processdefinition-unzip", String.valueOf(System.currentTimeMillis()));			
+				InputStream in = new ByteArrayInputStream(processDefinitionAsZip);
+				OutputStream out = new FileOutputStream(zipFile);
+				try {
+					IOUtil.transferStreamData(in, out);	
+				} finally {
+					in.close();
+					out.close();
+				}
+				IOUtil.unzipArchive(zipFile, unzippedFileDir);
+				processDefinitionURL = unzippedFileDir.toURI().toURL();
+				attached.readProcessDefinition(processDefinitionURL);
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			} finally {
+				if (zipFile != null)
+					zipFile.delete();
+				if (unzippedFileDir != null)
+					unzippedFileDir.delete();
+			}
+		}
+		else {
+			if (attached.getProcessDefinition() == null) {
+				try {
+					// if no process definition is provided use the default
+					processDefinitionURL = IssueType.class.getResource("jbpm/status/");
+					attached.readProcessDefinition(processDefinitionURL);
+				} catch (IOException e) {
+					throw new RuntimeException(e);
+				}
+			}
+		}
+		return result;
+	}
+	
 	@RolesAllowed("_Guest_")
 	@Override
 	public List<IssueType> getIssueTypes(Collection<IssueTypeID> issueTypeIDs, String[] fetchGroups, int maxFetchDepth)

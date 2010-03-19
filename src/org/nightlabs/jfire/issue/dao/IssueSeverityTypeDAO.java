@@ -45,10 +45,13 @@ public class IssueSeverityTypeDAO
 			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 			throws Exception
 	{
-		monitor.beginTask("Fetching "+objectIDs.size()+" severity types information", 1);
+		monitor.beginTask("Fetching severity types information", 1);
 		Collection<IssueSeverityType> issueSeverityTypes;
-		try {
+		try {			
 			IssueManagerRemote im = JFireEjb3Factory.getRemoteBean(IssueManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			if (objectIDs == null) {
+				objectIDs = im.getIssueSeverityTypeIDs();	
+			}
 			issueSeverityTypes = im.getIssueSeverityTypes(objectIDs, fetchGroups, maxFetchDepth);
 			monitor.worked(1);
 		} catch (Exception e) {

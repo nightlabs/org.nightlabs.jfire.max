@@ -48,7 +48,9 @@ import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.PersistenceModifier;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.Queries;
+import javax.jdo.listener.AttachCallback;
 
+import org.apache.log4j.Logger;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.transfer.Anchor;
@@ -108,13 +110,18 @@ import org.nightlabs.util.NLLocale;
 		name=Account.FETCH_GROUP_THIS_ACCOUNT,
 		members={@Persistent(name="owner"), @Persistent(name="currency"), @Persistent(name="accountType"), @Persistent(name="name"), @Persistent(name="summaryAccounts")})
 })
-@Queries(
+@Queries({
 	@javax.jdo.annotations.Query(
 		name="getAccountsForAccountTypeAndOwnerAndCurrency",
-		value="SELECT WHERE this.accountType == :accountType && this.owner == :owner && this.currency == :currency")
-)
+		value="SELECT WHERE this.accountType == :accountType && this.owner == :owner && this.currency == :currency"),
+	@javax.jdo.annotations.Query(
+			name="getAllSummedAccountsForSummaryAccount",
+			value="SELECT WHERE this.summaryAccounts.contains(:summaryAccount)")	
+})
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
-public class Account extends Anchor
+public class Account 
+extends Anchor
+implements AttachCallback
 {
 	private static final long serialVersionUID = 1L;
 
@@ -140,6 +147,14 @@ public class Account extends Anchor
 		return (Collection<? extends Account>) q.executeWithMap(params);
 	}
 
+	private static final Logger logger = Logger.getLogger(Account.class);
+	
+	public static Collection<Account> getAllSummedAccountsForSummaryAccount(PersistenceManager pm, Account account)
+	{
+		Query q = pm.newNamedQuery(Account.class, "getAllSummedAccountsForSummaryAccount");
+		return (Collection<Account>) q.execute(account);
+	}
+	
 ////	/**
 ////	 * anchorTypeID for normal accounts of the Local organisation
 ////	 *
@@ -513,6 +528,46 @@ public class Account extends Anchor
 		return getName().getText(NLLocale.getDefault().getLanguage());
 	}
 
+	@Override
+	public void jdoPostAttach(Object object) 
+	{
+//		Account detached = (Account) object;
+		Account attached = this;
+		
+		PersistenceManager pm = getPersistenceManager();
+		// retrieve all summary accounts where this account is registered as summed account
+		Collection<SummaryAccount> summaryAccounts = SummaryAccount.getAllSummaryAccountsForAccount(pm, attached);
+
+		// we check if the data is consistent 
+		if (!attached.summaryAccounts.equals(summaryAccounts)) {
+			// if a summary account contains this account as summed account although it is NOT registered here anymore remove it from the summary account
+			for (SummaryAccount summaryAccount : summaryAccounts) {
+				if (summaryAccount.summedAccounts.contains(attached) && !attached.summaryAccounts.contains(summaryAccount)) {
+					summaryAccount._removeSummedAccount(attached);
+					if (logger.isDebugEnabled()) {
+						logger.debug("jdoPostAttach: Removed summed account "+attached+" from summary account "+summaryAccount+" to maintain consistency");
+					}
+				}
+			}
+			// check if all summary account data is correct (consistent)
+			for (SummaryAccount summaryAccount : attached.summaryAccounts) {
+				if (!summaryAccounts.contains(summaryAccount)) {
+					// if we find a summary account where this account is NOT registered as summed account in a summary account add it 
+					summaryAccount._addSummedAccount(attached);
+					if (logger.isDebugEnabled()) {
+						logger.debug("jdoPostAttach: Added summed account "+attached+" to summary account "+summaryAccount+" to maintain consistency");
+					}					
+				}
+			}			
+		}
+	}
+
+	@Override
+	public void jdoPreAttach() {
+		// do nothing
+	}
+
+	
 //	/**
 //	 * If this Account is the split out account from which money is taken and transferred to a cost center account,
 //	 * this field will reference the original revenue account (where the money is coming in).

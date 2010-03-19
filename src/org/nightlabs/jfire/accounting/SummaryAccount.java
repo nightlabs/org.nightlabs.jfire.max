@@ -28,14 +28,19 @@ package org.nightlabs.jfire.accounting;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.transfer.Anchor;
 import org.nightlabs.jfire.transfer.Transfer;
 
+import javax.jdo.PersistenceManager;
+import javax.jdo.Query;
 import javax.jdo.annotations.Join;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.FetchGroups;
@@ -46,6 +51,7 @@ import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.FetchGroup;
 import javax.jdo.annotations.IdentityType;
 import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Queries;
 
 /**
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
@@ -75,6 +81,11 @@ import javax.jdo.annotations.PersistenceModifier;
 		members=@Persistent(name="summedAccounts"))
 })
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
+@Queries(
+	@javax.jdo.annotations.Query(
+		name="getAllSummaryAccountsForAccount",
+		value="SELECT WHERE this.summedAccounts.contains(:account)")
+)
 public class SummaryAccount extends Account
 {
 	private static final long serialVersionUID = 1L;
@@ -90,6 +101,14 @@ public class SummaryAccount extends Account
 	 */
 	public static final String FETCH_GROUP_THIS_SUMMARY_ACCOUNT = "SummaryAccount.this";
 
+	public static Collection<SummaryAccount> getAllSummaryAccountsForAccount(PersistenceManager pm, Account account)
+	{
+		Query q = pm.newNamedQuery(SummaryAccount.class, "getAllSummaryAccountsForAccount");
+		return (Collection<SummaryAccount>) q.execute(account);
+	}
+	
+	private static final Logger logger = Logger.getLogger(SummaryAccount.class);
+	
 	/**
 	 * @deprecated Only for JDO!
 	 */
@@ -190,4 +209,35 @@ public class SummaryAccount extends Account
 			throw new IllegalStateException("moneyTransfer is not an instance of SummaryMoneyTransfer!"); // can this happen?
 	}
 
+	@Override
+	public void jdoPostAttach(Object object) {
+		super.jdoPostAttach(object);
+		SummaryAccount attached = this;
+		PersistenceManager pm = getPersistenceManager();
+		// retrieve all summed accounts where this account is registered as summary account
+		Collection<Account> summedAccounts = Account.getAllSummedAccountsForSummaryAccount(pm, attached);
+		
+		// we check if the data is consistent 
+		if (!attached.summedAccounts.equals(summedAccounts)) {
+			// if a summed account contains this account as summary account although it is NOT registered here anymore remove it from the summed account
+			for (Account summedAccount : summedAccounts) {
+				if (summedAccount.summaryAccounts.contains(attached) && !attached.summedAccounts.contains(summedAccount)) {
+					summedAccount._removeSummaryAccount(attached);
+					if (logger.isDebugEnabled()) {
+						logger.debug("jdoPostAttach: Removed summary account "+attached+" from summed account "+summedAccount+" to maintain consistency");
+					}
+				}
+			}
+			// check if all summed account data is correct (consistent)
+			for (Account summedAccount : attached.summedAccounts) {
+				if (!summedAccounts.contains(summedAccount)) {
+					// if we find a summary account where this account is NOT registered as summed account in a summary account add it 
+					summedAccount._addSummaryAccount(attached);
+					if (logger.isDebugEnabled()) {
+						logger.debug("jdoPostAttach: Added summary account "+attached+" to summed account "+summedAccount+" to maintain consistency");
+					}					
+				}
+			}			
+		}
+	}
 }

@@ -59,6 +59,23 @@ public interface PersonRelationManagerRemote {
 			Set<PropertySetID> fromPropertySetIDsToExclude,
 			Set<PropertySetID> toPropertySetIDsToExclude
 	);
+
+	Collection<PersonRelationID> getInclusiveFilteredPersonRelationIDs(
+			PersonRelationTypeID personRelationTypeID,
+			PropertySetID fromPersonID,
+			PropertySetID toPersonID,
+			Set<PropertySetID> fromPropertySetIDsToInclude,
+			Set<PropertySetID> toPropertySetIDsToInclude,
+			PersonRelationComparator personRelationComparator // Leave this null to suggest no sorting
+	);
+
+	long getInclusiveFilteredPersonRelationCount(
+			PersonRelationTypeID personRelationTypeID,
+			PropertySetID fromPersonID,
+			PropertySetID toPersonID,
+			Set<PropertySetID> fromPropertySetIDsToExclude,
+			Set<PropertySetID> toPropertySetIDsToExclude
+	);
 	// -------------- ++++++++++ ----------------------------------------------------------------------------------------------------------- ++ ----|
 
 	Collection<PersonRelation> getPersonRelations(

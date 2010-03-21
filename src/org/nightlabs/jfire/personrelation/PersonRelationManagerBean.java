@@ -289,6 +289,81 @@ implements PersonRelationManagerRemote
 			pm.close();
 		}
 	}
+
+
+
+	// ------->> This direct filter is an 'inclusive' filter -- the direct opposite of the above codes where we filtered off unwanted IDs.
+	@SuppressWarnings("unchecked")
+	@RolesAllowed("_Guest_") // TODO access rights
+	@Override
+	public Collection<PersonRelationID> getInclusiveFilteredPersonRelationIDs(
+			PersonRelationTypeID personRelationTypeID,
+			PropertySetID fromPersonID,
+			PropertySetID toPersonID,
+			Set<PropertySetID> fromPropertySetIDsToInclude,
+			Set<PropertySetID> toPropertySetIDsToInclude,
+			PersonRelationComparator personRelationComparator // Leave this null to suggest no sorting
+	)
+	{
+		PersistenceManager pm = createPersistenceManager();
+		try {
+			PersonRelationType personRelationType = (PersonRelationType) (personRelationTypeID == null ? null : pm.getObjectById(personRelationTypeID));
+			Person fromPerson = (Person) (fromPersonID == null ? null : pm.getObjectById(fromPersonID));
+			Person toPerson = (Person) (toPersonID == null ? null : pm.getObjectById(toPersonID));
+
+			Collection<? extends PersonRelation> relations = PersonRelation.getPersonRelations(pm, personRelationType, fromPerson, toPerson);
+			Collection<PersonRelation> filteredInclusiveRelations = new LinkedList<PersonRelation>();
+
+			// Perform the filtration.
+			boolean isPerformFilterFrom = fromPropertySetIDsToInclude != null && !fromPropertySetIDsToInclude.isEmpty();
+			boolean isPerformFilterTo = toPropertySetIDsToInclude != null && !toPropertySetIDsToInclude.isEmpty();
+			for (PersonRelation personRelation : relations) {
+				if (isPerformFilterFrom && fromPropertySetIDsToInclude.contains(personRelation.getFromID()) || isPerformFilterTo && toPropertySetIDsToInclude.contains(personRelation.getToID())) // This ensures we dont get repeated elements in the LinkedList.
+					filteredInclusiveRelations.add(personRelation);
+			}
+
+			relations.clear();
+			relations = filteredInclusiveRelations;
+
+			// Sort if necessary.
+			return (Collection<PersonRelationID>) (personRelationComparator != null ? getSortedPersonRelationIDsByPersonRelationType(relations, personRelationComparator) : NLJDOHelper.getObjectIDList(relations));
+		} finally {
+			pm.close();
+		}
+	}
+
+
+	@Override
+	public long getInclusiveFilteredPersonRelationCount(
+			PersonRelationTypeID personRelationTypeID,
+			PropertySetID fromPersonID,
+			PropertySetID toPersonID,
+			Set<PropertySetID> fromPropertySetIDsToInclude,
+			Set<PropertySetID> toPropertySetIDsToInclude
+	)
+	{
+		PersistenceManager pm = createPersistenceManager();
+		try {
+			PersonRelationType personRelationType = (PersonRelationType) (personRelationTypeID == null ? null : pm.getObjectById(personRelationTypeID));
+			Person fromPerson = (Person) (fromPersonID == null ? null : pm.getObjectById(fromPersonID));
+			Person toPerson = (Person) (toPersonID == null ? null : pm.getObjectById(toPersonID));
+
+			Collection<? extends PersonRelation> relations = PersonRelation.getPersonRelations(pm, personRelationType, fromPerson, toPerson);
+			long count = 0;
+
+			// Perform the filtration.
+			boolean isPerformFilterFrom = fromPropertySetIDsToInclude != null && !fromPropertySetIDsToInclude.isEmpty();
+			boolean isPerformFilterTo = toPropertySetIDsToInclude != null && !toPropertySetIDsToInclude.isEmpty();
+			for (PersonRelation personRelation : relations) {
+				if (isPerformFilterFrom && fromPropertySetIDsToInclude.contains(personRelation.getFromID()) || isPerformFilterTo && toPropertySetIDsToInclude.contains(personRelation.getToID())) // This ensures we dont get repeated elements in the LinkedList.
+					count++;
+			}
+
+			return count;
+		} finally {
+			pm.close();
+		}
+	}
 	// -------------- ++++++++++ ----------------------------------------------------------------------------------------------------------- ++ ----|
 
 

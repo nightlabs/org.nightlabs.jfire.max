@@ -118,7 +118,6 @@ extends BaseJDOObjectDAO<PersonRelationID, PersonRelation>
 			Set<PropertySetID> fromPropertySetIDsToExclude,
 			Set<PropertySetID> toPropertySetIDsToExclude,
 			PersonRelationComparator personRelationComparator, // Leave this null to suggest no sorting
-//			boolean isSortByPersonRelationType,
 			ProgressMonitor monitor
 	) {
 		monitor.beginTask("Loading person relation IDs", 100);
@@ -148,6 +147,49 @@ extends BaseJDOObjectDAO<PersonRelationID, PersonRelation>
 			PersonRelationManagerRemote ejb = JFireEjb3Factory.getRemoteBean(PersonRelationManagerRemote.class, SecurityReflector.getInitialContextProperties());
 			monitor.worked(10);
 			return ejb.getFilteredPersonRelationCount(personRelationTypeID, fromPersonID, toPersonID, fromPropertySetIDsToExclude, toPropertySetIDsToExclude);
+		} finally {
+			monitor.worked(90);
+			monitor.done();
+		}
+	}
+
+	// -------------- ++++++++++ ----------------------------------------------------------------------------------------------------------- ++ ----|
+	public synchronized Collection<PersonRelationID> getInclusiveFilteredPersonRelationIDs(
+			PersonRelationTypeID personRelationTypeID,
+			PropertySetID fromPersonID,
+			PropertySetID toPersonID,
+			Set<PropertySetID> fromPropertySetIDsToInclude,
+			Set<PropertySetID> toPropertySetIDsToInclude,
+			PersonRelationComparator personRelationComparator, // Leave this null to suggest no sorting
+			ProgressMonitor monitor
+	) {
+		monitor.beginTask("Loading person relation IDs", 100);
+		try {
+			PersonRelationManagerRemote ejb = JFireEjb3Factory.getRemoteBean(PersonRelationManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			monitor.worked(10);
+			Collection<PersonRelationID> personRelationIDs = ejb.getInclusiveFilteredPersonRelationIDs(
+					personRelationTypeID, fromPersonID, toPersonID, fromPropertySetIDsToInclude, toPropertySetIDsToInclude, personRelationComparator
+			);
+			monitor.worked(90);
+			return personRelationIDs;
+		} finally {
+			monitor.done();
+		}
+	}
+
+	public synchronized long getInclusiveFilteredPersonRelationCount(
+			PersonRelationTypeID personRelationTypeID,
+			PropertySetID fromPersonID,
+			PropertySetID toPersonID,
+			Set<PropertySetID> fromPropertySetIDsToInclude,
+			Set<PropertySetID> toPropertySetIDsToInclude,
+			ProgressMonitor monitor
+	) {
+		monitor.beginTask("Loading person relation count", 100);
+		try {
+			PersonRelationManagerRemote ejb = JFireEjb3Factory.getRemoteBean(PersonRelationManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			monitor.worked(10);
+			return ejb.getInclusiveFilteredPersonRelationCount(personRelationTypeID, fromPersonID, toPersonID, fromPropertySetIDsToInclude, toPropertySetIDsToInclude);
 		} finally {
 			monitor.worked(90);
 			monitor.done();

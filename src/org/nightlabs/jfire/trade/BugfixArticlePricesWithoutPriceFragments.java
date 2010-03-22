@@ -1,5 +1,6 @@
 package org.nightlabs.jfire.trade;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -24,6 +25,12 @@ import org.nightlabs.jfire.accounting.PriceFragmentType;
 import org.nightlabs.jfire.accounting.id.PriceFragmentTypeID;
 import org.nightlabs.jfire.accounting.id.PriceID;
 import org.nightlabs.jfire.accounting.priceconfig.IPackagePriceConfig;
+import org.nightlabs.jfire.asyncinvoke.AsyncInvoke;
+import org.nightlabs.jfire.asyncinvoke.AsyncInvokeEnqueueException;
+import org.nightlabs.jfire.asyncinvoke.AsyncInvokeEnvelope;
+import org.nightlabs.jfire.asyncinvoke.Invocation;
+import org.nightlabs.jfire.asyncinvoke.UndeliverableCallback;
+import org.nightlabs.jfire.asyncinvoke.UndeliverableCallbackResult;
 import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.util.Util;
@@ -31,6 +38,8 @@ import org.nightlabs.util.Util;
 class BugfixArticlePricesWithoutPriceFragments
 {
 	private static final Logger logger = Logger.getLogger(BugfixArticlePricesWithoutPriceFragments.class);
+	private static final String UPDATE_HISTORY_ITEM_ID_FIX_IN_PROGRESS = ArticlePrice.class.getName() + "#fixMissingPriceFragments_inProgress";
+	private static final String UPDATE_HISTORY_ITEM_ID_FIX_DONE = ArticlePrice.class.getName() + "#fixMissingPriceFragments";
 
 	public static ArticlePrice tryRecreatingArticlePrice(PersistenceManager pm, PriceID packageArticlePriceID)
 	{
@@ -81,85 +90,58 @@ class BugfixArticlePricesWithoutPriceFragments
 		}
 	}
 
-	public static void fix(PersistenceManager pm)
+
+	private static class FixInvocationStep2 extends Invocation
 	{
-		UpdateNeededHandle handle = UpdateHistoryItem.updateNeeded(pm, JFireTradeEAR.MODULE_NAME, ArticlePrice.class.getName() + "#fixMissingPriceFragments");
-		if (handle != null) {
-			long articlePriceCountFixed = 0;
-			long articlePriceCountNotFixable = 0;
-			List<ArticlePrice> wrongArticlePrices = new LinkedList<ArticlePrice>();
+		private static final long serialVersionUID = 1L;
+		private static final Logger logger = Logger.getLogger(FixInvocationStep2.class);
 
-			Query q = pm.newQuery(ArticlePrice.class);
-			@SuppressWarnings("unchecked")
-			Collection<ArticlePrice> articlePrices = (Collection<ArticlePrice>) q.execute();
-			for (ArticlePrice articlePrice : articlePrices) {
-				if (articlePrice.getFragments(false).isEmpty())
-					wrongArticlePrices.add(articlePrice);
-			}
-			articlePrices = null; // allow gc
-			q.closeAll();
+		private Set<PriceID> articlePriceIDsToFixByCopyingFromPackage;
+		private Set<PriceID> packageArticlePriceIDsToRecreate;
+		private long articlePriceCountFixed;
+		private long articlePriceCountNotFixable;
 
-			Set<ArticlePrice> articlePricesToFixByCopyingFromPackage = new HashSet<ArticlePrice>();
-			Set<ArticlePrice> packageArticlePricesToRecreate = new HashSet<ArticlePrice>();
+		public FixInvocationStep2(
+				Set<PriceID> articlePriceIDsToFixByCopyingFromPackage,
+				Set<PriceID> packageArticlePriceIDsToRecreate,
+				long articlePriceCountFixed,
+				long articlePriceCountNotFixable
+		)
+		{
+			if (articlePriceIDsToFixByCopyingFromPackage == null)
+				throw new IllegalArgumentException("articlePriceIDsToFixByCopyingFromPackage must not be null!");
 
-			if (!wrongArticlePrices.isEmpty()) {
-				logger.warn("initialise: Fixing persistent data: " + wrongArticlePrices.size() + " ArticlePrices were persisted without PriceFragments!");
+			if (packageArticlePriceIDsToRecreate == null)
+				throw new IllegalArgumentException("packageArticlePriceIDsToRecreate must not be null!");
 
-				for (Iterator<ArticlePrice> itwap = wrongArticlePrices.iterator(); itwap.hasNext(); ) {
-					ArticlePrice articlePrice = itwap.next();
-					itwap.remove(); // releasing memory
+			this.articlePriceIDsToFixByCopyingFromPackage = articlePriceIDsToFixByCopyingFromPackage;
+			this.packageArticlePriceIDsToRecreate = packageArticlePriceIDsToRecreate;
+			this.articlePriceCountFixed = articlePriceCountFixed;
+			this.articlePriceCountNotFixable = articlePriceCountNotFixable;
+		}
 
-					ArticlePrice packageArticlePrice = articlePrice.getPackageArticlePrice();
-					boolean tryToCreateFromPriceConfig = false;
+		@Override
+		public Serializable invoke() throws Exception {
+			logger.warn("invoke: Entered with " + packageArticlePriceIDsToRecreate.size() + " + " + articlePriceIDsToFixByCopyingFromPackage.size() + " ArticlePrices to process.");
 
-					// First, we directly copy the packageArticlePrice data, if we can.
-					if (packageArticlePrice == null) {
-						tryToCreateFromPriceConfig = true;
-						logger.warn("initialise: Fixing persistent data: Cannot copy from packageArticlePrice, because the affected ArticlePrice is not nested: " + articlePrice);
-					}
-					else if (!articlePrice.isVirtualInner()) {
-						tryToCreateFromPriceConfig = true;
-						logger.warn("initialise: Fixing persistent data: Cannot copy from packageArticlePrice, because the affected nested ArticlePrice is not virtual-inner: " + articlePrice);
-					}
-					else {
-						if (packageArticlePrice.getNestedArticlePrices().size() != 1) {
-							tryToCreateFromPriceConfig = true;
-							logger.warn("initialise: Fixing persistent data: Cannot copy from packageArticlePrice, because the affected nested ArticlePrice a sibling among others: " + articlePrice);
-						}
-						else {
-							Iterator<ArticlePrice> it1 = packageArticlePrice.getNestedArticlePrices().iterator();
-							if (articlePrice != it1.next())
-								throw new IllegalStateException("articlePrice != it1.next()");
-
-							if (it1.hasNext())
-								throw new IllegalStateException("packageArticlePrice.getNestedArticlePrices().size() returned 1, but iterator returns more than one element!");
-
-							if (articlePrice.getAmount() != packageArticlePrice.getAmount()) {
-								tryToCreateFromPriceConfig = true;
-								logger.warn("initialise: Fixing persistent data: Cannot copy from packageArticlePrice, because the affected nested ArticlePrice has a different amount than its packageArticlePrice: " + articlePrice);
-							}
-							else
-								articlePricesToFixByCopyingFromPackage.add(articlePrice);
-						}
-					}
-
-					if (tryToCreateFromPriceConfig) {
-						if (packageArticlePrice == null) // in case it is not nested.
-							packageArticlePrice = articlePrice;
-
-						logger.info("initialise: Fixing persistent data: Registering to recreate packageArticlePrice from price config in order to fix this wrong ArticlePrice: " + articlePrice + " package=" + packageArticlePrice);
-						packageArticlePricesToRecreate.add(packageArticlePrice);
-					}
-				}
-
+			PersistenceManager pm = getPersistenceManager();
+			try {
+				int pricesProcessedCount = 0;
+				long startTimestamp = System.currentTimeMillis();
 				TradeManagerLocal tml = JFireEjb3Factory.getLocalBean(TradeManagerLocal.class);
 
 				Map<ArticlePrice, ArticlePrice> packageArticlePricesToRecreate2recreated = new HashMap<ArticlePrice, ArticlePrice>();
 
-				for (ArticlePrice packageArticlePrice : packageArticlePricesToRecreate) {
-					PriceID packageArticlePriceID = (PriceID) JDOHelper.getObjectId(packageArticlePrice);
+				for (Iterator<PriceID> it = packageArticlePriceIDsToRecreate.iterator(); it.hasNext(); ) {
+					PriceID packageArticlePriceID = it.next(); it.remove();
+					ArticlePrice packageArticlePrice = (ArticlePrice) pm.getObjectById(packageArticlePriceID);
+					++pricesProcessedCount;
+
 					ArticlePrice newDetachedPackageArticlePrice = tml.bugfix_tryRecreatingArticlePrice(packageArticlePriceID);
 					packageArticlePricesToRecreate2recreated.put(packageArticlePrice, newDetachedPackageArticlePrice);
+
+					if (System.currentTimeMillis() - startTimestamp > 30000L || packageArticlePricesToRecreate2recreated.size() >= 1000)
+						break;
 				}
 
 				for (Map.Entry<ArticlePrice, ArticlePrice> me : packageArticlePricesToRecreate2recreated.entrySet()) {
@@ -168,12 +150,12 @@ class BugfixArticlePricesWithoutPriceFragments
 
 					boolean apply = true;
 					if (newDetachedPackageArticlePrice.getAmount() != packageArticlePrice.getAmount()) {
-						logger.error("initialise: Fixing persistent data: Cannot fix packageArticlePrice, because price-config has changed (the top-level-amount does not match): " + packageArticlePrice);
+						logger.error("invoke: Fixing persistent data: Cannot fix packageArticlePrice, because price-config has changed (the top-level-amount does not match): " + packageArticlePrice);
 						apply = false;
 					}
 
 					if (!matchArticlePrices(pm, newDetachedPackageArticlePrice, packageArticlePrice, false)) {
-						logger.error("initialise: Fixing persistent data: Cannot fix packageArticlePrice, because price-config has changed (the nested prices or the existing price fragments don't match): " + packageArticlePrice);
+						logger.error("invoke: Fixing persistent data: Cannot fix packageArticlePrice, because price-config has changed (the nested prices or the existing price fragments don't match): " + packageArticlePrice);
 						apply = false;
 					}
 
@@ -181,13 +163,21 @@ class BugfixArticlePricesWithoutPriceFragments
 						++articlePriceCountNotFixable;
 					else {
 						matchArticlePrices(pm, newDetachedPackageArticlePrice, packageArticlePrice, true);
-						logger.warn("initialise: Fixing persistent data: Fixed packageArticlePrice successfully by trying to recreate from price config: " + packageArticlePrice);
+						logger.warn("invoke: Fixing persistent data: Fixed packageArticlePrice successfully by trying to recreate from price config: " + packageArticlePrice);
 						++articlePriceCountFixed;
 					}
 				}
 
-				for (ArticlePrice articlePrice : articlePricesToFixByCopyingFromPackage) {
-					logger.warn("initialise: Fixing persistent data: Copying from packageArticlePrice, because this ArticlePrice is the only nested one and it is virtual-inner: " + articlePrice);
+
+				for (Iterator<PriceID> it = articlePriceIDsToFixByCopyingFromPackage.iterator(); it.hasNext(); ) {
+					if (pricesProcessedCount > 0 && System.currentTimeMillis() - startTimestamp > 30000L)
+						break;
+
+					PriceID articlePriceID = it.next(); it.remove();
+					ArticlePrice articlePrice = (ArticlePrice) pm.getObjectById(articlePriceID);
+					++pricesProcessedCount;
+
+					logger.warn("invoke: Fixing persistent data: Copying from packageArticlePrice, because this ArticlePrice is the only nested one and it is virtual-inner: " + articlePrice);
 					ArticlePrice packageArticlePrice = articlePrice.getPackageArticlePrice();
 					for (PriceFragment origpf : packageArticlePrice.getFragments(false)) {
 						PriceFragment pf = articlePrice.createPriceFragment(origpf.getPriceFragmentType());
@@ -196,16 +186,238 @@ class BugfixArticlePricesWithoutPriceFragments
 					++articlePriceCountFixed;
 				}
 
-				logger.warn("initialise: Fixed persistent data: Successfully fixed " + articlePriceCountFixed + " ArticlePrices.");
+				logger.warn("invoke: Fixed persistent data: Successfully fixed " + articlePriceCountFixed + " ArticlePrices.");
 
 				if (articlePriceCountNotFixable == 0)
-					logger.warn("initialise: Fixed persistent data: Was unable to fix " + articlePriceCountNotFixable + " ArticlePrices!");
+					logger.warn("invoke: Fixed persistent data: Was unable to fix " + articlePriceCountNotFixable + " ArticlePrices!");
 				else
-					logger.error("initialise: Fixed persistent data: Was unable to fix " + articlePriceCountNotFixable + " ArticlePrices!");
-			}
+					logger.error("invoke: Fixed persistent data: Was unable to fix " + articlePriceCountNotFixable + " ArticlePrices!");
 
-			if (articlePriceCountNotFixable == 0) // We do not mark the update as done, if we were not able to completely fix the problem.
-				UpdateHistoryItem.updateDone(handle);
+				logger.warn("invoke: Still " + packageArticlePriceIDsToRecreate.size() + " + " + articlePriceIDsToFixByCopyingFromPackage.size() + " ArticlePrices to process.");
+
+				if (packageArticlePriceIDsToRecreate.isEmpty() && articlePriceIDsToFixByCopyingFromPackage.isEmpty()) {
+					List<UpdateHistoryItem> uhis = UpdateHistoryItem.getUpdateHistoryItems(pm, JFireTradeEAR.MODULE_NAME, UPDATE_HISTORY_ITEM_ID_FIX_IN_PROGRESS);
+					for (UpdateHistoryItem updateHistoryItem : uhis)
+						pm.deletePersistent(updateHistoryItem);
+
+					if (articlePriceCountNotFixable == 0) { // We do not mark the update as done, if we were not able to completely fix the problem.
+						UpdateNeededHandle handle = UpdateHistoryItem.updateNeeded(pm, JFireTradeEAR.MODULE_NAME, UPDATE_HISTORY_ITEM_ID_FIX_DONE);
+						if (handle != null)
+							UpdateHistoryItem.updateDone(handle);
+					}
+				}
+				else {
+					AsyncInvoke.exec(
+							new FixInvocationStep2(
+									articlePriceIDsToFixByCopyingFromPackage,
+									packageArticlePriceIDsToRecreate,
+									articlePriceCountFixed,
+									articlePriceCountNotFixable
+							),
+							new FixUndeliverableCallback(),
+							true
+					);
+				}
+
+				return null;
+			} finally {
+				pm.close();
+			}
+		}
+	}
+
+	private static class FixInvocationStep1 extends Invocation
+	{
+		private static final long serialVersionUID = 1L;
+		private static final Logger logger = Logger.getLogger(FixInvocationStep1.class);
+
+		private Collection<PriceID> wrongArticlePriceIDs;
+
+		public FixInvocationStep1(Collection<PriceID> wrongArticlePriceIDs) {
+			if (wrongArticlePriceIDs == null)
+				throw new IllegalArgumentException("wrongArticlePriceIDs must not be null!");
+
+			this.wrongArticlePriceIDs = wrongArticlePriceIDs;
+		}
+
+		@Override
+		public Serializable invoke() throws Exception {
+			logger.warn("invoke: Fixing persistent data: " + wrongArticlePriceIDs.size() + " ArticlePrices were persisted without PriceFragments!");
+
+			PersistenceManager pm = getPersistenceManager();
+			try {
+				Set<PriceID> articlePriceIDsToFixByCopyingFromPackage = new HashSet<PriceID>();
+				Set<PriceID> packageArticlePriceIDsToRecreate = new HashSet<PriceID>();
+
+				if (!wrongArticlePriceIDs.isEmpty()) {
+
+					for (Iterator<PriceID> itwap = wrongArticlePriceIDs.iterator(); itwap.hasNext(); ) {
+						PriceID articlePriceID = itwap.next();
+						itwap.remove();
+						ArticlePrice articlePrice = (ArticlePrice) pm.getObjectById(articlePriceID);
+
+						ArticlePrice packageArticlePrice = articlePrice.getPackageArticlePrice();
+						PriceID packageArticlePriceID = (PriceID) JDOHelper.getObjectId(packageArticlePrice);
+
+						boolean tryToCreateFromPriceConfig = false;
+
+						// First, we directly copy the packageArticlePrice data, if we can.
+						if (packageArticlePrice == null) {
+							tryToCreateFromPriceConfig = true;
+							logger.warn("invoke: Fixing persistent data: Cannot copy from packageArticlePrice, because the affected ArticlePrice is not nested: " + articlePrice);
+						}
+						else if (!articlePrice.isVirtualInner()) {
+							tryToCreateFromPriceConfig = true;
+							logger.warn("invoke: Fixing persistent data: Cannot copy from packageArticlePrice, because the affected nested ArticlePrice is not virtual-inner: " + articlePrice);
+						}
+						else {
+							if (packageArticlePrice.getNestedArticlePrices().size() != 1) {
+								tryToCreateFromPriceConfig = true;
+								logger.warn("invoke: Fixing persistent data: Cannot copy from packageArticlePrice, because the affected nested ArticlePrice a sibling among others: " + articlePrice);
+							}
+							else {
+								Iterator<ArticlePrice> it1 = packageArticlePrice.getNestedArticlePrices().iterator();
+								if (articlePrice != it1.next())
+									throw new IllegalStateException("articlePrice != it1.next()");
+
+								if (it1.hasNext())
+									throw new IllegalStateException("packageArticlePrice.getNestedArticlePrices().size() returned 1, but iterator returns more than one element!");
+
+								if (articlePrice.getAmount() != packageArticlePrice.getAmount()) {
+									tryToCreateFromPriceConfig = true;
+									logger.warn("invoke: Fixing persistent data: Cannot copy from packageArticlePrice, because the affected nested ArticlePrice has a different amount than its packageArticlePrice: " + articlePrice);
+								}
+								else
+									articlePriceIDsToFixByCopyingFromPackage.add(articlePriceID);
+							}
+						}
+
+						if (tryToCreateFromPriceConfig) {
+							if (packageArticlePrice == null) // in case it is not nested.
+								packageArticlePrice = articlePrice;
+
+							logger.info("invoke: Fixing persistent data: Registering to recreate packageArticlePrice from price config in order to fix this wrong ArticlePrice: " + articlePrice + " package=" + packageArticlePrice);
+							packageArticlePriceIDsToRecreate.add(packageArticlePriceID);
+						}
+					}
+				}
+
+				AsyncInvoke.exec(
+						new FixInvocationStep2(
+								articlePriceIDsToFixByCopyingFromPackage, packageArticlePriceIDsToRecreate,
+								0, 0
+						),
+						new FixUndeliverableCallback(),
+						true
+				);
+
+				return null;
+			} finally {
+				pm.close();
+			}
+		}
+	}
+
+	private static class FixInvocationStep0 extends Invocation
+	{
+		private static final Logger logger = Logger.getLogger(FixInvocationStep0.class);
+		private static final long serialVersionUID = 2L;
+		private static final long rangeSize = 10000;
+		private long beginIndex;
+		private Collection<PriceID> wrongArticlePriceIDs;
+
+		public FixInvocationStep0(long beginIndex, Collection<PriceID> wrongArticlePriceIDs) {
+			if (wrongArticlePriceIDs == null)
+				throw new IllegalArgumentException("wrongArticlePriceIDs == null");
+
+			this.beginIndex = beginIndex;
+			this.wrongArticlePriceIDs = wrongArticlePriceIDs;
+		}
+
+		@Override
+		public Serializable invoke() throws Exception
+		{
+			PersistenceManager pm = getPersistenceManager();
+			try {
+				logger.warn("invoke: entered with beginIndex=" + beginIndex + " wrongArticlePriceIDs.size=" + wrongArticlePriceIDs.size());
+				long startTimestamp = System.currentTimeMillis();
+
+				Query q = pm.newQuery(ArticlePrice.class);
+				q.setOrdering("this.organisationID ASCENDING, this.priceID ASCENDING");
+				long endIndex = beginIndex + rangeSize;
+				q.setRange(beginIndex, endIndex);
+				@SuppressWarnings("unchecked")
+				Collection<ArticlePrice> articlePrices = (Collection<ArticlePrice>) q.execute();
+				logger.warn("fix: Query returned in " + (System.currentTimeMillis() - startTimestamp) + " msec.");
+
+				for (ArticlePrice articlePrice : articlePrices) {
+					if (articlePrice.getFragments(false).isEmpty()) {
+						PriceID priceID = (PriceID) JDOHelper.getObjectId(articlePrice);
+						if (priceID == null)
+							throw new IllegalStateException("JDOHelper.getObjectId(articlePrice) returned null!");
+
+						wrongArticlePriceIDs.add(priceID);
+					}
+				}
+
+				if (articlePrices.isEmpty()) {
+					logger.warn("invoke: empty result for beginIndex=" + beginIndex + " and endIndex=" + endIndex + " => proceeding to next step with wrongArticlePriceIDs.size=" + wrongArticlePriceIDs.size());
+					AsyncInvoke.exec(
+							new FixInvocationStep1(wrongArticlePriceIDs),
+							new FixUndeliverableCallback(),
+							true
+					);
+				}
+				else {
+					logger.warn("invoke: reenqueing with new beginIndex=" + endIndex + " wrongArticlePriceIDs.size=" + wrongArticlePriceIDs.size());
+					AsyncInvoke.exec(
+							new FixInvocationStep0(endIndex, wrongArticlePriceIDs),
+							new FixUndeliverableCallback(),
+							true
+					);
+				}
+
+			} finally {
+				pm.close();
+			}
+			return null;
+		}
+	}
+
+	private static class FixUndeliverableCallback extends UndeliverableCallback
+	{
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		public UndeliverableCallbackResult handle(AsyncInvokeEnvelope envelope) throws Exception
+		{
+			PersistenceManager pm = getPersistenceManager();
+			try {
+				List<UpdateHistoryItem> uhis = UpdateHistoryItem.getUpdateHistoryItems(pm, JFireTradeEAR.MODULE_NAME, UPDATE_HISTORY_ITEM_ID_FIX_IN_PROGRESS);
+				for (UpdateHistoryItem updateHistoryItem : uhis)
+					pm.deletePersistent(updateHistoryItem);
+
+				return null;
+			} finally {
+				pm.close();
+			}
+		}
+	}
+
+	public static void fix(PersistenceManager pm) throws AsyncInvokeEnqueueException
+	{
+		UpdateNeededHandle handle = UpdateHistoryItem.updateNeeded(pm, JFireTradeEAR.MODULE_NAME, UPDATE_HISTORY_ITEM_ID_FIX_DONE);
+		if (handle != null) {
+			UpdateNeededHandle h_inProgress = UpdateHistoryItem.updateNeeded(pm, JFireTradeEAR.MODULE_NAME, UPDATE_HISTORY_ITEM_ID_FIX_IN_PROGRESS);
+			if (h_inProgress != null) {
+				UpdateHistoryItem.updateDone(h_inProgress);
+
+				AsyncInvoke.exec(
+						new FixInvocationStep0(0, new LinkedList<PriceID>()),
+						new FixUndeliverableCallback(),
+						true
+				);
+			}
 		}
 	}
 

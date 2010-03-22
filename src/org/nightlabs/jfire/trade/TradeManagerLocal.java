@@ -1,6 +1,5 @@
 package org.nightlabs.jfire.trade;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -42,8 +41,6 @@ import org.nightlabs.jfire.trade.id.OrderID;
 import org.nightlabs.jfire.trade.id.SegmentTypeID;
 import org.nightlabs.jfire.trade.query.AbstractArticleContainerQuery;
 import org.nightlabs.jfire.transfer.id.AnchorID;
-import org.nightlabs.timepattern.TimePatternFormatException;
-import org.nightlabs.version.MalformedVersionException;
 
 @Local
 public interface TradeManagerLocal {
@@ -513,11 +510,11 @@ public interface TradeManagerLocal {
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_System_"
+	 * @throws Exception TODO
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("_System_")
-	void initialise() throws IOException, MalformedVersionException,
-			TimePatternFormatException;
+	void initialise() throws Exception;
 
 	/**
 	 * @ejb.interface-method

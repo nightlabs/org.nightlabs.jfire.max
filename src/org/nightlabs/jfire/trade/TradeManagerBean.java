@@ -26,7 +26,6 @@
 
 package org.nightlabs.jfire.trade;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -128,9 +127,7 @@ import org.nightlabs.jfire.trade.recurring.RecurredOffer;
 import org.nightlabs.jfire.trade.recurring.RecurringOffer;
 import org.nightlabs.jfire.trade.recurring.RecurringOrder;
 import org.nightlabs.jfire.transfer.id.AnchorID;
-import org.nightlabs.timepattern.TimePatternFormatException;
 import org.nightlabs.util.CollectionUtil;
-import org.nightlabs.version.MalformedVersionException;
 
 
 /**
@@ -1162,7 +1159,7 @@ implements TradeManagerRemote, TradeManagerLocal
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("_System_")
 	public void initialise()
-	throws IOException, MalformedVersionException, TimePatternFormatException
+	throws Exception
 	{
 		PersistenceManager pm = createPersistenceManager();
 		try {

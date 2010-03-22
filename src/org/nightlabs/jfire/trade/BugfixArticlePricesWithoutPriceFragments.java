@@ -407,18 +407,28 @@ class BugfixArticlePricesWithoutPriceFragments
 	public static void fix(PersistenceManager pm) throws AsyncInvokeEnqueueException
 	{
 		UpdateNeededHandle handle = UpdateHistoryItem.updateNeeded(pm, JFireTradeEAR.MODULE_NAME, UPDATE_HISTORY_ITEM_ID_FIX_DONE);
-		if (handle != null) {
-			UpdateNeededHandle h_inProgress = UpdateHistoryItem.updateNeeded(pm, JFireTradeEAR.MODULE_NAME, UPDATE_HISTORY_ITEM_ID_FIX_IN_PROGRESS);
-			if (h_inProgress != null) {
-				UpdateHistoryItem.updateDone(h_inProgress);
+		if (handle == null) {
+			if (logger.isDebugEnabled())
+				logger.debug("fix: Update already done. Skipping.");
 
-				AsyncInvoke.exec(
-						new FixInvocationStep0(0, new LinkedList<PriceID>()),
-						new FixUndeliverableCallback(),
-						true
-				);
-			}
+			return;
 		}
+
+		UpdateNeededHandle h_inProgress = UpdateHistoryItem.updateNeeded(pm, JFireTradeEAR.MODULE_NAME, UPDATE_HISTORY_ITEM_ID_FIX_IN_PROGRESS);
+		if (h_inProgress == null) {
+			logger.info("fix: Update is already in progress. Skipping.");
+
+			return;
+		}
+		UpdateHistoryItem.updateDone(h_inProgress);
+
+		logger.warn("fix: Enqueueing AsyncInvoke for this update.");
+
+		AsyncInvoke.exec(
+				new FixInvocationStep0(0, new LinkedList<PriceID>()),
+				new FixUndeliverableCallback(),
+				true
+		);
 	}
 
 	private static boolean matchArticlePrices(PersistenceManager pm, ArticlePrice newArticlePrice, ArticlePrice oldArticlePrice, boolean fix)

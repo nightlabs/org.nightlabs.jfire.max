@@ -128,6 +128,8 @@ implements GeographyTemplateDataManagerRemote
 
 		PersistenceManager pm = createPersistenceManager();
 		try {
+			pm.getExtent(GeographyTemplateDataNotificationReceiver.class);
+			
 			NotificationReceiverID notificationReceiverID = NotificationReceiverID.create(
 					rootOrganisationID, SubscriptionUtil.SUBSCRIBER_TYPE_ORGANISATION, subscriberOrganisationID,
 					GeographyTemplateDataNotificationFilter.class.getName());

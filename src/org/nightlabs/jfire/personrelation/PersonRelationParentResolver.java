@@ -18,7 +18,7 @@ implements TreeNodeMultiParentResolver
 
 	@Override
 	public Collection<ObjectID> getParentObjectIDs(Object jdoObject) {
-		Collection<ObjectID> result = null;
+		Collection<ObjectID> result = new ArrayList<ObjectID>();
 
 		if (delegates != null) {
 			for (TreeNodeMultiParentResolver delegate : delegates) {

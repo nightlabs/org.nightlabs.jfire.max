@@ -1,5 +1,6 @@
 package org.nightlabs.jfire.personrelation;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.List;
@@ -40,7 +41,7 @@ public interface PersonRelationManagerRemote {
 			PersonRelationTypeID personRelationTypeID,
 			PropertySetID fromPersonID,
 			PropertySetID toPersonID,
-			PersonRelationComparator personRelationComparator // Leave this null to suggest no sorting
+			PersonRelationComparator personRelationComparator // Leave this null to indicate no sorting
 	);
 
 	Collection<PersonRelationID> getFilteredPersonRelationIDs(
@@ -49,7 +50,7 @@ public interface PersonRelationManagerRemote {
 			PropertySetID toPersonID,
 			Set<PropertySetID> fromPropertySetIDsToExclude,
 			Set<PropertySetID> toPropertySetIDsToExclude,
-			PersonRelationComparator personRelationComparator // Leave this null to suggest no sorting
+			PersonRelationComparator personRelationComparator // Leave this null to indicate no sorting
 	);
 
 	long getFilteredPersonRelationCount(
@@ -66,7 +67,7 @@ public interface PersonRelationManagerRemote {
 			PropertySetID toPersonID,
 			Set<PropertySetID> fromPropertySetIDsToInclude,
 			Set<PropertySetID> toPropertySetIDsToInclude,
-			PersonRelationComparator personRelationComparator // Leave this null to suggest no sorting
+			PersonRelationComparator personRelationComparator // Leave this null to indicate no sorting
 	);
 
 	long getInclusiveFilteredPersonRelationCount(
@@ -75,6 +76,23 @@ public interface PersonRelationManagerRemote {
 			PropertySetID toPersonID,
 			Set<PropertySetID> fromPropertySetIDsToExclude,
 			Set<PropertySetID> toPropertySetIDsToExclude
+	);
+	
+	
+	// -------------- ++++++++++ ----------------------------------------------------------------------------------------------------------- ++ ----|
+	// Test. May start this on a new class, since the methods are more intended to be used to serve TuckedPersonRelationTreeNodes.
+	// -------------- ++++++++++ ----------------------------------------------------------------------------------------------------------- ++ ----|
+	public class TuckedQueryCount implements Serializable {
+		private static final long serialVersionUID = 8694083868135075128L;
+		public long actualChildCount;
+		public long tuckedChildCount;
+	}
+
+	TuckedQueryCount getTuckedPersonRelationCount(
+			PersonRelationTypeID personRelationTypeID,
+			PropertySetID currentID,
+			Set<PropertySetID> propertySetIDsToRoot,
+			Set<PropertySetID> propertySetIDsToTuckedChildren
 	);
 	// -------------- ++++++++++ ----------------------------------------------------------------------------------------------------------- ++ ----|
 

@@ -16,6 +16,7 @@ import org.nightlabs.jfire.personrelation.PersonRelation;
 import org.nightlabs.jfire.personrelation.PersonRelationComparator;
 import org.nightlabs.jfire.personrelation.PersonRelationManagerRemote;
 import org.nightlabs.jfire.personrelation.PersonRelationType;
+import org.nightlabs.jfire.personrelation.PersonRelationManagerRemote.TuckedQueryCount;
 import org.nightlabs.jfire.personrelation.id.PersonRelationID;
 import org.nightlabs.jfire.personrelation.id.PersonRelationTypeID;
 import org.nightlabs.jfire.prop.id.PropertySetID;
@@ -190,6 +191,32 @@ extends BaseJDOObjectDAO<PersonRelationID, PersonRelation>
 			PersonRelationManagerRemote ejb = JFireEjb3Factory.getRemoteBean(PersonRelationManagerRemote.class, SecurityReflector.getInitialContextProperties());
 			monitor.worked(10);
 			return ejb.getInclusiveFilteredPersonRelationCount(personRelationTypeID, fromPersonID, toPersonID, fromPropertySetIDsToInclude, toPropertySetIDsToInclude);
+		} finally {
+			monitor.worked(90);
+			monitor.done();
+		}
+	}
+
+	// -------------- ++++++++++ ----------------------------------------------------------------------------------------------------------- ++ ----|
+	// Test. May start this on a new class, since the methods are more intended to be used to serve TuckedPersonRelationTreeNodes.
+	// -------------- ++++++++++ ----------------------------------------------------------------------------------------------------------- ++ ----|
+	public synchronized TuckedQueryCount getTuckedPersonRelationCount(
+			PersonRelationTypeID personRelationTypeID,
+			PropertySetID currentID,
+			Set<PropertySetID> propertySetIDsToRoot,
+			Set<PropertySetID> propertySetIDsToTuckedChildren,
+			ProgressMonitor monitor
+	) {
+		// Note(s):
+		//    I. The input parameter currentID represents the TuckedNode we are dealing with.
+		//   II. The given propertySetIDsToRoot are the IDs we want to avoid, in order to avoid open-ended relations.
+		//  III. The given propertySetIDsToTuckedChildrean are the IDs we want to seek to keep in the tucked status, if and only if they exist.
+		monitor.beginTask("Loading tucked person relation count...", 100);
+		try {
+			PersonRelationManagerRemote ejb = JFireEjb3Factory.getRemoteBean(PersonRelationManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			monitor.worked(10);
+			return ejb.getTuckedPersonRelationCount(personRelationTypeID, currentID, propertySetIDsToRoot, propertySetIDsToTuckedChildren);
+
 		} finally {
 			monitor.worked(90);
 			monitor.done();

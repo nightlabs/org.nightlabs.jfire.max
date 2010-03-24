@@ -22,6 +22,7 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 import javax.management.relation.RelationType;
 
+import org.apache.log4j.Logger;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
@@ -37,6 +38,8 @@ public class PersonRelationManagerBean
 extends BaseSessionBeanImpl
 implements PersonRelationManagerRemote
 {
+	private static Logger logger = Logger.getLogger(PersonRelationManagerBean.class);
+	
 	@RolesAllowed("_System_")
 	@Override
 	public void initialise() throws Exception
@@ -364,6 +367,64 @@ implements PersonRelationManagerRemote
 			pm.close();
 		}
 	}
+
+	// -------------- ++++++++++ ----------------------------------------------------------------------------------------------------------- ++ ----|
+	// Test. May start this on a new class, since the methods are more intended to be used to serve TuckedPersonRelationTreeNodes.
+	// -------------- ++++++++++ ----------------------------------------------------------------------------------------------------------- ++ ----|
+	@RolesAllowed("_Guest_") // TODO access rights
+	@Override
+	public TuckedQueryCount getTuckedPersonRelationCount(
+			PersonRelationTypeID personRelationTypeID,
+			PropertySetID currentID,
+			Set<PropertySetID> propertySetIDsToRoot,
+			Set<PropertySetID> propertySetIDsToTuckedChildren
+	) {
+		// Note(s):
+		//    I. The input parameter currentID represents the TuckedNode we are dealing with.
+		//   II. The given propertySetIDsToRoot are the IDs we want to avoid, in order to avoid open-ended relations.
+		//  III. The given propertySetIDsToTuckedChildrean are the IDs we want to seek to keep in the tucked status, if and only if they exist.
+		PersistenceManager pm = createPersistenceManager();
+		try {
+			PersonRelationType personRelationType = (PersonRelationType) (personRelationTypeID == null ? null : pm.getObjectById(personRelationTypeID));
+			Person fromPerson = (Person) (currentID == null ? null : pm.getObjectById(currentID));
+			Collection<? extends PersonRelation> personRelations = PersonRelation.getPersonRelations(pm, personRelationType, fromPerson, null);
+
+			TuckedQueryCount tqCount = new TuckedQueryCount();
+
+			// 1. Retrieve the 'actual' child-node count.
+			//    --> At this point in time: This is similar to the method getFilteredPersonRelationCount(), but more specific.
+			//    --> On filtration: Exclude any elements from the properySetIDsToRoot.
+			tqCount.actualChildCount = personRelations.size();
+			boolean isPerformExcludeFilter = propertySetIDsToRoot != null && !propertySetIDsToRoot.isEmpty();
+
+			// 2. Retrieve the 'tucked'-node count.
+			//    --> At this point in time: This is similar to the method getInclusiveFilteredPersonRelationCount(), but more specific.
+			//    --> On filtration: Only count elements if they are in the given propertySetIDsToTuckedChildren.
+			tqCount.tuckedChildCount = 0L;
+			boolean isPerformIncludeFilter = propertySetIDsToTuckedChildren != null && !propertySetIDsToTuckedChildren.isEmpty();
+
+			// Both 1. and 2. can run on the same iteration.
+			for (PersonRelation personRelation : personRelations) {
+				if (logger.isDebugEnabled())
+					logger.debug("  ~ personRelation [To]: " + personRelation.getTo().getDisplayName());
+
+				PropertySetID propertySetID = personRelation.getToID();
+
+				if (isPerformExcludeFilter && propertySetIDsToRoot.contains(propertySetID)) // On 1.
+					tqCount.actualChildCount--;
+
+				if (isPerformIncludeFilter && propertySetIDsToTuckedChildren.contains(propertySetID)) // On 2.
+					tqCount.tuckedChildCount++;
+			}
+
+			// Done.
+			return tqCount;
+
+		} finally {
+			pm.close();
+		}
+	}
+
 	// -------------- ++++++++++ ----------------------------------------------------------------------------------------------------------- ++ ----|
 
 

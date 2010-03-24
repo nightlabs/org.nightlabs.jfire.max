@@ -1,7 +1,6 @@
 package org.nightlabs.jfire.personrelation.issuetracking;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Set;
 
@@ -117,7 +116,7 @@ implements TreeNodeMultiParentResolver
 			}
 		}
 
-		return Collections.emptySet();
+		return null;
 	}
 
 }

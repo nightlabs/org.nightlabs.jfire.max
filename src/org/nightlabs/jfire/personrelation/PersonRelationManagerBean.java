@@ -17,6 +17,7 @@ import javax.ejb.TransactionAttributeType;
 import javax.ejb.TransactionManagement;
 import javax.ejb.TransactionManagementType;
 import javax.jdo.FetchPlan;
+import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
@@ -38,7 +39,7 @@ public class PersonRelationManagerBean
 extends BaseSessionBeanImpl
 implements PersonRelationManagerRemote
 {
-	private static Logger logger = Logger.getLogger(PersonRelationManagerBean.class);
+	private static final Logger logger = Logger.getLogger(PersonRelationManagerBean.class);
 	
 	@RolesAllowed("_System_")
 	@Override
@@ -388,7 +389,19 @@ implements PersonRelationManagerRemote
 			PersonRelationType personRelationType = (PersonRelationType) (personRelationTypeID == null ? null : pm.getObjectById(personRelationTypeID));
 			Person fromPerson = (Person) (currentID == null ? null : pm.getObjectById(currentID));
 			Collection<? extends PersonRelation> personRelations = PersonRelation.getPersonRelations(pm, personRelationType, fromPerson, null);
+			
+			if (logger.isDebugEnabled()) {
+				String str = "\n ---- Ref: " + showObjectID(currentID) + " ----";
+				str += "\n ~~ personRelationType: " + (personRelationType == null ? "null" : personRelationType.getName().getText());
+				str += "\n ~~ fromPerson: " + (fromPerson == null ? "null" : fromPerson.getDisplayName());
+				str += "\n ~~ " + showObjectIDs("propertySetIDsToRoot", propertySetIDsToRoot, 10);
+				str += "\n ~~ " + showObjectIDs("propertySetIDsToTuckedChildren", propertySetIDsToTuckedChildren, 10);
+				str += "\n ~~ personRelations.size(): " + (personRelations == null ? "null" : personRelations.size());
 
+				logger.debug(str);
+			}
+			
+			
 			TuckedQueryCount tqCount = new TuckedQueryCount();
 
 			// 1. Retrieve the 'actual' child-node count.
@@ -406,10 +419,9 @@ implements PersonRelationManagerRemote
 			// Both 1. and 2. can run on the same iteration.
 			for (PersonRelation personRelation : personRelations) {
 				if (logger.isDebugEnabled())
-					logger.debug("  ~ personRelation [To]: " + personRelation.getTo().getDisplayName());
+					logger.debug(" ~ personRelation [To]: " + showPersonInfo(personRelation.getTo())); // + ",  [From]: " + showPersonInfo(personRelation.getFrom()));
 
 				PropertySetID propertySetID = personRelation.getToID();
-
 				if (isPerformExcludeFilter && propertySetIDsToRoot.contains(propertySetID)) // On 1.
 					tqCount.actualChildCount--;
 
@@ -417,6 +429,9 @@ implements PersonRelationManagerRemote
 					tqCount.tuckedChildCount++;
 			}
 
+			if (logger.isDebugEnabled())
+				logger.debug(" :: TuckedNodeCount info gathered: tuckedChildCount = " + tqCount.tuckedChildCount + ", actualChildCount = " + tqCount.actualChildCount);
+			
 			// Done.
 			return tqCount;
 
@@ -424,8 +439,44 @@ implements PersonRelationManagerRemote
 			pm.close();
 		}
 	}
-
+	
 	// -------------- ++++++++++ ----------------------------------------------------------------------------------------------------------- ++ ----|
+	// -------------------------------------------------------------------------------------------------- ++ ------>>
+	//  Kai's debug shits. Will be removed once ALL testings are completed! Kai.
+	// -------------------------------------------------------------------------------------------------- ++ ------>>
+	// II. Quick debug.
+	private String showObjectIDs(String preamble, Collection<? extends ObjectID> objIDs, int modLnCnt) {
+		if (objIDs == null)
+			return preamble + " :: NULL";
+
+		boolean isLonger = objIDs.size() > modLnCnt;
+		String str = preamble + " (" + objIDs.size() + ") :: { " + (isLonger ? "\n     " : "");
+		int ctr = 0;
+		for (ObjectID objectID : objIDs) {
+			str += "(" + ctr + ")" + showObjectID(objectID) + " ";
+			ctr++;
+
+			if (ctr % modLnCnt == 0)
+				str += "\n     ";
+		}
+
+		return str + (isLonger ? "\n   }" : "}");
+	}
+
+	// III. Quick debug.
+	private String showObjectID(ObjectID objectID) {
+		if (objectID == null)
+			return "[null]";
+
+		String[] segID = objectID.toString().split("&");
+		return "[" + segID[1] + "]";
+	}
+	
+	// IV. Quick debug.
+	private String showPersonInfo(Person person) {
+		return String.format("%s %s", person.getDisplayName(), showObjectID((ObjectID) JDOHelper.getObjectId(person)));
+	}
+	// -------------------------------------------------------------------------------------------------- ++ ------>>
 
 
 	@RolesAllowed("_Guest_") // TODO access rights

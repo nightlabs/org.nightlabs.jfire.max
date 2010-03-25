@@ -48,18 +48,18 @@ implements ScriptExecutorJavaClassReportingDelegate
 	}
 
 	/**
-	 * Get the value of the data-set parameter with the given parameterName.
-	 * This will be the value that was bound to the data-set in the BIRT
-	 * report layout.
+	 * Get the value of the data-set parameter with the given parameterName. This will be the value
+	 * that was bound to the data-set in the BIRT report layout.
 	 * <p>
-	 * Note, that this parameters are set by the execution layer and might
-	 * be de-serialised object parameter values.
+	 * Note, that this parameters are set by the execution layer and might be de-serialised object
+	 * parameter values.
 	 * </p>
 	 * 
 	 * @param <T> The type of parameter expected.
 	 * @param parameterName The name of the parameter.
 	 * @param clazz The type of the parameter expected.
-	 * @return The value of the parameter with the given name.
+	 * @return The value of the parameter with the given name, or <code>null</code> if that
+	 *         parameter is not defined.
 	 */
 	@SuppressWarnings("unchecked")
 	public <T> T getObjectParameterValue(String parameterName, Class<T> clazz) {

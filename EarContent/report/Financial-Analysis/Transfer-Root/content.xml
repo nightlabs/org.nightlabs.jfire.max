@@ -101,5 +101,50 @@
 			</use-case>
 		</parameter-acquisition>
 	</report>
+
+	<report engineType="BIRT" file="GeneralLedgerJournal.rptdesign"
+		id="GeneralLedgerJournal" overwriteOnInit="true">
 	
+		<name language="de">Hauptbuch Journal</name>
+		<name language="en">General ledger journal</name>
+		
+		<description language="de">Ein Bericht, der die
+			Transaktionen des Hauptbuches auflistet.</description>
+		<description language="en">A report listing all transfers in
+			the general ledger in a certain time period.</description>
+			
+		<parameter-acquisition>
+			<use-case default="true" id="DefaultUseCase">
+				<name language="en">DefaultUseCase</name>
+				<description language="en">DefaultUseCase</description>
+				<parameters>
+					<parameter id="0" name="timePeriod" type="org.nightlabs.util.TimePeriod"
+						x="611" y="28" />
+					<parameter id="1" name="accountIDs"
+						type="java.util.Collection&lt;org.nightlabs.jfire.transfer.id.AnchorID&gt;"
+						x="611" y="88" />
+					<parameter id="2" name="initiatorIDs" type="string" x="610"
+						y="154" />
+				</parameters>
+				<value-provider-configs>
+					<provider-config allowNullOutputValue="true"
+						categoryID="JFireReporting-ValueProviderCategory-SimpleTypes"
+						growVertically="false" id="3" organisationID="dev.jfire.org"
+						pageColumn="0" pageIndex="0" pageRow="0" showMessageInHeader="true"
+						valueProviderID="org.nightlabs.util.TimePeriod" x="82" y="29">
+
+						<message language="de">Wählen Sie einen Zeitraum für den Bericht</message>
+						<message language="en">Select a time period</message>
+					</provider-config>
+				</value-provider-configs>
+				<value-consumer-bindings>
+					<value-consumer-binding>
+						<binding-provider id="3" />
+						<binding-parameter name="timePeriod" />
+						<binding-consumer id="0" />
+					</value-consumer-binding>
+				</value-consumer-bindings>
+			</use-case>
+		</parameter-acquisition>
+	</report>
 </report-category>

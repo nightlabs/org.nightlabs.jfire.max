@@ -1,0 +1,1083 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.14" id="1">
+    <property name="createdBy">Eclipse BIRT Designer Version 2.2.0.v20070620 Build &lt;@BUILD@></property>
+    <property name="units">in</property>
+    <property name="includeResource">reportMessages</property>
+    <html-property name="description">General ledger journal report</html-property>
+    <method name="initialize"><![CDATA[importClass(Packages.org.nightlabs.jfire.reporting.JFireReportingHelper);
+importClass(Packages.org.nightlabs.jfire.accounting.pay.Payment);
+
+highlightRowCount = 0;
+
+function isParamSet(param) {
+  return !("".equals(param) || ""+param == "null" || null == param);
+}]]></method>
+    <text-property name="displayName">WizardTemplateChoicePage.title.BlankReport</text-property>
+    <property name="iconFile">/templates/blank_report.gif</property>
+    <parameters>
+        <scalar-parameter name="timePeriod" id="488">
+            <property name="valueType">static</property>
+            <property name="dataType">string</property>
+            <property name="isRequired">false</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+    </parameters>
+    <data-sources>
+        <oda-data-source extensionID="org.nightlabs.jfire.reporting.oda.jfs.JFSDriver" name="JFSDataSource" id="4"/>
+    </data-sources>
+    <data-sets>
+        <oda-data-set extensionID="org.nightlabs.jfire.reporting.oda.jfs.JFSDataSet" name="GeneralLedgerJournalData" id="682">
+            <list-property name="computedColumns">
+                <structure>
+                    <property name="name">blockNumber</property>
+                    <expression name="expression">pageBreakInterval = 40;
+blockNumber = Math.floor(row["rowNumber"] / pageBreakInterval) + 1;</expression>
+                    <property name="dataType">integer</property>
+                </structure>
+                <structure>
+                    <property name="name">highlightRowCount</property>
+                    <expression name="expression">if ("Summary".equals(row["journalEntryType"])) {
+  highlightRowCount = 0;
+} else {
+  highlightRowCount++;
+}
+highlightRowCount</expression>
+                    <property name="dataType">integer</property>
+                </structure>
+            </list-property>
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure>
+                        <property name="position">1</property>
+                        <property name="name">journalEntryType</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">2</property>
+                        <property name="name">rowNumber</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                    <structure>
+                        <property name="position">3</property>
+                        <property name="name">timeStamp</property>
+                        <property name="dataType">date-time</property>
+                    </structure>
+                    <structure>
+                        <property name="position">4</property>
+                        <property name="name">containerJDOID</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">5</property>
+                        <property name="name">refAnchorJDOID</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">6</property>
+                        <property name="name">refAnchorIsAccount</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">7</property>
+                        <property name="name">refAnchorDescription</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">8</property>
+                        <property name="name">currencyJDOID</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">9</property>
+                        <property name="name">currencySymbol</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">10</property>
+                        <property name="name">amount</property>
+                        <property name="dataType">decimal</property>
+                    </structure>
+                    <structure>
+                        <property name="position">11</property>
+                        <property name="name">transferDescription</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">12</property>
+                        <property name="name">blockNumber</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                    <structure>
+                        <property name="position">13</property>
+                        <property name="name">highlightRowCount</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                </list-property>
+            </structure>
+            <property name="dataSource">JFSDataSource</property>
+            <list-property name="parameters">
+                <structure>
+                    <property name="name">timePeriod</property>
+                    <property name="nativeName">timePeriod</property>
+                    <property name="dataType">any</property>
+                    <property name="nativeDataType">10</property>
+                    <property name="position">1</property>
+                    <expression name="defaultValue">'__DUMMY_DEFAULT_PARAMETER_VALUE__'</expression>
+                    <property name="isOptional">false</property>
+                    <property name="allowNull">true</property>
+                    <property name="isInput">true</property>
+                </structure>
+                <structure>
+                    <property name="name">addSummaryRows</property>
+                    <property name="nativeName">timePeriod</property>
+                    <property name="dataType">any</property>
+                    <property name="nativeDataType">4</property>
+                    <property name="position">2</property>
+                    <expression name="defaultValue">'__DUMMY_DEFAULT_PARAMETER_VALUE__'</expression>
+                    <property name="isOptional">false</property>
+                    <property name="allowNull">true</property>
+                    <property name="isInput">true</property>
+                </structure>
+                <structure>
+                    <property name="name">consolidate</property>
+                    <property name="nativeName">timePeriod</property>
+                    <property name="dataType">any</property>
+                    <property name="nativeDataType">4</property>
+                    <property name="position">3</property>
+                    <expression name="defaultValue">'__DUMMY_DEFAULT_PARAMETER_VALUE__'</expression>
+                    <property name="isOptional">false</property>
+                    <property name="allowNull">true</property>
+                    <property name="isInput">true</property>
+                </structure>
+                <structure>
+                    <property name="name">excludeLegalEntities</property>
+                    <property name="nativeName">timePeriod</property>
+                    <property name="dataType">any</property>
+                    <property name="nativeDataType">4</property>
+                    <property name="position">4</property>
+                    <expression name="defaultValue">'__DUMMY_DEFAULT_PARAMETER_VALUE__'</expression>
+                    <property name="isOptional">false</property>
+                    <property name="allowNull">true</property>
+                    <property name="isInput">true</property>
+                </structure>
+            </list-property>
+            <list-property name="resultSet">
+                <structure>
+                    <property name="position">1</property>
+                    <property name="name">journalEntryType</property>
+                    <property name="nativeName">journalEntryType</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">1</property>
+                </structure>
+                <structure>
+                    <property name="position">2</property>
+                    <property name="name">rowNumber</property>
+                    <property name="nativeName">rowNumber</property>
+                    <property name="dataType">integer</property>
+                    <property name="nativeDataType">2</property>
+                </structure>
+                <structure>
+                    <property name="position">3</property>
+                    <property name="name">timeStamp</property>
+                    <property name="nativeName">timeStamp</property>
+                    <property name="dataType">date-time</property>
+                    <property name="nativeDataType">93</property>
+                </structure>
+                <structure>
+                    <property name="position">4</property>
+                    <property name="name">containerJDOID</property>
+                    <property name="nativeName">containerJDOID</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">1</property>
+                </structure>
+                <structure>
+                    <property name="position">5</property>
+                    <property name="name">refAnchorJDOID</property>
+                    <property name="nativeName">refAnchorJDOID</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">1</property>
+                </structure>
+                <structure>
+                    <property name="position">6</property>
+                    <property name="name">refAnchorIsAccount</property>
+                    <property name="nativeName">refAnchorIsAccount</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">1</property>
+                </structure>
+                <structure>
+                    <property name="position">7</property>
+                    <property name="name">refAnchorDescription</property>
+                    <property name="nativeName">refAnchorDescription</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">1</property>
+                </structure>
+                <structure>
+                    <property name="position">8</property>
+                    <property name="name">currencyJDOID</property>
+                    <property name="nativeName">currencyJDOID</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">1</property>
+                </structure>
+                <structure>
+                    <property name="position">9</property>
+                    <property name="name">currencySymbol</property>
+                    <property name="nativeName">currencySymbol</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">1</property>
+                </structure>
+                <structure>
+                    <property name="position">10</property>
+                    <property name="name">amount</property>
+                    <property name="nativeName">amount</property>
+                    <property name="dataType">decimal</property>
+                    <property name="nativeDataType">6</property>
+                </structure>
+                <structure>
+                    <property name="position">11</property>
+                    <property name="name">transferDescription</property>
+                    <property name="nativeName">transferDescription</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">1</property>
+                </structure>
+            </list-property>
+            <property name="queryText">&lt;queryPropertySet>&lt;org.nightlabs.jfire.reporting.oda.jfs.JFSQueryPropertySet>
+  &lt;scriptRegistryItemID>
+    &lt;organisationID>dev.jfire.org&lt;/organisationID>
+    &lt;scriptRegistryItemType>JFireReportingTrade-MoneyTransfer&lt;/scriptRegistryItemType>
+    &lt;scriptRegistryItemID>GeneralLedgerJournalList.javaclass&lt;/scriptRegistryItemID>
+  &lt;/scriptRegistryItemID>
+  &lt;properties/>
+&lt;/org.nightlabs.jfire.reporting.oda.jfs.JFSQueryPropertySet>&lt;/queryPropertySet></property>
+        </oda-data-set>
+    </data-sets>
+    <styles>
+        <style name="tableContent" id="741">
+            <property name="fontFamily">sans-serif</property>
+            <property name="fontSize">small</property>
+            <property name="paddingTop">0pt</property>
+            <property name="paddingLeft">0pt</property>
+            <property name="paddingBottom">0pt</property>
+            <property name="paddingRight">0pt</property>
+        </style>
+    </styles>
+    <page-setup>
+        <simple-master-page name="Simple MasterPage" id="2">
+            <property name="type">a4</property>
+            <property name="orientation">portrait</property>
+            <property name="topMargin">1cm</property>
+            <property name="leftMargin">1cm</property>
+            <property name="bottomMargin">1cm</property>
+            <property name="rightMargin">1cm</property>
+            <property name="fontSize">medium</property>
+            <property name="textIndent">0em</property>
+            <property name="showHeaderOnFirst">false</property>
+            <property name="headerHeight">0.5cm</property>
+            <property name="footerHeight">0.5cm</property>
+            <page-footer>
+                <text id="3">
+                    <property name="style">tableContent</property>
+                    <property name="marginTop">0pt</property>
+                    <property name="paddingTop">1pt</property>
+                    <property name="contentType">html</property>
+                    <text-property name="content"><![CDATA[<value-of>new Date()</value-of>]]></text-property>
+                </text>
+            </page-footer>
+        </simple-master-page>
+    </page-setup>
+    <body>
+        <grid id="355">
+            <column id="356"/>
+            <column id="357"/>
+            <row id="361">
+                <cell id="362">
+                    <text id="471">
+                        <property name="fontFamily">"Arial"</property>
+                        <property name="fontWeight">bold</property>
+                        <property name="contentType">auto</property>
+                        <text-property name="content"><![CDATA[Parameters:]]></text-property>
+                    </text>
+                    <grid id="472">
+                        <property name="width">100%</property>
+                        <column id="473"/>
+                        <row id="475">
+                            <cell id="476">
+                                <property name="paddingTop">1pt</property>
+                                <property name="paddingLeft">5pt</property>
+                                <property name="paddingBottom">1pt</property>
+                                <data id="1095">
+                                    <property name="fontFamily">sans-serif</property>
+                                    <list-property name="boundDataColumns">
+                                        <structure>
+                                            <property name="name">ParameterDisplay</property>
+                                            <expression name="expression">text = reportContext.getMessage("parameterListing.timePeriod", reportContext.getLocale());
+if (JFireReportingHelper.getParameter("timePeriod") == null) {
+  text + reportContext.getMessage("parameterListing.timePeriod.none", reportContext.getLocale());
+} else {
+  timePeriod = JFireReportingHelper.getParameter("timePeriod");
+  text = text + "\n " + reportContext.getMessage("parameterListing.timePeriod.from", reportContext.getLocale());
+  if (timePeriod.getFrom() == null) {  
+    text = text + reportContext.getMessage("parameterListing.timePeriod.none", reportContext.getLocale());
+  } else {
+    text = text + (new Date(timePeriod.getFrom().getTime())).toLocaleString();
+  }
+  text = text + "\n " + reportContext.getMessage("parameterListing.timePeriod.to", reportContext.getLocale());
+  if (timePeriod.getTo() == null) {  
+    text = text + reportContext.getMessage("parameterListing.timePeriod.none", reportContext.getLocale())
+  } else {
+    text = text + (new Date(timePeriod.getTo().getTime())).toLocaleString()
+  }
+}</expression>
+                                            <property name="dataType">string</property>
+                                        </structure>
+                                    </list-property>
+                                    <property name="resultSetColumn">ParameterDisplay</property>
+                                </data>
+                            </cell>
+                        </row>
+                    </grid>
+                </cell>
+                <cell id="363">
+                    <property name="textAlign">right</property>
+                    <image id="213">
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">imageData</property>
+                                <expression name="expression">importClass(Packages.org.nightlabs.jfire.trade.OrganisationLegalEntity);
+importClass(Packages.org.nightlabs.jfire.security.SecurityReflector);
+importClass(Packages.org.nightlabs.jfire.person.PersonStruct);
+
+var pm = JFireReportingHelper.getPersistenceManager();
+var ole = OrganisationLegalEntity.getOrganisationLegalEntity(pm, SecurityReflector.getUserDescriptor().getOrganisationID());
+ole.getPerson().getPersistentDataFieldByIndex(PersonStruct.PERSONALDATA_PHOTO, 0).getData();</expression>
+                                <property name="dataType">any</property>
+                            </structure>
+                        </list-property>
+                        <property name="source">expr</property>
+                        <expression name="valueExpr">row["imageData"]</expression>
+                    </image>
+                    <text id="354">
+                        <property name="fontFamily">"Arial"</property>
+                        <property name="contentType">html</property>
+                        <text-property name="content" key="header.title"><![CDATA[<H2>
+JFire general ledger journal
+</H2>]]></text-property>
+                    </text>
+                </cell>
+            </row>
+            <row id="364">
+                <property name="height">0.3541666667in</property>
+                <cell id="365"/>
+                <cell id="366"/>
+            </row>
+        </grid>
+        <table id="870">
+            <property name="style">tableContent</property>
+            <property name="width">100%</property>
+            <property name="dataSet">GeneralLedgerJournalData</property>
+            <list-property name="paramBindings">
+                <structure>
+                    <property name="paramName">timePeriod</property>
+                    <expression name="expression">if (JFireReportingHelper.getParameter("timePeriod") != null)
+    JFireReportingHelper.createDataSetParam(JFireReportingHelper.getParameter("timePeriod"))</expression>
+                </structure>
+                <structure>
+                    <property name="paramName">addSummaryRows</property>
+                    <expression name="expression">JFireReportingHelper.createDataSetParam(true)</expression>
+                </structure>
+                <structure>
+                    <property name="paramName">consolidate</property>
+                    <expression name="expression">JFireReportingHelper.createDataSetParam(false)</expression>
+                </structure>
+                <structure>
+                    <property name="paramName">excludeLegalEntities</property>
+                    <expression name="expression">JFireReportingHelper.createDataSetParam(true)</expression>
+                </structure>
+            </list-property>
+            <list-property name="boundDataColumns">
+                <structure>
+                    <property name="name">journalEntryType</property>
+                    <expression name="expression">dataSetRow["journalEntryType"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">timeStamp</property>
+                    <expression name="expression">dataSetRow["timeStamp"]</expression>
+                    <property name="dataType">date-time</property>
+                </structure>
+                <structure>
+                    <property name="name">containerJDOID</property>
+                    <expression name="expression">dataSetRow["containerJDOID"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">refAnchorJDOID</property>
+                    <expression name="expression">dataSetRow["refAnchorJDOID"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">refAnchorIsAccount</property>
+                    <expression name="expression">dataSetRow["refAnchorIsAccount"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">refAnchorDescription</property>
+                    <expression name="expression">dataSetRow["refAnchorDescription"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">currencyJDOID</property>
+                    <expression name="expression">dataSetRow["currencyJDOID"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">currencySymbol</property>
+                    <expression name="expression">dataSetRow["currencySymbol"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">amount</property>
+                    <expression name="expression">if (dataSetRow["currencyJDOID"] != null) {
+  currency = JFireReportingHelper.getJDOObject(dataSetRow["currencyJDOID"]);
+  Packages.org.nightlabs.l10n.NumberFormatter.formatCurrency(dataSetRow["amount"], currency, false)
+} else {
+ ""
+}</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">transferDescription</property>
+                    <expression name="expression">dataSetRow["transferDescription"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">blockNumber</property>
+                    <expression name="expression">dataSetRow["blockNumber"]</expression>
+                    <property name="dataType">integer</property>
+                </structure>
+                <structure>
+                    <property name="name">rowNum</property>
+                    <expression name="expression">dataSetRow["rowNumber"]</expression>
+                    <property name="dataType">integer</property>
+                </structure>
+                <structure>
+                    <property name="name">hightlightRowCount</property>
+                    <expression name="expression">dataSetRow["highlightRowCount"]</expression>
+                    <property name="dataType">integer</property>
+                </structure>
+            </list-property>
+            <property name="pageBreakInterval">25</property>
+            <column id="924"/>
+            <column id="933"/>
+            <header>
+                <row id="871">
+                    <property name="style">tableContent</property>
+                    <cell id="872">
+                        <property name="paddingTop">0pt</property>
+                        <property name="paddingLeft">0pt</property>
+                        <property name="paddingBottom">0pt</property>
+                        <property name="paddingRight">1em</property>
+                        <grid id="1263">
+                            <property name="backgroundColor">#A6A6A6</property>
+                            <property name="borderBottomColor">#000000</property>
+                            <property name="borderBottomStyle">solid</property>
+                            <property name="borderBottomWidth">thin</property>
+                            <property name="borderLeftColor">#000000</property>
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">thin</property>
+                            <property name="borderRightColor">#000000</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">thin</property>
+                            <property name="borderTopColor">#000000</property>
+                            <property name="borderTopStyle">solid</property>
+                            <property name="borderTopWidth">thin</property>
+                            <property name="width">100%</property>
+                            <column id="1264">
+                                <property name="width">50%</property>
+                            </column>
+                            <column id="1265">
+                                <property name="width">20%</property>
+                                <property name="textAlign">right</property>
+                            </column>
+                            <column id="1266">
+                                <property name="width">20%</property>
+                                <property name="textAlign">right</property>
+                            </column>
+                            <column id="1267">
+                                <property name="width">10%</property>
+                            </column>
+                            <row id="1271">
+                                <cell id="1272">
+                                    <property name="paddingTop">1pt</property>
+                                    <property name="paddingLeft">1em</property>
+                                    <property name="paddingBottom">1pt</property>
+                                    <label id="1273">
+                                        <text-property name="text" key="header.account">Anchor</text-property>
+                                    </label>
+                                </cell>
+                                <cell id="1274">
+                                    <label id="1275">
+                                        <text-property name="text" key="header.credit">Credit</text-property>
+                                    </label>
+                                </cell>
+                                <cell id="1276">
+                                    <label id="1277">
+                                        <text-property name="text" key="header.debit">Debit</text-property>
+                                    </label>
+                                </cell>
+                                <cell id="1278"/>
+                            </row>
+                        </grid>
+                    </cell>
+                    <cell id="890">
+                        <property name="paddingTop">0pt</property>
+                        <property name="paddingLeft">1em</property>
+                        <property name="paddingBottom">0pt</property>
+                        <property name="paddingRight">0pt</property>
+                        <grid id="1279">
+                            <property name="backgroundColor">#A6A6A6</property>
+                            <property name="borderBottomColor">#000000</property>
+                            <property name="borderBottomStyle">solid</property>
+                            <property name="borderBottomWidth">thin</property>
+                            <property name="borderLeftColor">#000000</property>
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">thin</property>
+                            <property name="borderRightColor">#000000</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">thin</property>
+                            <property name="borderTopColor">#000000</property>
+                            <property name="borderTopStyle">solid</property>
+                            <property name="borderTopWidth">thin</property>
+                            <property name="width">100%</property>
+                            <column id="1280">
+                                <property name="width">50%</property>
+                            </column>
+                            <column id="1281">
+                                <property name="width">20%</property>
+                                <property name="textAlign">right</property>
+                            </column>
+                            <column id="1282">
+                                <property name="width">20%</property>
+                                <property name="textAlign">right</property>
+                            </column>
+                            <column id="1283">
+                                <property name="width">10%</property>
+                            </column>
+                            <row id="1284">
+                                <cell id="1285">
+                                    <property name="paddingTop">1pt</property>
+                                    <property name="paddingLeft">1em</property>
+                                    <property name="paddingBottom">1pt</property>
+                                    <label id="1286">
+                                        <text-property name="text" key="header.account">Anchor</text-property>
+                                    </label>
+                                </cell>
+                                <cell id="1287">
+                                    <label id="1288">
+                                        <text-property name="text" key="header.credit">Credit</text-property>
+                                    </label>
+                                </cell>
+                                <cell id="1289">
+                                    <label id="1290">
+                                        <text-property name="text" key="header.debit">Debit</text-property>
+                                    </label>
+                                </cell>
+                                <cell id="1291"/>
+                            </row>
+                        </grid>
+                    </cell>
+                </row>
+            </header>
+            <footer>
+                <row id="913">
+                    <cell id="914">
+                        <property name="paddingTop">0pt</property>
+                        <property name="paddingLeft">0pt</property>
+                        <property name="paddingBottom">0pt</property>
+                        <property name="paddingRight">1em</property>
+                        <table id="1227">
+                            <property name="marginTop">0pt</property>
+                            <property name="marginBottom">0pt</property>
+                            <property name="width">100%</property>
+                            <list-property name="boundDataColumns">
+                                <structure>
+                                    <property name="name">test</property>
+                                    <expression name="expression">dataSetRow["highlightRowCount"]</expression>
+                                    <property name="dataType">integer</property>
+                                </structure>
+                                <structure>
+                                    <property name="name">blockNumber</property>
+                                    <expression name="expression">dataSetRow["blockNumber"]</expression>
+                                    <property name="dataType">integer</property>
+                                </structure>
+                            </list-property>
+                            <property name="pageBreakInterval">40</property>
+                            <list-property name="filter">
+                                <structure>
+                                    <property name="operator">eq</property>
+                                    <expression name="expr">var blockNumber = row["blockNumber"];
+totalColumns = 2;
+columnNumber = 1;
+((blockNumber - columnNumber) >= 0) &amp;&amp; (((blockNumber - columnNumber) % totalColumns) == 0)</expression>
+                                    <expression name="value1">true</expression>
+                                </structure>
+                            </list-property>
+                            <column id="1262"/>
+                            <detail>
+                                <row id="1228">
+                                    <cell id="1229">
+                                        <property name="paddingTop">0pt</property>
+                                        <property name="paddingLeft">0pt</property>
+                                        <property name="paddingBottom">0pt</property>
+                                        <property name="paddingRight">0pt</property>
+                                        <grid id="1230">
+                                            <property name="marginTop">0pt</property>
+                                            <property name="width">100%</property>
+                                            <column id="1231">
+                                                <property name="width">50%</property>
+                                            </column>
+                                            <column id="1232">
+                                                <property name="width">20%</property>
+                                                <property name="textAlign">right</property>
+                                            </column>
+                                            <column id="1233">
+                                                <property name="width">20%</property>
+                                                <property name="textAlign">right</property>
+                                            </column>
+                                            <column id="1234">
+                                                <property name="width">10%</property>
+                                            </column>
+                                            <row id="1235">
+                                                <list-property name="visibility">
+                                                    <structure>
+                                                        <property name="format">all</property>
+                                                        <expression name="valueExpr">var visibilityResult = row["journalEntryType"] != "Summary";
+if (visibilityResult) {
+  // We reset the highlightRowCount, so we always start with the same color
+  highlightRowCount1 = 0;
+}
+visibilityResult</expression>
+                                                    </structure>
+                                                </list-property>
+                                                <cell id="1236">
+                                                    <property name="colSpan">4</property>
+                                                    <property name="rowSpan">1</property>
+                                                    <property name="paddingTop">1.5em</property>
+                                                    <grid id="1237">
+                                                        <property name="backgroundColor">#A6A6A6</property>
+                                                        <property name="borderBottomColor">#000000</property>
+                                                        <property name="borderBottomStyle">solid</property>
+                                                        <property name="borderBottomWidth">thin</property>
+                                                        <property name="borderLeftColor">#000000</property>
+                                                        <property name="borderLeftStyle">solid</property>
+                                                        <property name="borderLeftWidth">thin</property>
+                                                        <property name="borderRightColor">#000000</property>
+                                                        <property name="borderRightStyle">solid</property>
+                                                        <property name="borderRightWidth">thin</property>
+                                                        <property name="borderTopColor">#000000</property>
+                                                        <property name="borderTopStyle">solid</property>
+                                                        <property name="borderTopWidth">thin</property>
+                                                        <property name="width">100%</property>
+                                                        <column id="1238">
+                                                            <property name="width">50%</property>
+                                                        </column>
+                                                        <column id="1239">
+                                                            <property name="width">20%</property>
+                                                            <property name="textAlign">right</property>
+                                                        </column>
+                                                        <column id="1240">
+                                                            <property name="width">20%</property>
+                                                            <property name="textAlign">right</property>
+                                                        </column>
+                                                        <column id="1241">
+                                                            <property name="width">10%</property>
+                                                        </column>
+                                                        <row id="1242">
+                                                            <method name="onRender"><![CDATA[highlightRowCount1 = 0;]]></method>
+                                                            <cell id="1243">
+                                                                <property name="colSpan">4</property>
+                                                                <property name="rowSpan">1</property>
+                                                                <property name="paddingTop">0.5em</property>
+                                                                <property name="paddingLeft">1pt</property>
+                                                                <property name="paddingBottom">1pt</property>
+                                                                <data id="1244">
+                                                                    <property name="resultSetColumn">transferDescription</property>
+                                                                </data>
+                                                            </cell>
+                                                        </row>
+                                                        <row id="1245">
+                                                            <list-property name="visibility">
+                                                                <structure>
+                                                                    <property name="format">all</property>
+                                                                    <expression name="valueExpr">true</expression>
+                                                                </structure>
+                                                            </list-property>
+                                                            <cell id="1246">
+                                                                <property name="paddingTop">1pt</property>
+                                                                <property name="paddingLeft">1em</property>
+                                                                <property name="paddingBottom">1pt</property>
+                                                                <label id="1247">
+                                                                    <text-property name="text" key="header.account">Anchor</text-property>
+                                                                </label>
+                                                            </cell>
+                                                            <cell id="1248">
+                                                                <label id="1249">
+                                                                    <text-property name="text" key="header.credit">Credit</text-property>
+                                                                </label>
+                                                            </cell>
+                                                            <cell id="1250">
+                                                                <label id="1251">
+                                                                    <text-property name="text" key="header.debit">Debit</text-property>
+                                                                </label>
+                                                            </cell>
+                                                            <cell id="1252"/>
+                                                        </row>
+                                                    </grid>
+                                                </cell>
+                                            </row>
+                                            <row id="1253">
+                                                <list-property name="highlightRules">
+                                                    <structure>
+                                                        <property name="operator">eq</property>
+                                                        <property name="backgroundColor">#D4D4D4</property>
+                                                        <expression name="testExpr">// row._outer["hightlightRowCount"] % 2
+row["test"] % 2</expression>
+                                                        <expression name="value1">1</expression>
+                                                    </structure>
+                                                </list-property>
+                                                <list-property name="visibility">
+                                                    <structure>
+                                                        <property name="format">all</property>
+                                                        <expression name="valueExpr">"Summary".equals(row["journalEntryType"])</expression>
+                                                    </structure>
+                                                </list-property>
+                                                <cell id="1254">
+                                                    <property name="paddingTop">1pt</property>
+                                                    <property name="paddingLeft">1em</property>
+                                                    <property name="paddingBottom">1pt</property>
+                                                    <data id="1255">
+                                                        <property name="resultSetColumn">refAnchorDescription</property>
+                                                    </data>
+                                                </cell>
+                                                <cell id="1256">
+                                                    <data id="1257">
+                                                        <list-property name="visibility">
+                                                            <structure>
+                                                                <property name="format">all</property>
+                                                                <expression name="valueExpr">row["journalEntryType"] == "Debit"</expression>
+                                                            </structure>
+                                                        </list-property>
+                                                        <property name="resultSetColumn">amount</property>
+                                                    </data>
+                                                </cell>
+                                                <cell id="1258">
+                                                    <data id="1259">
+                                                        <list-property name="visibility">
+                                                            <structure>
+                                                                <property name="format">all</property>
+                                                                <expression name="valueExpr">row["journalEntryType"] == "Credit"</expression>
+                                                            </structure>
+                                                        </list-property>
+                                                        <property name="resultSetColumn">amount</property>
+                                                    </data>
+                                                </cell>
+                                                <cell id="1260">
+                                                    <data id="1261">
+                                                        <property name="resultSetColumn">currencySymbol</property>
+                                                    </data>
+                                                </cell>
+                                            </row>
+                                        </grid>
+                                    </cell>
+                                </row>
+                            </detail>
+                        </table>
+                    </cell>
+                    <cell id="923">
+                        <property name="paddingTop">0pt</property>
+                        <property name="paddingLeft">1em</property>
+                        <property name="paddingBottom">0pt</property>
+                        <property name="paddingRight">1pt</property>
+                        <table id="1189">
+                            <property name="marginTop">0pt</property>
+                            <property name="marginBottom">0pt</property>
+                            <property name="width">100%</property>
+                            <list-property name="boundDataColumns">
+                                <structure>
+                                    <property name="name">test</property>
+                                    <expression name="expression">dataSetRow["highlightRowCount"]</expression>
+                                    <property name="dataType">integer</property>
+                                </structure>
+                                <structure>
+                                    <property name="name">blockNumber</property>
+                                    <expression name="expression">dataSetRow["blockNumber"]</expression>
+                                    <property name="dataType">integer</property>
+                                </structure>
+                            </list-property>
+                            <property name="pageBreakInterval">40</property>
+                            <list-property name="filter">
+                                <structure>
+                                    <property name="operator">eq</property>
+                                    <expression name="expr">var blockNumber = row["blockNumber"];
+totalColumns = 2;
+columnNumber = 2;
+((blockNumber - columnNumber) >= 0) &amp;&amp; (((blockNumber - columnNumber) % totalColumns) == 0)</expression>
+                                    <expression name="value1">true</expression>
+                                </structure>
+                            </list-property>
+                            <column id="1224"/>
+                            <detail>
+                                <row id="1190">
+                                    <cell id="1191">
+                                        <property name="paddingTop">0pt</property>
+                                        <property name="paddingLeft">0pt</property>
+                                        <property name="paddingBottom">0pt</property>
+                                        <property name="paddingRight">0pt</property>
+                                        <grid id="1192">
+                                            <property name="marginTop">0pt</property>
+                                            <property name="width">100%</property>
+                                            <column id="1193">
+                                                <property name="width">50%</property>
+                                            </column>
+                                            <column id="1194">
+                                                <property name="width">20%</property>
+                                                <property name="textAlign">right</property>
+                                            </column>
+                                            <column id="1195">
+                                                <property name="width">20%</property>
+                                                <property name="textAlign">right</property>
+                                            </column>
+                                            <column id="1196">
+                                                <property name="width">10%</property>
+                                            </column>
+                                            <row id="1197">
+                                                <list-property name="visibility">
+                                                    <structure>
+                                                        <property name="format">all</property>
+                                                        <expression name="valueExpr">var visibilityResult = row["journalEntryType"] != "Summary";
+if (visibilityResult) {
+  // We reset the highlightRowCount, so we always start with the same color
+  highlightRowCount1 = 0;
+}
+visibilityResult</expression>
+                                                    </structure>
+                                                </list-property>
+                                                <cell id="1198">
+                                                    <property name="colSpan">4</property>
+                                                    <property name="rowSpan">1</property>
+                                                    <property name="paddingTop">1.5em</property>
+                                                    <grid id="1199">
+                                                        <property name="backgroundColor">#A6A6A6</property>
+                                                        <property name="borderBottomColor">#000000</property>
+                                                        <property name="borderBottomStyle">solid</property>
+                                                        <property name="borderBottomWidth">thin</property>
+                                                        <property name="borderLeftColor">#000000</property>
+                                                        <property name="borderLeftStyle">solid</property>
+                                                        <property name="borderLeftWidth">thin</property>
+                                                        <property name="borderRightColor">#000000</property>
+                                                        <property name="borderRightStyle">solid</property>
+                                                        <property name="borderRightWidth">thin</property>
+                                                        <property name="borderTopColor">#000000</property>
+                                                        <property name="borderTopStyle">solid</property>
+                                                        <property name="borderTopWidth">thin</property>
+                                                        <property name="width">100%</property>
+                                                        <column id="1200">
+                                                            <property name="width">50%</property>
+                                                        </column>
+                                                        <column id="1201">
+                                                            <property name="width">20%</property>
+                                                            <property name="textAlign">right</property>
+                                                        </column>
+                                                        <column id="1202">
+                                                            <property name="width">20%</property>
+                                                            <property name="textAlign">right</property>
+                                                        </column>
+                                                        <column id="1203">
+                                                            <property name="width">10%</property>
+                                                        </column>
+                                                        <row id="1204">
+                                                            <method name="onRender"><![CDATA[highlightRowCount1 = 0;]]></method>
+                                                            <cell id="1205">
+                                                                <property name="colSpan">4</property>
+                                                                <property name="rowSpan">1</property>
+                                                                <property name="paddingTop">0.5em</property>
+                                                                <property name="paddingLeft">1pt</property>
+                                                                <property name="paddingBottom">1pt</property>
+                                                                <data id="1206">
+                                                                    <property name="resultSetColumn">transferDescription</property>
+                                                                </data>
+                                                            </cell>
+                                                        </row>
+                                                        <row id="1207">
+                                                            <list-property name="visibility">
+                                                                <structure>
+                                                                    <property name="format">all</property>
+                                                                    <expression name="valueExpr">true</expression>
+                                                                </structure>
+                                                            </list-property>
+                                                            <cell id="1208">
+                                                                <property name="paddingTop">1pt</property>
+                                                                <property name="paddingLeft">1em</property>
+                                                                <property name="paddingBottom">1pt</property>
+                                                                <label id="1209">
+                                                                    <text-property name="text" key="header.account">Anchor</text-property>
+                                                                </label>
+                                                            </cell>
+                                                            <cell id="1210">
+                                                                <label id="1211">
+                                                                    <text-property name="text" key="header.credit">Credit</text-property>
+                                                                </label>
+                                                            </cell>
+                                                            <cell id="1212">
+                                                                <label id="1213">
+                                                                    <text-property name="text" key="header.debit">Debit</text-property>
+                                                                </label>
+                                                            </cell>
+                                                            <cell id="1214"/>
+                                                        </row>
+                                                    </grid>
+                                                </cell>
+                                            </row>
+                                            <row id="1215">
+                                                <list-property name="highlightRules">
+                                                    <structure>
+                                                        <property name="operator">eq</property>
+                                                        <property name="backgroundColor">#D4D4D4</property>
+                                                        <expression name="testExpr">// row._outer["hightlightRowCount"] % 2
+row["test"] % 2</expression>
+                                                        <expression name="value1">1</expression>
+                                                    </structure>
+                                                </list-property>
+                                                <list-property name="visibility">
+                                                    <structure>
+                                                        <property name="format">all</property>
+                                                        <expression name="valueExpr">"Summary".equals(row["journalEntryType"])</expression>
+                                                    </structure>
+                                                </list-property>
+                                                <cell id="1216">
+                                                    <property name="paddingTop">1pt</property>
+                                                    <property name="paddingLeft">1em</property>
+                                                    <property name="paddingBottom">1pt</property>
+                                                    <data id="1217">
+                                                        <property name="resultSetColumn">refAnchorDescription</property>
+                                                    </data>
+                                                </cell>
+                                                <cell id="1218">
+                                                    <data id="1219">
+                                                        <list-property name="visibility">
+                                                            <structure>
+                                                                <property name="format">all</property>
+                                                                <expression name="valueExpr">row["journalEntryType"] == "Debit"</expression>
+                                                            </structure>
+                                                        </list-property>
+                                                        <property name="resultSetColumn">amount</property>
+                                                    </data>
+                                                </cell>
+                                                <cell id="1220">
+                                                    <data id="1221">
+                                                        <list-property name="visibility">
+                                                            <structure>
+                                                                <property name="format">all</property>
+                                                                <expression name="valueExpr">row["journalEntryType"] == "Credit"</expression>
+                                                            </structure>
+                                                        </list-property>
+                                                        <property name="resultSetColumn">amount</property>
+                                                    </data>
+                                                </cell>
+                                                <cell id="1222">
+                                                    <data id="1223">
+                                                        <property name="resultSetColumn">currencySymbol</property>
+                                                    </data>
+                                                </cell>
+                                            </row>
+                                        </grid>
+                                    </cell>
+                                </row>
+                            </detail>
+                        </table>
+                    </cell>
+                </row>
+            </footer>
+        </table>
+    </body>
+    <list-property name="images">
+        <structure>
+            <property name="name">JFire-Logo.jpg</property>
+            <property name="data">
+                /9j/4AAQSkZJRgABAQEASABIAAD/4QAWRXhpZgAATU0AKgAAAAgAAAAAAAD/2wBDAAUDBAQEAwUEBAQF
+                BQUGBwwIBwcHBw8LCwkMEQ8SEhEPERETFhwXExQaFRERGCEYGh0dHx8fExciJCIeJBweHx7/2wBDAQUF
+                BQcGBw4ICA4eFBEUHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4e
+                Hh7/wAARCABPAOsDASIAAhEBAxEB/8QAHAAAAgIDAQEAAAAAAAAAAAAAAAYFBwEECAID/8QARxAAAQIF
+                AQMHBwkHAQkAAAAAAQIDAAQFBhEHEiExE0FRYXGBkRQWIpSh0dIIFRcyQlaEkrFSVWJygpOi4SQlMzVG
+                U3ODwf/EABoBAQACAwEAAAAAAAAAAAAAAAAFBgECBAP/xAAuEQABAwIEAgoDAQEAAAAAAAABAAMEAhEF
+                EiExQZEGEyJRYXGBscHhMtHwM6H/2gAMAwEAAhEDEQA/AOy4IIIIiCCCCIggggiIIIIIiCCCCIggggiI
+                IIIIiCCMbSc42hntgizBBBBEQQQQREEfKXmGZgLLLiVhCyhRHAKHER9YwCDqFki26I8uuNstlx1aUISM
+                lSjgAQsXfe9KoKVMpUJud5mW1fV/mPN+sVDct0VevukzkwUs59Fhvcgd3P2mIXEMdjw70jtVdw+SpiBg
+                j8u1R7NPefgK1K7qPQacpTUspc+8N2GtyQf5j/8AMwuM33dlcmDL0Kksp6wkrKe1RISIr+miQS5y1QLi
+                208GWjhTnVn7I698WTaKrmrbCUUxti36OnclTLWVr7CeJ64hGMSlz3MprIHdSNeZ28yfRTT+GxYLeYUg
+                nvqOnIb+QHqt+Vod/TuF1C40SQP2GUgqHgAPbEizataa9IXlUyv+JAUPAmJum0tySWlXzpPzO70hMLCw
+                r2bu6JKLIzhzYF681/Go/BVcdnuE2py28KR8hQkmxckmQHZ2TqLQ47bZac8RkHwiZbUpSApSCgniknhH
+                qCO5tvqxYE+uv2uKtw1m5A9NPpEEEEei0RBBBBEQQQQREEEEERBBBBEQQQQRELd9XZLW1Jp9APzjoPJN
+                Z/yPVDJFJ11ldy6prp7zhS2ZjkOxCAc48D4xE4vMcjtClr86jYeqlMJiNyHSXfxpFz6LyzM3zeDq1yzs
+                yWM4PJq5JpPVnn9sbCtOrt2dvyiXUro8pVn9Idqzd9v2mtujoYeUplAHJMIGEDG7JJG+Jq2rhptwSin6
+                e6SUHDjaxhaD1iItrC4j1ZbeeNTnHVSbuJy2qOsZZFLfDT3VSP06/qECsGppbTvJadLiB3AmPchqRc0o
+                diYWxNAbiHWsHxGIu6IC5bRotdbUZmWDUwR6L7Q2Vjt6e+PR3BJDIvEeI8Cf72Xm1jMd42lsg+IH97pG
+                TqzOBGFUZgq6Q8QPDEQ9b1Gr9RaUyypqRbVuPIj0sfzHh3YjRu+z6pbzhW4nyiTJ9F9A3dihzGFyK5Lx
+                HEqCWnqyOQ9lYouH4dWA6zQCOfurSo+oFBolDl5CTlp2ZcbR6SlJCQpZ3kk5PEwvXHqHXKolTMsRT2Fb
+                ilo+mR1q4+GIToI83cZluNhsVWpGlhp9r0aweI3WXDTc766/SFEqUVKJJO8k88EABJAAyTFg2Hp/MTrr
+                dQrbSmJRJCksK3Ld7ege2OWJDeluZGhf4811S5jMRvO4bfPkvOm9jmqFFVqzZTJA5aaO4vdZ/h/WLgab
+                Q02lttCUISMJSkYAEQ9ZuOhUFsNTc402pKcJZb9JWOjA4Qpv6pS7j4Zp1GmZkk4TtKAJ7hmL1GqgYVR1
+                RrGbjxJ5KjyBOxSvrBQcvDgBzVjQQpSF01p1sOzNoVJDZ521BR/KcGJuTrDMwBtSs/LqP2XpVY9oGIlG
+                pjTv4nmCPcKMciut7jkQfZSUEYQoKTkcIzHSudEEEEERBBBBEQRqP1OmsOll+oSjTg4oW8lJHcTHtifk
+                ZhYQxOS7qjwCHQonwMEWxBBEdPV6hyD3Iz1Zp0q5+w9NIQrwJgikYIhvOy1vvLRvXm/ijIuq1zwuSjn8
+                c38UEUxBER502x946P66374Bc9tHhcNIP41v3wRS8VBqLS5yh3YLjppC0FxLq8by2vn2h0Hp6zFrU+oS
+                FQbU5ITstNoSdlSmHUrAPQSDGhccpb8+15PWFSoJHolx0IWOw5zEbikQSmcoNqgbg7WKkMNlmM9mtcHQ
+                jvCRpmu2BXFNVWrsusz6ACtsIX6ZHNu3EduI+ml4XP3hVq3KSypanOJKUoxgFRUCP0J74k6fYFnrmdtp
+                5ybA38n5SFD2b4bx83UengFUtIyjQxlRDaE953RwRIElx2l1/KLG/ZGpO2pXdKnR22qmmMxuLdrYDfQL
+                bgiG87LW+8tG9eb+KAXXa5OBclHP45v4osKgVLutodQptxCVoUMFKhkEQhXLpnTp5an6U6ZF07+TIy2T
+                2cRDR502x946P66374yLnto8LhpB7J1v3xyyoTEqnK7TddMaW9FqzNVWVNVWxLmp5JNPMy2PtsKC893H
+                2QvzEnNy6tmYlX2lDmW2Un2x0jIVGn1FClSE9KzaUnCiw6lYHbgxsLQhScLSlQ6xmK+90VZqN26yPPX9
+                KfZ6UPUizlAPlp+1zbR5yep84mYkEjlx9UloLI7Mg4MNzCNR6+nY255tlXFSiGE49hMWTMXFaVPmFNPV
+                qjSzw+skzDaVDtGYBeNpfeaj+ut++PSP0dqbGWp6rL3DT9rzkdIKXDmpZpv3nX9JPoulidsPVqoKdJOS
+                2xuz2qO/2Q+0ei0ukNcnT5JpgYwVJT6R7TxMafnjaX3mo/rrfvjPnfan3mo3rrfviYi4bGi/5Ua9+55q
+                IlYhIlf6VXHdw5KbgiE877U+81G9db98SdPn5Goy/lFPnJebZzs8ow6lac9GQcZjuXEtiCCCCIghOvzU
+                WgWdOMSVRTNPzLqOU5OXQCUpyQCckDfgxE0HWK2azWJSly0nVEPzbyWkFbSNkEnAzhR3QsisePnNPNy0
+                s7MOqCW2kFayeYAZMfSEfXKsfNGnM/sL2XpvZlW/6j6X+IVBFzJclScrFfn6o6TtTUwt3fzAkkDuEOXy
+                fae5PakSrqSQiTacfWR2bIHioRXsX58l6kclS6pW3E+k+4mXbP8ACkZV7SPCNjssKV+UBec7btLlqVSn
+                ixOTwUpbyT6TbY3bugk8/UY5xWpx50qWpbjizvJOSow9a9Vb501HnEJVtNSSUyyO0DKv8iYSJCZdkp5i
+                cYKQ6w4l1G0MjaScjI5+EAinm7DvNxAWi2amUkZB5AiPY0+vYjItmo/2oZhrdeY4ppp/Dn4oz9N95f8A
+                apn9g/FDVEtDTu9yM+bU/wDk/wBY9DTi+D/01O+A98Mg1wvEDezSz/6FfFGzTNZ70nqjLSTUtS1OPupa
+                SORVvKiAPtdcNUVkaOUGYs2wH3quz5PNOLXMvoJBKUgYAPXgZ74qmpTsxUJ56cmXFLddWVEk5480XPq5
+                UTI2etjaAdm1pa3dHFX6Y74pCKL0pkmp6lkHYX9T/f8AVdujEbK1U8eJsPIJ+0SklvXFMToJDcuxsnHA
+                lR3ewGFf5SlecnLsaobTyvJ5FpJcQDuLihnJ6wkjxMWlpJJt0yzHKk/hHLqU8tR5kJGB+hPfHM90VNyt
+                XHUKq6TtTT63B1AncO4YEWLAY/UwqAdzrz+lX8bf66bWRsNOX2vFDotVrk0qVpEg/OvJTtqQ0nJA6TE2
+                dOr3Az5tT/cge+H/AEaqVIsayn7nrhdSanNeTy4bRtKUhA4gdGdrwENa9cLOTwYqiuxhPxRMXUSuf67b
+                tcoQaNYpkzJB7PJ8qnG1jjjxERcM+pN3TV43G5UHQpqWQNiVZJ/4aOvrPExKaN2Qq768XZsEUuTIVMHO
+                Cs8yB28/VGUVifJqtmdkZKauObK2251Aal2ju2kg5Kz37h3xpfKGvmflZ4WrSphUukNhc442rClbW8Iz
+                zDG89ORF1nyeRkiQlDMvLt8AMBCUj9ABHG93VZdcuao1Zwn/AGl9S055k59EdwxGo1RaEpLzM7Nty0qy
+                4/MOq2UNoSVKUTzAc8T4sG9Dwtiqf2DEZbNbnrerTFXpxbEyxnYLiNobwQd3YYeBrXeoP16efw/+sbao
+                lvzAvX7s1P8AsmMjT69iM+bNR/tQyfTbevTTvV/9YyrW29CMAU4dYlz74xqiWxp5exIHmzUN/S3HSOlN
+                vO2zY8jTZlCUTRBdmADnC1HOM9QwO6Ky031OvO5L0p9JdEkuXdUS/ssYIQASTnO6L3jBugRBBBGFlcn6
+                2VBVR1LqyicpYcEunqCAAfbmIax621bt0yNaelPK0yqyrktvZycEA5weGcxauoejlcqdyz9Xo85JutTb
+                xeLTyihSCo5IzggjMLf0J3t0U31k+6NlhNh1/l+a13T2zo+CETVXUV690SbCaf5BLSxUvYL3KFazuznA
+                4D9TEgNEb1PE0wdswfhjI0RvT9ql+sH4YaIqyjrSwJRq1NL5IzA2BLyZmn88ckFas+OO6K0s/Q+pN1hi
+                ZuKclBKNLC1MsKKlO4+ySQMCLevmjzVbtCoUaQfblnplnk0rXnZAyMg45iMiMEoFyBUpp2eqExOvnLr7
+                qnFnrUcmLS+T9ZNKuL5xqdbkxNSzBSyy2okJKyMqJxxwNnxj5/QVdO1j5wpWOnlF/DFz6ZWv5o2mxSVu
+                oef21OvuIGApaujsAA7oySi+A02sYHPm3J/5e+PQ04sccLake9J98NcEarKVhp3ZA4W1T+9vMbNPsm0q
+                fNtTcnb9PZmGlbTbiWhtJPSOuGCCCKndbKj5RX2KchWUyrWVD+JW/wDTHjCJKsrmJlqXbGVurCEjpJOI
+                si79Pq7U7inKhLPSq2n17SdtwhQGBu4c0fSzdO6nT6/LVCpuSvIy6tsIbUVFSsbubp390UCXhsyXOqqq
+                oNid/Db2V8iYjEiwqaaaxcDbx391v6uTyLY0nekmVBK3WUSLWOJyMKP5QqOYWGnH322WkFbjiglCRxJJ
+                wBHTms1k1u9BTmabOyjEvLbanEPFQ2lnAB3A8AD4wp2Jo1VqTdkhU6tOSDsrKucqUNFRUpQ+rxA58Hui
+                /wBAFFIA4Kh1E1G5TfU9LKNWLeolLn5qdZFLl+TSJdaQFKOConKTvyIihoTaeP8AmFYz/wCVv4ItaCF0
+                XGt7UNy27pn6M4VKEu5htSuKkHek94Ih3+TlXzTLyVSXV4YqTewMng4nJT4jI7xFg6x6Zzt3VWVqlJfl
+                WJhLXJPh4kBQBykggHfvI8ISqXoxedOqctPS8/Skuy7yXEKDq9xBz+zG11hWbrpWvmbTydDa9l+dxKt/
+                1fW/xBjlaOtNUrNVelutyCZsSsyw6HWllOUE4III6N8VF9BV05P+8KX+dfwwCFaumlW0xptB2bmprk1U
+                1OKK1OS5cSE82zvwN0NAubREnfQmx+BPviB+gq6f3hS/zr+GMjQm5+epUsf1r+GGiKd84tDv3Kj1Jfvj
+                Kbi0Ozn5mbHbJLMQX0E3N+86X+ZfwwDQi5uep0sf1L+GGiK2tN27JnpRytWjS5eXTtlhToly2okAEjfv
+                xvEOEQdh283a9qyVGQsOKZSS64BgLWTlR8YnI1WUQQQQRf/Z
+            </property>
+        </structure>
+    </list-property>
+</report>

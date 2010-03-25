@@ -1,4 +1,4 @@
-<!DOCTYPE script-category PUBLIC "-//NightLabs//DTD ScriptingInitializer V 1.0//EN" "http://www.nightlabs.de/dtd/scripting-initialiser-content_0_2.dtd">
+<!DOCTYPE script-category PUBLIC "-//NightLabs//DTD ScriptingInitialiser V 0.2//EN" "http://www.nightlabs.de/dtd/scripting-initialiser-content_0_2.dtd">
 <script-category 
 	id="MoneyTransfer-Category"
 	type="JFireReportingTrade-MoneyTransfer"
@@ -15,7 +15,7 @@
 		<name language="en">Money transfers: list</name>
 		<parameter-set>
 			<name language="de">ParameterSet: Geldtransferliste</name>
-			<name language="en">ParameterSet: Moeny transfer list</name>
+			<name language="en">ParametNumberFormattererSet: Money transfer list</name>
 			<parameter name="timePeriod" type="org.nightlabs.util.TimePeriod"/>	
 			<parameter name="accountIDs" type="java.util.Collection"/>	
 			<parameter name="initiatorIDs" type="java.util.Collection"/>	
@@ -70,6 +70,23 @@
 			<parameter name="bookUserIDs" type="java.util.Collection"/>	
 			<parameter name="productTypeIDs" type="java.util.Collection"/>
 			<parameter name="productTypeOwnerIDs" type="java.util.Collection"/>	
+		</parameter-set>
+	</script>
+	
+	<script 
+		file="GeneralLedgerJournalList.javaclass" 
+		id="GeneralLedgerJournalList.javaclass"
+		resultClass="org.eclipse.datatools.connectivity.oda.IResultSet"
+	>
+		<name language="de">Hauptbuch-Journal Daten</name>
+		<name language="en">General ledger journal data</name>
+		<parameter-set>
+			<name language="de">ParameterSet: Hauptbuch-Journal</name>
+			<name language="en">ParameterSet: General ledger journal</name>
+			<parameter name="timePeriod" type="org.nightlabs.util.TimePeriod"/>
+			<parameter name="addSummaryRows" type="java.lang.Boolean"/>
+			<parameter name="consolidate" type="java.lang.Boolean"/>
+			<parameter name="excludeLegalEntities" type="java.lang.Boolean"/>
 		</parameter-set>
 	</script>
 	

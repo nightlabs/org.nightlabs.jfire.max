@@ -1,10 +1,12 @@
 package org.nightlabs.jfire.store;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -12,6 +14,12 @@ import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.jdo.NLJDOHelper;
@@ -31,14 +39,7 @@ import org.nightlabs.jfire.security.listener.SecurityChangeEvent_Authority_creat
 import org.nightlabs.jfire.security.listener.SecurityChangeEvent_AuthorizedObjectRef_addRemoveRole;
 import org.nightlabs.jfire.security.listener.SecurityChangeListener;
 import org.nightlabs.jfire.security.listener.id.SecurityChangeListenerID;
-import org.nightlabs.util.CollectionUtil;
-
-import javax.jdo.annotations.Inheritance;
-import javax.jdo.annotations.PersistenceModifier;
-import javax.jdo.annotations.Persistent;
-import javax.jdo.annotations.InheritanceStrategy;
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.IdentityType;
+import org.nightlabs.jfire.store.id.ProductTypeID;
 
 /**
  *
@@ -310,17 +311,17 @@ extends SecurityChangeListener
 		}
 
 		private static void populateUserLocalID2ProductTypeSetMap(
-				Map<UserLocalID, Set<ProductType>> destination,
+				Map<UserLocalID, Set<ProductTypeID>> destination,
 				UserLocalID userLocalID,
-				Collection<ProductType> productTypes
+				Collection<ProductTypeID> productTypeIDs
 		)
 		{
-			Set<ProductType> collectedProductTypes = destination.get(userLocalID);
-			if (collectedProductTypes == null) {
-				collectedProductTypes = new HashSet<ProductType>(Math.max(10, productTypes.size()));
-				destination.put(userLocalID, collectedProductTypes);
+			Set<ProductTypeID> collectedProductTypeIDs = destination.get(userLocalID);
+			if (collectedProductTypeIDs == null) {
+				collectedProductTypeIDs = new HashSet<ProductTypeID>(Math.max(10, productTypeIDs.size()));
+				destination.put(userLocalID, collectedProductTypeIDs);
 			}
-			collectedProductTypes.addAll(productTypes);
+			collectedProductTypeIDs.addAll(productTypeIDs);
 		}
 
 		private static void populateUserLocalID2AuthorityIDMap(Map<UserLocalID, Set<AuthorityID>> destination, Map<UserLocalID, Set<AuthorityID>> source)
@@ -356,8 +357,8 @@ extends SecurityChangeListener
 						userLocalIDs.addAll(sellProductTypeGrantChanged.keySet());
 						userLocalIDs.addAll(reverseProductTypeGrantChanged.keySet());
 
-						Map<UserLocalID, Set<ProductType>> userLocalID2productTypes_see = new HashMap<UserLocalID, Set<ProductType>>();
-						Map<UserLocalID, Set<ProductType>> userLocalID2productTypes_sellReverse = new HashMap<UserLocalID, Set<ProductType>>();
+						Map<UserLocalID, Set<ProductTypeID>> userLocalID2productTypeIDs_see = new HashMap<UserLocalID, Set<ProductTypeID>>();
+						Map<UserLocalID, Set<ProductTypeID>> userLocalID2productTypeIDs_sellReverse = new HashMap<UserLocalID, Set<ProductTypeID>>();
 
 						for (UserLocalID userLocalID : userLocalIDs) {
 							UserID userID = UserID.create(userLocalID);
@@ -368,16 +369,17 @@ extends SecurityChangeListener
 									logger.debug("* productType missing permissionFlagSet: " + productType);
 								}
 							}
+							Collection<ProductTypeID> productTypeIDs = NLJDOHelper.getObjectIDList(productTypes);
 
-							populateUserLocalID2ProductTypeSetMap(userLocalID2productTypes_see, userLocalID, productTypes);
-							populateUserLocalID2ProductTypeSetMap(userLocalID2productTypes_sellReverse, userLocalID, productTypes);
+							populateUserLocalID2ProductTypeSetMap(userLocalID2productTypeIDs_see, userLocalID, productTypeIDs);
+							populateUserLocalID2ProductTypeSetMap(userLocalID2productTypeIDs_sellReverse, userLocalID, productTypeIDs);
 						}
 
 						for (Map.Entry<UserLocalID, Set<AuthorityID>> me : seeProductTypeGrantChanged.entrySet()) {
 							UserLocalID userLocalID = me.getKey();
 							Set<AuthorityID> authorityIDs = me.getValue();
-							Set<ProductType> affectedProductTypes = getDirectlyAffectedProductTypes(pm, userLocalID, authorityIDs, true);
-							populateUserLocalID2ProductTypeSetMap(userLocalID2productTypes_see, userLocalID, affectedProductTypes);
+							Set<ProductTypeID> affectedProductTypeIDs = getDirectlyAffectedProductTypeIDs(pm, userLocalID, authorityIDs, true);
+							populateUserLocalID2ProductTypeSetMap(userLocalID2productTypeIDs_see, userLocalID, affectedProductTypeIDs);
 						}
 
 						Map<UserLocalID, Set<AuthorityID>> sellOrReverseProductTypeGrantChanged = new HashMap<UserLocalID, Set<AuthorityID>>();
@@ -387,25 +389,16 @@ extends SecurityChangeListener
 						for (Map.Entry<UserLocalID, Set<AuthorityID>> me : sellOrReverseProductTypeGrantChanged.entrySet()) {
 							UserLocalID userLocalID = me.getKey();
 							Set<AuthorityID> authorityIDs = me.getValue();
-							Set<ProductType> affectedProductTypes = getDirectlyAffectedProductTypes(pm, userLocalID, authorityIDs, false);
-							populateUserLocalID2ProductTypeSetMap(userLocalID2productTypes_sellReverse, userLocalID, affectedProductTypes);
+							Set<ProductTypeID> affectedProductTypeIDs = getDirectlyAffectedProductTypeIDs(pm, userLocalID, authorityIDs, false);
+							populateUserLocalID2ProductTypeSetMap(userLocalID2productTypeIDs_sellReverse, userLocalID, affectedProductTypeIDs);
 						}
 
-						for (Map.Entry<UserLocalID, Set<ProductType>> me : userLocalID2productTypes_see.entrySet()) {
-							UserLocalID userLocalID = me.getKey();
-							Set<ProductType> productTypes = me.getValue();
-							UserLocal userLocal = (UserLocal) pm.getObjectById(userLocalID);
-
-							ProductTypePermissionFlagSet.updateFlagsSeeProductType(pm, productTypes, userLocal.getUser());
-						}
-
-						for (Map.Entry<UserLocalID, Set<ProductType>> me : userLocalID2productTypes_sellReverse.entrySet()) {
-							UserLocalID userLocalID = me.getKey();
-							Set<ProductType> productTypes = me.getValue();
-							UserLocal userLocal = (UserLocal) pm.getObjectById(userLocalID);
-
-							ProductTypePermissionFlagSet.updateFlagsSellReverseProductType(pm, productTypes, userLocal.getUser());
-						}
+						AsyncInvoke.exec(
+								new UpdateFlagsInvocation(
+										userLocalID2productTypeIDs_see, userLocalID2productTypeIDs_sellReverse
+								),
+								true
+						);
 					} finally {
 						NLJDOHelper.disableTransactionSerializeReadObjects(pm);
 					}
@@ -418,7 +411,114 @@ extends SecurityChangeListener
 		}
 	}
 
-	private static Set<ProductType> getDirectlyAffectedProductTypes(
+	private static class UpdateFlagsInvocation extends Invocation
+	{
+		private static final long serialVersionUID = 1L;
+		private Map<UserLocalID, Set<ProductTypeID>> userLocalID2productTypeIDs_see;
+		private Map<UserLocalID, Set<ProductTypeID>> userLocalID2productTypeIDs_sellReverse;
+
+		public UpdateFlagsInvocation(
+				Map<UserLocalID, Set<ProductTypeID>> userLocalID2productTypeIDs_see,
+				Map<UserLocalID, Set<ProductTypeID>> userLocalID2productTypeIDs_sellReverse
+		)
+		{
+			if (userLocalID2productTypeIDs_see == null)
+				throw new IllegalArgumentException("userLocalID2productTypeIDs_see == null");
+
+			if (userLocalID2productTypeIDs_sellReverse == null)
+				throw new IllegalArgumentException("userLocalID2productTypeIDs_sellReverse == null");
+
+			this.userLocalID2productTypeIDs_see = userLocalID2productTypeIDs_see;
+			this.userLocalID2productTypeIDs_sellReverse = userLocalID2productTypeIDs_sellReverse;
+		}
+
+		private static final int PRODUCT_TYPE_CHUNK_SIZE = 10;
+		private static final long MAX_TX_DURATION = 30000L;
+
+		@Override
+		public Serializable invoke() throws Exception {
+			synchronized (ProductTypePermissionFlagSet.getMutex(getOrganisationID())) {
+				long startTimestamp = System.currentTimeMillis();
+				PersistenceManager pm = getPersistenceManager();
+				try {
+					NLJDOHelper.enableTransactionSerializeReadObjects(pm);
+					try {
+						boolean pristine = true;
+						for (Iterator<Map.Entry<UserLocalID, Set<ProductTypeID>>> it1 = userLocalID2productTypeIDs_see.entrySet().iterator(); it1.hasNext(); ) {
+							if (System.currentTimeMillis() - startTimestamp > MAX_TX_DURATION && !pristine)
+								break;
+
+							pristine = false;
+
+							Map.Entry<UserLocalID, Set<ProductTypeID>> me = it1.next();
+							UserLocalID userLocalID = me.getKey();
+							Set<ProductTypeID> productTypeIDs_source = me.getValue();
+							UserLocal userLocal = (UserLocal) pm.getObjectById(userLocalID);
+
+							Collection<ProductType> productTypes = new ArrayList<ProductType>(PRODUCT_TYPE_CHUNK_SIZE);
+							for (Iterator<ProductTypeID> it2 = productTypeIDs_source.iterator(); it2.hasNext();) {
+								ProductTypeID productTypeID = it2.next();
+								ProductType productType = (ProductType) pm.getObjectById(productTypeID);
+								productTypes.add(productType);
+								it2.remove();
+								if (productTypes.size() >= PRODUCT_TYPE_CHUNK_SIZE)
+									break;
+							}
+
+							if (productTypeIDs_source.isEmpty())
+								it1.remove();
+
+							ProductTypePermissionFlagSet.updateFlagsSeeProductType(pm, productTypes, userLocal.getUser());
+						}
+
+						for (Iterator<Map.Entry<UserLocalID, Set<ProductTypeID>>> it1 = userLocalID2productTypeIDs_sellReverse.entrySet().iterator(); it1.hasNext(); ) {
+							if (System.currentTimeMillis() - startTimestamp > MAX_TX_DURATION && !pristine)
+								break;
+
+							pristine = false;
+
+							Map.Entry<UserLocalID, Set<ProductTypeID>> me = it1.next();
+							UserLocalID userLocalID = me.getKey();
+							Set<ProductTypeID> productTypeIDs_source = me.getValue();
+							UserLocal userLocal = (UserLocal) pm.getObjectById(userLocalID);
+
+							Collection<ProductType> productTypes = new ArrayList<ProductType>(PRODUCT_TYPE_CHUNK_SIZE);
+							for (Iterator<ProductTypeID> it2 = productTypeIDs_source.iterator(); it2.hasNext();) {
+								ProductTypeID productTypeID = it2.next();
+								ProductType productType = (ProductType) pm.getObjectById(productTypeID);
+								productTypes.add(productType);
+								it2.remove();
+								if (productTypes.size() >= PRODUCT_TYPE_CHUNK_SIZE)
+									break;
+							}
+
+							if (productTypeIDs_source.isEmpty())
+								it1.remove();
+
+							ProductTypePermissionFlagSet.updateFlagsSellReverseProductType(pm, productTypes, userLocal.getUser());
+						}
+
+						if (!userLocalID2productTypeIDs_see.isEmpty() || !userLocalID2productTypeIDs_sellReverse.isEmpty()) {
+							AsyncInvoke.exec(
+									new UpdateFlagsInvocation(
+											userLocalID2productTypeIDs_see, userLocalID2productTypeIDs_sellReverse
+									),
+									true
+							);
+						}
+
+						return null;
+					} finally {
+						NLJDOHelper.disableTransactionSerializeReadObjects(pm);
+					}
+				} finally {
+					pm.close();
+				}
+			}
+		}
+	}
+
+	private static Set<ProductTypeID> getDirectlyAffectedProductTypeIDs(
 			PersistenceManager pm,
 			UserLocalID userLocalID,
 			Set<AuthorityID> authorityIDs,
@@ -438,28 +538,34 @@ extends SecurityChangeListener
 //		Set<Authority> authorities = NLJDOHelper.getObjectSet(pm, authorityIDs, Authority.class);
 
 		Query q = pm.newQuery(ProductType.class);
-		StringBuilder filter = new StringBuilder();
+		try {
+			q.setResult("JDOHelper.getObjectId(this)");
+			StringBuilder filter = new StringBuilder();
 
-		q.declareVariables(ProductTypePermissionFlagSet.class.getName() + " productTypePermissionFlagSet");
-		filter.append("productTypePermissionFlagSet.productType == this");
+			q.declareVariables(ProductTypePermissionFlagSet.class.getName() + " productTypePermissionFlagSet");
+			filter.append("productTypePermissionFlagSet.productType == this");
 
-		filter.append(" && this.inheritanceNature == "); filter.append(ProductType.INHERITANCE_NATURE_LEAF);
+			filter.append(" && this.inheritanceNature == "); filter.append(ProductType.INHERITANCE_NATURE_LEAF);
 
-		if (includeClosedButNotYetExpired)
-			filter.append(" && !productTypePermissionFlagSet.expired");
-		else
-			filter.append(" && !productTypePermissionFlagSet.closed");
+			if (includeClosedButNotYetExpired)
+				filter.append(" && !productTypePermissionFlagSet.expired");
+			else
+				filter.append(" && !productTypePermissionFlagSet.closed");
 
-		if (!organisationAuthorityContained) // if this authority is contained in the list, all product-types are affected - no matter what securing-authority they have configured
-			filter.append(" && :securingAuthorityIDs.contains(this.productTypeLocal.securingAuthorityID)");
+			if (!organisationAuthorityContained) // if this authority is contained in the list, all product-types are affected - no matter what securing-authority they have configured
+				filter.append(" && :securingAuthorityIDs.contains(this.productTypeLocal.securingAuthorityID)");
 
-		q.setFilter(filter.toString());
+			q.setFilter(filter.toString());
 
-		Map<String, Object> params = new HashMap<String, Object>();
-		params.put("securingAuthorityIDs", securingAuthorityIDAsStringSet);
-		params.put("userID", userID);
-		Collection<ProductType> c = CollectionUtil.castCollection((Collection<?>) q.executeWithMap(params));
-		return new HashSet<ProductType>(c);
+			Map<String, Object> params = new HashMap<String, Object>();
+			params.put("securingAuthorityIDs", securingAuthorityIDAsStringSet);
+			params.put("userID", userID);
+			@SuppressWarnings("unchecked")
+			Collection<ProductTypeID> c = (Collection<ProductTypeID>) q.executeWithMap(params);
+			return new HashSet<ProductTypeID>(c);
+		} finally {
+			q.closeAll();
+		}
 	}
 
 }

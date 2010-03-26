@@ -31,6 +31,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -41,6 +42,19 @@ import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.Discriminator;
+import javax.jdo.annotations.DiscriminatorStrategy;
+import javax.jdo.annotations.Element;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.Queries;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.ModuleException;
@@ -66,6 +80,7 @@ import org.nightlabs.jfire.store.deliver.Delivery;
 import org.nightlabs.jfire.store.deliver.DeliveryData;
 import org.nightlabs.jfire.store.deliver.id.DeliveryDataID;
 import org.nightlabs.jfire.store.id.ProductID;
+import org.nightlabs.jfire.store.id.ProductTypeActionHandlerID;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.CustomerGroupMapping;
@@ -93,21 +108,6 @@ import org.nightlabs.jfire.transfer.Anchor;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 import org.nightlabs.util.CollectionUtil;
 import org.nightlabs.util.Util;
-
-import org.nightlabs.jfire.store.id.ProductTypeActionHandlerID;
-import javax.jdo.annotations.Inheritance;
-import javax.jdo.annotations.PrimaryKey;
-import javax.jdo.annotations.PersistenceModifier;
-import javax.jdo.annotations.Discriminator;
-import javax.jdo.annotations.Element;
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.DiscriminatorStrategy;
-import javax.jdo.annotations.NullValue;
-import javax.jdo.annotations.Persistent;
-import javax.jdo.annotations.InheritanceStrategy;
-import javax.jdo.annotations.Queries;
-import javax.jdo.annotations.Column;
-import javax.jdo.annotations.IdentityType;
 
 /**
  * <p>
@@ -1384,7 +1384,9 @@ public abstract class ProductTypeActionHandler
 		// (by ProductTypeLocal.postInherit(...)) as well as directly by ProductTypeLocal.setSecuringAuthority() and then simply
 		// "commit" all changes at once here.
 		Set<ProductTypeID> productTypeIDsAssignedSecuringAuthority = CollectionUtil.castSet((Set<?>) pm.getUserObject(pmKey_productTypeIDsAssignedSecuringAuthority));
-		if (productTypeIDsAssignedSecuringAuthority != null && !productTypeIDsAssignedSecuringAuthority.isEmpty()) {
+
+		if (productTypeIDsAssignedSecuringAuthority != null && !productTypeIDsAssignedSecuringAuthority.isEmpty())
+		{
 			try {
 				AsyncInvoke.exec(
 						new CalculateProductTypePermissionFlagSetsInvocation(productTypeIDsAssignedSecuringAuthority),
@@ -1397,10 +1399,61 @@ public abstract class ProductTypeActionHandler
 		productTypeIDsAssignedSecuringAuthority = null;
 	}
 
+//	/**
+//	 * Notify the {@link ProductTypeActionHandler} about the fact that {@link ProductType#applyInheritance()}
+//	 * was called. This method is not triggered for all children, but only for the original {@link ProductType}
+//	 * (where <code>applyInheritance()</code> was called).
+//	 *
+//	 * @param productType the {@link ProductType} instance on which the method {@link ProductType#applyInheritance()} was invoked.
+//	 */
+//	public void postApplyInheritance(ProductType productType)
+//	{
+//		PersistenceManager pm = getPersistenceManager();
+//
+//		// applyInheritance() is called when a securingAuthorityID has been assigned using ProductTypeLocal.setSecuringAuthority().
+//		// Therefore, we can collect all changes during onAssignSecuringAuthority(...) since this is called during inheritance
+//		// (by ProductTypeLocal.postInherit(...)) as well as directly by ProductTypeLocal.setSecuringAuthority() and then simply
+//		// "commit" all changes at once here.
+//		Set<ProductTypeID> productTypeIDsAssignedSecuringAuthority = CollectionUtil.castSet((Set<?>) pm.getUserObject(pmKey_productTypeIDsAssignedSecuringAuthority));
+//
+//		if (productTypeIDsAssignedSecuringAuthority != null && !productTypeIDsAssignedSecuringAuthority.isEmpty())
+//		{
+//			if (logger.isDebugEnabled()) {
+//				logger.debug("postApplyInheritance: productTypeIDsAssignedSecuringAuthority.size() = "+productTypeIDsAssignedSecuringAuthority.size());
+//			}
+//
+//			int chunkSize = 1000;
+//			Set<ProductTypeID> chunkSet = new HashSet<ProductTypeID>(chunkSize);
+//			// iterate over all productTypeIDs and each chunkSize create a new invocation
+//			for (Iterator<ProductTypeID> it = productTypeIDsAssignedSecuringAuthority.iterator(); it.hasNext(); )
+//			{
+//				ProductTypeID productTypeID = it.next();
+//				chunkSet.add(productTypeID);
+//				it.remove();
+//
+//				if (!it.hasNext() || chunkSet.size() >= chunkSize)
+//				{
+//					try {
+//						AsyncInvoke.exec(
+//								new CalculateProductTypePermissionFlagSetsInvocation(chunkSet),
+//								true
+//						);
+//					} catch (Exception e) {
+//						throw new RuntimeException(e);
+//					}
+//					chunkSet = new HashSet<ProductTypeID>(chunkSize);
+//				}
+//			}
+//		}
+//		productTypeIDsAssignedSecuringAuthority = null;
+//	}
+
 	public static class CalculateProductTypePermissionFlagSetsInvocation
 	extends Invocation
 	{
 		private static final long serialVersionUID = 1L;
+		private static final int PRODUCT_TYPE_CHUNK_SIZE = 10;
+		private static final long MAX_TX_DURATION = 30000L;
 
 		private Set<ProductTypeID> productTypeIDs;
 
@@ -1416,15 +1469,36 @@ public abstract class ProductTypeActionHandler
 		public Serializable invoke() throws Exception
 		{
 			synchronized (ProductTypePermissionFlagSet.getMutex(getOrganisationID())) {
-
 				PersistenceManager pm = getPersistenceManager();
 				try {
 					NLJDOHelper.enableTransactionSerializeReadObjects(pm);
 					try {
+						long start = System.currentTimeMillis();
+//						List<ProductType> productTypes = NLJDOHelper.getObjectList(pm, productTypeIDs, ProductType.class);
+						do {
+							Collection<ProductType> productTypes = new ArrayList<ProductType>(PRODUCT_TYPE_CHUNK_SIZE);
+							for (Iterator<ProductTypeID> it = productTypeIDs.iterator(); it.hasNext();) {
+								ProductTypeID productTypeID = it.next();
+								ProductType productType = (ProductType) pm.getObjectById(productTypeID);
+								productTypes.add(productType);
+								it.remove();
+								if (productTypes.size() >= PRODUCT_TYPE_CHUNK_SIZE)
+									break;
+							}
 
-						List<ProductType> productTypes = NLJDOHelper.getObjectList(pm, productTypeIDs, ProductType.class);
-						ProductTypePermissionFlagSet.updateFlags(pm, productTypes);
+							ProductTypePermissionFlagSet.updateFlags(pm, productTypes);
+							if (logger.isDebugEnabled()) {
+								long duration = System.currentTimeMillis() - start;
+								logger.debug("Updating ProductTypePermissionFlagSet for "+productTypes.size()+" ProductTypes took "+duration+" ms");
+							}
+						} while (System.currentTimeMillis() - start <= MAX_TX_DURATION);
 
+						if (!productTypeIDs.isEmpty()) {
+							AsyncInvoke.exec(
+									new CalculateProductTypePermissionFlagSetsInvocation(productTypeIDs),
+									true
+							);
+						}
 					} finally {
 						NLJDOHelper.disableTransactionSerializeReadObjects(pm);
 					}

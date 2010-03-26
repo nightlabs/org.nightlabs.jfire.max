@@ -27,6 +27,7 @@
 package org.nightlabs.jfire.reporting.layout.render;
 
 import java.io.Serializable;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 
@@ -40,15 +41,36 @@ import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  *
  */
-public class RenderedReportLayout implements Serializable {
+public class RenderedReportLayout implements Serializable
+{
 	private static final long serialVersionUID = 1L;
+
+	public static String getDefaultReportFileName()
+	{
+		StringBuffer sb = new StringBuffer();
+		Calendar cal = Calendar.getInstance();
+		sb.append("renderedLayout");
+		sb.append("-");
+		sb.append(cal.get(Calendar.YEAR));
+		sb.append("-");
+		sb.append(cal.get(Calendar.MONTH));
+		sb.append("-");
+		sb.append(cal.get(Calendar.DAY_OF_MONTH));
+		sb.append("-");
+		sb.append(cal.get(Calendar.HOUR_OF_DAY));
+		sb.append(cal.get(Calendar.MINUTE));
+		sb.append(cal.get(Calendar.SECOND));
+		return sb.toString();
+
+//		return "renderedLayout";
+	}
 
 	/**
 	 * The header holds the descriptive information
 	 * for a {@link RenderedReportLayout}
 	 */
 	public class Header implements Serializable {
-		private static final long serialVersionUID = 20100129L;
+		private static final long serialVersionUID = 2L;
 
 		private ReportRegistryItemID reportRegistryItemID;
 		private Birt.OutputFormat outputFormat;
@@ -64,7 +86,7 @@ public class RenderedReportLayout implements Serializable {
 			this.outputFormat = outputFormat;
 			this.zipped = false;
 			this.multipleFiles = false;
-			this.entryFileName = "renderedLayout."+outputFormat.toString();
+			this.entryFileName = getDefaultReportFileName() + "." + outputFormat.toString();
 		}
 
 		/**
@@ -111,7 +133,7 @@ public class RenderedReportLayout implements Serializable {
 
 		/**
 		 * Returns the file name of the entry of the renderedLayout.
-		 * Defaults to 'renderedLayout.'[OUTPUTFORMAT].
+		 * Defaults to {@link RenderedReportLayout#getDefaultReportFileName()}.
 		 * @return the entryFileName
 		 */
 		public String getEntryFileName() {

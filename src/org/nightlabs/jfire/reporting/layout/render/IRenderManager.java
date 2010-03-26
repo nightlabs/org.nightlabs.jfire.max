@@ -15,13 +15,13 @@ import org.nightlabs.jfire.reporting.ReportingEngine;
  */
 public interface IRenderManager
 {
-	public static final String DEFAULT_ENTRY_FILE_NAME = "renderedLayout";
+//	public static final String DEFAULT_ENTRY_FILE_NAME = "renderedLayout";
 	
 	/**
 	 * Lets the underlying report engine render the given report with the given params in the given format.
 	 * The report will be rendered into the default temporary folder for
 	 * rendered report layouts (see {@link ReportLayoutRendererUtil#prepareRenderedLayoutOutputFolder()}).
-	 * Also it will set the entry file-name of the report to {@link #DEFAULT_ENTRY_FILE_NAME}.
+	 * Also it will set the entry file-name of the report to {@link RenderedReportLayout#getDefaultReportFileName()}.
 	 * 
 	 * @param pm
 	 * @param renderRequest

@@ -37,10 +37,10 @@ import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 
 import org.apache.log4j.Logger;
-import org.eclipse.datatools.connectivity.oda.IQuery;
 import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.reporting.layout.ReportLayout;
+import org.nightlabs.jfire.reporting.layout.render.RenderReportRequest;
 import org.nightlabs.jfire.reporting.oda.jfs.JFSParameterUtil;
 
 import com.thoughtworks.xstream.XStream;
@@ -67,14 +67,19 @@ public class JFireReportingHelper {
 	private static Logger logger = Logger.getLogger(JFireReportingHelper.class);
 
 	/**
+	 * A boolean can be placed under this
+	 */
+	public static final String PARAMETER_RERUN_REPORT = "rerunReport";
+
+	/**
 	 * Private class that keeps the helper per thread.
 	 */
 	private static class Helper {
 		private boolean closePM;
 		private PersistenceManager pm;
 		private Map<String, Object> vars = new HashMap<String, Object>();
-		private Map<String, Object> parameters = new HashMap<String, Object>();
-		private Locale locale;
+
+		private RenderReportRequest renderReportRequest;
 
 		private ReportLayout reportLayout;
 
@@ -91,11 +96,15 @@ public class JFireReportingHelper {
 		}
 
 		public Map<String, Object> getParameters() {
-			return parameters;
+			return renderReportRequest.getParameters();
 		}
 
 		public Locale getLocale() {
-			return locale;
+			return renderReportRequest.getLocale();
+		}
+
+		public RenderReportRequest getRenderReportRequest() {
+			return renderReportRequest;
 		}
 
 		public ReportLayout getReportLayout() {
@@ -104,19 +113,17 @@ public class JFireReportingHelper {
 
 		public void open(
 				PersistenceManager pm, boolean closePM,
-				Map<String, Object> params,
-				Locale locale, ReportLayout reportLayout) {
+				ReportLayout reportLayout,
+				RenderReportRequest renderReportRequest) {
 
 			JFireReportingHelper.logger.debug("Opening (JFireReporting)Helper with pm = "+pm+" and closePM="+closePM);
+			this.renderReportRequest = renderReportRequest;
 			this.closePM = closePM;
-			this.locale = locale;
-			JFireReportingHelper.logger.debug("JFireReportingHelper with locale " + locale);
+			JFireReportingHelper.logger.debug("JFireReportingHelper with locale " + renderReportRequest.getLocale());
 			this.reportLayout = reportLayout;
 			JFireReportingHelper.logger.debug("JFireReportingHelper with reportLayout " + JDOHelper.getObjectId(reportLayout));
 			setPersistenceManager(pm);
 			getVars().clear();
-			getParameters().clear();
-			getParameters().putAll(params);
 		}
 
 		public void close() {
@@ -158,10 +165,9 @@ public class JFireReportingHelper {
 	 */
 	public static void open(
 			PersistenceManager pm, boolean closePM,
-			Map<String, Object> params,
-			Locale locale, ReportLayout reportLayout) {
+			ReportLayout reportLayout, RenderReportRequest renderReportRequest) {
 
-		helpers.get().open(pm, closePM, params, locale, reportLayout);
+		helpers.get().open(pm, closePM, reportLayout, renderReportRequest);
 	}
 
 	/**
@@ -245,6 +251,17 @@ public class JFireReportingHelper {
 	 */
 	public static ReportLayout getReportLayout() {
 		return helpers.get().getReportLayout();
+	}
+
+	/**
+	 * Returns the {@link RenderReportRequest} for the ReportLayout rendered on
+	 * the current thread.
+	 *
+	 * @return the {@link RenderReportRequest} for the ReportLayout rendered on
+	 *         the current thread.
+	 */
+	public static RenderReportRequest getRenderReportRequest() {
+		return helpers.get().getRenderReportRequest();
 	}
 
 	/**

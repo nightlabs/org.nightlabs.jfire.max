@@ -106,7 +106,8 @@ implements IRenderManager
 	throws RenderReportException
 	{
 		File layoutRoot = ReportLayoutRendererUtil.prepareRenderedLayoutOutputFolder();
-		return renderReport(pm, renderRequest, IRenderManager.DEFAULT_ENTRY_FILE_NAME, layoutRoot, true);
+//		return renderReport(pm, renderRequest, IRenderManager.DEFAULT_ENTRY_FILE_NAME, layoutRoot, true);
+		return renderReport(pm, renderRequest, RenderedReportLayout.getDefaultReportFileName(), layoutRoot, true);
 	}
 
 	/*
@@ -180,7 +181,8 @@ implements IRenderManager
 			renderRequest.setParameters(parsedParams);
 
 			logger.debug("Have report renderer, delegating render work");
-			JFireReportingHelper.open(pm, false, parsedParams, locale, reportLayout);
+//			JFireReportingHelper.open(pm, false, parsedParams, locale, reportLayout);
+			JFireReportingHelper.open(pm, false, reportLayout, renderRequest);
 			RenderedReportLayout result = null;
 			// Ask the renderer to do the work
 			try {

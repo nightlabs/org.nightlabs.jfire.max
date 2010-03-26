@@ -71,6 +71,17 @@ extends SecurityChangeListener
 		}
 	}
 
+	public static void unregister(PersistenceManager pm) {
+		pm.getExtent(SecurityChangeListenerProductTypePermission.class);
+		SecurityChangeListenerID id = SecurityChangeListenerID.create(Organisation.DEV_ORGANISATION_ID, SecurityChangeListenerProductTypePermission.class.getName());
+		try {
+			SecurityChangeListener listener = (SecurityChangeListener) pm.getObjectById(id);
+			pm.deletePersistent(listener);
+		} catch (JDOObjectNotFoundException x) {
+			// Do nothing because already unregistered
+		}
+	}
+
 	/**
 	 * @deprecated Only for JDO!
 	 */

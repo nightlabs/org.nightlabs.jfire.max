@@ -23,6 +23,7 @@ import org.nightlabs.jfire.reporting.layout.ReportRegistryItem;
 import org.nightlabs.jfire.security.Authority;
 import org.nightlabs.jfire.security.ResolveSecuringAuthorityStrategy;
 import org.nightlabs.jfire.security.SecurityReflector;
+import org.nightlabs.jfire.security.SecurityReflector.UserDescriptor;
 import org.nightlabs.util.CacheDirTag;
 import org.nightlabs.util.IOUtil;
 import org.nightlabs.util.NLLocale;
@@ -56,7 +57,8 @@ public class ReportLayoutRendererUtil {
 	 * @throws RenderReportException When rendering the report fails.
 	 */
 	public static RenderedReportLayout renderReport(PersistenceManager pm, RenderReportRequest renderReportRequest)
-			throws RenderReportException {
+	throws RenderReportException
+	{
 
 		// check if user is allowed to render
 		ReportRegistryItem registryItem = (ReportRegistryItem) pm.getObjectById(renderReportRequest.getReportRegistryItemID());
@@ -86,7 +88,6 @@ public class ReportLayoutRendererUtil {
 
 	/**
 	 * @return the root folder for all temporary rendered report folders.
-	 * 		This is (JFireReporting#earDir/birt/rendered).
 	 */
 	public static File getRenderedLayoutOutputRootFolder() {
 //		File earDir;
@@ -114,12 +115,13 @@ public class ReportLayoutRendererUtil {
 	 */
 	public static File getRenderedLayoutOutputFolder() {
 		File layoutRoot = getRenderedLayoutOutputRootFolder();
-		layoutRoot = new File(layoutRoot, SecurityReflector.getUserDescriptor().getSessionID()+"-"+Long.toHexString(Thread.currentThread().getId()));
+		UserDescriptor userDescriptor = SecurityReflector.getUserDescriptor();
+		layoutRoot = new File(layoutRoot, userDescriptor.getSessionID() + '-' + Long.toHexString(Thread.currentThread().getId()));
 		return layoutRoot;
 	}
 
 	/**
-	 * Retruns after asuring that a folder exists, that can be uniquely addressed
+	 * Returns after assuring that a folder exists, that can be uniquely addressed
 	 * using the sessionID of the actual user.
 	 *
 	 * @return The root folder for renderedReportLayouts of the actual session.
@@ -135,7 +137,8 @@ public class ReportLayoutRendererUtil {
 				throw new IllegalStateException("Could not create rendered report tmp folder "+layoutRoot);
 		}
 		getLayoutOutputFolderProtectionFile(layoutRoot, true);
-		logger.debug("Returning rendered layout outputfolder: "+layoutRoot);
+		if (logger.isDebugEnabled())
+			logger.debug("Returning rendered layout outputfolder: "+layoutRoot);
 		return layoutRoot;
 	}
 
@@ -173,7 +176,7 @@ public class ReportLayoutRendererUtil {
 	 * forced.
 	 * </p>
 	 *
-	 * @param layoutRoot The root folder for the rendered layout (e.g. containig one html file and
+	 * @param layoutRoot The root folder for the rendered layout (e.g. containing one html file and
 	 *            several images, or a single pdf).
 	 * @param reportLayout The {@link RenderedReportLayout} with a valid header. The data member of
 	 *            this instance will be manipulated (populated with the file data).
@@ -262,13 +265,16 @@ public class ReportLayoutRendererUtil {
 	 * (Deletes all output directories, that are not protected by a protection file any more).
 	 */
 	public static void cleanupRenderedReportLayoutFolders() {
-		logger.debug("#cleanUpRenderedReportLayoutFolders: started.");
+		if (logger.isDebugEnabled())
+			logger.debug("#cleanUpRenderedReportLayoutFolders: started.");
 		File outputFolder = getRenderedLayoutOutputRootFolder();
-		logger.debug("#cleanUpRenderedReportLayoutFolders: listing files.");
+		if (logger.isDebugEnabled())
+			logger.debug("#cleanUpRenderedReportLayoutFolders: listing files.");
 		File[] files = outputFolder.listFiles();
 		if (files == null) {
 			// nothing to do
-			logger.debug("#cleanUpRenderedReportLayoutFolders: nothing to do, no sub-folders found.");
+			if (logger.isDebugEnabled())
+				logger.debug("#cleanUpRenderedReportLayoutFolders: nothing to do, no sub-folders found.");
 			return;
 		}
 		for (File layoutRoot : files) {
@@ -276,12 +282,14 @@ public class ReportLayoutRendererUtil {
 				continue;
 			File protectionFile = getLayoutOutputFolderProtectionFile(layoutRoot, false);
 			if (!protectionFile.exists()) {
-				logger.debug("#cleanUpRenderedReportLayoutFolders: Found unlocked directory, will delete it: " + layoutRoot);
+				if (logger.isDebugEnabled())
+					logger.debug("#cleanUpRenderedReportLayoutFolders: Found unlocked directory, will delete it: " + layoutRoot);
 				if (!IOUtil.deleteDirectoryRecursively(layoutRoot)) {
 					logger.warn("Could not delete report render folder " + layoutRoot);
 				}
 			}
 		}
-		logger.debug("Cleanup of rendered report layout folders finished.");
+		if (logger.isDebugEnabled())
+			logger.debug("Cleanup of rendered report layout folders finished.");
 	}
 }

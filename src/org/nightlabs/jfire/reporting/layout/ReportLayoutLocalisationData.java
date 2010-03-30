@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.nightlabs.jfire.reporting.layout;
 
@@ -40,7 +40,7 @@ import org.nightlabs.util.IOUtil;
 
 /**
  * Holds the contents of a properties file that is used in report localisation.
- * 
+ *
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
  *
  * @jdo.persistence-capable
@@ -52,7 +52,7 @@ import org.nightlabs.util.IOUtil;
  * @jdo.create-objectid-class field-order="organisationID, reportRegistryItemType, reportRegistryItemID, locale"
  *
  * @jdo.inheritance strategy = "new-table"
- * 
+ *
  * @jdo.fetch-group name="ReportLayoutLocalisationData.localisationData" fetch-groups="default" fields="localisationData"
  *
  *  @jdo.query
@@ -83,12 +83,12 @@ public class ReportLayoutLocalisationData implements StoreCallback, Serializable
 	private static final long serialVersionUID = 1L;
 
 	public static final String PROPERIES_FILE_PREFIX = "reportMessages";
-	
+
 	private static final Pattern localePattern = Pattern.compile(".*_(([a-z]+)(?:_*)([A-Z]*))\\.properties");
 
 	public static final String FETCH_GROUP_LOCALISATOIN_DATA = "ReportLayoutLocalisationData.localisationData";
 
-	
+
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
@@ -96,7 +96,7 @@ public class ReportLayoutLocalisationData implements StoreCallback, Serializable
 	@Column(length=100)
 
 	private String organisationID;
-	
+
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
@@ -104,7 +104,7 @@ public class ReportLayoutLocalisationData implements StoreCallback, Serializable
 	@Column(length=100)
 
 	private String reportRegistryItemType;
-	
+
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
@@ -112,7 +112,7 @@ public class ReportLayoutLocalisationData implements StoreCallback, Serializable
 	@Column(length=100)
 
 	private String reportRegistryItemID;
-	
+
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="10"
@@ -120,13 +120,13 @@ public class ReportLayoutLocalisationData implements StoreCallback, Serializable
 	@Column(length=10)
 
 	private String locale;
-	
+
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 
 	private ReportLayout reportLayout;
-	
+
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 * @jdo.column sql-type="BLOB"
@@ -134,7 +134,7 @@ public class ReportLayoutLocalisationData implements StoreCallback, Serializable
 	@Column(sqlType="BLOB")
 
 	private byte[] localisationData;
-	
+
 	/**
 	 * @deprecated Only for JDO
 	 */
@@ -151,7 +151,7 @@ public class ReportLayoutLocalisationData implements StoreCallback, Serializable
 		this.reportLayout = reportLayout;
 		this.locale = locale;
 	}
-	
+
 	/**
 	 */
 	public ReportLayoutLocalisationData(ReportRegistryItemID reportRegistryItemID, String locale) {
@@ -160,15 +160,15 @@ public class ReportLayoutLocalisationData implements StoreCallback, Serializable
 		this.reportRegistryItemID = reportRegistryItemID.reportRegistryItemID;
 		this.locale = locale;
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @return the locale
 	 */
 	public String getLocale() {
 		return locale;
 	}
-	
+
 	/**
 	 * @return the organisationID
 	 */
@@ -189,18 +189,18 @@ public class ReportLayoutLocalisationData implements StoreCallback, Serializable
 	public String getReportRegistryItemType() {
 		return reportRegistryItemType;
 	}
-	
+
 	public ReportLayout getReportLayout() {
 		return reportLayout;
 	}
-	
+
 	public byte[] getLocalisationData() {
 		return localisationData;
 	}
-	
+
 	/**
 	 * Loads the contents of the given file into the {@link #localisationData} member.
-	 * 
+	 *
 	 * @param f The {@link File} to load.
 	 * @throws IOException
 	 */
@@ -245,7 +245,7 @@ public class ReportLayoutLocalisationData implements StoreCallback, Serializable
 
 	/**
 	 * Returns all {@link ReportLayoutLocalisationData} objects related to the given ReportLayout.
-	 * 
+	 *
 	 * @param pm
 	 * @param reportLayout
 	 * @return
@@ -255,44 +255,53 @@ public class ReportLayoutLocalisationData implements StoreCallback, Serializable
 		Query q = pm.newNamedQuery(ReportLayoutLocalisationData.class, "getReportLayoutLocalisationBundle");
 		return (Collection<ReportLayoutLocalisationData>) q.execute(reportLayout);
 	}
-	
+
 	/**
 	 * Assuming the given file name is was build by the naming conventions of
 	 * resouce bundle properties files, this method extracts the whole locale part of a given file name.
-	 * 
+	 *
 	 * @param fileName The fileName the locale part should be extractd from.
 	 * @return The locale part of a given file name, null if none could be found.
+	 * @see LocalisationFileName
+	 * @deprecated Use {@link LocalisationFileName} instead.
 	 */
+	@Deprecated
 	public static String extractLocale(String fileName) {
 		Matcher matcher = localePattern.matcher(fileName);
 		if (matcher.matches())
 			return matcher.group(1);
 		return null;
 	}
-	
+
 	/**
 	 * Assuming the given file name is was build by the naming conventions of
 	 * resouce bundle properties files, this method extracts the language out
 	 * of the locale part of the given file name.
-	 * 
+	 *
 	 * @param fileName The fileName the language part should be extractd from.
 	 * @return The language part of a given file name, null if none could be found.
+	 * @see LocalisationFileName
+	 * @deprecated Use {@link LocalisationFileName} instead.
 	 */
+	@Deprecated
 	public static String extractLanguage(String fileName) {
 		Matcher matcher = localePattern.matcher(fileName);
 		if (matcher.matches())
 			return matcher.group(2);
 		return null;
 	}
-	
+
 	/**
 	 * Assuming the given file name is was build by the naming conventions of
 	 * resouce bundle properties files, this method extracts the country out
 	 * of the locale part of the given file name.
-	 * 
+	 *
 	 * @param fileName The fileName the language part should be extractd from.
 	 * @return The language part of a given file name, null if none could be found.
+	 * @see LocalisationFileName
+	 * @deprecated Use {@link LocalisationFileName} instead.
 	 */
+	@Deprecated
 	public static String extractCountry(String fileName) {
 		Matcher matcher = localePattern.matcher(fileName);
 		if (matcher.matches())
@@ -308,7 +317,7 @@ public class ReportLayoutLocalisationData implements StoreCallback, Serializable
 			this.reportLayout = layout;
 		}
 	}
-	
+
 	public static void cleanFolderFromLocalisationData(File folder) {
 		File[] files = folder.listFiles(new FileFilter() {
 			@Override
@@ -322,5 +331,5 @@ public class ReportLayoutLocalisationData implements StoreCallback, Serializable
 			}
 		}
 	}
-	
+
 }

@@ -234,7 +234,7 @@ public class ReportLayoutLocalisationData implements StoreCallback, Serializable
 	/**
 	 * Creates a new {@link InputStream} for the report messages file
 	 * that is wrapped by an {@link InflaterInputStream}.
-	 * This means you can read the messages unzipped from the returend stream.
+	 * This means you can read the messages unzipped from the returned stream.
 	 * <p>
 	 * Note that this will create a new {@link InputStream} and you need to make sure to close it.
 	 * </p>
@@ -258,9 +258,9 @@ public class ReportLayoutLocalisationData implements StoreCallback, Serializable
 
 	/**
 	 * Assuming the given file name is was build by the naming conventions of
-	 * resouce bundle properties files, this method extracts the whole locale part of a given file name.
+	 * resource bundle properties files, this method extracts the whole locale part of a given file name.
 	 *
-	 * @param fileName The fileName the locale part should be extractd from.
+	 * @param fileName The fileName the locale part should be extracted from.
 	 * @return The locale part of a given file name, null if none could be found.
 	 * @see LocalisationFileName
 	 * @deprecated Use {@link LocalisationFileName} instead.
@@ -275,10 +275,10 @@ public class ReportLayoutLocalisationData implements StoreCallback, Serializable
 
 	/**
 	 * Assuming the given file name is was build by the naming conventions of
-	 * resouce bundle properties files, this method extracts the language out
+	 * resource bundle properties files, this method extracts the language out
 	 * of the locale part of the given file name.
 	 *
-	 * @param fileName The fileName the language part should be extractd from.
+	 * @param fileName The fileName the language part should be extracted from.
 	 * @return The language part of a given file name, null if none could be found.
 	 * @see LocalisationFileName
 	 * @deprecated Use {@link LocalisationFileName} instead.
@@ -293,10 +293,10 @@ public class ReportLayoutLocalisationData implements StoreCallback, Serializable
 
 	/**
 	 * Assuming the given file name is was build by the naming conventions of
-	 * resouce bundle properties files, this method extracts the country out
+	 * resource bundle properties files, this method extracts the country out
 	 * of the locale part of the given file name.
 	 *
-	 * @param fileName The fileName the language part should be extractd from.
+	 * @param fileName The fileName the language part should be extracted from.
 	 * @return The language part of a given file name, null if none could be found.
 	 * @see LocalisationFileName
 	 * @deprecated Use {@link LocalisationFileName} instead.

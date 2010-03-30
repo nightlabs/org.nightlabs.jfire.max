@@ -94,10 +94,6 @@ implements IRenderManager
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.nightlabs.jfire.reporting.birt.layout.render.IRenderManager#renderReport(javax.jdo.PersistenceManager, org.nightlabs.jfire.reporting.birt.layout.render.RenderReportRequest)
-	 */
 	@Override
 	public RenderedReportLayout renderReport(
 			PersistenceManager pm,
@@ -105,15 +101,12 @@ implements IRenderManager
 		)
 	throws RenderReportException
 	{
-		File layoutRoot = ReportLayoutRendererUtil.prepareRenderedLayoutOutputFolder();
+		File layoutRoot = ReportLayoutRendererUtil.prepareRenderedLayoutOutputFolder();	// TODO this should not be done here, but instead *after* the report was rendered, the directory should be immediately removed. Freddy+Marco.
 //		return renderReport(pm, renderRequest, IRenderManager.DEFAULT_ENTRY_FILE_NAME, layoutRoot, true);
 		return renderReport(pm, renderRequest, RenderedReportLayout.getDefaultReportFileName(), layoutRoot, true);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.nightlabs.jfire.reporting.birt.layout.render.IRenderManager#renderReport(javax.jdo.PersistenceManager, org.nightlabs.jfire.reporting.birt.layout.render.RenderReportRequest, java.lang.String, java.io.File, boolean)
-	 */
+	// TODO this method should not be public! Freddy+Marco.
 	@Override
 	public RenderedReportLayout renderReport(
 			PersistenceManager pm,
@@ -180,7 +173,8 @@ implements IRenderManager
 			HashMap<String,Object> parsedParams = parseReportParams(engine, report, renderRequest.getParameters());
 			renderRequest.setParameters(parsedParams);
 
-			logger.debug("Have report renderer, delegating render work");
+			if (logger.isDebugEnabled())
+				logger.debug("Have report renderer, delegating render work");
 //			JFireReportingHelper.open(pm, false, parsedParams, locale, reportLayout);
 			JFireReportingHelper.open(pm, false, reportLayout, renderRequest);
 			RenderedReportLayout result = null;

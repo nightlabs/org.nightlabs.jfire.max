@@ -9,20 +9,20 @@ import org.nightlabs.jfire.reporting.ReportingEngine;
 /**
  * Helper to render reports on the server. Instances of {@link RenderManager}
  * can be obtained from a {@link ReportingEngine} of which one is registered per reporting-backend type.
- * 
+ *
  * @author Daniel Mazurek - daniel [at] nightlabs [dot] de
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
  */
 public interface IRenderManager
 {
 //	public static final String DEFAULT_ENTRY_FILE_NAME = "renderedLayout";
-	
+
 	/**
 	 * Lets the underlying report engine render the given report with the given params in the given format.
 	 * The report will be rendered into the default temporary folder for
 	 * rendered report layouts (see {@link ReportLayoutRendererUtil#prepareRenderedLayoutOutputFolder()}).
 	 * Also it will set the entry file-name of the report to {@link RenderedReportLayout#getDefaultReportFileName()}.
-	 * 
+	 *
 	 * @param pm
 	 * @param renderRequest
 	 *
@@ -49,12 +49,14 @@ public interface IRenderManager
 	 * @param prepareForTransfer Whether the results data should be set.
 	 * @throws RenderReportException If rendering the report fails.
 	 */
+	// TODO This method should not be in this interface! The fact that the implementation needs some temporary folders should be invisible to the user of the API.
+	// The API should work only with in-memory objects. Freddy+Marco.
 	public RenderedReportLayout renderReport(
 			PersistenceManager pm,
 			RenderReportRequest renderRequest,
 			String fileName,
 			File layoutRoot,
 			boolean prepareForTransfer
-		) 
+		)
 	throws RenderReportException;
 }

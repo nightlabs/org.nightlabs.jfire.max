@@ -370,7 +370,7 @@ implements PersonRelationManagerRemote
 	}
 
 	// -------------- ++++++++++ ----------------------------------------------------------------------------------------------------------- ++ ----|
-	// Test. May start this on a new class, since the methods are more intended to be used to serve TuckedPersonRelationTreeNodes.
+	// Query countings for actualNodeCount and tuckedNodeCount.
 	// -------------- ++++++++++ ----------------------------------------------------------------------------------------------------------- ++ ----|
 	@RolesAllowed("_Guest_") // TODO access rights
 	@Override
@@ -419,7 +419,7 @@ implements PersonRelationManagerRemote
 			// Both 1. and 2. can run on the same iteration.
 			for (PersonRelation personRelation : personRelations) {
 				if (logger.isDebugEnabled())
-					logger.debug(" ~ personRelation [To]: " + showPersonInfo(personRelation.getTo())); // + ",  [From]: " + showPersonInfo(personRelation.getFrom()));
+					logger.debug(" ~ personRelation [To]: " + showPersonInfo(personRelation.getTo()));
 
 				PropertySetID propertySetID = personRelation.getToID();
 				if (isPerformExcludeFilter && propertySetIDsToRoot.contains(propertySetID)) // On 1.

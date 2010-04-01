@@ -697,25 +697,57 @@ implements PersonRelationManagerRemote
 		}
 
 
+		// -------------------------------------------------------------- ++ AMENDED ++ --------------------------------------------------------------|| 
 		// Recursive case.
-		Deque<ObjectID> current_foundPath = foundOIDPath;        // <-- PersonRelationID
-		Deque<ObjectID> current_PPSIDfoundPath = foundPPSIDPath; // <-- PropertySetID
-
-		int outGoingPathIndex = 0;
+		// -------------------------------------------------------------- ++ AMENDED ++ --------------------------------------------------------------|| 
+		// A fork is found when we have more than one element in pRelnsToRoot.
+		// In this case, the current path that we are pursuing must be duplicated -- as many times as the number of elements found in pRelnsToRoot. [Go by BREADTH].
+		// Then for each of these duplicated paths, we continue to add with each element in pRelnsRoot. [Go by DEPTH].
+		int forkSize = pRelnsToRoot.size();
+		List<Deque<ObjectID>> current_foundPaths = new ArrayList<Deque<ObjectID>>(forkSize);      // <-- PersonRelationID (mixed)
+		List<Deque<ObjectID>> current_PPSIDfoundPaths = new ArrayList<Deque<ObjectID>>(forkSize); // <-- PropertySetID
+		
+		// [Prep]-[Go by BREADTH]
+		for (int i=0; i<forkSize; i++) {
+			current_foundPaths.add(i == 0 ? foundOIDPath : new LinkedList<ObjectID>(foundOIDPath));
+			current_PPSIDfoundPaths.add(i == 0 ? foundPPSIDPath : new LinkedList<ObjectID>(foundPPSIDPath));
+		}
+		
+		// [Go by DEPTH]
+		int i = 0;
 		for (PersonRelation pRelToRoot : pRelnsToRoot) {
-			if (outGoingPathIndex > 0) {
-				// More than one out-going paths originating from 'person_nextFrom'.
-				// These are new, and needs to be duplicated from the original 'foundPath'.
-				current_foundPath = new LinkedList<ObjectID>(foundOIDPath);
+			Deque<ObjectID> current_foundPath = current_foundPaths.get(i);
+			Deque<ObjectID> current_PPSIDfoundPath = current_PPSIDfoundPaths.get(i);
+			
+			if (i > 0) {
 				foundOIDPaths.add(current_foundPath);
-
-				current_PPSIDfoundPath = new LinkedList<ObjectID>(foundPPSIDPath);
 				foundPPSIDPaths.add(current_PPSIDfoundPath);
 			}
-
-			getPathsToRoots(pm, maxDepth-1, pRelToRoot, relationTypes, current_foundPath, foundOIDPaths, current_PPSIDfoundPath, foundPPSIDPaths);
-			outGoingPathIndex++;
-		}
+			
+			getPathsToRoots(pm, maxDepth-1, pRelToRoot, relationTypes, current_foundPath, foundOIDPaths, current_PPSIDfoundPath, foundPPSIDPaths); // Recursive epochs here.
+			i++;
+		}		
+		// -------------------------------------------------------------- ++ AMENDED ++ --------------------------------------------------------------|| 
+		
+		
+//		// Recursive case. OLD. Faulty with multi-roots!
+//		Deque<ObjectID> current_foundPath = foundOIDPath;        // <-- PersonRelationID
+//		Deque<ObjectID> current_PPSIDfoundPath = foundPPSIDPath; // <-- PropertySetID
+//		int outGoingPathIndex = 0;
+//		for (PersonRelation pRelToRoot : pRelnsToRoot) {
+//			if (outGoingPathIndex > 0) {
+//				// More than one out-going paths originating from 'person_nextFrom'.
+//				// These are new, and needs to be duplicated from the original 'foundPath'.
+//				current_foundPath = new LinkedList<ObjectID>(foundOIDPath);
+//				foundOIDPaths.add(current_foundPath);
+//
+//				current_PPSIDfoundPath = new LinkedList<ObjectID>(foundPPSIDPath);
+//				foundPPSIDPaths.add(current_PPSIDfoundPath);
+//			}
+//
+//			getPathsToRoots(pm, maxDepth-1, pRelToRoot, relationTypes, current_foundPath, foundOIDPaths, current_PPSIDfoundPath, foundPPSIDPaths);
+//			outGoingPathIndex++;
+//		}
 	}
 
 

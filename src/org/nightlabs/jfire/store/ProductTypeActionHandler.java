@@ -126,36 +126,24 @@ import org.nightlabs.util.Util;
  * </p>
  *
  * @author Marco Schulze - marco at nightlabs dot de
- *
- * @jdo.persistence-capable
- *		identity-type="application"
- *		objectid-class="org.nightlabs.jfire.store.id.ProductTypeActionHandlerID"
- *		detachable="true"
- *		table="JFireTrade_ProductTypeActionHandler"
- *
- * @jdo.inheritance strategy="new-table"
- * @jdo.inheritance-discriminator strategy="class-name"
- *
- * @jdo.create-objectid-class field-order="organisationID, productTypeActionHandlerID"
- *
- * @jdo.query name="getProductTypeActionHandlerByProductTypeClassName" query="
- *		SELECT UNIQUE
- *		WHERE this.productTypeClassName == pProductTypeClassName
- *		PARAMETERS String pProductTypeClassName
- *		import java.lang.String"
  */
 @PersistenceCapable(
-	objectIdClass=ProductTypeActionHandlerID.class,
-	identityType=IdentityType.APPLICATION,
-	detachable="true",
-	table="JFireTrade_ProductTypeActionHandler")
-@Discriminator(strategy=DiscriminatorStrategy.CLASS_NAME)
-@Queries(
-	@javax.jdo.annotations.Query(
-		name="getProductTypeActionHandlerByProductTypeClassName",
-		value=" SELECT UNIQUE WHERE this.productTypeClassName == pProductTypeClassName PARAMETERS String pProductTypeClassName import java.lang.String")
+		objectIdClass=ProductTypeActionHandlerID.class,
+		identityType=IdentityType.APPLICATION,
+		detachable="true",
+		table="JFireTrade_ProductTypeActionHandler"
 )
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
+@Discriminator(strategy=DiscriminatorStrategy.CLASS_NAME)
+@Queries(
+		@javax.jdo.annotations.Query(
+				name="getProductTypeActionHandlerByProductTypeClassName",
+				value="SELECT UNIQUE " +
+					"WHERE this.productTypeClassName == pProductTypeClassName " +
+					"PARAMETERS String pProductTypeClassName " +
+					"import java.lang.String"
+		)
+)
 public abstract class ProductTypeActionHandler
 {
 	private static final Logger logger = Logger.getLogger(ProductTypeActionHandler.class);
@@ -220,30 +208,22 @@ public abstract class ProductTypeActionHandler
 		return null;
 	}
 
-	/**
-	 * @jdo.field primary-key="true"
-	 * @jdo.column length="100"
-	 */
 	@PrimaryKey
 	@Column(length=100)
 	private String organisationID;
-	/**
-	 * @jdo.field primary-key="true"
-	 * @jdo.column length="100"
-	 */
+
 	@PrimaryKey
 	@Column(length=100)
 	private String productTypeActionHandlerID;
 
 	/**
 	 * Class or interface. If it's a class, it must extend {@link ProductType}.
-	 *
-	 * @jdo.field persistence-modifier="persistent" unique="true" null-value="exception"
 	 */
 	@Element(unique="true")
 	@Persistent(
-		nullValue=NullValue.EXCEPTION,
-		persistenceModifier=PersistenceModifier.PERSISTENT)
+			nullValue=NullValue.EXCEPTION,
+			persistenceModifier=PersistenceModifier.PERSISTENT
+	)
 	private String productTypeClassName;
 
 	/**
@@ -375,7 +355,6 @@ public abstract class ProductTypeActionHandler
 	 * @return the purchase-{@link Article}s which are buying the required nested {@link Product}s for the given <code>partnerNestedProductTypes</code>
 	 * @throws ModuleException if sth. goes wrong - e.g. a {@link NotAvailableException} if the nested products cannot be bought (the supplier cannot supply us).
 	 */
-	@SuppressWarnings("unchecked")
 	protected Collection<? extends Article> importCrossTradeNestedProducts(
 			User user, ProductTypeActionHandlerCache productTypeActionHandlerCache, Product packageProduct,
 			String partnerOrganisationID, Collection<NestedProductTypeLocal> partnerNestedProductTypes
@@ -578,19 +557,7 @@ public abstract class ProductTypeActionHandler
 
 		// All nestedProductTypes that come from a partner-organisation are collected and grouped in this map in order
 		// to import them more efficiently
-//		Map<String, List<NestedProductTypeLocal>> organisationID2partnerNestedProductType = new HashMap<String, List<NestedProductTypeLocal>>();
 		Map<String, List<NestedProductTypeLocal>> organisationID2partnerNestedProductTypes = null; // lazy creation
-// The above generic notation causes the class Product to be destroyed during enhancement with BCEL + JPOX-Enhancer. This results
-// in the following exception when afterwards enhancing JFireSimpleTrade (which extends the class Product):
-//		[jpoxenhancer] Exception in thread "main" java.lang.ClassFormatError: LVTT entry for 'me' in class file org/nightlabs/jfire/store/Product does not match any LVT entry
-//		[jpoxenhancer] at java.lang.ClassLoader.defineClass1(Native Method)
-//		[jpoxenhancer] at java.lang.ClassLoader.defineClass(ClassLoader.java:620)
-//		[jpoxenhancer] at java.security.SecureClassLoader.defineClass(SecureClassLoader.java:124)
-//		[jpoxenhancer] at java.net.URLClassLoader.defineClass(URLClassLoader.java:260)
-//		[jpoxenhancer] at java.net.URLClassLoader.access$100(URLClassLoader.java:56)
-//		[jpoxenhancer] at java.net.URLClassLoader$1.run(URLClassLoader.java:195)
-//		[jpoxenhancer] at java.security.AccessController.doPrivileged(Native Method)
-//		[jpoxenhancer] at java.net.URLClassLoader.findClass(URLClassLoader.java:188)
 
 		// local product => create/find nested products
 		ProductType productType = product.getProductType();
@@ -1186,159 +1153,7 @@ public abstract class ProductTypeActionHandler
 		return authorityType;
 	}
 
-//	/**
-//	 * Create the AuthorityType defined by the given <code>authorityTypeID</code>. This is usually done during
-//	 * datastore initialisation. You should populate the role groups by calling
-//	 * {@link AuthorityType#addRoleGroup(org.nightlabs.jfire.security.RoleGroup)}.
-//	 *
-//	 * @param authorityTypeID
-//	 * @param rootProductType
-//	 * @return the new <code>AuthorityType</code>
-//	 * @deprecated AuthorityTypes should be declared in the jfire-security.xml and not here anymore! See
-//	 */
-//	protected AuthorityType createAuthorityType(AuthorityTypeID authorityTypeID, ProductType rootProductType) { throw new UnsupportedOperationException("Declare your AuthorityType in the jfire-security.xml!"); }
-
 	public abstract AuthorityTypeID getAuthorityTypeID(ProductType rootProductType);
-
-//	/**
-//	 * Create/return an existing repository which is used to put a newly created product into it.
-//	 *
-//	 * @param product The new product before it is added to the store (it has no {@link ProductLocal} assigned yet).
-//	 * @return the repository
-//	 */
-//	public Repository getInitialRepository(Product product)
-//	{
-//		PersistenceManager pm = getPersistenceManager();
-//		Store store = Store.getStore(pm);
-//
-//		if (store.getOrganisationID().equals(product.getOrganisationID()))
-//			return getInitialLocalRepository(product);
-//		else
-//			return getInitialForeignRepository(product);
-//	}
-
-//	protected String getAnchorIDForLocalHomeRepository(ProductType productType)
-//	{
-//		return productType.getClass().getName() + ".home";
-//	}
-//
-//	protected String getAnchorIDForForeignHomeRepository(ProductType productType)
-//	{
-//		return productType.getClass().getName() + ".home#" + productType.getOrganisationID();
-//	}
-
-//	protected Repository getInitialLocalRepository(Product product)
-//	{
-//		return getDefaultHomeRepository(product.getProductType());
-//	}
-
-//	/**
-//	 * This method is called by {@link Store#addProductType(User, ProductType)} in order to assign the default
-//	 * value for {@link ProductTypeLocal#getHome()}.
-//	 * <p>
-//	 * Furthermore, it is called by {@link #getInitialLocalRepository(Product)} since the initial repository
-//	 * for local products is the same as the home (while it is different for foreign products, which first need to
-//	 * be delivered from their initial repository to their home).
-//	 * </p>
-//	 *
-//	 * @param productType The <code>ProductType</code> for which to determine the default home.
-//	 * @return the home repository
-//	 */
-//	public Repository getDefaultHomeRepository(ProductType productType)
-//	{
-//		PersistenceManager pm = getPersistenceManager();
-//		Store store = Store.getStore(pm);
-//
-//		return Repository.createRepository(
-//				pm,
-//				store.getOrganisationID(),
-//				Repository.ANCHOR_TYPE_ID_HOME,
-//				store.getOrganisationID().equals(productType.getOrganisationID()) ?
-//						getAnchorIDForLocalHomeRepository(productType) : getAnchorIDForForeignHomeRepository(productType),
-//				store.getMandator(), false);
-//	}
-
-//	protected Repository getInitialForeignRepository(Product product)
-//	{
-//		PersistenceManager pm = getPersistenceManager();
-//		Store store = Store.getStore(pm);
-//
-//		LegalEntity repositoryOwner = OrganisationLegalEntity.getOrganisationLegalEntity(
-//				pm, product.getOrganisationID(), OrganisationLegalEntity.ANCHOR_TYPE_ID_ORGANISATION, true);
-//
-//		return PartnerStorekeeper.createPartnerOutsideRepository(pm, store.getOrganisationID(), repositoryOwner);
-////		Store store = Store.getStore(pm);
-////
-////		// local (i.e. produced here)
-////		return Repository.createRepository(
-////				pm,
-////				store.getOrganisationID(),
-////				Repository.ANCHOR_TYPE_,
-////				ANCHOR_ID_REPOSITORY_HOME_LOCAL,
-////				store.getMandator(), true);
-//	}
-
-
-
-//	public CrossTradeDeliveryCoordinator getCrossTradeDeliveryCoordinator()
-//	{
-//		PersistenceManager pm = getPersistenceManager();
-//
-//		CrossTradeDeliveryCoordinatorID id = CrossTradeDeliveryCoordinatorID.create(Organisation.DEV_ORGANISATION_ID, CrossTradeDeliveryCoordinator.class.getName());
-//		try {
-//			CrossTradeDeliveryCoordinator ctdc = (CrossTradeDeliveryCoordinator) pm.getObjectById(id);
-//			ctdc.getModeOfDeliveryFlavour();
-//			return ctdc;
-//		} catch (JDOObjectNotFoundException x) {
-//			CrossTradeDeliveryCoordinator ctdc = new CrossTradeDeliveryCoordinator(id.organisationID, id.crossTradeDeliveryCoordinatorID);
-//
-//			ModeOfDeliveryFlavour modeOfDeliveryFlavour = (ModeOfDeliveryFlavour) pm.getObjectById(ModeOfDeliveryConst.MODE_OF_DELIVERY_FLAVOUR_ID_JFIRE);
-//			ctdc.setModeOfDeliveryFlavour(modeOfDeliveryFlavour);
-//
-//			ServerDeliveryProcessor serverDeliveryProcessor = ServerDeliveryProcessorJFire.getServerDeliveryProcessorJFire(pm);
-//			ctdc.setServerDeliveryProcessor(serverDeliveryProcessor);
-//
-//			ctdc = (CrossTradeDeliveryCoordinator) pm.makePersistent(ctdc);
-//			return ctdc;
-//		}
-//	}
-
-//	/**
-//	 * This method is called by {@link PaymentHelperBean#payBegin_storePayBeginServerResult(org.nightlabs.jfire.accounting.pay.id.PaymentID, org.nightlabs.jfire.accounting.pay.PaymentResult, boolean, String[], int)}
-//	 * at the end of its action. You should not cause any exception here as this will cause the <code>PaymentResult</code> not to be written and
-//	 * this situation is not handled.
-//	 * <p>
-//	 * Note, that payments are only very loosely coupled to the articles as you can do many payments for one or more {@link Invoice}s
-//	 * (thus allowing partial payments or instalment sales).
-//	 * </p>
-//	 *
-//	 * @param principal The user who initiated this action. If you need a {@link User} instance, call {@link User#getUser(PersistenceManager, org.nightlabs.jfire.base.JFireBasePrincipal)}.
-//	 * @param payment The currently performed payment. If you need the {@link PaymentData}, you can use {@link PersistenceManager#getObjectById(Object)} with {@link PaymentDataID#create(org.nightlabs.jfire.accounting.pay.id.PaymentID)}
-//	 * @param articles The articles containing {@link ProductType} implementations that are linked to this <code>ProductTypeActionHandler</code>.
-//	 */
-//	public void onPayBegin_storePayBeginServerResult(JFirePrincipal principal, Payment payment, Set<? extends Article> articles)
-//	{
-//	}
-//	/**
-//	 * This method is called by {@link PaymentHelperBean#payDoWork_storePayDoWorkServerResult(org.nightlabs.jfire.accounting.pay.id.PaymentID, org.nightlabs.jfire.accounting.pay.PaymentResult, boolean, String[], int)} at the end of its action.
-//	 *
-//	 * @param principal The user who initiated this action. If you need a {@link User} instance, call {@link User#getUser(PersistenceManager, org.nightlabs.jfire.base.JFireBasePrincipal)}.
-//	 * @param payment The currently performed payment. If you need the {@link PaymentData}, you can use {@link PersistenceManager#getObjectById(Object)} with {@link PaymentDataID#create(org.nightlabs.jfire.accounting.pay.id.PaymentID)}
-//	 * @param articles The articles containing {@link ProductType} implementations that are linked to this <code>ProductTypeActionHandler</code>.
-//	 */
-//	public void onPayDoWork_storePayDoWorkServerResult(JFirePrincipal principal, Payment payment, Set<? extends Article> articles)
-//	{
-//	}
-//	/**
-//	 * This method is called by {@link Store#payEnd(User, PaymentData)} at the end of its action.
-//	 *
-//	 * @param principal The user who initiated this action. If you need a {@link User} instance, call {@link User#getUser(PersistenceManager, org.nightlabs.jfire.base.JFireBasePrincipal)}.
-//	 * @param payment The currently performed payment. If you need the {@link PaymentData}, you can use {@link PersistenceManager#getObjectById(Object)} with {@link PaymentDataID#create(org.nightlabs.jfire.accounting.pay.id.PaymentID)}
-//	 * @param articles The articles containing {@link ProductType} implementations that are linked to this <code>ProductTypeActionHandler</code>.
-//	 */
-//	public void onPayEnd_storePayEndServerResult(JFirePrincipal principal, Payment payment, Set<? extends Article> articles)
-//	{
-//	}
 
 	private static final String pmKey_productTypeIDsAssignedSecuringAuthority = ProductTypeActionHandler.class.getName() + "#productTypeIDs";
 
@@ -1399,54 +1214,6 @@ public abstract class ProductTypeActionHandler
 		productTypeIDsAssignedSecuringAuthority = null;
 	}
 
-//	/**
-//	 * Notify the {@link ProductTypeActionHandler} about the fact that {@link ProductType#applyInheritance()}
-//	 * was called. This method is not triggered for all children, but only for the original {@link ProductType}
-//	 * (where <code>applyInheritance()</code> was called).
-//	 *
-//	 * @param productType the {@link ProductType} instance on which the method {@link ProductType#applyInheritance()} was invoked.
-//	 */
-//	public void postApplyInheritance(ProductType productType)
-//	{
-//		PersistenceManager pm = getPersistenceManager();
-//
-//		// applyInheritance() is called when a securingAuthorityID has been assigned using ProductTypeLocal.setSecuringAuthority().
-//		// Therefore, we can collect all changes during onAssignSecuringAuthority(...) since this is called during inheritance
-//		// (by ProductTypeLocal.postInherit(...)) as well as directly by ProductTypeLocal.setSecuringAuthority() and then simply
-//		// "commit" all changes at once here.
-//		Set<ProductTypeID> productTypeIDsAssignedSecuringAuthority = CollectionUtil.castSet((Set<?>) pm.getUserObject(pmKey_productTypeIDsAssignedSecuringAuthority));
-//
-//		if (productTypeIDsAssignedSecuringAuthority != null && !productTypeIDsAssignedSecuringAuthority.isEmpty())
-//		{
-//			if (logger.isDebugEnabled()) {
-//				logger.debug("postApplyInheritance: productTypeIDsAssignedSecuringAuthority.size() = "+productTypeIDsAssignedSecuringAuthority.size());
-//			}
-//
-//			int chunkSize = 1000;
-//			Set<ProductTypeID> chunkSet = new HashSet<ProductTypeID>(chunkSize);
-//			// iterate over all productTypeIDs and each chunkSize create a new invocation
-//			for (Iterator<ProductTypeID> it = productTypeIDsAssignedSecuringAuthority.iterator(); it.hasNext(); )
-//			{
-//				ProductTypeID productTypeID = it.next();
-//				chunkSet.add(productTypeID);
-//				it.remove();
-//
-//				if (!it.hasNext() || chunkSet.size() >= chunkSize)
-//				{
-//					try {
-//						AsyncInvoke.exec(
-//								new CalculateProductTypePermissionFlagSetsInvocation(chunkSet),
-//								true
-//						);
-//					} catch (Exception e) {
-//						throw new RuntimeException(e);
-//					}
-//					chunkSet = new HashSet<ProductTypeID>(chunkSize);
-//				}
-//			}
-//		}
-//		productTypeIDsAssignedSecuringAuthority = null;
-//	}
 
 	public static class CalculateProductTypePermissionFlagSetsInvocation
 	extends Invocation
@@ -1462,7 +1229,9 @@ public abstract class ProductTypeActionHandler
 			if (productTypeIDs == null)
 				throw new IllegalArgumentException("productTypeIDs == null");
 
-			this.productTypeIDs = productTypeIDs;
+			// We must copy the productTypeIDs-Set, because we don't know if the argument is serialisable and writable.
+			// For example, we might get a SingletonSet (=> Collections.singleton(...)) and thus the Iterator.remove() below would fail.
+			this.productTypeIDs = new HashSet<ProductTypeID>(productTypeIDs);
 		}
 
 		@Override

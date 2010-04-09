@@ -76,9 +76,18 @@ implements IContentDataField
 		super(organisationID, propertySetID, cloneField);
 	}
 
+	public FileDataField(String organisationID, long propertySetID, int dataBlockID, DataField cloneField) {
+		super(organisationID, propertySetID, dataBlockID, cloneField);
+	}
+
 	@Override
 	public DataField cloneDataField(PropertySet propertySet) {
-		FileDataField newField = new FileDataField(propertySet.getOrganisationID(), propertySet.getPropertySetID(), this);
+		return cloneDataField(propertySet, 0);
+	}
+
+	@Override
+	public DataField cloneDataField(PropertySet propertySet, int dataBlockID) {
+		FileDataField newField = new FileDataField(propertySet.getOrganisationID(), propertySet.getPropertySetID(), dataBlockID, this);
 		newField.fileName = this.fileName;
 		newField.fileTimestamp = this.fileTimestamp;
 
@@ -316,14 +325,73 @@ implements IContentDataField
 		this.fileTimestamp = fileTimestamp;
 	}
 
-	@Override
-	public Object getData() {
-		throw new UnsupportedOperationException();
+	private static class FileDataFieldContent {
+
+		private byte[] content;
+		private String contentEncoding;
+		private String contentType;
+		private String fileName;
+		private Date fileTimestamp;
+
+		FileDataFieldContent(final byte[] content, final String contentEncoding,
+				final String contentType, final String fileName, final Date fileTimestamp) {
+			this.content = content;
+			this.contentEncoding = contentEncoding;
+			this.contentType = contentType;
+			this.fileName = fileName;
+			this.fileTimestamp = fileTimestamp;
+		}
+
+		public byte[] getContent() {
+			return content;
+		}
+
+		public String getContentEncoding() {
+			return contentEncoding;
+		}
+
+		public String getContentType() {
+			return contentType;
+		}
+
+		public String getFileName() {
+			return fileName;
+		}
+
+		public Date getFileTimestamp() {
+			return fileTimestamp;
+		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * <p>
+	 * Returns a new instance of {@link FileDataFieldContent} wrapping properties of this data field.
+	 */
+	@Override
+	public Object getData() {
+		return new FileDataFieldContent(getContent(), getContentEncoding(), getContentType(), getFileName(), getFileTimestamp());
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * <p>
+	 * Sets the data of this data field according to the data given. In the case an instance of {@link FileDataFieldContent} is
+	 * given data are set according to the values wrapped by this instance.
+	 */
 	@Override
 	public void setData(Object data) {
-		throw new UnsupportedOperationException();
+		if (data instanceof FileDataFieldContent) {
+			FileDataFieldContent dataFieldContent = (FileDataFieldContent) data;
+			content = new byte[dataFieldContent.getContent().length];
+			for (int i = 0; i < content.length; i++) {
+				content[i] = dataFieldContent.getContent()[i];
+			}
+			contentEncoding = dataFieldContent.getContentEncoding();
+			contentType = dataFieldContent.getContentType();
+			fileName = dataFieldContent.getFileName();
+			fileTimestamp = dataFieldContent.getFileTimestamp();
+		}
 	}
 
 	@Override

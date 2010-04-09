@@ -131,15 +131,35 @@ public class HTMLDataField extends DataField
 		files = new ArrayList<IFCKEditorContentFile>();
 	}
 
+	/**
+	 * Create a new HTMLDataField instance.
+	 */
+	public HTMLDataField(String organisationID, long propertySetID, int dataBlockID, DataField cloneField)
+	{
+		super(organisationID, propertySetID, dataBlockID, cloneField);
+		files = new ArrayList<IFCKEditorContentFile>();
+	}
+
 	/* (non-Javadoc)
 	 * @see org.nightlabs.jfire.prop.DataField#cloneDataField(org.nightlabs.jfire.prop.PropertySet)
 	 */
 	@Override
 	public DataField cloneDataField(PropertySet propertySet)
 	{
+		return cloneDataField(propertySet, 0);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.nightlabs.jfire.prop.DataField#cloneDataField(org.nightlabs.jfire.prop.PropertySet, int)
+	 */
+	@Override
+	public DataField cloneDataField(PropertySet propertySet, int dataBlockID)
+	{
 		HTMLDataField htmlDataField = new HTMLDataField(
 				propertySet.getOrganisationID(),
 				propertySet.getPropertySetID(),
+				dataBlockID,
 				this);
 		htmlDataField.setTexts(new HashMap<String, String>(getTexts()));
 		htmlDataField.setFiles(new ArrayList<IFCKEditorContentFile>(getFiles()));
@@ -285,19 +305,55 @@ public class HTMLDataField extends DataField
 		}
 	}
 
+	private static class HTMLDataFieldContent {
+
+		private Map<String, String> texts;
+		private List<IFCKEditorContentFile> files;
+
+		HTMLDataFieldContent(final Map<String, String> texts, final List<IFCKEditorContentFile> files) {
+			this.texts = texts;
+			this.files = files;
+		}
+
+		public Map<String, String> getTexts() {
+			return texts;
+		}
+
+		public List<IFCKEditorContentFile> getFiles() {
+			return files;
+		}
+	}
+
 	public IFCKEditorContent getContent(String languageId)
 	{
 		return new HTMLDataFieldFCKEditorContent(this, languageId);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * <p>
+	 * Returns a new instance of {@link HTMLDataFieldContent} wrapping properties of this data field.
+	 */
 	@Override
 	public Object getData() {
-		return getContent(NLLocale.getDefault().getLanguage());
+//		return getContent(NLLocale.getDefault().getLanguage());
+		return new HTMLDataFieldContent(getTexts(), getFiles());
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * <p>
+	 * Sets the data of this data field according to the data given. In the case an instance of {@link HTMLDataFieldContent} is
+	 * given data are set according to the values wrapped by this instance.
+	 */
 	@Override
 	public void setData(Object data) {
-		throw new UnsupportedOperationException(this.getClass().getName() + " does not implement setData() yet.");
+		if (data instanceof HTMLDataFieldContent) {
+			HTMLDataFieldContent content = (HTMLDataFieldContent) data;
+			setTexts(new HashMap<String, String>(content.getTexts()));
+			setFiles(new ArrayList<IFCKEditorContentFile>(content.getFiles()));
+
+		}
 	}
 
 	@Override

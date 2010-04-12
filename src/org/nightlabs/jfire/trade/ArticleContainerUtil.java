@@ -4,8 +4,14 @@ import java.util.Comparator;
 
 import javax.jdo.JDOHelper;
 
+import org.nightlabs.jfire.accounting.Invoice;
+import org.nightlabs.jfire.accounting.id.InvoiceID;
 import org.nightlabs.jfire.security.SecurityReflector;
+import org.nightlabs.jfire.store.DeliveryNote;
+import org.nightlabs.jfire.store.id.DeliveryNoteID;
 import org.nightlabs.jfire.trade.id.ArticleContainerID;
+import org.nightlabs.jfire.trade.id.OfferID;
+import org.nightlabs.jfire.trade.id.OrderID;
 
 /**
  * Utility class which contains some methods for working with implementations of {@link ArticleContainer}.
@@ -82,5 +88,28 @@ public class ArticleContainerUtil
 	public static String getArticleContainerID(ArticleContainer articleContainer)
 	{
 		return getArticleContainerID((ArticleContainerID) JDOHelper.getObjectId(articleContainer));
+	}
+
+	/**
+	 * Returns the corresponding {@link ArticleContainer} class for the given {@link ArticleContainerID}.
+	 *
+	 * @param articleContainerID the {@link ArticleContainerID} to get the corresponding {@link ArticleContainer} class for.
+	 * @return the corresponding {@link ArticleContainer} class for the given {@link ArticleContainerID}.
+	 */
+	public static Class<? extends ArticleContainer> getArticleContainerClassByID(ArticleContainerID articleContainerID)
+	{
+		if (articleContainerID instanceof OfferID) {
+			return Offer.class;
+		}
+		else if (articleContainerID instanceof OrderID) {
+			return Order.class;
+		}
+		else if (articleContainerID instanceof InvoiceID) {
+			return Invoice.class;
+		}
+		else if (articleContainerID instanceof DeliveryNoteID) {
+			return DeliveryNote.class;
+		}
+		return ArticleContainer.class;
 	}
 }

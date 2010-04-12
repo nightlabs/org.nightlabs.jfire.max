@@ -56,19 +56,9 @@ public class DepartmentDataField extends DataField
 		super(block, field);
 	}
 
-	protected DepartmentDataField(String organisationID, long propertySetID, DepartmentDataField cloneField) {
-		super(organisationID, propertySetID, cloneField);
-		this.department = cloneField.department;
-	}
-
 	protected DepartmentDataField(String organisationID, long propertySetID, int dataBlockID, DepartmentDataField cloneField) {
 		super(organisationID, propertySetID, dataBlockID, cloneField);
 		this.department = cloneField.department;
-	}
-
-	@Override
-	public DataField cloneDataField(PropertySet propertySet) {
-		return cloneDataField(propertySet, 0);
 	}
 
 	@Override

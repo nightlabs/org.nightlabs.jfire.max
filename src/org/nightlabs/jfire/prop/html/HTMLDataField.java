@@ -125,28 +125,10 @@ public class HTMLDataField extends DataField
 	/**
 	 * Create a new HTMLDataField instance.
 	 */
-	public HTMLDataField(String organisationID, long propertySetID, DataField cloneField)
-	{
-		super(organisationID, propertySetID, cloneField);
-		files = new ArrayList<IFCKEditorContentFile>();
-	}
-
-	/**
-	 * Create a new HTMLDataField instance.
-	 */
 	public HTMLDataField(String organisationID, long propertySetID, int dataBlockID, DataField cloneField)
 	{
 		super(organisationID, propertySetID, dataBlockID, cloneField);
 		files = new ArrayList<IFCKEditorContentFile>();
-	}
-
-	/* (non-Javadoc)
-	 * @see org.nightlabs.jfire.prop.DataField#cloneDataField(org.nightlabs.jfire.prop.PropertySet)
-	 */
-	@Override
-	public DataField cloneDataField(PropertySet propertySet)
-	{
-		return cloneDataField(propertySet, 0);
 	}
 
 	/*

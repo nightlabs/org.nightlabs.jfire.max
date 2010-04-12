@@ -72,17 +72,8 @@ implements IContentDataField
 		super(dataBlock, structField);
 	}
 
-	public FileDataField(String organisationID, long propertySetID, DataField cloneField) {
-		super(organisationID, propertySetID, cloneField);
-	}
-
 	public FileDataField(String organisationID, long propertySetID, int dataBlockID, DataField cloneField) {
 		super(organisationID, propertySetID, dataBlockID, cloneField);
-	}
-
-	@Override
-	public DataField cloneDataField(PropertySet propertySet) {
-		return cloneDataField(propertySet, 0);
 	}
 
 	@Override

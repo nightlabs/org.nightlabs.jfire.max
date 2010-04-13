@@ -1260,7 +1260,7 @@ public abstract class ProductTypeActionHandler
 								long duration = System.currentTimeMillis() - start;
 								logger.debug("Updating ProductTypePermissionFlagSet for "+productTypes.size()+" ProductTypes took "+duration+" ms");
 							}
-						} while (System.currentTimeMillis() - start <= MAX_TX_DURATION);
+						} while (System.currentTimeMillis() - start <= MAX_TX_DURATION && !productTypeIDs.isEmpty());
 
 						if (!productTypeIDs.isEmpty()) {
 							AsyncInvoke.exec(

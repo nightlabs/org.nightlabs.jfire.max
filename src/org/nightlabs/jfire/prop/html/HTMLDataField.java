@@ -293,34 +293,6 @@ public class HTMLDataField extends DataField
 		}
 	}
 
-	/**
-	 * Helper class wrapping properties of this {@link DataField} instance. It is used for inheritance purposes in the case the contents of {@link HTMLDataField}s are inherited from mother to child.
-	 * @author Frederik Loeser <!-- frederik [AT] nightlabs [DOT] de -->
-	 */
-	private static class HTMLDataFieldContentDescriptor {
-
-		private Map<String, String> texts;
-		private List<IFCKEditorContentFile> files;
-
-		/**
-		 * Initialises a new {@link HTMLDataFieldContentDescriptor} instance.
-		 * @param texts
-		 * @param files
-		 */
-		HTMLDataFieldContentDescriptor(final Map<String, String> texts, final List<IFCKEditorContentFile> files) {
-			this.texts = texts;
-			this.files = files;
-		}
-
-		public Map<String, String> getTexts() {
-			return texts;
-		}
-
-		public List<IFCKEditorContentFile> getFiles() {
-			return files;
-		}
-	}
-
 	public IFCKEditorContent getContent(String languageId)
 	{
 		return new HTMLDataFieldFCKEditorContent(this, languageId);
@@ -329,24 +301,24 @@ public class HTMLDataField extends DataField
 	/**
 	 * {@inheritDoc}
 	 * <p>
-	 * Returns a new instance of {@link HTMLDataFieldContentDescriptor} wrapping properties of this data field.
+	 * Returns a new instance of {@link HTMLDataFieldContent} wrapping properties of this data field.
 	 */
 	@Override
 	public Object getData() {
 //		return getContent(NLLocale.getDefault().getLanguage());
-		return new HTMLDataFieldContentDescriptor(getTexts(), getFiles());
+		return new HTMLDataFieldContent(getTexts(), getFiles());
 	}
 
 	/**
 	 * {@inheritDoc}
 	 * <p>
-	 * Sets the data of this data field according to the data given. In the case an instance of {@link HTMLDataFieldContentDescriptor} is
+	 * Sets the data of this data field according to the data given. In the case an instance of {@link HTMLDataFieldContent} is
 	 * given data are set according to the values wrapped by this instance.
 	 */
 	@Override
 	public void setData(final Object data) {
-		if (data instanceof HTMLDataFieldContentDescriptor) {
-			final HTMLDataFieldContentDescriptor content = (HTMLDataFieldContentDescriptor) data;
+		if (data instanceof HTMLDataFieldContent) {
+			final HTMLDataFieldContent content = (HTMLDataFieldContent) data;
 			if (LOGGER.isDebugEnabled()) {
 				for (Map.Entry<String, String> entry : content.getTexts().entrySet()) {
 					LOGGER.debug("Key:   " + entry.getKey());

@@ -7,6 +7,10 @@ import java.util.Iterator;
 
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.PersistenceCapable;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.jfire.organisation.Organisation;
@@ -24,11 +28,6 @@ import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.Offer;
 import org.nightlabs.jfire.trade.id.OfferID;
 import org.nightlabs.jfire.trade.id.SegmentID;
-
-import javax.jdo.annotations.Inheritance;
-import javax.jdo.annotations.InheritanceStrategy;
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.IdentityType;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -124,7 +123,7 @@ public class VoucherTypeActionHandler
 		q.setFilter("productType == pProductType && productLocal.available");
 		q.declareParameters("VoucherType pProductType");
 		q.declareImports("import " + VoucherType.class.getName());
-		Collection availableProducts = (Collection) q.execute(this); // Product.getProducts(pm, this, ProductStatus.STATUS_AVAILABLE);
+		Collection availableProducts = (Collection) q.execute(productType); // Product.getProducts(pm, this, ProductStatus.STATUS_AVAILABLE);
 		ArrayList res = new ArrayList();
 		Iterator iteratorAvailableProducts = availableProducts.iterator();
 		for (int i = 0; i < qty; ++i) {

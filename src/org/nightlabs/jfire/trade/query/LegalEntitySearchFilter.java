@@ -24,44 +24,101 @@
  *                                                                             *
  ******************************************************************************/
 
-package org.nightlabs.jfire.trade;
+package org.nightlabs.jfire.trade.query;
 
+import java.util.Collection;
+import java.util.LinkedList;
+
+import org.nightlabs.jdo.query.AbstractJDOQuery;
 import org.nightlabs.jfire.prop.search.PropSearchFilter;
-
+import org.nightlabs.jfire.trade.LegalEntity;
 
 /**
+ * A {@link PropSearchFilter} that can be used to search {@link LegalEntity}s by the properties of
+ * its linked Person.
+ * <p>
+ * The result of a search using this query is a Collection of <b>
+ * {@link LegalEntityPersonMappingBean}</b>s.
+ * </p>
+ * <p>
+ * Note, that although this is an {@link AbstractJDOQuery} and therefore compatible with the JFire
+ * query framework this filter can't be used as a query constraining the candidates of a subsequent
+ * query of the candidate-class {@link LegalEntity}. It can only be the last query in the chain as
+ * its result type is not the candidate-class.
+ * </p>
+ * 
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
- *
+ * 
  */
 public class LegalEntitySearchFilter
 	extends PropSearchFilter
 {
-	private static final long serialVersionUID = 1L;
+	
+	private static final long serialVersionUID = 20100408L;
 
+	/**
+	 * Create a new {@link LegalEntitySearchFilter} with the default conjunction.
+	 */
 	public LegalEntitySearchFilter() {
 		super();
 	}
 
 	/**
-	 * @param _conjunction
+	 * Create a new {@link LegalEntitySearchFilter} using the given conjunction.
+	 * 
+	 * @param _conjunction The conjunction to use.
 	 */
 	public LegalEntitySearchFilter(int _conjunction) {
 		super(_conjunction);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * <p>
+	 * Points to the LegalEntity's person.
+	 * </p>
+	 */
 	@Override
 	public void setPropVariableCondition(StringBuffer filter) {
 		filter.append(PROPERTY_VARNAME+" == this.person");
 	}
-	
-//	@Override
-//	protected Class getExtentClass() {
-//		return LegalEntity.class;
-//	}
 
+	/**
+	 * {@inheritDoc}
+	 * <p>
+	 * {@link LegalEntity}.class
+	 * </p>
+	 */
 	@Override
 	protected Class<LegalEntity> initCandidateClass()
 	{
 		return LegalEntity.class;
+	}
+
+//	All of this does not work using DataNucleus in JFire 1.0 and trunk (2010-04-06)
+//	@Override
+//	protected void prepareQuery(Query query) {
+//		super.prepareQuery(query);
+////		query.setResult("new " + LegalEntityPersonMappingBean.class.getName() + "(JDOHelper.getObjectId(this), JDOHelper.getObjectId(this.person))");
+////		query.setResult("JDOHelper.getObjectId(this) as legalEntityID, JDOHelper.getObjectId(this.person) as personID");
+//		query.setResult("this as legalEntity");
+//		query.setResultClass(LegalEntityPersonMappingBean.class);
+//	}
+
+	/**
+	 * {@inheritDoc}
+	 * <p>
+	 * Currently this filter performs a post-processing of the query-result and converts it to
+	 * instances of {@link LegalEntityPersonMappingBean}.
+	 * </p>
+	 */
+	@Override
+	protected Collection<?> executeQuery() {
+		Collection<LegalEntityPersonMappingBean> result = new LinkedList<LegalEntityPersonMappingBean>();
+		Collection<?> queryResult = super.executeQuery();
+		for (Object legalEntity : queryResult) {
+			result.add(new LegalEntityPersonMappingBean((LegalEntity) legalEntity));
+		}
+		return result;
 	}
 }

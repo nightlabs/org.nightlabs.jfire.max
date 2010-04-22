@@ -748,14 +748,22 @@ implements TradeManagerRemote, TradeManagerLocal
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 			Trader trader = Trader.getTrader(pm);
-			LegalEntity aLegalEntity = LegalEntity.getLegalEntity(pm, person);
+			
+			if (person.isTrimmedDetached()) {
+				person = (Person) pm.getObjectById(JDOHelper.getObjectId(person)); 
+			}
+			
+			LegalEntity legalEntity = LegalEntity.getLegalEntity(pm, person);
 
-			if (aLegalEntity != null && aLegalEntity.isAnonymous())
-				person = aLegalEntity.getPerson();
-			else
+			if (legalEntity != null && legalEntity.isAnonymous()) {
+				// Removed the below line and replaced by exception to satisfy the method comment
+				// person = legalEntity.getPerson();
+				throw new IllegalArgumentException("Attempt to change anonymous LegalEntity");
+			} else {
 				person = pm.makePersistent(person);
+			}
 
-			LegalEntity legalEntity = trader.setPersonToLegalEntity(person, true);
+			legalEntity = trader.setPersonToLegalEntity(person, true);
 			if (get)
 				return pm.detachCopy(legalEntity);
 			else

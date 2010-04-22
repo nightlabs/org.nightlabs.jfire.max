@@ -211,16 +211,20 @@ public interface TradeManagerRemote {
 			int maxFetchDepth);
 
 	/**
-	 * Stores the given Person to a LegalEntity. If no LegalEntity with the right
-	 * AnchorID is found a new one will be created and made persistent.
+	 * Stores (attaches) the given Person, additionally, if no LegalEntity can be found that is
+	 * linked to the given Person, a new one will be created and made persistent.
 	 * <p>
-	 * Note that this method will throw an {@link IllegalArgumentException} on an
-	 * attempt to change the person of an anonymous {@link LegalEntity}.
+	 * If a trimmed-detached Person is passed to this method changes made to that person will be
+	 * silently ignored (i.e. not stored) but the link to a LegalEntity will still be made.
+	 * </p>
+	 * <p>
+	 * Note that this method will throw an {@link IllegalArgumentException} on an attempt to change
+	 * the person of an anonymous {@link LegalEntity}.
 	 * </p>
 	 * <p>
 	 * TODO https://www.jfire.org/modules/bugs/view.php?id=896
 	 * </p>
-	 *
+	 * 
 	 * @param person The person to be set to the LegalEntity
 	 * @param get If true the created LegalEntity will be returned else null
 	 * @param fetchGroups The fetchGroups the returned LegalEntity should be detached with
@@ -265,8 +269,33 @@ public interface TradeManagerRemote {
 	 */
 	Collection<LegalEntity> getLegalEntities(Set<AnchorID> anchorIDs, String[] fetchGroups, int maxFetchDepth);
 
+	/**
+	 * Returns the Offer with the given id detached with the given fetch-groups.
+	 * <p>
+	 * Note, that if the id points to a non-existing Offer a JDOObjectNotFoundException will be
+	 * thrown.
+	 * </p>
+	 * 
+	 * @param offerID The Id of the offer to return.
+	 * @param fetchGroups The fetch-groups to detach the Offer with.
+	 * @param maxFetchDepth The maximal fetch-depth to detach the offer with.
+	 * @return The offer with the given id detached with the given fetch-groups.
+	 */
 	Offer getOffer(OfferID offerID, String[] fetchGroups, int maxFetchDepth);
 
+	/**
+	 * Returns a Collection with all offers referenced by the given offerIDs detached with the given
+	 * fetch-groups.
+	 * <p>
+	 * If one of the offerIDs points to a non-existing offer a JDOObjectNotFoundException will be
+	 * thrown.
+	 * </p>
+	 * 
+	 * @param offerIDs The ids of the Offers to return.
+	 * @param fetchGroups The fetch-groups to detach the offers with.
+	 * @param maxFetchDepth The maximal fetch-depth to detach the offer with.
+	 * @return All offers with for the given offerIDs detached with the given fetch-groups.
+	 */
 	List<Offer> getOffers(Set<OfferID> offerIDs, String[] fetchGroups,
 			int maxFetchDepth);
 

@@ -20,5 +20,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/org.nightlabs.concurrent"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.nightlabs.config"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/NightLabsRhino"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/org.nightlabs.clientui"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

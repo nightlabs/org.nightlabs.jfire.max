@@ -23,6 +23,7 @@ import org.nightlabs.jfire.issue.id.IssueTypeID;
 import org.nightlabs.jfire.issue.project.id.ProjectID;
 import org.nightlabs.jfire.jbpm.graph.def.id.ProcessDefinitionID;
 import org.nightlabs.jfire.security.SecurityReflector;
+import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.security.id.UserID;
 
 /**
@@ -70,10 +71,10 @@ extends AbstractJDOQuery
 	private UserID assigneeID;
 	private Date createTimestamp;
 	private Date updateTimestamp;
-	
+
 	private Long deadlineTimePeriod;
 	private transient Date deadlineTimeDate;
-	
+
 	private IssueLinkTypeID issueLinkTypeID;
 	private Date issueWorkTimeRangeFrom;
 	private Date issueWorkTimeRangeTo;
@@ -82,9 +83,6 @@ extends AbstractJDOQuery
 	private String jbpmNodeName;
 
 	private ProcessDefinitionID processDefinitionID;
-
-	private boolean isSetCurrentUserAsAssignee;
-	private boolean isSetCurrentUserAsReporter;
 
 	private Set<IssueLinkQueryElement> issueLinkQueryElements;
 
@@ -98,9 +96,9 @@ extends AbstractJDOQuery
 		public static final String assigneeID = "assigneeID";
 		public static final String createTimestamp = "createTimestamp";
 		public static final String updateTimestamp = "updateTimestamp";
-		
+
 		public static final String deadlineTimePeriod = "deadlineTimePeriod";
-		
+
 		public static final String issueTypeID = "issueTypeID";
 		public static final String issuePriorityID = "issuePriorityID";
 		public static final String issueResolutionID = "issueResolutionID";
@@ -203,18 +201,18 @@ extends AbstractJDOQuery
 			deadlineTimeDate = new Date(System.currentTimeMillis() + deadlineTimePeriod);
 			filter.append("\n && this.deadlineTimestamp <=  :deadlineTimeDate" );
 		}
-		
+
 		/*if (
-				(isFieldEnabled(FieldName.deadlineBeforeTimestamp) && deadlineBeforeTimestamp != null) || 
+				(isFieldEnabled(FieldName.deadlineBeforeTimestamp) && deadlineBeforeTimestamp != null) ||
 				(isFieldEnabled(FieldName.deadlineAfterTimestamp) && deadlineAfterTimestamp != null)
-		) 
+		)
 		{
 			if (deadlineBeforeTimestamp != null)
 				filter.append("\n && this.deadlineTimestamp <= :deadlineBeforeTimestamp ");
 			if (deadlineAfterTimestamp != null)
 				filter.append("\n && this.deadlineTimestamp >= :deadlineAfterTimestamp ");
 		}*/
-		
+
 		if (isFieldEnabled(FieldName.issueLinkTypeID) && issueLinkTypeID != null) {
 //			filter.append("\n && (this.issueLinks.contains(varIssueLink) )) ");
 			filter.append("\n && (this.issueLinks.contains(varIssueLink) && (varIssueLink.issueLinkType.organisationID == :issueLinkTypeID.organisationID) && (varIssueLink.issueLinkType.issueLinkTypeID == :issueLinkTypeID.issueLinkTypeID)) ");
@@ -304,8 +302,8 @@ extends AbstractJDOQuery
 				filter.append("\n)");
 			}
 		}
-
-		logger.info(filter.toString());
+		if (logger.isInfoEnabled())
+			logger.info(filter.toString());
 		q.setFilter(filter.toString());
 	}
 
@@ -551,14 +549,17 @@ extends AbstractJDOQuery
 	}
 
 	/**
-	 * Sets the {@link UserID}.
-	 * @param issueSubject
+	 * Sets the {@link UserID} of the {@link Issue}'s reporter.
+	 * @param reporterID The {@link UserID} to set.
 	 */
-	public void setReporterID(UserID reporterID)
+	public void setReporterID(final UserID reporterID)
 	{
 		final UserID oldReporterID = this.reporterID;
-		this.reporterID = reporterID;
-		notifyListeners(FieldName.reporterID, oldReporterID, reporterID);
+		if (reporterID != null && reporterID.equals(User.USER_ID_CURRENT_USER))	// User#USER_ID_CURRENT_USER is utilised as "virtual" user that is replaced by the real currently logged-in user when performing certain kinds of stored queries.
+			setCurrentUserAsReporter();
+		else
+			this.reporterID = reporterID;
+		notifyListeners(FieldName.reporterID, oldReporterID, this.reporterID);
 	}
 
 	/**
@@ -570,14 +571,17 @@ extends AbstractJDOQuery
 	}
 
 	/**
-	 * Sets the {@link UserID}.
-	 * @param issueSubject
+	 * Sets the {@link UserID} of the {@link Issue}'s assignee.
+	 * @param assigneeID The {@link UserID} to set.
 	 */
-	public void setAssigneeID(UserID assigneeID)
+	public void setAssigneeID(final UserID assigneeID)
 	{
 		final UserID oldAssigneeID = this.assigneeID;
-		this.assigneeID = assigneeID;
-		notifyListeners(FieldName.assigneeID, oldAssigneeID, assigneeID);
+		if (assigneeID != null && assigneeID.equals(User.USER_ID_CURRENT_USER))	// User#USER_ID_CURRENT_USER is utilised as "virtual" user that is replaced by the real currently logged-in user when performing certain kinds of stored queries.
+			setCurrentUserAsAssignee();
+		else
+			this.assigneeID = assigneeID;
+		notifyListeners(FieldName.assigneeID, oldAssigneeID, this.assigneeID);
 	}
 
 	/**
@@ -674,7 +678,7 @@ extends AbstractJDOQuery
 		this.updateTimestamp = updateTimestamp;
 		notifyListeners(FieldName.updateTimestamp, oldUpdateTimestamp, updateTimestamp);
 	}
-	
+
 	/**
 	 * Returns the {@link Long} of {@link Issue}'s deadline time period
 	 * @return a {@link Long} of {@link Issue}'s deadline time period
@@ -711,7 +715,7 @@ extends AbstractJDOQuery
 //		this.deadlineAfterTimestamp = deadlineAfterTimestamp;
 //		notifyListeners(FieldName.deadlineAfterTimestamp, oldDeadlineAfterTimestamp, deadlineAfterTimestamp);
 //	}
-//	
+//
 //	/**
 //	 * Returns the {@link Date} of {@link Issue}'s deadline time
 //	 * @return a {@link Date} of {@link Issue}'s deadline time
@@ -818,13 +822,17 @@ extends AbstractJDOQuery
 		return Issue.class;
 	}
 
+	/**
+	 * Sets the current user as the {@link Issue}'s assignee.
+	 */
 	public void setCurrentUserAsAssignee() {
-		if (isSetCurrentUserAsAssignee)
-			this.assigneeID = SecurityReflector.getUserDescriptor().getUserObjectID();
+		this.assigneeID = SecurityReflector.getUserDescriptor().getUserObjectID();
 	}
 
+	/**
+	 * Sets the current user as the {@link Issue}'s reporter.
+	 */
 	public void setCurrentUserAsReporter() {
-		if (isSetCurrentUserAsReporter)
-			this.reporterID = SecurityReflector.getUserDescriptor().getUserObjectID();
+		this.reporterID = SecurityReflector.getUserDescriptor().getUserObjectID();
 	}
 }

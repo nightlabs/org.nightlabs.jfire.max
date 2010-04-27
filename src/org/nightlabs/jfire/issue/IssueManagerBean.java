@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -72,6 +73,7 @@ import org.nightlabs.jfire.issue.project.id.ProjectID;
 import org.nightlabs.jfire.issue.project.id.ProjectTypeID;
 import org.nightlabs.jfire.issue.prop.IssueStruct;
 import org.nightlabs.jfire.issue.query.IssueQuery;
+import org.nightlabs.jfire.issue.query.IssueQuery.FieldName;
 import org.nightlabs.jfire.issue.resource.Messages;
 import org.nightlabs.jfire.jbpm.JbpmLookup;
 import org.nightlabs.jfire.person.PersonSearchFilter;
@@ -398,14 +400,14 @@ implements IssueManagerRemote
 	public IssueComment storeIssueComment(IssueComment issueComment, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = createPersistenceManager();
-		
+
 		boolean isNew = !JDOHelper.isDetached(issueComment);
 		if (!isNew) {
 			issueComment.setUpdateTimestamp(new Date());
 			IssueHistoryItem issueHistoryItem = new IssueCommentHistoryItem(issueComment.getUser(), issueComment.getIssue(), issueComment, false);
 			storeIssueHistoryItem(issueHistoryItem, false, new String[]{FetchPlan.DEFAULT}, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
 		}
-		
+
 		issueComment = pm.makePersistent(issueComment);
 		if (!get)
 			return null;
@@ -1006,7 +1008,7 @@ implements IssueManagerRemote
 	public IssueType storeIssueType(IssueType issueType, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = createPersistenceManager();
-		try {			
+		try {
 			return doStoreIssueType(pm, issueType, null, get, fetchGroups, maxFetchDepth);
 		}//try
 		finally {
@@ -1020,14 +1022,14 @@ implements IssueManagerRemote
 	public IssueType storeIssueType(IssueType issueType, byte[] processDefinitionAsZip, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = createPersistenceManager();
-		try {			
+		try {
 			return doStoreIssueType(pm, issueType, processDefinitionAsZip, get, fetchGroups, maxFetchDepth);
 		}//try
 		finally {
 			pm.close();
 		}//finally
 	}
-	
+
 	private IssueType doStoreIssueType(PersistenceManager pm, IssueType issueType, byte[] processDefinitionAsZip, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
 		URL processDefinitionURL = null;
@@ -1039,11 +1041,11 @@ implements IssueManagerRemote
 			File unzippedFileDir = null;
 			try {
 				zipFile = File.createTempFile("issuelink-processdefinition-zip", String.valueOf(System.currentTimeMillis()));
-				unzippedFileDir = File.createTempFile("issuelink-processdefinition-unzip", String.valueOf(System.currentTimeMillis()));			
+				unzippedFileDir = File.createTempFile("issuelink-processdefinition-unzip", String.valueOf(System.currentTimeMillis()));
 				InputStream in = new ByteArrayInputStream(processDefinitionAsZip);
 				OutputStream out = new FileOutputStream(zipFile);
 				try {
-					IOUtil.transferStreamData(in, out);	
+					IOUtil.transferStreamData(in, out);
 				} finally {
 					in.close();
 					out.close();
@@ -1073,7 +1075,7 @@ implements IssueManagerRemote
 		}
 		return result;
 	}
-	
+
 	@RolesAllowed("_Guest_")
 	@Override
 	public List<IssueType> getIssueTypes(Collection<IssueTypeID> issueTypeIDs, String[] fetchGroups, int maxFetchDepth)
@@ -1299,10 +1301,10 @@ implements IssueManagerRemote
 	@Override
 	public void initialise() throws Exception
 	{
-		PersistenceManager pm = createPersistenceManager();
+		final PersistenceManager pm = createPersistenceManager();
 		try {
-			UserID systemUserID = UserID.create(getOrganisationID(), getUserID());
-			User systemUser = (User)pm.getObjectById(systemUserID);
+			final UserID systemUserID = UserID.create(getOrganisationID(), getUserID());
+			final User systemUser = (User) pm.getObjectById(systemUserID);
 
 			// WORKAROUND JPOX Bug to avoid problems with creating workflows as State.statable is defined as interface and has subclassed implementations
 			pm.getExtent(Issue.class);
@@ -1315,231 +1317,101 @@ implements IssueManagerRemote
 			if (moduleMetaData != null)
 				return;
 
-			logger.info("Initialization of " + JFireIssueTrackingEAR.MODULE_NAME + " started...");
+			if (logger.isInfoEnabled())
+				logger.info("Initialization of " + JFireIssueTrackingEAR.MODULE_NAME + " started...");
 
 			moduleMetaData = pm.makePersistent(
-					ModuleMetaData.createModuleMetaDataFromManifest(JFireIssueTrackingEAR.MODULE_NAME, JFireIssueTrackingEAR.class)
+				ModuleMetaData.createModuleMetaDataFromManifest(JFireIssueTrackingEAR.MODULE_NAME, JFireIssueTrackingEAR.class)
 			);
 
-			String baseName = "org.nightlabs.jfire.issue.resource.messages";
-			ClassLoader loader = IssueManagerBean.class.getClassLoader();
+			final String baseName = "org.nightlabs.jfire.issue.resource.messages";
+			final ClassLoader loader = IssueManagerBean.class.getClassLoader();
+			final String resourceKeyPrefix = IssueManagerBean.class.getName() + ".";
 
-/*			IssueType issueTypeDefault = new IssueType(getOrganisationID(), IssueType.DEFAULT_ISSUE_TYPE_ID);
-			issueTypeDefault.getName().readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.IssueManagerBean.issueTypeDefault"); //$NON-NLS-1$
-			issueTypeDefault = pm.makePersistent(issueTypeDefault);
+			final IssueQuery newIssueIssueQuery = new IssueQuery();
+			final IssueQuery unassignedIssueIssueQuery = new IssueQuery();
+			final IssueQuery resolvedIssueIssueQuery = new IssueQuery();
+			final IssueQuery acknowledgedIssueIssueQuery = new IssueQuery();
+			final IssueQuery closedIssueIssueQuery = new IssueQuery();
+			final IssueQuery confirmedIssueIssueQuery = new IssueQuery();
+			final IssueQuery rejectedIssueIssueQuery = new IssueQuery();
+			final IssueQuery reportedIssueIssueQuery = new IssueQuery();
+			final IssueQuery assignedIssueIssueQuery = new IssueQuery();
 
-			// Create the statuses
-			IssueSeverityType issueSeverityTypeMinor = new IssueSeverityType(getOrganisationID(), IssueSeverityType.ISSUE_SEVERITY_TYPE_MINOR);
-			issueSeverityTypeMinor.getIssueSeverityTypeText().readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.IssueManagerBean.issueSeverityTypeMinor"); //$NON-NLS-1$
-			issueSeverityTypeMinor = pm.makePersistent(issueSeverityTypeMinor);
-			issueTypeDefault.getIssueSeverityTypes().add(issueSeverityTypeMinor);
+			final List<IssueQuery> issueQueries = new ArrayList<IssueQuery>() {
+				{
+					// reportedIssueIssueQuery and assignedIssueIssueQuery will be added separately (see below)
+					add(newIssueIssueQuery);
+					add(unassignedIssueIssueQuery);
+					add(resolvedIssueIssueQuery);
+					add(acknowledgedIssueIssueQuery);
+					add(closedIssueIssueQuery);
+					add(confirmedIssueIssueQuery);
+					add(rejectedIssueIssueQuery);
+				}
+			};
+			final Map<IssueQuery, String> issueQueryToResourceKey = new HashMap<IssueQuery, String>() {
+				{
+					put(newIssueIssueQuery, resourceKeyPrefix + "queryStoreNew");
+					put(unassignedIssueIssueQuery, resourceKeyPrefix + "queryStoreUnassigned");
+					put(resolvedIssueIssueQuery, resourceKeyPrefix + "queryStoreResolved");
+					put(acknowledgedIssueIssueQuery, resourceKeyPrefix + "queryStoreAcknowledged");
+					put(closedIssueIssueQuery, resourceKeyPrefix + "queryStoreClosed");
+					put(confirmedIssueIssueQuery, resourceKeyPrefix + "queryStoreConfirmed");
+					put(rejectedIssueIssueQuery, resourceKeyPrefix + "queryStoreRejected");
+					put(reportedIssueIssueQuery, resourceKeyPrefix + "queryStoreReported");
+					put(assignedIssueIssueQuery, resourceKeyPrefix + "queryStoreAssigned");
+				}
+			};
+			final Map<IssueQuery, String> issueQueryToJbpmNodeName = new HashMap<IssueQuery, String>() {
+				{
+					// Note, that reportedIssueIssueQuery has no corresponding Jbpm Node.
+					put(newIssueIssueQuery, JbpmConstantsIssue.NODE_NAME_NEW);
+					put(unassignedIssueIssueQuery, JbpmConstantsIssue.NODE_NAME_OPEN);
+					put(resolvedIssueIssueQuery, JbpmConstantsIssue.NODE_NAME_RESOLVED);
+					put(acknowledgedIssueIssueQuery, JbpmConstantsIssue.NODE_NAME_ACKNOWLEDGED);
+					put(closedIssueIssueQuery, JbpmConstantsIssue.NODE_NAME_CLOSED);
+					put(confirmedIssueIssueQuery, JbpmConstantsIssue.NODE_NAME_CONFIRMED);
+					put(rejectedIssueIssueQuery, JbpmConstantsIssue.NODE_NAME_REJECTED);
+					put(assignedIssueIssueQuery, JbpmConstantsIssue.NODE_NAME_ASSIGNED);
+				}
+			};
+			for (final IssueQuery issueQuery : issueQueries) {
+				issueQuery.clearQuery();
+				issueQuery.setAllFieldsDisabled();
+				issueQuery.setFieldEnabled(IssueQuery.FieldName.processDefinitionID, true);
+				issueQuery.setFieldEnabled(IssueQuery.FieldName.jbpmNodeName, true);
+				if (issueQueryToJbpmNodeName.get(issueQuery) != null)
+					issueQuery.setJbpmNodeName(issueQueryToJbpmNodeName.get(issueQuery));
+			}
 
-			IssueSeverityType issueSeverityTypeMajor = new IssueSeverityType(getOrganisationID(), IssueSeverityType.ISSUE_SEVERITY_TYPE_MAJOR);
-			issueSeverityTypeMajor.getIssueSeverityTypeText().readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.IssueManagerBean.issueSeverityTypeMajor"); //$NON-NLS-1$
-			issueSeverityTypeMajor = pm.makePersistent(issueSeverityTypeMajor);
-			issueTypeDefault.getIssueSeverityTypes().add(issueSeverityTypeMajor);
+			reportedIssueIssueQuery.clearQuery();
+			reportedIssueIssueQuery.setAllFieldsDisabled();
+			reportedIssueIssueQuery.setReporterID(User.USER_ID_CURRENT_USER);
+			reportedIssueIssueQuery.setFieldEnabled(FieldName.reporterID, true);
+			issueQueries.add(reportedIssueIssueQuery);
 
-			IssueSeverityType issueSeverityTypeCrash = new IssueSeverityType(getOrganisationID(), IssueSeverityType.ISSUE_SEVERITY_TYPE_CRASH);
-			issueSeverityTypeCrash.getIssueSeverityTypeText().readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.IssueManagerBean.issueSeverityTypeCrash"); //$NON-NLS-1$
-			issueSeverityTypeCrash = pm.makePersistent(issueSeverityTypeCrash);
-			issueTypeDefault.getIssueSeverityTypes().add(issueSeverityTypeCrash);
+			assignedIssueIssueQuery.clearQuery();
+			assignedIssueIssueQuery.setAllFieldsDisabled();
+			assignedIssueIssueQuery.setAssigneeID(User.USER_ID_CURRENT_USER);
+			assignedIssueIssueQuery.setFieldEnabled(FieldName.assigneeID, true);
+			issueQueries.add(assignedIssueIssueQuery);
 
-			IssueSeverityType issueSeverityTypeBlock = new IssueSeverityType(getOrganisationID(), IssueSeverityType.ISSUE_SEVERITY_TYPE_BLOCK);
-			issueSeverityTypeBlock.getIssueSeverityTypeText().readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.IssueManagerBean.issueSeverityTypeBlock"); //$NON-NLS-1$
-			issueSeverityTypeBlock = pm.makePersistent(issueSeverityTypeBlock);
-			issueTypeDefault.getIssueSeverityTypes().add(issueSeverityTypeBlock);
+			pm.getExtent(BaseQueryStore.class);
 
-			IssueSeverityType issueSeverityTypeFeature = new IssueSeverityType(getOrganisationID(), IssueSeverityType.ISSUE_SEVERITY_TYPE_FEATURE);
-			issueSeverityTypeFeature.getIssueSeverityTypeText().readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.IssueManagerBean.issueSeverityTypeFeature"); //$NON-NLS-1$
-			issueSeverityTypeFeature = pm.makePersistent(issueSeverityTypeFeature);
-			issueTypeDefault.getIssueSeverityTypes().add(issueSeverityTypeFeature);
+			for (final IssueQuery issueQuery : issueQueries) {
+				final QueryCollection<IssueQuery> queryCollection = new QueryCollection<IssueQuery>(Issue.class);
+				queryCollection.add(issueQuery);
+				final BaseQueryStore queryStore = new BaseQueryStore(systemUser, IDGenerator.nextID(BaseQueryStore.class), queryCollection);
+				queryStore.setPubliclyAvailable(true);
+				if (issueQueryToResourceKey.get(issueQuery) != null)
+					queryStore.getName().readFromProperties(baseName, loader, issueQueryToResourceKey.get(issueQuery));
+				if (issueQueryToResourceKey.get(issueQuery) != null)
+					queryStore.getDescription().readFromProperties(baseName, loader, issueQueryToResourceKey.get(issueQuery));
+				queryStore.serialiseCollection();
 
-			IssueSeverityType issueSeverityTypeTrivial = new IssueSeverityType(getOrganisationID(), IssueSeverityType.ISSUE_SEVERITY_TYPE_TRIVIAL);
-			issueSeverityTypeTrivial.getIssueSeverityTypeText().readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.IssueManagerBean.issueSeverityTypeTrivial"); //$NON-NLS-1$
-			issueSeverityTypeTrivial = pm.makePersistent(issueSeverityTypeTrivial);
-			issueTypeDefault.getIssueSeverityTypes().add(issueSeverityTypeTrivial);
-
-			IssueSeverityType issueSeverityTypeText = new IssueSeverityType(getOrganisationID(), IssueSeverityType.ISSUE_SEVERITY_TYPE_TEXT);
-			issueSeverityTypeText.getIssueSeverityTypeText().readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.IssueManagerBean.issueSeverityTypeText"); //$NON-NLS-1$
-			issueSeverityTypeText = pm.makePersistent(issueSeverityTypeText);
-			issueTypeDefault.getIssueSeverityTypes().add(issueSeverityTypeText);
-
-			IssueSeverityType issueSeverityTypeTweak = new IssueSeverityType(getOrganisationID(), IssueSeverityType.ISSUE_SEVERITY_TYPE_TWEAK);
-			issueSeverityTypeTweak.getIssueSeverityTypeText().readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.IssueManagerBean.issueSeverityTypeTweak"); //$NON-NLS-1$
-			issueSeverityTypeTweak = pm.makePersistent(issueSeverityTypeTweak);
-			issueTypeDefault.getIssueSeverityTypes().add(issueSeverityTypeTweak);
-
-			////////////////////////////////////////////////////////
-			// Create the priorities
-			// check, whether the datastore is already initialized
-			IssuePriority issuePriorityNone = new IssuePriority(getOrganisationID(), IssuePriority.ISSUE_PRIORITY_NONE);
-			issuePriorityNone.getIssuePriorityText().readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.IssueManagerBean.issuePriorityNone"); //$NON-NLS-1$
-			issuePriorityNone = pm.makePersistent(issuePriorityNone);
-			issueTypeDefault.getIssuePriorities().add(issuePriorityNone);
-
-			IssuePriority issuePriorityLow = new IssuePriority(getOrganisationID(), IssuePriority.ISSUE_PRIORITY_LOW);
-			issuePriorityLow.getIssuePriorityText().readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.IssueManagerBean.issuePriorityLow"); //$NON-NLS-1$
-			issuePriorityLow = pm.makePersistent(issuePriorityLow);
-			issueTypeDefault.getIssuePriorities().add(issuePriorityLow);
-
-			IssuePriority issuePriorityNormal = new IssuePriority(getOrganisationID(), IssuePriority.ISSUE_PRIORITY_NORMAL);
-			issuePriorityNormal.getIssuePriorityText().readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.IssueManagerBean.issuePriorityNormal"); //$NON-NLS-1$
-			issuePriorityNormal = pm.makePersistent(issuePriorityNormal);
-			issueTypeDefault.getIssuePriorities().add(issuePriorityNormal);
-
-			IssuePriority issuePriorityHigh = new IssuePriority(getOrganisationID(), IssuePriority.ISSUE_PRIORITY_HIGH);
-			issuePriorityHigh.getIssuePriorityText().readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.IssueManagerBean.issuePriorityHigh"); //$NON-NLS-1$
-			issuePriorityHigh = pm.makePersistent(issuePriorityHigh);
-			issueTypeDefault.getIssuePriorities().add(issuePriorityHigh);
-
-			IssuePriority issuePriorityUrgent = new IssuePriority(getOrganisationID(), IssuePriority.ISSUE_PRIORITY_URGENT);
-			issuePriorityUrgent.getIssuePriorityText().readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.IssueManagerBean.issuePriorityUrgent"); //$NON-NLS-1$
-			issuePriorityUrgent = pm.makePersistent(issuePriorityUrgent);
-			issueTypeDefault.getIssuePriorities().add(issuePriorityUrgent);
-
-			IssuePriority issuePriorityImmediate = new IssuePriority(getOrganisationID(), IssuePriority.ISSUE_PRIORITY_IMMEDIATE);
-			issuePriorityImmediate.getIssuePriorityText().readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.IssueManagerBean.issuePriorityImmediate"); //$NON-NLS-1$
-			issuePriorityImmediate = pm.makePersistent(issuePriorityImmediate);
-			issueTypeDefault.getIssuePriorities().add(issuePriorityImmediate);
-
-
-			// Create the resolutions
-			IssueResolution issueResolutionNotAssigned = new IssueResolution(getOrganisationID(), IssueResolution.ISSUE_RESOLUTION_ID_NOT_ASSIGNED.issueResolutionID);
-			issueResolutionNotAssigned.getName().readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.IssueManagerBean.issueResolutionNotAssigned"); //$NON-NLS-1$
-			issueResolutionNotAssigned = pm.makePersistent(issueResolutionNotAssigned);
-			issueTypeDefault.getIssueResolutions().add(issueResolutionNotAssigned);
-
-			IssueResolution issueResolutionOpen = new IssueResolution(getOrganisationID(), IssueResolution.ISSUE_RESOLUTION_OPEN);
-			issueResolutionOpen.getName().readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.IssueManagerBean.issueResolutionOpen"); //$NON-NLS-1$
-			issueResolutionOpen = pm.makePersistent(issueResolutionOpen);
-			issueTypeDefault.getIssueResolutions().add(issueResolutionOpen);
-
-			IssueResolution issueResolutionFixed = new IssueResolution(getOrganisationID(), IssueResolution.ISSUE_RESOLUTION_FIXED);
-			issueResolutionFixed.getName().readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.IssueManagerBean.issueResolutionFixed"); //$NON-NLS-1$
-			issueResolutionFixed = pm.makePersistent(issueResolutionFixed);
-			issueTypeDefault.getIssueResolutions().add(issueResolutionFixed);
-
-			IssueResolution issueResolutionReopened = new IssueResolution(getOrganisationID(), IssueResolution.ISSUE_RESOLUTION_REOPENED);
-			issueResolutionReopened.getName().readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.IssueManagerBean.issueResolutionReopened"); //$NON-NLS-1$
-			issueResolutionReopened = pm.makePersistent(issueResolutionReopened);
-			issueTypeDefault.getIssueResolutions().add(issueResolutionReopened);
-
-			IssueResolution issueResolutionNotFixable = new IssueResolution(getOrganisationID(), IssueResolution.ISSUE_RESOLUTION_NOTFIXABLE);
-			issueResolutionNotFixable.getName().readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.IssueManagerBean.issueResolutionNotFixable"); //$NON-NLS-1$
-			issueResolutionNotFixable = pm.makePersistent(issueResolutionNotFixable);
-			issueTypeDefault.getIssueResolutions().add(issueResolutionNotFixable);
-
-			IssueResolution issueResolutionWillNotFix = new IssueResolution(getOrganisationID(), IssueResolution.ISSUE_RESOLUTION_WILLNOTFIX);
-			issueResolutionWillNotFix.getName().readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.IssueManagerBean.issueResolutionWillNotFix"); //$NON-NLS-1$
-			issueResolutionWillNotFix = pm.makePersistent(issueResolutionWillNotFix);
-			issueTypeDefault.getIssueResolutions().add(issueResolutionWillNotFix);
-
-			// Create the process definitions.
-			issueTypeDefault.readProcessDefinition(IssueType.class.getResource("jbpm/status/"));
-
-			IssueType issueTypeCustomer = new IssueType(getOrganisationID(), "Customer");
-			issueTypeCustomer.getName().readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.IssueManagerBean.issueTypeCustomer"); //$NON-NLS-1$
-			issueTypeCustomer = pm.makePersistent(issueTypeCustomer);
-
-			// Create the process definitions.
-			issueTypeCustomer.readProcessDefinition(IssueType.class.getResource("jbpm/status/"));
-
-
-
-			// ---[ IssueLinkTypes ]--------------------------------------------------------------------------------------------| Start |---
-			IssueLinkType issueLinkTypeRelated = new IssueLinkType(IssueLinkType.ISSUE_LINK_TYPE_ID_RELATED);
-			issueLinkTypeRelated.getName().readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.IssueManagerBean.issueLinkTypeRelated"); //$NON-NLS-1$
-			issueLinkTypeRelated.addLinkedObjectClass(Object.class);
-			issueLinkTypeRelated.addNotLinkedObjectClass(Issue.class);
-			issueLinkTypeRelated = pm.makePersistent(issueLinkTypeRelated);
-
-			IssueLinkType issueLinkTypeRelatedIssue = new IssueLinkTypeIssueToIssue(IssueLinkTypeIssueToIssue.ISSUE_LINK_TYPE_ID_RELATED_ISSUE);
-			issueLinkTypeRelatedIssue.getName().readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.IssueManagerBean.issueLinkTypeRelatedIssue"); //$NON-NLS-1$
-			issueLinkTypeRelatedIssue.addLinkedObjectClass(Issue.class);
-			issueLinkTypeRelatedIssue = pm.makePersistent(issueLinkTypeRelatedIssue);
-
-			IssueLinkType issueLinkTypeParent = new IssueLinkTypeParentChild(IssueLinkTypeParentChild.ISSUE_LINK_TYPE_ID_PARENT);
-			issueLinkTypeParent.getName().readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.IssueManagerBean.issueLinkTypeParent"); //$NON-NLS-1$
-
-			issueLinkTypeParent.addLinkedObjectClass(Issue.class);
-			issueLinkTypeParent = pm.makePersistent(issueLinkTypeParent);
-
-			IssueLinkType issueLinkTypeChild = new IssueLinkTypeParentChild(IssueLinkTypeParentChild.ISSUE_LINK_TYPE_ID_CHILD);
-			issueLinkTypeChild.getName().readFromProperties(baseName, loader, "org.nightlabs.jfire.issue.IssueManagerBean.issueLinkTypeChild" ); //$NON-NLS-1$
-			issueLinkTypeChild.addLinkedObjectClass(Issue.class);
-			issueLinkTypeChild = pm.makePersistent(issueLinkTypeChild);
-
-			IssueLinkType issueLinkTypeIsDuplicate = new IssueLinkTypeDuplicate(IssueLinkTypeDuplicate.ISSUE_LINK_TYPE_ID_IS_DUPLICATE);
-			issueLinkTypeIsDuplicate.getName().readFromProperties(baseName, loader, "org.nightlabs.jfire.issue.IssueManagerBean.issueLinkTypeIsDuplicate" ); //$NON-NLS-1$
-			issueLinkTypeIsDuplicate.addLinkedObjectClass(Issue.class);
-			issueLinkTypeIsDuplicate = pm.makePersistent(issueLinkTypeIsDuplicate);
-
-			IssueLinkType issueLinkTypeHasDuplicate = new IssueLinkTypeDuplicate(IssueLinkTypeDuplicate.ISSUE_LINK_TYPE_ID_HAS_DUPLICATE);
-			issueLinkTypeHasDuplicate.getName().readFromProperties(baseName, loader, "org.nightlabs.jfire.issue.IssueManagerBean.issueLinkTypeHasDuplicate" ); //$NON-NLS-1$
-			issueLinkTypeHasDuplicate.addLinkedObjectClass(Issue.class);
-			issueLinkTypeHasDuplicate = pm.makePersistent(issueLinkTypeHasDuplicate);
-			// ---[ IssueLinkTypes ]----------------------------------------------------------------------------------------------| End |---
-
-
-
-			// ---[ ProjectTypes ]----------------------------------------------------------------------------------------------| Start |---
-			pm.getExtent(ProjectType.class);
-
-			ProjectType projectTypeDefault = new ProjectType(ProjectType.PROJECT_TYPE_ID_DEFAULT);
-			projectTypeDefault.getName().readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.IssueManagerBean.projectTypeDefault"); //$NON-NLS-1$
-
-			projectTypeDefault = pm.makePersistent(projectTypeDefault);
-
-			ProjectType projectTypeSoftware = new ProjectType(IDGenerator.getOrganisationID(), "software");
-			projectTypeSoftware.getName().readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.IssueManagerBean.software"); //$NON-NLS-1$
-
-			projectTypeSoftware = pm.makePersistent(projectTypeSoftware);
-
-			// Create the projects
-			pm.getExtent(Project.class);
-
-			Project projectDefault = new Project(Project.PROJECT_ID_DEFAULT);
-			projectDefault.getName().readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.IssueManagerBean.projectDefault"); //$NON-NLS-1$
-
-			projectDefault.setProjectType(projectTypeDefault);
-			projectDefault = pm.makePersistent(projectDefault);
-
-			Project jfireProject = new Project(IDGenerator.getOrganisationID(), IDGenerator.nextID(Project.class));
-			jfireProject.getName().readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.IssueManagerBean.jfireProject"); //$NON-NLS-1$
-			jfireProject.setProjectType(projectTypeSoftware);
-			jfireProject = pm.makePersistent(jfireProject);*/
-			// ---[ ProjectTypes ]------------------------------------------------------------------------------------------------| End |---
-
-
+				pm.makePersistent(queryStore);
+			}
 
 			// ---[ IssueMarkers ]----------------------------------------------------------------------------------------------| Start |---
 			IssueMarker issueMarker_Email = new IssueMarker(false);
@@ -1569,223 +1441,170 @@ implements IssueManagerRemote
 			// ---[ IssueMarkers ]------------------------------------------------------------------------------------------------| End |---
 
 
-
-			// TODO Move the following DEMO Issues to a demo-data-creation module; yet to be created. Coming soon... stay tuned ;-)
-			//      Done. Moved to InitialiserIssueTracking.
-//			// ---[ Issues ]----------------------------------------------------------------------------------------------------| Start |---
-//			pm.getExtent(Issue.class);
-//
-//			int totDemoIssueCnt = 56;
-//			boolean isCreateArbitraryIssueToIssueLinks = !true;
-//			List<IssuePriority> def_issuePriorities = issueTypeDefault.getIssuePriorities();
-//			List<IssueResolution> def_issueResolutions = issueTypeDefault.getIssueResolutions();
-//			List<IssueSeverityType> def_issueSeverityTypes = issueTypeDefault.getIssueSeverityTypes();
-//			List<Issue> demoIssues = new ArrayList<Issue>(totDemoIssueCnt);
-//
-//			Random rndGen = new Random( System.currentTimeMillis() );
-//			for (int i=0; i<totDemoIssueCnt; i++) {
-//				Issue demoIssue = new Issue(true, issueTypeDefault);
-//
-//				// Essential issue settings
-//				demoIssue.setReporter(systemUser);
-//				demoIssue.setIssuePriority( def_issuePriorities.get( rndGen.nextInt(def_issuePriorities.size()) ) );
-//				demoIssue.setIssueResolution( def_issueResolutions.get( rndGen.nextInt(def_issueResolutions.size()) ) );
-//				demoIssue.setIssueSeverityType( def_issueSeverityTypes.get( rndGen.nextInt(def_issueSeverityTypes.size()) ) );
-//
-//				// Subject and description
-//				demoIssue.getSubject().readFromProperties(baseName, loader, "org.nightlabs.jfire.issue.IssueManagerBean.issueSubject" + (i+1)); //$NON-NLS-1$
-//				demoIssue.getDescription().readFromProperties(baseName, loader, "org.nightlabs.jfire.issue.IssueManagerBean.issueDescription" + (i+1)); //$NON-NLS-1$
-//
-//				// Markers
-//				if (rndGen.nextInt(100) < 40)	demoIssue.addIssueMarker(issueMarker_Phone);
-//				if (rndGen.nextInt(100) < 65)	demoIssue.addIssueMarker(issueMarker_Email);
-//
-//
-//				// Randomly (and playfully?) create links between Issues.
-//				if (isCreateArbitraryIssueToIssueLinks && demoIssues.size() > 5) {
-//					List<Integer> usedIndexRefs = new ArrayList<Integer>();
-//					while (rndGen.nextInt(100) < 67 && usedIndexRefs.size() < demoIssues.size()/2) {
-//						int index = rndGen.nextInt(demoIssues.size());
-//						if ( !usedIndexRefs.contains(index) ) {
-//							demoIssue.createIssueLink(issueLinkTypeParent, demoIssues.get(index));
-//							usedIndexRefs.add(index);
-//						}
-//					}
-//				}
-//
-//
-//				// Done and store.
-//				demoIssues.add(demoIssue);
-//				storeIssue(demoIssue, false, new String[0], NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
-//			}
-//			// ---[ Issues ]------------------------------------------------------------------------------------------------------| End |---
-
-
-
 			// ---[ Predefined Query Stores ]-----------------------------------------------------------------------------------| Start |---
 //			ProcessDefinitionID processDefinitionID = (ProcessDefinitionID)JDOHelper.getObjectId(issueTypeDefault.getProcessDefinition());
-			IssueQuery newIssueIssueQuery = new IssueQuery();
-			newIssueIssueQuery.clearQuery();
-			newIssueIssueQuery.setAllFieldsDisabled();
-			newIssueIssueQuery.setFieldEnabled(IssueQuery.FieldName.processDefinitionID, true);
-			newIssueIssueQuery.setFieldEnabled(IssueQuery.FieldName.jbpmNodeName, true);
-			newIssueIssueQuery.setJbpmNodeName(JbpmConstantsIssue.NODE_NAME_NEW);
-
-			IssueQuery unassignedIssueIssueQuery = new IssueQuery();
-			unassignedIssueIssueQuery.clearQuery();
-			unassignedIssueIssueQuery.setAllFieldsDisabled();
-			unassignedIssueIssueQuery.setFieldEnabled(IssueQuery.FieldName.processDefinitionID, true);
-			unassignedIssueIssueQuery.setFieldEnabled(IssueQuery.FieldName.jbpmNodeName, true);
-			unassignedIssueIssueQuery.setJbpmNodeName(JbpmConstantsIssue.NODE_NAME_OPEN);
-
-			IssueQuery resolvedIssueIssueQuery = new IssueQuery();
-			resolvedIssueIssueQuery.clearQuery();
-			resolvedIssueIssueQuery.setAllFieldsDisabled();
-			resolvedIssueIssueQuery.setFieldEnabled(IssueQuery.FieldName.processDefinitionID, true);
-			resolvedIssueIssueQuery.setFieldEnabled(IssueQuery.FieldName.jbpmNodeName, true);
-			resolvedIssueIssueQuery.setJbpmNodeName(JbpmConstantsIssue.NODE_NAME_RESOLVED);
-
-			IssueQuery acknowledgedIssueIssueQuery = new IssueQuery();
-			acknowledgedIssueIssueQuery.clearQuery();
-			acknowledgedIssueIssueQuery.setAllFieldsDisabled();
-			acknowledgedIssueIssueQuery.setFieldEnabled(IssueQuery.FieldName.processDefinitionID, true);
-			acknowledgedIssueIssueQuery.setFieldEnabled(IssueQuery.FieldName.jbpmNodeName, true);
-			acknowledgedIssueIssueQuery.setJbpmNodeName(JbpmConstantsIssue.NODE_NAME_ACKNOWLEDGED);
-
-			IssueQuery closedIssueIssueQuery = new IssueQuery();
-			closedIssueIssueQuery.clearQuery();
-			closedIssueIssueQuery.setAllFieldsDisabled();
-			closedIssueIssueQuery.setFieldEnabled(IssueQuery.FieldName.processDefinitionID, true);
-			closedIssueIssueQuery.setFieldEnabled(IssueQuery.FieldName.jbpmNodeName, true);
-			closedIssueIssueQuery.setJbpmNodeName(JbpmConstantsIssue.NODE_NAME_CLOSED);
-
-			IssueQuery confirmedIssueIssueQuery = new IssueQuery();
-			confirmedIssueIssueQuery.clearQuery();
-			confirmedIssueIssueQuery.setAllFieldsDisabled();
-			confirmedIssueIssueQuery.setFieldEnabled(IssueQuery.FieldName.processDefinitionID, true);
-			confirmedIssueIssueQuery.setFieldEnabled(IssueQuery.FieldName.jbpmNodeName, true);
-			confirmedIssueIssueQuery.setJbpmNodeName(JbpmConstantsIssue.NODE_NAME_CONFIRMED);
-
-			IssueQuery rejectedIssueIssueQuery = new IssueQuery();
-			rejectedIssueIssueQuery.clearQuery();
-			rejectedIssueIssueQuery.setAllFieldsDisabled();
-			rejectedIssueIssueQuery.setFieldEnabled(IssueQuery.FieldName.processDefinitionID, true);
-			rejectedIssueIssueQuery.setFieldEnabled(IssueQuery.FieldName.jbpmNodeName, true);
-			rejectedIssueIssueQuery.setJbpmNodeName(JbpmConstantsIssue.NODE_NAME_REJECTED);
-
-			//1 Unassigned Issues
-			pm.getExtent(BaseQueryStore.class);
-
-			QueryCollection<IssueQuery> queryCollection = new QueryCollection<IssueQuery>(Issue.class);
-			queryCollection.add(unassignedIssueIssueQuery);
-
-			BaseQueryStore queryStore = new BaseQueryStore(systemUser,
-					IDGenerator.nextID(BaseQueryStore.class), queryCollection);
-
-			queryStore.setQueryCollection(queryCollection);
-			queryStore.setPubliclyAvailable(true);
-			queryStore.getName().readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.IssueManagerBean.queryStoreUnassigned"); //$NON-NLS-1$
-			queryStore.getDescription().readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.IssueManagerBean.queryStoreUnassigned"); //$NON-NLS-1$
-			queryStore.serialiseCollection();
-			queryStore = pm.makePersistent(queryStore);
-
-			//2 Resolved Issues
-			queryCollection = new QueryCollection<IssueQuery>(Issue.class);
-			queryCollection.add(resolvedIssueIssueQuery);
-
-			queryStore = new BaseQueryStore(systemUser,
-					IDGenerator.nextID(BaseQueryStore.class), queryCollection);
-
-			queryStore.setQueryCollection(queryCollection);
-			queryStore.setPubliclyAvailable(true);
-			queryStore.getName().readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.IssueManagerBean.queryStoreResolved"); //$NON-NLS-1$
-			queryStore.getDescription().readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.IssueManagerBean.queryStoreResolved"); //$NON-NLS-1$
-			queryStore.serialiseCollection();
-			queryStore = pm.makePersistent(queryStore);
-
-			//3 Acknowledged Issues
-			queryCollection = new QueryCollection<IssueQuery>(Issue.class);
-			queryCollection.add(acknowledgedIssueIssueQuery);
-
-			queryStore = new BaseQueryStore(systemUser,
-					IDGenerator.nextID(BaseQueryStore.class), queryCollection);
-
-			queryStore.setQueryCollection(queryCollection);
-			queryStore.setPubliclyAvailable(true);
-			queryStore.getName().readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.IssueManagerBean.queryStoreAcknowledged"); //$NON-NLS-1$
-			queryStore.getDescription().readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.IssueManagerBean.queryStoreAcknowledged"); //$NON-NLS-1$
-			queryStore.serialiseCollection();
-			queryStore = pm.makePersistent(queryStore);
-
-			//4 Closed Issues
-			queryCollection = new QueryCollection<IssueQuery>(Issue.class);
-			queryCollection.add(closedIssueIssueQuery);
-
-			queryStore = new BaseQueryStore(systemUser,
-					IDGenerator.nextID(BaseQueryStore.class), queryCollection);
-
-			queryStore.setQueryCollection(queryCollection);
-			queryStore.setPubliclyAvailable(true);
-			queryStore.getName().readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.IssueManagerBean.queryStoreclosed"); //$NON-NLS-1$
-			queryStore.getDescription().readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.IssueManagerBean.queryStoreclosed"); //$NON-NLS-1$
-			queryStore.serialiseCollection();
-			queryStore = pm.makePersistent(queryStore);
-
-			//5 Confirmed Issues
-			queryCollection = new QueryCollection<IssueQuery>(Issue.class);
-			queryCollection.add(confirmedIssueIssueQuery);
-
-			queryStore = new BaseQueryStore(systemUser,
-					IDGenerator.nextID(BaseQueryStore.class), queryCollection);
-
-			queryStore.setQueryCollection(queryCollection);
-			queryStore.setPubliclyAvailable(true);
-			queryStore.getName().readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.IssueManagerBean.queryStoreConfirmed"); //$NON-NLS-1$
-			queryStore.getDescription().readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.IssueManagerBean.queryStoreConfirmed"); //$NON-NLS-1$
-			queryStore.serialiseCollection();
-			queryStore = pm.makePersistent(queryStore);
-
-			//6 Rejected Issues
-			queryCollection = new QueryCollection<IssueQuery>(Issue.class);
-			queryCollection.add(rejectedIssueIssueQuery);
-
-			queryStore = new BaseQueryStore(systemUser,
-					IDGenerator.nextID(BaseQueryStore.class), queryCollection);
-
-			queryStore.setQueryCollection(queryCollection);
-			queryStore.setPubliclyAvailable(true);
-			queryStore.getName().readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.IssueManagerBean.queryStoreRejected"); //$NON-NLS-1$
-			queryStore.getDescription().readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.IssueManagerBean.queryStoreRejected"); //$NON-NLS-1$
-			queryStore.serialiseCollection();
-			queryStore = pm.makePersistent(queryStore);
-
-			//7 New Issues
-			queryCollection = new QueryCollection<IssueQuery>(Issue.class);
-			queryCollection.add(newIssueIssueQuery);
-
-			queryStore = new BaseQueryStore(systemUser,
-					IDGenerator.nextID(BaseQueryStore.class), queryCollection);
-
-			queryStore.setQueryCollection(queryCollection);
-			queryStore.setPubliclyAvailable(true);
-			queryStore.getName().readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.IssueManagerBean.queryStoreNew"); //$NON-NLS-1$
-			queryStore.getDescription().readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.IssueManagerBean.queryStoreNew"); //$NON-NLS-1$
-			queryStore.serialiseCollection();
-			queryStore = pm.makePersistent(queryStore);
+//			IssueQuery newIssueIssueQuery = new IssueQuery();
+//			newIssueIssueQuery.clearQuery();
+//			newIssueIssueQuery.setAllFieldsDisabled();
+//			newIssueIssueQuery.setFieldEnabled(IssueQuery.FieldName.processDefinitionID, true);
+//			newIssueIssueQuery.setFieldEnabled(IssueQuery.FieldName.jbpmNodeName, true);
+//			newIssueIssueQuery.setJbpmNodeName(JbpmConstantsIssue.NODE_NAME_NEW);
+//
+//			IssueQuery unassignedIssueIssueQuery = new IssueQuery();
+//			unassignedIssueIssueQuery.clearQuery();
+//			unassignedIssueIssueQuery.setAllFieldsDisabled();
+//			unassignedIssueIssueQuery.setFieldEnabled(IssueQuery.FieldName.processDefinitionID, true);
+//			unassignedIssueIssueQuery.setFieldEnabled(IssueQuery.FieldName.jbpmNodeName, true);
+//			unassignedIssueIssueQuery.setJbpmNodeName(JbpmConstantsIssue.NODE_NAME_OPEN);
+//
+//			IssueQuery resolvedIssueIssueQuery = new IssueQuery();
+//			resolvedIssueIssueQuery.clearQuery();
+//			resolvedIssueIssueQuery.setAllFieldsDisabled();
+//			resolvedIssueIssueQuery.setFieldEnabled(IssueQuery.FieldName.processDefinitionID, true);
+//			resolvedIssueIssueQuery.setFieldEnabled(IssueQuery.FieldName.jbpmNodeName, true);
+//			resolvedIssueIssueQuery.setJbpmNodeName(JbpmConstantsIssue.NODE_NAME_RESOLVED);
+//
+//			IssueQuery acknowledgedIssueIssueQuery = new IssueQuery();
+//			acknowledgedIssueIssueQuery.clearQuery();
+//			acknowledgedIssueIssueQuery.setAllFieldsDisabled();
+//			acknowledgedIssueIssueQuery.setFieldEnabled(IssueQuery.FieldName.processDefinitionID, true);
+//			acknowledgedIssueIssueQuery.setFieldEnabled(IssueQuery.FieldName.jbpmNodeName, true);
+//			acknowledgedIssueIssueQuery.setJbpmNodeName(JbpmConstantsIssue.NODE_NAME_ACKNOWLEDGED);
+//
+//			IssueQuery closedIssueIssueQuery = new IssueQuery();
+//			closedIssueIssueQuery.clearQuery();
+//			closedIssueIssueQuery.setAllFieldsDisabled();
+//			closedIssueIssueQuery.setFieldEnabled(IssueQuery.FieldName.processDefinitionID, true);
+//			closedIssueIssueQuery.setFieldEnabled(IssueQuery.FieldName.jbpmNodeName, true);
+//			closedIssueIssueQuery.setJbpmNodeName(JbpmConstantsIssue.NODE_NAME_CLOSED);
+//
+//			IssueQuery confirmedIssueIssueQuery = new IssueQuery();
+//			confirmedIssueIssueQuery.clearQuery();
+//			confirmedIssueIssueQuery.setAllFieldsDisabled();
+//			confirmedIssueIssueQuery.setFieldEnabled(IssueQuery.FieldName.processDefinitionID, true);
+//			confirmedIssueIssueQuery.setFieldEnabled(IssueQuery.FieldName.jbpmNodeName, true);
+//			confirmedIssueIssueQuery.setJbpmNodeName(JbpmConstantsIssue.NODE_NAME_CONFIRMED);
+//
+//			IssueQuery rejectedIssueIssueQuery = new IssueQuery();
+//			rejectedIssueIssueQuery.clearQuery();
+//			rejectedIssueIssueQuery.setAllFieldsDisabled();
+//			rejectedIssueIssueQuery.setFieldEnabled(IssueQuery.FieldName.processDefinitionID, true);
+//			rejectedIssueIssueQuery.setFieldEnabled(IssueQuery.FieldName.jbpmNodeName, true);
+//			rejectedIssueIssueQuery.setJbpmNodeName(JbpmConstantsIssue.NODE_NAME_REJECTED);
+//
+//			//1 Unassigned Issues
+//			pm.getExtent(BaseQueryStore.class);
+//
+//			QueryCollection<IssueQuery> queryCollection = new QueryCollection<IssueQuery>(Issue.class);
+//			queryCollection.add(unassignedIssueIssueQuery);
+//
+//			BaseQueryStore queryStore = new BaseQueryStore(systemUser,
+//					IDGenerator.nextID(BaseQueryStore.class), queryCollection);
+//
+//			queryStore.setQueryCollection(queryCollection);
+//			queryStore.setPubliclyAvailable(true);
+//			queryStore.getName().readFromProperties(baseName, loader,
+//			"org.nightlabs.jfire.issue.IssueManagerBean.queryStoreUnassigned"); //$NON-NLS-1$
+//			queryStore.getDescription().readFromProperties(baseName, loader,
+//			"org.nightlabs.jfire.issue.IssueManagerBean.queryStoreUnassigned"); //$NON-NLS-1$
+//			queryStore.serialiseCollection();
+//			queryStore = pm.makePersistent(queryStore);
+//
+//			//2 Resolved Issues
+//			queryCollection = new QueryCollection<IssueQuery>(Issue.class);
+//			queryCollection.add(resolvedIssueIssueQuery);
+//
+//			queryStore = new BaseQueryStore(systemUser,
+//					IDGenerator.nextID(BaseQueryStore.class), queryCollection);
+//
+//			queryStore.setQueryCollection(queryCollection);
+//			queryStore.setPubliclyAvailable(true);
+//			queryStore.getName().readFromProperties(baseName, loader,
+//			"org.nightlabs.jfire.issue.IssueManagerBean.queryStoreResolved"); //$NON-NLS-1$
+//			queryStore.getDescription().readFromProperties(baseName, loader,
+//			"org.nightlabs.jfire.issue.IssueManagerBean.queryStoreResolved"); //$NON-NLS-1$
+//			queryStore.serialiseCollection();
+//			queryStore = pm.makePersistent(queryStore);
+//
+//			//3 Acknowledged Issues
+//			queryCollection = new QueryCollection<IssueQuery>(Issue.class);
+//			queryCollection.add(acknowledgedIssueIssueQuery);
+//
+//			queryStore = new BaseQueryStore(systemUser,
+//					IDGenerator.nextID(BaseQueryStore.class), queryCollection);
+//
+//			queryStore.setQueryCollection(queryCollection);
+//			queryStore.setPubliclyAvailable(true);
+//			queryStore.getName().readFromProperties(baseName, loader,
+//			"org.nightlabs.jfire.issue.IssueManagerBean.queryStoreAcknowledged"); //$NON-NLS-1$
+//			queryStore.getDescription().readFromProperties(baseName, loader,
+//			"org.nightlabs.jfire.issue.IssueManagerBean.queryStoreAcknowledged"); //$NON-NLS-1$
+//			queryStore.serialiseCollection();
+//			queryStore = pm.makePersistent(queryStore);
+//
+//			//4 Closed Issues
+//			queryCollection = new QueryCollection<IssueQuery>(Issue.class);
+//			queryCollection.add(closedIssueIssueQuery);
+//
+//			queryStore = new BaseQueryStore(systemUser,
+//					IDGenerator.nextID(BaseQueryStore.class), queryCollection);
+//
+//			queryStore.setQueryCollection(queryCollection);
+//			queryStore.setPubliclyAvailable(true);
+//			queryStore.getName().readFromProperties(baseName, loader,
+//			"org.nightlabs.jfire.issue.IssueManagerBean.queryStoreclosed"); //$NON-NLS-1$
+//			queryStore.getDescription().readFromProperties(baseName, loader,
+//			"org.nightlabs.jfire.issue.IssueManagerBean.queryStoreclosed"); //$NON-NLS-1$
+//			queryStore.serialiseCollection();
+//			queryStore = pm.makePersistent(queryStore);
+//
+//			//5 Confirmed Issues
+//			queryCollection = new QueryCollection<IssueQuery>(Issue.class);
+//			queryCollection.add(confirmedIssueIssueQuery);
+//
+//			queryStore = new BaseQueryStore(systemUser,
+//					IDGenerator.nextID(BaseQueryStore.class), queryCollection);
+//
+//			queryStore.setQueryCollection(queryCollection);
+//			queryStore.setPubliclyAvailable(true);
+//			queryStore.getName().readFromProperties(baseName, loader,
+//			"org.nightlabs.jfire.issue.IssueManagerBean.queryStoreConfirmed"); //$NON-NLS-1$
+//			queryStore.getDescription().readFromProperties(baseName, loader,
+//			"org.nightlabs.jfire.issue.IssueManagerBean.queryStoreConfirmed"); //$NON-NLS-1$
+//			queryStore.serialiseCollection();
+//			queryStore = pm.makePersistent(queryStore);
+//
+//			//6 Rejected Issues
+//			queryCollection = new QueryCollection<IssueQuery>(Issue.class);
+//			queryCollection.add(rejectedIssueIssueQuery);
+//
+//			queryStore = new BaseQueryStore(systemUser,
+//					IDGenerator.nextID(BaseQueryStore.class), queryCollection);
+//
+//			queryStore.setQueryCollection(queryCollection);
+//			queryStore.setPubliclyAvailable(true);
+//			queryStore.getName().readFromProperties(baseName, loader,
+//			"org.nightlabs.jfire.issue.IssueManagerBean.queryStoreRejected"); //$NON-NLS-1$
+//			queryStore.getDescription().readFromProperties(baseName, loader,
+//			"org.nightlabs.jfire.issue.IssueManagerBean.queryStoreRejected"); //$NON-NLS-1$
+//			queryStore.serialiseCollection();
+//			queryStore = pm.makePersistent(queryStore);
+//
+//			//7 New Issues
+//			queryCollection = new QueryCollection<IssueQuery>(Issue.class);
+//			queryCollection.add(newIssueIssueQuery);
+//
+//			queryStore = new BaseQueryStore(systemUser,
+//					IDGenerator.nextID(BaseQueryStore.class), queryCollection);
+//
+//			queryStore.setQueryCollection(queryCollection);
+//			queryStore.setPubliclyAvailable(true);
+//			queryStore.getName().readFromProperties(baseName, loader,
+//			"org.nightlabs.jfire.issue.IssueManagerBean.queryStoreNew"); //$NON-NLS-1$
+//			queryStore.getDescription().readFromProperties(baseName, loader,
+//			"org.nightlabs.jfire.issue.IssueManagerBean.queryStoreNew"); //$NON-NLS-1$
+//			queryStore.serialiseCollection();
+//			queryStore = pm.makePersistent(queryStore);
 
 			//EditLock
 			EditLockType issueEditLock = new EditLockType(EditLockTypeIssue.EDIT_LOCK_TYPE_ID);

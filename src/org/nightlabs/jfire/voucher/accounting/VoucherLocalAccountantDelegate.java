@@ -23,11 +23,13 @@ import javax.jdo.annotations.Persistent;
 import org.nightlabs.jdo.FetchPlanBackup;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.accounting.Account;
+import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.accounting.InvoiceMoneyTransfer;
 import org.nightlabs.jfire.accounting.book.BookMoneyTransfer;
 import org.nightlabs.jfire.accounting.book.LocalAccountantDelegate;
 import org.nightlabs.jfire.security.User;
+import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.ArticlePrice;
 import org.nightlabs.jfire.trade.OrganisationLegalEntity;
@@ -35,61 +37,37 @@ import org.nightlabs.jfire.transfer.Anchor;
 import org.nightlabs.jfire.voucher.store.VoucherType;
 
 /**
- * {@link VoucherLocalAccountantDelegate} is assigned to ProductTypes of type
- * {@link VoucherType}. It directs money from/to an account defined for
- * the delegate. Account for this delegate are defined per currency.
+ * An instance of {@link VoucherLocalAccountantDelegate} is assigned to {@link ProductType}s of type
+ * {@link VoucherType}. It directs money from/to an {@link Account} defined for
+ * the delegate. Accounts for this delegate are defined per {@link Currency} (for each currency,
+ * there's either zero or one account).
  *
  * @author Marco Schulze - Marco at NightLabs dot de
- *
- * @jdo.persistence-capable
- *		identity-type="application"
- *		persistence-capable-superclass="org.nightlabs.jfire.accounting.book.LocalAccountantDelegate"
- *		detachable="true"
- *		table="JFireVoucher_VoucherLocalAccountantDelegate"
- *
- * @jdo.inheritance strategy="new-table"
- *
- * @jdo.fetch-group name="VoucherLocalAccountantDelegate.accounts" fields="accounts"
- *
- * @!jdo.query
- *		name="getVoucherLocalAccountantDelegateByAccount"
- *		query="SELECT UNIQUE WHERE this.account == :account"
  */
 @PersistenceCapable(
 	identityType=IdentityType.APPLICATION,
 	detachable="true",
-	table="JFireVoucher_VoucherLocalAccountantDelegate")
+	table="JFireVoucher_VoucherLocalAccountantDelegate"
+)
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 @FetchGroups({
 	@FetchGroup(
 		name=VoucherLocalAccountantDelegate.FETCH_GROUP_VOUCHER_LOCAL_ACCOUNTS,
-		members=@Persistent(name="accounts"))
+		members=@Persistent(name="accounts")
+	)
 })
 public class VoucherLocalAccountantDelegate
 extends LocalAccountantDelegate
 {
 	private static final long serialVersionUID = 1L;
 
-//	public static final String ACCOUNT_ANCHOR_TYPE_ID_VOUCHER = "Account.Voucher";
-
 	public static final String FETCH_GROUP_VOUCHER_LOCAL_ACCOUNTS = "VoucherLocalAccountantDelegate.accounts";
 
-	/**
-	 * @jdo.field
-	 *		persistence-modifier="persistent"
-	 *		collection-type="map"
-	 *		key-type="String"
-	 *		value-type="Account"
-	 *		table="JFireVoucher_VoucherLocalAccountantDelegate_accounts"
-	 *		null-value="exception"
-	 *
-	 * @jdo.join
-	 */
-@Join
-@Persistent(
-	nullValue=NullValue.EXCEPTION,
-	table="JFireVoucher_VoucherLocalAccountantDelegate_accounts",
-	persistenceModifier=PersistenceModifier.PERSISTENT)
+	@Join
+	@Persistent(
+			nullValue=NullValue.EXCEPTION,
+			table="JFireVoucher_VoucherLocalAccountantDelegate_accounts"
+	)
 	private Map<String, Account> accounts;
 
 	/**
@@ -102,15 +80,8 @@ extends LocalAccountantDelegate
 	{
 		super(organisationID, localAccountantDelegateID);
 		accounts = new HashMap<String, Account>();
-//		this.account = account;
-//		if (!(ACCOUNT_ANCHOR_TYPE_ID_VOUCHER.equals(account.getAnchorTypeID())))
-//			throw new IllegalArgumentException("account.anchorType is invalid! Must be ACCOUNT_ANCHOR_TYPE_ID_VOUCHER='"+ACCOUNT_ANCHOR_TYPE_ID_VOUCHER+"'!!!");
 	}
 
-	/**
-	 * {@inheritDoc}
-	 * @see org.nightlabs.jfire.accounting.book.LocalAccountantDelegate#bookArticle(org.nightlabs.jfire.trade.OrganisationLegalEntity, org.nightlabs.jfire.security.User, org.nightlabs.jfire.accounting.Invoice, org.nightlabs.jfire.trade.Article, org.nightlabs.jfire.accounting.book.BookMoneyTransfer, java.util.Map)
-	 */
 	@Override
 	public void bookArticle(OrganisationLegalEntity mandator, User user,
 			Invoice invoice, Article article, BookMoneyTransfer container,
@@ -121,14 +92,18 @@ extends LocalAccountantDelegate
 		bookProductTypeParts(mandator, user, articlePriceStack, 1, container, involvedAnchors);
 	}
 
-	/**
-	 * @jdo.field persistence-modifier="none"
-	 */
 	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private transient Map<String, Account> unmodifiableAccounts = null;
 
 	/**
-	 * @return a Map with {@link Currency}'s id as
+	 * Get the accounts that are used for money transfers.
+	 * <p>
+	 * The returned <code>Map</code> is unmodifiable - to change the mapping from currency to account,
+	 * use the {@link #setAccount(String, Account)} method.
+	 * </p>
+	 *
+	 * @return a read-only <code>Map</code> with {@link Currency}'s ID (e.g. "EUR") as key and {@link Account} as value.
+	 * @see #setAccount(String, Account)
 	 */
 	public Map<String, Account> getAccounts()
 	{
@@ -140,11 +115,24 @@ extends LocalAccountantDelegate
 		return unmodifiableAccounts;
 	}
 
+	/**
+	 * Assign an {@link Account} for the money transfers in a certain currency. For every
+	 * currency, there is exactly zero or one <code>Account</code>. Vouchers can only be sold
+	 * or redeemed in a certain currency, if there's an account assigned.
+	 * <p>
+	 * To remove an assignment, you can pass <code>account = null</code>.
+	 * </p>
+	 *
+	 * @param currencyID the ID of the {@link Currency}. This argument must <b>not</b> be <code>null</code>.
+	 * @param account the account to assign to the currency - or <code>null</code> to clear a previous assignment.
+	 * If this argument is not <code>null</code>, the {@link Account#getCurrency()} must match the <code>currencyID</code>.
+	 */
 	public void setAccount(String currencyID, Account account)
 	{
 		if (currencyID == null)
 			throw new IllegalArgumentException("currencyID must not be null!");
 
+		derbyWorkaround();
 		if (account == null)
 			accounts.remove(currencyID);
 		else {
@@ -171,6 +159,10 @@ extends LocalAccountantDelegate
 		} finally {
 			NLJDOHelper.restoreFetchPlan(pm.getFetchPlan(), fetchPlanBackup);
 		}
+
+		// Even though the unmodifiable Map should be backed, we better null it here. Maybe the refresh
+		// causes a new instance to be assigned to this.accounts.
+		unmodifiableAccounts = null;
 	}
 
 	@Override
@@ -196,7 +188,7 @@ extends LocalAccountantDelegate
 		Invoice invoice = container.getInvoice();
 		if (invoice.getCustomer().equals(mandator)) {
 			// if the local organisation is the customer of the invoice
-			// we revert the transfer direction of ALL resolved transfers!
+			// we inverse the transfer direction of ALL resolved transfers!
 			Anchor tmp = from;
 			from = to;
 			to = tmp;

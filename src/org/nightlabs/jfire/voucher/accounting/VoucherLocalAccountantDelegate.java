@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 
+import javax.jdo.FetchPlan;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.annotations.FetchGroup;
@@ -19,6 +20,8 @@ import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.PersistenceModifier;
 import javax.jdo.annotations.Persistent;
 
+import org.nightlabs.jdo.FetchPlanBackup;
+import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.accounting.Account;
 import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.accounting.InvoiceMoneyTransfer;
@@ -129,18 +132,45 @@ extends LocalAccountantDelegate
 	 */
 	public Map<String, Account> getAccounts()
 	{
-		if (unmodifiableAccounts == null)
+		if (unmodifiableAccounts == null) {
+			derbyWorkaround();
 			unmodifiableAccounts = Collections.unmodifiableMap(accounts);
+		}
 
 		return unmodifiableAccounts;
 	}
 
 	public void setAccount(String currencyID, Account account)
 	{
+		if (currencyID == null)
+			throw new IllegalArgumentException("currencyID must not be null!");
+
 		if (account == null)
 			accounts.remove(currencyID);
-		else
+		else {
+			if (!currencyID.equals(account.getCurrency().getCurrencyID()))
+				throw new IllegalArgumentException("The given currencyID '" + currencyID + "' does not match the currency '" + account.getCurrency().getCurrencyID() + "' of the given account '" + account.getPrimaryKey() + "'!");
+
 			accounts.put(currencyID, account);
+		}
+	}
+
+	private final void derbyWorkaround()
+	{
+		// TODO this method is a WORKAROUND for this issue: http://www.datanucleus.org/servlet/jira/browse/NUCRDBMS-379
+		// Derby until (including) 10.5.3.0 has this bug (and maybe even newer versions). It is *not* a DataNucleus bug.
+		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
+		if (pm == null)
+			return;
+
+		FetchPlanBackup fetchPlanBackup = NLJDOHelper.backupFetchPlan(pm.getFetchPlan());
+		try {
+			pm.getFetchPlan().setGroup(FetchPlan.ALL);
+			pm.refresh(this);
+			this.accounts.values();
+		} finally {
+			NLJDOHelper.restoreFetchPlan(pm.getFetchPlan(), fetchPlanBackup);
+		}
 	}
 
 	@Override
@@ -148,6 +178,7 @@ extends LocalAccountantDelegate
 		ArticlePrice articlePrice = articlePriceStack.peek();
 		PersistenceManager pm = getPersistenceManager();
 		String currencyID = articlePrice.getCurrency().getCurrencyID();
+		derbyWorkaround();
 		Account account = accounts.get(currencyID);
 		if (account == null) // TODO maybe this should be a different exception in order to react on it specifically
 			throw new IllegalStateException("The VoucherLocalAccountantDelegate does not contain an account for currencyID '"+currencyID+"'!!! name='"+getName().getText()+"' id='"+JDOHelper.getObjectId(this)+"'");

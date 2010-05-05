@@ -185,10 +185,39 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback, StoreCallbac
 	public static final String FETCH_GROUP_ISSUE_WORK_TIME_RANGES = "Issue.issueWorkTimeRanges";
 	public static final String FETCH_GROUP_ISSUE_FILELIST = "Issue.issueFileAttachments";
 	public static final String FETCH_GROUP_ISSUE_PROJECT = "Issue.project";
-
 	public static final String FETCH_GROUP_PROPERTY_SET = "Issue.propertySet";
-
 	public static final String FETCH_GROUP_ISSUE_MARKERS = "Issue.issueMarkers";
+
+	/**
+	 * Modelled after ProductType.
+	 * A reference to what kind of fields this Issue can have (mostly, references the names of the internal variables).
+	 */
+	public static final class FieldName {
+		public static final String assignee = "assignee";
+		public static final String comments = "comments";
+		public static final String createTimestamp = "createTimestamp";
+		public static final String deadlineTimestamp = "deadlineTimestamp";
+		public static final String description = "description";
+		public static final String isStarted = "isStarted";
+		public static final String issueFileAttachments = "issueFileAttachments";
+		public static final String issueID = "issueID";
+		public static final String issueLinks = "issueLinks";
+		public static final String issueLocal = "issueLocal";
+		public static final String issueMarkers = "issueMarkers";
+		public static final String issuePriority = "issuePriority";
+		public static final String issueResolution = "issueResolution";
+		public static final String issueSeverityType = "issueSeverityType";
+		public static final String issueType = "issueType";
+		public static final String issueWorkTimeRanges = "issueWorkTimeRanges";
+		public static final String organisationID = "organisationID";
+		public static final String project = "project";
+		public static final String propertySet = "propertySet";
+		public static final String reporter = "reporter";
+		public static final String state = "state";
+		public static final String states = "states";
+		public static final String subject = "subject";
+		public static final String updateTimestamp = "updateTimestamp";
+	};
 
 	/**
 	 * This is the organisationID to which the issue belongs. Within one organisation,

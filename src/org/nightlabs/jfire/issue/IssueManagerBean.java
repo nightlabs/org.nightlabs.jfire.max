@@ -47,8 +47,11 @@ import org.nightlabs.jdo.query.AbstractSearchQuery;
 import org.nightlabs.jdo.query.JDOQueryCollectionDecorator;
 import org.nightlabs.jdo.query.QueryCollection;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
+import org.nightlabs.jfire.config.ConfigSetup;
+import org.nightlabs.jfire.config.UserConfigSetup;
 import org.nightlabs.jfire.editlock.EditLockType;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
+import org.nightlabs.jfire.issue.config.IssueTableConfigModule;
 import org.nightlabs.jfire.issue.history.IssueCommentHistoryItem;
 import org.nightlabs.jfire.issue.history.IssueHistoryItem;
 import org.nightlabs.jfire.issue.history.IssueHistoryItemFactory;
@@ -1311,6 +1314,23 @@ implements IssueManagerRemote
 
 			IssueStruct.getIssueStruct(pm);
 
+			// ------------------------------------------------------------------------------------------------------[ ConfigModule ]----->>|
+			// Initialise the ConfigModules related to the IssueTable.
+			ConfigSetup configSetup = ConfigSetup.getConfigSetup(
+					pm,
+					getOrganisationID(),
+					UserConfigSetup.CONFIG_SETUP_TYPE_USER
+				);
+
+			Set<String> configModuleClasses = configSetup.getConfigModuleClasses();
+			configModuleClasses.add(IssueTableConfigModule.class.getName()); // The Set ensures that no duplicated elements exists within.
+			// configModuleClasses.add(PersonIssueLinkTableConfigModule.class.getName()); // TODO Finish this.
+
+			// Ensure that all users have a ConfigModule.
+			ConfigSetup.ensureAllPrerequisites(pm);
+			// ------------------------------------------------------------------------------------------------------[ ConfigModule ]-----<<|
+
+
 			// The complete method is executed in *one* transaction. So if one thing fails, all fail.
 			// => We check once at the beginning, if this module has already been initialised.
 			ModuleMetaData moduleMetaData = ModuleMetaData.getModuleMetaData(pm, JFireIssueTrackingEAR.MODULE_NAME);
@@ -1425,7 +1445,7 @@ implements IssueManagerRemote
 			//    project, for the purpose of testing out our newly 'configurable' IssueTable.
 			// -- There is also are reasons why IssueMarkers were not included in the new separated project JFireIssueTrackerBugTracking,
 			//    and apart from the IssueMarkers being independent, I can't remember the rest. But when I do, I'll put them up on the Wiki.
-			
+
 			// ---[ IssueMarkers ]----------------------------------------------------------------------------------------------| Start |---
 			IssueMarker issueMarker_Email = new IssueMarker(false);
 			assignIssueMarkerIcon16x16(issueMarker_Email, "IssueMarker-email.16x16.png");

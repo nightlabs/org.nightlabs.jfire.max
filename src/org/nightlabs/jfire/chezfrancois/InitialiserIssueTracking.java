@@ -17,17 +17,23 @@ import org.nightlabs.jfire.base.JFirePrincipal;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.issue.Issue;
 import org.nightlabs.jfire.issue.IssueLinkType;
+import org.nightlabs.jfire.issue.IssueManagerBean;
 import org.nightlabs.jfire.issue.IssueManagerRemote;
 import org.nightlabs.jfire.issue.IssuePriority;
 import org.nightlabs.jfire.issue.IssueResolution;
 import org.nightlabs.jfire.issue.IssueSeverityType;
 import org.nightlabs.jfire.issue.IssueType;
+import org.nightlabs.jfire.issue.IssueTypeName;
 import org.nightlabs.jfire.issue.history.IssueHistoryItem;
 import org.nightlabs.jfire.issue.history.IssueHistoryItemAction;
 import org.nightlabs.jfire.issue.id.IssueID;
+import org.nightlabs.jfire.issue.id.IssueLinkTypeID;
+import org.nightlabs.jfire.issue.id.IssuePriorityID;
+import org.nightlabs.jfire.issue.id.IssueSeverityTypeID;
 import org.nightlabs.jfire.issue.id.IssueTypeID;
 import org.nightlabs.jfire.issue.issuemarker.IssueMarker;
 import org.nightlabs.jfire.issue.issuemarker.IssueMarkerHistoryItem;
+import org.nightlabs.jfire.issue.issuemarker.id.IssueMarkerID;
 import org.nightlabs.jfire.person.Person;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.security.User;
@@ -53,10 +59,8 @@ public class InitialiserIssueTracking extends Initialiser {
 	 * throw a series of exception here. Go figure what is needed for this scenario. Kai
 	 */
 	public void createDemoData() {
-		// Get a reference to the IssueManagerBean.
-		IssueManagerRemote issueMgr = JFireEjb3Factory.getRemoteBean(
-				IssueManagerRemote.class, SecurityReflector
-						.getInitialContextProperties());
+		// Get a reference to the IssueManagerBean. Is there another (cleaner, more direct way, since we ARE in the server side now)?
+		IssueManagerRemote issueMgr = JFireEjb3Factory.getRemoteBean(IssueManagerRemote.class, SecurityReflector.getInitialContextProperties());
 
 		// Determine if we need to create the demo data at all.
 		if (!issueMgr.getIssueIDs().isEmpty()) {
@@ -65,17 +69,41 @@ public class InitialiserIssueTracking extends Initialiser {
 
 			return;
 		}
+		
+		
+		// More bloody testssssssss.... somehow, no Issues were generated for testing!!!
+		Set<IssueTypeID> les_issueTypeIDs = issueMgr.getIssueTypeIDs();
+		logger.info(" ----> Found les_issueTypeIDs: " + les_issueTypeIDs.size());
+
+		Set<IssuePriorityID> les_issuePriorityIDs = issueMgr.getIssuePriorityIDs();
+		logger.info(" ----> Found les_issuePriorityIDs: " + les_issuePriorityIDs.size());
+
+		Set<IssueMarkerID> les_issueMarkerIDs = issueMgr.getIssueMarkerIDs();
+		logger.info(" ----> Found les_issueMarkerIDs: " + les_issueMarkerIDs.size());
+
+		Set<IssueSeverityTypeID> les_issueSeverityTypeIDs = issueMgr.getIssueSeverityTypeIDs();
+		logger.info(" ----> Found les_issueSeverityTypeIDs: " + les_issueSeverityTypeIDs.size());
+
+		Set<IssueLinkTypeID> les_issueLinkTypeIDs = issueMgr.getIssueLinkTypeIDs();
+		logger.info(" ----> Found les_issueLinkTypeIDs: " + les_issueLinkTypeIDs.size());
+		
+		
+		
 
 		// ::: Search for IssueType.DEFAULT_ISSUE_TYPE_ID.
 		IssueType issueTypeDefault = null;
-		final Query allIDsQuery = pm.newNamedQuery(IssueType.class, IssueType.QUERY_ALL_ISSUETYPE_IDS);
-		Set<IssueTypeID> issueTypeIDs = CollectionUtil.createHashSetFromCollection(allIDsQuery.execute());
-
-		for (IssueTypeID issueTypeID : issueTypeIDs)
+//		final Query allIDsQuery = pm.newNamedQuery(IssueType.class, IssueType.QUERY_ALL_ISSUETYPE_IDS);
+//		Set<IssueTypeID> issueTypeIDs = CollectionUtil.createHashSetFromCollection(allIDsQuery.execute());
+//		Collection<IssueTypeID> issueTypeIDs = IssueType.getIssueTypeIDs(pm);
+		for (IssueTypeID issueTypeID : les_issueTypeIDs) { // issueTypeIDs) {
+//			IssueType issTyp = (IssueType) pm.getObjectById(issueTypeID);
+//			IssueTypeName issueTypeName = issTyp.getName();
+			
 			if (issueTypeID.issueTypeID.equals(IssueType.DEFAULT_ISSUE_TYPE_ID)) {
 				issueTypeDefault = (IssueType) pm.getObjectById(issueTypeID);
 				break;
 			}
+		}
 
 		// Proceed only if the default IssueType can be found. We should
 		// otherwise create one??

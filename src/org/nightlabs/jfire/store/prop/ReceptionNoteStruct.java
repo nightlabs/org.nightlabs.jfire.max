@@ -62,7 +62,7 @@ public class ReceptionNoteStruct
 			StructBlock sb = PropHelper.createStructBlock(articleContainerStruct, COMMENT_BLOCK, "Comment", "Kommentar");
 			sb.setUnique(false);
 			// TODO use MultiLanguagePropertiesBundle for externalization
-			I18nTextStructField comment = PropHelper.createI18nTextField(sb, COMMENT_FIELD, "Comment", "Kommentar");
+			I18nTextStructField comment = PropHelper.createI18nTextDataField(sb, COMMENT_FIELD, "Comment", "Kommentar");
 			comment.setLineCount(10);
 			sb.addStructField(comment);
 			articleContainerStruct.addStructBlock(sb);

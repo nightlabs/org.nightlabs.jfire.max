@@ -1320,7 +1320,10 @@ implements IssueManagerRemote
 				);
 
 			Set<String> configModuleClasses = configSetup.getConfigModuleClasses();
-			configModuleClasses.add(IssueTableConfigModule.class.getName()); // The Set ensures that no duplicated elements exists within.
+			// TODO DataNucleus WORKAROUND: simply adding causes a duplicate key exception.
+			// We should open an issue in DN's JIRA! I've no time for this now, thus I simply check before adding. Marco.
+			if (!configModuleClasses.contains(IssueTableConfigModule.class.getName()))
+				configModuleClasses.add(IssueTableConfigModule.class.getName()); // The Set ensures that no duplicated elements exists within.
 			// configModuleClasses.add(PersonIssueLinkTableConfigModule.class.getName()); // TODO Finish this.
 
 			// Ensure that all users have a ConfigModule.

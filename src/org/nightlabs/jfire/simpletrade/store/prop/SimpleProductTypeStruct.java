@@ -59,9 +59,9 @@ public class SimpleProductTypeStruct {
 
 			StructBlock sb = PropHelper.createStructBlock(productTypeStruct, DESCRIPTION, "Description", "Beschreibung");
 			sb.setUnique(false);
-			I18nTextStructField descShort = PropHelper.createI18nTextField(sb, DESCRIPTION_SHORT, "Short description", "Kurzbeschreibung");
+			I18nTextStructField descShort = PropHelper.createI18nTextDataField(sb, DESCRIPTION_SHORT, "Short description", "Kurzbeschreibung");
 			descShort.setLineCount(5);
-			I18nTextStructField descLong = PropHelper.createI18nTextField(sb, DESCRIPTION_LONG, "Long description", "Ausführliche Beschreibung");
+			I18nTextStructField descLong = PropHelper.createI18nTextDataField(sb, DESCRIPTION_LONG, "Long description", "Ausführliche Beschreibung");
 			descLong.setLineCount(10);
 
 			sb.addStructField(descShort);
@@ -73,12 +73,12 @@ public class SimpleProductTypeStruct {
 
 			sb = PropHelper.createStructBlock(productTypeStruct, IMAGES, "Images", "Bilder");
 			sb.setUnique(false);
-			ImageStructField largeImage = PropHelper.createImageField(sb, IMAGES_LARGE_IMAGE, "Large image", "Grosses Bild");
+			ImageStructField largeImage = PropHelper.createImageDataField(sb, IMAGES_LARGE_IMAGE, "Large image", "Grosses Bild");
 			largeImage.addImageFormat("jpg");
 			largeImage.addImageFormat("png");
 			largeImage.addImageFormat("gif");
 			largeImage.setMaxSizeKB(1024);
-			ImageStructField smallImage = PropHelper.createImageField(sb, IMAGES_SMALL_IMAGE, "Small image", "Kleines Bild");
+			ImageStructField smallImage = PropHelper.createImageDataField(sb, IMAGES_SMALL_IMAGE, "Small image", "Kleines Bild");
 			smallImage.addImageFormat("jpg");
 			smallImage.addImageFormat("png");
 			smallImage.addImageFormat("gif");

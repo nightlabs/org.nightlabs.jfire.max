@@ -1413,6 +1413,19 @@ implements IssueManagerRemote
 				pm.makePersistent(queryStore);
 			}
 
+			// QUESTION:
+			// What happened to the rest of the initialisers for stuffs like IssuePriority, IssueSeverity, etc.?
+			// -- These were commented out from version 16940 onwards.
+			//
+			// ANSWER:
+			// They are now in the IssueBugTackingManagerBean, in a separated project called JFireIssueTrackerBugTracking. This missing
+			// project was located in v1.0, and has now been forward ported into trunk. Also, this re-arrangement of resources from this
+			// main JFireIssueTracking, and its specification of ordnances are still on-going. (I think). @Kai.
+			// -- I had needed access to these default JFire setup values in order to generate example Issues in the JFireChezFrancois
+			//    project, for the purpose of testing out our newly 'configurable' IssueTable.
+			// -- There is also are reasons why IssueMarkers were not included in the new separated project JFireIssueTrackerBugTracking,
+			//    and apart from the IssueMarkers being independent, I can't remember the rest. But when I do, I'll put them up on the Wiki.
+			
 			// ---[ IssueMarkers ]----------------------------------------------------------------------------------------------| Start |---
 			IssueMarker issueMarker_Email = new IssueMarker(false);
 			assignIssueMarkerIcon16x16(issueMarker_Email, "IssueMarker-email.16x16.png");

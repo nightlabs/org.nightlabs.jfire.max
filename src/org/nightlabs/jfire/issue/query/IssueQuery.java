@@ -10,7 +10,6 @@ import java.util.Set;
 
 import javax.jdo.Query;
 
-import org.apache.log4j.Logger;
 import org.nightlabs.jdo.query.AbstractJDOQuery;
 import org.nightlabs.jfire.issue.Issue;
 import org.nightlabs.jfire.issue.IssueComment;
@@ -25,6 +24,8 @@ import org.nightlabs.jfire.jbpm.graph.def.id.ProcessDefinitionID;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.security.id.UserID;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * An extended class of {@link AbstractJDOQuery} which intended to allow users setting parameters for querying {@link Issue}.
@@ -40,7 +41,7 @@ extends AbstractJDOQuery
 {
 	private static final long serialVersionUID = 20080811L;
 
-	private static final Logger logger = Logger.getLogger(IssueQuery.class);
+	private static final Logger logger = LoggerFactory.getLogger(IssueQuery.class);
 
 	private boolean issueSubjectRegex = false;
 	/**

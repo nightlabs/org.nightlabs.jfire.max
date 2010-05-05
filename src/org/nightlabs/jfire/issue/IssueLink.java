@@ -27,7 +27,6 @@ import javax.jdo.listener.StoreCallback;
 import javax.jdo.listener.StoreLifecycleListener;
 import javax.jdo.spi.PersistenceCapable;
 
-import org.apache.log4j.Logger;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jdo.ObjectIDUtil;
@@ -36,6 +35,8 @@ import org.nightlabs.jfire.issue.id.IssueLinkID;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.util.CollectionUtil;
 import org.nightlabs.util.Util;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The {@link IssueLink} class represents a link between an {@link Issue} and the other object.
@@ -95,7 +96,7 @@ import org.nightlabs.util.Util;
 public class IssueLink
 implements Serializable, DetachCallback, StoreCallback, DeleteCallback
 {
-	private static final Logger logger = Logger.getLogger(IssueLink.class);
+	private static final Logger logger = LoggerFactory.getLogger(IssueLink.class);
 
 	/**
 	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon!

@@ -22,7 +22,6 @@ import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 import javax.jdo.annotations.Queries;
 
-import org.apache.log4j.Logger;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.issue.Issue;
 import org.nightlabs.jfire.issue.history.id.IssueHistoryItemID;
@@ -30,6 +29,8 @@ import org.nightlabs.jfire.issue.id.IssueID;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.util.Util;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The {@link IssueHistoryItem} class represents a history which recorded the change of each {@link Issue}.
@@ -66,7 +67,7 @@ import org.nightlabs.util.Util;
 public abstract class IssueHistoryItem implements Serializable {
 	private static final long serialVersionUID = 1L;
 	@SuppressWarnings("unused")
-	private static final Logger logger = Logger.getLogger(IssueHistoryItem.class);
+	private static final Logger logger = LoggerFactory.getLogger(IssueHistoryItem.class);
 
 	public static final String FETCH_GROUP_ISSUE = "IssueHistoryItem.issue";
 	public static final String FETCH_GROUP_USER = "IssueHistoryItem.user";

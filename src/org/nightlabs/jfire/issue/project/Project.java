@@ -25,7 +25,6 @@ import javax.jdo.annotations.PrimaryKey;
 import javax.jdo.annotations.Queries;
 import javax.jdo.annotations.Query;
 
-import org.apache.log4j.Logger;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.issue.history.FetchGroupsIssueHistoryItem;
 import org.nightlabs.jfire.issue.project.id.ProjectID;
@@ -35,6 +34,8 @@ import org.nightlabs.jfire.prop.Struct;
 import org.nightlabs.jfire.prop.StructLocal;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.util.Util;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The {@link Project} class represents a project.
@@ -108,7 +109,7 @@ implements Serializable, Comparable<Project>
 {
 	private static final long serialVersionUID = 1L;
 	@SuppressWarnings("unused")
-	private static final Logger logger = Logger.getLogger(Project.class);
+	private static final Logger logger = LoggerFactory.getLogger(Project.class);
 
 	public static final String FETCH_GROUP_DESCRIPTION = "Project.description";
 	public static final String FETCH_GROUP_NAME = "Project.name";

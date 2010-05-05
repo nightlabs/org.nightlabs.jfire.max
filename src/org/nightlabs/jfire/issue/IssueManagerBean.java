@@ -35,7 +35,6 @@ import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
-import org.apache.log4j.Logger;
 import org.jbpm.JbpmContext;
 import org.jbpm.graph.exe.ProcessInstance;
 import org.jbpm.graph.exe.Token;
@@ -92,6 +91,8 @@ import org.nightlabs.progress.NullProgressMonitor;
 import org.nightlabs.util.CollectionUtil;
 import org.nightlabs.util.IOUtil;
 import org.nightlabs.util.Util;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * An EJB session bean provides methods for managing every objects used in the issue tracking.
@@ -106,11 +107,7 @@ public class IssueManagerBean extends BaseSessionBeanImpl
 implements IssueManagerRemote
 {
 	private static final long serialVersionUID = 1L;
-	/**
-	 * LOG4J logger used by this class
-	 */
-	private static final Logger logger = Logger.getLogger(IssueManagerBean.class);
-
+	private static final Logger logger = LoggerFactory.getLogger(IssueManagerBean.class);
 
 	//IssueFileAttachment//
 	@RolesAllowed("_Guest_")

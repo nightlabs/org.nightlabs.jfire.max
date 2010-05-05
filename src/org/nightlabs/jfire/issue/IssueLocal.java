@@ -22,13 +22,14 @@ import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 import javax.jdo.listener.DeleteCallback;
 
-import org.apache.log4j.Logger;
 import org.nightlabs.jfire.issue.id.IssueLocalID;
 import org.nightlabs.jfire.jbpm.graph.def.Statable;
 import org.nightlabs.jfire.jbpm.graph.def.StatableLocal;
 import org.nightlabs.jfire.jbpm.graph.def.State;
 import org.nightlabs.util.CollectionUtil;
 import org.nightlabs.util.Util;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class is created for wrapping the issue with its state. It's intended to be used within an organisation.
@@ -37,56 +38,39 @@ import org.nightlabs.util.Util;
  * </p>
  *
  * @author Chairat Kongarayawetchakun - chairat [AT] nightlabs [DOT] de
- *
- * @jdo.persistence-capable
- *		identity-type="application"
- *		objectid-class="org.nightlabs.jfire.issue.id.IssueLocalID"
- *		detachable="true"
- *		table="JFireIssueTracking_IssueLocal"
- *
- * @jdo.inheritance strategy="new-table"
- *
- * @jdo.implements name="org.nightlabs.jfire.jbpm.graph.def.StatableLocal"
- *
- * @jdo.create-objectid-class
- * 		field-order="organisationID, issueID"
- * 		include-body="id/IssueLocalID.body.inc"
- *
- * @jdo.fetch-group name="IssueLocal.state" fields="state"
- * @jdo.fetch-group name="IssueLocal.states" fields="states"
- *
- * @jdo.fetch-group name="IssueLocal.this" fetch-groups="default" fields="issue, state, states"
- *
- * @jdo.fetch-group name="Issue.issueLocal" fields="issue"
- *
- * @jdo.fetch-group name="StatableLocal.state" fields="state"
- * @jdo.fetch-group name="StatableLocal.states" fields="states"
  */
 @PersistenceCapable(
-	objectIdClass=IssueLocalID.class,
-	identityType=IdentityType.APPLICATION,
-	detachable="true",
-	table="JFireIssueTracking_IssueLocal")
+		objectIdClass=IssueLocalID.class,
+		identityType=IdentityType.APPLICATION,
+		detachable="true",
+		table="JFireIssueTracking_IssueLocal"
+)
 @FetchGroups({
 	@FetchGroup(
-		name="IssueLocal.state",
-		members=@Persistent(name="state")),
+			name="IssueLocal.state",
+			members=@Persistent(name="state")
+	),
 	@FetchGroup(
-		name="IssueLocal.states",
-		members=@Persistent(name="states")),
+			name="IssueLocal.states",
+			members=@Persistent(name="states")
+	),
 	@FetchGroup(
-		fetchGroups={"default"},
-		name=IssueLocal.FETCH_GROUP_THIS_ISSUE_LOCAL,
-		members={@Persistent(name="issue"), @Persistent(name="state"), @Persistent(name="states")}),
+			fetchGroups={"default"},
+			name=IssueLocal.FETCH_GROUP_THIS_ISSUE_LOCAL,
+			members={@Persistent(name="issue"), @Persistent(name="state"), @Persistent(name="states")}
+	),
 	@FetchGroup(
-		name="Issue.issueLocal",
-		members=@Persistent(name="issue")),
+			name="Issue.issueLocal",
+			members=@Persistent(name="issue")
+	),
 	@FetchGroup(
-		name="StatableLocal.state",
-		members=@Persistent(name="state")),
+			name="StatableLocal.state",
+			members=@Persistent(name="state")
+	),
 	@FetchGroup(
-		name="StatableLocal.states",
-		members=@Persistent(name="states"))
+			name="StatableLocal.states",
+			members=@Persistent(name="states")
+	)
 })
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class IssueLocal
@@ -95,7 +79,7 @@ implements Serializable, StatableLocal, DeleteCallback
 	private static final long serialVersionUID = 1L;
 
 	@SuppressWarnings("unused")
-	private static final Logger logger = Logger.getLogger(IssueLocal.class);
+	private static final Logger logger = LoggerFactory.getLogger(IssueLocal.class);
 
 	/**
 	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon!

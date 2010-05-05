@@ -4,28 +4,28 @@ import java.io.Serializable;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
 
-import org.apache.log4j.Logger;
 import org.nightlabs.jfire.issue.project.id.ProjectTypeID;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.util.Util;
-
-import javax.jdo.annotations.Persistent;
-import javax.jdo.annotations.FetchGroups;
-import javax.jdo.annotations.InheritanceStrategy;
-import javax.jdo.annotations.Inheritance;
-import javax.jdo.annotations.PrimaryKey;
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.FetchGroup;
-import javax.jdo.annotations.Column;
-import javax.jdo.annotations.IdentityType;
-import javax.jdo.annotations.PersistenceModifier;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * The {@link ProjectType} class represents a type of {@link Project}. 
+ * The {@link ProjectType} class represents a type of {@link Project}.
  * <p>
  * </p>
- * 
+ *
  * @author Chairat Kongarayawetchakun <!-- chairat at nightlabs dot de -->
  *
  * @jdo.persistence-capable
@@ -58,7 +58,7 @@ implements Serializable , Comparable<ProjectType>
 {
 	private static final long serialVersionUID = 1L;
 	@SuppressWarnings("unused")
-	private static final Logger logger = Logger.getLogger(ProjectType.class);
+	private static final Logger logger = LoggerFactory.getLogger(ProjectType.class);
 
 	public static final String FETCH_GROUP_NAME = "ProjectType.name";
 
@@ -66,7 +66,7 @@ implements Serializable , Comparable<ProjectType>
 	 * This is the organisationID to which the project type belongs. Within one organisation,
 	 * all the project types have their organisation's ID stored here, thus it's the same
 	 * value for all of them.
-	 * 
+	 *
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
@@ -88,7 +88,7 @@ implements Serializable , Comparable<ProjectType>
 		mappedBy="projectType",
 		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private ProjectTypeName name;
-	
+
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
@@ -96,9 +96,9 @@ implements Serializable , Comparable<ProjectType>
 	private ProjectTypeDescription description;
 
 	public static final ProjectTypeID PROJECT_TYPE_ID_DEFAULT = ProjectTypeID.create(Organisation.DEV_ORGANISATION_ID, "default");
-	
+
 	/**
-	 * @deprecated Constructor exists only for JDO! 
+	 * @deprecated Constructor exists only for JDO!
 	 */
 	@Deprecated
 	protected ProjectType() { }
@@ -106,7 +106,7 @@ implements Serializable , Comparable<ProjectType>
 	public ProjectType(ProjectTypeID projectTypeID) {
 		this(projectTypeID.organisationID, projectTypeID.projectTypeID);
 	}
-	
+
 	public ProjectType(String organisationID, String projectTypeID)
 	{
 		Organisation.assertValidOrganisationID(organisationID);
@@ -119,17 +119,17 @@ implements Serializable , Comparable<ProjectType>
 	/**
 	 * @return Returns the organisationID.
 	 */
-	public String getOrganisationID() 
+	public String getOrganisationID()
 	{
 		return organisationID;
 	}
 
-	public String getProjectTypeID() 
+	public String getProjectTypeID()
 	{
 		return projectTypeID;
 	}
 
-	
+
 	public ProjectTypeDescription getDescription() {
 		return description;
 	}
@@ -142,7 +142,7 @@ implements Serializable , Comparable<ProjectType>
 	{
 		return name;
 	}
-	
+
 	/**
 	 * Get the JDO object id.
 	 * @return the JDO object id.
@@ -151,19 +151,19 @@ implements Serializable , Comparable<ProjectType>
 	{
 		return (ProjectTypeID)JDOHelper.getObjectId(this);
 	}
-	
+
 	/**
 	 * Internal method.
-	 * @return The PersistenceManager associated with this object. 
+	 * @return The PersistenceManager associated with this object.
 	 */
-	protected PersistenceManager getPersistenceManager() 
+	protected PersistenceManager getPersistenceManager()
 	{
 		PersistenceManager projectTypePM = JDOHelper.getPersistenceManager(this);
 		if (projectTypePM == null)
 			throw new IllegalStateException("This instance of " + this.getClass().getName() + " is not persistent, can not get a PersistenceManager!");
 
 		return projectTypePM;
-	}	
+	}
 
 	@Override
 	public boolean equals(Object obj)
@@ -172,18 +172,18 @@ implements Serializable , Comparable<ProjectType>
 		if (!(obj instanceof ProjectType)) return false;
 		ProjectType o = (ProjectType) obj;
 		return
-		Util.equals(this.organisationID, o.organisationID) && 
+		Util.equals(this.organisationID, o.organisationID) &&
 		Util.equals(this.projectTypeID, o.projectTypeID);
 	}
 
 	@Override
 	public int hashCode()
 	{
-		return 
+		return
 		Util.hashCode(organisationID) ^
 		Util.hashCode(projectTypeID);
 	}
-	
+
 	@Override
 	public int compareTo(ProjectType o) {
 		return this.name.getText().compareTo(o.getName().getText());

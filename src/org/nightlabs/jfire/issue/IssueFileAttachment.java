@@ -24,11 +24,12 @@ import javax.jdo.annotations.PersistenceModifier;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 
-import org.apache.log4j.Logger;
 import org.nightlabs.io.DataBuffer;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.issue.id.IssueFileAttachmentID;
 import org.nightlabs.util.IOUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The {@link IssueFileAttachment} class represents an attached file on an {@link Issue}.
@@ -53,7 +54,7 @@ import org.nightlabs.util.IOUtil;
 public class IssueFileAttachment
 implements Serializable{
 	private static final long serialVersionUID = 1L;
-	private static final Logger logger = Logger.getLogger(IssueFileAttachment.class);
+	private static final Logger logger = LoggerFactory.getLogger(IssueFileAttachment.class);
 
 	/**
 	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon!

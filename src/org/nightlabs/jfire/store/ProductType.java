@@ -291,7 +291,7 @@ import org.nightlabs.util.Util;
 		name="FetchGroupsTrade.articleInDeliveryNoteEditor",
 		members={@Persistent(name="name"), @Persistent(name="vendor")})
 })
-@Discriminator(strategy=DiscriminatorStrategy.CLASS_NAME)
+//@Discriminator(strategy=DiscriminatorStrategy.CLASS_NAME)
 @Queries({
 	@javax.jdo.annotations.Query(
 			name="getProductTypesOfProductTypeGroup",

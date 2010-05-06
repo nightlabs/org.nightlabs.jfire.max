@@ -7,5 +7,6 @@
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.module.container"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.nightlabs.editor2d"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/org.nightlabs.i18n"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

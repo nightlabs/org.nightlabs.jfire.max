@@ -85,10 +85,12 @@ import org.nightlabs.util.CollectionUtil;
 		language="javax.jdo.query.JDOQL"),
 	@javax.jdo.annotations.Query(
 		name="getVoucherTypeIdsByVoucherLayoutId",
-		value="SELECT JDOHelper.getObjectId(this) WHERE :voucherLayoutId == JDOHelper.getObjectId(this.voucherLayout)"),
+		value="SELECT JDOHelper.getObjectId(this) WHERE JDOHelper.getObjectId(this.voucherLayout) == :voucherLayoutId",
+		language="javax.jdo.query.JDOQL"),
 	@javax.jdo.annotations.Query(
-				name="getVoucherTypeIdsByLocalAccountantDelegateId",
-				value="SELECT JDOHelper.getObjectId(this) WHERE :localAccountantDelegateID == JDOHelper.getObjectId(this.productTypeLocal.localAccountantDelegate)")
+		name="getVoucherTypeIdsByLocalAccountantDelegateId",
+		value="SELECT JDOHelper.getObjectId(this) WHERE JDOHelper.getObjectId(this.productTypeLocal.localAccountantDelegate) == :localAccountantDelegateID",
+		language="javax.jdo.query.JDOQL")
 })
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class VoucherType

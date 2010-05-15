@@ -157,7 +157,7 @@ implements ChezFrancoisDatastoreInitialiserRemote, ChezFrancoisDatastoreInitiali
 	public void configureLocalOrganisation()
 	throws MalformedVersionException, DataBlockNotFoundException, DataBlockGroupNotFoundException, DataFieldNotFoundException
 	{
-		logger.trace("createModuleMetaData: begin");
+		logger.trace("configureLocalOrganisation: begin");
 
 		PersistenceManager pm = this.createPersistenceManager();
 		try {
@@ -200,7 +200,7 @@ implements ChezFrancoisDatastoreInitialiserRemote, ChezFrancoisDatastoreInitiali
 			pm.makePersistent(detachedPerson);
 		} finally {
 			pm.close();
-			logger.trace("createModuleMetaData: end");
+			logger.trace("configureLocalOrganisation: end");
 		}
 	}
 

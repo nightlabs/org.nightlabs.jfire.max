@@ -102,7 +102,7 @@ import org.xml.sax.SAXParseException;
  */
 public class ReportingInitialiser {
 
-	protected static Logger logger = Logger.getLogger(ReportingInitialiser.class);
+	private static final Logger logger = Logger.getLogger(ReportingInitialiser.class);
 
 	private File ear;
 	private String reportSubDir;

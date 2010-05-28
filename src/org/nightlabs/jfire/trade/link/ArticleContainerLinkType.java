@@ -59,8 +59,8 @@ implements Serializable, DeleteCallback
 	public static final String FETCH_GROUP_NAME = "ArticleContainerLinkType.name";
 	public static final String FETCH_GROUP_DESCRIPTION = "ArticleContainerLinkType.description";
 
-	public static ArticleContainerLinkTypeID ID_OFFER_REPLACING = ArticleContainerLinkTypeID.create(Organisation.DEV_ORGANISATION_ID, "offer.replacing");
-	public static ArticleContainerLinkTypeID ID_OFFER_REPLACED = ArticleContainerLinkTypeID.create(Organisation.DEV_ORGANISATION_ID, "offer.replaced");
+	public static final ArticleContainerLinkTypeID ID_OFFER_REPLACING = ArticleContainerLinkTypeID.create(Organisation.DEV_ORGANISATION_ID, "offer.replacing");
+	public static final ArticleContainerLinkTypeID ID_OFFER_REPLACED = ArticleContainerLinkTypeID.create(Organisation.DEV_ORGANISATION_ID, "offer.replaced");
 
 	private static void populateArticleContainerLinkTypeSet(Set<ArticleContainerLinkType> articleContainerLinkTypes, Query q, Class<?> clazz, Set<Class<?>> processedClassesAndInterfaces)
 	{

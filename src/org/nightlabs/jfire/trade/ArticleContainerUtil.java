@@ -27,7 +27,7 @@ public class ArticleContainerUtil
 	 * Comparator which compares {@link ArticleContainer} passed on {@link ArticleContainer#getArticleContainerIDPrefix()} and
 	 * {@link ArticleContainer#getArticleContainerID()}
 	 */
-	public static Comparator<ArticleContainer> ARTICLE_CONTAINER_COMPARATOR = new Comparator<ArticleContainer>(){
+	public static final Comparator<ArticleContainer> ARTICLE_CONTAINER_COMPARATOR = new Comparator<ArticleContainer>(){
 		@Override
 		public int compare(ArticleContainer o1, ArticleContainer o2)
 		{

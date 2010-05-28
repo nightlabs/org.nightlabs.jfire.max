@@ -28,19 +28,18 @@ package org.nightlabs.jfire.store.deliver;
 
 import java.io.Serializable;
 
-import org.nightlabs.jfire.accounting.pay.PaymentResult;
-import org.nightlabs.jfire.idgenerator.IDGenerator;
-import org.nightlabs.util.Util;
-
-import javax.jdo.annotations.Persistent;
-import org.nightlabs.jfire.store.deliver.id.DeliveryResultID;
-import javax.jdo.annotations.InheritanceStrategy;
-import javax.jdo.annotations.Inheritance;
-import javax.jdo.annotations.PrimaryKey;
-import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Column;
 import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
+
+import org.nightlabs.jfire.idgenerator.IDGenerator;
+import org.nightlabs.jfire.store.deliver.id.DeliveryResultID;
+import org.nightlabs.util.Util;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -164,53 +163,53 @@ implements Serializable
 	 * hang "pending" in the server and needs manual care. In this pending state,
 	 * the money is already booked on the customer's account.
 	 */
-	public static String CODE_APPROVED_NO_EXTERNAL = "approvedNoExternal";
+	public static final String CODE_APPROVED_NO_EXTERNAL = "approvedNoExternal";
 
 	/**
 	 * 
 	 */
-	public static String CODE_APPROVED_WITH_EXTERNAL = "approvedWithExternal";
+	public static final String CODE_APPROVED_WITH_EXTERNAL = "approvedWithExternal";
 
 	/**
 	 * The delivery has failed.  More information will be found in {@link #text}
 	 * and {@link #error}.
 	 */
-	public static String CODE_FAILED = "failed";
+	public static final String CODE_FAILED = "failed";
 
 	/**
 	 * The delivery has been completed. No further access to external delivery systems
 	 * is necessary.
 	 */
-	public static String CODE_DELIVERED_WITH_EXTERNAL = "deliveredWithExternal";
+	public static final String CODE_DELIVERED_WITH_EXTERNAL = "deliveredWithExternal";
 
 	/**
 	 * The delivery has been done locally within JFire, but no external delivery has been
 	 * performed (e.g. the server processor might return this, because the client is
 	 * responsible for the delivery).
 	 */
-	public static String CODE_DELIVERED_NO_EXTERNAL = "deliveredNoExternal";
+	public static final String CODE_DELIVERED_NO_EXTERNAL = "deliveredNoExternal";
 
 	/**
 	 * The delivery has been rolled back externally.
 	 */
-	public static String CODE_ROLLED_BACK_WITH_EXTERNAL = "rolledBackWithExternal";
+	public static final String CODE_ROLLED_BACK_WITH_EXTERNAL = "rolledBackWithExternal";
 
 	/**
 	 * Even though there has no external work been involved, this means the delivery
 	 * has been rolled back in the not-really-existing external system.
 	 */
-	public static String CODE_ROLLED_BACK_NO_EXTERNAL = "rolledBackNoExternal";
+	public static final String CODE_ROLLED_BACK_NO_EXTERNAL = "rolledBackNoExternal";
 
 	/**
 	 * The delivery has been committed externally.
 	 */
-	public static String CODE_COMMITTED_WITH_EXTERNAL = "committedWithExternal";
+	public static final String CODE_COMMITTED_WITH_EXTERNAL = "committedWithExternal";
 
 	/**
 	 * Even though there has no external work been involved, this means the delivery
 	 * has been committed in the not-really-existing external system.
 	 */
-	public static String CODE_COMMITTED_NO_EXTERNAL = "committedNoExternal";
+	public static final String CODE_COMMITTED_NO_EXTERNAL = "committedNoExternal";
 
 	/**
 	 * The delivery has been postponed. This means, the delivery system has taken
@@ -231,7 +230,7 @@ implements Serializable
 	 * no transfer will be created. If this is the result at a later time, the transfer
 	 * will be rolled back.
 	 */
-	public static String CODE_POSTPONED = "postponed";
+	public static final String CODE_POSTPONED = "postponed";
 
 	/**
 	 * This is one of the <tt>CODE_</tt> constants.

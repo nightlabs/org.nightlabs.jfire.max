@@ -1349,7 +1349,7 @@ public class MappingBasedAccountantDelegate
 		return mappingKey;
 	}
 
-	public static List<String> DIMENSION_IDS = CollectionUtil
+	public static final List<String> DIMENSION_IDS = CollectionUtil
 			.array2ArrayList(new String[] { OwnerDimension.MONEY_FLOW_DIMENSION_ID,
 					SourceOrganisationDimension.MONEY_FLOW_DIMENSION_ID,
 					PriceFragmentDimension.MONEY_FLOW_DIMENSION_ID });

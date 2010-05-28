@@ -167,54 +167,54 @@ implements Serializable
 	 * hang "pending" in the server and needs manual care. In this pending state,
 	 * the money is already booked on the customer's account.
 	 */
-	public static String CODE_APPROVED_NO_EXTERNAL = "approvedNoExternal";
+	public static final String CODE_APPROVED_NO_EXTERNAL = "approvedNoExternal";
 
 	/**
 	 * This means the same as {@link #CODE_APPROVED_NO_EXTERNAL} except that it
 	 * indicates that an external approval has been done.
 	 */
-	public static String CODE_APPROVED_WITH_EXTERNAL = "approvedWithExternal";
+	public static final String CODE_APPROVED_WITH_EXTERNAL = "approvedWithExternal";
 
 	/**
 	 * The payment has failed.  More information will be found in {@link #text}
 	 * and {@link #error}.
 	 */
-	public static String CODE_FAILED = "failed";
+	public static final String CODE_FAILED = "failed";
 
 	/**
 	 * The payment has been completed. No further access to external payment systems
 	 * is necessary.
 	 */
-	public static String CODE_PAID_WITH_EXTERNAL = "paidWithExternal";
+	public static final String CODE_PAID_WITH_EXTERNAL = "paidWithExternal";
 
 	/**
 	 * The payment has been done locally within JFire, but no external payment has been
 	 * performed (e.g. the server processor might return this, because the client is
 	 * responsible for the payment).
 	 */
-	public static String CODE_PAID_NO_EXTERNAL = "paidNoExternal";
+	public static final String CODE_PAID_NO_EXTERNAL = "paidNoExternal";
 
 	/**
 	 * The payment has been rolled back externally.
 	 */
-	public static String CODE_ROLLED_BACK_WITH_EXTERNAL = "rolledBackWithExternal";
+	public static final String CODE_ROLLED_BACK_WITH_EXTERNAL = "rolledBackWithExternal";
 
 	/**
 	 * Even though there has no external work been involved, this means the payment
 	 * has been rolled back in the not-really-existing external system.
 	 */
-	public static String CODE_ROLLED_BACK_NO_EXTERNAL = "rolledBackNoExternal";
+	public static final String CODE_ROLLED_BACK_NO_EXTERNAL = "rolledBackNoExternal";
 
 	/**
 	 * The payment has been committed externally.
 	 */
-	public static String CODE_COMMITTED_WITH_EXTERNAL = "committedWithExternal";
+	public static final String CODE_COMMITTED_WITH_EXTERNAL = "committedWithExternal";
 
 	/**
 	 * Even though there has no external work been involved, this means the payment
 	 * has been committed in the not-really-existing external system.
 	 */
-	public static String CODE_COMMITTED_NO_EXTERNAL = "committedNoExternal";
+	public static final String CODE_COMMITTED_NO_EXTERNAL = "committedNoExternal";
 
 	/**
 	 * The payment has been postponed. This means, the payment system has taken
@@ -234,7 +234,7 @@ implements Serializable
 	 * no transfer will be created. If this is the result at a later time, the transfer
 	 * will be rolled back.
 	 */
-	public static String CODE_POSTPONED = "postponed";
+	public static final String CODE_POSTPONED = "postponed";
 
 	/**
 	 * This is one of the <tt>CODE_</tt> constants.

@@ -44,14 +44,14 @@ import org.nightlabs.jfire.trade.id.ArticleID;
 public class InvoiceEditException extends ArticleContainerException
 {
 	private static final long serialVersionUID = 1L;
-	public static int REASON_NESTED_EXCEPTION = 0;
-	public static int REASON_ARTICLE_ALREADY_IN_INVOICE = 1;
-	public static int REASON_OFFER_NOT_ACCEPTED = 2;
-	public static int REASON_ANCHORS_DONT_MATCH = 3;
-	public static int REASON_FOREIGN_ORGANISATION = 4;
-	public static int REASON_NO_ARTICLES = 5;
-	public static int REASON_MULTIPLE_CURRENCIES = 6;
-	public static int REASON_INVOICE_FINALIZED = 7;
+	public static final int REASON_NESTED_EXCEPTION = 0;
+	public static final int REASON_ARTICLE_ALREADY_IN_INVOICE = 1;
+	public static final int REASON_OFFER_NOT_ACCEPTED = 2;
+	public static final int REASON_ANCHORS_DONT_MATCH = 3;
+	public static final int REASON_FOREIGN_ORGANISATION = 4;
+	public static final int REASON_NO_ARTICLES = 5;
+	public static final int REASON_MULTIPLE_CURRENCIES = 6;
+	public static final int REASON_INVOICE_FINALIZED = 7;
 
 	/**
 	 * If an {@link org.nightlabs.jfire.trade.Article} has been reversed
@@ -64,7 +64,7 @@ public class InvoiceEditException extends ArticleContainerException
 	 *
 	 * @see #REASON_REVERSING_ARTICLE
 	 */
-	public static int REASON_REVERSED_ARTICLE = 8;
+	public static final int REASON_REVERSED_ARTICLE = 8;
 
 	/**
 	 * A reversing {@link org.nightlabs.jfire.trade.Article} can only be added to a
@@ -75,7 +75,7 @@ public class InvoiceEditException extends ArticleContainerException
 	 *
 	 * @see #REASON_REVERSED_ARTICLE
 	 */
-	public static int REASON_REVERSING_ARTICLE = 9;
+	public static final int REASON_REVERSING_ARTICLE = 9;
 
 	public InvoiceEditException(int reason) {
 		super();

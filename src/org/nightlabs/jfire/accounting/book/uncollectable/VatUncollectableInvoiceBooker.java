@@ -168,18 +168,10 @@ extends UncollectableInvoiceBooker
 		Accounting accounting = Accounting.getAccounting(pm);
 		if (accounting.getMandator().equals(invoice.getVendor())) {
 			partner = invoice.getCustomer();
-//			if (invoicePrice.getAmount() < 0)
-//				partnerAccountTypeID = AccountType.ACCOUNT_TYPE_ID_PARTNER_VENDOR;
-//			else
-//				partnerAccountTypeID = AccountType.ACCOUNT_TYPE_ID_PARTNER_CUSTOMER;
 			partnerAccountTypeID = AccountType.ACCOUNT_TYPE_ID_PARTNER_CUSTOMER;
 		}
 		else {
 			partner = invoice.getVendor();
-//			if (invoicePrice.getAmount() < 0)
-//				partnerAccountTypeID = AccountType.ACCOUNT_TYPE_ID_PARTNER_CUSTOMER;
-//			else
-//				partnerAccountTypeID = AccountType.ACCOUNT_TYPE_ID_PARTNER_VENDOR;
 			partnerAccountTypeID = AccountType.ACCOUNT_TYPE_ID_PARTNER_VENDOR;
 		}
 

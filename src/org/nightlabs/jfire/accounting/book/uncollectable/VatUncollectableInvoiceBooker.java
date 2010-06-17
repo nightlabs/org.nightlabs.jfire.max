@@ -168,17 +168,19 @@ extends UncollectableInvoiceBooker
 		Accounting accounting = Accounting.getAccounting(pm);
 		if (accounting.getMandator().equals(invoice.getVendor())) {
 			partner = invoice.getCustomer();
-			if (invoicePrice.getAmount() < 0)
-				partnerAccountTypeID = AccountType.ACCOUNT_TYPE_ID_PARTNER_VENDOR;
-			else
-				partnerAccountTypeID = AccountType.ACCOUNT_TYPE_ID_PARTNER_CUSTOMER;
+//			if (invoicePrice.getAmount() < 0)
+//				partnerAccountTypeID = AccountType.ACCOUNT_TYPE_ID_PARTNER_VENDOR;
+//			else
+//				partnerAccountTypeID = AccountType.ACCOUNT_TYPE_ID_PARTNER_CUSTOMER;
+			partnerAccountTypeID = AccountType.ACCOUNT_TYPE_ID_PARTNER_CUSTOMER;
 		}
 		else {
 			partner = invoice.getVendor();
-			if (invoicePrice.getAmount() < 0)
-				partnerAccountTypeID = AccountType.ACCOUNT_TYPE_ID_PARTNER_CUSTOMER;
-			else
-				partnerAccountTypeID = AccountType.ACCOUNT_TYPE_ID_PARTNER_VENDOR;
+//			if (invoicePrice.getAmount() < 0)
+//				partnerAccountTypeID = AccountType.ACCOUNT_TYPE_ID_PARTNER_CUSTOMER;
+//			else
+//				partnerAccountTypeID = AccountType.ACCOUNT_TYPE_ID_PARTNER_VENDOR;
+			partnerAccountTypeID = AccountType.ACCOUNT_TYPE_ID_PARTNER_VENDOR;
 		}
 
 		Currency currency = invoice.getCurrency();
@@ -195,10 +197,10 @@ extends UncollectableInvoiceBooker
 
 		MoneyTransfer moneyTransfer = new MoneyTransfer(
 				null, user,
-				getUncollectableAccountNet(currency),
-				partnerAccount,
+				(netAmount < 0 ? partnerAccount : getUncollectableAccountNet(currency)),
+				(netAmount < 0 ? getUncollectableAccountNet(currency) : partnerAccount),
 				currency,
-				netAmount
+				Math.abs(netAmount)
 		);
 		transfers.add(moneyTransfer);
 		moneyTransfer = pm.makePersistent(moneyTransfer);
@@ -207,10 +209,10 @@ extends UncollectableInvoiceBooker
 		for (Map.Entry<PriceFragmentType, Long> me : vatPriceFragmentType2vatValueAmount.entrySet()) {
 			moneyTransfer = new MoneyTransfer(
 					null, user,
-					getUncollectableAccountVatValue(currency, me.getKey()),
-					partnerAccount,
+					(me.getValue() < 0 ? partnerAccount : getUncollectableAccountVatValue(currency, me.getKey())),
+					(me.getValue() < 0 ? getUncollectableAccountVatValue(currency, me.getKey()) : partnerAccount),
 					currency,
-					me.getValue()
+					Math.abs(me.getValue())
 			);
 			transfers.add(moneyTransfer);
 			moneyTransfer = pm.makePersistent(moneyTransfer);

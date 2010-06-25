@@ -240,7 +240,7 @@ implements WebShopRemote
 	/**
 	 * Check if a customer can login. This is done by checking
 	 * the first and second password for the customer. If authentication
-	 * with the second password succeeds, the firsat password will be
+	 * with the second password succeeds, the first password will be
 	 * replaced by the second and the second password will be removed.
 	 * @param webCustomerID the customer to log in
 	 * @param password The plain text password to check
@@ -249,7 +249,6 @@ implements WebShopRemote
 	 * @ejb.transaction type="Required"
 	 */	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("_Guest_")
-
 	public boolean tryCustomerLogin(WebCustomerID webCustomerID, String password)
 	{
 		logger.debug("Trying authentication for web customer: "+webCustomerID);
@@ -295,7 +294,7 @@ implements WebShopRemote
 				return false;
 			}
 		}	catch (JDOObjectNotFoundException e) {
-			logger.error("Customer authentication failed: Customer not found: "+webCustomerID, e);
+			logger.info("Customer authentication failed: Customer not found: "+webCustomerID, e);
 			return false;
 		} finally {
 			pm.close();

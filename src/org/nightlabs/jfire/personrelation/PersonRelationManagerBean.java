@@ -3,6 +3,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Deque;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -30,7 +31,10 @@ import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.person.Person;
 import org.nightlabs.jfire.personrelation.id.PersonRelationID;
 import org.nightlabs.jfire.personrelation.id.PersonRelationTypeID;
+import org.nightlabs.jfire.prop.RoleConstants;
 import org.nightlabs.jfire.prop.id.PropertySetID;
+import org.nightlabs.jfire.security.Authority;
+import org.nightlabs.jfire.security.ResolveSecuringAuthorityStrategy;
 
 @TransactionAttribute(TransactionAttributeType.REQUIRED)
 @TransactionManagement(TransactionManagementType.CONTAINER)
@@ -170,8 +174,12 @@ implements PersonRelationManagerRemote
 			PersonRelationType personRelationType = (PersonRelationType) (personRelationTypeID == null ? null : pm.getObjectById(personRelationTypeID));
 			Person fromPerson = (Person) (fromPersonID == null ? null : pm.getObjectById(fromPersonID));
 			Person toPerson = (Person) (toPersonID == null ? null : pm.getObjectById(toPersonID));
-
-			return PersonRelation.getPersonRelationCount(pm, personRelationType, fromPerson, toPerson);
+//			// TODO also only return only number of (authority) filtered person relations
+//			return PersonRelation.getPersonRelationCount(pm, personRelationType, fromPerson, toPerson);
+			Collection<? extends PersonRelation> personRelations = PersonRelation.getPersonRelations(pm, personRelationType, fromPerson, toPerson);
+			// authority filtering
+			personRelations = filterPersonRelations(pm, personRelations);
+			return personRelations.size();
 		} finally {
 			pm.close();
 		}
@@ -207,7 +215,9 @@ implements PersonRelationManagerRemote
 			Person toPerson = (Person) (toPersonID == null ? null : pm.getObjectById(toPersonID));
 
 			Collection<? extends PersonRelation> relations = PersonRelation.getPersonRelations(pm, personRelationType, fromPerson, toPerson);
-			return (Collection<PersonRelationID>) (personRelationComparator != null ? getSortedPersonRelationIDsByPersonRelationType(relations, personRelationComparator) : NLJDOHelper.getObjectIDList(relations));
+			// authority filtering
+			Collection<PersonRelation> filteredResult = filterPersonRelations(pm, relations);
+			return (Collection<PersonRelationID>) (personRelationComparator != null ? getSortedPersonRelationIDsByPersonRelationType(filteredResult, personRelationComparator) : NLJDOHelper.getObjectIDList(filteredResult));
 
 		} finally {
 			pm.close();
@@ -215,9 +225,15 @@ implements PersonRelationManagerRemote
 	}
 
 	protected Collection<PersonRelationID> getSortedPersonRelationIDsByPersonRelationType
-	(Collection<? extends PersonRelation> relations, PersonRelationComparator personRelationComparator) {
-		@SuppressWarnings("unchecked")
-		List<PersonRelation> relns = (List<PersonRelation>) relations;
+	(Collection<? extends PersonRelation> relations, PersonRelationComparator personRelationComparator) 
+	{
+		List<PersonRelation> relns = null;
+		if (relations instanceof List) {
+			relns = (List<PersonRelation>) relations;	
+		}
+		else {
+			relns = new ArrayList<PersonRelation>(relations);
+		}
 		Collections.sort(relns, personRelationComparator);
 
 		return NLJDOHelper.getObjectIDList(relns);
@@ -242,6 +258,8 @@ implements PersonRelationManagerRemote
 			Person toPerson = (Person) (toPersonID == null ? null : pm.getObjectById(toPersonID));
 
 			Collection<? extends PersonRelation> relations = PersonRelation.getPersonRelations(pm, personRelationType, fromPerson, toPerson);
+			// authority filtering
+			relations = filterPersonRelations(pm, relations);			
 			Collection<PersonRelation> relationsMarkedForExclusion = new LinkedList<PersonRelation>();
 
 			// Perform the filtration. Mark elements to be excluded.
@@ -278,6 +296,8 @@ implements PersonRelationManagerRemote
 			Person toPerson = (Person) (toPersonID == null ? null : pm.getObjectById(toPersonID));
 
 			Collection<? extends PersonRelation> relations = PersonRelation.getPersonRelations(pm, personRelationType, fromPerson, toPerson);
+			// authority filtering
+			relations = filterPersonRelations(pm, relations);			
 			long relationsMarkedForExclusionCount = 0;
 
 			// Perform the filtration. Mark elements to be excluded.
@@ -287,7 +307,6 @@ implements PersonRelationManagerRemote
 				if (isPerformFilterFrom && fromPropertySetIDsToExclude.contains(personRelation.getFromID()) || isPerformFilterTo && toPropertySetIDsToExclude.contains(personRelation.getToID())) // This ensures we dont get repeated elements in the count.
 					relationsMarkedForExclusionCount++;
 			}
-
 			return relations.size() - relationsMarkedForExclusionCount;
 		} finally {
 			pm.close();
@@ -316,6 +335,8 @@ implements PersonRelationManagerRemote
 			Person toPerson = (Person) (toPersonID == null ? null : pm.getObjectById(toPersonID));
 
 			Collection<? extends PersonRelation> relations = PersonRelation.getPersonRelations(pm, personRelationType, fromPerson, toPerson);
+			// authority filtering
+			relations = filterPersonRelations(pm, relations);
 			Collection<PersonRelation> filteredInclusiveRelations = new LinkedList<PersonRelation>();
 
 			// Perform the filtration.
@@ -328,7 +349,6 @@ implements PersonRelationManagerRemote
 
 			relations.clear();
 			relations = filteredInclusiveRelations;
-
 			// Sort if necessary.
 			return (Collection<PersonRelationID>) (personRelationComparator != null ? getSortedPersonRelationIDsByPersonRelationType(relations, personRelationComparator) : NLJDOHelper.getObjectIDList(relations));
 		} finally {
@@ -353,6 +373,8 @@ implements PersonRelationManagerRemote
 			Person toPerson = (Person) (toPersonID == null ? null : pm.getObjectById(toPersonID));
 
 			Collection<? extends PersonRelation> relations = PersonRelation.getPersonRelations(pm, personRelationType, fromPerson, toPerson);
+			// authority filtering
+			relations = filterPersonRelations(pm, relations);			
 			long count = 0;
 
 			// Perform the filtration.
@@ -362,7 +384,6 @@ implements PersonRelationManagerRemote
 				if (isPerformFilterFrom && fromPropertySetIDsToInclude.contains(personRelation.getFromID()) || isPerformFilterTo && toPropertySetIDsToInclude.contains(personRelation.getToID())) // This ensures we dont get repeated elements in the LinkedList.
 					count++;
 			}
-
 			return count;
 		} finally {
 			pm.close();
@@ -389,6 +410,8 @@ implements PersonRelationManagerRemote
 			PersonRelationType personRelationType = (PersonRelationType) (personRelationTypeID == null ? null : pm.getObjectById(personRelationTypeID));
 			Person fromPerson = (Person) (currentID == null ? null : pm.getObjectById(currentID));
 			Collection<? extends PersonRelation> personRelations = PersonRelation.getPersonRelations(pm, personRelationType, fromPerson, null);
+			// authority filtering
+			personRelations = filterPersonRelations(pm, personRelations);
 			
 			if (logger.isDebugEnabled()) {
 				String str = "\n ---- Ref: " + showObjectID(currentID) + " ----";
@@ -488,7 +511,15 @@ implements PersonRelationManagerRemote
 	{
 		PersistenceManager pm = createPersistenceManager();
 		try {
-			return NLJDOHelper.getDetachedObjectList(pm, personRelationIDs, PersonRelation.class, fetchGroups, maxFetchDepth);
+//			return NLJDOHelper.getDetachedObjectList(pm, personRelationIDs, PersonRelation.class, fetchGroups, maxFetchDepth);
+			
+			Collection<PersonRelation> relations = pm.getObjectsById(personRelationIDs);
+			Collection<PersonRelation> filteredRelations = filterPersonRelations(pm, relations);
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+			if (fetchGroups != null)
+				pm.getFetchPlan().setGroups(fetchGroups);
+
+			return pm.detachCopyAll(filteredRelations);			
 		} finally {
 			pm.close();
 		}
@@ -750,5 +781,35 @@ implements PersonRelationManagerRemote
 //		}
 	}
 
+	/**
+	 * Filters the given set of PersonRelations based on the authority settings for PropertySets aka Persons.
+	 * Means if a user has not the right to see a certain PropertySet the corresponding PersonRelation where
+	 * such a user represents the to or from person, this PersonRelation is removed.
+	 *
+	 * @param pm The {@link PersistenceManager}
+	 * @param relations the Collection of PersonRelations to filter
+	 * @return the filtered Collection of PersonRelations.
+	 */
+	private Collection<PersonRelation> filterPersonRelations(PersistenceManager pm, Collection<? extends PersonRelation> relations)
+	{
+		// Begin authority check, only return personRelations which persons are allowed to be seen
+		Map<Person, PersonRelation> person2Relation = new HashMap<Person, PersonRelation>();
+		for (PersonRelation personRelation : relations) {
+			person2Relation.put(personRelation.getFrom(), personRelation);
+			person2Relation.put(personRelation.getTo(), personRelation);
+		}
 
+		Set<Person> filteredPersons = Authority.filterSecuredObjects(pm, person2Relation.keySet(), getPrincipal(), RoleConstants.seePropertySet, ResolveSecuringAuthorityStrategy.allow);
+		
+		Set<Person> removedPersons = new HashSet<Person>(person2Relation.keySet());
+		removedPersons.removeAll(filteredPersons);
+		for (Person removedPerson : removedPersons) {
+			PersonRelation removedRelation = person2Relation.get(removedPerson);
+			if (removedRelation != null) {
+				person2Relation.remove(removedRelation.getFrom());
+				person2Relation.remove(removedRelation.getTo());
+			}
+		}
+		return new HashSet<PersonRelation>(person2Relation.values());
+	}
 }

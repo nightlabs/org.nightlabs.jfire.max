@@ -105,10 +105,10 @@ public class StatableQuery
 		}
 
 		if (isFieldEnabled(FieldName.stateCreateDTMin) && stateCreateDTMin != null)
-			filter.append("\n && this.createDT >= :stateCreateDTMin");
+			filter.append("\n && this."+getCreateDTFieldName()+" >= :stateCreateDTMin");
 
 		if (isFieldEnabled(FieldName.stateCreateDTMax) && stateCreateDTMax != null)
-			filter.append("\n && this.createDT <= :stateCreateDTMax");
+			filter.append("\n && this."+getCreateDTFieldName()+" <= :stateCreateDTMax");
 
 		logger.debug("filter == "+filter);
 
@@ -244,5 +244,9 @@ public class StatableQuery
 	public Class<?> getResultClass()
 	{
 		return statableClass != null ? statableClass : super.getResultClass();
+	}
+
+	protected String getCreateDTFieldName() {
+		return "createDT";
 	}
 }

@@ -38,7 +38,9 @@ import org.nightlabs.jfire.jbpm.extension.ExtendedNodeDescriptor;
 import org.nightlabs.jfire.jbpm.extension.ExtendedProcessDefinitionDescriptor;
 import org.nightlabs.jfire.jbpm.extension.JpdlXmlExtensionReader;
 import org.nightlabs.jfire.jbpm.graph.def.id.ProcessDefinitionID;
+import org.nightlabs.jfire.jbpm.graph.def.id.StateDefinitionID;
 import org.nightlabs.jfire.security.User;
+import org.nightlabs.util.IOUtil;
 
 
 
@@ -152,6 +154,123 @@ implements Serializable
 		}
 	}
 
+//	/**
+//	 * @param jbpmContext The jbpm context to work in. Can be <code>null</code> which will cause a context to be implicitely created and closed.
+//	 * @param jbpmProcessDefinitionURL The URL pointing to the processdefinition.xml file's directory
+//	 * @return the newly created {@link ProcessDefinition} (or the old one with a new version, if it previously existed.
+//	 * @throws IOException
+//	 */
+//	public static ProcessDefinition storeProcessDefinition(
+//			PersistenceManager pm, JbpmContext jbpmContext, org.jbpm.graph.def.ProcessDefinition jbpmProcessDefinition,
+//			URL jbpmProcessDefinitionURL)
+//	throws IOException
+//	{
+//		ExtendedProcessDefinitionDescriptor processDefinitionDescriptor = null;
+//
+//		pm.getExtent(ProcessDefinition.class);
+//
+////		// register the main action handler ActionHandlerNodeEnter
+////		ActionHandlerNodeEnter.register(jbpmProcessDefinition);
+//
+//		boolean closeJbpmContext = false;
+//		if (jbpmContext == null) {
+//			closeJbpmContext = true;
+//			jbpmContext = JbpmLookup.getJbpmConfiguration().createJbpmContext();
+//		}
+//
+//		try {
+//			jbpmContext.deployProcessDefinition(jbpmProcessDefinition);
+//
+//			ProcessDefinitionID processDefinitionID = getProcessDefinitionID(jbpmProcessDefinition);
+//			ProcessDefinition processDefinition;
+//			try {
+//				processDefinition = (ProcessDefinition) pm.getObjectById(processDefinitionID);
+//				processDefinition.createProcessDefinitionVersion(jbpmProcessDefinition, jbpmProcessDefinitionURL);
+//			} catch (JDOObjectNotFoundException x) {
+//				processDefinition = pm.makePersistent(
+//						new ProcessDefinition(processDefinitionID, jbpmProcessDefinition, jbpmProcessDefinitionURL));
+//			}
+//
+//			URL jbpmExtensionURL = null;
+//			try {
+//				// read the jbpm extension process file
+//				jbpmExtensionURL = new URL(jbpmProcessDefinitionURL, "processdefinition-extension.xml");
+//				InputStream extensionInput = jbpmExtensionURL.openStream();
+//				// a simple check to throws I/O exception if file doesnt exist.
+//				if (jbpmExtensionURL.openConnection().getInputStream()!= null)
+//				{
+//					try {
+//						Reader extensionReader = new InputStreamReader(extensionInput);
+//						JpdlXmlExtensionReader jpdlXmlReaderExtension = new JpdlXmlExtensionReader(extensionReader);
+//						processDefinitionDescriptor = jpdlXmlReaderExtension.getExtendedProcessDefinitionDescriptor();
+//					} finally {
+//						extensionInput.close();
+//					}
+//				} else
+//					logger.info("Input stream is null in process definition extension:" + jbpmProcessDefinitionURL);
+//
+//			}
+//			catch (FileNotFoundException e) {
+//				logger.info("No additional process definition extension file found: " + jbpmExtensionURL);
+//			}
+//			catch (Throwable t) {
+//				if (t instanceof IOException)
+//					logger.info("reading process definition extension failed because of IO Exception: " + jbpmProcessDefinitionURL, t);
+//				if (t instanceof RuntimeException)
+//					logger.info("reading process definition extension failed because of Runtime Exception: " + jbpmProcessDefinitionURL, t);
+//				else
+//					logger.info("reading process definition extension failed:" + jbpmProcessDefinitionURL, t);
+//			}
+//
+//			// create StateDefinitions
+//			for (Iterator<?> itNode = jbpmProcessDefinition.getNodes().iterator(); itNode.hasNext(); ) {
+//				Node node = (Node) itNode.next();
+//				//				if (node instanceof StartState ||
+//				//						node instanceof EndState ||
+//				//						node instanceof org.jbpm.graph.node.State)
+//				//				{
+//				StateDefinition stateDefinition = pm.makePersistent(new StateDefinition(processDefinition, node));
+//				// look up for the extended node if it has matches
+//				if(processDefinitionDescriptor != null)
+//				{
+//					ExtendedNodeDescriptor extendedNode = processDefinitionDescriptor.getExtendedNodeDescriptor(node);
+//					if(extendedNode != null)
+//					{
+//						// set the name and description from the extended I18in Node
+//						stateDefinition.getName().copyFrom(extendedNode.getName());
+//						stateDefinition.getDescription().copyFrom(extendedNode.getDescription());
+//						stateDefinition.setPublicState(extendedNode.getPublicState());
+//					}
+//
+//				}
+//				// create Transitions
+//				if (node.getLeavingTransitions() != null) {
+//					for (Iterator <?>itTransition = node.getLeavingTransitions().iterator(); itTransition.hasNext(); ) {
+//						org.jbpm.graph.def.Transition jbpmTransition = (org.jbpm.graph.def.Transition) itTransition.next();
+//						//							TransitionID transitionID = Transition.getTransitionID(jbpmTransition);
+//						Transition transition = pm.makePersistent(new Transition(stateDefinition, jbpmTransition.getName()));
+//						if(processDefinitionDescriptor != null)
+//						{
+//							ExtendedNodeDescriptor transitionExtendedNode = processDefinitionDescriptor.getExtendedNodeDescriptor(jbpmTransition);
+//							if( transitionExtendedNode != null)
+//							{
+//								// SET THE NAME AND DESCRIPTION FROM THE EXTENDED I18IN NODE
+//								transition.getName().copyFrom(transitionExtendedNode.getName());
+//								transition.getDescription().copyFrom(transitionExtendedNode.getDescription());
+//								transition.setUserExecutable(transitionExtendedNode.getUserExecutable());
+//							}
+//						}
+//					}
+//				}
+//			}
+//
+//			return processDefinition;
+//		} finally {
+//			if (closeJbpmContext)
+//				jbpmContext.close();
+//		}
+//	}
+
 	/**
 	 * @param jbpmContext The jbpm context to work in. Can be <code>null</code> which will cause a context to be implicitely created and closed.
 	 * @param jbpmProcessDefinitionURL The URL pointing to the processdefinition.xml file's directory
@@ -163,7 +282,6 @@ implements Serializable
 			URL jbpmProcessDefinitionURL)
 	throws IOException
 	{
-
 		ExtendedProcessDefinitionDescriptor processDefinitionDescriptor = null;
 
 		pm.getExtent(ProcessDefinition.class);
@@ -199,7 +317,7 @@ implements Serializable
 				if (jbpmExtensionURL.openConnection().getInputStream()!= null)
 				{
 					try {
-						Reader extensionReader = new InputStreamReader(extensionInput);
+						Reader extensionReader = new InputStreamReader(extensionInput, IOUtil.CHARSET_NAME_UTF_8);
 						JpdlXmlExtensionReader jpdlXmlReaderExtension = new JpdlXmlExtensionReader(extensionReader);
 						processDefinitionDescriptor = jpdlXmlReaderExtension.getExtendedProcessDefinitionDescriptor();
 					} finally {
@@ -224,11 +342,11 @@ implements Serializable
 			// create StateDefinitions
 			for (Iterator<?> itNode = jbpmProcessDefinition.getNodes().iterator(); itNode.hasNext(); ) {
 				Node node = (Node) itNode.next();
-				//				if (node instanceof StartState ||
-				//						node instanceof EndState ||
-				//						node instanceof org.jbpm.graph.node.State)
-				//				{
-				StateDefinition stateDefinition = pm.makePersistent(new StateDefinition(processDefinition, node));
+
+				StateDefinition stateDefinition = StateDefinition.getStateDefinition(processDefinition, node.getName());
+				if (stateDefinition == null) {
+					stateDefinition = pm.makePersistent(new StateDefinition(processDefinition, node));
+				}
 				// look up for the extended node if it has matches
 				if(processDefinitionDescriptor != null)
 				{
@@ -240,14 +358,17 @@ implements Serializable
 						stateDefinition.getDescription().copyFrom(extendedNode.getDescription());
 						stateDefinition.setPublicState(extendedNode.getPublicState());
 					}
-
 				}
 				// create Transitions
 				if (node.getLeavingTransitions() != null) {
 					for (Iterator <?>itTransition = node.getLeavingTransitions().iterator(); itTransition.hasNext(); ) {
 						org.jbpm.graph.def.Transition jbpmTransition = (org.jbpm.graph.def.Transition) itTransition.next();
-						//							TransitionID transitionID = Transition.getTransitionID(jbpmTransition);
-						Transition transition = pm.makePersistent(new Transition(stateDefinition, jbpmTransition.getName()));
+
+						StateDefinitionID stateDefinitionID = (StateDefinitionID) JDOHelper.getObjectId(stateDefinition);
+						Transition transition = Transition.getTransition(pm, stateDefinitionID, jbpmTransition.getName());
+						if (transition == null) {
+							transition = pm.makePersistent(new Transition(stateDefinition, jbpmTransition.getName()));
+						}
 						if(processDefinitionDescriptor != null)
 						{
 							ExtendedNodeDescriptor transitionExtendedNode = processDefinitionDescriptor.getExtendedNodeDescriptor(jbpmTransition);

@@ -324,10 +324,23 @@ implements Serializable, StatableLocal, DeleteCallback
 			return statesToDelete;
 
 		Set<State> res = new HashSet<State>(this.states);
-		res.add(this.state);
+		// added check to avoid foreign key constraint and will be deleted anyway in jdoPreDelete() of Issue
+		if (!this.state.equals(issue.getState()))
+			res.add(this.state);
+
 		this.state = null;
 		this.states.clear();
 		statesToDelete = res;
+
+		PersistenceManager pm = getPersistenceManager();
+		for (State state : statesToDelete) {
+			// added check to avoid foreign key constraint and will be deleted anyway in jdoPreDelete() of Issue
+			if (!issue.getStates().contains(state))
+				pm.deletePersistent(state);
+		}
+
+		pm.flush();
+
 		return res;
 	}
 

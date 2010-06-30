@@ -1,386 +1,386 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <process-definition-extension xmlns="" name="dev.jfire.org:IssueType">
    <start-state name="dev.jfire.org:new">
-      <name language="de">new</name>
-      <description language="de">new</description>
+      <name language="de">Neu</name>
+      <description language="de">Neu</description>
       <name language="en">new</name>
       <description language="en">new</description>
       <icon file=""/>
       <transition name="reject">
-         <name language="de">reject</name>
-         <description language="de">reject</description>
+         <name language="de">Ablehnen</name>
+         <description language="de">Ablehnen</description>
          <name language="en">reject</name>
          <description language="en">reject</description>
          <icon file=""/>
       </transition>
       <transition name="open">
-         <name language="de">open</name>
-         <description language="de">open</description>
+         <name language="de">Öffnen</name>
+         <description language="de">Öffnen</description>
          <name language="en">open</name>
          <description language="en">open</description>
          <icon file=""/>
       </transition>
       <transition name="acknowledge">
-         <name language="de">acknowledge</name>
-         <description language="de">acknowledge</description>
+         <name language="de">Zur Kenntnis nehmen</name>
+         <description language="de">Zur Kenntnis nehmen</description>
          <name language="en">acknowledge</name>
          <description language="en">acknowledge</description>
          <icon file=""/>
       </transition>
       <transition name="confirm">
-         <name language="de">confirm</name>
-         <description language="de">confirm</description>
+         <name language="de">Bestätigen</name>
+         <description language="de">Bestätigen</description>
          <name language="en">confirm</name>
          <description language="en">confirm</description>
          <icon file=""/>
       </transition>
       <transition name="dev.jfire.org:assign">
-         <name language="de">assign</name>
-         <description language="de">assign</description>
+         <name language="de">Zuweisen</name>
+         <description language="de">Zuweisen</description>
          <name language="en">assign</name>
          <description language="en">assign</description>
          <icon file=""/>
       </transition>
       <transition name="resolve">
-         <name language="de">resolve</name>
-         <description language="de">resolve</description>
+         <name language="de">Lösen</name>
+         <description language="de">Lösen</description>
          <name language="en">resolve</name>
          <description language="en">resolve</description>
          <icon file=""/>
       </transition>
       <transition name="close">
-         <name language="de">close</name>
-         <description language="de">close</description>
+         <name language="de">Schließen</name>
+         <description language="de">Schließen</description>
          <name language="en">close</name>
          <description language="en">close</description>
          <icon file=""/>
       </transition>
    </start-state>
    <state name="dev.jfire.org:acknowledged">
-      <name language="de">acknowledged</name>
-      <description language="de">acknowledged</description>
+      <name language="de">Zur Kenntnis genommen</name>
+      <description language="de">Zur Kenntnis genommen</description>
       <name language="en">acknowledged</name>
       <description language="en">acknowledged</description>
       <icon file=""/>
       <transition name="confirm">
-         <name language="de">confirm</name>
-         <description language="de">confirm</description>
+         <name language="de">Bestätigen</name>
+         <description language="de">Bestätigen</description>
          <name language="en">confirm</name>
          <description language="en">confirm</description>
          <icon file=""/>
       </transition>
       <transition name="reject">
-         <name language="de">reject</name>
-         <description language="de">reject</description>
+         <name language="de">Ablehnen</name>
+         <description language="de">Ablehnen</description>
          <name language="en">reject</name>
          <description language="en">reject</description>
          <icon file=""/>
       </transition>
       <transition name="dev.jfire.org:assign">
-         <name language="de">assign</name>
-         <description language="de">assign</description>
+         <name language="de">Zuweisen</name>
+         <description language="de">Zuweisen</description>
          <name language="en">assign</name>
          <description language="en">assign</description>
          <icon file=""/>
       </transition>
       <transition name="resolve">
-         <name language="de">resolve</name>
-         <description language="de">resolve</description>
+         <name language="de">Lösen</name>
+         <description language="de">Lösen</description>
          <name language="en">resolve</name>
          <description language="en">resolve</description>
          <icon file=""/>
       </transition>
       <transition name="close">
-         <name language="de">close</name>
-         <description language="de">close</description>
+         <name language="de">Schließen</name>
+         <description language="de">Schließen</description>
          <name language="en">close</name>
          <description language="en">close</description>
          <icon file=""/>
       </transition>
    </state>
    <state name="dev.jfire.org:assigned">
-      <name language="de">assigned</name>
-      <description language="de">assigned</description>
+      <name language="de">Zugewiesen</name>
+      <description language="de">Zugewiesen</description>
       <name language="en">assigned</name>
       <description language="en">assigned</description>
       <icon file=""/>
       <transition name="reject">
-         <name language="de">reject</name>
-         <description language="de">reject</description>
+         <name language="de">Ablehnen</name>
+         <description language="de">Ablehnen</description>
          <name language="en">reject</name>
          <description language="en">reject</description>
          <icon file=""/>
       </transition>
       <transition name="resolve">
-         <name language="de">resolve</name>
-         <description language="de">resolve</description>
+         <name language="de">Lösen</name>
+         <description language="de">Lösen</description>
          <name language="en">resolve</name>
          <description language="en">resolve</description>
          <icon file=""/>
       </transition>
       <transition name="close">
-         <name language="de">close</name>
-         <description language="de">close</description>
+         <name language="de">Schließen</name>
+         <description language="de">Schließen</description>
          <name language="en">close</name>
          <description language="en">close</description>
          <icon file=""/>
       </transition>
       <transition name="dev.jfire.org:unassign">
-         <name language="de">unassign</name>
-         <description language="de">unassign</description>
+         <name language="de">Zuweisung entfernen</name>
+         <description language="de">Zuweisung entfernen</description>
          <name language="en">unassign</name>
          <description language="en">unassign</description>
          <icon file=""/>
       </transition>
    </state>
    <state name="dev.jfire.org:confirmed">
-      <name language="de">confirmed</name>
-      <description language="de">confirmed</description>
+      <name language="de">Bestätigt</name>
+      <description language="de">Bestätigt</description>
       <name language="en">confirmed</name>
       <description language="en">confirmed</description>
       <icon file=""/>
       <transition name="dev.jfire.org:assign">
-         <name language="de">assign</name>
-         <description language="de">assign</description>
+         <name language="de">Zuweisen</name>
+         <description language="de">Zuweisen</description>
          <name language="en">assign</name>
          <description language="en">assign</description>
          <icon file=""/>
       </transition>
    </state>
    <state name="dev.jfire.org:resolved">
-      <name language="de">resolved</name>
-      <description language="de">resolved</description>
+      <name language="de">Gelöst</name>
+      <description language="de">Gelöst</description>
       <name language="en">resolved</name>
       <description language="en">resolved</description>
       <icon file=""/>
       <transition name="close">
-         <name language="de">close</name>
-         <description language="de">close</description>
+         <name language="de">Schließen</name>
+         <description language="de">Schließen</description>
          <name language="en">close</name>
          <description language="en">close</description>
          <icon file=""/>
       </transition>
       <transition name="reject">
-         <name language="de">reject</name>
-         <description language="de">reject</description>
+         <name language="de">Ablehnen</name>
+         <description language="de">Ablehnen</description>
          <name language="en">reject</name>
          <description language="en">reject</description>
          <icon file=""/>
       </transition>
       <transition name="reopen">
-         <name language="de">reopen</name>
-         <description language="de">reopen</description>
+         <name language="de">Wieder öffnen</name>
+         <description language="de">Wieder öffnen</description>
          <name language="en">reopen</name>
          <description language="en">reopen</description>
          <icon file=""/>
       </transition>
    </state>
    <state name="dev.jfire.org:closed">
-      <name language="de">closed</name>
-      <description language="de">closed</description>
+      <name language="de">Geschlossen</name>
+      <description language="de">Geschlossen</description>
       <name language="en">closed</name>
       <description language="en">closed</description>
       <icon file=""/>
       <transition name="reject">
-         <name language="de">reject</name>
-         <description language="de">reject</description>
+         <name language="de">Ablehnen</name>
+         <description language="de">Ablehnen</description>
          <name language="en">reject</name>
          <description language="en">reject</description>
          <icon file=""/>
       </transition>
       <transition name="reopen">
-         <name language="de">reopen</name>
-         <description language="de">reopen</description>
+         <name language="de">Wieder öffnen</name>
+         <description language="de">Wieder öffnen</description>
          <name language="en">reopen</name>
          <description language="en">reopen</description>
          <icon file=""/>
       </transition>
    </state>
    <node name="dev.jfire.org:acknowledgedImplicitely">
-      <name language="de">acknowledgedImplicitely</name>
-      <description language="de">acknowledgedImplicitely</description>
+      <name language="de">Implizit zur Kenntnis genommen</name>
+      <description language="de">Implizit zur Kenntnis genommen</description>
       <name language="en">acknowledgedImplicitely</name>
       <description language="en">acknowledgedImplicitely</description>
       <icon file=""/>
       <transition name="confirm">
-         <name language="de">confirm</name>
-         <description language="de">confirm</description>
+         <name language="de">Bestätigen</name>
+         <description language="de">Bestätigen</description>
          <name language="en">confirm</name>
          <description language="en">confirm</description>
          <icon file=""/>
       </transition>
       <transition name="dev.jfire.org:assign">
-         <name language="de">assign</name>
-         <description language="de">assign</description>
+         <name language="de">Zuweisen</name>
+         <description language="de">Zuweisen</description>
          <name language="en">assign</name>
          <description language="en">assign</description>
          <icon file=""/>
       </transition>
       <transition name="resolve">
-         <name language="de">resolve</name>
-         <description language="de">resolve</description>
+         <name language="de">Lösen</name>
+         <description language="de">Lösen</description>
          <name language="en">resolve</name>
          <description language="en">resolve</description>
          <icon file=""/>
       </transition>
       <transition name="close">
-         <name language="de">close</name>
-         <description language="de">close</description>
+         <name language="de">Schließen</name>
+         <description language="de">Schließen</description>
          <name language="en">close</name>
          <description language="en">close</description>
          <icon file=""/>
       </transition>
    </node>
    <node name="dev.jfire.org:confirmedImplicitely">
-      <name language="de">confirmedImplicitely</name>
-      <description language="de">confirmedImplicitely</description>
+      <name language="de">Implizit bestätigt</name>
+      <description language="de">Implizit bestätigt</description>
       <name language="en">confirmedImplicitely</name>
       <description language="en">confirmedImplicitely</description>
       <icon file=""/>
       <transition name="dev.jfire.org:assign">
-         <name language="de">assign</name>
-         <description language="de">assign</description>
+         <name language="de">Zuweisen</name>
+         <description language="de">Zuweisen</description>
          <name language="en">assign</name>
          <description language="en">assign</description>
          <icon file=""/>
       </transition>
       <transition name="resolve">
-         <name language="de">resolve</name>
-         <description language="de">resolve</description>
+         <name language="de">Lösen</name>
+         <description language="de">Lösen</description>
          <name language="en">resolve</name>
          <description language="en">resolve</description>
          <icon file=""/>
       </transition>
       <transition name="close">
-         <name language="de">close</name>
-         <description language="de">close</description>
+         <name language="de">Schließen</name>
+         <description language="de">Schließen</description>
          <name language="en">close</name>
          <description language="en">close</description>
          <icon file=""/>
       </transition>
    </node>
    <node name="dev.jfire.org:resolvedImplicitely">
-      <name language="de">resolvedImplicitely</name>
-      <description language="de">resolvedImplicitely</description>
+      <name language="de">Implizit gelöst</name>
+      <description language="de">Implizit gelöst</description>
       <name language="en">resolvedImplicitely</name>
       <description language="en">resolvedImplicitely</description>
       <icon file=""/>
       <transition name="close">
-         <name language="de">close</name>
-         <description language="de">close</description>
+         <name language="de">Schließen</name>
+         <description language="de">Schließen</description>
          <name language="en">close</name>
          <description language="en">close</description>
          <icon file=""/>
       </transition>
    </node>
    <node name="dev.jfire.org:reopened">
-      <name language="de">reopened</name>
-      <description language="de">reopened</description>
+      <name language="de">Wieder geöffnet</name>
+      <description language="de">Wieder geöffnet</description>
       <name language="en">reopened</name>
       <description language="en">reopened</description>
       <icon file=""/>
       <transition name="reopen">
-         <name language="de">reopen</name>
-         <description language="de">reopen</description>
+         <name language="de">Wieder öffnen</name>
+         <description language="de">Wieder öffnen</description>
          <name language="en">reopen</name>
          <description language="en">reopen</description>
          <icon file=""/>
       </transition>
    </node>
    <state name="dev.jfire.org:open">
-      <name language="de">open</name>
-      <description language="de">open</description>
+      <name language="de">Offen</name>
+      <description language="de">Offen</description>
       <name language="en">open</name>
       <description language="en">open</description>
       <icon file=""/>
       <transition name="confirm">
-         <name language="de">confirm</name>
-         <description language="de">confirm</description>
+         <name language="de">Bestätigen</name>
+         <description language="de">Bestätigen</description>
          <name language="en">confirm</name>
          <description language="en">confirm</description>
          <icon file=""/>
       </transition>
       <transition name="dev.jfire.org:assign">
-         <name language="de">assign</name>
-         <description language="de">assign</description>
+         <name language="de">Zuweisen</name>
+         <description language="de">Zuweisen</description>
          <name language="en">assign</name>
          <description language="en">assign</description>
          <icon file=""/>
       </transition>
       <transition name="resolve">
-         <name language="de">resolve</name>
-         <description language="de">resolve</description>
+         <name language="de">Lösen</name>
+         <description language="de">Lösen</description>
          <name language="en">resolve</name>
          <description language="en">resolve</description>
          <icon file=""/>
       </transition>
       <transition name="close">
-         <name language="de">close</name>
-         <description language="de">close</description>
+         <name language="de">Schließen</name>
+         <description language="de">Schließen</description>
          <name language="en">close</name>
          <description language="en">close</description>
          <icon file=""/>
       </transition>
       <transition name="acknowledge">
-         <name language="de">acknowledge</name>
-         <description language="de">acknowledge</description>
+         <name language="de">Zur Kenntnis nehmen</name>
+         <description language="de">Zur Kenntnis nehmen</description>
          <name language="en">acknowledge</name>
          <description language="en">acknowledge</description>
          <icon file=""/>
       </transition>
       <transition name="reject">
-         <name language="de">reject</name>
-         <description language="de">reject</description>
+         <name language="de">Ablehnen</name>
+         <description language="de">Ablehnen</description>
          <name language="en">reject</name>
          <description language="en">reject</description>
          <icon file=""/>
       </transition>
    </state>
    <node name="dev.jfire.org:openedImplicitely">
-      <name language="de">openedImplicitely</name>
-      <description language="de">openedImplicitely</description>
+      <name language="de">Implizit geöffnet</name>
+      <description language="de">Implizit geöffnet</description>
       <name language="en">openedImplicitely</name>
       <description language="en">openedImplicitely</description>
       <icon file=""/>
       <transition name="acknowledge">
-         <name language="de">acknowledge</name>
-         <description language="de">acknowledge</description>
+         <name language="de">Zur Kenntnis nehmen</name>
+         <description language="de">Zur Kenntnis nehmen</description>
          <name language="en">acknowledge</name>
          <description language="en">acknowledge</description>
          <icon file=""/>
       </transition>
       <transition name="confirm">
-         <name language="de">confirm</name>
-         <description language="de">confirm</description>
+         <name language="de">Bestätigen</name>
+         <description language="de">Bestätigen</description>
          <name language="en">confirm</name>
          <description language="en">confirm</description>
          <icon file=""/>
       </transition>
       <transition name="dev.jfire.org:assign">
-         <name language="de">assign</name>
-         <description language="de">assign</description>
+         <name language="de">Zuweisen</name>
+         <description language="de">Zuweisen</description>
          <name language="en">assign</name>
          <description language="en">assign</description>
          <icon file=""/>
       </transition>
       <transition name="resolve">
-         <name language="de">resolve</name>
-         <description language="de">resolve</description>
+         <name language="de">Lösen</name>
+         <description language="de">Lösen</description>
          <name language="en">resolve</name>
          <description language="en">resolve</description>
          <icon file=""/>
       </transition>
       <transition name="close">
-         <name language="de">close</name>
-         <description language="de">close</description>
+         <name language="de">Schließen</name>
+         <description language="de">Schließen</description>
          <name language="en">close</name>
          <description language="en">close</description>
          <icon file=""/>
       </transition>
    </node>
    <end-state name="dev.jfire.org:rejected">
-      <name language="de">rejected</name>
-      <description language="de">rejected</description>
+      <name language="de">Abgelehnt</name>
+      <description language="de">Abgelehnt</description>
       <name language="en">rejected</name>
       <description language="en">rejected</description>
       <icon file=""/>

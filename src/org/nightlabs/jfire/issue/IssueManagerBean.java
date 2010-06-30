@@ -51,6 +51,7 @@ import org.nightlabs.jfire.config.UserConfigSetup;
 import org.nightlabs.jfire.editlock.EditLockType;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.issue.config.IssueTableConfigModule;
+import org.nightlabs.jfire.issue.config.PersonIssueLinkTableConfigModule;
 import org.nightlabs.jfire.issue.history.IssueCommentHistoryItem;
 import org.nightlabs.jfire.issue.history.IssueHistoryItem;
 import org.nightlabs.jfire.issue.history.IssueHistoryItemFactory;
@@ -1319,13 +1320,17 @@ implements IssueManagerRemote
 					UserConfigSetup.CONFIG_SETUP_TYPE_USER
 				);
 
-			Set<String> configModuleClasses = configSetup.getConfigModuleClasses();
 			// TODO DataNucleus WORKAROUND: simply adding causes a duplicate key exception.
 			// We should open an issue in DN's JIRA! I've no time for this now, thus I simply check before adding. Marco.
-			if (!configModuleClasses.contains(IssueTableConfigModule.class.getName()))
-				configModuleClasses.add(IssueTableConfigModule.class.getName()); // The Set ensures that no duplicated elements exists within.
-			// configModuleClasses.add(PersonIssueLinkTableConfigModule.class.getName()); // TODO Finish this.
-
+			if (!configSetup.getConfigModuleClasses().contains(IssueTableConfigModule.class.getName())) {
+				// Initialise/register the (default) IssueTableConfigModule.
+				configSetup.getConfigModuleClasses().add(IssueTableConfigModule.class.getName());
+			}
+			// only add config module if not yet existing/added
+			if (!configSetup.getConfigModuleClasses().contains(PersonIssueLinkTableConfigModule.class.getName())) {
+				// Initialise/register the (default) PersonIssueLinkTableConfigModule.
+				configSetup.getConfigModuleClasses().add(PersonIssueLinkTableConfigModule.class.getName());
+			}
 			// Ensure that all users have a ConfigModule.
 			ConfigSetup.ensureAllPrerequisites(pm);
 			// ------------------------------------------------------------------------------------------------------[ ConfigModule ]-----<<|
@@ -1474,171 +1479,6 @@ implements IssueManagerRemote
 			// ---[ IssueMarkers ]------------------------------------------------------------------------------------------------| End |---
 
 
-			// ---[ Predefined Query Stores ]-----------------------------------------------------------------------------------| Start |---
-//			ProcessDefinitionID processDefinitionID = (ProcessDefinitionID)JDOHelper.getObjectId(issueTypeDefault.getProcessDefinition());
-//			IssueQuery newIssueIssueQuery = new IssueQuery();
-//			newIssueIssueQuery.clearQuery();
-//			newIssueIssueQuery.setAllFieldsDisabled();
-//			newIssueIssueQuery.setFieldEnabled(IssueQuery.FieldName.processDefinitionID, true);
-//			newIssueIssueQuery.setFieldEnabled(IssueQuery.FieldName.jbpmNodeName, true);
-//			newIssueIssueQuery.setJbpmNodeName(JbpmConstantsIssue.NODE_NAME_NEW);
-//
-//			IssueQuery unassignedIssueIssueQuery = new IssueQuery();
-//			unassignedIssueIssueQuery.clearQuery();
-//			unassignedIssueIssueQuery.setAllFieldsDisabled();
-//			unassignedIssueIssueQuery.setFieldEnabled(IssueQuery.FieldName.processDefinitionID, true);
-//			unassignedIssueIssueQuery.setFieldEnabled(IssueQuery.FieldName.jbpmNodeName, true);
-//			unassignedIssueIssueQuery.setJbpmNodeName(JbpmConstantsIssue.NODE_NAME_OPEN);
-//
-//			IssueQuery resolvedIssueIssueQuery = new IssueQuery();
-//			resolvedIssueIssueQuery.clearQuery();
-//			resolvedIssueIssueQuery.setAllFieldsDisabled();
-//			resolvedIssueIssueQuery.setFieldEnabled(IssueQuery.FieldName.processDefinitionID, true);
-//			resolvedIssueIssueQuery.setFieldEnabled(IssueQuery.FieldName.jbpmNodeName, true);
-//			resolvedIssueIssueQuery.setJbpmNodeName(JbpmConstantsIssue.NODE_NAME_RESOLVED);
-//
-//			IssueQuery acknowledgedIssueIssueQuery = new IssueQuery();
-//			acknowledgedIssueIssueQuery.clearQuery();
-//			acknowledgedIssueIssueQuery.setAllFieldsDisabled();
-//			acknowledgedIssueIssueQuery.setFieldEnabled(IssueQuery.FieldName.processDefinitionID, true);
-//			acknowledgedIssueIssueQuery.setFieldEnabled(IssueQuery.FieldName.jbpmNodeName, true);
-//			acknowledgedIssueIssueQuery.setJbpmNodeName(JbpmConstantsIssue.NODE_NAME_ACKNOWLEDGED);
-//
-//			IssueQuery closedIssueIssueQuery = new IssueQuery();
-//			closedIssueIssueQuery.clearQuery();
-//			closedIssueIssueQuery.setAllFieldsDisabled();
-//			closedIssueIssueQuery.setFieldEnabled(IssueQuery.FieldName.processDefinitionID, true);
-//			closedIssueIssueQuery.setFieldEnabled(IssueQuery.FieldName.jbpmNodeName, true);
-//			closedIssueIssueQuery.setJbpmNodeName(JbpmConstantsIssue.NODE_NAME_CLOSED);
-//
-//			IssueQuery confirmedIssueIssueQuery = new IssueQuery();
-//			confirmedIssueIssueQuery.clearQuery();
-//			confirmedIssueIssueQuery.setAllFieldsDisabled();
-//			confirmedIssueIssueQuery.setFieldEnabled(IssueQuery.FieldName.processDefinitionID, true);
-//			confirmedIssueIssueQuery.setFieldEnabled(IssueQuery.FieldName.jbpmNodeName, true);
-//			confirmedIssueIssueQuery.setJbpmNodeName(JbpmConstantsIssue.NODE_NAME_CONFIRMED);
-//
-//			IssueQuery rejectedIssueIssueQuery = new IssueQuery();
-//			rejectedIssueIssueQuery.clearQuery();
-//			rejectedIssueIssueQuery.setAllFieldsDisabled();
-//			rejectedIssueIssueQuery.setFieldEnabled(IssueQuery.FieldName.processDefinitionID, true);
-//			rejectedIssueIssueQuery.setFieldEnabled(IssueQuery.FieldName.jbpmNodeName, true);
-//			rejectedIssueIssueQuery.setJbpmNodeName(JbpmConstantsIssue.NODE_NAME_REJECTED);
-//
-//			//1 Unassigned Issues
-//			pm.getExtent(BaseQueryStore.class);
-//
-//			QueryCollection<IssueQuery> queryCollection = new QueryCollection<IssueQuery>(Issue.class);
-//			queryCollection.add(unassignedIssueIssueQuery);
-//
-//			BaseQueryStore queryStore = new BaseQueryStore(systemUser,
-//					IDGenerator.nextID(BaseQueryStore.class), queryCollection);
-//
-//			queryStore.setQueryCollection(queryCollection);
-//			queryStore.setPubliclyAvailable(true);
-//			queryStore.getName().readFromProperties(baseName, loader,
-//			"org.nightlabs.jfire.issue.IssueManagerBean.queryStoreUnassigned"); //$NON-NLS-1$
-//			queryStore.getDescription().readFromProperties(baseName, loader,
-//			"org.nightlabs.jfire.issue.IssueManagerBean.queryStoreUnassigned"); //$NON-NLS-1$
-//			queryStore.serialiseCollection();
-//			queryStore = pm.makePersistent(queryStore);
-//
-//			//2 Resolved Issues
-//			queryCollection = new QueryCollection<IssueQuery>(Issue.class);
-//			queryCollection.add(resolvedIssueIssueQuery);
-//
-//			queryStore = new BaseQueryStore(systemUser,
-//					IDGenerator.nextID(BaseQueryStore.class), queryCollection);
-//
-//			queryStore.setQueryCollection(queryCollection);
-//			queryStore.setPubliclyAvailable(true);
-//			queryStore.getName().readFromProperties(baseName, loader,
-//			"org.nightlabs.jfire.issue.IssueManagerBean.queryStoreResolved"); //$NON-NLS-1$
-//			queryStore.getDescription().readFromProperties(baseName, loader,
-//			"org.nightlabs.jfire.issue.IssueManagerBean.queryStoreResolved"); //$NON-NLS-1$
-//			queryStore.serialiseCollection();
-//			queryStore = pm.makePersistent(queryStore);
-//
-//			//3 Acknowledged Issues
-//			queryCollection = new QueryCollection<IssueQuery>(Issue.class);
-//			queryCollection.add(acknowledgedIssueIssueQuery);
-//
-//			queryStore = new BaseQueryStore(systemUser,
-//					IDGenerator.nextID(BaseQueryStore.class), queryCollection);
-//
-//			queryStore.setQueryCollection(queryCollection);
-//			queryStore.setPubliclyAvailable(true);
-//			queryStore.getName().readFromProperties(baseName, loader,
-//			"org.nightlabs.jfire.issue.IssueManagerBean.queryStoreAcknowledged"); //$NON-NLS-1$
-//			queryStore.getDescription().readFromProperties(baseName, loader,
-//			"org.nightlabs.jfire.issue.IssueManagerBean.queryStoreAcknowledged"); //$NON-NLS-1$
-//			queryStore.serialiseCollection();
-//			queryStore = pm.makePersistent(queryStore);
-//
-//			//4 Closed Issues
-//			queryCollection = new QueryCollection<IssueQuery>(Issue.class);
-//			queryCollection.add(closedIssueIssueQuery);
-//
-//			queryStore = new BaseQueryStore(systemUser,
-//					IDGenerator.nextID(BaseQueryStore.class), queryCollection);
-//
-//			queryStore.setQueryCollection(queryCollection);
-//			queryStore.setPubliclyAvailable(true);
-//			queryStore.getName().readFromProperties(baseName, loader,
-//			"org.nightlabs.jfire.issue.IssueManagerBean.queryStoreclosed"); //$NON-NLS-1$
-//			queryStore.getDescription().readFromProperties(baseName, loader,
-//			"org.nightlabs.jfire.issue.IssueManagerBean.queryStoreclosed"); //$NON-NLS-1$
-//			queryStore.serialiseCollection();
-//			queryStore = pm.makePersistent(queryStore);
-//
-//			//5 Confirmed Issues
-//			queryCollection = new QueryCollection<IssueQuery>(Issue.class);
-//			queryCollection.add(confirmedIssueIssueQuery);
-//
-//			queryStore = new BaseQueryStore(systemUser,
-//					IDGenerator.nextID(BaseQueryStore.class), queryCollection);
-//
-//			queryStore.setQueryCollection(queryCollection);
-//			queryStore.setPubliclyAvailable(true);
-//			queryStore.getName().readFromProperties(baseName, loader,
-//			"org.nightlabs.jfire.issue.IssueManagerBean.queryStoreConfirmed"); //$NON-NLS-1$
-//			queryStore.getDescription().readFromProperties(baseName, loader,
-//			"org.nightlabs.jfire.issue.IssueManagerBean.queryStoreConfirmed"); //$NON-NLS-1$
-//			queryStore.serialiseCollection();
-//			queryStore = pm.makePersistent(queryStore);
-//
-//			//6 Rejected Issues
-//			queryCollection = new QueryCollection<IssueQuery>(Issue.class);
-//			queryCollection.add(rejectedIssueIssueQuery);
-//
-//			queryStore = new BaseQueryStore(systemUser,
-//					IDGenerator.nextID(BaseQueryStore.class), queryCollection);
-//
-//			queryStore.setQueryCollection(queryCollection);
-//			queryStore.setPubliclyAvailable(true);
-//			queryStore.getName().readFromProperties(baseName, loader,
-//			"org.nightlabs.jfire.issue.IssueManagerBean.queryStoreRejected"); //$NON-NLS-1$
-//			queryStore.getDescription().readFromProperties(baseName, loader,
-//			"org.nightlabs.jfire.issue.IssueManagerBean.queryStoreRejected"); //$NON-NLS-1$
-//			queryStore.serialiseCollection();
-//			queryStore = pm.makePersistent(queryStore);
-//
-//			//7 New Issues
-//			queryCollection = new QueryCollection<IssueQuery>(Issue.class);
-//			queryCollection.add(newIssueIssueQuery);
-//
-//			queryStore = new BaseQueryStore(systemUser,
-//					IDGenerator.nextID(BaseQueryStore.class), queryCollection);
-//
-//			queryStore.setQueryCollection(queryCollection);
-//			queryStore.setPubliclyAvailable(true);
-//			queryStore.getName().readFromProperties(baseName, loader,
-//			"org.nightlabs.jfire.issue.IssueManagerBean.queryStoreNew"); //$NON-NLS-1$
-//			queryStore.getDescription().readFromProperties(baseName, loader,
-//			"org.nightlabs.jfire.issue.IssueManagerBean.queryStoreNew"); //$NON-NLS-1$
-//			queryStore.serialiseCollection();
-//			queryStore = pm.makePersistent(queryStore);
-
 			//EditLock
 			EditLockType issueEditLock = new EditLockType(EditLockTypeIssue.EDIT_LOCK_TYPE_ID);
 			issueEditLock = pm.makePersistent(issueEditLock);
@@ -1648,6 +1488,16 @@ implements IssueManagerRemote
 		}
 	}
 
+
+	/** Update history item ID used for storing additional {@link IssueQuery}s according to the {@link UpdateHistoryItem} mechanism. */
+	private static final String UPDATE_HISTORY_ITEM_ID_ADDITIONAL_STORED_QUERIES = IssueQuery.class.getName() + "#addAdditionalStoredQueries";
+	/** Base name (prefix) for retrieving resources. */
+	private static final String BASENAME = "org.nightlabs.jfire.issue.resource.messages";
+	/** Resource key prefix used for retrieving name and description of a certain {@link IssueQuery}. */
+	private static final String RESOURCE_KEY_PREFIX = IssueManagerBean.class.getName() + ".";
+//	/** Map keeping track of the resource key of each {@link IssueQuery} to be considered. */
+//	private Map<IssueQuery, String> issueQueryToResourceKey;
+	
 	// Note: (From current standards)
 	// 1. objClassName: Offer (jdo/org.nightlabs.jfire.trade.id.OfferID?organisationID=chezfrancois.jfire.org&offerIDPrefix=2009&offerID=2)
 	// 2. objClassName: Order (jdo/org.nightlabs.jfire.trade.id.OrderID?organisationID=chezfrancois.jfire.org&orderIDPrefix=2009&orderID=8)

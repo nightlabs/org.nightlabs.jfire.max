@@ -1,12 +1,16 @@
 package org.nightlabs.jfire.issue.config;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import javax.jdo.FetchPlan;
+import javax.jdo.PersistenceManager;
 
 import org.nightlabs.i18n.MultiLanguagePropertiesBundle;
+import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.issue.Issue;
 import org.nightlabs.jfire.issue.IssuePriority;
 import org.nightlabs.jfire.issue.IssueSeverityType;
@@ -18,6 +22,7 @@ import org.nightlabs.jfire.jbpm.graph.def.State;
 import org.nightlabs.jfire.jbpm.graph.def.StateDefinition;
 import org.nightlabs.jfire.table.config.ColumnContentProperty;
 import org.nightlabs.jfire.table.config.ColumnDescriptor;
+import org.nightlabs.jfire.table.config.id.ColumnDescriptorID;
 import org.nightlabs.util.CollectionUtil;
 
 /**
@@ -26,7 +31,17 @@ import org.nightlabs.util.CollectionUtil;
  *
  * @author khaireel at nightlabs dot de
  */
-public final class IssueTableColumnDescriptorFactory {
+public final class IssueTableColumnDescriptorFactory
+{
+//	public static final ColumnDescriptorID ID_COLUMN_DESC = ColumnDescriptorID.create(columnDescriptionID, organisationID)
+
+	public static ColumnDescriptorID createColumnDescriptorID(String organisationID, String prefix, String field)
+	{
+		return ColumnDescriptorID.create(IDGenerator.nextID(ColumnDescriptor.class), organisationID);
+//		String columnDescriptorID = prefix + field;
+//		return ColumnDescriptorID.create(columnDescriptorID, organisationID);
+	}
+
 	// Descriptor's "columnName".
 	public static final Map<String, String> field2MultiLangPropBundleKey = new HashMap<String, String>();
 	static {
@@ -89,7 +104,12 @@ public final class IssueTableColumnDescriptorFactory {
 				IssueSeverityType.FETCH_GROUP_NAME});
 		field2ColumnFetchGroups.put(Issue.FieldName.issuePriority, new String[] {FetchPlan.DEFAULT,
 				Issue.FETCH_GROUP_ISSUE_PRIORITY,
-				IssuePriority.FETCH_GROUP_NAME,});
+				Issue.FETCH_GROUP_ISSUE_PRIORITY,
+				IssuePriority.FETCH_GROUP_NAME,
+				// WORKAROUND necessary to added issueType and priorities for sorting
+				Issue.FETCH_GROUP_ISSUE_TYPE,
+				IssueType.FETCH_GROUP_ISSUE_PRIORITIES
+				});
 		field2ColumnFetchGroups.put(Issue.FieldName.state, new String[] {FetchPlan.DEFAULT,
 				Statable.FETCH_GROUP_STATE,
 				Issue.FETCH_GROUP_ISSUE_LOCAL,
@@ -114,15 +134,10 @@ public final class IssueTableColumnDescriptorFactory {
 		field2ColumnFieldNames.put(Issue.FieldName.deadlineTimestamp, CollectionUtil.createHashSet(Issue.FieldName.deadlineTimestamp));
 	}
 
-////public static final ColumnDescriptorID ID_COLUMN_DESC = ColumnDescriptorID.create(columnDescriptionID, organisationID)
-	//
-//		public static ColumnDescriptorID createColumnDescriptorID(String organisationID, String prefix, String field)
-//		{
-//			return ColumnDescriptorID.create(IDGenerator.nextID(ColumnDescriptor.class), organisationID);
-////			String columnDescriptorID = prefix + field;
-////			return ColumnDescriptorID.create(columnDescriptorID, organisationID);
-//		}
 
+		// In preparation for multi-language text support.
+	@Deprecated
+	public static final MultiLanguagePropertiesBundle propertiesBundle = new MultiLanguagePropertiesBundle("org.nightlabs.jfire.issue.resource.messages", IssueTableConfigModule.class.getClassLoader(), true);
 
 	/**
 	 * Provided with an instantiated {@link ColumnDescriptor} and a valid {@link Issue} fieldName, this fills up the descriptor
@@ -156,5 +171,36 @@ public final class IssueTableColumnDescriptorFactory {
 		}
 
 		return fieldName2ColumnDescriptors;
+	}
+
+	/**
+	 * Generates the requested {@link ColumnDescriptor}s based on the given {@link Issue}.FieldNames, in the given order.
+	 * @return the requested {@link ColumnDescriptor}s based on the given {@link Issue}.FieldNames, in the given order.
+	 *
+	 * @deprecated Use instead {@link #fillColumnDescriptorInfos(LinkedHashMap)}.
+	 */
+	@Deprecated
+	public static List<ColumnDescriptor> generateIssueTableColumnDescriptors(PersistenceManager pm, List<ColumnDescriptor> columnDescriptors, String organisationID, String... fieldNames) {
+		// Guard.
+		if (fieldNames == null)
+			return null;
+
+		// Sets the ColumnDescriptors with defaults: colStyle = SWT.LEFT = 16384, isMoveable = TRUE.
+		for (String fieldName : fieldNames) {
+			String prefix = "IssueTableColumnConfig-";
+			ColumnDescriptorID columnDescriptorID = createColumnDescriptorID(organisationID, prefix, fieldName);
+			ColumnDescriptor colDesc = null;
+//			try {
+//				colDesc = (ColumnDescriptor) pm.getObjectById(columnDescriptorID);
+//			} catch (JDOObjectNotFoundException e) {
+				colDesc = new ColumnDescriptor(columnDescriptorID);
+				colDesc.getColumnName().readFromMultiLanguagePropertiesBundle(propertiesBundle, field2MultiLangPropBundleKey.get(fieldName));
+				colDesc.setDescriptorInfos(field2ColumnWeight.get(fieldName), field2ColumnContentProperty.get(fieldName), field2ColumnFieldNames.get(fieldName), field2ColumnFetchGroups.get(fieldName));
+				pm.makePersistent(colDesc);
+//			}
+			columnDescriptors.add(colDesc);
+		}
+
+		return columnDescriptors;
 	}
 }

@@ -68,6 +68,8 @@ implements WebShopRemote
 	 */
 	private static final long serialVersionUID = 1L;
 
+	private static final String PASSWORD_MAIL_TEMPLATE_PARAMETER = "${password}";
+	
 	public static final int secondPasswordExpirationTimeInHours = 6;
 	public static final int confirmationStringExpirationTimeInHours = 24;
 
@@ -488,12 +490,22 @@ implements WebShopRemote
 	 * @ejb.permission role-name="_Guest_"
 	 */	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("_Guest_")
-
 	public void createPassword(WebCustomerID webCustomerID) throws DataBlockGroupNotFoundException
 	{
+		createPassword(webCustomerID, "New Password for the JFire Demo Shop", "This is your new Password: " + PASSWORD_MAIL_TEMPLATE_PARAMETER);
+	}
+
+	/**
+	 * Creates, sends and if it succeeds stores it with an expiration Date.
+	 * @param mailTemplate The email template. This text will be used as e-mail text. All occurencies
+	 * of <code>${password}</code> in the text will be replaced by the newly created password.
+	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("_Guest_")
+	public void createPassword(WebCustomerID webCustomerID, String subject, String mailTemplate) throws DataBlockGroupNotFoundException
+	{
 		String newPassword = UserLocal.createHumanPassword(8,10);
-		String subject =  "New Password for the JFire-demoshop";
-		String message = "This is your new Password: "+ newPassword;
+		String message = mailTemplate.replace(PASSWORD_MAIL_TEMPLATE_PARAMETER, newPassword);
 		// sending the mail
 		boolean atLeastOneMailSent = sendBlockGroupMails(webCustomerID, subject, message);
 		if(atLeastOneMailSent) {
@@ -507,7 +519,7 @@ implements WebShopRemote
 			}
 		}
 	}
-
+	
 	/**
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"

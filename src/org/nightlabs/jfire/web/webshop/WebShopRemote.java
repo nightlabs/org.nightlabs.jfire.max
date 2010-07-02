@@ -186,6 +186,15 @@ public interface WebShopRemote {
 			throws DataBlockGroupNotFoundException;
 
 	/**
+	 * Creates, sends and if it succeeds stores it with an expiration Date.
+	 * @param mailTemplate The email template. This text will be used as e-mail text. All occurencies
+	 * of <code>${password}</code> in the text will be replaced by the newly created password.
+	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("_Guest_")
+	public void createPassword(WebCustomerID webCustomerID, String subject, String mailTemplate) throws DataBlockGroupNotFoundException;
+	
+	/**
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"

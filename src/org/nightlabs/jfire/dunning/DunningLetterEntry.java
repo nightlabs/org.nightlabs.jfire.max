@@ -1,15 +1,24 @@
 package org.nightlabs.jfire.dunning;
 
 import java.io.Serializable;
+import java.util.Date;
+import java.util.List;
 
 import javax.jdo.annotations.Column;
 import javax.jdo.annotations.IdentityType;
 import javax.jdo.annotations.Inheritance;
 import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Join;
 import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 
+import org.nightlabs.jdo.ObjectIDUtil;
+import org.nightlabs.jfire.accounting.Invoice;
+import org.nightlabs.jfire.accounting.Price;
 import org.nightlabs.jfire.dunning.id.DunningLetterEntryID;
+import org.nightlabs.jfire.organisation.Organisation;
 
 /**
  * @author Chairat Kongarayawetchakun - chairat [AT] nightlabs [DOT] de
@@ -33,9 +42,37 @@ implements Serializable
 	@Column(length=100)
 	private String dunningLetterEntryID;
 	
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+	private int dunningLevel;
+	
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+	private Invoice invoice;
+	
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+	private long periodOfGraceMSec;
+	
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+	private Date extendedDueDateForPayment;
+	
+	@Join
+	@Persistent(
+		table="JFireDunning_DunningLetterEntry_dunningFees",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
+	private List<DunningInterest> dunningFees;
+	
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+	private Price priceIncludingInvoice;
+	
 	/**
 	 * @deprecated Only for JDO!!!!
 	 */
 	@Deprecated
 	protected DunningLetterEntry() { }
+	
+	public DunningLetterEntry(String organisationID, String dunningLetterEntryID) {
+		Organisation.assertValidOrganisationID(organisationID);
+		ObjectIDUtil.assertValidIDString(dunningLetterEntryID, "dunningLetterEntryID"); //$NON-NLS-1$
+		this.organisationID = organisationID;
+		this.dunningLetterEntryID = dunningLetterEntryID;
+	}
 }

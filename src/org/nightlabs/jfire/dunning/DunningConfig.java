@@ -7,8 +7,10 @@ import javax.jdo.annotations.Column;
 import javax.jdo.annotations.IdentityType;
 import javax.jdo.annotations.Inheritance;
 import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Join;
 import javax.jdo.annotations.NullValue;
 import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 
@@ -57,19 +59,27 @@ implements Serializable
 	)
 	private DunningConfigDescription description;
 	
-	@Persistent(nullValue=NullValue.EXCEPTION)
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private long defaultTermOfPaymentMSec;
 	
-	@Persistent(nullValue=NullValue.EXCEPTION)
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private DunningAutoMode dunningAutoMode;
 	
-	@Persistent(nullValue=NullValue.EXCEPTION)
+	@Join
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		table="JFireDunning_invoiceDunningStepss",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private SortedSet<InvoiceDunningStep> invoiceDunningSteps;
 	
-	@Persistent(nullValue=NullValue.EXCEPTION)
+	@Join
+	@Persistent(
+		nullValue=NullValue.EXCEPTION,
+		table="JFireDunning_processDunningSteps",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private SortedSet<ProcessDunningStep> processDunningSteps;
 	
-	@Persistent(nullValue=NullValue.EXCEPTION)
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private DunningInterestCalculator dunningInterestCalculator;
 	
 	/**
@@ -77,6 +87,7 @@ implements Serializable
 	 */
 	@Deprecated
 	protected DunningConfig() { }
+	
 	/**
 	 * Create an instance of <code>DunningConfig</code>.
 	 *
@@ -84,11 +95,13 @@ implements Serializable
 	 * @param dunningConfigID second part of the primary key. A local identifier within the namespace of the organisation.
 	 * @see #DunningConfig(boolean)
 	 */
-	public DunningConfig(String organisationID, String dunningConfigID) {
+	public DunningConfig(String organisationID, String dunningConfigID, DunningAutoMode dunningAutoMode) {
 		Organisation.assertValidOrganisationID(organisationID);
 		ObjectIDUtil.assertValidIDString(dunningConfigID, "dunningConfigID"); //$NON-NLS-1$
+		
 		this.organisationID = organisationID;
 		this.dunningConfigID = dunningConfigID;
+		this.dunningAutoMode = dunningAutoMode;
 	}
 	
 	public String getOrganisationID() {
@@ -98,7 +111,6 @@ implements Serializable
 	public String getDunningConfigID() {
 		return dunningConfigID;
 	}
-
 
 	public DunningConfigDescription getDescription() {
 		return description;

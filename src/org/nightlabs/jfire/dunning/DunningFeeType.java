@@ -7,11 +7,17 @@ import javax.jdo.annotations.Column;
 import javax.jdo.annotations.IdentityType;
 import javax.jdo.annotations.Inheritance;
 import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.NullValue;
 import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 
+import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.accounting.Price;
 import org.nightlabs.jfire.dunning.id.DunningFeeTypeID;
+import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.l10n.Currency;
 
 /**
@@ -36,12 +42,23 @@ private static final long serialVersionUID = 1L;
 	@Column(length=100)
 	private String dunningFeeTypeID;
 	
+	@Persistent(nullValue=NullValue.EXCEPTION)
 	private DunningFee dunningFee;
 	
+	@Persistent(
+			dependent="true",
+			mappedBy="dunningFeeType",
+			persistenceModifier=PersistenceModifier.PERSISTENT)
 	private DunningFeeTypeName name;
 	
+	@Persistent(
+			dependent="true",
+			mappedBy="dunningFeeType",
+			persistenceModifier=PersistenceModifier.PERSISTENT)
 	private DunningFeeTypeDescription description;
 	
+	@Join
+	@Persistent(table="JFireDunning_DunningFeeType_currency2price")
 	private Map<Currency, Price> currency2price;
 	
 	/**
@@ -49,6 +66,21 @@ private static final long serialVersionUID = 1L;
 	 */
 	@Deprecated
 	protected DunningFeeType() { }
+	
+	/**
+	 * Create an instance of <code>DunningFeeType</code>.
+	 *
+	 * @param organisationID first part of the primary key. The organisation which created this object.
+	 * @param dunningFeeTypeID second part of the primary key. A local identifier within the namespace of the organisation.
+	 */
+	public DunningFeeType(String organisationID, String dunningFeeTypeID, DunningFee dunningFee) {
+		Organisation.assertValidOrganisationID(organisationID);
+		ObjectIDUtil.assertValidIDString(dunningFeeTypeID, "dunningFeeTypeID"); //$NON-NLS-1$
+		
+		this.organisationID = organisationID;
+		this.dunningFeeTypeID = dunningFeeTypeID;
+		this.dunningFee = dunningFee;
+	}
 	
 	public String getOrganisationID() {
 		return organisationID;

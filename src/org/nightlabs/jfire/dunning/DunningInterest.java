@@ -1,14 +1,20 @@
 package org.nightlabs.jfire.dunning;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.Date;
 
 import javax.jdo.annotations.Column;
 import javax.jdo.annotations.IdentityType;
 import javax.jdo.annotations.Inheritance;
 import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.NullValue;
 import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 
+import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.dunning.id.DunningInterestID;
 
 /**
@@ -33,9 +39,50 @@ implements Serializable
 	@Column(length=100)
 	private String dunningInterestID;
 	
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+	private DunningLetterEntry dunningLetterEntry;
+	
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+	private DunningInterest backReference;
+	
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+	private Date creditPeriodFromIncl;
+	
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+	private Date creditPeriodToExcl;
+	
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+	private Currency currency;
+	
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+	private long baseAmount;
+	
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+	private BigDecimal interestPercentage;
+	
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+	private long interestAmount;
+	
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+	private long amountPaid;
+	
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+	private long amountToPay;
+	
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+	private Date paidDT;
+	
 	/**
 	 * @deprecated Only for JDO!!!!
 	 */
 	@Deprecated
 	protected DunningInterest() { }
+	
+	public String getOrganisationID() {
+		return organisationID;
+	}
+	
+	public String getDunningInterestID() {
+		return dunningInterestID;
+	}
 }

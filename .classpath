@@ -11,5 +11,7 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireBaseClientLib"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireBaseDAO"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/JFireTrade"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/JFireJbpm"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

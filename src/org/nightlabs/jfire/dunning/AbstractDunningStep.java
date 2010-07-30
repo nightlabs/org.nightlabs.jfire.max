@@ -89,9 +89,6 @@ implements Serializable
 		final int prime = 31;
 		int result = 1;
 		result = prime * result
-				+ ((dunningConfig == null) ? 0 : dunningConfig.hashCode());
-		result = prime * result + dunningLevel;
-		result = prime * result
 				+ ((dunningStepID == null) ? 0 : dunningStepID.hashCode());
 		result = prime * result
 				+ ((organisationID == null) ? 0 : organisationID.hashCode());
@@ -107,13 +104,6 @@ implements Serializable
 		if (getClass() != obj.getClass())
 			return false;
 		AbstractDunningStep other = (AbstractDunningStep) obj;
-		if (dunningConfig == null) {
-			if (other.dunningConfig != null)
-				return false;
-		} else if (!dunningConfig.equals(other.dunningConfig))
-			return false;
-		if (dunningLevel != other.dunningLevel)
-			return false;
 		if (dunningStepID == null) {
 			if (other.dunningStepID != null)
 				return false;
@@ -129,8 +119,7 @@ implements Serializable
 
 	@Override
 	public String toString() {
-		return "AbstractDunningStep [dunningConfig=" + dunningConfig
-				+ ", dunningLevel=" + dunningLevel + ", dunningStepID="
-				+ dunningStepID + ", organisationID=" + organisationID + "]";
+		return "AbstractDunningStep [dunningStepID=" + dunningStepID
+				+ ", organisationID=" + organisationID + "]";
 	}
 }

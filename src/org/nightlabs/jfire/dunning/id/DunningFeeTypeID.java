@@ -26,7 +26,7 @@ implements ObjectID
 	 * The serial version uid of this class.
 	 */
 	@Generated("org.nightlabs.eclipse.sdk.jdo.ObjectIdGenerator")
-	private static final long serialVersionUID = -2057365872L;
+	private static final long serialVersionUID = -1829251437L;
 
 	/**
 	 * The values of all fields are URL encoded in UTF-8.
@@ -78,7 +78,7 @@ implements ObjectID
 
 	/**
 	 * Primary key field organisationID.
-	 * Declared as primary key field in {@link org.nightlabs.jfire.dunning.DunningFee}.
+	 * Declared as primary key field in {@link org.nightlabs.jfire.dunning.DunningFeeType}.
 	 */
 	@Generated("org.nightlabs.eclipse.sdk.jdo.ObjectIdGenerator")
 	public java.lang.String organisationID;
@@ -88,10 +88,10 @@ implements ObjectID
 	 * Declared as primary key field in {@link org.nightlabs.jfire.dunning.DunningFeeType}.
 	 */
 	@Generated("org.nightlabs.eclipse.sdk.jdo.ObjectIdGenerator")
-	public java.lang.String dunningFeeTypeID;
+	public long dunningFeeTypeID;
 
 	/**
-	 * Create a new empty instance of DunningFeeID.
+	 * Create a new empty instance of DunningFeeTypeID.
 	 */
 	@Generated("org.nightlabs.eclipse.sdk.jdo.ObjectIdGenerator")
 	public DunningFeeTypeID()
@@ -258,7 +258,7 @@ implements ObjectID
 			sb.append(URLEncoder.encode(String.valueOf(organisationID), ENCODING));
 			sb.append('&');
 			sb.append("dunningFeeTypeID="); //$NON-NLS-1$
-			sb.append(URLEncoder.encode(String.valueOf(dunningFeeTypeID), ENCODING));
+			sb.append(URLEncoder.encode(Long.toString(dunningFeeTypeID, RADIX), ENCODING));
 		} catch (UnsupportedEncodingException e) {
 			throw new RuntimeException(
 					"Encoding failed with encoding " + //$NON-NLS-1$
@@ -289,10 +289,7 @@ implements ObjectID
 				return false;
 		} else if(!organisationID.equals(other.organisationID))
 			return false;
-		if(dunningFeeTypeID == null) {
-			if(other.dunningFeeTypeID != null)
-				return false;
-		} else if(!dunningFeeTypeID.equals(other.dunningFeeTypeID))
+		if(dunningFeeTypeID != other.dunningFeeTypeID)
 			return false;
 		return true;
 	}
@@ -311,7 +308,7 @@ implements ObjectID
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((organisationID == null) ? 0 : organisationID.hashCode());
-		result = prime * result + ((dunningFeeTypeID == null) ? 0 : dunningFeeTypeID.hashCode());
+		result = prime * result + (int) (dunningFeeTypeID ^ (dunningFeeTypeID >>> 32));
 		return result;
 	}
 
@@ -323,7 +320,7 @@ implements ObjectID
 	 *     with the primary-key fields set to the given parameters.
 	 */
 	@Generated("org.nightlabs.eclipse.sdk.jdo.ObjectIdGenerator")
-	public static DunningFeeTypeID create(String organisationID, String dunningFeeTypeID)
+	public static DunningFeeTypeID create(String organisationID, long dunningFeeTypeID)
 	{
 		DunningFeeTypeID n = new DunningFeeTypeID();
 		n.organisationID = organisationID;

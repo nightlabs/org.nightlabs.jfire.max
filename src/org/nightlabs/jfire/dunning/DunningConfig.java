@@ -2,6 +2,7 @@ package org.nightlabs.jfire.dunning;
 
 import java.io.Serializable;
 import java.util.SortedSet;
+import java.util.TreeSet;
 
 import javax.jdo.annotations.Column;
 import javax.jdo.annotations.IdentityType;
@@ -102,6 +103,11 @@ implements Serializable
 		this.organisationID = organisationID;
 		this.dunningConfigID = dunningConfigID;
 		this.dunningAutoMode = dunningAutoMode;
+		
+		this.invoiceDunningSteps = new TreeSet<InvoiceDunningStep>();
+		this.processDunningSteps = new TreeSet<ProcessDunningStep>();
+		
+		this.dunningInterestCalculator = new DunningInterestCalculatorCustomerFriendly();
 	}
 	
 	public String getOrganisationID() {

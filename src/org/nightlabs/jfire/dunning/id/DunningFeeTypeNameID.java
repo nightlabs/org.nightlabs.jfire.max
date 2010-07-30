@@ -26,7 +26,7 @@ implements ObjectID
 	 * The serial version uid of this class.
 	 */
 	@Generated("org.nightlabs.eclipse.sdk.jdo.ObjectIdGenerator")
-	private static final long serialVersionUID = -2057365872L;
+	private static final long serialVersionUID = -1829251437L;
 
 	/**
 	 * The values of all fields are URL encoded in UTF-8.
@@ -84,11 +84,11 @@ implements ObjectID
 	public java.lang.String organisationID;
 
 	/**
-	 * Primary key field dunningFeeTypeID.
+	 * Primary key field dunningFeeTypeNameID.
 	 * Declared as primary key field in {@link org.nightlabs.jfire.dunning.DunningFeeTypeName}.
 	 */
 	@Generated("org.nightlabs.eclipse.sdk.jdo.ObjectIdGenerator")
-	public java.lang.String dunningFeeTypeID;
+	public long dunningFeeTypeID;
 
 	/**
 	 * Create a new empty instance of DunningFeeTypeNameID.
@@ -257,8 +257,8 @@ implements ObjectID
 			sb.append("organisationID="); //$NON-NLS-1$
 			sb.append(URLEncoder.encode(String.valueOf(organisationID), ENCODING));
 			sb.append('&');
-			sb.append("dunningFeeTypeID="); //$NON-NLS-1$
-			sb.append(URLEncoder.encode(String.valueOf(dunningFeeTypeID), ENCODING));
+			sb.append("dunningFeeTypeNameID="); //$NON-NLS-1$
+			sb.append(URLEncoder.encode(Long.toString(dunningFeeTypeID, RADIX), ENCODING));
 		} catch (UnsupportedEncodingException e) {
 			throw new RuntimeException(
 					"Encoding failed with encoding " + //$NON-NLS-1$
@@ -289,10 +289,7 @@ implements ObjectID
 				return false;
 		} else if(!organisationID.equals(other.organisationID))
 			return false;
-		if(dunningFeeTypeID == null) {
-			if(other.dunningFeeTypeID != null)
-				return false;
-		} else if(!dunningFeeTypeID.equals(other.dunningFeeTypeID))
+		if(dunningFeeTypeID != other.dunningFeeTypeID)
 			return false;
 		return true;
 	}
@@ -311,19 +308,19 @@ implements ObjectID
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((organisationID == null) ? 0 : organisationID.hashCode());
-		result = prime * result + ((dunningFeeTypeID == null) ? 0 : dunningFeeTypeID.hashCode());
+		result = prime * result + (int) (dunningFeeTypeID ^ (dunningFeeTypeID >>> 32));
 		return result;
 	}
 
 	/**
 	 * Create a new object id instance.
 	 * @param organisationID The primary key field organisationID.
-	 * @param dunningFeeTypeID The primary key field dunningFeeTypeID.
+	 * @param dunningFeeTypeNameID The primary key field dunningFeeTypeNameID.
 	 * @return a newly created instance of <code>DunningFeeTypeNameID</code>
 	 *     with the primary-key fields set to the given parameters.
 	 */
 	@Generated("org.nightlabs.eclipse.sdk.jdo.ObjectIdGenerator")
-	public static DunningFeeTypeNameID create(String organisationID, String dunningFeeTypeNameID)
+	public static DunningFeeTypeNameID create(String organisationID, long dunningFeeTypeNameID)
 	{
 		DunningFeeTypeNameID n = new DunningFeeTypeNameID();
 		n.organisationID = organisationID;

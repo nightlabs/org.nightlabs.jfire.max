@@ -55,7 +55,6 @@ private static final long serialVersionUID = 1L;
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private long amountPaid;
 	
-	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private transient long amountToPay;
 	
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)

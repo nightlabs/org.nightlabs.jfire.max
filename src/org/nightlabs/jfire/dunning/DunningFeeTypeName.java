@@ -52,8 +52,7 @@ extends I18nText
 	private String organisationID;
 
 	@PrimaryKey
-	@Column(length=100)
-	private String dunningFeeTypeID;
+	private long dunningFeeTypeID;
 
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private DunningFeeType dunningFeeType;

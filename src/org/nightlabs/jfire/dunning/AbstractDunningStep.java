@@ -8,8 +8,8 @@ import javax.jdo.annotations.DiscriminatorStrategy;
 import javax.jdo.annotations.IdentityType;
 import javax.jdo.annotations.Inheritance;
 import javax.jdo.annotations.InheritanceStrategy;
-import javax.jdo.annotations.NullValue;
 import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 
@@ -43,10 +43,10 @@ implements Serializable
 	@Column(length=100)
 	private String dunningStepID;
 	
-	@Persistent(nullValue=NullValue.EXCEPTION)
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private DunningConfig dunningConfig;
 	
-	@Persistent(nullValue=NullValue.EXCEPTION)
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private int dunningLevel;
 	
 	/**
@@ -62,6 +62,7 @@ implements Serializable
 	public AbstractDunningStep(String organisationID, String dunningStepID, DunningConfig dunningConfig, int dunningLevel) {
 		Organisation.assertValidOrganisationID(organisationID);
 		ObjectIDUtil.assertValidIDString(dunningStepID, "dunningStepID"); //$NON-NLS-1$
+		
 		this.organisationID = organisationID;
 		this.dunningStepID = dunningStepID;
 		this.dunningConfig = dunningConfig;

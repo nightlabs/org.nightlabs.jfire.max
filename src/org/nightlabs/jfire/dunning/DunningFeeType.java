@@ -1,6 +1,7 @@
 package org.nightlabs.jfire.dunning;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.jdo.annotations.Column;
@@ -39,8 +40,7 @@ private static final long serialVersionUID = 1L;
 	private String organisationID;
 
 	@PrimaryKey
-	@Column(length=100)
-	private String dunningFeeTypeID;
+	private long dunningFeeTypeID;
 	
 	@Persistent(nullValue=NullValue.EXCEPTION)
 	private DunningFee dunningFee;
@@ -73,20 +73,24 @@ private static final long serialVersionUID = 1L;
 	 * @param organisationID first part of the primary key. The organisation which created this object.
 	 * @param dunningFeeTypeID second part of the primary key. A local identifier within the namespace of the organisation.
 	 */
-	public DunningFeeType(String organisationID, String dunningFeeTypeID, DunningFee dunningFee) {
+	public DunningFeeType(String organisationID, long dunningFeeTypeID, DunningFee dunningFee) {
 		Organisation.assertValidOrganisationID(organisationID);
-		ObjectIDUtil.assertValidIDString(dunningFeeTypeID, "dunningFeeTypeID"); //$NON-NLS-1$
 		
 		this.organisationID = organisationID;
 		this.dunningFeeTypeID = dunningFeeTypeID;
 		this.dunningFee = dunningFee;
+		
+		this.name = new DunningFeeTypeName(this);
+		this.description = new DunningFeeTypeDescription(organisationID, dunningFeeTypeID, this);
+		
+		this.currency2price = new HashMap<Currency, Price>();
 	}
 	
 	public String getOrganisationID() {
 		return organisationID;
 	}
 	
-	public String getDunningFeeTypeID() {
+	public long getDunningFeeTypeID() {
 		return dunningFeeTypeID;
 	}
 	

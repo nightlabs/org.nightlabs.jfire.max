@@ -51,39 +51,17 @@ extends I18nText
 	 * This is the organisationID to which the dunningConfig description belongs. Within one organisation,
 	 * all the dunningConfig descriptions have their organisation's ID stored here, thus it's the same
 	 * value for all of them.
-	 *
-	 * @jdo.field primary-key="true"
-	 * @jdo.column length="100"
 	 */
 	@PrimaryKey
 	@Column(length=100)
 	private String organisationID;
 
-	/**
-	 * @jdo.field primary-key="true"
-	 */
 	@PrimaryKey
-	private long dunningConfigID;
+	private String dunningConfigID;
 
-	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 */
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private DunningConfig dunningConfig;
 
-	/**
-	 * key: String languageID<br/>
-	 * value: String description
-	 *
-	 * @jdo.field
-	 *		persistence-modifier="persistent"
-	 *		default-fetch-group="true"
-	 *		table="JFireDunning_DunningConfigDescription_descriptions"
-	 *		null-value="exception"
-	 *
-	 * @jdo.join
-	 * @jdo.value-column sql-type="CLOB"
-	 */
 	@Join
 	@Persistent(
 		nullValue=NullValue.EXCEPTION,
@@ -108,11 +86,11 @@ extends I18nText
 	 * Constructs a new DunningConfigDescription.
 	 * @param dunningConfig the dunningConfig that this dunningConfig description is made in
 	 */
-	public DunningConfigDescription(String organisationID, long dunningConfigID, DunningConfig dunningConfig)
+	public DunningConfigDescription(DunningConfig dunningConfig)
 	{
 		this.dunningConfig = dunningConfig;
-		this.organisationID = organisationID;
-		this.dunningConfigID = dunningConfigID;
+		this.organisationID = dunningConfig.getOrganisationID();
+		this.dunningConfigID = dunningConfig.getDunningConfigID();
 	}
 
 	/**
@@ -127,7 +105,7 @@ extends I18nText
 	 * Returns the dunningConfig id.
 	 * @return the dunningConfig id
 	 */
-	public long getDunningConfigID() {
+	public String getDunningConfigID() {
 		return dunningConfigID;
 	}
 

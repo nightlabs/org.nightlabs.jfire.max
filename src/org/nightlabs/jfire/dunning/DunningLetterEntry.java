@@ -72,7 +72,40 @@ implements Serializable
 	public DunningLetterEntry(String organisationID, String dunningLetterEntryID) {
 		Organisation.assertValidOrganisationID(organisationID);
 		ObjectIDUtil.assertValidIDString(dunningLetterEntryID, "dunningLetterEntryID"); //$NON-NLS-1$
+	
 		this.organisationID = organisationID;
 		this.dunningLetterEntryID = dunningLetterEntryID;
+	}
+	
+	public String getOrganisationID() {
+		return organisationID;
+	}
+	
+	public String getDunningLetterEntryID() {
+		return dunningLetterEntryID;
+	}
+	
+	public int getDunningLevel() {
+		return dunningLevel;
+	}
+	
+	public Invoice getInvoice() {
+		return invoice;
+	}
+	
+	public long getPeriodOfGraceMSec() {
+		return periodOfGraceMSec;
+	}
+	
+	public Date getExtendedDueDateForPayment() {
+		return extendedDueDateForPayment;
+	}
+	
+	public List<DunningInterest> getDunningFees() {
+		return dunningFees;
+	}
+	
+	public Price getPriceIncludingInvoice() {
+		return priceIncludingInvoice;
 	}
 }

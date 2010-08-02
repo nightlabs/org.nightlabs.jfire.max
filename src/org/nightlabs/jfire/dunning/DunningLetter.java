@@ -2,7 +2,6 @@ package org.nightlabs.jfire.dunning;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 
 import javax.jdo.annotations.Column;
@@ -16,7 +15,6 @@ import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 
 import org.nightlabs.jdo.ObjectIDUtil;
-import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.accounting.Price;
 import org.nightlabs.jfire.dunning.id.DunningLetterID;
 import org.nightlabs.jfire.organisation.Organisation;
@@ -95,5 +93,57 @@ implements Serializable
 		this.dunningLetterID = dunningLetterID;
 		this.dunningProcess = dunningProcess;
 		
+	}
+	
+	public String getOrganisationID() {
+		return organisationID;
+	}
+	
+	public String getDunningLetterID() {
+		return dunningLetterID;
+	}
+	
+	public DunningProcess getDunningProcess() {
+		return dunningProcess;
+	}
+	
+	public Integer getDunningLevel() {
+		return dunningLevel;
+	}
+	
+	public List<DunningLetterEntry> getDunnedInvoices() {
+		return dunnedInvoices;
+	}
+	
+	public List<DunningFee> getDunningFees() {
+		return dunningFees;
+	}
+	
+	public Date getFinalizeDT() {
+		return finalizeDT;
+	}
+	
+	public Date getBookDT() {
+		return bookDT;
+	}
+	
+	public Price getPriceExcludingInvoices() {
+		return priceExcludingInvoices;
+	}
+	
+	public Price getPriceIncludingInvoices() {
+		return priceIncludingInvoices;
+	}
+	
+	public long getAmountPaidExcludingInvoices() {
+		return amountPaidExcludingInvoices;
+	}
+	
+	public long getAmountToPay() {
+		return amountToPay;
+	}
+
+	public boolean isOutstanding() {
+		return outstanding;
 	}
 }

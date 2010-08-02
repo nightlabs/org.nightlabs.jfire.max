@@ -36,8 +36,16 @@ extends AbstractDunningStep
 		super(organisationID, dunningStepID, dunningConfig, dunningLevel);
 	}
 	
+	public void setInterestPercentage(BigDecimal interestPercentage) {
+		this.interestPercentage = interestPercentage;
+	}
+	
 	public BigDecimal getInterestPercentage() {
 		return interestPercentage;
+	}
+	
+	public void setPeriodOfGraceMSec(long periodOfGraceMSec) {
+		this.periodOfGraceMSec = periodOfGraceMSec;
 	}
 	
 	public long getPeriodOfGraceMSec() {

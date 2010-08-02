@@ -8,7 +8,6 @@ import javax.jdo.annotations.Column;
 import javax.jdo.annotations.IdentityType;
 import javax.jdo.annotations.Inheritance;
 import javax.jdo.annotations.InheritanceStrategy;
-import javax.jdo.annotations.NullValue;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.PersistenceModifier;
 import javax.jdo.annotations.Persistent;
@@ -84,5 +83,45 @@ implements Serializable
 	
 	public String getDunningInterestID() {
 		return dunningInterestID;
+	}
+	
+	public DunningLetterEntry getDunningLetterEntry() {
+		return dunningLetterEntry;
+	}
+	
+	public Date getCreditPeriodFromIncl() {
+		return creditPeriodFromIncl;
+	}
+	
+	public Date getCreditPeriodToExcl() {
+		return creditPeriodToExcl;
+	}
+	
+	public Currency getCurrency() {
+		return currency;
+	}
+	
+	public long getBaseAmount() {
+		return baseAmount;
+	}
+	
+	public BigDecimal getInterestPercentage() {
+		return interestPercentage;
+	}
+	
+	public long getInterestAmount() {
+		return interestAmount;
+	}
+	
+	public long getAmountPaid() {
+		return amountPaid;
+	}
+	
+	public long getAmountToPay() {
+		return amountToPay;
+	}
+	
+	public Date getPaidDT() {
+		return paidDT;
 	}
 }

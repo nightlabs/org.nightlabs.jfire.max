@@ -1,5 +1,6 @@
 package org.nightlabs.jfire.dunning;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.jdo.annotations.IdentityType;
@@ -42,14 +43,24 @@ extends AbstractDunningStep
 	
 	public ProcessDunningStep(String organisationID, String dunningStepID, DunningConfig dunningConfig, int dunningLevel) {
 		super(organisationID, dunningStepID, dunningConfig, dunningLevel);
+		
+		this.feeTypes = new ArrayList<DunningFeeType>();
 	}
 	
 	public List<DunningFeeType> getFeeTypes() {
 		return feeTypes;
 	}
 	
+	public void setLetterLayout(ReportLayout letterLayout) {
+		this.letterLayout = letterLayout;
+	}
+	
 	public ReportLayout getLetterLayout() {
 		return letterLayout;
+	}
+	
+	public void setCoolDownPeriod(long coolDownPeriod) {
+		this.coolDownPeriod = coolDownPeriod;
 	}
 	
 	public long getCoolDownPeriod() {

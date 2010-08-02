@@ -19,7 +19,7 @@ import org.nightlabs.i18n.I18nText;
 import org.nightlabs.jfire.dunning.id.DunningConfigNameID;
 
 /**
- * An extended class of {@link I18nText} that represents the {@link PhoneSystem}'s name.
+ * An extended class of {@link I18nText} that represents the {@link DunningConfig}'s name.
  *
  * @author Chairat Kongarayawetchakun - chairat [AT] nightlabs [DOT] de
  */

@@ -1,6 +1,7 @@
 package org.nightlabs.jfire.dunning;
 
 import java.io.Serializable;
+import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -83,6 +84,16 @@ implements Serializable
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private DunningInterestCalculator dunningInterestCalculator;
 	
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+	private DunningFeeAdder dunningFeeAdder;
+	
+	@Join
+	@Persistent(table="JFireDunning_DunningConfig_level2DunningLetterNotifiers")
+	private Map<Integer, DunningLetterNotifier> level2DunningLetterNotifiers;
+	
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+	private DunningMoneyFlowConfig moneyFlowConfig;
+	
 	/**
 	 * @deprecated This constructor exists only for JDO and should never be used directly!
 	 */
@@ -104,10 +115,14 @@ implements Serializable
 		this.dunningConfigID = dunningConfigID;
 		this.dunningAutoMode = dunningAutoMode;
 		
+		this.name = new DunningConfigName(this);
+		this.description = new DunningConfigDescription(this);
+		
 		this.invoiceDunningSteps = new TreeSet<InvoiceDunningStep>();
 		this.processDunningSteps = new TreeSet<ProcessDunningStep>();
 		
 		this.dunningInterestCalculator = new DunningInterestCalculatorCustomerFriendly();
+		this.dunningFeeAdder = new DunningFeeAdderCustomerFriendly();
 	}
 	
 	public String getOrganisationID() {

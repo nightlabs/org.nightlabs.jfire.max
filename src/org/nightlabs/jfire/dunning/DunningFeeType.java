@@ -15,7 +15,6 @@ import javax.jdo.annotations.PersistenceModifier;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 
-import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.accounting.Price;
 import org.nightlabs.jfire.dunning.id.DunningFeeTypeID;
 import org.nightlabs.jfire.organisation.Organisation;

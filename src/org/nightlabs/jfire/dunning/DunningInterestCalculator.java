@@ -17,6 +17,16 @@ import org.nightlabs.jfire.dunning.id.DunningInterestCalculatorID;
 import org.nightlabs.jfire.organisation.Organisation;
 
 /**
+ * According to http://zinsmethoden.de/ (unfortunately only in German), 
+ * there are many possibilities to calculate an interest. The questions 
+ * that need to be decided by this calculator are: <br>
+ 
+ * <br>1.How many days does the year have? This is important to divide the percentage accordingly (i.e. is a delay of payment of 1 day calculated as dueAmount * percentage / 360 or dueAmount * percentage / 365 or is the real calendar used)?
+ * <br>2.What's the first day in the interest calculation? Is it the due date or the following day at midnight?
+ * <br>3.What's the last day in the interest calculation? There are many options: The new due date, the finalization date of the DunningLetter or the creation date of the DunningLetter. And is this day included or excluded in the period?
+ * 
+ * <br><br>Due to all these questions, the DunningInterestCalculator is abstract. But we provide a pretty customer-friendly default implementation (see below).
+
  * @author Chairat Kongarayawetchakun - chairat [AT] nightlabs [DOT] de
  */
 @PersistenceCapable(

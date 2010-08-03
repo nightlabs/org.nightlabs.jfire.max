@@ -1,7 +1,6 @@
 package org.nightlabs.jfire.dunning;
 
 import java.io.Serializable;
-import java.util.TreeSet;
 
 import javax.jdo.annotations.Column;
 import javax.jdo.annotations.IdentityType;
@@ -19,6 +18,9 @@ import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.trade.LegalEntity;
 
 /**
+ * Binding-entity for establishing a relationship between one 
+ * certain customer and a DunningConfig.
+ * 
  * @author Chairat Kongarayawetchakun - chairat [AT] nightlabs [DOT] de
  */
 @PersistenceCapable(
@@ -42,9 +44,16 @@ implements Serializable
 	@Column(length=100)
 	private String dunningConfigCustomerID;
 	
+	/**
+	 * The configuration that shall be assigned.
+	 */
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private DunningConfig dunningConfig;
 	
+	/**
+	 * The customer to which a DunningConfig should be assigned 
+	 * or null to specify the default configuration.
+	 */
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private LegalEntity customer;
 	

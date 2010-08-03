@@ -22,6 +22,13 @@ import org.nightlabs.jfire.dunning.id.DunningMoneyFlowConfigID;
 import org.nightlabs.jfire.organisation.Organisation;
 
 /**
+ * The abstract base class for all implementations that map a triple consisting 
+ * of the DunningFeeType, the currency and the direction of the booking to an 
+ * account it shall be booked to.<br>
+ * 
+ * <br>A simple implementation is the SimpleDunningMoneyFlowConfig that directly maps 
+ * such a triple to an account via hash maps.
+ * 
  * @author Chairat Kongarayawetchakun - chairat [AT] nightlabs [DOT] de
  */
 @PersistenceCapable(
@@ -46,6 +53,9 @@ implements Serializable
 	@Column(length=100)
 	private String dunningMoneyFlowConfigID;
 	
+	/**
+	 * Maps all paid interests of a certain currency to the account it shall be booked to.
+	 */
 	@Join
 	@Persistent(table="JFireDunning_DunningMoneyFlowConfig_currency2InterestAccount")
 	private Map<Currency, Account> currency2InterestAccount;
@@ -64,6 +74,14 @@ implements Serializable
 		this.dunningMoneyFlowConfigID = dunningMoneyFlowConfigID;
 	}
 	
+	/**
+	 * This method returns the account a specific DunningFeeType will be booked on.
+	 * 
+	 * @param feeType
+	 * @param currency
+	 * @param isReverseBooking
+	 * @return
+	 */
 	public Account getAccount(DunningFeeType feeType, Currency currency, boolean isReverseBooking) {
 		return null;
 	}

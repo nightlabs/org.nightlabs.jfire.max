@@ -21,6 +21,13 @@ import org.nightlabs.jfire.dunning.id.DunningLetterEntryID;
 import org.nightlabs.jfire.organisation.Organisation;
 
 /**
+ * A DunningLetterEntry contains all the information needed to list the corresponding 
+ * invoice in the the table of dunned invoices in the DunningLetter. 
+ * 
+ * <br>Among this information is the new due date, the interests already build up 
+ * and the severity of the dunning step which reflects how long the invoice 
+ * is overdue already.
+ * 
  * @author Chairat Kongarayawetchakun - chairat [AT] nightlabs [DOT] de
  */
 @PersistenceCapable(

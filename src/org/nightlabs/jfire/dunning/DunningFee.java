@@ -39,23 +39,51 @@ implements Serializable
 	@Column(length=100)
 	private String dunningFeeID;
 	
+	/**
+	 * Back-reference to the owner-entity.
+	 */
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private DunningLetterEntry dunningLetterEntry;
 	
+	/**
+	 * Null or the one from which this one was copied (if it was copied from a previous DunningLetter).
+	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+	private DunningFee original;
+	
+	/**
+	 * The general fee descriptor for which this concrete fee was created.
+	 */
 	@Persistent(
 			dependent="true",
 			mappedBy="dunningFee",
 			persistenceModifier=PersistenceModifier.PERSISTENT)
 	private DunningFeeType dunningFeeType;
 	
+	/**
+	 * The amount of money to pay.
+	 */
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Price price;
 	
+	/**
+	 * The amount that was already paid. This could be a fraction 
+	 * of the amount needed to be paid (partial payment).
+	 */
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private long amountPaid;
 	
+	/**
+	 * The remaining amount of money that is left to be paid 
+	 * and is thus interestAmount – amountPaid.]
+	 */
 	private transient long amountToPay;
 	
+	/**
+	 * The date at which all of this interest was paid. This implies that 
+	 * as long as this field is set to null, there is still some part left 
+	 * to be paid.
+	 */
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Date paidDT;
 	
@@ -71,12 +99,14 @@ implements Serializable
 	 * @param organisationID first part of the primary key. The organisation which created this object.
 	 * @param dunningFeeID second part of the primary key. A local identifier within the namespace of the organisation.
 	 */
-	public DunningFee(String organisationID, String dunningFeeID) {
+	public DunningFee(String organisationID, String dunningFeeID, DunningFee original) {
 		Organisation.assertValidOrganisationID(organisationID);
 		ObjectIDUtil.assertValidIDString(dunningFeeID, "dunningFeeID"); //$NON-NLS-1$
 		
 		this.organisationID = organisationID;
 		this.dunningFeeID = dunningFeeID;
+		
+		this.original = original;
 	}
 	
 	public String getOrganisationID() {

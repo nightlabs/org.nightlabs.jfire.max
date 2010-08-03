@@ -43,9 +43,16 @@ implements Serializable
 	@Column(length=100)
 	private String dunningStepID;
 	
+	/**
+	 * The owner-entity, i.e. the one DunningConfig to which this DunningStep belongs.
+	 */
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private DunningConfig dunningConfig;
 	
+	/**
+	 * The severity of this dunning step. This is later used to order the dunning 
+	 * steps of one DunningConfig.
+	 */
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private int dunningLevel;
 	

@@ -7,6 +7,14 @@ import javax.jdo.annotations.PersistenceCapable;
 
 import org.apache.log4j.Logger;
 
+/**
+ * This is our default implementation of the DunningFeeAdder. It only 
+ * adds new fees if at least one of the dunned invoices has increased 
+ * its dunningLevel. If this happens, it will add the fees of the ProcessDunningStep 
+ * corresponding to that level.
+ * 
+ * @author Chairat Kongarayawetchakun - chairat [AT] nightlabs [DOT] de
+ */
 @PersistenceCapable(
 		identityType=IdentityType.APPLICATION,
 		detachable="true",

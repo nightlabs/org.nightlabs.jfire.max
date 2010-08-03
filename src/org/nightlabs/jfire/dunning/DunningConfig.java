@@ -22,6 +22,8 @@ import org.nightlabs.jfire.dunning.id.DunningConfigID;
 import org.nightlabs.jfire.organisation.Organisation;
 
 /**
+ * A DunningConfig contains all settings for a dunning process. 
+ * 
  * @author Chairat Kongarayawetchakun - chairat [AT] nightlabs [DOT] de
  */
 @PersistenceCapable(
@@ -61,12 +63,27 @@ implements Serializable
 	)
 	private DunningConfigDescription description;
 	
+	/**
+	 * The time (in milliseconds) within which the payment is due. 
+	 * It is copied to the Invoice, when a new invoice is created. 
+	 * We might need new a hook in JFire to be able to react on the 
+	 * invoice creation – or maybe we can simply use some default 
+	 * JDO lifecycle listener.
+	 */
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private long defaultTermOfPaymentMSec;
 	
+	/**
+	 * Whether and what to do automatically.
+	 */
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private DunningAutoMode dunningAutoMode;
 	
+	/**
+	 * The steps that need to be performed for one particular 
+	 * invoice of a dunning process. The level (or severeness) 
+	 * specifies the ordering of the dunning steps.
+	 */
 	@Join
 	@Persistent(
 		nullValue=NullValue.EXCEPTION,
@@ -74,6 +91,15 @@ implements Serializable
 		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private SortedSet<InvoiceDunningStep> invoiceDunningSteps;
 	
+	/**
+	 * According to the dunning level of a process (most likely 
+	 * the highest level of any invoice contained) different 
+	 * fees have to be included, different layouts have to be 
+	 * chosen and particular listener may have to be notified. 
+	 * 
+	 * This information is encapsulated in the ProcessDunningStep, 
+	 * which are ordered according to the dunning level of the dunning step.
+	 */
 	@Join
 	@Persistent(
 		nullValue=NullValue.EXCEPTION,
@@ -81,16 +107,31 @@ implements Serializable
 		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private SortedSet<ProcessDunningStep> processDunningSteps;
 	
+	/**
+	 * The calculator implementation used for the calculation of 
+	 * interests – there are many different ways to calculate them.
+	 */
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private DunningInterestCalculator dunningInterestCalculator;
 	
+	/**
+	 * Encapsulates the logic for deciding what fees to add to 
+	 * a newly created DunningLetter.
+	 */
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private DunningFeeAdder dunningFeeAdder;
 	
+	/**
+	 * Maps from a dunning level to the notifers that want to be triggered 
+	 * if a letter with the corresponding dunning level is created.
+	 */
 	@Join
 	@Persistent(table="JFireDunning_DunningConfig_level2DunningLetterNotifiers")
 	private Map<Integer, DunningLetterNotifier> level2DunningLetterNotifiers;
 	
+	/**
+	 * The configuration of the accounts  the fees and interests are booked to.
+	 */
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private DunningMoneyFlowConfig moneyFlowConfig;
 	

@@ -24,6 +24,17 @@ import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.trade.LegalEntity;
 
 /**
+ * When Invoice.dueDateForPayment is exceeded (i.e. NOW is after this timestamp) 
+ * and there is no DunningInvoiceProcess for the corresponding customer, 
+ * a new DunningProcess is either manually (via UI) or automatically created 
+ * (with the copy of its corresponding DunningConfig – a shallow copy is enough).<br> 
+ * 
+ * <br>Thus, there is at most one active DunningProcess for every customer in the database. 
+ * If there is one already, the existing DunningProcess is used and the overdue invoice 
+ * is added.<br>
+ * 
+ * <br>The DunningProcess governs the generation of DunningLetters which may be skipped depending on the coolDownEnd. 
+
  * @author Chairat Kongarayawetchakun - chairat [AT] nightlabs [DOT] de
  */
 @PersistenceCapable(
@@ -47,29 +58,47 @@ implements Serializable
 	@Column(length=100)
 	private String dunningProcessID;
 	
+	/**
+	 * A deep copy of the DunningConfig for the corresponding customer.
+	 */
 	@Persistent(
 			loadFetchGroup="all",
 			persistenceModifier=PersistenceModifier.PERSISTENT)
 	private DunningConfig dunningConfig;
 	
+	/**
+	 * The customer for which this DunningProcess has been created.
+	 */
 	@Persistent(
 			loadFetchGroup="all",
 			persistenceModifier=PersistenceModifier.PERSISTENT)
 	private LegalEntity customer;
 	
+	/**
+	 * The invoices for which this dunning process is happening and their corresponding dunning levels.
+	 */
 	@Join
 	@Persistent(table="JFireDunning_DunningProcess_invoices2DunningLevel")
 	private Map<Invoice, Integer> invoices2DunningLevel;
 	
+	/**
+	 * All DunningLetters that have been created so far within the scope of this dunning process.
+	 */
 	@Join
 	@Persistent(
 		table="JFireDunning_DunningProcess_dunningLetters",
 		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private List<DunningLetter> dunningLetters;
 	
+	/**
+	 * The date at which all invoices were paid. While this field is set to null, its DunningProcess is active!
+	 */
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Date paidDT;
 	
+	/**
+	 * The point of time after which new DunningLetters should be created again.
+	 */
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Date coolDownEnd;
 	

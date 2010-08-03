@@ -38,36 +38,82 @@ implements Serializable
 	@Column(length=100)
 	private String dunningInterestID;
 	
+	/**
+	 * Back-reference to the owner-entity.
+	 */
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private DunningLetterEntry dunningLetterEntry;
 	
+	/**
+	 * Back-reference to the old DunningInterest object (of the previous 
+	 * DunningLetter) that this one originates from.
+	 */
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private DunningInterest backReference;
 	
+	/**
+	 * The exact timestamp from which to calculate the interest. This is 
+	 * usually midnight of the following day after the due date, 
+	 * but it's up to the DunningInterestCalculator implementation to 
+	 * decide from when to when periods are counted
+	 */
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Date creditPeriodFromIncl;
 	
+	/**
+	 * The exact timestamp till which to calculate the interest (excluding 
+	 * the exact millisecond as previous.creditPeriodFrom == next.creditPeriodTo).
+	 */
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Date creditPeriodToExcl;
 	
+	/**
+	 * The currency in which this interest is calculated. This must match 
+	 * the invoice's currency.
+	 */
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Currency currency;
 	
+	/**
+	 * The base from which the interest is calculated in the smallest currency 
+	 * unit (e.g. in Cent when EUR is used).
+	 */
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private long baseAmount;
 	
+	/**
+	 * The percentage that should be applied when calculating the interest. 
+	 * This is copied from either the current DunningStep (dunningLetter.dunningStep) 
+	 * or a previously created DunningInterest (that's either copied or recalculated).
+	 */
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private BigDecimal interestPercentage;
 	
+	/**
+	 * The interest as absolute number in the smallest currency unit (e.g. in 
+	 * Cent when EUR is used).
+	 */
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private long interestAmount;
 	
+	/**
+	 * The amount that was already paid. This could be a fraction of the amount 
+	 * needed to be paid (partial payment).
+	 */
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private long amountPaid;
 	
+	/**
+	 * The remaining amount of money that is left to be paid 
+	 * and is thus interestAmount – amountPaid.]
+	 */
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private long amountToPay;
 	
+	/**
+	 * The date at which all of this interest was paid. This implies that as long 
+	 * as this field is set to null, there is still some part left to be paid.
+	 */
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Date paidDT;
 	

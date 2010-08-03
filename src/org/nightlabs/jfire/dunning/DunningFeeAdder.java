@@ -13,6 +13,19 @@ import javax.jdo.annotations.PrimaryKey;
 
 import org.nightlabs.jfire.dunning.id.DunningFeeAdderID;
 
+/**
+ * The DunningFeeAdder encapsulates the logic deciding if and what fees 
+ * to add to a newly created DunningLetter. 
+ * 
+ * As there may be arbitrarily many creations of DunningLetters in a fixed 
+ * time frame, it is not advisable to always add the default fees for every 
+ * generated letter. This class is where one can implement the desired behaviour.
+ * 
+ * We will provide a customer-friendly default implementation: 
+ * The DunningFeeAdderCustomerFriendly.
+ * 
+ * @author Chairat Kongarayawetchakun - chairat [AT] nightlabs [DOT] de
+ */
 @PersistenceCapable(
 	objectIdClass=DunningFeeAdderID.class,
 	identityType=IdentityType.APPLICATION,

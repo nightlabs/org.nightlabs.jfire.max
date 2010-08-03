@@ -15,6 +15,10 @@ import org.apache.log4j.Logger;
 import org.nightlabs.jfire.reporting.layout.ReportLayout;
 
 /**
+ * There are costs that may only be added once per DunningLetter. 
+ * The ProcessDunningStep is used to apply these and to know which 
+ * layout to use for a DunningLetter of a particular dunning level.
+ * 
  * @author Chairat Kongarayawetchakun - chairat [AT] nightlabs [DOT] de
  */
 @PersistenceCapable(
@@ -29,15 +33,31 @@ extends AbstractDunningStep
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger = Logger.getLogger(ProcessDunningStep.class);
 	
+	/**
+	 * The fees that should be applied to the new DunningLetter. 
+	 * 
+	 * Note, that all fees from the previous DunningLetter need to be 
+	 * copied into the new DunningLetter, additionally.
+	 */
 	@Join
 	@Persistent(
 		table="JFireDunning_ProcessDunningStep_feeTypes",
 		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private List<DunningFeeType> feeTypes;
 	
+	/**
+	 * The description of how the DunningLetter should look like.
+	 */
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private ReportLayout letterLayout;
 	
+	/**
+	 * The coolDownPeriod is the timespan from the last DunningLetter, 
+	 * in which no new DunningLetters are to be created.
+	 * 
+	 * Therefore, manual triggering of a DunningProcess check does not 
+	 * flood the customer with DunningLetters.
+	 */
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private long coolDownPeriod;
 	

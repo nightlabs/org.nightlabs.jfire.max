@@ -56,6 +56,10 @@ private static final long serialVersionUID = 1L;
 			persistenceModifier=PersistenceModifier.PERSISTENT)
 	private DunningFeeTypeDescription description;
 	
+	/**
+	 * The price to be charged additionally to the invoice amount, 
+	 * the interest and all previous fees.
+	 */
 	@Join
 	@Persistent(table="JFireDunning_DunningFeeType_currency2price")
 	private Map<Currency, Price> currency2price;

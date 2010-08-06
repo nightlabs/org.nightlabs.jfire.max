@@ -41,29 +41,20 @@ implements Serializable
 	@Column(length=100)
 	private String organisationID;
 
-	@PrimaryKey
-	@Column(length=100)
-	private String dunningFeeAdderID;
-
 	/**
 	 * @deprecated Only for JDO!
 	 */
 	@Deprecated
 	protected DunningFeeAdder() { }
 
-	public DunningFeeAdder(String organisationID, String dunningFeeAdderID)
+	public DunningFeeAdder(String organisationID)
 	{
 		this.organisationID = organisationID;
-		this.dunningFeeAdderID = dunningFeeAdderID;
 	}
 
 	public String getOrganisationID()
 	{
 		return organisationID;
-	}
-	public String getDunningFeeAdderID()
-	{
-		return dunningFeeAdderID;
 	}
 
 	public abstract void addDunningFee(DunningLetter dunningLetter);

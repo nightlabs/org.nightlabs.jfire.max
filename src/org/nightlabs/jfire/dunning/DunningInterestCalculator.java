@@ -47,10 +47,6 @@ implements Serializable
 	@Column(length=100)
 	private String organisationID;
 
-	@PrimaryKey
-	@Column(length=100)
-	private String dunningInterestCalculatorID;
-	
 	/**
 	 * @deprecated This constructor exists only for JDO and should never be used directly!
 	 */
@@ -61,18 +57,12 @@ implements Serializable
 	 * Create an instance of <code>DunningInterestCalculator</code>.
 	 *
 	 */
-	public DunningInterestCalculator(String organisationID, String dunningInterestCalculatorID) {
+	public DunningInterestCalculator(String organisationID) {
 		Organisation.assertValidOrganisationID(organisationID);
-		ObjectIDUtil.assertValidIDString(dunningInterestCalculatorID, "dunningInterestCalculatorID"); //$NON-NLS-1$
 		this.organisationID = organisationID;
-		this.dunningInterestCalculatorID = dunningInterestCalculatorID;
 	}
 	
 	public String getOrganisationID() {
 		return organisationID;
-	}
-	
-	public String getDunningInterestCalculatorID() {
-		return dunningInterestCalculatorID;
 	}
 }

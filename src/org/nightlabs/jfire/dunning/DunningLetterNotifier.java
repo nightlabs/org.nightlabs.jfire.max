@@ -1,5 +1,11 @@
 package org.nightlabs.jfire.dunning;
 
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.PrimaryKey;
+
+import org.nightlabs.jdo.ObjectIDUtil;
+import org.nightlabs.jfire.organisation.Organisation;
+
 
 /**
  * An abstract handler to notify someone about a DunningLetter. 
@@ -14,7 +20,18 @@ package org.nightlabs.jfire.dunning;
  * 
  * @author Chairat Kongarayawetchakun - chairat [AT] nightlabs [DOT] de
  */
-public class DunningLetterNotifier 
+public abstract class DunningLetterNotifier 
 {
-
+	@PrimaryKey
+	@Column(length=100)
+	private String organisationID;
+	
+	@Deprecated
+	protected DunningLetterNotifier() { }
+	
+	public DunningLetterNotifier(String organisationID) {
+		Organisation.assertValidOrganisationID(organisationID);
+		this.organisationID = organisationID;
+		
+	}
 }

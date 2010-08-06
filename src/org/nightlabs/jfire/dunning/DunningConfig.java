@@ -163,7 +163,7 @@ implements Serializable
 		this.processDunningSteps = new TreeSet<ProcessDunningStep>();
 		
 		this.dunningInterestCalculator = new DunningInterestCalculatorCustomerFriendly();
-		this.dunningFeeAdder = new DunningFeeAdderCustomerFriendly();
+		this.dunningFeeAdder = new DunningFeeAdderCustomerFriendly(organisationID);
 	}
 	
 	public String getOrganisationID() {

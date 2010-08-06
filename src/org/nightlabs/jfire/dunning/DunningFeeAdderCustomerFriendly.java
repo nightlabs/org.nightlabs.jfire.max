@@ -1,5 +1,7 @@
 package org.nightlabs.jfire.dunning;
 
+import java.util.SortedSet;
+
 import javax.jdo.annotations.IdentityType;
 import javax.jdo.annotations.Inheritance;
 import javax.jdo.annotations.InheritanceStrategy;
@@ -33,13 +35,21 @@ extends DunningFeeAdder
 	@Deprecated
 	protected DunningFeeAdderCustomerFriendly() { }
 
-	public DunningFeeAdderCustomerFriendly(String organisationID, String dunningFeeAdderID)
+	public DunningFeeAdderCustomerFriendly(String organisationID)
 	{
-		super(organisationID, dunningFeeAdderID);
+		super(organisationID);
 	}
 	
 	@Override
 	public void addDunningFee(DunningLetter dunningLetter) {
+		DunningConfig dunningConfig = dunningLetter.getDunningProcess().getDunningConfig();
+		SortedSet<ProcessDunningStep> processDunningSteps = dunningConfig.getProcessDunningSteps();
+		for (ProcessDunningStep processDunningStep : processDunningSteps) {
+			if (processDunningStep.getDunningLevel() == dunningLetter.getDunningLevel()) {
+				for (DunningFeeType dunningFeeType : processDunningStep.getFeeTypes()) {
+					dunningLetter.getDunningFees().add(dunningFeeType.getDunningFee());
+				}
+			}
+		}
 	}
-
 }

@@ -17,4 +17,6 @@ public interface DunningManagerRemote
 	
 	List<DunningProcess> getDunningProcesses(Collection<DunningProcessID> dunningProcessIDs, String[] fetchGroups, int maxFetchDepth);
 	Set<DunningProcessID> getDunningProcessIDs();
+	
+	void initialise() throws Exception;
 }

@@ -1,6 +1,7 @@
 package org.nightlabs.jfire.dunning;
 
 import java.io.Serializable;
+import java.util.Date;
 
 import javax.jdo.annotations.Column;
 import javax.jdo.annotations.Discriminator;
@@ -9,12 +10,15 @@ import javax.jdo.annotations.IdentityType;
 import javax.jdo.annotations.Inheritance;
 import javax.jdo.annotations.InheritanceStrategy;
 import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 
 import org.apache.log4j.Logger;
-import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.dunning.id.DunningInterestCalculatorID;
 import org.nightlabs.jfire.organisation.Organisation;
+
+import com.mckoi.util.BigNumber;
 
 /**
  * According to http://zinsmethoden.de/ (unfortunately only in German), 
@@ -47,22 +51,40 @@ implements Serializable
 	@Column(length=100)
 	private String organisationID;
 
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+	private DunningConfig dunningConfig;
 	/**
 	 * @deprecated This constructor exists only for JDO and should never be used directly!
 	 */
 	@Deprecated
 	protected DunningInterestCalculator() { }
 	
+	public abstract int getDays();
+	
+	public abstract Date getFirstDay();
+	
+	public abstract Date getLastDay();
+	
+	public BigNumber calculateInterest() {
+//		dunningConfig.getInvoiceDunningSteps().
+		return null;
+	}
+	
 	/**
 	 * Create an instance of <code>DunningInterestCalculator</code>.
 	 *
 	 */
-	public DunningInterestCalculator(String organisationID) {
+	public DunningInterestCalculator(String organisationID, DunningConfig dunningConfig) {
 		Organisation.assertValidOrganisationID(organisationID);
 		this.organisationID = organisationID;
+		this.dunningConfig = dunningConfig;
 	}
 	
 	public String getOrganisationID() {
 		return organisationID;
+	}
+	
+	public DunningConfig getDunningConfig() {
+		return dunningConfig;
 	}
 }

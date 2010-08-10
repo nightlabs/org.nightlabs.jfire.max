@@ -5,6 +5,8 @@ import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import javax.jdo.JDOHelper;
+import javax.jdo.PersistenceManager;
 import javax.jdo.annotations.Column;
 import javax.jdo.annotations.IdentityType;
 import javax.jdo.annotations.Inheritance;
@@ -20,6 +22,11 @@ import org.apache.log4j.Logger;
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.dunning.id.DunningConfigID;
 import org.nightlabs.jfire.organisation.Organisation;
+import org.nightlabs.jfire.security.User;
+import org.nightlabs.jfire.timer.Task;
+import org.nightlabs.jfire.timer.id.TaskID;
+import org.nightlabs.jfire.trade.recurring.RecurringTradeManagerLocal;
+import org.nightlabs.jfire.trade.recurring.RecurringTrader;
 
 /**
  * A DunningConfig contains all settings for a dunning process. 
@@ -39,6 +46,8 @@ implements Serializable
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger = Logger.getLogger(DunningConfig.class);
 
+	public static final String TASK_TYPE_ID_PROCESS_DUNNING = "DunningTask";
+	
 	@PrimaryKey
 	@Column(length=100)
 	private String organisationID;
@@ -135,6 +144,23 @@ implements Serializable
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private DunningMoneyFlowConfig moneyFlowConfig;
 	
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+	private Task creatorTask;
+	
+	/**
+	 * @return the {@link PersistenceManager} associated with this {@link DunningConfig}
+	 * will fail if the instance is not attached.
+	 */
+	protected PersistenceManager getPersistenceManager()
+	{
+		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
+		if (pm == null)
+			throw new IllegalStateException(
+			"This instance of Trader is currently not attached to a datastore! Cannot get a PersistenceManager!");
+
+		return pm;
+	}
+	
 	/**
 	 * @deprecated This constructor exists only for JDO and should never be used directly!
 	 */
@@ -164,6 +190,14 @@ implements Serializable
 		
 		this.dunningInterestCalculator = new DunningInterestCalculatorCustomerFriendly();
 		this.dunningFeeAdder = new DunningFeeAdderCustomerFriendly(organisationID);
+		
+		TaskID taskID = TaskID.create(organisationID, TASK_TYPE_ID_PROCESS_DUNNING, dunningConfigID);
+		this.creatorTask = new Task(
+				taskID,
+				User.getUser(getPersistenceManager(), getOrganisationID(), User.USER_ID_SYSTEM),
+				DunningManagerRemote.class,
+				"processAutomaticDunning"
+		);
 	}
 	
 	public String getOrganisationID() {

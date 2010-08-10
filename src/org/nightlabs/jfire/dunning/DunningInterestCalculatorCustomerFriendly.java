@@ -1,5 +1,8 @@
 package org.nightlabs.jfire.dunning;
 
+import java.util.Calendar;
+import java.util.Date;
+
 /**
  * There is a default implementation of DunningInterestCalculator with the 
  * following customer-friendly rules:
@@ -17,4 +20,18 @@ public class DunningInterestCalculatorCustomerFriendly
 extends DunningInterestCalculator
 {
 
+	@Override
+	public int getDays() {
+		return Calendar.getInstance().getActualMaximum(Calendar.DAY_OF_YEAR);
+	}
+
+	@Override
+	public Date getFirstDay() {
+		return null;
+	}
+
+	@Override
+	public Date getLastDay() {
+		return null;
+	}
 }

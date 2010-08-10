@@ -1,6 +1,7 @@
 package org.nightlabs.jfire.dunning;
 
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -15,6 +16,7 @@ import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.dunning.id.DunningConfigID;
 import org.nightlabs.jfire.dunning.id.DunningProcessID;
+import org.nightlabs.jfire.timer.id.TaskID;
 import org.nightlabs.util.CollectionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -84,5 +86,40 @@ implements DunningManagerRemote
 		} finally {
 			pm.close();
 		}
+	}
+	
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public void initTimerTaskAutomaticDunning(PersistenceManager pm)
+	throws Exception
+	{
+//		try {
+//			TaskID _taskID = TaskID.create(getOrganisationID(), DunningConfig.TASK_TYPE_ID_PROCESS_DUNNING, taskID);
+//			Task task = (Task) pm.getObjectById(_taskID);
+//		} finally {
+//			pm.close();
+//		}
+	}
+	
+	public void processAutomaticDunning(TaskID taskID)
+	throws Exception {
+		PersistenceManager pm = createPersistenceManager();
+		try {
+			for (Iterator<DunningProcess> dunningProcesses = pm.getExtent(DunningProcess.class).iterator(); dunningProcesses.hasNext(); ) {
+				DunningProcess dunningProcess = dunningProcesses.next();
+				if (!getOrganisationID().equals(dunningProcess.getOrganisationID()))
+					continue;
+				
+			}
+		} finally {
+			pm.close();
+		}
+	}
+	
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("_System_")
+	@Override
+	public void initialise() throws Exception
+	{
+		PersistenceManager pm = createPersistenceManager();
 	}
 }

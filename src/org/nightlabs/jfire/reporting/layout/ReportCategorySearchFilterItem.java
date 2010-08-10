@@ -66,13 +66,13 @@ public class ReportCategorySearchFilterItem extends SearchFilterItem {
 //		return null;
 //	}
 //
-//	/* (non-Javadoc)
-//	 * @see com.nightlabs.jdo.search.SearchFilterItem#isConstraint()
-//	 */
-//	@Override
-//	public boolean isConstraint() {
-//		return (nameFilter != null) || (internalFilter != INTERNAL_FILTER_BOTH);
-//	}
+	/* (non-Javadoc)
+	 * @see com.nightlabs.jdo.search.SearchFilterItem#isConstraint()
+	 */
+	@Override
+	public boolean isConstraint() {
+		return (nameFilter != null) || (internalFilter != INTERNAL_FILTER_BOTH);
+	}
 //
 //	/* (non-Javadoc)
 //	 * @see com.nightlabs.jdo.search.SearchFilterItem#appendSubQuery(int, int, java.util.Set, java.lang.StringBuffer, java.lang.StringBuffer, java.lang.StringBuffer, java.util.Map)

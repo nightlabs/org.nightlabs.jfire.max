@@ -156,7 +156,7 @@ implements Serializable
 		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
 		if (pm == null)
 			throw new IllegalStateException(
-			"This instance of Trader is currently not attached to a datastore! Cannot get a PersistenceManager!");
+			"This instance of DunningConfig is currently not attached to a datastore! Cannot get a PersistenceManager!");
 
 		return pm;
 	}
@@ -191,13 +191,13 @@ implements Serializable
 		this.dunningInterestCalculator = new DunningInterestCalculatorCustomerFriendly();
 		this.dunningFeeAdder = new DunningFeeAdderCustomerFriendly(organisationID);
 		
-		TaskID taskID = TaskID.create(organisationID, TASK_TYPE_ID_PROCESS_DUNNING, dunningConfigID);
-		this.creatorTask = new Task(
-				taskID,
-				User.getUser(getPersistenceManager(), getOrganisationID(), User.USER_ID_SYSTEM),
-				DunningManagerRemote.class,
-				"processAutomaticDunning"
-		);
+//		TaskID taskID = TaskID.create(organisationID, TASK_TYPE_ID_PROCESS_DUNNING, dunningConfigID);
+//		this.creatorTask = new Task(
+//				taskID,
+//				User.getUser(getPersistenceManager(), getOrganisationID(), User.USER_ID_SYSTEM),
+//				DunningManagerRemote.class,
+//				"processAutomaticDunning"
+//		);
 	}
 	
 	public String getOrganisationID() {

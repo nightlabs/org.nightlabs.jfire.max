@@ -34,6 +34,21 @@ implements DunningManagerRemote
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger = LoggerFactory.getLogger(DunningManagerBean.class);
 
+	//DunningConfig
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("_Guest_")
+	@Override
+	public DunningConfig storeDunningConfig(DunningConfig dunningConfig, boolean get, String[] fetchGroups, int maxFetchDepth)
+	{
+		PersistenceManager pm = createPersistenceManager();
+		try {
+			return NLJDOHelper.storeJDO(pm, dunningConfig, get, fetchGroups, maxFetchDepth);
+		}//try
+		finally {
+			pm.close();
+		}//finally
+	}
+	
 	@RolesAllowed("_Guest_")
 	@Override
 	public List<DunningConfig> getDunningConfigs(Collection<DunningConfigID> dunningConfigIDs, String[] fetchGroups, int maxFetchDepth)
@@ -61,6 +76,7 @@ implements DunningManagerRemote
 		}
 	}
 	
+	//DunningProcess
 	@RolesAllowed("_Guest_")
 	@Override
 	public List<DunningProcess> getDunningProcesses(Collection<DunningProcessID> dunningProcessIDs, String[] fetchGroups, int maxFetchDepth)

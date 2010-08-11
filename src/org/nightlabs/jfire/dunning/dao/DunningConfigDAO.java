@@ -80,4 +80,25 @@ public class DunningConfigDAO extends BaseJDOObjectDAO<DunningConfigID, DunningC
 			throw new RuntimeException(e);
 		}
 	}
+	
+	public synchronized DunningConfig storeDunningConfig(DunningConfig dunningConfig, boolean get, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor){
+		if(dunningConfig == null)
+			throw new NullPointerException("DunningConfig to save must not be null");
+		monitor.beginTask("Storing dunningConfig: "+ dunningConfig.getDunningConfigID(), 3);
+		try {
+			DunningManagerRemote im = JFireEjb3Factory.getRemoteBean(DunningManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			monitor.worked(1);
+
+			DunningConfig result = im.storeDunningConfig(dunningConfig, get, fetchGroups, maxFetchDepth);
+			if (result != null)
+				getCache().put(null, result, fetchGroups, maxFetchDepth);
+
+			monitor.worked(1);
+			monitor.done();
+			return result;
+		} catch (Exception e) {
+			monitor.done();
+			throw new RuntimeException(e);
+		}
+	}
 }

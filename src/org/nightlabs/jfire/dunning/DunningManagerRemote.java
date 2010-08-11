@@ -12,6 +12,8 @@ import org.nightlabs.jfire.dunning.id.DunningProcessID;
 @Remote
 public interface DunningManagerRemote 
 {
+	DunningConfig storeDunningConfig(DunningConfig dunningConfig, boolean get, String[] fetchGroups, int maxFetchDepth);
+	
 	List<DunningConfig> getDunningConfigs(Collection<DunningConfigID> dunningConfigIDs, String[] fetchGroups, int maxFetchDepth);
 	Set<DunningConfigID> getDunningConfigIDs();
 	

@@ -3,6 +3,13 @@ package org.nightlabs.jfire.dunning;
 import java.util.Calendar;
 import java.util.Date;
 
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.PersistenceCapable;
+
+import org.apache.log4j.Logger;
+
 /**
  * There is a default implementation of DunningInterestCalculator with the 
  * following customer-friendly rules:
@@ -16,10 +23,29 @@ import java.util.Date;
  * 
  * @author Chairat Kongarayawetchakun - chairat [AT] nightlabs [DOT] de
  */
+@PersistenceCapable(
+		identityType=IdentityType.APPLICATION,
+		detachable="true",
+		table="JFireDunning_DunningInterestCalculatorCustomerFriendly"
+)
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class DunningInterestCalculatorCustomerFriendly 
 extends DunningInterestCalculator
 {
+	private static final long serialVersionUID = 1L;
+	private static final Logger logger = Logger.getLogger(DunningInterestCalculatorCustomerFriendly.class);
+	
+	/**
+	 * @deprecated Only for JDO!
+	 */
+	@Deprecated
+	protected DunningInterestCalculatorCustomerFriendly() { }
 
+	public DunningInterestCalculatorCustomerFriendly(String organisationID, DunningConfig dunningConfig)
+	{
+		super(organisationID, dunningConfig);
+	}
+	
 	@Override
 	public int getDays() {
 		return Calendar.getInstance().getActualMaximum(Calendar.DAY_OF_YEAR);

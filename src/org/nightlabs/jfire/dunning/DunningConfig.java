@@ -8,6 +8,8 @@ import java.util.TreeSet;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.annotations.Column;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.FetchGroups;
 import javax.jdo.annotations.IdentityType;
 import javax.jdo.annotations.Inheritance;
 import javax.jdo.annotations.InheritanceStrategy;
@@ -22,11 +24,6 @@ import org.apache.log4j.Logger;
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.dunning.id.DunningConfigID;
 import org.nightlabs.jfire.organisation.Organisation;
-import org.nightlabs.jfire.security.User;
-import org.nightlabs.jfire.timer.Task;
-import org.nightlabs.jfire.timer.id.TaskID;
-import org.nightlabs.jfire.trade.recurring.RecurringTradeManagerLocal;
-import org.nightlabs.jfire.trade.recurring.RecurringTrader;
 
 /**
  * A DunningConfig contains all settings for a dunning process. 
@@ -37,8 +34,14 @@ import org.nightlabs.jfire.trade.recurring.RecurringTrader;
 		objectIdClass=DunningConfigID.class,
 		identityType=IdentityType.APPLICATION,
 		detachable="true",
-		table="JFireDunning_DunningConfig"
-)
+		table="JFireDunning_DunningConfig")
+@FetchGroups({
+	@FetchGroup(
+		fetchGroups={"default"},
+		name=DunningConfig.FETCH_GROUP_NAME,
+		members=@Persistent(name="name")
+	)
+})
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class DunningConfig
 implements Serializable
@@ -46,6 +49,8 @@ implements Serializable
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger = Logger.getLogger(DunningConfig.class);
 
+	public static final String FETCH_GROUP_NAME = "DunningConfig.name";
+	
 	public static final String TASK_TYPE_ID_PROCESS_DUNNING = "DunningTask";
 	
 	@PrimaryKey
@@ -144,8 +149,8 @@ implements Serializable
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private DunningMoneyFlowConfig moneyFlowConfig;
 	
-	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
-	private Task creatorTask;
+//	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+//	private Task creatorTask;
 	
 	/**
 	 * @return the {@link PersistenceManager} associated with this {@link DunningConfig}
@@ -188,7 +193,7 @@ implements Serializable
 		this.invoiceDunningSteps = new TreeSet<InvoiceDunningStep>();
 		this.processDunningSteps = new TreeSet<ProcessDunningStep>();
 		
-		this.dunningInterestCalculator = new DunningInterestCalculatorCustomerFriendly();
+		this.dunningInterestCalculator = new DunningInterestCalculatorCustomerFriendly(organisationID, this);
 		this.dunningFeeAdder = new DunningFeeAdderCustomerFriendly(organisationID);
 		
 //		TaskID taskID = TaskID.create(organisationID, TASK_TYPE_ID_PROCESS_DUNNING, dunningConfigID);

@@ -18,8 +18,9 @@ import org.nightlabs.progress.SubProgressMonitor;
  *
  * @author Chairat Kongarayawetchakun - chairat [AT] nightlabs [DOT] de
  */
-public class DunningConfigDAO extends BaseJDOObjectDAO<DunningConfigID, DunningConfig>{
-
+public class DunningConfigDAO 
+extends BaseJDOObjectDAO<DunningConfigID, DunningConfig>
+{
 	private static DunningConfigDAO sharedInstance = null;
 
 	public static DunningConfigDAO sharedInstance()

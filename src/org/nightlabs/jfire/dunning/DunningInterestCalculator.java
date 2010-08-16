@@ -1,6 +1,7 @@
 package org.nightlabs.jfire.dunning;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 
 import javax.jdo.annotations.Column;
@@ -17,8 +18,6 @@ import javax.jdo.annotations.PrimaryKey;
 import org.apache.log4j.Logger;
 import org.nightlabs.jfire.dunning.id.DunningInterestCalculatorID;
 import org.nightlabs.jfire.organisation.Organisation;
-
-import com.mckoi.util.BigNumber;
 
 /**
  * According to http://zinsmethoden.de/ (unfortunately only in German), 
@@ -65,7 +64,7 @@ implements Serializable
 	
 	public abstract Date getLastDay();
 	
-	public BigNumber calculateInterest() {
+	public BigDecimal calculateInterest() {
 //		dunningConfig.getInvoiceDunningSteps().
 		return null;
 	}

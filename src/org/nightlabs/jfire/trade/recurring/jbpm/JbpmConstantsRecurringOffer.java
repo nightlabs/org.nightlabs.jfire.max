@@ -17,7 +17,7 @@ public class JbpmConstantsRecurringOffer {
 			Organisation.DEV_ORGANISATION_ID + ":recurrenceStarted";
 	
 		public static final String NODE_NAME_RECURRENCE_STOPED =
-			Organisation.DEV_ORGANISATION_ID + ":recurrenceStoped";
+			Organisation.DEV_ORGANISATION_ID + ":recurrenceStopped";
 		
 		public static final String TRANSITION_NAME_START_RECURRENCE =
 			Organisation.DEV_ORGANISATION_ID + ":startRecurrence";

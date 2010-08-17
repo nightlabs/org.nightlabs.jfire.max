@@ -77,11 +77,10 @@ implements Serializable
 	 * Create an instance of <code>DunningInterestCalculator</code>.
 	 *
 	 */
-	public DunningInterestCalculator(String organisationID, String dunningInterestCalculatorID, DunningConfig dunningConfig) {
+	public DunningInterestCalculator(String organisationID, String dunningInterestCalculatorID) {
 		Organisation.assertValidOrganisationID(organisationID);
 		this.organisationID = organisationID;
 		this.dunningInterestCalculatorID = dunningInterestCalculatorID;
-		this.dunningConfig = dunningConfig;
 	}
 	
 	public String getOrganisationID() {
@@ -90,6 +89,10 @@ implements Serializable
 	
 	public String getDunningInterestCalculatorID() {
 		return dunningInterestCalculatorID;
+	}
+
+	public void setDunningConfig(DunningConfig dunningConfig) {
+		this.dunningConfig = dunningConfig;
 	}
 	
 	public DunningConfig getDunningConfig() {

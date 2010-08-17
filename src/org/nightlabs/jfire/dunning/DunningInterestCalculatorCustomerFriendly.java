@@ -9,6 +9,8 @@ import javax.jdo.annotations.InheritanceStrategy;
 import javax.jdo.annotations.PersistenceCapable;
 
 import org.apache.log4j.Logger;
+import org.nightlabs.jfire.dunning.id.DunningInterestCalculatorID;
+import org.nightlabs.jfire.organisation.Organisation;
 
 /**
  * There is a default implementation of DunningInterestCalculator with the 
@@ -35,15 +37,16 @@ extends DunningInterestCalculator
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger = Logger.getLogger(DunningInterestCalculatorCustomerFriendly.class);
 	
+	public static final DunningInterestCalculatorID ID = DunningInterestCalculatorID.create(Organisation.DEV_ORGANISATION_ID, "Dunning Interest Calculator Customer Friendly");
 	/**
 	 * @deprecated Only for JDO!
 	 */
 	@Deprecated
 	protected DunningInterestCalculatorCustomerFriendly() { }
 
-	public DunningInterestCalculatorCustomerFriendly(String organisationID, String dunningInterestCalculatorID, DunningConfig dunningConfig)
+	public DunningInterestCalculatorCustomerFriendly(String organisationID, String dunningInterestCalculatorID)
 	{
-		super(organisationID, dunningInterestCalculatorID, dunningConfig);
+		super(organisationID, dunningInterestCalculatorID);
 	}
 	
 	@Override

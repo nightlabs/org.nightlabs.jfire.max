@@ -8,6 +8,8 @@ import javax.jdo.annotations.InheritanceStrategy;
 import javax.jdo.annotations.PersistenceCapable;
 
 import org.apache.log4j.Logger;
+import org.nightlabs.jfire.dunning.id.DunningFeeAdderID;
+import org.nightlabs.jfire.organisation.Organisation;
 
 /**
  * This is our default implementation of the DunningFeeAdder. It only 
@@ -29,6 +31,8 @@ extends DunningFeeAdder
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger = Logger.getLogger(DunningFeeAdderCustomerFriendly.class);
 
+	public static final DunningFeeAdderID ID = DunningFeeAdderID.create(Organisation.DEV_ORGANISATION_ID, "Dunning Fee Adder Customer Friendly");
+	
 	/**
 	 * @deprecated Only for JDO!
 	 */

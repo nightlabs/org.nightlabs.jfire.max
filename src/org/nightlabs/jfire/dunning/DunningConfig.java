@@ -24,7 +24,6 @@ import javax.jdo.annotations.PrimaryKey;
 import org.apache.log4j.Logger;
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.dunning.id.DunningConfigID;
-import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.timer.Task;
 
@@ -201,9 +200,6 @@ implements Serializable
 		
 		this.invoiceDunningSteps = new TreeSet<InvoiceDunningStep>();
 		this.processDunningSteps = new TreeSet<ProcessDunningStep>();
-		
-		this.dunningFeeAdder = new DunningFeeAdderCustomerFriendly(organisationID, IDGenerator.nextIDString(DunningFeeAdder.class));
-		this.dunningInterestCalculator = new DunningInterestCalculatorCustomerFriendly(organisationID, IDGenerator.nextIDString(DunningInterestCalculator.class), this);
 		
 //		TaskID taskID = TaskID.create(organisationID, TASK_TYPE_ID_PROCESS_DUNNING, dunningConfigID);
 //		this.creatorTask = new Task(

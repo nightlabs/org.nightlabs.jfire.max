@@ -9,12 +9,15 @@ import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
+import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.dunning.id.DunningConfigID;
+import org.nightlabs.jfire.dunning.id.DunningFeeAdderID;
+import org.nightlabs.jfire.dunning.id.DunningInterestCalculatorID;
 import org.nightlabs.jfire.dunning.id.DunningProcessID;
 import org.nightlabs.jfire.timer.id.TaskID;
 import org.nightlabs.util.CollectionUtil;
@@ -104,6 +107,66 @@ implements DunningManagerRemote
 		}
 	}
 	
+	//DunningFeeAdder
+	@RolesAllowed("_Guest_")
+	@Override
+	public DunningFeeAdder getDunningFeeAdder(DunningFeeAdderID dunningFeeAdderID, String[] fetchGroups, int maxFetchDepth)
+	{
+		PersistenceManager pm = createPersistenceManager();
+		try {
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+			if (fetchGroups != null)
+				pm.getFetchPlan().setGroups(fetchGroups);
+
+			pm.getExtent(DunningFeeAdder.class);
+			return (DunningFeeAdder) pm.detachCopy(pm.getObjectById(dunningFeeAdderID));
+		} finally {
+			pm.close();
+		}
+	}
+
+	@RolesAllowed("_Guest_")
+	@Override
+	public List<DunningFeeAdder> getDunningFeeAdders(Set<DunningFeeAdderID> dunningFeeAdderIDs, String[] fetchGroups, int maxFetchDepth)
+	{
+		PersistenceManager pm = createPersistenceManager();
+		try {
+			return NLJDOHelper.getDetachedObjectList(pm, dunningFeeAdderIDs, DunningFeeAdder.class, fetchGroups, maxFetchDepth);
+		} finally {
+			pm.close();
+		}
+	}
+	
+	//DunningInterestCalculator
+	@RolesAllowed("_Guest_")
+	@Override
+	public DunningInterestCalculator getDunningInterestCalculator(DunningInterestCalculatorID dunningInterestCalculatorID, String[] fetchGroups, int maxFetchDepth)
+	{
+		PersistenceManager pm = createPersistenceManager();
+		try {
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+			if (fetchGroups != null)
+				pm.getFetchPlan().setGroups(fetchGroups);
+
+			pm.getExtent(DunningInterestCalculator.class);
+			return (DunningInterestCalculator) pm.detachCopy(pm.getObjectById(dunningInterestCalculatorID));
+		} finally {
+			pm.close();
+		}
+	}
+
+	@RolesAllowed("_Guest_")
+	@Override
+	public List<DunningInterestCalculator> getDunningInterestCalculators(Set<DunningInterestCalculatorID> dunningInterestCalculatorIDs, String[] fetchGroups, int maxFetchDepth)
+	{
+		PersistenceManager pm = createPersistenceManager();
+		try {
+			return NLJDOHelper.getDetachedObjectList(pm, dunningInterestCalculatorIDs, DunningInterestCalculator.class, fetchGroups, maxFetchDepth);
+		} finally {
+			pm.close();
+		}
+	}
+	
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public void initTimerTaskAutomaticDunning(PersistenceManager pm)
 	throws Exception
@@ -137,5 +200,26 @@ implements DunningManagerRemote
 	public void initialise() throws Exception
 	{
 		PersistenceManager pm = createPersistenceManager();
+		try {
+			pm.getExtent(DunningFeeAdder.class);
+			// check, whether the datastore is already initialized
+			try {
+				pm.getObjectById(DunningFeeAdderCustomerFriendly.ID);
+				return; // already initialized
+			} catch (JDOObjectNotFoundException x) {
+				// datastore not yet initialized
+			}
+
+			// create and persist the AccountTypes
+			DunningFeeAdder dunningFeeAdder;
+			dunningFeeAdder = pm.makePersistent(new DunningFeeAdderCustomerFriendly(DunningFeeAdderCustomerFriendly.ID.organisationID, DunningFeeAdderCustomerFriendly.ID.dunningFeeAdderID));
+			
+			pm.getExtent(DunningInterestCalculator.class);
+			
+			DunningInterestCalculator dunningInterestCalculator;
+			dunningInterestCalculator = pm.makePersistent(new DunningInterestCalculatorCustomerFriendly(DunningInterestCalculatorCustomerFriendly.ID.organisationID, DunningInterestCalculatorCustomerFriendly.ID.dunningInterestCalculatorID));
+		} finally {
+			pm.close();
+		}
 	}
 }

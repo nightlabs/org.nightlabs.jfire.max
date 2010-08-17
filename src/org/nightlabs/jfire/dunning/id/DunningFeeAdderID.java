@@ -84,6 +84,13 @@ implements ObjectID
 	public java.lang.String organisationID;
 
 	/**
+	 * Primary key field dunningFeeAdderID.
+	 * Declared as primary key field in {@link org.nightlabs.jfire.dunning.DunningFeeAdder}.
+	 */
+	@Generated("org.nightlabs.eclipse.sdk.jdo.ObjectIdGenerator")
+	public java.lang.String dunningFeeAdderID;
+
+	/**
 	 * Create a new empty instance of DunningFeeAdderID.
 	 */
 	@Generated("org.nightlabs.eclipse.sdk.jdo.ObjectIdGenerator")
@@ -249,6 +256,9 @@ implements ObjectID
 		try {
 			sb.append("organisationID="); //$NON-NLS-1$
 			sb.append(URLEncoder.encode(String.valueOf(organisationID), ENCODING));
+			sb.append('&');
+			sb.append("dunningFeeAdderID="); //$NON-NLS-1$
+			sb.append(URLEncoder.encode(String.valueOf(dunningFeeAdderID), ENCODING));
 		} catch (UnsupportedEncodingException e) {
 			throw new RuntimeException(
 					"Encoding failed with encoding " + //$NON-NLS-1$
@@ -279,6 +289,11 @@ implements ObjectID
 				return false;
 		} else if(!organisationID.equals(other.organisationID))
 			return false;
+		if(dunningFeeAdderID == null) {
+			if(other.dunningFeeAdderID != null)
+				return false;
+		} else if(!dunningFeeAdderID.equals(other.dunningFeeAdderID))
+			return false;
 		return true;
 	}
 
@@ -296,6 +311,7 @@ implements ObjectID
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((organisationID == null) ? 0 : organisationID.hashCode());
+		result = prime * result + ((dunningFeeAdderID == null) ? 0 : dunningFeeAdderID.hashCode());
 		return result;
 	}
 
@@ -311,6 +327,7 @@ implements ObjectID
 	{
 		DunningFeeAdderID n = new DunningFeeAdderID();
 		n.organisationID = organisationID;
+		n.dunningFeeAdderID = dunningFeeAdderID;
 		return n;
 	}
 }

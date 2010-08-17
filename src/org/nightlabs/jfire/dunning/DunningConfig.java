@@ -1,6 +1,7 @@
 package org.nightlabs.jfire.dunning;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -23,7 +24,9 @@ import javax.jdo.annotations.PrimaryKey;
 import org.apache.log4j.Logger;
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.dunning.id.DunningConfigID;
+import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.organisation.Organisation;
+import org.nightlabs.jfire.timer.Task;
 
 /**
  * A DunningConfig contains all settings for a dunning process. 
@@ -40,6 +43,11 @@ import org.nightlabs.jfire.organisation.Organisation;
 		fetchGroups={"default"},
 		name=DunningConfig.FETCH_GROUP_NAME,
 		members=@Persistent(name="name")
+	),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name=DunningConfig.FETCH_GROUP_DESCRIPTION,
+		members=@Persistent(name="description")
 	)
 })
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
@@ -50,6 +58,7 @@ implements Serializable
 	private static final Logger logger = Logger.getLogger(DunningConfig.class);
 
 	public static final String FETCH_GROUP_NAME = "DunningConfig.name";
+	public static final String FETCH_GROUP_DESCRIPTION = "DunningConfig.description";
 	
 	public static final String TASK_TYPE_ID_PROCESS_DUNNING = "DunningTask";
 	
@@ -149,8 +158,8 @@ implements Serializable
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private DunningMoneyFlowConfig moneyFlowConfig;
 	
-//	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
-//	private Task creatorTask;
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+	private Task creatorTask;
 	
 	/**
 	 * @return the {@link PersistenceManager} associated with this {@link DunningConfig}
@@ -193,8 +202,8 @@ implements Serializable
 		this.invoiceDunningSteps = new TreeSet<InvoiceDunningStep>();
 		this.processDunningSteps = new TreeSet<ProcessDunningStep>();
 		
-		this.dunningInterestCalculator = new DunningInterestCalculatorCustomerFriendly(organisationID, this);
-		this.dunningFeeAdder = new DunningFeeAdderCustomerFriendly(organisationID);
+		this.dunningFeeAdder = new DunningFeeAdderCustomerFriendly(organisationID, IDGenerator.nextIDString(DunningFeeAdder.class));
+		this.dunningInterestCalculator = new DunningInterestCalculatorCustomerFriendly(organisationID, IDGenerator.nextIDString(DunningInterestCalculator.class), this);
 		
 //		TaskID taskID = TaskID.create(organisationID, TASK_TYPE_ID_PROCESS_DUNNING, dunningConfigID);
 //		this.creatorTask = new Task(
@@ -225,16 +234,49 @@ implements Serializable
 		return defaultTermOfPaymentMSec;
 	}
 	
+	public void setDunningInterestCalculator(
+			DunningInterestCalculator dunningInterestCalculator) {
+		this.dunningInterestCalculator = dunningInterestCalculator;
+	}
+	
 	public DunningInterestCalculator getDunningInterestCalculator() {
 		return dunningInterestCalculator;
 	}
 	
+	public void setDunningFeeAdder(DunningFeeAdder dunningFeeAdder) {
+		this.dunningFeeAdder = dunningFeeAdder;
+	}
+	
+	public DunningFeeAdder getDunningFeeAdder() {
+		return dunningFeeAdder;
+	}
+	
+	public boolean addInvoiceDunningStep(InvoiceDunningStep invoiceDunningStep) {
+		return invoiceDunningSteps.add(invoiceDunningStep);
+	}
+	
+	public boolean removeInvoiceDunningStep(InvoiceDunningStep invoiceDunningStep) {
+		return invoiceDunningSteps.remove(invoiceDunningStep);
+	}
+	
 	public SortedSet<InvoiceDunningStep> getInvoiceDunningSteps() {
-		return invoiceDunningSteps;
+		return Collections.unmodifiableSortedSet(invoiceDunningSteps);
 	}
 	
 	public SortedSet<ProcessDunningStep> getProcessDunningSteps() {
-		return processDunningSteps;
+		return Collections.unmodifiableSortedSet(processDunningSteps);
+	}
+	
+	public Map<Integer, DunningLetterNotifier> getLevel2DunningLetterNotifiers() {
+		return level2DunningLetterNotifiers;
+	}
+	
+	public void setMoneyFlowConfig(DunningMoneyFlowConfig moneyFlowConfig) {
+		this.moneyFlowConfig = moneyFlowConfig;
+	}
+	
+	public DunningMoneyFlowConfig getMoneyFlowConfig() {
+		return moneyFlowConfig;
 	}
 	
 	public DunningConfigName getName() {

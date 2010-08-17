@@ -12,6 +12,7 @@ import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.PrimaryKey;
 
 import org.nightlabs.jfire.dunning.id.DunningFeeAdderID;
+import org.nightlabs.jfire.organisation.Organisation;
 
 /**
  * The DunningFeeAdder encapsulates the logic deciding if and what fees 
@@ -41,15 +42,22 @@ implements Serializable
 	@Column(length=100)
 	private String organisationID;
 
+	@PrimaryKey
+	@Column(length=100)
+	private String dunningFeeAdderID;
+	
 	/**
 	 * @deprecated Only for JDO!
 	 */
 	@Deprecated
 	protected DunningFeeAdder() { }
 
-	public DunningFeeAdder(String organisationID)
+	public DunningFeeAdder(String organisationID, String dunningFeeAdderID)
 	{
+		Organisation.assertValidOrganisationID(organisationID);
+		
 		this.organisationID = organisationID;
+		this.dunningFeeAdderID = dunningFeeAdderID;
 	}
 
 	public String getOrganisationID()
@@ -57,6 +65,10 @@ implements Serializable
 		return organisationID;
 	}
 
+	public String getDunningFeeAdderID() {
+		return dunningFeeAdderID;
+	}
+	
 	public abstract void addDunningFee(DunningLetter dunningLetter);
 
 	protected PersistenceManager getPersistenceManager()

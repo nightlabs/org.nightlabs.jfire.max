@@ -41,9 +41,9 @@ extends DunningInterestCalculator
 	@Deprecated
 	protected DunningInterestCalculatorCustomerFriendly() { }
 
-	public DunningInterestCalculatorCustomerFriendly(String organisationID, DunningConfig dunningConfig)
+	public DunningInterestCalculatorCustomerFriendly(String organisationID, String dunningInterestCalculatorID, DunningConfig dunningConfig)
 	{
-		super(organisationID, dunningConfig);
+		super(organisationID, dunningInterestCalculatorID, dunningConfig);
 	}
 	
 	@Override

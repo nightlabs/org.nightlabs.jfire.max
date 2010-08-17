@@ -50,6 +50,10 @@ implements Serializable
 	@Column(length=100)
 	private String organisationID;
 
+	@PrimaryKey
+	@Column(length=100)
+	private String dunningInterestCalculatorID;
+	
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private DunningConfig dunningConfig;
 	/**
@@ -73,14 +77,19 @@ implements Serializable
 	 * Create an instance of <code>DunningInterestCalculator</code>.
 	 *
 	 */
-	public DunningInterestCalculator(String organisationID, DunningConfig dunningConfig) {
+	public DunningInterestCalculator(String organisationID, String dunningInterestCalculatorID, DunningConfig dunningConfig) {
 		Organisation.assertValidOrganisationID(organisationID);
 		this.organisationID = organisationID;
+		this.dunningInterestCalculatorID = dunningInterestCalculatorID;
 		this.dunningConfig = dunningConfig;
 	}
 	
 	public String getOrganisationID() {
 		return organisationID;
+	}
+	
+	public String getDunningInterestCalculatorID() {
+		return dunningInterestCalculatorID;
 	}
 	
 	public DunningConfig getDunningConfig() {

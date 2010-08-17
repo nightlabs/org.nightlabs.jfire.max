@@ -35,9 +35,9 @@ extends DunningFeeAdder
 	@Deprecated
 	protected DunningFeeAdderCustomerFriendly() { }
 
-	public DunningFeeAdderCustomerFriendly(String organisationID)
+	public DunningFeeAdderCustomerFriendly(String organisationID, String dunningFeeAdderID)
 	{
-		super(organisationID);
+		super(organisationID, dunningFeeAdderID);
 	}
 	
 	@Override

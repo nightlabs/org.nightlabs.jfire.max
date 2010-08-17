@@ -5,7 +5,24 @@ package org.nightlabs.jfire.dunning;
  */
 public enum DunningAutoMode
 {
-	none,				//Nothing automatic.
-	create,				//Automatically create DunningLetters (but do not finalize them).
-	createAndFinalize 	//Automatically create and finalize DunningLetters.
+	none {	//Nothing automatic.
+		@Override
+		public String toString() {
+			return "None";
+		}
+	},
+	create	//Automatically create DunningLetters (but do not finalize them).
+	{
+		@Override
+		public String toString() {
+			return "Create";
+		}
+	},
+	createAndFinalize	//Automatically create and finalize DunningLetters.
+	{
+		@Override
+		public String toString() {
+			return "Create and Finalize";
+		}				
+	}
 }

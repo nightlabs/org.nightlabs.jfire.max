@@ -1,5 +1,6 @@
 package org.nightlabs.jfire.dunning;
 
+import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -17,8 +18,11 @@ import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.dunning.id.DunningConfigID;
 import org.nightlabs.jfire.dunning.id.DunningFeeAdderID;
+import org.nightlabs.jfire.dunning.id.DunningFeeTypeID;
 import org.nightlabs.jfire.dunning.id.DunningInterestCalculatorID;
 import org.nightlabs.jfire.dunning.id.DunningProcessID;
+import org.nightlabs.jfire.idgenerator.IDGenerator;
+import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.timer.id.TaskID;
 import org.nightlabs.util.CollectionUtil;
 import org.slf4j.Logger;
@@ -80,6 +84,23 @@ implements DunningManagerRemote
 	}
 	
 	//DunningProcess
+	@RolesAllowed("_Guest_")
+	@Override
+	public DunningProcess getDunningProcess(DunningProcessID dunningProcessID, String[] fetchGroups, int maxFetchDepth)
+	{
+		PersistenceManager pm = createPersistenceManager();
+		try {
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+			if (fetchGroups != null)
+				pm.getFetchPlan().setGroups(fetchGroups);
+
+			pm.getExtent(DunningProcess.class);
+			return (DunningProcess) pm.detachCopy(pm.getObjectById(dunningProcessID));
+		} finally {
+			pm.close();
+		}
+	}
+	
 	@RolesAllowed("_Guest_")
 	@Override
 	public List<DunningProcess> getDunningProcesses(Collection<DunningProcessID> dunningProcessIDs, String[] fetchGroups, int maxFetchDepth)
@@ -167,6 +188,49 @@ implements DunningManagerRemote
 		}
 	}
 	
+	//DunningFeeType
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("_Guest_")
+	@Override
+	public DunningFeeType storeDunningFeeType(DunningFeeType dunningFeeType, boolean get, String[] fetchGroups, int maxFetchDepth)
+	{
+		PersistenceManager pm = createPersistenceManager();
+		try {
+			return NLJDOHelper.storeJDO(pm, dunningFeeType, get, fetchGroups, maxFetchDepth);
+		}//try
+		finally {
+			pm.close();
+		}//finally
+	}
+	
+	@RolesAllowed("_Guest_")
+	@Override
+	public List<DunningFeeType> getDunningFeeTypes(Collection<DunningFeeTypeID> dunningFeeTypeIDs, String[] fetchGroups, int maxFetchDepth)
+	{
+		PersistenceManager pm = createPersistenceManager();
+		try {
+			return NLJDOHelper.getDetachedObjectList(pm, dunningFeeTypeIDs, DunningFeeType.class, fetchGroups, maxFetchDepth);
+		} finally {
+			pm.close();
+		}
+	}
+
+	@RolesAllowed("_Guest_")
+	@Override
+	public Set<DunningFeeTypeID> getDunningFeeTypeIDs()
+	{
+		PersistenceManager pm = createPersistenceManager();
+		try {
+			Query q = pm.newQuery(DunningFeeType.class);
+			q.setResult("JDOHelper.getObjectId(this)");
+
+			return CollectionUtil.createHashSetFromCollection( q.execute() );
+		} finally {
+			pm.close();
+		}
+	}
+	
+	//
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public void initTimerTaskAutomaticDunning(PersistenceManager pm)
 	throws Exception
@@ -200,6 +264,12 @@ implements DunningManagerRemote
 	public void initialise() throws Exception
 	{
 		PersistenceManager pm = createPersistenceManager();
+		String organisationIDStr = Organisation.DEV_ORGANISATION_ID;
+		String baseName = "org.nightlabs.jfire.dunning.resource.messages";
+		ClassLoader loader = DunningManagerBean.class.getClassLoader();
+
+		DunningInterestCalculator dunningInterestCalculator;
+		DunningFeeAdder dunningFeeAdder;
 		try {
 			pm.getExtent(DunningFeeAdder.class);
 			// check, whether the datastore is already initialized
@@ -208,16 +278,55 @@ implements DunningManagerRemote
 				return; // already initialized
 			} catch (JDOObjectNotFoundException x) {
 				// datastore not yet initialized
+				dunningFeeAdder = pm.makePersistent(new DunningFeeAdderCustomerFriendly(organisationIDStr, DunningFeeAdderCustomerFriendly.ID.dunningFeeAdderID));
+				
+				pm.getExtent(DunningInterestCalculator.class);
+				
+				dunningInterestCalculator = pm.makePersistent(new DunningInterestCalculatorCustomerFriendly(organisationIDStr, DunningInterestCalculatorCustomerFriendly.ID.dunningInterestCalculatorID));
 			}
 
-			// create and persist the AccountTypes
-			DunningFeeAdder dunningFeeAdder;
-			dunningFeeAdder = pm.makePersistent(new DunningFeeAdderCustomerFriendly(DunningFeeAdderCustomerFriendly.ID.organisationID, DunningFeeAdderCustomerFriendly.ID.dunningFeeAdderID));
-			
-			pm.getExtent(DunningInterestCalculator.class);
-			
-			DunningInterestCalculator dunningInterestCalculator;
-			dunningInterestCalculator = pm.makePersistent(new DunningInterestCalculatorCustomerFriendly(DunningInterestCalculatorCustomerFriendly.ID.organisationID, DunningInterestCalculatorCustomerFriendly.ID.dunningInterestCalculatorID));
+			pm.getExtent(DunningConfigCustomer.class);
+			// check, whether the datastore is already initialized
+			try {
+				pm.getObjectById(DunningConfigCustomer.DUNNING_CONFIG_CUSTOMER_DEFAULT_ID);
+				return; // already initialized
+			} catch (JDOObjectNotFoundException x) {
+				// datastore not yet initialized
+				DunningConfig defaultDunningConfig = new DunningConfig(DunningConfigCustomer.DUNNING_CONFIG_CUSTOMER_DEFAULT_ID.organisationID, "Default", DunningAutoMode.createAndFinalize);
+				defaultDunningConfig.getName().readFromProperties(baseName, loader, "org.nightlabs.jfire.dunning.DunningConfig.default.name");
+				defaultDunningConfig.getDescription().readFromProperties(baseName, loader, "org.nightlabs.jfire.dunning.DunningConfig.default.description");
+				
+				ProcessDunningStep processStep1 = new ProcessDunningStep(organisationIDStr, IDGenerator.nextIDString(ProcessDunningStep.class), defaultDunningConfig, 1);
+				
+				InvoiceDunningStep invStep1 = new InvoiceDunningStep(organisationIDStr, IDGenerator.nextIDString(InvoiceDunningStep.class), defaultDunningConfig, 1);
+				invStep1.setPeriodOfGraceMSec(31);
+				invStep1.setInterestPercentage(new BigDecimal(0));
+				
+				ProcessDunningStep processStep2 = new ProcessDunningStep(organisationIDStr, IDGenerator.nextIDString(ProcessDunningStep.class), defaultDunningConfig, 2);
+				
+				InvoiceDunningStep invStep2 = new InvoiceDunningStep(organisationIDStr, IDGenerator.nextIDString(InvoiceDunningStep.class), defaultDunningConfig, 2);
+				invStep2.setPeriodOfGraceMSec(31);
+				invStep2.setInterestPercentage(new BigDecimal(4));
+				
+				ProcessDunningStep processStep3 = new ProcessDunningStep(organisationIDStr, IDGenerator.nextIDString(ProcessDunningStep.class), defaultDunningConfig, 3);
+				
+				InvoiceDunningStep invStep3 = new InvoiceDunningStep(organisationIDStr, IDGenerator.nextIDString(InvoiceDunningStep.class), defaultDunningConfig, 3);
+				invStep3.setPeriodOfGraceMSec(31);
+				invStep3.setInterestPercentage(new BigDecimal(4));
+				
+				defaultDunningConfig.addInvoiceDunningStep(invStep1);
+				defaultDunningConfig.addInvoiceDunningStep(invStep2);
+				defaultDunningConfig.addInvoiceDunningStep(invStep3);
+				
+				defaultDunningConfig.addProcessDunningStep(processStep1);
+				defaultDunningConfig.addProcessDunningStep(processStep2);
+				defaultDunningConfig.addProcessDunningStep(processStep3);
+				
+				defaultDunningConfig.setDunningInterestCalculator(dunningInterestCalculator);
+				defaultDunningConfig.setDunningFeeAdder(dunningFeeAdder);
+				
+				pm.makePersistent(defaultDunningConfig);
+			}
 		} finally {
 			pm.close();
 		}

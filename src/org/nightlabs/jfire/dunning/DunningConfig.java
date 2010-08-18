@@ -267,6 +267,14 @@ implements Serializable
 		return Collections.unmodifiableSortedSet(invoiceDunningSteps);
 	}
 	
+	public boolean addProcessDunningStep(ProcessDunningStep processDunningStep) {
+		return processDunningSteps.add(processDunningStep);
+	}
+	
+	public boolean removeProcessDunningStep(ProcessDunningStep processDunningStep) {
+		return processDunningSteps.remove(processDunningStep);
+	}
+	
 	public SortedSet<ProcessDunningStep> getProcessDunningSteps() {
 		return Collections.unmodifiableSortedSet(processDunningSteps);
 	}

@@ -10,11 +10,14 @@ import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.PersistenceModifier;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.Queries;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.dunning.id.DunningConfigCustomerID;
+import org.nightlabs.jfire.dunning.id.DunningFeeAdderID;
 import org.nightlabs.jfire.organisation.Organisation;
+import org.nightlabs.jfire.reporting.layout.ReportRegistryItem;
 import org.nightlabs.jfire.trade.LegalEntity;
 
 /**
@@ -30,12 +33,20 @@ import org.nightlabs.jfire.trade.LegalEntity;
 		table="JFireDunning_DunningConfigCustomer"
 )
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
+@Queries({
+	@javax.jdo.annotations.Query(
+		name=DunningConfigCustomer.QUERY_GET_DUNNING_CONFIG_BY_CUSTOMER,
+		value="SELECT WHERE this.customer == :customer")
+})
 public class DunningConfigCustomer 
 implements Serializable
 {
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger = Logger.getLogger(DunningConfigCustomer.class);
 	
+	public static final DunningConfigCustomerID DUNNING_CONFIG_CUSTOMER_DEFAULT_ID = DunningConfigCustomerID.create(Organisation.DEV_ORGANISATION_ID, "Default");
+	
+	public static final String QUERY_GET_DUNNING_CONFIG_BY_CUSTOMER = "getReportRegistryItemByType";
 	@PrimaryKey
 	@Column(length=100)
 	private String organisationID;

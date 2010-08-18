@@ -222,8 +222,16 @@ implements Serializable
 		return description;
 	}
 	
+	public void setDunningAutoMode(DunningAutoMode dunningAutoMode) {
+		this.dunningAutoMode = dunningAutoMode;
+	}
+	
 	public DunningAutoMode getDunningAutoMode() {
 		return dunningAutoMode;
+	}
+	
+	public void setDefaultTermOfPaymentMSec(long defaultTermOfPaymentMSec) {
+		this.defaultTermOfPaymentMSec = defaultTermOfPaymentMSec;
 	}
 	
 	public long getDefaultTermOfPaymentMSec() {

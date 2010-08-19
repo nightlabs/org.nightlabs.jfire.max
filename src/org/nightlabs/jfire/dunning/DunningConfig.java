@@ -1,6 +1,7 @@
 package org.nightlabs.jfire.dunning;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.Map;
 import java.util.SortedSet;
@@ -195,6 +196,8 @@ implements Serializable
 		this.dunningConfigID = dunningConfigID;
 		this.dunningAutoMode = dunningAutoMode;
 		
+		this.defaultTermOfPaymentMSec = 31 * 24 * 60 * 60 * 1000;
+		
 		this.name = new DunningConfigName(this);
 		this.description = new DunningConfigDescription(this);
 		
@@ -234,8 +237,16 @@ implements Serializable
 		this.defaultTermOfPaymentMSec = defaultTermOfPaymentMSec;
 	}
 	
+	public void setDefaultTermOfPaymentDay(int defaultTermOfPaymentDay) {
+		this.defaultTermOfPaymentMSec = (long)defaultTermOfPaymentDay * (long)(24 * 60 * 60 * 1000);
+	}
+	
 	public long getDefaultTermOfPaymentMSec() {
 		return defaultTermOfPaymentMSec;
+	}
+	
+	public int getDefaultTermOfPaymentDay() {
+		return (int)((long)defaultTermOfPaymentMSec / (long)(24 * 60 * 60 * 1000));
 	}
 	
 	public void setDunningInterestCalculator(

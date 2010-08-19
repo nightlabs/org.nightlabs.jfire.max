@@ -196,7 +196,7 @@ implements Serializable
 		this.dunningConfigID = dunningConfigID;
 		this.dunningAutoMode = dunningAutoMode;
 		
-		this.defaultTermOfPaymentMSec = 31 * 24 * 60 * 60 * 1000;
+		this.defaultTermOfPaymentMSec = (long)(31 * 24 * 60 * 60 * 1000);
 		
 		this.name = new DunningConfigName(this);
 		this.description = new DunningConfigDescription(this);

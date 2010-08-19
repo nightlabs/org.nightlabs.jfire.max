@@ -30,7 +30,7 @@ import org.nightlabs.jfire.organisation.Organisation;
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 @Discriminator(strategy=DiscriminatorStrategy.CLASS_NAME)
 public abstract class AbstractDunningStep 
-implements Serializable
+implements Serializable, Comparable<AbstractDunningStep>
 {
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger = Logger.getLogger(AbstractDunningStep.class);
@@ -129,5 +129,18 @@ implements Serializable
 	public String toString() {
 		return "AbstractDunningStep [dunningStepID=" + dunningStepID
 				+ ", organisationID=" + organisationID + "]";
+	}
+	
+	@Override
+	/**
+	 * @see java.lang.Comparable#compareTo(java.lang.Object)
+	 */
+	public int compareTo(AbstractDunningStep o) {
+		if (o.getDunningLevel() < this.getDunningLevel())
+				return 1;
+		else if (o.getDunningLevel() > this.getDunningLevel())
+				return -1;
+		else 
+			return 0;
 	}
 }

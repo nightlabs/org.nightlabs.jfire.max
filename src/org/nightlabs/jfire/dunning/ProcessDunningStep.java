@@ -28,7 +28,7 @@ import org.nightlabs.jfire.reporting.layout.ReportLayout;
 )
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class ProcessDunningStep 
-extends AbstractDunningStep 
+extends AbstractDunningStep
 {
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger = Logger.getLogger(ProcessDunningStep.class);

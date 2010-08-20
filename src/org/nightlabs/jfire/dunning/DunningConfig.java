@@ -1,7 +1,6 @@
 package org.nightlabs.jfire.dunning;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.Map;
 import java.util.SortedSet;
@@ -110,7 +109,7 @@ implements Serializable
 	@Join
 	@Persistent(
 		nullValue=NullValue.EXCEPTION,
-		table="JFireDunning_invoiceDunningStepss",
+		table="JFireDunning_DunningConfig_invoiceDunningSteps",
 		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private SortedSet<InvoiceDunningStep> invoiceDunningSteps;
 	
@@ -126,7 +125,7 @@ implements Serializable
 	@Join
 	@Persistent(
 		nullValue=NullValue.EXCEPTION,
-		table="JFireDunning_processDunningSteps",
+		table="JFireDunning_DunningConfig_processDunningSteps",
 		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private SortedSet<ProcessDunningStep> processDunningSteps;
 	

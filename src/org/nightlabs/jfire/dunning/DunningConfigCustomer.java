@@ -15,9 +15,7 @@ import javax.jdo.annotations.Queries;
 import org.apache.log4j.Logger;
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.dunning.id.DunningConfigCustomerID;
-import org.nightlabs.jfire.dunning.id.DunningFeeAdderID;
 import org.nightlabs.jfire.organisation.Organisation;
-import org.nightlabs.jfire.reporting.layout.ReportRegistryItem;
 import org.nightlabs.jfire.trade.LegalEntity;
 
 /**

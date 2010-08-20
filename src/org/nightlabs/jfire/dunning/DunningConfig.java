@@ -196,7 +196,7 @@ implements Serializable
 		this.dunningConfigID = dunningConfigID;
 		this.dunningAutoMode = dunningAutoMode;
 		
-		this.defaultTermOfPaymentMSec = (long)(31 * 24 * 60 * 60 * 1000);
+		this.defaultTermOfPaymentMSec = 31l * 24l * 60l * 60l * 1000l;
 		
 		this.name = new DunningConfigName(this);
 		this.description = new DunningConfigDescription(this);
@@ -238,7 +238,7 @@ implements Serializable
 	}
 	
 	public void setDefaultTermOfPaymentDay(int defaultTermOfPaymentDay) {
-		this.defaultTermOfPaymentMSec = (long)defaultTermOfPaymentDay * (long)(24 * 60 * 60 * 1000);
+		this.defaultTermOfPaymentMSec = defaultTermOfPaymentDay * (24l * 60l * 60l * 1000l);
 	}
 	
 	public long getDefaultTermOfPaymentMSec() {
@@ -246,7 +246,7 @@ implements Serializable
 	}
 	
 	public int getDefaultTermOfPaymentDay() {
-		return (int)((long)defaultTermOfPaymentMSec / (long)(24 * 60 * 60 * 1000));
+		return (int)(defaultTermOfPaymentMSec / (24l * 60l * 60l * 1000l));
 	}
 	
 	public void setDunningInterestCalculator(

@@ -302,21 +302,21 @@ implements DunningManagerRemote
 				ProcessDunningStep processStep1 = new ProcessDunningStep(organisationIDStr, IDGenerator.nextIDString(AbstractDunningStep.class), defaultDunningConfig, 1);
 				
 				InvoiceDunningStep invStep1 = new InvoiceDunningStep(organisationIDStr, IDGenerator.nextIDString(AbstractDunningStep.class), defaultDunningConfig, 1);
-				invStep1.setPeriodOfGraceMSec(31 * 24 * 60 * 60 * 1000);
+				invStep1.setPeriodOfGraceMSec(31l * 24l * 60l * 60l * 1000l);
 				invStep1.setInterestPercentage(new BigDecimal(0));
 				
 				//Step2
 				ProcessDunningStep processStep2 = new ProcessDunningStep(organisationIDStr, IDGenerator.nextIDString(AbstractDunningStep.class), defaultDunningConfig, 2);
 				
 				InvoiceDunningStep invStep2 = new InvoiceDunningStep(organisationIDStr, IDGenerator.nextIDString(AbstractDunningStep.class), defaultDunningConfig, 2);
-				invStep2.setPeriodOfGraceMSec(31 * 24 * 60 * 60 * 1000);
+				invStep2.setPeriodOfGraceMSec(31l * 24l * 60l * 60l * 1000l);
 				invStep2.setInterestPercentage(new BigDecimal(4));
 				
 				//Step3
 				ProcessDunningStep processStep3 = new ProcessDunningStep(organisationIDStr, IDGenerator.nextIDString(AbstractDunningStep.class), defaultDunningConfig, 3);
 				
 				InvoiceDunningStep invStep3 = new InvoiceDunningStep(organisationIDStr, IDGenerator.nextIDString(AbstractDunningStep.class), defaultDunningConfig, 3);
-				invStep3.setPeriodOfGraceMSec(31 * 24 * 60 * 60 * 1000);
+				invStep3.setPeriodOfGraceMSec(31l * 24l * 60l * 60l * 1000l);
 				invStep3.setInterestPercentage(new BigDecimal(4));
 				
 				//

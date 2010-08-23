@@ -3,6 +3,8 @@ package org.nightlabs.jfire.dunning;
 import java.io.Serializable;
 
 import javax.jdo.annotations.Column;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.FetchGroups;
 import javax.jdo.annotations.IdentityType;
 import javax.jdo.annotations.Inheritance;
 import javax.jdo.annotations.InheritanceStrategy;
@@ -36,6 +38,18 @@ import org.nightlabs.jfire.trade.LegalEntity;
 		name=DunningConfigCustomer.QUERY_GET_DUNNING_CONFIG_BY_CUSTOMER,
 		value="SELECT WHERE this.customer == :customer")
 })
+@FetchGroups({
+	@FetchGroup(
+		fetchGroups={"default"},
+		name=DunningConfigCustomer.FETCH_GROUP_DUNNING_CONFIG,
+		members=@Persistent(name="dunningConfig")
+	),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name=DunningConfigCustomer.FETCH_GROUP_CUSTOMER,
+		members=@Persistent(name="customer")
+	)
+})
 public class DunningConfigCustomer 
 implements Serializable
 {
@@ -43,6 +57,9 @@ implements Serializable
 	private static final Logger logger = Logger.getLogger(DunningConfigCustomer.class);
 	
 	public static final DunningConfigCustomerID DUNNING_CONFIG_CUSTOMER_DEFAULT_ID = DunningConfigCustomerID.create(Organisation.DEV_ORGANISATION_ID, "Default");
+	
+	public static final String FETCH_GROUP_DUNNING_CONFIG = "DunningConfigCustomer.dunningConfig";
+	public static final String FETCH_GROUP_CUSTOMER = "DunningConfigCustomer.customer";
 	
 	public static final String QUERY_GET_DUNNING_CONFIG_BY_CUSTOMER = "getReportRegistryItemByType";
 	@PrimaryKey

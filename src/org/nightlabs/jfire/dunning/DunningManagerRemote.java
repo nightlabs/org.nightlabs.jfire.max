@@ -6,6 +6,7 @@ import java.util.Set;
 
 import javax.ejb.Remote;
 
+import org.nightlabs.jfire.dunning.id.DunningConfigCustomerID;
 import org.nightlabs.jfire.dunning.id.DunningConfigID;
 import org.nightlabs.jfire.dunning.id.DunningFeeAdderID;
 import org.nightlabs.jfire.dunning.id.DunningFeeTypeID;
@@ -40,4 +41,14 @@ public interface DunningManagerRemote
 			String[] fetchGroups, int maxFetchDepth);
 
 	Set<DunningFeeTypeID> getDunningFeeTypeIDs();
+
+	DunningConfigCustomer storeDunningConfigCustomer(
+			DunningConfigCustomer dunningConfigCustomer, boolean get,
+			String[] fetchGroups, int maxFetchDepth);
+
+	List<DunningConfigCustomer> getDunningConfigCustomers(
+			Collection<DunningConfigCustomerID> dunningConfigCustomerIDs,
+			String[] fetchGroups, int maxFetchDepth);
+
+	Set<DunningConfigCustomerID> getDunningConfigCustomerIDs();
 }

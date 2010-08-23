@@ -25,6 +25,7 @@ import org.nightlabs.jfire.dunning.id.DunningProcessID;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.timer.id.TaskID;
+import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.util.CollectionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,6 +77,48 @@ implements DunningManagerRemote
 		PersistenceManager pm = createPersistenceManager();
 		try {
 			Query q = pm.newQuery(DunningConfig.class);
+			q.setResult("JDOHelper.getObjectId(this)");
+
+			return CollectionUtil.createHashSetFromCollection( q.execute() );
+		} finally {
+			pm.close();
+		}
+	}
+	
+	//DunningConfigCustomer
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("_Guest_")
+	@Override
+	public DunningConfigCustomer storeDunningConfigCustomer(DunningConfigCustomer dunningConfigCustomer, boolean get, String[] fetchGroups, int maxFetchDepth)
+	{
+		PersistenceManager pm = createPersistenceManager();
+		try {
+			return NLJDOHelper.storeJDO(pm, dunningConfigCustomer, get, fetchGroups, maxFetchDepth);
+		}//try
+		finally {
+			pm.close();
+		}//finally
+	}
+	
+	@RolesAllowed("_Guest_")
+	@Override
+	public List<DunningConfigCustomer> getDunningConfigCustomers(Collection<DunningConfigCustomerID> dunningConfigCustomerIDs, String[] fetchGroups, int maxFetchDepth)
+	{
+		PersistenceManager pm = createPersistenceManager();
+		try {
+			return NLJDOHelper.getDetachedObjectList(pm, dunningConfigCustomerIDs, DunningConfigCustomer.class, fetchGroups, maxFetchDepth);
+		} finally {
+			pm.close();
+		}
+	}
+
+	@RolesAllowed("_Guest_")
+	@Override
+	public Set<DunningConfigCustomerID> getDunningConfigCustomerIDs()
+	{
+		PersistenceManager pm = createPersistenceManager();
+		try {
+			Query q = pm.newQuery(DunningConfigCustomer.class);
 			q.setResult("JDOHelper.getObjectId(this)");
 
 			return CollectionUtil.createHashSetFromCollection( q.execute() );
@@ -331,7 +374,9 @@ implements DunningManagerRemote
 				defaultDunningConfig.setDunningInterestCalculator(dunningInterestCalculator);
 				defaultDunningConfig.setDunningFeeAdder(dunningFeeAdder);
 				
-				pm.makePersistent(defaultDunningConfig);
+				DunningConfigCustomer dcc = new DunningConfigCustomer(dccID.organisationID, dccID.dunningConfigCustomerID, defaultDunningConfig, LegalEntity.getAnonymousLegalEntity(pm));
+				
+				pm.makePersistent(dcc);
 			}
 		} finally {
 			pm.close();

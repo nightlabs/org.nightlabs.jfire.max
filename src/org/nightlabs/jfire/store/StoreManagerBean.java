@@ -3052,4 +3052,56 @@ implements StoreManagerRemote, StoreManagerLocal
 		}
 	}
 
+
+	/**
+	 * Takes a {@link ProductTypeID}, searches for all {@link Article}s with the productTypeID reference, order them by their createDTs,
+	 * then depending on the desired type of {@link ArticleContainer}, return their unique IDs in a Set accordingly.
+	 * @return So, in effect, if we set isOrderByDescendingArticleDT to true, then returned Set of {@link ArticleContainerID}s are all
+	 * most recent ones. Otherwise, they are refer to the oldest {@link ArticleContainer}s.
+	 */
+	@SuppressWarnings("unchecked")
+//	@RolesAllowed("_Guest_")
+	@RolesAllowed("org.nightlabs.jfire.store.seeProductType") // <-- Is this correct?
+	@Override
+	public Set<ArticleContainerID> getArticleContainerIDsByProductTypeID(ProductTypeID productTypeId, Class<? extends ArticleContainer> articleContainerClass, boolean isOrderByDescendingArticleDT) {
+		PersistenceManager pm = createPersistenceManager();
+		try {
+			Query q = getQueryByArticleClass(pm, articleContainerClass);
+			if (q == null)
+				return null;
+
+			q.setOrdering(isOrderByDescendingArticleDT ? "this.createDT DESC" : "this.createDT ASC");
+			return NLJDOHelper.getObjectIDSet((Collection<? extends ArticleContainer>) q.execute(productTypeId)); // If unique entries are not desired, dont use getObjectIDSet(). Instead getObjectIDList().
+
+		} finally {
+			pm.close();
+		}
+	}
+
+	/**
+	 * Sets up the {@link Query} for {@link ArticleContainer}-type classes.
+	 * @return null if articleContainerClass is not recognised.
+	 */
+	private Query getQueryByArticleClass(PersistenceManager pm, Class<? extends ArticleContainer> articleContainerClass) {
+		if (logger.isDebugEnabled())
+			logger.debug("+++++++++++++ >>> Check: articleContainerClass.getName() = " + articleContainerClass.getName());
+
+		String resultType = "";
+		if (articleContainerClass.getName().equals(Offer.class.getName())) resultType = "this.offer";
+		else if (articleContainerClass.getName().equals(Order.class.getName())) resultType = "this.order";
+		else if (articleContainerClass.getName().equals(Invoice.class.getName())) resultType = "this.invoice";
+		else if (articleContainerClass.getName().equals(DeliveryNote.class.getName())) resultType = "this.deliveryNote";
+		else if (articleContainerClass.getName().equals(ReceptionNote.class.getName())) resultType = "this.receptionNote";
+		// Are there anymore known ArticleContainer class? Can we not hardcode these? We can use static String-fields in Article like in PropertySet...
+
+		if (resultType.isEmpty())
+			return null;
+
+		Query q = pm.newQuery(Article.class);
+		q.setResult(resultType);
+		q.setFilter(resultType + " != null && JDOHelper.getObjectId(this.productType) == :productTypeId");
+
+		return q;
+	}
+
 }

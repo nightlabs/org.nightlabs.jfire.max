@@ -42,6 +42,7 @@ import org.nightlabs.jfire.store.query.ProductTransferQuery;
 import org.nightlabs.jfire.store.search.AbstractProductTypeQuery;
 import org.nightlabs.jfire.store.search.ProductTypeIDTreeNode;
 import org.nightlabs.jfire.trade.Article;
+import org.nightlabs.jfire.trade.ArticleContainer;
 import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.trade.id.ArticleContainerID;
 import org.nightlabs.jfire.trade.id.ArticleID;
@@ -456,4 +457,12 @@ public interface StoreManagerRemote {
 	Collection<ProductTypeID> getChildProductTypeIDs(ProductTypeID parentProductTypeID, QueryCollection<? extends AbstractProductTypeQuery> productTypeQueries);
 	
 	Unit storeUnit(Unit unit, boolean get, String[] fetchGroups, int maxFetchDepth);
+	
+	/**
+	 * Takes a {@link ProductTypeID}, searches for all {@link Article}s with the productTypeID reference, order them by their createDTs,
+	 * then depending on the desired type of {@link ArticleContainer}, return their unique IDs in a Set accordingly.
+	 * @return So, in effect, if we set isOrderByDescendingArticleDT to true, then returned Set of {@link ArticleContainerID}s are all
+	 * most recent ones. Otherwise, they are refer to the oldest {@link ArticleContainer}s.
+	 */
+	public Set<ArticleContainerID> getArticleContainerIDsByProductTypeID(ProductTypeID productTypeId, Class<? extends ArticleContainer> articleContainerClass, boolean isOrderByDescendingArticleDT);
 }

@@ -3,6 +3,7 @@ package org.nightlabs.jfire.dunning;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -15,7 +16,6 @@ import javax.jdo.annotations.IdentityType;
 import javax.jdo.annotations.Inheritance;
 import javax.jdo.annotations.InheritanceStrategy;
 import javax.jdo.annotations.Join;
-import javax.jdo.annotations.NullValue;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.PersistenceModifier;
 import javax.jdo.annotations.Persistent;
@@ -47,6 +47,19 @@ import org.nightlabs.jfire.timer.Task;
 		fetchGroups={"default"},
 		name=DunningConfig.FETCH_GROUP_DESCRIPTION,
 		members=@Persistent(name="description")
+	),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name=DunningConfig.FETCH_GROUP_DUNNING_AUTO_MODE,
+		members=@Persistent(name="dunningAutoMode")
+	),
+	@FetchGroup(
+		name=DunningConfig.FETCH_GROUP_PROCESS_DUNNING_STEPS,
+		members=@Persistent(name="processDunningSteps")
+	),
+	@FetchGroup(
+		name=DunningConfig.FETCH_GROUP_INVOICE_DUNNING_STEPS,
+		members=@Persistent(name="invoiceDunningSteps")
 	)
 })
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
@@ -58,6 +71,9 @@ implements Serializable
 
 	public static final String FETCH_GROUP_NAME = "DunningConfig.name";
 	public static final String FETCH_GROUP_DESCRIPTION = "DunningConfig.description";
+	public static final String FETCH_GROUP_DUNNING_AUTO_MODE = "DunningConfig.dunningAutoMode";
+	public static final String FETCH_GROUP_PROCESS_DUNNING_STEPS = "DunningConfig.processDunningSteps";
+	public static final String FETCH_GROUP_INVOICE_DUNNING_STEPS = "DunningConfig.invoiceDunningSteps";
 	
 	public static final String TASK_TYPE_ID_PROCESS_DUNNING = "DunningTask";
 	
@@ -108,11 +124,13 @@ implements Serializable
 	 */
 	@Join
 	@Persistent(
-		nullValue=NullValue.EXCEPTION,
 		table="JFireDunning_DunningConfig_invoiceDunningSteps",
+		mappedBy="dunningConfig",
 		persistenceModifier=PersistenceModifier.PERSISTENT)
-	private SortedSet<InvoiceDunningStep> invoiceDunningSteps;
+	private Set<InvoiceDunningStep> invoiceDunningSteps;
 	
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
+	private transient SortedSet<InvoiceDunningStep> sortedInvoiceDunningSteps;
 	/**
 	 * According to the dunning level of a process (most likely 
 	 * the highest level of any invoice contained) different 
@@ -124,10 +142,13 @@ implements Serializable
 	 */
 	@Join
 	@Persistent(
-		nullValue=NullValue.EXCEPTION,
 		table="JFireDunning_DunningConfig_processDunningSteps",
+		mappedBy="dunningConfig",
 		persistenceModifier=PersistenceModifier.PERSISTENT)
-	private SortedSet<ProcessDunningStep> processDunningSteps;
+	private Set<ProcessDunningStep> processDunningSteps;
+	
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
+	private transient SortedSet<ProcessDunningStep> sortedProcessDunningSteps;
 	
 	/**
 	 * The calculator implementation used for the calculation of 
@@ -266,27 +287,43 @@ implements Serializable
 	}
 	
 	public boolean addInvoiceDunningStep(InvoiceDunningStep invoiceDunningStep) {
-		return invoiceDunningSteps.add(invoiceDunningStep);
+		getInvoiceDunningSteps().add(invoiceDunningStep);
+		return invoiceDunningSteps.addAll(sortedInvoiceDunningSteps);
 	}
 	
 	public boolean removeInvoiceDunningStep(InvoiceDunningStep invoiceDunningStep) {
-		return invoiceDunningSteps.remove(invoiceDunningStep);
+		getInvoiceDunningSteps().remove(invoiceDunningStep);
+		return invoiceDunningSteps.addAll(sortedInvoiceDunningSteps);
 	}
 	
-	public SortedSet<InvoiceDunningStep> getInvoiceDunningSteps() {
-		return Collections.unmodifiableSortedSet(invoiceDunningSteps);
+	public Set<InvoiceDunningStep> getInvoiceDunningSteps() {
+		if (sortedInvoiceDunningSteps == null) {
+			sortedInvoiceDunningSteps = new TreeSet<InvoiceDunningStep>();
+			for (InvoiceDunningStep is : invoiceDunningSteps) {
+				sortedInvoiceDunningSteps.add(is);
+			}
+		}
+		return sortedInvoiceDunningSteps;
 	}
 	
 	public boolean addProcessDunningStep(ProcessDunningStep processDunningStep) {
-		return processDunningSteps.add(processDunningStep);
+		getProcessDunningSteps().add(processDunningStep);
+		return processDunningSteps.addAll(sortedProcessDunningSteps);
 	}
 	
 	public boolean removeProcessDunningStep(ProcessDunningStep processDunningStep) {
-		return processDunningSteps.remove(processDunningStep);
+		getProcessDunningSteps().remove(processDunningStep);
+		return processDunningSteps.addAll(sortedProcessDunningSteps);
 	}
 	
 	public SortedSet<ProcessDunningStep> getProcessDunningSteps() {
-		return Collections.unmodifiableSortedSet(processDunningSteps);
+		if (sortedProcessDunningSteps == null) {
+			sortedProcessDunningSteps = new TreeSet<ProcessDunningStep>();
+			for (ProcessDunningStep is : processDunningSteps) {
+				sortedProcessDunningSteps.add(is);
+			}
+		}
+		return sortedProcessDunningSteps;
 	}
 	
 	public Map<Integer, DunningLetterNotifier> getLevel2DunningLetterNotifiers() {

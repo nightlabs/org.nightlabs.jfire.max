@@ -1,5 +1,6 @@
 package org.nightlabs.jfire.dunning;
 
+import java.util.Set;
 import java.util.SortedSet;
 
 import javax.jdo.annotations.IdentityType;
@@ -47,7 +48,7 @@ extends DunningFeeAdder
 	@Override
 	public void addDunningFee(DunningLetter dunningLetter) {
 		DunningConfig dunningConfig = dunningLetter.getDunningProcess().getDunningConfig();
-		SortedSet<ProcessDunningStep> processDunningSteps = dunningConfig.getProcessDunningSteps();
+		Set<ProcessDunningStep> processDunningSteps = dunningConfig.getProcessDunningSteps();
 		for (ProcessDunningStep processDunningStep : processDunningSteps) {
 			if (processDunningStep.getDunningLevel() == dunningLetter.getDunningLevel()) {
 				for (DunningFeeType dunningFeeType : processDunningStep.getFeeTypes()) {

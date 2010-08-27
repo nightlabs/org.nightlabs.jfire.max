@@ -88,6 +88,10 @@ implements Serializable, Comparable<AbstractDunningStep>
 		return dunningConfig;
 	}
 	
+	public void setDunningLevel(int dunningLevel) {
+		this.dunningLevel = dunningLevel;
+	}
+	
 	public int getDunningLevel() {
 		return dunningLevel;
 	}

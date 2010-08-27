@@ -29,6 +29,8 @@ package org.nightlabs.jfire.accounting.book.mappingbased;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 import javax.jdo.annotations.Column;
+import javax.jdo.annotations.Discriminator;
+import javax.jdo.annotations.DiscriminatorStrategy;
 import javax.jdo.annotations.IdentityType;
 import javax.jdo.annotations.Inheritance;
 import javax.jdo.annotations.InheritanceStrategy;
@@ -75,6 +77,7 @@ import org.nightlabs.jfire.trade.Article;
 		value="SELECT UNIQUE this WHERE moneyFlowDimensionID == paramMoneyFlowDimensionID PARAMETERS String paramMoneyFlowDimensionID import java.lang.String")
 )
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
+@Discriminator(strategy=DiscriminatorStrategy.CLASS_NAME)
 public abstract class MoneyFlowDimension {
 
 	private static final String FETCH_GROUP_GET_MONEY_FLOW_DIMENSION = "getMoneyFlowDimension";

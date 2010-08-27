@@ -167,6 +167,8 @@ implements AccountingManagerRemote, AccountingManagerLocal
 		try {
 //			SecurityChangeListenerTariffUserSet.register(pm);
 			pm.getExtent(PFMoneyFlowMapping.class);
+			pm.getExtent(OwnerDimension.class);
+			pm.getExtent(PriceFragmentDimension.class);
 
 			MoneyFlowDimension priceFragmentDimension = MoneyFlowDimension.getMoneyFlowDimension(pm, PriceFragmentDimension.MONEY_FLOW_DIMENSION_ID);
 			if (priceFragmentDimension == null) {

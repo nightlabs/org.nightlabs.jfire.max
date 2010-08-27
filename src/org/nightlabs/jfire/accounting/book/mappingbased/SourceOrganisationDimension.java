@@ -51,7 +51,8 @@ import javax.jdo.annotations.Inheritance;
 	identityType=IdentityType.APPLICATION,
 	detachable="true",
 	table="JFireTrade_SourceOrganisationDimension")
-@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
+//@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
+@Inheritance(strategy=InheritanceStrategy.SUPERCLASS_TABLE)
 public class SourceOrganisationDimension extends MoneyFlowDimension {
 
 	public static final String MONEY_FLOW_DIMENSION_ID = SourceOrganisationDimension.class.getName();

@@ -56,7 +56,8 @@ import org.nightlabs.jfire.trade.Article;
 	identityType=IdentityType.APPLICATION,
 	detachable="true",
 	table="JFireTrade_PriceFragmentDimension")
-@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
+//@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
+@Inheritance(strategy=InheritanceStrategy.SUPERCLASS_TABLE)
 public class PriceFragmentDimension extends MoneyFlowDimension {
 
 	public static final String MONEY_FLOW_DIMENSION_ID = PriceFragmentDimension.class.getName();

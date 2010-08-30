@@ -296,7 +296,7 @@ implements Serializable
 		return invoiceDunningSteps.addAll(sortedInvoiceDunningSteps);
 	}
 	
-	public Set<InvoiceDunningStep> getInvoiceDunningSteps() {
+	public SortedSet<InvoiceDunningStep> getInvoiceDunningSteps() {
 		if (sortedInvoiceDunningSteps == null) {
 			sortedInvoiceDunningSteps = new TreeSet<InvoiceDunningStep>();
 			for (InvoiceDunningStep is : invoiceDunningSteps) {

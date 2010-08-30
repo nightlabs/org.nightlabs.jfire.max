@@ -3,6 +3,8 @@ package org.nightlabs.jfire.dunning;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.FetchGroups;
 import javax.jdo.annotations.IdentityType;
 import javax.jdo.annotations.Inheritance;
 import javax.jdo.annotations.InheritanceStrategy;
@@ -27,12 +29,20 @@ import org.nightlabs.jfire.reporting.layout.ReportLayout;
 		table="JFireDunning_ProcessDunningStep"
 )
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
+@FetchGroups({
+	@FetchGroup(
+		fetchGroups={"default"},
+		name=ProcessDunningStep.FETCH_GROUP_DUNNING_FEE_TYPE,
+		members=@Persistent(name="feeTypes")
+	)
+})
 public class ProcessDunningStep 
 extends AbstractDunningStep
 {
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger = Logger.getLogger(ProcessDunningStep.class);
 	
+	public static final String FETCH_GROUP_DUNNING_FEE_TYPE = "ProcessDunningStep.feeTypes";
 	/**
 	 * The fees that should be applied to the new DunningLetter. 
 	 * 

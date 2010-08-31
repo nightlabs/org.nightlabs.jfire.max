@@ -56,7 +56,7 @@ implements Serializable
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger = Logger.getLogger(DunningConfigCustomer.class);
 	
-	public static final DunningConfigCustomerID DUNNING_CONFIG_CUSTOMER_DEFAULT_ID = DunningConfigCustomerID.create(Organisation.DEV_ORGANISATION_ID, "Default");
+	public static final String DUNNING_CONFIG_CUSTOMER_DEFAULT_ID = "Default";
 	
 	public static final String FETCH_GROUP_DUNNING_CONFIG = "DunningConfigCustomer.dunningConfig";
 	public static final String FETCH_GROUP_CUSTOMER = "DunningConfigCustomer.customer";

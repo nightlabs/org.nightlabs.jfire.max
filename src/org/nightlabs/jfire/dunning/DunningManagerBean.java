@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
@@ -308,7 +309,7 @@ implements DunningManagerRemote
 	public void initialise() throws Exception
 	{
 		PersistenceManager pm = createPersistenceManager();
-		String organisationIDStr = Organisation.DEV_ORGANISATION_ID;
+		String organisationIDStr = getOrganisationID();
 		String baseName = "org.nightlabs.jfire.dunning.resource.messages";
 		ClassLoader loader = DunningManagerBean.class.getClassLoader();
 
@@ -331,12 +332,12 @@ implements DunningManagerRemote
 
 			pm.getExtent(DunningConfigCustomer.class);
 			// check, whether the datastore is already initialized
+			 DunningConfigCustomerID dccID = DunningConfigCustomerID.create(getOrganisationID(), DunningConfigCustomer.DUNNING_CONFIG_CUSTOMER_DEFAULT_ID);
 			try {
-				pm.getObjectById(DunningConfigCustomer.DUNNING_CONFIG_CUSTOMER_DEFAULT_ID);
+				pm.getObjectById(dccID);
 				return; // already initialized
 			} catch (JDOObjectNotFoundException x) {
 				// datastore not yet initialized
-				DunningConfigCustomerID dccID = DunningConfigCustomer.DUNNING_CONFIG_CUSTOMER_DEFAULT_ID;
 				DunningConfig defaultDunningConfig = new DunningConfig(dccID.organisationID, dccID.dunningConfigCustomerID, DunningAutoMode.createAndFinalize);
 				defaultDunningConfig.getName().readFromProperties(baseName, loader, "org.nightlabs.jfire.dunning.DunningConfig.default.name");
 				defaultDunningConfig.getDescription().readFromProperties(baseName, loader, "org.nightlabs.jfire.dunning.DunningConfig.default.description");
@@ -345,21 +346,21 @@ implements DunningManagerRemote
 				ProcessDunningStep processStep1 = new ProcessDunningStep(organisationIDStr, IDGenerator.nextIDString(AbstractDunningStep.class), defaultDunningConfig, 1);
 				
 				InvoiceDunningStep invStep1 = new InvoiceDunningStep(organisationIDStr, IDGenerator.nextIDString(AbstractDunningStep.class), defaultDunningConfig, 1);
-				invStep1.setPeriodOfGraceMSec(31l * 24l * 60l * 60l * 1000l);
+				invStep1.setPeriodOfGraceMSec(TimeUnit.DAYS.toMillis(31));
 				invStep1.setInterestPercentage(new BigDecimal(0));
 				
 				//Step2
 				ProcessDunningStep processStep2 = new ProcessDunningStep(organisationIDStr, IDGenerator.nextIDString(AbstractDunningStep.class), defaultDunningConfig, 2);
 				
 				InvoiceDunningStep invStep2 = new InvoiceDunningStep(organisationIDStr, IDGenerator.nextIDString(AbstractDunningStep.class), defaultDunningConfig, 2);
-				invStep2.setPeriodOfGraceMSec(31l * 24l * 60l * 60l * 1000l);
+				invStep2.setPeriodOfGraceMSec(TimeUnit.DAYS.toMillis(31));
 				invStep2.setInterestPercentage(new BigDecimal(4));
 				
 				//Step3
 				ProcessDunningStep processStep3 = new ProcessDunningStep(organisationIDStr, IDGenerator.nextIDString(AbstractDunningStep.class), defaultDunningConfig, 3);
 				
 				InvoiceDunningStep invStep3 = new InvoiceDunningStep(organisationIDStr, IDGenerator.nextIDString(AbstractDunningStep.class), defaultDunningConfig, 3);
-				invStep3.setPeriodOfGraceMSec(31l * 24l * 60l * 60l * 1000l);
+				invStep3.setPeriodOfGraceMSec(TimeUnit.DAYS.toMillis(31));
 				invStep3.setInterestPercentage(new BigDecimal(4));
 				
 				//

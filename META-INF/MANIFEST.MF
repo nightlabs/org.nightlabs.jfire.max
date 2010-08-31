@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Reporting Server ODA Plug-in
+Bundle-SymbolicName: org.nightlabs.jfire.reporting.oda.server;singleton:=true
+Bundle-Version: 1.0.1.qualifier
+Bundle-ClassPath: .
+Bundle-Vendor: NightLabs.org
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.datatools.connectivity.oda,
+ org.nightlabs.jfire.reporting.oda.wrapper;bundle-version="1.1.0"
+Eclipse-LazyStart: true

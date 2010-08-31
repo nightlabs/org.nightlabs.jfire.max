@@ -55,6 +55,7 @@
 	       file="InvoiceBookingList.rptdesign" 
 	       id="InvoiceBookingList"
 	       overwriteOnInit="true"
+	       engineType="BIRT"
 	       >
 		<name language="de">Liste gebuchter Rechnungen</name>
 		<name language="en">Invoice booking list</name>

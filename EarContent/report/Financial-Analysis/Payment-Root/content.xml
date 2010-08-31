@@ -79,6 +79,7 @@
 		file="BookedArticlesWithPaymentInfo.rptdesign" 
 		id="BookedArticlesWithPaymentInfo"
 		overwriteOnInit="true"
+		engineType="BIRT"
 	>
 		<name language="de">Gebuchte Artikel mit Zahlungen</name>
 		<name language="en">Booked articles with payments</name>

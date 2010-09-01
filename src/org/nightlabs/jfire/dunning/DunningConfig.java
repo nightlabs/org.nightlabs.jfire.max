@@ -288,11 +288,13 @@ implements Serializable
 	
 	public boolean addInvoiceDunningStep(InvoiceDunningStep invoiceDunningStep) {
 		getInvoiceDunningSteps().add(invoiceDunningStep);
+		invoiceDunningSteps.clear();
 		return invoiceDunningSteps.addAll(sortedInvoiceDunningSteps);
 	}
 	
 	public boolean removeInvoiceDunningStep(InvoiceDunningStep invoiceDunningStep) {
 		getInvoiceDunningSteps().remove(invoiceDunningStep);
+		invoiceDunningSteps.clear();
 		return invoiceDunningSteps.addAll(sortedInvoiceDunningSteps);
 	}
 	
@@ -308,11 +310,13 @@ implements Serializable
 	
 	public boolean addProcessDunningStep(ProcessDunningStep processDunningStep) {
 		getProcessDunningSteps().add(processDunningStep);
+		processDunningSteps.clear();
 		return processDunningSteps.addAll(sortedProcessDunningSteps);
 	}
 	
 	public boolean removeProcessDunningStep(ProcessDunningStep processDunningStep) {
 		getProcessDunningSteps().remove(processDunningStep);
+		processDunningSteps.clear();
 		return processDunningSteps.addAll(sortedProcessDunningSteps);
 	}
 	

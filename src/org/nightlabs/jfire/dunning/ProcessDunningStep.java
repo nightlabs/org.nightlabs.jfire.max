@@ -1,6 +1,8 @@
 package org.nightlabs.jfire.dunning;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import javax.jdo.annotations.FetchGroup;
@@ -34,6 +36,11 @@ import org.nightlabs.jfire.reporting.layout.ReportLayout;
 		fetchGroups={"default"},
 		name=ProcessDunningStep.FETCH_GROUP_DUNNING_FEE_TYPE,
 		members=@Persistent(name="feeTypes")
+	),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name=ProcessDunningStep.FETCH_GROUP_LETTER_LAYOUT,
+		members=@Persistent(name="letterLayout")
 	)
 })
 public class ProcessDunningStep 
@@ -43,6 +50,7 @@ extends AbstractDunningStep
 	private static final Logger logger = Logger.getLogger(ProcessDunningStep.class);
 	
 	public static final String FETCH_GROUP_DUNNING_FEE_TYPE = "ProcessDunningStep.feeTypes";
+	public static final String FETCH_GROUP_LETTER_LAYOUT = "ProcessDunningStep.letterLayout";
 	/**
 	 * The fees that should be applied to the new DunningLetter. 
 	 * 
@@ -77,8 +85,16 @@ extends AbstractDunningStep
 		this.feeTypes = new ArrayList<DunningFeeType>();
 	}
 	
+	public void addFeeTypes(Collection<DunningFeeType> feeTypes) {
+		feeTypes.addAll(feeTypes);
+	}
+	
+	public void removeFeeTypes(Collection<DunningFeeType> feeTypes) {
+		feeTypes.removeAll(feeTypes);
+	}
+
 	public List<DunningFeeType> getFeeTypes() {
-		return feeTypes;
+		return Collections.unmodifiableList(feeTypes);
 	}
 	
 	public void setLetterLayout(ReportLayout letterLayout) {

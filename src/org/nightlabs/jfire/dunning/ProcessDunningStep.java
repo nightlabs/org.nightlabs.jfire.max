@@ -85,8 +85,16 @@ extends AbstractDunningStep
 		this.feeTypes = new ArrayList<DunningFeeType>();
 	}
 	
+	public void addFeeType(DunningFeeType feeType) {
+		feeTypes.add(feeType);
+	}
+	
 	public void addFeeTypes(Collection<DunningFeeType> feeTypes) {
 		feeTypes.addAll(feeTypes);
+	}
+	
+	public void removeFeeType(DunningFeeType feeType) {
+		feeTypes.remove(feeType);
 	}
 	
 	public void removeFeeTypes(Collection<DunningFeeType> feeTypes) {

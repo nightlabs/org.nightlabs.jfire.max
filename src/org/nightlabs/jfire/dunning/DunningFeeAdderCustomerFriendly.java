@@ -52,7 +52,7 @@ extends DunningFeeAdder
 		for (ProcessDunningStep processDunningStep : processDunningSteps) {
 			if (processDunningStep.getDunningLevel() == dunningLetter.getDunningLevel()) {
 				for (DunningFeeType dunningFeeType : processDunningStep.getFeeTypes()) {
-					dunningLetter.getDunningFees().add(dunningFeeType.getDunningFee());
+
 				}
 			}
 		}

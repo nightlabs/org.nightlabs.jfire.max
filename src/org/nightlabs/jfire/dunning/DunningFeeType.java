@@ -5,11 +5,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.jdo.annotations.Column;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.FetchGroups;
 import javax.jdo.annotations.IdentityType;
 import javax.jdo.annotations.Inheritance;
 import javax.jdo.annotations.InheritanceStrategy;
 import javax.jdo.annotations.Join;
-import javax.jdo.annotations.NullValue;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.PersistenceModifier;
 import javax.jdo.annotations.Persistent;
@@ -29,20 +30,31 @@ import org.nightlabs.l10n.Currency;
 		detachable="true",
 		table="JFireDunning_DunningFeeType")
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
+@FetchGroups({
+	@FetchGroup(
+		fetchGroups={"default"},
+		name=DunningConfig.FETCH_GROUP_NAME,
+		members=@Persistent(name="name")
+	),
+	@FetchGroup(
+		fetchGroups={"default"},
+		name=DunningConfig.FETCH_GROUP_DESCRIPTION,
+		members=@Persistent(name="description")
+	)
+})
 public class DunningFeeType 
 implements Serializable
 {
-private static final long serialVersionUID = 1L;
-	
+	private static final long serialVersionUID = 1L;
+
+	public static final String FETCH_GROUP_NAME = "DunningFeeType.name";
+	public static final String FETCH_GROUP_DESCRIPTION = "DunningFeeType.description";
 	@PrimaryKey
 	@Column(length=100)
 	private String organisationID;
 
 	@PrimaryKey
 	private long dunningFeeTypeID;
-	
-	@Persistent(nullValue=NullValue.EXCEPTION)
-	private DunningFee dunningFee;
 	
 	@Persistent(
 			dependent="true",
@@ -76,12 +88,11 @@ private static final long serialVersionUID = 1L;
 	 * @param organisationID first part of the primary key. The organisation which created this object.
 	 * @param dunningFeeTypeID second part of the primary key. A local identifier within the namespace of the organisation.
 	 */
-	public DunningFeeType(String organisationID, long dunningFeeTypeID, DunningFee dunningFee) {
+	public DunningFeeType(String organisationID, long dunningFeeTypeID) {
 		Organisation.assertValidOrganisationID(organisationID);
 		
 		this.organisationID = organisationID;
 		this.dunningFeeTypeID = dunningFeeTypeID;
-		this.dunningFee = dunningFee;
 		
 		this.name = new DunningFeeTypeName(this);
 		this.description = new DunningFeeTypeDescription(organisationID, dunningFeeTypeID, this);
@@ -95,10 +106,6 @@ private static final long serialVersionUID = 1L;
 	
 	public long getDunningFeeTypeID() {
 		return dunningFeeTypeID;
-	}
-	
-	public DunningFee getDunningFee() {
-		return dunningFee;
 	}
 	
 	public DunningFeeTypeName getName() {

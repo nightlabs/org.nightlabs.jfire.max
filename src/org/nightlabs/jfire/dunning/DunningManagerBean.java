@@ -337,6 +337,10 @@ implements DunningManagerRemote
 				pm.getObjectById(dccID);
 				return; // already initialized
 			} catch (JDOObjectNotFoundException x) {
+				DunningFeeType defaultDunningFeeType = new DunningFeeType(dccID.organisationID, IDGenerator.nextID(DunningFeeType.class));
+				defaultDunningFeeType.getName().readFromProperties(baseName, loader, "org.nightlabs.jfire.dunning.DunningFeeType.default.name");
+				defaultDunningFeeType.getDescription().readFromProperties(baseName, loader, "org.nightlabs.jfire.dunning.DunningFeeType.default.description");
+				
 				// datastore not yet initialized
 				DunningConfig defaultDunningConfig = new DunningConfig(dccID.organisationID, dccID.dunningConfigCustomerID, DunningAutoMode.createAndFinalize);
 				defaultDunningConfig.getName().readFromProperties(baseName, loader, "org.nightlabs.jfire.dunning.DunningConfig.default.name");
@@ -344,6 +348,7 @@ implements DunningManagerRemote
 				
 				//Step1
 				ProcessDunningStep processStep1 = new ProcessDunningStep(organisationIDStr, IDGenerator.nextIDString(AbstractDunningStep.class), defaultDunningConfig, 1);
+				processStep1.addFeeType(defaultDunningFeeType);
 				
 				InvoiceDunningStep invStep1 = new InvoiceDunningStep(organisationIDStr, IDGenerator.nextIDString(AbstractDunningStep.class), defaultDunningConfig, 1);
 				invStep1.setPeriodOfGraceMSec(TimeUnit.DAYS.toMillis(31));
@@ -351,6 +356,7 @@ implements DunningManagerRemote
 				
 				//Step2
 				ProcessDunningStep processStep2 = new ProcessDunningStep(organisationIDStr, IDGenerator.nextIDString(AbstractDunningStep.class), defaultDunningConfig, 2);
+				processStep2.addFeeType(defaultDunningFeeType);
 				
 				InvoiceDunningStep invStep2 = new InvoiceDunningStep(organisationIDStr, IDGenerator.nextIDString(AbstractDunningStep.class), defaultDunningConfig, 2);
 				invStep2.setPeriodOfGraceMSec(TimeUnit.DAYS.toMillis(31));

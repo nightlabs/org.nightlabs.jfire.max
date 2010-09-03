@@ -32,7 +32,7 @@ import java.util.regex.Pattern;
 
 
 /**
- * Parser for JDOQL to get {@link org.eclipse.datatools.connectivity.oda.IResultSetMetaData}
+ * Parser for JDOQL to get {@link org.eclipse.datatools.connectivity.oda.jfire.IResultSetMetaData}
  * without executing the query.
  * 
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>

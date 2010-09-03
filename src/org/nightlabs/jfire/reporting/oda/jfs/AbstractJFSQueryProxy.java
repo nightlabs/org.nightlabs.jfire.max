@@ -3,8 +3,8 @@
  */
 package org.nightlabs.jfire.reporting.oda.jfs;
 
-import org.eclipse.datatools.connectivity.oda.IParameterMetaData;
-import org.eclipse.datatools.connectivity.oda.OdaException;
+import org.eclipse.datatools.connectivity.oda.jfire.IParameterMetaData;
+import org.eclipse.datatools.connectivity.oda.jfire.JFireOdaException;
 import org.nightlabs.jfire.reporting.JFireReportingHelper;
 import org.nightlabs.jfire.reporting.oda.Query;
 import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
@@ -33,7 +33,7 @@ public abstract class AbstractJFSQueryProxy extends Query implements IJFSQueryPr
 	}
 
 	@Override
-	public IParameterMetaData getParameterMetaData() throws OdaException {
+	public IParameterMetaData getParameterMetaData() throws JFireOdaException {
 		// TODO: Implement getParameterMetaData for JFS Scripts (Possible with ParameterSet)
 		return super.getParameterMetaData();
 	}
@@ -42,9 +42,9 @@ public abstract class AbstractJFSQueryProxy extends Query implements IJFSQueryPr
 	 * Checks if the query is set to an JDO-ObjectID String and
 	 * creates a ScriptRegistryID if possible.
 	 * 
-	 * @see org.eclipse.datatools.connectivity.oda.IQuery#prepare(java.lang.String)
+	 * @see org.eclipse.datatools.connectivity.oda.jfire.IQuery#prepare(java.lang.String)
 	 */
-	public void prepare(String query) throws OdaException {
+	public void prepare(String query) throws JFireOdaException {
 		queryPropertySet = JFSQueryUtil.createPropertySetFromQueryString(query);
 		if (queryPropertySet == null)
 			throw new IllegalStateException("QueryPropertySet has not been created.");

@@ -31,8 +31,8 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import org.eclipse.datatools.connectivity.oda.IResultSetMetaData;
-import org.eclipse.datatools.connectivity.oda.OdaException;
+import org.eclipse.datatools.connectivity.oda.jfire.IResultSetMetaData;
+import org.eclipse.datatools.connectivity.oda.jfire.JFireOdaException;
 import org.nightlabs.jfire.reporting.oda.ResultSetMetaData;
 
 /**
@@ -86,7 +86,7 @@ implements IJDOQLQueryMetaData
 						
 					);
 				}
-			} catch (OdaException e) {
+			} catch (JFireOdaException e) {
 				throw new RuntimeException(e);
 			}
 		}
@@ -106,7 +106,7 @@ implements IJDOQLQueryMetaData
 				try {
 					if (metaData != null && metaData.getColumnCount() >= i)
 						colName = metaData.getColumnName(i);
-				} catch (OdaException e) {
+				} catch (JFireOdaException e) {
 					throw new RuntimeException(e);
 				}
 				setColumn(i, colName, col.getClass(), java.sql.ResultSetMetaData.columnNullable);

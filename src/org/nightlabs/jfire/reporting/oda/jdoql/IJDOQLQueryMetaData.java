@@ -28,7 +28,7 @@ package org.nightlabs.jfire.reporting.oda.jdoql;
 
 import java.io.Serializable;
 
-import org.eclipse.datatools.connectivity.oda.IResultSetMetaData;
+import org.eclipse.datatools.connectivity.oda.jfire.IResultSetMetaData;
 
 /**
  * 

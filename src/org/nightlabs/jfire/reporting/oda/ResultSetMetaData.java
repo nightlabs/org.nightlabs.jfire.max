@@ -30,8 +30,8 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.datatools.connectivity.oda.IResultSetMetaData;
-import org.eclipse.datatools.connectivity.oda.OdaException;
+import org.eclipse.datatools.connectivity.oda.jfire.IResultSetMetaData;
+import org.eclipse.datatools.connectivity.oda.jfire.JFireOdaException;
 
 /**
  * Common type for all oda resultset metadata in JFireReporting.
@@ -73,9 +73,9 @@ public class ResultSetMetaData implements IResultSetMetaData, Serializable {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.datatools.connectivity.oda.IResultSetMetaData#getColumnCount()
+	 * @see org.eclipse.datatools.connectivity.oda.jfire.IResultSetMetaData#getColumnCount()
 	 */
-	public int getColumnCount() throws OdaException {
+	public int getColumnCount() throws JFireOdaException {
 		return columns.size();
 	}
 	
@@ -146,23 +146,23 @@ public class ResultSetMetaData implements IResultSetMetaData, Serializable {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.datatools.connectivity.oda.IResultSetMetaData#getColumnName(int)
+	 * @see org.eclipse.datatools.connectivity.oda.jfire.IResultSetMetaData#getColumnName(int)
 	 */
-	public String getColumnName(int index) throws OdaException {
+	public String getColumnName(int index) throws JFireOdaException {
 		return getColumn(index).getName();
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.datatools.connectivity.oda.IResultSetMetaData#getColumnLabel(int)
+	 * @see org.eclipse.datatools.connectivity.oda.jfire.IResultSetMetaData#getColumnLabel(int)
 	 */
-	public String getColumnLabel(int index) throws OdaException {
+	public String getColumnLabel(int index) throws JFireOdaException {
 		return getColumn(index).getName();
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.datatools.connectivity.oda.IResultSetMetaData#getColumnType(int)
+	 * @see org.eclipse.datatools.connectivity.oda.jfire.IResultSetMetaData#getColumnType(int)
 	 */
-	public int getColumnType(int index) throws OdaException {
+	public int getColumnType(int index) throws JFireOdaException {
 		return getColumnDataType(index);
 	}
 	
@@ -171,38 +171,38 @@ public class ResultSetMetaData implements IResultSetMetaData, Serializable {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.datatools.connectivity.oda.IResultSetMetaData#getColumnTypeName(int)
+	 * @see org.eclipse.datatools.connectivity.oda.jfire.IResultSetMetaData#getColumnTypeName(int)
 	 */
-	public String getColumnTypeName(int index) throws OdaException {
+	public String getColumnTypeName(int index) throws JFireOdaException {
 		return DataType.getTypeName(getColumnType(index)).toString();
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.datatools.connectivity.oda.IResultSetMetaData#getColumnDisplayLength(int)
+	 * @see org.eclipse.datatools.connectivity.oda.jfire.IResultSetMetaData#getColumnDisplayLength(int)
 	 */
-	public int getColumnDisplayLength(int index) throws OdaException {
+	public int getColumnDisplayLength(int index) throws JFireOdaException {
 		return 0;
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.datatools.connectivity.oda.IResultSetMetaData#getPrecision(int)
+	 * @see org.eclipse.datatools.connectivity.oda.jfire.IResultSetMetaData#getPrecision(int)
 	 */
-	public int getPrecision(int index) throws OdaException {
+	public int getPrecision(int index) throws JFireOdaException {
 		return 0;
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.datatools.connectivity.oda.IResultSetMetaData#getScale(int)
+	 * @see org.eclipse.datatools.connectivity.oda.jfire.IResultSetMetaData#getScale(int)
 	 */
-	public int getScale(int index) throws OdaException {
+	public int getScale(int index) throws JFireOdaException {
 		// TODO Auto-generated method stub
 		return 2;
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.datatools.connectivity.oda.IResultSetMetaData#isNullable(int)
+	 * @see org.eclipse.datatools.connectivity.oda.jfire.IResultSetMetaData#isNullable(int)
 	 */
-	public int isNullable(int index) throws OdaException {
+	public int isNullable(int index) throws JFireOdaException {
 		return getColumn(index).isNullable();
 	}
 }

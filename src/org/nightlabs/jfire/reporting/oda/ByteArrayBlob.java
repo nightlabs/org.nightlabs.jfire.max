@@ -6,8 +6,8 @@ package org.nightlabs.jfire.reporting.oda;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
-import org.eclipse.datatools.connectivity.oda.IBlob;
-import org.eclipse.datatools.connectivity.oda.OdaException;
+import org.eclipse.datatools.connectivity.oda.jfire.IBlob;
+import org.eclipse.datatools.connectivity.oda.jfire.JFireOdaException;
 
 /**
  * @author Alexander Bieber
@@ -28,7 +28,7 @@ public class ByteArrayBlob implements IBlob {
 	 * @see org.eclipse.datatools.connectivity.oda.IBlob#getBinaryStream()
 	 */
 	@Override
-	public InputStream getBinaryStream() throws OdaException {
+	public InputStream getBinaryStream() throws JFireOdaException {
 		return new ByteArrayInputStream(bytes);
 	}
 
@@ -36,7 +36,7 @@ public class ByteArrayBlob implements IBlob {
 	 * @see org.eclipse.datatools.connectivity.oda.IBlob#getBytes(long, int)
 	 */
 	@Override
-	public byte[] getBytes(long arg0, int arg1) throws OdaException {
+	public byte[] getBytes(long arg0, int arg1) throws JFireOdaException {
 		return bytes;
 	}
 
@@ -44,7 +44,7 @@ public class ByteArrayBlob implements IBlob {
 	 * @see org.eclipse.datatools.connectivity.oda.IBlob#length()
 	 */
 	@Override
-	public long length() throws OdaException {
+	public long length() throws JFireOdaException {
 		return bytes.length;
 	}
 

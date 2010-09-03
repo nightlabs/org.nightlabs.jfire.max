@@ -4,6 +4,7 @@
 package org.nightlabs.jfire.reporting.scripting.javaclass.prop;
 
 import java.util.Iterator;
+
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -14,7 +15,7 @@ import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 
 import org.apache.log4j.Logger;
-import org.eclipse.datatools.connectivity.oda.IResultSetMetaData;
+import org.eclipse.datatools.connectivity.oda.jfire.IResultSetMetaData;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.prop.DataField;
 import org.nightlabs.jfire.prop.IStruct;

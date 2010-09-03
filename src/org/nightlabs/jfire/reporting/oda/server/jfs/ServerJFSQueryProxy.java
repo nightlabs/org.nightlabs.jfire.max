@@ -5,13 +5,14 @@ package org.nightlabs.jfire.reporting.oda.server.jfs;
 
 import java.util.Map;
 
+
 import javax.jdo.PersistenceManager;
 
 import org.apache.log4j.Logger;
-import org.eclipse.datatools.connectivity.oda.IParameterMetaData;
-import org.eclipse.datatools.connectivity.oda.IResultSet;
-import org.eclipse.datatools.connectivity.oda.IResultSetMetaData;
-import org.eclipse.datatools.connectivity.oda.OdaException;
+import org.eclipse.datatools.connectivity.oda.jfire.IParameterMetaData;
+import org.eclipse.datatools.connectivity.oda.jfire.IResultSet;
+import org.eclipse.datatools.connectivity.oda.jfire.IResultSetMetaData;
+import org.eclipse.datatools.connectivity.oda.jfire.JFireOdaException;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.reporting.oda.JFireReportingOdaException;
 import org.nightlabs.jfire.reporting.oda.ParameterMetaData;
@@ -58,7 +59,7 @@ public class ServerJFSQueryProxy extends AbstractJFSQueryProxy {
 	/* (non-Javadoc)
 	 * @see org.eclipse.datatools.connectivity.oda.IQuery#close()
 	 */
-	public void close() throws OdaException {
+	public void close() throws JFireOdaException {
 		logger.debug("close() IQuery.");
 //		closePersistenceManager();
 	}
@@ -71,14 +72,14 @@ public class ServerJFSQueryProxy extends AbstractJFSQueryProxy {
 	 */
 	@Override
 	public IParameterMetaData getParameterMetaData()
-	throws OdaException
+	throws JFireOdaException
 	{
 		if (parameterMetaData == null) {
 			ScriptRegistryItemID itemID = getScriptRegistryItemID();
 			try {
 				parameterMetaData = getScriptParameterMetaData(itemID);
 			} catch (JFireReportingOdaException e) {
-				throw new OdaException(e);
+				throw new JFireOdaException(e);
 			}
 		}
 		return parameterMetaData;
@@ -90,16 +91,16 @@ public class ServerJFSQueryProxy extends AbstractJFSQueryProxy {
 	 * Calls {@link #getJFSResultSet(ScriptRegistryItemID, Map)} with the
 	 * parameters of this script.
 	 * 
-	 * @see org.eclipse.datatools.connectivity.oda.IQuery#executeQuery()
+	 * @see org.eclipse.datatools.connectivity.oda.jfire.IQuery#executeQuery()
 	 */
-	public IResultSet executeQuery() throws OdaException {
+	public IResultSet executeQuery() throws JFireOdaException {
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			try {
 				return getJFSResultSet(pm, getScriptRegistryItemID(), getJFSQueryPropertySet(), getNamedParameters());
 			} catch (Exception e) {
 				logger.error("Could not get ResultSet", e);
-				OdaException ex = new OdaException("Could not get ResultSet "+e.getMessage());
+				JFireOdaException ex = new JFireOdaException("Could not get ResultSet "+e.getMessage());
 				ex.initCause(e);
 				throw ex;
 			}
@@ -114,15 +115,15 @@ public class ServerJFSQueryProxy extends AbstractJFSQueryProxy {
 	 * Calls {@link #getJFSResultSetMetaData(ScriptRegistryItemID)} with the
 	 * {@link ScriptRegistryItemID} associated to the calling data set.
 	 * 
-	 * @see org.eclipse.datatools.connectivity.oda.IQuery#getMetaData()
+	 * @see org.eclipse.datatools.connectivity.oda.jfire.IQuery#getMetaData()
 	 */
-	public IResultSetMetaData getMetaData() throws OdaException {
+	public IResultSetMetaData getMetaData() throws JFireOdaException {
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			try {
 				return getJFSResultSetMetaData(pm, getScriptRegistryItemID(), getJFSQueryPropertySet());
 			} catch (Exception e) {
-				OdaException ex = new OdaException("Could not get MetaData "+e.getMessage());
+				JFireOdaException ex = new JFireOdaException("Could not get MetaData "+e.getMessage());
 				ex.initCause(e);
 				throw ex;
 			}

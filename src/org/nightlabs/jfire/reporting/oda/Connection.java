@@ -27,12 +27,13 @@
 package org.nightlabs.jfire.reporting.oda;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 
-import org.eclipse.datatools.connectivity.oda.IConnection;
-import org.eclipse.datatools.connectivity.oda.IDataSetMetaData;
-import org.eclipse.datatools.connectivity.oda.OdaException;
+import org.eclipse.datatools.connectivity.oda.jfire.IConnection;
+import org.eclipse.datatools.connectivity.oda.jfire.IDataSetMetaData;
+import org.eclipse.datatools.connectivity.oda.jfire.JFireOdaException;
 
 /**
  * Common type for oda IConnections in JFireReporting.
@@ -47,13 +48,15 @@ public abstract class Connection implements IConnection {
 	private Map currentProperties;
 	private Object appContext;
 	
+	private Locale locale;
+	
 	public Map getConnectionProperties() {
 		return currentProperties;
 	}
 	/* (non-Javadoc)
 	 * @see org.eclipse.datatools.connectivity.oda.IConnection#open(java.util.Properties)
 	 */
-	public void open(Properties connProperties) throws OdaException {
+	public void open(Properties connProperties) throws JFireOdaException {
 		// TODO: obtain IJDOQueryProxy
 		currentProperties = connProperties;
 	}
@@ -61,7 +64,7 @@ public abstract class Connection implements IConnection {
 	/* (non-Javadoc)
 	 * @see org.eclipse.datatools.connectivity.oda.IConnection#setAppContext(java.lang.Object)
 	 */
-	public void setAppContext(Object context) throws OdaException {
+	public void setAppContext(Object context) throws JFireOdaException {
 		this.appContext = context;
 	}
 	
@@ -75,21 +78,21 @@ public abstract class Connection implements IConnection {
 	/* (non-Javadoc)
 	 * @see org.eclipse.datatools.connectivity.oda.IConnection#close()
 	 */
-	public void close() throws OdaException {
+	public void close() throws JFireOdaException {
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.datatools.connectivity.oda.IConnection#isOpen()
 	 */
-	public boolean isOpen() throws OdaException {
+	public boolean isOpen() throws JFireOdaException {
 		return currentProperties != null;
 	}
 
 	/**
 	 * Does nothing.
-	 * @see org.eclipse.datatools.connectivity.oda.IConnection#getMetaData(java.lang.String)
+	 * @see org.eclipse.datatools.connectivity.oda.jfire.IConnection#getMetaData(java.lang.String)
 	 */
-	public IDataSetMetaData getMetaData(String dataSetType) throws OdaException {
+	public IDataSetMetaData getMetaData(String dataSetType) throws JFireOdaException {
 		// TODO Auto-generated method stub
 		return new ConnectionMetaData(this);
 	}
@@ -97,22 +100,27 @@ public abstract class Connection implements IConnection {
 	/* (non-Javadoc)
 	 * @see org.eclipse.datatools.connectivity.oda.IConnection#getMaxQueries()
 	 */
-	public int getMaxQueries() throws OdaException {
+	public int getMaxQueries() throws JFireOdaException {
 		return 0;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.datatools.connectivity.oda.IConnection#commit()
 	 */
-	public void commit() throws OdaException {
+	public void commit() throws JFireOdaException {
 		// TODO Auto-generated method stub
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.datatools.connectivity.oda.IConnection#rollback()
 	 */
-	public void rollback() throws OdaException {
+	public void rollback() throws JFireOdaException {
 		// TODO Auto-generated method stub
+	}
+	
+	@Override
+	public void setLocale(Locale locale) throws JFireOdaException {
+		this.locale = locale;
 	}
 	
 	/**

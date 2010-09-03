@@ -3,8 +3,8 @@
  */
 package org.nightlabs.jfire.reporting.oda.jfs;
 
-import org.eclipse.datatools.connectivity.oda.IQuery;
-import org.eclipse.datatools.connectivity.oda.OdaException;
+import org.eclipse.datatools.connectivity.oda.jfire.IQuery;
+import org.eclipse.datatools.connectivity.oda.jfire.JFireOdaException;
 import org.nightlabs.jfire.reporting.oda.Connection;
 
 /**
@@ -26,7 +26,7 @@ public class JFSConnection extends Connection {
 	/* (non-Javadoc)
 	 * @see org.eclipse.datatools.connectivity.oda.IConnection#newQuery(java.lang.String)
 	 */
-	public IQuery newQuery(String arg0) throws OdaException {
+	public IQuery newQuery(String arg0) throws JFireOdaException {
 		if (getConnectionProperties() == null)
 			throw new IllegalStateException("Connection properties are not assigned. Maybe open() was never called!");
 		return proxyFactory.createJFSQueryProxy(getConnectionProperties());

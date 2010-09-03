@@ -28,8 +28,8 @@ package org.nightlabs.jfire.reporting.oda.jdoql;
 
 import java.util.Collection;
 
-import org.eclipse.datatools.connectivity.oda.IResultSet;
-import org.eclipse.datatools.connectivity.oda.OdaException;
+import org.eclipse.datatools.connectivity.oda.jfire.IResultSet;
+import org.eclipse.datatools.connectivity.oda.jfire.JFireOdaException;
 import org.nightlabs.jfire.reporting.oda.ResultSet;
 
 
@@ -52,7 +52,7 @@ public class JDOQLResultSet extends ResultSet implements IResultSet {
 		super(JDOQLMetaDataParser.parseJDOQLMetaData(jdoqlQuery));
 		try {
 			setMetaData((JDOQLResultSetMetaData)getMetaData(), collection);
-		} catch (OdaException e) {
+		} catch (JFireOdaException e) {
 			throw new RuntimeException(e);
 		}
 	}

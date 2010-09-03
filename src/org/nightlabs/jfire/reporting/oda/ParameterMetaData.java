@@ -9,9 +9,9 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.eclipse.datatools.connectivity.oda.IParameterMetaData;
-import org.eclipse.datatools.connectivity.oda.IResultSetMetaData;
-import org.eclipse.datatools.connectivity.oda.OdaException;
+import org.eclipse.datatools.connectivity.oda.jfire.IParameterMetaData;
+import org.eclipse.datatools.connectivity.oda.jfire.IResultSetMetaData;
+import org.eclipse.datatools.connectivity.oda.jfire.JFireOdaException;
 import org.nightlabs.jfire.scripting.ScriptParameter;
 import org.nightlabs.jfire.scripting.ScriptParameterSet;
 
@@ -157,7 +157,7 @@ public class ParameterMetaData implements NamedParameterMetaData, Serializable {
 	/* (non-Javadoc)
 	 * @see org.eclipse.datatools.connectivity.oda.IParameterMetaData#getParameterCount()
 	 */
-	public int getParameterCount() throws OdaException {
+	public int getParameterCount() throws JFireOdaException {
 		return parameters.size();
 	}
 
@@ -183,42 +183,42 @@ public class ParameterMetaData implements NamedParameterMetaData, Serializable {
 	/* (non-Javadoc)
 	 * @see org.eclipse.datatools.connectivity.oda.IParameterMetaData#getParameterMode(int)
 	 */
-	public int getParameterMode(int pPosition) throws OdaException {
+	public int getParameterMode(int pPosition) throws JFireOdaException {
 		return getDescriptor(pPosition).getMode();
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.datatools.connectivity.oda.IParameterMetaData#getParameterType(int)
 	 */
-	public int getParameterType(int pPosition) throws OdaException {
+	public int getParameterType(int pPosition) throws JFireOdaException {
 		return getDescriptor(pPosition).getDataType();
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.datatools.connectivity.oda.IParameterMetaData#getParameterTypeName(int)
 	 */
-	public String getParameterTypeName(int pPosition) throws OdaException {
+	public String getParameterTypeName(int pPosition) throws JFireOdaException {
 		return getDescriptor(pPosition).getDataTypeName();
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.datatools.connectivity.oda.IParametParameterDescriptorerMetaData#getPrecision(int)
 	 */
-	public int getPrecision(int pPosition) throws OdaException {
+	public int getPrecision(int pPosition) throws JFireOdaException {
 		return getDescriptor(pPosition).getPrecision();
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.datatools.connectivity.oda.IParameterMetaData#getScale(int)
 	 */
-	public int getScale(int pPosition) throws OdaException {
+	public int getScale(int pPosition) throws JFireOdaException {
 		return getDescriptor(pPosition).getScale();
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.datatools.connectivity.oda.IParameterMetaData#isNullable(int)
 	 */
-	public int isNullable(int pPosition) throws OdaException {
+	public int isNullable(int pPosition) throws JFireOdaException {
 		return getDescriptor(pPosition).isNullable();
 	}
 	
@@ -267,7 +267,7 @@ public class ParameterMetaData implements NamedParameterMetaData, Serializable {
 				for (int i = 0; i < result.getParameterCount(); i++) {
 					logger.debug("Parameter "+(i+1)+": "+result.getParameterName(i+1)+", "+result.getParameterTypeName(i+1));
 				}
-			} catch (OdaException e) {
+			} catch (JFireOdaException e) {
 				throw new JFireReportingOdaException(e);
 			}
 		}

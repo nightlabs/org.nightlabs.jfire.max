@@ -38,11 +38,11 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.eclipse.datatools.connectivity.oda.IBlob;
-import org.eclipse.datatools.connectivity.oda.IClob;
-import org.eclipse.datatools.connectivity.oda.IResultSet;
-import org.eclipse.datatools.connectivity.oda.IResultSetMetaData;
-import org.eclipse.datatools.connectivity.oda.OdaException;
+import org.eclipse.datatools.connectivity.oda.jfire.IBlob;
+import org.eclipse.datatools.connectivity.oda.jfire.IClob;
+import org.eclipse.datatools.connectivity.oda.jfire.IResultSet;
+import org.eclipse.datatools.connectivity.oda.jfire.IResultSetMetaData;
+import org.eclipse.datatools.connectivity.oda.jfire.JFireOdaException;
 
 
 /**
@@ -90,31 +90,31 @@ public abstract class ResultSet implements IResultSet, Serializable {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.datatools.connectivity.oda.IResultSet#getMetaData()
+	 * @see org.eclipse.datatools.connectivity.oda.jfire.IResultSet#getMetaData()
 	 */
-	public IResultSetMetaData getMetaData() throws OdaException {
+	public IResultSetMetaData getMetaData() throws JFireOdaException {
 		return metaData;
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.datatools.connectivity.oda.IResultSet#close()
+	 * @see org.eclipse.datatools.connectivity.oda.jfire.IResultSet#close()
 	 */
-	public void close() throws OdaException {
+	public void close() throws JFireOdaException {
 		iterator = null;
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.datatools.connectivity.oda.IResultSet#setMaxRows(int)
+	 * @see org.eclipse.datatools.connectivity.oda.jfire.IResultSet#setMaxRows(int)
 	 */
-	public void setMaxRows(int max) throws OdaException {
+	public void setMaxRows(int max) throws JFireOdaException {
 		// TODO: Maybe implement
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.datatools.connectivity.oda.IResultSet#next()
+	 * @see org.eclipse.datatools.connectivity.oda.jfire.IResultSet#next()
 	 */
 	@SuppressWarnings("unchecked")
-	public boolean next() throws OdaException {
+	public boolean next() throws JFireOdaException {
 		if (iterator == null)
 			return false;
 		if (iterator.hasNext()) {
@@ -133,30 +133,30 @@ public abstract class ResultSet implements IResultSet, Serializable {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.datatools.connectivity.oda.IResultSet#getRow()
+	 * @see org.eclipse.datatools.connectivity.oda.jfire.IResultSet#getRow()
 	 */
-	public int getRow() throws OdaException {
+	public int getRow() throws JFireOdaException {
 		return currPos;
 	}
 
-	private void checkRow() throws OdaException {
+	private void checkRow() throws JFireOdaException {
 		if (currRowCols == null)
-			throw new OdaException("The current rows columns are not assigned (maybe next() was never called)");
+			throw new JFireOdaException("The current rows columns are not assigned (maybe next() was never called)");
 	}
 	
-	private Object getColObject(int index) throws OdaException {
+	private Object getColObject(int index) throws JFireOdaException {
 		checkRow();
 		if (index < 1 || index > currRowCols.size() )
-			throw new OdaException("The given column index is invalid: "+index+". Number of columns is "+currRowCols.size());
+			throw new JFireOdaException("The given column index is invalid: "+index+". Number of columns is "+currRowCols.size());
 		return currRowCols.get(index - 1);
 	}
 	
 	@SuppressWarnings("unchecked")
-	private <T> T checkColObject(int index, Class<T> objectClass) throws OdaException {
+	private <T> T checkColObject(int index, Class<T> objectClass) throws JFireOdaException {
 		Object o = getColObject(index);
 		if (o != null) {
 			if (!objectClass.isAssignableFrom(o.getClass()))
-				throw new OdaException("Column "+index+" can not be treated as "+objectClass.getName()+" it is "+o.getClass().getName());
+				throw new JFireOdaException("Column "+index+" can not be treated as "+objectClass.getName()+" it is "+o.getClass().getName());
 		}
 		return (T) o;
 	}
@@ -166,159 +166,168 @@ public abstract class ResultSet implements IResultSet, Serializable {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.datatools.connectivity.oda.IResultSet#getString(int)
+	 * @see org.eclipse.datatools.connectivity.oda.jfire.IResultSet#getString(int)
 	 */
-	public String getString(int index) throws OdaException {
+	public String getString(int index) throws JFireOdaException {
 		String s = checkColObject(index, String.class);
 		return s != null ? s : "";
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.datatools.connectivity.oda.IResultSet#getString(java.lang.String)
+	 * @see org.eclipse.datatools.connectivity.oda.jfire.IResultSet#getString(java.lang.String)
 	 */
-	public String getString(String columnName) throws OdaException {
+	public String getString(String columnName) throws JFireOdaException {
 		return getString(findColumn(columnName));
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.datatools.connectivity.oda.IResultSet#getInt(int)
+	 * @see org.eclipse.datatools.connectivity.oda.jfire.IResultSet#getInt(int)
 	 */
-	public int getInt(int index) throws OdaException {
+	public int getInt(int index) throws JFireOdaException {
 		Integer i = checkColObject(index, Integer.class);
 		return i != null ? i.intValue() : 0;
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.datatools.connectivity.oda.IResultSet#getInt(java.lang.String)
+	 * @see org.eclipse.datatools.connectivity.oda.jfire.IResultSet#getInt(java.lang.String)
 	 */
-	public int getInt(String columnName) throws OdaException {
+	public int getInt(String columnName) throws JFireOdaException {
 		return getInt(findColumn(columnName));
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.datatools.connectivity.oda.IResultSet#getDouble(int)
+	 * @see org.eclipse.datatools.connectivity.oda.jfire.IResultSet#getDouble(int)
 	 */
-	public double getDouble(int index) throws OdaException {
+	public double getDouble(int index) throws JFireOdaException {
 		Double d = checkColObject(index, Double.class);
 		return d != null ? d.doubleValue() : 0d;
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.datatools.connectivity.oda.IResultSet#getDouble(java.lang.String)
+	 * @see org.eclipse.datatools.connectivity.oda.jfire.IResultSet#getDouble(java.lang.String)
 	 */
-	public double getDouble(String columnName) throws OdaException {
+	public double getDouble(String columnName) throws JFireOdaException {
 		return getDouble(findColumn(columnName));
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.datatools.connectivity.oda.IResultSet#getBigDecimal(int)
+	 * @see org.eclipse.datatools.connectivity.oda.jfire.IResultSet#getBigDecimal(int)
 	 */
-	public BigDecimal getBigDecimal(int index) throws OdaException {
+	public BigDecimal getBigDecimal(int index) throws JFireOdaException {
 		Long l = checkColObject(index, Long.class);
 		return new BigDecimal(l != null ? l.longValue() : 0);
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.datatools.connectivity.oda.IResultSet#getBigDecimal(java.lang.String)
+	 * @see org.eclipse.datatools.connectivity.oda.jfire.IResultSet#getBigDecimal(java.lang.String)
 	 */
-	public BigDecimal getBigDecimal(String columnName) throws OdaException {
+	public BigDecimal getBigDecimal(String columnName) throws JFireOdaException {
 		return getBigDecimal(findColumn(columnName));
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.datatools.connectivity.oda.IResultSet#getDate(int)
+	 * @see org.eclipse.datatools.connectivity.oda.jfire.IResultSet#getDate(int)
 	 */
-	public Date getDate(int index) throws OdaException {
+	public Date getDate(int index) throws JFireOdaException {
 		java.util.Date date = checkColObject(index, java.util.Date.class);
 		return date != null ? new Date(date.getTime()) : null;
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.datatools.connectivity.oda.IResultSet#getDate(java.lang.String)
+	 * @see org.eclipse.datatools.connectivity.oda.jfire.IResultSet#getDate(java.lang.String)
 	 */
-	public Date getDate(String columnName) throws OdaException {
+	public Date getDate(String columnName) throws JFireOdaException {
 		return getDate(findColumn(columnName));
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.datatools.connectivity.oda.IResultSet#getTime(int)
+	 * @see org.eclipse.datatools.connectivity.oda.jfire.IResultSet#getTime(int)
 	 */
-	public Time getTime(int index) throws OdaException {
+	public Time getTime(int index) throws JFireOdaException {
 		java.util.Date date = checkColObject(index, java.util.Date.class); 
 		return new Time(date != null ? date.getTime() : 0);
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.datatools.connectivity.oda.IResultSet#getTime(java.lang.String)
+	 * @see org.eclipse.datatools.connectivity.oda.jfire.IResultSet#getTime(java.lang.String)
 	 */
-	public Time getTime(String columnName) throws OdaException {
+	public Time getTime(String columnName) throws JFireOdaException {
 		return getTime(findColumn(columnName));
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.datatools.connectivity.oda.IResultSet#getTimestamp(int)
+	 * @see org.eclipse.datatools.connectivity.oda.jfire.IResultSet#getTimestamp(int)
 	 */
-	public Timestamp getTimestamp(int index) throws OdaException {
+	public Timestamp getTimestamp(int index) throws JFireOdaException {
 		java.util.Date date = checkColObject(index, java.util.Date.class); 
 		return new Timestamp(date != null ? date.getTime() : 0);
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.datatools.connectivity.oda.IResultSet#getTimestamp(java.lang.String)
+	 * @see org.eclipse.datatools.connectivity.oda.jfire.IResultSet#getTimestamp(java.lang.String)
 	 */
-	public Timestamp getTimestamp(String columnName) throws OdaException {
+	public Timestamp getTimestamp(String columnName) throws JFireOdaException {
 		return getTimestamp(findColumn(columnName));
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.datatools.connectivity.oda.IResultSet#getBlob(int)
+	 * @see org.eclipse.datatools.connectivity.oda.jfire.IResultSet#getBlob(int)
 	 */
-	public IBlob getBlob(int index) throws OdaException {
+	public IBlob getBlob(int index) throws JFireOdaException {
 		Object o = getColObject(index);
 		return DataType.getIBlob(o);
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.datatools.connectivity.oda.IResultSet#getBlob(java.lang.String)
+	 * @see org.eclipse.datatools.connectivity.oda.jfire.IResultSet#getBlob(java.lang.String)
 	 */
-	public IBlob getBlob(String columnName) throws OdaException {
+	public IBlob getBlob(String columnName) throws JFireOdaException {
 		return getBlob(findColumn(columnName));
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.datatools.connectivity.oda.IResultSet#getClob(int)
+	 * @see org.eclipse.datatools.connectivity.oda.jfire.IResultSet#getClob(int)
 	 */
-	public IClob getClob(int index) throws OdaException {
+	public IClob getClob(int index) throws JFireOdaException {
 		throw new UnsupportedOperationException("NYI");
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.datatools.connectivity.oda.IResultSet#getClob(java.lang.String)
+	 * @see org.eclipse.datatools.connectivity.oda.jfire.IResultSet#getClob(java.lang.String)
 	 */
-	public IClob getClob(String columnName) throws OdaException {
+	public IClob getClob(String columnName) throws JFireOdaException {
 		return getClob(findColumn(columnName));
 	}
 	
 	/**
 	 * {@inheritDoc}
 	 */
-	public boolean getBoolean(String columnName) throws OdaException {
+	public boolean getBoolean(String columnName) throws JFireOdaException {
 		return getBoolean(findColumn(columnName));
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public boolean getBoolean(int index) throws OdaException {
+	public boolean getBoolean(int index) throws JFireOdaException {
 		Boolean b = checkColObject(index, Boolean.class);
 		return b != null ? b : false;
 	}
 	
+	@Override
+	public Object getObject(int index) throws JFireOdaException {
+		return checkColObject(index, Object.class);
+	}
+	
+	@Override
+	public Object getObject(String columnName) throws JFireOdaException {
+		return getObject(findColumn(columnName));
+	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.datatools.connectivity.oda.IResultSet#wasNull()
+	 * @see org.eclipse.datatools.connectivity.oda.jfire.IResultSet#wasNull()
 	 */
-	public boolean wasNull() throws OdaException {
+	public boolean wasNull() throws JFireOdaException {
 		return currRow == null;
 	}
 	
@@ -354,7 +363,7 @@ public abstract class ResultSet implements IResultSet, Serializable {
 		try {
 			metaData = getMetaData();
 			metaDataColCount = (metaData == null) ? 0 : metaData.getColumnCount();
-		} catch (OdaException e) {
+		} catch (JFireOdaException e) {
 			throw new RuntimeException(e);
 		}
 		if (currentAddRow != null) {
@@ -372,7 +381,7 @@ public abstract class ResultSet implements IResultSet, Serializable {
 				row = new ArrayList<Object>(getMetaData().getColumnCount());
 			else
 				row = new ArrayList<Object>();
-		} catch (OdaException e) {
+		} catch (JFireOdaException e) {
 			throw new RuntimeException(e);
 		}
 		col.add(row);
@@ -391,7 +400,7 @@ public abstract class ResultSet implements IResultSet, Serializable {
 			metaData = getMetaData();
 			metaDataColCount = (metaData == null) ? 0 : metaData.getColumnCount();
 			
-		} catch (OdaException e) {
+		} catch (JFireOdaException e) {
 			throw new RuntimeException(e);
 		}
 		if (metaData != null) {
@@ -413,7 +422,7 @@ public abstract class ResultSet implements IResultSet, Serializable {
 		int mColCount = 0;
 		try {
 			mColCount = getMetaData().getColumnCount();
-		} catch (OdaException e) {
+		} catch (JFireOdaException e) {
 			throw new RuntimeException(e);
 		}
 		if (columns.length != mColCount)
@@ -435,7 +444,7 @@ public abstract class ResultSet implements IResultSet, Serializable {
 		try {
 			metaData = getMetaData();
 			dataType = metaData.getColumnType(index);
-		} catch (OdaException e) {
+		} catch (JFireOdaException e) {
 			throw new IllegalStateException("Exception in checkCol while getting metaData: "+e.getClass().getName()+", message: "+e.getMessage());
 		}
 		int oType = DataType.classToDataType(col.getClass());

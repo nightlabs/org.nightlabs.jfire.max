@@ -3,7 +3,7 @@
  */
 package org.nightlabs.jfire.reporting.oda;
 
-import org.eclipse.datatools.connectivity.oda.IParameterMetaData;
+import org.eclipse.datatools.connectivity.oda.jfire.IParameterMetaData;
 
 /**
  * Interface to extend the functionality of ODA's {@link IParameterMetaData}

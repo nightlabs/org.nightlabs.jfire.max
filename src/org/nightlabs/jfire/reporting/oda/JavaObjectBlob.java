@@ -6,8 +6,8 @@ package org.nightlabs.jfire.reporting.oda;
 import java.io.InputStream;
 import java.io.Serializable;
 
-import org.eclipse.datatools.connectivity.oda.IBlob;
-import org.eclipse.datatools.connectivity.oda.OdaException;
+import org.eclipse.datatools.connectivity.oda.jfire.IBlob;
+import org.eclipse.datatools.connectivity.oda.jfire.JFireOdaException;
 
 /**
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
@@ -29,21 +29,21 @@ public class JavaObjectBlob implements IBlob, Serializable {
 	/* (non-Javadoc)
 	 * @see org.eclipse.datatools.connectivity.oda.IBlob#getBinaryStream()
 	 */
-	public InputStream getBinaryStream() throws OdaException {
+	public InputStream getBinaryStream() throws JFireOdaException {
 		return null;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.datatools.connectivity.oda.IBlob#getBytes(long, int)
 	 */
-	public byte[] getBytes(long arg0, int arg1) throws OdaException {
+	public byte[] getBytes(long arg0, int arg1) throws JFireOdaException {
 		return null;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.datatools.connectivity.oda.IBlob#length()
 	 */
-	public long length() throws OdaException {
+	public long length() throws JFireOdaException {
 		return 0;
 	}
 

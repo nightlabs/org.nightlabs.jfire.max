@@ -26,7 +26,7 @@
 
 package org.nightlabs.jfire.reporting.oda.jdoql;
 
-import org.eclipse.datatools.connectivity.oda.OdaException;
+import org.eclipse.datatools.connectivity.oda.jfire.JFireOdaException;
 import org.nightlabs.jfire.reporting.oda.Query;
 
 
@@ -55,7 +55,7 @@ public abstract class AbstractJDOQLProxy extends Query implements IJDOQueryProxy
 	/* (non-Javadoc)
 	 * @see org.eclipse.datatools.connectivity.oda.IQuery#prepare(java.lang.String)
 	 */
-	public void prepare(String queryText) throws OdaException {
+	public void prepare(String queryText) throws JFireOdaException {
 		setQuery(queryText);
 		// TODO Maybe check query here and make parametermetadata
 	}
@@ -64,6 +64,6 @@ public abstract class AbstractJDOQLProxy extends Query implements IJDOQueryProxy
 	 * (non-Javadoc)
 	 * @see org.eclipse.datatools.connectivity.oda.IQuery#close()
 	 */
-	public void close() throws OdaException {
+	public void close() throws JFireOdaException {
 	}
 }

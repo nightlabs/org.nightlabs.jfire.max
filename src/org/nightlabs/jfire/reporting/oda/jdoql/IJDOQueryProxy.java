@@ -26,8 +26,8 @@
 
 package org.nightlabs.jfire.reporting.oda.jdoql;
 
-import org.eclipse.datatools.connectivity.oda.IQuery;
-import org.eclipse.datatools.connectivity.oda.OdaException;
+import org.eclipse.datatools.connectivity.oda.jfire.IQuery;
+import org.eclipse.datatools.connectivity.oda.jfire.JFireOdaException;
 
 /**
  * 
@@ -60,5 +60,5 @@ public interface IJDOQueryProxy extends IQuery {
 	 * @param paramName The name of the parameter to set.
 	 * @param param The value of the parameter to set.
 	 */
-	public void setParameter(String paramName, Object value) throws OdaException;
+	public void setParameter(String paramName, Object value) throws JFireOdaException;
 }

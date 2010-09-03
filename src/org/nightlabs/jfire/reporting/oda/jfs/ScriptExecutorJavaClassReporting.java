@@ -1,12 +1,13 @@
 package org.nightlabs.jfire.reporting.oda.jfs;
 
 import java.util.HashMap;
+
 import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
-import org.eclipse.datatools.connectivity.oda.IResultSet;
-import org.eclipse.datatools.connectivity.oda.IResultSetMetaData;
+import org.eclipse.datatools.connectivity.oda.jfire.IResultSet;
+import org.eclipse.datatools.connectivity.oda.jfire.IResultSetMetaData;
 import org.nightlabs.jfire.reporting.JFireReportingHelper;
 import org.nightlabs.jfire.reporting.classloader.ReportingClassLoader;
 import org.nightlabs.jfire.reporting.oda.server.jfs.ServerJFSQueryProxy;

@@ -5,7 +5,7 @@ package org.nightlabs.jfire.reporting.oda.jfs;
 
 import java.sql.SQLException;
 
-import org.eclipse.datatools.connectivity.oda.OdaException;
+import org.eclipse.datatools.connectivity.oda.jfire.JFireOdaException;
 import org.nightlabs.db.Column;
 import org.nightlabs.db.TableBuffer;
 import org.nightlabs.jfire.reporting.oda.DataType;
@@ -17,7 +17,7 @@ import org.nightlabs.jfire.reporting.oda.DataType;
 public class JFSResultUtil {
 
 	public static TableBuffer createTableBuffer(JFSResultSetMetaData metaData)
-	throws OdaException, SQLException
+	throws JFireOdaException, SQLException
 	{
 		TableBuffer tableBuffer = new TableBuffer();
 		for (int i = 1; i <= metaData.getColumnCount(); i++) {

@@ -9,7 +9,7 @@ import java.util.Iterator;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
-import org.eclipse.datatools.connectivity.oda.IResultSetMetaData;
+import org.eclipse.datatools.connectivity.oda.jfire.IResultSetMetaData;
 import org.nightlabs.jfire.reporting.JFireReportingHelper;
 import org.nightlabs.jfire.reporting.oda.DataType;
 import org.nightlabs.jfire.reporting.oda.jfs.AbstractJFSScriptExecutorDelegate;

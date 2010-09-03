@@ -3,7 +3,7 @@
  */
 package org.nightlabs.jfire.reporting.trade.scripting;
 
-import org.eclipse.datatools.connectivity.oda.IResultSetMetaData;
+import org.eclipse.datatools.connectivity.oda.jfire.IResultSetMetaData;
 import org.nightlabs.jfire.reporting.oda.DataType;
 import org.nightlabs.jfire.reporting.oda.jfs.AbstractJFSScriptExecutorDelegate;
 import org.nightlabs.jfire.reporting.oda.jfs.JFSResultSet;

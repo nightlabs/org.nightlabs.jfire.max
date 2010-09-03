@@ -16,8 +16,8 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
 import org.apache.log4j.Logger;
-import org.eclipse.datatools.connectivity.oda.IResultSetMetaData;
-import org.eclipse.datatools.connectivity.oda.OdaException;
+import org.eclipse.datatools.connectivity.oda.jfire.IResultSetMetaData;
+import org.eclipse.datatools.connectivity.oda.jfire.JFireOdaException;
 import org.nightlabs.db.Record;
 import org.nightlabs.db.TableBuffer;
 import org.nightlabs.jfire.accounting.Account;
@@ -247,7 +247,7 @@ public class GeneralLedgerJournalList extends AbstractJFSScriptExecutorDelegate 
 	private ArrayList<Object> createResultRow() throws ScriptException {
 		try {
 			return new ArrayList<Object>(metaData.getColumnCount());
-		} catch (OdaException e) {
+		} catch (JFireOdaException e) {
 			throw new ScriptException("Failed creating result row", e);
 		}
 	}

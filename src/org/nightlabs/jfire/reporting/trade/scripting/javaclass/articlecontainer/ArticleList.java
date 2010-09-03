@@ -10,7 +10,7 @@ import java.util.TreeMap;
 
 import javax.jdo.PersistenceManager;
 
-import org.eclipse.datatools.connectivity.oda.IResultSetMetaData;
+import org.eclipse.datatools.connectivity.oda.jfire.IResultSetMetaData;
 import org.nightlabs.db.Record;
 import org.nightlabs.db.TableBuffer;
 import org.nightlabs.jdo.ObjectID;

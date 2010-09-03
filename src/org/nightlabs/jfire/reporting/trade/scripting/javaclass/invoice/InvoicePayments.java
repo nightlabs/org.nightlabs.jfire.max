@@ -7,8 +7,8 @@ import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
-import org.eclipse.datatools.connectivity.oda.IResultSetMetaData;
-import org.eclipse.datatools.connectivity.oda.OdaException;
+import org.eclipse.datatools.connectivity.oda.jfire.IResultSetMetaData;
+import org.eclipse.datatools.connectivity.oda.jfire.JFireOdaException;
 import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.accounting.InvoiceMoneyTransfer;
 import org.nightlabs.jfire.accounting.id.InvoiceID;
@@ -67,7 +67,7 @@ public class InvoicePayments extends AbstractJFSScriptExecutorDelegate {
 
 			try {
 				columnCount = resultSetMetaData.getColumnCount();
-			} catch (final OdaException exception) {
+			} catch (final JFireOdaException exception) {
 				throw new RuntimeException(exception);
 			}
 		}

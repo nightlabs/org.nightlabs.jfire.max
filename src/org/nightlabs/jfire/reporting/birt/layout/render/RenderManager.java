@@ -156,7 +156,7 @@ implements IRenderManager
 				// TODO: Add the users locale
 			}
 
-			task.setLocale(locale);
+			task.setLocale((java.util.Locale)locale);
 
 			if (logger.isDebugEnabled())
 				logger.debug("Creating ReportLayoutRenderer");

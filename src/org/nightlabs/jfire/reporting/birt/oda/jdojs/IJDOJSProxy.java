@@ -27,7 +27,7 @@
 package org.nightlabs.jfire.reporting.birt.oda.jdojs;
 
 import org.eclipse.birt.report.model.elements.interfaces.IOdaDataSetModel;
-import org.eclipse.datatools.connectivity.oda.IQuery;
+import org.eclipse.datatools.connectivity.oda.jfire.IQuery;
 
 /**
  * 

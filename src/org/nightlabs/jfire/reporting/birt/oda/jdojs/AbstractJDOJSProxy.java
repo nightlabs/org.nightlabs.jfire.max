@@ -26,7 +26,7 @@
 
 package org.nightlabs.jfire.reporting.birt.oda.jdojs;
 
-import org.eclipse.datatools.connectivity.oda.OdaException;
+import org.eclipse.datatools.connectivity.oda.jfire.JFireOdaException;
 import org.nightlabs.jfire.reporting.oda.Query;
 
 /**
@@ -67,7 +67,7 @@ public abstract class AbstractJDOJSProxy extends Query implements IJDOJSProxy {
 	/* (non-Javadoc)
 	 * @see org.eclipse.datatools.connectivity.oda.IQuery#close()
 	 */
-	public void close() throws OdaException {
+	public void close() throws JFireOdaException {
 		// TODO Auto-generated method stub
 	}
 }

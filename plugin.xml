@@ -5,7 +5,7 @@
          point="org.eclipse.datatools.connectivity.oda.dataSource">
       <dataSource
             defaultDisplayName="JFire Server Side Script Driver"
-            driverClass="org.nightlabs.jfire.reporting.oda.client.jfs.ClientJFSDriver"
+            driverClass="org.nightlabs.jfire.reporting.oda.client.wrapper.ClientJFSDriverWrapper"
             id="org.nightlabs.jfire.reporting.oda.jfs.JFSDriver"
             odaVersion="3.0"
             setThreadContextClassLoader="false">

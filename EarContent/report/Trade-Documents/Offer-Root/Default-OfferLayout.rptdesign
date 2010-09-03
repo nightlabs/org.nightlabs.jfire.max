@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.14" id="1">
-    <property name="createdBy">Eclipse BIRT Designer Version 1.0.1 Build &lt;20051201-1157></property>
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.21" id="1">
+    <property name="createdBy">Eclipse BIRT Designer Version 2.6.0.v20100531 Build &lt;2.6.0.v20100609-1613></property>
+    <simple-property-list name="includeResource">
+        <value>reportMessages</value>
+    </simple-property-list>
     <property name="units">mm</property>
-    <property name="includeResource">reportMessages</property>
     <method name="initialize"><![CDATA[// Import the JFireReportingHelper
 importClass(Packages.org.nightlabs.jfire.reporting.JFireReportingHelper);
 // Import the JDOHelper
@@ -39,22 +41,25 @@ function isBundleProduct(productJDOID) {
 
 function getLocalizedMessage(key) {
   msg = reportContext.getMessage(key, reportContext.getLocale());
-  if (msg != null && !"".equals(msg)) {
+  if (msg != null &amp;&amp; !"".equals(msg)) {
     return msg;
   }
   return "";
 }
 
 function getDataFieldString(field) {
-  if (field != null && field.getData() != null && !"".equals(field.getData)) {
+  if (field != null &amp;&amp; field.getData() != null &amp;&amp; !"".equals(field.getData)) {
     return field.getData();
   } 
   return "";
 }]]></method>
+    <property name="layoutPreference">auto layout</property>
     <parameters>
         <scalar-parameter name="articleContainerID" id="136">
             <property name="valueType">static</property>
-            <property name="dataType">string</property>
+            <property name="dataType">integer</property>
+            <property name="distinct">true</property>
+            <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
@@ -70,6 +75,19 @@ function getDataFieldString(field) {
     <data-sets>
         <oda-data-set extensionID="org.nightlabs.jfire.reporting.oda.jfs.JFSDataSet" name="InvoiceArticles" id="137">
             <text-property name="displayName">Articles</text-property>
+            <list-property name="parameters">
+                <structure>
+                    <property name="name">articleContainerID</property>
+                    <property name="nativeName">articleContainerID</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">1</property>
+                    <property name="position">1</property>
+                    <expression name="defaultValue">'""'</expression>
+                    <property name="isOptional">false</property>
+                    <property name="allowNull">true</property>
+                    <property name="isInput">true</property>
+                </structure>
+            </list-property>
             <structure name="cachedMetaData">
                 <list-property name="resultSet">
                     <structure>
@@ -199,55 +217,42 @@ function getDataFieldString(field) {
                     </structure>
                     <structure>
                         <property name="position">26</property>
-                        <property name="name">${rootOrganisationIDConverted}/vat-ch-7__6-net</property>
+                        <property name="name">chezfrancois_jfire_org/vat-ch-7__6-net</property>
                         <property name="dataType">float</property>
                     </structure>
                     <structure>
                         <property name="position">27</property>
-                        <property name="name">${rootOrganisationIDConverted}/vat-ch-7__6-val</property>
+                        <property name="name">chezfrancois_jfire_org/vat-ch-7__6-val</property>
                         <property name="dataType">float</property>
                     </structure>
                     <structure>
                         <property name="position">28</property>
-                        <property name="name">${rootOrganisationIDConverted}/vat-de-19-net</property>
+                        <property name="name">chezfrancois_jfire_org/vat-de-19-net</property>
                         <property name="dataType">float</property>
                     </structure>
                     <structure>
                         <property name="position">29</property>
-                        <property name="name">${rootOrganisationIDConverted}/vat-de-19-val</property>
+                        <property name="name">chezfrancois_jfire_org/vat-de-19-val</property>
                         <property name="dataType">float</property>
                     </structure>
                     <structure>
                         <property name="position">30</property>
-                        <property name="name">${rootOrganisationIDConverted}/vat-de-7-net</property>
+                        <property name="name">chezfrancois_jfire_org/vat-de-7-net</property>
                         <property name="dataType">float</property>
                     </structure>
                     <structure>
                         <property name="position">31</property>
-                        <property name="name">${rootOrganisationIDConverted}/vat-de-7-val</property>
+                        <property name="name">chezfrancois_jfire_org/vat-de-7-val</property>
                         <property name="dataType">float</property>
                     </structure>
                     <structure>
                         <property name="position">32</property>
-                        <property name="name">${devOrganisationIDConverted}/__Total__</property>
+                        <property name="name">dev_jfire_org/__Total__</property>
                         <property name="dataType">float</property>
                     </structure>
                 </list-property>
             </structure>
             <property name="dataSource">JFS-Datasource</property>
-            <list-property name="parameters">
-                <structure>
-                    <property name="name">articleContainerID</property>
-                    <property name="nativeName">articleContainerID</property>
-                    <property name="dataType">string</property>
-                    <property name="nativeDataType">1</property>
-                    <property name="position">1</property>
-                    <expression name="defaultValue">'""'</expression>
-                    <property name="isOptional">false</property>
-                    <property name="allowNull">true</property>
-                    <property name="isInput">true</property>
-                </structure>
-            </list-property>
             <list-property name="resultSet">
                 <structure>
                     <property name="position">1</property>
@@ -401,57 +406,57 @@ function getDataFieldString(field) {
                 </structure>
                 <structure>
                     <property name="position">26</property>
-                    <property name="name">${rootOrganisationIDConverted}/vat-ch-7__6-net</property>
-                    <property name="nativeName">${rootOrganisationIDConverted}/vat-ch-7__6-net</property>
+                    <property name="name">chezfrancois_jfire_org/vat-ch-7__6-net</property>
+                    <property name="nativeName">chezfrancois_jfire_org/vat-ch-7__6-net</property>
                     <property name="dataType">float</property>
                 </structure>
                 <structure>
                     <property name="position">27</property>
-                    <property name="name">${rootOrganisationIDConverted}/vat-ch-7__6-val</property>
-                    <property name="nativeName">${rootOrganisationIDConverted}/vat-ch-7__6-val</property>
+                    <property name="name">chezfrancois_jfire_org/vat-ch-7__6-val</property>
+                    <property name="nativeName">chezfrancois_jfire_org/vat-ch-7__6-val</property>
                     <property name="dataType">float</property>
                 </structure>
                 <structure>
                     <property name="position">28</property>
-                    <property name="name">${rootOrganisationIDConverted}/vat-de-19-net</property>
-                    <property name="nativeName">${rootOrganisationIDConverted}/vat-de-19-net</property>
+                    <property name="name">chezfrancois_jfire_org/vat-de-19-net</property>
+                    <property name="nativeName">chezfrancois_jfire_org/vat-de-19-net</property>
                     <property name="dataType">float</property>
                 </structure>
                 <structure>
                     <property name="position">29</property>
-                    <property name="name">${rootOrganisationIDConverted}/vat-de-19-val</property>
-                    <property name="nativeName">${rootOrganisationIDConverted}/vat-de-19-val</property>
+                    <property name="name">chezfrancois_jfire_org/vat-de-19-val</property>
+                    <property name="nativeName">chezfrancois_jfire_org/vat-de-19-val</property>
                     <property name="dataType">float</property>
                 </structure>
                 <structure>
                     <property name="position">30</property>
-                    <property name="name">${rootOrganisationIDConverted}/vat-de-7-net</property>
-                    <property name="nativeName">${rootOrganisationIDConverted}/vat-de-7-net</property>
+                    <property name="name">chezfrancois_jfire_org/vat-de-7-net</property>
+                    <property name="nativeName">chezfrancois_jfire_org/vat-de-7-net</property>
                     <property name="dataType">float</property>
                 </structure>
                 <structure>
                     <property name="position">31</property>
-                    <property name="name">${rootOrganisationIDConverted}/vat-de-7-val</property>
-                    <property name="nativeName">${rootOrganisationIDConverted}/vat-de-7-val</property>
+                    <property name="name">chezfrancois_jfire_org/vat-de-7-val</property>
+                    <property name="nativeName">chezfrancois_jfire_org/vat-de-7-val</property>
                     <property name="dataType">float</property>
                 </structure>
                 <structure>
                     <property name="position">32</property>
-                    <property name="name">${devOrganisationIDConverted}/__Total__</property>
-                    <property name="nativeName">${devOrganisationIDConverted}/__Total__</property>
+                    <property name="name">dev_jfire_org/__Total__</property>
+                    <property name="nativeName">dev_jfire_org/__Total__</property>
                     <property name="dataType">float</property>
                 </structure>
             </list-property>
-            <property name="queryText">&lt;queryPropertySet>&lt;org.nightlabs.jfire.reporting.oda.jfs.JFSQueryPropertySet>
-  &lt;scriptRegistryItemID>
-    &lt;organisationID>${devOrganisationID}&lt;/organisationID>
-    &lt;scriptRegistryItemType>JFireReportingTrade-Scripting-ArticleContainerData&lt;/scriptRegistryItemType>
-    &lt;scriptRegistryItemID>ArticleList&lt;/scriptRegistryItemID>
-  &lt;/scriptRegistryItemID>
-  &lt;properties class="tree-map">
-    &lt;no-comparator/>
-  &lt;/properties>
-&lt;/org.nightlabs.jfire.reporting.oda.jfs.JFSQueryPropertySet>&lt;/queryPropertySet></property>
+            <xml-property name="queryText"><![CDATA[<queryPropertySet><org.nightlabs.jfire.reporting.oda.jfs.JFSQueryPropertySet>
+  <scriptRegistryItemID>
+    <organisationID>dev.jfire.org</organisationID>
+    <scriptRegistryItemType>JFireReportingTrade-Scripting-ArticleContainerData</scriptRegistryItemType>
+    <scriptRegistryItemID>ArticleList</scriptRegistryItemID>
+  </scriptRegistryItemID>
+  <properties class="tree-map">
+    <no-comparator/>
+  </properties>
+</org.nightlabs.jfire.reporting.oda.jfs.JFSQueryPropertySet></queryPropertySet>]]></xml-property>
             <xml-property name="designerValues"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 <model:DesignValues xmlns:design="http://www.eclipse.org/datatools/connectivity/oda/design" xmlns:model="http://www.eclipse.org/birt/report/model/adapter/odaModel">
   <Version>1.0</Version>
@@ -468,7 +473,7 @@ function getDataFieldString(field) {
       </design:attributes>
       <design:inputAttributes>
         <design:elementAttributes>
-          <design:defaultScalarValue>&quot;&quot;</design:defaultScalarValue>
+          <design:defaultScalarValue>&amp;quot;&amp;quot;</design:defaultScalarValue>
         </design:elementAttributes>
       </design:inputAttributes>
     </design:parameterDefinitions>
@@ -477,6 +482,19 @@ function getDataFieldString(field) {
         </oda-data-set>
         <oda-data-set extensionID="org.nightlabs.jfire.reporting.oda.jfs.JFSDataSet" name="CustomerPropertySet" id="171">
             <text-property name="displayName">CustomerPropretySet</text-property>
+            <list-property name="parameters">
+                <structure>
+                    <property name="name">propertySetID</property>
+                    <property name="nativeName">propertySetID</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">1</property>
+                    <property name="position">1</property>
+                    <expression name="defaultValue">'__DUMMY_DEFAULT_PARAMETER_VALUE__'</expression>
+                    <property name="isOptional">false</property>
+                    <property name="allowNull">true</property>
+                    <property name="isInput">true</property>
+                </structure>
+            </list-property>
             <structure name="cachedMetaData">
                 <list-property name="resultSet">
                     <structure>
@@ -662,19 +680,6 @@ function getDataFieldString(field) {
                 </list-property>
             </structure>
             <property name="dataSource">JFS-Datasource</property>
-            <list-property name="parameters">
-                <structure>
-                    <property name="name">propertySetID</property>
-                    <property name="nativeName">propertySetID</property>
-                    <property name="dataType">string</property>
-                    <property name="nativeDataType">1</property>
-                    <property name="position">1</property>
-                    <expression name="defaultValue">'__DUMMY_DEFAULT_PARAMETER_VALUE__'</expression>
-                    <property name="isOptional">false</property>
-                    <property name="allowNull">true</property>
-                    <property name="isInput">true</property>
-                </structure>
-            </list-property>
             <list-property name="resultSet">
                 <structure>
                     <property name="position">1</property>
@@ -893,24 +898,24 @@ function getDataFieldString(field) {
                     <property name="dataType">string</property>
                 </structure>
             </list-property>
-            <property name="queryText">&lt;queryPropertySet>&lt;org.nightlabs.jfire.reporting.oda.jfs.JFSQueryPropertySet>
-  &lt;scriptRegistryItemID>
-    &lt;organisationID>${devOrganisationID}&lt;/organisationID>
-    &lt;scriptRegistryItemType>JFireReporting-Scripting-PropertySet&lt;/scriptRegistryItemType>
-    &lt;scriptRegistryItemID>PropertySet&lt;/scriptRegistryItemID>
-  &lt;/scriptRegistryItemID>
-  &lt;properties class="tree-map">
-    &lt;no-comparator/>
-    &lt;entry>
-      &lt;string>linkClass&lt;/string>
-      &lt;string>org.nightlabs.jfire.person.Person&lt;/string>
-    &lt;/entry>
-    &lt;entry>
-      &lt;string>scope&lt;/string>
-      &lt;string>default&lt;/string>
-    &lt;/entry>
-  &lt;/properties>
-&lt;/org.nightlabs.jfire.reporting.oda.jfs.JFSQueryPropertySet>&lt;/queryPropertySet></property>
+            <xml-property name="queryText"><![CDATA[<queryPropertySet><org.nightlabs.jfire.reporting.oda.jfs.JFSQueryPropertySet>
+  <scriptRegistryItemID>
+    <organisationID>dev.jfire.org</organisationID>
+    <scriptRegistryItemType>JFireReporting-Scripting-PropertySet</scriptRegistryItemType>
+    <scriptRegistryItemID>PropertySet</scriptRegistryItemID>
+  </scriptRegistryItemID>
+  <properties class="tree-map">
+    <no-comparator/>
+    <entry>
+      <string>linkClass</string>
+      <string>org.nightlabs.jfire.person.Person</string>
+    </entry>
+    <entry>
+      <string>scope</string>
+      <string>default</string>
+    </entry>
+  </properties>
+</org.nightlabs.jfire.reporting.oda.jfs.JFSQueryPropertySet></queryPropertySet>]]></xml-property>
             <xml-property name="designerValues"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 <model:DesignValues xmlns:design="http://www.eclipse.org/datatools/connectivity/oda/design" xmlns:model="http://www.eclipse.org/birt/report/model/adapter/odaModel">
   <Version>1.0</Version>
@@ -935,6 +940,19 @@ function getDataFieldString(field) {
 </model:DesignValues>]]></xml-property>
         </oda-data-set>
         <oda-data-set extensionID="org.nightlabs.jfire.reporting.oda.jfs.JFSDataSet" name="OrganisationData" id="216">
+            <list-property name="parameters">
+                <structure>
+                    <property name="name">propertySetID</property>
+                    <property name="nativeName">propertySetID</property>
+                    <property name="dataType">any</property>
+                    <property name="nativeDataType">10</property>
+                    <property name="position">1</property>
+                    <expression name="defaultValue">'__DUMMY_DEFAULT_PARAMETER_VALUE__'</expression>
+                    <property name="isOptional">false</property>
+                    <property name="allowNull">true</property>
+                    <property name="isInput">true</property>
+                </structure>
+            </list-property>
             <structure name="cachedMetaData">
                 <list-property name="resultSet">
                     <structure>
@@ -1120,19 +1138,6 @@ function getDataFieldString(field) {
                 </list-property>
             </structure>
             <property name="dataSource">JFS-Datasource</property>
-            <list-property name="parameters">
-                <structure>
-                    <property name="name">propertySetID</property>
-                    <property name="nativeName">propertySetID</property>
-                    <property name="dataType">any</property>
-                    <property name="nativeDataType">10</property>
-                    <property name="position">1</property>
-                    <expression name="defaultValue">'__DUMMY_DEFAULT_PARAMETER_VALUE__'</expression>
-                    <property name="isOptional">false</property>
-                    <property name="allowNull">true</property>
-                    <property name="isInput">true</property>
-                </structure>
-            </list-property>
             <list-property name="resultSet">
                 <structure>
                     <property name="position">1</property>
@@ -1351,27 +1356,27 @@ function getDataFieldString(field) {
                     <property name="dataType">string</property>
                 </structure>
             </list-property>
-            <property name="queryText">&lt;queryPropertySet>&lt;org.nightlabs.jfire.reporting.oda.jfs.JFSQueryPropertySet>
-  &lt;scriptRegistryItemID>
-    &lt;organisationID>${devOrganisationID}&lt;/organisationID>
-    &lt;scriptRegistryItemType>JFireReporting-Scripting-PropertySet&lt;/scriptRegistryItemType>
-    &lt;scriptRegistryItemID>PropertySet&lt;/scriptRegistryItemID>
-  &lt;/scriptRegistryItemID>
-  &lt;properties>
-    &lt;entry>
-      &lt;string>structScope&lt;/string>
-      &lt;string>default&lt;/string>
-    &lt;/entry>
-    &lt;entry>
-      &lt;string>linkClass&lt;/string>
-      &lt;string>org.nightlabs.jfire.person.Person&lt;/string>
-    &lt;/entry>
-    &lt;entry>
-      &lt;string>structLocalScope&lt;/string>
-      &lt;string>default&lt;/string>
-    &lt;/entry>
-  &lt;/properties>
-&lt;/org.nightlabs.jfire.reporting.oda.jfs.JFSQueryPropertySet>&lt;/queryPropertySet></property>
+            <xml-property name="queryText"><![CDATA[<queryPropertySet><org.nightlabs.jfire.reporting.oda.jfs.JFSQueryPropertySet>
+  <scriptRegistryItemID>
+    <organisationID>dev.jfire.org</organisationID>
+    <scriptRegistryItemType>JFireReporting-Scripting-PropertySet</scriptRegistryItemType>
+    <scriptRegistryItemID>PropertySet</scriptRegistryItemID>
+  </scriptRegistryItemID>
+  <properties>
+    <entry>
+      <string>structScope</string>
+      <string>default</string>
+    </entry>
+    <entry>
+      <string>linkClass</string>
+      <string>org.nightlabs.jfire.person.Person</string>
+    </entry>
+    <entry>
+      <string>structLocalScope</string>
+      <string>default</string>
+    </entry>
+  </properties>
+</org.nightlabs.jfire.reporting.oda.jfs.JFSQueryPropertySet></queryPropertySet>]]></xml-property>
             <xml-property name="designerValues"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 <model:DesignValues xmlns:design="http://www.eclipse.org/datatools/connectivity/oda/design" xmlns:model="http://www.eclipse.org/birt/report/model/adapter/odaModel">
   <Version>1.0</Version>
@@ -1415,6 +1420,7 @@ function getDataFieldString(field) {
                 <structure>
                     <property name="position">4</property>
                     <property name="name">currency</property>
+                    <property name="dataType">javaObject</property>
                 </structure>
             </list-property>
             <list-property name="columnHints">
@@ -1436,7 +1442,7 @@ function getDataFieldString(field) {
                     <structure>
                         <property name="position">1</property>
                         <property name="name">priceFragmentType</property>
-                        <property name="dataType">any</property>
+                        <property name="dataType">string</property>
                     </structure>
                     <structure>
                         <property name="position">2</property>
@@ -1451,7 +1457,7 @@ function getDataFieldString(field) {
                     <structure>
                         <property name="position">4</property>
                         <property name="name">currency</property>
-                        <property name="dataType">any</property>
+                        <property name="dataType">javaObject</property>
                     </structure>
                 </list-property>
             </structure>
@@ -1621,7 +1627,7 @@ return true;]]></method>
                             <text-data id="387">
                                 <property name="style">HeaderText</property>
                                 <property name="paddingTop">1pt</property>
-                                <expression name="valueExpr"><![CDATA[importClass(Packages.org.nightlabs.jfire.reporting.JFireReportingHelper);
+                                <expression name="valueExpr">importClass(Packages.org.nightlabs.jfire.reporting.JFireReportingHelper);
 importClass(Packages.org.nightlabs.jfire.security.SecurityReflector);
 importClass(Packages.org.nightlabs.jfire.trade.OrganisationLegalEntity);
 importClass(Packages.org.nightlabs.jfire.person.PersonStruct);
@@ -1637,28 +1643,28 @@ result[resultIndex] = "";
 
 //////// BankAccount Holder
 f = orgP.getPersistentDataFieldByIndex(PersonStruct.BANKDATA_ACCOUNTHOLDER, 0);
-if (f != null && f.getData() != null && f.getData() != "") {
+if (f != null &amp;&amp; f.getData() != null &amp;&amp; f.getData() != "") {
 	if (result[resultIndex] != "") result[resultIndex] += " | ";
 	result[resultIndex] += f.getData();
 }
 
 //////// Trade register number
 f = orgP.getPersistentDataFieldByIndex(PersonStruct.GOVERNMENTALDATA_TRADEREGISTERNUMBER, 0);
-if (f != null && f.getData() != null && f.getData() != "") {
+if (f != null &amp;&amp; f.getData() != null &amp;&amp; f.getData() != "") {
 	if (result[resultIndex] != "") result[resultIndex] += " | ";
 	result[resultIndex] += getLocalizedMessage("footer.tradeRegisterNumber") + f.getData();
 }
 
 //////// Trade register name
 f = orgP.getPersistentDataFieldByIndex(PersonStruct.GOVERNMENTALDATA_TRADEREGISTERNAME, 0);
-if (f != null && f.getData() != null && f.getData() != "") {
+if (f != null &amp;&amp; f.getData() != null &amp;&amp; f.getData() != "") {
 	if (result[resultIndex] != "") result[resultIndex] += " | ";
 	result[resultIndex] += getLocalizedMessage("footer.tradeRegisterName") + f.getData();
 }
 
 //////// VAT number
 f = orgP.getPersistentDataFieldByIndex(PersonStruct.GOVERNMENTALDATA_VATIN, 0);
-if (f != null && f.getData() != null && f.getData() != "") {
+if (f != null &amp;&amp; f.getData() != null &amp;&amp; f.getData() != "") {
 	if (result[resultIndex] != "") result[resultIndex] += " | ";
 	result[resultIndex] += getLocalizedMessage("footer.vatNumber") + f.getData();
 }
@@ -1669,44 +1675,44 @@ if (f != null && f.getData() != null && f.getData() != "") {
 
 //////// BankAccount AccountNumber
 f = orgP.getPersistentDataFieldByIndex(PersonStruct.BANKDATA_ACCOUNTNUMBER, 0);
-if (f != null && f.getData() != null && f.getData() != "") {
+if (f != null &amp;&amp; f.getData() != null &amp;&amp; f.getData() != "") {
 	if (result[resultIndex] != "") result[resultIndex] += " | ";
 	result[resultIndex] += getLocalizedMessage("footer.accountNumber") + f.getData();
 }
 
 f = orgP.getPersistentDataFieldByIndex(PersonStruct.BANKDATA_BANKCODE, 0);
-if (f != null && f.getData() != null && f.getData() != "") {
+if (f != null &amp;&amp; f.getData() != null &amp;&amp; f.getData() != "") {
 	if (result[resultIndex] != "") result[resultIndex] += " | ";
 	result[resultIndex] += getLocalizedMessage("footer.bankCode") + f.getData();
 }
 
 f = orgP.getPersistentDataFieldByIndex(PersonStruct.BANKDATA_IBAN, 0);
-if (f != null && f.getData() != null && f.getData() != "") {
+if (f != null &amp;&amp; f.getData() != null &amp;&amp; f.getData() != "") {
 	if (result[resultIndex] != "") result[resultIndex] += " | ";
 	result[resultIndex] += getLocalizedMessage("footer.accountIBAN") + f.getData();
 }
 
 f = orgP.getPersistentDataFieldByIndex(PersonStruct.BANKDATA_BIC, 0);
-if (f != null && f.getData() != null && f.getData() != "") {
+if (f != null &amp;&amp; f.getData() != null &amp;&amp; f.getData() != "") {
 	if (result[resultIndex] != "") result[resultIndex] += " | ";
 	result[resultIndex] += getLocalizedMessage("footer.accountBIC") + f.getData();
 }
 
 f = orgP.getPersistentDataFieldByIndex(PersonStruct.BANKDATA_BANKNAME, 0);
-if (f != null && f.getData() != null && f.getData() != "") {
+if (f != null &amp;&amp; f.getData() != null &amp;&amp; f.getData() != "") {
 	if (result[resultIndex] != "") result[resultIndex] += " | ";
 	result[resultIndex] += getLocalizedMessage("footer.bankName") + f.getData();
 }
 
 resultAll = "";
 
-for (i = 0; i < result.length; ++i) {
+for (i = 0; i &lt; result.length; ++i) {
 	if (result[i] != "") {
-		if (i > 0) resultAll += "<br/>";
+		if (i > 0) resultAll += "&lt;br/>";
 		resultAll += result[i];
 	}
 }
-resultAll;]]></expression>
+resultAll;</expression>
                                 <property name="contentType">html</property>
                             </text-data>
                         </cell>
@@ -1933,6 +1939,7 @@ result + "\n" + articleContainerType;</expression>
                     <property name="dataType">string</property>
                 </structure>
             </list-property>
+            <property name="pageBreakInterval">50</property>
             <column id="376"/>
             <header>
                 <row id="370">
@@ -2383,22 +2390,23 @@ articleContainerType = reportContext.getMessage("articleContainer.name."+classNa
 articleContainerType + reportContext.getMessage("header.articleContainerFrom", reportContext.getLocale())  + df.format(articleContainer.getCreateDT())</expression>
                                     <property name="dataType">string</property>
                                 </structure>
-                            <structure>
+                                <structure>
                                     <property name="name">Salutation_Text</property>
                                     <expression name="expression">dataSetRow["PersonalData_Salutation_text"]</expression>
                                     <property name="dataType">string</property>
-                            </structure>
-                            <structure>
-                                <property name="name">Salutation_StructFieldValueID</property>
-                                <expression name="expression">dataSetRow["PersonalData_Salutation_structFieldValueID"]</expression>
-                                <property name="dataType">string</property>
-                            </structure>
-                            <structure>
-                                <property name="name">Title</property>
-                                <expression name="expression">dataSetRow["PersonalData_Title"]</expression>
-                                <property name="dataType">string</property>
-                            </structure>    
+                                </structure>
+                                <structure>
+                                    <property name="name">Salutation_StructFieldValueID</property>
+                                    <expression name="expression">dataSetRow["PersonalData_Salutation_structFieldValueID"]</expression>
+                                    <property name="dataType">string</property>
+                                </structure>
+                                <structure>
+                                    <property name="name">Title</property>
+                                    <expression name="expression">dataSetRow["PersonalData_Title"]</expression>
+                                    <property name="dataType">string</property>
+                                </structure>
                             </list-property>
+                            <property name="pageBreakInterval">50</property>
                             <column id="18"/>
                             <detail>
                                 <row id="14">
@@ -2657,6 +2665,7 @@ JFireReportingHelper.createDataSetParam(JDOHelper.getObjectId(orgLE.getPerson())
                                                                             <property name="dataType">string</property>
                                                                         </structure>
                                                                     </list-property>
+                                                                    <property name="pageBreakInterval">50</property>
                                                                     <column id="224"/>
                                                                     <detail>
                                                                         <row id="220">
@@ -2916,13 +2925,13 @@ JFireReportingHelper.createDataSetParam(params["articleContainerID"])</expressio
                                     <property name="dataType">string</property>
                                 </structure>
                                 <structure>
-                                    <property name="name">${devOrganisationIDConverted}/__Total__</property>
-                                    <expression name="expression">dataSetRow["${devOrganisationIDConverted}/__Total__"]</expression>
+                                    <property name="name">dev_jfire_org/__Total__</property>
+                                    <expression name="expression">dataSetRow["dev_jfire_org/__Total__"]</expression>
                                     <property name="dataType">float</property>
                                 </structure>
                                 <structure>
                                     <property name="name">SumTotal</property>
-                                    <expression name="expression">Total.sum(dataSetRow["${devOrganisationIDConverted}/__Total__"])</expression>
+                                    <expression name="expression">Total.sum(dataSetRow["dev_jfire_org/__Total__"])</expression>
                                     <property name="dataType">float</property>
                                 </structure>
                                 <structure>
@@ -2987,56 +2996,56 @@ result</expression>
                                 </structure>
                                 <structure>
                                     <property name="name">Sum_PriceFragmentValues</property>
-                                    <expression name="expression">result="";
-
-priceFragmentType2currency2sum = JFireReportingHelper.getVar("priceFragmentType2currency2sum");
-article = JFireReportingHelper.getJDOObject(row["articleJDOID"]);
-price = article.getPrice();
-currency = price.getCurrency();
-for (it = price.getFragments().iterator(); it.hasNext(); ) {
-	priceFragment = it.next();
-	priceFragmentType = priceFragment.getPriceFragmentType();
-	
-	currency2sum = priceFragmentType2currency2sum.get(priceFragmentType);
-	if (currency2sum == null) {
-		currency2sum = new Packages.java.util.HashMap();
-		priceFragmentType2currency2sum.put(priceFragmentType, currency2sum);
-	}
-
-	sum = currency2sum.get(currency);
-	if (sum == null) {
-		sum = 0;
-	}
-
-	// We must first assign to some new javascript variables, because otherwise Rhino appends Strings
-	// instead of really performing a mathematical addition (1 + 2 = 12 instead of 1 + 2 = 3).
-	val = priceFragment.getAmount() * 1;
-	sv = sum * 1;
-	sum = sv + val;
-	currency2sum.put(currency, sum);
-}
-
-
-// debug begin
-/*
-for (it1 = priceFragmentType2currency2sum.entrySet().iterator(); it1.hasNext(); ) {
-	me1 = it1.next();
-	priceFragmentType = me1.getKey();
-	currency2sum = me1.getValue();
-
-	for (it2 = currency2sum.entrySet().iterator(); it2.hasNext(); ) {
-		me2 = it2.next();
-		currency = me2.getKey();
-		sum = me2.getValue();
-		
-		result += "(" + priceFragmentType.getName().getText() + "," + currency.getCurrencySymbol() + ")=" + sum + "\n\n";
-	}
-}
-*/
-// debug end
-
+                                    <expression name="expression" type="javascript">result="";&#13;
+&#13;
+priceFragmentType2currency2sum = JFireReportingHelper.getVar("priceFragmentType2currency2sum");&#13;
+article = JFireReportingHelper.getJDOObject(row["articleJDOID"]);&#13;
+price = article.getPrice();&#13;
+currency = price.getCurrency();&#13;
+for (it = price.getFragments().iterator(); it.hasNext(); ) {&#13;
+	priceFragment = it.next();&#13;
+	priceFragmentType = priceFragment.getPriceFragmentType();&#13;
+	&#13;
+	currency2sum = priceFragmentType2currency2sum.get(priceFragmentType);&#13;
+	if (currency2sum == null) {&#13;
+		currency2sum = new Packages.java.util.HashMap();&#13;
+		priceFragmentType2currency2sum.put(priceFragmentType, currency2sum);&#13;
+	}&#13;
+&#13;
+	sum = currency2sum.get(currency);&#13;
+	if (sum == null) {&#13;
+		sum = 0;&#13;
+	}&#13;
+&#13;
+	// We must first assign to some new javascript variables, because otherwise Rhino appends Strings&#13;
+	// instead of really performing a mathematical addition (1 + 2 = 12 instead of 1 + 2 = 3).&#13;
+	val = priceFragment.getAmount() * 1;&#13;
+	sv = sum * 1;&#13;
+	sum = sv + val;&#13;
+	currency2sum.put(currency, sum);&#13;
+}&#13;
+&#13;
+&#13;
+// debug begin&#13;
+/*&#13;
+for (it1 = priceFragmentType2currency2sum.entrySet().iterator(); it1.hasNext(); ) {&#13;
+	me1 = it1.next();&#13;
+	priceFragmentType = me1.getKey();&#13;
+	currency2sum = me1.getValue();&#13;
+&#13;
+	for (it2 = currency2sum.entrySet().iterator(); it2.hasNext(); ) {&#13;
+		me2 = it2.next();&#13;
+		currency = me2.getKey();&#13;
+		sum = me2.getValue();&#13;
+		&#13;
+		result += "(" + priceFragmentType.getName().getText() + "," + currency.getCurrencySymbol() + ")=" + sum + "\n\n";&#13;
+	}&#13;
+}&#13;
+*/&#13;
+// debug end&#13;
+&#13;
 result;</expression>
-                                    <property name="dataType">any</property>
+                                    <property name="dataType">string</property>
                                 </structure>
                                 <structure>
                                     <property name="name">BundleProduct_QtyUnitSymbol</property>
@@ -3051,6 +3060,7 @@ result</expression>
                                     <property name="dataType">string</property>
                                 </structure>
                             </list-property>
+                            <property name="pageBreakInterval">50</property>
                             <column id="81">
                                 <property name="width">14mm</property>
                             </column>
@@ -3171,7 +3181,7 @@ result</expression>
                                                 <property name="pattern">#,##0.00</property>
                                             </structure>
                                             <property name="textAlign">right</property>
-                                            <property name="resultSetColumn">${devOrganisationIDConverted}/__Total__</property>
+                                            <property name="resultSetColumn">dev_jfire_org/__Total__</property>
                                         </data>
                                     </cell>
                                     <cell id="178">
@@ -3198,7 +3208,7 @@ result</expression>
                                                 <property name="pattern">Fixed</property>
                                             </structure>
                                             <property name="textAlign">right</property>
-                                            <property name="resultSetColumn">${devOrganisationIDConverted}/__Total__</property>
+                                            <property name="resultSetColumn">dev_jfire_org/__Total__</property>
                                         </data>
                                     </cell>
                                     <cell id="161">
@@ -3284,7 +3294,7 @@ result</expression>
                                                 <property name="pattern">#,##0.00</property>
                                             </structure>
                                             <property name="textAlign">right</property>
-                                            <property name="resultSetColumn">${devOrganisationIDConverted}/__Total__</property>
+                                            <property name="resultSetColumn">dev_jfire_org/__Total__</property>
                                         </data>
                                     </cell>
                                     <cell id="200">
@@ -3462,6 +3472,7 @@ Packages.org.nightlabs.l10n.NumberFormatter.formatCurrency(
                                                     <property name="dataType">string</property>
                                                 </structure>
                                             </list-property>
+                                            <property name="pageBreakInterval">50</property>
                                             <column id="294"/>
                                             <column id="295">
                                                 <property name="width">25mm</property>

@@ -9,7 +9,7 @@
 	<script 
 		file="DeliveryList.javaclass" 
 		id="DeliveryList"
-		resultClass="org.eclipse.datatools.connectivity.oda.IResultSet"
+		resultClass="org.eclipse.datatools.connectivity.oda.jfire.IResultSet"
 	>
 		<name language="de">Lieferungen: Liste</name>
 		<name language="en">Deliveries: List</name>

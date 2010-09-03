@@ -9,7 +9,7 @@
 	<script 
 		file="PaymentList.javaclass" 
 		id="PaymentList"
-		resultClass="org.eclipse.datatools.connectivity.oda.IResultSet"
+		resultClass="org.eclipse.datatools.connectivity.oda.jfire.IResultSet"
 	>
 		<name language="de">Zahlungen: Liste</name>
 		<name language="en">Payments: List</name>

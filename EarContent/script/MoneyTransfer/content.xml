@@ -9,7 +9,7 @@
 	<script 
 		file="MoneyTransferList.javaclass" 
 		id="MoneyTransferList"
-		resultClass="org.eclipse.datatools.connectivity.oda.IResultSet"
+		resultClass="org.eclipse.datatools.connectivity.oda.jfire.IResultSet"
 	>
 		<name language="de">Geldtransfers: Liste</name>
 		<name language="en">Money transfers: list</name>
@@ -25,7 +25,7 @@
 	<script 
 		file="BookMoneyTransferList.javaclass" 
 		id="BookMoneyTransferList"
-		resultClass="org.eclipse.datatools.connectivity.oda.IResultSet"
+		resultClass="org.eclipse.datatools.connectivity.oda.jfire.IResultSet"
 	>
 		<name language="de">Rechnungsbuchungen: Liste</name>
 		<name language="en">Invoice bookings: list</name>
@@ -41,7 +41,7 @@
 	<script 
 		file="BookedArticles.javaclass" 
 		id="BookedArticles"
-		resultClass="org.eclipse.datatools.connectivity.oda.IResultSet"
+		resultClass="org.eclipse.datatools.connectivity.oda.jfire.IResultSet"
 	>
 		<name language="de">Rechnungsbuchungen: Liste gebuchter Artikel</name>
 		<name language="en">Invoice bookings: booked articles</name>
@@ -59,7 +59,7 @@
 	<script 
 		file="BookedArticlesWithPaymentInfo.javaclass" 
 		id="BookedArticlesWithPaymentInfo"
-		resultClass="org.eclipse.datatools.connectivity.oda.IResultSet"
+		resultClass="org.eclipse.datatools.connectivity.oda.jfire.IResultSet"
 	>
 		<name language="de">Rechnungsbuchungen: Liste gebuchter Artikel + Zahlungsinformationen</name>
 		<name language="en">Invoice bookings: booked articles + payment info</name>
@@ -76,7 +76,7 @@
 	<script 
 		file="GeneralLedgerJournalList.javaclass" 
 		id="GeneralLedgerJournalList.javaclass"
-		resultClass="org.eclipse.datatools.connectivity.oda.IResultSet"
+		resultClass="org.eclipse.datatools.connectivity.oda.jfire.IResultSet"
 	>
 		<name language="de">Hauptbuch-Journal Daten</name>
 		<name language="en">General ledger journal data</name>

@@ -297,7 +297,7 @@ if (isEvent(productType)) {
             </list-property>
             <property name="queryText">&lt;queryPropertySet>&lt;org.nightlabs.jfire.reporting.oda.jfs.JFSQueryPropertySet>
   &lt;scriptRegistryItemID>
-    &lt;organisationID>${devOrganisationID}&lt;/organisationID>
+    &lt;organisationID>dev.jfire.org&lt;/organisationID>
     &lt;scriptRegistryItemType>JFireReportingTrade-MoneyTransfer&lt;/scriptRegistryItemType>
     &lt;scriptRegistryItemID>BookedArticles&lt;/scriptRegistryItemID>
   &lt;/scriptRegistryItemID>
@@ -784,7 +784,7 @@ if (isEvent(productType)) {
             </list-property>
             <property name="queryText">&lt;queryPropertySet>&lt;org.nightlabs.jfire.reporting.oda.jfs.JFSQueryPropertySet>
   &lt;scriptRegistryItemID>
-    &lt;organisationID>${devOrganisationID}&lt;/organisationID>
+    &lt;organisationID>dev.jfire.org&lt;/organisationID>
     &lt;scriptRegistryItemType>JFireReporting-Scripting-PropertySet&lt;/scriptRegistryItemType>
     &lt;scriptRegistryItemID>LocalOrganisationPropertySet&lt;/scriptRegistryItemID>
   &lt;/scriptRegistryItemID>

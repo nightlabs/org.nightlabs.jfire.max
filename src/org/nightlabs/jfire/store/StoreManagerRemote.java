@@ -465,4 +465,9 @@ public interface StoreManagerRemote {
 	 * most recent ones. Otherwise, they are refer to the oldest {@link ArticleContainer}s.
 	 */
 	public Set<ArticleContainerID> getArticleContainerIDsByProductTypeID(ProductTypeID productTypeId, Class<? extends ArticleContainer> articleContainerClass, boolean isOrderByDescendingArticleDT);
+
+	/**
+	 * @return the index position of the childProductTypeID in the list, given the parentProductTypeID.
+	 */
+	public int getChildProductTypeIDsPositionInList(ProductTypeID parentProductTypeID, ProductTypeID childProductTypeID, QueryCollection<? extends AbstractProductTypeQuery> productTypeQueries);
 }

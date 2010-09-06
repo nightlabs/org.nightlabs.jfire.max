@@ -3054,6 +3054,28 @@ implements StoreManagerRemote, StoreManagerLocal
 
 
 	/**
+	 * @return the index position of the child's {@link ProductTypeID} with respect to the parent. If the child's {@link ProductTypeID} is
+	 * not found (i.e. that it is not a child of the given parent) then -1 is returned.
+	 */
+	@RolesAllowed("org.nightlabs.jfire.store.seeProductType")
+	@Override
+	public int getChildProductTypeIDsPositionInList(ProductTypeID parentProductTypeID, ProductTypeID childProductTypeID, QueryCollection<? extends AbstractProductTypeQuery> productTypeQueries) {
+		Collection<ProductTypeID> childProductTypeIDs = productTypeQueries != null ? getChildProductTypeIDs(parentProductTypeID, productTypeQueries) : getChildProductTypeIDs(parentProductTypeID);
+		if (childProductTypeIDs == null || childProductTypeIDs.isEmpty() || !childProductTypeIDs.contains(childProductTypeID))
+			return -1;
+
+		int index = 0;
+		for (ProductTypeID productTypeID : childProductTypeIDs) {
+			if (productTypeID.equals(childProductTypeID))
+				break;
+
+			index++;
+		}
+
+		return index;
+	}
+
+	/**
 	 * Takes a {@link ProductTypeID}, searches for all {@link Article}s with the productTypeID reference, order them by their createDTs,
 	 * then depending on the desired type of {@link ArticleContainer}, return their unique IDs in a Set accordingly.
 	 * @return So, in effect, if we set isOrderByDescendingArticleDT to true, then returned Set of {@link ArticleContainerID}s are all

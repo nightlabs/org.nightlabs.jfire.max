@@ -3,7 +3,6 @@ package org.nightlabs.jfire.dunning;
 import javax.jdo.annotations.Column;
 import javax.jdo.annotations.PrimaryKey;
 
-import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.organisation.Organisation;
 
 
@@ -32,6 +31,5 @@ public abstract class DunningLetterNotifier
 	public DunningLetterNotifier(String organisationID) {
 		Organisation.assertValidOrganisationID(organisationID);
 		this.organisationID = organisationID;
-		
 	}
 }

@@ -1,7 +1,6 @@
 package org.nightlabs.jfire.dunning;
 
 import java.io.Serializable;
-import java.util.Map;
 
 import javax.jdo.annotations.Column;
 import javax.jdo.annotations.Discriminator;
@@ -9,15 +8,14 @@ import javax.jdo.annotations.DiscriminatorStrategy;
 import javax.jdo.annotations.IdentityType;
 import javax.jdo.annotations.Inheritance;
 import javax.jdo.annotations.InheritanceStrategy;
-import javax.jdo.annotations.Join;
 import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.accounting.Account;
-import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.dunning.id.DunningMoneyFlowConfigID;
 import org.nightlabs.jfire.organisation.Organisation;
 
@@ -53,12 +51,8 @@ implements Serializable
 	@Column(length=100)
 	private String dunningMoneyFlowConfigID;
 	
-	/**
-	 * Maps all paid interests of a certain currency to the account it shall be booked to.
-	 */
-	@Join
-	@Persistent(table="JFireDunning_DunningMoneyFlowConfig_currency2InterestAccount")
-	private Map<Currency, Account> currency2InterestAccount;
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+	private DunningConfig dunningConfig;
 	
 	/**
 	 * @deprecated This constructor exists only for JDO and should never be used directly!
@@ -66,12 +60,13 @@ implements Serializable
 	@Deprecated
 	protected DunningMoneyFlowConfig() { }
 	
-	public DunningMoneyFlowConfig(String organisationID, String dunningMoneyFlowConfigID) {
+	public DunningMoneyFlowConfig(String organisationID, String dunningMoneyFlowConfigID, DunningConfig dunningConfig) {
 		Organisation.assertValidOrganisationID(organisationID);
 		ObjectIDUtil.assertValidIDString(dunningMoneyFlowConfigID, "dunningMoneyFlowConfigID"); //$NON-NLS-1$
 		
 		this.organisationID = organisationID;
 		this.dunningMoneyFlowConfigID = dunningMoneyFlowConfigID;
+		this.dunningConfig = dunningConfig;
 	}
 	
 	/**
@@ -82,7 +77,9 @@ implements Serializable
 	 * @param isReverseBooking
 	 * @return
 	 */
-	public Account getAccount(DunningFeeType feeType, Currency currency, boolean isReverseBooking) {
-		return null;
+	public abstract Account getAccount(DunningFee fee, boolean isReverseBooking);
+	
+	public DunningConfig getDunningConfig() {
+		return dunningConfig;
 	}
 }

@@ -1,7 +1,6 @@
 package org.nightlabs.jfire.dunning;
 
 import java.util.Set;
-import java.util.SortedSet;
 
 import javax.jdo.annotations.IdentityType;
 import javax.jdo.annotations.Inheritance;

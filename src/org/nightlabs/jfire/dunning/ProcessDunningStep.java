@@ -1,9 +1,9 @@
 package org.nightlabs.jfire.dunning;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import javax.jdo.annotations.FetchGroup;
 import javax.jdo.annotations.FetchGroups;
@@ -57,11 +57,10 @@ extends AbstractDunningStep
 	 * Note, that all fees from the previous DunningLetter need to be 
 	 * copied into the new DunningLetter, additionally.
 	 */
-	@Join
 	@Persistent(
 		table="JFireDunning_ProcessDunningStep_feeTypes",
 		persistenceModifier=PersistenceModifier.PERSISTENT)
-	private List<DunningFeeType> feeTypes;
+	private Set<DunningFeeType> feeTypes;
 	
 	/**
 	 * The description of how the DunningLetter should look like.
@@ -82,7 +81,7 @@ extends AbstractDunningStep
 	public ProcessDunningStep(String organisationID, String dunningStepID, DunningConfig dunningConfig, int dunningLevel) {
 		super(organisationID, dunningStepID, dunningConfig, dunningLevel);
 		
-		this.feeTypes = new ArrayList<DunningFeeType>();
+		this.feeTypes = new TreeSet<DunningFeeType>();
 	}
 	
 	public void addFeeType(DunningFeeType feeType) {
@@ -101,8 +100,8 @@ extends AbstractDunningStep
 		feeTypes.removeAll(feeTypes);
 	}
 
-	public List<DunningFeeType> getFeeTypes() {
-		return Collections.unmodifiableList(feeTypes);
+	public Set<DunningFeeType> getFeeTypes() {
+		return Collections.unmodifiableSet(feeTypes);
 	}
 	
 	public void setLetterLayout(ReportLayout letterLayout) {

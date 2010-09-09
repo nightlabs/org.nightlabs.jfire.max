@@ -27,6 +27,7 @@
 package org.nightlabs.jfire.accounting;
 
 import java.io.Serializable;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -35,6 +36,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
@@ -381,6 +383,8 @@ implements Serializable, PricedArticleContainer, Statable, DetachCallback
 //				accountingPriceConfig.getOrganisationID(), accountingPriceConfig.getPriceConfigID(),
 //				accountingPriceConfig.createPriceID(), currency);
 
+		this.termOfPaymentMSec = TimeUnit.DAYS.toMillis(31); //31 days
+		
 		articles = new HashSet<Article>();
 
 		String structScope = Struct.DEFAULT_SCOPE;
@@ -563,6 +567,12 @@ implements Serializable, PricedArticleContainer, Statable, DetachCallback
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private PropertySet propertySet;
 
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+	private long termOfPaymentMSec;
+	
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+	private Date dueDateForPayment;
+	
 	/**
 	 * @return the same as {@link #getStatableLocal()}
 	 */
@@ -866,6 +876,14 @@ implements Serializable, PricedArticleContainer, Statable, DetachCallback
 		return currency;
 	}
 
+	public Date getDueDateForPayment() {
+		return dueDateForPayment;
+	}
+	
+	public long getTermOfPaymentMSec() {
+		return termOfPaymentMSec;
+	}
+	
 	/**
 	 * @return Returns the valid.
 	 */
@@ -885,6 +903,7 @@ implements Serializable, PricedArticleContainer, Statable, DetachCallback
 			throw new IllegalStateException("This Invoice is not valid! Call validate() before!");
 		this.finalizeUser = finalizer;
 		this.finalizeDT = new Date(System.currentTimeMillis());
+		this.dueDateForPayment = new Date(finalizeDT.getTime() + termOfPaymentMSec);
 	}
 	/**
 	 * This member is set to true as soon as all desired

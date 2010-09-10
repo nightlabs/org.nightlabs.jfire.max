@@ -8,7 +8,9 @@ import javax.jdo.annotations.InheritanceStrategy;
 import javax.jdo.annotations.PersistenceCapable;
 
 import org.apache.log4j.Logger;
+import org.nightlabs.jfire.accounting.Price;
 import org.nightlabs.jfire.dunning.id.DunningFeeAdderID;
+import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.organisation.Organisation;
 
 /**
@@ -47,11 +49,23 @@ extends DunningFeeAdder
 	@Override
 	public void addDunningFee(DunningLetter dunningLetter) {
 		DunningConfig dunningConfig = dunningLetter.getDunningProcess().getDunningConfig();
+		DunningProcess dunningProcess = dunningLetter.getDunningProcess();
+		
+		DunningLetterEntry lastLetterEntry = dunningLetter.getDunnedInvoices().get(dunningLetter.getDunnedInvoices().size() - 1);
+		int dunningLevel = lastLetterEntry.getDunningLevel();
+		
 		Set<ProcessDunningStep> processDunningSteps = dunningConfig.getProcessDunningSteps();
 		for (ProcessDunningStep processDunningStep : processDunningSteps) {
-			if (processDunningStep.getDunningLevel() == dunningLetter.getDunningLevel()) {
+			if (processDunningStep.getDunningLevel() == dunningLevel) {
 				for (DunningFeeType dunningFeeType : processDunningStep.getFeeTypes()) {
-
+					DunningFee fee = new DunningFee(dunningLetter.getOrganisationID(), IDGenerator.nextIDString(DunningFee.class), null);
+					fee.setAmountPaid(0);
+					
+					Price amountToPay = dunningFeeType.getCurrency2price().get(dunningProcess.getCurrency());
+					fee.setAmountToPay(amountToPay.getAmount());
+					
+					fee.setDunningFeeType(dunningFeeType);
+					fee.setDunningLetter(dunningLetter);
 				}
 			}
 		}

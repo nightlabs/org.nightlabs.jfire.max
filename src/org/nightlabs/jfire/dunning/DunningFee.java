@@ -43,7 +43,7 @@ implements Serializable
 	 * Back-reference to the owner-entity.
 	 */
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
-	private DunningLetterEntry dunningLetterEntry;
+	private DunningLetter dunningLetter;
 	
 	/**
 	 * Null or the one from which this one was copied (if it was copied from a previous DunningLetter).
@@ -80,7 +80,7 @@ implements Serializable
 	private transient long amountToPay;
 	
 	/**
-	 * The date at which all of this interest was paid. This implies that 
+	 * The date at which all of this fee was paid. This implies that 
 	 * as long as this field is set to null, there is still some part left 
 	 * to be paid.
 	 */
@@ -141,12 +141,12 @@ implements Serializable
 		return amountToPay;
 	}
 	
-	public void setDunningLetterEntry(DunningLetterEntry dunningLetterEntry) {
-		this.dunningLetterEntry = dunningLetterEntry;
+	public void setDunningLetter(DunningLetter dunningLetter) {
+		this.dunningLetter = dunningLetter;
 	}
 	
-	public DunningLetterEntry getDunningLetterEntry() {
-		return dunningLetterEntry;
+	public DunningLetter getDunningLetter() {
+		return dunningLetter;
 	}
 
 	public void setPaidDT(Date paidDT) {

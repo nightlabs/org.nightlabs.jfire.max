@@ -28,10 +28,11 @@ import org.nightlabs.jfire.organisation.Organisation;
  * @author Chairat Kongarayawetchakun - chairat [AT] nightlabs [DOT] de
  */
 @PersistenceCapable(
-	objectIdClass=DunningFeeAdderID.class,
-	identityType=IdentityType.APPLICATION,
-	detachable="true",
-	table="JFireDunning_DunningFeeAdder")
+		objectIdClass=DunningFeeAdderID.class,
+		identityType=IdentityType.APPLICATION,
+		detachable="true",
+		table="JFireDunning_DunningFeeAdder"
+)
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public abstract class DunningFeeAdder
 implements Serializable
@@ -45,7 +46,7 @@ implements Serializable
 	@PrimaryKey
 	@Column(length=100)
 	private String dunningFeeAdderID;
-	
+
 	/**
 	 * @deprecated Only for JDO!
 	 */
@@ -55,7 +56,7 @@ implements Serializable
 	public DunningFeeAdder(String organisationID, String dunningFeeAdderID)
 	{
 		Organisation.assertValidOrganisationID(organisationID);
-		
+
 		this.organisationID = organisationID;
 		this.dunningFeeAdderID = dunningFeeAdderID;
 	}
@@ -68,7 +69,7 @@ implements Serializable
 	public String getDunningFeeAdderID() {
 		return dunningFeeAdderID;
 	}
-	
+
 	public abstract void addDunningFee(DunningLetter dunningLetter);
 
 	protected PersistenceManager getPersistenceManager()
@@ -78,4 +79,4 @@ implements Serializable
 			throw new IllegalStateException("This instance of DunningFeeAdder has no PersistenceManager assigned!");
 		return pm;
 	}
-		}
+}

@@ -1,7 +1,6 @@
 package org.nightlabs.jfire.dunning;
 
 import java.io.Serializable;
-import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
@@ -25,7 +24,9 @@ import org.apache.log4j.Logger;
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.dunning.id.DunningConfigID;
 import org.nightlabs.jfire.organisation.Organisation;
+import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.timer.Task;
+import org.nightlabs.jfire.timer.id.TaskID;
 
 /**
  * A DunningConfig contains all settings for a dunning process. 
@@ -224,13 +225,14 @@ implements Serializable
 		this.invoiceDunningSteps = new TreeSet<InvoiceDunningStep>();
 		this.processDunningSteps = new TreeSet<ProcessDunningStep>();
 		
-//		TaskID taskID = TaskID.create(organisationID, TASK_TYPE_ID_PROCESS_DUNNING, dunningConfigID);
-//		this.creatorTask = new Task(
-//				taskID,
-//				User.getUser(getPersistenceManager(), getOrganisationID(), User.USER_ID_SYSTEM),
-//				DunningManagerRemote.class,
-//				"processAutomaticDunning"
-//		);
+		TaskID taskID = TaskID.create(organisationID, TASK_TYPE_ID_PROCESS_DUNNING, dunningConfigID);
+		this.creatorTask = new Task(
+				taskID,
+				User.getUser(getPersistenceManager(), getOrganisationID(), User.USER_ID_SYSTEM),
+				DunningManagerRemote.class,
+				"processAutomaticDunning"
+		);
+		this.creatorTask.setParam(this);
 	}
 	
 	public String getOrganisationID() {

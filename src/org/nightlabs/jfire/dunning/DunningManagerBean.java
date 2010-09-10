@@ -2,8 +2,10 @@ package org.nightlabs.jfire.dunning;
 
 import java.math.BigDecimal;
 import java.util.Collection;
-import java.util.Iterator;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -11,11 +13,14 @@ import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
+import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
 import org.nightlabs.jdo.NLJDOHelper;
+import org.nightlabs.jfire.accounting.Currency;
+import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.dunning.id.DunningConfigCustomerID;
 import org.nightlabs.jfire.dunning.id.DunningConfigID;
@@ -24,7 +29,7 @@ import org.nightlabs.jfire.dunning.id.DunningFeeTypeID;
 import org.nightlabs.jfire.dunning.id.DunningInterestCalculatorID;
 import org.nightlabs.jfire.dunning.id.DunningProcessID;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
-import org.nightlabs.jfire.organisation.Organisation;
+import org.nightlabs.jfire.timer.Task;
 import org.nightlabs.jfire.timer.id.TaskID;
 import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.util.CollectionUtil;
@@ -292,11 +297,27 @@ implements DunningManagerRemote
 	throws Exception {
 		PersistenceManager pm = createPersistenceManager();
 		try {
-			for (Iterator<DunningProcess> dunningProcesses = pm.getExtent(DunningProcess.class).iterator(); dunningProcesses.hasNext(); ) {
-				DunningProcess dunningProcess = dunningProcesses.next();
-				if (!getOrganisationID().equals(dunningProcess.getOrganisationID()))
-					continue;
-				
+			Task task = (Task) pm.getObjectById(taskID);
+			DunningConfig dunningConfig =  (DunningConfig) task.getParam();
+			if (dunningConfig.getDunningAutoMode() != DunningAutoMode.none) {
+				Query query = pm.newNamedQuery(Invoice.class, "getOverdueInvoices");
+				Map<String, Object> params = new HashMap<String, Object>();
+				params.put("paramOrganisationID", dunningConfig.getOrganisationID());
+				params.put("paramDate", new Date());
+
+				Collection<Invoice> overdueInvoices = CollectionUtil.castList((List<?>) query.executeWithMap(params));
+				for (Invoice inv : overdueInvoices) {
+					LegalEntity customer = inv.getCustomer();
+					Currency currency = inv.getCurrency();
+					
+					query = pm.newNamedQuery(DunningProcess.class, "getDunningProcessIDsByCustomer");
+					params = new HashMap<String, Object>();
+					params.put("customerID", JDOHelper.getObjectId(customer));
+					Collection<DunningProcessID> dunningProcessIDs = CollectionUtil.castList((List<?>) query.executeWithMap(params));
+					if (dunningProcessIDs.size() != 0) {
+						
+					}
+				}
 			}
 		} finally {
 			pm.close();

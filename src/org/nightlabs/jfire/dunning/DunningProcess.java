@@ -15,9 +15,11 @@ import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.PersistenceModifier;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.Queries;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.jdo.ObjectIDUtil;
+import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.dunning.id.DunningProcessID;
 import org.nightlabs.jfire.organisation.Organisation;
@@ -44,6 +46,13 @@ import org.nightlabs.jfire.trade.LegalEntity;
 		table="JFireDunning_DunningProcess"
 )
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
+@Queries({
+	@javax.jdo.annotations.Query(
+			name="getDunningProcessIDsByCustomer",
+			value="SELECT JDOHelper.getObjectId(this) " +
+					"WHERE JDOHelper.getObjectId(customer) == :customerID"
+	),
+})
 public class DunningProcess 
 implements Serializable
 {
@@ -73,6 +82,12 @@ implements Serializable
 			loadFetchGroup="all",
 			persistenceModifier=PersistenceModifier.PERSISTENT)
 	private LegalEntity customer;
+
+	/**
+	 * The currency used in all the invoices for that DunningProcess.
+	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+	private Currency currency;
 	
 	/**
 	 * The invoices for which this dunning process is happening and their corresponding dunning levels.
@@ -133,17 +148,37 @@ implements Serializable
 	public DunningConfig getDunningConfig() {
 		return dunningConfig;
 	}
+
+	public void setCustomer(LegalEntity customer) {
+		this.customer = customer;
+	}
 	
 	public LegalEntity getCustomer() {
 		return customer;
+	}
+	
+	public void setCurrency(Currency currency) {
+		this.currency = currency;
+	}
+	
+	public Currency getCurrency() {
+		return currency;
 	}
 	
 	public List<DunningLetter> getDunningLetters() {
 		return dunningLetters;
 	}
 	
+	public void setCoolDownEnd(Date coolDownEnd) {
+		this.coolDownEnd = coolDownEnd;
+	}
+	
 	public Date getCoolDownEnd() {
 		return coolDownEnd;
+	}
+	
+	public void setPaidDT(Date paidDT) {
+		this.paidDT = paidDT;
 	}
 	
 	public Date getPaidDT() {

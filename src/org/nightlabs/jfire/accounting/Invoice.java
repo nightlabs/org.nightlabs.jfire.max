@@ -244,6 +244,10 @@ import org.nightlabs.util.Util;
 			name="getNonFinalizedInvoicesByVendorAndCustomer",
 			value="SELECT WHERE vendor.organisationID == paramVendorID_organisationID && vendor.anchorID == paramVendorID_anchorID && customer.organisationID == paramCustomerID_organisationID && customer.anchorID == paramCustomerID_anchorID && finalizeDT == null PARAMETERS String paramVendorID_organisationID, String paramVendorID_anchorID, String paramCustomerID_organisationID, String paramCustomerID_anchorID import java.lang.String ORDER BY invoiceID DESC"
 	),
+	@javax.jdo.annotations.Query(
+			name="getOverdueInvoices",
+			value="SELECT WHERE this.organisationID == paramOrganisationID && dueDateForPayment < paramDate && finalizeDT != null PARAMETERS String paramOrganisationID, Date paramDate import java.lang.String, java.util.Date ORDER BY invoiceID DESC"
+	),
 })
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class Invoice
@@ -567,9 +571,22 @@ implements Serializable, PricedArticleContainer, Statable, DetachCallback
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private PropertySet propertySet;
 
+	/**
+	 * The time (in milliseconds) within which the payment is due. 
+	 * It is counted from the timestamp of the invoice finalization 
+	 * (Invoice.finalizeDT). Default value is 31 days, but this default 
+	 * needs to be overridden by the JFireDunning module, if it is installed.
+	 */
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private long termOfPaymentMSec;
 	
+	/**
+	 * The date when the invoice should be paid. It is set to 
+	 * finalizeDT +  termOfPaymentMSec when the invoice is finalized. 
+	 * It cannot be changed after the finalization, hence the only way 
+	 * to modify this value is to adjust the termOfPaymentMSec before 
+	 * finalizing the invoice.
+	 */
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Date dueDateForPayment;
 	

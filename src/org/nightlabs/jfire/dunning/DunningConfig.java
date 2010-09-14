@@ -1,10 +1,12 @@
 package org.nightlabs.jfire.dunning;
 
 import java.io.Serializable;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.concurrent.TimeUnit;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
@@ -27,6 +29,7 @@ import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.timer.Task;
 import org.nightlabs.jfire.timer.id.TaskID;
+import org.nightlabs.timepattern.TimePatternFormatException;
 
 /**
  * A DunningConfig contains all settings for a dunning process. 
@@ -217,7 +220,7 @@ implements Serializable
 		this.dunningConfigID = dunningConfigID;
 		this.dunningAutoMode = dunningAutoMode;
 		
-		this.defaultTermOfPaymentMSec = 31l * 24l * 60l * 60l * 1000l;
+		this.defaultTermOfPaymentMSec = TimeUnit.DAYS.toMillis(31);
 		
 		this.name = new DunningConfigName(this);
 		this.description = new DunningConfigDescription(this);
@@ -233,6 +236,21 @@ implements Serializable
 				"processAutomaticDunning"
 		);
 		this.creatorTask.setParam(this);
+		creatorTask.getName().setText(Locale.ENGLISH.getLanguage(), "Cleanup rendered report layout folders");
+		creatorTask.getDescription().setText(Locale.ENGLISH.getLanguage(), "This task deletes old folder used for rendering reports");
+		try {
+			creatorTask.getTimePatternSet().createTimePattern(
+					"*", // year
+					"*", // month
+					"*", // day
+					"*", // dayOfWeek
+					"*", //  hour
+			"15"); // minute
+		} catch (TimePatternFormatException e) {
+			throw new RuntimeException(e);
+		}
+
+		creatorTask.setEnabled(true);
 	}
 	
 	public String getOrganisationID() {
@@ -346,5 +364,9 @@ implements Serializable
 	
 	public DunningConfigName getName() {
 		return name;
+	}
+	
+	public Task getCreatorTask() {
+		return creatorTask;
 	}
 }

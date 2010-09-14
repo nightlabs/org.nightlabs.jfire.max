@@ -3,9 +3,7 @@ package org.nightlabs.jfire.dunning;
 import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -21,6 +19,7 @@ import javax.jdo.Query;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.Invoice;
+import org.nightlabs.jfire.accounting.id.CurrencyID;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.dunning.id.DunningConfigCustomerID;
 import org.nightlabs.jfire.dunning.id.DunningConfigID;
@@ -32,6 +31,7 @@ import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.timer.Task;
 import org.nightlabs.jfire.timer.id.TaskID;
 import org.nightlabs.jfire.trade.LegalEntity;
+import org.nightlabs.jfire.transfer.id.AnchorID;
 import org.nightlabs.util.CollectionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -300,22 +300,33 @@ implements DunningManagerRemote
 			Task task = (Task) pm.getObjectById(taskID);
 			DunningConfig dunningConfig =  (DunningConfig) task.getParam();
 			if (dunningConfig.getDunningAutoMode() != DunningAutoMode.none) {
-				Query query = pm.newNamedQuery(Invoice.class, "getOverdueInvoices");
-				Map<String, Object> params = new HashMap<String, Object>();
-				params.put("paramOrganisationID", dunningConfig.getOrganisationID());
-				params.put("paramDate", new Date());
+				//Overdue Invoices
+				Collection<Invoice> overdueInvoices = 
+					Invoice.getOverdueInvoices(pm, dunningConfig.getOrganisationID(), new Date());
 
-				Collection<Invoice> overdueInvoices = CollectionUtil.castList((List<?>) query.executeWithMap(params));
 				for (Invoice inv : overdueInvoices) {
 					LegalEntity customer = inv.getCustomer();
 					Currency currency = inv.getCurrency();
 					
-					query = pm.newNamedQuery(DunningProcess.class, "getDunningProcessIDsByCustomer");
-					params = new HashMap<String, Object>();
-					params.put("customerID", JDOHelper.getObjectId(customer));
-					Collection<DunningProcessID> dunningProcessIDs = CollectionUtil.castList((List<?>) query.executeWithMap(params));
-					if (dunningProcessIDs.size() != 0) {
-						
+					//DunningProcess
+					DunningProcessID dunningProcessID = 
+						DunningProcess.getDunningProcessesByCustomerAndCurrency(pm, (AnchorID)JDOHelper.getObjectId(customer), (CurrencyID)JDOHelper.getObjectId(currency));
+					DunningProcess dunningProcess = null;
+					if (dunningProcessID == null) {
+						DunningConfig customerDunningConfig = DunningConfigCustomer.getDunningConfigByCustomer(pm, (AnchorID)JDOHelper.getObjectId(customer));
+						dunningProcess = 
+							new DunningProcess(dunningConfig.getOrganisationID(), IDGenerator.nextIDString(DunningProcess.class), customerDunningConfig == null ? dunningConfig : customerDunningConfig);
+					}
+					else {
+						dunningProcess = (DunningProcess)pm.getObjectById(dunningProcessID);
+					}
+					
+					int dunningLevel = dunningProcess.getInvoices2DunningLevel().get(inv);
+					dunningProcess.addInvoice(inv, dunningLevel + 1);
+					
+					Collection<DunningProcess> activeDunningProcesses = DunningProcess.getActiveDunningProcessesByDunningConfig(pm, (DunningConfigID)JDOHelper.getObjectId(dunningConfig));
+					for (DunningProcess process : activeDunningProcesses) {
+						process.createDunningLetter();
 					}
 				}
 			}

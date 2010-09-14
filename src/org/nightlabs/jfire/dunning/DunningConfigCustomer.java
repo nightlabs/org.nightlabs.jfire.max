@@ -1,7 +1,11 @@
 package org.nightlabs.jfire.dunning;
 
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
+import javax.jdo.PersistenceManager;
+import javax.jdo.Query;
 import javax.jdo.annotations.Column;
 import javax.jdo.annotations.FetchGroup;
 import javax.jdo.annotations.FetchGroups;
@@ -16,9 +20,12 @@ import javax.jdo.annotations.Queries;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.jdo.ObjectIDUtil;
+import org.nightlabs.jfire.accounting.id.CurrencyID;
 import org.nightlabs.jfire.dunning.id.DunningConfigCustomerID;
+import org.nightlabs.jfire.dunning.id.DunningProcessID;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.trade.LegalEntity;
+import org.nightlabs.jfire.transfer.id.AnchorID;
 
 /**
  * Binding-entity for establishing a relationship between one 
@@ -61,7 +68,7 @@ implements Serializable
 	public static final String FETCH_GROUP_DUNNING_CONFIG = "DunningConfigCustomer.dunningConfig";
 	public static final String FETCH_GROUP_CUSTOMER = "DunningConfigCustomer.customer";
 	
-	public static final String QUERY_GET_DUNNING_CONFIG_BY_CUSTOMER = "getReportRegistryItemByType";
+	public static final String QUERY_GET_DUNNING_CONFIG_BY_CUSTOMER = "getDunningConfigByCustomer";
 	@PrimaryKey
 	@Column(length=100)
 	private String organisationID;
@@ -115,5 +122,12 @@ implements Serializable
 	
 	public LegalEntity getCustomer() {
 		return customer;
+	}
+	
+	public static DunningConfig getDunningConfigByCustomer(PersistenceManager pm, AnchorID customerID) {
+		Query query = pm.newNamedQuery(DunningConfigCustomer.class, QUERY_GET_DUNNING_CONFIG_BY_CUSTOMER);
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("customerID", customerID);
+		return (DunningConfig)query.executeWithMap(params);
 	}
 }

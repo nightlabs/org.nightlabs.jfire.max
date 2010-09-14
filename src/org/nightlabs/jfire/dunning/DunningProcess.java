@@ -1,11 +1,16 @@
 package org.nightlabs.jfire.dunning;
 
 import java.io.Serializable;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.jdo.PersistenceManager;
+import javax.jdo.Query;
 import javax.jdo.annotations.Column;
 import javax.jdo.annotations.IdentityType;
 import javax.jdo.annotations.Inheritance;
@@ -21,9 +26,14 @@ import org.apache.log4j.Logger;
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.Invoice;
+import org.nightlabs.jfire.accounting.id.CurrencyID;
+import org.nightlabs.jfire.dunning.id.DunningConfigID;
 import org.nightlabs.jfire.dunning.id.DunningProcessID;
+import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.trade.LegalEntity;
+import org.nightlabs.jfire.transfer.id.AnchorID;
+import org.nightlabs.util.CollectionUtil;
 
 /**
  * When Invoice.dueDateForPayment is exceeded (i.e. NOW is after this timestamp) 
@@ -51,6 +61,17 @@ import org.nightlabs.jfire.trade.LegalEntity;
 			name="getDunningProcessIDsByCustomer",
 			value="SELECT JDOHelper.getObjectId(this) " +
 					"WHERE JDOHelper.getObjectId(customer) == :customerID"
+	),
+	@javax.jdo.annotations.Query(
+			name="getDunningProcessIDsByCustomerAndCurrency",
+			value="SELECT JDOHelper.getObjectId(this) " +
+					"WHERE JDOHelper.getObjectId(customer) == :customerID &&" +
+					"JDOHelper.getObjectId(currency) == :currencyID"
+	),
+	@javax.jdo.annotations.Query(
+			name="getActiveDunningProcessesByDunningConfig",
+			value="SELECT this " +
+					"WHERE paidDT == null && JDOHelper.getObjectId(dunningConfig) == :dunningConfigID"
 	),
 })
 public class DunningProcess 
@@ -165,8 +186,17 @@ implements Serializable
 		return currency;
 	}
 	
+	public void createDunningLetter() {
+		DunningLetter dunningLetter = new DunningLetter(organisationID, IDGenerator.nextIDString(DunningLetter.class), this);
+		dunningConfig.getDunningFeeAdder().addDunningFee(dunningLetter);
+		for (Invoice inv : invoices2DunningLevel.keySet()) {
+//			DunningLetterEntry letterEntry = new DunningLetterEntry(organisationID, IDGenerator.nextIDString(DunningLetterEntry.class), inv);
+
+		}
+	}
+	
 	public List<DunningLetter> getDunningLetters() {
-		return dunningLetters;
+		return Collections.unmodifiableList(dunningLetters);
 	}
 	
 	public void setCoolDownEnd(Date coolDownEnd) {
@@ -185,8 +215,34 @@ implements Serializable
 		return paidDT;
 	}
 	
+	public void addInvoice(Invoice invoice, int dunningLevel) {
+		invoices2DunningLevel.put(invoice, dunningLevel);
+	}
+	
 	public Map<Invoice, Integer> getInvoices2DunningLevel() {
 		return invoices2DunningLevel;
+	}
+	
+	public static Collection<DunningProcessID> getDunningProcessesByCustomer(PersistenceManager pm, AnchorID customerID) {
+		Query query = pm.newNamedQuery(DunningProcess.class, "getDunningProcessIDsByCustomer");
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("customerID", customerID);
+		return CollectionUtil.castList((List<?>) query.executeWithMap(params));
+	}
+	
+	public static DunningProcessID getDunningProcessesByCustomerAndCurrency(PersistenceManager pm, AnchorID customerID, CurrencyID currencyID) {
+		Query query = pm.newNamedQuery(DunningProcess.class, "getDunningProcessByCustomerAndCurrency");
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("customerID", customerID);
+		params.put("currencyID", currencyID);
+		return (DunningProcessID)query.executeWithMap(params);
+	}
+	
+	public static Collection<DunningProcess> getActiveDunningProcessesByDunningConfig(PersistenceManager pm, DunningConfigID dunningConfigID) {
+		Query query = pm.newNamedQuery(DunningProcess.class, "getActiveDunningProcessesByDunningConfig");
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("dunningConfigID", dunningConfigID);
+		return CollectionUtil.castList((List<?>)query.executeWithMap(params));
 	}
 
 	@Override

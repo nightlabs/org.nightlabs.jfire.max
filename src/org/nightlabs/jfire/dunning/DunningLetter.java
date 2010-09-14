@@ -1,6 +1,7 @@
 package org.nightlabs.jfire.dunning;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -146,6 +147,8 @@ implements Serializable
 		this.dunningLetterID = dunningLetterID;
 		this.dunningProcess = dunningProcess;
 		
+		this.dunnedInvoices = new ArrayList<DunningLetterEntry>();
+		this.dunningFees = new ArrayList<DunningFee>();
 	}
 	
 	public String getOrganisationID() {

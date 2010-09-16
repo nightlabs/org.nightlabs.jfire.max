@@ -20,7 +20,9 @@ function isEvent(productType) {
         <scalar-parameter name="bookUserIDs" id="786">
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
-            <property name="dataType">string</property>
+            <property name="dataType">integer</property>
+            <property name="distinct">true</property>
+            <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
@@ -29,7 +31,9 @@ function isEvent(productType) {
         <scalar-parameter name="productTypeOwnerIDs" id="787">
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
-            <property name="dataType">string</property>
+            <property name="dataType">integer</property>
+            <property name="distinct">true</property>
+            <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
@@ -1622,6 +1626,16 @@ text</expression>
             <property name="pageBreakAfter">auto</property>
             <property name="width">100%</property>
             <property name="dataSet">BookedArticles</property>
+            <list-property name="paramBindings">
+                <structure>
+                    <property name="paramName">bookUserIDs</property>
+                    <expression name="expression" type="javascript">JFireReportingHelper.createDataSetParam(JFireReportingHelper.getParameter("bookUserIDs"))</expression>
+                </structure>
+                <structure>
+                    <property name="paramName">timePeriod</property>
+                    <expression name="expression" type="javascript">JFireReportingHelper.createDataSetParam(JFireReportingHelper.getParameter("timePeriod"))</expression>
+                </structure>
+            </list-property>
             <list-property name="boundDataColumns">
                 <structure>
                     <property name="name">articleJDOID</property>

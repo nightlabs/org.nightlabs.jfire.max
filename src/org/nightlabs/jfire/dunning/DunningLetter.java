@@ -2,6 +2,7 @@ package org.nightlabs.jfire.dunning;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -16,8 +17,10 @@ import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 
 import org.nightlabs.jdo.ObjectIDUtil;
+import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.accounting.Price;
 import org.nightlabs.jfire.dunning.id.DunningLetterID;
+import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.organisation.Organisation;
 
 /**
@@ -151,6 +154,10 @@ implements Serializable
 		this.dunningFees = new ArrayList<DunningFee>();
 	}
 	
+	public DunningLetter(DunningProcess dunningProcess) {
+		this(dunningProcess.getOrganisationID(), IDGenerator.nextIDString(DunningLetter.class), dunningProcess);
+	}
+	
 	public String getOrganisationID() {
 		return organisationID;
 	}
@@ -167,8 +174,13 @@ implements Serializable
 		return dunningLevel;
 	}
 	
+	public void addDunnedInvoice(int level, Invoice invoice) {
+		DunningLetterEntry letterEntry = new DunningLetterEntry(organisationID, IDGenerator.nextIDString(DunningLetterEntry.class), level, invoice);
+		dunnedInvoices.add(letterEntry);
+	}
+	
 	public List<DunningLetterEntry> getDunnedInvoices() {
-		return dunnedInvoices;
+		return Collections.unmodifiableList(dunnedInvoices);
 	}
 	
 	public List<DunningFee> getDunningFees() {

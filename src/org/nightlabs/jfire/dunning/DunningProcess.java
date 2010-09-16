@@ -63,8 +63,8 @@ import org.nightlabs.util.CollectionUtil;
 					"WHERE JDOHelper.getObjectId(customer) == :customerID"
 	),
 	@javax.jdo.annotations.Query(
-			name="getDunningProcessIDsByCustomerAndCurrency",
-			value="SELECT JDOHelper.getObjectId(this) " +
+			name="getDunningProcessByCustomerAndCurrency",
+			value="SELECT this " +
 					"WHERE JDOHelper.getObjectId(customer) == :customerID &&" +
 					"JDOHelper.getObjectId(currency) == :currencyID"
 	),
@@ -186,15 +186,6 @@ implements Serializable
 		return currency;
 	}
 	
-	public void createDunningLetter() {
-		DunningLetter dunningLetter = new DunningLetter(organisationID, IDGenerator.nextIDString(DunningLetter.class), this);
-		dunningConfig.getDunningFeeAdder().addDunningFee(dunningLetter);
-		for (Invoice inv : invoices2DunningLevel.keySet()) {
-//			DunningLetterEntry letterEntry = new DunningLetterEntry(organisationID, IDGenerator.nextIDString(DunningLetterEntry.class), inv);
-
-		}
-	}
-	
 	public List<DunningLetter> getDunningLetters() {
 		return Collections.unmodifiableList(dunningLetters);
 	}
@@ -223,6 +214,20 @@ implements Serializable
 		return invoices2DunningLevel;
 	}
 	
+	public int getLastLevel() {
+		DunningLetter lastLetter = dunningLetters.get(dunningLetters.size() - 1);
+		return lastLetter.getDunningLevel();
+	}
+	
+	public void createDunningLetter() {
+		DunningLetter dunningLetter = new DunningLetter(this);
+		for (Invoice inv : invoices2DunningLevel.keySet()) {
+			dunningLetter.addDunnedInvoice(invoices2DunningLevel.get(inv), inv);
+		}
+		dunningConfig.getDunningFeeAdder().addDunningFee(dunningLetter);
+		dunningLetters.add(dunningLetter);
+	}
+	
 	public static Collection<DunningProcessID> getDunningProcessesByCustomer(PersistenceManager pm, AnchorID customerID) {
 		Query query = pm.newNamedQuery(DunningProcess.class, "getDunningProcessIDsByCustomer");
 		Map<String, Object> params = new HashMap<String, Object>();
@@ -230,12 +235,12 @@ implements Serializable
 		return CollectionUtil.castList((List<?>) query.executeWithMap(params));
 	}
 	
-	public static DunningProcessID getDunningProcessesByCustomerAndCurrency(PersistenceManager pm, AnchorID customerID, CurrencyID currencyID) {
+	public static DunningProcess getDunningProcessByCustomerAndCurrency(PersistenceManager pm, AnchorID customerID, CurrencyID currencyID) {
 		Query query = pm.newNamedQuery(DunningProcess.class, "getDunningProcessByCustomerAndCurrency");
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("customerID", customerID);
 		params.put("currencyID", currencyID);
-		return (DunningProcessID)query.executeWithMap(params);
+		return (DunningProcess)query.executeWithMap(params);
 	}
 	
 	public static Collection<DunningProcess> getActiveDunningProcessesByDunningConfig(PersistenceManager pm, DunningConfigID dunningConfigID) {

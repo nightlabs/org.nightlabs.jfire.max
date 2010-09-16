@@ -3,7 +3,9 @@ package org.nightlabs.jfire.dunning;
 import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -63,7 +65,7 @@ implements DunningManagerRemote
 			pm.close();
 		}//finally
 	}
-	
+
 	@RolesAllowed("_Guest_")
 	@Override
 	public List<DunningConfig> getDunningConfigs(Collection<DunningConfigID> dunningConfigIDs, String[] fetchGroups, int maxFetchDepth)
@@ -90,7 +92,7 @@ implements DunningManagerRemote
 			pm.close();
 		}
 	}
-	
+
 	//DunningConfigCustomer
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("_Guest_")
@@ -105,7 +107,7 @@ implements DunningManagerRemote
 			pm.close();
 		}//finally
 	}
-	
+
 	@RolesAllowed("_Guest_")
 	@Override
 	public List<DunningConfigCustomer> getDunningConfigCustomers(Collection<DunningConfigCustomerID> dunningConfigCustomerIDs, String[] fetchGroups, int maxFetchDepth)
@@ -132,7 +134,7 @@ implements DunningManagerRemote
 			pm.close();
 		}
 	}
-	
+
 	//DunningProcess
 	@RolesAllowed("_Guest_")
 	@Override
@@ -150,7 +152,7 @@ implements DunningManagerRemote
 			pm.close();
 		}
 	}
-	
+
 	@RolesAllowed("_Guest_")
 	@Override
 	public List<DunningProcess> getDunningProcesses(Collection<DunningProcessID> dunningProcessIDs, String[] fetchGroups, int maxFetchDepth)
@@ -177,7 +179,7 @@ implements DunningManagerRemote
 			pm.close();
 		}
 	}
-	
+
 	//DunningFeeAdder
 	@RolesAllowed("_Guest_")
 	@Override
@@ -207,7 +209,7 @@ implements DunningManagerRemote
 			pm.close();
 		}
 	}
-	
+
 	//DunningInterestCalculator
 	@RolesAllowed("_Guest_")
 	@Override
@@ -237,7 +239,7 @@ implements DunningManagerRemote
 			pm.close();
 		}
 	}
-	
+
 	//DunningFeeType
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("_Guest_")
@@ -252,7 +254,7 @@ implements DunningManagerRemote
 			pm.close();
 		}//finally
 	}
-	
+
 	@RolesAllowed("_Guest_")
 	@Override
 	public List<DunningFeeType> getDunningFeeTypes(Collection<DunningFeeTypeID> dunningFeeTypeIDs, String[] fetchGroups, int maxFetchDepth)
@@ -279,20 +281,20 @@ implements DunningManagerRemote
 			pm.close();
 		}
 	}
-	
+
 	//
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public void initTimerTaskAutomaticDunning(PersistenceManager pm)
 	throws Exception
 	{
-//		try {
-//			TaskID _taskID = TaskID.create(getOrganisationID(), DunningConfig.TASK_TYPE_ID_PROCESS_DUNNING, taskID);
-//			Task task = (Task) pm.getObjectById(_taskID);
-//		} finally {
-//			pm.close();
-//		}
+		//		try {
+		//			TaskID _taskID = TaskID.create(getOrganisationID(), DunningConfig.TASK_TYPE_ID_PROCESS_DUNNING, taskID);
+		//			Task task = (Task) pm.getObjectById(_taskID);
+		//		} finally {
+		//			pm.close();
+		//		}
 	}
-	
+
 	public void processAutomaticDunning(TaskID taskID)
 	throws Exception {
 		PersistenceManager pm = createPersistenceManager();
@@ -304,37 +306,42 @@ implements DunningManagerRemote
 				Collection<Invoice> overdueInvoices = 
 					Invoice.getOverdueInvoices(pm, dunningConfig.getOrganisationID(), new Date());
 
+				Map<DunningProcess, DunningLetter> process2LetterMap = new HashMap<DunningProcess, DunningLetter>();
 				for (Invoice inv : overdueInvoices) {
 					LegalEntity customer = inv.getCustomer();
 					Currency currency = inv.getCurrency();
-					
+
 					//DunningProcess
-					DunningProcessID dunningProcessID = 
-						DunningProcess.getDunningProcessesByCustomerAndCurrency(pm, (AnchorID)JDOHelper.getObjectId(customer), (CurrencyID)JDOHelper.getObjectId(currency));
-					DunningProcess dunningProcess = null;
-					if (dunningProcessID == null) {
+					DunningProcess dunningProcess = 
+						DunningProcess.getDunningProcessByCustomerAndCurrency(pm, (AnchorID)JDOHelper.getObjectId(customer), (CurrencyID)JDOHelper.getObjectId(currency));
+					if (dunningProcess == null || dunningProcess.getPaidDT() != null) {
+						//Get DunningConfig for the Customer
 						DunningConfig customerDunningConfig = DunningConfigCustomer.getDunningConfigByCustomer(pm, (AnchorID)JDOHelper.getObjectId(customer));
+						//Create new DunningProcess
 						dunningProcess = 
 							new DunningProcess(dunningConfig.getOrganisationID(), IDGenerator.nextIDString(DunningProcess.class), customerDunningConfig == null ? dunningConfig : customerDunningConfig);
 					}
-					else {
-						dunningProcess = (DunningProcess)pm.getObjectById(dunningProcessID);
-					}
+
+					//Wrong!!!!!!!!!!!!!!!!!!!!
+					//Get current level or if it's a new process, it will be 1st level.
+//					int dunningLevel = dunningProcess.getInvoices2DunningLevel().get(inv);
+//					dunningProcess.addInvoice(inv, dunningLevel + 1);
+					dunningProcess.addInvoice(inv, dunningProcess.getLastLevel());
 					
-					int dunningLevel = dunningProcess.getInvoices2DunningLevel().get(inv);
-					dunningProcess.addInvoice(inv, dunningLevel + 1);
-					
-					Collection<DunningProcess> activeDunningProcesses = DunningProcess.getActiveDunningProcessesByDunningConfig(pm, (DunningConfigID)JDOHelper.getObjectId(dunningConfig));
-					for (DunningProcess process : activeDunningProcesses) {
-						process.createDunningLetter();
-					}
+					pm.makePersistent(dunningProcess);
+				}
+
+				Collection<DunningProcess> activeDunningProcesses = DunningProcess.getActiveDunningProcessesByDunningConfig(pm, (DunningConfigID)JDOHelper.getObjectId(dunningConfig));
+				for (DunningProcess process : activeDunningProcesses) {
+					process.createDunningLetter();
+					pm.makePersistent(process);
 				}
 			}
 		} finally {
 			pm.close();
 		}
 	}
-	
+
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("_System_")
 	@Override
@@ -356,15 +363,15 @@ implements DunningManagerRemote
 			} catch (JDOObjectNotFoundException x) {
 				// datastore not yet initialized
 				dunningFeeAdder = pm.makePersistent(new DunningFeeAdderCustomerFriendly(organisationIDStr, DunningFeeAdderCustomerFriendly.ID.dunningFeeAdderID));
-				
+
 				pm.getExtent(DunningInterestCalculator.class);
-				
+
 				dunningInterestCalculator = pm.makePersistent(new DunningInterestCalculatorCustomerFriendly(organisationIDStr, DunningInterestCalculatorCustomerFriendly.ID.dunningInterestCalculatorID));
 			}
 
 			pm.getExtent(DunningConfigCustomer.class);
 			// check, whether the datastore is already initialized
-			 DunningConfigCustomerID dccID = DunningConfigCustomerID.create(getOrganisationID(), DunningConfigCustomer.DUNNING_CONFIG_CUSTOMER_DEFAULT_ID);
+			DunningConfigCustomerID dccID = DunningConfigCustomerID.create(getOrganisationID(), DunningConfigCustomer.DUNNING_CONFIG_CUSTOMER_DEFAULT_ID);
 			try {
 				pm.getObjectById(dccID);
 				return; // already initialized
@@ -372,49 +379,49 @@ implements DunningManagerRemote
 				DunningFeeType defaultDunningFeeType = new DunningFeeType(dccID.organisationID, IDGenerator.nextID(DunningFeeType.class));
 				defaultDunningFeeType.getName().readFromProperties(baseName, loader, "org.nightlabs.jfire.dunning.DunningFeeType.default.name");
 				defaultDunningFeeType.getDescription().readFromProperties(baseName, loader, "org.nightlabs.jfire.dunning.DunningFeeType.default.description");
-				
+
 				// datastore not yet initialized
 				DunningConfig defaultDunningConfig = new DunningConfig(dccID.organisationID, dccID.dunningConfigCustomerID, DunningAutoMode.createAndFinalize);
 				defaultDunningConfig.getName().readFromProperties(baseName, loader, "org.nightlabs.jfire.dunning.DunningConfig.default.name");
 				defaultDunningConfig.getDescription().readFromProperties(baseName, loader, "org.nightlabs.jfire.dunning.DunningConfig.default.description");
-				
+
 				//Step1
 				ProcessDunningStep processStep1 = new ProcessDunningStep(organisationIDStr, IDGenerator.nextIDString(AbstractDunningStep.class), defaultDunningConfig, 1);
 				processStep1.addFeeType(defaultDunningFeeType);
-				
+
 				InvoiceDunningStep invStep1 = new InvoiceDunningStep(organisationIDStr, IDGenerator.nextIDString(AbstractDunningStep.class), defaultDunningConfig, 1);
 				invStep1.setPeriodOfGraceMSec(TimeUnit.DAYS.toMillis(31));
 				invStep1.setInterestPercentage(new BigDecimal(0));
-				
+
 				//Step2
 				ProcessDunningStep processStep2 = new ProcessDunningStep(organisationIDStr, IDGenerator.nextIDString(AbstractDunningStep.class), defaultDunningConfig, 2);
 				processStep2.addFeeType(defaultDunningFeeType);
-				
+
 				InvoiceDunningStep invStep2 = new InvoiceDunningStep(organisationIDStr, IDGenerator.nextIDString(AbstractDunningStep.class), defaultDunningConfig, 2);
 				invStep2.setPeriodOfGraceMSec(TimeUnit.DAYS.toMillis(31));
 				invStep2.setInterestPercentage(new BigDecimal(4));
-				
+
 				//Step3
 				ProcessDunningStep processStep3 = new ProcessDunningStep(organisationIDStr, IDGenerator.nextIDString(AbstractDunningStep.class), defaultDunningConfig, 3);
-				
+
 				InvoiceDunningStep invStep3 = new InvoiceDunningStep(organisationIDStr, IDGenerator.nextIDString(AbstractDunningStep.class), defaultDunningConfig, 3);
 				invStep3.setPeriodOfGraceMSec(TimeUnit.DAYS.toMillis(31));
 				invStep3.setInterestPercentage(new BigDecimal(4));
-				
+
 				//
 				defaultDunningConfig.addInvoiceDunningStep(invStep1);
 				defaultDunningConfig.addInvoiceDunningStep(invStep2);
 				defaultDunningConfig.addInvoiceDunningStep(invStep3);
-				
+
 				defaultDunningConfig.addProcessDunningStep(processStep1);
 				defaultDunningConfig.addProcessDunningStep(processStep2);
 				defaultDunningConfig.addProcessDunningStep(processStep3);
-				
+
 				defaultDunningConfig.setDunningInterestCalculator(dunningInterestCalculator);
 				defaultDunningConfig.setDunningFeeAdder(dunningFeeAdder);
-				
+
 				DunningConfigCustomer dcc = new DunningConfigCustomer(dccID.organisationID, dccID.dunningConfigCustomerID, defaultDunningConfig, LegalEntity.getAnonymousLegalEntity(pm));
-				
+
 				pm.makePersistent(dcc);
 			}
 		} finally {

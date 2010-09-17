@@ -15,7 +15,7 @@
 	<script 
 		file="InvoiceData.javaclass" 
 		id="InvoiceData"
-		resultClass="org.nightlabs.jfire.reporting.oda.jfs.ResultSet"
+		resultClass="org.eclipse.datatools.connectivity.oda.jfire.IResultSet"
 	>
 	<!-- id is optional and defaults to the value of file -->
 		<name language="de">Rechnungsdaten</name>

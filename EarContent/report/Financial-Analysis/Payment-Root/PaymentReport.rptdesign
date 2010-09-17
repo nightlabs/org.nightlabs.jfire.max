@@ -1,31 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.14" id="1">
-    <property name="createdBy">Eclipse BIRT Designer Version 2.2.0.v20070620 Build &lt;@BUILD@></property>
-    <property name="units">in</property>
-    <property name="includeResource">reportMessages</property>
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.21" id="1">
+    <property name="createdBy">Eclipse BIRT Designer Version 2.6.0.v20100531 Build &lt;2.6.0.v20100609-1613></property>
     <html-property name="description">WizardTemplateChoicePage.message.BlankReport</html-property>
+    <simple-property-list name="includeResource">
+        <value>reportMessages</value>
+    </simple-property-list>
+    <property name="units">in</property>
+    <list-property name="propertyBindings">
+        <structure>
+            <property name="name">queryText</property>
+            <property name="id">218</property>
+        </structure>
+    </list-property>
     <method name="initialize"><![CDATA[importClass(Packages.org.nightlabs.jfire.reporting.JFireReportingHelper);
 importClass(Packages.org.nightlabs.jfire.accounting.pay.Payment);
+importClass(Packages.org.nightlabs.l10n.DateFormatter);
 
 function isParamSet(param) {
   return !("".equals(param) || ""+param == "null" || null == param);
+}
+
+function formatDate(date) {
+  return DateFormatter.formatDate(date, DateFormatter.FLAGS_DATE_SHORT_TIME_HM);
 }]]></method>
     <text-property name="displayName">WizardTemplateChoicePage.title.BlankReport</text-property>
     <property name="iconFile">/templates/blank_report.gif</property>
+    <property name="layoutPreference">auto layout</property>
     <parameters>
         <scalar-parameter name="userIDs" id="325">
             <property name="valueType">static</property>
-            <property name="dataType">string</property>
             <property name="isRequired">false</property>
-            <property name="controlType">text-box</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="userGroupIDs" id="326">
-            <property name="valueType">static</property>
-            <property name="dataType">string</property>
-            <property name="isRequired">false</property>
+            <property name="dataType">integer</property>
+            <property name="distinct">true</property>
+            <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
@@ -33,8 +40,10 @@ function isParamSet(param) {
         </scalar-parameter>
         <scalar-parameter name="partnerIDs" id="327">
             <property name="valueType">static</property>
-            <property name="dataType">string</property>
             <property name="isRequired">false</property>
+            <property name="dataType">integer</property>
+            <property name="distinct">true</property>
+            <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
@@ -42,8 +51,10 @@ function isParamSet(param) {
         </scalar-parameter>
         <scalar-parameter name="modeOfPaymentFlavourIDs" id="468">
             <property name="valueType">static</property>
-            <property name="dataType">string</property>
             <property name="isRequired">false</property>
+            <property name="dataType">integer</property>
+            <property name="distinct">true</property>
+            <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
@@ -51,8 +62,20 @@ function isParamSet(param) {
         </scalar-parameter>
         <scalar-parameter name="beginTimePeriod" id="328">
             <property name="valueType">static</property>
-            <property name="dataType">string</property>
             <property name="isRequired">false</property>
+            <property name="dataType">integer</property>
+            <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="hideNonPayment" id="489">
+            <property name="valueType">static</property>
+            <property name="dataType">integer</property>
+            <property name="distinct">true</property>
+            <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
@@ -73,6 +96,211 @@ function isParamSet(param) {
   - row["amount"]
 }</expression>
                     <property name="dataType">decimal</property>
+                </structure>
+            </list-property>
+            <list-property name="columnHints">
+                <structure>
+                    <property name="columnName">organisationID</property>
+                    <text-property name="displayName">organisationID</text-property>
+                    <text-property name="heading">organisationID</text-property>
+                    <property name="displayLength">0</property>
+                    <property name="horizontalAlign">justify</property>
+                    <property name="wordWrap">false</property>
+                </structure>
+                <structure>
+                    <property name="columnName">paymentID</property>
+                    <text-property name="displayName">paymentID</text-property>
+                    <text-property name="heading">paymentID</text-property>
+                    <property name="displayLength">0</property>
+                    <property name="horizontalAlign">justify</property>
+                    <property name="wordWrap">false</property>
+                </structure>
+                <structure>
+                    <property name="columnName">paymentDirection</property>
+                    <text-property name="displayName">paymentDirection</text-property>
+                    <text-property name="heading">paymentDirection</text-property>
+                    <property name="displayLength">0</property>
+                    <property name="horizontalAlign">justify</property>
+                    <property name="wordWrap">false</property>
+                </structure>
+                <structure>
+                    <property name="columnName">reasonForPayment</property>
+                    <text-property name="displayName">reasonForPayment</text-property>
+                    <text-property name="heading">reasonForPayment</text-property>
+                    <property name="displayLength">0</property>
+                    <property name="horizontalAlign">justify</property>
+                    <property name="wordWrap">false</property>
+                </structure>
+                <structure>
+                    <property name="columnName">modeOfPaymentFlavourJDOID</property>
+                    <text-property name="displayName">modeOfPaymentFlavourJDOID</text-property>
+                    <text-property name="heading">modeOfPaymentFlavourJDOID</text-property>
+                    <property name="displayLength">0</property>
+                    <property name="horizontalAlign">justify</property>
+                    <property name="wordWrap">false</property>
+                </structure>
+                <structure>
+                    <property name="columnName">currencyJDOID</property>
+                    <text-property name="displayName">currencyJDOID</text-property>
+                    <text-property name="heading">currencyJDOID</text-property>
+                    <property name="displayLength">0</property>
+                    <property name="horizontalAlign">justify</property>
+                    <property name="wordWrap">false</property>
+                </structure>
+                <structure>
+                    <property name="columnName">partnerJDOID</property>
+                    <text-property name="displayName">partnerJDOID</text-property>
+                    <text-property name="heading">partnerJDOID</text-property>
+                    <property name="displayLength">0</property>
+                    <property name="horizontalAlign">justify</property>
+                    <property name="wordWrap">false</property>
+                </structure>
+                <structure>
+                    <property name="columnName">partnerAccountJDOID</property>
+                    <text-property name="displayName">partnerAccountJDOID</text-property>
+                    <text-property name="heading">partnerAccountJDOID</text-property>
+                    <property name="displayLength">0</property>
+                    <property name="horizontalAlign">justify</property>
+                    <property name="wordWrap">false</property>
+                </structure>
+                <structure>
+                    <property name="columnName">amount</property>
+                    <text-property name="displayName">amount</text-property>
+                    <text-property name="heading">amount</text-property>
+                    <property name="displayLength">0</property>
+                    <property name="horizontalAlign">justify</property>
+                    <property name="wordWrap">false</property>
+                </structure>
+                <structure>
+                    <property name="columnName">userJDOID</property>
+                    <text-property name="displayName">userJDOID</text-property>
+                    <text-property name="heading">userJDOID</text-property>
+                    <property name="displayLength">0</property>
+                    <property name="horizontalAlign">justify</property>
+                    <property name="wordWrap">false</property>
+                </structure>
+                <structure>
+                    <property name="columnName">beginDT</property>
+                    <text-property name="displayName">beginDT</text-property>
+                    <text-property name="heading">beginDT</text-property>
+                    <property name="displayLength">0</property>
+                    <property name="horizontalAlign">justify</property>
+                    <property name="wordWrap">false</property>
+                </structure>
+                <structure>
+                    <property name="columnName">endDT</property>
+                    <text-property name="displayName">endDT</text-property>
+                    <text-property name="heading">endDT</text-property>
+                    <property name="displayLength">0</property>
+                    <property name="horizontalAlign">justify</property>
+                    <property name="wordWrap">false</property>
+                </structure>
+                <structure>
+                    <property name="columnName">postponed</property>
+                    <text-property name="displayName">postponed</text-property>
+                    <text-property name="heading">postponed</text-property>
+                    <property name="displayLength">0</property>
+                    <property name="horizontalAlign">justify</property>
+                    <property name="wordWrap">false</property>
+                </structure>
+                <structure>
+                    <property name="columnName">pending</property>
+                    <text-property name="displayName">pending</text-property>
+                    <text-property name="heading">pending</text-property>
+                    <property name="displayLength">0</property>
+                    <property name="horizontalAlign">justify</property>
+                    <property name="wordWrap">false</property>
+                </structure>
+                <structure>
+                    <property name="columnName">failed</property>
+                    <text-property name="displayName">failed</text-property>
+                    <text-property name="heading">failed</text-property>
+                    <property name="displayLength">0</property>
+                    <property name="horizontalAlign">justify</property>
+                    <property name="wordWrap">false</property>
+                </structure>
+                <structure>
+                    <property name="columnName">forceRollback</property>
+                    <text-property name="displayName">forceRollback</text-property>
+                    <text-property name="heading">forceRollback</text-property>
+                    <property name="displayLength">0</property>
+                    <property name="horizontalAlign">justify</property>
+                    <property name="wordWrap">false</property>
+                </structure>
+                <structure>
+                    <property name="columnName">invoiceIDs</property>
+                    <text-property name="displayName">invoiceIDs</text-property>
+                    <text-property name="heading">invoiceIDs</text-property>
+                    <property name="displayLength">0</property>
+                    <property name="horizontalAlign">justify</property>
+                    <property name="wordWrap">false</property>
+                </structure>
+            </list-property>
+            <list-property name="parameters">
+                <structure>
+                    <property name="name">userIDs</property>
+                    <property name="nativeName">userIDs</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">1</property>
+                    <property name="position">1</property>
+                    <expression name="defaultValue">'__DUMMY_DEFAULT_PARAMETER_VALUE__'</expression>
+                    <property name="isOptional">false</property>
+                    <property name="allowNull">false</property>
+                    <property name="isInput">true</property>
+                </structure>
+                <structure>
+                    <property name="name">modeOfPaymentFlavourIDs</property>
+                    <property name="nativeName">modeOfPaymentFlavourIDs</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">1</property>
+                    <property name="position">2</property>
+                    <expression name="defaultValue" type="constant">__DUMMY_DEFAULT_PARAMETER_VALUE__</expression>
+                    <property name="isOptional">false</property>
+                    <property name="allowNull">false</property>
+                    <property name="isInput">true</property>
+                </structure>
+                <structure>
+                    <property name="name">partnerIDs</property>
+                    <property name="nativeName">partnerIDs</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">1</property>
+                    <property name="position">3</property>
+                    <expression name="defaultValue" type="constant">__DUMMY_DEFAULT_PARAMETER_VALUE__</expression>
+                    <property name="isOptional">false</property>
+                    <property name="allowNull">false</property>
+                    <property name="isInput">true</property>
+                </structure>
+                <structure>
+                    <property name="name">beginTimePeriod_1</property>
+                    <property name="nativeName">beginTimePeriod</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">10</property>
+                    <property name="position">5</property>
+                    <expression name="defaultValue">'__DUMMY_DEFAULT_PARAMETER_VALUE__'</expression>
+                    <property name="isOptional">false</property>
+                    <property name="allowNull">true</property>
+                    <property name="isInput">true</property>
+                </structure>
+                <structure>
+                    <property name="name">beginTimePeriod</property>
+                    <property name="nativeName">beginTimePeriod</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">10</property>
+                    <property name="position">4</property>
+                    <expression name="defaultValue" type="constant">__DUMMY_DEFAULT_PARAMETER_VALUE__</expression>
+                    <property name="isOptional">false</property>
+                    <property name="allowNull">false</property>
+                    <property name="isInput">true</property>
+                </structure>
+                <structure>
+                    <property name="name">hideNonPayment</property>
+                    <property name="nativeName">hideNonPayment</property>
+                    <property name="nativeDataType">4</property>
+                    <property name="position">6</property>
+                    <expression name="defaultValue" type="constant">__DUMMY_DEFAULT_PARAMETER_VALUE__</expression>
+                    <property name="isOptional">false</property>
+                    <property name="allowNull">false</property>
+                    <property name="isInput">true</property>
                 </structure>
             </list-property>
             <structure name="cachedMetaData">
@@ -130,32 +358,32 @@ function isParamSet(param) {
                     <structure>
                         <property name="position">11</property>
                         <property name="name">beginDT</property>
-                        <property name="dataType">date</property>
+                        <property name="dataType">date-time</property>
                     </structure>
                     <structure>
                         <property name="position">12</property>
                         <property name="name">endDT</property>
-                        <property name="dataType">date</property>
+                        <property name="dataType">date-time</property>
                     </structure>
                     <structure>
                         <property name="position">13</property>
                         <property name="name">postponed</property>
-                        <property name="dataType">integer</property>
+                        <property name="dataType">boolean</property>
                     </structure>
                     <structure>
                         <property name="position">14</property>
                         <property name="name">pending</property>
-                        <property name="dataType">integer</property>
+                        <property name="dataType">boolean</property>
                     </structure>
                     <structure>
                         <property name="position">15</property>
                         <property name="name">failed</property>
-                        <property name="dataType">integer</property>
+                        <property name="dataType">boolean</property>
                     </structure>
                     <structure>
                         <property name="position">16</property>
                         <property name="name">forceRollback</property>
-                        <property name="dataType">integer</property>
+                        <property name="dataType">boolean</property>
                     </structure>
                     <structure>
                         <property name="position">17</property>
@@ -170,205 +398,118 @@ function isParamSet(param) {
                 </list-property>
             </structure>
             <property name="dataSource">JFSDataSource</property>
-            <list-property name="parameters">
-                <structure>
-                    <property name="name">userIDs</property>
-                    <property name="nativeName">userIDs</property>
-                    <property name="dataType">string</property>
-                    <property name="nativeDataType">1</property>
-                    <property name="position">1</property>
-                    <expression name="defaultValue">'__DUMMY_DEFAULT_PARAMETER_VALUE__'</expression>
-                    <property name="isOptional">false</property>
-                    <property name="allowNull">true</property>
-                    <property name="isInput">true</property>
-                </structure>
-                <structure>
-                    <property name="name">userGroupIDs</property>
-                    <property name="nativeName">userGroupIDs</property>
-                    <property name="dataType">string</property>
-                    <property name="nativeDataType">1</property>
-                    <property name="position">2</property>
-                    <expression name="defaultValue">'__DUMMY_DEFAULT_PARAMETER_VALUE__'</expression>
-                    <property name="isOptional">false</property>
-                    <property name="allowNull">true</property>
-                    <property name="isInput">true</property>
-                </structure>
-                <structure>
-                    <property name="name">partnerIDs</property>
-                    <property name="nativeName">partnerIDs</property>
-                    <property name="dataType">string</property>
-                    <property name="nativeDataType">1</property>
-                    <property name="position">4</property>
-                    <expression name="defaultValue">'__DUMMY_DEFAULT_PARAMETER_VALUE__'</expression>
-                    <property name="isOptional">false</property>
-                    <property name="allowNull">true</property>
-                    <property name="isInput">true</property>
-                </structure>
-                <structure>
-                    <property name="name">beginTimePeriod</property>
-                    <property name="nativeName">beginTimePeriod</property>
-                    <property name="dataType">string</property>
-                    <property name="nativeDataType">1</property>
-                    <property name="position">5</property>
-                    <expression name="defaultValue">'__DUMMY_DEFAULT_PARAMETER_VALUE__'</expression>
-                    <property name="isOptional">false</property>
-                    <property name="allowNull">true</property>
-                    <property name="isInput">true</property>
-                </structure>
-                <structure>
-                    <property name="name">endTimePeriod</property>
-                    <property name="nativeName">endTimePeriod</property>
-                    <property name="dataType">string</property>
-                    <property name="nativeDataType">1</property>
-                    <property name="position">6</property>
-                    <expression name="defaultValue">'__DUMMY_DEFAULT_PARAMETER_VALUE__'</expression>
-                    <property name="isOptional">false</property>
-                    <property name="allowNull">true</property>
-                    <property name="isInput">true</property>
-                </structure>
-                <structure>
-                    <property name="name">modeOfPaymentFlavourIDs</property>
-                    <property name="nativeName">modeOfPaymentFlavourIDs</property>
-                    <property name="dataType">string</property>
-                    <property name="nativeDataType">1</property>
-                    <property name="position">3</property>
-                    <expression name="defaultValue">'__DUMMY_DEFAULT_PARAMETER_VALUE__'</expression>
-                    <property name="isOptional">false</property>
-                    <property name="allowNull">true</property>
-                    <property name="isInput">true</property>
-                </structure>
-            </list-property>
             <list-property name="resultSet">
                 <structure>
                     <property name="position">1</property>
                     <property name="name">organisationID</property>
                     <property name="nativeName">organisationID</property>
                     <property name="dataType">string</property>
-                    <property name="nativeDataType">1</property>
                 </structure>
                 <structure>
                     <property name="position">2</property>
                     <property name="name">paymentID</property>
                     <property name="nativeName">paymentID</property>
                     <property name="dataType">decimal</property>
-                    <property name="nativeDataType">6</property>
                 </structure>
                 <structure>
                     <property name="position">3</property>
                     <property name="name">paymentDirection</property>
                     <property name="nativeName">paymentDirection</property>
                     <property name="dataType">string</property>
-                    <property name="nativeDataType">1</property>
                 </structure>
                 <structure>
                     <property name="position">4</property>
                     <property name="name">reasonForPayment</property>
                     <property name="nativeName">reasonForPayment</property>
                     <property name="dataType">string</property>
-                    <property name="nativeDataType">1</property>
                 </structure>
                 <structure>
                     <property name="position">5</property>
                     <property name="name">modeOfPaymentFlavourJDOID</property>
                     <property name="nativeName">modeOfPaymentFlavourJDOID</property>
                     <property name="dataType">string</property>
-                    <property name="nativeDataType">1</property>
                 </structure>
                 <structure>
                     <property name="position">6</property>
                     <property name="name">currencyJDOID</property>
                     <property name="nativeName">currencyJDOID</property>
                     <property name="dataType">string</property>
-                    <property name="nativeDataType">1</property>
                 </structure>
                 <structure>
                     <property name="position">7</property>
                     <property name="name">partnerJDOID</property>
                     <property name="nativeName">partnerJDOID</property>
                     <property name="dataType">string</property>
-                    <property name="nativeDataType">1</property>
                 </structure>
                 <structure>
                     <property name="position">8</property>
                     <property name="name">partnerAccountJDOID</property>
                     <property name="nativeName">partnerAccountJDOID</property>
                     <property name="dataType">string</property>
-                    <property name="nativeDataType">1</property>
                 </structure>
                 <structure>
                     <property name="position">9</property>
                     <property name="name">amount</property>
                     <property name="nativeName">amount</property>
                     <property name="dataType">decimal</property>
-                    <property name="nativeDataType">6</property>
                 </structure>
                 <structure>
                     <property name="position">10</property>
                     <property name="name">userJDOID</property>
                     <property name="nativeName">userJDOID</property>
                     <property name="dataType">string</property>
-                    <property name="nativeDataType">1</property>
                 </structure>
                 <structure>
                     <property name="position">11</property>
                     <property name="name">beginDT</property>
                     <property name="nativeName">beginDT</property>
-                    <property name="dataType">date</property>
-                    <property name="nativeDataType">5</property>
+                    <property name="dataType">date-time</property>
                 </structure>
                 <structure>
                     <property name="position">12</property>
                     <property name="name">endDT</property>
                     <property name="nativeName">endDT</property>
-                    <property name="dataType">date</property>
-                    <property name="nativeDataType">5</property>
+                    <property name="dataType">date-time</property>
                 </structure>
                 <structure>
                     <property name="position">13</property>
                     <property name="name">postponed</property>
                     <property name="nativeName">postponed</property>
-                    <property name="dataType">integer</property>
-                    <property name="nativeDataType">4</property>
+                    <property name="dataType">boolean</property>
                 </structure>
                 <structure>
                     <property name="position">14</property>
                     <property name="name">pending</property>
                     <property name="nativeName">pending</property>
-                    <property name="dataType">integer</property>
-                    <property name="nativeDataType">4</property>
+                    <property name="dataType">boolean</property>
                 </structure>
                 <structure>
                     <property name="position">15</property>
                     <property name="name">failed</property>
                     <property name="nativeName">failed</property>
-                    <property name="dataType">integer</property>
-                    <property name="nativeDataType">4</property>
+                    <property name="dataType">boolean</property>
                 </structure>
                 <structure>
                     <property name="position">16</property>
                     <property name="name">forceRollback</property>
                     <property name="nativeName">forceRollback</property>
-                    <property name="dataType">integer</property>
-                    <property name="nativeDataType">4</property>
+                    <property name="dataType">boolean</property>
                 </structure>
                 <structure>
                     <property name="position">17</property>
                     <property name="name">invoiceIDs</property>
                     <property name="nativeName">invoiceIDs</property>
                     <property name="dataType">string</property>
-                    <property name="nativeDataType">1</property>
                 </structure>
             </list-property>
-            <property name="queryText">&lt;queryPropertySet>&lt;org.nightlabs.jfire.reporting.oda.jfs.JFSQueryPropertySet>
-  &lt;scriptRegistryItemID>
-    &lt;organisationID>dev.jfire.org&lt;/organisationID>
-    &lt;scriptRegistryItemType>JFireReportingTrade-PaymentData&lt;/scriptRegistryItemType>
-    &lt;scriptRegistryItemID>PaymentList&lt;/scriptRegistryItemID>
-  &lt;/scriptRegistryItemID>
-  &lt;properties class="tree-map">
-    &lt;no-comparator/>
-  &lt;/properties>
-&lt;/org.nightlabs.jfire.reporting.oda.jfs.JFSQueryPropertySet>&lt;/queryPropertySet></property>
+            <xml-property name="queryText"><![CDATA[<queryPropertySet><org.nightlabs.jfire.reporting.oda.jfs.JFSQueryPropertySet>
+  <scriptRegistryItemID>
+    <organisationID>dev.jfire.org</organisationID>
+    <scriptRegistryItemType>JFireReportingTrade-PaymentData</scriptRegistryItemType>
+    <scriptRegistryItemID>PaymentList</scriptRegistryItemID>
+  </scriptRegistryItemID>
+  <properties/>
+</org.nightlabs.jfire.reporting.oda.jfs.JFSQueryPropertySet></queryPropertySet>]]></xml-property>
             <xml-property name="designerValues"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 <model:DesignValues xmlns:design="http://www.eclipse.org/datatools/connectivity/oda/design" xmlns:model="http://www.eclipse.org/birt/report/model/adapter/odaModel">
   <Version>1.0</Version>
@@ -381,27 +522,13 @@ function isParamSet(param) {
         <design:nativeDataTypeCode>1</design:nativeDataTypeCode>
         <design:precision>0</design:precision>
         <design:scale>0</design:scale>
-        <design:nullability>Nullable</design:nullability>
+        <design:nullability>NotNullable</design:nullability>
       </design:attributes>
       <design:inputAttributes>
         <design:elementAttributes>
-          <design:defaultScalarValue>__DUMMY_DEFAULT_PARAMETER_VALUE__</design:defaultScalarValue>
-        </design:elementAttributes>
-      </design:inputAttributes>
-    </design:parameterDefinitions>
-    <design:parameterDefinitions>
-      <design:inOutMode>In</design:inOutMode>
-      <design:attributes>
-        <design:name>userGroupIDs</design:name>
-        <design:position>2</design:position>
-        <design:nativeDataTypeCode>1</design:nativeDataTypeCode>
-        <design:precision>0</design:precision>
-        <design:scale>0</design:scale>
-        <design:nullability>Nullable</design:nullability>
-      </design:attributes>
-      <design:inputAttributes>
-        <design:elementAttributes>
-          <design:defaultScalarValue>__DUMMY_DEFAULT_PARAMETER_VALUE__</design:defaultScalarValue>
+          <design:defaultValues>
+            <design:values>__DUMMY_DEFAULT_PARAMETER_VALUE__</design:values>
+          </design:defaultValues>
         </design:elementAttributes>
       </design:inputAttributes>
     </design:parameterDefinitions>
@@ -409,15 +536,17 @@ function isParamSet(param) {
       <design:inOutMode>In</design:inOutMode>
       <design:attributes>
         <design:name>modeOfPaymentFlavourIDs</design:name>
-        <design:position>3</design:position>
+        <design:position>2</design:position>
         <design:nativeDataTypeCode>1</design:nativeDataTypeCode>
         <design:precision>0</design:precision>
         <design:scale>0</design:scale>
-        <design:nullability>Nullable</design:nullability>
+        <design:nullability>NotNullable</design:nullability>
       </design:attributes>
       <design:inputAttributes>
         <design:elementAttributes>
-          <design:defaultScalarValue>__DUMMY_DEFAULT_PARAMETER_VALUE__</design:defaultScalarValue>
+          <design:defaultValues>
+            <design:values>__DUMMY_DEFAULT_PARAMETER_VALUE__</design:values>
+          </design:defaultValues>
         </design:elementAttributes>
       </design:inputAttributes>
     </design:parameterDefinitions>
@@ -425,15 +554,17 @@ function isParamSet(param) {
       <design:inOutMode>In</design:inOutMode>
       <design:attributes>
         <design:name>partnerIDs</design:name>
-        <design:position>4</design:position>
+        <design:position>3</design:position>
         <design:nativeDataTypeCode>1</design:nativeDataTypeCode>
         <design:precision>0</design:precision>
         <design:scale>0</design:scale>
-        <design:nullability>Nullable</design:nullability>
+        <design:nullability>NotNullable</design:nullability>
       </design:attributes>
       <design:inputAttributes>
         <design:elementAttributes>
-          <design:defaultScalarValue>__DUMMY_DEFAULT_PARAMETER_VALUE__</design:defaultScalarValue>
+          <design:defaultValues>
+            <design:values>__DUMMY_DEFAULT_PARAMETER_VALUE__</design:values>
+          </design:defaultValues>
         </design:elementAttributes>
       </design:inputAttributes>
     </design:parameterDefinitions>
@@ -441,31 +572,35 @@ function isParamSet(param) {
       <design:inOutMode>In</design:inOutMode>
       <design:attributes>
         <design:name>beginTimePeriod</design:name>
-        <design:position>5</design:position>
-        <design:nativeDataTypeCode>1</design:nativeDataTypeCode>
+        <design:position>4</design:position>
+        <design:nativeDataTypeCode>10</design:nativeDataTypeCode>
         <design:precision>0</design:precision>
         <design:scale>0</design:scale>
-        <design:nullability>Nullable</design:nullability>
+        <design:nullability>NotNullable</design:nullability>
       </design:attributes>
       <design:inputAttributes>
         <design:elementAttributes>
-          <design:defaultScalarValue>__DUMMY_DEFAULT_PARAMETER_VALUE__</design:defaultScalarValue>
+          <design:defaultValues>
+            <design:values>__DUMMY_DEFAULT_PARAMETER_VALUE__</design:values>
+          </design:defaultValues>
         </design:elementAttributes>
       </design:inputAttributes>
     </design:parameterDefinitions>
     <design:parameterDefinitions>
       <design:inOutMode>In</design:inOutMode>
       <design:attributes>
-        <design:name>endTimePeriod</design:name>
+        <design:name>hideNonPayment</design:name>
         <design:position>6</design:position>
-        <design:nativeDataTypeCode>1</design:nativeDataTypeCode>
+        <design:nativeDataTypeCode>4</design:nativeDataTypeCode>
         <design:precision>0</design:precision>
         <design:scale>0</design:scale>
-        <design:nullability>Nullable</design:nullability>
+        <design:nullability>NotNullable</design:nullability>
       </design:attributes>
       <design:inputAttributes>
         <design:elementAttributes>
-          <design:defaultScalarValue>__DUMMY_DEFAULT_PARAMETER_VALUE__</design:defaultScalarValue>
+          <design:defaultValues>
+            <design:values>__DUMMY_DEFAULT_PARAMETER_VALUE__</design:values>
+          </design:defaultValues>
         </design:elementAttributes>
       </design:inputAttributes>
     </design:parameterDefinitions>
@@ -751,6 +886,19 @@ function isParamSet(param) {
 </model:DesignValues>]]></xml-property>
         </oda-data-set>
         <oda-data-set extensionID="org.nightlabs.jfire.reporting.oda.jfs.JFSDataSet" name="PersonData" id="331">
+            <list-property name="parameters">
+                <structure>
+                    <property name="name">propertySetID</property>
+                    <property name="nativeName">propertySetID</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">1</property>
+                    <property name="position">1</property>
+                    <expression name="defaultValue">'__DUMMY_DEFAULT_PARAMETER_VALUE__'</expression>
+                    <property name="isOptional">false</property>
+                    <property name="allowNull">true</property>
+                    <property name="isInput">true</property>
+                </structure>
+            </list-property>
             <structure name="cachedMetaData">
                 <list-property name="resultSet">
                     <structure>
@@ -881,19 +1029,6 @@ function isParamSet(param) {
                 </list-property>
             </structure>
             <property name="dataSource">JFSDataSource</property>
-            <list-property name="parameters">
-                <structure>
-                    <property name="name">propertySetID</property>
-                    <property name="nativeName">propertySetID</property>
-                    <property name="dataType">string</property>
-                    <property name="nativeDataType">1</property>
-                    <property name="position">1</property>
-                    <expression name="defaultValue">'__DUMMY_DEFAULT_PARAMETER_VALUE__'</expression>
-                    <property name="isOptional">false</property>
-                    <property name="allowNull">true</property>
-                    <property name="isInput">true</property>
-                </structure>
-            </list-property>
             <list-property name="resultSet">
                 <structure>
                     <property name="position">1</property>
@@ -1071,24 +1206,24 @@ function isParamSet(param) {
                     <property name="nativeDataType">1</property>
                 </structure>
             </list-property>
-            <property name="queryText">&lt;queryPropertySet>&lt;org.nightlabs.jfire.reporting.oda.jfs.JFSQueryPropertySet>
-  &lt;scriptRegistryItemID>
-    &lt;organisationID>dev.jfire.org&lt;/organisationID>
-    &lt;scriptRegistryItemType>JFireReporting-Scripting-PropertySet&lt;/scriptRegistryItemType>
-    &lt;scriptRegistryItemID>PropertySet&lt;/scriptRegistryItemID>
-  &lt;/scriptRegistryItemID>
-  &lt;properties class="tree-map">
-    &lt;no-comparator/>
-    &lt;entry>
-      &lt;string>linkClass&lt;/string>
-      &lt;string>org.nightlabs.jfire.person.Person&lt;/string>
-    &lt;/entry>
-    &lt;entry>
-      &lt;string>scope&lt;/string>
-      &lt;string>default&lt;/string>
-    &lt;/entry>
-  &lt;/properties>
-&lt;/org.nightlabs.jfire.reporting.oda.jfs.JFSQueryPropertySet>&lt;/queryPropertySet></property>
+            <xml-property name="queryText"><![CDATA[<queryPropertySet><org.nightlabs.jfire.reporting.oda.jfs.JFSQueryPropertySet>
+  <scriptRegistryItemID>
+    <organisationID>dev.jfire.org</organisationID>
+    <scriptRegistryItemType>JFireReporting-Scripting-PropertySet</scriptRegistryItemType>
+    <scriptRegistryItemID>PropertySet</scriptRegistryItemID>
+  </scriptRegistryItemID>
+  <properties class="tree-map">
+    <no-comparator/>
+    <entry>
+      <string>linkClass</string>
+      <string>org.nightlabs.jfire.person.Person</string>
+    </entry>
+    <entry>
+      <string>scope</string>
+      <string>default</string>
+    </entry>
+  </properties>
+</org.nightlabs.jfire.reporting.oda.jfs.JFSQueryPropertySet></queryPropertySet>]]></xml-property>
             <xml-property name="designerValues"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 <model:DesignValues xmlns:design="http://www.eclipse.org/datatools/connectivity/oda/design" xmlns:model="http://www.eclipse.org/birt/report/model/adapter/odaModel">
   <Version>1.0</Version>
@@ -1113,6 +1248,19 @@ function isParamSet(param) {
 </model:DesignValues>]]></xml-property>
         </oda-data-set>
         <oda-data-set extensionID="org.nightlabs.jfire.reporting.oda.jfs.JFSDataSet" name="InvoiceData" id="376">
+            <list-property name="parameters">
+                <structure>
+                    <property name="name">invoiceIDs</property>
+                    <property name="nativeName">invoiceIDs</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">1</property>
+                    <property name="position">1</property>
+                    <expression name="defaultValue">'__DUMMY_DEFAULT_PARAMETER_VALUE__'</expression>
+                    <property name="isOptional">false</property>
+                    <property name="allowNull">true</property>
+                    <property name="isInput">true</property>
+                </structure>
+            </list-property>
             <structure name="cachedMetaData">
                 <list-property name="resultSet">
                     <structure>
@@ -1223,19 +1371,6 @@ function isParamSet(param) {
                 </list-property>
             </structure>
             <property name="dataSource">JFSDataSource</property>
-            <list-property name="parameters">
-                <structure>
-                    <property name="name">invoiceIDs</property>
-                    <property name="nativeName">invoiceIDs</property>
-                    <property name="dataType">string</property>
-                    <property name="nativeDataType">1</property>
-                    <property name="position">1</property>
-                    <expression name="defaultValue">'__DUMMY_DEFAULT_PARAMETER_VALUE__'</expression>
-                    <property name="isOptional">false</property>
-                    <property name="allowNull">true</property>
-                    <property name="isInput">true</property>
-                </structure>
-            </list-property>
             <list-property name="resultSet">
                 <structure>
                     <property name="position">1</property>
@@ -1385,16 +1520,16 @@ function isParamSet(param) {
                     <property name="nativeDataType">1</property>
                 </structure>
             </list-property>
-            <property name="queryText">&lt;queryPropertySet>&lt;org.nightlabs.jfire.reporting.oda.jfs.JFSQueryPropertySet>
-  &lt;scriptRegistryItemID>
-    &lt;organisationID>dev.jfire.org&lt;/organisationID>
-    &lt;scriptRegistryItemType>JFireReportingTrade-InvoiceData&lt;/scriptRegistryItemType>
-    &lt;scriptRegistryItemID>InvoiceData&lt;/scriptRegistryItemID>
-  &lt;/scriptRegistryItemID>
-  &lt;properties class="tree-map">
-    &lt;no-comparator/>
-  &lt;/properties>
-&lt;/org.nightlabs.jfire.reporting.oda.jfs.JFSQueryPropertySet>&lt;/queryPropertySet></property>
+            <xml-property name="queryText"><![CDATA[<queryPropertySet><org.nightlabs.jfire.reporting.oda.jfs.JFSQueryPropertySet>
+  <scriptRegistryItemID>
+    <organisationID>dev.jfire.org</organisationID>
+    <scriptRegistryItemType>JFireReportingTrade-InvoiceData</scriptRegistryItemType>
+    <scriptRegistryItemID>InvoiceData</scriptRegistryItemID>
+  </scriptRegistryItemID>
+  <properties class="tree-map">
+    <no-comparator/>
+  </properties>
+</org.nightlabs.jfire.reporting.oda.jfs.JFSQueryPropertySet></queryPropertySet>]]></xml-property>
             <xml-property name="designerValues"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 <model:DesignValues xmlns:design="http://www.eclipse.org/datatools/connectivity/oda/design" xmlns:model="http://www.eclipse.org/birt/report/model/adapter/odaModel">
   <Version>1.0</Version>
@@ -1806,7 +1941,7 @@ function isParamSet(param) {
                                 <property name="paddingLeft">5pt</property>
                                 <property name="paddingBottom">1pt</property>
                                 <text-data id="485">
-                                    <property name="fontFamily">"Arial Narrow"</property>
+                                    <property name="fontFamily">sans-serif</property>
                                     <property name="paddingTop">5pt</property>
                                     <property name="paddingBottom">5pt</property>
                                     <expression name="valueExpr">text = reportContext.getMessage("parameterListing.selectedBeginTime", reportContext.getLocale());
@@ -1818,19 +1953,19 @@ if (JFireReportingHelper.getParameter("beginTimePeriod") == null) {
   if (timePeriod.getFrom() == null) {  
     text = text + reportContext.getMessage("parameterListing.selectedBeginTime.none", reportContext.getLocale());
   } else {
-    text = text + (new Date(timePeriod.getFrom().getTime())).toLocaleString();
+    text = text + formatDate(timePeriod.getFrom());
   }
   text = text + "&lt;br>&amp;nbsp;" + reportContext.getMessage("parameterListing.selectedBeginTime.to", reportContext.getLocale());
   if (timePeriod.getTo() == null) {  
     text = text + reportContext.getMessage("parameterListing.selectedBeginTime.none", reportContext.getLocale())
   } else {
-    text = text + (new Date(timePeriod.getTo().getTime())).toLocaleString()
+    text = text + formatDate(timePeriod.getTo())
   }
 }</expression>
                                     <property name="contentType">html</property>
                                 </text-data>
                                 <text-data id="484">
-                                    <property name="fontFamily">"Arial Narrow"</property>
+                                    <property name="fontFamily">sans-serif</property>
                                     <expression name="valueExpr">text = reportContext.getMessage("parameterListing.selectedUsers", reportContext.getLocale());
 userSelected = JFireReportingHelper.getParameter("userIDs") != null || JFireReportingHelper.getParameter("userGroupIDs") != null;
 if (!userSelected) {
@@ -1862,7 +1997,7 @@ if (!userSelected) {
                                 <property name="paddingTop">1pt</property>
                                 <property name="paddingLeft">5pt</property>
                                 <text-data id="486">
-                                    <property name="fontFamily">"Arial Narrow"</property>
+                                    <property name="fontFamily">sans-serif</property>
                                     <property name="paddingTop">5pt</property>
                                     <property name="paddingBottom">5pt</property>
                                     <expression name="valueExpr">text = reportContext.getMessage("parameterListing.selectedMOPF", reportContext.getLocale());
@@ -1881,7 +2016,7 @@ if (JFireReportingHelper.getParameter("modeOfPaymentFlavourIDs") == null) {
                                     <property name="contentType">html</property>
                                 </text-data>
                                 <text-data id="487">
-                                    <property name="fontFamily">"Arial Narrow"</property>
+                                    <property name="fontFamily">sans-serif</property>
                                     <expression name="valueExpr">text = reportContext.getMessage("parameterListing.selectedPartner", reportContext.getLocale());
 if (JFireReportingHelper.getParameter("partnerIDs") == null) {
   text = text + reportContext.getMessage("parameterListing.selectedPartner.none", reportContext.getLocale())
@@ -1916,7 +2051,7 @@ if (JFireReportingHelper.getParameter("partnerIDs") == null) {
                         <property name="imageName">JFire-Logo.jpg</property>
                     </image>
                     <text id="354">
-                        <property name="fontFamily">"Arial"</property>
+                        <property name="fontFamily">sans-serif</property>
                         <property name="contentType">html</property>
                         <text-property name="content"><![CDATA[<H2>
 JFire Payment List
@@ -1931,7 +2066,6 @@ JFire Payment List
             </row>
         </grid>
         <table id="219">
-            <property name="width">100%</property>
             <property name="dataSet">Payments</property>
             <list-property name="paramBindings">
                 <structure>
@@ -1955,14 +2089,14 @@ JFire Payment List
     JFireReportingHelper.createDataSetParam(JFireReportingHelper.getParameter("beginTimePeriod"))</expression>
                 </structure>
                 <structure>
-                    <property name="paramName">endTimePeriod</property>
-                    <expression name="expression">if (JFireReportingHelper.getParameter("endTimePeriod") != null)
-    JFireReportingHelper.createDataSetParam(JFireReportingHelper.getParameter("endTimePeriod"))</expression>
+                    <property name="paramName">modeOfPaymentFlavourIDs</property>
+                    <expression name="expression" type="javascript">if (JFireReportingHelper.getParameter("modeOfPaymentFlavourIDs") != null)
+    JFireReportingHelper.createDataSetParam(JFireReportingHelper.getParameter("modeOfPaymentFlavourIDs"))</expression>
                 </structure>
                 <structure>
-                    <property name="paramName">modeOfPaymentFlavourIDs</property>
-                    <expression name="expression">if (JFireReportingHelper.getParameter("modeOfPaymentFlavourIDs") != null)
-    JFireReportingHelper.createDataSetParam(JFireReportingHelper.getParameter("modeOfPaymentFlavourIDs"))</expression>
+                    <property name="paramName">hideNonPayment</property>
+                    <expression name="expression" type="javascript">if (JFireReportingHelper.getParameter("hideNonPayment") != null)
+    JFireReportingHelper.createDataSetParam(JFireReportingHelper.getParameter("hideNonPayment"))</expression>
                 </structure>
             </list-property>
             <list-property name="boundDataColumns">
@@ -2048,7 +2182,7 @@ JFire Payment List
                 </structure>
                 <structure>
                     <property name="name">ModeOfPaymentFlavourName</property>
-                    <property name="displayName">ModeOfPaymentFlavourName</property>
+                    <text-property name="displayName">ModeOfPaymentFlavourName</text-property>
                     <expression name="expression">importClass(Packages.org.nightlabs.jfire.reporting.JFireReportingHelper);
 mopf = JFireReportingHelper.getJDOObject(dataSetRow["modeOfPaymentFlavourJDOID"])
 mopf.getName().getText()</expression>
@@ -2056,15 +2190,15 @@ mopf.getName().getText()</expression>
                 </structure>
                 <structure>
                     <property name="name">CurrencyName</property>
-                    <property name="displayName">CurrencyName</property>
-                    <expression name="expression">importClass(Packages.org.nightlabs.jfire.reporting.JFireReportingHelper);
+                    <text-property name="displayName">CurrencyName</text-property>
+                    <expression name="expression" type="javascript">importClass(Packages.org.nightlabs.jfire.reporting.JFireReportingHelper);
 currency = JFireReportingHelper.getJDOObject(dataSetRow["currencyJDOID"]);
-currency.getCurrencyID() + "(" + currency.getCurrencySymbol() +")"</expression>
+currency.getCurrencySymbol() + "(" + currency.getCurrencyID() +")"</expression>
                     <property name="dataType">string</property>
                 </structure>
                 <structure>
                     <property name="name">PaymentAmount</property>
-                    <property name="displayName">PaymentAmount</property>
+                    <text-property name="displayName">PaymentAmount</text-property>
                     <expression name="expression">importClass(Packages.org.nightlabs.jfire.reporting.JFireReportingHelper);
 currency = JFireReportingHelper.getJDOObject(dataSetRow["currencyJDOID"]);
 currency.toDouble(row["amount"])</expression>
@@ -2072,7 +2206,7 @@ currency.toDouble(row["amount"])</expression>
                 </structure>
                 <structure>
                     <property name="name">UserName</property>
-                    <property name="displayName">UserName</property>
+                    <text-property name="displayName">UserName</text-property>
                     <expression name="expression">importClass(Packages.org.nightlabs.jfire.reporting.JFireReportingHelper);
 user = JFireReportingHelper.getJDOObject(dataSetRow["userJDOID"]);
 user.getName()</expression>
@@ -2098,7 +2232,13 @@ if (!row["failed"]) {
                     </simple-property-list>
                     <property name="aggregateFunction">sum</property>
                 </structure>
+                <structure>
+                    <property name="name">formattedBeginDT</property>
+                    <expression name="expression" type="javascript">formatDate(dataSetRow["beginDT"])</expression>
+                    <property name="dataType">string</property>
+                </structure>
             </list-property>
+            <property name="pageBreakInterval">50</property>
             <list-property name="sort">
                 <structure>
                     <expression name="key">row["paymentID"]</expression>
@@ -2110,7 +2250,6 @@ if (!row["failed"]) {
                 <property name="repeat">1</property>
             </column>
             <column id="310">
-                <property name="width">0.7in</property>
                 <property name="repeat">1</property>
             </column>
             <column id="311">
@@ -2138,9 +2277,7 @@ if (!row["failed"]) {
             <column id="445">
                 <property name="width">2.3cm</property>
             </column>
-            <column id="466">
-                <property name="width">2in</property>
-            </column>
+            <column id="466"/>
             <group id="402">
                 <property name="groupName">CurrencyGroup</property>
                 <property name="interval">none</property>
@@ -2178,43 +2315,43 @@ if (!row["failed"]) {
                         <property name="borderBottomWidth">thin</property>
                         <cell id="423">
                             <label id="242">
-                                <property name="fontFamily">"Arial"</property>
+                                <property name="fontFamily">sans-serif</property>
                                 <text-property name="text" key="header.beginTime">header.beginTime</text-property>
                             </label>
                         </cell>
                         <cell id="424">
                             <label id="226">
-                                <property name="fontFamily">"Arial"</property>
+                                <property name="fontFamily">sans-serif</property>
                                 <text-property name="text" key="header.paymentDirection">&lt;-></text-property>
                             </label>
                         </cell>
                         <cell id="425">
                             <label id="228">
-                                <property name="fontFamily">"Arial"</property>
+                                <property name="fontFamily">sans-serif</property>
                                 <text-property name="text" key="header.reasonForPayment">Reason</text-property>
                             </label>
                         </cell>
                         <cell id="426">
                             <label id="230">
-                                <property name="fontFamily">"Arial"</property>
+                                <property name="fontFamily">sans-serif</property>
                                 <text-property name="text" key="header.modeOfPayment">Mode of payment</text-property>
                             </label>
                         </cell>
                         <cell id="433">
                             <label id="240">
-                                <property name="fontFamily">"Arial"</property>
+                                <property name="fontFamily">sans-serif</property>
                                 <text-property name="text" key="header.user">User</text-property>
                             </label>
                         </cell>
                         <cell id="427">
                             <label id="234">
-                                <property name="fontFamily">"Arial"</property>
+                                <property name="fontFamily">sans-serif</property>
                                 <text-property name="text" key="header.partner">Partner</text-property>
                             </label>
                         </cell>
                         <cell id="428">
                             <label id="238">
-                                <property name="fontFamily">"Arial"</property>
+                                <property name="fontFamily">sans-serif</property>
                                 <property name="textAlign">right</property>
                                 <text-property name="text" key="header.amount">Amount</text-property>
                             </label>
@@ -2223,7 +2360,7 @@ if (!row["failed"]) {
                             <property name="paddingTop">1pt</property>
                             <property name="paddingLeft">5pt</property>
                             <text id="446">
-                                <property name="fontFamily">"Arial"</property>
+                                <property name="fontFamily">sans-serif</property>
                                 <property name="contentType">auto</property>
                                 <text-property name="content" key="header.status"><![CDATA[Status]]></text-property>
                             </text>
@@ -2233,7 +2370,7 @@ if (!row["failed"]) {
                             <property name="paddingLeft">5pt</property>
                             <property name="textAlign">left</property>
                             <label id="467">
-                                <property name="fontFamily">"Arial"</property>
+                                <property name="fontFamily">sans-serif</property>
                                 <property name="textAlign">left</property>
                                 <text-property name="text" key="header.invoices">Related invoices</text-property>
                             </label>
@@ -2251,7 +2388,7 @@ if (!row["failed"]) {
                             <property name="rowSpan">1</property>
                             <property name="paddingTop">5pt</property>
                             <text-data id="449">
-                                <property name="fontFamily">"Arial"</property>
+                                <property name="fontFamily">sans-serif</property>
                                 <property name="fontSize">medium</property>
                                 <property name="fontWeight">bold</property>
                                 <expression name="valueExpr">reportContext.getMessage("header.currencyGroupHeader", reportContext.getLocale()) + row["CurrencyName"]</expression>
@@ -2262,7 +2399,7 @@ if (!row["failed"]) {
                             <property name="paddingTop">5pt</property>
                             <property name="textAlign">right</property>
                             <data id="457">
-                                <property name="fontFamily">"Arial"</property>
+                                <property name="fontFamily">sans-serif</property>
                                 <property name="fontWeight">bold</property>
                                 <structure name="numberFormat">
                                     <property name="category">Currency</property>
@@ -2283,7 +2420,9 @@ if (!row["failed"]) {
                             <property name="operator">eq</property>
                             <property name="backgroundColor">#C0C0C0</property>
                             <expression name="testExpr">Total.runningCount() % 2</expression>
-                            <expression name="value1">0</expression>
+                            <simple-property-list name="value1">
+                                <value>0</value>
+                            </simple-property-list>
                         </structure>
                         <structure>
                             <property name="operator">is-true</property>
@@ -2293,20 +2432,15 @@ if (!row["failed"]) {
                     </list-property>
                     <cell id="276">
                         <property name="paddingTop">1pt</property>
-                        <data id="277">
-                            <property name="fontFamily">"Arial Narrow"</property>
-                            <property name="marginTop">0pt</property>
-                            <structure name="dateTimeFormat">
-                                <property name="category">Custom</property>
-                                <property name="pattern">dd. MM yyyy HH:mm:ss</property>
-                            </structure>
-                            <property name="resultSetColumn">beginDT</property>
+                        <data id="488">
+                            <property name="fontFamily">sans-serif</property>
+                            <property name="resultSetColumn">formattedBeginDT</property>
                         </data>
                     </cell>
                     <cell id="260">
                         <property name="paddingTop">1pt</property>
                         <text-data id="401">
-                            <property name="fontFamily">"Arial Narrow"</property>
+                            <property name="fontFamily">sans-serif</property>
                             <expression name="valueExpr">if (row["paymentDirection"].equals(Payment.PAYMENT_DIRECTION_INCOMING))
   reportContext.getMessage("paymentDirection.incoming", reportContext.getLocale())
 else
@@ -2317,21 +2451,21 @@ else
                     <cell id="262">
                         <property name="paddingTop">1pt</property>
                         <data id="263">
-                            <property name="fontFamily">"Arial Narrow"</property>
+                            <property name="fontFamily">sans-serif</property>
                             <property name="resultSetColumn">reasonForPayment</property>
                         </data>
                     </cell>
                     <cell id="264">
                         <property name="paddingTop">1pt</property>
                         <data id="344">
-                            <property name="fontFamily">"Arial Narrow"</property>
+                            <property name="fontFamily">sans-serif</property>
                             <property name="resultSetColumn">ModeOfPaymentFlavourName</property>
                         </data>
                     </cell>
                     <cell id="434">
                         <property name="paddingTop">1pt</property>
                         <data id="347">
-                            <property name="fontFamily">"Arial Narrow"</property>
+                            <property name="fontFamily">sans-serif</property>
                             <property name="resultSetColumn">UserName</property>
                         </data>
                     </cell>
@@ -2370,6 +2504,7 @@ JFireReportingHelper.createDataSetParam(JDOHelper.getObjectId(partner.getPerson(
                                     <property name="dataType">string</property>
                                 </structure>
                             </list-property>
+                            <property name="pageBreakInterval">50</property>
                             <detail>
                                 <grid id="333">
                                     <property name="width">100%</property>
@@ -2381,7 +2516,7 @@ JFireReportingHelper.createDataSetParam(JDOHelper.getObjectId(partner.getPerson(
                                             <property name="colSpan">3</property>
                                             <property name="rowSpan">1</property>
                                             <data id="352">
-                                                <property name="fontFamily">"Arial Narrow"</property>
+                                                <property name="fontFamily">sans-serif</property>
                                                 <property name="resultSetColumn">DisplayName</property>
                                             </data>
                                         </cell>
@@ -2393,7 +2528,7 @@ JFireReportingHelper.createDataSetParam(JDOHelper.getObjectId(partner.getPerson(
                     <cell id="272">
                         <property name="paddingTop">1pt</property>
                         <data id="346">
-                            <property name="fontFamily">"Arial Narrow"</property>
+                            <property name="fontFamily">sans-serif</property>
                             <structure name="numberFormat">
                                 <property name="category">Currency</property>
                                 <property name="pattern">###0.00</property>
@@ -2406,7 +2541,7 @@ JFireReportingHelper.createDataSetParam(JDOHelper.getObjectId(partner.getPerson(
                         <property name="paddingTop">1pt</property>
                         <property name="paddingLeft">5pt</property>
                         <text-data id="447">
-                            <property name="fontFamily">"Arial Narrow"</property>
+                            <property name="fontFamily">sans-serif</property>
                             <list-property name="highlightRules">
                                 <structure>
                                     <property name="operator">is-true</property>
@@ -2425,7 +2560,7 @@ else
   key = key + "successfulAndComplete";
   
 reportContext.getMessage(key, reportContext.getLocale())</expression>
-                            <property name="contentType">html</property>
+                            <property name="contentType">auto</property>
                         </text-data>
                     </cell>
                     <cell id="462">
@@ -2496,18 +2631,21 @@ description</expression>
                                     <property name="dataType">string</property>
                                 </structure>
                             </list-property>
+                            <property name="pageBreakInterval">50</property>
                             <column id="391"/>
                             <detail>
                                 <row id="382">
                                     <cell id="384">
                                         <data id="459">
-                                            <property name="fontFamily">"Arial Narrow"</property>
+                                            <property name="fontFamily">sans-serif</property>
                                             <list-property name="highlightRules">
                                                 <structure>
                                                     <property name="operator">ne</property>
                                                     <property name="color">#FF0000</property>
                                                     <expression name="testExpr">row["outstanding"]</expression>
-                                                    <expression name="value1">0</expression>
+                                                    <simple-property-list name="value1">
+                                                        <value>0</value>
+                                                    </simple-property-list>
                                                 </structure>
                                             </list-property>
                                             <property name="resultSetColumn">InvoiceDescription</property>

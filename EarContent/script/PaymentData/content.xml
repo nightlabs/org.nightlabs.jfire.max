@@ -27,6 +27,7 @@ With the parameters the list can be filtered by user, partner and time period.
 			<parameter name="partnerIDs" type="java.util.Collection"/>	
 			<parameter name="beginTimePeriod" type="org.nightlabs.util.TimePeriod"/>	
 			<parameter name="endTimePeriod" type="org.nightlabs.util.TimePeriod"/>
+			<parameter name="hideNonPayment" type="java.lang.Boolean"/>
 		</parameter-set>
 	</script>
 </script-category>

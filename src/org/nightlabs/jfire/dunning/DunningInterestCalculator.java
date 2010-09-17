@@ -17,6 +17,7 @@ import javax.jdo.annotations.PrimaryKey;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.jfire.dunning.id.DunningInterestCalculatorID;
+import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.organisation.Organisation;
 
 /**
@@ -64,13 +65,25 @@ implements Serializable
 	
 	public abstract int getDays();
 	
-	public abstract Date getFirstDay();
+	public abstract Date getFirstDay(DunningLetterEntry dunningLetterEntry);
 	
-	public abstract Date getLastDay();
+	public abstract Date getLastDay(DunningLetterEntry dunningLetterEntry);
 	
-	public BigDecimal calculateInterest() {
-//		dunningConfig.getInvoiceDunningSteps().
-		return null;
+	public void calculateInterest(DunningLetter prevLetter, DunningLetter letter) {
+		if (prevLetter == null) {
+			for (DunningLetterEntry letterEntry : letter.getDunnedInvoices()) {
+				int dunningLevel = letterEntry.getDunningLevel();
+				InvoiceDunningStep invDunningStep = dunningConfig.getInvoiceDunningStep(dunningLevel);
+				
+				BigDecimal interestPercentage = invDunningStep.getInterestPercentage();
+				long periodOfGraceMSec = invDunningStep.getPeriodOfGraceMSec();
+				
+				DunningInterest interest = new DunningInterest(organisationID, IDGenerator.nextIDString(DunningInterest.class), letterEntry, null);
+			}
+		}
+		for (DunningLetterEntry letterEntry : prevLetter.getDunnedInvoices()) {
+			
+		}
 	}
 	
 	/**

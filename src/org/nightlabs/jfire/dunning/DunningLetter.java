@@ -2,8 +2,10 @@ package org.nightlabs.jfire.dunning;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 
 import javax.jdo.annotations.Column;
@@ -158,6 +160,16 @@ implements Serializable
 		this(dunningProcess.getOrganisationID(), IDGenerator.nextIDString(DunningLetter.class), dunningProcess);
 	}
 	
+	public Collection<DunningLetterEntry> getDunningLetterEntries(int level) {
+		Collection<DunningLetterEntry> entries = new HashSet<DunningLetterEntry>();
+		for (DunningLetterEntry entry : dunnedInvoices) {
+			if (entry.getDunningLevel() == level) {
+				entries.add(entry);
+			}
+		}
+		return entries;
+	}
+	
 	public String getOrganisationID() {
 		return organisationID;
 	}
@@ -175,6 +187,9 @@ implements Serializable
 	}
 	
 	public void addDunnedInvoice(int level, Invoice invoice) {
+		if (level > dunningLevel) {
+			this.dunningLevel = level;
+		}
 		DunningLetterEntry letterEntry = new DunningLetterEntry(organisationID, IDGenerator.nextIDString(DunningLetterEntry.class), level, invoice);
 		dunnedInvoices.add(letterEntry);
 	}
@@ -183,34 +198,66 @@ implements Serializable
 		return Collections.unmodifiableList(dunnedInvoices);
 	}
 	
+	public void addDunningFee(DunningFee dunningFee) {
+		dunningFees.add(dunningFee);
+	}
+	
 	public List<DunningFee> getDunningFees() {
-		return dunningFees;
+		return Collections.unmodifiableList(dunningFees);
+	}
+	
+	public void setFinalizeDT(Date finalizeDT) {
+		this.finalizeDT = finalizeDT;
 	}
 	
 	public Date getFinalizeDT() {
 		return finalizeDT;
 	}
 	
+	public void setBookDT(Date bookDT) {
+		this.bookDT = bookDT;
+	}
+	
 	public Date getBookDT() {
 		return bookDT;
+	}
+	
+	public void setPriceExcludingInvoices(Price priceExcludingInvoices) {
+		this.priceExcludingInvoices = priceExcludingInvoices;
 	}
 	
 	public Price getPriceExcludingInvoices() {
 		return priceExcludingInvoices;
 	}
 	
+	public void setPriceIncludingInvoices(Price priceIncludingInvoices) {
+		this.priceIncludingInvoices = priceIncludingInvoices;
+	}
+	
 	public Price getPriceIncludingInvoices() {
 		return priceIncludingInvoices;
 	}
 	
+	public void setAmountPaidExcludingInvoices(long amountPaidExcludingInvoices) {
+		this.amountPaidExcludingInvoices = amountPaidExcludingInvoices;
+	}
+	
 	public long getAmountPaidExcludingInvoices() {
 		return amountPaidExcludingInvoices;
+	}
+
+	public void setAmountToPay(long amountToPay) {
+		this.amountToPay = amountToPay;
 	}
 	
 	public long getAmountToPay() {
 		return amountToPay;
 	}
 
+	public void setOutstanding(boolean outstanding) {
+		this.outstanding = outstanding;
+	}
+	
 	public boolean isOutstanding() {
 		return outstanding;
 	}

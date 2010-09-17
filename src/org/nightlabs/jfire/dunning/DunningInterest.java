@@ -15,6 +15,7 @@ import javax.jdo.annotations.PrimaryKey;
 
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.dunning.id.DunningInterestID;
+import org.nightlabs.jfire.organisation.Organisation;
 
 /**
  * @author Chairat Kongarayawetchakun - chairat [AT] nightlabs [DOT] de
@@ -123,6 +124,17 @@ implements Serializable
 	@Deprecated
 	protected DunningInterest() { }
 	
+	
+	public DunningInterest(String organisationID, String dunningInterestID,
+			DunningLetterEntry dunningLetterEntry, DunningInterest backReference) {
+		Organisation.assertValidOrganisationID(organisationID);
+		this.organisationID = organisationID;
+		this.dunningInterestID = dunningInterestID;
+		this.dunningLetterEntry = dunningLetterEntry;
+		this.backReference = backReference;
+	}
+
+
 	public String getOrganisationID() {
 		return organisationID;
 	}

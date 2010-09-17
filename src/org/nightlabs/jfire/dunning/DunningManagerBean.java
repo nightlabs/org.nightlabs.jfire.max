@@ -301,7 +301,8 @@ implements DunningManagerRemote
 		try {
 			Task task = (Task) pm.getObjectById(taskID);
 			DunningConfig dunningConfig =  (DunningConfig) task.getParam();
-			if (dunningConfig.getDunningAutoMode() != DunningAutoMode.none) {
+			DunningAutoMode autoMode = dunningConfig.getDunningAutoMode();
+			if (autoMode != DunningAutoMode.none) {
 				//Overdue Invoices
 				Collection<Invoice> overdueInvoices = 
 					Invoice.getOverdueInvoices(pm, dunningConfig.getOrganisationID(), new Date());
@@ -326,15 +327,19 @@ implements DunningManagerRemote
 					//Get current level or if it's a new process, it will be 1st level.
 //					int dunningLevel = dunningProcess.getInvoices2DunningLevel().get(inv);
 //					dunningProcess.addInvoice(inv, dunningLevel + 1);
-					dunningProcess.addInvoice(inv, dunningProcess.getLastLevel());
+					int level = dunningProcess.getLastDunningLetter() == null?1:dunningProcess.getLastDunningLetter().getDunningLevel();
+					dunningProcess.addInvoice(inv, level);
 					
 					pm.makePersistent(dunningProcess);
 				}
 
 				Collection<DunningProcess> activeDunningProcesses = DunningProcess.getActiveDunningProcessesByDunningConfig(pm, (DunningConfigID)JDOHelper.getObjectId(dunningConfig));
 				for (DunningProcess process : activeDunningProcesses) {
-					process.createDunningLetter();
-					pm.makePersistent(process);
+					if (process.getCoolDownEnd().before(new Date())) {
+						boolean isFinalized = autoMode == DunningAutoMode.createAndFinalize;
+						process.createDunningLetter(isFinalized);
+						pm.makePersistent(process);
+					}
 				}
 			}
 		} finally {

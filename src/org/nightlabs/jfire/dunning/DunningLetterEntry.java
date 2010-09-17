@@ -1,6 +1,7 @@
 package org.nightlabs.jfire.dunning;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -143,8 +144,12 @@ implements Serializable
 		this.extendedDueDateForPayment = extendedDueDateForPayment;
 	}
 	
+	public void addDunningInterest(DunningInterest dunningInterest) {
+		dunningInterests.add(dunningInterest);
+	}
+	
 	public List<DunningInterest> getDunningInterests() {
-		return dunningInterests;
+		return Collections.unmodifiableList(dunningInterests);
 	}
 	
 	public void setPriceIncludingInvoice(Price priceIncludingInvoice) {

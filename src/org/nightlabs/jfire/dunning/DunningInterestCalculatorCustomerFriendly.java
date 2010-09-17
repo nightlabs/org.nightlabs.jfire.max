@@ -55,12 +55,12 @@ extends DunningInterestCalculator
 	}
 
 	@Override
-	public Date getFirstDay() {
+	public Date getFirstDay(DunningLetterEntry dunningLetterEntry) {
 		return null;
 	}
 
 	@Override
-	public Date getLastDay() {
+	public Date getLastDay(DunningLetterEntry dunningLetterEntry) {
 		return null;
 	}
 }

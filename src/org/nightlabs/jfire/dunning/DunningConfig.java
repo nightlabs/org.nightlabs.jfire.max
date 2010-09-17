@@ -236,16 +236,14 @@ implements Serializable
 				"processAutomaticDunning"
 		);
 		this.creatorTask.setParam(this);
-		creatorTask.getName().setText(Locale.ENGLISH.getLanguage(), "Cleanup rendered report layout folders");
-		creatorTask.getDescription().setText(Locale.ENGLISH.getLanguage(), "This task deletes old folder used for rendering reports");
 		try {
 			creatorTask.getTimePatternSet().createTimePattern(
 					"*", // year
 					"*", // month
-					"*", // day
+					"31", // day
 					"*", // dayOfWeek
 					"*", //  hour
-			"15"); // minute
+			"*"); // minute
 		} catch (TimePatternFormatException e) {
 			throw new RuntimeException(e);
 		}
@@ -348,6 +346,24 @@ implements Serializable
 			}
 		}
 		return sortedProcessDunningSteps;
+	}
+	
+	public ProcessDunningStep getProcessDunningStep(int level) {
+		for (ProcessDunningStep processDunningStep : processDunningSteps) {
+			if (processDunningStep.getDunningLevel() == level) {
+				return processDunningStep;
+			}
+		}
+		return null;
+	}
+
+	public InvoiceDunningStep getInvoiceDunningStep(int level) {
+		for (InvoiceDunningStep invoiceDunningStep : invoiceDunningSteps) {
+			if (invoiceDunningStep.getDunningLevel() == level) {
+				return invoiceDunningStep;
+			}
+		}
+		return null;
 	}
 	
 	public Map<Integer, DunningLetterNotifier> getLevel2DunningLetterNotifiers() {

@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -29,7 +28,6 @@ import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.accounting.id.CurrencyID;
 import org.nightlabs.jfire.dunning.id.DunningConfigID;
 import org.nightlabs.jfire.dunning.id.DunningProcessID;
-import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.transfer.id.AnchorID;
@@ -214,17 +212,37 @@ implements Serializable
 		return invoices2DunningLevel;
 	}
 	
-	public int getLastLevel() {
-		DunningLetter lastLetter = dunningLetters.get(dunningLetters.size() - 1);
-		return lastLetter.getDunningLevel();
+	public DunningLetter getLastDunningLetter() {
+		return dunningLetters.size() == 0 ? null:dunningLetters.get(dunningLetters.size() - 1);
 	}
 	
-	public void createDunningLetter() {
+	public void createDunningLetter(boolean isFinalized) {
 		DunningLetter dunningLetter = new DunningLetter(this);
+		//Create entries
 		for (Invoice inv : invoices2DunningLevel.keySet()) {
 			dunningLetter.addDunnedInvoice(invoices2DunningLevel.get(inv), inv);
 		}
-		dunningConfig.getDunningFeeAdder().addDunningFee(dunningLetter);
+		
+		//Add fees
+		DunningFeeAdder feeAdder = dunningConfig.getDunningFeeAdder();
+		feeAdder.addDunningFee(dunningLetter);
+		
+//		InvoiceDunningStep invoiceDunningStep = null;
+//		for (InvoiceDunningStep invDunningStep : dunningConfig.getInvoiceDunningSteps()) {
+//			if (invDunningStep.getDunningLevel() == dunningLetter.getDunningLevel()) {
+//				invoiceDunningStep = invDunningStep;
+//				break;
+//			}
+//		}
+
+		//Calculate interests
+		DunningInterestCalculator dunningInterestCalculator = dunningConfig.getDunningInterestCalculator();
+		dunningInterestCalculator.calculateInterest(getLastDunningLetter(), dunningLetter);
+		
+		DunningLetter prevLetter = getLastDunningLetter();
+		
+		
+		//Add to the list
 		dunningLetters.add(dunningLetter);
 	}
 	

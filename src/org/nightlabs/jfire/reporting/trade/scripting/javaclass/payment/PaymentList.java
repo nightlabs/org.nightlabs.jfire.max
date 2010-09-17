@@ -17,6 +17,7 @@ import javax.jdo.Query;
 import org.eclipse.datatools.connectivity.oda.jfire.IResultSetMetaData;
 import org.nightlabs.db.Record;
 import org.nightlabs.db.TableBuffer;
+import org.nightlabs.jfire.accounting.pay.ModeOfPaymentConst;
 import org.nightlabs.jfire.accounting.pay.Payment;
 import org.nightlabs.jfire.accounting.pay.id.ModeOfPaymentFlavourID;
 import org.nightlabs.jfire.reporting.JFireReportingHelper;
@@ -86,6 +87,7 @@ public class PaymentList extends AbstractJFSScriptExecutorDelegate {
 		Collection<ModeOfPaymentFlavourID> modeOfPaymentFlavourIDs = getObjectParameterValue("modeOfPaymentFlavourIDs", Collection.class);;
 		TimePeriod beginTimePeriod = getObjectParameterValue("beginTimePeriod", TimePeriod.class);
 		TimePeriod endTimePeriod = getObjectParameterValue("endTimePeriod", TimePeriod.class);
+		Boolean hideNonPayment = getObjectParameterValue("hideNonPayment", Boolean.class);
 
 		PersistenceManager pm = getScriptExecutorJavaClass().getPersistenceManager();
 
@@ -183,8 +185,15 @@ public class PaymentList extends AbstractJFSScriptExecutorDelegate {
 			throw new ScriptException(e);
 		}
 		for (Iterator<Payment> iter = queryResult.iterator(); iter.hasNext();) {
-			List<Object> row = new ArrayList<Object>(17);
 			Payment payment = iter.next();
+			if (hideNonPayment != null && hideNonPayment) {
+				if (payment.getModeOfPaymentFlavourID().equals(
+								ModeOfPaymentConst.MODE_OF_PAYMENT_FLAVOUR_ID_NON_PAYMENT)) {
+					continue;
+				}
+			}
+			
+			List<Object> row = new ArrayList<Object>(17);
 			row.add(payment.getOrganisationID());
 			row.add(payment.getPaymentID());
 			row.add(payment.getPaymentDirection());

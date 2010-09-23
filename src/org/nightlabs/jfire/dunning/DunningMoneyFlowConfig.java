@@ -82,4 +82,47 @@ implements Serializable
 	public DunningConfig getDunningConfig() {
 		return dunningConfig;
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime
+				* result
+				+ ((dunningMoneyFlowConfigID == null) ? 0
+						: dunningMoneyFlowConfigID.hashCode());
+		result = prime * result
+				+ ((organisationID == null) ? 0 : organisationID.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		DunningMoneyFlowConfig other = (DunningMoneyFlowConfig) obj;
+		if (dunningMoneyFlowConfigID == null) {
+			if (other.dunningMoneyFlowConfigID != null)
+				return false;
+		} else if (!dunningMoneyFlowConfigID
+				.equals(other.dunningMoneyFlowConfigID))
+			return false;
+		if (organisationID == null) {
+			if (other.organisationID != null)
+				return false;
+		} else if (!organisationID.equals(other.organisationID))
+			return false;
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "DunningMoneyFlowConfig [dunningMoneyFlowConfigID="
+				+ dunningMoneyFlowConfigID + ", organisationID="
+				+ organisationID + "]";
+	}
 }

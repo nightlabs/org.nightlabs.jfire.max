@@ -56,11 +56,18 @@ extends DunningInterestCalculator
 
 	@Override
 	public Date getFirstDay(DunningLetterEntry dunningLetterEntry) {
-		return null;
+		Date dueDate = dunningLetterEntry.getInvoice().getDueDateForPayment();
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(dueDate);
+		cal.set(Calendar.HOUR, 0);
+		cal.set(Calendar.MINUTE, 0);
+		cal.set(Calendar.SECOND, 0);
+		cal.roll(Calendar.DATE, -1);
+		return cal.getTime();
 	}
 
 	@Override
 	public Date getLastDay(DunningLetterEntry dunningLetterEntry) {
-		return null;
+		return dunningLetterEntry.getDunningLetter().getFinalizeDT();
 	}
 }

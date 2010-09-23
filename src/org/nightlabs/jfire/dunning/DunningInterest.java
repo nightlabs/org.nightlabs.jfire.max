@@ -163,23 +163,87 @@ implements Serializable
 		return baseAmount;
 	}
 	
+	public void setInterestPercentage(BigDecimal interestPercentage) {
+		this.interestPercentage = interestPercentage;
+	}
+	
 	public BigDecimal getInterestPercentage() {
 		return interestPercentage;
+	}
+	
+	public void setInterestAmount(long interestAmount) {
+		this.interestAmount = interestAmount;
 	}
 	
 	public long getInterestAmount() {
 		return interestAmount;
 	}
 	
+	public void setAmountPaid(long amountPaid) {
+		this.amountPaid = amountPaid;
+	}
+	
 	public long getAmountPaid() {
 		return amountPaid;
+	}
+	
+	public void setAmountToPay(long amountToPay) {
+		this.amountToPay = amountToPay;
 	}
 	
 	public long getAmountToPay() {
 		return amountToPay;
 	}
 	
+	public void setPaidDT(Date paidDT) {
+		this.paidDT = paidDT;
+	}
+	
 	public Date getPaidDT() {
 		return paidDT;
+	}
+
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime
+				* result
+				+ ((dunningInterestID == null) ? 0 : dunningInterestID
+						.hashCode());
+		result = prime * result
+				+ ((organisationID == null) ? 0 : organisationID.hashCode());
+		return result;
+	}
+
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		DunningInterest other = (DunningInterest) obj;
+		if (dunningInterestID == null) {
+			if (other.dunningInterestID != null)
+				return false;
+		} else if (!dunningInterestID.equals(other.dunningInterestID))
+			return false;
+		if (organisationID == null) {
+			if (other.organisationID != null)
+				return false;
+		} else if (!organisationID.equals(other.organisationID))
+			return false;
+		return true;
+	}
+
+
+	@Override
+	public String toString() {
+		return "DunningInterest [dunningInterestID=" + dunningInterestID
+				+ ", organisationID=" + organisationID + "]";
 	}
 }

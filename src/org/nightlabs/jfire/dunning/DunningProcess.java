@@ -217,33 +217,24 @@ implements Serializable
 	}
 	
 	public void createDunningLetter(boolean isFinalized) {
-		DunningLetter dunningLetter = new DunningLetter(this);
+		DunningLetter prevDunningLetter = getLastDunningLetter();
+		DunningLetter newDunningLetter = new DunningLetter(this);
 		//Create entries
 		for (Invoice inv : invoices2DunningLevel.keySet()) {
-			dunningLetter.addDunnedInvoice(invoices2DunningLevel.get(inv), inv);
+			newDunningLetter.addDunnedInvoice(invoices2DunningLevel.get(inv), inv);
 		}
 		
 		//Add fees
 		DunningFeeAdder feeAdder = dunningConfig.getDunningFeeAdder();
-		feeAdder.addDunningFee(dunningLetter);
+		feeAdder.addDunningFee(prevDunningLetter, newDunningLetter);
 		
-//		InvoiceDunningStep invoiceDunningStep = null;
-//		for (InvoiceDunningStep invDunningStep : dunningConfig.getInvoiceDunningSteps()) {
-//			if (invDunningStep.getDunningLevel() == dunningLetter.getDunningLevel()) {
-//				invoiceDunningStep = invDunningStep;
-//				break;
-//			}
-//		}
-
 		//Calculate interests
+		
 		DunningInterestCalculator dunningInterestCalculator = dunningConfig.getDunningInterestCalculator();
-		dunningInterestCalculator.calculateInterest(getLastDunningLetter(), dunningLetter);
-		
-		DunningLetter prevLetter = getLastDunningLetter();
-		
+		dunningInterestCalculator.calculateInterest(prevDunningLetter, newDunningLetter);
 		
 		//Add to the list
-		dunningLetters.add(dunningLetter);
+		dunningLetters.add(newDunningLetter);
 	}
 	
 	public static Collection<DunningProcessID> getDunningProcessesByCustomer(PersistenceManager pm, AnchorID customerID) {

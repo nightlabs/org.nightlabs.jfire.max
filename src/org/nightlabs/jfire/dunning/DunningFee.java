@@ -164,4 +164,43 @@ implements Serializable
 	public Price getPrice() {
 		return price;
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((dunningFeeID == null) ? 0 : dunningFeeID.hashCode());
+		result = prime * result
+				+ ((organisationID == null) ? 0 : organisationID.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		DunningFee other = (DunningFee) obj;
+		if (dunningFeeID == null) {
+			if (other.dunningFeeID != null)
+				return false;
+		} else if (!dunningFeeID.equals(other.dunningFeeID))
+			return false;
+		if (organisationID == null) {
+			if (other.organisationID != null)
+				return false;
+		} else if (!organisationID.equals(other.organisationID))
+			return false;
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "DunningFee [dunningFeeID=" + dunningFeeID + ", organisationID="
+				+ organisationID + "]";
+	}
 }

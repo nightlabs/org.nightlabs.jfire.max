@@ -70,7 +70,7 @@ implements Serializable
 		return dunningFeeAdderID;
 	}
 
-	public abstract void addDunningFee(DunningLetter dunningLetter);
+	public abstract void addDunningFee(DunningLetter prevDunningLetter, DunningLetter newDunningLetter);
 
 	protected PersistenceManager getPersistenceManager()
 	{

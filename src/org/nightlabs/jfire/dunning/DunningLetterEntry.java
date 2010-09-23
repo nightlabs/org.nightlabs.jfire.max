@@ -96,13 +96,16 @@ implements Serializable
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Price priceIncludingInvoice;
 	
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+	private DunningLetter dunningLetter;
+	
 	/**
 	 * @deprecated Only for JDO!!!!
 	 */
 	@Deprecated
 	protected DunningLetterEntry() { }
 	
-	public DunningLetterEntry(String organisationID, String dunningLetterEntryID, int dunningLevel, Invoice invoice) {
+	public DunningLetterEntry(String organisationID, String dunningLetterEntryID, int dunningLevel, Invoice invoice, DunningLetter dunningLetter) {
 		Organisation.assertValidOrganisationID(organisationID);
 		ObjectIDUtil.assertValidIDString(dunningLetterEntryID, "dunningLetterEntryID"); //$NON-NLS-1$
 	
@@ -110,6 +113,9 @@ implements Serializable
 		this.dunningLetterEntryID = dunningLetterEntryID;
 		this.dunningLevel = dunningLevel;
 		this.invoice = invoice;
+		this.dunningLetter = dunningLetter;
+		
+		this.priceIncludingInvoice = invoice.getPrice(); 
 	}
 	
 	public String getOrganisationID() {
@@ -145,6 +151,7 @@ implements Serializable
 	}
 	
 	public void addDunningInterest(DunningInterest dunningInterest) {
+		this.priceIncludingInvoice.setAmount(priceIncludingInvoice.getAmount() + dunningInterest.getInterestAmount());
 		dunningInterests.add(dunningInterest);
 	}
 	
@@ -152,11 +159,53 @@ implements Serializable
 		return Collections.unmodifiableList(dunningInterests);
 	}
 	
-	public void setPriceIncludingInvoice(Price priceIncludingInvoice) {
-		this.priceIncludingInvoice = priceIncludingInvoice;
-	}
-	
 	public Price getPriceIncludingInvoice() {
 		return priceIncludingInvoice;
+	}
+
+	public DunningLetter getDunningLetter() {
+		return dunningLetter;
+	}
+	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime
+				* result
+				+ ((dunningLetterEntryID == null) ? 0 : dunningLetterEntryID
+						.hashCode());
+		result = prime * result
+				+ ((organisationID == null) ? 0 : organisationID.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		DunningLetterEntry other = (DunningLetterEntry) obj;
+		if (dunningLetterEntryID == null) {
+			if (other.dunningLetterEntryID != null)
+				return false;
+		} else if (!dunningLetterEntryID.equals(other.dunningLetterEntryID))
+			return false;
+		if (organisationID == null) {
+			if (other.organisationID != null)
+				return false;
+		} else if (!organisationID.equals(other.organisationID))
+			return false;
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "DunningLetterEntry [dunningLetterEntryID="
+				+ dunningLetterEntryID + ", organisationID=" + organisationID
+				+ "]";
 	}
 }

@@ -190,7 +190,7 @@ implements Serializable
 		if (level > dunningLevel) {
 			this.dunningLevel = level;
 		}
-		DunningLetterEntry letterEntry = new DunningLetterEntry(organisationID, IDGenerator.nextIDString(DunningLetterEntry.class), level, invoice);
+		DunningLetterEntry letterEntry = new DunningLetterEntry(organisationID, IDGenerator.nextIDString(DunningLetterEntry.class), level, invoice, this);
 		dunnedInvoices.add(letterEntry);
 	}
 	
@@ -260,5 +260,44 @@ implements Serializable
 	
 	public boolean isOutstanding() {
 		return outstanding;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((dunningLetterID == null) ? 0 : dunningLetterID.hashCode());
+		result = prime * result
+				+ ((organisationID == null) ? 0 : organisationID.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		DunningLetter other = (DunningLetter) obj;
+		if (dunningLetterID == null) {
+			if (other.dunningLetterID != null)
+				return false;
+		} else if (!dunningLetterID.equals(other.dunningLetterID))
+			return false;
+		if (organisationID == null) {
+			if (other.organisationID != null)
+				return false;
+		} else if (!organisationID.equals(other.organisationID))
+			return false;
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "DunningLetter [dunningLetterID=" + dunningLetterID
+				+ ", organisationID=" + organisationID + "]";
 	}
 }

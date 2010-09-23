@@ -3,9 +3,7 @@ package org.nightlabs.jfire.dunning;
 import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -307,12 +305,11 @@ implements DunningManagerRemote
 				Collection<Invoice> overdueInvoices = 
 					Invoice.getOverdueInvoices(pm, dunningConfig.getOrganisationID(), new Date());
 
-				Map<DunningProcess, DunningLetter> process2LetterMap = new HashMap<DunningProcess, DunningLetter>();
 				for (Invoice inv : overdueInvoices) {
 					LegalEntity customer = inv.getCustomer();
 					Currency currency = inv.getCurrency();
 
-					//DunningProcess
+					//Get DunningProcess
 					DunningProcess dunningProcess = 
 						DunningProcess.getDunningProcessByCustomerAndCurrency(pm, (AnchorID)JDOHelper.getObjectId(customer), (CurrencyID)JDOHelper.getObjectId(currency));
 					if (dunningProcess == null || dunningProcess.getPaidDT() != null) {
@@ -323,16 +320,15 @@ implements DunningManagerRemote
 							new DunningProcess(dunningConfig.getOrganisationID(), IDGenerator.nextIDString(DunningProcess.class), customerDunningConfig == null ? dunningConfig : customerDunningConfig);
 					}
 
-					//Wrong!!!!!!!!!!!!!!!!!!!!
-					//Get current level or if it's a new process, it will be 1st level.
-//					int dunningLevel = dunningProcess.getInvoices2DunningLevel().get(inv);
-//					dunningProcess.addInvoice(inv, dunningLevel + 1);
-					int level = dunningProcess.getLastDunningLetter() == null?1:dunningProcess.getLastDunningLetter().getDunningLevel();
-					dunningProcess.addInvoice(inv, level);
+					//Add the overdue invoice to the next level
+					Integer oldLevel = dunningProcess.getInvoices2DunningLevel().get(inv);
+					int newLevel =  oldLevel == null?1:oldLevel + 1;
+					dunningProcess.addInvoice(inv, newLevel);
 					
 					pm.makePersistent(dunningProcess);
 				}
 
+				//Create Letters
 				Collection<DunningProcess> activeDunningProcesses = DunningProcess.getActiveDunningProcessesByDunningConfig(pm, (DunningConfigID)JDOHelper.getObjectId(dunningConfig));
 				for (DunningProcess process : activeDunningProcesses) {
 					if (process.getCoolDownEnd().before(new Date())) {

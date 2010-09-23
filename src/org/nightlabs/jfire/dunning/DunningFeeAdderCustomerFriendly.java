@@ -47,25 +47,25 @@ extends DunningFeeAdder
 	}
 	
 	@Override
-	public void addDunningFee(DunningLetter dunningLetter) {
-		DunningConfig dunningConfig = dunningLetter.getDunningProcess().getDunningConfig();
-		DunningProcess dunningProcess = dunningLetter.getDunningProcess();
+	public void addDunningFee(DunningLetter prevDunningLetter, DunningLetter newDunningLetter) {
+		DunningConfig dunningConfig = newDunningLetter.getDunningProcess().getDunningConfig();
+		DunningProcess dunningProcess = newDunningLetter.getDunningProcess();
 		
-		DunningLetterEntry lastLetterEntry = dunningLetter.getDunnedInvoices().get(dunningLetter.getDunnedInvoices().size() - 1);
-		int dunningLevel = lastLetterEntry.getDunningLevel();
+		int dunningLevel = newDunningLetter.getDunningLevel();
 		
 		Set<ProcessDunningStep> processDunningSteps = dunningConfig.getProcessDunningSteps();
 		for (ProcessDunningStep processDunningStep : processDunningSteps) {
 			if (processDunningStep.getDunningLevel() == dunningLevel) {
 				for (DunningFeeType dunningFeeType : processDunningStep.getFeeTypes()) {
-					DunningFee fee = new DunningFee(dunningLetter.getOrganisationID(), IDGenerator.nextIDString(DunningFee.class), null);
+					DunningFee fee = new DunningFee(newDunningLetter.getOrganisationID(), IDGenerator.nextIDString(DunningFee.class), null);
 					fee.setAmountPaid(0);
 					
 					Price amountToPay = dunningFeeType.getCurrency2price().get(dunningProcess.getCurrency());
 					fee.setAmountToPay(amountToPay.getAmount());
 					
 					fee.setDunningFeeType(dunningFeeType);
-					fee.setDunningLetter(dunningLetter);
+					
+					newDunningLetter.addDunningFee(fee);
 				}
 			}
 		}

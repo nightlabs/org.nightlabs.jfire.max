@@ -108,8 +108,7 @@ implements Serializable
 	 * The remaining amount of money that is left to be paid 
 	 * and is thus interestAmount – amountPaid.]
 	 */
-	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
-	private long amountToPay;
+	private transient long amountToPay;
 	
 	/**
 	 * The date at which all of this interest was paid. This implies that as long 
@@ -132,6 +131,9 @@ implements Serializable
 		this.dunningInterestID = dunningInterestID;
 		this.dunningLetterEntry = dunningLetterEntry;
 		this.backReference = backReference;
+		
+		this.currency = dunningLetterEntry.getInvoice().getCurrency();
+		this.baseAmount = dunningLetterEntry.getInvoice().getPrice().getAmount();
 	}
 
 
@@ -147,8 +149,16 @@ implements Serializable
 		return dunningLetterEntry;
 	}
 	
+	public void setCreditPeriodFromIncl(Date creditPeriodFromIncl) {
+		this.creditPeriodFromIncl = creditPeriodFromIncl;
+	}
+	
 	public Date getCreditPeriodFromIncl() {
 		return creditPeriodFromIncl;
+	}
+	
+	public void setCreditPeriodToExcl(Date creditPeriodToExcl) {
+		this.creditPeriodToExcl = creditPeriodToExcl;
 	}
 	
 	public Date getCreditPeriodToExcl() {
@@ -169,10 +179,6 @@ implements Serializable
 	
 	public BigDecimal getInterestPercentage() {
 		return interestPercentage;
-	}
-	
-	public void setInterestAmount(long interestAmount) {
-		this.interestAmount = interestAmount;
 	}
 	
 	public long getInterestAmount() {

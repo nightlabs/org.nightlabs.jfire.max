@@ -219,19 +219,18 @@ implements Serializable
 	public void createDunningLetter(boolean isFinalized) {
 		DunningLetter prevDunningLetter = getLastDunningLetter();
 		DunningLetter newDunningLetter = new DunningLetter(this);
+		
+		//Calculate new due date
+		
 		//Create entries
 		for (Invoice inv : invoices2DunningLevel.keySet()) {
-			newDunningLetter.addDunnedInvoice(invoices2DunningLevel.get(inv), inv);
+			int level = invoices2DunningLevel.get(inv);
+			newDunningLetter.addDunnedInvoice(dunningConfig, prevDunningLetter, level, inv);
 		}
 		
 		//Add fees
 		DunningFeeAdder feeAdder = dunningConfig.getDunningFeeAdder();
 		feeAdder.addDunningFee(prevDunningLetter, newDunningLetter);
-		
-		//Calculate interests
-		
-		DunningInterestCalculator dunningInterestCalculator = dunningConfig.getDunningInterestCalculator();
-		dunningInterestCalculator.calculateInterest(prevDunningLetter, newDunningLetter);
 		
 		//Add to the list
 		dunningLetters.add(newDunningLetter);

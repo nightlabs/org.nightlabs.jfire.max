@@ -186,10 +186,17 @@ implements Serializable
 		return dunningLevel;
 	}
 	
-	public void addDunnedInvoice(int level, Invoice invoice) {
+	public void addDunnedInvoice(DunningConfig dunningConfig, DunningLetter prevDunningLetter, int level, Invoice invoice) {
 		if (level > dunningLevel) {
 			this.dunningLevel = level;
 		}
+		
+		InvoiceDunningStep invDunningStep = dunningConfig.getInvoiceDunningStep(level);
+		
+		//Calculate interests
+		DunningInterestCalculator dunningInterestCalculator = dunningConfig.getDunningInterestCalculator();
+		dunningInterestCalculator.calculateInterest(invDunningStep, prevDunningLetter, this);
+		
 		DunningLetterEntry letterEntry = new DunningLetterEntry(organisationID, IDGenerator.nextIDString(DunningLetterEntry.class), level, invoice, this);
 		dunnedInvoices.add(letterEntry);
 	}

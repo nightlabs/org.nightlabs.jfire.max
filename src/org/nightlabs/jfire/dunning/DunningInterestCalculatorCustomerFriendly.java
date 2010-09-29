@@ -62,7 +62,7 @@ extends DunningInterestCalculator
 		cal.set(Calendar.HOUR, 0);
 		cal.set(Calendar.MINUTE, 0);
 		cal.set(Calendar.SECOND, 0);
-		cal.roll(Calendar.DATE, -1);
+		cal.roll(Calendar.DATE, 1);
 		return cal.getTime();
 	}
 

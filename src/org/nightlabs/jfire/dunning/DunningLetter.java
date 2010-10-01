@@ -8,6 +8,9 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 
+import javax.jdo.JDOHelper;
+import javax.jdo.PersistenceManager;
+import javax.jdo.Query;
 import javax.jdo.annotations.Column;
 import javax.jdo.annotations.IdentityType;
 import javax.jdo.annotations.Inheritance;
@@ -17,13 +20,19 @@ import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.PersistenceModifier;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.Queries;
 
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.accounting.Invoice;
+import org.nightlabs.jfire.accounting.InvoiceLocal;
+import org.nightlabs.jfire.accounting.InvoiceMoneyTransfer;
 import org.nightlabs.jfire.accounting.Price;
+import org.nightlabs.jfire.accounting.id.InvoiceID;
 import org.nightlabs.jfire.dunning.id.DunningLetterID;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.organisation.Organisation;
+import org.nightlabs.jfire.transfer.Transfer;
+import org.nightlabs.util.CollectionUtil;
 
 /**
  * A DunningLetter represents the letter send to a customer 
@@ -39,6 +48,13 @@ import org.nightlabs.jfire.organisation.Organisation;
 		detachable="true",
 		table="JFireDunning_DunningLetter")
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
+@Queries({
+	@javax.jdo.annotations.Query(
+			name="getOpenDunningLetters",
+			value="SELECT this " +
+					"WHERE finalizeDT == null"
+	),
+})
 public class DunningLetter 
 implements Serializable
 {
@@ -195,7 +211,7 @@ implements Serializable
 		
 		//Calculate interests
 		DunningInterestCalculator dunningInterestCalculator = dunningConfig.getDunningInterestCalculator();
-		dunningInterestCalculator.calculateInterest(invDunningStep, prevDunningLetter, this);
+		dunningInterestCalculator.createDunningInterest(invDunningStep, prevDunningLetter, this);
 		
 		DunningLetterEntry letterEntry = new DunningLetterEntry(organisationID, IDGenerator.nextIDString(DunningLetterEntry.class), level, invoice, this);
 		dunnedInvoices.add(letterEntry);
@@ -221,12 +237,22 @@ implements Serializable
 		return finalizeDT;
 	}
 	
+	public boolean isFinalized()
+	{
+		return finalizeDT != null;
+	}
+	
 	public void setBookDT(Date bookDT) {
 		this.bookDT = bookDT;
 	}
 	
 	public Date getBookDT() {
 		return bookDT;
+	}
+	
+	public boolean isBooked()
+	{
+		return bookDT != null;
 	}
 	
 	public void setPriceExcludingInvoices(Price priceExcludingInvoices) {
@@ -268,7 +294,58 @@ implements Serializable
 	public boolean isOutstanding() {
 		return outstanding;
 	}
+	
+	public void bookDunningLetter(InvoiceMoneyTransfer transfer, boolean rollback)
+	{
+//		if (!InvoiceMoneyTransfer.BOOK_TYPE_PAY.equals(transfer.getBookType()))
+//			return;
+//
+//		boolean vendorIsFrom = transfer.getAnchorType(vendor) == Transfer.ANCHORTYPE_FROM;
+//		boolean vendorIsTo = transfer.getAnchorType(vendor) == Transfer.ANCHORTYPE_TO;
+//		boolean customerIsFrom = transfer.getAnchorType(customer) == Transfer.ANCHORTYPE_FROM;
+//		boolean customerIsTo = transfer.getAnchorType(customer) == Transfer.ANCHORTYPE_TO;
+//
+//		if (!vendorIsFrom && !vendorIsTo && !customerIsFrom && !customerIsTo)
+//			throw new IllegalArgumentException("Transfer \""+transfer.getPrimaryKey()+"\" && Invoice \""+this.getPrimaryKey()+"\": Transfer and invoice are not related!");
+//
+//		long amount;
+//		if (vendorIsTo || customerIsFrom)
+//			amount = transfer.getAmount();
+//		else
+//			amount = - transfer.getAmount();
+//
+//		if (rollback)
+//			amount *= -1;
+//
+//		InvoiceLocal invoiceLocal = getInvoiceLocal();
+//		invoiceLocal.incAmountPaid(amount);
+//
+//		if (invoiceLocal.getAmountToPay() == 0) {
+//			invoiceLocal.setOutstanding(false);
+//		}
+//		else {
+//			invoiceLocal.setOutstanding(true);
+//		}
+	}
+	
 
+	private static Collection<DunningLetter> getOpenDunningLetters(PersistenceManager pm) {
+		Query query = pm.newNamedQuery(DunningLetter.class, "getOpenDunningLetters");
+		return CollectionUtil.castList((List<?>) query.execute());
+	}
+	
+	public static DunningLetter getOpenDunningLetterByInvoiceID(PersistenceManager pm, InvoiceID invoiceID) {
+		Collection<DunningLetter> openDunningLetters = getOpenDunningLetters(pm);
+		for (DunningLetter openDunningLetter : openDunningLetters) {
+			for (DunningLetterEntry entry : openDunningLetter.getDunnedInvoices()) {
+				if (JDOHelper.getObjectId(entry.getInvoice()).equals(invoiceID)) {
+					return openDunningLetter;
+				}
+			}
+		}
+		return null;
+	}
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;

@@ -15,6 +15,7 @@ import javax.jdo.annotations.PrimaryKey;
 
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.dunning.id.DunningInterestID;
+import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.organisation.Organisation;
 
 /**
@@ -181,6 +182,10 @@ implements Serializable
 		return interestPercentage;
 	}
 	
+	public void setInterestAmount(long interestAmount) {
+		this.interestAmount = interestAmount;
+	}
+	
 	public long getInterestAmount() {
 		return interestAmount;
 	}
@@ -208,7 +213,6 @@ implements Serializable
 	public Date getPaidDT() {
 		return paidDT;
 	}
-
 
 	@Override
 	public int hashCode() {

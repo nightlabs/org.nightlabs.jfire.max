@@ -276,7 +276,7 @@ implements Serializable
 	}
 	
 	public void setDefaultTermOfPaymentDay(int defaultTermOfPaymentDay) {
-		this.defaultTermOfPaymentMSec = defaultTermOfPaymentDay * (24l * 60l * 60l * 1000l);
+		this.defaultTermOfPaymentMSec = TimeUnit.DAYS.toMillis(defaultTermOfPaymentDay);
 	}
 	
 	public long getDefaultTermOfPaymentMSec() {

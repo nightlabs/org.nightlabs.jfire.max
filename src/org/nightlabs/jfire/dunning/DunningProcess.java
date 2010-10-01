@@ -234,6 +234,9 @@ implements Serializable
 		
 		//Add to the list
 		dunningLetters.add(newDunningLetter);
+		
+		DunningLetterNotifier letterNotifier = dunningConfig.getLevel2DunningLetterNotifiers().get(newDunningLetter.getDunningLevel());
+		letterNotifier.triggerNotifier();
 	}
 	
 	public static Collection<DunningProcessID> getDunningProcessesByCustomer(PersistenceManager pm, AnchorID customerID) {

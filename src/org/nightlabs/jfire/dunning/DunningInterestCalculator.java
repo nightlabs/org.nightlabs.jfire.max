@@ -91,66 +91,59 @@ implements Serializable
 	 */
 	public abstract Date getLastDay(DunningLetterEntry dunningLetterEntry);
 
-	public void calculateInterest(InvoiceDunningStep invoiceDunningStep, DunningLetter prevLetter, DunningLetter letter) {
+	public void createDunningInterest(InvoiceDunningStep invoiceDunningStep, DunningLetter prevLetter, DunningLetter letter) {
 		if (prevLetter == null) {
 			for (DunningLetterEntry entry : letter.getDunnedInvoices()) {
-				createNewInterest(entry);
+				DunningInterest interest = new DunningInterest(organisationID, IDGenerator.nextIDString(DunningInterest.class), entry, null);
+				calculate(invoiceDunningStep, interest);
+				entry.addDunningInterest(interest);
 			}
 		}
 		else {
 			List<DunningLetterEntry> entries = letter.getDunnedInvoices();
 			List<DunningLetterEntry> prevEntries = prevLetter.getDunnedInvoices();
-			int days = getDays();
 			for (DunningLetterEntry entry : entries) {
 				Date firstDay = getFirstDay(entry);
 				Date lastDay = getLastDay(entry);
 				long dayDifTime = lastDay.getTime() - firstDay.getTime();
-				long dayDiffDays = dayDifTime / (24 * 60 * 60 * 1000);
+				long dayDiffDays = dayDifTime / (24l * 60l * 60l * 1000l);
 				
 				int entryIndex = prevEntries.indexOf(entry);
 				if (entryIndex != -1) {
 					DunningLetterEntry prevEntry = prevEntries.get(entryIndex);
-					int dunningLevel = entry.getDunningLevel();
-					InvoiceDunningStep invDunningStep = dunningConfig.getInvoiceDunningStep(dunningLevel);
-					BigDecimal interestPercentage = invDunningStep.getInterestPercentage();
-					
 					DunningInterest prevInterest = prevEntry.getDunningInterests().get(prevEntry.getDunningInterests().size() - 1);
-					DunningInterest interest = new DunningInterest(organisationID, IDGenerator.nextIDString(DunningInterest.class), entry, prevInterest);
-					interest.setInterestPercentage(interestPercentage);
-					interest.setCreditPeriodFromIncl(firstDay);
-					interest.setCreditPeriodToExcl(lastDay);
-					
-//					double dop = (entry.getPriceIncludingInvoice().getAmount() * interestPercentage.doubleValue()) / days;
-//					double amountToPay = dop * dayDiffDays;
-					
-//					interest.setInterestAmount(interestAmount)
-//					interest.setAmountToPay(amountToPay);
-					
-					
-					entry.addDunningInterest(interest);
+
+					BigDecimal interestPercentage = invoiceDunningStep.getInterestPercentage();
+					if (interestPercentage.equals(prevInterest.getInterestPercentage())) {
+						prevInterest.setCreditPeriodToExcl(lastDay);
+						calculate(invoiceDunningStep, prevInterest);
+					}
+					else {
+						DunningInterest interest = new DunningInterest(organisationID, IDGenerator.nextIDString(DunningInterest.class), entry, prevInterest);
+						interest.setInterestPercentage(interestPercentage);
+						interest.setCreditPeriodFromIncl(firstDay);
+						interest.setCreditPeriodToExcl(lastDay);
+
+						calculate(invoiceDunningStep, interest);
+						entry.addDunningInterest(interest);
+					}
 				}
 				else {
-					createNewInterest(entry);
+					DunningInterest interest = new DunningInterest(organisationID, IDGenerator.nextIDString(DunningInterest.class), entry, null);
+					calculate(invoiceDunningStep, interest);
+					entry.addDunningInterest(interest);
 				}
 			}	
 		}
 	}
 
-	private void createNewInterest(DunningLetterEntry entry) {
-		int dunningLevel = entry.getDunningLevel();
-		InvoiceDunningStep invDunningStep = dunningConfig.getInvoiceDunningStep(dunningLevel);
-
+	private void calculate(InvoiceDunningStep invDunningStep, DunningInterest interest) {
 		BigDecimal interestPercentage = invDunningStep.getInterestPercentage();
-		long interestAmount = interestPercentage.longValue() * entry.getPriceIncludingInvoice().getAmount();
-		long amountToPay = interestAmount;
+		double interestAmount = interestPercentage.doubleValue() * interest.getBaseAmount(); //TODO Check if the base amount needed to be converted?
+		double amountToPay = interestAmount - interest.getAmountPaid();
 		
-		DunningInterest interest = new DunningInterest(organisationID, IDGenerator.nextIDString(DunningInterest.class), entry, null);
-		interest.setInterestPercentage(interestPercentage);
-//		interest.setInterestAmount(interestAmount);
-		interest.setAmountToPay(amountToPay);
-		interest.setAmountPaid(0);
-		
-		entry.addDunningInterest(interest);
+		interest.setAmountToPay(interest.getCurrency().toLong(amountToPay));
+		interest.setInterestAmount(interest.getCurrency().toLong(interestAmount));
 	}
 	
 	/**

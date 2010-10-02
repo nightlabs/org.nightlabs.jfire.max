@@ -9,12 +9,10 @@ import java.util.Set;
 import javax.jdo.FetchPlan;
 
 import org.nightlabs.jdo.NLJDOHelper;
-import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.scripting.ScriptManagerRemote;
 import org.nightlabs.jfire.scripting.ScriptParameterSet;
 import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
-import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.progress.ProgressMonitor;
 
 /**
@@ -61,7 +59,7 @@ extends BaseJDOObjectDAO<ScriptRegistryItemID, ScriptParameterSet>
 	protected Collection<ScriptParameterSet> retrieveJDOObjects(
 			Set<ScriptRegistryItemID> objectIDs, String[] fetchGroups,
 			int maxFetchDepth, ProgressMonitor monitor) throws Exception {
-		ScriptManagerRemote sm = JFireEjb3Factory.getRemoteBean(ScriptManagerRemote.class, SecurityReflector.getInitialContextProperties());
+		ScriptManagerRemote sm = getEjbProvider().getRemoteBean(ScriptManagerRemote.class);
 		return sm.getScriptParameterSetsForScriptRegistryItemIDs(objectIDs, fetchGroups, maxFetchDepth);
 	}
 

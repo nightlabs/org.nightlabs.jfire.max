@@ -5,16 +5,11 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.scripting.IScriptParameter;
-import org.nightlabs.jfire.scripting.ScriptManagerBean;
 import org.nightlabs.jfire.scripting.ScriptManagerRemote;
 import org.nightlabs.jfire.scripting.ScriptParameter;
-import org.nightlabs.jfire.scripting.ScriptRegistryItem;
 import org.nightlabs.jfire.scripting.id.ScriptParameterID;
-import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
-import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.progress.ProgressMonitor;
 
 public class ScriptParameterDAO extends
@@ -35,7 +30,7 @@ public class ScriptParameterDAO extends
 			Set<ScriptParameterID> objectIDs, String[] fetchGroups,
 			int maxFetchDepth, ProgressMonitor monitor) throws Exception {
 		
-		ScriptManagerRemote sm=JFireEjb3Factory.getRemoteBean(ScriptManagerRemote.class,  SecurityReflector.getInitialContextProperties());
+		ScriptManagerRemote sm=getEjbProvider().getRemoteBean(ScriptManagerRemote.class);
         List<ScriptParameterID> ids=new ArrayList<ScriptParameterID>(objectIDs);
                                    List<ScriptParameter> l= sm.getScriptParameters(ids, fetchGroups, maxFetchDepth);
 	
@@ -49,7 +44,7 @@ public class ScriptParameterDAO extends
 			
 	      ){
 		    try{
-		    	ScriptManagerRemote sm = JFireEjb3Factory.getRemoteBean(ScriptManagerRemote.class, SecurityReflector.getInitialContextProperties());
+		    	ScriptManagerRemote sm = getEjbProvider().getRemoteBean(ScriptManagerRemote.class);
 		    	return sm.storeParameter(scriptParameter, get, fetchGroups, maxFetchDepth);
 		    	
 		    }catch (Exception e){

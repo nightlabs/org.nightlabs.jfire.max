@@ -4,12 +4,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.base.jdo.IJDOObjectDAO;
 import org.nightlabs.jfire.dynamictrade.DynamicTradeManagerRemote;
 import org.nightlabs.jfire.dynamictrade.store.DynamicProductType;
-import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.store.StoreManagerRemote;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.progress.ProgressMonitor;
@@ -45,7 +43,7 @@ implements IJDOObjectDAO<DynamicProductType>
 //				vm = JFireEjbFactory.getBean(DynamicTradeManager.class, SecurityReflector.getInitialContextProperties());
 //
 //			return vm.getDynamicProductTypes(dynamicProductTypeIDs, fetchGroups, maxFetchDepth);
-			StoreManagerRemote sm = JFireEjb3Factory.getRemoteBean(StoreManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			StoreManagerRemote sm = getEjbProvider().getRemoteBean(StoreManagerRemote.class);
 			return CollectionUtil.castCollection(sm.getProductTypes(dynamicProductTypeIDs, fetchGroups, maxFetchDepth));
 		} finally {
 			monitor.worked(1);
@@ -59,7 +57,7 @@ implements IJDOObjectDAO<DynamicProductType>
 			ProgressMonitor monitor)
 	{
 		try {
-			dynamicTradeManager = JFireEjb3Factory.getRemoteBean(DynamicTradeManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			dynamicTradeManager = getEjbProvider().getRemoteBean(DynamicTradeManagerRemote.class);
 			try {
 				Collection<ProductTypeID> dynamicProductTypeIDs = dynamicTradeManager.getChildDynamicProductTypeIDs(parentDynamicProductTypeID);
 				return getJDOObjects(null, dynamicProductTypeIDs, fetchGroups, maxFetchDepth, monitor);
@@ -114,7 +112,7 @@ implements IJDOObjectDAO<DynamicProductType>
 	@Override
 	public DynamicProductType storeJDOObject(DynamicProductType jdoObject, boolean get, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) {
 		try {
-			DynamicTradeManagerRemote dtm = JFireEjb3Factory.getRemoteBean(DynamicTradeManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			DynamicTradeManagerRemote dtm = getEjbProvider().getRemoteBean(DynamicTradeManagerRemote.class);
 			return dtm.storeDynamicProductType(jdoObject, get, fetchGroups, maxFetchDepth);
 		} catch (Exception e) {
 			throw new RuntimeException(e);

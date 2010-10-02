@@ -5,11 +5,9 @@ import java.util.List;
 import java.util.Set;
 
 import org.nightlabs.jfire.accounting.priceconfig.id.PriceConfigID;
-import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.dynamictrade.DynamicTradeManagerRemote;
 import org.nightlabs.jfire.dynamictrade.accounting.priceconfig.DynamicTradePriceConfig;
-import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.progress.ProgressMonitor;
 
 public class DynamicTradePriceConfigDAO
@@ -38,7 +36,7 @@ extends BaseJDOObjectDAO<PriceConfigID, DynamicTradePriceConfig>
 		try {
 			DynamicTradeManagerRemote vm = dynamicTradeManager;
 			if (vm == null)
-				vm = JFireEjb3Factory.getRemoteBean(DynamicTradeManagerRemote.class, SecurityReflector.getInitialContextProperties());
+				vm = getEjbProvider().getRemoteBean(DynamicTradeManagerRemote.class);
 
 			return vm.getDynamicTradePriceConfigs(dynamicTradePriceConfigIDs, fetchGroups, maxFetchDepth);
 		} finally {
@@ -52,7 +50,7 @@ extends BaseJDOObjectDAO<PriceConfigID, DynamicTradePriceConfig>
 			ProgressMonitor monitor)
 	{
 		try {
-			dynamicTradeManager = JFireEjb3Factory.getRemoteBean(DynamicTradeManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			dynamicTradeManager = getEjbProvider().getRemoteBean(DynamicTradeManagerRemote.class);
 			try {
 				Collection<PriceConfigID> dynamicTradePriceConfigIDs = dynamicTradeManager.getDynamicTradePriceConfigIDs();
 				return getJDOObjects(null, dynamicTradePriceConfigIDs, fetchGroups, maxFetchDepth, monitor);

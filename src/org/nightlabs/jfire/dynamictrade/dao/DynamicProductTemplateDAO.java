@@ -6,13 +6,11 @@ import java.util.Set;
 
 import javax.jdo.JDOHelper;
 
-import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.base.jdo.IJDOObjectDAO;
 import org.nightlabs.jfire.dynamictrade.DynamicTradeManagerRemote;
 import org.nightlabs.jfire.dynamictrade.template.DynamicProductTemplate;
 import org.nightlabs.jfire.dynamictrade.template.id.DynamicProductTemplateID;
-import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.progress.ProgressMonitor;
 import org.nightlabs.progress.SubProgressMonitor;
 
@@ -39,7 +37,7 @@ implements IJDOObjectDAO<DynamicProductTemplate>
 	{
 		DynamicTradeManagerRemote ejb = this.ejb;
 		if (ejb == null)
-			ejb = JFireEjb3Factory.getRemoteBean(DynamicTradeManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			ejb = getEjbProvider().getRemoteBean(DynamicTradeManagerRemote.class);
 
 		return ejb.getDynamicProductTemplates(dynamicProductTemplateIDs, fetchGroups, maxFetchDepth);
 	}
@@ -57,7 +55,7 @@ implements IJDOObjectDAO<DynamicProductTemplate>
 	{
 		monitor.beginTask("Loading templates", 100);
 		try {
-			ejb = JFireEjb3Factory.getRemoteBean(DynamicTradeManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			ejb = getEjbProvider().getRemoteBean(DynamicTradeManagerRemote.class);
 			try {
 				Collection<DynamicProductTemplateID> dynamicProductTemplateIDs = ejb.getChildDynamicProductTemplateIDs(parentCategoryID);
 				monitor.worked(30);
@@ -84,7 +82,7 @@ implements IJDOObjectDAO<DynamicProductTemplate>
 	@Override
 	public DynamicProductTemplate storeJDOObject(DynamicProductTemplate dynamicProductTemplate, boolean get, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
-		DynamicTradeManagerRemote ejb = JFireEjb3Factory.getRemoteBean(DynamicTradeManagerRemote.class, SecurityReflector.getInitialContextProperties());
+		DynamicTradeManagerRemote ejb = getEjbProvider().getRemoteBean(DynamicTradeManagerRemote.class);
 		dynamicProductTemplate = ejb.storeDynamicProductTemplate(dynamicProductTemplate, get, fetchGroups, maxFetchDepth);
 		if (dynamicProductTemplate != null)
 			getCache().put(null, dynamicProductTemplate, fetchGroups, maxFetchDepth);

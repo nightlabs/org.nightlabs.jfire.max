@@ -3,12 +3,10 @@ package org.nightlabs.jfire.jbpm.dao;
 import java.util.Collection;
 import java.util.Set;
 
-import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.jbpm.JbpmManagerRemote;
 import org.nightlabs.jfire.jbpm.graph.def.StateDefinition;
 import org.nightlabs.jfire.jbpm.graph.def.id.StateDefinitionID;
-import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.progress.ProgressMonitor;
 
 /**
@@ -41,7 +39,7 @@ extends BaseJDOObjectDAO<StateDefinitionID, StateDefinition>
 	{
 		monitor.beginTask("Loading StateDefintions", 2);
 		monitor.worked(1);
-		JbpmManagerRemote jbpmManager = JFireEjb3Factory.getRemoteBean(JbpmManagerRemote.class, SecurityReflector.getInitialContextProperties());
+		JbpmManagerRemote jbpmManager = getEjbProvider().getRemoteBean(JbpmManagerRemote.class);
 		Collection<StateDefinition> stateDefintions = jbpmManager.getStateDefinitions(objectIDs, fetchGroups, maxFetchDepth);
 		monitor.worked(1);
 		return stateDefintions;

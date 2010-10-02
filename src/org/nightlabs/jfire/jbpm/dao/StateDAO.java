@@ -5,12 +5,10 @@ import java.util.List;
 import java.util.Set;
 
 import org.nightlabs.jdo.ObjectID;
-import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.jbpm.JbpmManagerRemote;
 import org.nightlabs.jfire.jbpm.graph.def.State;
 import org.nightlabs.jfire.jbpm.graph.def.id.StateID;
-import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.progress.ProgressMonitor;
 
 public class StateDAO
@@ -36,7 +34,7 @@ extends BaseJDOObjectDAO<StateID, State>
 			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 			throws Exception
 	{
-		JbpmManagerRemote m = JFireEjb3Factory.getRemoteBean(JbpmManagerRemote.class, SecurityReflector.getInitialContextProperties());
+		JbpmManagerRemote m = getEjbProvider().getRemoteBean(JbpmManagerRemote.class);
 		return m.getStates(stateIDs, fetchGroups, maxFetchDepth);
 	}
 
@@ -54,7 +52,7 @@ extends BaseJDOObjectDAO<StateID, State>
 	{
 		Set<StateID> stateIDs;
 		try {
-			JbpmManagerRemote m = JFireEjb3Factory.getRemoteBean(JbpmManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			JbpmManagerRemote m = getEjbProvider().getRemoteBean(JbpmManagerRemote.class);
 			stateIDs = m.getStateIDs(statableID);
 		} catch (Exception x) {
 			throw new RuntimeException(x);

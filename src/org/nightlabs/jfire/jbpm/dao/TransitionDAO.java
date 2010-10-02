@@ -4,14 +4,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.jbpm.JbpmManagerRemote;
 import org.nightlabs.jfire.jbpm.graph.def.Transition;
 import org.nightlabs.jfire.jbpm.graph.def.id.StateDefinitionID;
 import org.nightlabs.jfire.jbpm.graph.def.id.StateID;
 import org.nightlabs.jfire.jbpm.graph.def.id.TransitionID;
-import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.progress.ProgressMonitor;
 
 public class TransitionDAO
@@ -34,7 +32,7 @@ public class TransitionDAO
 			ProgressMonitor monitor)
 			throws Exception
 	{
-		JbpmManagerRemote m = JFireEjb3Factory.getRemoteBean(JbpmManagerRemote.class, SecurityReflector.getInitialContextProperties());
+		JbpmManagerRemote m = getEjbProvider().getRemoteBean(JbpmManagerRemote.class);
 		return m.getTransitions(transitionIDs, fetchGroups, maxFetchDepth);
 	}
 
@@ -43,7 +41,7 @@ public class TransitionDAO
 	{
 		Set<TransitionID> transitionIDs;
 		try {
-			JbpmManagerRemote m = JFireEjb3Factory.getRemoteBean(JbpmManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			JbpmManagerRemote m = getEjbProvider().getRemoteBean(JbpmManagerRemote.class);
 			transitionIDs = m.getTransitionIDs(stateDefinitionID, userExecutable);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
@@ -56,7 +54,7 @@ public class TransitionDAO
 	{
 		Set<TransitionID> transitionIDs;
 		try {
-			JbpmManagerRemote m = JFireEjb3Factory.getRemoteBean(JbpmManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			JbpmManagerRemote m = getEjbProvider().getRemoteBean(JbpmManagerRemote.class);
 			transitionIDs = m.getTransitionIDs(stateID, userExecutable);
 		} catch (Exception e) {
 			throw new RuntimeException(e);

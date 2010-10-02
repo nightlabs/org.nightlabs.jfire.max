@@ -3,12 +3,10 @@ package org.nightlabs.jfire.jbpm.dao;
 import java.util.Collection;
 import java.util.Set;
 
-import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.jbpm.JbpmManagerRemote;
 import org.nightlabs.jfire.jbpm.graph.def.ProcessDefinition;
 import org.nightlabs.jfire.jbpm.graph.def.id.ProcessDefinitionID;
-import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.progress.ProgressMonitor;
 
 /**
@@ -44,7 +42,7 @@ extends BaseJDOObjectDAO<ProcessDefinitionID, ProcessDefinition>
 	{
 		monitor.beginTask("Loading ProcessDefintions", 2);
 		monitor.worked(1);
-		JbpmManagerRemote jbpmManager = JFireEjb3Factory.getRemoteBean(JbpmManagerRemote.class, SecurityReflector.getInitialContextProperties());
+		JbpmManagerRemote jbpmManager = getEjbProvider().getRemoteBean(JbpmManagerRemote.class);
 		Collection<ProcessDefinition> processDefintions = jbpmManager.getProcessDefinitions(objectIDs, fetchGroups, maxFetchDepth);
 		monitor.worked(1);
 		return processDefintions;

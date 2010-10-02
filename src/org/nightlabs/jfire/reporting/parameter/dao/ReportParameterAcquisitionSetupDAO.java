@@ -15,7 +15,6 @@ import javax.naming.NamingException;
 
 import org.nightlabs.ModuleException;
 import org.nightlabs.jdo.NLJDOHelper;
-import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
 import org.nightlabs.jfire.reporting.parameter.ReportParameterManagerRemote;
@@ -25,7 +24,6 @@ import org.nightlabs.jfire.reporting.parameter.config.ValueAcquisitionSetup;
 import org.nightlabs.jfire.reporting.parameter.config.ValueConsumerBinding;
 import org.nightlabs.jfire.reporting.parameter.config.ValueProviderConfig;
 import org.nightlabs.jfire.reporting.parameter.config.id.ReportParameterAcquisitionSetupID;
-import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.progress.ProgressMonitor;
 
 /**
@@ -64,7 +62,7 @@ extends BaseJDOObjectDAO<ReportParameterAcquisitionSetupID, ReportParameterAcqui
 		)
 		throws Exception
 	{
-		ReportParameterManagerRemote rpm = JFireEjb3Factory.getRemoteBean(ReportParameterManagerRemote.class, SecurityReflector.getInitialContextProperties());
+		ReportParameterManagerRemote rpm = getEjbProvider().getRemoteBean(ReportParameterManagerRemote.class);
 		return rpm.getReportParameterAcquisitionSetups(objectIDs, fetchGroups, maxFetchDepth);
 	}
 
@@ -77,7 +75,7 @@ extends BaseJDOObjectDAO<ReportParameterAcquisitionSetupID, ReportParameterAcqui
 	{
 		Set<ReportRegistryItemID> itemIDs = new HashSet<ReportRegistryItemID>(1);
 		itemIDs.add(reportLayoutID);
-		ReportParameterManagerRemote rpm = JFireEjb3Factory.getRemoteBean(ReportParameterManagerRemote.class, SecurityReflector.getInitialContextProperties());
+		ReportParameterManagerRemote rpm = getEjbProvider().getRemoteBean(ReportParameterManagerRemote.class);
 		Map<ReportRegistryItemID, ReportParameterAcquisitionSetupID> ids = rpm.getReportParameterAcquisitionSetupIDs(itemIDs);
 		ReportParameterAcquisitionSetupID setupID = ids.get(reportLayoutID);
 		if (setupID == null)

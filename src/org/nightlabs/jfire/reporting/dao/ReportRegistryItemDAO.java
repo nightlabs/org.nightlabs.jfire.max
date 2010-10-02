@@ -36,15 +36,12 @@ import javax.jdo.JDOHelper;
 import javax.naming.NamingException;
 
 import org.nightlabs.jdo.NLJDOHelper;
-import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
-import org.nightlabs.jfire.base.jdo.cache.Cache;
 import org.nightlabs.jfire.reporting.ReportManagerRemote;
 import org.nightlabs.jfire.reporting.layout.ReportCategory;
 import org.nightlabs.jfire.reporting.layout.ReportLayout;
 import org.nightlabs.jfire.reporting.layout.ReportRegistryItem;
 import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
-import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.progress.ProgressMonitor;
 
 /**
@@ -70,7 +67,7 @@ extends BaseJDOObjectDAO<ReportRegistryItemID, ReportRegistryItem>
 	protected Collection<ReportRegistryItem> retrieveJDOObjects(
 			Set<ReportRegistryItemID> objectIDs, String[] fetchGroups,
 			int maxFetchDepth, ProgressMonitor monitor) throws Exception {
-		ReportManagerRemote rm = JFireEjb3Factory.getRemoteBean(ReportManagerRemote.class, SecurityReflector.getInitialContextProperties());
+		ReportManagerRemote rm = getEjbProvider().getRemoteBean(ReportManagerRemote.class);
 		return rm.getReportRegistryItems(new ArrayList<ReportRegistryItemID>(objectIDs), fetchGroups, maxFetchDepth);
 	}
 
@@ -128,11 +125,11 @@ extends BaseJDOObjectDAO<ReportRegistryItemID, ReportRegistryItem>
 			ReportRegistryItem reportRegistryItem, boolean get, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	throws RemoteException, CreateException, NamingException
 	{
-		ReportManagerRemote rm = JFireEjb3Factory.getRemoteBean(ReportManagerRemote.class, SecurityReflector.getInitialContextProperties());
+		ReportManagerRemote rm = getEjbProvider().getRemoteBean(ReportManagerRemote.class);
 		if (get) {
-			Cache.sharedInstance().removeByObjectID(JDOHelper.getObjectId(reportRegistryItem), false);
+			getCache().removeByObjectID(JDOHelper.getObjectId(reportRegistryItem), false);
 			ReportRegistryItem item = rm.storeRegistryItem(reportRegistryItem, get, fetchGroups, maxFetchDepth);
-			Cache.sharedInstance().put(null, item, fetchGroups, maxFetchDepth);
+			getCache().put(null, item, fetchGroups, maxFetchDepth);
 			return item;
 		} else
 			return rm.storeRegistryItem(reportRegistryItem, get, fetchGroups, maxFetchDepth);

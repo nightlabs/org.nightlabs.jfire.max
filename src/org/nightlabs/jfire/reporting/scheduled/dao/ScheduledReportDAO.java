@@ -6,13 +6,11 @@ package org.nightlabs.jfire.reporting.scheduled.dao;
 import java.util.Collection;
 import java.util.Set;
 
-import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.base.jdo.IJDOObjectDAO;
 import org.nightlabs.jfire.reporting.scheduled.ScheduledReport;
 import org.nightlabs.jfire.reporting.scheduled.ScheduledReportManagerRemote;
 import org.nightlabs.jfire.reporting.scheduled.id.ScheduledReportID;
-import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.progress.ProgressMonitor;
 
 /**
@@ -37,7 +35,7 @@ implements IJDOObjectDAO<ScheduledReport> {
 	protected Collection<? extends ScheduledReport> retrieveJDOObjects(
 			Set<ScheduledReportID> scheduledReportIDs, String[] fetchGroups,
 			int maxFetchDepth, ProgressMonitor monitor) throws Exception {
-		return JFireEjb3Factory.getRemoteBean(ScheduledReportManagerRemote.class, SecurityReflector.getInitialContextProperties())
+		return getEjbProvider().getRemoteBean(ScheduledReportManagerRemote.class)
 			.getScheduledReports(scheduledReportIDs, fetchGroups, maxFetchDepth);
 	}
 
@@ -48,7 +46,7 @@ implements IJDOObjectDAO<ScheduledReport> {
 	public ScheduledReport storeJDOObject(ScheduledReport scheduledReport,
 			boolean get, String[] fetchGroups, int maxFetchDepth,
 			ProgressMonitor monitor) {
-		return JFireEjb3Factory.getRemoteBean(ScheduledReportManagerRemote.class, SecurityReflector.getInitialContextProperties())
+		return getEjbProvider().getRemoteBean(ScheduledReportManagerRemote.class)
 			.storeScheduledReport(scheduledReport, get, fetchGroups, maxFetchDepth);
 	}
 
@@ -59,7 +57,7 @@ implements IJDOObjectDAO<ScheduledReport> {
 	 * @param monitor TODO
 	 */
 	public void deleteScheduledReport(ScheduledReportID scheduledReportID, ProgressMonitor monitor) {
-		JFireEjb3Factory.getRemoteBean(ScheduledReportManagerRemote.class, SecurityReflector.getInitialContextProperties())
+		getEjbProvider().getRemoteBean(ScheduledReportManagerRemote.class)
 				.deleteScheduledReport(scheduledReportID);
 	}
 
@@ -104,7 +102,7 @@ implements IJDOObjectDAO<ScheduledReport> {
 	 */
 	public Collection<ScheduledReport> getScheduledReports(
 			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) {
-		ScheduledReportManagerRemote srm = JFireEjb3Factory.getRemoteBean(ScheduledReportManagerRemote.class, SecurityReflector.getInitialContextProperties());
+		ScheduledReportManagerRemote srm = getEjbProvider().getRemoteBean(ScheduledReportManagerRemote.class);
 		Collection<ScheduledReportID> scheduledReportIDs = srm.getScheduledReportIDs();
 		return getJDOObjects(null, scheduledReportIDs, fetchGroups, maxFetchDepth, monitor);
 	}

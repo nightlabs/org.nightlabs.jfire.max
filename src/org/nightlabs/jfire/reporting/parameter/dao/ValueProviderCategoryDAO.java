@@ -7,12 +7,10 @@ import java.util.Collection;
 import java.util.Set;
 
 import org.nightlabs.jdo.NLJDOHelper;
-import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.reporting.parameter.ReportParameterManagerRemote;
 import org.nightlabs.jfire.reporting.parameter.ValueProviderCategory;
 import org.nightlabs.jfire.reporting.parameter.id.ValueProviderCategoryID;
-import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.progress.ProgressMonitor;
 
 /**
@@ -38,7 +36,7 @@ extends BaseJDOObjectDAO<ValueProviderCategoryID, ValueProviderCategory> {
 		)
 	throws Exception
 	{
-		ReportParameterManagerRemote rpm = JFireEjb3Factory.getRemoteBean(ReportParameterManagerRemote.class, SecurityReflector.getInitialContextProperties());
+		ReportParameterManagerRemote rpm = getEjbProvider().getRemoteBean(ReportParameterManagerRemote.class);
 		return rpm.getValueProviderCategories(objectIDs, fetchGroups, maxFetchDepth);
 	}
 

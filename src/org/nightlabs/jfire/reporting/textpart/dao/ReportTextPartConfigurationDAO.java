@@ -7,13 +7,11 @@ import java.util.Collection;
 import java.util.Set;
 
 import org.nightlabs.jdo.ObjectID;
-import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
 import org.nightlabs.jfire.reporting.textpart.ReportTextPartConfiguration;
 import org.nightlabs.jfire.reporting.textpart.ReportTextPartManagerRemote;
 import org.nightlabs.jfire.reporting.textpart.id.ReportTextPartConfigurationID;
-import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.progress.ProgressMonitor;
 
 /**
@@ -163,6 +161,6 @@ public class ReportTextPartConfigurationDAO extends BaseJDOObjectDAO<ReportTextP
 
 
 	private ReportTextPartManagerRemote getReportTextPartManager() {
-		return JFireEjb3Factory.getRemoteBean(ReportTextPartManagerRemote.class, SecurityReflector.getInitialContextProperties());
+		return getEjbProvider().getRemoteBean(ReportTextPartManagerRemote.class);
 	}
 }

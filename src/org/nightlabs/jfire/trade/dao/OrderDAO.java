@@ -12,9 +12,7 @@ import javax.jdo.JDOHelper;
 
 import org.nightlabs.jdo.query.AbstractJDOQuery;
 import org.nightlabs.jdo.query.QueryCollection;
-import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
-import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.trade.Order;
 import org.nightlabs.jfire.trade.TradeManagerRemote;
@@ -56,7 +54,7 @@ public class OrderDAO extends BaseJDOObjectDAO<OrderID, Order> {
 	protected Collection<Order> retrieveJDOObjects(Set<OrderID> orderIDs,
 			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 			throws Exception {
-		TradeManagerRemote tm = JFireEjb3Factory.getRemoteBean(TradeManagerRemote.class, SecurityReflector.getInitialContextProperties());
+		TradeManagerRemote tm = getEjbProvider().getRemoteBean(TradeManagerRemote.class);
 		return tm.getOrders(orderIDs, fetchGroups, maxFetchDepth);
 	}
 
@@ -101,7 +99,7 @@ public class OrderDAO extends BaseJDOObjectDAO<OrderID, Order> {
 			QueryCollection<? extends AbstractJDOQuery> queries,
 			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) {
 		try {
-			TradeManagerRemote tm  = JFireEjb3Factory.getRemoteBean(TradeManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			TradeManagerRemote tm  = getEjbProvider().getRemoteBean(TradeManagerRemote.class);
 			Set<OrderID> orderIDs = CollectionUtil.castSet(tm.getOrderIDs(queries));
 
 			return getJDOObjects(null, orderIDs, fetchGroups, maxFetchDepth, monitor);
@@ -154,7 +152,7 @@ public class OrderDAO extends BaseJDOObjectDAO<OrderID, Order> {
 			AnchorID endCustomerID, long rangeBeginIdx, long rangeEndIdx,
 			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) {
 		try {
-			TradeManagerRemote tm = JFireEjb3Factory.getRemoteBean(TradeManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			TradeManagerRemote tm = getEjbProvider().getRemoteBean(TradeManagerRemote.class);
 			List<OrderID> orderIDList = tm.getOrderIDs(orderClass, subclasses, vendorID, customerID, endCustomerID, rangeBeginIdx, rangeEndIdx);
 			Set<OrderID> orderIDs = new HashSet<OrderID>(orderIDList);
 

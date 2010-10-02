@@ -4,9 +4,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
-import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.store.StoreManagerRemote;
 import org.nightlabs.jfire.store.deliver.ModeOfDeliveryFlavour;
 import org.nightlabs.jfire.store.deliver.id.ModeOfDeliveryFlavourID;
@@ -38,7 +36,7 @@ public class ModeOfDeliveryFlavourDAO
 	{
 		StoreManagerRemote sm = storeManager;
 		if (sm == null)
-			sm = JFireEjb3Factory.getRemoteBean(StoreManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			sm = getEjbProvider().getRemoteBean(StoreManagerRemote.class);
 
 		return sm.getModeOfDeliveryFlavours(modeOfDeliveryFlavourIDs, fetchGroups, maxFetchDepth);
 	}
@@ -48,7 +46,7 @@ public class ModeOfDeliveryFlavourDAO
 	public synchronized List<ModeOfDeliveryFlavour> getModeOfDeliveryFlavours(String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
 		try {
-			storeManager = JFireEjb3Factory.getRemoteBean(StoreManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			storeManager = getEjbProvider().getRemoteBean(StoreManagerRemote.class);
 			try {
 				Set<ModeOfDeliveryFlavourID> tariffIDs = storeManager.getAllModeOfDeliveryFlavourIDs();
 				return getJDOObjects(null, tariffIDs, fetchGroups, maxFetchDepth, monitor);

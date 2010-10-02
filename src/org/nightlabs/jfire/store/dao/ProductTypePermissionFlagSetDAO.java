@@ -6,9 +6,7 @@ import java.util.Set;
 import javax.jdo.FetchPlan;
 
 import org.nightlabs.jdo.NLJDOHelper;
-import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
-import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.store.ProductTypePermissionFlagSet;
 import org.nightlabs.jfire.store.StoreManagerRemote;
 import org.nightlabs.jfire.store.id.ProductTypeID;
@@ -34,7 +32,6 @@ extends BaseJDOObjectDAO<ProductTypePermissionFlagSetID, ProductTypePermissionFl
 
 	private StoreManagerRemote storeManager;
 
-	@SuppressWarnings("unchecked")
 	@Override
 	protected Collection<ProductTypePermissionFlagSet> retrieveJDOObjects(
 			Set<ProductTypePermissionFlagSetID> productTypePermissionFlagSetIDs,
@@ -43,14 +40,13 @@ extends BaseJDOObjectDAO<ProductTypePermissionFlagSetID, ProductTypePermissionFl
 	{
 		StoreManagerRemote sm = storeManager;
 		if (sm == null)
-			sm = JFireEjb3Factory.getRemoteBean(StoreManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			sm = getEjbProvider().getRemoteBean(StoreManagerRemote.class);
 
 		return sm.getProductTypePermissionFlagSets(productTypePermissionFlagSetIDs);
 	}
 
 	private static final String[] FETCH_GROUPS_INTERNAL = { FetchPlan.DEFAULT };
 
-	@SuppressWarnings("unchecked")
 	public synchronized Collection<ProductTypePermissionFlagSet> getMyProductTypePermissionFlagSets(
 			Collection<? extends ProductTypeID> productTypeIDs,
 			ProgressMonitor monitor
@@ -58,7 +54,7 @@ extends BaseJDOObjectDAO<ProductTypePermissionFlagSetID, ProductTypePermissionFl
 	{
 		monitor.beginTask("Fetching ProductTypePermissionFlagSets", 100);
 		try {
-			storeManager = JFireEjb3Factory.getRemoteBean(StoreManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			storeManager = getEjbProvider().getRemoteBean(StoreManagerRemote.class);
 			try {
 				monitor.worked(10);
 				Collection<ProductTypePermissionFlagSetID> productTypePermissionFlagSetIDs = storeManager.getMyProductTypePermissionFlagSetIDs(productTypeIDs);

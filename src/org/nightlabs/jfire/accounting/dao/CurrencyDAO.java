@@ -10,9 +10,7 @@ import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.accounting.AccountingManagerRemote;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.id.CurrencyID;
-import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
-import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.progress.ProgressMonitor;
 import org.nightlabs.progress.SubProgressMonitor;
 
@@ -39,7 +37,7 @@ public class CurrencyDAO extends BaseJDOObjectDAO<CurrencyID, Currency>
 	{
 		monitor.beginTask("Fetching Currencies...", 1); //$NON-NLS-1$
 		try {
-			AccountingManagerRemote am = JFireEjb3Factory.getRemoteBean(AccountingManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			AccountingManagerRemote am = getEjbProvider().getRemoteBean(AccountingManagerRemote.class);
 			monitor.worked(1);
 			return am.getCurrencies(objectIDs, fetchGroups, maxFetchDepth);
 		} catch (Exception e) {
@@ -60,7 +58,7 @@ public class CurrencyDAO extends BaseJDOObjectDAO<CurrencyID, Currency>
 	public List<Currency> getCurrencies(ProgressMonitor monitor)
 	{
 		try {
-			AccountingManagerRemote am = JFireEjb3Factory.getRemoteBean(AccountingManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			AccountingManagerRemote am = getEjbProvider().getRemoteBean(AccountingManagerRemote.class);
 			Collection<CurrencyID> currencyIDs = am.getCurrencyIDs();
 			return getJDOObjects(null, currencyIDs, FETCH_GROUPS, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT, monitor);
 		} catch (Exception e) {
@@ -81,7 +79,7 @@ public class CurrencyDAO extends BaseJDOObjectDAO<CurrencyID, Currency>
 	//	monitor.beginTask("Save currency", 1);
 
 		try {
-			AccountingManagerRemote am = JFireEjb3Factory.getRemoteBean(AccountingManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			AccountingManagerRemote am = getEjbProvider().getRemoteBean(AccountingManagerRemote.class);
 		         currency =  am.storeCurrency(currency, get, fetchGroups, maxFetchDepth);
 
                 return currency;

@@ -4,10 +4,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
-import org.nightlabs.jfire.base.jdo.cache.Cache;
-import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.trade.CustomerGroupMapping;
 import org.nightlabs.jfire.trade.TradeManagerRemote;
 import org.nightlabs.jfire.trade.id.CustomerGroupID;
@@ -37,7 +34,7 @@ extends BaseJDOObjectDAO<CustomerGroupMappingID, CustomerGroupMapping>
 	{
 		TradeManagerRemote tm = tradeManager;
 		if (tm == null)
-			tm = JFireEjb3Factory.getRemoteBean(TradeManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			tm = getEjbProvider().getRemoteBean(TradeManagerRemote.class);
 
 		return tm.getCustomerGroupMappings(customerGroupMappingIDs, fetchGroups, maxFetchDepth);
 	}
@@ -47,7 +44,7 @@ extends BaseJDOObjectDAO<CustomerGroupMappingID, CustomerGroupMapping>
 	public synchronized List<CustomerGroupMapping> getCustomerGroupMappings(String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
 		try {
-			tradeManager = JFireEjb3Factory.getRemoteBean(TradeManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			tradeManager = getEjbProvider().getRemoteBean(TradeManagerRemote.class);
 			try {
 				Set<CustomerGroupMappingID> customerGroupMappingIDs = tradeManager.getCustomerGroupMappingIDs();
 				return getJDOObjects(null, customerGroupMappingIDs, fetchGroups, maxFetchDepth, monitor);
@@ -67,11 +64,11 @@ extends BaseJDOObjectDAO<CustomerGroupMappingID, CustomerGroupMapping>
 	public CustomerGroupMapping createCustomerGroupMapping(CustomerGroupID localCustomerGroupID, CustomerGroupID partnerCustomerGroupID, boolean get, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
 		try {
-			TradeManagerRemote tm = JFireEjb3Factory.getRemoteBean(TradeManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			TradeManagerRemote tm = getEjbProvider().getRemoteBean(TradeManagerRemote.class);
 			CustomerGroupMapping cgm = tm.createCustomerGroupMapping(localCustomerGroupID, partnerCustomerGroupID, get, fetchGroups, maxFetchDepth);
 
 			if (cgm != null)
-				Cache.sharedInstance().put(null, cgm, fetchGroups, maxFetchDepth);
+				getCache().put(null, cgm, fetchGroups, maxFetchDepth);
 
 			return cgm;
 		} catch (Exception x) {

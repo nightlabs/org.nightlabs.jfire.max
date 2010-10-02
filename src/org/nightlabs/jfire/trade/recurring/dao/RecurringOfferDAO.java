@@ -4,9 +4,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
-import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.trade.id.OfferID;
 import org.nightlabs.jfire.trade.recurring.RecurringOffer;
 import org.nightlabs.jfire.trade.recurring.RecurringOfferConfiguration;
@@ -36,7 +34,7 @@ public class RecurringOfferDAO extends BaseJDOObjectDAO<OfferID, RecurringOffer>
 	)
 	throws Exception
 	{
-		RecurringTradeManagerRemote tm = JFireEjb3Factory.getRemoteBean(RecurringTradeManagerRemote.class, SecurityReflector.getInitialContextProperties());
+		RecurringTradeManagerRemote tm = getEjbProvider().getRemoteBean(RecurringTradeManagerRemote.class);
 		return tm.getRecurringOffers(offerIDs, fetchGroups, maxFetchDepth);
 	}
 
@@ -53,7 +51,7 @@ public class RecurringOfferDAO extends BaseJDOObjectDAO<OfferID, RecurringOffer>
 	public RecurringOfferConfiguration storeRecurringOfferConfiguration(
 			RecurringOfferConfiguration configuration, boolean get, String[] fetchGroups, int maxFetchDepth) {
 		try {
-			RecurringTradeManagerRemote tm = JFireEjb3Factory.getRemoteBean(RecurringTradeManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			RecurringTradeManagerRemote tm = getEjbProvider().getRemoteBean(RecurringTradeManagerRemote.class);
 			return tm.storeRecurringOfferConfiguration(configuration, get, fetchGroups, maxFetchDepth);
 		} catch (Exception e) {
 			throw new RuntimeException(e);

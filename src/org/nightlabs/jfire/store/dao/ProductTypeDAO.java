@@ -36,9 +36,7 @@ import java.util.Set;
 import javax.jdo.FetchPlan;
 
 import org.nightlabs.jdo.query.QueryCollection;
-import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
-import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.StoreManagerRemote;
 import org.nightlabs.jfire.store.id.ProductTypeID;
@@ -120,7 +118,7 @@ extends BaseJDOObjectDAO<ProductTypeID, ProductType>
 		progressMonitor.beginTask("Loading ProductTypes", 200);
 		StoreManagerRemote sm = storeManager;
 		if (sm == null)
-			sm = JFireEjb3Factory.getRemoteBean(StoreManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			sm = getEjbProvider().getRemoteBean(StoreManagerRemote.class);
 
 		progressMonitor.worked(100);
 		Collection<ProductType> productTypes = sm.getProductTypes(objectIDs, fetchGroups, maxFetchDepth);
@@ -134,7 +132,7 @@ extends BaseJDOObjectDAO<ProductTypeID, ProductType>
 	public synchronized List<ProductType> queryProductTypes(QueryCollection<?> queryCollection, String[] fetchGroups, // TODO correct type for QueryCollection!
 	int maxFetchDepth, ProgressMonitor progressMonitor) throws Exception
 	{
-		storeManager = JFireEjb3Factory.getRemoteBean(StoreManagerRemote.class, SecurityReflector.getInitialContextProperties());
+		storeManager = getEjbProvider().getRemoteBean(StoreManagerRemote.class);
 		try {
 			@SuppressWarnings("unchecked")
 			QueryCollection<? extends AbstractProductTypeQuery> productTypeQueries = (QueryCollection<? extends AbstractProductTypeQuery>) queryCollection;
@@ -165,7 +163,7 @@ extends BaseJDOObjectDAO<ProductTypeID, ProductType>
 			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor
 	)
 	{
-		storeManager = JFireEjb3Factory.getRemoteBean(StoreManagerRemote.class, SecurityReflector.getInitialContextProperties());
+		storeManager = getEjbProvider().getRemoteBean(StoreManagerRemote.class);
 		try {
 			Collection<ProductTypeID> productTypeIDs = storeManager.getRootProductTypeIDs(productTypeClass, subclasses);
 			return getJDOObjects(null, productTypeIDs, fetchGroups, maxFetchDepth, monitor);
@@ -186,7 +184,7 @@ extends BaseJDOObjectDAO<ProductTypeID, ProductType>
 	public synchronized List<ProductType> getChildProductTypes(ProductTypeID parentProductTypeID,
 			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
-		storeManager = JFireEjb3Factory.getRemoteBean(StoreManagerRemote.class, SecurityReflector.getInitialContextProperties());
+		storeManager = getEjbProvider().getRemoteBean(StoreManagerRemote.class);
 		try {
 			Collection<ProductTypeID> productTypeIDs = storeManager.getChildProductTypeIDs(parentProductTypeID);
 			return getJDOObjects(null, productTypeIDs, fetchGroups, maxFetchDepth, monitor);
@@ -208,7 +206,7 @@ extends BaseJDOObjectDAO<ProductTypeID, ProductType>
 	public synchronized Collection<ProductTypeID> getChildProductTypesIDs(ProductTypeID parentProductTypeID,
 			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
-		storeManager = JFireEjb3Factory.getRemoteBean(StoreManagerRemote.class, SecurityReflector.getInitialContextProperties());
+		storeManager = getEjbProvider().getRemoteBean(StoreManagerRemote.class);
 		try {
 			Collection<ProductTypeID> productTypeIDs = storeManager.getChildProductTypeIDs(parentProductTypeID);
 			return productTypeIDs;
@@ -226,7 +224,7 @@ extends BaseJDOObjectDAO<ProductTypeID, ProductType>
 	 */
 	public synchronized Map<ProductTypeID, Long> getChildProductTypeCounts(Collection<ProductTypeID> parentProductTypeIDs, ProgressMonitor monitor)
 	{
-		storeManager = JFireEjb3Factory.getRemoteBean(StoreManagerRemote.class, SecurityReflector.getInitialContextProperties());
+		storeManager = getEjbProvider().getRemoteBean(StoreManagerRemote.class);
 		try {
 			return storeManager.getChildProductTypeCounts(parentProductTypeIDs);
 		} finally {

@@ -7,9 +7,7 @@ import java.util.Set;
 
 import org.nightlabs.jdo.query.AbstractJDOQuery;
 import org.nightlabs.jdo.query.QueryCollection;
-import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
-import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.trade.Offer;
 import org.nightlabs.jfire.trade.TradeManagerRemote;
@@ -35,7 +33,7 @@ public class OfferDAO
 			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 			throws Exception
 	{
-		TradeManagerRemote tm = JFireEjb3Factory.getRemoteBean(TradeManagerRemote.class, SecurityReflector.getInitialContextProperties());
+		TradeManagerRemote tm = getEjbProvider().getRemoteBean(TradeManagerRemote.class);
 		return tm.getOffers(offerIDs, fetchGroups, maxFetchDepth);
 	}
 
@@ -55,7 +53,7 @@ public class OfferDAO
 	{
 		try
 		{
-			TradeManagerRemote tm = JFireEjb3Factory.getRemoteBean(TradeManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			TradeManagerRemote tm = getEjbProvider().getRemoteBean(TradeManagerRemote.class);
 			Set<OfferID> offerIDs = tm.getOfferIDs(queries);
 
 			return getJDOObjects(null, offerIDs, fetchGroups, maxFetchDepth, monitor);
@@ -75,7 +73,7 @@ public class OfferDAO
 		Offer offer;
 		monitor.beginTask("Set offer expiry", 100);
 		try {
-			TradeManagerRemote tm = JFireEjb3Factory.getRemoteBean(TradeManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			TradeManagerRemote tm = getEjbProvider().getRemoteBean(TradeManagerRemote.class);
 			monitor.worked(20);
 			offer = tm.setOfferExpiry(
 					offerID,
@@ -100,7 +98,7 @@ public class OfferDAO
 	{
 		monitor.beginTask("Signal Offer", 100);
 		try {
-			TradeManagerRemote tm = JFireEjb3Factory.getRemoteBean(TradeManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			TradeManagerRemote tm = getEjbProvider().getRemoteBean(TradeManagerRemote.class);
 			monitor.worked(20);
 			tm.signalOffer(offerID, jbpmTransitionName);
 			monitor.worked(80);

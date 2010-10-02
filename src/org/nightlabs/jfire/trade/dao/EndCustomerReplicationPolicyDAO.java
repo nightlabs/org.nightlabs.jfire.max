@@ -4,9 +4,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
-import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.trade.TradeManagerRemote;
 import org.nightlabs.jfire.trade.endcustomer.EndCustomerReplicationPolicy;
 import org.nightlabs.jfire.trade.endcustomer.id.EndCustomerReplicationPolicyID;
@@ -35,7 +33,7 @@ extends BaseJDOObjectDAO<EndCustomerReplicationPolicyID, EndCustomerReplicationP
 	{
 		TradeManagerRemote tm = tradeManager;
 		if (tm == null)
-			tm = JFireEjb3Factory.getRemoteBean(TradeManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			tm = getEjbProvider().getRemoteBean(TradeManagerRemote.class);
 
 		return tm.getEndCustomerReplicationPolicies(endCustomerReplicationPolicyIDs, fetchGroups, maxFetchDepth);
 	}
@@ -62,7 +60,7 @@ extends BaseJDOObjectDAO<EndCustomerReplicationPolicyID, EndCustomerReplicationP
 			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor
 	)
 	{
-		tradeManager = JFireEjb3Factory.getRemoteBean(TradeManagerRemote.class, SecurityReflector.getInitialContextProperties());
+		tradeManager = getEjbProvider().getRemoteBean(TradeManagerRemote.class);
 		try {
 			Collection<EndCustomerReplicationPolicyID> endCustomerReplicationPolicyIDs = tradeManager.getEndCustomerReplicationPolicyIDs();
 			return getJDOObjects(null, endCustomerReplicationPolicyIDs, fetchGroups, maxFetchDepth, monitor);

@@ -4,9 +4,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
-import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.store.StoreManagerRemote;
 import org.nightlabs.jfire.store.Unit;
 import org.nightlabs.jfire.store.id.UnitID;
@@ -35,7 +33,7 @@ extends BaseJDOObjectDAO<UnitID, Unit>
 	{
 		StoreManagerRemote stm = storeManager;
 		if (stm == null)
-			stm = JFireEjb3Factory.getRemoteBean(StoreManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			stm = getEjbProvider().getRemoteBean(StoreManagerRemote.class);
 
 		return stm.getUnits(unitIDs, fetchGroups, maxFetchDepth);
 	}
@@ -61,7 +59,7 @@ extends BaseJDOObjectDAO<UnitID, Unit>
 	public List<Unit> getUnits(String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
 		try {
-			storeManager = JFireEjb3Factory.getRemoteBean(StoreManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			storeManager = getEjbProvider().getRemoteBean(StoreManagerRemote.class);
 			try {
 				Set<UnitID> unitIDs = storeManager.getUnitIDs();
 				return getJDOObjects(null, unitIDs, fetchGroups, maxFetchDepth, monitor);
@@ -78,7 +76,7 @@ extends BaseJDOObjectDAO<UnitID, Unit>
 			throw new NullPointerException("Unit to save must not be null");
 		monitor.beginTask("Storing unit: "+ unit.getUnitID(), 3);
 		try {
-			StoreManagerRemote sm = JFireEjb3Factory.getRemoteBean(StoreManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			StoreManagerRemote sm = getEjbProvider().getRemoteBean(StoreManagerRemote.class);
 			monitor.worked(1);
 
 			Unit result = sm.storeUnit(unit, get, fetchGroups, maxFetchDepth);

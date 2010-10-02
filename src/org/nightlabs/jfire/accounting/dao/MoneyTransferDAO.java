@@ -8,9 +8,7 @@ import org.nightlabs.jfire.accounting.AccountingManagerRemote;
 import org.nightlabs.jfire.accounting.MoneyTransfer;
 import org.nightlabs.jfire.accounting.query.MoneyTransferIDQuery;
 import org.nightlabs.jfire.accounting.query.MoneyTransferQuery;
-import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
-import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.transfer.id.TransferID;
 import org.nightlabs.progress.ProgressMonitor;
 
@@ -35,7 +33,7 @@ extends BaseJDOObjectDAO<TransferID, MoneyTransfer>
 			ProgressMonitor monitor)
 			throws Exception
 	{
-		AccountingManagerRemote am = JFireEjb3Factory.getRemoteBean(AccountingManagerRemote.class, SecurityReflector.getInitialContextProperties());
+		AccountingManagerRemote am = getEjbProvider().getRemoteBean(AccountingManagerRemote.class);
 		return am.getMoneyTransfers(productTransferIDs, fetchGroups, maxFetchDepth);
 	}
 
@@ -45,7 +43,7 @@ extends BaseJDOObjectDAO<TransferID, MoneyTransfer>
 			ProgressMonitor monitor)
 	{
 		try {
-			AccountingManagerRemote am = JFireEjb3Factory.getRemoteBean(AccountingManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			AccountingManagerRemote am = getEjbProvider().getRemoteBean(AccountingManagerRemote.class);
 			List<TransferID> transferIDs = am.getMoneyTransferIDs(productTransferIDQuery);
 			return getJDOObjects(null, transferIDs, fetchGroups, maxFetchDepth, monitor);
 		} catch (Exception e) {
@@ -59,7 +57,7 @@ extends BaseJDOObjectDAO<TransferID, MoneyTransfer>
 			ProgressMonitor monitor)
 	{
 		try {
-			AccountingManagerRemote am = JFireEjb3Factory.getRemoteBean(AccountingManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			AccountingManagerRemote am = getEjbProvider().getRemoteBean(AccountingManagerRemote.class);
 			List<TransferID> transferIDs = am.getMoneyTransferIDs(productTransferQueries);
 			return getJDOObjects(null, transferIDs, fetchGroups, maxFetchDepth, monitor);
 		} catch (Exception e) {

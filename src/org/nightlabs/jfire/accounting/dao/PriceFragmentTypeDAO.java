@@ -9,14 +9,11 @@ import java.util.Set;
 import org.nightlabs.jfire.accounting.AccountingManagerRemote;
 import org.nightlabs.jfire.accounting.PriceFragmentType;
 import org.nightlabs.jfire.accounting.id.PriceFragmentTypeID;
-import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
-import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.progress.ProgressMonitor;
 
 /**
  * @author Daniel Mazurek - daniel [at] nightlabs [dot] de
- *
  */
 public class PriceFragmentTypeDAO
 extends BaseJDOObjectDAO<PriceFragmentTypeID, PriceFragmentType>
@@ -29,16 +26,13 @@ extends BaseJDOObjectDAO<PriceFragmentTypeID, PriceFragmentType>
 		return sharedInstance;
 	}
 
-	private PriceFragmentTypeDAO() {
-	}
-
 	@Override
 	protected Collection<PriceFragmentType> retrieveJDOObjects(Set<PriceFragmentTypeID> objectIDs,
 			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) throws Exception
 	{
 		monitor.beginTask("Loading Accounts", 1);
 		try {
-			AccountingManagerRemote am = JFireEjb3Factory.getRemoteBean(AccountingManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			AccountingManagerRemote am = getEjbProvider().getRemoteBean(AccountingManagerRemote.class);
 			return am.getPriceFragmentTypes(objectIDs, fetchGroups, maxFetchDepth);
 
 		} catch (Exception e) {
@@ -55,7 +49,7 @@ extends BaseJDOObjectDAO<PriceFragmentTypeID, PriceFragmentType>
 			int maxFetchDepth, ProgressMonitor monitor)
 	{
 		try {
-			AccountingManagerRemote am = JFireEjb3Factory.getRemoteBean(AccountingManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			AccountingManagerRemote am = getEjbProvider().getRemoteBean(AccountingManagerRemote.class);
 			Collection<PriceFragmentTypeID> priceFragementTypeIDs = am.getPriceFragmentTypeIDs();
 			return getJDOObjects(null, priceFragementTypeIDs, fetchGroups, maxFetchDepth, monitor);
 		} catch (Exception e) {
@@ -82,7 +76,7 @@ extends BaseJDOObjectDAO<PriceFragmentTypeID, PriceFragmentType>
 	{
 		monitor.beginTask("Storing price fragment type", 100);
 		try {
-			AccountingManagerRemote am = JFireEjb3Factory.getRemoteBean(AccountingManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			AccountingManagerRemote am = getEjbProvider().getRemoteBean(AccountingManagerRemote.class);
 			monitor.worked(10);
 
 			priceFragmentType = am.storePriceFragmentType(priceFragmentType, get, fetchGroups, maxFetchDepth);

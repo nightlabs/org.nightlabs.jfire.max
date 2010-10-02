@@ -7,9 +7,7 @@ import java.util.Set;
 import org.nightlabs.jfire.accounting.AccountingManagerRemote;
 import org.nightlabs.jfire.accounting.pay.ModeOfPaymentFlavour;
 import org.nightlabs.jfire.accounting.pay.id.ModeOfPaymentFlavourID;
-import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
-import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.progress.ProgressMonitor;
 
 public class ModeOfPaymentFlavourDAO
@@ -33,7 +31,7 @@ public class ModeOfPaymentFlavourDAO
 	{
 		AccountingManagerRemote am = accountingManager;
 		if (am == null)
-			am = JFireEjb3Factory.getRemoteBean(AccountingManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			am = getEjbProvider().getRemoteBean(AccountingManagerRemote.class);
 
 		return am.getModeOfPaymentFlavours(modeOfPaymentFlavourIDs, fetchGroups, maxFetchDepth);
 	}
@@ -43,7 +41,7 @@ public class ModeOfPaymentFlavourDAO
 	public synchronized List<ModeOfPaymentFlavour> getModeOfPaymentFlavours(String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
 		try {
-			accountingManager = JFireEjb3Factory.getRemoteBean(AccountingManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			accountingManager = getEjbProvider().getRemoteBean(AccountingManagerRemote.class);
 			try {
 				Set<ModeOfPaymentFlavourID> tariffIDs = accountingManager.getAllModeOfPaymentFlavourIDs();
 				return getJDOObjects(null, tariffIDs, fetchGroups, maxFetchDepth, monitor);

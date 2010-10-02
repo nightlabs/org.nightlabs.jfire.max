@@ -4,9 +4,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
-import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.trade.Order;
 import org.nightlabs.jfire.trade.dao.OrderDAO;
@@ -38,7 +36,7 @@ extends BaseJDOObjectDAO<OrderID, RecurringOrder>
 			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 			throws Exception
 	{
-		RecurringTradeManagerRemote tm = JFireEjb3Factory.getRemoteBean(RecurringTradeManagerRemote.class, SecurityReflector.getInitialContextProperties());
+		RecurringTradeManagerRemote tm = getEjbProvider().getRemoteBean(RecurringTradeManagerRemote.class);
 		return CollectionUtil.castCollection(tm.getRecurringOrders(orderIDs, fetchGroups, maxFetchDepth));
 	}
 
@@ -103,7 +101,7 @@ extends BaseJDOObjectDAO<OrderID, RecurringOrder>
 //			long rangeBeginIdx, long rangeEndIdx, String[] fetchGroups,
 //			int maxFetchDepth, ProgressMonitor monitor) {
 //		try {
-//			TradeManagerRemote = JFireEjb3Factory.getRemoteBean(TradeManagerRemote.class, SecurityReflector.getInitialContextProperties());
+//			TradeManagerRemote = getEjbProvider().getRemoteBean(TradeManagerRemote.class);
 //			List<OrderID> orderIDList = tm.getOrderIDs(orderClass, subclasses, vendorID, customerID, rangeBeginIdx, rangeEndIdx);
 //			Set<OrderID> orderIDs = new HashSet<OrderID>(orderIDList);
 //

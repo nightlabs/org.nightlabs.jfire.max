@@ -8,10 +8,7 @@ import org.nightlabs.jfire.accounting.AccountingManagerRemote;
 import org.nightlabs.jfire.accounting.TariffMapping;
 import org.nightlabs.jfire.accounting.id.TariffID;
 import org.nightlabs.jfire.accounting.id.TariffMappingID;
-import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
-import org.nightlabs.jfire.base.jdo.cache.Cache;
-import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.progress.ProgressMonitor;
 
 public class TariffMappingDAO
@@ -37,7 +34,7 @@ public class TariffMappingDAO
 	{
 		AccountingManagerRemote am = accountingManager;
 		if (am == null)
-			am = JFireEjb3Factory.getRemoteBean(AccountingManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			am = getEjbProvider().getRemoteBean(AccountingManagerRemote.class);
 
 		return am.getTariffMappings(tariffMappingIDs, fetchGroups, maxFetchDepth);
 	}
@@ -47,7 +44,7 @@ public class TariffMappingDAO
 	public synchronized List<TariffMapping> getTariffMappings(String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
 		try {
-			accountingManager = JFireEjb3Factory.getRemoteBean(AccountingManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			accountingManager = getEjbProvider().getRemoteBean(AccountingManagerRemote.class);
 			try {
 				Set<TariffMappingID> tariffMappingIDs = accountingManager.getTariffMappingIDs();
 				return getJDOObjects(null, tariffMappingIDs, fetchGroups, maxFetchDepth, monitor);
@@ -67,11 +64,11 @@ public class TariffMappingDAO
 	public TariffMapping createTariffMapping(TariffID localTariffID, TariffID partnerTariffID, boolean get, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
 		try {
-			AccountingManagerRemote am = JFireEjb3Factory.getRemoteBean(AccountingManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			AccountingManagerRemote am = getEjbProvider().getRemoteBean(AccountingManagerRemote.class);
 			TariffMapping tm = am.createTariffMapping(localTariffID, partnerTariffID, get, fetchGroups, maxFetchDepth);
 
 			if (tm != null)
-				Cache.sharedInstance().put(null, tm, fetchGroups, maxFetchDepth);
+				getCache().put(null, tm, fetchGroups, maxFetchDepth);
 
 			return tm;
 		} catch (Exception x) {

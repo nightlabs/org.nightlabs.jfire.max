@@ -7,9 +7,7 @@ import java.util.Set;
 import org.nightlabs.jfire.accounting.AccountingManagerRemote;
 import org.nightlabs.jfire.accounting.Tariff;
 import org.nightlabs.jfire.accounting.id.TariffID;
-import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
-import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.progress.ProgressMonitor;
 
 public class TariffDAO
@@ -33,7 +31,7 @@ public class TariffDAO
 	{
 		AccountingManagerRemote am = accountingManager;
 		if (am == null)
-			am = JFireEjb3Factory.getRemoteBean(AccountingManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			am = getEjbProvider().getRemoteBean(AccountingManagerRemote.class);
 
 		return am.getTariffs(tariffIDs, fetchGroups, maxFetchDepth);
 	}
@@ -57,7 +55,7 @@ public class TariffDAO
 	public synchronized List<Tariff> getTariffs(String organisationID, boolean inverse, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
 		try {
-			accountingManager = JFireEjb3Factory.getRemoteBean(AccountingManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			accountingManager = getEjbProvider().getRemoteBean(AccountingManagerRemote.class);
 			try {
 				Set<TariffID> tariffIDs = accountingManager.getTariffIDs(organisationID, inverse);
 				return getJDOObjects(null, tariffIDs, fetchGroups, maxFetchDepth, monitor);

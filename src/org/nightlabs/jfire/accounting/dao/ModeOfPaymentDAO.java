@@ -7,9 +7,7 @@ import java.util.Set;
 import org.nightlabs.jfire.accounting.AccountingManagerRemote;
 import org.nightlabs.jfire.accounting.pay.ModeOfPayment;
 import org.nightlabs.jfire.accounting.pay.id.ModeOfPaymentID;
-import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
-import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.progress.ProgressMonitor;
 
 public class ModeOfPaymentDAO
@@ -25,7 +23,6 @@ public class ModeOfPaymentDAO
 		return sharedInstance;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	protected Collection<ModeOfPayment> retrieveJDOObjects(
 			Set<ModeOfPaymentID> modeOfPaymentIDs, String[] fetchGroups, int maxFetchDepth,
@@ -34,18 +31,17 @@ public class ModeOfPaymentDAO
 	{
 		AccountingManagerRemote am = accountingManager;
 		if (am == null)
-			am = JFireEjb3Factory.getRemoteBean(AccountingManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			am = getEjbProvider().getRemoteBean(AccountingManagerRemote.class);
 
 		return am.getModeOfPayments(modeOfPaymentIDs, fetchGroups, maxFetchDepth);
 	}
 
 	private AccountingManagerRemote accountingManager;
 
-	@SuppressWarnings("unchecked")
 	public synchronized List<ModeOfPayment> getModeOfPayments(String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
 		try {
-			accountingManager = JFireEjb3Factory.getRemoteBean(AccountingManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			accountingManager = getEjbProvider().getRemoteBean(AccountingManagerRemote.class);
 			try {
 				Set<ModeOfPaymentID> modeOfPaymentIDs = accountingManager.getAllModeOfPaymentIDs();
 				return getJDOObjects(null, modeOfPaymentIDs, fetchGroups, maxFetchDepth, monitor);

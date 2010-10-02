@@ -9,9 +9,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
-import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.TradeManagerRemote;
 import org.nightlabs.jfire.trade.id.ArticleID;
@@ -55,7 +53,7 @@ extends BaseJDOObjectDAO<ArticleID, Article>
 
 		monitor.beginTask("Loading articles", 1);
 		try {
-			TradeManagerRemote tradeManager = JFireEjb3Factory.getRemoteBean(TradeManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			TradeManagerRemote tradeManager = getEjbProvider().getRemoteBean(TradeManagerRemote.class);
 			Collection<Article> articles = CollectionUtil.castCollection(
 					tradeManager.getArticles(articleIDs, fetchGroups, maxFetchDepth)
 			);
@@ -93,7 +91,7 @@ extends BaseJDOObjectDAO<ArticleID, Article>
 	)
 	{
 		try {
-			TradeManagerRemote tradeManager = JFireEjb3Factory.getRemoteBean(TradeManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			TradeManagerRemote tradeManager = getEjbProvider().getRemoteBean(TradeManagerRemote.class);
 			Collection<?> c = tradeManager.releaseArticles(
 					articleIDs, synchronously,
 					get,
@@ -174,7 +172,7 @@ extends BaseJDOObjectDAO<ArticleID, Article>
 	)
 	{
 		try {
-			TradeManagerRemote tradeManager = JFireEjb3Factory.getRemoteBean(TradeManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			TradeManagerRemote tradeManager = getEjbProvider().getRemoteBean(TradeManagerRemote.class);
 			Collection<?> c = tradeManager.deleteArticles(articleIDs, validate, get, fetchGroups, maxFetchDepth);
 
 			if (c == null) {

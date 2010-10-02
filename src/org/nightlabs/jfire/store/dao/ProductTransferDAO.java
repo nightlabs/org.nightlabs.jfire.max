@@ -5,9 +5,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.nightlabs.jdo.query.QueryCollection;
-import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
-import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.store.ProductTransfer;
 import org.nightlabs.jfire.store.StoreManagerRemote;
 import org.nightlabs.jfire.store.query.ProductTransferQuery;
@@ -35,7 +33,7 @@ public class ProductTransferDAO
 			ProgressMonitor monitor)
 			throws Exception
 	{
-		StoreManagerRemote sm = JFireEjb3Factory.getRemoteBean(StoreManagerRemote.class, SecurityReflector.getInitialContextProperties());
+		StoreManagerRemote sm = getEjbProvider().getRemoteBean(StoreManagerRemote.class);
 		return sm.getProductTransfers(productTransferIDs, fetchGroups, maxFetchDepth);
 	}
 
@@ -46,7 +44,7 @@ public class ProductTransferDAO
 //			ProgressMonitor monitor)
 //	{
 //		try {
-//			StoreManagerRemote = JFireEjb3Factory.getRemoteBean(StoreManagerRemote.class, SecurityReflector.getInitialContextProperties());
+//			StoreManagerRemote = getEjbProvider().getRemoteBean(StoreManagerRemote.class);
 //			List<TransferID> transferIDs = sm.getProductTransferIDs(productTransferIDQuery);
 //			return getJDOObjects(null, transferIDs, fetchGroups, maxFetchDepth, monitor);
 //		} catch (Exception e) {
@@ -60,7 +58,7 @@ public class ProductTransferDAO
 			ProgressMonitor monitor)
 	{
 		try {
-			StoreManagerRemote sm = JFireEjb3Factory.getRemoteBean(StoreManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			StoreManagerRemote sm = getEjbProvider().getRemoteBean(StoreManagerRemote.class);
 			List<TransferID> transferIDs = sm.getProductTransferIDs(productTransferQueries);
 			return getJDOObjects(null, transferIDs, fetchGroups, maxFetchDepth, monitor);
 		} catch (Exception e) {
@@ -75,7 +73,7 @@ public class ProductTransferDAO
 //	{
 //		try
 //		{
-//			StoreManagerRemote = JFireEjb3Factory.getRemoteBean(StoreManagerRemote.class, SecurityReflector.getInitialContextProperties());
+//			StoreManagerRemote = getEjbProvider().getRemoteBean(StoreManagerRemote.class);
 //			List<TransferID> transferIDs = sm.getProductTransferIDs(queries);
 //			return getJDOObjects(null, transferIDs, fetchGroups, maxFetchDepth, monitor);
 //		}

@@ -8,9 +8,7 @@ import javax.jdo.JDOHelper;
 import org.nightlabs.jdo.query.QueryCollection;
 import org.nightlabs.jfire.accounting.AccountingManagerRemote;
 import org.nightlabs.jfire.accounting.id.InvoiceID;
-import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
-import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.store.StoreManagerRemote;
 import org.nightlabs.jfire.store.id.DeliveryNoteID;
 import org.nightlabs.jfire.store.id.ReceptionNoteID;
@@ -63,27 +61,27 @@ extends BaseJDOObjectDAO<ArticleContainerID, ArticleContainer>
 			if (!articleContainerIDs.isEmpty()) {
 				ArticleContainerID articleContainerID = articleContainerIDs.iterator().next();
 				if (articleContainerID instanceof DeliveryNoteID) {
-					StoreManagerRemote sm = JFireEjb3Factory.getRemoteBean(StoreManagerRemote.class, SecurityReflector.getInitialContextProperties());
+					StoreManagerRemote sm = getEjbProvider().getRemoteBean(StoreManagerRemote.class);
 					Set<DeliveryNoteID> deliveryNoteIDs = CollectionUtil.castSet(articleContainerIDs);
 					return sm.getDeliveryNotes(deliveryNoteIDs, fetchGroups, maxFetchDepth);
 				}
 				if (articleContainerID instanceof InvoiceID) {
-					AccountingManagerRemote am = JFireEjb3Factory.getRemoteBean(AccountingManagerRemote.class, SecurityReflector.getInitialContextProperties());
+					AccountingManagerRemote am = getEjbProvider().getRemoteBean(AccountingManagerRemote.class);
 					Set<InvoiceID> invoiceIDs = CollectionUtil.castSet(articleContainerIDs);
 					return am.getInvoices(invoiceIDs, fetchGroups, maxFetchDepth);
 				}
 				if (articleContainerID instanceof OfferID) {
-					TradeManagerRemote tm = JFireEjb3Factory.getRemoteBean(TradeManagerRemote.class, SecurityReflector.getInitialContextProperties());
+					TradeManagerRemote tm = getEjbProvider().getRemoteBean(TradeManagerRemote.class);
 					Set<OfferID> offerIDs = CollectionUtil.castSet(articleContainerIDs);
 					return tm.getOffers(offerIDs, fetchGroups, maxFetchDepth);
 				}
 				if (articleContainerID instanceof OrderID) {
-					TradeManagerRemote tm = JFireEjb3Factory.getRemoteBean(TradeManagerRemote.class, SecurityReflector.getInitialContextProperties());
+					TradeManagerRemote tm = getEjbProvider().getRemoteBean(TradeManagerRemote.class);
 					Set<OrderID> orderIDs = CollectionUtil.castSet(articleContainerIDs);
 					return tm.getOrders(orderIDs, fetchGroups, maxFetchDepth);
 				}
 				if (articleContainerID instanceof ReceptionNoteID) {
-					StoreManagerRemote sm = JFireEjb3Factory.getRemoteBean(StoreManagerRemote.class, SecurityReflector.getInitialContextProperties());
+					StoreManagerRemote sm = getEjbProvider().getRemoteBean(StoreManagerRemote.class);
 					Set<ReceptionNoteID> receptionNoteIDs = CollectionUtil.castSet(articleContainerIDs);
 					return sm.getReceptionNotes(receptionNoteIDs, fetchGroups, maxFetchDepth);
 				}
@@ -112,7 +110,7 @@ extends BaseJDOObjectDAO<ArticleContainerID, ArticleContainer>
 			int maxFetchDepth, ProgressMonitor monitor)
 	{
 		try {
-			TradeManagerRemote tm = JFireEjb3Factory.getRemoteBean(TradeManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			TradeManagerRemote tm = getEjbProvider().getRemoteBean(TradeManagerRemote.class);
 			Collection<ArticleContainerID> articleContainerIDs = tm.getArticleContainerIDs(queries);
 			return CollectionUtil.castCollection(
 				getJDOObjects(null, articleContainerIDs, fetchGroups, maxFetchDepth, monitor)
@@ -135,7 +133,7 @@ extends BaseJDOObjectDAO<ArticleContainerID, ArticleContainer>
 	{
 		try {
 			monitor.beginTask("Load Delivery Date Information", 500);
-			TradeManagerRemote tm = JFireEjb3Factory.getRemoteBean(TradeManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			TradeManagerRemote tm = getEjbProvider().getRemoteBean(TradeManagerRemote.class);
 			Collection<ArticleContainerDeliveryDateDTO> dtos = tm.getArticleContainerDeliveryDateDTOs(queries);
 			for (ArticleContainerDeliveryDateDTO dto : dtos) {
 				ArticleContainer ac = getArticleContainer(dto.getArticleContainerID(), fetchGroups, maxFetchDepth, new SubProgressMonitor(monitor, 100 / dtos.size()));

@@ -4,9 +4,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
-import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.store.RepositoryType;
 import org.nightlabs.jfire.store.StoreManagerRemote;
 import org.nightlabs.jfire.store.id.RepositoryTypeID;
@@ -29,14 +27,13 @@ extends BaseJDOObjectDAO<RepositoryTypeID, RepositoryType>
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	protected Collection<RepositoryType> retrieveJDOObjects(Set<RepositoryTypeID> objectIDs, String[] fetchGroups,
 			int maxFetchDepth, ProgressMonitor monitor)
 			throws Exception
 	{
 		monitor.beginTask("Loading RepositoryTypes", 1);
 		try {
-			StoreManagerRemote sm = JFireEjb3Factory.getRemoteBean(StoreManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			StoreManagerRemote sm = getEjbProvider().getRemoteBean(StoreManagerRemote.class);
 			return sm.getRepositoryTypes(objectIDs, fetchGroups, maxFetchDepth);
 
 		} catch (Exception e) {
@@ -49,12 +46,11 @@ extends BaseJDOObjectDAO<RepositoryTypeID, RepositoryType>
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<RepositoryType> getRepositoryTypes(String[] fetchGroups,
 			int maxFetchDepth, ProgressMonitor monitor)
 	{
 		try {
-			StoreManagerRemote sm = JFireEjb3Factory.getRemoteBean(StoreManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			StoreManagerRemote sm = getEjbProvider().getRemoteBean(StoreManagerRemote.class);
 			Set<RepositoryTypeID> repositoryTypeIDs = sm.getRepositoryTypeIDs();
 			return getJDOObjects(null, repositoryTypeIDs, fetchGroups, maxFetchDepth, monitor);
 		} catch (Exception x) {

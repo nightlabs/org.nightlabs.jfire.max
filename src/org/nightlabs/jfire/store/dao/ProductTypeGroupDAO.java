@@ -13,9 +13,7 @@ import javax.jdo.JDOHelper;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.jdo.query.QueryCollection;
-import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
-import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.ProductTypeGroup;
 import org.nightlabs.jfire.store.ProductTypeGroupIDSearchResult;
@@ -53,14 +51,13 @@ extends BaseJDOObjectDAO<ProductTypeGroupID, ProductTypeGroup>
 	/* (non-Javadoc)
 	 * @see org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO#retrieveJDOObjects(java.util.Set, java.lang.String[], int, org.nightlabs.progress.ProgressMonitor)
 	 */
-	@SuppressWarnings("unchecked")
 	@Override
 	protected Collection<ProductTypeGroup> retrieveJDOObjects(Set<ProductTypeGroupID> productTypeGroupIDs, String[] fetchGroups,
 			int maxFetchDepth, ProgressMonitor monitor) throws Exception
 	{
 		monitor.beginTask("Loading ProductTypeGroups", 1);
 		try {
-			StoreManagerRemote sm = JFireEjb3Factory.getRemoteBean(StoreManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			StoreManagerRemote sm = getEjbProvider().getRemoteBean(StoreManagerRemote.class);
 			return sm.getProductTypeGroups(productTypeGroupIDs, fetchGroups, maxFetchDepth);
 		} catch (Exception e) {
 			monitor.setCanceled(true);
@@ -115,7 +112,7 @@ extends BaseJDOObjectDAO<ProductTypeGroupID, ProductTypeGroup>
 //			String[] fetchGroups, int maxFetchDepth, ProgressMonitor progressMonitor)throws Exception
 //	{
 //		progressMonitor.beginTask("Load ProductTypeGroups", 100);
-//		StoreManagerRemote = JFireEjb3Factory.getRemoteBean(StoreManagerRemote.class, SecurityReflector.getInitialContextProperties());
+//		StoreManagerRemote = getEjbProvider().getRemoteBean(StoreManagerRemote.class);
 //		try {
 //			Set<ProductTypeGroupID> productTypeGroupIDs = storeManager.getProductTypeGroupIDs(queryCollection);
 //			progressMonitor.worked(50);
@@ -142,7 +139,7 @@ extends BaseJDOObjectDAO<ProductTypeGroupID, ProductTypeGroup>
 //			String[] fetchGroups, int maxFetchDepth, ProgressMonitor progressMonitor)throws Exception
 //	{
 //		progressMonitor.beginTask("Load ProductTypeGroups", 100);
-//		StoreManagerRemote = JFireEjb3Factory.getRemoteBean(StoreManagerRemote.class, SecurityReflector.getInitialContextProperties());
+//		StoreManagerRemote = getEjbProvider().getRemoteBean(StoreManagerRemote.class);
 //		try {
 //			progressMonitor.worked(50);
 //			ProductTypeGroupIDSearchResult result = storeManager.getProductTypeGroupSearchResult(queryCollection, fetchGroups, maxFetchDepth);
@@ -245,7 +242,7 @@ extends BaseJDOObjectDAO<ProductTypeGroupID, ProductTypeGroup>
 			Map<ProductTypeGroupID, ProductTypeGroup> productTypeGroupID2ProductTypeGroup = new HashMap<ProductTypeGroupID, ProductTypeGroup>();
 			synchronized (this) {
 				try {
-					storeManager = JFireEjb3Factory.getRemoteBean(StoreManagerRemote.class, SecurityReflector.getInitialContextProperties());
+					storeManager = getEjbProvider().getRemoteBean(StoreManagerRemote.class);
 					resultIDs = storeManager.getProductTypeGroupIDSearchResultForProductTypeQueries(queryCollection);
 					progressMonitor.worked(50);
 					Set<ProductTypeGroupID> productTypeGroupIDs = resultIDs.getProductTypesGroupIDs();

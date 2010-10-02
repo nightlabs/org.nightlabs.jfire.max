@@ -4,9 +4,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
-import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.trade.ArticleEndCustomerHistoryItem;
 import org.nightlabs.jfire.trade.TradeManagerRemote;
 import org.nightlabs.jfire.trade.id.ArticleEndCustomerHistoryItemID;
@@ -36,7 +34,7 @@ extends BaseJDOObjectDAO<ArticleEndCustomerHistoryItemID, ArticleEndCustomerHist
 	{
 		TradeManagerRemote tm = tradeManager;
 		if (tm == null)
-			tm = JFireEjb3Factory.getRemoteBean(TradeManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			tm = getEjbProvider().getRemoteBean(TradeManagerRemote.class);
 
 		return tm.getArticleEndCustomerHistoryItems(articleEndCustomerHistoryItemIDs, fetchGroups, maxFetchDepth);
 	}
@@ -64,7 +62,7 @@ extends BaseJDOObjectDAO<ArticleEndCustomerHistoryItemID, ArticleEndCustomerHist
 			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor
 	)
 	{
-		tradeManager = JFireEjb3Factory.getRemoteBean(TradeManagerRemote.class, SecurityReflector.getInitialContextProperties());
+		tradeManager = getEjbProvider().getRemoteBean(TradeManagerRemote.class);
 		try {
 			Collection<ArticleEndCustomerHistoryItemID> articleEndCustomerHistoryItemIDs = tradeManager.getArticleEndCustomerHistoryItemIDs(articleID);
 			return getJDOObjects(null, articleEndCustomerHistoryItemIDs, fetchGroups, maxFetchDepth, monitor);

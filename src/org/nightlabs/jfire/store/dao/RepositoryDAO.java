@@ -5,10 +5,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.nightlabs.jdo.query.QueryCollection;
-import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
-import org.nightlabs.jfire.base.jdo.cache.Cache;
-import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.store.Repository;
 import org.nightlabs.jfire.store.StoreManagerRemote;
 import org.nightlabs.jfire.store.query.RepositoryQuery;
@@ -32,14 +29,13 @@ extends BaseJDOObjectDAO<AnchorID, Repository>
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	protected Collection<Repository> retrieveJDOObjects(Set<AnchorID> objectIDs, String[] fetchGroups,
 			int maxFetchDepth, ProgressMonitor monitor)
 			throws Exception
 	{
 		monitor.beginTask("Loading Repositories", 1);
 		try {
-			StoreManagerRemote sm = JFireEjb3Factory.getRemoteBean(StoreManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			StoreManagerRemote sm = getEjbProvider().getRemoteBean(StoreManagerRemote.class);
 			return sm.getRepositories(objectIDs, fetchGroups, maxFetchDepth);
 
 		} catch (Exception e) {
@@ -52,13 +48,12 @@ extends BaseJDOObjectDAO<AnchorID, Repository>
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<Repository> getRepositoriesForQueries(
 		QueryCollection<? extends RepositoryQuery> queries, String[] fetchGroups,
 			int maxFetchDepth, ProgressMonitor monitor)
 	{
 		try {
-			StoreManagerRemote sm = JFireEjb3Factory.getRemoteBean(StoreManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			StoreManagerRemote sm = getEjbProvider().getRemoteBean(StoreManagerRemote.class);
 			Set<AnchorID> repositoryIDs = sm.getRepositoryIDs(queries);
 			return getJDOObjects(null, repositoryIDs, fetchGroups, maxFetchDepth, monitor);
 		} catch (Exception x) {
@@ -83,10 +78,10 @@ extends BaseJDOObjectDAO<AnchorID, Repository>
 	{
 		StoreManagerRemote sm;
 		try {
-			sm = JFireEjb3Factory.getRemoteBean(StoreManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			sm = getEjbProvider().getRemoteBean(StoreManagerRemote.class);
 			repository = sm.storeRepository(repository, get, fetchGroups, maxFetchDepth);
 			if (repository != null)
-				Cache.sharedInstance().put(null, repository, fetchGroups, maxFetchDepth);
+				getCache().put(null, repository, fetchGroups, maxFetchDepth);
 			return repository;
 		} catch (Exception x) {
 			throw new RuntimeException(x);

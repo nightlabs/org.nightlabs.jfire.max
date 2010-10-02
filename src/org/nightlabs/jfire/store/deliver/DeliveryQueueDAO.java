@@ -6,9 +6,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
-import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.store.StoreManagerRemote;
 import org.nightlabs.jfire.store.deliver.id.DeliveryQueueID;
 import org.nightlabs.progress.ProgressMonitor;
@@ -31,7 +29,7 @@ public class DeliveryQueueDAO extends BaseJDOObjectDAO<DeliveryQueueID, Delivery
 	@Override
 	protected Collection<DeliveryQueue> retrieveJDOObjects(Set<DeliveryQueueID> objectIDs, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) throws Exception {
 		monitor.beginTask("Fetching DeliveryQueues", 3);
-		StoreManagerRemote storeManager = JFireEjb3Factory.getRemoteBean(StoreManagerRemote.class, SecurityReflector.getInitialContextProperties());
+		StoreManagerRemote storeManager = getEjbProvider().getRemoteBean(StoreManagerRemote.class);
 		monitor.worked(1);
 		Collection<DeliveryQueue> deliveryQueues = storeManager.getDeliveryQueuesById(objectIDs, fetchGroups, maxFetchDepth);
 		monitor.worked(2);
@@ -66,7 +64,7 @@ public class DeliveryQueueDAO extends BaseJDOObjectDAO<DeliveryQueueID, Delivery
 
 	public synchronized Collection<DeliveryQueue> storeDeliveryQueues(Collection<DeliveryQueue> deliveryQueues, boolean get, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) {
 		monitor.beginTask("Storing DeliveryQueues", 3);
-		StoreManagerRemote storeManager = JFireEjb3Factory.getRemoteBean(StoreManagerRemote.class, SecurityReflector.getInitialContextProperties());
+		StoreManagerRemote storeManager = getEjbProvider().getRemoteBean(StoreManagerRemote.class);
 		monitor.worked(1);
 
 		try {

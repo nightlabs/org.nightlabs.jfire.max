@@ -4,9 +4,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
-import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.trade.ArticleContainer;
 import org.nightlabs.jfire.trade.link.ArticleContainerLinkManagerRemote;
 import org.nightlabs.jfire.trade.link.ArticleContainerLinkType;
@@ -33,7 +31,7 @@ public class ArticleContainerLinkTypeDAO extends BaseJDOObjectDAO<ArticleContain
 	{
 		monitor.beginTask("Retrieving article container link types", 100);
 		try {
-			ArticleContainerLinkManagerRemote ejb = JFireEjb3Factory.getRemoteBean(ArticleContainerLinkManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			ArticleContainerLinkManagerRemote ejb = getEjbProvider().getRemoteBean(ArticleContainerLinkManagerRemote.class);
 			monitor.worked(10);
 			return ejb.getArticleContainerLinkTypes(objectIDs, fetchGroups, maxFetchDepth);
 		} finally {
@@ -64,7 +62,7 @@ public class ArticleContainerLinkTypeDAO extends BaseJDOObjectDAO<ArticleContain
 	{
 		monitor.beginTask("Loading article container link types", 100);
 		try {
-			ArticleContainerLinkManagerRemote ejb = JFireEjb3Factory.getRemoteBean(ArticleContainerLinkManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			ArticleContainerLinkManagerRemote ejb = getEjbProvider().getRemoteBean(ArticleContainerLinkManagerRemote.class);
 			Collection<ArticleContainerLinkTypeID> articleContainerLinkTypeIDs = ejb.getArticleContainerLinkTypeIDs(fromClass, toClass);
 			monitor.worked(20);
 			return getJDOObjects(null, articleContainerLinkTypeIDs, fetchGroups, maxFetchDepth, new SubProgressMonitor(monitor, 80));

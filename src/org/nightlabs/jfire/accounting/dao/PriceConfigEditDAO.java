@@ -5,9 +5,7 @@ import java.util.Set;
 
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.accounting.AccountingManagerRemote;
-import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
-import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.progress.ProgressMonitor;
@@ -45,7 +43,7 @@ extends BaseJDOObjectDAO<ProductTypeID, ProductType>
 			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	throws Exception
 	{
-		AccountingManagerRemote am = JFireEjb3Factory.getRemoteBean(AccountingManagerRemote.class, SecurityReflector.getInitialContextProperties());
+		AccountingManagerRemote am = getEjbProvider().getRemoteBean(AccountingManagerRemote.class);
 		return am.getProductTypeForPriceConfigEditing(objectID);
 	}
 

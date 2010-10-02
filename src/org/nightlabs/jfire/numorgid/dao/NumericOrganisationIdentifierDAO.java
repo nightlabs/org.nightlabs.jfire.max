@@ -3,14 +3,12 @@ package org.nightlabs.jfire.numorgid.dao;
 import java.util.Collection;
 import java.util.Set;
 
-import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.numorgid.NumericOrganisationIdentifier;
 import org.nightlabs.jfire.numorgid.NumericOrganisationIdentifierManagerRemote;
 import org.nightlabs.jfire.numorgid.UnknownNumericOrganisationIdentifierException;
 import org.nightlabs.jfire.numorgid.UnknownOrganisationException;
 import org.nightlabs.jfire.numorgid.id.NumericOrganisationIdentifierID;
-import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.progress.ProgressMonitor;
 
 public class NumericOrganisationIdentifierDAO extends BaseJDOObjectDAO<NumericOrganisationIdentifierID, NumericOrganisationIdentifier>
@@ -42,7 +40,7 @@ public class NumericOrganisationIdentifierDAO extends BaseJDOObjectDAO<NumericOr
 	{
 		monitor.beginTask("Loading numeric organisation identifier", 100);
 		try {
-			NumericOrganisationIdentifierManagerRemote m = JFireEjb3Factory.getRemoteBean(NumericOrganisationIdentifierManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			NumericOrganisationIdentifierManagerRemote m = getEjbProvider().getRemoteBean(NumericOrganisationIdentifierManagerRemote.class);
 			monitor.worked(50);
 			return m.getNumericOrganisationIdentifier(objectID);
 		} finally {
@@ -88,7 +86,7 @@ public class NumericOrganisationIdentifierDAO extends BaseJDOObjectDAO<NumericOr
 			else {
 				NumericOrganisationIdentifierManagerRemote m;
 				try {
-					m = JFireEjb3Factory.getRemoteBean(NumericOrganisationIdentifierManagerRemote.class, SecurityReflector.getInitialContextProperties());
+					m = getEjbProvider().getRemoteBean(NumericOrganisationIdentifierManagerRemote.class);
 					monitor.worked(50);
 					numericOrganisationIdentifier = m.getNumericOrganisationIdentifier(numericOrganisationID);
 				} catch (Exception e) {

@@ -5,14 +5,12 @@ import java.util.List;
 import java.util.Set;
 
 import org.nightlabs.jdo.NLJDOHelper;
-import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.issue.dao.IssueDAO;
 import org.nightlabs.jfire.issue.project.id.ProjectID;
 import org.nightlabs.jfire.issuetimetracking.IssueTimeTrackingManagerRemote;
 import org.nightlabs.jfire.issuetimetracking.ProjectCost;
 import org.nightlabs.jfire.issuetimetracking.id.ProjectCostID;
-import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.progress.ProgressMonitor;
 
 /**
@@ -39,7 +37,7 @@ extends BaseJDOObjectDAO<ProjectCostID, ProjectCost>
 			int maxFetchDepth, ProgressMonitor monitor) throws Exception {
 		monitor.beginTask("Loading Project Costs", 1);
 		try {
-			IssueTimeTrackingManagerRemote it = JFireEjb3Factory.getRemoteBean(IssueTimeTrackingManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			IssueTimeTrackingManagerRemote it = getEjbProvider().getRemoteBean(IssueTimeTrackingManagerRemote.class);
 			return it.getProjectCosts(objectIDs, fetchGroups, maxFetchDepth);
 		} catch (Exception e) {
 			monitor.setCanceled(true);
@@ -56,7 +54,7 @@ extends BaseJDOObjectDAO<ProjectCostID, ProjectCost>
 			ProgressMonitor monitor)
 	{
 		try {
-			IssueTimeTrackingManagerRemote issueTimeTrackingManager = JFireEjb3Factory.getRemoteBean(IssueTimeTrackingManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			IssueTimeTrackingManagerRemote issueTimeTrackingManager = getEjbProvider().getRemoteBean(IssueTimeTrackingManagerRemote.class);
 			try {
 				Collection<ProjectCostID> projectCostIDs = issueTimeTrackingManager.getProjectCostIDsByProjectID(projectID);
 				List<ProjectCost> projectCosts = getJDOObjects(null, projectCostIDs, fetchGroups, maxFetchDepth, monitor);
@@ -110,7 +108,7 @@ extends BaseJDOObjectDAO<ProjectCostID, ProjectCost>
 			throw new NullPointerException("Currency must not be null");
 		monitor.beginTask("Creating project costs for project: "+ projectCost.getProject().getProjectID(), 3);
 		try {
-			IssueTimeTrackingManagerRemote it = JFireEjb3Factory.getRemoteBean(IssueTimeTrackingManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			IssueTimeTrackingManagerRemote it = getEjbProvider().getRemoteBean(IssueTimeTrackingManagerRemote.class);
 			monitor.worked(1);
 
 			ProjectCost result = it.storeProjectCost(projectCost, true, fetchgroups, maxFetchDepth);

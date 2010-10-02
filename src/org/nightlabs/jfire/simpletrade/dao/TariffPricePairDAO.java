@@ -34,8 +34,10 @@ import org.nightlabs.jfire.accounting.Price;
 import org.nightlabs.jfire.accounting.Tariff;
 import org.nightlabs.jfire.accounting.gridpriceconfig.TariffPricePair;
 import org.nightlabs.jfire.accounting.id.CurrencyID;
+import org.nightlabs.jfire.base.GlobalJFireEjb3Provider;
 import org.nightlabs.jfire.base.JFireEjb3Provider;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
+import org.nightlabs.jfire.base.jdo.GlobalJDOManagerProvider;
 import org.nightlabs.jfire.base.jdo.cache.Cache;
 import org.nightlabs.jfire.simpletrade.SimpleTradeManagerRemote;
 import org.nightlabs.jfire.store.id.ProductTypeID;
@@ -57,6 +59,15 @@ public class TariffPricePairDAO
 		this.ejbProvider = ejbProvider;
 	}
 
+	private static TariffPricePairDAO sharedInstance;
+	
+	public static TariffPricePairDAO sharedInstance() {
+		if(sharedInstance == null) {
+			sharedInstance = new TariffPricePairDAO(GlobalJDOManagerProvider.sharedInstance().getCache(), GlobalJFireEjb3Provider.sharedInstance());
+		}
+		return null;
+	}
+	
 	protected static class TariffPricePairsCarrier {
 		public TariffPricePairsCarrier(
 				ProductTypeID productTypeID, CustomerGroupID customerGroupID,

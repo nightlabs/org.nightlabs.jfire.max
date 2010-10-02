@@ -34,9 +34,9 @@ import org.nightlabs.jfire.accounting.Price;
 import org.nightlabs.jfire.accounting.Tariff;
 import org.nightlabs.jfire.accounting.gridpriceconfig.TariffPricePair;
 import org.nightlabs.jfire.accounting.id.CurrencyID;
-import org.nightlabs.jfire.base.JFireEjb3Factory;
+import org.nightlabs.jfire.base.JFireEjb3Provider;
+import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.base.jdo.cache.Cache;
-import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.simpletrade.SimpleTradeManagerRemote;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.trade.id.CustomerGroupID;
@@ -45,19 +45,16 @@ import org.nightlabs.util.CollectionUtil;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
+ * FIXME: this should also extends {@link BaseJDOObjectDAO} - shouldn't it? Marc
  */
 public class TariffPricePairDAO
 {
-//	public static final long EXPIRE_MSEC = 1000 * 60 * 15; // 15 min
-
-	private static TariffPricePairDAO _sharedInstance = null;
-
-	public static TariffPricePairDAO sharedInstance()
-	{
-		if (_sharedInstance == null)
-			_sharedInstance = new TariffPricePairDAO();
-
-		return _sharedInstance;
+	private Cache cache;
+	private JFireEjb3Provider ejbProvider;
+	
+	public TariffPricePairDAO(Cache cache, JFireEjb3Provider ejbProvider) {
+		this.cache = cache;
+		this.ejbProvider = ejbProvider;
 	}
 
 	protected static class TariffPricePairsCarrier {
@@ -115,11 +112,11 @@ public class TariffPricePairDAO
 
 //		TariffPricePairsCarrier tppc = (TariffPricePairsCarrier) tariffPricePairsCarriers.get(key);
 
-		TariffPricePairsCarrier tppc = (TariffPricePairsCarrier) Cache.sharedInstance().get(
+		TariffPricePairsCarrier tppc = (TariffPricePairsCarrier) cache.get(
 				TariffPricePairDAO.class.getName(), key, (String[])null, -1);
 		if (tppc == null) { // || System.currentTimeMillis() - tppc.loadDT > EXPIRE_MSEC) {
 			try {
-				SimpleTradeManagerRemote stm = JFireEjb3Factory.getRemoteBean(SimpleTradeManagerRemote.class, SecurityReflector.getInitialContextProperties());
+				SimpleTradeManagerRemote stm = ejbProvider.getRemoteBean(SimpleTradeManagerRemote.class);
 				Collection<TariffPricePair> tariffPricePairs = CollectionUtil.castCollection(stm.getTariffPricePairs(productTypeID,
 						customerGroupID,
 						currencyID,
@@ -131,7 +128,7 @@ public class TariffPricePairDAO
 //				tariffPricePairsCarriers.put(key, tppc);
 
 				// TODO We have to somehow get notified when the appropriate TariffUserSet changes (and evict the record from the cache). Needs some more thoughts. Marco.
-				Cache.sharedInstance().put(TariffPricePairDAO.class.getName(), key, tppc, (String[])null, -1);
+				cache.put(TariffPricePairDAO.class.getName(), key, tppc, (String[])null, -1);
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}

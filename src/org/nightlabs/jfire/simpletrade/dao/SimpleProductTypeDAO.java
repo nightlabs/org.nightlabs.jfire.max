@@ -2,17 +2,14 @@ package org.nightlabs.jfire.simpletrade.dao;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Properties;
 import java.util.Set;
 
 import javax.jdo.JDODetachedFieldAccessException;
 
 import org.nightlabs.jdo.NLJDOHelper;
-import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.base.jdo.IJDOObjectDAO;
 import org.nightlabs.jfire.prop.PropertySet;
-import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.simpletrade.SimpleTradeManagerRemote;
 import org.nightlabs.jfire.simpletrade.store.SimpleProductType;
 import org.nightlabs.jfire.store.StoreManagerRemote;
@@ -51,7 +48,7 @@ implements IJDOObjectDAO<SimpleProductType>
 //				vm = JFireEjbFactory.getBean(SimpleTradeManager.class, SecurityReflector.getInitialContextProperties());
 //
 //			return vm.getSimpleProductTypes(simpleProductTypeIDs, fetchGroups, maxFetchDepth);
-			StoreManagerRemote sm = JFireEjb3Factory.getRemoteBean(StoreManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			StoreManagerRemote sm = getEjbProvider().getRemoteBean(StoreManagerRemote.class);
 			return CollectionUtil.castCollection(sm.getProductTypes(simpleProductTypeIDs, fetchGroups, maxFetchDepth));
 		} finally {
 			monitor.worked(1);
@@ -65,7 +62,7 @@ implements IJDOObjectDAO<SimpleProductType>
 			ProgressMonitor monitor)
 	{
 		try {
-			simpleTradeManager = JFireEjb3Factory.getRemoteBean(SimpleTradeManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			simpleTradeManager = getEjbProvider().getRemoteBean(SimpleTradeManagerRemote.class);
 			try {
 				Collection<ProductTypeID> simpleProductTypeIDs = simpleTradeManager.getChildSimpleProductTypeIDs(parentSimpleProductTypeID);
 				return getJDOObjects(null, simpleProductTypeIDs, fetchGroups, maxFetchDepth, monitor);
@@ -120,7 +117,6 @@ implements IJDOObjectDAO<SimpleProductType>
 		SimpleProductType productType = Util.cloneSerializable(jdoObject);
 		SimpleProductType result = null;
 		monitor.beginTask("Saving SimpleProductType PropertySet", 3);
-		Properties initialContextProperties = SecurityReflector.getInitialContextProperties();
 		try {
 			PropertySet propertySet = null;
 			try {
@@ -132,7 +128,7 @@ implements IJDOObjectDAO<SimpleProductType>
 			if (propertySet != null) {
 				propertySet.deflate();
 			}
-			SimpleTradeManagerRemote simpleTradeManager = JFireEjb3Factory.getRemoteBean(SimpleTradeManagerRemote.class, initialContextProperties);
+			SimpleTradeManagerRemote simpleTradeManager = getEjbProvider().getRemoteBean(SimpleTradeManagerRemote.class);
 			result = simpleTradeManager.storeProductType(productType, get, fetchGroups, maxFetchDepth);
 			monitor.worked(1);
 			monitor.done();

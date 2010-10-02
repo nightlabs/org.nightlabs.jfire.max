@@ -6,9 +6,7 @@ import java.util.Set;
 
 import org.nightlabs.jfire.accounting.gridpriceconfig.FormulaPriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.id.PriceConfigID;
-import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
-import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.simpletrade.SimpleTradeManagerRemote;
 import org.nightlabs.progress.ProgressMonitor;
 
@@ -38,7 +36,7 @@ extends BaseJDOObjectDAO<PriceConfigID, FormulaPriceConfig>
 		try {
 			SimpleTradeManagerRemote vm = simpleTradeManager;
 			if (vm == null)
-				vm = JFireEjb3Factory.getRemoteBean(SimpleTradeManagerRemote.class, SecurityReflector.getInitialContextProperties());
+				vm = getEjbProvider().getRemoteBean(SimpleTradeManagerRemote.class);
 
 			return vm.getFormulaPriceConfigs(formulaPriceConfigIDs, fetchGroups, maxFetchDepth);
 		} finally {
@@ -52,7 +50,7 @@ extends BaseJDOObjectDAO<PriceConfigID, FormulaPriceConfig>
 			ProgressMonitor monitor)
 	{
 		try {
-			simpleTradeManager = JFireEjb3Factory.getRemoteBean(SimpleTradeManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			simpleTradeManager = getEjbProvider().getRemoteBean(SimpleTradeManagerRemote.class);
 			try {
 				Collection<PriceConfigID> formulaPriceConfigIDs = simpleTradeManager.getFormulaPriceConfigIDs();
 				return getJDOObjects(null, formulaPriceConfigIDs, fetchGroups, maxFetchDepth, monitor);

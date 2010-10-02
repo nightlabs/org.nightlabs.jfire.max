@@ -6,12 +6,10 @@ import java.util.List;
 import java.util.Set;
 
 import org.nightlabs.jdo.NLJDOHelper;
-import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.issue.IssueManagerRemote;
 import org.nightlabs.jfire.issue.IssueSeverityType;
 import org.nightlabs.jfire.issue.id.IssueSeverityTypeID;
-import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.progress.ProgressMonitor;
 
 /**
@@ -48,7 +46,7 @@ public class IssueSeverityTypeDAO
 		monitor.beginTask("Fetching severity types information", 1);
 		Collection<IssueSeverityType> issueSeverityTypes;
 		try {			
-			IssueManagerRemote im = JFireEjb3Factory.getRemoteBean(IssueManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			IssueManagerRemote im = getEjbProvider().getRemoteBean(IssueManagerRemote.class);
 			if (objectIDs == null) {
 				objectIDs = im.getIssueSeverityTypeIDs();	
 			}
@@ -88,7 +86,7 @@ public class IssueSeverityTypeDAO
 			throw new NullPointerException("Issue severity type to save must not be null");
 		monitor.beginTask("Storing issueSeverityType: "+ issueSeverityType.getIssueSeverityTypeID(), 3);
 		try {
-			IssueManagerRemote im = JFireEjb3Factory.getRemoteBean(IssueManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			IssueManagerRemote im = getEjbProvider().getRemoteBean(IssueManagerRemote.class);
 			IssueSeverityType result = im.storeIssueSeverityType(issueSeverityType, get, fetchGroups, maxFetchDepth);
 			monitor.worked(1);
 			monitor.done();

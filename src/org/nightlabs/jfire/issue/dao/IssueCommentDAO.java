@@ -5,14 +5,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.issue.IssueComment;
 import org.nightlabs.jfire.issue.IssueManagerRemote;
 import org.nightlabs.jfire.issue.id.IssueCommentID;
 import org.nightlabs.jfire.issue.id.IssueID;
 import org.nightlabs.jfire.issue.id.IssueLinkID;
-import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.progress.ProgressMonitor;
 import org.nightlabs.progress.SubProgressMonitor;
 
@@ -51,7 +49,7 @@ public class IssueCommentDAO extends BaseJDOObjectDAO<IssueCommentID, IssueComme
 	{
 		monitor.beginTask("Loading issue comments", 1);
 		try {
-			IssueManagerRemote im = JFireEjb3Factory.getRemoteBean(IssueManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			IssueManagerRemote im = getEjbProvider().getRemoteBean(IssueManagerRemote.class);
 			return im.getIssueComments(commentIDs, fetchGroups, maxFetchDepth);
 
 		} catch (Exception e) {
@@ -77,7 +75,7 @@ public class IssueCommentDAO extends BaseJDOObjectDAO<IssueCommentID, IssueComme
 	{
 		monitor.beginTask("Storing issue comment", 1);
 		try {
-			IssueManagerRemote im = JFireEjb3Factory.getRemoteBean(IssueManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			IssueManagerRemote im = getEjbProvider().getRemoteBean(IssueManagerRemote.class);
 			return im.storeIssueComment(issueComment, get, fetchGroups, maxFetchDepth);
 		} finally {
 			monitor.worked(1);
@@ -94,7 +92,7 @@ public class IssueCommentDAO extends BaseJDOObjectDAO<IssueCommentID, IssueComme
 	{
 		monitor.beginTask("Loading issue comment IDs", 1);
 		try {
-			IssueManagerRemote im = JFireEjb3Factory.getRemoteBean(IssueManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			IssueManagerRemote im = getEjbProvider().getRemoteBean(IssueManagerRemote.class);
 			List<IssueCommentID> issueCommentIDs = im.getIssueCommentIDs(issueID);
 			return issueCommentIDs;
 		} finally {
@@ -107,7 +105,7 @@ public class IssueCommentDAO extends BaseJDOObjectDAO<IssueCommentID, IssueComme
 	{
 		monitor.beginTask("Loading issue comments", 100);
 		try {
-			IssueManagerRemote im = JFireEjb3Factory.getRemoteBean(IssueManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			IssueManagerRemote im = getEjbProvider().getRemoteBean(IssueManagerRemote.class);
 			monitor.worked(30);
 			List<IssueCommentID> issueCommentIDs = im.getIssueCommentIDs(issueID);
 			return getJDOObjects(null, issueCommentIDs, fetchGroups, maxFetchDepth, new SubProgressMonitor(monitor, 70));
@@ -120,7 +118,7 @@ public class IssueCommentDAO extends BaseJDOObjectDAO<IssueCommentID, IssueComme
 	{
 		monitor.beginTask("Loading issue comment IDs", 1);
 		try {
-			IssueManagerRemote im = JFireEjb3Factory.getRemoteBean(IssueManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			IssueManagerRemote im = getEjbProvider().getRemoteBean(IssueManagerRemote.class);
 			return im.getIssueCommentIDsOfIssueOfIssueLink(issueLinkID);
 		} finally {
 			monitor.worked(1);
@@ -131,7 +129,7 @@ public class IssueCommentDAO extends BaseJDOObjectDAO<IssueCommentID, IssueComme
 	public Map<IssueLinkID, Long> getIssueCommentCountsOfIssueOfIssueLinks(Collection<IssueLinkID> issueLinkIDs, ProgressMonitor monitor) {
 		monitor.beginTask("Loading issue comment ID counts", 1);
 		try {
-			IssueManagerRemote im = JFireEjb3Factory.getRemoteBean(IssueManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			IssueManagerRemote im = getEjbProvider().getRemoteBean(IssueManagerRemote.class);
 			return im.getIssueCommentCountsOfIssueOfIssueLinks(issueLinkIDs);
 		} finally {
 			monitor.worked(1);
@@ -142,7 +140,7 @@ public class IssueCommentDAO extends BaseJDOObjectDAO<IssueCommentID, IssueComme
 	public synchronized void deleteIssueComment(IssueCommentID issueCommentID, ProgressMonitor monitor) {
 		monitor.beginTask("Deleting issue comment: "+ issueCommentID, 3);
 		try {
-			IssueManagerRemote im = JFireEjb3Factory.getRemoteBean(IssueManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			IssueManagerRemote im = getEjbProvider().getRemoteBean(IssueManagerRemote.class);
 			im.deleteIssueComment(issueCommentID);
 			monitor.worked(1);
 			monitor.done();

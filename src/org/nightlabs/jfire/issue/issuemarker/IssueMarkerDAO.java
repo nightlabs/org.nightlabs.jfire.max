@@ -10,13 +10,11 @@ import java.util.Set;
 import javax.jdo.JDODetachedFieldAccessException;
 import javax.jdo.JDOHelper;
 
-import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.issue.Issue;
 import org.nightlabs.jfire.issue.IssueManagerRemote;
 import org.nightlabs.jfire.issue.id.IssueID;
 import org.nightlabs.jfire.issue.issuemarker.id.IssueMarkerID;
-import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.progress.ProgressMonitor;
 import org.nightlabs.progress.SubProgressMonitor;
 import org.nightlabs.util.CollectionUtil;
@@ -45,7 +43,7 @@ public class IssueMarkerDAO extends BaseJDOObjectDAO<IssueMarkerID, IssueMarker>
 	throws Exception {
 		monitor.beginTask("Loading issue markers", 1);
 		try {
-			IssueManagerRemote cbm = JFireEjb3Factory.getRemoteBean(IssueManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			IssueManagerRemote cbm = getEjbProvider().getRemoteBean(IssueManagerRemote.class);
 			return CollectionUtil.castCollection(cbm.getIssueMarkers(objectIDs, fetchGroups, maxFetchDepth));
 		}catch (Exception e) {
 			monitor.setCanceled(true);
@@ -79,7 +77,7 @@ public class IssueMarkerDAO extends BaseJDOObjectDAO<IssueMarkerID, IssueMarker>
 		try {
 			Collection<IssueMarkerID> issueMarkerIDs;
 			try {
-				IssueManagerRemote cbm = JFireEjb3Factory.getRemoteBean(IssueManagerRemote.class, SecurityReflector.getInitialContextProperties());
+				IssueManagerRemote cbm = getEjbProvider().getRemoteBean(IssueManagerRemote.class);
 				issueMarkerIDs = CollectionUtil.castCollection(cbm.getIssueMarkerIDs(issueID));
 			} catch (Exception e) {
 				throw new RuntimeException(e);
@@ -104,7 +102,7 @@ public class IssueMarkerDAO extends BaseJDOObjectDAO<IssueMarkerID, IssueMarker>
 			if (result != null)
 				monitor.worked(100);
 			else {
-				IssueManagerRemote ejb = JFireEjb3Factory.getRemoteBean(IssueManagerRemote.class, SecurityReflector.getInitialContextProperties());
+				IssueManagerRemote ejb = getEjbProvider().getRemoteBean(IssueManagerRemote.class);
 				Set<IssueMarkerID> issueMarkerIDs = ejb.getIssueMarkerIDs();
 				monitor.worked(20);
 

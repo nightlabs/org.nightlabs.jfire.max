@@ -5,12 +5,10 @@ import java.util.List;
 import java.util.Set;
 
 import org.nightlabs.jdo.NLJDOHelper;
-import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.issue.IssueFileAttachment;
 import org.nightlabs.jfire.issue.IssueManagerRemote;
 import org.nightlabs.jfire.issue.id.IssueFileAttachmentID;
-import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.progress.ProgressMonitor;
 import org.nightlabs.progress.SubProgressMonitor;
 
@@ -44,7 +42,7 @@ public class IssueFileAttachmentDAO extends BaseJDOObjectDAO<IssueFileAttachment
 
 		monitor.beginTask("Loading IssueFileAttachments", 1);
 		try {
-			IssueManagerRemote im = JFireEjb3Factory.getRemoteBean(IssueManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			IssueManagerRemote im = getEjbProvider().getRemoteBean(IssueManagerRemote.class);
 			return im.getIssueFileAttachments(issueFileAttachmentIDs, fetchGroups, maxFetchDepth);
 		} catch (Exception e) {
 			monitor.setCanceled(true);
@@ -89,7 +87,7 @@ public class IssueFileAttachmentDAO extends BaseJDOObjectDAO<IssueFileAttachment
 	public synchronized Collection<IssueFileAttachment> getIssueFileAttachments(String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
 		try {
-			IssueManagerRemote im = JFireEjb3Factory.getRemoteBean(IssueManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			IssueManagerRemote im = getEjbProvider().getRemoteBean(IssueManagerRemote.class);
 			Set<IssueFileAttachmentID> is = im.getIssueFileAttachmentIDs();
 			return getJDOObjects(null, is, fetchGroups, maxFetchDepth, monitor);
 		} catch (Exception e) {

@@ -5,12 +5,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.issue.IssueManagerRemote;
 import org.nightlabs.jfire.issue.IssueResolution;
 import org.nightlabs.jfire.issue.id.IssueResolutionID;
-import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.progress.ProgressMonitor;
 import org.nightlabs.progress.SubProgressMonitor;
 
@@ -45,7 +43,7 @@ extends BaseJDOObjectDAO<IssueResolutionID, IssueResolution>
 			throws Exception {
 		monitor.beginTask("Fetching IssueResolution...", 1); //$NON-NLS-1$
 		try {
-			IssueManagerRemote im = JFireEjb3Factory.getRemoteBean(IssueManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			IssueManagerRemote im = getEjbProvider().getRemoteBean(IssueManagerRemote.class);
 			monitor.worked(1);
 			return im.getIssueResolutions(objectIDs, fetchGroups, maxFetchDepth);
 		} catch (Exception e) {
@@ -77,7 +75,7 @@ extends BaseJDOObjectDAO<IssueResolutionID, IssueResolution>
 			throw new NullPointerException("Issue Resolution to save must not be null");
 		monitor.beginTask("Storing issuePriority: "+ issueResolution.getIssueResolutionID(), 3);
 		try {
-			IssueManagerRemote im = JFireEjb3Factory.getRemoteBean(IssueManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			IssueManagerRemote im = getEjbProvider().getRemoteBean(IssueManagerRemote.class);
 			IssueResolution result = im.storeIssueResolution(issueResolution, get, fetchGroups, maxFetchDepth);
 			monitor.worked(1);
 			monitor.done();

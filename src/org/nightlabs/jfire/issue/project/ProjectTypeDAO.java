@@ -5,11 +5,9 @@ import java.util.List;
 import java.util.Set;
 
 import org.nightlabs.jdo.NLJDOHelper;
-import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.issue.IssueManagerRemote;
 import org.nightlabs.jfire.issue.project.id.ProjectTypeID;
-import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.progress.ProgressMonitor;
 import org.nightlabs.progress.SubProgressMonitor;
 
@@ -44,7 +42,7 @@ extends BaseJDOObjectDAO<ProjectTypeID, ProjectType>
 
 		monitor.beginTask("Loading ProjectTypes", 1);
 		try {
-			IssueManagerRemote im = JFireEjb3Factory.getRemoteBean(IssueManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			IssueManagerRemote im = getEjbProvider().getRemoteBean(IssueManagerRemote.class);
 			return im.getProjectTypes(projectTypeIDs, fetchGroups, maxFetchDepth);
 		} catch (Exception e) {
 			monitor.setCanceled(true);
@@ -79,7 +77,7 @@ extends BaseJDOObjectDAO<ProjectTypeID, ProjectType>
 			ProgressMonitor monitor)
 	{
 		try {
-			issueManager = JFireEjb3Factory.getRemoteBean(IssueManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			issueManager = getEjbProvider().getRemoteBean(IssueManagerRemote.class);
 			try {
 				Collection<ProjectTypeID> projectTypeIDs = issueManager.getProjectTypeIDs();
 				return getJDOObjects(null, projectTypeIDs, fetchGroups, maxFetchDepth, monitor);
@@ -101,7 +99,7 @@ extends BaseJDOObjectDAO<ProjectTypeID, ProjectType>
 			throw new NullPointerException("ProjectType to save must not be null");
 		monitor.beginTask("Storing projectType: "+ projectType.getProjectTypeID(), 3);
 		try {
-			IssueManagerRemote im = JFireEjb3Factory.getRemoteBean(IssueManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			IssueManagerRemote im = getEjbProvider().getRemoteBean(IssueManagerRemote.class);
 			monitor.worked(1);
 
 			ProjectType result = im.storeProjectType(projectType, get, fetchGroups, maxFetchDepth);
@@ -120,7 +118,7 @@ extends BaseJDOObjectDAO<ProjectTypeID, ProjectType>
 	public synchronized void deleteProjectType(ProjectTypeID projectTypeID, ProgressMonitor monitor) {
 		monitor.beginTask("Deleting projectType: "+ projectTypeID, 3);
 		try {
-			IssueManagerRemote im = JFireEjb3Factory.getRemoteBean(IssueManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			IssueManagerRemote im = getEjbProvider().getRemoteBean(IssueManagerRemote.class);
 			im.deleteProjectType(projectTypeID);
 			monitor.worked(1);
 			monitor.done();

@@ -5,12 +5,10 @@ import java.util.List;
 import java.util.Set;
 
 import org.nightlabs.jdo.NLJDOHelper;
-import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.issue.IssueLinkType;
 import org.nightlabs.jfire.issue.IssueManagerRemote;
 import org.nightlabs.jfire.issue.id.IssueLinkTypeID;
-import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.progress.ProgressMonitor;
 import org.nightlabs.progress.SubProgressMonitor;
 
@@ -50,7 +48,7 @@ extends BaseJDOObjectDAO<IssueLinkTypeID, IssueLinkType>
 		try {
 			IssueManagerRemote im = issueManager;
 			if (im == null)
-				im = JFireEjb3Factory.getRemoteBean(IssueManagerRemote.class, SecurityReflector.getInitialContextProperties());
+				im = getEjbProvider().getRemoteBean(IssueManagerRemote.class);
 
 			return im.getIssueLinkTypes(objectIDs, fetchGroups, maxFetchDepth);
 		} catch (Exception e) {
@@ -75,7 +73,7 @@ extends BaseJDOObjectDAO<IssueLinkTypeID, IssueLinkType>
 	public synchronized List<IssueLinkType> getIssueLinkTypes(String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
 		try {
-			issueManager = JFireEjb3Factory.getRemoteBean(IssueManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			issueManager = getEjbProvider().getRemoteBean(IssueManagerRemote.class);
 			Set<IssueLinkTypeID> issueLinkTypeIDs = issueManager.getIssueLinkTypeIDs();
 			return getJDOObjects(null, issueLinkTypeIDs, fetchGroups, maxFetchDepth, monitor);
 		} catch (Exception e) {
@@ -98,7 +96,7 @@ extends BaseJDOObjectDAO<IssueLinkTypeID, IssueLinkType>
 	{
 		monitor.beginTask("Loading issue link types", 100);
 		try {
-			issueManager = JFireEjb3Factory.getRemoteBean(IssueManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			issueManager = getEjbProvider().getRemoteBean(IssueManagerRemote.class);
 			Set<IssueLinkTypeID> issueLinkTypeIDs = issueManager.getIssueLinkTypeIDs(linkedObjectClass);
 			monitor.worked(30);
 			return getJDOObjects(null, issueLinkTypeIDs, fetchGroups, maxFetchDepth, new SubProgressMonitor(monitor, 70));

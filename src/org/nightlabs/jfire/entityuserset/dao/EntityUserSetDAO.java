@@ -4,13 +4,11 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.base.jdo.IJDOObjectDAO;
 import org.nightlabs.jfire.entityuserset.EntityUserSet;
 import org.nightlabs.jfire.entityuserset.EntityUserSetManagerRemote;
 import org.nightlabs.jfire.entityuserset.id.EntityUserSetID;
-import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.progress.ProgressMonitor;
 
 /**
@@ -49,8 +47,7 @@ implements IJDOObjectDAO<EntityUserSet<?>>
 	{
 		monitor.beginTask("Loading EntityUserSet", 100);
 		try {
-			EntityUserSetManagerRemote entityUserSetManager = JFireEjb3Factory.getRemoteBean(EntityUserSetManagerRemote.class,
-					SecurityReflector.getInitialContextProperties());
+			EntityUserSetManagerRemote entityUserSetManager = getEjbProvider().getRemoteBean(EntityUserSetManagerRemote.class);
 			List<EntityUserSet<?>> entityUserSets = entityUserSetManager.getEntityUserSets(entityUserSetsIDs, fetchGroups, maxFetchDepth);
 			monitor.worked(100);
 			return entityUserSets;
@@ -107,8 +104,7 @@ implements IJDOObjectDAO<EntityUserSet<?>>
 	{
 		monitor.beginTask("Saving EntityUserSet", 100);
 		try {
-			EntityUserSetManagerRemote entityUserSetManager = JFireEjb3Factory.getRemoteBean(EntityUserSetManagerRemote.class,
-					SecurityReflector.getInitialContextProperties());
+			EntityUserSetManagerRemote entityUserSetManager = getEjbProvider().getRemoteBean(EntityUserSetManagerRemote.class);
 			return (EntityUserSet<E>) entityUserSetManager.storeEntityUserSet(entityUserSet, get, fetchGroups, maxFetchDepth);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
@@ -136,8 +132,7 @@ implements IJDOObjectDAO<EntityUserSet<?>>
 	{
 		monitor.beginTask("Loading EntityUserSets", 100);
 		try {
-			EntityUserSetManagerRemote entityUserSetManager = JFireEjb3Factory.getRemoteBean(EntityUserSetManagerRemote.class,
-					SecurityReflector.getInitialContextProperties());
+			EntityUserSetManagerRemote entityUserSetManager = getEjbProvider().getRemoteBean(EntityUserSetManagerRemote.class);
 			return entityUserSetManager.getEntityUserSetIDs(organisationID, entityClass);
 		} catch (Exception e) {
 			throw new RuntimeException(e);

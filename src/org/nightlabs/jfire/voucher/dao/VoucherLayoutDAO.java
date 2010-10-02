@@ -6,10 +6,8 @@ import java.util.Set;
 
 import javax.jdo.JDOHelper;
 
-import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.base.jdo.IJDOObjectDAO;
-import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.voucher.VoucherManagerRemote;
 import org.nightlabs.jfire.voucher.scripting.VoucherLayout;
 import org.nightlabs.jfire.voucher.scripting.id.VoucherLayoutID;
@@ -43,7 +41,7 @@ implements IJDOObjectDAO<VoucherLayout>
 
 		monitor.beginTask("Loading VoucherLayouts", 3);
 		try {
-			VoucherManagerRemote voucherManager = JFireEjb3Factory.getRemoteBean(VoucherManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			VoucherManagerRemote voucherManager = getEjbProvider().getRemoteBean(VoucherManagerRemote.class);
 			monitor.worked(1);
 			List<VoucherLayout> VoucherLayouts = voucherManager.getVoucherLayouts(objectIDs, fetchGroups, maxFetchDepth);
 			monitor.worked(2);
@@ -65,18 +63,18 @@ implements IJDOObjectDAO<VoucherLayout>
 // TODO Implement the following methods for voucher layouts (copied from TicketLayoutDAO and replaced TicketLayout by VoucherLayout yet). Tobias.
 
 	public List<VoucherLayout> getAllVoucherLayouts(String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) {
-		VoucherManagerRemote voucherManager = JFireEjb3Factory.getRemoteBean(VoucherManagerRemote.class, SecurityReflector.getInitialContextProperties());
+		VoucherManagerRemote voucherManager = getEjbProvider().getRemoteBean(VoucherManagerRemote.class);
 		return getJDOObjects(null, voucherManager.getAllVoucherLayoutIds(), fetchGroups, maxFetchDepth, monitor);
 	}
 
 	@Override
 	public VoucherLayout storeJDOObject(VoucherLayout jdoObject, boolean get, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) {
-		VoucherManagerRemote voucherManager = JFireEjb3Factory.getRemoteBean(VoucherManagerRemote.class, SecurityReflector.getInitialContextProperties());
+		VoucherManagerRemote voucherManager = getEjbProvider().getRemoteBean(VoucherManagerRemote.class);
 		return voucherManager.storeVoucherLayout(jdoObject, get, fetchGroups, maxFetchDepth);
 	}
 
 	public void deleteVoucherLayout(VoucherLayout VoucherLayout) {
-		VoucherManagerRemote voucherManager = JFireEjb3Factory.getRemoteBean(VoucherManagerRemote.class, SecurityReflector.getInitialContextProperties());
+		VoucherManagerRemote voucherManager = getEjbProvider().getRemoteBean(VoucherManagerRemote.class);
 		voucherManager.deleteVoucherLayout((VoucherLayoutID) JDOHelper.getObjectId(VoucherLayout));
 	}
 
@@ -88,12 +86,12 @@ implements IJDOObjectDAO<VoucherLayout>
 	 * @param newVoucherLayout
 	 */
 	public void replaceVoucherLayout(VoucherLayoutID oldVoucherLayoutId, VoucherLayout newVoucherLayout) {
-		VoucherManagerRemote voucherManager = JFireEjb3Factory.getRemoteBean(VoucherManagerRemote.class, SecurityReflector.getInitialContextProperties());
+		VoucherManagerRemote voucherManager = getEjbProvider().getRemoteBean(VoucherManagerRemote.class);
 		voucherManager.replaceVoucherLayout(oldVoucherLayoutId, newVoucherLayout);
 	}
 
 	public Collection<VoucherLayoutID> getVoucherLayoutIdsByFileName(String fileName) {
-		VoucherManagerRemote voucherManager = JFireEjb3Factory.getRemoteBean(VoucherManagerRemote.class, SecurityReflector.getInitialContextProperties());
+		VoucherManagerRemote voucherManager = getEjbProvider().getRemoteBean(VoucherManagerRemote.class);
 		return voucherManager.getVoucherLayoutIdsByFileName(fileName);
 	}
 }

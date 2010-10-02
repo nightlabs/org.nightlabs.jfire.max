@@ -5,10 +5,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.nightlabs.jdo.ObjectID;
-import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.base.jdo.IJDOObjectDAO;
-import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.store.StoreManagerRemote;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.voucher.VoucherManagerRemote;
@@ -44,7 +42,7 @@ implements IJDOObjectDAO<VoucherType>
 //				vm = JFireEjbFactory.getBean(VoucherManager.class, SecurityReflector.getInitialContextProperties());
 //
 //			return vm.getVoucherTypes(voucherTypeIDs, fetchGroups, maxFetchDepth);
-			StoreManagerRemote sm = JFireEjb3Factory.getRemoteBean(StoreManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			StoreManagerRemote sm = getEjbProvider().getRemoteBean(StoreManagerRemote.class);
 			return CollectionUtil.castCollection(sm.getProductTypes(voucherTypeIDs, fetchGroups, maxFetchDepth));
 		} finally {
 			monitor.worked(1);
@@ -59,7 +57,7 @@ implements IJDOObjectDAO<VoucherType>
 			ProgressMonitor monitor)
 	{
 		try {
-			voucherManager = JFireEjb3Factory.getRemoteBean(VoucherManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			voucherManager = getEjbProvider().getRemoteBean(VoucherManagerRemote.class);
 			try {
 				Collection<ProductTypeID> voucherTypeIDs = voucherManager.getChildVoucherTypeIDs(parentVoucherTypeID);
 				return getJDOObjects(null, voucherTypeIDs, fetchGroups, maxFetchDepth, monitor);
@@ -94,7 +92,7 @@ implements IJDOObjectDAO<VoucherType>
 	@Override
 	public VoucherType storeJDOObject(VoucherType jdoObject, boolean get, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) {
 		try {
-			VoucherManagerRemote vm = JFireEjb3Factory.getRemoteBean(VoucherManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			VoucherManagerRemote vm = getEjbProvider().getRemoteBean(VoucherManagerRemote.class);
 			return vm.storeVoucherType(jdoObject, get, fetchGroups, maxFetchDepth);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
@@ -108,7 +106,7 @@ implements IJDOObjectDAO<VoucherType>
 	 */
 	public List<VoucherType> getVoucherTypesByLocalAccountantDelegateId(ObjectID  localAccountantDelegateId, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) {
 		try {
-			VoucherManagerRemote voucherManager = JFireEjb3Factory.getRemoteBean(VoucherManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			VoucherManagerRemote voucherManager = getEjbProvider().getRemoteBean(VoucherManagerRemote.class);
 			Set<ProductTypeID> voucherTypeIds = voucherManager.getVoucherTypeIdsByLocalAccountantDelegateId(localAccountantDelegateId);
 			return getJDOObjects(null, voucherTypeIds, fetchGroups, maxFetchDepth, monitor);
 		} catch (Exception e) {
@@ -126,7 +124,7 @@ implements IJDOObjectDAO<VoucherType>
 	 */
 	public List<VoucherType> getVoucherTypesByVoucherLayoutId(VoucherLayoutID voucherLayoutId, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) {
 		try {
-			VoucherManagerRemote voucherManager = JFireEjb3Factory.getRemoteBean(VoucherManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			VoucherManagerRemote voucherManager = getEjbProvider().getRemoteBean(VoucherManagerRemote.class);
 			Set<ProductTypeID> voucherTypeIds = voucherManager.getVoucherTypeIdsByVoucherLayoutId(voucherLayoutId);
 			return getJDOObjects(null, voucherTypeIds, fetchGroups, maxFetchDepth, monitor);
 		} catch (Exception e) {

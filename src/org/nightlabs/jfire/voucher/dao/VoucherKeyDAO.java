@@ -4,9 +4,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
-import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.voucher.VoucherManagerRemote;
 import org.nightlabs.jfire.voucher.store.VoucherKey;
 import org.nightlabs.jfire.voucher.store.id.VoucherKeyID;
@@ -37,7 +35,7 @@ extends BaseJDOObjectDAO<VoucherKeyID, VoucherKey>
 		monitor.beginTask("Loading VoucherKeys", 1);
 		try {
 			VoucherManagerRemote vm = voucherManager;
-			if (vm == null) vm = JFireEjb3Factory.getRemoteBean(VoucherManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			if (vm == null) vm = getEjbProvider().getRemoteBean(VoucherManagerRemote.class);
 			return vm.getVoucherKeys(voucherKeyIDs, fetchGroups, maxFetchDepth);
 		} finally {
 			monitor.worked(1);
@@ -68,7 +66,7 @@ extends BaseJDOObjectDAO<VoucherKeyID, VoucherKey>
 	)
 	{
 		try {
-			voucherManager = JFireEjb3Factory.getRemoteBean(VoucherManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			voucherManager = getEjbProvider().getRemoteBean(VoucherManagerRemote.class);
 			try {
 				VoucherKeyID voucherKeyID = voucherManager.getVoucherKeyID(voucherKeyString);
 				if (voucherKeyID == null)

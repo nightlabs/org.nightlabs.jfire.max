@@ -5,9 +5,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.nightlabs.jfire.accounting.priceconfig.id.PriceConfigID;
-import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
-import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.voucher.VoucherManagerRemote;
 import org.nightlabs.jfire.voucher.accounting.VoucherPriceConfig;
 import org.nightlabs.progress.ProgressMonitor;
@@ -39,7 +37,7 @@ extends BaseJDOObjectDAO<PriceConfigID, VoucherPriceConfig>
 		monitor.beginTask("Load VoucherPriceConfigs", 1);
 		try {
 			VoucherManagerRemote vm = voucherManager;
-			if (vm == null) vm = JFireEjb3Factory.getRemoteBean(VoucherManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			if (vm == null) vm = getEjbProvider().getRemoteBean(VoucherManagerRemote.class);
 			return vm.getVoucherPriceConfigs(objectIDs, fetchGroups, maxFetchDepth);
 		} finally {
 			monitor.worked(1);
@@ -51,7 +49,7 @@ extends BaseJDOObjectDAO<PriceConfigID, VoucherPriceConfig>
 			ProgressMonitor monitor)
 	{
 		try {
-			voucherManager = JFireEjb3Factory.getRemoteBean(VoucherManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			voucherManager = getEjbProvider().getRemoteBean(VoucherManagerRemote.class);
 			try {
 				Set<PriceConfigID> priceConfigIDs = voucherManager.getVoucherPriceConfigIDs();
 				return getJDOObjects(null, priceConfigIDs, fetchGroups, maxFetchDepth, monitor);

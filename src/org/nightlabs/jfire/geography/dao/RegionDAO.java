@@ -8,14 +8,12 @@ import java.util.List;
 import java.util.Set;
 
 import org.nightlabs.jdo.NLJDOHelper;
-import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.geography.Country;
 import org.nightlabs.jfire.geography.GeographyManagerRemote;
 import org.nightlabs.jfire.geography.Region;
 import org.nightlabs.jfire.geography.id.CountryID;
 import org.nightlabs.jfire.geography.id.RegionID;
-import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.progress.ProgressMonitor;
 import org.nightlabs.progress.SubProgressMonitor;
 
@@ -61,7 +59,7 @@ extends BaseJDOObjectDAO<RegionID, Region>
 	{
 		monitor.beginTask("Getting regions", 100);
 		try {
-			geographyManager = JFireEjb3Factory.getRemoteBean(GeographyManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			geographyManager = getEjbProvider().getRemoteBean(GeographyManagerRemote.class);
 			monitor.worked(10);
 
 			Collection<RegionID> regionIDs = geographyManager.getRegionIDs(countryID);
@@ -80,7 +78,7 @@ extends BaseJDOObjectDAO<RegionID, Region>
 	{
 		monitor.beginTask("Importing region", 100);
 		try {
-			GeographyManagerRemote gm = JFireEjb3Factory.getRemoteBean(GeographyManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			GeographyManagerRemote gm = getEjbProvider().getRemoteBean(GeographyManagerRemote.class);
 			monitor.worked(10);
 
 			Region region = gm.importRegion(regionID, get, fetchGroups, maxFetchDepth);
@@ -106,7 +104,7 @@ extends BaseJDOObjectDAO<RegionID, Region>
 		try {
 			GeographyManagerRemote gm = geographyManager;
 			if (gm == null)
-				gm = JFireEjb3Factory.getRemoteBean(GeographyManagerRemote.class, SecurityReflector.getInitialContextProperties());
+				gm = getEjbProvider().getRemoteBean(GeographyManagerRemote.class);
 
 			monitor.worked(50);
 			Collection<Region> regions = gm.getRegions(objectIDs, fetchGroups, maxFetchDepth);

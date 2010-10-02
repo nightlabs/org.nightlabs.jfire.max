@@ -4,12 +4,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.department.Department;
 import org.nightlabs.jfire.department.DepartmentManagerRemote;
 import org.nightlabs.jfire.department.id.DepartmentID;
-import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.progress.ProgressMonitor;
 
 /**
@@ -43,7 +41,7 @@ extends BaseJDOObjectDAO<DepartmentID, Department>
 		monitor.beginTask("Fetching "+objectIDs.size()+" department information", 1);
 		Collection<Department> departments = null;
 		try {
-			DepartmentManagerRemote departmentManager = JFireEjb3Factory.getRemoteBean(DepartmentManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			DepartmentManagerRemote departmentManager = getEjbProvider().getRemoteBean(DepartmentManagerRemote.class);
 			departments = departmentManager.getDepartments(objectIDs, fetchGroups, maxFetchDepth);
 			monitor.worked(1);
 		} catch (Exception e) {
@@ -63,7 +61,7 @@ extends BaseJDOObjectDAO<DepartmentID, Department>
 	public synchronized List<Department> getDepartments(String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) {
 		monitor.beginTask("Loading departments", 1);
 		try {
-			DepartmentManagerRemote departmentManager = JFireEjb3Factory.getRemoteBean(DepartmentManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			DepartmentManagerRemote departmentManager = getEjbProvider().getRemoteBean(DepartmentManagerRemote.class);
 			Set<DepartmentID> departmentIDs = departmentManager.getDepartmentIDs();
 			monitor.done();
 			return getJDOObjects(null, departmentIDs, fetchGroups, maxFetchDepth, monitor);
@@ -83,7 +81,7 @@ extends BaseJDOObjectDAO<DepartmentID, Department>
 			throw new NullPointerException("Department to save must not be null");
 		monitor.beginTask("Storing department: "+ department.getDepartmentID(), 3);
 		try {
-			DepartmentManagerRemote departmentManager = JFireEjb3Factory.getRemoteBean(DepartmentManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			DepartmentManagerRemote departmentManager = getEjbProvider().getRemoteBean(DepartmentManagerRemote.class);
 			monitor.worked(1);
 
 			Department result = departmentManager.storeDepartment(department, get, fetchGroups, maxFetchDepth);

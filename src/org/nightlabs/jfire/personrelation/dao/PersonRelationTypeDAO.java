@@ -4,12 +4,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.personrelation.PersonRelationManagerRemote;
 import org.nightlabs.jfire.personrelation.PersonRelationType;
 import org.nightlabs.jfire.personrelation.id.PersonRelationTypeID;
-import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.progress.ProgressMonitor;
 import org.nightlabs.progress.SubProgressMonitor;
 
@@ -40,7 +38,7 @@ extends BaseJDOObjectDAO<PersonRelationTypeID, PersonRelationType>
 		try {
 			PersonRelationManagerRemote ejb = this.ejb;
 			if (ejb == null)
-				ejb = JFireEjb3Factory.getRemoteBean(PersonRelationManagerRemote.class, SecurityReflector.getInitialContextProperties());
+				ejb = getEjbProvider().getRemoteBean(PersonRelationManagerRemote.class);
 
 			monitor.worked(5);
 
@@ -60,7 +58,7 @@ extends BaseJDOObjectDAO<PersonRelationTypeID, PersonRelationType>
 	{
 		monitor.beginTask("Loading person relations", 100);
 		try {
-			ejb = JFireEjb3Factory.getRemoteBean(PersonRelationManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			ejb = getEjbProvider().getRemoteBean(PersonRelationManagerRemote.class);
 			try {
 				monitor.worked(10);
 				Collection<PersonRelationTypeID> personRelationTypeIDs = ejb.getPersonRelationTypeIDs();

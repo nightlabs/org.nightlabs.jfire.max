@@ -9,7 +9,6 @@ import java.util.Set;
 import javax.management.relation.RelationType;
 
 import org.nightlabs.jdo.ObjectID;
-import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.person.Person;
 import org.nightlabs.jfire.personrelation.PersonRelation;
@@ -20,7 +19,6 @@ import org.nightlabs.jfire.personrelation.PersonRelationManagerRemote.TuckedQuer
 import org.nightlabs.jfire.personrelation.id.PersonRelationID;
 import org.nightlabs.jfire.personrelation.id.PersonRelationTypeID;
 import org.nightlabs.jfire.prop.id.PropertySetID;
-import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.progress.ProgressMonitor;
 import org.nightlabs.progress.SubProgressMonitor;
 
@@ -51,7 +49,7 @@ extends BaseJDOObjectDAO<PersonRelationID, PersonRelation>
 		try {
 			PersonRelationManagerRemote ejb = this.ejb;
 			if (ejb == null)
-				ejb = JFireEjb3Factory.getRemoteBean(PersonRelationManagerRemote.class, SecurityReflector.getInitialContextProperties());
+				ejb = getEjbProvider().getRemoteBean(PersonRelationManagerRemote.class);
 
 			monitor.worked(5);
 
@@ -99,7 +97,7 @@ extends BaseJDOObjectDAO<PersonRelationID, PersonRelation>
 	{
 		monitor.beginTask("Loading person relation IDs", 100);
 		try {
-			PersonRelationManagerRemote ejb = JFireEjb3Factory.getRemoteBean(PersonRelationManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			PersonRelationManagerRemote ejb = getEjbProvider().getRemoteBean(PersonRelationManagerRemote.class);
 			monitor.worked(10);
 			Collection<PersonRelationID> personRelationIDs = ejb.getPersonRelationIDs(
 					personRelationTypeID, fromPersonID, toPersonID
@@ -123,7 +121,7 @@ extends BaseJDOObjectDAO<PersonRelationID, PersonRelation>
 	) {
 		monitor.beginTask("Loading person relation IDs", 100);
 		try {
-			PersonRelationManagerRemote ejb = JFireEjb3Factory.getRemoteBean(PersonRelationManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			PersonRelationManagerRemote ejb = getEjbProvider().getRemoteBean(PersonRelationManagerRemote.class);
 			monitor.worked(10);
 			Collection<PersonRelationID> personRelationIDs = ejb.getFilteredPersonRelationIDs(
 					personRelationTypeID, fromPersonID, toPersonID, fromPropertySetIDsToExclude, toPropertySetIDsToExclude, personRelationComparator
@@ -145,7 +143,7 @@ extends BaseJDOObjectDAO<PersonRelationID, PersonRelation>
 	) {
 		monitor.beginTask("Loading person relation count", 100);
 		try {
-			PersonRelationManagerRemote ejb = JFireEjb3Factory.getRemoteBean(PersonRelationManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			PersonRelationManagerRemote ejb = getEjbProvider().getRemoteBean(PersonRelationManagerRemote.class);
 			monitor.worked(10);
 			return ejb.getFilteredPersonRelationCount(personRelationTypeID, fromPersonID, toPersonID, fromPropertySetIDsToExclude, toPropertySetIDsToExclude);
 		} finally {
@@ -166,7 +164,7 @@ extends BaseJDOObjectDAO<PersonRelationID, PersonRelation>
 	) {
 		monitor.beginTask("Loading person relation IDs", 100);
 		try {
-			PersonRelationManagerRemote ejb = JFireEjb3Factory.getRemoteBean(PersonRelationManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			PersonRelationManagerRemote ejb = getEjbProvider().getRemoteBean(PersonRelationManagerRemote.class);
 			monitor.worked(10);
 			Collection<PersonRelationID> personRelationIDs = ejb.getInclusiveFilteredPersonRelationIDs(
 					personRelationTypeID, fromPersonID, toPersonID, fromPropertySetIDsToInclude, toPropertySetIDsToInclude, personRelationComparator
@@ -188,7 +186,7 @@ extends BaseJDOObjectDAO<PersonRelationID, PersonRelation>
 	) {
 		monitor.beginTask("Loading person relation count", 100);
 		try {
-			PersonRelationManagerRemote ejb = JFireEjb3Factory.getRemoteBean(PersonRelationManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			PersonRelationManagerRemote ejb = getEjbProvider().getRemoteBean(PersonRelationManagerRemote.class);
 			monitor.worked(10);
 			return ejb.getInclusiveFilteredPersonRelationCount(personRelationTypeID, fromPersonID, toPersonID, fromPropertySetIDsToInclude, toPropertySetIDsToInclude);
 		} finally {
@@ -213,7 +211,7 @@ extends BaseJDOObjectDAO<PersonRelationID, PersonRelation>
 		//  III. The given propertySetIDsToTuckedChildrean are the IDs we want to seek to keep in the tucked status, if and only if they exist.
 		monitor.beginTask("Loading tucked person relation count...", 100);
 		try {
-			PersonRelationManagerRemote ejb = JFireEjb3Factory.getRemoteBean(PersonRelationManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			PersonRelationManagerRemote ejb = getEjbProvider().getRemoteBean(PersonRelationManagerRemote.class);
 			monitor.worked(10);
 			return ejb.getTuckedPersonRelationCount(personRelationTypeID, currentID, propertySetIDsToRoot, propertySetIDsToTuckedChildren);
 
@@ -249,7 +247,7 @@ extends BaseJDOObjectDAO<PersonRelationID, PersonRelation>
 	{
 		monitor.beginTask("Loading person relations", 100);
 		try {
-			ejb = JFireEjb3Factory.getRemoteBean(PersonRelationManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			ejb = getEjbProvider().getRemoteBean(PersonRelationManagerRemote.class);
 			try {
 				monitor.worked(10);
 				Collection<PersonRelationID> personRelationIDs = ejb.getPersonRelationIDs(
@@ -290,7 +288,7 @@ extends BaseJDOObjectDAO<PersonRelationID, PersonRelation>
 		monitor.beginTask("Finding related persons", 10);
 		try
 		{
-			ejb = JFireEjb3Factory.getRemoteBean(PersonRelationManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			ejb = getEjbProvider().getRemoteBean(PersonRelationManagerRemote.class);
 			monitor.worked(2);
 			Map<Class<? extends ObjectID>, List<Deque<ObjectID>>> nearestNodes = ejb.getRootNodes(allowedRelations, ofPerson, maxDepth);
 			monitor.worked(8);
@@ -320,7 +318,7 @@ extends BaseJDOObjectDAO<PersonRelationID, PersonRelation>
 	{
 		monitor.beginTask("Loading person relation count", 100);
 		try {
-			PersonRelationManagerRemote ejb = JFireEjb3Factory.getRemoteBean(PersonRelationManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			PersonRelationManagerRemote ejb = getEjbProvider().getRemoteBean(PersonRelationManagerRemote.class);
 			monitor.worked(10);
 			return ejb.getPersonRelationCount(personRelationTypeID, fromPersonID, toPersonID);
 		} finally {
@@ -338,7 +336,7 @@ extends BaseJDOObjectDAO<PersonRelationID, PersonRelation>
 	{
 		monitor.beginTask("Creating person relation", 100);
 		try {
-			JFireEjb3Factory.getRemoteBean(PersonRelationManagerRemote.class, SecurityReflector.getInitialContextProperties()).createPersonRelation(
+			getEjbProvider().getRemoteBean(PersonRelationManagerRemote.class).createPersonRelation(
 					personRelationTypeID, fromPersonID, toPersonID
 			);
 		} finally {
@@ -355,7 +353,7 @@ extends BaseJDOObjectDAO<PersonRelationID, PersonRelation>
 	{
 		monitor.beginTask("Deleting person relation", 100);
 		try {
-			JFireEjb3Factory.getRemoteBean(PersonRelationManagerRemote.class, SecurityReflector.getInitialContextProperties()).deletePersonRelation(
+			getEjbProvider().getRemoteBean(PersonRelationManagerRemote.class).deletePersonRelation(
 					personRelationTypeID, fromPersonID, toPersonID
 			);
 		} finally {

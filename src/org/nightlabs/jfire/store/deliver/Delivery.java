@@ -250,6 +250,9 @@ implements Serializable, StoreCallback, DetachCallback
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private String deliveryDirection = null;
 
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+	private Date deliveryDT;
+	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
@@ -1457,6 +1460,16 @@ implements Serializable, StoreCallback, DetachCallback
 		this.deliveryLocal = deliveryLocal;
 	}
 
+
+	public Date getDeliveryDT() {
+		return deliveryDT;
+	}
+	
+	
+	public void setDeliveryDT(Date deliveryDT) {
+		this.deliveryDT = deliveryDT;
+	}
+	
 	/**
 	 * This method is called before a newly created <tt>Delivery</tt> is sent to the
 	 * server.

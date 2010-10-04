@@ -308,6 +308,11 @@ implements Serializable, StoreCallback
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Date beginDT;
 
+
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+	private Date paymentDT;
+	
+
 	/**
 	 * @jdo.field persistence-modifier="persistent" dependent="true"
 	 */
@@ -502,6 +507,7 @@ implements Serializable, StoreCallback
 		this.paymentID = paymentID;
 
 		this.beginDT = new Date();
+		this.paymentDT = new Date();
 //		this.paymentDirection = PAYMENT_DIRECTION_INCOMING;
 	}
 
@@ -695,6 +701,18 @@ implements Serializable, StoreCallback
 		return beginDT;
 	}
 
+
+	/**
+	 * @return Returns the payment date
+	 */
+	public Date getPaymentDT() {
+		return paymentDT;
+	}
+
+	public void setPaymentDT(Date paymentDT) {
+		this.paymentDT = paymentDT;
+	}
+	
 	/**
 	 * @return Returns the user. Will be <tt>null</tt> until this <tt>Payment</tt>
 	 *		has been stored to the database the first time.

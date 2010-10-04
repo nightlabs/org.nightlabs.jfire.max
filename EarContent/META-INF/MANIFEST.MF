@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 EAR-Module-ID: JFireTradeEAR
-EAR-Schema-Version: 1.0.3
+EAR-Schema-Version: 1.0.4
 Comment: Update note 1.0.1:
   From 1.0.0 to 1.0.1, there have been 2 fields added to Offer - DataNucleus
   is able to update the datastore itself. Additionally, the workflow Offer/vendor has
@@ -11,4 +11,5 @@ Comment: Update note 1.0.2:
   and for having the state readily available.
 Comment: Update note 1.0.3:
   Added new class LegalEntitySearchConfigModule.
-  
+Comment: Update note 1.0.4:
+  Added the new field paymentDT into the classes Payment and Delivery.

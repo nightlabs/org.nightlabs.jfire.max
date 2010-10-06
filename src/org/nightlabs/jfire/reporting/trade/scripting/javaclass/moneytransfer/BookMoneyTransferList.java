@@ -17,7 +17,7 @@ import javax.jdo.Query;
 import org.eclipse.datatools.connectivity.oda.jfire.IResultSetMetaData;
 import org.nightlabs.db.Record;
 import org.nightlabs.db.TableBuffer;
-import org.nightlabs.jfire.accounting.book.BookMoneyTransfer;
+import org.nightlabs.jfire.accounting.book.BookInvoiceMoneyTransfer;
 import org.nightlabs.jfire.reporting.oda.DataType;
 import org.nightlabs.jfire.reporting.oda.SQLResultSet;
 import org.nightlabs.jfire.reporting.oda.jfs.AbstractJFSScriptExecutorDelegate;
@@ -29,7 +29,7 @@ import org.nightlabs.jfire.security.id.UserID;
 import org.nightlabs.util.TimePeriod;
 
 /**
- * BIRT datasource javaclass script that lists {@link BookMoneyTransfer}s.
+ * BIRT datasource javaclass script that lists {@link BookInvoiceMoneyTransfer}s.
  * It takes the following parameters:
  * <ul>
  *   <li>timePeriod(optional): A {@link TimePeriod} to filter the transfers</li>
@@ -99,7 +99,7 @@ public class BookMoneyTransferList extends AbstractJFSScriptExecutorDelegate {
 		jdoql.append("SELECT "+
 				"  this "+
 				"FROM " +
-				"  "+BookMoneyTransfer.class.getName()+" " +
+				"  "+BookInvoiceMoneyTransfer.class.getName()+" " +
 		"WHERE (1 == 1) ");
 
 		if (showOnlyOutstanding) {
@@ -137,11 +137,11 @@ public class BookMoneyTransferList extends AbstractJFSScriptExecutorDelegate {
 
 
 		Query q = pm.newQuery(jdoql.toString());
-		Collection<BookMoneyTransfer> queryResult = (Collection<BookMoneyTransfer>)q.executeWithMap(jdoParams);
+		Collection<BookInvoiceMoneyTransfer> queryResult = (Collection<BookInvoiceMoneyTransfer>)q.executeWithMap(jdoParams);
 
-		for (Iterator<BookMoneyTransfer> it = queryResult.iterator(); it.hasNext();) {
+		for (Iterator<BookInvoiceMoneyTransfer> it = queryResult.iterator(); it.hasNext();) {
 			List<Object> row = new ArrayList<Object>(18);
-			BookMoneyTransfer moneyTransfer = it.next();
+			BookInvoiceMoneyTransfer moneyTransfer = it.next();
 			row.add(JDOHelper.getObjectId(moneyTransfer).toString());
 			row.add(moneyTransfer.getOrganisationID());
 			row.add(moneyTransfer.getTransferTypeID());

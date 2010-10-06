@@ -26,7 +26,7 @@ import org.nightlabs.jfire.accounting.Account;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.accounting.InvoiceMoneyTransfer;
-import org.nightlabs.jfire.accounting.book.BookMoneyTransfer;
+import org.nightlabs.jfire.accounting.book.BookInvoiceMoneyTransfer;
 import org.nightlabs.jfire.accounting.book.LocalAccountantDelegate;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.ProductType;
@@ -84,7 +84,7 @@ extends LocalAccountantDelegate
 
 	@Override
 	public void bookArticle(OrganisationLegalEntity mandator, User user,
-			Invoice invoice, Article article, BookMoneyTransfer container,
+			Invoice invoice, Article article, BookInvoiceMoneyTransfer container,
 			Set<Anchor> involvedAnchors)
 	{
 		LinkedList<ArticlePrice> articlePriceStack = new LinkedList<ArticlePrice>();
@@ -166,7 +166,7 @@ extends LocalAccountantDelegate
 	}
 
 	@Override
-	public void bookProductTypeParts(OrganisationLegalEntity mandator, User user, LinkedList<ArticlePrice> articlePriceStack, int delegationLevel, BookMoneyTransfer container, Set<Anchor> involvedAnchors) {
+	public void bookProductTypeParts(OrganisationLegalEntity mandator, User user, LinkedList<ArticlePrice> articlePriceStack, int delegationLevel, BookInvoiceMoneyTransfer container, Set<Anchor> involvedAnchors) {
 		ArticlePrice articlePrice = articlePriceStack.peek();
 		PersistenceManager pm = getPersistenceManager();
 		String currencyID = articlePrice.getCurrency().getCurrencyID();

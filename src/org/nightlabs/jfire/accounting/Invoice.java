@@ -316,6 +316,16 @@ implements Serializable, PricedArticleContainer, Statable, DetachCallback
 
 		return CollectionUtil.castList((List<?>) query.executeWithMap(params));
 	}
+	
+	public static List<Invoice> getOverdueInvoices(PersistenceManager pm, String organisationID, Date date)
+	{
+		Query query = pm.newNamedQuery(Invoice.class, "getOverdueInvoices");
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("paramOrganisationID", organisationID);
+		params.put("paramDate", date);
+
+		return CollectionUtil.castList((List<?>) query.executeWithMap(params));
+	}
 
 	/**
 	 * @jdo.field primary-key="true"

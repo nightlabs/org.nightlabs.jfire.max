@@ -58,7 +58,7 @@ import org.nightlabs.util.Util;
 /**
  * LocalAccountantDelegates are used by {@link org.nightlabs.jfire.accounting.book.LocalAccountant}
  * to assist in the booking procedure. A delegate is registered per ProductType
- * and will be asked to {@link #bookArticle(OrganisationLegalEntity, User, Invoice, Article, BookMoneyTransfer, Set)}
+ * and will be asked to {@link #bookArticle(OrganisationLegalEntity, User, Invoice, Article, BookInvoiceMoneyTransfer, Set)}
  * when an invoice is booked.
  *
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
@@ -213,7 +213,7 @@ public abstract class LocalAccountantDelegate implements Serializable {
 	 * configuration to which accounts the money is to be booked.
 	 *
 	 * Subclasses may delegate the work here to
-	 * {@link #bookProductTypeParts(OrganisationLegalEntity, User, LinkedList, int, BookMoneyTransfer, Set)}
+	 * {@link #bookProductTypeParts(OrganisationLegalEntity, User, LinkedList, int, BookInvoiceMoneyTransfer, Set)}
 	 * and only provide new dimensions.
 	 *
 	 * @param mandator The organisation the LocalAccountant books for.
@@ -228,7 +228,7 @@ public abstract class LocalAccountantDelegate implements Serializable {
 			User user,
 			Invoice invoice,
 			Article article,
-			BookMoneyTransfer container,
+			BookInvoiceMoneyTransfer container,
 			Set<Anchor> involvedAnchors
 		);
 
@@ -240,10 +240,10 @@ public abstract class LocalAccountantDelegate implements Serializable {
 	 * @param mandator The mandator.
 	 * @param user The user that initiated the book.
 	 * @param invoice The invoice to book articles for.
-	 * @param bookTransfer The container {@link BookMoneyTransfer}
+	 * @param bookTransfer The container {@link BookInvoiceMoneyTransfer}
 	 * @param involvedAnchors A set of {@link Anchor} that should contain all involved ones when the book is finished.
 	 */
-	public void preBookArticles(OrganisationLegalEntity mandator, User user, Invoice invoice, BookMoneyTransfer bookTransfer, Set<Anchor> involvedAnchors) {}
+	public void preBookArticles(OrganisationLegalEntity mandator, User user, Invoice invoice, BookInvoiceMoneyTransfer bookTransfer, Set<Anchor> involvedAnchors) {}
 
 	/**
 	 * Called by LocalAccountant before all articles of an invoice are booked.
@@ -252,10 +252,10 @@ public abstract class LocalAccountantDelegate implements Serializable {
 	 * @param mandator The mandator.
 	 * @param user The user that initiated the book.
 	 * @param invoice The invoice to book articles for.
-	 * @param bookTransfer The container {@link BookMoneyTransfer}
+	 * @param bookTransfer The container {@link BookInvoiceMoneyTransfer}
 	 * @param involvedAnchors A set of {@link Anchor} that contains all involved ones now that the book is finished.
 	 */
-	public void postBookArticles(OrganisationLegalEntity mandator, User user, Invoice invoice, BookMoneyTransfer bookTransfer, Set<Anchor> involvedAnchors) {}
+	public void postBookArticles(OrganisationLegalEntity mandator, User user, Invoice invoice, BookInvoiceMoneyTransfer bookTransfer, Set<Anchor> involvedAnchors) {}
 
 
 	/**
@@ -273,7 +273,7 @@ public abstract class LocalAccountantDelegate implements Serializable {
 			User user,
 			LinkedList<ArticlePrice> articlePriceStack,
 			int delegationLevel,
-			BookMoneyTransfer container,
+			BookInvoiceMoneyTransfer container,
 			Set<Anchor> involvedAnchors
 		);
 

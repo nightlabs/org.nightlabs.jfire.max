@@ -55,7 +55,7 @@ public class SummaryMoneyTransfer extends MoneyTransfer
 	protected SummaryMoneyTransfer() { }
 
 	/**
-	 * BookMoneyTransfer associated to only one Invoice, used for invoice-bookings.
+	 * BookInvoiceMoneyTransfer associated to only one Invoice, used for invoice-bookings.
 	 * 
 	 * @param transferRegistry
 	 * @param container

@@ -87,8 +87,8 @@ public class PartnerAccountant extends Accountant
 
 	@Override
 	public void bookTransfer(User user, LegalEntity mandator, MoneyTransfer transfer, Set<Anchor> involvedAnchors) {
-		if (transfer instanceof BookMoneyTransfer)
-			handleBookMoneyTransfer(mandator, (BookMoneyTransfer)transfer, user, involvedAnchors);
+		if (transfer instanceof BookInvoiceMoneyTransfer)
+			handleBookMoneyTransfer(mandator, (BookInvoiceMoneyTransfer)transfer, user, involvedAnchors);
 		else if (transfer instanceof PayMoneyTransfer)
 			handlePayMoneyTransfer(user, mandator, (PayMoneyTransfer)transfer, involvedAnchors);
 		// Do something on simple MoneyTransfers? - No, I don't think so! Marco ;-)
@@ -96,9 +96,9 @@ public class PartnerAccountant extends Accountant
 
 	/**
 	 * Handles MoneyTransfers between LegalEntities by creating one IntraLegalMoneyTransfer for the
-	 * given BookMoneyTransfer.
+	 * given BookInvoiceMoneyTransfer.
 	 */
-	protected void handleBookMoneyTransfer(LegalEntity mandator, BookMoneyTransfer transfer, User user, Set<Anchor> involvedAnchors)
+	protected void handleBookMoneyTransfer(LegalEntity mandator, BookInvoiceMoneyTransfer transfer, User user, Set<Anchor> involvedAnchors)
 	{
 		boolean mandatorIsVendor = transfer.getInvoice().getVendor().getPrimaryKey().equals(mandator.getPrimaryKey());
 		boolean mandatorIsCustomer = !mandatorIsVendor;

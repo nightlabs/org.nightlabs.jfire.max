@@ -40,7 +40,7 @@ import javax.jdo.annotations.InheritanceStrategy;
 import javax.jdo.annotations.Inheritance;
 
 /**
- * A {@link BookMoneyTransfer} is created when an {@link Invoice} is booked. 
+ * A {@link BookInvoiceMoneyTransfer} is created when an {@link Invoice} is booked. 
  * It is the container transfer of all sub-transfers made for this booking process. 
  * <p>
  * The transfer happens between two LegalEntities. This means, 
@@ -52,26 +52,26 @@ import javax.jdo.annotations.Inheritance;
  *		identity-type="application"
  *		persistence-capable-superclass="org.nightlabs.jfire.accounting.InvoiceMoneyTransfer"
  *		detachable="true"
- *		table="JFireTrade_BookMoneyTransfer"
+ *		table="JFireTrade_BookInvoiceMoneyTransfer"
  *
  * @jdo.inheritance strategy="new-table"
  */
 @PersistenceCapable(
 	identityType=IdentityType.APPLICATION,
 	detachable="true",
-	table="JFireTrade_BookMoneyTransfer")
+	table="JFireTrade_BookInvoiceMoneyTransfer")
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
-public class BookMoneyTransfer extends InvoiceMoneyTransfer
+public class BookInvoiceMoneyTransfer extends InvoiceMoneyTransfer
 {
 	private static final long serialVersionUID = 1L;
 
-	private static final Logger logger = Logger.getLogger(BookMoneyTransfer.class);
+	private static final Logger logger = Logger.getLogger(BookInvoiceMoneyTransfer.class);
 
 	/**
 	 * @deprecated Only of JDO!
 	 */
 	@Deprecated
-	protected BookMoneyTransfer() { }
+	protected BookInvoiceMoneyTransfer() { }
 
 	private static long getAmountAbsoluteValue(Invoice invoice)
 	{
@@ -82,14 +82,14 @@ public class BookMoneyTransfer extends InvoiceMoneyTransfer
 	}
 
 	/**
-	 * BookMoneyTransfer associated to only one Invoice, as it is used for invoice-bookings.
+	 * BookInvoiceMoneyTransfer associated to only one Invoice, as it is used for invoice-bookings.
 	 *
 	 * @param initiator The user that initiated this transfer.
 	 * @param from The from-anchor for the new transfer.
 	 * @param to The to-anchor for the new transfer.
 	 * @param invoice The {@link Invoice} the new transfer should be 
 	 */
-	public BookMoneyTransfer(User initiator, Anchor from, Anchor to, Invoice invoice)
+	public BookInvoiceMoneyTransfer(User initiator, Anchor from, Anchor to, Invoice invoice)
 	{
 		super(BOOK_TYPE_BOOK, initiator, from, to, invoice, getAmountAbsoluteValue(invoice));
 

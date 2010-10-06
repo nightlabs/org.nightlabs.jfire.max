@@ -1143,7 +1143,7 @@ implements StoreCallback
 //		if (to.getAccountant() == null)
 //			to.setAccountant(getPartnerAccountant());
 //
-//		// create the BookMoneyTransfer with positive amount but in the right direction
+//		// create the BookInvoiceMoneyTransfer with positive amount but in the right direction
 //		if (deliveryNote.getPrice().getAmount() < 0) {
 //			LegalEntity tmp = from;
 //			from = to;

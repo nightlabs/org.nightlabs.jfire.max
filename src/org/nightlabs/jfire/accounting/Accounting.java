@@ -59,7 +59,7 @@ import org.apache.log4j.Logger;
 import org.jbpm.JbpmContext;
 import org.jbpm.graph.exe.ProcessInstance;
 import org.nightlabs.i18n.I18nText;
-import org.nightlabs.jfire.accounting.book.BookMoneyTransfer;
+import org.nightlabs.jfire.accounting.book.BookInvoiceMoneyTransfer;
 import org.nightlabs.jfire.accounting.book.LocalAccountant;
 import org.nightlabs.jfire.accounting.book.PartnerAccountant;
 import org.nightlabs.jfire.accounting.book.uncollectable.UncollectableInvoiceBooker;
@@ -522,14 +522,14 @@ implements StoreCallback
 		if (to.getAccountant() == null)
 			to.setAccountant(getPartnerAccountant());
 
-		// create the BookMoneyTransfer with positive amount but in the right direction
+		// create the BookInvoiceMoneyTransfer with positive amount but in the right direction
 		if (invoice.getPrice().getAmount() < 0) {
 			LegalEntity tmp = from;
 			from = to;
 			to = tmp;
 		}
 
-		BookMoneyTransfer bookMoneyTransfer = new BookMoneyTransfer(
+		BookInvoiceMoneyTransfer bookMoneyTransfer = new BookInvoiceMoneyTransfer(
 				user,
 				from,
 				to,

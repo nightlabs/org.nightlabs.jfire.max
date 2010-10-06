@@ -47,7 +47,7 @@ import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.accounting.InvoiceMoneyTransfer;
 import org.nightlabs.jfire.accounting.PriceFragment;
 import org.nightlabs.jfire.accounting.PriceFragmentType;
-import org.nightlabs.jfire.accounting.book.BookMoneyTransfer;
+import org.nightlabs.jfire.accounting.book.BookInvoiceMoneyTransfer;
 import org.nightlabs.jfire.accounting.book.LocalAccountantDelegate;
 import org.nightlabs.jfire.accounting.id.PriceFragmentTypeID;
 import org.nightlabs.jfire.security.User;
@@ -618,11 +618,11 @@ public class MappingBasedAccountantDelegate
 	/**
 	 * @see org.nightlabs.jfire.accounting.book.LocalAccountantDelegate#preBookArticles(org.nightlabs.jfire.trade.OrganisationLegalEntity,
 	 *      org.nightlabs.jfire.security.User,
-	 *      org.nightlabs.jfire.accounting.Invoice, BookMoneyTransfer, Map)
+	 *      org.nightlabs.jfire.accounting.Invoice, BookInvoiceMoneyTransfer, Map)
 	 */
 	@Override
 	public void preBookArticles(OrganisationLegalEntity mandator, User user,
-			Invoice invoice, BookMoneyTransfer bookTransfer,
+			Invoice invoice, BookInvoiceMoneyTransfer bookTransfer,
 			Set<Anchor> involvedAnchors)
 	{
 		if (resolvedPTypeMappings.containsKey(invoice))
@@ -633,11 +633,11 @@ public class MappingBasedAccountantDelegate
 	/**
 	 * @see org.nightlabs.jfire.accounting.book.LocalAccountantDelegate#postBookArticles(org.nightlabs.jfire.trade.OrganisationLegalEntity,
 	 *      org.nightlabs.jfire.security.User,
-	 *      org.nightlabs.jfire.accounting.Invoice, BookMoneyTransfer, Map)
+	 *      org.nightlabs.jfire.accounting.Invoice, BookInvoiceMoneyTransfer, Map)
 	 */
 	@Override
 	public void postBookArticles(OrganisationLegalEntity mandator, User user,
-			Invoice invoice, BookMoneyTransfer bookTransfer,
+			Invoice invoice, BookInvoiceMoneyTransfer bookTransfer,
 			Set<Anchor> involvedAnchors)
 	{
 		if (resolvedPTypeMappings.containsKey(invoice))
@@ -649,11 +649,11 @@ public class MappingBasedAccountantDelegate
 	 *      org.nightlabs.jfire.security.User,
 	 *      org.nightlabs.jfire.accounting.Invoice,
 	 *      org.nightlabs.jfire.trade.ArticlePrice,
-	 *      org.nightlabs.jfire.accounting.book.BookMoneyTransfer, Map)
+	 *      org.nightlabs.jfire.accounting.book.BookInvoiceMoneyTransfer, Map)
 	 */
 	@Override
 	public void bookArticle(OrganisationLegalEntity mandator, User user,
-			Invoice invoice, Article article, BookMoneyTransfer container,
+			Invoice invoice, Article article, BookInvoiceMoneyTransfer container,
 			Set<Anchor> involvedAnchors)
 	{
 		Map<ResolvedMapKey, ResolvedMapEntry> resolvedMappings = resolvedPTypeMappings
@@ -688,7 +688,7 @@ public class MappingBasedAccountantDelegate
 	@Override
 	public void bookProductTypeParts(OrganisationLegalEntity mandator, User user,
 			LinkedList<ArticlePrice> articlePriceStack, int delegationLevel,
-			BookMoneyTransfer container, Set<Anchor> involvedAnchors)
+			BookInvoiceMoneyTransfer container, Set<Anchor> involvedAnchors)
 	{
 		ArticlePrice articlePrice = articlePriceStack.peek();
 		ProductTypeID pTypeID = (ProductTypeID) JDOHelper.getObjectId(articlePrice
@@ -710,7 +710,7 @@ public class MappingBasedAccountantDelegate
 			ProductType productType,
 			LinkedList<ArticlePrice> articlePriceStack,
 			Map<Anchor, Map<Anchor, Collection<BookInvoiceTransfer>>> bookInvoiceTransfers,
-			int delegationLevel, BookMoneyTransfer container,
+			int delegationLevel, BookInvoiceMoneyTransfer container,
 			Set<Anchor> involvedAnchors)
 	{
 		LocalAccountantDelegate delegate = productType.getProductTypeLocal().getLocalAccountantDelegate();
@@ -730,7 +730,7 @@ public class MappingBasedAccountantDelegate
 	/**
 	 * Tries to book all money concerning the given ProductType. It is intended to
 	 * be called from the implementation of
-	 * {@link #bookArticle(OrganisationLegalEntity, User, Invoice, Article, BookMoneyTransfer, Map)}
+	 * {@link #bookArticle(OrganisationLegalEntity, User, Invoice, Article, BookInvoiceMoneyTransfer, Map)}
 	 * with the top-level ArticlePrice in the articlePriceStack parameter.
 	 * 
 	 * Looks up the resolved mapping entries and decides on basis of the
@@ -740,7 +740,7 @@ public class MappingBasedAccountantDelegate
 	 * 
 	 * If no delegation is done this implementation of bookProductTypeParts will
 	 * call abstract
-	 * {@link #internalBookProductTypeParts(OrganisationLegalEntity, User, Map, LinkedList, ArticlePrice, ProductType, String, int, BookMoneyTransfer, Map)}
+	 * {@link #internalBookProductTypeParts(OrganisationLegalEntity, User, Map, LinkedList, ArticlePrice, ProductType, String, int, BookInvoiceMoneyTransfer, Map)}
 	 * which should do the job.
 	 * 
 	 * @param mandator
@@ -766,7 +766,7 @@ public class MappingBasedAccountantDelegate
 			Map<ResolvedMapKey, ResolvedMapEntry> resolvedMappings,
 			LinkedList<ArticlePrice> articlePriceStack,
 			Map<Anchor, Map<Anchor, Collection<BookInvoiceTransfer>>> bookInvoiceTransfers,
-			int delegationLevel, BookMoneyTransfer container,
+			int delegationLevel, BookInvoiceMoneyTransfer container,
 			Set<Anchor> involvedAnchors)
 	{
 		ArticlePrice articlePrice = articlePriceStack.peek();
@@ -791,7 +791,7 @@ public class MappingBasedAccountantDelegate
 
 	/**
 	 * Can be used as default implementation of
-	 * {@link #internalBookProductTypeParts(OrganisationLegalEntity, User, Map, LinkedList, ArticlePrice, ProductType, String, int, BookMoneyTransfer, Map)}.
+	 * {@link #internalBookProductTypeParts(OrganisationLegalEntity, User, Map, LinkedList, ArticlePrice, ProductType, String, int, BookInvoiceMoneyTransfer, Map)}.
 	 * Spans all possible dimension values and books the amount to the appropriate
 	 * Account based on the (Dimension)-Mappings in the resolvedMappings Map.
 	 */
@@ -803,7 +803,7 @@ public class MappingBasedAccountantDelegate
 			ArticlePrice articlePrice,
 			Map<Anchor, Map<Anchor, Collection<BookInvoiceTransfer>>> bookInvoiceTransfers,
 			ProductType productType, String packageType, int delegationLevel,
-			BookMoneyTransfer container, Set<Anchor> involvedAnchors)
+			BookInvoiceMoneyTransfer container, Set<Anchor> involvedAnchors)
 	{
 
 		logger.info("bookProductTypePartsByDimension for article with PType "
@@ -1265,7 +1265,7 @@ public class MappingBasedAccountantDelegate
 	protected void bookInvoiceTransfers(
 			User user,
 			Map<Anchor, Map<Anchor, Collection<BookInvoiceTransfer>>> bookInvoiceTransfers,
-			BookMoneyTransfer container, Set<Anchor> involvedAnchors)
+			BookInvoiceMoneyTransfer container, Set<Anchor> involvedAnchors)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		OrganisationLegalEntity mandator = Accounting.getAccounting(pm).getMandator();
@@ -1370,7 +1370,7 @@ public class MappingBasedAccountantDelegate
 			ArticlePrice articlePrice,
 			Map<Anchor, Map<Anchor, Collection<BookInvoiceTransfer>>> bookInvoiceTransfers,
 			ProductType productType, String packageType, int delegationLevel,
-			BookMoneyTransfer container, Set<Anchor> involvedAnchors)
+			BookInvoiceMoneyTransfer container, Set<Anchor> involvedAnchors)
 	{
 		internalBookProductTypePartsByDimension(mandator, user, resolvedMappings,
 				articlePriceStack, articlePrice, bookInvoiceTransfers, productType,
@@ -1401,7 +1401,7 @@ public class MappingBasedAccountantDelegate
 			LinkedList<ArticlePrice> articlePriceStack,
 			Map<String, String> dimensionValues, MoneyFlowMapping resolvedMapping,
 			Map<ResolvedMapKey, ResolvedMapEntry> resolvedMappings,
-			BookMoneyTransfer bookMoneyTransfer)
+			BookInvoiceMoneyTransfer bookMoneyTransfer)
 	{
 		// get the priceFragment of interest
 		String priceFragmentTypePK = dimensionValues.get(PriceFragmentDimension.MONEY_FLOW_DIMENSION_ID);
@@ -1438,7 +1438,7 @@ public class MappingBasedAccountantDelegate
 			LinkedList<ArticlePrice> articlePriceStack,
 			Map<String, String> dimensionValues, MoneyFlowMapping resolvedMapping,
 			Map<ResolvedMapKey, ResolvedMapEntry> resolvedMappings,
-			BookMoneyTransfer bookMoneyTransfer)
+			BookInvoiceMoneyTransfer bookMoneyTransfer)
 	{
 		// Get the PriceFragmentTypes that are defined for the given container
 		ArticlePrice price = articlePriceStack.getFirst();
@@ -1474,7 +1474,7 @@ public class MappingBasedAccountantDelegate
 			Map<String, String> dimensionValues,
 			MoneyFlowMapping resolvedMapping,
 			Map<ResolvedMapKey, ResolvedMapEntry> resolvedMappings,
-			boolean forContainer, BookMoneyTransfer bookMoneyTransfer
+			boolean forContainer, BookInvoiceMoneyTransfer bookMoneyTransfer
 		)
 	{
 		Collection<BookInvoiceTransfer> result = new ArrayList<BookInvoiceTransfer>();
@@ -1578,7 +1578,7 @@ public class MappingBasedAccountantDelegate
 			LinkedList<ArticlePrice> articlePriceStack,
 			Map<String, String> dimensionValues, MoneyFlowMapping resolvedMapping,
 			Map<ResolvedMapKey, ResolvedMapEntry> resolvedMappings,
-			boolean forContainer, BookMoneyTransfer bookMoneyTransfer)
+			boolean forContainer, BookInvoiceMoneyTransfer bookMoneyTransfer)
 	{
 		List<PriceFragmentType> priceFragmentTypes = new LinkedList<PriceFragmentType>();
 		priceFragmentTypes.add(priceFragmentType);
@@ -1682,7 +1682,7 @@ public class MappingBasedAccountantDelegate
 			List<PriceFragmentType> searchPriceFragmentTypes,
 			MoneyFlowMapping resolvedMapping,
 			Map<ResolvedMapKey, ResolvedMapEntry> resolvedMappings,
-			BookMoneyTransfer bookMoneyTransfer)
+			BookInvoiceMoneyTransfer bookMoneyTransfer)
 	{
 		String upperPackageType = getPackageType(upperArticlePrice);
 		for (PriceFragmentType searchPriceFragmentType : searchPriceFragmentTypes) {

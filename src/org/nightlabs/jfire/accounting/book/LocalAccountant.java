@@ -84,12 +84,12 @@ public class LocalAccountant extends Accountant
 
 	/**
 	 * Takes care of MoneyTransfers. This Accountant only handles
-	 * {@link BookMoneyTransfer}s and silently ignores all other {@link MoneyTransfer}s.
-	 * It will created sub-transfers with the given {@link BookMoneyTransfer} as container.
+	 * {@link BookInvoiceMoneyTransfer}s and silently ignores all other {@link MoneyTransfer}s.
+	 * It will created sub-transfers with the given {@link BookInvoiceMoneyTransfer} as container.
 	 * <p>
 	 * This method searches for the {@link LocalAccountantDelegate}s configured for the
 	 * {@link ProductType}s of the articles found in the {@link Invoice} referenced by the
-	 * given {@link BookMoneyTransfer} and delegates the work of creating the correct
+	 * given {@link BookInvoiceMoneyTransfer} and delegates the work of creating the correct
 	 * sub-transfers to the according {@link LocalAccountantDelegate} found.
 	 * </p>
 	 *
@@ -98,10 +98,10 @@ public class LocalAccountant extends Accountant
 	@Override
 	public void bookTransfer(User user, LegalEntity mandator, MoneyTransfer transfer, Set<Anchor> involvedAnchors) {
 		// An Accountant gets all bookings and has to decide himself what to do.
-		if (! (transfer instanceof BookMoneyTransfer))
+		if (! (transfer instanceof BookInvoiceMoneyTransfer))
 			return;
 
-		BookMoneyTransfer bookTransfer = (BookMoneyTransfer)transfer;
+		BookInvoiceMoneyTransfer bookTransfer = (BookInvoiceMoneyTransfer)transfer;
 		Invoice invoice = bookTransfer.getInvoice();
 
 		// find the delegates

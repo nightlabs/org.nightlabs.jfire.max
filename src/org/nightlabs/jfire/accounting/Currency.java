@@ -27,6 +27,10 @@
 package org.nightlabs.jfire.accounting;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.math.MathContext;
+import java.math.RoundingMode;
 
 import javax.jdo.annotations.Column;
 import javax.jdo.annotations.IdentityType;
@@ -94,7 +98,7 @@ implements Serializable, org.nightlabs.l10n.Currency
 
 	protected Currency() { }
 
-	public Currency(String currencyID, String currencySymbol, int decimalDigitCount) {
+	public Currency(final String currencyID, final String currencySymbol, final int decimalDigitCount) {
 		if (currencyID == null)
 			throw new IllegalArgumentException("currencyID must not be null!");
 
@@ -129,18 +133,23 @@ implements Serializable, org.nightlabs.l10n.Currency
 	/**
 	 * @param currencySymbol The currencySymbol to set.
 	 */
-	public void setCurrencySymbol(String currencySymbol)
+	public void setCurrencySymbol(final String currencySymbol)
 	{
 		this.currencySymbol = currencySymbol;
 	}
 
 	@Override
-	public boolean equals(Object obj)
+	public boolean equals(final Object obj)
 	{
 		if (obj == this) return true;
 		if (!(obj instanceof Currency)) return false;
-		Currency o = (Currency) obj;
+		final Currency o = (Currency) obj;
 		return Util.equals(o.currencyID, this.currencyID);
+	}
+
+	@Override
+	public String toString() {
+		return super.toString() + '[' + currencyID + ']';
 	}
 
 	@Override
@@ -149,30 +158,23 @@ implements Serializable, org.nightlabs.l10n.Currency
 		return Util.hashCode(currencyID);
 	}
 
-	/**
-	 * Returns the given amount in the double value of this currency.
-	 * <p>
-	 *   amount / 10^(decimalDigitCount)
-	 * <p>
-	 *
-	 * @param amount The amount to convert
-	 * @return the approximate value as double - there might be rounding differences.
-	 */
-	public double toDouble(long amount) {
-		return amount / Math.pow(10, getDecimalDigitCount());
+	@Override
+	public double toDouble(final long amount) {
+		return amount / pow10(getDecimalDigitCount());
 	}
 
-	/**
-	 * Convert the given amount to the long value of this currency.
-	 * <p>
-	 *   amount * 10^(decimalDigitCount)
-	 * <p>
-	 *
-	 * @param amount The amount to convert
-	 * @return the approximate value as long - there might be rounding differences.
-	 */
-	public long toLong(double amount) {
-		return Math.round(amount * Math.pow(10, getDecimalDigitCount()));
+	private static int pow10(final int decimalDigitCount)
+	{
+		final BigInteger pow10 = BigInteger.valueOf(10L).pow(decimalDigitCount);
+		if (pow10.compareTo(BigInteger.valueOf(Integer.MAX_VALUE)) > 0)
+			throw new IllegalArgumentException("Result too big; it exceeds the integer range!!!");
+
+		return pow10.intValue();
+	}
+
+	@Override
+	public long toLong(final double amount) {
+		return Math.round(amount * pow10(getDecimalDigitCount()));
 		// 2010-02-03: Switched from (long)(...) cast to Math.round(...), because the following code
 		// otherwise produces a wrong result (4079 instead of 4080). Marco.
 		//				public static void main(String[] args) {
@@ -188,5 +190,17 @@ implements Serializable, org.nightlabs.l10n.Currency
 		//					l = (long) (d * 100);
 		//					System.out.println(l);
 		//				}
+	}
+
+	@Override
+	public BigDecimal toBigDecimal(final long amount)
+	{
+		return new BigDecimal(amount).divide(BigDecimal.valueOf(pow10(getDecimalDigitCount())), getDecimalDigitCount(), RoundingMode.HALF_EVEN);
+	}
+
+	@Override
+	public long toLong(final BigDecimal amount)
+	{
+		return amount.multiply(BigDecimal.valueOf(pow10(getDecimalDigitCount()))).round(new MathContext(0, RoundingMode.HALF_EVEN)).longValueExact();
 	}
 }

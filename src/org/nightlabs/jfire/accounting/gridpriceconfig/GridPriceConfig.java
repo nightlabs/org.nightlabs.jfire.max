@@ -26,6 +26,7 @@
 
 package org.nightlabs.jfire.accounting.gridpriceconfig;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -36,6 +37,16 @@ import java.util.Set;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
 
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.PriceFragmentType;
@@ -44,21 +55,11 @@ import org.nightlabs.jfire.accounting.TariffMapping;
 import org.nightlabs.jfire.accounting.id.TariffID;
 import org.nightlabs.jfire.accounting.priceconfig.IPriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.PriceConfig;
+import org.nightlabs.jfire.accounting.priceconfig.id.PriceConfigID;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.CustomerGroup;
 import org.nightlabs.jfire.trade.CustomerGroupMapping;
 import org.nightlabs.jfire.trade.id.CustomerGroupID;
-
-import javax.jdo.annotations.Join;
-import javax.jdo.annotations.FetchGroups;
-import javax.jdo.annotations.NullValue;
-import javax.jdo.annotations.Inheritance;
-import javax.jdo.annotations.FetchGroup;
-import javax.jdo.annotations.PersistenceModifier;
-import javax.jdo.annotations.Persistent;
-import javax.jdo.annotations.InheritanceStrategy;
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.IdentityType;
 
 /**
  * This implementation of <tt>PriceConfig</tt> manages cells
@@ -152,13 +153,9 @@ public abstract class GridPriceConfig extends PriceConfig implements IGridPriceC
 	@Deprecated
 	protected GridPriceConfig() { }
 
-	/**
-	 * @param organisationID
-	 * @param priceConfigID
-	 */
-	public GridPriceConfig(String organisationID, String priceConfigID)
+	public GridPriceConfig(final PriceConfigID priceConfigID)
 	{
-		super(organisationID, priceConfigID);
+		super(priceConfigID);
 	}
 
 	@Override
@@ -174,7 +171,7 @@ public abstract class GridPriceConfig extends PriceConfig implements IGridPriceC
 	}
 
 	@Override
-	public boolean addCustomerGroup(CustomerGroup customerGroup)
+	public boolean addCustomerGroup(final CustomerGroup customerGroup)
 	{
 		if (customerGroups.containsKey(customerGroup.getPrimaryKey()))
 			return false;
@@ -184,28 +181,34 @@ public abstract class GridPriceConfig extends PriceConfig implements IGridPriceC
 	}
 
 	@Override
-	public CustomerGroup getCustomerGroup(CustomerGroupID customerGroupID, boolean throwExceptionIfNotExistent)
+	public CustomerGroup getCustomerGroup(final CustomerGroupID customerGroupID, final boolean throwExceptionIfNotExistent)
 	{
 		return getCustomerGroup(customerGroupID.organisationID, customerGroupID.customerGroupID, throwExceptionIfNotExistent);
 	}
 
 	@Override
-	public CustomerGroup getCustomerGroup(String organisationID, String customerGroupID, boolean throwExceptionIfNotExistent)
+	public CustomerGroup getCustomerGroup(final String organisationID, final String customerGroupID, final boolean throwExceptionIfNotExistent)
 	{
-		CustomerGroup customerGroup = customerGroups.get(CustomerGroup.getPrimaryKey(organisationID, customerGroupID));
+		final CustomerGroup customerGroup = customerGroups.get(CustomerGroup.getPrimaryKey(organisationID, customerGroupID));
 		if (customerGroup == null && throwExceptionIfNotExistent)
 			throw new IllegalArgumentException("No CustomerGroup registered with organisationID=\""+organisationID+"\" customerGroupID=\""+customerGroupID+"\"!");
 		return customerGroup;
 	}
 
 	@Override
-	public boolean containsCustomerGroup(CustomerGroup customerGroup)
+	public void clearCustomerGroups() {
+		for (final CustomerGroup customerGroup : new ArrayList<CustomerGroup>(customerGroups.values()))
+			removeCustomerGroup(customerGroup.getOrganisationID(), customerGroup.getCustomerGroupID());
+	}
+
+	@Override
+	public boolean containsCustomerGroup(final CustomerGroup customerGroup)
 	{
 		return customerGroups.containsKey(customerGroup.getPrimaryKey());
 	}
 
 	@Override
-	public CustomerGroup removeCustomerGroup(String organisationID, String customerGroupID)
+	public CustomerGroup removeCustomerGroup(final String organisationID, final String customerGroupID)
 	{
 		return customerGroups.remove(
 				CustomerGroup.getPrimaryKey(organisationID, customerGroupID));
@@ -218,7 +221,7 @@ public abstract class GridPriceConfig extends PriceConfig implements IGridPriceC
 	}
 
 	@Override
-	public boolean addTariff(Tariff tariff)
+	public boolean addTariff(final Tariff tariff)
 	{
 		if (tariffs.containsKey(tariff.getPrimaryKey()))
 			return false;
@@ -228,15 +231,15 @@ public abstract class GridPriceConfig extends PriceConfig implements IGridPriceC
 	}
 
 	@Override
-	public Tariff getTariff(TariffID tariffID, boolean throwExceptionIfNotExistent)
+	public Tariff getTariff(final TariffID tariffID, final boolean throwExceptionIfNotExistent)
 	{
 		return getTariff(tariffID.organisationID, tariffID.tariffID, throwExceptionIfNotExistent);
 	}
 
 	@Override
-	public Tariff getTariff(String organisationID, String tariffID, boolean throwExceptionIfNotExistent)
+	public Tariff getTariff(final String organisationID, final String tariffID, final boolean throwExceptionIfNotExistent)
 	{
-		Tariff tariff = tariffs.get(Tariff.getPrimaryKey(organisationID, tariffID));
+		final Tariff tariff = tariffs.get(Tariff.getPrimaryKey(organisationID, tariffID));
 		if (tariff == null && throwExceptionIfNotExistent)
 			throw new IllegalArgumentException("There is no Tariff registered with organisationID=\""+organisationID+"\" tariffID=\""+tariffID+"\"!");
 
@@ -244,19 +247,19 @@ public abstract class GridPriceConfig extends PriceConfig implements IGridPriceC
 	}
 
 	@Override
-	public boolean containsTariff(Tariff tariff)
+	public boolean containsTariff(final Tariff tariff)
 	{
 		return tariffs.containsKey(tariff.getPrimaryKey());
 	}
 
 	@Override
-	public Tariff removeTariff(String organisationID, String tariffID)
+	public Tariff removeTariff(final String organisationID, final String tariffID)
 	{
 		return tariffs.remove(Tariff.getPrimaryKey(organisationID, tariffID));
 	}
 
 	@Override
-	public void removeTariff(Tariff tariff)
+	public void removeTariff(final Tariff tariff)
 	{
 		tariffs.remove(Tariff.getPrimaryKey(tariff.getOrganisationID(), tariff.getTariffID()));
 	}
@@ -264,17 +267,18 @@ public abstract class GridPriceConfig extends PriceConfig implements IGridPriceC
 	@Override
 	public void clearTariffs()
 	{
-		tariffs.clear();
+		for (final Tariff tariff : new ArrayList<Tariff>(tariffs.values()))
+			removeTariff(tariff);
 	}
 
 	@Override
-	public void adoptParameters(IPriceConfig other)
+	public void adoptParameters(final IPriceConfig other)
 	{
 		adoptParameters(other, false);
 	}
 
 	@Override
-	public void adoptParameters(IPriceConfig _other, boolean onlyAdd)
+	public void adoptParameters(final IPriceConfig _other, final boolean onlyAdd)
 	{
 		if (_other == null)
 			throw new IllegalArgumentException("Param 'IPriceConfig other' must not be null!");
@@ -282,84 +286,84 @@ public abstract class GridPriceConfig extends PriceConfig implements IGridPriceC
 		if (!(_other instanceof GridPriceConfig))
 			throw new IllegalArgumentException("other is an instance of \""+_other.getClass().getName()+"\" but must be GridPriceConfig!");
 
-		GridPriceConfig other = (GridPriceConfig)_other;
+		final GridPriceConfig other = (GridPriceConfig)_other;
 
 		// assimilate CustomerGroup s
 		if (!onlyAdd) {
-			Set<CustomerGroup> customerGroupsToRemove = onlyAdd ? null : new HashSet<CustomerGroup>();
-			for (Iterator<CustomerGroup> it = this.getCustomerGroups().iterator(); it.hasNext(); ) {
-				CustomerGroup cg = it.next();
+			final Set<CustomerGroup> customerGroupsToRemove = onlyAdd ? null : new HashSet<CustomerGroup>();
+			for (final Iterator<CustomerGroup> it = this.getCustomerGroups().iterator(); it.hasNext(); ) {
+				final CustomerGroup cg = it.next();
 				if (!onlyAdd && !other.containsCustomerGroup(cg))
 					customerGroupsToRemove.add(cg);
 			}
 //		if (!onlyAdd) {
-			for (Iterator<CustomerGroup> it = customerGroupsToRemove.iterator(); it.hasNext(); ) {
-				CustomerGroup cg = it.next();
+			for (final Iterator<CustomerGroup> it = customerGroupsToRemove.iterator(); it.hasNext(); ) {
+				final CustomerGroup cg = it.next();
 				this.removeCustomerGroup(cg.getOrganisationID(), cg.getCustomerGroupID());
 			}
 		}
-		for (Iterator<CustomerGroup> it = other.getCustomerGroups().iterator(); it.hasNext(); )
+		for (final Iterator<CustomerGroup> it = other.getCustomerGroups().iterator(); it.hasNext(); )
 			this.addCustomerGroup(it.next());
 
 
 		// assimilate Tariff s
 		if (!onlyAdd) {
-			Set<Tariff> tariffsToRemove = onlyAdd ? null : new HashSet<Tariff>();
-			for (Iterator<Tariff> it = this.getTariffs().iterator(); it.hasNext(); ) {
-				Tariff t = it.next();
+			final Set<Tariff> tariffsToRemove = onlyAdd ? null : new HashSet<Tariff>();
+			for (final Iterator<Tariff> it = this.getTariffs().iterator(); it.hasNext(); ) {
+				final Tariff t = it.next();
 				if (!onlyAdd && !other.containsTariff(t))
 					tariffsToRemove.add(t);
 			}
 //			if (!onlyAdd) {
-			for (Iterator<Tariff> it = tariffsToRemove.iterator(); it.hasNext(); ) {
-				Tariff t = it.next();
+			for (final Iterator<Tariff> it = tariffsToRemove.iterator(); it.hasNext(); ) {
+				final Tariff t = it.next();
 				this.removeTariff(t.getOrganisationID(), t.getTariffID());
 			}
 		}
-		for (Iterator<Tariff> it = other.getTariffs().iterator(); it.hasNext(); )
+		for (final Iterator<Tariff> it = other.getTariffs().iterator(); it.hasNext(); )
 			this.addTariff(it.next());
 
 
 		// assimilate Currency s
 		if (!onlyAdd) {
-			Set<Currency> currenciesToRemove = onlyAdd ? null : new HashSet<Currency>();
-			for (Iterator<Currency> it = this.getCurrencies().iterator(); it.hasNext(); ) {
-				Currency c = it.next();
+			final Set<Currency> currenciesToRemove = onlyAdd ? null : new HashSet<Currency>();
+			for (final Iterator<Currency> it = this.getCurrencies().iterator(); it.hasNext(); ) {
+				final Currency c = it.next();
 				if (!onlyAdd && !other.containsCurrency(c))
 					currenciesToRemove.add(c);
 			}
 //			if (!onlyAdd) {
-			for (Iterator<Currency> it = currenciesToRemove.iterator(); it.hasNext(); ) {
-				Currency c = it.next();
+			for (final Iterator<Currency> it = currenciesToRemove.iterator(); it.hasNext(); ) {
+				final Currency c = it.next();
 				this.removeCurrency(c.getCurrencyID());
 			}
 		}
-		for (Iterator<Currency> it = other.getCurrencies().iterator(); it.hasNext(); )
+		for (final Iterator<Currency> it = other.getCurrencies().iterator(); it.hasNext(); )
 			this.addCurrency(it.next());
 
 
 		// assimilate PriceFragmenType s
 		if (!onlyAdd) {
-			Set<PriceFragmentType> priceFragmenTypesToRemove = onlyAdd ? null : new HashSet<PriceFragmentType>();
-			for (Iterator<PriceFragmentType> it = this.getPriceFragmentTypes().iterator(); it.hasNext(); ) {
-				PriceFragmentType pft = it.next();
+			final Set<PriceFragmentType> priceFragmenTypesToRemove = onlyAdd ? null : new HashSet<PriceFragmentType>();
+			for (final Iterator<PriceFragmentType> it = this.getPriceFragmentTypes().iterator(); it.hasNext(); ) {
+				final PriceFragmentType pft = it.next();
 				if (!onlyAdd && !other.containsPriceFragmentType(pft))
 					priceFragmenTypesToRemove.add(pft);
 			}
 //			if (!onlyAdd) {
-			for (Iterator<PriceFragmentType> it = priceFragmenTypesToRemove.iterator(); it.hasNext(); ) {
-				PriceFragmentType pft = it.next();
+			for (final Iterator<PriceFragmentType> it = priceFragmenTypesToRemove.iterator(); it.hasNext(); ) {
+				final PriceFragmentType pft = it.next();
 				this.removePriceFragmentType(pft.getOrganisationID(), pft.getPriceFragmentTypeID());
 			}
 		}
-		for (Iterator<PriceFragmentType> it = other.getPriceFragmentTypes().iterator(); it.hasNext(); )
+		for (final Iterator<PriceFragmentType> it = other.getPriceFragmentTypes().iterator(); it.hasNext(); )
 			this.addPriceFragmentType(it.next());
 
 	}
 
 	protected PersistenceManager getPersistenceManager()
 	{
-		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
+		final PersistenceManager pm = JDOHelper.getPersistenceManager(this);
 		if (pm == null)
 			throw new IllegalStateException("This instance of StablePriceConfig is currently not persistent and attached to the datastore!");
 		return pm;
@@ -367,16 +371,16 @@ public abstract class GridPriceConfig extends PriceConfig implements IGridPriceC
 
 //	public abstract PriceCell getPriceCell(PriceCoordinate priceCoordinate, boolean throwExceptionIfNotExistent);
 
-	protected Tariff getTariff(Article article)
+	protected Tariff getTariff(final Article article)
 	{
 		if (this.getOrganisationID().equals(article.getOrganisationID()))
 			return article.getTariff();
 		else {
-			PersistenceManager pm = getPersistenceManager();
+			final PersistenceManager pm = getPersistenceManager();
 
-			TariffID localTariffID = (TariffID) JDOHelper.getObjectId(article.getTariff());
-			String partnerTariffOrganisationID = this.getOrganisationID();
-			TariffMapping tariffMapping = TariffMapping.getTariffMappingForLocalTariffAndPartner(pm, localTariffID, partnerTariffOrganisationID);
+			final TariffID localTariffID = (TariffID) JDOHelper.getObjectId(article.getTariff());
+			final String partnerTariffOrganisationID = this.getOrganisationID();
+			final TariffMapping tariffMapping = TariffMapping.getTariffMappingForLocalTariffAndPartner(pm, localTariffID, partnerTariffOrganisationID);
 
 			if (tariffMapping == null)
 				throw new IllegalStateException("Could not find TariffMapping for local Tariff \"" + localTariffID + "\" and partnerOrganisation \"" + partnerTariffOrganisationID + "\"!");
@@ -385,16 +389,16 @@ public abstract class GridPriceConfig extends PriceConfig implements IGridPriceC
 		}
 	}
 
-	protected CustomerGroup getCustomerGroup(Article article)
+	protected CustomerGroup getCustomerGroup(final Article article)
 	{
 		if (this.getOrganisationID().equals(article.getOrganisationID()))
 			return article.getOffer().getOrder().getCustomerGroup();
 		else {
-			PersistenceManager pm = getPersistenceManager();
+			final PersistenceManager pm = getPersistenceManager();
 
-			CustomerGroupID localCustomerGroupID = (CustomerGroupID) JDOHelper.getObjectId(article.getOffer().getOrder().getCustomerGroup());
-			String partnerCustomerGroupOrganisationID = this.getOrganisationID();
-			CustomerGroupMapping customerGroupMapping = CustomerGroupMapping.getCustomerGroupMappingForLocalCustomerGroupAndPartner(
+			final CustomerGroupID localCustomerGroupID = (CustomerGroupID) JDOHelper.getObjectId(article.getOffer().getOrder().getCustomerGroup());
+			final String partnerCustomerGroupOrganisationID = this.getOrganisationID();
+			final CustomerGroupMapping customerGroupMapping = CustomerGroupMapping.getCustomerGroupMappingForLocalCustomerGroupAndPartner(
 					pm, localCustomerGroupID, partnerCustomerGroupOrganisationID);
 
 			if (customerGroupMapping == null)

@@ -28,185 +28,148 @@ package org.nightlabs.jfire.accounting;
 
 import java.io.Serializable;
 
-import javax.jdo.JDODetachedFieldAccessException;
-import javax.jdo.JDOHelper;
 import javax.jdo.annotations.Column;
+import javax.jdo.annotations.Discriminator;
+import javax.jdo.annotations.DiscriminatorStrategy;
 import javax.jdo.annotations.FetchGroup;
 import javax.jdo.annotations.FetchGroups;
 import javax.jdo.annotations.IdentityType;
 import javax.jdo.annotations.Inheritance;
 import javax.jdo.annotations.InheritanceStrategy;
 import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.PersistenceModifier;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.listener.AttachCallback;
+import javax.jdo.listener.DetachCallback;
 
 import org.nightlabs.jdo.ObjectIDUtil;
+import org.nightlabs.jfire.accounting.gridpriceconfig.GridPriceConfig;
 import org.nightlabs.jfire.accounting.id.TariffID;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
+import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.util.Util;
 
 /**
- * TODO Shall I really put this class into JFireTrade? Or is it Ticketing specific?
- *			Does it help me here or does it make things complicated?
- *			To have it here makes sense, if I define directly in CustomerGroup which Tariffs
- *			they're allowed to sell. Or should I better use our Authority based ACL to manage
- *			Tariffs? Or should a CustomerGroup automatically create an Authority? That seems to
- *			make sense. We wanted to make Authorities markable "internal" and then use them for
- *			such purposes...
- *
- * @author Marco Schulze - marco at nightlabs dot de
- *
- * @jdo.persistence-capable
- *		identity-type="application"
- *		objectid-class="org.nightlabs.jfire.accounting.id.TariffID"
- *		detachable="true"
- *		table="JFireTrade_Tariff"
- *
- * @jdo.inheritance strategy = "new-table"
- *
- * @jdo.create-objectid-class
- *		field-order="organisationID, tariffID"
- *		include-body="id/TariffID.body.inc"
- *
- * @jdo.fetch-group name="Tariff.name" fields="name"
- * @jdo.fetch-group name="Tariff.this" fetch-groups="default" fields="name"
- *
- * @jdo.fetch-group name="FetchGroupsTrade.articleInOrderEditor" fields="name"
- * @jdo.fetch-group name="FetchGroupsTrade.articleInOfferEditor" fields="name"
- * @jdo.fetch-group name="FetchGroupsTrade.articleInInvoiceEditor" fields="name"
- * @jdo.fetch-group name="FetchGroupsTrade.articleInDeliveryNoteEditor" fields="name"
- *
- * @jdo.fetch-group name="FetchGroupsPriceConfig.edit" fields="name"
- *
- * @jdo.fetch-group name="FetchGroupsEntityUserSet.replicateToReseller" fields="name"
- *
- * @jdo.query
- *		name="getTariffByName"
- *		query="SELECT
- *			WHERE
- *				this.name.names.get(paramLanguageID)==paramName
- *		PARAMETERS String paramLanguageID, String paramName
- *		import java.lang.String;"
+ * <p>
+ * A tariff describes a situation in which a certain price is applicable to a certain product.
+ * What exactly a tariff means is highly use-case-specific. For example, when selling an admission
+ * ticket, tariffs might be "Normal price", "Student" and "Senior citizen". In another context,
+ * you might use tariffs to differentiate between VIPs and normal customers.
+ * </p>
+ * <p>
+ * Being a means to assign multiple prices to the same {@link ProductType}, a {@link Tariff}
+ * is used for example in the {@link GridPriceConfig} representing one of the grid's dimensions.
+ * </p>
+ * <p>
+ * You can either instantiate {@link Tariff} directly or declare a specific sub-class containing
+ * additional use-case-specific data. Note, that some methods will not list instances
+ * of sub-classes as they don't know how to handle them.
+ * </p>
+ */
+ /* <p>
+ * Tariffs can either be visible and usable globally or in a use-case-specific {@link #getScope() scope}.
+ * </p>
  */
 @PersistenceCapable(
-	objectIdClass=TariffID.class,
-	identityType=IdentityType.APPLICATION,
-	detachable="true",
-	table="JFireTrade_Tariff")
+		objectIdClass=TariffID.class,
+		identityType=IdentityType.APPLICATION,
+		detachable="true",
+		table="JFireTrade_Tariff"
+)
 @FetchGroups({
 	@FetchGroup(
-		name=Tariff.FETCH_GROUP_NAME,
-		members=@Persistent(name="name")),
+			name=Tariff.FETCH_GROUP_NAME,
+			members=@Persistent(name="name")
+	),
 	@FetchGroup(
-		fetchGroups={"default"},
-		name=Tariff.FETCH_GROUP_THIS_TARIFF,
-		members=@Persistent(name="name")),
+			name="FetchGroupsTrade.articleInOrderEditor",
+			members=@Persistent(name="name")
+	),
 	@FetchGroup(
-		name="FetchGroupsTrade.articleInOrderEditor",
-		members=@Persistent(name="name")),
+			name="FetchGroupsTrade.articleInOfferEditor",
+			members=@Persistent(name="name")
+	),
 	@FetchGroup(
-		name="FetchGroupsTrade.articleInOfferEditor",
-		members=@Persistent(name="name")),
+			name="FetchGroupsTrade.articleInInvoiceEditor",
+			members=@Persistent(name="name")
+	),
 	@FetchGroup(
-		name="FetchGroupsTrade.articleInInvoiceEditor",
-		members=@Persistent(name="name")),
+			name="FetchGroupsTrade.articleInDeliveryNoteEditor",
+			members=@Persistent(name="name")
+	),
 	@FetchGroup(
-		name="FetchGroupsTrade.articleInDeliveryNoteEditor",
-		members=@Persistent(name="name")),
+			name="FetchGroupsPriceConfig.edit",
+			members=@Persistent(name="name")
+	),
 	@FetchGroup(
-		name="FetchGroupsPriceConfig.edit",
-		members=@Persistent(name="name")),
-	@FetchGroup(
-		name="FetchGroupsEntityUserSet.replicateToReseller",
-		members=@Persistent(name="name"))
+			name="FetchGroupsEntityUserSet.replicateToReseller",
+			members=@Persistent(name="name")
+	)
 })
-//@Queries(
-//	@javax.jdo.annotations.Query(name="getTariffByName", value="SELECT WHERE this.name.names.get(:paramLanguageID) == :paramName")
-//)
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
+@Discriminator(strategy=DiscriminatorStrategy.CLASS_NAME)
 public class Tariff
-implements Serializable
+implements Serializable, AttachCallback, DetachCallback
 {
 	/**
 	 * The serial version of this class.
 	 */
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 2L;
 
 	public static final String FETCH_GROUP_NAME = "Tariff.name"; //$NON-NLS-1$
 
-	/**
-	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon!
-	 */
-	@Deprecated
-	public static final String FETCH_GROUP_THIS_TARIFF = "Tariff.this"; //$NON-NLS-1$
-
 //	/**
-//	 * Return a {@link Collection} of Tariffs with the given name in the given Locale language.
-//	 * @param pm the PersistenceManager to use
-//	 * @param name the name in the given locale language
-//	 * @param locale the Locale to search with its language in the I18nText of the tariff
-//	 * @return a {@link Collection} of Tariffs with the given name in the given Locale language
+//	 * Specifies the global {@link #getScope() scope}.
 //	 */
-//	@SuppressWarnings("unchecked")
-//	public static Collection<Tariff> getTariffByName(PersistenceManager pm, String name, Locale locale) {
-//		Query q = pm.newNamedQuery(Tariff.class, "getTariffByName"); //$NON-NLS-1$
-//		return (Collection<Tariff>)q.execute(locale.getLanguage(), name);
-//	}
+//	public static final String SCOPE_GLOBAL = "global";
 
-	/**
-	 * @jdo.field primary-key="true"
-	 * @jdo.column length="100"
-	 */
 	@PrimaryKey
 	@Column(length=100)
 	private String organisationID;
 
-//	/**
-//	 * @jdo.field primary-key="true"
-//	 */
-//	private long tariffID = -1;
-	/**
-	 * @jdo.field primary-key="true"
-	 * @jdo.column length="100"
-	 */
-@PrimaryKey
-@Column(length=100)
+	@PrimaryKey
+	@Column(length=100)
 	private String tariffID;
 
-	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 */
-	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
-	private String primaryKey;
-
-	/**
-	 * @jdo.field persistence-modifier="persistent" dependent="true" mapped-by="tariff"
-	 */
-	@Persistent(
-		dependent="true",
-		mappedBy="tariff",
-		persistenceModifier=PersistenceModifier.PERSISTENT)
+	@Persistent(mappedBy="tariff", dependent="true")
 	private TariffName name;
 
-	/** @jdo.field persistence-modifier="persistent" */
-	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private int tariffIndex;
 
-	public Tariff() { }
+//	@Persistent(nullValue=NullValue.EXCEPTION)
+//	@Column(defaultValue=SCOPE_GLOBAL)
+//	private String scope;
 
-	public Tariff(String organisationID, String tariffID)
+	/**
+	 * @deprecated Only for JDO! Don't use this constructor directly!
+	 */
+	@Deprecated
+	protected Tariff() { }
+
+	public Tariff(final TariffID tariffID)
 	{
-		this.organisationID = organisationID;
-		this.tariffID = tariffID;
-		this.primaryKey = getPrimaryKey(organisationID, tariffID);
+		if (tariffID == null) {
+			this.organisationID = IDGenerator.getOrganisationID();
+			this.tariffID = createTariffID();
+		}
+		else {
+			this.organisationID = tariffID.organisationID;
+			this.tariffID = tariffID.tariffID;
+		}
+
 		this.name = new TariffName(this);
 		this.tariffIndex = Integer.MAX_VALUE;
+//		this.scope = SCOPE_GLOBAL;
 	}
 
-	public static String getPrimaryKey(String organisationID, String tariffID)
+	/**
+	 * Get the primary key fields concatenated in one string separated by '/'.
+	 * @param organisationID the first part of the primary key.
+	 * @param tariffID the 2nd part of the primary key.
+	 * @return the concatenated primary key.
+	 */
+	public static String getPrimaryKey(final String organisationID, final String tariffID)
 	{
-//		return organisationID + '/' + ObjectIDUtil.longObjectIDFieldToString(tariffID);
 		return organisationID + '/' + tariffID;
 	}
 
@@ -216,101 +179,83 @@ implements Serializable
 	}
 
 	/**
-	 * Get the JDO object id.
-	 * @return the JDO object id.
-	 */
-	public TariffID getObjectId()
-	{
-		return (TariffID)JDOHelper.getObjectId(this);
-	}
-
-	/**
-	 * @return Returns the organisationID.
+	 * Get the ID of the organisation which owns (created) this <code>Tariff</code> instance.
+	 * @return the organisationID.
 	 */
 	public String getOrganisationID()
 	{
 		return organisationID;
 	}
 	/**
+	 * Get the local identifier within the namespace of the {@link #getOrganisationID() organisation}.
 	 * @return Returns the tariffID.
 	 */
 	public String getTariffID()
 	{
 		return tariffID;
 	}
-//	/**
-//	 * @param tariffID The tariffID to set.
-//	 */
-//	public void setTariffID(long tariffID)
-//	{
-//		this.tariffID = tariffID;
-//		this.primaryKey = getPrimaryKey(getOrganisationID(), tariffID);
-//		this.name.setTariffID(tariffID);
-//	}
-//	public static String getPrimaryKey(String organisationID, String tariffID)
-//	{
-//		return organisationID + '/' + tariffID;
-//	}
+
 	/**
-	 * @return Returns the primaryKey.
+	 * Get the primary key fields concatenated in one string separated by '/'.
+	 * @return the concatenated primary key.
 	 */
 	public String getPrimaryKey()
 	{
-		return primaryKey;
+		return getPrimaryKey(organisationID, tariffID);
 	}
 
-//	/**
-//	 * @see javax.jdo.listener.StoreCallback#jdoPreStore()
-//	 */
-//	public void jdoPreStore()
-//	{
-//		if (tariffID < 0) {
-//			PersistenceManager pm = JDOHelper.getPersistenceManager(this);
-//			this.setTariffID(
-//					TariffRegistry.getTariffRegistry(pm).createTariffID());
-//		}
-//	}
-
 	/**
-	 * @return Returns the name.
+	 * Get the multilingual name of this tariff.
+	 * @return the name.
 	 */
 	public TariffName getName()
 	{
 		return name;
 	}
 
-//	/**
-//	 * @see org.nightlabs.i18n.Localizable#localize(java.lang.String)
-//	 */
-//	public void localize(String languageID)
-//	{
-//		name.localize(languageID);
-//	}
-//
-//	/**
-//	 * @see org.nightlabs.jdo.LocalizedDetachable#detachCopyLocalized(java.lang.String, javax.jdo.PersistenceManager)
-//	 */
-//	public LocalizedDetachable detachCopyLocalized(String languageID, PersistenceManager pm)
-//	{
-//		Tariff tariff = (Tariff) pm.detachCopy(this);
-//		tariff.name.localize(languageID, this.name);
-//		return tariff;
-//	}
-
+	/**
+	 * <p>
+	 * Get the global order hint of this tariff. This should be taken into account when
+	 * sorting tariffs in a user-independent way or when determining the initial ordering
+	 * for a user. The {@link TariffOrderConfigModule} allows to sort user-specifically
+	 * and should be used instead, when there is a user context.
+	 * </p>
+	 * <p>
+	 * Note, that this is only a hint and there might be multiple tariffs with the same
+	 * <code>tariffIndex</code>.
+	 * </p>
+	 * @return the global tariff index (for ordering).
+	 */
 	public int getTariffIndex() {
 		return tariffIndex;
 	}
 
-	public void setTariffIndex(int tariffIndex) {
+	/**
+	 * Set the global order hint of this tariff. See {@link #getTariffIndex()} for further infos.
+	 * @param tariffIndex the global tariff index (for ordering).
+	 */
+	public void setTariffIndex(final int tariffIndex) {
 		this.tariffIndex = tariffIndex;
 	}
 
+//	/**
+//	 * Get the scope of this tariff.
+//	 * @return the scope of this tariff.
+//	 */
+//	public String getScope() {
+//		return scope;
+//	}
+//	public void setScope(final String scope) {
+//		this.scope = scope;
+//	}
+
 	@Override
-	public boolean equals(Object obj)
+	public boolean equals(final Object obj)
 	{
 		if (obj == this) return true;
-		if (!(obj instanceof Tariff)) return false;
-		Tariff o = (Tariff) obj;
+		if (obj == null) return false;
+		if (obj.getClass() != this.getClass()) return false;
+		final Tariff o = (Tariff) obj;
 		return Util.equals(o.organisationID, this.organisationID) && Util.equals(o.tariffID, this.tariffID);
 	}
 
@@ -322,10 +267,22 @@ implements Serializable
 
 	@Override
 	public String toString() {
-		try {
-			return getName().getText();
-		} catch (JDODetachedFieldAccessException e) {
-			return super.toString();
-		}
+		return super.toString() + '[' + organisationID + ',' + tariffID + ']';
+	}
+
+	@Override
+	public void jdoPostAttach(final Object o) {
+	}
+
+	@Override
+	public void jdoPreAttach() {
+	}
+
+	@Override
+	public void jdoPostDetach(final Object o) {
+	}
+
+	@Override
+	public void jdoPreDetach() {
 	}
 }

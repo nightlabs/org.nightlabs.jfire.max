@@ -34,31 +34,32 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 
+import javax.jdo.annotations.Discriminator;
+import javax.jdo.annotations.DiscriminatorStrategy;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.Value;
+
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.PriceFragmentType;
 import org.nightlabs.jfire.accounting.Tariff;
 import org.nightlabs.jfire.accounting.priceconfig.IPackagePriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.IPriceConfig;
+import org.nightlabs.jfire.accounting.priceconfig.id.PriceConfigID;
 import org.nightlabs.jfire.store.NestedProductTypeLocal;
 import org.nightlabs.jfire.store.Product;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.ArticlePrice;
 import org.nightlabs.jfire.trade.CustomerGroup;
-
-import javax.jdo.annotations.Join;
-import javax.jdo.annotations.Value;
-import javax.jdo.annotations.FetchGroups;
-import javax.jdo.annotations.NullValue;
-import javax.jdo.annotations.Inheritance;
-import javax.jdo.annotations.FetchGroup;
-import javax.jdo.annotations.PersistenceModifier;
-import javax.jdo.annotations.Discriminator;
-import javax.jdo.annotations.Persistent;
-import javax.jdo.annotations.InheritanceStrategy;
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.DiscriminatorStrategy;
-import javax.jdo.annotations.IdentityType;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -117,7 +118,7 @@ implements IFormulaPriceConfig
 	/**
 	 * key: String innerProductPK_packageProductPK<br/>
 	 * value: StablePriceConfig stablePriceConfig
-	 * 
+	 *
 	 * @see #getPackagingResultPriceConfig(String, String, boolean)
 	 * @see #setPackagingResultPriceConfig(String, String, IPriceConfig)
 	 *
@@ -140,16 +141,16 @@ implements IFormulaPriceConfig
 	@Value(dependent="true")
 	private Map<String, GridPriceConfig> packagingResultPriceConfigs = new HashMap<String, GridPriceConfig>();
 
-	public void setPackagingResultPriceConfig(String innerProductTypePK, String packageProductTypePK, IPriceConfig resultPriceConfig)
+	public void setPackagingResultPriceConfig(final String innerProductTypePK, final String packageProductTypePK, final IPriceConfig resultPriceConfig)
 	{
 		if (!(resultPriceConfig instanceof GridPriceConfig))
 			throw new IllegalArgumentException("This implementation of IInnerPriceConfig only supports instances of type " + GridPriceConfig.class.getName() + " as resultPriceConfig, but you passed an instance of " + (resultPriceConfig == null ? null : resultPriceConfig.getClass().getName()));
 
 		packagingResultPriceConfigs.put(innerProductTypePK+'-'+packageProductTypePK, (GridPriceConfig)resultPriceConfig);
 	}
-	public IPriceConfig getPackagingResultPriceConfig(String innerProductTypePK, String packageProductTypePK, boolean throwExceptionIfNotExistent)
+	public IPriceConfig getPackagingResultPriceConfig(final String innerProductTypePK, final String packageProductTypePK, final boolean throwExceptionIfNotExistent)
 	{
-		IPriceConfig res = packagingResultPriceConfigs.get(innerProductTypePK+'-'+packageProductTypePK);
+		final IPriceConfig res = packagingResultPriceConfigs.get(innerProductTypePK+'-'+packageProductTypePK);
 		if (throwExceptionIfNotExistent && res == null)
 			throw new IllegalArgumentException("There is no PriceConfig registered as the result of the combination of the innerProductType \""+innerProductTypePK+"\" packaged in the packageProductType \""+packageProductTypePK+"\"!");
 		return res;
@@ -198,8 +199,8 @@ implements IFormulaPriceConfig
 
 	protected Map<IPriceCoordinate, FormulaCell> getPriceCoordinate2formulaCell() {
 		if (priceCoordinate2formulaCell == null) {
-			Map<IPriceCoordinate, FormulaCell> m = new HashMap<IPriceCoordinate, FormulaCell>();
-			for (FormulaCell formulaCell : formulaCells)
+			final Map<IPriceCoordinate, FormulaCell> m = new HashMap<IPriceCoordinate, FormulaCell>();
+			for (final FormulaCell formulaCell : formulaCells)
 				m.put(formulaCell.getPriceCoordinate(), formulaCell);
 
 			priceCoordinate2formulaCell = m;
@@ -228,13 +229,10 @@ implements IFormulaPriceConfig
 	protected FormulaPriceConfig()
 	{
 	}
-	/**
-	 * @param organisationID
-	 * @param priceConfigID
-	 */
-	public FormulaPriceConfig(String organisationID, String priceConfigID)
+
+	public FormulaPriceConfig(final PriceConfigID priceConfigID)
 	{
-		super(organisationID, priceConfigID);
+		super(priceConfigID);
 //		formulaCells = new HashMap<IPriceCoordinate, FormulaCell>();
 		formulaCells = new HashSet<FormulaCell>();
 	}
@@ -267,11 +265,11 @@ implements IFormulaPriceConfig
 	 * @see org.nightlabs.jfire.accounting.priceconfig.PriceConfig#createArticlePrice(Article)
 	 */
 	@Override
-	public ArticlePrice createArticlePrice(Article article)
+	public ArticlePrice createArticlePrice(final Article article)
 	{
 		throw new UnsupportedOperationException("This implementation of PriceConfig cannot deliver a price for an Article! It is only intended to be used internally within a package and not to be sold directly!");
 	}
-	
+
 	/**
 	 * Additionally to the parameters within a price config, we need - for our formulas -
 	 * to be able to address other price configs which are assigned to other
@@ -309,22 +307,22 @@ implements IFormulaPriceConfig
 	{
 		return Collections.unmodifiableCollection(productTypes.values());
 	}
-	public void addProductType(ProductType productType)
+	public void addProductType(final ProductType productType)
 	{
 		productTypes.put(productType.getPrimaryKey(), productType);
 	}
-	public ProductType getProductType(String organisationID, String productTypeID, boolean throwExceptionIfNotExsistent)
+	public ProductType getProductType(final String organisationID, final String productTypeID, final boolean throwExceptionIfNotExsistent)
 	{
-		ProductType product = productTypes.get(ProductType.getPrimaryKey(organisationID, productTypeID));
+		final ProductType product = productTypes.get(ProductType.getPrimaryKey(organisationID, productTypeID));
 		if (product == null && throwExceptionIfNotExsistent)
 			throw new IllegalArgumentException("No ProductType registered with organisationID=\""+organisationID+"\" productTypeID=\""+productTypeID+"\"!");
 		return product;
 	}
 
 	public FormulaCell createFormulaCell(
-			CustomerGroup customerGroup, Tariff tariff, Currency currency)
+			final CustomerGroup customerGroup, final Tariff tariff, final Currency currency)
 	{
-		PriceCoordinate priceCoordinate = new PriceCoordinate(
+		final PriceCoordinate priceCoordinate = new PriceCoordinate(
 				this, customerGroup, tariff, currency);
 		return createFormulaCell(priceCoordinate);
 	}
@@ -344,9 +342,9 @@ implements IFormulaPriceConfig
 		return formulaCell;
 	}
 
-	protected void putFormulaCell(FormulaCell formulaCell)
+	protected void putFormulaCell(final FormulaCell formulaCell)
 	{
-		IPriceCoordinate priceCoordinate = formulaCell.getPriceCoordinate();
+		final IPriceCoordinate priceCoordinate = formulaCell.getPriceCoordinate();
 		priceCoordinate.assertAllDimensionValuesAssigned();
 		if (formulaCell == null)
 			throw new IllegalArgumentException("formulaCell must not be null!");
@@ -354,7 +352,7 @@ implements IFormulaPriceConfig
 		formulaCell.setMapOwner(this);
 //		formulaCells.put(priceCoordinate, formulaCell);
 
-		FormulaCell oldFormulaCell = getPriceCoordinate2formulaCell().get(priceCoordinate);
+		final FormulaCell oldFormulaCell = getPriceCoordinate2formulaCell().get(priceCoordinate);
 		if (oldFormulaCell != null && !oldFormulaCell.equals(formulaCell))
 			formulaCells.remove(oldFormulaCell);
 
@@ -363,19 +361,19 @@ implements IFormulaPriceConfig
 	}
 
 	public FormulaCell getFormulaCell(
-			CustomerGroup customerGroup,
-			Tariff tariff, Currency currency,
-			boolean throwExceptionIfNotExistent)
+			final CustomerGroup customerGroup,
+			final Tariff tariff, final Currency currency,
+			final boolean throwExceptionIfNotExistent)
 	{
-		PriceCoordinate priceCoordinate = new PriceCoordinate(
+		final PriceCoordinate priceCoordinate = new PriceCoordinate(
 				this, customerGroup,
 				tariff, currency);
 		return getFormulaCell(priceCoordinate, throwExceptionIfNotExistent);
 	}
 	@Override
-	public FormulaCell getFormulaCell(IPriceCoordinate priceCoordinate, boolean throwExceptionIfNotExistent)
+	public FormulaCell getFormulaCell(final IPriceCoordinate priceCoordinate, final boolean throwExceptionIfNotExistent)
 	{
-		FormulaCell formulaCell = getPriceCoordinate2formulaCell().get(priceCoordinate);
+		final FormulaCell formulaCell = getPriceCoordinate2formulaCell().get(priceCoordinate);
 
 //		// If the JDO implementation uses a shortcut (a direct JDOQL instead of loading the whole Map and then
 //		// searching for the key), the cell might exist and not be found. Hence, we load the whole Map and try it again.
@@ -394,10 +392,10 @@ implements IFormulaPriceConfig
 	}
 
 	protected void removeFormulaCell(
-			CustomerGroup customerGroup,
-			Tariff tariff, Currency currency)
+			final CustomerGroup customerGroup,
+			final Tariff tariff, final Currency currency)
 	{
-		PriceCoordinate priceCoordinate = new PriceCoordinate(
+		final PriceCoordinate priceCoordinate = new PriceCoordinate(
 				this, customerGroup,
 				tariff, currency);
 		removeFormulaCell(priceCoordinate);
@@ -406,7 +404,7 @@ implements IFormulaPriceConfig
 	 * @see org.nightlabs.jfire.accounting.gridpriceconfig.IFormulaPriceConfig#getFallbackFormulaCell(boolean)
 	 */
 	@Override
-	public FormulaCell getFallbackFormulaCell(boolean throwExceptionIfNotExistent)
+	public FormulaCell getFallbackFormulaCell(final boolean throwExceptionIfNotExistent)
 	{
 		if (throwExceptionIfNotExistent && fallbackFormulaCell == null)
 			throw new NullPointerException("There is no fallbackFormulaCell defined!");
@@ -421,7 +419,7 @@ implements IFormulaPriceConfig
 		return fallbackFormulaCell;
 	}
 
-	protected static boolean isWhiteSpace(char c)
+	protected static boolean isWhiteSpace(final char c)
 	{
 		return c == ' ' || c == '\n' || c == '\r' || c == '\t' || c == '\f';
 	}
@@ -430,7 +428,7 @@ implements IFormulaPriceConfig
 	{
 		if (formula != null) {
 			// TODO can this be done with a regular expression?
-			StringBuffer sb = new StringBuffer(formula);
+			final StringBuffer sb = new StringBuffer(formula);
 			while (sb.length() > 0 && isWhiteSpace(sb.charAt(sb.length() - 1)))
 				sb.deleteCharAt(sb.length() - 1);
 			formula = sb.toString();
@@ -443,12 +441,12 @@ implements IFormulaPriceConfig
 	}
 
 	@Override
-	public void setFallbackFormula(PriceFragmentType priceFragmentType, String formula)
+	public void setFallbackFormula(final PriceFragmentType priceFragmentType, String formula)
 	{
 		formula = prepareFormula(formula);
 
 		if (formula == null) {
-			FormulaCell formulaCell = getFallbackFormulaCell(false);
+			final FormulaCell formulaCell = getFallbackFormulaCell(false);
 			if (formulaCell != null) {
 				formulaCell.setFormula(priceFragmentType, formula);
 				if (formulaCell.isEmpty())
@@ -456,7 +454,7 @@ implements IFormulaPriceConfig
 			}
 		} // if (formula == null) {
 		else {
-			FormulaCell formulaCell = createFallbackFormulaCell();
+			final FormulaCell formulaCell = createFallbackFormulaCell();
 			formulaCell.setFormula(priceFragmentType, formula);
 		}
 	}
@@ -474,12 +472,12 @@ implements IFormulaPriceConfig
 	 * @param formula Can be <tt>null</tt>.
 	 */
 	@Override
-	public void setFormula(IPriceCoordinate priceCoordinate, PriceFragmentType priceFragmentType, String formula)
+	public void setFormula(final IPriceCoordinate priceCoordinate, final PriceFragmentType priceFragmentType, String formula)
 	{
 		formula = prepareFormula(formula);
 
 		if (formula == null) {
-			FormulaCell formulaCell = getFormulaCell(priceCoordinate, false);
+			final FormulaCell formulaCell = getFormulaCell(priceCoordinate, false);
 			if (formulaCell != null) {
 				formulaCell.setFormula(priceFragmentType, formula);
 				if (formulaCell.isEmpty())
@@ -487,7 +485,7 @@ implements IFormulaPriceConfig
 			}
 		} // if (formula == null) {
 		else {
-			FormulaCell formulaCell = createFormulaCell(priceCoordinate);
+			final FormulaCell formulaCell = createFormulaCell(priceCoordinate);
 			formulaCell.setFormula(priceFragmentType, formula);
 		}
 	}
@@ -497,12 +495,17 @@ implements IFormulaPriceConfig
 		this.fallbackFormulaCell = null; // TODO check, whether the persistent instance really disappears.
 	}
 
-	protected void removeFormulaCell(IPriceCoordinate priceCoordinate)
+	protected void removeFormulaCell(final IPriceCoordinate priceCoordinate)
 	{
 //		formulaCells.remove(priceCoordinate);
-		FormulaCell oldFormulaCell = getPriceCoordinate2formulaCell().remove(priceCoordinate);
+		final FormulaCell oldFormulaCell = getPriceCoordinate2formulaCell().remove(priceCoordinate);
 		if (oldFormulaCell != null)
 			formulaCells.remove(oldFormulaCell);
+	}
+
+	protected void clearFormulaCells()
+	{
+		formulaCells.clear();
 	}
 
 //	/**
@@ -522,20 +525,17 @@ implements IFormulaPriceConfig
 //		// TODO This is expensive! Is it really necessary? Can we
 //		for (Iterator it = packagingResultPriceConfigs.values().iterator(); it.)
 //	}
-	
-	/**
-	 * @see org.nightlabs.jfire.accounting.priceconfig.IPriceConfig#createNestedArticlePrice(IPackagePriceConfig, org.nightlabs.jfire.trade.Article, LinkedList, org.nightlabs.jfire.trade.ArticlePrice, org.nightlabs.jfire.trade.ArticlePrice, LinkedList, org.nightlabs.jfire.store.NestedProductTypeLocal, LinkedList)
-	 */
+
 	@Override
 	public ArticlePrice createNestedArticlePrice(
-			IPackagePriceConfig packagePriceConfig, Article article,
-			LinkedList<IPriceConfig> priceConfigStack, ArticlePrice topLevelArticlePrice,
-			ArticlePrice nextLevelArticlePrice, LinkedList<ArticlePrice> articlePriceStack,
-			NestedProductTypeLocal nestedProductTypeLocal, LinkedList<NestedProductTypeLocal> nestedProductTypeStack)
+			final IPackagePriceConfig packagePriceConfig, final Article article,
+			final LinkedList<IPriceConfig> priceConfigStack, final ArticlePrice topLevelArticlePrice,
+			final ArticlePrice nextLevelArticlePrice, final LinkedList<ArticlePrice> articlePriceStack,
+			final NestedProductTypeLocal nestedProductTypeLocal, final LinkedList<NestedProductTypeLocal> nestedProductTypeStack)
 	{
-		ProductType packageProductType = nestedProductTypeLocal.getPackageProductTypeLocal().getProductType();
-		ProductType innerProductType = nestedProductTypeLocal.getInnerProductTypeLocal().getProductType();
-		StablePriceConfig packagingResultPriceConfig = (StablePriceConfig) getPackagingResultPriceConfig(
+		final ProductType packageProductType = nestedProductTypeLocal.getPackageProductTypeLocal().getProductType();
+		final ProductType innerProductType = nestedProductTypeLocal.getInnerProductTypeLocal().getProductType();
+		final StablePriceConfig packagingResultPriceConfig = (StablePriceConfig) getPackagingResultPriceConfig(
 				innerProductType.getPrimaryKey(),
 				packageProductType.getPrimaryKey(), true);
 
@@ -546,20 +546,17 @@ implements IFormulaPriceConfig
 				nestedProductTypeLocal, nestedProductTypeStack);
 	}
 
-	/**
-	 * @see org.nightlabs.jfire.accounting.priceconfig.IPriceConfig#createNestedArticlePrice(IPackagePriceConfig, org.nightlabs.jfire.trade.Article, LinkedList, org.nightlabs.jfire.trade.ArticlePrice, org.nightlabs.jfire.trade.ArticlePrice, LinkedList, NestedProductTypeLocal, LinkedList, org.nightlabs.jfire.store.Product, LinkedList)
-	 */
 	@Override
 	public ArticlePrice createNestedArticlePrice(
-			IPackagePriceConfig packagePriceConfig, Article article,
-			LinkedList<IPriceConfig> priceConfigStack, ArticlePrice topLevelArticlePrice,
-			ArticlePrice nextLevelArticlePrice, LinkedList<ArticlePrice> articlePriceStack,
-			NestedProductTypeLocal nestedProductTypeLocal, LinkedList<NestedProductTypeLocal> nestedProductTypeStack,
-			Product nestedProduct, LinkedList<Product> productStack)
+			final IPackagePriceConfig packagePriceConfig, final Article article,
+			final LinkedList<IPriceConfig> priceConfigStack, final ArticlePrice topLevelArticlePrice,
+			final ArticlePrice nextLevelArticlePrice, final LinkedList<ArticlePrice> articlePriceStack,
+			final NestedProductTypeLocal nestedProductTypeLocal, final LinkedList<NestedProductTypeLocal> nestedProductTypeStack,
+			final Product nestedProduct, final LinkedList<Product> productStack)
 	{
-		ProductType packageProductType = nestedProductTypeLocal.getPackageProductTypeLocal().getProductType();
-		ProductType innerProductType = nestedProductTypeLocal.getInnerProductTypeLocal().getProductType();
-		IPriceConfig packagingResultPriceConfig = getPackagingResultPriceConfig(
+		final ProductType packageProductType = nestedProductTypeLocal.getPackageProductTypeLocal().getProductType();
+		final ProductType innerProductType = nestedProductTypeLocal.getInnerProductTypeLocal().getProductType();
+		final IPriceConfig packagingResultPriceConfig = getPackagingResultPriceConfig(
 				innerProductType.getPrimaryKey(),
 				packageProductType.getPrimaryKey(), true);
 

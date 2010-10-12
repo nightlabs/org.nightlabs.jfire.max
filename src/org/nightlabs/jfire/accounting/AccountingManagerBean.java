@@ -163,7 +163,7 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	public void initialise()
 	throws IOException
 	{
-		PersistenceManager pm = createPersistenceManager();
+		final PersistenceManager pm = createPersistenceManager();
 		try {
 //			SecurityChangeListenerTariffUserSet.register(pm);
 			pm.getExtent(PFMoneyFlowMapping.class);
@@ -191,8 +191,8 @@ implements AccountingManagerRemote, AccountingManagerLocal
 			pm.getExtent(AccountType.class);
 			try {
 				pm.getObjectById(AccountType.ACCOUNT_TYPE_ID_UNCOLLECTABLE);
-			} catch (JDOObjectNotFoundException x) {
-				AccountType accountType = pm.makePersistent(new AccountType(AccountType.ACCOUNT_TYPE_ID_UNCOLLECTABLE, false));
+			} catch (final JDOObjectNotFoundException x) {
+				final AccountType accountType = pm.makePersistent(new AccountType(AccountType.ACCOUNT_TYPE_ID_UNCOLLECTABLE, false));
 				accountType.getName().setText(Locale.ENGLISH.getLanguage(), "Uncollectable");
 				accountType.getName().setText(Locale.GERMAN.getLanguage(), "Uneinbringlich");
 			}
@@ -206,7 +206,7 @@ implements AccountingManagerRemote, AccountingManagerLocal
 			try {
 				pm.getObjectById(AccountType.ACCOUNT_TYPE_ID_OUTSIDE);
 				return; // already initialized
-			} catch (JDOObjectNotFoundException x) {
+			} catch (final JDOObjectNotFoundException x) {
 				// datastore not yet initialized
 			}
 
@@ -266,7 +266,7 @@ implements AccountingManagerRemote, AccountingManagerLocal
 
 
 			// create PriceFragmentTypes for Swiss and German VAT
-			PriceFragmentTypeHelper pfth = new PriceFragmentTypeHelper();
+			final PriceFragmentTypeHelper pfth = new PriceFragmentTypeHelper();
 			PriceFragmentType priceFragmentType = new PriceFragmentType(pfth.getDE().VAT_DE_19_NET);
 			priceFragmentType.getName().setText(Locale.ENGLISH.getLanguage(), "VAT Germany 19% Net");
 			priceFragmentType.getName().setText(Locale.GERMAN.getLanguage(), "MwSt. Deutschland 19% Netto");
@@ -299,14 +299,14 @@ implements AccountingManagerRemote, AccountingManagerLocal
 			priceFragmentType.setContainerPriceFragmentType(PriceFragmentType.getTotalPriceFragmentType(pm));
 			pm.makePersistent(priceFragmentType);
 
-			Accounting accounting = Accounting.getAccounting(pm);
-			Trader trader = Trader.getTrader(pm);
+			final Accounting accounting = Accounting.getAccounting(pm);
+			final Trader trader = Trader.getTrader(pm);
 
 
 
 
-			LegalEntity anonymousCustomer = LegalEntity.getAnonymousLegalEntity(pm);
-			CustomerGroup anonymousCustomerGroup = anonymousCustomer.getDefaultCustomerGroup();
+			final LegalEntity anonymousCustomer = LegalEntity.getAnonymousLegalEntity(pm);
+			final CustomerGroup anonymousCustomerGroup = anonymousCustomer.getDefaultCustomerGroup();
 
 			//		 create some ModeOfPayments
 			// Cash
@@ -324,7 +324,7 @@ implements AccountingManagerRemote, AccountingManagerLocal
 			anonymousCustomerGroup.addModeOfPayment(modeOfPayment);
 
 			// we need this later for payment processor registration
-			ModeOfPayment modeOfPaymentCash = modeOfPayment;
+			final ModeOfPayment modeOfPaymentCash = modeOfPayment;
 
 			// No payment - this is a dummy MOP which means, the payment is postponed without
 			//   specifying a certain real MOP
@@ -339,7 +339,7 @@ implements AccountingManagerRemote, AccountingManagerLocal
 			trader.getDefaultCustomerGroupForKnownCustomer().addModeOfPayment(modeOfPayment);
 
 			// we need this later for payment processor registration
-			ModeOfPayment modeOfPaymentNonPayment = modeOfPayment;
+			final ModeOfPayment modeOfPaymentNonPayment = modeOfPayment;
 
 
 			// Credit Card - VISA, Master, AmEx, Diners
@@ -364,7 +364,7 @@ implements AccountingManagerRemote, AccountingManagerLocal
 			anonymousCustomerGroup.addModeOfPayment(modeOfPayment);
 
 			// we need this later for payment processor registration
-			ModeOfPayment modeOfPaymentCreditCard = modeOfPayment;
+			final ModeOfPayment modeOfPaymentCreditCard = modeOfPayment;
 
 			// Bank Transfer
 			modeOfPayment = new ModeOfPayment(ModeOfPaymentConst.MODE_OF_PAYMENT_ID_BANK_TRANSFER);
@@ -380,7 +380,7 @@ implements AccountingManagerRemote, AccountingManagerLocal
 			trader.getDefaultCustomerGroupForKnownCustomer().addModeOfPayment(modeOfPayment);
 
 			// we need this later for payment processor registration
-			ModeOfPayment modeOfPaymentBankTransfer = modeOfPayment;
+			final ModeOfPayment modeOfPaymentBankTransfer = modeOfPayment;
 
 			// Debit Note
 			modeOfPayment = new ModeOfPayment(ModeOfPaymentConst.MODE_OF_PAYMENT_ID_DEBIT_NOTE);
@@ -396,34 +396,34 @@ implements AccountingManagerRemote, AccountingManagerLocal
 			trader.getDefaultCustomerGroupForKnownCustomer().addModeOfPayment(modeOfPayment);
 
 			// we need this later for payment processor registration
-			ModeOfPayment modeOfPaymentDebitNote = modeOfPayment;
+			final ModeOfPayment modeOfPaymentDebitNote = modeOfPayment;
 
 
 			// create some ServerPaymentProcessors
-			ServerPaymentProcessorCash serverPaymentProcessorCash = ServerPaymentProcessorCash.getServerPaymentProcessorCash(pm);
+			final ServerPaymentProcessorCash serverPaymentProcessorCash = ServerPaymentProcessorCash.getServerPaymentProcessorCash(pm);
 			serverPaymentProcessorCash.getName().setText(Locale.ENGLISH.getLanguage(), "Cash Payment");
 			serverPaymentProcessorCash.getName().setText(Locale.GERMAN.getLanguage(), "Barzahlung");
 			serverPaymentProcessorCash.getName().setText(Locale.FRENCH.getLanguage(), "Paiement Argent Liquide");
 			serverPaymentProcessorCash.addModeOfPayment(modeOfPaymentCash);
 
-			ServerPaymentProcessorNonPayment serverPaymentProcessorNonPayment =
+			final ServerPaymentProcessorNonPayment serverPaymentProcessorNonPayment =
 				ServerPaymentProcessorNonPayment.getServerPaymentProcessorNonPayment(pm);
 			serverPaymentProcessorNonPayment.getName().setText(Locale.ENGLISH.getLanguage(), "Non-Payment (payment will be postponed)");
 			serverPaymentProcessorNonPayment.getName().setText(Locale.GERMAN.getLanguage(), "Nichtzahlung (Zahlung wird verschoben)");
 			serverPaymentProcessorNonPayment.addModeOfPayment(modeOfPaymentNonPayment);
 
-			ServerPaymentProcessorCreditCardDummyForClientPayment serverPaymentProcessorCreditCardDummyForClientPayment =
+			final ServerPaymentProcessorCreditCardDummyForClientPayment serverPaymentProcessorCreditCardDummyForClientPayment =
 				ServerPaymentProcessorCreditCardDummyForClientPayment.getServerPaymentProcessorCreditCardDummyForClientPayment(pm);
 			serverPaymentProcessorCreditCardDummyForClientPayment.getName().setText(Locale.ENGLISH.getLanguage(), "Dummy for client-sided Credit Card Payment");
 			serverPaymentProcessorCreditCardDummyForClientPayment.getName().setText(Locale.GERMAN.getLanguage(), "Pseudo-Modul für client-seitige Kreditkarten-Zahlungen");
 			serverPaymentProcessorCreditCardDummyForClientPayment.addModeOfPayment(modeOfPaymentCreditCard);
 
-			ServerPaymentProcessorBankTransferGermany serverPaymentProcessorBankTransferGermany = ServerPaymentProcessorBankTransferGermany.getServerPaymentProcessorBankTransferGermany(pm);
+			final ServerPaymentProcessorBankTransferGermany serverPaymentProcessorBankTransferGermany = ServerPaymentProcessorBankTransferGermany.getServerPaymentProcessorBankTransferGermany(pm);
 			serverPaymentProcessorBankTransferGermany.getName().setText(Locale.ENGLISH.getLanguage(), "Bank transfer within Germany");
 			serverPaymentProcessorBankTransferGermany.getName().setText(Locale.GERMAN.getLanguage(), "Überweisung innerhalb Deutschlands");
 			serverPaymentProcessorBankTransferGermany.addModeOfPayment(modeOfPaymentBankTransfer);
 
-			ServerPaymentProcessorDebitNoteGermany serverPaymentProcessorDebitNoteGermany = ServerPaymentProcessorDebitNoteGermany.getServerPaymentProcessorDebitNoteGermany(pm);
+			final ServerPaymentProcessorDebitNoteGermany serverPaymentProcessorDebitNoteGermany = ServerPaymentProcessorDebitNoteGermany.getServerPaymentProcessorDebitNoteGermany(pm);
 			serverPaymentProcessorDebitNoteGermany.getName().setText(Locale.ENGLISH.getLanguage(), "Debit Note within Germany");
 			serverPaymentProcessorDebitNoteGermany.getName().setText(Locale.GERMAN.getLanguage(), "Lastschrift innerhalb Deutschlands");
 			serverPaymentProcessorDebitNoteGermany.addModeOfPayment(modeOfPaymentDebitNote);
@@ -444,7 +444,7 @@ implements AccountingManagerRemote, AccountingManagerLocal
 
 
 			// deactive IDGenerator's cache for invoice
-			IDNamespaceDefault idNamespaceDefault = IDNamespaceDefault.createIDNamespaceDefault(pm, getOrganisationID(), Invoice.class);
+			final IDNamespaceDefault idNamespaceDefault = IDNamespaceDefault.createIDNamespaceDefault(pm, getOrganisationID(), Invoice.class);
 			idNamespaceDefault.setCacheSizeServer(0);
 			idNamespaceDefault.setCacheSizeClient(0);
 
@@ -463,7 +463,7 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	 * was performed already and therefore can be safely
 	 * called anytime in the process.
 	 */
-	private void initRegisterConfigModules(PersistenceManager pm)
+	private void initRegisterConfigModules(final PersistenceManager pm)
 	{
 		boolean needsUpdate = false;
 		// Register all User - ConfigModules
@@ -499,9 +499,9 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	@Override
 	public Set<TariffMappingID> getTariffMappingIDs()
 	{
-		PersistenceManager pm = createPersistenceManager();
+		final PersistenceManager pm = createPersistenceManager();
 		try {
-			Query q = pm.newQuery(TariffMapping.class);
+			final Query q = pm.newQuery(TariffMapping.class);
 			q.setResult("JDOHelper.getObjectId(this)");
 			return new HashSet<TariffMappingID>((Collection<? extends TariffMappingID>) q.execute());
 		} finally {
@@ -514,9 +514,9 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	 */
 	@RolesAllowed("_Guest_")
 	@Override
-	public Collection<TariffMapping> getTariffMappings(Collection<TariffMappingID> tariffMappingIDs, String[] fetchGroups, int maxFetchDepth)
+	public Collection<TariffMapping> getTariffMappings(final Collection<TariffMappingID> tariffMappingIDs, final String[] fetchGroups, final int maxFetchDepth)
 	{
-		PersistenceManager pm = createPersistenceManager();
+		final PersistenceManager pm = createPersistenceManager();
 		try {
 			return NLJDOHelper.getDetachedObjectList(pm, tariffMappingIDs, TariffMapping.class, fetchGroups, maxFetchDepth);
 		} finally {
@@ -530,15 +530,15 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("org.nightlabs.jfire.accounting.editTariffMapping")
 	@Override
-	public TariffMapping createTariffMapping(TariffID localTariffID, TariffID partnerTariffID, boolean get, String[] fetchGroups, int maxFetchDepth)
+	public TariffMapping createTariffMapping(final TariffID localTariffID, final TariffID partnerTariffID, final boolean get, final String[] fetchGroups, final int maxFetchDepth)
 	{
-		PersistenceManager pm = createPersistenceManager();
+		final PersistenceManager pm = createPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 
-			TariffMapping tm = TariffMapping.create(pm, localTariffID, partnerTariffID);
+			final TariffMapping tm = TariffMapping.create(pm, localTariffID, partnerTariffID);
 			if (!get)
 				return null;
 
@@ -548,22 +548,60 @@ implements AccountingManagerRemote, AccountingManagerLocal
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.nightlabs.jfire.accounting.AccountingManagerRemote#getTariffIDs(java.lang.String, boolean)
-	 */
+//	@RolesAllowed("_Guest_")
+//	@SuppressWarnings("unchecked")
+//	@Override
+//	public Set<TariffID> getTariffIDs(String organisationID, boolean inverse)
+//	{
+//		return getTariffIDs(organisationID, inverse, (String[]) null);
+//	}
+
 	@RolesAllowed("_Guest_")
 	@SuppressWarnings("unchecked")
 	@Override
-	public Set<TariffID> getTariffIDs(String organisationID, boolean inverse)
+	public Set<TariffID> getTariffIDs(final String organisationID, final boolean inverse)
 	{
-		PersistenceManager pm = createPersistenceManager();
+		final PersistenceManager pm = createPersistenceManager();
 		try {
-			Query q = pm.newQuery(Tariff.class);
+			final Map<String, Object> params = new HashMap<String, Object>();
+			final StringBuilder filter = new StringBuilder();
+			final Query q = pm.newQuery(Tariff.class); // TODO include subclasses or not? Marco.
+//			final Query q = pm.newQuery(pm.getExtent(Tariff.class, false));
 			q.setResult("JDOHelper.getObjectId(this)");
-			if (organisationID != null)
-				q.setFilter("this.organisationID " + (inverse ? "!=" : "==") + " :organisationID");
 
-			return new HashSet<TariffID>((Collection<? extends TariffID>) q.execute(organisationID));
+			if (organisationID != null)
+				filter.append("this.organisationID " + (inverse ? "!=" : "==") + " :organisationID");
+
+			params.put("organisationID", organisationID);
+
+//			if (filter.length() > 0)
+//				filter.append(" && ");
+//
+//			filter.append("this.scope == :scope");
+//			params.put("scope", Tariff.SCOPE_GLOBAL);
+
+//			if (scope != null && scope.length != 0) {
+//				boolean closeBracket = false;
+//				if (filter.length() > 0) {
+//					closeBracket = true;
+//					filter.append(" && (");
+//				}
+//
+//				for (int i = 0; i < scope.length; ++i) {
+//					if (i > 0)
+//						filter.append(" || ");
+//
+//					filter.append("this.scope == :scope_").append(i);
+//					params.put("scope_" + i, scope[i]);
+//				}
+//
+//				if (closeBracket)
+//					filter.append(")");
+//			}
+
+			q.setFilter(filter.toString());
+
+			return new HashSet<TariffID>((Collection<? extends TariffID>) q.executeWithMap(params));
 		} finally {
 			pm.close();
 		}
@@ -574,13 +612,13 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	 */
 	@RolesAllowed("_Guest_")
 	@Override
-	public Collection<Tariff> getTariffs(Collection<TariffID> tariffIDs, String[] fetchGroups, int maxFetchDepth)
+	public Collection<Tariff> getTariffs(final Collection<TariffID> tariffIDs, final String[] fetchGroups, final int maxFetchDepth)
 	{
 		// TODO filter Tariffs according to visibility-configuration for the currently logged-in user.
 		// We should additionally introduce a new access right that allows to see all (suppress filtering)
 		// or alternatively only use org.nightlabs.jfire.accounting.editTariff, too. Marco.
 
-		PersistenceManager pm = createPersistenceManager();
+		final PersistenceManager pm = createPersistenceManager();
 		try {
 			return NLJDOHelper.getDetachedObjectList(pm, tariffIDs, Tariff.class, fetchGroups, maxFetchDepth);
 		} finally {
@@ -594,9 +632,9 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("org.nightlabs.jfire.accounting.editTariff")
 	@Override
-	public Tariff storeTariff(Tariff tariff, boolean get, String[] fetchGroups, int maxFetchDepth)
+	public Tariff storeTariff(final Tariff tariff, final boolean get, final String[] fetchGroups, final int maxFetchDepth)
 	{
-		PersistenceManager pm = createPersistenceManager();
+		final PersistenceManager pm = createPersistenceManager();
 		try {
 			return NLJDOHelper.storeJDO(pm, tariff, get, fetchGroups, maxFetchDepth);
 		} finally {
@@ -611,15 +649,15 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	@RolesAllowed("_Guest_")
 	@SuppressWarnings("unchecked")
 	@Override
-	public Collection<Currency> getCurrencies(String[] fetchGroups, int maxFetchDepth)
+	public Collection<Currency> getCurrencies(final String[] fetchGroups, final int maxFetchDepth)
 	{
-		PersistenceManager pm = createPersistenceManager();
+		final PersistenceManager pm = createPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 
-			Query q = pm.newQuery(Currency.class);
+			final Query q = pm.newQuery(Currency.class);
 			return pm.detachCopyAll((Collection<Currency>)q.execute());
 		} finally {
 			pm.close();
@@ -628,9 +666,9 @@ implements AccountingManagerRemote, AccountingManagerLocal
 
 	@RolesAllowed("_Guest_")
 	@Override
-	public Collection<Currency> getCurrencies(Collection<CurrencyID> currencyIDs, String[] fetchGroups, int maxFetchDepth)
+	public Collection<Currency> getCurrencies(final Collection<CurrencyID> currencyIDs, final String[] fetchGroups, final int maxFetchDepth)
 	{
-		PersistenceManager pm = createPersistenceManager();
+		final PersistenceManager pm = createPersistenceManager();
 		try {
 			return NLJDOHelper.getDetachedObjectSet(pm, currencyIDs, Currency.class, fetchGroups, maxFetchDepth);
 		} finally {
@@ -642,9 +680,9 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	@SuppressWarnings("unchecked")
 	@Override
 	public Collection<CurrencyID> getCurrencyIDs() {
-		PersistenceManager pm = createPersistenceManager();
+		final PersistenceManager pm = createPersistenceManager();
 		try {
-			Query q = pm.newQuery(Currency.class);
+			final Query q = pm.newQuery(Currency.class);
 			q.setResult("JDOHelper.getObjectId(this)");
 			return new HashSet<CurrencyID>((Collection<? extends CurrencyID>) q.execute());
 		} finally {
@@ -683,9 +721,9 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	 */
 	@RolesAllowed("org.nightlabs.jfire.accounting.queryAccounts")
 	@Override
-	public Set<AnchorID> getAccountIDs(AccountSearchFilter searchFilter)
+	public Set<AnchorID> getAccountIDs(final AccountSearchFilter searchFilter)
 	{
-		PersistenceManager pm = createPersistenceManager();
+		final PersistenceManager pm = createPersistenceManager();
 		try {
 			searchFilter.setPersistenceManager(pm);
 			return NLJDOHelper.getObjectIDSet(searchFilter.getResult());
@@ -699,9 +737,9 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	 */
 	@RolesAllowed("org.nightlabs.jfire.accounting.queryAccounts")
 	@Override
-	public List<Account> getAccounts(Collection<AnchorID> accountIDs,  String[] fetchGroups, int maxFetchDepth)
+	public List<Account> getAccounts(final Collection<AnchorID> accountIDs,  final String[] fetchGroups, final int maxFetchDepth)
 	{
-		PersistenceManager pm = createPersistenceManager();
+		final PersistenceManager pm = createPersistenceManager();
 		try {
 			return NLJDOHelper.getDetachedObjectList(pm, accountIDs, Account.class, fetchGroups, maxFetchDepth);
 		} finally {
@@ -715,14 +753,14 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("org.nightlabs.jfire.accounting.editAccount")
 	@Override
-	public Account storeAccount(Account account, boolean get, String[] fetchGroups, int maxFetchDepth)
+	public Account storeAccount(final Account account, final boolean get, final String[] fetchGroups, final int maxFetchDepth)
 	{
-		PersistenceManager pm = createPersistenceManager();
+		final PersistenceManager pm = createPersistenceManager();
 		try {
 			if (!account.getOrganisationID().equals(getOrganisationID()))
 				throw new IllegalArgumentException("Given Account was created for a different organisation, can not store to this datastore!");
 
-			Account result = NLJDOHelper.storeJDO(pm, account, get, fetchGroups, maxFetchDepth);
+			final Account result = NLJDOHelper.storeJDO(pm, account, get, fetchGroups, maxFetchDepth);
 			return result;
 		} finally {
 			pm.close();
@@ -735,25 +773,25 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("org.nightlabs.jfire.accounting.editAccount")
 	@Override
-	public void setAccountSummaryAccounts(AnchorID anchorID, Collection<AnchorID> _summaryAccountIDs)
+	public void setAccountSummaryAccounts(final AnchorID anchorID, final Collection<AnchorID> _summaryAccountIDs)
 	{
-		PersistenceManager pm = createPersistenceManager();
+		final PersistenceManager pm = createPersistenceManager();
 		try {
-			Set<AnchorID> summaryAccountIDs = new HashSet<AnchorID>(_summaryAccountIDs);
+			final Set<AnchorID> summaryAccountIDs = new HashSet<AnchorID>(_summaryAccountIDs);
 
-			Account account = (Account)pm.getObjectById(anchorID);
-			Set<SummaryAccount> summaryAccountsToRemove = new HashSet<SummaryAccount>();
-			for (SummaryAccount sa : account.getSummaryAccounts()) {
+			final Account account = (Account)pm.getObjectById(anchorID);
+			final Set<SummaryAccount> summaryAccountsToRemove = new HashSet<SummaryAccount>();
+			for (final SummaryAccount sa : account.getSummaryAccounts()) {
 				if (!summaryAccountIDs.remove(JDOHelper.getObjectId(sa)))
 					summaryAccountsToRemove.add(sa);
 			}
 
-			for (SummaryAccount summaryAccount : summaryAccountsToRemove)
+			for (final SummaryAccount summaryAccount : summaryAccountsToRemove)
 				account.removeSummaryAccount(summaryAccount);
 
-			for (Iterator<AnchorID> iter = summaryAccountIDs.iterator(); iter.hasNext();) {
-				AnchorID summaryAccountID = iter.next();
-				SummaryAccount summaryAccount = (SummaryAccount)pm.getObjectById(summaryAccountID);
+			for (final Iterator<AnchorID> iter = summaryAccountIDs.iterator(); iter.hasNext();) {
+				final AnchorID summaryAccountID = iter.next();
+				final SummaryAccount summaryAccount = (SummaryAccount)pm.getObjectById(summaryAccountID);
 				account.addSummaryAccount(summaryAccount);
 			}
 		} finally {
@@ -767,25 +805,25 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("org.nightlabs.jfire.accounting.editAccount")
 	@Override
-	public void setSummaryAccountSummedAccounts(AnchorID summaryAccountID, Collection<AnchorID> _summedAccountIDs)
+	public void setSummaryAccountSummedAccounts(final AnchorID summaryAccountID, final Collection<AnchorID> _summedAccountIDs)
 	{
-		PersistenceManager pm = createPersistenceManager();
+		final PersistenceManager pm = createPersistenceManager();
 		try {
-			Set<AnchorID> summedAccountIDs = new HashSet<AnchorID>(_summedAccountIDs);
+			final Set<AnchorID> summedAccountIDs = new HashSet<AnchorID>(_summedAccountIDs);
 
-			SummaryAccount summaryAccount = (SummaryAccount)pm.getObjectById(summaryAccountID);
-			Set<Account> accountsToRemove = new HashSet<Account>();
-			for (Account a : summaryAccount.getSummedAccounts()) {
+			final SummaryAccount summaryAccount = (SummaryAccount)pm.getObjectById(summaryAccountID);
+			final Set<Account> accountsToRemove = new HashSet<Account>();
+			for (final Account a : summaryAccount.getSummedAccounts()) {
 				if (!summedAccountIDs.remove(JDOHelper.getObjectId(a)))
 					accountsToRemove.add(a);
 			}
 
-			for (Account account : accountsToRemove)
+			for (final Account account : accountsToRemove)
 				summaryAccount.removeSummedAccount(account);
 
-			for (Iterator<AnchorID> iter = summedAccountIDs.iterator(); iter.hasNext();) {
-				AnchorID accountID = iter.next();
-				Account account = (Account)pm.getObjectById(accountID);
+			for (final Iterator<AnchorID> iter = summedAccountIDs.iterator(); iter.hasNext();) {
+				final AnchorID accountID = iter.next();
+				final Account account = (Account)pm.getObjectById(accountID);
 				summaryAccount.addSummedAccount(account);
 			}
 		} finally {
@@ -827,11 +865,11 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("org.nightlabs.jfire.accounting.queryLocalAccountantDelegates")
 	@Override
-	public Collection<LocalAccountantDelegateID> getTopLevelAccountantDelegates(Class<? extends LocalAccountantDelegate> delegateClass)
+	public Collection<LocalAccountantDelegateID> getTopLevelAccountantDelegates(final Class<? extends LocalAccountantDelegate> delegateClass)
 	{
-		PersistenceManager pm = createPersistenceManager();
+		final PersistenceManager pm = createPersistenceManager();
 		try {
-			Collection<? extends LocalAccountantDelegate> delegates = LocalAccountantDelegate.getTopLevelDelegates(pm, delegateClass);
+			final Collection<? extends LocalAccountantDelegate> delegates = LocalAccountantDelegate.getTopLevelDelegates(pm, delegateClass);
 			return NLJDOHelper.getObjectIDSet(delegates);
 		} finally {
 			pm.close();
@@ -844,11 +882,11 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("org.nightlabs.jfire.accounting.queryLocalAccountantDelegates")
 	@Override
-	public Collection<LocalAccountantDelegateID> getChildAccountantDelegates(LocalAccountantDelegateID delegateID)
+	public Collection<LocalAccountantDelegateID> getChildAccountantDelegates(final LocalAccountantDelegateID delegateID)
 	{
-		PersistenceManager pm = createPersistenceManager();
+		final PersistenceManager pm = createPersistenceManager();
 		try {
-			Collection<? extends LocalAccountantDelegate> delegates = LocalAccountantDelegate.getChildDelegates(
+			final Collection<? extends LocalAccountantDelegate> delegates = LocalAccountantDelegate.getChildDelegates(
 					pm,
 					delegateID.organisationID,
 					delegateID.localAccountantDelegateID
@@ -865,9 +903,9 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("org.nightlabs.jfire.accounting.queryLocalAccountantDelegates")
 	@Override
-	public Collection<LocalAccountantDelegate> getLocalAccountantDelegates(Collection<LocalAccountantDelegateID> delegateIDs, String[] fetchGroups, int maxFetchDepth)
+	public Collection<LocalAccountantDelegate> getLocalAccountantDelegates(final Collection<LocalAccountantDelegateID> delegateIDs, final String[] fetchGroups, final int maxFetchDepth)
 	{
-		PersistenceManager pm = createPersistenceManager();
+		final PersistenceManager pm = createPersistenceManager();
 		try {
 			return NLJDOHelper.getDetachedObjectSet(pm, delegateIDs, LocalAccountantDelegate.class, fetchGroups, maxFetchDepth);
 		} finally {
@@ -881,15 +919,15 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("org.nightlabs.jfire.accounting.queryLocalAccountantDelegates")
 	@Override
-	public LocalAccountantDelegate getLocalAccountantDelegate(LocalAccountantDelegateID delegateID, String[] fetchGroups, int maxFetchDepth)
+	public LocalAccountantDelegate getLocalAccountantDelegate(final LocalAccountantDelegateID delegateID, final String[] fetchGroups, final int maxFetchDepth)
 	{
-		PersistenceManager pm = createPersistenceManager();
+		final PersistenceManager pm = createPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 
-			LocalAccountantDelegate delegate = (LocalAccountantDelegate)pm.getObjectById(delegateID);
+			final LocalAccountantDelegate delegate = (LocalAccountantDelegate)pm.getObjectById(delegateID);
 			return pm.detachCopy(delegate);
 		} finally {
 			pm.close();
@@ -903,12 +941,12 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	@RolesAllowed("org.nightlabs.jfire.accounting.editLocalAccountantDelegate")
 	@Override
 	public LocalAccountantDelegate storeLocalAccountantDelegate(
-			LocalAccountantDelegate delegate,
-			boolean get,
-			String[] fetchGroups, int maxFetchDepth
+			final LocalAccountantDelegate delegate,
+			final boolean get,
+			final String[] fetchGroups, final int maxFetchDepth
 	)
 	{
-		PersistenceManager pm = createPersistenceManager();
+		final PersistenceManager pm = createPersistenceManager();
 		try {
 			return NLJDOHelper.storeJDO(pm, delegate, get, fetchGroups, maxFetchDepth);
 		} finally {
@@ -922,9 +960,9 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("org.nightlabs.jfire.accounting.editLocalAccountantDelegate")
 	@Override
-	public MoneyFlowMapping storeMoneyFlowMapping(MoneyFlowMapping mapping, boolean get, String[] fetchGroups, int maxFetchDepth)
+	public MoneyFlowMapping storeMoneyFlowMapping(final MoneyFlowMapping mapping, final boolean get, final String[] fetchGroups, final int maxFetchDepth)
 	{
-		PersistenceManager pm = createPersistenceManager();
+		final PersistenceManager pm = createPersistenceManager();
 		try {
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
@@ -935,30 +973,30 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	}
 
 	protected Map<ResolvedMapKey, ResolvedMapEntry> getResolvedMoneyFlowMappings(
-			PersistenceManager pm,
-			LocalAccountantDelegateID localAccountantDelegateID,
-			ProductTypeID productTypeID,
-			String[] mappingFetchGroups,
-			int maxFetchDepth
+			final PersistenceManager pm,
+			final LocalAccountantDelegateID localAccountantDelegateID,
+			final ProductTypeID productTypeID,
+			final String[] mappingFetchGroups,
+			final int maxFetchDepth
 	)
 	{
 		if (mappingFetchGroups != null)
 			pm.getFetchPlan().setGroups(mappingFetchGroups);
 		pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 
-		ProductType productType = (ProductType) pm.getObjectById(productTypeID);
-		LocalAccountantDelegate delegate = (LocalAccountantDelegate) pm.getObjectById(localAccountantDelegateID);
+		final ProductType productType = (ProductType) pm.getObjectById(productTypeID);
+		final LocalAccountantDelegate delegate = (LocalAccountantDelegate) pm.getObjectById(localAccountantDelegateID);
 		if (!(delegate instanceof MappingBasedAccountantDelegate))
 			throw new IllegalArgumentException("MoneyFlowMappings can only be resolved for instances of " + MappingBasedAccountantDelegate.class.getName() + " but object with ID \"" + localAccountantDelegateID + "\" is an instance of " + delegate.getClass().getName());
-		Map<ResolvedMapKey, ResolvedMapEntry> resolvedMappings = ((MappingBasedAccountantDelegate) delegate).resolveProductTypeMappings(productType);
-		Map<ResolvedMapKey, ResolvedMapEntry> result = new HashMap<ResolvedMapKey, ResolvedMapEntry>();
-		for (Entry<ResolvedMapKey, ResolvedMapEntry> entry : resolvedMappings.entrySet()) {
-			ResolvedMapEntry persitentMapEntry = entry.getValue();
-			ResolvedMapEntry mapEntry = new ResolvedMapEntry();
+		final Map<ResolvedMapKey, ResolvedMapEntry> resolvedMappings = ((MappingBasedAccountantDelegate) delegate).resolveProductTypeMappings(productType);
+		final Map<ResolvedMapKey, ResolvedMapEntry> result = new HashMap<ResolvedMapKey, ResolvedMapEntry>();
+		for (final Entry<ResolvedMapKey, ResolvedMapEntry> entry : resolvedMappings.entrySet()) {
+			final ResolvedMapEntry persitentMapEntry = entry.getValue();
+			final ResolvedMapEntry mapEntry = new ResolvedMapEntry();
 
-			for (Map.Entry<String, MoneyFlowMapping> resolvedEntry : persitentMapEntry.getResolvedMappings().entrySet()) {
-				MoneyFlowMapping persistentMapping = resolvedEntry.getValue();
-				MoneyFlowMapping detachedMapping = pm.detachCopy(persistentMapping);
+			for (final Map.Entry<String, MoneyFlowMapping> resolvedEntry : persitentMapEntry.getResolvedMappings().entrySet()) {
+				final MoneyFlowMapping persistentMapping = resolvedEntry.getValue();
+				final MoneyFlowMapping detachedMapping = pm.detachCopy(persistentMapping);
 				mapEntry.getResolvedMappings().put(resolvedEntry.getKey(), detachedMapping);
 			}
 			result.put(entry.getKey(), mapEntry);
@@ -973,12 +1011,12 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("org.nightlabs.jfire.accounting.queryLocalAccountantDelegates")
 	@Override
-	public Map<ResolvedMapKey, ResolvedMapEntry> getResolvedMoneyFlowMappings(ProductTypeID productTypeID, String[] mappingFetchGroups, int maxFetchDepth)
+	public Map<ResolvedMapKey, ResolvedMapEntry> getResolvedMoneyFlowMappings(final ProductTypeID productTypeID, final String[] mappingFetchGroups, final int maxFetchDepth)
 	{
-		PersistenceManager pm = createPersistenceManager();
+		final PersistenceManager pm = createPersistenceManager();
 		try {
-			ProductType productType = (ProductType)pm.getObjectById(productTypeID);
-			LocalAccountantDelegate delegate = productType.getProductTypeLocal().getLocalAccountantDelegate();
+			final ProductType productType = (ProductType)pm.getObjectById(productTypeID);
+			final LocalAccountantDelegate delegate = productType.getProductTypeLocal().getLocalAccountantDelegate();
 			if (delegate == null) {
 				// TODO maybe we should have a DefaultLocalAccountantDelegate, similar to the Store logic, where there is a DefaultLocalStorekeeperDelegate.
 				throw new IllegalArgumentException("The ProductType with id "+productTypeID+" does not have a LocalAccountantDelegate assigned to it.");
@@ -995,9 +1033,9 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("org.nightlabs.jfire.accounting.queryLocalAccountantDelegates")
 	@Override
-	public Map<ResolvedMapKey, ResolvedMapEntry> getResolvedMoneyFlowMappings(ProductTypeID productTypeID, LocalAccountantDelegateID delegateID, String[] mappingFetchGroups, int maxFetchDepth)
+	public Map<ResolvedMapKey, ResolvedMapEntry> getResolvedMoneyFlowMappings(final ProductTypeID productTypeID, final LocalAccountantDelegateID delegateID, final String[] mappingFetchGroups, final int maxFetchDepth)
 	{
-		PersistenceManager pm = createPersistenceManager();
+		final PersistenceManager pm = createPersistenceManager();
 		try {
 			if (mappingFetchGroups != null)
 				pm.getFetchPlan().setGroups(mappingFetchGroups);
@@ -1013,9 +1051,9 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("_Guest_")
 	@Override
-	public Collection<PriceFragmentType> getPriceFragmentTypes(Collection<PriceFragmentTypeID> priceFragmentTypeIDs, String[] fetchGroups, int maxFetchDepth)
+	public Collection<PriceFragmentType> getPriceFragmentTypes(final Collection<PriceFragmentTypeID> priceFragmentTypeIDs, final String[] fetchGroups, final int maxFetchDepth)
 	{
-		PersistenceManager pm = createPersistenceManager();
+		final PersistenceManager pm = createPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
@@ -1047,11 +1085,11 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	@Override
 	public Collection<PriceFragmentTypeID> getPriceFragmentTypeIDs()
 	{
-		PersistenceManager pm = createPersistenceManager();
+		final PersistenceManager pm = createPersistenceManager();
 		try {
-			Query q = pm.newQuery(PriceFragmentType.class);
+			final Query q = pm.newQuery(PriceFragmentType.class);
 			q.setResult("JDOHelper.getObjectId(this)");
-			Collection<PriceFragmentTypeID> c = CollectionUtil.castCollection((Collection<?>)q.execute());
+			final Collection<PriceFragmentTypeID> c = CollectionUtil.castCollection((Collection<?>)q.execute());
 			return new HashSet<PriceFragmentTypeID>(c);
 		} finally {
 			pm.close();
@@ -1086,27 +1124,27 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	@RolesAllowed("org.nightlabs.jfire.accounting.editInvoice")
 	@Override
 	public Invoice createInvoice(
-			Collection<ArticleID> articleIDs, String invoiceIDPrefix,
-			boolean get, String[] fetchGroups, int maxFetchDepth)
+			final Collection<ArticleID> articleIDs, final String invoiceIDPrefix,
+			final boolean get, final String[] fetchGroups, final int maxFetchDepth)
 	throws InvoiceEditException
 	{
-		PersistenceManager pm = createPersistenceManager();
+		final PersistenceManager pm = createPersistenceManager();
 		try {
 			pm.getExtent(Article.class);
-			User user = User.getUser(pm, getPrincipal());
-			Trader trader = Trader.getTrader(pm);
-			Accounting accounting = trader.getAccounting();
+			final User user = User.getUser(pm, getPrincipal());
+			final Trader trader = Trader.getTrader(pm);
+			final Accounting accounting = trader.getAccounting();
 
-			ArrayList<Article> articles = new ArrayList<Article>(articleIDs.size());
-			for (ArticleID articleID : articleIDs) {
-				Article article = (Article) pm.getObjectById(articleID);
-				Offer offer = article.getOffer();
+			final ArrayList<Article> articles = new ArrayList<Article>(articleIDs.size());
+			for (final ArticleID articleID : articleIDs) {
+				final Article article = (Article) pm.getObjectById(articleID);
+				final Offer offer = article.getOffer();
 				trader.validateOffer(offer);
 				trader.acceptOfferImplicitely(offer);
 				articles.add(article);
 			}
 
-			Invoice invoice = accounting.createInvoice(user, articles, invoiceIDPrefix);
+			final Invoice invoice = accounting.createInvoice(user, articles, invoiceIDPrefix);
 			accounting.validateInvoice(invoice);
 
 			if (get) {
@@ -1130,11 +1168,11 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	@RolesAllowed("org.nightlabs.jfire.accounting.editInvoice")
 	@Override
 	public Invoice createInvoice(
-			ArticleContainerID articleContainerID, String invoiceIDPrefix,
-			boolean get, String[] fetchGroups, int maxFetchDepth)
+			final ArticleContainerID articleContainerID, final String invoiceIDPrefix,
+			final boolean get, final String[] fetchGroups, final int maxFetchDepth)
 	throws InvoiceEditException
 	{
-		PersistenceManager pm = createPersistenceManager();
+		final PersistenceManager pm = createPersistenceManager();
 		try {
 			if (articleContainerID == null)
 				throw new IllegalArgumentException("articleContainerID must not be null!");
@@ -1148,14 +1186,14 @@ implements AccountingManagerRemote, AccountingManagerLocal
 			else
 				throw new IllegalArgumentException("articleContainerID must be an instance of OrderID, OfferID or DeliveryNoteID, but is " + articleContainerID.getClass().getName());
 
-			ArticleContainer articleContainer = (ArticleContainer)pm.getObjectById(articleContainerID);
+			final ArticleContainer articleContainer = (ArticleContainer)pm.getObjectById(articleContainerID);
 
-			User user = User.getUser(pm, getPrincipal());
-			Trader trader = Trader.getTrader(pm);
-			Accounting accounting = trader.getAccounting();
+			final User user = User.getUser(pm, getPrincipal());
+			final Trader trader = Trader.getTrader(pm);
+			final Accounting accounting = trader.getAccounting();
 
 			if (articleContainer instanceof Offer) {
-				Offer offer = (Offer) articleContainer;
+				final Offer offer = (Offer) articleContainer;
 //				OfferLocal offerLocal = offer.getOfferLocal();
 				trader.validateOffer(offer);
 				trader.acceptOfferImplicitely(offer);
@@ -1164,13 +1202,13 @@ implements AccountingManagerRemote, AccountingManagerLocal
 //				trader.confirmOffer(user, offerLocal);
 			}
 			else {
-				Set<Offer> offers = new HashSet<Offer>();
-				for (Article article : articleContainer.getArticles()) {
-					Offer offer = article.getOffer();
+				final Set<Offer> offers = new HashSet<Offer>();
+				for (final Article article : articleContainer.getArticles()) {
+					final Offer offer = article.getOffer();
 					offers.add(offer);
 				}
-				for (Iterator<Offer> it = offers.iterator(); it.hasNext(); ) {
-					Offer offer = it.next();
+				for (final Iterator<Offer> it = offers.iterator(); it.hasNext(); ) {
+					final Offer offer = it.next();
 					trader.validateOffer(offer);
 					trader.acceptOfferImplicitely(offer);
 //					trader.finalizeOffer(user, offer);
@@ -1179,7 +1217,7 @@ implements AccountingManagerRemote, AccountingManagerLocal
 				}
 			}
 
-			Invoice invoice = accounting.createInvoice(user, articleContainer, invoiceIDPrefix);
+			final Invoice invoice = accounting.createInvoice(user, articleContainer, invoiceIDPrefix);
 			accounting.validateInvoice(invoice);
 
 			if (get) {
@@ -1203,27 +1241,27 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	@RolesAllowed("org.nightlabs.jfire.accounting.editInvoice")
 	@Override
 	public Invoice addArticlesToInvoice(
-			InvoiceID invoiceID, Collection<ArticleID> articleIDs,
-			boolean validate, boolean get, String[] fetchGroups, int maxFetchDepth)
+			final InvoiceID invoiceID, final Collection<ArticleID> articleIDs,
+			final boolean validate, final boolean get, final String[] fetchGroups, final int maxFetchDepth)
 	throws InvoiceEditException
 	{
-		PersistenceManager pm = createPersistenceManager();
+		final PersistenceManager pm = createPersistenceManager();
 		try {
 			pm.getExtent(Invoice.class);
 			pm.getExtent(Article.class);
-			Trader trader = Trader.getTrader(pm);
+			final Trader trader = Trader.getTrader(pm);
 
-			Invoice invoice = (Invoice) pm.getObjectById(invoiceID);
-			Collection<Article> articles = new ArrayList<Article>(articleIDs.size());
-			for (ArticleID articleID : articleIDs) {
-				Article article = (Article) pm.getObjectById(articleID);
-				Offer offer = article.getOffer();
+			final Invoice invoice = (Invoice) pm.getObjectById(invoiceID);
+			final Collection<Article> articles = new ArrayList<Article>(articleIDs.size());
+			for (final ArticleID articleID : articleIDs) {
+				final Article article = (Article) pm.getObjectById(articleID);
+				final Offer offer = article.getOffer();
 				trader.validateOffer(offer);
 				trader.acceptOfferImplicitely(offer);
 				articles.add(article);
 			}
 
-			Accounting accounting = Accounting.getAccounting(pm);
+			final Accounting accounting = Accounting.getAccounting(pm);
 			accounting.addArticlesToInvoice(User.getUser(pm, getPrincipal()), invoice, articles);
 
 			if (validate)
@@ -1249,22 +1287,22 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	@RolesAllowed("org.nightlabs.jfire.accounting.editInvoice")
 	@Override
 	public Invoice removeArticlesFromInvoice(
-			InvoiceID invoiceID, Collection<ArticleID> articleIDs,
-			boolean validate, boolean get, String[] fetchGroups, int maxFetchDepth)
+			final InvoiceID invoiceID, final Collection<ArticleID> articleIDs,
+			final boolean validate, final boolean get, final String[] fetchGroups, final int maxFetchDepth)
 	throws InvoiceEditException
 	{
-		PersistenceManager pm = createPersistenceManager();
+		final PersistenceManager pm = createPersistenceManager();
 		try {
 			pm.getExtent(Invoice.class);
 			pm.getExtent(Article.class);
-			Invoice invoice = (Invoice) pm.getObjectById(invoiceID);
-			Collection<Article> articles = NLJDOHelper.getObjectList(pm, articleIDs, Article.class);
+			final Invoice invoice = (Invoice) pm.getObjectById(invoiceID);
+			final Collection<Article> articles = NLJDOHelper.getObjectList(pm, articleIDs, Article.class);
 //			Collection<Article> articles = new ArrayList<Article>(articleIDs.size());
 //			for (ArticleID articleID : articleIDs) {
 //			articles.add((Article) pm.getObjectById(articleID));
 //			}
 
-			Accounting accounting = Accounting.getAccounting(pm);
+			final Accounting accounting = Accounting.getAccounting(pm);
 			accounting.removeArticlesFromInvoice(User.getUser(pm, getPrincipal()), invoice, articles);
 
 			if (!get)
@@ -1291,20 +1329,20 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	 */
 	@RolesAllowed("org.nightlabs.jfire.accounting.pay")
 	@Override
-	public List<PaymentResult> payBegin(List<PaymentData> paymentDataList)
+	public List<PaymentResult> payBegin(final List<PaymentData> paymentDataList)
 	{
 		try {
-			List<PaymentResult> resList = new ArrayList<PaymentResult>();
-			for (PaymentData paymentData : paymentDataList) {
+			final List<PaymentResult> resList = new ArrayList<PaymentResult>();
+			for (final PaymentData paymentData : paymentDataList) {
 				PaymentResult res = null;
 				try {
 					res = accountingManagerLocal._payBegin(paymentData);
-				} catch (Throwable t) {
+				} catch (final Throwable t) {
 					PaymentException x = null;
 					if (t instanceof PaymentException)
 						x = (PaymentException)t;
 					else {
-						int i = ExceptionUtils.indexOfThrowable(t, PaymentException.class);
+						final int i = ExceptionUtils.indexOfThrowable(t, PaymentException.class);
 						if (i >= 0)
 							x = (PaymentException)ExceptionUtils.getThrowables(t)[i];
 					}
@@ -1318,9 +1356,9 @@ implements AccountingManagerRemote, AccountingManagerLocal
 
 			}
 			return resList;
-		} catch (RuntimeException x) {
+		} catch (final RuntimeException x) {
 			throw x;
-		} catch (Exception x) {
+		} catch (final Exception x) {
 			throw new RuntimeException(x);
 		}
 	}
@@ -1331,7 +1369,7 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	 */
 	@RolesAllowed("org.nightlabs.jfire.accounting.pay")
 	@Override
-	public PaymentResult payBegin(PaymentData paymentData)
+	public PaymentResult payBegin(final PaymentData paymentData)
 	{
 		return _payBegin(paymentData);
 	}
@@ -1345,7 +1383,7 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
 	@RolesAllowed("_Guest_")
 	@Override
-	public PaymentResult _payBegin(PaymentData paymentData)
+	public PaymentResult _payBegin(final PaymentData paymentData)
 	{
 		if (paymentData == null)
 			throw new NullPointerException("paymentData");
@@ -1376,24 +1414,24 @@ implements AccountingManagerRemote, AccountingManagerLocal
 
 		// Store paymentData into the database within a NEW TRANSACTION to prevent it
 		// from being deleted (if this method fails later and causes a rollback).
-		PaymentDataID paymentDataID = paymentHelperLocal.payBegin_storePaymentData(paymentData);
+		final PaymentDataID paymentDataID = paymentHelperLocal.payBegin_storePaymentData(paymentData);
 
-		String[] fetchGroups = new String[] {FetchPlan.DEFAULT};
+		final String[] fetchGroups = new String[] {FetchPlan.DEFAULT};
 
 		try {
 
 			return paymentHelperLocal.payBegin_internal(paymentDataID, fetchGroups, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
 
-		} catch (Throwable t) {
+		} catch (final Throwable t) {
 			logger.error("payBegin_internal(...) failed: " + paymentDataID, t);
-			PaymentResult payBeginServerResult = new PaymentResult(getOrganisationID(), t);
+			final PaymentResult payBeginServerResult = new PaymentResult(getOrganisationID(), t);
 
 			try {
 				return paymentHelperLocal.payBegin_storePayBeginServerResult(
 						PaymentID.create(paymentDataID), payBeginServerResult, true, fetchGroups, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
-			} catch (RuntimeException x) {
+			} catch (final RuntimeException x) {
 				throw x;
-			} catch (Exception x) {
+			} catch (final Exception x) {
 				throw new RuntimeException(x);
 			}
 		}
@@ -1405,26 +1443,26 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	 */
 	@RolesAllowed("_Guest_")
 	@Override
-	public List<PaymentResult> payDoWork(List<PaymentID> paymentIDs, List<PaymentResult> payDoWorkClientResults, boolean forceRollback)
+	public List<PaymentResult> payDoWork(final List<PaymentID> paymentIDs, final List<PaymentResult> payDoWorkClientResults, final boolean forceRollback)
 	{
 		if (paymentIDs.size() != payDoWorkClientResults.size())
 			throw new IllegalArgumentException("paymentIDs.size() != payDoWorkClientResults.size()!!!");
 
-		List<PaymentResult> resList = new ArrayList<PaymentResult>();
-		Iterator<PaymentResult> itResults = payDoWorkClientResults.iterator();
-		for (Iterator<PaymentID> itIDs = paymentIDs.iterator(); itIDs.hasNext(); ) {
-			PaymentID paymentID = itIDs.next();
-			PaymentResult payDoWorkClientResult = itResults.next();
+		final List<PaymentResult> resList = new ArrayList<PaymentResult>();
+		final Iterator<PaymentResult> itResults = payDoWorkClientResults.iterator();
+		for (final Iterator<PaymentID> itIDs = paymentIDs.iterator(); itIDs.hasNext(); ) {
+			final PaymentID paymentID = itIDs.next();
+			final PaymentResult payDoWorkClientResult = itResults.next();
 
 			PaymentResult res = null;
 			try {
 				res = accountingManagerLocal._payDoWork(paymentID, payDoWorkClientResult, forceRollback);
-			} catch (Throwable t) {
+			} catch (final Throwable t) {
 				PaymentException x = null;
 				if (t instanceof PaymentException)
 					x = (PaymentException)t;
 				else {
-					int i = ExceptionUtils.indexOfThrowable(t, PaymentException.class);
+					final int i = ExceptionUtils.indexOfThrowable(t, PaymentException.class);
 					if (i >= 0)
 						x = (PaymentException)ExceptionUtils.getThrowables(t)[i];
 				}
@@ -1447,9 +1485,9 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	@RolesAllowed("_Guest_")
 	@Override
 	public PaymentResult payDoWork(
-			PaymentID paymentID,
-			PaymentResult payEndClientResult,
-			boolean forceRollback)
+			final PaymentID paymentID,
+			final PaymentResult payEndClientResult,
+			final boolean forceRollback)
 	{
 		return _payDoWork(paymentID, payEndClientResult, forceRollback);
 	}
@@ -1461,9 +1499,9 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	@RolesAllowed("_Guest_")
 	@Override
 	public PaymentResult _payDoWork(
-			PaymentID paymentID,
-			PaymentResult payDoWorkClientResult,
-			boolean forceRollback)
+			final PaymentID paymentID,
+			final PaymentResult payDoWorkClientResult,
+			final boolean forceRollback)
 	{
 		if (paymentID == null)
 			throw new NullPointerException("paymentID");
@@ -1477,30 +1515,30 @@ implements AccountingManagerRemote, AccountingManagerLocal
 			paymentHelperLocal.payDoWork_storePayDoWorkClientResult(
 					paymentID, payDoWorkClientResult, forceRollback
 			);
-		} catch (RuntimeException x) {
+		} catch (final RuntimeException x) {
 			throw x;
-		} catch (Exception x) {
+		} catch (final Exception x) {
 			throw new RuntimeException(x);
 		}
 
-		String[] fetchGroups = new String[] {FetchPlan.DEFAULT};
+		final String[] fetchGroups = new String[] {FetchPlan.DEFAULT};
 
 		try {
 
 			return paymentHelperLocal.payDoWork_internal(paymentID, fetchGroups, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
 
-		} catch (Throwable t) {
+		} catch (final Throwable t) {
 			logger.error("payDoWork_internal(...) failed: " + paymentID, t);
-			PaymentResult payDoWorkServerResult = new PaymentResult(getOrganisationID(), t);
+			final PaymentResult payDoWorkServerResult = new PaymentResult(getOrganisationID(), t);
 
 			try {
-				PaymentResult payDoWorkServerResult_detached = paymentHelperLocal.payDoWork_storePayDoWorkServerResult(
+				final PaymentResult payDoWorkServerResult_detached = paymentHelperLocal.payDoWork_storePayDoWorkServerResult(
 						paymentID, payDoWorkServerResult, true, fetchGroups, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
 
 				return payDoWorkServerResult_detached;
-			} catch (RuntimeException x) {
+			} catch (final RuntimeException x) {
 				throw x;
-			} catch (Exception x) {
+			} catch (final Exception x) {
 				throw new RuntimeException(x);
 			}
 		}
@@ -1512,27 +1550,27 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	 */
 	@RolesAllowed("_Guest_")
 	@Override
-	public List<PaymentResult> payEnd(List<PaymentID> paymentIDs, List<PaymentResult> payEndClientResults, boolean forceRollback)
+	public List<PaymentResult> payEnd(final List<PaymentID> paymentIDs, final List<PaymentResult> payEndClientResults, final boolean forceRollback)
 	{
 		try {
 			if (paymentIDs.size() != payEndClientResults.size())
 				throw new IllegalArgumentException("paymentIDs.size() != payEndClientResults.size()!!!");
 
-			List<PaymentResult> resList = new ArrayList<PaymentResult>();
-			Iterator<PaymentResult> itResults = payEndClientResults.iterator();
-			for (Iterator<PaymentID> itIDs = paymentIDs.iterator(); itIDs.hasNext(); ) {
-				PaymentID paymentID = itIDs.next();
-				PaymentResult payEndClientResult = itResults.next();
+			final List<PaymentResult> resList = new ArrayList<PaymentResult>();
+			final Iterator<PaymentResult> itResults = payEndClientResults.iterator();
+			for (final Iterator<PaymentID> itIDs = paymentIDs.iterator(); itIDs.hasNext(); ) {
+				final PaymentID paymentID = itIDs.next();
+				final PaymentResult payEndClientResult = itResults.next();
 
 				PaymentResult res = null;
 				try {
 					res = accountingManagerLocal._payEnd(paymentID, payEndClientResult, forceRollback);
-				} catch (Throwable t) {
+				} catch (final Throwable t) {
 					PaymentException x = null;
 					if (t instanceof PaymentException)
 						x = (PaymentException)t;
 					else {
-						int i = ExceptionUtils.indexOfThrowable(t, PaymentException.class);
+						final int i = ExceptionUtils.indexOfThrowable(t, PaymentException.class);
 						if (i >= 0)
 							x = (PaymentException)ExceptionUtils.getThrowables(t)[i];
 					}
@@ -1546,9 +1584,9 @@ implements AccountingManagerRemote, AccountingManagerLocal
 
 			}
 			return resList;
-		} catch (RuntimeException x) {
+		} catch (final RuntimeException x) {
 			throw x;
-		} catch (Exception x) {
+		} catch (final Exception x) {
 			throw new RuntimeException(x);
 		}
 	}
@@ -1559,9 +1597,9 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	@RolesAllowed("_Guest_")
 	@Override
 	public PaymentResult payEnd(
-			PaymentID paymentID,
-			PaymentResult payEndClientResult,
-			boolean forceRollback)
+			final PaymentID paymentID,
+			final PaymentResult payEndClientResult,
+			final boolean forceRollback)
 	{
 		return _payEnd(paymentID, payEndClientResult, forceRollback);
 	}
@@ -1573,9 +1611,9 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	@RolesAllowed("_Guest_")
 	@Override
 	public PaymentResult _payEnd(
-			PaymentID paymentID,
-			PaymentResult payEndClientResult,
-			boolean forceRollback)
+			final PaymentID paymentID,
+			final PaymentResult payEndClientResult,
+			final boolean forceRollback)
 	{
 		if (paymentID == null)
 			throw new NullPointerException("paymentID");
@@ -1589,32 +1627,32 @@ implements AccountingManagerRemote, AccountingManagerLocal
 			paymentHelperLocal.payEnd_storePayEndClientResult(
 					paymentID, payEndClientResult, forceRollback
 			);
-		} catch (RuntimeException x) {
+		} catch (final RuntimeException x) {
 			throw x;
-		} catch (Exception x) {
+		} catch (final Exception x) {
 			throw new RuntimeException(x);
 		}
 
-		String[] fetchGroups = new String[] {FetchPlan.DEFAULT};
+		final String[] fetchGroups = new String[] {FetchPlan.DEFAULT};
 
 		try {
 
 			return paymentHelperLocal.payEnd_internal(paymentID, fetchGroups, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
 
-		} catch (Throwable t) {
+		} catch (final Throwable t) {
 			logger.error("payEnd_internal(...) failed: " + paymentID, t);
-			PaymentResult payEndServerResult = new PaymentResult(getOrganisationID(), t);
+			final PaymentResult payEndServerResult = new PaymentResult(getOrganisationID(), t);
 
 			try {
-				PaymentResult payEndServerResult_detached = paymentHelperLocal.payEnd_storePayEndServerResult(
+				final PaymentResult payEndServerResult_detached = paymentHelperLocal.payEnd_storePayEndServerResult(
 						paymentID, payEndServerResult, true, fetchGroups, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
 
 				paymentHelperLocal.payRollback(paymentID);
 
 				return payEndServerResult_detached;
-			} catch (RuntimeException x) {
+			} catch (final RuntimeException x) {
 				throw x;
-			} catch (Exception x) {
+			} catch (final Exception x) {
 				throw new RuntimeException(x);
 			}
 		}
@@ -1637,7 +1675,7 @@ implements AccountingManagerRemote, AccountingManagerLocal
 					"Invalid return type= "+ invoiceQueries.getResultClassName());
 		}
 
-		PersistenceManager pm = createPersistenceManager();
+		final PersistenceManager pm = createPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(1);
 			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
@@ -1647,11 +1685,11 @@ implements AccountingManagerRemote, AccountingManagerLocal
 				invoiceQueries = new JDOQueryCollectionDecorator<AbstractJDOQuery>(invoiceQueries);
 			}
 
-			JDOQueryCollectionDecorator<AbstractJDOQuery> queryCollection =
+			final JDOQueryCollectionDecorator<AbstractJDOQuery> queryCollection =
 				(JDOQueryCollectionDecorator<AbstractJDOQuery>) invoiceQueries;
 
 			queryCollection.setPersistenceManager(pm);
-			Collection<Invoice> invoices = (Collection<Invoice>) queryCollection.executeQueries();
+			final Collection<Invoice> invoices = (Collection<Invoice>) queryCollection.executeQueries();
 
 			return NLJDOHelper.getObjectIDSet(invoices);
 		} finally {
@@ -1664,9 +1702,9 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	 */
 	@RolesAllowed("org.nightlabs.jfire.accounting.queryInvoices")
 	@Override
-	public List<Invoice> getInvoices(Set<InvoiceID> invoiceIDs, String[] fetchGroups, int maxFetchDepth)
+	public List<Invoice> getInvoices(final Set<InvoiceID> invoiceIDs, final String[] fetchGroups, final int maxFetchDepth)
 	{
-		PersistenceManager pm = createPersistenceManager();
+		final PersistenceManager pm = createPersistenceManager();
 		try {
 			return NLJDOHelper.getDetachedObjectList(pm, invoiceIDs, Invoice.class, fetchGroups, maxFetchDepth);
 		} finally {
@@ -1679,9 +1717,9 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	 */
 	@RolesAllowed("org.nightlabs.jfire.accounting.queryInvoices")
 	@Override
-	public List<InvoiceID> getInvoiceIDs(AnchorID vendorID, AnchorID customerID, AnchorID endCustomerID, long rangeBeginIdx, long rangeEndIdx)
+	public List<InvoiceID> getInvoiceIDs(final AnchorID vendorID, final AnchorID customerID, final AnchorID endCustomerID, final long rangeBeginIdx, final long rangeEndIdx)
 	{
-		PersistenceManager pm = createPersistenceManager();
+		final PersistenceManager pm = createPersistenceManager();
 		try {
 			return new ArrayList<InvoiceID>(Invoice.getInvoiceIDs(pm, vendorID, customerID, endCustomerID, rangeBeginIdx, rangeEndIdx));
 //			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
@@ -1698,9 +1736,9 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	 */
 	@RolesAllowed("org.nightlabs.jfire.accounting.queryInvoices")
 	@Override
-	public List<Invoice> getNonFinalizedInvoices(AnchorID vendorID, AnchorID customerID, String[] fetchGroups, int maxFetchDepth)
+	public List<Invoice> getNonFinalizedInvoices(final AnchorID vendorID, final AnchorID customerID, final String[] fetchGroups, final int maxFetchDepth)
 	{
-		PersistenceManager pm = createPersistenceManager();
+		final PersistenceManager pm = createPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
@@ -1717,15 +1755,15 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	@RolesAllowed("_Guest_")
 	@Override
 	public Collection<ModeOfPaymentFlavour> getAvailableModeOfPaymentFlavoursForAllCustomerGroups(
-			Collection<CustomerGroupID> customerGroupIDs, byte mergeMode, boolean filterByConfig, String[] fetchGroups, int maxFetchDepth)
+			final Collection<CustomerGroupID> customerGroupIDs, final byte mergeMode, final boolean filterByConfig, final String[] fetchGroups, final int maxFetchDepth)
 			{
-		PersistenceManager pm = createPersistenceManager();
+		final PersistenceManager pm = createPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 
-			Collection<ModeOfPaymentFlavour> c = ModeOfPaymentFlavour.getAvailableModeOfPaymentFlavoursForAllCustomerGroups(
+			final Collection<ModeOfPaymentFlavour> c = ModeOfPaymentFlavour.getAvailableModeOfPaymentFlavoursForAllCustomerGroups(
 					pm, customerGroupIDs, mergeMode, filterByConfig);
 
 			return pm.detachCopyAll(c);
@@ -1740,11 +1778,11 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	@RolesAllowed("_Guest_")
 	@Override
 	public Set<ModeOfPaymentID> getAllModeOfPaymentIDs() {
-		PersistenceManager pm = createPersistenceManager();
+		final PersistenceManager pm = createPersistenceManager();
 		try {
-			Query q = pm.newQuery(ModeOfPayment.class);
+			final Query q = pm.newQuery(ModeOfPayment.class);
 			q.setResult("JDOHelper.getObjectId(this)");
-			Collection<ModeOfPaymentID> c = CollectionUtil.castCollection((Collection<?>) q.execute());
+			final Collection<ModeOfPaymentID> c = CollectionUtil.castCollection((Collection<?>) q.execute());
 			return new HashSet<ModeOfPaymentID>(c);
 //			return ModeOfPayment.getAllModeOfPaymentIDs(pm);
 		} finally {
@@ -1757,9 +1795,9 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	 */
 	@RolesAllowed("_Guest_")
 	@Override
-	public Collection<ModeOfPayment> getModeOfPayments(Set<ModeOfPaymentID> modeOfPaymentIDs, String[] fetchGroups, int maxFetchDepth)
+	public Collection<ModeOfPayment> getModeOfPayments(final Set<ModeOfPaymentID> modeOfPaymentIDs, final String[] fetchGroups, final int maxFetchDepth)
 	{
-		PersistenceManager pm = createPersistenceManager();
+		final PersistenceManager pm = createPersistenceManager();
 		try {
 			return NLJDOHelper.getDetachedObjectList(pm, modeOfPaymentIDs, ModeOfPayment.class, fetchGroups, maxFetchDepth);
 		} finally {
@@ -1773,11 +1811,11 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	@RolesAllowed("_Guest_")
 	@Override
 	public Set<ModeOfPaymentFlavourID> getAllModeOfPaymentFlavourIDs() {
-		PersistenceManager pm = createPersistenceManager();
+		final PersistenceManager pm = createPersistenceManager();
 		try {
-			Query q = pm.newQuery(ModeOfPaymentFlavour.class);
+			final Query q = pm.newQuery(ModeOfPaymentFlavour.class);
 			q.setResult("JDOHelper.getObjectId(this)");
-			Collection<ModeOfPaymentFlavourID> c = CollectionUtil.castCollection((Collection<?>) q.execute());
+			final Collection<ModeOfPaymentFlavourID> c = CollectionUtil.castCollection((Collection<?>) q.execute());
 			return new HashSet<ModeOfPaymentFlavourID>(c);
 //			return ModeOfPaymentFlavour.getAllModeOfPaymentFlavourIDs(pm);
 		} finally {
@@ -1790,9 +1828,9 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	 */
 	@RolesAllowed("_Guest_")
 	@Override
-	public Collection<ModeOfPaymentFlavour> getModeOfPaymentFlavours(Set<ModeOfPaymentFlavourID> modeOfPaymentFlavourIDs, String[] fetchGroups, int maxFetchDepth)
+	public Collection<ModeOfPaymentFlavour> getModeOfPaymentFlavours(final Set<ModeOfPaymentFlavourID> modeOfPaymentFlavourIDs, final String[] fetchGroups, final int maxFetchDepth)
 	{
-		PersistenceManager pm = createPersistenceManager();
+		final PersistenceManager pm = createPersistenceManager();
 		try {
 			return NLJDOHelper.getDetachedObjectList(pm, modeOfPaymentFlavourIDs, ModeOfPaymentFlavour.class, fetchGroups, maxFetchDepth);
 		} finally {
@@ -1806,11 +1844,11 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	@RolesAllowed("_Guest_")
 	@Override
 	public Collection<ServerPaymentProcessor> getServerPaymentProcessorsForOneModeOfPaymentFlavour(
-			ModeOfPaymentFlavourID modeOfPaymentFlavourID,
-			CheckRequirementsEnvironment checkRequirementsEnvironment,
-			String[] fetchGroups, int maxFetchDepth)
+			final ModeOfPaymentFlavourID modeOfPaymentFlavourID,
+			final CheckRequirementsEnvironment checkRequirementsEnvironment,
+			final String[] fetchGroups, final int maxFetchDepth)
 			{
-		PersistenceManager pm = createPersistenceManager();
+		final PersistenceManager pm = createPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
@@ -1819,7 +1857,7 @@ implements AccountingManagerRemote, AccountingManagerLocal
 			Collection<ServerPaymentProcessor> c = ServerPaymentProcessor.getServerPaymentProcessorsForOneModeOfPaymentFlavour(
 					pm, modeOfPaymentFlavourID);
 
-			for (ServerPaymentProcessor pp : c) {
+			for (final ServerPaymentProcessor pp : c) {
 				pp.checkRequirements(checkRequirementsEnvironment);
 			}
 
@@ -1840,15 +1878,15 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	 */
 	@RolesAllowed("_Guest_")
 	@Override
-	public Collection<ModeOfPaymentFlavour> getAvailableModeOfPaymentFlavoursForOneCustomerGroup(CustomerGroupID customerGroupID, boolean filterByConfig, String[] fetchGroups, int maxFetchDepth)
+	public Collection<ModeOfPaymentFlavour> getAvailableModeOfPaymentFlavoursForOneCustomerGroup(final CustomerGroupID customerGroupID, final boolean filterByConfig, final String[] fetchGroups, final int maxFetchDepth)
 	{
-		PersistenceManager pm = createPersistenceManager();
+		final PersistenceManager pm = createPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 
-			Collection<ModeOfPaymentFlavour> c = ModeOfPaymentFlavour.getAvailableModeOfPaymentFlavoursForOneCustomerGroup(
+			final Collection<ModeOfPaymentFlavour> c = ModeOfPaymentFlavour.getAvailableModeOfPaymentFlavoursForOneCustomerGroup(
 					pm, customerGroupID, filterByConfig);
 
 			return pm.detachCopyAll(c);
@@ -1862,9 +1900,9 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	 */
 	@RolesAllowed("org.nightlabs.jfire.accounting.editPriceConfiguration")
 	@Override
-	public ProductType getProductTypeForPriceConfigEditing(ProductTypeID productTypeID)
+	public ProductType getProductTypeForPriceConfigEditing(final ProductTypeID productTypeID)
 	{
-		PersistenceManager pm = createPersistenceManager();
+		final PersistenceManager pm = createPersistenceManager();
 		try {
 			return GridPriceConfigUtil.detachProductTypeForPriceConfigEditing(pm, productTypeID);
 		} finally {
@@ -1878,9 +1916,9 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("org.nightlabs.jfire.accounting.editInvoice")
 	@Override
-	public void signalInvoice(InvoiceID invoiceID, String jbpmTransitionName)
+	public void signalInvoice(final InvoiceID invoiceID, final String jbpmTransitionName)
 	{
-		PersistenceManager pm = createPersistenceManager();
+		final PersistenceManager pm = createPersistenceManager();
 		try {
 			Accounting.getAccounting(pm).signalInvoice(invoiceID, jbpmTransitionName);
 		} finally {
@@ -1893,9 +1931,9 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	 */
 	@RolesAllowed("org.nightlabs.jfire.accounting.editPriceConfiguration")
 	@Override
-	public Map<PriceConfigID, List<AffectedProductType>> getAffectedProductTypes(Set<PriceConfigID> priceConfigIDs, ProductTypeID productTypeID, PriceConfigID innerPriceConfigID)
+	public Map<PriceConfigID, List<AffectedProductType>> getAffectedProductTypes(final Set<PriceConfigID> priceConfigIDs, final ProductTypeID productTypeID, final PriceConfigID innerPriceConfigID)
 	{
-		PersistenceManager pm = createPersistenceManager();
+		final PersistenceManager pm = createPersistenceManager();
 		try {
 			// TODO implement this method correctly to take the will-be-assigned innerPriceConfig into account instead of the currently assigned one!
 			return PriceConfigUtil.getAffectedProductTypes(pm, priceConfigIDs, productTypeID, innerPriceConfigID);
@@ -1921,7 +1959,7 @@ implements AccountingManagerRemote, AccountingManagerLocal
 					"Invalid return type= "+ queries.getResultClassName());
 		}
 
-		PersistenceManager pm = createPersistenceManager();
+		final PersistenceManager pm = createPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(1);
 			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
@@ -1930,11 +1968,11 @@ implements AccountingManagerRemote, AccountingManagerLocal
 			{
 				queries = new JDOQueryCollectionDecorator<AbstractJDOQuery>(queries);
 			}
-			JDOQueryCollectionDecorator<AbstractJDOQuery> decoratedQueries =
+			final JDOQueryCollectionDecorator<AbstractJDOQuery> decoratedQueries =
 				(JDOQueryCollectionDecorator<AbstractJDOQuery>) queries;
 
 			decoratedQueries.setPersistenceManager(pm);
-			Collection<Account> accounts = (Collection<Account>) decoratedQueries.executeQueries();
+			final Collection<Account> accounts = (Collection<Account>) decoratedQueries.executeQueries();
 
 			return NLJDOHelper.getObjectIDSet(accounts);
 		} finally {
@@ -1988,25 +2026,25 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	@RolesAllowed("org.nightlabs.jfire.accounting.manualMoneyTransfer")
 	@Override
 	public ManualMoneyTransfer createManualMoneyTransfer(
-			AnchorID fromID, AnchorID toID, CurrencyID currencyID, long amount, I18nText reason,
-			boolean get, String[] fetchGroups, int maxFetchDepth)
+			final AnchorID fromID, final AnchorID toID, final CurrencyID currencyID, final long amount, final I18nText reason,
+			final boolean get, final String[] fetchGroups, final int maxFetchDepth)
 	{
-		PersistenceManager pm = createPersistenceManager();
+		final PersistenceManager pm = createPersistenceManager();
 		try{
 			// the JavaEE server knows who we are - get the User object corresponding to the currently working principal
-			User user = User.getUser(pm, getPrincipal());
+			final User user = User.getUser(pm, getPrincipal());
 
 			// initialise meta-data for Account & Currency - not really necessary, but still safer
 			pm.getExtent(Account.class);
 			pm.getExtent(Currency.class);
 
 			// load the objects for the given IDs
-			Account from = (Account) pm.getObjectById(fromID);
-			Account to = (Account) pm.getObjectById(toID);
-			Currency currency = (Currency) pm.getObjectById(currencyID);
+			final Account from = (Account) pm.getObjectById(fromID);
+			final Account to = (Account) pm.getObjectById(toID);
+			final Currency currency = (Currency) pm.getObjectById(currencyID);
 
 			// delegate to Accounting for the actual creation + booking
-			ManualMoneyTransfer manualMoneyTransfer = Accounting.getAccounting(pm).createManualMoneyTransfer(user, from, to, currency, amount, reason);
+			final ManualMoneyTransfer manualMoneyTransfer = Accounting.getAccounting(pm).createManualMoneyTransfer(user, from, to, currency, amount, reason);
 
 			// if the client doesn't need it, we simply return null here
 			if (!get)
@@ -2030,9 +2068,9 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	@RolesAllowed("org.nightlabs.jfire.accounting.queryMoneyTransfers")
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<TransferID> getMoneyTransferIDs(MoneyTransferIDQuery productTransferIDQuery)
+	public List<TransferID> getMoneyTransferIDs(final MoneyTransferIDQuery productTransferIDQuery)
 	{
-		PersistenceManager pm = createPersistenceManager();
+		final PersistenceManager pm = createPersistenceManager();
 		try {
 			productTransferIDQuery.setPersistenceManager(pm);
 			return new ArrayList<TransferID>((Collection<TransferID>) productTransferIDQuery.getResult());
@@ -2046,12 +2084,12 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	 */
 	@RolesAllowed("org.nightlabs.jfire.accounting.queryMoneyTransfers")
 	@SuppressWarnings("unchecked")
-	public List<TransferID> getMoneyTransferIDs(Collection<MoneyTransferQuery> moneyTransferQueries)
+	public List<TransferID> getMoneyTransferIDs(final Collection<MoneyTransferQuery> moneyTransferQueries)
 	{
-		PersistenceManager pm = createPersistenceManager();
+		final PersistenceManager pm = createPersistenceManager();
 		try {
 			Collection<MoneyTransfer> productTransfers = null;
-			for (MoneyTransferQuery productTransferQuery : moneyTransferQueries) {
+			for (final MoneyTransferQuery productTransferQuery : moneyTransferQueries) {
 				productTransferQuery.setPersistenceManager(pm);
 				productTransferQuery.setCandidates(productTransfers);
 				productTransfers = (Collection<MoneyTransfer>) productTransferQuery.getResult();
@@ -2068,9 +2106,9 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	 */
 	@RolesAllowed("org.nightlabs.jfire.accounting.queryMoneyTransfers")
 	@Override
-	public List<MoneyTransfer> getMoneyTransfers(Collection<TransferID> moneyTransferIDs, String[] fetchGroups, int maxFetchDepth)
+	public List<MoneyTransfer> getMoneyTransfers(final Collection<TransferID> moneyTransferIDs, final String[] fetchGroups, final int maxFetchDepth)
 	{
-		PersistenceManager pm = createPersistenceManager();
+		final PersistenceManager pm = createPersistenceManager();
 		try {
 			return NLJDOHelper.getDetachedObjectList(pm, moneyTransferIDs, MoneyTransfer.class, fetchGroups, maxFetchDepth);
 		} finally {
@@ -2086,9 +2124,9 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	@Override
 	public Set<AccountTypeID> getAccountTypeIDs()
 	{
-		PersistenceManager pm = createPersistenceManager();
+		final PersistenceManager pm = createPersistenceManager();
 		try {
-			Query q = pm.newQuery(AccountType.class);
+			final Query q = pm.newQuery(AccountType.class);
 			q.setResult("JDOHelper.getObjectId(this)");
 			return new HashSet<AccountTypeID>((Collection<? extends AccountTypeID>) q.execute());
 		} finally {
@@ -2101,9 +2139,9 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	 */
 	@RolesAllowed("_Guest_")
 	@Override
-	public List<AccountType> getAccountTypes(Collection<AccountTypeID> accountTypeIDs, String[] fetchGroups, int maxFetchDepth)
+	public List<AccountType> getAccountTypes(final Collection<AccountTypeID> accountTypeIDs, final String[] fetchGroups, final int maxFetchDepth)
 	{
-		PersistenceManager pm = createPersistenceManager();
+		final PersistenceManager pm = createPersistenceManager();
 		try {
 			return NLJDOHelper.getDetachedObjectList(pm, accountTypeIDs, AccountType.class, fetchGroups, maxFetchDepth);
 		} finally {
@@ -2117,9 +2155,9 @@ implements AccountingManagerRemote, AccountingManagerLocal
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("org.nightlabs.jfire.accounting.editPriceFragmentType")
 	@Override
-	public PriceFragmentType storePriceFragmentType(PriceFragmentType priceFragmentType, boolean get, String[] fetchGroups, int maxFetchDepth)
+	public PriceFragmentType storePriceFragmentType(final PriceFragmentType priceFragmentType, final boolean get, final String[] fetchGroups, final int maxFetchDepth)
 	{
-		PersistenceManager pm = createPersistenceManager();
+		final PersistenceManager pm = createPersistenceManager();
 		try {
 			return NLJDOHelper.storeJDO(pm, priceFragmentType, get, fetchGroups, maxFetchDepth);
 		} finally {
@@ -2129,8 +2167,8 @@ implements AccountingManagerRemote, AccountingManagerLocal
 
 	@RolesAllowed("org.nightlabs.jfire.accounting.editCurrency")
 	@Override
-	public Currency storeCurrency(Currency currency, boolean get,String[] fetchGroups, int maxFetchDepth) {
-		PersistenceManager pm = createPersistenceManager();
+	public Currency storeCurrency(final Currency currency, final boolean get,final String[] fetchGroups, final int maxFetchDepth) {
+		final PersistenceManager pm = createPersistenceManager();
 		try {
              return NLJDOHelper.storeJDO(pm, currency, get, fetchGroups, maxFetchDepth);
 		} finally {

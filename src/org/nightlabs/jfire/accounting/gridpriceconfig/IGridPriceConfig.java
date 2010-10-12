@@ -31,6 +31,8 @@ public interface IGridPriceConfig extends IPriceConfig
 	CustomerGroup removeCustomerGroup(String organisationID,
 			String customerGroupID);
 
+	void clearCustomerGroups();
+
 	/**
 	 * @return Returns the tariffs.
 	 */

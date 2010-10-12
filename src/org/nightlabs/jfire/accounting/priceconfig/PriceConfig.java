@@ -27,6 +27,7 @@
 package org.nightlabs.jfire.accounting.priceconfig;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -34,81 +35,70 @@ import java.util.Map;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.Discriminator;
+import javax.jdo.annotations.DiscriminatorStrategy;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
 import javax.jdo.listener.AttachCallback;
 import javax.jdo.listener.StoreCallback;
 
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.accounting.Currency;
-import org.nightlabs.jfire.accounting.Price;
 import org.nightlabs.jfire.accounting.PriceFragmentType;
 import org.nightlabs.jfire.accounting.id.CurrencyID;
 import org.nightlabs.jfire.accounting.priceconfig.id.PriceConfigID;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
+import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.ArticlePrice;
 import org.nightlabs.util.Util;
 
-import javax.jdo.annotations.Join;
-import javax.jdo.annotations.FetchGroups;
-import javax.jdo.annotations.NullValue;
-import javax.jdo.annotations.Inheritance;
-import javax.jdo.annotations.PrimaryKey;
-import javax.jdo.annotations.FetchGroup;
-import javax.jdo.annotations.PersistenceModifier;
-import javax.jdo.annotations.Discriminator;
-import javax.jdo.annotations.Persistent;
-import javax.jdo.annotations.InheritanceStrategy;
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.DiscriminatorStrategy;
-import javax.jdo.annotations.Column;
-import javax.jdo.annotations.IdentityType;
-
 /**
- * A <tt>PriceConfig</tt> is a complete set of prices which can be assigned to a product by setting
- * it's <tt>ProductInfo.priceConfig</tt>. This class may be inherited thus, the PriceConfig can be
- * specialized for special products.
- * <br/><br/>
- * Because the prices are not hardlinked to a product but indirectly assigned via a PriceConfig, it is
- * no problem for multiple products to share the same <tt>PriceConfig</tt>. The property <tt>PriceConfig</tt>
- * of <tt>ProductInfo</tt> is inherited.
+ * <p>
+ * A <tt>PriceConfig</tt> is a complete set of prices which can be assigned to a {@link ProductType} by setting
+ * its {@link ProductType#setInnerPriceConfig(IInnerPriceConfig) inner-price-config} or its
+ * {@link ProductType#setPackagePriceConfig(IPackagePriceConfig) package-price-config}.
+ * This class may be inherited. Thus, the PriceConfig can be specialized for special products.
+ * </p>
+ * <p>
+ * Because the prices are not hardlinked to a product-type but indirectly assigned via a <code>PriceConfig</code>, it is
+ * no problem for multiple product-types to share the same <tt>PriceConfig</tt>.
+ * </p>
  *
  * @author Marco Schulze - marco at nightlabs dot de
- *
- * @jdo.persistence-capable
- *		identity-type="application"
- *		objectid-class="org.nightlabs.jfire.accounting.priceconfig.id.PriceConfigID"
- *		detachable="true"
- *		table="JFireTrade_PriceConfig"
- *
- * @jdo.inheritance strategy="new-table"
- * @jdo.inheritance-discriminator strategy="class-name"
- *
- * @jdo.create-objectid-class field-order="organisationID, priceConfigID"
- *
- * @jdo.fetch-group name="PriceConfig.currencies" fields="currencies"
- * @jdo.fetch-group name="PriceConfig.name" fields="name"
- * @jdo.fetch-group name="PriceConfig.priceFragmentTypes" fields="priceFragmentTypes"
- *
- * @jdo.fetch-group name="FetchGroupsPriceConfig.edit" fields="currencies, name, priceFragmentTypes"
  */
 @PersistenceCapable(
-	objectIdClass=PriceConfigID.class,
-	identityType=IdentityType.APPLICATION,
-	detachable="true",
-	table="JFireTrade_PriceConfig")
+		objectIdClass=PriceConfigID.class,
+		identityType=IdentityType.APPLICATION,
+		detachable="true",
+		table="JFireTrade_PriceConfig"
+)
 @FetchGroups({
 	@FetchGroup(
-		name=PriceConfig.FETCH_GROUP_CURRENCIES,
-		members=@Persistent(name="currencies")),
-	@FetchGroup(
-		name=PriceConfig.FETCH_GROUP_NAME,
-		members=@Persistent(name="name")),
-	@FetchGroup(
-		name=PriceConfig.FETCH_GROUP_PRICE_FRAGMENT_TYPES,
-		members=@Persistent(name="priceFragmentTypes")),
-	@FetchGroup(
-		name="FetchGroupsPriceConfig.edit",
-		members={@Persistent(name="currencies"), @Persistent(name="name"), @Persistent(name="priceFragmentTypes")})
+			name=PriceConfig.FETCH_GROUP_CURRENCIES,
+			members=@Persistent(name="currencies")),
+			@FetchGroup(
+					name=PriceConfig.FETCH_GROUP_NAME,
+					members=@Persistent(name="name")
+			),
+			@FetchGroup(
+					name=PriceConfig.FETCH_GROUP_PRICE_FRAGMENT_TYPES,
+					members=@Persistent(name="priceFragmentTypes")
+			),
+			@FetchGroup(
+					name="FetchGroupsPriceConfig.edit",
+					members={@Persistent(name="currencies"), @Persistent(name="name"), @Persistent(name="priceFragmentTypes")}
+			)
 })
 @Discriminator(strategy=DiscriminatorStrategy.CLASS_NAME)
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
@@ -119,52 +109,20 @@ public abstract class PriceConfig implements Serializable, StoreCallback, Attach
 	public static final String FETCH_GROUP_NAME = "PriceConfig.name";
 	public static final String FETCH_GROUP_PRICE_FRAGMENT_TYPES = "PriceConfig.priceFragmentTypes";
 
-//	public static long createPriceConfigID() {
-//		return IDGenerator.nextID(PriceConfig.class);
-//	}
-
-	/**
-	 * @jdo.field primary-key="true"
-	 * @jdo.column length="100"
-	 */
-@PrimaryKey
-@Column(length=100)
+	@PrimaryKey
+	@Column(length=100)
 	private String organisationID = null;
 
-//	/**
-//	 * @jdo.field primary-key="true"
-//	 */
-//	private long priceConfigID = -1;
-	/**
-	 * @jdo.field primary-key="true"
-	 * @jdo.column length="100"
-	 */
-@PrimaryKey
-@Column(length=100)
+	@PrimaryKey
+	@Column(length=100)
 	private String priceConfigID = null;
 
-	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 */
-	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
-	private String primaryKey;
+//	private String primaryKey;
 
-	/**
-	 * @jdo.field persistence-modifier="persistent" dependent="true" mapped-by="priceConfig"
-	 */
-	@Persistent(
-		dependent="true",
-		mappedBy="priceConfig",
-		persistenceModifier=PersistenceModifier.PERSISTENT)
+	@Persistent(mappedBy="priceConfig", dependent="true")
 	private PriceConfigName name;
 
-	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 */
-	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private String managedBy;
-
-//	protected PriceConfig extendedPriceConfig = null;
 
 	/**
 	 * @deprecated Only for JDO!
@@ -172,40 +130,41 @@ public abstract class PriceConfig implements Serializable, StoreCallback, Attach
 	@Deprecated
 	protected PriceConfig() { }
 
-	public PriceConfig(String organisationID, String priceConfigID)
+//	public PriceConfig(final String organisationID, final String priceConfigID)
+//	{
+	public PriceConfig(final PriceConfigID priceConfigID)
 	{
-//		if (organisationID == null)
-//			throw new IllegalArgumentException("organisationID must not be null!");
-//		if (priceConfigID < 0)
-//			throw new IllegalArgumentException("priceConfigID < 0!");
+		if (priceConfigID == null) {
+			this.organisationID = IDGenerator.getOrganisationID();
+			this.priceConfigID = createPriceConfigID(); // IDGenerator.nextIDString(PriceConfig.class);
+		}
+		else {
+			ObjectIDUtil.assertValidIDString(priceConfigID.organisationID, "organisationID");
+			ObjectIDUtil.assertValidIDString(priceConfigID.priceConfigID, "priceConfigID");
 
-		ObjectIDUtil.assertValidIDString(organisationID, "organisationID");
-		ObjectIDUtil.assertValidIDString(priceConfigID, "priceConfigID");
-
-		this.organisationID = organisationID;
-		this.priceConfigID = priceConfigID;
-		this.primaryKey = getPrimaryKey(organisationID, priceConfigID);
+			this.organisationID = priceConfigID.organisationID;
+			this.priceConfigID = priceConfigID.priceConfigID;
+		}
+//		this.primaryKey = getPrimaryKey(organisationID, priceConfigID);
 		this.name = new PriceConfigName(this);
 		this.managedBy = null;
 		this.currencies = new HashMap<String, Currency>();
 		this.priceFragmentTypes = new HashMap<String, PriceFragmentType>();
 	}
 
-	/**
-	 * @return Returns the organisationID.
-	 */
+	@Override
 	public String getOrganisationID()
 	{
 		return organisationID;
 	}
-	/**
-	 * @return Returns the priceConfigID.
-	 */
+
+	@Override
 	public String getPriceConfigID()
 	{
 		return priceConfigID;
 	}
-	public static String getPrimaryKey(String organisationID, String priceConfigID)
+
+	public static String getPrimaryKey(final String organisationID, final String priceConfigID)
 	{
 		if (organisationID == null)
 			throw new IllegalArgumentException("organisationID must not be null!");
@@ -220,7 +179,8 @@ public abstract class PriceConfig implements Serializable, StoreCallback, Attach
 
 	public String getPrimaryKey()
 	{
-		return primaryKey;
+		return getPrimaryKey(organisationID, priceConfigID);
+//		return primaryKey;
 	}
 
 	/**
@@ -232,16 +192,6 @@ public abstract class PriceConfig implements Serializable, StoreCallback, Attach
 	 *
 	 * key: String currencyID<br/>
 	 * value: Currency currency
-	 *
-	 * @jdo.field
-	 *		persistence-modifier="persistent"
-	 *		collection-type="map"
-	 *		key-type="java.lang.String"
-	 *		value-type="Currency"
-	 *		table="JFireTrade_PriceConfig_currencies"
-	 *		null-value="exception"
-	 *
-	 * @jdo.join
 	 */
 	@Join
 	@Persistent(
@@ -261,7 +211,7 @@ public abstract class PriceConfig implements Serializable, StoreCallback, Attach
 	 * @see #beginAdjustParameters()
 	 * @see #endAdjustParameters()
 	 */
-	public boolean addCurrency(Currency currency)
+	public boolean addCurrency(final Currency currency)
 	{
 		if (currencies.containsKey(currency.getCurrencyID()))
 			return false;
@@ -269,7 +219,7 @@ public abstract class PriceConfig implements Serializable, StoreCallback, Attach
 		currencies.put(currency.getCurrencyID(), currency);
 		return true;
 	}
-	public Currency getCurrency(CurrencyID currencyID, boolean throwExceptionIfNotRegistered)
+	public Currency getCurrency(final CurrencyID currencyID, final boolean throwExceptionIfNotRegistered)
 	{
 		return getCurrency(currencyID.currencyID, throwExceptionIfNotRegistered);
 	}
@@ -277,27 +227,36 @@ public abstract class PriceConfig implements Serializable, StoreCallback, Attach
 	 * @return Returns the desired Currency if registered or <tt>null</tt> if the
 	 * given currencyID is not known.
 	 */
-	public Currency getCurrency(String currencyID, boolean throwExceptionIfNotRegistered)
+	public Currency getCurrency(final String currencyID, final boolean throwExceptionIfNotRegistered)
 	{
-		Currency res = currencies.get(currencyID);
+		final Currency res = currencies.get(currencyID);
 		if (res == null && throwExceptionIfNotRegistered)
 			throw new IndexOutOfBoundsException("There is no Currency registered in this PriceConfig with the currencyID "+currencyID);
 		return res;
 	}
+
 	@Override
-	public boolean containsCurrency(String currencyID)
+	public boolean containsCurrency(final String currencyID)
 	{
 		return currencies.containsKey(currencyID);
 	}
+
 	@Override
-	public boolean containsCurrency(Currency currency)
+	public boolean containsCurrency(final Currency currency)
 	{
 		return currencies.containsKey(currency.getCurrencyID());
 	}
+
 	@Override
-	public Currency removeCurrency(String currencyID)
+	public Currency removeCurrency(final String currencyID)
 	{
 		return currencies.remove(currencyID);
+	}
+
+	@Override
+	public void clearCurrencies() {
+		for (final Currency currency : new ArrayList<Currency>(currencies.values()))
+			removeCurrency(currency.getCurrencyID());
 	}
 
 	/**
@@ -327,7 +286,7 @@ public abstract class PriceConfig implements Serializable, StoreCallback, Attach
 		return Collections.unmodifiableCollection(priceFragmentTypes.values());
 	}
 	@Override
-	public boolean addPriceFragmentType(PriceFragmentType priceFragmentType)
+	public boolean addPriceFragmentType(final PriceFragmentType priceFragmentType)
 	{
 		if (priceFragmentTypes.containsKey(priceFragmentType.getPrimaryKey()))
 			return false;
@@ -336,32 +295,32 @@ public abstract class PriceConfig implements Serializable, StoreCallback, Attach
 		return true;
 	}
 	@Override
-	public PriceFragmentType getPriceFragmentType(String organisationID, String priceFragmentTypeID, boolean throwExceptionIfNotExistent)
+	public PriceFragmentType getPriceFragmentType(final String organisationID, final String priceFragmentTypeID, final boolean throwExceptionIfNotExistent)
 	{
 		return getPriceFragmentType(
 				PriceFragmentType.getPrimaryKey(organisationID, priceFragmentTypeID),
 				throwExceptionIfNotExistent);
 	}
 	@Override
-	public PriceFragmentType getPriceFragmentType(String priceFragmentTypePK, boolean throwExceptionIfNotExistent)
+	public PriceFragmentType getPriceFragmentType(final String priceFragmentTypePK, final boolean throwExceptionIfNotExistent)
 	{
-		PriceFragmentType res = priceFragmentTypes.get(priceFragmentTypePK);
+		final PriceFragmentType res = priceFragmentTypes.get(priceFragmentTypePK);
 		if (throwExceptionIfNotExistent && res == null)
 			throw new IllegalArgumentException("No PriceFragmentType registered with \""+priceFragmentTypePK+"\"!");
 		return res;
 	}
 	@Override
-	public boolean containsPriceFragmentType(PriceFragmentType priceFragmentType)
+	public boolean containsPriceFragmentType(final PriceFragmentType priceFragmentType)
 	{
 		return priceFragmentTypes.containsKey(priceFragmentType.getPrimaryKey());
 	}
 	@Override
-	public boolean containsPriceFragmentType(String priceFragmentTypePK)
+	public boolean containsPriceFragmentType(final String priceFragmentTypePK)
 	{
 		return priceFragmentTypes.containsKey(priceFragmentTypePK);
 	}
 	@Override
-	public boolean containsPriceFragmentType(String organisationID, String priceFragmentTypeID)
+	public boolean containsPriceFragmentType(final String organisationID, final String priceFragmentTypeID)
 	{
 		return priceFragmentTypes.containsKey(
 				PriceFragmentType.getPrimaryKey(organisationID, priceFragmentTypeID));
@@ -376,7 +335,7 @@ public abstract class PriceConfig implements Serializable, StoreCallback, Attach
 	 * @see PriceFragmentType#getPrimaryKey(String, String)
 	 */
 	@Override
-	public PriceFragmentType removePriceFragmentType(String organisationID, String priceFragmentTypeID)
+	public PriceFragmentType removePriceFragmentType(final String organisationID, final String priceFragmentTypeID)
 	{
 		return removePriceFragmentType(
 				PriceFragmentType.getPrimaryKey(organisationID, priceFragmentTypeID));
@@ -390,7 +349,7 @@ public abstract class PriceConfig implements Serializable, StoreCallback, Attach
 	 * @see #removePriceFragmentType(String, String)
 	 */
 	@Override
-	public PriceFragmentType removePriceFragmentType(String priceFragmentTypePK)
+	public PriceFragmentType removePriceFragmentType(final String priceFragmentTypePK)
 	{
 		return priceFragmentTypes.remove(priceFragmentTypePK);
 	}
@@ -517,9 +476,9 @@ public abstract class PriceConfig implements Serializable, StoreCallback, Attach
 	public void jdoPreStore()
 	{
 		if (JDOHelper.isNew(this)) {
-			PersistenceManager pm = JDOHelper.getPersistenceManager(this);
+			final PersistenceManager pm = JDOHelper.getPersistenceManager(this);
 
-			PriceFragmentType totalPFT = PriceFragmentType.getTotalPriceFragmentType(pm);
+			final PriceFragmentType totalPFT = PriceFragmentType.getTotalPriceFragmentType(pm);
 			addPriceFragmentType(totalPFT);
 
 			this.dependentOnOffer = isDependentOnOffer();
@@ -532,7 +491,7 @@ public abstract class PriceConfig implements Serializable, StoreCallback, Attach
 	}
 
 	@Override
-	public void jdoPostAttach(Object detached) {
+	public void jdoPostAttach(final Object detached) {
 	}
 
 	@Override
@@ -553,7 +512,7 @@ public abstract class PriceConfig implements Serializable, StoreCallback, Attach
 	}
 
 	@Override
-	public void setManagedBy(String managedBy) {
+	public void setManagedBy(final String managedBy) {
 		if (JDOHelper.isDetached(this))
 			throw new IllegalStateException("setManagedBy can only be set for attached instances of " + this.getClass().getSimpleName());
 		this.managedBy = managedBy;
@@ -567,8 +526,8 @@ public abstract class PriceConfig implements Serializable, StoreCallback, Attach
 	 * @param pm The {@link PersistenceManager} to use.
 	 * @param priceConfigID The id of the {@link PriceConfig} to check, this might also be <code>null</code> (the result of JDOHelper.getObjectId() of a new object).
 	 */
-	public static void assertPriceConfigNotManaged(PersistenceManager pm, PriceConfigID priceConfigID) {
-		PriceConfig priceConfig = (PriceConfig) pm.getObjectById(priceConfigID);
+	public static void assertPriceConfigNotManaged(final PersistenceManager pm, final PriceConfigID priceConfigID) {
+		final PriceConfig priceConfig = (PriceConfig) pm.getObjectById(priceConfigID);
 		if (priceConfig.getManagedBy() != null)
 			throw new ManagedPriceConfigModficationException(priceConfigID, priceConfig.getManagedBy());
 	}
@@ -585,19 +544,19 @@ public abstract class PriceConfig implements Serializable, StoreCallback, Attach
 	 * @param priceConfigID The id of the {@link PriceConfig} to check, this might also be <code>null</code> (the result of JDOHelper.getObjectId() of a new object).
 	 * @return <code>true</code> if the given {@link PriceConfig} is found to be tagged with the managed-by flag, <code>false</code> otherwise.
 	 */
-	public static boolean isPriceConfigManaged(PersistenceManager pm, PriceConfigID priceConfigID) {
-		PriceConfig priceConfig = (PriceConfig) pm.getObjectById(priceConfigID);
+	public static boolean isPriceConfigManaged(final PersistenceManager pm, final PriceConfigID priceConfigID) {
+		final PriceConfig priceConfig = (PriceConfig) pm.getObjectById(priceConfigID);
 		return priceConfig.getManagedBy() != null;
 	}
 
 	@Override
-	public boolean equals(Object obj)
+	public boolean equals(final Object obj)
 	{
 		if (obj == this) return true;
 		if (obj == null) return false;
 		if (this.getClass() != obj.getClass()) return false;
 
-		IPriceConfig other = (IPriceConfig) obj;
+		final IPriceConfig other = (IPriceConfig) obj;
 
 		return Util.equals(this.organisationID, other.getOrganisationID()) && Util.equals(this.priceConfigID, other.getPriceConfigID());
 	}

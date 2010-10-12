@@ -53,6 +53,7 @@ import org.nightlabs.jfire.accounting.Tariff;
 import org.nightlabs.jfire.accounting.priceconfig.IPackagePriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.IPriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.PriceConfigUtil;
+import org.nightlabs.jfire.accounting.priceconfig.id.PriceConfigID;
 import org.nightlabs.jfire.store.NestedProductTypeLocal;
 import org.nightlabs.jfire.store.Product;
 import org.nightlabs.jfire.trade.Article;
@@ -109,7 +110,7 @@ implements IPackagePriceConfig, IResultPriceConfig
 	/**
 	 * @see #getPriceCells(String, String)
 	 */
-	public Collection<PriceCell> getPriceCells(CustomerGroup customerGroup, Currency currency)
+	public Collection<PriceCell> getPriceCells(final CustomerGroup customerGroup, final Currency currency)
 	{
 		return getPriceCells(customerGroup.getPrimaryKey(), currency.getCurrencyID());
 	}
@@ -117,11 +118,11 @@ implements IPackagePriceConfig, IResultPriceConfig
 	 * @return a <tt>Collection</tt> of {@link PriceCell}.
 	 */
 	@SuppressWarnings("unchecked")
-	public Collection<PriceCell> getPriceCells(String customerGroupPK, String currencyID)
+	public Collection<PriceCell> getPriceCells(final String customerGroupPK, final String currencyID)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		final PersistenceManager pm = getPersistenceManager();
 		//Query query = pm.newNamedQuery(StablePriceConfig.class, "getPriceCellsForCustomerGroupAndCurrency");
-		Query query = pm.newNamedQuery(PriceCell.class, "getPriceCellsForCustomerGroupAndCurrency");
+		final Query query = pm.newNamedQuery(PriceCell.class, "getPriceCellsForCustomerGroupAndCurrency");
 		return (Collection<PriceCell>) query.execute(this, customerGroupPK, currencyID);
 	}
 
@@ -166,8 +167,8 @@ implements IPackagePriceConfig, IResultPriceConfig
 	protected Map<IPriceCoordinate, PriceCell> getPriceCoordinate2priceCell()
 	{
 		if (priceCoordinate2priceCell == null) {
-			Map<IPriceCoordinate, PriceCell> m = new HashMap<IPriceCoordinate, PriceCell>();
-			for (PriceCell priceCell : priceCells)
+			final Map<IPriceCoordinate, PriceCell> m = new HashMap<IPriceCoordinate, PriceCell>();
+			for (final PriceCell priceCell : priceCells)
 				m.put(priceCell.getPriceCoordinate(), priceCell);
 
 			priceCoordinate2priceCell = m;
@@ -185,9 +186,9 @@ implements IPackagePriceConfig, IResultPriceConfig
 	 * @param organisationID
 	 * @param priceConfigID
 	 */
-	public StablePriceConfig(String organisationID, String priceConfigID)
+	public StablePriceConfig(final PriceConfigID priceConfigID)
 	{
-		super(organisationID, priceConfigID);
+		super(priceConfigID);
 		priceCells = new HashSet<PriceCell>();
 	}
 
@@ -211,7 +212,7 @@ implements IPackagePriceConfig, IResultPriceConfig
 	public void resetPriceFragmentCalculationStatus()
 	{
 //		for (Map.Entry<IPriceCoordinate, PriceCell> me : new ArrayList<Map.Entry<IPriceCoordinate, PriceCell>>(priceCells.entrySet())) { // new ArrayList, because we might call putPriceCell(...)
-		for (PriceCell priceCell : new ArrayList<PriceCell>(priceCells)) { // new ArrayList, because we might call putPriceCell(...)
+		for (final PriceCell priceCell : new ArrayList<PriceCell>(priceCells)) { // new ArrayList, because we might call putPriceCell(...)
 //			PriceCell priceCell = me.getValue();
 //			if (priceCell == null) {
 //				IPriceCoordinate priceCoordinate = me.getKey();
@@ -252,30 +253,30 @@ implements IPackagePriceConfig, IResultPriceConfig
 	}
 
 	protected PriceCell createPriceCell(
-			CustomerGroup customerGroup,
-			Tariff tariff, Currency currency)
+			final CustomerGroup customerGroup,
+			final Tariff tariff, final Currency currency)
 	{
-		PriceCoordinate priceCoordinate = new PriceCoordinate(
+		final PriceCoordinate priceCoordinate = new PriceCoordinate(
 				this, customerGroup,
 				tariff, currency);
 		return createPriceCell(priceCoordinate);
 	}
 
 	public PriceCell getPriceCell(
-			CustomerGroup customerGroup,
-			Tariff tariff, Currency currency,
-			boolean throwExceptionIfNotExistent)
+			final CustomerGroup customerGroup,
+			final Tariff tariff, final Currency currency,
+			final boolean throwExceptionIfNotExistent)
 	{
-		PriceCoordinate priceCoordinate = new PriceCoordinate(
+		final PriceCoordinate priceCoordinate = new PriceCoordinate(
 				this, customerGroup,
 				tariff, currency);
 		return getPriceCell(priceCoordinate, throwExceptionIfNotExistent);
 	}
 
 	@Override
-	public PriceCell getPriceCell(IPriceCoordinate priceCoordinate, boolean throwExceptionIfNotExistent)
+	public PriceCell getPriceCell(final IPriceCoordinate priceCoordinate, final boolean throwExceptionIfNotExistent)
 	{
-		PriceCell priceCell = getPriceCoordinate2priceCell().get(priceCoordinate);
+		final PriceCell priceCell = getPriceCoordinate2priceCell().get(priceCoordinate);
 
 //		// If the JDO implementation uses a shortcut (a direct JDOQL instead of loading the whole Map and then
 //		// search for the key), the cell might exist and not be found. Hence, we load the whole Map and try it again.
@@ -310,9 +311,9 @@ implements IPackagePriceConfig, IResultPriceConfig
 		return priceCell;
 	}
 
-	protected void putPriceCell(PriceCell priceCell)
+	protected void putPriceCell(final PriceCell priceCell)
 	{
-		IPriceCoordinate priceCoordinate = priceCell.getPriceCoordinate();
+		final IPriceCoordinate priceCoordinate = priceCell.getPriceCoordinate();
 		priceCoordinate.assertAllDimensionValuesAssigned();
 		if (priceCell == null)
 			throw new IllegalArgumentException("priceCell must not be null");
@@ -320,7 +321,7 @@ implements IPackagePriceConfig, IResultPriceConfig
 		if (logger.isDebugEnabled())
 			logger.debug("putPriceCell: priceCoordinate=" + priceCoordinate + " priceCell=" + priceCell);
 
-		PriceCell oldPriceCell = getPriceCoordinate2priceCell().get(priceCoordinate);
+		final PriceCell oldPriceCell = getPriceCoordinate2priceCell().get(priceCoordinate);
 		if (oldPriceCell != null && !oldPriceCell.equals(priceCell))
 			priceCells.remove(oldPriceCell);
 
@@ -330,22 +331,22 @@ implements IPackagePriceConfig, IResultPriceConfig
 	}
 
 	protected void removePriceCell(
-			CustomerGroup customerGroup,
-			Tariff tariff, Currency currency)
+			final CustomerGroup customerGroup,
+			final Tariff tariff, final Currency currency)
 	{
-		PriceCoordinate priceCoordinate = new PriceCoordinate(
+		final PriceCoordinate priceCoordinate = new PriceCoordinate(
 				this, customerGroup,
 				tariff, currency);
 		removePriceCell(priceCoordinate);
 	}
 
-	protected void removePriceCell(PriceCoordinate priceCoordinate)
+	protected void removePriceCell(final PriceCoordinate priceCoordinate)
 	{
 		if (logger.isDebugEnabled())
 			logger.debug("removePriceCell: " + priceCoordinate);
 
 //		priceCells.remove(priceCoordinate);
-		PriceCell oldPriceCell = getPriceCoordinate2priceCell().remove(priceCoordinate);
+		final PriceCell oldPriceCell = getPriceCoordinate2priceCell().remove(priceCoordinate);
 		if (oldPriceCell != null)
 			priceCells.remove(oldPriceCell);
 	}
@@ -363,8 +364,8 @@ implements IPackagePriceConfig, IResultPriceConfig
 	 * @param currency <tt>null</tt> or a specific Currency for which to add the missing cells in the other dimensions.
 	 */
 	protected void createPriceCells(
-			CustomerGroup _customerGroup, Tariff _tariff,
-			Currency _currency)
+			final CustomerGroup _customerGroup, final Tariff _tariff,
+			final Currency _currency)
 	{
 		int paramCount = 0;
 		if (_customerGroup != null) ++paramCount;
@@ -380,18 +381,18 @@ implements IPackagePriceConfig, IResultPriceConfig
 		if (_currency != null && !containsCurrency(_currency))
 			throw new IllegalArgumentException("Given Currency is not a registered parameter!");
 
-		Collection<CustomerGroup> customerGroups = _customerGroup == null ? getCustomerGroups() : Collections.singleton(_customerGroup);
-		Collection<Tariff> tariffs = _tariff == null ? getTariffs() : Collections.singleton(_tariff);
-		Collection<Currency> currencies = _currency == null ? getCurrencies() : Collections.singleton(_currency);
+		final Collection<CustomerGroup> customerGroups = _customerGroup == null ? getCustomerGroups() : Collections.singleton(_customerGroup);
+		final Collection<Tariff> tariffs = _tariff == null ? getTariffs() : Collections.singleton(_tariff);
+		final Collection<Currency> currencies = _currency == null ? getCurrencies() : Collections.singleton(_currency);
 
-		for (Iterator<CustomerGroup> itCustomerGroups = customerGroups.iterator(); itCustomerGroups.hasNext(); ) {
-			CustomerGroup customerGroup = itCustomerGroups.next();
+		for (final Iterator<CustomerGroup> itCustomerGroups = customerGroups.iterator(); itCustomerGroups.hasNext(); ) {
+			final CustomerGroup customerGroup = itCustomerGroups.next();
 
-			for (Iterator<Tariff> itTariffs = tariffs.iterator(); itTariffs.hasNext(); ) {
-				Tariff tariff = itTariffs.next();
+			for (final Iterator<Tariff> itTariffs = tariffs.iterator(); itTariffs.hasNext(); ) {
+				final Tariff tariff = itTariffs.next();
 
-				for (Iterator<Currency> itCurrencies = currencies.iterator(); itCurrencies.hasNext(); ) {
-					Currency currency = itCurrencies.next();
+				for (final Iterator<Currency> itCurrencies = currencies.iterator(); itCurrencies.hasNext(); ) {
+					final Currency currency = itCurrencies.next();
 
 					createPriceCell(customerGroup, tariff, currency);
 				} // iterate Currency
@@ -400,55 +401,55 @@ implements IPackagePriceConfig, IResultPriceConfig
 	}
 
 	@Override
-	public boolean addCustomerGroup(CustomerGroup customerGroup)
+	public boolean addCustomerGroup(final CustomerGroup customerGroup)
 	{
-		boolean res = super.addCustomerGroup(customerGroup);
+		final boolean res = super.addCustomerGroup(customerGroup);
 		if (res)
 			createPriceCells(customerGroup, null, null);
 		return res;
 	}
 
 	@Override
-	public boolean addTariff(Tariff tariff)
+	public boolean addTariff(final Tariff tariff)
 	{
-		boolean res = super.addTariff(tariff);
+		final boolean res = super.addTariff(tariff);
 		if (res)
 			createPriceCells(null, tariff, null);
 		return res;
 	}
 
 	@Override
-	public boolean addCurrency(Currency currency)
+	public boolean addCurrency(final Currency currency)
 	{
-		boolean res = super.addCurrency(currency);
+		final boolean res = super.addCurrency(currency);
 		if (res)
 			createPriceCells(null, null, currency);
 		return res;
 	}
 
 	@Override
-	public CustomerGroup removeCustomerGroup(String organisationID,
-			String customerGroupID)
+	public CustomerGroup removeCustomerGroup(final String organisationID,
+			final String customerGroupID)
 	{
-		CustomerGroup cg = super.removeCustomerGroup(organisationID, customerGroupID);
+		final CustomerGroup cg = super.removeCustomerGroup(organisationID, customerGroupID);
 		if (cg != null)
 			removePriceCells(cg, null, null);
 		return cg;
 	}
 
 	@Override
-	public Tariff removeTariff(String organisationID, String tariffID)
+	public Tariff removeTariff(final String organisationID, final String tariffID)
 	{
-		Tariff t = super.removeTariff(organisationID, tariffID);
+		final Tariff t = super.removeTariff(organisationID, tariffID);
 		if (t != null)
 			removePriceCells(null, t, null);
 		return t;
 	}
 
 	@Override
-	public Currency removeCurrency(String currencyID)
+	public Currency removeCurrency(final String currencyID)
 	{
-		Currency c = super.removeCurrency(currencyID);
+		final Currency c = super.removeCurrency(currencyID);
 		if (c != null)
 			removePriceCells(null, null, c);
 		return c;
@@ -467,8 +468,8 @@ implements IPackagePriceConfig, IResultPriceConfig
 	 * @param _currency
 	 */
 	protected void removePriceCells(
-			CustomerGroup _customerGroup, Tariff _tariff,
-			Currency _currency)
+			final CustomerGroup _customerGroup, final Tariff _tariff,
+			final Currency _currency)
 	{
 		int paramCount = 0;
 		if (_customerGroup != null) ++paramCount;
@@ -485,18 +486,18 @@ implements IPackagePriceConfig, IResultPriceConfig
 //		if (_currency != null && !containsCurrency(_currency))
 //			throw new IllegalArgumentException("Given Currency is not a registered parameter!");
 
-		Collection<CustomerGroup> customerGroups = _customerGroup == null ? getCustomerGroups() : Collections.singleton(_customerGroup);
-		Collection<Tariff> tariffs = _tariff == null ? getTariffs() : Collections.singleton(_tariff);
-		Collection<Currency> currencies = _currency == null ? getCurrencies() : Collections.singleton(_currency);
+		final Collection<CustomerGroup> customerGroups = _customerGroup == null ? getCustomerGroups() : Collections.singleton(_customerGroup);
+		final Collection<Tariff> tariffs = _tariff == null ? getTariffs() : Collections.singleton(_tariff);
+		final Collection<Currency> currencies = _currency == null ? getCurrencies() : Collections.singleton(_currency);
 
-		for (Iterator<CustomerGroup> itCustomerGroups = customerGroups.iterator(); itCustomerGroups.hasNext(); ) {
-			CustomerGroup customerGroup = itCustomerGroups.next();
+		for (final Iterator<CustomerGroup> itCustomerGroups = customerGroups.iterator(); itCustomerGroups.hasNext(); ) {
+			final CustomerGroup customerGroup = itCustomerGroups.next();
 
-			for (Iterator<Tariff> itTariffs = tariffs.iterator(); itTariffs.hasNext(); ) {
-				Tariff tariff = itTariffs.next();
+			for (final Iterator<Tariff> itTariffs = tariffs.iterator(); itTariffs.hasNext(); ) {
+				final Tariff tariff = itTariffs.next();
 
-				for (Iterator<Currency> itCurrencies = currencies.iterator(); itCurrencies.hasNext(); ) {
-					Currency currency = itCurrencies.next();
+				for (final Iterator<Currency> itCurrencies = currencies.iterator(); itCurrencies.hasNext(); ) {
+					final Currency currency = itCurrencies.next();
 
 					removePriceCell(customerGroup, tariff, currency);
 				} // iterate Currency
@@ -505,32 +506,32 @@ implements IPackagePriceConfig, IResultPriceConfig
 	}
 
 	@Override
-	public ArticlePrice createArticlePrice(Article article)
+	public ArticlePrice createArticlePrice(final Article article)
 	{
-		CustomerGroup customerGroup = getCustomerGroup(article);
-		Tariff tariff = getTariff(article);
-		Currency currency = article.getCurrency();
+		final CustomerGroup customerGroup = getCustomerGroup(article);
+		final Tariff tariff = getTariff(article);
+		final Currency currency = article.getCurrency();
 
-		PriceCell priceCell = getPriceCell(customerGroup, tariff, currency, true);
+		final PriceCell priceCell = getPriceCell(customerGroup, tariff, currency, true);
 		return PriceConfigUtil.createArticlePrice(this, article, priceCell.getPrice());
 	}
 
-	public void fillArticlePrice(Article article)
+	public void fillArticlePrice(final Article article)
 	{
 		PriceConfigUtil.fillArticlePrice(this, article);
 	}
 
 	public ArticlePrice createNestedArticlePrice(
-			IPackagePriceConfig packagePriceConfig, Article article,
-			LinkedList<IPriceConfig> priceConfigStack, ArticlePrice topLevelArticlePrice,
-			ArticlePrice nextLevelArticlePrice, LinkedList<ArticlePrice> articlePriceStack,
-			NestedProductTypeLocal nestedProductTypeLocal, LinkedList<NestedProductTypeLocal> nestedProductTypeStack)
+			final IPackagePriceConfig packagePriceConfig, final Article article,
+			final LinkedList<IPriceConfig> priceConfigStack, final ArticlePrice topLevelArticlePrice,
+			final ArticlePrice nextLevelArticlePrice, final LinkedList<ArticlePrice> articlePriceStack,
+			final NestedProductTypeLocal nestedProductTypeLocal, final LinkedList<NestedProductTypeLocal> nestedProductTypeStack)
 	{
-		CustomerGroup customerGroup = getCustomerGroup(article);
-		Tariff tariff = getTariff(article);
-		Currency currency = article.getCurrency();
+		final CustomerGroup customerGroup = getCustomerGroup(article);
+		final Tariff tariff = getTariff(article);
+		final Currency currency = article.getCurrency();
 
-		PriceCell priceCell = getPriceCell(customerGroup, tariff, currency, true);
+		final PriceCell priceCell = getPriceCell(customerGroup, tariff, currency, true);
 
 		return PriceConfigUtil.createNestedArticlePrice(
 				packagePriceConfig,
@@ -544,16 +545,16 @@ implements IPackagePriceConfig, IResultPriceConfig
 	}
 
 	public ArticlePrice createNestedArticlePrice(
-			IPackagePriceConfig packagePriceConfig, Article article,
-			LinkedList<IPriceConfig> priceConfigStack, ArticlePrice topLevelArticlePrice,
-			ArticlePrice nextLevelArticlePrice, LinkedList<ArticlePrice> articlePriceStack,
-			NestedProductTypeLocal nestedProductTypeLocal, LinkedList<NestedProductTypeLocal> nestedProductTypeStack, Product nestedProduct, LinkedList<Product> productStack)
+			final IPackagePriceConfig packagePriceConfig, final Article article,
+			final LinkedList<IPriceConfig> priceConfigStack, final ArticlePrice topLevelArticlePrice,
+			final ArticlePrice nextLevelArticlePrice, final LinkedList<ArticlePrice> articlePriceStack,
+			final NestedProductTypeLocal nestedProductTypeLocal, final LinkedList<NestedProductTypeLocal> nestedProductTypeStack, final Product nestedProduct, final LinkedList<Product> productStack)
 	{
-		CustomerGroup customerGroup = getCustomerGroup(article);
-		Tariff tariff = getTariff(article);
-		Currency currency = article.getCurrency();
+		final CustomerGroup customerGroup = getCustomerGroup(article);
+		final Tariff tariff = getTariff(article);
+		final Currency currency = article.getCurrency();
 
-		PriceCell priceCell = getPriceCell(customerGroup, tariff, currency, true);
+		final PriceCell priceCell = getPriceCell(customerGroup, tariff, currency, true);
 
 		return PriceConfigUtil.createNestedArticlePrice(
 				packagePriceConfig,

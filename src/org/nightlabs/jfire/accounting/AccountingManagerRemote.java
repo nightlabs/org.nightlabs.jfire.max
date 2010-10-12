@@ -124,7 +124,7 @@ public interface AccountingManagerRemote {
 			String[] fetchGroups, int maxFetchDepth);
 
 	Collection<CurrencyID> getCurrencyIDs();
-	
+
 	Set<AnchorID> getAccountIDs(AccountSearchFilter searchFilter);
 
 

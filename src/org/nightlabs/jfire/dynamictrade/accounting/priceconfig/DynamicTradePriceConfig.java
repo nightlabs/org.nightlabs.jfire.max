@@ -5,36 +5,23 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.jdo.JDODetachedFieldAccessException;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
 
 import org.nightlabs.jfire.accounting.PriceFragmentType;
 import org.nightlabs.jfire.accounting.gridpriceconfig.FormulaPriceConfig;
-
-import javax.jdo.annotations.Join;
-import javax.jdo.annotations.Persistent;
-import javax.jdo.annotations.FetchGroups;
-import javax.jdo.annotations.NullValue;
-import javax.jdo.annotations.InheritanceStrategy;
-import javax.jdo.annotations.Inheritance;
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.FetchGroup;
-import javax.jdo.annotations.IdentityType;
-import javax.jdo.annotations.PersistenceModifier;
+import org.nightlabs.jfire.accounting.priceconfig.id.PriceConfigID;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
- *
- * @jdo.persistence-capable
- *		identity-type="application"
- *		persistence-capable-superclass="org.nightlabs.jfire.accounting.gridpriceconfig.FormulaPriceConfig"
- *		detachable="true"
- *		table="JFireDynamicTrade_DynamicTradePriceConfig"
- *
- * @!jdo.inheritance strategy="superclass-table" @!TODO JPOX WORKAROUND: Using superclass-table here causes weird errors - see: http://www.jpox.org/servlet/forum/viewthread?thread=4874
- * @jdo.inheritance strategy="new-table"
- *
- * @jdo.fetch-group name="DynamicTradePriceConfig.inputPriceFragmentTypes" fields="inputPriceFragmentTypes"
- *
- * @jdo.fetch-group name="FetchGroupsPriceConfig.edit" fetch-groups="default" fields="inputPriceFragmentTypes"
  */
 @PersistenceCapable(
 	identityType=IdentityType.APPLICATION,
@@ -62,15 +49,6 @@ extends FormulaPriceConfig
 	 * whenever an {@link org.nightlabs.jfire.trade.Article} is added to an
 	 * {@link org.nightlabs.jfire.trade.Offer}. Then, the price for this article is
 	 * calculated based on these values.
-	 *
-	 * @jdo.field
-	 *		persistence-modifier="persistent"
-	 *		collection-type="collection"
-	 *		element-type="PriceFragmentType"
-	 *		table="JFireDynamicTrade_DynamicTradePriceConfig_inputPriceFragmentTypes"
-	 *		null-value="exception"
-	 *
-	 * @jdo.join
 	 */
 	@Join
 	@Persistent(
@@ -79,9 +57,6 @@ extends FormulaPriceConfig
 		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Set<PriceFragmentType> inputPriceFragmentTypes;
 
-	/**
-	 * @jdo.field persistence-modifier="none"
-	 */
 	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private transient Set<PriceFragmentType> inputPriceFragmentTypes_readonly = null;
 
@@ -91,9 +66,9 @@ extends FormulaPriceConfig
 	@Deprecated
 	protected DynamicTradePriceConfig() { }
 
-	public DynamicTradePriceConfig(String organisationID, String priceConfigID)
+	public DynamicTradePriceConfig(final PriceConfigID priceConfigID)
 	{
-		super(organisationID, priceConfigID);
+		super(priceConfigID);
 		this.inputPriceFragmentTypes = new HashSet<PriceFragmentType>();
 	}
 
@@ -105,12 +80,12 @@ extends FormulaPriceConfig
 		return inputPriceFragmentTypes_readonly;
 	}
 
-	public void addInputPriceFragmentType(PriceFragmentType priceFragmentType)
+	public void addInputPriceFragmentType(final PriceFragmentType priceFragmentType)
 	{
 		inputPriceFragmentTypes.add(priceFragmentType);
 	}
 
-	public void removeInputPriceFragmentType(PriceFragmentType priceFragmentType)
+	public void removeInputPriceFragmentType(final PriceFragmentType priceFragmentType)
 	{
 		inputPriceFragmentTypes.remove(priceFragmentType);
 	}
@@ -137,13 +112,13 @@ extends FormulaPriceConfig
 		super.jdoPreAttach();
 		try {
 			clearPackagingResultPriceConfigs(); // we never store the results, because prices are dynamic
-		} catch (JDODetachedFieldAccessException x) {
+		} catch (final JDODetachedFieldAccessException x) {
 			// silently ignore it - the field packagingResultPriceConfigs is not detached => no problem.
 		}
 	}
 
 	@Override
-	public void jdoPostAttach(Object detached) {
+	public void jdoPostAttach(final Object detached) {
 		super.jdoPostAttach(detached);
 
 		// make sure that the field packagingResultPriceConfigs is really empty

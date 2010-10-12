@@ -5,6 +5,17 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.Price;
 import org.nightlabs.jfire.accounting.PriceFragmentType;
@@ -12,21 +23,11 @@ import org.nightlabs.jfire.accounting.priceconfig.IPackagePriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.IPriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.PriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.PriceConfigUtil;
+import org.nightlabs.jfire.accounting.priceconfig.id.PriceConfigID;
 import org.nightlabs.jfire.store.NestedProductTypeLocal;
 import org.nightlabs.jfire.store.Product;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.ArticlePrice;
-
-import javax.jdo.annotations.Join;
-import javax.jdo.annotations.FetchGroups;
-import javax.jdo.annotations.NullValue;
-import javax.jdo.annotations.Inheritance;
-import javax.jdo.annotations.FetchGroup;
-import javax.jdo.annotations.PersistenceModifier;
-import javax.jdo.annotations.Persistent;
-import javax.jdo.annotations.InheritanceStrategy;
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.IdentityType;
 
 /**
  * @author Marco Schulze - Marco at NightLabs dot de
@@ -88,9 +89,9 @@ implements IPackagePriceConfig
 	@Deprecated
 	protected VoucherPriceConfig() { }
 
-	public VoucherPriceConfig(String organisationID, String priceConfigID)
+	public VoucherPriceConfig(final PriceConfigID priceConfigID)
 	{
-		super(organisationID, priceConfigID);
+		super(priceConfigID);
 		prices = new HashMap<Currency, Long>();
 	}
 
@@ -107,14 +108,14 @@ implements IPackagePriceConfig
 	}
 
 	@Override
-	public ArticlePrice createArticlePrice(Article article)
+	public ArticlePrice createArticlePrice(final Article article)
 	{
-		Long amount = prices.get(article.getCurrency());
+		final Long amount = prices.get(article.getCurrency());
 
-		PriceFragmentType priceFragmentTypeTotal = getPriceFragmentType(
+		final PriceFragmentType priceFragmentTypeTotal = getPriceFragmentType(
 				PriceFragmentType.PRICE_FRAGMENT_TYPE_ID_TOTAL.organisationID, PriceFragmentType.PRICE_FRAGMENT_TYPE_ID_TOTAL.priceFragmentTypeID, true);
 
-		Price price = new Price("", -1, article.getCurrency());
+		final Price price = new Price("", -1, article.getCurrency());
 		if (amount != null)
 			price.setAmount(priceFragmentTypeTotal, amount);
 
@@ -123,17 +124,17 @@ implements IPackagePriceConfig
 
 	@Override
 	public ArticlePrice createNestedArticlePrice(
-			IPackagePriceConfig topLevelPriceConfig, Article article,
-			LinkedList<IPriceConfig> priceConfigStack, ArticlePrice topLevelArticlePrice,
-			ArticlePrice nextLevelArticlePrice, LinkedList<ArticlePrice> articlePriceStack,
-			NestedProductTypeLocal nestedProductTypeLocal, LinkedList<NestedProductTypeLocal> nestedProductTypeStack)
+			final IPackagePriceConfig topLevelPriceConfig, final Article article,
+			final LinkedList<IPriceConfig> priceConfigStack, final ArticlePrice topLevelArticlePrice,
+			final ArticlePrice nextLevelArticlePrice, final LinkedList<ArticlePrice> articlePriceStack,
+			final NestedProductTypeLocal nestedProductTypeLocal, final LinkedList<NestedProductTypeLocal> nestedProductTypeStack)
 	{
-		Long amount = prices.get(article.getCurrency());
+		final Long amount = prices.get(article.getCurrency());
 
-		PriceFragmentType priceFragmentTypeTotal = getPriceFragmentType(
+		final PriceFragmentType priceFragmentTypeTotal = getPriceFragmentType(
 				PriceFragmentType.PRICE_FRAGMENT_TYPE_ID_TOTAL.organisationID, PriceFragmentType.PRICE_FRAGMENT_TYPE_ID_TOTAL.priceFragmentTypeID, true);
 
-		Price origPrice = new Price("", -1, article.getCurrency());
+		final Price origPrice = new Price("", -1, article.getCurrency());
 		if (amount != null)
 			origPrice.setAmount(priceFragmentTypeTotal, amount);
 
@@ -145,18 +146,18 @@ implements IPackagePriceConfig
 
 	@Override
 	public ArticlePrice createNestedArticlePrice(
-			IPackagePriceConfig topLevelPriceConfig, Article article,
-			LinkedList<IPriceConfig> priceConfigStack, ArticlePrice topLevelArticlePrice,
-			ArticlePrice nextLevelArticlePrice, LinkedList<ArticlePrice> articlePriceStack,
-			NestedProductTypeLocal nestedProductTypeLocal, LinkedList<NestedProductTypeLocal> nestedProductTypeStack,
-			Product nestedProduct, LinkedList<Product> productStack)
+			final IPackagePriceConfig topLevelPriceConfig, final Article article,
+			final LinkedList<IPriceConfig> priceConfigStack, final ArticlePrice topLevelArticlePrice,
+			final ArticlePrice nextLevelArticlePrice, final LinkedList<ArticlePrice> articlePriceStack,
+			final NestedProductTypeLocal nestedProductTypeLocal, final LinkedList<NestedProductTypeLocal> nestedProductTypeStack,
+			final Product nestedProduct, final LinkedList<Product> productStack)
 	{
-		Long amount = prices.get(article.getCurrency());
+		final Long amount = prices.get(article.getCurrency());
 
-		PriceFragmentType priceFragmentTypeTotal = getPriceFragmentType(
+		final PriceFragmentType priceFragmentTypeTotal = getPriceFragmentType(
 				PriceFragmentType.PRICE_FRAGMENT_TYPE_ID_TOTAL.organisationID, PriceFragmentType.PRICE_FRAGMENT_TYPE_ID_TOTAL.priceFragmentTypeID, true);
 
-		Price origPrice = new Price("", -1, article.getCurrency());
+		final Price origPrice = new Price("", -1, article.getCurrency());
 		if (amount != null)
 			origPrice.setAmount(priceFragmentTypeTotal, amount);
 
@@ -168,7 +169,7 @@ implements IPackagePriceConfig
 	}
 
 	@Override
-	public void fillArticlePrice(Article article)
+	public void fillArticlePrice(final Article article)
 	{
 		PriceConfigUtil.fillArticlePrice(this, article);
 	}
@@ -202,7 +203,7 @@ implements IPackagePriceConfig
 //		return pricesAsDouble;
 //	}
 
-	public void setPrice(Currency currency, Long value)
+	public void setPrice(final Currency currency, final Long value)
 	{
 		if (value == null) {
 			removeCurrency(currency.getCurrencyID());

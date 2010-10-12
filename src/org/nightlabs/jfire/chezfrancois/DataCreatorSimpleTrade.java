@@ -51,9 +51,7 @@ import org.nightlabs.jfire.accounting.gridpriceconfig.PriceCalculationException;
 import org.nightlabs.jfire.accounting.gridpriceconfig.PriceCalculator;
 import org.nightlabs.jfire.accounting.gridpriceconfig.StablePriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.IInnerPriceConfig;
-import org.nightlabs.jfire.accounting.priceconfig.PriceConfig;
 import org.nightlabs.jfire.base.JFireBaseEAR;
-import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.prop.IStruct;
 import org.nightlabs.jfire.prop.PropertySet;
 import org.nightlabs.jfire.prop.datafield.I18nTextDataField;
@@ -80,7 +78,7 @@ extends DataCreator
 
 	private SimpleProductType rootSimpleProductType;
 
-	public DataCreatorSimpleTrade(PersistenceManager pm, User user)
+	public DataCreatorSimpleTrade(final PersistenceManager pm, final User user)
 	{
 		super(pm, user);
 
@@ -89,14 +87,14 @@ extends DataCreator
 				ProductTypeID.create(organisationID, SimpleProductType.class.getName()));
 	}
 
-	public SimpleProductType createCategory(SimpleProductType parent, String productTypeID, String ... names) throws CannotPublishProductTypeException
+	public SimpleProductType createCategory(SimpleProductType parent, final String productTypeID, final String ... names) throws CannotPublishProductTypeException
 	{
 		if (parent == null)
 			parent = rootSimpleProductType;
 
 		try {
 			return (SimpleProductType) pm.getObjectById(ProductTypeID.create(organisationID, productTypeID));
-		} catch (JDOObjectNotFoundException x) {
+		} catch (final JDOObjectNotFoundException x) {
 			// not yet existent => create the object!
 		}
 
@@ -113,7 +111,7 @@ extends DataCreator
 
 	private List<ProductTypeID> createdLeafIDs = new ArrayList<ProductTypeID>();
 
-	public SimpleProductType createLeaf(SimpleProductType category, String productTypeID, IInnerPriceConfig innerPriceConfig, String ... names) throws CannotPublishProductTypeException, CannotConfirmProductTypeException
+	public SimpleProductType createLeaf(SimpleProductType category, final String productTypeID, final IInnerPriceConfig innerPriceConfig, final String ... names) throws CannotPublishProductTypeException, CannotConfirmProductTypeException
 	{
 		if (category == null)
 			category = rootSimpleProductType;
@@ -121,7 +119,7 @@ extends DataCreator
 		SimpleProductType pt = new SimpleProductType(
 				organisationID, productTypeID, category, ProductType.INHERITANCE_NATURE_LEAF, ProductType.PACKAGE_NATURE_OUTER);
 		setNames(pt.getName(), names);
-		pt.setPackagePriceConfig(new StablePriceConfig(IDGenerator.getOrganisationID(), PriceConfig.createPriceConfigID()));
+		pt.setPackagePriceConfig(new StablePriceConfig(null));
 		pt.getFieldMetaData(ProductType.FieldName.innerPriceConfig).setValueInherited(false);
 //		pt.getFieldMetaData("localAccountantDelegate").setValueInherited(false); // TODO this should be a field of ProductTypeLocal - not ProductType!
 //		pt.getFieldMetaData("localStorekeeperDelegate").setValueInherited(false); // TODO this should be a field of ProductTypeLocal - not ProductType!
@@ -140,15 +138,15 @@ extends DataCreator
 	public void makeAllLeavesSaleable()
 	throws CannotMakeProductTypeSaleableException, CannotConfirmProductTypeException
 	{
-		for (ProductTypeID ptID : createdLeafIDs) {
-			ProductType pt = (ProductType) pm.getObjectById(ptID);
+		for (final ProductTypeID ptID : createdLeafIDs) {
+			final ProductType pt = (ProductType) pm.getObjectById(ptID);
 			store.setProductTypeStatus_confirmed(user, pt);
 			store.setProductTypeStatus_saleable(user, pt, true);
 		}
 	}
 
-	public void createWineProperties(PersistenceManager pm, SimpleProductType productType, String englishShort, String germanShort, String englishLong, String germanLong, String smallImage, String smallImageContentType, String largeImage, String largeImageContentType) {
-		IStruct struct = SimpleProductTypeStruct.getSimpleProductTypeStructLocal(pm);
+	public void createWineProperties(final PersistenceManager pm, final SimpleProductType productType, final String englishShort, final String germanShort, final String englishLong, final String germanLong, final String smallImage, final String smallImageContentType, final String largeImage, final String largeImageContentType) {
+		final IStruct struct = SimpleProductTypeStruct.getSimpleProductTypeStructLocal(pm);
 //		IStruct struct = StructLocal.getStructLocal(SimpleProductType.class, Struct.DEFAULT_SCOPE, StructLocal.DEFAULT_SCOPE, pm);
 		PropertySet props = productType.getPropertySet();
 		productType.getFieldMetaData(SimpleProductType.FieldName.propertySet).setValueInherited(false);
@@ -166,7 +164,7 @@ extends DataCreator
 		I18nTextDataField shortDesc;
 		try {
 			shortDesc = props.getDataField(SimpleProductTypeStruct.DESCRIPTION_SHORT, I18nTextDataField.class);
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			throw new RuntimeException(e);
 		}
 		shortDesc.getI18nText().setText(Locale.ENGLISH.getLanguage(), englishShort);
@@ -174,7 +172,7 @@ extends DataCreator
 		I18nTextDataField longDesc;
 		try {
 			longDesc = props.getDataField(SimpleProductTypeStruct.DESCRIPTION_LONG, I18nTextDataField.class);
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			throw new RuntimeException(e);
 		}
 		longDesc.getI18nText().setText(Locale.ENGLISH.getLanguage(), englishLong);
@@ -182,19 +180,19 @@ extends DataCreator
 		ImageDataField smallImg;
 		try {
 			smallImg = (ImageDataField)props.getDataField(SimpleProductTypeStruct.IMAGES_SMALL_IMAGE);
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			throw new RuntimeException(e);
 		}
 		InputStream in = getClass().getResourceAsStream("resource/"+smallImage);
 		if (in != null) {
 			try {
 				smallImg.loadStream(in, smallImage, smallImageContentType);
-			} catch (IOException e) {
+			} catch (final IOException e) {
 				logger.error("Error loading image", e);
 			} finally {
 				try {
 					in.close();
-				} catch (IOException e) {
+				} catch (final IOException e) {
 					logger.error("Error loading image", e);
 				}
 			}
@@ -202,19 +200,19 @@ extends DataCreator
 		ImageDataField largeImg;
 		try {
 			largeImg = (ImageDataField)props.getDataField(SimpleProductTypeStruct.IMAGES_LARGE_IMAGE);
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			throw new RuntimeException(e);
 		}
 		in = getClass().getResourceAsStream("resource/"+largeImage);
 		if (in != null) {
 			try {
 				largeImg.loadStream(in, largeImage, largeImageContentType);
-			} catch (IOException e) {
+			} catch (final IOException e) {
 				logger.error("Error loading image", e);
 			} finally {
 				try {
 					in.close();
-				} catch (IOException e) {
+				} catch (final IOException e) {
 					logger.error("Error loading image", e);
 				}
 			}
@@ -224,16 +222,16 @@ extends DataCreator
 		HTMLDataField html;
 		try {
 			html = (HTMLDataField)props.getDataField(SimpleProductTypeStruct.XINFO_INFO);
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			throw new RuntimeException(e);
 		}
 		String imageLink = null;
 		in = getClass().getResourceAsStream("resource/"+largeImage);
 		if (in != null) {
 			try {
-				ByteArrayOutputStream out = new ByteArrayOutputStream();
+				final ByteArrayOutputStream out = new ByteArrayOutputStream();
 				IOUtil.transferStreamData(in, out);
-				HTMLContentFile file = new HTMLContentFile(html);
+				final HTMLContentFile file = new HTMLContentFile(html);
 				file.setData(out.toByteArray());
 				file.setName(largeImage);
 				file.setContentType(largeImageContentType);
@@ -243,19 +241,19 @@ extends DataCreator
 //				files.add(file);
 //				html.setFiles(files);
 				html.getFiles().add(file);
-			} catch(IOException e) {
+			} catch(final IOException e) {
 				logger.error("Error loading image", e);
 			} finally {
 				try {
 					in.close();
-				} catch (IOException e) {
+				} catch (final IOException e) {
 					logger.error("Error loading image", e);
 				}
 			}
 		}
 
-		String largeTextEn = loadText("wine-wikipedia_en.html");
-		String largeTextDe = loadText("wine-wikipedia_de.html");
+		final String largeTextEn = loadText("wine-wikipedia_en.html");
+		final String largeTextDe = loadText("wine-wikipedia_de.html");
 
 		if(imageLink != null) {
 			html.setText(Locale.ENGLISH.getLanguage(), "<p>This is my text in english. This contains an image.</p><p><img src=\""+imageLink+"\"/></p>"+largeTextEn);
@@ -274,7 +272,7 @@ extends DataCreator
 					pm.makePersistent(props);
 					props = null;
 					break; // successful => break retry loop
-				} catch (Exception x) {
+				} catch (final Exception x) {
 					// ignore and try again
 				}
 				pm.flush();
@@ -285,7 +283,7 @@ extends DataCreator
 			pm.makePersistent(props);
 	}
 
-	private String loadText(String fileName)
+	private String loadText(final String fileName)
 	{
 		InputStream in;
 		String text = "";
@@ -293,7 +291,7 @@ extends DataCreator
 		if (in != null) {
 			try {
 				text = IOUtil.readTextFile(in, "UTF-8");
-			} catch (IOException e) {
+			} catch (final IOException e) {
 				logger.error("Error loading text", e);
 				text = "";
 			}
@@ -303,12 +301,12 @@ extends DataCreator
 
 	public void calculatePrices() throws PriceCalculationException
 	{
-		for (ProductTypeID ptID : createdLeafIDs) {
-			SimpleProductType pt = (SimpleProductType) pm.getObjectById(ptID);
+		for (final ProductTypeID ptID : createdLeafIDs) {
+			final SimpleProductType pt = (SimpleProductType) pm.getObjectById(ptID);
 			if (pt.getInnerPriceConfig() != null && pt.getPackagePriceConfig() != null)
 				((StablePriceConfig)pt.getPackagePriceConfig()).adoptParameters(pt.getInnerPriceConfig());
 
-			PriceCalculator priceCalculator = new PriceCalculator(pt, new CustomerGroupMapper(pm), new TariffMapper(pm));
+			final PriceCalculator priceCalculator = new PriceCalculator(pt, new CustomerGroupMapper(pm), new TariffMapper(pm));
 			priceCalculator.preparePriceCalculation();
 			priceCalculator.calculatePrices();
 		}
@@ -351,37 +349,37 @@ extends DataCreator
 //		return formulaPriceConfig;
 //	}
 
-	public IInnerPriceConfig createFixPriceConfig(Tariff[] tariffs, long[] prices, String ... names)
+	public IInnerPriceConfig createFixPriceConfig(final Tariff[] tariffs, final long[] prices, final String ... names)
 	{
-		String[] formulas = new String[prices.length];
+		final String[] formulas = new String[prices.length];
 		for (int i = 0; i < prices.length; i++) {
-			long price = prices[i];
+			final long price = prices[i];
 			formulas[i] = String.valueOf(price);
 		}
 		return createFormulaPriceConfig(tariffs, formulas, names);
 	}
 
-	public IInnerPriceConfig createFormulaPriceConfig(Tariff[] tariffs, String[] formulas, String ... names)
+	public IInnerPriceConfig createFormulaPriceConfig(final Tariff[] tariffs, final String[] formulas, final String ... names)
 	{
-		Currency euro = getCurrencyEUR();
+		final Currency euro = getCurrencyEUR();
 
 //	 create the price config "Car - Middle Class"
-		PriceFragmentType totalPriceFragmentType = getPriceFragmentTypeTotal();
-		PriceFragmentType vatNet = getPriceFragmentTypeVatNet();
-		PriceFragmentType vatVal = getPriceFragmentTypeVatVal();
+		final PriceFragmentType totalPriceFragmentType = getPriceFragmentTypeTotal();
+		final PriceFragmentType vatNet = getPriceFragmentTypeVatNet();
+		final PriceFragmentType vatVal = getPriceFragmentTypeVatVal();
 
-		StablePriceConfig stablePriceConfig = new StablePriceConfig(IDGenerator.getOrganisationID(), PriceConfig.createPriceConfigID());
-		FormulaPriceConfig formulaPriceConfig = new FormulaPriceConfig(IDGenerator.getOrganisationID(), PriceConfig.createPriceConfigID());
+		final StablePriceConfig stablePriceConfig = new StablePriceConfig(null);
+		final FormulaPriceConfig formulaPriceConfig = new FormulaPriceConfig(null);
 		setNames(formulaPriceConfig.getName(), names);
 
-		CustomerGroup customerGroupDefault = trader.getDefaultCustomerGroupForKnownCustomer();
-		CustomerGroup customerGroupAnonymous = LegalEntity.getAnonymousLegalEntity(pm).getDefaultCustomerGroup();
-		CustomerGroup customerGroupReseller = trader.getDefaultCustomerGroupForReseller();
+		final CustomerGroup customerGroupDefault = trader.getDefaultCustomerGroupForKnownCustomer();
+		final CustomerGroup customerGroupAnonymous = LegalEntity.getAnonymousLegalEntity(pm).getDefaultCustomerGroup();
+		final CustomerGroup customerGroupReseller = trader.getDefaultCustomerGroupForReseller();
 		formulaPriceConfig.addCustomerGroup(customerGroupDefault);
 		formulaPriceConfig.addCustomerGroup(customerGroupAnonymous);
 		formulaPriceConfig.addCustomerGroup(customerGroupReseller);
 		formulaPriceConfig.addCurrency(euro);
-		for (Tariff tariff : tariffs) {
+		for (final Tariff tariff : tariffs) {
 			formulaPriceConfig.addTariff(tariff);
 		}
 //			formulaPriceConfig.addProductType(rootSimpleProductType);
@@ -391,8 +389,8 @@ extends DataCreator
 		stablePriceConfig.adoptParameters(formulaPriceConfig);
 
 		// give resellers a special price
-		for (Tariff tariff : tariffs) {
-				FormulaCell cell = formulaPriceConfig.createFormulaCell(customerGroupReseller, tariff, euro);
+		for (final Tariff tariff : tariffs) {
+				final FormulaCell cell = formulaPriceConfig.createFormulaCell(customerGroupReseller, tariff, euro);
 				cell.setFormula(totalPriceFragmentType,
 						"cell.resolvePriceCellsAmount(\n" +
 						"	CustomerGroupID.create(\"" + organisationID + "\", \"" + CustomerGroup.CUSTOMER_GROUP_ID_DEFAULT + "\")\n" +
@@ -401,7 +399,7 @@ extends DataCreator
 		}
 
 		// set fallback values
-		FormulaCell fallbackFormulaCell = formulaPriceConfig.createFallbackFormulaCell();
+		final FormulaCell fallbackFormulaCell = formulaPriceConfig.createFallbackFormulaCell();
 		fallbackFormulaCell.setFormula(totalPriceFragmentType,
 				"cell.resolvePriceCellsAmount(\n" +
 				"	CustomerGroupID.create(\"" + organisationID + "\", \"" + CustomerGroup.CUSTOMER_GROUP_ID_DEFAULT + "\")\n" +
@@ -423,10 +421,10 @@ extends DataCreator
 				");");
 
 		for (int i = 0; i < formulas.length; i++) {
-			String formula = formulas[i];
-			Tariff tariff = tariffs[i];
+			final String formula = formulas[i];
+			final Tariff tariff = tariffs[i];
 
-			FormulaCell cell = formulaPriceConfig.createFormulaCell(customerGroupDefault, tariff, euro);
+			final FormulaCell cell = formulaPriceConfig.createFormulaCell(customerGroupDefault, tariff, euro);
 			cell.setFormula(totalPriceFragmentType, formula);
 		}
 

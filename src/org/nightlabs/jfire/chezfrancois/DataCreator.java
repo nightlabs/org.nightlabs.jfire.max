@@ -93,7 +93,7 @@ public class DataCreator
 	protected Accounting accounting;
 	protected String rootOrganisationID;
 
-	public DataCreator(PersistenceManager pm, User user)
+	public DataCreator(final PersistenceManager pm, final User user)
 	{
 		this.pm = pm;
 		this.user = user;
@@ -104,13 +104,13 @@ public class DataCreator
 		accounting = trader.getAccounting();
 
 		try {
-			InitialContext ctx = new InitialContext();
+			final InitialContext ctx = new InitialContext();
 			try {
 				rootOrganisationID = Organisation.getRootOrganisationID(ctx);
 			} finally {
 				ctx.close();
 			}
-		} catch (NamingException e) {
+		} catch (final NamingException e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -121,7 +121,7 @@ public class DataCreator
 	 * @param names Names in different languages.
 	 * @param name The i18n text object to set.
 	 */
-	protected void setNames(I18nText name, String[] names)
+	protected void setNames(final I18nText name, final String[] names)
 	{
 		String prefix = "";
 		if (ChezFrancoisServerInitialiser.ORGANISATION_ID_RESELLER.equals(organisationID)) {
@@ -129,7 +129,7 @@ public class DataCreator
 		}
 
 		int langIdx = 0;
-		for (String string : names) {
+		for (final String string : names) {
 			if(langIdx >= languages.length)
 				break;
 			name.setText(languages[langIdx], prefix + string);
@@ -145,11 +145,11 @@ public class DataCreator
 	{
 		if (tariffNormalPrice == null) {
 			pm.getExtent(Tariff.class);
-			TariffID tariffID = TariffID.create(organisationID, "_normal_price_");
+			final TariffID tariffID = TariffID.create(organisationID, "_normal_price_");
 			try {
 				tariffNormalPrice = (Tariff) pm.getObjectById(tariffID);
-			} catch (JDOObjectNotFoundException x) {
-				tariffNormalPrice = pm.makePersistent(new Tariff(tariffID.organisationID, tariffID.tariffID));
+			} catch (final JDOObjectNotFoundException x) {
+				tariffNormalPrice = pm.makePersistent(new Tariff(tariffID));
 				tariffNormalPrice.setTariffIndex(0);
 				tariffNormalPrice.getName().setText(Locale.ENGLISH.getLanguage(), "Normal Price");
 				tariffNormalPrice.getName().setText(Locale.GERMAN.getLanguage(), "Normaler Preis");
@@ -163,11 +163,11 @@ public class DataCreator
 	{
 		if (tariffGoldCard == null) {
 			pm.getExtent(Tariff.class);
-			TariffID tariffID = TariffID.create(organisationID, "_gold_card_");
+			final TariffID tariffID = TariffID.create(organisationID, "_gold_card_");
 			try {
 				tariffGoldCard = (Tariff) pm.getObjectById(tariffID);
-			} catch (JDOObjectNotFoundException x) {
-				tariffGoldCard = pm.makePersistent(new Tariff(tariffID.organisationID, tariffID.tariffID));
+			} catch (final JDOObjectNotFoundException x) {
+				tariffGoldCard = pm.makePersistent(new Tariff(tariffID));
 				tariffGoldCard.setTariffIndex(1);
 				tariffGoldCard.getName().setText(Locale.ENGLISH.getLanguage(), "Gold Card");
 				tariffGoldCard.getName().setText(Locale.GERMAN.getLanguage(), "Goldene Kundenkarte");
@@ -243,11 +243,11 @@ public class DataCreator
 		return customerGroupAnonymous;
 	}
 
-	public Account createLocalRevenueAccount(String anchorIDSuffix, String name)
+	public Account createLocalRevenueAccount(final String anchorIDSuffix, final String name)
 	{
-		Currency euro = getCurrencyEUR();
+		final Currency euro = getCurrencyEUR();
 
-		AccountType accountType = (AccountType) pm.getObjectById(AccountType.ACCOUNT_TYPE_ID_LOCAL_REVENUE);
+		final AccountType accountType = (AccountType) pm.getObjectById(AccountType.ACCOUNT_TYPE_ID_LOCAL_REVENUE);
 		Account account = new Account(
 				organisationID, "revenue#" + anchorIDSuffix, accountType, getOrganisationLegalEntity(), euro);
 		account.getName().setText(languageID, name);
@@ -256,11 +256,11 @@ public class DataCreator
 
 		return account;
 	}
-	public Account createLocalExpenseAccount(String anchorIDSuffix, String name)
+	public Account createLocalExpenseAccount(final String anchorIDSuffix, final String name)
 	{
-		Currency euro = getCurrencyEUR();
+		final Currency euro = getCurrencyEUR();
 
-		AccountType accountType = (AccountType) pm.getObjectById(AccountType.ACCOUNT_TYPE_ID_LOCAL_EXPENSE);
+		final AccountType accountType = (AccountType) pm.getObjectById(AccountType.ACCOUNT_TYPE_ID_LOCAL_EXPENSE);
 		Account account = new Account(
 				organisationID, "expense#" + anchorIDSuffix, accountType, getOrganisationLegalEntity(), euro);
 		account.getName().setText(languageID, name);
@@ -271,10 +271,10 @@ public class DataCreator
 	}
 
 	public PFMoneyFlowMapping createPFMoneyFlowMapping(
-			ProductType productType, PriceFragmentType priceFragmentType, Account revenueAccount, Account expenseAccount)
+			final ProductType productType, final PriceFragmentType priceFragmentType, final Account revenueAccount, final Account expenseAccount)
 	{
-		Currency euro = getCurrencyEUR();
-		PFMoneyFlowMapping mapping = new PFMoneyFlowMapping(
+		final Currency euro = getCurrencyEUR();
+		final PFMoneyFlowMapping mapping = new PFMoneyFlowMapping(
 				IDGenerator.getOrganisationID(),
 				IDGenerator.nextID(MoneyFlowMapping.class),
 				productType,
@@ -291,8 +291,8 @@ public class DataCreator
 	}
 
 	public User createUser(
-			String userID, String password,
-			String personCompany, String personName, String personFirstName, String personEMail)
+			final String userID, final String password,
+			final String personCompany, final String personName, final String personFirstName, final String personEMail)
 	throws
 	SecurityException, DataBlockNotFoundException, DataBlockGroupNotFoundException, DataFieldNotFoundException
 	{
@@ -303,51 +303,51 @@ public class DataCreator
 			// it already exists => return, but before check for existing person
 			if (user.getPerson() != null)
 				return user;
-		} catch (JDOObjectNotFoundException x) {
+		} catch (final JDOObjectNotFoundException x) {
 			// fine, it doesn't exist yet => create it
 			user = new User(organisationID, userID);
-			UserLocal userLocal = new UserLocal(user);
+			final UserLocal userLocal = new UserLocal(user);
 			userLocal.setPasswordPlain(password);
 		}
 
-		Person person = createPerson(personCompany, personName, personFirstName, personEMail);
+		final Person person = createPerson(personCompany, personName, personFirstName, personEMail);
 		user.setPerson(person);
 		user = pm.makePersistent(user);
 		return user;
 	}
 
-	public User createUser(String userID, String password, Person person)
+	public User createUser(final String userID, final String password, final Person person)
 //	throws SecurityException, DataBlockNotFoundException, DataBlockGroupNotFoundException, DataFieldNotFoundException
 	{
 		pm.getExtent(User.class);
 		try {
-			User user = (User) pm.getObjectById(UserID.create(organisationID, userID));
+			final User user = (User) pm.getObjectById(UserID.create(organisationID, userID));
 			// it already exists => return
 			return user;
-		} catch (JDOObjectNotFoundException x) {
+		} catch (final JDOObjectNotFoundException x) {
 			// fine, it doesn't exist yet
 		}
 
 		User user = new User(organisationID, userID);
-		UserLocal userLocal = new UserLocal(user);
+		final UserLocal userLocal = new UserLocal(user);
 		userLocal.setPasswordPlain(password);
 		user.setPerson(person);
 		user = pm.makePersistent(user);
 		return user;
 	}
 
-	public Person createPerson(String company, String name, String firstName, String eMail,
-			Date dateOfBirth, String salutation, String title, String postAdress, String postCode,
-			String postCity, String postRegion, String postCountry, String phoneCountryCode,
-			String phoneAreaCode, String phoneNumber, String faxCountryCode,
-			String faxAreaCode, String faxNumber, String bankAccountHolder, String bankAccountNumber,
-			String bankCode, String bankName, String creditCardHolder, String creditCardNumber,
-			int creditCardExpiryMonth, int creditCardExpiryYear, String comment)
+	public Person createPerson(final String company, final String name, final String firstName, final String eMail,
+			final Date dateOfBirth, final String salutation, final String title, final String postAdress, final String postCode,
+			final String postCity, final String postRegion, final String postCountry, final String phoneCountryCode,
+			final String phoneAreaCode, final String phoneNumber, final String faxCountryCode,
+			final String faxAreaCode, final String faxNumber, final String bankAccountHolder, final String bankAccountNumber,
+			final String bankCode, final String bankName, final String creditCardHolder, final String creditCardNumber,
+			final int creditCardExpiryMonth, final int creditCardExpiryYear, final String comment)
 	throws DataBlockNotFoundException, DataBlockGroupNotFoundException, DataFieldNotFoundException, StructFieldValueNotFoundException, StructFieldNotFoundException, StructBlockNotFoundException
 	{
-		IStruct personStruct = getPersonStruct();
+		final IStruct personStruct = getPersonStruct();
 
-		Person person = new Person(IDGenerator.getOrganisationID(), IDGenerator.nextID(PropertySet.class));
+		final Person person = new Person(IDGenerator.getOrganisationID(), IDGenerator.nextID(PropertySet.class));
 		person.inflate(personStruct);
 		person.getDataField(PersonStruct.PERSONALDATA_COMPANY).setData(company);
 		person.getDataField(PersonStruct.PERSONALDATA_NAME).setData(name);
@@ -355,7 +355,7 @@ public class DataCreator
 		person.getDataField(PersonStruct.INTERNET_EMAIL).setData(eMail);
 		person.getDataField(PersonStruct.PERSONALDATA_DATEOFBIRTH).setData(dateOfBirth);
 
-		SelectionStructField salutationSelectionStructField = (SelectionStructField) personStruct.getStructField(
+		final SelectionStructField salutationSelectionStructField = (SelectionStructField) personStruct.getStructField(
 				PersonStruct.PERSONALDATA, PersonStruct.PERSONALDATA_SALUTATION);
 		StructFieldValue sfv = salutationSelectionStructField.getStructFieldValue(PersonStruct.PERSONALDATA_SALUTATION_MR);
 		person.getDataField(PersonStruct.PERSONALDATA_SALUTATION, SelectionDataField.class).setSelection(sfv);
@@ -367,12 +367,12 @@ public class DataCreator
 		person.getDataField(PersonStruct.POSTADDRESS_REGION).setData(postRegion);
 		person.getDataField(PersonStruct.POSTADDRESS_COUNTRY).setData(postCountry);
 
-		PhoneNumberDataField phoneNumberDF = person.getDataField(PersonStruct.PHONE_PRIMARY, PhoneNumberDataField.class);
+		final PhoneNumberDataField phoneNumberDF = person.getDataField(PersonStruct.PHONE_PRIMARY, PhoneNumberDataField.class);
 		phoneNumberDF.setCountryCode(phoneCountryCode);
 		phoneNumberDF.setAreaCode(phoneAreaCode);
 		phoneNumberDF.setLocalNumber(phoneNumber);
 
-		PhoneNumberDataField faxDF = person.getDataField(PersonStruct.FAX, PhoneNumberDataField.class);
+		final PhoneNumberDataField faxDF = person.getDataField(PersonStruct.FAX, PhoneNumberDataField.class);
 		faxDF.setCountryCode(faxCountryCode);
 		faxDF.setAreaCode(faxAreaCode);
 		faxDF.setLocalNumber(faxNumber);
@@ -387,7 +387,7 @@ public class DataCreator
 
 //		((NumberDataField)person.getDataField(PersonStruct.CREDITCARD_EXPIRYMONTH)).setValue(creditCardExpiryMonth);
 
-		SelectionStructField expiryMonthStructField = (SelectionStructField) personStruct.getStructField(
+		final SelectionStructField expiryMonthStructField = (SelectionStructField) personStruct.getStructField(
 				PersonStruct.CREDITCARD, PersonStruct.CREDITCARD_EXPIRYMONTH);
 		if (creditCardExpiryMonth < 1 || creditCardExpiryMonth > 12)
 			sfv = null;
@@ -420,10 +420,10 @@ public class DataCreator
 	}
 
 	public Person createPerson(
-			String company, String name, String firstName, String eMail)
+			final String company, final String name, final String firstName, final String eMail)
 	throws DataBlockNotFoundException, DataBlockGroupNotFoundException, DataFieldNotFoundException
 	{
-		IStruct personStruct = getPersonStruct();
+		final IStruct personStruct = getPersonStruct();
 		Person person = new Person(IDGenerator.getOrganisationID(), IDGenerator.nextID(PropertySet.class));
 		person.inflate(personStruct);
 		person.getDataField(PersonStruct.PERSONALDATA_COMPANY).setData(company);
@@ -437,12 +437,12 @@ public class DataCreator
 		return person;
 	}
 
-	public LegalEntity createLegalEntity(Person person)
+	public LegalEntity createLegalEntity(final Person person)
 	{
 		if (person == null)
 			throw new IllegalArgumentException("person must not be null!");
 
-		Trader trader = Trader.getTrader(pm);
+		final Trader trader = Trader.getTrader(pm);
 		return trader.setPersonToLegalEntity(person, true);
 	}
 
@@ -467,19 +467,19 @@ public class DataCreator
 	 * @param eMail the e-mail address of the company/contact person.
 	 * @return the new or previously existing vendor.
 	 */
-	public LegalEntity createVendor(String _vendorID, String company, String name, String firstName, String eMail)
+	public LegalEntity createVendor(final String _vendorID, final String company, final String name, final String firstName, final String eMail)
 	throws DataBlockNotFoundException, DataBlockGroupNotFoundException, DataFieldNotFoundException
 	{
 		pm.getExtent(LegalEntity.class); // ensure meta-data is loaded
 
-		AnchorID vendorID = AnchorID.create(organisationID, LegalEntity.ANCHOR_TYPE_ID_LEGAL_ENTITY, _vendorID);
+		final AnchorID vendorID = AnchorID.create(organisationID, LegalEntity.ANCHOR_TYPE_ID_LEGAL_ENTITY, _vendorID);
 		try {
 			return (LegalEntity) pm.getObjectById(vendorID);
-		} catch (JDOObjectNotFoundException x) {
+		} catch (final JDOObjectNotFoundException x) {
 			// vendor does not exist => create it below
 		}
 
-		Person vendorPerson = createPerson(company, name, firstName, eMail);
+		final Person vendorPerson = createPerson(company, name, firstName, eMail);
 		LegalEntity vendor = new LegalEntity(vendorID.organisationID, vendorID.anchorID);
 		vendor = pm.makePersistent(vendor);
 		vendor.setPerson(vendorPerson);
@@ -487,10 +487,10 @@ public class DataCreator
 		return vendor;
 	}
 
-	public Order createOrderForEndcustomer(LegalEntity customer)
+	public Order createOrderForEndcustomer(final LegalEntity customer)
 	{
-		Trader trader = Trader.getTrader(pm);
-		Order order = trader.createOrder(trader.getMandator(), customer, null, getCurrencyEUR());
+		final Trader trader = Trader.getTrader(pm);
+		final Order order = trader.createOrder(trader.getMandator(), customer, null, getCurrencyEUR());
 		trader.createSegment(order, SegmentType.getDefaultSegmentType(pm));
 		return order;
 	}

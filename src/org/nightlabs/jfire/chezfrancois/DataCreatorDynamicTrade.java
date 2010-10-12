@@ -8,10 +8,8 @@ import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 
 import org.nightlabs.jfire.accounting.priceconfig.IInnerPriceConfig;
-import org.nightlabs.jfire.accounting.priceconfig.PriceConfig;
 import org.nightlabs.jfire.dynamictrade.accounting.priceconfig.PackagePriceConfig;
 import org.nightlabs.jfire.dynamictrade.store.DynamicProductType;
-import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.CannotConfirmProductTypeException;
 import org.nightlabs.jfire.store.CannotMakeProductTypeSaleableException;
@@ -25,7 +23,7 @@ extends DataCreator
 {
 	private DynamicProductType rootDynamicProductType;
 
-	public DataCreatorDynamicTrade(PersistenceManager pm, User user)
+	public DataCreatorDynamicTrade(final PersistenceManager pm, final User user)
 	{
 		super(pm, user);
 
@@ -39,15 +37,15 @@ extends DataCreator
 		return rootDynamicProductType;
 	}
 
-	public DynamicProductType createCategory(DynamicProductType parent, String productTypeID,
-			IInnerPriceConfig innerPriceConfig, String ... names) throws CannotPublishProductTypeException
+	public DynamicProductType createCategory(DynamicProductType parent, final String productTypeID,
+			final IInnerPriceConfig innerPriceConfig, final String ... names) throws CannotPublishProductTypeException
 	{
 		if (parent == null)
 			parent = rootDynamicProductType;
 
 		try {
 			return (DynamicProductType) pm.getObjectById(ProductTypeID.create(organisationID, productTypeID));
-		} catch (JDOObjectNotFoundException x) {
+		} catch (final JDOObjectNotFoundException x) {
 			// not yet existent => create the object!
 		}
 
@@ -72,9 +70,9 @@ extends DataCreator
 
 	private List<DynamicProductType> createdLeafs = new ArrayList<DynamicProductType>();
 
-	public DynamicProductType createLeaf(DynamicProductType category, String productTypeID,
-			IInnerPriceConfig innerPriceConfig, LegalEntity vendor,
-			String ... names) throws CannotPublishProductTypeException, CannotConfirmProductTypeException
+	public DynamicProductType createLeaf(DynamicProductType category, final String productTypeID,
+			final IInnerPriceConfig innerPriceConfig, final LegalEntity vendor,
+			final String ... names) throws CannotPublishProductTypeException, CannotConfirmProductTypeException
 	{
 		if (category == null)
 			category = rootDynamicProductType;
@@ -82,7 +80,7 @@ extends DataCreator
 		DynamicProductType pt = new DynamicProductType(
 				organisationID, productTypeID, category, ProductType.INHERITANCE_NATURE_LEAF, ProductType.PACKAGE_NATURE_OUTER);
 		setNames(pt.getName(), names);
-		pt.setPackagePriceConfig(new PackagePriceConfig(IDGenerator.getOrganisationID(), PriceConfig.createPriceConfigID()));
+		pt.setPackagePriceConfig(new PackagePriceConfig(null));
 		if (innerPriceConfig != null) {
 			pt.getFieldMetaData(ProductType.FieldName.innerPriceConfig).setValueInherited(false);
 			pt.setInnerPriceConfig(innerPriceConfig);
@@ -90,14 +88,14 @@ extends DataCreator
 		else {
 			pt.setInnerPriceConfig(category.getInnerPriceConfig());
 		}
-		
+
 		if (vendor != null) {
 			pt.setVendor(vendor);
 			pt.setOwner(vendor);
 			pt.getFieldMetaData(ProductType.FieldName.vendor).setValueInherited(false);
 			pt.getFieldMetaData(ProductType.FieldName.owner).setValueInherited(false);
 		}
-		
+
 		pt = (DynamicProductType) store.addProductType(user, pt); // , DynamicProductTypeActionHandler.getDefaultHome(pm, pt));
 		store.setProductTypeStatus_published(user, pt);
 		store.setProductTypeStatus_confirmed(user, pt);
@@ -108,8 +106,8 @@ extends DataCreator
 	}
 
 	public void makeAllLeavesSaleable() throws CannotMakeProductTypeSaleableException {
-		for (ProductType pt : createdLeafs) {
-			ProductType productType = (ProductType) pm.getObjectById(JDOHelper.getObjectId(pt));
+		for (final ProductType pt : createdLeafs) {
+			final ProductType productType = (ProductType) pm.getObjectById(JDOHelper.getObjectId(pt));
 			store.setProductTypeStatus_saleable(user, productType, true);
 		}
 	}

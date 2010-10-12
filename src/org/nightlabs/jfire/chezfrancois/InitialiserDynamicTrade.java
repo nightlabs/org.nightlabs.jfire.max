@@ -14,11 +14,9 @@ import org.nightlabs.jfire.accounting.gridpriceconfig.FormulaCell;
 import org.nightlabs.jfire.accounting.gridpriceconfig.PriceCoordinate;
 import org.nightlabs.jfire.accounting.id.CurrencyID;
 import org.nightlabs.jfire.accounting.id.TariffID;
-import org.nightlabs.jfire.accounting.priceconfig.PriceConfig;
 import org.nightlabs.jfire.base.JFirePrincipal;
 import org.nightlabs.jfire.dynamictrade.accounting.priceconfig.DynamicTradePriceConfig;
 import org.nightlabs.jfire.dynamictrade.store.DynamicProductType;
-import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.prop.exception.DataBlockGroupNotFoundException;
 import org.nightlabs.jfire.prop.exception.DataBlockNotFoundException;
 import org.nightlabs.jfire.prop.exception.DataFieldNotFoundException;
@@ -34,7 +32,7 @@ import org.nightlabs.jfire.trade.id.CustomerGroupID;
 public class InitialiserDynamicTrade
 extends Initialiser
 {
-	public InitialiserDynamicTrade(PersistenceManager pm, JFirePrincipal principal)
+	public InitialiserDynamicTrade(final PersistenceManager pm, final JFirePrincipal principal)
 	{
 		super(pm, principal);
 	}
@@ -42,42 +40,42 @@ extends Initialiser
 	public void createDemoData()
 	throws CannotPublishProductTypeException, CannotConfirmProductTypeException, CannotMakeProductTypeSaleableException, DataBlockNotFoundException, DataBlockGroupNotFoundException, DataFieldNotFoundException
 	{
-		String organisationID = getOrganisationID();
+		final String organisationID = getOrganisationID();
 
 		pm.getExtent(DynamicProductType.class);
-		ProductTypeID softwareDevelopmentID = ProductTypeID.create(organisationID, "softwareDevelopment");
-		ProductTypeID serviceID = ProductTypeID.create(organisationID, "service");
-		ProductTypeID miscID = ProductTypeID.create(organisationID, "softwareDevelopment.misc");
+		final ProductTypeID softwareDevelopmentID = ProductTypeID.create(organisationID, "softwareDevelopment");
+		final ProductTypeID serviceID = ProductTypeID.create(organisationID, "service");
+		final ProductTypeID miscID = ProductTypeID.create(organisationID, "softwareDevelopment.misc");
 		try {
 			pm.getObjectById(softwareDevelopmentID);
 			return; // it exists => do nothing
-		} catch (JDOObjectNotFoundException x) {
+		} catch (final JDOObjectNotFoundException x) {
 			// ignore this exception and create demo date
 		}
 
-		DataCreatorDynamicTrade dataCreator = new DataCreatorDynamicTrade(pm, User.getUser(pm, getPrincipal()));
+		final DataCreatorDynamicTrade dataCreator = new DataCreatorDynamicTrade(pm, User.getUser(pm, getPrincipal()));
 
 		// create Tariffs: normal price, gold card
-		Tariff tariffNormalPrice = dataCreator.getTariffNormalPrice();
-		Tariff tariffGoldCard = dataCreator.getTariffGoldCard();
+		final Tariff tariffNormalPrice = dataCreator.getTariffNormalPrice();
+		final Tariff tariffGoldCard = dataCreator.getTariffGoldCard();
 
-		DynamicTradePriceConfig priceConfig = new DynamicTradePriceConfig(IDGenerator.getOrganisationID(), PriceConfig.createPriceConfigID());
-		PriceFragmentType vatNet = dataCreator.getPriceFragmentTypeVatNet();
-		PriceFragmentType vatVal = dataCreator.getPriceFragmentTypeVatVal();
+		final DynamicTradePriceConfig priceConfig = new DynamicTradePriceConfig(null);
+		final PriceFragmentType vatNet = dataCreator.getPriceFragmentTypeVatNet();
+		final PriceFragmentType vatVal = dataCreator.getPriceFragmentTypeVatVal();
 		priceConfig.addPriceFragmentType(vatVal);
 		priceConfig.addPriceFragmentType(vatNet);
 
 		priceConfig.addInputPriceFragmentType(vatNet);
 
-		CustomerGroupID customerGroupID = (CustomerGroupID) JDOHelper.getObjectId(dataCreator.getCustomerGroupAnonymous());
+		final CustomerGroupID customerGroupID = (CustomerGroupID) JDOHelper.getObjectId(dataCreator.getCustomerGroupAnonymous());
 		priceConfig.addCustomerGroup(dataCreator.getCustomerGroupDefault());
 		priceConfig.addCustomerGroup(dataCreator.getCustomerGroupAnonymous());
 
-		CurrencyID currencyID = (CurrencyID) JDOHelper.getObjectId(dataCreator.getCurrencyEUR());
+		final CurrencyID currencyID = (CurrencyID) JDOHelper.getObjectId(dataCreator.getCurrencyEUR());
 		priceConfig.addCurrency(dataCreator.getCurrencyEUR());
 
-		TariffID tariffIDNormalPrice = (TariffID) JDOHelper.getObjectId(tariffNormalPrice);
-		TariffID tariffIDGoldCard = (TariffID) JDOHelper.getObjectId(tariffGoldCard);
+		final TariffID tariffIDNormalPrice = (TariffID) JDOHelper.getObjectId(tariffNormalPrice);
+		final TariffID tariffIDGoldCard = (TariffID) JDOHelper.getObjectId(tariffGoldCard);
 		priceConfig.addTariff(tariffNormalPrice);
 		priceConfig.addTariff(tariffGoldCard);
 
@@ -85,7 +83,7 @@ extends Initialiser
 		priceConfig.getName().setText(Locale.GERMAN.getLanguage(), "Standard");
 
 
-		FormulaCell fallbackFormulaCell = priceConfig.createFallbackFormulaCell();
+		final FormulaCell fallbackFormulaCell = priceConfig.createFallbackFormulaCell();
 		fallbackFormulaCell.setFormula(dataCreator.getPriceFragmentTypeTotal(),
 				"cell.resolvePriceCellsAmount(\n" +
 				"	PriceFragmentTypeID.create(\"" + vatNet.getOrganisationID() + "\", \"" + vatNet.getPriceFragmentTypeID() + "\")\n" +
@@ -112,49 +110,57 @@ extends Initialiser
 		dataCreator.getRootDynamicProductType().setInnerPriceConfig(priceConfig);
 
 		// create Accounts
-		Account accountSoftwareDevelopmentVatNet_revenue = dataCreator.createLocalRevenueAccount("software-development-vat-net.eur", "Software Development Net Revenue (EUR)");
-		Account accountSoftwareDevelopmentVatVal_revenue = dataCreator.createLocalRevenueAccount("software-development-vat-val.eur", "Software Development VAT Revenue (EUR)");
-		Account accountServiceVatNet_revenue = dataCreator.createLocalRevenueAccount("service-vat-net.eur", "Service Net Revenue (EUR)");
-		Account accountServiceVatVal_revenue = dataCreator.createLocalRevenueAccount("service-vat-val.eur", "Service VAT Revenue (EUR)");
+		final Account accountSoftwareDevelopmentVatNet_revenue = dataCreator.createLocalRevenueAccount("software-development-vat-net.eur", "Software Development Net Revenue (EUR)");
+		final Account accountSoftwareDevelopmentVatVal_revenue = dataCreator.createLocalRevenueAccount("software-development-vat-val.eur", "Software Development VAT Revenue (EUR)");
+		final Account accountServiceVatNet_revenue = dataCreator.createLocalRevenueAccount("service-vat-net.eur", "Service Net Revenue (EUR)");
+		final Account accountServiceVatVal_revenue = dataCreator.createLocalRevenueAccount("service-vat-val.eur", "Service VAT Revenue (EUR)");
 
-		Account accountSoftwareDevelopmentVatNet_expense = dataCreator.createLocalExpenseAccount("software-development-vat-net.eur", "Software Development Net Expense (EUR)");
-		Account accountSoftwareDevelopmentVatVal_expense = dataCreator.createLocalExpenseAccount("software-development-vat-val.eur", "Software Development VAT Expense (EUR)");
-		Account accountServiceVatNet_expense = dataCreator.createLocalExpenseAccount("service-vat-net.eur", "Service Net Expense (EUR)");
-		Account accountServiceVatVal_expense = dataCreator.createLocalExpenseAccount("service-vat-val.eur", "Service VAT Expense (EUR)");
+		final Account accountSoftwareDevelopmentVatNet_expense = dataCreator.createLocalExpenseAccount("software-development-vat-net.eur", "Software Development Net Expense (EUR)");
+		final Account accountSoftwareDevelopmentVatVal_expense = dataCreator.createLocalExpenseAccount("software-development-vat-val.eur", "Software Development VAT Expense (EUR)");
+		final Account accountServiceVatNet_expense = dataCreator.createLocalExpenseAccount("service-vat-net.eur", "Service Net Expense (EUR)");
+		final Account accountServiceVatVal_expense = dataCreator.createLocalExpenseAccount("service-vat-val.eur", "Service VAT Expense (EUR)");
 
-		DynamicProductType softwareDevelopment = dataCreator.createCategory(null, softwareDevelopmentID.productTypeID, null, "Software Development", "Software-Entwicklung");
+		final DynamicProductType softwareDevelopment = dataCreator.createCategory(null, softwareDevelopmentID.productTypeID, null, "Software Development", "Software-Entwicklung");
 
-		LegalEntity vendor  = dataCreator.createVendor1();
+		final LegalEntity vendor  = dataCreator.createVendor1();
 
 		// FIXME
 		@SuppressWarnings("unused")
+		final
 		DynamicProductType swDevJFire = dataCreator.createLeaf(softwareDevelopment, "softwareDevelopment.jfire", null, null, "JFire");
 		@SuppressWarnings("unused")
+		final
 		DynamicProductType swDevProjectA = dataCreator.createLeaf(softwareDevelopment, "softwareDevelopment.projectA", null, null, "Project A", "Projekt A");
 		@SuppressWarnings("unused")
+		final
 		DynamicProductType swDevProjectB = dataCreator.createLeaf(softwareDevelopment, "softwareDevelopment.projectB", null, null, "Project B", "Projekt B");
 		@SuppressWarnings("unused")
+		final
 		DynamicProductType swDevProjectC = dataCreator.createLeaf(softwareDevelopment, "softwareDevelopment.projectC", null, null, "Project C", "Projekt C");
 		@SuppressWarnings("unused")
+		final
 		DynamicProductType swDevProjectD = dataCreator.createLeaf(softwareDevelopment, "softwareDevelopment.projectD", null, vendor, "Project D", "Projekt D");
 
-		DynamicProductType service = dataCreator.createCategory(null, serviceID.productTypeID, null, "Service", "Dienstleistung");
+		final DynamicProductType service = dataCreator.createCategory(null, serviceID.productTypeID, null, "Service", "Dienstleistung");
 
 		// FIXME
 		@SuppressWarnings("unused")
+		final
 		DynamicProductType serviceJFire = dataCreator.createLeaf(service, "service.jfire", null, null, "JFire");
 		@SuppressWarnings("unused")
+		final
 		DynamicProductType serviceNetwork = dataCreator.createLeaf(service, "service.network", null, null, "Network", "Netzwerk");
 		@SuppressWarnings("unused")
+		final
 		DynamicProductType serviceWebserver = dataCreator.createLeaf(service, "service.webserver", null, null, "Webserver");
 
-		DynamicProductType misc = dataCreator.createLeaf(null, miscID.productTypeID, null, null, "Miscellaneous", "Verschiedenes");
+		final DynamicProductType misc = dataCreator.createLeaf(null, miscID.productTypeID, null, null, "Miscellaneous", "Verschiedenes");
 
 	// can not be set here because setting the vendor for an already confirmed ProductType is not possible
 //		swDevProjectD.setVendor(legalEntityVendor);
 
 		// configure moneyflow
-		MappingBasedAccountantDelegate swDelegate = new MappingBasedAccountantDelegate(organisationID, "softwareAccountantDelegate");
+		final MappingBasedAccountantDelegate swDelegate = new MappingBasedAccountantDelegate(organisationID, "softwareAccountantDelegate");
 
 		swDelegate.addMoneyFlowMapping(
 				dataCreator.createPFMoneyFlowMapping(softwareDevelopment, dataCreator.getPriceFragmentTypeTotal(),
@@ -163,7 +169,7 @@ extends Initialiser
 				dataCreator.createPFMoneyFlowMapping(softwareDevelopment, dataCreator.getPriceFragmentTypeVatVal(),
 						accountSoftwareDevelopmentVatVal_revenue, accountSoftwareDevelopmentVatVal_expense));
 
-		MappingBasedAccountantDelegate serviceDelegate = new MappingBasedAccountantDelegate(organisationID, "serviceAccountantDelegate");
+		final MappingBasedAccountantDelegate serviceDelegate = new MappingBasedAccountantDelegate(organisationID, "serviceAccountantDelegate");
 
 		serviceDelegate.addMoneyFlowMapping(
 				dataCreator.createPFMoneyFlowMapping(service, dataCreator.getPriceFragmentTypeTotal(),
@@ -173,7 +179,7 @@ extends Initialiser
 						accountServiceVatVal_revenue, accountServiceVatVal_expense));
 
 
-		MappingBasedAccountantDelegate miscDelegate = new MappingBasedAccountantDelegate(organisationID, "miscAccountantDelegate");
+		final MappingBasedAccountantDelegate miscDelegate = new MappingBasedAccountantDelegate(organisationID, "miscAccountantDelegate");
 
 		miscDelegate.addMoneyFlowMapping(
 				dataCreator.createPFMoneyFlowMapping(misc, dataCreator.getPriceFragmentTypeTotal(),

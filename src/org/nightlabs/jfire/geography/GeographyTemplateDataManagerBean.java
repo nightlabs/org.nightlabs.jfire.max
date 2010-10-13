@@ -104,7 +104,7 @@ implements GeographyTemplateDataManagerRemote
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("_System_")
-	public void initialiseJDOLifecycleListeners(Context context)
+	public void initialiseJDOLifecycleListeners(final Context context)
 	throws Exception
 	{
 		if (context.getOtherOrganisationID().equals(getRootOrganisationID()))
@@ -121,50 +121,50 @@ implements GeographyTemplateDataManagerRemote
 	public void initialiseJDOLifecycleListeners()
 	throws Exception
 	{
-		String subscriberOrganisationID = getOrganisationID();
-		String rootOrganisationID = getRootOrganisationID();
+		final String subscriberOrganisationID = getOrganisationID();
+		final String rootOrganisationID = getRootOrganisationID();
 		if (subscriberOrganisationID.equals(rootOrganisationID)) // only register in the root organisation, if that's not the local organisation
 			return;
 
-		PersistenceManager pm = createPersistenceManager();
+		final PersistenceManager pm = createPersistenceManager();
 		try {
 			pm.getExtent(GeographyTemplateDataNotificationReceiver.class);
-			
-			NotificationReceiverID notificationReceiverID = NotificationReceiverID.create(
+
+			final NotificationReceiverID notificationReceiverID = NotificationReceiverID.create(
 					rootOrganisationID, SubscriptionUtil.SUBSCRIBER_TYPE_ORGANISATION, subscriberOrganisationID,
 					GeographyTemplateDataNotificationFilter.class.getName());
 			try {
 				pm.getObjectById(notificationReceiverID);
 				logger.info("initialiseJDOLifecycleListeners: NotificationReceiver for CSV changes in the root organisation has already been registered. Skipping!");
 				return; // it exists already => doing nothing
-			} catch (JDOObjectNotFoundException x) {
+			} catch (final JDOObjectNotFoundException x) {
 				// it doesn't exist => register the persistent lifecycle listener
 			}
 
 			// check if the root-organisation is already registered
 			try {
 				pm.getObjectById(OrganisationID.create(rootOrganisationID));
-			} catch (JDOObjectNotFoundException x) {
+			} catch (final JDOObjectNotFoundException x) {
 				logger.info("initialiseJDOLifecycleListeners: NotificationReceiver does not yet exist, but I cannot register the JDO lifecycle listener in the root organisation, because the root organisation is not yet registered.");
 				return;
 			}
 			logger.info("initialiseJDOLifecycleListeners: NotificationReceiver does not yet exist. Will register persistent JDO lifecycle listener in root organisation and persist NotificationReceiver now.");
 
-			GeographyTemplateDataNotificationFilter notificationFilter = new GeographyTemplateDataNotificationFilter(
+			final GeographyTemplateDataNotificationFilter notificationFilter = new GeographyTemplateDataNotificationFilter(
 					rootOrganisationID, SubscriptionUtil.SUBSCRIBER_TYPE_ORGANISATION, subscriberOrganisationID,
 					GeographyTemplateDataNotificationFilter.class.getName());
 			PersistentNotificationEJBRemote persistentNotificationEJB;
 
 			try {
 				persistentNotificationEJB = JFireEjb3Factory.getRemoteBean(PersistentNotificationEJBRemote.class, getInitialContextProperties(rootOrganisationID));
-			} catch (JDOObjectNotFoundException x) {
+			} catch (final JDOObjectNotFoundException x) {
 				logger.warn("Creating JDO lifecycle listeners for CSV instances in the root organisation failed. Reason: Root organisation " + rootOrganisationID + " does not exist.");
 				return;
 			}
 
 			persistentNotificationEJB.storeNotificationFilter(notificationFilter, false, null, 1);
 
-			GeographyTemplateDataNotificationReceiver notificationReceiver = new GeographyTemplateDataNotificationReceiver(notificationFilter);
+			final GeographyTemplateDataNotificationReceiver notificationReceiver = new GeographyTemplateDataNotificationReceiver(notificationFilter);
 			pm.makePersistent(notificationReceiver);
 
 			logger.info("initialiseJDOLifecycleListeners: NotificationReceiver for changes of CSV instances in the root organisation has been successfully created.");
@@ -181,10 +181,10 @@ implements GeographyTemplateDataManagerRemote
 	public void initialise()
 	throws Exception
 	{
-		Geography geography = Geography.sharedInstance();
-		String organisationID = getOrganisationID();
+		final Geography geography = Geography.sharedInstance();
+		final String organisationID = getOrganisationID();
 
-		PersistenceManager pm = createPersistenceManager();
+		final PersistenceManager pm = createPersistenceManager();
 		try {
 			// As the ModuleMetaData is not managed by GeographyManagerBean, we can do it here (this stuff is expensive and we should therefore avoid to
 			// run it on every boot).
@@ -199,25 +199,25 @@ implements GeographyTemplateDataManagerRemote
 			pm.makePersistent(moduleMetaData);
 
 
-			iterateCountries: for (Country country : geography.getCountries()) {
+			iterateCountries: for (final Country country : geography.getCountries()) {
 				// CityIDs are local within the namespace of countryID and organisationID
 
-				IDNamespace namespace = IDNamespace.getIDNamespace(pm, organisationID, City.class.getName() + "#" + country.getCountryID());
+				final IDNamespace namespace = IDNamespace.getIDNamespace(pm, organisationID, City.class.getName() + "#" + country.getCountryID());
 				long nextID = namespace.getNextID();
 				if (nextID != 0)
 					continue iterateCountries; // already initialised - skip this country
 
 				nextID = -1;
 
-				for (Region region : geography.getRegions(CountryID.create(country), true)) {
-					iterateCities: for (City city : geography.getCities(RegionID.create(region), true)) {
+				for (final Region region : geography.getRegions(CountryID.create(country), true)) {
+					iterateCities: for (final City city : geography.getCities(RegionID.create(region), true)) {
 						if (!organisationID.equals(city.getOrganisationID()))
 							continue iterateCities;
 
 						long cityID;
 						try {
 							cityID = Long.parseLong(city.getCityID());
-						} catch (NumberFormatException x) {
+						} catch (final NumberFormatException x) {
 							continue iterateCities;
 						}
 
@@ -258,7 +258,7 @@ implements GeographyTemplateDataManagerRemote
 		// we do this again in an AsyncInvoke, because the current transaction is not yet committed and another thread might cause OLD data to be read!
 		try {
 			AsyncInvoke.exec(new InvocationClearCache(), true);
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			logger.error("Spawning AsyncInvoke failed!", e);
 			throw new RuntimeException(e); // we escalate it transparently as RuntimeException as it should never happen anyway - maybe we should change the API of AsyncInvoke and drop the throws declarations
 		}
@@ -274,7 +274,7 @@ implements GeographyTemplateDataManagerRemote
 		if (!hasRootOrganisation()) // if there is no root-organisation, writing is allowed
 			return;
 
-		String rootOrganisationID = getRootOrganisationID();
+		final String rootOrganisationID = getRootOrganisationID();
 
 		if (getOrganisationID().equals(rootOrganisationID)) // if we are the root-organisation, writing is ok
 			return;
@@ -292,17 +292,17 @@ implements GeographyTemplateDataManagerRemote
 	{
 		assertWritingAllowed();
 
-		PersistenceManager pm = createPersistenceManager();
+		final PersistenceManager pm = createPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(1);
 			pm.getFetchPlan().setGroup(FetchPlan.ALL);
 
-			Geography geography = Geography.sharedInstance();
+			final Geography geography = Geography.sharedInstance();
 
 			String rootOrganisationID;
 
 			try {
-				InitialContext initialContext = new InitialContext();
+				final InitialContext initialContext = new InitialContext();
 				try {
 					rootOrganisationID = Organisation.getRootOrganisationID(initialContext);
 				}//try
@@ -310,14 +310,14 @@ implements GeographyTemplateDataManagerRemote
 					initialContext.close();
 				}//finally
 			}//try
-			catch (NamingException x) {
+			catch (final NamingException x) {
 				throw new RuntimeException(x); // it's definitely an unexpected exception if we can't access the local JNDI.
 			}//catch
 
-			CountryID countryID = CountryID.create(storedCountry);
+			final CountryID countryID = CountryID.create(storedCountry);
 
-			ByteArrayOutputStream out = new ByteArrayOutputStream();
-			Writer w = new OutputStreamWriter(new DeflaterOutputStream(out), IOUtil.CHARSET_UTF_8);
+			final ByteArrayOutputStream out = new ByteArrayOutputStream();
+			final Writer w = new OutputStreamWriter(new DeflaterOutputStream(out), IOUtil.CHARSET_UTF_8);
 			try {
 				w.write(COUNTRY_CSV_HEADER);
 				for (Country existCountry : geography.getCountries()) {
@@ -326,7 +326,7 @@ implements GeographyTemplateDataManagerRemote
 						storedCountry = null;
 					}//if
 
-					String csvLines = GeographyImplResourceCSV.country2csvLines(existCountry);
+					final String csvLines = GeographyImplResourceCSV.country2csvLines(existCountry);
 
 					if (logger.isDebugEnabled())
 						logger.debug(csvLines);
@@ -335,7 +335,7 @@ implements GeographyTemplateDataManagerRemote
 				}//for
 
 				if (storedCountry != null) {
-					String csvLines = GeographyImplResourceCSV.country2csvLines(storedCountry);
+					final String csvLines = GeographyImplResourceCSV.country2csvLines(storedCountry);
 
 					if (logger.isDebugEnabled())
 						logger.debug(csvLines);
@@ -367,17 +367,17 @@ implements GeographyTemplateDataManagerRemote
 	{
 		assertWritingAllowed();
 
-		PersistenceManager pm = createPersistenceManager();
+		final PersistenceManager pm = createPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(1);
 			pm.getFetchPlan().setGroup(FetchPlan.ALL);
 
-			Geography geography = Geography.sharedInstance();
+			final Geography geography = Geography.sharedInstance();
 
 			String rootOrganisationID;
 
 			try {
-				InitialContext initialContext = new InitialContext();
+				final InitialContext initialContext = new InitialContext();
 				try {
 					rootOrganisationID = Organisation.getRootOrganisationID(initialContext);
 				}//try
@@ -385,15 +385,15 @@ implements GeographyTemplateDataManagerRemote
 					initialContext.close();
 				}//finally
 			}//try
-			catch (NamingException x) {
+			catch (final NamingException x) {
 				throw new RuntimeException(x); // it's definitely an unexpected exception if we can't access the local JNDI.
 			}//catch
 
 			RegionID regionID = RegionID.create(storedRegion);
-			CountryID countryID = CountryID.create(storedRegion);
+			final CountryID countryID = CountryID.create(storedRegion);
 
-			ByteArrayOutputStream out = new ByteArrayOutputStream();
-			Writer w = new OutputStreamWriter(new DeflaterOutputStream(out), IOUtil.CHARSET_UTF_8);
+			final ByteArrayOutputStream out = new ByteArrayOutputStream();
+			final Writer w = new OutputStreamWriter(new DeflaterOutputStream(out), IOUtil.CHARSET_UTF_8);
 			try {
 				w.write(REGION_CSV_HEADER);
 				for (Region existRegion : geography.getRegions(countryID, true)) {
@@ -402,7 +402,7 @@ implements GeographyTemplateDataManagerRemote
 						storedRegion = null; regionID = null;
 					}//if
 
-					String csvLines = GeographyImplResourceCSV.region2csvLines(existRegion);
+					final String csvLines = GeographyImplResourceCSV.region2csvLines(existRegion);
 
 					if (logger.isDebugEnabled())
 						logger.debug(csvLines);
@@ -411,7 +411,7 @@ implements GeographyTemplateDataManagerRemote
 				}//for
 
 				if (storedRegion != null) {
-					String csvLines = GeographyImplResourceCSV.region2csvLines(storedRegion);
+					final String csvLines = GeographyImplResourceCSV.region2csvLines(storedRegion);
 
 					if (logger.isDebugEnabled())
 						logger.debug(csvLines);
@@ -443,17 +443,17 @@ implements GeographyTemplateDataManagerRemote
 	{
 		assertWritingAllowed();
 
-		PersistenceManager pm = createPersistenceManager();
+		final PersistenceManager pm = createPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(1);
 			pm.getFetchPlan().setGroup(FetchPlan.ALL);
 
-			Geography geography = Geography.sharedInstance();
+			final Geography geography = Geography.sharedInstance();
 
 			String rootOrganisationID;
 
 			try {
-				InitialContext initialContext = new InitialContext();
+				final InitialContext initialContext = new InitialContext();
 				try {
 					rootOrganisationID = Organisation.getRootOrganisationID(initialContext);
 				}//try
@@ -461,25 +461,25 @@ implements GeographyTemplateDataManagerRemote
 					initialContext.close();
 				}//finally
 			}//try
-			catch (NamingException x) {
+			catch (final NamingException x) {
 				throw new RuntimeException(x); // it's definitely an unexpected exception if we can't access the local JNDI.
 			}//catch
 
 			CityID cityID = CityID.create(storedCity);
-			CountryID countryID = CountryID.create(storedCity);
+			final CountryID countryID = CountryID.create(storedCity);
 
-			ByteArrayOutputStream out = new ByteArrayOutputStream();
-			Writer w = new OutputStreamWriter(new DeflaterOutputStream(out), IOUtil.CHARSET_UTF_8);
+			final ByteArrayOutputStream out = new ByteArrayOutputStream();
+			final Writer w = new OutputStreamWriter(new DeflaterOutputStream(out), IOUtil.CHARSET_UTF_8);
 			try {
 				w.write(CITY_CSV_HEADER);
-				for (Region existRegion : geography.getRegions(countryID, true)) {
+				for (final Region existRegion : geography.getRegions(countryID, true)) {
 					for (City existCity : geography.getCities(RegionID.create(existRegion), true)) {
 						if (CityID.create(existCity).equals(cityID)) { //if come in this case it is update
 							existCity = storedCity;
 							storedCity = null; cityID = null;
 						}//if
 
-						String csvLines = GeographyImplResourceCSV.city2csvLines(existCity);
+						final String csvLines = GeographyImplResourceCSV.city2csvLines(existCity);
 
 						if (logger.isDebugEnabled())
 							logger.debug(csvLines);
@@ -489,7 +489,7 @@ implements GeographyTemplateDataManagerRemote
 				}//for
 
 				if (storedCity != null) {	//add new city
-					String csvLines = GeographyImplResourceCSV.city2csvLines(storedCity);
+					final String csvLines = GeographyImplResourceCSV.city2csvLines(storedCity);
 
 					if (logger.isDebugEnabled())
 						logger.debug(csvLines);
@@ -521,45 +521,45 @@ implements GeographyTemplateDataManagerRemote
 	{
 		assertWritingAllowed();
 
-		PersistenceManager pm = createPersistenceManager();
+		final PersistenceManager pm = createPersistenceManager();
 		try {
 			NLJDOHelper.enableTransactionSerializeReadObjects(pm);
 			try {
 				pm.getFetchPlan().setMaxFetchDepth(1);
 				pm.getFetchPlan().setGroup(FetchPlan.ALL);
 
-				Geography geography = Geography.sharedInstance();
+				final Geography geography = Geography.sharedInstance();
 				geography.clearCache(); // ensure that the data we're going to manipulate in this transaction are really up-to-date.
 
 				String rootOrganisationID;
 
 				try {
-					InitialContext initialContext = new InitialContext();
+					final InitialContext initialContext = new InitialContext();
 					try {
 						rootOrganisationID = Organisation.getRootOrganisationID(initialContext);
 					} finally {
 						initialContext.close();
 					}
-				} catch (NamingException x) {
+				} catch (final NamingException x) {
 					throw new RuntimeException(x); // it's definitely an unexpected exception if we can't access the local JNDI.
 				}
 
 				LocationID locationID = LocationID.create(storedLocation.getCountryID(), rootOrganisationID, storedLocation.getLocationID());
-				CountryID countryID = CountryID.create(storedLocation.getCountryID());
+				final CountryID countryID = CountryID.create(storedLocation.getCountryID());
 
-				ByteArrayOutputStream out = new ByteArrayOutputStream();
-				Writer w = new OutputStreamWriter(new DeflaterOutputStream(out), IOUtil.CHARSET_UTF_8);
+				final ByteArrayOutputStream out = new ByteArrayOutputStream();
+				final Writer w = new OutputStreamWriter(new DeflaterOutputStream(out), IOUtil.CHARSET_UTF_8);
 				try {
 					w.write(LOCATION_CSV_HEADER);
-					for (Region r : geography.getRegions(countryID, true)) {
-						for (City c : geography.getCities(RegionID.create(r), true)) {
+					for (final Region r : geography.getRegions(countryID, true)) {
+						for (final City c : geography.getCities(RegionID.create(r), true)) {
 							for (Location existLocation : geography.getLocations(CityID.create(c), true)){
 								if (LocationID.create(existLocation.getCountryID(), rootOrganisationID, existLocation.getLocationID()).equals(locationID)) {
 									existLocation = storedLocation;
 									storedLocation = null; locationID = null;
 								}//if
 
-								String csvLines = GeographyImplResourceCSV.location2csvLines(existLocation);
+								final String csvLines = GeographyImplResourceCSV.location2csvLines(existLocation);
 
 								if (logger.isDebugEnabled())
 									logger.debug(csvLines);
@@ -570,7 +570,7 @@ implements GeographyTemplateDataManagerRemote
 					}//for
 
 					if (storedLocation != null) {
-						String csvLines = GeographyImplResourceCSV.location2csvLines(storedLocation);
+						final String csvLines = GeographyImplResourceCSV.location2csvLines(storedLocation);
 
 						if (logger.isDebugEnabled())
 							logger.debug(csvLines);
@@ -599,12 +599,12 @@ implements GeographyTemplateDataManagerRemote
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("_Guest_")
-	public void storeGeographyTemplateDistrictData(District storedDistrict)
+	public void storeGeographyTemplateDistrictData(final District storedDistrict)
 	throws IOException, SecurityException
 	{
 		assertWritingAllowed();
 
-		PersistenceManager pm = createPersistenceManager();
+		final PersistenceManager pm = createPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(1);
 			pm.getFetchPlan().setGroup(FetchPlan.ALL);
@@ -615,7 +615,7 @@ implements GeographyTemplateDataManagerRemote
 			String rootOrganisationID;
 
 			try {
-				InitialContext initialContext = new InitialContext();
+				final InitialContext initialContext = new InitialContext();
 				try {
 					rootOrganisationID = Organisation.getRootOrganisationID(initialContext);
 				}//try
@@ -623,19 +623,19 @@ implements GeographyTemplateDataManagerRemote
 					initialContext.close();
 				}//finally
 			}//try
-			catch (NamingException x) {
+			catch (final NamingException x) {
 				throw new RuntimeException(x); // it's definitely an unexpected exception if we can't access the local JNDI.
 			}//catch
 
-			CountryID countryID = CountryID.create(storedDistrict.getCountryID());
+			final CountryID countryID = CountryID.create(storedDistrict.getCountryID());
 
-			ByteArrayOutputStream out = new ByteArrayOutputStream();
-			Writer w = new OutputStreamWriter(new DeflaterOutputStream(out), IOUtil.CHARSET_UTF_8);
+			final ByteArrayOutputStream out = new ByteArrayOutputStream();
+			final Writer w = new OutputStreamWriter(new DeflaterOutputStream(out), IOUtil.CHARSET_UTF_8);
 			try {
 				w.write(DISTRICT_CSV_HEADER);
 				// TODO: write all old data!
 				if (storedDistrict != null) {
-					String csvLines = GeographyImplResourceCSV.district2csvLines(storedDistrict);
+					final String csvLines = GeographyImplResourceCSV.district2csvLines(storedDistrict);
 
 					if (logger.isDebugEnabled())
 						logger.debug(csvLines);
@@ -665,11 +665,11 @@ implements GeographyTemplateDataManagerRemote
 
 	public Set<CSVID> getCSVIDs()
 	{
-		PersistenceManager pm = createPersistenceManager();
+		final PersistenceManager pm = createPersistenceManager();
 		try {
-			Query q = pm.newQuery(CSV.class);
+			final Query q = pm.newQuery(CSV.class);
 			q.setResult("JDOHelper.getObjectId(this)");
-			Collection<CSVID> c = CollectionUtil.castCollection((Collection<?>) q.execute());
+			final Collection<CSVID> c = CollectionUtil.castCollection((Collection<?>) q.execute());
 			return new HashSet<CSVID>(c);
 		} finally{
 			pm.close();
@@ -681,14 +681,21 @@ implements GeographyTemplateDataManagerRemote
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@RolesAllowed("_Guest_")
-	public Set<CSV> getCSVs(Set<CSVID> csvIDs, String[] fetchGroups, int maxFetchDepth)
+	public Set<CSV> getCSVs(final Set<CSVID> csvIDs, final String[] fetchGroups, final int maxFetchDepth)
 	{
-		PersistenceManager pm = createPersistenceManager();
+		final PersistenceManager pm = createPersistenceManager();
 		try {
 			return NLJDOHelper.getDetachedObjectSet(pm, csvIDs, CSV.class, fetchGroups, maxFetchDepth);
 		} finally{
 			pm.close();
 		}
+	}
+
+	@RolesAllowed("_Guest_")
+	@Override
+	public Collection<Country> getCountries()
+	{
+		return Geography.sharedInstance().getCountries();
 	}
 
 	// TODO: needs implementation!

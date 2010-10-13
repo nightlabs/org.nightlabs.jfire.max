@@ -1,6 +1,7 @@
 package org.nightlabs.jfire.geography;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Set;
 
 import javax.annotation.security.RolesAllowed;
@@ -121,5 +122,7 @@ public interface GeographyTemplateDataManagerRemote {
 	 */
 	@RolesAllowed("_Guest_")
 	Set<CSV> getCSVs(Set<CSVID> csvIDs, String[] fetchGroups, int maxFetchDepth);
+
+	Collection<Country> getCountries();
 
 }

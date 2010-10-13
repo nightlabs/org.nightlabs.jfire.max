@@ -51,19 +51,20 @@ import org.nightlabs.jfire.trade.OrganisationLegalEntity;
 import org.nightlabs.jfire.transfer.Anchor;
 
 /**
- * A {@link LocalAccountant} is responsible to split money to the {@link Organisation}s
+ * A {@link LocalBookInvoiceAccountantDelegate} is responsible to split money to the {@link Organisation}s
  * own accounts when payments are received/booked and to collect money from the correct
  * accounts when payments are done by the organisation.
  *
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
+ * @author Chairat Kongarayawetchakun <chairatk[AT]nightlabs[DOT]de>
  */
 @PersistenceCapable(
 		identityType=IdentityType.APPLICATION,
 		detachable="true",
-		table="JFireTrade_LocalAccountant"
+		table="JFireTrade_LocalBookInvoiceAccountantDelegate"
 )
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
-public class LocalAccountant extends Accountant
+public class LocalBookInvoiceAccountantDelegate extends AccountantDelegate
 {
 	private static final long serialVersionUID = 1L;
 
@@ -71,11 +72,11 @@ public class LocalAccountant extends Accountant
 	 * @deprecated Do not use! Only for JDO!
 	 */
 	@Deprecated
-	protected LocalAccountant() {
+	protected LocalBookInvoiceAccountantDelegate() {
 	}
 
-	public LocalAccountant(OrganisationLegalEntity mandator, String accountantID) {
-		super(mandator.getOrganisationID(), accountantID);
+	public LocalBookInvoiceAccountantDelegate(OrganisationLegalEntity mandator, String accountantDelegateID) {
+		super(mandator.getOrganisationID(), accountantDelegateID);
 		this.mandator = mandator;
 	}
 
@@ -138,7 +139,7 @@ public class LocalAccountant extends Accountant
 	protected PersistenceManager getPersistenceManager() {
 		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
 		if (pm == null)
-			throw new IllegalStateException("This instance of LocalAccountant is not persistent. Can't get PersistenceManager");
+			throw new IllegalStateException("This instance of LocalBookInvoiceAccountantDelegate is not persistent. Can't get PersistenceManager");
 		return pm;
 	}
 

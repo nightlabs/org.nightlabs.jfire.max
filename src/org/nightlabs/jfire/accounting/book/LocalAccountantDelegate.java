@@ -56,7 +56,7 @@ import org.nightlabs.jfire.transfer.Anchor;
 import org.nightlabs.util.Util;
 
 /**
- * LocalAccountantDelegates are used by {@link org.nightlabs.jfire.accounting.book.LocalAccountant}
+ * LocalAccountantDelegates are used by {@link org.nightlabs.jfire.accounting.book.LocalBookInvoiceAccountantDelegate}
  * to assist in the booking procedure. A delegate is registered per ProductType
  * and will be asked to {@link #bookArticle(OrganisationLegalEntity, User, Invoice, Article, BookInvoiceMoneyTransfer, Set)}
  * when an invoice is booked.
@@ -216,7 +216,7 @@ public abstract class LocalAccountantDelegate implements Serializable {
 	 * {@link #bookProductTypeParts(OrganisationLegalEntity, User, LinkedList, int, BookInvoiceMoneyTransfer, Set)}
 	 * and only provide new dimensions.
 	 *
-	 * @param mandator The organisation the LocalAccountant books for.
+	 * @param mandator The organisation the LocalBookInvoiceAccountantDelegate books for.
 	 * @param user The user that initiated the booking.
 	 * @param invoice The invoice that is currently booked.
 	 * @param article The Article to book.
@@ -234,7 +234,7 @@ public abstract class LocalAccountantDelegate implements Serializable {
 
 
 	/**
-	 * Called by LocalAccountant before all articles of an invoice are booked.
+	 * Called by LocalBookInvoiceAccountantDelegate before all articles of an invoice are booked.
 	 * Gives the delegate the chance to initialize.
 	 *
 	 * @param mandator The mandator.
@@ -246,7 +246,7 @@ public abstract class LocalAccountantDelegate implements Serializable {
 	public void preBookArticles(OrganisationLegalEntity mandator, User user, Invoice invoice, BookInvoiceMoneyTransfer bookTransfer, Set<Anchor> involvedAnchors) {}
 
 	/**
-	 * Called by LocalAccountant before all articles of an invoice are booked.
+	 * Called by LocalBookInvoiceAccountantDelegate before all articles of an invoice are booked.
 	 * Gives the delegate the chance to clean up.
 	 *
 	 * @param mandator The mandator.

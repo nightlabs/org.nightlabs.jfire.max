@@ -1134,7 +1134,7 @@ implements StoreCallback
 //			to = deliveryNote.getCustomer();
 //		}
 //
-//		// The LocalAccountant is assigned to the mandator in any case, because it is
+//		// The LocalBookInvoiceAccountantDelegate is assigned to the mandator in any case, because it is
 //		// assigned during creation of Accounting. Hence, we don't need to check whether
 //		// from or to is the other side.
 //		if (from.getAccountant() == null)

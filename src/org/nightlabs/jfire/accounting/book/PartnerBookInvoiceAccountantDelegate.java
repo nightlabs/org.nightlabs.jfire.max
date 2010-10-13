@@ -57,32 +57,33 @@ import org.nightlabs.jfire.transfer.Anchor;
 import org.nightlabs.jfire.transfer.Transfer;
 
 /**
- * One instance of PartnerAccountant exists per organisation.
+ * One instance of PartnerBookInvoiceAccountantDelegate exists per organisation.
  * It handles Transfers for trade partners that can be other
  * organisations or customers.
  *
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  * @author Marco หงุ่ยตระกูล-Schulze - marco at nightlabs dot de
+ * @author Chairat Kongarayawetchakun <chairatk[AT]nightlabs[DOT]de>
  */
 @PersistenceCapable(
 	identityType=IdentityType.APPLICATION,
 	detachable="true",
-	table="JFireTrade_PartnerAccountant")
+	table="JFireTrade_PartnerBookInvoiceAccountantDelegate")
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
-public class PartnerAccountant extends Accountant
+public class PartnerBookInvoiceAccountantDelegate extends AccountantDelegate
 {
 	private static final long serialVersionUID = 1L;
-	private static final Logger logger = Logger.getLogger(PartnerAccountant.class);
+	private static final Logger logger = Logger.getLogger(PartnerBookInvoiceAccountantDelegate.class);
 
 	/**
 	 * @deprecated Constructor only existing for JDO!
 	 */
 	@Deprecated
-	protected PartnerAccountant() {
+	protected PartnerBookInvoiceAccountantDelegate() {
 	}
 
-	public PartnerAccountant(String organisationID, String accountantID) {
-		super(organisationID, accountantID);
+	public PartnerBookInvoiceAccountantDelegate(String organisationID, String accountantDelegateID) {
+		super(organisationID, accountantDelegateID);
 	}
 
 	@Override
@@ -711,13 +712,13 @@ public class PartnerAccountant extends Accountant
 	}
 
 	/**
-	 * Returns the PersitenceManager of this PartnerAccountant. This
+	 * Returns the PersitenceManager of this PartnerBookInvoiceAccountantDelegate. This
 	 * is not cached (which is not necessary, anyway, because it's a fast operation via {@link JDOHelper#getObjectId(Object)}).
 	 */
 	protected PersistenceManager getPersistenceManager() {
 		PersistenceManager accountantPM = JDOHelper.getPersistenceManager(this);
 		if (accountantPM == null)
-			throw new IllegalStateException("This instance of PartnerAccountant is currently not persistent, can not get a PesistenceManager!!");
+			throw new IllegalStateException("This instance of PartnerBookInvoiceAccountantDelegate is currently not persistent, can not get a PesistenceManager!!");
 
 		return accountantPM;
 	}

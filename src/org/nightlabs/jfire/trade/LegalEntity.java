@@ -484,7 +484,7 @@ public class LegalEntity extends Anchor
 		else
 			balance.amount += transfer.getAmount();
 
-		accountant.bookTransfer(user, this, transfer, involvedAnchors);
+		accountant.getAccountantDelegate(transfer.getClass()).bookTransfer(user, this, transfer, involvedAnchors);
 	}
 
 	protected void rollbackMoneyTransfer(MoneyTransfer transfer, User user,

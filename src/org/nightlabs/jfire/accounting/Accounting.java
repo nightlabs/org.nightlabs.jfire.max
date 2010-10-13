@@ -59,9 +59,11 @@ import org.apache.log4j.Logger;
 import org.jbpm.JbpmContext;
 import org.jbpm.graph.exe.ProcessInstance;
 import org.nightlabs.i18n.I18nText;
+import org.nightlabs.jfire.accounting.book.Accountant;
+import org.nightlabs.jfire.accounting.book.AccountantDelegate;
 import org.nightlabs.jfire.accounting.book.BookInvoiceMoneyTransfer;
-import org.nightlabs.jfire.accounting.book.LocalAccountant;
-import org.nightlabs.jfire.accounting.book.PartnerAccountant;
+import org.nightlabs.jfire.accounting.book.LocalBookInvoiceAccountantDelegate;
+import org.nightlabs.jfire.accounting.book.PartnerBookInvoiceAccountantDelegate;
 import org.nightlabs.jfire.accounting.book.uncollectable.UncollectableInvoiceBooker;
 import org.nightlabs.jfire.accounting.book.uncollectable.VatUncollectableInvoiceBooker;
 import org.nightlabs.jfire.accounting.id.AccountingID;
@@ -106,6 +108,7 @@ import org.nightlabs.jfire.transfer.Transfer;
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
+ * @author Chairat Kongarayawetchakun <chairatk[AT]nightlabs[DOT]de>
  *
  * @jdo.persistence-capable
  *		identity-type="application"
@@ -161,10 +164,21 @@ implements StoreCallback
 		accounting.organisationID = organisationID;
 		accounting.mandator = OrganisationLegalEntity.getOrganisationLegalEntity(pm, organisationID); // new OrganisationLegalEntity(localOrganisation.getOrganisation());
 //		accounting.accountingPriceConfig = new AccountingPriceConfig(IDGenerator.getOrganisationID(), PriceConfig.createPriceConfigID());
-		accounting.localAccountant = new LocalAccountant(accounting.mandator, LocalAccountant.class.getName());
+		/*accounting.localAccountant = new LocalBookInvoiceAccountantDelegate(accounting.mandator, LocalBookInvoiceAccountantDelegate.class.getName());
 		accounting.mandator.setAccountant(accounting.localAccountant);
-		accounting.partnerAccountant = new PartnerAccountant(organisationID, PartnerAccountant.class.getName());
-
+		accounting.partnerAccountant = new PartnerBookInvoiceAccountantDelegate(organisationID, PartnerBookInvoiceAccountantDelegate.class.getName());
+		 */
+		accounting.localAccountant = new Accountant(IDGenerator.getOrganisationID(), Accountant.LOCAL_ACCOUNTANT_ID);
+		accounting.mandator.setAccountant(accounting.localAccountant);
+		
+		accounting.partnerAccountant = new Accountant(IDGenerator.getOrganisationID(), Accountant.PARTNER_ACCOUTANT_ID);
+		
+		AccountantDelegate localBookInvoiceAccountantDelegate = new LocalBookInvoiceAccountantDelegate(accounting.mandator, IDGenerator.nextIDString(AccountantDelegate.class)); 
+		accounting.localAccountant.setAccountantDelegate(BookInvoiceMoneyTransfer.class, localBookInvoiceAccountantDelegate);
+		
+		AccountantDelegate partnerBookInvoiceAccountantDelegate = new PartnerBookInvoiceAccountantDelegate(organisationID, IDGenerator.nextIDString(AccountantDelegate.class));
+		accounting.partnerAccountant.setAccountantDelegate(BookInvoiceMoneyTransfer.class, partnerBookInvoiceAccountantDelegate);
+		
 		accounting = pm.makePersistent(accounting);
 		accounting.getUncollectableInvoiceBooker(); // initialise default value - must be done after persisting!
 		return accounting;
@@ -193,13 +207,13 @@ implements StoreCallback
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
-	private LocalAccountant localAccountant;
+	private Accountant localAccountant;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
-	private PartnerAccountant partnerAccountant;
+	private Accountant partnerAccountant;
 
 	/**
 	 * @return Returns the organisationID.
@@ -444,14 +458,14 @@ implements StoreCallback
 	/**
 	 * @return Returns the localAccountant.
 	 */
-	public LocalAccountant getLocalAccountant()
+	public Accountant getLocalAccountant()
 	{
 		return localAccountant;
 	}
 	/**
 	 * @return Returns the partnerAccountant.
 	 */
-	public PartnerAccountant getPartnerAccountant()
+	public Accountant getPartnerAccountant()
 	{
 		return partnerAccountant;
 	}
@@ -513,7 +527,7 @@ implements StoreCallback
 		if (logger.isDebugEnabled())
 			logger.debug("Invoice " + invoice.getPrimaryKey() + ": price=" + invoice.getPrice().getAmount() + invoice.getPrice().getCurrency().getCurrencyID() + " vendor=" + invoice.getVendor().getPrimaryKey() + " customer=" + invoice.getCustomer().getPrimaryKey());
 
-		// The LocalAccountant is assigned to the mandator in any case, because it is
+		// The LocalBookInvoiceAccountantDelegate is assigned to the mandator in any case, because it is
 		// assigned during creation of Accounting. Hence, we don't need to check whether
 		// from or to is the other side.
 		if (from.getAccountant() == null)
@@ -1130,14 +1144,14 @@ implements StoreCallback
 //	}
 
 	/**
-	 * @deprecated Use {@link PartnerAccountant#getPartnerAccount(AccountType, LegalEntity, Currency)} instead!
-	 *		You can obtain the <code>PartnerAccountant</code> via {@link #getPartnerAccountant()}.
+	 * @deprecated Use {@link PartnerBookInvoiceAccountantDelegate#getPartnerAccount(AccountType, LegalEntity, Currency)} instead!
+	 *		You can obtain the <code>PartnerBookInvoiceAccountantDelegate</code> via {@link #getPartnerAccountant()}.
 	 *		This method will soon be removed.
-	 */
+	 *//*
 	@Deprecated
 	public Account getPartnerAccount(AccountType accountType, LegalEntity partner, Currency currency) {
-		return getPartnerAccountant().getPartnerAccount(accountType, partner, currency);
-	}
+		return getPartnerAccountant().getAccountantDelegate(null).getPartnerAccount(accountType, partner, currency);
+	}*/
 
 	public void jdoPreStore()
 	{

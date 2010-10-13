@@ -31,8 +31,10 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Serializable;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.zip.DeflaterOutputStream;
 
@@ -695,7 +697,12 @@ implements GeographyTemplateDataManagerRemote
 	@Override
 	public Collection<Country> getCountries()
 	{
-		return Geography.sharedInstance().getCountries();
+		final Collection<Country> countries = Geography.sharedInstance().getCountries();
+		final List<Country> result = new ArrayList<Country>(countries.size());
+		for (final Country country : countries) {
+			result.add(country.copyForJDOStorage());
+		}
+		return result;
 	}
 
 	// TODO: needs implementation!

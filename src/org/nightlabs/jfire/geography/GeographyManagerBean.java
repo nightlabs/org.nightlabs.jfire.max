@@ -53,13 +53,7 @@ import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.util.CollectionUtil;
 
 /**
- * @ejb.bean name="jfire/ejb/JFireGeography/GeographyManager"
- *           jndi-name="jfire/ejb/JFireGeography/GeographyManager"
- *           type="Stateless"
- *           transaction-type="Container"
- *
- * @ejb.util generate="physical"
- * @ejb.transaction type="Required"
+ * Geography manager implementation.
  */
 @TransactionAttribute(TransactionAttributeType.REQUIRED)
 @TransactionManagement(TransactionManagementType.CONTAINER)
@@ -69,7 +63,6 @@ extends BaseSessionBeanImpl
 implements GeographyManagerRemote
 {
 	private static final long serialVersionUID = 1L;
-//	private static final Logger logger = Logger.getLogger(GeographyManagerBean.class);
 
 	/* (non-Javadoc)
 	 * @see org.nightlabs.jfire.geography.GeographyManagerRemote#initialise()
@@ -78,14 +71,11 @@ implements GeographyManagerRemote
 	@RolesAllowed("_System_")
 	public void initialise()
 	{
-//		GeographyImplResourceCSV.register();
 		GeographyImplJDO.register();
 	}
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.geography.GeographyManagerRemote#getCountryIDs()
 	 */
 	@RolesAllowed("_Guest_")
 	public Collection<CountryID> getCountryIDs()
@@ -101,10 +91,8 @@ implements GeographyManagerRemote
 		}
 	}
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.geography.GeographyManagerRemote#getRegionIDs(org.nightlabs.jfire.geography.id.CountryID)
 	 */
 	@RolesAllowed("_Guest_")
 	public Collection<RegionID> getRegionIDs(CountryID countryID)
@@ -123,10 +111,8 @@ implements GeographyManagerRemote
 		}
 	}
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.geography.GeographyManagerRemote#getCityIDs(org.nightlabs.jfire.geography.id.RegionID)
 	 */
 	@RolesAllowed("_Guest_")
 	public Collection<CityID> getCityIDs(RegionID regionID)
@@ -145,10 +131,8 @@ implements GeographyManagerRemote
 		}
 	}
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.geography.GeographyManagerRemote#getLocationIDs(org.nightlabs.jfire.geography.id.CityID)
 	 */
 	@RolesAllowed("_Guest_")
 	public Collection<LocationID> getLocationIDs(CityID cityID)
@@ -167,10 +151,8 @@ implements GeographyManagerRemote
 		}
 	}
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.geography.GeographyManagerRemote#getCountries(java.util.Collection, java.lang.String[], int)
 	 */
 	@RolesAllowed("_Guest_")
 	public Collection<Country> getCountries(Collection<CountryID> countryIDs, String[] fetchGroups, int maxFetchDepth)
@@ -183,10 +165,8 @@ implements GeographyManagerRemote
 		}
 	}
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.geography.GeographyManagerRemote#getRegions(java.util.Collection, java.lang.String[], int)
 	 */
 	@RolesAllowed("_Guest_")
 	public Collection<Region> getRegions(Collection<RegionID> regionIDs, String[] fetchGroups, int maxFetchDepth)
@@ -199,10 +179,8 @@ implements GeographyManagerRemote
 		}
 	}
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.geography.GeographyManagerRemote#getCities(java.util.Collection, java.lang.String[], int)
 	 */
 	@RolesAllowed("_Guest_")
 	public Collection<City> getCities(Collection<CityID> cityIDs, String[] fetchGroups, int maxFetchDepth)
@@ -215,10 +193,8 @@ implements GeographyManagerRemote
 		}
 	}
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.geography.GeographyManagerRemote#getLocations(java.util.Collection, java.lang.String[], int)
 	 */
 	@RolesAllowed("_Guest_")
 	public Collection<Location> getLocations(Collection<LocationID> locationIDs, String[] fetchGroups, int maxFetchDepth)
@@ -231,9 +207,8 @@ implements GeographyManagerRemote
 		}
 	}
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.geography.GeographyManagerRemote#importCountry(org.nightlabs.jfire.geography.id.CountryID, boolean, java.lang.String[], int)
 	 */
 	@RolesAllowed("_Guest_")
 	public Country importCountry(CountryID countryID, boolean get, String[] fetchGroups, int maxFetchDepth)
@@ -269,9 +244,8 @@ implements GeographyManagerRemote
 		}
 	}
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.geography.GeographyManagerRemote#importRegion(org.nightlabs.jfire.geography.id.RegionID, boolean, java.lang.String[], int)
 	 */
 	@RolesAllowed("_Guest_")
 	public Region importRegion(RegionID regionID, boolean get, String[] fetchGroups, int maxFetchDepth)
@@ -306,9 +280,8 @@ implements GeographyManagerRemote
 		}
 	}
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.geography.GeographyManagerRemote#importCity(org.nightlabs.jfire.geography.id.CityID, boolean, java.lang.String[], int)
 	 */
 	@RolesAllowed("_Guest_")
 	public City importCity(CityID cityID, boolean get, String[] fetchGroups, int maxFetchDepth)
@@ -343,9 +316,8 @@ implements GeographyManagerRemote
 		}
 	}
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.geography.GeographyManagerRemote#importLocation(org.nightlabs.jfire.geography.id.LocationID, boolean, java.lang.String[], int)
 	 */
 	@RolesAllowed("_Guest_")
 	public Location importLocation(LocationID locationID, boolean get, String[] fetchGroups, int maxFetchDepth)
@@ -379,48 +351,6 @@ implements GeographyManagerRemote
 			pm.close();
 		}
 	}
-
-//	/**
-//	 * @ejb.interface-method
-//	 * @ejb.permission role-name="_Guest_"
-//	 */
-//	public Country storeCountry(Country country, boolean get, String[] fetchGroups, int maxFetchDepth)
-//	{
-//		PersistenceManager pm = createPersistenceManager();
-//		try {
-//			return NLJDOHelper.storeJDO(pm, country, get, fetchGroups, maxFetchDepth);
-//		} finally {
-//			pm.close();
-//		}
-//	}
-
-//	/**
-//	 * @ejb.interface-method
-//	 * @ejb.permission role-name="_Guest_"
-//	 */
-//	public Region storeRegion(Region region, boolean get, String[] fetchGroups, int maxFetchDepth)
-//	{
-//		PersistenceManager pm = createPersistenceManager();
-//		try {
-//			return NLJDOHelper.storeJDO(pm, region, get, fetchGroups, maxFetchDepth);
-//		} finally {
-//			pm.close();
-//		}
-//	}
-
-//	/**
-//	 * @ejb.interface-method
-//	 * @ejb.permission role-name="_Guest_"
-//	 */
-//	public City storeCity(City city, boolean get, String[] fetchGroups, int maxFetchDepth)
-//	{
-//		PersistenceManager pm = createPersistenceManager();
-//		try {
-//			return NLJDOHelper.storeJDO(pm, city, get, fetchGroups, maxFetchDepth);
-//		} finally {
-//			pm.close();
-//		}
-//	}
 
 	/* (non-Javadoc)
 	 * @see org.nightlabs.jfire.geography.GeographyManagerRemote#getCSVData(java.lang.String, java.lang.String)
@@ -457,38 +387,35 @@ implements GeographyManagerRemote
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.geography.GeographyManagerRemote#getCSVsData(java.lang.String)
+	 */
 	@RolesAllowed("_Guest_")
 	public byte[] getCSVsData(String csvType)
 	{
-	PersistenceManager pm = createPersistenceManager();
-	pm.getFetchPlan().setMaxFetchDepth(1);
-	pm.getFetchPlan().setGroup(FetchPlan.ALL);
-	try {
-		InitialContext initialContext = new InitialContext();
+		PersistenceManager pm = createPersistenceManager();
+		pm.getFetchPlan().setMaxFetchDepth(1);
+		pm.getFetchPlan().setGroup(FetchPlan.ALL);
 		try {
-			byte[] data = CSV.getCSVsData(pm, Organisation.getRootOrganisationID(initialContext), csvType);
-			if (data == null) {
-				Geography.sharedInstance().needCountries();
-				data = CSV.getCSVsData(pm, Organisation.getRootOrganisationID(initialContext), csvType);
+			InitialContext initialContext = new InitialContext();
+			try {
+				byte[] data = CSV.getCSVsData(pm, Organisation.getRootOrganisationID(initialContext), csvType);
+				if (data == null) {
+					Geography.sharedInstance().needCountries();
+					data = CSV.getCSVsData(pm, Organisation.getRootOrganisationID(initialContext), csvType);
+				}
+				return data;
+			} finally {
+				initialContext.close();
+			}
+		} catch (NamingException x) {
+			throw new RuntimeException(x); // it's definitely an unexpected exception if we can't access the local JNDI.
 		}
-			return data;
-		} finally {
-			initialContext.close();
+		finally {
+			pm.close();
 		}
-	} catch (NamingException x) {
-		throw new RuntimeException(x); // it's definitely an unexpected exception if we can't access the local JNDI.
 	}
-	finally {
-		pm.close();
-	}
-}
-	
-	
-	
-	
-	
-	
-	
+
 	/* (non-Javadoc)
 	 * @see org.nightlabs.jfire.geography.GeographyManagerRemote#getGeographyObject(org.nightlabs.jdo.ObjectID, java.lang.String[], int)
 	 */
@@ -507,98 +434,4 @@ implements GeographyManagerRemote
 			pm.close();
 		}
 	}
-
-//	/**
-//	 * Returns the {@link Country} with the given name and {@link Locale}
-//	 * @param countryName the name of the country
-//	 * @param locale the {@link Locale} to search in the multiLanguage name of the country
-//	 * @return the {@link Country} with the given name and {@link Locale}
-//	 *
-//	 * @ejb.interface-method
-//	 * @ejb.permission role-name="_Guest_"
-//	 */
-//	public Country getCountryByName(String countryName, Locale locale)
-//	{
-//		PersistenceManager pm = createPersistenceManager();
-//		try {
-//			Collection<Country> countries = Country.getCountryByName(pm, countryName, locale);
-//			if (countries != null && !countries.isEmpty()) {
-//				return countries.iterator().next();
-//			}
-//			return null;
-//		} finally {
-//			pm.close();
-//		}
-//	}
-//
-//	/**
-//	 * Returns the {@link Region} with the given name and {@link Locale}
-//	 * @param regionName the name of the region
-//	 * @param locale the {@link Locale} to search in the multiLanguage name of the region
-//	 * @return the {@link Region} with the given name and {@link Locale}
-//	 *
-//	 * @ejb.interface-method
-//	 * @ejb.permission role-name="_Guest_"
-//	 */
-//	public Region getRegionByName(String regionName, Locale locale)
-//	{
-//		PersistenceManager pm = createPersistenceManager();
-//		try {
-//			Collection<Region> regions = Region.getRegionByName(pm, regionName, locale);
-//			if (regions != null && !regions.isEmpty()) {
-//				return regions.iterator().next();
-//			}
-//			return null;
-//		} finally {
-//			pm.close();
-//		}
-//	}
-//
-//	/**
-//	 * Returns the {@link City} with the given name and {@link Locale}
-//	 * @param cityName the name of the city
-//	 * @param locale the {@link Locale} to search in the multiLanguage name of the city
-//	 * @return the {@link City} with the given name and {@link Locale}
-//	 *
-//	 * @ejb.interface-method
-//	 * @ejb.permission role-name="_Guest_"
-//	 */
-//	public City getCityByName(String cityName, Locale locale)
-//	{
-//		PersistenceManager pm = createPersistenceManager();
-//		try {
-//			Collection<City> cities = City.getCityByName(createPersistenceManager(),
-//					cityName, locale);
-//			if (cities != null && !cities.isEmpty()) {
-//				return cities.iterator().next();
-//			}
-//			return null;
-//		} finally {
-//			pm.close();
-//		}
-//	}
-//
-//	/**
-//	 * Returns the {@link Location} with the given name and {@link Locale}
-//	 * @param locationName the name of the location
-//	 * @param locale the {@link Locale} to search in the multiLanguage name of the location
-//	 * @return the {@link Location} with the given name and {@link Locale}
-// 	*
-//	 * @ejb.interface-method
-//	 * @ejb.permission role-name="_Guest_"
-//	 */
-//	public Location getLocationByName(String locationName, Locale locale)
-//	{
-//		PersistenceManager pm = createPersistenceManager();
-//		try {
-//			Collection<Location> locations = Location.getLocationByName(pm, locationName, locale);
-//			if (locations != null && !locations.isEmpty()) {
-//				return locations.iterator().next();
-//			}
-//			return null;
-//		} finally {
-//			pm.close();
-//		}
-//	}
-
 }

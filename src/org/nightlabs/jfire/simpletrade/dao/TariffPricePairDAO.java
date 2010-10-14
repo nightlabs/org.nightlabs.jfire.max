@@ -65,7 +65,7 @@ public class TariffPricePairDAO
 		if(sharedInstance == null) {
 			sharedInstance = new TariffPricePairDAO(GlobalJDOManagerProvider.sharedInstance().getCache(), GlobalJFireEjb3Provider.sharedInstance());
 		}
-		return null;
+		return sharedInstance;
 	}
 	
 	protected static class TariffPricePairsCarrier {

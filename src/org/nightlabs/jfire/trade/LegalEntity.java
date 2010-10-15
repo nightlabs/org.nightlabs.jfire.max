@@ -42,6 +42,7 @@ import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.accounting.Account;
 import org.nightlabs.jfire.accounting.MoneyTransfer;
 import org.nightlabs.jfire.accounting.book.Accountant;
+import org.nightlabs.jfire.accounting.book.AccountantDelegate;
 import org.nightlabs.jfire.accounting.id.CurrencyID;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.organisation.LocalOrganisation;
@@ -484,7 +485,9 @@ public class LegalEntity extends Anchor
 		else
 			balance.amount += transfer.getAmount();
 
-		accountant.getAccountantDelegate(transfer.getClass()).bookTransfer(user, this, transfer, involvedAnchors);
+		AccountantDelegate delegate = accountant.getAccountantDelegate(transfer.getClass());
+		if (delegate != null) //TODO Should handle the null?
+			delegate.bookTransfer(user, this, transfer, involvedAnchors);
 	}
 
 	protected void rollbackMoneyTransfer(MoneyTransfer transfer, User user,

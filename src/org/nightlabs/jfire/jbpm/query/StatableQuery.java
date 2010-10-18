@@ -71,6 +71,15 @@ public class StatableQuery
 		return getPersistenceManager().newQuery(getStatableClass());
 	}
 
+	
+	@Override
+	protected void configureQuery(Query q)
+	{
+		super.configureQuery(q);
+		q.setOrdering("this."+getCreateDTFieldName()+" DESCENDING");
+	}
+	
+	
 	@Override
 	protected void prepareQuery(Query q)
 	{

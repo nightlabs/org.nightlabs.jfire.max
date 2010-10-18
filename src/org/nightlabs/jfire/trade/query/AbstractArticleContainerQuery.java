@@ -56,6 +56,14 @@ public abstract class AbstractArticleContainerQuery
 		public static final String articleDeliveryDate = "articleDeliveryDate";
 	}
 
+	
+	@Override
+	protected void configureQuery(Query q)
+	{
+		super.configureQuery(q);
+		q.setOrdering("this.createDT DESCENDING");
+	}
+	
 	@Override
 	protected void prepareQuery(Query q)
 	{

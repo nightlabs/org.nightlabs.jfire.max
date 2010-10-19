@@ -84,7 +84,7 @@ public class LocalBookInvoiceAccountantDelegate extends AccountantDelegate
 	private OrganisationLegalEntity mandator;
 
 	/**
-	 * Takes care of MoneyTransfers. This Accountant only handles
+	 * Takes care of MoneyTransfers. This AccountantDelegate only handles
 	 * {@link BookInvoiceMoneyTransfer}s and silently ignores all other {@link MoneyTransfer}s.
 	 * It will created sub-transfers with the given {@link BookInvoiceMoneyTransfer} as container.
 	 * <p>

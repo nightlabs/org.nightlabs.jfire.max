@@ -2369,7 +2369,7 @@ public class Trader
 					productHistory.addProductHistoryItem(productHistoryItem);
 				}
 
-				Collection<Payment> payments = Payment.getPaymentsForInvoice(pm, invoice);
+				Collection<Payment> payments = Payment.getPaymentsForPayableObject(pm, invoice);
 				for (Payment payment : payments) {
 					ProductHistoryItem productHistoryItem = new ProductHistoryItem(
 							payment.getUser(),

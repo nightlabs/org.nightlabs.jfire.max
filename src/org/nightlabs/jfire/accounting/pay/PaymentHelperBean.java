@@ -37,7 +37,6 @@ import javax.jdo.PersistenceManager;
 
 import org.nightlabs.ModuleException;
 import org.nightlabs.jfire.accounting.Accounting;
-import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.accounting.pay.id.PaymentDataID;
 import org.nightlabs.jfire.accounting.pay.id.PaymentID;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
@@ -89,11 +88,11 @@ implements PaymentHelperLocal
 
 			if (paymentData.getPayment().getPartner() == null) {
 				String mandatorPK = Accounting.getAccounting(pm).getMandator().getPrimaryKey();
-				Invoice invoice = paymentData.getPayment().getInvoices().iterator().next();
+				PayableObject payableObject = paymentData.getPayment().getPayableObjects().iterator().next();
 
-				LegalEntity partner = invoice.getCustomer();
+				LegalEntity partner = payableObject.getCustomer();
 				if (mandatorPK.equals(partner.getPrimaryKey()))
-					partner = invoice.getVendor();
+					partner = payableObject.getVendor();
 
 				paymentData.getPayment().setPartner(partner);
 			}
@@ -233,7 +232,7 @@ implements PaymentHelperLocal
 
 			payEndServerResult = pm.makePersistent(payEndServerResult);
 			paymentData.getPayment().setPayEndServerResult(payEndServerResult);
-			paymentData.getPayment().getInvoiceIDs();
+			paymentData.getPayment().getPayableObjectIDs();
 
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)

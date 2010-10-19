@@ -50,11 +50,13 @@ import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.accounting.InvoiceMoneyTransfer;
 import org.nightlabs.jfire.accounting.MoneyTransfer;
 import org.nightlabs.jfire.accounting.pay.PayMoneyTransfer;
+import org.nightlabs.jfire.accounting.pay.PayableObject;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.transfer.Anchor;
 import org.nightlabs.jfire.transfer.Transfer;
+import org.nightlabs.util.CollectionUtil;
 
 /**
  * One instance of PartnerBookInvoiceAccountantDelegate exists per organisation.
@@ -497,7 +499,7 @@ public class PartnerBookInvoiceAccountantDelegate extends AccountantDelegate
 		if (partnerAccount != null && partner != null && !partnerAccount.getOwner().getPrimaryKey().equals(partner.getPrimaryKey()))
 			throw new IllegalArgumentException("PayMoneyTransfer \""+payMoneyTransfer.getPrimaryKey()+"\": partnerAccount \""+partnerAccount.getPrimaryKey()+"\" is not owned by partner \""+partner.getPrimaryKey()+"\"!");
 
-		if (payMoneyTransfer.getPayment().getInvoices().isEmpty() && partnerAccount == null)
+		if (payMoneyTransfer.getPayment().getPayableObjects().isEmpty() && partnerAccount == null)
 			throw new IllegalArgumentException("PayMoneyTransfer \""+payMoneyTransfer.getPrimaryKey()+"\" has no related invoices. Hence, partnerAccount must not be null! payMoneyTransfer.getPayment().getPartnerAccount() is null!!!");
 
 		// Sort invoices (by finalizeDT, organisationID, invoiceIDPrefix, invoiceID).
@@ -505,7 +507,9 @@ public class PartnerBookInvoiceAccountantDelegate extends AccountantDelegate
 		// This way JFire guarantees that the booking is the same on vendor and customer side in a multi-organisation-scenario.
 		// Without sorting, it might happen e.g. when paying too little money (underpaying), that the vendor keeps invoice 1001
 		// open, while the customer pays invoice 1001 completely and instead keeps invoice 1002 open.
-		List<Invoice> sortedInvoices = new LinkedList<Invoice>(payMoneyTransfer.getPayment().getInvoices());
+		Set<PayableObject> payableObjects = payMoneyTransfer.getPayment().getPayableObjects();
+		Set<Invoice> invoices = CollectionUtil.castSet(payableObjects);
+		List<Invoice> sortedInvoices = new LinkedList<Invoice>(invoices);
 		Collections.sort(sortedInvoices, new InvoiceComparator());
 
 		// What direction is money flowing by the currently processed payment (payMoneyTransfer)?

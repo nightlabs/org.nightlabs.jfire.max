@@ -201,8 +201,8 @@ public class PayMoneyTransfer extends MoneyTransfer
 	@Override
 	protected String internalGetDescription() {
 		String invoiceStr = "";
-		for (Iterator<Invoice> it = getPayment().getInvoices().iterator(); it.hasNext();) {
-			Invoice invoice = it.next();
+		for (Iterator<PayableObject> it = getPayment().getPayableObjects().iterator(); it.hasNext();) {
+			Invoice invoice = (Invoice)it.next();
 			invoiceStr = invoiceStr + invoice.getPrimaryKey();
 			if (it.hasNext())
 				invoiceStr = invoiceStr + ", ";

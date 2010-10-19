@@ -416,10 +416,12 @@ public class LegalEntity extends Anchor
 		Transfer firstContainer = containers.iterator().next();
 
 		if (firstContainer instanceof MoneyTransfer) {
-			Map<CurrencyID,Balance> balanceMap = getBalanceMap();
-			for (Balance balance : balanceMap.values()) {
-				if (balance.amount != 0)
-					throw new IllegalStateException("Balance for LegalEntity \""+getPrimaryKey()+"\" must be 0, but is "+balance.amount+" for currency \""+balance.currencyID+"\"!");
+			if (firstContainer.getClass().equals(MoneyTransfer.class)) {
+				Map<CurrencyID,Balance> balanceMap = getBalanceMap();
+				for (Balance balance : balanceMap.values()) {
+					if (balance.amount != 0)
+						throw new IllegalStateException("Balance for LegalEntity \""+getPrimaryKey()+"\" must be 0, but is "+balance.amount+" for currency \""+balance.currencyID+"\"!");
+				}
 			}
 		}
 		else if (firstContainer instanceof ProductTransfer) {
@@ -453,9 +455,9 @@ public class LegalEntity extends Anchor
 	/**
 	 * The bookMoneyTransfer method of a {@link LegalEntity} adjusts the balance-map (balance per Currency)
 	 * and more importantly delegates to the {@link Account} set for the {@link LegalEntity}.
-	 * It gives the {@link Accountant} the possibility to perform further actions.
+	 * It gives the {@link AccountantDelegate} the possibility to perform further actions.
 	 *
-	 * @see Accountant#bookTransfer(User, LegalEntity, MoneyTransfer, Set)
+	 * @see AccountantDelegate#bookTransfer(User, LegalEntity, MoneyTransfer, Set)
 	 *
 	 * @param transfer The transfer to book.
 	 * @param user The user that initiated the transfer.

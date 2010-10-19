@@ -36,14 +36,26 @@ import java.util.Set;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.Queries;
 import javax.jdo.listener.StoreCallback;
 
+import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.accounting.Account;
 import org.nightlabs.jfire.accounting.Currency;
-import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.accounting.id.CurrencyID;
-import org.nightlabs.jfire.accounting.id.InvoiceID;
 import org.nightlabs.jfire.accounting.pay.ServerPaymentProcessor.PayParams;
 import org.nightlabs.jfire.accounting.pay.id.ModeOfPaymentFlavourID;
 import org.nightlabs.jfire.accounting.pay.id.PaymentID;
@@ -54,26 +66,12 @@ import org.nightlabs.jfire.transfer.Transfer;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 import org.nightlabs.util.Util;
 
-import javax.jdo.annotations.Join;
-import javax.jdo.annotations.FetchGroups;
-import javax.jdo.annotations.NullValue;
-import javax.jdo.annotations.Inheritance;
-import javax.jdo.annotations.PrimaryKey;
-import javax.jdo.annotations.FetchGroup;
-import javax.jdo.annotations.PersistenceModifier;
-import javax.jdo.annotations.Persistent;
-import javax.jdo.annotations.InheritanceStrategy;
-import javax.jdo.annotations.Queries;
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.Column;
-import javax.jdo.annotations.IdentityType;
-
 /**
- * {@link Payment}s are created when invoices or parts of invoices are paid. Therefore
- * a {@link Payment} is linked to one or more invoices ({@link Payment#getInvoices()}).
+ * {@link Payment}s are created when payableObjects or parts of payableObjects are paid. Therefore
+ * a {@link Payment} is linked to one or more payableObjects ({@link Payment#getPayableObjects()}).
  * <p>
  * Additionally, every <tt>MoneyTransfer</tt> can occur without being linked to any
- * <tt>Invoice</tt> (e.g. if the partner decides later to do a withdrawal of some
+ * <tt>PayableObject</tt> (e.g. if the partner decides later to do a withdrawal of some
  * "old" money kept after reimbourse).
  * </p>
  * @author Marco Schulze - marco at nightlabs dot de
@@ -101,16 +99,16 @@ import javax.jdo.annotations.IdentityType;
  * @jdo.fetch-group name="Payment.payEndClientResult" fields="payEndClientResult"
  * @jdo.fetch-group name="Payment.payEndServerResult" fields="payEndServerResult"
  * @jdo.fetch-group name="Payment.currency" fields="currency"
- * @jdo.fetch-group name="Payment.invoices" fields="invoices"
+ * @jdo.fetch-group name="Payment.payableObjects" fields="payableObjects"
  * @jdo.fetch-group name="Payment.partner" fields="partner"
  * @jdo.fetch-group name="Payment.partnerAccount" fields="partnerAccount"
  * @jdo.fetch-group name="Payment.modeOfPaymentFlavour" fields="modeOfPaymentFlavour"
  *
  * @jdo.query
- * 	name="getPaymentsForInvoice"
+ * 	name="getPaymentsForPayableObject"
  * 	query="SELECT
  *			WHERE
- *				this.invoices.contains(:invoice)"
+ *				this.payableObjects.contains(:payableObject)"
  */
 @PersistenceCapable(
 	objectIdClass=PaymentID.class,
@@ -149,8 +147,8 @@ import javax.jdo.annotations.IdentityType;
 		name=Payment.FETCH_GROUP_CURRENCY,
 		members=@Persistent(name="currency")),
 	@FetchGroup(
-		name=Payment.FETCH_GROUP_INVOICES,
-		members=@Persistent(name="invoices")),
+		name=Payment.FETCH_GROUP_PAYABLEOBJECTS,
+		members=@Persistent(name="payableObjects")),
 	@FetchGroup(
 		name=Payment.FETCH_GROUP_PARTNER,
 		members=@Persistent(name="partner")),
@@ -163,8 +161,8 @@ import javax.jdo.annotations.IdentityType;
 })
 @Queries(
 	@javax.jdo.annotations.Query(
-		name="getPaymentsForInvoice",
-		value="SELECT WHERE this.invoices.contains(:invoice)")
+		name="getPaymentsForPayableObject",
+		value="SELECT WHERE this.payableObjects.contains(:payableObject)")
 )
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class Payment
@@ -186,15 +184,15 @@ implements Serializable, StoreCallback
 	public static final String FETCH_GROUP_PAY_END_CLIENT_RESULT = "Payment.payEndClientResult";
 	public static final String FETCH_GROUP_PAY_END_SERVER_RESULT = "Payment.payEndServerResult";
 	public static final String FETCH_GROUP_CURRENCY = "Payment.currency";
-	public static final String FETCH_GROUP_INVOICES = "Payment.invoices";
+	public static final String FETCH_GROUP_PAYABLEOBJECTS = "Payment.payableObjects";
 	public static final String FETCH_GROUP_PARTNER = "Payment.partner";
 	public static final String FETCH_GROUP_PARTNER_ACCOUNT = "Payment.partnerAccount";
 	public static final String FETCH_GROUP_MODE_OF_PAYMENT_FLAVOUR = "Payment.modeOfPaymentFlavour";
 
 	@SuppressWarnings("unchecked")
-	public static Collection<Payment> getPaymentsForInvoice(PersistenceManager pm, Invoice invoice) {
-		Query q = pm.newNamedQuery(Payment.class, "getPaymentsForInvoice");
-		return (Collection<Payment>) q.execute(invoice);
+	public static Collection<Payment> getPaymentsForPayableObject(PersistenceManager pm, PayableObject payableObject) {
+		Query q = pm.newNamedQuery(Payment.class, "getPaymentsForPayableObject");
+		return (Collection<Payment>) q.execute(payableObject);
 	}
 
 	/**
@@ -903,7 +901,7 @@ implements Serializable, StoreCallback
 	}
 
 	/**
-	 * If no <tt>Invoice</tt>s are defined, a reasonForPayment must be declared.
+	 * If no <tt>PayableObject</tt>s are defined, a reasonForPayment must be declared.
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
@@ -915,18 +913,18 @@ implements Serializable, StoreCallback
 	 * @jdo.field
 	 *		persistence-modifier="persistent"
 	 *		collection-type="collection"
-	 *		element-type="org.nightlabs.jfire.accounting.Invoice"
-	 *		table="JFireTrade_Payment_invoices"
+	 *		element-type="org.nightlabs.jfire.accounting.pay.PayableObject"
+	 *		table="JFireTrade_Payment_payableObjects"
 	 *		null-value="exception"
 	 *
 	 * @jdo.join
 	 */
-@Join
-@Persistent(
+	@Join
+	@Persistent(
 	nullValue=NullValue.EXCEPTION,
-	table="JFireTrade_Payment_invoices",
+	table="JFireTrade_Payment_payableObjects",
 	persistenceModifier=PersistenceModifier.PERSISTENT)
-	private Set<Invoice> invoices = null;
+	private Set<PayableObject> payableObjects = null;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -964,8 +962,8 @@ implements Serializable, StoreCallback
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
-@Persistent(persistenceModifier=PersistenceModifier.NONE)
-	private Set<InvoiceID> invoiceIDs = null;
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
+	private Set<ObjectID> payableObjectIDs = null;
 
 	/**
 	 * @jdo.field persistence-modifier="transactional"
@@ -992,11 +990,11 @@ implements Serializable, StoreCallback
 	private AnchorID partnerAccountID = null;
 
 	/**
-	 * @return Returns the invoices.
+	 * @return Returns the payableObjects.
 	 */
-	public Set<Invoice> getInvoices()
+	public Set<PayableObject> getPayableObjects()
 	{
-		return invoices;
+		return payableObjects;
 	}
 	/**
 	 * @return Returns the modeOfPaymentFlavour.
@@ -1033,77 +1031,77 @@ implements Serializable, StoreCallback
 	}
 
 	/**
-	 * Sets the {@link InvoiceID}s.
-	 * IMPORTANT: May only be called before the Payment is persisted, otherwise use {@link #setInvoices(Set)} instead.
+	 * Sets the {@link ObjectID}s.
+	 * IMPORTANT: May only be called before the Payment is persisted, otherwise use {@link #setPayableObjects(Set)} instead.
 	 *
-	 * @param invoiceIDs The invoiceIDs to set.
+	 * @param payableObjectIDs The objectIDs to set.
 	 */
-	public void setInvoiceIDs(Set<InvoiceID> invoiceIDs)
+	public void setPayableObjectIDs(Set<ObjectID> payableObjectIDs)
 	{
-		if (invoiceIDs == null)
-			throw new NullPointerException("invoiceIDs must not be null!");
+		if (payableObjectIDs == null)
+			throw new NullPointerException("payableObjectIDs must not be null!");
 
-		// check wether this object has not been persistet yet, only then setInvoiceIDs is legal
+		// check whether this object has not been persistet yet, only then setPayableObjectIDs is legal
 		if (JDOHelper.getObjectId(this) != null) {
-			throw new IllegalStateException("setInvoiceIDs can only be called on NOT yet persisted instances of Payment, use setInvoices() instead!");
+			throw new IllegalStateException("setPayableObjectIDs can only be called on NOT yet persisted instances of Payment, use setPayableObjects() instead!");
 		}
 
-		if (invoices != null)
-			invoices = null;
+		if (payableObjects != null)
+			payableObjects = null;
 
-		for (Iterator<InvoiceID> it = invoiceIDs.iterator(); it.hasNext(); ) {
-			InvoiceID invoiceID = it.next();
-			if (invoiceID == null)
-				throw new IllegalArgumentException("invoiceIDs must not contain null entries!");
+		for (Iterator<ObjectID> it = payableObjectIDs.iterator(); it.hasNext(); ) {
+			ObjectID objectID = it.next();
+			if (objectID == null)
+				throw new IllegalArgumentException("payableObjectIDs must not contain null entries!");
 		}
-		this.invoiceIDs = invoiceIDs;
+		this.payableObjectIDs = payableObjectIDs;
 	}
 
 
 	/**
-	 * Sets the {@link Invoice}s.
-	 * IMPORTANT: May only be called after the Paymnet is persisted, otherwise use {@link #setInvoiceIDs(Set)} instead.
+	 * Sets the {@link PayableObject}s.
+	 * IMPORTANT: May only be called after the Paymnet is persisted, otherwise use {@link #setPayableObjectIDs(Set)} instead.
 	 *
-	 * @param invoices The invoices to set.
+	 * @param payableObjects The PayableObject to set.
 	 */
-	public void setInvoices(Set<Invoice> invoices)
+	public void setPayableObjects(Set<PayableObject> payableObjects)
 	{
-		if (invoices == null)
-			throw new NullPointerException("invoices must not be null!");
+		if (payableObjects == null)
+			throw new NullPointerException("payableObjects must not be null!");
 
-		// check wether this object has been already persisted, only then setInvoices is legal
+		// check wether this object has been already persisted, only then setPayableObjects is legal
 		if (JDOHelper.getObjectId(this) == null) {
-			throw new IllegalStateException("setInvoices can only be called on already persisted instances of Payment, use setInvoiceIDs() instead!");
+			throw new IllegalStateException("setPayableObjects can only be called on already persisted instances of Payment, use setPayableObjectIDs() instead!");
 		}
 
-		if (invoiceIDs == null)
-			invoiceIDs = new HashSet<InvoiceID>();
+		if (payableObjectIDs == null)
+			payableObjectIDs = new HashSet<ObjectID>();
 		else
-			invoiceIDs.clear();
+			payableObjectIDs.clear();
 
-		for (Iterator<Invoice> it = invoices.iterator(); it.hasNext(); ) {
-			Invoice invoice = it.next();
-			invoiceIDs.add((InvoiceID) JDOHelper.getObjectId(invoice));
+		for (Iterator<PayableObject> it = payableObjects.iterator(); it.hasNext(); ) {
+			PayableObject payableObject = it.next();
+			payableObjectIDs.add((ObjectID) JDOHelper.getObjectId(payableObject));
 		}
-		this.invoices = invoices;
+		this.payableObjects = payableObjects;
 	}
 
 	/**
-	 * @return Returns the invoiceIDs.
+	 * @return Returns the objectIDs.
 	 */
-	public Set<InvoiceID> getInvoiceIDs()
+	public Set<ObjectID> getPayableObjectIDs()
 	{
-		if (invoiceIDs == null && invoices != null) {
-			Set<InvoiceID> s = new HashSet<InvoiceID>(invoices.size());
+		if (payableObjectIDs == null && payableObjects != null) {
+			Set<ObjectID> s = new HashSet<ObjectID>(payableObjects.size());
 
-			for (Iterator<Invoice> it = invoices.iterator(); it.hasNext(); ) {
-				Invoice invoice = it.next();
-				s.add((InvoiceID) JDOHelper.getObjectId(invoice));
+			for (Iterator<PayableObject> it = payableObjects.iterator(); it.hasNext(); ) {
+				PayableObject payableObject = it.next();
+				s.add((ObjectID) JDOHelper.getObjectId(payableObject));
 			}
 
-			invoiceIDs = s;
+			payableObjectIDs = s;
 		}
-		return invoiceIDs;
+		return payableObjectIDs;
 	}
 
 	/**
@@ -1328,7 +1326,7 @@ implements Serializable, StoreCallback
 	 * server.
 	 *
 	 * @return Returns a new instance of <tt>Payment</tt> with {@link #modeOfPaymentFlavour},
-	 *		{@link #currency} and {@link #invoices} being <tt>null</tt> in order to minimize
+	 *		{@link #currency} and {@link #payableObjects} being <tt>null</tt> in order to minimize
 	 *		traffic when uploading.
 	 *
 	 * @see #jdoPreStore()
@@ -1344,7 +1342,7 @@ implements Serializable, StoreCallback
 		n.externalPaymentApproved = externalPaymentApproved;
 		n.externalPaymentDone = externalPaymentDone;
 		n.failed = failed;
-		n.invoiceIDs = getInvoiceIDs();
+		n.payableObjectIDs = getPayableObjectIDs();
 //		n.followUp = followUp;
 		n.precursorID = getPrecursorID();
 		n.modeOfPaymentFlavourID = getModeOfPaymentFlavourID();
@@ -1365,7 +1363,7 @@ implements Serializable, StoreCallback
 
 	/**
 	 * This method resolves {@link #modeOfPaymentFlavour},
-	 * {@link #currency} and {@link #invoices} by using the IDs before
+	 * {@link #currency} and {@link #payableObjects} by using the IDs before
 	 * the object is written to datastore.
 	 *
 	 * @see javax.jdo.listener.StoreCallback#jdoPreStore()
@@ -1391,24 +1389,24 @@ implements Serializable, StoreCallback
 		if (currencyID != null && currency == null)
 			currency = (Currency) pm.getObjectById(currencyID);
 
-		if (invoiceIDs != null) {
-			if (invoices == null || invoices.size() != invoiceIDs.size()) {
-				if (invoices == null)
-					invoices = new HashSet<Invoice>();
+		if (payableObjectIDs != null) {
+			if (payableObjects == null || payableObjects.size() != payableObjectIDs.size()) {
+				if (payableObjects == null)
+					payableObjects = new HashSet<PayableObject>();
 
-				invoices.clear();
+				payableObjects.clear();
 
-				for (Iterator<InvoiceID> it = invoiceIDs.iterator(); it.hasNext(); ) {
-					InvoiceID invoiceID = it.next();
-					Invoice invoice = (Invoice) pm.getObjectById(invoiceID);
-					invoices.add(invoice);
+				for (Iterator<ObjectID> it = payableObjectIDs.iterator(); it.hasNext(); ) {
+					ObjectID objectID = it.next();
+					PayableObject payableObject = (PayableObject) pm.getObjectById(objectID);
+					payableObjects.add(payableObject);
 				}
-			} // if (invoices == null || invoices.size() != invoiceIDs.size()) {
-		} // if (invoiceIDs != null) {
+			} // if (payableObjects == null || payableObjects.size() != payableObjectIDs.size()) {
+		} // if (payableObjectIDs != null) {
 
 		if (JDOHelper.isNew(this)) {
-			if (invoices == null)
-				invoices = new HashSet<Invoice>();
+			if (payableObjects == null)
+				payableObjects = new HashSet<PayableObject>();
 		}
 
 		if (precursorID != null && precursor != null) {

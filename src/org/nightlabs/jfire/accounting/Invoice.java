@@ -27,7 +27,6 @@
 package org.nightlabs.jfire.accounting;
 
 import java.io.Serializable;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -61,6 +60,7 @@ import javax.jdo.listener.DetachCallback;
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.accounting.id.InvoiceID;
 import org.nightlabs.jfire.accounting.jbpm.ActionHandlerFinalizeInvoice;
+import org.nightlabs.jfire.accounting.pay.PayableObject;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.jbpm.graph.def.ActionHandlerNodeEnter;
 import org.nightlabs.jfire.jbpm.graph.def.Statable;
@@ -251,7 +251,7 @@ import org.nightlabs.util.Util;
 })
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class Invoice
-implements Serializable, PricedArticleContainer, Statable, DetachCallback
+implements Serializable, PayableObject, PricedArticleContainer, Statable, DetachCallback
 {
 	private static final long serialVersionUID = 1L;
 	public static final String FETCH_GROUP_INVOICE_LOCAL = "Invoice.invoiceLocal";

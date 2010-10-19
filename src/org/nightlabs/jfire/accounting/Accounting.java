@@ -73,6 +73,7 @@ import org.nightlabs.jfire.accounting.jbpm.ActionHandlerBookInvoice;
 import org.nightlabs.jfire.accounting.jbpm.JbpmConstantsInvoice;
 import org.nightlabs.jfire.accounting.pay.ModeOfPaymentFlavour;
 import org.nightlabs.jfire.accounting.pay.PayMoneyTransfer;
+import org.nightlabs.jfire.accounting.pay.PayableObject;
 import org.nightlabs.jfire.accounting.pay.Payment;
 import org.nightlabs.jfire.accounting.pay.PaymentActionHandler;
 import org.nightlabs.jfire.accounting.pay.PaymentData;
@@ -617,9 +618,12 @@ implements StoreCallback
 		}
 
 		try {
-			for (Invoice invoice : paymentData.getPayment().getInvoices()) {
-				for (InvoiceActionHandler invoiceActionHandler : invoice.getInvoiceLocal().getInvoiceActionHandlers()) {
-					invoiceActionHandler.onPayDoWork(user, paymentData, invoice);
+			for (PayableObject payableObject : paymentData.getPayment().getPayableObjects()) {
+				if (payableObject instanceof Invoice) {
+					Invoice invoice = (Invoice)payableObject;
+					for (InvoiceActionHandler invoiceActionHandler : invoice.getInvoiceLocal().getInvoiceActionHandlers()) {
+						invoiceActionHandler.onPayDoWork(user, paymentData, invoice);
+					}
 				}
 			}
 		} catch (PaymentException x) {
@@ -713,9 +717,12 @@ implements StoreCallback
 			throw new IllegalStateException("Payment should not be pending anymore, because failed is false! How's that possible?");
 
 		try {
-			for (Invoice invoice : paymentData.getPayment().getInvoices()) {
-				for (InvoiceActionHandler invoiceActionHandler : invoice.getInvoiceLocal().getInvoiceActionHandlers()) {
-					invoiceActionHandler.onPayEnd(user, paymentData, invoice);
+			for (PayableObject payableObject : paymentData.getPayment().getPayableObjects()) {
+				if (payableObject instanceof Invoice) {
+					Invoice invoice = (Invoice)payableObject;
+					for (InvoiceActionHandler invoiceActionHandler : invoice.getInvoiceLocal().getInvoiceActionHandlers()) {
+						invoiceActionHandler.onPayEnd(user, paymentData, invoice);
+					}
 				}
 			}
 		} catch (Exception x) {
@@ -741,17 +748,20 @@ implements StoreCallback
 		}
 
 		try {
-			for (Invoice invoice : paymentData.getPayment().getInvoices()) {
-				InvoiceLocal invoiceLocal = invoice.getInvoiceLocal();
-				if (invoiceLocal.getAmountToPay() == 0) {
-					JbpmContext jbpmContext = JbpmLookup.getJbpmConfiguration().createJbpmContext();
-					try {
-						ProcessInstance processInstance = jbpmContext.getProcessInstanceForUpdate(invoiceLocal.getJbpmProcessInstanceId());
-						if (!JbpmConstantsInvoice.Both.NODE_NAME_PAID.equals(processInstance.getRootToken().getNode().getName())) {
-							processInstance.signal(JbpmConstantsInvoice.Both.TRANSITION_NAME_PAY);
+			for (PayableObject payableObject : paymentData.getPayment().getPayableObjects()) {
+				if (payableObject instanceof Invoice) {
+					Invoice invoice = (Invoice)payableObject;
+					InvoiceLocal invoiceLocal = invoice.getInvoiceLocal();
+					if (invoiceLocal.getAmountToPay() == 0) {
+						JbpmContext jbpmContext = JbpmLookup.getJbpmConfiguration().createJbpmContext();
+						try {
+							ProcessInstance processInstance = jbpmContext.getProcessInstanceForUpdate(invoiceLocal.getJbpmProcessInstanceId());
+							if (!JbpmConstantsInvoice.Both.NODE_NAME_PAID.equals(processInstance.getRootToken().getNode().getName())) {
+								processInstance.signal(JbpmConstantsInvoice.Both.TRANSITION_NAME_PAY);
+							}
+						} finally {
+							jbpmContext.close();
 						}
-					} finally {
-						jbpmContext.close();
 					}
 				}
 			}
@@ -878,9 +888,9 @@ implements StoreCallback
 				paymentData.getPayment());
 
 		LegalEntity partner = null;
-		if (paymentData.getPayment().getInvoices() != null) {
+		if (paymentData.getPayment().getPayableObjects() != null) {
 			partner = bookInvoicesImplicitelyAndGetPartner(user,
-					paymentData.getPayment().getInvoices(),
+					paymentData.getPayment().getPayableObjects(),
 					paymentData.getPayment().getCurrency());
 		}
 		if (partner == null) {
@@ -919,9 +929,12 @@ implements StoreCallback
 //		paymentData.getPayment().setPayBeginServerResult(serverPaymentResult);
 
 		try {
-			for (Invoice invoice : paymentData.getPayment().getInvoices()) {
-				for (InvoiceActionHandler invoiceActionHandler : invoice.getInvoiceLocal().getInvoiceActionHandlers()) {
-					invoiceActionHandler.onPayBegin(user, paymentData, invoice);
+			for (PayableObject payableObject : paymentData.getPayment().getPayableObjects()) {
+				if (payableObject instanceof Invoice) {
+					Invoice invoice = (Invoice)payableObject;
+					for (InvoiceActionHandler invoiceActionHandler : invoice.getInvoiceLocal().getInvoiceActionHandlers()) {
+						invoiceActionHandler.onPayBegin(user, paymentData, invoice);
+					}
 				}
 			}
 		} catch (PaymentException x) {

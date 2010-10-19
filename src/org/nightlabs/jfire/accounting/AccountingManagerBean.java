@@ -1393,10 +1393,10 @@ implements AccountingManagerRemote, AccountingManagerLocal
 
 		if (paymentData.getPayment().getPartnerID() == null) {
 			// if no partner is defined, at least one invoice must be known!
-			if (paymentData.getPayment().getInvoiceIDs() == null)
+			if (paymentData.getPayment().getPayableObjectIDs() == null)
 				throw new NullPointerException("paymentData.getPayment().getPartnerID() and paymentData.getPayment().getInvoiceIDs() are both null! One of them must be specified, because I need to know who's paying!");
 
-			if (paymentData.getPayment().getInvoiceIDs().isEmpty())
+			if (paymentData.getPayment().getPayableObjectIDs().isEmpty())
 				throw new NullPointerException("paymentData.getPayment().getPartnerID() is null and paymentData.getPayment().getInvoiceIDs() is empty! If no partner is specified explicitely, I need at least one invoice to find out who's paying!");
 		}
 

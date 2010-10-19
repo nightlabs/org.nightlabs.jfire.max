@@ -210,7 +210,7 @@ public class PaymentList extends AbstractJFSScriptExecutorDelegate {
 			row.add(payment.isPending());
 			row.add(payment.isFailed());
 			row.add(payment.isForceRollback());
-			row.add(JFireReportingHelper.createDataSetParam(payment.getInvoiceIDs()));
+			row.add(JFireReportingHelper.createDataSetParam(payment.getPayableObjectIDs()));
 			try {
 				buffer.addRecord(new Record(row));
 			} catch (Exception e) {

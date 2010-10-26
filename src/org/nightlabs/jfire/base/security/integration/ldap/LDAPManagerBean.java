@@ -1,19 +1,13 @@
 package org.nightlabs.jfire.base.security.integration.ldap;
 
-import java.util.Collection;
-
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
-import javax.jdo.FetchPlan;
 import javax.jdo.PersistenceManager;
 
 import org.jboss.annotation.security.SecurityDomain;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
-import org.nightlabs.jfire.security.integration.UserManagementSystem;
-import org.nightlabs.jfire.security.integration.id.UserManagementSystemID;
-import org.nightlabs.jfire.servermanager.JFireServerManager;
 
 /**
  * 
@@ -36,12 +30,8 @@ public class LDAPManagerBean extends BaseSessionBeanImpl implements LDAPManagerR
 			// within UserManagementSystemType instances map
 			InetOrgPersonLDAPServerType.createSingleInstance(pm, "InetOrgPersonLDAPServerType");
 			
-			
-			JFireServerManager jFireServerManager = getJFireServerManager();
-			Collection<LDAPServer> activeServers = getActiveLDAPServers();
-			
-			
-//			// FIXME: temporary server creation
+			// FIXME: temporary server creation
+//			Collection<UserManagementSystem> activeServers = getActiveLDAPServers();
 //			if (activeServers.size() == 0){
 //				InetOrgPersonLDAPServerType umsType = UserManagementSystemType.getInstance(InetOrgPersonLDAPServerType.class);
 //				LDAPServer server1 = umsType.createUserManagementSystem();
@@ -49,45 +39,29 @@ public class LDAPManagerBean extends BaseSessionBeanImpl implements LDAPManagerR
 //				LDAPServer server2 = umsType.createUserManagementSystem();
 //				server1 = pm.makePersistent(server1);
 //				server2 = pm.makePersistent(server2);
-//				
-//				activeServers.add(server1);
-//				activeServers.add(server2);
 //			}
 			
-			
-			for (LDAPServer ldapServer : activeServers) {
-				
-				jFireServerManager.registerActiveUserManagementSystem(ldapServer);
-				
-			}
-			
-		}catch(Exception e){
-			e.printStackTrace();
 		}finally{
 			pm.close();
 		}
 		
 	}
-	
-	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
-	private Collection<LDAPServer> getActiveLDAPServers(){
-		
-		PersistenceManager pm = createPersistenceManager();
-		
-		try{
-			
-			javax.jdo.Query q = pm.newNamedQuery(LDAPServer.class, LDAPServer.GET_ACTIVE_LDAP_SERVERS_IDS);
-			Collection<UserManagementSystemID> ids = (Collection<UserManagementSystemID>) q.execute();
 
-			pm.getFetchPlan().setMaxFetchDepth(-1);
-			pm.getFetchPlan().setGroups(FetchPlan.DEFAULT, UserManagementSystem.FETCH_GROUP_NAME);
-
-			return pm.detachCopyAll(pm.getObjectsById(ids));
-			
-		}finally{
-			pm.close();
-		}
-		
-	}
+	// FIXME: temporary server creation
+//	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+//	private Collection<UserManagementSystem> getActiveLDAPServers(){
+//		
+//		PersistenceManager pm = createPersistenceManager();
+//		
+//		try{
+//			
+//			javax.jdo.Query q = pm.newNamedQuery(UserManagementSystem.class, UserManagementSystem.GET_ACTIVE_USER_MANAGEMENT_SYSTEMS);
+//			return (Collection<UserManagementSystem>) q.execute();
+//			
+//		}finally{
+//			pm.close();
+//		}
+//		
+//	}
 	
 }

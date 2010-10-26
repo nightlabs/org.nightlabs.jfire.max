@@ -6,7 +6,7 @@ import javax.jdo.annotations.Inheritance;
 import javax.jdo.annotations.InheritanceStrategy;
 import javax.jdo.annotations.PersistenceCapable;
 
-import org.nightlabs.jfire.base.security.integration.ldap.connection.IConnectionParamsProvider.EncryptionMethod;
+import org.nightlabs.jfire.base.security.integration.ldap.connection.ILDAPConnectionParamsProvider.EncryptionMethod;
 import org.nightlabs.jfire.security.integration.UserManagementSystemType;
 
 /**

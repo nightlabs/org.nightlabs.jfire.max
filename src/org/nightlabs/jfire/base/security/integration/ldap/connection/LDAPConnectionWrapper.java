@@ -1,21 +1,22 @@
 package org.nightlabs.jfire.base.security.integration.ldap.connection;
 
-import javax.naming.NamingException;
+import javax.naming.AuthenticationException;
+import javax.naming.CommunicationException;
 
 /**
  * A ConnectionWrapper is a wrapper for a real directory connection implementation.
  *
  * @author Denis Dudnik <deniska.dudnik[at]gmail{dot}com>
  */
-public interface ConnectionWrapper
+public interface LDAPConnectionWrapper
 {
 
     /**
      * Connects to the directory server.
      * 
-     * @throws NamingException 
+     * @throws CommunicationException 
      */
-    public void connect() throws NamingException;
+    public void connect() throws CommunicationException;
 
 
     /**
@@ -30,15 +31,17 @@ public interface ConnectionWrapper
      * @param password 
      * @param bindPrincipal 
      * 
-     * @throws NamingException 
+     * @throws CommunicationException, AuthenticationException 
      */
-    public void bind(String bindPrincipal, String password) throws NamingException;
+    public void bind(String bindPrincipal, String password) throws CommunicationException, AuthenticationException;
 
 
     /**
      * Unbinds from the directory server.
+     * 
+     * @throws CommunicationException 
      */
-    public void unbind();
+    public void unbind() throws CommunicationException;
 
 
     /**

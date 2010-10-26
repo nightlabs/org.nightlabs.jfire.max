@@ -3,25 +3,24 @@ package org.nightlabs.jfire.base.security.integration.ldap;
 import javax.jdo.annotations.IdentityType;
 import javax.jdo.annotations.Inheritance;
 import javax.jdo.annotations.InheritanceStrategy;
-import javax.jdo.annotations.NotPersistent;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
-import javax.jdo.annotations.Queries;
-import javax.jdo.annotations.Query;
-import javax.naming.NamingException;
+import javax.naming.AuthenticationException;
+import javax.naming.CommunicationException;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.j2ee.LoginData;
-import org.nightlabs.jfire.base.security.integration.ldap.connection.Connection;
-import org.nightlabs.jfire.base.security.integration.ldap.connection.IConnectionParamsProvider;
+import org.nightlabs.jfire.base.security.integration.ldap.connection.LDAPConnection;
+import org.nightlabs.jfire.base.security.integration.ldap.connection.ILDAPConnectionParamsProvider;
+import org.nightlabs.jfire.base.security.integration.ldap.connection.LDAPConnectionManager;
 import org.nightlabs.jfire.security.integration.Session;
 import org.nightlabs.jfire.security.integration.UserManagementSystem;
 import org.nightlabs.jfire.security.integration.UserManagementSystemType;
 
 /**
  * Class representing LDAP-based UserManagementSystem. 
- * It also implements {@link IConnectionParamsProvider} for providing stored server parameters
- * to a {@link Connection}
+ * It also implements {@link ILDAPConnectionParamsProvider} for providing stored server parameters
+ * to a {@link LDAPConnection}
  * 
  * 
  * @author Denis Dudnik <deniska.dudnik[at]gmail{dot}com>
@@ -32,17 +31,9 @@ import org.nightlabs.jfire.security.integration.UserManagementSystemType;
 		detachable="true",
 		table="JFireLDAP_LDAPServer")
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
-@Queries(
-		@Query(
-				name=LDAPServer.GET_ACTIVE_LDAP_SERVERS_IDS, 
-				value="SELECT JDOHelper.getObjectId(this) WHERE this.isActive == true"
-					)
-		)
-public class LDAPServer extends UserManagementSystem implements IConnectionParamsProvider{
+public class LDAPServer extends UserManagementSystem implements ILDAPConnectionParamsProvider{
 
 	private static final Logger logger = Logger.getLogger(LDAPServer.class);
-
-	public static final String GET_ACTIVE_LDAP_SERVERS_IDS = "getActiveLDAPServersIDs";
 
 	/**
 	 * The serial version of this class.
@@ -68,19 +59,7 @@ public class LDAPServer extends UserManagementSystem implements IConnectionParam
 	@Persistent(defaultFetchGroup="true")
 	private EncryptionMethod encryptionMethod;
 	
-	/**
-	 * Indicates whether this LDAP server should be used for authentication
-	 */
-	@Persistent
-	private boolean isActive = false;
-	
-	/**
-	 * Connection to actual LDAP server
-	 */
-	@NotPersistent
-	private Connection connection;
 
-	
 	/**
 	 * {@inheritDoc}
 	 * 
@@ -102,79 +81,79 @@ public class LDAPServer extends UserManagementSystem implements IConnectionParam
 
 	/**
 	 * {@inheritDoc}
+	 * @throws CommunicationException 
 	 */
 	@Override
-	public void logout(Session session) {
+	public void logout(Session session) throws CommunicationException {
 		
+		LDAPConnection connection = null;
 		try{
-	        if (connection != null && connection.isConnected()){
-	        	connection.unbind();
+
+			if (logger.isDebugEnabled()){
+	        	logger.debug("Loggin out from session, id: " + session.getSessionID());
 	        }
-		}catch(Exception e){
-			// TODO:
-			e.printStackTrace();
+
+			connection = LDAPConnectionManager.getInstance().getConnection(this);
+        	connection.unbind();
+        	
+			if (logger.isDebugEnabled()){
+	        	logger.debug("Logged out from session, id: " + session.getSessionID());
+	        }
+        	
+		}finally{
+			LDAPConnectionManager.getInstance().releaseConnection(connection);
 		}
 		
 	}
 
 	/**
 	 * {@inheritDoc}
+	 * @throws CommunicationException 
 	 */
 	@Override
-	public Session login(LoginData loginData) {
+	public Session login(LoginData loginData) throws AuthenticationException, CommunicationException {
 
         Session session = null;
+        LDAPConnection connection = null;
 
-		try{
+        try{
+
+        	if (logger.isDebugEnabled()){
+        		logger.debug(
+        				"Try to recieve an LDAPConnection and login for " + 
+        				loginData.getUserID() + LoginData.USER_ORGANISATION_SEPARATOR + loginData.getOrganisationID()
+        				);
+        	}
+        	
+        	connection = LDAPConnectionManager.getInstance().getConnection(this);
+
+        	if (logger.isDebugEnabled()){
+        		ILDAPConnectionParamsProvider params = connection.getConnectionParamsProvider();
+        		logger.debug(
+        				"LDAPConnection recieved. Trying to bind against LDAPServer at " + 
+        				params.getHost() + ":" + params.getPort() + 
+        				" Encryption: " + params.getEncryptionMethod().stringValue() +
+        				" Auth method: " + params.getAuthMethod().stringValue()
+        				);
+        	}
+
+	        connection.bind(
+					"cn=ddudnik,ou=staff,ou=people,dc=nightlabs,dc=de",
+					loginData.getPassword()
+					);
 			
-			if (connection == null){
-				connection = new Connection(this);
-			}
-			if (!connection.isConnected()){
-				connection.connect();
-			}
+			// if no exception was thrown during bind operation we assume that login was successful
+			session = new Session(loginData);
 	        
-	        if (connection.isConnected()){
-	        	try{
-	        		
-	        		connection.bind(
-	        				"cn=ddudnik,ou=staff,ou=people,dc=nightlabs,dc=de",
-	        				loginData.getPassword()
-	        				);
-	        		
-	        		// if no exception was thrown during bind operation we assume that login was successful
-	        		session = new Session(loginData);
-	        		
-	        	}catch(NamingException e){
-	        		
-	        		// not authenticated
-	        		// TODO:
-	        		logger.info("Authentication failed!");
-	        	}
+	        if (logger.isDebugEnabled()){
+	        	logger.debug("Bind successful. Session id: " + session.getSessionID());
 	        }
-		}catch(Exception e){
-			// TODO: 
-			e.printStackTrace();
+			
+		}finally{
+			LDAPConnectionManager.getInstance().releaseConnection(connection);
 		}
 		
 		return session;
-	}
-	
-	/**
-	 * Set this <code>LDAPServer</code> active which means it will be used for authentication
-	 * 
-	 * @param isActive
-	 */
-	public void setActive(boolean isActive) {
-		this.isActive = isActive;
-	}
-	
-	/**
-	 * 
-	 * @return whether this <code>LDAPServer</code> is active
-	 */
-	public boolean isActive() {
-		return isActive;
 	}
 	
 	/**

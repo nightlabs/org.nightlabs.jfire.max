@@ -5,36 +5,56 @@ package org.nightlabs.jfire.base.security.integration.ldap.connection;
  * @author Denis Dudnik <deniska.dudnik[at]gmail{dot}com>
  *
  */
-public interface IConnectionParamsProvider{
+public interface ILDAPConnectionParamsProvider{
 
     /**
      * Enum for the used authentication method.
      * 
      */
-    public enum AuthenticationMethod{
+    public enum AuthenticationMethod {
 
         /** No authentication, anonymous bind. */
-        NONE,
+        NONE("none"),
 
         /** Simple authentication, simple bind. */
-        SIMPLE
+        SIMPLE("simple");
+        
+        private String stringValue;
+        
+        private AuthenticationMethod(String stringValue){
+        	this.stringValue = stringValue;
+        }
+        
+        public String stringValue(){
+        	return stringValue;
+        }
+        
     }
 
     /**
      * Enum for the used encryption method.
      * 
      */
-    public enum EncryptionMethod
-    {
+    public enum EncryptionMethod {
 
         /** No encryption. */
-        NONE,
+        NONE("None"),
 
         /** SSL encryption. */
-        LDAPS,
+        LDAPS("SSL (LDAPS)"),
 
         /** Encryption using Start TLS extension. */
-        START_TLS
+        START_TLS("Start TLS");
+        
+        private String stringValue;
+        
+        private EncryptionMethod(String stringValue){
+        	this.stringValue = stringValue;
+        }
+        
+        public String stringValue(){
+        	return stringValue;
+        }
     }
 
 
@@ -60,17 +80,11 @@ public interface IConnectionParamsProvider{
     public String getHost();
 
     /**
-     * Gets the name.
-     * 
-     * @return the name
-     */
-    public String getName();
-
-    /**
      * Gets the port.
      * 
      * @return the port
      */
     public int getPort();
+    
 
 }

@@ -8,14 +8,15 @@ import javax.jdo.annotations.Persistent;
 import javax.naming.AuthenticationException;
 import javax.naming.CommunicationException;
 
-import org.apache.log4j.Logger;
 import org.nightlabs.j2ee.LoginData;
-import org.nightlabs.jfire.base.security.integration.ldap.connection.LDAPConnection;
 import org.nightlabs.jfire.base.security.integration.ldap.connection.ILDAPConnectionParamsProvider;
+import org.nightlabs.jfire.base.security.integration.ldap.connection.LDAPConnection;
 import org.nightlabs.jfire.base.security.integration.ldap.connection.LDAPConnectionManager;
 import org.nightlabs.jfire.security.integration.Session;
 import org.nightlabs.jfire.security.integration.UserManagementSystem;
 import org.nightlabs.jfire.security.integration.UserManagementSystemType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Class representing LDAP-based UserManagementSystem. 
@@ -33,7 +34,7 @@ import org.nightlabs.jfire.security.integration.UserManagementSystemType;
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class LDAPServer extends UserManagementSystem implements ILDAPConnectionParamsProvider{
 
-	private static final Logger logger = Logger.getLogger(LDAPServer.class);
+	private static final Logger logger = LoggerFactory.getLogger(LDAPServer.class);
 
 	/**
 	 * The serial version of this class.

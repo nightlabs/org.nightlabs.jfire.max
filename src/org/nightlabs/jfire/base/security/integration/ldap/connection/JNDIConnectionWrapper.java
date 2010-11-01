@@ -9,8 +9,9 @@ import javax.naming.NamingException;
 import javax.naming.ldap.InitialLdapContext;
 
 import org.apache.directory.shared.ldap.util.LdapURL;
-import org.apache.log4j.Logger;
 import org.nightlabs.jfire.base.security.integration.ldap.connection.ILDAPConnectionParamsProvider.AuthenticationMethod;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A connection wrapper that uses JNDI.
@@ -19,7 +20,7 @@ import org.nightlabs.jfire.base.security.integration.ldap.connection.ILDAPConnec
  */
 public class JNDIConnectionWrapper implements LDAPConnectionWrapper {
 
-	private static final Logger logger = Logger.getLogger(JNDIConnectionWrapper.class);
+	private static final Logger logger = LoggerFactory.getLogger(JNDIConnectionWrapper.class);
 
 	private static final String JAVA_NAMING_SECURITY_SASL_REALM = "java.naming.security.sasl.realm"; //$NON-NLS-1$
 	private static final String JAVA_NAMING_LDAP_VERSION = "java.naming.ldap.version"; //$NON-NLS-1$

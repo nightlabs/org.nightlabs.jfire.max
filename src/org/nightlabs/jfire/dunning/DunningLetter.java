@@ -23,15 +23,15 @@ import javax.jdo.annotations.PrimaryKey;
 import javax.jdo.annotations.Queries;
 
 import org.nightlabs.jdo.ObjectIDUtil;
+import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.Invoice;
-import org.nightlabs.jfire.accounting.InvoiceLocal;
-import org.nightlabs.jfire.accounting.InvoiceMoneyTransfer;
 import org.nightlabs.jfire.accounting.Price;
 import org.nightlabs.jfire.accounting.id.InvoiceID;
+import org.nightlabs.jfire.dunning.book.BookDunningLetterMoneyTransfer;
 import org.nightlabs.jfire.dunning.id.DunningLetterID;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.organisation.Organisation;
-import org.nightlabs.jfire.transfer.Transfer;
+import org.nightlabs.jfire.security.User;
 import org.nightlabs.util.CollectionUtil;
 
 /**
@@ -122,6 +122,15 @@ implements Serializable
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Price priceExcludingInvoices;
 	
+	private void calculatePriceExcludingInvoices() {
+		Currency currency = dunningProcess.getCurrency();
+		for (DunningLetterEntry entry : dunnedInvoices) {
+			for (DunningInterest interest : entry.getDunningInterests()) {
+				
+			}
+		}
+	}
+	
 	/**
 	 * The total amount of this DunningLetter comprising the invoice, 
 	 * all fees and interests. It always comprises the complete amount 
@@ -137,7 +146,9 @@ implements Serializable
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private long amountPaidExcludingInvoices;
 	
-	
+	/**
+	 * price.amount - amountPaid
+	 */
 	private transient long amountToPay;
 	
 	/**
@@ -214,6 +225,7 @@ implements Serializable
 		dunningInterestCalculator.createDunningInterest(invDunningStep, prevDunningLetter, this);
 		
 		DunningLetterEntry letterEntry = new DunningLetterEntry(organisationID, IDGenerator.nextIDString(DunningLetterEntry.class), level, invoice, this);
+		letterEntry.setPeriodOfGraceMSec(invDunningStep.getPeriodOfGraceMSec());
 		dunnedInvoices.add(letterEntry);
 	}
 	
@@ -227,6 +239,13 @@ implements Serializable
 	
 	public List<DunningFee> getDunningFees() {
 		return Collections.unmodifiableList(dunningFees);
+	}
+	
+	public void setFinalized() {
+		if (isFinalized())
+			return;
+
+		this.finalizeDT = new Date(System.currentTimeMillis());
 	}
 	
 	public void setFinalizeDT(Date finalizeDT) {
@@ -295,27 +314,14 @@ implements Serializable
 		return outstanding;
 	}
 	
-	public void bookDunningLetter(InvoiceMoneyTransfer transfer, boolean rollback)
+	public void bookDunningLetter(BookDunningLetterMoneyTransfer transfer, boolean rollback)
 	{
-//		if (!InvoiceMoneyTransfer.BOOK_TYPE_PAY.equals(transfer.getBookType()))
-//			return;
-//
-//		boolean vendorIsFrom = transfer.getAnchorType(vendor) == Transfer.ANCHORTYPE_FROM;
-//		boolean vendorIsTo = transfer.getAnchorType(vendor) == Transfer.ANCHORTYPE_TO;
-//		boolean customerIsFrom = transfer.getAnchorType(customer) == Transfer.ANCHORTYPE_FROM;
-//		boolean customerIsTo = transfer.getAnchorType(customer) == Transfer.ANCHORTYPE_TO;
-//
-//		if (!vendorIsFrom && !vendorIsTo && !customerIsFrom && !customerIsTo)
-//			throw new IllegalArgumentException("Transfer \""+transfer.getPrimaryKey()+"\" && Invoice \""+this.getPrimaryKey()+"\": Transfer and invoice are not related!");
-//
-//		long amount;
-//		if (vendorIsTo || customerIsFrom)
-//			amount = transfer.getAmount();
-//		else
-//			amount = - transfer.getAmount();
-//
-//		if (rollback)
-//			amount *= -1;
+		long amount = transfer.getAmount();
+		if (rollback)
+			amount *= -1;
+		
+		
+		amountPaidExcludingInvoices = amount;
 //
 //		InvoiceLocal invoiceLocal = getInvoiceLocal();
 //		invoiceLocal.incAmountPaid(amount);

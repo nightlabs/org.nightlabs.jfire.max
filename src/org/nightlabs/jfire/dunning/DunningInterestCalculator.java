@@ -91,6 +91,16 @@ implements Serializable
 	 */
 	public abstract Date getLastDay(DunningLetterEntry dunningLetterEntry);
 
+	/**
+	 * It is important to note that the InterestCalculator needs to know 
+	 * the previous DunningInterests (from the previous DunningLetter) 
+	 * in order to be able to merge Interests from adjacent time intervals 
+	 * and to realize that partial payments have already been conducted!
+	 * 
+	 * @param invoiceDunningStep
+	 * @param prevLetter
+	 * @param letter
+	 */
 	public void createDunningInterest(InvoiceDunningStep invoiceDunningStep, DunningLetter prevLetter, DunningLetter letter) {
 		if (prevLetter == null) {
 			for (DunningLetterEntry entry : letter.getDunnedInvoices()) {
@@ -102,20 +112,21 @@ implements Serializable
 		else {
 			List<DunningLetterEntry> entries = letter.getDunnedInvoices();
 			List<DunningLetterEntry> prevEntries = prevLetter.getDunnedInvoices();
+			BigDecimal interestPercentage = invoiceDunningStep.getInterestPercentage();
+			
 			for (DunningLetterEntry entry : entries) {
-				Date firstDay = getFirstDay(entry);
+				Date firstDay = getFirstDay(entry); //either the invoice due date or the extended due date
 				Date lastDay = getLastDay(entry);
 				long dayDifTime = lastDay.getTime() - firstDay.getTime();
 				long dayDiffDays = dayDifTime / (24l * 60l * 60l * 1000l);
 				
 				int entryIndex = prevEntries.indexOf(entry);
-				if (entryIndex != -1) {
-					DunningLetterEntry prevEntry = prevEntries.get(entryIndex);
-					DunningInterest prevInterest = prevEntry.getDunningInterests().get(prevEntry.getDunningInterests().size() - 1);
+				if (entryIndex != -1) { //combination of an old one + additional time
+					DunningInterest prevInterest = entry.getDunningInterests().get(entry.getDunningInterests().size() - 1);
 
-					BigDecimal interestPercentage = invoiceDunningStep.getInterestPercentage();
-					if (interestPercentage.equals(prevInterest.getInterestPercentage())) {
-						prevInterest.setCreditPeriodToExcl(lastDay);
+					if (interestPercentage.equals(prevInterest.getInterestPercentage())) { //if the interest percentage didn't change
+						Date extendedDate = new Date(lastDay.getTime() + entry.getPeriodOfGraceMSec());
+						prevInterest.setCreditPeriodToExcl(extendedDate);
 						calculate(invoiceDunningStep, prevInterest);
 					}
 					else {
@@ -128,8 +139,12 @@ implements Serializable
 						entry.addDunningInterest(interest);
 					}
 				}
-				else {
+				else { //create completely new one
 					DunningInterest interest = new DunningInterest(organisationID, IDGenerator.nextIDString(DunningInterest.class), entry, null);
+					interest.setInterestPercentage(interestPercentage);
+					interest.setCreditPeriodFromIncl(firstDay);
+					interest.setCreditPeriodToExcl(lastDay);
+					
 					calculate(invoiceDunningStep, interest);
 					entry.addDunningInterest(interest);
 				}

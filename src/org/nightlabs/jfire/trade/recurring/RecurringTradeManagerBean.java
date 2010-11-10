@@ -27,6 +27,7 @@
 package org.nightlabs.jfire.trade.recurring;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -36,6 +37,7 @@ import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 import javax.ejb.TransactionManagement;
 import javax.ejb.TransactionManagementType;
+import javax.jdo.FetchPlan;
 import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
@@ -43,6 +45,9 @@ import javax.jdo.PersistenceManager;
 import org.apache.log4j.Logger;
 import org.nightlabs.ModuleException;
 import org.nightlabs.jdo.NLJDOHelper;
+import org.nightlabs.jdo.query.AbstractJDOQuery;
+import org.nightlabs.jdo.query.JDOQueryCollectionDecorator;
+import org.nightlabs.jdo.query.QueryCollection;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.id.CurrencyID;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
@@ -53,6 +58,7 @@ import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.timer.Task;
 import org.nightlabs.jfire.timer.id.TaskID;
 import org.nightlabs.jfire.trade.LegalEntity;
+import org.nightlabs.jfire.trade.Offer;
 import org.nightlabs.jfire.trade.Order;
 import org.nightlabs.jfire.trade.Segment;
 import org.nightlabs.jfire.trade.SegmentType;
@@ -343,4 +349,37 @@ implements RecurringTradeManagerRemote, RecurringTradeManagerLocal
 		}
 	}
 
+	@RolesAllowed("org.nightlabs.jfire.trade.queryOffers")
+	public Set<RecurredOffer> getRecurredOffers(QueryCollection<? extends AbstractJDOQuery> queries)
+	{
+		if (queries == null)
+			throw new IllegalArgumentException("queries must not be null!");
+
+		if (queries.isEmpty())
+			throw new IllegalArgumentException("queries must not be empty!");
+		
+		PersistenceManager pm = createPersistenceManager();
+		try {
+			pm.getFetchPlan().setMaxFetchDepth(1);
+			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
+
+			JDOQueryCollectionDecorator<AbstractJDOQuery> decoratedQueries;
+
+			if (queries instanceof JDOQueryCollectionDecorator)
+			{
+				decoratedQueries = (JDOQueryCollectionDecorator<AbstractJDOQuery>) queries;
+			}
+			else
+			{
+				decoratedQueries = new JDOQueryCollectionDecorator<AbstractJDOQuery>(queries);
+			}
+			decoratedQueries.setPersistenceManager(pm);
+			Collection<? extends RecurredOffer> offers =
+				(Collection<? extends RecurredOffer>) decoratedQueries.executeQueries();
+
+			return NLJDOHelper.getObjectIDSet(offers);
+		} finally {
+			pm.close();
+		}
+	}
 }

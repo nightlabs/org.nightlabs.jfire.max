@@ -10,6 +10,8 @@ import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 
 import org.nightlabs.ModuleException;
+import org.nightlabs.jdo.query.AbstractJDOQuery;
+import org.nightlabs.jdo.query.QueryCollection;
 import org.nightlabs.jfire.accounting.id.CurrencyID;
 import org.nightlabs.jfire.trade.Segment;
 import org.nightlabs.jfire.trade.SegmentType;
@@ -105,5 +107,7 @@ public interface RecurringTradeManagerRemote {
 	@RolesAllowed("org.nightlabs.jfire.trade.queryOffers")
 	List<RecurringOffer> getRecurringOffers(Set<OfferID> offerIDs,
 			String[] fetchGroups, int maxFetchDepth);
-
+	
+	@RolesAllowed("org.nightlabs.jfire.trade.queryOffers")
+	Set<RecurredOffer> getRecurredOffers(QueryCollection<? extends AbstractJDOQuery> queries);
 }

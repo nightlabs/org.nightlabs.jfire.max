@@ -49,11 +49,20 @@ extends DunningInterestCalculator
 		super(organisationID, dunningInterestCalculatorID);
 	}
 	
+	/**
+	 * For every relevant year (i.e. the first and the last year) the real 
+	 * calendar number of days (which is at least 365) is used.
+	 */
 	@Override
 	public int getDays() {
 		return Calendar.getInstance().getActualMaximum(Calendar.DAY_OF_YEAR);
 	}
 
+	/**
+	 * The invoice's due-date is excluded from the credit period. Calculation 
+	 * starts at the following day at midnight. The same applies for all 
+	 * extended due-dates (i.e. previousDunningLetterEntry.extendedDueDateForPayment).
+	 */
 	@Override
 	public Date getFirstDay(DunningLetterEntry dunningLetterEntry) {
 		Date extendedDueDate = dunningLetterEntry.getExtendedDueDateForPayment();
@@ -71,6 +80,15 @@ extends DunningInterestCalculator
 		return cal.getTime();
 	}
 
+	/**
+	 * The last end date is always the finalization date of the  DunningLetter. 
+	 * Of course, this means there would be holes if we directly copied the previous 
+	 * DunningInterests from the previous DunningLetterEntry. Therefore, the last 
+	 * old DunningInterest is recalculated and its end-date is extended to match 
+	 * exactly the new DunningInterest's begin-date. If the interest percentages of 
+	 * the previous and the current DunningLetter are the same, the DunningInterests 
+	 * sshould be combined to one.
+	 */
 	@Override
 	public Date getLastDay(DunningLetterEntry dunningLetterEntry) {
 		return dunningLetterEntry.getDunningLetter().getFinalizeDT();

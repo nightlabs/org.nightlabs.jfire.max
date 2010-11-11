@@ -99,54 +99,54 @@ implements Serializable
 	 * 
 	 * @param invoiceDunningStep
 	 * @param prevLetter
-	 * @param letter
+	 * @param newLetter
 	 */
-	public void createDunningInterest(InvoiceDunningStep invoiceDunningStep, DunningLetter prevLetter, DunningLetter letter) {
-		if (prevLetter == null) {
-			for (DunningLetterEntry entry : letter.getDunnedInvoices()) {
+	public void generateDunningInterest(InvoiceDunningStep invoiceDunningStep, DunningLetter prevLetter, DunningLetter newLetter) {
+		if (prevLetter == null) { // New letter
+			for (DunningLetterEntry entry : newLetter.getDunnedInvoices()) {
 				DunningInterest interest = new DunningInterest(organisationID, IDGenerator.nextIDString(DunningInterest.class), entry, null);
 				calculate(invoiceDunningStep, interest);
 				entry.addDunningInterest(interest);
 			}
 		}
 		else {
-			List<DunningLetterEntry> entries = letter.getDunnedInvoices();
-			List<DunningLetterEntry> prevEntries = prevLetter.getDunnedInvoices();
+			List<DunningLetterEntry> newLetterEntries = newLetter.getDunnedInvoices();
+			List<DunningLetterEntry> prevLetterEntries = prevLetter.getDunnedInvoices();
 			BigDecimal interestPercentage = invoiceDunningStep.getInterestPercentage();
 			
-			for (DunningLetterEntry entry : entries) {
-				Date firstDay = getFirstDay(entry); //either the invoice due date or the extended due date
-				Date lastDay = getLastDay(entry);
+			for (DunningLetterEntry newLetterEntry : newLetterEntries) {
+				Date firstDay = getFirstDay(newLetterEntry); //either the invoice due date or the extended due date
+				Date lastDay = getLastDay(newLetterEntry);
 				long dayDifTime = lastDay.getTime() - firstDay.getTime();
 				long dayDiffDays = dayDifTime / (24l * 60l * 60l * 1000l);
 				
-				int entryIndex = prevEntries.indexOf(entry);
+				int entryIndex = prevLetterEntries.indexOf(newLetterEntry);
 				if (entryIndex != -1) { //combination of an old one + additional time
-					DunningInterest prevInterest = entry.getDunningInterests().get(entry.getDunningInterests().size() - 1);
+					DunningInterest prevInterest = newLetterEntry.getDunningInterests().get(newLetterEntry.getDunningInterests().size() - 1);
 
 					if (interestPercentage.equals(prevInterest.getInterestPercentage())) { //if the interest percentage didn't change
-						Date extendedDate = new Date(lastDay.getTime() + entry.getPeriodOfGraceMSec());
+						Date extendedDate = new Date(lastDay.getTime() + newLetterEntry.getPeriodOfGraceMSec());
 						prevInterest.setCreditPeriodToExcl(extendedDate);
 						calculate(invoiceDunningStep, prevInterest);
 					}
-					else {
-						DunningInterest interest = new DunningInterest(organisationID, IDGenerator.nextIDString(DunningInterest.class), entry, prevInterest);
+					else { //create new interest
+						DunningInterest interest = new DunningInterest(organisationID, IDGenerator.nextIDString(DunningInterest.class), newLetterEntry, prevInterest);
 						interest.setInterestPercentage(interestPercentage);
 						interest.setCreditPeriodFromIncl(firstDay);
 						interest.setCreditPeriodToExcl(lastDay);
 
 						calculate(invoiceDunningStep, interest);
-						entry.addDunningInterest(interest);
+						newLetterEntry.addDunningInterest(interest);
 					}
 				}
 				else { //create completely new one
-					DunningInterest interest = new DunningInterest(organisationID, IDGenerator.nextIDString(DunningInterest.class), entry, null);
+					DunningInterest interest = new DunningInterest(organisationID, IDGenerator.nextIDString(DunningInterest.class), newLetterEntry, null);
 					interest.setInterestPercentage(interestPercentage);
 					interest.setCreditPeriodFromIncl(firstDay);
 					interest.setCreditPeriodToExcl(lastDay);
 					
 					calculate(invoiceDunningStep, interest);
-					entry.addDunningInterest(interest);
+					newLetterEntry.addDunningInterest(interest);
 				}
 			}	
 		}

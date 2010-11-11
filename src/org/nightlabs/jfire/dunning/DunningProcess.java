@@ -112,11 +112,13 @@ implements Serializable
 	 * The invoices for which this dunning process is happening and their corresponding dunning levels.
 	 */
 	@Join
-	@Persistent(table="JFireDunning_DunningProcess_invoices2DunningLevel")
-	private Map<Invoice, Integer> invoices2DunningLevel;
+	@Persistent(table="JFireDunning_DunningProcess_dunnedInvoices2DunningLevel")
+	private Map<Invoice, Integer> dunnedInvoices2DunningLevel;
 	
 	/**
 	 * All DunningLetters that have been created so far within the scope of this dunning process.
+	 * There's only one active DunningLetter and when a new DunningLetter is finalized & booked, the 
+	 * previous DunningLetter needs to be booked out.
 	 */
 	@Join
 	@Persistent(
@@ -153,7 +155,7 @@ implements Serializable
 		this.dunningProcessID = dunningProcessID;
 		this.dunningConfig = dunningConfig;
 		
-		this.invoices2DunningLevel = new HashMap<Invoice, Integer>();
+		this.dunnedInvoices2DunningLevel = new HashMap<Invoice, Integer>();
 	}
 	
 	public String getOrganisationID() {
@@ -204,35 +206,47 @@ implements Serializable
 		return paidDT;
 	}
 	
-	public void addInvoice(Invoice invoice, int dunningLevel) {
-		invoices2DunningLevel.put(invoice, dunningLevel);
+	public boolean isActive() {
+		return paidDT == null;
+	}
+	
+	public void addOverdueInvoice(Invoice invoice, int dunningLevel) {
+		dunnedInvoices2DunningLevel.put(invoice, dunningLevel);
 	}
 	
 	public Map<Invoice, Integer> getInvoices2DunningLevel() {
-		return invoices2DunningLevel;
+		return dunnedInvoices2DunningLevel;
 	}
 	
 	public DunningLetter getLastDunningLetter() {
 		return dunningLetters.size() == 0 ? null:dunningLetters.get(dunningLetters.size() - 1);
 	}
 	
+	public boolean isDunnedInvoice(Invoice invoice) {
+		return dunnedInvoices2DunningLevel.containsKey(invoice);
+	}
+	
 	public void createDunningLetter(boolean isFinalized) {
 		DunningLetter prevDunningLetter = getLastDunningLetter();
-		DunningLetter newDunningLetter = new DunningLetter(this);
-		
-		//Calculate new due date
-		
-		//Create entries
-		for (Invoice inv : invoices2DunningLevel.keySet()) {
-			int level = invoices2DunningLevel.get(inv);
-			newDunningLetter.addDunnedInvoice(dunningConfig, prevDunningLetter, level, inv);
+		if (isFinalized && prevDunningLetter != null) {
+			prevDunningLetter.setBookDT(new Date());
+			prevDunningLetter.setFinalized();
+			//TODO 6.3.6 books out the prev letter
 		}
 		
-		//Add fees
+		DunningLetter newDunningLetter = new DunningLetter(this);
+		
+		//Create entries in the new letter
+		for (Invoice dunnedInv : dunnedInvoices2DunningLevel.keySet()) {
+			int dunningLevel = dunnedInvoices2DunningLevel.get(dunnedInv);
+			newDunningLetter.addDunnedInvoice(dunningConfig, prevDunningLetter, dunningLevel, dunnedInv);
+		}
+		
+		//Calculate fees for the new letter
 		DunningFeeAdder feeAdder = dunningConfig.getDunningFeeAdder();
 		feeAdder.addDunningFee(prevDunningLetter, newDunningLetter);
 		
-		//Add to the list
+		//Add the new letter to the list
 		dunningLetters.add(newDunningLetter);
 		
 		DunningLetterNotifier letterNotifier = dunningConfig.getLevel2DunningLetterNotifiers().get(newDunningLetter.getDunningLevel());

@@ -1,7 +1,6 @@
 package org.nightlabs.jfire.dunning;
 
 import java.io.Serializable;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
@@ -210,7 +209,6 @@ implements Serializable
 	 *
 	 * @param organisationID first part of the primary key. The organisation which created this object.
 	 * @param dunningConfigID second part of the primary key. A local identifier within the namespace of the organisation.
-	 * @see #DunningConfig(boolean)
 	 */
 	public DunningConfig(String organisationID, String dunningConfigID, DunningAutoMode dunningAutoMode) {
 		Organisation.assertValidOrganisationID(organisationID);

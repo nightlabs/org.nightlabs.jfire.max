@@ -27,7 +27,6 @@ import org.apache.log4j.Logger;
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.Invoice;
-import org.nightlabs.jfire.accounting.InvoiceLocal;
 import org.nightlabs.jfire.accounting.Price;
 import org.nightlabs.jfire.accounting.id.InvoiceID;
 import org.nightlabs.jfire.accounting.pay.PayableObject;
@@ -38,9 +37,7 @@ import org.nightlabs.jfire.jbpm.graph.def.Statable;
 import org.nightlabs.jfire.jbpm.graph.def.StatableLocal;
 import org.nightlabs.jfire.jbpm.graph.def.State;
 import org.nightlabs.jfire.organisation.Organisation;
-import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.trade.LegalEntity;
-import org.nightlabs.jfire.trade.Offer;
 import org.nightlabs.util.CollectionUtil;
 
 /**
@@ -77,7 +74,7 @@ public class DunningLetter implements Serializable, PayableObject, Statable {
 	 * highest level of all included invoices.
 	 */
 	@Persistent(persistenceModifier = PersistenceModifier.PERSISTENT)
-	private Integer dunningLevel;
+	private Integer letterDunningLevel;
 
 	/**
 	 * The information of each overdue invoice needed to print the letter. This
@@ -213,9 +210,14 @@ public class DunningLetter implements Serializable, PayableObject, Statable {
 	}
 
 	public Integer getDunningLevel() {
-		return dunningLevel;
+		return letterDunningLevel;
 	}
 
+	/**
+	 * price.amount - amountPaid
+	 */
+	private transient boolean haveChangedItem = false;
+	
 	/**
 	 * Adds the overdue invoice into the new letter. When adding the invoice, it
 	 * calculates the interest of each invoices too.
@@ -223,17 +225,16 @@ public class DunningLetter implements Serializable, PayableObject, Statable {
 	 * it calculates the new 
 	 * @param dunningConfig
 	 * @param prevDunningLetter
-	 * @param currentDunningLevel
+	 * @param invoiceDunningLevel
 	 * @param dunningInvoice
 	 */
 	public void addDunnedInvoice(DunningConfig dunningConfig,
-			DunningLetter prevDunningLetter, int currentDunningLevel, Invoice dunningInvoice) {
-		if (currentDunningLevel > dunningLevel) {
-			this.dunningLevel = currentDunningLevel;
+			DunningLetter prevDunningLetter, int invoiceDunningLevel, Invoice dunningInvoice) {
+		if (invoiceDunningLevel > letterDunningLevel) {
+			this.letterDunningLevel = invoiceDunningLevel;
 		}
 
-		InvoiceDunningStep invDunningStep = dunningConfig.getInvoiceDunningStep(currentDunningLevel);
-		ProcessDunningStep processDunningStep = dunningConfig.getProcessDunningStep(currentDunningLevel);
+		InvoiceDunningStep invDunningStep = dunningConfig.getInvoiceDunningStep(invoiceDunningLevel);
 
 		List<DunningLetterEntry> prevEntries = prevDunningLetter.getDunnedInvoices();
 		//Check if the dunningInv needs to be dunned again (it's late for payment on the extended due date). 
@@ -246,6 +247,8 @@ public class DunningLetter implements Serializable, PayableObject, Statable {
 				if (isOverdue) {
 					long newDueDateTime = prevEntry.getExtendedDueDateForPayment().getTime() + invDunningStep.getPeriodOfGraceMSec();
 					newDueDate = new Date(newDueDateTime);
+					invoiceDunningLevel++;
+					haveChangedItem = true;
 				}
 			}
 		}
@@ -258,7 +261,7 @@ public class DunningLetter implements Serializable, PayableObject, Statable {
 
 		//Create the entry
 		DunningLetterEntry letterEntry = new DunningLetterEntry(organisationID,
-				IDGenerator.nextIDString(DunningLetterEntry.class), currentDunningLevel,
+				IDGenerator.nextIDString(DunningLetterEntry.class), invoiceDunningLevel,
 				dunningInvoice, this);
 		letterEntry.setPeriodOfGraceMSec(invDunningStep.getPeriodOfGraceMSec());
 		if (isOverdue) {
@@ -267,6 +270,10 @@ public class DunningLetter implements Serializable, PayableObject, Statable {
 		dunnedInvoices.add(letterEntry);
 	}
 
+	public boolean haveChangedItem() {
+		return haveChangedItem;
+	}
+	
 	public List<DunningLetterEntry> getDunnedInvoices() {
 		return Collections.unmodifiableList(dunnedInvoices);
 	}
@@ -359,6 +366,16 @@ public class DunningLetter implements Serializable, PayableObject, Statable {
 		amountPaidExcludingInvoices = amount;
 	}
 
+	public void copyAllFeesFrom(DunningLetter dunningLetter) {
+		if (dunningLetter == null) {
+			throw new IllegalArgumentException("The dunning letter should not be null!!!");
+		}
+		
+		for (DunningFee dunningFee : dunningLetter.getDunningFees()) {
+			addDunningFee(dunningFee);
+		}
+	}
+	
 	private static Collection<DunningLetter> getOpenDunningLetters(
 			PersistenceManager pm) {
 		Query query = pm.newNamedQuery(DunningLetter.class,

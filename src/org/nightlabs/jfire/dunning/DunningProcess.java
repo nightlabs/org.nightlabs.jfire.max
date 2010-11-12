@@ -235,6 +235,7 @@ implements Serializable
 		}
 		
 		DunningLetter newDunningLetter = new DunningLetter(this);
+		newDunningLetter.copyAllFeesFrom(prevDunningLetter);
 		
 		//Create entries in the new letter
 		for (Invoice dunnedInv : dunnedInvoices2DunningLevel.keySet()) {

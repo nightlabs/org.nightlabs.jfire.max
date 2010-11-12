@@ -1,7 +1,5 @@
 package org.nightlabs.jfire.dunning;
 
-import java.util.Set;
-
 import javax.jdo.annotations.IdentityType;
 import javax.jdo.annotations.Inheritance;
 import javax.jdo.annotations.InheritanceStrategy;
@@ -46,26 +44,34 @@ extends DunningFeeAdder
 		super(organisationID, dunningFeeAdderID);
 	}
 	
+	/**
+	 * Adds new fees if at least one of the dunned invoices has increased 
+	 * its dunningLevel. If this happens, it will add the fees of the ProcessDunningStep 
+	 * corresponding to that level.
+	 */
 	@Override
 	public void addDunningFee(DunningLetter prevDunningLetter, DunningLetter newDunningLetter) {
 		DunningConfig dunningConfig = newDunningLetter.getDunningProcess().getDunningConfig();
 		DunningProcess dunningProcess = newDunningLetter.getDunningProcess();
 		
-		int dunningLevel = newDunningLetter.getDunningLevel();
-		
-		Set<ProcessDunningStep> processDunningSteps = dunningConfig.getProcessDunningSteps();
-		for (ProcessDunningStep processDunningStep : processDunningSteps) {
-			if (processDunningStep.getDunningLevel() == dunningLevel) {
-				for (DunningFeeType dunningFeeType : processDunningStep.getFeeTypes()) {
-					DunningFee fee = new DunningFee(newDunningLetter.getOrganisationID(), IDGenerator.nextIDString(DunningFee.class), null);
-					fee.setAmountPaid(0);
-					
-					Price amountToPay = dunningFeeType.getCurrency2price().get(dunningProcess.getCurrency());
-					fee.setAmountToPay(amountToPay.getAmount());
-					
-					fee.setDunningFeeType(dunningFeeType);
-					
-					newDunningLetter.addDunningFee(fee);
+		if (newDunningLetter.haveChangedItem()) {
+			for (DunningLetterEntry prevEntry : prevDunningLetter.getDunnedInvoices()) {
+				int index = newDunningLetter.getDunnedInvoices().indexOf(prevEntry);
+				if (index > 0) {
+					DunningLetterEntry entry = newDunningLetter.getDunnedInvoices().get(index);
+					if (entry.getDunningLevel() > prevEntry.getDunningLevel()) {
+						ProcessDunningStep processDunningStep = dunningConfig.getProcessDunningStep(entry.getDunningLevel());
+						for (DunningFeeType dunningFeeType : processDunningStep.getFeeTypes()) {
+							DunningFee fee = new DunningFee(newDunningLetter.getOrganisationID(), IDGenerator.nextIDString(DunningFee.class), null);
+							fee.setAmountPaid(0);
+							
+							Price amountToPay = dunningFeeType.getCurrency2price().get(dunningProcess.getCurrency());
+							fee.setAmountToPay(amountToPay.getAmount());
+							fee.setDunningFeeType(dunningFeeType);
+							
+							newDunningLetter.addDunningFee(fee);
+						}
+					}
 				}
 			}
 		}

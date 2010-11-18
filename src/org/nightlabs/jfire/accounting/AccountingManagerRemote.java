@@ -10,6 +10,7 @@ import javax.ejb.Remote;
 
 import org.nightlabs.ModuleException;
 import org.nightlabs.i18n.I18nText;
+import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jdo.query.AbstractJDOQuery;
 import org.nightlabs.jdo.query.QueryCollection;
 import org.nightlabs.jfire.accounting.book.LocalAccountantDelegate;
@@ -26,6 +27,8 @@ import org.nightlabs.jfire.accounting.id.TariffMappingID;
 import org.nightlabs.jfire.accounting.pay.CheckRequirementsEnvironment;
 import org.nightlabs.jfire.accounting.pay.ModeOfPayment;
 import org.nightlabs.jfire.accounting.pay.ModeOfPaymentFlavour;
+import org.nightlabs.jfire.accounting.pay.PayableObject;
+import org.nightlabs.jfire.accounting.pay.Payment;
 import org.nightlabs.jfire.accounting.pay.PaymentData;
 import org.nightlabs.jfire.accounting.pay.PaymentResult;
 import org.nightlabs.jfire.accounting.pay.ServerPaymentProcessor;
@@ -548,6 +551,9 @@ public interface AccountingManagerRemote {
 			PriceFragmentType priceFragmentType, boolean get,
 			String[] fetchGroups, int maxFetchDepth);
 
-
+	Set<PaymentID> getPaymentIDsForPayableObjectID(ObjectID payableObject);
+	
+	List<Payment> getPayments(final Collection<PaymentID> paymentIDs, final String[] fetchGroups, final int maxFetchDepth);
+	
 	String ping(String message);
 }

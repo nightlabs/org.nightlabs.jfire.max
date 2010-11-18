@@ -55,6 +55,7 @@ import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.log4j.Logger;
 import org.nightlabs.i18n.I18nText;
 import org.nightlabs.jdo.NLJDOHelper;
+import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jdo.query.AbstractJDOQuery;
 import org.nightlabs.jdo.query.JDOQueryCollectionDecorator;
 import org.nightlabs.jdo.query.QueryCollection;
@@ -80,6 +81,8 @@ import org.nightlabs.jfire.accounting.pay.CheckRequirementsEnvironment;
 import org.nightlabs.jfire.accounting.pay.ModeOfPayment;
 import org.nightlabs.jfire.accounting.pay.ModeOfPaymentConst;
 import org.nightlabs.jfire.accounting.pay.ModeOfPaymentFlavour;
+import org.nightlabs.jfire.accounting.pay.PayableObject;
+import org.nightlabs.jfire.accounting.pay.Payment;
 import org.nightlabs.jfire.accounting.pay.PaymentData;
 import org.nightlabs.jfire.accounting.pay.PaymentException;
 import org.nightlabs.jfire.accounting.pay.PaymentHelperLocal;
@@ -2134,6 +2137,36 @@ implements AccountingManagerRemote, AccountingManagerLocal
 		}
 	}
 
+	
+	@RolesAllowed("_Guest_")
+	@Override
+	public Set<PaymentID> getPaymentIDsForPayableObjectID(ObjectID payableObjectID)
+	{
+		PersistenceManager pm = createPersistenceManager();
+		try {
+			final PayableObject payableObject = (PayableObject) pm.getObjectById(payableObjectID);
+			return NLJDOHelper.getObjectIDSet(Payment.getPaymentsForPayableObject(pm, payableObject));
+		} finally {
+			pm.close();
+		}		
+	}
+	
+	
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.accounting.AccountingManagerRemote#getAccountTypes(java.util.Collection, java.lang.String[], int)
+	 */
+	@RolesAllowed("_Guest_")
+	@Override
+	public List<Payment> getPayments(final Collection<PaymentID> paymentIDs, final String[] fetchGroups, final int maxFetchDepth)
+	{
+		final PersistenceManager pm = createPersistenceManager();
+		try {
+			return NLJDOHelper.getDetachedObjectList(pm, paymentIDs, Payment.class, fetchGroups, maxFetchDepth);
+		} finally {
+			pm.close();
+		}
+	}
+	
 	/* (non-Javadoc)
 	 * @see org.nightlabs.jfire.accounting.AccountingManagerRemote#getAccountTypes(java.util.Collection, java.lang.String[], int)
 	 */

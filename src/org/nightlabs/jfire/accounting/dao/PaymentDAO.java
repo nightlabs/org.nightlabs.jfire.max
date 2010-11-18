@@ -50,15 +50,16 @@ public class PaymentDAO extends BaseJDOObjectDAO<PaymentID, Payment>
 			int maxFetchDepth, ProgressMonitor monitor)
 	{
 		try{
+			monitor.beginTask("Fetching Payments for Payable Object...", 1); //$NON-NLS-1$
 			AccountingManagerRemote am = getEjbProvider().getRemoteBean(AccountingManagerRemote.class);
 			Set<PaymentID> paymentIDs =am.getPaymentIDsForPayableObjectID(payableObjectID);
+			monitor.worked(50);
 			return getJDOObjects(null, paymentIDs, fetchGroups, maxFetchDepth, monitor);
 		}
 		catch (Exception x) {
 			monitor.setCanceled(true);
 			throw new RuntimeException(x);
 		} finally {
-			monitor.worked(1);
 			monitor.done();
 		}
 	}

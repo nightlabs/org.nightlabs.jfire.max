@@ -80,7 +80,7 @@ import org.nightlabs.jfire.trade.Article;
 @Discriminator(strategy=DiscriminatorStrategy.CLASS_NAME)
 public abstract class MoneyFlowDimension {
 
-	private static final String FETCH_GROUP_GET_MONEY_FLOW_DIMENSION = "getMoneyFlowDimension";
+	protected static final String FETCH_GROUP_GET_MONEY_FLOW_DIMENSION = "getMoneyFlowDimension";
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" primary-key="true"

@@ -91,14 +91,14 @@ public class Script
 {
 	private static final long serialVersionUID = 1L;
 
-	private static final String QUERY_GET_SCRIPTS_BY_TYPE_AND_ID = "getScriptsByTypeAndID";
+	protected static final String QUERY_GET_SCRIPTS_BY_TYPE_AND_ID = "getScriptsByTypeAndID";
 	public static Collection<Script> getScripts(PersistenceManager pm, String scriptRegistryItemType, String scriptRegistryItemID)
 	{
 		Query q = pm.newNamedQuery(Script.class, QUERY_GET_SCRIPTS_BY_TYPE_AND_ID);
 		return (Collection<Script>) q.execute(scriptRegistryItemType, scriptRegistryItemID);
 	}
 
-	private static final String QUERY_GET_SCRIPTS_BY_TYPE_AND_RESULT_CLASS = "getScriptsByTypeAndResultClass";
+	protected static final String QUERY_GET_SCRIPTS_BY_TYPE_AND_RESULT_CLASS = "getScriptsByTypeAndResultClass";
 	public static Collection<Script> getScriptsByTypeAndResult(PersistenceManager pm,
 			String scriptRegistryItemType, String resultClassName)
 	{

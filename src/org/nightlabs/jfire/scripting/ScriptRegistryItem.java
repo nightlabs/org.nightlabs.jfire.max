@@ -160,11 +160,11 @@ public abstract class ScriptRegistryItem
 {
 	private static final long serialVersionUID = 9221181132208442543L;
 
-	private static final String QUERY_GET_TOPLEVEL_SCRIPT_REGISTRY_ITEMS_BY_ORGANISATION_ID_AND_TYPE = "getTopLevelScriptRegistryItemsByOrganisationIDAndType";
-	private static final String QUERY_GET_TOPLEVEL_SCRIPT_REGISTRY_ITEMS_BY_TYPE = "getTopLevelScriptRegistryItemsByType";
-	private static final String QUERY_GET_TOPLEVEL_SCRIPT_REGISTRY_ITEMS_BY_ORGANISATION_ID = "getTopLevelScriptRegistryItemsByOrganisationID";
-	private static final String QUERY_GET_TOPLEVEL_SCRIPT_REGISTRY_ITEMS = "getTopLevelScriptRegistryItems";
-	private static final String QUERY_GET_SCRIPT_REGISTRY_IDPARENT_ITEMS = "getScriptRegistryItemIDsForParent";
+	protected static final String QUERY_GET_TOPLEVEL_SCRIPT_REGISTRY_ITEMS_BY_ORGANISATION_ID_AND_TYPE = "getTopLevelScriptRegistryItemsByOrganisationIDAndType";
+	protected static final String QUERY_GET_TOPLEVEL_SCRIPT_REGISTRY_ITEMS_BY_TYPE = "getTopLevelScriptRegistryItemsByType";
+	protected static final String QUERY_GET_TOPLEVEL_SCRIPT_REGISTRY_ITEMS_BY_ORGANISATION_ID = "getTopLevelScriptRegistryItemsByOrganisationID";
+	protected static final String QUERY_GET_TOPLEVEL_SCRIPT_REGISTRY_ITEMS = "getTopLevelScriptRegistryItems";
+	protected static final String QUERY_GET_SCRIPT_REGISTRY_IDPARENT_ITEMS = "getScriptRegistryItemIDsForParent";
 	
 	public static final String FETCH_GROUP_PARENT = "ScriptRegistryItem.parent";
 	public static final String FETCH_GROUP_NAME = "ScriptRegistryItem.name";

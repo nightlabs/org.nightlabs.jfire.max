@@ -26,6 +26,7 @@ import org.nightlabs.jfire.accounting.MoneyTransfer;
 import org.nightlabs.jfire.accounting.Price;
 import org.nightlabs.jfire.accounting.PriceFragment;
 import org.nightlabs.jfire.accounting.PriceFragmentType;
+import org.nightlabs.jfire.accounting.book.Accountant;
 import org.nightlabs.jfire.accounting.book.BookInvoiceMoneyTransfer;
 import org.nightlabs.jfire.accounting.book.PartnerBookInvoiceAccountantDelegate;
 import org.nightlabs.jfire.accounting.id.AccountTypeID;
@@ -178,10 +179,14 @@ extends UncollectableInvoiceBooker
 		}
 
 		Currency currency = invoice.getCurrency();
-
 		AccountType partnerAccountType = (AccountType) pm.getObjectById(partnerAccountTypeID);
-		PartnerBookInvoiceAccountantDelegate partnerBookInvoiceAccountantDelegate = 
-			(PartnerBookInvoiceAccountantDelegate)accounting.getPartnerAccountant().getAccountantDelegate(BookInvoiceMoneyTransfer.class);
+
+		Accountant partnerAccountant = partner.getAccountant();
+		if (partnerAccountant == null)
+			partnerAccountant = accounting.getPartnerAccountant();
+
+		PartnerBookInvoiceAccountantDelegate partnerBookInvoiceAccountantDelegate =
+			(PartnerBookInvoiceAccountantDelegate)partnerAccountant.getAccountantDelegate(BookInvoiceMoneyTransfer.class);
 		Account partnerAccount = partnerBookInvoiceAccountantDelegate.getPartnerAccount(
 				partnerAccountType,
 				partner,

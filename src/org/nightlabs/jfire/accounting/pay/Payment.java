@@ -1336,6 +1336,7 @@ implements Serializable, StoreCallback
 		Payment n = new Payment(organisationID, paymentID);
 		n.amount = amount;
 		n.beginDT = beginDT;
+		n.paymentDT = paymentDT;
 		n.clientPaymentProcessorFactoryID = clientPaymentProcessorFactoryID;
 		n.currencyID = getCurrencyID();
 		n.endDT = endDT;

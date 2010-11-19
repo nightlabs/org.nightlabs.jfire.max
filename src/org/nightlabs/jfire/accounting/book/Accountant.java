@@ -28,6 +28,7 @@ package org.nightlabs.jfire.accounting.book;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -46,6 +47,7 @@ import org.nightlabs.jfire.accounting.MoneyTransfer;
 import org.nightlabs.jfire.accounting.book.id.AccountantID;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.trade.LegalEntity;
+import org.nightlabs.util.reflect.ReflectUtil;
 
 /**
  * An Accountant is responsible for splitting money into several accounts and for
@@ -136,9 +138,27 @@ public class Accountant implements Serializable
 	public void setAccountantDelegate(Class<? extends MoneyTransfer> moneyTransferClass, AccountantDelegate accountantDelegate) {
 		this.moneyTransferClass2accountantDelegate.put(moneyTransferClass.getName(), accountantDelegate);
 	}
-	
+
+	/**
+	 * Returns an {@link AccountantDelegate} registered for this
+	 * {@link Accountant} to handle either the given type of MoneyTransfer or
+	 * any of its super-types (including interfaces).
+	 * 
+	 * @param moneyTransferClass
+	 *            The type of MoneyTransfer to search a delegate for. Note, that
+	 *            super-types are included in the search.
+	 * @return The {@link AccountantDelegate} registered to handle the given
+	 *         type of MoneyTransfer or one of its super-types.
+	 */
 	public AccountantDelegate getAccountantDelegate(Class<? extends MoneyTransfer> moneyTransferClass) {
-		return moneyTransferClass2accountantDelegate.get(moneyTransferClass.getName());
+		List<Class<?>> moneyTransferTypeHeirarchy = ReflectUtil.collectTypeHierarchy(moneyTransferClass);
+		for (Class<?> transferClass : moneyTransferTypeHeirarchy) {
+			AccountantDelegate delegate = moneyTransferClass2accountantDelegate.get(transferClass.getName());
+			if (delegate != null) {
+				return delegate;
+			}
+		}
+		return null;
 	}
 
 	@Override

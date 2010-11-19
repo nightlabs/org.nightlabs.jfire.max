@@ -416,12 +416,10 @@ public class LegalEntity extends Anchor
 		Transfer firstContainer = containers.iterator().next();
 
 		if (firstContainer instanceof MoneyTransfer) {
-			if (firstContainer.getClass().equals(MoneyTransfer.class)) {
-				Map<CurrencyID,Balance> balanceMap = getBalanceMap();
-				for (Balance balance : balanceMap.values()) {
-					if (balance.amount != 0)
-						throw new IllegalStateException("Balance for LegalEntity \""+getPrimaryKey()+"\" must be 0, but is "+balance.amount+" for currency \""+balance.currencyID+"\"!");
-				}
+			Map<CurrencyID,Balance> balanceMap = getBalanceMap();
+			for (Balance balance : balanceMap.values()) {
+				if (balance.amount != 0)
+					throw new IllegalStateException("Balance for LegalEntity \""+getPrimaryKey()+"\" must be 0, but is "+balance.amount+" for currency \""+balance.currencyID+"\"!");
 			}
 		}
 		else if (firstContainer instanceof ProductTransfer) {

@@ -34,16 +34,16 @@ import org.nightlabs.jfire.transfer.id.AnchorID;
 import org.nightlabs.util.CollectionUtil;
 
 /**
- * When Invoice.dueDateForPayment is exceeded (i.e. NOW is after this timestamp) 
- * and there is no DunningInvoiceProcess for the corresponding customer, 
- * a new DunningProcess is either manually (via UI) or automatically created 
- * (with the copy of its corresponding DunningConfig – a shallow copy is enough).<br> 
- * 
- * <br>Thus, there is at most one active DunningProcess for every customer in the database. 
- * If there is one already, the existing DunningProcess is used and the overdue invoice 
+ * When Invoice.dueDateForPayment is exceeded (i.e. NOW is after this timestamp)
+ * and there is no DunningInvoiceProcess for the corresponding customer,
+ * a new DunningProcess is either manually (via UI) or automatically created
+ * (with the copy of its corresponding DunningConfig – a shallow copy is enough).<br>
+ *
+ * <br>Thus, there is at most one active DunningProcess for every customer in the database.
+ * If there is one already, the existing DunningProcess is used and the overdue invoice
  * is added.<br>
- * 
- * <br>The DunningProcess governs the generation of DunningLetters which may be skipped depending on the coolDownEnd. 
+ *
+ * <br>The DunningProcess governs the generation of DunningLetters which may be skipped depending on the coolDownEnd.
 
  * @author Chairat Kongarayawetchakun - chairat [AT] nightlabs [DOT] de
  */
@@ -72,12 +72,12 @@ import org.nightlabs.util.CollectionUtil;
 					"WHERE paidDT == null && JDOHelper.getObjectId(dunningConfig) == :dunningConfigID"
 	),
 })
-public class DunningProcess 
+public class DunningProcess
 implements Serializable
 {
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger = Logger.getLogger(DunningProcess.class);
-	
+
 	@PrimaryKey
 	@Column(length=100)
 	private String organisationID;
@@ -85,7 +85,7 @@ implements Serializable
 	@PrimaryKey
 	@Column(length=100)
 	private String dunningProcessID;
-	
+
 	/**
 	 * A deep copy of the DunningConfig for the corresponding customer.
 	 */
@@ -93,7 +93,7 @@ implements Serializable
 			loadFetchGroup="all",
 			persistenceModifier=PersistenceModifier.PERSISTENT)
 	private DunningConfig dunningConfig;
-	
+
 	/**
 	 * The customer for which this DunningProcess has been created.
 	 */
@@ -107,17 +107,22 @@ implements Serializable
 	 */
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Currency currency;
-	
+
+	// *** REV_marco_dunning ***
+	// This wasn't specified. Are you sure that you need it? Don't you have all necessary information
+	// in the last DunningLetter's entries? Isn't this the same as the dunning level in the last DunningLetterEntry?
+	// You run the risk of inconsistencies if you keep both - I would omit this, if there are no important
+	// reasons to keep it.
 	/**
 	 * The invoices for which this dunning process is happening and their corresponding dunning levels.
 	 */
 	@Join
 	@Persistent(table="JFireDunning_DunningProcess_dunnedInvoices2DunningLevel")
 	private Map<Invoice, Integer> dunnedInvoices2DunningLevel;
-	
+
 	/**
 	 * All DunningLetters that have been created so far within the scope of this dunning process.
-	 * There's only one active DunningLetter and when a new DunningLetter is finalized & booked, the 
+	 * There's only one active DunningLetter and when a new DunningLetter is finalized & booked, the
 	 * previous DunningLetter needs to be booked out.
 	 */
 	@Join
@@ -125,25 +130,25 @@ implements Serializable
 		table="JFireDunning_DunningProcess_dunningLetters",
 		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private List<DunningLetter> dunningLetters;
-	
+
 	/**
 	 * The date at which all invoices were paid. While this field is set to null, its DunningProcess is active!
 	 */
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Date paidDT;
-	
+
 	/**
 	 * The point of time after which new DunningLetters should be created again.
 	 */
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Date coolDownEnd;
-	
+
 	/**
 	 * @deprecated This constructor exists only for JDO and should never be used directly!
 	 */
 	@Deprecated
 	protected DunningProcess() { }
-	
+
 	/**
 	 * Create an instance of <code>DunningProcess</code>.
 	 *
@@ -154,18 +159,18 @@ implements Serializable
 		this.organisationID = organisationID;
 		this.dunningProcessID = dunningProcessID;
 		this.dunningConfig = dunningConfig;
-		
+
 		this.dunnedInvoices2DunningLevel = new HashMap<Invoice, Integer>();
 	}
-	
+
 	public String getOrganisationID() {
 		return organisationID;
 	}
-	
+
 	public String getDunningProcessID() {
 		return dunningProcessID;
 	}
-	
+
 	public DunningConfig getDunningConfig() {
 		return dunningConfig;
 	}
@@ -173,59 +178,59 @@ implements Serializable
 	public void setCustomer(LegalEntity customer) {
 		this.customer = customer;
 	}
-	
+
 	public LegalEntity getCustomer() {
 		return customer;
 	}
-	
+
 	public void setCurrency(Currency currency) {
 		this.currency = currency;
 	}
-	
+
 	public Currency getCurrency() {
 		return currency;
 	}
-	
+
 	public List<DunningLetter> getDunningLetters() {
 		return Collections.unmodifiableList(dunningLetters);
 	}
-	
+
 	public void setCoolDownEnd(Date coolDownEnd) {
 		this.coolDownEnd = coolDownEnd;
 	}
-	
+
 	public Date getCoolDownEnd() {
 		return coolDownEnd;
 	}
-	
+
 	public void setPaidDT(Date paidDT) {
 		this.paidDT = paidDT;
 	}
-	
+
 	public Date getPaidDT() {
 		return paidDT;
 	}
-	
+
 	public boolean isActive() {
 		return paidDT == null;
 	}
-	
+
 	public void addOverdueInvoice(Invoice invoice, int dunningLevel) {
 		dunnedInvoices2DunningLevel.put(invoice, dunningLevel);
 	}
-	
+
 	public Map<Invoice, Integer> getInvoices2DunningLevel() {
 		return dunnedInvoices2DunningLevel;
 	}
-	
+
 	public DunningLetter getLastDunningLetter() {
 		return dunningLetters.size() == 0 ? null:dunningLetters.get(dunningLetters.size() - 1);
 	}
-	
+
 	public boolean isDunnedInvoice(Invoice invoice) {
 		return dunnedInvoices2DunningLevel.containsKey(invoice);
 	}
-	
+
 	public void createDunningLetter(boolean isFinalized) {
 		DunningLetter prevDunningLetter = getLastDunningLetter();
 		if (isFinalized && prevDunningLetter != null) {
@@ -233,34 +238,34 @@ implements Serializable
 			prevDunningLetter.setFinalized();
 			//TODO 6.3.6 books out the prev letter
 		}
-		
+
 		DunningLetter newDunningLetter = new DunningLetter(this);
 		newDunningLetter.copyAllFeesFrom(prevDunningLetter);
-		
+
 		//Create entries in the new letter
 		for (Invoice dunnedInv : dunnedInvoices2DunningLevel.keySet()) {
 			int dunningLevel = dunnedInvoices2DunningLevel.get(dunnedInv);
 			newDunningLetter.addDunnedInvoice(dunningConfig, prevDunningLetter, dunningLevel, dunnedInv);
 		}
-		
+
 		//Calculate fees for the new letter
 		DunningFeeAdder feeAdder = dunningConfig.getDunningFeeAdder();
 		feeAdder.addDunningFee(prevDunningLetter, newDunningLetter);
-		
+
 		//Add the new letter to the list
 		dunningLetters.add(newDunningLetter);
-		
+
 		DunningLetterNotifier letterNotifier = dunningConfig.getLevel2DunningLetterNotifiers().get(newDunningLetter.getDunningLevel());
 		letterNotifier.triggerNotifier();
 	}
-	
+
 	public static Collection<DunningProcessID> getDunningProcessesByCustomer(PersistenceManager pm, AnchorID customerID) {
 		Query query = pm.newNamedQuery(DunningProcess.class, "getDunningProcessIDsByCustomer");
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("customerID", customerID);
 		return CollectionUtil.castList((List<?>) query.executeWithMap(params));
 	}
-	
+
 	public static DunningProcess getDunningProcessByCustomerAndCurrency(PersistenceManager pm, AnchorID customerID, CurrencyID currencyID) {
 		Query query = pm.newNamedQuery(DunningProcess.class, "getDunningProcessByCustomerAndCurrency");
 		Map<String, Object> params = new HashMap<String, Object>();
@@ -268,7 +273,7 @@ implements Serializable
 		params.put("currencyID", currencyID);
 		return (DunningProcess)query.executeWithMap(params);
 	}
-	
+
 	public static Collection<DunningProcess> getActiveDunningProcessesByDunningConfig(PersistenceManager pm, DunningConfigID dunningConfigID) {
 		Query query = pm.newNamedQuery(DunningProcess.class, "getActiveDunningProcessesByDunningConfig");
 		Map<String, Object> params = new HashMap<String, Object>();

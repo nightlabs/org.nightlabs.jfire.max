@@ -22,13 +22,13 @@ import org.nightlabs.jfire.dunning.id.DunningLetterEntryID;
 import org.nightlabs.jfire.organisation.Organisation;
 
 /**
- * A DunningLetterEntry contains all the information needed to list the corresponding 
- * invoice in the the table of dunned invoices in the DunningLetter. 
- * 
- * <br>Among this information is the new due date, the interests already build up 
- * and the severity of the dunning step which reflects how long the invoice 
+ * A DunningLetterEntry contains all the information needed to list the corresponding
+ * invoice in the the table of dunned invoices in the DunningLetter.
+ *
+ * <br>Among this information is the new due date, the interests already build up
+ * and the severity of the dunning step which reflects how long the invoice
  * is overdue already.
- * 
+ *
  * @author Chairat Kongarayawetchakun - chairat [AT] nightlabs [DOT] de
  */
 @PersistenceCapable(
@@ -37,51 +37,53 @@ import org.nightlabs.jfire.organisation.Organisation;
 		detachable="true",
 		table="JFireDunning_DunningLetterEntry")
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
-public class DunningLetterEntry 
+public class DunningLetterEntry
 implements Serializable
 {
 	private static final long serialVersionUID = 1L;
-	
+
 	@PrimaryKey
 	@Column(length=100)
 	private String organisationID;
 
+	// *** REV_marco_dunning ***
+	// Again, a long ID would be better. You don't need a string here and the performance is much better with a long.
 	@PrimaryKey
 	@Column(length=100)
 	private String dunningLetterEntryID;
-	
+
 	/**
-	 * The severity of the dunning for the corresponding invoice, 
+	 * The severity of the dunning for the corresponding invoice,
 	 * i.e. the InvoiceDunning step in which the process is for the invoice.
 	 */
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private int dunningLevel;
-	
+
 	/**
 	 * The invoice that is overdue and represented by this entry.
 	 */
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Invoice invoice;
-	
+
 	/**
 	 * Copied during creation from corresponding dunningStep.
 	 */
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private long periodOfGraceMSec;
-	
+
 	/**
-	 * The due-date until which this DunningLetter needs to be 
-	 * paid. It is calculated when the DunningLetter is finalized 
+	 * The due-date until which this DunningLetter needs to be
+	 * paid. It is calculated when the DunningLetter is finalized
 	 * (and null till finalization):  this.finalizeDT + this.periodOfGraceMSec.
 	 */
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Date extendedDueDateForPayment;
-	
+
 	/**
-	 * The interests that already arose until the time 
-	 * of the creation of the corresponding DunningLetter. 
-	 * Note: These will include all the Interests that were 
-	 * already contained in the previous DunningLetter, but 
+	 * The interests that already arose until the time
+	 * of the creation of the corresponding DunningLetter.
+	 * Note: These will include all the Interests that were
+	 * already contained in the previous DunningLetter, but
 	 * they may be summarized by the DunningInterestCalculator.
 	 */
 	@Join
@@ -89,76 +91,76 @@ implements Serializable
 		table="JFireDunning_DunningLetterEntry_dunningFees",
 		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private List<DunningInterest> dunningInterests;
-	
+
 	/**
 	 * The total amount to pay for the overdue invoice.
 	 */
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Price priceIncludingInvoice;
-	
+
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private DunningLetter dunningLetter;
-	
+
 	/**
 	 * @deprecated Only for JDO!!!!
 	 */
 	@Deprecated
 	protected DunningLetterEntry() { }
-	
+
 	public DunningLetterEntry(String organisationID, String dunningLetterEntryID, int dunningLevel, Invoice invoice, DunningLetter dunningLetter) {
 		Organisation.assertValidOrganisationID(organisationID);
 		ObjectIDUtil.assertValidIDString(dunningLetterEntryID, "dunningLetterEntryID"); //$NON-NLS-1$
-	
+
 		this.organisationID = organisationID;
 		this.dunningLetterEntryID = dunningLetterEntryID;
 		this.dunningLevel = dunningLevel;
 		this.invoice = invoice;
 		this.dunningLetter = dunningLetter;
-		
-		this.priceIncludingInvoice = invoice.getPrice(); 
+
+		this.priceIncludingInvoice = invoice.getPrice();
 	}
-	
+
 	public String getOrganisationID() {
 		return organisationID;
 	}
-	
+
 	public String getDunningLetterEntryID() {
 		return dunningLetterEntryID;
 	}
-	
+
 	public int getDunningLevel() {
 		return dunningLevel;
 	}
-	
+
 	public Invoice getInvoice() {
 		return invoice;
 	}
-	
+
 	public void setPeriodOfGraceMSec(long periodOfGraceMSec) {
 		this.periodOfGraceMSec = periodOfGraceMSec;
 	}
-	
+
 	public long getPeriodOfGraceMSec() {
 		return periodOfGraceMSec;
 	}
-	
+
 	public Date getExtendedDueDateForPayment() {
 		return extendedDueDateForPayment;
 	}
-	
+
 	public void setExtendedDueDateForPayment(Date extendedDueDateForPayment) {
 		this.extendedDueDateForPayment = extendedDueDateForPayment;
 	}
-	
+
 	public void addDunningInterest(DunningInterest dunningInterest) {
 		this.priceIncludingInvoice.setAmount(priceIncludingInvoice.getAmount() + dunningInterest.getInterestAmount());
 		dunningInterests.add(dunningInterest);
 	}
-	
+
 	public List<DunningInterest> getDunningInterests() {
 		return Collections.unmodifiableList(dunningInterests);
 	}
-	
+
 	public Price getPriceIncludingInvoice() {
 		return priceIncludingInvoice;
 	}
@@ -166,7 +168,7 @@ implements Serializable
 	public DunningLetter getDunningLetter() {
 		return dunningLetter;
 	}
-	
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -204,8 +206,9 @@ implements Serializable
 
 	@Override
 	public String toString() {
-		return "DunningLetterEntry [dunningLetterEntryID="
-				+ dunningLetterEntryID + ", organisationID=" + organisationID
-				+ "]";
+//		return "DunningLetterEntry [dunningLetterEntryID="
+//				+ dunningLetterEntryID + ", organisationID=" + organisationID
+//				+ "]";
+		return super.toString() + '[' + organisationID + ',' + dunningLetterEntryID + ']';
 	}
 }

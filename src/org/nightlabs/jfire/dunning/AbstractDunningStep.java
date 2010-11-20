@@ -29,12 +29,12 @@ import org.nightlabs.jfire.organisation.Organisation;
 )
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 @Discriminator(strategy=DiscriminatorStrategy.CLASS_NAME)
-public abstract class AbstractDunningStep 
+public abstract class AbstractDunningStep
 implements Serializable, Comparable<AbstractDunningStep>
 {
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger = Logger.getLogger(AbstractDunningStep.class);
-	
+
 	@PrimaryKey
 	@Column(length=100)
 	private String organisationID;
@@ -42,26 +42,26 @@ implements Serializable, Comparable<AbstractDunningStep>
 	@PrimaryKey
 	@Column(length=100)
 	private String dunningStepID;
-	
+
 	/**
 	 * The owner-entity, i.e. the one DunningConfig to which this DunningStep belongs.
 	 */
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private DunningConfig dunningConfig;
-	
+
 	/**
-	 * The severity of this dunning step. This is later used to order the dunning 
+	 * The severity of this dunning step. This is later used to order the dunning
 	 * steps of one DunningConfig.
 	 */
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private int dunningLevel;
-	
+
 	/**
 	 * @deprecated This constructor exists only for JDO and should never be used directly!
 	 */
 	@Deprecated
 	protected AbstractDunningStep() { }
-	
+
 	/**
 	 * Create an instance of <code>AbstractDunningStep</code>.
 	 *
@@ -69,29 +69,29 @@ implements Serializable, Comparable<AbstractDunningStep>
 	public AbstractDunningStep(String organisationID, String dunningStepID, DunningConfig dunningConfig, int dunningLevel) {
 		Organisation.assertValidOrganisationID(organisationID);
 		ObjectIDUtil.assertValidIDString(dunningStepID, "dunningStepID"); //$NON-NLS-1$
-		
+
 		this.organisationID = organisationID;
 		this.dunningStepID = dunningStepID;
 		this.dunningConfig = dunningConfig;
 		this.dunningLevel = dunningLevel;
 	}
-	
+
 	public String getOrganisationID() {
 		return organisationID;
 	}
-	
+
 	public String getDunningStepID() {
 		return dunningStepID;
 	}
-	
+
 	public DunningConfig getDunningConfig() {
 		return dunningConfig;
 	}
-	
+
 	public void setDunningLevel(int dunningLevel) {
 		this.dunningLevel = dunningLevel;
 	}
-	
+
 	public int getDunningLevel() {
 		return dunningLevel;
 	}
@@ -131,11 +131,28 @@ implements Serializable, Comparable<AbstractDunningStep>
 
 	@Override
 	public String toString() {
-		return "AbstractDunningStep [dunningStepID=" + dunningStepID
-				+ ", organisationID=" + organisationID + "]";
+		// *** REV_marco_dunning ***
+		// In most other classes, we use the notation ${fullyQualifiedClassName}@${memoryAddress}[${primaryKey}]
+		// for example org.nightlabs.jfire.dunning.AbstractDunningStep@20d9a[jfire.nightlabs.de,234]
+		// IMHO there's no reason to handle it differently here. It is desirable to see both, the memory address
+		// and the primary key in the database, because there are situations during debugging, when you want to
+		// see if it is the exact same instance - only the memory address can answer this question.
+		// The easiest way to achieve this is by the code I wrote below.
+		// Alternatively, you can write this:
+		//   return this.getClass().getName() + '@' + Long.toHexString(System.identityHashCode(this)) + '[' + organisationID + ',' + dunningStepID + ']';
+		// but that's much longer.
+//		return "AbstractDunningStep [dunningStepID=" + dunningStepID
+//				+ ", organisationID=" + organisationID + "]";#
+		return super.toString() + '[' + organisationID + ',' + dunningStepID + ']';
 	}
-	
+
 	@Override
+	// *** REV_marco_dunning ***
+	// Why do you add javadoc to an overriding method?! Don't you know that javadoc
+	// is automatically inherited from the superclass/interface, if you don't have
+	// javadoc in the sub-class/implementation? If you want to combine the super-class'
+	// documentation with some additional docs, then use {@inheritDoc} and put your
+	// specific stuff for the sub-class either above or below.
 	/**
 	 * @see java.lang.Comparable#compareTo(java.lang.Object)
 	 */
@@ -144,7 +161,7 @@ implements Serializable, Comparable<AbstractDunningStep>
 				return 1;
 		else if (o.getDunningLevel() > this.getDunningLevel())
 				return -1;
-		else 
+		else
 			return 0;
 	}
 }

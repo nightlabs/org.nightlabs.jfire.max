@@ -44,7 +44,7 @@ import org.nightlabs.util.CollectionUtil;
  * A DunningLetter represents the letter send to a customer which may contain
  * several overdue invoices and its potentially increased costs (including the
  * interests for each invoice and dunning level dependent fees).
- * 
+ *
  * @author Chairat Kongarayawetchakun - chairat [AT] nightlabs [DOT] de
  */
 @PersistenceCapable(objectIdClass = DunningLetterID.class, identityType = IdentityType.APPLICATION, detachable = "true", table = "JFireDunning_DunningLetter")
@@ -153,7 +153,7 @@ public class DunningLetter implements Serializable, PayableObject, Statable {
 	 * payment (of the amountToPay). This flag should be cleared immediately
 	 * when all invoices are paid completely including the DunningLetter's fees
 	 * and interest.
-	 * 
+	 *
 	 * We thus need to register an InvoiceActionHandler for every invoice that
 	 * is part of a dunning process. If the invoice is paid without the dunning
 	 * fees+interests, the dunning process is not complete and should be
@@ -196,7 +196,7 @@ public class DunningLetter implements Serializable, PayableObject, Statable {
 		}
 		return entries;
 	}
-	
+
 	public String getOrganisationID() {
 		return organisationID;
 	}
@@ -213,16 +213,19 @@ public class DunningLetter implements Serializable, PayableObject, Statable {
 		return letterDunningLevel;
 	}
 
+	// *** REV_marco_dunning ***
+	// The javadoc doesn't make sense here. What does haveChangedItem mean?
+	// Explain it - but not here; the getter is better suited for documentation (because it's public).
 	/**
 	 * price.amount - amountPaid
 	 */
 	private transient boolean haveChangedItem = false;
-	
+
 	/**
 	 * Adds the overdue invoice into the new letter. When adding the invoice, it
 	 * calculates the interest of each invoices too.
-	 * It also checks if the invoice is already dunned or not. If it's already dunned, 
-	 * it calculates the new 
+	 * It also checks if the invoice is already dunned or not. If it's already dunned,
+	 * it calculates the new
 	 * @param dunningConfig
 	 * @param prevDunningLetter
 	 * @param invoiceDunningLevel
@@ -237,7 +240,7 @@ public class DunningLetter implements Serializable, PayableObject, Statable {
 		InvoiceDunningStep invDunningStep = dunningConfig.getInvoiceDunningStep(invoiceDunningLevel);
 
 		List<DunningLetterEntry> prevEntries = prevDunningLetter.getDunnedInvoices();
-		//Check if the dunningInv needs to be dunned again (it's late for payment on the extended due date). 
+		//Check if the dunningInv needs to be dunned again (it's late for payment on the extended due date).
 		//If so, we need to change the dunningLevel.
 		boolean isOverdue = false;
 		Date newDueDate = null;
@@ -252,8 +255,13 @@ public class DunningLetter implements Serializable, PayableObject, Statable {
 				}
 			}
 		}
-		
+
 		//Calculate interests
+		// *** REV_marco_dunning ***
+		// Wouldn't it be better to calculate this once and not every time you add a new invoice?
+		// And maybe you should put this logic into a separate class - maybe into the one which
+		// contains the "outer" logic to create a new DunningLetter. IMHO, it's architecturally
+		// cleaner to have only simple methods here in the persistence-capable DATA MODEL class.
 		DunningInterestCalculator dunningInterestCalculator = dunningConfig
 				.getDunningInterestCalculator();
 		dunningInterestCalculator.generateDunningInterest(invDunningStep,
@@ -270,10 +278,15 @@ public class DunningLetter implements Serializable, PayableObject, Statable {
 		dunnedInvoices.add(letterEntry);
 	}
 
+	// *** REV_marco_dunning ***
+	// Please use bean conventions for getters and setters. If the resulting method name sounds awkward you
+	// don't like it, then please choose another property name.
 	public boolean haveChangedItem() {
 		return haveChangedItem;
 	}
-	
+
+	// *** REV_marco_dunning ***
+	// Why is this called dunned-invoices, if you keep dunning-letter-entries?! Shouldn't it better be getDunningLetterEntries() or simply getEntries()?
 	public List<DunningLetterEntry> getDunnedInvoices() {
 		return Collections.unmodifiableList(dunnedInvoices);
 	}
@@ -370,12 +383,12 @@ public class DunningLetter implements Serializable, PayableObject, Statable {
 		if (dunningLetter == null) {
 			throw new IllegalArgumentException("The dunning letter should not be null!!!");
 		}
-		
+
 		for (DunningFee dunningFee : dunningLetter.getDunningFees()) {
 			addDunningFee(dunningFee);
 		}
 	}
-	
+
 	private static Collection<DunningLetter> getOpenDunningLetters(
 			PersistenceManager pm) {
 		Query query = pm.newNamedQuery(DunningLetter.class,

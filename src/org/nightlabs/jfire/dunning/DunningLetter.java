@@ -41,15 +41,15 @@ import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.util.CollectionUtil;
 
 /**
- * A DunningLetter represents the letter send to a customer which may contain
+ * A DunningLetter represents the letter sent to a customer which may contain
  * several overdue invoices and its potentially increased costs (including the
- * interests for each invoice and dunning level dependent fees).
+ * interests for each invoice and dunning-level-dependent fees).
  *
  * @author Chairat Kongarayawetchakun - chairat [AT] nightlabs [DOT] de
  */
 @PersistenceCapable(objectIdClass = DunningLetterID.class, identityType = IdentityType.APPLICATION, detachable = "true", table = "JFireDunning_DunningLetter")
 @Inheritance(strategy = InheritanceStrategy.NEW_TABLE)
-@Queries( { @javax.jdo.annotations.Query(name = "getOpenDunningLetters", value = "SELECT this "
+@Queries({ @javax.jdo.annotations.Query(name = "getOpenDunningLetters", value = "SELECT this "
 		+ "WHERE finalizeDT == null"), })
 public class DunningLetter implements Serializable, PayableObject, Statable {
 	private static final long serialVersionUID = 1L;
@@ -76,6 +76,13 @@ public class DunningLetter implements Serializable, PayableObject, Statable {
 	@Persistent(persistenceModifier = PersistenceModifier.PERSISTENT)
 	private Integer letterDunningLevel;
 
+	// *** REV_marco_dunning ***
+	// This should NOT use @Join! Use mapped-by! It's a 1-n-relationship; not m-n.
+	// Every DunningLetterEntry belongs only to exactly one DunningLetter and is not
+	// modified when a new one is created! Instead new entries will be created for the new letter
+	// (i.e. the old entries will be copied and modified).
+	// Btw. take a look at the class DunningLetterEntry. There is the field 'dunningLetter'. What should
+	// that mean, if one entry could belong to many DunningLetters?!
 	/**
 	 * The information of each overdue invoice needed to print the letter. This
 	 * includes the dunning level, the original invoice, the interest for that
@@ -85,6 +92,13 @@ public class DunningLetter implements Serializable, PayableObject, Statable {
 	@Persistent(table = "JFireDunning_DunningLetter_dunnedInvoices", persistenceModifier = PersistenceModifier.PERSISTENT)
 	private List<DunningLetterEntry> dunnedInvoices;
 
+	// *** REV_marco_dunning ***
+	// This should NOT use @Join either! Every DunningLetterFee belongs only to exactly one DunningLetter and is not
+	// modified when a new one is created! Instead new fees will be created for the new letter
+	// (i.e. the old fees will be copied and modified). That's why there is the field DunningFee.original! Nong Yo, read
+	// the javadoc of DunningFee.original, please! Though you wrote that javadoc, you seem not to have understood it.
+	// Thus please meditate a bit about the datastructure and its behaviour (e.g. the life cycles of various objects and
+	// their relationships).
 	/**
 	 * Contains all old fees (from the previous DunningLetter) as well as all
 	 * new ones (based on dunningStep.feeTypes).
@@ -133,6 +147,14 @@ public class DunningLetter implements Serializable, PayableObject, Statable {
 	 * and interests. It always comprises the complete amount of all invoices
 	 * summarized!
 	 */
+	// *** REV_marco_dunning ***
+	// It is not necessary to annotate this. First of all, you can omit
+	// 'persistenceModifier = PersistenceModifier.PERSISTENT', because most data types are persistent by default.
+	// Thus only @Persistent() [no content] remains. And since nearly every field of a persistence-capable class
+	// is persistent by default, you can omit the whole annotation. I'm not sure, which data types are not persisted, but
+	// I think they are definitely rare (you'll find out, anyway, when you try it out the first time).
+	// We only had these annotations everywhere in old code, because of a bug in a very old JPOX version. This is
+	// fixed already a long time ago. Thus, these unnecessary annotation
 	@Persistent(persistenceModifier = PersistenceModifier.PERSISTENT)
 	private Price priceIncludingInvoices;
 
@@ -148,6 +170,9 @@ public class DunningLetter implements Serializable, PayableObject, Statable {
 	 */
 	private transient long amountToPay;
 
+	// *** REV_marco_dunning ***
+	// Shouldn't the outstanding flag be cleared, too, when a new DunningLetter
+	// (replacing the old one) is created?
 	/**
 	 * A flag indicating that this DunningLetter is still open and waits for
 	 * payment (of the amountToPay). This flag should be cleared immediately

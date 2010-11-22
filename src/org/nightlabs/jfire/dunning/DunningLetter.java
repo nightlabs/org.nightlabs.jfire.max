@@ -25,7 +25,6 @@ import javax.jdo.annotations.Queries;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.jdo.ObjectIDUtil;
-import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.accounting.Price;
 import org.nightlabs.jfire.accounting.id.InvoiceID;
@@ -38,6 +37,7 @@ import org.nightlabs.jfire.jbpm.graph.def.StatableLocal;
 import org.nightlabs.jfire.jbpm.graph.def.State;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.trade.LegalEntity;
+import org.nightlabs.jfire.trade.OrganisationLegalEntity;
 import org.nightlabs.util.CollectionUtil;
 
 /**
@@ -51,7 +51,9 @@ import org.nightlabs.util.CollectionUtil;
 @Inheritance(strategy = InheritanceStrategy.NEW_TABLE)
 @Queries({ @javax.jdo.annotations.Query(name = "getOpenDunningLetters", value = "SELECT this "
 		+ "WHERE finalizeDT == null"), })
-public class DunningLetter implements Serializable, PayableObject, Statable {
+public class DunningLetter 
+implements Serializable, PayableObject, Statable 
+{
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger = Logger.getLogger(DunningLetter.class);
 
@@ -76,21 +78,16 @@ public class DunningLetter implements Serializable, PayableObject, Statable {
 	@Persistent(persistenceModifier = PersistenceModifier.PERSISTENT)
 	private Integer letterDunningLevel;
 
-	// *** REV_marco_dunning ***
-	// This should NOT use @Join! Use mapped-by! It's a 1-n-relationship; not m-n.
-	// Every DunningLetterEntry belongs only to exactly one DunningLetter and is not
-	// modified when a new one is created! Instead new entries will be created for the new letter
-	// (i.e. the old entries will be copied and modified).
-	// Btw. take a look at the class DunningLetterEntry. There is the field 'dunningLetter'. What should
-	// that mean, if one entry could belong to many DunningLetters?!
 	/**
 	 * The information of each overdue invoice needed to print the letter. This
 	 * includes the dunning level, the original invoice, the interest for that
 	 * invoice, the extended due date, etc.
 	 */
-	@Join
-	@Persistent(table = "JFireDunning_DunningLetter_dunnedInvoices", persistenceModifier = PersistenceModifier.PERSISTENT)
-	private List<DunningLetterEntry> dunnedInvoices;
+	@Persistent(
+			mappedBy="dunningLetter", 
+			table = "JFireDunning_DunningLetter_dunningLetterEntries", 
+			persistenceModifier = PersistenceModifier.PERSISTENT)
+	private List<DunningLetterEntry> dunningLetterEntries;
 
 	// *** REV_marco_dunning ***
 	// This should NOT use @Join either! Every DunningLetterFee belongs only to exactly one DunningLetter and is not
@@ -103,8 +100,10 @@ public class DunningLetter implements Serializable, PayableObject, Statable {
 	 * Contains all old fees (from the previous DunningLetter) as well as all
 	 * new ones (based on dunningStep.feeTypes).
 	 */
-	@Join
-	@Persistent(table = "JFireDunning_DunningLetter_dunningFees", persistenceModifier = PersistenceModifier.PERSISTENT)
+	@Persistent(
+			mappedBy="dunningLetter", 
+			table = "JFireDunning_DunningLetter_dunningFees", 
+			persistenceModifier = PersistenceModifier.PERSISTENT)
 	private List<DunningFee> dunningFees;
 
 	/**
@@ -133,28 +132,11 @@ public class DunningLetter implements Serializable, PayableObject, Statable {
 		this.dunningLetterLocal = dunningLetterLocal;
 	}
 
-	private void calculatePriceExcludingInvoices() {
-		Currency currency = dunningProcess.getCurrency();
-		for (DunningLetterEntry entry : dunnedInvoices) {
-			for (DunningInterest interest : entry.getDunningInterests()) {
-
-			}
-		}
-	}
-
 	/**
 	 * The total amount of this DunningLetter comprising the invoice, all fees
 	 * and interests. It always comprises the complete amount of all invoices
 	 * summarized!
 	 */
-	// *** REV_marco_dunning ***
-	// It is not necessary to annotate this. First of all, you can omit
-	// 'persistenceModifier = PersistenceModifier.PERSISTENT', because most data types are persistent by default.
-	// Thus only @Persistent() [no content] remains. And since nearly every field of a persistence-capable class
-	// is persistent by default, you can omit the whole annotation. I'm not sure, which data types are not persisted, but
-	// I think they are definitely rare (you'll find out, anyway, when you try it out the first time).
-	// We only had these annotations everywhere in old code, because of a bug in a very old JPOX version. This is
-	// fixed already a long time ago. Thus, these unnecessary annotation
 	@Persistent(persistenceModifier = PersistenceModifier.PERSISTENT)
 	private Price priceIncludingInvoices;
 
@@ -169,6 +151,7 @@ public class DunningLetter implements Serializable, PayableObject, Statable {
 	 * price.amount - amountPaid
 	 */
 	private transient long amountToPay;
+
 
 	// *** REV_marco_dunning ***
 	// Shouldn't the outstanding flag be cleared, too, when a new DunningLetter
@@ -203,8 +186,11 @@ public class DunningLetter implements Serializable, PayableObject, Statable {
 		this.dunningLetterID = dunningLetterID;
 		this.dunningProcess = dunningProcess;
 
-		this.dunnedInvoices = new ArrayList<DunningLetterEntry>();
+		this.dunningLetterEntries = new ArrayList<DunningLetterEntry>();
 		this.dunningFees = new ArrayList<DunningFee>();
+		
+		this.dunningLetterLocal = new DunningLetterLocal(this);
+		this.priceIncludingInvoices = new Price(IDGenerator.getOrganisationID(), IDGenerator.nextID(Price.class), dunningProcess.getCurrency());
 	}
 
 	public DunningLetter(DunningProcess dunningProcess) {
@@ -214,7 +200,7 @@ public class DunningLetter implements Serializable, PayableObject, Statable {
 
 	public Collection<DunningLetterEntry> getDunningLetterEntries(int level) {
 		Collection<DunningLetterEntry> entries = new HashSet<DunningLetterEntry>();
-		for (DunningLetterEntry entry : dunnedInvoices) {
+		for (DunningLetterEntry entry : dunningLetterEntries) {
 			if (entry.getDunningLevel() == level) {
 				entries.add(entry);
 			}
@@ -241,9 +227,6 @@ public class DunningLetter implements Serializable, PayableObject, Statable {
 	// *** REV_marco_dunning ***
 	// The javadoc doesn't make sense here. What does haveChangedItem mean?
 	// Explain it - but not here; the getter is better suited for documentation (because it's public).
-	/**
-	 * price.amount - amountPaid
-	 */
 	private transient boolean haveChangedItem = false;
 
 	/**
@@ -264,7 +247,7 @@ public class DunningLetter implements Serializable, PayableObject, Statable {
 
 		InvoiceDunningStep invDunningStep = dunningConfig.getInvoiceDunningStep(invoiceDunningLevel);
 
-		List<DunningLetterEntry> prevEntries = prevDunningLetter.getDunnedInvoices();
+		List<DunningLetterEntry> prevEntries = prevDunningLetter.getEntries();
 		//Check if the dunningInv needs to be dunned again (it's late for payment on the extended due date).
 		//If so, we need to change the dunningLevel.
 		boolean isOverdue = false;
@@ -294,13 +277,18 @@ public class DunningLetter implements Serializable, PayableObject, Statable {
 
 		//Create the entry
 		DunningLetterEntry letterEntry = new DunningLetterEntry(organisationID,
-				IDGenerator.nextIDString(DunningLetterEntry.class), invoiceDunningLevel,
+				IDGenerator.nextID(DunningLetterEntry.class), invoiceDunningLevel,
 				dunningInvoice, this);
 		letterEntry.setPeriodOfGraceMSec(invDunningStep.getPeriodOfGraceMSec());
 		if (isOverdue) {
 			letterEntry.setExtendedDueDateForPayment(newDueDate);
 		}
-		dunnedInvoices.add(letterEntry);
+		dunningLetterEntries.add(letterEntry);
+		
+		priceIncludingInvoices.sumPrice(letterEntry.getPriceIncludingInvoice());
+		for (DunningFee dunningFee : dunningFees) {
+			priceIncludingInvoices.sumPrice(dunningFee.getPrice());
+		}
 	}
 
 	// *** REV_marco_dunning ***
@@ -310,10 +298,8 @@ public class DunningLetter implements Serializable, PayableObject, Statable {
 		return haveChangedItem;
 	}
 
-	// *** REV_marco_dunning ***
-	// Why is this called dunned-invoices, if you keep dunning-letter-entries?! Shouldn't it better be getDunningLetterEntries() or simply getEntries()?
-	public List<DunningLetterEntry> getDunnedInvoices() {
-		return Collections.unmodifiableList(dunnedInvoices);
+	public List<DunningLetterEntry> getEntries() {
+		return Collections.unmodifiableList(dunningLetterEntries);
 	}
 
 	public void addDunningFee(DunningFee dunningFee) {
@@ -401,7 +387,8 @@ public class DunningLetter implements Serializable, PayableObject, Statable {
 		if (rollback)
 			amount *= -1;
 
-		amountPaidExcludingInvoices = amount;
+		amountToPay = amountToPay - amount;
+		outstanding = amountToPay != 0;
 	}
 
 	public void copyAllFeesFrom(DunningLetter dunningLetter) {
@@ -426,7 +413,7 @@ public class DunningLetter implements Serializable, PayableObject, Statable {
 		Collection<DunningLetter> openDunningLetters = getOpenDunningLetters(pm);
 		for (DunningLetter openDunningLetter : openDunningLetters) {
 			for (DunningLetterEntry entry : openDunningLetter
-					.getDunnedInvoices()) {
+					.getEntries()) {
 				if (JDOHelper.getObjectId(entry.getInvoice()).equals(invoiceID)) {
 					return openDunningLetter;
 				}
@@ -476,14 +463,26 @@ public class DunningLetter implements Serializable, PayableObject, Statable {
 
 	@Override
 	public LegalEntity getCustomer() {
-		return null;
+		return dunningProcess.getCustomer();
 	}
 
 	@Override
 	public LegalEntity getVendor() {
-		return null;
+		PersistenceManager pm = getPersistenceManager();
+		return OrganisationLegalEntity.getOrganisationLegalEntity(pm,
+				organisationID);
 	}
 
+	protected PersistenceManager getPersistenceManager()
+	{
+		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
+		if (pm == null)
+			throw new IllegalStateException(
+			"This instance of DunningLetter is currently not attached to a datastore! Cannot get a PersistenceManager!");
+
+		return pm;
+	}
+	
 	@Persistent(persistenceModifier = PersistenceModifier.PERSISTENT)
 	private State state;
 
@@ -493,7 +492,11 @@ public class DunningLetter implements Serializable, PayableObject, Statable {
 
 	@Override
 	public StatableLocal getStatableLocal() {
-		return null;
+		return dunningLetterLocal;
+	}
+	
+	public DunningLetterLocal getDunningLetterLocal() {
+		return dunningLetterLocal;
 	}
 
 	@Override

@@ -15,7 +15,6 @@ import javax.jdo.annotations.PersistenceModifier;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 
-import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.accounting.Price;
 import org.nightlabs.jfire.dunning.id.DunningLetterEntryID;
@@ -46,11 +45,8 @@ implements Serializable
 	@Column(length=100)
 	private String organisationID;
 
-	// *** REV_marco_dunning ***
-	// Again, a long ID would be better. You don't need a string here and the performance is much better with a long.
 	@PrimaryKey
-	@Column(length=100)
-	private String dunningLetterEntryID;
+	private long dunningLetterEntryID;
 
 	/**
 	 * The severity of the dunning for the corresponding invoice,
@@ -107,9 +103,8 @@ implements Serializable
 	@Deprecated
 	protected DunningLetterEntry() { }
 
-	public DunningLetterEntry(String organisationID, String dunningLetterEntryID, int dunningLevel, Invoice invoice, DunningLetter dunningLetter) {
+	public DunningLetterEntry(String organisationID, long dunningLetterEntryID, int dunningLevel, Invoice invoice, DunningLetter dunningLetter) {
 		Organisation.assertValidOrganisationID(organisationID);
-		ObjectIDUtil.assertValidIDString(dunningLetterEntryID, "dunningLetterEntryID"); //$NON-NLS-1$
 
 		this.organisationID = organisationID;
 		this.dunningLetterEntryID = dunningLetterEntryID;
@@ -124,7 +119,7 @@ implements Serializable
 		return organisationID;
 	}
 
-	public String getDunningLetterEntryID() {
+	public long getDunningLetterEntryID() {
 		return dunningLetterEntryID;
 	}
 
@@ -173,10 +168,8 @@ implements Serializable
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime
-				* result
-				+ ((dunningLetterEntryID == null) ? 0 : dunningLetterEntryID
-						.hashCode());
+		result = prime * result
+				+ (int) (dunningLetterEntryID ^ (dunningLetterEntryID >>> 32));
 		result = prime * result
 				+ ((organisationID == null) ? 0 : organisationID.hashCode());
 		return result;
@@ -191,10 +184,7 @@ implements Serializable
 		if (getClass() != obj.getClass())
 			return false;
 		DunningLetterEntry other = (DunningLetterEntry) obj;
-		if (dunningLetterEntryID == null) {
-			if (other.dunningLetterEntryID != null)
-				return false;
-		} else if (!dunningLetterEntryID.equals(other.dunningLetterEntryID))
+		if (dunningLetterEntryID != other.dunningLetterEntryID)
 			return false;
 		if (organisationID == null) {
 			if (other.organisationID != null)
@@ -206,9 +196,8 @@ implements Serializable
 
 	@Override
 	public String toString() {
-//		return "DunningLetterEntry [dunningLetterEntryID="
-//				+ dunningLetterEntryID + ", organisationID=" + organisationID
-//				+ "]";
-		return super.toString() + '[' + organisationID + ',' + dunningLetterEntryID + ']';
+		return "DunningLetterEntry [dunningLetterEntryID="
+				+ dunningLetterEntryID + ", organisationID=" + organisationID
+				+ "]";
 	}
 }

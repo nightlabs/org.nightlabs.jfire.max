@@ -69,13 +69,10 @@ implements Serializable
 	 * divide the percentage accordingly (i.e. is a delay of
 	 * payment of 1 day calculated as dueAmount * percentage / 360
 	 * or dueAmount * percentage / 365 or is the real calendar used)?
+	 * @param year TODO
 	 * @return
 	 */
-	// *** REV_marco_dunning ***
-	// Why is this never used? And please give it a better name. getDays() doesn't say anything - maybe better getDaysOfYear() and then you might want to provide a year - i.e. getDaysOfYear(int year) or getDaysOfYear(Date timestampWithinYear).
-	// And why is this method public? Think about what's the contract of a DunningInterestCalculator to the external world: Isn't
-	// it only your generateDunningInterest(...) method? Why expose other things publicly? IMHO all non-external-API methods should be protected.
-	public abstract int getDays();
+	protected abstract int getDaysOfYear(int year);
 
 	/**
 	 * What's the first day in the interest calculation? Is it the
@@ -124,15 +121,15 @@ implements Serializable
 	 */
 	public void generateDunningInterest(InvoiceDunningStep invoiceDunningStep, DunningLetter prevLetter, DunningLetter newLetter) {
 		if (prevLetter == null) { // New letter
-			for (DunningLetterEntry entry : newLetter.getDunnedInvoices()) {
-				DunningInterest interest = new DunningInterest(organisationID, IDGenerator.nextIDString(DunningInterest.class), entry, null);
+			for (DunningLetterEntry entry : newLetter.getEntries()) {
+				DunningInterest interest = new DunningInterest(organisationID, IDGenerator.nextID(DunningInterest.class), entry, null);
 				calculate(invoiceDunningStep, interest);
 				entry.addDunningInterest(interest);
 			}
 		}
 		else {
-			List<DunningLetterEntry> newLetterEntries = newLetter.getDunnedInvoices();
-			List<DunningLetterEntry> prevLetterEntries = prevLetter.getDunnedInvoices();
+			List<DunningLetterEntry> newLetterEntries = newLetter.getEntries();
+			List<DunningLetterEntry> prevLetterEntries = prevLetter.getEntries();
 			BigDecimal interestPercentage = invoiceDunningStep.getInterestPercentage();
 
 			for (DunningLetterEntry newLetterEntry : newLetterEntries) {
@@ -154,7 +151,7 @@ implements Serializable
 						calculate(invoiceDunningStep, prevInterest);
 					}
 					else { //create new interest
-						DunningInterest interest = new DunningInterest(organisationID, IDGenerator.nextIDString(DunningInterest.class), newLetterEntry, prevInterest);
+						DunningInterest interest = new DunningInterest(organisationID, IDGenerator.nextID(DunningInterest.class), newLetterEntry, prevInterest);
 						interest.setInterestPercentage(interestPercentage);
 						interest.setCreditPeriodFromIncl(firstDay);
 						interest.setCreditPeriodToExcl(lastDay);
@@ -164,7 +161,7 @@ implements Serializable
 					}
 				}
 				else { //create completely new one
-					DunningInterest interest = new DunningInterest(organisationID, IDGenerator.nextIDString(DunningInterest.class), newLetterEntry, null);
+					DunningInterest interest = new DunningInterest(organisationID, IDGenerator.nextID(DunningInterest.class), newLetterEntry, null);
 					interest.setInterestPercentage(interestPercentage);
 					interest.setCreditPeriodFromIncl(firstDay);
 					interest.setCreditPeriodToExcl(lastDay);

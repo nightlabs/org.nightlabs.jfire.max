@@ -1,10 +1,7 @@
 package org.nightlabs.jfire.dunning.book;
 
-import java.util.Collection;
 import java.util.Set;
 
-import javax.jdo.PersistenceManager;
-import javax.jdo.Query;
 import javax.jdo.annotations.PersistenceModifier;
 import javax.jdo.annotations.Persistent;
 

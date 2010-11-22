@@ -60,14 +60,14 @@ extends DunningFeeAdder
 		// add the fees ONCE for this dunning-level. But your code adds the fees multiple times
 		// if there are multiple invoices with modified dunning-level.
 		if (newDunningLetter.haveChangedItem()) {
-			for (DunningLetterEntry prevEntry : prevDunningLetter.getDunnedInvoices()) {
+			for (DunningLetterEntry prevEntry : prevDunningLetter.getEntries()) {
 
 				// *** REV_marco_dunning ***
 				// Can this ever return an index >= 0? Is a prevEntry ever to be found in the NEW dunning letter?
 				// IMHO every entry should be copied from one dunning letter to the other, thus there should never be one entry in both (prev + new) letters!
-				int index = newDunningLetter.getDunnedInvoices().indexOf(prevEntry);
+				int index = newDunningLetter.getEntries().indexOf(prevEntry);
 				if (index > 0) { // TODO what about 0??? Isn't that a valid index?!
-					DunningLetterEntry entry = newDunningLetter.getDunnedInvoices().get(index);
+					DunningLetterEntry entry = newDunningLetter.getEntries().get(index);
 					if (entry.getDunningLevel() > prevEntry.getDunningLevel()) {
 						ProcessDunningStep processDunningStep = dunningConfig.getProcessDunningStep(entry.getDunningLevel());
 						for (DunningFeeType dunningFeeType : processDunningStep.getFeeTypes()) {

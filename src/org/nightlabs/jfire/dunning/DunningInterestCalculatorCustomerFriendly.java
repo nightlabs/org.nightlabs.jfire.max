@@ -56,11 +56,10 @@ extends DunningInterestCalculator
 	 * calendar number of days (which is at least 365) is used.
 	 */
 	@Override
-	public int getDays() {
-		// *** REV_marco_dunning ***
-		// This returns the number of days of the CURRENT year. But what if you have to calculate the
-		// interest for another year - e.g. the PREVIOUS year (that's very likely for a DunningLetter created in January!).
-		return Calendar.getInstance().getActualMaximum(Calendar.DAY_OF_YEAR);
+	public int getDaysOfYear(int year) {
+		Calendar calendar = Calendar.getInstance();
+		calendar.set(Calendar.YEAR, year);
+		return calendar.getActualMaximum(Calendar.DAY_OF_YEAR);
 	}
 
 	/**

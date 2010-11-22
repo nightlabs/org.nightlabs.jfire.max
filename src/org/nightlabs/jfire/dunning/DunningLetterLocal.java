@@ -106,8 +106,6 @@ implements Serializable, StatableLocal
 		this.dunningLetterID = dunningLetter.getDunningLetterID();
 		
 		this.dunningLetter = dunningLetter;
-
-		dunningLetter.setDunningLetterLocal(this);
 	}
 
 	public String getOrganisationID()

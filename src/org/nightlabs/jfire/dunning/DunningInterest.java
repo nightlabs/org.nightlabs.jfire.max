@@ -35,12 +35,8 @@ implements Serializable
 	@Column(length=100)
 	private String organisationID;
 
-	// *** REV_marco_dunning ***
-	// Why do you use a String field here? IMHO you never have any system-internal instances of DunningInterest, thus a long field would
-	// be more appropriate.
 	@PrimaryKey
-	@Column(length=100)
-	private String dunningInterestID;
+	private long dunningInterestID;
 
 	/**
 	 * Back-reference to the owner-entity.
@@ -127,7 +123,7 @@ implements Serializable
 	protected DunningInterest() { }
 
 
-	public DunningInterest(String organisationID, String dunningInterestID,
+	public DunningInterest(String organisationID, long dunningInterestID,
 			DunningLetterEntry dunningLetterEntry, DunningInterest backReference) {
 		Organisation.assertValidOrganisationID(organisationID);
 		this.organisationID = organisationID;
@@ -144,7 +140,7 @@ implements Serializable
 		return organisationID;
 	}
 
-	public String getDunningInterestID() {
+	public long getDunningInterestID() {
 		return dunningInterestID;
 	}
 
@@ -216,14 +212,13 @@ implements Serializable
 		return paidDT;
 	}
 
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime
-				* result
-				+ ((dunningInterestID == null) ? 0 : dunningInterestID
-						.hashCode());
+		result = prime * result
+				+ (int) (dunningInterestID ^ (dunningInterestID >>> 32));
 		result = prime * result
 				+ ((organisationID == null) ? 0 : organisationID.hashCode());
 		return result;
@@ -239,10 +234,7 @@ implements Serializable
 		if (getClass() != obj.getClass())
 			return false;
 		DunningInterest other = (DunningInterest) obj;
-		if (dunningInterestID == null) {
-			if (other.dunningInterestID != null)
-				return false;
-		} else if (!dunningInterestID.equals(other.dunningInterestID))
+		if (dunningInterestID != other.dunningInterestID)
 			return false;
 		if (organisationID == null) {
 			if (other.organisationID != null)
@@ -251,7 +243,6 @@ implements Serializable
 			return false;
 		return true;
 	}
-
 
 	@Override
 	public String toString() {

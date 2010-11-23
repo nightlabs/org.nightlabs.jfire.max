@@ -691,7 +691,10 @@ implements Serializable, StoreCallback
 		this.pending = false;
 		this.endDT = new Date();
 	}
+	
 	/**
+	 * when new Payment is created and the payment process begins BeginDT is sets to the current Timestamp.
+	 * 
 	 * @return Returns the beginDT.
 	 */
 	public Date getBeginDT()
@@ -699,14 +702,30 @@ implements Serializable, StoreCallback
 		return beginDT;
 	}
 
-
 	/**
-	 * @return Returns the payment date
+	 * the end Payment Date is sets to the current TimeStamp when a Payment has finished processing (when pending is sets to False).
+	 * @return Returns the endDT.
+	 */
+	public Date getEndDT()
+	{
+		return endDT;
+	}
+	
+	
+	/**
+	 * @return Returns the user defined payment date
 	 */
 	public Date getPaymentDT() {
 		return paymentDT;
 	}
 
+	/**
+	 * Sets the Payment date of a <tt>Payment</tt> this date is defind by the User, 
+	 * usually in the UI in the payment wizard dialog, so this is a User defined actuall payment date.
+	 *
+	 * @param paymentDT The User defined Payment Date.
+	 */
+	
 	public void setPaymentDT(Date paymentDT) {
 		this.paymentDT = paymentDT;
 	}
@@ -891,13 +910,6 @@ implements Serializable, StoreCallback
 	public boolean isPostponed()
 	{
 		return postponed;
-	}
-	/**
-	 * @return Returns the endDT.
-	 */
-	public Date getEndDT()
-	{
-		return endDT;
 	}
 
 	/**

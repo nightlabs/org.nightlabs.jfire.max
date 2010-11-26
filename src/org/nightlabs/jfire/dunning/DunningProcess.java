@@ -28,6 +28,7 @@ import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.accounting.id.CurrencyID;
 import org.nightlabs.jfire.dunning.id.DunningConfigID;
 import org.nightlabs.jfire.dunning.id.DunningProcessID;
+import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.transfer.id.AnchorID;
@@ -113,12 +114,12 @@ implements Serializable
 	// in the last DunningLetter's entries? Isn't this the same as the dunning level in the last DunningLetterEntry?
 	// You run the risk of inconsistencies if you keep both - I would omit this, if there are no important
 	// reasons to keep it.
-	/**
-	 * The invoices for which this dunning process is happening and their corresponding dunning levels.
-	 */
-	@Join
-	@Persistent(table="JFireDunning_DunningProcess_dunnedInvoices2DunningLevel")
-	private Map<Invoice, Integer> dunnedInvoices2DunningLevel;
+//	/**
+//	 * The invoices for which this dunning process is happening and their corresponding dunning levels.
+//	 */
+//	@Join
+//	@Persistent(table="JFireDunning_DunningProcess_dunnedInvoices2DunningLevel")
+//	private Map<Invoice, Integer> dunnedInvoices2DunningLevel;
 
 	/**
 	 * All DunningLetters that have been created so far within the scope of this dunning process.
@@ -160,7 +161,7 @@ implements Serializable
 		this.dunningProcessID = dunningProcessID;
 		this.dunningConfig = dunningConfig;
 
-		this.dunnedInvoices2DunningLevel = new HashMap<Invoice, Integer>();
+//		this.dunnedInvoices2DunningLevel = new HashMap<Invoice, Integer>();
 	}
 
 	public String getOrganisationID() {
@@ -215,12 +216,15 @@ implements Serializable
 		return paidDT == null;
 	}
 
-	public void addOverdueInvoice(Invoice invoice, int dunningLevel) {
-		dunnedInvoices2DunningLevel.put(invoice, dunningLevel);
+	public void addOverdueInvoice(Invoice invoice) {
+		DunningLetter lastDunningLetter = getLastDunningLetter();
+		DunningLetterEntry dunningLetterEntry = new DunningLetterEntry(IDGenerator.getOrganisationID(), IDGenerator.nextID(DunningLetterEntry.class), 1, invoice, getLastDunningLetter());
+//		lastDunningLetter.addEntry(dunningLetterEntry);
 	}
-
-	public Map<Invoice, Integer> getInvoices2DunningLevel() {
-		return dunnedInvoices2DunningLevel;
+	
+	public void updateLetterEntry(Invoice invoice) {
+		DunningLetter lastDunningLetter = getLastDunningLetter();
+		
 	}
 
 	public DunningLetter getLastDunningLetter() {
@@ -228,14 +232,18 @@ implements Serializable
 	}
 
 	public boolean isDunnedInvoice(Invoice invoice) {
-		return dunnedInvoices2DunningLevel.containsKey(invoice);
+		for (DunningLetterEntry entry : getLastDunningLetter().getEntries()) {
+			if (entry.getInvoice().equals(invoice)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public void createDunningLetter(boolean isFinalized) {
 		DunningLetter prevDunningLetter = getLastDunningLetter();
 		if (isFinalized && prevDunningLetter != null) {
-			prevDunningLetter.setBookDT(new Date());
-			prevDunningLetter.setFinalized();
+			doFinalization(prevDunningLetter);
 			//TODO 6.3.6 books out the prev letter
 		}
 
@@ -243,11 +251,24 @@ implements Serializable
 		newDunningLetter.copyAllFeesFrom(prevDunningLetter);
 
 		//Create entries in the new letter
-		for (Invoice dunnedInv : dunnedInvoices2DunningLevel.keySet()) {
-			int dunningLevel = dunnedInvoices2DunningLevel.get(dunnedInv);
-			newDunningLetter.addDunnedInvoice(dunningConfig, prevDunningLetter, dunningLevel, dunnedInv);
+		for (DunningLetterEntry entry : prevDunningLetter.getEntries()) {
+			
 		}
+//		for (Invoice inv : dunnedInvoices2DunningLevel.keySet()) {
+//			int dunningLevel = dunnedInvoices2DunningLevel.get(inv);
+//			newDunningLetter.addEntry(prevDunningLetter, dunningLevel, inv);
+//		}
 
+		//Calculate interests
+		// *** REV_marco_dunning ***
+		// Wouldn't it be better to calculate this once and not every time you add a new invoice?
+		// And maybe you should put this logic into a separate class - maybe into the one which
+		// contains the "outer" logic to create a new DunningLetter. IMHO, it's architecturally
+		// cleaner to have only simple methods here in the persistence-capable DATA MODEL class.
+		DunningInterestCalculator dunningInterestCalculator = dunningConfig
+				.getDunningInterestCalculator();
+		dunningInterestCalculator.generateDunningInterests(prevDunningLetter, newDunningLetter);
+		
 		//Calculate fees for the new letter
 		DunningFeeAdder feeAdder = dunningConfig.getDunningFeeAdder();
 		feeAdder.addDunningFee(prevDunningLetter, newDunningLetter);
@@ -257,6 +278,11 @@ implements Serializable
 
 		DunningLetterNotifier letterNotifier = dunningConfig.getLevel2DunningLetterNotifiers().get(newDunningLetter.getDunningLevel());
 		letterNotifier.triggerNotifier();
+	}
+	
+	private void doFinalization(DunningLetter letter) {
+		letter.setBookDT(new Date());
+		letter.setFinalized();
 	}
 
 	public static Collection<DunningProcessID> getDunningProcessesByCustomer(PersistenceManager pm, AnchorID customerID) {
@@ -280,6 +306,13 @@ implements Serializable
 		params.put("dunningConfigID", dunningConfigID);
 		return CollectionUtil.castList((List<?>)query.executeWithMap(params));
 	}
+	
+//	public static DunningLetterEntry getDunningLetterEntryByInvoice(PersistenceManager pm, InvoiceID invID) {
+//		Query query = pm.newNamedQuery(DunningProcess.class, "getActiveDunningProcessesByDunningConfig");
+//		Map<String, Object> params = new HashMap<String, Object>();
+//		params.put("dunningConfigID", dunningConfigID);
+//		return CollectionUtil.castList((List<?>)query.executeWithMap(params));
+//	}
 
 	@Override
 	public int hashCode() {

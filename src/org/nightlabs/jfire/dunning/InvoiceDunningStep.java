@@ -59,6 +59,10 @@ extends AbstractDunningStep
 		this.interestPercentage = interestPercentage;
 	}
 	
+	/**
+	 * Returns the interest percentage of the step.
+	 * @return
+	 */
 	public BigDecimal getInterestPercentage() {
 		return interestPercentage;
 	}
@@ -67,6 +71,12 @@ extends AbstractDunningStep
 		this.periodOfGraceMSec = periodOfGraceMSec;
 	}
 	
+	/**
+	 * Returns the time (in milliseconds) that specify how long to wait
+	 * before continuing the DunningProcess.
+	 * 
+	 * @return long time
+	 */
 	public long getPeriodOfGraceMSec() {
 		return periodOfGraceMSec;
 	}

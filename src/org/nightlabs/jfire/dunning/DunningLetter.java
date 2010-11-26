@@ -89,13 +89,6 @@ implements Serializable, PayableObject, Statable
 			persistenceModifier = PersistenceModifier.PERSISTENT)
 	private List<DunningLetterEntry> dunningLetterEntries;
 
-	// *** REV_marco_dunning ***
-	// This should NOT use @Join either! Every DunningLetterFee belongs only to exactly one DunningLetter and is not
-	// modified when a new one is created! Instead new fees will be created for the new letter
-	// (i.e. the old fees will be copied and modified). That's why there is the field DunningFee.original! Nong Yo, read
-	// the javadoc of DunningFee.original, please! Though you wrote that javadoc, you seem not to have understood it.
-	// Thus please meditate a bit about the datastructure and its behaviour (e.g. the life cycles of various objects and
-	// their relationships).
 	/**
 	 * Contains all old fees (from the previous DunningLetter) as well as all
 	 * new ones (based on dunningStep.feeTypes).
@@ -133,7 +126,7 @@ implements Serializable, PayableObject, Statable
 	}
 
 	/**
-	 * The total amount of this DunningLetter comprising the invoice, all fees
+	 * The total amount of this DunningLetter comprising the invoices, all fees
 	 * and interests. It always comprises the complete amount of all invoices
 	 * summarized!
 	 */
@@ -224,28 +217,24 @@ implements Serializable, PayableObject, Statable
 		return letterDunningLevel;
 	}
 
-	// *** REV_marco_dunning ***
-	// The javadoc doesn't make sense here. What does haveChangedItem mean?
-	// Explain it - but not here; the getter is better suited for documentation (because it's public).
-	private transient boolean haveChangedItem = false;
+	private transient boolean containUpdatedItem = false;
 
 	/**
-	 * Adds the overdue invoice into the new letter. When adding the invoice, it
-	 * calculates the interest of each invoices too.
-	 * It also checks if the invoice is already dunned or not. If it's already dunned,
-	 * it calculates the new
+	 * Adds the overdue invoice into the new letter. 
+	 * It checks if the invoice is already dunned or not. If it's already dunned,
+	 * it calculates the new level and new due date.
 	 * @param dunningConfig
 	 * @param prevDunningLetter
-	 * @param invoiceDunningLevel
+	 * @param dunningLevel
 	 * @param dunningInvoice
 	 */
-	public void addDunnedInvoice(DunningConfig dunningConfig,
-			DunningLetter prevDunningLetter, int invoiceDunningLevel, Invoice dunningInvoice) {
-		if (invoiceDunningLevel > letterDunningLevel) {
-			this.letterDunningLevel = invoiceDunningLevel;
+	public void addEntry(DunningLetter prevDunningLetter, int dunningLevel, Invoice dunningInvoice) {
+		if (dunningLevel > letterDunningLevel) {
+			this.letterDunningLevel = dunningLevel;
 		}
 
-		InvoiceDunningStep invDunningStep = dunningConfig.getInvoiceDunningStep(invoiceDunningLevel);
+		DunningConfig dunningConfig = dunningProcess.getDunningConfig();
+		InvoiceDunningStep invDunningStep = dunningConfig.getInvoiceDunningStep(dunningLevel);
 
 		List<DunningLetterEntry> prevEntries = prevDunningLetter.getEntries();
 		//Check if the dunningInv needs to be dunned again (it's late for payment on the extended due date).
@@ -254,30 +243,19 @@ implements Serializable, PayableObject, Statable
 		Date newDueDate = null;
 		for (DunningLetterEntry prevEntry : prevEntries) {
 			if (prevEntry.getInvoice().equals(dunningInvoice)) {
-				isOverdue = prevEntry.getExtendedDueDateForPayment().before(new Date());
+				isOverdue = prevEntry.isOverdue(new Date());
 				if (isOverdue) {
 					long newDueDateTime = prevEntry.getExtendedDueDateForPayment().getTime() + invDunningStep.getPeriodOfGraceMSec();
 					newDueDate = new Date(newDueDateTime);
-					invoiceDunningLevel++;
-					haveChangedItem = true;
+					dunningLevel++;
+					containUpdatedItem = true;
 				}
 			}
 		}
 
-		//Calculate interests
-		// *** REV_marco_dunning ***
-		// Wouldn't it be better to calculate this once and not every time you add a new invoice?
-		// And maybe you should put this logic into a separate class - maybe into the one which
-		// contains the "outer" logic to create a new DunningLetter. IMHO, it's architecturally
-		// cleaner to have only simple methods here in the persistence-capable DATA MODEL class.
-		DunningInterestCalculator dunningInterestCalculator = dunningConfig
-				.getDunningInterestCalculator();
-		dunningInterestCalculator.generateDunningInterest(invDunningStep,
-				prevDunningLetter, this);
-
 		//Create the entry
 		DunningLetterEntry letterEntry = new DunningLetterEntry(organisationID,
-				IDGenerator.nextID(DunningLetterEntry.class), invoiceDunningLevel,
+				IDGenerator.nextID(DunningLetterEntry.class), dunningLevel,
 				dunningInvoice, this);
 		letterEntry.setPeriodOfGraceMSec(invDunningStep.getPeriodOfGraceMSec());
 		if (isOverdue) {
@@ -291,11 +269,8 @@ implements Serializable, PayableObject, Statable
 		}
 	}
 
-	// *** REV_marco_dunning ***
-	// Please use bean conventions for getters and setters. If the resulting method name sounds awkward you
-	// don't like it, then please choose another property name.
-	public boolean haveChangedItem() {
-		return haveChangedItem;
+	public boolean isContainUpdatedItem() {
+		return containUpdatedItem;
 	}
 
 	public List<DunningLetterEntry> getEntries() {

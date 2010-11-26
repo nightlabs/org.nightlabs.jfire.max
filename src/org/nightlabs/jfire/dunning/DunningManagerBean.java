@@ -296,62 +296,68 @@ implements DunningManagerRemote
 //		}
 	}
 
+	@RolesAllowed("_Guest_")
+	public void processDunning(DunningConfig dunningConfig, Date date)
+	throws Exception {
+		PersistenceManager pm = createPersistenceManager();
+		DunningAutoMode autoMode = dunningConfig.getDunningAutoMode();
+		if (autoMode != DunningAutoMode.none) {
+			//All Overdue Invoices
+			Collection<Invoice> overdueInvoices = 
+				Invoice.getOverdueInvoices(pm, dunningConfig.getOrganisationID(), new Date());
+			for (Invoice inv : overdueInvoices) {
+				LegalEntity customer = inv.getCustomer();
+				Currency currency = inv.getCurrency();
+
+				//Get DunningProcess
+				DunningProcess dunningProcess = 
+					DunningProcess.getDunningProcessByCustomerAndCurrency(pm, (AnchorID)JDOHelper.getObjectId(customer), (CurrencyID)JDOHelper.getObjectId(currency));
+				if (dunningProcess == null/* || !dunningProcess.isActive()*/) { //TODO: do we need to check if it's active? if there is the dunning process?
+					//Get DunningConfig for the Customer
+					DunningConfig customerDunningConfig = DunningConfigCustomer.getDunningConfigByCustomer(pm, (AnchorID)JDOHelper.getObjectId(customer));
+					//Create new DunningProcess
+					dunningProcess = 
+						new DunningProcess(dunningConfig.getOrganisationID(), IDGenerator.nextIDString(DunningProcess.class), customerDunningConfig == null ? dunningConfig : customerDunningConfig);
+				}
+
+				//Check if the invoice is already dunned
+				if (!dunningProcess.isDunnedInvoice(inv)) {
+					//Add the non-existing overdue invoice to the process
+					dunningProcess.addOverdueInvoice(inv);
+				}
+				else {
+					dunningProcess.updateLetterEntry(inv);
+				}
+				
+				pm.makePersistent(dunningProcess);
+			}
+
+			//Generate Letters
+			Collection<DunningProcess> activeDunningProcesses = DunningProcess.getActiveDunningProcessesByDunningConfig(pm, (DunningConfigID)JDOHelper.getObjectId(dunningConfig));
+			for (DunningProcess activeProcess : activeDunningProcesses) {
+				if (activeProcess.getCoolDownEnd().before(new Date())) {
+					boolean isFinalized = autoMode == DunningAutoMode.createAndFinalize;
+					activeProcess.createDunningLetter(isFinalized);
+					pm.makePersistent(activeProcess);
+				}
+			}
+		}
+	}
+	
+	@RolesAllowed("_Guest_")
 	public void processAutomaticDunning(TaskID taskID)
 	throws Exception {
 		PersistenceManager pm = createPersistenceManager();
 		try {
 			Task task = (Task) pm.getObjectById(taskID);
 			DunningConfig dunningConfig =  (DunningConfig) task.getParam();
-			DunningAutoMode autoMode = dunningConfig.getDunningAutoMode();
-			if (autoMode != DunningAutoMode.none) {
-				//All Overdue Invoices
-				Collection<Invoice> overdueInvoices = 
-					Invoice.getOverdueInvoices(pm, dunningConfig.getOrganisationID(), new Date());
-
-				for (Invoice inv : overdueInvoices) {
-					LegalEntity customer = inv.getCustomer();
-					Currency currency = inv.getCurrency();
-
-					//Get DunningProcess
-					boolean needPersistent = false;
-					DunningProcess dunningProcess = 
-						DunningProcess.getDunningProcessByCustomerAndCurrency(pm, (AnchorID)JDOHelper.getObjectId(customer), (CurrencyID)JDOHelper.getObjectId(currency));
-					if (dunningProcess == null/* || !dunningProcess.isActive()*/) { //TODO: do we need to check if it's active? if there is the dunning process?
-						//Get DunningConfig for the Customer
-						DunningConfig customerDunningConfig = DunningConfigCustomer.getDunningConfigByCustomer(pm, (AnchorID)JDOHelper.getObjectId(customer));
-						//Create new DunningProcess
-						dunningProcess = 
-							new DunningProcess(dunningConfig.getOrganisationID(), IDGenerator.nextIDString(DunningProcess.class), customerDunningConfig == null ? dunningConfig : customerDunningConfig);
-						needPersistent = true;
-					}
-
-					//Check if the invoice is already dunned
-					if (!dunningProcess.isDunnedInvoice(inv)) {
-						//Add the non-existing overdue invoice to the process
-						dunningProcess.addOverdueInvoice(inv, 1);
-						needPersistent = true;
-					}
-					
-					if (needPersistent) {
-						pm.makePersistent(dunningProcess);
-					}
-				}
-
-				//Generate Letters
-				Collection<DunningProcess> activeDunningProcesses = DunningProcess.getActiveDunningProcessesByDunningConfig(pm, (DunningConfigID)JDOHelper.getObjectId(dunningConfig));
-				for (DunningProcess activeProcess : activeDunningProcesses) {
-					if (activeProcess.getCoolDownEnd().before(new Date())) {
-						boolean isFinalized = autoMode == DunningAutoMode.createAndFinalize;
-						activeProcess.createDunningLetter(isFinalized);
-						pm.makePersistent(activeProcess);
-					}
-				}
-			}
+			processDunning(dunningConfig, new Date());
 		} finally {
 			pm.close();
 		}
 	}
 
+	
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("_System_")
 	@Override

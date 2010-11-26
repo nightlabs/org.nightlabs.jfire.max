@@ -2,6 +2,7 @@ package org.nightlabs.jfire.dunning;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -110,41 +111,47 @@ implements Serializable
 	// the work flow. Think about when this method is called and what the situation looks like at this time (i.e. what objects exist
 	// and what states do they have and what should change).
 	/**
-	 * It is important to note that the InterestCalculator needs to know
+	 * Create new instances of {@link DunningInterest}s that calculate from 
+	 * 
+	 * It is important to note that the DunningInterestCalculator needs to know
 	 * the previous DunningInterests (from the previous DunningLetter)
 	 * in order to be able to merge Interests from adjacent time intervals
 	 * and to realize that partial payments have already been conducted!
 	 *
-	 * @param invoiceDunningStep
 	 * @param prevLetter
 	 * @param newLetter
 	 */
-	public void generateDunningInterest(InvoiceDunningStep invoiceDunningStep, DunningLetter prevLetter, DunningLetter newLetter) {
-		if (prevLetter == null) { // New letter
+	public void generateDunningInterests(DunningLetter prevLetter, DunningLetter newLetter) {
+		if (prevLetter == null) { // Create the interests for the new letter
 			for (DunningLetterEntry entry : newLetter.getEntries()) {
 				DunningInterest interest = new DunningInterest(organisationID, IDGenerator.nextID(DunningInterest.class), entry, null);
+				InvoiceDunningStep invoiceDunningStep = dunningConfig.getInvoiceDunningStep(entry.getDunningLevel());
 				calculate(invoiceDunningStep, interest);
 				entry.addDunningInterest(interest);
 			}
 		}
-		else {
+		else { //Calculate the interests
 			List<DunningLetterEntry> newLetterEntries = newLetter.getEntries();
-			List<DunningLetterEntry> prevLetterEntries = prevLetter.getEntries();
-			BigDecimal interestPercentage = invoiceDunningStep.getInterestPercentage();
-
+			List<DunningLetterEntry> oldLetterEntries = prevLetter.getEntries();
+			
+			//(((Annual Interest+Amount)-Amount Paid)*Rate)/DaysOfYear)*Days
 			for (DunningLetterEntry newLetterEntry : newLetterEntries) {
+				InvoiceDunningStep invoiceDunningStep = dunningConfig.getInvoiceDunningStep(newLetter.getDunningLevel());
+				BigDecimal interestPercentage = invoiceDunningStep.getInterestPercentage();
+				
 				Date firstDay = getFirstDay(newLetterEntry); //either the invoice due date or the extended due date
 				Date lastDay = getLastDay(newLetterEntry);
 				long dayDifTime = lastDay.getTime() - firstDay.getTime();
 				long dayDiffDays = dayDifTime / (24l * 60l * 60l * 1000l);
+				long daysOfYear = getDaysOfYear(Calendar.getInstance().get(Calendar.YEAR));
 
-				int entryIndex = prevLetterEntries.indexOf(newLetterEntry);
+				int entryIndex = oldLetterEntries.indexOf(newLetterEntry);
 				if (entryIndex != -1) { //combination of an old one + additional time
 					// *** REV_marco_dunning ***
 					// What's this?! IMHO that's nonsense. The previous interest is the corresponding interest in the previous DunningLetter
 					// and definitely not in the new DunningLetter! Think about what you are doing here & understand it!
 					DunningInterest prevInterest = newLetterEntry.getDunningInterests().get(newLetterEntry.getDunningInterests().size() - 1);
-
+					
 					if (interestPercentage.equals(prevInterest.getInterestPercentage())) { //if the interest percentage didn't change
 						Date extendedDate = new Date(lastDay.getTime() + newLetterEntry.getPeriodOfGraceMSec());
 						prevInterest.setCreditPeriodToExcl(extendedDate);

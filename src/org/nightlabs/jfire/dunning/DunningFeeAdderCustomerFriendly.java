@@ -59,7 +59,7 @@ extends DunningFeeAdder
 		// As I understand it, it should find the highest *new* dunning-level. And then
 		// add the fees ONCE for this dunning-level. But your code adds the fees multiple times
 		// if there are multiple invoices with modified dunning-level.
-		if (newDunningLetter.haveChangedItem()) {
+		if (newDunningLetter.isContainUpdatedItem()) {
 			for (DunningLetterEntry prevEntry : prevDunningLetter.getEntries()) {
 
 				// *** REV_marco_dunning ***

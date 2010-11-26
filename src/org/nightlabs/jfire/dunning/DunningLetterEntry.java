@@ -135,6 +135,12 @@ implements Serializable
 		this.periodOfGraceMSec = periodOfGraceMSec;
 	}
 
+	/**
+	 * Returns the time (in milliseconds) that specify how long to wait
+	 * before continuing the DunningProcess. This value is copied from its InvoiceDunningStep
+	 * 
+	 * @return long time
+	 */
 	public long getPeriodOfGraceMSec() {
 		return periodOfGraceMSec;
 	}
@@ -175,6 +181,10 @@ implements Serializable
 		return result;
 	}
 
+	public boolean isOverdue(Date date) {
+		return extendedDueDateForPayment.before(date);
+	}
+	
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)

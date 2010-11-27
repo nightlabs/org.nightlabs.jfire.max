@@ -5,8 +5,8 @@ import javax.jdo.annotations.Inheritance;
 import javax.jdo.annotations.InheritanceStrategy;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
-import javax.naming.AuthenticationException;
 import javax.naming.CommunicationException;
+import javax.security.auth.login.LoginException;
 
 import org.nightlabs.j2ee.LoginData;
 import org.nightlabs.jfire.base.security.integration.ldap.connection.ILDAPConnectionParamsProvider;
@@ -14,6 +14,7 @@ import org.nightlabs.jfire.base.security.integration.ldap.connection.LDAPConnect
 import org.nightlabs.jfire.base.security.integration.ldap.connection.LDAPConnectionManager;
 import org.nightlabs.jfire.security.integration.Session;
 import org.nightlabs.jfire.security.integration.UserManagementSystem;
+import org.nightlabs.jfire.security.integration.UserManagementSystemCommunicationException;
 import org.nightlabs.jfire.security.integration.UserManagementSystemType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -85,7 +86,7 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 	 * @throws CommunicationException 
 	 */
 	@Override
-	public void logout(Session session) throws CommunicationException {
+	public void logout(Session session) throws UserManagementSystemCommunicationException {
 		
 		LDAPConnection connection = null;
 		try{
@@ -112,7 +113,7 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 	 * @throws CommunicationException 
 	 */
 	@Override
-	public Session login(LoginData loginData) throws AuthenticationException, CommunicationException {
+	public Session login(LoginData loginData) throws LoginException, UserManagementSystemCommunicationException{
 
         Session session = null;
         LDAPConnection connection = null;

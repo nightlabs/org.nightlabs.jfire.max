@@ -4,12 +4,21 @@ import java.util.Hashtable;
 
 import javax.naming.AuthenticationException;
 import javax.naming.CommunicationException;
+import javax.naming.CompositeName;
 import javax.naming.Context;
+import javax.naming.InvalidNameException;
+import javax.naming.Name;
 import javax.naming.NamingException;
+import javax.naming.directory.Attributes;
+import javax.naming.ldap.Control;
 import javax.naming.ldap.InitialLdapContext;
+import javax.naming.ldap.LdapContext;
+import javax.naming.ldap.LdapName;
+import javax.security.auth.login.LoginException;
 
 import org.apache.directory.shared.ldap.util.LdapURL;
 import org.nightlabs.jfire.base.security.integration.ldap.connection.ILDAPConnectionParamsProvider.AuthenticationMethod;
+import org.nightlabs.jfire.security.integration.UserManagementSystemCommunicationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,6 +38,7 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper {
 	private static final String COM_SUN_JNDI_DNS_TIMEOUT_INITIAL = "com.sun.jndi.dns.timeout.initial"; //$NON-NLS-1$
 	private static final String COM_SUN_JNDI_LDAP_CONNECT_TIMEOUT = "com.sun.jndi.ldap.connect.timeout"; //$NON-NLS-1$
 
+    public static final String REFERRAL_IGNORE = "ignore"; //$NON-NLS-1$
 
 	private LDAPConnection connection;
 
@@ -53,7 +63,7 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper {
 	 * @throws CommunicationException 
 	 */
 	@Override
-	public void connect() throws CommunicationException {
+	public void connect() throws UserManagementSystemCommunicationException {
 
 		context = null;
 		isConnected = true;
@@ -84,7 +94,7 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper {
 			
 			disconnect();
 			
-			throw new CommunicationException(
+			throw new UserManagementSystemCommunicationException(
 					"Can't connect to LDAP server at " + host + ":" + port +
 					", see log for details. Cause: " + e.getMessage()
 					);
@@ -120,7 +130,7 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper {
 	@Override
 	public void bind(
 			String bindPrincipal, String bindCredentials
-			) throws CommunicationException, AuthenticationException {
+			) throws UserManagementSystemCommunicationException, LoginException {
 
 		String host = connection.getConnectionParamsProvider().getHost();
 		int port = connection.getConnectionParamsProvider().getPort();
@@ -152,7 +162,7 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper {
 				
 				disconnect();
 				
-				throw new AuthenticationException(
+				throw new LoginException(
 						"LDAP login failed, see log for details. Cause " + e.getMessage()
 						);
 				
@@ -161,7 +171,7 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper {
 		}else{
 			String msg = "No connection to LDAP server at " + host + ":" + port;
 			logger.error(msg);
-			throw new CommunicationException(msg);
+			throw new UserManagementSystemCommunicationException(msg);
 		}
 	}
 
@@ -173,6 +183,30 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper {
 		disconnect();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+    public void createEntry(String dn, Attributes attributes, Control[] controls){
+    	
+        try {
+        	
+            LdapContext modCtx = context.newInstance(controls);
+
+            // TODO: deal with referrals. We can leave it up to service provider or make it manually
+            // like in Apache Studio
+            modCtx.addToEnvironment(Context.REFERRAL, REFERRAL_IGNORE);
+
+            // create entry
+            modCtx.createSubcontext(getSaveJndiName(dn), attributes);
+            
+        }catch(NamingException ne){
+        	// TODO
+        }
+
+    }
+
+    
 	/**
 	 * {@inheritDoc}
 	 */
@@ -217,6 +251,48 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper {
 
         throw new NamingException("No LDAP ContextFactory found!");
         
+    }
+    
+    /**
+     * Gets a Name object that is save for JNDI operations.
+     * <p>
+     * In JNDI we have could use the following classes for names:
+     * <ul>
+     * <li>DN as String</li>
+     * <li>javax.naming.CompositeName</li>
+     * <li>javax.naming.ldap.LdapName (since Java5)</li>
+     * <li>org.apache.directory.shared.ldap.name.LdapDN</li>
+     * </ul>
+     * <p>
+     * There are some drawbacks when using this classes:
+     * <ul>
+     * <li>When passing DN as String, JNDI doesn't handle slashes '/' correctly.
+     * So we must use a Name object here.</li>
+     * <li>With CompositeName we have the same problem with slashes '/'.</li>
+     * <li>When using LdapDN from shared-ldap, JNDI uses the toString() method
+     * and LdapDN.toString() returns the normalized ATAV, but we need the
+     * user provided ATAV.</li>
+     * <li>When using LdapName for the empty DN (Root DSE) JNDI _sometimes_ throws
+     * an Exception (java.lang.IndexOutOfBoundsException: Posn: -1, Size: 0
+     * at javax.naming.ldap.LdapName.getPrefix(LdapName.java:240)).</li>
+     * <li>Using LdapDN for the RootDSE doesn't work with Apache Harmony because
+     * its JNDI provider only accepts intstances of CompositeName or LdapName.</li>
+     * </ul>
+     * <p>
+     * So we use LdapName as default and the CompositeName for the empty DN.
+     * 
+     * @param name the DN
+     * 
+     * @return the save JNDI name
+     * 
+     * @throws InvalidNameException the invalid name exception
+     */
+    private static Name getSaveJndiName(String name) throws InvalidNameException{
+        if (name == null || "".equals(name)){
+            return new CompositeName();
+        }else{
+            return new LdapName(name);
+        }
     }
 
 }

@@ -1,7 +1,10 @@
 package org.nightlabs.jfire.base.security.integration.ldap.connection;
 
-import javax.naming.AuthenticationException;
-import javax.naming.CommunicationException;
+import javax.naming.directory.Attributes;
+import javax.naming.ldap.Control;
+import javax.security.auth.login.LoginException;
+
+import org.nightlabs.jfire.security.integration.UserManagementSystemCommunicationException;
 
 /**
  * A ConnectionWrapper is a wrapper for a real directory connection implementation.
@@ -16,7 +19,7 @@ public interface LDAPConnectionWrapper
      * 
      * @throws CommunicationException 
      */
-    public void connect() throws CommunicationException;
+    public void connect() throws UserManagementSystemCommunicationException;
 
 
     /**
@@ -33,7 +36,7 @@ public interface LDAPConnectionWrapper
      * 
      * @throws CommunicationException, AuthenticationException 
      */
-    public void bind(String bindPrincipal, String password) throws CommunicationException, AuthenticationException;
+    public void bind(String bindPrincipal, String password) throws UserManagementSystemCommunicationException, LoginException;
 
 
     /**
@@ -41,7 +44,7 @@ public interface LDAPConnectionWrapper
      * 
      * @throws CommunicationException 
      */
-    public void unbind() throws CommunicationException;
+    public void unbind() throws UserManagementSystemCommunicationException;
 
 
     /**
@@ -50,5 +53,16 @@ public interface LDAPConnectionWrapper
      * @return true, if is connected
      */
     public boolean isConnected();
+
+    /**
+     * Creates an entry.
+     * 
+     * @param dn the entry's DN
+     * @param attributes the entry's attributes
+     * @param controls the controls
+     * @param monitor the progress monitor
+     * @param referralsInfo the referrals info
+     */
+	public void createEntry(String dn, Attributes attributes, Control[] controls);
 
 }

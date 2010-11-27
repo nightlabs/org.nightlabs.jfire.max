@@ -1,7 +1,8 @@
 package org.nightlabs.jfire.base.security.integration.ldap.connection;
 
-import javax.naming.AuthenticationException;
-import javax.naming.CommunicationException;
+import javax.security.auth.login.LoginException;
+
+import org.nightlabs.jfire.security.integration.UserManagementSystemCommunicationException;
 
 /**
  * Class representing connection to an actual LDAP server. Connection parameters are passed by
@@ -40,13 +41,13 @@ public class LDAPConnection {
         return connectionParamsProvider;
     }
 
-    public void connect() throws CommunicationException {
+    public void connect() throws UserManagementSystemCommunicationException {
     	this.connectionWrapper.connect();
     }
     
     public void bind(
     		String bindPrincipal, String password
-    		) throws AuthenticationException, CommunicationException {
+    		) throws LoginException, UserManagementSystemCommunicationException {
     	
     	this.connectionWrapper.bind(bindPrincipal, password);
     }
@@ -55,7 +56,7 @@ public class LDAPConnection {
     	this.connectionWrapper.disconnect();
     }
 
-    public void unbind() throws CommunicationException {
+    public void unbind() throws UserManagementSystemCommunicationException {
     	this.connectionWrapper.unbind();
     }
 

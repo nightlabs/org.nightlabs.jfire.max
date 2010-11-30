@@ -109,18 +109,6 @@ implements Serializable
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Currency currency;
 
-	// *** REV_marco_dunning ***
-	// This wasn't specified. Are you sure that you need it? Don't you have all necessary information
-	// in the last DunningLetter's entries? Isn't this the same as the dunning level in the last DunningLetterEntry?
-	// You run the risk of inconsistencies if you keep both - I would omit this, if there are no important
-	// reasons to keep it.
-//	/**
-//	 * The invoices for which this dunning process is happening and their corresponding dunning levels.
-//	 */
-//	@Join
-//	@Persistent(table="JFireDunning_DunningProcess_dunnedInvoices2DunningLevel")
-//	private Map<Invoice, Integer> dunnedInvoices2DunningLevel;
-
 	/**
 	 * All DunningLetters that have been created so far within the scope of this dunning process.
 	 * There's only one active DunningLetter and when a new DunningLetter is finalized & booked, the
@@ -160,8 +148,6 @@ implements Serializable
 		this.organisationID = organisationID;
 		this.dunningProcessID = dunningProcessID;
 		this.dunningConfig = dunningConfig;
-
-//		this.dunnedInvoices2DunningLevel = new HashMap<Invoice, Integer>();
 	}
 
 	public String getOrganisationID() {
@@ -216,15 +202,29 @@ implements Serializable
 		return paidDT == null;
 	}
 
-	public void addOverdueInvoice(Invoice invoice) {
+	public void processInvoice(Invoice invoice) {
 		DunningLetter lastDunningLetter = getLastDunningLetter();
-		DunningLetterEntry dunningLetterEntry = new DunningLetterEntry(IDGenerator.getOrganisationID(), IDGenerator.nextID(DunningLetterEntry.class), 1, invoice, getLastDunningLetter());
-//		lastDunningLetter.addEntry(dunningLetterEntry);
+		if (!isDunnedInvoice(invoice)) {
+			//Add the non-existing overdue invoice to the process
+			createDunningLetterEntry(lastDunningLetter, invoice);
+		}
+		else {
+			updateDunningLetterEntry(lastDunningLetter, invoice);
+		}
 	}
 	
-	public void updateLetterEntry(Invoice invoice) {
-		DunningLetter lastDunningLetter = getLastDunningLetter();
-		
+	private void createDunningLetterEntry(DunningLetter dunningLetter, Invoice invoice) {
+		DunningLetterEntry dunningLetterEntry = new DunningLetterEntry(
+				IDGenerator.getOrganisationID(), 
+				IDGenerator.nextID(DunningLetterEntry.class), 
+				1, 
+				invoice, 
+				dunningLetter);
+		dunningLetter.addEntry(dunningLetterEntry);
+	}
+	
+	private void updateDunningLetterEntry(DunningLetter dunningLetter, Invoice invoice) {
+		dunningLetter.updateEntry(invoice);
 	}
 
 	public DunningLetter getLastDunningLetter() {
@@ -252,12 +252,8 @@ implements Serializable
 
 		//Create entries in the new letter
 		for (DunningLetterEntry entry : prevDunningLetter.getEntries()) {
-			
+			newDunningLetter.addEntry(entry);
 		}
-//		for (Invoice inv : dunnedInvoices2DunningLevel.keySet()) {
-//			int dunningLevel = dunnedInvoices2DunningLevel.get(inv);
-//			newDunningLetter.addEntry(prevDunningLetter, dunningLevel, inv);
-//		}
 
 		//Calculate interests
 		// *** REV_marco_dunning ***
@@ -307,13 +303,6 @@ implements Serializable
 		return CollectionUtil.castList((List<?>)query.executeWithMap(params));
 	}
 	
-//	public static DunningLetterEntry getDunningLetterEntryByInvoice(PersistenceManager pm, InvoiceID invID) {
-//		Query query = pm.newNamedQuery(DunningProcess.class, "getActiveDunningProcessesByDunningConfig");
-//		Map<String, Object> params = new HashMap<String, Object>();
-//		params.put("dunningConfigID", dunningConfigID);
-//		return CollectionUtil.castList((List<?>)query.executeWithMap(params));
-//	}
-
 	@Override
 	public int hashCode() {
 		final int prime = 31;

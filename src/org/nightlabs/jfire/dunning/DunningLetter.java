@@ -5,8 +5,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
@@ -31,6 +33,7 @@ import org.nightlabs.jfire.accounting.id.InvoiceID;
 import org.nightlabs.jfire.accounting.pay.PayableObject;
 import org.nightlabs.jfire.dunning.book.BookDunningLetterMoneyTransfer;
 import org.nightlabs.jfire.dunning.id.DunningLetterID;
+import org.nightlabs.jfire.dunning.id.DunningProcessID;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.jbpm.graph.def.Statable;
 import org.nightlabs.jfire.jbpm.graph.def.StatableLocal;
@@ -49,8 +52,19 @@ import org.nightlabs.util.CollectionUtil;
  */
 @PersistenceCapable(objectIdClass = DunningLetterID.class, identityType = IdentityType.APPLICATION, detachable = "true", table = "JFireDunning_DunningLetter")
 @Inheritance(strategy = InheritanceStrategy.NEW_TABLE)
-@Queries({ @javax.jdo.annotations.Query(name = "getOpenDunningLetters", value = "SELECT this "
-		+ "WHERE finalizeDT == null"), })
+@Queries({ 
+	@javax.jdo.annotations.Query(
+			name = "getOpenDunningLetters", 
+			value = "SELECT this "
+					+ "WHERE finalizeDT == null"
+	), 
+	@javax.jdo.annotations.Query(
+			name = "getActiveDunningLetterByDunningProcess", 
+			value = "SELECT this "
+					+ "WHERE outstanding == true &&" +
+					"JDOHelper.getObjectId(dunningProcess) == :dunningProcessID"
+	),
+})
 public class DunningLetter 
 implements Serializable, PayableObject, Statable 
 {
@@ -76,7 +90,7 @@ implements Serializable, PayableObject, Statable
 	 * highest level of all included invoices.
 	 */
 	@Persistent(persistenceModifier = PersistenceModifier.PERSISTENT)
-	private Integer letterDunningLevel;
+	private Integer letterDunningLevel = -1;
 
 	/**
 	 * The information of each overdue invoice needed to print the letter. This
@@ -228,7 +242,8 @@ implements Serializable, PayableObject, Statable
 	 * @param dunningLevel
 	 * @param dunningInvoice
 	 */
-	public void addEntry(DunningLetter prevDunningLetter, int dunningLevel, Invoice dunningInvoice) {
+	public void addEntry(DunningLetterEntry letterEntry) {
+		int dunningLevel = letterEntry.getDunningLevel();
 		if (dunningLevel > letterDunningLevel) {
 			this.letterDunningLevel = dunningLevel;
 		}
@@ -236,37 +251,40 @@ implements Serializable, PayableObject, Statable
 		DunningConfig dunningConfig = dunningProcess.getDunningConfig();
 		InvoiceDunningStep invDunningStep = dunningConfig.getInvoiceDunningStep(dunningLevel);
 
-		List<DunningLetterEntry> prevEntries = prevDunningLetter.getEntries();
+		letterEntry.setPeriodOfGraceMSec(invDunningStep.getPeriodOfGraceMSec());
+		dunningLetterEntries.add(letterEntry);
+		
+		priceIncludingInvoices.sumPrice(letterEntry.getPriceIncludingInvoice());
+	}
+	
+	public void updateEntry(Invoice dunningInvoice) {
+		DunningConfig dunningConfig = dunningProcess.getDunningConfig();
+
 		//Check if the dunningInv needs to be dunned again (it's late for payment on the extended due date).
 		//If so, we need to change the dunningLevel.
 		boolean isOverdue = false;
 		Date newDueDate = null;
-		for (DunningLetterEntry prevEntry : prevEntries) {
-			if (prevEntry.getInvoice().equals(dunningInvoice)) {
-				isOverdue = prevEntry.isOverdue(new Date());
+		int dunningLevel = -1;
+		for (DunningLetterEntry entry : dunningLetterEntries) {
+			if (entry.getInvoice().equals(dunningInvoice)) {
+				dunningLevel = entry.getDunningLevel();
+				InvoiceDunningStep invDunningStep = dunningConfig.getInvoiceDunningStep(dunningLevel);
+				isOverdue = entry.isOverdue(new Date());
 				if (isOverdue) {
-					long newDueDateTime = prevEntry.getExtendedDueDateForPayment().getTime() + invDunningStep.getPeriodOfGraceMSec();
+					long newDueDateTime = entry.getExtendedDueDateForPayment().getTime() + invDunningStep.getPeriodOfGraceMSec();
 					newDueDate = new Date(newDueDateTime);
-					dunningLevel++;
+					entry.setDunningLevel(dunningLevel++);
+					entry.setPeriodOfGraceMSec(invDunningStep.getPeriodOfGraceMSec());
+					entry.setExtendedDueDateForPayment(newDueDate);
 					containUpdatedItem = true;
 				}
 			}
 		}
 
-		//Create the entry
-		DunningLetterEntry letterEntry = new DunningLetterEntry(organisationID,
-				IDGenerator.nextID(DunningLetterEntry.class), dunningLevel,
-				dunningInvoice, this);
-		letterEntry.setPeriodOfGraceMSec(invDunningStep.getPeriodOfGraceMSec());
-		if (isOverdue) {
-			letterEntry.setExtendedDueDateForPayment(newDueDate);
-		}
-		dunningLetterEntries.add(letterEntry);
-		
-		priceIncludingInvoices.sumPrice(letterEntry.getPriceIncludingInvoice());
-		for (DunningFee dunningFee : dunningFees) {
-			priceIncludingInvoices.sumPrice(dunningFee.getPrice());
-		}
+//		priceIncludingInvoices.sumPrice(letterEntry.getPriceIncludingInvoice());
+//		for (DunningFee dunningFee : dunningFees) {
+//			priceIncludingInvoices.sumPrice(dunningFee.getPrice());
+//		}
 	}
 
 	public boolean isContainUpdatedItem() {
@@ -376,6 +394,15 @@ implements Serializable, PayableObject, Statable
 		}
 	}
 
+	public static Collection<DunningLetter> getOpenDunningLetters(
+			PersistenceManager pm, DunningProcessID dunningProcessID) {
+		Query query = pm.newNamedQuery(DunningLetter.class,
+				"getActiveDunningLetterByDunningProcess");
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("dunningProcessID", dunningProcessID);
+		return CollectionUtil.castList((List<?>)query.executeWithMap(params));
+	}
+	
 	private static Collection<DunningLetter> getOpenDunningLetters(
 			PersistenceManager pm) {
 		Query query = pm.newNamedQuery(DunningLetter.class,

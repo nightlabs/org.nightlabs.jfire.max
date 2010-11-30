@@ -320,14 +320,7 @@ implements DunningManagerRemote
 						new DunningProcess(dunningConfig.getOrganisationID(), IDGenerator.nextIDString(DunningProcess.class), customerDunningConfig == null ? dunningConfig : customerDunningConfig);
 				}
 
-				//Check if the invoice is already dunned
-				if (!dunningProcess.isDunnedInvoice(inv)) {
-					//Add the non-existing overdue invoice to the process
-					dunningProcess.addOverdueInvoice(inv);
-				}
-				else {
-					dunningProcess.updateLetterEntry(inv);
-				}
+				dunningProcess.processInvoice(inv);
 				
 				pm.makePersistent(dunningProcess);
 			}

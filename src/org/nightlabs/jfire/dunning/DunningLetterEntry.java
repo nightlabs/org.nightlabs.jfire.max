@@ -123,6 +123,10 @@ implements Serializable
 		return dunningLetterEntryID;
 	}
 
+	public void setDunningLevel(int dunningLevel) {
+		this.dunningLevel = dunningLevel;
+	}
+	
 	public int getDunningLevel() {
 		return dunningLevel;
 	}

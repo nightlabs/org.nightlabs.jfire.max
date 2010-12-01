@@ -149,6 +149,11 @@ implements Serializable
 		return periodOfGraceMSec;
 	}
 
+	/**
+	 * Returns The due-date until which this DunningLetter needs to be
+	 * paid. It is calculated when the DunningLetter is finalized
+	 * (and null till finalization):  dunningLetter.finalizeDT + this.periodOfGraceMSec.
+	 */
 	public Date getExtendedDueDateForPayment() {
 		return extendedDueDateForPayment;
 	}

@@ -121,6 +121,13 @@ implements Serializable
 	private List<DunningLetter> dunningLetters;
 
 	/**
+	 * The invoices for which this dunning process is happening and their corresponding dunning levels.
+	 */
+	@Join
+	@Persistent(table="JFireDunning_DunningProcess_dunnedInvoices2DunningLevel")
+	private Map<Invoice, Integer> dunnedInvoices2DunningLevel;
+	
+	/**
 	 * The date at which all invoices were paid. While this field is set to null, its DunningProcess is active!
 	 */
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
@@ -148,6 +155,8 @@ implements Serializable
 		this.organisationID = organisationID;
 		this.dunningProcessID = dunningProcessID;
 		this.dunningConfig = dunningConfig;
+		
+		this.dunnedInvoices2DunningLevel = new HashMap<Invoice, Integer>();
 	}
 
 	public String getOrganisationID() {
@@ -202,42 +211,27 @@ implements Serializable
 		return paidDT == null;
 	}
 
-	public void processInvoice(Invoice invoice) {
-		DunningLetter lastDunningLetter = getLastDunningLetter();
+	public void processInvoice(Invoice invoice, Date date) {
 		if (!isDunnedInvoice(invoice)) {
-			//Add the non-existing overdue invoice to the process
-			createDunningLetterEntry(lastDunningLetter, invoice);
+			dunnedInvoices2DunningLevel.put(invoice, 1);
 		}
 		else {
-			updateDunningLetterEntry(lastDunningLetter, invoice);
+			DunningLetter dunningLetter = getLastDunningLetter();
+			if (dunningLetter != null) {
+				DunningLetterEntry entry = dunningLetter.getDunningLetterEntry(invoice);
+				if (entry.getExtendedDueDateForPayment().after(date)) {
+					dunnedInvoices2DunningLevel.put(invoice, entry.getDunningLevel() + 1);
+				}
+			}
 		}
 	}
 	
-	private void createDunningLetterEntry(DunningLetter dunningLetter, Invoice invoice) {
-		DunningLetterEntry dunningLetterEntry = new DunningLetterEntry(
-				IDGenerator.getOrganisationID(), 
-				IDGenerator.nextID(DunningLetterEntry.class), 
-				1, 
-				invoice, 
-				dunningLetter);
-		dunningLetter.addEntry(dunningLetterEntry);
-	}
-	
-	private void updateDunningLetterEntry(DunningLetter dunningLetter, Invoice invoice) {
-		dunningLetter.updateEntry(invoice);
-	}
-
 	public DunningLetter getLastDunningLetter() {
 		return dunningLetters.size() == 0 ? null:dunningLetters.get(dunningLetters.size() - 1);
 	}
 
 	public boolean isDunnedInvoice(Invoice invoice) {
-		for (DunningLetterEntry entry : getLastDunningLetter().getEntries()) {
-			if (entry.getInvoice().equals(invoice)) {
-				return true;
-			}
-		}
-		return false;
+		return dunnedInvoices2DunningLevel.containsKey(invoice);
 	}
 
 	public void createDunningLetter(boolean isFinalized) {
@@ -251,16 +245,25 @@ implements Serializable
 		newDunningLetter.copyAllFeesFrom(prevDunningLetter);
 
 		//Create entries in the new letter
-		for (DunningLetterEntry entry : prevDunningLetter.getEntries()) {
-			newDunningLetter.addEntry(entry);
+		for (Invoice dunnedInvoice : dunnedInvoices2DunningLevel.keySet()) {
+			DunningLetterEntry dunningLetterEntry = new DunningLetterEntry(
+					IDGenerator.getOrganisationID(), 
+					IDGenerator.nextID(DunningLetterEntry.class), 
+					dunnedInvoices2DunningLevel.get(dunnedInvoice), 
+					dunnedInvoice, 
+					newDunningLetter);
+			DunningLetterEntry oldEntry = prevDunningLetter.getDunningLetterEntry(dunnedInvoice);
+			if (oldEntry != null) {
+				if (oldEntry.getDunningLevel() < dunningLetterEntry.getDunningLevel()) {
+					InvoiceDunningStep invDunningStep = dunningConfig.getInvoiceDunningStep(dunningLetterEntry.getDunningLevel());
+					long extendedDueDateForPayment = prevDunningLetter.getFinalizeDT().getTime() + invDunningStep.getPeriodOfGraceMSec();
+					dunningLetterEntry.setExtendedDueDateForPayment(new Date(extendedDueDateForPayment));
+					dunningLetterEntry.setPeriodOfGraceMSec(invDunningStep.getPeriodOfGraceMSec());
+				}
+			}
+			newDunningLetter.addEntry(dunningLetterEntry);
 		}
-
-		//Calculate interests
-		// *** REV_marco_dunning ***
-		// Wouldn't it be better to calculate this once and not every time you add a new invoice?
-		// And maybe you should put this logic into a separate class - maybe into the one which
-		// contains the "outer" logic to create a new DunningLetter. IMHO, it's architecturally
-		// cleaner to have only simple methods here in the persistence-capable DATA MODEL class.
+		
 		DunningInterestCalculator dunningInterestCalculator = dunningConfig
 				.getDunningInterestCalculator();
 		dunningInterestCalculator.generateDunningInterests(prevDunningLetter, newDunningLetter);

@@ -6,7 +6,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -205,14 +204,13 @@ implements Serializable, PayableObject, Statable
 				.nextIDString(DunningLetter.class), dunningProcess);
 	}
 
-	public Collection<DunningLetterEntry> getDunningLetterEntries(int level) {
-		Collection<DunningLetterEntry> entries = new HashSet<DunningLetterEntry>();
+	public DunningLetterEntry getDunningLetterEntry(Invoice invoice) {
 		for (DunningLetterEntry entry : dunningLetterEntries) {
-			if (entry.getDunningLevel() == level) {
-				entries.add(entry);
+			if (entry.getInvoice().equals(invoice)) {
+				return entry;
 			}
 		}
-		return entries;
+		return null;
 	}
 
 	public String getOrganisationID() {
@@ -248,12 +246,7 @@ implements Serializable, PayableObject, Statable
 			this.letterDunningLevel = dunningLevel;
 		}
 
-		DunningConfig dunningConfig = dunningProcess.getDunningConfig();
-		InvoiceDunningStep invDunningStep = dunningConfig.getInvoiceDunningStep(dunningLevel);
-
-		letterEntry.setPeriodOfGraceMSec(invDunningStep.getPeriodOfGraceMSec());
 		dunningLetterEntries.add(letterEntry);
-		
 		priceIncludingInvoices.sumPrice(letterEntry.getPriceIncludingInvoice());
 	}
 	
@@ -262,17 +255,15 @@ implements Serializable, PayableObject, Statable
 
 		//Check if the dunningInv needs to be dunned again (it's late for payment on the extended due date).
 		//If so, we need to change the dunningLevel.
-		boolean isOverdue = false;
-		Date newDueDate = null;
 		int dunningLevel = -1;
 		for (DunningLetterEntry entry : dunningLetterEntries) {
 			if (entry.getInvoice().equals(dunningInvoice)) {
 				dunningLevel = entry.getDunningLevel();
 				InvoiceDunningStep invDunningStep = dunningConfig.getInvoiceDunningStep(dunningLevel);
-				isOverdue = entry.isOverdue(new Date());
+				boolean isOverdue = entry.isOverdue(new Date());
 				if (isOverdue) {
 					long newDueDateTime = entry.getExtendedDueDateForPayment().getTime() + invDunningStep.getPeriodOfGraceMSec();
-					newDueDate = new Date(newDueDateTime);
+					Date newDueDate = new Date(newDueDateTime);
 					entry.setDunningLevel(dunningLevel++);
 					entry.setPeriodOfGraceMSec(invDunningStep.getPeriodOfGraceMSec());
 					entry.setExtendedDueDateForPayment(newDueDate);

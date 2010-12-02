@@ -85,6 +85,7 @@ import org.nightlabs.jfire.person.Person;
 import org.nightlabs.jfire.prop.id.PropertySetID;
 import org.nightlabs.jfire.security.Authority;
 import org.nightlabs.jfire.security.ResolveSecuringAuthorityStrategy;
+import org.nightlabs.jfire.security.Role;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.security.id.UserID;
 import org.nightlabs.jfire.store.DeliveryNote;
@@ -729,6 +730,8 @@ implements TradeManagerRemote, TradeManagerLocal
 	{
 		PersistenceManager pm = createPersistenceManager();
 		try {
+			//WORKAROUND to get the correct field ArticleCount !!!
+			pm.refreshAll(NLJDOHelper.getObjectSet(pm, orderIDs, Order.class));
 			return NLJDOHelper.getDetachedObjectList(pm, orderIDs, Order.class, fetchGroups, maxFetchDepth);
 		} finally {
 			pm.close();
@@ -823,8 +826,11 @@ implements TradeManagerRemote, TradeManagerLocal
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
-
-			return (Order) pm.detachCopy(pm.getObjectById(orderID));
+			//WORKAROUND to get the correct field ArticleCount !!!
+			pm.getExtent(Order.class);
+			Order order = (Order)pm.getObjectById(orderID);
+			pm.refresh(order);
+			return (Order) pm.detachCopy(order);
 		} finally {
 			pm.close();
 		}

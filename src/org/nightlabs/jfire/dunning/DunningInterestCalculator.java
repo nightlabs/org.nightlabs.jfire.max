@@ -134,48 +134,87 @@ implements Serializable
 			List<DunningLetterEntry> newLetterEntries = newLetter.getEntries();
 			List<DunningLetterEntry> oldLetterEntries = prevLetter.getEntries();
 			
-			//(((Annual Interest+Amount)-Amount Paid)*Rate)/DaysOfYear)*Days
+			//(((Annual Interest+Amount)-Amount Paid)*Interest Percentage)/DaysOfYear)*Days
 			for (DunningLetterEntry newLetterEntry : newLetterEntries) {
-				InvoiceDunningStep invoiceDunningStep = dunningConfig.getInvoiceDunningStep(newLetter.getDunningLevel());
+				int dunningLevel = newLetterEntry.getDunningLevel();
+				
+				Date startDate = getFirstDay(newLetterEntry); //either the invoice due date or the extended due date
+				Date endDate = getLastDay(newLetterEntry);
+				
+				DunningInterest backRefInterest = newLetterEntry.getLastestDunningInterest();
+				InvoiceDunningStep invoiceDunningStep = dunningConfig.getInvoiceDunningStep(dunningLevel);
 				BigDecimal interestPercentage = invoiceDunningStep.getInterestPercentage();
 				
-				Date firstDay = getFirstDay(newLetterEntry); //either the invoice due date or the extended due date
-				Date lastDay = getLastDay(newLetterEntry);
-				long dayDifTime = lastDay.getTime() - firstDay.getTime();
-				long dayDiffDays = dayDifTime / (24l * 60l * 60l * 1000l);
-				long daysOfYear = getDaysOfYear(Calendar.getInstance().get(Calendar.YEAR));
-
-				int entryIndex = oldLetterEntries.indexOf(newLetterEntry);
-				if (entryIndex != -1) { //combination of an old one + additional time
-					// *** REV_marco_dunning ***
-					// What's this?! IMHO that's nonsense. The previous interest is the corresponding interest in the previous DunningLetter
-					// and definitely not in the new DunningLetter! Think about what you are doing here & understand it!
-					DunningInterest prevInterest = newLetterEntry.getDunningInterests().get(newLetterEntry.getDunningInterests().size() - 1);
+				Calendar startDateCalendar = Calendar.getInstance();
+				Calendar endDateCalendar = Calendar.getInstance();
+				
+				startDateCalendar.setTime(startDate);
+				endDateCalendar.setTime(endDate);
+				
+				int startDateYear = startDateCalendar.get(Calendar.YEAR);
+				int endDateYear = endDateCalendar.get(Calendar.YEAR);
+				
+				int currentYear = startDateCalendar.get(Calendar.YEAR);
+				double annualInterestAmount = 0;
+				BigDecimal amount = new BigDecimal(newLetterEntry.getPriceIncludingInvoice().getAmount() - newLetterEntry.getLastestDunningInterest().getAmountPaid());
+				while (currentYear < endDateYear) {
+					int daysOfYear = getDaysOfYear(currentYear);
+					if (currentYear == startDateYear) { //TODO I separated them for the new design of the interest, otherwise just combine the days for calculating.
+						int numDays = daysOfYear - startDateCalendar.get(Calendar.DAY_OF_YEAR);
+						annualInterestAmount += (interestPercentage.multiply(amount).doubleValue()/daysOfYear)*numDays;
+					}
+					else if (currentYear == endDateYear) {
+						int numDays = endDateCalendar.get(Calendar.DAY_OF_YEAR);
+						annualInterestAmount += (interestPercentage.multiply(amount).doubleValue()/daysOfYear)*numDays;
+					}
+					else {
+						int numDays = daysOfYear;
+						annualInterestAmount += (interestPercentage.multiply(amount).doubleValue()/daysOfYear)*numDays;
+					}
 					
-					if (interestPercentage.equals(prevInterest.getInterestPercentage())) { //if the interest percentage didn't change
-						Date extendedDate = new Date(lastDay.getTime() + newLetterEntry.getPeriodOfGraceMSec());
-						prevInterest.setCreditPeriodToExcl(extendedDate);
-						calculate(invoiceDunningStep, prevInterest);
-					}
-					else { //create new interest
-						DunningInterest interest = new DunningInterest(organisationID, IDGenerator.nextID(DunningInterest.class), newLetterEntry, prevInterest);
-						interest.setInterestPercentage(interestPercentage);
-						interest.setCreditPeriodFromIncl(firstDay);
-						interest.setCreditPeriodToExcl(lastDay);
-
-						calculate(invoiceDunningStep, interest);
-						newLetterEntry.addDunningInterest(interest);
-					}
+					//TODO
+					currentYear++;
 				}
-				else { //create completely new one
-					DunningInterest interest = new DunningInterest(organisationID, IDGenerator.nextID(DunningInterest.class), newLetterEntry, null);
-					interest.setInterestPercentage(interestPercentage);
-					interest.setCreditPeriodFromIncl(firstDay);
-					interest.setCreditPeriodToExcl(lastDay);
-
-					calculate(invoiceDunningStep, interest);
-					newLetterEntry.addDunningInterest(interest);
-				}
+				
+				DunningInterest interest = new DunningInterest(IDGenerator.getOrganisationID(), 
+						IDGenerator.nextID(DunningInterest.class), 
+						newLetterEntry, 
+						backRefInterest);
+				interest.setInterestPercentage(interestPercentage);
+				interest.setCreditPeriodFromIncl(startDate);
+				interest.setCreditPeriodToExcl(endDate);
+				
+//				int entryIndex = oldLetterEntries.indexOf(newLetterEntry);
+//				if (entryIndex != -1) { //combination of an old one + additional time
+//					// *** REV_marco_dunning ***
+//					// What's this?! IMHO that's nonsense. The previous interest is the corresponding interest in the previous DunningLetter
+//					// and definitely not in the new DunningLetter! Think about what you are doing here & understand it!
+//					DunningInterest prevInterest = newLetterEntry.getDunningInterests().get(newLetterEntry.getDunningInterests().size() - 1);
+//					
+//					if (interestPercentage.equals(prevInterest.getInterestPercentage())) { //if the interest percentage didn't change
+//						Date extendedDate = new Date(lastDate.getTime() + newLetterEntry.getPeriodOfGraceMSec());
+//						prevInterest.setCreditPeriodToExcl(extendedDate);
+//						calculate(invoiceDunningStep, prevInterest);
+//					}
+//					else { //create new interest
+//						DunningInterest interest = new DunningInterest(organisationID, IDGenerator.nextID(DunningInterest.class), newLetterEntry, prevInterest);
+//						interest.setInterestPercentage(interestPercentage);
+//						interest.setCreditPeriodFromIncl(firstDate);
+//						interest.setCreditPeriodToExcl(lastDate);
+//
+//						calculate(invoiceDunningStep, interest);
+//						newLetterEntry.addDunningInterest(interest);
+//					}
+//				}
+//				else { //create completely new one
+//					DunningInterest interest = new DunningInterest(organisationID, IDGenerator.nextID(DunningInterest.class), newLetterEntry, null);
+//					interest.setInterestPercentage(interestPercentage);
+//					interest.setCreditPeriodFromIncl(firstDate);
+//					interest.setCreditPeriodToExcl(lastDate);
+//
+//					calculate(invoiceDunningStep, interest);
+//					newLetterEntry.addDunningInterest(interest);
+//				}
 			}
 		}
 	}

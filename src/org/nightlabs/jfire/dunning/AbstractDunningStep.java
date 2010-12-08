@@ -131,31 +131,10 @@ implements Serializable, Comparable<AbstractDunningStep>
 
 	@Override
 	public String toString() {
-		// *** REV_marco_dunning ***
-		// In most other classes, we use the notation ${fullyQualifiedClassName}@${memoryAddress}[${primaryKey}]
-		// for example org.nightlabs.jfire.dunning.AbstractDunningStep@20d9a[jfire.nightlabs.de,234]
-		// IMHO there's no reason to handle it differently here. It is desirable to see both, the memory address
-		// and the primary key in the database, because there are situations during debugging, when you want to
-		// see if it is the exact same instance - only the memory address can answer this question.
-		// The easiest way to achieve this is by the code I wrote below.
-		// Alternatively, you can write this:
-		//   return this.getClass().getName() + '@' + Long.toHexString(System.identityHashCode(this)) + '[' + organisationID + ',' + dunningStepID + ']';
-		// but that's much longer.
-//		return "AbstractDunningStep [dunningStepID=" + dunningStepID
-//				+ ", organisationID=" + organisationID + "]";#
 		return super.toString() + '[' + organisationID + ',' + dunningStepID + ']';
 	}
 
 	@Override
-	// *** REV_marco_dunning ***
-	// Why do you add javadoc to an overriding method?! Don't you know that javadoc
-	// is automatically inherited from the superclass/interface, if you don't have
-	// javadoc in the sub-class/implementation? If you want to combine the super-class'
-	// documentation with some additional docs, then use {@inheritDoc} and put your
-	// specific stuff for the sub-class either above or below.
-	/**
-	 * @see java.lang.Comparable#compareTo(java.lang.Object)
-	 */
 	public int compareTo(AbstractDunningStep o) {
 		if (o.getDunningLevel() < this.getDunningLevel())
 				return 1;

@@ -168,6 +168,10 @@ implements Serializable
 		return currency;
 	}
 
+	/**
+	 * Returns the base from which the interest is calculated in the smallest currency unit.
+	 * @return long baseAmount
+	 */
 	public long getBaseAmount() {
 		return baseAmount;
 	}

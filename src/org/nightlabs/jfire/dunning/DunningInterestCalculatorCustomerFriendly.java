@@ -30,9 +30,7 @@ import org.nightlabs.jfire.organisation.Organisation;
 		detachable="true",
 		table="JFireDunning_DunningInterestCalculatorCustomerFriendly"
 )
-// *** REV_marco_dunning ***
-// Why do you use NEW_TABLE? There are no additional fields. You should better use SUPERCLASS_TABLE.
-@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
+@Inheritance(strategy=InheritanceStrategy.SUPERCLASS_TABLE)
 public class DunningInterestCalculatorCustomerFriendly
 extends DunningInterestCalculator
 {

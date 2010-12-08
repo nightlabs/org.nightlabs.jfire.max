@@ -1,6 +1,7 @@
 package org.nightlabs.jfire.dunning;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -111,7 +112,8 @@ implements Serializable
 		this.dunningLevel = dunningLevel;
 		this.invoice = invoice;
 		this.dunningLetter = dunningLetter;
-
+		this.dunningInterests = new ArrayList<DunningInterest>();
+		
 		this.priceIncludingInvoice = invoice.getPrice();
 	}
 
@@ -170,6 +172,13 @@ implements Serializable
 	public List<DunningInterest> getDunningInterests() {
 		return Collections.unmodifiableList(dunningInterests);
 	}
+	
+	public DunningInterest getLastestDunningInterest() {
+		if (dunningInterests.size() > 0) {
+			return dunningInterests.get(dunningInterests.size() - 1);
+		}
+		return null;
+	}
 
 	public Price getPriceIncludingInvoice() {
 		return priceIncludingInvoice;
@@ -179,6 +188,10 @@ implements Serializable
 		return dunningLetter;
 	}
 
+	public void copyInterestsFrom(DunningLetterEntry src) {
+		this.dunningInterests.addAll(src.getDunningInterests());
+	}
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;

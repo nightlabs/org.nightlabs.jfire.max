@@ -318,18 +318,9 @@ implements DunningManagerRemote
 					//Create new DunningProcess
 					dunningProcess = 
 						new DunningProcess(dunningConfig.getOrganisationID(), IDGenerator.nextIDString(DunningProcess.class), customerDunningConfig == null ? dunningConfig : customerDunningConfig);
-//					/****************************************
-//					 * this makes the wrong workflow!!!! Should not create it here!!!!
-//					 ****************************************/
-//					DunningLetter dunningLetter = new DunningLetter(
-//							IDGenerator.getOrganisationID(), 
-//							IDGenerator.nextIDString(DunningLetter.class), 
-//							dunningProcess); //TODO: Is this good?
-//					dunningProcess.getDunningLetters().add(dunningLetter); //TODO: Is this good?
 				}
 
 				dunningProcess.processInvoice(inv, date);
-				
 				pm.makePersistent(dunningProcess);
 			}
 

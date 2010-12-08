@@ -91,6 +91,12 @@ implements Serializable, PayableObject, Statable
 	@Persistent(persistenceModifier = PersistenceModifier.PERSISTENT)
 	private Integer letterDunningLevel = -1;
 
+	// *** Re-Added by chairat REV_marco_dunning ***
+	// Every DunningLetterEntry belongs only to exactly one DunningLetter and is not
+	// modified when a new one is created! Instead new entries will be created for the new letter
+	// (i.e. the old entries will be copied and modified).
+	// Btw. take a look at the class DunningLetterEntry. There is the field 'dunningLetter'. What should
+	// that mean, if one entry could belong to many DunningLetters?!
 	/**
 	 * The information of each overdue invoice needed to print the letter. This
 	 * includes the dunning level, the original invoice, the interest for that
@@ -162,6 +168,7 @@ implements Serializable, PayableObject, Statable
 	// *** REV_marco_dunning ***
 	// Shouldn't the outstanding flag be cleared, too, when a new DunningLetter
 	// (replacing the old one) is created?
+	// From chairat: it's not replaced. the dunning letters are added into a list in the dunning process.
 	/**
 	 * A flag indicating that this DunningLetter is still open and waits for
 	 * payment (of the amountToPay). This flag should be cleared immediately
@@ -204,6 +211,11 @@ implements Serializable, PayableObject, Statable
 				.nextIDString(DunningLetter.class), dunningProcess);
 	}
 
+	/**
+	 * Returns the corresponding entry that contains the invoice
+	 * @param invoice
+	 * @return DunningLetterEntry
+	 */
 	public DunningLetterEntry getDunningLetterEntry(Invoice invoice) {
 		for (DunningLetterEntry entry : dunningLetterEntries) {
 			if (entry.getInvoice().equals(invoice)) {
@@ -240,7 +252,11 @@ implements Serializable, PayableObject, Statable
 	 * @param dunningLevel
 	 * @param dunningInvoice
 	 */
-	public void addEntry(DunningLetterEntry letterEntry) {
+	public void addEntry(DunningLetterEntry letterEntry, boolean isUpdatedItem) {
+		if (isUpdatedItem) {
+			this.containUpdatedItem = true;
+		}
+		
 		int dunningLevel = letterEntry.getDunningLevel();
 		if (dunningLevel > letterDunningLevel) {
 			this.letterDunningLevel = dunningLevel;
@@ -250,38 +266,10 @@ implements Serializable, PayableObject, Statable
 		priceIncludingInvoices.sumPrice(letterEntry.getPriceIncludingInvoice());
 	}
 	
-	public void updateEntry(Invoice dunningInvoice) {
-		DunningConfig dunningConfig = dunningProcess.getDunningConfig();
-
-		//Check if the dunningInv needs to be dunned again (it's late for payment on the extended due date).
-		//If so, we need to change the dunningLevel.
-		int dunningLevel = -1;
-		for (DunningLetterEntry entry : dunningLetterEntries) {
-			if (entry.getInvoice().equals(dunningInvoice)) {
-				dunningLevel = entry.getDunningLevel();
-				InvoiceDunningStep invDunningStep = dunningConfig.getInvoiceDunningStep(dunningLevel);
-				boolean isOverdue = entry.isOverdue(new Date());
-				if (isOverdue) {
-					long newDueDateTime = entry.getExtendedDueDateForPayment().getTime() + invDunningStep.getPeriodOfGraceMSec();
-					Date newDueDate = new Date(newDueDateTime);
-					entry.setDunningLevel(dunningLevel++);
-					entry.setPeriodOfGraceMSec(invDunningStep.getPeriodOfGraceMSec());
-					entry.setExtendedDueDateForPayment(newDueDate);
-					containUpdatedItem = true;
-				}
-			}
-		}
-
-//		priceIncludingInvoices.sumPrice(letterEntry.getPriceIncludingInvoice());
-//		for (DunningFee dunningFee : dunningFees) {
-//			priceIncludingInvoices.sumPrice(dunningFee.getPrice());
-//		}
-	}
-
 	public boolean isContainUpdatedItem() {
 		return containUpdatedItem;
 	}
-
+	
 	public List<DunningLetterEntry> getEntries() {
 		return Collections.unmodifiableList(dunningLetterEntries);
 	}
@@ -375,12 +363,12 @@ implements Serializable, PayableObject, Statable
 		outstanding = amountToPay != 0;
 	}
 
-	public void copyAllFeesFrom(DunningLetter dunningLetter) {
-		if (dunningLetter == null) {
+	public void copyAllFeesFrom(DunningLetter srcDunningLetter) {
+		if (srcDunningLetter == null) {
 			throw new IllegalArgumentException("The dunning letter should not be null!!!");
 		}
 
-		for (DunningFee dunningFee : dunningLetter.getDunningFees()) {
+		for (DunningFee dunningFee : srcDunningLetter.getDunningFees()) {
 			addDunningFee(dunningFee);
 		}
 	}

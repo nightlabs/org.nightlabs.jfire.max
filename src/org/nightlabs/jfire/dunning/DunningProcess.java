@@ -236,32 +236,40 @@ implements Serializable
 
 	public void createDunningLetter(boolean isFinalized) {
 		DunningLetter prevDunningLetter = getLastDunningLetter();
+		DunningLetter newDunningLetter = new DunningLetter(this);
 		if (isFinalized && prevDunningLetter != null) {
 			doFinalization(prevDunningLetter);
 			//TODO 6.3.6 books out the prev letter
 		}
 
-		DunningLetter newDunningLetter = new DunningLetter(this);
-		newDunningLetter.copyAllFeesFrom(prevDunningLetter);
-
 		//Create entries in the new letter
 		for (Invoice dunnedInvoice : dunnedInvoices2DunningLevel.keySet()) {
+			//TODO Should we create new or use the old one???!!!!!!!
 			DunningLetterEntry dunningLetterEntry = new DunningLetterEntry(
 					IDGenerator.getOrganisationID(), 
 					IDGenerator.nextID(DunningLetterEntry.class), 
 					dunnedInvoices2DunningLevel.get(dunnedInvoice), 
 					dunnedInvoice, 
 					newDunningLetter);
-			DunningLetterEntry oldEntry = prevDunningLetter.getDunningLetterEntry(dunnedInvoice);
-			if (oldEntry != null) {
-				if (oldEntry.getDunningLevel() < dunningLetterEntry.getDunningLevel()) {
-					InvoiceDunningStep invDunningStep = dunningConfig.getInvoiceDunningStep(dunningLetterEntry.getDunningLevel());
-					long extendedDueDateForPayment = prevDunningLetter.getFinalizeDT().getTime() + invDunningStep.getPeriodOfGraceMSec();
-					dunningLetterEntry.setExtendedDueDateForPayment(new Date(extendedDueDateForPayment));
-					dunningLetterEntry.setPeriodOfGraceMSec(invDunningStep.getPeriodOfGraceMSec());
+
+			boolean isUpdatedItem = false;
+			if(prevDunningLetter != null) {
+				DunningLetterEntry oldEntry = prevDunningLetter.getDunningLetterEntry(dunnedInvoice);
+				if (oldEntry != null) {
+					dunningLetterEntry.copyInterestsFrom(oldEntry);
+					if (oldEntry.getDunningLevel() < dunningLetterEntry.getDunningLevel()) { //TODO Should we check this? I think it'll never happen.
+						InvoiceDunningStep invDunningStep = dunningConfig.getInvoiceDunningStep(dunningLetterEntry.getDunningLevel());
+						long periodOfGraceMSec = invDunningStep.getPeriodOfGraceMSec();
+						long extendedDueDateForPaymentMSec = prevDunningLetter.getFinalizeDT().getTime() + periodOfGraceMSec; //TODO Check this!!!
+						
+						dunningLetterEntry.setExtendedDueDateForPayment(new Date(extendedDueDateForPaymentMSec));
+						dunningLetterEntry.setPeriodOfGraceMSec(invDunningStep.getPeriodOfGraceMSec());
+						
+						isUpdatedItem = true;
+					}
 				}
 			}
-			newDunningLetter.addEntry(dunningLetterEntry);
+			newDunningLetter.addEntry(dunningLetterEntry, isUpdatedItem);
 		}
 		
 		DunningInterestCalculator dunningInterestCalculator = dunningConfig
@@ -269,6 +277,10 @@ implements Serializable
 		dunningInterestCalculator.generateDunningInterests(prevDunningLetter, newDunningLetter);
 		
 		//Calculate fees for the new letter
+		if (prevDunningLetter != null) {
+			newDunningLetter.copyAllFeesFrom(prevDunningLetter);
+		}
+		
 		DunningFeeAdder feeAdder = dunningConfig.getDunningFeeAdder();
 		feeAdder.addDunningFee(prevDunningLetter, newDunningLetter);
 

@@ -98,6 +98,7 @@ implements Serializable
 	 *
 	 * @param organisationID first part of the primary key. The organisation which created this object.
 	 * @param dunningFeeID second part of the primary key. A local identifier within the namespace of the organisation.
+	 * @param original null or the one from which this one was copied (if it was copied from a previous DunningLetter).
 	 */
 	public DunningFee(String organisationID, String dunningFeeID, DunningFee original) {
 		Organisation.assertValidOrganisationID(organisationID);

@@ -67,6 +67,12 @@ extends AbstractDunningStep
 		return interestPercentage;
 	}
 	
+	/**
+	 * Sets the time (in milliseconds) that specify how long to wait
+	 * before continuing the DunningProcess.
+	 * 
+	 * @return long time
+	 */
 	public void setPeriodOfGraceMSec(long periodOfGraceMSec) {
 		this.periodOfGraceMSec = periodOfGraceMSec;
 	}

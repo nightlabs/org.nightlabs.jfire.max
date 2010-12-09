@@ -287,6 +287,11 @@ implements Serializable, PayableObject, Statable
 			return;
 
 		this.finalizeDT = new Date(System.currentTimeMillis());
+
+		for (DunningLetterEntry entry : dunningLetterEntries) {
+			long extendedDueDateForPaymentMSec = finalizeDT.getTime() + entry.getPeriodOfGraceMSec();
+			entry.setExtendedDueDateForPayment(new Date(extendedDueDateForPaymentMSec));
+		}
 	}
 
 	public void setFinalizeDT(Date finalizeDT) {

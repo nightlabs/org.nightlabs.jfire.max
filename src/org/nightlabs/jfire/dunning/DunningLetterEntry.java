@@ -63,6 +63,9 @@ implements Serializable
 	private Invoice invoice;
 
 	/**
+	 * The time (in milliseconds) that specify how long to wait
+	 * before continuing the DunningProcess.
+	 * 
 	 * Copied during creation from corresponding dunningStep.
 	 */
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
@@ -114,6 +117,9 @@ implements Serializable
 		this.dunningLetter = dunningLetter;
 		this.dunningInterests = new ArrayList<DunningInterest>();
 		
+		InvoiceDunningStep invDunningStep = dunningLetter.getDunningProcess().getDunningConfig().getInvoiceDunningStep(dunningLevel);
+		this.periodOfGraceMSec = invDunningStep.getPeriodOfGraceMSec();
+		
 		this.priceIncludingInvoice = invoice.getPrice();
 	}
 
@@ -137,10 +143,6 @@ implements Serializable
 		return invoice;
 	}
 
-	public void setPeriodOfGraceMSec(long periodOfGraceMSec) {
-		this.periodOfGraceMSec = periodOfGraceMSec;
-	}
-
 	/**
 	 * Returns the time (in milliseconds) that specify how long to wait
 	 * before continuing the DunningProcess. This value is copied from its InvoiceDunningStep
@@ -152,7 +154,7 @@ implements Serializable
 	}
 
 	/**
-	 * Returns The due-date until which this DunningLetter needs to be
+	 * Returns the due-date until which this DunningLetter needs to be
 	 * paid. It is calculated when the DunningLetter is finalized
 	 * (and null till finalization):  dunningLetter.finalizeDT + this.periodOfGraceMSec.
 	 */
@@ -160,6 +162,11 @@ implements Serializable
 		return extendedDueDateForPayment;
 	}
 
+	/**
+	 * Sets the due-date until which this DunningLetter needs to be
+	 * paid. It is calculated when the DunningLetter is finalized
+	 * (and null till finalization):  dunningLetter.finalizeDT + this.periodOfGraceMSec.
+	 */
 	public void setExtendedDueDateForPayment(Date extendedDueDateForPayment) {
 		this.extendedDueDateForPayment = extendedDueDateForPayment;
 	}

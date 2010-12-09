@@ -251,22 +251,18 @@ implements Serializable
 					dunnedInvoices2DunningLevel.get(dunnedInvoice), 
 					dunnedInvoice, 
 					newDunningLetter);
-
+			
 			boolean isUpdatedItem = false;
 			if(prevDunningLetter != null) {
 				DunningLetterEntry oldEntry = prevDunningLetter.getDunningLetterEntry(dunnedInvoice);
 				if (oldEntry != null) {
 					dunningLetterEntry.copyInterestsFrom(oldEntry);
 					if (oldEntry.getDunningLevel() < dunningLetterEntry.getDunningLevel()) { //TODO Should we check this? I think it'll never happen.
-						InvoiceDunningStep invDunningStep = dunningConfig.getInvoiceDunningStep(dunningLetterEntry.getDunningLevel());
-						long periodOfGraceMSec = invDunningStep.getPeriodOfGraceMSec();
-						long extendedDueDateForPaymentMSec = prevDunningLetter.getFinalizeDT().getTime() + periodOfGraceMSec; //TODO Check this!!!
-						
-						dunningLetterEntry.setExtendedDueDateForPayment(new Date(extendedDueDateForPaymentMSec));
-						dunningLetterEntry.setPeriodOfGraceMSec(invDunningStep.getPeriodOfGraceMSec());
-						
 						isUpdatedItem = true;
 					}
+				}
+				else {
+					
 				}
 			}
 			newDunningLetter.addEntry(dunningLetterEntry, isUpdatedItem);

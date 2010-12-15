@@ -93,25 +93,9 @@ implements Serializable
 	 */
 	public abstract Date getLastDay(DunningLetterEntry dunningLetterEntry);
 
-	// *** REV_marco_dunning ***
-	// Write better javadoc, please! A javadoc comment must decribe the method. That means it
-	// would be more appropriate to start like this: "Create new instances of {@link DunningInterest} accoding to
-	// the time passed ..."
-	// Simply imagine, you had no idea about this method (i.e. never read any spec). What would you
-	// expect to read here? What would help you to understand the behaviour of this method? What you copied here (from the spec)
-	// definitely helps, but only as second or third paragraph. WRITE SOMETHING YOURSELF! Not only copy + paste things.
-	// In this concrete case, here, you have two kinds of people who read this javadoc:
-	// Those who want to USE this method and therefore need to understand what they have to feed into it to make it do what
-	// they want.
-	// And those people who want to OVERRIDE this method, because they want to implement a different way to handle interest
-	// calculation. These people need to know what they have to do in their implementation.
-	// In both cases, a clear contract would help. Every API method is part of a contract - i.e. defines a sub-contract. You
-	// should use the javadoc to explain this sub-contract in human language. If you cannot do this properly, then you didn't think
-	// enough about it or you didn't understand the specification properly. In both situations it might help to think through
-	// the work flow. Think about when this method is called and what the situation looks like at this time (i.e. what objects exist
-	// and what states do they have and what should change).
 	/**
 	 * Create new instances of {@link DunningInterest}s that calculate from 
+	 * the previous {@link DunningInterest}s copied from the previous {@link DunningLetter}.  
 	 * 
 	 * It is important to note that the DunningInterestCalculator needs to know
 	 * the previous DunningInterests (from the previous DunningLetter)
@@ -140,16 +124,13 @@ implements Serializable
 		}
 		else { //Calculate the interests
 			List<DunningLetterEntry> newLetterEntries = newLetter.getEntries();
-			List<DunningLetterEntry> oldLetterEntries = prevLetter.getEntries();
-			
-			//(((Annual Interest+Amount)-Amount Paid)*Interest Percentage)/DaysOfYear)*Days
 			for (DunningLetterEntry newLetterEntry : newLetterEntries) {
 				int dunningLevel = newLetterEntry.getDunningLevel();
 				
 				Date startDate = getFirstDay(newLetterEntry); //either the invoice due date or the extended due date
 				Date endDate = getLastDay(newLetterEntry);
 				
-				DunningInterest backRefInterest = newLetterEntry.getLastestDunningInterest();
+				DunningInterest backRefInterest = newLetterEntry.getLastestDunningInterest(); //Reference to the prev interest instance
 				InvoiceDunningStep invoiceDunningStep = dunningConfig.getInvoiceDunningStep(dunningLevel);
 				BigDecimal interestPercentage = invoiceDunningStep.getInterestPercentage();
 				
@@ -165,6 +146,7 @@ implements Serializable
 				int currentYear = startDateCalendar.get(Calendar.YEAR);
 				BigDecimal annualInterest = BigDecimal.valueOf(0);
 				BigDecimal totalInterest = BigDecimal.valueOf(0);
+				//Amount - Amount paid
 				BigDecimal toPayAmount = BigDecimal.valueOf(newLetterEntry.getPriceIncludingInvoice().getAmount() - newLetterEntry.getLastestDunningInterest().getAmountPaid());
 				while (currentYear < endDateYear) {
 					int daysOfYearInt = getDaysOfYear(currentYear);
@@ -182,6 +164,7 @@ implements Serializable
 					}
 					
 					BigDecimal numDays = BigDecimal.valueOf(numDaysInt);
+					//(((Annual Interest+Amount)*Interest Percentage)/DaysOfYear)*Days
 					totalInterest = interestPercentage.multiply(annualInterest.add(toPayAmount)).divide(daysOfYear).multiply(numDays);
 					
 					currentYear++;

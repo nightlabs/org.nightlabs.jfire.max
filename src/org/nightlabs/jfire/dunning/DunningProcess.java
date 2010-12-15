@@ -244,7 +244,6 @@ implements Serializable
 
 		//Create entries in the new letter
 		for (Invoice dunnedInvoice : dunnedInvoices2DunningLevel.keySet()) {
-			//TODO Should we create new or use the old one???!!!!!!!
 			DunningLetterEntry dunningLetterEntry = new DunningLetterEntry(
 					IDGenerator.getOrganisationID(), 
 					IDGenerator.nextID(DunningLetterEntry.class), 
@@ -261,8 +260,8 @@ implements Serializable
 						isUpdatedItem = true;
 					}
 				}
-				else {
-					
+				else { //oldEntry == null
+					//it's a new invoice
 				}
 			}
 			newDunningLetter.addEntry(dunningLetterEntry, isUpdatedItem);

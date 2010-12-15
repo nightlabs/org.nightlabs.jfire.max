@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<root-container name="dev.jfire.org:DunningLetter.DunningLetter" width="1106" height="804">
+  <node name="dev.jfire.org:created" x="148" y="17" width="132" height="36">
+    <edge>
+      <label x="7" y="-10"/>
+    </edge>
+    <edge>
+      <label x="-3" y="22"/>
+      <bendpoint w1="-189" h1="0" w2="0" h2="-163"/>
+    </edge>
+    <edge>
+      <label x="-22" y="-19"/>
+    </edge>
+  </node>
+  <node name="dev.jfire.org:finalized" x="147" y="82" width="132" height="36">
+    <edge>
+      <label x="5" y="-10"/>
+    </edge>
+  </node>
+  <node name="dev.jfire.org:paid" x="148" y="375" width="132" height="36"/>
+  <node name="dev.jfire.org:aborted" x="363" y="17" width="178" height="36"/>
+  <node name="dev.jfire.org:booked" x="134" y="180" width="159" height="36">
+    <edge>
+      <label x="5" y="-10"/>
+    </edge>
+    <edge>
+      <label x="5" y="-10"/>
+    </edge>
+  </node>
+  <node name="dev.jfire.org:bookedImplicitely" x="-63" y="180" width="176" height="36">
+    <edge>
+      <label x="5" y="-10"/>
+    </edge>
+  </node>
+  <node name="dev.jfire.org:sent" x="409" y="73" width="132" height="36">
+    <edge>
+      <label x="5" y="-10"/>
+      <bendpoint w1="-100" h1="1" w2="162" h2="-106"/>
+    </edge>
+  </node>
+</root-container>

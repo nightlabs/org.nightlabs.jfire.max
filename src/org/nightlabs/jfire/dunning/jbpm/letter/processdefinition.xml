@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<process-definition xmlns=""
+	name="dev.jfire.org:DunningLetter.DunningLetter">
+	<start-state name="dev.jfire.org:created">
+		<transition name="finalize" to="dev.jfire.org:finalized"></transition>
+		<transition name="dev.jfire.org:bookImplicitely" to="dev.jfire.org:bookedImplicitely"></transition>
+		<transition to="dev.jfire.org:aborted" name="abort"></transition>
+	</start-state>
+	<state name="dev.jfire.org:finalized">
+		<event type="node-enter">
+			<action class="org.nightlabs.jfire.dunning.jbpm.ActionHandlerFinalizeDunningLetter" />
+		</event>
+		<transition name="dev.jfire.org:book" to="dev.jfire.org:booked"></transition>
+	</state>
+	<end-state name="dev.jfire.org:paid"></end-state>
+
+	<end-state name="dev.jfire.org:aborted"></end-state>
+	<state name="dev.jfire.org:booked">
+		<event type="node-enter">
+			<action class="org.nightlabs.jfire.dunning.jbpm.ActionHandlerBookDunningLetter" />
+		</event>
+		<transition name="dev.jfire.org:pay" to="dev.jfire.org:paid"></transition>
+		<transition to="dev.jfire.org:sent" name="dev.jfire.org:send"></transition>
+	</state>
+	<node name="dev.jfire.org:bookedImplicitely">
+		<event type="node-enter">
+			<action
+				class="org.nightlabs.jfire.dunning.jbpm.ActionHandlerBookDunningLetterImplicitely" />
+		</event>
+		<transition name="" to="dev.jfire.org:booked"></transition>
+	</node>
+
+	<node name="dev.jfire.org:sent">
+		<transition to="dev.jfire.org:booked" name=""></transition>
+	</node>
+</process-definition>

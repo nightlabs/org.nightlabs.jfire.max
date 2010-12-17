@@ -103,8 +103,8 @@ implements Serializable, PayableObject, Statable
 	 * invoice, the extended due date, etc.
 	 */
 	@Persistent(
-			mappedBy="dunningLetter", 
-			table = "JFireDunning_DunningLetter_dunningLetterEntries", 
+			dependentElement="true",
+			mappedBy="dunningLetter",
 			persistenceModifier = PersistenceModifier.PERSISTENT)
 	private List<DunningLetterEntry> dunningLetterEntries;
 
@@ -113,8 +113,8 @@ implements Serializable, PayableObject, Statable
 	 * new ones (based on dunningStep.feeTypes).
 	 */
 	@Persistent(
-			mappedBy="dunningLetter", 
-			table = "JFireDunning_DunningLetter_dunningFees", 
+			dependentElement="true",
+			mappedBy="dunningLetter",
 			persistenceModifier = PersistenceModifier.PERSISTENT)
 	private List<DunningFee> dunningFees;
 

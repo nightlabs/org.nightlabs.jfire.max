@@ -3,6 +3,7 @@
 		"http://www.nightlabs.de/dtd/datastoreinit_1_1.dtd">
 <organisation-initialisation>
 	<init bean="org.nightlabs.jfire.dunning.DunningManagerRemote" method="initialise">
+		<depends module="JFireJbpmEAR.ear"/>
 		<depends module="JFireBaseEAR.ear"
 			archive="JFireBaseBean.jar" />
 	</init>

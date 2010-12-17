@@ -364,74 +364,74 @@ implements DunningManagerRemote
 		DunningFeeAdder dunningFeeAdder;
 		try {
 			pm.getExtent(DunningFeeAdder.class);
-			// check, whether the datastore is already initialized
-			try {
-				pm.getObjectById(DunningFeeAdderCustomerFriendly.ID);
-				return; // already initialized
-			} catch (JDOObjectNotFoundException x) {
+//			// check, whether the datastore is already initialized
+//			try {
+//				pm.getObjectById(DunningFeeAdderCustomerFriendly.ID);
+//				return; // already initialized
+//			} catch (JDOObjectNotFoundException x) {
 				// datastore not yet initialized
 				dunningFeeAdder = pm.makePersistent(new DunningFeeAdderCustomerFriendly(organisationIDStr, DunningFeeAdderCustomerFriendly.ID.dunningFeeAdderID));
-
 				pm.getExtent(DunningInterestCalculator.class);
-
 				dunningInterestCalculator = pm.makePersistent(new DunningInterestCalculatorCustomerFriendly(organisationIDStr, DunningInterestCalculatorCustomerFriendly.ID.dunningInterestCalculatorID));
-			}
+//			}
 
-			pm.getExtent(DunningConfigCustomer.class);
-			// check, whether the datastore is already initialized
-			DunningConfigCustomerID dccID = DunningConfigCustomerID.create(getOrganisationID(), DunningConfigCustomer.DUNNING_CONFIG_CUSTOMER_DEFAULT_ID);
-			try {
-				pm.getObjectById(dccID);
-				return; // already initialized
-			} catch (JDOObjectNotFoundException x) {
-				DunningFeeType defaultDunningFeeType = new DunningFeeType(dccID.organisationID, IDGenerator.nextID(DunningFeeType.class));
-				defaultDunningFeeType.getName().readFromProperties(baseName, loader, "org.nightlabs.jfire.dunning.DunningFeeType.default.name");
-				defaultDunningFeeType.getDescription().readFromProperties(baseName, loader, "org.nightlabs.jfire.dunning.DunningFeeType.default.description");
-
-				// datastore not yet initialized
-				DunningConfig defaultDunningConfig = new DunningConfig(dccID.organisationID, dccID.dunningConfigCustomerID, DunningAutoMode.createAndFinalize);
-				defaultDunningConfig.getName().readFromProperties(baseName, loader, "org.nightlabs.jfire.dunning.DunningConfig.default.name");
-				defaultDunningConfig.getDescription().readFromProperties(baseName, loader, "org.nightlabs.jfire.dunning.DunningConfig.default.description");
-
-				//Step1
-				ProcessDunningStep processStep1 = new ProcessDunningStep(organisationIDStr, IDGenerator.nextIDString(AbstractDunningStep.class), defaultDunningConfig, 1);
-				processStep1.addFeeType(defaultDunningFeeType);
-
-				InvoiceDunningStep invStep1 = new InvoiceDunningStep(organisationIDStr, IDGenerator.nextIDString(AbstractDunningStep.class), defaultDunningConfig, 1);
-				invStep1.setPeriodOfGraceMSec(TimeUnit.DAYS.toMillis(31));
-				invStep1.setInterestPercentage(new BigDecimal(0));
-
-				//Step2
-				ProcessDunningStep processStep2 = new ProcessDunningStep(organisationIDStr, IDGenerator.nextIDString(AbstractDunningStep.class), defaultDunningConfig, 2);
-				processStep2.addFeeType(defaultDunningFeeType);
-
-				InvoiceDunningStep invStep2 = new InvoiceDunningStep(organisationIDStr, IDGenerator.nextIDString(AbstractDunningStep.class), defaultDunningConfig, 2);
-				invStep2.setPeriodOfGraceMSec(TimeUnit.DAYS.toMillis(31));
-				invStep2.setInterestPercentage(new BigDecimal(4));
-
-				//Step3
-				ProcessDunningStep processStep3 = new ProcessDunningStep(organisationIDStr, IDGenerator.nextIDString(AbstractDunningStep.class), defaultDunningConfig, 3);
-
-				InvoiceDunningStep invStep3 = new InvoiceDunningStep(organisationIDStr, IDGenerator.nextIDString(AbstractDunningStep.class), defaultDunningConfig, 3);
-				invStep3.setPeriodOfGraceMSec(TimeUnit.DAYS.toMillis(31));
-				invStep3.setInterestPercentage(new BigDecimal(4));
-
-				//
-				defaultDunningConfig.addInvoiceDunningStep(invStep1);
-				defaultDunningConfig.addInvoiceDunningStep(invStep2);
-				defaultDunningConfig.addInvoiceDunningStep(invStep3);
-
-				defaultDunningConfig.addProcessDunningStep(processStep1);
-				defaultDunningConfig.addProcessDunningStep(processStep2);
-				defaultDunningConfig.addProcessDunningStep(processStep3);
-
-				defaultDunningConfig.setDunningInterestCalculator(dunningInterestCalculator);
-				defaultDunningConfig.setDunningFeeAdder(dunningFeeAdder);
-
-				DunningConfigCustomer dcc = new DunningConfigCustomer(dccID.organisationID, dccID.dunningConfigCustomerID, defaultDunningConfig, LegalEntity.getAnonymousLegalEntity(pm));
-
-				pm.makePersistent(dcc);
-			}
+//			pm.getExtent(DunningConfigCustomer.class);
+//			// check, whether the datastore is already initialized
+//			DunningConfigCustomerID dccID = DunningConfigCustomerID.create(getOrganisationID(), DunningConfigCustomer.DUNNING_CONFIG_CUSTOMER_DEFAULT_ID);
+//			try {
+//				pm.getObjectById(dccID);
+//				return; // already initialized
+//			} catch (JDOObjectNotFoundException x) {
+//				DunningFeeType defaultDunningFeeType = new DunningFeeType(dccID.organisationID, IDGenerator.nextID(DunningFeeType.class));
+//				defaultDunningFeeType.getName().readFromProperties(baseName, loader, "org.nightlabs.jfire.dunning.DunningFeeType.default.name");
+//				defaultDunningFeeType.getDescription().readFromProperties(baseName, loader, "org.nightlabs.jfire.dunning.DunningFeeType.default.description");
+//
+//				// datastore not yet initialized
+//				DunningConfig defaultDunningConfig = new DunningConfig(dccID.organisationID, dccID.dunningConfigCustomerID, DunningAutoMode.createAndFinalize);
+//				defaultDunningConfig.getName().readFromProperties(baseName, loader, "org.nightlabs.jfire.dunning.DunningConfig.default.name");
+//				defaultDunningConfig.getDescription().readFromProperties(baseName, loader, "org.nightlabs.jfire.dunning.DunningConfig.default.description");
+//				// Create the process definitions.
+//				defaultDunningConfig.readProcessDefinition(DunningConfig.class.getResource("jbpm/letter/"));
+//				
+//				//Step1
+//				ProcessDunningStep processStep1 = new ProcessDunningStep(organisationIDStr, IDGenerator.nextIDString(AbstractDunningStep.class), defaultDunningConfig, 1);
+//				processStep1.addFeeType(defaultDunningFeeType);
+//
+//				InvoiceDunningStep invStep1 = new InvoiceDunningStep(organisationIDStr, IDGenerator.nextIDString(AbstractDunningStep.class), defaultDunningConfig, 1);
+//				invStep1.setPeriodOfGraceMSec(TimeUnit.DAYS.toMillis(31));
+//				invStep1.setInterestPercentage(new BigDecimal(0));
+//
+//				//Step2
+//				ProcessDunningStep processStep2 = new ProcessDunningStep(organisationIDStr, IDGenerator.nextIDString(AbstractDunningStep.class), defaultDunningConfig, 2);
+//				processStep2.addFeeType(defaultDunningFeeType);
+//
+//				InvoiceDunningStep invStep2 = new InvoiceDunningStep(organisationIDStr, IDGenerator.nextIDString(AbstractDunningStep.class), defaultDunningConfig, 2);
+//				invStep2.setPeriodOfGraceMSec(TimeUnit.DAYS.toMillis(31));
+//				invStep2.setInterestPercentage(new BigDecimal(4));
+//
+//				//Step3
+//				ProcessDunningStep processStep3 = new ProcessDunningStep(organisationIDStr, IDGenerator.nextIDString(AbstractDunningStep.class), defaultDunningConfig, 3);
+//
+//				InvoiceDunningStep invStep3 = new InvoiceDunningStep(organisationIDStr, IDGenerator.nextIDString(AbstractDunningStep.class), defaultDunningConfig, 3);
+//				invStep3.setPeriodOfGraceMSec(TimeUnit.DAYS.toMillis(31));
+//				invStep3.setInterestPercentage(new BigDecimal(4));
+//
+//				//
+//				defaultDunningConfig.addInvoiceDunningStep(invStep1);
+//				defaultDunningConfig.addInvoiceDunningStep(invStep2);
+//				defaultDunningConfig.addInvoiceDunningStep(invStep3);
+//
+//				defaultDunningConfig.addProcessDunningStep(processStep1);
+//				defaultDunningConfig.addProcessDunningStep(processStep2);
+//				defaultDunningConfig.addProcessDunningStep(processStep3);
+//
+//				defaultDunningConfig.setDunningInterestCalculator(dunningInterestCalculator);
+//				defaultDunningConfig.setDunningFeeAdder(dunningFeeAdder);
+//
+//				DunningConfigCustomer dcc = new DunningConfigCustomer(dccID.organisationID, dccID.dunningConfigCustomerID, defaultDunningConfig, LegalEntity.getAnonymousLegalEntity(pm));
+//
+//				pm.makePersistent(dcc);
+//			}
 		} finally {
 			pm.close();
 		}

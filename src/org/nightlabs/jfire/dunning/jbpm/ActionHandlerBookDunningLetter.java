@@ -7,7 +7,7 @@ import org.jbpm.graph.exe.ExecutionContext;
 import org.nightlabs.jfire.dunning.DunningLetter;
 import org.nightlabs.jfire.dunning.id.DunningLetterID;
 import org.nightlabs.jfire.jbpm.graph.def.AbstractActionHandler;
-import org.nightlabs.jfire.security.SecurityReflector;
+import org.nightlabs.jfire.security.GlobalSecurityReflector;
 import org.nightlabs.jfire.security.User;
 
 public class ActionHandlerBookDunningLetter
@@ -20,7 +20,7 @@ extends AbstractActionHandler
 	throws Exception
 	{
 		PersistenceManager pm = getPersistenceManager();
-		User user = SecurityReflector.getUserDescriptor().getUser(pm);
+		User user = GlobalSecurityReflector.sharedInstance().getUserDescriptor().getUser(pm);
 		DunningLetter dunningLetter = (DunningLetter) getStatable();
 //		dunningLetter.bookDunningLetter(user);
 

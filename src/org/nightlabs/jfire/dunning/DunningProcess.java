@@ -22,6 +22,8 @@ import javax.jdo.annotations.PrimaryKey;
 import javax.jdo.annotations.Queries;
 
 import org.apache.log4j.Logger;
+import org.jbpm.JbpmContext;
+import org.jbpm.graph.exe.ProcessInstance;
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.Invoice;
@@ -29,6 +31,7 @@ import org.nightlabs.jfire.accounting.id.CurrencyID;
 import org.nightlabs.jfire.dunning.id.DunningConfigID;
 import org.nightlabs.jfire.dunning.id.DunningProcessID;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
+import org.nightlabs.jfire.jbpm.JbpmLookup;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.transfer.id.AnchorID;
@@ -240,6 +243,12 @@ implements Serializable
 		if (isFinalized && prevDunningLetter != null) {
 			doFinalization(prevDunningLetter);
 			//TODO 6.3.6 books out the prev letter
+			JbpmContext jbpmContext = JbpmLookup.getJbpmConfiguration().createJbpmContext();
+			try {
+//				ProcessInstance processInstance = jbpmContext.new
+			} finally {
+				jbpmContext.close();
+			}
 		}
 
 		//Create entries in the new letter

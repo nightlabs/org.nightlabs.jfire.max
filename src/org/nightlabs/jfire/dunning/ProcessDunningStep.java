@@ -58,7 +58,6 @@ extends AbstractDunningStep
 	 * copied into the new DunningLetter, additionally.
 	 */
 	@Persistent(
-		table="JFireDunning_ProcessDunningStep_feeTypes",
 		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Set<DunningFeeType> feeTypes;
 	

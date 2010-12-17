@@ -1,6 +1,8 @@
 package org.nightlabs.jfire.dunning;
 
+import java.io.IOException;
 import java.io.Serializable;
+import java.net.URL;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
@@ -22,9 +24,16 @@ import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 
 import org.apache.log4j.Logger;
+import org.jbpm.JbpmContext;
+import org.jbpm.graph.exe.ProcessInstance;
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.dunning.id.DunningConfigID;
+import org.nightlabs.jfire.dunning.jbpm.JbpmConstantsDunningLetter;
+import org.nightlabs.jfire.jbpm.JbpmLookup;
+import org.nightlabs.jfire.jbpm.graph.def.AbstractActionHandler;
+import org.nightlabs.jfire.jbpm.graph.def.ProcessDefinition;
 import org.nightlabs.jfire.organisation.Organisation;
+import org.nightlabs.jfire.security.GlobalSecurityReflector;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.timer.Task;
 import org.nightlabs.jfire.timer.id.TaskID;
@@ -125,15 +134,12 @@ implements Serializable
 	 * invoice of a dunning process. The level (or severeness) 
 	 * specifies the ordering of the dunning steps.
 	 */
-	@Join
 	@Persistent(
-		table="JFireDunning_DunningConfig_invoiceDunningSteps",
+		dependentElement="true",
 		mappedBy="dunningConfig",
 		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Set<InvoiceDunningStep> invoiceDunningSteps;
 	
-	@Persistent(persistenceModifier=PersistenceModifier.NONE)
-	private transient SortedSet<InvoiceDunningStep> sortedInvoiceDunningSteps;
 	/**
 	 * According to the dunning level of a process (most likely 
 	 * the highest level of any invoice contained) different 
@@ -143,12 +149,14 @@ implements Serializable
 	 * This information is encapsulated in the ProcessDunningStep, 
 	 * which are ordered according to the dunning level of the dunning step.
 	 */
-	@Join
 	@Persistent(
-		table="JFireDunning_DunningConfig_processDunningSteps",
+		dependentElement="true",
 		mappedBy="dunningConfig",
 		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Set<ProcessDunningStep> processDunningSteps;
+	
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
+	private transient SortedSet<InvoiceDunningStep> sortedInvoiceDunningSteps;
 	
 	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private transient SortedSet<ProcessDunningStep> sortedProcessDunningSteps;
@@ -180,6 +188,12 @@ implements Serializable
 	 */
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private DunningMoneyFlowConfig moneyFlowConfig;
+	
+	/**
+	 * Instances of {@link ProcessDefinition}.
+	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+	private ProcessDefinition processDefinition;
 	
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Task creatorTask;
@@ -302,6 +316,14 @@ implements Serializable
 		return dunningFeeAdder;
 	}
 	
+	/**
+	 *
+	 * @return The {@link ProcessDefinition} assigned to this DunningConfig.
+	 */
+	public ProcessDefinition getProcessDefinition() {
+		return processDefinition;
+	}
+	
 	public boolean addInvoiceDunningStep(InvoiceDunningStep invoiceDunningStep) {
 		getInvoiceDunningSteps().add(invoiceDunningStep);
 		invoiceDunningSteps.clear();
@@ -384,6 +406,42 @@ implements Serializable
 		return creatorTask;
 	}
 
+	/**
+	 * Read a {@link ProcessDefinition} from the given URL and store it as new Version
+	 * of the {@link ProcessDefinition} of this DunningConfig.
+	 * <p>
+	 * New DunningLetters created with this DunningConfig will have and Process instance according
+	 * to the newly read definition.
+	 * </p>
+	 * @param jbpmProcessDefinitionURL An URL pointing to a folder containing the definitions 'processdefinition.xml' file.
+	 * @throws IOException If reading the URL fails.
+	 */
+	public void readProcessDefinition(URL jbpmProcessDefinitionURL) throws IOException {
+		org.jbpm.graph.def.ProcessDefinition jbpmProcessDefinition = ProcessDefinition.readProcessDefinition(jbpmProcessDefinitionURL);
+
+		jbpmProcessDefinition.setName(getOrganisationID() + ":DunningLetter-" + getDunningConfigID());
+		this.processDefinition = ProcessDefinition.storeProcessDefinition(getPersistenceManager(), null, jbpmProcessDefinition, jbpmProcessDefinitionURL);
+		JbpmConstantsDunningLetter.initStandardProcessDefinition(this.processDefinition);
+	}
+
+	public ProcessInstance createProcessInstanceForIssue(DunningLetter dunningLetter) {
+		JbpmContext jbpmContext = JbpmLookup.getJbpmConfiguration().createJbpmContext();
+		try {
+			ProcessInstance processInstance = jbpmContext.newProcessInstanceForUpdate(getProcessDefinition().getJbpmProcessDefinitionName());
+			dunningLetter.getStatableLocal().setJbpmProcessInstanceId(processInstance.getId());
+			processInstance.getContextInstance().setVariable(AbstractActionHandler.VARIABLE_NAME_STATABLE_ID, JDOHelper.getObjectId(dunningLetter).toString());
+			ProcessDefinition.createStartState(
+					getPersistenceManager(),
+					GlobalSecurityReflector.sharedInstance().getUserDescriptor().getUser(getPersistenceManager()),
+					dunningLetter,
+					processInstance.getProcessDefinition()
+			);
+			return processInstance;
+		} finally {
+			jbpmContext.close();
+		}
+	}
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;

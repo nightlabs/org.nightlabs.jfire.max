@@ -56,7 +56,6 @@ implements Serializable
 	 */
 	@Persistent(
 			dependent="true",
-			mappedBy="dunningFee",
 			persistenceModifier=PersistenceModifier.PERSISTENT)
 	private DunningFeeType dunningFeeType;
 	

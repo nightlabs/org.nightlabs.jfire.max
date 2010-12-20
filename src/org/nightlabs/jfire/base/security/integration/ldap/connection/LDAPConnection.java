@@ -1,13 +1,17 @@
 package org.nightlabs.jfire.base.security.integration.ldap.connection;
 
+import java.util.Enumeration;
+import java.util.HashMap;
+
 import javax.security.auth.login.LoginException;
 
+import org.nightlabs.jfire.base.security.integration.ldap.connection.LDAPConnectionWrapper.EntryModificationFlag;
 import org.nightlabs.jfire.security.integration.UserManagementSystemCommunicationException;
 
 /**
  * Class representing connection to an actual LDAP server. Connection parameters are passed by
  * {@link ILDAPConnectionParamsProvider}, actual implementation is done inside {@link LDAPConnectionWrapper}
- * subclasses.
+ * subclasses, so see it for code documentation.
  * 
  * @author Denis Dudnik <deniska.dudnik[at]gmail{dot}com>
  *
@@ -51,6 +55,22 @@ public class LDAPConnection {
     	
     	this.connectionWrapper.bind(bindPrincipal, password);
     }
+
+    public void createEntry(String entryDN, HashMap<String, Object> attributes) throws UserManagementSystemCommunicationException{
+    	this.connectionWrapper.createEntry(entryDN, attributes);
+    }
+
+    public void modifyEntry(String entryDN, HashMap<String, Object> attributes, EntryModificationFlag modificationFlag) throws UserManagementSystemCommunicationException{
+    	this.connectionWrapper.modifyEntry(entryDN, attributes, modificationFlag);
+    }
+    
+    public Enumeration<?> search(String dn, HashMap<String, Object> searchAttributes, String[] returnAttributes) throws UserManagementSystemCommunicationException{
+    	return this.connectionWrapper.search(dn, searchAttributes, returnAttributes);
+    }
+    
+	public HashMap<String, Object> getAttributesForEntry(String dn) throws UserManagementSystemCommunicationException {
+		return this.connectionWrapper.getAttribbutesForEntry(dn);
+	}
 
     public void disconnect() {
     	this.connectionWrapper.disconnect();

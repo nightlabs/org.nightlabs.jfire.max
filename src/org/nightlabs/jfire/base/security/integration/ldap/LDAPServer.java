@@ -1,5 +1,10 @@
 package org.nightlabs.jfire.base.security.integration.ldap;
 
+import java.util.HashMap;
+
+import javax.jdo.JDOHelper;
+import javax.jdo.JDOObjectNotFoundException;
+import javax.jdo.PersistenceManager;
 import javax.jdo.annotations.IdentityType;
 import javax.jdo.annotations.Inheritance;
 import javax.jdo.annotations.InheritanceStrategy;
@@ -9,9 +14,12 @@ import javax.naming.CommunicationException;
 import javax.security.auth.login.LoginException;
 
 import org.nightlabs.j2ee.LoginData;
+import org.nightlabs.jfire.base.security.integration.ldap.LDAPSyncEvent.LDAPSyncEventType;
 import org.nightlabs.jfire.base.security.integration.ldap.connection.ILDAPConnectionParamsProvider;
 import org.nightlabs.jfire.base.security.integration.ldap.connection.LDAPConnection;
 import org.nightlabs.jfire.base.security.integration.ldap.connection.LDAPConnectionManager;
+import org.nightlabs.jfire.base.security.integration.ldap.connection.LDAPConnectionWrapper.EntryModificationFlag;
+import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.security.integration.Session;
 import org.nightlabs.jfire.security.integration.UserManagementSystem;
 import org.nightlabs.jfire.security.integration.UserManagementSystemCommunicationException;
@@ -25,7 +33,6 @@ import org.slf4j.LoggerFactory;
  * It also implements {@link ILDAPConnectionParamsProvider} for providing stored server parameters
  * to a {@link LDAPConnection}
  *
- *
  * @author Denis Dudnik <deniska.dudnik[at]gmail{dot}com>
  *
  */
@@ -36,13 +43,16 @@ import org.slf4j.LoggerFactory;
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class LDAPServer extends UserManagementSystem implements ILDAPConnectionParamsProvider{
 
+	// TODO: test DN before there's no LDAPScriptSet, should be removed
+	private static final String TEST_DN = "cn=ddudnik,ou=staff,ou=people,dc=nightlabs,dc=de";
+
 	private static final Logger logger = LoggerFactory.getLogger(LDAPServer.class);
 
 	/**
 	 * The serial version of this class.
 	 */
 	private static final long serialVersionUID = 1L;
-
+	
 
 	/**
 	 * LDAP server host
@@ -61,21 +71,15 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 	 */
 	@Persistent(defaultFetchGroup="true")
 	private EncryptionMethod encryptionMethod;
+	
+	@Persistent
+	private String syncDN = TEST_DN;
 
-	// *** REV_marco_2 ***
-	// The default constructor is missing. JDO requires a default constructor and DataNucleus' enhancer automatically
-	// adds a *private* (AFAIK) default constructor if needed. However, it is a good practice to add a *protected*
-	// default constructor in order to make subclassing possible and to make it more portable (the JDO standard IMHO
-	// does not require an enhancer to add a default constructor - that's a DataNucleus extension).
+	@Persistent
+	private String syncPassword = "1111";
+	
 
-	// *** REV_marco_2 ***
-	// Additionally, it's IMHO better not to pass all properties to the constructor, because it easily breaks code
-	// when adding new properties and it makes it impossible to instantiate an empty instance (e.g. in the initialisation
-	// of a wizard - which then populates the instance page by page).
-	//
-	// Our best practice is therefore to add a constructor taking an OPTIONAL object-id like the following constructor:
-	public LDAPServer(UserManagementSystemID userManagementSystemID, UserManagementSystemType<?> type)
-	{
+	public LDAPServer(UserManagementSystemID userManagementSystemID, UserManagementSystemType<?> type){
 		super(userManagementSystemID, type);
 	}
 
@@ -112,7 +116,7 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 	        	logger.debug("Loggin out from session, id: " + session.getSessionID());
 	        }
 
-			connection = LDAPConnectionManager.getInstance().getConnection(this);
+			connection = LDAPConnectionManager.sharedInstance().getConnection(this);
         	connection.unbind();
 
 			if (logger.isDebugEnabled()){
@@ -120,7 +124,7 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 	        }
 
 		}finally{
-			LDAPConnectionManager.getInstance().releaseConnection(connection);
+			LDAPConnectionManager.sharedInstance().releaseConnection(connection);
 		}
 
 	}
@@ -144,7 +148,7 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
         				);
         	}
 
-        	connection = LDAPConnectionManager.getInstance().getConnection(this);
+        	connection = LDAPConnectionManager.sharedInstance().getConnection(this);
 
         	if (logger.isDebugEnabled()){
         		ILDAPConnectionParamsProvider params = connection.getConnectionParamsProvider();
@@ -157,7 +161,7 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
         	}
 
 	        connection.bind(
-					"cn=ddudnik,ou=staff,ou=people,dc=nightlabs,dc=de",
+					TEST_DN,
 					loginData.getPassword()
 					);
 
@@ -168,11 +172,23 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 	        	logger.debug("Bind successful. Session id: " + session.getSessionID());
 	        }
 
+	        // It could be not the best choice to keep this code here, but for now it seems as 
+	        // an optimal decision for me. I think that having a login or bind listener somewhere 
+	        // could be a better one. But I didn' want to plug in JFSM login() since JFSM
+	        // is considered deprecated. Also didn't want to pollute LDAPServer (or UserManagementSystem)
+	        // code with these listeners processing. But we can cosider it if we really need 
+	        // to recieve login/bind events somewhere else. Denis.
+	        if (shouldFetchUserFromLDAP(session.getLoginData())){
+				fetchUserFromLDAP(session.getLoginData());
+	        }
+
+			return session;
+
 		}finally{
-			LDAPConnectionManager.getInstance().releaseConnection(connection);
+			connection.unbind();
+			LDAPConnectionManager.sharedInstance().releaseConnection(connection);
 		}
 
-		return session;
 	}
 
 	/**
@@ -207,4 +223,177 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 		return AuthenticationMethod.SIMPLE;
 	}
 
+	/**
+	 * Set DN used for synchronization
+	 * 
+	 * @param syncDN
+	 */
+	public void setSyncDN(String syncDN) {
+		this.syncDN = syncDN;
+	}
+	
+	/**
+	 * Set password used for synchronization
+	 * @param syncPassword
+	 */
+	public void setSyncPassword(String syncPassword) {
+		this.syncPassword = syncPassword;
+	}
+	
+	/**
+	 * Get DN used for synchronization
+	 * 
+	 * @return
+	 */
+	public String getSyncDN() {
+		return syncDN;
+	}
+	
+	/***********************************
+	 * Synchronization section START *
+	 ***********************************/
+	
+	/**
+	 * Starts synchronization process. It's driven by {@link LDAPSyncEvent} objects
+	 * which are telling what to do: send data to LDAP server or recieve it and store
+	 * in JFire. These events also contain pointers for the data to be synchronized 
+	 * (i.e. a complete userId for a User object).
+	 * 
+	 * TODO: This API could be generalized and be a part of {@link UserManagementSystem}.
+	 * And we can create a general SyncEvent of course in this case. 
+	 * This option needs to be considered. Denis. 
+	 * 
+	 * @param syncEvent
+	 * @throws Exception
+	 */
+	public void synchronize(LDAPSyncEvent syncEvent) throws Exception{
+		
+		String completeUserId = syncEvent.getCompleteUserId();
+		
+		if (LDAPSyncEventType.FETCH == syncEvent.getType()){
+			
+			updateJFireUser(completeUserId);
+			
+		}else if (LDAPSyncEventType.SEND == syncEvent.getType()){
+			
+			updateLDAPUser(completeUserId);
+			
+		}else{
+			throw new UnsupportedOperationException("Unknown LDAPSyncEventType!");
+		}
+		
+	}
+	
+	private boolean shouldFetchUserFromLDAP(LoginData loginData){
+
+		// determine who is the leading system, LDAP or JFire
+		boolean ldapAsLeadingSystem = true;	// FIXME: read property value from configuration
+											// Where could be the most appropriate place in JFire 
+											// for holding this kind of configuration? Denis. 
+
+		// we can fetch user data from LDAP in both scenarios:
+		// - when JFire is a leading system we're doing it because it might help in certain situations 
+		//   (e.g. when you want to use JFire as leading system, but initially have some users in the 
+		//   LDAP which you want to import)
+		// - when LDAP is a leading system it's done when user still does not exist in JFire
+		boolean fetchUserFromLDAP;
+		if (ldapAsLeadingSystem){
+			fetchUserFromLDAP = true;
+		}else{
+			fetchUserFromLDAP = true;	// FIXME: get property value from some configuration
+										// Where could be the most appropriate place in JFire 
+										// for holding this kind of configuration? Denis.
+		}
+
+		if (fetchUserFromLDAP){
+			
+			// TODO: what if call it on detached instance and there would be no PersistenceManager? Denis.
+			PersistenceManager pm = JDOHelper.getPersistenceManager(this);
+			if (pm != null){
+				User user = null;
+				try{
+					user = User.getUser(pm, loginData.getOrganisationID(), loginData.getUserID());
+				}catch(JDOObjectNotFoundException e){
+					// there's no such User in JFire
+				}
+				if (user == null){
+					return true;
+				}
+			}
+			
+		}
+		
+		return false;
+	}
+	
+	private void fetchUserFromLDAP(LoginData loginData) throws UserManagementSystemCommunicationException{
+		
+		LDAPSyncEvent syncEvent = new LDAPSyncEvent(
+				LDAPSyncEventType.FETCH, loginData.getUserID()
+				);
+		try {
+			synchronize(syncEvent);
+		} catch (Exception e) {
+			throw new UserManagementSystemCommunicationException("Synchronization failed!", e);
+		}
+
+	}
+	
+	private void updateJFireUser(String userId){
+		logger.info("Fetch user");
+	}
+
+	private void updateLDAPUser(String userId) throws UserManagementSystemCommunicationException, LoginException{
+		
+		LDAPConnection connection = null;
+		try{
+
+			connection = LDAPConnectionManager.sharedInstance().getConnection(this);
+			
+			// We need to be logged in against LDAPServer for modification calls.
+			String syncDN = this.syncDN;
+			String syncPassword = this.syncPassword;
+			if (syncDN == null || "".equals(syncDN)){
+				syncDN = TEST_DN;	// TODO: get current logged in user DN via LDAPScriptSet
+			}
+			if (syncPassword == null){
+				syncPassword = "1111";	// TODO: get current logged in user's password
+			}
+			connection.bind(syncDN, syncPassword);
+			
+			
+			// collect attributes to be stored in LDAP entry (new or existing one)
+			// TODO: will be done via LDAPScriptSet
+			HashMap<String, Object> modifyAttributes = new HashMap<String, Object>();
+			modifyAttributes.put("sn", "Denis Dudnik changed his name!");
+			modifyAttributes.put("mail", new String[]{"deniska.dudnik@gmail.com", "deniska@instinctools.ru"});
+			
+			
+			// check if user alreadt exist in LDAP
+			String userDN = TEST_DN; // TODO: will be done via LDAPScriptSet
+			
+			HashMap<String, Object> foundAttributes = connection.getAttributesForEntry(userDN);
+			if (foundAttributes != null && foundAttributes.size() > 0){	// user exists
+				
+				if(modifyAttributes != null && modifyAttributes.size() > 0){
+					connection.modifyEntry(userDN, modifyAttributes, EntryModificationFlag.MODIFY);
+				}
+				
+			}else{	// user doesn't exist, create new entry 
+				
+				connection.createEntry(userDN, modifyAttributes);
+				
+			}
+
+		}finally{
+			connection.unbind();
+			LDAPConnectionManager.sharedInstance().releaseConnection(connection);
+		}
+		
+	}
+
+	/***********************************
+	 * Synchronization section END *
+	 ***********************************/
+	
 }

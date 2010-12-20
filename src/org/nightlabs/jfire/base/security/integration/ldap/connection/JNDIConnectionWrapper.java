@@ -1,6 +1,10 @@
 package org.nightlabs.jfire.base.security.integration.ldap.connection;
 
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.List;
 
 import javax.naming.AuthenticationException;
 import javax.naming.CommunicationException;
@@ -8,15 +12,18 @@ import javax.naming.CompositeName;
 import javax.naming.Context;
 import javax.naming.InvalidNameException;
 import javax.naming.Name;
+import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
+import javax.naming.directory.Attribute;
 import javax.naming.directory.Attributes;
-import javax.naming.ldap.Control;
+import javax.naming.directory.BasicAttribute;
+import javax.naming.directory.BasicAttributes;
+import javax.naming.directory.DirContext;
+import javax.naming.directory.ModificationItem;
 import javax.naming.ldap.InitialLdapContext;
-import javax.naming.ldap.LdapContext;
 import javax.naming.ldap.LdapName;
 import javax.security.auth.login.LoginException;
 
-import org.apache.directory.shared.ldap.util.LdapURL;
 import org.nightlabs.jfire.base.security.integration.ldap.connection.ILDAPConnectionParamsProvider.AuthenticationMethod;
 import org.nightlabs.jfire.security.integration.UserManagementSystemCommunicationException;
 import org.slf4j.Logger;
@@ -31,14 +38,11 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper {
 
 	private static final Logger logger = LoggerFactory.getLogger(JNDIConnectionWrapper.class);
 
-	private static final String JAVA_NAMING_SECURITY_SASL_REALM = "java.naming.security.sasl.realm"; //$NON-NLS-1$
 	private static final String JAVA_NAMING_LDAP_VERSION = "java.naming.ldap.version"; //$NON-NLS-1$
-
 	private static final String COM_SUN_JNDI_DNS_TIMEOUT_RETRIES = "com.sun.jndi.dns.timeout.retries"; //$NON-NLS-1$
 	private static final String COM_SUN_JNDI_DNS_TIMEOUT_INITIAL = "com.sun.jndi.dns.timeout.initial"; //$NON-NLS-1$
 	private static final String COM_SUN_JNDI_LDAP_CONNECT_TIMEOUT = "com.sun.jndi.ldap.connect.timeout"; //$NON-NLS-1$
-
-    public static final String REFERRAL_IGNORE = "ignore"; //$NON-NLS-1$
+	private static final String LDAP_SCHEME = "ldap://";
 
 	private LDAPConnection connection;
 
@@ -64,6 +68,8 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper {
 	 */
 	@Override
 	public void connect() throws UserManagementSystemCommunicationException {
+		
+		// TODO: consider hiding connect() from client and do it implicitly in each method if not connected
 
 		context = null;
 		isConnected = true;
@@ -77,7 +83,7 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper {
 
 		String host = connection.getConnectionParamsProvider().getHost();
 		int port = connection.getConnectionParamsProvider().getPort();
-		environment.put(Context.PROVIDER_URL, LdapURL.LDAP_SCHEME + host + ':' + port);
+		environment.put(Context.PROVIDER_URL, LDAP_SCHEME + host + ':' + port);
 
 		try{
 			
@@ -105,6 +111,8 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper {
 
 	/**
 	 * {@inheritDoc}
+	 * 
+	 * TODO: consider calling this method internally, probably it's called more than needed :)
 	 */
 	@Override
 	public void disconnect() {
@@ -132,9 +140,6 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper {
 			String bindPrincipal, String bindCredentials
 			) throws UserManagementSystemCommunicationException, LoginException {
 
-		String host = connection.getConnectionParamsProvider().getHost();
-		int port = connection.getConnectionParamsProvider().getPort();
-		
 		if (context != null && isConnected) {
 			
 			authMethod = AuthenticationMethod.NONE.stringValue();
@@ -147,7 +152,6 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper {
 				context.removeFromEnvironment(Context.SECURITY_AUTHENTICATION);
 				context.removeFromEnvironment(Context.SECURITY_PRINCIPAL);
 				context.removeFromEnvironment(Context.SECURITY_CREDENTIALS);
-				context.removeFromEnvironment(JAVA_NAMING_SECURITY_SASL_REALM);
 	
 				context.addToEnvironment(Context.SECURITY_AUTHENTICATION, authMethod);
 	
@@ -157,7 +161,10 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper {
 				context.reconnect(context.getConnectControls());
 				
 			}catch(NamingException e){
-				
+
+				String host = connection.getConnectionParamsProvider().getHost();
+				int port = connection.getConnectionParamsProvider().getPort();
+
 				logger.error("Failed to bind against LDAP server at " + host + ":" + port, e);
 				
 				disconnect();
@@ -169,6 +176,8 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper {
 			}
 				
 		}else{
+			String host = connection.getConnectionParamsProvider().getHost();
+			int port = connection.getConnectionParamsProvider().getPort();
 			String msg = "No connection to LDAP server at " + host + ":" + port;
 			logger.error(msg);
 			throw new UserManagementSystemCommunicationException(msg);
@@ -180,41 +189,199 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper {
 	 */
 	@Override
 	public void unbind() {
-		disconnect();
+		if (context != null && isConnected) {
+			
+			try{
+				
+				context.removeFromEnvironment(Context.SECURITY_AUTHENTICATION);
+				context.removeFromEnvironment(Context.SECURITY_PRINCIPAL);
+				context.removeFromEnvironment(Context.SECURITY_CREDENTIALS);
+	
+				context.reconnect(context.getConnectControls());
+				
+			}catch(NamingException e){
+				String host = connection.getConnectionParamsProvider().getHost();
+				int port = connection.getConnectionParamsProvider().getPort();
+				logger.error("Failed to unbind on LDAP server at " + host + ":" + port, e);
+				disconnect(); 
+			}
+				
+		}
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-    public void createEntry(String dn, Attributes attributes, Control[] controls){
+    public void createEntry(String dn, HashMap<String, Object> attributes) throws UserManagementSystemCommunicationException{
     	
         try {
         	
-            LdapContext modCtx = context.newInstance(controls);
-
-            // TODO: deal with referrals. We can leave it up to service provider or make it manually
-            // like in Apache Studio
-            modCtx.addToEnvironment(Context.REFERRAL, REFERRAL_IGNORE);
-
             // create entry
-            modCtx.createSubcontext(getSaveJndiName(dn), attributes);
+            context.createSubcontext(getSaveJndiName(dn), getAttributesFromHashMap(attributes));
             
-        }catch(NamingException ne){
-        	// TODO
+        }catch(NamingException e){
+			throw new UserManagementSystemCommunicationException("Failed to create an entry! Entry DN: " + dn, e);
         }
 
     }
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void modifyEntry(
+			String dn, HashMap<String, Object> attributes, EntryModificationFlag modificationFlag
+			) throws UserManagementSystemCommunicationException {
+		
+		try{
+
+	        // determine operation type
+	        int operationType = DirContext.REPLACE_ATTRIBUTE;
+	        switch(modificationFlag){
+	        case MODIFY:
+	        	operationType = DirContext.REPLACE_ATTRIBUTE;
+	        	break;
+	        	
+	        case REMOVE:
+	        	operationType = DirContext.REMOVE_ATTRIBUTE;
+	        	break;
+	        	
+	        default: 
+		        operationType = DirContext.REPLACE_ATTRIBUTE;
+	        }
+	        
+	        // prepare mododifcation items
+	        Attributes translatedAttributes = getAttributesFromHashMap(attributes);
+	        ModificationItem[] modificationItems = new ModificationItem[translatedAttributes.size()];
+	        int i = 0;
+	        for (Enumeration<? extends Attribute> attributesEnum = translatedAttributes.getAll(); attributesEnum.hasMoreElements();) {
+	        	modificationItems[i] = new ModificationItem(operationType, attributesEnum.nextElement());
+	        	i++;
+			}
+	        
+	        // perform modification
+	        context.modifyAttributes(getSaveJndiName(dn), modificationItems);
+	        
+		}catch(NamingException e){
+			throw new UserManagementSystemCommunicationException("Entry modification failed! Entry: " + dn, e);
+		}
+
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Enumeration<?> search(
+			String dn, HashMap<String, Object> searchAttributes, String[] returnAttributes
+			) throws UserManagementSystemCommunicationException {
+
+		try{
+			
+			return context.search(dn, getAttributesFromHashMap(searchAttributes), returnAttributes);
+			
+		}catch(NamingException e){
+			throw new UserManagementSystemCommunicationException("Search failed!");
+		}
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 * @throws UserManagementSystemCommunicationException 
+	 */
+	@Override
+	public HashMap<String, Object> getAttribbutesForEntry(String dn) throws UserManagementSystemCommunicationException {
+		try {
+			return getAttributesMap(context.getAttributes(dn));
+		} catch (NamingException e) {
+			throw new UserManagementSystemCommunicationException("Failed to get attributes from entry with DN: " + dn);
+		}
+	}
     
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	public boolean isConnected() {
+		// It's not a very troubleproof strategy to check some internal flag. But since there's no way
+		// to ping a LDAPServer via JNDI (we can just recreate a JNDI context, perform a search or lookup)
+		// we need to maintain these flags carefully so they will reflect the real connection state.
 		return context != null && isConnected;
 	}
+	
+	
+	/**
+	 * Translates {@link Attributes} to {@link HashMap} 
+	 * 
+	 * @param attributes if <code>null</code> is passed it returns and empty {@link HashMap}
+	 * @return
+	 * @throws NamingException 
+	 */
+	private static HashMap<String, Object> getAttributesMap(Attributes attributes) throws NamingException{
+		
+		HashMap<String, Object> attributesMap = new HashMap<String, Object>();
+		
+		if (attributes == null){
+			return attributesMap;
+		}
+		
+		for (Enumeration<? extends Attribute> attsEnum = attributes.getAll(); attsEnum.hasMoreElements();){
+			Attribute attr = attsEnum.nextElement();
+			attributesMap.put(attr.getID(), getAttributeValues(attr));
+		}
+		
+		return attributesMap;
+	}
+	
+	private static Object[] getAttributeValues(Attribute attr) throws NamingException{
+		
+		if (attr == null){
+			return new Object[0];
+		}
+		
+		NamingEnumeration<?> allValues = attr.getAll();
+		List<Object> valuesList = new ArrayList<Object>();
+		for (Enumeration<?> valuesEnum = allValues; valuesEnum.hasMoreElements();) {
+			valuesList.add(valuesEnum.nextElement());
+		}
+		
+		return valuesList.toArray();
+	}
 
+	/**
+	 * Translates a {@link HashMap} of attributes into JNDI {@link Attributes}
+	 * 
+	 * @param attributes if <code>null</code> is passed it returs an empty {@link Attributes} object 
+	 * @return
+	 */
+	private static Attributes getAttributesFromHashMap(HashMap<String, Object> attributes){
+		Attributes atts = new BasicAttributes();
+
+		if (attributes == null){
+			return atts;
+		}
+		
+		for (String attributeName : attributes.keySet()){
+        	
+        	Object attributeValue = attributes.get(attributeName);
+        	
+        	Attribute attribute = new BasicAttribute(attributeName);
+        	if (attributeValue != null 
+        			&& attributeValue.getClass().isArray()){
+        		for (Object obj : (Object[]) attributeValue) {
+					attribute.add(obj);
+				}
+        	}else if (attributeValue != null){
+        		attribute.add(attributeValue);
+        	}
+        	
+        	atts.put(attribute);
+        }
+        
+        return atts;
+	}
+	
     /**
      * Gets the default LDAP context factory.
      * 

@@ -14,7 +14,7 @@ import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.security.integration.UserManagementSystemCommunicationException;
 
 /**
- * Simple LDAPConnection pool
+ * Simple LDAPConnection pool.
  *
  * @author deniska
  *
@@ -41,10 +41,7 @@ public class LDAPConnectionManager{
 		availableConnections = new HashMap<ILDAPConnectionParamsProvider, List<LDAPConnection>>();
 	}
 
-	// *** REV_marco_2 ***
-	// Just for reasons of consistency: We usually call these methods "sharedInstance()". It's
-	// of course just as good to call it "getInstance()" - I'd just prefer consistency.
-	public static synchronized LDAPConnectionManager getInstance(){
+	public static synchronized LDAPConnectionManager sharedInstance(){
 		if (_instance == null){
 			_instance = new LDAPConnectionManager();
 		}
@@ -123,30 +120,13 @@ public class LDAPConnectionManager{
 
 		connections.add(connection);
 
-		// Instead of an if, we use a while loop AFTER adding it so that we allow configuration changes
+		// We use a while loop AFTER adding a connection so that we allow configuration changes
 		// during runtime. Even if we don't need this, it's more robust to implement it this way.
 		// Marco.
 		while (connections.size() > maxConnectionsPerServer){
 			connections.remove(connections.size() - 1);
 		}
 
-		// *** REV_marco ***
-		// One final thought coming into my mind now: Are you ensuring that no broken connection is released back
-		// into the pool? Are you trying to reconnect a broken connection? Did you try it?
-		// Marco.
-		//
-		// *** REV_denis ***
-		// Yes, connection is checked before it is given from pool, see code in getConnection method just before
-		// it returns the connection
-		//
-		// *** REV_marco_2 ***
-		// Are you sure that "conn.isConnected()" really returns false, if it's broken? I assume, you probably
-		// have to do some kind of ping to make sure it really is not broken. The connection status might be stale -
-		// at least that is the case for e.g. java.net.Socket.
-		//
-		// I have no idea, if the LDAP stuff supports pings or similar functionality to actually check whether a
-		// connection is still alive and it's definitely low priority now, but in the long run, we should make
-		// sure, our pool doesn't become counterproductive by returning dead connections (with a stale status).
 	}
 
 }

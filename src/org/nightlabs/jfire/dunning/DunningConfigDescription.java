@@ -86,11 +86,11 @@ extends I18nText
 	 * Constructs a new DunningConfigDescription.
 	 * @param dunningConfig the dunningConfig that this dunningConfig description is made in
 	 */
-	public DunningConfigDescription(DunningConfig dunningConfig)
+	public DunningConfigDescription(String organisationID, String dunningConfigID, DunningConfig dunningConfig)
 	{
 		this.dunningConfig = dunningConfig;
-		this.organisationID = dunningConfig.getOrganisationID();
-		this.dunningConfigID = dunningConfig.getDunningConfigID();
+		this.organisationID = organisationID;
+		this.dunningConfigID = dunningConfigID;
 	}
 
 	/**

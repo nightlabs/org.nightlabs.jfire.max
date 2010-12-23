@@ -280,22 +280,6 @@ implements DunningManagerRemote
 		}
 	}
 
-	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	public void initTimerTaskAutomaticDunning(PersistenceManager pm)
-	throws Exception
-	{
-//		Set<DunningConfigID> dunningConfigIDs = getDunningConfigIDs();
-//		try {
-//			for (DunningConfigID dunningConfigID : dunningConfigIDs) {
-//				TaskID _taskID = TaskID.create(getOrganisationID(), DunningConfig.TASK_TYPE_ID_PROCESS_DUNNING, dunningConfigID.dunningConfigID);
-//				Task task = (Task) pm.getObjectById(_taskID);
-//				task.setEnabled(true);
-//			}
-//		} finally {
-//			pm.close();
-//		}
-	}
-
 	@RolesAllowed("_Guest_")
 	public void processDunning(DunningConfig dunningConfig, Date date)
 	throws Exception {
@@ -343,7 +327,7 @@ implements DunningManagerRemote
 		try {
 			Task task = (Task) pm.getObjectById(taskID);
 			DunningConfig dunningConfig =  (DunningConfig) task.getParam();
-			processDunning(dunningConfig, new Date());
+			processDunning(dunningConfig, new Date()); //TODO remove hardcoding!?
 		} finally {
 			pm.close();
 		}
@@ -386,6 +370,7 @@ implements DunningManagerRemote
 				defaultDunningConfig.getName().readFromProperties(baseName, loader, "org.nightlabs.jfire.dunning.DunningConfig.default.name");
 				defaultDunningConfig.getDescription().readFromProperties(baseName, loader, "org.nightlabs.jfire.dunning.DunningConfig.default.description");
 				
+				
 				//Step1
 				ProcessDunningStep processStep1 = new ProcessDunningStep(organisationIDStr, IDGenerator.nextIDString(AbstractDunningStep.class), defaultDunningConfig, 1);
 				processStep1.addFeeType(defaultDunningFeeType);
@@ -426,7 +411,6 @@ implements DunningManagerRemote
 				defaultDunningConfig.readProcessDefinition(DunningConfig.class.getResource("jbpm/letter/"));
 				
 				defaultDunningConfig.initTimerTask();
-				
 				
 //				DunningConfigCustomer dcc = new DunningConfigCustomer(dccID.organisationID, dccID.dunningConfigCustomerID, defaultDunningConfig, LegalEntity.getAnonymousLegalEntity(pm));
 //				pm.makePersistent(dcc);

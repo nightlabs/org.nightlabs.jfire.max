@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<root-container name="dev.jfire.org:DunningLetter.DunningLetter" width="1106" height="804">
+<root-container name="dev.jfire.org:DunningLetter.DunningLetter" width="720" height="465">
   <node name="dev.jfire.org:created" x="148" y="17" width="132" height="36">
     <edge>
       <label x="7" y="-10"/>

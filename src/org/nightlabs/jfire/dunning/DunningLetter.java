@@ -38,6 +38,7 @@ import org.nightlabs.jfire.jbpm.graph.def.Statable;
 import org.nightlabs.jfire.jbpm.graph.def.StatableLocal;
 import org.nightlabs.jfire.jbpm.graph.def.State;
 import org.nightlabs.jfire.organisation.Organisation;
+import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.trade.OrganisationLegalEntity;
 import org.nightlabs.util.CollectionUtil;
@@ -282,7 +283,7 @@ implements Serializable, PayableObject, Statable
 		return Collections.unmodifiableList(dunningFees);
 	}
 
-	public void setFinalized() {
+	public void setFinalized(User user) { //TODO Record the user
 		if (isFinalized())
 			return;
 

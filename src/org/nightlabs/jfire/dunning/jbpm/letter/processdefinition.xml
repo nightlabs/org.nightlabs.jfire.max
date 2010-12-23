@@ -3,7 +3,7 @@
 <process-definition xmlns=""
 	name="dev.jfire.org:DunningLetter.DunningLetter">
 	<start-state name="dev.jfire.org:created">
-		<transition name="finalize" to="dev.jfire.org:finalized"></transition>
+		<transition name="dev.jfire.org:finalize" to="dev.jfire.org:finalized"></transition>
 		<transition name="dev.jfire.org:bookImplicitely" to="dev.jfire.org:bookedImplicitely"></transition>
 		<transition to="dev.jfire.org:aborted" name="abort"></transition>
 	</start-state>

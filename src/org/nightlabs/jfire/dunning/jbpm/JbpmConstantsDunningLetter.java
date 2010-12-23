@@ -47,7 +47,8 @@ public class JbpmConstantsDunningLetter
 	 * This constant represents a node that used for assigning <code>PAID</code> state.
 	 */
 	public static final String NODE_NAME_PAID = Organisation.DEV_ORGANISATION_ID + ":paid";
-	
+
+	public static final String TRANSITION_NAME_FINALIZE = Organisation.DEV_ORGANISATION_ID + ":finalize";
 
 	public static final String TRANSITION_NAME_BOOK_IMPLICITELY = Organisation.DEV_ORGANISATION_ID + ":bookImplicitely";
 	

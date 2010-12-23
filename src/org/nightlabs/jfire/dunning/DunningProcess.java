@@ -30,6 +30,7 @@ import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.accounting.id.CurrencyID;
 import org.nightlabs.jfire.dunning.id.DunningConfigID;
 import org.nightlabs.jfire.dunning.id.DunningProcessID;
+import org.nightlabs.jfire.dunning.jbpm.JbpmConstantsDunningLetter;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.jbpm.JbpmLookup;
 import org.nightlabs.jfire.organisation.Organisation;
@@ -241,11 +242,15 @@ implements Serializable
 		DunningLetter prevDunningLetter = getLastDunningLetter();
 		DunningLetter newDunningLetter = new DunningLetter(this);
 		if (isFinalized && prevDunningLetter != null) {
-			doFinalization(prevDunningLetter);
 			//TODO 6.3.6 books out the prev letter
 			JbpmContext jbpmContext = JbpmLookup.getJbpmConfiguration().createJbpmContext();
 			try {
-//				ProcessInstance processInstance = jbpmContext.new
+				ProcessInstance processInstance = jbpmContext.newProcessInstanceForUpdate(
+					      dunningConfig.getProcessDefinition().getJbpmProcessDefinitionName()
+					  );
+				
+				String jbpmTransitionName = JbpmConstantsDunningLetter.TRANSITION_NAME_FINALIZE;
+				processInstance.signal(jbpmTransitionName);
 			} finally {
 				jbpmContext.close();
 			}
@@ -295,11 +300,6 @@ implements Serializable
 		letterNotifier.triggerNotifier();
 	}
 	
-	private void doFinalization(DunningLetter letter) {
-		letter.setBookDT(new Date());
-		letter.setFinalized();
-	}
-
 	public static Collection<DunningProcessID> getDunningProcessesByCustomer(PersistenceManager pm, AnchorID customerID) {
 		Query query = pm.newNamedQuery(DunningProcess.class, "getDunningProcessIDsByCustomer");
 		Map<String, Object> params = new HashMap<String, Object>();

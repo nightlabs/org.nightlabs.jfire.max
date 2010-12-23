@@ -11,15 +11,15 @@ import org.nightlabs.jfire.accounting.Accounting;
 import org.nightlabs.jfire.dunning.DunningLetter;
 import org.nightlabs.jfire.jbpm.graph.def.AbstractActionHandler;
 
-public class ActionHandlerBookDunningLettermplicitely
+public class ActionHandlerBookDunningLetterImplicitely
 extends AbstractActionHandler
 {
 	private static final long serialVersionUID = 1L;
 
 	public static void register(org.jbpm.graph.def.ProcessDefinition jbpmProcessDefinition)
 	{
-		Action action = new Action(new Delegation(ActionHandlerBookDunningLettermplicitely.class.getName()));
-		action.setName(ActionHandlerBookDunningLettermplicitely.class.getName());
+		Action action = new Action(new Delegation(ActionHandlerBookDunningLetterImplicitely.class.getName()));
+		action.setName(ActionHandlerBookDunningLetterImplicitely.class.getName());
 
 		Event event = new Event("node-enter");
 		event.addAction(action);

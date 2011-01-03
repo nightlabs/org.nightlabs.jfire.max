@@ -242,7 +242,7 @@ import org.nightlabs.util.Util;
 //	),
 	@javax.jdo.annotations.Query(
 			name="getNonFinalizedInvoicesByVendorAndCustomer",
-			value="SELECT WHERE vendor.organisationID == paramVendorID_organisationID && vendor.anchorID == paramVendorID_anchorID && customer.organisationID == paramCustomerID_organisationID && customer.anchorID == paramCustomerID_anchorID && finalizeDT == null PARAMETERS String paramVendorID_organisationID, String paramVendorID_anchorID, String paramCustomerID_organisationID, String paramCustomerID_anchorID import java.lang.String ORDER BY invoiceID DESC"
+			value="SELECT WHERE vendor.organisationID == paramVendorID_organisationID && vendor.anchorID == paramVendorID_anchorID && customer.organisationID == paramCustomerID_organisationID && customer.anchorID == paramCustomerID_anchorID && finalizeDT == null && invoiceLocal.processEnded == false PARAMETERS String paramVendorID_organisationID, String paramVendorID_anchorID, String paramCustomerID_organisationID, String paramCustomerID_anchorID import java.lang.String ORDER BY invoiceID DESC"
 	),
 	@javax.jdo.annotations.Query(
 			name="getOverdueInvoices",

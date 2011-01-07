@@ -25,7 +25,8 @@ public class InvoiceQuery
 	private Long amountPaidMin = null;
 	private Long amountPaidMax = null;
 	private Boolean booked = null;
-
+	private Boolean outstanding = null;
+	
 	private Date bookDTMin = null;
 	private Date bookDTMax = null;
 
@@ -39,7 +40,14 @@ public class InvoiceQuery
 	public static final String PROPERTY_BOOK_DATE_MIN = PROPERTY_PREFIX + "bookDTMin";
 	public static final String PROPERTY_BOOKED = PROPERTY_PREFIX + "booked";
 	public static final String PROPERTY_CURRENCY = PROPERTY_PREFIX + "currencyID";
-
+	public static final String PROPERTY_OUTSTANDING = PROPERTY_PREFIX + "outstanding";
+	
+	
+	public static final class FieldName
+	{
+		public static final String outstanding = "outstanding";
+	}
+	
 	@Override
 	public String getArticleContainerIDMemberName() {
 		return "invoiceID";
@@ -89,6 +97,9 @@ public class InvoiceQuery
 
 		if (bookDTMax != null)
 			filter.append("\n && this.bookDT >= :bookDTMax");
+		
+		if (isFieldEnabled(FieldName.outstanding) && outstanding != null)
+			filter.append("\n && this.invoiceLocal.outstanding == :outstanding");
 	}
 
 	public CurrencyID getCurrencyID()
@@ -149,6 +160,19 @@ public class InvoiceQuery
 		notifyListeners(PROPERTY_AMOUNT_TO_PAY_MIN, oldAmountToPayMin, amountToPayMin);
 	}
 
+
+	public void setOutstanding(Boolean outstanding)
+	{
+		final Boolean oldoutstanding = this.outstanding;
+		this.outstanding = outstanding;
+		notifyListeners(FieldName.outstanding, oldoutstanding, outstanding);
+	}
+
+	public Boolean getOutstanding()
+	{
+		return outstanding;
+	}
+
 	public Boolean getBooked()
 	{
 		return booked;
@@ -161,6 +185,8 @@ public class InvoiceQuery
 		notifyListeners(PROPERTY_BOOKED, oldBooked, booked);
 	}
 
+	
+	
 	public Date getBookDTMax()
 	{
 		return bookDTMax;

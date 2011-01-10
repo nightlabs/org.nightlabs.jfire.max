@@ -44,15 +44,9 @@ extends MoneyTransfer
 	 */
 	public static final String BOOK_TYPE_PAY = "pay";
 
-	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 */
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private DunningLetter dunningLetter;
 
-	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 */
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private String bookType;
 

@@ -126,6 +126,9 @@ implements Serializable, PayableObject, Statable
 	@Persistent(persistenceModifier = PersistenceModifier.PERSISTENT)
 	private Date finalizeDT;
 
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+	private User finalizeUser = null;
+	
 	/**
 	 * Null or the timestamp when all the fees and interests were booked.
 	 */
@@ -207,11 +210,6 @@ implements Serializable, PayableObject, Statable
 		this.priceIncludingInvoices = new Price(IDGenerator.getOrganisationID(), IDGenerator.nextID(Price.class), dunningProcess.getCurrency());
 	}
 
-	public DunningLetter(DunningProcess dunningProcess) {
-		this(dunningProcess.getOrganisationID(), IDGenerator
-				.nextIDString(DunningLetter.class), dunningProcess);
-	}
-
 	/**
 	 * Returns the corresponding entry that contains the invoice
 	 * @param invoice
@@ -288,15 +286,12 @@ implements Serializable, PayableObject, Statable
 			return;
 
 		this.finalizeDT = new Date(System.currentTimeMillis());
-
+		this.finalizeUser = user;
+		
 		for (DunningLetterEntry entry : dunningLetterEntries) {
 			long extendedDueDateForPaymentMSec = finalizeDT.getTime() + entry.getPeriodOfGraceMSec();
 			entry.setExtendedDueDateForPayment(new Date(extendedDueDateForPaymentMSec));
 		}
-	}
-
-	public void setFinalizeDT(Date finalizeDT) {
-		this.finalizeDT = finalizeDT;
 	}
 
 	public Date getFinalizeDT() {

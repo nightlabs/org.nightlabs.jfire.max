@@ -76,9 +76,6 @@ implements Serializable, StatableLocal
 		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private List<State> states;
 
-	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 */
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private boolean processEnded = false;
 

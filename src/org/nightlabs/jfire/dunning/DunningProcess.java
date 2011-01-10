@@ -240,7 +240,7 @@ implements Serializable
 
 	public void createDunningLetter(boolean isFinalized) {
 		DunningLetter prevDunningLetter = getLastDunningLetter();
-		DunningLetter newDunningLetter = new DunningLetter(this);
+		DunningLetter newDunningLetter = new DunningLetter(IDGenerator.getOrganisationID(), IDGenerator.nextIDString(DunningLetter.class), this);
 		if (isFinalized && prevDunningLetter != null) {
 			//TODO 6.3.6 books out the prev letter
 			JbpmContext jbpmContext = JbpmLookup.getJbpmConfiguration().createJbpmContext();

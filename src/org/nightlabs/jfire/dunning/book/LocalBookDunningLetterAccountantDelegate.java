@@ -24,10 +24,10 @@ import org.nightlabs.jfire.transfer.Anchor;
 @PersistenceCapable(
 		identityType=IdentityType.APPLICATION,
 		detachable="true",
-		table="JFireDunning_LocalDunningLetterAccountantDelegate"
+		table="JFireDunning_LocalBookDunningLetterAccountantDelegate"
 )
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
-public class LocalDunningLetterAccountantDelegate extends AccountantDelegate
+public class LocalBookDunningLetterAccountantDelegate extends AccountantDelegate
 {
 	private static final long serialVersionUID = 1L;
 
@@ -35,10 +35,10 @@ public class LocalDunningLetterAccountantDelegate extends AccountantDelegate
 	 * @deprecated Do not use! Only for JDO!
 	 */
 	@Deprecated
-	protected LocalDunningLetterAccountantDelegate() {
+	protected LocalBookDunningLetterAccountantDelegate() {
 	}
 
-	public LocalDunningLetterAccountantDelegate(OrganisationLegalEntity mandator, String accountantDelegateID) {
+	public LocalBookDunningLetterAccountantDelegate(OrganisationLegalEntity mandator, String accountantDelegateID) {
 		super(mandator.getOrganisationID(), accountantDelegateID);
 		this.mandator = mandator;
 	}

@@ -20,21 +20,21 @@ import org.nightlabs.jfire.transfer.Anchor;
 @PersistenceCapable(
 	identityType=IdentityType.APPLICATION,
 	detachable="true",
-	table="JFireDunning_PartnerDunningLetterAccountantDelegate")
+	table="JFireDunning_PartnerBookDunningLetterAccountantDelegate")
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
-public class PartnerDunningLetterAccountantDelegate extends AccountantDelegate
+public class PartnerBookDunningLetterAccountantDelegate extends AccountantDelegate
 {
 	private static final long serialVersionUID = 1L;
-	private static final Logger logger = Logger.getLogger(PartnerDunningLetterAccountantDelegate.class);
+	private static final Logger logger = Logger.getLogger(PartnerBookDunningLetterAccountantDelegate.class);
 
 	/**
 	 * @deprecated Constructor only existing for JDO!
 	 */
 	@Deprecated
-	protected PartnerDunningLetterAccountantDelegate() {
+	protected PartnerBookDunningLetterAccountantDelegate() {
 	}
 
-	public PartnerDunningLetterAccountantDelegate(String organisationID, String accountantDelegateID) {
+	public PartnerBookDunningLetterAccountantDelegate(String organisationID, String accountantDelegateID) {
 		super(organisationID, accountantDelegateID);
 	}
 

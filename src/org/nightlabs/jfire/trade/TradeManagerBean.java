@@ -931,9 +931,11 @@ implements TradeManagerRemote, TradeManagerLocal
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
-
+			//WORKAROUND to get the correct field ArticleCount !!!
 			pm.getExtent(Offer.class);
-			return (Offer) pm.detachCopy(pm.getObjectById(offerID));
+			Offer offer = (Offer)pm.getObjectById(offerID);
+			pm.refresh(offer);
+			return (Offer) pm.detachCopy(offer);
 		} finally {
 			pm.close();
 		}
@@ -948,6 +950,8 @@ implements TradeManagerRemote, TradeManagerLocal
 	{
 		PersistenceManager pm = createPersistenceManager();
 		try {
+			//WORKAROUND to get the correct field ArticleCount !!!
+			pm.refreshAll(NLJDOHelper.getObjectSet(pm, offerIDs, Offer.class));
 			return NLJDOHelper.getDetachedObjectList(pm, offerIDs, Offer.class, fetchGroups, maxFetchDepth);
 		} finally {
 			pm.close();

@@ -17,10 +17,15 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
 import org.nightlabs.jdo.NLJDOHelper;
+import org.nightlabs.jfire.accounting.Accounting;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.Invoice;
+import org.nightlabs.jfire.accounting.book.AccountantDelegate;
 import org.nightlabs.jfire.accounting.id.CurrencyID;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
+import org.nightlabs.jfire.dunning.book.BookDunningLetterMoneyTransfer;
+import org.nightlabs.jfire.dunning.book.LocalBookDunningLetterAccountantDelegate;
+import org.nightlabs.jfire.dunning.book.PartnerBookDunningLetterAccountantDelegate;
 import org.nightlabs.jfire.dunning.id.DunningConfigCustomerID;
 import org.nightlabs.jfire.dunning.id.DunningConfigID;
 import org.nightlabs.jfire.dunning.id.DunningFeeAdderID;
@@ -419,6 +424,16 @@ implements DunningManagerRemote
 				
 //				DunningConfigCustomer dcc = new DunningConfigCustomer(dccID.organisationID, dccID.dunningConfigCustomerID, defaultDunningConfig, LegalEntity.getAnonymousLegalEntity(pm));
 //				pm.makePersistent(dcc);
+				
+				Accounting accounting = Accounting.getAccounting(pm);
+				
+				AccountantDelegate localBookDunningLetterAccountantDelegate = new LocalBookDunningLetterAccountantDelegate(accounting.getMandator(), IDGenerator.nextIDString(AccountantDelegate.class)); 
+				accounting.getLocalAccountant().setAccountantDelegate(BookDunningLetterMoneyTransfer.class, localBookDunningLetterAccountantDelegate);
+				
+				AccountantDelegate partnerBookDunningLetterAccountantDelegate = new PartnerBookDunningLetterAccountantDelegate(organisationIDStr, IDGenerator.nextIDString(AccountantDelegate.class));
+				accounting.getPartnerAccountant().setAccountantDelegate(BookDunningLetterMoneyTransfer.class, partnerBookDunningLetterAccountantDelegate);
+				
+				pm.makePersistent(accounting);
 			}
 		} finally {
 			pm.close();

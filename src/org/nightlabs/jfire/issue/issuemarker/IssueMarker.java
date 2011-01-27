@@ -82,18 +82,14 @@ public class IssueMarker implements Serializable {
 	protected IssueMarker() {}
 
 
-	public IssueMarker(boolean dummy)
+	public IssueMarker(IssueMarkerID issueMarkerID)
 	{
-		this(IDGenerator.getOrganisationID(), IDGenerator.nextID(IssueMarker.class));
-	}
-
-	/**
-	 * Creates a new instance of an IssueMarker.
-	 */
-	public IssueMarker(String organisationID, long issueMarkerID) {
-		Organisation.assertValidOrganisationID(organisationID);
-		this.organisationID = organisationID;
-		this.issueMarkerID = issueMarkerID;
+		if (issueMarkerID == null) {
+			issueMarkerID = IssueMarkerID.create(IDGenerator.getOrganisationID(), IDGenerator.nextID(IssueMarker.class));
+		}
+		Organisation.assertValidOrganisationID(issueMarkerID.organisationID);
+		this.organisationID = issueMarkerID.organisationID;
+		this.issueMarkerID = issueMarkerID.issueMarkerID;
 
 		name = new IssueMarkerName(this);
 		description = new IssueMarkerDescription(this);

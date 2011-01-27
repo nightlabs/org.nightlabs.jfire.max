@@ -10,11 +10,14 @@ import java.util.Set;
 import javax.jdo.JDODetachedFieldAccessException;
 import javax.jdo.JDOHelper;
 
+import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
+import org.nightlabs.jfire.base.jdo.IJDOObjectDAO;
 import org.nightlabs.jfire.issue.Issue;
 import org.nightlabs.jfire.issue.IssueManagerRemote;
 import org.nightlabs.jfire.issue.id.IssueID;
 import org.nightlabs.jfire.issue.issuemarker.id.IssueMarkerID;
+import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.progress.ProgressMonitor;
 import org.nightlabs.progress.SubProgressMonitor;
 import org.nightlabs.util.CollectionUtil;
@@ -25,7 +28,7 @@ import org.nightlabs.util.NLLocale;
  * @author Khaireel Mohamed - khaireel at nightlabs dot de
  * @author Marco หงุ่ยตระกูล-Schulze - marco at nightlabs dot de
  */
-public class IssueMarkerDAO extends BaseJDOObjectDAO<IssueMarkerID, IssueMarker> {
+public class IssueMarkerDAO extends BaseJDOObjectDAO<IssueMarkerID, IssueMarker> implements IJDOObjectDAO<IssueMarker> {
 	// :: --- [Statics] -----------------------------------------------------------------
 	private static IssueMarkerDAO sharedInstance = null;
 	public static IssueMarkerDAO sharedInstance() {
@@ -130,5 +133,15 @@ public class IssueMarkerDAO extends BaseJDOObjectDAO<IssueMarkerID, IssueMarker>
 		} finally {
 			monitor.done();
 		}
+	}
+
+	public IssueMarker storeIssueMarker(IssueMarker issueMarker, boolean get, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) {
+		return storeJDOObject(issueMarker, get, fetchGroups, maxFetchDepth, monitor);
+	}
+	
+	@Override
+	public IssueMarker storeJDOObject(IssueMarker issueMarker, boolean get, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) {
+		IssueManagerRemote ejb = JFireEjb3Factory.getRemoteBean(IssueManagerRemote.class, SecurityReflector.getInitialContextProperties());
+		return ejb.storeIssueMarker(issueMarker, get, fetchGroups, maxFetchDepth);
 	}
 }

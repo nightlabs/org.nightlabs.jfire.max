@@ -41,6 +41,8 @@ import org.jbpm.graph.exe.Token;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
+import org.nightlabs.jdo.moduleregistry.UpdateHistoryItem;
+import org.nightlabs.jdo.moduleregistry.UpdateNeededHandle;
 import org.nightlabs.jdo.query.AbstractJDOQuery;
 import org.nightlabs.jdo.query.AbstractSearchQuery;
 import org.nightlabs.jdo.query.JDOQueryCollectionDecorator;
@@ -640,9 +642,10 @@ implements IssueManagerRemote
 			boolean isNewIssue = !JDOHelper.isDetached(issue);
 
 			if (isNewIssue) {
-				if (issue.getProject() == null) {
-					issue.setProject((Project)pm.getObjectById(Project.PROJECT_ID_DEFAULT));
-				}
+				// An issue does not necessarily need a project
+//				if (issue.getProject() == null) {
+//					issue.setProject((Project)pm.getObjectById(Project.PROJECT_ID_DEFAULT));
+//				}
 				pIssue = pm.makePersistent(issue);
 				// TODO BEGIN WORKAROUND - see Issue.jdoPreStore()
 				issue.ensureIntegrity();
@@ -1335,6 +1338,9 @@ implements IssueManagerRemote
 			ConfigSetup.ensureAllPrerequisites(pm);
 			// ------------------------------------------------------------------------------------------------------[ ConfigModule ]-----<<|
 
+			createAdditionalIssueQueries(pm);
+			createDefaultIssueLinkTypes(pm);
+			
 
 			// The complete method is executed in *one* transaction. So if one thing fails, all fail.
 			// => We check once at the beginning, if this module has already been initialised.
@@ -1352,91 +1358,8 @@ implements IssueManagerRemote
 			final String baseName = "org.nightlabs.jfire.issue.resource.messages";
 			final ClassLoader loader = IssueManagerBean.class.getClassLoader();
 			final String resourceKeyPrefix = IssueManagerBean.class.getName() + ".";
-
-			final IssueQuery newIssueIssueQuery = new IssueQuery();
-			final IssueQuery unassignedIssueIssueQuery = new IssueQuery();
-			final IssueQuery resolvedIssueIssueQuery = new IssueQuery();
-			final IssueQuery acknowledgedIssueIssueQuery = new IssueQuery();
-			final IssueQuery closedIssueIssueQuery = new IssueQuery();
-			final IssueQuery confirmedIssueIssueQuery = new IssueQuery();
-			final IssueQuery rejectedIssueIssueQuery = new IssueQuery();
-			final IssueQuery reportedIssueIssueQuery = new IssueQuery();
-			final IssueQuery assignedIssueIssueQuery = new IssueQuery();
-
-			final List<IssueQuery> issueQueries = new ArrayList<IssueQuery>() {
-				{
-					// reportedIssueIssueQuery and assignedIssueIssueQuery will be added separately (see below)
-					add(newIssueIssueQuery);
-					add(unassignedIssueIssueQuery);
-					add(resolvedIssueIssueQuery);
-					add(acknowledgedIssueIssueQuery);
-					add(closedIssueIssueQuery);
-					add(confirmedIssueIssueQuery);
-					add(rejectedIssueIssueQuery);
-				}
-			};
-			final Map<IssueQuery, String> issueQueryToResourceKey = new HashMap<IssueQuery, String>() {
-				{
-					put(newIssueIssueQuery, resourceKeyPrefix + "queryStoreNew");
-					put(unassignedIssueIssueQuery, resourceKeyPrefix + "queryStoreUnassigned");
-					put(resolvedIssueIssueQuery, resourceKeyPrefix + "queryStoreResolved");
-					put(acknowledgedIssueIssueQuery, resourceKeyPrefix + "queryStoreAcknowledged");
-					put(closedIssueIssueQuery, resourceKeyPrefix + "queryStoreClosed");
-					put(confirmedIssueIssueQuery, resourceKeyPrefix + "queryStoreConfirmed");
-					put(rejectedIssueIssueQuery, resourceKeyPrefix + "queryStoreRejected");
-					put(reportedIssueIssueQuery, resourceKeyPrefix + "queryStoreReported");
-					put(assignedIssueIssueQuery, resourceKeyPrefix + "queryStoreAssigned");
-				}
-			};
-			final Map<IssueQuery, String> issueQueryToJbpmNodeName = new HashMap<IssueQuery, String>() {
-				{
-					// Note, that reportedIssueIssueQuery has no corresponding Jbpm Node.
-					put(newIssueIssueQuery, JbpmConstantsIssue.NODE_NAME_NEW);
-					put(unassignedIssueIssueQuery, JbpmConstantsIssue.NODE_NAME_OPEN);
-					put(resolvedIssueIssueQuery, JbpmConstantsIssue.NODE_NAME_RESOLVED);
-					put(acknowledgedIssueIssueQuery, JbpmConstantsIssue.NODE_NAME_ACKNOWLEDGED);
-					put(closedIssueIssueQuery, JbpmConstantsIssue.NODE_NAME_CLOSED);
-					put(confirmedIssueIssueQuery, JbpmConstantsIssue.NODE_NAME_CONFIRMED);
-					put(rejectedIssueIssueQuery, JbpmConstantsIssue.NODE_NAME_REJECTED);
-					put(assignedIssueIssueQuery, JbpmConstantsIssue.NODE_NAME_ASSIGNED);
-				}
-			};
-			for (final IssueQuery issueQuery : issueQueries) {
-				issueQuery.clearQuery();
-				issueQuery.setAllFieldsDisabled();
-				issueQuery.setFieldEnabled(IssueQuery.FieldName.processDefinitionID, true);
-				issueQuery.setFieldEnabled(IssueQuery.FieldName.jbpmNodeName, true);
-				if (issueQueryToJbpmNodeName.get(issueQuery) != null)
-					issueQuery.setJbpmNodeName(issueQueryToJbpmNodeName.get(issueQuery));
-			}
-
-			reportedIssueIssueQuery.clearQuery();
-			reportedIssueIssueQuery.setAllFieldsDisabled();
-			reportedIssueIssueQuery.setReporterID(User.USER_ID_CURRENT_USER);
-			reportedIssueIssueQuery.setFieldEnabled(FieldName.reporterID, true);
-			issueQueries.add(reportedIssueIssueQuery);
-
-			assignedIssueIssueQuery.clearQuery();
-			assignedIssueIssueQuery.setAllFieldsDisabled();
-			assignedIssueIssueQuery.setAssigneeID(User.USER_ID_CURRENT_USER);
-			assignedIssueIssueQuery.setFieldEnabled(FieldName.assigneeID, true);
-			issueQueries.add(assignedIssueIssueQuery);
-
-			pm.getExtent(BaseQueryStore.class);
-
-			for (final IssueQuery issueQuery : issueQueries) {
-				final QueryCollection<IssueQuery> queryCollection = new QueryCollection<IssueQuery>(Issue.class);
-				queryCollection.add(issueQuery);
-				final BaseQueryStore queryStore = new BaseQueryStore(systemUser, IDGenerator.nextID(BaseQueryStore.class), queryCollection);
-				queryStore.setPubliclyAvailable(true);
-				if (issueQueryToResourceKey.get(issueQuery) != null)
-					queryStore.getName().readFromProperties(baseName, loader, issueQueryToResourceKey.get(issueQuery));
-				if (issueQueryToResourceKey.get(issueQuery) != null)
-					queryStore.getDescription().readFromProperties(baseName, loader, issueQueryToResourceKey.get(issueQuery));
-				queryStore.serialiseCollection();
-
-				pm.makePersistent(queryStore);
-			}
+			
+			createIssueQueries(pm);
 
 			// QUESTION:
 			// What happened to the rest of the initialisers for stuffs like IssuePriority, IssueSeverity, etc.?
@@ -1452,26 +1375,26 @@ implements IssueManagerRemote
 			//    and apart from the IssueMarkers being independent, I can't remember the rest. But when I do, I'll put them up on the Wiki.
 
 			// ---[ IssueMarkers ]----------------------------------------------------------------------------------------------| Start |---
-			IssueMarker issueMarker_Email = new IssueMarker(false);
+			IssueMarker issueMarker_Email = new IssueMarker(null);
 			assignIssueMarkerIcon16x16(issueMarker_Email, "IssueMarker-email.16x16.png");
 			issueMarker_Email.getName().readFromProperties(baseName, loader, "org.nightlabs.jfire.issue.issuemarker.IssueMarkerEmail.name");
 			issueMarker_Email.getDescription().readFromProperties(baseName, loader, "org.nightlabs.jfire.issue.issuemarker.IssueMarkerEmail.description");
 			issueMarker_Email = pm.makePersistent(issueMarker_Email);
 
-			IssueMarker issueMarker_Phone = new IssueMarker(false);
+			IssueMarker issueMarker_Phone = new IssueMarker(null);
 			assignIssueMarkerIcon16x16(issueMarker_Phone, "IssueMarker-phone.16x16.png");
 			issueMarker_Phone.getName().readFromProperties(baseName, loader, "org.nightlabs.jfire.issue.issuemarker.IssueMarkerPhone.name");
 			issueMarker_Phone.getDescription().readFromProperties(baseName, loader, "org.nightlabs.jfire.issue.issuemarker.IssueMarkerPhone.description");
 			issueMarker_Phone = pm.makePersistent(issueMarker_Phone);
 
 
-			IssueMarker issueMarker_EmailTodo = new IssueMarker(false);
+			IssueMarker issueMarker_EmailTodo = new IssueMarker(null);
 			assignIssueMarkerIcon16x16(issueMarker_EmailTodo, "IssueMarker-email-todo.16x16.png");
 			issueMarker_EmailTodo.getName().readFromProperties(baseName, loader, "org.nightlabs.jfire.issue.issuemarker.IssueMarkerEmailTodo.name");
 			issueMarker_EmailTodo.getDescription().readFromProperties(baseName, loader, "org.nightlabs.jfire.issue.issuemarker.IssueMarkerEmailTodo.description");
 			issueMarker_EmailTodo = pm.makePersistent(issueMarker_EmailTodo);
 
-			IssueMarker issueMarker_PhoneTodo = new IssueMarker(false);
+			IssueMarker issueMarker_PhoneTodo = new IssueMarker(null);
 			assignIssueMarkerIcon16x16(issueMarker_PhoneTodo, "IssueMarker-phone-todo.16x16.png");
 			issueMarker_PhoneTodo.getName().readFromProperties(baseName, loader, "org.nightlabs.jfire.issue.issuemarker.IssueMarkerPhoneTodo.name");
 			issueMarker_PhoneTodo.getDescription().readFromProperties(baseName, loader, "org.nightlabs.jfire.issue.issuemarker.IssueMarkerPhoneTodo.description");
@@ -1488,6 +1411,199 @@ implements IssueManagerRemote
 		}
 	}
 
+	
+	/**
+	 * Creates a new {@link QueryCollection} for each {@link IssueQuery} to be considered. A new {@link BaseQueryStore} is created
+	 * for each such {@link QueryCollection} by setting its name and description and serialising the collection. Finally, the store
+	 * will be persisted to the data store.
+	 * @param issueQueries List of {@link IssueQuery}s to be considered.
+	 * @param pm {@link PersistenceManager} to be used.
+	 */
+	private void storeQueryStores(final List<IssueQuery> issueQueries, final PersistenceManager pm, Map<IssueQuery, String> issueQueryToResourceKey) {
+		final UserID systemUserID = UserID.create(getOrganisationID(), getUserID());
+		final User systemUser = (User) pm.getObjectById(systemUserID);
+		final ClassLoader loader = IssueManagerBean.class.getClassLoader();
+
+		pm.getExtent(BaseQueryStore.class);
+
+		for (final IssueQuery issueQuery : issueQueries) {
+			final QueryCollection<IssueQuery> queryCollection = new QueryCollection<IssueQuery>(Issue.class);
+			queryCollection.add(issueQuery);
+			final BaseQueryStore queryStore = new BaseQueryStore(
+				systemUser, IDGenerator.nextID(BaseQueryStore.class), queryCollection
+			);
+			queryStore.setPubliclyAvailable(true);
+			if (issueQueryToResourceKey != null && issueQueryToResourceKey.get(issueQuery) != null) {
+				queryStore.getName().readFromProperties(BASENAME, loader, issueQueryToResourceKey.get(issueQuery));
+			}
+			if (issueQueryToResourceKey != null && issueQueryToResourceKey.get(issueQuery) != null) {
+				queryStore.getDescription().readFromProperties(BASENAME, loader, issueQueryToResourceKey.get(issueQuery));
+			}
+			queryStore.serialiseCollection();
+			pm.makePersistent(queryStore);
+		}
+	}
+
+	/**
+	 * Helper method creating additional {@link IssueQuery}s for issues reported/assigned by me.
+	 * @param pm {@link PersistenceManager} to be used.
+	 */
+	private void createAdditionalIssueQueries(final PersistenceManager pm) {
+		final UpdateNeededHandle handle = UpdateHistoryItem.updateNeeded(pm, JFireIssueTrackingEAR.MODULE_NAME, UPDATE_HISTORY_ITEM_ID_ADDITIONAL_STORED_QUERIES);
+		if (handle != null) {
+			UpdateHistoryItem.updateDone(handle);
+
+			// TODO add issue query for assigned issues
+
+			final List<IssueQuery> issueQueries = new ArrayList<IssueQuery>();
+			final IssueQuery assignedIssueIssueQuery = new IssueQuery();
+			final IssueQuery myReportedIssueIssueQuery = new IssueQuery();
+			final IssueQuery myAssignedIssueIssueQuery = new IssueQuery();
+			HashMap<IssueQuery, String> issueQueryToResourceKey = new HashMap<IssueQuery, String>() {
+				{
+					put(assignedIssueIssueQuery, RESOURCE_KEY_PREFIX + "queryStoreAssigned");
+					put(myReportedIssueIssueQuery, RESOURCE_KEY_PREFIX + "queryStoreReported");
+					put(myAssignedIssueIssueQuery, RESOURCE_KEY_PREFIX + "queryStoreAssigned");
+				}
+			};
+			assignedIssueIssueQuery.clearQuery();
+			assignedIssueIssueQuery.setAllFieldsDisabled();
+			assignedIssueIssueQuery.setFieldEnabled(IssueQuery.FieldName.processDefinitionID, true);
+			assignedIssueIssueQuery.setFieldEnabled(IssueQuery.FieldName.jbpmNodeName, true);
+			assignedIssueIssueQuery.setJbpmNodeName(JbpmConstantsIssue.NODE_NAME_ASSIGNED);
+			issueQueries.add(assignedIssueIssueQuery);
+
+			myReportedIssueIssueQuery.clearQuery();
+			myReportedIssueIssueQuery.setAllFieldsDisabled();
+			myReportedIssueIssueQuery.setReporterID(User.USER_ID_CURRENT_USER);
+			myReportedIssueIssueQuery.setFieldEnabled(FieldName.reporterID, true);
+			issueQueries.add(myReportedIssueIssueQuery);
+
+			myAssignedIssueIssueQuery.clearQuery();
+			myAssignedIssueIssueQuery.setAllFieldsDisabled();
+			myAssignedIssueIssueQuery.setAssigneeID(User.USER_ID_CURRENT_USER);
+			myAssignedIssueIssueQuery.setFieldEnabled(FieldName.assigneeID, true);
+			issueQueries.add(myAssignedIssueIssueQuery);
+
+			storeQueryStores(issueQueries, pm, issueQueryToResourceKey);
+		}
+	}
+
+	/**
+	 *
+	 * @param pm {@link PersistenceManager} to be used.
+	 */
+	private void createIssueQueries(final PersistenceManager pm)
+	{
+		final IssueQuery newIssueIssueQuery = new IssueQuery();
+		final IssueQuery unassignedIssueIssueQuery = new IssueQuery();
+		final IssueQuery resolvedIssueIssueQuery = new IssueQuery();
+		final IssueQuery acknowledgedIssueIssueQuery = new IssueQuery();
+		final IssueQuery closedIssueIssueQuery = new IssueQuery();
+		final IssueQuery confirmedIssueIssueQuery = new IssueQuery();
+		final IssueQuery rejectedIssueIssueQuery = new IssueQuery();
+
+		final List<IssueQuery> issueQueries = new ArrayList<IssueQuery>() {
+			{
+				// reportedIssueIssueQuery and assignedIssueIssueQuery will be added separately (see below)
+				add(newIssueIssueQuery);
+				add(unassignedIssueIssueQuery);
+				add(resolvedIssueIssueQuery);
+				add(acknowledgedIssueIssueQuery);
+				add(closedIssueIssueQuery);
+				add(confirmedIssueIssueQuery);
+				add(rejectedIssueIssueQuery);
+			}
+		};
+		HashMap<IssueQuery, String> issueQueryToResourceKey = new HashMap<IssueQuery, String>() {
+			{
+				put(newIssueIssueQuery, RESOURCE_KEY_PREFIX + "queryStoreNew");
+				put(unassignedIssueIssueQuery, RESOURCE_KEY_PREFIX + "queryStoreUnassigned");
+				put(resolvedIssueIssueQuery, RESOURCE_KEY_PREFIX + "queryStoreResolved");
+				put(acknowledgedIssueIssueQuery, RESOURCE_KEY_PREFIX + "queryStoreAcknowledged");
+				put(closedIssueIssueQuery, RESOURCE_KEY_PREFIX + "queryStoreClosed");
+				put(confirmedIssueIssueQuery, RESOURCE_KEY_PREFIX + "queryStoreConfirmed");
+				put(rejectedIssueIssueQuery, RESOURCE_KEY_PREFIX + "queryStoreRejected");
+			}
+		};
+		final Map<IssueQuery, String> issueQueryToJbpmNodeName = new HashMap<IssueQuery, String>() {
+			{
+				// Note, that reportedIssueIssueQuery has no corresponding Jbpm Node.
+				put(newIssueIssueQuery, JbpmConstantsIssue.NODE_NAME_NEW);
+				put(unassignedIssueIssueQuery, JbpmConstantsIssue.NODE_NAME_OPEN);
+				put(resolvedIssueIssueQuery, JbpmConstantsIssue.NODE_NAME_RESOLVED);
+				put(acknowledgedIssueIssueQuery, JbpmConstantsIssue.NODE_NAME_ACKNOWLEDGED);
+				put(closedIssueIssueQuery, JbpmConstantsIssue.NODE_NAME_CLOSED);
+				put(confirmedIssueIssueQuery, JbpmConstantsIssue.NODE_NAME_CONFIRMED);
+				put(rejectedIssueIssueQuery, JbpmConstantsIssue.NODE_NAME_REJECTED);
+			}
+		};
+		for (final IssueQuery issueQuery : issueQueries) {
+			issueQuery.clearQuery();
+			issueQuery.setAllFieldsDisabled();
+			issueQuery.setFieldEnabled(IssueQuery.FieldName.processDefinitionID, true);
+			issueQuery.setFieldEnabled(IssueQuery.FieldName.jbpmNodeName, true);
+			if (issueQueryToJbpmNodeName.get(issueQuery) != null)
+				issueQuery.setJbpmNodeName(issueQueryToJbpmNodeName.get(issueQuery));
+		}
+
+		storeQueryStores(issueQueries, pm, issueQueryToResourceKey);
+	}
+	
+	/**
+	 * Creates the default IssueLinkTypes. This is not extracted into a
+	 * specialized package as the default link-types are used in the base
+	 * functionality.
+	 * 
+	 * @param pm {@link PersistenceManager}
+	 */
+	private void createDefaultIssueLinkTypes(final PersistenceManager pm) {
+		UpdateNeededHandle updateHandle = UpdateHistoryItem.updateNeeded(pm, IssueTrackingEAR.MODULE_NAME, IssueLink.class.getName() +"#issueLinkRegistration");
+		if (updateHandle != null) {
+			String baseName = "org.nightlabs.jfire.issue.resource.messages";
+			ClassLoader loader = IssueManagerBean.class.getClassLoader();
+			
+			UpdateHistoryItem.updateDone(updateHandle);
+			// ---[ IssueLinkTypes ]--------------------------------------------------------------------------------------------| Start |---
+			IssueLinkType issueLinkTypeRelated = new IssueLinkType(IssueLinkType.ISSUE_LINK_TYPE_ID_RELATED);
+			issueLinkTypeRelated.getName().readFromProperties(baseName, loader,
+			"org.nightlabs.jfire.issue.bug.IssueManagerBean.issueLinkTypeRelated"); //$NON-NLS-1$
+			issueLinkTypeRelated.addLinkedObjectClass(Object.class);
+			issueLinkTypeRelated.addNotLinkedObjectClass(Issue.class);
+			issueLinkTypeRelated = pm.makePersistent(issueLinkTypeRelated);
+
+			IssueLinkType issueLinkTypeRelatedIssue = new IssueLinkTypeIssueToIssue(IssueLinkTypeIssueToIssue.ISSUE_LINK_TYPE_ID_RELATED_ISSUE);
+			issueLinkTypeRelatedIssue.getName().readFromProperties(baseName, loader,
+			"org.nightlabs.jfire.issue.bug.IssueManagerBean.issueLinkTypeRelatedIssue"); //$NON-NLS-1$
+			issueLinkTypeRelatedIssue.addLinkedObjectClass(Issue.class);
+			issueLinkTypeRelatedIssue = pm.makePersistent(issueLinkTypeRelatedIssue);
+
+			IssueLinkType issueLinkTypeParent = new IssueLinkTypeParentChild(IssueLinkTypeParentChild.ISSUE_LINK_TYPE_ID_PARENT);
+			issueLinkTypeParent.getName().readFromProperties(baseName, loader,
+			"org.nightlabs.jfire.issue.bug.IssueManagerBean.issueLinkTypeParent"); //$NON-NLS-1$
+
+			issueLinkTypeParent.addLinkedObjectClass(Issue.class);
+			issueLinkTypeParent = pm.makePersistent(issueLinkTypeParent);
+
+			IssueLinkType issueLinkTypeChild = new IssueLinkTypeParentChild(IssueLinkTypeParentChild.ISSUE_LINK_TYPE_ID_CHILD);
+			issueLinkTypeChild.getName().readFromProperties(baseName, loader, "org.nightlabs.jfire.issue.bug.IssueManagerBean.issueLinkTypeChild" ); //$NON-NLS-1$
+			issueLinkTypeChild.addLinkedObjectClass(Issue.class);
+			issueLinkTypeChild = pm.makePersistent(issueLinkTypeChild);
+
+			IssueLinkType issueLinkTypeIsDuplicate = new IssueLinkTypeDuplicate(IssueLinkTypeDuplicate.ISSUE_LINK_TYPE_ID_IS_DUPLICATE);
+			issueLinkTypeIsDuplicate.getName().readFromProperties(baseName, loader, "org.nightlabs.jfire.issue.bug.IssueManagerBean.issueLinkTypeIsDuplicate" ); //$NON-NLS-1$
+			issueLinkTypeIsDuplicate.addLinkedObjectClass(Issue.class);
+			issueLinkTypeIsDuplicate = pm.makePersistent(issueLinkTypeIsDuplicate);
+
+			IssueLinkType issueLinkTypeHasDuplicate = new IssueLinkTypeDuplicate(IssueLinkTypeDuplicate.ISSUE_LINK_TYPE_ID_HAS_DUPLICATE);
+			issueLinkTypeHasDuplicate.getName().readFromProperties(baseName, loader, "org.nightlabs.jfire.issue.bug.IssueManagerBean.issueLinkTypeHasDuplicate" ); //$NON-NLS-1$
+			issueLinkTypeHasDuplicate.addLinkedObjectClass(Issue.class);
+			issueLinkTypeHasDuplicate = pm.makePersistent(issueLinkTypeHasDuplicate);
+			// ---[ IssueLinkTypes ]----------------------------------------------------------------------------------------------| End |---
+		}
+	}
+	
+	
 
 	/** Update history item ID used for storing additional {@link IssueQuery}s according to the {@link UpdateHistoryItem} mechanism. */
 	private static final String UPDATE_HISTORY_ITEM_ID_ADDITIONAL_STORED_QUERIES = IssueQuery.class.getName() + "#addAdditionalStoredQueries";

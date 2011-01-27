@@ -7,6 +7,7 @@ import javax.jdo.JDODetachedFieldAccessException;
 import org.nightlabs.jfire.issue.Issue;
 import org.nightlabs.jfire.jbpm.graph.def.StateDefinition;
 import org.nightlabs.jfire.security.User;
+import org.nightlabs.util.Util;
 
 /**
  * This is the {@link IssueHistoryItemFactory} that generates {@link IssueStateDefinitionHistoryItem}s, based on information
@@ -28,7 +29,7 @@ public class IssueStateDefinitionHistoryItemFactory extends IssueHistoryItemFact
 		StateDefinition newStateDefinition = newDetachedIssue.getState().getStateDefinition();
 
 		// So, we only to check whether the StateDefinitions have changed or not.
-		if ( !oldStateDefinition.equals(newStateDefinition) )
+		if ( !Util.equals(oldStateDefinition, newStateDefinition) )
 			return IssueHistoryItemFactory.makeItemIntoCollection( new IssueStateDefinitionHistoryItem(user, oldPersistentIssue, oldStateDefinition, newStateDefinition) );
 
 		return null;

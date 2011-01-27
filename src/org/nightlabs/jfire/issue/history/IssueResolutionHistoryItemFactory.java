@@ -7,6 +7,8 @@ import javax.jdo.JDODetachedFieldAccessException;
 import org.nightlabs.jfire.issue.Issue;
 import org.nightlabs.jfire.issue.IssueResolution;
 import org.nightlabs.jfire.security.User;
+import org.nightlabs.util.Util;
+
 
 /**
  * This is the {@link IssueHistoryItemFactory} that generates {@link IssueResolutionHistoryItem}s, based on information
@@ -28,7 +30,7 @@ public class IssueResolutionHistoryItemFactory extends IssueHistoryItemFactory {
 		IssueResolution newIssueResolution = newDetachedIssue.getIssueResolution();
 
 		// So, we only to check whether the IssueResolution have changed or not.
-		if ( !oldIssueResolution.equals(newIssueResolution) )
+		if ( !Util.equals(oldIssueResolution, newIssueResolution) )
 			return IssueHistoryItemFactory.makeItemIntoCollection( new IssueResolutionHistoryItem(user, oldPersistentIssue, oldIssueResolution, newIssueResolution) );
 
 		return null;

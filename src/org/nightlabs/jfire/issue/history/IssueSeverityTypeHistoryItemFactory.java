@@ -7,6 +7,7 @@ import javax.jdo.JDODetachedFieldAccessException;
 import org.nightlabs.jfire.issue.Issue;
 import org.nightlabs.jfire.issue.IssueSeverityType;
 import org.nightlabs.jfire.security.User;
+import org.nightlabs.util.Util;
 
 /**
  * This is the {@link IssueHistoryItemFactory} that generates {@link IssueSeverityTypeHistoryItem}s, based on information
@@ -28,7 +29,7 @@ public class IssueSeverityTypeHistoryItemFactory extends IssueHistoryItemFactory
 		IssueSeverityType newSeverityType = newDetachedIssue.getIssueSeverityType();
 
 		// So, we only to check whether the IssueSeverityTypes have changed or not.
-		if ( !oldSeverityType.equals(newSeverityType) )
+		if ( !Util.equals(oldSeverityType, newSeverityType) )
 			return IssueHistoryItemFactory.makeItemIntoCollection( new IssueSeverityTypeHistoryItem(user, oldPersistentIssue, oldSeverityType, newSeverityType) );
 
 		return null;

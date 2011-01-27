@@ -7,6 +7,7 @@ import javax.jdo.JDODetachedFieldAccessException;
 import org.nightlabs.jfire.issue.Issue;
 import org.nightlabs.jfire.issue.IssuePriority;
 import org.nightlabs.jfire.security.User;
+import org.nightlabs.util.Util;
 
 /**
  * This is the {@link IssueHistoryItemFactory} that generates {@link IssuePriorityHistoryItem}s, based on information
@@ -28,7 +29,7 @@ public class IssuePriorityHistoryItemFactory extends IssueHistoryItemFactory {
 		IssuePriority newIssuePriority = newDetachedIssue.getIssuePriority();
 
 		// So, we only to check whether the IssuePriorities have changed or not.
-		if ( !oldIssuePriority.equals(newIssuePriority) )
+		if ( !Util.equals(oldIssuePriority, newIssuePriority) )
 			return IssueHistoryItemFactory.makeItemIntoCollection( new IssuePriorityHistoryItem(user, oldPersistentIssue, oldIssuePriority, newIssuePriority) );
 
 		return null;

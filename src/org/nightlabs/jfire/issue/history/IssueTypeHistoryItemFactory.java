@@ -7,6 +7,7 @@ import javax.jdo.JDODetachedFieldAccessException;
 import org.nightlabs.jfire.issue.Issue;
 import org.nightlabs.jfire.issue.IssueType;
 import org.nightlabs.jfire.security.User;
+import org.nightlabs.util.Util;
 
 /**
  * This is the {@link IssueHistoryItemFactory} that generates {@link IssueTypeHistoryItem}s, based on information
@@ -29,7 +30,7 @@ public class IssueTypeHistoryItemFactory extends IssueHistoryItemFactory {
 		IssueType newIssueType = newDetachedIssue.getIssueType();
 
 		// So, we only to check whether the IssueTypes have changed or not.
-		if ( !oldIssueType.equals(newIssueType) )
+		if ( !Util.equals(oldIssueType, newIssueType) )
 			return IssueHistoryItemFactory.makeItemIntoCollection( new IssueTypeHistoryItem(user, oldPersistentIssue, oldIssueType, newIssueType) );
 
 		return null;

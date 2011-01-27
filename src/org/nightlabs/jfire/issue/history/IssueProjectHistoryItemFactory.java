@@ -7,6 +7,7 @@ import javax.jdo.JDODetachedFieldAccessException;
 import org.nightlabs.jfire.issue.Issue;
 import org.nightlabs.jfire.issue.project.Project;
 import org.nightlabs.jfire.security.User;
+import org.nightlabs.util.Util;
 
 /**
  * This is the {@link IssueHistoryItemFactory} that generates {@link IssueProjectHistoryItem}s, based on information
@@ -28,7 +29,7 @@ public class IssueProjectHistoryItemFactory extends IssueHistoryItemFactory {
 		Project newProject = newDetachedIssue.getProject();
 
 		// So, we only to check whether the Projects have changed or not.
-		if ( !oldProject.equals(newProject) )
+		if ( !Util.equals(oldProject, newProject) )
 			return IssueHistoryItemFactory.makeItemIntoCollection( new IssueProjectHistoryItem(user, oldPersistentIssue, oldProject, newProject) );
 
 		return null;

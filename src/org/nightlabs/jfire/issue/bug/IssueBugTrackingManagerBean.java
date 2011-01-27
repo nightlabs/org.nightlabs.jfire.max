@@ -227,44 +227,6 @@ implements IssueBugTrackingManagerRemote
 			// Create the process definitions.
 			issueTypeCustomer.readProcessDefinition(IssueType.class.getResource("jbpm/status/"));
 
-
-			// ---[ IssueLinkTypes ]--------------------------------------------------------------------------------------------| Start |---
-			IssueLinkType issueLinkTypeRelated = new IssueLinkType(IssueLinkType.ISSUE_LINK_TYPE_ID_RELATED);
-			issueLinkTypeRelated.getName().readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.bug.IssueManagerBean.issueLinkTypeRelated"); //$NON-NLS-1$
-			issueLinkTypeRelated.addLinkedObjectClass(Object.class);
-			issueLinkTypeRelated.addNotLinkedObjectClass(Issue.class);
-			issueLinkTypeRelated = pm.makePersistent(issueLinkTypeRelated);
-
-			IssueLinkType issueLinkTypeRelatedIssue = new IssueLinkTypeIssueToIssue(IssueLinkTypeIssueToIssue.ISSUE_LINK_TYPE_ID_RELATED_ISSUE);
-			issueLinkTypeRelatedIssue.getName().readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.bug.IssueManagerBean.issueLinkTypeRelatedIssue"); //$NON-NLS-1$
-			issueLinkTypeRelatedIssue.addLinkedObjectClass(Issue.class);
-			issueLinkTypeRelatedIssue = pm.makePersistent(issueLinkTypeRelatedIssue);
-
-			IssueLinkType issueLinkTypeParent = new IssueLinkTypeParentChild(IssueLinkTypeParentChild.ISSUE_LINK_TYPE_ID_PARENT);
-			issueLinkTypeParent.getName().readFromProperties(baseName, loader,
-			"org.nightlabs.jfire.issue.bug.IssueManagerBean.issueLinkTypeParent"); //$NON-NLS-1$
-
-			issueLinkTypeParent.addLinkedObjectClass(Issue.class);
-			issueLinkTypeParent = pm.makePersistent(issueLinkTypeParent);
-
-			IssueLinkType issueLinkTypeChild = new IssueLinkTypeParentChild(IssueLinkTypeParentChild.ISSUE_LINK_TYPE_ID_CHILD);
-			issueLinkTypeChild.getName().readFromProperties(baseName, loader, "org.nightlabs.jfire.issue.bug.IssueManagerBean.issueLinkTypeChild" ); //$NON-NLS-1$
-			issueLinkTypeChild.addLinkedObjectClass(Issue.class);
-			issueLinkTypeChild = pm.makePersistent(issueLinkTypeChild);
-
-			IssueLinkType issueLinkTypeIsDuplicate = new IssueLinkTypeDuplicate(IssueLinkTypeDuplicate.ISSUE_LINK_TYPE_ID_IS_DUPLICATE);
-			issueLinkTypeIsDuplicate.getName().readFromProperties(baseName, loader, "org.nightlabs.jfire.issue.bug.IssueManagerBean.issueLinkTypeIsDuplicate" ); //$NON-NLS-1$
-			issueLinkTypeIsDuplicate.addLinkedObjectClass(Issue.class);
-			issueLinkTypeIsDuplicate = pm.makePersistent(issueLinkTypeIsDuplicate);
-
-			IssueLinkType issueLinkTypeHasDuplicate = new IssueLinkTypeDuplicate(IssueLinkTypeDuplicate.ISSUE_LINK_TYPE_ID_HAS_DUPLICATE);
-			issueLinkTypeHasDuplicate.getName().readFromProperties(baseName, loader, "org.nightlabs.jfire.issue.bug.IssueManagerBean.issueLinkTypeHasDuplicate" ); //$NON-NLS-1$
-			issueLinkTypeHasDuplicate.addLinkedObjectClass(Issue.class);
-			issueLinkTypeHasDuplicate = pm.makePersistent(issueLinkTypeHasDuplicate);
-			// ---[ IssueLinkTypes ]----------------------------------------------------------------------------------------------| End |---
-			
 			// ---[ ProjectTypes ]----------------------------------------------------------------------------------------------| Start |---
 			pm.getExtent(ProjectType.class);
 

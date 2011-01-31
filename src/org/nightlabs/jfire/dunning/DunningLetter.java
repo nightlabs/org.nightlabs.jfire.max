@@ -34,7 +34,6 @@ import org.nightlabs.jfire.dunning.book.BookDunningLetterMoneyTransfer;
 import org.nightlabs.jfire.dunning.id.DunningLetterID;
 import org.nightlabs.jfire.dunning.id.DunningProcessID;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
-import org.nightlabs.jfire.jbpm.graph.def.Statable;
 import org.nightlabs.jfire.jbpm.graph.def.StatableLocal;
 import org.nightlabs.jfire.jbpm.graph.def.State;
 import org.nightlabs.jfire.organisation.Organisation;
@@ -66,7 +65,7 @@ import org.nightlabs.util.CollectionUtil;
 	),
 })
 public class DunningLetter 
-implements Serializable, PayableObject, Statable 
+implements Serializable, PayableObject 
 {
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger = Logger.getLogger(DunningLetter.class);

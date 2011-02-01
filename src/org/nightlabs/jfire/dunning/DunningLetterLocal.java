@@ -19,9 +19,9 @@ import javax.jdo.annotations.PrimaryKey;
 import javax.jdo.annotations.Version;
 import javax.jdo.annotations.VersionStrategy;
 
+import org.nightlabs.jfire.accounting.pay.PayableObjectLocal;
 import org.nightlabs.jfire.dunning.id.DunningLetterLocalID;
 import org.nightlabs.jfire.jbpm.graph.def.Statable;
-import org.nightlabs.jfire.jbpm.graph.def.StatableLocal;
 import org.nightlabs.jfire.jbpm.graph.def.State;
 import org.nightlabs.util.CollectionUtil;
 
@@ -50,7 +50,7 @@ import org.nightlabs.util.CollectionUtil;
 })
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class DunningLetterLocal
-implements Serializable, StatableLocal
+implements Serializable, PayableObjectLocal
 {
 	private static final long serialVersionUID = 1L;
 
@@ -122,6 +122,7 @@ implements Serializable, StatableLocal
 	{
 		return dunningLetter;
 	}
+	
 	public Statable getStatable()
 	{
 		return dunningLetter;
@@ -164,5 +165,4 @@ implements Serializable, StatableLocal
 	{
 		this.jbpmProcessInstanceId = jbpmProcessInstanceId;
 	}
-
 }

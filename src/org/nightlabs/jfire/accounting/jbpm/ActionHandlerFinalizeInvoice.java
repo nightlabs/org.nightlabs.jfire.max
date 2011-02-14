@@ -54,7 +54,8 @@ extends AbstractActionHandler
 
 		// invoice.setFinalized(...) does nothing, if it is already finalized.
 		invoice.setFinalized(user);
-
+		// sets outstanding to true !!!
+		invoice.getInvoiceLocal().setOutstanding(true);
 		// book synchronously
 		InvoiceID invoiceID = (InvoiceID) JDOHelper.getObjectId(invoice);
 		if (!State.hasState(pm, invoiceID, JbpmConstantsInvoice.Both.NODE_NAME_BOOKED))

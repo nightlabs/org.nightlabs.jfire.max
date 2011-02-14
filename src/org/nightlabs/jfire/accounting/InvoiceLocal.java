@@ -173,7 +173,7 @@ implements Serializable, StatableLocal
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
-	private boolean outstanding = true;
+	private boolean outstanding = false;
 
 	/**
 	 * This member stores the user who booked this Invoice.

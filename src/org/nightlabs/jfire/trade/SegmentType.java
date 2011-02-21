@@ -85,9 +85,13 @@ import org.nightlabs.jfire.trade.id.SegmentTypeID;
 		name=SegmentType.FETCH_GROUP_NAME,
 		members=@Persistent(name="name")),
 	@FetchGroup(
+			fetchGroups={"default"},
+			name=SegmentType.FETCH_GROUP_THIS_SEGMENT_TYPE,
+			members=@Persistent(name="name")),
+	@FetchGroup(
 		fetchGroups={"default"},
-		name=SegmentType.FETCH_GROUP_THIS_SEGMENT_TYPE,
-		members=@Persistent(name="name"))
+		name=FetchGroupsTrade.FETCH_GROUP_ARTICLE_IN_ARTICLE_CONTAINER_EDITOR,
+		members=@Persistent(name="name"))		
 })
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class SegmentType implements Serializable

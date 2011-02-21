@@ -72,7 +72,10 @@ import org.nightlabs.jfire.trade.id.SegmentTypeNameID;
 		members={@Persistent(name="segmentType"), @Persistent(name="names")}),
 	@FetchGroup(
 		name="SegmentType.this",
-		members={@Persistent(name="segmentType"), @Persistent(name="names")})
+		members={@Persistent(name="segmentType"), @Persistent(name="names")}),
+	@FetchGroup(
+			name=FetchGroupsTrade.FETCH_GROUP_ARTICLE_IN_ARTICLE_CONTAINER_EDITOR,
+			members={@Persistent(name="segmentType"), @Persistent(name="names")})
 })
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class SegmentTypeName extends I18nText

@@ -358,14 +358,14 @@ implements SimpleTradeManagerRemote
 
 				// make sure the prices are correct
 				priceCalculationNeeded = true;
-			}
-
-			// TODO JPOX WORKAROUND: In cross-organisation trade and some other situations, we get JDODetachedFieldAccessExceptions, even though the object should be persistent - trying a workaround
-			if (JFireBaseEAR.JPOX_WORKAROUND_FLUSH_ENABLED) {
-				ProductTypeID productTypeID = (ProductTypeID) JDOHelper.getObjectId(productType);
-				pm.flush();
-				pm.evictAll();
-				productType = (SimpleProductType) pm.getObjectById(productTypeID);
+				
+				// TODO JPOX WORKAROUND: In cross-organisation trade and some other situations, we get JDODetachedFieldAccessExceptions, even though the object should be persistent - trying a workaround
+				if (JFireBaseEAR.JPOX_WORKAROUND_FLUSH_ENABLED) {
+					ProductTypeID productTypeID = (ProductTypeID) JDOHelper.getObjectId(productType);
+					pm.flush();
+					pm.evictAll();
+					productType = (SimpleProductType) pm.getObjectById(productTypeID);
+				}
 			}
 
 //			03:09:47,950 ERROR [LogInterceptor] RuntimeException in method: public abstract org.nightlabs.jfire.simpletrade.store.SimpleProductType org.nightlabs.jfire.simpletrade.SimpleTradeManager.storeProductType(org.nightlabs.jfire.simpletrade.store.SimpleProductType,boolean,java.lang.String[],int) throws org.nightlabs.ModuleException,java.rmi.RemoteException:

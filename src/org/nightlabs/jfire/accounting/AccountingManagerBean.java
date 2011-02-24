@@ -213,20 +213,6 @@ implements AccountingManagerRemote, AccountingManagerLocal
 				// datastore not yet initialized
 			}
 
-			// Create the currencies EUR and CHF - TODO don't create them here - see https://www.jfire.org/modules/bugs/view.php?id=1248
-			{
-				Currency currency;
-
-				// TODO currencySymbol (second "EUR") should be €,
-				// but this doesn't work yet because of a charset problem with the db
-				currency = new Currency(CurrencyConstants.EUR.currencyID, "EUR", 2);
-				pm.makePersistent(currency);
-
-				currency = new Currency(CurrencyConstants.CHF.currencyID, "CHF", 2);
-				pm.makePersistent(currency);
-			}
-			CurrencyOrganisationDefault.getCurrencyOrganisationDefault(pm);
-
 			// Initalise standard property set structures for articleContainers
 			InvoiceStruct.getInvoiceStructLocal(pm);
 
@@ -266,41 +252,6 @@ implements AccountingManagerRemote, AccountingManagerLocal
 			accountType = pm.makePersistent(new AccountType(AccountType.ACCOUNT_TYPE_ID_SUMMARY, false));
 			accountType.getName().setText(Locale.ENGLISH.getLanguage(), "Summary");
 			accountType.getName().setText(Locale.GERMAN.getLanguage(), "Summenkonto");
-
-
-			// create PriceFragmentTypes for Swiss and German VAT
-			final PriceFragmentTypeHelper pfth = new PriceFragmentTypeHelper();
-			PriceFragmentType priceFragmentType = new PriceFragmentType(pfth.getDE().VAT_DE_19_NET);
-			priceFragmentType.getName().setText(Locale.ENGLISH.getLanguage(), "VAT Germany 19% Net");
-			priceFragmentType.getName().setText(Locale.GERMAN.getLanguage(), "MwSt. Deutschland 19% Netto");
-			priceFragmentType.setContainerPriceFragmentType(PriceFragmentType.getTotalPriceFragmentType(pm));
-			pm.makePersistent(priceFragmentType);
-
-			priceFragmentType = new PriceFragmentType(pfth.getDE().VAT_DE_19_VAL);
-			priceFragmentType.getName().setText(Locale.ENGLISH.getLanguage(), "VAT Germany 19% Value");
-			priceFragmentType.getName().setText(Locale.GERMAN.getLanguage(), "MwSt. Deutschland 19% Wert");
-			priceFragmentType.setContainerPriceFragmentType(PriceFragmentType.getTotalPriceFragmentType(pm));
-			pm.makePersistent(priceFragmentType);
-
-			priceFragmentType = new PriceFragmentType(pfth.getDE().VAT_DE_7_NET);
-			priceFragmentType.getName().setText(Locale.ENGLISH.getLanguage(), "VAT Germany 7% Net");
-			priceFragmentType.setContainerPriceFragmentType(PriceFragmentType.getTotalPriceFragmentType(pm));
-			pm.makePersistent(priceFragmentType);
-
-			priceFragmentType = new PriceFragmentType(pfth.getDE().VAT_DE_7_VAL);
-			priceFragmentType.getName().setText(Locale.ENGLISH.getLanguage(), "VAT Germany 7% Value");
-			priceFragmentType.setContainerPriceFragmentType(PriceFragmentType.getTotalPriceFragmentType(pm));
-			pm.makePersistent(priceFragmentType);
-
-			priceFragmentType = new PriceFragmentType(pfth.getCH().VAT_CH_7_6_NET);
-			priceFragmentType.getName().setText(Locale.ENGLISH.getLanguage(), "VAT Switzerland 7.6% Net");
-			priceFragmentType.setContainerPriceFragmentType(PriceFragmentType.getTotalPriceFragmentType(pm));
-			pm.makePersistent(priceFragmentType);
-
-			priceFragmentType = new PriceFragmentType(pfth.getCH().VAT_CH_7_6_VAL);
-			priceFragmentType.getName().setText(Locale.ENGLISH.getLanguage(), "VAT Switzerland 7.6% Value");
-			priceFragmentType.setContainerPriceFragmentType(PriceFragmentType.getTotalPriceFragmentType(pm));
-			pm.makePersistent(priceFragmentType);
 
 			final Accounting accounting = Accounting.getAccounting(pm);
 			final Trader trader = Trader.getTrader(pm);

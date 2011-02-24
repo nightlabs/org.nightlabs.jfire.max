@@ -41,6 +41,10 @@ public interface ChezFrancoisDatastoreInitialiserLocal {
 	@RolesAllowed("_System_")
 	void createModuleMetaData() throws MalformedVersionException, IOException;
 
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("_System_")	
+	void createDemoData_JFireAccount() throws Exception;
+	
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_System_"

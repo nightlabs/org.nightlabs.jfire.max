@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.Locale;
 import java.util.Properties;
 import java.util.regex.Pattern;
 
@@ -42,10 +43,17 @@ import javax.ejb.TransactionAttributeType;
 import javax.ejb.TransactionManagement;
 import javax.ejb.TransactionManagementType;
 import javax.jdo.FetchPlan;
+import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
+import org.nightlabs.jfire.accounting.AccountType;
+import org.nightlabs.jfire.accounting.Currency;
+import org.nightlabs.jfire.accounting.CurrencyConstants;
+import org.nightlabs.jfire.accounting.CurrencyOrganisationDefault;
+import org.nightlabs.jfire.accounting.PriceFragmentType;
+import org.nightlabs.jfire.accounting.PriceFragmentTypeHelper;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
@@ -107,6 +115,7 @@ implements ChezFrancoisDatastoreInitialiserRemote, ChezFrancoisDatastoreInitiali
 		initialiser.configureLocalOrganisation(); // have to do this before createModuleMetaData as it checks for the ModuleMetaData
 		initialiser.createModuleMetaData();
 
+		initialiser.createDemoData_JFireAccount();
 		initialiser.createDemoData_JFireSimpleTrade();
 		initialiser.createDemoData_JFireVoucher();
 		initialiser.createDemoData_JFireDynamicTrade();
@@ -203,7 +212,73 @@ implements ChezFrancoisDatastoreInitialiserRemote, ChezFrancoisDatastoreInitiali
 			logger.trace("configureLocalOrganisation: end");
 		}
 	}
+	
+	
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.chezfrancois.ChezFrancoisDatastoreInitialiserRemote#createDemoData_JFireVoucher()
+	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+	@RolesAllowed("_System_")
+	public void createDemoData_JFireAccount()
+	throws Exception
+	{
+		PersistenceManager pm = this.createPersistenceManager();
+		try {
+			// check, whether the the currency is already created
+			try {
+				pm.getObjectById(CurrencyConstants.EUR);
+				return; // already initialized
+			} catch (final JDOObjectNotFoundException x) {
+				// currency has not been created !!!
+			}
+			// Create the currencies EUR and CHF - TODO don't create them here - see https://www.jfire.org/modules/bugs/view.php?id=1248
+			Currency currency;
+			// TODO currencySymbol (second "EUR") should be €,
+			// but this doesn't work yet because of a charset problem with the db
+			currency = new Currency(CurrencyConstants.EUR.currencyID, "EUR", 2);
+			pm.makePersistent(currency);
+			//	currency = new Currency(CurrencyConstants.CHF.currencyID, "CHF", 2);
+			//	pm.makePersistent(currency);
+			CurrencyOrganisationDefault.getCurrencyOrganisationDefault(pm);
+			// create PriceFragmentTypes for Swiss and German VAT
+			final PriceFragmentTypeHelper pfth = new PriceFragmentTypeHelper();
+			PriceFragmentType priceFragmentType = new PriceFragmentType(pfth.getDE().VAT_DE_19_NET);
+			priceFragmentType.getName().setText(Locale.ENGLISH.getLanguage(), "VAT Germany 19% Net");
+			priceFragmentType.getName().setText(Locale.GERMAN.getLanguage(), "MwSt. Deutschland 19% Netto");
+			priceFragmentType.setContainerPriceFragmentType(PriceFragmentType.getTotalPriceFragmentType(pm));
+			pm.makePersistent(priceFragmentType);
 
+			priceFragmentType = new PriceFragmentType(pfth.getDE().VAT_DE_19_VAL);
+			priceFragmentType.getName().setText(Locale.ENGLISH.getLanguage(), "VAT Germany 19% Value");
+			priceFragmentType.getName().setText(Locale.GERMAN.getLanguage(), "MwSt. Deutschland 19% Wert");
+			priceFragmentType.setContainerPriceFragmentType(PriceFragmentType.getTotalPriceFragmentType(pm));
+			pm.makePersistent(priceFragmentType);
+
+			priceFragmentType = new PriceFragmentType(pfth.getDE().VAT_DE_7_NET);
+			priceFragmentType.getName().setText(Locale.ENGLISH.getLanguage(), "VAT Germany 7% Net");
+			priceFragmentType.setContainerPriceFragmentType(PriceFragmentType.getTotalPriceFragmentType(pm));
+			pm.makePersistent(priceFragmentType);
+
+			priceFragmentType = new PriceFragmentType(pfth.getDE().VAT_DE_7_VAL);
+			priceFragmentType.getName().setText(Locale.ENGLISH.getLanguage(), "VAT Germany 7% Value");
+			priceFragmentType.setContainerPriceFragmentType(PriceFragmentType.getTotalPriceFragmentType(pm));
+			pm.makePersistent(priceFragmentType);
+			//	priceFragmentType = new PriceFragmentType(pfth.getCH().VAT_CH_7_6_NET);
+			//	priceFragmentType.getName().setText(Locale.ENGLISH.getLanguage(), "VAT Switzerland 7.6% Net");
+			//	priceFragmentType.setContainerPriceFragmentType(PriceFragmentType.getTotalPriceFragmentType(pm));
+			//	pm.makePersistent(priceFragmentType);
+			//
+			//	priceFragmentType = new PriceFragmentType(pfth.getCH().VAT_CH_7_6_VAL);
+			//	priceFragmentType.getName().setText(Locale.ENGLISH.getLanguage(), "VAT Switzerland 7.6% Value");
+			//	priceFragmentType.setContainerPriceFragmentType(PriceFragmentType.getTotalPriceFragmentType(pm));
+			//	pm.makePersistent(priceFragmentType);
+
+		}
+		finally {
+			pm.close();
+		}
+	}
+	
 	/* (non-Javadoc)
 	 * @see org.nightlabs.jfire.chezfrancois.ChezFrancoisDatastoreInitialiserRemote#createDemoData_JFireVoucher()
 	 */

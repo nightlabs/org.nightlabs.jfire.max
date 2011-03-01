@@ -671,6 +671,15 @@ implements ReportManagerRemote
 			IOUtil.unzipArchive(tmpZipFile, reportUnzipDir);
 			tmpZipFile.delete();
 			
+			//Added this code because of the change in the category name, Chairat
+			for (File file : reportUnzipDir.listFiles()) {
+				if (file.getName().endsWith(ReportTextPartConfiguration.class.getSimpleName() + ".xml")) {
+					file.renameTo(new File(file.getParent(), reportCateogoryID.reportRegistryItemID + "." +
+							ReportTextPartConfiguration.class.getSimpleName() +
+							".xml"));
+				}
+			}
+			
 			ReportCategory reportCategory;
 			PersistenceManager pm = createPersistenceManager();
 			try {

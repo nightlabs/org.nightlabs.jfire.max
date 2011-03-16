@@ -1,13 +1,15 @@
 package org.nightlabs.jfire.base.security.integration.ldap;
 
+import java.io.IOException;
+
 import javax.jdo.PersistenceManager;
 import javax.jdo.annotations.IdentityType;
 import javax.jdo.annotations.Inheritance;
 import javax.jdo.annotations.InheritanceStrategy;
 import javax.jdo.annotations.PersistenceCapable;
 
-import org.nightlabs.jfire.base.security.integration.ldap.connection.ILDAPConnectionParamsProvider.EncryptionMethod;
 import org.nightlabs.jfire.security.integration.UserManagementSystemType;
+import org.nightlabs.util.IOUtil;
 
 /**
  * {@link UserManagementSystemType} for {@link LDAPServer} with InetOrgPerson schema
@@ -21,6 +23,11 @@ import org.nightlabs.jfire.security.integration.UserManagementSystemType;
 @Inheritance(strategy=InheritanceStrategy.SUPERCLASS_TABLE)
 public class InetOrgPersonLDAPServerType extends UserManagementSystemType<LDAPServer> {
 
+	private static final String INET_ORG_PERSON_SYNC_TO_JFIRE_SCRIPT = "scripts/InetOrgPersonSyncToJFireScript.js";
+	private static final String INET_ORG_PERSON_GET_ATTRIBUTES_FOR_LDAP_SCRIPT = "scripts/InetOrgPersonGetAttributesForLDAPScript.js";
+	private static final String INET_ORG_PERSON_GET_DN_SCRIPT = "scripts/InetOrgPersonGetDNScript.js";
+	private static final String INET_ORG_PERSON_BIND_VARIABLES_SCRIPT = "scripts/InetOrgPersonBindVariablesScript.js";
+	
 	/**
 	 * The serial version of this class.
 	 */
@@ -34,14 +41,10 @@ public class InetOrgPersonLDAPServerType extends UserManagementSystemType<LDAPSe
 	 * @param name
 	 */
 	public static synchronized void createSingleInstance(PersistenceManager pm, String name){
-		String className = InetOrgPersonLDAPServerType.class.getName();
-		if (_instances.get(className) == null && pm != null){
-			InetOrgPersonLDAPServerType singleInstance = loadSingleInstance(pm, InetOrgPersonLDAPServerType.class);
-			if (singleInstance == null){
-				singleInstance = new InetOrgPersonLDAPServerType(name);
-				singleInstance = pm.makePersistent(singleInstance);
-				_instances.put(className, singleInstance);
-			}
+		InetOrgPersonLDAPServerType singleInstance = loadSingleInstance(pm, InetOrgPersonLDAPServerType.class);
+		if (singleInstance == null){
+			singleInstance = new InetOrgPersonLDAPServerType(name);
+			singleInstance = pm.makePersistent(singleInstance);
 		}
 	}
 	
@@ -59,10 +62,24 @@ public class InetOrgPersonLDAPServerType extends UserManagementSystemType<LDAPSe
 	@Override
 	public LDAPServer createUserManagementSystem() {
 		
-		LDAPServer server = new LDAPServer(
-				"local LDAP server", this, "localhost", 10389, EncryptionMethod.NONE
-				);
-		
+		LDAPServer server = new LDAPServer(null, this);
+
+		try {
+			LDAPScriptSet ldapScriptSet = new LDAPScriptSet(null);
+
+			// actual scripts are stored in separate files to make their editing more comfortable
+			Class<? extends InetOrgPersonLDAPServerType> typeClass = this.getClass();
+			ldapScriptSet.setBindVariablesScript(IOUtil.readTextFile(typeClass.getResourceAsStream(INET_ORG_PERSON_BIND_VARIABLES_SCRIPT)));
+			ldapScriptSet.setLdapDNScript(IOUtil.readTextFile(typeClass.getResourceAsStream(INET_ORG_PERSON_GET_DN_SCRIPT)));
+			ldapScriptSet.setSyncJFireToLdapScript(IOUtil.readTextFile(typeClass.getResourceAsStream(INET_ORG_PERSON_GET_ATTRIBUTES_FOR_LDAP_SCRIPT)));
+			ldapScriptSet.setSyncLdapToJFireScript(IOUtil.readTextFile(typeClass.getResourceAsStream(INET_ORG_PERSON_SYNC_TO_JFIRE_SCRIPT)));
+
+			server.setLdapScriptSet(ldapScriptSet);
+			
+		} catch (IOException e) {
+			throw new RuntimeException("Can't create LDAPScriptSet!", e);
+		}
+
 		return server;
 	}
 

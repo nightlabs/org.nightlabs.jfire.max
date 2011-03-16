@@ -1,7 +1,7 @@
 package org.nightlabs.jfire.base.security.integration.ldap.connection;
 
 import java.util.Enumeration;
-import java.util.HashMap;
+import java.util.Map;
 
 import javax.security.auth.login.LoginException;
 
@@ -56,19 +56,19 @@ public class LDAPConnection {
     	this.connectionWrapper.bind(bindPrincipal, password);
     }
 
-    public void createEntry(String entryDN, HashMap<String, Object> attributes) throws UserManagementSystemCommunicationException{
+    public void createEntry(String entryDN, Map<String, Object[]> attributes) throws UserManagementSystemCommunicationException{
     	this.connectionWrapper.createEntry(entryDN, attributes);
     }
 
-    public void modifyEntry(String entryDN, HashMap<String, Object> attributes, EntryModificationFlag modificationFlag) throws UserManagementSystemCommunicationException{
+    public void modifyEntry(String entryDN, Map<String, Object[]> attributes, EntryModificationFlag modificationFlag) throws UserManagementSystemCommunicationException{
     	this.connectionWrapper.modifyEntry(entryDN, attributes, modificationFlag);
     }
     
-    public Enumeration<?> search(String dn, HashMap<String, Object> searchAttributes, String[] returnAttributes) throws UserManagementSystemCommunicationException{
+    public Enumeration<?> search(String dn, Map<String, Object[]> searchAttributes, String[] returnAttributes) throws UserManagementSystemCommunicationException{
     	return this.connectionWrapper.search(dn, searchAttributes, returnAttributes);
     }
     
-	public HashMap<String, Object> getAttributesForEntry(String dn) throws UserManagementSystemCommunicationException {
+	public Map<String, Object[]> getAttributesForEntry(String dn) throws UserManagementSystemCommunicationException {
 		return this.connectionWrapper.getAttribbutesForEntry(dn);
 	}
 

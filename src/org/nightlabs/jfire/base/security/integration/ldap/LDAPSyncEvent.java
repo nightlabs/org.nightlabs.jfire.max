@@ -1,12 +1,13 @@
 package org.nightlabs.jfire.base.security.integration.ldap;
 
 import java.io.Serializable;
+import java.util.Collection;
 
 /**
- * Instances of this class are used for managing the synchronization process by passing them 
+ * <p>Instances of this class are used for managing the synchronization process by passing them 
  * to {@link LDAPServer} synchronize() method. 
- * They indicate what to synchronize (via {@code completeUserId}) and in which direction
- * (via {@code eventType}).
+ * Instance of this class indicates what to synchronize (via {@code jfireObjectsIds} 
+ * and {@code ldapUsersIds}) and in which direction (via {@code eventType}).</p>
  * 
  * @author Denis Dudnik <deniska.dudnik[at]gmail{dot}com>
  *
@@ -35,15 +36,21 @@ public class LDAPSyncEvent implements Serializable{
 	 */
 	private LDAPSyncEventType eventType;
 	
+	/**
+	 * ID of organisation where sync is performed
+	 */
+	private String organisationID;
 	
 	/**
-	 * A complete user Id, returned by {@link org.nightlabs.jfire.security.User}.getCompleteUserID();
-	 * 
-	 * TODO: it should be changed to an objectId (or smth else) because we'll also sync a Person object.
-	 * But if a Person is never stored separately from User we still can use a user ID here. Although
-	 * I would go for a more general approach and not limit SyncEvent to a particular object type.
+	 * Collection of Strings containing DNs of users in LDAP directory
 	 */
-	private String completeUserId;
+	private Collection<String> ldapUsersIds;
+
+	/**
+	 * Collection of JFire objects IDs, i.e. UserID
+	 */
+	private Collection<Object> jfireObjectsIds;
+
 	
 	/**
 	 * Constructs a new LDAPSyncEvent to be passed to {@link LDAPServer} synchronize() method.
@@ -51,25 +58,64 @@ public class LDAPSyncEvent implements Serializable{
 	 * @param type
 	 * @param completeUserId
 	 */
-	public LDAPSyncEvent(LDAPSyncEventType type, String completeUserId){
+	public LDAPSyncEvent(LDAPSyncEventType type){
 		this.eventType = type;
-		this.completeUserId = completeUserId;
 	}
 
 	/**
 	 * 
-	 * @return a complete user id
+	 * @return organisationID
 	 */
-	public String getCompleteUserId() {
-		return completeUserId;
+	public String getOrganisationID() {
+		return organisationID;
+	}
+	
+	/**
+	 * Sets organisationID
+	 * @param organisationID
+	 */
+	public void setOrganisationID(String organisationID) {
+		this.organisationID = organisationID;
+	}
+	
+	/**
+	 * 
+	 * @return collection of JFire objects IDs
+	 */
+	public Collection<Object> getJFireObjectsIds() {
+		return jfireObjectsIds;
+	}
+	
+	/**
+	 * Provide collection of JFire objects IDs for synchronization user data from JFire to LDAP. 
+	 * @param jfireObjectsIds
+	 */
+	public void setJFireObjectsIds(Collection<Object> jfireObjectsIds) {
+		this.jfireObjectsIds = jfireObjectsIds;
+	}
+	
+	/**
+	 * 
+	 * @return collection of user DNs in LDAP directory 
+	 */
+	public Collection<String> getLdapUsersIds() {
+		return ldapUsersIds;
+	}
+	
+	/**
+	 * Provide collection of DNs for synchronization user data from LDAP to JFire. 
+	 * @param ldapUsersIds
+	 */
+	public void setLdapUsersIds(Collection<String> ldapUsersIds) {
+		this.ldapUsersIds = ldapUsersIds;
 	}
 	
 	/**
 	 * 
 	 * @return an event type
 	 */
-	public LDAPSyncEventType getType() {
+	public LDAPSyncEventType getEventType() {
 		return eventType;
 	}
-	
+
 }

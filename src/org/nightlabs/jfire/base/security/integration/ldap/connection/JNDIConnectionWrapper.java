@@ -5,6 +5,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 
 import javax.naming.AuthenticationException;
 import javax.naming.CommunicationException;
@@ -197,7 +198,7 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper {
 				context.removeFromEnvironment(Context.SECURITY_PRINCIPAL);
 				context.removeFromEnvironment(Context.SECURITY_CREDENTIALS);
 	
-				context.reconnect(context.getConnectControls());
+				context = new InitialLdapContext(context.getEnvironment(), context.getConnectControls());
 				
 			}catch(NamingException e){
 				String host = connection.getConnectionParamsProvider().getHost();
@@ -213,12 +214,12 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper {
 	 * {@inheritDoc}
 	 */
 	@Override
-    public void createEntry(String dn, HashMap<String, Object> attributes) throws UserManagementSystemCommunicationException{
+    public void createEntry(String dn, Map<String, Object[]> attributes) throws UserManagementSystemCommunicationException{
     	
         try {
         	
             // create entry
-            context.createSubcontext(getSaveJndiName(dn), getAttributesFromHashMap(attributes));
+            context.createSubcontext(getSaveJndiName(dn), getAttributesFromMap(attributes));
             
         }catch(NamingException e){
 			throw new UserManagementSystemCommunicationException("Failed to create an entry! Entry DN: " + dn, e);
@@ -231,7 +232,7 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper {
 	 */
 	@Override
 	public void modifyEntry(
-			String dn, HashMap<String, Object> attributes, EntryModificationFlag modificationFlag
+			String dn, Map<String, Object[]> attributes, EntryModificationFlag modificationFlag
 			) throws UserManagementSystemCommunicationException {
 		
 		try{
@@ -252,7 +253,7 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper {
 	        }
 	        
 	        // prepare mododifcation items
-	        Attributes translatedAttributes = getAttributesFromHashMap(attributes);
+	        Attributes translatedAttributes = getAttributesFromMap(attributes);
 	        ModificationItem[] modificationItems = new ModificationItem[translatedAttributes.size()];
 	        int i = 0;
 	        for (Enumeration<? extends Attribute> attributesEnum = translatedAttributes.getAll(); attributesEnum.hasMoreElements();) {
@@ -274,12 +275,12 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper {
 	 */
 	@Override
 	public Enumeration<?> search(
-			String dn, HashMap<String, Object> searchAttributes, String[] returnAttributes
+			String dn, Map<String, Object[]> searchAttributes, String[] returnAttributes
 			) throws UserManagementSystemCommunicationException {
 
 		try{
 			
-			return context.search(dn, getAttributesFromHashMap(searchAttributes), returnAttributes);
+			return context.search(dn, getAttributesFromMap(searchAttributes), returnAttributes);
 			
 		}catch(NamingException e){
 			throw new UserManagementSystemCommunicationException("Search failed!");
@@ -291,7 +292,7 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper {
 	 * @throws UserManagementSystemCommunicationException 
 	 */
 	@Override
-	public HashMap<String, Object> getAttribbutesForEntry(String dn) throws UserManagementSystemCommunicationException {
+	public HashMap<String, Object[]> getAttribbutesForEntry(String dn) throws UserManagementSystemCommunicationException {
 		try {
 			return getAttributesMap(context.getAttributes(dn));
 		} catch (NamingException e) {
@@ -318,9 +319,9 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper {
 	 * @return
 	 * @throws NamingException 
 	 */
-	private static HashMap<String, Object> getAttributesMap(Attributes attributes) throws NamingException{
+	private static HashMap<String, Object[]> getAttributesMap(Attributes attributes) throws NamingException{
 		
-		HashMap<String, Object> attributesMap = new HashMap<String, Object>();
+		HashMap<String, Object[]> attributesMap = new HashMap<String, Object[]>();
 		
 		if (attributes == null){
 			return attributesMap;
@@ -355,7 +356,7 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper {
 	 * @param attributes if <code>null</code> is passed it returs an empty {@link Attributes} object 
 	 * @return
 	 */
-	private static Attributes getAttributesFromHashMap(HashMap<String, Object> attributes){
+	private static Attributes getAttributesFromMap(Map<String, Object[]> attributes){
 		Attributes atts = new BasicAttributes();
 
 		if (attributes == null){

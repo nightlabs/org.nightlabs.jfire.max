@@ -436,6 +436,11 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 	}
 	
 	private void unbindAndReleaseConnection(LDAPConnection connection) throws UserManagementSystemCommunicationException{
+		
+		if (connection == null){
+			return;
+		}
+		
     	if (logger.isDebugEnabled()){
     		ILDAPConnectionParamsProvider params = connection.getConnectionParamsProvider();
     		logger.debug(

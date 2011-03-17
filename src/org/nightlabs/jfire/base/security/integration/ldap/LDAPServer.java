@@ -349,6 +349,15 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 	}
 	
 	/**
+	 * Get password for syncronization
+	 * 
+	 * @return
+	 */
+	public String getSyncPassword() {
+		return syncPassword;
+	}
+	
+	/**
 	 * Set LDAPScriptSet to this LDAP Server
 	 * 
 	 * @param ldapScriptSet can't be null 

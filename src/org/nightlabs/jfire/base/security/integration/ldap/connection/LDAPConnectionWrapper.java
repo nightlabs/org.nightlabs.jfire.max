@@ -73,7 +73,15 @@ public interface LDAPConnectionWrapper{
      * @throws UserManagementSystemCommunicationException 
      */
 	public void createEntry(String dn, Map<String, Object[]> attributes) throws UserManagementSystemCommunicationException;
-	
+
+	/**
+	 * Deletes an entry
+	 * 
+	 * @param dn the entry's DN
+	 * @throws UserManagementSystemCommunicationException
+	 */
+	public void deleteEntry(String dn) throws UserManagementSystemCommunicationException;
+
     /**
      * Modifies attributes of an entry.
      * 
@@ -106,4 +114,5 @@ public interface LDAPConnectionWrapper{
 	 * @throws UserManagementSystemCommunicationException 
 	 */
 	public Map<String, Object[]> getAttribbutesForEntry(String dn) throws UserManagementSystemCommunicationException;
+
 }

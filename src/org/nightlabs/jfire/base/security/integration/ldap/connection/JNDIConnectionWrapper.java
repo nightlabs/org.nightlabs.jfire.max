@@ -231,6 +231,23 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper {
 	 * {@inheritDoc}
 	 */
 	@Override
+    public void deleteEntry(String dn) throws UserManagementSystemCommunicationException{
+    	
+        try {
+        	
+            // delete entry
+            context.destroySubcontext(getSaveJndiName(dn));
+            
+        }catch(NamingException e){
+			throw new UserManagementSystemCommunicationException("Failed to delete an entry! Entry DN: " + dn, e);
+        }
+
+    }
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public void modifyEntry(
 			String dn, Map<String, Object[]> attributes, EntryModificationFlag modificationFlag
 			) throws UserManagementSystemCommunicationException {
@@ -280,7 +297,7 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper {
 
 		try{
 			
-			return context.search(dn, getAttributesFromMap(searchAttributes), returnAttributes);
+			return context.search(getSaveJndiName(dn), getAttributesFromMap(searchAttributes), returnAttributes);
 			
 		}catch(NamingException e){
 			throw new UserManagementSystemCommunicationException("Search failed!");
@@ -294,7 +311,7 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper {
 	@Override
 	public HashMap<String, Object[]> getAttribbutesForEntry(String dn) throws UserManagementSystemCommunicationException {
 		try {
-			return getAttributesMap(context.getAttributes(dn));
+			return getAttributesMap(context.getAttributes(getSaveJndiName(dn)));
 		} catch (NamingException e) {
 			throw new UserManagementSystemCommunicationException("Failed to get attributes from entry with DN: " + dn);
 		}

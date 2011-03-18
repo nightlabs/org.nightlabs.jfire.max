@@ -60,6 +60,10 @@ public class LDAPConnection {
     	this.connectionWrapper.createEntry(entryDN, attributes);
     }
 
+    public void deleteEntry(String entryDN) throws UserManagementSystemCommunicationException{
+    	this.connectionWrapper.deleteEntry(entryDN);
+    }
+
     public void modifyEntry(String entryDN, Map<String, Object[]> attributes, EntryModificationFlag modificationFlag) throws UserManagementSystemCommunicationException{
     	this.connectionWrapper.modifyEntry(entryDN, attributes, modificationFlag);
     }

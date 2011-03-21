@@ -4,14 +4,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.Serializable;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.Properties;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
-import javax.jdo.Extent;
 import javax.jdo.JDOHelper;
 import javax.jdo.JDOUserCallbackException;
 import javax.jdo.PersistenceManager;
@@ -26,8 +24,8 @@ import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.base.security.integration.ldap.LDAPSyncEvent.LDAPSyncEventType;
 import org.nightlabs.jfire.base.security.integration.ldap.connection.ILDAPConnectionParamsProvider.EncryptionMethod;
 import org.nightlabs.jfire.person.Person;
-import org.nightlabs.jfire.security.GlobalSecurityReflector;
 import org.nightlabs.jfire.security.User;
+import org.nightlabs.jfire.security.integration.UserManagementSystem;
 import org.nightlabs.jfire.security.integration.UserManagementSystemType;
 import org.nightlabs.jfire.server.data.dir.JFireServerDataDirectory;
 import org.nightlabs.util.CollectionUtil;
@@ -71,36 +69,48 @@ public class LDAPManagerBean extends BaseSessionBeanImpl implements LDAPManagerR
 	
 	private static void configureSynchronization(PersistenceManager pm){
 
-		// determine who is the leading system, LDAP or JFire
-		boolean jfireAsLeadingSystem = true;	// FIXME: read property value from configuration
-												// Where could be the most appropriate place in JFire 
-												// for holding this kind of configuration? Denis. 
-		
-		if (jfireAsLeadingSystem){
+		// determine if JFire is a leading system for at least one existent LDAPServer
+		Collection<LDAPServer> leadingSystems = UserManagementSystem.getUserManagementSystemsByLeading(
+				pm, false, LDAPServer.class
+				);
+		if (!leadingSystems.isEmpty()){
 			
+			// FIXME: Now if User is stored this listener will be called twice -
+			// both for User and Person objects. Need to figure out if Person is connected with
+			// User or it's just a stand-alone Person object.
 			pm.getPersistenceManagerFactory().addInstanceLifecycleListener(
 					syncStoreLifecycleListener, new Class[]{User.class, Person.class}
 					);
 			
-		}else{
-			
-			// TODO: LDAP as a leading system scenario is still to be done
-			// 1. using timer
-			// 2. using push notifications from LDAP server
-			
 		}
+			
+		// TODO: LDAP as a leading system scenario is still to be done
+		// 1. using timer
+		// 2. using push notifications from LDAP server
 	}
 
 	private static StoreLifecycleListener syncStoreLifecycleListener = new SyncStoreLifecycleListener();
 	
 	static class SyncStoreLifecycleListener implements StoreLifecycleListener{
 		
+		private static ThreadLocal<Boolean> isEnabledTL = new ThreadLocal<Boolean>(){
+			protected Boolean initialValue() {
+				return true;
+			};
+		};
+		
+		public static void setEnabled(boolean isEnabled) {
+			isEnabledTL.set(isEnabled);
+		}
+		
+		public static boolean isEnabled(){
+			return isEnabledTL.get();
+		}
+		
 		@Override
 		public void postStore(InstanceLifecycleEvent event) {
 			
-			try{
-				GlobalSecurityReflector.sharedInstance().getUserDescriptor();
-			}catch(Exception e){	// no user logged in - return
+			if (!isEnabled()){
 				return;
 			}
 			
@@ -136,14 +146,12 @@ public class LDAPManagerBean extends BaseSessionBeanImpl implements LDAPManagerR
 			PersistenceManager pm = createPersistenceManager();
 			try{
 				
-				// call to getExtent with second parameter set to true just in case some classes
-				// will appear extending an LDAPServer
-				Extent<LDAPServer> ldapServersExtent = pm.getExtent(LDAPServer.class, true);
+				Collection<LDAPServer> ldapServers = UserManagementSystem.getUserManagementSystemsByLeading(
+						pm, false, LDAPServer.class
+						);
 				
 				boolean exceptionOccured = false;
-				for (Iterator<LDAPServer> iterator = ldapServersExtent.iterator(); iterator.hasNext();) {
-					
-					LDAPServer ldapServer = iterator.next();
+				for (LDAPServer ldapServer : ldapServers) {
 					
 					LDAPSyncEvent syncEvent = new LDAPSyncEvent(LDAPSyncEventType.SEND);
 					syncEvent.setOrganisationID(getOrganisationID());
@@ -183,6 +191,7 @@ public class LDAPManagerBean extends BaseSessionBeanImpl implements LDAPManagerR
 	private static final String PROP_LDAP_SERVER_SYNC_DN = "ldapServer%s.syncDN";
 	private static final String PROP_LDAP_SERVER_SYNC_PASSWORD = "ldapServer%s.syncPassword";
 	private static final String PROP_LDAP_REMOVE_SERVER_INSTANCE = "ldapServer%s.remove";
+	private static final String PROP_LDAP_SERVER_IS_LEADING = "ldapServer%s.isLeading";
 
 	private static final int LDAP_DEFAULT_PORT = 10389;
 	private static final String LDAP_DEFAULT_HOST = "localhost";
@@ -198,6 +207,7 @@ public class LDAPManagerBean extends BaseSessionBeanImpl implements LDAPManagerR
 	 * ldapServerN.isActive=true
 	 * ldapServerN.syncDN=uid=sync_user,ou=staff,ou=people,dc=nightlabs,dc=de
 	 * ldapServerN.syncPassword=1111
+	 * ldapServerN.isLeading=false
 	 * 
 	 * - where N is an integer counting from 0 and ALWAYS having +1 increment. Used to create, modify 
 	 * or remove more than one LDAPServer instance at once. 
@@ -262,6 +272,14 @@ public class LDAPManagerBean extends BaseSessionBeanImpl implements LDAPManagerR
 										);
 					}
 
+					boolean isLeading = false;
+					if (ldapProps.getProperty(String.format(PROP_LDAP_SERVER_IS_LEADING, i)) != null){
+						isLeading = Boolean.parseBoolean(
+								ldapProps.getProperty(
+										String.format(PROP_LDAP_SERVER_IS_LEADING, i)).toLowerCase()
+										);
+					}
+
 					boolean remove = false;
 					if (ldapProps.getProperty(String.format(PROP_LDAP_REMOVE_SERVER_INSTANCE, i)) != null){
 						remove = Boolean.parseBoolean(
@@ -298,6 +316,7 @@ public class LDAPManagerBean extends BaseSessionBeanImpl implements LDAPManagerR
 						server.setActive(isActive);
 						server.setSyncDN(syncDN);
 						server.setSyncPassword(syncPassword);
+						server.setLeading(isLeading);
 						
 						pm.makePersistent(server);
 					}

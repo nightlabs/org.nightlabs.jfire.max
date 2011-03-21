@@ -174,9 +174,19 @@ public class LDAPScriptSet implements Serializable{
 	 * @throws ScriptException
 	 */
 	public String getLdapDN(Object jfireObject) throws ScriptException{
+
+		ScriptContext ctx = new SimpleScriptContext();
+		Bindings b = ctx.getBindings(ScriptContext.ENGINE_SCOPE);
+		if (jfireObject instanceof User){
+			User user = (User) jfireObject;
+			b.put("user", user);
+			b.put("person", user.getPerson());
+		}else if (jfireObject instanceof Person){
+			b.put("person", jfireObject);
+		}
+
 		Object result = execute(
-				new String(bindVariablesScript, SCRIPT_CHARSET_UTF_8)+new String(ldapDNScript, SCRIPT_CHARSET_UTF_8), 
-				getDefaultUserPersonScriptContext(jfireObject)
+				new String(bindVariablesScript, SCRIPT_CHARSET_UTF_8)+new String(ldapDNScript, SCRIPT_CHARSET_UTF_8), ctx
 				);
 		if (result != null){
 			return result.toString();
@@ -193,10 +203,21 @@ public class LDAPScriptSet implements Serializable{
 	 * @throws ScriptException
 	 */
 	@SuppressWarnings("unchecked")
-	public Map<String, Object[]> getAttributesMapForLDAP(Object jfireObject) throws ScriptException{
+	public Map<String, Object[]> getAttributesMapForLDAP(Object jfireObject, boolean isNewEntry) throws ScriptException{
+
+		ScriptContext ctx = new SimpleScriptContext();
+		Bindings b = ctx.getBindings(ScriptContext.ENGINE_SCOPE);
+		b.put("isNewEntry", isNewEntry);
+		if (jfireObject instanceof User){
+			User user = (User) jfireObject;
+			b.put("user", user);
+			b.put("person", user.getPerson());
+		}else if (jfireObject instanceof Person){
+			b.put("person", jfireObject);
+		}
+		
 		Object result = execute(
-				new String(bindVariablesScript, SCRIPT_CHARSET_UTF_8)+new String(syncJFireToLdapScript, SCRIPT_CHARSET_UTF_8), 
-				getDefaultUserPersonScriptContext(jfireObject)
+				new String(bindVariablesScript, SCRIPT_CHARSET_UTF_8)+new String(syncJFireToLdapScript, SCRIPT_CHARSET_UTF_8), ctx
 				);
 		if (result instanceof Map){
 			return (Map<String, Object[]>) result;
@@ -237,17 +258,4 @@ public class LDAPScriptSet implements Serializable{
 
 	}
 	
-	private static ScriptContext getDefaultUserPersonScriptContext(Object jfireObject) throws ScriptException{
-		ScriptContext ctx = new SimpleScriptContext();
-		Bindings b = ctx.getBindings(ScriptContext.ENGINE_SCOPE);
-		if (jfireObject instanceof User){
-			User user = (User) jfireObject;
-			b.put("user", user);
-			b.put("person", user.getPerson());
-		}else if (jfireObject instanceof Person){
-			b.put("person", (Person) jfireObject);
-		}
-		return ctx;
-	}
-
 }

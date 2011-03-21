@@ -4,6 +4,10 @@
 
 var attributes = new java.util.HashMap();
 
+if (isNewEntry){
+	attributes.put('objectClass', 'InetOrgPerson');
+}
+
 if (userData != null){
 	// User fields
 	attributes.put('cn', $userName$);
@@ -21,7 +25,7 @@ if (personData != null){
 	attributes.put('displayName', $personDisplayName$);
 	attributes.put('fax', $personFax$);
 	attributes.put('gn', $personFirstName$);
-	attributes.put('photo', $personPhoto$);
+//	attributes.put('photo', $personPhoto$);
 	attributes.put('localityName', $personCity$);
 	attributes.put('labeledURI', $personHomepage$);
 	attributes.put('mail', $personEMail$);

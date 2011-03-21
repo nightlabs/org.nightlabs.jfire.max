@@ -24,6 +24,7 @@ import javax.security.auth.login.LoginException;
 import org.nightlabs.j2ee.LoginData;
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.base.AuthCallbackHandler;
+import org.nightlabs.jfire.base.security.integration.ldap.LDAPManagerBean.SyncStoreLifecycleListener;
 import org.nightlabs.jfire.base.security.integration.ldap.LDAPSyncEvent.LDAPSyncEventType;
 import org.nightlabs.jfire.base.security.integration.ldap.connection.ILDAPConnectionParamsProvider;
 import org.nightlabs.jfire.base.security.integration.ldap.connection.LDAPConnection;
@@ -67,13 +68,13 @@ import org.slf4j.LoggerFactory;
 		@javax.jdo.annotations.Query(
 				name=LDAPServer.FIND_LDAP_SERVERS,
 				value="SELECT where this.host == :host && this.port == :port && this.encryptionMethod == :encryptionMethod ORDER BY JDOHelper.getObjectId(this) ASCENDING"
-					)
+				)
 		)
 public class LDAPServer extends UserManagementSystem implements ILDAPConnectionParamsProvider{
 
-	public static final String FIND_LDAP_SERVERS = "LDAPServer.findLDAPServers";
-	
 	public static final String FETCH_GROUP_LDAP_SCRIPT_SET = "LDAPServer.ldapScriptSet";
+
+	private static final String FIND_LDAP_SERVERS = "LDAPServer.findLDAPServers";
 
 	private static final Logger logger = LoggerFactory.getLogger(LDAPServer.class);
 
@@ -496,23 +497,18 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 	
 	private boolean shouldFetchUserFromLDAP(LoginData loginData){
 
-		// determine who is the leading system, LDAP or JFire
-		boolean ldapAsLeadingSystem = true;	// FIXME: read property value from configuration
-											// Where could be the most appropriate place in JFire 
-											// for holding this kind of configuration? Denis. 
-
 		// we can fetch user data from LDAP in both scenarios:
 		// - when JFire is a leading system we're doing it because it might help in certain situations 
 		//   (e.g. when you want to use JFire as leading system, but initially have some users in the 
 		//   LDAP which you want to import)
 		// - when LDAP is a leading system it's done when user still does not exist in JFire
 		boolean fetchUserFromLDAP;
-		if (ldapAsLeadingSystem){
+		if (isLeading()){
 			fetchUserFromLDAP = true;
 		}else{
-			fetchUserFromLDAP = true;	// FIXME: get property value from some configuration
-										// Where could be the most appropriate place in JFire 
-										// for holding this kind of configuration? Denis.
+			fetchUserFromLDAP = Boolean.parseBoolean(
+					System.getProperty(UserManagementSystem.SHOULD_FETCH_USER_DATA)
+					);
 		}
 
 		return fetchUserFromLDAP;
@@ -532,10 +528,10 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 		LDAPConnection connection = null;
 		LoginContext loginContext = null;
 		JFireServerManager jsm = null;
-		try{
 
-			PersistenceManager pm = JDOHelper.getPersistenceManager(this);
-			
+		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
+		
+		try{
 			// We need to be logged into JFire to be able to persist objects, inflate property sets, generate IDs ...
 			try{
 				// check if there's some User logged in
@@ -574,6 +570,9 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 			// We need to be logged in against LDAPServer for modification calls.
 			bindForSync(connection, pm);
 			
+			// disable JDO lifecycle listener used for JFire2LDAP synchronization
+			SyncStoreLifecycleListener.setEnabled(false);
+			
 			for (String ldapEntryDN : ldapEntriesDNs){
 				try{
 					
@@ -595,6 +594,13 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 			}
 			
 		}finally{
+			
+			// need flush before enabling SyncStoreLifecycleListener
+			pm.flush();
+
+			// enable JDO lifecycle listener used for JFire2LDAP synchronization
+			SyncStoreLifecycleListener.setEnabled(true);
+			
 			if (loginContext != null && loginContext.getSubject() != null){
 				if (logger.isDebugEnabled()){
 					logger.debug("_System_ user was logged in, loggin it out...");
@@ -637,28 +643,42 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 				
 					Object jfireObject = pm.getObjectById(jfireObjectId);
 					String userDN = getLDAPUserDN(jfireObject);
+					
+					if (userDN == null || "".equals(userDN)){
+						logger.warn("DN is empty, can't process synchronization for JFire object " + jfireObjectId.toString());
+						continue;
+					}
+
+					// check if entry exists, probabaly should be done with another API
+					boolean entryExists = false;
+					try{
+						connection.getAttributesForEntry(userDN);
+						entryExists = true;
+					}catch(UserManagementSystemCommunicationException e){
+						entryExists = false;
+					}
 
 					if (logger.isDebugEnabled()){
 						logger.debug("Preparing attributes for modifying entry with DN: " + userDN);
 					}
-					Map<String, Object[]> modifyAttributes = ldapScriptSet.getAttributesMapForLDAP(jfireObject);
-
-					Map<String, Object[]> foundAttributes = connection.getAttributesForEntry(userDN);
-					if (foundAttributes != null && foundAttributes.size() > 0){	// user exists in LDAP
-
+					Map<String, Object[]> modifyAttributes = ldapScriptSet.getAttributesMapForLDAP(
+							jfireObject, !entryExists
+							);
+					
+					if (entryExists){
 						if (logger.isDebugEnabled()){
-							logger.debug("Entry exists, modifying attributes. DN: " + userDN);
+							logger.debug("Modifying entry with DN: " + userDN);
 						}
-
+						
 						if(modifyAttributes != null && modifyAttributes.size() > 0){
 							connection.modifyEntry(userDN, modifyAttributes, EntryModificationFlag.MODIFY);
 						}
-					}else{	// user doesn't exist, create new entry 
-
+						
+					}else{	// create new entry 
 						if (logger.isDebugEnabled()){
-							logger.debug("Entry doesn't exist, creting new entry with DN: " + userDN);
+							logger.debug("Creating new entry with DN: " + userDN);
 						}
-
+						
 						connection.createEntry(userDN, modifyAttributes);
 					}
 

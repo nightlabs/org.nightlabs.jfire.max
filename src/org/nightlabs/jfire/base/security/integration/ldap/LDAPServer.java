@@ -128,7 +128,7 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 	private int port;
 
 	/**
-	 * Encryption method used in communication eith LDAP server
+	 * Encryption method used in communication with LDAP server
 	 */
 	@Persistent(defaultFetchGroup="true")
 	private EncryptionMethod encryptionMethod;
@@ -140,7 +140,8 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 	private String syncDN;
 
 	/**
-	 * Password for DN used for binding agains LDAP server during synchronization process
+	 * Password for DN used for binding agains LDAP server during synchronization process.
+	 * REV: (Alex) It should be possible to sync only when a user authenticates and thus leave this field empty (make it optional, as it is only essentially required for timed synchronisations).
 	 */
 	@Persistent
 	private String syncPassword;
@@ -148,7 +149,7 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 	/**
 	 * Set of scripts which perform specific synchronization tasks
 	 */
-	@Persistent
+	@Persistent // REV: @Persistent is not necessary. It is the default value. You can safely remove it. Marco.
 	private LDAPScriptSet ldapScriptSet;
 	
 
@@ -506,6 +507,11 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 		if (isLeading()){
 			fetchUserFromLDAP = true;
 		}else{
+			// REV: Alex. If I understand correctly, the default (when no
+			// system-property is set) is that this method does return false, so
+			// the user will not be fetched from LDAP. From the spec one can
+			// read that the default should be 'fetch just like UMS is leading
+			// system'.
 			fetchUserFromLDAP = Boolean.parseBoolean(
 					System.getProperty(UserManagementSystem.SHOULD_FETCH_USER_DATA)
 					);

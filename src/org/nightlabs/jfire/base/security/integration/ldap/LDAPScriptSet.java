@@ -59,25 +59,45 @@ public class LDAPScriptSet implements Serializable{
 	private long ldapScriptSetID;
 
 	/**
-	 * Bind variables (i.e. $userID$ or $personEmail$) to JFire objects data
+	 * Bind variables (i.e. $userID$ or $personEmail$) to JFire objects data.
+	 * 
+	 * <p>
+	 * REV: why do you use byte[] here instead of a String marked as CLOB like this:
+	 * </p>
+	 * <pre>
+	 * &#64;Column(sqlType="CLOB")
+	 * private String bindVariablesScript;
+	 * </pre>
+	 * <p>
+	 * Marco :-)
+	 * </p>
 	 */
 	@Persistent(defaultFetchGroup="true")
 	private byte[] bindVariablesScript;
 	
 	/**
-	 * Generates and returns an LDAP DN using {@code bindVariablesScript)
+	 * Generates and returns an LDAP DN using {@code bindVariablesScript).
+	 * <p>
+	 * REV: Why do you use byte[] here instead of a String marked as CLOB? See {@link #bindVariablesScript}
+	 * </p>
 	 */
 	@Persistent(defaultFetchGroup="true")
 	private byte[] ldapDNScript;
 	
 	/**
 	 * Performs synchronization from LDAP directory to JFire(creating or modifying User/Person objects)
+	 * <p>
+	 * REV: Why do you use byte[] here instead of a String marked as CLOB? See {@link #bindVariablesScript}
+	 * </p>
 	 */
 	@Persistent(defaultFetchGroup="true")
 	private byte[] syncLdapToJFireScript;
 	
 	/**
-	 * Generates and returns a map of attributes to be stored in LDAP directory using {@code bindVariablesScript)
+	 * Generates and returns a map of attributes to be stored in LDAP directory using {@code bindVariablesScript).
+	 * <p>
+	 * REV: Why do you use byte[] here instead of a String marked as CLOB? See {@link #bindVariablesScript}
+	 * </p>
 	 */
 	@Persistent(defaultFetchGroup="true")
 	private byte[] syncJFireToLdapScript;

@@ -51,6 +51,7 @@ import javax.jdo.annotations.PrimaryKey;
 import javax.jdo.annotations.Queries;
 import javax.jdo.annotations.Version;
 import javax.jdo.annotations.VersionStrategy;
+import javax.jdo.listener.DeleteCallback;
 import javax.jdo.listener.DetachCallback;
 
 import org.nightlabs.inheritance.FieldInheriter;
@@ -63,6 +64,8 @@ import org.nightlabs.jdo.inheritance.JDOInheritableFieldInheriter;
 import org.nightlabs.jdo.inheritance.JDOInheritanceManager;
 import org.nightlabs.jdo.inheritance.JDOSimpleFieldInheriter;
 import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
+import org.nightlabs.jfire.reporting.parameter.config.ReportParameterAcquisitionSetup;
+import org.nightlabs.jfire.reporting.textpart.ReportTextPartConfiguration;
 import org.nightlabs.jfire.security.Authority;
 import org.nightlabs.jfire.security.AuthorityType;
 import org.nightlabs.jfire.security.SecuredObject;
@@ -184,7 +187,7 @@ import org.nightlabs.util.Util;
 })
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public abstract class ReportRegistryItem
-implements Serializable, DetachCallback, SecuredObject, Inheritable, InheritanceCallbacks
+implements Serializable, DetachCallback, SecuredObject, DeleteCallback, Inheritable, InheritanceCallbacks
 {
 	private static final long serialVersionUID = 20081212L;
 
@@ -743,6 +746,28 @@ implements Serializable, DetachCallback, SecuredObject, Inheritable, Inheritance
 		}
 	}
 
+	@Override
+	public void jdoPreDelete() {
+		PersistenceManager pm = getPersistenceManager();
+		// remove ReportTextPartConfiguration
+		ReportTextPartConfiguration textPart = ReportTextPartConfiguration.getReportTextPartConfiguration(pm, this);
+		if(textPart != null)
+		{
+			pm.deletePersistent(textPart);
+			pm.flush();
+		}
+		// the setup already persistent remove it !!!!
+		ReportParameterAcquisitionSetup setup = ReportParameterAcquisitionSetup.getSetupForReportLayout(pm, (ReportRegistryItemID)JDOHelper.getObjectId(this));
+		if(setup != null)
+		{
+			pm.deletePersistent(setup);
+			pm.flush();
+		}
+		pm.deletePersistent(getName());
+		pm.deletePersistent(getDescription());
+		pm.flush();
+	}	
+	
 	/**
 	 * {@inheritDoc}
 	 * This implementation does nothing.

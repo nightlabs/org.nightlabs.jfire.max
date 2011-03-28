@@ -27,6 +27,7 @@ import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Column;
 import javax.jdo.annotations.IdentityType;
 import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.listener.DeleteCallback;
 
 /**
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
@@ -84,7 +85,7 @@ import javax.jdo.annotations.PersistenceModifier;
 )
 
 public class ReportParameterAcquisitionSetup
-implements Serializable
+implements Serializable, DeleteCallback
 {
 
 	private static final long serialVersionUID = 1L;
@@ -253,7 +254,14 @@ implements Serializable
 //			pm.flush();
 //		}
 	}
-
+	
+	@Override
+	public void jdoPreDelete() {
+		if(defaultUseCase != null)
+		{
+			removeUseCase(defaultUseCase);
+		}
+	}
 	/**
 	 * @return the reportLayout
 	 */

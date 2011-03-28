@@ -26,22 +26,20 @@
 
 package org.nightlabs.jfire.reporting.layout;
 
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
-
-import javax.jdo.annotations.Persistent;
-import javax.jdo.annotations.FetchGroups;
-import javax.jdo.annotations.InheritanceStrategy;
-import javax.jdo.annotations.Queries;
-import javax.jdo.annotations.Inheritance;
-import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.FetchGroups;
 import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.Queries;
 import javax.jdo.listener.DeleteCallback;
 
 
@@ -197,11 +195,12 @@ public class ReportCategory extends ReportRegistryItem implements DeleteCallback
 	
 	@Override
 	public void jdoPreDelete() {
+		super.jdoPreDelete();
 		PersistenceManager pm = getPersistenceManager();
 		if(childItems != null)
+		{
 			pm.deletePersistentAll(childItems);
-		pm.deletePersistent(getName());
-		pm.deletePersistent(getDescription());
-		pm.flush();
+			pm.flush();
+		}
 	}	
 }

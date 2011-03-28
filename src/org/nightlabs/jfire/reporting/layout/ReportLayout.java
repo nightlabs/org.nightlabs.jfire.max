@@ -47,7 +47,6 @@ import javax.jdo.annotations.InheritanceStrategy;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.PersistenceModifier;
 import javax.jdo.annotations.Persistent;
-import javax.jdo.listener.DeleteCallback;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.io.DataBuffer;
@@ -88,7 +87,7 @@ import org.nightlabs.util.Util;
 		members=@Persistent(name="reportDesign"))
 })
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
-public class ReportLayout extends ReportRegistryItem implements DeleteCallback{
+public class ReportLayout extends ReportRegistryItem{
 
 	/**
 	 * LOG4J logger used by this class
@@ -262,12 +261,10 @@ public class ReportLayout extends ReportRegistryItem implements DeleteCallback{
 	
 	@Override
 	public void jdoPreDelete() {
+		super.jdoPreDelete();
 		PersistenceManager pm = getPersistenceManager();
 		Collection<ReportLayoutLocalisationData> bundle = ReportLayoutLocalisationData.getReportLayoutLocalisationBundle(pm, this);
 		if(bundle != null && !bundle.isEmpty())
 			pm.deletePersistentAll(bundle);
-		pm.deletePersistent(getName());
-		pm.deletePersistent(getDescription());
-		pm.flush();
 	}
 }

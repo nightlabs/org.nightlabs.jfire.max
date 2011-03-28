@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.Locale;
 import java.util.Properties;
 
 import javax.annotation.security.RolesAllowed;
@@ -11,12 +12,13 @@ import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 import javax.jdo.JDOHelper;
+import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.JDOUserCallbackException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.listener.InstanceLifecycleEvent;
 import javax.jdo.listener.StoreLifecycleListener;
+import javax.security.auth.login.LoginException;
 
-import org.jboss.annotation.security.SecurityDomain;
 import org.nightlabs.jfire.asyncinvoke.AsyncInvoke;
 import org.nightlabs.jfire.asyncinvoke.AsyncInvokeEnqueueException;
 import org.nightlabs.jfire.asyncinvoke.Invocation;
@@ -26,20 +28,28 @@ import org.nightlabs.jfire.base.security.integration.ldap.connection.ILDAPConnec
 import org.nightlabs.jfire.person.Person;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.security.integration.UserManagementSystem;
+import org.nightlabs.jfire.security.integration.UserManagementSystemCommunicationException;
 import org.nightlabs.jfire.security.integration.UserManagementSystemType;
 import org.nightlabs.jfire.server.data.dir.JFireServerDataDirectory;
+import org.nightlabs.jfire.timer.Task;
+import org.nightlabs.jfire.timer.id.TaskID;
 import org.nightlabs.util.CollectionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * EJB for configuring LDAP user management system. It has an orgnisation-init which creates LDAPServer types
+ * single instances if not created already, creates LDAPServer instances from ldap.properties configuration file,
+ * configures synchronization of user data from JFire to LDAP directory and vice versa.
  * 
  * @author Denis Dudnik <deniska.dudnik[at]gmail{dot}com>
  *
  */
-@Stateless(mappedName = "LDAPManager")
-@SecurityDomain(value="jfire")
-public class LDAPManagerBean extends BaseSessionBeanImpl implements LDAPManagerRemote {
+@Stateless(
+		mappedName="jfire/ejb/JFireLDAP/LDAPManager", 
+		name="jfire/ejb/JFireLDAP/LDAPManager"
+			)
+public class LDAPManagerBean extends BaseSessionBeanImpl implements LDAPManagerRemote, LDAPManagerLocal {
 	
 	private static final Logger logger = LoggerFactory.getLogger(LDAPManagerBean.class);
 	
@@ -59,7 +69,8 @@ public class LDAPManagerBean extends BaseSessionBeanImpl implements LDAPManagerR
 			
 			// run sync configuration only once at startup because it's unlikely 
 			// that leading system scenario will be changed at server runtime
-			configureSynchronization(pm);
+			configureJFireAsLeadingSystem(pm);
+			configureLdapAsLeadingSystem(pm);
 			
 		}finally{
 			pm.close();
@@ -67,9 +78,36 @@ public class LDAPManagerBean extends BaseSessionBeanImpl implements LDAPManagerR
 		
 	}
 	
-	private static void configureSynchronization(PersistenceManager pm){
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("_System_")
+	@Override
+	public void syncUserDataFromLDAP(TaskID taskID) throws LoginException, LDAPSyncException, UserManagementSystemCommunicationException {
+		PersistenceManager pm = createPersistenceManager();
+		try{
+			// determine if there's any leading LDAPServers
+			Collection<LDAPServer> leadingSystems = UserManagementSystem.getUserManagementSystemsByLeading(
+					pm, true, LDAPServer.class
+					);
+			
+			for (LDAPServer ldapServer : leadingSystems) {
+				
+				Collection<String> entriesForSync = ldapServer.getAllEntriesForSync();
+				if (!entriesForSync.isEmpty()){
+					LDAPSyncEvent syncEvent = new LDAPSyncEvent(LDAPSyncEventType.FETCH);
+					syncEvent.setOrganisationID(getOrganisationID());
+					syncEvent.setLdapUsersIds(entriesForSync);
+					
+					ldapServer.synchronize(syncEvent);
+				}
+			}
+		}finally{
+			pm.close();
+		}
+	}
 
-		// determine if JFire is a leading system for at least one existent LDAPServer
+	private void configureJFireAsLeadingSystem(PersistenceManager pm){
+		// Determine if JFire is a leading system for at least one existent LDAPServer, 
+		// therefore we query all NON leading LDAPServers.
 		Collection<LDAPServer> leadingSystems = UserManagementSystem.getUserManagementSystemsByLeading(
 				pm, false, LDAPServer.class
 				);
@@ -83,10 +121,49 @@ public class LDAPManagerBean extends BaseSessionBeanImpl implements LDAPManagerR
 					);
 			
 		}
-			
-		// TODO: LDAP as a leading system scenario is still to be done
-		// 1. using timer
-		// 2. using push notifications from LDAP server
+	}
+	
+	private void configureLdapAsLeadingSystem(PersistenceManager pm){
+		try {
+			pm.getExtent(Task.class);
+			TaskID taskID = TaskID.create(
+					getOrganisationID(),
+					Task.TASK_TYPE_ID_SYSTEM, "JFireLDAP-syncUserDataFromLDAP"
+					);
+			Task task;
+			try {
+				task = (Task) pm.getObjectById(taskID);
+				task.getActiveExecID();
+			} catch (JDOObjectNotFoundException x) {
+				task = new Task(
+						taskID.organisationID, taskID.taskTypeID, taskID.taskID,
+						User.getUser(pm, getOrganisationID(), User.USER_ID_SYSTEM),
+						LDAPManagerLocal.class,
+						"syncUserDataFromLDAP"
+				);
+
+				task.getName().setText(Locale.ENGLISH.getLanguage(), "LDAPSynchronization");
+				task.getDescription().setText(
+						Locale.ENGLISH.getLanguage(),
+						"This Task queries all users from all leading LDAPServers and synchronizes changes to JFire."
+						);
+
+				task.getTimePatternSet().createTimePattern(
+						"*", // year
+						"*", // month
+						"*", // day
+						"*", // dayOfWeek
+						"*", //  hour
+						"*/60"); // minute
+
+				task.setEnabled(true);
+				pm.makePersistent(task);
+			}
+		} catch(Exception e){
+			logger.error("Can't configure a timer task for LDAP as leading system sychronization!", e);
+		}
+		
+		// TODO push notifications from LDAP server
 	}
 
 	private static StoreLifecycleListener syncStoreLifecycleListener = new SyncStoreLifecycleListener();
@@ -99,10 +176,23 @@ public class LDAPManagerBean extends BaseSessionBeanImpl implements LDAPManagerR
 			};
 		};
 		
+		/**
+		 * Enable/disable this listener. If it's disabled than it will not exec AsyncInvoke for synchronization.
+		 * 
+		 * IMPORTANT! When you want to disable listener and then persist your objects you SHOULD always call to
+		 * pm.flush() BEFORE enabling listener back. Otherwise there's a big chance that pm will be flushed 
+		 * somewhere else AFTER you enable listener and it will be triggered causing unexpected behaviour.  
+		 * 
+		 * @param isEnabled
+		 */
 		public static void setEnabled(boolean isEnabled) {
 			isEnabledTL.set(isEnabled);
 		}
 		
+		/**
+		 * 
+		 * @return if this listener is enabled and will exec AsyncInvokes
+		 */
 		public static boolean isEnabled(){
 			return isEnabledTL.get();
 		}
@@ -130,6 +220,12 @@ public class LDAPManagerBean extends BaseSessionBeanImpl implements LDAPManagerR
 		
 	}
 	
+	/**
+	 * This invocation is used for synchronizing data from JFire to LDAP directory
+	 * 
+	 * @author Denis Dudnik <deniska.dudnik[at]gmail{dot}com>
+	 *
+	 */
 	public static class SyncToLDAPServersInvocation extends Invocation{
 		
 		private static final long serialVersionUID = 1L;
@@ -329,4 +425,5 @@ public class LDAPManagerBean extends BaseSessionBeanImpl implements LDAPManagerR
 			}
 		}
 	}
+
 }

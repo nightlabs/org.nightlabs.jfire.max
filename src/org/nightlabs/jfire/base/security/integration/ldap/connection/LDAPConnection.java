@@ -1,6 +1,6 @@
 package org.nightlabs.jfire.base.security.integration.ldap.connection;
 
-import java.util.Enumeration;
+import java.util.Collection;
 import java.util.Map;
 
 import javax.security.auth.login.LoginException;
@@ -68,12 +68,16 @@ public class LDAPConnection {
     	this.connectionWrapper.modifyEntry(entryDN, attributes, modificationFlag);
     }
     
-    public Enumeration<?> search(String dn, Map<String, Object[]> searchAttributes, String[] returnAttributes) throws UserManagementSystemCommunicationException{
+    public Map<String, Map<String, Object[]>> search(String dn, Map<String, Object[]> searchAttributes, String[] returnAttributes) throws UserManagementSystemCommunicationException{
     	return this.connectionWrapper.search(dn, searchAttributes, returnAttributes);
     }
     
 	public Map<String, Object[]> getAttributesForEntry(String dn) throws UserManagementSystemCommunicationException {
 		return this.connectionWrapper.getAttribbutesForEntry(dn);
+	}
+	
+	public Collection<String> getChildEntries(String parentName) throws UserManagementSystemCommunicationException{
+		return this.connectionWrapper.getChildEntries(parentName);
 	}
 
     public void disconnect() {

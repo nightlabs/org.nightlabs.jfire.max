@@ -1,13 +1,13 @@
-// REV: Alex: These are the scripts that will be used initially 
-// when a LDAP-Server (LDAPScriptSet) is created, so maybe there 
-// should be a comment on top of every script telling the administrator 
-// what this script is for, when it is executed and which 
-// variables are published into it when it is executed.
-// Additionally the comment should tell, whether the script is 
-// supposed to return a value and for what this value is used
-
 /**
- * InetOrgPersonBindVariablesScript.js should be executed first
+ * This is initial script which is used when new LDAPServer and corresponding LDAPScriptSet are created. 
+ * All changes in this particular file WILL NOT be reflected in existing LDAPServers but only in new ones.
+ * 
+ * This script makes use of variables from InetOrgPersonBindVariablesScript.js, so it SHOULD be executed first.
+ * 
+ * This script is used for generating a String with LDAP entry DN usign User/Person data.  
+ * 
+ * Returns a String with LDAP entry DN.
+ *  
  */
 var dn = null;
 if ($userID$ != null){

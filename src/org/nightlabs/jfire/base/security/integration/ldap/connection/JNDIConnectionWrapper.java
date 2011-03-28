@@ -1,6 +1,7 @@
 package org.nightlabs.jfire.base.security.integration.ldap.connection;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -13,6 +14,7 @@ import javax.naming.CompositeName;
 import javax.naming.Context;
 import javax.naming.InvalidNameException;
 import javax.naming.Name;
+import javax.naming.NameClassPair;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.directory.Attribute;
@@ -21,8 +23,13 @@ import javax.naming.directory.BasicAttribute;
 import javax.naming.directory.BasicAttributes;
 import javax.naming.directory.DirContext;
 import javax.naming.directory.ModificationItem;
+import javax.naming.directory.SearchResult;
+import javax.naming.event.EventDirContext;
+import javax.naming.event.NamingExceptionEvent;
 import javax.naming.ldap.InitialLdapContext;
 import javax.naming.ldap.LdapName;
+import javax.naming.ldap.UnsolicitedNotificationEvent;
+import javax.naming.ldap.UnsolicitedNotificationListener;
 import javax.security.auth.login.LoginException;
 
 import org.nightlabs.jfire.base.security.integration.ldap.connection.ILDAPConnectionParamsProvider.AuthenticationMethod;
@@ -75,25 +82,27 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper {
 		context = null;
 		isConnected = true;
 
-		Hashtable<String, String> environment = new Hashtable<String, String>();
-
-		environment.put(JAVA_NAMING_LDAP_VERSION, "3"); //$NON-NLS-1$
-		environment.put(COM_SUN_JNDI_LDAP_CONNECT_TIMEOUT, "10000"); //$NON-NLS-1$
-		environment.put(COM_SUN_JNDI_DNS_TIMEOUT_INITIAL, "2000"); //$NON-NLS-1$
-		environment.put(COM_SUN_JNDI_DNS_TIMEOUT_RETRIES, "3"); //$NON-NLS-1$
-
 		String host = connection.getConnectionParamsProvider().getHost();
 		int port = connection.getConnectionParamsProvider().getPort();
-		environment.put(Context.PROVIDER_URL, LDAP_SCHEME + host + ':' + port);
 
 		try{
-			
-			if (logger.isDebugEnabled()){
-				logger.debug("Connecting to LDAP server with params: " + environment.toString());
+			Hashtable<String, String> environment = new Hashtable<String, String>();
+			synchronized (environment) {
+				environment.put(JAVA_NAMING_LDAP_VERSION, "3"); //$NON-NLS-1$
+				environment.put(COM_SUN_JNDI_LDAP_CONNECT_TIMEOUT, "10000"); //$NON-NLS-1$
+				environment.put(COM_SUN_JNDI_DNS_TIMEOUT_INITIAL, "2000"); //$NON-NLS-1$
+				environment.put(COM_SUN_JNDI_DNS_TIMEOUT_RETRIES, "3"); //$NON-NLS-1$
+				environment.put(Context.PROVIDER_URL, LDAP_SCHEME + host + ':' + port);
+				environment.put(Context.INITIAL_CONTEXT_FACTORY, getDefaultLdapContextFactory());
+
+				if (logger.isDebugEnabled()){
+					logger.debug("Connecting to LDAP server with params: " + environment.toString());
+				}
+				
+				context = new InitialLdapContext(environment, null);
+				
+				configureConnectionProblemsListener();
 			}
-			
-			environment.put(Context.INITIAL_CONTEXT_FACTORY, getDefaultLdapContextFactory());
-			context = new InitialLdapContext(environment, null);
 			
 		}catch(NamingException e){
 			
@@ -150,17 +159,18 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper {
 
 			// setup credentials
 			try{
-				context.removeFromEnvironment(Context.SECURITY_AUTHENTICATION);
-				context.removeFromEnvironment(Context.SECURITY_PRINCIPAL);
-				context.removeFromEnvironment(Context.SECURITY_CREDENTIALS);
-	
-				context.addToEnvironment(Context.SECURITY_AUTHENTICATION, authMethod);
-	
-				context.addToEnvironment(Context.SECURITY_PRINCIPAL, bindPrincipal);
-				context.addToEnvironment(Context.SECURITY_CREDENTIALS, bindCredentials);
-	
-				context.reconnect(context.getConnectControls());
-				
+				synchronized (context) {
+					context.removeFromEnvironment(Context.SECURITY_AUTHENTICATION);
+					context.removeFromEnvironment(Context.SECURITY_PRINCIPAL);
+					context.removeFromEnvironment(Context.SECURITY_CREDENTIALS);
+		
+					context.addToEnvironment(Context.SECURITY_AUTHENTICATION, authMethod);
+		
+					context.addToEnvironment(Context.SECURITY_PRINCIPAL, bindPrincipal);
+					context.addToEnvironment(Context.SECURITY_CREDENTIALS, bindCredentials);
+		
+					context.reconnect(context.getConnectControls());
+				}
 			}catch(NamingException e){
 
 				String host = connection.getConnectionParamsProvider().getHost();
@@ -193,13 +203,13 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper {
 		if (context != null && isConnected) {
 			
 			try{
-				
-				context.removeFromEnvironment(Context.SECURITY_AUTHENTICATION);
-				context.removeFromEnvironment(Context.SECURITY_PRINCIPAL);
-				context.removeFromEnvironment(Context.SECURITY_CREDENTIALS);
-	
-				context = new InitialLdapContext(context.getEnvironment(), context.getConnectControls());
-				
+				synchronized(context){
+					context.removeFromEnvironment(Context.SECURITY_AUTHENTICATION);
+					context.removeFromEnvironment(Context.SECURITY_PRINCIPAL);
+					context.removeFromEnvironment(Context.SECURITY_CREDENTIALS);
+		
+					context = new InitialLdapContext(context.getEnvironment(), context.getConnectControls());
+				}
 			}catch(NamingException e){
 				String host = connection.getConnectionParamsProvider().getHost();
 				int port = connection.getConnectionParamsProvider().getPort();
@@ -217,10 +227,10 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper {
     public void createEntry(String dn, Map<String, Object[]> attributes) throws UserManagementSystemCommunicationException{
     	
         try {
-        	
-            // create entry
-            context.createSubcontext(getSaveJndiName(dn), getAttributesFromMap(attributes));
-            
+        	synchronized (context) {
+                // create entry
+                context.createSubcontext(getSaveJndiName(dn), getAttributesFromMap(attributes));
+			}
         }catch(NamingException e){
 			throw new UserManagementSystemCommunicationException("Failed to create an entry! Entry DN: " + dn, e);
         }
@@ -234,10 +244,10 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper {
     public void deleteEntry(String dn) throws UserManagementSystemCommunicationException{
     	
         try {
-        	
-            // delete entry
-            context.destroySubcontext(getSaveJndiName(dn));
-            
+        	synchronized (context) {
+                // delete entry
+                context.destroySubcontext(getSaveJndiName(dn));
+			}
         }catch(NamingException e){
 			throw new UserManagementSystemCommunicationException("Failed to delete an entry! Entry DN: " + dn, e);
         }
@@ -269,17 +279,19 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper {
 		        operationType = DirContext.REPLACE_ATTRIBUTE;
 	        }
 	        
-	        // prepare mododifcation items
-	        Attributes translatedAttributes = getAttributesFromMap(attributes);
-	        ModificationItem[] modificationItems = new ModificationItem[translatedAttributes.size()];
-	        int i = 0;
-	        for (Enumeration<? extends Attribute> attributesEnum = translatedAttributes.getAll(); attributesEnum.hasMoreElements();) {
-	        	modificationItems[i] = new ModificationItem(operationType, attributesEnum.nextElement());
-	        	i++;
+	        synchronized (context) {
+		        // prepare mododifcation items
+		        Attributes translatedAttributes = getAttributesFromMap(attributes);
+		        ModificationItem[] modificationItems = new ModificationItem[translatedAttributes.size()];
+		        int i = 0;
+		        for (Enumeration<? extends Attribute> attributesEnum = translatedAttributes.getAll(); attributesEnum.hasMoreElements();) {
+		        	modificationItems[i] = new ModificationItem(operationType, attributesEnum.nextElement());
+		        	i++;
+				}
+		        
+		        // perform modification
+		        context.modifyAttributes(getSaveJndiName(dn), modificationItems);
 			}
-	        
-	        // perform modification
-	        context.modifyAttributes(getSaveJndiName(dn), modificationItems);
 	        
 		}catch(NamingException e){
 			throw new UserManagementSystemCommunicationException("Entry modification failed! Entry: " + dn, e);
@@ -291,14 +303,24 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Enumeration<?> search(
+	public Map<String, Map<String, Object[]>> search(
 			String dn, Map<String, Object[]> searchAttributes, String[] returnAttributes
 			) throws UserManagementSystemCommunicationException {
 
 		try{
-			
-			return context.search(getSaveJndiName(dn), getAttributesFromMap(searchAttributes), returnAttributes);
-			
+			synchronized (context){
+				NamingEnumeration<SearchResult> result = context.search(getSaveJndiName(dn), getAttributesFromMap(searchAttributes), returnAttributes);
+				try{
+					Map<String, Map<String, Object[]>> returnMap = new HashMap<String, Map<String,Object[]>>();
+					while (result.hasMoreElements()) {
+						SearchResult searchResult = (SearchResult) result.nextElement();
+						returnMap.put(searchResult.getNameInNamespace(), getAttributesMap(searchResult.getAttributes()));
+					}
+					return returnMap;
+				}finally{
+					result.close();
+				}
+			}
 		}catch(NamingException e){
 			throw new UserManagementSystemCommunicationException("Search failed!");
 		}
@@ -306,14 +328,39 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper {
 	
 	/**
 	 * {@inheritDoc}
-	 * @throws UserManagementSystemCommunicationException 
 	 */
 	@Override
 	public HashMap<String, Object[]> getAttribbutesForEntry(String dn) throws UserManagementSystemCommunicationException {
 		try {
-			return getAttributesMap(context.getAttributes(getSaveJndiName(dn)));
+			synchronized (context) {
+				return getAttributesMap(context.getAttributes(getSaveJndiName(dn)));
+			}
 		} catch (NamingException e) {
 			throw new UserManagementSystemCommunicationException("Failed to get attributes from entry with DN: " + dn);
+		}
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Collection<String> getChildEntries(String parentName) throws UserManagementSystemCommunicationException{
+		try {
+			synchronized (context) {
+				NamingEnumeration<NameClassPair> childEntries = context.list(getSaveJndiName(parentName));
+				try{
+					Collection<String> childNames = new ArrayList<String>();
+					while (childEntries.hasMoreElements()) {
+						NameClassPair pair = (NameClassPair) childEntries.nextElement();
+						childNames.add(pair.getNameInNamespace());
+					}
+					return childNames;
+				}finally{
+					childEntries.close();
+				}
+			}
+		} catch (NamingException e) {
+			throw new UserManagementSystemCommunicationException("Failed to get child entries for parent with DN: " + parentName);
 		}
 	}
     
@@ -328,6 +375,51 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper {
 		return context != null && isConnected;
 	}
 	
+	/**
+	 * LDAP servers often have an idle timeout period after which they will close connections no longer being used.
+	 * That's why we need this listener to catch connection exceptions from LDAP server. If such exception is caught
+	 * it will be logged and new connection will be established immidiately.
+	 * 
+	 * @throws NamingException
+	 */
+	private void configureConnectionProblemsListener() throws NamingException{
+		
+		if (context instanceof EventDirContext){
+			
+			UnsolicitedNotificationListener ldapPushNotificationsListener = new UnsolicitedNotificationListener() {
+				
+				@Override
+				public void namingExceptionThrown(NamingExceptionEvent event) {
+					if (event.getException() instanceof CommunicationException){
+						// TODO: check what type of exception will be given with event
+						logger.warn("Recieved communication exception from LDAP server, trying to reconnect.");
+						try {
+							disconnect();
+							connect();
+						} catch (Exception e) {
+							logger.error("Faield to reconnect to LDAP server!", e);
+							throw new RuntimeException(e);
+						}
+						
+					}
+				}
+				
+				@Override
+				public void notificationReceived(
+						UnsolicitedNotificationEvent unsolicitednotificationevent
+						) {
+					// we are not inersted in any notifications, so do nothig
+				}
+			};
+
+			// Name and scope parameters are not used when adding UnsolicitedNotificationListener,
+			// so we just specify a blank string and OBJECT_SCOPE to avoid possible NullPointerExceptions.
+			((EventDirContext) context).addNamingListener(
+					"", EventDirContext.OBJECT_SCOPE, ldapPushNotificationsListener
+					);
+		}
+		
+	}
 	
 	/**
 	 * Translates {@link Attributes} to {@link HashMap} 

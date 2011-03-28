@@ -27,6 +27,7 @@ public class InetOrgPersonLDAPServerType extends UserManagementSystemType<LDAPSe
 	private static final String INET_ORG_PERSON_GET_ATTRIBUTES_FOR_LDAP_SCRIPT = "scripts/InetOrgPersonGetAttributesForLDAPScript.js";
 	private static final String INET_ORG_PERSON_GET_DN_SCRIPT = "scripts/InetOrgPersonGetDNScript.js";
 	private static final String INET_ORG_PERSON_BIND_VARIABLES_SCRIPT = "scripts/InetOrgPersonBindVariablesScript.js";
+	private static final String INET_ORG_PERSON_GET_PARENT_ENTRIES_SCRIPT = "scripts/InetOrgPersonGetParentEntriesScript.js";
 	
 	/**
 	 * The serial version of this class.
@@ -71,8 +72,9 @@ public class InetOrgPersonLDAPServerType extends UserManagementSystemType<LDAPSe
 			Class<? extends InetOrgPersonLDAPServerType> typeClass = this.getClass();
 			ldapScriptSet.setBindVariablesScript(IOUtil.readTextFile(typeClass.getResourceAsStream(INET_ORG_PERSON_BIND_VARIABLES_SCRIPT)));
 			ldapScriptSet.setLdapDNScript(IOUtil.readTextFile(typeClass.getResourceAsStream(INET_ORG_PERSON_GET_DN_SCRIPT)));
-			ldapScriptSet.setSyncJFireToLdapScript(IOUtil.readTextFile(typeClass.getResourceAsStream(INET_ORG_PERSON_GET_ATTRIBUTES_FOR_LDAP_SCRIPT)));
+			ldapScriptSet.setGenerateJFireToLdapAttributesScript(IOUtil.readTextFile(typeClass.getResourceAsStream(INET_ORG_PERSON_GET_ATTRIBUTES_FOR_LDAP_SCRIPT)));
 			ldapScriptSet.setSyncLdapToJFireScript(IOUtil.readTextFile(typeClass.getResourceAsStream(INET_ORG_PERSON_SYNC_TO_JFIRE_SCRIPT)));
+			ldapScriptSet.setGenerateParentLdapEntriesScript(IOUtil.readTextFile(typeClass.getResourceAsStream(INET_ORG_PERSON_GET_PARENT_ENTRIES_SCRIPT)));
 
 			server.setLdapScriptSet(ldapScriptSet);
 			

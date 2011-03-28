@@ -36,6 +36,7 @@ import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.security.integration.Session;
 import org.nightlabs.jfire.security.integration.UserManagementSystem;
 import org.nightlabs.jfire.security.integration.UserManagementSystemCommunicationException;
+import org.nightlabs.jfire.security.integration.UserManagementSystemManagerBean.ForbidUserCreationLyfecycleListener;
 import org.nightlabs.jfire.security.integration.UserManagementSystemType;
 import org.nightlabs.jfire.security.integration.id.UserManagementSystemID;
 import org.nightlabs.jfire.servermanager.JFireServerManager;
@@ -142,6 +143,26 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 	/**
 	 * Password for DN used for binding agains LDAP server during synchronization process.
 	 * REV: (Alex) It should be possible to sync only when a user authenticates and thus leave this field empty (make it optional, as it is only essentially required for timed synchronisations).
+	 * 
+	 * REV: (Denis) If I understood correctly sync scenario for JFire as leading system (not involving any timers) should look like this:
+	 * 	- some user was authenticated in JFire (and was bind against LDAP during login)
+	 *	- we assume that no additional binding against LDAP needed for synchronization
+	 *	- run sync process under this authenticated user
+	 *
+	 * In this case there are couple of problems:
+	 * 1) Current user could not have enough permissions for modifying LDAP directory. It should be checked and if this happens we need to bind against LDAP with syncDN/syncPassword so they must not be empty.
+	 * 2) Even if first problem is not encountered there's another issue. Every time we obtain a LDAPConnection from LDAPCOnnectionManager we get a clean connection which doesn't contain any credentials.
+	 *    It happens because we always unbind LDAPConnection (which means removing any auth related data) before releasing it back to LDAPConnectionManager in order not to have security violation if someone would
+	 *    obtain this released connection somewhere else. 
+	 *    So the point is that we always perform bind operation after getting new LDAPConnection if we want to perform some 'write' operations on LDAP directory.
+	 *    Of course we need a password for that and there's no possibility to get plain password of currently logged in user.
+	 *    
+	 * Possible workarounds/solutions would be:
+	 * 1) Alwas use syncDN/syncPassword for synchronization purposes, so they can't be empty (that's why it was already implemented in previous revision, solves both problems)
+	 * 2) Modify LDAPConnectionManager and manage two kinds of LDAPConnections: anonymous and logged in (bind was called on them). And have an API to recieve authenticated LDAPConnection providing Session object for example.
+	 *    It solves problem 2.
+	 * 3) Something else :)
+	 *    
 	 */
 	@Persistent
 	private String syncPassword;
@@ -149,7 +170,10 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 	/**
 	 * Set of scripts which perform specific synchronization tasks
 	 */
-	@Persistent // REV: @Persistent is not necessary. It is the default value. You can safely remove it. Marco.
+	// REV: @Persistent is not necessary. It is the default value. You can safely remove it. Marco.
+	// REV: Yes, I knew that. Im my opinion code looks more readable and clear when specifying this explicitly. 
+	// Of course I can remove this annotation if it fits better into JFire code style. Denis.
+	@Persistent
 	private LDAPScriptSet ldapScriptSet;
 	
 
@@ -189,6 +213,10 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 	@Override
 	public Session login(LoginData loginData) throws LoginException, UserManagementSystemCommunicationException{
 
+		if (!canBind(loginData.getUserID(), loginData.getPassword())){
+			return null;
+		}
+
         Session session = null;
         LDAPConnection connection = null;
 
@@ -217,7 +245,7 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
     			if (logger.isDebugEnabled()){
 		        	logger.debug(String.format("User %s@%s found in JFire, result DN is %s", loginDataUserID, loginDataOrganisationID, userDN));
 		        }
-    		}else if (user == null && shouldFetchUserFromLDAP(loginData)){
+    		}else if (user == null && shouldFetchUserFromLDAP()){
     			if (logger.isDebugEnabled()){
 		        	logger.debug(String.format("User %s@%s was not found JFire, will fetch it from LDAP", loginDataUserID, loginDataOrganisationID));
 		        }
@@ -247,7 +275,7 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 	        	logger.debug("Bind successful. Session id: " + session.getSessionID());
 	        }
 
-			if (user == null && shouldFetchUserFromLDAP(loginData)){
+			if (user == null && shouldFetchUserFromLDAP()){
    				try {
    					if (logger.isDebugEnabled()){
    			        	logger.debug(String.format("User %s@%s was not found JFire, start fetching it from LDAP", loginDataUserID, loginDataOrganisationID));
@@ -461,6 +489,25 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
     	}
 	}
 	
+	private boolean canBind(String userName, String password){
+		
+		if (userName == null || "".equals(userName)){
+			return false;
+		}
+		
+		if (AuthenticationMethod.SIMPLE.equals(getAuthMethod())
+				&& (password == null || "".equals(password))){
+			// For simple auth method LDAP doesn't support authentication without password.
+			// If password is not provided than it's supposed by LDAP that access is anonymous.
+			// So we just log the warning here and silently return, because otherwise log will be 
+			// polluted with LoginExceptions. When JFire client starts - it already tries to log in
+			// with blank password until login/password dialog appears - it will cause exceptions. Denis.
+			logger.warn("Password was not specified for simple LDAP authentication! Bind will no be executed, returning null.");
+			return false;
+		}
+		return true;
+	}
+	
 	/***********************************
 	 * Synchronization section START *
 	 ***********************************/
@@ -488,7 +535,7 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 			
 		}else if (LDAPSyncEventType.SEND == syncEvent.getEventType()){
 			
-			updateLDAPUsers(syncEvent.getJFireObjectsIds());
+			updateLDAPData(syncEvent.getJFireObjectsIds());
 			
 		}else{
 			throw new UnsupportedOperationException("Unknown LDAPSyncEventType!");
@@ -496,7 +543,44 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 		
 	}
 	
-	private boolean shouldFetchUserFromLDAP(LoginData loginData){
+	/**
+	 * Retrieves all entries' names from LDAP which should be synchronized with JFire objects.
+	 * 
+	 * @return all LDAP entries which should be synchronized into JFire
+	 * @throws UserManagementSystemCommunicationException 
+	 * @throws LDAPSyncException 
+	 * @throws LoginException 
+	 */
+	public Collection<String> getAllEntriesForSync() throws UserManagementSystemCommunicationException, LoginException, LDAPSyncException{
+		LDAPConnection connection = null;
+		Collection<String> entriesForSync = new ArrayList<String>();
+		try{
+
+			PersistenceManager pm = JDOHelper.getPersistenceManager(this);
+			connection = createConnection(this);
+
+			bindForSync(connection, pm);
+			
+			Collection<String> parentEntriesNames = new ArrayList<String>();
+			try {
+				parentEntriesNames.addAll(ldapScriptSet.getParentEntriesForSync());
+			} catch (ScriptException e) {
+				logger.error("Can't get initial parent entries from LDAPScripSet!", e);
+			}
+			
+			for (String parentEntryName : parentEntriesNames) {
+				entriesForSync.addAll(
+						connection.getChildEntries(parentEntryName)
+						);
+			}
+			
+		}finally{
+			unbindAndReleaseConnection(connection);
+		}
+		return entriesForSync;
+	}
+	
+	private boolean shouldFetchUserFromLDAP(){
 
 		// we can fetch user data from LDAP in both scenarios:
 		// - when JFire is a leading system we're doing it because it might help in certain situations 
@@ -507,14 +591,14 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 		if (isLeading()){
 			fetchUserFromLDAP = true;
 		}else{
-			// REV: Alex. If I understand correctly, the default (when no
-			// system-property is set) is that this method does return false, so
-			// the user will not be fetched from LDAP. From the spec one can
-			// read that the default should be 'fetch just like UMS is leading
-			// system'.
-			fetchUserFromLDAP = Boolean.parseBoolean(
-					System.getProperty(UserManagementSystem.SHOULD_FETCH_USER_DATA)
-					);
+			String fetchPropertyValue = System.getProperty(UserManagementSystem.SHOULD_FETCH_USER_DATA);
+			if (fetchPropertyValue != null && !fetchPropertyValue.isEmpty()){
+				fetchUserFromLDAP = Boolean.parseBoolean(
+						System.getProperty(UserManagementSystem.SHOULD_FETCH_USER_DATA)
+						);
+			}else{
+				fetchUserFromLDAP = true;
+			}
 		}
 
 		return fetchUserFromLDAP;
@@ -573,11 +657,12 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 
 			connection = createConnection(this);
 
-			// We need to be logged in against LDAPServer for modification calls.
 			bindForSync(connection, pm);
 			
 			// disable JDO lifecycle listener used for JFire2LDAP synchronization
 			SyncStoreLifecycleListener.setEnabled(false);
+			// disable JDO lifecycle listener which forbids new User creation
+			ForbidUserCreationLyfecycleListener.setEnabled(false);
 			
 			for (String ldapEntryDN : ldapEntriesDNs){
 				try{
@@ -606,6 +691,8 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 
 			// enable JDO lifecycle listener used for JFire2LDAP synchronization
 			SyncStoreLifecycleListener.setEnabled(true);
+			// enable JDO lifecycle listener which forbids new User creation
+			ForbidUserCreationLyfecycleListener.setEnabled(true);
 			
 			if (loginContext != null && loginContext.getSubject() != null){
 				if (logger.isDebugEnabled()){
@@ -629,7 +716,7 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 	 * @throws LoginException
 	 * @throws LDAPSyncException
 	 */
-	private void updateLDAPUsers(Collection<Object> jfireObjectsIds) throws UserManagementSystemCommunicationException, LoginException, LDAPSyncException{
+	private void updateLDAPData(Collection<Object> jfireObjectsIds) throws UserManagementSystemCommunicationException, LoginException, LDAPSyncException{
 		
 		LDAPConnection connection = null;
 		try{
@@ -704,30 +791,27 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 	
 	private void bindForSync(LDAPConnection  connection, PersistenceManager pm) throws LoginException, LDAPSyncException, UserManagementSystemCommunicationException{
 		
-		String syncDN = this.syncDN;
-		String syncPassword = this.syncPassword;
-		if (syncDN == null || "".equals(syncDN)){	// try to bind with currently logged in user
-	    	
-			User user = GlobalSecurityReflector.sharedInstance().getUserDescriptor().getUser(pm);
-			syncDN = getLDAPUserDN(user);
-        	
-        	if (syncDN == null){
-        		ILDAPConnectionParamsProvider params = connection.getConnectionParamsProvider();
-        		throw new LDAPSyncException(
-        				String.format(
-        						"Can't bind against LDAPServer at %s for synchronization because userDN is null for current logged in user %s@%s!",
-        						params.getHost(), user!=null?user.getUserID():"null", user!=null?user.getOrganisationID():"null"
-        						)
-        				);
-        	}
+		try{
+			// if some User is logged in than we assume that bind operation has been already performed
+			// TODO: check if this user has enough permissions to modify LDAP entries
+			GlobalSecurityReflector.sharedInstance().getUserDescriptor();
 			
-    		// TODO: Where should I get a password? what to do if passwords are not stored in JFire anymore? Denis.
-    		syncPassword = "root"; 
-        	
+			// TODO: temp
+			connection.bind(syncDN, syncPassword);
+			
+		}catch(NoUserException e){
+			// There's no logged in User, so we'll try to bind with syncDN and syncPasswrod
+			if (canBind(syncDN, syncPassword)){
+				
+				connection.bind(syncDN, syncPassword);
+				
+			}else{
+				logger.warn(
+						"Can't bind against LDAP because either syncDN or password are not specified. " +
+						"There's also no logged in User so all further requests to LDAP will be performed under anonymous user."
+						);
+			}
 		}
-
-		connection.bind(syncDN, syncPassword);
-		
 	}
 
 	private AuthCallbackHandler createAuthCallbackHandler(JFireServerManager ism, User user) throws Exception {

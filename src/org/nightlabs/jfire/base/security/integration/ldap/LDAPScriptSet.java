@@ -1,7 +1,7 @@
 package org.nightlabs.jfire.base.security.integration.ldap;
 
 import java.io.Serializable;
-import java.nio.charset.Charset;
+import java.util.Collection;
 import java.util.Map;
 
 import javax.jdo.JDOHelper;
@@ -44,8 +44,6 @@ public class LDAPScriptSet implements Serializable{
 	
 	private static final Logger logger = LoggerFactory.getLogger(LDAPScriptSet.class);
 
-	private static final Charset SCRIPT_CHARSET_UTF_8 = Charset.forName("UTF-8");
-
 	/**
 	 * The serial version UID of this class.
 	 */
@@ -60,47 +58,39 @@ public class LDAPScriptSet implements Serializable{
 
 	/**
 	 * Bind variables (i.e. $userID$ or $personEmail$) to JFire objects data.
-	 * 
-	 * <p>
-	 * REV: why do you use byte[] here instead of a String marked as CLOB like this:
-	 * </p>
-	 * <pre>
-	 * &#64;Column(sqlType="CLOB")
-	 * private String bindVariablesScript;
-	 * </pre>
-	 * <p>
-	 * Marco :-)
-	 * </p>
 	 */
-	@Persistent(defaultFetchGroup="true")
-	private byte[] bindVariablesScript;
+	@Persistent
+	@Column(sqlType="CLOB")
+	private String bindVariablesScript;
 	
 	/**
 	 * Generates and returns an LDAP DN using {@code bindVariablesScript).
-	 * <p>
-	 * REV: Why do you use byte[] here instead of a String marked as CLOB? See {@link #bindVariablesScript}
-	 * </p>
 	 */
-	@Persistent(defaultFetchGroup="true")
-	private byte[] ldapDNScript;
+	@Persistent
+	@Column(sqlType="CLOB")
+	private String ldapDNScript;
 	
 	/**
 	 * Performs synchronization from LDAP directory to JFire(creating or modifying User/Person objects)
-	 * <p>
-	 * REV: Why do you use byte[] here instead of a String marked as CLOB? See {@link #bindVariablesScript}
-	 * </p>
 	 */
-	@Persistent(defaultFetchGroup="true")
-	private byte[] syncLdapToJFireScript;
+	@Persistent
+	@Column(sqlType="CLOB")
+	private String syncLdapToJFireScript;
 	
 	/**
 	 * Generates and returns a map of attributes to be stored in LDAP directory using {@code bindVariablesScript).
-	 * <p>
-	 * REV: Why do you use byte[] here instead of a String marked as CLOB? See {@link #bindVariablesScript}
-	 * </p>
 	 */
-	@Persistent(defaultFetchGroup="true")
-	private byte[] syncJFireToLdapScript;
+	@Persistent
+	@Column(sqlType="CLOB")
+	private String generateJFireToLdapAttributesScript;
+	
+	/**
+	 * Generates and returns a collection of names for parent LDAP entries which hold all entries that
+	 * should be synchronized to JFire objects.
+	 */
+	@Persistent
+	@Column(sqlType="CLOB")
+	private String generateParentLdapEntriesScript;
 	
 	/**
 	 * @deprecated For JDO only!
@@ -127,23 +117,15 @@ public class LDAPScriptSet implements Serializable{
 	 * @param ldapDN
 	 */
 	public void setLdapDNScript(String ldapDN) {
-		if (ldapDN != null){
-			this.ldapDNScript = ldapDN.getBytes(SCRIPT_CHARSET_UTF_8);
-		}else{
-			this.ldapDNScript = null;
-		}
+		this.ldapDNScript = ldapDN;
 	}
 	
 	/**
 	 * Set syncJFireToLdapScript content
 	 * @param syncJFireToLdapScript
 	 */
-	public void setSyncJFireToLdapScript(String syncJFireToLdapScript) {
-		if (syncJFireToLdapScript != null){
-			this.syncJFireToLdapScript = syncJFireToLdapScript.getBytes(SCRIPT_CHARSET_UTF_8);
-		}else{
-			this.syncJFireToLdapScript = null;
-		}
+	public void setGenerateJFireToLdapAttributesScript(String syncJFireToLdapScript) {
+		this.generateJFireToLdapAttributesScript = syncJFireToLdapScript;
 	}
 	
 	/**
@@ -151,11 +133,7 @@ public class LDAPScriptSet implements Serializable{
 	 * @param syncLdapToJFireScript
 	 */
 	public void setSyncLdapToJFireScript(String syncLdapToJFireScript) {
-		if (syncLdapToJFireScript != null){
-			this.syncLdapToJFireScript = syncLdapToJFireScript.getBytes(SCRIPT_CHARSET_UTF_8);
-		}else{
-			this.syncLdapToJFireScript = null;
-		}
+		this.syncLdapToJFireScript = syncLdapToJFireScript;
 	}
 	
 	/**
@@ -163,11 +141,15 @@ public class LDAPScriptSet implements Serializable{
 	 * @param bindVariablesScript
 	 */
 	public void setBindVariablesScript(String bindVariablesScript) {
-		if (bindVariablesScript != null){
-			this.bindVariablesScript = bindVariablesScript.getBytes(SCRIPT_CHARSET_UTF_8);
-		}else{
-			this.bindVariablesScript = null;
-		}
+		this.bindVariablesScript = bindVariablesScript;
+	}
+	
+	/**
+	 * Set generateParentLdapEntriesScript content
+	 * @param generateParentLdapEntriesScript
+	 */
+	public void setGenerateParentLdapEntriesScript(String generateParentLdapEntriesScript) {
+		this.generateParentLdapEntriesScript = generateParentLdapEntriesScript;
 	}
 	
 	/**
@@ -205,9 +187,7 @@ public class LDAPScriptSet implements Serializable{
 			b.put("person", jfireObject);
 		}
 
-		Object result = execute(
-				new String(bindVariablesScript, SCRIPT_CHARSET_UTF_8)+new String(ldapDNScript, SCRIPT_CHARSET_UTF_8), ctx
-				);
+		Object result = execute(bindVariablesScript+ldapDNScript, ctx);
 		if (result != null){
 			return result.toString();
 		}
@@ -236,9 +216,7 @@ public class LDAPScriptSet implements Serializable{
 			b.put("person", jfireObject);
 		}
 		
-		Object result = execute(
-				new String(bindVariablesScript, SCRIPT_CHARSET_UTF_8)+new String(syncJFireToLdapScript, SCRIPT_CHARSET_UTF_8), ctx
-				);
+		Object result = execute(bindVariablesScript+generateJFireToLdapAttributesScript, ctx);
 		if (result instanceof Map){
 			return (Map<String, Object[]>) result;
 		}
@@ -266,7 +244,22 @@ public class LDAPScriptSet implements Serializable{
 		b.put("newPersonID", IDGenerator.nextID(PropertySet.class));
 		b.put("logger", logger);
 	
-		return execute(new String(syncLdapToJFireScript, SCRIPT_CHARSET_UTF_8), ctx);
+		return execute(syncLdapToJFireScript, ctx);
+	}
+	
+	/**
+	 * Executes script for getting collection of parent LDAP entries which hold child entries to be synchronized. 
+	 * 
+	 * @return
+	 * @throws ScriptException
+	 */
+	@SuppressWarnings("unchecked")
+	public Collection<String> getParentEntriesForSync() throws ScriptException{
+		Object result = execute(generateParentLdapEntriesScript, new SimpleScriptContext());
+		if (result instanceof Collection){
+			return (Collection<String>) result;
+		}
+		return null;
 	}
 	
 	private Object execute(String script, ScriptContext scriptContext) throws ScriptException{

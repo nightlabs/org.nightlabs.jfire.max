@@ -1,13 +1,18 @@
-// REV: Alex: These are the scripts that will be used initially 
-// when a LDAP-Server (LDAPScriptSet) is created, so maybe there 
-// should be a comment on top of every script telling the administrator 
-// what this script is for, when it is executed and which 
-// variables are published into it when it is executed.
-// Additionally the comment should tell, whether the script is 
-// supposed to return a value and for what this value is used
-
+/**
+ * This is initial script which is used when new LDAPServer and corresponding LDAPScriptSet are created. 
+ * All changes in this particular file WILL NOT be reflected in existing LDAPServers but only in new ones.
+ * 
+ * This script is used for binding script variables to values taken from JFire objects (e.g. User and Person).
+ * These variables are used afterwards in other scripts (i.e. InetOrgPersonGetAttributesForLDAPScript.js, InetOrgPersonGetDNScript.js)
+ * so this script SHOULD be evaluated BEFORE other scripts are evaluated or joined at first place together with them (see {@link LDAPScriptSet}).
+ * 
+ * It makes use of <code>user</code> and <code>person</code> java objects passed to evaluating ScriptContext.
+ * 
+ * NOT supposed to return any values.
+ *  
+ */
 importClass(org.nightlabs.jfire.person.PersonStruct);
-	
+
 var $userID$ = null;
 var $userName$ = null;
 var $userDescription$ = null;
@@ -92,8 +97,10 @@ try{
 	// do nothing
 }
 
-// REV: Alex. I think you can use the getPersistentDataFieldByIndex()-way exclusively. 
-// And maybe use a small function for better readability
+function getPersonDataFieldValue(person, fieldID){
+	return person.getPersistentDataFieldByIndex(fieldID, 0)!=null?person.getPersistentDataFieldByIndex(fieldID, 0).getData():null;	
+}
+	
 if (personData != null){
 	
 	$personID$ = personData.getPropertySetID();
@@ -104,114 +111,56 @@ if (personData != null){
 	}
 	$personDisplayName$ = personData.getDisplayName();
 	
-	if (person.isInflated()){
-		
-		// personal data
-		$personCompany$ = personData.getDataField(PersonStruct.PERSONALDATA_COMPANY).getData();
-		$personName$ = personData.getDataField(PersonStruct.PERSONALDATA_NAME).getData();
-		$personFirstName$ = personData.getDataField(PersonStruct.PERSONALDATA_FIRSTNAME).getData();
-		$personSalutation$ = personData.getDataField(PersonStruct.PERSONALDATA_SALUTATION).getData();
-		$personTitle$ = personData.getDataField(PersonStruct.PERSONALDATA_TITLE).getData();
-		$personDateOfBirth$ = personData.getDataField(PersonStruct.PERSONALDATA_DATEOFBIRTH).getData();
-		$personPhoto$ = personData.getDataField(PersonStruct.PERSONALDATA_PHOTO).getData();
-		
-		// postadress
-		$personAddress$ = personData.getDataField(PersonStruct.POSTADDRESS_ADDRESS).getData();
-		$personPostCode$ = personData.getDataField(PersonStruct.POSTADDRESS_POSTCODE).getData();
-		$personCity$ = personData.getDataField(PersonStruct.POSTADDRESS_CITY).getData();
-		$personRegion$ = personData.getDataField(PersonStruct.POSTADDRESS_REGION).getData();
-		$personCountry$ = personData.getDataField(PersonStruct.POSTADDRESS_COUNTRY).getData();
+	// personal data
+	$personCompany$ = getPersonDataFieldValue(personData, PersonStruct.PERSONALDATA_COMPANY);
+	$personName$ = getPersonDataFieldValue(personData, PersonStruct.PERSONALDATA_NAME);
+	$personFirstName$ = getPersonDataFieldValue(personData, PersonStruct.PERSONALDATA_FIRSTNAME);
+	$personSalutation$ = getPersonDataFieldValue(personData, PersonStruct.PERSONALDATA_SALUTATION);
+	$personTitle$ = getPersonDataFieldValue(personData, PersonStruct.PERSONALDATA_TITLE);
+	$personDateOfBirth$ = getPersonDataFieldValue(personData, PersonStruct.PERSONALDATA_DATEOFBIRTH);
+	$personPhoto$ = getPersonDataFieldValue(personData, PersonStruct.PERSONALDATA_PHOTO);
 	
-		// internet
-		$personEMail$ = personData.getDataField(PersonStruct.INTERNET_EMAIL).getData();
-		$personHomepage$ = personData.getDataField(PersonStruct.INTERNET_HOMEPAGE).getData();
-		
-		// phone
-		$personPhonePrimary$ = personData.getDataField(PersonStruct.PHONE_PRIMARY).getData();
-		if ($personPhonePrimary$ != null){
-			$personPhonePrimary$ = $personPhonePrimary$.toString();
-		}
-		$personFax$ = personData.getDataField(PersonStruct.FAX).getData();
-		if ($personFax$ != null){
-			$personFax$ = $personFax$.toString();
-		}
-		
-		// bankdata
-		$personAccountHolder$ = personData.getDataField(PersonStruct.BANKDATA_ACCOUNTHOLDER).getData();
-		$personBankCode$ = personData.getDataField(PersonStruct.BANKDATA_BANKCODE).getData();
-		$personBankName$ = personData.getDataField(PersonStruct.BANKDATA_BANKNAME).getData();
-		$personAccountNumber$ = personData.getDataField(PersonStruct.BANKDATA_ACCOUNTNUMBER).getData();
-		$personIBAN$ = personData.getDataField(PersonStruct.BANKDATA_IBAN).getData();
-		$personBIC$ = personData.getDataField(PersonStruct.BANKDATA_BIC).getData();
-		
-		// creditcard
-		$personCreditCardHolder$ = personData.getDataField(PersonStruct.CREDITCARD_CREDITCARDHOLDER).getData();
-		$personCreditCardNumber$ = personData.getDataField(PersonStruct.CREDITCARD_NUMBER).getData();
-		$personCreditCardExpiryYear$ = personData.getDataField(PersonStruct.CREDITCARD_EXPIRYYEAR).getData();
-		$personCreditCardExpiryMonth$ = personData.getDataField(PersonStruct.CREDITCARD_EXPIRYMONTH).getData();
-		
-		// govermentaldata
-		$personVATIN$ = personData.getDataField(PersonStruct.GOVERNMENTALDATA_VATIN).getData();
-		$personNationalTaxNumber$ = personData.getDataField(PersonStruct.GOVERNMENTALDATA_NATIONALTAXNUMBER).getData();
-		$personTradeRegisterName$ = personData.getDataField(PersonStruct.GOVERNMENTALDATA_TRADEREGISTERNAME).getData();
-		$personTradeRegisterNumber$ = personData.getDataField(PersonStruct.GOVERNMENTALDATA_TRADEREGISTERNUMBER).getData();
-		
-		// comment
-		$personComment$ = personData.getDataField(PersonStruct.COMMENT_COMMENT).getData();
+	// postadress
+	$personAddress$ = getPersonDataFieldValue(personData, PersonStruct.POSTADDRESS_ADDRESS);
+	$personPostCode$ = getPersonDataFieldValue(personData, PersonStruct.POSTADDRESS_POSTCODE);
+	$personCity$ = getPersonDataFieldValue(personData, PersonStruct.POSTADDRESS_CITY);
+	$personRegion$ = getPersonDataFieldValue(personData, PersonStruct.POSTADDRESS_REGION);
+	$personCountry$ = getPersonDataFieldValue(personData, PersonStruct.POSTADDRESS_COUNTRY);
 
-	}else{	// takes by zero index
-		
-		// personal data
-		$personCompany$ = personData.getPersistentDataFieldByIndex(PersonStruct.PERSONALDATA_COMPANY, 0)!=null?personData.getPersistentDataFieldByIndex(PersonStruct.PERSONALDATA_COMPANY, 0).getData():null;
-		$personName$ = personData.getPersistentDataFieldByIndex(PersonStruct.PERSONALDATA_NAME, 0)!=null?personData.getPersistentDataFieldByIndex(PersonStruct.PERSONALDATA_NAME, 0).getData():null;
-		$personFirstName$ = personData.getPersistentDataFieldByIndex(PersonStruct.PERSONALDATA_FIRSTNAME, 0)!=null?personData.getPersistentDataFieldByIndex(PersonStruct.PERSONALDATA_FIRSTNAME, 0).getData():null;
-		$personSalutation$ = personData.getPersistentDataFieldByIndex(PersonStruct.PERSONALDATA_SALUTATION, 0)!=null?personData.getPersistentDataFieldByIndex(PersonStruct.PERSONALDATA_SALUTATION, 0).getData():null;
-		$personTitle$ = personData.getPersistentDataFieldByIndex(PersonStruct.PERSONALDATA_TITLE, 0)!=null?personData.getPersistentDataFieldByIndex(PersonStruct.PERSONALDATA_TITLE, 0).getData():null;
-		$personDateOfBirth$ = personData.getPersistentDataFieldByIndex(PersonStruct.PERSONALDATA_DATEOFBIRTH, 0)!=null?personData.getPersistentDataFieldByIndex(PersonStruct.PERSONALDATA_DATEOFBIRTH, 0).getData():null;
-		$personPhoto$ = personData.getPersistentDataFieldByIndex(PersonStruct.PERSONALDATA_PHOTO, 0)!=null?personData.getPersistentDataFieldByIndex(PersonStruct.PERSONALDATA_PHOTO, 0).getData():null;
-		
-		// postadress
-		$personAddress$ = personData.getPersistentDataFieldByIndex(PersonStruct.POSTADDRESS_ADDRESS, 0)!=null?personData.getPersistentDataFieldByIndex(PersonStruct.POSTADDRESS_ADDRESS, 0).getData():null;
-		$personPostCode$ = personData.getPersistentDataFieldByIndex(PersonStruct.POSTADDRESS_POSTCODE, 0)!=null?personData.getPersistentDataFieldByIndex(PersonStruct.POSTADDRESS_POSTCODE, 0).getData():null;
-		$personCity$ = personData.getPersistentDataFieldByIndex(PersonStruct.POSTADDRESS_CITY, 0)!=null?personData.getPersistentDataFieldByIndex(PersonStruct.POSTADDRESS_CITY, 0).getData():null;
-		$personRegion$ = personData.getPersistentDataFieldByIndex(PersonStruct.POSTADDRESS_REGION, 0)!=null?personData.getPersistentDataFieldByIndex(PersonStruct.POSTADDRESS_REGION, 0).getData():null;
-		$personCountry$ = personData.getPersistentDataFieldByIndex(PersonStruct.POSTADDRESS_COUNTRY, 0)!=null?personData.getPersistentDataFieldByIndex(PersonStruct.POSTADDRESS_COUNTRY, 0).getData():null;
+	// internet
+	$personEMail$ = getPersonDataFieldValue(personData, PersonStruct.INTERNET_EMAIL);
+	$personHomepage$ = getPersonDataFieldValue(personData, PersonStruct.INTERNET_HOMEPAGE);
 	
-		// internet
-		$personEMail$ = personData.getPersistentDataFieldByIndex(PersonStruct.INTERNET_EMAIL, 0)!=null?personData.getPersistentDataFieldByIndex(PersonStruct.INTERNET_EMAIL, 0).getData():null;
-		$personHomepage$ = personData.getPersistentDataFieldByIndex(PersonStruct.INTERNET_HOMEPAGE, 0)!=null?personData.getPersistentDataFieldByIndex(PersonStruct.INTERNET_HOMEPAGE, 0).getData():null;
-		
-		// phone
-		$personPhonePrimary$ = personData.getPersistentDataFieldByIndex(PersonStruct.PHONE_PRIMARY, 0)!=null?personData.getPersistentDataFieldByIndex(PersonStruct.PHONE_PRIMARY, 0).getData():null;
-		if ($personPhonePrimary$ != null){
-			$personPhonePrimary$ = $personPhonePrimary$.toString();
-		}
-		$personFax$ = personData.getPersistentDataFieldByIndex(PersonStruct.FAX, 0)!=null?personData.getPersistentDataFieldByIndex(PersonStruct.FAX, 0).getData():null;
-		if ($personFax$ != null){
-			$personFax$ = $personFax$.toString();
-		}
-		
-		// bankdata
-		$personAccountHolder$ = personData.getPersistentDataFieldByIndex(PersonStruct.BANKDATA_ACCOUNTHOLDER, 0)!=null?personData.getPersistentDataFieldByIndex(PersonStruct.BANKDATA_ACCOUNTHOLDER, 0).getData():null;
-		$personBankCode$ = personData.getPersistentDataFieldByIndex(PersonStruct.BANKDATA_BANKCODE, 0)!=null?personData.getPersistentDataFieldByIndex(PersonStruct.BANKDATA_BANKCODE, 0).getData():null;
-		$personBankName$ = personData.getPersistentDataFieldByIndex(PersonStruct.BANKDATA_BANKNAME, 0)!=null?personData.getPersistentDataFieldByIndex(PersonStruct.BANKDATA_BANKNAME, 0).getData():null;
-		$personAccountNumber$ = personData.getPersistentDataFieldByIndex(PersonStruct.BANKDATA_ACCOUNTNUMBER, 0)!=null?personData.getPersistentDataFieldByIndex(PersonStruct.BANKDATA_ACCOUNTNUMBER, 0).getData():null;
-		$personIBAN$ = personData.getPersistentDataFieldByIndex(PersonStruct.BANKDATA_IBAN, 0)!=null?personData.getPersistentDataFieldByIndex(PersonStruct.BANKDATA_IBAN, 0).getData():null;
-		$personBIC$ = personData.getPersistentDataFieldByIndex(PersonStruct.BANKDATA_BIC, 0)!=null?personData.getPersistentDataFieldByIndex(PersonStruct.BANKDATA_BIC, 0).getData():null;
-		
-		// creditcard
-		$personCreditCardHolder$ = personData.getPersistentDataFieldByIndex(PersonStruct.CREDITCARD_CREDITCARDHOLDER, 0)!=null?personData.getPersistentDataFieldByIndex(PersonStruct.CREDITCARD_CREDITCARDHOLDER, 0).getData():null;
-		$personCreditCardNumber$ = personData.getPersistentDataFieldByIndex(PersonStruct.CREDITCARD_NUMBER, 0)!=null?personData.getPersistentDataFieldByIndex(PersonStruct.CREDITCARD_NUMBER, 0).getData():null;
-		$personCreditCardExpiryYear$ = personData.getPersistentDataFieldByIndex(PersonStruct.CREDITCARD_EXPIRYYEAR, 0)!=null?personData.getPersistentDataFieldByIndex(PersonStruct.CREDITCARD_EXPIRYYEAR, 0).getData():null;
-		$personCreditCardExpiryMonth$ = personData.getPersistentDataFieldByIndex(PersonStruct.CREDITCARD_EXPIRYMONTH, 0)!=null?personData.getPersistentDataFieldByIndex(PersonStruct.CREDITCARD_EXPIRYMONTH, 0).getData():null;
-		
-		// govermentaldata
-		$personVATIN$ = personData.getPersistentDataFieldByIndex(PersonStruct.GOVERNMENTALDATA_VATIN, 0)!=null?personData.getPersistentDataFieldByIndex(PersonStruct.GOVERNMENTALDATA_VATIN, 0).getData():null;
-		$personNationalTaxNumber$ = personData.getPersistentDataFieldByIndex(PersonStruct.GOVERNMENTALDATA_NATIONALTAXNUMBER, 0)!=null?personData.getPersistentDataFieldByIndex(PersonStruct.GOVERNMENTALDATA_NATIONALTAXNUMBER, 0).getData():null;
-		$personTradeRegisterName$ = personData.getPersistentDataFieldByIndex(PersonStruct.GOVERNMENTALDATA_TRADEREGISTERNAME, 0)!=null?personData.getPersistentDataFieldByIndex(PersonStruct.GOVERNMENTALDATA_TRADEREGISTERNAME, 0).getData():null;
-		$personTradeRegisterNumber$ = personData.getPersistentDataFieldByIndex(PersonStruct.GOVERNMENTALDATA_TRADEREGISTERNUMBER, 0)!=null?personData.getPersistentDataFieldByIndex(PersonStruct.GOVERNMENTALDATA_TRADEREGISTERNUMBER, 0).getData():null;
-		
-		// comment
-		$personComment$ = personData.getPersistentDataFieldByIndex(PersonStruct.COMMENT_COMMENT, 0)!=null?personData.getPersistentDataFieldByIndex(PersonStruct.COMMENT_COMMENT, 0).getData():null;
+	// phone
+	$personPhonePrimary$ = getPersonDataFieldValue(personData, PersonStruct.PHONE_PRIMARY);
+	if ($personPhonePrimary$ != null){
+		$personPhonePrimary$ = $personPhonePrimary$.toString();
 	}
+	$personFax$ = getPersonDataFieldValue(personData, PersonStruct.FAX);
+	if ($personFax$ != null){
+		$personFax$ = $personFax$.toString();
+	}
+	
+	// bankdata
+	$personAccountHolder$ = getPersonDataFieldValue(personData, PersonStruct.BANKDATA_ACCOUNTHOLDER);
+	$personBankCode$ = getPersonDataFieldValue(personData, PersonStruct.BANKDATA_BANKCODE);
+	$personBankName$ = getPersonDataFieldValue(personData, PersonStruct.BANKDATA_BANKNAME);
+	$personAccountNumber$ = getPersonDataFieldValue(personData, PersonStruct.BANKDATA_ACCOUNTNUMBER);
+	$personIBAN$ = getPersonDataFieldValue(personData, PersonStruct.BANKDATA_IBAN);
+	$personBIC$ = getPersonDataFieldValue(personData, PersonStruct.BANKDATA_BIC);
+	
+	// creditcard
+	$personCreditCardHolder$ = getPersonDataFieldValue(personData, PersonStruct.CREDITCARD_CREDITCARDHOLDER);
+	$personCreditCardNumber$ = getPersonDataFieldValue(personData, PersonStruct.CREDITCARD_NUMBER);
+	$personCreditCardExpiryYear$ = getPersonDataFieldValue(personData, PersonStruct.CREDITCARD_EXPIRYYEAR);
+	$personCreditCardExpiryMonth$ = getPersonDataFieldValue(personData, PersonStruct.CREDITCARD_EXPIRYMONTH);
+	
+	// govermentaldata
+	$personVATIN$ = getPersonDataFieldValue(personData, PersonStruct.GOVERNMENTALDATA_VATIN);
+	$personNationalTaxNumber$ = getPersonDataFieldValue(personData, PersonStruct.GOVERNMENTALDATA_NATIONALTAXNUMBER);
+	$personTradeRegisterName$ = getPersonDataFieldValue(personData, PersonStruct.GOVERNMENTALDATA_TRADEREGISTERNAME);
+	$personTradeRegisterNumber$ = getPersonDataFieldValue(personData, PersonStruct.GOVERNMENTALDATA_TRADEREGISTERNUMBER);
+	
+	// comment
+	$personComment$ = getPersonDataFieldValue(personData, PersonStruct.COMMENT_COMMENT);
 }

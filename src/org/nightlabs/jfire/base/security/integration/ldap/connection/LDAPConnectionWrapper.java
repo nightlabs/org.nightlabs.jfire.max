@@ -1,6 +1,6 @@
 package org.nightlabs.jfire.base.security.integration.ldap.connection;
 
-import java.util.Enumeration;
+import java.util.Collection;
 import java.util.Map;
 
 import javax.security.auth.login.LoginException;
@@ -99,15 +99,15 @@ public interface LDAPConnectionWrapper{
 	 * (with wildcards), with the possibility to specify search result size and scope. Denis.
 	 * 
 	 * @param dn startig point for a search
-	 * @param searchAttributes will not check attributes if set to <code>null</code> or empty {@link HashMap}
+	 * @param searchAttributes will not check attributes if set to <code>null</code> or empty {@link Map}
 	 * @param returnAttributes all attributes will be returned if set to <code>null</code>, no attributes if set to an empty array
 	 * @return enumeration with search results
 	 * @throws UserManagementSystemCommunicationException 
 	 */
-	public Enumeration<?> search(String dn, Map<String, Object[]> searchAttributes, String[] returnAttributes) throws UserManagementSystemCommunicationException;
+	public Map<String, Map<String, Object[]>> search(String dn, Map<String, Object[]> searchAttributes, String[] returnAttributes) throws UserManagementSystemCommunicationException;
 	
 	/**
-	 * Get {@link HashMap} of attributes of an entry specified by DN
+	 * Get {@link Map} of attributes of an entry specified by DN
 	 * 
 	 * @param dn
 	 * @return
@@ -115,4 +115,13 @@ public interface LDAPConnectionWrapper{
 	 */
 	public Map<String, Object[]> getAttribbutesForEntry(String dn) throws UserManagementSystemCommunicationException;
 
+	/**
+	 * Get collection of names of direct children of a given entry
+	 * 
+	 * @param parentName
+	 * @return collection of child entries' names
+	 * @throws UserManagementSystemCommunicationException
+	 */
+	public Collection<String> getChildEntries(String parentName) throws UserManagementSystemCommunicationException;
+	
 }

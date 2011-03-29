@@ -195,14 +195,15 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 	        }
 
 			connection = createConnection(this);
-        	connection.unbind();
+			
+			// currently this method does nothing, probably it will be used if Session object is used somehow by LDAPServer
 
 			if (logger.isDebugEnabled()){
 	        	logger.debug("Logged out from session, id: " + session.getSessionID());
 	        }
 
 		}finally{
-			LDAPConnectionManager.sharedInstance().releaseConnection(connection);
+			unbindAndReleaseConnection(connection);
 		}
 
 	}

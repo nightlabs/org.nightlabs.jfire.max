@@ -168,7 +168,7 @@ public class LDAPManagerBean extends BaseSessionBeanImpl implements LDAPManagerR
 
 	private static StoreLifecycleListener syncStoreLifecycleListener = new SyncStoreLifecycleListener();
 	
-	static class SyncStoreLifecycleListener implements StoreLifecycleListener{
+	public static class SyncStoreLifecycleListener implements StoreLifecycleListener{
 		
 		private static ThreadLocal<Boolean> isEnabledTL = new ThreadLocal<Boolean>(){
 			protected Boolean initialValue() {

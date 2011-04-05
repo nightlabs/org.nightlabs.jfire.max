@@ -11,6 +11,6 @@
  */
 var dn = null;
 if ($userID$ != null){
-	dn = 'uid='+$userID$+',ou=staff,ou=people,dc=nightlabs,dc=de';
+	dn = 'uid='+$userID$+',ou=Users,dc=nightlabs,dc=de';
 }
 dn;

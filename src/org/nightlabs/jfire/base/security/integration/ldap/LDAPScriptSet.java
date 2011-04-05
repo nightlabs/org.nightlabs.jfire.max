@@ -92,24 +92,23 @@ public class LDAPScriptSet implements Serializable{
 	@Column(sqlType="CLOB")
 	private String generateParentLdapEntriesScript;
 	
+	@Persistent(defaultFetchGroup="true")
+	private LDAPServer ldapServer;
+	
 	/**
 	 * @deprecated For JDO only!
 	 */
-	protected LDAPScriptSet(){
-	}
+	@Deprecated
+	public LDAPScriptSet(){}
 	
 	/**
 	 * Default constructor for creating LDAPSCriptSet objects
 	 * @param id
 	 */
-	public LDAPScriptSet(LDAPScriptSetID id){
-		if (id == null){
-			this.ldapScriptSetID = IDGenerator.nextID(LDAPScriptSet.class);
-			this.organisationID = IDGenerator.getOrganisationID();
-		}else{
-			this.ldapScriptSetID = id.ldapScriptSetID;
-			this.organisationID = id.organisationID;
-		}
+	public LDAPScriptSet(LDAPServer server){
+		this.ldapScriptSetID = server.getUserManagementSystemID();
+		this.organisationID = server.getOrganisationID();
+		this.ldapServer = server;
 	}
 	
 	/**
@@ -150,6 +149,14 @@ public class LDAPScriptSet implements Serializable{
 	 */
 	public void setGenerateParentLdapEntriesScript(String generateParentLdapEntriesScript) {
 		this.generateParentLdapEntriesScript = generateParentLdapEntriesScript;
+	}
+	
+	/**
+	 * 
+	 * @return mapped LDAPServer
+	 */
+	public LDAPServer getLDAPServer() {
+		return ldapServer;
 	}
 	
 	/**
@@ -203,7 +210,7 @@ public class LDAPScriptSet implements Serializable{
 	 * @throws ScriptException
 	 */
 	@SuppressWarnings("unchecked")
-	public Map<String, Object[]> getAttributesMapForLDAP(Object jfireObject, boolean isNewEntry) throws ScriptException{
+	public Map<String, Object> getAttributesMapForLDAP(Object jfireObject, boolean isNewEntry) throws ScriptException{
 
 		ScriptContext ctx = new SimpleScriptContext();
 		Bindings b = ctx.getBindings(ScriptContext.ENGINE_SCOPE);
@@ -218,7 +225,7 @@ public class LDAPScriptSet implements Serializable{
 		
 		Object result = execute(bindVariablesScript+generateJFireToLdapAttributesScript, ctx);
 		if (result instanceof Map){
-			return (Map<String, Object[]>) result;
+			return (Map<String, Object>) result;
 		}
 		return null;
 	}
@@ -232,7 +239,7 @@ public class LDAPScriptSet implements Serializable{
 	 * @return synchronized JFire object
 	 * @throws ScriptException
 	 */
-	public Object syncLDAPDataToJFireObjects(Map<String, Object[]> allAttributes, String organisationID) throws ScriptException{
+	public Object syncLDAPDataToJFireObjects(Map<String, Object> allAttributes, String organisationID) throws ScriptException{
 		
 		ScriptContext ctx = new SimpleScriptContext();
 		Bindings b = ctx.getBindings(ScriptContext.ENGINE_SCOPE);

@@ -2,7 +2,7 @@
  * This is initial script which is used when new LDAPServer and corresponding LDAPScriptSet are created. 
  * All changes in this particular file WILL NOT be reflected in existing LDAPServers but only in new ones.
  * 
- * This script is used for storing data into JFire objects (User and/or Person) during synchronization when InetOrgPerson LDAPServer is a leading system.
+ * This script is used for storing data into JFire objects (User and/or Person) during synchronization when Samba LDAPServer is a leading system.
  * 
  * It makes use of several java objects passed to evaluating ScriptContext: <code>allAtributes</code> - Map<String, Object[]> with all attributes
  * of entry to be synchronized, <code>pm</code> - PersistenceManager, <code>organisationID</code> - the ID of JFire organisation, 
@@ -105,14 +105,12 @@ function getAttributeValue(name){
 	return allAttributes.get(name)!=null?allAttributes.get(name)[0]:null;
 }
 
-var cn = getAttributeValue('cn');
 var description = getAttributeValue('description');
-var sn = getAttributeValue('sn');
 
 // set attributes to JFire objects
 if (user != null){
 	logger.debug("set name and description to user");
-	user.setName(cn);
+	user.setName(getAttributeValue('cn'));
 	user.setDescription(description);
 }
 
@@ -130,34 +128,9 @@ if (person != null){
 	person.inflate(ps);
 
 	logger.debug("setting data to data fields...");
-
-	// personal data
-	person.getDataField(PersonStruct.PERSONALDATA_COMPANY).setData(getAttributeValue('organizationName'));
-	person.getDataField(PersonStruct.PERSONALDATA_NAME).setData(sn!=null?sn:cn);
-	person.getDataField(PersonStruct.PERSONALDATA_FIRSTNAME).setData(getAttributeValue('gn'));
-	person.getDataField(PersonStruct.PERSONALDATA_TITLE).setData(getAttributeValue('title'));
-	person.getDataField(PersonStruct.PERSONALDATA_PHOTO).setData(getAttributeValue('photo'));
-	
-	// postadress
-	person.getDataField(PersonStruct.POSTADDRESS_ADDRESS).setData(getAttributeValue('street'));
-	person.getDataField(PersonStruct.POSTADDRESS_POSTCODE).setData(getAttributeValue('postalCode'));
-	person.getDataField(PersonStruct.POSTADDRESS_CITY).setData(getAttributeValue('localityName'));
-	person.getDataField(PersonStruct.POSTADDRESS_REGION).setData(getAttributeValue('stateOrProvinceName'));
-
-	// internet
-	person.getDataField(PersonStruct.INTERNET_EMAIL).setData(getAttributeValue('mail'));
-	person.getDataField(PersonStruct.INTERNET_HOMEPAGE).setData(getAttributeValue('labeledURI'));
-	
-	// phone
-	person.getDataField(PersonStruct.PHONE_PRIMARY).setData(getAttributeValue('telephoneNumber'));
-	person.getDataField(PersonStruct.FAX).setData(getAttributeValue('fax'));
-	
 	// comment
 	person.getDataField(PersonStruct.COMMENT_COMMENT).setData(description);
 	
-	logger.debug("setting locale to person...");
-	person.setLocale(new java.util.Locale(getAttributeValue('preferredLanguage')));
-
 	logger.debug("deflating person...");
 	person.deflate();
 }

@@ -2,7 +2,6 @@ package org.nightlabs.jfire.base.security.integration.ldap;
 
 import java.io.IOException;
 
-import javax.jdo.PersistenceManager;
 import javax.jdo.annotations.IdentityType;
 import javax.jdo.annotations.Inheritance;
 import javax.jdo.annotations.InheritanceStrategy;
@@ -26,7 +25,7 @@ public class InetOrgPersonLDAPServerType extends UserManagementSystemType<LDAPSe
 	private static final String INET_ORG_PERSON_SYNC_TO_JFIRE_SCRIPT = "scripts/InetOrgPersonSyncToJFireScript.js";
 	private static final String INET_ORG_PERSON_GET_ATTRIBUTES_FOR_LDAP_SCRIPT = "scripts/InetOrgPersonGetAttributesForLDAPScript.js";
 	private static final String INET_ORG_PERSON_GET_DN_SCRIPT = "scripts/InetOrgPersonGetDNScript.js";
-	private static final String INET_ORG_PERSON_BIND_VARIABLES_SCRIPT = "scripts/InetOrgPersonBindVariablesScript.js";
+	private static final String INET_ORG_PERSON_BIND_VARIABLES_SCRIPT = "scripts/CommonBindVariablesScript.js";
 	private static final String INET_ORG_PERSON_GET_PARENT_ENTRIES_SCRIPT = "scripts/InetOrgPersonGetParentEntriesScript.js";
 	
 	/**
@@ -35,25 +34,16 @@ public class InetOrgPersonLDAPServerType extends UserManagementSystemType<LDAPSe
 	private static final long serialVersionUID = 1L;
 	
 	/**
-	 * Creates single instance of the class if it's not found in datastore and registers it
-	 * within _instances map of superclass.
-	 * 
-	 * @param pm
-	 * @param name
+	 * @deprecated For JDO only!
 	 */
-	public static synchronized void createSingleInstance(PersistenceManager pm, String name){
-		InetOrgPersonLDAPServerType singleInstance = loadSingleInstance(pm, InetOrgPersonLDAPServerType.class);
-		if (singleInstance == null){
-			singleInstance = new InetOrgPersonLDAPServerType(name);
-			singleInstance = pm.makePersistent(singleInstance);
-		}
-	}
+	@Deprecated
+	public InetOrgPersonLDAPServerType(){}
 	
 	/**
 	 * {@inheritDoc}
 	 * @param name
 	 */
-	private InetOrgPersonLDAPServerType(String name){
+	protected InetOrgPersonLDAPServerType(String name){
 		super(name);
 	}
 	
@@ -66,7 +56,7 @@ public class InetOrgPersonLDAPServerType extends UserManagementSystemType<LDAPSe
 		LDAPServer server = new LDAPServer(null, this);
 
 		try {
-			LDAPScriptSet ldapScriptSet = new LDAPScriptSet(null);
+			LDAPScriptSet ldapScriptSet = new LDAPScriptSet(server);
 
 			// actual scripts are stored in separate files to make their editing more comfortable
 			Class<? extends InetOrgPersonLDAPServerType> typeClass = this.getClass();

@@ -3,7 +3,7 @@
  * All changes in this particular file WILL NOT be reflected in existing LDAPServers but only in new ones.
  * 
  * This script is used for binding script variables to values taken from JFire objects (e.g. User and Person).
- * These variables are used afterwards in other scripts (i.e. InetOrgPersonGetAttributesForLDAPScript.js, InetOrgPersonGetDNScript.js)
+ * These variables are used afterwards in other scripts (i.e. InetOrgPersonGetAttributesForLDAPScript.js, SambaGetDNScript.js etc.)
  * so this script SHOULD be evaluated BEFORE other scripts are evaluated or joined at first place together with them (see {@link LDAPScriptSet}).
  * 
  * It makes use of <code>user</code> and <code>person</code> java objects passed to evaluating ScriptContext.

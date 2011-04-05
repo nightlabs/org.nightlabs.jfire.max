@@ -61,8 +61,12 @@ public class LDAPManagerBean extends BaseSessionBeanImpl implements LDAPManagerR
 		PersistenceManager pm = createPersistenceManager();
 
 		try{
-			// creating/loading InetOrgPersonLDAPServerType single instance
-			InetOrgPersonLDAPServerType.createSingleInstance(pm, "InetOrgPersonLDAPServerType");
+			// creating InetOrgPersonLDAPServerType single instance (will not be created if exists already)
+			UserManagementSystemType.createSingleInstance(pm, InetOrgPersonLDAPServerType.class, "InetOrgPersonLDAPServerType");
+			UserManagementSystemType.createSingleInstance(pm, SambaLDAPServerType.class, "SambaLDAPServerType");
+			
+			pm.getExtent(LDAPServer.class);
+			pm.getExtent(LDAPScriptSet.class);
 			
 			// server creation via configuration property files
 			initLDAPServersFromPropertiesFile(pm);

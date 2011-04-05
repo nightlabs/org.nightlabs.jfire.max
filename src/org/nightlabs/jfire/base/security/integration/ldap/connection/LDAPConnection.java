@@ -56,7 +56,7 @@ public class LDAPConnection {
     	this.connectionWrapper.bind(bindPrincipal, password);
     }
 
-    public void createEntry(String entryDN, Map<String, Object[]> attributes) throws UserManagementSystemCommunicationException{
+    public void createEntry(String entryDN, Map<String, Object> attributes) throws UserManagementSystemCommunicationException{
     	this.connectionWrapper.createEntry(entryDN, attributes);
     }
 
@@ -64,25 +64,21 @@ public class LDAPConnection {
     	this.connectionWrapper.deleteEntry(entryDN);
     }
 
-    public void modifyEntry(String entryDN, Map<String, Object[]> attributes, EntryModificationFlag modificationFlag) throws UserManagementSystemCommunicationException{
+    public void modifyEntry(String entryDN, Map<String, Object> attributes, EntryModificationFlag modificationFlag) throws UserManagementSystemCommunicationException{
     	this.connectionWrapper.modifyEntry(entryDN, attributes, modificationFlag);
     }
     
-    public Map<String, Map<String, Object[]>> search(String dn, Map<String, Object[]> searchAttributes, String[] returnAttributes) throws UserManagementSystemCommunicationException{
+    public Map<String, Map<String, Object>> search(String dn, Map<String, Object> searchAttributes, String[] returnAttributes) throws UserManagementSystemCommunicationException{
     	return this.connectionWrapper.search(dn, searchAttributes, returnAttributes);
     }
     
-	public Map<String, Object[]> getAttributesForEntry(String dn) throws UserManagementSystemCommunicationException {
+	public Map<String, Object> getAttributesForEntry(String dn) throws UserManagementSystemCommunicationException {
 		return this.connectionWrapper.getAttribbutesForEntry(dn);
 	}
 	
 	public Collection<String> getChildEntries(String parentName) throws UserManagementSystemCommunicationException{
 		return this.connectionWrapper.getChildEntries(parentName);
 	}
-
-    public void disconnect() {
-    	this.connectionWrapper.disconnect();
-    }
 
     public void unbind() throws UserManagementSystemCommunicationException {
     	this.connectionWrapper.unbind();

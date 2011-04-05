@@ -15,47 +15,36 @@ var attributes = new java.util.HashMap();
 if (isNewEntry){
 	var objectClasses = java.lang.reflect.Array.newInstance(java.lang.String, 4);
 	objectClasses[0] = 'top';
-	objectClasses[1] = 'person';
-	objectClasses[2] = 'organizationalPerson';
-	objectClasses[3] = 'inetOrgPerson';
+	objectClasses[1] = 'posixAccount';
+	objectClasses[2] = 'sambaSamAccount';
+	objectClasses[3] = 'sambaSidEntry';
 	attributes.put('objectClass', objectClasses);
 	if (userData != null){
 		attributes.put('cn', $userName$);
-		attributes.put('sn', $userName$);
+		attributes.put('uid', $userID$);
+		attributes.put('uidNumber', ''+$userID$.hashCode());
 	}else if (personData != null){
 		attributes.put('cn', $personName$);
-		attributes.put('sn', $personName$);
+		attributes.put('uid', $personID$ +'@'+$personOrganisationID$);
+		attributes.put('uidNumber', ''+$personID$);
 	}
+	attributes.put('gidNumber', '0');	// security group ID number, not used but is a MUST attribute
+	attributes.put('homeDirectory', '');	// ???
+	attributes.put('sambaSID', '');	// ???
 }
 
 if (userData != null){
 	// User fields
 	attributes.put('cn', $userName$);
-	attributes.put('sn', $userName$);
 	attributes.put('uid', $userID$);
 	attributes.put('description', $userDescription$);
 }else if (personData != null){
 	attributes.put('cn', $personName$);
-	attributes.put('sn', $personName$);
 	attributes.put('description', $personComment$);
 }
 
 // Person fields
 if (personData != null){
 	attributes.put('displayName', $personDisplayName$);
-	attributes.put('fax', $personFax$);
-	attributes.put('gn', $personFirstName$);
-//	attributes.put('photo', $personPhoto$);
-	attributes.put('localityName', $personCity$);
-	attributes.put('labeledURI', $personHomepage$);
-	attributes.put('mail', $personEMail$);
-	attributes.put('organizationName', $personCompany$);
-	attributes.put('postalAddress', $personAddress$ + ' ' + $personCity$ + ' ' + $personPostCode$ + ' ' + $personCity$ + ' ' + $personRegion$ + ' ' + $personCountry$);
-	attributes.put('postalCode', $personPostCode$);
-	attributes.put('preferredLanguage', $personLocaleLanguage$);
-	attributes.put('stateOrProvinceName', $personRegion$);
-	attributes.put('street', $personAddress$);
-	attributes.put('telephoneNumber', $personPhonePrimary$);
-	attributes.put('title', $personTitle$);
 }
 attributes;

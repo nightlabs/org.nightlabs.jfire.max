@@ -34,12 +34,6 @@ public interface LDAPConnectionWrapper{
 
 
     /**
-     * Disconnects from the directory server.
-     */
-    public void disconnect();
-
-
-    /**
      * Binds to the directory server.
      * 
      * @param password 
@@ -72,7 +66,7 @@ public interface LDAPConnectionWrapper{
      * @param attributes the entry's initial attributes. If <code>null</code> is passed entry is created with no attributes.
      * @throws UserManagementSystemCommunicationException 
      */
-	public void createEntry(String dn, Map<String, Object[]> attributes) throws UserManagementSystemCommunicationException;
+	public void createEntry(String dn, Map<String, Object> attributes) throws UserManagementSystemCommunicationException;
 
 	/**
 	 * Deletes an entry
@@ -90,7 +84,7 @@ public interface LDAPConnectionWrapper{
      * @param modificationFlag indicates what is to be done: replacement, addition or removal
      * @throws UserManagementSystemCommunicationException 
      */
-	public void modifyEntry(String dn, Map<String, Object[]> attributes, EntryModificationFlag modificationFlag) throws UserManagementSystemCommunicationException;
+	public void modifyEntry(String dn, Map<String, Object> attributes, EntryModificationFlag modificationFlag) throws UserManagementSystemCommunicationException;
 
 	/**
 	 * Performs a search for entries by their attributes.
@@ -104,7 +98,7 @@ public interface LDAPConnectionWrapper{
 	 * @return enumeration with search results
 	 * @throws UserManagementSystemCommunicationException 
 	 */
-	public Map<String, Map<String, Object[]>> search(String dn, Map<String, Object[]> searchAttributes, String[] returnAttributes) throws UserManagementSystemCommunicationException;
+	public Map<String, Map<String, Object>> search(String dn, Map<String, Object> searchAttributes, String[] returnAttributes) throws UserManagementSystemCommunicationException;
 	
 	/**
 	 * Get {@link Map} of attributes of an entry specified by DN
@@ -113,7 +107,7 @@ public interface LDAPConnectionWrapper{
 	 * @return
 	 * @throws UserManagementSystemCommunicationException 
 	 */
-	public Map<String, Object[]> getAttribbutesForEntry(String dn) throws UserManagementSystemCommunicationException;
+	public Map<String, Object> getAttribbutesForEntry(String dn) throws UserManagementSystemCommunicationException;
 
 	/**
 	 * Get collection of names of direct children of a given entry

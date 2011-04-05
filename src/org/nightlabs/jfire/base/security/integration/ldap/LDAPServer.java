@@ -173,10 +173,17 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 	// REV: @Persistent is not necessary. It is the default value. You can safely remove it. Marco.
 	// REV: Yes, I knew that. Im my opinion code looks more readable and clear when specifying this explicitly. 
 	// Of course I can remove this annotation if it fits better into JFire code style. Denis.
-	@Persistent
+	@Persistent(dependent="true", mappedBy="ldapServer")
 	private LDAPScriptSet ldapScriptSet;
 	
+	
+	/**
+	 * @deprecated For JDO only!
+	 */
+	@Deprecated
+	public LDAPServer(){}
 
+	
 	public LDAPServer(UserManagementSystemID userManagementSystemID, UserManagementSystemType<?> type){
 		super(userManagementSystemID, type);
 	}
@@ -755,7 +762,7 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 					if (logger.isDebugEnabled()){
 						logger.debug("Preparing attributes for modifying entry with DN: " + userDN);
 					}
-					Map<String, Object[]> modifyAttributes = ldapScriptSet.getAttributesMapForLDAP(
+					Map<String, Object> modifyAttributes = ldapScriptSet.getAttributesMapForLDAP(
 							jfireObject, !entryExists
 							);
 					

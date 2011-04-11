@@ -16,7 +16,7 @@ import org.nightlabs.jfire.security.integration.UserManagementSystemCommunicatio
 /**
  * Simple LDAPConnection pool.
  *
- * @author deniska
+ * @author Denis Dudnik <deniska.dudnik[at]gmail{dot}com>
  *
  */
 public class LDAPConnectionManager{

@@ -35,6 +35,8 @@ import javax.naming.ldap.UnsolicitedNotificationEvent;
 import javax.naming.ldap.UnsolicitedNotificationListener;
 import javax.security.auth.login.LoginException;
 
+import org.nightlabs.jfire.base.security.integration.ldap.attributes.LDAPAttribute;
+import org.nightlabs.jfire.base.security.integration.ldap.attributes.LDAPAttributeSet;
 import org.nightlabs.jfire.base.security.integration.ldap.connection.ILDAPConnectionParamsProvider.AuthenticationMethod;
 import org.nightlabs.jfire.security.integration.UserManagementSystemCommunicationException;
 import org.slf4j.Logger;
@@ -45,7 +47,7 @@ import org.slf4j.LoggerFactory;
  * 
  * @author Denis Dudnik <deniska.dudnik[at]gmail{dot}com>
  */
-public class JNDIConnectionWrapper implements LDAPConnectionWrapper {
+public class JNDIConnectionWrapper implements LDAPConnectionWrapper{
 
 	private static final Logger logger = LoggerFactory.getLogger(JNDIConnectionWrapper.class);
 
@@ -194,10 +196,10 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper {
 	 * {@inheritDoc}
 	 */
 	@Override
-    public void createEntry(String dn, Map<String, Object> attributes) throws UserManagementSystemCommunicationException{
+    public void createEntry(String dn, LDAPAttributeSet attributes) throws UserManagementSystemCommunicationException{
         try {
         	synchronized (context) {
-                context.createSubcontext(getSaveJndiName(dn), getAttributesFromMap(attributes));
+                context.createSubcontext(getSaveJndiName(dn), getJNDIAttributes(attributes));
 			}
         }catch(NamingException e){
 			throw new UserManagementSystemCommunicationException("Failed to create an entry! Entry DN: " + dn, e);
@@ -223,7 +225,7 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper {
 	 */
 	@Override
 	public void modifyEntry(
-			String dn, Map<String, Object> attributes, EntryModificationFlag modificationFlag
+			String dn, LDAPAttributeSet attributes, EntryModificationFlag modificationFlag
 			) throws UserManagementSystemCommunicationException {
 		try{
 	        // determine operation type
@@ -241,7 +243,7 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper {
 	        
 	        synchronized (context) {
 		        // prepare mododifcation items
-		        Attributes translatedAttributes = getAttributesFromMap(attributes);
+		        Attributes translatedAttributes = getJNDIAttributes(attributes);
 		        ModificationItem[] modificationItems = new ModificationItem[translatedAttributes.size()];
 		        int i = 0;
 		        for (Enumeration<? extends Attribute> attributesEnum = translatedAttributes.getAll(); attributesEnum.hasMoreElements();) {
@@ -260,17 +262,17 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Map<String, Map<String, Object>> search(
-			String dn, Map<String, Object> searchAttributes, String[] returnAttributes
+	public Map<String, LDAPAttributeSet> search(
+			String dn, LDAPAttributeSet searchAttributes, String[] returnAttributes
 			) throws UserManagementSystemCommunicationException {
 		try{
 			synchronized (context){
-				NamingEnumeration<SearchResult> result = context.search(getSaveJndiName(dn), getAttributesFromMap(searchAttributes), returnAttributes);
+				NamingEnumeration<SearchResult> result = context.search(getSaveJndiName(dn), getJNDIAttributes(searchAttributes), returnAttributes);
 				try{
-					Map<String, Map<String, Object>> returnMap = new HashMap<String, Map<String,Object>>();
+					Map<String, LDAPAttributeSet> returnMap = new HashMap<String, LDAPAttributeSet>();
 					while (result.hasMoreElements()) {
 						SearchResult searchResult = (SearchResult) result.nextElement();
-						returnMap.put(searchResult.getNameInNamespace(), getAttributesMap(searchResult.getAttributes()));
+						returnMap.put(searchResult.getNameInNamespace(), getLDAPAttributeSet(searchResult.getAttributes()));
 					}
 					return returnMap;
 				}finally{
@@ -286,10 +288,10 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Map<String, Object> getAttribbutesForEntry(String dn) throws UserManagementSystemCommunicationException {
+	public LDAPAttributeSet getAttribbutesForEntry(String dn) throws UserManagementSystemCommunicationException {
 		try {
 			synchronized (context) {
-				return getAttributesMap(context.getAttributes(getSaveJndiName(dn)));
+				return getLDAPAttributeSet(context.getAttributes(getSaveJndiName(dn)));
 			}
 		} catch (NamingException e) {
 			throw new UserManagementSystemCommunicationException("Failed to get attributes from entry with DN: " + dn, e);
@@ -411,29 +413,29 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper {
 	}
 	
 	/**
-	 * Translates {@link Attributes} to {@link HashMap} 
+	 * Translates {@link Attributes} to {@link LDAPAttributeSet} 
 	 * 
 	 * @param attributes if <code>null</code> is passed it returns and empty {@link HashMap}
 	 * @return
 	 * @throws NamingException 
 	 */
-	private static Map<String, Object> getAttributesMap(Attributes attributes) throws NamingException{
+	private static LDAPAttributeSet getLDAPAttributeSet(Attributes attributes) throws NamingException{
 		
-		Map<String, Object> attributesMap = new HashMap<String, Object>();
+		LDAPAttributeSet attributeSet = new LDAPAttributeSet();
 		
 		if (attributes == null){
-			return attributesMap;
+			return attributeSet;
 		}
 		
 		for (Enumeration<? extends Attribute> attsEnum = attributes.getAll(); attsEnum.hasMoreElements();){
 			Attribute attr = attsEnum.nextElement();
-			attributesMap.put(attr.getID(), getAttributeValues(attr));
+			attributeSet.createAttribute(attr.getID(), getAttributeValues(attr));
 		}
 		
-		return attributesMap;
+		return attributeSet;
 	}
 	
-	private static Object getAttributeValues(Attribute attr) throws NamingException{
+	private static Collection<Object> getAttributeValues(Attribute attr) throws NamingException{
 		
 		if (attr == null){
 			return null;
@@ -444,41 +446,32 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper {
 		for (Enumeration<?> valuesEnum = allValues; valuesEnum.hasMoreElements();) {
 			valuesList.add(valuesEnum.nextElement());
 		}
-		if (valuesList.size() > 1){
-			return valuesList.toArray();
-		}else if (!valuesList.isEmpty()){
-			return valuesList.get(0);
-		}else{
-			return null;
-		}
+		return valuesList;
 	}
 
 	/**
-	 * Translates a {@link Map} of attributes into JNDI {@link Attributes}
+	 * Translates {@link LDAPAttributeSet} into JNDI {@link Attributes}
 	 * 
-	 * @param attributes if <code>null</code> is passed it returs an empty {@link Attributes} object 
+	 * @param attributeSet if <code>null</code> is passed it returs an empty {@link Attributes} object 
 	 * @return
 	 */
-	private static Attributes getAttributesFromMap(Map<String, Object> attributes){
-		Attributes atts = new BasicAttributes();
+	private static Attributes getJNDIAttributes(LDAPAttributeSet attributeSet){
+		Attributes atts = new BasicAttributes(true);	// "true" indicates that we consider attribute names case-insensitive as they are in LDAP
 
-		if (attributes == null){
+		if (attributeSet == null){
 			return atts;
 		}
 		
-		for (String attributeName : attributes.keySet()){
-        	
-        	Object attributeValue = attributes.get(attributeName);
-        	
-        	Attribute attribute = new BasicAttribute(attributeName);
-        	if (attributeValue != null 
-        			&& attributeValue.getClass().isArray()){
-        		for (Object obj : (Object[]) attributeValue) {
-					attribute.add(obj);
+		for (LDAPAttribute<Object> ldapAttribute : attributeSet){
+			
+        	Attribute attribute = new BasicAttribute(ldapAttribute.getName());
+			if (ldapAttribute.hasSingleValue()){
+        		attribute.add(ldapAttribute.getValue());
+			}else{
+				for (Object value : ldapAttribute.getValues()){
+					attribute.add(value);
 				}
-        	}else if (attributeValue != null){
-        		attribute.add(attributeValue);
-        	}
+			}
         	
         	atts.put(attribute);
         }

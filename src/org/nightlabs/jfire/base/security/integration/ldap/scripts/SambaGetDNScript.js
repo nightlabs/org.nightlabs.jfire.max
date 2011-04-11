@@ -8,6 +8,8 @@
  * 
  * Returns a String with LDAP entry DN.
  *  
+ * @author Denis Dudnik <deniska.dudnik[at]gmail{dot}com>
+ *  
  */
 var dn = null;
 if ($userID$ != null){

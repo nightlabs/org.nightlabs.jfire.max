@@ -7,7 +7,9 @@
  * This script is used for generating a String with LDAP entry DN usign User/Person data.  
  * 
  * Returns a String with LDAP entry DN.
- *  
+ * 
+ * @author Denis Dudnik <deniska.dudnik[at]gmail{dot}com>
+ * 
  */
 var dn = null;
 if ($userID$ != null){

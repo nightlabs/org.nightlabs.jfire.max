@@ -6,6 +6,8 @@
  * Used for synchronization when LDAPServer is a leading system. 
  * 
  * Returns an ArrayList<String> with entries names.
+ * 
+ * @author Denis Dudnik <deniska.dudnik[at]gmail{dot}com>
  *  
  */
 var parentEntries = new java.util.ArrayList();

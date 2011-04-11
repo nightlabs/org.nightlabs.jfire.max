@@ -2,7 +2,6 @@ package org.nightlabs.jfire.base.security.integration.ldap;
 
 import java.io.Serializable;
 import java.util.Collection;
-import java.util.Map;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.annotations.Column;
@@ -17,6 +16,7 @@ import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import javax.script.SimpleScriptContext;
 
+import org.nightlabs.jfire.base.security.integration.ldap.attributes.LDAPAttributeSet;
 import org.nightlabs.jfire.base.security.integration.ldap.id.LDAPScriptSetID;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.person.Person;
@@ -202,15 +202,14 @@ public class LDAPScriptSet implements Serializable{
 	}
 	
 	/**
-	 * Executes script for generating map of attributes to be stored in LDAP entry 
+	 * Executes script for generating LDAPAttributeSet with attributes to be stored in LDAP entry 
 	 * using {@code jfireObject} data and returns the result.
 	 * 
 	 * @param jfireObject
-	 * @return map of attributes or <code>null</code> if script didn't return anything
+	 * @return {@link LDAPAttributeSet} with attributes or <code>null</code> if script didn't return anything
 	 * @throws ScriptException
 	 */
-	@SuppressWarnings("unchecked")
-	public Map<String, Object> getAttributesMapForLDAP(Object jfireObject, boolean isNewEntry) throws ScriptException{
+	public LDAPAttributeSet getAttributesMapForLDAP(Object jfireObject, boolean isNewEntry) throws ScriptException{
 
 		ScriptContext ctx = new SimpleScriptContext();
 		Bindings b = ctx.getBindings(ScriptContext.ENGINE_SCOPE);
@@ -224,8 +223,8 @@ public class LDAPScriptSet implements Serializable{
 		}
 		
 		Object result = execute(bindVariablesScript+generateJFireToLdapAttributesScript, ctx);
-		if (result instanceof Map){
-			return (Map<String, Object>) result;
+		if (result instanceof LDAPAttributeSet){
+			return (LDAPAttributeSet) result;
 		}
 		return null;
 	}
@@ -239,7 +238,7 @@ public class LDAPScriptSet implements Serializable{
 	 * @return synchronized JFire object
 	 * @throws ScriptException
 	 */
-	public Object syncLDAPDataToJFireObjects(Map<String, Object> allAttributes, String organisationID) throws ScriptException{
+	public Object syncLDAPDataToJFireObjects(LDAPAttributeSet allAttributes, String organisationID) throws ScriptException{
 		
 		ScriptContext ctx = new SimpleScriptContext();
 		Bindings b = ctx.getBindings(ScriptContext.ENGINE_SCOPE);

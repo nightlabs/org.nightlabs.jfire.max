@@ -3,7 +3,6 @@ package org.nightlabs.jfire.base.security.integration.ldap;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
@@ -26,6 +25,7 @@ import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.base.AuthCallbackHandler;
 import org.nightlabs.jfire.base.security.integration.ldap.LDAPManagerBean.SyncStoreLifecycleListener;
 import org.nightlabs.jfire.base.security.integration.ldap.LDAPSyncEvent.LDAPSyncEventType;
+import org.nightlabs.jfire.base.security.integration.ldap.attributes.LDAPAttributeSet;
 import org.nightlabs.jfire.base.security.integration.ldap.connection.ILDAPConnectionParamsProvider;
 import org.nightlabs.jfire.base.security.integration.ldap.connection.LDAPConnection;
 import org.nightlabs.jfire.base.security.integration.ldap.connection.LDAPConnectionManager;
@@ -762,7 +762,7 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 					if (logger.isDebugEnabled()){
 						logger.debug("Preparing attributes for modifying entry with DN: " + userDN);
 					}
-					Map<String, Object> modifyAttributes = ldapScriptSet.getAttributesMapForLDAP(
+					LDAPAttributeSet modifyAttributes = ldapScriptSet.getAttributesMapForLDAP(
 							jfireObject, !entryExists
 							);
 					

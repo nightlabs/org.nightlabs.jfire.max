@@ -5,6 +5,7 @@ import java.util.Map;
 
 import javax.security.auth.login.LoginException;
 
+import org.nightlabs.jfire.base.security.integration.ldap.attributes.LDAPAttributeSet;
 import org.nightlabs.jfire.base.security.integration.ldap.connection.LDAPConnectionWrapper.EntryModificationFlag;
 import org.nightlabs.jfire.security.integration.UserManagementSystemCommunicationException;
 
@@ -16,7 +17,7 @@ import org.nightlabs.jfire.security.integration.UserManagementSystemCommunicatio
  * @author Denis Dudnik <deniska.dudnik[at]gmail{dot}com>
  *
  */
-public class LDAPConnection {
+public class LDAPConnection{
 
     private ILDAPConnectionParamsProvider connectionParamsProvider;
 
@@ -56,7 +57,7 @@ public class LDAPConnection {
     	this.connectionWrapper.bind(bindPrincipal, password);
     }
 
-    public void createEntry(String entryDN, Map<String, Object> attributes) throws UserManagementSystemCommunicationException{
+    public void createEntry(String entryDN, LDAPAttributeSet attributes) throws UserManagementSystemCommunicationException{
     	this.connectionWrapper.createEntry(entryDN, attributes);
     }
 
@@ -64,15 +65,15 @@ public class LDAPConnection {
     	this.connectionWrapper.deleteEntry(entryDN);
     }
 
-    public void modifyEntry(String entryDN, Map<String, Object> attributes, EntryModificationFlag modificationFlag) throws UserManagementSystemCommunicationException{
+    public void modifyEntry(String entryDN, LDAPAttributeSet attributes, EntryModificationFlag modificationFlag) throws UserManagementSystemCommunicationException{
     	this.connectionWrapper.modifyEntry(entryDN, attributes, modificationFlag);
     }
     
-    public Map<String, Map<String, Object>> search(String dn, Map<String, Object> searchAttributes, String[] returnAttributes) throws UserManagementSystemCommunicationException{
+    public Map<String, LDAPAttributeSet> search(String dn, LDAPAttributeSet searchAttributes, String[] returnAttributes) throws UserManagementSystemCommunicationException{
     	return this.connectionWrapper.search(dn, searchAttributes, returnAttributes);
     }
     
-	public Map<String, Object> getAttributesForEntry(String dn) throws UserManagementSystemCommunicationException {
+	public LDAPAttributeSet getAttributesForEntry(String dn) throws UserManagementSystemCommunicationException {
 		return this.connectionWrapper.getAttribbutesForEntry(dn);
 	}
 	

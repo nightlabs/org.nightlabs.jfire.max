@@ -9,7 +9,9 @@
  * It makes use of <code>user</code> and <code>person</code> java objects passed to evaluating ScriptContext.
  * 
  * NOT supposed to return any values.
- *  
+ * 
+ * @author Denis Dudnik <deniska.dudnik[at]gmail{dot}com>
+ * 
  */
 importClass(org.nightlabs.jfire.person.PersonStruct);
 

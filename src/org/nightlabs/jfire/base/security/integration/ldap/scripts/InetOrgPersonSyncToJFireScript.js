@@ -4,12 +4,14 @@
  * 
  * This script is used for storing data into JFire objects (User and/or Person) during synchronization when InetOrgPerson LDAPServer is a leading system.
  * 
- * It makes use of several java objects passed to evaluating ScriptContext: <code>allAtributes</code> - Map<String, Object[]> with all attributes
+ * It makes use of several java objects passed to evaluating ScriptContext: <code>allAtributes</code> - LDAPAttributeSet with all attributes
  * of entry to be synchronized, <code>pm</code> - PersistenceManager, <code>organisationID</code> - the ID of JFire organisation, 
  * <code>newPersonID</code> - value returned by IDGenerator.nextID(PropertySet.class) used when new Person object is created,
  * <code>logger</code> - org.slf4j.Logger for debug purposes.  
  * 
  * Returns persisted object (either User or Person).
+ * 
+ * @author Denis Dudnik <deniska.dudnik[at]gmail{dot}com>
  *  
  */
 importClass(org.nightlabs.jfire.prop.PropertySet);
@@ -17,97 +19,111 @@ importClass(org.nightlabs.jfire.security.User);
 importClass(org.nightlabs.jfire.person.Person);
 importClass(org.nightlabs.jfire.person.PersonStruct);
 
-var user = null;
-var person = null;
+/**
+ * Functions block: start
+ * TODO: Consider move these code to a separate file as it's the same both for InetOrgPerson and Samba schemes. For now they use several
+ * global variables, so do not forget to add corresponding parameters to functions.
+ */
 
-var uid = allAttributes.get('uid');	// should NOT be changed in LDAP directory
-if (uid != null && uid.length > 0){	// assume were dealing with User object
-	logger.debug("UID is "+ uid[0]);
-	try{
-		user = User.getUser(pm, organisationID, uid[0]);
-	}catch(e){
-		// user not found - create new one
-		logger.debug("Creating new user...");
-		user = new User(organisationID, uid[0]);
-		
-		logger.debug("Creating new user local...");
-		new Packages.org.nightlabs.jfire.security.UserLocal(user);
-		
-		user = pm.makePersistent(user);
-		var userLocal = user.getUserLocal();
-		
-		logger.debug("configuring security for new user...");
-		var successful = false;
+function getUser(uid){
+	logger.debug("UID is "+ uid);
+	var user = null;
+	if (uid != null){	// assume were dealing with User object
 		try{
-
-			var authorityID = Packages.org.nightlabs.jfire.security.id.AuthorityID.create(
-					organisationID, Packages.org.nightlabs.jfire.security.Authority.AUTHORITY_ID_ORGANISATION
-					);
-			var logUserRoleGroupID  = Packages.org.nightlabs.jfire.security.id.RoleGroupID.create(
-					'org.nightlabs.jfire.workstation.loginWithoutWorkstation'
-					);
-
-			logger.debug("begin changing...");
-			Packages.org.nightlabs.jfire.security.listener.SecurityChangeController.beginChanging();
+			user = User.getUser(pm, organisationID, uid);
+		}catch(e){
+			// user not found - create new one
+			logger.debug("Creating new user...");
+			user = new User(organisationID, uid);
 			
-			logger.debug("getting authority...");
-			var authority = pm.getObjectById(authorityID);
-			logger.debug("creating AuthorizedObjectRef...");
-			var userRef = authority.createAuthorizedObjectRef(userLocal);
+			logger.debug("Creating new user local...");
+			new Packages.org.nightlabs.jfire.security.UserLocal(user);
 			
-			logger.debug("getting role group by id...");
-			var roleGroup = pm.getObjectById(logUserRoleGroupID);
-			logger.debug("creating and adding RoleGroupRef to userRef...");
-			userRef.addRoleGroupRef(authority.createRoleGroupRef(roleGroup));
+			user = pm.makePersistent(user);
+			var userLocal = user.getUserLocal();
 			
-			successful = true;
+			logger.debug("configuring security for new user...");
+			var successful = false;
+			try{
+	
+				var authorityID = Packages.org.nightlabs.jfire.security.id.AuthorityID.create(
+						organisationID, Packages.org.nightlabs.jfire.security.Authority.AUTHORITY_ID_ORGANISATION
+						);
+				var logUserRoleGroupID  = Packages.org.nightlabs.jfire.security.id.RoleGroupID.create(
+						'org.nightlabs.jfire.workstation.loginWithoutWorkstation'
+						);
+	
+				logger.debug("begin changing...");
+				Packages.org.nightlabs.jfire.security.listener.SecurityChangeController.beginChanging();
+				
+				logger.debug("getting authority...");
+				var authority = pm.getObjectById(authorityID);
+				logger.debug("creating AuthorizedObjectRef...");
+				var userRef = authority.createAuthorizedObjectRef(userLocal);
+				
+				logger.debug("getting role group by id...");
+				var roleGroup = pm.getObjectById(logUserRoleGroupID);
+				logger.debug("creating and adding RoleGroupRef to userRef...");
+				userRef.addRoleGroupRef(authority.createRoleGroupRef(roleGroup));
+				
+				successful = true;
+	
+				logger.debug("security configuration done.");
+			}finally{
+				logger.debug("end changing: " + successful);
+				Packages.org.nightlabs.jfire.security.listener.SecurityChangeController.endChanging(successful);
+			}
+			
+			logger.debug("user creation done.");
+		}
+	}
+	return user;
+}
 
-			logger.debug("security configuration done.");
-		}finally{
-			logger.debug("end changing: " + successful);
-			Packages.org.nightlabs.jfire.security.listener.SecurityChangeController.endChanging(successful);
+function getPerson(user){
+	if (user != null){
+		logger.debug("User != null");
+		person = user.getPerson();
+		if (person == null){ // 
+			logger.debug("Create new person");
+			person = new Person(organisationID, newPersonID);
+			user.setPerson(person);
+		}
+	}else{	// assume we are synchronizing just Person
+		// try to find Person object by displayName or create a new one
+
+		logger.debug("User is null, looking for person...");
+		
+		var f = new Packages.org.nightlabs.jfire.person.PersonSearchFilter(Packages.org.nightlabs.jdo.search.SearchFilter.CONJUNCTION_AND);
+		f.addSearchFilterItem(new Packages.org.nightlabs.jfire.prop.search.DisplayNameSearchFilterItem(Packages.org.nightlabs.jdo.search.MatchType.EQUALS), allAttributes.getAttributeValue('displayName'));
+		var results = f.getResult();
+		if (results.size() > 0){	// what if size greater than 1?
+			person = results.iterator().next();
+		}else{
+			logger.debug("Person not found, creating new one...");
+			person = new Person(organisationID, newPersonID);
 		}
 		
-		logger.debug("user creation done.");
 	}
 }
-
-if (user != null){
-	logger.debug("User != null");
-	person = user.getPerson();
-	if (person == null){ // 
-		logger.debug("Create new person");
-		person = new Person(organisationID, newPersonID);
-		user.setPerson(person);
-	}
-}else{	// assume we are synchronizing just Person
-	// try to find Person object by displayName or create a new one
-
-	logger.debug("User is null, looking for person...");
-	
-	var f = new Packages.org.nightlabs.jfire.person.PersonSearchFilter(Packages.org.nightlabs.jdo.search.SearchFilter.CONJUNCTION_AND);
-	f.addSearchFilterItem(new Packages.org.nightlabs.jfire.prop.search.DisplayNameSearchFilterItem(Packages.org.nightlabs.jdo.search.MatchType.EQUALS), allAttributes.get('displayName')[0]);
-	var results = f.getResult();
-	if (results.size() > 0){	// what if size greater than 1?
-		person = results.iterator().next();
-	}else{
-		logger.debug("Person not found, creating new one...");
-		person = new Person(organisationID, newPersonID);
-	}
-	
-}
-
-logger.debug("Init data attributes...");
-
 
 function getAttributeValue(name){
-	// getting first atribute value, can be rewritten to gain multiple values
-	return allAttributes.get(name)!=null?allAttributes.get(name)[0]:null;
+	if (allAttributes.getAttribute(name).hasSingleValue()){
+		return allAttributes.getAttributeValue(name);
+	}else{
+		return allAttributes.getAttributeValues(name);
+	}
 }
+/**
+ * Functions block: end 
+ */
 
-var cn = getAttributeValue('cn');
+var user = getUser(allAttributes.getAttributeValue('userid'));
+var person = getPerson(user);
+
+var cn = getAttributeValue('commonName');
 var description = getAttributeValue('description');
-var sn = getAttributeValue('sn');
+var sn = getAttributeValue('surname');
 
 // set attributes to JFire objects
 if (user != null){
@@ -134,12 +150,16 @@ if (person != null){
 	// personal data
 	person.getDataField(PersonStruct.PERSONALDATA_COMPANY).setData(getAttributeValue('organizationName'));
 	person.getDataField(PersonStruct.PERSONALDATA_NAME).setData(sn!=null?sn:cn);
-	person.getDataField(PersonStruct.PERSONALDATA_FIRSTNAME).setData(getAttributeValue('gn'));
+	person.getDataField(PersonStruct.PERSONALDATA_FIRSTNAME).setData(getAttributeValue('givenName'));
 	person.getDataField(PersonStruct.PERSONALDATA_TITLE).setData(getAttributeValue('title'));
-	person.getDataField(PersonStruct.PERSONALDATA_PHOTO).setData(getAttributeValue('photo'));
+	var photo = getAttributeValue('photo');
+	if (photo == null){
+		photo = getAttributeValue('jpegPhoto');
+	}
+	person.getDataField(PersonStruct.PERSONALDATA_PHOTO).setData(photo);
 	
 	// postadress
-	person.getDataField(PersonStruct.POSTADDRESS_ADDRESS).setData(getAttributeValue('street'));
+	person.getDataField(PersonStruct.POSTADDRESS_ADDRESS).setData(getAttributeValue('streetAddress'));
 	person.getDataField(PersonStruct.POSTADDRESS_POSTCODE).setData(getAttributeValue('postalCode'));
 	person.getDataField(PersonStruct.POSTADDRESS_CITY).setData(getAttributeValue('localityName'));
 	person.getDataField(PersonStruct.POSTADDRESS_REGION).setData(getAttributeValue('stateOrProvinceName'));
@@ -150,7 +170,7 @@ if (person != null){
 	
 	// phone
 	person.getDataField(PersonStruct.PHONE_PRIMARY).setData(getAttributeValue('telephoneNumber'));
-	person.getDataField(PersonStruct.FAX).setData(getAttributeValue('fax'));
+	person.getDataField(PersonStruct.FAX).setData(getAttributeValue('facsimileTelephoneNumber'));
 	
 	// comment
 	person.getDataField(PersonStruct.COMMENT_COMMENT).setData(description);

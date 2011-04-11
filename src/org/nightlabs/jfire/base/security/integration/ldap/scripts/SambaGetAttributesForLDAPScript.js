@@ -4,47 +4,48 @@
  * 
  * This script makes use of variables from CommonBindVariablesScript.js, so it SHOULD be executed first.
  * 
- * This script is used for generating a Map with attributes names and values which is then passed in LDAP modidifcation calls.
- * Used for synchronization when JFire is a leading system. 
- * 
- * Returns attributes Map<String, Object>.
+ * This script is used for generating a LDAPAttributeSet with attributes names and values which is then passed in LDAP modidifcation calls.
+ * Used for synchronization when JFire is a leading system.
  *  
+ * It makes java object passed to evaluating ScriptContext: <code>atributes</code> - LDAPAttributeSet to add all attributes to.
+ *   
+ * Returns LDAPAttributeSet.
+ * 
+ * @author Denis Dudnik <deniska.dudnik[at]gmail{dot}com>
+ * 
  */
-var attributes = new java.util.HashMap();
+importClass(org.nightlabs.jfire.base.security.integration.ldap.attributes.LDAPAttributeSet);
+
+var attributes = new LDAPAttributeSet();
 
 if (isNewEntry){
-	var objectClasses = java.lang.reflect.Array.newInstance(java.lang.String, 4);
-	objectClasses[0] = 'top';
-	objectClasses[1] = 'posixAccount';
-	objectClasses[2] = 'sambaSamAccount';
-	objectClasses[3] = 'sambaSidEntry';
-	attributes.put('objectClass', objectClasses);
+	attributes.createAttribute('objectClass', 'top', 'posixAccount', 'sambaSamAccount', 'sambaSidEntry');
 	if (userData != null){
-		attributes.put('cn', $userName$);
-		attributes.put('uid', $userID$);
-		attributes.put('uidNumber', ''+$userID$.hashCode());
+		attributes.createAttribute('commonName', $userName$);
+		attributes.createAttribute('userid', $userID$);
+		attributes.createAttribute('uidNumber', ''+$userID$.hashCode());
 	}else if (personData != null){
-		attributes.put('cn', $personName$);
-		attributes.put('uid', $personID$ +'@'+$personOrganisationID$);
-		attributes.put('uidNumber', ''+$personID$);
+		attributes.createAttribute('commonName', $personName$);
+		attributes.createAttribute('userid', $personID$ +'@'+$personOrganisationID$);
+		attributes.createAttribute('uidNumber', ''+$personID$);
 	}
-	attributes.put('gidNumber', '0');	// security group ID number, not used but is a MUST attribute
-	attributes.put('homeDirectory', '');	// ???
-	attributes.put('sambaSID', '');	// ???
+	attributes.createAttribute('gidNumber', '0');	// security group ID number, not used but is a MUST attribute
+	attributes.createAttribute('homeDirectory', '');	// ???
+	attributes.createAttribute('sambaSID', '');	// ???
 }
 
 if (userData != null){
 	// User fields
-	attributes.put('cn', $userName$);
-	attributes.put('uid', $userID$);
-	attributes.put('description', $userDescription$);
+	attributes.createAttribute('commonName', $userName$);
+	attributes.createAttribute('userid', $userID$);
+	attributes.createAttribute('description', $userDescription$);
 }else if (personData != null){
-	attributes.put('cn', $personName$);
-	attributes.put('description', $personComment$);
+	attributes.createAttribute('commonName', $personName$);
+	attributes.createAttribute('description', $personComment$);
 }
 
 // Person fields
 if (personData != null){
-	attributes.put('displayName', $personDisplayName$);
+	attributes.createAttribute('displayName', $personDisplayName$);
 }
 attributes;

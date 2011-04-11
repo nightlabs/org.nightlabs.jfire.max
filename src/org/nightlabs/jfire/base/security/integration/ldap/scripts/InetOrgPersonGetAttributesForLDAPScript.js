@@ -4,58 +4,60 @@
  * 
  * This script makes use of variables from CommonBindVariablesScript.js, so it SHOULD be executed first.
  * 
- * This script is used for generating a Map with attributes names and values which is then passed in LDAP modidifcation calls.
- * Used for synchronization when JFire is a leading system. 
- * 
- * Returns attributes Map<String, Object>.
+ * This script is used for generating a LDAPAttributeSet with attributes names and values which is then passed in LDAP modidifcation calls.
+ * Used for synchronization when JFire is a leading system.
  *  
+ * It makes java object passed to evaluating ScriptContext: <code>atributes</code> - LDAPAttributeSet to add all attributes to.
+ *   
+ * Returns LDAPAttributeSet.
+ * 
+ * @author Denis Dudnik <deniska.dudnik[at]gmail{dot}com>
+ * 
  */
-var attributes = new java.util.HashMap();
+importClass(org.nightlabs.jfire.base.security.integration.ldap.attributes.LDAPAttributeSet);
+
+var attributes = new LDAPAttributeSet();
 
 if (isNewEntry){
-	var objectClasses = java.lang.reflect.Array.newInstance(java.lang.String, 4);
-	objectClasses[0] = 'top';
-	objectClasses[1] = 'person';
-	objectClasses[2] = 'organizationalPerson';
-	objectClasses[3] = 'inetOrgPerson';
-	attributes.put('objectClass', objectClasses);
+	attributes.createAttribute('objectClass', 'top', 'person', 'organizationalPerson', 'inetOrgPerson');
 	if (userData != null){
-		attributes.put('cn', $userName$);
-		attributes.put('sn', $userName$);
+		attributes.createAttribute('commonName', $userName$);
+		attributes.createAttribute('surname', $userName$);
 	}else if (personData != null){
-		attributes.put('cn', $personName$);
-		attributes.put('sn', $personName$);
+		attributes.createAttribute('commonName', $personName$);
+		attributes.createAttribute('surname', $personName$);
 	}
 }
 
 if (userData != null){
 	// User fields
-	attributes.put('cn', $userName$);
-	attributes.put('sn', $userName$);
-	attributes.put('uid', $userID$);
-	attributes.put('description', $userDescription$);
+	attributes.createAttribute('commonName', $userName$);
+	attributes.createAttribute('surname', $userName$);
+	attributes.createAttribute('userid', $userID$);
+	attributes.createAttribute('description', $userDescription$);
 }else if (personData != null){
-	attributes.put('cn', $personName$);
-	attributes.put('sn', $personName$);
-	attributes.put('description', $personComment$);
+	attributes.createAttribute('commonName', $personName$);
+	attributes.createAttribute('surname', $personName$);
+	attributes.createAttribute('description', $personComment$);
 }
 
 // Person fields
 if (personData != null){
-	attributes.put('displayName', $personDisplayName$);
-	attributes.put('fax', $personFax$);
-	attributes.put('gn', $personFirstName$);
-//	attributes.put('photo', $personPhoto$);
-	attributes.put('localityName', $personCity$);
-	attributes.put('labeledURI', $personHomepage$);
-	attributes.put('mail', $personEMail$);
-	attributes.put('organizationName', $personCompany$);
-	attributes.put('postalAddress', $personAddress$ + ' ' + $personCity$ + ' ' + $personPostCode$ + ' ' + $personCity$ + ' ' + $personRegion$ + ' ' + $personCountry$);
-	attributes.put('postalCode', $personPostCode$);
-	attributes.put('preferredLanguage', $personLocaleLanguage$);
-	attributes.put('stateOrProvinceName', $personRegion$);
-	attributes.put('street', $personAddress$);
-	attributes.put('telephoneNumber', $personPhonePrimary$);
-	attributes.put('title', $personTitle$);
+	attributes.createAttribute('displayName', $personDisplayName$);
+	attributes.createAttribute('facsimileTelephoneNumber', $personFax$);
+	attributes.createAttribute('givenName', $personFirstName$);
+	attributes.createAttribute('photo', $personPhoto$);
+	attributes.createAttribute('jpegPhoto', $personPhoto$);
+	attributes.createAttribute('localityName', $personCity$);
+	attributes.createAttribute('labeledURI', $personHomepage$);
+	attributes.createAttribute('mail', $personEMail$);
+	attributes.createAttribute('organizationName', $personCompany$);
+	attributes.createAttribute('postalAddress', $personAddress$ + ' ' + $personCity$ + ' ' + $personPostCode$ + ' ' + $personCity$ + ' ' + $personRegion$ + ' ' + $personCountry$);
+	attributes.createAttribute('postalCode', $personPostCode$);
+	attributes.createAttribute('preferredLanguage', $personLocaleLanguage$);
+	attributes.createAttribute('stateOrProvinceName', $personRegion$);
+	attributes.createAttribute('streetAddress', $personAddress$);
+	attributes.createAttribute('telephoneNumber', $personPhonePrimary$);
+	attributes.createAttribute('title', $personTitle$);
 }
 attributes;

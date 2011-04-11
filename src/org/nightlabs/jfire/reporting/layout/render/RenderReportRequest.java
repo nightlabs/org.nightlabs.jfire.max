@@ -23,12 +23,13 @@ import org.nightlabs.util.Util;
 public class RenderReportRequest implements Serializable {
 	private static final long serialVersionUID = 1L;
 
-
 	private ReportRegistryItemID reportRegistryItemID;
 	private OutputFormat outputFormat;
 	private Locale locale;
 	private Map<String,Object> parameters;
-
+	private String fileName;
+	private String fileExtension;
+	
 	/**
 	 * This constructor must only be used in conjunction with ALL the setters (except for the locale) - otherwise the resulting object cannot be used.
 	 */
@@ -160,6 +161,48 @@ public class RenderReportRequest implements Serializable {
 		this.locale = locale;
 	}
 	
+	/**
+	 * Returns the fileName. If this method returns null a fileName is generated. 
+	 * @return the fileName
+	 */
+	public String getFileName() {
+		if (fileName == null) {
+			fileName = RenderedReportLayout.getDefaultReportFileName();
+		}
+		return fileName;
+	}
+
+	/**
+	 * Sets the (optional) fileName. If no fileName is set a fileName will be generated. 
+	 * 
+	 * @param fileName the fileName to set
+	 */
+	public void setFileName(String fileName) {
+		this.fileName = fileName;
+	}	
+	
+	/**
+	 * Returns the (optional) fileExtension. 
+	 * If no fileExtension is set the {@link OutputFormat} will be used as fileExtension.
+	 * 
+	 * @return the fileExtension
+	 */
+	public String getFileExtension() {
+		if (fileExtension == null) {
+			fileExtension = outputFormat.toString();
+		}
+		return fileExtension;
+	}
+
+	/**
+	 * Sets the (optional) fileName. If no fileExtension is set the {@link OutputFormat} will be used as fileExtension.
+	 * 
+	 * @param fileExtension the fileExtension to set
+	 */
+	public void setFileExtension(String fileExtension) {
+		this.fileExtension = fileExtension;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -173,6 +216,8 @@ public class RenderReportRequest implements Serializable {
 				* result
 				+ ((reportRegistryItemID == null) ? 0 : reportRegistryItemID
 						.hashCode());
+		result = prime * result + ((fileName == null) ? 0 : fileName.hashCode());
+		result = prime * result + ((fileExtension == null) ? 0 : fileExtension.hashCode());	
 		return result;
 	}
 
@@ -203,8 +248,10 @@ public class RenderReportRequest implements Serializable {
 			}
 			
 			boolean localesEqual = Util.equals(this.getLocale(), other.getLocale());
+			boolean fileNameEquals = Util.equals(this.fileName, other.fileName);
+			boolean fileExtensionEquals = Util.equals(this.fileExtension, other.fileExtension);
 			
-			return regItemEqual && paramsEqual && localesEqual && this.outputFormat == other.outputFormat;
+			return regItemEqual && paramsEqual && localesEqual && fileNameEquals && fileExtensionEquals && this.outputFormat == other.outputFormat;
 		}
 		else
 			return false;		
@@ -219,7 +266,11 @@ public class RenderReportRequest implements Serializable {
 			newRequest.setLocale(this.getLocale());
 		if (this.getParameters() != null) 
 			newRequest.setParameters(new HashMap<String, Object>(this.getParameters()));
+		if (this.getFileName() != null) 
+			newRequest.setFileName(this.getFileName());
+		if (this.getFileExtension() != null) 
+			newRequest.setFileExtension(this.getFileExtension());				
 		return newRequest;
-		
 	}
+
 }

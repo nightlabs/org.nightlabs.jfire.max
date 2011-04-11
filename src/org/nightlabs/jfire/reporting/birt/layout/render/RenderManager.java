@@ -103,7 +103,9 @@ implements IRenderManager
 	{
 		File layoutRoot = ReportLayoutRendererUtil.prepareRenderedLayoutOutputFolder();	// TODO this should not be done here, but instead *after* the report was rendered, the directory should be immediately removed. Freddy+Marco.
 //		return renderReport(pm, renderRequest, IRenderManager.DEFAULT_ENTRY_FILE_NAME, layoutRoot, true);
-		return renderReport(pm, renderRequest, RenderedReportLayout.getDefaultReportFileName(), layoutRoot, true);
+//		return renderReport(pm, renderRequest, RenderedReportLayout.getDefaultReportFileName(), layoutRoot, true);
+		String fileName = renderRequest.getFileName();
+		return renderReport(pm, renderRequest, fileName, layoutRoot, true);
 	}
 
 	// TODO this method should not be public! Freddy+Marco.

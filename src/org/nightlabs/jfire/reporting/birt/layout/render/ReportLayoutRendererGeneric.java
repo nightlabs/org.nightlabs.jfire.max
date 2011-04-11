@@ -83,7 +83,8 @@ public class ReportLayoutRendererGeneric implements ReportLayoutRenderer {
 	{
 		RenderOption options = new RenderOption( );
 		options.setOutputFormat(renderRequest.getOutputFormat().toString());
-		options.setOutputFileName(layoutRoot.getAbsolutePath().toString() + File.separator + fileName+"." + renderRequest.getOutputFormat().toString()); //$NON-NLS-1$
+		String fileExtension = renderRequest.getFileExtension();
+		options.setOutputFileName(layoutRoot.getAbsolutePath().toString() + File.separator + fileName+"." + fileExtension); //$NON-NLS-1$
 		return options;
 	}
 }

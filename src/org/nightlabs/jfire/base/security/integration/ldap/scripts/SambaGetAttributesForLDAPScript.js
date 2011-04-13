@@ -22,11 +22,11 @@ if (isNewEntry){
 	attributes.createAttribute('objectClass', 'top', 'posixAccount', 'sambaSamAccount', 'sambaSidEntry');
 	if (userData != null){
 		attributes.createAttribute('commonName', $userName$);
-		attributes.createAttribute('userid', $userID$);
+		attributes.createAttribute('uid', $userID$);
 		attributes.createAttribute('uidNumber', ''+$userID$.hashCode());
 	}else if (personData != null){
 		attributes.createAttribute('commonName', $personName$);
-		attributes.createAttribute('userid', $personID$ +'@'+$personOrganisationID$);
+		attributes.createAttribute('uid', $personID$ +'@'+$personOrganisationID$);
 		attributes.createAttribute('uidNumber', ''+$personID$);
 	}
 	attributes.createAttribute('gidNumber', '0');	// security group ID number, not used but is a MUST attribute
@@ -37,7 +37,7 @@ if (isNewEntry){
 if (userData != null){
 	// User fields
 	attributes.createAttribute('commonName', $userName$);
-	attributes.createAttribute('userid', $userID$);
+	attributes.createAttribute('uid', $userID$);
 	attributes.createAttribute('description', $userDescription$);
 }else if (personData != null){
 	attributes.createAttribute('commonName', $personName$);

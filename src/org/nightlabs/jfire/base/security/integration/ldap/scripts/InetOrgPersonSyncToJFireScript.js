@@ -80,6 +80,23 @@ function getUser(uid){
 	return user;
 }
 
+function getAttributeValue(name, canonicalName){
+	if (name != null && allAttributes.getAttribute(name) != null){
+		if (allAttributes.getAttribute(name).hasSingleValue()){
+			return allAttributes.getAttributeValue(name);
+		}else{
+			return allAttributes.getAttributeValues(name);
+		}
+	}else if (canonicalName != null && allAttributes.getAttribute(canonicalName)){
+		if (allAttributes.getAttribute(canonicalName).hasSingleValue()){
+			return allAttributes.getAttributeValue(canonicalName);
+		}else{
+			return allAttributes.getAttributeValues(canonicalName);
+		}
+	}
+	return null;
+}
+
 function getPerson(user){
 	if (user != null){
 		logger.debug("User != null");
@@ -89,13 +106,13 @@ function getPerson(user){
 			person = new Person(organisationID, newPersonID);
 			user.setPerson(person);
 		}
-	}else{	// assume we are synchronizing just Person
+	}else if (getAttributeValue('displayName', null) != null){	// assume we are synchronizing just Person
 		// try to find Person object by displayName or create a new one
 
 		logger.debug("User is null, looking for person...");
 		
 		var f = new Packages.org.nightlabs.jfire.person.PersonSearchFilter(Packages.org.nightlabs.jdo.search.SearchFilter.CONJUNCTION_AND);
-		f.addSearchFilterItem(new Packages.org.nightlabs.jfire.prop.search.DisplayNameSearchFilterItem(Packages.org.nightlabs.jdo.search.MatchType.EQUALS), allAttributes.getAttributeValue('displayName'));
+		f.addSearchFilterItem(new Packages.org.nightlabs.jfire.prop.search.DisplayNameSearchFilterItem(Packages.org.nightlabs.jdo.search.MatchType.EQUALS, getAttributeValue('displayName', null)));
 		var results = f.getResult();
 		if (results.size() > 0){	// what if size greater than 1?
 			person = results.iterator().next();
@@ -107,23 +124,16 @@ function getPerson(user){
 	}
 }
 
-function getAttributeValue(name){
-	if (allAttributes.getAttribute(name).hasSingleValue()){
-		return allAttributes.getAttributeValue(name);
-	}else{
-		return allAttributes.getAttributeValues(name);
-	}
-}
 /**
  * Functions block: end 
  */
 
-var user = getUser(allAttributes.getAttributeValue('userid'));
+var user = getUser(getAttributeValue('uid', 'userid'));
 var person = getPerson(user);
 
-var cn = getAttributeValue('commonName');
-var description = getAttributeValue('description');
-var sn = getAttributeValue('surname');
+var cn = getAttributeValue('cn', 'commonName');
+var description = getAttributeValue('description', null);
+var sn = getAttributeValue('sn', 'surname');
 
 // set attributes to JFire objects
 if (user != null){
@@ -148,29 +158,29 @@ if (person != null){
 	logger.debug("setting data to data fields...");
 
 	// personal data
-	person.getDataField(PersonStruct.PERSONALDATA_COMPANY).setData(getAttributeValue('organizationName'));
+	person.getDataField(PersonStruct.PERSONALDATA_COMPANY).setData(getAttributeValue('o', 'organizationName'));
 	person.getDataField(PersonStruct.PERSONALDATA_NAME).setData(sn!=null?sn:cn);
-	person.getDataField(PersonStruct.PERSONALDATA_FIRSTNAME).setData(getAttributeValue('givenName'));
-	person.getDataField(PersonStruct.PERSONALDATA_TITLE).setData(getAttributeValue('title'));
-	var photo = getAttributeValue('photo');
+	person.getDataField(PersonStruct.PERSONALDATA_FIRSTNAME).setData(getAttributeValue('gn', 'givenName'));
+	person.getDataField(PersonStruct.PERSONALDATA_TITLE).setData(getAttributeValue('title', null));
+	var photo = getAttributeValue('photo', null);
 	if (photo == null){
-		photo = getAttributeValue('jpegPhoto');
+		photo = getAttributeValue('jpegPhoto', null);
 	}
 	person.getDataField(PersonStruct.PERSONALDATA_PHOTO).setData(photo);
 	
 	// postadress
-	person.getDataField(PersonStruct.POSTADDRESS_ADDRESS).setData(getAttributeValue('streetAddress'));
-	person.getDataField(PersonStruct.POSTADDRESS_POSTCODE).setData(getAttributeValue('postalCode'));
-	person.getDataField(PersonStruct.POSTADDRESS_CITY).setData(getAttributeValue('localityName'));
-	person.getDataField(PersonStruct.POSTADDRESS_REGION).setData(getAttributeValue('stateOrProvinceName'));
+	person.getDataField(PersonStruct.POSTADDRESS_ADDRESS).setData(getAttributeValue('street', 'streetAddress'));
+	person.getDataField(PersonStruct.POSTADDRESS_POSTCODE).setData(getAttributeValue('postalCode', null));
+	person.getDataField(PersonStruct.POSTADDRESS_CITY).setData(getAttributeValue('l', 'localityName'));
+	person.getDataField(PersonStruct.POSTADDRESS_REGION).setData(getAttributeValue('st', 'stateOrProvinceName', null));
 
 	// internet
-	person.getDataField(PersonStruct.INTERNET_EMAIL).setData(getAttributeValue('mail'));
-	person.getDataField(PersonStruct.INTERNET_HOMEPAGE).setData(getAttributeValue('labeledURI'));
+	person.getDataField(PersonStruct.INTERNET_EMAIL).setData(getAttributeValue('mail', 'rfc822Mailbox'));
+	person.getDataField(PersonStruct.INTERNET_HOMEPAGE).setData(getAttributeValue('labeledURI', null));
 	
 	// phone
-	person.getDataField(PersonStruct.PHONE_PRIMARY).setData(getAttributeValue('telephoneNumber'));
-	person.getDataField(PersonStruct.FAX).setData(getAttributeValue('facsimileTelephoneNumber'));
+	person.getDataField(PersonStruct.PHONE_PRIMARY).setData(getAttributeValue('telephoneNumber', null));
+	person.getDataField(PersonStruct.FAX).setData(getAttributeValue('fax', 'facsimileTelephoneNumber'));
 	
 	// comment
 	person.getDataField(PersonStruct.COMMENT_COMMENT).setData(description);

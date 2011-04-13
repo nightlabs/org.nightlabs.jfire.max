@@ -260,6 +260,16 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
         		
     			// create new fake user to get userDN
 		        userDN = getLDAPUserDN(new User(loginData.getOrganisationID(), loginData.getUserID()));
+		        
+        	}else if (user == null && !isLeading()){
+        		// if there's no such user in JFire and if it's not supposed to fetch it from LDAP
+        		// and if JFire is a leading system than login will fail
+        		
+        		throw new LoginException(
+        				String.format(
+        						"Can't proceed with login! There's no user in JFire with specified userID %s and JFire being a leading system is NOT configured to fetch it from LDAP. Either use LDAP as leading system or add a %s=true system property.", 
+        						loginDataUserID, UserManagementSystem.SHOULD_FETCH_USER_DATA
+        						));        		
         	}
         	
         	if (userDN == null){

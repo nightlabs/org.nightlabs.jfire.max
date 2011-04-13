@@ -33,7 +33,7 @@ if (userData != null){
 	// User fields
 	attributes.createAttribute('commonName', $userName$);
 	attributes.createAttribute('surname', $userName$);
-	attributes.createAttribute('userid', $userID$);
+	attributes.createAttribute('uid', $userID$);
 	attributes.createAttribute('description', $userDescription$);
 }else if (personData != null){
 	attributes.createAttribute('commonName', $personName$);

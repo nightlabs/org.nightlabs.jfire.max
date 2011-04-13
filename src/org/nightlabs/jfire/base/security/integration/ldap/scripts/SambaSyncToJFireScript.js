@@ -80,6 +80,23 @@ function getUser(uid){
 	return user;
 }
 
+function getAttributeValue(name, canonicalName){
+	if (name != null && allAttributes.getAttribute(name) != null){
+		if (allAttributes.getAttribute(name).hasSingleValue()){
+			return allAttributes.getAttributeValue(name);
+		}else{
+			return allAttributes.getAttributeValues(name);
+		}
+	}else if (canonicalName != null && allAttributes.getAttribute(canonicalName)){
+		if (allAttributes.getAttribute(canonicalName).hasSingleValue()){
+			return allAttributes.getAttributeValue(canonicalName);
+		}else{
+			return allAttributes.getAttributeValues(canonicalName);
+		}
+	}
+	return null;
+}
+
 function getPerson(user){
 	if (user != null){
 		logger.debug("User != null");
@@ -89,13 +106,13 @@ function getPerson(user){
 			person = new Person(organisationID, newPersonID);
 			user.setPerson(person);
 		}
-	}else{	// assume we are synchronizing just Person
+	}else if (getAttributeValue('displayName', null) != null){	// assume we are synchronizing just Person
 		// try to find Person object by displayName or create a new one
 
 		logger.debug("User is null, looking for person...");
 		
 		var f = new Packages.org.nightlabs.jfire.person.PersonSearchFilter(Packages.org.nightlabs.jdo.search.SearchFilter.CONJUNCTION_AND);
-		f.addSearchFilterItem(new Packages.org.nightlabs.jfire.prop.search.DisplayNameSearchFilterItem(Packages.org.nightlabs.jdo.search.MatchType.EQUALS), allAttributes.getAttributeValue('displayName'));
+		f.addSearchFilterItem(new Packages.org.nightlabs.jfire.prop.search.DisplayNameSearchFilterItem(Packages.org.nightlabs.jdo.search.MatchType.EQUALS, getAttributeValue('displayName', null)));
 		var results = f.getResult();
 		if (results.size() > 0){	// what if size greater than 1?
 			person = results.iterator().next();
@@ -107,26 +124,19 @@ function getPerson(user){
 	}
 }
 
-function getAttributeValue(name){
-	if (allAttributes.getAttribute(name).hasSingleValue()){
-		return allAttributes.getAttributeValue(name);
-	}else{
-		return allAttributes.getAttributeValues(name);
-	}
-}
 /**
  * Functions block: end 
  */
 
-var user = getUser(allAttributes.getAttributeValue('userid'));
+var user = getUser(getAttributeValue('uid', 'userid'));
 var person = getPerson(user);
 
-var description = getAttributeValue('description');
+var description = getAttributeValue('description', null);
 
 // set attributes to JFire objects
 if (user != null){
 	logger.debug("set name and description to user");
-	user.setName(getAttributeValue('commonName'));
+	user.setName(getAttributeValue('cn', 'commonName'));
 	user.setDescription(description);
 }
 

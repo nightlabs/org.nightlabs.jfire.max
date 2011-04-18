@@ -19,7 +19,12 @@ importClass(org.nightlabs.jfire.base.security.integration.ldap.attributes.LDAPAt
 var attributes = new LDAPAttributeSet();
 
 if (isNewEntry){
-	attributes.createAttribute('objectClass', 'top', 'posixAccount', 'sambaSamAccount', 'sambaSidEntry');
+	var objectClasses = new java.util.ArrayList();
+	objectClasses.add('top');
+	objectClasses.add('posixAccount');
+	objectClasses.add('sambaSamAccount');
+	objectClasses.add('sambaSidEntry');
+	attributes.createAttribute('objectClass', objectClasses);
 	if (userData != null){
 		attributes.createAttribute('commonName', $userName$);
 		attributes.createAttribute('uid', $userID$);

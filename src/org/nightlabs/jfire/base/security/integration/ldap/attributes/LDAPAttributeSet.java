@@ -1,10 +1,14 @@
 package org.nightlabs.jfire.base.security.integration.ldap.attributes;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <p>Represents a manageable set of {@link LDAPAttribute}s and provides API for attribute creation  when client could know nothing 
@@ -19,6 +23,8 @@ import java.util.Map;
  *
  */
 public class LDAPAttributeSet implements Iterable<LDAPAttribute<Object>>{
+
+	private static final Logger logger = LoggerFactory.getLogger(LDAPAttributeSet.class);
 	
 	/**
 	 * {@link Map} holding attributes instances
@@ -59,10 +65,30 @@ public class LDAPAttributeSet implements Iterable<LDAPAttribute<Object>>{
 	 * NO new attribute will be added. 
 	 * 
 	 * @param attribute can't be <code>null</code>, {@link IllegalArgumentException} will be thrown otherwise
+	 * @return <code>true</code> if either new attribute was added or it's values were added to existing one, <code>false</code> if nothing at all was added
 	 */
-	public void addAttribute(LDAPAttribute<Object> attribute) {
+	public boolean addAttribute(LDAPAttribute<Object> attribute) {
 		if (attribute == null){
 			throw new IllegalArgumentException("LDAPAttribute can't be null!");
+		}
+		
+		if (attribute.hasSingleValue()){
+			if (attribute.getValue() == null || "".equals(attribute.getValue())){
+				logger.warn(String.format("Attribute %s has no valid value, it will not be added to the set!", attribute.getName()));
+				return false;
+			}
+		}else{
+			Collection<Object> valuesToDelete = new ArrayList<Object>();
+			for (Object value : attribute.getValues()){
+				if (value == null || "".equals(value)){
+					valuesToDelete.add(value);
+				}
+			}
+			attribute.removeValues(valuesToDelete);
+			if (attribute.valuesCount() == 0){
+				logger.warn(String.format("Attribute %s has no valid values, it will not be added to the set!", attribute.getName()));
+				return false;
+			}
 		}
 		
 		if (attributes.containsKey(attribute.getName())){	// add new value to existing attribute
@@ -70,6 +96,7 @@ public class LDAPAttributeSet implements Iterable<LDAPAttribute<Object>>{
 		}else{
 			attributes.put(attribute.getName(), attribute);
 		}
+		return true;
 	}
 
 	/**
@@ -132,35 +159,27 @@ public class LDAPAttributeSet implements Iterable<LDAPAttribute<Object>>{
 	 * Create {@link LDAPAttribute} instance using {@link #attributeFactory} and adds it to the set.
 	 * 
 	 * @param attributeName
-	 * @param attributeValues
+	 * @param attributeValue - if value is <code>null</code> or empty string then resulting attribute WILL NOT be added to the set
 	 * @return created {@link LDAPAttribute} instance
 	 */
-	public LDAPAttribute<Object> createAttribute(String attributeName, Object... attributeValues) {
-		LDAPAttribute<Object> attribute = attributeFactory.createAttribute(attributeName, attributeValues);
-		addAttribute(attribute);
-		return attribute;
-	}
+	@SuppressWarnings("unchecked")
+	public LDAPAttribute<Object> createAttribute(String attributeName, Object attributeValue) {
+		LDAPAttribute<Object> attribute = null;
+		if (attributeValue instanceof Iterable){
+			Iterator<Object> valuesIterator = ((Iterable<Object>) attributeValue).iterator();
 
-	/**
-	 * Create {@link LDAPAttribute} instance using {@link #attributeFactory} and adds it to the set.
-	 * 
-	 * @param attributeName
-	 * @param attributeValues
-	 * @return created {@link LDAPAttribute} instance
-	 */
-	public LDAPAttribute<Object> createAttribute(String attributeName, Collection<Object> attributeValues) {
-		if (attributeValues == null){
-			throw new IllegalArgumentException("Can't create attribute with null value, such attribute will not be created in LDAP anyway. Please specify an empty String if you want to have an attribute with no real value.");
-		}
-		
-		if (attributeValues.isEmpty()){	// for creating attribute with blank value
-			attributeValues.add("");
-		}
-
-		Iterator<Object> valuesIterator = attributeValues.iterator();
-		LDAPAttribute<Object> attribute = attributeFactory.createAttribute(attributeName, valuesIterator.next());
-		while (valuesIterator.hasNext()){
-			attribute.addValue(valuesIterator.next());
+			Object value = null;
+			if (valuesIterator.hasNext()){
+				value = valuesIterator.next();
+			}else{
+				value = "";	// for creating attribute with no values
+			}
+			attribute = attributeFactory.createAttribute(attributeName, value);
+			while (valuesIterator.hasNext()){
+				attribute.addValue(valuesIterator.next());
+			}
+		}else{
+			attribute = attributeFactory.createAttribute(attributeName, attributeValue);
 		}
 		addAttribute(attribute);
 		return attribute;
@@ -185,6 +204,16 @@ public class LDAPAttributeSet implements Iterable<LDAPAttribute<Object>>{
 	@Override
 	public Iterator<LDAPAttribute<Object>> iterator() {
 		return attributes.values().iterator();
+	}
+	
+	@Override
+	public String toString() {
+		StringBuffer toStringValue = new StringBuffer();
+		for (LDAPAttribute<Object> attribute : attributes.values()){
+			toStringValue.append(attribute.toString());
+			toStringValue.append("\n");
+		}
+		return toStringValue.toString();
 	}
 
 }

@@ -19,7 +19,12 @@ importClass(org.nightlabs.jfire.base.security.integration.ldap.attributes.LDAPAt
 var attributes = new LDAPAttributeSet();
 
 if (isNewEntry){
-	attributes.createAttribute('objectClass', 'top', 'person', 'organizationalPerson', 'inetOrgPerson');
+	var objectClasses = new java.util.ArrayList();
+	objectClasses.add('top');
+	objectClasses.add('person');
+	objectClasses.add('organizationalPerson');
+	objectClasses.add('inetOrgPerson');
+	attributes.createAttribute('objectClass', objectClasses);
 	if (userData != null){
 		attributes.createAttribute('commonName', $userName$);
 		attributes.createAttribute('surname', $userName$);

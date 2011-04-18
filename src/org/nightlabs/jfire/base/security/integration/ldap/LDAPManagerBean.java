@@ -110,21 +110,12 @@ public class LDAPManagerBean extends BaseSessionBeanImpl implements LDAPManagerR
 	}
 
 	private void configureJFireAsLeadingSystem(PersistenceManager pm){
-		// Determine if JFire is a leading system for at least one existent LDAPServer, 
-		// therefore we query all NON leading LDAPServers.
-		Collection<LDAPServer> leadingSystems = UserManagementSystem.getUserManagementSystemsByLeading(
-				pm, false, LDAPServer.class
+		// FIXME: Now if User is stored this listener will be called twice -
+		// both for User and Person objects. Need to figure out if Person is connected with
+		// User or it's just a stand-alone Person object.
+		pm.getPersistenceManagerFactory().addInstanceLifecycleListener(
+				syncStoreLifecycleListener, new Class[]{User.class, Person.class}
 				);
-		if (!leadingSystems.isEmpty()){
-			
-			// FIXME: Now if User is stored this listener will be called twice -
-			// both for User and Person objects. Need to figure out if Person is connected with
-			// User or it's just a stand-alone Person object.
-			pm.getPersistenceManagerFactory().addInstanceLifecycleListener(
-					syncStoreLifecycleListener, new Class[]{User.class, Person.class}
-					);
-			
-		}
 	}
 	
 	private void configureLdapAsLeadingSystem(PersistenceManager pm){
@@ -209,9 +200,18 @@ public class LDAPManagerBean extends BaseSessionBeanImpl implements LDAPManagerR
 			}
 			
 			try {
-				AsyncInvoke.exec(
-						new SyncToLDAPServersInvocation(JDOHelper.getObjectId(event.getPersistentInstance())), true
+				// Determine if JFire is a leading system for at least one existent LDAPServer, 
+				// therefore we query all NON leading LDAPServers.
+				Collection<LDAPServer> nonLeadingSystems = UserManagementSystem.getUserManagementSystemsByLeading(
+						JDOHelper.getPersistenceManager(event.getPersistentInstance()), false, LDAPServer.class
 						);
+				if (!nonLeadingSystems.isEmpty()){
+
+					AsyncInvoke.exec(
+							new SyncToLDAPServersInvocation(JDOHelper.getObjectId(event.getPersistentInstance())), true
+							);
+					
+				}
 			} catch (AsyncInvokeEnqueueException e) {
 				throw new JDOUserCallbackException("Unable to synhronize User data to LDAP server(s)!", e);
 			}

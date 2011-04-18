@@ -139,4 +139,19 @@ public abstract class AbstractSimpleLDAPAttribute<ValueType> implements LDAPAttr
 		return values.size();
 	}
 
+	@Override
+	public String toString() {
+		StringBuffer toStringValue = new StringBuffer();
+		toStringValue.append(name);
+		toStringValue.append("=");
+		if (hasSingleValue()){
+			toStringValue.append(getValue());
+		}else{
+			for (ValueType value : getValues()){
+				toStringValue.append(value);
+				toStringValue.append(" ");
+			}
+		}
+		return toStringValue.toString();
+	}
 }

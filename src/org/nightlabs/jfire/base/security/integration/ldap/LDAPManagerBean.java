@@ -123,7 +123,7 @@ public class LDAPManagerBean extends BaseSessionBeanImpl implements LDAPManagerR
 			pm.getExtent(Task.class);
 			TaskID taskID = TaskID.create(
 					getOrganisationID(),
-					Task.TASK_TYPE_ID_SYSTEM, "JFireLDAP-syncUserDataFromLDAP"
+					Task.TASK_TYPE_ID_SYSTEM, LDAPServer.SYNC_USER_DATA_FROM_LDAP_TASK_ID
 					);
 			Task task;
 			try {

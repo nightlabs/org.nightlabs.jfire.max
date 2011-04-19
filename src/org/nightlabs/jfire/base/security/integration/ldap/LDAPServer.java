@@ -73,10 +73,10 @@ import org.slf4j.LoggerFactory;
 		)
 public class LDAPServer extends UserManagementSystem implements ILDAPConnectionParamsProvider{
 
+	public static final String SYNC_USER_DATA_FROM_LDAP_TASK_ID = "JFireLDAP-syncUserDataFromLDAP";
 	public static final String FETCH_GROUP_LDAP_SCRIPT_SET = "LDAPServer.ldapScriptSet";
 
 	private static final String FIND_LDAP_SERVERS = "LDAPServer.findLDAPServers";
-
 	private static final Logger logger = LoggerFactory.getLogger(LDAPServer.class);
 
 	/**

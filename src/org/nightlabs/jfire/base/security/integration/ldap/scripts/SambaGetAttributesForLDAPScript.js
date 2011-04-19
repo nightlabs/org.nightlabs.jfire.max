@@ -35,8 +35,8 @@ if (isNewEntry){
 		attributes.createAttribute('uidNumber', ''+$personID$);
 	}
 	attributes.createAttribute('gidNumber', '0');	// security group ID number, not used but is a MUST attribute
-	attributes.createAttribute('homeDirectory', '');	// ???
-	attributes.createAttribute('sambaSID', '');	// ???
+	attributes.createAttribute('homeDirectory', '/');	// ???
+	attributes.createAttribute('sambaSID', '0');	// ???
 }
 
 if (userData != null){

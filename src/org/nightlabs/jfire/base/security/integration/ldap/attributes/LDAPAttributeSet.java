@@ -64,6 +64,9 @@ public class LDAPAttributeSet implements Iterable<LDAPAttribute<Object>>{
 	 * If attribute with the same name already exists in the set than all values of attribute parameter will be added to existing one and
 	 * NO new attribute will be added. 
 	 * 
+	 * TODO: some attributes could have "" as a value, some could not. Need to decide if we restrict attribute values and which rules for 
+	 * restrictions should be used. Denis.
+	 * 
 	 * @param attribute can't be <code>null</code>, {@link IllegalArgumentException} will be thrown otherwise
 	 * @return <code>true</code> if either new attribute was added or it's values were added to existing one, <code>false</code> if nothing at all was added
 	 */

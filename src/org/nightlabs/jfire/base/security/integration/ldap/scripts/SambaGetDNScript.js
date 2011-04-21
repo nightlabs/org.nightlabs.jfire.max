@@ -12,7 +12,9 @@
  *  
  */
 var dn = null;
-if ($userID$ != null){
+if (userData != null && $userID$ != null){
 	dn = 'uid='+$userID$+',ou=Users,dc=nightlabs,dc=de';
+}else if (personData != null && $personName$ != null){
+	dn = 'cn='+$personName$+',ou=Users,dc=nightlabs,dc=de';
 }
 dn;

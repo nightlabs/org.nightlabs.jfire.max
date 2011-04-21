@@ -106,13 +106,18 @@ function getPerson(user){
 			person = new Person(organisationID, newPersonID);
 			user.setPerson(person);
 		}
-	}else if (getAttributeValue('displayName', null) != null){	// assume we are synchronizing just Person
+	}else if (getAttributeValue('cn', 'commonName') != null){	// assume we are synchronizing just Person
 		// try to find Person object by displayName or create a new one
 
 		logger.debug("User is null, looking for person...");
 		
 		var f = new Packages.org.nightlabs.jfire.person.PersonSearchFilter(Packages.org.nightlabs.jdo.search.SearchFilter.CONJUNCTION_AND);
-		f.addSearchFilterItem(new Packages.org.nightlabs.jfire.prop.search.DisplayNameSearchFilterItem(Packages.org.nightlabs.jdo.search.MatchType.EQUALS, getAttributeValue('displayName', null)));
+		f.setPersistenceManager(pm);
+		var structFiledIDs = new java.util.ArrayList();
+		structFiledIDs.add(PersonStruct.PERSONALDATA_NAME);
+		f.addSearchFilterItem(
+				new Packages.org.nightlabs.jfire.prop.search.TextStructFieldSearchFilterItem(
+						structFiledIDs, Packages.org.nightlabs.jdo.search.MatchType.EQUALS, getAttributeValue('cn', 'commonName')));
 		var results = f.getResult();
 		if (results.size() > 0){	// what if size greater than 1?
 			person = results.iterator().next();
@@ -128,7 +133,11 @@ function getPerson(user){
  * Functions block: end 
  */
 
-var user = getUser(getAttributeValue('uid', 'userid'));
+var user = null;
+var displayName = getAttributeValue('displayName', null);
+if (displayName == null || displayName == ''){	// assume it's not a Person
+	user = getUser(getAttributeValue('uid', 'userid'));
+}
 var person = getPerson(user);
 
 var description = getAttributeValue('description', null);
@@ -154,7 +163,7 @@ if (person != null){
 	person.inflate(ps);
 
 	logger.debug("setting data to data fields...");
-	// comment
+	person.getDataField(PersonStruct.PERSONALDATA_NAME).setData(getAttributeValue('cn', 'commonName'));
 	person.getDataField(PersonStruct.COMMENT_COMMENT).setData(description);
 	
 	logger.debug("deflating person...");

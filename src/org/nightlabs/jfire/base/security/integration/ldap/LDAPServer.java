@@ -734,7 +734,7 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 	 * @throws LoginException
 	 * @throws LDAPSyncException
 	 */
-	private void updateLDAPData(Collection<Object> jfireObjectsIds) throws UserManagementSystemCommunicationException, LoginException, LDAPSyncException{
+	private void updateLDAPData(Collection<?> jfireObjectsIds) throws UserManagementSystemCommunicationException, LoginException, LDAPSyncException{
 		
 		LDAPConnection connection = null;
 		try{

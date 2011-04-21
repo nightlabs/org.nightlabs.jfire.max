@@ -106,13 +106,18 @@ function getPerson(user){
 			person = new Person(organisationID, newPersonID);
 			user.setPerson(person);
 		}
-	}else if (getAttributeValue('displayName', null) != null){	// assume we are synchronizing just Person
+	}else if (getAttributeValue('cn', 'commonName') != null){	// assume we are synchronizing just Person
 		// try to find Person object by displayName or create a new one
 
 		logger.debug("User is null, looking for person...");
 		
 		var f = new Packages.org.nightlabs.jfire.person.PersonSearchFilter(Packages.org.nightlabs.jdo.search.SearchFilter.CONJUNCTION_AND);
-		f.addSearchFilterItem(new Packages.org.nightlabs.jfire.prop.search.DisplayNameSearchFilterItem(Packages.org.nightlabs.jdo.search.MatchType.EQUALS, getAttributeValue('displayName', null)));
+		f.setPersistenceManager(pm);
+		var structFiledIDs = new java.util.ArrayList();
+		structFiledIDs.add(PersonStruct.PERSONALDATA_NAME);
+		f.addSearchFilterItem(
+				new Packages.org.nightlabs.jfire.prop.search.TextStructFieldSearchFilterItem(
+						structFiledIDs, Packages.org.nightlabs.jdo.search.MatchType.EQUALS, getAttributeValue('cn', 'commonName')));
 		var results = f.getResult();
 		if (results.size() > 0){	// what if size greater than 1?
 			person = results.iterator().next();
@@ -159,7 +164,7 @@ if (person != null){
 
 	// personal data
 	person.getDataField(PersonStruct.PERSONALDATA_COMPANY).setData(getAttributeValue('o', 'organizationName'));
-	person.getDataField(PersonStruct.PERSONALDATA_NAME).setData(sn!=null?sn:cn);
+	person.getDataField(PersonStruct.PERSONALDATA_NAME).setData(cn!=null?cn:sn);
 	person.getDataField(PersonStruct.PERSONALDATA_FIRSTNAME).setData(getAttributeValue('gn', 'givenName'));
 	person.getDataField(PersonStruct.PERSONALDATA_TITLE).setData(getAttributeValue('title', null));
 	var photo = getAttributeValue('photo', null);

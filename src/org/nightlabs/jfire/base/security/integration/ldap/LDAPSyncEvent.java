@@ -49,7 +49,7 @@ public class LDAPSyncEvent implements Serializable{
 	/**
 	 * Collection of JFire objects IDs, i.e. UserID
 	 */
-	private Collection<Object> jfireObjectsIds;
+	private Collection<?> jfireObjectsIds;
 
 	
 	/**
@@ -82,7 +82,7 @@ public class LDAPSyncEvent implements Serializable{
 	 * 
 	 * @return collection of JFire objects IDs
 	 */
-	public Collection<Object> getJFireObjectsIds() {
+	public Collection<?> getJFireObjectsIds() {
 		return jfireObjectsIds;
 	}
 	
@@ -90,7 +90,7 @@ public class LDAPSyncEvent implements Serializable{
 	 * Provide collection of JFire objects IDs for synchronization user data from JFire to LDAP. 
 	 * @param jfireObjectsIds
 	 */
-	public void setJFireObjectsIds(Collection<Object> jfireObjectsIds) {
+	public void setJFireObjectsIds(Collection<?> jfireObjectsIds) {
 		this.jfireObjectsIds = jfireObjectsIds;
 	}
 	

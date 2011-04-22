@@ -26,23 +26,23 @@ importClass(org.nightlabs.jfire.person.PersonStruct);
  */
 
 function getUser(uid){
-	logger.debug("UID is "+ uid);
+	logger.info("UID is "+ uid);
 	var user = null;
 	if (uid != null){	// assume were dealing with User object
 		try{
 			user = User.getUser(pm, organisationID, uid);
 		}catch(e){
 			// user not found - create new one
-			logger.debug("Creating new user...");
+			logger.info("Creating new user...");
 			user = new User(organisationID, uid);
 			
-			logger.debug("Creating new user local...");
+			logger.info("Creating new user local...");
 			new Packages.org.nightlabs.jfire.security.UserLocal(user);
 			
 			user = pm.makePersistent(user);
 			var userLocal = user.getUserLocal();
 			
-			logger.debug("configuring security for new user...");
+			logger.info("configuring security for new user...");
 			var successful = false;
 			try{
 	
@@ -53,28 +53,28 @@ function getUser(uid){
 						'org.nightlabs.jfire.workstation.loginWithoutWorkstation'
 						);
 	
-				logger.debug("begin changing...");
+				logger.info("begin changing...");
 				Packages.org.nightlabs.jfire.security.listener.SecurityChangeController.beginChanging();
 				
-				logger.debug("getting authority...");
+				logger.info("getting authority...");
 				var authority = pm.getObjectById(authorityID);
-				logger.debug("creating AuthorizedObjectRef...");
+				logger.info("creating AuthorizedObjectRef...");
 				var userRef = authority.createAuthorizedObjectRef(userLocal);
 				
-				logger.debug("getting role group by id...");
+				logger.info("getting role group by id...");
 				var roleGroup = pm.getObjectById(logUserRoleGroupID);
-				logger.debug("creating and adding RoleGroupRef to userRef...");
+				logger.info("creating and adding RoleGroupRef to userRef...");
 				userRef.addRoleGroupRef(authority.createRoleGroupRef(roleGroup));
 				
 				successful = true;
 	
-				logger.debug("security configuration done.");
+				logger.info("security configuration done.");
 			}finally{
-				logger.debug("end changing: " + successful);
+				logger.info("end changing: " + successful);
 				Packages.org.nightlabs.jfire.security.listener.SecurityChangeController.endChanging(successful);
 			}
 			
-			logger.debug("user creation done.");
+			logger.info("user creation done.");
 		}
 	}
 	return user;
@@ -99,17 +99,18 @@ function getAttributeValue(name, canonicalName){
 
 function getPerson(user){
 	if (user != null){
-		logger.debug("User != null");
-		person = user.getPerson();
+		logger.info("User != null");
+		var person = user.getPerson();
 		if (person == null){ // 
-			logger.debug("Create new person");
+			logger.info("Create new person");
 			person = new Person(organisationID, newPersonID);
 			user.setPerson(person);
 		}
+		return person;
 	}else if (getAttributeValue('cn', 'commonName') != null){	// assume we are synchronizing just Person
 		// try to find Person object by displayName or create a new one
 
-		logger.debug("User is null, looking for person...");
+		logger.info("User is null, looking for person...");
 		
 		var f = new Packages.org.nightlabs.jfire.person.PersonSearchFilter(Packages.org.nightlabs.jdo.search.SearchFilter.CONJUNCTION_AND);
 		f.setPersistenceManager(pm);
@@ -120,13 +121,15 @@ function getPerson(user){
 						structFiledIDs, Packages.org.nightlabs.jdo.search.MatchType.EQUALS, getAttributeValue('cn', 'commonName')));
 		var results = f.getResult();
 		if (results.size() > 0){	// what if size greater than 1?
-			person = results.iterator().next();
+			return results.iterator().next();
 		}else{
-			logger.debug("Person not found, creating new one...");
-			person = new Person(organisationID, newPersonID);
+			logger.info("Person not found, creating new one...");
+			return new Person(organisationID, newPersonID);
 		}
 		
 	}
+	logger.info("No Person found or created!");
+	return null;
 }
 
 /**
@@ -142,25 +145,25 @@ var sn = getAttributeValue('sn', 'surname');
 
 // set attributes to JFire objects
 if (user != null){
-	logger.debug("set name and description to user");
+	logger.info("set name and description to user");
 	user.setName(cn);
 	user.setDescription(description);
 }
 
 if (person != null){
 
-	logger.debug("setting person data...");
+	logger.info("setting person data...");
 
 	var structLocalId = person.getStructLocalObjectID();
-	logger.debug("loading person struct...");
+	logger.info("loading person struct...");
 	var ps = Packages.org.nightlabs.jfire.prop.StructLocal.getStructLocal(
 			pm, Packages.org.nightlabs.jfire.organisation.Organisation.DEV_ORGANISATION_ID, structLocalId.linkClass, structLocalId.structScope, structLocalId.structLocalScope
 	);
 	
-	logger.debug("inflating person...");
+	logger.info("inflating person...");
 	person.inflate(ps);
 
-	logger.debug("setting data to data fields...");
+	logger.info("setting data to data fields...");
 
 	// personal data
 	person.getDataField(PersonStruct.PERSONALDATA_COMPANY).setData(getAttributeValue('o', 'organizationName'));
@@ -190,10 +193,10 @@ if (person != null){
 	// comment
 	person.getDataField(PersonStruct.COMMENT_COMMENT).setData(description);
 	
-	logger.debug("setting locale to person...");
+	logger.info("setting locale to person...");
 	person.setLocale(new java.util.Locale(getAttributeValue('preferredLanguage')));
 
-	logger.debug("deflating person...");
+	logger.info("deflating person...");
 	person.deflate();
 }
 

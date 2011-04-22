@@ -100,12 +100,13 @@ function getAttributeValue(name, canonicalName){
 function getPerson(user){
 	if (user != null){
 		logger.debug("User != null");
-		person = user.getPerson();
+		var person = user.getPerson();
 		if (person == null){ // 
 			logger.debug("Create new person");
 			person = new Person(organisationID, newPersonID);
 			user.setPerson(person);
 		}
+		return person;
 	}else if (getAttributeValue('cn', 'commonName') != null){	// assume we are synchronizing just Person
 		// try to find Person object by displayName or create a new one
 
@@ -120,13 +121,14 @@ function getPerson(user){
 						structFiledIDs, Packages.org.nightlabs.jdo.search.MatchType.EQUALS, getAttributeValue('cn', 'commonName')));
 		var results = f.getResult();
 		if (results.size() > 0){	// what if size greater than 1?
-			person = results.iterator().next();
+			return results.iterator().next();
 		}else{
 			logger.debug("Person not found, creating new one...");
-			person = new Person(organisationID, newPersonID);
+			return new Person(organisationID, newPersonID);
 		}
-		
 	}
+	logger.debug("No Person found or created!");
+	return null;
 }
 
 /**

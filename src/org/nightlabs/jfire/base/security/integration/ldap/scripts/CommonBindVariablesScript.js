@@ -120,7 +120,13 @@ if (personData != null){
 	$personSalutation$ = getPersonDataFieldValue(personData, PersonStruct.PERSONALDATA_SALUTATION);
 	$personTitle$ = getPersonDataFieldValue(personData, PersonStruct.PERSONALDATA_TITLE);
 	$personDateOfBirth$ = getPersonDataFieldValue(personData, PersonStruct.PERSONALDATA_DATEOFBIRTH);
-	$personPhoto$ = getPersonDataFieldValue(personData, PersonStruct.PERSONALDATA_PHOTO);
+	var personPhotoData = getPersonDataFieldValue(personData, PersonStruct.PERSONALDATA_PHOTO);
+	try{
+		// in case if $personPhoto$ is instance of ImageDataFieldContent we get it's byte[] content
+		$personPhoto$ = personPhotoData.getContent();
+	}catch(e){
+		$personPhoto$ = personPhotoData;
+	}
 	
 	// postadress
 	$personAddress$ = getPersonDataFieldValue(personData, PersonStruct.POSTADDRESS_ADDRESS);

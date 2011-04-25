@@ -27,6 +27,7 @@ import org.nightlabs.jfire.base.security.integration.ldap.LDAPSyncEvent.LDAPSync
 import org.nightlabs.jfire.base.security.integration.ldap.connection.ILDAPConnectionParamsProvider.EncryptionMethod;
 import org.nightlabs.jfire.person.Person;
 import org.nightlabs.jfire.security.User;
+import org.nightlabs.jfire.security.id.UserID;
 import org.nightlabs.jfire.security.integration.UserManagementSystem;
 import org.nightlabs.jfire.security.integration.UserManagementSystemCommunicationException;
 import org.nightlabs.jfire.security.integration.UserManagementSystemType;
@@ -110,9 +111,6 @@ public class LDAPManagerBean extends BaseSessionBeanImpl implements LDAPManagerR
 	}
 
 	private void configureJFireAsLeadingSystem(PersistenceManager pm){
-		// FIXME: Now if User is stored this listener will be called twice -
-		// both for User and Person objects. Need to figure out if Person is connected with
-		// User or it's just a stand-alone Person object.
 		pm.getPersistenceManagerFactory().addInstanceLifecycleListener(
 				syncStoreLifecycleListener, new Class[]{User.class, Person.class}
 				);
@@ -200,15 +198,44 @@ public class LDAPManagerBean extends BaseSessionBeanImpl implements LDAPManagerR
 			}
 			
 			try {
+				Object persistentInstance = event.getPersistentInstance();
+				PersistenceManager pm = JDOHelper.getPersistenceManager(persistentInstance);
+				
 				// Determine if JFire is a leading system for at least one existent LDAPServer, 
 				// therefore we query all NON leading LDAPServers.
 				Collection<LDAPServer> nonLeadingSystems = UserManagementSystem.getUserManagementSystemsByLeading(
-						JDOHelper.getPersistenceManager(event.getPersistentInstance()), false, LDAPServer.class
+						pm, false, LDAPServer.class
 						);
 				if (!nonLeadingSystems.isEmpty()){
 
+					// If object being stored is a Person than we proceed with synchronization 
+					// ONLY if this Person is NOT related to any User object - in this case we consider
+					// this Person to be a separate entry in LDAP. If Person is related to at least one User
+					// we consider that all Person data will be synchronized to LDAP when storing corresponding
+					// User object. Denis.
+					if (persistentInstance instanceof Person){
+						Person person = (Person) persistentInstance;
+						javax.jdo.Query q = pm.newQuery(User.class);
+						try{
+							q.setResult("JDOHelper.getObjectId(this)");
+							q.setFilter("this.person == :person");
+							
+							@SuppressWarnings("unchecked")
+							Collection<UserID> userIds = (Collection<UserID>) q.execute(person);
+							
+							if (userIds != null 
+									&& !userIds.isEmpty()){
+								logger.info("Person being stored is related to at least one User and therefore this Person will NOT be synchonized to LDAP.");
+								return;
+							}
+							
+						}finally{
+							q.closeAll();
+						}
+					}
+					
 					AsyncInvoke.exec(
-							new SyncToLDAPServersInvocation(JDOHelper.getObjectId(event.getPersistentInstance())), true
+							new SyncToLDAPServersInvocation(JDOHelper.getObjectId(persistentInstance)), true
 							);
 					
 				}

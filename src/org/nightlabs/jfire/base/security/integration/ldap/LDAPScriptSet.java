@@ -194,7 +194,7 @@ public class LDAPScriptSet implements Serializable{
 			b.put("person", jfireObject);
 		}
 
-		Object result = execute(bindVariablesScript+ldapDNScript, ctx);
+		Object result = execute(bindVariablesScript + ldapDNScript, ctx);
 		if (result != null){
 			return result.toString();
 		}

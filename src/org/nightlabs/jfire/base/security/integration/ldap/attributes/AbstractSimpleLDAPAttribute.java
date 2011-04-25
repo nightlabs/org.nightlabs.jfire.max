@@ -28,7 +28,7 @@ public abstract class AbstractSimpleLDAPAttribute<ValueType> implements LDAPAttr
 	 * 
 	 * @param name
 	 */
-	public AbstractSimpleLDAPAttribute(String name){
+	protected AbstractSimpleLDAPAttribute(String name){
 		this.name = name;
 	}
 
@@ -38,7 +38,7 @@ public abstract class AbstractSimpleLDAPAttribute<ValueType> implements LDAPAttr
 	 * @param name
 	 * @param value
 	 */
-	public AbstractSimpleLDAPAttribute(String name, ValueType value){
+	protected AbstractSimpleLDAPAttribute(String name, ValueType value){
 		this.name = name;
 		this.values.add(value);
 	}
@@ -128,7 +128,7 @@ public abstract class AbstractSimpleLDAPAttribute<ValueType> implements LDAPAttr
 	 */
 	@Override
 	public boolean hasSingleValue() {
-		return values.size() == 1;
+		return 1 == values.size();
 	}
 
 	/**
@@ -143,13 +143,13 @@ public abstract class AbstractSimpleLDAPAttribute<ValueType> implements LDAPAttr
 	public String toString() {
 		StringBuffer toStringValue = new StringBuffer();
 		toStringValue.append(name);
-		toStringValue.append("=");
+		toStringValue.append('=');
 		if (hasSingleValue()){
 			toStringValue.append(getValue());
 		}else{
 			for (ValueType value : getValues()){
 				toStringValue.append(value);
-				toStringValue.append(" ");
+				toStringValue.append(' ');
 			}
 		}
 		return toStringValue.toString();

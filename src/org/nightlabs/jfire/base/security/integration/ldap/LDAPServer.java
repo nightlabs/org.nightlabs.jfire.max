@@ -807,7 +807,7 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 		}
 	}
 	
-	private void bindForSync(LDAPConnection  connection, PersistenceManager pm) throws LoginException, LDAPSyncException, UserManagementSystemCommunicationException{
+	private void bindForSync(LDAPConnection  connection, PersistenceManager pm) throws LoginException, UserManagementSystemCommunicationException{
 		
 		try{
 			// if some User is logged in than we assume that bind operation has been already performed

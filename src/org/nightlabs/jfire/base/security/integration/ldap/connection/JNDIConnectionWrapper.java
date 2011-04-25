@@ -271,7 +271,7 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper{
 				try{
 					Map<String, LDAPAttributeSet> returnMap = new HashMap<String, LDAPAttributeSet>();
 					while (result.hasMoreElements()) {
-						SearchResult searchResult = (SearchResult) result.nextElement();
+						SearchResult searchResult = result.nextElement();
 						returnMap.put(searchResult.getNameInNamespace(), getLDAPAttributeSet(searchResult.getAttributes()));
 					}
 					return returnMap;
@@ -309,7 +309,7 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper{
 				try{
 					Collection<String> childNames = new ArrayList<String>();
 					while (childEntries.hasMoreElements()) {
-						NameClassPair pair = (NameClassPair) childEntries.nextElement();
+						NameClassPair pair = childEntries.nextElement();
 						childNames.add(pair.getNameInNamespace());
 					}
 					return childNames;
@@ -342,7 +342,7 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper{
 			try {
 				context.close();
 			} catch (NamingException e) {
-				// ignore
+				logger.debug(e.getMessage(), e);
 			}
 			context = null;
 		}
@@ -350,7 +350,7 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper{
 		System.gc();
 	}
 
-	private static int MAX_TRIES = 3;
+	private static final int MAX_TRIES = 3;
 	/**
 	 * LDAP servers often have an idle timeout period after which they will close connections no longer being used.
 	 * That's why we need this listener to catch connection exceptions from LDAP server. If such exception is caught

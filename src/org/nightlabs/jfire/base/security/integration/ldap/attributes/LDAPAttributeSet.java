@@ -214,7 +214,7 @@ public class LDAPAttributeSet implements Iterable<LDAPAttribute<Object>>{
 		StringBuffer toStringValue = new StringBuffer();
 		for (LDAPAttribute<Object> attribute : attributes.values()){
 			toStringValue.append(attribute.toString());
-			toStringValue.append("\n");
+			toStringValue.append(System.getProperty("line.separator"));
 		}
 		return toStringValue.toString();
 	}

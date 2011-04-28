@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import org.nightlabs.jdo.query.QueryCollection;
 import org.nightlabs.jfire.accounting.AccountingManagerRemote;
 import org.nightlabs.jfire.accounting.MoneyTransfer;
 import org.nightlabs.jfire.accounting.query.MoneyTransferIDQuery;
@@ -62,6 +63,19 @@ extends BaseJDOObjectDAO<TransferID, MoneyTransfer>
 			return getJDOObjects(null, transferIDs, fetchGroups, maxFetchDepth, monitor);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
+		}
+	}
+	
+	public List<MoneyTransfer> getMoneyTransfersForQueries(
+			QueryCollection<? extends MoneyTransferQuery> queries,	String[] fetchGroups,
+			int maxFetchDepth, ProgressMonitor monitor)
+	{
+		try {
+			AccountingManagerRemote am = getEjbProvider().getRemoteBean(AccountingManagerRemote.class);
+			Set<TransferID> moneyTransferIDs = am.getMoneyTransferIDs(queries);
+			return getJDOObjects(null, moneyTransferIDs, fetchGroups, maxFetchDepth, monitor);
+		} catch (Exception x) {
+			throw new RuntimeException(x);
 		}
 	}
 }

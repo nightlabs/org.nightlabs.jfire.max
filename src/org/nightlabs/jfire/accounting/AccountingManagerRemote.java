@@ -556,4 +556,7 @@ public interface AccountingManagerRemote {
 	List<Payment> getPayments(final Collection<PaymentID> paymentIDs, final String[] fetchGroups, final int maxFetchDepth);
 	
 	String ping(String message);
+	
+	Set<TransferID> getMoneyTransferIDs(
+			QueryCollection<? extends AbstractJDOQuery> queries);
 }

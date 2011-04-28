@@ -2159,4 +2159,42 @@ implements AccountingManagerRemote, AccountingManagerLocal
 			pm.close();
 		}
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.accounting.AccountingManagerRemote#getMoneyTransferIDs(org.nightlabs.jdo.query.QueryCollection)
+	 */
+	@RolesAllowed("org.nightlabs.jfire.accounting.queryAccounts")
+	@SuppressWarnings("unchecked")
+	@Override
+	public Set<TransferID> getMoneyTransferIDs(QueryCollection<? extends AbstractJDOQuery> queries)
+	{
+		if (queries == null)
+			return null;
+
+		if (!MoneyTransfer.class.isAssignableFrom(queries.getResultClass()))
+		{
+			throw new RuntimeException("Given QueryCollection has invalid return type! " +
+					"Invalid return type= "+ queries.getResultClassName());
+		}
+
+		final PersistenceManager pm = createPersistenceManager();
+		try {
+			pm.getFetchPlan().setMaxFetchDepth(1);
+			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
+
+			if (!(queries instanceof JDOQueryCollectionDecorator))
+			{
+				queries = new JDOQueryCollectionDecorator<AbstractJDOQuery>(queries);
+			}
+			final JDOQueryCollectionDecorator<AbstractJDOQuery> decoratedQueries =
+				(JDOQueryCollectionDecorator<AbstractJDOQuery>) queries;
+
+			decoratedQueries.setPersistenceManager(pm);
+			final Collection<MoneyTransfer> moneyTransfers = (Collection<MoneyTransfer>) decoratedQueries.executeQueries();
+
+			return NLJDOHelper.getObjectIDSet(moneyTransfers);
+		} finally {
+			pm.close();
+		}
+	}
 }

@@ -22,7 +22,7 @@ public abstract class AbstractTransferQuery
 	private AnchorID currentAnchorID = null;
 	private AnchorID otherAnchorID = null;
 
-
+	
 	// TODO JPOX WORKAROUND begin
 	@SuppressWarnings("unused")
 	private transient Anchor fromAnchor = null;

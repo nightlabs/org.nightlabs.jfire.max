@@ -73,6 +73,10 @@ import org.slf4j.LoggerFactory;
 		)
 public class LDAPServer extends UserManagementSystem implements ILDAPConnectionParamsProvider{
 
+	public static final int LDAP_DEFAULT_PORT = 10389;
+	public static final String LDAP_DEFAULT_HOST = "localhost";
+	public static final EncryptionMethod LDAP_DEFAULT_ENCRYPTION_METHOD = EncryptionMethod.NONE;
+
 	public static final String SYNC_USER_DATA_FROM_LDAP_TASK_ID = "JFireLDAP-syncUserDataFromLDAP";
 	public static final String FETCH_GROUP_LDAP_SCRIPT_SET = "LDAPServer.ldapScriptSet";
 

@@ -320,10 +320,6 @@ public class LDAPManagerBean extends BaseSessionBeanImpl implements LDAPManagerR
 	private static final String PROP_LDAP_REMOVE_SERVER_INSTANCE = "ldapServer%s.remove";
 	private static final String PROP_LDAP_SERVER_IS_LEADING = "ldapServer%s.isLeading";
 
-	private static final int LDAP_DEFAULT_PORT = 10389;
-	private static final String LDAP_DEFAULT_HOST = "localhost";
-	private static final EncryptionMethod LDAP_DEFAULT_ENCRYPTION_METHOD = EncryptionMethod.NONE;
-
 	/**
 	 * <p>Reads a property file "ldap.properties" from  JFire server data directory (i.e. "/server/default/data/jfire") 
 	 * and creates, modifies or removes {@link LDAPServer) instances according to specified properties' values.</p>
@@ -374,21 +370,21 @@ public class LDAPManagerBean extends BaseSessionBeanImpl implements LDAPManagerR
 					
 					String host = ldapProps.getProperty(String.format(PROP_LDAP_SERVER_HOST, i));
 					if (host == null || "".equals(host)){
-						host = LDAP_DEFAULT_HOST;
+						host = LDAPServer.LDAP_DEFAULT_HOST;
 					}
 					
 					int port = 0;
 					try{
 						port = Integer.parseInt(ldapProps.getProperty(String.format(PROP_LDAP_SERVER_PORT, i)));
 					}catch(NumberFormatException e){
-						port = LDAP_DEFAULT_PORT;
+						port = LDAPServer.LDAP_DEFAULT_PORT;
 					}
 					
 					EncryptionMethod encryptionMethod = null;
 					try{
 						encryptionMethod = EncryptionMethod.valueOf(EncryptionMethod.class, ldapProps.getProperty(String.format(PROP_LDAP_SERVER_ENCRYPTION_METHOD, i)));
 					}catch(Exception e){
-						encryptionMethod = LDAP_DEFAULT_ENCRYPTION_METHOD;
+						encryptionMethod = LDAPServer.LDAP_DEFAULT_ENCRYPTION_METHOD;
 					}
 					
 					boolean isActive = false;

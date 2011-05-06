@@ -135,7 +135,7 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper{
 		if (context != null && isConnected) {
 			
 			authMethod = AuthenticationMethod.NONE.stringValue();
-			if (AuthenticationMethod.SIMPLE.equals(connection.getConnectionParamsProvider().getAuthMethod())) {
+			if (AuthenticationMethod.SIMPLE.equals(connection.getConnectionParamsProvider().getAuthenticationMethod())) {
 				authMethod = AuthenticationMethod.SIMPLE.stringValue();
 			}
 

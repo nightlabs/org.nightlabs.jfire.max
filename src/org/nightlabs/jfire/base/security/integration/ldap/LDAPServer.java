@@ -139,6 +139,13 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 	private EncryptionMethod encryptionMethod;
 	
 	/**
+	 * Authentication method used when binding against LDAP server
+	 * IMPORTANT! For now only SIMPLE method is supported or NONE for anonymous access.
+	 */
+	@Persistent(defaultFetchGroup="true")
+	private AuthenticationMethod authenticationMethod = AuthenticationMethod.SIMPLE;
+	
+	/**
 	 * DN used for binding agains LDAP server during synchronization process
 	 */
 	@Persistent
@@ -370,8 +377,24 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 	 * {@inheritDoc}
 	 */
 	@Override
-	public AuthenticationMethod getAuthMethod() {
-		return AuthenticationMethod.SIMPLE;
+	public AuthenticationMethod getAuthenticationMethod() {
+		return authenticationMethod;
+	}
+	
+	/**
+	 * Set Authentication method for this LDAPServer.
+	 * IMPORTANT! For now only SIMPLE method is supported or NONE for anonymous access.
+	 * 
+	 * @param authenticationMethod
+	 */
+	public void setAuthenticationMethod(AuthenticationMethod authenticationMethod) {
+		if (AuthenticationMethod.NONE.equals(authenticationMethod)){
+			logger.info("AuthenticationMethod was set to NONE, which means anonymous access only.");
+		}else if (!AuthenticationMethod.SIMPLE.equals(authenticationMethod)){
+			logger.warn("For now only SIMPLE method is supported or NONE for anonymous access, setting it to SIMPLE");
+			authenticationMethod = AuthenticationMethod.SIMPLE;
+		}
+		this.authenticationMethod = authenticationMethod;
 	}
 
 	/**
@@ -480,7 +503,7 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
     				"LDAPConnection recieved. Trying to bind against LDAPServer at " +
     				params.getHost() + ":" + params.getPort() +
     				" Encryption: " + params.getEncryptionMethod().stringValue() +
-    				" Auth method: " + params.getAuthMethod().stringValue()
+    				" Auth method: " + params.getAuthenticationMethod().stringValue()
     				);
     	}
 
@@ -499,7 +522,7 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
     				"Unbinding and releasing connection for LDAP server at" +
     				params.getHost() + ":" + params.getPort() +
     				" Encryption: " + params.getEncryptionMethod().stringValue() +
-    				" Auth method: " + params.getAuthMethod().stringValue()
+    				" Auth method: " + params.getAuthenticationMethod().stringValue()
     				);
     	}
 		
@@ -517,7 +540,7 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 			return false;
 		}
 		
-		if (AuthenticationMethod.SIMPLE.equals(getAuthMethod())
+		if (AuthenticationMethod.SIMPLE.equals(getAuthenticationMethod())
 				&& (password == null || "".equals(password))){
 			// For simple auth method LDAP doesn't support authentication without password.
 			// If password is not provided than it's supposed by LDAP that access is anonymous.

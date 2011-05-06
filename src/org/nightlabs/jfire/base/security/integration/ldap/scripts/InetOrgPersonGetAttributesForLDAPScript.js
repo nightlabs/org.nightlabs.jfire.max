@@ -7,8 +7,6 @@
  * This script is used for generating a LDAPAttributeSet with attributes names and values which is then passed in LDAP modidifcation calls.
  * Used for synchronization when JFire is a leading system.
  *  
- * It makes java object passed to evaluating ScriptContext: <code>atributes</code> - LDAPAttributeSet to add all attributes to.
- *   
  * Returns LDAPAttributeSet.
  * 
  * @author Denis Dudnik <deniska.dudnik[at]gmail{dot}com>

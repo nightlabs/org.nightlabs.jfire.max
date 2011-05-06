@@ -63,7 +63,7 @@ public interface ILDAPConnectionParamsProvider{
      * 
      * @return the auth method
      */
-    public AuthenticationMethod getAuthMethod();
+    public AuthenticationMethod getAuthenticationMethod();
 
     /**
      * Gets the encryption method.

@@ -194,6 +194,7 @@ if (person != null){
 	person.getDataField(PersonStruct.COMMENT_COMMENT).setData(description);
 	
 	logger.info("setting locale to person...");
+	// REV Alex: Not nullsave here, what about the other other calls to getAttributeValue(), do we have to secure their usage, too?
 	person.setLocale(new java.util.Locale(getAttributeValue('preferredLanguage')));
 
 	logger.info("deflating person...");

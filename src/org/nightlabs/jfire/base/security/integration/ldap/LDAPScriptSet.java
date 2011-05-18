@@ -120,11 +120,27 @@ public class LDAPScriptSet implements Serializable{
 	}
 	
 	/**
+	 * Get ldapDNScript contents
+	 * @return script contents as {@link String}
+	 */
+	public String getLdapDNScript() {
+		return ldapDNScript;
+	}
+	
+	/**
 	 * Set syncJFireToLdapScript content
 	 * @param syncJFireToLdapScript
 	 */
 	public void setGenerateJFireToLdapAttributesScript(String syncJFireToLdapScript) {
 		this.generateJFireToLdapAttributesScript = syncJFireToLdapScript;
+	}
+	
+	/**
+	 * Get syncJFireToLdapScript contents
+	 * @return script contents as {@link String}
+	 */
+	public String getGenerateJFireToLdapAttributesScript() {
+		return generateJFireToLdapAttributesScript;
 	}
 	
 	/**
@@ -136,6 +152,14 @@ public class LDAPScriptSet implements Serializable{
 	}
 	
 	/**
+	 * Get syncLdapToJFireScript contents
+	 * @return script contents as {@link String}
+	 */
+	public String getSyncLdapToJFireScript() {
+		return syncLdapToJFireScript;
+	}
+	
+	/**
 	 * Set bindVariablesScript content
 	 * @param bindVariablesScript
 	 */
@@ -144,11 +168,27 @@ public class LDAPScriptSet implements Serializable{
 	}
 	
 	/**
+	 * Get bindVariablesScript contents
+	 * @return script contents as {@link String}
+	 */
+	public String getBindVariablesScript() {
+		return bindVariablesScript;
+	}
+	
+	/**
 	 * Set generateParentLdapEntriesScript content
 	 * @param generateParentLdapEntriesScript
 	 */
 	public void setGenerateParentLdapEntriesScript(String generateParentLdapEntriesScript) {
 		this.generateParentLdapEntriesScript = generateParentLdapEntriesScript;
+	}
+	
+	/**
+	 * Get generateParentLdapEntriesScript contents
+	 * @return script contents as {@link String}
+	 */
+	public String getGenerateParentLdapEntriesScript() {
+		return generateParentLdapEntriesScript;
 	}
 	
 	/**

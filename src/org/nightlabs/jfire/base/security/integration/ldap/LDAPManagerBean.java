@@ -4,8 +4,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
+import java.util.Set;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
@@ -15,22 +18,26 @@ import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.JDOUserCallbackException;
 import javax.jdo.PersistenceManager;
+import javax.jdo.Query;
 import javax.jdo.listener.InstanceLifecycleEvent;
 import javax.jdo.listener.StoreLifecycleListener;
 import javax.security.auth.login.LoginException;
 
+import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.asyncinvoke.AsyncInvoke;
 import org.nightlabs.jfire.asyncinvoke.AsyncInvokeEnqueueException;
 import org.nightlabs.jfire.asyncinvoke.Invocation;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.base.security.integration.ldap.LDAPSyncEvent.LDAPSyncEventType;
 import org.nightlabs.jfire.base.security.integration.ldap.connection.ILDAPConnectionParamsProvider.EncryptionMethod;
+import org.nightlabs.jfire.base.security.integration.ldap.id.LDAPScriptSetID;
 import org.nightlabs.jfire.person.Person;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.security.id.UserID;
 import org.nightlabs.jfire.security.integration.UserManagementSystem;
 import org.nightlabs.jfire.security.integration.UserManagementSystemCommunicationException;
 import org.nightlabs.jfire.security.integration.UserManagementSystemType;
+import org.nightlabs.jfire.security.integration.id.UserManagementSystemID;
 import org.nightlabs.jfire.server.data.dir.JFireServerDataDirectory;
 import org.nightlabs.jfire.timer.Task;
 import org.nightlabs.jfire.timer.id.TaskID;
@@ -46,6 +53,7 @@ import org.slf4j.LoggerFactory;
  * @author Denis Dudnik <deniska.dudnik[at]gmail{dot}com>
  *
  */
+@TransactionAttribute(TransactionAttributeType.REQUIRED)
 @Stateless(
 		mappedName="jfire/ejb/JFireLDAP/LDAPManager", 
 		name="jfire/ejb/JFireLDAP/LDAPManager"
@@ -54,6 +62,9 @@ public class LDAPManagerBean extends BaseSessionBeanImpl implements LDAPManagerR
 	
 	private static final Logger logger = LoggerFactory.getLogger(LDAPManagerBean.class);
 	
+	/**
+	 * {@inheritDoc}
+	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("_System_")
 	@Override
@@ -83,6 +94,79 @@ public class LDAPManagerBean extends BaseSessionBeanImpl implements LDAPManagerR
 		
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
+	@RolesAllowed("org.nightlabs.jfire.security.accessRightManagement")
+	@Override
+	public List<LDAPScriptSet> getLDAPScriptSets(Set<LDAPScriptSetID> objectIDs, String[] fetchGroups, int maxFetchDepth) {
+		if (objectIDs == null){
+			throw new IllegalArgumentException("Object IDs should be specified (not null) for loading LDAP script sets!");
+		}
+		PersistenceManager pm = createPersistenceManager();
+		try {
+			return NLJDOHelper.getDetachedObjectList(pm, objectIDs, LDAPScriptSet.class, fetchGroups, maxFetchDepth);
+		} finally {
+			pm.close();
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@SuppressWarnings("unchecked")
+	@RolesAllowed("org.nightlabs.jfire.security.accessRightManagement")
+	@Override
+	public LDAPScriptSetID getLDAPScriptSetID(UserManagementSystemID ldapServerID) {
+		PersistenceManager pm = createPersistenceManager();
+		try{
+			Query query = pm.newQuery(pm.getExtent(LDAPScriptSet.class, true));
+			query.setResult("JDOHelper.getObjectId(this)");
+			HashSet<LDAPScriptSetID> hashSet = new HashSet<LDAPScriptSetID>((Collection<LDAPScriptSetID>) query.execute());
+			if (hashSet.size() > 0){
+				return hashSet.iterator().next();
+			}
+			return null;
+		}finally{
+			pm.close();
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("org.nightlabs.jfire.security.accessRightManagement")
+	@Override
+	public LDAPScriptSet storeLDAPScriptSet(LDAPScriptSet ldapScriptSet, boolean get, String[] fetchGroups, int maxFetchDepth) {
+		if (ldapScriptSet == null){
+			logger.warn("Can't store NULL ldapScriptSet, return null.");
+			return null;
+		}
+		
+		PersistenceManager pm = createPersistenceManager();
+		try{
+			
+			ldapScriptSet = pm.makePersistent(ldapScriptSet);
+			
+			if (!get){
+				return null;
+			}
+
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+			if (fetchGroups != null)
+				pm.getFetchPlan().setGroups(fetchGroups);
+
+			return pm.detachCopy(ldapScriptSet);
+			
+		}finally{
+			pm.close();
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("_System_")
 	@Override

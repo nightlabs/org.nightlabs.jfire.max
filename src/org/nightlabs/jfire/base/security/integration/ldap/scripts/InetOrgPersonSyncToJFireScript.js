@@ -26,23 +26,23 @@ importClass(org.nightlabs.jfire.person.PersonStruct);
  */
 
 function getUser(uid){
-	logger.info("UID is "+ uid);
+	logger.debug("UID is "+ uid);
 	var user = null;
 	if (uid != null){	// assume were dealing with User object
 		try{
 			user = User.getUser(pm, organisationID, uid);
 		}catch(e){
 			// user not found - create new one
-			logger.info("Creating new user...");
+			logger.debug("Creating new user...");
 			user = new User(organisationID, uid);
 			
-			logger.info("Creating new user local...");
+			logger.debug("Creating new user local...");
 			new Packages.org.nightlabs.jfire.security.UserLocal(user);
 			
 			user = pm.makePersistent(user);
 			var userLocal = user.getUserLocal();
 			
-			logger.info("configuring security for new user...");
+			logger.debug("configuring security for new user...");
 			var successful = false;
 			try{
 	
@@ -53,28 +53,28 @@ function getUser(uid){
 						'org.nightlabs.jfire.workstation.loginWithoutWorkstation'
 						);
 	
-				logger.info("begin changing...");
+				logger.debug("begin changing...");
 				Packages.org.nightlabs.jfire.security.listener.SecurityChangeController.beginChanging();
 				
-				logger.info("getting authority...");
+				logger.debug("getting authority...");
 				var authority = pm.getObjectById(authorityID);
-				logger.info("creating AuthorizedObjectRef...");
+				logger.debug("creating AuthorizedObjectRef...");
 				var userRef = authority.createAuthorizedObjectRef(userLocal);
 				
-				logger.info("getting role group by id...");
+				logger.debug("getting role group by id...");
 				var roleGroup = pm.getObjectById(logUserRoleGroupID);
-				logger.info("creating and adding RoleGroupRef to userRef...");
+				logger.debug("creating and adding RoleGroupRef to userRef...");
 				userRef.addRoleGroupRef(authority.createRoleGroupRef(roleGroup));
 				
 				successful = true;
 	
-				logger.info("security configuration done.");
+				logger.debug("security configuration done.");
 			}finally{
-				logger.info("end changing: " + successful);
+				logger.debug("end changing: " + successful);
 				Packages.org.nightlabs.jfire.security.listener.SecurityChangeController.endChanging(successful);
 			}
 			
-			logger.info("user creation done.");
+			logger.debug("user creation done.");
 		}
 	}
 	return user;
@@ -99,10 +99,10 @@ function getAttributeValue(name, canonicalName){
 
 function getPerson(user){
 	if (user != null){
-		logger.info("User != null");
+		logger.debug("User != null");
 		var person = user.getPerson();
 		if (person == null){ // 
-			logger.info("Create new person");
+			logger.debug("Create new person");
 			person = new Person(organisationID, newPersonID);
 			user.setPerson(person);
 		}
@@ -110,7 +110,7 @@ function getPerson(user){
 	}else if (getAttributeValue('cn', 'commonName') != null){	// assume we are synchronizing just Person
 		// try to find Person object by displayName or create a new one
 
-		logger.info("User is null, looking for person...");
+		logger.debug("User is null, looking for person...");
 		
 		var f = new Packages.org.nightlabs.jfire.person.PersonSearchFilter(Packages.org.nightlabs.jdo.search.SearchFilter.CONJUNCTION_AND);
 		f.setPersistenceManager(pm);
@@ -123,12 +123,12 @@ function getPerson(user){
 		if (results.size() > 0){	// what if size greater than 1?
 			return results.iterator().next();
 		}else{
-			logger.info("Person not found, creating new one...");
+			logger.debug("Person not found, creating new one...");
 			return new Person(organisationID, newPersonID);
 		}
 		
 	}
-	logger.info("No Person found or created!");
+	logger.debug("No Person found or created!");
 	return null;
 }
 
@@ -145,25 +145,25 @@ var sn = getAttributeValue('sn', 'surname');
 
 // set attributes to JFire objects
 if (user != null){
-	logger.info("set name and description to user");
+	logger.debug("set name and description to user");
 	user.setName(cn);
 	user.setDescription(description);
 }
 
 if (person != null){
 
-	logger.info("setting person data...");
+	logger.debug("setting person data...");
 
 	var structLocalId = person.getStructLocalObjectID();
-	logger.info("loading person struct...");
+	logger.debug("loading person struct...");
 	var ps = Packages.org.nightlabs.jfire.prop.StructLocal.getStructLocal(
 			pm, Packages.org.nightlabs.jfire.organisation.Organisation.DEV_ORGANISATION_ID, structLocalId.linkClass, structLocalId.structScope, structLocalId.structLocalScope
 	);
 	
-	logger.info("inflating person...");
+	logger.debug("inflating person...");
 	person.inflate(ps);
 
-	logger.info("setting data to data fields...");
+	logger.debug("setting data to data fields...");
 
 	// personal data
 	person.getDataField(PersonStruct.PERSONALDATA_COMPANY).setData(getAttributeValue('o', 'organizationName'));
@@ -193,11 +193,11 @@ if (person != null){
 	// comment
 	person.getDataField(PersonStruct.COMMENT_COMMENT).setData(description);
 	
-	logger.info("setting locale to person...");
+	logger.debug("setting locale to person...");
 	// REV Alex: Not nullsave here, what about the other other calls to getAttributeValue(), do we have to secure their usage, too?
 	person.setLocale(new java.util.Locale(getAttributeValue('preferredLanguage')));
 
-	logger.info("deflating person...");
+	logger.debug("deflating person...");
 	person.deflate();
 }
 

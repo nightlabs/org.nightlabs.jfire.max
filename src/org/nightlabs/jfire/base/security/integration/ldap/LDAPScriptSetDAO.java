@@ -25,8 +25,11 @@ public class LDAPScriptSetDAO extends BaseJDOObjectDAO<LDAPScriptSetID, LDAPScri
 	 * @return The shared instance
 	 */
 	public static LDAPScriptSetDAO sharedInstance(){
-		if (sharedInstance == null){
-			sharedInstance = new LDAPScriptSetDAO();
+		if (sharedInstance == null) {
+			synchronized (LDAPScriptSetDAO.class) {
+				if (sharedInstance == null)
+					sharedInstance = new LDAPScriptSetDAO();
+			}
 		}
 		return sharedInstance;
 	}

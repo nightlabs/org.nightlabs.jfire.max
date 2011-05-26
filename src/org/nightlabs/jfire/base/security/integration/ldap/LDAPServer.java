@@ -454,6 +454,21 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 		return ldapScriptSet;
 	}
 	
+	/**
+	 * Set LDAP entry name which will be used as base entry for generating LDAP distingueshed names by {@link LDAPScriptSet}.
+	 * 
+	 * @param entryName
+	 */
+	public void setBaseDN(String entryName) {
+		if (entryName == null){
+			return;
+		}
+		ldapScriptSet.setLdapDNScript(
+				ldapScriptSet.getLdapDNScript().replaceAll(LDAPScriptSet.BASE_ENTRY_NAME_PLACEHOLDER, entryName));
+		ldapScriptSet.setGenerateParentLdapEntriesScript(
+				ldapScriptSet.getGenerateParentLdapEntriesScript().replaceAll(LDAPScriptSet.BASE_ENTRY_NAME_PLACEHOLDER, entryName));
+	}
+	
 
 	private User getUserById(PersistenceManager pm, String organisationId, String userId){
 		if (pm == null){

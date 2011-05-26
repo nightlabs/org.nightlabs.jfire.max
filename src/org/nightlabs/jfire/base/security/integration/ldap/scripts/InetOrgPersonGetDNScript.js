@@ -4,7 +4,9 @@
  * 
  * This script makes use of variables from CommonBindVariablesScript.js, so it SHOULD be executed first.
  * 
- * This script is used for generating a String with LDAP entry DN usign User/Person data.  
+ * This script is used for generating a String with LDAP entry DN usign User/Person data.
+ * 
+ * NOTE that "BASE_ENTRY_NAME_PLACEHOLDER" could be replaced with another existing LDAP entry.
  * 
  * Returns a String with LDAP entry DN.
  * 
@@ -15,9 +17,9 @@
 // differently, we have our users as cn, and other Persons with sn)
 var dn = null;
 if (userData != null && $userID$ != null){
-	dn = 'uid='+$userID$+',ou=staff,ou=people,dc=nightlabs,dc=de';
+	dn = 'uid='+$userID$+',BASE_ENTRY_NAME_PLACEHOLDER';
 }else if (personData != null && $personName$ != null){
 	// REV Alex: Maybe use personDisplayName or some other concatenated value as cn
-	dn = 'cn='+$personName$+',ou=staff,ou=people,dc=nightlabs,dc=de';
+	dn = 'cn='+$personName$+',BASE_ENTRY_NAME_PLACEHOLDER';
 }
 dn;

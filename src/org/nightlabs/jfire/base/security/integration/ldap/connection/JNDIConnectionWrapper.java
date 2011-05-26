@@ -4,9 +4,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.naming.AuthenticationException;
 import javax.naming.CommunicationException;
@@ -18,6 +20,7 @@ import javax.naming.Name;
 import javax.naming.NameClassPair;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
+import javax.naming.NoPermissionException;
 import javax.naming.ServiceUnavailableException;
 import javax.naming.directory.Attribute;
 import javax.naming.directory.Attributes;
@@ -25,6 +28,7 @@ import javax.naming.directory.BasicAttribute;
 import javax.naming.directory.BasicAttributes;
 import javax.naming.directory.DirContext;
 import javax.naming.directory.ModificationItem;
+import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 import javax.naming.event.EventContext;
 import javax.naming.event.EventDirContext;
@@ -302,21 +306,31 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper{
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Collection<String> getChildEntries(String parentName) throws UserManagementSystemCommunicationException{
+	public Collection<String> getChildEntries(String parentName) throws UserManagementSystemCommunicationException, LoginException{
 		try {
 			synchronized (context) {
-				NamingEnumeration<NameClassPair> childEntries = context.list(getSaveJndiName(parentName));
-				try{
-					Collection<String> childNames = new ArrayList<String>();
-					while (childEntries.hasMoreElements()) {
-						NameClassPair pair = childEntries.nextElement();
-						childNames.add(pair.getNameInNamespace());
+				if (parentName == null || parentName.isEmpty()){
+					
+					return getRootEntries();
+					
+		 		}else{
+					NamingEnumeration<NameClassPair> childEntries = context.list(getSaveJndiName(parentName));
+					try{
+						Collection<String> childNames = new ArrayList<String>();
+						while (childEntries.hasMoreElements()) {
+							NameClassPair pair = childEntries.nextElement();
+							childNames.add(pair.getNameInNamespace());
+						}
+						
+						return childNames;
+						
+					}finally{
+						childEntries.close();
 					}
-					return childNames;
-				}finally{
-					childEntries.close();
-				}
+		 		}
 			}
+		} catch (NoPermissionException e){
+			throw new LoginException("Insufficient permissions! Bind against this LDAP server or enable anonymous access. Failed to get child entries for parent with DN: " + parentName);
 		} catch (NamingException e) {
 			throw new UserManagementSystemCommunicationException("Failed to get child entries for parent with DN: " + parentName, e);
 		}
@@ -478,6 +492,91 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper{
         
         return atts;
 	}
+
+	
+	private static final String NAMING_CONTEXTS_ATTRIBUTE = "namingContexts";
+
+	private Collection<String> getRootEntries() throws NamingException {
+		
+		SearchControls controls = new SearchControls();
+		controls.setSearchScope(SearchControls.OBJECT_SCOPE);
+		controls.setReturningAttributes(new String[]{NAMING_CONTEXTS_ATTRIBUTE});
+		NamingEnumeration<SearchResult> childEntries = context.search("", "(objectclass=*)", controls);
+		Attributes rootDSEAttributes = null;
+		try{
+			if (childEntries.hasMoreElements()) {
+				rootDSEAttributes = childEntries.nextElement().getAttributes();
+			}
+		}finally{
+			childEntries.close();
+		}
+		
+		Collection<String> returnChildEntries = new ArrayList<String>();
+		if (rootDSEAttributes != null){
+			
+            Set<String> namingContextSet = new HashSet<String>();
+            Attribute namingAttribute = rootDSEAttributes.get(NAMING_CONTEXTS_ATTRIBUTE);
+            if (namingAttribute != null) {
+                NamingEnumeration<?> values = namingAttribute.getAll();
+                while (values.hasMoreElements()) {
+					Object value = (Object) values.nextElement();
+					if (value instanceof String){
+						namingContextSet.add((String) value);
+					}
+				}
+            }
+
+            if (!namingContextSet.isEmpty()) {
+                for (String name : namingContextSet) {
+                    
+                	if (name.length() > 0 
+                			&& name.charAt(name.length() - 1) == '\u0000') {
+                        name = name.substring(0, name.length() - 1);
+                    }
+
+                    if (!name.isEmpty()) {
+                    	
+                    	returnChildEntries.add(name);
+                    	
+                    } else {
+                        // special handling of empty namingContext (Novell eDirectory): 
+                        // perform a one-level search and add all result DNs to the set
+                        returnChildEntries.addAll(searchRootDseEntries());
+                    }
+                }
+            } else {
+                // special handling of non-existing namingContexts attribute (Oracle Internet Directory)
+                // perform a one-level search and add all result DNs to the set
+            	returnChildEntries.addAll(searchRootDseEntries());
+            }
+			
+		}
+		
+		return returnChildEntries;
+	}
+	
+    private Collection<String> searchRootDseEntries() throws NamingException {
+		
+    	SearchControls controls = new SearchControls();
+		controls.setSearchScope(SearchControls.ONELEVEL_SCOPE);
+		controls.setReturningAttributes(new String[0]);
+		controls.setDerefLinkFlag(false);
+		NamingEnumeration<SearchResult> childEntries = context.search("", "(objectclass=*)", controls);
+		
+		Collection<String> returnEntries = new ArrayList<String>();
+		try{
+			while (childEntries.hasMoreElements()) {
+				String searchResultName = childEntries.nextElement().getNameInNamespace();
+				if (searchResultName != null && !searchResultName.isEmpty()){
+					returnEntries.add(searchResultName);
+				}
+			}
+		}finally{
+			childEntries.close();
+		}
+		
+		return returnEntries;
+    }
 	
     /**
      * Gets the default LDAP context factory.

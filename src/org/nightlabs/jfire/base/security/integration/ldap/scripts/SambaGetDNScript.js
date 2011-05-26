@@ -6,6 +6,8 @@
  * 
  * This script is used for generating a String with LDAP entry DN usign User/Person data.  
  * 
+ * NOTE that "BASE_ENTRY_NAME_PLACEHOLDER" could be replaced with another existing LDAP entry.
+ * 
  * Returns a String with LDAP entry DN.
  *  
  * @author Denis Dudnik <deniska.dudnik[at]gmail{dot}com>
@@ -13,8 +15,8 @@
  */
 var dn = null;
 if (userData != null && $userID$ != null){
-	dn = 'uid='+$userID$+',ou=Users,dc=nightlabs,dc=de';
+	dn = 'uid='+$userID$+',BASE_ENTRY_NAME_PLACEHOLDER';
 }else if (personData != null && $personName$ != null){
-	dn = 'cn='+$personName$+',ou=Users,dc=nightlabs,dc=de';
+	dn = 'cn='+$personName$+',BASE_ENTRY_NAME_PLACEHOLDER';
 }
 dn;

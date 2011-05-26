@@ -122,7 +122,8 @@ public class LDAPManagerBean extends BaseSessionBeanImpl implements LDAPManagerR
 		try{
 			Query query = pm.newQuery(pm.getExtent(LDAPScriptSet.class, true));
 			query.setResult("JDOHelper.getObjectId(this)");
-			HashSet<LDAPScriptSetID> hashSet = new HashSet<LDAPScriptSetID>((Collection<LDAPScriptSetID>) query.execute());
+			query.setFilter("JDOHelper.getObjectId(this.ldapServer) == :ldapServerID");
+			HashSet<LDAPScriptSetID> hashSet = new HashSet<LDAPScriptSetID>((Collection<LDAPScriptSetID>) query.execute(ldapServerID));
 			if (hashSet.size() > 0){
 				return hashSet.iterator().next();
 			}
@@ -400,6 +401,7 @@ public class LDAPManagerBean extends BaseSessionBeanImpl implements LDAPManagerR
 	private static final String PROP_LDAP_SERVER_HOST = "ldapServer%s.host";
 	private static final String PROP_LDAP_SERVER_NAME = "ldapServer%s.name";
 	private static final String PROP_LDAP_SERVER_SYNC_DN = "ldapServer%s.syncDN";
+	private static final String PROP_LDAP_SERVER_BASE_ENTRY_DN = "ldapServer%s.syncDN";
 	private static final String PROP_LDAP_SERVER_SYNC_PASSWORD = "ldapServer%s.syncPassword";
 	private static final String PROP_LDAP_REMOVE_SERVER_INSTANCE = "ldapServer%s.remove";
 	private static final String PROP_LDAP_SERVER_IS_LEADING = "ldapServer%s.isLeading";
@@ -412,6 +414,7 @@ public class LDAPManagerBean extends BaseSessionBeanImpl implements LDAPManagerR
 	 * ldapServerN.typeClassName=org.nightlabs.jfire.base.security.integration.ldap.InetOrgPersonLDAPServerType
 	 * ldapServerN.name=local test LDAP server
 	 * ldapServerN.isActive=true
+	 * ldapServerN.baseEntryDN=ou=staff,ou=people,dc=nightlabs,dc=de
 	 * ldapServerN.syncDN=uid=sync_user,ou=staff,ou=people,dc=nightlabs,dc=de
 	 * ldapServerN.syncPassword=1111
 	 * ldapServerN.isLeading=false
@@ -451,6 +454,10 @@ public class LDAPManagerBean extends BaseSessionBeanImpl implements LDAPManagerR
 					String serverName = ldapProps.getProperty(String.format(PROP_LDAP_SERVER_NAME, i ));
 					String syncDN = ldapProps.getProperty(String.format(PROP_LDAP_SERVER_SYNC_DN, i ));					
 					String syncPassword = ldapProps.getProperty(String.format(PROP_LDAP_SERVER_SYNC_PASSWORD, i ));					
+					String baseEntryDN = ldapProps.getProperty(String.format(PROP_LDAP_SERVER_BASE_ENTRY_DN, i ));					
+					if (baseEntryDN == null || baseEntryDN.isEmpty()){
+						logger.warn("Base entry is not set for this server! Scripts generating LDAP names will not work properly!");
+					}
 					
 					String host = ldapProps.getProperty(String.format(PROP_LDAP_SERVER_HOST, i));
 					if (host == null || "".equals(host)){
@@ -524,6 +531,7 @@ public class LDAPManagerBean extends BaseSessionBeanImpl implements LDAPManagerR
 						server.setSyncDN(syncDN);
 						server.setSyncPassword(syncPassword);
 						server.setLeading(isLeading);
+						server.setBaseDN(baseEntryDN);
 						
 						pm.makePersistent(server);
 					}

@@ -42,6 +42,8 @@ import org.slf4j.LoggerFactory;
 		table="JFireLDAP_LDAPScriptSet")
 public class LDAPScriptSet implements Serializable{
 	
+	public static final String BASE_ENTRY_NAME_PLACEHOLDER = "BASE_ENTRY_NAME_PLACEHOLDER";
+	
 	private static final Logger logger = LoggerFactory.getLogger(LDAPScriptSet.class);
 
 	/**
@@ -103,7 +105,7 @@ public class LDAPScriptSet implements Serializable{
 	
 	/**
 	 * Default constructor for creating LDAPSCriptSet objects
-	 * @param id
+	 * @param server
 	 */
 	public LDAPScriptSet(LDAPServer server){
 		this.ldapScriptSetID = server.getUserManagementSystemID();

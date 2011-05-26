@@ -80,6 +80,7 @@ function getUser(uid){
 	return user;
 }
 
+// calls to this method should be null-secured where appropriate 
 function getAttributeValue(name, canonicalName){
 	if (name != null && allAttributes.getAttribute(name) != null){
 		if (allAttributes.getAttribute(name).hasSingleValue()){
@@ -194,8 +195,10 @@ if (person != null){
 	person.getDataField(PersonStruct.COMMENT_COMMENT).setData(description);
 	
 	logger.debug("setting locale to person...");
-	// REV Alex: Not nullsave here, what about the other other calls to getAttributeValue(), do we have to secure their usage, too?
-	person.setLocale(new java.util.Locale(getAttributeValue('preferredLanguage')));
+	var language = getAttributeValue('preferredLanguage');
+	if (language != null && language != ''){
+		person.setLocale(new java.util.Locale(language));
+	}
 
 	logger.debug("deflating person...");
 	person.deflate();

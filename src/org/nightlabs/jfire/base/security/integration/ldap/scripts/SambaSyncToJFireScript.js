@@ -80,6 +80,7 @@ function getUser(uid){
 	return user;
 }
 
+//calls to this method should be null-secured where appropriate 
 function getAttributeValue(name, canonicalName){
 	if (name != null && allAttributes.getAttribute(name) != null){
 		if (allAttributes.getAttribute(name).hasSingleValue()){

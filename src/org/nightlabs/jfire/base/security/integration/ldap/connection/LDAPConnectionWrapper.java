@@ -116,7 +116,8 @@ public interface LDAPConnectionWrapper{
 	 * @param parentName
 	 * @return collection of child entries' names
 	 * @throws UserManagementSystemCommunicationException
+	 * @throws LoginException 
 	 */
-	public Collection<String> getChildEntries(String parentName) throws UserManagementSystemCommunicationException;
+	public Collection<String> getChildEntries(String parentName) throws UserManagementSystemCommunicationException, LoginException;
 	
 }

@@ -5,11 +5,13 @@
  * This script is used for generating a List with names of entries which are parents to all LDAP user entries which should be synchronized.
  * Used for synchronization when LDAPServer is a leading system. 
  * 
+ * NOTE that "BASE_ENTRY_NAME_PLACEHOLDER" could be replaced with another existing LDAP entry.
+ * 
  * Returns an ArrayList<String> with entries names.
  * 
  * @author Denis Dudnik <deniska.dudnik[at]gmail{dot}com>
  * 
  */
 var parentEntries = new java.util.ArrayList();
-parentEntries.add("ou=staff,ou=people,dc=nightlabs,dc=de");
+parentEntries.add('BASE_ENTRY_NAME_PLACEHOLDER');
 parentEntries;

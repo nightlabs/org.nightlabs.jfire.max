@@ -18,6 +18,7 @@ import javax.naming.InsufficientResourcesException;
 import javax.naming.InvalidNameException;
 import javax.naming.Name;
 import javax.naming.NameClassPair;
+import javax.naming.NameNotFoundException;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.NoPermissionException;
@@ -536,7 +537,12 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper{
 
                     if (!name.isEmpty()) {
                     	
-                    	returnChildEntries.add(name);
+                    	try{
+                    		context.lookup(name);
+                        	returnChildEntries.add(name);
+                    	}catch(NameNotFoundException e){
+                    		// do nothing - it means that some of namingContexts values are not valid
+                    	}
                     	
                     } else {
                         // special handling of empty namingContext (Novell eDirectory): 

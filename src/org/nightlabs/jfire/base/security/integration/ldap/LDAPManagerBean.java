@@ -195,6 +195,31 @@ public class LDAPManagerBean extends BaseSessionBeanImpl implements LDAPManagerR
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@RolesAllowed("org.nightlabs.jfire.security.accessRightManagement")
+	@Override
+	public void runLDAPServerSynchronization(UserManagementSystemID ldapServerID, LDAPSyncEvent syncEvent) throws LoginException, LDAPSyncException, UserManagementSystemCommunicationException {
+		if (ldapServerID == null){
+			throw new IllegalArgumentException("LDAPServer ID should be not null!");
+		}
+		if (syncEvent == null){
+			throw new IllegalArgumentException("LDAPSyncEvent should be not null!");
+		}
+		
+		PersistenceManager pm = createPersistenceManager();
+		try{
+			
+			LDAPServer ldapServer = (LDAPServer) pm.getObjectById(ldapServerID);
+			ldapServer.synchronize(syncEvent);
+			
+		}finally{
+			pm.close();
+		}
+	}
+
 	private void configureJFireAsLeadingSystem(PersistenceManager pm){
 		pm.getPersistenceManagerFactory().addInstanceLifecycleListener(
 				syncStoreLifecycleListener, new Class[]{User.class, Person.class}

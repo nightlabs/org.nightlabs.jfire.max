@@ -200,9 +200,77 @@ public class LDAPAttributeSet implements Iterable<LDAPAttribute<Object>>{
 		}
 		return null;
 	}
-
+	
 	/**
-	 * Implemet {@link Iterator} for iterating over {@link LDAPAttributeSet} as a simple {@link Iterable}.
+	 * Checks if this {@link LDAPAttributeSet} contains an {@link LDAPAttribute} with ANY of given values.
+	 * 
+	 * @param attributeName
+	 * @param values
+	 * @return <code>true</code> if an {@link LDAPAttribute} with ANY of given values was found in this {@link LDAPAttributeSet}
+	 */
+	public boolean containsAnyAttributeValue(String attributeName, Iterable<?> values){
+		if (attributes.containsKey(attributeName)){
+			LDAPAttribute<Object> ldapAttribute = attributes.get(attributeName);
+			if (ldapAttribute.hasSingleValue()){
+				Object value = ldapAttribute.getValue();
+				for (Object valueToContain : values){
+					if (valueToContain != null && valueToContain.equals(value)){
+						return true;
+					}
+				}
+			}else{
+				Iterable<Object> valuesToContain = ldapAttribute.getValues();
+				for (Object givenValue : values){
+					for (Object valueToContain : valuesToContain) {
+						if (valueToContain != null && valueToContain.equals(givenValue)){
+							return true;
+						}
+					}
+				}
+			}
+		}
+		return false;
+	}
+	
+	/**
+	 * Checks if this {@link LDAPAttributeSet} contains an {@link LDAPAttribute} with ALL given attribute values.
+	 * 
+	 * @param attributeName
+	 * @param values
+	 * @return <code>true</code> if an {@link LDAPAttribute} with ALL given values was found in this {@link LDAPAttributeSet}
+	 */
+	public boolean containsAllAttributeValues(String attributeName, Iterable<?> values){
+		if (attributes.containsKey(attributeName)){
+			LDAPAttribute<Object> ldapAttribute = attributes.get(attributeName);
+			if (ldapAttribute.hasSingleValue()){
+				Object value = ldapAttribute.getValue();
+				for (Object valueToContain : values){
+					if (valueToContain != null && valueToContain.equals(value)){
+						return true;
+					}
+				}
+			}else{
+				Iterable<Object> valuesToContain = ldapAttribute.getValues();
+				for (Object givenValue : values){
+					boolean found = false;
+					for (Object valueToContain : valuesToContain) {
+						if (valueToContain != null && valueToContain.equals(givenValue)){
+							found = true;
+							break;
+						}
+					}
+					if (!found){
+						return false;
+					}
+				}
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	/**
+	 * Implements {@link Iterator} for iterating over {@link LDAPAttributeSet} as a simple {@link Iterable}.
 	 */
 	@Override
 	public Iterator<LDAPAttribute<Object>> iterator() {

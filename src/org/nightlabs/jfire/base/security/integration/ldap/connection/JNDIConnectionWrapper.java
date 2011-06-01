@@ -293,16 +293,30 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper{
 	 * {@inheritDoc}
 	 */
 	@Override
-	public LDAPAttributeSet getAttribbutesForEntry(String dn) throws UserManagementSystemCommunicationException {
+	public LDAPAttributeSet getAttributesForEntry(String dn) throws UserManagementSystemCommunicationException {
+		return getAttributesForEntry(dn, null);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public LDAPAttributeSet getAttributesForEntry(String dn, String[] attributeNames) throws UserManagementSystemCommunicationException {
 		try {
 			synchronized (context) {
-				return getLDAPAttributeSet(context.getAttributes(getSaveJndiName(dn)));
+				Attributes attributes = null;
+				if (attributeNames != null && attributeNames.length > 0){
+					attributes = context.getAttributes(getSaveJndiName(dn), attributeNames);
+				}else{	// get all attributes
+					attributes = context.getAttributes(getSaveJndiName(dn));
+				}
+				return getLDAPAttributeSet(attributes);
 			}
 		} catch (NamingException e) {
 			throw new UserManagementSystemCommunicationException("Failed to get attributes from entry with DN: " + dn, e);
 		}
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */

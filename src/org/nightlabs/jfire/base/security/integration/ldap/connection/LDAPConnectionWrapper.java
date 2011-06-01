@@ -108,7 +108,18 @@ public interface LDAPConnectionWrapper{
 	 * @return attributes of given entry
 	 * @throws UserManagementSystemCommunicationException 
 	 */
-	public LDAPAttributeSet getAttribbutesForEntry(String dn) throws UserManagementSystemCommunicationException;
+	public LDAPAttributeSet getAttributesForEntry(String dn) throws UserManagementSystemCommunicationException;
+
+	/**
+	 * Get {@link LDAPAttributeSet} with attributes specified by <code>attributeNames</code> of an entry specified by DN.
+	 * Will return all attributes if <code>attributeNames</code> is <code>null</code>.
+	 * 
+	 * @param dn
+	 * @param attributeNames
+	 * @return attributes of given entry
+	 * @throws UserManagementSystemCommunicationException 
+	 */
+	public LDAPAttributeSet getAttributesForEntry(String dn, String[] attributeNames) throws UserManagementSystemCommunicationException;
 
 	/**
 	 * Get collection of names of direct children of a given entry

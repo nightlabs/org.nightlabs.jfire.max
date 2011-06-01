@@ -74,9 +74,13 @@ public class LDAPConnection{
     }
     
 	public LDAPAttributeSet getAttributesForEntry(String dn) throws UserManagementSystemCommunicationException {
-		return this.connectionWrapper.getAttribbutesForEntry(dn);
+		return this.connectionWrapper.getAttributesForEntry(dn);
 	}
-	
+
+	public LDAPAttributeSet getAttributesForEntry(String dn, String[] attributeNames) throws UserManagementSystemCommunicationException {
+		return this.connectionWrapper.getAttributesForEntry(dn, attributeNames);
+	}
+
 	public Collection<String> getChildEntries(String parentName) throws UserManagementSystemCommunicationException, LoginException{
 		return this.connectionWrapper.getChildEntries(parentName);
 	}

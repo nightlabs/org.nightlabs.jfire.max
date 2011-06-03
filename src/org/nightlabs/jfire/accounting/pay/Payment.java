@@ -936,7 +936,7 @@ implements Serializable, StoreCallback
 	nullValue=NullValue.EXCEPTION,
 	table="JFireTrade_Payment_payableObjects",
 	persistenceModifier=PersistenceModifier.PERSISTENT)
-	private Set<PayableObject> payableObjects = null;
+	private Set<? extends PayableObject> payableObjects = null;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -1076,7 +1076,7 @@ implements Serializable, StoreCallback
 	 *
 	 * @param payableObjects The PayableObject to set.
 	 */
-	public void setPayableObjects(Set<PayableObject> payableObjects)
+	public void setPayableObjects(Set<? extends PayableObject> payableObjects)
 	{
 		if (payableObjects == null)
 			throw new NullPointerException("payableObjects must not be null!");
@@ -1091,7 +1091,7 @@ implements Serializable, StoreCallback
 		else
 			payableObjectIDs.clear();
 
-		for (Iterator<PayableObject> it = payableObjects.iterator(); it.hasNext(); ) {
+		for (Iterator<? extends PayableObject> it = payableObjects.iterator(); it.hasNext(); ) {
 			PayableObject payableObject = it.next();
 			payableObjectIDs.add((ObjectID) JDOHelper.getObjectId(payableObject));
 		}

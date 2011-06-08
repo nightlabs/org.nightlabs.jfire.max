@@ -1,13 +1,17 @@
 package org.nightlabs.jfire.base.security.integration.ldap;
+import java.util.Collection;
+
 import javax.ejb.Local;
 import javax.security.auth.login.LoginException;
 
+import org.nightlabs.jfire.base.security.integration.ldap.sync.LDAPSyncException;
 import org.nightlabs.jfire.security.integration.UserManagementSystemCommunicationException;
+import org.nightlabs.jfire.security.integration.id.UserManagementSystemID;
 import org.nightlabs.jfire.timer.Task;
 import org.nightlabs.jfire.timer.id.TaskID;
 
 /**
- * Local interface for LDAPManagerBean
+ * Local interface for {@link LDAPManagerBean}
  * 
  * @author Denis Dudnik <deniska.dudnik[at]gmail{dot}com>
  *
@@ -24,5 +28,13 @@ public interface LDAPManagerLocal {
 	 * @throws UserManagementSystemCommunicationException
 	 */
 	void syncUserDataFromLDAP(TaskID taskID) throws LoginException, LDAPSyncException, UserManagementSystemCommunicationException;
+	
+	/**
+	 * Get parent LDAP entries from {@link LDAPServer} scripts
+	 * 
+	 * @param ldapServerID
+	 * @return Names of base parent entries
+	 */
+	Collection<String> getLDAPServerParentEntries(UserManagementSystemID ldapServerID);
 
 }

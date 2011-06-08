@@ -1,7 +1,9 @@
-package org.nightlabs.jfire.base.security.integration.ldap;
+package org.nightlabs.jfire.base.security.integration.ldap.sync;
 
 import java.io.Serializable;
 import java.util.Collection;
+
+import org.nightlabs.jfire.base.security.integration.ldap.LDAPServer;
 
 /**
  * <p>Instances of this class are used for managing the synchronization process by passing them 

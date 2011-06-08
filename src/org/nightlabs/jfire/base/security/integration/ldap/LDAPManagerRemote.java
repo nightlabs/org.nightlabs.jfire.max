@@ -7,12 +7,14 @@ import javax.security.auth.login.LoginException;
 
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.base.security.integration.ldap.id.LDAPScriptSetID;
+import org.nightlabs.jfire.base.security.integration.ldap.sync.LDAPSyncEvent;
+import org.nightlabs.jfire.base.security.integration.ldap.sync.LDAPSyncException;
 import org.nightlabs.jfire.security.integration.UserManagementSystemCommunicationException;
 import org.nightlabs.jfire.security.integration.UserManagementSystemType;
 import org.nightlabs.jfire.security.integration.id.UserManagementSystemID;
 
 /**
- * Remote interface for LDAPManagerBean.
+ * Remote interface for {@link LDAPManagerBean}
  * 
  * @author Denis Dudnik <deniska.dudnik[at]gmail{dot}com>
  *

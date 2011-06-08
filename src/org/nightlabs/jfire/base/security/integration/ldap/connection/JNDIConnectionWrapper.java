@@ -56,11 +56,11 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper{
 
 	private static final Logger logger = LoggerFactory.getLogger(JNDIConnectionWrapper.class);
 
-	private static final String JAVA_NAMING_LDAP_VERSION = "java.naming.ldap.version"; //$NON-NLS-1$
-	private static final String COM_SUN_JNDI_DNS_TIMEOUT_RETRIES = "com.sun.jndi.dns.timeout.retries"; //$NON-NLS-1$
-	private static final String COM_SUN_JNDI_DNS_TIMEOUT_INITIAL = "com.sun.jndi.dns.timeout.initial"; //$NON-NLS-1$
-	private static final String COM_SUN_JNDI_LDAP_CONNECT_TIMEOUT = "com.sun.jndi.ldap.connect.timeout"; //$NON-NLS-1$
-	private static final String LDAP_SCHEME = "ldap://";
+	public static final String JAVA_NAMING_LDAP_VERSION = "java.naming.ldap.version"; //$NON-NLS-1$
+	public static final String COM_SUN_JNDI_DNS_TIMEOUT_RETRIES = "com.sun.jndi.dns.timeout.retries"; //$NON-NLS-1$
+	public static final String COM_SUN_JNDI_DNS_TIMEOUT_INITIAL = "com.sun.jndi.dns.timeout.initial"; //$NON-NLS-1$
+	public static final String COM_SUN_JNDI_LDAP_CONNECT_TIMEOUT = "com.sun.jndi.ldap.connect.timeout"; //$NON-NLS-1$
+	public static final String LDAP_SCHEME = "ldap://";
 
 	private LDAPConnection connection;
 
@@ -610,7 +610,7 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper{
      * @return the default LDAP context factory
      * @throws NamingException 
      */
-    private static String getDefaultLdapContextFactory() throws NamingException {
+    public static String getDefaultLdapContextFactory() throws NamingException {
 
         try{
             

@@ -1,4 +1,4 @@
-package org.nightlabs.jfire.base.security.integration.ldap;
+package org.nightlabs.jfire.base.security.integration.ldap.sync;
 
 /**
  * This exception is thrown if some problem occurs when synchronizing data

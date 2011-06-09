@@ -16,5 +16,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/com.thoughtworks.xstream"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.xmlpull"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.nightlabs.i18n"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/org.nightlabs.xml"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

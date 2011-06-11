@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	
+	<!-- @generated - Auto generated POM. Remove this marker after review. -->
+	
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.nightlabs.jfire</groupId>
+	<artifactId>org.nightlabs.jfire.pbx</artifactId>
+	<version>1.2.0-SNAPSHOT</version>
+	<packaging>bundle</packaging>
+	<name>${project.artifactId}</name>
+
+	<parent>
+		<groupId>org.nightlabs.jfire</groupId>
+		<artifactId>org.nightlabs.jfire.parent</artifactId>
+		<version>1.2.0-SNAPSHOT</version>
+	</parent>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.nightlabs</groupId>
+			<artifactId>org.nightlabs.base</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.nightlabs</groupId>
+			<artifactId>org.nightlabs.jdo</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.nightlabs.jfire</groupId>
+			<artifactId>org.nightlabs.jfire.base</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.nightlabs.jfire</groupId>
+			<artifactId>org.nightlabs.jfire.base.bean</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.nightlabs.jfire</groupId>
+			<artifactId>org.nightlabs.jfire.base.clientlib</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.nightlabs.jfire</groupId>
+			<artifactId>org.nightlabs.jfire.base.dao</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.nightlabs.jfire</groupId>
+			<artifactId>org.nightlabs.jfire.servermanager</artifactId>
+			<scope>provided</scope>
+		</dependency>		
+	</dependencies>
+
+	<build>
+		<sourceDirectory>src</sourceDirectory>
+		<outputDirectory>bin</outputDirectory>
+		<resources>
+			<resource>
+				<directory>src</directory>
+				<excludes>
+					<exclude>**/*.java</exclude>
+				</excludes>
+			</resource>
+		</resources>
+
+
+	</build>
+</project>

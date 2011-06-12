@@ -46,7 +46,7 @@ import org.nightlabs.jfire.config.ConfigModule;
 	@FetchGroup(
 		name=AsteriskConfigModule.FETCH_GROUP_CALL_FILE_OVERRIDE_KEYS,
 		members=@Persistent(name="overrideCallFilePropertyKeys")
-	),
+	)
 })
 public class AsteriskConfigModule
 extends ConfigModule

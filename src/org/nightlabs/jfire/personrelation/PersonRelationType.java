@@ -39,7 +39,7 @@ import org.nightlabs.util.Util;
 	@FetchGroup(
 			name=PersonRelationType.FETCH_GROUP_DESCRIPTION,
 			members=@Persistent(name="description")
-	),
+	)
 })
 public class PersonRelationType
 implements Serializable

@@ -60,7 +60,7 @@ import org.nightlabs.util.Util;
 	@FetchGroup(
 			name=PersonRelation.FETCH_GROUP_TO,
 			members=@Persistent(name=PersonRelation.FieldName.to)
-	),
+	)
 })
 public class PersonRelation
 implements Serializable, AttachCallback, DetachCallback, StoreCallback, DeleteCallback

@@ -55,7 +55,7 @@ import org.slf4j.LoggerFactory;
 	@FetchGroup(
 		name=FetchGroupsIssueHistoryItem.FETCH_GROUP_LIST,
 		members=@Persistent(name="user")
-	),
+	)
 })
 @Queries(
 	@javax.jdo.annotations.Query(

@@ -90,7 +90,7 @@ import org.slf4j.LoggerFactory;
 	@javax.jdo.annotations.Query(
 			name="getIssueLinkCountByLinkedObjectID",
 			value="SELECT count(this) WHERE this.linkedObjectID == :linkedObjectID"
-	),
+	)
 })
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class IssueLink

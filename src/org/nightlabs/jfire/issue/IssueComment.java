@@ -73,7 +73,7 @@ import org.nightlabs.util.Util;
 			@FetchGroup(
 					name=IssueComment.FETCH_GROUP_THIS_COMMENT,
 					members={@Persistent(name="text"), @Persistent(name="createTimestamp"), @Persistent(name="user")}
-			),
+			)
 		})
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class IssueComment

@@ -93,7 +93,7 @@ import org.nightlabs.util.Util;
 	@javax.jdo.annotations.Query(
 		name="getAllIssueTypeIDs",
 		value="SELECT JDOHelper.getObjectId(this)"
-	),
+	)
 })
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class IssueType

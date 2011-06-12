@@ -72,15 +72,17 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>com.thoughtworks.xstream</groupId>
-			<artifactId>xstream</artifactId>
+			<groupId>org.apache.servicemix.bundles</groupId>
+			<artifactId>org.apache.servicemix.bundles.xstream</artifactId>
 			<scope>provided</scope>
 		</dependency>
+		<!-- 
 		<dependency>
-			<groupId>org.xmlpull</groupId>
-			<artifactId>org.xmlpull</artifactId>
+			<groupId>org.apache.servicemix.bundles</groupId>
+			<artifactId>org.apache.servicemix.bundles.xmlpull</artifactId>
 			<scope>provided</scope>
-		</dependency>		
+		</dependency>
+		-->
 	</dependencies>
 
 	<build>
@@ -94,7 +96,5 @@
 				</excludes>
 			</resource>
 		</resources>
-
-
 	</build>
 </project>

@@ -34,7 +34,7 @@ import org.nightlabs.jfire.pbx.resource.Messages;
 	@FetchGroup(
 			name=PhoneSystemConfigModule.FETCH_GROUP_PHONE_SYSTEM,
 			members=@Persistent(name="phoneSystem")
-	),
+	)
 })
 public class PhoneSystemConfigModule
 extends ConfigModule

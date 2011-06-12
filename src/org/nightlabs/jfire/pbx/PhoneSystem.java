@@ -50,7 +50,7 @@ import org.nightlabs.util.Util;
 	@FetchGroup(
 			name="PhoneSystem.callableStructFields",
 			members=@Persistent(name="callableStructFields")
-	),
+	)
 })
 public abstract class PhoneSystem
 implements Serializable

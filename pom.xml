@@ -95,7 +95,7 @@
 		<dependency>
 			<groupId>org.apache.geronimo.specs</groupId>
 			<artifactId>geronimo-javamail_1.4_spec</artifactId>
-			<version>1.7.1</version>
+			<scope>provided</scope>
 		</dependency>
 	</dependencies>
 

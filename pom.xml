@@ -2,8 +2,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	
-	<!-- @generated - Auto generated POM. Remove this marker after review. -->
-	
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.nightlabs.jfire</groupId>
 	<artifactId>org.nightlabs.jfire.jbpm.aop</artifactId>
@@ -37,7 +35,24 @@
 			<groupId>org.nightlabs.jfire</groupId>
 			<artifactId>org.nightlabs.jfire.jbpm</artifactId>
 			<scope>provided</scope>
+		</dependency>
+		
+		<dependency>
+		    <groupId>javax.jdo</groupId>
+		    <artifactId>jdo2-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+		    <groupId>log4j</groupId>
+		    <artifactId>log4j</artifactId>
+			<scope>provided</scope>
 		</dependency>		
+		<dependency>
+			<groupId>jboss.aop</groupId>
+			<artifactId>jboss-aop-jdk50</artifactId>
+			<version>1.5.6.GA</version>
+			<scope>provided</scope>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -51,7 +66,5 @@
 				</excludes>
 			</resource>
 		</resources>
-
-
 	</build>
 </project>

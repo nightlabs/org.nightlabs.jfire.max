@@ -79,7 +79,7 @@
 		</dependency>
 		<dependency>
 			<groupId>javax.jdo</groupId>
-			<artifactId>jdo2-api</artifactId>
+			<artifactId>jdo-api</artifactId>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -116,5 +116,11 @@
 				</excludes>
 			</resource>
 		</resources>
+		<plugins>
+			<plugin>
+				<groupId>org.datanucleus</groupId>
+				<artifactId>maven-datanucleus-plugin</artifactId>
+			</plugin>
+		</plugins>
 	</build>
 </project>

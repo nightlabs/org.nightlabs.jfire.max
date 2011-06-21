@@ -1,0 +1,18 @@
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd
+    http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+	<changeSet id="JFireTradeEAR|1.0.4|1.2.0" author="jfire">
+		<comment>MoneyFlowDimension introduced discriminator and InheritanceStrategy of its subclasses chagned to superclass-table</comment>
+		
+		<ext:dnIntroduceDiscriminator className="org.nightlabs.jfire.accounting.book.mappingbased.MoneyFlowDimension"/>
+		<ext:dnChangeInheritanceStrategy className="org.nightlabs.jfire.accounting.book.mappingbased.OwnerDimension" oldStrategy="NEW_TABLE" newStrategy="SUPERCLASS_TABLE"/>
+		<ext:dnChangeInheritanceStrategy className="org.nightlabs.jfire.accounting.book.mappingbased.PriceFragmentDimension" oldStrategy="NEW_TABLE" newStrategy="SUPERCLASS_TABLE"/>
+		<ext:dnChangeInheritanceStrategy className="org.nightlabs.jfire.accounting.book.mappingbased.SourceOrganisationDimension" oldStrategy="NEW_TABLE" newStrategy="SUPERCLASS_TABLE"/>
+		
+    </changeSet>
+    
+</databaseChangeLog>

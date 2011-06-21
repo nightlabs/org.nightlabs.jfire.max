@@ -1,0 +1,23 @@
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd
+    http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+    
+   <property name="jfire.update.moduleID" value="JFireAsteriskEAR"/>
+   <property name="jfire.update.fromVersion" value="1.0.0"/>
+   <property name="jfire.update.toVersion" value="1.2.0"/>
+      
+   <changeSet id="JFireAsteriskEAR|1.0.0|1.2.0" author="jfire">
+     	<comment>Tables for AsteriskClasses where moved from Prefix JFireContactAsterisk_ to JFireAsterisk_</comment>
+     
+		<ext:dnChangeTableName className="org.nightlabs.jfire.asterisk.AsteriskServer" newTableName="JFireAsterisk_AsteriskServer"/>
+		<ext:dnChangeTableName className="org.nightlabs.jfire.asterisk.AsteriskServer.callFileProperties" newTableName="JFireAsterisk_AsteriskServer_callFileProperties"/>
+		  
+		<ext:dnChangeTableName className="org.nightlabs.jfire.asterisk.config.AsteriskConfigModule" newTableName="JFireAsterisk_AsteriskConfigModule"/>
+		<ext:dnChangeTableName className="org.nightlabs.jfire.asterisk.config.AsteriskConfigModule.callFileProperties" newTableName="JFireAsterisk_AsteriskConfigModule_callFileProperties"/>
+		<ext:dnChangeTableName className="org.nightlabs.jfire.asterisk.config.AsteriskConfigModule.overrideCallFilePropertyKeys" newTableName="JFireAsterisk_AsteriskConfigModule_overrideCallFilePropertyKeys"/>
+	</changeSet>
+    
+</databaseChangeLog>

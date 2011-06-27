@@ -16,6 +16,7 @@ import javax.jdo.Query;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.jdo.NLJDOHelper;
+import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.config.Config;
 import org.nightlabs.jfire.config.ConfigSetup;
@@ -161,6 +162,8 @@ implements PhoneSystemManagerRemote
 	{
 		PersistenceManager pm = createPersistenceManager();
 		try {
+			ModuleMetaData.initModuleMetadata(pm, JFirePBXEAR.MODULE_NAME, JFirePBXEAR.class);
+			
 			pm.getExtent(ClientOnlyPhoneSystem.class);
 			DefaultPhoneSystem defaultPhoneSystem = DefaultPhoneSystem.getDefaultPhoneSystem(pm);
 

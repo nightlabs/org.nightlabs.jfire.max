@@ -94,7 +94,7 @@ implements Serializable
 	@Join
 	@Persistent(
 		nullValue=NullValue.EXCEPTION,
-		table="JFirePBX_callableStructFields",
+		table="JFirePBX_PhoneSystem_callableStructFields",
 		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Set<StructField> callableStructFields;
 	/**

@@ -1,3 +1,6 @@
 Manifest-Version: 1.0
 EAR-Module-ID: JFireReportingEAR
-EAR-Schema-Version: 1.0.1
+EAR-Schema-Version: 1.2.0
+Comment: Update note 1.2.0:
+  Reworked Reporting-Registry and dependencies so JFireReporting is not dependent on BIRT.
+  Raised version for release.

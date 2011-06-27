@@ -10,7 +10,7 @@ import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.timer.id.TaskID;
 
 /**
- * EJB for 
+ * EJB for {@link PushNotificationsConfigurator} stuff, i.e. method for adding push notification listeners by timer task.
  * 
  * @author Denis Dudnik <deniska.dudnik[at]gmail{dot}com>
  *
@@ -33,6 +33,7 @@ public class PushNotificationsManagerBean extends BaseSessionBeanImpl implements
 			
 			PushNotificationsConfigurator.sharedInstance().initialize(pm, getOrganisationID());
 			PushNotificationsConfigurator.sharedInstance().addPushNotificationListeners(pm);
+			PushNotificationsConfigurator.sharedInstance().removePushNotificationListeners(pm);
 			
 		}finally{
 			pm.close();

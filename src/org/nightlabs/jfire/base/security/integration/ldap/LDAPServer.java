@@ -185,9 +185,6 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 	/**
 	 * Set of scripts which perform specific synchronization tasks
 	 */
-	// REV: @Persistent is not necessary. It is the default value. You can safely remove it. Marco.
-	// REV: Yes, I knew that. Im my opinion code looks more readable and clear when specifying this explicitly. 
-	// Of course I can remove this annotation if it fits better into JFire code style. Denis.
 	@Persistent(dependent="true", mappedBy="ldapServer")
 	private LDAPScriptSet ldapScriptSet;
 	

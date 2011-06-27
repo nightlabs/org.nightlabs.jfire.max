@@ -303,7 +303,7 @@ public class LDAPManagerBean extends BaseSessionBeanImpl implements LDAPManagerR
 	private static final String PROP_LDAP_SERVER_HOST = "ldapServer%s.host";
 	private static final String PROP_LDAP_SERVER_NAME = "ldapServer%s.name";
 	private static final String PROP_LDAP_SERVER_SYNC_DN = "ldapServer%s.syncDN";
-	private static final String PROP_LDAP_SERVER_BASE_ENTRY_DN = "ldapServer%s.syncDN";
+	private static final String PROP_LDAP_SERVER_BASE_ENTRY_DN = "ldapServer%s.baseEntryDN";
 	private static final String PROP_LDAP_SERVER_SYNC_PASSWORD = "ldapServer%s.syncPassword";
 	private static final String PROP_LDAP_REMOVE_SERVER_INSTANCE = "ldapServer%s.remove";
 	private static final String PROP_LDAP_SERVER_IS_LEADING = "ldapServer%s.isLeading";

@@ -15,6 +15,7 @@ import javax.jdo.listener.StoreLifecycleListener;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
+import javax.naming.NoPermissionException;
 import javax.naming.event.EventContext;
 import javax.naming.event.NamespaceChangeListener;
 import javax.naming.event.NamingEvent;
@@ -30,6 +31,8 @@ import org.nightlabs.j2ee.LoginData;
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.asyncinvoke.AsyncInvoke;
 import org.nightlabs.jfire.asyncinvoke.AsyncInvokeEnqueueException;
+import org.nightlabs.jfire.asyncinvoke.ErrorCallback;
+import org.nightlabs.jfire.asyncinvoke.SuccessCallback;
 import org.nightlabs.jfire.base.AuthCallbackHandler;
 import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.security.integration.ldap.LDAPManagerLocal;
@@ -99,7 +102,8 @@ public class PushNotificationsConfigurator {
 						removePushNotificationsListener(ldapServer);
 					}
 				} catch (UserManagementSystemCommunicationException e) {
-					logger.error(e.getMessage(), e);
+					logger.error("Can't add/remove push notification listener in postStore: " + e.getMessage());
+					logger.debug(e.getMessage(), e);
 				}
 			}
 		}
@@ -122,7 +126,8 @@ public class PushNotificationsConfigurator {
 					try {
 						removePushNotificationsListener(ldapServer);
 					} catch (UserManagementSystemCommunicationException e) {
-						logger.error(e.getMessage(), e);
+						logger.error("Can't remove push notification listener in preDelete: " + e.getMessage());
+						logger.debug(e.getMessage(), e);
 					}
 				}
 			}
@@ -170,7 +175,7 @@ public class PushNotificationsConfigurator {
 	
 	/**
 	 * Loads all leading {@link LDAPServer} instances and tries to add push notification listener to them.
-	 * Listener is not added if was already added before. In case ant exception occurs during addition it will be logged.
+	 * Listener is not added if was already added before. In case any exception occurs during addition it will be logged.
 	 * 
 	 * @param pm
 	 */
@@ -183,11 +188,33 @@ public class PushNotificationsConfigurator {
 			try {
 				addPushNotificationsListener(ldapServer);
 			} catch (UserManagementSystemCommunicationException e) {
-				logger.error(e.getMessage(), e);
+				logger.error("Can't add push notification listeners: " + e.getMessage());
+				logger.debug(e.getMessage(), e);
 			}
 		}
 	}
-	
+
+	/**
+	 * Loads all non-leading {@link LDAPServer} instances and tries to remove push notification listener from them.
+	 * In case any exception occurs during addition it will be logged.
+	 * 
+	 * @param pm
+	 */
+	public void removePushNotificationListeners(PersistenceManager pm){
+		// determine if there's any leading LDAPServers already existent
+		Collection<LDAPServer> leadingSystems = UserManagementSystem.getUserManagementSystemsByLeading(
+				pm, false, LDAPServer.class
+				);
+		for (LDAPServer ldapServer : leadingSystems) {
+			try {
+				removePushNotificationsListener(ldapServer);
+			} catch (UserManagementSystemCommunicationException e) {
+				logger.error("Can't remove push notification listeners: " + e.getMessage());
+				logger.debug(e.getMessage(), e);
+			}
+		}
+	}
+
 	private void configureTimerTask(PersistenceManager pm){
 		try {
 			pm.getExtent(Task.class);
@@ -389,22 +416,55 @@ public class PushNotificationsConfigurator {
 			}
 		}
 		
+		
+		private ErrorCallback errorCallback;
+		private SuccessCallback successCallback;
+		
+		protected void setErrorCallback(ErrorCallback errorCallback) {
+			this.errorCallback = errorCallback;
+		}
+		
+		protected void setSuccessCallback(SuccessCallback successCallback) {
+			this.successCallback = successCallback;
+		}
+		
 		private void fetchLDAPEntry(NamingEvent event){
 			if (event.getEventContext() == null){
 				logger.warn("Can't proceed with fetching LDAP entry because source EventContext is null!");
 				return;
 			}
+			
+			String newName = event.getNewBinding().getNameInNamespace();
 			if (event.getNewBinding() == null 
-					|| event.getNewBinding().getNameInNamespace() == null 
-					|| event.getNewBinding().getNameInNamespace().isEmpty()){
+					|| newName == null 
+					|| newName.isEmpty()){
 				logger.warn("Can't proceed with fetching LDAP entry because entry name is not specified!");
 				return;
 			}
+			
+			String oldName = null;
+			try{
+				oldName = event.getOldBinding().getNameInNamespace();
+			}catch(Exception e){	// it turned out that, for example, Apache DS returned no name in namespace, just a relative name
+				oldName = event.getOldBinding().getName();
+			}
+			if (newName.equals(oldName)){
+				oldName = null;
+			}
+			if (oldName != null && !oldName.isEmpty()){
+				// TODO: [Denis] If LDAP entry was renamed and corresponding JFire User already exists than we have several choices:
+				// 1) Rename JFire User accordingly - but we can't change part of User primary key (userID)
+				// 2) Delete existing user with an old name and let synchronization create a new one with the new name (we can tranfer Person from old User to new one)
+				// 3) Do nothing, just log a warning - in this case both User with old name and User with new name will be present
+				logger.warn("It seems that LDAP entry was renamed from %s to %s. Since we can't replace userID of existing JFire User new User object with a new name will be created.");
+			}
+			
 			LDAPSyncEvent syncEvent = new LDAPSyncEvent(LDAPSyncEventType.FETCH);
-			syncEvent.setLdapUsersIds(CollectionUtil.createHashSet(event.getNewBinding().getNameInNamespace()));
+			syncEvent.setLdapUsersIds(CollectionUtil.createHashSet(newName));
 			try {
 				AsyncInvoke.exec(
-						new LDAPSyncInvocation(getLDAPServerIDByEventContext(event.getEventContext()), syncEvent), false);
+						new LDAPSyncInvocation(getLDAPServerIDByEventContext(event.getEventContext()), syncEvent),
+						successCallback, errorCallback, null, false);
 			} catch (AsyncInvokeEnqueueException e) {
 				logger.error(e.getMessage(), e);
 			}
@@ -413,6 +473,18 @@ public class PushNotificationsConfigurator {
 	}
 	
 	private NamingListener syncPushNotificationsListener = new PushNotificationsListener();
+	
+	
+	/**
+	 * For unit-test purposes only!
+	 * 
+	 * @param successCallback
+	 * @param errorCallback
+	 */
+	public void setCallbacks(SuccessCallback successCallback, ErrorCallback errorCallback){
+		((PushNotificationsListener)syncPushNotificationsListener).setErrorCallback(errorCallback);
+		((PushNotificationsListener)syncPushNotificationsListener).setSuccessCallback(successCallback);
+	}
 	
 	
 	/**
@@ -467,10 +539,22 @@ public class PushNotificationsConfigurator {
 				
 				InitialLdapContext context = new InitialLdapContext(environment, null);
 				
-				// TODO: bind with sync DN?
-				
 				for (String parentEntry : parentEntriesForSync){
-					Object ctx = context.lookup(parentEntry);
+					Object ctx = null;
+					
+					try{	// check if anonymous access to LDAP directory is enabled
+						ctx = context.lookup(parentEntry);
+					}catch(NoPermissionException e){	// specify bind login/password otherwise
+
+						context.addToEnvironment(Context.SECURITY_AUTHENTICATION, ldapServer.getAuthenticationMethod().stringValue());
+						context.addToEnvironment(Context.SECURITY_PRINCIPAL, ldapServer.getSyncDN());
+						context.addToEnvironment(Context.SECURITY_CREDENTIALS, ldapServer.getSyncPassword());
+			
+						context.reconnect(context.getConnectControls());
+
+						ctx = context.lookup(parentEntry);
+					}
+					
 					if (ctx instanceof EventContext){
 						synchronized (registeredContexts) {
 							EventContext eventContext = (EventContext) ctx;
@@ -523,6 +607,16 @@ public class PushNotificationsConfigurator {
 			}
 		}
 		return null;
+	}
+	
+	/**
+	 * Get {@link Collection} of {@link EventContext}s which has registered listeners.
+	 * 
+	 * @param ldapServerID
+	 * @return
+	 */
+	public Collection<EventContext> getEventContextsWithListenersByLDAPServerID(UserManagementSystemID ldapServerID){
+		return registeredContexts.get(ldapServerID);
 	}
 
 }

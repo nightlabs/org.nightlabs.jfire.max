@@ -28,7 +28,7 @@ import org.nightlabs.jfire.base.security.integration.ldap.sync.LDAPSyncEvent;
 import org.nightlabs.jfire.base.security.integration.ldap.sync.LDAPSyncEvent.LDAPSyncEventType;
 import org.nightlabs.jfire.base.security.integration.ldap.sync.LDAPSyncException;
 import org.nightlabs.jfire.base.security.integration.ldap.sync.PushNotificationsConfigurator;
-import org.nightlabs.jfire.base.security.integration.ldap.sync.SyncStoreLifecycleListener;
+import org.nightlabs.jfire.base.security.integration.ldap.sync.SyncLifecycleListener;
 import org.nightlabs.jfire.person.Person;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.security.integration.UserManagementSystem;
@@ -237,7 +237,7 @@ public class LDAPManagerBean extends BaseSessionBeanImpl implements LDAPManagerR
 	}
 
 	
-	private static StoreLifecycleListener syncStoreLifecycleListener = new SyncStoreLifecycleListener();
+	private static StoreLifecycleListener syncStoreLifecycleListener = new SyncLifecycleListener();
 
 	private void configureJFireAsLeadingSystem(PersistenceManager pm){
 		pm.getPersistenceManagerFactory().addInstanceLifecycleListener(

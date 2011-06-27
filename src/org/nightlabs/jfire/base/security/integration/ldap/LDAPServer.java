@@ -31,7 +31,7 @@ import org.nightlabs.jfire.base.security.integration.ldap.connection.LDAPConnect
 import org.nightlabs.jfire.base.security.integration.ldap.sync.LDAPSyncEvent;
 import org.nightlabs.jfire.base.security.integration.ldap.sync.LDAPSyncEvent.LDAPSyncEventType;
 import org.nightlabs.jfire.base.security.integration.ldap.sync.LDAPSyncException;
-import org.nightlabs.jfire.base.security.integration.ldap.sync.SyncStoreLifecycleListener;
+import org.nightlabs.jfire.base.security.integration.ldap.sync.SyncLifecycleListener;
 import org.nightlabs.jfire.security.GlobalSecurityReflector;
 import org.nightlabs.jfire.security.NoUserException;
 import org.nightlabs.jfire.security.User;
@@ -311,7 +311,7 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
    			        	logger.debug(String.format("User %s@%s was not found JFire, start fetching it from LDAP", loginDataUserID, loginDataOrganisationID));
    			        }
    	    			
-					updateJFireData(CollectionUtil.createHashSet(userDN), loginDataOrganisationID);
+					updateJFireData(CollectionUtil.createHashSet(userDN), loginDataOrganisationID, false);
 				} catch (LDAPSyncException e) {
 					logger.error(String.format("Exception while fetching user %s@%s from LDAP", loginDataUserID, loginDataOrganisationID), e);
 					throw new LoginException(String.format("Can't fetch user %s@%s at login! See log for details.", loginDataUserID, loginDataOrganisationID));
@@ -592,11 +592,20 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 		
 		if (LDAPSyncEventType.FETCH == syncEvent.getEventType()){
 			
-			updateJFireData(syncEvent.getLdapUsersIds(), syncEvent.getOrganisationID());
+			updateJFireData(syncEvent.getLdapUsersIds(), syncEvent.getOrganisationID(), false);
 			
 		}else if (LDAPSyncEventType.SEND == syncEvent.getEventType()){
 			
-			updateLDAPData(syncEvent.getJFireObjectsIds());
+			updateLDAPData(syncEvent.getJFireObjectsIds(), false);
+			
+		}else if (LDAPSyncEventType.DELETE == syncEvent.getEventType()){
+			
+			if (syncEvent.getJFireObjectsIds() != null){
+				updateLDAPData(syncEvent.getJFireObjectsIds(), true);
+			}
+			if (syncEvent.getLdapUsersIds() != null){
+				updateJFireData(syncEvent.getLdapUsersIds(), syncEvent.getOrganisationID(), true);
+			}
 			
 		}else{
 			throw new UnsupportedOperationException("Unknown LDAPSyncEventType!");
@@ -670,11 +679,12 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 	 * 
 	 * @param ldapEntriesDNs
 	 * @param organisationID
+	 * @param removeJFireObjects
 	 * @throws UserManagementSystemCommunicationException
 	 * @throws LoginException
 	 * @throws LDAPSyncException
 	 */
-	private void updateJFireData(Collection<String> ldapEntriesDNs, String organisationID) throws UserManagementSystemCommunicationException, LoginException, LDAPSyncException{
+	private void updateJFireData(Collection<String> ldapEntriesDNs, String organisationID, boolean removeJFireObjects) throws UserManagementSystemCommunicationException, LoginException, LDAPSyncException{
 		
 		LDAPConnection connection = null;
 		LoginContext loginContext = null;
@@ -721,7 +731,7 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 			bindForSync(connection, pm);
 			
 			// disable JDO lifecycle listener used for JFire2LDAP synchronization
-			SyncStoreLifecycleListener.setEnabled(false);
+			SyncLifecycleListener.setEnabled(false);
 			// disable JDO lifecycle listener which forbids new User creation
 			ForbidUserCreationLyfecycleListener.setEnabled(false);
 			
@@ -732,8 +742,15 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 						logger.debug("Trying synchronization for DN: " + ldapEntryDN);
 					}
 					
+					LDAPAttributeSet attributes = null;
+					if (!removeJFireObjects){
+						attributes = connection.getAttributesForEntry(ldapEntryDN);
+					}else{
+						attributes = new LDAPAttributeSet();
+						attributes.createAttributesFromString(ldapEntryDN);
+					}
 					ldapScriptSet.syncLDAPDataToJFireObjects(
-								connection.getAttributesForEntry(ldapEntryDN), organisationID
+								attributes, organisationID, removeJFireObjects
 							);
 
 					if (logger.isDebugEnabled()){
@@ -747,11 +764,11 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 			
 		}finally{
 			
-			// need flush before enabling SyncStoreLifecycleListener
+			// need flush before enabling SyncLifecycleListener
 			pm.flush();
 
 			// enable JDO lifecycle listener used for JFire2LDAP synchronization
-			SyncStoreLifecycleListener.setEnabled(true);
+			SyncLifecycleListener.setEnabled(true);
 			// enable JDO lifecycle listener which forbids new User creation
 			ForbidUserCreationLyfecycleListener.setEnabled(true);
 			
@@ -773,11 +790,12 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 	 * Performs synchronization from JFire to LDAP directory
 	 * 
 	 * @param jfireObjectsIds
+	 * @param removeEntries
 	 * @throws UserManagementSystemCommunicationException
 	 * @throws LoginException
 	 * @throws LDAPSyncException
 	 */
-	private void updateLDAPData(Collection<?> jfireObjectsIds) throws UserManagementSystemCommunicationException, LoginException, LDAPSyncException{
+	private void updateLDAPData(Collection<?> jfireObjectsIds, boolean removeEntries) throws UserManagementSystemCommunicationException, LoginException, LDAPSyncException{
 		
 		LDAPConnection connection = null;
 		try{
@@ -812,28 +830,45 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 						entryExists = false;
 					}
 
-					if (logger.isDebugEnabled()){
-						logger.debug("Preparing attributes for modifying entry with DN: " + userDN);
-					}
-					LDAPAttributeSet modifyAttributes = ldapScriptSet.getAttributesMapForLDAP(
-							jfireObject, !entryExists
-							);
-					
-					if (entryExists){
+					if (removeEntries){
+						
+						if (!entryExists){
+							logger.warn("Can't remove non-existent entry with DN: " + userDN);
+							continue;
+						}
+						
 						if (logger.isDebugEnabled()){
-							logger.debug("Modifying entry with DN: " + userDN);
+							logger.debug("Removing existing entry with DN: " + userDN);
 						}
 						
-						if(modifyAttributes != null && modifyAttributes.size() > 0){
-							connection.modifyEntry(userDN, modifyAttributes, EntryModificationFlag.MODIFY);
-						}
+						connection.deleteEntry(userDN);
 						
-					}else{	// create new entry 
+					}else{
+	
 						if (logger.isDebugEnabled()){
-							logger.debug("Creating new entry with DN: " + userDN);
+							logger.debug("Preparing attributes for modifying entry with DN: " + userDN);
+						}
+						LDAPAttributeSet modifyAttributes = ldapScriptSet.getAttributesMapForLDAP(
+								jfireObject, !entryExists
+								);
+						
+						if (entryExists){
+							if (logger.isDebugEnabled()){
+								logger.debug("Modifying entry with DN: " + userDN);
+							}
+							
+							if(modifyAttributes != null && modifyAttributes.size() > 0){
+								connection.modifyEntry(userDN, modifyAttributes, EntryModificationFlag.MODIFY);
+							}
+							
+						}else{	// create new entry 
+							if (logger.isDebugEnabled()){
+								logger.debug("Creating new entry with DN: " + userDN);
+							}
+							
+							connection.createEntry(userDN, modifyAttributes);
 						}
 						
-						connection.createEntry(userDN, modifyAttributes);
 					}
 
 					if (logger.isDebugEnabled()){

@@ -27,8 +27,11 @@ public class SyncToLDAPServerInvocation extends Invocation{
 	
 	private Object objectId;
 	
-	public SyncToLDAPServerInvocation(Object objectId){
+	private LDAPSyncEventType eventType;
+	
+	public SyncToLDAPServerInvocation(Object objectId, LDAPSyncEventType eventType){
 		this.objectId = objectId;
+		this.eventType = eventType;
 	}
 
 	@Override
@@ -44,7 +47,7 @@ public class SyncToLDAPServerInvocation extends Invocation{
 			boolean exceptionOccured = false;
 			for (LDAPServer ldapServer : ldapServers) {
 				
-				LDAPSyncEvent syncEvent = new LDAPSyncEvent(LDAPSyncEventType.SEND);
+				LDAPSyncEvent syncEvent = new LDAPSyncEvent(eventType);
 				syncEvent.setOrganisationID(getOrganisationID());
 				syncEvent.setJFireObjectsIds(CollectionUtil.createHashSet(objectId));
 				try{

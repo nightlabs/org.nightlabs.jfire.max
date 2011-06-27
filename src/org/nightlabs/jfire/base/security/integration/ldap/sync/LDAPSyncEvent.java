@@ -29,7 +29,8 @@ public class LDAPSyncEvent implements Serializable{
 	 */
 	public enum LDAPSyncEventType{
 		FETCH,
-		SEND
+		SEND,
+		DELETE
 	}
 
 	/**

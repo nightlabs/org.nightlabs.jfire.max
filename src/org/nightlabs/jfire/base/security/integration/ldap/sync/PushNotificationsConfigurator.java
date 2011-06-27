@@ -102,8 +102,7 @@ public class PushNotificationsConfigurator {
 						removePushNotificationsListener(ldapServer);
 					}
 				} catch (UserManagementSystemCommunicationException e) {
-					logger.error("Can't add/remove push notification listener in postStore: " + e.getMessage());
-					logger.debug(e.getMessage(), e);
+					logger.error(e.getMessage(), e);
 				}
 			}
 		}
@@ -126,8 +125,7 @@ public class PushNotificationsConfigurator {
 					try {
 						removePushNotificationsListener(ldapServer);
 					} catch (UserManagementSystemCommunicationException e) {
-						logger.error("Can't remove push notification listener in preDelete: " + e.getMessage());
-						logger.debug(e.getMessage(), e);
+						logger.error(e.getMessage(), e);
 					}
 				}
 			}
@@ -188,8 +186,7 @@ public class PushNotificationsConfigurator {
 			try {
 				addPushNotificationsListener(ldapServer);
 			} catch (UserManagementSystemCommunicationException e) {
-				logger.error("Can't add push notification listeners: " + e.getMessage());
-				logger.debug(e.getMessage(), e);
+				logger.error(e.getMessage(), e);
 			}
 		}
 	}
@@ -209,8 +206,7 @@ public class PushNotificationsConfigurator {
 			try {
 				removePushNotificationsListener(ldapServer);
 			} catch (UserManagementSystemCommunicationException e) {
-				logger.error("Can't remove push notification listeners: " + e.getMessage());
-				logger.debug(e.getMessage(), e);
+				logger.error(e.getMessage(), e);
 			}
 		}
 	}
@@ -283,7 +279,7 @@ public class PushNotificationsConfigurator {
 		 */
 		@Override
 		public void objectRemoved(NamingEvent event) {
-			// TODO
+			removeJFireObject(event);
 		}
 
 		/**
@@ -461,6 +457,31 @@ public class PushNotificationsConfigurator {
 			
 			LDAPSyncEvent syncEvent = new LDAPSyncEvent(LDAPSyncEventType.FETCH);
 			syncEvent.setLdapUsersIds(CollectionUtil.createHashSet(newName));
+			try {
+				AsyncInvoke.exec(
+						new LDAPSyncInvocation(getLDAPServerIDByEventContext(event.getEventContext()), syncEvent),
+						successCallback, errorCallback, null, false);
+			} catch (AsyncInvokeEnqueueException e) {
+				logger.error(e.getMessage(), e);
+			}
+		}
+
+		private void removeJFireObject(NamingEvent event){
+			if (event.getEventContext() == null){
+				logger.warn("Can't proceed with removing JFire object because source EventContext is null!");
+				return;
+			}
+			
+			String name = event.getOldBinding().getNameInNamespace();
+			if (event.getOldBinding() == null 
+					|| name == null 
+					|| name.isEmpty()){
+				logger.warn("Can't proceed with removing JFire object because entry name is not specified!");
+				return;
+			}
+			
+			LDAPSyncEvent syncEvent = new LDAPSyncEvent(LDAPSyncEventType.DELETE);
+			syncEvent.setLdapUsersIds(CollectionUtil.createHashSet(name));
 			try {
 				AsyncInvoke.exec(
 						new LDAPSyncInvocation(getLDAPServerIDByEventContext(event.getEventContext()), syncEvent),

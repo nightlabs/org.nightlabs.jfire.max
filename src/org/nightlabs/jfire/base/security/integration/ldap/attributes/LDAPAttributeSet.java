@@ -187,6 +187,31 @@ public class LDAPAttributeSet implements Iterable<LDAPAttribute<Object>>{
 		addAttribute(attribute);
 		return attribute;
 	}
+	
+	/**
+	 * Parse a string and create {@link LDAPAttribute}s from it. String is a LDAP entry name, which looks like "attr1=value1,attr2=value2,...".
+	 * 
+	 * @param input
+	 */
+	public void createAttributesFromString(String input){
+		if (input == null){
+			throw new IllegalArgumentException("Can't create attributes from NULL! Non-empty string should be specified.");
+		}
+		
+		String[] attributesAndValues = new String[]{input};
+		if (input.indexOf(",") > -1){
+			attributesAndValues = input.split(",");
+		}
+		for (String nameAndValue : attributesAndValues) {
+			String[] parts = nameAndValue.split("=");
+			if (parts.length == 2
+					&& createAttribute(parts[0], parts[1]) != null){
+				continue;
+			}else{
+				logger.warn("Attribute can't be created. Name and value string is: " + nameAndValue);
+			}
+		}
+	}
 
 	/**
 	 * Get attribute value by attribute name.

@@ -231,7 +231,7 @@ public class LDAPScriptSet implements Serializable{
 		if (jfireObject instanceof User){
 			User user = (User) jfireObject;
 			b.put("user", user);
-			b.put("person", user.getPerson());
+			b.put("person", getPerson(user));
 		}else if (jfireObject instanceof Person){
 			b.put("person", jfireObject);
 		}
@@ -259,7 +259,7 @@ public class LDAPScriptSet implements Serializable{
 		if (jfireObject instanceof User){
 			User user = (User) jfireObject;
 			b.put("user", user);
-			b.put("person", user.getPerson());
+			b.put("person", getPerson(user));
 		}else if (jfireObject instanceof Person){
 			b.put("person", jfireObject);
 		}
@@ -272,18 +272,20 @@ public class LDAPScriptSet implements Serializable{
 	}
 	
 	/**
-	 * Executes script for syncronizing data from LDAP entry to JFire object. All objects are created
-	 * and stored inside the script, so there's no need to store them outside of this method.
+	 * Executes script for syncronizing data from LDAP entry to JFire object. All objects are created,
+	 * stored and deleted inside the script, so there's no need to store/delete them outside of this method.
 	 * 
 	 * @param allAttributes attributes of an entry which data is fetched
 	 * @param organisationID
+	 * @param removeJFireObjects 
 	 * @return synchronized JFire object
 	 * @throws ScriptException
 	 */
-	public Object syncLDAPDataToJFireObjects(LDAPAttributeSet allAttributes, String organisationID) throws ScriptException{
+	public Object syncLDAPDataToJFireObjects(LDAPAttributeSet allAttributes, String organisationID, boolean removeJFireObjects) throws ScriptException{
 		
 		ScriptContext ctx = new SimpleScriptContext();
 		Bindings b = ctx.getBindings(ScriptContext.ENGINE_SCOPE);
+		b.put("removeJFireObjects", removeJFireObjects);
 		b.put("allAttributes", allAttributes);
 		b.put("pm", JDOHelper.getPersistenceManager(this));
 		b.put("organisationID", organisationID);
@@ -319,4 +321,14 @@ public class LDAPScriptSet implements Serializable{
 
 	}
 	
+	private Person getPerson(User user){
+		if (user != null){
+			try{
+				return user.getPerson();	// to avoid possible DataNucleus exceptions (just log them) when running from unit tests
+			}catch(Exception e){
+				logger.error(e.getMessage(), e);
+			}
+		}
+		return null;
+	}
 }

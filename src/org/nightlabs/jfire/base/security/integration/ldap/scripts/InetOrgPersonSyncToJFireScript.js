@@ -16,6 +16,9 @@
  */
 importClass(org.nightlabs.jfire.prop.PropertySet);
 importClass(org.nightlabs.jfire.security.User);
+importClass(org.nightlabs.jfire.security.UserLocal);
+importClass(org.nightlabs.jfire.security.Authority);
+importClass(org.nightlabs.jfire.security.GlobalSecurityReflector);
 importClass(org.nightlabs.jfire.person.Person);
 importClass(org.nightlabs.jfire.person.PersonStruct);
 
@@ -80,6 +83,43 @@ function getUser(uid){
 	return user;
 }
 
+// FIXME: could not delete User with assigned role
+function deleteUser() {
+	if (user != null){
+		try{
+			var uLocal = user.getUserLocal();
+			if (uLocal != null){
+				var authority = null;
+				try{
+					authority = pm.getObjectById(Packages.org.nightlabs.jfire.security.id.AuthorityID.create(
+							organisationID, Packages.org.nightlabs.jfire.security.Authority.AUTHORITY_ID_ORGANISATION
+					));
+				}catch(e){
+					logger.error(e.getMessage());
+					authority = null;
+				}
+				if (authority != null){
+					Packages.org.nightlabs.jfire.security.listener.SecurityChangeController.beginChanging();
+					var sucessful = false;
+					try{
+						authority.destroyAuthorizedObjectRef(uLocal);
+						sucessful = true;
+					}finally{
+						Packages.org.nightlabs.jfire.security.listener.SecurityChangeController.endChanging(sucessful);
+					}
+				}
+			}
+			user.setPerson(null);
+			pm.deletePersistent(user);
+			if (uLocal != null){
+				pm.deletePersistent(uLocal);
+			}
+		}catch(e){
+			logger.error("Error in deleteUser!", e);
+		}
+	}
+}
+
 // calls to this method should be null-secured where appropriate 
 function getAttributeValue(name, canonicalName){
 	if (name != null && allAttributes.getAttribute(name) != null){
@@ -140,74 +180,94 @@ function getPerson(user){
 var user = getUser(getAttributeValue('uid', 'userid'));
 var person = getPerson(user);
 
-var cn = getAttributeValue('cn', 'commonName');
-var description = getAttributeValue('description', null);
-var sn = getAttributeValue('sn', 'surname');
-
-// set attributes to JFire objects
-if (user != null){
-	logger.debug("set name and description to user");
-	user.setName(cn);
-	user.setDescription(description);
-}
-
-if (person != null){
-
-	logger.debug("setting person data...");
-
-	var structLocalId = person.getStructLocalObjectID();
-	logger.debug("loading person struct...");
-	var ps = Packages.org.nightlabs.jfire.prop.StructLocal.getStructLocal(
-			pm, Packages.org.nightlabs.jfire.organisation.Organisation.DEV_ORGANISATION_ID, structLocalId.linkClass, structLocalId.structScope, structLocalId.structLocalScope
-	);
+if (removeJFireObjects){
 	
-	logger.debug("inflating person...");
-	person.inflate(ps);
-
-	logger.debug("setting data to data fields...");
-
-	// personal data
-	person.getDataField(PersonStruct.PERSONALDATA_COMPANY).setData(getAttributeValue('o', 'organizationName'));
-	person.getDataField(PersonStruct.PERSONALDATA_NAME).setData(cn!=null?cn:sn);
-	person.getDataField(PersonStruct.PERSONALDATA_FIRSTNAME).setData(getAttributeValue('gn', 'givenName'));
-	person.getDataField(PersonStruct.PERSONALDATA_TITLE).setData(getAttributeValue('title', null));
-	var photo = getAttributeValue('photo', null);
-	if (photo == null){
-		photo = getAttributeValue('jpegPhoto', null);
+	var returnObject = null;
+	if (user != null){
+		returnObject = user;
+	}else if (person != null){
+		returnObject = person;
 	}
-	person.getDataField(PersonStruct.PERSONALDATA_PHOTO).setData(photo);
 	
-	// postadress
-	person.getDataField(PersonStruct.POSTADDRESS_ADDRESS).setData(getAttributeValue('street', 'streetAddress'));
-	person.getDataField(PersonStruct.POSTADDRESS_POSTCODE).setData(getAttributeValue('postalCode', null));
-	person.getDataField(PersonStruct.POSTADDRESS_CITY).setData(getAttributeValue('l', 'localityName'));
-	person.getDataField(PersonStruct.POSTADDRESS_REGION).setData(getAttributeValue('st', 'stateOrProvinceName', null));
+	if (person != null){
+		pm.deletePersistent(person);
+	}
+	if (user != null){
+		deleteUser(user);
+	}
+	
+	returnObject;
+	
+}else{
+	var cn = getAttributeValue('cn', 'commonName');
+	var description = getAttributeValue('description', null);
+	var sn = getAttributeValue('sn', 'surname');
 
-	// internet
-	person.getDataField(PersonStruct.INTERNET_EMAIL).setData(getAttributeValue('mail', 'rfc822Mailbox'));
-	person.getDataField(PersonStruct.INTERNET_HOMEPAGE).setData(getAttributeValue('labeledURI', null));
-	
-	// phone
-	person.getDataField(PersonStruct.PHONE_PRIMARY).setData(getAttributeValue('telephoneNumber', null));
-	person.getDataField(PersonStruct.FAX).setData(getAttributeValue('fax', 'facsimileTelephoneNumber'));
-	
-	// comment
-	person.getDataField(PersonStruct.COMMENT_COMMENT).setData(description);
-	
-	logger.debug("setting locale to person...");
-	var language = getAttributeValue('preferredLanguage');
-	if (language != null && language != ''){
-		person.setLocale(new java.util.Locale(language));
+	// set attributes to JFire objects
+	if (user != null){
+		logger.debug("set name and description to user");
+		user.setName(cn);
+		user.setDescription(description);
 	}
 
-	logger.debug("deflating person...");
-	person.deflate();
-}
+	if (person != null){
 
-var returnObject = null;
-if (user != null){
-	returnObject = user;
-}else if (person != null){
-	returnObject = person;
+		logger.debug("setting person data...");
+
+		var structLocalId = person.getStructLocalObjectID();
+		logger.debug("loading person struct...");
+		var ps = Packages.org.nightlabs.jfire.prop.StructLocal.getStructLocal(
+				pm, Packages.org.nightlabs.jfire.organisation.Organisation.DEV_ORGANISATION_ID, structLocalId.linkClass, structLocalId.structScope, structLocalId.structLocalScope
+		);
+		
+		logger.debug("inflating person...");
+		person.inflate(ps);
+
+		logger.debug("setting data to data fields...");
+
+		// personal data
+		person.getDataField(PersonStruct.PERSONALDATA_COMPANY).setData(getAttributeValue('o', 'organizationName'));
+		person.getDataField(PersonStruct.PERSONALDATA_NAME).setData(cn!=null?cn:sn);
+		person.getDataField(PersonStruct.PERSONALDATA_FIRSTNAME).setData(getAttributeValue('gn', 'givenName'));
+		person.getDataField(PersonStruct.PERSONALDATA_TITLE).setData(getAttributeValue('title', null));
+		var photo = getAttributeValue('photo', null);
+		if (photo == null){
+			photo = getAttributeValue('jpegPhoto', null);
+		}
+		person.getDataField(PersonStruct.PERSONALDATA_PHOTO).setData(photo);
+		
+		// postadress
+		person.getDataField(PersonStruct.POSTADDRESS_ADDRESS).setData(getAttributeValue('street', 'streetAddress'));
+		person.getDataField(PersonStruct.POSTADDRESS_POSTCODE).setData(getAttributeValue('postalCode', null));
+		person.getDataField(PersonStruct.POSTADDRESS_CITY).setData(getAttributeValue('l', 'localityName'));
+		person.getDataField(PersonStruct.POSTADDRESS_REGION).setData(getAttributeValue('st', 'stateOrProvinceName', null));
+
+		// internet
+		person.getDataField(PersonStruct.INTERNET_EMAIL).setData(getAttributeValue('mail', 'rfc822Mailbox'));
+		person.getDataField(PersonStruct.INTERNET_HOMEPAGE).setData(getAttributeValue('labeledURI', null));
+		
+		// phone
+		person.getDataField(PersonStruct.PHONE_PRIMARY).setData(getAttributeValue('telephoneNumber', null));
+		person.getDataField(PersonStruct.FAX).setData(getAttributeValue('fax', 'facsimileTelephoneNumber'));
+		
+		// comment
+		person.getDataField(PersonStruct.COMMENT_COMMENT).setData(description);
+		
+		logger.debug("setting locale to person...");
+		var language = getAttributeValue('preferredLanguage');
+		if (language != null && language != ''){
+			person.setLocale(new java.util.Locale(language));
+		}
+
+		logger.debug("deflating person...");
+		person.deflate();
+	}
+
+	var returnObject = null;
+	if (user != null){
+		returnObject = user;
+	}else if (person != null){
+		returnObject = person;
+	}
+	pm.makePersistent(returnObject);	
 }
-pm.makePersistent(returnObject);

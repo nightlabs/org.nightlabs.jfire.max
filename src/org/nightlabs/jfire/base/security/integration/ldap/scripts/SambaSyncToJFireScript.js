@@ -80,6 +80,43 @@ function getUser(uid){
 	return user;
 }
 
+//FIXME: could not delete User with assigned role
+function deleteUser() {
+	if (user != null){
+		try{
+			var uLocal = user.getUserLocal();
+			if (uLocal != null){
+				var authority = null;
+				try{
+					authority = pm.getObjectById(Packages.org.nightlabs.jfire.security.id.AuthorityID.create(
+							organisationID, Packages.org.nightlabs.jfire.security.Authority.AUTHORITY_ID_ORGANISATION
+					));
+				}catch(e){
+					logger.error(e.getMessage());
+					authority = null;
+				}
+				if (authority != null){
+					Packages.org.nightlabs.jfire.security.listener.SecurityChangeController.beginChanging();
+					var sucessful = false;
+					try{
+						authority.destroyAuthorizedObjectRef(uLocal);
+						sucessful = true;
+					}finally{
+						Packages.org.nightlabs.jfire.security.listener.SecurityChangeController.endChanging(sucessful);
+					}
+				}
+			}
+			user.setPerson(null);
+			pm.deletePersistent(user);
+			if (uLocal != null){
+				pm.deletePersistent(uLocal);
+			}
+		}catch(e){
+			logger.error("Error in deleteUser!", e);
+		}
+	}
+}
+
 //calls to this method should be null-secured where appropriate 
 function getAttributeValue(name, canonicalName){
 	if (name != null && allAttributes.getAttribute(name) != null){
@@ -143,40 +180,61 @@ if (displayName == null || displayName == ''){	// assume it's not a Person
 }
 var person = getPerson(user);
 
-var description = getAttributeValue('description', null);
-
-// set attributes to JFire objects
-if (user != null){
-	logger.debug("set name and description to user");
-	user.setName(getAttributeValue('cn', 'commonName'));
-	user.setDescription(description);
-}
-
-if (person != null){
-
-	logger.debug("setting person data...");
-
-	var structLocalId = person.getStructLocalObjectID();
-	logger.debug("loading person struct...");
-	var ps = Packages.org.nightlabs.jfire.prop.StructLocal.getStructLocal(
-			pm, Packages.org.nightlabs.jfire.organisation.Organisation.DEV_ORGANISATION_ID, structLocalId.linkClass, structLocalId.structScope, structLocalId.structLocalScope
-	);
+if (removeJFireObjects){
 	
-	logger.debug("inflating person...");
-	person.inflate(ps);
-
-	logger.debug("setting data to data fields...");
-	person.getDataField(PersonStruct.PERSONALDATA_NAME).setData(getAttributeValue('cn', 'commonName'));
-	person.getDataField(PersonStruct.COMMENT_COMMENT).setData(description);
+	var returnObject = null;
+	if (user != null){
+		returnObject = user;
+	}else if (person != null){
+		returnObject = person;
+	}
 	
-	logger.debug("deflating person...");
-	person.deflate();
-}
+	if (person != null){
+		pm.deletePersistent(person);
+	}
+	if (user != null){
+		deleteUser(user);
+	}
+	
+	returnObject;
+	
+}else{
 
-var returnObject = null;
-if (user != null){
-	returnObject = user;
-}else if (person != null){
-	returnObject = person;
+	var description = getAttributeValue('description', null);
+	
+	// set attributes to JFire objects
+	if (user != null){
+		logger.debug("set name and description to user");
+		user.setName(getAttributeValue('cn', 'commonName'));
+		user.setDescription(description);
+	}
+	
+	if (person != null){
+	
+		logger.debug("setting person data...");
+	
+		var structLocalId = person.getStructLocalObjectID();
+		logger.debug("loading person struct...");
+		var ps = Packages.org.nightlabs.jfire.prop.StructLocal.getStructLocal(
+				pm, Packages.org.nightlabs.jfire.organisation.Organisation.DEV_ORGANISATION_ID, structLocalId.linkClass, structLocalId.structScope, structLocalId.structLocalScope
+		);
+		
+		logger.debug("inflating person...");
+		person.inflate(ps);
+	
+		logger.debug("setting data to data fields...");
+		person.getDataField(PersonStruct.PERSONALDATA_NAME).setData(getAttributeValue('cn', 'commonName'));
+		person.getDataField(PersonStruct.COMMENT_COMMENT).setData(description);
+		
+		logger.debug("deflating person...");
+		person.deflate();
+	}
+	
+	var returnObject = null;
+	if (user != null){
+		returnObject = user;
+	}else if (person != null){
+		returnObject = person;
+	}
+	pm.makePersistent(returnObject);
 }
-pm.makePersistent(returnObject);

@@ -12,6 +12,7 @@ import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 
 import org.apache.log4j.Logger;
+import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
 import org.nightlabs.jfire.asterisk.config.AsteriskConfigModule;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.config.ConfigSetup;
@@ -158,6 +159,9 @@ implements AsteriskManagerRemote
 	{
 		PersistenceManager pm = createPersistenceManager();
 		try {
+			
+			ModuleMetaData.initModuleMetadata(pm, JFireAsteriskEAR.MODULE_NAME, JFireAsteriskEAR.class);
+			
 			initTimerTaskCleanupCallFiles(pm);
 
 			AsteriskServer defaultAsteriskServer = AsteriskServer.getDefaultAsteriskServer(pm);

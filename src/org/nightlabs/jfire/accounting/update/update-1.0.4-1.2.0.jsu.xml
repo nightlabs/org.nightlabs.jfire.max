@@ -6,12 +6,53 @@
     http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 
 	<changeSet id="JFireTradeEAR|1.0.4|1.2.0" author="jfire">
-		<comment>MoneyFlowDimension introduced discriminator and InheritanceStrategy of its subclasses chagned to superclass-table</comment>
+		<comment>Some smaller changes to MoneyFlowDimension and BookMoneyTransfer. Changes in Accounting/Accountant handling in respect of new JFireDunning-backend.</comment>
 		
 		<ext:dnIntroduceDiscriminator className="org.nightlabs.jfire.accounting.book.mappingbased.MoneyFlowDimension"/>
 		<ext:dnChangeInheritanceStrategy className="org.nightlabs.jfire.accounting.book.mappingbased.OwnerDimension" oldStrategy="NEW_TABLE" newStrategy="SUPERCLASS_TABLE"/>
 		<ext:dnChangeInheritanceStrategy className="org.nightlabs.jfire.accounting.book.mappingbased.PriceFragmentDimension" oldStrategy="NEW_TABLE" newStrategy="SUPERCLASS_TABLE"/>
 		<ext:dnChangeInheritanceStrategy className="org.nightlabs.jfire.accounting.book.mappingbased.SourceOrganisationDimension" oldStrategy="NEW_TABLE" newStrategy="SUPERCLASS_TABLE"/>
+		
+		<ext:dnChangeClassName
+			className="org.nightlabs.jfire.accounting.book.BookMoneyTransfer"
+			newClassName="org.nightlabs.jfire.accounting.book.BookInvoiceMoneyTransfer"
+			newTableName="JFireTrade_BookInvoiceMoneyTransfer" />
+			
+		<ext:dnChangeClassName
+			className="org.nightlabs.jfire.accounting.pay.Payment.invoices"
+			newClassName="org.nightlabs.jfire.accounting.pay.Payment.payableObjects"
+			newTableName="JFireTrade_Payment_payableObjects" />
+			
+			
+		<ext:dnDropField className="org.nightlabs.jfire.accounting.priceconfig.PriceConfig" fieldName="primaryKey"/>
+		<ext:dnDropField className="org.nightlabs.jfire.accounting.Tariff" fieldName="primaryKey"/>
+		
+		<!-- There is no dn-Change for this one, and it does not really matter whether this change can really be applied -->
+		<dropColumn tableName="jfiretrade_accountant" columnName="discriminator"/>
+		
+		<!-- The following new fields can be added by DN automatically
+				jfiretrade_delivery.delivery_dt
+     			jfiretrade_invoice.due_date_for_payment
+     			jfiretrade_invoice.term_of_payment_msec
+     			jfiretrade_payment.payment_dt
+     			
+     					
+		  -->	
+		  
+		  <!-- The following new tables can be added by DN automatically
+		  		jfiretrade_legalentitysearchconfigmodule 
+		   -->	
+
+		<ext:dnIntroduceDiscriminator className="org.nightlabs.jfire.accounting.Tariff"/>
+		
+		<ext:dnDropClassTable className="org.nightlabs.jfire.accounting.AccountingPriceConfig" />
+
+		<!-- In order to adapt for the new Accounting/Accountant we naively drop 
+			all tables and rely on Accounting#getAccounting() to (re-)setup all correctly. -->
+		<ext:dnDropClassTable className="org.nightlabs.jfire.accounting.book.LocalAccountant"/>
+		<ext:dnDropClassTable className="org.nightlabs.jfire.accounting.book.PartnerAccountant"/>
+		<ext:dnDropClassTable className="org.nightlabs.jfire.accounting.book.Accountant"/>
+		<ext:dnDropClassTable className="org.nightlabs.jfire.accounting.Accounting"/>
 		
     </changeSet>
     

@@ -47,12 +47,14 @@
 		
 		<ext:dnDropClassTable className="org.nightlabs.jfire.accounting.AccountingPriceConfig" />
 
+		<!-- We drop all constraints on jfiretrade_accounting and hope that DN will re-create them -->
+		<dropAllForeignKeyConstraints baseTableName="jfiretrade_accounting"/>
+		
 		<!-- In order to adapt for the new Accounting/Accountant we naively drop 
 			all tables and rely on Accounting#getAccounting() to (re-)setup all correctly. -->
 		<ext:dnDropClassTable className="org.nightlabs.jfire.accounting.book.LocalAccountant"/>
 		<ext:dnDropClassTable className="org.nightlabs.jfire.accounting.book.PartnerAccountant"/>
-		<ext:dnDropClassTable className="org.nightlabs.jfire.accounting.book.Accountant"/>
-		<ext:dnDropClassTable className="org.nightlabs.jfire.accounting.Accounting"/>
+		
 		
     </changeSet>
     

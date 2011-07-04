@@ -99,7 +99,7 @@ public class PushNotificationsConfigurator {
 					if (ldapServer.isLeading()){
 						addPushNotificationsListener(ldapServer, syncPushNotificationsListener);
 					}else{
-						removePushNotificationsListener(ldapServer, syncPushNotificationsListener);
+						removePushNotificationsListenerInternal(ldapServer, syncPushNotificationsListener);
 					}
 				} catch (UserManagementSystemCommunicationException e) {
 					logger.error(e.getMessage(), e);
@@ -123,7 +123,7 @@ public class PushNotificationsConfigurator {
 				LDAPServer ldapServer = (LDAPServer) event.getPersistentInstance();
 				if (ldapServer.isLeading()){
 					try {
-						removePushNotificationsListener(ldapServer, syncPushNotificationsListener);
+						removePushNotificationsListenerInternal(ldapServer, syncPushNotificationsListener);
 					} catch (UserManagementSystemCommunicationException e) {
 						logger.error(e.getMessage(), e);
 					}
@@ -218,7 +218,7 @@ public class PushNotificationsConfigurator {
 				);
 		for (LDAPServer ldapServer : leadingSystems) {
 			try {
-				removePushNotificationsListener(ldapServer, syncPushNotificationsListener);
+				removePushNotificationsListenerInternal(ldapServer, syncPushNotificationsListener);
 			} catch (UserManagementSystemCommunicationException e) {
 				logger.error(e.getMessage(), e);
 			}
@@ -226,14 +226,14 @@ public class PushNotificationsConfigurator {
 	}
 
 	/**
-	 * Removes a given {@link NamingListener} from a given {@link LDAPServer}
+	 * Removes a given {@link NamingListener} from a given {@link LDAPServer} by its ID.
 	 * 
-	 * @param ldapServer {@link LDAPServer} to remove listener from
+	 * @param ldapServerID The ID of {@link LDAPServer} to remove listener from
 	 * @param listener {@link NamingListener} to be removed
 	 */
-	public void removePushNotificationListener(LDAPServer ldapServer, NamingListener listener){
+	public void removePushNotificationListener(UserManagementSystemID ldapServerID, NamingListener listener){
 		try {
-			removePushNotificationsListener(ldapServer, listener);
+			removePushNotificationsListenerInternal(ldapServerID, listener);
 		} catch (UserManagementSystemCommunicationException e) {
 			logger.error(e.getMessage(), e);
 		}
@@ -573,7 +573,7 @@ public class PushNotificationsConfigurator {
 						}
 						return;
 					}else{
-						removePushNotificationsListener(ldapServer, listener);
+						removePushNotificationsListenerInternal(ldapServer, listener);
 					}
 				}
 
@@ -632,8 +632,12 @@ public class PushNotificationsConfigurator {
 		}
 	}
 	
-	private void removePushNotificationsListener(LDAPServer ldapServer, NamingListener listener) throws UserManagementSystemCommunicationException{
+	private void removePushNotificationsListenerInternal(LDAPServer ldapServer, NamingListener listener) throws UserManagementSystemCommunicationException{
 		UserManagementSystemID ldapServerID = UserManagementSystemID.create(ldapServer.getOrganisationID(), ldapServer.getUserManagementSystemID());
+		removePushNotificationListener(ldapServerID, listener);
+	}
+
+	private void removePushNotificationsListenerInternal(UserManagementSystemID ldapServerID, NamingListener listener) throws UserManagementSystemCommunicationException{
 		if (registeredContexts.containsKey(ldapServerID)){
 			try{
 				synchronized (registeredContexts) {
@@ -650,7 +654,7 @@ public class PushNotificationsConfigurator {
 			}
 		}
 	}
-	
+
 	/**
 	 * Get ID of {@link LDAPServer} by given {@link EventContext}.
 	 * 

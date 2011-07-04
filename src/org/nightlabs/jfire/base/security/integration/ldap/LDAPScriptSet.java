@@ -93,7 +93,14 @@ public class LDAPScriptSet implements Serializable{
 	@Persistent
 	@Column(sqlType="CLOB")
 	private String generateParentLdapEntriesScript;
-	
+
+	/**
+	 * Generates and returns name of attribute which holds user password in LDAP.
+	 */
+	@Persistent
+	@Column(sqlType="CLOB")
+	private String generateUserPasswordAttributeName;
+
 	@Persistent(defaultFetchGroup="true")
 	private LDAPServer ldapServer;
 	
@@ -114,7 +121,7 @@ public class LDAPScriptSet implements Serializable{
 	}
 	
 	/**
-	 * Set ldapDNScript contents
+	 * Set {@link #ldapDNScript} contents
 	 * @param ldapDN
 	 */
 	public void setLdapDNScript(String ldapDN) {
@@ -122,7 +129,7 @@ public class LDAPScriptSet implements Serializable{
 	}
 	
 	/**
-	 * Get ldapDNScript contents
+	 * Get {@link #ldapDNScript} contents
 	 * @return script contents as {@link String}
 	 */
 	public String getLdapDNScript() {
@@ -130,7 +137,7 @@ public class LDAPScriptSet implements Serializable{
 	}
 	
 	/**
-	 * Set syncJFireToLdapScript content
+	 * Set {@link #generateJFireToLdapAttributesScript} content
 	 * @param syncJFireToLdapScript
 	 */
 	public void setGenerateJFireToLdapAttributesScript(String syncJFireToLdapScript) {
@@ -138,7 +145,7 @@ public class LDAPScriptSet implements Serializable{
 	}
 	
 	/**
-	 * Get syncJFireToLdapScript contents
+	 * Get {@link #generateJFireToLdapAttributesScript} contents
 	 * @return script contents as {@link String}
 	 */
 	public String getGenerateJFireToLdapAttributesScript() {
@@ -146,7 +153,7 @@ public class LDAPScriptSet implements Serializable{
 	}
 	
 	/**
-	 * Set syncLdapToJFireScript content
+	 * Set {@link #syncLdapToJFireScript} content
 	 * @param syncLdapToJFireScript
 	 */
 	public void setSyncLdapToJFireScript(String syncLdapToJFireScript) {
@@ -154,7 +161,7 @@ public class LDAPScriptSet implements Serializable{
 	}
 	
 	/**
-	 * Get syncLdapToJFireScript contents
+	 * Get {@link #syncLdapToJFireScript} contents
 	 * @return script contents as {@link String}
 	 */
 	public String getSyncLdapToJFireScript() {
@@ -162,7 +169,7 @@ public class LDAPScriptSet implements Serializable{
 	}
 	
 	/**
-	 * Set bindVariablesScript content
+	 * Set {@link #bindVariablesScript} content
 	 * @param bindVariablesScript
 	 */
 	public void setBindVariablesScript(String bindVariablesScript) {
@@ -170,7 +177,7 @@ public class LDAPScriptSet implements Serializable{
 	}
 	
 	/**
-	 * Get bindVariablesScript contents
+	 * Get {@link #bindVariablesScript} contents
 	 * @return script contents as {@link String}
 	 */
 	public String getBindVariablesScript() {
@@ -178,7 +185,7 @@ public class LDAPScriptSet implements Serializable{
 	}
 	
 	/**
-	 * Set generateParentLdapEntriesScript content
+	 * Set {@link #generateParentLdapEntriesScript} content
 	 * @param generateParentLdapEntriesScript
 	 */
 	public void setGenerateParentLdapEntriesScript(String generateParentLdapEntriesScript) {
@@ -186,11 +193,27 @@ public class LDAPScriptSet implements Serializable{
 	}
 	
 	/**
-	 * Get generateParentLdapEntriesScript contents
+	 * Get {@link #generateParentLdapEntriesScript} contents
 	 * @return script contents as {@link String}
 	 */
 	public String getGenerateParentLdapEntriesScript() {
 		return generateParentLdapEntriesScript;
+	}
+	
+	/**
+	 * Set {@link #generateUserPasswordAttributeName} contents 
+	 * @param generateUserPasswordAttributeName
+	 */
+	public void setGenerateUserPasswordAttributeName(String generateUserPasswordAttributeName) {
+		this.generateUserPasswordAttributeName = generateUserPasswordAttributeName;
+	}
+	
+	/**
+	 * Get {@link #generateUserPasswordAttributeName} contents
+	 * @return script contents as {@link String}
+	 */
+	public String getGenerateUserPasswordAttributeName() {
+		return generateUserPasswordAttributeName;
 	}
 	
 	/**
@@ -300,7 +323,7 @@ public class LDAPScriptSet implements Serializable{
 	/**
 	 * Executes script for getting collection of parent LDAP entries which hold child entries to be synchronized. 
 	 * 
-	 * @return
+	 * @return {@link Collection} of entries names or <code>null</code> if script did not return any
 	 * @throws ScriptException
 	 */
 	@SuppressWarnings("unchecked")
@@ -308,6 +331,20 @@ public class LDAPScriptSet implements Serializable{
 		Object result = execute(generateParentLdapEntriesScript, new SimpleScriptContext());
 		if (result instanceof Collection){
 			return (Collection<String>) result;
+		}
+		return null;
+	}
+	
+	/**
+	 * Executes script for getting the name of attribute which holfd user password in LDAP. 
+	 * 
+	 * @return attribute name as {@link String} or <code>null</code> if script did not return any
+	 * @throws ScriptException
+	 */
+	public String getUserPasswordAttributeName() throws ScriptException{
+		Object result = execute(generateUserPasswordAttributeName, new SimpleScriptContext());
+		if (result instanceof String){
+			return (String) result;
 		}
 		return null;
 	}

@@ -28,6 +28,7 @@ import org.nightlabs.jfire.base.security.integration.ldap.sync.LDAPSyncEvent;
 import org.nightlabs.jfire.base.security.integration.ldap.sync.LDAPSyncEvent.LDAPSyncEventType;
 import org.nightlabs.jfire.base.security.integration.ldap.sync.LDAPSyncException;
 import org.nightlabs.jfire.base.security.integration.ldap.sync.PushNotificationsConfigurator;
+import org.nightlabs.jfire.base.security.integration.ldap.sync.SecurityChangeListenerJFirePasswordChanged;
 import org.nightlabs.jfire.base.security.integration.ldap.sync.SyncLifecycleListener;
 import org.nightlabs.jfire.person.Person;
 import org.nightlabs.jfire.security.User;
@@ -83,6 +84,9 @@ public class LDAPManagerBean extends BaseSessionBeanImpl implements LDAPManagerR
 			// that leading system scenario will be changed at server runtime
 			configureJFireAsLeadingSystem(pm);
 			configureLdapAsLeadingSystem(pm);
+			
+			// track password chages in JFire and propagate it to LDAP directory
+			SecurityChangeListenerJFirePasswordChanged.register(pm);
 			
 		}finally{
 			pm.close();

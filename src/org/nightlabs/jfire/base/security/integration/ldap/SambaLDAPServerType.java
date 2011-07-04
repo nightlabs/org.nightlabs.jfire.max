@@ -27,6 +27,7 @@ public class SambaLDAPServerType extends UserManagementSystemType<LDAPServer> {
 	private static final String SAMBA_GET_DN_SCRIPT = "scripts/SambaGetDNScript.js";
 	private static final String SAMBA_BIND_VARIABLES_SCRIPT = "scripts/CommonBindVariablesScript.js";
 	private static final String SAMBA_GET_PARENT_ENTRIES_SCRIPT = "scripts/SambaGetParentEntriesScript.js";
+	private static final String SAMBA_GET_USER_PASSWORD_ATTRRIBUTE_NAME_SCRIPT = "scripts/CommonGetUserPasswordAttributeNameScript.js";
 	
 	/**
 	 * The serial version of this class.
@@ -65,6 +66,7 @@ public class SambaLDAPServerType extends UserManagementSystemType<LDAPServer> {
 			ldapScriptSet.setGenerateJFireToLdapAttributesScript(IOUtil.readTextFile(typeClass.getResourceAsStream(SAMBA_GET_ATTRIBUTES_FOR_LDAP_SCRIPT)));
 			ldapScriptSet.setSyncLdapToJFireScript(IOUtil.readTextFile(typeClass.getResourceAsStream(SAMBA_SYNC_TO_JFIRE_SCRIPT)));
 			ldapScriptSet.setGenerateParentLdapEntriesScript(IOUtil.readTextFile(typeClass.getResourceAsStream(SAMBA_GET_PARENT_ENTRIES_SCRIPT)));
+			ldapScriptSet.setGenerateUserPasswordAttributeName(IOUtil.readTextFile(typeClass.getResourceAsStream(SAMBA_GET_USER_PASSWORD_ATTRRIBUTE_NAME_SCRIPT)));
 
 			server.setLdapScriptSet(ldapScriptSet);
 			

@@ -27,6 +27,7 @@ public class InetOrgPersonLDAPServerType extends UserManagementSystemType<LDAPSe
 	private static final String INET_ORG_PERSON_GET_DN_SCRIPT = "scripts/InetOrgPersonGetDNScript.js";
 	private static final String INET_ORG_PERSON_BIND_VARIABLES_SCRIPT = "scripts/CommonBindVariablesScript.js";
 	private static final String INET_ORG_PERSON_GET_PARENT_ENTRIES_SCRIPT = "scripts/InetOrgPersonGetParentEntriesScript.js";
+	private static final String INET_ORG_PERSON_GET_USER_PASSWORD_ATTRRIBUTE_NAME_SCRIPT = "scripts/CommonGetUserPasswordAttributeNameScript.js";
 	
 	/**
 	 * The serial version of this class.
@@ -65,6 +66,7 @@ public class InetOrgPersonLDAPServerType extends UserManagementSystemType<LDAPSe
 			ldapScriptSet.setGenerateJFireToLdapAttributesScript(IOUtil.readTextFile(typeClass.getResourceAsStream(INET_ORG_PERSON_GET_ATTRIBUTES_FOR_LDAP_SCRIPT)));
 			ldapScriptSet.setSyncLdapToJFireScript(IOUtil.readTextFile(typeClass.getResourceAsStream(INET_ORG_PERSON_SYNC_TO_JFIRE_SCRIPT)));
 			ldapScriptSet.setGenerateParentLdapEntriesScript(IOUtil.readTextFile(typeClass.getResourceAsStream(INET_ORG_PERSON_GET_PARENT_ENTRIES_SCRIPT)));
+			ldapScriptSet.setGenerateUserPasswordAttributeName(IOUtil.readTextFile(typeClass.getResourceAsStream(INET_ORG_PERSON_GET_USER_PASSWORD_ATTRRIBUTE_NAME_SCRIPT)));
 
 			server.setLdapScriptSet(ldapScriptSet);
 			

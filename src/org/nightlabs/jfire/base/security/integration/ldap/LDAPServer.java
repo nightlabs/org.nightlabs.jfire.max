@@ -69,7 +69,7 @@ import org.slf4j.LoggerFactory;
 })
 @Queries(
 		@javax.jdo.annotations.Query(
-				name=LDAPServer.FIND_LDAP_SERVERS,
+				name="LDAPServer.findLDAPServers",
 				value="SELECT where this.host == :host && this.port == :port && this.encryptionMethod == :encryptionMethod ORDER BY JDOHelper.getObjectId(this) ASCENDING"
 				)
 		)
@@ -84,7 +84,6 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 	public static final String SYNC_USER_DATA_FROM_LDAP_TASK_ID = "JFireLDAP-syncUserDataFromLDAP";
 	public static final String FETCH_GROUP_LDAP_SCRIPT_SET = "LDAPServer.ldapScriptSet";
 
-	private static final String FIND_LDAP_SERVERS = "LDAPServer.findLDAPServers";
 	private static final Logger logger = LoggerFactory.getLogger(LDAPServer.class);
 
 	/**
@@ -107,7 +106,7 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 		
 		javax.jdo.Query q = pm.newNamedQuery(
 				LDAPServer.class, 
-				LDAPServer.FIND_LDAP_SERVERS
+				"LDAPServer.findLDAPServers"
 				);
 		@SuppressWarnings("unchecked")
 		List<LDAPServer> foundServers = (List<LDAPServer>) q.execute(host, port, encryptionMethod);
@@ -868,7 +867,6 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 							
 							connection.createEntry(userDN, modifyAttributes);
 						}
-						
 					}
 
 					if (logger.isDebugEnabled()){
@@ -889,10 +887,10 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 		
 		try{
 			// if some User is logged in than we assume that bind operation has been already performed
-			// TODO: check if this user has enough permissions to modify LDAP entries
+			// TODO: check if this user has enough permissions to modify LDAP entries, see issue 1971
 			GlobalSecurityReflector.sharedInstance().getUserDescriptor();
 			
-			// TODO: temp
+			// TODO: temp, see issue 1974
 			connection.bind(syncDN, syncPassword);
 			
 		}catch(NoUserException e){

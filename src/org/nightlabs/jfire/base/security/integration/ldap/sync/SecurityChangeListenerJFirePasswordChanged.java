@@ -158,9 +158,7 @@ public class SecurityChangeListenerJFirePasswordChanged extends SecurityChangeLi
 			}
 			
 			connection = LDAPConnectionManager.sharedInstance().getConnection(ldapServer);
-
-			// FIXME: see issue 1974
-			connection.bind(ldapServer.getSyncDN(), ldapServer.getSyncPassword());
+			ldapServer.bindForSynchronization(connection);
 
 			String entryDN = ldapServer.getLdapScriptSet().getLdapDN(user);
 			if (logger.isDebugEnabled()){

@@ -42,6 +42,7 @@ import org.nightlabs.jfire.base.security.integration.ldap.sync.LDAPSyncEvent.LDA
 import org.nightlabs.jfire.security.GlobalSecurityReflector;
 import org.nightlabs.jfire.security.NoUserException;
 import org.nightlabs.jfire.security.User;
+import org.nightlabs.jfire.security.UserDescriptor;
 import org.nightlabs.jfire.security.integration.UserManagementSystem;
 import org.nightlabs.jfire.security.integration.UserManagementSystemCommunicationException;
 import org.nightlabs.jfire.security.integration.id.UserManagementSystemID;
@@ -597,12 +598,20 @@ public class PushNotificationsConfigurator {
 					try{	// check if anonymous access to LDAP directory is enabled
 						ctx = context.lookup(parentEntry);
 					}catch(NoPermissionException e){	// specify bind login/password otherwise
-
-						context.addToEnvironment(Context.SECURITY_AUTHENTICATION, ldapServer.getAuthenticationMethod().stringValue());
-						context.addToEnvironment(Context.SECURITY_PRINCIPAL, ldapServer.getSyncDN());
-						context.addToEnvironment(Context.SECURITY_CREDENTIALS, ldapServer.getSyncPassword());
-			
-						context.reconnect(context.getConnectControls());
+						
+						boolean successful = bindContextWithCurrentUser(context, ldapServer);
+						if (!successful){
+							logger.info("Unable to bind with current JFire user, will try global syncUser.");
+							if (ldapServer.getSyncDN() != null
+									&& ldapServer.getSyncPassword() != null){
+								bindContext(context, ldapServer.getAuthenticationMethod().stringValue(), ldapServer.getSyncDN(), ldapServer.getSyncPassword());
+							}else{
+								
+								logger.error("Unable to bind with global syncUser because it's not set. Push notifications listener will NOT be added.");
+								return;
+								
+							}
+						}
 
 						ctx = context.lookup(parentEntry);
 					}
@@ -630,6 +639,63 @@ public class PushNotificationsConfigurator {
 			throw new UserManagementSystemCommunicationException(
 					"Can't add push notification listener to LDAPServer with ID: " + ldapServerID.toString(), e);
 		}
+	}
+	
+	private boolean bindContextWithCurrentUser(InitialLdapContext context, LDAPServer ldapServer) throws ScriptException{
+		logger.info("Trying to bind against LDAP with current user.");
+		try{
+			UserDescriptor userDescriptor = GlobalSecurityReflector.sharedInstance().getUserDescriptor();
+			if (logger.isDebugEnabled()){
+				logger.debug("Current user is: " + userDescriptor.getCompleteUserID());
+			}
+			
+			if (User.USER_ID_SYSTEM.equals(userDescriptor.getUserID())){
+				logger.info("Current user is a JFire system user, can't bind it against LDAP");
+				return false;
+			}
+			
+			Object credential = GlobalSecurityReflector.sharedInstance().getCredential();
+			String pwd = null;
+			if (credential instanceof String){
+				pwd = (String) credential;
+			}else if (credential instanceof char[]){
+				pwd = new String((char[]) credential);
+			}else{
+				logger.warn("Cannot get string password for current user: " + userDescriptor.getCompleteUserID());
+				return false;
+			}
+			
+			if (logger.isDebugEnabled()){
+				logger.debug("Got password for user, trying to bind: " + userDescriptor.getCompleteUserID());
+			}
+			
+			String userDN = ldapServer.getLdapScriptSet().getLdapDN(
+					new User(userDescriptor.getOrganisationID(), userDescriptor.getUserID()));
+
+			if (logger.isDebugEnabled()){
+				logger.debug("LDAP entry name for current user is: " + userDN);
+			}
+			
+			try{
+				bindContext(context, ldapServer.getAuthenticationMethod().stringValue(), userDN, pwd);
+				return true;
+			}catch(NamingException ne){
+				logger.warn("Bind failed with current user: " + userDescriptor.getCompleteUserID(), ne);
+				return false;
+			}
+			
+		}catch(NoUserException ex){
+			logger.info("No current user. Will try global syncUser if set.");
+			return false;
+		}
+	}
+	
+	private void bindContext(InitialLdapContext context, String authMethod, String user, String pwd) throws NamingException{
+		context.addToEnvironment(Context.SECURITY_AUTHENTICATION, authMethod);
+		context.addToEnvironment(Context.SECURITY_PRINCIPAL, user);
+		context.addToEnvironment(Context.SECURITY_CREDENTIALS, pwd);
+
+		context.reconnect(context.getConnectControls());
 	}
 	
 	private void removePushNotificationsListenerInternal(LDAPServer ldapServer, NamingListener listener) throws UserManagementSystemCommunicationException{

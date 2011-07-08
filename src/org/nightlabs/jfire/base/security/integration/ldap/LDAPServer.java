@@ -35,6 +35,7 @@ import org.nightlabs.jfire.base.security.integration.ldap.sync.SyncLifecycleList
 import org.nightlabs.jfire.security.GlobalSecurityReflector;
 import org.nightlabs.jfire.security.NoUserException;
 import org.nightlabs.jfire.security.User;
+import org.nightlabs.jfire.security.UserDescriptor;
 import org.nightlabs.jfire.security.integration.Session;
 import org.nightlabs.jfire.security.integration.UserManagementSystem;
 import org.nightlabs.jfire.security.integration.UserManagementSystemCommunicationException;
@@ -611,7 +612,92 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 		}
 		
 	}
-	
+
+	/**
+	 * Convinient method which binds given {@link LDAPConnection} before data synchronization to LDAP.
+	 * First it tries to bind against LDAP using currently logged in {@link User} credentials. If that fails
+	 * it tries to bind using {@link #syncDN} and {@link #syncPassword} fields if they are set.
+	 * If non of that succeeds it just logs a warning that all further requests to LDAP directory will be 
+	 * anonymous so it's up to LDAP directory itself whether it allows anonymous access or throws some kind
+	 * of authentication exception (which of course will be propagated to JFire).
+	 * 
+	 * @param connection {@link LDAPConnection} to bind
+	 * @throws LoginException
+	 * @throws UserManagementSystemCommunicationException
+	 */
+	public void bindForSynchronization(LDAPConnection connection) throws LoginException, UserManagementSystemCommunicationException{
+		
+		boolean fallToGlobalSyncCredentials = false;
+		try{
+			UserDescriptor userDescriptor = GlobalSecurityReflector.sharedInstance().getUserDescriptor();
+
+			if (User.USER_ID_SYSTEM.equals(userDescriptor.getUserID())){
+				
+				logger.warn(
+						String.format(
+								"Current user is a system user with ID %s, can't bind it against LDAP. Will try to bind with global syncDN/syncPassword if set.", userDescriptor.getCompleteUserID()));
+				fallToGlobalSyncCredentials = true;
+				
+			}else{
+			
+				User user = null;
+				PersistenceManager pm = JDOHelper.getPersistenceManager(this);
+				if (pm != null){
+					user = userDescriptor.getUser(pm);
+				}else{	// create fake, not persisted new User just to get LDAP entry DN
+					user = new User(userDescriptor.getOrganisationID(), userDescriptor.getUserID());
+				}
+				
+				String bindDN = getLDAPUserDN(user);
+				String bindPwd = null;
+				
+				Object credential = GlobalSecurityReflector.sharedInstance().getCredential();
+				if (credential instanceof String){
+					bindPwd = (String) credential;
+				}else if (credential instanceof char[]){
+					bindPwd = new String((char[])credential);
+				}else{
+					logger.warn("User credential type is neither String nor char[], can't use it for binding against LDAP. UserID: " + userDescriptor.getCompleteUserID());
+				}
+				
+				if (canBind(bindDN, bindPwd)){
+					// TODO: check if this user has enough permissions to read/modify LDAP entries, see issue 1971 (enhancement)
+					try{
+						connection.bind(bindDN, bindPwd);
+					}catch(LoginException e){
+						// if we can't log in with current User credentials, we fall to global syncDN/syncPassword
+						logger.warn(
+								String.format(
+										"Can't bind with current User credentials, bind entry name: %s. LoginException occured.", bindDN), e);
+						fallToGlobalSyncCredentials = true;
+					}
+				}else{
+					logger.info(
+							String.format(
+									"Unable to bind against LDAP with current user (userID=%s) credentials, will try to bind with global syncDN/syncPassword if set.", userDescriptor.getCompleteUserID()));
+					fallToGlobalSyncCredentials = true;
+				}
+				
+			}
+		}catch(NoUserException e){
+			// There's no logged in User, so we'll try to bind with syncDN and syncPasswrod
+			fallToGlobalSyncCredentials = true;
+		}
+		
+		if (fallToGlobalSyncCredentials){
+			if (canBind(syncDN, syncPassword)){
+				
+				connection.bind(syncDN, syncPassword);
+				
+			}else{
+				logger.warn(
+						"Can't bind against LDAP because either syncDN or password are not specified. " +
+						"There's also no logged in User so all further requests to LDAP will be performed under anonymous user."
+						);
+			}
+		}
+	}
+
 	/**
 	 * Retrieves all entries' names from LDAP which should be synchronized with JFire objects.
 	 * 
@@ -624,11 +710,9 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 		LDAPConnection connection = null;
 		Collection<String> entriesForSync = new ArrayList<String>();
 		try{
-
-			PersistenceManager pm = JDOHelper.getPersistenceManager(this);
 			connection = createConnection(this);
 
-			bindForSync(connection, pm);
+			bindForSynchronization(connection);
 			
 			Collection<String> parentEntriesNames = new ArrayList<String>();
 			try {
@@ -726,8 +810,7 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 			}
 
 			connection = createConnection(this);
-
-			bindForSync(connection, pm);
+			bindForSynchronization(connection);
 			
 			// disable JDO lifecycle listener used for JFire2LDAP synchronization
 			SyncLifecycleListener.setEnabled(false);
@@ -799,12 +882,10 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 		LDAPConnection connection = null;
 		try{
 
-			PersistenceManager pm = JDOHelper.getPersistenceManager(this);
 			connection = createConnection(this);
+			bindForSynchronization(connection);
 
-			// We need to be logged in against LDAPServer for modification calls.
-			bindForSync(connection, pm);
-
+			PersistenceManager pm = JDOHelper.getPersistenceManager(this);
 			for (Object jfireObjectId : jfireObjectsIds){
 				try{
 					
@@ -883,31 +964,6 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 		}
 	}
 	
-	private void bindForSync(LDAPConnection  connection, PersistenceManager pm) throws LoginException, UserManagementSystemCommunicationException{
-		
-		try{
-			// if some User is logged in than we assume that bind operation has been already performed
-			// TODO: check if this user has enough permissions to modify LDAP entries, see issue 1971
-			GlobalSecurityReflector.sharedInstance().getUserDescriptor();
-			
-			// TODO: temp, see issue 1974
-			connection.bind(syncDN, syncPassword);
-			
-		}catch(NoUserException e){
-			// There's no logged in User, so we'll try to bind with syncDN and syncPasswrod
-			if (canBind(syncDN, syncPassword)){
-				
-				connection.bind(syncDN, syncPassword);
-				
-			}else{
-				logger.warn(
-						"Can't bind against LDAP because either syncDN or password are not specified. " +
-						"There's also no logged in User so all further requests to LDAP will be performed under anonymous user."
-						);
-			}
-		}
-	}
-
 	private AuthCallbackHandler createAuthCallbackHandler(JFireServerManager ism, User user) throws Exception {
 		return new AuthCallbackHandler(ism,
 				user.getOrganisationID(),

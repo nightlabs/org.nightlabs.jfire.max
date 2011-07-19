@@ -1,10 +1,10 @@
-<!DOCTYPE organisation-initialisation
-		PUBLIC "-//NightLabs GmbH//DTD Organisation Initialisation 1.0//EN"
-		"http://www.nightlabs.de/dtd/organisation-init_1_0.dtd">
-<organisation-initialisation>
+<organisation-initialisation
+		xmlns="urn:jfire.org:organisation-init_1_1"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="urn:jfire.org:organisation-init_1_1 http://dev.nightlabs.org/xml/organisation-init_1_1.xsd ">
 
-	<init bean="org.nightlabs.jfire.dynamictrade.DynamicTradeManagerRemote" method="initialise">
-			<depends module="JFireTradeEAR.ear" />
+	<init invocation="org.nightlabs.jfire.dynamictrade.DynamicTradeManagerRemote.initialise">
+		<depends invocation="org.nightlabs.jfire.trade" />
 	</init>
 
 </organisation-initialisation>

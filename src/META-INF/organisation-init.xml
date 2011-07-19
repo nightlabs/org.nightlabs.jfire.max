@@ -6,4 +6,5 @@
 	<init:init invocation="org.nightlabs.jfire.department.DepartmentManagerRemote.initialise">
 		<init:depends invocation="org.nightlabs.jfire.base" />
 	</init:init>
+
 </init:organisation-initialisation>

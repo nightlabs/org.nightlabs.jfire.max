@@ -1,25 +1,16 @@
-<!DOCTYPE organisation-initialisation
-		PUBLIC "-//NightLabs GmbH//DTD Organisation Initialisation 1.0//EN"
-		"http://www.nightlabs.de/dtd/organisation-init_1_0.dtd">
-<organisation-initialisation>
-	<init bean="org.nightlabs.jfire.reporting.ReportManagerRemote" method="initialise">
-		<depends
-			module="JFireBaseEAR.ear"
-			archive="JFireBaseBean.jar" />
-		<depends
-			module="JFireScriptingEAR.ear"
-			archive="JFireScripting.jar" />
+<organisation-initialisation
+		xmlns="urn:jfire.org:organisation-init_1_1"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="urn:jfire.org:organisation-init_1_1 http://dev.nightlabs.org/xml/organisation-init_1_1.xsd ">
+
+	<init invocation="org.nightlabs.jfire.reporting.ReportManagerRemote.initialise">
+		<depends invocation="org.nightlabs.jfire.base"/>
+		<depends invocation="org.nightlabs.jfire.scripting"/>
 	</init>
-	<init bean="org.nightlabs.jfire.reporting.parameter.ReportParameterManagerRemote" method="initDefaultValueProviders">
-		<depends
-			module="JFireReportingEAR.ear" 
-			archive="JFireReporting.jar" 
-			bean="org.nightlabs.jfire.reporting.ReportManagerRemote"/>
+	<init invocation="org.nightlabs.jfire.reporting.parameter.ReportParameterManagerRemote.initDefaultValueProviders">
+		<depends invocation="org.nightlabs.jfire.reporting.ReportManagerRemote"/>
 	</init>
-	<init bean="org.nightlabs.jfire.reporting.scheduled.ScheduledReportManagerRemote" method="initialise">
-		<depends
-			module="JFireReportingEAR.ear" 
-			archive="JFireReporting.jar" 
-			bean="org.nightlabs.jfire.reporting.ReportManagerRemote"/>
+	<init invocation="org.nightlabs.jfire.reporting.scheduled.ScheduledReportManagerRemote.initialise">
+		<depends invocation="org.nightlabs.jfire.reporting.ReportManagerRemote"/>
 	</init>
 </organisation-initialisation>

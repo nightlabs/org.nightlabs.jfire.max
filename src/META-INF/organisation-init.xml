@@ -1,8 +1,10 @@
-<!DOCTYPE organisation-initialisation
-		PUBLIC "-//NightLabs GmbH//DTD Organisation Initialisation 1.0//EN"
-		"http://www.nightlabs.de/dtd/organisation-init_1_0.dtd">
-<organisation-initialisation>
-	<init bean="org.nightlabs.jfire.prop.file.PropFileManagerRemote" method="initialise">
-		<depends module="JFireBaseEAR.ear"/>
+<organisation-initialisation
+		xmlns="urn:jfire.org:organisation-init_1_1"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="urn:jfire.org:organisation-init_1_1 http://dev.nightlabs.org/xml/organisation-init_1_1.xsd ">
+
+	<init invocation="org.nightlabs.jfire.prop.file.PropFileManagerRemote.initialise">
+		<depends invocation="org.nightlabs.jfire.base" />
 	</init>
+
 </organisation-initialisation>

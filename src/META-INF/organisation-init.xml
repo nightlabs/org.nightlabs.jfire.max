@@ -1,26 +1,28 @@
-<!DOCTYPE organisation-initialisation
-		PUBLIC "-//NightLabs GmbH//DTD Organisation Initialisation 1.0//EN"
-		"http://www.nightlabs.de/dtd/organisation-init_1_0.dtd">
-<organisation-initialisation>
-	<init bean="org.nightlabs.jfire.accounting.AccountingManagerRemote" method="initialise">
-		<depends module="JFireJbpmEAR.ear"/>
-		<depends module="JFireBaseEAR.ear"
-			archive="JFireBaseBean.jar"/>
+<organisation-initialisation
+		xmlns="urn:jfire.org:organisation-init_1_1.xsd"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="urn:jfire.org:organisation-init_1_1.xsd http://dev.nightlabs.org/xml/organisation-init_1_1.xsd ">
+
+	<init invocation="org.nightlabs.jfire.accounting.AccountingManagerRemote.initialise">
+		<depends invocation="org.nightlabs.jfire.jbpm"/>
+		<depends invocation="org.nightlabs.jfire.base" />
 	</init>
-	<init bean="org.nightlabs.jfire.store.StoreManagerRemote" method="initialise">
-		<depends module="JFireJbpmEAR.ear"/>
-		<depends module="JFireBaseEAR.ear"
-			archive="JFireBaseBean.jar"/>
+	<init invocation="org.nightlabs.jfire.store.StoreManagerRemote.initialise">
+		<depends invocation="org.nightlabs.jfire.jbpm"/>
+		<depends invocation="org.nightlabs.jfire.base" />
 	</init>
-	<init bean="org.nightlabs.jfire.trade.TradeManagerRemote" method="initialise">
-		<depends module="JFireJbpmEAR.ear"/>
-		<depends module="JFireBaseEAR.ear"
-			archive="JFireBaseBean.jar"/>
+	<init invocation="org.nightlabs.jfire.trade.TradeManagerRemote.initialise">
+		<!--
+			A dependency on org.nightlabs.jfire.jbpm and org.nightlabs.jfire.base would be sufficient,
+			but declaring org.nightlabs.jfire.trade being the last makes it easier to declare other
+			inits - they only need a dependency on org.nightlabs.jfire.trade (and no additional
+			dependencies on org.nightlabs.jfire.accounting and org.nightlabs.jfire.store).
+		-->
+		<depends invocation="org.nightlabs.jfire.accounting"/>
+		<depends invocation="org.nightlabs.jfire.store" />
 	</init>
-	<init bean="org.nightlabs.jfire.trade.recurring.RecurringTradeManagerRemote" method="initialise">
-		<depends module="JFireTradeEAR.ear"
-			archive="JFireTrade.jar"
-			bean="org.nightlabs.jfire.trade.TradeManagerRemote"
-			method="initialise" />
+	<init invocation="org.nightlabs.jfire.trade.recurring.RecurringTradeManagerRemote.initialise">
+		<depends invocation="org.nightlabs.jfire.trade.TradeManagerRemote" />
 	</init>
+
 </organisation-initialisation>

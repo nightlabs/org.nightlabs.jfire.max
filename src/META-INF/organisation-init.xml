@@ -1,12 +1,12 @@
-<!DOCTYPE organisation-initialisation
-		PUBLIC "-//NightLabs GmbH//DTD Organisation Initialisation 1.0//EN"
-		"http://www.nightlabs.de/dtd/organisation-init_1_0.dtd">
-<organisation-initialisation>
+<organisation-initialisation
+		xmlns="urn:jfire.org:organisation-init_1_1"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="urn:jfire.org:organisation-init_1_1 http://dev.nightlabs.org/xml/organisation-init_1_1.xsd ">
 
-	<init bean="org.nightlabs.jfire.chezfrancois.ChezFrancoisDatastoreInitialiserRemote" method="initialise">
-		<depends module="JFireSimpleTradeEAR.ear" resolution="optional" />
-		<depends module="JFireVoucherEAR.ear" resolution="optional" />
-		<depends module="JFireDynamicTradeEAR.ear" resolution="optional" />
+	<init invocation="org.nightlabs.jfire.chezfrancois.ChezFrancoisDatastoreInitialiserRemote.initialise">
+		<depends invocation="org.nightlabs.jfire.simpletrade" resolution="optional" />
+		<depends invocation="org.nightlabs.jfire.voucher" resolution="optional" />
+		<depends invocation="org.nightlabs.jfire.dynamictrade" resolution="optional" />
 	</init>
 
 </organisation-initialisation>

@@ -4,7 +4,9 @@
 		xsi:schemaLocation="urn:jfire.org:organisation-init_1_1 http://dev.nightlabs.org/xml/organisation-init_1_1.xsd ">
 
 	<init invocation="org.nightlabs.jfire.reporting.engine.birt.ReportingEngineBirtManagerRemote.initialise">
-		<depends invocation="org.nightlabs.jfire.reporting" />
+		<depends invocation="org.nightlabs.jfire.reporting.ReportManagerRemote" />
+		<depends invocation="org.nightlabs.jfire.reporting.parameter" />
+		<depends invocation="org.nightlabs.jfire.reporting.scheduled" />
 	</init>
 
 </organisation-initialisation>

@@ -1,8 +1,10 @@
-<!DOCTYPE organisation-initialisation
-		PUBLIC "-//NightLabs GmbH//DTD Datastore Initialization 1.1//EN"
-		"http://www.nightlabs.de/dtd/datastoreinit_1_1.dtd">
-<organisation-initialisation>
-	<init bean="org.nightlabs.jfire.asterisk.AsteriskManagerRemote" method="initialise">
-		<depends module="JFirePBXEAR.ear" />
+<organisation-initialisation
+		xmlns="urn:jfire.org:organisation-init_1_1"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="urn:jfire.org:organisation-init_1_1 http://dev.nightlabs.org/xml/organisation-init_1_1.xsd ">
+
+	<init invocation="org.nightlabs.jfire.asterisk.AsteriskManagerRemote.initialise">
+		<depends invocation="org.nightlabs.jfire.pbx" />
 	</init>
+
 </organisation-initialisation>

@@ -1,7 +1,7 @@
 <organisation-initialisation
-		xmlns="urn:jfire.org:organisation-init_1_1.xsd"
+		xmlns="urn:jfire.org:organisation-init_1_1"
 		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		xsi:schemaLocation="urn:jfire.org:organisation-init_1_1.xsd http://dev.nightlabs.org/xml/organisation-init_1_1.xsd ">
+		xsi:schemaLocation="urn:jfire.org:organisation-init_1_1 http://dev.nightlabs.org/xml/organisation-init_1_1.xsd ">
 
 	<init invocation="org.nightlabs.jfire.accounting.AccountingManagerRemote.initialise">
 		<depends invocation="org.nightlabs.jfire.jbpm"/>

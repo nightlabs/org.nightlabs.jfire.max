@@ -2,7 +2,7 @@ package org.nightlabs.jfire.reporting.oda.client;
 
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.nightlabs.jfire.base.JFireEjb3Factory;
-import org.nightlabs.jfire.base.ui.login.Login;
+import org.nightlabs.jfire.base.login.ui.Login;
 import org.nightlabs.jfire.reporting.ReportManagerRemote;
 import org.osgi.framework.BundleContext;
 

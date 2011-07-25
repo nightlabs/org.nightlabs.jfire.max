@@ -148,7 +148,7 @@ public class SecurityChangeListenerJFirePasswordChanged extends SecurityChangeLi
 		}
 	}
 	
-	private boolean modifyPassword(LDAPServer ldapServer, User user, String newPasswordHashed) throws UserManagementSystemCommunicationException, LoginException, ScriptException{
+	private boolean modifyPassword(LDAPServer ldapServer, User user, String newPasswordHashed) throws UserManagementSystemCommunicationException, LoginException, ScriptException, NoSuchMethodException{
 		LDAPConnection connection = null;
 		try{
 			if (logger.isDebugEnabled()){

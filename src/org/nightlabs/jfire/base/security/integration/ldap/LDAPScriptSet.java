@@ -10,6 +10,7 @@ import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 import javax.script.Bindings;
+import javax.script.Invocable;
 import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
@@ -18,9 +19,7 @@ import javax.script.SimpleScriptContext;
 
 import org.nightlabs.jfire.base.security.integration.ldap.attributes.LDAPAttributeSet;
 import org.nightlabs.jfire.base.security.integration.ldap.id.LDAPScriptSetID;
-import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.person.Person;
-import org.nightlabs.jfire.prop.PropertySet;
 import org.nightlabs.jfire.security.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,7 +44,7 @@ public class LDAPScriptSet implements Serializable{
 	public static final String BASE_ENTRY_NAME_PLACEHOLDER = "BASE_ENTRY_NAME_PLACEHOLDER";
 	
 	private static final Logger logger = LoggerFactory.getLogger(LDAPScriptSet.class);
-
+	
 	/**
 	 * The serial version UID of this class.
 	 */
@@ -80,12 +79,12 @@ public class LDAPScriptSet implements Serializable{
 	private String syncLdapToJFireScript;
 	
 	/**
-	 * Generates and returns a map of attributes to be stored in LDAP directory using {@code bindVariablesScript).
+	 * Generates and returns a {@link LDAPAttributeSet} of attributes to be stored in LDAP directory using {@code bindVariablesScript).
 	 */
 	@Persistent
 	@Column(sqlType="CLOB")
 	private String generateJFireToLdapAttributesScript;
-	
+
 	/**
 	 * Generates and returns a collection of names for parent LDAP entries which hold all entries that
 	 * should be synchronized to JFire objects.
@@ -93,13 +92,6 @@ public class LDAPScriptSet implements Serializable{
 	@Persistent
 	@Column(sqlType="CLOB")
 	private String generateParentLdapEntriesScript;
-
-	/**
-	 * Generates and returns name of attribute which holds user password in LDAP.
-	 */
-	@Persistent
-	@Column(sqlType="CLOB")
-	private String generateUserPasswordAttributeName;
 
 	@Persistent(defaultFetchGroup="true")
 	private LDAPServer ldapServer;
@@ -201,22 +193,6 @@ public class LDAPScriptSet implements Serializable{
 	}
 	
 	/**
-	 * Set {@link #generateUserPasswordAttributeName} contents 
-	 * @param generateUserPasswordAttributeName
-	 */
-	public void setGenerateUserPasswordAttributeName(String generateUserPasswordAttributeName) {
-		this.generateUserPasswordAttributeName = generateUserPasswordAttributeName;
-	}
-	
-	/**
-	 * Get {@link #generateUserPasswordAttributeName} contents
-	 * @return script contents as {@link String}
-	 */
-	public String getGenerateUserPasswordAttributeName() {
-		return generateUserPasswordAttributeName;
-	}
-	
-	/**
 	 * 
 	 * @return mapped LDAPServer
 	 */
@@ -259,7 +235,7 @@ public class LDAPScriptSet implements Serializable{
 			b.put("person", jfireObject);
 		}
 
-		Object result = execute(bindVariablesScript + ldapDNScript, ctx);
+		Object result = getScriptEngine().eval(bindVariablesScript + ldapDNScript, ctx);
 		if (result != null){
 			return result.toString();
 		}
@@ -267,14 +243,15 @@ public class LDAPScriptSet implements Serializable{
 	}
 	
 	/**
-	 * Executes script for generating LDAPAttributeSet with attributes to be stored in LDAP entry 
+	 * Executes script for generating {@link LDAPAttributeSet} with attributes to be stored in LDAP entry 
 	 * using {@code jfireObject} data and returns the result.
 	 * 
 	 * @param jfireObject
 	 * @return {@link LDAPAttributeSet} with attributes or <code>null</code> if script didn't return anything
 	 * @throws ScriptException
+	 * @throws NoSuchMethodException 
 	 */
-	public LDAPAttributeSet getAttributesMapForLDAP(Object jfireObject, boolean isNewEntry) throws ScriptException{
+	public LDAPAttributeSet getLDAPAttributes(Object jfireObject, boolean isNewEntry) throws ScriptException, NoSuchMethodException{
 
 		ScriptContext ctx = new SimpleScriptContext();
 		Bindings b = ctx.getBindings(ScriptContext.ENGINE_SCOPE);
@@ -286,8 +263,15 @@ public class LDAPScriptSet implements Serializable{
 		}else if (jfireObject instanceof Person){
 			b.put("person", jfireObject);
 		}
+		ScriptEngine scriptEngine = getScriptEngine();
+		scriptEngine.setContext(ctx);
+		scriptEngine.eval(bindVariablesScript+generateJFireToLdapAttributesScript);
 		
-		Object result = execute(bindVariablesScript+generateJFireToLdapAttributesScript, ctx);
+		Invocable invocable = (Invocable) scriptEngine;
+		Object result = null;
+		
+		result = invocable.invokeFunction("getMappedAttributes");
+		
 		if (result instanceof LDAPAttributeSet){
 			return (LDAPAttributeSet) result;
 		}
@@ -310,14 +294,12 @@ public class LDAPScriptSet implements Serializable{
 		Bindings b = ctx.getBindings(ScriptContext.ENGINE_SCOPE);
 		b.put("removeJFireObjects", removeJFireObjects);
 		b.put("allAttributes", allAttributes);
+		b.put("attributeSyncPolicy", ldapServer.getAttributeSyncPolicy().stringValue());
 		b.put("pm", JDOHelper.getPersistenceManager(this));
 		b.put("organisationID", organisationID);
-		// generate new ID for Person object here because there are difficulties with getting 
-		// Class object in script (via Class.forName() and via .class field) 
-		b.put("newPersonID", IDGenerator.nextID(PropertySet.class));
 		b.put("logger", logger);
 	
-		return execute(syncLdapToJFireScript, ctx);
+		return getScriptEngine().eval(syncLdapToJFireScript, ctx);
 	}
 	
 	/**
@@ -328,7 +310,7 @@ public class LDAPScriptSet implements Serializable{
 	 */
 	@SuppressWarnings("unchecked")
 	public Collection<String> getParentEntriesForSync() throws ScriptException{
-		Object result = execute(generateParentLdapEntriesScript, new SimpleScriptContext());
+		Object result = getScriptEngine().eval(generateParentLdapEntriesScript, new SimpleScriptContext());
 		if (result instanceof Collection){
 			return (Collection<String>) result;
 		}
@@ -340,22 +322,22 @@ public class LDAPScriptSet implements Serializable{
 	 * 
 	 * @return attribute name as {@link String} or <code>null</code> if script did not return any
 	 * @throws ScriptException
+	 * @throws NoSuchMethodException 
 	 */
-	public String getUserPasswordAttributeName() throws ScriptException{
-		Object result = execute(generateUserPasswordAttributeName, new SimpleScriptContext());
+	public String getUserPasswordAttributeName() throws ScriptException, NoSuchMethodException{
+        ScriptEngine engine = getScriptEngine();
+		engine.eval(generateJFireToLdapAttributesScript);
+		Invocable invocable = (Invocable) engine;
+		Object result = invocable.invokeFunction("getPasswordAttributeName");
 		if (result instanceof String){
 			return (String) result;
 		}
 		return null;
 	}
 	
-	private Object execute(String script, ScriptContext scriptContext) throws ScriptException{
-		
+	private ScriptEngine getScriptEngine(){
         ScriptEngineManager manager = new ScriptEngineManager();
-        ScriptEngine engine = manager.getEngineByName("JavaScript");
-
-        return engine.eval(script, scriptContext);
-
+        return manager.getEngineByName("JavaScript");
 	}
 	
 	private Person getPerson(User user){

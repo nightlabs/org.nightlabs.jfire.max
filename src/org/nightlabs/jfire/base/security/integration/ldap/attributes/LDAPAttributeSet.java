@@ -109,6 +109,10 @@ public class LDAPAttributeSet implements Iterable<LDAPAttribute<Object>>{
 	 * @param attributes
 	 */
 	public void addAttributes(Iterable<LDAPAttribute<Object>> attributes) {
+		if (attributes == null){
+			logger.warn("Can't add attributes to the set. Given attributes are NULL!");
+			return;
+		}
 		for (LDAPAttribute<Object> attribute : attributes){
 			addAttribute(attribute);
 		}
@@ -224,6 +228,15 @@ public class LDAPAttributeSet implements Iterable<LDAPAttribute<Object>>{
 			return attributes.get(attributeName).getValue();
 		}
 		return null;
+	}
+	
+	/**
+	 * Checks if this {@link LDAPAttributeSet} contains an {@link LDAPAttribute} with given name.
+	 * 
+	 * @return <code>true</code> if {@link LDAPAttribute} with given name is present in this {@link LDAPAttributeSet}, <code>false</code> otherwise
+	 */
+	public boolean containsAttribute(String name){
+		return attributes.containsKey(name);
 	}
 	
 	/**

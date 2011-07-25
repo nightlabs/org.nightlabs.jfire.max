@@ -2,6 +2,7 @@ package org.nightlabs.jfire.base.security.integration.ldap;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.jdo.JDOHelper;
@@ -13,25 +14,36 @@ import javax.jdo.annotations.IdentityType;
 import javax.jdo.annotations.Inheritance;
 import javax.jdo.annotations.InheritanceStrategy;
 import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.Queries;
+import javax.jdo.listener.AttachCallback;
+import javax.jdo.listener.DeleteCallback;
 import javax.naming.InitialContext;
 import javax.script.ScriptException;
 import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
 
 import org.nightlabs.j2ee.LoginData;
+import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.base.AuthCallbackHandler;
+import org.nightlabs.jfire.base.security.integration.ldap.attributes.LDAPAttribute;
 import org.nightlabs.jfire.base.security.integration.ldap.attributes.LDAPAttributeSet;
 import org.nightlabs.jfire.base.security.integration.ldap.connection.ILDAPConnectionParamsProvider;
 import org.nightlabs.jfire.base.security.integration.ldap.connection.LDAPConnection;
 import org.nightlabs.jfire.base.security.integration.ldap.connection.LDAPConnectionManager;
 import org.nightlabs.jfire.base.security.integration.ldap.connection.LDAPConnectionWrapper.EntryModificationFlag;
+import org.nightlabs.jfire.base.security.integration.ldap.sync.AttributeStructFieldSyncHelper;
+import org.nightlabs.jfire.base.security.integration.ldap.sync.AttributeStructFieldSyncHelper.AttributeStructFieldDescriptor;
+import org.nightlabs.jfire.base.security.integration.ldap.sync.AttributeStructFieldSyncHelper.LDAPAttributeSyncPolicy;
 import org.nightlabs.jfire.base.security.integration.ldap.sync.LDAPSyncEvent;
 import org.nightlabs.jfire.base.security.integration.ldap.sync.LDAPSyncEvent.LDAPSyncEventType;
+import org.nightlabs.jfire.base.security.integration.ldap.sync.IAttributeStructFieldDescriptorProvider;
 import org.nightlabs.jfire.base.security.integration.ldap.sync.LDAPSyncException;
 import org.nightlabs.jfire.base.security.integration.ldap.sync.SyncLifecycleListener;
+import org.nightlabs.jfire.person.Person;
+import org.nightlabs.jfire.prop.StructLocal;
 import org.nightlabs.jfire.security.GlobalSecurityReflector;
 import org.nightlabs.jfire.security.NoUserException;
 import org.nightlabs.jfire.security.User;
@@ -50,9 +62,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Class representing LDAP-based UserManagementSystem.
- * It also implements {@link ILDAPConnectionParamsProvider} for providing stored server parameters
- * to a {@link LDAPConnection}
+ * Class representing LDAP-based UserManagementSystem. This is the most important class for the JFireLDAP module. 
+ * It is in charge of logging in {@link User} and synchronization between LDAP directory and JFire. It also implements 
+ * {@link ILDAPConnectionParamsProvider} for providing stored server parameters to a {@link LDAPConnection}.
  *
  * @author Denis Dudnik <deniska.dudnik[at]gmail{dot}com>
  *
@@ -68,13 +80,17 @@ import org.slf4j.LoggerFactory;
 				members=@Persistent(name="ldapScriptSet")
 				)
 })
-@Queries(
+@Queries({
 		@javax.jdo.annotations.Query(
 				name="LDAPServer.findLDAPServers",
 				value="SELECT where this.host == :host && this.port == :port && this.encryptionMethod == :encryptionMethod ORDER BY JDOHelper.getObjectId(this) ASCENDING"
+				),
+		@javax.jdo.annotations.Query(
+				name="LDAPServer.findLDAPServersByAttributeSyncPolicy",
+				value="SELECT where this.type == :serverType && this.attributeSyncPolicy == :attributeSyncPolicy ORDER BY JDOHelper.getObjectId(this) ASCENDING"
 				)
-		)
-public class LDAPServer extends UserManagementSystem implements ILDAPConnectionParamsProvider{
+		})
+public class LDAPServer extends UserManagementSystem implements ILDAPConnectionParamsProvider, AttachCallback, DeleteCallback{
 
 	public static final int LDAP_DEFAULT_PORT = 10389;
 	public static final String LDAP_DEFAULT_HOST = "localhost";
@@ -125,6 +141,28 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 	}
 
 	/**
+	 * Executes {@link javax.jdo.Query) to find persistent LDAPServer instances by attributeSyncPolicy 
+	 * 
+	 * @param pm
+	 * @param attributeSyncPolicy
+	 * @return
+	 */
+	public static Collection<LDAPServer> findLDAPServersByAttributeSyncPolicy(
+			PersistenceManager pm, UserManagementSystemType<?> serverType, LDAPAttributeSyncPolicy attributeSyncPolicy
+			) {
+		
+		javax.jdo.Query q = pm.newNamedQuery(
+				LDAPServer.class, 
+				"LDAPServer.findLDAPServersByAttributeSyncPolicy"
+				);
+		@SuppressWarnings("unchecked")
+		List<LDAPServer> foundServers = (List<LDAPServer>) q.execute(serverType, attributeSyncPolicy);
+		foundServers = new ArrayList<LDAPServer>(foundServers);
+		q.closeAll();
+		return foundServers;
+	}
+
+	/**
 	 * LDAP server host
 	 */
 	@Persistent
@@ -150,34 +188,13 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 	private AuthenticationMethod authenticationMethod = AuthenticationMethod.SIMPLE;
 	
 	/**
-	 * DN used for binding agains LDAP server during synchronization process
+	 * DN used for binding agains LDAP server during synchronization process (see issue 1974)
 	 */
 	@Persistent
 	private String syncDN;
 
 	/**
-	 * Password for DN used for binding agains LDAP server during synchronization process.
-	 * REV: (Alex) It should be possible to sync only when a user authenticates and thus leave this field empty (make it optional, as it is only essentially required for timed synchronisations).
-	 * 
-	 * REV: (Denis) If I understood correctly sync scenario for JFire as leading system (not involving any timers) should look like this:
-	 * 	- some user was authenticated in JFire (and was bind against LDAP during login)
-	 *	- we assume that no additional binding against LDAP needed for synchronization
-	 *	- run sync process under this authenticated user
-	 *
-	 * In this case there are couple of problems:
-	 * 1) Current user could not have enough permissions for modifying LDAP directory. It should be checked and if this happens we need to bind against LDAP with syncDN/syncPassword so they must not be empty.
-	 * 2) Even if first problem is not encountered there's another issue. Every time we obtain a LDAPConnection from LDAPCOnnectionManager we get a clean connection which doesn't contain any credentials.
-	 *    It happens because we always unbind LDAPConnection (which means removing any auth related data) before releasing it back to LDAPConnectionManager in order not to have security violation if someone would
-	 *    obtain this released connection somewhere else. 
-	 *    So the point is that we always perform bind operation after getting new LDAPConnection if we want to perform some 'write' operations on LDAP directory.
-	 *    Of course we need a password for that and there's no possibility to get plain password of currently logged in user.
-	 *    
-	 * Possible workarounds/solutions would be:
-	 * 1) Alwas use syncDN/syncPassword for synchronization purposes, so they can't be empty (that's why it was already implemented in previous revision, solves both problems)
-	 * 2) Modify LDAPConnectionManager and manage two kinds of LDAPConnections: anonymous and logged in (bind was called on them). And have an API to recieve authenticated LDAPConnection providing Session object for example.
-	 *    It solves problem 2.
-	 * 3) Something else :)
-	 *    
+	 * Password for DN used for binding agains LDAP server during synchronization process (see issue 1974)
 	 */
 	@Persistent
 	private String syncPassword;
@@ -187,6 +204,13 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 	 */
 	@Persistent(dependent="true", mappedBy="ldapServer")
 	private LDAPScriptSet ldapScriptSet;
+	
+	/**
+	 * Policy for mapping LDAP entry attributes to {@link Person} datafields during synchronization.
+	 * See {@link AttributeStructFieldSyncHelper} class for details.
+	 */
+	@Persistent(defaultFetchGroup="true")
+	private LDAPAttributeSyncPolicy attributeSyncPolicy = LDAPAttributeSyncPolicy.MANDATORY_ONLY;
 	
 	
 	/**
@@ -205,10 +229,8 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 	 */
 	@Override
 	public void logout(Session session) throws UserManagementSystemCommunicationException {
-
 		LDAPConnection connection = null;
 		try{
-
 			if (logger.isDebugEnabled()){
 	        	logger.debug("Loggin out from session, id: " + session.getSessionID());
 	        }
@@ -220,11 +242,9 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 			if (logger.isDebugEnabled()){
 	        	logger.debug("Logged out from session, id: " + session.getSessionID());
 	        }
-
 		}finally{
 			unbindAndReleaseConnection(connection);
 		}
-
 	}
 
 	/**
@@ -232,7 +252,6 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 	 */
 	@Override
 	public Session login(LoginData loginData) throws LoginException, UserManagementSystemCommunicationException{
-
 		if (!canBind(loginData.getUserID(), loginData.getPassword())){
 			return null;
 		}
@@ -242,9 +261,7 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 
         String loginDataOrganisationID = loginData.getOrganisationID();
 		String loginDataUserID = loginData.getUserID();
-
         try{
-
 			if (logger.isDebugEnabled()){
         		logger.debug(
         				"Try to recieve an LDAPConnection and login for " +
@@ -253,7 +270,6 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
         	}
 
 			connection = createConnection(this);
-			
     		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
 
     		// getting LDAP DN for the loggin in user
@@ -323,7 +339,6 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 		}finally{
 			unbindAndReleaseConnection(connection);
 		}
-
 	}
 
 	/**
@@ -368,9 +383,12 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 	
 	/**
 	 * Set server encryption method
-	 * @param encryptionMethod
+	 * @param encryptionMethod, if <code>null</code> is given than the default value will be set
 	 */
 	public void setEncryptionMethod(EncryptionMethod encryptionMethod) {
+		if (encryptionMethod == null){
+			encryptionMethod = EncryptionMethod.NONE;
+		}
 		this.encryptionMethod = encryptionMethod;
 	}
 
@@ -454,6 +472,27 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 	}
 	
 	/**
+	 * Get {@link #attributeSyncPolicy}
+	 * 
+	 * @return {@link #attributeSyncPolicy} value
+	 */
+	public LDAPAttributeSyncPolicy getAttributeSyncPolicy() {
+		return attributeSyncPolicy;
+	}
+	
+	/**
+	 * Set {@link #attributeSyncPolicy} to this LDAPServer
+	 * 
+	 * @param attributeSyncPolicy value to set, if <code>null</code> is given than the default value will be set
+	 */
+	public void setAttributeSyncPolicy(LDAPAttributeSyncPolicy attributeSyncPolicy) {
+		if (attributeSyncPolicy == null){
+			attributeSyncPolicy = LDAPAttributeSyncPolicy.MANDATORY_ONLY;
+		}
+		this.attributeSyncPolicy = attributeSyncPolicy;
+	}
+	
+	/**
 	 * Set LDAP entry name which will be used as base entry for generating LDAP distingueshed names by {@link LDAPScriptSet}.
 	 * 
 	 * @param entryName
@@ -527,7 +566,6 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 	}
 	
 	private void unbindAndReleaseConnection(LDAPConnection connection) throws UserManagementSystemCommunicationException{
-		
 		if (connection == null){
 			return;
 		}
@@ -551,7 +589,6 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 	}
 	
 	private boolean canBind(String userName, String password){
-		
 		if (userName == null || "".equals(userName)){
 			return false;
 		}
@@ -589,7 +626,6 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 	 * @throws LDAPSyncException
 	 */
 	public void synchronize(LDAPSyncEvent syncEvent) throws LDAPSyncException, LoginException, UserManagementSystemCommunicationException{
-		
 		if (LDAPSyncEventType.FETCH == syncEvent.getEventType()){
 			
 			updateJFireData(syncEvent.getLdapUsersIds(), syncEvent.getOrganisationID(), false);
@@ -610,7 +646,6 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 		}else{
 			throw new UnsupportedOperationException("Unknown LDAPSyncEventType!");
 		}
-		
 	}
 
 	/**
@@ -626,7 +661,6 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 	 * @throws UserManagementSystemCommunicationException
 	 */
 	public void bindForSynchronization(LDAPConnection connection) throws LoginException, UserManagementSystemCommunicationException{
-		
 		boolean fallToGlobalSyncCredentials = false;
 		try{
 			UserDescriptor userDescriptor = GlobalSecurityReflector.sharedInstance().getUserDescriptor();
@@ -677,7 +711,6 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 									"Unable to bind against LDAP with current user (userID=%s) credentials, will try to bind with global syncDN/syncPassword if set.", userDescriptor.getCompleteUserID()));
 					fallToGlobalSyncCredentials = true;
 				}
-				
 			}
 		}catch(NoUserException e){
 			// There's no logged in User, so we'll try to bind with syncDN and syncPasswrod
@@ -726,7 +759,6 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 						connection.getChildEntries(parentEntryName)
 						);
 			}
-			
 		}finally{
 			unbindAndReleaseConnection(connection);
 		}
@@ -734,7 +766,6 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 	}
 	
 	private boolean shouldFetchUserFromLDAP(){
-
 		// we can fetch user data from LDAP in both scenarios:
 		// - when JFire is a leading system we're doing it because it might help in certain situations 
 		//   (e.g. when you want to use JFire as leading system, but initially have some users in the 
@@ -753,7 +784,6 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 				fetchUserFromLDAP = true;
 			}
 		}
-
 		return fetchUserFromLDAP;
 	}
 	
@@ -768,11 +798,9 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 	 * @throws LDAPSyncException
 	 */
 	private void updateJFireData(Collection<String> ldapEntriesDNs, String organisationID, boolean removeJFireObjects) throws UserManagementSystemCommunicationException, LoginException, LDAPSyncException{
-		
 		LDAPConnection connection = null;
 		LoginContext loginContext = null;
 		JFireServerManager jsm = null;
-
 		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
 		
 		try{
@@ -792,11 +820,13 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 					J2EEAdapter j2eeAdapter = (J2EEAdapter) initialContext.lookup(J2EEAdapter.JNDI_NAME);
 					JFireServerManagerFactory jsmf = (JFireServerManagerFactory) initialContext.lookup(JFireServerManagerFactory.JNDI_NAME);
 					jsm = jsmf.getJFireServerManager();
+					User user = User.getUser(pm, organisationID, User.USER_ID_SYSTEM);
 					loginContext = j2eeAdapter.createLoginContext(
-							LoginData.DEFAULT_SECURITY_PROTOCOL, 
-							createAuthCallbackHandler(
-									jsm, User.getUser(pm, organisationID, User.USER_ID_SYSTEM)
-									)
+							LoginData.DEFAULT_SECURITY_PROTOCOL,
+							new AuthCallbackHandler(jsm,
+									user.getOrganisationID(),
+									user.getUserID(),
+									ObjectIDUtil.makeValidIDString(null, true))
 							);
 					loginContext.login();
 
@@ -808,7 +838,6 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 					throw new LDAPSyncException("Can't sync from LDAP to JFire because there's no logged in User.", ne);
 				}
 			}
-
 			connection = createConnection(this);
 			bindForSynchronization(connection);
 			
@@ -831,9 +860,34 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 						attributes = new LDAPAttributeSet();
 						attributes.createAttributesFromString(ldapEntryDN);
 					}
-					ldapScriptSet.syncLDAPDataToJFireObjects(
+					Object returnObject = ldapScriptSet.syncLDAPDataToJFireObjects(
 								attributes, organisationID, removeJFireObjects
 							);
+					
+					// processing attributes synchronization depending on current LDAPAttributeSyncPolicy for this LDAPServer
+					if (logger.isDebugEnabled()){
+						logger.debug("LDAPAttributeSyncPolicy is " + attributeSyncPolicy.stringValue());
+					}
+					if (!LDAPAttributeSyncPolicy.NONE.equals(attributeSyncPolicy)
+							&& returnObject instanceof Person
+							&& getType() instanceof IAttributeStructFieldDescriptorProvider){
+						
+						IAttributeStructFieldDescriptorProvider descriptorProvider = (IAttributeStructFieldDescriptorProvider) getType();
+						Collection<AttributeStructFieldDescriptor> attributeDescriptors = descriptorProvider.getAttributeStructFieldDescriptors(attributeSyncPolicy);
+						
+						if (logger.isDebugEnabled()){
+							logger.debug(
+									String.format(
+											"Got %s attribute descriptors for sync. Server type is %s, attribute sync policy is %s.", attributeDescriptors.size(), getType().getClass().getName(), attributeSyncPolicy.stringValue()));
+						}
+						
+						AttributeStructFieldSyncHelper.setPersonDataForAttributes(
+								pm, (Person) returnObject, descriptorProvider.getAttributeStructBlockID(), attributes, attributeDescriptors);
+
+						if (logger.isDebugEnabled()){
+							logger.debug("Attribute sync is done.");
+						}
+					}
 
 					if (logger.isDebugEnabled()){
 						logger.debug("Data synchronized for DN: " + ldapEntryDN);
@@ -843,9 +897,7 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 					throw new LDAPSyncException("Exception occured while synchronizing entry with DN " + ldapEntryDN, e);
 				}
 			}
-			
 		}finally{
-			
 			// need flush before enabling SyncLifecycleListener
 			pm.flush();
 
@@ -856,7 +908,7 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 			
 			if (loginContext != null && loginContext.getSubject() != null){
 				if (logger.isDebugEnabled()){
-					logger.debug("_System_ user was logged in, loggin it out...");
+					logger.debug("_System_ user was logged in, logging it out...");
 				}
 				loginContext.logout();
 			}
@@ -865,7 +917,6 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 			}
 			unbindAndReleaseConnection(connection);
 		}
-		
 	}
 	
 	/**
@@ -878,17 +929,14 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 	 * @throws LDAPSyncException
 	 */
 	private void updateLDAPData(Collection<?> jfireObjectsIds, boolean removeEntries) throws UserManagementSystemCommunicationException, LoginException, LDAPSyncException{
-		
 		LDAPConnection connection = null;
 		try{
-
 			connection = createConnection(this);
 			bindForSynchronization(connection);
 
 			PersistenceManager pm = JDOHelper.getPersistenceManager(this);
 			for (Object jfireObjectId : jfireObjectsIds){
 				try{
-					
 					if (logger.isDebugEnabled()){
 						logger.debug("Trying synchronization for object " + jfireObjectId.toString());
 					}
@@ -916,11 +964,9 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 							logger.warn("Can't remove non-existent entry with DN: " + userDN);
 							continue;
 						}
-						
 						if (logger.isDebugEnabled()){
 							logger.debug("Removing existing entry with DN: " + userDN);
 						}
-						
 						connection.deleteEntry(userDN);
 						
 					}else{
@@ -928,24 +974,54 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 						if (logger.isDebugEnabled()){
 							logger.debug("Preparing attributes for modifying entry with DN: " + userDN);
 						}
-						LDAPAttributeSet modifyAttributes = ldapScriptSet.getAttributesMapForLDAP(
+						LDAPAttributeSet modifyAttributes = ldapScriptSet.getLDAPAttributes(
 								jfireObject, !entryExists
 								);
+						
+						
+						// add attributs based on attributeSyncPolicy set for this LDAPServer
+						if (logger.isDebugEnabled()){
+							logger.debug("LDAPAttributeSyncPolicy is " + attributeSyncPolicy.stringValue());
+						}
+						if (!LDAPAttributeSyncPolicy.NONE.equals(attributeSyncPolicy)
+								&& getType() instanceof IAttributeStructFieldDescriptorProvider){
+							IAttributeStructFieldDescriptorProvider ldapServerType = (IAttributeStructFieldDescriptorProvider) getType();
+							LDAPAttributeSet syncAttributes = AttributeStructFieldSyncHelper.getAttributesForSync(
+									jfireObject, ldapServerType.getAttributeStructFieldDescriptors(attributeSyncPolicy));
+
+							if (logger.isDebugEnabled()){
+								logger.debug(
+										String.format(
+												"Got %s LDAP attributes for sync. Server type is %s, attribute sync policy is %s.", syncAttributes.size(), getType().getClass().getName(), attributeSyncPolicy.stringValue()));
+							}
+							
+							// removing attributes which might be set by a script earlier
+							for (Iterator<LDAPAttribute<Object>> iterator = modifyAttributes.iterator(); iterator.hasNext();) {
+								LDAPAttribute<Object> attribute = iterator.next();
+								if (syncAttributes.containsAttribute(attribute.getName())){
+									iterator.remove();
+									logger.debug(
+											String.format(
+													"LDAP attribute %s was removed from generated by script attribute set because it is mapped by current attribute sync policy %s.", attribute.getName(), attributeSyncPolicy.stringValue()));
+								}
+							}
+							modifyAttributes.addAttributes(syncAttributes);
+						}else{
+							logger.warn(
+									"LDAPServer type is not an instance of ILDAPUserManagementSystemType! Cant' sync attributes based on current attribute sync policy.");
+						}
 						
 						if (entryExists){
 							if (logger.isDebugEnabled()){
 								logger.debug("Modifying entry with DN: " + userDN);
 							}
-							
 							if(modifyAttributes != null && modifyAttributes.size() > 0){
 								connection.modifyEntry(userDN, modifyAttributes, EntryModificationFlag.MODIFY);
 							}
-							
 						}else{	// create new entry 
 							if (logger.isDebugEnabled()){
 								logger.debug("Creating new entry with DN: " + userDN);
 							}
-							
 							connection.createEntry(userDN, modifyAttributes);
 						}
 					}
@@ -956,21 +1032,83 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 				}catch(Exception e){
 					throw new LDAPSyncException("Exception occured while synchronizing object with id " + jfireObjectId.toString(), e);
 				}
-				
 			}
-			
 		}finally{
 			unbindAndReleaseConnection(connection);
 		}
 	}
+
 	
-	private AuthCallbackHandler createAuthCallbackHandler(JFireServerManager ism, User user) throws Exception {
-		return new AuthCallbackHandler(ism,
-				user.getOrganisationID(),
-				user.getUserID(),
-				ObjectIDUtil.makeValidIDString(null, true));
+	/**
+	 * This boolean flag is used to determine if {@link #attributeSyncPolicy} value was changed on detached {@link LDAPServer} instance.
+	 * The field is set for DETACHED instance during {@link #jdoPreAttach()} and is checked in {@link #jdoPostAttach(Object)}.
+	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
+	private boolean attributeSyncPolicyChanged = true;
+	
+	/**
+	 * If {@link #attributeSyncPolicy} is changed on a ATTACHED {@link LDAPServer} instance you MUST call this method after
+	 * {@link #setAttributeSyncPolicy(LDAPAttributeSyncPolicy)} was called to proceed with {@link Person} structure modification.
+	 * {@link Person} structure is NOT modified at once every time {@link #setAttributeSyncPolicy(LDAPAttributeSyncPolicy)} is called
+	 * because this operation might be time consuming. So do not forget to call {@link #commitAttributeSyncPolicyChange()} when changing
+	 * {@link #attributeSyncPolicy} on attached {@link LDAPServer} instance.
+	 */
+	public void commitAttributeSyncPolicyChange(){
+		if (JDOHelper.isDetached(this)){
+			logger.warn("commitAttributeSyncPolicyChange can't be called on a detached instance! Returning, Person structure will not be modified.");
+			return;
+		}
+		AttributeStructFieldSyncHelper.modifyPersonStructure(JDOHelper.getPersistenceManager(this), this);
 	}
 
+	/**
+	 * Attach callback which calls for modification of {@link Person} {@link StructLocal} if {@link #attributeSyncPolicy}
+	 * was changed on detached {@link LDAPServer} instance. See {@link AttributeStructFieldSyncHelper} for details.  
+	 * @param obj
+	 */
+	@Override
+	public void jdoPostAttach(Object detachedObj) {
+		LDAPServer detachedServer = (LDAPServer) detachedObj;
+		if (detachedServer.attributeSyncPolicyChanged){
+			AttributeStructFieldSyncHelper.modifyPersonStructure(JDOHelper.getPersistenceManager(this), this);
+		}
+	}
+
+	/**
+	 * Attach callback which checks if {@link #attributeSyncPolicy} was changed on a detached {@link LDAPServer} instance
+	 * and sets {@link #attributeSyncPolicyChanged} accordingly. See {@link #jdoPostAttach(Object)}.
+	 */
+	@Override
+	public void jdoPreAttach() {
+		PersistenceManager pm = NLJDOHelper.getThreadPersistenceManager();
+		if (pm != null){
+			LDAPServer attachedServer = null;
+			try{
+				attachedServer = (LDAPServer) pm.getObjectById(
+						UserManagementSystemID.create(this.getOrganisationID(), this.getUserManagementSystemID()));
+			}catch(JDOObjectNotFoundException e){
+				// no object exist, so we assume that new LDAPServer is created and attributeSyncPolicyChanged is considered true
+				return;
+			}
+			if (attachedServer != null){
+				this.attributeSyncPolicyChanged = !this.getAttributeSyncPolicy().equals(attachedServer.getAttributeSyncPolicy());
+			}
+		}
+	}
+
+	/**
+	 * Delete callback which calls for {@link Person} {@link StructLocal} modification when {@link LDAPServer} is deleted.
+	 * It's done for the case when it is the last {@link LDAPServer} existed with {@link #attributeSyncPolicy} not NONE.
+	 * However note that {@link #attributeSyncPolicy} is set to {@link LDAPAttributeSyncPolicy#NONE} before calling for 
+	 * {@link Person} structure modifications. This is done in order to remove {@link Person} structure parts if they are not
+	 * needed by any other {@link LDAPServer} anymore.
+	 */
+	@Override
+	public void jdoPreDelete() {
+		setAttributeSyncPolicy(LDAPAttributeSyncPolicy.NONE);
+		AttributeStructFieldSyncHelper.modifyPersonStructure(JDOHelper.getPersistenceManager(this), this);
+	}
+	
 	/***********************************
 	 * Synchronization section END *
 	 ***********************************/

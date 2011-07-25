@@ -55,6 +55,16 @@ import org.slf4j.LoggerFactory;
  * NONE means that nothing will be mapped by this class and all the m apping is done inside {@link LDAPScriptSet} so system administrator
  * is fully responsible for setting it up.</p>
  * 
+ * <p>There could be several {@link LDAPServer} insances existing and every one of them could have it's own {@link LDAPAttributeSyncPolicy}
+ * configured. Since {@link Person} structure is common for everybody here's how it works with several {@link LDAPServer}s:
+ * whenever {@link LDAPAttributeSyncPolicy} is changed on any {@link LDAPServer} we call structure modification in {@link #modifyPersonStructure(PersistenceManager, LDAPServer)}.
+ * But before actual modification we query for other {@link LDAPServer} instances which have the same {@link LDAPAttributeSyncPolicy} or higher 
+ * (ALL is "higher" than MANDATORY_ONLY etc.). If query returns any result we do not modify Person structure and assume that it was already
+ * modified when policy was changed earlier for another {@link LDAPServer} instance. When sync policy is set to a "lower" value 
+ * (i.e. NONE instead of ALL) we again query for another {@link LDAPServer}s which have higher sync policy value and therefore are 
+ * interested in maintaining Person structure. If any result is returned by this query we do not proceed with structure modification 
+ * (removing {@link StructField}s)</p>
+ * 
  * <p>See issue 1975 for more details: https://www.jfire.org/modules/bugs/view.php?id=1975</p>
  * 
  * @author Denis Dudnik <deniska.dudnik[at]gmail{dot}com>

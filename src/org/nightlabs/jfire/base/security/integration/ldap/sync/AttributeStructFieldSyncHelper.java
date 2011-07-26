@@ -170,11 +170,6 @@ public class AttributeStructFieldSyncHelper {
 	 */
 	public static synchronized void modifyPersonStructure(PersistenceManager pm, LDAPServer ldapServer){
 		
-		// Need to evict possible cached StructLocal instances here when running inside unit test.
-		// When StructLocal instance is cached it has structBlockMap field (AbstractStruct) non null
-		// which may cause unexpected behaviour. Denis.
-		pm.evictAll(true, StructLocal.class);
-		
 		Struct personStruct = Struct.getStruct(Organisation.DEV_ORGANISATION_ID, Person.class, Person.STRUCT_SCOPE, pm);
 		IStruct personStructLocal = StructLocal.getStructLocal(
 				pm, Organisation.DEV_ORGANISATION_ID, Person.class.getName(), personStruct.getStructScope(), Person.STRUCT_LOCAL_SCOPE);
@@ -227,9 +222,6 @@ public class AttributeStructFieldSyncHelper {
 				throw new RuntimeException(
 						"Specified LDAPAttributeSyncPolicy is either null or unknown! String value: " + attributeSyncPolicy.stringValue());
 			}
-
-			pm.makePersistent(personStructLocal);
-			
 		} catch (Exception e) {
 			throw new RuntimeException("Can't modify Person structure!", e);
 		}
@@ -283,17 +275,11 @@ public class AttributeStructFieldSyncHelper {
 			PersistenceManager pm, Person person, StructBlockID structBlockID, 
 			LDAPAttributeSet attributes, Collection<AttributeStructFieldDescriptor> attributeDescriptors) throws LDAPSyncException{
 
-		// Need to evict possible cached StructLocal instances here when running inside unit test.
-		// When StructLocal instance is cached it has structBlockMap field (AbstractStruct) non null
-		// which may cause unexpected behaviour. Denis.
-		pm.evictAll(true, StructLocal.class);
-		
 		StructLocalID structLocalId = person.getStructLocalObjectID();
 		IStruct personStruct = StructLocal.getStructLocal(
 				pm, Organisation.DEV_ORGANISATION_ID, structLocalId.linkClass, structLocalId.structScope, structLocalId.structLocalScope
 		);
 		createPersonStructFieldsForAttributes(personStruct, structBlockID, attributeDescriptors);
-		pm.makePersistent(personStruct);
 
 		if (attributeDescriptors.size() > 0){
 			person.inflate(personStruct);

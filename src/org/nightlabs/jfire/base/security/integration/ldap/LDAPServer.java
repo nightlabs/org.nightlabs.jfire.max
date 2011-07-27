@@ -97,6 +97,7 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 	public static final String LDAP_DEFAULT_SERVER_NAME = LDAPServer.class.getSimpleName();
 	public static final EncryptionMethod LDAP_DEFAULT_ENCRYPTION_METHOD = EncryptionMethod.NONE;
 	public static final AuthenticationMethod LDAP_DEFAULT_AUTHENTICATION_METHOD = AuthenticationMethod.SIMPLE;
+	public static final LDAPAttributeSyncPolicy LDAP_DEFAULT_ATTRIBUTE_SYNC_POLICY = LDAPAttributeSyncPolicy.MANDATORY_ONLY;
 
 	public static final String SYNC_USER_DATA_FROM_LDAP_TASK_ID = "JFireLDAP-syncUserDataFromLDAP";
 	public static final String FETCH_GROUP_LDAP_SCRIPT_SET = "LDAPServer.ldapScriptSet";
@@ -178,14 +179,14 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 	 * Encryption method used in communication with LDAP server
 	 */
 	@Persistent(defaultFetchGroup="true")
-	private EncryptionMethod encryptionMethod;
+	private EncryptionMethod encryptionMethod = LDAP_DEFAULT_ENCRYPTION_METHOD;
 	
 	/**
 	 * Authentication method used when binding against LDAP server
 	 * IMPORTANT! For now only SIMPLE method is supported or NONE for anonymous access.
 	 */
 	@Persistent(defaultFetchGroup="true")
-	private AuthenticationMethod authenticationMethod = AuthenticationMethod.SIMPLE;
+	private AuthenticationMethod authenticationMethod = LDAP_DEFAULT_AUTHENTICATION_METHOD;
 	
 	/**
 	 * DN used for binding agains LDAP server during synchronization process (see issue 1974)
@@ -210,7 +211,7 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 	 * See {@link AttributeStructFieldSyncHelper} class for details.
 	 */
 	@Persistent(defaultFetchGroup="true")
-	private LDAPAttributeSyncPolicy attributeSyncPolicy = LDAPAttributeSyncPolicy.MANDATORY_ONLY;
+	private LDAPAttributeSyncPolicy attributeSyncPolicy = LDAP_DEFAULT_ATTRIBUTE_SYNC_POLICY;
 	
 	
 	/**
@@ -387,7 +388,7 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 	 */
 	public void setEncryptionMethod(EncryptionMethod encryptionMethod) {
 		if (encryptionMethod == null){
-			encryptionMethod = EncryptionMethod.NONE;
+			encryptionMethod = LDAP_DEFAULT_ENCRYPTION_METHOD;
 		}
 		this.encryptionMethod = encryptionMethod;
 	}
@@ -487,7 +488,7 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 	 */
 	public void setAttributeSyncPolicy(LDAPAttributeSyncPolicy attributeSyncPolicy) {
 		if (attributeSyncPolicy == null){
-			attributeSyncPolicy = LDAPAttributeSyncPolicy.MANDATORY_ONLY;
+			attributeSyncPolicy = LDAP_DEFAULT_ATTRIBUTE_SYNC_POLICY;
 		}
 		this.attributeSyncPolicy = attributeSyncPolicy;
 	}

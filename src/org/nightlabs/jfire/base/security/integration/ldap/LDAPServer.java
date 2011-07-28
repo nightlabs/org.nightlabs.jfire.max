@@ -19,6 +19,7 @@ import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.Queries;
 import javax.jdo.listener.AttachCallback;
 import javax.jdo.listener.DeleteCallback;
+import javax.jdo.listener.StoreCallback;
 import javax.naming.InitialContext;
 import javax.script.ScriptException;
 import javax.security.auth.login.LoginContext;
@@ -37,9 +38,9 @@ import org.nightlabs.jfire.base.security.integration.ldap.connection.LDAPConnect
 import org.nightlabs.jfire.base.security.integration.ldap.sync.AttributeStructFieldSyncHelper;
 import org.nightlabs.jfire.base.security.integration.ldap.sync.AttributeStructFieldSyncHelper.AttributeStructFieldDescriptor;
 import org.nightlabs.jfire.base.security.integration.ldap.sync.AttributeStructFieldSyncHelper.LDAPAttributeSyncPolicy;
+import org.nightlabs.jfire.base.security.integration.ldap.sync.IAttributeStructFieldDescriptorProvider;
 import org.nightlabs.jfire.base.security.integration.ldap.sync.LDAPSyncEvent;
 import org.nightlabs.jfire.base.security.integration.ldap.sync.LDAPSyncEvent.LDAPSyncEventType;
-import org.nightlabs.jfire.base.security.integration.ldap.sync.IAttributeStructFieldDescriptorProvider;
 import org.nightlabs.jfire.base.security.integration.ldap.sync.LDAPSyncException;
 import org.nightlabs.jfire.base.security.integration.ldap.sync.SyncLifecycleListener;
 import org.nightlabs.jfire.person.Person;
@@ -90,7 +91,7 @@ import org.slf4j.LoggerFactory;
 				value="SELECT where this.type == :serverType && this.attributeSyncPolicy == :attributeSyncPolicy ORDER BY JDOHelper.getObjectId(this) ASCENDING"
 				)
 		})
-public class LDAPServer extends UserManagementSystem implements ILDAPConnectionParamsProvider, AttachCallback, DeleteCallback{
+public class LDAPServer extends UserManagementSystem implements ILDAPConnectionParamsProvider, AttachCallback, DeleteCallback, StoreCallback{
 
 	public static final int LDAP_DEFAULT_PORT = 10389;
 	public static final String LDAP_DEFAULT_HOST = "localhost";
@@ -1098,6 +1099,18 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 	}
 
 	/**
+	 * Store callback is used for new {@link LDAPServer} instances only to call for {@link Person} structure modification
+	 * when these instances are created. Further modifications are supposed to happen either in attach callback or by calling
+	 * {@link #commitAttributeSyncPolicyChange()} manually on attached {@link LDAPServer} instance.
+	 */
+	@Override
+	public void jdoPreStore() {
+		if (JDOHelper.isNew(this)){
+			AttributeStructFieldSyncHelper.modifyPersonStructure(JDOHelper.getPersistenceManager(this), this);
+		}
+	}
+	
+	/**
 	 * Delete callback which calls for {@link Person} {@link StructLocal} modification when {@link LDAPServer} is deleted.
 	 * It's done for the case when it is the last {@link LDAPServer} existed with {@link #attributeSyncPolicy} not NONE.
 	 * However note that {@link #attributeSyncPolicy} is set to {@link LDAPAttributeSyncPolicy#NONE} before calling for 
@@ -1109,7 +1122,7 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 		setAttributeSyncPolicy(LDAPAttributeSyncPolicy.NONE);
 		AttributeStructFieldSyncHelper.modifyPersonStructure(JDOHelper.getPersistenceManager(this), this);
 	}
-	
+
 	/***********************************
 	 * Synchronization section END *
 	 ***********************************/

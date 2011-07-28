@@ -468,13 +468,15 @@ public class PushNotificationsConfigurator {
 			}
 			
 			String oldName = null;
-			try{
-				oldName = event.getOldBinding().getNameInNamespace();
-			}catch(Exception e){	// it turned out that, for example, Apache DS returned no name in namespace, just a relative name
-				oldName = event.getOldBinding().getName();
-			}
-			if (newName.equals(oldName)){
-				oldName = null;
+			if (event.getOldBinding() != null){
+				try{
+					oldName = event.getOldBinding().getNameInNamespace();
+				}catch(Exception e){	// it turned out that, for example, Apache DS returned no name in namespace, just a relative name
+					oldName = event.getOldBinding().getName();
+				}
+				if (newName.equals(oldName)){
+					oldName = null;
+				}
 			}
 			if (oldName != null && !oldName.isEmpty()){
 				// TODO: [Denis] If LDAP entry was renamed and corresponding JFire User already exists than we have several choices:

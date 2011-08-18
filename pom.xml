@@ -74,6 +74,12 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
+		    <groupId>org.apache.geronimo.specs</groupId>
+		    <artifactId>geronimo-annotation_1.1_spec</artifactId>
+		    <!-- FIXME add to dependency-management -->
+		    <version>1.0.1</version>
+		</dependency>		
+		<dependency>
 		    <groupId>javax.annotation</groupId>
 		    <artifactId>jsr250-api</artifactId>
 			<scope>provided</scope>

@@ -13,6 +13,7 @@ import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.person.Person;
 import org.nightlabs.jfire.personrelation.PersonRelation;
 import org.nightlabs.jfire.personrelation.PersonRelationComparator;
+import org.nightlabs.jfire.personrelation.PersonRelationFilterCriteria;
 import org.nightlabs.jfire.personrelation.PersonRelationManagerRemote;
 import org.nightlabs.jfire.personrelation.PersonRelationType;
 import org.nightlabs.jfire.personrelation.PersonRelationManagerRemote.TuckedQueryCount;
@@ -88,6 +89,10 @@ extends BaseJDOObjectDAO<PersonRelationID, PersonRelation>
 		);
 	}
 
+	/**
+	 * @deprecated Use {@link #getPersonRelationIDs(PersonRelationFilterCriteria, ProgressMonitor)}
+	 */
+	@Deprecated
 	public synchronized Collection<PersonRelationID> getPersonRelationIDs(
 			PersonRelationTypeID personRelationTypeID,
 			PropertySetID fromPersonID,
@@ -109,7 +114,30 @@ extends BaseJDOObjectDAO<PersonRelationID, PersonRelation>
 		}
 	}
 
+	/**
+	 * @see PersonRelationManagerRemote#getPersonRelationIDs(PersonRelationFilterCriteria)
+	 */
+	public synchronized Collection<PersonRelationID> getPersonRelationIDs(
+			PersonRelationFilterCriteria filterCriteria,
+			ProgressMonitor monitor
+	) {
+		monitor.beginTask("Loading person relation IDs", 100);
+		try {
+			PersonRelationManagerRemote ejb = getEjbProvider().getRemoteBean(PersonRelationManagerRemote.class);
+			monitor.worked(10);
+			Collection<PersonRelationID> personRelationIDs = ejb.getPersonRelationIDs(filterCriteria);
+			monitor.worked(90);
+			return personRelationIDs;
+		} finally {
+			monitor.done();
+		}
+	}
+	
 	// -------------- ++++++++++ ----------------------------------------------------------------------------------------------------------- ++ ----|
+	/**
+	 * @deprecated Use {@link #getPersonRelationIDs(PersonRelationFilterCriteria, ProgressMonitor)}
+	 */
+	@Deprecated
 	public synchronized Collection<PersonRelationID> getFilteredPersonRelationIDs(
 			PersonRelationTypeID personRelationTypeID,
 			PropertySetID fromPersonID,
@@ -133,6 +161,10 @@ extends BaseJDOObjectDAO<PersonRelationID, PersonRelation>
 		}
 	}
 
+	/**
+	 * @deprecated Use {@link #getPersonRelationCount(PersonRelationFilterCriteria, ProgressMonitor)}
+	 */
+	@Deprecated
 	public synchronized long getFilteredPersonRelationCount(
 			PersonRelationTypeID personRelationTypeID,
 			PropertySetID fromPersonID,
@@ -223,6 +255,34 @@ extends BaseJDOObjectDAO<PersonRelationID, PersonRelation>
 	// -------------- ++++++++++ ----------------------------------------------------------------------------------------------------------- ++ ----|
 
 
+	/**
+	 * Get all those {@link PersonRelation}s that are of the given criteria.
+	 * 
+	 * @see PersonRelationManagerRemote#getPersonRelationIDs(PersonRelationFilterCriteria).
+	 * 
+	 * @return the {@link PersonRelation}s that match the given criteria.
+	 */
+	public synchronized List<PersonRelation> getPersonRelations(PersonRelationFilterCriteria filterCriteria, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
+	{
+		monitor.beginTask("Loading person relations", 100);
+		try {
+			ejb = getEjbProvider().getRemoteBean(PersonRelationManagerRemote.class);
+			try {
+				monitor.worked(10);
+				Collection<PersonRelationID> personRelationIDs = ejb.getPersonRelationIDs(filterCriteria);
+				monitor.worked(20);
+				return getJDOObjects(
+						null, personRelationIDs,
+						fetchGroups, maxFetchDepth,
+						new SubProgressMonitor(monitor, 70)
+				);
+			} finally {
+				ejb = null;
+			}
+		} finally {
+			monitor.done();
+		}
+	}
 
 	/**
 	 * Get all those {@link PersonRelation}s that are of a certain {@link PersonRelationType type}
@@ -309,6 +369,25 @@ extends BaseJDOObjectDAO<PersonRelationID, PersonRelation>
 		}
 	}
 
+	/**
+	 * @see PersonRelationManagerRemote#getPersonRelationIDs(PersonRelationFilterCriteria).
+	 */
+	public synchronized long getPersonRelationCount(PersonRelationFilterCriteria filterCriteria, ProgressMonitor monitor) {
+		monitor.beginTask("Loading person relation count", 100);
+		try {
+			PersonRelationManagerRemote ejb = getEjbProvider().getRemoteBean(PersonRelationManagerRemote.class);
+			monitor.worked(10);
+			return ejb.getPersonRelationCount(filterCriteria);
+		} finally {
+			monitor.worked(90);
+			monitor.done();
+		}
+	}
+
+	/**
+	 * @deprecated Use {@link #getPersonRelationCount(PersonRelationFilterCriteria, ProgressMonitor)}.
+	 */
+	@Deprecated
 	public synchronized long getPersonRelationCount(
 			PersonRelationTypeID personRelationTypeID,
 			PropertySetID fromPersonID,

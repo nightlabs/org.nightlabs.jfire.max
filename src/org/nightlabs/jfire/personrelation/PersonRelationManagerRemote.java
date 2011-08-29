@@ -26,23 +26,86 @@ public interface PersonRelationManagerRemote {
 			String[] fetchGroups, int maxFetchDepth
 	);
 
+	/**
+	 * Get the number of PersonRelations between the given two persons. If
+	 * personRelationTypeID is set the result will be limited to PersonRelations
+	 * of that type.
+	 * 
+	 * @deprecated Use {@link #getPersonRelationCount(PersonRelationFilterCriteria)} instead for more flexibility.
+	 * 
+	 * @param personRelationTypeID The PersonRelationTypeID to limit the result to.
+	 * @param fromPersonID The from-anchor of the relations.
+	 * @param toPersonID The to-anchor of the relations.
+	 * @return The number of PersonRelations of the given criteria.
+	 */
+	@Deprecated
 	long getPersonRelationCount(
 			PersonRelationTypeID personRelationTypeID,
 			PropertySetID fromPersonID, PropertySetID toPersonID
 	);
 
+	/**
+	 * Get the number of PersonRelations for the given criteria. 
+	 * You need to set at least toPersonID and fromPersonID in the criteria. 
+	 * Additionally you can either limit the result to certain PersonRelationTypes ({@link PersonRelationFilterCriteria#setPersonRelationTypeIncludeIDs(Collection)})
+	 * or exclude a list of types ({@link PersonRelationFilterCriteria#setPersonRelationTypeExcludedIDs(Collection)}).
+	 * 
+	 * @param personFilterCriteria The criteria to limit the result..
+	 * @return The number of PersonRelations of the given criteria.
+	 */
+	long getPersonRelationCount(PersonRelationFilterCriteria personFilterCriteria);
+	
+	/**
+	 * Get the PersonRelations between the given two persons. If
+	 * personRelationTypeID is set the result will be limited to PersonRelations
+	 * of that type.
+	 * 
+	 * @deprecated Use {@link #getPersonRelationIDs(PersonRelationFilterCriteria)} instead for more flexibility.
+	 * 
+	 * @param personRelationTypeID The PersonRelationTypeID to limit the result to.
+	 * @param fromPersonID The from-anchor of the relations.
+	 * @param toPersonID The to-anchor of the relations.
+	 * @return The PersonRelations of the given criteria.
+	 */
+	@Deprecated
 	Collection<PersonRelationID> getPersonRelationIDs(
 			PersonRelationTypeID personRelationTypeID,
 			PropertySetID fromPersonID, PropertySetID toPersonID
 	);
 
-	// -------------- ++++++++++ ----------------------------------------------------------------------------------------------------------- ++ ----|
+	/**
+	 * Get the PersonRelations between the given two persons. If
+	 * personRelationTypeID is set the result will be limited to PersonRelations
+	 * of that type.
+	 * 
+	 * @deprecated Use {@link #getPersonRelationIDs(PersonRelationFilterCriteria)} instead for more flexibility.
+	 * 
+	 * @param personRelationTypeID The PersonRelationTypeID to limit the result to.
+	 * @param fromPersonID The from-anchor of the relations.
+	 * @param toPersonID The to-anchor of the relations.
+	 * @param personRelationComparator A comparator to sort the result.
+	 * @return The PersonRelations of the given criteria.
+	 */
+	@Deprecated
 	Collection<PersonRelationID> getPersonRelationIDs(
 			PersonRelationTypeID personRelationTypeID,
 			PropertySetID fromPersonID,
 			PropertySetID toPersonID,
 			PersonRelationComparator personRelationComparator // Leave this null to indicate no sorting
 	);
+
+	/**
+	 * Get the PersonRelations for the given criteria. You need to set at least
+	 * toPersonID and fromPersonID in the criteria. Additionally you can either
+	 * limit the result to certain PersonRelationTypes ({@link PersonRelationFilterCriteria#setPersonRelationTypeIncludeIDs(Collection)}) 
+	 * or exclude a list of types ({@link PersonRelationFilterCriteria#setPersonRelationTypeExcludedIDs(Collection)}) 
+	 * as well as set a Comparator to sort the result ({@link PersonRelationFilterCriteria#setPersonRelationComparator(PersonRelationComparator)}).
+	 * 
+	 * @param personFilterCriteria The criteria to limit the result..
+	 * @return The PersonRelations of the given criteria.
+	 */
+	Collection<PersonRelationID> getPersonRelationIDs(PersonRelationFilterCriteria personRelationFilterCriteria);
+	
 
 	Collection<PersonRelationID> getFilteredPersonRelationIDs(
 			PersonRelationTypeID personRelationTypeID,

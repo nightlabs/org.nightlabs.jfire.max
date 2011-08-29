@@ -235,9 +235,22 @@ implements Serializable
 		}
 	}
 
+	/**
+	 * Method used by standard-implementation of
+	 * {@link #createPersonRelation(Person, Person)} to create the instance of
+	 * the PersonRelation to be persisted.
+	 * 
+	 * @param from The Person the relation should link from.
+	 * @param to The Person the relation should link to.
+	 * @return A new instance (not yet persisted) instance of {@link PersonRelation}.
+	 */
+	protected PersonRelation createNewPersonRelationInstance(Person from, Person to) {
+		return new PersonRelation(this, from, to);
+	}
+	
 	public PersonRelation createPersonRelation(Person from, Person to)
 	{
-		PersonRelation personRelation = new PersonRelation(this, from, to);
+		PersonRelation personRelation = createNewPersonRelationInstance(from, to);
 
 		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
 		if (pm != null)

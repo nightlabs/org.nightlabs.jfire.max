@@ -38,6 +38,7 @@ import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.security.integration.ldap.LDAPManagerLocal;
 import org.nightlabs.jfire.base.security.integration.ldap.LDAPServer;
 import org.nightlabs.jfire.base.security.integration.ldap.connection.JNDIConnectionWrapper;
+import org.nightlabs.jfire.base.security.integration.ldap.sync.LDAPSyncEvent.FetchEventTypeDataUnit;
 import org.nightlabs.jfire.base.security.integration.ldap.sync.LDAPSyncEvent.LDAPSyncEventType;
 import org.nightlabs.jfire.security.GlobalSecurityReflector;
 import org.nightlabs.jfire.security.NoUserException;
@@ -487,7 +488,7 @@ public class PushNotificationsConfigurator {
 			}
 			
 			LDAPSyncEvent syncEvent = new LDAPSyncEvent(LDAPSyncEventType.FETCH);
-			syncEvent.setLdapUsersIds(CollectionUtil.createHashSet(newName));
+			syncEvent.setFetchEventTypeDataUnits(CollectionUtil.createHashSet(new FetchEventTypeDataUnit(newName)));
 			try {
 				AsyncInvoke.exec(
 						new LDAPSyncInvocation(getLDAPServerIDByEventContext(event.getEventContext()), syncEvent),
@@ -511,8 +512,8 @@ public class PushNotificationsConfigurator {
 				return;
 			}
 			
-			LDAPSyncEvent syncEvent = new LDAPSyncEvent(LDAPSyncEventType.DELETE);
-			syncEvent.setLdapUsersIds(CollectionUtil.createHashSet(name));
+			LDAPSyncEvent syncEvent = new LDAPSyncEvent(LDAPSyncEventType.FETCH_DELETE);
+			syncEvent.setFetchEventTypeDataUnits(CollectionUtil.createHashSet(new FetchEventTypeDataUnit(name)));
 			try {
 				AsyncInvoke.exec(
 						new LDAPSyncInvocation(getLDAPServerIDByEventContext(event.getEventContext()), syncEvent),

@@ -40,7 +40,9 @@ import org.nightlabs.jfire.base.security.integration.ldap.sync.AttributeStructFi
 import org.nightlabs.jfire.base.security.integration.ldap.sync.AttributeStructFieldSyncHelper.LDAPAttributeSyncPolicy;
 import org.nightlabs.jfire.base.security.integration.ldap.sync.IAttributeStructFieldDescriptorProvider;
 import org.nightlabs.jfire.base.security.integration.ldap.sync.LDAPSyncEvent;
+import org.nightlabs.jfire.base.security.integration.ldap.sync.LDAPSyncEvent.FetchEventTypeDataUnit;
 import org.nightlabs.jfire.base.security.integration.ldap.sync.LDAPSyncEvent.LDAPSyncEventType;
+import org.nightlabs.jfire.base.security.integration.ldap.sync.LDAPSyncEvent.SendEventTypeDataUnit;
 import org.nightlabs.jfire.base.security.integration.ldap.sync.LDAPSyncException;
 import org.nightlabs.jfire.base.security.integration.ldap.sync.SyncLifecycleListener;
 import org.nightlabs.jfire.person.Person;
@@ -329,7 +331,12 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
    			        	logger.debug(String.format("User %s@%s was not found JFire, start fetching it from LDAP", loginDataUserID, loginDataOrganisationID));
    			        }
    	    			
-					updateJFireData(CollectionUtil.createHashSet(userDN), loginDataOrganisationID, false);
+   					LDAPSyncEvent syncEvent = new LDAPSyncEvent(LDAPSyncEventType.FETCH);
+   					syncEvent.setOrganisationID(loginDataOrganisationID);
+   					syncEvent.setFetchEventTypeDataUnits(
+   							CollectionUtil.createHashSet(
+   									new FetchEventTypeDataUnit(userDN)));
+					updateJFireData(syncEvent);
 				} catch (LDAPSyncException e) {
 					logger.error(String.format("Exception while fetching user %s@%s from LDAP", loginDataUserID, loginDataOrganisationID), e);
 					throw new LoginException(String.format("Can't fetch user %s@%s at login! See log for details.", loginDataUserID, loginDataOrganisationID));
@@ -628,22 +635,16 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 	 * @throws LDAPSyncException
 	 */
 	public void synchronize(LDAPSyncEvent syncEvent) throws LDAPSyncException, LoginException, UserManagementSystemCommunicationException{
-		if (LDAPSyncEventType.FETCH == syncEvent.getEventType()){
+		LDAPSyncEventType eventType = syncEvent.getEventType();
+		if (LDAPSyncEventType.FETCH == eventType
+				|| LDAPSyncEventType.FETCH_DELETE == eventType){
 			
-			updateJFireData(syncEvent.getLdapUsersIds(), syncEvent.getOrganisationID(), false);
+			updateJFireData(syncEvent);
 			
-		}else if (LDAPSyncEventType.SEND == syncEvent.getEventType()){
+		}else if (LDAPSyncEventType.SEND == eventType
+				|| LDAPSyncEventType.SEND_DELETE == eventType){
 			
-			updateLDAPData(syncEvent.getJFireObjectsIds(), false);
-			
-		}else if (LDAPSyncEventType.DELETE == syncEvent.getEventType()){
-			
-			if (syncEvent.getJFireObjectsIds() != null){
-				updateLDAPData(syncEvent.getJFireObjectsIds(), true);
-			}
-			if (syncEvent.getLdapUsersIds() != null){
-				updateJFireData(syncEvent.getLdapUsersIds(), syncEvent.getOrganisationID(), true);
-			}
+			updateLDAPData(syncEvent);
 			
 		}else{
 			throw new UnsupportedOperationException("Unknown LDAPSyncEventType!");
@@ -792,18 +793,25 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 	/**
 	 * Performs synchronization from LDAP directory to JFire
 	 * 
-	 * @param ldapEntriesDNs
-	 * @param organisationID
+	 * @param ldapSyncEvent
 	 * @param removeJFireObjects
 	 * @throws UserManagementSystemCommunicationException
 	 * @throws LoginException
 	 * @throws LDAPSyncException
 	 */
-	private void updateJFireData(Collection<String> ldapEntriesDNs, String organisationID, boolean removeJFireObjects) throws UserManagementSystemCommunicationException, LoginException, LDAPSyncException{
+	private void updateJFireData(LDAPSyncEvent ldapSyncEvent) throws UserManagementSystemCommunicationException, LoginException, LDAPSyncException{
+		
+		if (ldapSyncEvent.getFetchEventTypeDataUnits() == null
+				|| ldapSyncEvent.getFetchEventTypeDataUnits().isEmpty()){
+			logger.error("Synchronization is not possible! LDAPSyncEvent don't have any FetchEventTypeDataUnits!");
+			return;
+		}
+		
 		LDAPConnection connection = null;
 		LoginContext loginContext = null;
 		JFireServerManager jsm = null;
 		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
+		String organisationID = ldapSyncEvent.getOrganisationID();
 		
 		try{
 			// We need to be logged into JFire to be able to persist objects, inflate property sets, generate IDs ...
@@ -848,15 +856,16 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 			// disable JDO lifecycle listener which forbids new User creation
 			ForbidUserCreationLyfecycleListener.setEnabled(false);
 			
-			for (String ldapEntryDN : ldapEntriesDNs){
+			for (FetchEventTypeDataUnit dataUnit : ldapSyncEvent.getFetchEventTypeDataUnits()){
+				String ldapEntryDN = dataUnit.getLdapEntryName();
 				try{
-					
 					if (logger.isDebugEnabled()){
 						logger.debug("Trying synchronization for DN: " + ldapEntryDN);
 					}
 					
 					LDAPAttributeSet attributes = null;
-					if (!removeJFireObjects){
+					boolean removeJFireObjects = ldapSyncEvent.getEventType() == LDAPSyncEventType.FETCH_DELETE;
+					if (!removeJFireObjects ){
 						attributes = connection.getAttributesForEntry(ldapEntryDN);
 					}else{
 						attributes = new LDAPAttributeSet();
@@ -867,11 +876,19 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 							);
 					
 					// processing attributes synchronization depending on current LDAPAttributeSyncPolicy for this LDAPServer
+					Person person = null;
+					User user = null;
+					if (returnObject instanceof Person){
+						person = (Person) returnObject;
+					}else if (returnObject instanceof User){
+						user = (User) returnObject;
+						person = user.getPerson();
+					}
 					if (logger.isDebugEnabled()){
 						logger.debug("LDAPAttributeSyncPolicy is " + attributeSyncPolicy.stringValue());
 					}
 					if (!LDAPAttributeSyncPolicy.NONE.equals(attributeSyncPolicy)
-							&& returnObject instanceof Person
+							&& person != null
 							&& getType() instanceof IAttributeStructFieldDescriptorProvider){
 						
 						IAttributeStructFieldDescriptorProvider descriptorProvider = (IAttributeStructFieldDescriptorProvider) getType();
@@ -884,8 +901,10 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 						}
 						
 						AttributeStructFieldSyncHelper.setPersonDataForAttributes(
-								pm, (Person) returnObject, descriptorProvider.getAttributeStructBlockID(), attributes, attributeDescriptors);
+								pm, person, descriptorProvider.getAttributeStructBlockID(), attributes, attributeDescriptors);
 
+						pm.makePersistent(user!=null?user:person);
+						
 						if (logger.isDebugEnabled()){
 							logger.debug("Attribute sync is done.");
 						}
@@ -924,27 +943,42 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 	/**
 	 * Performs synchronization from JFire to LDAP directory
 	 * 
-	 * @param jfireObjectsIds
-	 * @param removeEntries
+	 * @param ldapSyncEvent
 	 * @throws UserManagementSystemCommunicationException
 	 * @throws LoginException
 	 * @throws LDAPSyncException
 	 */
-	private void updateLDAPData(Collection<?> jfireObjectsIds, boolean removeEntries) throws UserManagementSystemCommunicationException, LoginException, LDAPSyncException{
+	private void updateLDAPData(LDAPSyncEvent ldapSyncEvent) throws UserManagementSystemCommunicationException, LoginException, LDAPSyncException{
+		
+		if (ldapSyncEvent.getSendEventTypeDataUnits() == null
+				|| ldapSyncEvent.getSendEventTypeDataUnits().isEmpty()){
+			logger.error("Synchronization is not possible! LDAPSyncEvent don't have any SendEventTypeDataUnits!");
+			return;
+		}
+		
 		LDAPConnection connection = null;
 		try{
 			connection = createConnection(this);
 			bindForSynchronization(connection);
 
 			PersistenceManager pm = JDOHelper.getPersistenceManager(this);
-			for (Object jfireObjectId : jfireObjectsIds){
+			for (SendEventTypeDataUnit dataUnit : ldapSyncEvent.getSendEventTypeDataUnits()){
+				Object jfireObjectId = dataUnit.getJfireObjectId();
 				try{
 					if (logger.isDebugEnabled()){
 						logger.debug("Trying synchronization for object " + jfireObjectId.toString());
 					}
 				
-					Object jfireObject = pm.getObjectById(jfireObjectId);
-					String userDN = getLDAPUserDN(jfireObject);
+					String userDN = dataUnit.getLdapEntryId();
+					if (ldapSyncEvent.getEventType() == LDAPSyncEventType.SEND
+							&& (userDN == null || "".equals(userDN))){
+						if (logger.isDebugEnabled()){
+							logger.debug("LDAP entry name was not given in SendEventTypeDataUnit, trying to get it via scriptset for object with ID " + jfireObjectId.toString());
+						}
+						Object jfireObject = pm.getObjectById(jfireObjectId);
+						pm.refresh(jfireObject);
+						userDN = getLDAPUserDN(jfireObject);
+					}
 					
 					if (userDN == null || "".equals(userDN)){
 						logger.warn("DN is empty, can't process synchronization for JFire object " + jfireObjectId.toString());
@@ -960,7 +994,7 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 						entryExists = false;
 					}
 
-					if (removeEntries){
+					if (ldapSyncEvent.getEventType() == LDAPSyncEventType.SEND_DELETE){
 						
 						if (!entryExists){
 							logger.warn("Can't remove non-existent entry with DN: " + userDN);
@@ -976,20 +1010,28 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 						if (logger.isDebugEnabled()){
 							logger.debug("Preparing attributes for modifying entry with DN: " + userDN);
 						}
+						Object jfireObject = pm.getObjectById(jfireObjectId);
 						LDAPAttributeSet modifyAttributes = ldapScriptSet.getLDAPAttributes(
 								jfireObject, !entryExists
 								);
 						
 						
 						// add attributs based on attributeSyncPolicy set for this LDAPServer
+						Person person = null;
+						if (jfireObject instanceof Person){
+							person = (Person) jfireObject;
+						}else if (jfireObject instanceof User){
+							person = ((User) jfireObject).getPerson();
+						}
 						if (logger.isDebugEnabled()){
 							logger.debug("LDAPAttributeSyncPolicy is " + attributeSyncPolicy.stringValue());
 						}
 						if (!LDAPAttributeSyncPolicy.NONE.equals(attributeSyncPolicy)
+								&& person != null
 								&& getType() instanceof IAttributeStructFieldDescriptorProvider){
 							IAttributeStructFieldDescriptorProvider ldapServerType = (IAttributeStructFieldDescriptorProvider) getType();
 							LDAPAttributeSet syncAttributes = AttributeStructFieldSyncHelper.getAttributesForSync(
-									jfireObject, ldapServerType.getAttributeStructFieldDescriptors(attributeSyncPolicy));
+									person, ldapServerType.getAttributeStructFieldDescriptors(attributeSyncPolicy));
 
 							if (logger.isDebugEnabled()){
 								logger.debug(

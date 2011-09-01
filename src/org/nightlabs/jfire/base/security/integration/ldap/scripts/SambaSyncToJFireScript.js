@@ -8,7 +8,7 @@
  * of entry to be synchronized, <code>pm</code> - PersistenceManager, <code>organisationID</code> - the ID of JFire organisation, 
  * <code>logger</code> - org.slf4j.Logger for debug purposes.  
  * 
- * Returns Person object or nothing if removing was called.
+ * Returns stored object (either User or Person) or nothing if removing was called.
  * 
  * @author Denis Dudnik <deniska.dudnik[at]gmail{dot}com>
  *  
@@ -58,5 +58,4 @@ if (removeJFireObjects){
 		objectToStore = person;
 	}
 	pm.makePersistent(objectToStore);
-	person;
 }

@@ -35,7 +35,6 @@ import org.nightlabs.jfire.prop.exception.StructFieldNotFoundException;
 import org.nightlabs.jfire.prop.id.StructBlockID;
 import org.nightlabs.jfire.prop.id.StructFieldID;
 import org.nightlabs.jfire.prop.id.StructLocalID;
-import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.security.integration.UserManagementSystemType;
 import org.nightlabs.util.NLLocale;
 import org.slf4j.Logger;
@@ -231,32 +230,24 @@ public class AttributeStructFieldSyncHelper {
 	 * Returns {@link LDAPAttributeSet} with attributes mapped from {@link Person} datafields according to given {@link Collection} of 
 	 * {@link AttributeStructFieldDescriptor}s.
 	 * 
-	 * @param jfireObject JFire object being synchronized (either {@link User} or {@link Person})
+	 * @param person {@link Person} being synchronized
 	 * @param attributeDescriptors Descriptors of attributes which should be taken for synchronization
 	 * @return {@link LDAPAttributeSet} with attributes to be synchronized to LDAP directory
 	 */
-	public static LDAPAttributeSet getAttributesForSync(Object jfireObject, Collection<AttributeStructFieldDescriptor> attributeDescriptors){
-		Person person = null;
-		if (jfireObject instanceof Person){
-			person = (Person) jfireObject;
-		}else if (jfireObject instanceof User){
-			person = ((User) jfireObject).getPerson();
-		}
+	public static LDAPAttributeSet getAttributesForSync(Person person, Collection<AttributeStructFieldDescriptor> attributeDescriptors){
 		LDAPAttributeSet attributes = new LDAPAttributeSet();
-		if (person != null){
-			for (AttributeStructFieldDescriptor descriptor : attributeDescriptors){
-				Object dataFieldValue = getPersonDataFieldValue(person, descriptor.getStructFieldID());
-				Object attributeValue = null;
-				if (dataFieldValue instanceof String
-						|| dataFieldValue instanceof byte[]){
-					attributeValue = dataFieldValue;
-				}else if (dataFieldValue instanceof Number){
-					attributeValue = String.valueOf(dataFieldValue);
-				}else if (dataFieldValue != null){
-					attributeValue = dataFieldValue.toString();
-				}
-				attributes.createAttribute(descriptor.getStructFieldID().structFieldID, attributeValue);
+		for (AttributeStructFieldDescriptor descriptor : attributeDescriptors){
+			Object dataFieldValue = getPersonDataFieldValue(person, descriptor.getStructFieldID());
+			Object attributeValue = null;
+			if (dataFieldValue instanceof String
+					|| dataFieldValue instanceof byte[]){
+				attributeValue = dataFieldValue;
+			}else if (dataFieldValue instanceof Number){
+				attributeValue = String.valueOf(dataFieldValue);
+			}else if (dataFieldValue != null){
+				attributeValue = dataFieldValue.toString();
 			}
+			attributes.createAttribute(descriptor.getStructFieldID().structFieldID, attributeValue);
 		}
 		return attributes;
 	}
@@ -313,7 +304,6 @@ public class AttributeStructFieldSyncHelper {
 				}
 			}
 			person.deflate();
-			pm.makePersistent(person);
 		}
 	}
 

@@ -25,6 +25,7 @@ import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.base.security.integration.ldap.connection.ILDAPConnectionParamsProvider.EncryptionMethod;
 import org.nightlabs.jfire.base.security.integration.ldap.id.LDAPScriptSetID;
 import org.nightlabs.jfire.base.security.integration.ldap.sync.LDAPSyncEvent;
+import org.nightlabs.jfire.base.security.integration.ldap.sync.LDAPSyncEvent.FetchEventTypeDataUnit;
 import org.nightlabs.jfire.base.security.integration.ldap.sync.LDAPSyncEvent.LDAPSyncEventType;
 import org.nightlabs.jfire.base.security.integration.ldap.sync.LDAPSyncException;
 import org.nightlabs.jfire.base.security.integration.ldap.sync.PushNotificationsConfigurator;
@@ -182,10 +183,14 @@ public class LDAPManagerBean extends BaseSessionBeanImpl implements LDAPManagerR
 			for (LDAPServer ldapServer : leadingSystems) {
 				
 				Collection<String> entriesForSync = ldapServer.getAllEntriesForSync();
-				if (!entriesForSync.isEmpty()){
+				Collection<FetchEventTypeDataUnit> dataUnits = new HashSet<FetchEventTypeDataUnit>();
+				for (String ldapEntryName : entriesForSync){
+					dataUnits.add(new FetchEventTypeDataUnit(ldapEntryName));
+				}
+				if (!dataUnits.isEmpty()){
 					LDAPSyncEvent syncEvent = new LDAPSyncEvent(LDAPSyncEventType.FETCH);
 					syncEvent.setOrganisationID(getOrganisationID());
-					syncEvent.setLdapUsersIds(entriesForSync);
+   					syncEvent.setFetchEventTypeDataUnits(dataUnits);
 					
 					ldapServer.synchronize(syncEvent);
 				}

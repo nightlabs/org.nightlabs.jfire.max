@@ -6,6 +6,7 @@ import java.util.Set;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.base.security.integration.ldap.id.LDAPScriptSetID;
+import org.nightlabs.jfire.base.security.integration.ldap.scripts.ILDAPScriptProvider;
 import org.nightlabs.jfire.security.integration.id.UserManagementSystemID;
 import org.nightlabs.progress.ProgressMonitor;
 import org.nightlabs.progress.SubProgressMonitor;
@@ -98,10 +99,10 @@ public class LDAPScriptSetDAO extends BaseJDOObjectDAO<LDAPScriptSetID, LDAPScri
 
 		monitor.beginTask("Storing LDAPScriptSet", 3);
 		try{
-			LDAPManagerRemote um = getEjbProvider().getRemoteBean(LDAPManagerRemote.class);
+			LDAPManagerRemote remoteBean = getEjbProvider().getRemoteBean(LDAPManagerRemote.class);
 			monitor.worked(1);
 
-			LDAPScriptSet result = um.storeLDAPScriptSet(ldapScriptSet, get, fetchGroups, maxFetchDepth);
+			LDAPScriptSet result = remoteBean.storeLDAPScriptSet(ldapScriptSet, get, fetchGroups, maxFetchDepth);
 			if (result != null){
 				getCache().put(null, result, fetchGroups, maxFetchDepth);
 			}
@@ -117,4 +118,34 @@ public class LDAPScriptSetDAO extends BaseJDOObjectDAO<LDAPScriptSetID, LDAPScri
 		}
 	}
 
+	/**
+	 * Get initial script content by specified scriptID (one of values from {@link ILDAPScriptProvider})
+	 * 
+	 * @param ldapScriptSetID ID of the {@link LDAPScriptSet} where initial script content will be set, can't be <code>null</code>
+	 * @param scriptID ID of script wich will be rolled back to initial content, can't be <code>null</code>
+	 * @param monitor The progress monitor to use
+	 * @return initial script content
+	 */
+	public synchronized String getInitialScriptContent(LDAPScriptSetID ldapScriptSetID, String scriptID, ProgressMonitor monitor){
+		if (ldapScriptSetID == null){
+			throw new IllegalArgumentException("LDAPScriptSetID can't be null!");
+		}
+		if (scriptID == null){
+			throw new IllegalArgumentException("scriptID can't be null!");
+		}
+		
+		monitor.beginTask("Getting initial content for script " + scriptID, 3);
+		try{
+			LDAPManagerRemote remoteBean = getEjbProvider().getRemoteBean(LDAPManagerRemote.class);
+			monitor.worked(1);
+			String inititalScriptContent = remoteBean.getInitialScriptContent(ldapScriptSetID, scriptID);
+			monitor.worked(1);
+			return inititalScriptContent;
+		}catch (Exception e){
+			monitor.setCanceled(true);
+			throw new RuntimeException("Failed to get initial script content for scriptID " + scriptID, e);
+		}finally{
+			monitor.done();
+		}
+	}
 }

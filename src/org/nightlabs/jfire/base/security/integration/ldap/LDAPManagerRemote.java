@@ -7,6 +7,7 @@ import javax.security.auth.login.LoginException;
 
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.base.security.integration.ldap.id.LDAPScriptSetID;
+import org.nightlabs.jfire.base.security.integration.ldap.scripts.ILDAPScriptProvider;
 import org.nightlabs.jfire.base.security.integration.ldap.sync.LDAPSyncEvent;
 import org.nightlabs.jfire.base.security.integration.ldap.sync.LDAPSyncException;
 import org.nightlabs.jfire.security.integration.UserManagementSystemCommunicationException;
@@ -45,6 +46,15 @@ public interface LDAPManagerRemote {
 	 * @return found {@link LDAPScriptSetID}
 	 */
 	LDAPScriptSetID getLDAPScriptSetID(UserManagementSystemID ldapServerID);
+	
+	/**
+	 * Get initial script content by specified scriptID (one of values from {@link ILDAPScriptProvider}).
+	 * 
+	 * @param ldapScriptSetID ID of the {@link LDAPScriptSet} where initial script content will be set
+	 * @param scriptID scriptID ID of script wich will be rolled back to initial content
+	 * @return initial script content
+	 */
+	String getInitialScriptContent(LDAPScriptSetID ldapScriptSetID, String scriptID);
 	
 	/**
 	 * Stores {@link LDAPScriptSet} object.

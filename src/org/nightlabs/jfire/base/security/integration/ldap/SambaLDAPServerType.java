@@ -9,6 +9,7 @@ import javax.jdo.annotations.Inheritance;
 import javax.jdo.annotations.InheritanceStrategy;
 import javax.jdo.annotations.PersistenceCapable;
 
+import org.nightlabs.jfire.base.security.integration.ldap.scripts.ILDAPScriptProvider;
 import org.nightlabs.jfire.base.security.integration.ldap.sync.IAttributeStructFieldDescriptorProvider;
 import org.nightlabs.jfire.base.security.integration.ldap.sync.AttributeStructFieldSyncHelper.AttributeStructFieldDescriptor;
 import org.nightlabs.jfire.base.security.integration.ldap.sync.AttributeStructFieldSyncHelper.LDAPAttributeSyncPolicy;
@@ -30,7 +31,7 @@ import org.nightlabs.util.IOUtil;
 		identityType=IdentityType.APPLICATION,
 		detachable="true")
 @Inheritance(strategy=InheritanceStrategy.SUPERCLASS_TABLE)
-public class SambaLDAPServerType extends UserManagementSystemType<LDAPServer> implements IAttributeStructFieldDescriptorProvider{
+public class SambaLDAPServerType extends UserManagementSystemType<LDAPServer> implements IAttributeStructFieldDescriptorProvider, ILDAPScriptProvider{
 
 	private static final StructBlockID LDAP_ATTRIBUTES = StructBlockID.create(Organisation.DEV_ORGANISATION_ID, "SambaLDAPAttributes"); //$NON-NLS-1$
 	
@@ -201,6 +202,31 @@ public class SambaLDAPServerType extends UserManagementSystemType<LDAPServer> im
 			return mandatoryAttributeStructFieldDescriptors;
 		}
 		return new ArrayList<AttributeStructFieldDescriptor>();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String getInitialScriptContentByID(String scriptID) {
+		Class<? extends SambaLDAPServerType> typeClass = this.getClass();
+		try{
+			if (ILDAPScriptProvider.BIND_VARIABLES_SCRIPT_ID.equals(scriptID)){
+				return IOUtil.readTextFile(typeClass.getResourceAsStream(SAMBA_BIND_VARIABLES_SCRIPT));
+			}else if (ILDAPScriptProvider.GET_ENTRY_NAME_SCRIPT_ID.equals(scriptID)){
+				return IOUtil.readTextFile(typeClass.getResourceAsStream(SAMBA_GET_DN_SCRIPT));
+			}else if (ILDAPScriptProvider.GET_ATTRIBUTE_SET_SCRIPT_ID.equals(scriptID)){
+				return IOUtil.readTextFile(typeClass.getResourceAsStream(SAMBA_GET_ATTRIBUTES_FOR_LDAP_SCRIPT));
+			}else if (ILDAPScriptProvider.GET_PARENT_ENTRIES_SCRIPT_ID.equals(scriptID)){
+				return IOUtil.readTextFile(typeClass.getResourceAsStream(SAMBA_GET_PARENT_ENTRIES_SCRIPT));
+			}else if (ILDAPScriptProvider.SYNC_TO_JFIRE_SCRIPT_ID.equals(scriptID)){
+				return IOUtil.readTextFile(typeClass.getResourceAsStream(SAMBA_SYNC_TO_JFIRE_SCRIPT));
+			}else{
+				return null;
+			}
+		}catch(IOException e){
+			return null;
+		}
 	}
 
 }

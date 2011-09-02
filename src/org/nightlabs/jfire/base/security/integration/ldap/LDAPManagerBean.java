@@ -24,6 +24,7 @@ import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.base.security.integration.ldap.connection.ILDAPConnectionParamsProvider.EncryptionMethod;
 import org.nightlabs.jfire.base.security.integration.ldap.id.LDAPScriptSetID;
+import org.nightlabs.jfire.base.security.integration.ldap.scripts.ILDAPScriptProvider;
 import org.nightlabs.jfire.base.security.integration.ldap.sync.LDAPSyncEvent;
 import org.nightlabs.jfire.base.security.integration.ldap.sync.LDAPSyncEvent.FetchEventTypeDataUnit;
 import org.nightlabs.jfire.base.security.integration.ldap.sync.LDAPSyncEvent.LDAPSyncEventType;
@@ -127,6 +128,24 @@ public class LDAPManagerBean extends BaseSessionBeanImpl implements LDAPManagerR
 			HashSet<LDAPScriptSetID> hashSet = new HashSet<LDAPScriptSetID>((Collection<LDAPScriptSetID>) query.execute(ldapServerID));
 			if (hashSet.size() > 0){
 				return hashSet.iterator().next();
+			}
+			return null;
+		}finally{
+			pm.close();
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@RolesAllowed("org.nightlabs.jfire.security.accessRightManagement")
+	@Override
+	public String getInitialScriptContent(LDAPScriptSetID ldapScriptSetID, String scriptID) {
+		PersistenceManager pm = createPersistenceManager();
+		try{
+			LDAPScriptSet ldapScriptSet = (LDAPScriptSet) pm.getObjectById(ldapScriptSetID);
+			if (ldapScriptSet.getLDAPServer().getType() instanceof ILDAPScriptProvider){
+				return ((ILDAPScriptProvider) ldapScriptSet.getLDAPServer().getType()).getInitialScriptContentByID(scriptID);
 			}
 			return null;
 		}finally{

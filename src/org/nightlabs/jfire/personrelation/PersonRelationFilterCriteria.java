@@ -160,4 +160,20 @@ public class PersonRelationFilterCriteria implements Serializable {
 			Set<PropertySetID> fromPropertySetIDsToExclude) {
 		this.fromPropertySetIDsToExclude = fromPropertySetIDsToExclude;
 	}
+
+	/**
+	 * @return Human readable.
+	 */
+	public String toHumanReadable() {
+		StringBuilder sb = new StringBuilder();
+		sb.append(getClass().getSimpleName()).append("#").append(System.identityHashCode(this)).append("{\n").
+		append("personRelationTypeIncludeIDs = ").append(personRelationTypeIncludeIDs != null ? personRelationTypeIncludeIDs.toString() : "null").append("\n").
+		append("personRelationTypeExcludeIDs = ").append(personRelationTypeExcludeIDs != null ? personRelationTypeExcludeIDs.toString() : "null").append("\n").
+		append("fromPersonID = ").append(fromPersonID != null ? fromPersonID.toString() : "null").append("\n").
+		append("toPersonID = ").append(toPersonID != null ? toPersonID.toString() : "null").append("\n").
+		append("fromPropertySetIDsToExclude = ").append(fromPropertySetIDsToExclude != null ? fromPropertySetIDsToExclude.toString() : "null").append("\n").
+		append("toPropertySetIDsToExclude = ").append(toPropertySetIDsToExclude != null ? toPropertySetIDsToExclude.toString() : "null").append("\n").
+		append("personRelationComparator = ").append(personRelationComparator).append("\n}");
+		return sb.toString();
+	}
 }

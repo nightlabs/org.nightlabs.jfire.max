@@ -177,5 +177,8 @@ public interface PersonRelationManagerRemote {
 	Map<Class<? extends ObjectID>, List<Deque<ObjectID>>> getRootNodes(
 			Set<PersonRelationTypeID> relationTypeIDs,
 			PropertySetID startPoint, int maxDepth);
+	
+	List<PropertySetID> getRootNodes(Set<PersonRelationTypeID> relationTypeIDs,
+			Set<PropertySetID> personIDs, int maxDepth);	
 
 }

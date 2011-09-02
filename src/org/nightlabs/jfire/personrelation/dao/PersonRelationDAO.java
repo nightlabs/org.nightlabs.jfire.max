@@ -15,8 +15,8 @@ import org.nightlabs.jfire.personrelation.PersonRelation;
 import org.nightlabs.jfire.personrelation.PersonRelationComparator;
 import org.nightlabs.jfire.personrelation.PersonRelationFilterCriteria;
 import org.nightlabs.jfire.personrelation.PersonRelationManagerRemote;
-import org.nightlabs.jfire.personrelation.PersonRelationType;
 import org.nightlabs.jfire.personrelation.PersonRelationManagerRemote.TuckedQueryCount;
+import org.nightlabs.jfire.personrelation.PersonRelationType;
 import org.nightlabs.jfire.personrelation.id.PersonRelationID;
 import org.nightlabs.jfire.personrelation.id.PersonRelationTypeID;
 import org.nightlabs.jfire.prop.id.PropertySetID;
@@ -368,6 +368,34 @@ extends BaseJDOObjectDAO<PersonRelationID, PersonRelation>
 			ejb = null;
 		}
 	}
+	
+	public synchronized List<PropertySetID> getRelationRootNodes(Set<PersonRelationTypeID> allowedRelations,
+			Set<PropertySetID> personIDs, int maxDepth, ProgressMonitor monitor)
+	{
+		monitor.beginTask("Finding related persons", 10);
+		try
+		{
+			ejb = getEjbProvider().getRemoteBean(PersonRelationManagerRemote.class);
+			monitor.worked(2);
+			List<PropertySetID> result = ejb.getRootNodes(allowedRelations, personIDs, maxDepth);
+			monitor.worked(8);
+			monitor.done();
+			return result;
+		}
+		catch (Exception e)
+		{
+			monitor.setCanceled(true);
+			if (e instanceof RuntimeException)
+				throw (RuntimeException)e;
+			else
+				throw new RuntimeException("Error finding related persons", e);
+		}
+		finally
+		{
+			ejb = null;
+		}
+	}
+	
 
 	/**
 	 * @see PersonRelationManagerRemote#getPersonRelationIDs(PersonRelationFilterCriteria).

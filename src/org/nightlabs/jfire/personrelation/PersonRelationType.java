@@ -1,5 +1,9 @@
 package org.nightlabs.jfire.personrelation;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.Collection;
 
@@ -18,9 +22,11 @@ import javax.jdo.annotations.PersistenceModifier;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 
+import org.nightlabs.io.DataBuffer;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.person.Person;
 import org.nightlabs.jfire.personrelation.id.PersonRelationTypeID;
+import org.nightlabs.util.IOUtil;
 import org.nightlabs.util.Util;
 
 @PersistenceCapable(
@@ -97,7 +103,11 @@ implements Serializable
 
 	@Persistent(persistenceModifier=PersistenceModifier.NONE)
 	private transient PersonRelationTypeID _reversePersonRelationTypeID;
-
+	
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+	@Column(sqlType="BLOB")
+	private byte[] icon16x16Data;
+																																					
 	/**
 	 * @deprecated Only for JDO!
 	 */
@@ -281,4 +291,65 @@ implements Serializable
 			pm.deletePersistent(r);
 		}
 	}
+	
+	public byte[] getIcon16x16Data()
+	{
+		return icon16x16Data;
+	}
+	public void setIcon16x16Data(byte[] icon16x16Data)
+	{
+		this.icon16x16Data = icon16x16Data;
+	}
+
+	/**
+	 * Calls {@link #loadIconFromResource(Class, String) } with <code>resourceLoaderClass == this.getClass()</code>
+	 * {@link PersonRelationType} and <code>fileName == "PersonRelationType-" + personRelationTypeID + ".16x16.png"</code>.
+	 * This method is used for the default {@link PersonRelationType}s created by the module-initialisation.
+	 *
+	 * @throws IOException
+	 */
+	public void loadIconFromResource() throws IOException
+	{
+		String resourcePath = "resource/" + PersonRelationType.class.getSimpleName() + '-' + personRelationTypeID + ".16x16.png";
+		loadIconFromResource(
+				PersonRelationType.class, resourcePath);
+	}
+
+	/**
+	 * This method loads an icon from a resource file by calling the method
+	 * {@link Class#getResourceAsStream(String)} of
+	 * <code>resourceLoaderClass</code>.
+	 *
+	 * @param resourceLoaderClass The class that is used for loading the file.
+	 * @param fileName A filename relative to <code>resourceLoaderClass</code>. Note, that subdirectories are possible, but ".." not.
+	 * @throws IOException If loading the resource failed. This might be a {@link FileNotFoundException}.
+	 */
+	public void loadIconFromResource(Class<?> resourceLoaderClass, String fileName) throws IOException
+	{
+		InputStream in = resourceLoaderClass.getResourceAsStream(fileName);
+		if (in == null)
+			throw new FileNotFoundException("Could not find resource: " + fileName);
+		try {
+			loadIconFromStream(in);
+		} finally {
+			in.close();
+		}
+	}
+	
+	/**
+	 * Loads the icon from the given InputStream.
+	 * 
+	 * @param in The stream to fread from.
+	 * @throws IOException ...
+	 */
+	public void loadIconFromStream(InputStream in) throws IOException {
+		DataBuffer db = new DataBuffer(512);
+		OutputStream out = db.createOutputStream();
+		try {
+			IOUtil.transferStreamData(in, out);
+		} finally {
+			out.close();
+		}
+		this.icon16x16Data = db.createByteArray();
+	}	
 }

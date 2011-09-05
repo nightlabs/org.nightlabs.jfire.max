@@ -45,6 +45,10 @@ import org.nightlabs.util.Util;
 	@FetchGroup(
 			name=PersonRelationType.FETCH_GROUP_DESCRIPTION,
 			members=@Persistent(name="description")
+	),
+	@FetchGroup(
+			name=PersonRelationType.FETCH_GROUP_ICON16x16DATA,
+			members=@Persistent(name="icon16x16Data")
 	)
 })
 public class PersonRelationType
@@ -85,6 +89,7 @@ implements Serializable
 
 	public static final String FETCH_GROUP_NAME = "PersonRelationType.name";
 	public static final String FETCH_GROUP_DESCRIPTION = "PersonRelationType.description";
+	public static final String FETCH_GROUP_ICON16x16DATA = "PersonRelationType.icon16x16Data";
 
 	@PrimaryKey
 	@Column(length=100)

@@ -7,6 +7,8 @@ import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.base.security.integration.ldap.id.LDAPScriptSetID;
 import org.nightlabs.jfire.base.security.integration.ldap.scripts.ILDAPScriptProvider;
+import org.nightlabs.jfire.security.User;
+import org.nightlabs.jfire.security.id.UserID;
 import org.nightlabs.jfire.security.integration.id.UserManagementSystemID;
 import org.nightlabs.progress.ProgressMonitor;
 import org.nightlabs.progress.SubProgressMonitor;
@@ -144,6 +146,36 @@ public class LDAPScriptSetDAO extends BaseJDOObjectDAO<LDAPScriptSetID, LDAPScri
 		}catch (Exception e){
 			monitor.setCanceled(true);
 			throw new RuntimeException("Failed to get initial script content for scriptID " + scriptID, e);
+		}finally{
+			monitor.done();
+		}
+	}
+	
+	/**
+	 * Get LDAP entry name for given {@link UserID} using {@link LDAPServer} by given {@link UserManagementSystemID}.
+	 * 
+	 * @param ldapServerID The ID of {@link LDAPServer} which will generate LDAP entry name
+	 * @param userID The ID of a {@link User} to generate LDAP entry name for
+	 * @return full LDAP entry name as a {@link String}
+	 */
+	public synchronized String getLDAPEntryName(UserManagementSystemID ldapServerID, UserID userID, ProgressMonitor monitor){
+		if (ldapServerID == null){
+			throw new IllegalArgumentException("LDAPServer ID can't be null!");
+		}
+		if (userID == null){
+			throw new IllegalArgumentException("userID can't be null!");
+		}
+
+		monitor.beginTask("Getting LDAP entry name for user " + userID.toString(), 3);
+		try{
+			LDAPManagerRemote remoteBean = getEjbProvider().getRemoteBean(LDAPManagerRemote.class);
+			monitor.worked(1);
+			String ldapEntryName = remoteBean.getLDAPEntryName(ldapServerID, userID);
+			monitor.worked(1);
+			return ldapEntryName;
+		}catch (Exception e){
+			monitor.setCanceled(true);
+			throw new RuntimeException("Failed to get LDAP entry name for user " + userID.toString(), e);
 		}finally{
 			monitor.done();
 		}

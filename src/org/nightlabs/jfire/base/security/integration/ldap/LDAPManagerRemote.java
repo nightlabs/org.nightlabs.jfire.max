@@ -10,6 +10,8 @@ import org.nightlabs.jfire.base.security.integration.ldap.id.LDAPScriptSetID;
 import org.nightlabs.jfire.base.security.integration.ldap.scripts.ILDAPScriptProvider;
 import org.nightlabs.jfire.base.security.integration.ldap.sync.LDAPSyncEvent;
 import org.nightlabs.jfire.base.security.integration.ldap.sync.LDAPSyncException;
+import org.nightlabs.jfire.security.User;
+import org.nightlabs.jfire.security.id.UserID;
 import org.nightlabs.jfire.security.integration.UserManagementSystemCommunicationException;
 import org.nightlabs.jfire.security.integration.UserManagementSystemType;
 import org.nightlabs.jfire.security.integration.id.UserManagementSystemID;
@@ -55,6 +57,15 @@ public interface LDAPManagerRemote {
 	 * @return initial script content
 	 */
 	String getInitialScriptContent(LDAPScriptSetID ldapScriptSetID, String scriptID);
+	
+	/**
+	 * Get LDAP entry name for given {@link UserID} using {@link LDAPServer} by given {@link UserManagementSystemID}
+	 * 
+	 * @param ldapServerID The ID of {@link LDAPServer} which will generate LDAP entry name
+	 * @param userID The ID of a {@link User} to generate LDAP entry name for
+	 * @return full LDAP entry name as a {@link String}
+	 */
+	String getLDAPEntryName(UserManagementSystemID ldapServerID, UserID userID);
 	
 	/**
 	 * Stores {@link LDAPScriptSet} object.

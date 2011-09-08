@@ -34,6 +34,7 @@ import org.nightlabs.jfire.base.security.integration.ldap.sync.SecurityChangeLis
 import org.nightlabs.jfire.base.security.integration.ldap.sync.SyncLifecycleListener;
 import org.nightlabs.jfire.person.Person;
 import org.nightlabs.jfire.security.User;
+import org.nightlabs.jfire.security.id.UserID;
 import org.nightlabs.jfire.security.integration.UserManagementSystem;
 import org.nightlabs.jfire.security.integration.UserManagementSystemCommunicationException;
 import org.nightlabs.jfire.security.integration.UserManagementSystemType;
@@ -259,6 +260,22 @@ public class LDAPManagerBean extends BaseSessionBeanImpl implements LDAPManagerR
 				return new HashSet<String>();
 			}
 			
+		}finally{
+			pm.close();
+		}
+	}
+
+	@RolesAllowed("org.nightlabs.jfire.security.accessRightManagement")
+	@Override
+	public String getLDAPEntryName(UserManagementSystemID ldapServerID, UserID userID) {
+		PersistenceManager pm = createPersistenceManager();
+		try{
+			User user = User.getUser(pm, userID.organisationID, userID.userID);
+			LDAPServer ldapServer = (LDAPServer) pm.getObjectById(ldapServerID);
+			return ldapServer.getLdapScriptSet().getLdapDN(user);
+		} catch (ScriptException e) {
+			logger.error(e.getMessage(), e);
+			return null;
 		}finally{
 			pm.close();
 		}

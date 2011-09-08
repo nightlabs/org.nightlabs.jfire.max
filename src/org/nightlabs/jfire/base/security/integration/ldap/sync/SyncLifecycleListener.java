@@ -87,7 +87,7 @@ public class SyncLifecycleListener implements StoreLifecycleListener, DeleteLife
 		Object objectId = JDOHelper.getObjectId(jfireObject);
 		for (LDAPServer ldapServer : ldapServers) {
 			try{
-				UserManagementSystemID ldapServerId = UserManagementSystemID.create(ldapServer.getOrganisationID(), ldapServer.getUserManagementSystemID());
+				UserManagementSystemID ldapServerId = ldapServer.getUserManagementSystemObjectID();
 				synchronized (ldapServerId2sendEventDataUnits) {
 					String ldapDN = ldapServer.getLdapScriptSet().getLdapDN(jfireObject);
 					SendEventTypeDataUnit sendEventTypeDataUnit = new SendEventTypeDataUnit(objectId, ldapDN);
@@ -151,7 +151,7 @@ public class SyncLifecycleListener implements StoreLifecycleListener, DeleteLife
 			for (LDAPServer ldapServer : nonLeadingLdapServers){
 				
 				Object jfireObjectId = JDOHelper.getObjectId(persistentInstance);
-				UserManagementSystemID ldapServerId = UserManagementSystemID.create(ldapServer.getOrganisationID(), ldapServer.getUserManagementSystemID());
+				UserManagementSystemID ldapServerId = ldapServer.getUserManagementSystemObjectID();
 				SendEventTypeDataUnit dataUnit = null;
 				if (LDAPSyncEventType.SEND_DELETE == eventType
 						&& ldapServerId2sendEventDataUnits.get(ldapServerId) != null){

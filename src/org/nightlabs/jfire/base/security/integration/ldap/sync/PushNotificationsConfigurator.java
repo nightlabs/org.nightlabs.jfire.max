@@ -559,7 +559,7 @@ public class PushNotificationsConfigurator {
 		if (listener == null){
 			throw new IllegalArgumentException("NamingListener to be added can't be null!");
 		}
-		UserManagementSystemID ldapServerID = UserManagementSystemID.create(ldapServer.getOrganisationID(), ldapServer.getUserManagementSystemID());
+		UserManagementSystemID ldapServerID = ldapServer.getUserManagementSystemObjectID();
 		try{
 			Collection<String> parentEntriesForSync = ldapServer.getLdapScriptSet().getParentEntriesForSync();
 			if (!parentEntriesForSync.isEmpty()){
@@ -702,7 +702,7 @@ public class PushNotificationsConfigurator {
 	}
 	
 	private void removePushNotificationsListenerInternal(LDAPServer ldapServer, NamingListener listener) throws UserManagementSystemCommunicationException{
-		UserManagementSystemID ldapServerID = UserManagementSystemID.create(ldapServer.getOrganisationID(), ldapServer.getUserManagementSystemID());
+		UserManagementSystemID ldapServerID = ldapServer.getUserManagementSystemObjectID();
 		removePushNotificationListener(ldapServerID, listener);
 	}
 

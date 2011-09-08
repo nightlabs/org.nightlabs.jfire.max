@@ -1128,8 +1128,7 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 		if (pm != null){
 			LDAPServer attachedServer = null;
 			try{
-				attachedServer = (LDAPServer) pm.getObjectById(
-						UserManagementSystemID.create(this.getOrganisationID(), this.getUserManagementSystemID()));
+				attachedServer = (LDAPServer) pm.getObjectById(this.getUserManagementSystemObjectID());
 			}catch(JDOObjectNotFoundException e){
 				// no object exist, so we assume that new LDAPServer is created and attributeSyncPolicyChanged is considered true
 				return;

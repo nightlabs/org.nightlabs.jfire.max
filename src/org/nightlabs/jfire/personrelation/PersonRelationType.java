@@ -243,9 +243,10 @@ implements Serializable
 		}
 
 		if (reversePersonRelation == null) {
-			reversePersonRelation = reversePersonRelationType.createPersonRelation(
+			reversePersonRelation = reversePersonRelationType.createReversePersonRelation(
 					reverseFrom,
-					reverseTo
+					reverseTo,
+					personRelation
 			);
 		}
 	}
@@ -273,6 +274,11 @@ implements Serializable
 
 		return personRelation;
 	}
+	
+	public PersonRelation createReversePersonRelation(Person from, Person to, PersonRelation personRelation)
+	{
+		return createPersonRelation(from, to);
+	}	
 
 	public void prePersonRelationDelete(PersonRelation personRelation)
 	{

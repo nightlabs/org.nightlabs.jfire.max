@@ -34,19 +34,20 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import javax.jdo.annotations.Join;
-import javax.jdo.annotations.Persistent;
-import javax.jdo.annotations.FetchGroups;
-import javax.jdo.annotations.NullValue;
-import javax.jdo.annotations.InheritanceStrategy;
-import javax.jdo.annotations.Inheritance;
-import javax.jdo.annotations.PrimaryKey;
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.FetchGroup;
 import javax.jdo.annotations.Column;
-import org.nightlabs.jfire.store.deliver.id.DeliveryConfigurationID;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.FetchGroups;
 import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Join;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
+
+import org.nightlabs.jfire.store.deliver.id.DeliveryConfigurationID;
 
 /**
  * An instance of this class is assigned to a
@@ -57,27 +58,6 @@ import javax.jdo.annotations.PersistenceModifier;
  * <tt>DeliveryConfiguration</tt>.
  *
  * @author Marco Schulze - marco at nightlabs dot de
- *
- * @jdo.persistence-capable
- *		identity-type="application"
- *		objectid-class="org.nightlabs.jfire.store.deliver.id.DeliveryConfigurationID"
- *		detachable="true"
- *		table="JFireTrade_DeliveryConfiguration"
- *
- * @jdo.create-objectid-class field-order="organisationID, deliveryConfigurationID"
- *
- * @jdo.inheritance strategy="new-table"
- * 
- * @jdo.fetch-group name="DeliveryConfiguration.name" fields="name"
- * @jdo.fetch-group name="DeliveryConfiguration.modeOfDeliveries" fields="modeOfDeliveries"
- * @jdo.fetch-group name="DeliveryConfiguration.modeOfDeliveryFlavours" fields="modeOfDeliveryFlavours"
- * @jdo.fetch-group name="DeliveryConfiguration.includedServerDeliveryProcessors" fields="includedServerDeliveryProcessors"
- * @jdo.fetch-group name="DeliveryConfiguration.excludedServerDeliveryProcessors" fields="excludedServerDeliveryProcessors"
- * @jdo.fetch-group name="DeliveryConfiguration.includedClientDeliveryProcessorFactoryIDs" fields="includedClientDeliveryProcessorFactoryIDs"
- * @jdo.fetch-group name="DeliveryConfiguration.excludedClientDeliveryProcessorFactoryIDs" fields="excludedClientDeliveryProcessorFactoryIDs"
- * @jdo.fetch-group name="DeliveryConfiguration.crossTradeDeliveryCoordinator" fields="crossTradeDeliveryCoordinator"
- *
- * @jdo.fetch-group name="DeliveryConfiguration.this" fields="name, modeOfDeliveries, modeOfDeliveryFlavours, includedServerDeliveryProcessors, excludedServerDeliveryProcessors, includedClientDeliveryProcessorFactoryIDs, excludedClientDeliveryProcessorFactoryIDs, crossTradeDeliveryCoordinator"
  */
 @PersistenceCapable(
 	objectIdClass=DeliveryConfigurationID.class,
@@ -128,22 +108,15 @@ implements Serializable
 	public static final String FETCH_GROUP_EXCLUDED_CLIENT_DELIVERY_PROCESSOR_FACTORY_IDS = "DeliveryConfiguration.excludedClientDeliveryProcessorFactoryIDs";
 	public static final String FETCH_GROUP_CROSS_TRADE_DELIVERY_COORDINATOR = "DeliveryConfiguration.crossTradeDeliveryCoordinator";
 	/**
-	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon! 
+	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon!
 	 */
+	@Deprecated
 	public static final String FETCH_GROUP_THIS_DELIVERY_CONFIGURATION = "DeliveryConfiguration.this";
 
-	/**
-	 * @jdo.field primary-key="true"
-	 * @jdo.column length="100"
-	 */
 	@PrimaryKey
 	@Column(length=100)
 	private String organisationID;
 
-	/**
-	 * @jdo.field primary-key="true"
-	 * @jdo.column length="100"
-	 */
 	@PrimaryKey
 	@Column(length=100)
 	private String deliveryConfigurationID;
@@ -151,43 +124,23 @@ implements Serializable
 	/**
 	 * key: String primaryKey<br/>
 	 * value: ModeOfDelivery
-	 *
-	 * @jdo.field
-	 *		persistence-modifier="persistent"
-	 *		collection-type="map"
-	 *		key-type="java.lang.String"
-	 *		value-type="ModeOfDelivery"
-	 *		table="JFireTrade_DeliveryConfiguration_modeOfDeliveries"
-	 *		null-value="exception"
-	 *
-	 * @jdo.join
 	 */
 	@Join
 	@Persistent(
 		nullValue=NullValue.EXCEPTION,
-		table="JFireTrade_DeliveryConfiguration_modeOfDeliveries",
-		persistenceModifier=PersistenceModifier.PERSISTENT)
+		table="JFireTrade_DeliveryConfiguration_modeOfDeliveries"
+	)
 	private Map<String, ModeOfDelivery> modeOfDeliveries;
 
 	/**
 	 * key: String primaryKey<br/>
 	 * value: ModeOfDeliveryFlavour
-	 *
-	 * @jdo.field
-	 *		persistence-modifier="persistent"
-	 *		collection-type="map"
-	 *		key-type="java.lang.String"
-	 *		value-type="ModeOfDeliveryFlavour"
-	 *		table="JFireTrade_DeliveryConfiguration_modeOfDeliveryFlavours"
-	 *		null-value="exception"
-	 *
-	 * @jdo.join
 	 */
 	@Join
 	@Persistent(
 		nullValue=NullValue.EXCEPTION,
-		table="JFireTrade_DeliveryConfiguration_modeOfDeliveryFlavours",
-		persistenceModifier=PersistenceModifier.PERSISTENT)
+		table="JFireTrade_DeliveryConfiguration_modeOfDeliveryFlavours"
+	)
 	private Map<String, ModeOfDeliveryFlavour> modeOfDeliveryFlavours;
 
 
@@ -224,10 +177,7 @@ implements Serializable
 	 */
 	public static final byte SERVER_DELIVERY_PROCESSOR_SUPPORT_MODE_EXCLUDED = 2;
 
-	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 */
-	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+	@Persistent
 	private byte serverDeliveryProcessorSupportMode = SERVER_DELIVERY_PROCESSOR_SUPPORT_MODE_ALL;
 
 
@@ -264,10 +214,7 @@ implements Serializable
 	 */
 	public static final byte CLIENT_DELIVERY_PROCESSOR_SUPPORT_MODE_EXCLUDED = 2;
 
-	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 */
-	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+	@Persistent
 	private byte clientDeliveryProcessorSupportMode = CLIENT_DELIVERY_PROCESSOR_SUPPORT_MODE_ALL;
 
 
@@ -279,16 +226,6 @@ implements Serializable
 	 *
 	 * key: String primaryKey<br/>
 	 * value: ServerDeliveryProcessor
-	 *
-	 * @jdo.field
-	 *		persistence-modifier="persistent"
-	 *		collection-type="map"
-	 *		key-type="java.lang.String"
-	 *		value-type="ServerDeliveryProcessor"
-	 *		table="JFireTrade_DeliveryConfiguration_includedServerDeliveryProcessors"
-	 *		null-value="exception"
-	 *
-	 * @jdo.join
 	 */
 	@Join
 	@Persistent(
@@ -305,16 +242,6 @@ implements Serializable
 	 *
 	 * key: String primaryKey<br/>
 	 * value: ServerDeliveryProcessor
-	 *
-	 * @jdo.field
-	 *		persistence-modifier="persistent"
-	 *		collection-type="map"
-	 *		key-type="java.lang.String"
-	 *		value-type="ServerDeliveryProcessor"
-	 *		table="JFireTrade_DeliveryConfiguration_excludedServerDeliveryProcessors"
-	 *		null-value="exception"
-	 *
-	 * @jdo.join
 	 */
 	@Join
 	@Persistent(
@@ -328,21 +255,12 @@ implements Serializable
 	 * which is available in this configuration. For activation of this <tt>Set</tt>
 	 * {@link #clientDeliveryProcessorSupportMode} must be set to
 	 * {@link #CLIENT_DELIVERY_PROCESSOR_SUPPORT_MODE_INCLUDED}.
-	 *
-	 * @jdo.field
-	 *		persistence-modifier="persistent"
-	 *		collection-type="collection"
-	 *		element-type="java.lang.String"
-	 *		table="JFireTrade_DeliveryConfiguration_includedClientDeliveryProcessorFactoryIDs"
-	 *		null-value="exception"
-	 *
-	 * @jdo.join
 	 */
 	@Join
 	@Persistent(
 		nullValue=NullValue.EXCEPTION,
-		table="JFireTrade_DeliveryConfiguration_includedClientDeliveryProcessorFactoryIDs",
-		persistenceModifier=PersistenceModifier.PERSISTENT)
+		table="JFireTrade_DeliveryConfiguration_includedClientDeliveryProcessorFactoryIDs"
+	)
 	private Set<String> includedClientDeliveryProcessorFactoryIDs;
 
 	/**
@@ -350,36 +268,21 @@ implements Serializable
 	 * which is NOT available in this configuration. For activation of this <tt>Set</tt>
 	 * {@link #clientDeliveryProcessorSupportMode} must be set to
 	 * {@link #CLIENT_DELIVERY_PROCESSOR_SUPPORT_MODE_EXCLUDED}.
-	 *
-	 * @jdo.field
-	 *		persistence-modifier="persistent"
-	 *		collection-type="collection"
-	 *		element-type="java.lang.String"
-	 *		table="JFireTrade_DeliveryConfiguration_excludedClientDeliveryProcessorFactoryIDs"
-	 *		null-value="exception"
-	 *
-	 * @jdo.join
 	 */
 	@Join
 	@Persistent(
 		nullValue=NullValue.EXCEPTION,
-		table="JFireTrade_DeliveryConfiguration_excludedClientDeliveryProcessorFactoryIDs",
-		persistenceModifier=PersistenceModifier.PERSISTENT)
+		table="JFireTrade_DeliveryConfiguration_excludedClientDeliveryProcessorFactoryIDs"
+	)
 	private Set<String> excludedClientDeliveryProcessorFactoryIDs;
 
-	/**
-	 * @jdo.field persistence-modifier="persistent" dependent="true" mapped-by="deliveryConfiguration"
-	 */
 	@Persistent(
 		dependent="true",
-		mappedBy="deliveryConfiguration",
-		persistenceModifier=PersistenceModifier.PERSISTENT)
+		mappedBy="deliveryConfiguration"
+	)
 	private DeliveryConfigurationName name;
 
-	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 */
-	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+	@Persistent
 	private CrossTradeDeliveryCoordinator crossTradeDeliveryCoordinator = null;
 
 	/**
@@ -387,6 +290,11 @@ implements Serializable
 	 */
 	@Deprecated
 	protected DeliveryConfiguration() { }
+
+	public DeliveryConfiguration(DeliveryConfigurationID deliveryConfigurationID)
+	{
+		this(deliveryConfigurationID.organisationID, deliveryConfigurationID.deliveryConfigurationID);
+	}
 
 	public DeliveryConfiguration(String organisationID, String deliveryConfigurationID)
 	{

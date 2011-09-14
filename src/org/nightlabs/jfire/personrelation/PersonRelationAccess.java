@@ -19,14 +19,15 @@ import javax.jdo.PersistenceManager;
 
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.ObjectID;
-import org.nightlabs.jfire.base.JFirePrincipal;
 import org.nightlabs.jfire.person.Person;
 import org.nightlabs.jfire.personrelation.id.PersonRelationID;
 import org.nightlabs.jfire.personrelation.id.PersonRelationTypeID;
 import org.nightlabs.jfire.prop.RoleConstants;
 import org.nightlabs.jfire.prop.id.PropertySetID;
 import org.nightlabs.jfire.security.Authority;
+import org.nightlabs.jfire.security.GlobalSecurityReflector;
 import org.nightlabs.jfire.security.ResolveSecuringAuthorityStrategy;
+import org.nightlabs.jfire.security.id.UserID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,11 +44,11 @@ public class PersonRelationAccess {
 	/**
 	 * Get all {@link PersonRelationID}s matching the given criteria (and where the to and from persons are visible to the user).
 	 * @param pm The PersistenceManager to use.
-	 * @param principal JFirePrincipal used to check access rights.
+	 * @param userID The userID used to check access rights.
 	 * @param filterCriteria The filter-criteria.
 	 */
 	@SuppressWarnings("unchecked")
-	public static Collection<PersonRelationID> getPersonRelationIDs(PersistenceManager pm, JFirePrincipal principal, PersonRelationFilterCriteria filterCriteria)
+	public static Collection<PersonRelationID> getPersonRelationIDs(PersistenceManager pm, PersonRelationFilterCriteria filterCriteria)
 	{
 		if (logger.isDebugEnabled()) {
 			logger.debug("getPersonRelationIDs() started with filterCriteria");
@@ -75,16 +76,22 @@ public class PersonRelationAccess {
 		if (logger.isDebugEnabled()) {
 			logger.debug("getPersonRelationIDs() have {} relations after filtering from/to exlcude persons", relations.size());
 		}
-		relations = filterPersonRelationsByAuthority(pm, principal, relations);
+		if (filterCriteria.isFilterByPersonAuthority()) {
+			relations = filterPersonRelationsByAuthority(pm, relations);
+		} else {
+			if (logger.isDebugEnabled()) {
+				logger.debug("getPersonRelationIDs() not filtering by person access-rights, filterCriteria#isFilterByPersonAuthority() == false");
+			}
+		}
 		if (logger.isDebugEnabled()) {
 			logger.debug("getPersonRelationIDs() have {} relations after person access-rights", relations.size());
 		}
 		return (Collection<PersonRelationID>) (filterCriteria.getPersonRelationComparator() != null ? getSortedPersonRelationIDsByPersonRelationType(relations, filterCriteria.getPersonRelationComparator()) : NLJDOHelper.getObjectIDList(relations));
 	}
 	
-	public static long getPersonRelationCount(PersistenceManager pm, JFirePrincipal principal, PersonRelationFilterCriteria filterCriteria)
+	public static long getPersonRelationCount(PersistenceManager pm, PersonRelationFilterCriteria filterCriteria)
 	{
-		return getPersonRelationIDs(pm, principal, filterCriteria).size();
+		return getPersonRelationIDs(pm, filterCriteria).size();
 	}
 	
 	private static void filterPersonRelationsByAnchorPersons(
@@ -134,10 +141,11 @@ public class PersonRelationAccess {
 	 * @param relations the Collection of PersonRelations to filter
 	 * @return the filtered Collection of PersonRelations.
 	 */
-	static Collection<PersonRelation> filterPersonRelationsByAuthority(PersistenceManager pm, JFirePrincipal principal, Collection<? extends PersonRelation> relations)
+	static Collection<PersonRelation> filterPersonRelationsByAuthority(PersistenceManager pm, Collection<? extends PersonRelation> relations)
 	{
+		UserID userID = GlobalSecurityReflector.sharedInstance().getUserDescriptor().getUserObjectID();
 		if (logger.isDebugEnabled()) {
-			logger.debug("filterPersonRelationsByAuthority() Filtering for principal {}", principal);
+			logger.debug("filterPersonRelationsByAuthority() Filtering for user {}", userID);
 		}
 		// Begin authority check, only return personRelations which persons are allowed to be seen
 		Map<Person, PersonRelation> person2Relation = new HashMap<Person, PersonRelation>();
@@ -146,7 +154,7 @@ public class PersonRelationAccess {
 			person2Relation.put(personRelation.getTo(), personRelation);
 		}
 
-		Set<Person> filteredPersons = Authority.filterSecuredObjects(pm, person2Relation.keySet(), principal, RoleConstants.seePropertySet, ResolveSecuringAuthorityStrategy.allow);
+		Set<Person> filteredPersons = Authority.filterSecuredObjects(pm, person2Relation.keySet(), userID, RoleConstants.seePropertySet, ResolveSecuringAuthorityStrategy.allow);
 		
 		Set<Person> removedPersons = new HashSet<Person>(person2Relation.keySet());
 		removedPersons.removeAll(filteredPersons);

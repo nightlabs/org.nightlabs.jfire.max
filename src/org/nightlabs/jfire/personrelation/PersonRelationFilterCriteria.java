@@ -24,6 +24,7 @@ public class PersonRelationFilterCriteria implements Serializable {
 	private PersonRelationComparator personRelationComparator;
 	private Set<PropertySetID> toPropertySetIDsToExclude;
 	private Set<PropertySetID> fromPropertySetIDsToExclude;
+	private boolean filterByPersonAuthority = true;
 
 	/**
 	 * Convenience Constructor
@@ -84,8 +85,9 @@ public class PersonRelationFilterCriteria implements Serializable {
 	/**
 	 * @param personRelationTypeID A list of PersonRelationTypes to limit the result to.
 	 */
-	public void setPersonRelationTypeIncludeIDs(Set<PersonRelationTypeID> personRelationTypeIncludeIDs) {
+	public PersonRelationFilterCriteria setPersonRelationTypeIncludeIDs(Set<PersonRelationTypeID> personRelationTypeIncludeIDs) {
 		this.personRelationTypeIncludeIDs = personRelationTypeIncludeIDs;
+		return this;
 	}
 
 	/**
@@ -98,8 +100,9 @@ public class PersonRelationFilterCriteria implements Serializable {
 	/**
 	 * @param excludedPersonRelationTypeIDs A PersonRelationType to limit the result to.
 	 */
-	public void setPersonRelationTypeExcludeIDs(Set<PersonRelationTypeID> personRelationTypeExcludeIDs) {
+	public PersonRelationFilterCriteria setPersonRelationTypeExcludeIDs(Set<PersonRelationTypeID> personRelationTypeExcludeIDs) {
 		this.personRelationTypeExcludeIDs = personRelationTypeExcludeIDs;
+		return this;
 	}
 
 	/**
@@ -112,8 +115,9 @@ public class PersonRelationFilterCriteria implements Serializable {
 	/**
 	 * @param fromPersonID The id of the person that should be the from-anchor of the result.
 	 */
-	public void setFromPersonID(PropertySetID fromPersonID) {
+	public PersonRelationFilterCriteria setFromPersonID(PropertySetID fromPersonID) {
 		this.fromPersonID = fromPersonID;
+		return this;
 	}
 
 	/**
@@ -126,8 +130,9 @@ public class PersonRelationFilterCriteria implements Serializable {
 	/**
 	 * @param toPersonID The id of the person that should be the to-anchor of the result.
 	 */
-	public void setToPersonID(PropertySetID toPersonID) {
+	public PersonRelationFilterCriteria setToPersonID(PropertySetID toPersonID) {
 		this.toPersonID = toPersonID;
+		return this;
 	}
 
 	/**
@@ -140,25 +145,37 @@ public class PersonRelationFilterCriteria implements Serializable {
 	/**
 	 * @param personRelationComparator The comparator to use in order to sort the result.
 	 */
-	public void setPersonRelationComparator(PersonRelationComparator personRelationComparator) {
+	public PersonRelationFilterCriteria setPersonRelationComparator(PersonRelationComparator personRelationComparator) {
 		this.personRelationComparator = personRelationComparator;
+		return this;
 	}
 	
 	public Set<PropertySetID> getToPropertySetIDsToExclude() {
 		return toPropertySetIDsToExclude;
 	}
 	
-	public void setToPropertySetIDsToExclude(Set<PropertySetID> toPropertySetIDsToExclude) {
+	public PersonRelationFilterCriteria setToPropertySetIDsToExclude(Set<PropertySetID> toPropertySetIDsToExclude) {
 		this.toPropertySetIDsToExclude = toPropertySetIDsToExclude;
+		return this;
 	}
 	
 	public Set<PropertySetID> getFromPropertySetIDsToExclude() {
 		return fromPropertySetIDsToExclude;
 	}
 	
-	public void setFromPropertySetIDsToExclude(
+	public PersonRelationFilterCriteria setFromPropertySetIDsToExclude(
 			Set<PropertySetID> fromPropertySetIDsToExclude) {
 		this.fromPropertySetIDsToExclude = fromPropertySetIDsToExclude;
+		return this;
+	}
+	
+	public PersonRelationFilterCriteria setFilterByPersonAuthority(boolean filterByPersonAuthority) {
+		this.filterByPersonAuthority = filterByPersonAuthority;
+		return this;
+	}
+	
+	public boolean isFilterByPersonAuthority() {
+		return filterByPersonAuthority;
 	}
 
 	/**
@@ -173,7 +190,8 @@ public class PersonRelationFilterCriteria implements Serializable {
 		append("toPersonID = ").append(toPersonID != null ? toPersonID.toString() : "null").append("\n").
 		append("fromPropertySetIDsToExclude = ").append(fromPropertySetIDsToExclude != null ? fromPropertySetIDsToExclude.toString() : "null").append("\n").
 		append("toPropertySetIDsToExclude = ").append(toPropertySetIDsToExclude != null ? toPropertySetIDsToExclude.toString() : "null").append("\n").
-		append("personRelationComparator = ").append(personRelationComparator).append("\n}");
+		append("personRelationComparator = ").append(personRelationComparator).append("\n").
+		append("filterByPersonAuthority = ").append(filterByPersonAuthority).append("\n}");
 		return sb.toString();
 	}
 }

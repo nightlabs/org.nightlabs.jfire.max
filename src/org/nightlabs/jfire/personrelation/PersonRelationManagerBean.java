@@ -173,7 +173,7 @@ implements PersonRelationManagerRemote
 	{
 		PersistenceManager pm = createPersistenceManager();
 		try {
-			return PersonRelationAccess.getPersonRelationCount(pm, getPrincipal(), filterCriteria);
+			return PersonRelationAccess.getPersonRelationCount(pm, filterCriteria.setFilterByPersonAuthority(true));
 		} finally {
 			pm.close();
 		}
@@ -211,7 +211,7 @@ implements PersonRelationManagerRemote
 	{
 		PersistenceManager pm = createPersistenceManager();
 		try {
-			return PersonRelationAccess.getPersonRelationIDs(pm, getPrincipal(), filterCriteria);
+			return PersonRelationAccess.getPersonRelationIDs(pm, filterCriteria.setFilterByPersonAuthority(true));
 		} finally {
 			pm.close();
 		}
@@ -251,7 +251,7 @@ implements PersonRelationManagerRemote
 	{
 		PersistenceManager pm = createPersistenceManager();
 		try {
-			return PersonRelationAccess.getPersonRelationIDs(pm, getPrincipal(), new PersonRelationFilterCriteria(
+			return PersonRelationAccess.getPersonRelationIDs(pm, new PersonRelationFilterCriteria(
 					Collections.singleton(personRelationTypeID), null,
 					fromPersonID, toPersonID,
 					fromPropertySetIDsToExclude, toPropertySetIDsToExclude,
@@ -276,7 +276,7 @@ implements PersonRelationManagerRemote
 	{
 		PersistenceManager pm = createPersistenceManager();
 		try {
-			return PersonRelationAccess.getPersonRelationCount(pm, getPrincipal(), new PersonRelationFilterCriteria(
+			return PersonRelationAccess.getPersonRelationCount(pm, new PersonRelationFilterCriteria(
 					Collections.singleton(personRelationTypeID), null,
 					fromPersonID, toPersonID,
 					fromPropertySetIDsToExclude, toPropertySetIDsToExclude,
@@ -309,7 +309,7 @@ implements PersonRelationManagerRemote
 
 			Collection<? extends PersonRelation> relations = PersonRelation.getPersonRelations(pm, personRelationType, fromPerson, toPerson);
 			// authority filtering
-			relations = PersonRelationAccess.filterPersonRelationsByAuthority(pm, getPrincipal(), relations);
+			relations = PersonRelationAccess.filterPersonRelationsByAuthority(pm, relations);
 			Collection<PersonRelation> filteredInclusiveRelations = new LinkedList<PersonRelation>();
 
 			// Perform the filtration.
@@ -347,7 +347,7 @@ implements PersonRelationManagerRemote
 
 			Collection<? extends PersonRelation> relations = PersonRelation.getPersonRelations(pm, personRelationType, fromPerson, toPerson);
 			// authority filtering
-			relations = PersonRelationAccess.filterPersonRelationsByAuthority(pm, getPrincipal(), relations);			
+			relations = PersonRelationAccess.filterPersonRelationsByAuthority(pm, relations);			
 			long count = 0;
 
 			// Perform the filtration.
@@ -384,7 +384,7 @@ implements PersonRelationManagerRemote
 			Person fromPerson = (Person) (currentID == null ? null : pm.getObjectById(currentID));
 			Collection<? extends PersonRelation> personRelations = PersonRelation.getPersonRelations(pm, personRelationType, fromPerson, null);
 			// authority filtering
-			personRelations = PersonRelationAccess.filterPersonRelationsByAuthority(pm, getPrincipal(), personRelations);
+			personRelations = PersonRelationAccess.filterPersonRelationsByAuthority(pm, personRelations);
 			
 			if (logger.isDebugEnabled()) {
 				String str = "\n ---- Ref: " + showObjectID(currentID) + " ----";
@@ -487,7 +487,7 @@ implements PersonRelationManagerRemote
 //			return NLJDOHelper.getDetachedObjectList(pm, personRelationIDs, PersonRelation.class, fetchGroups, maxFetchDepth);
 			
 			Collection<PersonRelation> relations = pm.getObjectsById(personRelationIDs);
-			Collection<PersonRelation> filteredRelations = PersonRelationAccess.filterPersonRelationsByAuthority(pm, getPrincipal(), relations);
+			Collection<PersonRelation> filteredRelations = PersonRelationAccess.filterPersonRelationsByAuthority(pm, relations);
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);

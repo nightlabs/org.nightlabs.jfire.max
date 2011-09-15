@@ -3,6 +3,7 @@
  */
 package org.nightlabs.jfire.personrelation;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -21,6 +22,7 @@ import org.nightlabs.jfire.personrelation.id.PersonRelationID;
 import org.nightlabs.jfire.personrelation.id.PersonRelationTypeID;
 import org.nightlabs.jfire.prop.DataField;
 import org.nightlabs.jfire.prop.IStruct;
+import org.nightlabs.jfire.prop.PropertySet;
 import org.nightlabs.jfire.prop.id.PropertySetID;
 import org.nightlabs.jfire.prop.id.StructFieldID;
 import org.slf4j.Logger;
@@ -61,15 +63,15 @@ public class PersonRelationDataFieldManagementListener {
 				PersonRelationTypeID typeID = (PersonRelationTypeID) JDOHelper.getObjectId(personRelation.getPersonRelationType());
 				if (personRelationTypeID.equals(typeID)) {
 					if (logger.isDebugEnabled()) {
-						logger.debug("Caught create-event for PersonRelation of type {}.", typeID);
+						logger.debug(getClassName() + " Caught create-event for PersonRelation of type {}.", typeID);
 					}
 					Collection<PersonRelation> relations = filterPersonRelations(null, Collections.singleton(personRelation));
-					if (logger.isDebugEnabled()) {
-						logger.debug("Have {} PersonRelations after filtering.", relations != null ? relations.size() : 0);
+					if (logger.isTraceEnabled()) {
+						logger.trace(getClassName() + " Have {} PersonRelations after filtering.", relations != null ? relations.size() : 0);
 					}
 					if (relations != null && relations.size() == 1) {
-						if (logger.isDebugEnabled()) {
-							logger.debug("Will adjust to-person StructFields for PersonRelation of type {}. StructFields to adjust {}", typeID, structFieldIDs);
+						if (logger.isTraceEnabled()) {
+							logger.trace(getClassName() + " Will adjust to-person StructFields for PersonRelation of type {}. StructFields to adjust {}", typeID, structFieldsStr(structFieldIDs));
 						}
 						// A new PersonRelation of our monitored type was created
 						// We get the to-person and set the managed-By flag for all dataFields
@@ -95,11 +97,11 @@ public class PersonRelationDataFieldManagementListener {
 				PersonRelationTypeID typeID = (PersonRelationTypeID) JDOHelper.getObjectId(personRelation.getPersonRelationType());
 				if (personRelationTypeID.equals(typeID)) {
 					if (logger.isDebugEnabled()) {
-						logger.debug("Caught delete-event for PersonRelation of type {}.", typeID);
+						logger.debug(getClassName() + " Caught delete-event for PersonRelation of type {}.", typeID);
 					}
 					Collection<PersonRelation> relations = filterPersonRelations(null, Collections.singleton(personRelation));
-					if (logger.isDebugEnabled()) {
-						logger.debug("Have {} PersonRelations after filtering.", relations != null ? relations.size() : 0);
+					if (logger.isTraceEnabled()) {
+						logger.trace(getClassName() + " Have {} PersonRelations after filtering.", relations != null ? relations.size() : 0);
 					}
 					if (relations != null && relations.size() == 1) {
 						// A PersonRelation of our monitored type is about to be deleted, we unhook the managedBy of the to-persons datafields
@@ -146,7 +148,7 @@ public class PersonRelationDataFieldManagementListener {
 
 	private void removeToPersonFieldsManagedBy(PersonRelation personRelation) {
 		if (logger.isDebugEnabled()) {
-			logger.debug("Unhook managedBy for the following fields of {}. Fields to unhook {}", personRelation.getTo(), structFieldIDs);
+			logger.debug(getClassName() + " Unhook managedBy for the following fields of {}. Fields to unhook {}", propStr(personRelation.getTo()), structFieldsStr(structFieldIDs));
 		}
 		for (StructFieldID structFieldID : structFieldIDs) {
 			DataField persistentDataField = retrieveToPersonDataField(personRelation, structFieldID, false);
@@ -158,9 +160,12 @@ public class PersonRelationDataFieldManagementListener {
 
 	private void adjustToPersonFields(PersonRelation personRelation, StructFieldID structFieldIDToAdjust) {
 		Collection<StructFieldID> fieldsToAdjust = structFieldIDToAdjust != null ? Collections.singleton(structFieldIDToAdjust) : structFieldIDs;
+		if (logger.isDebugEnabled()) {
+			logger.debug(getClassName() + " Adjusting {} for {} caused by change in {}", new Object[] {structFieldsStr(fieldsToAdjust), propStr(personRelation.getTo()), propStr(personRelation.getFrom())});
+		}
 		for (StructFieldID structFieldID : fieldsToAdjust) {
-			if (logger.isDebugEnabled()) {
-				logger.debug("Adjusting {} for {} caused by change in {}", new Object[] {structFieldID, personRelation.getTo(), personRelation.getFrom()});
+			if (logger.isTraceEnabled()) {
+				logger.trace(getClassName() + " Adjusting {} for {} caused by change in {}", new Object[] {structFieldsStr(structFieldID), propStr(personRelation.getTo()), propStr(personRelation.getFrom())});
 			}
 			
 			DataField fromPersonDataField = retrieveFromPersonDataField(personRelation, structFieldID);
@@ -180,8 +185,8 @@ public class PersonRelationDataFieldManagementListener {
 		}
 		
 		if (isNeedsDisplayNameAdjustment() && personRelation.getTo().isAutoGenerateDisplayName()) {
-			if (logger.isDebugEnabled()) {
-				logger.debug("Adjusting autogenerated display-name for {} caused by change in {}", new Object[] {personRelation.getTo(), personRelation.getFrom()});
+			if (logger.isTraceEnabled()) {
+				logger.trace(getClassName() + " Adjusting autogenerated display-name for {} caused by change in {}", new Object[] {propStr(personRelation.getTo()), propStr(personRelation.getFrom())});
 			}
 			PersistenceManager pm = JDOHelper.getPersistenceManager(personRelation.getTo());
 			IStruct structure = (IStruct) pm.getObjectById(personRelation.getTo().getStructLocalObjectID());
@@ -200,7 +205,14 @@ public class PersonRelationDataFieldManagementListener {
 	 * @return A DataField whose {@link DataField#getData()} will be used to copy the value to the toPersons datafield.
 	 */
 	protected DataField retrieveFromPersonDataField(PersonRelation personRelation, StructFieldID structFieldID) {
-		return personRelation.getFrom().getCreatePersistentDataField(structFieldID);
+		DataField dataField = personRelation.getFrom().getPersistentDataFieldByIndex(structFieldID, 0);
+		if (dataField == null) {
+			logger.warn("retrieveFromPersonDataField() did not find the field in the person, will auto-create one.", new Throwable());
+			return personRelation.getFrom().getCreatePersistentDataField(structFieldID);
+		} else if (dataField.isEmpty()) {
+			logger.warn("retrieveFromPersonDataField() found empty field in the person, no data will be copied.", new Throwable());
+		}
+		return dataField;
 	}
 	
 	/**
@@ -228,14 +240,14 @@ public class PersonRelationDataFieldManagementListener {
 			PersonRelationFilterCriteria filterCriteria = new PersonRelationFilterCriteria();
 			PropertySetID fromPersonID = PropertySetID.create(dataField.getOrganisationID(), dataField.getPropertySetID());
 			if (logger.isDebugEnabled()) {
-				logger.debug("Chaught change of {} for {}. Searching for relations", new Object[] {dataField.getStructFieldIDObj(), fromPersonID});
+				logger.debug(getClassName() + " Chaught change of {} for {}. Searching for relations", new Object[] {structFieldsStr(dataField.getStructFieldIDObj()), propStr(fromPersonID)});
 			}
 			filterCriteria.setFromPersonID(fromPersonID);
 			filterCriteria.setPersonRelationTypeIncludeIDs(Collections.singleton(personRelationTypeID));
 			filterCriteria.setFilterByPersonAuthority(false); // TODO: Think about this again: We also adapt Person that the current user is not allowed to see/edit?
 			Collection<PersonRelationID> personRelationIDs = PersonRelationAccess.getPersonRelationIDs(pm, filterCriteria);
-			if (logger.isDebugEnabled()) {
-				logger.debug("Found {} PersonRelations to adjust", personRelationIDs != null ? personRelationIDs.size() : 0);
+			if (logger.isTraceEnabled()) {
+				logger.trace(getClassName() + " Found {} PersonRelations to adjust", personRelationIDs != null ? personRelationIDs.size() : 0);
 			}
 			if (personRelationIDs != null && personRelationIDs.size() > 0) {
 				// There are PersonRelations of our monitored type from the modified Property set
@@ -243,8 +255,8 @@ public class PersonRelationDataFieldManagementListener {
 				@SuppressWarnings("unchecked")
 				Collection<PersonRelation> personRelations = pm.getObjectsById(personRelationIDs);
 				personRelations = filterPersonRelations(dataField, personRelations);
-				if (logger.isDebugEnabled()) {
-					logger.debug("Have {} PersonRelations after filter", personRelations != null ? personRelations.size() : 0);
+				if (logger.isTraceEnabled()) {
+					logger.trace(getClassName() + " Have {} PersonRelations after filter", personRelations != null ? personRelations.size() : 0);
 				}				
 				for (PersonRelation personRelation : personRelations) {
 					adjustToPersonFields(personRelation, dataField.getStructFieldIDObj());
@@ -329,4 +341,48 @@ public class PersonRelationDataFieldManagementListener {
 		return sb.toString();
 	}
 
+	/**
+	 * For debug output
+	 */
+	private String structFieldsStr(StructFieldID... structFieldIDs) {
+		return structFieldsStr(Arrays.asList(structFieldIDs));
+	}
+	
+	/**
+	 * For debug output
+	 */
+	private String structFieldsStr(Collection<StructFieldID> structFieldIDs) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("[");
+		for (StructFieldID structFieldID : structFieldIDs) {
+			if (sb.length() > 1)
+				sb.append(", ");
+			sb.append(structFieldID.structFieldID);
+		} 
+		sb.append("]");
+		return sb.toString();
+	}
+	
+	/**
+	 * For debug output
+	 */
+	private String propStr(Object person) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("PropertySet[");
+		if (person instanceof PropertySetID) {
+			sb.append(((PropertySetID)person).propertySetID);
+		} else if (person instanceof PropertySet) {
+			sb.append(((PropertySet)person).getPropertySetID());
+		}
+		sb.append("]");
+		return sb.toString();
+	}
+
+	/**
+	 * For debug output
+	 */
+	private String getClassName() {
+		return PersonRelationDataFieldManagementListener.this.getClass().getSimpleName();
+	}
+	
 }

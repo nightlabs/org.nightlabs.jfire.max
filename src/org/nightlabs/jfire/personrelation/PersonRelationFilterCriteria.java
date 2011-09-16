@@ -54,7 +54,7 @@ public class PersonRelationFilterCriteria implements Serializable {
 			PropertySetID fromPersonID, PropertySetID toPersonID,
 			PersonRelationComparator personRelationComparator) {
 
-		this(Collections.singleton(personRelationTypeID), null, fromPersonID, toPersonID,
+		this(personRelationTypeID != null ? Collections.singleton(personRelationTypeID) : null, null, fromPersonID, toPersonID,
 				null, null, personRelationComparator);
 	}
 
@@ -65,7 +65,7 @@ public class PersonRelationFilterCriteria implements Serializable {
 			PersonRelationTypeID personRelationTypeID,
 			PropertySetID fromPersonID, PropertySetID toPersonID) {
 
-		this(Collections.singleton(personRelationTypeID), null, fromPersonID, toPersonID, null, null, null);
+		this(personRelationTypeID != null ? Collections.singleton(personRelationTypeID) : null, null, fromPersonID, toPersonID, null, null, null);
 	}
 	
 	/**

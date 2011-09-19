@@ -120,7 +120,7 @@ implements IJDOObjectDAO<SimpleProductType>
 		try {
 			PropertySet propertySet = null;
 			try {
-				productType.getPropertySet();
+				propertySet = productType.getPropertySet();
 			} catch (JDODetachedFieldAccessException e) {
 				// propertySet not detached
 				propertySet = null;

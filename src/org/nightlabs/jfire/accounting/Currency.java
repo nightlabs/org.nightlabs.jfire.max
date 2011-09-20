@@ -160,7 +160,7 @@ implements Serializable, org.nightlabs.l10n.Currency
 
 	@Override
 	public double toDouble(final long amount) {
-		return amount / pow10(getDecimalDigitCount());
+		return amount / (double) pow10(getDecimalDigitCount());
 	}
 
 	private static int pow10(final int decimalDigitCount)
@@ -201,6 +201,9 @@ implements Serializable, org.nightlabs.l10n.Currency
 	@Override
 	public long toLong(final BigDecimal amount)
 	{
-		return amount.multiply(BigDecimal.valueOf(pow10(getDecimalDigitCount()))).round(new MathContext(0, RoundingMode.HALF_EVEN)).longValueExact();
+		// 2011-09-20: Switched to Math.round((...).doubleValue()) because:
+		// 1. ((...).longExactValue()) throws an exception if rounding is neccessary
+		// 2. Math.round((...).doubleValue()) has the same behaviour as #toLong(double)
+		return Math.round(amount.multiply(BigDecimal.valueOf(pow10(getDecimalDigitCount()))).round(new MathContext(0, RoundingMode.HALF_EVEN)).doubleValue());
 	}
 }

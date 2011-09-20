@@ -109,12 +109,11 @@ implements IJDOObjectDAO<SimpleProductType>
 	 * @see org.nightlabs.jfire.base.jdo.IJDOObjectDAO#storeJDOObject(java.lang.Object, boolean, java.lang.String[], int, org.nightlabs.progress.ProgressMonitor)
 	 */
 	@Override
-	public SimpleProductType storeJDOObject(SimpleProductType jdoObject, boolean get, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) {
-		if(jdoObject == null)
+	public SimpleProductType storeJDOObject(SimpleProductType productType, boolean get, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) {
+		if(productType == null)
 			throw new NullPointerException("SimpleProductType to save must not be null");
 //		if (!(jdoObject instanceof SimpleProductType))
 //			throw new IllegalArgumentException("ProductType to save must be of type " + SimpleProductType.class.getSimpleName() + ", passed was " + jdoObject.getClass().getSimpleName());
-		SimpleProductType productType = Util.cloneSerializable(jdoObject);
 		SimpleProductType result = null;
 		monitor.beginTask("Saving SimpleProductType PropertySet", 3);
 		try {
@@ -128,6 +127,7 @@ implements IJDOObjectDAO<SimpleProductType>
 			if (propertySet != null) {
 				propertySet.deflate();
 			}
+			productType = Util.cloneSerializable(productType);
 			SimpleTradeManagerRemote simpleTradeManager = getEjbProvider().getRemoteBean(SimpleTradeManagerRemote.class);
 			result = simpleTradeManager.storeProductType(productType, get, fetchGroups, maxFetchDepth);
 			monitor.worked(1);

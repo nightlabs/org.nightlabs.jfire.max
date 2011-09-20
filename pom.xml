@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.nightlabs.jfire</groupId>
+	<artifactId>org.nightlabs.jfire.jbpm.ear</artifactId>
+	<packaging>ear</packaging>
+	<name>${project.artifactId}</name>
+
+	<parent>
+		<groupId>org.nightlabs.jfire</groupId>
+		<artifactId>org.nightlabs.jfire.parent</artifactId>
+		<version>1.2.0-SNAPSHOT</version>
+		<relativePath>../org.nightlabs.jfire.parent/pom.xml</relativePath>
+	</parent>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.nightlabs.jfire</groupId>
+				<artifactId>org.nightlabs.jfire.jbpm.parent</artifactId>
+				<version>1.2.0-SNAPSHOT</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<dependencies>
+	
+		<!-- JFire dependencies -->
+	
+		<dependency>
+			<groupId>org.nightlabs.jfire</groupId>
+			<artifactId>org.nightlabs.jfire.jbpm</artifactId>
+		</dependency>
+		
+		<!-- JBPM dependencies -->
+		<!-- FIXME: We exclude transitive dependencies using an unsupported behaviour. groupId * and artifactId * produces a warning, but works as expected -->
+		<dependency>
+			<groupId>org.jbpm.jbpm3</groupId>
+			<artifactId>jbpm-jpdl</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>*</groupId>
+					<artifactId>*</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.jbpm.jbpm3</groupId>
+			<artifactId>jbpm-identity</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>*</groupId>
+					<artifactId>*</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>net.sf.ehcache</groupId>
+			<artifactId>ehcache</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>*</groupId>
+					<artifactId>*</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+	</dependencies>
+	<build>
+		<plugins>
+			<!-- TODO - workaround to use generated application.xml but all other 
+				files from EarContent Default Maven location for files would be src/main/application -->
+			<plugin>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<executions>
+					<execution>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<target>
+								<mkdir dir="target/application" />
+								<copy todir="target/application">
+									<fileset dir="EarContent" excludes="META-INF/application.xml" />
+								</copy>
+							</target>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<artifactId>maven-ear-plugin</artifactId>
+				<configuration>
+					<earSourceDirectory>target/application</earSourceDirectory>
+					<artifactTypeMappings>
+						<artifactTypeMapping type="jar" mapping="ejb" />
+					</artifactTypeMappings>
+					<version>5</version>
+					<modules>
+						<ejbModule>
+							<groupId>org.nightlabs.jfire</groupId>
+							<artifactId>org.nightlabs.jfire.jbpm</artifactId>
+						</ejbModule>
+						<jarModule>
+							<groupId>org.jbpm.jbpm3</groupId>
+							<artifactId>jbpm-jpdl</artifactId>
+							<includeInApplicationXml>true</includeInApplicationXml>
+						</jarModule>
+						<jarModule>
+							<groupId>org.jbpm.jbpm3</groupId>
+							<artifactId>jbpm-identity</artifactId>
+							<includeInApplicationXml>true</includeInApplicationXml>
+						</jarModule>
+						<jarModule>
+							<groupId>net.sf.ehcache</groupId>
+							<artifactId>ehcache</artifactId>
+							<includeInApplicationXml>true</includeInApplicationXml>
+						</jarModule>
+					</modules>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>

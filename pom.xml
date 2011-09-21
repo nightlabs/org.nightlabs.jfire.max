@@ -13,6 +13,7 @@
 		<groupId>org.nightlabs.jfire</groupId>
 		<artifactId>org.nightlabs.jfire.trade.parent</artifactId>
 		<version>1.2.0-SNAPSHOT</version>
+		<relativePath>../org.nightlabs.jfire.trade.parent/pom.xml</relativePath>
 	</parent>
 
 	<dependencies>

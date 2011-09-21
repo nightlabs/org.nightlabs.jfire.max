@@ -10,9 +10,9 @@
 
 	<parent>
 		<groupId>org.nightlabs.jfire</groupId>
-		<artifactId>org.nightlabs.jfire.parent</artifactId>
+		<artifactId>org.nightlabs.jfire.jbpm.parent</artifactId>
 		<version>1.2.0-SNAPSHOT</version>
-		<relativePath>../org.nightlabs.jfire.parent/pom.xml</relativePath>
+		<relativePath>../org.nightlabs.jfire.jbpm.parent/pom.xml</relativePath>
 	</parent>
 
 	<dependencies>
@@ -106,11 +106,9 @@
 
 		<!-- FIXME could not find this version (3.1.4) in Maven repositories -->
 		<dependency>
-			<groupId>org.jbpm</groupId>
-			<artifactId>jbpm</artifactId>
-			<version>3.1.4</version>
-			<scope>system</scope>
-			<systemPath>${basedir}/lib/jbpm/jbpm-3.1.4.jar</systemPath>
+			<groupId>org.jbpm.jbpm3</groupId>
+			<artifactId>jbpm-jpdl</artifactId>
+			<scope>provided</scope>
 		</dependency>
 		<!-- as provided by JBoss 4.2.3 GA -->
 		<dependency>

@@ -44,4 +44,8 @@ public class JFireJbpmAuthenticationService implements AuthenticationService {
 	public void close() {
 		//Empty for now
 	}
+
+	public void setActorId(String arg0) {
+		// TODO: What to do here?
+	}
 }

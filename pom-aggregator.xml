@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.nightlabs.jfire</groupId>
+	<artifactId>org.nightlabs.jfire.max.aggregator</artifactId>
+	<version>1.2.0-SNAPSHOT</version>
+	<packaging>pom</packaging>
+	<name>${project.artifactId}</name>
+
+	<distributionManagement>
+		<repository>
+			<id>dev.nightlabs.org-libs-releases-local</id>
+			<url>https://dev.nightlabs.org/maven-repository/libs-releases-local</url>
+		</repository>
+		<snapshotRepository>
+			<id>dev.nightlabs.org-libs-snapshots-local</id>
+			<url>https://dev.nightlabs.org/maven-repository/libs-snapshots-local</url>
+		</snapshotRepository>
+	</distributionManagement>
+
+	<modules>
+		<module>../JFireAsterisk</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.asterisk -->
+		<module>../JFireAsteriskEAR</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.asterisk.ear -->
+		
+		<!-- TODO has Eclipse dependencies <module>../org.nightlabs.jfire.base.j2ee</module> --> <!-- org.nightlabs.jfire:org.nightlabs.jfire.base.j2ee -->
+		<!-- TODO has Eclipse dependencies <module>../org.nightlabs.jfire.base.j2ee.osgi</module> --> <!-- org.nightlabs.jfire:org.nightlabs.jfire.base.j2ee.osgi -->
+		<!-- requires a lot <module>../JFireChezFrancois</module> --> <!-- org.nightlabs.jfire:org.nightlabs.jfire.chezfrancois -->
+		
+		<module>../JFireDepartment</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.department -->
+		<module>../JFireDepartmentEAR</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.department.ear -->
+		<module>../JFireDynamicTrade</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.dynamictrade -->
+		<module>../JFireDynamicTradeEAR</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.dynamictrade.ear -->
+		
+		<module>../JFireGeography</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.geography -->
+		<module>../JFireIssueTracking</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.issue -->
+		<module>../JFireIssueTrackerBugTracking</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.issue.bug -->
+		<module>../JFireIssueTrackerBugTrackingEAR</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.issue.bug.ear -->
+		<module>../JFireIssueTrackingEAR</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.issue.ear -->
+		<!-- depends on trade (!) <module>../JFireIssueTimeTracking</module> --> <!-- org.nightlabs.jfire:org.nightlabs.jfire.issuetimetracking -->
+		
+		<module>../JFireJbpm</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.jbpm -->
+		<module>../JFireJbpmAOP</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.jbpm.aop -->
+		<module>../JFireJbpmEAR</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.jbpm.ear -->
+		
+		<module>../JFirePBX</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.pbx -->
+		<module>../JFirePBXEAR</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.pbx.ear -->
+		
+		<module>../JFirePersonRelation</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.personrelation -->
+		<module>../JFirePersonRelationEAR</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.personrelation.ear -->
+		<module>../JFirePersonRelationIssueTracking</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.personrelation.issuetracking -->
+		
+		
+		<!-- requires scripting <module>../JFireReporting</module> --> <!-- org.nightlabs.jfire:org.nightlabs.jfire.reporting -->
+		<!-- TODO has eclipse dependencies <module>../org.nightlabs.jfire.reporting.birt</module> --> <!-- org.nightlabs.jfire:org.nightlabs.jfire.reporting.birt -->
+		<!-- requires a lot <module>../JFireReportingEngineBirt</module> --> <!-- org.nightlabs.jfire:org.nightlabs.jfire.reporting.engine.birt -->
+		<!-- TODO has eclipse dependencies <module>../org.nightlabs.jfire.reporting.oda.client</module> --> <!-- org.nightlabs.jfire:org.nightlabs.jfire.reporting.oda.client -->
+		<!-- TODO has eclipse dependencies <module>../org.nightlabs.jfire.reporting.oda.wrapper</module> --> <!-- org.nightlabs.jfire:org.nightlabs.jfire.reporting.oda.wrapper -->
+		<!-- requires trade <module>../JFireReportingTrade</module> --> <!-- org.nightlabs.jfire:org.nightlabs.jfire.reporting.trade -->
+		<!-- requires nl-rhino <module>../JFireScripting</module> --> <!-- org.nightlabs.jfire:org.nightlabs.jfire.scripting -->
+		<!-- requires scripting <module>../JFireScriptingEditor2D</module> --> <!-- org.nightlabs.jfire:org.nightlabs.jfire.scripting.editor2d -->
+		
+		<module>../JFireTrade</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.trade -->
+		<module>../JFireTradeEAR</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.trade.ear -->
+		
+		<module>../JFireSimpleTrade</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.simpletrade -->
+		<module>../JFireSimpleTradeEAR</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.simpletrade.ear -->
+		
+		<!-- generics compile error with javac <module>../JFireTestSuiteDepartment</module> --> <!-- org.nightlabs.jfire:org.nightlabs.jfire.testsuite.department -->
+		<!-- generics compile error with javac <module>../JFireTestSuiteIssueTracking</module> --> <!-- org.nightlabs.jfire:org.nightlabs.jfire.testsuite.issuetracking -->
+		<!-- requires trade <module>../org.nightlabs.jfire.trade.editor2d</module> --> <!-- org.nightlabs.jfire:org.nightlabs.jfire.trade.editor2d -->
+		
+
+		
+		<!-- requires trade <module>../JFireVoucher</module> --> <!-- org.nightlabs.jfire:org.nightlabs.jfire.voucher -->
+		<!-- requires trade <module>../JFireVoucherEditor2D</module> --> <!-- org.nightlabs.jfire:org.nightlabs.jfire.voucher.editor2d.iofilter -->
+		
+		<!-- requires trade <module>../JFireWebShopDemo</module> --> <!-- org.nightlabs.jfire:org.nightlabs.jfire.web.demoshop -->
+		<!-- requires trade <module>../JFireWebShopBase</module> --> <!-- org.nightlabs.jfire:org.nightlabs.jfire.web.webshop -->
+		
+		<!-- 
+		<module>../JFireTestSuiteJFireBaseEAR</module>
+		<module>../NightLabsXStreamEAR</module>
+		-->
+		
+		<module>../org.nightlabs.jfire.jbpm.parent</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.jbpm.parent -->
+		<module>../org.nightlabs.jfire.trade.parent</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.trade.parent -->
+		
+	</modules>
+</project>

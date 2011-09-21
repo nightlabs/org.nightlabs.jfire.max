@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<project name="maven-antrun-" default="main"  >
+<target name="main">
+  <mkdir dir="target/application"/>
+  <copy todir="target/application">
+    <fileset dir="EarContent" excludes="META-INF/application.xml"/>
+  </copy>
+</target>
+</project>

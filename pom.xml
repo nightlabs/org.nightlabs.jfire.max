@@ -11,9 +11,9 @@
 
 	<parent>
 		<groupId>org.nightlabs.jfire</groupId>
-		<artifactId>org.nightlabs.jfire.trade.parent</artifactId>
+		<artifactId>org.nightlabs.jfire.parent</artifactId>
 		<version>1.2.0-SNAPSHOT</version>
-		<relativePath>../org.nightlabs.jfire.trade.parent/pom.xml</relativePath>
+		<relativePath>../org.nightlabs.jfire.parent/pom.xml</relativePath>
 	</parent>
 
 	<dependencies>
@@ -137,11 +137,12 @@
 		<dependency>
 			<groupId>commons-lang</groupId>
 			<artifactId>commons-lang</artifactId>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>rhino</groupId>
 			<artifactId>js</artifactId>
-			<version>1.7R2</version>
+			<scope>provided</scope>
 		</dependency>
 		
 		

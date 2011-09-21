@@ -95,5 +95,7 @@
 		<module>../JFireTestSuiteJFireBaseEAR</module>
 		<module>../NightLabsXStreamEAR</module>
 		-->
+		
+		<module>../org.nightlabs.jfire.max.assembly</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.max.assembly -->
 	</modules>
 </project>

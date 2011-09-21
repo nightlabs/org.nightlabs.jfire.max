@@ -37,6 +37,7 @@
 		<module>../JFireDynamicTradeEAR</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.dynamictrade.ear -->
 		
 		<module>../JFireGeography</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.geography -->
+		<module>../JFireGeographyEAR</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.geography.ear -->
 		<module>../JFireIssueTracking</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.issue -->
 		<module>../JFireIssueTrackerBugTracking</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.issue.bug -->
 		<module>../JFireIssueTrackerBugTrackingEAR</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.issue.bug.ear -->

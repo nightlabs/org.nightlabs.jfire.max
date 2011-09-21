@@ -44,11 +44,11 @@ import org.nightlabs.jfire.idgenerator.IDGenerator;
 	@FetchGroup(
 			name=DynamicProductTemplate.FETCH_GROUP_PARENT_CATEGORY,
 			members={@Persistent(name="parentCategory")}
-	),
+	)
 })
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 @Queries({
-	@Query(name="getChildDynamicProductTemplates", value="SELECT WHERE this.parentCategory == :parentCategory"),
+	@Query(name="getChildDynamicProductTemplates", value="SELECT WHERE this.parentCategory == :parentCategory")
 })
 public class DynamicProductTemplate
 implements Serializable, DetachCallback

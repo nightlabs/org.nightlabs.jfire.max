@@ -59,7 +59,7 @@ import org.nightlabs.jfire.dynamictrade.template.id.DynamicProductTemplateProduc
 	@FetchGroup(
 		name=DynamicProductTemplate.FETCH_GROUP_PRODUCT_NAME,
 		members={@Persistent(name="dynamicProductTemplate"), @Persistent(name="names")}
-	),
+	)
 })
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class DynamicProductTemplateProductName

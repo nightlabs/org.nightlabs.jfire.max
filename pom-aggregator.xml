@@ -83,9 +83,5 @@
 		<module>../JFireTestSuiteJFireBaseEAR</module>
 		<module>../NightLabsXStreamEAR</module>
 		-->
-		
-		<module>../org.nightlabs.jfire.jbpm.parent</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.jbpm.parent -->
-		<module>../org.nightlabs.jfire.trade.parent</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.trade.parent -->
-		
 	</modules>
 </project>

@@ -78,6 +78,7 @@
 		    <artifactId>geronimo-annotation_1.1_spec</artifactId>
 		    <!-- FIXME add to dependency-management -->
 		    <version>1.0.1</version>
+		    <scope>provided</scope>
 		</dependency>		
 		<dependency>
 		    <groupId>javax.annotation</groupId>

@@ -1,0 +1,251 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.nightlabs.jfire</groupId>
+	<artifactId>org.nightlabs.jfire.max.assembly</artifactId>
+	<packaging>pom</packaging>
+
+	<parent>
+		<groupId>org.nightlabs.jfire</groupId>
+		<artifactId>org.nightlabs.jfire.parent</artifactId>
+		<version>1.2.0-SNAPSHOT</version>
+		<relativePath>../org.nightlabs.jfire.parent/pom.xml</relativePath>
+	</parent>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.nightlabs.jfire</groupId>
+			<artifactId>org.nightlabs.jfire.min.assembly</artifactId>
+			<type>zip</type>
+			<classifier>bin</classifier>
+			<exclusions>
+				<exclusion>
+					<!-- According to http://jira.codehaus.org/browse/MNG-2315 this should 
+						not be supported - but it is! There is a warning, but it excludes the transitive 
+						dependencies as desired. Marco :-) -->
+					<groupId>*</groupId>
+					<artifactId>*</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<!-- JFire-dependencies on top of jfire.min -->
+		<dependency>
+			<groupId>org.nightlabs.jfire</groupId>
+			<artifactId>org.nightlabs.jfire.asterisk.ear</artifactId>
+			<type>ear</type>
+		</dependency>
+		<dependency>
+			<groupId>org.nightlabs.jfire</groupId>
+			<artifactId>org.nightlabs.jfire.department.ear</artifactId>
+			<type>ear</type>
+		</dependency>
+		<dependency>
+			<groupId>org.nightlabs.jfire</groupId>
+			<artifactId>org.nightlabs.jfire.dynamictrade.ear</artifactId>
+			<type>ear</type>
+		</dependency>
+		<dependency>
+			<groupId>org.nightlabs.jfire</groupId>
+			<artifactId>org.nightlabs.jfire.entityuserset.ear</artifactId>
+			<type>ear</type>
+		</dependency>
+		<dependency>
+			<groupId>org.nightlabs.jfire</groupId>
+			<artifactId>org.nightlabs.jfire.geography.ear</artifactId>
+			<type>ear</type>
+		</dependency>
+		<dependency>
+			<groupId>org.nightlabs.jfire</groupId>
+			<artifactId>org.nightlabs.jfire.prop.html.ear</artifactId>
+			<type>ear</type>
+		</dependency>
+		<dependency>
+			<groupId>org.nightlabs.jfire</groupId>
+			<artifactId>org.nightlabs.jfire.prop.file.ear</artifactId>
+			<type>ear</type>
+		</dependency>
+		<dependency>
+			<groupId>org.nightlabs.jfire</groupId>
+			<artifactId>org.nightlabs.jfire.issuetimetracking.ear</artifactId>
+			<type>ear</type>
+		</dependency>
+		<dependency>
+			<groupId>org.nightlabs.jfire</groupId>
+			<artifactId>org.nightlabs.jfire.issue.bug.ear</artifactId>
+			<type>ear</type>
+		</dependency>
+		<dependency>
+			<groupId>org.nightlabs.jfire</groupId>
+			<artifactId>org.nightlabs.jfire.issue.ear</artifactId>
+			<type>ear</type>
+		</dependency>
+		<dependency>
+			<groupId>org.nightlabs.jfire</groupId>
+			<artifactId>org.nightlabs.jfire.jbpm.ear</artifactId>
+			<type>ear</type>
+		</dependency>
+		<dependency>
+			<groupId>org.nightlabs.jfire</groupId>
+			<artifactId>org.nightlabs.jfire.pbx.ear</artifactId>
+			<type>ear</type>
+		</dependency>
+		<dependency>
+			<groupId>org.nightlabs.jfire</groupId>
+			<artifactId>org.nightlabs.jfire.personrelation.ear</artifactId>
+			<type>ear</type>
+		</dependency>
+		<dependency>
+			<groupId>org.nightlabs.jfire</groupId>
+			<artifactId>org.nightlabs.jfire.personrelation.issuetracking.ear</artifactId>
+			<type>ear</type>
+		</dependency>
+		<dependency>
+			<groupId>org.nightlabs.jfire</groupId>
+			<artifactId>org.nightlabs.jfire.simpletrade.ear</artifactId>
+			<type>ear</type>
+		</dependency>
+		<dependency>
+			<groupId>org.nightlabs.jfire</groupId>
+			<artifactId>org.nightlabs.jfire.trade.ear</artifactId>
+			<type>ear</type>
+		</dependency>
+		
+		
+		
+	</dependencies>
+
+	<properties>
+		<assembly.directory>${project.build.directory}/assembly</assembly.directory>
+		<jboss.subdirectory>jfire-server</jboss.subdirectory>
+		<assembly.jboss.directory>${assembly.directory}/${jboss.subdirectory}</assembly.jboss.directory>
+		<assembly.deploy.directory>${assembly.jboss.directory}/server/default/deploy</assembly.deploy.directory>
+		<assembly.lib.directory>${assembly.jboss.directory}/server/default/lib</assembly.lib.directory>
+		<assembly.jfire.deploy.directory>${assembly.deploy.directory}/JFire.last</assembly.jfire.deploy.directory>
+	</properties>
+
+
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>unpack-jboss</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>unpack-dependencies</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${assembly.directory}</outputDirectory>
+							<includeGroupIds>org.nightlabs.jfire</includeGroupIds>
+							<includeArtifactIds>org.nightlabs.jfire.min.assembly</includeArtifactIds>
+							<!-- <excludes>${jboss.subdirectory}/server/all/**,${jboss.subdirectory}/server/minimal/**</excludes> -->
+						</configuration>
+					</execution>
+					<execution>
+						<id>copy-deploy</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>copy-dependencies</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${assembly.deploy.directory}</outputDirectory>
+							<!-- <includeGroupIds>org.nightlabs,org.nightlabs.jfire,org.datanucleus</includeGroupIds> -->
+							<includeTypes>sar,war,rar</includeTypes>
+							<stripVersion>true</stripVersion>
+						</configuration>
+					</execution>
+					<execution>
+						<id>copy-lib</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>copy-dependencies</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${assembly.lib.directory}</outputDirectory>
+							<includeTypes>jar</includeTypes>
+							<stripVersion>true</stripVersion>
+						</configuration>
+					</execution>
+					<execution>
+						<id>copy-jfire-deploy</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>copy-dependencies</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${assembly.jfire.deploy.directory}</outputDirectory>
+							<!-- <includeGroupIds>org.nightlabs,org.nightlabs.jfire</includeGroupIds> -->
+							<includeTypes>ear</includeTypes>
+							<stripVersion>true</stripVersion>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<artifactId>maven-resources-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>copy-resoures</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<resources>
+								<resource>
+									<directory>src/main/resources</directory>
+								</resource>
+							</resources>
+							<outputDirectory>${assembly.directory}</outputDirectory>
+							<overwrite>true</overwrite>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<executions>
+					<execution>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<tasks>
+								<!-- Dependency plugin discards file permissions so we need to set 
+									them back manually. See: http://jira.codehaus.org/browse/MDEP-109 Marco :-) -->
+								<chmod file="${assembly.jboss.directory}/bin/*.sh" perm="ugo+rx" />
+							</tasks>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<!-- <version>2.2.1</version> => parent -->
+				<configuration>
+					<!-- TODO the following bin.xml-file is an exact copy of the one in 
+						org.nightlabs.jfire.min.assembly. We should find out how to reference the 
+						original here instead of copying it locally. Marco :-) -->
+					<descriptors>
+						<descriptor>src/main/assembly/bin.xml</descriptor>
+					</descriptors>
+				</configuration>
+				<executions>
+					<execution>
+						<id>make-assembly</id> <!-- this is used for inheritance merges -->
+						<phase>package</phase> <!-- bind to the packaging phase -->
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+</project>

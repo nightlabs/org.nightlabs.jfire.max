@@ -164,6 +164,7 @@
 				<directory>src</directory>
 				<excludes>
 					<exclude>**/*.java</exclude>
+					<exclude>**/*.inc</exclude>
 				</excludes>
 			</resource>
 		</resources>
@@ -174,9 +175,25 @@
 				<artifactId>maven-datanucleus-plugin</artifactId>
 			</plugin>
 			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<configuration>
+					<instructions>
+						<!-- SPECIAL CASE HERE as the bundle name does not correspond to the 
+							base package name. -->
+						<Export-Package>
+							org.nightlabs.jfire.accounting.*;version="${project.version}",
+							org.nightlabs.jfire.store.*;version="${project.version}",
+							org.nightlabs.jfire.trade.*;version="${project.version}",
+							org.nightlabs.jfire.transfer.*;version="${project.version}"
+						</Export-Package>
+					</instructions>
+				</configuration>
+			</plugin>
+			<plugin>
 				<groupId>org.datanucleus</groupId>
 				<artifactId>maven-datanucleus-plugin</artifactId>
 			</plugin>
-		</plugins>
+		</plugins>			
 	</build>
 </project>

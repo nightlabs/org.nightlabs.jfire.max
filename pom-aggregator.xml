@@ -28,6 +28,9 @@
 		<!-- TODO has Eclipse dependencies <module>../org.nightlabs.jfire.base.j2ee.osgi</module> --> <!-- org.nightlabs.jfire:org.nightlabs.jfire.base.j2ee.osgi -->
 		<!-- requires a lot <module>../JFireChezFrancois</module> --> <!-- org.nightlabs.jfire:org.nightlabs.jfire.chezfrancois -->
 		
+		<module>../JFireEntityUserSet</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.entityuserset -->
+		<module>../JFireEntityUserSetEAR</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.entityuserset.ear -->
+		
 		<module>../JFireDepartment</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.department -->
 		<module>../JFireDepartmentEAR</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.department.ear -->
 		<module>../JFireDynamicTrade</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.dynamictrade -->

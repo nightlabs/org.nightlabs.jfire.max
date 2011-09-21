@@ -3,9 +3,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.nightlabs.jfire</groupId>
 	<artifactId>org.nightlabs.jfire.reporting</artifactId>
-	<version>1.2.0-SNAPSHOT</version>
 	<packaging>bundle</packaging>
 	<name>${project.artifactId}</name>
 
@@ -32,6 +30,42 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
+			<groupId>org.nightlabs</groupId>
+			<artifactId>org.nightlabs.query</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.nightlabs</groupId>
+			<artifactId>org.nightlabs.query.jdo</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.nightlabs</groupId>
+			<artifactId>org.nightlabs.xml</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.nightlabs</groupId>
+			<artifactId>org.nightlabs.config</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.nightlabs</groupId>
+			<artifactId>org.nightlabs.progress</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.nightlabs</groupId>
+			<artifactId>org.nightlabs.util</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.apache.servicemix.bundles</groupId>
+			<artifactId>org.apache.servicemix.bundles.xerces</artifactId>
+			<scope>provided</scope>
+		</dependency>	
+		<dependency>
 			<groupId>org.nightlabs.jfire</groupId>
 			<artifactId>org.nightlabs.jfire.base</artifactId>
 			<scope>provided</scope>
@@ -56,24 +90,43 @@
 			<artifactId>org.nightlabs.jfire.servermanager</artifactId>
 			<scope>provided</scope>
 		</dependency>
+		
+		
 		<dependency>
-			<groupId>org.nightlabs</groupId>
-			<artifactId>org.nightlabs.query</artifactId>
+			<groupId>org.apache.geronimo.specs</groupId>
+			<artifactId>geronimo-ejb_3.0_spec</artifactId>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.nightlabs</groupId>
-			<artifactId>org.nightlabs.query.jdo</artifactId>
-			<scope>provided</scope>
+		    <groupId>org.apache.geronimo.specs</groupId>
+		    <artifactId>geronimo-annotation_1.1_spec</artifactId>
+		    <!-- FIXME add to dependency-management -->
+		    <version>1.0.1</version>
+		    <scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.nightlabs</groupId>
-			<artifactId>org.nightlabs.xml</artifactId>
+			<groupId>org.apache.geronimo.specs</groupId>
+			<artifactId>geronimo-javamail_1.4_spec</artifactId>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.servicemix.bundles</groupId>
 			<artifactId>org.apache.servicemix.bundles.xstream</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>javax.jdo</groupId>
+			<artifactId>jdo-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.datanucleus</groupId>
+			<artifactId>datanucleus-api-jdo</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
 			<scope>provided</scope>
 		</dependency>
 		<!-- 
@@ -83,6 +136,13 @@
 			<scope>provided</scope>
 		</dependency>
 		-->
+		<!-- 
+		<dependency>
+			<groupId>javax.jdo</groupId>
+			<artifactId>jdo-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		 -->
 	</dependencies>
 
 	<build>
@@ -96,5 +156,13 @@
 				</excludes>
 			</resource>
 		</resources>
+		<!-- 
+		<plugins>
+			<plugin>
+				<groupId>org.datanucleus</groupId>
+				<artifactId>maven-datanucleus-plugin</artifactId>
+			</plugin>
+		</plugins>
+		 -->
 	</build>
 </project>

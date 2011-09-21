@@ -48,7 +48,8 @@
 		<module>../JFireIssueTrackerBugTracking</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.issue.bug -->
 		<module>../JFireIssueTrackerBugTrackingEAR</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.issue.bug.ear -->
 		<module>../JFireIssueTrackingEAR</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.issue.ear -->
-		<!-- depends on trade (!) <module>../JFireIssueTimeTracking</module> --> <!-- org.nightlabs.jfire:org.nightlabs.jfire.issuetimetracking -->
+		<module>../JFireIssueTimeTracking</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.issuetimetracking -->
+		<module>../JFireIssueTimeTrackingEAR</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.issuetimetracking.ear -->
 		
 		<module>../JFireJbpm</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.jbpm -->
 		<module>../JFireJbpmAOP</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.jbpm.aop -->
@@ -60,6 +61,7 @@
 		<module>../JFirePersonRelation</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.personrelation -->
 		<module>../JFirePersonRelationEAR</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.personrelation.ear -->
 		<module>../JFirePersonRelationIssueTracking</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.personrelation.issuetracking -->
+		<module>../JFirePersonRelationIssueTrackingEAR</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.personrelation.issuetracking.ear -->
 		
 		
 		<!-- requires scripting <module>../JFireReporting</module> --> <!-- org.nightlabs.jfire:org.nightlabs.jfire.reporting -->

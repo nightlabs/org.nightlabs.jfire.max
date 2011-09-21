@@ -105,7 +105,7 @@ import org.nightlabs.util.Util;
 		members=@Persistent(name="propertySet")),
 	@FetchGroup(
 		name=ArticleContainer.FETCH_GROUP_ARTICLES,
-		members=@Persistent(name="articles")),
+		members=@Persistent(name="articles"))
 //	@FetchGroup(
 //		name=ArticleContainer.FETCH_GROUP_CUSTOMER,
 //		members=@Persistent(name="customer")),

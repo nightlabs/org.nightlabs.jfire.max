@@ -145,7 +145,7 @@ import org.nightlabs.util.Util;
 					@Persistent(name=Offer.FieldName.order),
 					@Persistent(name=Offer.FieldName.price),
 					@Persistent(name=Offer.FieldName.state),
-					@Persistent(name=Offer.FieldName.states),
+					@Persistent(name=Offer.FieldName.states)
 			}
 	),
 	@FetchGroup(
@@ -155,7 +155,7 @@ import org.nightlabs.util.Util;
 	@FetchGroup(
 			name=ArticleContainer.FETCH_GROUP_ARTICLES,
 			members=@Persistent(name=Offer.FieldName.articles)
-	),
+	)
 //	@FetchGroup(
 //			name=ArticleContainer.FETCH_GROUP_CUSTOMER,
 //			members=@Persistent(name=Offer.FieldName.customer)

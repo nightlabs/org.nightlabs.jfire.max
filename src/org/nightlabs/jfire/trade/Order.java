@@ -155,7 +155,7 @@ import org.nightlabs.util.Util;
 	@javax.jdo.annotations.Query(
 		name="getQuickSaleWorkOrderIDCandidates_WORKAROUND",
 		value="SELECT WHERE this.quickSaleWorkOrder && this.orderIDPrefix == :orderIDPrefix && this.currency.currencyID == :currencyID && this.vendor.organisationID == :paramVendorID_organisationID && this.vendor.anchorID == :paramVendorID_anchorID && this.customer.organisationID == :paramCustomerID_organisationID && this.customer.anchorID == :paramCustomerID_anchorID ORDER BY orderID ASC"
-	),
+	)
 })
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class Order

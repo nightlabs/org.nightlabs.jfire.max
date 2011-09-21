@@ -247,7 +247,7 @@ import org.nightlabs.util.Util;
 	@javax.jdo.annotations.Query(
 			name="getOverdueInvoices",
 			value="SELECT WHERE this.organisationID == paramOrganisationID && dueDateForPayment < paramDate && finalizeDT != null PARAMETERS String paramOrganisationID, Date paramDate import java.lang.String, java.util.Date ORDER BY invoiceID DESC"
-	),
+	)
 })
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class Invoice

@@ -31,7 +31,7 @@ import org.nightlabs.jfire.config.ConfigModule;
 		@FetchGroup(
 			name=SummedPriceFragmentTypeConfigModule.FETCH_GROUP_SUMMED_PRICE_FRAGMENT_TYPE_LIST,
 			members=@Persistent(name="summedPriceFragmentTypeList")
-		),
+		)
 	})
 public class SummedPriceFragmentTypeConfigModule 
 extends ConfigModule

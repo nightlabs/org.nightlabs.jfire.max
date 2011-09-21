@@ -41,7 +41,7 @@ import org.nightlabs.jfire.trade.id.ArticleEndCustomerHistoryItemID;
 	@FetchGroup(
 			name=ArticleEndCustomerHistoryItem.FETCH_GROUP_USER,
 			members=@Persistent(name=ArticleEndCustomerHistoryItem.FieldName.user)
-	),
+	)
 })
 @Queries({
 		@Query(

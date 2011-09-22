@@ -304,7 +304,7 @@ public abstract class Geography
 	/**
 	 * @param countryID
 	 * @param throwExceptionIfNotFound
-	 * @return Returns an empty collection if <tt>throwExceptionIfNotFound == false</tt> and
+	 * @return Returns an empty unmodifiable collection if <tt>throwExceptionIfNotFound == false</tt> and
 	 *		no <tt>Country</tt> exists for the given <tt>countryID</tt>.
 	 */
 	public synchronized Collection<Region> getRegions(CountryID countryID, boolean throwExceptionIfNotFound)
@@ -356,7 +356,7 @@ public abstract class Geography
 	/**
 	 * @param countryID
 	 * @param throwExceptionIfNotFound
-	 * @return Returns an empty collection if <tt>throwExceptionIfNotFound == false</tt> and
+	 * @return Returns an empty unmodifiable collection if <tt>throwExceptionIfNotFound == false</tt> and
 	 *		no <tt>Country</tt> exists for the given <tt>countryID</tt>.
 	 */
 	public synchronized Collection<Location> getLocations(CityID cityID, boolean throwExceptionIfNotFound)
@@ -396,7 +396,7 @@ public abstract class Geography
 	/**
 	 * @param regionID
 	 * @param throwExceptionIfNotFound
-	 * @return Returns an empty collection if <tt>throwExceptionIfNotFound == false</tt> and
+	 * @return Returns an empty unmodifiable collection if <tt>throwExceptionIfNotFound == false</tt> and
 	 *		no <tt>Country</tt> exists for the given <tt>countryID</tt>.
 	 */
 	public synchronized Collection<City> getCities(RegionID regionID, boolean throwExceptionIfNotFound)

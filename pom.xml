@@ -156,13 +156,26 @@
 				</excludes>
 			</resource>
 		</resources>
-		<!-- 
 		<plugins>
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<configuration>
+					<instructions>
+<!-- 		                <Import-Package>org.nightlabs.*;provide:=true,*</Import-Package> -->
+<!-- 		                <Bundle-SymbolicName>org.nightlabs.jfire.reporting</Bundle-SymbolicName> -->
+		                <Export-Package>!org.nightlabs.jfire.reporting.internal.*,org.eclipse.datatools.connectivity.oda.jfire.*,org.nightlabs.jfire.reporting.*;version="1.2.0-SNAPSHOT"</Export-Package>
+		                <Private-Package>org.nightlabs.jfire.reporting.internal.*</Private-Package>
+<!-- 		                <Bundle-RequiredExecutionEnvironment>JavaSE-1.6</Bundle-RequiredExecutionEnvironment> -->
+					</instructions>
+				</configuration>
+			</plugin>
+		<!-- 
 			<plugin>
 				<groupId>org.datanucleus</groupId>
 				<artifactId>maven-datanucleus-plugin</artifactId>
 			</plugin>
-		</plugins>
 		 -->
+		</plugins>
 	</build>
 </project>

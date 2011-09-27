@@ -1,13 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	
-	<!-- @generated - Auto generated POM. Remove this marker after review. -->
-	
+
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.nightlabs.jfire</groupId>
 	<artifactId>org.nightlabs.jfire.reporting.birt</artifactId>
-	<version>1.2.0-SNAPSHOT</version>
 	<packaging>bundle</packaging>
 	<name>${project.artifactId}</name>
 
@@ -17,47 +13,20 @@
 		<version>1.2.0-SNAPSHOT</version>
 	</parent>
 
+	<!-- Remark on repositories for BIRT: Their seems to be no complete BIRT 
+		mvn-repo available in the net. So best solution might be to build your own 
+		with a script, out of the BIRT-runtime and -framework package. http://www.birt-exchange.org/org/forum/index.php/topic/11056-birt-and-maven/page__s__8d7020f6c6a7f5dcd9cf3e30b30cc24c 
+		helpful script: http://community.jboss.org/wiki/BIRTIntegration (Sebl, 2011-09-21) -->
+	<!-- <repositories> <repository> <id>jboss-public-repository-group</id> 
+		<name>JBoss Public Repository Group</name> <url>http://repository.jboss.org/nexus/content/groups/public</url> 
+		</repository> </repositories> <properties> <birt.version>2.2.0</birt.version> 
+		Sebl: ATM I do no see a repo with version 2.2.0. So trying this version. 
+		<birt.version>2.2.2</birt.version> </properties> -->
+	<properties>
+		<birt.version>2.2.0</birt.version>
+	</properties>
+
 	<dependencies>
-		<dependency>
-			<groupId>XXX</groupId>
-			<artifactId>com.thoughtworks.xstream</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>commons-lang</groupId>
-			<artifactId>commons-lang</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>javax.jdo</groupId>
-			<artifactId>jdo2-api</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.eclipse.XXX</groupId>
-			<artifactId>org.eclipse.birt.core</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.eclipse.XXX</groupId>
-			<artifactId>org.eclipse.birt.report.engine</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.eclipse.XXX</groupId>
-			<artifactId>org.eclipse.birt.report.model</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.eclipse.XXX</groupId>
-			<artifactId>org.eclipse.datatools.connectivity.oda</artifactId>
-			<scope>provided</scope>
-		</dependency>
 		<dependency>
 			<groupId>org.nightlabs</groupId>
 			<artifactId>org.nightlabs.base</artifactId>
@@ -68,6 +37,12 @@
 			<artifactId>org.nightlabs.jdo</artifactId>
 			<scope>provided</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.nightlabs</groupId>
+			<artifactId>org.nightlabs.util</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
 		<dependency>
 			<groupId>org.nightlabs.jfire</groupId>
 			<artifactId>org.nightlabs.jfire.reporting</artifactId>
@@ -80,14 +55,85 @@
 		</dependency>
 		<dependency>
 			<groupId>org.nightlabs.jfire</groupId>
-			<artifactId>org.nightlabs.jfire.scripting</artifactId>
+			<artifactId>org.nightlabs.jfire.base</artifactId>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.xmlpull</groupId>
-			<artifactId>org.xmlpull</artifactId>
+			<groupId>org.nightlabs.jfire</groupId>
+			<artifactId>org.nightlabs.jfire.scripting</artifactId>
 			<scope>provided</scope>
-		</dependency>		
+		</dependency>
+
+
+<!-- org.eclipse.birt.v2-2-0-mvnzd are libs that were uploaded to our artifactory by script; source was the birt-framework; -->
+		<dependency>
+			<groupId>org.eclipse.birt.v2-2-0-mvnzd</groupId>
+			<artifactId>coreapi</artifactId>
+			<scope>provided</scope>
+			<version>${birt.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.birt.v2-2-0-mvnzd</groupId>
+			<artifactId>engineapi</artifactId>
+			<scope>provided</scope>
+			<version>${birt.version}</version> <!-- TODO move to parent pom -->
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.birt.v2-2-0-mvnzd</groupId>
+			<artifactId>modelapi</artifactId>
+			<scope>provided</scope>
+			<version>${birt.version}</version> <!-- TODO move to parent pom -->
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.birt.v2-2-0-mvnzd</groupId>
+			<artifactId>org.eclipse.datatools.connectivity.oda</artifactId>
+			<version>3.1.0</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.birt.v2-2-0-mvnzd</groupId>
+			<artifactId>icu</artifactId>
+			<version>3.6.1</version> <!--  Version taken from BIRT 2.2.0 (Sebl, 2011-09-26) -->
+		</dependency>
+		
+		<dependency>
+			<groupId>com.thoughtworks.xstream</groupId>
+			<artifactId>xstream</artifactId>
+			<scope>provided</scope>
+			<!-- <version>1.2.0</version> TODO move version to parent pom -->
+			<version>1.2</version> <!-- did not find version 1.2.0 (sebl) -->
+		</dependency>
+		
+		<dependency>
+			<groupId>commons-lang</groupId>
+			<artifactId>commons-lang</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>javax.jdo</groupId>
+			<!-- <artifactId>jdo2-api</artifactId> sebl: changed to 'jdo-api', as 
+				this all seems to be the same. -->
+			<artifactId>jdo-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<!-- 
+			<dependency> 
+			<groupId>org.xmlpull</groupId> <artifactId>org.xmlpull</artifactId> 
+			<version>1.1.3</version> TODO move to parent pom 
+			<scope>provided</scope> 
+			</dependency> 
+			-->
+		<dependency>
+			<groupId>org.apache.servicemix.bundles</groupId>
+			<artifactId>org.apache.servicemix.bundles.xmlpull</artifactId>
+			<!-- Changed version to this, just because of availability. -->
+			<version>1.1.3.1_1</version>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -101,7 +147,6 @@
 				</excludes>
 			</resource>
 		</resources>
-
 
 	</build>
 </project>

@@ -26,31 +26,6 @@
 		</dependency>
 		<dependency>
 			<groupId>org.nightlabs.jfire</groupId>
-			<artifactId>org.nightlabs.jfire.base</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.nightlabs.jfire</groupId>
-			<artifactId>org.nightlabs.jfire.base.bean</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.nightlabs.jfire</groupId>
-			<artifactId>org.nightlabs.jfire.base.clientlib</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.nightlabs.jfire</groupId>
-			<artifactId>org.nightlabs.jfire.reporting</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.nightlabs.jfire</groupId>
-			<artifactId>org.nightlabs.jfire.scripting</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.nightlabs.jfire</groupId>
 			<artifactId>org.nightlabs.jfire.servermanager</artifactId>
 			<scope>provided</scope>
 		</dependency>
@@ -72,6 +47,32 @@
 		<dependency>
 			<groupId>org.nightlabs</groupId>
 			<artifactId>org.nightlabs.config</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.nightlabs.jfire</groupId>
+			<artifactId>org.nightlabs.jfire.base</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.nightlabs.jfire</groupId>
+			<artifactId>org.nightlabs.jfire.base.bean</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.nightlabs.jfire</groupId>
+			<artifactId>org.nightlabs.jfire.base.clientlib</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.nightlabs.jfire</groupId>
+			<artifactId>org.nightlabs.jfire.reporting</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.nightlabs.jfire</groupId>
+			<artifactId>org.nightlabs.jfire.scripting</artifactId>
 			<scope>provided</scope>
 		</dependency>
 		

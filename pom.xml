@@ -91,7 +91,6 @@
 			<scope>provided</scope>
 		</dependency>
 		
-		
 		<dependency>
 			<groupId>org.apache.geronimo.specs</groupId>
 			<artifactId>geronimo-ejb_3.0_spec</artifactId>
@@ -136,13 +135,6 @@
 			<scope>provided</scope>
 		</dependency>
 		-->
-		<!-- 
-		<dependency>
-			<groupId>javax.jdo</groupId>
-			<artifactId>jdo-api</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		 -->
 	</dependencies>
 
 	<build>

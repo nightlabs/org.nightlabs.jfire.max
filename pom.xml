@@ -23,6 +23,7 @@
 		Sebl: ATM I do no see a repo with version 2.2.0. So trying this version. 
 		<birt.version>2.2.2</birt.version> </properties> -->
 	<properties>
+		<!-- As wished from fleque, I do this here -->
 		<birt.version>2.2.0</birt.version>
 	</properties>
 
@@ -67,31 +68,31 @@
 
 <!-- org.eclipse.birt.v2-2-0-mvnzd are libs that were uploaded to our artifactory by script; source was the birt-framework; -->
 		<dependency>
-			<groupId>org.eclipse.birt.v2-2-0-mvnzd</groupId>
+			<groupId>org.eclipse.birt.runtime.v2-2-0-mvnzd</groupId>
 			<artifactId>coreapi</artifactId>
 			<scope>provided</scope>
 			<version>${birt.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.eclipse.birt.v2-2-0-mvnzd</groupId>
+			<groupId>org.eclipse.birt.runtime.v2-2-0-mvnzd</groupId>
 			<artifactId>engineapi</artifactId>
 			<scope>provided</scope>
 			<version>${birt.version}</version> <!-- TODO move to parent pom -->
 		</dependency>
 		<dependency>
-			<groupId>org.eclipse.birt.v2-2-0-mvnzd</groupId>
+			<groupId>org.eclipse.birt.runtime.v2-2-0-mvnzd</groupId>
 			<artifactId>modelapi</artifactId>
 			<scope>provided</scope>
 			<version>${birt.version}</version> <!-- TODO move to parent pom -->
 		</dependency>
 		<dependency>
-			<groupId>org.eclipse.birt.v2-2-0-mvnzd</groupId>
+			<groupId>org.eclipse.birt.runtime.v2-2-0-mvnzd</groupId>
 			<artifactId>org.eclipse.datatools.connectivity.oda</artifactId>
 			<version>3.1.0</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.eclipse.birt.v2-2-0-mvnzd</groupId>
+			<groupId>org.eclipse.birt.runtime.v2-2-0-mvnzd</groupId>
 			<artifactId>icu</artifactId>
 			<version>3.6.1</version> <!--  Version taken from BIRT 2.2.0 (Sebl, 2011-09-26) -->
 		</dependency>

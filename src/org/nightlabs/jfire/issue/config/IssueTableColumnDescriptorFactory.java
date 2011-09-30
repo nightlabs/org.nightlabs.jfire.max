@@ -13,6 +13,7 @@ import org.nightlabs.i18n.MultiLanguagePropertiesBundle;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.issue.Issue;
 import org.nightlabs.jfire.issue.IssuePriority;
+import org.nightlabs.jfire.issue.IssueResolution;
 import org.nightlabs.jfire.issue.IssueSeverityType;
 import org.nightlabs.jfire.issue.IssueType;
 import org.nightlabs.jfire.issue.issuemarker.IssueMarker;
@@ -55,6 +56,7 @@ public final class IssueTableColumnDescriptorFactory
 		field2MultiLangPropBundleKey.put(Issue.FieldName.issuePriority, "org.nightlabs.jfire.issue.config.IssueTableConfigModule.tableColumn.priority.text");
 		field2MultiLangPropBundleKey.put(Issue.FieldName.state, "org.nightlabs.jfire.issue.config.IssueTableConfigModule.tableColumn.state.text");
 		field2MultiLangPropBundleKey.put(Issue.FieldName.deadlineTimestamp, "org.nightlabs.jfire.issue.config.IssueTableConfigModule.tableColumn.deadline.text");
+		field2MultiLangPropBundleKey.put(Issue.FieldName.issueResolution, "org.nightlabs.jfire.issue.config.IssueTableConfigModule.tableColumn.resolution.text");
 	}
 
 	// Descriptor's "columnWeight". Suggested DEFAULT values.
@@ -70,6 +72,7 @@ public final class IssueTableColumnDescriptorFactory
 		field2ColumnWeight.put(Issue.FieldName.issuePriority, 15);
 		field2ColumnWeight.put(Issue.FieldName.state, 15);
 		field2ColumnWeight.put(Issue.FieldName.deadlineTimestamp, 20);
+		field2ColumnWeight.put(Issue.FieldName.issueResolution, 15);
 	}
 
 	// Descriptor's "content-type".
@@ -85,6 +88,7 @@ public final class IssueTableColumnDescriptorFactory
 		field2ColumnContentProperty.put(Issue.FieldName.issuePriority, ColumnContentProperty.TEXT_ONLY);
 		field2ColumnContentProperty.put(Issue.FieldName.state, ColumnContentProperty.TEXT_ONLY);
 		field2ColumnContentProperty.put(Issue.FieldName.deadlineTimestamp, ColumnContentProperty.TEXT_ONLY);
+		field2ColumnContentProperty.put(Issue.FieldName.issueResolution, ColumnContentProperty.TEXT_ONLY);
 	}
 
 	// Descriptor's "column-fetchGroups".
@@ -117,6 +121,8 @@ public final class IssueTableColumnDescriptorFactory
 				State.FETCH_GROUP_STATE_DEFINITION,
 				StateDefinition.FETCH_GROUP_NAME});
 		field2ColumnFetchGroups.put(Issue.FieldName.deadlineTimestamp, new String[] {FetchPlan.DEFAULT});
+		field2ColumnFetchGroups.put(Issue.FieldName.issueResolution, new String[] {FetchPlan.DEFAULT, 
+				Issue.FETCH_GROUP_ISSUE_RESOLUTION, IssueResolution.FETCH_GROUP_NAME});
 	}
 
 	// Descriptor's "column fieldNames" (the current implementation has a one-to-one mapping, but in general, it is possible for one column to display more than one field)
@@ -132,6 +138,7 @@ public final class IssueTableColumnDescriptorFactory
 		field2ColumnFieldNames.put(Issue.FieldName.issuePriority, CollectionUtil.createHashSet(Issue.FieldName.issuePriority));
 		field2ColumnFieldNames.put(Issue.FieldName.state, CollectionUtil.createHashSet(Issue.FieldName.state));
 		field2ColumnFieldNames.put(Issue.FieldName.deadlineTimestamp, CollectionUtil.createHashSet(Issue.FieldName.deadlineTimestamp));
+		field2ColumnFieldNames.put(Issue.FieldName.issueResolution, CollectionUtil.createHashSet(Issue.FieldName.issueResolution));
 	}
 
 

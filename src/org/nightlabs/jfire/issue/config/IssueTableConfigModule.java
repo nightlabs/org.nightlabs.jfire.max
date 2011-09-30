@@ -73,7 +73,8 @@ public class IssueTableConfigModule extends ConfigModule implements IColumnConfi
 				Issue.FieldName.issueMarkers,
 				Issue.FieldName.issueSeverityType,
 				Issue.FieldName.issuePriority,
-				Issue.FieldName.state
+				Issue.FieldName.state,
+				Issue.FieldName.issueResolution
 			);
 	}
 

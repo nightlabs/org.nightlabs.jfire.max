@@ -83,7 +83,7 @@ public class ReportLayoutRendererRegistry {
 	 *		collection-type="map"
 	 *		key-type="java.lang.String"
 	 *		value-type="java.lang.String"
-	 *		table="JFireReporting_ReportRegistry_format2ReportRendererClassName"
+	 *		table="JFireReportingEngineBIRT_ReportLayoutRendererRegistry_format2ReportRendererClassName"
 	 *		null-value="exception"
 	 *
 	 * @jdo.join
@@ -91,7 +91,7 @@ public class ReportLayoutRendererRegistry {
 	@Join
 	@Persistent(
 		nullValue=NullValue.EXCEPTION,
-		table="JFireReportingBIRT_ReportRegistry_format2ReportRendererClassName",
+		table="JFireReportingEngineBIRT_ReportLayoutRendererRegistry_format2ReportRendererClassName",
 		persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Map<String, String> format2ReportRendererClassName;
 

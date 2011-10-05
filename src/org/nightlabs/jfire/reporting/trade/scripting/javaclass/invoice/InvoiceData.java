@@ -108,7 +108,8 @@ public class InvoiceData extends AbstractJFSScriptExecutorDelegate {
 			row.add(invoice.getInvoiceLocal().getAmountToPay());
 			row.add(invoice.getInvoiceLocal().isOutstanding());
 			row.add(invoice.getInvoiceLocal().isBooked());
-			row.add(JDOHelper.getObjectId(invoice.getInvoiceLocal().getBookUser()).toString());
+			Object objectId = JDOHelper.getObjectId(invoice.getInvoiceLocal().getBookUser());
+			row.add(objectId != null ? objectId.toString() : null);
 			row.add(invoice.getInvoiceLocal().getBookDT());
 			try {
 				buffer.addRecord(new Record(row));

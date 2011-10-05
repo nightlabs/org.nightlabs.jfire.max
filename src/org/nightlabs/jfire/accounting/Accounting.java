@@ -174,10 +174,10 @@ implements StoreCallback
 		
 		accounting.partnerAccountant = new Accountant(IDGenerator.getOrganisationID(), Accountant.PARTNER_ACCOUTANT_ID);
 		
-		AccountantDelegate localBookInvoiceAccountantDelegate = new LocalBookInvoiceAccountantDelegate(accounting.mandator, IDGenerator.nextIDString(AccountantDelegate.class)); 
+		AccountantDelegate localBookInvoiceAccountantDelegate = new LocalBookInvoiceAccountantDelegate(accounting.mandator); 
 		accounting.localAccountant.setAccountantDelegate(MoneyTransfer.class, localBookInvoiceAccountantDelegate);
 		
-		AccountantDelegate partnerBookInvoiceAccountantDelegate = new PartnerBookInvoiceAccountantDelegate(organisationID, IDGenerator.nextIDString(AccountantDelegate.class));
+		AccountantDelegate partnerBookInvoiceAccountantDelegate = new PartnerBookInvoiceAccountantDelegate(organisationID);
 		accounting.partnerAccountant.setAccountantDelegate(MoneyTransfer.class, partnerBookInvoiceAccountantDelegate);
 		
 		accounting = pm.makePersistent(accounting);

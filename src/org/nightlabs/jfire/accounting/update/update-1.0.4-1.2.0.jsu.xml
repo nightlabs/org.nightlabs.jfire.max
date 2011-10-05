@@ -18,12 +18,6 @@
 			newClassName="org.nightlabs.jfire.accounting.book.BookInvoiceMoneyTransfer"
 			newTableName="JFireTrade_BookInvoiceMoneyTransfer" />
 			
-		<ext:dnChangeClassName
-			className="org.nightlabs.jfire.accounting.pay.Payment.invoices"
-			newClassName="org.nightlabs.jfire.accounting.pay.Payment.payableObjects"
-			newTableName="JFireTrade_Payment_payableObjects" />
-			
-			
 		<ext:dnDropField className="org.nightlabs.jfire.accounting.priceconfig.PriceConfig" fieldName="primaryKey"/>
 		<ext:dnDropField className="org.nightlabs.jfire.accounting.Tariff" fieldName="primaryKey"/>
 		
@@ -55,7 +49,16 @@
 		<ext:dnDropClassTable className="org.nightlabs.jfire.accounting.book.LocalAccountant"/>
 		<ext:dnDropClassTable className="org.nightlabs.jfire.accounting.book.PartnerAccountant"/>
 		
+		<ext:dnChangeClassName
+			className="org.nightlabs.jfire.accounting.pay.Payment.invoices"
+			newClassName="org.nightlabs.jfire.accounting.pay.Payment.payableObjects"
+			newTableName="JFireTrade_Payment_payableObjects" />
 		
+		<ext:dnDropAllForeignKeyConstraints tableName="jfiretrade_payment_payableobjects"/>
+					
+		<ext:dnRenameColumn tableName="jfiretrade_payment_payableobjects" oldColumnName="invoice_id_eid" newColumnName="payable_objects_invoice_invoice_id_eid"/>
+		<ext:dnRenameColumn tableName="jfiretrade_payment_payableobjects" oldColumnName="organisation_id_eid" newColumnName="payable_objects_invoice_organisation_id_eid"/>
+		<ext:dnRenameColumn tableName="jfiretrade_payment_payableobjects" oldColumnName="invoice_idprefix_eid" newColumnName="payable_objects_invoice_invoice_idprefix_eid"/>
     </changeSet>
     
 </databaseChangeLog>

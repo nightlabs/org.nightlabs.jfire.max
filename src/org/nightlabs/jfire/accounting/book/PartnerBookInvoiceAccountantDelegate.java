@@ -84,8 +84,8 @@ public class PartnerBookInvoiceAccountantDelegate extends AccountantDelegate
 	protected PartnerBookInvoiceAccountantDelegate() {
 	}
 
-	public PartnerBookInvoiceAccountantDelegate(String organisationID, String accountantDelegateID) {
-		super(organisationID, accountantDelegateID);
+	public PartnerBookInvoiceAccountantDelegate(String organisationID) {
+		super(organisationID, "internal.partner.bookInvoice");
 	}
 
 	@Override

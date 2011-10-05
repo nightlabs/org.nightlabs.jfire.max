@@ -204,6 +204,8 @@ implements AccountingManagerRemote, AccountingManagerLocal
 			initRegisterConfigModules(pm);
 
 			BugfixWrongOutstandingFlag.fix(pm);
+			
+			UpdateTo12AccountantStructure.update(pm);
 
 			// check, whether the datastore is already initialized
 			try {

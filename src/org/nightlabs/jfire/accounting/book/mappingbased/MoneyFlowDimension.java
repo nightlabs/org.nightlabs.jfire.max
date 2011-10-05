@@ -26,6 +26,7 @@
 
 package org.nightlabs.jfire.accounting.book.mappingbased;
 
+import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 import javax.jdo.annotations.Column;
@@ -117,8 +118,12 @@ public abstract class MoneyFlowDimension {
 	 * @return The MoneyFlowDimension with for the given keys.
 	 */
 	public static MoneyFlowDimension getMoneyFlowDimension(PersistenceManager pm, String moneyFlowDimensionID) {
-		Query q = pm.newNamedQuery(MoneyFlowDimension.class, FETCH_GROUP_GET_MONEY_FLOW_DIMENSION);
-		return (MoneyFlowDimension)q.execute(moneyFlowDimensionID);
+		MoneyFlowDimensionID dimensionID = MoneyFlowDimensionID.create(moneyFlowDimensionID);
+		try {
+			return (MoneyFlowDimension) pm.getObjectById(dimensionID);
+		} catch (JDOObjectNotFoundException ex) {
+			return null;
+		}
 	}
 
 }

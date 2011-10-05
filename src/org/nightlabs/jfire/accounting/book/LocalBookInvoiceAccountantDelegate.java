@@ -75,8 +75,8 @@ public class LocalBookInvoiceAccountantDelegate extends AccountantDelegate
 	protected LocalBookInvoiceAccountantDelegate() {
 	}
 
-	public LocalBookInvoiceAccountantDelegate(OrganisationLegalEntity mandator, String accountantDelegateID) {
-		super(mandator.getOrganisationID(), accountantDelegateID);
+	public LocalBookInvoiceAccountantDelegate(OrganisationLegalEntity mandator) {
+		super(mandator.getOrganisationID(), "internal.local.bookInvoice");
 		this.mandator = mandator;
 	}
 

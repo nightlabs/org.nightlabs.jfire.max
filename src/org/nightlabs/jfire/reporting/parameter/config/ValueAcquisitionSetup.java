@@ -121,7 +121,6 @@ implements Serializable
 		dependentElement="true",
 		mappedBy="setup",
 		persistenceModifier=PersistenceModifier.PERSISTENT)
-
 	private List<AcquisitionParameterConfig> parameterConfigs;
 
 	/**

@@ -3,7 +3,6 @@
  */
 package org.nightlabs.jfire.reporting;
 
-import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -13,7 +12,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
@@ -700,8 +698,13 @@ public class ReportingInitialiser {
 			}
 
 			// (re-)create the use case
-			if (useCase == null)
-				useCase = new ReportParameterAcquisitionUseCase(setup, useCaseID);
+			if (useCase == null) {
+				pm.flush();
+				useCase = getPersistentUseCase(setup, useCaseID);
+				if (useCase == null) {
+					useCase = new ReportParameterAcquisitionUseCase(setup, useCaseID);
+				}
+			}
 			createElementName(useCaseNode, "name", useCase.getName(), useCaseID);
 			createElementName(useCaseNode, "description", useCase.getDescription(), useCaseID);
 
@@ -862,14 +865,15 @@ public class ReportingInitialiser {
 //			Object o = setup.getValueAcquisitionSetups().get(useCase);
 //			if (o != null) {
 //				setup.getValueAcquisitionSetups().remove(useCase);
-////				pm.deletePersistent(o);
+//				pm.deletePersistent(o);
+//				pm.deletePersistent(useCase);
 //			}
 //
 //			pm.flush();
-
-//			acquisitionSetup = pm.makePersistent(acquisitionSetup);
-			// TODO end JPOX workaround
-
+//
+////			acquisitionSetup = pm.makePersistent(acquisitionSetup);
+//			// TODO end JPOX workaround
+			
 			// make the usecase setup persistent
 			setup.addValueAcquisitionSetup(acquisitionSetup);
 
@@ -904,8 +908,14 @@ public class ReportingInitialiser {
 		if (setup.getDefaultSetup() != null &&
 			setup.getDefaultSetup().getUseCase() != null &&
 			setup.getDefaultSetup().getUseCase().getReportParameterAcquisitionUseCaseID().equals(useCaseID)
-		)
+		) {
 			return setup.getDefaultSetup().getUseCase();
+		}
+		return getPersistentUseCase(setup, useCaseID);
+	}
+
+	private ReportParameterAcquisitionUseCase getPersistentUseCase(
+			ReportParameterAcquisitionSetup setup, String useCaseID) {
 		ReportParameterAcquisitionUseCaseID id = ReportParameterAcquisitionUseCaseID.create(setup.getOrganisationID(), setup.getReportParameterAcquisitionSetupID(), useCaseID);
 		ReportParameterAcquisitionUseCase useCase = null;
 		try {

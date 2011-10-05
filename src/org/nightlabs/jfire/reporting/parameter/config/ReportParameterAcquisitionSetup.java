@@ -11,23 +11,21 @@ import java.util.Map;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Key;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.Queries;
+import javax.jdo.listener.DeleteCallback;
 
 import org.nightlabs.jfire.reporting.layout.ReportLayout;
 import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
-
-import javax.jdo.annotations.Persistent;
-import javax.jdo.annotations.Key;
-import javax.jdo.annotations.Value;
-import javax.jdo.annotations.FetchGroups;
-import javax.jdo.annotations.Queries;
-import javax.jdo.annotations.PrimaryKey;
-import javax.jdo.annotations.FetchGroup;
 import org.nightlabs.jfire.reporting.parameter.config.id.ReportParameterAcquisitionSetupID;
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.Column;
-import javax.jdo.annotations.IdentityType;
-import javax.jdo.annotations.PersistenceModifier;
-import javax.jdo.listener.DeleteCallback;
 
 /**
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
@@ -141,8 +139,6 @@ implements Serializable, DeleteCallback
 		mappedBy="parameterAcquisitionSetup",
 		persistenceModifier=PersistenceModifier.PERSISTENT)
 	@Key(mappedBy="useCase")
-	@Value(dependent="true")
-
 	private Map<ReportParameterAcquisitionUseCase, ValueAcquisitionSetup> valueAcquisitionSetups;
 	
 
@@ -227,6 +223,13 @@ implements Serializable, DeleteCallback
 
 	public void addValueAcquisitionSetup(ValueAcquisitionSetup valueAcquisitionSetup)
 	{
+//		// TODO JPOX WORKAROUND : To directly put the new acquisitionSetup causes a duplicate key exception
+		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
+		if (pm != null && valueAcquisitionSetups.containsKey(valueAcquisitionSetup.getUseCase())) {
+			valueAcquisitionSetups.remove(valueAcquisitionSetup.getUseCase());
+			pm.flush();
+		}
+		// TODO end JPOX workaround
 		valueAcquisitionSetups.put(valueAcquisitionSetup.getUseCase(), valueAcquisitionSetup);
 	}
 
@@ -238,21 +241,15 @@ implements Serializable, DeleteCallback
 	{
 		assert useCase != null;
 
-		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
-
-		if (useCase.equals(defaultUseCase)) {
-			// TODO we should set the next available use-case as default
-			defaultUseCase = null;
-			if (pm != null)
-				pm.flush();
-		}
-		valueAcquisitionSetups.remove(useCase);
-//		ValueAcquisitionSetup setup = valueAcquisitionSetups.remove(useCase);
-//		if (pm != null) {
-//			pm.deletePersistent(setup);
-//			pm.deletePersistent(useCase);
-//			pm.flush();
+//		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
+//
+//		if (useCase.equals(defaultUseCase)) {
+//			// TODO we should set the next available use-case as default
+//			defaultUseCase = null;
+//			if (pm != null)
+//				pm.flush();
 //		}
+		valueAcquisitionSetups.remove(useCase);
 	}
 	
 	@Override

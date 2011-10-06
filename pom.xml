@@ -2,8 +2,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	
-	<!-- @generated - Auto generated POM. Remove this marker after review. -->
-	
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.nightlabs.jfire</groupId>
 	<artifactId>org.nightlabs.jfire.reporting.oda.wrapper</artifactId>
@@ -19,8 +17,19 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>org.eclipse.XXX</groupId>
+			<groupId>${birt-runtime.group}</groupId>
 			<artifactId>org.eclipse.datatools.connectivity.oda</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>${birt-runtime.group}</groupId>
+			<artifactId>com.ibm.icu</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.nightlabs.jfire</groupId>
+			<artifactId>org.nightlabs.jfire.base.bean</artifactId>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -32,7 +41,7 @@
 			<groupId>org.nightlabs.jfire</groupId>
 			<artifactId>org.nightlabs.jfire.reporting</artifactId>
 			<scope>provided</scope>
-		</dependency>		
+		</dependency>
 	</dependencies>
 
 	<build>

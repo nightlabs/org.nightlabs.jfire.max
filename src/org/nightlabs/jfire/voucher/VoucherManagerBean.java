@@ -132,7 +132,6 @@ public class VoucherManagerBean
 extends BaseSessionBeanImpl
 implements VoucherManagerRemote
 {
-	private static final long serialVersionUID = 1L;
 	private static final Logger logger = Logger.getLogger(VoucherManagerBean.class);
 
 	/* (non-Javadoc)
@@ -396,7 +395,7 @@ implements VoucherManagerRemote
 		try {
 			final Query q = pm.newQuery(VoucherPriceConfig.class);
 			q.setResult("JDOHelper.getObjectId(this)");
-			return new HashSet<PriceConfigID>((Collection) q.execute());
+			return new HashSet<PriceConfigID>((Collection<PriceConfigID>) q.execute());
 		} finally {
 			pm.close();
 		}
@@ -471,13 +470,13 @@ implements VoucherManagerRemote
 				voucherType = pm.makePersistent(voucherType);
 			} else {
 				voucherType = (VoucherType) Store.getStore(pm).addProductType(User.getUser(pm, getPrincipal()), voucherType);
-			}
 
-			if (JFireBaseEAR.JPOX_WORKAROUND_FLUSH_ENABLED) { // TODO JPOX WORKAROUND
-				pm.flush();
-				final ProductTypeID vtid = (ProductTypeID) JDOHelper.getObjectId(voucherType);
-				pm.evictAll();
-				voucherType = (VoucherType) pm.getObjectById(vtid);
+				if (JFireBaseEAR.JPOX_WORKAROUND_FLUSH_ENABLED) { // TODO JPOX WORKAROUND
+					pm.flush();
+					final ProductTypeID vtid = (ProductTypeID) JDOHelper.getObjectId(voucherType);
+					pm.evictAll();
+					voucherType = (VoucherType) pm.getObjectById(vtid);
+				}
 			}
 
 			if (voucherType.isConfirmed()) {
@@ -710,6 +709,7 @@ implements VoucherManagerRemote
 	 * @ejb.permission role-name="org.nightlabs.jfire.accounting.queryLocalAccountantDelegates"
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
+	@SuppressWarnings("unchecked")
 	@RolesAllowed("org.nightlabs.jfire.accounting.queryLocalAccountantDelegates")
 	public Set<LocalAccountantDelegateID> getVoucherLocalAccountantDelegateIDs() {
 		final PersistenceManager pm = createPersistenceManager();
@@ -813,6 +813,7 @@ implements VoucherManagerRemote
 	// TODO we need to pass ArticleIDs instead of ProductIDs, because products can be resold
 	// after having been reversed and we should be able to print duplicates at any time with
 	// the correct data.
+	@SuppressWarnings("unchecked")
 	protected Map<ProductID, Map<ScriptRegistryItemID, Object>> getVoucherScriptingResults(
 			PersistenceManager pm, final Collection<ProductID> voucherIDs,
 			boolean allScripts)
@@ -1248,6 +1249,7 @@ implements VoucherManagerRemote
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="org.nightlabs.jfire.voucher.editVoucherLayout"
 	 */
+	@SuppressWarnings("unchecked")
 	@RolesAllowed("org.nightlabs.jfire.voucher.editVoucherLayout")
 	public Set<VoucherLayoutID> getAllVoucherLayoutIds() {
 		final PersistenceManager pm = createPersistenceManager();

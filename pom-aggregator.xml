@@ -70,7 +70,9 @@
 		<module>../org.nightlabs.jfire.reporting.oda.client</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.reporting.oda.client -->
 		<module>../org.nightlabs.jfire.reporting.oda.wrapper</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.reporting.oda.wrapper -->
 		<!-- requires trade <module>../JFireReportingTrade</module> --> <!-- org.nightlabs.jfire:org.nightlabs.jfire.reporting.trade -->
-		<!-- requires nl-rhino <module>../JFireScripting</module> --> <!-- org.nightlabs.jfire:org.nightlabs.jfire.scripting -->
+		<module>../JFireScripting</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.scripting -->
+		<module>../JFireScriptingEAR</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.scripting.ear -->
+		
 		<!-- requires scripting <module>../JFireScriptingEditor2D</module> --> <!-- org.nightlabs.jfire:org.nightlabs.jfire.scripting.editor2d -->
 		
 		<module>../JFireTrade</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.trade -->

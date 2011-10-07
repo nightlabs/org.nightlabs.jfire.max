@@ -64,11 +64,11 @@
 		<module>../JFirePersonRelationIssueTrackingEAR</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.personrelation.issuetracking.ear -->
 		
 		
-		<!-- requires scripting <module>../JFireReporting</module> --> <!-- org.nightlabs.jfire:org.nightlabs.jfire.reporting -->
-		<!-- TODO has eclipse dependencies <module>../org.nightlabs.jfire.reporting.birt</module> --> <!-- org.nightlabs.jfire:org.nightlabs.jfire.reporting.birt -->
-		<!-- requires a lot <module>../JFireReportingEngineBirt</module> --> <!-- org.nightlabs.jfire:org.nightlabs.jfire.reporting.engine.birt -->
-		<!-- TODO has eclipse dependencies <module>../org.nightlabs.jfire.reporting.oda.client</module> --> <!-- org.nightlabs.jfire:org.nightlabs.jfire.reporting.oda.client -->
-		<!-- TODO has eclipse dependencies <module>../org.nightlabs.jfire.reporting.oda.wrapper</module> --> <!-- org.nightlabs.jfire:org.nightlabs.jfire.reporting.oda.wrapper -->
+		<module>../JFireReporting</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.reporting -->
+		<module>../org.nightlabs.jfire.reporting.birt</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.reporting.birt -->
+		<module>../JFireReportingEngineBirt</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.reporting.engine.birt -->
+		<module>../org.nightlabs.jfire.reporting.oda.client</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.reporting.oda.client -->
+		<module>../org.nightlabs.jfire.reporting.oda.wrapper</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.reporting.oda.wrapper -->
 		<!-- requires trade <module>../JFireReportingTrade</module> --> <!-- org.nightlabs.jfire:org.nightlabs.jfire.reporting.trade -->
 		<!-- requires nl-rhino <module>../JFireScripting</module> --> <!-- org.nightlabs.jfire:org.nightlabs.jfire.scripting -->
 		<!-- requires scripting <module>../JFireScriptingEditor2D</module> --> <!-- org.nightlabs.jfire:org.nightlabs.jfire.scripting.editor2d -->

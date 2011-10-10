@@ -24,19 +24,20 @@ class UpdateTo12AccountantStructure {
 			
 			ModuleMetaData moduleMetaData = ModuleMetaData.getModuleMetaData(pm, JFireTradeEAR.MODULE_NAME);
 			
-			if (moduleMetaData.getSchemaVersionObj().equals(new org.nightlabs.version.Version(1, 2, 0, 0))) {
-				
-				Accounting accounting = Accounting.getAccounting(pm);
-				if (accounting.getLocalAccountant().getAccountantDelegate(MoneyTransfer.class) == null) {
-					accounting.getLocalAccountant().setAccountantDelegate(MoneyTransfer.class, new LocalBookInvoiceAccountantDelegate(accounting.getMandator()));
+			if (moduleMetaData != null) {
+				if (moduleMetaData.getSchemaVersionObj().equals(new org.nightlabs.version.Version(1, 2, 0, 0))) {
+					
+					Accounting accounting = Accounting.getAccounting(pm);
+					if (accounting.getLocalAccountant().getAccountantDelegate(MoneyTransfer.class) == null) {
+						accounting.getLocalAccountant().setAccountantDelegate(MoneyTransfer.class, new LocalBookInvoiceAccountantDelegate(accounting.getMandator()));
+					}
+					
+					if (accounting.getPartnerAccountant().getAccountantDelegate(MoneyTransfer.class) == null) {
+						accounting.getPartnerAccountant().setAccountantDelegate(MoneyTransfer.class, new PartnerBookInvoiceAccountantDelegate(accounting.getOrganisationID()));
+					}
 				}
-				
-				if (accounting.getPartnerAccountant().getAccountantDelegate(MoneyTransfer.class) == null) {
-					accounting.getPartnerAccountant().setAccountantDelegate(MoneyTransfer.class, new PartnerBookInvoiceAccountantDelegate(accounting.getOrganisationID()));
-				}
-			}
-			
-			UpdateHistoryItem.updateDone(handle);			
+				UpdateHistoryItem.updateDone(handle);
+			}			
 		}
 	}
 

@@ -69,4 +69,44 @@ implements Serializable
 	{
 		return productTypeID;
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime
+				* result
+				+ ((causeProductTypeID == null) ? 0 : causeProductTypeID
+						.hashCode());
+		result = prime * result
+				+ ((causeType == null) ? 0 : causeType.hashCode());
+		result = prime * result
+				+ ((productTypeID == null) ? 0 : productTypeID.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		AffectedProductType other = (AffectedProductType) obj;
+		if (causeProductTypeID == null) {
+			if (other.causeProductTypeID != null)
+				return false;
+		} else if (!causeProductTypeID.equals(other.causeProductTypeID))
+			return false;
+		if (causeType != other.causeType)
+			return false;
+		if (productTypeID == null) {
+			if (other.productTypeID != null)
+				return false;
+		} else if (!productTypeID.equals(other.productTypeID))
+			return false;
+		return true;
+	}
+	
 }

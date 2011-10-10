@@ -110,16 +110,16 @@ public class PriceConfigUtil
 		if (!packageArticlePrice.getNestedArticlePrices().isEmpty())
 			throw new IllegalStateException("The ArticlePrice " + packageArticlePrice.getPrimaryKey() + " does already have nested prices!");
 
-		LinkedList priceConfigStack = new LinkedList();
-		LinkedList articlePriceStack = new LinkedList();
-		LinkedList nestedProductTypeStack = new LinkedList();
-		LinkedList productStack = new LinkedList();
+		LinkedList<IPriceConfig> priceConfigStack = new LinkedList<IPriceConfig>();
+		LinkedList<ArticlePrice> articlePriceStack = new LinkedList<ArticlePrice>();
+		LinkedList<NestedProductTypeLocal> nestedProductTypeStack = new LinkedList<NestedProductTypeLocal>();
+		LinkedList<Product> productStack = new LinkedList<Product>();
 
 		ProductType productType = article.getProductType();
 		Product product = article.getProduct();
 		if (product != null) {
-			for (Iterator it = product.getProductLocal().getNestedProductLocals(true).iterator(); it.hasNext(); ) {
-				ProductLocal nestedProductLocal = (ProductLocal) it.next();
+			for (Iterator<ProductLocal> it = product.getProductLocal().getNestedProductLocals(true).iterator(); it.hasNext(); ) {
+				ProductLocal nestedProductLocal = it.next();
 				Product nestedProduct = nestedProductLocal.getProduct();
 				NestedProductTypeLocal nestedProductTypeLocal = productType.getProductTypeLocal().getNestedProductTypeLocal(nestedProduct.getProductType().getPrimaryKey(), true);
 				ProductType innerProductType = nestedProductTypeLocal.getInnerProductTypeLocal().getProductType();
@@ -214,13 +214,13 @@ public class PriceConfigUtil
 			IPackagePriceConfig topLevelPriceConfig,
 			IPriceConfig priceConfig,
 			Article article,
-			LinkedList priceConfigStack,
+			LinkedList<IPriceConfig> priceConfigStack,
 			ArticlePrice topLevelArticlePrice, ArticlePrice nextLevelArticlePrice,
-			LinkedList articlePriceStack,
+			LinkedList<ArticlePrice> articlePriceStack,
 			NestedProductTypeLocal nestedProductTypeLocal,
-			LinkedList nestedProductTypeStack,
+			LinkedList<NestedProductTypeLocal> nestedProductTypeStack,
 			Product nestedProduct,
-			LinkedList productStack,
+			LinkedList<Product> productStack,
 			Price origPrice)
 	{
 		boolean inner = nestedProduct.getPrimaryKey().equals(nextLevelArticlePrice.getProduct().getPrimaryKey());
@@ -259,8 +259,8 @@ public class PriceConfigUtil
 				productStack.addFirst(nestedProduct);
 				try {
 
-					for (Iterator it = nestedProduct.getProductLocal().getNestedProductLocals(true).iterator(); it.hasNext(); ) {
-						ProductLocal innerProductLocal = (ProductLocal) it.next();
+					for (Iterator<ProductLocal> it = nestedProduct.getProductLocal().getNestedProductLocals(true).iterator(); it.hasNext(); ) {
+						ProductLocal innerProductLocal = it.next();
 						NestedProductTypeLocal innerNestedProductType = productType.getProductTypeLocal().getNestedProductTypeLocal(
 								nestedProduct.getProductType().getPrimaryKey(), true);
 						ProductType innerProductType = innerNestedProductType.getInnerProductTypeLocal().getProductType();
@@ -297,11 +297,11 @@ public class PriceConfigUtil
 			IPackagePriceConfig topLevelPriceConfig,
 			IPriceConfig priceConfig,
 			Article article,
-			LinkedList priceConfigStack,
+			LinkedList<IPriceConfig> priceConfigStack,
 			ArticlePrice topLevelArticlePrice, ArticlePrice nextLevelArticlePrice,
-			LinkedList articlePriceStack,
+			LinkedList<ArticlePrice> articlePriceStack,
 			NestedProductTypeLocal nestedProductTypeLocal,
-			LinkedList nestedProductTypeStack,
+			LinkedList<NestedProductTypeLocal> nestedProductTypeStack,
 			Price origPrice)
 	{
 		boolean inner = nestedProductTypeLocal.getInnerProductTypeLocal().getPrimaryKey().equals(nextLevelArticlePrice.getProductType().getPrimaryKey());
@@ -417,15 +417,21 @@ public class PriceConfigUtil
 	private static void populateAffectedProductTypeListWithProductTypesNestingThis(List<AffectedProductType> affectedProductTypes, PersistenceManager pm, ProductType productType)
 	{
 		Collection<ProductType> productTypes = ProductType.getProductTypesNestingThis(pm, productType);
-		ArrayList<AffectedProductType> res = new ArrayList<AffectedProductType>(productTypes.size());
+//		ArrayList<AffectedProductType> res = new ArrayList<AffectedProductType>(productTypes.size());
 		for (ProductType pt : productTypes) {
-			res.add(new AffectedProductType(
+			AffectedProductType affectedProductType = new AffectedProductType(
 					(ProductTypeID) JDOHelper.getObjectId(productType),
 					AffectedProductType.CauseType.NESTED,
-					(ProductTypeID) JDOHelper.getObjectId(pt)));
-
-//			populateAffectedProductTypeListWithSiblings(affectedProductTypes, pt);
-			populateAffectedProductTypeListWithProductTypesNestingThis(affectedProductTypes, pm, pt);
+					(ProductTypeID) JDOHelper.getObjectId(pt));
+			
+			if (affectedProductTypes.contains(affectedProductType)){
+				continue;
+			}else{
+				affectedProductTypes.add(affectedProductType);
+				
+	//			populateAffectedProductTypeListWithSiblings(affectedProductTypes, pt);
+				populateAffectedProductTypeListWithProductTypesNestingThis(affectedProductTypes, pm, pt);
+			}
 		}
 //		ArrayList<AffectedProductType> res = new ArrayList<AffectedProductType>();
 //		for (ProductType pt : (Collection<ProductType>)q.execute(productType)) {
@@ -439,6 +445,7 @@ public class PriceConfigUtil
 	 * is changed. This means both, ProductTypes that use the given priceConfig (see {@link ProductType#getInnerPriceConfig()}
 	 * and {@link ProductType#getPackagePriceConfig()}) and those that package the directly affected ProductTypes.
 	 */
+	@SuppressWarnings("unchecked")
 	public static ArrayList<AffectedProductType> getAffectedProductTypes(PersistenceManager pm, IPriceConfig priceConfig)
 	{
 		ArrayList<AffectedProductType> res = new ArrayList<AffectedProductType>();
@@ -460,14 +467,14 @@ public class PriceConfigUtil
 		return res;
 	}
 
-	/**
-	 * @return The returned Map&lt;PriceConfigID, List&lt;AffectedProductType&gt;&gt; indicates which modified
-	 *		price config would result in which products to have their prices recalculated.
-	 */
-	private static Map<PriceConfigID, List<AffectedProductType>> getAffectedProductTypes(PersistenceManager pm, Set<PriceConfigID> priceConfigIDs)
-	{
-		return getAffectedProductTypes(pm, priceConfigIDs, null, null);
-	}
+//	/**
+//	 * @return The returned Map&lt;PriceConfigID, List&lt;AffectedProductType&gt;&gt; indicates which modified
+//	 *		price config would result in which products to have their prices recalculated.
+//	 */
+//	private static Map<PriceConfigID, List<AffectedProductType>> getAffectedProductTypes(PersistenceManager pm, Set<PriceConfigID> priceConfigIDs)
+//	{
+//		return getAffectedProductTypes(pm, priceConfigIDs, null, null);
+//	}
 
 	// TODO continue with this: the currently assigned innerPriceConfig should be handled as if it was NOT assigned and the given
 	// new one (innerPriceConfigID) should instead be taken into account!

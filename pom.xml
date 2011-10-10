@@ -3,7 +3,7 @@
 	
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.nightlabs.jfire</groupId>
-	<artifactId>Jorg.nightlabs.jfire.scripting.editor2d.ear</artifactId>
+	<artifactId>org.nightlabs.jfire.scripting.editor2d.ear</artifactId>
 	<version>1.2.0-SNAPSHOT</version>
 	<packaging>ear</packaging>
 	<name>${project.artifactId}</name>

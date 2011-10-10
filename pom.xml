@@ -61,11 +61,6 @@
 		</dependency>
 		
 		<dependency>
-			<groupId>org.apache.servicemix.bundles</groupId>
-			<artifactId>org.apache.servicemix.bundles.xerces</artifactId>
-			<scope>provided</scope>
-		</dependency>	
-		<dependency>
 			<groupId>org.nightlabs.jfire</groupId>
 			<artifactId>org.nightlabs.jfire.base</artifactId>
 			<scope>provided</scope>
@@ -99,13 +94,16 @@
 		<dependency>
 		    <groupId>org.apache.geronimo.specs</groupId>
 		    <artifactId>geronimo-annotation_1.1_spec</artifactId>
-		    <!-- FIXME add to dependency-management -->
-		    <version>1.0.1</version>
 		    <scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.geronimo.specs</groupId>
 			<artifactId>geronimo-javamail_1.4_spec</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.servicemix.bundles</groupId>
+			<artifactId>org.apache.servicemix.bundles.xerces</artifactId>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>

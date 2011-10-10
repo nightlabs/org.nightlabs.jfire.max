@@ -79,12 +79,9 @@
 		</dependency>
 		
 		<dependency>
-		<!-- TODO think about changeing to artifact "org.apache.servicemix.bundles:org.apache.servicemix.bundles.xstream:1.3_5 (Sebl) -->
-			<groupId>com.thoughtworks.xstream</groupId>
-			<artifactId>xstream</artifactId>
+			<groupId>org.apache.servicemix.bundles</groupId>
+			<artifactId>org.apache.servicemix.bundles.xstream</artifactId>
 			<scope>provided</scope>
-			<!-- <version>1.2.0</version> TODO move version to parent pom -->
-			<version>1.2</version> <!-- did not find version 1.2.0 (Sebl) -->
 		</dependency>
 		
 		<dependency>

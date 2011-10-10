@@ -72,8 +72,8 @@
 		<module>../JFireReportingTradeEAR</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.reporting.trade.ear -->
 		<module>../JFireScripting</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.scripting -->
 		<module>../JFireScriptingEAR</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.scripting.ear -->
-		<module>../JFireScriptingEditor2D</module> --> <!-- org.nightlabs.jfire:org.nightlabs.jfire.scripting.editor2d -->
-		<module>../JFireScriptingEditor2DEAR</module> --> <!-- org.nightlabs.jfire:org.nightlabs.jfire.scripting.editor2d.ear -->
+		<module>../JFireScriptingEditor2D</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.scripting.editor2d -->
+		<module>../JFireScriptingEditor2DEAR</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.scripting.editor2d.ear -->
 		<module>../JFireTrade</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.trade -->
 		<module>../JFireTradeEAR</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.trade.ear -->
 		<module>../JFireSimpleTrade</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.simpletrade -->

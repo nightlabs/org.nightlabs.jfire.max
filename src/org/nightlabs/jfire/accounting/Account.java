@@ -441,7 +441,7 @@ implements AttachCallback
 	//			}
 
 				SummaryMoneyTransfer summaryMoneyTransfer = new SummaryMoneyTransfer(
-						(InvoiceMoneyTransfer)(moneyTransfer.getContainer() == null ? moneyTransfer : moneyTransfer.getContainer()),
+						(MoneyTransfer)(moneyTransfer.getContainer() == null ? moneyTransfer : moneyTransfer.getContainer()),
 	//					from, to,
 						(isDebit) ? summaryAccount : this,
 						(isDebit) ? this : summaryAccount,

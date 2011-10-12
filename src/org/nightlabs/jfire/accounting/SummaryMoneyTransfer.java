@@ -66,7 +66,7 @@ public class SummaryMoneyTransfer extends MoneyTransfer
 	 * @param currency
 	 * @param amount
 	 */
-	public SummaryMoneyTransfer(InvoiceMoneyTransfer container, Account from, Account to, long amount)
+	public SummaryMoneyTransfer(MoneyTransfer container, Account from, Account to, long amount)
 	{
 		super(container, // container.getInitiator(),
 					from, to, // container.getInvoice(),

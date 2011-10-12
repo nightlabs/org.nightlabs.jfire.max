@@ -21,6 +21,7 @@
 	</distributionManagement>
 
 	<modules>
+		<!-- ##### Backend-projects of jfire-MAX ##### -->
 		<module>../JFireAsterisk</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.asterisk -->
 		<module>../JFireAsteriskEAR</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.asterisk.ear -->
 		
@@ -64,25 +65,26 @@
 		<module>../JFirePersonRelationIssueTrackingEAR</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.personrelation.issuetracking.ear -->
 		
 		<module>../JFireReporting</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.reporting -->
-		<module>../org.nightlabs.jfire.reporting.birt</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.reporting.birt -->
 		<module>../JFireReportingEngineBirt</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.reporting.engine.birt -->
-		<module>../org.nightlabs.jfire.reporting.oda.client</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.reporting.oda.client -->
-		<module>../org.nightlabs.jfire.reporting.oda.wrapper</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.reporting.oda.wrapper -->
+		<module>../JFireReportingEngineBirtEAR</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.reporting.engine.birt.ear -->
 		<module>../JFireReportingTrade</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.reporting.trade -->
 		<module>../JFireReportingTradeEAR</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.reporting.trade.ear -->
 		<module>../JFireScripting</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.scripting -->
 		<module>../JFireScriptingEAR</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.scripting.ear -->
 		<module>../JFireScriptingEditor2D</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.scripting.editor2d -->
 		<module>../JFireScriptingEditor2DEAR</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.scripting.editor2d.ear -->
-		<module>../JFireTrade</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.trade -->
-		<module>../JFireTradeEAR</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.trade.ear -->
 		<module>../JFireSimpleTrade</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.simpletrade -->
 		<module>../JFireSimpleTradeEAR</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.simpletrade.ear -->
+		<module>../JFireTrade</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.trade -->
+		<module>../JFireTradeEAR</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.trade.ear -->
+		
+		<module>../org.nightlabs.jfire.entityuserset</module>
+		<module>../org.nightlabs.jfire.reporting.birt</module>
+		<module>../org.nightlabs.jfire.reporting.oda.wrapper</module>
+		<module>../org.nightlabs.jfire.trade.editor2d</module>
 		
 		<!-- generics compile error with javac <module>../JFireTestSuiteDepartment</module> --> <!-- org.nightlabs.jfire:org.nightlabs.jfire.testsuite.department -->
 		<!-- generics compile error with javac <module>../JFireTestSuiteIssueTracking</module> --> <!-- org.nightlabs.jfire:org.nightlabs.jfire.testsuite.issuetracking -->
-		<module>../org.nightlabs.jfire.trade.editor2d</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.trade.editor2d -->
-		<module>../org.nightlabs.editor2d</module> <!-- org.nightlabs.jfire:org.nightlabs.editor2d -->
 		<!-- requires trade <module>../JFireVoucher</module> --> <!-- org.nightlabs.jfire:org.nightlabs.jfire.voucher -->
 		<!-- requires trade <module>../JFireVoucherEditor2D</module> --> <!-- org.nightlabs.jfire:org.nightlabs.jfire.voucher.editor2d.iofilter -->
 		

@@ -78,7 +78,6 @@
 		<module>../JFireTrade</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.trade -->
 		<module>../JFireTradeEAR</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.trade.ear -->
 		
-		<module>../org.nightlabs.jfire.entityuserset</module>
 		<module>../org.nightlabs.jfire.reporting.birt</module>
 		<module>../org.nightlabs.jfire.reporting.oda.wrapper</module>
 		<module>../org.nightlabs.jfire.trade.editor2d</module>

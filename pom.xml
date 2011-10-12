@@ -63,12 +63,12 @@
 			<artifactId>org.nightlabs.jfire.scripting</artifactId>
 			<scope>provided</scope>
 		</dependency>
-
 		<dependency>
 			<groupId>org.nightlabs.jfire</groupId>
 			<artifactId>org.nightlabs.jfire.reporting.oda.wrapper</artifactId>
 			<scope>provided</scope>
 		</dependency>
+		
 		<dependency>
 			<groupId>org.nightlabs.jfire.eclipse</groupId>
 			<artifactId>org.nightlabs.jfire.base.login.ui</artifactId>

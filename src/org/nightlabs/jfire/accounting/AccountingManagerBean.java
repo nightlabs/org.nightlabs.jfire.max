@@ -1165,8 +1165,10 @@ implements AccountingManagerRemote, AccountingManagerLocal
 				}
 				for (final Iterator<Offer> it = offers.iterator(); it.hasNext(); ) {
 					final Offer offer = it.next();
-					trader.validateOffer(offer);
-					trader.acceptOfferImplicitely(offer);
+					if (!offer.isAborted()) {
+						trader.validateOffer(offer);
+						trader.acceptOfferImplicitely(offer);
+					}
 //					trader.finalizeOffer(user, offer);
 //					trader.acceptOffer(user, offerLocal);
 //					trader.confirmOffer(user, offerLocal);

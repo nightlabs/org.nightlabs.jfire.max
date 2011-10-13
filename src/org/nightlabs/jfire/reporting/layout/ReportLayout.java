@@ -37,6 +37,7 @@ import java.util.Date;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.InflaterInputStream;
 
+import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.annotations.Column;
 import javax.jdo.annotations.FetchGroup;
@@ -50,7 +51,9 @@ import javax.jdo.annotations.Persistent;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.io.DataBuffer;
-import org.nightlabs.util.Util;
+import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
+import org.nightlabs.jfire.reporting.scheduled.ScheduledReport;
+import org.nightlabs.util.IOUtil;
 
 
 /**
@@ -189,7 +192,7 @@ public class ReportLayout extends ReportRegistryItem{
 			DataBuffer db = new DataBuffer((long) (length * 0.6));
 			OutputStream out = new DeflaterOutputStream(db.createOutputStream());
 			try {
-				Util.transferStreamData(in, out);
+				IOUtil.transferStreamData(in, out);
 			} finally {
 				out.close();
 			}
@@ -266,5 +269,9 @@ public class ReportLayout extends ReportRegistryItem{
 		Collection<ReportLayoutLocalisationData> bundle = ReportLayoutLocalisationData.getReportLayoutLocalisationBundle(pm, this);
 		if(bundle != null && !bundle.isEmpty())
 			pm.deletePersistentAll(bundle);
+		
+		Collection<ScheduledReport> scheduledReports = ScheduledReport.getScheduledReportsByReportLayoutID(pm, (ReportRegistryItemID) JDOHelper.getObjectId(this));
+		if (scheduledReports != null && !scheduledReports.isEmpty())
+			pm.deletePersistentAll(scheduledReports);
 	}
 }

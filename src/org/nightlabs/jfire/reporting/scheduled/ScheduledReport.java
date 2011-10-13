@@ -7,6 +7,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.zip.DeflaterOutputStream;
@@ -27,6 +28,7 @@ import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.PersistenceModifier;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.Queries;
 import javax.jdo.annotations.Version;
 import javax.jdo.annotations.VersionStrategy;
 import javax.jdo.listener.AttachCallback;
@@ -37,7 +39,7 @@ import org.nightlabs.jfire.reporting.layout.ReportLayout;
 import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
 import org.nightlabs.jfire.reporting.layout.render.RenderReportRequest;
 import org.nightlabs.jfire.reporting.scheduled.id.ScheduledReportID;
-import org.nightlabs.jfire.security.SecurityReflector;
+import org.nightlabs.jfire.security.GlobalSecurityReflector;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.security.id.UserID;
 import org.nightlabs.jfire.timer.Task;
@@ -81,6 +83,16 @@ import com.thoughtworks.xstream.io.xml.XppDriver;
 			name=ScheduledReport.FETCH_GROUP_DELIVERY_DELEGATE,
 			members=@Persistent(name=ScheduledReport.FieldName.deliveryDelegate))
 })
+@Queries({
+	@javax.jdo.annotations.Query(
+			name="ScheduledReport.getScheduledReportIDsByUserID",
+			value="SELECT JDOHelper.getObjectId(this) WHERE JDOHelper.getObjectId(this.user) == :userID ORDER BY JDOHelper.getObjectId(this) ASCENDING"
+			),
+	@javax.jdo.annotations.Query(
+			name="ScheduledReport.getScheduledReportsByReportLayoutID",
+			value="SELECT WHERE JDOHelper.getObjectId(this.reportLayout) == :reportLayoutID ORDER BY JDOHelper.getObjectId(this) ASCENDING"
+			)
+	})
 @Discriminator(strategy=DiscriminatorStrategy.CLASS_NAME)
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class ScheduledReport implements Serializable, DetachCallback, AttachCallback {
@@ -121,6 +133,46 @@ public class ScheduledReport implements Serializable, DetachCallback, AttachCall
 	 * fetch-group to be edited correctly.
 	 */
 	public static final String FETCH_GROUP_DELIVERY_DELEGATE_FULL_DATA = fetchGroupPrefix + FieldName.deliveryDelegate + ".fullData";
+
+	
+	/**
+	 * Get the list of {@link ScheduledReportID}s of the current user.
+	 * 
+	 * @param pm The {@link PersistenceManager} to use.
+	 * @return The list of {@link ScheduledReportID}s of the current user.
+	 */
+	public static Collection<ScheduledReportID> getScheduledReportIDsByUserID(PersistenceManager pm) {
+		javax.jdo.Query q = pm.newNamedQuery(ScheduledReport.class, "ScheduledReport.getScheduledReportIDsByUserID");
+		
+		@SuppressWarnings("unchecked")
+		Collection<ScheduledReportID> result = (Collection<ScheduledReportID>) q.execute(
+				GlobalSecurityReflector.sharedInstance().getUserDescriptor().getUserObjectID());
+		result = new LinkedList<ScheduledReportID>(result);
+		
+		q.closeAll();
+		
+		return result;
+	}
+
+	/**
+	 * Get the list of {@link ScheduledReport}s by the given {@link ReportRegistryItemID} which is ID of related {@link ReportLayout}.
+	 * 
+	 * @param pm The {@link PersistenceManager} to use
+	 * @param reportLayoutID ID of {@link ReportLayout}
+	 * @return The list of {@link ScheduledReport}s
+	 */
+	public static Collection<ScheduledReport> getScheduledReportsByReportLayoutID(PersistenceManager pm, ReportRegistryItemID reportLayoutID) {
+		javax.jdo.Query q = pm.newNamedQuery(ScheduledReport.class, "ScheduledReport.getScheduledReportsByReportLayoutID");
+		
+		@SuppressWarnings("unchecked")
+		Collection<ScheduledReport> result = (Collection<ScheduledReport>) q.execute(reportLayoutID);
+		result = new ArrayList<ScheduledReport>(result);
+		
+		q.closeAll();
+		
+		return result;
+	}
+
 	
 	/** pk-part */
 	@PrimaryKey
@@ -528,21 +580,6 @@ public class ScheduledReport implements Serializable, DetachCallback, AttachCall
 		}
 		sb.append(")");
 		return sb.toString();
-	}
-	
-	
-	/**
-	 * Get the list of {@link ScheduledReportID}s of the current user.
-	 * 
-	 * @param pm The PersistenceManager to use.
-	 * @return The list of {@link ScheduledReportID}s of the current user.
-	 */
-	@SuppressWarnings("unchecked")
-	public static Collection<ScheduledReportID> getScheduledReportIDsByUserID(PersistenceManager pm) {
-		javax.jdo.Query q = pm.newQuery("SELECT JDOHelper.getObjectId(this) FROM " + ScheduledReport.class.getName()
-				+ " WHERE JDOHelper.getObjectId(this.user) == :userID");
-		return new LinkedList<ScheduledReportID>(
-				(Collection<ScheduledReportID>) q.execute(SecurityReflector.getUserDescriptor().getUserObjectID()));
 	}
 	
 }

@@ -13,7 +13,10 @@ PUBLIC "-//NightLabs GmbH//DTD ClassLoader Repository 1.1//EN"
 	<publish>
 		<resources>com\/nightlabs\/.*</resources>
 		<resources>org\/nightlabs\/.*</resources>
-		<!-- Add de. -->
-		<resources>de\/bsg\/.*</resources>
+		
+		<!-- Add YOUR.DOMAIN 
+		<resources>YOUR\/DOMAIN\/.*</resources>
+		-->
+		
 	</publish>
 </classloader-repository>

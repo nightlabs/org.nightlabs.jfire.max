@@ -1,6 +1,7 @@
 package org.nightlabs.jfire.base.security.integration.ldap.connection;
 
 /**
+ * Implementations are intended to hold LDAP connection parameters used by {@link LDAPConnection} instances.
  * 
  * @author Denis Dudnik <deniska.dudnik[at]gmail{dot}com>
  *

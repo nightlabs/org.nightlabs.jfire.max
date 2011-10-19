@@ -197,10 +197,12 @@ public class LDAPAttributeSet implements Iterable<LDAPAttribute<Object>>{
 	 * 
 	 * @param input
 	 */
-	public void createAttributesFromString(String input){
+	public static LDAPAttributeSet createAttributesFromString(String input){
 		if (input == null){
 			throw new IllegalArgumentException("Can't create attributes from NULL! Non-empty string should be specified.");
 		}
+		
+		LDAPAttributeSet attributeSet = new LDAPAttributeSet();
 		
 		String[] attributesAndValues = new String[]{input};
 		if (input.indexOf(",") > -1){
@@ -209,12 +211,13 @@ public class LDAPAttributeSet implements Iterable<LDAPAttribute<Object>>{
 		for (String nameAndValue : attributesAndValues) {
 			String[] parts = nameAndValue.split("=");
 			if (parts.length == 2
-					&& createAttribute(parts[0], parts[1]) != null){
+					&& attributeSet.createAttribute(parts[0], parts[1]) != null){
 				continue;
 			}else{
 				logger.warn("Attribute can't be created. Name and value string is: " + nameAndValue);
 			}
 		}
+		return attributeSet;
 	}
 
 	/**

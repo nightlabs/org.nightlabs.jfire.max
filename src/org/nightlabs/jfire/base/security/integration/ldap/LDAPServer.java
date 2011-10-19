@@ -868,8 +868,7 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 					if (!removeJFireObjects ){
 						attributes = connection.getAttributesForEntry(ldapEntryDN);
 					}else{
-						attributes = new LDAPAttributeSet();
-						attributes.createAttributesFromString(ldapEntryDN);
+						attributes = LDAPAttributeSet.createAttributesFromString(ldapEntryDN);
 					}
 					Object returnObject = ldapScriptSet.syncLDAPDataToJFireObjects(
 								attributes, organisationID, removeJFireObjects

@@ -121,7 +121,6 @@ if (isEvent(productType)) {
                 <structure>
                     <property name="name">timePeriod</property>
                     <property name="nativeName">timePeriod</property>
-                    <property name="dataType">any</property>
                     <property name="nativeDataType">10</property>
                     <property name="position">1</property>
                     <expression name="defaultValue">'__DUMMY_DEFAULT_PARAMETER_VALUE__'</expression>
@@ -527,7 +526,6 @@ if (isEvent(productType)) {
                     <structure>
                         <property name="position">23</property>
                         <property name="name">PersonalData_Photo</property>
-                        <property name="dataType">any</property>
                     </structure>
                     <structure>
                         <property name="position">24</property>
@@ -736,7 +734,6 @@ if (isEvent(productType)) {
                     <property name="position">23</property>
                     <property name="name">PersonalData_Photo</property>
                     <property name="nativeName">PersonalData_Photo</property>
-                    <property name="dataType">any</property>
                     <property name="nativeDataType">9</property>
                 </structure>
                 <structure>
@@ -1470,7 +1467,6 @@ if (isEvent(productType)) {
                 <structure>
                     <property name="name">PersonalData_Photo</property>
                     <expression name="expression">dataSetRow["PersonalData_Photo"]</expression>
-                    <property name="dataType">any</property>
                 </structure>
                 <structure>
                     <property name="name">PersonalData_Salutation</property>
@@ -2018,7 +2014,7 @@ text</expression>
                 <structure>
                     <property name="name">SumQuantityProductType</property>
                     <expression name="expression">dataSetRow["quantity"]</expression>
-                    <property name="dataType">any</property>
+                    
                     <simple-property-list name="aggregateOn">
                         <value>GroupProductType</value>
                     </simple-property-list>
@@ -2027,7 +2023,6 @@ text</expression>
                 <structure>
                     <property name="name">SumQuantityOwner</property>
                     <expression name="expression">dataSetRow["quantity"]</expression>
-                    <property name="dataType">any</property>
                     <simple-property-list name="aggregateOn">
                         <value>GroupOwner</value>
                     </simple-property-list>
@@ -2036,7 +2031,6 @@ text</expression>
                 <structure>
                     <property name="name">SumQuantityCurrency</property>
                     <expression name="expression">dataSetRow["quantity"]</expression>
-                    <property name="dataType">any</property>
                     <simple-property-list name="aggregateOn">
                         <value>GroupCurrency</value>
                     </simple-property-list>
@@ -2045,7 +2039,6 @@ text</expression>
                 <structure>
                     <property name="name">SumAmountProductType</property>
                     <expression name="expression">dataSetRow["amount"]</expression>
-                    <property name="dataType">any</property>
                     <simple-property-list name="aggregateOn">
                         <value>GroupProductType</value>
                     </simple-property-list>
@@ -2054,7 +2047,6 @@ text</expression>
                 <structure>
                     <property name="name">SumAmountOwner</property>
                     <expression name="expression">dataSetRow["amount"]</expression>
-                    <property name="dataType">any</property>
                     <simple-property-list name="aggregateOn">
                         <value>GroupOwner</value>
                     </simple-property-list>
@@ -2063,7 +2055,6 @@ text</expression>
                 <structure>
                     <property name="name">SumAmountCurrency</property>
                     <expression name="expression">dataSetRow["amount"]</expression>
-                    <property name="dataType">any</property>
                     <simple-property-list name="aggregateOn">
                         <value>GroupCurrency</value>
                     </simple-property-list>

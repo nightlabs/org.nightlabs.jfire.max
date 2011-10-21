@@ -58,7 +58,7 @@ function getDataFieldString(field) {
     <parameters>
         <scalar-parameter name="articleContainerID" id="136">
             <property name="valueType">static</property>
-            <property name="dataType">any</property>
+            
             <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
@@ -619,7 +619,7 @@ function getDataFieldString(field) {
                     <structure>
                         <property name="position">25</property>
                         <property name="name">PersonalData_Photo</property>
-                        <property name="dataType">any</property>
+                        
                     </structure>
                     <structure>
                         <property name="position">26</property>
@@ -828,7 +828,7 @@ function getDataFieldString(field) {
                     <property name="position">25</property>
                     <property name="name">PersonalData_Photo</property>
                     <property name="nativeName">PersonalData_Photo</property>
-                    <property name="dataType">any</property>
+                    
                 </structure>
                 <structure>
                     <property name="position">26</property>
@@ -943,7 +943,7 @@ function getDataFieldString(field) {
                 <structure>
                     <property name="name">propertySetID</property>
                     <property name="nativeName">propertySetID</property>
-                    <property name="dataType">any</property>
+                    
                     <property name="nativeDataType">10</property>
                     <property name="position">1</property>
                     <expression name="defaultValue">'__DUMMY_DEFAULT_PARAMETER_VALUE__'</expression>
@@ -1077,7 +1077,7 @@ function getDataFieldString(field) {
                     <structure>
                         <property name="position">25</property>
                         <property name="name">PersonalData_Photo</property>
-                        <property name="dataType">any</property>
+                        
                     </structure>
                     <structure>
                         <property name="position">26</property>
@@ -1286,7 +1286,7 @@ function getDataFieldString(field) {
                     <property name="position">25</property>
                     <property name="name">PersonalData_Photo</property>
                     <property name="nativeName">PersonalData_Photo</property>
-                    <property name="dataType">any</property>
+                    
                 </structure>
                 <structure>
                     <property name="position">26</property>
@@ -1404,7 +1404,7 @@ function getDataFieldString(field) {
                 <structure>
                     <property name="position">1</property>
                     <property name="name">priceFragmentType</property>
-                    <property name="dataType">any</property>
+                    
                 </structure>
                 <structure>
                     <property name="position">2</property>
@@ -1853,7 +1853,7 @@ JFireReportingHelper.createDataSetParam(JDOHelper.getObjectId(orgLE.getPerson())
                 <structure>
                     <property name="name">PersonalData_Photo</property>
                     <expression name="expression">dataSetRow["PersonalData_Photo"]</expression>
-                    <property name="dataType">any</property>
+                    
                 </structure>
                 <structure>
                     <property name="name">PersonalData_Salutation</property>
@@ -2616,7 +2616,7 @@ JFireReportingHelper.createDataSetParam(JDOHelper.getObjectId(orgLE.getPerson())
                                                                         <structure>
                                                                             <property name="name">PersonalData_Photo</property>
                                                                             <expression name="expression">dataSetRow["PersonalData_Photo"]</expression>
-                                                                            <property name="dataType">any</property>
+                                                                            
                                                                         </structure>
                                                                         <structure>
                                                                             <property name="name">PersonalData_Salutation</property>
@@ -2958,7 +2958,7 @@ JFireReportingHelper.createDataSetParam(params["articleContainerID"])</expressio
     new Packages.java.util.HashMap());
     "Done: "
 }</expression>
-                                    <property name="dataType">any</property>
+                                    
                                 </structure>
                                 <structure>
                                     <property name="name">DynamicProduct_SinglePrice</property>
@@ -3434,7 +3434,7 @@ result</expression>
                                                 <structure>
                                                     <property name="name">priceFragmentType</property>
                                                     <expression name="expression">dataSetRow["priceFragmentType"]</expression>
-                                                    <property name="dataType">any</property>
+                                                    
                                                 </structure>
                                                 <structure>
                                                     <property name="name">priceFragmentTypeName</property>
@@ -3449,7 +3449,7 @@ result</expression>
                                                 <structure>
                                                     <property name="name">currency</property>
                                                     <expression name="expression">dataSetRow["currency"]</expression>
-                                                    <property name="dataType">any</property>
+                                                    
                                                 </structure>
                                                 <structure>
                                                     <property name="name">PriceFragmentType_Description</property>

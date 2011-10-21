@@ -880,7 +880,6 @@ function getDataFieldString(field) {
                 <structure>
                     <property name="name">propertySetID</property>
                     <property name="nativeName">propertySetID</property>
-                    <property name="dataType">any</property>
                     <property name="nativeDataType">10</property>
                     <property name="position">1</property>
                     <expression name="defaultValue">'__DUMMY_DEFAULT_PARAMETER_VALUE__'</expression>
@@ -1004,7 +1003,7 @@ function getDataFieldString(field) {
                     <structure>
                         <property name="position">23</property>
                         <property name="name">PersonalData_Photo</property>
-                        <property name="dataType">any</property>
+                        
                     </structure>
                     <structure>
                         <property name="position">24</property>
@@ -1213,7 +1212,7 @@ function getDataFieldString(field) {
                     <property name="position">23</property>
                     <property name="name">PersonalData_Photo</property>
                     <property name="nativeName">PersonalData_Photo</property>
-                    <property name="dataType">any</property>
+                    
                     <property name="nativeDataType">9</property>
                 </structure>
                 <structure>
@@ -1329,7 +1328,7 @@ function getDataFieldString(field) {
                 <structure>
                     <property name="position">1</property>
                     <property name="name">priceFragmentType</property>
-                    <property name="dataType">any</property>
+                    
                 </structure>
                 <structure>
                     <property name="position">2</property>
@@ -1778,7 +1777,7 @@ JFireReportingHelper.createDataSetParam(JDOHelper.getObjectId(orgLE.getPerson())
                 <structure>
                     <property name="name">PersonalData_Photo</property>
                     <expression name="expression">dataSetRow["PersonalData_Photo"]</expression>
-                    <property name="dataType">any</property>
+                    
                 </structure>
                 <structure>
                     <property name="name">PersonalData_Salutation</property>
@@ -2541,7 +2540,7 @@ JFireReportingHelper.createDataSetParam(JDOHelper.getObjectId(orgLE.getPerson())
                                                                         <structure>
                                                                             <property name="name">PersonalData_Photo</property>
                                                                             <expression name="expression">dataSetRow["PersonalData_Photo"]</expression>
-                                                                            <property name="dataType">any</property>
+                                                                            
                                                                         </structure>
                                                                         <structure>
                                                                             <property name="name">PersonalData_Salutation</property>
@@ -2875,7 +2874,7 @@ JFireReportingHelper.createDataSetParam(params["articleContainerID"])</expressio
     new Packages.java.util.HashMap());
     "Done: "
 }</expression>
-                                    <property name="dataType">any</property>
+                                    
                                 </structure>
                                 <structure>
                                     <property name="name">DynamicProduct_SinglePrice</property>
@@ -2961,7 +2960,7 @@ for (it1 = priceFragmentType2currency2sum.entrySet().iterator(); it1.hasNext(); 
 // debug end
 
 result;</expression>
-                                    <property name="dataType">any</property>
+                                    
                                 </structure>
                                 <structure>
                                     <property name="name">BundleProduct_QtyUnitSymbol</property>

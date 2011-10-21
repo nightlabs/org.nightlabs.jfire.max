@@ -2486,17 +2486,14 @@ JFireReportingHelper.createDataSetParam(JDOHelper.getObjectId(partner.getPerson(
                                 <structure>
                                     <property name="name">Company</property>
                                     <expression name="expression">dataSetRow["PersonalData_Company"]</expression>
-                                    <property name="dataType">any</property>
                                 </structure>
                                 <structure>
                                     <property name="name">Name</property>
                                     <expression name="expression">dataSetRow["PersonalData_Name"]</expression>
-                                    <property name="dataType">any</property>
                                 </structure>
                                 <structure>
                                     <property name="name">FirstName</property>
                                     <expression name="expression">dataSetRow["PersonalData_FirstName"]</expression>
-                                    <property name="dataType">any</property>
                                 </structure>
                                 <structure>
                                     <property name="name">DisplayName</property>

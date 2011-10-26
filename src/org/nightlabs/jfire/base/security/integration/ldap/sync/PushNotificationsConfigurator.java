@@ -657,14 +657,8 @@ public class PushNotificationsConfigurator {
 				return false;
 			}
 			
-			Object credential = GlobalSecurityReflector.sharedInstance().getCredential();
-			String pwd = null;
-			if (credential instanceof String){
-				pwd = (String) credential;
-			}else if (credential instanceof char[]){
-				pwd = new String((char[]) credential);
-			}else{
-				logger.warn("Cannot get string password for current user: " + userDescriptor.getCompleteUserID());
+			String pwd = LDAPServer.getLDAPPasswordForCurrentUser();
+			if (pwd == null){
 				return false;
 			}
 			

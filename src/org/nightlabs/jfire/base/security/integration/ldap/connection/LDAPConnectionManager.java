@@ -11,6 +11,10 @@ import javax.jdo.PersistenceManager;
 
 import org.nightlabs.jdo.FetchPlanBackup;
 import org.nightlabs.jdo.NLJDOHelper;
+import org.nightlabs.jfire.security.GlobalSecurityReflector;
+import org.nightlabs.jfire.security.NoUserException;
+import org.nightlabs.jfire.security.User;
+import org.nightlabs.jfire.security.id.UserID;
 import org.nightlabs.jfire.security.integration.UserManagementSystemCommunicationException;
 
 /**
@@ -20,7 +24,7 @@ import org.nightlabs.jfire.security.integration.UserManagementSystemCommunicatio
  *
  */
 public class LDAPConnectionManager{
-
+	
 	/**
 	 * Number of possible connections in the pool per every LDAP server
 	 */
@@ -33,12 +37,30 @@ public class LDAPConnectionManager{
 	private static LDAPConnectionManager _instance;
 
 	/**
-	 * Map of free LDAP connections
+	 * Free LDAP connections
 	 */
-	private Map<ILDAPConnectionParamsProvider, List<LDAPConnection>> availableConnections;
+	private ConnectionsHolder availableConnections;
+	
+	/**
+	 * Map of private (authenticated) LDAP connections which may be used by the same Users with only.
+	 * The {@link LDAPConnectionManager} DOES NOT create connections directly for this map neither it adds them here. 
+	 * These operations are performed externally. Typical usage cycle would be: 
+	 * 	1) {@link User} gained a connection from {@link LDAPConnectionManager#getConnection(ILDAPConnectionParamsProvider)}
+	 *  2) performed a "bind" opeartion on it so it became an authenticated one
+	 *  3) put it back by {@link LDAPConnectionManager#preservePrivateLDAPConnection(LDAPConnection)} in order to preserve it for later usage
+	 * 	4) got it somewhere by {@link LDAPConnectionManager#getPrivateLDAPConnection()} when authenticated conection is needed
+	 *  	but there's no possibility to get one (i.e. in Async invocaions), performed all operations needed
+	 *  5) "unbind" this {@link LDAPConnection} and release it back to {@link LDAPConnectionManager}  
+	 * 
+	 * One of the use cases where this kind of connections are used is described here: 
+	 * https://www.jfire.org/modules/bugs/view.php?id=1974
+	 */
+	private Map<UserID, ConnectionsHolder> privateConnections;
+	
 
 	private LDAPConnectionManager(){
-		availableConnections = new HashMap<ILDAPConnectionParamsProvider, List<LDAPConnection>>();
+		availableConnections = new ConnectionsHolder();
+		privateConnections = new HashMap<UserID, ConnectionsHolder>();
 	}
 
 	public static synchronized LDAPConnectionManager sharedInstance(){
@@ -60,13 +82,7 @@ public class LDAPConnectionManager{
 			ILDAPConnectionParamsProvider paramsProvider
 	) throws UserManagementSystemCommunicationException {
 
-		LDAPConnection conn = null;
-
-		List<LDAPConnection> connections = availableConnections.get(paramsProvider);
-		if (connections != null && !connections.isEmpty()){
-			conn = connections.remove(0);
-		}
-
+		LDAPConnection conn = availableConnections.getConnection(paramsProvider);
 		if (conn == null) {
 			// Since the paramsProvider is kept across transactions, we must detach it now, if it is a
 			// persistence-capable class and the instance is currently attached to a datastore.
@@ -110,23 +126,107 @@ public class LDAPConnectionManager{
 		if (connection == null){
 			return;
 		}
-
-		ILDAPConnectionParamsProvider paramsProvider = connection.getConnectionParamsProvider();
-		List<LDAPConnection> connections = availableConnections.get(paramsProvider);
-		if (connections == null) {
-			connections = new LinkedList<LDAPConnection>();
-			availableConnections.put(paramsProvider, connections);
+		
+		// if released connection is still a preserved one we remove it from private connections map
+		for (UserID key : privateConnections.keySet()){
+			ConnectionsHolder holder = privateConnections.get(key);
+			if (holder != null && holder.containsConnection(connection)){
+				holder.getConnection(connection.getConnectionParamsProvider());	// will remove it from holder
+				break;
+			}
 		}
 
-		connections.add(connection);
-
-		// We use a while loop AFTER adding a connection so that we allow configuration changes
-		// during runtime. Even if we don't need this, it's more robust to implement it this way.
-		// Marco.
-		while (connections.size() > maxConnectionsPerServer){
-			connections.remove(connections.size() - 1);
-		}
-
+		availableConnections.putConnection(connection.getConnectionParamsProvider(), connection);
 	}
 
+	/**
+	 * Preserve some {@link LDAPConnection} for the later usage by the same {@link User}.
+	 * If another {@link LDAPConnection} was already preserved by this {@link User} it will
+	 * be unbinded and released back to the {@link LDAPConnectionManager}.
+	 * 
+	 * Be careful when using this API and try to make sure that preserved connection will be
+	 * released by your code at some point even if some unexpected situations will occur. 
+	 * Of course it is not always possible so usage of this API should be strongly considered.
+	 * It was introduced to cover the use case described here (https://www.jfire.org/modules/bugs/view.php?id=1974)
+	 * so please use it for similar use cases. 
+	 * 
+	 * @param connection The {@link LDAPConnection} to be preserved
+	 * @throws NoUserException If no {@link User} is logged in 
+	 */
+	public synchronized void preservePrivateLDAPConnection(ILDAPConnectionParamsProvider paramsProvider, LDAPConnection connection) throws NoUserException{
+		UserID userID = GlobalSecurityReflector.sharedInstance().getUserDescriptor().getUserObjectID();
+		
+		ConnectionsHolder connectionsHolder = privateConnections.get(userID);
+		if (connectionsHolder == null){
+			connectionsHolder = new ConnectionsHolder();
+			privateConnections.put(userID, connectionsHolder);
+		}
+		
+		LDAPConnection prevConnection = connectionsHolder.getConnection(paramsProvider);
+		if (prevConnection != null){
+			try {
+				prevConnection.unbind();
+			} catch (UserManagementSystemCommunicationException e) {
+				// connection is not alive, but we do not need to do anything about it
+				// because it will be connected when asked again from the pool
+			}
+			releaseConnection(prevConnection);
+		}
+		
+		connectionsHolder.putConnection(paramsProvider, connection);
+	}
+	
+	/**
+	 * Get {@link LDAPConnection} which was preserved by this {@link User} earlier. 
+	 * Returned {@link LDAPConnection} might be not alive and this method will NOT try to reconnect it 
+	 * in a way that {@link LDAPConnectionManager#getConnection(ILDAPConnectionParamsProvider)} does.
+	 * 
+	 * @param paramsProvider params provider or a preserved connection
+	 * @return {@link LDAPConnection} that was preserved by this {@link User} earlier
+	 * @throws NoUserException If no {@link User} is logged in 
+	 */
+	public LDAPConnection getPrivateLDAPConnection(ILDAPConnectionParamsProvider paramsProvider) throws NoUserException{
+		UserID userID = GlobalSecurityReflector.sharedInstance().getUserDescriptor().getUserObjectID();
+		ConnectionsHolder connectionsHolder = privateConnections.get(userID);
+		if (connectionsHolder != null){
+			return connectionsHolder.getConnection(paramsProvider);
+		}
+		return null;
+	}
+	
+	class ConnectionsHolder{
+		private Map<ILDAPConnectionParamsProvider, List<LDAPConnection>> connectionsMap;
+		public ConnectionsHolder(){
+			connectionsMap = new HashMap<ILDAPConnectionParamsProvider, List<LDAPConnection>>();
+		}
+		public void putConnection(ILDAPConnectionParamsProvider paramsProvider, LDAPConnection connection) {
+			List<LDAPConnection> connections = connectionsMap.get(paramsProvider);
+			if (connections == null){
+				connections = new LinkedList<LDAPConnection>();
+				connectionsMap.put(paramsProvider, connections);
+			}
+			connections.add(connection);
+
+			// We use a while loop AFTER adding a connection so that we allow configuration changes
+			// during runtime. Even if we don't need this, it's more robust to implement it this way.
+			// Marco.
+			while (connections.size() > maxConnectionsPerServer){
+				connections.remove(connections.size() - 1);
+			}
+		}
+		public LDAPConnection getConnection(ILDAPConnectionParamsProvider paramsProvider) {
+			List<LDAPConnection> connections = connectionsMap.get(paramsProvider);
+			if (connections != null && !connections.isEmpty()){
+				return connections.remove(0);
+			}
+			return null;
+		}
+		public boolean containsConnection(LDAPConnection connection){
+			List<LDAPConnection> connections = connectionsMap.get(connection.getConnectionParamsProvider());
+			if (connections != null){
+				return connections.contains(connection);
+			}
+			return false;
+		}
+	}
 }

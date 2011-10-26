@@ -27,6 +27,7 @@ import org.nightlabs.jfire.base.security.integration.ldap.LDAPManagerBean;
 import org.nightlabs.jfire.base.security.integration.ldap.LDAPServer;
 import org.nightlabs.jfire.base.security.integration.ldap.attributes.LDAPAttributeSet;
 import org.nightlabs.jfire.base.security.integration.ldap.attributes.LDAPPasswordWrapper;
+import org.nightlabs.jfire.base.security.integration.ldap.connection.ILDAPConnectionParamsProvider.AuthenticationMethod;
 import org.nightlabs.jfire.base.security.integration.ldap.connection.LDAPConnection;
 import org.nightlabs.jfire.base.security.integration.ldap.connection.LDAPConnectionManager;
 import org.nightlabs.jfire.base.security.integration.ldap.connection.LDAPConnectionWrapper.EntryModificationFlag;
@@ -133,8 +134,30 @@ public class SecurityChangeListenerJFirePasswordChanged extends SecurityChangeLi
 					if (logger.isDebugEnabled()){
 						logger.debug(String.format("Password was not changed yet. However we'll wait until entry is possibly created in LDAP. Adding push notification listener to LDAPServer with ID %s@%s.", ldapServer.getUserManagementSystemID(), ldapServer.getOrganisationID()));
 					}
-					PushNotificationsConfigurator.sharedInstance().addPushNotificationListener(
-							ldapServer, new LDAPEntryAddedListener(user, newPasswordWrapper.toString(), ldapServer.getLdapScriptSet().getLdapDN(user)));
+
+					LDAPConnection preservedConnection = null;
+					if (AuthenticationMethod.SIMPLE.equals(ldapServer.getAuthenticationMethod())){
+						// preserve LDAPConnection
+						preservedConnection = LDAPSyncInvocation.preserveConnection(pm, ldapServer);
+						if (preservedConnection == null){
+							logger.warn("LDAPConnection was not preserved for later usage when changing user password in LDAP!");
+						}
+					}
+					
+					try{
+						PushNotificationsConfigurator.sharedInstance().addPushNotificationListener(
+								ldapServer, new LDAPEntryAddedListener(
+										user, newPasswordWrapper.toString(), ldapServer.getLdapScriptSet().getLdapDN(user)));
+					}catch(Exception e){
+						try{
+							if (preservedConnection != null){
+								preservedConnection.unbind();
+							}
+						}finally{
+							LDAPConnectionManager.sharedInstance().releaseConnection(preservedConnection);
+						}
+						throw e;
+					}
 				}
 			}catch(Exception e){
 				exceptionOccured = true;
@@ -157,8 +180,7 @@ public class SecurityChangeListenerJFirePasswordChanged extends SecurityChangeLi
 								"Trying to sync password to LDAPServer at %s:%s, object ID: %s@%s", ldapServer.getHost(), ldapServer.getPort(), ldapServer.getUserManagementSystemID(), ldapServer.getOrganisationID()));
 			}
 			
-			connection = LDAPConnectionManager.sharedInstance().getConnection(ldapServer);
-			ldapServer.bindForSynchronization(connection);
+			connection = ldapServer.createAndBindConnectionForSync();
 
 			String entryDN = ldapServer.getLdapScriptSet().getLdapDN(user);
 			if (logger.isDebugEnabled()){
@@ -249,7 +271,8 @@ public class SecurityChangeListenerJFirePasswordChanged extends SecurityChangeLi
 		private String newPasswordHashed;
 		private String ldapEntryName;
 		
-		public LDAPEntryAddedListener(User user, String newPassword, String ldapEntryName) {
+		public LDAPEntryAddedListener(
+				User user, String newPassword, String ldapEntryName) {
 			this.user = user;
 			this.newPasswordHashed = newPassword;
 			this.ldapEntryName = ldapEntryName;

@@ -12,7 +12,6 @@ import javax.jdo.listener.DeleteLifecycleListener;
 import javax.jdo.listener.InstanceLifecycleEvent;
 import javax.jdo.listener.StoreLifecycleListener;
 
-import org.nightlabs.jfire.asyncinvoke.AsyncInvoke;
 import org.nightlabs.jfire.asyncinvoke.AsyncInvokeEnqueueException;
 import org.nightlabs.jfire.base.jdo.notification.JDOLifecycleListener;
 import org.nightlabs.jfire.base.security.integration.ldap.LDAPServer;
@@ -23,12 +22,13 @@ import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.security.id.UserID;
 import org.nightlabs.jfire.security.integration.UserManagementSystem;
 import org.nightlabs.jfire.security.integration.id.UserManagementSystemID;
+import org.nightlabs.util.CollectionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * {@link JDOLifecycleListener} used for calling {@link SyncToLDAPServerInvocation} for synchronization from JFire to LDAP when 
- * JFire is a leading system.
+ * {@link JDOLifecycleListener} used for calling {@link LDAPSyncInvocation} for synchronization from JFire to LDAP 
+ * when JFire is a leading system.
  * 
  * @author Denis Dudnik <deniska.dudnik[at]gmail{dot}com>
  *
@@ -172,10 +172,11 @@ public class SyncLifecycleListener implements StoreLifecycleListener, DeleteLife
 					dataUnit = new SendEventTypeDataUnit(jfireObjectId);
 				}
 				
-				try{
-					AsyncInvoke.exec(
-							new SyncToLDAPServerInvocation(ldapServerId, dataUnit, eventType), true
-							);
+				LDAPSyncEvent syncEvent = new LDAPSyncEvent(eventType);
+				syncEvent.setSendEventTypeDataUnits(CollectionUtil.createHashSet(dataUnit));
+				try {
+					LDAPSyncInvocation.executeWithPreservedLDAPConnection(
+							pm, new LDAPSyncInvocation(ldapServerId, syncEvent), ldapServer);
 				} catch (AsyncInvokeEnqueueException e) {
 					exceptionOccured = true;
 					logger.error(e.getMessage(), e);

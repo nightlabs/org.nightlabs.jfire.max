@@ -28,10 +28,20 @@ public class LDAPSyncEvent implements Serializable{
 	 *
 	 */
 	public enum LDAPSyncEventType{
-		FETCH,			// get data from LDAP directory and store in JFire
-		SEND,			// send data to store in LDAP directory
-		SEND_DELETE,	// delete entry in LDAP directory after JFire entry was deleted
-		FETCH_DELETE	// delete JFire object after LDAP entry was deleted
+		FETCH("FETCH"),					// get data from LDAP directory and store in JFire
+		SEND("SEND"),					// send data to store in LDAP directory
+		SEND_DELETE("SEND_DELETE"),		// delete entry in LDAP directory after JFire entry was deleted
+		FETCH_DELETE("FETCH_DELETE");	// delete JFire object after LDAP entry was deleted
+        
+		private String stringValue;
+		
+		private LDAPSyncEventType(String stringValue){
+        	this.stringValue = stringValue;
+        }
+        
+        public String stringValue(){
+        	return stringValue;
+        }
 	}
 	
 	/**

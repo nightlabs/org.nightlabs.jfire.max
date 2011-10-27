@@ -40,13 +40,17 @@ import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.PersistenceModifier;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.listener.AttachCallback;
 import javax.jdo.listener.DetachCallback;
+import javax.jdo.listener.StoreCallback;
 
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 import org.nightlabs.util.Util;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * An Anchor is an end-point for a Transfer. Every Transfer has exactly two Anchors -
@@ -83,9 +87,10 @@ import org.nightlabs.util.Util;
 //)
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public abstract class Anchor
-	implements Serializable, DetachCallback
+	implements Serializable, DetachCallback, AttachCallback, StoreCallback
 {
 	private static final long serialVersionUID = 1L;
+	private static final Logger logger = LoggerFactory.getLogger(Anchor.class);
 
 	//	public static final String FETCH_GROUP_TRANSFERS = "Anchor.transfers";
 //	/**
@@ -409,6 +414,20 @@ public abstract class Anchor
 
 	@Override
 	public void jdoPreDetach() {
+	}
+
+	@Override
+	public void jdoPreAttach() {
+		logger.info("jdoPreAttach: " + this.getClass().getName() + '[' + getPrimaryKey() + ']');
+	}
+	@Override
+	public void jdoPostAttach(Object arg0) {
+		logger.info("jdoPostAttach: " + this.getClass().getName() + '[' + getPrimaryKey() + ']');
+	}
+
+	@Override
+	public void jdoPreStore() {
+		logger.info("jdoPreStore: " + this.getClass().getName() + '[' + getPrimaryKey() + ']');
 	}
 
 	/**

@@ -29,6 +29,14 @@ package org.nightlabs.jfire.trade;
 import javax.jdo.JDODataStoreException;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
 import javax.jdo.listener.StoreCallback;
 
 import org.apache.log4j.Logger;
@@ -36,15 +44,6 @@ import org.nightlabs.jfire.organisation.LocalOrganisation;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.transfer.Anchor;
 import org.nightlabs.jfire.transfer.id.AnchorID;
-
-import javax.jdo.annotations.Persistent;
-import javax.jdo.annotations.FetchGroups;
-import javax.jdo.annotations.InheritanceStrategy;
-import javax.jdo.annotations.Inheritance;
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.FetchGroup;
-import javax.jdo.annotations.IdentityType;
-import javax.jdo.annotations.PersistenceModifier;
 
 /**
  * All organisations known by a JFire organisation are represented in its datastore
@@ -220,12 +219,14 @@ implements StoreCallback
 	}
 
 
+	@Override
 	public void jdoPreStore() {
 		// TODO JPOX Workaround - would be great to set this automatically
 //		if (organisation == null)
 //			organisation = Organisation.getOrganisation(getPersistenceManager(), getOrganisationID());
 //		if (getPerson() == null)
 //			setPerson(organisation.getPerson());
+		super.jdoPreStore();
 	}
 
 	/**

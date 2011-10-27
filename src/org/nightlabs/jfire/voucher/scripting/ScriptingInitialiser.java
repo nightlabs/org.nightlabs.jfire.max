@@ -5,7 +5,6 @@ import java.util.Locale;
 
 import javax.jdo.PersistenceManager;
 
-import org.apache.log4j.Logger;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.scripting.ScriptCategory;
@@ -14,6 +13,8 @@ import org.nightlabs.jfire.scripting.ScriptingIntialiserException;
 import org.nightlabs.jfire.servermanager.JFireServerManager;
 import org.nightlabs.jfire.voucher.JFireVoucherEAR;
 import org.nightlabs.jfire.voucher.store.id.VoucherKeyID;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Daniel.Mazurek [at] NightLabs [dot] de
@@ -21,7 +22,7 @@ import org.nightlabs.jfire.voucher.store.id.VoucherKeyID;
  */
 public class ScriptingInitialiser
 {
-	protected Logger LOGGER = Logger.getLogger(ScriptingInitialiser.class);
+	protected Logger LOGGER = LoggerFactory.getLogger(ScriptingInitialiser.class);
 
 	private JFireServerManager jfsm;
 	private String organisationID;

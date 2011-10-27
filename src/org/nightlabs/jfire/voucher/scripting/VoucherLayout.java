@@ -12,23 +12,23 @@ import java.util.Set;
 
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.Queries;
 
-import org.apache.log4j.Logger;
 import org.nightlabs.io.DataBuffer;
 import org.nightlabs.jfire.trade.editor2d.ILayout;
 import org.nightlabs.jfire.voucher.scripting.id.VoucherLayoutID;
-
-import javax.jdo.annotations.FetchGroups;
-import javax.jdo.annotations.Inheritance;
-import javax.jdo.annotations.PrimaryKey;
-import javax.jdo.annotations.FetchGroup;
-import javax.jdo.annotations.PersistenceModifier;
-import javax.jdo.annotations.Persistent;
-import javax.jdo.annotations.InheritanceStrategy;
-import javax.jdo.annotations.Queries;
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.Column;
-import javax.jdo.annotations.IdentityType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Daniel.Mazurek [at] NightLabs [dot] de
@@ -70,7 +70,7 @@ implements Serializable, ILayout
 {
 	private static final long serialVersionUID = 1L;
 
-	private static final Logger logger = Logger.getLogger(VoucherLayout.class);
+	private static final Logger logger = LoggerFactory.getLogger(VoucherLayout.class);
 
 	public static final String FETCH_GROUP_FILE = "VoucherLayout.file";
 
@@ -205,10 +205,10 @@ implements Serializable, ILayout
 		}
 		f.setLastModified(timestamp);
 	}
-	
+
 	/**
 	 * Returns a set of the IDs of all {@link VoucherLayout}s that share the given fileName.
-	 * 
+	 *
 	 * @param pm The persistence manager to use to execute the query.
 	 * @param fileName The fileName of the {@link VoucherLayout}s to retrieve
 	 * @return a set of the IDs of all {@link VoucherLayout}s that share the given fileName.
@@ -221,7 +221,7 @@ implements Serializable, ILayout
 
 	/**
 	 * Fills the value fields of this instance with the values in the given source object.
-	 * 
+	 *
 	 * @param source The source instance to copy the values from.
 	 */
 	public void copyValuesFrom(VoucherLayout source) {

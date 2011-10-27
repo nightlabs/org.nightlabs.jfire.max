@@ -12,7 +12,6 @@ import javax.jdo.annotations.Inheritance;
 import javax.jdo.annotations.InheritanceStrategy;
 import javax.jdo.annotations.PersistenceCapable;
 
-import org.apache.log4j.Logger;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.security.id.AuthorityTypeID;
@@ -28,6 +27,8 @@ import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.Offer;
 import org.nightlabs.jfire.trade.id.OfferID;
 import org.nightlabs.jfire.trade.id.SegmentID;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -46,7 +47,7 @@ import org.nightlabs.jfire.trade.id.SegmentID;
 public class VoucherTypeActionHandler
 		extends ProductTypeActionHandler
 {
-	private static final Logger logger = Logger.getLogger(VoucherTypeActionHandler.class);
+	private static final Logger logger = LoggerFactory.getLogger(VoucherTypeActionHandler.class);
 
 	public static final AuthorityTypeID AUTHORITY_TYPE_ID = AuthorityTypeID.create(VoucherType.class.getName());
 

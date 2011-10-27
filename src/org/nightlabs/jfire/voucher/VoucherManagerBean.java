@@ -28,7 +28,6 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 import javax.naming.NamingException;
 
-import org.apache.log4j.Logger;
 import org.nightlabs.ModuleException;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.ObjectID;
@@ -116,6 +115,8 @@ import org.nightlabs.jfire.voucher.store.VoucherType;
 import org.nightlabs.jfire.voucher.store.VoucherTypeActionHandler;
 import org.nightlabs.jfire.voucher.store.deliver.ServerDeliveryProcessorClientSideVoucherPrint;
 import org.nightlabs.jfire.voucher.store.id.VoucherKeyID;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @ejb.bean name="jfire/ejb/JFireVoucher/VoucherManager"
@@ -132,7 +133,7 @@ public class VoucherManagerBean
 extends BaseSessionBeanImpl
 implements VoucherManagerRemote
 {
-	private static final Logger logger = Logger.getLogger(VoucherManagerBean.class);
+	private static final Logger logger = LoggerFactory.getLogger(VoucherManagerBean.class);
 
 	/* (non-Javadoc)
 	 * @see org.nightlabs.jfire.voucher.VoucherManagerRemote#initialise()
@@ -445,8 +446,18 @@ implements VoucherManagerRemote
 					if (delegate != null) {
 						OrganisationLegalEntity organisationLegalEntity = null;
 
-						for (final Account account : delegate.getAccounts().values()) {
+						logger.debug("storeVoucherType: delegate.getAccounts().size()={}", delegate.getAccounts().size());
+
+						for (final Account account : delegate.getAccounts().values())
+						{
 							try {
+								logger.debug(
+										"storeVoucherType: * account.primaryKey={} account.currencyID={} account.name={}",
+										new Object[] {
+												account.getPrimaryKey(), account.getCurrency().getCurrencyID(), account.getName()
+										}
+								);
+
 								if (account.getOwner() == null) {
 									if (organisationLegalEntity == null)
 										organisationLegalEntity = OrganisationLegalEntity

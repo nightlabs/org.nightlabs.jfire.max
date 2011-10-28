@@ -3,4 +3,4 @@ EAR-Module-ID: org.nightlabs.jfire.trade.editor2d.ear
 EAR-Module-Version: 1.0.0
 EAR-Schema-Version: 1.0.0
 Bundle-SymbolicName: org.nightlabs.jfire.trade.editor2d
-Bundle-Version: 1.0.0
+Bundle-Version: 1.2.0

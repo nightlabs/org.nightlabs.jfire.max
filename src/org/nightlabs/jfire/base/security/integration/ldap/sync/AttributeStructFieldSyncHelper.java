@@ -35,6 +35,7 @@ import org.nightlabs.jfire.prop.exception.StructFieldNotFoundException;
 import org.nightlabs.jfire.prop.id.StructBlockID;
 import org.nightlabs.jfire.prop.id.StructFieldID;
 import org.nightlabs.jfire.prop.id.StructLocalID;
+import org.nightlabs.jfire.security.integration.UserManagementSystemSyncException;
 import org.nightlabs.jfire.security.integration.UserManagementSystemType;
 import org.nightlabs.util.NLLocale;
 import org.slf4j.Logger;
@@ -260,11 +261,11 @@ public class AttributeStructFieldSyncHelper {
 	 * @param structBlockID {@link StructBlockID} which contains corresponding {@link StructField}s
 	 * @param attributes {@link LDAPAttributeSet} with attributes from LDAP directory
 	 * @param attributeDescriptors descriptors to be used for mapping
-	 * @throws LDAPSyncException
+	 * @throws UserManagementSystemSyncException
 	 */
 	public static void setPersonDataForAttributes(
 			PersistenceManager pm, Person person, StructBlockID structBlockID, 
-			LDAPAttributeSet attributes, Collection<AttributeStructFieldDescriptor> attributeDescriptors) throws LDAPSyncException{
+			LDAPAttributeSet attributes, Collection<AttributeStructFieldDescriptor> attributeDescriptors) throws UserManagementSystemSyncException{
 
 		StructLocalID structLocalId = person.getStructLocalObjectID();
 		IStruct personStruct = StructLocal.getStructLocal(
@@ -300,7 +301,7 @@ public class AttributeStructFieldSyncHelper {
 										"Value can't be set for datafield %s because it's type is not determined, value string: %s", dataField.getStructFieldIDObj().toString(), attributeValue));
 					}
 				} catch (Exception e) {
-					throw new LDAPSyncException("Exception while setting Person datafields!", e);
+					throw new UserManagementSystemSyncException("Exception while setting Person datafields!", e);
 				}
 			}
 			person.deflate();

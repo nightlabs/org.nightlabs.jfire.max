@@ -3,16 +3,12 @@ import java.util.List;
 import java.util.Set;
 
 import javax.ejb.Remote;
-import javax.security.auth.login.LoginException;
 
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.base.security.integration.ldap.id.LDAPScriptSetID;
 import org.nightlabs.jfire.base.security.integration.ldap.scripts.ILDAPScriptProvider;
-import org.nightlabs.jfire.base.security.integration.ldap.sync.LDAPSyncEvent;
-import org.nightlabs.jfire.base.security.integration.ldap.sync.LDAPSyncException;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.security.id.UserID;
-import org.nightlabs.jfire.security.integration.UserManagementSystemCommunicationException;
 import org.nightlabs.jfire.security.integration.UserManagementSystemType;
 import org.nightlabs.jfire.security.integration.id.UserManagementSystemID;
 
@@ -78,15 +74,4 @@ public interface LDAPManagerRemote {
 	 */
 	LDAPScriptSet storeLDAPScriptSet(LDAPScriptSet ldapScriptSet, boolean get, String[] fetchGroups, int maxFetchDepth);
 	
-	/**
-	 * Run synchronization within attached {@link LDAPServer} instance on server. 
-	 * 
-	 * @param ldapServerID Object ID of {@link LDAPServer}
-	 * @param syncEvent {@link LDAPSyncEvent} for sync configuration
-	 * @throws LoginException
-	 * @throws LDAPSyncException
-	 * @throws UserManagementSystemCommunicationException
-	 */
-	void runLDAPServerSynchronization(UserManagementSystemID ldapServerID, LDAPSyncEvent syncEvent) throws LoginException, LDAPSyncException, UserManagementSystemCommunicationException;
-
 }

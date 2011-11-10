@@ -15,12 +15,13 @@ import javax.jdo.listener.StoreLifecycleListener;
 import org.nightlabs.jfire.asyncinvoke.AsyncInvokeEnqueueException;
 import org.nightlabs.jfire.base.jdo.notification.JDOLifecycleListener;
 import org.nightlabs.jfire.base.security.integration.ldap.LDAPServer;
-import org.nightlabs.jfire.base.security.integration.ldap.sync.LDAPSyncEvent.LDAPSyncEventType;
 import org.nightlabs.jfire.base.security.integration.ldap.sync.LDAPSyncEvent.SendEventTypeDataUnit;
 import org.nightlabs.jfire.person.Person;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.security.id.UserID;
 import org.nightlabs.jfire.security.integration.UserManagementSystem;
+import org.nightlabs.jfire.security.integration.UserManagementSystemSyncEvent.SyncEventGenericType;
+import org.nightlabs.jfire.security.integration.UserManagementSystemSyncEvent.SyncEventType;
 import org.nightlabs.jfire.security.integration.id.UserManagementSystemID;
 import org.nightlabs.util.CollectionUtil;
 import org.slf4j.Logger;
@@ -68,12 +69,12 @@ public class SyncLifecycleListener implements StoreLifecycleListener, DeleteLife
 	
 	@Override
 	public void postStore(InstanceLifecycleEvent event) {
-		execSyncInvocation(event.getPersistentInstance(), LDAPSyncEventType.SEND);
+		execSyncInvocation(event.getPersistentInstance(), SyncEventGenericType.SEND);
 	}
 
 	@Override
 	public void postDelete(InstanceLifecycleEvent event) {
-		execSyncInvocation(event.getPersistentInstance(), LDAPSyncEventType.SEND_DELETE);
+		execSyncInvocation(event.getPersistentInstance(), SyncEventGenericType.SEND_DELETE);
 	}
 	
 	@Override
@@ -106,7 +107,7 @@ public class SyncLifecycleListener implements StoreLifecycleListener, DeleteLife
 		}
 	}
 	
-	private void execSyncInvocation(Object persistentInstance, LDAPSyncEventType eventType) {
+	private void execSyncInvocation(Object persistentInstance, SyncEventType eventType) {
 
 		if (!isEnabled()){
 			return;
@@ -153,7 +154,7 @@ public class SyncLifecycleListener implements StoreLifecycleListener, DeleteLife
 				Object jfireObjectId = JDOHelper.getObjectId(persistentInstance);
 				UserManagementSystemID ldapServerId = ldapServer.getUserManagementSystemObjectID();
 				SendEventTypeDataUnit dataUnit = null;
-				if (LDAPSyncEventType.SEND_DELETE == eventType
+				if (SyncEventGenericType.SEND_DELETE == eventType
 						&& ldapServerId2sendEventDataUnits.get(ldapServerId) != null){
 					synchronized (ldapServerId2sendEventDataUnits) {
 						for (SendEventTypeDataUnit unit : ldapServerId2sendEventDataUnits.get(ldapServerId)){

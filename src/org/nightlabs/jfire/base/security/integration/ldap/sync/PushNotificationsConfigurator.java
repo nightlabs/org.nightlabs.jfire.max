@@ -39,13 +39,13 @@ import org.nightlabs.jfire.base.security.integration.ldap.LDAPManagerLocal;
 import org.nightlabs.jfire.base.security.integration.ldap.LDAPServer;
 import org.nightlabs.jfire.base.security.integration.ldap.connection.JNDIConnectionWrapper;
 import org.nightlabs.jfire.base.security.integration.ldap.sync.LDAPSyncEvent.FetchEventTypeDataUnit;
-import org.nightlabs.jfire.base.security.integration.ldap.sync.LDAPSyncEvent.LDAPSyncEventType;
 import org.nightlabs.jfire.security.GlobalSecurityReflector;
 import org.nightlabs.jfire.security.NoUserException;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.security.UserDescriptor;
 import org.nightlabs.jfire.security.integration.UserManagementSystem;
 import org.nightlabs.jfire.security.integration.UserManagementSystemCommunicationException;
+import org.nightlabs.jfire.security.integration.UserManagementSystemSyncEvent.SyncEventGenericType;
 import org.nightlabs.jfire.security.integration.id.UserManagementSystemID;
 import org.nightlabs.jfire.servermanager.JFireServerManager;
 import org.nightlabs.jfire.servermanager.JFireServerManagerFactory;
@@ -487,7 +487,7 @@ public class PushNotificationsConfigurator {
 				logger.warn(String.format("It seems that LDAP entry was renamed from %s to %s. Since we can't replace userID of existing JFire User new User object with a new name will be created.", oldName, newName));
 			}
 			
-			LDAPSyncEvent syncEvent = new LDAPSyncEvent(LDAPSyncEventType.FETCH);
+			LDAPSyncEvent syncEvent = new LDAPSyncEvent(SyncEventGenericType.FETCH);
 			syncEvent.setFetchEventTypeDataUnits(CollectionUtil.createHashSet(new FetchEventTypeDataUnit(newName)));
 			try {
 				AsyncInvoke.exec(
@@ -512,7 +512,7 @@ public class PushNotificationsConfigurator {
 				return;
 			}
 			
-			LDAPSyncEvent syncEvent = new LDAPSyncEvent(LDAPSyncEventType.FETCH_DELETE);
+			LDAPSyncEvent syncEvent = new LDAPSyncEvent(SyncEventGenericType.FETCH_DELETE);
 			syncEvent.setFetchEventTypeDataUnits(CollectionUtil.createHashSet(new FetchEventTypeDataUnit(name)));
 			try {
 				AsyncInvoke.exec(

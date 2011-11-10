@@ -27,8 +27,6 @@ import org.nightlabs.jfire.base.security.integration.ldap.id.LDAPScriptSetID;
 import org.nightlabs.jfire.base.security.integration.ldap.scripts.ILDAPScriptProvider;
 import org.nightlabs.jfire.base.security.integration.ldap.sync.LDAPSyncEvent;
 import org.nightlabs.jfire.base.security.integration.ldap.sync.LDAPSyncEvent.FetchEventTypeDataUnit;
-import org.nightlabs.jfire.base.security.integration.ldap.sync.LDAPSyncEvent.LDAPSyncEventType;
-import org.nightlabs.jfire.base.security.integration.ldap.sync.LDAPSyncException;
 import org.nightlabs.jfire.base.security.integration.ldap.sync.PushNotificationsConfigurator;
 import org.nightlabs.jfire.base.security.integration.ldap.sync.SecurityChangeListenerJFirePasswordChanged;
 import org.nightlabs.jfire.base.security.integration.ldap.sync.SyncLifecycleListener;
@@ -37,6 +35,8 @@ import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.security.id.UserID;
 import org.nightlabs.jfire.security.integration.UserManagementSystem;
 import org.nightlabs.jfire.security.integration.UserManagementSystemCommunicationException;
+import org.nightlabs.jfire.security.integration.UserManagementSystemSyncEvent.SyncEventGenericType;
+import org.nightlabs.jfire.security.integration.UserManagementSystemSyncException;
 import org.nightlabs.jfire.security.integration.UserManagementSystemType;
 import org.nightlabs.jfire.security.integration.id.UserManagementSystemID;
 import org.nightlabs.jfire.server.data.dir.JFireServerDataDirectory;
@@ -46,8 +46,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * EJB for configuring LDAP user management system. It has an orgnisation-init which creates LDAPServer types
- * single instances if not created already, creates LDAPServer instances from ldap.properties configuration file,
+ * EJB for configuring LDAP user management system. It has an orgnisation-init which creates {@link LDAPServer} types
+ * single instances if not created already, creates {@link LDAPServer} instances from ldap.properties configuration file,
  * configures synchronization of user data from JFire to LDAP directory and vice versa.
  * 
  * @author Denis Dudnik <deniska.dudnik[at]gmail{dot}com>
@@ -192,7 +192,7 @@ public class LDAPManagerBean extends BaseSessionBeanImpl implements LDAPManagerR
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@RolesAllowed("_System_")
 	@Override
-	public void syncUserDataFromLDAP(TaskID taskID) throws LoginException, LDAPSyncException, UserManagementSystemCommunicationException {
+	public void syncUserDataFromLDAP(TaskID taskID) throws LoginException, UserManagementSystemSyncException, UserManagementSystemCommunicationException {
 		PersistenceManager pm = createPersistenceManager();
 		try{
 			// determine if there's any leading LDAPServers
@@ -208,7 +208,7 @@ public class LDAPManagerBean extends BaseSessionBeanImpl implements LDAPManagerR
 					dataUnits.add(new FetchEventTypeDataUnit(ldapEntryName));
 				}
 				if (!dataUnits.isEmpty()){
-					LDAPSyncEvent syncEvent = new LDAPSyncEvent(LDAPSyncEventType.FETCH);
+					LDAPSyncEvent syncEvent = new LDAPSyncEvent(SyncEventGenericType.FETCH);
 					syncEvent.setOrganisationID(getOrganisationID());
    					syncEvent.setFetchEventTypeDataUnits(dataUnits);
 					
@@ -216,31 +216,6 @@ public class LDAPManagerBean extends BaseSessionBeanImpl implements LDAPManagerR
 				}
 				
 			}
-		}finally{
-			pm.close();
-		}
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	@RolesAllowed("org.nightlabs.jfire.security.accessRightManagement")
-	@Override
-	public void runLDAPServerSynchronization(UserManagementSystemID ldapServerID, LDAPSyncEvent syncEvent) throws LoginException, LDAPSyncException, UserManagementSystemCommunicationException {
-		if (ldapServerID == null){
-			throw new IllegalArgumentException("LDAPServer ID should be not null!");
-		}
-		if (syncEvent == null){
-			throw new IllegalArgumentException("LDAPSyncEvent should be not null!");
-		}
-		
-		PersistenceManager pm = createPersistenceManager();
-		try{
-			
-			LDAPServer ldapServer = (LDAPServer) pm.getObjectById(ldapServerID);
-			ldapServer.synchronize(syncEvent);
-			
 		}finally{
 			pm.close();
 		}

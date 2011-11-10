@@ -4,46 +4,23 @@ import java.io.Serializable;
 import java.util.Collection;
 
 import org.nightlabs.jfire.base.security.integration.ldap.LDAPServer;
+import org.nightlabs.jfire.security.integration.UserManagementSystemSyncEvent;
 
 /**
- * <p>Instances of this class are used for managing the synchronization process by passing them 
- * to {@link LDAPServer} synchronize() method. 
- * Instance of this class indicates what to synchronize (via {@code #sendEventTypeDataUnits} 
- * and {@code #fetchEventTypeDataUnits}) and in which direction (via {@code eventType}).</p>
+ * Implementation of a {@link UserManagementSystemSyncEvent} for {@link LDAPServer}. 
+ * Indicates what to synchronize (via {@code #sendEventTypeDataUnits} and {@code #fetchEventTypeDataUnits}) 
+ * and in which direction (via {@code eventType}).
  * 
  * @author Denis Dudnik <deniska.dudnik[at]gmail{dot}com>
  *
  */
-public class LDAPSyncEvent implements Serializable{
+public class LDAPSyncEvent implements UserManagementSystemSyncEvent, Serializable{
 	
 	/**
 	 * The serial version of this class.
 	 */
 	private static final long serialVersionUID = 1L;
 
-	/**
-	 * Event types for LDAPSyncEvent
-	 * 
-	 * @author Denis Dudnik <deniska.dudnik[at]gmail{dot}com>
-	 *
-	 */
-	public enum LDAPSyncEventType{
-		FETCH("FETCH"),					// get data from LDAP directory and store in JFire
-		SEND("SEND"),					// send data to store in LDAP directory
-		SEND_DELETE("SEND_DELETE"),		// delete entry in LDAP directory after JFire entry was deleted
-		FETCH_DELETE("FETCH_DELETE");	// delete JFire object after LDAP entry was deleted
-        
-		private String stringValue;
-		
-		private LDAPSyncEventType(String stringValue){
-        	this.stringValue = stringValue;
-        }
-        
-        public String stringValue(){
-        	return stringValue;
-        }
-	}
-	
 	/**
 	 * Simple class for holding data for synchronization of one JFire object. Event type: SEND_DELETE
 	 * This class is introduced to help with proper usage of {@link LDAPSyncEvent} class.
@@ -193,7 +170,7 @@ public class LDAPSyncEvent implements Serializable{
 	 * Event type defines the synchronization direction. Either fetch data from {@link LDAPServer)
 	 * and store it in JFire or send (perhaps changed) data to the {@link LDAPServer).
 	 */
-	private LDAPSyncEventType eventType;
+	private SyncEventType eventType;
 	
 	/**
 	 * ID of organisation where sync is performed
@@ -212,12 +189,12 @@ public class LDAPSyncEvent implements Serializable{
 	
 	
 	/**
-	 * Constructs a new LDAPSyncEvent to be passed to {@link LDAPServer} synchronize() method.
+	 * Constructs a new LDAPSyncEvent to be passed to {@link LDAPServer#synchronize(UserManagementSystemSyncEvent)} method.
 	 * 
 	 * @param type
 	 * @param completeUserId
 	 */
-	public LDAPSyncEvent(LDAPSyncEventType type){
+	public LDAPSyncEvent(SyncEventType type){
 		this.eventType = type;
 	}
 
@@ -272,13 +249,13 @@ public class LDAPSyncEvent implements Serializable{
 	public void setFetchEventTypeDataUnits(Collection<FetchEventTypeDataUnit> fetchEventTypeDataUnits) {
 		this.fetchEventTypeDataUnits = fetchEventTypeDataUnits;
 	}
-	
+
 	/**
-	 * 
-	 * @return an event type
+	 * {@inheritDoc}
 	 */
-	public LDAPSyncEventType getEventType() {
+	@Override
+	public SyncEventType getEventType() {
 		return eventType;
 	}
-
+	
 }

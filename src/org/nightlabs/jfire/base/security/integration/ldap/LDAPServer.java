@@ -41,9 +41,7 @@ import org.nightlabs.jfire.base.security.integration.ldap.sync.AttributeStructFi
 import org.nightlabs.jfire.base.security.integration.ldap.sync.IAttributeStructFieldDescriptorProvider;
 import org.nightlabs.jfire.base.security.integration.ldap.sync.LDAPSyncEvent;
 import org.nightlabs.jfire.base.security.integration.ldap.sync.LDAPSyncEvent.FetchEventTypeDataUnit;
-import org.nightlabs.jfire.base.security.integration.ldap.sync.LDAPSyncEvent.LDAPSyncEventType;
 import org.nightlabs.jfire.base.security.integration.ldap.sync.LDAPSyncEvent.SendEventTypeDataUnit;
-import org.nightlabs.jfire.base.security.integration.ldap.sync.LDAPSyncException;
 import org.nightlabs.jfire.base.security.integration.ldap.sync.SyncLifecycleListener;
 import org.nightlabs.jfire.person.Person;
 import org.nightlabs.jfire.prop.StructLocal;
@@ -56,6 +54,9 @@ import org.nightlabs.jfire.security.integration.Session;
 import org.nightlabs.jfire.security.integration.UserManagementSystem;
 import org.nightlabs.jfire.security.integration.UserManagementSystemCommunicationException;
 import org.nightlabs.jfire.security.integration.UserManagementSystemManagerBean.ForbidUserCreationLyfecycleListener;
+import org.nightlabs.jfire.security.integration.UserManagementSystemSyncEvent.SyncEventGenericType;
+import org.nightlabs.jfire.security.integration.UserManagementSystemSyncEvent.SyncEventType;
+import org.nightlabs.jfire.security.integration.UserManagementSystemSyncException;
 import org.nightlabs.jfire.security.integration.UserManagementSystemType;
 import org.nightlabs.jfire.security.integration.id.UserManagementSystemID;
 import org.nightlabs.jfire.servermanager.JFireServerManager;
@@ -66,7 +67,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Class representing LDAP-based UserManagementSystem. This is the most important class for the JFireLDAP module. 
+ * Class representing LDAP-based {@link UserManagementSystem}. This is the most important class for the JFireLDAP module. 
  * It is in charge of logging in {@link User} and synchronization between LDAP directory and JFire. It also implements 
  * {@link ILDAPConnectionParamsProvider} for providing stored server parameters to a {@link LDAPConnection}.
  *
@@ -94,7 +95,7 @@ import org.slf4j.LoggerFactory;
 				value="SELECT where this.type == :serverType && this.attributeSyncPolicy == :attributeSyncPolicy ORDER BY JDOHelper.getObjectId(this) ASCENDING"
 				)
 		})
-public class LDAPServer extends UserManagementSystem implements ILDAPConnectionParamsProvider, AttachCallback, DeleteCallback, StoreCallback{
+public class LDAPServer extends UserManagementSystem<LDAPSyncEvent> implements ILDAPConnectionParamsProvider, AttachCallback, DeleteCallback, StoreCallback{
 
 	public static final int LDAP_DEFAULT_PORT = 10389;
 	public static final String LDAP_DEFAULT_HOST = "localhost";
@@ -240,7 +241,7 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 	        	logger.debug("Loggin out from session, id: " + session.getSessionID());
 	        }
 
-			connection = createConnection(this);
+//			connection = createConnection(this);
 			
 			// currently this method does nothing, probably it will be used if Session object is used somehow by LDAPServer
 
@@ -334,13 +335,13 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
    			        			String.format("User %s@%s was not found JFire, start fetching it from LDAP", loginDataUserID, loginDataOrganisationID));
    			        }
    	    			
-   					LDAPSyncEvent syncEvent = new LDAPSyncEvent(LDAPSyncEventType.FETCH);
+   					LDAPSyncEvent syncEvent = new LDAPSyncEvent(SyncEventGenericType.FETCH);
    					syncEvent.setOrganisationID(loginDataOrganisationID);
    					syncEvent.setFetchEventTypeDataUnits(
    							CollectionUtil.createHashSet(
    									new FetchEventTypeDataUnit(userDN)));
 					updateJFireData(syncEvent);
-				} catch (LDAPSyncException e) {
+				} catch (UserManagementSystemSyncException e) {
 					logger.error(
 							String.format("Exception while fetching user %s@%s from LDAP", loginDataUserID, loginDataOrganisationID), e);
 					throw new LoginException(
@@ -624,34 +625,23 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 	 ***********************************/
 	
 	/**
-	 * Starts synchronization process. It's driven by {@link LDAPSyncEvent} objects
-	 * which are telling what to do: send data to LDAP server or recieve it and store
-	 * in JFire. These events also contain pointers for the data to be synchronized 
-	 * (i.e. a complete userId for a User object).
-	 * 
-	 * TODO: This API could be generalized and be a part of {@link UserManagementSystem}.
-	 * And of course we could create a general SyncEvent in this case. 
-	 * I think taht this option needs to be considered. Denis. 
-	 * 
-	 * @param syncEvent
-	 * @throws UserManagementSystemCommunicationException 
-	 * @throws LoginException 
-	 * @throws LDAPSyncException
+	 * {@inheritDoc}
 	 */
-	public void synchronize(LDAPSyncEvent syncEvent) throws LDAPSyncException, LoginException, UserManagementSystemCommunicationException{
-		LDAPSyncEventType eventType = syncEvent.getEventType();
-		if (LDAPSyncEventType.FETCH == eventType
-				|| LDAPSyncEventType.FETCH_DELETE == eventType){
+	@Override
+	public void synchronize(LDAPSyncEvent syncEvent) throws UserManagementSystemSyncException, LoginException, UserManagementSystemCommunicationException{
+		SyncEventType eventType = syncEvent.getEventType();
+		if (SyncEventGenericType.FETCH == eventType
+				|| SyncEventGenericType.FETCH_DELETE == eventType){
 			
 			updateJFireData(syncEvent);
 			
-		}else if (LDAPSyncEventType.SEND == eventType
-				|| LDAPSyncEventType.SEND_DELETE == eventType){
+		}else if (SyncEventGenericType.SEND == eventType
+				|| SyncEventGenericType.SEND_DELETE == eventType){
 			
 			updateLDAPData(syncEvent);
 			
 		}else{
-			throw new UnsupportedOperationException("Unknown LDAPSyncEventType!");
+			throw new UnsupportedOperationException("Unknown UserManagementSystemSyncEventType!");
 		}
 	}
 
@@ -725,10 +715,10 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 	 * 
 	 * @return all LDAP entries which should be synchronized into JFire
 	 * @throws UserManagementSystemCommunicationException 
-	 * @throws LDAPSyncException 
+	 * @throws UserManagementSystemSyncException 
 	 * @throws LoginException 
 	 */
-	public Collection<String> getAllEntriesForSync() throws UserManagementSystemCommunicationException, LoginException, LDAPSyncException{
+	public Collection<String> getAllEntriesForSync() throws UserManagementSystemCommunicationException, LoginException, UserManagementSystemSyncException{
 		LDAPConnection connection = null;
 		Collection<String> entriesForSync = new ArrayList<String>();
 		try{
@@ -843,9 +833,9 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 	 * @param removeJFireObjects
 	 * @throws UserManagementSystemCommunicationException
 	 * @throws LoginException
-	 * @throws LDAPSyncException
+	 * @throws UserManagementSystemSyncException
 	 */
-	private void updateJFireData(LDAPSyncEvent ldapSyncEvent) throws UserManagementSystemCommunicationException, LoginException, LDAPSyncException{
+	private void updateJFireData(LDAPSyncEvent ldapSyncEvent) throws UserManagementSystemCommunicationException, LoginException, UserManagementSystemSyncException{
 		
 		if (ldapSyncEvent.getFetchEventTypeDataUnits() == null
 				|| ldapSyncEvent.getFetchEventTypeDataUnits().isEmpty()){
@@ -891,7 +881,7 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 					}
 					
 				}catch(Exception ne){
-					throw new LDAPSyncException("Can't sync from LDAP to JFire because there's no logged in User.", ne);
+					throw new UserManagementSystemSyncException("Can't sync from LDAP to JFire because there's no logged in User.", ne);
 				}
 			}
 			connection = createAndBindConnectionForSync();
@@ -909,7 +899,7 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 					}
 					
 					LDAPAttributeSet attributes = null;
-					boolean removeJFireObjects = ldapSyncEvent.getEventType() == LDAPSyncEventType.FETCH_DELETE;
+					boolean removeJFireObjects = ldapSyncEvent.getEventType() == SyncEventGenericType.FETCH_DELETE;
 					if (!removeJFireObjects ){
 						attributes = connection.getAttributesForEntry(ldapEntryDN);
 					}else{
@@ -959,7 +949,7 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 					}
 
 				}catch(Exception e){
-					throw new LDAPSyncException("Exception occured while synchronizing entry with DN " + ldapEntryDN, e);
+					throw new UserManagementSystemSyncException("Exception occured while synchronizing entry with DN " + ldapEntryDN, e);
 				}
 			}
 		}finally{
@@ -990,9 +980,9 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 	 * @param ldapSyncEvent
 	 * @throws UserManagementSystemCommunicationException
 	 * @throws LoginException
-	 * @throws LDAPSyncException
+	 * @throws UserManagementSystemSyncException
 	 */
-	private void updateLDAPData(LDAPSyncEvent ldapSyncEvent) throws UserManagementSystemCommunicationException, LoginException, LDAPSyncException{
+	private void updateLDAPData(LDAPSyncEvent ldapSyncEvent) throws UserManagementSystemCommunicationException, LoginException, UserManagementSystemSyncException{
 		
 		if (ldapSyncEvent.getSendEventTypeDataUnits() == null
 				|| ldapSyncEvent.getSendEventTypeDataUnits().isEmpty()){
@@ -1013,7 +1003,7 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 					}
 				
 					String userDN = dataUnit.getLdapEntryId();
-					if (ldapSyncEvent.getEventType() == LDAPSyncEventType.SEND
+					if (ldapSyncEvent.getEventType() == SyncEventGenericType.SEND
 							&& (userDN == null || "".equals(userDN))){
 						if (logger.isDebugEnabled()){
 							logger.debug("LDAP entry name was not given in SendEventTypeDataUnit, trying to get it via scriptset for object with ID " + jfireObjectId.toString());
@@ -1037,7 +1027,7 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 						entryExists = false;
 					}
 
-					if (ldapSyncEvent.getEventType() == LDAPSyncEventType.SEND_DELETE){
+					if (ldapSyncEvent.getEventType() == SyncEventGenericType.SEND_DELETE){
 						
 						if (!entryExists){
 							logger.warn("Can't remove non-existent entry with DN: " + userDN);
@@ -1117,7 +1107,7 @@ public class LDAPServer extends UserManagementSystem implements ILDAPConnectionP
 						logger.debug("Data synchronized for object " + jfireObjectId.toString());
 					}
 				}catch(Exception e){
-					throw new LDAPSyncException("Exception occured while synchronizing object with id " + jfireObjectId.toString(), e);
+					throw new UserManagementSystemSyncException("Exception occured while synchronizing object with id " + jfireObjectId.toString(), e);
 				}
 			}
 		}finally{

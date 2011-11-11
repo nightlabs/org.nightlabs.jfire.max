@@ -50,6 +50,7 @@ import org.nightlabs.jfire.security.ISecurityReflector;
 import org.nightlabs.jfire.security.NoUserException;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.security.UserDescriptor;
+import org.nightlabs.jfire.security.integration.SynchronizableUserManagementSystem;
 import org.nightlabs.jfire.security.integration.Session;
 import org.nightlabs.jfire.security.integration.UserManagementSystem;
 import org.nightlabs.jfire.security.integration.UserManagementSystemCommunicationException;
@@ -95,7 +96,8 @@ import org.slf4j.LoggerFactory;
 				value="SELECT where this.type == :serverType && this.attributeSyncPolicy == :attributeSyncPolicy ORDER BY JDOHelper.getObjectId(this) ASCENDING"
 				)
 		})
-public class LDAPServer extends UserManagementSystem<LDAPSyncEvent> implements ILDAPConnectionParamsProvider, AttachCallback, DeleteCallback, StoreCallback{
+public class LDAPServer extends UserManagementSystem 
+implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDAPSyncEvent>, AttachCallback, DeleteCallback, StoreCallback{
 
 	public static final int LDAP_DEFAULT_PORT = 10389;
 	public static final String LDAP_DEFAULT_HOST = "localhost";

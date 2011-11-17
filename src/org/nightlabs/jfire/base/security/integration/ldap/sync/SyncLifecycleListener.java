@@ -69,12 +69,12 @@ public class SyncLifecycleListener implements StoreLifecycleListener, DeleteLife
 	
 	@Override
 	public void postStore(InstanceLifecycleEvent event) {
-		execSyncInvocation(event.getPersistentInstance(), SyncEventGenericType.SEND);
+		execSyncInvocation(event.getPersistentInstance(), SyncEventGenericType.SEND_USER);
 	}
 
 	@Override
 	public void postDelete(InstanceLifecycleEvent event) {
-		execSyncInvocation(event.getPersistentInstance(), SyncEventGenericType.SEND_DELETE);
+		execSyncInvocation(event.getPersistentInstance(), SyncEventGenericType.UMS_REMOVE_USER);
 	}
 	
 	@Override
@@ -154,7 +154,7 @@ public class SyncLifecycleListener implements StoreLifecycleListener, DeleteLife
 				Object jfireObjectId = JDOHelper.getObjectId(persistentInstance);
 				UserManagementSystemID ldapServerId = ldapServer.getUserManagementSystemObjectID();
 				SendEventTypeDataUnit dataUnit = null;
-				if (SyncEventGenericType.SEND_DELETE == eventType
+				if (SyncEventGenericType.UMS_REMOVE_USER == eventType
 						&& ldapServerId2sendEventDataUnits.get(ldapServerId) != null){
 					synchronized (ldapServerId2sendEventDataUnits) {
 						for (SendEventTypeDataUnit unit : ldapServerId2sendEventDataUnits.get(ldapServerId)){

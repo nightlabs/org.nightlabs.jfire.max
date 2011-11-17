@@ -232,7 +232,20 @@ public class LDAPAttributeSet implements Iterable<LDAPAttribute<Object>>{
 		}
 		return null;
 	}
-	
+
+	/**
+	 * Get multi-valued attribute values by attribute name.
+	 * 
+	 * @param attributeName
+	 * @return attribute values or <code>null</code> if there's no {@link LDAPAttribute} with such name in the set
+	 */
+	public Iterable<Object> getAttributeValues(String attributeName) {
+		if (attributes.containsKey(attributeName)){
+			return attributes.get(attributeName).getValues();
+		}
+		return null;
+	}
+
 	/**
 	 * Checks if this {@link LDAPAttributeSet} contains an {@link LDAPAttribute} with given name.
 	 * 

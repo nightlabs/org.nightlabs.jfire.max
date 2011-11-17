@@ -40,6 +40,7 @@ import javax.naming.ldap.UnsolicitedNotificationEvent;
 import javax.naming.ldap.UnsolicitedNotificationListener;
 import javax.security.auth.login.LoginException;
 
+import org.nightlabs.jfire.base.security.integration.ldap.LDAPServer;
 import org.nightlabs.jfire.base.security.integration.ldap.attributes.LDAPAttribute;
 import org.nightlabs.jfire.base.security.integration.ldap.attributes.LDAPAttributeSet;
 import org.nightlabs.jfire.base.security.integration.ldap.connection.ILDAPConnectionParamsProvider.AuthenticationMethod;
@@ -362,7 +363,21 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper{
 		return context != null && isConnected;
 	}
 	
-	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean entryExists(String entryName) {
+		try{
+			LDAPAttributeSet attributesForEntry = getAttributesForEntry(entryName, new String[]{LDAPServer.OBJECT_CLASS_ATTR_NAME});
+			return attributesForEntry != null && attributesForEntry.size() > 0;
+		}catch(UserManagementSystemCommunicationException e){
+			logger.info(
+					String.format("Check for entry %s existence failed with exception which probably means that entry does not exist.", entryName), e);
+			return false;
+		}
+	}
+
 	/**
 	 * Performs disconnection and releases all resources
 	 */

@@ -130,5 +130,13 @@ public interface LDAPConnectionWrapper{
 	 * @throws LoginException 
 	 */
 	public Collection<String> getChildEntries(String parentName) throws UserManagementSystemCommunicationException, LoginException;
+
+	/**
+	 * Checks if entry with given name exists in LDAP directory
+	 * 
+	 * @param entryName The distingueshed name of LDAP entry to be checked
+	 * @return <code>true</code> if entry exists
+	 */
+	public boolean entryExists(String entryName);
 	
 }

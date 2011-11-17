@@ -64,10 +64,6 @@ public class LDAPSyncInvocation extends Invocation{
 		try{
 			
 			LDAPServer ldapServer = (LDAPServer) pm.getObjectById(ldapServerID);
-			if (ldapSyncEvent.getOrganisationID() == null
-					|| ldapSyncEvent.getOrganisationID().isEmpty()){
-				ldapSyncEvent.setOrganisationID(getOrganisationID());
-			}
 			if (logger.isDebugEnabled()){
 				logger.debug(
 						String.format("Running %s synchronization for LDAPServer at %s:%s", 

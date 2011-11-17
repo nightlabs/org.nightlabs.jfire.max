@@ -173,11 +173,6 @@ public class LDAPSyncEvent implements UserManagementSystemSyncEvent, Serializabl
 	private SyncEventType eventType;
 	
 	/**
-	 * ID of organisation where sync is performed
-	 */
-	private String organisationID;
-	
-	/**
 	 * {@link Collection} of entities describing data objects being send to {@link LDAPServer}
 	 */
 	private Collection<SendEventTypeDataUnit> sendEventTypeDataUnits;
@@ -198,22 +193,6 @@ public class LDAPSyncEvent implements UserManagementSystemSyncEvent, Serializabl
 		this.eventType = type;
 	}
 
-	/**
-	 * 
-	 * @return organisationID
-	 */
-	public String getOrganisationID() {
-		return organisationID;
-	}
-	
-	/**
-	 * Sets organisationID
-	 * @param organisationID
-	 */
-	public void setOrganisationID(String organisationID) {
-		this.organisationID = organisationID;
-	}
-	
 	/**
 	 * Get entites describing objects to be sent to {@link LDAPServer}
 	 * 

@@ -208,8 +208,7 @@ public class LDAPManagerBean extends BaseSessionBeanImpl implements LDAPManagerR
 					dataUnits.add(new FetchEventTypeDataUnit(ldapEntryName));
 				}
 				if (!dataUnits.isEmpty()){
-					LDAPSyncEvent syncEvent = new LDAPSyncEvent(SyncEventGenericType.FETCH);
-					syncEvent.setOrganisationID(getOrganisationID());
+					LDAPSyncEvent syncEvent = new LDAPSyncEvent(SyncEventGenericType.FETCH_USER);
    					syncEvent.setFetchEventTypeDataUnits(dataUnits);
 					
 					ldapServer.synchronize(syncEvent);

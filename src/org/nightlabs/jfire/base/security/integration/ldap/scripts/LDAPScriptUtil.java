@@ -22,6 +22,7 @@ import org.nightlabs.jfire.prop.id.StructLocalID;
 import org.nightlabs.jfire.prop.search.TextStructFieldSearchFilterItem;
 import org.nightlabs.jfire.security.Authority;
 import org.nightlabs.jfire.security.AuthorizedObjectRef;
+import org.nightlabs.jfire.security.GlobalSecurityReflector;
 import org.nightlabs.jfire.security.RoleGroup;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.security.UserLocal;
@@ -41,15 +42,16 @@ public class LDAPScriptUtil {
 
 	private static final Logger logger = LoggerFactory.getLogger(LDAPScriptUtil.class);
 	
+	public static final String ORGANISATION_SEPARATOR = new String(new char[]{User.SEPARATOR_BETWEEN_USER_ID_AND_ORGANISATION_ID});
+	
 	/**
 	 * Either gets JFire {@link User} by given uid or creates a new one.
 	 * 
 	 * @param pm
 	 * @param uid
-	 * @param organisationID
 	 * @return {@link User} (loaded or created)
 	 */
-	public static User getUser(PersistenceManager pm, String uid, String organisationID){
+	public static User getUser(PersistenceManager pm, String organisationID, String uid){
 		logger.debug("UID is "+ uid);
 		User user = null;
 		if (uid != null){	// assume were dealing with User object
@@ -226,4 +228,21 @@ public class LDAPScriptUtil {
 		return null;
 	}
 	
+	/**
+	 * Get organisation ID by given completeID of JFire object.
+	 * 
+	 * @param completeID The complete ID of a JFire object, i.e "username@organisationID"
+	 * @return organisationID from completeID or a local organisationID
+	 */
+	public static String getOrganisationID(String completeID){
+		String organisationID = GlobalSecurityReflector.sharedInstance().getUserDescriptor().getOrganisationID();
+		if (completeID != null && completeID.indexOf(ORGANISATION_SEPARATOR) > -1){
+			String[] idParts = completeID.split(ORGANISATION_SEPARATOR);
+			if (idParts.length == 2
+					&& !idParts[1].isEmpty()){
+				return idParts[1];
+			}
+		}
+		return organisationID;
+	}
 }

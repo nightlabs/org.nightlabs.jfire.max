@@ -487,7 +487,7 @@ public class PushNotificationsConfigurator {
 				logger.warn(String.format("It seems that LDAP entry was renamed from %s to %s. Since we can't replace userID of existing JFire User new User object with a new name will be created.", oldName, newName));
 			}
 			
-			LDAPSyncEvent syncEvent = new LDAPSyncEvent(SyncEventGenericType.FETCH);
+			LDAPSyncEvent syncEvent = new LDAPSyncEvent(SyncEventGenericType.FETCH_USER);
 			syncEvent.setFetchEventTypeDataUnits(CollectionUtil.createHashSet(new FetchEventTypeDataUnit(newName)));
 			try {
 				AsyncInvoke.exec(
@@ -512,7 +512,7 @@ public class PushNotificationsConfigurator {
 				return;
 			}
 			
-			LDAPSyncEvent syncEvent = new LDAPSyncEvent(SyncEventGenericType.FETCH_DELETE);
+			LDAPSyncEvent syncEvent = new LDAPSyncEvent(SyncEventGenericType.JFIRE_REMOVE_USER);
 			syncEvent.setFetchEventTypeDataUnits(CollectionUtil.createHashSet(new FetchEventTypeDataUnit(name)));
 			try {
 				AsyncInvoke.exec(

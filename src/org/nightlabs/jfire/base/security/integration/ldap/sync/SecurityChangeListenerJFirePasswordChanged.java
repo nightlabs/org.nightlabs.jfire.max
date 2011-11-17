@@ -186,13 +186,8 @@ public class SecurityChangeListenerJFirePasswordChanged extends SecurityChangeLi
 			if (logger.isDebugEnabled()){
 				logger.debug("Check if LDAP entry exists with name " + entryDN);
 			}
-			boolean entryExists = false;
-			try{
-				connection.getAttributesForEntry(entryDN);
-				entryExists = true;
-			}catch(UserManagementSystemCommunicationException e){
-				entryExists = false;
-			}
+
+			boolean entryExists = connection.entryExists(entryDN);
 			if (logger.isDebugEnabled()){
 				logger.debug(String.format("Entry %s does%s exist.", entryDN, entryExists ? "" : " not"));
 			}

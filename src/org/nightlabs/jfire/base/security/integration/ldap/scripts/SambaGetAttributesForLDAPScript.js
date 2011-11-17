@@ -34,17 +34,19 @@ function getMappedAttributes(){
 
 	if ($userID$ != null){
 		// User fields
-		attributes.createAttribute('commonName', $userName$);
-		attributes.createAttribute('uid', $userID$);
+		attributes.createAttribute('commonName', $userID$);
+		attributes.createAttribute('uid', $userCompleteUserID$);
 		attributes.createAttribute('description', $userDescription$);
-		attributes.createAttribute('uidNumber', ''+$userID$.hashCode());
+
+		// DEFAULT VALUE for this mandatory attribute is '1'
+		attributes.createAttribute('uidNumber', '1');
 	}else if ($personID$ != null){
 		attributes.createAttribute('commonName', $personName$);
 		attributes.createAttribute('description', $personComment$);
-		attributes.createAttribute('uid', $personID$ +'@'+$personOrganisationID$);
+		attributes.createAttribute('uid', $personCompleteID$);
 
-		// DEFAULT VALUE for this mandatory attribute is $personID$
-		attributes.createAttribute('uidNumber', ''+$personID$);
+		// DEFAULT VALUE for this mandatory attribute is '0'
+		attributes.createAttribute('uidNumber', '1');
 	}
 
 	// DEFAULT VALUE for this mandatory attribute is '0'
@@ -67,4 +69,18 @@ function getMappedAttributes(){
  */
 function getPasswordAttributeName(){
 	return 'userPassword';
+}
+
+/**
+ * Get JFire UserID as String by given attributes of an LDAP entry.
+ */
+function getUserIDFromLDAPEntry(attributes){
+	var displayName = LDAPScriptUtil.getAttributeValue(attributes, 'displayName', null);
+	if (displayName == null || displayName == ''){	// assume it's not a Person
+		var uid = LDAPScriptUtil.getAttributeValue(allAttributes, 'uid', 'userid');
+		if (uid != null){
+			return uid;
+		}
+	}
+	return null;
 }

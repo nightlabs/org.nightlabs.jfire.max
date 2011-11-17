@@ -13,13 +13,11 @@
  * @author Denis Dudnik <deniska.dudnik[at]gmail{dot}com>
  * 
  */
-// REV Alex: Is this correct User => uid=, Person => cn= we (at NightLabs use it
-// differently, we have our users as cn, and other Persons with sn)
 var dn = null;
 if (userData != null && $userID$ != null){
-	dn = 'uid='+$userID$+',BASE_ENTRY_NAME_PLACEHOLDER';
+	dn = 'cn='+$userID$+',BASE_ENTRY_NAME_PLACEHOLDER';
 }else if (personData != null && $personName$ != null){
 	// REV Alex: Maybe use personDisplayName or some other concatenated value as cn
-	dn = 'cn='+$personName$+',BASE_ENTRY_NAME_PLACEHOLDER';
+	dn = 'sn='+$personName$+',BASE_ENTRY_NAME_PLACEHOLDER';
 }
 dn;

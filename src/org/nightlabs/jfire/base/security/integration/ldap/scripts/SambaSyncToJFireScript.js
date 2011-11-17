@@ -17,11 +17,12 @@ importClass(org.nightlabs.jfire.base.security.integration.ldap.scripts.LDAPScrip
 importClass(org.nightlabs.jfire.person.PersonStruct);
 
 var user = null;
+var completeID = LDAPScriptUtil.getAttributeValue(allAttributes, 'uid', 'userid');
 var displayName = LDAPScriptUtil.getAttributeValue(allAttributes, 'displayName', null);
 if (displayName == null || displayName == ''){	// assume it's not a Person
-	user = LDAPScriptUtil.getUser(pm, LDAPScriptUtil.getAttributeValue(allAttributes, 'uid', 'userid'), organisationID);
+	user = LDAPScriptUtil.getUser(pm, LDAPScriptUtil.getOrganisationID(completeID), LDAPScriptUtil.getAttributeValue(allAttributes, 'cn', 'commonName'));
 }
-var person = LDAPScriptUtil.getPerson(pm, user, organisationID, LDAPScriptUtil.getAttributeValue(allAttributes, 'cn', 'commonName'));
+var person = LDAPScriptUtil.getPerson(pm, user, LDAPScriptUtil.getOrganisationID(completeID), LDAPScriptUtil.getAttributeValue(allAttributes, 'cn', 'commonName'));
 
 if (removeJFireObjects){
 	if (person != null){

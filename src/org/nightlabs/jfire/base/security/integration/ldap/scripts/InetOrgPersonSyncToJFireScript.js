@@ -16,8 +16,13 @@
 importClass(org.nightlabs.jfire.base.security.integration.ldap.scripts.LDAPScriptUtil);
 importClass(org.nightlabs.jfire.person.PersonStruct);
 
-var user = LDAPScriptUtil.getUser(pm, LDAPScriptUtil.getAttributeValue(allAttributes, 'uid', 'userid'), organisationID);
-var person = LDAPScriptUtil.getPerson(pm, user, organisationID, LDAPScriptUtil.getAttributeValue(allAttributes, 'cn', 'commonName'));
+var completeID = LDAPScriptUtil.getAttributeValue(allAttributes, 'uid', 'userid');
+var user = null;
+if (entryName != null 
+		&& (entryName.toLowerCase().indexOf("cn") == 0 || entryName.toLowerCase().indexOf("commonname") == 0)){	// assume it's a User
+	user = LDAPScriptUtil.getUser(pm, LDAPScriptUtil.getOrganisationID(completeID), LDAPScriptUtil.getAttributeValue(allAttributes, 'cn', 'commonName'));
+}
+var person = LDAPScriptUtil.getPerson(pm, user, LDAPScriptUtil.getOrganisationID(completeID), LDAPScriptUtil.getAttributeValue(allAttributes, 'sn', 'surname'));
 
 if (removeJFireObjects){
 	if (person != null){
@@ -42,7 +47,7 @@ if (removeJFireObjects){
 		logger.debug("setting data to data fields...");
 		// personal data
 		person.getDataField(PersonStruct.PERSONALDATA_COMPANY).setData(LDAPScriptUtil.getAttributeValue(allAttributes, 'o', 'organizationName'));
-		person.getDataField(PersonStruct.PERSONALDATA_NAME).setData(LDAPScriptUtil.getAttributeValue(allAttributes, 'cn', 'commonName')!=null?LDAPScriptUtil.getAttributeValue(allAttributes, 'cn', 'commonName'):LDAPScriptUtil.getAttributeValue(allAttributes, 'sn', 'surname'));
+		person.getDataField(PersonStruct.PERSONALDATA_NAME).setData(LDAPScriptUtil.getAttributeValue(allAttributes, 'sn', 'surname')!=null?LDAPScriptUtil.getAttributeValue(allAttributes, 'sn', 'surname'):LDAPScriptUtil.getAttributeValue(allAttributes, 'cn', 'commonName'));
 		person.getDataField(PersonStruct.PERSONALDATA_FIRSTNAME).setData(LDAPScriptUtil.getAttributeValue(allAttributes, 'gn', 'givenName'));
 		person.getDataField(PersonStruct.PERSONALDATA_TITLE).setData(LDAPScriptUtil.getAttributeValue(allAttributes, 'title', null));
 		var photo = LDAPScriptUtil.getAttributeValue(allAttributes, 'photo', null);

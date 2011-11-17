@@ -15,7 +15,7 @@
  */
 var dn = null;
 if (userData != null && $userID$ != null){
-	dn = 'uid='+$userID$+',BASE_ENTRY_NAME_PLACEHOLDER';
+	dn = 'cn='+$userID$+',BASE_ENTRY_NAME_PLACEHOLDER';
 }else if (personData != null && $personName$ != null){
 	dn = 'cn='+$personName$+',BASE_ENTRY_NAME_PLACEHOLDER';
 }

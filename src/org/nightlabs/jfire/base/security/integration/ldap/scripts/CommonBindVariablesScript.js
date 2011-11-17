@@ -14,6 +14,7 @@
  * 
  */
 importClass(org.nightlabs.jfire.person.PersonStruct);
+importClass(org.nightlabs.jfire.base.security.integration.ldap.scripts.LDAPScriptUtil);
 
 var $userID$ = null;
 var $userName$ = null;
@@ -41,6 +42,7 @@ if (userData != null){
 var $personID$ = null;
 var $personOrganisationID$ = null;
 var $personLocaleLanguage$ = null;
+var $personCompleteID$ = ''+$personID$ + LDAPScriptUtil.ORGANISATION_SEPARATOR + $personOrganisationID$;
 
 // internal
 var $personDisplayName$ = null;

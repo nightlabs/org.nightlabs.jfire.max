@@ -19,8 +19,10 @@ import javax.script.SimpleScriptContext;
 
 import org.nightlabs.jfire.base.security.integration.ldap.attributes.LDAPAttributeSet;
 import org.nightlabs.jfire.base.security.integration.ldap.id.LDAPScriptSetID;
+import org.nightlabs.jfire.base.security.integration.ldap.scripts.LDAPScriptUtil;
 import org.nightlabs.jfire.person.Person;
 import org.nightlabs.jfire.security.User;
+import org.nightlabs.jfire.security.id.UserID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 /**
@@ -282,21 +284,21 @@ public class LDAPScriptSet implements Serializable{
 	 * Executes script for syncronizing data from LDAP entry to JFire object. All objects are created,
 	 * stored and deleted inside the script, so there's no need to store/delete them outside of this method.
 	 * 
+	 * @param entryName Name of LDAP entry, could be needed in script to determine which JFire object this entry maps to
 	 * @param allAttributes attributes of an entry which data is fetched
-	 * @param organisationID
 	 * @param removeJFireObjects 
 	 * @return synchronized JFire object
 	 * @throws ScriptException
 	 */
-	public Object syncLDAPDataToJFireObjects(LDAPAttributeSet allAttributes, String organisationID, boolean removeJFireObjects) throws ScriptException{
+	public Object syncLDAPDataToJFireObjects(String entryName, LDAPAttributeSet allAttributes, boolean removeJFireObjects) throws ScriptException{
 		
 		ScriptContext ctx = new SimpleScriptContext();
 		Bindings b = ctx.getBindings(ScriptContext.ENGINE_SCOPE);
+		b.put("entryName", entryName);
 		b.put("removeJFireObjects", removeJFireObjects);
 		b.put("allAttributes", allAttributes);
 		b.put("attributeSyncPolicy", ldapServer.getAttributeSyncPolicy().stringValue());
 		b.put("pm", JDOHelper.getPersistenceManager(this));
-		b.put("organisationID", organisationID);
 		b.put("logger", logger);
 	
 		return getScriptEngine().eval(syncLdapToJFireScript, ctx);
@@ -331,6 +333,28 @@ public class LDAPScriptSet implements Serializable{
 		Object result = invocable.invokeFunction("getPasswordAttributeName");
 		if (result instanceof String){
 			return (String) result;
+		}
+		return null;
+	}
+	
+	/**
+	 * Get JFire {@link UserID} by given attributes of LDAP entry.
+	 * 
+	 * @param attributes {@link LDAPAttributeSet} of LDAP entry
+	 * @return {@link UserID} (with current organisationID) or <code>null</code>
+	 * @throws ScriptException
+	 * @throws NoSuchMethodException
+	 */
+	public UserID getUserIDFromLDAPEntry(LDAPAttributeSet attributes) throws ScriptException, NoSuchMethodException{
+        ScriptEngine engine = getScriptEngine();
+		engine.eval(generateJFireToLdapAttributesScript);
+		Invocable invocable = (Invocable) engine;
+		Object result = invocable.invokeFunction("getUserIDFromLDAPEntry", attributes);
+		if (result instanceof String){
+			String[] idParts = ((String) result).split(LDAPScriptUtil.ORGANISATION_SEPARATOR);
+			if (idParts.length == 2){
+				return UserID.create(idParts[1], idParts[0]);
+			}
 		}
 		return null;
 	}

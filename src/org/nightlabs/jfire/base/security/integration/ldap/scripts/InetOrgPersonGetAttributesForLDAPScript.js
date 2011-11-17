@@ -33,14 +33,15 @@ function getMappedAttributes(){
 	}
 	
 	if ($userID$ != null){
-		attributes.createAttribute('commonName', $userName$);
-		attributes.createAttribute('surname', $userName$);
-		attributes.createAttribute('uid', $userID$);
+		attributes.createAttribute('commonName', $userID$);
+		attributes.createAttribute('surname', $userID$);
+		attributes.createAttribute('uid', $userCompleteUserID$);
 		attributes.createAttribute('description', $userDescription$);
 	}else if ($personID$ != null){
 		attributes.createAttribute('commonName', $personName$);
 		attributes.createAttribute('surname', $personName$);
 		attributes.createAttribute('description', $personComment$);
+		attributes.createAttribute('uid', $personCompleteID$);
 	}
 
 	if ($personID$ != null){
@@ -66,9 +67,18 @@ function getMappedAttributes(){
 
 /**
  * Get the name of LDAP attribute which holds user password
- * 
- * @returns {String}
  */
 function getPasswordAttributeName(){
 	return 'userPassword';
+}
+
+/**
+ * Get JFire UserID as String by given attributes of an LDAP entry.
+ */
+function getUserIDFromLDAPEntry(attributes){
+	var uid = LDAPScriptUtil.getAttributeValue(attributes, 'uid', 'userid');
+	if (uid != null){
+		return uid;
+	}
+	return null;
 }

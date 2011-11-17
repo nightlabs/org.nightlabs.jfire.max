@@ -92,5 +92,9 @@ public class LDAPConnection{
     public boolean isConnected() {
     	return this.connectionWrapper.isConnected();
     }
+    
+    public boolean entryExists(String entryName){
+    	return this.connectionWrapper.entryExists(entryName);
+    }
 
 }

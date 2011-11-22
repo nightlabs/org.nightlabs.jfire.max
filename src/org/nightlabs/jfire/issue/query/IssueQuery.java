@@ -21,7 +21,7 @@ import org.nightlabs.jfire.issue.id.IssueSeverityTypeID;
 import org.nightlabs.jfire.issue.id.IssueTypeID;
 import org.nightlabs.jfire.issue.project.id.ProjectID;
 import org.nightlabs.jfire.jbpm.graph.def.id.ProcessDefinitionID;
-import org.nightlabs.jfire.security.SecurityReflector;
+import org.nightlabs.jfire.security.GlobalSecurityReflector;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.security.id.UserID;
 import org.slf4j.Logger;
@@ -74,7 +74,6 @@ extends AbstractJDOQuery
 	private Date updateTimestamp;
 
 	private Long deadlineTimePeriod;
-	private transient Date deadlineTimeDate;
 
 	private IssueLinkTypeID issueLinkTypeID;
 	private Date issueWorkTimeRangeFrom;
@@ -199,8 +198,9 @@ extends AbstractJDOQuery
 		}
 
 		if (isFieldEnabled(FieldName.deadlineTimePeriod) && deadlineTimePeriod != null) {
-			deadlineTimeDate = new Date(System.currentTimeMillis() + deadlineTimePeriod);
-			filter.append("\n && this.deadlineTimestamp <=  :deadlineTimeDate" );
+			Date deadlineTimeDate = new Date(System.currentTimeMillis() + deadlineTimePeriod);
+			filter.append("\n && this.deadlineTimestamp <=  :deadlineTimeDate");
+			addParam("deadlineTimeDate", deadlineTimeDate);
 		}
 
 		/*if (
@@ -216,7 +216,8 @@ extends AbstractJDOQuery
 
 		if (isFieldEnabled(FieldName.issueLinkTypeID) && issueLinkTypeID != null) {
 //			filter.append("\n && (this.issueLinks.contains(varIssueLink) )) ");
-			filter.append("\n && (this.issueLinks.contains(varIssueLink) && (varIssueLink.issueLinkType.organisationID == :issueLinkTypeID.organisationID) && (varIssueLink.issueLinkType.issueLinkTypeID == :issueLinkTypeID.issueLinkTypeID)) ");
+			addVariable(String.class, "varIssueLink");
+			filter.append("\n && (this.issueLinks.contains(varIssueLink) && JDOHelper.getObjectId(varIssueLink.issueLinkType) == :issueLinkTypeID) ");
 		}
 
 		if (isFieldEnabled(FieldName.issueWorkTimeRangeFrom) && !isFieldEnabled(FieldName.issueWorkTimeRangeTo) && issueWorkTimeRangeFrom != null) {
@@ -237,17 +238,21 @@ extends AbstractJDOQuery
 			int i = 0;
 			for (Iterator<ProjectID> it = projectIDs.iterator(); it.hasNext(); i++) {
 				ProjectID pid = it.next();
-				if (i == 0) {
-					filter.append("\n && this.project.organisationID == \"" + pid.organisationID + "\" && (");
+				if (pid == null){
+					continue;
+				}
+				if (i == 0){
+					filter.append("\n&& (");
 				}
 
-				filter.append("this.project.projectID == " + pid.projectID);
-
-				if (i != projectIDs.size() - 1) {
-					filter.append(") || (");
-				}
-				else {
-					filter.append(")");
+				String projectIDParamName = "projectID" + i;
+				filter.append("\nJDOHelper.getObjectId(this.project) == :").append(projectIDParamName);
+				addParam(projectIDParamName, pid);
+				
+				if (it.hasNext()) {
+					filter.append("\n|| ");
+				}else{
+					filter.append("\n)");
 				}
 			}
 		}
@@ -307,7 +312,7 @@ extends AbstractJDOQuery
 			logger.info(filter.toString());
 		q.setFilter(filter.toString());
 	}
-
+	
 	/**
 	 * Returns the string of the {@link IssueSubject}.
 	 * @return a string of the {@link IssueSubject}
@@ -827,13 +832,13 @@ extends AbstractJDOQuery
 	 * Sets the current user as the {@link Issue}'s assignee.
 	 */
 	public void setCurrentUserAsAssignee() {
-		this.assigneeID = SecurityReflector.getUserDescriptor().getUserObjectID();
+		this.assigneeID = GlobalSecurityReflector.sharedInstance().getUserDescriptor().getUserObjectID();
 	}
 
 	/**
 	 * Sets the current user as the {@link Issue}'s reporter.
 	 */
 	public void setCurrentUserAsReporter() {
-		this.reporterID = SecurityReflector.getUserDescriptor().getUserObjectID();
+		this.reporterID = GlobalSecurityReflector.sharedInstance().getUserDescriptor().getUserObjectID();
 	}
 }

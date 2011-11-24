@@ -524,10 +524,6 @@ public class MappingBasedAccountantDelegate
 			entry.setDelegationLevel(delegationLevel);
 			ResolvedMapKey entryKey = new ResolvedMapKey((ProductTypeID) JDOHelper.getObjectId(entry.getProductType()), packageType);
 			resolvedMappings.put(entryKey, entry);
-			for (ResolveProductTypeProvider nested : productTypeProvider.getNestedProviders()) {
-				resolveProductTypeMappings(nested, nested.getPackageType(),
-						resolvedMappings, delegationLevel);
-			}
 		}
 		else {
 			LocalAccountantDelegate _delegate = productTypeProvider.getProductType().getProductTypeLocal().getLocalAccountantDelegate();
@@ -535,13 +531,14 @@ public class MappingBasedAccountantDelegate
 				return; // not compatible
 
 			MappingBasedAccountantDelegate delegate = (MappingBasedAccountantDelegate) _delegate;
-			if (delegate == null)
-				return; // No delegate assigned to the productType
-
-			if (JDOHelper.getObjectId(delegate).equals(JDOHelper.getObjectId(this)))
-				return; // We are the delegate assigned to the productType
-
-			delegate.resolveProductTypeMappings(productTypeProvider, packageType, resolvedMappings, delegationLevel + 1);
+			if (delegate != null && !JDOHelper.getObjectId(delegate).equals(JDOHelper.getObjectId(this))) {
+				// There is a delegate an that delegate we are not that delegate ourselves
+				delegate.resolveProductTypeMappings(productTypeProvider, packageType, resolvedMappings, delegationLevel + 1);
+			}
+		}
+		for (ResolveProductTypeProvider nested : productTypeProvider.getNestedProviders()) {
+			resolveProductTypeMappings(nested, nested.getPackageType(),
+					resolvedMappings, delegationLevel);
 		}
 	}
 
@@ -781,11 +778,12 @@ public class MappingBasedAccountantDelegate
 			delegateBookProductTypeParts(mandator, user, resolvedMappings,
 					productType, articlePriceStack, bookInvoiceTransfers,
 					delegationLevel, container, involvedAnchors);
+		} 
+		else {
+			internalBookProductTypeParts(mandator, user, resolvedMappings,
+					articlePriceStack, articlePrice, bookInvoiceTransfers, productType,
+					packageType, delegationLevel, container, involvedAnchors);
 		}
-
-		internalBookProductTypeParts(mandator, user, resolvedMappings,
-				articlePriceStack, articlePrice, bookInvoiceTransfers, productType,
-				packageType, delegationLevel, container, involvedAnchors);
 
 	}
 
@@ -836,7 +834,7 @@ public class MappingBasedAccountantDelegate
 						mandator, articlePriceStack, dimensionNode.getDimensionValues(),
 						mapping, resolvedMappings, container);
 				for (BookInvoiceTransfer biTransfer : bookTransfers) {
-					if (biTransfer.getFrom() == null || biTransfer.getFrom().equals(biTransfer.getTo()))
+					if (biTransfer.getFrom() == null)
 						biTransfer.setFrom(mandator);
 
 					// reverse if amount negative
@@ -1478,75 +1476,99 @@ public class MappingBasedAccountantDelegate
 		)
 	{
 		Collection<BookInvoiceTransfer> result = new ArrayList<BookInvoiceTransfer>();
-		BookInvoiceTransfer transfer = getBookInvoiceTransferForSingleFragmentType(
+		BookInvoiceTransfer upperTransfer = findUpperArticleTransfersForSinglePriceFragment(
 				mandator, priceFragmentType, articlePriceStack,
 				dimensionValues, resolvedMapping,
 				resolvedMappings, forContainer, bookMoneyTransfer
 			);
-		if (transfer == null) {
-			// Get the articlePrice which has been added last - i.e. the most inner ArticlePrice.
-			ArticlePrice articlePrice = articlePriceStack.getFirst();
-
-			long amount = resolvedMapping.getArticlePriceDimensionAmount(
-					dimensionValues,
-					articlePrice
-				);
-
-			Invoice invoice = bookMoneyTransfer.getInvoice();
-			// In order to get the Article, we get the last from the stack - i.e. the most outer ArticlePrice
-			Article article = articlePriceStack.getLast().getArticle();
-
-			// ensure that what we do is correct
-			assert invoice.equals(article.getInvoice()) : "article.getInvoice() does not match current invoice! articlePK=\"" + article.getPrimaryKey() + "\" invoicePK=\"" + invoice.getPrimaryKey() + "\"";
-
-			Account otherAccount;
-			if (mandator.equals(invoice.getVendor())) {
-				if (article.isReversing()) {
-					otherAccount = resolvedMapping.getReverseRevenueAccount(); // can be null in datastore
-					if (otherAccount == null)
-						otherAccount = resolvedMapping.getRevenueAccount(); // cannot be null in datastore
-				}
-				else
-					otherAccount = resolvedMapping.getRevenueAccount(); // cannot be null in datastore
-			}
-			else if (mandator.equals(invoice.getCustomer())) {
-				if (article.isReversing()) {
-					otherAccount = resolvedMapping.getReverseExpenseAccount(); // can be null in datastore
-					if (otherAccount == null)
-						otherAccount = resolvedMapping.getExpenseAccount(); // cannot be null in datastore
-				}
-				else
-					otherAccount = resolvedMapping.getExpenseAccount(); // cannot be null in datastore
-			}
-			else
-				throw new IllegalStateException("Mandator \"" + mandator.getPrimaryKey() + "\" is neither vendor nor customer of invoice \"" + invoice.getPrimaryKey() + "\"!");
-
-			assert otherAccount == null;
-
-			assert false : "Test Test Test"; // TODO remove this line!
-
-			Anchor from;
-			Anchor to;
-			if (amount >= 0) {
-				from = mandator;
-				to = otherAccount;
-			}
-			else {
-				to = mandator;
-				from = otherAccount;
-				amount *= -1;
-			}
-
-			transfer = new BookInvoiceTransfer(
-					from,
-					to,
-					amount
-				);
+		BookInvoiceTransfer transferToMake = null;
+		if (upperTransfer == null) {
+			transferToMake = createBookInvoiceTransferForSingleFragmentType(
+					mandator, mandator,
+					articlePriceStack, dimensionValues, resolvedMapping,
+					bookMoneyTransfer);
+		} else {
+			transferToMake = createBookInvoiceTransferForSingleFragmentType(
+					mandator, upperTransfer.getTo(),
+					articlePriceStack, dimensionValues, resolvedMapping,
+					bookMoneyTransfer);
+			// We've found an transfer made for an upper Article, means we need to take the money from this to-account instead, not from the mandator.
+			;
 		}
-		result.add(transfer);
+		result.add(transferToMake);
 		logBookInvoiceTransfers("getBookInvoiceTransferForSingleFragmentType ", result);
 		
 		return result;
+	}
+
+	private BookInvoiceTransfer createBookInvoiceTransferForSingleFragmentType(
+			OrganisationLegalEntity mandator,
+			Anchor orgFrom,
+			LinkedList<ArticlePrice> articlePriceStack,
+			Map<String, String> dimensionValues,
+			MoneyFlowMapping resolvedMapping,
+			BookInvoiceMoneyTransfer bookMoneyTransfer) {
+		
+		BookInvoiceTransfer transfer;
+		// Get the articlePrice which has been added last - i.e. the most inner ArticlePrice.
+		ArticlePrice articlePrice = articlePriceStack.getFirst();
+
+		long amount = resolvedMapping.getArticlePriceDimensionAmount(
+				dimensionValues,
+				articlePrice
+			);
+
+		Invoice invoice = bookMoneyTransfer.getInvoice();
+		// In order to get the Article, we get the last from the stack - i.e. the most outer ArticlePrice
+		Article article = articlePriceStack.getLast().getArticle();
+
+		// ensure that what we do is correct
+		assert invoice.equals(article.getInvoice()) : "article.getInvoice() does not match current invoice! articlePK=\"" + article.getPrimaryKey() + "\" invoicePK=\"" + invoice.getPrimaryKey() + "\"";
+
+		Account otherAccount;
+		if (mandator.equals(invoice.getVendor())) {
+			if (article.isReversing()) {
+				otherAccount = resolvedMapping.getReverseRevenueAccount(); // can be null in datastore
+				if (otherAccount == null)
+					otherAccount = resolvedMapping.getRevenueAccount(); // cannot be null in datastore
+			}
+			else
+				otherAccount = resolvedMapping.getRevenueAccount(); // cannot be null in datastore
+		}
+		else if (mandator.equals(invoice.getCustomer())) {
+			if (article.isReversing()) {
+				otherAccount = resolvedMapping.getReverseExpenseAccount(); // can be null in datastore
+				if (otherAccount == null)
+					otherAccount = resolvedMapping.getExpenseAccount(); // cannot be null in datastore
+			}
+			else
+				otherAccount = resolvedMapping.getExpenseAccount(); // cannot be null in datastore
+		}
+		else
+			throw new IllegalStateException("Mandator \"" + mandator.getPrimaryKey() + "\" is neither vendor nor customer of invoice \"" + invoice.getPrimaryKey() + "\"!");
+
+		assert otherAccount == null;
+
+		assert false : "Test Test Test"; // TODO remove this line!
+
+		Anchor from;
+		Anchor to;
+		if (amount >= 0) {
+			from = orgFrom;
+			to = otherAccount;
+		}
+		else {
+			to = orgFrom;
+			from = otherAccount;
+			amount *= -1;
+		}
+
+		transfer = new BookInvoiceTransfer(
+				from,
+				to,
+				amount
+			);
+		return transfer;
 	}
 
 	/**
@@ -1573,7 +1595,7 @@ public class MappingBasedAccountantDelegate
 		}
 	}
 
-	protected BookInvoiceTransfer getBookInvoiceTransferForSingleFragmentType(
+	protected BookInvoiceTransfer findUpperArticleTransfersForSinglePriceFragment(
 			OrganisationLegalEntity mandator, PriceFragmentType priceFragmentType,
 			LinkedList<ArticlePrice> articlePriceStack,
 			Map<String, String> dimensionValues, MoneyFlowMapping resolvedMapping,

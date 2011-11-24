@@ -936,7 +936,7 @@ implements Serializable, StoreCallback
 	nullValue=NullValue.EXCEPTION,
 	table="JFireTrade_Payment_payableObjects",
 	persistenceModifier=PersistenceModifier.PERSISTENT)
-	private Set<PayableObject> payableObjects = null;
+	private Set<PayableObject> payableObjects = new HashSet<PayableObject>();
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -1057,9 +1057,6 @@ implements Serializable, StoreCallback
 		if (JDOHelper.getObjectId(this) != null) {
 			throw new IllegalStateException("setPayableObjectIDs can only be called on NOT yet persisted instances of Payment, use setPayableObjects() instead!");
 		}
-
-		if (payableObjects != null)
-			payableObjects = null;
 
 		for (Iterator<ObjectID> it = payableObjectIDs.iterator(); it.hasNext(); ) {
 			ObjectID objectID = it.next();
@@ -1405,9 +1402,6 @@ implements Serializable, StoreCallback
 
 		if (payableObjectIDs != null) {
 			if (payableObjects == null || payableObjects.size() != payableObjectIDs.size()) {
-				if (payableObjects == null)
-					payableObjects = new HashSet<PayableObject>();
-
 				payableObjects.clear();
 
 				for (Iterator<ObjectID> it = payableObjectIDs.iterator(); it.hasNext(); ) {
@@ -1417,11 +1411,6 @@ implements Serializable, StoreCallback
 				}
 			} // if (payableObjects == null || payableObjects.size() != payableObjectIDs.size()) {
 		} // if (payableObjectIDs != null) {
-
-		if (JDOHelper.isNew(this)) {
-			if (payableObjects == null)
-				payableObjects = new HashSet<PayableObject>();
-		}
 
 		if (precursorID != null && precursor != null) {
 			precursor = (Payment) pm.getObjectById(precursorID);

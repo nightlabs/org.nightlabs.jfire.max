@@ -33,6 +33,8 @@ import java.util.Set;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.annotations.Column;
+import javax.jdo.annotations.Discriminator;
+import javax.jdo.annotations.DiscriminatorStrategy;
 import javax.jdo.annotations.IdentityType;
 import javax.jdo.annotations.Inheritance;
 import javax.jdo.annotations.InheritanceStrategy;
@@ -86,6 +88,7 @@ import org.slf4j.LoggerFactory;
 //		members={})
 //)
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
+@Discriminator(strategy=DiscriminatorStrategy.CLASS_NAME)
 public abstract class Anchor
 	implements Serializable, DetachCallback, AttachCallback, StoreCallback
 {

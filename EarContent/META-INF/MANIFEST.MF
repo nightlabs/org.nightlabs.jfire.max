@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 EAR-Module-ID: JFireTradeEAR
-EAR-Schema-Version: 1.2.0
+EAR-Schema-Version: 1.2.1
 Comment: 
  * Update note 1.0.1:
    From 1.0.0 to 1.0.1, there have been 2 fields added to Offer - DataNucleus
@@ -16,3 +16,6 @@ Comment:
    Added the new field paymentDT into the classes Payment and Delivery.
  * Update note 1.2.0:
    Raised version for release
+ * Update note 1.2.1:
+   Discriminator for Anchor
+

@@ -2,23 +2,15 @@ package org.nightlabs.jfire.pbx;
 
 import java.io.Serializable;
 
-import org.nightlabs.jfire.prop.id.DataFieldID;
+import javax.jdo.PersistenceManager;
 
 /**
  * @author Marco หงุ่ยตระกูล-Schulze - marco at nightlabs dot de
  */
-public class Call
-implements Serializable
+public interface Call extends Serializable
 {
-	private static final long serialVersionUID = 1L;
-
-	private DataFieldID phoneNumberDataFieldID;
-
-	public Call(DataFieldID phoneNumberDataFieldID) {
-		this.phoneNumberDataFieldID = phoneNumberDataFieldID;
-	}
-
-	public DataFieldID getPhoneNumberDataFieldID() {
-		return phoneNumberDataFieldID;
-	}
+	/**
+	 * @return The phone-number to dial.
+	 */
+	String getDialPhoneNumber(PersistenceManager pm, PhoneSystem phoneSystem) throws UnsupportedCallException;
 }

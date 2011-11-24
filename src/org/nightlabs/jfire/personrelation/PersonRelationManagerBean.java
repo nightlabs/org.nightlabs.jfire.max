@@ -29,6 +29,7 @@ import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.person.Person;
+import org.nightlabs.jfire.person.PersonStruct;
 import org.nightlabs.jfire.personrelation.id.PersonRelationID;
 import org.nightlabs.jfire.personrelation.id.PersonRelationTypeID;
 import org.nightlabs.jfire.prop.id.PropertySetID;
@@ -124,6 +125,12 @@ implements PersonRelationManagerRemote
 				}
 			}
 
+			// Install a listener that will auto-manage the company-datafield of employees
+			new PersonRelationDataFieldManagementListener(
+					pm.getPersistenceManagerFactory(),
+					PersonRelationType.PredefinedRelationTypes.employing,
+					Collections.singleton(PersonStruct.PERSONALDATA_COMPANY));
+			
 		} finally {
 			pm.close();
 		}

@@ -1,12 +1,16 @@
 package org.nightlabs.jfire.jbpm.query;
 
+import java.util.Collection;
 import java.util.Date;
+import java.util.LinkedList;
 
 import javax.jdo.Query;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.jdo.query.AbstractJDOQuery;
 import org.nightlabs.jfire.jbpm.graph.def.Statable;
+import org.nightlabs.jfire.jbpm.graph.def.State;
+import org.nightlabs.jfire.jbpm.graph.def.StateDefinition;
 import org.nightlabs.jfire.jbpm.graph.def.id.ProcessDefinitionID;
 import org.nightlabs.jfire.jbpm.graph.def.id.StateDefinitionID;
 
@@ -27,6 +31,8 @@ public class StatableQuery
 	{
 		public static final String onlyInSelectedState = "onlyInSelectedState";
 		public static final String notInSelectedState = "notInSelectedState";
+		public static final String selectedStatePassed = "selectedStatePassed";
+		public static final String selectedStateNotPassed = "selectedStateNotPassed";
 		public static final String stateCreateDTMax = "stateCreateDTMax";
 		public static final String stateCreateDTMin = "stateCreateDTMin";
 		public static final String stateDefinitionID = "stateDefinitionID";
@@ -90,20 +96,20 @@ public class StatableQuery
 		if (isFieldEnabled(FieldName.stateDefinitionID) && stateDefinitionID != null)
 		{
 			if (onlyInSelectedState || isFieldEnabled(FieldName.onlyInSelectedState)) {
-				filter.append("\n && (this.states.contains(stateVar))");
+				filter.append("\n && JDOHelper.getObjectId(this.state.stateDefinition) == :stateDefinitionID");
 			}
 			if (notInSelectedState || isFieldEnabled(FieldName.notInSelectedState)) {
-				filter.append("\n && !(this.states.contains(stateVar))");
+				filter.append("\n && JDOHelper.getObjectId(this.state.stateDefinition) != :stateDefinitionID");
 			}
-
-			// TODO: JDOHelper.getObjectId(this.*) does not seem to work (java.lang.IndexOutOfBoundsException: Index: 3, Size: 3)
-			// WORKAROUND:
-			filter.append("\n && (" +
-					"this.state.stateDefinition.processDefinitionOrganisationID == \""+stateDefinitionID.processDefinitionOrganisationID+"\" && " +
-					"this.state.stateDefinition.processDefinitionID == \""+stateDefinitionID.processDefinitionID+"\" && " +
-					"this.state.stateDefinition.stateDefinitionOrganisationID == \""+stateDefinitionID.stateDefinitionOrganisationID+"\" && " +
-					"this.state.stateDefinition.stateDefinitionID == \""+stateDefinitionID.stateDefinitionID+"\"" +
-					")");
+			if (selectedStatePassed || isFieldEnabled(FieldName.selectedStatePassed)) {
+				filter.append("\n && (this.states.contains(stateVar))");
+				filter.append("\n && (JDOHelper.getObjectId(stateVar.stateDefinition) == :stateDefinitionID)");
+			}
+			// Unfortunately needed to move that to postProcessing => Bug in Datanucleus
+//			if (selectedStateNotPassed || isFieldEnabled(FieldName.selectedStateNotPassed)) {
+//				filter.append("\n && (!this.states.contains(stateVar))");
+//				filter.append("\n && (JDOHelper.getObjectId(stateVar.stateDefinition) == :stateDefinitionID)");
+//			}
 		}
 
 		if (isFieldEnabled(FieldName.processDefinitionID) && processDefinitionID != null)
@@ -122,6 +128,33 @@ public class StatableQuery
 		logger.debug("filter == "+filter);
 
 		q.setFilter(filter.toString());
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	protected Object postProcessQueryResult(Object result) {
+		if (selectedStateNotPassed || isFieldEnabled(FieldName.selectedStateNotPassed)) {
+			StateDefinition stateDef = (StateDefinition) getPersistenceManager().getObjectById(stateDefinitionID);
+			Collection<Statable> statableResults = new LinkedList<Statable>();
+			if (result instanceof Collection) {
+				Collection<Object> resultCol = (Collection<Object>) result;
+				resultRowLoop: for (Object object : resultCol) {
+					if (object instanceof Statable) {
+						Statable statable = (Statable) object;
+						for (State state : statable.getStates()) {
+							if (state.getStateDefinition().equals(stateDef)) {
+								continue resultRowLoop;
+							}
+						}
+						statableResults.add(statable);
+					} else {
+						return super.postProcessQueryResult(result);
+					}
+				}
+				return statableResults;
+			}
+		}
+		return super.postProcessQueryResult(result);
 	}
 
 	/**
@@ -220,6 +253,45 @@ public class StatableQuery
 		this.notInSelectedState = notInSelectedState;
 		notifyListeners(FieldName.notInSelectedState, oldNotInSelectedState,
 			Boolean.valueOf(notInSelectedState));
+	}
+	
+	
+	private boolean selectedStatePassed = false;
+	
+	/**
+	 * @return the selectedStatePassed
+	 */
+	public boolean isSelectedStatePassed() {
+		return selectedStatePassed;
+	}
+
+	/**
+	 * @param selectedStatePassed the selectedStatePassed to set
+	 */
+	public void setSelectedStatePassed(boolean selectedStatePassed) {
+		final Boolean oldSelectedStatePassed = this.selectedStatePassed;
+		this.selectedStatePassed = selectedStatePassed;
+		notifyListeners(FieldName.selectedStatePassed, oldSelectedStatePassed,
+			Boolean.valueOf(selectedStatePassed));
+	}
+	
+	private boolean selectedStateNotPassed = false;
+	
+	/**
+	 * @return the selectedStateNotPassed
+	 */
+	public boolean isSelectedNotStatePassed() {
+		return selectedStateNotPassed;
+	}
+
+	/**
+	 * @param selectedStateNotPassed the selectedStateNotPassed to set
+	 */
+	public void setSelectedStateNotPassed(boolean selectedStateNotPassed) {
+		final Boolean oldSelectedStateNotPassed = this.selectedStateNotPassed;
+		this.selectedStateNotPassed = selectedStateNotPassed;
+		notifyListeners(FieldName.selectedStateNotPassed, oldSelectedStateNotPassed,
+			Boolean.valueOf(selectedStateNotPassed));
 	}
 
 	@Override

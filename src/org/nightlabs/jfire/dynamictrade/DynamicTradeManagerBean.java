@@ -35,6 +35,7 @@ import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.base.JFireBaseEAR;
 import org.nightlabs.jfire.dynamictrade.accounting.priceconfig.DynamicTradePriceConfig;
 import org.nightlabs.jfire.dynamictrade.accounting.priceconfig.PackagePriceConfig;
+import org.nightlabs.jfire.dynamictrade.prop.DynamicProductTypeStruct;
 import org.nightlabs.jfire.dynamictrade.recurring.DynamicProductTypeRecurringTradeActionHandler;
 import org.nightlabs.jfire.dynamictrade.store.DynamicProduct;
 import org.nightlabs.jfire.dynamictrade.store.DynamicProductType;
@@ -95,6 +96,8 @@ implements DynamicTradeManagerRemote
 		try {
 			String organisationID = getOrganisationID();
 
+			DynamicProductTypeStruct.getSimpleProductTypeStructLocal(pm);
+			
 			ModuleMetaData moduleMetaData = ModuleMetaData.getModuleMetaData(pm, JFireDynamicTradeEAR.MODULE_NAME);
 			if (moduleMetaData != null)
 				return;

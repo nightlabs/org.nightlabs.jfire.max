@@ -2,17 +2,26 @@ package org.nightlabs.jfire.dynamictrade.store;
 
 import java.util.Collection;
 
+import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.Queries;
 
+import org.nightlabs.inheritance.FieldInheriter;
+import org.nightlabs.inheritance.NullCapableInheritableFieldInheriter.ChildFieldCreator;
+import org.nightlabs.jdo.inheritance.JDONullCapableInheritableFieldInheriter;
+import org.nightlabs.jfire.idgenerator.IDGenerator;
+import org.nightlabs.jfire.prop.PropertySet;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.id.ProductTypeID;
-
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.IdentityType;
-import javax.jdo.annotations.InheritanceStrategy;
-import javax.jdo.annotations.Inheritance;
-import javax.jdo.annotations.Queries;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -46,6 +55,12 @@ import javax.jdo.annotations.Queries;
 	identityType=IdentityType.APPLICATION,
 	detachable="true",
 	table="JFireDynamicTrade_DynamicProductType")
+@FetchGroups({
+	@FetchGroup(
+		fetchGroups={"default"},
+		name=DynamicProductType.FETCH_GROUP_PROPERTY_SET,
+		members=@Persistent(name="propertySet"))
+})
 @Queries({
 	@javax.jdo.annotations.Query(
 		name="getChildProductTypes_topLevel",
@@ -60,7 +75,14 @@ import javax.jdo.annotations.Queries;
 public class DynamicProductType
 extends ProductType
 {
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 20111115L;
+	
+	public static final class FieldName
+	{
+		public static final String propertySet = "propertySet";
+	};
+	
+	public static final String FETCH_GROUP_PROPERTY_SET = "DynamicProductType.propertySet";
 
 	/**
 	 * Note, that this method does only return instances of {@link DynamicProductType} while
@@ -109,5 +131,49 @@ extends ProductType
 		// Nothing to do, because DynamicProducts have dynamic prices that are entered
 		// on-the-fly when an Article is created.
 	}
+	
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+	private PropertySet propertySet;
 
+	/**
+	 * Returns the property set of this {@link SimpleProductType}.
+	 * Note that this is optional and might be <code>null</code>.
+	 *
+	 * @return The property set of this {@link SimpleProductType}.
+	 */
+	public PropertySet getPropertySet() {
+		return propertySet;
+	}
+
+	private static FieldInheriter propSetInheriter = new JDONullCapableInheritableFieldInheriter<DynamicProductType, PropertySet>(new ChildFieldCreator<DynamicProductType, PropertySet>() {
+		@Override
+		public PropertySet createAndAssignChildField(DynamicProductType mother, PropertySet motherFieldValueObj, DynamicProductType child) {
+			PropertySet newPropertySet = new PropertySet(
+					motherFieldValueObj.getOrganisationID(), IDGenerator.nextID(PropertySet.class), 
+					motherFieldValueObj.getStructOrganisationID(), motherFieldValueObj.getStructLinkClass(), motherFieldValueObj.getStructScope(), motherFieldValueObj.getStructLocalScope());
+			
+			PersistenceManager pm = JDOHelper.getPersistenceManager(child);
+			if (pm != null) {
+				newPropertySet = pm.makePersistent(newPropertySet);
+			}
+			
+			child.setPropertySet(newPropertySet);
+			return child.getPropertySet();
+		}
+	});
+	
+	@Override
+	public FieldInheriter getFieldInheriter(String fieldName) {
+		if (FieldName.propertySet.equals(fieldName))
+			return propSetInheriter;
+
+		return super.getFieldInheriter(fieldName);
+	}
+	
+	public void setPropertySet(PropertySet propertySet) {
+		this.propertySet = propertySet;
+	}
 }

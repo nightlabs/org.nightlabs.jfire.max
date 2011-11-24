@@ -27,6 +27,7 @@ import org.nightlabs.jfire.config.WorkstationConfigSetup;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.organisation.LocalOrganisation;
 import org.nightlabs.jfire.pbx.Call;
+import org.nightlabs.jfire.pbx.PhoneNumberDataFieldCall;
 import org.nightlabs.jfire.pbx.PhoneSystem;
 import org.nightlabs.jfire.pbx.PhoneSystemException;
 import org.nightlabs.jfire.pbx.UnsupportedCallException;
@@ -264,8 +265,8 @@ extends PhoneSystem
 	public void call(Call call)
 	throws PhoneSystemException
 	{
-		if (call.getPhoneNumberDataFieldID() == null)
-			throw new UnsupportedCallException(call, "The call must contain a phoneNumberDataFieldID!"); //$NON-NLS-1$
+		if (call == null)
+			throw new IllegalArgumentException("The call must not be null!"); //$NON-NLS-1$
 
 		PersistenceManager pm = getPersistenceManager();
 
@@ -280,49 +281,37 @@ extends PhoneSystem
 		keys.addAll(asteriskConfigModule.getCallFileProperties().keySet());
 		keys.addAll(this.getCallFileProperties().keySet());
 
-		Object o = pm.getObjectById(call.getPhoneNumberDataFieldID());
-		if (!(o instanceof PhoneNumberDataField))
-			throw new IllegalArgumentException("call.phoneNumberDataFieldID does not reference an instance of PhoneNumberDataField! Instead, it is: " + o.getClass().getName()); //$NON-NLS-1$
-
-		PhoneNumberDataField phoneNumberDataField = (PhoneNumberDataField) o;
-		Person person = (Person) pm.getObjectById(
-				PropertySetID.create(
-						phoneNumberDataField.getOrganisationID(),
-						phoneNumberDataField.getPropertySetID()
-				)
-		);
-
 		// Pattern to clean all spaces, minuses etc. in order to make the number
 		// an ordinary-phone-callable-number (i.e. purely digits from 0 to 9).
 		Pattern cleanDialPhoneNumberPattern = Pattern.compile("[^0-9]"); //$NON-NLS-1$
 
-		//create dial phone number
-		StringBuilder dialPhoneNumberSB = new StringBuilder();
-
-		// First, we clean the country-code individually to decide whether there really is one (might be only spaces).
-		String countryCode = phoneNumberDataField.getCountryCode();
-		if (countryCode != null && !countryCode.isEmpty())
-			countryCode = cleanDialPhoneNumberPattern.matcher(countryCode).replaceAll(""); //$NON-NLS-1$
-
-		// In order to support local numbers (within the local PBX), we only append the
-		// international-call-prefix, if we have a country code. Otherwise, we omit it.
-		if (countryCode != null && !countryCode.isEmpty()) {
-			dialPhoneNumberSB.append(this.getInternationalCallPrefix());
-			dialPhoneNumberSB.append(countryCode);
+		String dialPhoneNumber = call.getDialPhoneNumber(pm, this);
+		
+		if (dialPhoneNumber == null || dialPhoneNumber.isEmpty()) {
+			throw new UnsupportedCallException(call, "The call did not return a dialPhoneNumber"); //$NON-NLS-1$ 
 		}
-
-		// Append the area code and the local number.
-		dialPhoneNumberSB.append(phoneNumberDataField.getAreaCode());
-		dialPhoneNumberSB.append(phoneNumberDataField.getLocalNumber());
-
+		
 		// Clean all spaces, minuses etc. to make it an ordinary-phone-callable-number
 		// (i.e. purely digits from 0 to 9).
-		String dialPhoneNumber = cleanDialPhoneNumberPattern.matcher(dialPhoneNumberSB.toString()).replaceAll(""); //$NON-NLS-1$
+		dialPhoneNumber = cleanDialPhoneNumberPattern.matcher(dialPhoneNumber).replaceAll(""); //$NON-NLS-1$
 
 		// Create a map with all variables (and their values) which can be used in the call-file-properties' values.
 		Map<String, String> variables = new HashMap<String, String>();
-		variables.put(AsteriskServer.CALL_FILE_VARIABLE_DIAL_DISPLAY_NAME, person.getDisplayName());
+		variables.put(AsteriskServer.CALL_FILE_VARIABLE_DIAL_DISPLAY_NAME, dialPhoneNumber);
 		variables.put(AsteriskServer.CALL_FILE_VARIABLE_DIAL_PHONE_NUMBER, dialPhoneNumber);
+		
+		if (call instanceof PhoneNumberDataFieldCall) {
+			// If the call is a PhoneNumberDataFieldCall we can display the persons display-name
+			PhoneNumberDataField phoneNumberDataField = (PhoneNumberDataField) pm.getObjectById(((PhoneNumberDataFieldCall)call).getPhoneNumberDataFieldID());
+			Person person = (Person) pm.getObjectById(
+					PropertySetID.create(
+							phoneNumberDataField.getOrganisationID(),
+							phoneNumberDataField.getPropertySetID()
+					)
+			);
+			variables.put(AsteriskServer.CALL_FILE_VARIABLE_DIAL_DISPLAY_NAME, person.getDisplayName());
+		}
+		
 		// make variables read-only to guarantee they don't change later
 		variables = Collections.unmodifiableMap(variables);
 

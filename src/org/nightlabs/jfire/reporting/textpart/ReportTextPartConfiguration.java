@@ -568,7 +568,11 @@ public class ReportTextPartConfiguration implements Serializable {
 			logger.debug("Searching ReportTextPartConfiguration for reportRegistryItemID =  " + reportRegistryItemID +
 					"linkedObjectID = " + linkedObjectID + ", synthesize = " + synthesize);
 		ReportRegistryItem item = (ReportRegistryItem) pm.getObjectById(reportRegistryItemID);
-		ReportTextPartConfiguration configuration = getReportTextPartConfigurationByLinkedObject(pm, item, linkedObjectID);
+		ReportTextPartConfiguration configuration = null;
+		if (linkedObjectID != null)
+			configuration = getReportTextPartConfigurationByLinkedObject(pm, item, linkedObjectID);
+		else
+			configuration = getReportTextPartConfigurationByReportRegistryItem(pm, item);
 		
 		if (configuration != null) {
 			if (logger.isDebugEnabled())

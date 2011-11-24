@@ -11,7 +11,7 @@
 		file="TransferReport.rptdesign" 
 		id="TransferReport"
 		engineType="BIRT"
-		overwriteOnInit="false"
+		overwriteOnInit="true"
 	>
 		<name language="de">Transferbericht</name>
 		<name language="en">Transfer report</name>

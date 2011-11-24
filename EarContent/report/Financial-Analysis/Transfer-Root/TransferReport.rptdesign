@@ -42,7 +42,9 @@ function isParamSet(param) {
         <scalar-parameter name="initiatorIDs" id="490">
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
-            <property name="dataType">string</property>
+            <property name="dataType">integer</property>
+            <property name="distinct">true</property>
+            <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>

@@ -26,7 +26,9 @@ function isParamSet(param) {
         <scalar-parameter name="timePeriod" id="488">
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
-            <property name="dataType">string</property>
+            <property name="dataType">integer</property>
+            <property name="distinct">true</property>
+            <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
@@ -44,7 +46,9 @@ function isParamSet(param) {
         <scalar-parameter name="initiatorIDs" id="490">
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
-            <property name="dataType">string</property>
+            <property name="dataType">integer</property>
+            <property name="distinct">true</property>
+            <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
@@ -60,7 +64,6 @@ function isParamSet(param) {
                 <structure>
                     <property name="name">invoice</property>
                     <expression name="expression">JFireReportingHelper.getJDOObject(row["invoiceJDOID"])</expression>
-                    
                 </structure>
                 <structure>
                     <property name="name">productTypes</property>
@@ -83,7 +86,6 @@ s</expression>
                 <structure>
                     <property name="name">initiator</property>
                     <expression name="expression">JFireReportingHelper.getJDOObject(row["initiatorJDOID"])</expression>
-                    
                 </structure>
                 <structure>
                     <property name="name">initiatorDescription</property>
@@ -119,7 +121,6 @@ else
                 <structure>
                     <property name="name">timePeriod</property>
                     <property name="nativeName">timePeriod</property>
-                    
                     <property name="nativeDataType">10</property>
                     <property name="position">1</property>
                     <expression name="defaultValue">'__DUMMY_DEFAULT_PARAMETER_VALUE__'</expression>
@@ -141,7 +142,6 @@ else
                 <structure>
                     <property name="name">showOnlyOutstanding</property>
                     <property name="nativeName">showOnlyOutstanding</property>
-                    
                     <property name="nativeDataType">4</property>
                     <property name="position">3</property>
                     <expression name="defaultValue">__DUMMY_DEFAULT_PARAMETER_VALUE__</expression>
@@ -230,7 +230,6 @@ else
                     <structure>
                         <property name="position">16</property>
                         <property name="name">invoice</property>
-                        
                     </structure>
                     <structure>
                         <property name="position">17</property>
@@ -240,7 +239,6 @@ else
                     <structure>
                         <property name="position">18</property>
                         <property name="name">initiator</property>
-                        
                     </structure>
                     <structure>
                         <property name="position">19</property>
@@ -943,7 +941,6 @@ inv.getCurrency().toDouble(inv.getInvoiceLocal().getAmountToPay())</expression>
                 <structure>
                     <property name="name">invoice</property>
                     <expression name="expression">dataSetRow["invoice"]</expression>
-                    
                 </structure>
                 <structure>
                     <property name="name">articleCount</property>

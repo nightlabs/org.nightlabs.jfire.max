@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.14" id="1">
-    <property name="createdBy">Eclipse BIRT Designer Version 2.2.0.v20070620 Build &lt;@BUILD@></property>
-    <property name="units">in</property>
-    <property name="includeResource">reportMessages</property>
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.21" id="1">
+    <property name="createdBy">Eclipse BIRT Designer Version 2.6.0.v20100531 Build &lt;2.6.0.v20100609-1613></property>
     <html-property name="description">General ledger journal report</html-property>
+    <simple-property-list name="includeResource">
+        <value>reportMessages</value>
+    </simple-property-list>
+    <property name="units">in</property>
     <method name="initialize"><![CDATA[importClass(Packages.org.nightlabs.jfire.reporting.JFireReportingHelper);
 importClass(Packages.org.nightlabs.jfire.accounting.pay.Payment);
 
@@ -14,11 +16,14 @@ function isParamSet(param) {
 }]]></method>
     <text-property name="displayName">WizardTemplateChoicePage.title.BlankReport</text-property>
     <property name="iconFile">/templates/blank_report.gif</property>
+    <property name="layoutPreference">auto layout</property>
     <parameters>
         <scalar-parameter name="timePeriod" id="488">
             <property name="valueType">static</property>
-            <property name="dataType">string</property>
             <property name="isRequired">false</property>
+            <property name="dataType">integer</property>
+            <property name="distinct">true</property>
+            <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
@@ -46,6 +51,48 @@ blockNumber = Math.floor(row["rowNumber"] / pageBreakInterval) + 1;</expression>
 }
 highlightRowCount</expression>
                     <property name="dataType">integer</property>
+                </structure>
+            </list-property>
+            <list-property name="parameters">
+                <structure>
+                    <property name="name">timePeriod</property>
+                    <property name="nativeName">timePeriod</property>
+                    <property name="nativeDataType">10</property>
+                    <property name="position">1</property>
+                    <expression name="defaultValue">'__DUMMY_DEFAULT_PARAMETER_VALUE__'</expression>
+                    <property name="isOptional">false</property>
+                    <property name="allowNull">true</property>
+                    <property name="isInput">true</property>
+                </structure>
+                <structure>
+                    <property name="name">addSummaryRows</property>
+                    <property name="nativeName">timePeriod</property>
+                    <property name="nativeDataType">4</property>
+                    <property name="position">2</property>
+                    <expression name="defaultValue">'__DUMMY_DEFAULT_PARAMETER_VALUE__'</expression>
+                    <property name="isOptional">false</property>
+                    <property name="allowNull">true</property>
+                    <property name="isInput">true</property>
+                </structure>
+                <structure>
+                    <property name="name">consolidate</property>
+                    <property name="nativeName">timePeriod</property>
+                    <property name="nativeDataType">4</property>
+                    <property name="position">3</property>
+                    <expression name="defaultValue">'__DUMMY_DEFAULT_PARAMETER_VALUE__'</expression>
+                    <property name="isOptional">false</property>
+                    <property name="allowNull">true</property>
+                    <property name="isInput">true</property>
+                </structure>
+                <structure>
+                    <property name="name">excludeLegalEntities</property>
+                    <property name="nativeName">timePeriod</property>
+                    <property name="nativeDataType">4</property>
+                    <property name="position">4</property>
+                    <expression name="defaultValue">'__DUMMY_DEFAULT_PARAMETER_VALUE__'</expression>
+                    <property name="isOptional">false</property>
+                    <property name="allowNull">true</property>
+                    <property name="isInput">true</property>
                 </structure>
             </list-property>
             <structure name="cachedMetaData">
@@ -118,52 +165,6 @@ highlightRowCount</expression>
                 </list-property>
             </structure>
             <property name="dataSource">JFSDataSource</property>
-            <list-property name="parameters">
-                <structure>
-                    <property name="name">timePeriod</property>
-                    <property name="nativeName">timePeriod</property>
-                    
-                    <property name="nativeDataType">10</property>
-                    <property name="position">1</property>
-                    <expression name="defaultValue">'__DUMMY_DEFAULT_PARAMETER_VALUE__'</expression>
-                    <property name="isOptional">false</property>
-                    <property name="allowNull">true</property>
-                    <property name="isInput">true</property>
-                </structure>
-                <structure>
-                    <property name="name">addSummaryRows</property>
-                    <property name="nativeName">timePeriod</property>
-                    
-                    <property name="nativeDataType">4</property>
-                    <property name="position">2</property>
-                    <expression name="defaultValue">'__DUMMY_DEFAULT_PARAMETER_VALUE__'</expression>
-                    <property name="isOptional">false</property>
-                    <property name="allowNull">true</property>
-                    <property name="isInput">true</property>
-                </structure>
-                <structure>
-                    <property name="name">consolidate</property>
-                    <property name="nativeName">timePeriod</property>
-                    
-                    <property name="nativeDataType">4</property>
-                    <property name="position">3</property>
-                    <expression name="defaultValue">'__DUMMY_DEFAULT_PARAMETER_VALUE__'</expression>
-                    <property name="isOptional">false</property>
-                    <property name="allowNull">true</property>
-                    <property name="isInput">true</property>
-                </structure>
-                <structure>
-                    <property name="name">excludeLegalEntities</property>
-                    <property name="nativeName">timePeriod</property>
-                    
-                    <property name="nativeDataType">4</property>
-                    <property name="position">4</property>
-                    <expression name="defaultValue">'__DUMMY_DEFAULT_PARAMETER_VALUE__'</expression>
-                    <property name="isOptional">false</property>
-                    <property name="allowNull">true</property>
-                    <property name="isInput">true</property>
-                </structure>
-            </list-property>
             <list-property name="resultSet">
                 <structure>
                     <property name="position">1</property>
@@ -243,14 +244,14 @@ highlightRowCount</expression>
                     <property name="nativeDataType">1</property>
                 </structure>
             </list-property>
-            <property name="queryText">&lt;queryPropertySet>&lt;org.nightlabs.jfire.reporting.oda.jfs.JFSQueryPropertySet>
-  &lt;scriptRegistryItemID>
-    &lt;organisationID>dev.jfire.org&lt;/organisationID>
-    &lt;scriptRegistryItemType>JFireReportingTrade-MoneyTransfer&lt;/scriptRegistryItemType>
-    &lt;scriptRegistryItemID>GeneralLedgerJournalList.javaclass&lt;/scriptRegistryItemID>
-  &lt;/scriptRegistryItemID>
-  &lt;properties/>
-&lt;/org.nightlabs.jfire.reporting.oda.jfs.JFSQueryPropertySet>&lt;/queryPropertySet></property>
+            <xml-property name="queryText"><![CDATA[<queryPropertySet><org.nightlabs.jfire.reporting.oda.jfs.JFSQueryPropertySet>
+  <scriptRegistryItemID>
+    <organisationID>dev.jfire.org</organisationID>
+    <scriptRegistryItemType>JFireReportingTrade-MoneyTransfer</scriptRegistryItemType>
+    <scriptRegistryItemID>GeneralLedgerJournalList.javaclass</scriptRegistryItemID>
+  </scriptRegistryItemID>
+  <properties/>
+</org.nightlabs.jfire.reporting.oda.jfs.JFSQueryPropertySet></queryPropertySet>]]></xml-property>
         </oda-data-set>
     </data-sets>
     <styles>
@@ -352,7 +353,6 @@ importClass(Packages.org.nightlabs.jfire.person.PersonStruct);
 var pm = JFireReportingHelper.getPersistenceManager();
 var ole = OrganisationLegalEntity.getOrganisationLegalEntity(pm, SecurityReflector.getUserDescriptor().getOrganisationID());
 ole.getPerson().getPersistentDataFieldByIndex(PersonStruct.PERSONALDATA_PHOTO, 0).getData();</expression>
-                                
                             </structure>
                         </list-property>
                         <property name="source">expr</property>
@@ -621,7 +621,9 @@ JFire general ledger journal
 totalColumns = 2;
 columnNumber = 1;
 ((blockNumber - columnNumber) >= 0) &amp;&amp; (((blockNumber - columnNumber) % totalColumns) == 0)</expression>
-                                    <expression name="value1">true</expression>
+                                    <simple-property-list name="value1">
+                                        <value>true</value>
+                                    </simple-property-list>
                                 </structure>
                             </list-property>
                             <column id="1262"/>
@@ -744,7 +746,9 @@ visibilityResult</expression>
                                                         <property name="backgroundColor">#D4D4D4</property>
                                                         <expression name="testExpr">// row._outer["hightlightRowCount"] % 2
 row["test"] % 2</expression>
-                                                        <expression name="value1">1</expression>
+                                                        <simple-property-list name="value1">
+                                                            <value>1</value>
+                                                        </simple-property-list>
                                                     </structure>
                                                 </list-property>
                                                 <list-property name="visibility">
@@ -824,7 +828,9 @@ row["test"] % 2</expression>
 totalColumns = 2;
 columnNumber = 2;
 ((blockNumber - columnNumber) >= 0) &amp;&amp; (((blockNumber - columnNumber) % totalColumns) == 0)</expression>
-                                    <expression name="value1">true</expression>
+                                    <simple-property-list name="value1">
+                                        <value>true</value>
+                                    </simple-property-list>
                                 </structure>
                             </list-property>
                             <column id="1224"/>
@@ -947,7 +953,9 @@ visibilityResult</expression>
                                                         <property name="backgroundColor">#D4D4D4</property>
                                                         <expression name="testExpr">// row._outer["hightlightRowCount"] % 2
 row["test"] % 2</expression>
-                                                        <expression name="value1">1</expression>
+                                                        <simple-property-list name="value1">
+                                                            <value>1</value>
+                                                        </simple-property-list>
                                                     </structure>
                                                 </list-property>
                                                 <list-property name="visibility">

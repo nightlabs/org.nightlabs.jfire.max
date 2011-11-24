@@ -58,7 +58,9 @@ function getDataFieldString(field) {
     <parameters>
         <scalar-parameter name="articleContainerID" id="136">
             <property name="valueType">static</property>
-            
+            <property name="dataType">integer</property>
+            <property name="distinct">true</property>
+            <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
@@ -74,6 +76,223 @@ function getDataFieldString(field) {
     <data-sets>
         <oda-data-set extensionID="org.nightlabs.jfire.reporting.oda.jfs.JFSDataSet" name="InvoiceArticles" id="137">
             <text-property name="displayName">Articles</text-property>
+            <list-property name="computedColumns">
+                <structure>
+                    <property name="name">currency</property>
+                    <expression name="expression">JFireReportingHelper.getJDOObject(row["currencyJDOID"])</expression>
+                    <property name="dataType">javaObject</property>
+                </structure>
+            </list-property>
+            <list-property name="columnHints">
+                <structure>
+                    <property name="columnName">articleJDOID</property>
+                    <text-property name="displayName">articleJDOID</text-property>
+                    <text-property name="heading">articleJDOID</text-property>
+                    <property name="displayLength">0</property>
+                    <property name="horizontalAlign">justify</property>
+                    <property name="wordWrap">false</property>
+                </structure>
+                <structure>
+                    <property name="columnName">articleID</property>
+                    <text-property name="displayName">articleID</text-property>
+                    <text-property name="heading">articleID</text-property>
+                    <property name="displayLength">0</property>
+                    <property name="horizontalAlign">justify</property>
+                    <property name="wordWrap">false</property>
+                </structure>
+                <structure>
+                    <property name="columnName">allocated</property>
+                    <text-property name="displayName">allocated</text-property>
+                    <text-property name="heading">allocated</text-property>
+                    <property name="displayLength">0</property>
+                    <property name="horizontalAlign">justify</property>
+                    <property name="wordWrap">false</property>
+                </structure>
+                <structure>
+                    <property name="columnName">allocationPending</property>
+                    <text-property name="displayName">allocationPending</text-property>
+                    <text-property name="heading">allocationPending</text-property>
+                    <property name="displayLength">0</property>
+                    <property name="horizontalAlign">justify</property>
+                    <property name="wordWrap">false</property>
+                </structure>
+                <structure>
+                    <property name="columnName">delivered</property>
+                    <text-property name="displayName">delivered</text-property>
+                    <text-property name="heading">delivered</text-property>
+                    <property name="displayLength">0</property>
+                    <property name="horizontalAlign">justify</property>
+                    <property name="wordWrap">false</property>
+                </structure>
+                <structure>
+                    <property name="columnName">deliveryJDOID</property>
+                    <text-property name="displayName">deliveryJDOID</text-property>
+                    <text-property name="heading">deliveryJDOID</text-property>
+                    <property name="displayLength">0</property>
+                    <property name="horizontalAlign">justify</property>
+                    <property name="wordWrap">false</property>
+                </structure>
+                <structure>
+                    <property name="columnName">deliveryNoteJDOID</property>
+                    <text-property name="displayName">deliveryNoteJDOID</text-property>
+                    <text-property name="heading">deliveryNoteJDOID</text-property>
+                    <property name="displayLength">0</property>
+                    <property name="horizontalAlign">justify</property>
+                    <property name="wordWrap">false</property>
+                </structure>
+                <structure>
+                    <property name="columnName">createDT</property>
+                    <text-property name="displayName">createDT</text-property>
+                    <text-property name="heading">createDT</text-property>
+                    <property name="displayLength">0</property>
+                    <property name="horizontalAlign">justify</property>
+                    <property name="wordWrap">false</property>
+                </structure>
+                <structure>
+                    <property name="columnName">createUserID</property>
+                    <text-property name="displayName">createUserID</text-property>
+                    <text-property name="heading">createUserID</text-property>
+                    <property name="displayLength">0</property>
+                    <property name="horizontalAlign">justify</property>
+                    <property name="wordWrap">false</property>
+                </structure>
+                <structure>
+                    <property name="columnName">createUserJDOID</property>
+                    <text-property name="displayName">createUserJDOID</text-property>
+                    <text-property name="heading">createUserJDOID</text-property>
+                    <property name="displayLength">0</property>
+                    <property name="horizontalAlign">justify</property>
+                    <property name="wordWrap">false</property>
+                </structure>
+                <structure>
+                    <property name="columnName">currencyID</property>
+                    <text-property name="displayName">currencyID</text-property>
+                    <text-property name="heading">currencyID</text-property>
+                    <property name="displayLength">0</property>
+                    <property name="horizontalAlign">justify</property>
+                    <property name="wordWrap">false</property>
+                </structure>
+                <structure>
+                    <property name="columnName">currencyJDOID</property>
+                    <text-property name="displayName">currencyJDOID</text-property>
+                    <text-property name="heading">currencyJDOID</text-property>
+                    <property name="displayLength">0</property>
+                    <property name="horizontalAlign">justify</property>
+                    <property name="wordWrap">false</property>
+                </structure>
+                <structure>
+                    <property name="columnName">invoiceJDOID</property>
+                    <text-property name="displayName">invoiceJDOID</text-property>
+                    <text-property name="heading">invoiceJDOID</text-property>
+                    <property name="displayLength">0</property>
+                    <property name="horizontalAlign">justify</property>
+                    <property name="wordWrap">false</property>
+                </structure>
+                <structure>
+                    <property name="columnName">offerJDOID</property>
+                    <text-property name="displayName">offerJDOID</text-property>
+                    <text-property name="heading">offerJDOID</text-property>
+                    <property name="displayLength">0</property>
+                    <property name="horizontalAlign">justify</property>
+                    <property name="wordWrap">false</property>
+                </structure>
+                <structure>
+                    <property name="columnName">orderJDOID</property>
+                    <text-property name="displayName">orderJDOID</text-property>
+                    <text-property name="heading">orderJDOID</text-property>
+                    <property name="displayLength">0</property>
+                    <property name="horizontalAlign">justify</property>
+                    <property name="wordWrap">false</property>
+                </structure>
+                <structure>
+                    <property name="columnName">productJDOID</property>
+                    <text-property name="displayName">productJDOID</text-property>
+                    <text-property name="heading">productJDOID</text-property>
+                    <property name="displayLength">0</property>
+                    <property name="horizontalAlign">justify</property>
+                    <property name="wordWrap">false</property>
+                </structure>
+                <structure>
+                    <property name="columnName">productTypeJDOID</property>
+                    <text-property name="displayName">productTypeJDOID</text-property>
+                    <text-property name="heading">productTypeJDOID</text-property>
+                    <property name="displayLength">0</property>
+                    <property name="horizontalAlign">justify</property>
+                    <property name="wordWrap">false</property>
+                </structure>
+                <structure>
+                    <property name="columnName">productTypeName</property>
+                    <text-property name="displayName">productTypeName</text-property>
+                    <text-property name="heading">productTypeName</text-property>
+                    <property name="displayLength">0</property>
+                    <property name="horizontalAlign">justify</property>
+                    <property name="wordWrap">false</property>
+                </structure>
+                <structure>
+                    <property name="columnName">receptionNoteJDOID</property>
+                    <text-property name="displayName">receptionNoteJDOID</text-property>
+                    <text-property name="heading">receptionNoteJDOID</text-property>
+                    <property name="displayLength">0</property>
+                    <property name="horizontalAlign">justify</property>
+                    <property name="wordWrap">false</property>
+                </structure>
+                <structure>
+                    <property name="columnName">reversed</property>
+                    <text-property name="displayName">reversed</text-property>
+                    <text-property name="heading">reversed</text-property>
+                    <property name="displayLength">0</property>
+                    <property name="horizontalAlign">justify</property>
+                    <property name="wordWrap">false</property>
+                </structure>
+                <structure>
+                    <property name="columnName">reversingArticleJDOID</property>
+                    <text-property name="displayName">reversingArticleJDOID</text-property>
+                    <text-property name="heading">reversingArticleJDOID</text-property>
+                    <property name="displayLength">0</property>
+                    <property name="horizontalAlign">justify</property>
+                    <property name="wordWrap">false</property>
+                </structure>
+                <structure>
+                    <property name="columnName">reversing</property>
+                    <text-property name="displayName">reversing</text-property>
+                    <text-property name="heading">reversing</text-property>
+                    <property name="displayLength">0</property>
+                    <property name="horizontalAlign">justify</property>
+                    <property name="wordWrap">false</property>
+                </structure>
+                <structure>
+                    <property name="columnName">reversedArticleJDOID</property>
+                    <text-property name="displayName">reversedArticleJDOID</text-property>
+                    <text-property name="heading">reversedArticleJDOID</text-property>
+                    <property name="displayLength">0</property>
+                    <property name="horizontalAlign">justify</property>
+                    <property name="wordWrap">false</property>
+                </structure>
+                <structure>
+                    <property name="columnName">tariffJDOID</property>
+                    <text-property name="displayName">tariffJDOID</text-property>
+                    <text-property name="heading">tariffJDOID</text-property>
+                    <property name="displayLength">0</property>
+                    <property name="horizontalAlign">justify</property>
+                    <property name="wordWrap">false</property>
+                </structure>
+                <structure>
+                    <property name="columnName">tariffName</property>
+                    <text-property name="displayName">tariffName</text-property>
+                    <text-property name="heading">tariffName</text-property>
+                    <property name="displayLength">0</property>
+                    <property name="horizontalAlign">justify</property>
+                    <property name="wordWrap">false</property>
+                </structure>
+                <structure>
+                    <property name="columnName">dev_jfire_org/__Total__</property>
+                    <text-property name="displayName">dev_jfire_org/__Total__</text-property>
+                    <text-property name="heading">dev_jfire_org/__Total__</text-property>
+                    <property name="displayLength">0</property>
+                    <property name="horizontalAlign">justify</property>
+                    <property name="wordWrap">false</property>
+                </structure>
+            </list-property>
             <list-property name="parameters">
                 <structure>
                     <property name="name">articleContainerID</property>
@@ -81,9 +300,9 @@ function getDataFieldString(field) {
                     <property name="dataType">string</property>
                     <property name="nativeDataType">1</property>
                     <property name="position">1</property>
-                    <expression name="defaultValue">'""'</expression>
+                    <expression name="defaultValue" type="constant">__DUMMY_DEFAULT_PARAMETER_VALUE__</expression>
                     <property name="isOptional">false</property>
-                    <property name="allowNull">true</property>
+                    <property name="allowNull">false</property>
                     <property name="isInput">true</property>
                 </structure>
             </list-property>
@@ -127,7 +346,7 @@ function getDataFieldString(field) {
                     <structure>
                         <property name="position">8</property>
                         <property name="name">createDT</property>
-                        <property name="dataType">date</property>
+                        <property name="dataType">date-time</property>
                     </structure>
                     <structure>
                         <property name="position">9</property>
@@ -216,38 +435,13 @@ function getDataFieldString(field) {
                     </structure>
                     <structure>
                         <property name="position">26</property>
-                        <property name="name">chezfrancois_jfire_org/vat-ch-7__6-net</property>
+                        <property name="name">dev_jfire_org/__Total__</property>
                         <property name="dataType">float</property>
                     </structure>
                     <structure>
                         <property name="position">27</property>
-                        <property name="name">chezfrancois_jfire_org/vat-ch-7__6-val</property>
-                        <property name="dataType">float</property>
-                    </structure>
-                    <structure>
-                        <property name="position">28</property>
-                        <property name="name">chezfrancois_jfire_org/vat-de-19-net</property>
-                        <property name="dataType">float</property>
-                    </structure>
-                    <structure>
-                        <property name="position">29</property>
-                        <property name="name">chezfrancois_jfire_org/vat-de-19-val</property>
-                        <property name="dataType">float</property>
-                    </structure>
-                    <structure>
-                        <property name="position">30</property>
-                        <property name="name">chezfrancois_jfire_org/vat-de-7-net</property>
-                        <property name="dataType">float</property>
-                    </structure>
-                    <structure>
-                        <property name="position">31</property>
-                        <property name="name">chezfrancois_jfire_org/vat-de-7-val</property>
-                        <property name="dataType">float</property>
-                    </structure>
-                    <structure>
-                        <property name="position">32</property>
-                        <property name="name">dev_jfire_org/__Total__</property>
-                        <property name="dataType">float</property>
+                        <property name="name">currency</property>
+                        <property name="dataType">javaObject</property>
                     </structure>
                 </list-property>
             </structure>
@@ -299,7 +493,7 @@ function getDataFieldString(field) {
                     <property name="position">8</property>
                     <property name="name">createDT</property>
                     <property name="nativeName">createDT</property>
-                    <property name="dataType">date</property>
+                    <property name="dataType">date-time</property>
                 </structure>
                 <structure>
                     <property name="position">9</property>
@@ -405,42 +599,6 @@ function getDataFieldString(field) {
                 </structure>
                 <structure>
                     <property name="position">26</property>
-                    <property name="name">chezfrancois_jfire_org/vat-ch-7__6-net</property>
-                    <property name="nativeName">chezfrancois_jfire_org/vat-ch-7__6-net</property>
-                    <property name="dataType">float</property>
-                </structure>
-                <structure>
-                    <property name="position">27</property>
-                    <property name="name">chezfrancois_jfire_org/vat-ch-7__6-val</property>
-                    <property name="nativeName">chezfrancois_jfire_org/vat-ch-7__6-val</property>
-                    <property name="dataType">float</property>
-                </structure>
-                <structure>
-                    <property name="position">28</property>
-                    <property name="name">chezfrancois_jfire_org/vat-de-19-net</property>
-                    <property name="nativeName">chezfrancois_jfire_org/vat-de-19-net</property>
-                    <property name="dataType">float</property>
-                </structure>
-                <structure>
-                    <property name="position">29</property>
-                    <property name="name">chezfrancois_jfire_org/vat-de-19-val</property>
-                    <property name="nativeName">chezfrancois_jfire_org/vat-de-19-val</property>
-                    <property name="dataType">float</property>
-                </structure>
-                <structure>
-                    <property name="position">30</property>
-                    <property name="name">chezfrancois_jfire_org/vat-de-7-net</property>
-                    <property name="nativeName">chezfrancois_jfire_org/vat-de-7-net</property>
-                    <property name="dataType">float</property>
-                </structure>
-                <structure>
-                    <property name="position">31</property>
-                    <property name="name">chezfrancois_jfire_org/vat-de-7-val</property>
-                    <property name="nativeName">chezfrancois_jfire_org/vat-de-7-val</property>
-                    <property name="dataType">float</property>
-                </structure>
-                <structure>
-                    <property name="position">32</property>
                     <property name="name">dev_jfire_org/__Total__</property>
                     <property name="nativeName">dev_jfire_org/__Total__</property>
                     <property name="dataType">float</property>
@@ -452,9 +610,7 @@ function getDataFieldString(field) {
     <scriptRegistryItemType>JFireReportingTrade-Scripting-ArticleContainerData</scriptRegistryItemType>
     <scriptRegistryItemID>ArticleList</scriptRegistryItemID>
   </scriptRegistryItemID>
-  <properties class="tree-map">
-    <no-comparator/>
-  </properties>
+  <properties/>
 </org.nightlabs.jfire.reporting.oda.jfs.JFSQueryPropertySet></queryPropertySet>]]></xml-property>
             <xml-property name="designerValues"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 <model:DesignValues xmlns:design="http://www.eclipse.org/datatools/connectivity/oda/design" xmlns:model="http://www.eclipse.org/birt/report/model/adapter/odaModel">
@@ -468,11 +624,13 @@ function getDataFieldString(field) {
         <design:nativeDataTypeCode>1</design:nativeDataTypeCode>
         <design:precision>0</design:precision>
         <design:scale>0</design:scale>
-        <design:nullability>Nullable</design:nullability>
+        <design:nullability>NotNullable</design:nullability>
       </design:attributes>
       <design:inputAttributes>
         <design:elementAttributes>
-          <design:defaultScalarValue>&amp;quot;&amp;quot;</design:defaultScalarValue>
+          <design:defaultValues>
+            <design:values>__DUMMY_DEFAULT_PARAMETER_VALUE__</design:values>
+          </design:defaultValues>
         </design:elementAttributes>
       </design:inputAttributes>
     </design:parameterDefinitions>
@@ -619,7 +777,6 @@ function getDataFieldString(field) {
                     <structure>
                         <property name="position">25</property>
                         <property name="name">PersonalData_Photo</property>
-                        
                     </structure>
                     <structure>
                         <property name="position">26</property>
@@ -828,7 +985,6 @@ function getDataFieldString(field) {
                     <property name="position">25</property>
                     <property name="name">PersonalData_Photo</property>
                     <property name="nativeName">PersonalData_Photo</property>
-                    
                 </structure>
                 <structure>
                     <property name="position">26</property>
@@ -943,7 +1099,6 @@ function getDataFieldString(field) {
                 <structure>
                     <property name="name">propertySetID</property>
                     <property name="nativeName">propertySetID</property>
-                    
                     <property name="nativeDataType">10</property>
                     <property name="position">1</property>
                     <expression name="defaultValue">'__DUMMY_DEFAULT_PARAMETER_VALUE__'</expression>
@@ -1077,7 +1232,6 @@ function getDataFieldString(field) {
                     <structure>
                         <property name="position">25</property>
                         <property name="name">PersonalData_Photo</property>
-                        
                     </structure>
                     <structure>
                         <property name="position">26</property>
@@ -1286,7 +1440,6 @@ function getDataFieldString(field) {
                     <property name="position">25</property>
                     <property name="name">PersonalData_Photo</property>
                     <property name="nativeName">PersonalData_Photo</property>
-                    
                 </structure>
                 <structure>
                     <property name="position">26</property>
@@ -1404,7 +1557,7 @@ function getDataFieldString(field) {
                 <structure>
                     <property name="position">1</property>
                     <property name="name">priceFragmentType</property>
-                    
+                    <property name="dataType">javaObject</property>
                 </structure>
                 <structure>
                     <property name="position">2</property>
@@ -1441,7 +1594,7 @@ function getDataFieldString(field) {
                     <structure>
                         <property name="position">1</property>
                         <property name="name">priceFragmentType</property>
-                        <property name="dataType">string</property>
+                        <property name="dataType">javaObject</property>
                     </structure>
                     <structure>
                         <property name="position">2</property>
@@ -1853,7 +2006,6 @@ JFireReportingHelper.createDataSetParam(JDOHelper.getObjectId(orgLE.getPerson())
                 <structure>
                     <property name="name">PersonalData_Photo</property>
                     <expression name="expression">dataSetRow["PersonalData_Photo"]</expression>
-                    
                 </structure>
                 <structure>
                     <property name="name">PersonalData_Salutation</property>
@@ -2616,7 +2768,6 @@ JFireReportingHelper.createDataSetParam(JDOHelper.getObjectId(orgLE.getPerson())
                                                                         <structure>
                                                                             <property name="name">PersonalData_Photo</property>
                                                                             <expression name="expression">dataSetRow["PersonalData_Photo"]</expression>
-                                                                            
                                                                         </structure>
                                                                         <structure>
                                                                             <property name="name">PersonalData_Salutation</property>
@@ -2958,7 +3109,6 @@ JFireReportingHelper.createDataSetParam(params["articleContainerID"])</expressio
     new Packages.java.util.HashMap());
     "Done: "
 }</expression>
-                                    
                                 </structure>
                                 <structure>
                                     <property name="name">DynamicProduct_SinglePrice</property>
@@ -3059,6 +3209,11 @@ else {
   result = "";
 }
 result</expression>
+                                    <property name="dataType">string</property>
+                                </structure>
+                                <structure>
+                                    <property name="name">currencySymbol</property>
+                                    <expression name="expression" type="javascript">dataSetRow["currency"].getCurrencySymbol()</expression>
                                     <property name="dataType">string</property>
                                 </structure>
                             </list-property>
@@ -3219,7 +3374,7 @@ result</expression>
                                         <data id="167">
                                             <property name="style">TableContent</property>
                                             <property name="textAlign">left</property>
-                                            <property name="resultSetColumn">currencyID</property>
+                                            <property name="resultSetColumn">currencySymbol</property>
                                         </data>
                                     </cell>
                                 </row>
@@ -3305,7 +3460,7 @@ result</expression>
                                         <data id="206">
                                             <property name="style">TableContent</property>
                                             <property name="textAlign">left</property>
-                                            <property name="resultSetColumn">currencyID</property>
+                                            <property name="resultSetColumn">currencySymbol</property>
                                         </data>
                                     </cell>
                                 </row>
@@ -3416,7 +3571,7 @@ result</expression>
                                             <property name="style">TableContent</property>
                                             <property name="fontWeight">bold</property>
                                             <property name="textAlign">left</property>
-                                            <property name="resultSetColumn">currencyID</property>
+                                            <property name="resultSetColumn">currencySymbol</property>
                                         </data>
                                     </cell>
                                 </row>
@@ -3434,7 +3589,6 @@ result</expression>
                                                 <structure>
                                                     <property name="name">priceFragmentType</property>
                                                     <expression name="expression">dataSetRow["priceFragmentType"]</expression>
-                                                    
                                                 </structure>
                                                 <structure>
                                                     <property name="name">priceFragmentTypeName</property>
@@ -3449,7 +3603,6 @@ result</expression>
                                                 <structure>
                                                     <property name="name">currency</property>
                                                     <expression name="expression">dataSetRow["currency"]</expression>
-                                                    
                                                 </structure>
                                                 <structure>
                                                     <property name="name">PriceFragmentType_Description</property>

@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.14" id="1">
-    <property name="createdBy">Eclipse BIRT Designer Version 2.2.0.v20070620 Build &lt;2.2.0.v20070626-1003></property>
-    <property name="units">in</property>
-    <property name="includeResource">reportMessages</property>
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.21" id="1">
+    <property name="createdBy">Eclipse BIRT Designer Version 2.6.0.v20100531 Build &lt;2.6.0.v20100609-1613></property>
     <html-property name="description">WizardTemplateChoicePage.message.BlankReport</html-property>
+    <simple-property-list name="includeResource">
+        <value>reportMessages</value>
+    </simple-property-list>
+    <property name="units">in</property>
     <method name="initialize"><![CDATA[importPackage(Packages.org.nightlabs.jfire.reporting);
 importPackage(Packages.javax.jdo);
 importPackage(Packages.org.nightlabs.jfire.reporting.textpart);
@@ -13,11 +15,12 @@ function isEvent(productType) {
 }]]></method>
     <text-property name="displayName">WizardTemplateChoicePage.title.BlankReport</text-property>
     <property name="iconFile">/templates/blank_report.gif</property>
+    <property name="layoutPreference">auto layout</property>
     <parameters>
         <scalar-parameter name="bookUserIDs" id="786">
             <property name="valueType">static</property>
-            <property name="dataType">integer</property>
             <property name="isRequired">false</property>
+            <property name="dataType">integer</property>
             <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
@@ -25,8 +28,10 @@ function isEvent(productType) {
         </scalar-parameter>
         <scalar-parameter name="productTypeOwnerIDs" id="787">
             <property name="valueType">static</property>
-            <property name="dataType">string</property>
             <property name="isRequired">false</property>
+            <property name="dataType">integer</property>
+            <property name="distinct">true</property>
+            <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
@@ -34,8 +39,10 @@ function isEvent(productType) {
         </scalar-parameter>
         <scalar-parameter name="productTypeIDs" id="788">
             <property name="valueType">static</property>
-            <property name="dataType">string</property>
             <property name="isRequired">false</property>
+            <property name="dataType">integer</property>
+            <property name="distinct">true</property>
+            <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
@@ -43,8 +50,10 @@ function isEvent(productType) {
         </scalar-parameter>
         <scalar-parameter name="timePeriod" id="789">
             <property name="valueType">static</property>
-            <property name="dataType">string</property>
             <property name="isRequired">false</property>
+            <property name="dataType">integer</property>
+            <property name="distinct">true</property>
+            <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
@@ -96,6 +105,61 @@ if (isEvent(productType)) {
   0
 }</expression>
                     <property name="dataType">decimal</property>
+                </structure>
+            </list-property>
+            <list-property name="parameters">
+                <structure>
+                    <property name="name">groupResults</property>
+                    <property name="nativeName">groupResults</property>
+                    <property name="nativeDataType">4</property>
+                    <property name="position">1</property>
+                    <expression name="defaultValue">'__DUMMY_DEFAULT_PARAMETER_VALUE__'</expression>
+                    <property name="isOptional">false</property>
+                    <property name="allowNull">true</property>
+                    <property name="isInput">true</property>
+                </structure>
+                <structure>
+                    <property name="name">timePeriod</property>
+                    <property name="nativeName">timePeriod</property>
+                    <property name="nativeDataType">10</property>
+                    <property name="position">2</property>
+                    <expression name="defaultValue">'__DUMMY_DEFAULT_PARAMETER_VALUE__'</expression>
+                    <property name="isOptional">false</property>
+                    <property name="allowNull">true</property>
+                    <property name="isInput">true</property>
+                </structure>
+                <structure>
+                    <property name="name">bookUserIDs</property>
+                    <property name="nativeName">bookUserIDs</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">1</property>
+                    <property name="position">3</property>
+                    <expression name="defaultValue">'__DUMMY_DEFAULT_PARAMETER_VALUE__'</expression>
+                    <property name="isOptional">false</property>
+                    <property name="allowNull">true</property>
+                    <property name="isInput">true</property>
+                </structure>
+                <structure>
+                    <property name="name">productTypeIDs</property>
+                    <property name="nativeName">productTypeIDs</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">1</property>
+                    <property name="position">4</property>
+                    <expression name="defaultValue">'__DUMMY_DEFAULT_PARAMETER_VALUE__'</expression>
+                    <property name="isOptional">false</property>
+                    <property name="allowNull">true</property>
+                    <property name="isInput">true</property>
+                </structure>
+                <structure>
+                    <property name="name">productTypeOwnerIDs</property>
+                    <property name="nativeName">productTypeOwnerIDs</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">1</property>
+                    <property name="position">5</property>
+                    <expression name="defaultValue">'__DUMMY_DEFAULT_PARAMETER_VALUE__'</expression>
+                    <property name="isOptional">false</property>
+                    <property name="allowNull">true</property>
+                    <property name="isInput">true</property>
                 </structure>
             </list-property>
             <structure name="cachedMetaData">
@@ -173,63 +237,6 @@ if (isEvent(productType)) {
                 </list-property>
             </structure>
             <property name="dataSource">JFS-DataSource</property>
-            <list-property name="parameters">
-                <structure>
-                    <property name="name">groupResults</property>
-                    <property name="nativeName">groupResults</property>
-                    
-                    <property name="nativeDataType">4</property>
-                    <property name="position">1</property>
-                    <expression name="defaultValue">'__DUMMY_DEFAULT_PARAMETER_VALUE__'</expression>
-                    <property name="isOptional">false</property>
-                    <property name="allowNull">true</property>
-                    <property name="isInput">true</property>
-                </structure>
-                <structure>
-                    <property name="name">timePeriod</property>
-                    <property name="nativeName">timePeriod</property>
-                    
-                    <property name="nativeDataType">10</property>
-                    <property name="position">2</property>
-                    <expression name="defaultValue">'__DUMMY_DEFAULT_PARAMETER_VALUE__'</expression>
-                    <property name="isOptional">false</property>
-                    <property name="allowNull">true</property>
-                    <property name="isInput">true</property>
-                </structure>
-                <structure>
-                    <property name="name">bookUserIDs</property>
-                    <property name="nativeName">bookUserIDs</property>
-                    <property name="dataType">string</property>
-                    <property name="nativeDataType">1</property>
-                    <property name="position">3</property>
-                    <expression name="defaultValue">'__DUMMY_DEFAULT_PARAMETER_VALUE__'</expression>
-                    <property name="isOptional">false</property>
-                    <property name="allowNull">true</property>
-                    <property name="isInput">true</property>
-                </structure>
-                <structure>
-                    <property name="name">productTypeIDs</property>
-                    <property name="nativeName">productTypeIDs</property>
-                    <property name="dataType">string</property>
-                    <property name="nativeDataType">1</property>
-                    <property name="position">4</property>
-                    <expression name="defaultValue">'__DUMMY_DEFAULT_PARAMETER_VALUE__'</expression>
-                    <property name="isOptional">false</property>
-                    <property name="allowNull">true</property>
-                    <property name="isInput">true</property>
-                </structure>
-                <structure>
-                    <property name="name">productTypeOwnerIDs</property>
-                    <property name="nativeName">productTypeOwnerIDs</property>
-                    <property name="dataType">string</property>
-                    <property name="nativeDataType">1</property>
-                    <property name="position">5</property>
-                    <expression name="defaultValue">'__DUMMY_DEFAULT_PARAMETER_VALUE__'</expression>
-                    <property name="isOptional">false</property>
-                    <property name="allowNull">true</property>
-                    <property name="isInput">true</property>
-                </structure>
-            </list-property>
             <list-property name="resultSet">
                 <structure>
                     <property name="position">1</property>
@@ -295,14 +302,14 @@ if (isEvent(productType)) {
                     <property name="nativeDataType">6</property>
                 </structure>
             </list-property>
-            <property name="queryText">&lt;queryPropertySet>&lt;org.nightlabs.jfire.reporting.oda.jfs.JFSQueryPropertySet>
-  &lt;scriptRegistryItemID>
-    &lt;organisationID>dev.jfire.org&lt;/organisationID>
-    &lt;scriptRegistryItemType>JFireReportingTrade-MoneyTransfer&lt;/scriptRegistryItemType>
-    &lt;scriptRegistryItemID>BookedArticles&lt;/scriptRegistryItemID>
-  &lt;/scriptRegistryItemID>
-  &lt;properties/>
-&lt;/org.nightlabs.jfire.reporting.oda.jfs.JFSQueryPropertySet>&lt;/queryPropertySet></property>
+            <xml-property name="queryText"><![CDATA[<queryPropertySet><org.nightlabs.jfire.reporting.oda.jfs.JFSQueryPropertySet>
+  <scriptRegistryItemID>
+    <organisationID>dev.jfire.org</organisationID>
+    <scriptRegistryItemType>JFireReportingTrade-MoneyTransfer</scriptRegistryItemType>
+    <scriptRegistryItemID>BookedArticles</scriptRegistryItemID>
+  </scriptRegistryItemID>
+  <properties/>
+</org.nightlabs.jfire.reporting.oda.jfs.JFSQueryPropertySet></queryPropertySet>]]></xml-property>
             <xml-property name="designerValues"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 <model:DesignValues xmlns:design="http://www.eclipse.org/datatools/connectivity/oda/design" xmlns:model="http://www.eclipse.org/birt/report/model/adapter/odaModel">
   <Version>1.0</Version>
@@ -506,7 +513,6 @@ if (isEvent(productType)) {
                     <structure>
                         <property name="position">23</property>
                         <property name="name">PersonalData_Photo</property>
-                        
                     </structure>
                     <structure>
                         <property name="position">24</property>
@@ -715,7 +721,6 @@ if (isEvent(productType)) {
                     <property name="position">23</property>
                     <property name="name">PersonalData_Photo</property>
                     <property name="nativeName">PersonalData_Photo</property>
-                    
                     <property name="nativeDataType">9</property>
                 </structure>
                 <structure>
@@ -782,14 +787,14 @@ if (isEvent(productType)) {
                     <property name="nativeDataType">1</property>
                 </structure>
             </list-property>
-            <property name="queryText">&lt;queryPropertySet>&lt;org.nightlabs.jfire.reporting.oda.jfs.JFSQueryPropertySet>
-  &lt;scriptRegistryItemID>
-    &lt;organisationID>dev.jfire.org&lt;/organisationID>
-    &lt;scriptRegistryItemType>JFireReporting-Scripting-PropertySet&lt;/scriptRegistryItemType>
-    &lt;scriptRegistryItemID>LocalOrganisationPropertySet&lt;/scriptRegistryItemID>
-  &lt;/scriptRegistryItemID>
-  &lt;properties/>
-&lt;/org.nightlabs.jfire.reporting.oda.jfs.JFSQueryPropertySet>&lt;/queryPropertySet></property>
+            <xml-property name="queryText"><![CDATA[<queryPropertySet><org.nightlabs.jfire.reporting.oda.jfs.JFSQueryPropertySet>
+  <scriptRegistryItemID>
+    <organisationID>dev.jfire.org</organisationID>
+    <scriptRegistryItemType>JFireReporting-Scripting-PropertySet</scriptRegistryItemType>
+    <scriptRegistryItemID>LocalOrganisationPropertySet</scriptRegistryItemID>
+  </scriptRegistryItemID>
+  <properties/>
+</org.nightlabs.jfire.reporting.oda.jfs.JFSQueryPropertySet></queryPropertySet>]]></xml-property>
             <xml-property name="designerValues"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 <model:DesignValues xmlns:design="http://www.eclipse.org/datatools/connectivity/oda/design" xmlns:model="http://www.eclipse.org/birt/report/model/adapter/odaModel">
   <Version>1.0</Version>
@@ -1449,7 +1454,6 @@ if (isEvent(productType)) {
                 <structure>
                     <property name="name">PersonalData_Photo</property>
                     <expression name="expression">dataSetRow["PersonalData_Photo"]</expression>
-                    
                 </structure>
                 <structure>
                     <property name="name">PersonalData_Salutation</property>
@@ -1497,6 +1501,7 @@ if (isEvent(productType)) {
                     <property name="dataType">string</property>
                 </structure>
             </list-property>
+            <property name="pageBreakInterval">50</property>
             <column id="771"/>
             <column id="772">
                 <property name="textAlign">right</property>
@@ -1679,7 +1684,6 @@ text</expression>
                 <structure>
                     <property name="name">SumQuantityProductType</property>
                     <expression name="expression">dataSetRow["quantity"]</expression>
-                    
                     <simple-property-list name="aggregateOn">
                         <value>GroupProductType</value>
                     </simple-property-list>
@@ -1688,7 +1692,6 @@ text</expression>
                 <structure>
                     <property name="name">SumQuantityOwner</property>
                     <expression name="expression">dataSetRow["quantity"]</expression>
-                    
                     <simple-property-list name="aggregateOn">
                         <value>GroupOwner</value>
                     </simple-property-list>
@@ -1697,7 +1700,6 @@ text</expression>
                 <structure>
                     <property name="name">SumQuantityCurrency</property>
                     <expression name="expression">dataSetRow["quantity"]</expression>
-                    
                     <simple-property-list name="aggregateOn">
                         <value>GroupCurrency</value>
                     </simple-property-list>
@@ -1706,7 +1708,6 @@ text</expression>
                 <structure>
                     <property name="name">SumAmountProductType</property>
                     <expression name="expression">dataSetRow["amount"]</expression>
-                    
                     <simple-property-list name="aggregateOn">
                         <value>GroupProductType</value>
                     </simple-property-list>
@@ -1715,7 +1716,6 @@ text</expression>
                 <structure>
                     <property name="name">SumAmountOwner</property>
                     <expression name="expression">dataSetRow["amount"]</expression>
-                    
                     <simple-property-list name="aggregateOn">
                         <value>GroupOwner</value>
                     </simple-property-list>
@@ -1724,7 +1724,6 @@ text</expression>
                 <structure>
                     <property name="name">SumAmountCurrency</property>
                     <expression name="expression">dataSetRow["amount"]</expression>
-                    
                     <simple-property-list name="aggregateOn">
                         <value>GroupCurrency</value>
                     </simple-property-list>
@@ -1746,6 +1745,7 @@ text</expression>
                     <property name="dataType">float</property>
                 </structure>
             </list-property>
+            <property name="pageBreakInterval">50</property>
             <list-property name="sort">
                 <structure>
                     <expression name="key">row["performanceBeginDT"]</expression>

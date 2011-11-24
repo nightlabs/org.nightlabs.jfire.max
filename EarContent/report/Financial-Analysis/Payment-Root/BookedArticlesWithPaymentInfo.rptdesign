@@ -42,7 +42,9 @@ function isEvent(productType) {
         <scalar-parameter name="productTypeIDs" id="788">
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
-            <property name="dataType">string</property>
+            <property name="dataType">integer</property>
+            <property name="distinct">true</property>
+            <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
@@ -2014,7 +2016,6 @@ text</expression>
                 <structure>
                     <property name="name">SumQuantityProductType</property>
                     <expression name="expression">dataSetRow["quantity"]</expression>
-                    
                     <simple-property-list name="aggregateOn">
                         <value>GroupProductType</value>
                     </simple-property-list>

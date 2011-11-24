@@ -77,7 +77,7 @@ import org.nightlabs.util.Util;
 		})
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class IssueComment
-implements Serializable, DetachCallback
+implements Serializable, DetachCallback// , AttachCallback
 {
 	private static final long serialVersionUID = 1L;
 
@@ -155,7 +155,7 @@ implements Serializable, DetachCallback
 	 */
 	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Date updateTimestamp;
-	
+
 	/**
 	 * @jdo.field persistence-modifier="persistent" load-fetch-group="all"
 	 */
@@ -239,7 +239,7 @@ implements Serializable, DetachCallback
 	public void setText(String text) {
 		this.text = text;
 	}
-	
+
 	/**
 	 * Returns the create time of the comment.
 	 * @return the create time of the comment
@@ -247,7 +247,7 @@ implements Serializable, DetachCallback
 	public Date getCreateTimestamp() {
 		return createTimestamp;
 	}
-	
+
 	/**
 	 * Returns the update time of the comment.
 	 * @return the update time of the comment
@@ -263,7 +263,7 @@ implements Serializable, DetachCallback
 	public void setUpdateTimestamp(Date timestamp) {
 		this.updateTimestamp = timestamp;
 	}
-	
+
 	/**
 	 * Returns the user who created the comment.
 	 * @return the user who created the comment
@@ -317,4 +317,19 @@ implements Serializable, DetachCallback
 
 	@Override
 	public void jdoPreDetach() { }
+
+//	@Override
+//	public void jdoPostAttach(Object arg0) {
+//		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
+//		if (pm == null) {
+//			throw new IllegalStateException("Something's very wrong, cannot get PersistenceManager from attached instance");
+//		}
+//		if (!this.issue.getComments().contains(this)) {
+//			this.issue.addComment(this);
+//		}
+//	}
+//
+//	@Override
+//	public void jdoPreAttach() {
+//	}
 }

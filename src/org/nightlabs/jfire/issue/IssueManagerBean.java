@@ -403,22 +403,29 @@ implements IssueManagerRemote
 	public IssueComment storeIssueComment(IssueComment issueComment, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = createPersistenceManager();
-
-		boolean isNew = !JDOHelper.isDetached(issueComment);
-		if (!isNew) {
+		try {
+			boolean isNew = !JDOHelper.isDetached(issueComment);
 			issueComment.setUpdateTimestamp(new Date());
-			IssueHistoryItem issueHistoryItem = new IssueCommentHistoryItem(issueComment.getUser(), issueComment.getIssue(), issueComment, false);
-			storeIssueHistoryItem(issueHistoryItem, false, new String[]{FetchPlan.DEFAULT}, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
+
+			if (get) {
+				pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+				pm.getFetchPlan().setGroups(fetchGroups);
+			}
+
+			issueComment = pm.makePersistent(issueComment);
+
+			if (isNew) {
+				IssueHistoryItem issueHistoryItem = new IssueCommentHistoryItem(issueComment.getUser(), issueComment.getIssue(), issueComment, false);
+				storeIssueHistoryItem(issueHistoryItem, false, new String[]{FetchPlan.DEFAULT}, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
+			}
+
+			if (get)
+				return pm.detachCopy(issueComment);
+			else
+				return null;
+		} finally {
+			pm.close();
 		}
-
-		issueComment = pm.makePersistent(issueComment);
-		if (!get)
-			return null;
-
-		pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
-		if (fetchGroups != null)
-			pm.getFetchPlan().setGroups(fetchGroups);
-		return NLJDOHelper.storeJDO(pm, issueComment, get, fetchGroups, maxFetchDepth);
 	}
 
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
@@ -1340,7 +1347,7 @@ implements IssueManagerRemote
 
 			createAdditionalIssueQueries(pm);
 			createDefaultIssueLinkTypes(pm);
-			
+
 
 			// The complete method is executed in *one* transaction. So if one thing fails, all fail.
 			// => We check once at the beginning, if this module has already been initialised.
@@ -1358,7 +1365,7 @@ implements IssueManagerRemote
 			final String baseName = "org.nightlabs.jfire.issue.resource.messages";
 			final ClassLoader loader = IssueManagerBean.class.getClassLoader();
 			final String resourceKeyPrefix = IssueManagerBean.class.getName() + ".";
-			
+
 			createIssueQueries(pm);
 
 			// QUESTION:
@@ -1411,7 +1418,7 @@ implements IssueManagerRemote
 		}
 	}
 
-	
+
 	/**
 	 * Creates a new {@link QueryCollection} for each {@link IssueQuery} to be considered. A new {@link BaseQueryStore} is created
 	 * for each such {@link QueryCollection} by setting its name and description and serialising the collection. Finally, the store
@@ -1549,12 +1556,12 @@ implements IssueManagerRemote
 
 		storeQueryStores(issueQueries, pm, issueQueryToResourceKey);
 	}
-	
+
 	/**
 	 * Creates the default IssueLinkTypes. This is not extracted into a
 	 * specialized package as the default link-types are used in the base
 	 * functionality.
-	 * 
+	 *
 	 * @param pm {@link PersistenceManager}
 	 */
 	private void createDefaultIssueLinkTypes(final PersistenceManager pm) {
@@ -1562,7 +1569,7 @@ implements IssueManagerRemote
 		if (updateHandle != null) {
 			String baseName = "org.nightlabs.jfire.issue.resource.messages";
 			ClassLoader loader = IssueManagerBean.class.getClassLoader();
-			
+
 			UpdateHistoryItem.updateDone(updateHandle);
 			// ---[ IssueLinkTypes ]--------------------------------------------------------------------------------------------| Start |---
 			IssueLinkType issueLinkTypeRelated = new IssueLinkType(IssueLinkType.ISSUE_LINK_TYPE_ID_RELATED);
@@ -1602,8 +1609,8 @@ implements IssueManagerRemote
 			// ---[ IssueLinkTypes ]----------------------------------------------------------------------------------------------| End |---
 		}
 	}
-	
-	
+
+
 
 	/** Update history item ID used for storing additional {@link IssueQuery}s according to the {@link UpdateHistoryItem} mechanism. */
 	private static final String UPDATE_HISTORY_ITEM_ID_ADDITIONAL_STORED_QUERIES = IssueQuery.class.getName() + "#addAdditionalStoredQueries";
@@ -1613,7 +1620,7 @@ implements IssueManagerRemote
 	private static final String RESOURCE_KEY_PREFIX = IssueManagerBean.class.getName() + ".";
 //	/** Map keeping track of the resource key of each {@link IssueQuery} to be considered. */
 //	private Map<IssueQuery, String> issueQueryToResourceKey;
-	
+
 	// Note: (From current standards)
 	// 1. objClassName: Offer (jdo/org.nightlabs.jfire.trade.id.OfferID?organisationID=chezfrancois.jfire.org&offerIDPrefix=2009&offerID=2)
 	// 2. objClassName: Order (jdo/org.nightlabs.jfire.trade.id.OrderID?organisationID=chezfrancois.jfire.org&orderIDPrefix=2009&orderID=8)

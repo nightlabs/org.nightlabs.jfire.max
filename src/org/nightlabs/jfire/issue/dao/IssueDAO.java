@@ -114,7 +114,7 @@ public class IssueDAO extends BaseJDOObjectDAO<IssueID, Issue>{
 	/**
 	 * Get a single issue.
 	 * @param issueID The ID of the issue to get
-	 * @param fetchGroups Wich fetch groups to use
+	 * @param fetchGroups Which fetch groups to use
 	 * @param maxFetchDepth Fetch depth or {@link NLJDOHelper#MAX_FETCH_DEPTH_NO_LIMIT}
 	 * @param monitor The progress monitor for this action. For every downloaded
 	 * 					object, <code>monitor.worked(1)</code> will be called.
@@ -135,7 +135,7 @@ public class IssueDAO extends BaseJDOObjectDAO<IssueID, Issue>{
 
 	/**
 	 * Get all issues.
-	 * @param fetchGroups Wich fetch groups to use
+	 * @param fetchGroups Which fetch groups to use
 	 * @param maxFetchDepth Fetch depth or {@link NLJDOHelper#MAX_FETCH_DEPTH_NO_LIMIT}
 	 * @param monitor The progress monitor for this action. For every downloaded
 	 * 					object, <code>monitor.worked(1)</code> will be called.

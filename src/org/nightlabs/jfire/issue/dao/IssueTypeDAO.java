@@ -68,7 +68,7 @@ public class IssueTypeDAO extends BaseJDOObjectDAO<IssueTypeID, IssueType>
 	/**
 	 * Get a single issue type.
 	 * @param issueTypeID The ID of the issue type to get
-	 * @param fetchGroups Wich fetch groups to use
+	 * @param fetchGroups Which fetch groups to use
 	 * @param maxFetchDepth Fetch depth or {@link NLJDOHelper#MAX_FETCH_DEPTH_NO_LIMIT}
 	 * @param monitor The progress monitor for this action. For every downloaded
 	 * 					object, <code>monitor.worked(1)</code> will be called.

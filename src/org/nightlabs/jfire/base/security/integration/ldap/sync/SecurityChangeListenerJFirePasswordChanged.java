@@ -106,10 +106,6 @@ public class SecurityChangeListenerJFirePasswordChanged extends SecurityChangeLi
 			return;
 		}
 
-		if (logger.isDebugEnabled()){
-			logger.debug("Getting all persistent LDAPServers via extent");
-		}
-		
 		PersistenceManager pm = getPersistenceManager();
 		List<LDAPServer> ldapServers = new ArrayList<LDAPServer>();
 		for (Iterator<LDAPServer> it = pm.getExtent(LDAPServer.class, true).iterator(); it.hasNext(); ){
@@ -122,7 +118,7 @@ public class SecurityChangeListenerJFirePasswordChanged extends SecurityChangeLi
 		// create password wrapper for calculating hashed password and transmitting it to LDAP
 		LDAPPasswordWrapper newPasswordWrapper = new LDAPPasswordWrapper(Util.HASH_ALGORITHM_SHA, event.getNewPassword());
 		
-		boolean exceptionOccured = false;
+		Throwable lastThrowable = null;
 		for (LDAPServer ldapServer : ldapServers){
 			try{
 				boolean passwordChanged = modifyPassword(ldapServer, user, newPasswordWrapper.toString());
@@ -160,15 +156,17 @@ public class SecurityChangeListenerJFirePasswordChanged extends SecurityChangeLi
 					}
 				}
 			}catch(Exception e){
-				exceptionOccured = true;
+				lastThrowable = e;
 				logger.error(
 						String.format(
-								"Exception occured while trying to sync password to LDAPServer at %s:%s! Will contibue with next LDAPServer.", ldapServer.getHost(), ldapServer.getPort()), e);
+								"Exception occured while trying to sync password to LDAPServer at %s:%s! Will continue with next LDAPServer.", ldapServer.getHost(), ldapServer.getPort()), e);
 			}
 		}
-		if (exceptionOccured){
-			throw new RuntimeException("Exception(s) occured during password change in LDAP! Please see server log for details.");
+		if (lastThrowable != null){
+			throw new RuntimeException(
+					"Exception(s) occured during password change in LDAP! Please see server log for details. Last one was " + lastThrowable.getMessage(), lastThrowable);
 		}
+		super.on_UserLocal_passwordChanged(event);
 	}
 	
 	private boolean modifyPassword(LDAPServer ldapServer, User user, String newPasswordHashed) throws UserManagementSystemCommunicationException, LoginException, ScriptException, NoSuchMethodException{

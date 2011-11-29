@@ -73,6 +73,10 @@ public class LDAPConnection{
     	return this.connectionWrapper.search(dn, searchAttributes, returnAttributes);
     }
     
+    public Map<String, LDAPAttributeSet> search(String dn, String filterExpr, Object[] filterArgs) throws UserManagementSystemCommunicationException{
+    	return this.connectionWrapper.search(dn, filterExpr, filterArgs);
+    }
+    
 	public LDAPAttributeSet getAttributesForEntry(String dn) throws UserManagementSystemCommunicationException {
 		return this.connectionWrapper.getAttributesForEntry(dn);
 	}

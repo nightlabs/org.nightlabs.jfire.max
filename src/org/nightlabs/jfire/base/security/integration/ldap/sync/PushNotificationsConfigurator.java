@@ -488,7 +488,7 @@ public class PushNotificationsConfigurator {
 			}
 			
 			LDAPSyncEvent syncEvent = new LDAPSyncEvent(SyncEventGenericType.FETCH_USER);
-			syncEvent.setFetchEventTypeDataUnits(CollectionUtil.createHashSet(new FetchEventTypeDataUnit(newName)));
+			syncEvent.setFetchEventTypeDataUnits(CollectionUtil.createArrayList(new FetchEventTypeDataUnit(newName)));
 			try {
 				AsyncInvoke.exec(
 						new LDAPSyncInvocation(getLDAPServerIDByEventContext(event.getEventContext()), syncEvent),
@@ -513,7 +513,7 @@ public class PushNotificationsConfigurator {
 			}
 			
 			LDAPSyncEvent syncEvent = new LDAPSyncEvent(SyncEventGenericType.JFIRE_REMOVE_USER);
-			syncEvent.setFetchEventTypeDataUnits(CollectionUtil.createHashSet(new FetchEventTypeDataUnit(name)));
+			syncEvent.setFetchEventTypeDataUnits(CollectionUtil.createArrayList(new FetchEventTypeDataUnit(name)));
 			try {
 				AsyncInvoke.exec(
 						new LDAPSyncInvocation(getLDAPServerIDByEventContext(event.getEventContext()), syncEvent),

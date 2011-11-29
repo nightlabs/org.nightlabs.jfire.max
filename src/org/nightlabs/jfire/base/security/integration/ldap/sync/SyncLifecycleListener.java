@@ -11,17 +11,22 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.listener.DeleteLifecycleListener;
 import javax.jdo.listener.InstanceLifecycleEvent;
 import javax.jdo.listener.StoreLifecycleListener;
+import javax.script.ScriptException;
 
 import org.nightlabs.jfire.asyncinvoke.AsyncInvokeEnqueueException;
 import org.nightlabs.jfire.base.jdo.notification.JDOLifecycleListener;
 import org.nightlabs.jfire.base.security.integration.ldap.LDAPServer;
+import org.nightlabs.jfire.base.security.integration.ldap.LDAPUserSecurityGroupSyncConfig;
 import org.nightlabs.jfire.base.security.integration.ldap.sync.LDAPSyncEvent.SendEventTypeDataUnit;
 import org.nightlabs.jfire.person.Person;
 import org.nightlabs.jfire.security.User;
+import org.nightlabs.jfire.security.UserSecurityGroup;
 import org.nightlabs.jfire.security.id.UserID;
+import org.nightlabs.jfire.security.id.UserSecurityGroupID;
 import org.nightlabs.jfire.security.integration.UserManagementSystem;
 import org.nightlabs.jfire.security.integration.UserManagementSystemSyncEvent.SyncEventGenericType;
 import org.nightlabs.jfire.security.integration.UserManagementSystemSyncEvent.SyncEventType;
+import org.nightlabs.jfire.security.integration.UserSecurityGroupSyncConfig;
 import org.nightlabs.jfire.security.integration.id.UserManagementSystemID;
 import org.nightlabs.util.CollectionUtil;
 import org.slf4j.Logger;
@@ -69,12 +74,14 @@ public class SyncLifecycleListener implements StoreLifecycleListener, DeleteLife
 	
 	@Override
 	public void postStore(InstanceLifecycleEvent event) {
-		execSyncInvocation(event.getPersistentInstance(), SyncEventGenericType.SEND_USER);
+		Object persistentInstance = event.getPersistentInstance();
+		execSyncInvocation(persistentInstance, getSyncEventType(persistentInstance, false));
 	}
 
 	@Override
 	public void postDelete(InstanceLifecycleEvent event) {
-		execSyncInvocation(event.getPersistentInstance(), SyncEventGenericType.UMS_REMOVE_USER);
+		Object persistentInstance = event.getPersistentInstance();
+		execSyncInvocation(persistentInstance, getSyncEventType(persistentInstance, true));
 	}
 	
 	@Override
@@ -87,24 +94,29 @@ public class SyncLifecycleListener implements StoreLifecycleListener, DeleteLife
 				);
 		Object objectId = JDOHelper.getObjectId(jfireObject);
 		for (LDAPServer ldapServer : ldapServers) {
-			try{
-				UserManagementSystemID ldapServerId = ldapServer.getUserManagementSystemObjectID();
-				synchronized (ldapServerId2sendEventDataUnits) {
-					String ldapDN = ldapServer.getLdapScriptSet().getLdapDN(jfireObject);
-					SendEventTypeDataUnit sendEventTypeDataUnit = new SendEventTypeDataUnit(objectId, ldapDN);
-					if (ldapServerId2sendEventDataUnits.get(ldapServerId) != null){
-						ldapServerId2sendEventDataUnits.get(ldapServerId).add(sendEventTypeDataUnit);
-					}else{
-						Collection<SendEventTypeDataUnit> dataUnits = new HashSet<SendEventTypeDataUnit>();
-						dataUnits.add(sendEventTypeDataUnit);
-						ldapServerId2sendEventDataUnits.put(ldapServerId, dataUnits);
-					}
+			UserManagementSystemID ldapServerId = ldapServer.getUserManagementSystemObjectID();
+			synchronized (ldapServerId2sendEventDataUnits) {
+				String ldapDN = getLDAPNameForPersistentInstance(ldapServer, jfireObject);
+				if (ldapDN == null || ldapDN.isEmpty()){
+					logger.info(
+							String.format("No LDAP name on LDAPSerever %s for object being deleted %s. Skipping it.", ldapServerId, objectId));
+					continue;
 				}
-			}catch(Exception e){
-				logger.error(
-						String.format("Can't calculate ldapDN for object with ID %s", objectId), e);
+				SendEventTypeDataUnit sendEventTypeDataUnit = new SendEventTypeDataUnit(objectId, ldapDN);
+				if (ldapServerId2sendEventDataUnits.get(ldapServerId) != null){
+					ldapServerId2sendEventDataUnits.get(ldapServerId).add(sendEventTypeDataUnit);
+				}else{
+					Collection<SendEventTypeDataUnit> dataUnits = new HashSet<SendEventTypeDataUnit>();
+					dataUnits.add(sendEventTypeDataUnit);
+					ldapServerId2sendEventDataUnits.put(ldapServerId, dataUnits);
+				}
 			}
 		}
+	}
+
+	@Override
+	public void preStore(InstanceLifecycleEvent event) {
+		// do nothing
 	}
 	
 	private void execSyncInvocation(Object persistentInstance, SyncEventType eventType) {
@@ -148,13 +160,13 @@ public class SyncLifecycleListener implements StoreLifecycleListener, DeleteLife
 				}
 			}
 			
-			boolean exceptionOccured = false;
+			Throwable lastThrowable = null;
 			for (LDAPServer ldapServer : nonLeadingLdapServers){
 				
 				Object jfireObjectId = JDOHelper.getObjectId(persistentInstance);
 				UserManagementSystemID ldapServerId = ldapServer.getUserManagementSystemObjectID();
 				SendEventTypeDataUnit dataUnit = null;
-				if (SyncEventGenericType.UMS_REMOVE_USER == eventType
+				if ((SyncEventGenericType.UMS_REMOVE_USER == eventType || SyncEventGenericType.UMS_REMOVE_AUTHORIZATION == eventType)
 						&& ldapServerId2sendEventDataUnits.get(ldapServerId) != null){
 					synchronized (ldapServerId2sendEventDataUnits) {
 						for (SendEventTypeDataUnit unit : ldapServerId2sendEventDataUnits.get(ldapServerId)){
@@ -179,20 +191,55 @@ public class SyncLifecycleListener implements StoreLifecycleListener, DeleteLife
 					LDAPSyncInvocation.executeWithPreservedLDAPConnection(
 							pm, new LDAPSyncInvocation(ldapServerId, syncEvent), ldapServer);
 				} catch (AsyncInvokeEnqueueException e) {
-					exceptionOccured = true;
+					lastThrowable = e;
 					logger.error(e.getMessage(), e);
 				}
 			}
 			
-			if (exceptionOccured){
-				throw new JDOUserCallbackException("Unable to synhronize User data to some LDAP server(s)! Please see log for details.");
+			if (lastThrowable != null){
+				throw new JDOUserCallbackException(
+						"Unable to synhronize to some LDAP server(s)! Please see log for details. Last exception was " + lastThrowable.getMessage(), lastThrowable);
 			}
 		}
 	}
+	
+	private static String getLDAPNameForPersistentInstance(LDAPServer ldapServer, Object persistentInstance){
+		if (persistentInstance instanceof User
+				|| persistentInstance instanceof Person){
+			try{
+				return ldapServer.getLdapScriptSet().getLdapDN(persistentInstance);
+			}catch(ScriptException e){
+				logger.error(
+						String.format("Can't calculate ldapDN for object with ID %s", JDOHelper.getObjectId(persistentInstance)), e);
+				return null;
+			}
+		}else if (persistentInstance instanceof UserSecurityGroup){
+			UserSecurityGroup userSecurityGroup = (UserSecurityGroup) persistentInstance;
+			UserSecurityGroupID userSecurityGroupId = UserSecurityGroupID.create(
+					userSecurityGroup.getOrganisationID(), userSecurityGroup.getUserSecurityGroupID());
+			UserSecurityGroupSyncConfig<?, ?> syncConfigForGroup = UserSecurityGroupSyncConfig.getSyncConfigForGroup(
+					JDOHelper.getPersistenceManager(userSecurityGroup), ldapServer.getUserManagementSystemObjectID(), userSecurityGroupId);
+			if (syncConfigForGroup instanceof LDAPUserSecurityGroupSyncConfig){
+				return (String) syncConfigForGroup.getUserManagementSystemSecurityObject();
+			}
+			return null;
+		}else{
+			logger.warn(
+					"Can not get LDAP name for object cause it is not either User/Person or UserSecurityGroup! Instead it is " + persistentInstance.getClass().getName());
+			return null;
+		}
+	}
 
-	@Override
-	public void preStore(InstanceLifecycleEvent event) {
-		// do nothing
+	private static SyncEventType getSyncEventType(Object persistentInstance, boolean isRemove){
+		if (persistentInstance instanceof User
+				|| persistentInstance instanceof Person){
+			return isRemove ? SyncEventGenericType.UMS_REMOVE_USER : SyncEventGenericType.SEND_USER;
+		}else if (persistentInstance instanceof UserSecurityGroup){
+			return isRemove ? SyncEventGenericType.UMS_REMOVE_AUTHORIZATION : SyncEventGenericType.SEND_AUTHORIZATION;
+		}else{
+			throw new UnsupportedOperationException(
+					"Persistent instance should be either User/Person or UserSecurityGroup! Instead it is " + persistentInstance.getClass().getName());
+		}
 	}
 
 }

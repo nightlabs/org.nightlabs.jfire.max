@@ -268,28 +268,48 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper{
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Map<String, LDAPAttributeSet> search(
-			String dn, LDAPAttributeSet searchAttributes, String[] returnAttributes
-			) throws UserManagementSystemCommunicationException {
+	public Map<String, LDAPAttributeSet> search(String dn, LDAPAttributeSet searchAttributes, String[] returnAttributes) 
+			throws UserManagementSystemCommunicationException {
 		try{
 			synchronized (context){
-				NamingEnumeration<SearchResult> result = context.search(getSaveJndiName(dn), getJNDIAttributes(searchAttributes), returnAttributes);
-				try{
-					Map<String, LDAPAttributeSet> returnMap = new HashMap<String, LDAPAttributeSet>();
-					while (result.hasMoreElements()) {
-						SearchResult searchResult = result.nextElement();
-						returnMap.put(searchResult.getNameInNamespace(), getLDAPAttributeSet(searchResult.getAttributes()));
-					}
-					return returnMap;
-				}finally{
-					result.close();
-				}
+				return processResult(
+						context.search(getSaveJndiName(dn), getJNDIAttributes(searchAttributes), returnAttributes));
 			}
 		}catch(NamingException e){
 			throw new UserManagementSystemCommunicationException("Search failed!" , e);
 		}
 	}
-	
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Map<String, LDAPAttributeSet> search(String dn, String filterExpr, Object[] filterArgs)
+			throws UserManagementSystemCommunicationException {
+		try{
+			synchronized (context){
+				return processResult(
+						context.search(getSaveJndiName(dn), filterExpr, filterArgs, null));
+			}
+		}catch(NamingException e){
+			throw new UserManagementSystemCommunicationException("Search failed!" , e);
+		}
+	}
+
+	private Map<String, LDAPAttributeSet> processResult(
+			NamingEnumeration<SearchResult> result) throws NamingException {
+		try{
+			Map<String, LDAPAttributeSet> returnMap = new HashMap<String, LDAPAttributeSet>();
+			while (result.hasMoreElements()) {
+				SearchResult searchResult = result.nextElement();
+				returnMap.put(searchResult.getNameInNamespace(), getLDAPAttributeSet(searchResult.getAttributes()));
+			}
+			return returnMap;
+		}finally{
+			result.close();
+		}
+	}
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -692,5 +712,4 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper{
             return new LdapName(name);
         }
     }
-
 }

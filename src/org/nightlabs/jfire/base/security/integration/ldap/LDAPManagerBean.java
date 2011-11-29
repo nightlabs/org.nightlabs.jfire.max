@@ -2,6 +2,7 @@ package org.nightlabs.jfire.base.security.integration.ldap;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -16,7 +17,6 @@ import javax.ejb.TransactionAttributeType;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
-import javax.jdo.listener.StoreLifecycleListener;
 import javax.script.ScriptException;
 import javax.security.auth.login.LoginException;
 
@@ -27,17 +27,21 @@ import org.nightlabs.jfire.base.security.integration.ldap.id.LDAPScriptSetID;
 import org.nightlabs.jfire.base.security.integration.ldap.scripts.ILDAPScriptProvider;
 import org.nightlabs.jfire.base.security.integration.ldap.sync.LDAPSyncEvent;
 import org.nightlabs.jfire.base.security.integration.ldap.sync.LDAPSyncEvent.FetchEventTypeDataUnit;
+import org.nightlabs.jfire.base.security.integration.ldap.sync.LDAPUserSecurityGroupSyncConfigLifecycleListener;
 import org.nightlabs.jfire.base.security.integration.ldap.sync.PushNotificationsConfigurator;
 import org.nightlabs.jfire.base.security.integration.ldap.sync.SecurityChangeListenerJFirePasswordChanged;
+import org.nightlabs.jfire.base.security.integration.ldap.sync.SecurityChangeListenerUserSecurityGroupMembers;
 import org.nightlabs.jfire.base.security.integration.ldap.sync.SyncLifecycleListener;
 import org.nightlabs.jfire.person.Person;
 import org.nightlabs.jfire.security.User;
+import org.nightlabs.jfire.security.UserSecurityGroup;
 import org.nightlabs.jfire.security.id.UserID;
 import org.nightlabs.jfire.security.integration.UserManagementSystem;
 import org.nightlabs.jfire.security.integration.UserManagementSystemCommunicationException;
 import org.nightlabs.jfire.security.integration.UserManagementSystemSyncEvent.SyncEventGenericType;
 import org.nightlabs.jfire.security.integration.UserManagementSystemSyncException;
 import org.nightlabs.jfire.security.integration.UserManagementSystemType;
+import org.nightlabs.jfire.security.integration.UserSecurityGroupSyncConfig;
 import org.nightlabs.jfire.security.integration.id.UserManagementSystemID;
 import org.nightlabs.jfire.server.data.dir.JFireServerDataDirectory;
 import org.nightlabs.jfire.timer.Task;
@@ -61,6 +65,8 @@ import org.slf4j.LoggerFactory;
 public class LDAPManagerBean extends BaseSessionBeanImpl implements LDAPManagerRemote, LDAPManagerLocal {
 	
 	private static final Logger logger = LoggerFactory.getLogger(LDAPManagerBean.class);
+	
+	private static LDAPUserSecurityGroupSyncConfigLifecycleListener syncConfigListener = new LDAPUserSecurityGroupSyncConfigLifecycleListener();
 	
 	/**
 	 * {@inheritDoc}
@@ -91,7 +97,17 @@ public class LDAPManagerBean extends BaseSessionBeanImpl implements LDAPManagerR
 			// track password chages in JFire and propagate it to LDAP directory
 			SecurityChangeListenerJFirePasswordChanged.register(pm);
 			
-		}finally{
+			// listener for sync whenever LDAPUserSecurityGroupSyncConfig is created or its mapping is changed
+			pm.getPersistenceManagerFactory().addInstanceLifecycleListener(
+					syncConfigListener, new Class[]{LDAPUserSecurityGroupSyncConfig.class}
+					);
+			
+			// run sync for leading LDAPServers at startup
+			syncUserDataFromLDAP(null);
+			
+		} catch (Exception e) {
+			logger.error("Exception during LDAPManagerBean.initialise!", e);
+		} finally {
 			pm.close();
 		}
 		
@@ -202,8 +218,9 @@ public class LDAPManagerBean extends BaseSessionBeanImpl implements LDAPManagerR
 			
 			for (LDAPServer ldapServer : leadingSystems) {
 				
+				// sync Users and Persons
 				Collection<String> entriesForSync = ldapServer.getAllEntriesForSync();
-				Collection<FetchEventTypeDataUnit> dataUnits = new HashSet<FetchEventTypeDataUnit>();
+				Collection<FetchEventTypeDataUnit> dataUnits = new ArrayList<FetchEventTypeDataUnit>();
 				for (String ldapEntryName : entriesForSync){
 					dataUnits.add(new FetchEventTypeDataUnit(ldapEntryName));
 				}
@@ -212,8 +229,22 @@ public class LDAPManagerBean extends BaseSessionBeanImpl implements LDAPManagerR
    					syncEvent.setFetchEventTypeDataUnits(dataUnits);
 					
 					ldapServer.synchronize(syncEvent);
+					pm.flush();
 				}
-				
+
+				// sync UserSecurityGroups
+				Collection<UserSecurityGroupSyncConfig<?, ?>> syncConfigs = UserSecurityGroupSyncConfig.getAllSyncConfigsForUserManagementSystem(
+						pm, ldapServer.getUserManagementSystemObjectID());
+				dataUnits = new ArrayList<FetchEventTypeDataUnit>();
+				for (UserSecurityGroupSyncConfig<?, ?> syncConfig : syncConfigs){
+					dataUnits.add(new FetchEventTypeDataUnit((String) syncConfig.getUserManagementSystemSecurityObject()));
+				}
+				if (!dataUnits.isEmpty()){
+					LDAPSyncEvent syncEvent = new LDAPSyncEvent(SyncEventGenericType.FETCH_AUTHORIZATION);
+   					syncEvent.setFetchEventTypeDataUnits(dataUnits);
+					
+					ldapServer.synchronize(syncEvent);
+				}
 			}
 		}finally{
 			pm.close();
@@ -256,12 +287,13 @@ public class LDAPManagerBean extends BaseSessionBeanImpl implements LDAPManagerR
 	}
 
 	
-	private static StoreLifecycleListener syncStoreLifecycleListener = new SyncLifecycleListener();
+	private static SyncLifecycleListener syncLifecycleListener = new SyncLifecycleListener();
 
 	private void configureJFireAsLeadingSystem(PersistenceManager pm){
 		pm.getPersistenceManagerFactory().addInstanceLifecycleListener(
-				syncStoreLifecycleListener, new Class[]{User.class, Person.class}
+				syncLifecycleListener, new Class[]{User.class, Person.class, UserSecurityGroup.class}
 				);
+		SecurityChangeListenerUserSecurityGroupMembers.register(pm);
 	}
 	
 	private void configureLdapAsLeadingSystem(PersistenceManager pm){
@@ -291,7 +323,7 @@ public class LDAPManagerBean extends BaseSessionBeanImpl implements LDAPManagerR
 				task.getName().setText(Locale.ENGLISH.getLanguage(), "LDAPSynchronization");
 				task.getDescription().setText(
 						Locale.ENGLISH.getLanguage(),
-						"This Task queries all users from all leading LDAPServers and synchronizes changes to JFire."
+						"This Task queries all users and user security groups from all leading LDAPServers and synchronizes changes to JFire."
 						);
 
 				task.getTimePatternSet().createTimePattern(

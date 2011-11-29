@@ -339,24 +339,32 @@ public class LDAPScriptSet implements Serializable{
 	
 	/**
 	 * Get JFire {@link UserID} by given attributes of LDAP entry.
+	 * If organisationID could not be obtained from LDAP entry it will use local organisationID.
 	 * 
 	 * @param attributes {@link LDAPAttributeSet} of LDAP entry
 	 * @return {@link UserID} (with current organisationID) or <code>null</code>
 	 * @throws ScriptException
 	 * @throws NoSuchMethodException
+	 * @throws IllegalStateException if script function will return a non-<code>null</code> non-String value
 	 */
 	public UserID getUserIDFromLDAPEntry(LDAPAttributeSet attributes) throws ScriptException, NoSuchMethodException{
         ScriptEngine engine = getScriptEngine();
 		engine.eval(generateJFireToLdapAttributesScript);
 		Invocable invocable = (Invocable) engine;
 		Object result = invocable.invokeFunction("getUserIDFromLDAPEntry", attributes);
-		if (result instanceof String){
-			String[] idParts = ((String) result).split(LDAPScriptUtil.ORGANISATION_SEPARATOR);
-			if (idParts.length == 2){
-				return UserID.create(idParts[1], idParts[0]);
-			}
+		if (result == null){
+			return null;
 		}
-		return null;
+		if (!(result instanceof String)){
+			throw new IllegalStateException(
+					"getUserIDFromLDAPEntry(attributes) script function should return java.lang.String! Instead it is " + result.getClass().getName());
+		}
+		String[] idParts = ((String) result).split(LDAPScriptUtil.ORGANISATION_SEPARATOR);
+		if (idParts.length == 2){
+			return UserID.create(idParts[1], idParts[0]);
+		}else{
+			return UserID.create(getOrganisationID(), (String) result);
+		}
 	}
 	
 	private ScriptEngine getScriptEngine(){

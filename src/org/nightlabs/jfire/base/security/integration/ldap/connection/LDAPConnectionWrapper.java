@@ -90,9 +90,6 @@ public interface LDAPConnectionWrapper{
 	/**
 	 * Performs a search for entries by their attributes.
 	 * 
-	 * TODO: another search method could be created if needed for searching by String filter 
-	 * (with wildcards), with the possibility to specify search result size and scope. Denis.
-	 * 
 	 * @param dn startig point for a search
 	 * @param searchAttributes will not check attributes if set to <code>null</code> or empty {@link LDAPAttributeSet}
 	 * @param returnAttributes all attributes will be returned if set to <code>null</code>, no attributes if set to an empty array
@@ -100,6 +97,18 @@ public interface LDAPConnectionWrapper{
 	 * @throws UserManagementSystemCommunicationException 
 	 */
 	public Map<String, LDAPAttributeSet> search(String dn, LDAPAttributeSet searchAttributes, String[] returnAttributes) throws UserManagementSystemCommunicationException;
+	
+	/**
+	 * Performs a search for entries by given LDAP search filter. 
+	 * Filter could contain variables, i.e. {i} which will be replaced by filterArgs[i].
+	 * 
+	 * @param dn startig point for a search
+	 * @param filterExpr filter to apply
+	 * @param filterArgs arguments for a filter or <code>null</code> if filterExpr does not contain any variables
+	 * @return Map with search results - {@link LDAPAttributeSet} per found entry.
+	 * @throws UserManagementSystemCommunicationException
+	 */
+	public Map<String, LDAPAttributeSet> search(String dn, String filterExpr, Object[] filterArgs) throws UserManagementSystemCommunicationException;
 	
 	/**
 	 * Get {@link LDAPAttributeSet} with all attributes of an entry specified by DN

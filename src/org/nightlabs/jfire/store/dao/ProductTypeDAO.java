@@ -50,7 +50,7 @@ import org.nightlabs.progress.ProgressMonitor;
 public class ProductTypeDAO
 extends BaseJDOObjectDAO<ProductTypeID, ProductType>
 {
-	protected ProductTypeDAO() {
+	public ProductTypeDAO() {
 	}
 
 	/**

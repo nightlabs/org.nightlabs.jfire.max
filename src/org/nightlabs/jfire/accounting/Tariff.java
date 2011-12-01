@@ -28,6 +28,7 @@ package org.nightlabs.jfire.accounting;
 
 import java.io.Serializable;
 
+import javax.jdo.JDOHelper;
 import javax.jdo.annotations.Column;
 import javax.jdo.annotations.Discriminator;
 import javax.jdo.annotations.DiscriminatorStrategy;
@@ -178,6 +179,18 @@ implements Serializable, AttachCallback, DetachCallback
 		return ObjectIDUtil.longObjectIDFieldToString(IDGenerator.nextID(Tariff.class));
 	}
 
+	/**
+	 * Get the JDO object id.
+	 * <p>
+	 * Note, do not remove this method, references might not be found, but are made through jsp.
+	 * </p>
+	 * @return the JDO object id.
+	 */
+	public TariffID getObjectId()
+	{
+		return (TariffID)JDOHelper.getObjectId(this);
+	}	
+	
 	/**
 	 * Get the ID of the organisation which owns (created) this <code>Tariff</code> instance.
 	 * @return the organisationID.

@@ -2,8 +2,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	
-	<!-- @generated - Auto generated POM. Remove this marker after review. -->
-	
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>org.nightlabs.jfire.scripting</artifactId>
 	<packaging>bundle</packaging>
@@ -74,10 +72,8 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-		    <groupId>org.apache.geronimo.specs</groupId>
-		    <artifactId>geronimo-annotation_1.1_spec</artifactId>
-		    <!-- FIXME add to dependency-management -->
-		    <version>1.0.1</version>
+			<groupId>javax.annotation</groupId>
+			<artifactId>jsr250-api</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.servicemix.bundles</groupId>
@@ -87,7 +83,6 @@
 		<dependency>
 			<groupId>rhino</groupId>
 			<artifactId>js</artifactId>
-			<version>1.7R2</version><!-- TODO move version to jfire-parent -->
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -124,12 +119,10 @@
 				<groupId>org.datanucleus</groupId>
 				<artifactId>maven-datanucleus-plugin</artifactId>
 			</plugin>
-						
 			<plugin>
 				<groupId>org.apache.felix</groupId>
 				<artifactId>maven-bundle-plugin</artifactId>
-			</plugin>			
-	
+			</plugin>
 		</plugins>
 	</build>
 </project>

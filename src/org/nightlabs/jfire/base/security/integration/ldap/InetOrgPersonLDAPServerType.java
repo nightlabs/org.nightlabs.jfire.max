@@ -132,7 +132,7 @@ public class InetOrgPersonLDAPServerType extends UserManagementSystemType<LDAPSe
 	private static final String INET_ORG_PERSON_GET_ATTRIBUTES_FOR_LDAP_SCRIPT = "scripts/InetOrgPersonGetAttributesForLDAPScript.js";
 	private static final String INET_ORG_PERSON_GET_DN_SCRIPT = "scripts/InetOrgPersonGetDNScript.js";
 	private static final String INET_ORG_PERSON_BIND_VARIABLES_SCRIPT = "scripts/CommonBindVariablesScript.js";
-	private static final String INET_ORG_PERSON_GET_PARENT_ENTRIES_SCRIPT = "scripts/InetOrgPersonGetParentEntriesScript.js";
+	private static final String INET_ORG_PERSON_GET_PARENT_ENTRIES_SCRIPT = "scripts/CommonGetParentEntriesScript.js";
 
 	/**
 	 * The serial version of this class.

@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -219,7 +220,7 @@ public class LDAPManagerBean extends BaseSessionBeanImpl implements LDAPManagerR
 			for (LDAPServer ldapServer : leadingSystems) {
 				
 				// sync Users and Persons
-				Collection<String> entriesForSync = ldapServer.getAllEntriesForSync();
+				Collection<String> entriesForSync = ldapServer.getAllUserEntriesForSync();
 				Collection<FetchEventTypeDataUnit> dataUnits = new ArrayList<FetchEventTypeDataUnit>();
 				for (String ldapEntryName : entriesForSync){
 					dataUnits.add(new FetchEventTypeDataUnit(ldapEntryName));
@@ -259,10 +260,16 @@ public class LDAPManagerBean extends BaseSessionBeanImpl implements LDAPManagerR
 			
 			LDAPServer ldapServer = (LDAPServer) pm.getObjectById(ldapServerID);
 			try {
-				return ldapServer.getLdapScriptSet().getParentEntriesForSync();
+				Collection<String> result = new ArrayList<String>();
+				result.addAll(ldapServer.getLdapScriptSet().getUserParentEntriesForSync());
+				result.addAll(ldapServer.getLdapScriptSet().getGroupParentEntriesForSync());
+				return result;
 			} catch (ScriptException e) {
 				logger.error(e.getMessage(), e);
-				return new HashSet<String>();
+				return Collections.emptyList();
+			} catch (NoSuchMethodException e) {
+				logger.error(e.getMessage(), e);
+				return Collections.emptyList();
 			}
 			
 		}finally{
@@ -354,7 +361,8 @@ public class LDAPManagerBean extends BaseSessionBeanImpl implements LDAPManagerR
 	private static final String PROP_LDAP_SERVER_HOST = "ldapServer%s.host";
 	private static final String PROP_LDAP_SERVER_NAME = "ldapServer%s.name";
 	private static final String PROP_LDAP_SERVER_SYNC_DN = "ldapServer%s.syncDN";
-	private static final String PROP_LDAP_SERVER_BASE_ENTRY_DN = "ldapServer%s.baseEntryDN";
+	private static final String PROP_LDAP_SERVER_BASE_USER_ENTRY_DN = "ldapServer%s.baseUserEntryDN";
+	private static final String PROP_LDAP_SERVER_BASE_GROUP_ENTRY_DN = "ldapServer%s.baseGroupEntryDN";
 	private static final String PROP_LDAP_SERVER_SYNC_PASSWORD = "ldapServer%s.syncPassword";
 	private static final String PROP_LDAP_REMOVE_SERVER_INSTANCE = "ldapServer%s.remove";
 	private static final String PROP_LDAP_SERVER_IS_LEADING = "ldapServer%s.isLeading";
@@ -367,7 +375,8 @@ public class LDAPManagerBean extends BaseSessionBeanImpl implements LDAPManagerR
 	 * ldapServerN.typeClassName=org.nightlabs.jfire.base.security.integration.ldap.InetOrgPersonLDAPServerType
 	 * ldapServerN.name=local test LDAP server
 	 * ldapServerN.isActive=true
-	 * ldapServerN.baseEntryDN=ou=staff,ou=people,dc=nightlabs,dc=de
+	 * ldapServerN.baseUserEntryDN=ou=staff,ou=people,dc=nightlabs,dc=de
+	 * ldapServerN.baseGroupEntryDN=ou=groups,dc=nightlabs,dc=de
 	 * ldapServerN.syncDN=uid=sync_user,ou=staff,ou=people,dc=nightlabs,dc=de
 	 * ldapServerN.syncPassword=1111
 	 * ldapServerN.isLeading=false
@@ -407,9 +416,13 @@ public class LDAPManagerBean extends BaseSessionBeanImpl implements LDAPManagerR
 					String serverName = ldapProps.getProperty(String.format(PROP_LDAP_SERVER_NAME, i ));
 					String syncDN = ldapProps.getProperty(String.format(PROP_LDAP_SERVER_SYNC_DN, i ));					
 					String syncPassword = ldapProps.getProperty(String.format(PROP_LDAP_SERVER_SYNC_PASSWORD, i ));					
-					String baseEntryDN = ldapProps.getProperty(String.format(PROP_LDAP_SERVER_BASE_ENTRY_DN, i ));					
-					if (baseEntryDN == null || baseEntryDN.isEmpty()){
-						logger.warn("Base entry is not set for this server! Scripts generating LDAP names will not work properly!");
+					String baseUserEntryDN = ldapProps.getProperty(String.format(PROP_LDAP_SERVER_BASE_USER_ENTRY_DN, i ));					
+					if (baseUserEntryDN == null || baseUserEntryDN.isEmpty()){
+						logger.warn("Base entry for Users is not set for this server! Scripts generating LDAP names will not work properly!");
+					}
+					String baseGroupEntryDN = ldapProps.getProperty(String.format(PROP_LDAP_SERVER_BASE_GROUP_ENTRY_DN, i ));					
+					if (baseGroupEntryDN == null || baseGroupEntryDN.isEmpty()){
+						logger.warn("Base entry for Security Groups is not set for this server! Scripts generating LDAP names will not work properly!");
 					}
 					
 					String host = ldapProps.getProperty(String.format(PROP_LDAP_SERVER_HOST, i));
@@ -484,7 +497,8 @@ public class LDAPManagerBean extends BaseSessionBeanImpl implements LDAPManagerR
 						server.setSyncDN(syncDN);
 						server.setSyncPassword(syncPassword);
 						server.setLeading(isLeading);
-						server.setBaseDN(baseEntryDN);
+						server.setBaseDN(LDAPScriptSet.BASE_USER_ENTRY_NAME_PLACEHOLDER, baseUserEntryDN);
+						server.setBaseDN(LDAPScriptSet.BASE_GROUP_ENTRY_NAME_PLACEHOLDER, baseGroupEntryDN);
 						
 						pm.makePersistent(server);
 					}

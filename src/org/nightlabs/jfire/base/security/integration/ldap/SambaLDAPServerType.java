@@ -134,7 +134,7 @@ public class SambaLDAPServerType extends UserManagementSystemType<LDAPServer> im
 	private static final String SAMBA_GET_ATTRIBUTES_FOR_LDAP_SCRIPT = "scripts/SambaGetAttributesForLDAPScript.js";
 	private static final String SAMBA_GET_DN_SCRIPT = "scripts/SambaGetDNScript.js";
 	private static final String SAMBA_BIND_VARIABLES_SCRIPT = "scripts/CommonBindVariablesScript.js";
-	private static final String SAMBA_GET_PARENT_ENTRIES_SCRIPT = "scripts/SambaGetParentEntriesScript.js";
+	private static final String SAMBA_GET_PARENT_ENTRIES_SCRIPT = "scripts/CommonGetParentEntriesScript.js";
 	
 	/**
 	 * The serial version of this class.

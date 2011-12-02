@@ -527,14 +527,16 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 	 * 
 	 * @param entryName
 	 */
-	public void setBaseDN(String entryName) {
+	public void setBaseDN(String propName, String entryName) {
 		if (entryName == null){
 			return;
 		}
-		ldapScriptSet.setLdapDNScript(
-				ldapScriptSet.getLdapDNScript().replaceAll(LDAPScriptSet.BASE_ENTRY_NAME_PLACEHOLDER, entryName));
+		if (LDAPScriptSet.BASE_USER_ENTRY_NAME_PLACEHOLDER.equals(propName)){
+			ldapScriptSet.setLdapDNScript(
+					ldapScriptSet.getLdapDNScript().replaceAll(LDAPScriptSet.BASE_USER_ENTRY_NAME_PLACEHOLDER, entryName));
+		}
 		ldapScriptSet.setGenerateParentLdapEntriesScript(
-				ldapScriptSet.getGenerateParentLdapEntriesScript().replaceAll(LDAPScriptSet.BASE_ENTRY_NAME_PLACEHOLDER, entryName));
+				ldapScriptSet.getGenerateParentLdapEntriesScript().replaceAll(propName, entryName));
 	}
 	
 
@@ -760,7 +762,7 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 	 * @throws UserManagementSystemSyncException 
 	 * @throws LoginException 
 	 */
-	public Collection<String> getAllEntriesForSync() throws UserManagementSystemCommunicationException, LoginException, UserManagementSystemSyncException{
+	public Collection<String> getAllUserEntriesForSync() throws UserManagementSystemCommunicationException, LoginException, UserManagementSystemSyncException{
 		LDAPConnection connection = null;
 		Collection<String> entriesForSync = new ArrayList<String>();
 		try{
@@ -768,8 +770,10 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 			
 			Collection<String> parentEntriesNames = new ArrayList<String>();
 			try {
-				parentEntriesNames.addAll(ldapScriptSet.getParentEntriesForSync());
+				parentEntriesNames.addAll(ldapScriptSet.getUserParentEntriesForSync());
 			} catch (ScriptException e) {
+				logger.error("Can't get initial parent entries from LDAPScripSet!", e);
+			} catch (NoSuchMethodException e) {
 				logger.error("Can't get initial parent entries from LDAPScripSet!", e);
 			}
 			
@@ -989,6 +993,7 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 				}
 				filterString.append("))");
 				try {
+					// TODO: search API (+scope, ...)
 					Map<String, LDAPAttributeSet> searchResult = connection.search("", filterString.toString(), null);
 					
 					LDAPSyncEvent event = new LDAPSyncEvent(SyncEventGenericType.FETCH_AUTHORIZATION);

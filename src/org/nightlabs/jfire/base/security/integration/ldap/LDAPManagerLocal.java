@@ -30,7 +30,7 @@ public interface LDAPManagerLocal {
 	void syncUserDataFromLDAP(TaskID taskID) throws LoginException, UserManagementSystemSyncException, UserManagementSystemCommunicationException;
 	
 	/**
-	 * Get parent LDAP entries from {@link LDAPServer} scripts
+	 * Get both User and Group parent LDAP entries from {@link LDAPServer} scripts
 	 * 
 	 * @param ldapServerID
 	 * @return Names of base parent entries

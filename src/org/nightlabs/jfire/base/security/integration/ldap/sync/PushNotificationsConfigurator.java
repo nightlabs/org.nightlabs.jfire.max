@@ -1,5 +1,6 @@
 package org.nightlabs.jfire.base.security.integration.ldap.sync;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -293,7 +294,9 @@ public class PushNotificationsConfigurator {
 		 */
 		@Override
 		public void objectChanged(NamingEvent event) {
-			fetchLDAPEntry(event);
+			if (validateIncomingEvent(event, true)){
+				fetchLDAPEntry(event);
+			}
 		}
 
 		/**
@@ -301,7 +304,9 @@ public class PushNotificationsConfigurator {
 		 */
 		@Override
 		public void objectAdded(NamingEvent event) {
-			fetchLDAPEntry(event);
+			if (validateIncomingEvent(event, true)){
+				fetchLDAPEntry(event);
+			}
 		}
 
 		/**
@@ -309,7 +314,9 @@ public class PushNotificationsConfigurator {
 		 */
 		@Override
 		public void objectRemoved(NamingEvent event) {
-			removeJFireObject(event);
+			if (validateIncomingEvent(event, false)){
+				removeJFireObject(event);
+			}
 		}
 
 		/**
@@ -317,25 +324,19 @@ public class PushNotificationsConfigurator {
 		 */
 		@Override
 		public void objectRenamed(NamingEvent event) {
-			if (event.getEventContext() == null){
-				logger.warn("Can't proceed with fetching LDAP entry because source EventContext is null!");
+			if (event.getEventContext() == null
+					|| event.getNewBinding() == null
+					|| event.getOldBinding() == null){
+				logger.warn("Can't proceed with fetching LDAP entry because source EventContext is null or bindings are not specified!");
 				return;
 			}
-			if (event.getNewBinding() == null 
-					|| event.getNewBinding().getNameInNamespace() == null 
-					|| event.getNewBinding().getNameInNamespace().isEmpty()){
-				logger.warn("Can't proceed with fetching LDAP entry because entry name is not specified!");
-				return;
-			}
-
 			String newEntryName = event.getNewBinding().getNameInNamespace();
 			EventContext eventContext = event.getEventContext();
 			String ctxName = null;
 			try {
 				ctxName = eventContext.getNameInNamespace();
 			} catch (NamingException e) {
-				logger.error("Can't proceed with fetching LDAP entry!");
-				logger.error(e.getMessage(), e);
+				logger.error("Can't proceed with fetching LDAP entry! " + e.getMessage(), e);
 				return;
 			}
 			
@@ -343,7 +344,15 @@ public class PushNotificationsConfigurator {
 				
 				fetchLDAPEntry(event);
 				
-			}else{	// we check if new name is within possible LDAP base entries (configured in LDAP scripts)
+			}else if (event.getOldBinding().isRelative()){	// FIXME: validateIncomingEntry() can't be used here because there's no
+															// guarantee that event will contain an old binding with full name
+															// (it turned out that events from Apache DS do not, they have just 
+															// a relative name), so we check if old binding has a relative name 
+															// which would mean (at least for Apache DS) that this event came from
+															// correct EventContext and should be processed 
+															// (see validateIncomingEntry() for more details)
+				
+				// we check if new name is within possible LDAP base entries (configured in LDAP scripts)
 				
 				logger.info("New name seems to be out of sync scope, will check LDAP parent entries...");
 				
@@ -357,7 +366,6 @@ public class PushNotificationsConfigurator {
 					}catch(NoUserException e){
 						// login with _System_ user
 						try{
-							
 							if (logger.isDebugEnabled()){
 								logger.debug("No user logged in, trying to log in with _System_ user...");
 							}
@@ -380,11 +388,8 @@ public class PushNotificationsConfigurator {
 							}
 							
 						}catch(Exception ne){
-							
-							logger.error("Can't proceed with fetching LDAP entry!");
-							logger.error(ne.getMessage(), ne);
+							logger.error("Can't proceed with fetching LDAP entry! " + ne.getMessage(), ne);
 							return;
-							
 						}
 					}
 					
@@ -402,7 +407,7 @@ public class PushNotificationsConfigurator {
 						logger.info("New name seems is in sync scope, so will proceed with fetching LDAP entry...");
 						fetchLDAPEntry(event);
 					}else{
-						logger.info("Entry was renamed and now is out of synchronization scope! To be inside this scope it should have name ending with i.e. " + ctxName + " or another configured base parent entry.");
+						logger.error("Entry was renamed and now is out of synchronization scope! To be inside this scope it should have name ending with i.e. " + ctxName + " or another configured base parent entry.");
 					}
 					
 				}finally{
@@ -420,7 +425,7 @@ public class PushNotificationsConfigurator {
 						jsm.close();
 					}
 				}
-			}
+			}	// if (ctxName != null && newEntryName.endsWith(ctxName))
 		}
 
 		/**
@@ -455,19 +460,7 @@ public class PushNotificationsConfigurator {
 		}
 		
 		private void fetchLDAPEntry(NamingEvent event){
-			if (event.getEventContext() == null){
-				logger.warn("Can't proceed with fetching LDAP entry because source EventContext is null!");
-				return;
-			}
-			
 			String newName = event.getNewBinding().getNameInNamespace();
-			if (event.getNewBinding() == null 
-					|| newName == null 
-					|| newName.isEmpty()){
-				logger.warn("Can't proceed with fetching LDAP entry because entry name is not specified!");
-				return;
-			}
-			
 			String oldName = null;
 			if (event.getOldBinding() != null){
 				try{
@@ -480,11 +473,12 @@ public class PushNotificationsConfigurator {
 				}
 			}
 			if (oldName != null && !oldName.isEmpty()){
-				// TODO: [Denis] If LDAP entry was renamed and corresponding JFire User already exists than we have several choices:
-				// 1) Rename JFire User accordingly - but we can't change part of User primary key (userID)
-				// 2) Delete existing user with an old name and let synchronization create a new one with the new name (we can tranfer Person from old User to new one)
-				// 3) Do nothing, just log a warning - in this case both User with old name and User with new name will be present
-				logger.warn(String.format("It seems that LDAP entry was renamed from %s to %s. Since we can't replace userID of existing JFire User new User object with a new name will be created.", oldName, newName));
+				// TODO: [Denis] If LDAP entry was renamed and corresponding JFire object (i.e. User) already exists than we have several choices:
+				// 1) Rename JFire object accordingly - but we can't change part of primary key (userID)
+				// 2) Delete existing object with an old name and let synchronization create a new one with the new name (we can tranfer Person from old User to new one)
+				// 3) Do nothing, just log a warning - in this case both objects with old name and new name will be present
+				logger.warn(
+						String.format("It seems that LDAP entry was renamed from %s to %s. Since we can't replace ID of existing JFire object (i.e. User) new object with a new name will be created.", oldName, newName));
 			}
 			
 			LDAPSyncEvent syncEvent = new LDAPSyncEvent(SyncEventGenericType.FETCH_USER);
@@ -499,19 +493,7 @@ public class PushNotificationsConfigurator {
 		}
 
 		private void removeJFireObject(NamingEvent event){
-			if (event.getEventContext() == null){
-				logger.warn("Can't proceed with removing JFire object because source EventContext is null!");
-				return;
-			}
-			
 			String name = event.getOldBinding().getNameInNamespace();
-			if (event.getOldBinding() == null 
-					|| name == null 
-					|| name.isEmpty()){
-				logger.warn("Can't proceed with removing JFire object because entry name is not specified!");
-				return;
-			}
-			
 			LDAPSyncEvent syncEvent = new LDAPSyncEvent(SyncEventGenericType.JFIRE_REMOVE_USER);
 			syncEvent.setFetchEventTypeDataUnits(CollectionUtil.createArrayList(new FetchEventTypeDataUnit(name)));
 			try {
@@ -523,6 +505,66 @@ public class PushNotificationsConfigurator {
 			}
 		}
 
+		/**
+		 * This method validates the name of incoming LDAP entry which caused the event if it is equal or a descendant
+		 * of a {@link EventContext} which has the initial listener added to. It helps to workaroud the problem when every
+		 * change in LDAP is propagated to all listeners with no respect to initial listener target. For example it happened
+		 * with Apache Directory Server 1.5.6 - this seems to be fixed in 2.0 branch, see more details here: 
+		 * https://issues.apache.org/jira/browse/DIRSERVER-1502
+		 * 
+		 * @param event Incoming {@link NamingEvent}
+		 * @param newName Indicates which name to check: new one or old one
+		 * @return <code>true</code> if incoming entry name is equal or a descendant of initial {@link EventContext} name
+		 */
+		private boolean validateIncomingEvent(NamingEvent event, boolean newName){
+			if (event.getEventContext() == null){
+				logger.warn("Can't proceed with fetching LDAP entry because source EventContext is null!");
+				return false;
+			}
+			if (newName && event.getNewBinding() == null){
+				logger.warn("Can't proceed with fetching LDAP entry because new binding is not specified!");
+				return false;
+			}
+			if (!newName && event.getOldBinding() == null){
+				logger.warn("Can't proceed with fetching LDAP entry because old binding is not specified!");
+				return false;
+			}
+			String ctxName = null;
+			try {
+				ctxName = event.getEventContext().getNameInNamespace();
+			} catch (NamingException e) {
+				logger.error("Can't proceed with fetching LDAP entry! " + e.getMessage(), e);
+				return false;
+			}
+			
+			String entryName = null;
+			if (newName){
+				try{
+					entryName = event.getNewBinding().getNameInNamespace();
+				}catch(UnsupportedOperationException e){
+					entryName = event.getNewBinding().getName();
+				}
+			}else{
+				try{
+					entryName = event.getOldBinding().getNameInNamespace();
+				}catch(UnsupportedOperationException e){
+					entryName = event.getOldBinding().getName();
+				}
+			}
+			
+			if (entryName == null || entryName.isEmpty()){
+				logger.warn("Can't proceed with fetching LDAP entry because entry name is not specified!");
+				return false;
+			}
+			
+			if (ctxName != null 
+					&& (entryName.toLowerCase().equals(ctxName.toLowerCase()) 
+							|| entryName.toLowerCase().endsWith(ctxName.toLowerCase()))){
+				return true;
+			}
+
+			return false;
+		}
 	}
 	
 	private NamingListener syncPushNotificationsListener = new PushNotificationsListener();
@@ -561,7 +603,9 @@ public class PushNotificationsConfigurator {
 		}
 		UserManagementSystemID ldapServerID = ldapServer.getUserManagementSystemObjectID();
 		try{
-			Collection<String> parentEntriesForSync = ldapServer.getLdapScriptSet().getParentEntriesForSync();
+			Collection<String> parentEntriesForSync = new ArrayList<String>();
+			parentEntriesForSync.addAll(ldapServer.getLdapScriptSet().getUserParentEntriesForSync());
+			parentEntriesForSync.addAll(ldapServer.getLdapScriptSet().getGroupParentEntriesForSync());
 			if (!parentEntriesForSync.isEmpty()){
 				
 				// check if listener was already added for this LDAPServer
@@ -623,7 +667,7 @@ public class PushNotificationsConfigurator {
 						synchronized (registeredContexts) {
 							EventContext eventContext = (EventContext) ctx;
 							eventContext.addNamingListener(
-									parentEntry, EventContext.SUBTREE_SCOPE, listener);
+									eventContext.getNameInNamespace(), EventContext.SUBTREE_SCOPE, listener);
 							
 							if (registeredContexts.containsKey(ldapServerID)){
 								registeredContexts.get(ldapServerID).add(eventContext);
@@ -636,6 +680,9 @@ public class PushNotificationsConfigurator {
 				
 			}
 		} catch (ScriptException e) {
+			throw new UserManagementSystemCommunicationException(
+					"Can't get parent entries names from LDAPServer with ID: " + ldapServerID.toString(), e);
+		} catch (NoSuchMethodException e) {
 			throw new UserManagementSystemCommunicationException(
 					"Can't get parent entries names from LDAPServer with ID: " + ldapServerID.toString(), e);
 		} catch (NamingException e) {

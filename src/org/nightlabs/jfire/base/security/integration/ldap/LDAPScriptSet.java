@@ -2,6 +2,7 @@ package org.nightlabs.jfire.base.security.integration.ldap;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.Collections;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.annotations.Column;
@@ -43,7 +44,8 @@ import org.slf4j.LoggerFactory;
 		table="JFireLDAP_LDAPScriptSet")
 public class LDAPScriptSet implements Serializable{
 	
-	public static final String BASE_ENTRY_NAME_PLACEHOLDER = "BASE_ENTRY_NAME_PLACEHOLDER";
+	public static final String BASE_USER_ENTRY_NAME_PLACEHOLDER = "BASE_USER_ENTRY_NAME_PLACEHOLDER";
+	public static final String BASE_GROUP_ENTRY_NAME_PLACEHOLDER = "BASE_GROUP_ENTRY_NAME_PLACEHOLDER";
 	
 	private static final Logger logger = LoggerFactory.getLogger(LDAPScriptSet.class);
 	
@@ -307,16 +309,35 @@ public class LDAPScriptSet implements Serializable{
 	/**
 	 * Executes script for getting collection of parent LDAP entries which hold child entries to be synchronized. 
 	 * 
-	 * @return {@link Collection} of entries names or <code>null</code> if script did not return any
+	 * @return {@link Collection} of entries names or empty List if script did not return any
 	 * @throws ScriptException
+	 * @throws NoSuchMethodException 
 	 */
+	public Collection<String> getUserParentEntriesForSync() throws ScriptException, NoSuchMethodException{
+		return getParentEntriesInternal("getUserParentEntries");
+	}
+
+	/**
+	 * Executes script for getting collection of parent LDAP entries which hold child entries to be synchronized. 
+	 * 
+	 * @return {@link Collection} of entries names or empty List if script did not return any
+	 * @throws ScriptException
+	 * @throws NoSuchMethodException 
+	 */
+	public Collection<String> getGroupParentEntriesForSync() throws ScriptException, NoSuchMethodException{
+		return getParentEntriesInternal("getGroupParentEntries");
+	}
+
 	@SuppressWarnings("unchecked")
-	public Collection<String> getParentEntriesForSync() throws ScriptException{
-		Object result = getScriptEngine().eval(generateParentLdapEntriesScript, new SimpleScriptContext());
+	private Collection<String> getParentEntriesInternal(String functionName) throws ScriptException, NoSuchMethodException{
+        ScriptEngine engine = getScriptEngine();
+		engine.eval(generateParentLdapEntriesScript);
+		Invocable invocable = (Invocable) engine;
+		Object result = invocable.invokeFunction(functionName);
 		if (result instanceof Collection){
 			return (Collection<String>) result;
 		}
-		return null;
+		return Collections.emptyList();
 	}
 	
 	/**

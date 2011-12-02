@@ -68,7 +68,7 @@ public class SecurityChangeListenerUserSecurityGroupMembers extends SecurityChan
 
 	public static void register(PersistenceManager pm) {
 		pm.getExtent(SecurityChangeListenerUserSecurityGroupMembers.class);
-		SecurityChangeListenerID id = SecurityChangeListenerID.create(Organisation.DEV_ORGANISATION_ID, SecurityChangeListenerUserSecurityGroupMembers.class.getName());
+		SecurityChangeListenerID id = SecurityChangeListenerID.create(Organisation.DEV_ORGANISATION_ID, "JFireLDAP."+SecurityChangeListenerUserSecurityGroupMembers.class.getSimpleName());
 		try {
 			pm.getObjectById(id);
 		} catch (JDOObjectNotFoundException x) {
@@ -78,7 +78,7 @@ public class SecurityChangeListenerUserSecurityGroupMembers extends SecurityChan
 
 	public static void unregister(PersistenceManager pm) {
 		pm.getExtent(SecurityChangeListenerUserSecurityGroupMembers.class);
-		SecurityChangeListenerID id = SecurityChangeListenerID.create(Organisation.DEV_ORGANISATION_ID, SecurityChangeListenerUserSecurityGroupMembers.class.getName());
+		SecurityChangeListenerID id = SecurityChangeListenerID.create(Organisation.DEV_ORGANISATION_ID, "JFireLDAP."+SecurityChangeListenerUserSecurityGroupMembers.class.getSimpleName());
 		try {
 			SecurityChangeListener listener = (SecurityChangeListener) pm.getObjectById(id);
 			pm.deletePersistent(listener);

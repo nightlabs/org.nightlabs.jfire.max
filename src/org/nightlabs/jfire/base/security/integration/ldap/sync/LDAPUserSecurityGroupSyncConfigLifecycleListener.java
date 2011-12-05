@@ -50,8 +50,9 @@ public class LDAPUserSecurityGroupSyncConfigLifecycleListener implements CreateL
 		if (!isEnabled()){
 			return;
 		}
-		if (true){	// TODO: configurable policy or leading system
-			execSyncInvocation((LDAPUserSecurityGroupSyncConfig) event.getPersistentInstance());
+		LDAPUserSecurityGroupSyncConfig persistentInstance = (LDAPUserSecurityGroupSyncConfig) event.getPersistentInstance();
+		if (persistentInstance.getUserManagementSystem().shouldFetchUserData()){
+			execSyncInvocation(persistentInstance);
 		}
 	}
 	
@@ -92,7 +93,7 @@ public class LDAPUserSecurityGroupSyncConfigLifecycleListener implements CreateL
 			}
 			if (attachedSyncConfig != null
 					&& !syncConfig.getUserManagementSystemSecurityObject().equals(attachedSyncConfig.getUserManagementSystemSecurityObject())
-					&& true){	// TODO: configurable policy or leading system
+					&& attachedSyncConfig.getUserManagementSystem().shouldFetchUserData()){
 				syncConfigsForInitialSync.add(syncConfigId);
 			}
 		}

@@ -39,6 +39,7 @@ import org.nightlabs.jfire.base.security.integration.ldap.connection.ILDAPConnec
 import org.nightlabs.jfire.base.security.integration.ldap.connection.LDAPConnection;
 import org.nightlabs.jfire.base.security.integration.ldap.connection.LDAPConnectionManager;
 import org.nightlabs.jfire.base.security.integration.ldap.connection.LDAPConnectionWrapper.EntryModificationFlag;
+import org.nightlabs.jfire.base.security.integration.ldap.connection.LDAPConnectionWrapper.SearchScope;
 import org.nightlabs.jfire.base.security.integration.ldap.sync.AttributeStructFieldSyncHelper;
 import org.nightlabs.jfire.base.security.integration.ldap.sync.AttributeStructFieldSyncHelper.AttributeStructFieldDescriptor;
 import org.nightlabs.jfire.base.security.integration.ldap.sync.AttributeStructFieldSyncHelper.LDAPAttributeSyncPolicy;
@@ -303,7 +304,7 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 		        	logger.debug(
 		        			String.format("User %s@%s found in JFire, result DN is %s", loginDataUserID, loginDataOrganisationID, userDN));
 		        }
-    		}else if (user == null && shouldFetchUserFromLDAP()){
+    		}else if (user == null && shouldFetchUserData()){
     			if (logger.isDebugEnabled()){
 		        	logger.debug(
 		        			String.format("User %s@%s was not found JFire, will fetch it from LDAP", loginDataUserID, loginDataOrganisationID));
@@ -344,7 +345,7 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 	        	logger.debug("Bind successful. Session id: " + session.getSessionID());
 	        }
 
-			if (user == null && shouldFetchUserFromLDAP()){
+			if (user == null && shouldFetchUserData()){
    				try {
    					if (logger.isDebugEnabled()){
    			        	logger.debug(
@@ -738,23 +739,6 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 	}
 	
 	/**
-	 * Check whether given "objectClass" attribute values contains "groupOfNames" or "groupOfUniqueNames" which signals
-	 * that this entry could be LDAP security-related group.
-	 * 
-	 * @param objectClassAttributeValues Values of "objectClass" attribute
-	 * @return <code>true</code> if given values contain needed ones 
-	 */
-	public static boolean entryIsSecurityGroup(Iterable<Object> objectClassAttributeValues){
-		for (Object value : objectClassAttributeValues){
-			if (GROUP_OF_NAMES_ATTR_VALUE.equals(value)
-					|| GROUP_OF_UNIQUE_NAMES_ATTR_VALUE.equals(value)){
-				return true;
-			}
-		}
-		return false;
-	}
-
-	/**
 	 * Retrieves all entries' names from LDAP which should be synchronized with JFire objects.
 	 * 
 	 * @return all LDAP entries which should be synchronized into JFire
@@ -850,28 +834,6 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 		}
 	}
 
-	private boolean shouldFetchUserFromLDAP(){
-		// we can fetch user data from LDAP in both scenarios:
-		// - when JFire is a leading system we're doing it because it might help in certain situations 
-		//   (e.g. when you want to use JFire as leading system, but initially have some users in the 
-		//   LDAP which you want to import)
-		// - when LDAP is a leading system it's done when user still does not exist in JFire
-		boolean fetchUserFromLDAP;
-		if (isLeading()){
-			fetchUserFromLDAP = true;
-		}else{
-			String fetchPropertyValue = System.getProperty(UserManagementSystem.SHOULD_FETCH_USER_DATA);
-			if (fetchPropertyValue != null && !fetchPropertyValue.isEmpty()){
-				fetchUserFromLDAP = Boolean.parseBoolean(
-						System.getProperty(UserManagementSystem.SHOULD_FETCH_USER_DATA)
-						);
-			}else{
-				fetchUserFromLDAP = true;
-			}
-		}
-		return fetchUserFromLDAP;
-	}
-	
 	/**
 	 * Performs synchronization of {@link User} and/or {@link Person} data from LDAP directory to JFire
 	 * 
@@ -993,8 +955,8 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 				}
 				filterString.append("))");
 				try {
-					// TODO: search API (+scope, ...)
-					Map<String, LDAPAttributeSet> searchResult = connection.search("", filterString.toString(), null);
+					Map<String, LDAPAttributeSet> searchResult = connection.search(
+							"", filterString.toString(), null, SearchScope.SUBTREE);
 					
 					LDAPSyncEvent event = new LDAPSyncEvent(SyncEventGenericType.FETCH_AUTHORIZATION);
 					Collection<FetchEventTypeDataUnit> fetchDataUnits = new ArrayList<FetchEventTypeDataUnit>();
@@ -1003,11 +965,10 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 					}
 					event.setFetchEventTypeDataUnits(fetchDataUnits);
 					
-					// TODO: disable user sync in auth sync
+					userSyncIsRunning.set(true);
 					synchronize(event);
-					
 				} finally {
-					// TODO: user sync in auth sync to old value
+					userSyncIsRunning.set(false);
 				}
 			}
 		};
@@ -1127,7 +1088,16 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 		}
 		return null;
 	}
-	
+
+	/**
+	 * When sync for {@link User}s is already running we do not sync other Users while synchronizing authorization data for current Users.
+	 */
+	private static ThreadLocal<Boolean> userSyncIsRunning = new ThreadLocal<Boolean>(){
+		protected Boolean initialValue() {
+			return false;
+		};
+	};
+
 	private void updateJFireAuthorizationData(final LDAPSyncEvent ldapSyncEvent) throws UserManagementSystemSyncException, LoginException, UserManagementSystemCommunicationException{
 		final PersistenceManager pm = JDOHelper.getPersistenceManager(this);
 
@@ -1152,11 +1122,9 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 									pm, LDAPServer.this.getUserManagementSystemObjectID(), ldapGroupDN);
 
 							LDAPAttributeSet attributes = connection.getAttributesForEntry(
-									ldapGroupDN, new String[]{OBJECT_CLASS_ATTR_NAME, MEMBER_ATTR_NAME, COMMON_NAME_ATTR_NAME});
-							if (!entryIsSecurityGroup(attributes.getAttributeValues(OBJECT_CLASS_ATTR_NAME))){
-								throw new UserManagementSystemSyncException(
-										"Synchronized LDAP entry is not a groupOfNames or a groupOfUniqueNames! Can't proceed with sync!");
-							}
+									ldapGroupDN, new String[]{OBJECT_CLASS_ATTR_NAME, MEMBER_ATTR_NAME, UNIQUE_MEMBER_ATTR_NAME, COMMON_NAME_ATTR_NAME});
+							
+							LDAPSecurityGroup ldapGroup = new LDAPSecurityGroup(attributes);
 
 							if (syncConfig != null && removeJFireObjects){
 								UserSecurityGroup userSecurityGroup = syncConfig.getUserSecurityGroup();
@@ -1180,8 +1148,9 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 									pm.deletePersistent(userSecurityGroup);
 								}
 							}else{
-								if (syncConfig == null && true){	// TODO: configurable policy
-									String groupName = (String) attributes.getAttributeValue(COMMON_NAME_ATTR_NAME);
+								if (syncConfig == null 
+										&& shouldFetchUserData()){
+									String groupName = ldapGroup.getGroupName();
 									if (groupName == null){
 										groupName = ldapGroupDN;
 									}
@@ -1198,7 +1167,7 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 									return;
 								}
 
-								Iterable<Object> ldapGroupMembers = attributes.getAttributeValues(MEMBER_ATTR_NAME);
+								Iterable<Object> ldapGroupMembers = attributes.getAttributeValues(ldapGroup.getMemberAttr());
 								Collection<User> users = new ArrayList<User>();
 								Map<String, LDAPAttributeSet> ldapEntriesForSync = new HashMap<String, LDAPAttributeSet>();
 								for (Object groupMember : ldapGroupMembers){
@@ -1210,7 +1179,7 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 											user = getUserByLDAPEntryName(pm, attributesForEntry);
 										}catch(JDOObjectNotFoundException e){
 											// no user, add for later synchronization
-											if (true){	// TODO: configurable policy
+											if (shouldFetchUserData() && !userSyncIsRunning.get()){
 												ldapEntriesForSync.put(groupMemberName, attributesForEntry);
 											}
 										}
@@ -1338,14 +1307,17 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 						connection.deleteEntry(ldapGroupName);
 						
 					}else{
+						LDAPSecurityGroup ldapGroup = getDefaultLDAPSecurityGroup(
+								existingEntryAttributes, connection, syncConfig.getUserSecurityGroup().getName());
+						
 						LDAPAttributeSet modifyAttributes = new LDAPAttributeSet();
-						modifyAttributes.createAttribute(COMMON_NAME_ATTR_NAME, syncConfig.getUserSecurityGroup().getName());
+						modifyAttributes.createAttribute(COMMON_NAME_ATTR_NAME, ldapGroup.getGroupName());
 						Set<AuthorizedObject> members = syncConfig.getUserSecurityGroup().getMembers();
 						for (AuthorizedObject authorizedObject : members) {
 							if (authorizedObject instanceof UserLocal){
 								User user = ((UserLocal) authorizedObject).getUser();
 								String ldapUserDN = getLDAPUserDN(user);
-								modifyAttributes.createAttribute(getMemeberAttrName(existingEntryAttributes), ldapUserDN);
+								modifyAttributes.createAttribute(ldapGroup.getMemberAttr(), ldapUserDN);
 							}
 						}
 						
@@ -1354,7 +1326,7 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 								connection.modifyEntry(ldapGroupName, modifyAttributes, EntryModificationFlag.MODIFY);
 							}else{	// create new entry
 								modifyAttributes.createAttribute(OBJECT_CLASS_ATTR_NAME, "top");
-								modifyAttributes.createAttribute(OBJECT_CLASS_ATTR_NAME, GROUP_OF_NAMES_ATTR_VALUE);	// TODO: make it configurable
+								modifyAttributes.createAttribute(OBJECT_CLASS_ATTR_NAME, ldapGroup.getObjectClassAttr());
 								connection.createEntry(ldapGroupName, modifyAttributes);
 							}
 						}
@@ -1427,25 +1399,78 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 		}
 	}
 	
-	private static String getMemeberAttrName(LDAPAttributeSet entryAttributes){
-		if (entryAttributes != null){
-			Iterable<Object> attributeValues = entryAttributes.getAttributeValues(OBJECT_CLASS_ATTR_NAME);
-			for (Object value : attributeValues){
-				if (GROUP_OF_NAMES_ATTR_VALUE.equals(value)){
-					return MEMBER_ATTR_NAME;
-				}else if (GROUP_OF_UNIQUE_NAMES_ATTR_VALUE.equals(value)){
-					return UNIQUE_MEMBER_ATTR_NAME;
+	private LDAPSecurityGroup getDefaultLDAPSecurityGroup(LDAPAttributeSet existingEntryAttrs, LDAPConnection connection, String groupName) 
+			throws ScriptException, NoSuchMethodException, LoginException, UserManagementSystemCommunicationException{
+		if (existingEntryAttrs != null){
+			return new LDAPSecurityGroup(existingEntryAttrs);
+		}else{
+			Collection<String> groupParentEntries = ldapScriptSet.getGroupParentEntriesForSync();
+			if (groupParentEntries.isEmpty()){
+				throw new IllegalStateException("No parent entries for LDAP security groups found!");
+			}
+			Collection<String> childEntries = null;
+			for (String parentEntry : groupParentEntries){
+				childEntries = connection.getChildEntries(parentEntry);
+				if (childEntries != null && !childEntries.isEmpty()){
+					break;
 				}
 			}
-			throw new UnsupportedOperationException(
-					String.format("objectClasses should contain either %s or %s!", GROUP_OF_NAMES_ATTR_VALUE, GROUP_OF_UNIQUE_NAMES_ATTR_VALUE));
-		}else{
-			return MEMBER_ATTR_NAME;	// TODO: make it configurable
+			if (childEntries == null || childEntries.isEmpty()){
+				logger.warn("Can't get any group entries from LDAP server, default values will be used for LDAPSecurityGroup!");
+				return new LDAPSecurityGroup("", GROUP_OF_NAMES_ATTR_VALUE, MEMBER_ATTR_NAME);
+			}else{
+				return new LDAPSecurityGroup(
+						connection.getAttributesForEntry(childEntries.iterator().next()));
+			}
 		}
 	}
 	
 	abstract class SyncRunnable{
 		public abstract void run() throws LoginException, UserManagementSystemCommunicationException, UserManagementSystemSyncException;
+	}
+	
+	class LDAPSecurityGroup{
+
+		private String groupName;
+		private String objectClassAttr;
+		private String memberAttr;
+		
+		public LDAPSecurityGroup(LDAPAttributeSet attributes) {
+			Iterable<Object> attributeValues = attributes.getAttributeValues(OBJECT_CLASS_ATTR_NAME);
+			for (Object value : attributeValues){
+				if (GROUP_OF_NAMES_ATTR_VALUE.equals(value)){
+					objectClassAttr = GROUP_OF_NAMES_ATTR_VALUE;
+					memberAttr = MEMBER_ATTR_NAME;
+					break;
+				}else if (GROUP_OF_UNIQUE_NAMES_ATTR_VALUE.equals(value)){
+					objectClassAttr = GROUP_OF_UNIQUE_NAMES_ATTR_VALUE;
+					memberAttr = UNIQUE_MEMBER_ATTR_NAME;
+					break;
+				}
+			}
+			if (objectClassAttr == null || memberAttr == null){
+				throw new IllegalArgumentException("Can't get objectClass and member attribute names from given attribute set!");
+			}
+			this.groupName = (String) attributes.getAttributeValue(COMMON_NAME_ATTR_NAME);
+		}
+		
+		public LDAPSecurityGroup(String name, String objectClassAttr, String memberAttr) {
+			this.groupName = name;
+			this.objectClassAttr = objectClassAttr;
+			this.memberAttr = memberAttr;
+		}
+		
+		public String getGroupName() {
+			return groupName;
+		}
+
+		public String getMemberAttr() {
+			return memberAttr;
+		}
+		
+		public String getObjectClassAttr() {
+			return objectClassAttr;
+		}
 	}
 	
 	/***********************************

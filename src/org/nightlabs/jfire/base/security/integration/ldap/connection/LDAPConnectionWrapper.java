@@ -20,11 +20,11 @@ public interface LDAPConnectionWrapper{
 		MODIFY
 	}
 	
-//	public enum SearchScope{
-//		SUBTREE,	// Starts at the base entry; searches the base entry and everything below it
-//		ONELEVEL,	// Searches only the entries below the base entry
-//		OBJECT		// Searches only the base entry; useful if you need to get attributes/value pair of just one entry
-//	}
+	public enum SearchScope{
+		SUBTREE,	// Starts at the base entry; searches the base entry and everything below it
+		ONELEVEL,	// Searches only the entries below the base entry
+		OBJECT		// Searches only the base entry; useful if you need to get attributes/value pair of just one entry
+	}
 
     /**
      * Connects to the directory server.
@@ -105,10 +105,11 @@ public interface LDAPConnectionWrapper{
 	 * @param dn startig point for a search
 	 * @param filterExpr filter to apply
 	 * @param filterArgs arguments for a filter or <code>null</code> if filterExpr does not contain any variables
+	 * @param searchScope scope for the search, see {@link SearchScope}
 	 * @return Map with search results - {@link LDAPAttributeSet} per found entry.
 	 * @throws UserManagementSystemCommunicationException
 	 */
-	public Map<String, LDAPAttributeSet> search(String dn, String filterExpr, Object[] filterArgs) throws UserManagementSystemCommunicationException;
+	public Map<String, LDAPAttributeSet> search(String dn, String filterExpr, Object[] filterArgs, SearchScope searchScope) throws UserManagementSystemCommunicationException;
 	
 	/**
 	 * Get {@link LDAPAttributeSet} with all attributes of an entry specified by DN

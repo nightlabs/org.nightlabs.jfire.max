@@ -7,6 +7,7 @@ import javax.security.auth.login.LoginException;
 
 import org.nightlabs.jfire.base.security.integration.ldap.attributes.LDAPAttributeSet;
 import org.nightlabs.jfire.base.security.integration.ldap.connection.LDAPConnectionWrapper.EntryModificationFlag;
+import org.nightlabs.jfire.base.security.integration.ldap.connection.LDAPConnectionWrapper.SearchScope;
 import org.nightlabs.jfire.security.integration.UserManagementSystemCommunicationException;
 
 /**
@@ -73,8 +74,8 @@ public class LDAPConnection{
     	return this.connectionWrapper.search(dn, searchAttributes, returnAttributes);
     }
     
-    public Map<String, LDAPAttributeSet> search(String dn, String filterExpr, Object[] filterArgs) throws UserManagementSystemCommunicationException{
-    	return this.connectionWrapper.search(dn, filterExpr, filterArgs);
+    public Map<String, LDAPAttributeSet> search(String dn, String filterExpr, Object[] filterArgs, SearchScope scope) throws UserManagementSystemCommunicationException{
+    	return this.connectionWrapper.search(dn, filterExpr, filterArgs, scope);
     }
     
 	public LDAPAttributeSet getAttributesForEntry(String dn) throws UserManagementSystemCommunicationException {

@@ -284,12 +284,29 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper{
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Map<String, LDAPAttributeSet> search(String dn, String filterExpr, Object[] filterArgs)
+	public Map<String, LDAPAttributeSet> search(String dn, String filterExpr, Object[] filterArgs, SearchScope searchScope)
 			throws UserManagementSystemCommunicationException {
 		try{
 			synchronized (context){
+				int searchScopeValue = SearchControls.OBJECT_SCOPE;
+				switch (searchScope) {
+				case OBJECT:
+					searchScopeValue = SearchControls.OBJECT_SCOPE;
+					break;
+				case ONELEVEL:
+					searchScopeValue = SearchControls.ONELEVEL_SCOPE;
+					break;
+				case SUBTREE:
+					searchScopeValue = SearchControls.SUBTREE_SCOPE;
+					break;
+				default:
+					searchScopeValue = SearchControls.OBJECT_SCOPE;
+					break;
+				}
+				SearchControls controls = new SearchControls();
+				controls.setSearchScope(searchScopeValue);
 				return processResult(
-						context.search(getSaveJndiName(dn), filterExpr, filterArgs, null));
+						context.search(getSaveJndiName(dn), filterExpr, filterArgs, controls));
 			}
 		}catch(NamingException e){
 			throw new UserManagementSystemCommunicationException("Search failed!" , e);

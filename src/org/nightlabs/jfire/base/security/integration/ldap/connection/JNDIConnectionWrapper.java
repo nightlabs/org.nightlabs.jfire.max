@@ -205,7 +205,7 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper{
     public void createEntry(String dn, LDAPAttributeSet attributes) throws UserManagementSystemCommunicationException{
         try {
         	synchronized (context) {
-                context.createSubcontext(getSaveJndiName(dn), getJNDIAttributes(attributes));
+                context.createSubcontext(getSafeJndiName(dn), getJNDIAttributes(attributes));
 			}
         }catch(NamingException e){
 			throw new UserManagementSystemCommunicationException("Failed to create an entry! Entry DN: " + dn, e);
@@ -219,7 +219,7 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper{
     public void deleteEntry(String dn) throws UserManagementSystemCommunicationException{
         try {
         	synchronized (context) {
-                context.destroySubcontext(getSaveJndiName(dn));
+                context.destroySubcontext(getSafeJndiName(dn));
 			}
         }catch(NamingException e){
 			throw new UserManagementSystemCommunicationException("Failed to delete an entry! Entry DN: " + dn, e);
@@ -257,7 +257,7 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper{
 		        	i++;
 				}
 		        // perform modification
-		        context.modifyAttributes(getSaveJndiName(dn), modificationItems);
+		        context.modifyAttributes(getSafeJndiName(dn), modificationItems);
 			}
 		}catch(NamingException e){
 			throw new UserManagementSystemCommunicationException("Entry modification failed! Entry: " + dn, e);
@@ -268,12 +268,12 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper{
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Map<String, LDAPAttributeSet> search(String dn, LDAPAttributeSet searchAttributes, String[] returnAttributes) 
+	public Map<String, LDAPAttributeSet> search(String baseDN, LDAPAttributeSet searchAttributes, String[] returnAttributes) 
 			throws UserManagementSystemCommunicationException {
 		try{
 			synchronized (context){
 				return processResult(
-						context.search(getSaveJndiName(dn), getJNDIAttributes(searchAttributes), returnAttributes));
+						context.search(getSafeJndiName(getSafeSearchBaseDN(baseDN)), getJNDIAttributes(searchAttributes), returnAttributes));
 			}
 		}catch(NamingException e){
 			throw new UserManagementSystemCommunicationException("Search failed!" , e);
@@ -284,7 +284,7 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper{
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Map<String, LDAPAttributeSet> search(String dn, String filterExpr, Object[] filterArgs, SearchScope searchScope)
+	public Map<String, LDAPAttributeSet> search(String baseDN, String filterExpr, Object[] filterArgs, SearchScope searchScope)
 			throws UserManagementSystemCommunicationException {
 		try{
 			synchronized (context){
@@ -306,7 +306,7 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper{
 				SearchControls controls = new SearchControls();
 				controls.setSearchScope(searchScopeValue);
 				return processResult(
-						context.search(getSaveJndiName(dn), filterExpr, filterArgs, controls));
+						context.search(getSafeJndiName(getSafeSearchBaseDN(baseDN)), filterExpr, filterArgs, controls));
 			}
 		}catch(NamingException e){
 			throw new UserManagementSystemCommunicationException("Search failed!" , e);
@@ -326,6 +326,21 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper{
 			result.close();
 		}
 	}
+	
+	private static final String DC_OBJECT_OBJECT_CLASS = "dcObject";
+	
+	private String getSafeSearchBaseDN(String baseDN) throws NamingException{
+		if (baseDN == null || baseDN.isEmpty()){	// getting root entry
+			Collection<String> rootEntries = getRootEntries();
+			for (String entryName : rootEntries){
+				Attributes attributes = context.getAttributes(entryName, new String[]{LDAPServer.OBJECT_CLASS_ATTR_NAME});
+				if (attributes.get(LDAPServer.OBJECT_CLASS_ATTR_NAME).contains(DC_OBJECT_OBJECT_CLASS)){
+					return entryName;
+				}
+			}
+		}
+		return baseDN;	// TODO: escaping special characters could be done here;
+	}
 
 	/**
 	 * {@inheritDoc}
@@ -344,9 +359,9 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper{
 			synchronized (context) {
 				Attributes attributes = null;
 				if (attributeNames != null && attributeNames.length > 0){
-					attributes = context.getAttributes(getSaveJndiName(dn), attributeNames);
+					attributes = context.getAttributes(getSafeJndiName(dn), attributeNames);
 				}else{	// get all attributes
-					attributes = context.getAttributes(getSaveJndiName(dn));
+					attributes = context.getAttributes(getSafeJndiName(dn));
 				}
 				return getLDAPAttributeSet(attributes);
 			}
@@ -367,7 +382,7 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper{
 					return getRootEntries();
 					
 		 		}else{
-					NamingEnumeration<NameClassPair> childEntries = context.list(getSaveJndiName(parentName));
+					NamingEnumeration<NameClassPair> childEntries = context.list(getSafeJndiName(parentName));
 					try{
 						Collection<String> childNames = new ArrayList<String>();
 						while (childEntries.hasMoreElements()) {
@@ -410,7 +425,7 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper{
 			return attributesForEntry != null && attributesForEntry.size() > 0;
 		}catch(UserManagementSystemCommunicationException e){
 			logger.info(
-					String.format("Check for entry %s existence failed with exception which probably means that entry does not exist.", entryName), e);
+					String.format("Check for entry %s existence failed with exception which probably means that entry does not exist: %s", entryName, e.getMessage()));
 			return false;
 		}
 	}
@@ -722,7 +737,7 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper{
      * 
      * @throws InvalidNameException the invalid name exception
      */
-    private static Name getSaveJndiName(String name) throws InvalidNameException{
+    private static Name getSafeJndiName(String name) throws InvalidNameException{
         if (name == null || "".equals(name)){
             return new CompositeName();
         }else{

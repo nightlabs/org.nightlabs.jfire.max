@@ -77,7 +77,7 @@ function getPasswordAttributeName(){
 function getUserIDFromLDAPEntry(attributes){
 	var displayName = LDAPScriptUtil.getAttributeValue(attributes, 'displayName', null);
 	if (displayName == null || displayName == ''){	// assume it's not a Person
-		var uid = LDAPScriptUtil.getAttributeValue(allAttributes, 'uid', 'userid');
+		var uid = LDAPScriptUtil.getAttributeValue(attributes, 'uid', 'userid');
 		if (uid != null){
 			return uid;
 		}

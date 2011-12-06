@@ -1133,7 +1133,7 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 								pm.deletePersistent(syncConfig);
 								
 								// remove UserSecurityGroup if it does not have other UserSecurityGroupSyncConfigs referencing it
-								if (UserSecurityGroupSyncConfig.syncConfigsExistForGroup(
+								if (!UserSecurityGroupSyncConfig.syncConfigsExistForGroup(
 										pm, UserSecurityGroupID.create(userSecurityGroup.getOrganisationID(), userSecurityGroup.getUserSecurityGroupID()))){
 									boolean successful = false;
 									SecurityChangeController.beginChanging();
@@ -1148,12 +1148,12 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 									pm.deletePersistent(userSecurityGroup);
 								}
 							}else{
+								String groupName = ldapGroup.getGroupName();
+								if (groupName == null){
+									groupName = ldapGroupDN;
+								}
 								if (syncConfig == null 
 										&& shouldFetchUserData()){
-									String groupName = ldapGroup.getGroupName();
-									if (groupName == null){
-										groupName = ldapGroupDN;
-									}
 									UserSecurityGroup newUserSecurityGroup = new UserSecurityGroup(getOrganisationID(), groupName);
 									newUserSecurityGroup = pm.makePersistent(newUserSecurityGroup);
 									
@@ -1214,6 +1214,7 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 								ldapEntriesForSync.clear();
 
 								UserSecurityGroup userSecurityGroup = syncConfig.getUserSecurityGroup();
+								userSecurityGroup.setName(groupName);
 								boolean successful = false;
 								SecurityChangeController.beginChanging();
 								try {
@@ -1232,6 +1233,7 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 								} finally {
 									SecurityChangeController.endChanging(successful);
 								}
+								pm.makePersistent(userSecurityGroup);
 							}
 						}catch(Exception e){
 							logger.error("Exception occured while synchronizing group with DN " + ldapGroupDN, e);

@@ -86,6 +86,9 @@ public class SyncLifecycleListener implements StoreLifecycleListener, DeleteLife
 	
 	@Override
 	public void preDelete(InstanceLifecycleEvent event) {
+		if (!isEnabled()){
+			return;
+		}
 		// when JFire object is about to be deleted we should get corresponding LDAP entry name 
 		// to be able to remove it from directory later when postDelete is called
 		Object jfireObject = event.getPersistentInstance();

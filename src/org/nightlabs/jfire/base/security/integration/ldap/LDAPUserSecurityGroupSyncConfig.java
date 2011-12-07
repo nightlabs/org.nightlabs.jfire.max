@@ -1,5 +1,8 @@
 package org.nightlabs.jfire.base.security.integration.ldap;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 import javax.jdo.annotations.IdentityType;
@@ -46,9 +49,14 @@ public class LDAPUserSecurityGroupSyncConfig extends UserSecurityGroupSyncConfig
 				LDAPUserSecurityGroupSyncConfig.class, 
 				"LDAPUserSecurityGroupSyncConfig.getSyncConfigForLDAPGroupName"
 				);
-		LDAPUserSecurityGroupSyncConfig syncConfig = (LDAPUserSecurityGroupSyncConfig) q.execute(ldapServerId, ldapGroupName);
+		@SuppressWarnings("unchecked")
+		Collection<LDAPUserSecurityGroupSyncConfig> syncConfigs = (Collection<LDAPUserSecurityGroupSyncConfig>) q.execute(ldapServerId, ldapGroupName);
+		syncConfigs = new ArrayList<LDAPUserSecurityGroupSyncConfig>(syncConfigs);
 		q.closeAll();
-		return syncConfig;
+		if (!syncConfigs.isEmpty()){
+			return syncConfigs.iterator().next();
+		}
+		return null;
 	}
 
 	/**

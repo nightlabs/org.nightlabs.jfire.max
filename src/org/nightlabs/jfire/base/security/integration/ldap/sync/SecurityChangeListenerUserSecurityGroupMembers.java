@@ -39,14 +39,20 @@ public class SecurityChangeListenerUserSecurityGroupMembers extends SecurityChan
 	
 	private static final Logger logger = Logger.getLogger(SecurityChangeListenerUserSecurityGroupMembers.class);
 
-	private static ThreadLocal<Boolean> isEnabledTL = new ThreadLocal<Boolean>(){
+	private static ThreadLocal<Boolean> isChangeGroupMembersEnabledTL = new ThreadLocal<Boolean>(){
 		protected Boolean initialValue() {
 			return true;
 		};
 	};
-	
+
+	private static ThreadLocal<Boolean> isListenerEnabledTL = new ThreadLocal<Boolean>(){
+		protected Boolean initialValue() {
+			return true;
+		};
+	};
+
 	/**
-	 * Enable/disable this listener. If it's disabled than it will not allow adding or removing {@link UserSecurityGroup}s members.
+	 * Enable/disable this listener. If it's disabled than addition/removing of {@link UserSecurityGroup}s members will NOT be processed.
 	 * 
 	 * IMPORTANT! When you want to disable listener and then persist your objects you SHOULD always call to
 	 * pm.flush() BEFORE enabling listener back. Otherwise there's a big chance that pm will be flushed 
@@ -54,8 +60,25 @@ public class SecurityChangeListenerUserSecurityGroupMembers extends SecurityChan
 	 * 
 	 * @param isEnabled
 	 */
+	public static void setEnabled(boolean isEnabled) {
+		isListenerEnabledTL.set(isEnabled);
+	}
+	
+	/**
+	 * 
+	 * @return if this listener is enabled and addition/removal of Group memebers will be processed
+	 */
+	public static boolean isEnabled(){
+		return isListenerEnabledTL.get();
+	}
+
+	/**
+	 * If it's disabled than it will not allow adding or removing {@link UserSecurityGroup}s members.
+	 * 
+	 * @param isEnabled
+	 */
 	public static void setChangeGroupMembersEnabled(boolean isEnabled) {
-		isEnabledTL.set(isEnabled);
+		isChangeGroupMembersEnabledTL.set(isEnabled);
 	}
 	
 	/**
@@ -63,7 +86,7 @@ public class SecurityChangeListenerUserSecurityGroupMembers extends SecurityChan
 	 * @return if this listener is enabled and will allow changing members of {@link UserSecurityGroup}s
 	 */
 	public static boolean isChangeGroupMembersEnabled(){
-		return isEnabledTL.get();
+		return isChangeGroupMembersEnabledTL.get();
 	}
 
 	public static void register(PersistenceManager pm) {
@@ -105,6 +128,9 @@ public class SecurityChangeListenerUserSecurityGroupMembers extends SecurityChan
 
 	@Override
 	public void post_UserSecurityGroup_addMember(SecurityChangeEvent_UserSecurityGroup_addRemoveMember event) {
+		if (!isEnabled()){
+			return;
+		}
 		if (!isChangeGroupMembersEnabled()){
 			throw new RuntimeException("Adding new members to UserSecurityGroup is disalowed because of running synchronization to LDAP!");
 		}
@@ -114,6 +140,9 @@ public class SecurityChangeListenerUserSecurityGroupMembers extends SecurityChan
 	
 	@Override
 	public void post_UserSecurityGroup_removeMember(SecurityChangeEvent_UserSecurityGroup_addRemoveMember event) {
+		if (!isEnabled()){
+			return;
+		}
 		if (!isChangeGroupMembersEnabled()){
 			throw new RuntimeException("Removing members from UserSecurityGroup is disalowed because of running synchronization to LDAP!");
 		}
@@ -123,6 +152,9 @@ public class SecurityChangeListenerUserSecurityGroupMembers extends SecurityChan
 	
 	@Override
 	public void on_SecurityChangeController_endChanging() {
+		if (!isEnabled()){
+			return;
+		}
 		syncUserSecurityGroup();
 		super.on_SecurityChangeController_endChanging();
 	}

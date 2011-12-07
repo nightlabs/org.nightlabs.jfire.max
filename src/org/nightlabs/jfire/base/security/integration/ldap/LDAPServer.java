@@ -1111,7 +1111,7 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 					// disable JDO lifecycle listeners used for JFire2LDAP synchronization
 					SyncLifecycleListener.setEnabled(false);
 					LDAPUserSecurityGroupSyncConfigLifecycleListener.setEnabled(false);
-					SecurityChangeListenerUserSecurityGroupMembers.setChangeGroupMembersEnabled(false);
+					SecurityChangeListenerUserSecurityGroupMembers.setEnabled(false);
 					
 					Throwable lastSyncThrowable = null;
 					boolean removeJFireObjects = ldapSyncEvent.getEventType() == SyncEventGenericType.JFIRE_REMOVE_AUTHORIZATION;
@@ -1251,7 +1251,7 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 					// enable JDO lifecycle listeners used for JFire2LDAP synchronization
 					SyncLifecycleListener.setEnabled(true);
 					LDAPUserSecurityGroupSyncConfigLifecycleListener.setEnabled(true);
-					SecurityChangeListenerUserSecurityGroupMembers.setChangeGroupMembersEnabled(true);
+					SecurityChangeListenerUserSecurityGroupMembers.setEnabled(true);
 					
 					unbindAndReleaseConnection(connection);
 				}

@@ -9,5 +9,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireReporting"/>
 	<classpathentry kind="con" path="org.nightlabs.eclipse.sdk.jdo.JDO_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireReportingEngineBirt"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/org.nightlabs.jfire.base"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

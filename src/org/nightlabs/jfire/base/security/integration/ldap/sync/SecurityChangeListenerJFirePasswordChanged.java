@@ -364,7 +364,14 @@ public class SecurityChangeListenerJFirePasswordChanged extends SecurityChangeLi
 			PersistenceManager pm = createPersistenceManager();
 			try{
 				
-				LDAPServer ldapServer = (LDAPServer) pm.getObjectById(ldapServerID);
+				LDAPServer ldapServer = null;
+				try {
+					ldapServer = (LDAPServer) pm.getObjectById(ldapServerID);
+				}catch(JDOObjectNotFoundException e){
+					logger.error(String.format("LDAPServer with ID %s not found! Cannot proceed with password change!", ldapServerID.toString()));
+					return null;
+				}
+				
 				if (logger.isDebugEnabled()){
 					logger.debug(String.format("Got LDAPServer, will check if User %s@%s matches added LDAP entry %s", user.getUserID(), user.getOrganisationID(), addedEntryName));
 				}

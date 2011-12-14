@@ -117,6 +117,16 @@ public class LDAPAttributeSet implements Iterable<LDAPAttribute<Object>>{
 			addAttribute(attribute);
 		}
 	}
+	
+	/**
+	 * Removes {@link LDAPAttribute} from the set by its name.
+	 * 
+	 * @param attributeName name of attribute to remove
+	 * @return removed {@link LDAPAttribute} or <code>null</code> if this set did not contain it
+	 */
+	public LDAPAttribute<Object> removeAttribute(String attributeName) {
+		return attributes.remove(attributeName);
+	}
 
 	/**
 	 * Removes {@link LDAPAttribute} from the set.
@@ -321,6 +331,15 @@ public class LDAPAttributeSet implements Iterable<LDAPAttribute<Object>>{
 			}
 		}
 		return false;
+	}
+	
+	/**
+	 * Get names of all attributes in this set.
+	 * 
+	 * @return {@link Collection} of names
+	 */
+	public Collection<String> getAllAttributesNames(){
+		return attributes.keySet();
 	}
 	
 	/**

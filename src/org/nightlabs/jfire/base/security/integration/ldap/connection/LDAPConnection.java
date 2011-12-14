@@ -66,8 +66,8 @@ public class LDAPConnection{
     	this.connectionWrapper.deleteEntry(entryDN);
     }
 
-    public void modifyEntry(String entryDN, LDAPAttributeSet attributes, EntryModificationFlag modificationFlag) throws UserManagementSystemCommunicationException{
-    	this.connectionWrapper.modifyEntry(entryDN, attributes, modificationFlag);
+    public String modifyEntry(String entryDN, LDAPAttributeSet attributes, EntryModificationFlag modificationFlag) throws UserManagementSystemCommunicationException{
+    	return this.connectionWrapper.modifyEntry(entryDN, attributes, modificationFlag);
     }
     
     public Map<String, LDAPAttributeSet> search(String dn, LDAPAttributeSet searchAttributes, String[] returnAttributes) throws UserManagementSystemCommunicationException{

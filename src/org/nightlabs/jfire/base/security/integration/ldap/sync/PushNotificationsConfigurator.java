@@ -284,6 +284,30 @@ public class PushNotificationsConfigurator {
 	}
 
 	
+	private static ThreadLocal<Boolean> isNotificationListenerEnabledTL = new ThreadLocal<Boolean>(){
+		protected Boolean initialValue() {
+			return true;
+		};
+	};
+	
+	/**
+	 * Enable/disable push notifications listener. If it's disabled than incoming notifications will NOT be processed.
+	 * 
+	 * @param isEnabled
+	 */
+	public static void setNotificationsListenerEnabled(boolean isEnabled) {
+		isNotificationListenerEnabledTL.set(isEnabled);
+	}
+	
+	/**
+	 * 
+	 * @return if this listener is enabled and will process incoming notifications
+	 */
+	public static boolean isNotificationsListenerEnabled(){
+		return isNotificationListenerEnabledTL.get();
+	}
+
+	
 	/**
 	 * Listener which recieves notifications from LDAP and performs synchronization calls.
 	 */
@@ -294,7 +318,8 @@ public class PushNotificationsConfigurator {
 		 */
 		@Override
 		public void objectChanged(NamingEvent event) {
-			if (validateIncomingEvent(event, true)){
+			if (isNotificationsListenerEnabled() 
+					&& validateIncomingEvent(event, true)){
 				fetchLDAPEntry(event);
 			}
 		}
@@ -304,7 +329,8 @@ public class PushNotificationsConfigurator {
 		 */
 		@Override
 		public void objectAdded(NamingEvent event) {
-			if (validateIncomingEvent(event, true)){
+			if (isNotificationsListenerEnabled() 
+					&& validateIncomingEvent(event, true)){
 				fetchLDAPEntry(event);
 			}
 		}
@@ -314,7 +340,8 @@ public class PushNotificationsConfigurator {
 		 */
 		@Override
 		public void objectRemoved(NamingEvent event) {
-			if (validateIncomingEvent(event, false)){
+			if (isNotificationsListenerEnabled()
+					&& validateIncomingEvent(event, false)){
 				removeJFireObject(event);
 			}
 		}
@@ -324,6 +351,9 @@ public class PushNotificationsConfigurator {
 		 */
 		@Override
 		public void objectRenamed(NamingEvent event) {
+			if (!isNotificationsListenerEnabled()){
+				return;
+			}
 			if (event.getEventContext() == null
 					|| event.getNewBinding() == null
 					|| event.getOldBinding() == null){
@@ -433,6 +463,9 @@ public class PushNotificationsConfigurator {
 		 */
 		@Override
 		public void namingExceptionThrown(NamingExceptionEvent event) {
+			if (!isNotificationsListenerEnabled()){
+				logger.warn("Notifications listener is disabled. However we still process this incoming notification message cause it is an error one. See logs below.");
+			}
 			Throwable t = event.getException();
 			if (t != null){
 				logger.error(t.getMessage(), t);
@@ -752,9 +785,11 @@ public class PushNotificationsConfigurator {
 			try{
 				synchronized (registeredContexts) {
 					Collection<EventContext> contexts = registeredContexts.get(ldapServerID);
-					for (EventContext ctx : contexts){
-						ctx.removeNamingListener(listener);
-						ctx.close();
+					if (contexts != null){
+						for (EventContext ctx : contexts){
+							ctx.removeNamingListener(listener);
+							ctx.close();
+						}
 					}
 					registeredContexts.remove(ldapServerID);
 				}

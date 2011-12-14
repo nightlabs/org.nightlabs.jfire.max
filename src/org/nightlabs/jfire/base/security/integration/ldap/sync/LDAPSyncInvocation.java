@@ -2,6 +2,7 @@ package org.nightlabs.jfire.base.security.integration.ldap.sync;
 
 import java.io.Serializable;
 
+import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.script.ScriptException;
 import javax.security.auth.login.LoginException;
@@ -63,7 +64,14 @@ public class LDAPSyncInvocation extends Invocation{
 		PersistenceManager pm = createPersistenceManager();
 		try{
 			
-			LDAPServer ldapServer = (LDAPServer) pm.getObjectById(ldapServerID);
+			LDAPServer ldapServer = null;
+			try{
+				ldapServer = (LDAPServer) pm.getObjectById(ldapServerID);
+			}catch(JDOObjectNotFoundException e){
+				logger.error(
+						String.format("LDAPServer with ID %s is not found! Cannot proceed with invocation!", ldapServerID.toString()));
+				return null;
+			}
 			if (logger.isDebugEnabled()){
 				logger.debug(
 						String.format("Running %s synchronization for LDAPServer at %s:%s", 

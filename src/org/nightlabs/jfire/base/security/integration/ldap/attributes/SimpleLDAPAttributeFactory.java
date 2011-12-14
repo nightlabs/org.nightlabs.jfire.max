@@ -27,10 +27,14 @@ public class SimpleLDAPAttributeFactory implements LDAPAttributeFactory{
 	public LDAPAttribute<?> createAttribute(String attributeName, Object... attributeValues) {
 		
 		if (attributeValues == null){
-			logger.warn("NULL was specified as value for the attribute so SimpleStringLDAPAttribute will be created with empty String as a value.");
+			logger.warn(
+					String.format(
+							"NULL was specified as value for the attribute \"%s\" so SimpleStringLDAPAttribute will be created with empty String as a value.", attributeName));
 			attributeValues = new String[]{""};
 		}else if (attributeValues.length == 0){
-			logger.warn("Empty array was specified as value for the attribute so SimpleStringLDAPAttribute will be created with empty String as a value.");
+			logger.warn(
+					String.format(
+							"Empty array was specified as value for the attribute \"%s\" so SimpleStringLDAPAttribute will be created with empty String as a value.", attributeName));
 			attributeValues = new String[]{""};
 		}
 		
@@ -50,7 +54,9 @@ public class SimpleLDAPAttributeFactory implements LDAPAttributeFactory{
 		}else if (attributeValues.length > 1){	// create multivalued attribute
 			
 			if (attributeValues[0] == null){
-				logger.warn("NULL was specified as value for the attribute so SimpleStringLDAPAttribute will be created with empty String as a value.");
+				logger.warn(
+						String.format(
+								"NULL was specified as value for the attribute \"%s\" so SimpleStringLDAPAttribute will be created with empty String as a value.", attributeName));
 				attributeValues[0] = "";
 			}
 			
@@ -71,11 +77,12 @@ public class SimpleLDAPAttributeFactory implements LDAPAttributeFactory{
 				return attribute;
 				
 			}else{
-				throw new IllegalArgumentException("Unknown attribute value type!");
+				throw new IllegalArgumentException("Unknown attribute value type for attribute " + attributeName);
 			}
 			
 		}else{
-			throw new IllegalArgumentException("Can't create attribute when no values are given. Please specify an empty String if you want to have an attribute with no real value.");
+			throw new IllegalArgumentException(
+					String.format("Can't create attribute \"%s\" when no values are given. Please specify an empty String if you want to have an attribute with no real value.", attributeName));
 		}
 	}
 

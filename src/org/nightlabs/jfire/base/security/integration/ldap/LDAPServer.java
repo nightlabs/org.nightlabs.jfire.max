@@ -124,7 +124,7 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 	public static final String FETCH_GROUP_LDAP_SCRIPT_SET = "LDAPServer.ldapScriptSet";
 
 	public static final String OBJECT_CLASS_ATTR_NAME = "objectClass";
-	private static final String COMMON_NAME_ATTR_NAME = "cn";
+	private static final String COMMON_NAME_ATTR_NAME = "commonName";
 	private static final String UNIQUE_MEMBER_ATTR_NAME = "uniqueMember";
 	private static final String MEMBER_ATTR_NAME = "member";
 	private static final String GROUP_OF_NAMES_ATTR_VALUE = "groupOfNames";
@@ -1048,9 +1048,6 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 								}
 							}
 							modifyAttributes.addAttributes(syncAttributes);
-						}else{
-							logger.warn(
-									"LDAPServer type is not an instance of ILDAPUserManagementSystemType! Cant' sync attributes based on current attribute sync policy.");
 						}
 						
 						if(modifyAttributes != null && modifyAttributes.size() > 0){
@@ -1155,6 +1152,7 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 								if (syncConfig == null 
 										&& shouldFetchUserData()){
 									UserSecurityGroup newUserSecurityGroup = new UserSecurityGroup(getOrganisationID(), groupName);
+									newUserSecurityGroup.setName(groupName);
 									newUserSecurityGroup = pm.makePersistent(newUserSecurityGroup);
 									
 									syncConfig = new LDAPUserSecurityGroupSyncConfig(newUserSecurityGroup, LDAPServer.this, ldapGroupDN);
@@ -1278,17 +1276,17 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 						throw new UserManagementSystemSyncException("JFire object ID should be UserSecurityGroupID! Instead it is " + jfireObjectId.getClass());
 					}
 					userSecurityGroupId = (UserSecurityGroupID) jfireObjectId;
+					
 					LDAPUserSecurityGroupSyncConfig syncConfig = (LDAPUserSecurityGroupSyncConfig) UserSecurityGroupSyncConfig.getSyncConfigForGroup(
 							pm, getUserManagementSystemObjectID(), userSecurityGroupId);
-					if (syncConfig == null){
-						logger.info(
-								String.format("No UserSecurityGroupSyncConfig exist for UserSecurityGroup with ID %s, skipping synchronization", userSecurityGroupId.userSecurityGroupID));
-						continue;
-					}
 
-					String ldapGroupName = syncConfig.getUserManagementSystemSecurityObject();
-					if (ldapGroupName == null || ldapGroupName.isEmpty()){
-						throw new UserManagementSystemSyncException("LDAP group name is either null or empty for LDAPUserSecurityGroupSyncConfig with UserSecurityGroup: " + userSecurityGroupId.toString());
+					String ldapGroupName = dataUnit.getLdapEntryId();
+					if ((ldapGroupName == null || ldapGroupName.isEmpty()) 
+							&& syncConfig != null){
+						ldapGroupName = syncConfig.getUserManagementSystemSecurityObject();
+						if (ldapGroupName == null || ldapGroupName.isEmpty()){
+							throw new UserManagementSystemSyncException("LDAP group name is either null or empty for LDAPUserSecurityGroupSyncConfig with UserSecurityGroup: " + userSecurityGroupId.toString());
+						}
 					}
 					
 					boolean entryExists = false;
@@ -1309,8 +1307,20 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 						connection.deleteEntry(ldapGroupName);
 						
 					}else{
+
+						if (syncConfig == null){
+							logger.info(
+									String.format("No UserSecurityGroupSyncConfig exist for UserSecurityGroup with ID %s, skipping synchronization", userSecurityGroupId.userSecurityGroupID));
+							continue;
+						}
+
+						String groupName = syncConfig.getUserSecurityGroup().getName();
+						if (groupName == null || groupName.isEmpty()){
+							groupName = syncConfig.getUserSecurityGroup().getUserSecurityGroupID();
+						}
 						LDAPSecurityGroup ldapGroup = getDefaultLDAPSecurityGroup(
-								existingEntryAttributes, connection, syncConfig.getUserSecurityGroup().getName());
+								existingEntryAttributes, connection);
+						ldapGroup.setGroupName(groupName);
 						
 						LDAPAttributeSet modifyAttributes = new LDAPAttributeSet();
 						modifyAttributes.createAttribute(COMMON_NAME_ATTR_NAME, ldapGroup.getGroupName());
@@ -1325,7 +1335,11 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 						
 						if(modifyAttributes != null && modifyAttributes.size() > 0){
 							if (entryExists){
-								connection.modifyEntry(ldapGroupName, modifyAttributes, EntryModificationFlag.MODIFY);
+								String newEntryName = connection.modifyEntry(ldapGroupName, modifyAttributes, EntryModificationFlag.MODIFY);
+								if (newEntryName != null){
+									syncConfig.setLdapGroupName(newEntryName);
+									pm.makePersistent(syncConfig);
+								}
 							}else{	// create new entry
 								modifyAttributes.createAttribute(OBJECT_CLASS_ATTR_NAME, "top");
 								modifyAttributes.createAttribute(OBJECT_CLASS_ATTR_NAME, ldapGroup.getObjectClassAttr());
@@ -1401,7 +1415,7 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 		}
 	}
 	
-	private LDAPSecurityGroup getDefaultLDAPSecurityGroup(LDAPAttributeSet existingEntryAttrs, LDAPConnection connection, String groupName) 
+	private LDAPSecurityGroup getDefaultLDAPSecurityGroup(LDAPAttributeSet existingEntryAttrs, LDAPConnection connection) 
 			throws ScriptException, NoSuchMethodException, LoginException, UserManagementSystemCommunicationException{
 		if (existingEntryAttrs != null){
 			return new LDAPSecurityGroup(existingEntryAttrs);
@@ -1464,6 +1478,10 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 		
 		public String getGroupName() {
 			return groupName;
+		}
+		
+		public void setGroupName(String groupName) {
+			this.groupName = groupName;
 		}
 
 		public String getMemberAttr() {

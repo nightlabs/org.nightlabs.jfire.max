@@ -80,7 +80,7 @@ public class LDAPUserSecurityGroupSyncConfigLifecycleListener implements CreateL
 		}
 		LDAPUserSecurityGroupSyncConfig syncConfig = (LDAPUserSecurityGroupSyncConfig) event.getDetachedInstance();
 		PersistenceManager pm = JDOHelper.getPersistenceManager(event.getPersistentInstance());
-		if (pm != null){
+		if (pm != null && syncConfig != null){
 			LDAPUserSecurityGroupSyncConfig attachedSyncConfig = null;
 			UserSecurityGroupSyncConfigID syncConfigId = UserSecurityGroupSyncConfigID.create(
 					syncConfig.getUserSecurityGroupSyncConfigID(), syncConfig.getOrganisationID());

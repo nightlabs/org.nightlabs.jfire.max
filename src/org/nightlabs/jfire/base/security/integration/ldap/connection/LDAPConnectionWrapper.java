@@ -78,14 +78,16 @@ public interface LDAPConnectionWrapper{
 	public void deleteEntry(String dn) throws UserManagementSystemCommunicationException;
 
     /**
-     * Modifies attributes of an entry.
+     * Modifies attributes of an entry. Note that entry could be renamed as a result of modification, in this case method will
+     * return new entry name. Otherwise <code>null</code> is returned.
      * 
      * @param dn the DN
      * @param attributes to be replaced, added or removed. If <code>null</code> is passed, method will silently return.
      * @param modificationFlag indicates what is to be done: replacement, addition or removal
-     * @throws UserManagementSystemCommunicationException 
+     * @throws UserManagementSystemCommunicationException
+     * @return new entry name if it was renamed as a result of modification or <code>null</code> if it was not renamed 
      */
-	public void modifyEntry(String dn, LDAPAttributeSet attributes, EntryModificationFlag modificationFlag) throws UserManagementSystemCommunicationException;
+	public String modifyEntry(String dn, LDAPAttributeSet attributes, EntryModificationFlag modificationFlag) throws UserManagementSystemCommunicationException;
 
 	/**
 	 * Performs a search for entries by their attributes.

@@ -56,6 +56,27 @@ import org.slf4j.LoggerFactory;
 public class JNDIConnectionWrapper implements LDAPConnectionWrapper{
 
 	private static final Logger logger = LoggerFactory.getLogger(JNDIConnectionWrapper.class);
+	
+	/**
+	 * This map holds attributes together with their known aliases, key is alias, value is full name of attribute
+	 */
+	private static final Map<String, String> attributeAliases = new HashMap<String, String>();
+	static{
+		attributeAliases.put("cn", "commonName");
+		attributeAliases.put("sn", "surname");
+		attributeAliases.put("fax", "facsimileTelephoneNumber");
+		attributeAliases.put("gn", "givenName");
+		attributeAliases.put("homePhone", "homeTelephoneNumber");
+		attributeAliases.put("l", "locality");
+		attributeAliases.put("mail", "rfc822Mailbox");
+		attributeAliases.put("mobile", "mobileTelephoneNumber");
+		attributeAliases.put("o", "organizationName");
+		attributeAliases.put("ou", "organizationalUnitName");
+		attributeAliases.put("pager", "pagerTelephoneNumber");
+		attributeAliases.put("st", "stateOrProvinceName");
+		attributeAliases.put("street", "streetAddress");
+		attributeAliases.put("uid", "userid");
+	}
 
 	public static final String JAVA_NAMING_LDAP_VERSION = "java.naming.ldap.version"; //$NON-NLS-1$
 	public static final String COM_SUN_JNDI_DNS_TIMEOUT_RETRIES = "com.sun.jndi.dns.timeout.retries"; //$NON-NLS-1$
@@ -230,7 +251,7 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper{
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void modifyEntry(
+	public String modifyEntry(
 			String dn, LDAPAttributeSet attributes, EntryModificationFlag modificationFlag
 			) throws UserManagementSystemCommunicationException {
 		try{
@@ -248,7 +269,36 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper{
 	        }
 	        
 	        synchronized (context) {
-		        // prepare mododifcation items
+		        Name entryName = getSafeJndiName(dn);
+		        Name originalName = (Name) entryName.clone();
+		        
+		        // check if modified attributes contain RDN related attributes, 
+		        // need to call context.rename() if found and remove such attributes from modification ones
+		        Collection<String> attributesNames = attributes.getAllAttributesNames();
+		        Enumeration<String> nameComponents = entryName.getAll();
+		        int namePos = 0;
+		        Collection<LDAPAttribute<Object>> attrsToDelete = new ArrayList<LDAPAttribute<Object>>();
+		        while (nameComponents.hasMoreElements()) {
+					String component = (String) nameComponents.nextElement();
+			        for (String attrName : attributesNames) {
+						if (component.indexOf(attrName) > -1
+								|| (attributeAliases.containsKey(attrName) && component.indexOf(attributeAliases.get(attrName)) > -1)
+								|| (attributeAliases.containsValue(attrName)) && component.indexOf(getAliasMapKeyByValue(attrName)) > -1){
+							entryName.remove(namePos);
+							entryName.add(namePos, component.replaceAll("^(.+)=(.+)$", "$1="+attributes.getAttributeValue(attrName)));
+							attrsToDelete.add(attributes.getAttribute(attrName));
+						}
+					}
+			        namePos++;
+				}
+		        attributes.removeAttributes(attrsToDelete);
+		        String newName = null;
+		        if (originalName.compareTo(entryName) != 0){
+		        	context.rename(originalName, entryName);
+		        	newName = entryName.toString();
+		        }
+
+		        // prepare modification items
 		        Attributes translatedAttributes = getJNDIAttributes(attributes);
 		        ModificationItem[] modificationItems = new ModificationItem[translatedAttributes.size()];
 		        int i = 0;
@@ -256,12 +306,27 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper{
 		        	modificationItems[i] = new ModificationItem(operationType, attributesEnum.nextElement());
 		        	i++;
 				}
+
 		        // perform modification
-		        context.modifyAttributes(getSafeJndiName(dn), modificationItems);
+				context.modifyAttributes(entryName, modificationItems);
+				
+				return newName;
 			}
 		}catch(NamingException e){
 			throw new UserManagementSystemCommunicationException("Entry modification failed! Entry: " + dn, e);
 		}
+	}
+	
+	private static String getAliasMapKeyByValue(String value){
+		if (value == null){
+			return null;
+		}
+		for (String key : attributeAliases.keySet()){
+			if (value.equals(attributeAliases.get(key))){
+				return key;
+			}
+		}
+		return null;
 	}
 	
 	/**

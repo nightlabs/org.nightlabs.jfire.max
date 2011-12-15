@@ -65,9 +65,10 @@ public class LDAPUserSecurityGroupSyncConfigLifecycleListener implements CreateL
 		if (!isEnabled()){
 			return;
 		}
-		LDAPUserSecurityGroupSyncConfig persistentInstance = (LDAPUserSecurityGroupSyncConfig) event.getPersistentInstance();
-		if (persistentInstance.getUserManagementSystem().shouldFetchUserData()){
-			execSyncInvocation(persistentInstance);
+		LDAPUserSecurityGroupSyncConfig syncConfig = (LDAPUserSecurityGroupSyncConfig) event.getPersistentInstance();
+		if (syncConfig.isSyncEnabled() 
+				&& syncConfig.getUserManagementSystem().shouldFetchUserData()){
+			execSyncInvocation(syncConfig);
 		}
 	}
 	
@@ -80,6 +81,9 @@ public class LDAPUserSecurityGroupSyncConfigLifecycleListener implements CreateL
 			return;
 		}
 		LDAPUserSecurityGroupSyncConfig syncConfig = (LDAPUserSecurityGroupSyncConfig) event.getPersistentInstance();
+		if (!syncConfig.isSyncEnabled()){
+			return;
+		}
 		UserSecurityGroupSyncConfigID syncConfigId = UserSecurityGroupSyncConfigID.create(
 				syncConfig.getUserSecurityGroupSyncConfigID(), syncConfig.getOrganisationID());
 		if (syncConfigsForSync.contains(syncConfigId)){
@@ -99,12 +103,14 @@ public class LDAPUserSecurityGroupSyncConfigLifecycleListener implements CreateL
 		if (!isEnabled()){
 			return;
 		}
-		LDAPUserSecurityGroupSyncConfig syncConfig = (LDAPUserSecurityGroupSyncConfig) event.getDetachedInstance();
+		LDAPUserSecurityGroupSyncConfig detachedSyncConfig = (LDAPUserSecurityGroupSyncConfig) event.getDetachedInstance();
 		PersistenceManager pm = JDOHelper.getPersistenceManager(event.getPersistentInstance());
-		if (pm != null && syncConfig != null){
+		if (pm != null 
+				&& detachedSyncConfig != null 
+				&& detachedSyncConfig.isSyncEnabled()){
 			LDAPUserSecurityGroupSyncConfig attachedSyncConfig = null;
 			UserSecurityGroupSyncConfigID syncConfigId = UserSecurityGroupSyncConfigID.create(
-					syncConfig.getUserSecurityGroupSyncConfigID(), syncConfig.getOrganisationID());
+					detachedSyncConfig.getUserSecurityGroupSyncConfigID(), detachedSyncConfig.getOrganisationID());
 			try{
 				attachedSyncConfig = (LDAPUserSecurityGroupSyncConfig) pm.getObjectById(syncConfigId);
 			}catch(JDOObjectNotFoundException e){
@@ -113,7 +119,7 @@ public class LDAPUserSecurityGroupSyncConfigLifecycleListener implements CreateL
 				return;
 			}
 			if (attachedSyncConfig != null
-					&& !syncConfig.getUserManagementSystemSecurityObject().equals(attachedSyncConfig.getUserManagementSystemSecurityObject())
+					&& !detachedSyncConfig.getUserManagementSystemSecurityObject().equals(attachedSyncConfig.getUserManagementSystemSecurityObject())
 					&& attachedSyncConfig.getUserManagementSystem().shouldFetchUserData()){
 				syncConfigsForSync.add(syncConfigId);
 			}

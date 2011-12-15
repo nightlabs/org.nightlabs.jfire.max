@@ -1117,13 +1117,28 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 						try{
 							LDAPUserSecurityGroupSyncConfig syncConfig = LDAPUserSecurityGroupSyncConfig.getSyncConfigForLDAPGroupName(
 									pm, LDAPServer.this.getUserManagementSystemObjectID(), ldapGroupDN);
+							
+							if (syncConfig != null && !syncConfig.isSyncEnabled()){
+								UserSecurityGroup userSecurityGroup = syncConfig.getUserSecurityGroup();
+								logger.info(
+										String.format(
+												"Synchronization is disabled for this group, skipping. UserSecurityGroup ID: %s, ldapGroup: %s", 
+												UserSecurityGroupID.create(userSecurityGroup.getOrganisationID(), userSecurityGroup.getUserSecurityGroupID()), 
+												syncConfig.getUserManagementSystemSecurityObject()));
+								continue;
+							}else if (syncConfig == null 
+									&& (removeJFireObjects || !shouldFetchUserData())){
+								logger.info(
+										String.format("Neither LDAPUserSecurityGroupSyncConfig found for LDAP group %s nor system is configured to craete a new one, skipping synchronization", ldapGroupDN));
+								continue;
+							}
 
 							LDAPAttributeSet attributes = connection.getAttributesForEntry(
 									ldapGroupDN, new String[]{OBJECT_CLASS_ATTR_NAME, MEMBER_ATTR_NAME, UNIQUE_MEMBER_ATTR_NAME, COMMON_NAME_ATTR_NAME});
 							
 							LDAPSecurityGroup ldapGroup = new LDAPSecurityGroup(attributes);
 
-							if (syncConfig != null && removeJFireObjects){
+							if (removeJFireObjects){
 								UserSecurityGroup userSecurityGroup = syncConfig.getUserSecurityGroup();
 								
 								// remove the sync config
@@ -1159,12 +1174,6 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 									syncConfig = pm.makePersistent(syncConfig);
 								}
 								
-								if (syncConfig == null){
-									logger.info(
-											String.format("Neither LDAPUserSecurityGroupSyncConfig found for LDAP group %s nor system is configured to craete a new one, skipping synchronization", ldapGroupDN));
-									return;
-								}
-
 								Iterable<Object> ldapGroupMembers = attributes.getAttributeValues(ldapGroup.getMemberAttr());
 								Collection<User> users = new ArrayList<User>();
 								Map<String, LDAPAttributeSet> ldapEntriesForSync = new HashMap<String, LDAPAttributeSet>();
@@ -1268,6 +1277,7 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 			SecurityChangeListenerUserSecurityGroupMembers.setChangeGroupMembersEnabled(false);
 			
 			Throwable lastSyncThrowable = null;
+			boolean removeLDAPEntries = ldapSyncEvent.getEventType() == SyncEventGenericType.UMS_REMOVE_AUTHORIZATION;
 			for (SendEventTypeDataUnit dataUnit : ldapSyncEvent.getSendEventTypeDataUnits()){
 				UserSecurityGroupID userSecurityGroupId = null;
 				try{
@@ -1279,10 +1289,20 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 					
 					LDAPUserSecurityGroupSyncConfig syncConfig = (LDAPUserSecurityGroupSyncConfig) UserSecurityGroupSyncConfig.getSyncConfigForGroup(
 							pm, getUserManagementSystemObjectID(), userSecurityGroupId);
+					
+					if (syncConfig != null && !syncConfig.isSyncEnabled()){
+						logger.info(
+								String.format(
+										"Synchronization is disabled for this group, skipping. UserSecurityGroup ID: %s, ldapGroup: %s", userSecurityGroupId.toString(), syncConfig.getUserManagementSystemSecurityObject()));
+						continue;
+					}else if (syncConfig == null && !removeLDAPEntries){
+						logger.info(
+								String.format("No UserSecurityGroupSyncConfig exist for UserSecurityGroup with ID %s, skipping synchronization", userSecurityGroupId.userSecurityGroupID));
+						continue;
+					}
 
 					String ldapGroupName = dataUnit.getLdapEntryId();
-					if ((ldapGroupName == null || ldapGroupName.isEmpty()) 
-							&& syncConfig != null){
+					if (ldapGroupName == null || ldapGroupName.isEmpty()){
 						ldapGroupName = syncConfig.getUserManagementSystemSecurityObject();
 						if (ldapGroupName == null || ldapGroupName.isEmpty()){
 							throw new UserManagementSystemSyncException("LDAP group name is either null or empty for LDAPUserSecurityGroupSyncConfig with UserSecurityGroup: " + userSecurityGroupId.toString());
@@ -1298,7 +1318,7 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 						logger.info(
 								String.format("Exception while getting attributes for LDAP entry %s. Assume it does not exist.", ldapGroupName), e);
 					}
-					if (ldapSyncEvent.getEventType() == SyncEventGenericType.UMS_REMOVE_AUTHORIZATION){
+					if (removeLDAPEntries){
 						
 						if (!entryExists){
 							logger.warn("Can't remove non-existent group entry with DN: " + ldapGroupName);
@@ -1307,12 +1327,6 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 						connection.deleteEntry(ldapGroupName);
 						
 					}else{
-
-						if (syncConfig == null){
-							logger.info(
-									String.format("No UserSecurityGroupSyncConfig exist for UserSecurityGroup with ID %s, skipping synchronization", userSecurityGroupId.userSecurityGroupID));
-							continue;
-						}
 
 						String groupName = syncConfig.getUserSecurityGroup().getName();
 						if (groupName == null || groupName.isEmpty()){

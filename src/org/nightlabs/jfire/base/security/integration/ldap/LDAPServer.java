@@ -1441,10 +1441,26 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 		}
 	}
 	
+	/**
+	 * Simple abstract class to be used internally instead of standard java {@link Runnable}
+	 * to make it possible to throw needed exceptions directly from {@link #run()} and not 
+	 * making the code more complicated. Anyway, this runnable is NOT intended to be used 
+	 * for asynchronious calls in different threads, something that java {@link Runnable} 
+	 * is often used for.
+	 * 
+	 * @author Denis Dudnik <deniska.dudnik[at]gmail{dot}com>
+	 *
+	 */
 	abstract class SyncRunnable{
 		public abstract void run() throws LoginException, UserManagementSystemCommunicationException, UserManagementSystemSyncException;
 	}
 	
+	/**
+	 * Internal class for incapsulating LDAP group data in a convinient way.
+	 * 
+	 * @author Denis Dudnik <deniska.dudnik[at]gmail{dot}com>
+	 *
+	 */
 	class LDAPSecurityGroup{
 
 		private String groupName;
@@ -1452,6 +1468,9 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 		private String memberAttr;
 		
 		public LDAPSecurityGroup(LDAPAttributeSet attributes) {
+			if (attributes == null){
+				throw new IllegalArgumentException("LDAPAttributeSet could not be null!");
+			}
 			Iterable<Object> attributeValues = attributes.getAttributeValues(OBJECT_CLASS_ATTR_NAME);
 			for (Object value : attributeValues){
 				if (GROUP_OF_NAMES_ATTR_VALUE.equals(value)){

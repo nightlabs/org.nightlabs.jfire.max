@@ -17,6 +17,17 @@ import org.nightlabs.jfire.security.integration.UserManagementSystem;
 import org.nightlabs.jfire.security.integration.UserSecurityGroupSyncConfig;
 import org.nightlabs.jfire.security.integration.id.UserManagementSystemID;
 
+/**
+ * Implementation of {@link UserSecurityGroupSyncConfig} for {@link LDAPServer} user management system.
+ * The type which maps to a {@link UserSecurityGroup} is a simple {@link String} with full distingueshed
+ * name of a corresponding entry in LDAP directory. Note that this entry MUST represent a group which means
+ * that it must have either "groupOfNames" or "groupOfUniqueNames" object class.
+ * 
+ * For more details please see {@link UserSecurityGroupSyncConfig}.
+ * 
+ * @author Denis Dudnik <deniska.dudnik[at]gmail{dot}com>
+ *
+ */
 @PersistenceCapable(
 		identityType=IdentityType.APPLICATION, 
 		detachable="true")

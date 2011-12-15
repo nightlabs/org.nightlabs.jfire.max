@@ -268,31 +268,32 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper{
 		        operationType = DirContext.REPLACE_ATTRIBUTE;
 	        }
 	        
-	        synchronized (context) {
-		        Name entryName = getSafeJndiName(dn);
-		        Name originalName = (Name) entryName.clone();
-		        
-		        // check if modified attributes contain RDN related attributes, 
-		        // need to call context.rename() if found and remove such attributes from modification ones
-		        Collection<String> attributesNames = attributes.getAllAttributesNames();
-		        Enumeration<String> nameComponents = entryName.getAll();
-		        int namePos = 0;
-		        Collection<LDAPAttribute<Object>> attrsToDelete = new ArrayList<LDAPAttribute<Object>>();
-		        while (nameComponents.hasMoreElements()) {
-					String component = (String) nameComponents.nextElement();
-			        for (String attrName : attributesNames) {
-						if (component.indexOf(attrName) > -1
-								|| (attributeAliases.containsKey(attrName) && component.indexOf(attributeAliases.get(attrName)) > -1)
-								|| (attributeAliases.containsValue(attrName)) && component.indexOf(getAliasMapKeyByValue(attrName)) > -1){
-							entryName.remove(namePos);
-							entryName.add(namePos, component.replaceAll("^(.+)=(.+)$", "$1="+attributes.getAttributeValue(attrName)));
-							attrsToDelete.add(attributes.getAttribute(attrName));
-						}
+	        Name entryName = getSafeJndiName(dn);
+	        Name originalName = (Name) entryName.clone();
+	        
+	        // check if modified attributes contain RDN related attributes, 
+	        // need to call context.rename() if found and remove such attributes from modification ones
+	        Collection<String> attributesNames = attributes.getAllAttributesNames();
+	        Enumeration<String> nameComponents = entryName.getAll();
+	        int namePos = 0;
+	        Collection<LDAPAttribute<Object>> attrsToDelete = new ArrayList<LDAPAttribute<Object>>();
+	        while (nameComponents.hasMoreElements()) {
+				String component = (String) nameComponents.nextElement();
+		        for (String attrName : attributesNames) {
+					if (component.indexOf(attrName) > -1
+							|| (attributeAliases.containsKey(attrName) && component.indexOf(attributeAliases.get(attrName)) > -1)
+							|| (attributeAliases.containsValue(attrName)) && component.indexOf(getAliasMapKeyByValue(attrName)) > -1){
+						entryName.remove(namePos);
+						entryName.add(namePos, component.replaceAll("^(.+)=(.+)$", "$1="+attributes.getAttributeValue(attrName)));
+						attrsToDelete.add(attributes.getAttribute(attrName));
 					}
-			        namePos++;
 				}
-		        attributes.removeAttributes(attrsToDelete);
-		        String newName = null;
+		        namePos++;
+			}
+	        attributes.removeAttributes(attrsToDelete);
+	        String newName = null;
+	        
+	        synchronized (context) {
 		        if (originalName.compareTo(entryName) != 0){
 		        	context.rename(originalName, entryName);
 		        	newName = entryName.toString();
@@ -404,7 +405,7 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper{
 				}
 			}
 		}
-		return baseDN;	// TODO: escaping special characters could be done here;
+		return baseDN;
 	}
 
 	/**

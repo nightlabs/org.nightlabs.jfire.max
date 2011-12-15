@@ -18,6 +18,14 @@ import org.nightlabs.jfire.security.integration.UserManagementSystemSyncEvent.Sy
 import org.nightlabs.jfire.security.integration.id.UserSecurityGroupSyncConfigID;
 import org.nightlabs.util.CollectionUtil;
 
+/**
+ * JDO lifecycle listener that is configured to listen to creation and storing of {@link LDAPUserSecurityGroupSyncConfig}s.
+ * It performs synchronization of authorization-related data whenever new {@link LDAPUserSecurityGroupSyncConfig} is created
+ * or an existing one is stored AND has its mapping (name of LDAP group) changed.
+ * 
+ * @author Denis Dudnik <deniska.dudnik[at]gmail{dot}com>
+ *
+ */
 public class LDAPUserSecurityGroupSyncConfigLifecycleListener implements CreateLifecycleListener, StoreLifecycleListener{
 	
 	private static ThreadLocal<Boolean> isEnabledTL = new ThreadLocal<Boolean>(){
@@ -26,7 +34,11 @@ public class LDAPUserSecurityGroupSyncConfigLifecycleListener implements CreateL
 		};
 	};
 	
-	private Set<UserSecurityGroupSyncConfigID> syncConfigsForInitialSync = new HashSet<UserSecurityGroupSyncConfigID>();
+	/**
+	 * Holds IDs of {@link LDAPUserSecurityGroupSyncConfig}s which should be synchronized. 
+	 * Added by {@link #preStore(InstanceLifecycleEvent)} and removed by {@link #postStore(InstanceLifecycleEvent)}.
+	 */
+	private Set<UserSecurityGroupSyncConfigID> syncConfigsForSync = new HashSet<UserSecurityGroupSyncConfigID>();
 
 	/**
 	 * Enable/disable this listener.
@@ -45,6 +57,9 @@ public class LDAPUserSecurityGroupSyncConfigLifecycleListener implements CreateL
 		return isEnabledTL.get();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void postCreate(InstanceLifecycleEvent event) {
 		if (!isEnabled()){
@@ -56,6 +71,9 @@ public class LDAPUserSecurityGroupSyncConfigLifecycleListener implements CreateL
 		}
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void postStore(InstanceLifecycleEvent event) {
 		if (!isEnabled()){
@@ -64,15 +82,18 @@ public class LDAPUserSecurityGroupSyncConfigLifecycleListener implements CreateL
 		LDAPUserSecurityGroupSyncConfig syncConfig = (LDAPUserSecurityGroupSyncConfig) event.getPersistentInstance();
 		UserSecurityGroupSyncConfigID syncConfigId = UserSecurityGroupSyncConfigID.create(
 				syncConfig.getUserSecurityGroupSyncConfigID(), syncConfig.getOrganisationID());
-		if (syncConfigsForInitialSync.contains(syncConfigId)){
+		if (syncConfigsForSync.contains(syncConfigId)){
 			try{
 				execSyncInvocation(syncConfig);
 			}finally{
-				syncConfigsForInitialSync.remove(syncConfigId);
+				syncConfigsForSync.remove(syncConfigId);
 			}
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void preStore(InstanceLifecycleEvent event) {
 		if (!isEnabled()){
@@ -88,13 +109,13 @@ public class LDAPUserSecurityGroupSyncConfigLifecycleListener implements CreateL
 				attachedSyncConfig = (LDAPUserSecurityGroupSyncConfig) pm.getObjectById(syncConfigId);
 			}catch(JDOObjectNotFoundException e){
 				// no object exist, so we assume that new LDAPUserSecurityGroupSyncConfig is created and initial sync is necessary
-				syncConfigsForInitialSync.add(syncConfigId);
+				syncConfigsForSync.add(syncConfigId);
 				return;
 			}
 			if (attachedSyncConfig != null
 					&& !syncConfig.getUserManagementSystemSecurityObject().equals(attachedSyncConfig.getUserManagementSystemSecurityObject())
 					&& attachedSyncConfig.getUserManagementSystem().shouldFetchUserData()){
-				syncConfigsForInitialSync.add(syncConfigId);
+				syncConfigsForSync.add(syncConfigId);
 			}
 		}
 	}

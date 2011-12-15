@@ -25,6 +25,9 @@ import org.nightlabs.jfire.security.listener.id.SecurityChangeListenerID;
 import org.nightlabs.util.CollectionUtil;
 
 /**
+ * {@link SecurityChangeListener} which listens to addition and removal of members of a {@link UserSecurityGroup}.
+ * When modifications to {@link UserSecurityGroup} are over and {@link #on_SecurityChangeController_endChanging()}
+ * is called then it performs synchronization of authorization related data to LDAP when JFire is a leading system.
  * 
  * @author Denis Dudnik <deniska.dudnik[at]gmail{dot}com>
  *
@@ -39,12 +42,20 @@ public class SecurityChangeListenerUserSecurityGroupMembers extends SecurityChan
 	
 	private static final Logger logger = Logger.getLogger(SecurityChangeListenerUserSecurityGroupMembers.class);
 
+	/**
+	 * Flag for enabling/disabling changing {@link UserSecurityGroup} membership. It affects external modification which
+	 * triggered this listener.	For example it is set when synchronization is running.
+	 */
 	private static ThreadLocal<Boolean> isChangeGroupMembersEnabledTL = new ThreadLocal<Boolean>(){
 		protected Boolean initialValue() {
 			return true;
 		};
 	};
 
+	/**
+	 * Flag for enabling/disabling this listener, so it could do nothing itself. It does NOT affect external modification
+	 * which triggered this listener.
+	 */
 	private static ThreadLocal<Boolean> isListenerEnabledTL = new ThreadLocal<Boolean>(){
 		protected Boolean initialValue() {
 			return true;
@@ -126,6 +137,9 @@ public class SecurityChangeListenerUserSecurityGroupMembers extends SecurityChan
 		super(organisationID, securityChangeListenerID);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void post_UserSecurityGroup_addMember(SecurityChangeEvent_UserSecurityGroup_addRemoveMember event) {
 		if (!isEnabled()){
@@ -138,6 +152,9 @@ public class SecurityChangeListenerUserSecurityGroupMembers extends SecurityChan
 		super.post_UserSecurityGroup_addMember(event);
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void post_UserSecurityGroup_removeMember(SecurityChangeEvent_UserSecurityGroup_addRemoveMember event) {
 		if (!isEnabled()){
@@ -150,6 +167,9 @@ public class SecurityChangeListenerUserSecurityGroupMembers extends SecurityChan
 		super.post_UserSecurityGroup_removeMember(event);
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void on_SecurityChangeController_endChanging() {
 		if (!isEnabled()){

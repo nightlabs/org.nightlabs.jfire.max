@@ -176,12 +176,18 @@ extends AbstractJDOQuery
 		}
 
 		if (isFieldEnabled(FieldName.reporterID) && reporterID != null) {
+			if (reporterID.equals(User.USER_ID_CURRENT_USER)) {
+				setCurrentUserAsReporter();
+			}
 //			filter.append("JDOHelper.getObjectId(this.reporter) == :reporterID && ");
 			filter.append("\n && this.reporter.organisationID == :reporterID.organisationID ");
 			filter.append("\n && this.reporter.userID == :reporterID.userID ");
 		}
 
 		if (isFieldEnabled(FieldName.assigneeID) && assigneeID != null) {
+			if (assigneeID.equals(User.USER_ID_CURRENT_USER)) {
+				setCurrentUserAsAssignee();
+			}
 //			filter.append("JDOHelper.getObjectId(this.assignee) == :assigneeID && ");
 			filter.append("\n && this.assignee.organisationID == :assigneeID.organisationID ");
 			filter.append("\n && this.assignee.userID == :assigneeID.userID ");
@@ -561,9 +567,10 @@ extends AbstractJDOQuery
 	public void setReporterID(final UserID reporterID)
 	{
 		final UserID oldReporterID = this.reporterID;
-		if (reporterID != null && reporterID.equals(User.USER_ID_CURRENT_USER))	// User#USER_ID_CURRENT_USER is utilised as "virtual" user that is replaced by the real currently logged-in user when performing certain kinds of stored queries.
-			setCurrentUserAsReporter();
-		else
+		// Must be resolved during execution, because when initalising as System-User it does not work 
+//		if (reporterID != null && reporterID.equals(User.USER_ID_CURRENT_USER))	// User#USER_ID_CURRENT_USER is utilised as "virtual" user that is replaced by the real currently logged-in user when performing certain kinds of stored queries.
+//			setCurrentUserAsReporter();
+//		else
 			this.reporterID = reporterID;
 		notifyListeners(FieldName.reporterID, oldReporterID, this.reporterID);
 	}
@@ -583,9 +590,10 @@ extends AbstractJDOQuery
 	public void setAssigneeID(final UserID assigneeID)
 	{
 		final UserID oldAssigneeID = this.assigneeID;
-		if (assigneeID != null && assigneeID.equals(User.USER_ID_CURRENT_USER))	// User#USER_ID_CURRENT_USER is utilised as "virtual" user that is replaced by the real currently logged-in user when performing certain kinds of stored queries.
-			setCurrentUserAsAssignee();
-		else
+		// Must be resolved during execution, because when initalising as System-User it does not work
+//		if (assigneeID != null && assigneeID.equals(User.USER_ID_CURRENT_USER))	// User#USER_ID_CURRENT_USER is utilised as "virtual" user that is replaced by the real currently logged-in user when performing certain kinds of stored queries.
+//			setCurrentUserAsAssignee();
+//		else
 			this.assigneeID = assigneeID;
 		notifyListeners(FieldName.assigneeID, oldAssigneeID, this.assigneeID);
 	}

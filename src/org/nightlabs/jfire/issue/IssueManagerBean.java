@@ -1436,6 +1436,9 @@ implements IssueManagerRemote
 		for (final IssueQuery issueQuery : issueQueries) {
 			final QueryCollection<IssueQuery> queryCollection = new QueryCollection<IssueQuery>(Issue.class);
 			queryCollection.add(issueQuery);
+			// TODO: There should be constants for the QueryStoreIDs so that they can be referenced.
+			// But as QueryStoreID contains long we need to think about a solution, to avoid conflicts
+			// with IDGenerator
 			final BaseQueryStore queryStore = new BaseQueryStore(
 				systemUser, IDGenerator.nextID(BaseQueryStore.class), queryCollection
 			);
@@ -1460,8 +1463,6 @@ implements IssueManagerRemote
 		if (handle != null) {
 			UpdateHistoryItem.updateDone(handle);
 
-			// TODO add issue query for assigned issues
-
 			final List<IssueQuery> issueQueries = new ArrayList<IssueQuery>();
 			final IssueQuery assignedIssueIssueQuery = new IssueQuery();
 			final IssueQuery myReportedIssueIssueQuery = new IssueQuery();
@@ -1469,8 +1470,8 @@ implements IssueManagerRemote
 			HashMap<IssueQuery, String> issueQueryToResourceKey = new HashMap<IssueQuery, String>() {
 				{
 					put(assignedIssueIssueQuery, RESOURCE_KEY_PREFIX + "queryStoreAssigned");
-					put(myReportedIssueIssueQuery, RESOURCE_KEY_PREFIX + "queryStoreReported");
-					put(myAssignedIssueIssueQuery, RESOURCE_KEY_PREFIX + "queryStoreAssigned");
+					put(myReportedIssueIssueQuery, RESOURCE_KEY_PREFIX + "queryStoreMyReported");
+					put(myAssignedIssueIssueQuery, RESOURCE_KEY_PREFIX + "queryStoreMyAssigned");
 				}
 			};
 			assignedIssueIssueQuery.clearQuery();

@@ -6,6 +6,8 @@ public class DashboardGadgetLastCustomersConfig implements Serializable {
 
 	private static final long serialVersionUID = 20111220L;
 	
+	public static final int maxCustomersInDashboard = 50;
+	
 	private int amountLastCustomers;
 	
 	public DashboardGadgetLastCustomersConfig() {

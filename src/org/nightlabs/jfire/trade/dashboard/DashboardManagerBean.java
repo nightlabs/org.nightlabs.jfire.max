@@ -77,14 +77,15 @@ public class DashboardManagerBean extends BaseSessionBeanImpl implements Dashboa
 					return -(o1.compareTo(o2));
 				}
 			});
+			int maxCustomers = lastCustomersConfig != null ? lastCustomersConfig.getAmountLastCustomers() : DashboardGadgetLastCustomersConfig.maxCustomersInDashboard;
 			
-			putAll(queryLastCustomersForArticleContainer(pm, lastCustomersConfig, Order.class, "created"), orderedTransactions);
-			putAll(queryLastCustomersForArticleContainer(pm, lastCustomersConfig, Offer.class, "created"), orderedTransactions);
-			putAll(queryLastCustomersForArticleContainer(pm, lastCustomersConfig, Offer.class, "finalized"), orderedTransactions);
-			putAll(queryLastCustomersForArticleContainer(pm, lastCustomersConfig, Invoice.class, "created"), orderedTransactions);
-			putAll(queryLastCustomersForArticleContainer(pm, lastCustomersConfig, Invoice.class, "finalized"), orderedTransactions);
-			putAll(queryLastCustomersForArticleContainer(pm, lastCustomersConfig, DeliveryNote.class, "created"), orderedTransactions);
-			putAll(queryLastCustomersForArticleContainer(pm, lastCustomersConfig, DeliveryNote.class, "finalized"), orderedTransactions);
+			putAll(queryLastCustomersForArticleContainer(pm, maxCustomers, Order.class, "created"), orderedTransactions);
+			putAll(queryLastCustomersForArticleContainer(pm, maxCustomers, Offer.class, "created"), orderedTransactions);
+			putAll(queryLastCustomersForArticleContainer(pm, maxCustomers, Offer.class, "finalized"), orderedTransactions);
+			putAll(queryLastCustomersForArticleContainer(pm, maxCustomers, Invoice.class, "created"), orderedTransactions);
+			putAll(queryLastCustomersForArticleContainer(pm, maxCustomers, Invoice.class, "finalized"), orderedTransactions);
+			putAll(queryLastCustomersForArticleContainer(pm, maxCustomers, DeliveryNote.class, "created"), orderedTransactions);
+			putAll(queryLastCustomersForArticleContainer(pm, maxCustomers, DeliveryNote.class, "finalized"), orderedTransactions);
 
 			Set<AnchorID> distinctCustomers = new HashSet<AnchorID>();
 			
@@ -93,7 +94,7 @@ public class DashboardManagerBean extends BaseSessionBeanImpl implements Dashboa
 					result.add(transaction);
 					distinctCustomers.add(transaction.getCustomerID());
 				}
-				if (distinctCustomers.size() == lastCustomersConfig.getAmountLastCustomers()) {
+				if (distinctCustomers.size() == maxCustomers) {
 					break;
 				}
 			}
@@ -112,7 +113,7 @@ public class DashboardManagerBean extends BaseSessionBeanImpl implements Dashboa
 
 	private List<LastCustomerTransaction> queryLastCustomersForArticleContainer(
 			PersistenceManager pm,
-			DashboardGadgetLastCustomersConfig lastCustomersConfig, Class<?> articleContainerClass, String transactionType) {
+			int maxCustomers, Class<?> articleContainerClass, String transactionType) {
 
 		String field = "created".equals(transactionType) ? "this.createDT" : "this.finalizeDT";
 		String userField = "created".equals(transactionType) ? "this.createUser" : "this.finalizeUser";
@@ -127,7 +128,8 @@ public class DashboardManagerBean extends BaseSessionBeanImpl implements Dashboa
 		sb.append("WHERE ").append(field).append(" != null");
 		sb.append(" && JDOHelper.getObjectId(").append(userField).append(") == :userId");
 		Query query = pm.newQuery(sb.toString());
-		query.setRange(0, lastCustomersConfig.getAmountLastCustomers());
+		
+		query.setRange(0, maxCustomers);
 		query.setOrdering("max(" + field+ ") DESC");
 		query.setGrouping(customerField);
 		

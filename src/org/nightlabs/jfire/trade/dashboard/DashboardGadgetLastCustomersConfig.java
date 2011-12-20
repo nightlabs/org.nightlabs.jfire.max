@@ -1,7 +1,11 @@
 package org.nightlabs.jfire.trade.dashboard;
 
-public class DashboardGadgetLastCustomersConfig {
+import java.io.Serializable;
 
+public class DashboardGadgetLastCustomersConfig implements Serializable {
+
+	private static final long serialVersionUID = 20111220L;
+	
 	private int amountLastCustomers;
 	
 	public DashboardGadgetLastCustomersConfig() {

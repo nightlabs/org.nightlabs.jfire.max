@@ -3,6 +3,7 @@
  */
 package org.nightlabs.jfire.trade.dashboard;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import org.nightlabs.jfire.transfer.id.AnchorID;
@@ -11,8 +12,10 @@ import org.nightlabs.jfire.transfer.id.AnchorID;
  * @author abieber
  *
  */
-public class LastCustomerTransaction {
-
+public class LastCustomerTransaction implements Serializable {
+	
+	private static final long serialVersionUID = 20111220L;
+	
 	private AnchorID customerID;
 	private String transactionType;
 	private Date transactionDate;

@@ -11,6 +11,10 @@ public class DashboardGadgetLastCustomersConfig implements Serializable {
 	public DashboardGadgetLastCustomersConfig() {
 	}
 	
+	public DashboardGadgetLastCustomersConfig(int amountLastCustomers) {
+		this.amountLastCustomers = amountLastCustomers;
+	}
+		
 	public int getAmountLastCustomers() {
 		return amountLastCustomers;
 	}

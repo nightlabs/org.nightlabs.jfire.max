@@ -5,11 +5,7 @@ public class DashboardGadgetLastCustomersConfig {
 	private int amountLastCustomers;
 	
 	public DashboardGadgetLastCustomersConfig() {
-		// TODO Auto-generated constructor stub
 	}
-
-	
-	
 	
 	public int getAmountLastCustomers() {
 		return amountLastCustomers;

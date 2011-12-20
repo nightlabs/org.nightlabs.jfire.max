@@ -24,7 +24,7 @@ public class DashboardLayoutConfigModuleInitialiser extends
 	public DashboardLayoutConfigModuleInitialiser() {
 		super(IDGenerator.getOrganisationID(),
 			DashboardLayoutConfigModule.class.getName(),
-			"DashboardGadgetLastCustomersFactory", -1);
+			"DashboardGadgetLastCustomersFactory", 5000);
 	}
 	
 	@Override
@@ -46,7 +46,9 @@ public class DashboardLayoutConfigModuleInitialiser extends
 		cfMod.addEditLayoutEntry(lastCustomersEntry);
 
 		
-		lastCustomersEntry.setConfig(null); 	// TODO where to create/initialise the config object of type DashboardGadgetLastCustomersConfig ?
+		DashboardGadgetLastCustomersConfig config = new DashboardGadgetLastCustomersConfig();
+		config.setAmountLastCustomers(5);
+		lastCustomersEntry.setConfig(config);
 		
 		initializeLastCustomersGadgetName(lastCustomersEntry.getEntryName());
 	}

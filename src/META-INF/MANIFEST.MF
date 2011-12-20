@@ -1,0 +1,3 @@
+Manifest-Version: 1.0
+Bundle-SymbolicName: JFireTradeDashboard
+Bundle-Version: 1.2.0

@@ -3,18 +3,29 @@
  */
 package org.nightlabs.jfire.trade.dashboard;
 
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 
 import javax.ejb.Stateless;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
+import javax.jdo.Query;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
+import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
-import org.nightlabs.jfire.trade.LegalEntity;
+import org.nightlabs.jfire.security.SecurityReflector;
+import org.nightlabs.jfire.store.DeliveryNote;
+import org.nightlabs.jfire.trade.Offer;
+import org.nightlabs.jfire.trade.Order;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 
 @Stateless
@@ -59,14 +70,82 @@ public class DashboardManagerBean extends BaseSessionBeanImpl implements Dashboa
 		PersistenceManager pm = createPersistenceManager();
 		try {
 			List<LastCustomerTransaction> result = new LinkedList<LastCustomerTransaction>();
-			LastCustomerTransaction trans1 = new LastCustomerTransaction(
-					(AnchorID) JDOHelper.getObjectId(LegalEntity.getAnonymousLegalEntity(pm)), 
-					"Order.created", new Date());
-			result.add(trans1);
+			
+			TreeMap<Date, LastCustomerTransaction> orderedTransactions = new TreeMap<Date, LastCustomerTransaction>(new Comparator<Date>() {
+				@Override
+				public int compare(Date o1, Date o2) {
+					return -(o1.compareTo(o2));
+				}
+			});
+			
+			putAll(queryLastCustomersForArticleContainer(pm, lastCustomersConfig, Order.class, "created"), orderedTransactions);
+			putAll(queryLastCustomersForArticleContainer(pm, lastCustomersConfig, Offer.class, "created"), orderedTransactions);
+			putAll(queryLastCustomersForArticleContainer(pm, lastCustomersConfig, Offer.class, "finalized"), orderedTransactions);
+			putAll(queryLastCustomersForArticleContainer(pm, lastCustomersConfig, Invoice.class, "created"), orderedTransactions);
+			putAll(queryLastCustomersForArticleContainer(pm, lastCustomersConfig, Invoice.class, "finalized"), orderedTransactions);
+			putAll(queryLastCustomersForArticleContainer(pm, lastCustomersConfig, DeliveryNote.class, "created"), orderedTransactions);
+			putAll(queryLastCustomersForArticleContainer(pm, lastCustomersConfig, DeliveryNote.class, "finalized"), orderedTransactions);
+
+			Set<AnchorID> distinctCustomers = new HashSet<AnchorID>();
+			
+			for (LastCustomerTransaction transaction : orderedTransactions.values()) {
+				if (!distinctCustomers.contains(transaction.getCustomerID())) {
+					result.add(transaction);
+					distinctCustomers.add(transaction.getCustomerID());
+				}
+				if (distinctCustomers.size() == lastCustomersConfig.getAmountLastCustomers()) {
+					break;
+				}
+			}
+			
 			return result;
 		} finally {
 			pm.close();
 		}
 	}
+	
+	private void putAll(List<LastCustomerTransaction> transactions, Map<Date, LastCustomerTransaction> map) {
+		for (LastCustomerTransaction trans : transactions) {
+			map.put(trans.getTransactionDate(), trans);
+		}
+	}
 
+	private List<LastCustomerTransaction> queryLastCustomersForArticleContainer(
+			PersistenceManager pm,
+			DashboardGadgetLastCustomersConfig lastCustomersConfig, Class<?> articleContainerClass, String transactionType) {
+
+		String field = "created".equals(transactionType) ? "this.createDT" : "this.finalizeDT";
+		String userField = "created".equals(transactionType) ? "this.createUser" : "this.finalizeUser";
+		String customerField = articleContainerClass != Offer.class ? "customer" : "this.order.customer";
+		
+		StringBuilder sb = new StringBuilder();
+		sb.append("SELECT DISTINCT ");
+		sb.append(customerField).append(", ");
+		sb.append("max(").append(field).append(") ");
+		sb.append("FROM ");
+		sb.append(articleContainerClass.getName()).append(" ");
+		sb.append("WHERE ").append(field).append(" != null");
+		sb.append(" && JDOHelper.getObjectId(").append(userField).append(") == :userId");
+		Query query = pm.newQuery(sb.toString());
+		query.setRange(0, lastCustomersConfig.getAmountLastCustomers());
+		query.setOrdering("max(" + field+ ") DESC");
+		query.setGrouping(customerField);
+		
+		Collection<Object[]> queryResult = (Collection<Object[]>) query.execute(SecurityReflector.getUserDescriptor().getUserObjectID());
+		
+		
+		List<LastCustomerTransaction> queryTransactions = new LinkedList<LastCustomerTransaction>();
+		for (Object[] resultRow : queryResult) {
+			queryTransactions.add(
+					new LastCustomerTransaction(
+							(AnchorID) JDOHelper.getObjectId(resultRow[0]), 
+							articleContainerClass.getSimpleName()+"."+transactionType, 
+							(Date) resultRow[1]
+					)
+			);
+//			queryTransactions.add(new LastCustomerTransaction((AnchorID) JDOHelper.getObjectId(resultRow[0]), (String) resultRow[1], (Date) resultRow[2]));
+		}
+		return queryTransactions;
+	}
+	
 }

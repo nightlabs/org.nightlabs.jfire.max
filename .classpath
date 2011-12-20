@@ -13,5 +13,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/NightLabsXStream"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireDashboard"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireTrade"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/JFireQueryStore"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.nightlabs.jfire.trade.dashboard;
 
 import java.util.Collection;

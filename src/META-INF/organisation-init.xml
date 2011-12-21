@@ -1,0 +1,10 @@
+<init:organisation-initialisation
+		xmlns:init="urn:jfire.org:organisation-init_1_1"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="urn:jfire.org:organisation-init_1_1 http://dev.nightlabs.org/xml/organisation-init_1_1.xsd ">
+
+	<init:init invocation="org.nightlabs.jfire.trade.dashboard.DashboardManagerRemote.initialise">
+		<init:depends invocation="org.nightlabs.jfire.base" />
+	</init:init>
+
+</init:organisation-initialisation>

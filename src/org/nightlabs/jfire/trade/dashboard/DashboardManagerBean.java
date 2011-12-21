@@ -61,7 +61,7 @@ public class DashboardManagerBean extends BaseSessionBeanImpl implements Dashboa
 		if (logger.isDebugEnabled()) {
 			logger.debug("Creating DashboardLayoutConfigModuleInitialiser");
 		}
-		DashboardLayoutConfigModuleInitialiser dashboardLayoutConfigModuleInitialiser = new DashboardLayoutConfigModuleInitialiser();
+		TradeDashboardGadgetsConfigModuleInitialiser dashboardLayoutConfigModuleInitialiser = new TradeDashboardGadgetsConfigModuleInitialiser();
 		pm.makePersistent(dashboardLayoutConfigModuleInitialiser);
 	}
 

@@ -6,7 +6,7 @@ import org.nightlabs.jfire.query.store.id.QueryStoreID;
 
 public class DashboardGadgetInvoiceConfig implements Serializable {
 
-	private static final long serialVersionUID = 20111220L;
+	private static final long serialVersionUID = 20111221L;
 	
 	private int amountOfInvoices;
 	
@@ -19,14 +19,13 @@ public class DashboardGadgetInvoiceConfig implements Serializable {
 		this.amountOfInvoices = amountOfInvoices;
 		this.setInvoiceQueryItemId(invoiceQueryItemId);
 	}
-		
-	
-	public int getAmountLastCustomers() {
-		return amountOfInvoices;
-	}
 
-	public void setAmountLastCustomers(int amountOfInvoices) {
+	public void setAmountOfInvoices(int amountOfInvoices) {
 		this.amountOfInvoices = amountOfInvoices;
+	}
+	
+	public int getAmountOfInvoices() {
+		return amountOfInvoices;
 	}
 
 	public QueryStoreID getInvoiceQueryItemId() {

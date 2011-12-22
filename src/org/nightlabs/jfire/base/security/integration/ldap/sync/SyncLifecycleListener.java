@@ -27,6 +27,7 @@ import org.nightlabs.jfire.security.integration.UserManagementSystem;
 import org.nightlabs.jfire.security.integration.UserManagementSystemSyncEvent.SyncEventGenericType;
 import org.nightlabs.jfire.security.integration.UserManagementSystemSyncEvent.SyncEventType;
 import org.nightlabs.jfire.security.integration.UserSecurityGroupSyncConfig;
+import org.nightlabs.jfire.security.integration.UserSecurityGroupSyncConfigContainer;
 import org.nightlabs.jfire.security.integration.id.UserManagementSystemID;
 import org.nightlabs.util.CollectionUtil;
 import org.slf4j.Logger;
@@ -220,10 +221,13 @@ public class SyncLifecycleListener implements StoreLifecycleListener, DeleteLife
 			UserSecurityGroup userSecurityGroup = (UserSecurityGroup) persistentInstance;
 			UserSecurityGroupID userSecurityGroupId = UserSecurityGroupID.create(
 					userSecurityGroup.getOrganisationID(), userSecurityGroup.getUserSecurityGroupID());
-			UserSecurityGroupSyncConfig<?, ?> syncConfigForGroup = UserSecurityGroupSyncConfig.getSyncConfigForGroup(
-					JDOHelper.getPersistenceManager(userSecurityGroup), ldapServer.getUserManagementSystemObjectID(), userSecurityGroupId);
-			if (syncConfigForGroup instanceof LDAPUserSecurityGroupSyncConfig){
-				return (String) syncConfigForGroup.getUserManagementSystemSecurityObject();
+			
+			UserSecurityGroupSyncConfigContainer syncConfigContainer = UserSecurityGroupSyncConfigContainer.getSyncConfigContainerForGroup(JDOHelper.getPersistenceManager(userSecurityGroup), userSecurityGroupId);
+			if (syncConfigContainer != null){
+				UserSecurityGroupSyncConfig<?, ?> syncConfigForGroup = syncConfigContainer.getSyncConfigForUserManagementSystem(ldapServer.getUserManagementSystemObjectID());
+				if (syncConfigForGroup instanceof LDAPUserSecurityGroupSyncConfig){
+					return (String) syncConfigForGroup.getUserManagementSystemSecurityObject();
+				}
 			}
 			return null;
 		}else{

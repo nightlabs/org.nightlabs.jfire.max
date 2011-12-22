@@ -71,7 +71,7 @@ import org.nightlabs.jfire.security.integration.UserManagementSystemSyncEvent.Sy
 import org.nightlabs.jfire.security.integration.UserManagementSystemSyncEvent.SyncEventType;
 import org.nightlabs.jfire.security.integration.UserManagementSystemSyncException;
 import org.nightlabs.jfire.security.integration.UserManagementSystemType;
-import org.nightlabs.jfire.security.integration.UserSecurityGroupSyncConfig;
+import org.nightlabs.jfire.security.integration.UserSecurityGroupSyncConfigContainer;
 import org.nightlabs.jfire.security.integration.id.UserManagementSystemID;
 import org.nightlabs.jfire.security.listener.SecurityChangeController;
 import org.nightlabs.jfire.servermanager.JFireServerManager;
@@ -124,11 +124,11 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 	public static final String FETCH_GROUP_LDAP_SCRIPT_SET = "LDAPServer.ldapScriptSet";
 
 	public static final String OBJECT_CLASS_ATTR_NAME = "objectClass";
+	public static final String GROUP_OF_NAMES_ATTR_VALUE = "groupOfNames";
+	public static final String GROUP_OF_UNIQUE_NAMES_ATTR_VALUE = "groupOfUniqueNames";
 	private static final String COMMON_NAME_ATTR_NAME = "commonName";
 	private static final String UNIQUE_MEMBER_ATTR_NAME = "uniqueMember";
 	private static final String MEMBER_ATTR_NAME = "member";
-	private static final String GROUP_OF_NAMES_ATTR_VALUE = "groupOfNames";
-	private static final String GROUP_OF_UNIQUE_NAMES_ATTR_VALUE = "groupOfUniqueNames";
 
 	private static final Logger logger = LoggerFactory.getLogger(LDAPServer.class);
 
@@ -1145,7 +1145,7 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 								pm.deletePersistent(syncConfig);
 								
 								// remove UserSecurityGroup if it does not have other UserSecurityGroupSyncConfigs referencing it
-								if (!UserSecurityGroupSyncConfig.syncConfigsExistForGroup(
+								if (!UserSecurityGroupSyncConfigContainer.syncConfigsExistForGroup(
 										pm, UserSecurityGroupID.create(userSecurityGroup.getOrganisationID(), userSecurityGroup.getUserSecurityGroupID()))){
 									boolean successful = false;
 									SecurityChangeController.beginChanging();
@@ -1170,8 +1170,11 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 									newUserSecurityGroup.setName(groupName);
 									newUserSecurityGroup = pm.makePersistent(newUserSecurityGroup);
 									
-									syncConfig = new LDAPUserSecurityGroupSyncConfig(newUserSecurityGroup, LDAPServer.this, ldapGroupDN);
-									syncConfig = pm.makePersistent(syncConfig);
+									UserSecurityGroupSyncConfigContainer container = new UserSecurityGroupSyncConfigContainer(newUserSecurityGroup);
+									syncConfig = new LDAPUserSecurityGroupSyncConfig(container, LDAPServer.this, ldapGroupDN);
+									container.addSyncConfig(syncConfig);
+									container = pm.makePersistent(container);
+									syncConfig = (LDAPUserSecurityGroupSyncConfig) container.getSyncConfigs().iterator().next();
 								}
 								
 								Iterable<Object> ldapGroupMembers = attributes.getAttributeValues(ldapGroup.getMemberAttr());
@@ -1287,9 +1290,14 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 					}
 					userSecurityGroupId = (UserSecurityGroupID) jfireObjectId;
 					
-					LDAPUserSecurityGroupSyncConfig syncConfig = (LDAPUserSecurityGroupSyncConfig) UserSecurityGroupSyncConfig.getSyncConfigForGroup(
-							pm, getUserManagementSystemObjectID(), userSecurityGroupId);
-					
+					UserSecurityGroupSyncConfigContainer syncConfigContainer = UserSecurityGroupSyncConfigContainer.getSyncConfigContainerForGroup(
+							pm, userSecurityGroupId);
+
+					LDAPUserSecurityGroupSyncConfig syncConfig = null;
+					if (syncConfigContainer != null){
+						syncConfig = (LDAPUserSecurityGroupSyncConfig) syncConfigContainer.getSyncConfigForUserManagementSystem(getUserManagementSystemObjectID());
+					}
+
 					if (syncConfig != null && !syncConfig.isSyncEnabled()){
 						logger.info(
 								String.format(

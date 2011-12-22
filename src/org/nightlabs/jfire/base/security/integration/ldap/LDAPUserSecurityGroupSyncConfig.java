@@ -3,6 +3,7 @@ package org.nightlabs.jfire.base.security.integration.ldap;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import javax.jdo.JDOUserCallbackException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 import javax.jdo.annotations.IdentityType;
@@ -11,10 +12,12 @@ import javax.jdo.annotations.InheritanceStrategy;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.Queries;
+import javax.jdo.listener.StoreCallback;
 
 import org.nightlabs.jfire.security.UserSecurityGroup;
 import org.nightlabs.jfire.security.integration.UserManagementSystem;
 import org.nightlabs.jfire.security.integration.UserSecurityGroupSyncConfig;
+import org.nightlabs.jfire.security.integration.UserSecurityGroupSyncConfigContainer;
 import org.nightlabs.jfire.security.integration.id.UserManagementSystemID;
 
 /**
@@ -38,7 +41,7 @@ import org.nightlabs.jfire.security.integration.id.UserManagementSystemID;
 			value="SELECT where JDOHelper.getObjectId(this.userManagementSystem) == :ldapServerId && this.ldapGroupName == :ldapGroupName ORDER BY JDOHelper.getObjectId(this) ASCENDING"
 			)
 	})
-public class LDAPUserSecurityGroupSyncConfig extends UserSecurityGroupSyncConfig<LDAPServer, String> {
+public class LDAPUserSecurityGroupSyncConfig extends UserSecurityGroupSyncConfig<LDAPServer, String> implements StoreCallback{
 
 	/**
 	 * The serial version UID of this class.
@@ -82,17 +85,29 @@ public class LDAPUserSecurityGroupSyncConfig extends UserSecurityGroupSyncConfig
 	 */
 	@Deprecated
 	public LDAPUserSecurityGroupSyncConfig(){}
-	
+
+	/**
+	 * Construct new synchronization config for given {@link LDAPServer} with empty LDAP group name.
+	 * Note that this config cannot be stored before LDAP group name is not set via {@link #setLdapGroupName(String)},
+	 * if {@link #ldapGroupName} is not correctly set {@link JDOUserCallbackException} will be thrown in {@link #jdoPreStore()}. 
+	 * 
+	 * @param container {@link UserSecurityGroupSyncConfigContainer} which holds this {@link LDAPUserSecurityGroupSyncConfig}, not <code>null</code>
+	 * @param userManagementSystem {@link UserManagementSystem} to synchronize with, not <code>null</code>
+	 */
+	public LDAPUserSecurityGroupSyncConfig(UserSecurityGroupSyncConfigContainer container, LDAPServer userManagementSystem) {
+		super(container, userManagementSystem);
+	}
+
 	/**
 	 * Construct new synchronization config for given {@link LDAPServer}. 
 	 * 
-	 * @param userSecurityGroup {@link UserSecurityGroup} which will be synchronized according to this configuration, not <code>null</code>
+	 * @param container {@link UserSecurityGroupSyncConfigContainer} which holds this {@link LDAPUserSecurityGroupSyncConfig}, not <code>null</code>
 	 * @param userManagementSystem {@link UserManagementSystem} to synchronize with, not <code>null</code>
 	 * @param ldapGroupName Distingueshed (full) name of LDAP group to map to, not <code>null</code> and not empty
 	 */
 	public LDAPUserSecurityGroupSyncConfig(
-			UserSecurityGroup userSecurityGroup, LDAPServer userManagementSystem, String ldapGroupName) {
-		super(userSecurityGroup, userManagementSystem);
+			UserSecurityGroupSyncConfigContainer container, LDAPServer userManagementSystem, String ldapGroupName) {
+		this(container, userManagementSystem);
 		setLdapGroupName(ldapGroupName);
 	}
 
@@ -114,6 +129,16 @@ public class LDAPUserSecurityGroupSyncConfig extends UserSecurityGroupSyncConfig
 			throw new IllegalArgumentException("ldapGroupName must be not null an not empty!");
 		}
 		this.ldapGroupName = ldapGroupName;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void jdoPreStore() {
+		if (this.ldapGroupName == null || this.ldapGroupName.isEmpty()){
+			throw new JDOUserCallbackException("Cannot store LDAPUserSecurityGroupSyncConfig with null or empty ldapGroupName!");
+		}
 	}
 
 }

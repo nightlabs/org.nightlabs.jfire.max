@@ -6,10 +6,10 @@ import java.util.Set;
 import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
-import javax.jdo.listener.CreateLifecycleListener;
 import javax.jdo.listener.InstanceLifecycleEvent;
 import javax.jdo.listener.StoreLifecycleListener;
 
+import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.asyncinvoke.AsyncInvokeEnqueueException;
 import org.nightlabs.jfire.base.security.integration.ldap.LDAPServer;
 import org.nightlabs.jfire.base.security.integration.ldap.LDAPUserSecurityGroupSyncConfig;
@@ -26,7 +26,7 @@ import org.nightlabs.util.CollectionUtil;
  * @author Denis Dudnik <deniska.dudnik[at]gmail{dot}com>
  *
  */
-public class LDAPUserSecurityGroupSyncConfigLifecycleListener implements CreateLifecycleListener, StoreLifecycleListener{
+public class LDAPUserSecurityGroupSyncConfigLifecycleListener implements StoreLifecycleListener{
 	
 	private static ThreadLocal<Boolean> isEnabledTL = new ThreadLocal<Boolean>(){
 		protected Boolean initialValue() {
@@ -61,21 +61,6 @@ public class LDAPUserSecurityGroupSyncConfigLifecycleListener implements CreateL
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void postCreate(InstanceLifecycleEvent event) {
-		if (!isEnabled()){
-			return;
-		}
-		LDAPUserSecurityGroupSyncConfig syncConfig = (LDAPUserSecurityGroupSyncConfig) event.getPersistentInstance();
-		if (syncConfig.isSyncEnabled() 
-				&& syncConfig.getUserManagementSystem().shouldFetchUserData()){
-			execSyncInvocation(syncConfig);
-		}
-	}
-	
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
 	public void postStore(InstanceLifecycleEvent event) {
 		if (!isEnabled()){
 			return;
@@ -104,18 +89,19 @@ public class LDAPUserSecurityGroupSyncConfigLifecycleListener implements CreateL
 			return;
 		}
 		LDAPUserSecurityGroupSyncConfig detachedSyncConfig = (LDAPUserSecurityGroupSyncConfig) event.getDetachedInstance();
-		PersistenceManager pm = JDOHelper.getPersistenceManager(event.getPersistentInstance());
-		if (pm != null 
-				&& detachedSyncConfig != null 
+		if (detachedSyncConfig != null
 				&& detachedSyncConfig.isSyncEnabled()){
-			LDAPUserSecurityGroupSyncConfig attachedSyncConfig = null;
 			UserSecurityGroupSyncConfigID syncConfigId = UserSecurityGroupSyncConfigID.create(
 					detachedSyncConfig.getUserSecurityGroupSyncConfigID(), detachedSyncConfig.getOrganisationID());
+			PersistenceManager pm = NLJDOHelper.getThreadPersistenceManager();
+			LDAPUserSecurityGroupSyncConfig attachedSyncConfig = null;
 			try{
 				attachedSyncConfig = (LDAPUserSecurityGroupSyncConfig) pm.getObjectById(syncConfigId);
 			}catch(JDOObjectNotFoundException e){
 				// no object exist, so we assume that new LDAPUserSecurityGroupSyncConfig is created and initial sync is necessary
-				syncConfigsForSync.add(syncConfigId);
+				if (detachedSyncConfig.getUserManagementSystem().shouldFetchUserData()){	// assume that userManagementSystem field would be present in new detached instance
+					syncConfigsForSync.add(syncConfigId);
+				}
 				return;
 			}
 			if (attachedSyncConfig != null

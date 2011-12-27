@@ -11,9 +11,12 @@ public class DashboardGadgetInvoiceConfig implements Serializable {
 	private int amountOfInvoices;
 	
 	private QueryStoreID invoiceQueryItemId;
+
+	public static final int initialAmountOfInvoicesInDashboard = 10;	// initially at most 10
 	
-	public DashboardGadgetInvoiceConfig() {
-	}
+	public static final int maxAmountOfInvoicesInDashboard = 50;
+	
+	public DashboardGadgetInvoiceConfig() { }
 	
 	public DashboardGadgetInvoiceConfig(int amountOfInvoices, QueryStoreID invoiceQueryItemId) {
 		this.amountOfInvoices = amountOfInvoices;

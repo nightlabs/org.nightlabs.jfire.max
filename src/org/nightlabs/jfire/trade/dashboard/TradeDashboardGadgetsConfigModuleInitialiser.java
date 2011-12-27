@@ -1,7 +1,6 @@
 package org.nightlabs.jfire.trade.dashboard;
 
 import javax.jdo.PersistenceManager;
-
 import javax.jdo.annotations.IdentityType;
 import javax.jdo.annotations.Inheritance;
 import javax.jdo.annotations.InheritanceStrategy;
@@ -57,7 +56,7 @@ public class TradeDashboardGadgetsConfigModuleInitialiser extends
 		cfMod.addEditLayoutEntry(lastCustomersEntry);
 
 		DashboardGadgetLastCustomersConfig config = new DashboardGadgetLastCustomersConfig();
-		config.setAmountLastCustomers(10);
+		config.setAmountLastCustomers(DashboardGadgetLastCustomersConfig.initialAmountOfCustomersInDashboard);
 		lastCustomersEntry.setConfig(config);
 		
 		initializeLastCustomersGadgetName(lastCustomersEntry.getEntryName());
@@ -71,7 +70,7 @@ public class TradeDashboardGadgetsConfigModuleInitialiser extends
 		cfMod.addEditLayoutEntry(invoiceEntry);
 
 		DashboardGadgetInvoiceConfig config = new DashboardGadgetInvoiceConfig();
-		config.setAmountOfInvoices(10);
+		config.setAmountOfInvoices(DashboardGadgetInvoiceConfig.initialAmountOfInvoicesInDashboard);
 		config.setInvoiceQueryItemId(null);
 		invoiceEntry.setConfig(config);
 		

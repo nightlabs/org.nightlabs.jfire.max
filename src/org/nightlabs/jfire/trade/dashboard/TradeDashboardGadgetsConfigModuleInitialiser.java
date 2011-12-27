@@ -96,10 +96,10 @@ public class TradeDashboardGadgetsConfigModuleInitialiser extends
 		initializeGadgetName(gadgetName, "invoiceGadget.title");
 	}
 	
-	public static void initializeGadgetName(I18nText gadgetName, String nameKey) {
+	public static void initializeGadgetName(I18nText gadgetName, String nameKeySuffix) {
 		gadgetName.readFromProperties(
 			Messages.BUNDLE_NAME, 
 			TradeDashboardGadgetsConfigModuleInitialiser.class.getClassLoader(), 
-			TradeDashboardGadgetsConfigModuleInitialiser.class.getName() + "." +nameKey);
+			TradeDashboardGadgetsConfigModuleInitialiser.class.getName() + "." + nameKeySuffix);
 	}
 }

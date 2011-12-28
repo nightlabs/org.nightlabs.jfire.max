@@ -32,14 +32,12 @@ public class TradeDashboardGadgetsConfigModuleInitialiser extends
 	public void initialiseConfigModule(PersistenceManager pm, ConfigModule configModule) {
 		createLastCustomersGadgetConfig((DashboardLayoutConfigModule<?>) configModule);
 		createInvoiceGadgetConfig((DashboardLayoutConfigModule<?>) configModule);
-		createClientScriptsGadgetConfig((DashboardLayoutConfigModule<?>) configModule);
 	}
 
 	@Override
 	public void initialiseDetachedConfigModule(ConfigModule configModule) {
 		createLastCustomersGadgetConfig((DashboardLayoutConfigModule<?>) configModule);
 		createInvoiceGadgetConfig((DashboardLayoutConfigModule<?>) configModule);
-		createClientScriptsGadgetConfig((DashboardLayoutConfigModule<?>) configModule);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -71,23 +69,6 @@ public class TradeDashboardGadgetsConfigModuleInitialiser extends
 		initializeInvoiceGadgetName(invoiceEntry.getEntryName());
 	}
 
-	@SuppressWarnings("unchecked")
-	private void createClientScriptsGadgetConfig(DashboardLayoutConfigModule cfMod) {
-		DashboardGadgetLayoutEntry clientScriptsEntry = cfMod.createEditLayoutEntry("DashboardGadgetClientScriptsFactory");
-		clientScriptsEntry.getGridData().setGrabExcessHorizontalSpace(true);
-		clientScriptsEntry.getGridData().setHorizontalAlignment(GridData.FILL);
-		cfMod.addEditLayoutEntry(clientScriptsEntry);
-		
-		DashboardGadgetClientScriptsConfig config = new DashboardGadgetClientScriptsConfig();
-		clientScriptsEntry.setConfig(config);
-		
-		initializeClientScriptsGadgetName(clientScriptsEntry.getEntryName());
-	}
-	
-	public static void initializeClientScriptsGadgetName(I18nText gadgetName) {
-		initializeGadgetName(gadgetName, "clientScriptsGadget.title");
-	}
-	
 	public static void initializeLastCustomersGadgetName(I18nText gadgetName) {
 		initializeGadgetName(gadgetName, "lastCustomersGadget.title");
 	}

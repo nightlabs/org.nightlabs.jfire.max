@@ -148,7 +148,8 @@ public interface LDAPConnectionWrapper{
 	 * 
 	 * @param entryName The distingueshed name of LDAP entry to be checked
 	 * @return <code>true</code> if entry exists
+	 * @throws LoginException 
 	 */
-	public boolean entryExists(String entryName);
+	public boolean entryExists(String entryName) throws LoginException;
 	
 }

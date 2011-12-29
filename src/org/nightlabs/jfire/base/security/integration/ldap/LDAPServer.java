@@ -103,7 +103,7 @@ import org.slf4j.LoggerFactory;
 @Queries({
 		@javax.jdo.annotations.Query(
 				name="LDAPServer.findLDAPServers",
-				value="SELECT where this.host == :host && this.port == :port && this.encryptionMethod == :encryptionMethod ORDER BY JDOHelper.getObjectId(this) ASCENDING"
+				value="SELECT where this.host == :host && this.port == :port && this.encryptionMethod == :encryptionMethod && this.authenticationMethod == :authMethod ORDER BY JDOHelper.getObjectId(this) ASCENDING"
 				),
 		@javax.jdo.annotations.Query(
 				name="LDAPServer.findLDAPServersByAttributeSyncPolicy",
@@ -138,7 +138,7 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * Executes {@link javax.jdo.Query) to find persistent LDAPServer instances by host, port and encryptionMethod 
+	 * Executes {@link javax.jdo.Query) to find persistent LDAPServer instances by host, port, encryption and authentication methods 
 	 * 
 	 * @param pm
 	 * @param host
@@ -147,7 +147,7 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 	 * @return
 	 */
 	public static Collection<LDAPServer> findLDAPServers(
-			PersistenceManager pm, String host, int port, EncryptionMethod encryptionMethod
+			PersistenceManager pm, String host, int port, EncryptionMethod encryptionMethod, AuthenticationMethod authMethod
 			) {
 		
 		javax.jdo.Query q = pm.newNamedQuery(
@@ -155,7 +155,7 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 				"LDAPServer.findLDAPServers"
 				);
 		@SuppressWarnings("unchecked")
-		List<LDAPServer> foundServers = (List<LDAPServer>) q.execute(host, port, encryptionMethod);
+		List<LDAPServer> foundServers = (List<LDAPServer>) q.executeWithArray(host, port, encryptionMethod, authMethod);
 		
 		// We copy them into a new ArrayList in order to be able to already close the query (save resources).
 		// That would only be a bad idea, if we had really a lot of them and we would not need to iterate all afterwards.
@@ -211,7 +211,6 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 	
 	/**
 	 * Authentication method used when binding against LDAP server
-	 * IMPORTANT! For now only SIMPLE method is supported or NONE for anonymous access.
 	 */
 	@Persistent(defaultFetchGroup="true")
 	private AuthenticationMethod authenticationMethod = LDAP_DEFAULT_AUTHENTICATION_METHOD;
@@ -241,6 +240,23 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 	@Persistent(defaultFetchGroup="true")
 	private LDAPAttributeSyncPolicy attributeSyncPolicy = LDAP_DEFAULT_ATTRIBUTE_SYNC_POLICY;
 	
+	
+	/**
+	 * This field is used internally for temporary keeping bind credentials to be used later on
+	 * inside {@link #bindForSynchronization(LDAPConnection)}. They will be set to <code>null</code>
+	 * immideately after the first use.
+	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
+	private String tempBindDN;
+
+	/**
+	 * This field is used internally for temporary keeping bind credentials to be used later on
+	 * inside {@link #bindForSynchronization(LDAPConnection)}. They will be set to <code>null</code>
+	 * immideately after the first use.
+	 */
+	@Persistent(persistenceModifier=PersistenceModifier.NONE)
+	private String tempBindPassword;
+
 	
 	/**
 	 * @deprecated For JDO only!
@@ -356,6 +372,11 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
    					syncEvent.setFetchEventTypeDataUnits(
    							CollectionUtil.createHashSet(
    									new FetchEventTypeDataUnit(userDN)));
+
+   					// temporary keeping bind credentials here, because in seems the only way to obtain them later on in this use case
+   					this.tempBindDN = userDN;
+   					this.tempBindPassword = loginData.getPassword();
+   					
 					synchronize(syncEvent);
 				} catch (UserManagementSystemSyncException e) {
 					logger.error(
@@ -433,16 +454,12 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 	
 	/**
 	 * Set Authentication method for this LDAPServer.
-	 * IMPORTANT! For now only SIMPLE method is supported or NONE for anonymous access.
 	 * 
 	 * @param authenticationMethod
 	 */
 	public void setAuthenticationMethod(AuthenticationMethod authenticationMethod) {
-		if (AuthenticationMethod.NONE.equals(authenticationMethod)){
-			logger.info("AuthenticationMethod was set to NONE, which means anonymous access only.");
-		}else if (!AuthenticationMethod.SIMPLE.equals(authenticationMethod)){
-			logger.warn("For now only SIMPLE method is supported or NONE for anonymous access, setting it to SIMPLE");
-			authenticationMethod = AuthenticationMethod.SIMPLE;
+		if (authenticationMethod == null){
+			authenticationMethod = LDAP_DEFAULT_AUTHENTICATION_METHOD;
 		}
 		this.authenticationMethod = authenticationMethod;
 	}
@@ -625,9 +642,9 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 			return false;
 		}
 		
-		if (AuthenticationMethod.SIMPLE.equals(getAuthenticationMethod())
+		if (!AuthenticationMethod.NONE.equals(getAuthenticationMethod())
 				&& (password == null || "".equals(password))){
-			// For simple auth method LDAP doesn't support authentication without password.
+			// For every auth method except NONE LDAP doesn't support authentication without password.
 			// If password is not provided than it's supposed by LDAP that access is anonymous.
 			// So we just log the warning here and silently return, because otherwise log will be 
 			// polluted with LoginExceptions. When JFire client starts - it already tries to log in
@@ -773,63 +790,72 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 	}
 
 	private void bindForSynchronization(LDAPConnection connection) throws LoginException, UserManagementSystemCommunicationException{
-		boolean fallToGlobalSyncCredentials = false;
-		try{
-			UserDescriptor userDescriptor = GlobalSecurityReflector.sharedInstance().getUserDescriptor();
-
-			if (User.USER_ID_SYSTEM.equals(userDescriptor.getUserID())){
+		if (canBind(this.tempBindDN, this.tempBindPassword)){
+			String syncDN = this.tempBindDN;
+			String syncPwd = this.tempBindPassword;
+			this.tempBindDN = null;
+			this.tempBindPassword = null;
+			logger.info("Will try to bind with temporary credentials! Bind DN is: " + syncDN);
+			connection.bind(syncDN, syncPwd);	// at this point temporary fields are null, even in case some exception happened during binding
+		}else{
+			boolean fallToGlobalSyncCredentials = false;
+			try{
+				UserDescriptor userDescriptor = GlobalSecurityReflector.sharedInstance().getUserDescriptor();
+	
+				if (User.USER_ID_SYSTEM.equals(userDescriptor.getUserID())){
+					
+					logger.warn(
+							String.format(
+									"Current user is a system user with ID %s, can't bind it against LDAP. Will try to bind with global syncDN/syncPassword if set.", userDescriptor.getCompleteUserID()));
+					fallToGlobalSyncCredentials = true;
+					
+				}else{
 				
-				logger.warn(
-						String.format(
-								"Current user is a system user with ID %s, can't bind it against LDAP. Will try to bind with global syncDN/syncPassword if set.", userDescriptor.getCompleteUserID()));
-				fallToGlobalSyncCredentials = true;
-				
-			}else{
-			
-				User user = null;
-				PersistenceManager pm = JDOHelper.getPersistenceManager(this);
-				if (pm != null){
-					user = userDescriptor.getUser(pm);
-				}else{	// create fake, not persisted new User just to get LDAP entry DN
-					user = new User(userDescriptor.getOrganisationID(), userDescriptor.getUserID());
-				}
-				
-				String bindDN = getLDAPUserDN(user);
-				String bindPwd = getLDAPPasswordForCurrentUser();
-				
-				if (canBind(bindDN, bindPwd)){
-					// TODO: check if this user has enough permissions to read/modify LDAP entries, see issue 1971 (enhancement)
-					try{
-						connection.bind(bindDN, bindPwd);
-					}catch(LoginException e){
-						// if we can't log in with current User credentials, we fall to global syncDN/syncPassword
-						logger.warn(
+					User user = null;
+					PersistenceManager pm = JDOHelper.getPersistenceManager(this);
+					if (pm != null){
+						user = userDescriptor.getUser(pm);
+					}else{	// create fake, not persisted new User just to get LDAP entry DN
+						user = new User(userDescriptor.getOrganisationID(), userDescriptor.getUserID());
+					}
+					
+					String bindDN = getLDAPUserDN(user);
+					String bindPwd = getLDAPPasswordForCurrentUser();
+					
+					if (canBind(bindDN, bindPwd)){
+						// TODO: check if this user has enough permissions to read/modify LDAP entries, see issue 1971 (enhancement)
+						try{
+							connection.bind(bindDN, bindPwd);
+						}catch(LoginException e){
+							// if we can't log in with current User credentials, we fall to global syncDN/syncPassword
+							logger.warn(
+									String.format(
+											"Can't bind with current User credentials, bind entry name: %s. LoginException occured.", bindDN), e);
+							fallToGlobalSyncCredentials = true;
+						}
+					}else{
+						logger.info(
 								String.format(
-										"Can't bind with current User credentials, bind entry name: %s. LoginException occured.", bindDN), e);
+										"Unable to bind against LDAP with current user (userID=%s) credentials, will try to bind with global syncDN/syncPassword if set.", userDescriptor.getCompleteUserID()));
 						fallToGlobalSyncCredentials = true;
 					}
-				}else{
-					logger.info(
-							String.format(
-									"Unable to bind against LDAP with current user (userID=%s) credentials, will try to bind with global syncDN/syncPassword if set.", userDescriptor.getCompleteUserID()));
-					fallToGlobalSyncCredentials = true;
 				}
+			}catch(NoUserException e){
+				// There's no logged in User, so we'll try to bind with syncDN and syncPasswrod
+				fallToGlobalSyncCredentials = true;
 			}
-		}catch(NoUserException e){
-			// There's no logged in User, so we'll try to bind with syncDN and syncPasswrod
-			fallToGlobalSyncCredentials = true;
-		}
-		
-		if (fallToGlobalSyncCredentials){
-			if (canBind(syncDN, syncPassword)){
-				
-				connection.bind(syncDN, syncPassword);
-				
-			}else{
-				logger.warn(
-						"Can't bind against LDAP because either syncDN or password are not specified. " +
-						"There's also no logged in User so all further requests to LDAP will be performed under anonymous user."
-						);
+			
+			if (fallToGlobalSyncCredentials){
+				if (canBind(syncDN, syncPassword)){
+					
+					connection.bind(syncDN, syncPassword);
+					
+				}else{
+					logger.warn(
+							"Can't bind against LDAP because either syncDN or password are not specified. " +
+							"There's also no logged in User so all further requests to LDAP will be performed under anonymous user."
+							);
+				}
 			}
 		}
 	}
@@ -966,6 +992,7 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 					event.setFetchEventTypeDataUnits(fetchDataUnits);
 					
 					userSyncIsRunning.set(true);
+					LDAPConnectionManager.sharedInstance().preservePrivateLDAPConnection(LDAPServer.this, connection);	// will be released in caller of this method
 					synchronize(event);
 				} finally {
 					userSyncIsRunning.set(false);

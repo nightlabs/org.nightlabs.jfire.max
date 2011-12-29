@@ -18,8 +18,14 @@ public interface ILDAPConnectionParamsProvider{
         NONE("none"),
 
         /** Simple authentication, simple bind. */
-        SIMPLE("simple");
-        
+        SIMPLE("simple"),
+
+        /** SASL authentication using DIGEST-MD5. */
+        SASL_DIGEST_MD5("DIGEST-MD5"),
+
+        /** SASL authentication using CRAM-MD5. */
+        SASL_CRAM_MD5("CRAM-MD5");
+
         private String stringValue;
         
         private AuthenticationMethod(String stringValue){
@@ -48,7 +54,7 @@ public interface ILDAPConnectionParamsProvider{
          * Get {@link Enum} element by {@link String} value.
          * 
          * @param stringValue
-         * @return {@link AuthenticationMethod} element
+         * @return {@link AuthenticationMethod} element or throws {@link IllegalArgumentException} if not found
          */
     	public static AuthenticationMethod findAuthenticationMethodByStringValue(String stringValue){
     	    for(AuthenticationMethod v : AuthenticationMethod.values()){
@@ -56,7 +62,7 @@ public interface ILDAPConnectionParamsProvider{
     	            return v;
     	        }
     	    }
-    	    return null;
+    	    throw new IllegalArgumentException("Unable to find enum constant by String value: " + stringValue);
     	}
 
     }
@@ -104,7 +110,7 @@ public interface ILDAPConnectionParamsProvider{
          * Get {@link Enum} element by {@link String} value.
          * 
          * @param stringValue
-         * @return EncryptionMethod element
+         * @return EncryptionMethod element or throws {@link IllegalArgumentException} if not found
          */
     	public static EncryptionMethod findEncryptionMethodByStringValue(String stringValue){
     	    for(EncryptionMethod v : EncryptionMethod.values()){
@@ -112,7 +118,7 @@ public interface ILDAPConnectionParamsProvider{
     	            return v;
     	        }
     	    }
-    	    return null;
+    	    throw new IllegalArgumentException("Unable to find enum constant by String value: " + stringValue);
     	}
 
     }
@@ -145,6 +151,5 @@ public interface ILDAPConnectionParamsProvider{
      * @return the port
      */
     public int getPort();
-    
 
 }

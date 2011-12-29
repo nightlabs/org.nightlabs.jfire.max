@@ -97,7 +97,7 @@ public class LDAPSyncInvocation extends Invocation{
 			PersistenceManager pm, Invocation invocation, LDAPServer ldapServer) throws AsyncInvokeEnqueueException{
 		
 		LDAPConnection connection = null;
-		if (AuthenticationMethod.SIMPLE.equals(ldapServer.getAuthenticationMethod())){
+		if (!AuthenticationMethod.NONE.equals(ldapServer.getAuthenticationMethod())){
 
 			// We preserve an authenticated instance of LDAPConnection before executing an Invocation
 			// because it will be impossible to authenticate against LDAP inside the invocation 

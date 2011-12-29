@@ -36,14 +36,19 @@ import javax.naming.event.EventDirContext;
 import javax.naming.event.NamingExceptionEvent;
 import javax.naming.ldap.InitialLdapContext;
 import javax.naming.ldap.LdapName;
+import javax.naming.ldap.StartTlsRequest;
+import javax.naming.ldap.StartTlsResponse;
 import javax.naming.ldap.UnsolicitedNotificationEvent;
 import javax.naming.ldap.UnsolicitedNotificationListener;
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLSession;
 import javax.security.auth.login.LoginException;
 
 import org.nightlabs.jfire.base.security.integration.ldap.LDAPServer;
 import org.nightlabs.jfire.base.security.integration.ldap.attributes.LDAPAttribute;
 import org.nightlabs.jfire.base.security.integration.ldap.attributes.LDAPAttributeSet;
 import org.nightlabs.jfire.base.security.integration.ldap.connection.ILDAPConnectionParamsProvider.AuthenticationMethod;
+import org.nightlabs.jfire.base.security.integration.ldap.connection.ILDAPConnectionParamsProvider.EncryptionMethod;
 import org.nightlabs.jfire.security.integration.UserManagementSystemCommunicationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,14 +84,16 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper{
 	}
 
 	public static final String JAVA_NAMING_LDAP_VERSION = "java.naming.ldap.version"; //$NON-NLS-1$
+    public static final String JAVA_NAMING_LDAP_FACTORY_SOCKET = "java.naming.ldap.factory.socket"; //$NON-NLS-1$
+    public static final String JAVA_NAMING_SECURITY_SASL_REALM = "java.naming.security.sasl.realm"; //$NON-NLS-1$
+    public static final String JAVAX_SECURITY_SASL_QOP = "javax.security.sasl.qop"; //$NON-NLS-1$
 	public static final String COM_SUN_JNDI_DNS_TIMEOUT_RETRIES = "com.sun.jndi.dns.timeout.retries"; //$NON-NLS-1$
 	public static final String COM_SUN_JNDI_DNS_TIMEOUT_INITIAL = "com.sun.jndi.dns.timeout.initial"; //$NON-NLS-1$
 	public static final String COM_SUN_JNDI_LDAP_CONNECT_TIMEOUT = "com.sun.jndi.ldap.connect.timeout"; //$NON-NLS-1$
 	public static final String LDAP_SCHEME = "ldap://";
+	public static final String LDAPS_SCHEME = "ldaps://";
 
 	private LDAPConnection connection;
-
-	private String authMethod;
 
 	private InitialLdapContext context;
 
@@ -113,22 +120,52 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper{
 
 		String host = connection.getConnectionParamsProvider().getHost();
 		int port = connection.getConnectionParamsProvider().getPort();
+		boolean useLdaps = connection.getConnectionParamsProvider().getEncryptionMethod() == EncryptionMethod.LDAPS;
+        boolean useStartTLS = connection.getConnectionParamsProvider().getEncryptionMethod() == EncryptionMethod.START_TLS;
 
 		try{
 			Hashtable<String, String> environment = new Hashtable<String, String>();
 			synchronized (environment) {
 				environment.put(JAVA_NAMING_LDAP_VERSION, "3"); //$NON-NLS-1$
-				environment.put(COM_SUN_JNDI_LDAP_CONNECT_TIMEOUT, "10000"); //$NON-NLS-1$
+				environment.put(Context.INITIAL_CONTEXT_FACTORY, getDefaultLdapContextFactory());
+				
+		        // Don't use a timeout when using ldaps: JNDI throws a SocketException when setting a timeout on SSL connections.
+		        if (!useLdaps){
+		        	environment.put(COM_SUN_JNDI_LDAP_CONNECT_TIMEOUT, "10000"); //$NON-NLS-1$
+		        }
 				environment.put(COM_SUN_JNDI_DNS_TIMEOUT_INITIAL, "2000"); //$NON-NLS-1$
 				environment.put(COM_SUN_JNDI_DNS_TIMEOUT_RETRIES, "3"); //$NON-NLS-1$
-				environment.put(Context.PROVIDER_URL, LDAP_SCHEME + host + ':' + port);
-				environment.put(Context.INITIAL_CONTEXT_FACTORY, getDefaultLdapContextFactory());
+				
+		        if (useLdaps) {
+		            environment.put(Context.PROVIDER_URL, LDAPS_SCHEME + host + ':' + port);
+		            environment.put(Context.SECURITY_PROTOCOL, "ssl"); //$NON-NLS-1$
+		            environment.put(JAVA_NAMING_LDAP_FACTORY_SOCKET, DummySSLSocketFactory.class.getName());
+		        }else{
+		        	environment.put(Context.PROVIDER_URL, LDAP_SCHEME + host + ':' + port);
+		        }
 
 				if (logger.isDebugEnabled()){
 					logger.debug("Connecting to LDAP server with params: " + environment.toString());
 				}
 				
 				context = new InitialLdapContext(environment, null);
+				
+                if (useStartTLS){
+                    try{
+                        StartTlsResponse tls = (StartTlsResponse) context.extendedOperation(new StartTlsRequest());
+                        tls.setHostnameVerifier(new HostnameVerifier(){
+                            public boolean verify(String hostname, SSLSession session){
+                                return true;
+                            }
+                        });
+                        tls.negotiate(DummySSLSocketFactory.getDefault());
+                    } catch (Exception e){
+                    	NamingException namingException = new NamingException(e.getMessage() != null ? e.getMessage() : "Error while establishing TLS session"); //$NON-NLS-1$
+                        namingException.setRootCause(e);
+                        throw namingException;
+                    }
+                }
+
 				isConnected = true;
 				
 				configureConnectionProblemsListener();
@@ -161,9 +198,16 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper{
 
 		if (context != null && isConnected) {
 			
-			authMethod = AuthenticationMethod.NONE.stringValue();
+			String authMethod = AuthenticationMethod.NONE.stringValue();
+			boolean useSASL = false;
 			if (AuthenticationMethod.SIMPLE.equals(connection.getConnectionParamsProvider().getAuthenticationMethod())) {
 				authMethod = AuthenticationMethod.SIMPLE.stringValue();
+			}else if (AuthenticationMethod.SASL_DIGEST_MD5.equals(connection.getConnectionParamsProvider().getAuthenticationMethod())) {
+				authMethod = AuthenticationMethod.SASL_DIGEST_MD5.stringValue();
+				useSASL = true;
+			}else if (AuthenticationMethod.SASL_CRAM_MD5.equals(connection.getConnectionParamsProvider().getAuthenticationMethod())) {
+				authMethod = AuthenticationMethod.SASL_CRAM_MD5.stringValue();
+				useSASL = true;
 			}
 
 			// setup credentials
@@ -172,13 +216,18 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper{
 					context.removeFromEnvironment(Context.SECURITY_AUTHENTICATION);
 					context.removeFromEnvironment(Context.SECURITY_PRINCIPAL);
 					context.removeFromEnvironment(Context.SECURITY_CREDENTIALS);
-		
+                    context.removeFromEnvironment(JAVA_NAMING_SECURITY_SASL_REALM);
+
 					context.addToEnvironment(Context.SECURITY_AUTHENTICATION, authMethod);
-		
+
+                    if (useSASL) {
+                        // Request quality of protection
+                    	context.addToEnvironment(JAVAX_SECURITY_SASL_QOP, "auth-conf,auth-int,auth");
+                    }
+
 					context.addToEnvironment(Context.SECURITY_PRINCIPAL, bindPrincipal);
 					context.addToEnvironment(Context.SECURITY_CREDENTIALS, bindCredentials);
-		
-					context.reconnect(context.getConnectControls());
+                    context.reconnect( context.getConnectControls() );
 				}
 			}catch(NamingException e){
 				logger.error(String.format("Failed to bind against LDAP server at %s:%s", connection.getConnectionParamsProvider().getHost(), connection.getConnectionParamsProvider().getPort()), e);
@@ -485,11 +534,14 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper{
 	 * {@inheritDoc}
 	 */
 	@Override
-	public boolean entryExists(String entryName) {
+	public boolean entryExists(String entryName) throws LoginException{
 		try{
 			LDAPAttributeSet attributesForEntry = getAttributesForEntry(entryName, new String[]{LDAPServer.OBJECT_CLASS_ATTR_NAME});
 			return attributesForEntry != null && attributesForEntry.size() > 0;
 		}catch(UserManagementSystemCommunicationException e){
+			if (e.getCause() instanceof NoPermissionException){
+				throw new LoginException("Authentication failed! Can't check for entry existance. See log for details.");
+			}
 			logger.info(
 					String.format("Check for entry %s existence failed with exception which probably means that entry does not exist: %s", entryName, e.getMessage()));
 			return false;

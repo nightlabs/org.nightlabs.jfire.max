@@ -15,6 +15,7 @@ import javax.jdo.listener.InstanceLifecycleEvent;
 import javax.jdo.listener.StoreLifecycleListener;
 import javax.naming.Context;
 import javax.naming.InitialContext;
+import javax.naming.NameNotFoundException;
 import javax.naming.NamingException;
 import javax.naming.NoPermissionException;
 import javax.naming.event.EventContext;
@@ -24,6 +25,10 @@ import javax.naming.event.NamingExceptionEvent;
 import javax.naming.event.NamingListener;
 import javax.naming.event.ObjectChangeListener;
 import javax.naming.ldap.InitialLdapContext;
+import javax.naming.ldap.StartTlsRequest;
+import javax.naming.ldap.StartTlsResponse;
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLSession;
 import javax.script.ScriptException;
 import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
@@ -38,6 +43,8 @@ import org.nightlabs.jfire.base.AuthCallbackHandler;
 import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.security.integration.ldap.LDAPManagerLocal;
 import org.nightlabs.jfire.base.security.integration.ldap.LDAPServer;
+import org.nightlabs.jfire.base.security.integration.ldap.connection.DummySSLSocketFactory;
+import org.nightlabs.jfire.base.security.integration.ldap.connection.ILDAPConnectionParamsProvider.EncryptionMethod;
 import org.nightlabs.jfire.base.security.integration.ldap.connection.JNDIConnectionWrapper;
 import org.nightlabs.jfire.base.security.integration.ldap.sync.LDAPSyncEvent.FetchEventTypeDataUnit;
 import org.nightlabs.jfire.security.GlobalSecurityReflector;
@@ -659,41 +666,70 @@ public class PushNotificationsConfigurator {
 				}
 
 				Hashtable<String, String> environment = new Hashtable<String, String>();
+				environment.put(Context.INITIAL_CONTEXT_FACTORY, JNDIConnectionWrapper.getDefaultLdapContextFactory());
 				environment.put(JNDIConnectionWrapper.JAVA_NAMING_LDAP_VERSION, "3"); //$NON-NLS-1$
-				environment.put(JNDIConnectionWrapper.COM_SUN_JNDI_LDAP_CONNECT_TIMEOUT, "10000"); //$NON-NLS-1$
+		        // Don't use a timeout when using ldaps: JNDI throws a SocketException when setting a timeout on SSL connections.
+		        if (!EncryptionMethod.LDAPS.equals(ldapServer.getEncryptionMethod())){
+		        	environment.put(JNDIConnectionWrapper.COM_SUN_JNDI_LDAP_CONNECT_TIMEOUT, "10000"); //$NON-NLS-1$
+		        }
 				environment.put(JNDIConnectionWrapper.COM_SUN_JNDI_DNS_TIMEOUT_INITIAL, "2000"); //$NON-NLS-1$
 				environment.put(JNDIConnectionWrapper.COM_SUN_JNDI_DNS_TIMEOUT_RETRIES, "3"); //$NON-NLS-1$
-				environment.put(Context.PROVIDER_URL, JNDIConnectionWrapper.LDAP_SCHEME + ldapServer.getHost() + ':' + ldapServer.getPort());
-				environment.put(Context.INITIAL_CONTEXT_FACTORY, JNDIConnectionWrapper.getDefaultLdapContextFactory());
+		        if (EncryptionMethod.LDAPS.equals(ldapServer.getEncryptionMethod())) {
+		            environment.put(Context.PROVIDER_URL, JNDIConnectionWrapper.LDAPS_SCHEME + ldapServer.getHost() + ':' + ldapServer.getPort());
+		            environment.put(Context.SECURITY_PROTOCOL, "ssl"); //$NON-NLS-1$
+		            environment.put(JNDIConnectionWrapper.JAVA_NAMING_LDAP_FACTORY_SOCKET, DummySSLSocketFactory.class.getName());
+		        }else{
+					environment.put(Context.PROVIDER_URL, JNDIConnectionWrapper.LDAP_SCHEME + ldapServer.getHost() + ':' + ldapServer.getPort());
+		        }
 
 				if (logger.isDebugEnabled()){
 					logger.debug("Connecting to LDAP server with params: " + environment.toString());
 				}
 				
 				InitialLdapContext context = new InitialLdapContext(environment, null);
+                if (EncryptionMethod.START_TLS.equals(ldapServer.getEncryptionMethod())){
+                    try{
+                        StartTlsResponse tls = (StartTlsResponse) context.extendedOperation(new StartTlsRequest());
+                        tls.setHostnameVerifier(new HostnameVerifier(){
+                            public boolean verify(String hostname, SSLSession session){
+                                return true;
+                            }
+                        });
+                        tls.negotiate(DummySSLSocketFactory.getDefault());
+                    } catch (Exception e){
+                    	NamingException namingException = new NamingException(e.getMessage() != null ? e.getMessage() : "Error while establishing TLS session"); //$NON-NLS-1$
+                        namingException.setRootCause(e);
+                        throw namingException;
+                    }
+                }
 				
 				for (String parentEntry : parentEntriesForSync){
 					Object ctx = null;
 					
-					try{	// check if anonymous access to LDAP directory is enabled
-						ctx = context.lookup(parentEntry);
-					}catch(NoPermissionException e){	// specify bind login/password otherwise
-						
-						boolean successful = bindContextWithCurrentUser(context, ldapServer);
-						if (!successful){
-							logger.info("Unable to bind with current JFire user, will try global syncUser.");
-							if (ldapServer.getSyncDN() != null
-									&& ldapServer.getSyncPassword() != null){
-								bindContext(context, ldapServer.getAuthenticationMethod().stringValue(), ldapServer.getSyncDN(), ldapServer.getSyncPassword());
-							}else{
-								
-								logger.error("Unable to bind with global syncUser because it's not set. Push notifications listener will NOT be added.");
-								return;
-								
+					try{
+						try{	// check if anonymous access to LDAP directory is enabled
+							ctx = context.lookup(parentEntry);
+						}catch(NoPermissionException e){	// specify bind login/password otherwise
+							
+							boolean successful = bindContextWithCurrentUser(context, ldapServer);
+							if (!successful){
+								logger.info("Unable to bind with current JFire user, will try global syncUser.");
+								if (ldapServer.getSyncDN() != null
+										&& ldapServer.getSyncPassword() != null){
+									bindContext(context, ldapServer.getAuthenticationMethod().stringValue(), ldapServer.getSyncDN(), ldapServer.getSyncPassword());
+								}else{
+									
+									logger.error("Unable to bind with global syncUser because it's not set. Push notifications listener will NOT be added.");
+									return;
+									
+								}
 							}
+							ctx = context.lookup(parentEntry);
 						}
-
-						ctx = context.lookup(parentEntry);
+					}catch(NameNotFoundException e){
+						logger.error(
+								String.format("LDAP entry with name %s not found! Skipping addition of PushNotification Listener!", parentEntry));
+						continue;
 					}
 					
 					if (ctx instanceof EventContext){

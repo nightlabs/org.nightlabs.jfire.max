@@ -98,7 +98,7 @@ public class LDAPConnection{
     	return this.connectionWrapper.isConnected();
     }
     
-    public boolean entryExists(String entryName){
+    public boolean entryExists(String entryName) throws LoginException{
     	return this.connectionWrapper.entryExists(entryName);
     }
 

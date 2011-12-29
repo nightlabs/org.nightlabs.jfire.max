@@ -23,6 +23,7 @@ import javax.security.auth.login.LoginException;
 
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
+import org.nightlabs.jfire.base.security.integration.ldap.connection.ILDAPConnectionParamsProvider.AuthenticationMethod;
 import org.nightlabs.jfire.base.security.integration.ldap.connection.ILDAPConnectionParamsProvider.EncryptionMethod;
 import org.nightlabs.jfire.base.security.integration.ldap.id.LDAPScriptSetID;
 import org.nightlabs.jfire.base.security.integration.ldap.scripts.ILDAPScriptProvider;
@@ -357,6 +358,7 @@ public class LDAPManagerBean extends BaseSessionBeanImpl implements LDAPManagerR
 	private static final String PROP_LDAP_SERVER_TYPE_CLASS_NAME = "ldapServer%s.typeClassName";
 	private static final String PROP_LDAP_SERVER_IS_ACTIVE = "ldapServer%s.isActive";
 	private static final String PROP_LDAP_SERVER_ENCRYPTION_METHOD = "ldapServer%s.encryptionMethod";
+	private static final String PROP_LDAP_SERVER_AUTHENTICATION_METHOD = "ldapServer%s.authenticationMethod";
 	private static final String PROP_LDAP_SERVER_PORT = "ldapServer%s.port";
 	private static final String PROP_LDAP_SERVER_HOST = "ldapServer%s.host";
 	private static final String PROP_LDAP_SERVER_NAME = "ldapServer%s.name";
@@ -439,11 +441,18 @@ public class LDAPManagerBean extends BaseSessionBeanImpl implements LDAPManagerR
 					
 					EncryptionMethod encryptionMethod = null;
 					try{
-						encryptionMethod = EncryptionMethod.valueOf(EncryptionMethod.class, ldapProps.getProperty(String.format(PROP_LDAP_SERVER_ENCRYPTION_METHOD, i)));
+						encryptionMethod = EncryptionMethod.findEncryptionMethodByStringValue(ldapProps.getProperty(String.format(PROP_LDAP_SERVER_ENCRYPTION_METHOD, i)));
 					}catch(Exception e){
 						encryptionMethod = LDAPServer.LDAP_DEFAULT_ENCRYPTION_METHOD;
 					}
-					
+
+					AuthenticationMethod authMethod = null;
+					try{
+						authMethod = AuthenticationMethod.findAuthenticationMethodByStringValue(ldapProps.getProperty(String.format(PROP_LDAP_SERVER_AUTHENTICATION_METHOD, i)));
+					}catch(Exception e){
+						authMethod = LDAPServer.LDAP_DEFAULT_AUTHENTICATION_METHOD;
+					}
+
 					boolean isActive = false;
 					if (ldapProps.getProperty(String.format(PROP_LDAP_SERVER_IS_ACTIVE, i)) != null){
 						isActive = Boolean.parseBoolean(
@@ -471,7 +480,7 @@ public class LDAPManagerBean extends BaseSessionBeanImpl implements LDAPManagerR
 					LDAPServer server = null;
 
 					// check for existing LDAPServer instances with specified host, port and encryptionMethod
-					Collection<LDAPServer> servers = LDAPServer.findLDAPServers(pm, host, port, encryptionMethod);
+					Collection<LDAPServer> servers = LDAPServer.findLDAPServers(pm, host, port, encryptionMethod, authMethod);
 					if (!servers.isEmpty()){
 						server = servers.iterator().next();
 					}
@@ -493,6 +502,7 @@ public class LDAPManagerBean extends BaseSessionBeanImpl implements LDAPManagerR
 						server.setHost(host);
 						server.setPort(port);
 						server.setEncryptionMethod(encryptionMethod);
+						server.setAuthenticationMethod(authMethod);
 						server.setActive(isActive);
 						server.setSyncDN(syncDN);
 						server.setSyncPassword(syncPassword);

@@ -132,7 +132,7 @@ public class SecurityChangeListenerJFirePasswordChanged extends SecurityChangeLi
 					}
 
 					LDAPConnection preservedConnection = null;
-					if (AuthenticationMethod.SIMPLE.equals(ldapServer.getAuthenticationMethod())){
+					if (!AuthenticationMethod.NONE.equals(ldapServer.getAuthenticationMethod())){
 						// preserve LDAPConnection
 						preservedConnection = LDAPSyncInvocation.preserveConnection(pm, ldapServer);
 						if (preservedConnection == null){

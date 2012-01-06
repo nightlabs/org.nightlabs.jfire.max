@@ -4,7 +4,6 @@ import java.io.Serializable;
 
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
-import javax.script.ScriptException;
 import javax.security.auth.login.LoginException;
 
 import org.nightlabs.jfire.asyncinvoke.AsyncInvoke;
@@ -159,17 +158,8 @@ public class LDAPSyncInvocation extends Invocation{
 			}else{	// create fake, not persisted new User just to get LDAP entry DN
 				user = new User(userDescriptor.getOrganisationID(), userDescriptor.getUserID());
 			}
-			String bindDN = ldapServer.getLdapScriptSet().getLdapDN(user);
-			String bindPwd = LDAPServer.getLDAPPasswordForCurrentUser();
 
-			if (ldapServer.canBind(bindDN, bindPwd)){
-				connection.bind(bindDN, bindPwd);
-			}else{
-				logger.warn(
-						String.format("LDAPConnection could not be authenticated for DN %s. Either name or password is empty. No connection will be available inside sync invocation!", bindDN)
-						);
-				return null;
-			}
+			ldapServer.bindConnection(connection, user, LDAPServer.getLDAPPasswordForCurrentUser());
 			
 			LDAPConnectionManager.sharedInstance().preservePrivateLDAPConnection(ldapServer, connection);
 			
@@ -181,9 +171,6 @@ public class LDAPSyncInvocation extends Invocation{
 		} catch (LoginException e) {
 			exceptionOccured = true;
 			logger.error("LDAPConnection could not be authenticated! No connection will be available inside sync invocation!", e);
-		} catch (ScriptException e) {
-			exceptionOccured = true;
-			logger.error("Can't get userDN to bind the connection! No connection will be available inside sync invocation!", e);
 		} catch (Exception e){
 			exceptionOccured = true;
 			throw new RuntimeException(e);

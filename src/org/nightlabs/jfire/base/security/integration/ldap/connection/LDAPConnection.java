@@ -34,11 +34,25 @@ public class LDAPConnection{
         this.connectionWrapper = new JNDIConnectionWrapper(this);
     }
     
+    /**
+     * Set an implementation of {@link LDAPConnectionWrapper} which will handle actual connection-related staff.
+     * 
+     * @param connectionWrapper implementation of {@link LDAPConnectionWrapper}
+     */
     public void setConnectionWrapper(LDAPConnectionWrapper connectionWrapper) {
 		this.connectionWrapper = connectionWrapper;
-	}    
+	}
+    
+    /**
+     * Get current {@link LDAPConnectionWrapper} which performs all the connection-related staff for this {@link LDAPConnection}
+     * 
+     * @return implementation of {@link LDAPConnectionWrapper}
+     */
+    public LDAPConnectionWrapper getConnectionWrapper() {
+		return connectionWrapper;
+	}
 
-     /**
+    /**
      * Gets the connection parameter.
      * 
      * @return the connection parameter
@@ -49,6 +63,10 @@ public class LDAPConnection{
 
     public void connect() throws UserManagementSystemCommunicationException {
     	this.connectionWrapper.connect();
+    }
+    
+    public void disconnect(){
+    	this.connectionWrapper.disconnect();
     }
     
     public void bind(

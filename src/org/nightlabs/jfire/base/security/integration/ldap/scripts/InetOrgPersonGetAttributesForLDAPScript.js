@@ -82,3 +82,10 @@ function getUserIDFromLDAPEntry(attributes){
 	}
 	return null;
 }
+
+/**
+ * Get the name of SASL realm for given bind principal 
+ */
+function getSASLRealm(bindPrincipal){
+	return "";
+}

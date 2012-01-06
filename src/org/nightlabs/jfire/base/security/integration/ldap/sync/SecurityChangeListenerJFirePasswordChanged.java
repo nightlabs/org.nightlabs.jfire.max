@@ -115,12 +115,16 @@ public class SecurityChangeListenerJFirePasswordChanged extends SecurityChangeLi
 			logger.debug(String.format("Got %s LDAPServers, will try to sync password change on every LDAPServer which has corresponding entry", ldapServers.size()));
 		}
 		
-		// create password wrapper for calculating hashed password and transmitting it to LDAP
-		LDAPPasswordWrapper newPasswordWrapper = new LDAPPasswordWrapper(Util.HASH_ALGORITHM_SHA, event.getNewPassword());
-		
 		Throwable lastThrowable = null;
 		for (LDAPServer ldapServer : ldapServers){
 			try{
+				// create password wrapper for calculating hashed password and transmitting it to LDAP
+				String hashAlgorithm = Util.HASH_ALGORITHM_SHA;
+				if (AuthenticationMethod.SASL_CRAM_MD5.equals(ldapServer.getAuthenticationMethod())
+						|| AuthenticationMethod.SASL_DIGEST_MD5.equals(ldapServer.getAuthenticationMethod())){
+					hashAlgorithm = null; // CRAM_MD5 and DIGEST-MD5 support only plain text passwords
+				}
+				LDAPPasswordWrapper newPasswordWrapper = new LDAPPasswordWrapper(event.getNewPassword(), hashAlgorithm);
 				boolean passwordChanged = modifyPassword(ldapServer, user, newPasswordWrapper.toString());
 				if (!passwordChanged && !ldapServer.isLeading()){
 					// We assume that if entry does not exist yet in LDAP directory it could mean that new User is being created in JFire
@@ -178,7 +182,7 @@ public class SecurityChangeListenerJFirePasswordChanged extends SecurityChangeLi
 								"Trying to sync password to LDAPServer at %s:%s, object ID: %s@%s", ldapServer.getHost(), ldapServer.getPort(), ldapServer.getUserManagementSystemID(), ldapServer.getOrganisationID()));
 			}
 			
-			connection = ldapServer.createAndBindConnectionForSync();
+			connection = ldapServer.getConnectionForSync();
 
 			String entryDN = ldapServer.getLdapScriptSet().getLdapDN(user);
 			if (logger.isDebugEnabled()){

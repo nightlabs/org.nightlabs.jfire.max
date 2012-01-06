@@ -51,6 +51,12 @@ public interface LDAPConnectionWrapper{
      * @throws UserManagementSystemCommunicationException 
      */
     public void unbind() throws UserManagementSystemCommunicationException;
+    
+    
+	/**
+	 * Performs disconnection and releases all resources
+	 */
+    public void disconnect();
 
 
     /**

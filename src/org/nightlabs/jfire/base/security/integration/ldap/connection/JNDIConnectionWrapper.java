@@ -83,15 +83,16 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper{
 		attributeAliases.put("uid", "userid");
 	}
 
-	public static final String JAVA_NAMING_LDAP_VERSION = "java.naming.ldap.version"; //$NON-NLS-1$
-    public static final String JAVA_NAMING_LDAP_FACTORY_SOCKET = "java.naming.ldap.factory.socket"; //$NON-NLS-1$
-    public static final String JAVA_NAMING_SECURITY_SASL_REALM = "java.naming.security.sasl.realm"; //$NON-NLS-1$
-    public static final String JAVAX_SECURITY_SASL_QOP = "javax.security.sasl.qop"; //$NON-NLS-1$
-	public static final String COM_SUN_JNDI_DNS_TIMEOUT_RETRIES = "com.sun.jndi.dns.timeout.retries"; //$NON-NLS-1$
-	public static final String COM_SUN_JNDI_DNS_TIMEOUT_INITIAL = "com.sun.jndi.dns.timeout.initial"; //$NON-NLS-1$
-	public static final String COM_SUN_JNDI_LDAP_CONNECT_TIMEOUT = "com.sun.jndi.ldap.connect.timeout"; //$NON-NLS-1$
-	public static final String LDAP_SCHEME = "ldap://";
-	public static final String LDAPS_SCHEME = "ldaps://";
+	private static final String JAVA_NAMING_LDAP_VERSION = "java.naming.ldap.version"; //$NON-NLS-1$
+	private static final String JAVA_NAMING_LDAP_FACTORY_SOCKET = "java.naming.ldap.factory.socket"; //$NON-NLS-1$
+	private static final String JAVA_NAMING_SECURITY_SASL_REALM = "java.naming.security.sasl.realm"; //$NON-NLS-1$
+	private static final String JAVAX_SECURITY_SASL_QOP = "javax.security.sasl.qop"; //$NON-NLS-1$
+	private static final String COM_SUN_JNDI_DNS_TIMEOUT_RETRIES = "com.sun.jndi.dns.timeout.retries"; //$NON-NLS-1$
+	private static final String COM_SUN_JNDI_DNS_TIMEOUT_INITIAL = "com.sun.jndi.dns.timeout.initial"; //$NON-NLS-1$
+	private static final String COM_SUN_JNDI_LDAP_CONNECT_TIMEOUT = "com.sun.jndi.ldap.connect.timeout"; //$NON-NLS-1$
+	private static final String COM_SUN_JNDI_LDAP_CONNECT_POOL = "com.sun.jndi.ldap.connect.pool"; //$NON-NLS-1$
+	private static final String LDAP_SCHEME = "ldap://";
+	private static final String LDAPS_SCHEME = "ldaps://";
 
 	private LDAPConnection connection;
 
@@ -107,6 +108,15 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper{
 	 */
 	public JNDIConnectionWrapper(LDAPConnection connection) {
 		this.connection = connection;
+	}
+	
+	/**
+	 * Get underlying {@link InitialLdapContext}.
+	 * 
+	 * @return
+	 */
+	public InitialLdapContext getContext() {
+		return context;
 	}
 
 	/**
@@ -128,10 +138,11 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper{
 			synchronized (environment) {
 				environment.put(JAVA_NAMING_LDAP_VERSION, "3"); //$NON-NLS-1$
 				environment.put(Context.INITIAL_CONTEXT_FACTORY, getDefaultLdapContextFactory());
+				environment.put(COM_SUN_JNDI_LDAP_CONNECT_POOL, "false"); //$NON-NLS-1$
 				
 		        // Don't use a timeout when using ldaps: JNDI throws a SocketException when setting a timeout on SSL connections.
 		        if (!useLdaps){
-		        	environment.put(COM_SUN_JNDI_LDAP_CONNECT_TIMEOUT, "10000"); //$NON-NLS-1$
+		        	environment.put(COM_SUN_JNDI_LDAP_CONNECT_TIMEOUT, "30000"); //$NON-NLS-1$
 		        }
 				environment.put(COM_SUN_JNDI_DNS_TIMEOUT_INITIAL, "2000"); //$NON-NLS-1$
 				environment.put(COM_SUN_JNDI_DNS_TIMEOUT_RETRIES, "3"); //$NON-NLS-1$
@@ -223,6 +234,12 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper{
                     if (useSASL) {
                         // Request quality of protection
                     	context.addToEnvironment(JAVAX_SECURITY_SASL_QOP, "auth-conf,auth-int,auth");
+                    	if (AuthenticationMethod.SASL_DIGEST_MD5.equals(authMethod)){
+                    		String saslRealm = connection.getConnectionParamsProvider().getSASLRealm(bindPrincipal);
+                    		if (saslRealm != null && !saslRealm.isEmpty()){
+                    			context.addToEnvironment(JAVA_NAMING_SECURITY_SASL_REALM, saslRealm);
+                    		}
+                    	}
                     }
 
 					context.addToEnvironment(Context.SECURITY_PRINCIPAL, bindPrincipal);
@@ -549,9 +566,10 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper{
 	}
 
 	/**
-	 * Performs disconnection and releases all resources
+	 * {@inheritDoc}
 	 */
-	private void disconnect() {
+	@Override
+	public void disconnect() {
 		if (context != null) {
 			try {
 				context.close();

@@ -341,7 +341,7 @@ public class LDAPScriptSet implements Serializable{
 	}
 	
 	/**
-	 * Executes script for getting the name of attribute which holfd user password in LDAP. 
+	 * Executes script for getting the name of attribute which holds user password in LDAP. 
 	 * 
 	 * @return attribute name as {@link String} or <code>null</code> if script did not return any
 	 * @throws ScriptException
@@ -387,7 +387,26 @@ public class LDAPScriptSet implements Serializable{
 			return UserID.create(getOrganisationID(), (String) result);
 		}
 	}
-	
+
+	/**
+	 * Executes script for getting the SASL realm. 
+	 * 
+	 * @param jfireObject 
+	 * @return SASL realm as {@link String} or <code>null</code> if script did not return anything
+	 * @throws ScriptException
+	 * @throws NoSuchMethodException 
+	 */
+	public String getSASLRealm(String bindPrincipal) throws ScriptException, NoSuchMethodException{
+        ScriptEngine engine = getScriptEngine();
+		engine.eval(generateJFireToLdapAttributesScript);
+		Invocable invocable = (Invocable) engine;
+		Object result = invocable.invokeFunction("getSASLRealm", bindPrincipal);
+		if (result instanceof String){
+			return (String) result;
+		}
+		return null;
+	}
+
 	private ScriptEngine getScriptEngine(){
         ScriptEngineManager manager = new ScriptEngineManager();
         return manager.getEngineByName("JavaScript");

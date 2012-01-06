@@ -51,7 +51,7 @@ public class LDAPPasswordWrapper{
             } else {
             	throw new IllegalArgumentException(
             			String.format(
-            					"Unsupported hash method specifed! Supported methods: %s. Given method: %s", 
+            					"Unsupported hash method specifed! Supported methods: %s and Plaintext(null). Given method: %s", 
             					Util.HASH_ALGORITHM_SHA + ", " + Util.HASH_ALGORITHM_MD5, hashMethod));
             }
         } else {	// plain text password given
@@ -64,20 +64,20 @@ public class LDAPPasswordWrapper{
     /**
      * Creates a new instance of Password and calculates the hashed password.
      *
-     * @param hashMethod the hash method to use, could be <code>null</code> if no hash is needed - password is stored as plain text
      * @param passwordAsPlaintext the plain text password
+     * @param hashMethod the hash method to use, could be <code>null</code> if no hash is needed - password is stored as plain text
      * 
      * @throws IllegalArgumentException if the given hash method is not
      *         supported of if the given password is null
      */
-    public LDAPPasswordWrapper(String hashMethod, String passwordAsPlaintext) {
+    public LDAPPasswordWrapper(String passwordAsPlaintext, String hashMethod) {
         if (!(hashMethod == null 
         		|| Util.HASH_ALGORITHM_SHA.equalsIgnoreCase(hashMethod) 
         		|| Util.HASH_ALGORITHM_MD5.equalsIgnoreCase(hashMethod))) {
             
         	throw new IllegalArgumentException(
         			String.format(
-        					"Unsupported hash method specifed! Supported methods: %s. Given method: %s", 
+        					"Unsupported hash method specifed! Supported methods: %s and Plaintext(null). Given method: %s", 
         					Util.HASH_ALGORITHM_SHA + ", " + Util.HASH_ALGORITHM_MD5, hashMethod));
         }
         

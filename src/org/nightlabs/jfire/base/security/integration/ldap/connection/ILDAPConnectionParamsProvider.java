@@ -20,7 +20,7 @@ public interface ILDAPConnectionParamsProvider{
         /** Simple authentication, simple bind. */
         SIMPLE("simple"),
 
-        /** SASL authentication using DIGEST-MD5. */
+        /** SASL authentication using DIGEST-MD5. Realm should be specified via {@link ILDAPConnectionParamsProvider#getSASLRealm()} */
         SASL_DIGEST_MD5("DIGEST-MD5"),
 
         /** SASL authentication using CRAM-MD5. */
@@ -130,6 +130,15 @@ public interface ILDAPConnectionParamsProvider{
      * @return the auth method
      */
     public AuthenticationMethod getAuthenticationMethod();
+    
+    /**
+     * Get realm for SASL authentication methods (i.e. for {@link AuthenticationMethod#SASL_DIGEST_MD5})
+     * by given bind pricipal name.
+     * 
+     * @param bindPrincipal Name of principal (LDAP entry) which will bind against LDAP server
+     * @return realm as a {@link String}
+     */
+    public String getSASLRealm(String bindPrincipal);
 
     /**
      * Gets the encryption method.

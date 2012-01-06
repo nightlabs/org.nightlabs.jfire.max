@@ -126,6 +126,7 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 	public static final String OBJECT_CLASS_ATTR_NAME = "objectClass";
 	public static final String GROUP_OF_NAMES_ATTR_VALUE = "groupOfNames";
 	public static final String GROUP_OF_UNIQUE_NAMES_ATTR_VALUE = "groupOfUniqueNames";
+	
 	private static final String COMMON_NAME_ATTR_NAME = "commonName";
 	private static final String UNIQUE_MEMBER_ATTR_NAME = "uniqueMember";
 	private static final String MEMBER_ATTR_NAME = "member";
@@ -156,14 +157,6 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 				);
 		@SuppressWarnings("unchecked")
 		List<LDAPServer> foundServers = (List<LDAPServer>) q.executeWithArray(host, port, encryptionMethod, authMethod);
-		
-		// We copy them into a new ArrayList in order to be able to already close the query (save resources).
-		// That would only be a bad idea, if we had really a lot of them and we would not need to iterate all afterwards.
-		// But as we need to iterate most of them anyway, we can fetch the whole result set already here.
-		// Note that this has only a positive effect in long-running transactions (because the query will be closed at the end of the
-		// transaction, anyway). However, it has no negative effect besides the one already mentioned and we don't know in
-		// which contexts this method might be used => better close the query quickly.
-		// Marco.
 		foundServers = new ArrayList<LDAPServer>(foundServers);
 		q.closeAll();
 		return foundServers;
@@ -243,7 +236,7 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 	
 	/**
 	 * This field is used internally for temporary keeping bind credentials to be used later on
-	 * inside {@link #bindForSynchronization(LDAPConnection)}. They will be set to <code>null</code>
+	 * inside {@link #bindConnectionForSync(LDAPConnection)}. They will be set to <code>null</code>
 	 * immideately after the first use.
 	 */
 	@Persistent(persistenceModifier=PersistenceModifier.NONE)
@@ -251,7 +244,7 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 
 	/**
 	 * This field is used internally for temporary keeping bind credentials to be used later on
-	 * inside {@link #bindForSynchronization(LDAPConnection)}. They will be set to <code>null</code>
+	 * inside {@link #bindConnectionForSync(LDAPConnection)}. They will be set to <code>null</code>
 	 * immideately after the first use.
 	 */
 	@Persistent(persistenceModifier=PersistenceModifier.NONE)
@@ -297,7 +290,8 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 	 */
 	@Override
 	public Session login(LoginData loginData) throws LoginException, UserManagementSystemCommunicationException{
-		if (!canBind(loginData.getUserID(), loginData.getPassword())){
+		if (AuthenticationMethod.NONE.equals(authenticationMethod) 
+				|| !canBind(loginData.getUserID(), loginData.getPassword())){
 			return null;
 		}
 
@@ -310,29 +304,10 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 			connection = createConnection(this);
     		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
 
-    		// getting LDAP DN for the loggin in user
     		User user = getUserById(pm, loginDataOrganisationID, loginDataUserID);
-    		String userDN = null;
-    		if (user != null){
-    			userDN = getLDAPUserDN(user);
-    			
-    			if (logger.isDebugEnabled()){
-		        	logger.debug(
-		        			String.format("User %s@%s found in JFire, result DN is %s", loginDataUserID, loginDataOrganisationID, userDN));
-		        }
-    		}else if (user == null && shouldFetchUserData()){
-    			if (logger.isDebugEnabled()){
-		        	logger.debug(
-		        			String.format("User %s@%s was not found JFire, will fetch it from LDAP", loginDataUserID, loginDataOrganisationID));
-		        }
-        		
-    			// create new fake user to get userDN
-		        userDN = getLDAPUserDN(new User(loginData.getOrganisationID(), loginData.getUserID()));
-		        
-        	}else if (user == null && !isLeading()){
+    		if (user == null && !shouldFetchUserData()){
         		// if there's no such user in JFire and if it's not supposed to fetch it from LDAP
         		// and if JFire is a leading system than login will fail
-        		
         		throw new LoginException(
         				String.format(
         						"Can't proceed with login! There's no user in JFire with specified userID %s and JFire being a leading system is NOT configured to fetch it from LDAP. Either use LDAP as leading system or add a %s=true system property.", 
@@ -340,20 +315,11 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
         						));        		
         	}
         	
-        	if (userDN == null){
-        		ILDAPConnectionParamsProvider params = connection.getConnectionParamsProvider();
-        		throw new LoginException(
-        				String.format(
-        						"Can't bind against LDAPServer at %s because userDN is null for loginData %s@%s!",
-        						params.getHost(), loginDataUserID, loginDataOrganisationID
-        						)
-        				);
+        	User userToBind = user;
+        	if (userToBind == null){
+        		userToBind = new User(loginData.getOrganisationID(), loginData.getUserID());
         	}
-        	
-	        connection.bind(
-					userDN,
-					loginData.getPassword()
-					);
+        	String succededLoginID = bindConnection(connection, userToBind, loginData.getPassword());
 
 			// if no exception was thrown during bind operation we assume that login was successful
 			session = new Session(loginData);
@@ -367,17 +333,26 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
    			        	logger.debug(
    			        			String.format("User %s@%s was not found JFire, start fetching it from LDAP", loginDataUserID, loginDataOrganisationID));
    			        }
-   	    			
-   					LDAPSyncEvent syncEvent = new LDAPSyncEvent(SyncEventGenericType.FETCH_USER);
-   					syncEvent.setFetchEventTypeDataUnits(
-   							CollectionUtil.createHashSet(
-   									new FetchEventTypeDataUnit(userDN)));
+   	    			// create new fake user to get userDN
+   					user = new User(loginData.getOrganisationID(), loginData.getUserID());
+   			        String userDN = getLDAPUserDN(user);
+   			        if (userDN != null && !userDN.isEmpty()){
+   			        	
+   	   					LDAPSyncEvent syncEvent = new LDAPSyncEvent(SyncEventGenericType.FETCH_USER);
+   	   					syncEvent.setFetchEventTypeDataUnits(
+   	   							CollectionUtil.createHashSet(
+   	   									new FetchEventTypeDataUnit(userDN)));
 
-   					// temporary keeping bind credentials here, because in seems the only way to obtain them later on in this use case
-   					this.tempBindDN = userDN;
-   					this.tempBindPassword = loginData.getPassword();
-   					
-					synchronize(syncEvent);
+   	   					// temporary keeping bind credentials here, because in seems the only way to obtain them later on in this use case
+   						this.tempBindDN = succededLoginID;
+   	   					this.tempBindPassword = loginData.getPassword();
+   	   					
+   						synchronize(syncEvent);
+   						
+   			        }else{
+   			        	logger.warn(
+   			        			String.format("Unable to get LDAP user DN for User %s. User will not be fetched into JFire.", user.getCompleteUserID()));
+   			        }
 				} catch (UserManagementSystemSyncException e) {
 					logger.error(
 							String.format("Exception while fetching user %s@%s from LDAP", loginDataUserID, loginDataOrganisationID), e);
@@ -402,10 +377,14 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 	}
 	
 	/**
-	 * Set server host
+	 * Set server host. Default host ({@link #LDAP_DEFAULT_HOST}) will be used if value given is <code>null</code> or empty {@link String}.
+	 * 
 	 * @param host
 	 */
 	public void setHost(String host) {
+		if (host == null || host.isEmpty()){
+			host = LDAP_DEFAULT_HOST;
+		}
 		this.host = host;
 	}
 
@@ -418,10 +397,14 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 	}
 	
 	/**
-	 * Set server port
+	 * Set server port. Default port ({@link #LDAP_DEFAULT_PORT}) will be used if value given is below zero.
+	 * 
 	 * @param port
 	 */
 	public void setPort(int port) {
+		if (port < 0){
+			port = LDAP_DEFAULT_PORT;
+		}
 		this.port = port;
 	}
 
@@ -434,8 +417,9 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 	}
 	
 	/**
-	 * Set server encryption method
-	 * @param encryptionMethod, if <code>null</code> is given than the default value will be set
+	 * Set server encryption method. Default {@link EncryptionMethod} ({@link #LDAP_DEFAULT_ENCRYPTION_METHOD}) will be used if value given is <code>null</code>.
+	 * 
+	 * @param encryptionMethod
 	 */
 	public void setEncryptionMethod(EncryptionMethod encryptionMethod) {
 		if (encryptionMethod == null){
@@ -453,7 +437,7 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 	}
 	
 	/**
-	 * Set Authentication method for this LDAPServer.
+	 * Set server authentication method. Default {@link AuthenticationMethod} ({@link #LDAP_DEFAULT_AUTHENTICATION_METHOD}) will be used if value given is <code>null</code>.
 	 * 
 	 * @param authenticationMethod
 	 */
@@ -475,6 +459,7 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 	
 	/**
 	 * Set password used for synchronization
+	 * 
 	 * @param syncPassword
 	 */
 	public void setSyncPassword(String syncPassword) {
@@ -500,9 +485,9 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 	}
 	
 	/**
-	 * Set LDAPScriptSet to this LDAP Server
+	 * Set {@link LDAPScriptSet} to this LDAP Server
 	 * 
-	 * @param ldapScriptSet can't be null 
+	 * @param ldapScriptSet can't be <code>null</code> 
 	 */
 	public void setLdapScriptSet(LDAPScriptSet ldapScriptSet) {
 		if (ldapScriptSet == null){
@@ -512,8 +497,9 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 	}
 	
 	/**
+	 * Get {@link LDAPScriptSet} 
 	 * 
-	 * @return LDAPSCriptSet of this LDAPServer
+	 * @return {@link LDAPScriptSet} of this {@link LDAPServer}
 	 */
 	public LDAPScriptSet getLdapScriptSet() {
 		return ldapScriptSet;
@@ -529,9 +515,26 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 	}
 	
 	/**
-	 * Set {@link #attributeSyncPolicy} to this LDAPServer
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String getSASLRealm(String bindPrincipal) {
+		String saslRealm = null;
+		try {
+			saslRealm = ldapScriptSet.getSASLRealm(bindPrincipal);
+		} catch (ScriptException e) {
+			logger.error(e.getMessage(), e);
+		} catch (NoSuchMethodException e) {
+			logger.error(e.getMessage(), e);
+		}
+		return saslRealm;
+	}
+	
+	/**
+	 * Set {@link #attributeSyncPolicy} to this LDAPServer. 
+	 * Default {@link LDAPAttributeSyncPolicy} ({@link #LDAP_DEFAULT_ATTRIBUTE_SYNC_POLICY}) will be used if value given is <code>null</code>.
 	 * 
-	 * @param attributeSyncPolicy value to set, if <code>null</code> is given than the default value will be set
+	 * @param attributeSyncPolicy
 	 */
 	public void setAttributeSyncPolicy(LDAPAttributeSyncPolicy attributeSyncPolicy) {
 		if (attributeSyncPolicy == null){
@@ -556,80 +559,117 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 		ldapScriptSet.setGenerateParentLdapEntriesScript(
 				ldapScriptSet.getGenerateParentLdapEntriesScript().replaceAll(propName, entryName));
 	}
-	
 
-	private User getUserById(PersistenceManager pm, String organisationId, String userId){
-		if (pm == null){
-			logger.error(
-					String.format("Can't load for user %s@%s because PersistenceManager is null!", userId, organisationId)
-					);
-			return null;
-		}
-		try{
-			return User.getUser(pm, organisationId, userId);
-		}catch(JDOObjectNotFoundException e){
-			// there's no such User in JFire
-			if (logger.isDebugEnabled()){
-				logger.debug(
-						String.format("User not found: %s@%s", userId, organisationId)
-						);
-			}
-		}
-		return null;
-	}
-	
 	/**
-	 * Gets LDAP DN for given object usign {@link LDAPScripSet} of this LDAPServer instance
-	 * @param jfireObject
-	 * @return
+	 * Convinient method which either creates and binds or gets an existent private authenticated {@link LDAPConnection} 
+	 * When non-private and non-authenticated {@link LDAPConnection} from {@link LDAPConnectionManager} pool
+	 * is recieved first it tries to bind it using currently logged in {@link User} credentials. If that fails
+	 * it tries to bind using {@link #syncDN} and {@link #syncPassword} fields of this {@link LDAPServer} if they are set.
+	 * If non of that succeeds it just logs a warning that all further requests to LDAP directory will be 
+	 * anonymous so it's up to LDAP directory itself whether it allows anonymous access or throws some kind
+	 * of authentication exception (which of course will be propagated to JFire).
+	 * 
+	 * @return either private (autheticated) {@link LDAPConnection} or a new authenticated {@link LDAPConnection}
 	 * @throws LoginException
+	 * @throws UserManagementSystemCommunicationException
 	 */
-	private String getLDAPUserDN(Object jfireObject) throws LoginException{
-		try {
-			return ldapScriptSet.getLdapDN(jfireObject);
-		} catch (ScriptException e) {
-			logger.error("Exception executing LDAPScript", e);
-			throw new LoginException("Exception in LDAPScriptSet, see log for details.");
+	public LDAPConnection getConnectionForSync() throws UserManagementSystemCommunicationException, LoginException{
+		LDAPConnection connection = null;
+		try{	// try to get already authenticated connection for a current User
+			logger.info("Getting already authenticated (binded) LDAPConnection for synchronization.");
+			connection = LDAPConnectionManager.sharedInstance().getPrivateLDAPConnection(this);
+		}catch(NoUserException e){
+			logger.info("Failed getting authenticated LDAPConnection for synchronization, new connection from pool will be used.");
 		}
-	}
-	
-	private static LDAPConnection createConnection(ILDAPConnectionParamsProvider paramsProvider) throws UserManagementSystemCommunicationException{
-		LDAPConnection connection = LDAPConnectionManager.sharedInstance().getConnection(paramsProvider);
-    	if (logger.isDebugEnabled()){
-    		logger.debug(
-    				String.format("LDAPConnection recieved. LDAPServer at %s:%s  Encryption: %s  Auth method: %s",
-    								paramsProvider.getHost(), paramsProvider.getPort(), 
-    								paramsProvider.getEncryptionMethod().stringValue(),
-    								paramsProvider.getAuthenticationMethod().stringValue()));
-    	}
+		
+		if (connection != null){
+			if (logger.isDebugEnabled()){
+	    		logger.debug(
+	    				String.format("Private (authenticated) LDAPConnection recieved. LDAPServer at %s:%s  Encryption: %s  Auth method: %s",
+	    								getHost(), getPort(),
+	    								getEncryptionMethod().stringValue(),
+	    								getAuthenticationMethod().stringValue()));
+	    	}
+		}else{
+			connection = createConnection(this);
+			bindConnectionForSync(connection);
+		}
     	return connection;
 	}
 
-	private void unbindAndReleaseConnection(LDAPConnection connection) throws UserManagementSystemCommunicationException{
-		if (connection == null){
-			return;
-		}
-		
-    	if (logger.isDebugEnabled()){
-    		ILDAPConnectionParamsProvider params = connection.getConnectionParamsProvider();
-    		logger.debug(
-    				String.format("Unbinding and releasing connection for LDAP server at %s:%s  Encryption: %s  Auth method: %s",
-    								params.getHost(), params.getPort(),
-    								params.getEncryptionMethod().stringValue(),
-    								params.getAuthenticationMethod().stringValue()));
+	/**
+	 * Binds given {@link LDAPConnection} with given {@link User}'s credentials.
+	 * 
+	 * @param connection {@link LDAPConnection} to bind
+	 * @param user {@link User} to bind with
+	 * @param password Password to bind with
+	 * @return actual username which was successfully binded agains this {@link LDAPServer}
+	 * @throws LoginException
+	 * @throws UserManagementSystemCommunicationException
+	 */
+	public String bindConnection(LDAPConnection connection, User user, String password) throws LoginException, UserManagementSystemCommunicationException{
+    	if (AuthenticationMethod.SIMPLE.equals(authenticationMethod)){
+	        String userDN = getLDAPUserDN(user);
+        	if (userDN == null){
+        		ILDAPConnectionParamsProvider params = connection.getConnectionParamsProvider();
+        		throw new LoginException(
+        				String.format(
+        						"Can't bind against LDAPServer at %s because userDN is null for loginData %s!",
+        						params.getHost(), user.getCompleteUserID()
+        						)
+        				);
+        	}
+	        if (logger.isDebugEnabled()){
+	        	logger.debug("Authentication method is SIMPLE, binding with username: " + userDN);
+	        }
+	        if (canBind(userDN, password)){
+		        connection.bind(userDN, password);
+		        return userDN;
+	        }
+    	}else if (AuthenticationMethod.SASL_CRAM_MD5.equals(authenticationMethod)
+    			|| AuthenticationMethod.SASL_DIGEST_MD5.equals(authenticationMethod)){
+    		
+    		// CRAM-MD5 and DIGEST-MD5 authentication methods look for user under configured parent entry
+    		// (which is specified in LDAP config file, i.e. server.xml) and check for 'uid'
+    		// attribute value to be equal to given login data. In JFire-LDAP interaction we use
+    		// this attribute value to store not only simple userID but also a complete userID@organisationID
+    		// (when JFire is a leading system). That's why we need to bind twice: first with simple userID
+    		// and, if it fails, secondary with complete userID@organisationID (which one goes first depends
+    		// on who is the leading system - this makes it possible to reduce the number of unsuccessful 
+    		// authentications and thus save some performance time and not pollute server log with error messages).
+    		
+    		String firstTryUsername = null;
+    		String secondTryUsername = null;
+    		if (isLeading()){
+    			firstTryUsername = user.getUserID();
+    			secondTryUsername = user.getCompleteUserID();
+    		}else{
+    			firstTryUsername = user.getCompleteUserID();
+    			secondTryUsername = user.getUserID();
+    		}
+    		
+			if (logger.isDebugEnabled()){
+	        	logger.debug("Authentication method is CRAM-MD5, try binding with user ID: " + firstTryUsername);
+	        }
+	        try {
+	        	if (canBind(firstTryUsername, password)) {
+			        connection.bind(firstTryUsername, password);
+			        return firstTryUsername;
+				}
+	        }catch(LoginException e){
+
+	        	if (logger.isDebugEnabled()){
+					logger.debug(
+    	        			"Login for CRAM-MD5 authentication failed, will try to bind with complete user ID: " + secondTryUsername);
+    	        }
+				
+		        connection.bind(secondTryUsername, password);
+		        return secondTryUsername;
+	        }
     	}
-		
-    	try{
-    		connection.unbind();
-    	}finally{
-    		LDAPConnectionManager.sharedInstance().releaseConnection(connection);
-    	}
-    	
-		if (logger.isDebugEnabled()){
-    		logger.debug("Connection released");
-    	}
+    	return null;
 	}
-	
+
 	/**
 	 * Checks whether we can bind against {@link LDAPServer} using provided username and password.
 	 * 
@@ -644,7 +684,7 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 		
 		if (!AuthenticationMethod.NONE.equals(getAuthenticationMethod())
 				&& (password == null || "".equals(password))){
-			// For every auth method except NONE LDAP doesn't support authentication without password.
+			// For every supported auth method except NONE LDAP doesn't support authentication without password.
 			// If password is not provided than it's supposed by LDAP that access is anonymous.
 			// So we just log the warning here and silently return, because otherwise log will be 
 			// polluted with LoginExceptions. When JFire client starts - it already tries to log in
@@ -654,7 +694,30 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 		}
 		return true;
 	}
+
+	/**
+	 * Get credential of current logged in {@link User} from a {@link ISecurityReflector}
+	 * and checks whether it is a {@link String} or a char array so it could be used for 
+	 * binding against LDAP directory. Logs a warning if credential is neither String nor char[].
+	 * 
+	 * @return password as a {@link String} or <code>null</code> if password is not a {@link String} or char[]
+	 * @throws NoUserException If no {@link User} is logged in
+	 */
+	public static String getLDAPPasswordForCurrentUser() throws NoUserException{
+		Object credential = GlobalSecurityReflector.sharedInstance().getCredential();
+		String pwd = null;
+		if (credential instanceof String){
+			pwd = (String) credential;
+		}else if (credential instanceof char[]){
+			pwd = new String((char[])credential);
+		}else{
+			logger.warn(
+					"User credential type is neither String nor char[], can't use it for binding against LDAP. UserID: " +  GlobalSecurityReflector.sharedInstance().getUserDescriptor().getCompleteUserID());
+		}
+		return pwd;
+	}
 	
+
 	/***********************************
 	 * Synchronization section START *
 	 ***********************************/
@@ -691,71 +754,6 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 	}
 
 	/**
-	 * Convinient method which either creates and binds or gets a private authenticated {@link LDAPConnection} 
-	 * before data synchronization to LDAP. When non-private {@link LDAPConnection} from {@link LDAPConnectionManager} pool
-	 * is recieved first it tries to bind it using currently logged in {@link User} credentials. If that fails
-	 * it tries to bind using {@link #syncDN} and {@link #syncPassword} fields if they are set.
-	 * If non of that succeeds it just logs a warning that all further requests to LDAP directory will be 
-	 * anonymous so it's up to LDAP directory itself whether it allows anonymous access or throws some kind
-	 * of authentication exception (which of course will be propagated to JFire).
-	 * 
-	 * @throws LoginException
-	 * @throws UserManagementSystemCommunicationException
-	 */
-	public LDAPConnection createAndBindConnectionForSync() throws UserManagementSystemCommunicationException, LoginException{
-		LDAPConnection connection = null;
-		try{	// try to get already authenticated connection for a current User
-			logger.info("Getting already authenticated (binded) LDAPConnection for synchronization.");
-			connection = LDAPConnectionManager.sharedInstance().getPrivateLDAPConnection(this);
-		}catch(NoUserException e){
-			logger.info("Failed getting authenticated LDAPConnection for synchronization, new connection from pool will be used.");
-		}
-		
-		if (connection != null){
-			if (logger.isDebugEnabled()){
-	    		logger.debug(
-	    				String.format("Private (authenticated) LDAPConnection recieved. LDAPServer at %s:%s  Encryption: %s  Auth method: %s",
-	    								getHost(), getPort(),
-	    								getEncryptionMethod().stringValue(),
-	    								getAuthenticationMethod().stringValue()));
-	    	}
-		}else{
-			connection = LDAPConnectionManager.sharedInstance().getConnection(this);
-	    	if (logger.isDebugEnabled()){
-	    		logger.debug(
-	    				String.format("LDAPConnection recieved. LDAPServer at %s:%s  Encryption: %s  Auth method: %s",
-	    								getHost(), getPort(),
-	    								getEncryptionMethod().stringValue(),
-	    								getAuthenticationMethod().stringValue()));
-	    	}
-			bindForSynchronization(connection);
-		}
-    	return connection;
-	}
-
-	/**
-	 * Get credential of current logged in {@link User} from a {@link ISecurityReflector}
-	 * and checks whether it is a {@link String} or a char array so it could be used for 
-	 * binding against LDAP directory. Logs a warning if credential is neither String nor char[].
-	 * 
-	 * @return password as a {@link String} or <code>null</code> if password is not a {@link String} or char[]
-	 * @throws NoUserException If no {@link User} is logged in
-	 */
-	public static String getLDAPPasswordForCurrentUser() throws NoUserException{
-		Object credential = GlobalSecurityReflector.sharedInstance().getCredential();
-		String pwd = null;
-		if (credential instanceof String){
-			pwd = (String) credential;
-		}else if (credential instanceof char[]){
-			pwd = new String((char[])credential);
-		}else{
-			logger.warn(
-					"User credential type is neither String nor char[], can't use it for binding against LDAP. UserID: " +  GlobalSecurityReflector.sharedInstance().getUserDescriptor().getCompleteUserID());
-		}
-		return pwd;
-	}
-	
-	/**
 	 * Retrieves all entries' names from LDAP which should be synchronized with JFire objects.
 	 * 
 	 * @return all LDAP entries which should be synchronized into JFire
@@ -767,7 +765,7 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 		LDAPConnection connection = null;
 		Collection<String> entriesForSync = new ArrayList<String>();
 		try{
-			connection = createAndBindConnectionForSync();
+			connection = getConnectionForSync();
 			
 			Collection<String> parentEntriesNames = new ArrayList<String>();
 			try {
@@ -789,7 +787,8 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 		return entriesForSync;
 	}
 
-	private void bindForSynchronization(LDAPConnection connection) throws LoginException, UserManagementSystemCommunicationException{
+	
+	private void bindConnectionForSync(LDAPConnection connection) throws LoginException, UserManagementSystemCommunicationException{
 		if (canBind(this.tempBindDN, this.tempBindPassword)){
 			String syncDN = this.tempBindDN;
 			String syncPwd = this.tempBindPassword;
@@ -819,24 +818,14 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 						user = new User(userDescriptor.getOrganisationID(), userDescriptor.getUserID());
 					}
 					
-					String bindDN = getLDAPUserDN(user);
-					String bindPwd = getLDAPPasswordForCurrentUser();
-					
-					if (canBind(bindDN, bindPwd)){
-						// TODO: check if this user has enough permissions to read/modify LDAP entries, see issue 1971 (enhancement)
-						try{
-							connection.bind(bindDN, bindPwd);
-						}catch(LoginException e){
-							// if we can't log in with current User credentials, we fall to global syncDN/syncPassword
-							logger.warn(
-									String.format(
-											"Can't bind with current User credentials, bind entry name: %s. LoginException occured.", bindDN), e);
-							fallToGlobalSyncCredentials = true;
-						}
-					}else{
-						logger.info(
+					try{
+						// TODO: check user LDAP permissions?
+						bindConnection(connection, user, getLDAPPasswordForCurrentUser());
+					}catch(LoginException e){
+						// if we can't log in with current User credentials, we fall to global syncDN/syncPassword
+						logger.warn(
 								String.format(
-										"Unable to bind against LDAP with current user (userID=%s) credentials, will try to bind with global syncDN/syncPassword if set.", userDescriptor.getCompleteUserID()));
+										"Can't bind with current User credentials, user ID is %s. LoginException occured.", user.getCompleteUserID()), e);
 						fallToGlobalSyncCredentials = true;
 					}
 				}
@@ -883,7 +872,7 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 			public void run() throws LoginException, UserManagementSystemCommunicationException, UserManagementSystemSyncException {
 				LDAPConnection connection = null;
 				try{
-					connection = createAndBindConnectionForSync();
+					connection = getConnectionForSync();
 					
 					// disable JDO lifecycle listener used for JFire2LDAP synchronization
 					SyncLifecycleListener.setEnabled(false);
@@ -1019,7 +1008,7 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 		
 		LDAPConnection connection = null;
 		try{
-			connection = createAndBindConnectionForSync();
+			connection = getConnectionForSync();
 			Throwable lastSyncThrowable = null;
 			PersistenceManager pm = JDOHelper.getPersistenceManager(this);
 			for (SendEventTypeDataUnit dataUnit : ldapSyncEvent.getSendEventTypeDataUnits()){
@@ -1130,7 +1119,7 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 			public void run() throws LoginException, UserManagementSystemCommunicationException, UserManagementSystemSyncException{
 				LDAPConnection connection = null;
 				try{
-					connection = createAndBindConnectionForSync();
+					connection = getConnectionForSync();
 					
 					// disable JDO lifecycle listeners used for JFire2LDAP synchronization
 					SyncLifecycleListener.setEnabled(false);
@@ -1300,7 +1289,7 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 	private void updateLDAPAuthorizationData(LDAPSyncEvent ldapSyncEvent) throws LoginException, UserManagementSystemCommunicationException, UserManagementSystemSyncException{
 		LDAPConnection connection = null;
 		try{
-			connection = createAndBindConnectionForSync();
+			connection = getConnectionForSync();
 			PersistenceManager pm = JDOHelper.getPersistenceManager(this);
 
 			// disallowing changing UserSecurityGroups members
@@ -1649,5 +1638,71 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 	/***********************************
 	 * Synchronization section END *
 	 ***********************************/
+
+	private User getUserById(PersistenceManager pm, String organisationId, String userId){
+		if (pm == null){
+			logger.error(
+					String.format("Can't load for user %s@%s because PersistenceManager is null!", userId, organisationId)
+					);
+			return null;
+		}
+		try{
+			return User.getUser(pm, organisationId, userId);
+		}catch(JDOObjectNotFoundException e){
+			// there's no such User in JFire
+			if (logger.isDebugEnabled()){
+				logger.debug(
+						String.format("User not found: %s@%s", userId, organisationId)
+						);
+			}
+		}
+		return null;
+	}
 	
+	private String getLDAPUserDN(Object jfireObject) throws LoginException{
+		try {
+			return ldapScriptSet.getLdapDN(jfireObject);
+		} catch (ScriptException e) {
+			logger.error("Exception executing LDAPScript", e);
+			throw new LoginException("Exception in LDAPScriptSet, see log for details.");
+		}
+	}
+	
+	private static LDAPConnection createConnection(ILDAPConnectionParamsProvider paramsProvider) throws UserManagementSystemCommunicationException{
+		LDAPConnection connection = LDAPConnectionManager.sharedInstance().getConnection(paramsProvider);
+    	if (logger.isDebugEnabled()){
+    		logger.debug(
+    				String.format("LDAPConnection recieved. LDAPServer at %s:%s  Encryption: %s  Auth method: %s",
+    								paramsProvider.getHost(), paramsProvider.getPort(), 
+    								paramsProvider.getEncryptionMethod().stringValue(),
+    								paramsProvider.getAuthenticationMethod().stringValue()));
+    	}
+    	return connection;
+	}
+
+	private static void unbindAndReleaseConnection(LDAPConnection connection) throws UserManagementSystemCommunicationException{
+		if (connection == null){
+			return;
+		}
+		
+    	if (logger.isDebugEnabled()){
+    		ILDAPConnectionParamsProvider params = connection.getConnectionParamsProvider();
+    		logger.debug(
+    				String.format("Unbinding and releasing connection for LDAP server at %s:%s  Encryption: %s  Auth method: %s",
+    								params.getHost(), params.getPort(),
+    								params.getEncryptionMethod().stringValue(),
+    								params.getAuthenticationMethod().stringValue()));
+    	}
+		
+    	try{
+    		connection.unbind();
+    	}finally{
+    		LDAPConnectionManager.sharedInstance().releaseConnection(connection);
+    	}
+    	
+		if (logger.isDebugEnabled()){
+    		logger.debug("Connection released");
+    	}
+	}
+
 }

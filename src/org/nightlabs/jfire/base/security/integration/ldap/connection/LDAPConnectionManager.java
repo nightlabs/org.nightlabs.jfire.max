@@ -130,8 +130,8 @@ public class LDAPConnectionManager{
 		// if released connection is still a preserved one we remove it from private connections map
 		for (UserID key : privateConnections.keySet()){
 			ConnectionsHolder holder = privateConnections.get(key);
-			if (holder != null && holder.containsConnection(connection)){
-				holder.getConnection(connection.getConnectionParamsProvider());	// will remove it from holder
+			if (holder != null){
+				holder.removePrivateConnection(connection);
 				break;
 			}
 		}
@@ -149,11 +149,13 @@ public class LDAPConnectionManager{
 	 * Of course it is not always possible so usage of this API should be strongly considered.
 	 * It was introduced to cover the use case described here (https://www.jfire.org/modules/bugs/view.php?id=1974)
 	 * so please use it for similar use cases. 
-	 * 
+	 *
+	 * @param paramsProvider Params provider of a connection
+	 * @param key Key to preserve given connection under
 	 * @param connection The {@link LDAPConnection} to be preserved
 	 * @throws NoUserException If no {@link User} is logged in 
 	 */
-	public synchronized void preservePrivateLDAPConnection(ILDAPConnectionParamsProvider paramsProvider, LDAPConnection connection) throws NoUserException{
+	public synchronized void preservePrivateLDAPConnection(ILDAPConnectionParamsProvider paramsProvider, String key, LDAPConnection connection) throws NoUserException{
 		UserID userID = GlobalSecurityReflector.sharedInstance().getUserDescriptor().getUserObjectID();
 		
 		ConnectionsHolder connectionsHolder = privateConnections.get(userID);
@@ -162,7 +164,7 @@ public class LDAPConnectionManager{
 			privateConnections.put(userID, connectionsHolder);
 		}
 		
-		LDAPConnection prevConnection = connectionsHolder.getConnection(paramsProvider);
+		LDAPConnection prevConnection = connectionsHolder.getPrivateConnection(paramsProvider, key);
 		if (prevConnection != null){
 			try {
 				prevConnection.unbind();
@@ -173,31 +175,69 @@ public class LDAPConnectionManager{
 			releaseConnection(prevConnection);
 		}
 		
-		connectionsHolder.putConnection(paramsProvider, connection);
+		connectionsHolder.putPrivateConnection(paramsProvider, key, connection);
 	}
-	
+
+	/**
+	 * Preserve some {@link LDAPConnection} for the later usage by the same {@link User}.
+	 * If another {@link LDAPConnection} was already preserved by this {@link User} it will
+	 * be unbinded and released back to the {@link LDAPConnectionManager}.
+	 * As private {@link LDAPConnection}s are keeped under certain keys, default one will be used by this method.
+	 * 
+	 * Be careful when using this API and try to make sure that preserved connection will be
+	 * released by your code at some point even if some unexpected situations will occur. 
+	 * Of course it is not always possible so usage of this API should be strongly considered.
+	 * It was introduced to cover the use case described here (https://www.jfire.org/modules/bugs/view.php?id=1974)
+	 * so please use it for similar use cases. 
+	 *
+	 * @param paramsProvider Params provider of a connection
+	 * @param connection The {@link LDAPConnection} to be preserved
+	 * @throws NoUserException If no {@link User} is logged in 
+	 */
+	public synchronized void preservePrivateLDAPConnection(ILDAPConnectionParamsProvider paramsProvider, LDAPConnection connection) throws NoUserException{
+		preservePrivateLDAPConnection(paramsProvider, ConnectionsHolder.DEFAULT_KEY, connection);
+	}
+
 	/**
 	 * Get {@link LDAPConnection} which was preserved by this {@link User} earlier. 
 	 * Returned {@link LDAPConnection} might be not alive and this method will NOT try to reconnect it 
 	 * in a way that {@link LDAPConnectionManager#getConnection(ILDAPConnectionParamsProvider)} does.
+	 * 
+	 * @param paramsProvider Params provider or a preserved connection
+	 * @param key Key to retrieve preserved {@link LDAPConnection}
+	 * @return {@link LDAPConnection} that was preserved by this {@link User} earlier
+	 * @throws NoUserException If no {@link User} is logged in 
+	 */
+	public LDAPConnection getPrivateLDAPConnection(ILDAPConnectionParamsProvider paramsProvider, String key) throws NoUserException{
+		UserID userID = GlobalSecurityReflector.sharedInstance().getUserDescriptor().getUserObjectID();
+		ConnectionsHolder connectionsHolder = privateConnections.get(userID);
+		if (connectionsHolder != null){
+			return connectionsHolder.getPrivateConnection(paramsProvider, key);
+		}
+		return null;
+	}
+
+	/**
+	 * Get {@link LDAPConnection} which was preserved by this {@link User} earlier. 
+	 * Returned {@link LDAPConnection} might be not alive and this method will NOT try to reconnect it 
+	 * in a way that {@link LDAPConnectionManager#getConnection(ILDAPConnectionParamsProvider)} does.
+	 * As private {@link LDAPConnection}s are keeped under certain keys, default one will be used by this method.
 	 * 
 	 * @param paramsProvider params provider or a preserved connection
 	 * @return {@link LDAPConnection} that was preserved by this {@link User} earlier
 	 * @throws NoUserException If no {@link User} is logged in 
 	 */
 	public LDAPConnection getPrivateLDAPConnection(ILDAPConnectionParamsProvider paramsProvider) throws NoUserException{
-		UserID userID = GlobalSecurityReflector.sharedInstance().getUserDescriptor().getUserObjectID();
-		ConnectionsHolder connectionsHolder = privateConnections.get(userID);
-		if (connectionsHolder != null){
-			return connectionsHolder.getConnection(paramsProvider);
-		}
-		return null;
+		return getPrivateLDAPConnection(paramsProvider, ConnectionsHolder.DEFAULT_KEY);
 	}
 	
 	class ConnectionsHolder{
+		private static final String DEFAULT_KEY = "default";
+		private Map<ILDAPConnectionParamsProvider, Map<String, LDAPConnection>> privateConnectionsMap;
 		private Map<ILDAPConnectionParamsProvider, List<LDAPConnection>> connectionsMap;
 		public ConnectionsHolder(){
 			connectionsMap = new HashMap<ILDAPConnectionParamsProvider, List<LDAPConnection>>();
+			privateConnectionsMap = new HashMap<ILDAPConnectionParamsProvider, Map<String,LDAPConnection>>();
 		}
 		public void putConnection(ILDAPConnectionParamsProvider paramsProvider, LDAPConnection connection) {
 			List<LDAPConnection> connections = connectionsMap.get(paramsProvider);
@@ -214,6 +254,14 @@ public class LDAPConnectionManager{
 				connections.remove(connections.size() - 1);
 			}
 		}
+		public void putPrivateConnection(ILDAPConnectionParamsProvider paramsProvider, String key, LDAPConnection connection){
+			Map<String, LDAPConnection> connections = privateConnectionsMap.get(paramsProvider);
+			if (connections == null){
+				connections = new HashMap<String, LDAPConnection>();
+				privateConnectionsMap.put(paramsProvider, connections);
+			}
+			connections.put(key, connection);
+		}
 		public LDAPConnection getConnection(ILDAPConnectionParamsProvider paramsProvider) {
 			List<LDAPConnection> connections = connectionsMap.get(paramsProvider);
 			if (connections != null && !connections.isEmpty()){
@@ -221,12 +269,30 @@ public class LDAPConnectionManager{
 			}
 			return null;
 		}
-		public boolean containsConnection(LDAPConnection connection){
-			List<LDAPConnection> connections = connectionsMap.get(connection.getConnectionParamsProvider());
-			if (connections != null){
-				return connections.contains(connection);
+		public LDAPConnection getPrivateConnection(ILDAPConnectionParamsProvider paramsProvider, String key){
+			Map<String, LDAPConnection> connections = privateConnectionsMap.get(paramsProvider);
+			if (connections != null && connections.containsKey(key)){
+				return connections.remove(key);
 			}
-			return false;
+			return null;
+		}
+		public void removePrivateConnection(LDAPConnection connection){
+			if (connection == null){
+				return;
+			}
+			Map<String, LDAPConnection> connections = privateConnectionsMap.get(connection.getConnectionParamsProvider());
+			if (connections != null){
+				String keyToRemove = null;
+				for (String key : connections.keySet()){
+					if (connection.equals(connections.get(key))){
+						keyToRemove = key;
+						break;
+					}
+				}
+				if (keyToRemove != null){
+					connections.remove(keyToRemove);
+				}
+			}
 		}
 	}
 }

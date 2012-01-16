@@ -435,10 +435,36 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper{
 					searchScopeValue = SearchControls.OBJECT_SCOPE;
 					break;
 				}
-				SearchControls controls = new SearchControls();
-				controls.setSearchScope(searchScopeValue);
-				return processResult(
-						context.search(getSafeJndiName(getSafeSearchBaseDN(baseDN)), filterExpr, filterArgs, controls));
+				
+				// FIXME: temporary workaround for issue with searching when DIGEST-MD5 is used as authentication method,
+				// see issue 2156 for details https://www.jfire.org/modules/bugs/view.php?id=2156
+				// The same workaround could be implemented in another search method above if needed.
+				boolean authMethodChanged = false;
+				Object saslRealm = null;
+				try{
+					if (AuthenticationMethod.SASL_DIGEST_MD5.equals(connection.getConnectionParamsProvider().getAuthenticationMethod())){
+						context.removeFromEnvironment(Context.SECURITY_AUTHENTICATION);
+		                saslRealm = context.removeFromEnvironment(JAVA_NAMING_SECURITY_SASL_REALM);
+						context.addToEnvironment(Context.SECURITY_AUTHENTICATION, AuthenticationMethod.SASL_CRAM_MD5.stringValue());
+		                authMethodChanged = true;
+		                context.reconnect(context.getConnectControls());
+					}
+					
+					SearchControls controls = new SearchControls();
+					controls.setSearchScope(searchScopeValue);
+					return processResult(
+							context.search(getSafeJndiName(getSafeSearchBaseDN(baseDN)), filterExpr, filterArgs, controls));
+					
+				}finally{
+					if (authMethodChanged){
+						context.removeFromEnvironment(Context.SECURITY_AUTHENTICATION);
+						context.addToEnvironment(Context.SECURITY_AUTHENTICATION, AuthenticationMethod.SASL_DIGEST_MD5.stringValue());
+						if (saslRealm instanceof String && !((String) saslRealm).isEmpty()){
+                			context.addToEnvironment(JAVA_NAMING_SECURITY_SASL_REALM, saslRealm);
+						}
+		                context.reconnect(context.getConnectControls());
+					}
+				}
 			}
 		}catch(NamingException e){
 			throw new UserManagementSystemCommunicationException("Search failed!" , e);

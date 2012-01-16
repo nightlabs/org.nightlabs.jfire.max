@@ -32,7 +32,10 @@ import org.nightlabs.jfire.base.security.integration.ldap.connection.LDAPConnect
 import org.nightlabs.jfire.base.security.integration.ldap.connection.LDAPConnectionManager;
 import org.nightlabs.jfire.base.security.integration.ldap.connection.LDAPConnectionWrapper.EntryModificationFlag;
 import org.nightlabs.jfire.organisation.Organisation;
+import org.nightlabs.jfire.security.GlobalSecurityReflector;
+import org.nightlabs.jfire.security.NoUserException;
 import org.nightlabs.jfire.security.User;
+import org.nightlabs.jfire.security.UserDescriptor;
 import org.nightlabs.jfire.security.integration.UserManagementSystemCommunicationException;
 import org.nightlabs.jfire.security.integration.id.UserManagementSystemID;
 import org.nightlabs.jfire.security.listener.SecurityChangeEvent_UserLocal_passwordChanged;
@@ -125,7 +128,7 @@ public class SecurityChangeListenerJFirePasswordChanged extends SecurityChangeLi
 					hashAlgorithm = null; // CRAM_MD5 and DIGEST-MD5 support only plain text passwords
 				}
 				LDAPPasswordWrapper newPasswordWrapper = new LDAPPasswordWrapper(event.getNewPassword(), hashAlgorithm);
-				boolean passwordChanged = modifyPassword(ldapServer, user, newPasswordWrapper.toString());
+				boolean passwordChanged = modifyPassword(ldapServer, false, user, newPasswordWrapper.toString());
 				if (!passwordChanged && !ldapServer.isLeading()){
 					// We assume that if entry does not exist yet in LDAP directory it could mean that new User is being created in JFire
 					// and its password is set BEFORE the User is made persistent. So this listener is triggered BEFORE actual entry
@@ -138,7 +141,7 @@ public class SecurityChangeListenerJFirePasswordChanged extends SecurityChangeLi
 					LDAPConnection preservedConnection = null;
 					if (!AuthenticationMethod.NONE.equals(ldapServer.getAuthenticationMethod())){
 						// preserve LDAPConnection
-						preservedConnection = LDAPSyncInvocation.preserveConnection(pm, ldapServer);
+						preservedConnection = preserveConnection(pm, ldapServer, PRESERVED_CONNECTION_KEY + user.getCompleteUserID());
 						if (preservedConnection == null){
 							logger.warn("LDAPConnection was not preserved for later usage when changing user password in LDAP!");
 						}
@@ -173,7 +176,7 @@ public class SecurityChangeListenerJFirePasswordChanged extends SecurityChangeLi
 		super.on_UserLocal_passwordChanged(event);
 	}
 	
-	private boolean modifyPassword(LDAPServer ldapServer, User user, String newPasswordHashed) throws UserManagementSystemCommunicationException, LoginException, ScriptException, NoSuchMethodException{
+	private static boolean modifyPassword(LDAPServer ldapServer, boolean usePreservedConnection, User user, String newPasswordHashed) throws UserManagementSystemCommunicationException, LoginException, ScriptException, NoSuchMethodException{
 		LDAPConnection connection = null;
 		try{
 			if (logger.isDebugEnabled()){
@@ -182,7 +185,11 @@ public class SecurityChangeListenerJFirePasswordChanged extends SecurityChangeLi
 								"Trying to sync password to LDAPServer at %s:%s, object ID: %s@%s", ldapServer.getHost(), ldapServer.getPort(), ldapServer.getUserManagementSystemID(), ldapServer.getOrganisationID()));
 			}
 			
-			connection = ldapServer.getConnectionForSync();
+			if (usePreservedConnection){
+				connection = LDAPConnectionManager.sharedInstance().getPrivateLDAPConnection(ldapServer, PRESERVED_CONNECTION_KEY + user.getCompleteUserID());
+			}else{
+				connection = ldapServer.getConnectionForSync();
+			}
 
 			String entryDN = ldapServer.getLdapScriptSet().getLdapDN(user);
 			if (logger.isDebugEnabled()){
@@ -218,6 +225,55 @@ public class SecurityChangeListenerJFirePasswordChanged extends SecurityChangeLi
 			}
 			LDAPConnectionManager.sharedInstance().releaseConnection(connection);
 		}
+	}
+	
+	private static LDAPConnection preserveConnection(PersistenceManager pm, LDAPServer ldapServer, String key){
+		UserDescriptor userDescriptor = null;
+		LDAPConnection connection = null;
+		
+		try{
+			userDescriptor = GlobalSecurityReflector.sharedInstance().getUserDescriptor();
+		}catch(NoUserException e){
+			logger.error("No User logged in while preserving LDAPConnection!");
+			return null;
+		}
+		
+		boolean exceptionOccured = false;
+		try {
+			connection = LDAPConnectionManager.sharedInstance().getConnection(ldapServer);
+			
+			User user = null;
+			if (pm != null){
+				user = userDescriptor.getUser(pm);
+			}else{	// create fake, not persisted new User just to get LDAP entry DN
+				user = new User(userDescriptor.getOrganisationID(), userDescriptor.getUserID());
+			}
+			ldapServer.bindConnection(connection, user, LDAPServer.getLDAPPasswordForCurrentUser());
+			
+			LDAPConnectionManager.sharedInstance().preservePrivateLDAPConnection(ldapServer, key, connection);
+			
+			return connection;
+			
+		} catch (UserManagementSystemCommunicationException e) {
+			exceptionOccured = true;
+			logger.error("Exception while trying to preserve a connection! No connection will be available inside sync invocation!", e);
+		} catch (LoginException e) {
+			exceptionOccured = true;
+			logger.error("LDAPConnection could not be authenticated! No connection will be available inside sync invocation!", e);
+		} catch (Exception e){
+			exceptionOccured = true;
+			throw new RuntimeException(e);
+		} finally {
+			if (exceptionOccured){
+				try {
+					connection.unbind();
+				} catch (UserManagementSystemCommunicationException e) {
+					// do nothing, this exception does not matter for us
+				}
+				LDAPConnectionManager.sharedInstance().releaseConnection(connection);
+			}
+		}
+		return null;
 	}
 	
 	/**
@@ -342,6 +398,8 @@ public class SecurityChangeListenerJFirePasswordChanged extends SecurityChangeLi
 		}
 		
 	}
+	
+	private static final String PRESERVED_CONNECTION_KEY = "passwordChangedFor_";
 
 	class LDAPChangePasswordInvocation extends Invocation{
 
@@ -385,7 +443,7 @@ public class SecurityChangeListenerJFirePasswordChanged extends SecurityChangeLi
 					if (logger.isDebugEnabled()){
 						logger.debug(String.format("User and entry name are correct, modifying LDAP entry with new password for user %s@%s", user.getUserID(), user.getOrganisationID()));
 					}
-					modifyPassword(ldapServer, user, newPasswordHashed);
+					modifyPassword(ldapServer, true, user, newPasswordHashed);
 					return null;
 				}
 				

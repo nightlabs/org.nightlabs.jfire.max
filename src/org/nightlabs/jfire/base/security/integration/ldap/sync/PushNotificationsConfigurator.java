@@ -22,7 +22,6 @@ import javax.naming.event.NamingEvent;
 import javax.naming.event.NamingExceptionEvent;
 import javax.naming.event.NamingListener;
 import javax.naming.event.ObjectChangeListener;
-import javax.naming.ldap.InitialLdapContext;
 import javax.script.ScriptException;
 import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
@@ -663,14 +662,13 @@ public class PushNotificationsConfigurator {
 				connection = new LDAPConnection(ldapServer);
 				connection.setConnectionWrapper(new JNDIConnectionWrapper(connection));
 				connection.connect();
-				InitialLdapContext context = ((JNDIConnectionWrapper) connection.getConnectionWrapper()).getContext();
 
 				for (String parentEntry : parentEntriesForSync){
 					Object ctx = null;
 					
 					try{
 						try{	// check if anonymous access to LDAP directory is enabled
-							ctx = context.lookup(parentEntry);
+							ctx = ((JNDIConnectionWrapper) connection.getConnectionWrapper()).getContext().lookup(parentEntry);
 						}catch(NoPermissionException e){	// specify bind login/password otherwise
 							
 							boolean successful = bindConnectionWithCurrentUser(connection, ldapServer);
@@ -682,6 +680,7 @@ public class PushNotificationsConfigurator {
 										connection.bind(ldapServer.getSyncDN(), ldapServer.getSyncPassword());
 									} catch (LoginException ex) {
 										logger.error("Bind failed while trying to add PushNotification Listener! Exception: " + ex.getMessage(), ex);
+										return;
 									}
 								}else{
 									
@@ -690,7 +689,7 @@ public class PushNotificationsConfigurator {
 									
 								}
 							}
-							ctx = context.lookup(parentEntry);
+							ctx = ((JNDIConnectionWrapper) connection.getConnectionWrapper()).getContext().lookup(parentEntry);
 						}
 					}catch(NameNotFoundException e){
 						logger.error(
@@ -799,10 +798,12 @@ public class PushNotificationsConfigurator {
 	 * @return ID of {@link LDAPServer} or <code>null</code> if not found
 	 */
 	public UserManagementSystemID getLDAPServerIDByEventContext(EventContext ctx){
-		for (UserManagementSystemID ldapServerID : registeredContexts.keySet()){
-			Collection<EventContext> contexts = registeredContexts.get(ldapServerID);
-			if (contexts.contains(ctx)){
-				return ldapServerID;
+		synchronized (registeredContexts) {
+			for (UserManagementSystemID ldapServerID : registeredContexts.keySet()){
+				Collection<EventContext> contexts = registeredContexts.get(ldapServerID);
+				if (contexts.contains(ctx)){
+					return ldapServerID;
+				}
 			}
 		}
 		return null;

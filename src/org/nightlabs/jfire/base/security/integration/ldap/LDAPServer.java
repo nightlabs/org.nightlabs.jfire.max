@@ -128,6 +128,7 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 	public static final String GROUP_OF_UNIQUE_NAMES_ATTR_VALUE = "groupOfUniqueNames";
 	
 	private static final String COMMON_NAME_ATTR_NAME = "commonName";
+	private static final String COMMON_NAME_ATTR_NAME_SHORT = "cn";
 	private static final String UNIQUE_MEMBER_ATTR_NAME = "uniqueMember";
 	private static final String MEMBER_ATTR_NAME = "member";
 
@@ -1149,11 +1150,6 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 								continue;
 							}
 
-							LDAPAttributeSet attributes = connection.getAttributesForEntry(
-									ldapGroupDN, new String[]{OBJECT_CLASS_ATTR_NAME, MEMBER_ATTR_NAME, UNIQUE_MEMBER_ATTR_NAME, COMMON_NAME_ATTR_NAME});
-							
-							LDAPSecurityGroup ldapGroup = new LDAPSecurityGroup(attributes);
-
 							if (removeJFireObjects){
 								UserSecurityGroup userSecurityGroup = syncConfig.getUserSecurityGroup();
 								
@@ -1176,6 +1172,11 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 									pm.deletePersistent(userSecurityGroup);
 								}
 							}else{
+								LDAPAttributeSet attributes = connection.getAttributesForEntry(
+										ldapGroupDN, new String[]{OBJECT_CLASS_ATTR_NAME, MEMBER_ATTR_NAME, UNIQUE_MEMBER_ATTR_NAME, COMMON_NAME_ATTR_NAME});
+								
+								LDAPSecurityGroup ldapGroup = new LDAPSecurityGroup(attributes);
+
 								String groupName = ldapGroup.getGroupName();
 								if (groupName == null){
 									groupName = ldapGroupDN;
@@ -1524,7 +1525,7 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 			if (objectClassAttr == null || memberAttr == null){
 				throw new IllegalArgumentException("Can't get objectClass and member attribute names from given attribute set!");
 			}
-			this.groupName = (String) attributes.getAttributeValue(COMMON_NAME_ATTR_NAME);
+			this.groupName = getValueFromCommonNameAttr(attributes);
 		}
 		
 		public LDAPSecurityGroup(String name, String objectClassAttr, String memberAttr) {
@@ -1705,4 +1706,11 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
     	}
 	}
 
+	private static String getValueFromCommonNameAttr(LDAPAttributeSet attributes){
+		String name = (String) attributes.getAttributeValue(COMMON_NAME_ATTR_NAME);
+		if (name == null || name.isEmpty()){
+			name = (String) attributes.getAttributeValue(COMMON_NAME_ATTR_NAME_SHORT);
+		}
+		return name;
+	}
 }

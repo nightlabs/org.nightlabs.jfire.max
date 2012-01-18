@@ -149,8 +149,10 @@ public class SecurityChangeListenerJFirePasswordChanged extends SecurityChangeLi
 					
 					try{
 						PushNotificationsConfigurator.sharedInstance().addPushNotificationListener(
-								ldapServer, new LDAPEntryAddedListener(
-										user, newPasswordWrapper.toString(), ldapServer.getLdapScriptSet().getLdapDN(user)));
+								ldapServer, 
+								new LDAPEntryAddedListener(
+										user, newPasswordWrapper.toString(), ldapServer.getLdapScriptSet().getLdapDN(user)),
+								ldapServer.getLdapScriptSet().getUserParentEntriesForSync());
 					}catch(Exception e){
 						try{
 							if (preservedConnection != null){

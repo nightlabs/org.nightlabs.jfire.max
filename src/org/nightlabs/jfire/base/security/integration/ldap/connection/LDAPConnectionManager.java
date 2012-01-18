@@ -106,6 +106,10 @@ public class LDAPConnectionManager{
 			}else{
 				conn = new LDAPConnection(paramsProvider);
 			}
+		}else{
+			// Params provider could have some data changed: i.e. encryption or authentication methods, but still remains 
+			// the same object with the same ID. So we just "update" obtained connection with a new one.
+			conn.setConnectionParamsProvider(paramsProvider);
 		}
 
 		if (!conn.isConnected()){

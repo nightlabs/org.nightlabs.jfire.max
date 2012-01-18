@@ -340,15 +340,15 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper{
 	        // check if modified attributes contain RDN related attributes, 
 	        // need to call context.rename() if found and remove such attributes from modification ones
 	        Collection<String> attributesNames = attributes.getAllAttributesNames();
-	        Enumeration<String> nameComponents = entryName.getAll();
+	        Enumeration<String> nameComponents = originalName.getAll();
 	        int namePos = 0;
 	        Collection<LDAPAttribute<Object>> attrsToDelete = new ArrayList<LDAPAttribute<Object>>();
 	        while (nameComponents.hasMoreElements()) {
 				String component = (String) nameComponents.nextElement();
 		        for (String attrName : attributesNames) {
-					if (component.indexOf(attrName) > -1
-							|| (attributeAliases.containsKey(attrName) && component.indexOf(attributeAliases.get(attrName)) > -1)
-							|| (attributeAliases.containsValue(attrName)) && component.indexOf(getAliasMapKeyByValue(attrName)) > -1){
+					if (component.matches("^"+attrName+"=(.+)$")
+							|| (attributeAliases.containsKey(attrName) && component.matches("^"+attributeAliases.get(attrName)+"=(.+)$"))
+							|| (attributeAliases.containsValue(attrName) && component.matches("^"+getAliasMapKeyByValue(attrName)+"=(.+)$"))){
 						entryName.remove(namePos);
 						entryName.add(namePos, component.replaceAll("^(.+)=(.+)$", "$1="+attributes.getAttributeValue(attrName)));
 						attrsToDelete.add(attributes.getAttribute(attrName));

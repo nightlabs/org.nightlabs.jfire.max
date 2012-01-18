@@ -46,6 +46,7 @@ import org.nightlabs.jfire.security.UserDescriptor;
 import org.nightlabs.jfire.security.integration.UserManagementSystem;
 import org.nightlabs.jfire.security.integration.UserManagementSystemCommunicationException;
 import org.nightlabs.jfire.security.integration.UserManagementSystemSyncEvent.SyncEventGenericType;
+import org.nightlabs.jfire.security.integration.UserManagementSystemSyncEvent.SyncEventType;
 import org.nightlabs.jfire.security.integration.id.UserManagementSystemID;
 import org.nightlabs.jfire.servermanager.JFireServerManager;
 import org.nightlabs.jfire.servermanager.JFireServerManagerFactory;
@@ -59,7 +60,7 @@ import org.slf4j.LoggerFactory;
 /**
  * This class holds all staff needed for configuration of push notifications from {@link LDAPServer}.
  * Underlying push notifications are implemented with the help of JNDI {@link NamingListener}s - 
- * see {@link #syncPushNotificationsListener} for an example.
+ * see {@link #syncUsersPushNotificationsListener} for an example.
  * 
  * @author Denis Dudnik <deniska.dudnik[at]gmail{dot}com>
  *
@@ -89,8 +90,8 @@ public class PushNotificationsConfigurator {
 	
 	
 	/**
-	 * {@link StoreLifecycleListener} which registers {@link #syncPushNotificationsListener} to every leading {@link LDAPServer}
-	 * and removes {@link #syncPushNotificationsListener} from every non-leading {@link LDAPServer}.
+	 * {@link StoreLifecycleListener} which registers {@link #syncUsersPushNotificationsListener} to every leading {@link LDAPServer}
+	 * and removes {@link #syncUsersPushNotificationsListener} from every non-leading {@link LDAPServer}.
 	 */
 	private StoreLifecycleListener ldapServerStoreListener = new StoreLifecycleListener(){
 		@Override
@@ -99,9 +100,20 @@ public class PushNotificationsConfigurator {
 				LDAPServer ldapServer = (LDAPServer) event.getPersistentInstance();
 				try {
 					if (ldapServer.isLeading()){
-						addPushNotificationsListener(ldapServer, syncPushNotificationsListener);
+						UserManagementSystemID ldapServerID = ldapServer.getUserManagementSystemObjectID();
+						try {
+							addPushNotificationListener(ldapServer, syncUsersPushNotificationsListener, ldapServer.getLdapScriptSet().getUserParentEntriesForSync());
+							addPushNotificationListener(ldapServer, syncGroupsPushNotificationsListener, ldapServer.getLdapScriptSet().getGroupParentEntriesForSync());
+						} catch (ScriptException e) {
+							throw new UserManagementSystemCommunicationException(
+									"Can't get parent entries names from LDAPServer with ID: " + ldapServerID.toString(), e);
+						} catch (NoSuchMethodException e) {
+							throw new UserManagementSystemCommunicationException(
+									"Can't get parent entries names from LDAPServer with ID: " + ldapServerID.toString(), e);
+						}
 					}else{
-						removePushNotificationsListenerInternal(ldapServer, syncPushNotificationsListener);
+						removePushNotificationsListenerInternal(ldapServer, syncUsersPushNotificationsListener);
+						removePushNotificationsListenerInternal(ldapServer, syncGroupsPushNotificationsListener);
 					}
 				} catch (UserManagementSystemCommunicationException e) {
 					logger.error(e.getMessage(), e);
@@ -116,7 +128,7 @@ public class PushNotificationsConfigurator {
 	
 	
 	/**
-	 * {@link DeleteLifecycleListener} which removes {@link #syncPushNotificationsListener} from every deleted {@link LDAPServer}
+	 * {@link DeleteLifecycleListener} which removes {@link #syncUsersPushNotificationsListener} from every deleted {@link LDAPServer}
 	 */
 	private DeleteLifecycleListener ldapServerDeleteListener = new DeleteLifecycleListener() {
 		@Override
@@ -125,7 +137,8 @@ public class PushNotificationsConfigurator {
 				LDAPServer ldapServer = (LDAPServer) event.getPersistentInstance();
 				if (ldapServer.isLeading()){
 					try {
-						removePushNotificationsListenerInternal(ldapServer, syncPushNotificationsListener);
+						removePushNotificationsListenerInternal(ldapServer, syncUsersPushNotificationsListener);
+						removePushNotificationsListenerInternal(ldapServer, syncGroupsPushNotificationsListener);
 					} catch (UserManagementSystemCommunicationException e) {
 						logger.error(e.getMessage(), e);
 					}
@@ -186,7 +199,17 @@ public class PushNotificationsConfigurator {
 				);
 		for (LDAPServer ldapServer : leadingSystems) {
 			try {
-				addPushNotificationsListener(ldapServer, syncPushNotificationsListener);
+				UserManagementSystemID ldapServerID = ldapServer.getUserManagementSystemObjectID();
+				try {
+					addPushNotificationListener(ldapServer, syncUsersPushNotificationsListener, ldapServer.getLdapScriptSet().getUserParentEntriesForSync());
+					addPushNotificationListener(ldapServer, syncGroupsPushNotificationsListener, ldapServer.getLdapScriptSet().getGroupParentEntriesForSync());
+				} catch (ScriptException e) {
+					throw new UserManagementSystemCommunicationException(
+							"Can't get parent entries names from LDAPServer with ID: " + ldapServerID.toString(), e);
+				} catch (NoSuchMethodException e) {
+					throw new UserManagementSystemCommunicationException(
+							"Can't get parent entries names from LDAPServer with ID: " + ldapServerID.toString(), e);
+				}
 			} catch (UserManagementSystemCommunicationException e) {
 				logger.error(e.getMessage(), e);
 			}
@@ -199,9 +222,9 @@ public class PushNotificationsConfigurator {
 	 * @param ldapServer to add listener to
 	 * @param listener {@link NamingListener} to be added
 	 */
-	public void addPushNotificationListener(LDAPServer ldapServer, NamingListener listener){
+	public void addPushNotificationListener(LDAPServer ldapServer, NamingListener listener, Collection<String> parentEntriesForSync){
 		try {
-			addPushNotificationsListener(ldapServer, listener);
+			addPushNotificationsListenerInternal(ldapServer, listener, parentEntriesForSync);
 		} catch (UserManagementSystemCommunicationException e) {
 			logger.error(e.getMessage(), e);
 		}
@@ -220,7 +243,8 @@ public class PushNotificationsConfigurator {
 				);
 		for (LDAPServer ldapServer : leadingSystems) {
 			try {
-				removePushNotificationsListenerInternal(ldapServer, syncPushNotificationsListener);
+				removePushNotificationsListenerInternal(ldapServer, syncUsersPushNotificationsListener);
+				removePushNotificationsListenerInternal(ldapServer, syncGroupsPushNotificationsListener);
 			} catch (UserManagementSystemCommunicationException e) {
 				logger.error(e.getMessage(), e);
 			}
@@ -283,7 +307,7 @@ public class PushNotificationsConfigurator {
 	}
 
 	
-	private static ThreadLocal<Boolean> isNotificationListenerEnabledTL = new ThreadLocal<Boolean>(){
+	private static ThreadLocal<Boolean> isNotificationListenersEnabledTL = new ThreadLocal<Boolean>(){
 		protected Boolean initialValue() {
 			return true;
 		};
@@ -294,16 +318,16 @@ public class PushNotificationsConfigurator {
 	 * 
 	 * @param isEnabled
 	 */
-	public static void setNotificationsListenerEnabled(boolean isEnabled) {
-		isNotificationListenerEnabledTL.set(isEnabled);
+	public static void setNotificationsListenersEnabled(boolean isEnabled) {
+		isNotificationListenersEnabledTL.set(isEnabled);
 	}
 	
 	/**
 	 * 
 	 * @return if this listener is enabled and will process incoming notifications
 	 */
-	public static boolean isNotificationsListenerEnabled(){
-		return isNotificationListenerEnabledTL.get();
+	public static boolean isNotificationsListenersEnabled(){
+		return isNotificationListenersEnabledTL.get();
 	}
 
 	
@@ -312,12 +336,20 @@ public class PushNotificationsConfigurator {
 	 */
 	class PushNotificationsListener implements ObjectChangeListener, NamespaceChangeListener{
 		
+		private SyncEventType fetchEventType;
+		private SyncEventType removeEventType;
+		
+		public PushNotificationsListener(SyncEventType fetchEventType, SyncEventType removeEventType){
+			this.fetchEventType = fetchEventType;
+			this.removeEventType = removeEventType;
+		}
+		
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
 		public void objectChanged(NamingEvent event) {
-			if (isNotificationsListenerEnabled() 
+			if (isNotificationsListenersEnabled() 
 					&& validateIncomingEvent(event, true)){
 				fetchLDAPEntry(event);
 			}
@@ -328,7 +360,7 @@ public class PushNotificationsConfigurator {
 		 */
 		@Override
 		public void objectAdded(NamingEvent event) {
-			if (isNotificationsListenerEnabled() 
+			if (isNotificationsListenersEnabled() 
 					&& validateIncomingEvent(event, true)){
 				fetchLDAPEntry(event);
 			}
@@ -339,7 +371,7 @@ public class PushNotificationsConfigurator {
 		 */
 		@Override
 		public void objectRemoved(NamingEvent event) {
-			if (isNotificationsListenerEnabled()
+			if (isNotificationsListenersEnabled()
 					&& validateIncomingEvent(event, false)){
 				removeJFireObject(event);
 			}
@@ -350,7 +382,7 @@ public class PushNotificationsConfigurator {
 		 */
 		@Override
 		public void objectRenamed(NamingEvent event) {
-			if (!isNotificationsListenerEnabled()){
+			if (!isNotificationsListenersEnabled()){
 				return;
 			}
 			if (event.getEventContext() == null
@@ -462,7 +494,7 @@ public class PushNotificationsConfigurator {
 		 */
 		@Override
 		public void namingExceptionThrown(NamingExceptionEvent event) {
-			if (!isNotificationsListenerEnabled()){
+			if (!isNotificationsListenersEnabled()){
 				logger.warn("Notifications listener is disabled. However we still process this incoming notification message cause it is an error one. See logs below.");
 			}
 			Throwable t = event.getException();
@@ -513,7 +545,7 @@ public class PushNotificationsConfigurator {
 						String.format("It seems that LDAP entry was renamed from %s to %s. Since we can't replace ID of existing JFire object (i.e. User) new object with a new name will be created.", oldName, newName));
 			}
 			
-			LDAPSyncEvent syncEvent = new LDAPSyncEvent(SyncEventGenericType.FETCH_USER);
+			LDAPSyncEvent syncEvent = new LDAPSyncEvent(fetchEventType);
 			syncEvent.setFetchEventTypeDataUnits(CollectionUtil.createArrayList(new FetchEventTypeDataUnit(newName)));
 			try {
 				AsyncInvoke.exec(
@@ -526,7 +558,7 @@ public class PushNotificationsConfigurator {
 
 		private void removeJFireObject(NamingEvent event){
 			String name = event.getOldBinding().getNameInNamespace();
-			LDAPSyncEvent syncEvent = new LDAPSyncEvent(SyncEventGenericType.JFIRE_REMOVE_USER);
+			LDAPSyncEvent syncEvent = new LDAPSyncEvent(removeEventType);
 			syncEvent.setFetchEventTypeDataUnits(CollectionUtil.createArrayList(new FetchEventTypeDataUnit(name)));
 			try {
 				AsyncInvoke.exec(
@@ -599,7 +631,8 @@ public class PushNotificationsConfigurator {
 		}
 	}
 	
-	private NamingListener syncPushNotificationsListener = new PushNotificationsListener();
+	private NamingListener syncUsersPushNotificationsListener = new PushNotificationsListener(SyncEventGenericType.FETCH_USER, SyncEventGenericType.JFIRE_REMOVE_USER);
+	private NamingListener syncGroupsPushNotificationsListener = new PushNotificationsListener(SyncEventGenericType.FETCH_AUTHORIZATION, SyncEventGenericType.JFIRE_REMOVE_AUTHORIZATION);
 	
 	
 	/**
@@ -609,13 +642,15 @@ public class PushNotificationsConfigurator {
 	 * @param errorCallback
 	 */
 	public void setCallbacks(SuccessCallback successCallback, ErrorCallback errorCallback){
-		((PushNotificationsListener)syncPushNotificationsListener).setErrorCallback(errorCallback);
-		((PushNotificationsListener)syncPushNotificationsListener).setSuccessCallback(successCallback);
+		((PushNotificationsListener)syncUsersPushNotificationsListener).setErrorCallback(errorCallback);
+		((PushNotificationsListener)syncUsersPushNotificationsListener).setSuccessCallback(successCallback);
+		((PushNotificationsListener)syncGroupsPushNotificationsListener).setErrorCallback(errorCallback);
+		((PushNotificationsListener)syncGroupsPushNotificationsListener).setSuccessCallback(successCallback);
 	}
 	
 	
 	/**
-	 * Map for holding {@link EventContext} instances which have some {@link NamingListener} added to them.
+	 * Map for holding {@link EventContext} instances which have {@link NamingListener}s added to them.
 	 * 
 	 * FIXME: It could be not the best choice (for clustering issues) to hold a this map here in a single static instance, but I don't see another solution at the moment. Denis.
 	 * Here's a quote from {@link EventContext} javadoc:
@@ -627,34 +662,34 @@ public class PushNotificationsConfigurator {
 	 * 		deregistration.
 	 * 
 	 */
-	private Map<UserManagementSystemID, Collection<EventContext>> registeredContexts = new HashMap<UserManagementSystemID, Collection<EventContext>>();
+	private Map<NamingListener, Map<UserManagementSystemID, Collection<EventContext>>> registeredContexts = new HashMap<NamingListener, Map<UserManagementSystemID,Collection<EventContext>>>();
 	
-	private void addPushNotificationsListener(LDAPServer ldapServer, NamingListener listener) throws UserManagementSystemCommunicationException{
+	private void addPushNotificationsListenerInternal(LDAPServer ldapServer, NamingListener listener, Collection<String> parentEntriesForSync) throws UserManagementSystemCommunicationException{
 		if (listener == null){
 			throw new IllegalArgumentException("NamingListener to be added can't be null!");
 		}
 		UserManagementSystemID ldapServerID = ldapServer.getUserManagementSystemObjectID();
 		LDAPConnection connection = null;
 		try{
-			Collection<String> parentEntriesForSync = new ArrayList<String>();
-			parentEntriesForSync.addAll(ldapServer.getLdapScriptSet().getUserParentEntriesForSync());
-			parentEntriesForSync.addAll(ldapServer.getLdapScriptSet().getGroupParentEntriesForSync());
 			if (!parentEntriesForSync.isEmpty()){
 				
 				// check if listener was already added for this LDAPServer
-				if (registeredContexts.containsKey(ldapServerID)){
-					Collection<EventContext> contexts = registeredContexts.get(ldapServerID);
-					Collection<String> contextNames = new HashSet<String>();
-					for (EventContext ctx : contexts){
-						contextNames.add(ctx.getNameInNamespace());
-					}
-					if (contextNames.containsAll(parentEntriesForSync)){
-						if (logger.isDebugEnabled()){
-							logger.debug("Push notifications listener already added for all parent entries of this LDAPServer, returning. LDAPServer ID: " + ldapServerID.toString());
+				if (registeredContexts.containsKey(listener)){
+					Map<UserManagementSystemID, Collection<EventContext>> contextsMap = registeredContexts.get(listener);
+					if (contextsMap.containsKey(ldapServerID)){
+						Collection<EventContext> contexts = contextsMap.get(ldapServerID);
+						Collection<String> contextNames = new HashSet<String>();
+						for (EventContext ctx : contexts){
+							contextNames.add(ctx.getNameInNamespace());
 						}
-						return;
-					}else{
-						removePushNotificationsListenerInternal(ldapServer, listener);
+						if (contextNames.containsAll(parentEntriesForSync)){
+							if (logger.isDebugEnabled()){
+								logger.debug("Push notifications listener already added for all parent entries of this LDAPServer, returning. LDAPServer ID: " + ldapServerID.toString());
+							}
+							return;
+						}else{
+							removePushNotificationsListenerInternal(ldapServer, listener);
+						}
 					}
 				}
 				
@@ -703,10 +738,17 @@ public class PushNotificationsConfigurator {
 							eventContext.addNamingListener(
 									eventContext.getNameInNamespace(), EventContext.SUBTREE_SCOPE, listener);
 							
-							if (registeredContexts.containsKey(ldapServerID)){
-								registeredContexts.get(ldapServerID).add(eventContext);
+							if (registeredContexts.containsKey(listener)){
+								Map<UserManagementSystemID, Collection<EventContext>> contextsMap = registeredContexts.get(listener);
+								if (contextsMap.containsKey(ldapServerID)){
+									contextsMap.get(ldapServerID).add(eventContext);
+								}else{
+									contextsMap.put(ldapServerID, CollectionUtil.createHashSet(eventContext));
+								}
 							}else{
-								registeredContexts.put(ldapServerID, CollectionUtil.createHashSet(eventContext));
+								Map<UserManagementSystemID, Collection<EventContext>> contextsMap = new HashMap<UserManagementSystemID, Collection<EventContext>>();
+								contextsMap.put(ldapServerID, CollectionUtil.createHashSet(eventContext));
+								registeredContexts.put(listener, contextsMap);
 							}
 						}
 					}
@@ -715,10 +757,7 @@ public class PushNotificationsConfigurator {
 			}
 		} catch (ScriptException e) {
 			throw new UserManagementSystemCommunicationException(
-					"Can't get parent entries names from LDAPServer with ID: " + ldapServerID.toString(), e);
-		} catch (NoSuchMethodException e) {
-			throw new UserManagementSystemCommunicationException(
-					"Can't get parent entries names from LDAPServer with ID: " + ldapServerID.toString(), e);
+					"Can't add push notification listener to LDAPServer with ID: " + ldapServerID.toString(), e);
 		} catch (NamingException e) {
 			throw new UserManagementSystemCommunicationException(
 					"Can't add push notification listener to LDAPServer with ID: " + ldapServerID.toString(), e);
@@ -768,21 +807,25 @@ public class PushNotificationsConfigurator {
 	
 	private void removePushNotificationsListenerInternal(LDAPServer ldapServer, NamingListener listener) throws UserManagementSystemCommunicationException{
 		UserManagementSystemID ldapServerID = ldapServer.getUserManagementSystemObjectID();
-		removePushNotificationListener(ldapServerID, listener);
+		removePushNotificationsListenerInternal(ldapServerID, listener);
 	}
 
 	private void removePushNotificationsListenerInternal(UserManagementSystemID ldapServerID, NamingListener listener) throws UserManagementSystemCommunicationException{
-		if (registeredContexts.containsKey(ldapServerID)){
+		if (registeredContexts.containsKey(listener)){
 			try{
 				synchronized (registeredContexts) {
-					Collection<EventContext> contexts = registeredContexts.get(ldapServerID);
+					Map<UserManagementSystemID, Collection<EventContext>> contextsMap = registeredContexts.get(listener);
+					Collection<EventContext> contexts = contextsMap.get(ldapServerID);
 					if (contexts != null){
 						for (EventContext ctx : contexts){
 							ctx.removeNamingListener(listener);
 							ctx.close();
 						}
 					}
-					registeredContexts.remove(ldapServerID);
+					contextsMap.remove(ldapServerID);
+					if (contextsMap.isEmpty()){
+						registeredContexts.remove(listener);
+					}
 				}
 			} catch (NamingException e){
 				throw new UserManagementSystemCommunicationException(
@@ -799,10 +842,16 @@ public class PushNotificationsConfigurator {
 	 */
 	public UserManagementSystemID getLDAPServerIDByEventContext(EventContext ctx){
 		synchronized (registeredContexts) {
-			for (UserManagementSystemID ldapServerID : registeredContexts.keySet()){
-				Collection<EventContext> contexts = registeredContexts.get(ldapServerID);
-				if (contexts.contains(ctx)){
-					return ldapServerID;
+			for (NamingListener listener : registeredContexts.keySet()){
+				Map<UserManagementSystemID, Collection<EventContext>> contextsMap = registeredContexts.get(listener);
+				if (contextsMap == null){
+					continue;
+				}
+				for (UserManagementSystemID ldapServerID : contextsMap.keySet()){
+					Collection<EventContext> contexts = contextsMap.get(ldapServerID);
+					if (contexts.contains(ctx)){
+						return ldapServerID;
+					}
 				}
 			}
 		}
@@ -810,13 +859,26 @@ public class PushNotificationsConfigurator {
 	}
 	
 	/**
-	 * Get {@link Collection} of {@link EventContext}s which has registered listeners.
+	 * Get {@link Collection} of {@link EventContext}s which has registered listeners for given {@link LDAPServer}.
 	 * 
 	 * @param ldapServerID
 	 * @return
 	 */
 	public Collection<EventContext> getEventContextsWithListenersByLDAPServerID(UserManagementSystemID ldapServerID){
-		return registeredContexts.get(ldapServerID);
+		Collection<EventContext> result = new ArrayList<EventContext>();
+		for (NamingListener listener : registeredContexts.keySet()){
+			Map<UserManagementSystemID, Collection<EventContext>> contextsMap = registeredContexts.get(listener);
+			if (contextsMap == null){
+				continue;
+			}
+			for (UserManagementSystemID serverID : contextsMap.keySet()){
+				if (serverID.equals(ldapServerID)){
+					result.addAll(contextsMap.get(serverID));
+					break;
+				}
+			}
+		}
+		return !result.isEmpty() ? result : null;
 	}
 
 }

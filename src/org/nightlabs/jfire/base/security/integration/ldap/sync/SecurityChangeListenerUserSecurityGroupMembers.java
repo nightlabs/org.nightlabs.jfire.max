@@ -181,7 +181,6 @@ public class SecurityChangeListenerUserSecurityGroupMembers extends SecurityChan
 	
 	private void syncUserSecurityGroup(){
 		if (userSecurityGroup == null){
-			logger.warn("Can't proceed with because UserSecurityGroup is null!");
 			return;
 		}
 

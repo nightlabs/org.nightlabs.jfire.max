@@ -60,6 +60,19 @@ public class LDAPConnection{
     public ILDAPConnectionParamsProvider getConnectionParamsProvider() {
         return connectionParamsProvider;
     }
+    
+    /**
+     * Set {@link ILDAPConnectionParamsProvider} to this connection, can't be <code>null</code> 
+     * or {@link IllegalArgumentException} will be thrown.
+     * 
+     * @param connectionParamsProvider, not <code>null</code>
+     */
+    public void setConnectionParamsProvider(ILDAPConnectionParamsProvider connectionParamsProvider) {
+    	if (connectionParamsProvider == null){
+    		throw new IllegalArgumentException("ILDAPConnectionParamsProvider can't be null!");
+    	}
+		this.connectionParamsProvider = connectionParamsProvider;
+	}
 
     public void connect() throws UserManagementSystemCommunicationException {
     	this.connectionWrapper.connect();

@@ -289,11 +289,15 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper{
 	 * {@inheritDoc}
 	 */
 	@Override
-    public void createEntry(String dn, LDAPAttributeSet attributes) throws UserManagementSystemCommunicationException{
+    public void createEntry(String dn, LDAPAttributeSet attributes) throws UserManagementSystemCommunicationException, LoginException{
         try {
         	synchronized (context) {
                 context.createSubcontext(getSafeJndiName(dn), getJNDIAttributes(attributes));
 			}
+		} catch (NoPermissionException e){
+			logger.error(e.getMessage(), e);
+			throw new LoginException(
+					String.format("Insufficient permissions! Failed to create an entry %s. Exception: %s", dn, e.getMessage()));
         }catch(NamingException e){
 			throw new UserManagementSystemCommunicationException("Failed to create an entry! Entry DN: " + dn, e);
         }
@@ -303,11 +307,15 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper{
 	 * {@inheritDoc}
 	 */
 	@Override
-    public void deleteEntry(String dn) throws UserManagementSystemCommunicationException{
+    public void deleteEntry(String dn) throws UserManagementSystemCommunicationException, LoginException{
         try {
         	synchronized (context) {
                 context.destroySubcontext(getSafeJndiName(dn));
 			}
+		} catch (NoPermissionException e){
+			logger.error(e.getMessage(), e);
+			throw new LoginException(
+					String.format("Insufficient permissions! Failed to delete an entry %s. Exception: %s", dn, e.getMessage()));
         }catch(NamingException e){
 			throw new UserManagementSystemCommunicationException("Failed to delete an entry! Entry DN: " + dn, e);
         }
@@ -319,7 +327,7 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper{
 	@Override
 	public String modifyEntry(
 			String dn, LDAPAttributeSet attributes, EntryModificationFlag modificationFlag
-			) throws UserManagementSystemCommunicationException {
+			) throws UserManagementSystemCommunicationException, LoginException {
 		try{
 	        // determine operation type
 	        int operationType = DirContext.REPLACE_ATTRIBUTE;
@@ -379,6 +387,10 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper{
 				
 				return newName;
 			}
+		} catch (NoPermissionException e){
+			logger.error(e.getMessage(), e);
+			throw new LoginException(
+					String.format("Insufficient permissions! Entry modification failed (%s). Exception: %s", dn, e.getMessage()));
 		}catch(NamingException e){
 			throw new UserManagementSystemCommunicationException("Entry modification failed! Entry: " + dn, e);
 		}
@@ -401,12 +413,15 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper{
 	 */
 	@Override
 	public Map<String, LDAPAttributeSet> search(String baseDN, LDAPAttributeSet searchAttributes, String[] returnAttributes) 
-			throws UserManagementSystemCommunicationException {
+			throws UserManagementSystemCommunicationException, LoginException {
 		try{
 			synchronized (context){
 				return processResult(
 						context.search(getSafeJndiName(getSafeSearchBaseDN(baseDN)), getJNDIAttributes(searchAttributes), returnAttributes));
 			}
+		} catch (NoPermissionException e){
+			logger.error(e.getMessage(), e);
+			throw new LoginException("Insufficient permissions! Search failed! Exception: " + e.getMessage());
 		}catch(NamingException e){
 			throw new UserManagementSystemCommunicationException("Search failed!" , e);
 		}
@@ -417,7 +432,7 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper{
 	 */
 	@Override
 	public Map<String, LDAPAttributeSet> search(String baseDN, String filterExpr, Object[] filterArgs, SearchScope searchScope)
-			throws UserManagementSystemCommunicationException {
+			throws UserManagementSystemCommunicationException, LoginException {
 		try{
 			synchronized (context){
 				int searchScopeValue = SearchControls.OBJECT_SCOPE;
@@ -466,6 +481,9 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper{
 					}
 				}
 			}
+		} catch (NoPermissionException e){
+			logger.error(e.getMessage(), e);
+			throw new LoginException("Insufficient permissions! Search failed! Exception: " + e.getMessage());
 		}catch(NamingException e){
 			throw new UserManagementSystemCommunicationException("Search failed!" , e);
 		}
@@ -504,7 +522,7 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper{
 	 * {@inheritDoc}
 	 */
 	@Override
-	public LDAPAttributeSet getAttributesForEntry(String dn) throws UserManagementSystemCommunicationException {
+	public LDAPAttributeSet getAttributesForEntry(String dn) throws UserManagementSystemCommunicationException, LoginException {
 		return getAttributesForEntry(dn, null);
 	}
 
@@ -512,7 +530,7 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper{
 	 * {@inheritDoc}
 	 */
 	@Override
-	public LDAPAttributeSet getAttributesForEntry(String dn, String[] attributeNames) throws UserManagementSystemCommunicationException {
+	public LDAPAttributeSet getAttributesForEntry(String dn, String[] attributeNames) throws UserManagementSystemCommunicationException, LoginException {
 		try {
 			synchronized (context) {
 				Attributes attributes = null;
@@ -523,6 +541,8 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper{
 				}
 				return getLDAPAttributeSet(attributes);
 			}
+		} catch (NoPermissionException e){
+			throw new LoginException("Insufficient permissions! Bind against this LDAP server or enable anonymous access. Failed to get attributes for entry: " + dn);
 		} catch (NamingException e) {
 			throw new UserManagementSystemCommunicationException("Failed to get attributes from entry with DN: " + dn, e);
 		}

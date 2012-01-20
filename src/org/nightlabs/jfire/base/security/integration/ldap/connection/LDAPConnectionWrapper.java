@@ -72,16 +72,18 @@ public interface LDAPConnectionWrapper{
      * @param dn the entry's DN
      * @param attributes the entry's initial attributes. If <code>null</code> is passed entry is created with no attributes.
      * @throws UserManagementSystemCommunicationException 
+     * @throws LoginException 
      */
-	public void createEntry(String dn, LDAPAttributeSet attributes) throws UserManagementSystemCommunicationException;
+	public void createEntry(String dn, LDAPAttributeSet attributes) throws UserManagementSystemCommunicationException, LoginException;
 
 	/**
 	 * Deletes an entry
 	 * 
 	 * @param dn the entry's DN
 	 * @throws UserManagementSystemCommunicationException
+	 * @throws LoginException 
 	 */
-	public void deleteEntry(String dn) throws UserManagementSystemCommunicationException;
+	public void deleteEntry(String dn) throws UserManagementSystemCommunicationException, LoginException;
 
     /**
      * Modifies attributes of an entry. Note that entry could be renamed as a result of modification, in this case method will
@@ -92,8 +94,9 @@ public interface LDAPConnectionWrapper{
      * @param modificationFlag indicates what is to be done: replacement, addition or removal
      * @throws UserManagementSystemCommunicationException
      * @return new entry name if it was renamed as a result of modification or <code>null</code> if it was not renamed 
+     * @throws LoginException 
      */
-	public String modifyEntry(String dn, LDAPAttributeSet attributes, EntryModificationFlag modificationFlag) throws UserManagementSystemCommunicationException;
+	public String modifyEntry(String dn, LDAPAttributeSet attributes, EntryModificationFlag modificationFlag) throws UserManagementSystemCommunicationException, LoginException;
 
 	/**
 	 * Performs a search for entries by their attributes.
@@ -103,8 +106,9 @@ public interface LDAPConnectionWrapper{
 	 * @param returnAttributes all attributes will be returned if set to <code>null</code>, no attributes if set to an empty array
 	 * @return Map with search results - {@link LDAPAttributeSet} per found entry.
 	 * @throws UserManagementSystemCommunicationException 
+	 * @throws LoginException 
 	 */
-	public Map<String, LDAPAttributeSet> search(String dn, LDAPAttributeSet searchAttributes, String[] returnAttributes) throws UserManagementSystemCommunicationException;
+	public Map<String, LDAPAttributeSet> search(String dn, LDAPAttributeSet searchAttributes, String[] returnAttributes) throws UserManagementSystemCommunicationException, LoginException;
 	
 	/**
 	 * Performs a search for entries by given LDAP search filter. 
@@ -116,8 +120,9 @@ public interface LDAPConnectionWrapper{
 	 * @param searchScope scope for the search, see {@link SearchScope}
 	 * @return Map with search results - {@link LDAPAttributeSet} per found entry.
 	 * @throws UserManagementSystemCommunicationException
+	 * @throws LoginException 
 	 */
-	public Map<String, LDAPAttributeSet> search(String dn, String filterExpr, Object[] filterArgs, SearchScope searchScope) throws UserManagementSystemCommunicationException;
+	public Map<String, LDAPAttributeSet> search(String dn, String filterExpr, Object[] filterArgs, SearchScope searchScope) throws UserManagementSystemCommunicationException, LoginException;
 	
 	/**
 	 * Get {@link LDAPAttributeSet} with all attributes of an entry specified by DN
@@ -125,8 +130,9 @@ public interface LDAPConnectionWrapper{
 	 * @param dn
 	 * @return attributes of given entry
 	 * @throws UserManagementSystemCommunicationException 
+	 * @throws LoginException 
 	 */
-	public LDAPAttributeSet getAttributesForEntry(String dn) throws UserManagementSystemCommunicationException;
+	public LDAPAttributeSet getAttributesForEntry(String dn) throws UserManagementSystemCommunicationException, LoginException;
 
 	/**
 	 * Get {@link LDAPAttributeSet} with attributes specified by <code>attributeNames</code> of an entry specified by DN.
@@ -136,8 +142,9 @@ public interface LDAPConnectionWrapper{
 	 * @param attributeNames
 	 * @return attributes of given entry
 	 * @throws UserManagementSystemCommunicationException 
+	 * @throws LoginException 
 	 */
-	public LDAPAttributeSet getAttributesForEntry(String dn, String[] attributeNames) throws UserManagementSystemCommunicationException;
+	public LDAPAttributeSet getAttributesForEntry(String dn, String[] attributeNames) throws UserManagementSystemCommunicationException, LoginException;
 
 	/**
 	 * Get collection of names of direct children of a given entry

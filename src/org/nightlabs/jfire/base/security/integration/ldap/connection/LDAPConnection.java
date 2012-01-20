@@ -89,31 +89,31 @@ public class LDAPConnection{
     	this.connectionWrapper.bind(bindPrincipal, password);
     }
 
-    public void createEntry(String entryDN, LDAPAttributeSet attributes) throws UserManagementSystemCommunicationException{
+    public void createEntry(String entryDN, LDAPAttributeSet attributes) throws UserManagementSystemCommunicationException, LoginException{
     	this.connectionWrapper.createEntry(entryDN, attributes);
     }
 
-    public void deleteEntry(String entryDN) throws UserManagementSystemCommunicationException{
+    public void deleteEntry(String entryDN) throws UserManagementSystemCommunicationException, LoginException{
     	this.connectionWrapper.deleteEntry(entryDN);
     }
 
-    public String modifyEntry(String entryDN, LDAPAttributeSet attributes, EntryModificationFlag modificationFlag) throws UserManagementSystemCommunicationException{
+    public String modifyEntry(String entryDN, LDAPAttributeSet attributes, EntryModificationFlag modificationFlag) throws UserManagementSystemCommunicationException, LoginException{
     	return this.connectionWrapper.modifyEntry(entryDN, attributes, modificationFlag);
     }
     
-    public Map<String, LDAPAttributeSet> search(String dn, LDAPAttributeSet searchAttributes, String[] returnAttributes) throws UserManagementSystemCommunicationException{
+    public Map<String, LDAPAttributeSet> search(String dn, LDAPAttributeSet searchAttributes, String[] returnAttributes) throws UserManagementSystemCommunicationException, LoginException{
     	return this.connectionWrapper.search(dn, searchAttributes, returnAttributes);
     }
     
-    public Map<String, LDAPAttributeSet> search(String dn, String filterExpr, Object[] filterArgs, SearchScope scope) throws UserManagementSystemCommunicationException{
+    public Map<String, LDAPAttributeSet> search(String dn, String filterExpr, Object[] filterArgs, SearchScope scope) throws UserManagementSystemCommunicationException, LoginException{
     	return this.connectionWrapper.search(dn, filterExpr, filterArgs, scope);
     }
     
-	public LDAPAttributeSet getAttributesForEntry(String dn) throws UserManagementSystemCommunicationException {
+	public LDAPAttributeSet getAttributesForEntry(String dn) throws UserManagementSystemCommunicationException, LoginException {
 		return this.connectionWrapper.getAttributesForEntry(dn);
 	}
 
-	public LDAPAttributeSet getAttributesForEntry(String dn, String[] attributeNames) throws UserManagementSystemCommunicationException {
+	public LDAPAttributeSet getAttributesForEntry(String dn, String[] attributeNames) throws UserManagementSystemCommunicationException, LoginException {
 		return this.connectionWrapper.getAttributesForEntry(dn, attributeNames);
 	}
 

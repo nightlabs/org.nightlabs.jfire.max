@@ -6,8 +6,9 @@ import java.util.Set;
 import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
+import javax.jdo.listener.AttachLifecycleListener;
+import javax.jdo.listener.CreateLifecycleListener;
 import javax.jdo.listener.InstanceLifecycleEvent;
-import javax.jdo.listener.StoreLifecycleListener;
 
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.asyncinvoke.AsyncInvokeEnqueueException;
@@ -19,14 +20,14 @@ import org.nightlabs.jfire.security.integration.id.UserSecurityGroupSyncConfigID
 import org.nightlabs.util.CollectionUtil;
 
 /**
- * JDO lifecycle listener that is configured to listen to creation and storing of {@link LDAPUserSecurityGroupSyncConfig}s.
+ * JDO lifecycle listener that is configured to listen for creation and attaching of {@link LDAPUserSecurityGroupSyncConfig}s.
  * It performs synchronization of authorization-related data whenever new {@link LDAPUserSecurityGroupSyncConfig} is created
- * or an existing one is stored AND has its mapping (name of LDAP group) changed.
+ * or an existing one is attached back to datastore AND has its mapping (name of LDAP group) changed.
  * 
  * @author Denis Dudnik <deniska.dudnik[at]gmail{dot}com>
  *
  */
-public class LDAPUserSecurityGroupSyncConfigLifecycleListener implements StoreLifecycleListener{
+public class LDAPUserSecurityGroupSyncConfigLifecycleListener implements AttachLifecycleListener, CreateLifecycleListener{
 	
 	private static ThreadLocal<Boolean> isEnabledTL = new ThreadLocal<Boolean>(){
 		protected Boolean initialValue() {
@@ -61,7 +62,7 @@ public class LDAPUserSecurityGroupSyncConfigLifecycleListener implements StoreLi
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void postStore(InstanceLifecycleEvent event) {
+	public void postAttach(InstanceLifecycleEvent event) {
 		if (!isEnabled()){
 			return;
 		}
@@ -84,7 +85,7 @@ public class LDAPUserSecurityGroupSyncConfigLifecycleListener implements StoreLi
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void preStore(InstanceLifecycleEvent event) {
+	public void preAttach(InstanceLifecycleEvent event) {
 		if (!isEnabled()){
 			return;
 		}
@@ -112,6 +113,18 @@ public class LDAPUserSecurityGroupSyncConfigLifecycleListener implements StoreLi
 		}
 	}
 
+	@Override
+	public void postCreate(InstanceLifecycleEvent event) {
+		if (!isEnabled()){
+			return;
+		}
+		LDAPUserSecurityGroupSyncConfig syncConfig = (LDAPUserSecurityGroupSyncConfig) event.getPersistentInstance();
+		if (!syncConfig.isSyncEnabled()){
+			return;
+		}
+		execSyncInvocation(syncConfig);
+	}
+
 	private void execSyncInvocation(LDAPUserSecurityGroupSyncConfig syncConfig){
 		LDAPSyncEvent syncEvent = new LDAPSyncEvent(SyncEventGenericType.FETCH_AUTHORIZATION);
 		syncEvent.setFetchEventTypeDataUnits(
@@ -126,4 +139,5 @@ public class LDAPUserSecurityGroupSyncConfigLifecycleListener implements StoreLi
 					"Unable to enqueue Async invocation for initial sync of created LDAPUserSecurityGroupSyncConfig!", e);
 		}
 	}
+
 }

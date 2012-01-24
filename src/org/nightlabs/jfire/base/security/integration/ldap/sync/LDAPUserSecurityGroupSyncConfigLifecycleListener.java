@@ -133,7 +133,7 @@ public class LDAPUserSecurityGroupSyncConfigLifecycleListener implements AttachL
 		LDAPServer ldapServer = syncConfig.getUserManagementSystem();
 		try {
 			LDAPSyncInvocation.executeWithPreservedLDAPConnection(
-					JDOHelper.getPersistenceManager(syncConfig), new LDAPSyncInvocation(ldapServer.getUserManagementSystemObjectID(), syncEvent), ldapServer);
+					JDOHelper.getPersistenceManager(syncConfig), syncEvent, ldapServer);
 		} catch (AsyncInvokeEnqueueException e) {
 			throw new RuntimeException(
 					"Unable to enqueue Async invocation for initial sync of created LDAPUserSecurityGroupSyncConfig!", e);

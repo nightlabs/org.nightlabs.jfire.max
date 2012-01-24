@@ -1,6 +1,9 @@
 package org.nightlabs.jfire.base.security.integration.ldap.sync;
 
 import java.io.Serializable;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
 
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
@@ -14,6 +17,7 @@ import org.nightlabs.jfire.base.security.integration.ldap.connection.ILDAPConnec
 import org.nightlabs.jfire.base.security.integration.ldap.connection.ILDAPConnectionParamsProvider.AuthenticationMethod;
 import org.nightlabs.jfire.base.security.integration.ldap.connection.LDAPConnection;
 import org.nightlabs.jfire.base.security.integration.ldap.connection.LDAPConnectionManager;
+import org.nightlabs.jfire.base.security.integration.ldap.connection.LDAPConnectionManager.IPreservedConnectionListener;
 import org.nightlabs.jfire.security.GlobalSecurityReflector;
 import org.nightlabs.jfire.security.NoUserException;
 import org.nightlabs.jfire.security.User;
@@ -85,15 +89,34 @@ public class LDAPSyncInvocation extends Invocation{
 		}
 	}
 	
+	private static Collection<LDAPSyncInvocationDescriptor> invocationsInProgress = Collections.synchronizedSet(new HashSet<LDAPSyncInvocationDescriptor>());
+	
 	/**
-	 * Preserves {@link LDAPConnection} and executes given {@link Invocation}.
+	 * Preserves {@link LDAPConnection} and executes new {@link LDAPSyncInvocation} with given {@link LDAPSyncEvent}.
+	 * As this method makes use of preserved (private) {@link LDAPConnection}s which could be used only once per {@link User}
+	 * and {@link LDAPServer}, it also controls that no invocation will be executed for the same {@link LDAPServer}, the same {@link User}
+	 * and the same object being synchronized if such an invocation was started already earlier, preserved {@link LDAPConnection} for itself
+	 * and still did NOT make use of this preserved {@link LDAPConnection} which means that sync has not been started. 
+	 * As soon as preserved connection was used by invocation started earlier it is allowed to execute any invocation with 
+	 * private connections again. 
 	 * 
 	 * @param pm The {@link PersistenceManager} to use
+	 * @param syncEvent {@link LDAPSyncEvent} with all synchronization related data
 	 * @param ldapServer {@link LDAPServer} to connect to
 	 * @throws AsyncInvokeEnqueueException 
 	 */
 	public static void executeWithPreservedLDAPConnection(
-			PersistenceManager pm, Invocation invocation, LDAPServer ldapServer) throws AsyncInvokeEnqueueException{
+			PersistenceManager pm, LDAPSyncEvent syncEvent, LDAPServer ldapServer) throws AsyncInvokeEnqueueException{
+
+		final LDAPSyncInvocationDescriptor invocationDescriptor = new LDAPSyncInvocationDescriptor(syncEvent, ldapServer);
+		if (invocationsInProgress.contains(invocationDescriptor)){
+			
+			logger.info(
+					String.format(
+							"No LDAPInvocation will be started for sync event %s, LDAPServer %s and User %s cause similiar one is running already and all changes to objects should be processed by it.", 
+							syncEvent.toString(), ldapServer.getUserManagementSystemObjectID().toString(), GlobalSecurityReflector.sharedInstance().getUserDescriptor().getCompleteUserID()));
+			return;
+		}
 		
 		LDAPConnection connection = null;
 		if (!AuthenticationMethod.NONE.equals(ldapServer.getAuthenticationMethod())){
@@ -104,10 +127,29 @@ public class LDAPSyncInvocation extends Invocation{
 			// See https://www.jfire.org/modules/bugs/view.php?id=1974 for details.
 			connection = preserveConnection(pm, ldapServer);
 			
+			if (connection != null){
+				invocationsInProgress.add(invocationDescriptor);
+				boolean listenerAdded = false;
+				try{
+					listenerAdded = LDAPConnectionManager.sharedInstance().addPreservedConnectionListener(connection, new IPreservedConnectionListener() {
+						@Override
+						public void connectionRecieved() {
+							invocationsInProgress.remove(invocationDescriptor);
+						}
+					});
+				}finally{
+					if (!listenerAdded){
+						// We should remove invocationDescriptor from the invocationsInProgress if listener was not added successfully,
+						// because otherwise it will cause the case when no similiar invocations could be ever executed
+						logger.warn("Preserved connection listener was not added so instantly removing previously added invocation descriptor!");
+						invocationsInProgress.remove(invocationDescriptor);
+					}
+				}
+			}
 		}
 		
 		try{
-			AsyncInvoke.exec(invocation, true);
+			AsyncInvoke.exec(new LDAPSyncInvocation(ldapServer.getUserManagementSystemObjectID(), syncEvent), true);
 		}catch(Exception e){
 			try{
 				if (connection != null){
@@ -144,8 +186,7 @@ public class LDAPSyncInvocation extends Invocation{
 		try{
 			userDescriptor = GlobalSecurityReflector.sharedInstance().getUserDescriptor();
 		}catch(NoUserException e){
-			logger.error("No User logged in while preserving LDAPConnection!");
-			return null;
+			throw new IllegalStateException("No User is logged in! Makes no sense as no Invocation could be executed with no User.");
 		}
 		
 		boolean exceptionOccured = false;
@@ -161,7 +202,7 @@ public class LDAPSyncInvocation extends Invocation{
 
 			ldapServer.bindConnection(connection, user, LDAPServer.getLDAPPasswordForCurrentUser());
 			
-			LDAPConnectionManager.sharedInstance().preservePrivateLDAPConnection(ldapServer, connection);
+			LDAPConnectionManager.sharedInstance().preservePrivateLDAPConnection(connection);
 			
 			return connection;
 			
@@ -185,6 +226,66 @@ public class LDAPSyncInvocation extends Invocation{
 			}
 		}
 		return null;
+	}
+	
+	private static class LDAPSyncInvocationDescriptor{
+		private LDAPSyncEvent syncEvent;
+		private LDAPServer ldapServer;
+		private UserDescriptor userDescriptor;
+		public LDAPSyncInvocationDescriptor(LDAPSyncEvent syncEvent, LDAPServer ldapServer) {
+			this.syncEvent = syncEvent;
+			this.ldapServer = ldapServer;
+			try{
+				this.userDescriptor = GlobalSecurityReflector.sharedInstance().getUserDescriptor();
+			}catch(NoUserException e){
+				throw new IllegalStateException("No User is logged in! Makes no sense as no Invocation could be executed with no User.");
+			}
+		}
+		/* (non-Javadoc)
+		 * @see java.lang.Object#hashCode()
+		 */
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result
+					+ ((ldapServer == null) ? 0 : ldapServer.hashCode());
+			result = prime * result
+					+ ((syncEvent == null) ? 0 : syncEvent.hashCode());
+			result = prime
+					* result
+					+ ((userDescriptor == null) ? 0 : userDescriptor.hashCode());
+			return result;
+		}
+		/* (non-Javadoc)
+		 * @see java.lang.Object#equals(java.lang.Object)
+		 */
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			LDAPSyncInvocationDescriptor other = (LDAPSyncInvocationDescriptor) obj;
+			if (ldapServer == null) {
+				if (other.ldapServer != null)
+					return false;
+			} else if (!ldapServer.equals(other.ldapServer))
+				return false;
+			if (syncEvent == null) {
+				if (other.syncEvent != null)
+					return false;
+			} else if (!syncEvent.equals(other.syncEvent))
+				return false;
+			if (userDescriptor == null) {
+				if (other.userDescriptor != null)
+					return false;
+			} else if (!userDescriptor.equals(other.userDescriptor))
+				return false;
+			return true;
+		}
 	}
 }
 

@@ -252,7 +252,7 @@ public class SecurityChangeListenerJFirePasswordChanged extends SecurityChangeLi
 			}
 			ldapServer.bindConnection(connection, user, LDAPServer.getLDAPPasswordForCurrentUser());
 			
-			LDAPConnectionManager.sharedInstance().preservePrivateLDAPConnection(ldapServer, key, connection);
+			LDAPConnectionManager.sharedInstance().preservePrivateLDAPConnection(key, connection);
 			
 			return connection;
 			

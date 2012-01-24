@@ -196,8 +196,7 @@ public class SecurityChangeListenerUserSecurityGroupMembers extends SecurityChan
 						UserSecurityGroupID.create(userSecurityGroup.getOrganisationID(), userSecurityGroup.getUserSecurityGroupID()));
 				syncEvent.setSendEventTypeDataUnits(CollectionUtil.createArrayList(dataUnit));
 				
-				LDAPSyncInvocation.executeWithPreservedLDAPConnection(
-						pm, new LDAPSyncInvocation(ldapServer.getUserManagementSystemObjectID(), syncEvent), ldapServer);
+				LDAPSyncInvocation.executeWithPreservedLDAPConnection(pm, syncEvent, ldapServer);
 				
 			}catch(Exception e){
 				lastThrowable = e;

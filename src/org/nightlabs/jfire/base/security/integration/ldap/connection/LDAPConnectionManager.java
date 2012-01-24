@@ -1,5 +1,7 @@
 package org.nightlabs.jfire.base.security.integration.ldap.connection;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -16,6 +18,8 @@ import org.nightlabs.jfire.security.NoUserException;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.security.id.UserID;
 import org.nightlabs.jfire.security.integration.UserManagementSystemCommunicationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Simple LDAPConnection pool.
@@ -24,6 +28,8 @@ import org.nightlabs.jfire.security.integration.UserManagementSystemCommunicatio
  *
  */
 public class LDAPConnectionManager{
+	
+	private static final Logger logger = LoggerFactory.getLogger(LDAPConnectionManager.class);
 	
 	/**
 	 * Number of possible connections in the pool per every LDAP server
@@ -57,10 +63,27 @@ public class LDAPConnectionManager{
 	 */
 	private Map<UserID, ConnectionsHolder> privateConnections;
 	
+	public interface IPreservedConnectionListener{
+		/**
+		 * Is triggered when preserved {@link LDAPConnection} was requested and returned 
+		 * either by {@link LDAPConnectionManager#getPrivateLDAPConnection(ILDAPConnectionParamsProvider, String)}
+		 * or by {@link LDAPConnectionManager#getPrivateLDAPConnection(ILDAPConnectionParamsProvider)}
+		 */
+		void connectionRecieved();
+	}
+	
+	/**
+	 * Holds a {@link Collection} of {@link IPreservedConnectionListener}s per {@link LDAPConnection}
+	 * All listeners are removed automatically when {@link LDAPConnection} was removed from {@link #privateConnections},
+	 * which means that every listener could be triggered exactly once and then is removed.
+	 */
+	private Map<LDAPConnection, Collection<IPreservedConnectionListener>> preservedConnectionsListeners;
+	
 
 	private LDAPConnectionManager(){
 		availableConnections = new ConnectionsHolder();
 		privateConnections = new HashMap<UserID, ConnectionsHolder>();
+		preservedConnectionsListeners = new HashMap<LDAPConnection, Collection<IPreservedConnectionListener>>();
 	}
 
 	public static synchronized LDAPConnectionManager sharedInstance(){
@@ -136,6 +159,9 @@ public class LDAPConnectionManager{
 			ConnectionsHolder holder = privateConnections.get(key);
 			if (holder != null){
 				holder.removePrivateConnection(connection);
+				if (preservedConnectionsListeners.containsKey(connection)){
+					preservedConnectionsListeners.remove(connection);
+				}
 				break;
 			}
 		}
@@ -154,12 +180,11 @@ public class LDAPConnectionManager{
 	 * It was introduced to cover the use case described here (https://www.jfire.org/modules/bugs/view.php?id=1974)
 	 * so please use it for similar use cases. 
 	 *
-	 * @param paramsProvider Params provider of a connection
 	 * @param key Key to preserve given connection under
 	 * @param connection The {@link LDAPConnection} to be preserved
 	 * @throws NoUserException If no {@link User} is logged in 
 	 */
-	public synchronized void preservePrivateLDAPConnection(ILDAPConnectionParamsProvider paramsProvider, String key, LDAPConnection connection) throws NoUserException{
+	public synchronized void preservePrivateLDAPConnection(String key, LDAPConnection connection) throws NoUserException{
 		UserID userID = GlobalSecurityReflector.sharedInstance().getUserDescriptor().getUserObjectID();
 		
 		ConnectionsHolder connectionsHolder = privateConnections.get(userID);
@@ -168,7 +193,7 @@ public class LDAPConnectionManager{
 			privateConnections.put(userID, connectionsHolder);
 		}
 		
-		LDAPConnection prevConnection = connectionsHolder.getPrivateConnection(paramsProvider, key);
+		LDAPConnection prevConnection = connectionsHolder.getPrivateConnection(connection.getConnectionParamsProvider(), key);
 		if (prevConnection != null){
 			try {
 				prevConnection.unbind();
@@ -179,7 +204,7 @@ public class LDAPConnectionManager{
 			releaseConnection(prevConnection);
 		}
 		
-		connectionsHolder.putPrivateConnection(paramsProvider, key, connection);
+		connectionsHolder.putPrivateConnection(connection.getConnectionParamsProvider(), key, connection);
 	}
 
 	/**
@@ -194,12 +219,11 @@ public class LDAPConnectionManager{
 	 * It was introduced to cover the use case described here (https://www.jfire.org/modules/bugs/view.php?id=1974)
 	 * so please use it for similar use cases. 
 	 *
-	 * @param paramsProvider Params provider of a connection
 	 * @param connection The {@link LDAPConnection} to be preserved
 	 * @throws NoUserException If no {@link User} is logged in 
 	 */
-	public synchronized void preservePrivateLDAPConnection(ILDAPConnectionParamsProvider paramsProvider, LDAPConnection connection) throws NoUserException{
-		preservePrivateLDAPConnection(paramsProvider, ConnectionsHolder.DEFAULT_KEY, connection);
+	public synchronized void preservePrivateLDAPConnection(LDAPConnection connection) throws NoUserException{
+		preservePrivateLDAPConnection(ConnectionsHolder.DEFAULT_KEY, connection);
 	}
 
 	/**
@@ -216,7 +240,21 @@ public class LDAPConnectionManager{
 		UserID userID = GlobalSecurityReflector.sharedInstance().getUserDescriptor().getUserObjectID();
 		ConnectionsHolder connectionsHolder = privateConnections.get(userID);
 		if (connectionsHolder != null){
-			return connectionsHolder.getPrivateConnection(paramsProvider, key);
+			LDAPConnection privateConnection = connectionsHolder.getPrivateConnection(paramsProvider, key);
+			
+			if (privateConnection != null && preservedConnectionsListeners.containsKey(privateConnection)){
+				Collection<IPreservedConnectionListener> listeners = preservedConnectionsListeners.get(privateConnection);
+				for (IPreservedConnectionListener listener : listeners){
+					try{
+						listener.connectionRecieved();
+					}catch(Exception e){
+						logger.error("Exception occured at one of preserved connection listeners: " + e.getMessage(), e);
+					}
+				}
+				preservedConnectionsListeners.remove(privateConnection);
+			}
+			
+			return privateConnection;
 		}
 		return null;
 	}
@@ -235,13 +273,60 @@ public class LDAPConnectionManager{
 		return getPrivateLDAPConnection(paramsProvider, ConnectionsHolder.DEFAULT_KEY);
 	}
 	
+	/**
+	 * Adds {@link IPreservedConnectionListener} for a given {@link LDAPConnection} which SHOULD be preserved earlier
+	 * either by {@link #preservePrivateLDAPConnection(ILDAPConnectionParamsProvider, String, LDAPConnection)}
+	 * or by {@link #preservePrivateLDAPConnection(ILDAPConnectionParamsProvider, LDAPConnection)}.
+	 * Note that this listener could be triggered only once cause private connection could be requested and recieved only once.
+	 * 
+	 * @param connection {@link LDAPConnection} which was preserved earlier
+	 * @param listener {@link IPreservedConnectionListener} to add
+	 * @return <code>true</code> if listener was added successfully, <code>false</code> otherwise
+	 */
+	public boolean addPreservedConnectionListener(LDAPConnection connection, IPreservedConnectionListener listener){
+		UserID userID = GlobalSecurityReflector.sharedInstance().getUserDescriptor().getUserObjectID();
+		ConnectionsHolder connectionsHolder = privateConnections.get(userID);
+		if (connectionsHolder != null && connectionsHolder.containsPrivateConnection(connection)){
+			if (preservedConnectionsListeners.containsKey(connection)){
+				return preservedConnectionsListeners.get(connection).add(listener);
+			}else{
+				Collection<IPreservedConnectionListener> listeners = new ArrayList<IPreservedConnectionListener>();
+				boolean listenerAdded = listeners.add(listener);
+				if (listenerAdded){
+					preservedConnectionsListeners.put(connection, listeners);
+				}
+				return listenerAdded;
+			}
+		}
+		return false;
+	}
+	
+	/**
+	 * Removes given {@link IPreservedConnectionListener} from listening to given preserved {@link LDAPConnection}.
+	 * 
+	 * @param connection preserved {@link LDAPConnection} which had listener added
+	 * @param listener {@link IPreservedConnectionListener} to be removed
+	 * @return <code>true</code> if listener was successfully removed, <code>false</code> otherwise
+	 */
+	public boolean removePreservedConnectionListener(LDAPConnection connection, IPreservedConnectionListener listener){
+		if (preservedConnectionsListeners.containsKey(connection)){
+			Collection<IPreservedConnectionListener> listeners = preservedConnectionsListeners.get(connection);
+			boolean removed = listeners.remove(listener);
+			if (listeners.isEmpty()){
+				preservedConnectionsListeners.remove(connection);
+			}
+			return removed;
+		}
+		return false;
+	}
+	
 	class ConnectionsHolder{
 		private static final String DEFAULT_KEY = "default";
 		private Map<ILDAPConnectionParamsProvider, Map<String, LDAPConnection>> privateConnectionsMap;
 		private Map<ILDAPConnectionParamsProvider, List<LDAPConnection>> connectionsMap;
 		public ConnectionsHolder(){
 			connectionsMap = new HashMap<ILDAPConnectionParamsProvider, List<LDAPConnection>>();
-			privateConnectionsMap = new HashMap<ILDAPConnectionParamsProvider, Map<String,LDAPConnection>>();
+			privateConnectionsMap = new HashMap<ILDAPConnectionParamsProvider, Map<String, LDAPConnection>>();
 		}
 		public void putConnection(ILDAPConnectionParamsProvider paramsProvider, LDAPConnection connection) {
 			List<LDAPConnection> connections = connectionsMap.get(paramsProvider);
@@ -297,6 +382,10 @@ public class LDAPConnectionManager{
 					connections.remove(keyToRemove);
 				}
 			}
+		}
+		public boolean containsPrivateConnection(LDAPConnection connection){
+			Map<String, LDAPConnection> connections = privateConnectionsMap.get(connection.getConnectionParamsProvider());
+			return connections != null && connections.containsValue(connection);
 		}
 	}
 }

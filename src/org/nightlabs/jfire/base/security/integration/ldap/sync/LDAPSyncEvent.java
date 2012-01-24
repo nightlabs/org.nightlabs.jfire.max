@@ -236,5 +236,66 @@ public class LDAPSyncEvent implements UserManagementSystemSyncEvent, Serializabl
 	public SyncEventType getEventType() {
 		return eventType;
 	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "LDAPSyncEvent [eventType=" + eventType.stringValue()
+				+ ", sendEventTypeDataUnits=" + sendEventTypeDataUnits
+				+ ", fetchEventTypeDataUnits=" + fetchEventTypeDataUnits + "]";
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((eventType == null) ? 0 : eventType.hashCode());
+		result = prime
+				* result
+				+ ((fetchEventTypeDataUnits == null) ? 0
+						: fetchEventTypeDataUnits.hashCode());
+		result = prime
+				* result
+				+ ((sendEventTypeDataUnits == null) ? 0
+						: sendEventTypeDataUnits.hashCode());
+		return result;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		LDAPSyncEvent other = (LDAPSyncEvent) obj;
+		if (eventType == null) {
+			if (other.eventType != null)
+				return false;
+		} else if (!eventType.equals(other.eventType))
+			return false;
+		if (fetchEventTypeDataUnits == null) {
+			if (other.fetchEventTypeDataUnits != null)
+				return false;
+		} else if (!fetchEventTypeDataUnits
+				.equals(other.fetchEventTypeDataUnits))
+			return false;
+		if (sendEventTypeDataUnits == null) {
+			if (other.sendEventTypeDataUnits != null)
+				return false;
+		} else if (!sendEventTypeDataUnits.equals(other.sendEventTypeDataUnits))
+			return false;
+		return true;
+	}
 	
 }

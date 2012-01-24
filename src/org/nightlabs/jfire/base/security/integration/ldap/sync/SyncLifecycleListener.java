@@ -192,8 +192,7 @@ public class SyncLifecycleListener implements StoreLifecycleListener, DeleteLife
 				LDAPSyncEvent syncEvent = new LDAPSyncEvent(eventType);
 				syncEvent.setSendEventTypeDataUnits(CollectionUtil.createHashSet(dataUnit));
 				try {
-					LDAPSyncInvocation.executeWithPreservedLDAPConnection(
-							pm, new LDAPSyncInvocation(ldapServerId, syncEvent), ldapServer);
+					LDAPSyncInvocation.executeWithPreservedLDAPConnection(pm, syncEvent, ldapServer);
 				} catch (AsyncInvokeEnqueueException e) {
 					lastThrowable = e;
 					logger.error(e.getMessage(), e);

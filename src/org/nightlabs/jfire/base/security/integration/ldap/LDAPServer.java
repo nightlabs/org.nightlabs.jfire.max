@@ -982,7 +982,7 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 					event.setFetchEventTypeDataUnits(fetchDataUnits);
 					
 					userSyncIsRunning.set(true);
-					LDAPConnectionManager.sharedInstance().preservePrivateLDAPConnection(LDAPServer.this, connection);	// will be released in caller of this method
+					LDAPConnectionManager.sharedInstance().preservePrivateLDAPConnection(connection);	// will be released in caller of this method
 					synchronize(event);
 				} finally {
 					userSyncIsRunning.set(false);

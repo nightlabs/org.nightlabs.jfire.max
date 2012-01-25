@@ -1353,6 +1353,12 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 						
 					}else{
 
+						Set<AuthorizedObject> groupMembers = syncConfig.getUserSecurityGroup().getMembers();
+						if (groupMembers.isEmpty()){
+							throw new UserManagementSystemSyncException(
+									String.format("UserSecurityGroup %s does not have members, so it is not possible to synchronize it to LDAP since LDAP groups does not allow empty members and therefore any attempt to sync will end up with schema violation exception.", syncConfig.getUserSecurityGroup().getName()));
+						}
+
 						String groupName = syncConfig.getUserSecurityGroup().getName();
 						if (groupName == null || groupName.isEmpty()){
 							groupName = syncConfig.getUserSecurityGroup().getUserSecurityGroupID();
@@ -1363,8 +1369,7 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 						
 						LDAPAttributeSet modifyAttributes = new LDAPAttributeSet();
 						modifyAttributes.createAttribute(COMMON_NAME_ATTR_NAME, ldapGroup.getGroupName());
-						Set<AuthorizedObject> members = syncConfig.getUserSecurityGroup().getMembers();
-						for (AuthorizedObject authorizedObject : members) {
+						for (AuthorizedObject authorizedObject : groupMembers) {
 							if (authorizedObject instanceof UserLocal){
 								User user = ((UserLocal) authorizedObject).getUser();
 								String ldapUserDN = getLDAPUserDN(user);
@@ -1372,18 +1377,16 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 							}
 						}
 						
-						if(modifyAttributes != null && modifyAttributes.size() > 0){
-							if (entryExists){
-								String newEntryName = connection.modifyEntry(ldapGroupName, modifyAttributes, EntryModificationFlag.MODIFY);
-								if (newEntryName != null){
-									syncConfig.setLdapGroupName(newEntryName);
-									pm.makePersistent(syncConfig);
-								}
-							}else{	// create new entry
-								modifyAttributes.createAttribute(OBJECT_CLASS_ATTR_NAME, "top");
-								modifyAttributes.createAttribute(OBJECT_CLASS_ATTR_NAME, ldapGroup.getObjectClassAttr());
-								connection.createEntry(ldapGroupName, modifyAttributes);
+						if (entryExists){
+							String newEntryName = connection.modifyEntry(ldapGroupName, modifyAttributes, EntryModificationFlag.MODIFY);
+							if (newEntryName != null){
+								syncConfig.setLdapGroupName(newEntryName);
+								pm.makePersistent(syncConfig);
 							}
+						}else{	// create new entry
+							modifyAttributes.createAttribute(OBJECT_CLASS_ATTR_NAME, "top");
+							modifyAttributes.createAttribute(OBJECT_CLASS_ATTR_NAME, ldapGroup.getObjectClassAttr());
+							connection.createEntry(ldapGroupName, modifyAttributes);
 						}
 					}
 				}catch(Exception e){

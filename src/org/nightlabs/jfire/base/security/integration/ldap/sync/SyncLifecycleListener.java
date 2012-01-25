@@ -162,6 +162,13 @@ public class SyncLifecycleListener implements StoreLifecycleListener, DeleteLife
 				}finally{
 					q.closeAll();
 				}
+			}else if (persistentInstance instanceof UserSecurityGroup
+					&& SyncEventGenericType.UMS_REMOVE_AUTHORIZATION != eventType){
+				UserSecurityGroup userSecurityGroup = (UserSecurityGroup) persistentInstance;
+				if (userSecurityGroup.getMembers().isEmpty()){
+					logger.error(String.format("UserSecurityGroup %s does not have members, so it is not possible to synchronize it to LDAP since LDAP groups does not allow empty members and therefore any attempt to sync will end up with schema violation exception.", userSecurityGroup.getName()));
+					return;
+				}
 			}
 			
 			Throwable lastThrowable = null;

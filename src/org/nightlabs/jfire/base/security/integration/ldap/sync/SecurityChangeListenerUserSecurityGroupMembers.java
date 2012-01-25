@@ -183,6 +183,11 @@ public class SecurityChangeListenerUserSecurityGroupMembers extends SecurityChan
 		if (userSecurityGroup == null){
 			return;
 		}
+		if (userSecurityGroup.getMembers().isEmpty()){
+			logger.error(
+					String.format("UserSecurityGroup %s does not have members, so it is not possible to synchronize it to LDAP since LDAP groups does not allow empty members and therefore any attempt to sync will end up with schema violation exception.", userSecurityGroup.getName()));
+			return;
+		}
 
 		PersistenceManager pm = getPersistenceManager();
 		Collection<LDAPServer> ldapServers = UserManagementSystem.getUserManagementSystemsByLeading(pm, false, LDAPServer.class);

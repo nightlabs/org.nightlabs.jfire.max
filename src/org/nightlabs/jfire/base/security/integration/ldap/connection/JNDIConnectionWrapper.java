@@ -94,7 +94,7 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper{
 	private static final String LDAP_SCHEME = "ldap://";
 	private static final String LDAPS_SCHEME = "ldaps://";
 
-	private LDAPConnection connection;
+	private ILDAPConnectionParamsProvider connectionParamsProvider;
 
 	private InitialLdapContext context;
 
@@ -106,8 +106,11 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper{
 	 * @param connection
 	 *            the connection
 	 */
-	public JNDIConnectionWrapper(LDAPConnection connection) {
-		this.connection = connection;
+	public JNDIConnectionWrapper(ILDAPConnectionParamsProvider connectionParamsProvider) {
+		if (connectionParamsProvider == null){
+			throw new IllegalArgumentException("ILDAPConnectionParamsProvider can't be null!");
+		}
+		this.connectionParamsProvider = connectionParamsProvider;
 	}
 	
 	/**
@@ -128,10 +131,10 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper{
 
 		context = null;
 
-		String host = connection.getConnectionParamsProvider().getHost();
-		int port = connection.getConnectionParamsProvider().getPort();
-		boolean useLdaps = connection.getConnectionParamsProvider().getEncryptionMethod() == EncryptionMethod.LDAPS;
-        boolean useStartTLS = connection.getConnectionParamsProvider().getEncryptionMethod() == EncryptionMethod.START_TLS;
+		String host = connectionParamsProvider.getHost();
+		int port = connectionParamsProvider.getPort();
+		boolean useLdaps = connectionParamsProvider.getEncryptionMethod() == EncryptionMethod.LDAPS;
+        boolean useStartTLS = connectionParamsProvider.getEncryptionMethod() == EncryptionMethod.START_TLS;
 
 		try{
 			Hashtable<String, String> environment = new Hashtable<String, String>();
@@ -190,7 +193,7 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper{
 			throw new UserManagementSystemCommunicationException(
 					String.format(
 							"Can't connect to LDAP server at %s:%s, see log for details. Cause: %s", host, port, e.getMessage()
-							));
+							), e);
 		}
 		
 	}
@@ -211,12 +214,12 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper{
 			
 			String authMethod = AuthenticationMethod.NONE.stringValue();
 			boolean useSASL = false;
-			if (AuthenticationMethod.SIMPLE.equals(connection.getConnectionParamsProvider().getAuthenticationMethod())) {
+			if (AuthenticationMethod.SIMPLE.equals(connectionParamsProvider.getAuthenticationMethod())) {
 				authMethod = AuthenticationMethod.SIMPLE.stringValue();
-			}else if (AuthenticationMethod.SASL_DIGEST_MD5.equals(connection.getConnectionParamsProvider().getAuthenticationMethod())) {
+			}else if (AuthenticationMethod.SASL_DIGEST_MD5.equals(connectionParamsProvider.getAuthenticationMethod())) {
 				authMethod = AuthenticationMethod.SASL_DIGEST_MD5.stringValue();
 				useSASL = true;
-			}else if (AuthenticationMethod.SASL_CRAM_MD5.equals(connection.getConnectionParamsProvider().getAuthenticationMethod())) {
+			}else if (AuthenticationMethod.SASL_CRAM_MD5.equals(connectionParamsProvider.getAuthenticationMethod())) {
 				authMethod = AuthenticationMethod.SASL_CRAM_MD5.stringValue();
 				useSASL = true;
 			}
@@ -235,7 +238,7 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper{
                         // Request quality of protection
                     	context.addToEnvironment(JAVAX_SECURITY_SASL_QOP, "auth-conf,auth-int,auth");
                     	if (AuthenticationMethod.SASL_DIGEST_MD5.equals(authMethod)){
-                    		String saslRealm = connection.getConnectionParamsProvider().getSASLRealm(bindPrincipal);
+                    		String saslRealm = connectionParamsProvider.getSASLRealm(bindPrincipal);
                     		if (saslRealm != null && !saslRealm.isEmpty()){
                     			context.addToEnvironment(JAVA_NAMING_SECURITY_SASL_REALM, saslRealm);
                     		}
@@ -247,7 +250,7 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper{
                     context.reconnect( context.getConnectControls() );
 				}
 			}catch(NamingException e){
-				logger.error(String.format("Failed to bind against LDAP server at %s:%s", connection.getConnectionParamsProvider().getHost(), connection.getConnectionParamsProvider().getPort()), e);
+				logger.error(String.format("Failed to bind against LDAP server at %s:%s", connectionParamsProvider.getHost(), connectionParamsProvider.getPort()), e);
 				
 				unbind();
 				
@@ -257,7 +260,7 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper{
 			}
 		}else{
 			throw new UserManagementSystemCommunicationException(
-					String.format("No connection to LDAP server at %s:%s", connection.getConnectionParamsProvider().getHost(), connection.getConnectionParamsProvider().getPort())
+					String.format("No connection to LDAP server at %s:%s", connectionParamsProvider.getHost(), connectionParamsProvider.getPort())
 					);
 		}
 	}
@@ -278,7 +281,7 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper{
 				}
 			}catch(NamingException e){
 				logger.error(
-						String.format("Failed to unbind on LDAP server at %s:%s", connection.getConnectionParamsProvider().getHost(), connection.getConnectionParamsProvider().getPort()), e
+						String.format("Failed to unbind on LDAP server at %s:%s", connectionParamsProvider.getHost(), connectionParamsProvider.getPort()), e
 						);
 				disconnect(); 
 			}
@@ -457,7 +460,7 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper{
 				boolean authMethodChanged = false;
 				Object saslRealm = null;
 				try{
-					if (AuthenticationMethod.SASL_DIGEST_MD5.equals(connection.getConnectionParamsProvider().getAuthenticationMethod())){
+					if (AuthenticationMethod.SASL_DIGEST_MD5.equals(connectionParamsProvider.getAuthenticationMethod())){
 						context.removeFromEnvironment(Context.SECURITY_AUTHENTICATION);
 		                saslRealm = context.removeFromEnvironment(JAVA_NAMING_SECURITY_SASL_REALM);
 						context.addToEnvironment(Context.SECURITY_AUTHENTICATION, AuthenticationMethod.SASL_CRAM_MD5.stringValue());

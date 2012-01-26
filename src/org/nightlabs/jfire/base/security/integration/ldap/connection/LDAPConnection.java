@@ -29,9 +29,9 @@ public class LDAPConnection{
      *
      * @param connectionParameter
      */
-    public LDAPConnection(ILDAPConnectionParamsProvider connectionParameter){
-        this.connectionParamsProvider = connectionParameter;
-        this.connectionWrapper = new JNDIConnectionWrapper(this);
+    public LDAPConnection(ILDAPConnectionParamsProvider connectionParamsProvider){
+        this.connectionParamsProvider = connectionParamsProvider;
+        this.connectionWrapper = new JNDIConnectionWrapper(connectionParamsProvider);
     }
     
     /**

@@ -695,7 +695,6 @@ public class PushNotificationsConfigurator {
 				
 				// we use LDAPConnection via JNDI here because all the push notifications are done via JNDI listeners
 				connection = new LDAPConnection(ldapServer);
-				connection.setConnectionWrapper(new JNDIConnectionWrapper(ldapServer));
 				connection.connect();
 
 				for (String parentEntry : parentEntriesForSync){

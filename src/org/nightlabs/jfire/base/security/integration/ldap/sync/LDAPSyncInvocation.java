@@ -151,15 +151,7 @@ public class LDAPSyncInvocation extends Invocation{
 		try{
 			AsyncInvoke.exec(new LDAPSyncInvocation(ldapServer.getUserManagementSystemObjectID(), syncEvent), true);
 		}catch(Exception e){
-			try{
-				if (connection != null){
-					connection.unbind();
-				}
-			} catch (UserManagementSystemCommunicationException ex) {
-				// do nothing
-			}finally{
-				LDAPConnectionManager.sharedInstance().releaseConnection(connection);
-			}
+			LDAPConnectionManager.sharedInstance().releaseConnection(connection);
 			
 			AsyncInvokeEnqueueException asyncInvokeEnqueueException = null;
 			if (e instanceof AsyncInvokeEnqueueException){
@@ -217,11 +209,6 @@ public class LDAPSyncInvocation extends Invocation{
 			throw new RuntimeException(e);
 		} finally {
 			if (exceptionOccured){
-				try {
-					connection.unbind();
-				} catch (UserManagementSystemCommunicationException e) {
-					// do nothing, this exception does not matter for us
-				}
 				LDAPConnectionManager.sharedInstance().releaseConnection(connection);
 			}
 		}

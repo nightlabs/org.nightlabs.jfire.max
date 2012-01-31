@@ -185,11 +185,6 @@ public class LDAPUserSecurityGroupSyncConfigLifecycleListener implements AttachL
 		} catch (LoginException e) {
 			throw e;
 		} finally {
-			try {
-				connection.unbind();
-			} catch (UserManagementSystemCommunicationException e) {
-				// do nothing, this exception does not matter for us
-			}
 			LDAPConnectionManager.sharedInstance().releaseConnection(connection);
 		}
 	}

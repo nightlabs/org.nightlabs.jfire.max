@@ -10,7 +10,11 @@ import org.nightlabs.jfire.security.integration.UserManagementSystemCommunicatio
 
 /**
  * A ConnectionWrapper is a wrapper for a real directory connection implementation.
- *
+ * 
+ * It is strongly recommended that implementation classes should have a constructor accepting {@link ILDAPConnectionParamsProvider} argument
+ * since it is assumed by {@link LDAPConnectionManager} that they have one. If there's no such a constructor, {@link LDAPConnectionManager}
+ * will be using default {@link LDAPConnectionWrapper} which is defined by {@link LDAPConnection} class.
+ *  
  * @author Denis Dudnik <deniska.dudnik[at]gmail{dot}com>
  */
 public interface LDAPConnectionWrapper{
@@ -62,9 +66,16 @@ public interface LDAPConnectionWrapper{
     /**
      * Checks if is connected.
      * 
-     * @return true, if is connected
+     * @return <code>true</code> if is connected, <code>false</code> otherwise
      */
     public boolean isConnected();
+    
+    /**
+     * Checks if connection is authenticated (bind operation was issued successfully)
+     * 
+     * @return <code>true</code> if authenticated, <code>false</code> otherwise
+     */
+    public boolean isAuthenticated();
 
     /**
      * Creates an entry.
@@ -128,7 +139,7 @@ public interface LDAPConnectionWrapper{
 	 * Get {@link LDAPAttributeSet} with all attributes of an entry specified by DN
 	 * 
 	 * @param dn
-	 * @return attributes of given entry
+	 * @return attributes of given entry or <code>null</code> if entry can't be found
 	 * @throws UserManagementSystemCommunicationException 
 	 * @throws LoginException 
 	 */
@@ -140,7 +151,7 @@ public interface LDAPConnectionWrapper{
 	 * 
 	 * @param dn
 	 * @param attributeNames
-	 * @return attributes of given entry
+	 * @return attributes of given entry or <code>null</code> if entry can't be found
 	 * @throws UserManagementSystemCommunicationException 
 	 * @throws LoginException 
 	 */

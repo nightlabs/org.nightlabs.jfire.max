@@ -154,13 +154,7 @@ public class SecurityChangeListenerJFirePasswordChanged extends SecurityChangeLi
 										user, newPasswordWrapper.toString(), ldapServer.getLdapScriptSet().getLdapDN(user)),
 								ldapServer.getLdapScriptSet().getUserParentEntriesForSync());
 					}catch(Exception e){
-						try{
-							if (preservedConnection != null){
-								preservedConnection.unbind();
-							}
-						}finally{
-							LDAPConnectionManager.sharedInstance().releaseConnection(preservedConnection);
-						}
+						LDAPConnectionManager.sharedInstance().releaseConnection(preservedConnection);
 						throw e;
 					}
 				}
@@ -222,9 +216,6 @@ public class SecurityChangeListenerJFirePasswordChanged extends SecurityChangeLi
 			}
 			return false;
 		}finally{
-			if (connection != null){
-				connection.unbind();
-			}
 			LDAPConnectionManager.sharedInstance().releaseConnection(connection);
 		}
 	}
@@ -267,11 +258,6 @@ public class SecurityChangeListenerJFirePasswordChanged extends SecurityChangeLi
 			throw new RuntimeException(e);
 		} finally {
 			if (exceptionOccured){
-				try {
-					connection.unbind();
-				} catch (UserManagementSystemCommunicationException e) {
-					// do nothing, this exception does not matter for us
-				}
 				LDAPConnectionManager.sharedInstance().releaseConnection(connection);
 			}
 		}

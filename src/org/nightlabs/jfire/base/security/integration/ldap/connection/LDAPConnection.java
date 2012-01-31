@@ -13,7 +13,7 @@ import org.nightlabs.jfire.security.integration.UserManagementSystemCommunicatio
 /**
  * Class representing connection to an actual LDAP server. Connection parameters are passed by
  * {@link ILDAPConnectionParamsProvider}, actual implementation is done inside {@link LDAPConnectionWrapper}
- * subclasses, so see it for code documentation.
+ * implementations. Default is {@link JNDIConnectionWrapper}.
  * 
  * @author Denis Dudnik <deniska.dudnik[at]gmail{dot}com>
  *
@@ -25,24 +25,30 @@ public class LDAPConnection{
     private LDAPConnectionWrapper connectionWrapper;
 
     /**
-     * Creates a new instance of Connection.
+     * Creates a new instance of {@link LDAPConnection} with given {@link ILDAPConnectionParamsProvider} 
+     * using default {@link JNDIConnectionWrapper}.
      *
-     * @param connectionParameter
+     * @param connectionParamsProvider
      */
     public LDAPConnection(ILDAPConnectionParamsProvider connectionParamsProvider){
-        this.connectionParamsProvider = connectionParamsProvider;
-        this.connectionWrapper = new JNDIConnectionWrapper(connectionParamsProvider);
+    	this(connectionParamsProvider, new JNDIConnectionWrapper(connectionParamsProvider));
     }
-    
+
     /**
-     * Set an implementation of {@link LDAPConnectionWrapper} which will handle actual connection-related staff.
-     * 
-     * @param connectionWrapper implementation of {@link LDAPConnectionWrapper}
+     * Creates a new instance of {@link LDAPConnection} with given {@link ILDAPConnectionParamsProvider} 
+     * and {@link LDAPConnectionWrapper} implementation.
+     *
+     * @param connectionParamsProvider
+     * @param connectionWrapper can't be <code>null</code>, {@link IllegalArgumentException} will be thrown otherwise
      */
-    public void setConnectionWrapper(LDAPConnectionWrapper connectionWrapper) {
-		this.connectionWrapper = connectionWrapper;
-	}
-    
+    public LDAPConnection(ILDAPConnectionParamsProvider connectionParamsProvider, LDAPConnectionWrapper connectionWrapper){
+    	if (connectionWrapper == null){
+    		throw new IllegalArgumentException("LDAPConnectionWrapper cannot be null!");
+    	}
+        this.connectionParamsProvider = connectionParamsProvider;
+        this.connectionWrapper = connectionWrapper;
+    }
+
     /**
      * Get current {@link LDAPConnectionWrapper} which performs all the connection-related staff for this {@link LDAPConnection}
      * 
@@ -74,14 +80,29 @@ public class LDAPConnection{
 		this.connectionParamsProvider = connectionParamsProvider;
 	}
 
+    /**
+     * @see LDAPConnectionWrapper
+     * @throws UserManagementSystemCommunicationException
+     */
     public void connect() throws UserManagementSystemCommunicationException {
     	this.connectionWrapper.connect();
     }
     
+    /**
+     * @see LDAPConnectionWrapper
+     */
     public void disconnect(){
     	this.connectionWrapper.disconnect();
     }
     
+    /**
+     * @see LDAPConnectionWrapper
+     * 
+     * @param bindPrincipal
+     * @param password
+     * @throws LoginException
+     * @throws UserManagementSystemCommunicationException
+     */
     public void bind(
     		String bindPrincipal, String password
     		) throws LoginException, UserManagementSystemCommunicationException {
@@ -89,10 +110,25 @@ public class LDAPConnection{
     	this.connectionWrapper.bind(bindPrincipal, password);
     }
 
+    /**
+     * @see LDAPConnectionWrapper
+     * 
+     * @param entryDN
+     * @param attributes
+     * @throws UserManagementSystemCommunicationException
+     * @throws LoginException
+     */
     public void createEntry(String entryDN, LDAPAttributeSet attributes) throws UserManagementSystemCommunicationException, LoginException{
     	this.connectionWrapper.createEntry(entryDN, attributes);
     }
 
+    /**
+     * @see LDAPConnectionWrapper
+     * 
+     * @param entryDN
+     * @throws UserManagementSystemCommunicationException
+     * @throws LoginException
+     */
     public void deleteEntry(String entryDN) throws UserManagementSystemCommunicationException, LoginException{
     	this.connectionWrapper.deleteEntry(entryDN);
     }
@@ -101,34 +137,97 @@ public class LDAPConnection{
     	return this.connectionWrapper.modifyEntry(entryDN, attributes, modificationFlag);
     }
     
+    /**
+     * @see LDAPConnectionWrapper
+     * 
+     * @param dn
+     * @param searchAttributes
+     * @param returnAttributes
+     * @return
+     * @throws UserManagementSystemCommunicationException
+     * @throws LoginException
+     */
     public Map<String, LDAPAttributeSet> search(String dn, LDAPAttributeSet searchAttributes, String[] returnAttributes) throws UserManagementSystemCommunicationException, LoginException{
     	return this.connectionWrapper.search(dn, searchAttributes, returnAttributes);
     }
     
+    /**
+     * @see LDAPConnectionWrapper
+     * 
+     * @param dn
+     * @param filterExpr
+     * @param filterArgs
+     * @param scope
+     * @return
+     * @throws UserManagementSystemCommunicationException
+     * @throws LoginException
+     */
     public Map<String, LDAPAttributeSet> search(String dn, String filterExpr, Object[] filterArgs, SearchScope scope) throws UserManagementSystemCommunicationException, LoginException{
     	return this.connectionWrapper.search(dn, filterExpr, filterArgs, scope);
     }
     
+    /**
+     * @see LDAPConnectionWrapper
+     * 
+     * @param dn
+     * @return
+     * @throws UserManagementSystemCommunicationException
+     * @throws LoginException
+     */
 	public LDAPAttributeSet getAttributesForEntry(String dn) throws UserManagementSystemCommunicationException, LoginException {
 		return this.connectionWrapper.getAttributesForEntry(dn);
 	}
 
+	/**
+     * @see LDAPConnectionWrapper
+	 * 
+	 * @param dn
+	 * @param attributeNames
+	 * @return
+	 * @throws UserManagementSystemCommunicationException
+	 * @throws LoginException
+	 */
 	public LDAPAttributeSet getAttributesForEntry(String dn, String[] attributeNames) throws UserManagementSystemCommunicationException, LoginException {
 		return this.connectionWrapper.getAttributesForEntry(dn, attributeNames);
 	}
 
+	/**
+     * @see LDAPConnectionWrapper
+	 * 
+	 * @param parentName
+	 * @return
+	 * @throws UserManagementSystemCommunicationException
+	 * @throws LoginException
+	 */
 	public Collection<String> getChildEntries(String parentName) throws UserManagementSystemCommunicationException, LoginException{
 		return this.connectionWrapper.getChildEntries(parentName);
 	}
 
+	/**
+     * @see LDAPConnectionWrapper
+	 * 
+	 * @throws UserManagementSystemCommunicationException
+	 */
     public void unbind() throws UserManagementSystemCommunicationException {
     	this.connectionWrapper.unbind();
     }
 
+    /**
+     * @see LDAPConnectionWrapper
+     * 
+     * @return
+     */
     public boolean isConnected() {
     	return this.connectionWrapper.isConnected();
     }
     
+    /**
+     * @see LDAPConnectionWrapper
+     * 
+     * @param entryName
+     * @return
+     * @throws LoginException
+     */
     public boolean entryExists(String entryName) throws LoginException{
     	return this.connectionWrapper.entryExists(entryName);
     }

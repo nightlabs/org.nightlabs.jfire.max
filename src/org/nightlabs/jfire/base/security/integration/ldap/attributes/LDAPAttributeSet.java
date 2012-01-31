@@ -160,6 +160,15 @@ public class LDAPAttributeSet implements Iterable<LDAPAttribute<Object>>{
 	}
 	
 	/**
+	 * Check if this {@link LDAPAttributeSet} has any attributes
+	 * 
+	 * @return <code>true</code> if this {@link LDAPAttributeSet} is empty, <code>false</code> otherwise
+	 */
+	public boolean isEmpty(){
+		return attributes.isEmpty();
+	}
+	
+	/**
 	 * Set {@link LDAPAttributeFactory} which creates {@link LDAPAttribute} instances. Remember to set it before attribute's creation,
 	 * default {@link SimpleLDAPAttributeFactory} will be used otherwise.
 	 * 
@@ -253,7 +262,7 @@ public class LDAPAttributeSet implements Iterable<LDAPAttribute<Object>>{
 		if (attributes.containsKey(attributeName)){
 			return attributes.get(attributeName).getValues();
 		}
-		return null;
+		return Collections.emptyList();
 	}
 
 	/**

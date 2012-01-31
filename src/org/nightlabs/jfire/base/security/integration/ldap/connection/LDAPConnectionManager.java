@@ -22,7 +22,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Simple LDAPConnection pool.
+ * Pool of {@link LDAPConnection}s. New {@link LDAPConnection}s are created using {@link LDAPConnectionWrapper} specified
+ * by a system property: org.nightlabs.jfire.ldap.LDAPConnectionManager.wrapperClass.
+ * If this property is either not specified or empty(null) default {@link LDAPConnectionWrapper} will be used which is defined
+ * by {@link LDAPConnection} class.
  *
  * @author Denis Dudnik <deniska.dudnik[at]gmail{dot}com>
  *
@@ -30,6 +33,8 @@ import org.slf4j.LoggerFactory;
 public class LDAPConnectionManager{
 	
 	private static final Logger logger = LoggerFactory.getLogger(LDAPConnectionManager.class);
+	
+	private static final String LDAP_CONNECTION_WRAPPER_CLASS_NAME = "org.nightlabs.jfire.ldap.LDAPConnectionManager.wrapperClass";
 	
 	/**
 	 * Number of possible connections in the pool per every LDAP server
@@ -41,6 +46,11 @@ public class LDAPConnectionManager{
 	 * every cluster will have it's own singleton instance and a bunch of connections.
 	 */
 	private static LDAPConnectionManager _instance;
+	
+	/**
+	 * {@link Class} of {@link LDAPConnectionWrapper} to be used when creating new instances of {@link LDAPConnection}
+	 */
+	private Class<LDAPConnectionWrapper> connectionWrapperClass;
 
 	/**
 	 * Free LDAP connections
@@ -80,15 +90,32 @@ public class LDAPConnectionManager{
 	private Map<LDAPConnection, Collection<IPreservedConnectionListener>> preservedConnectionsListeners;
 	
 
+	@SuppressWarnings("unchecked")
 	private LDAPConnectionManager(){
 		availableConnections = new ConnectionsHolder();
 		privateConnections = new HashMap<UserID, ConnectionsHolder>();
 		preservedConnectionsListeners = new HashMap<LDAPConnection, Collection<IPreservedConnectionListener>>();
+		String wrapperClassName = System.getProperty(LDAP_CONNECTION_WRAPPER_CLASS_NAME);
+		if (wrapperClassName != null && !wrapperClassName.isEmpty()){
+			try {
+				connectionWrapperClass = (Class<LDAPConnectionWrapper>) Class.forName(wrapperClassName);
+			} catch (ClassNotFoundException e) {
+				throw new RuntimeException("Class not found for LDAPConnectionWrapper implementation! Please make sure you specified correct class name and corresponding class is on the classpath.", e);
+			}
+		}
 	}
 
+	/**
+	 * Get single instance of {@link LDAPConnectionManager}.
+	 * 
+	 * @return singleton instance of {@link LDAPConnectionManager}
+	 */
 	public static synchronized LDAPConnectionManager sharedInstance(){
-		if (_instance == null){
-			_instance = new LDAPConnectionManager();
+		if (_instance == null) {
+			synchronized (LDAPConnectionManager.class) {
+				if (_instance == null)
+					_instance = new LDAPConnectionManager();
+			}
 		}
 		return _instance;
 	}
@@ -123,9 +150,22 @@ public class LDAPConnectionManager{
 					NLJDOHelper.restoreFetchPlan(pm.getFetchPlan(), fetchPlanBackup);
 				}
 			}
-
 			if (detachedParamsProvider != null){
-				conn = new LDAPConnection(detachedParamsProvider);
+				paramsProvider = detachedParamsProvider;
+			}
+			
+			LDAPConnectionWrapper connectionWrapper = null;
+			if (connectionWrapperClass != null){
+				try {
+					connectionWrapper = connectionWrapperClass.getConstructor(ILDAPConnectionParamsProvider.class).newInstance(paramsProvider);
+				} catch (Exception e) {
+					logger.error(
+							String.format("Exception creating new instance of LDAPConnectionWrapper(%s)! New LDAPConnection will be created with a default one.", connectionWrapperClass.getName()), e);
+					connectionWrapper = null;
+				}
+			}
+			if (connectionWrapper != null){
+				conn = new LDAPConnection(paramsProvider, connectionWrapper);
 			}else{
 				conn = new LDAPConnection(paramsProvider);
 			}
@@ -152,6 +192,12 @@ public class LDAPConnectionManager{
 
 		if (connection == null){
 			return;
+		}
+		
+		try {
+			connection.unbind();
+		} catch (UserManagementSystemCommunicationException e) {
+			logger.warn("Exception while unbinding released connection.", e);
 		}
 		
 		// if released connection is still a preserved one we remove it from private connections map

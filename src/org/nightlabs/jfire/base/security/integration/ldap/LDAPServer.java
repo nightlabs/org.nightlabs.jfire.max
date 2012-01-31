@@ -282,7 +282,7 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 	        	logger.debug("Logged out from session, id: " + session.getSessionID());
 	        }
 		}finally{
-			unbindAndReleaseConnection(connection);
+			releaseConnection(connection);
 		}
 	}
 
@@ -365,7 +365,7 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 			return session;
 
 		}finally{
-			unbindAndReleaseConnection(connection);
+			releaseConnection(connection);
 		}
 	}
 
@@ -783,7 +783,7 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 						);
 			}
 		}finally{
-			unbindAndReleaseConnection(connection);
+			releaseConnection(connection);
 		}
 		return entriesForSync;
 	}
@@ -956,7 +956,7 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 					// enable JDO lifecycle listener which forbids new User creation
 					ForbidUserCreationLyfecycleListener.setEnabled(true);
 					
-					unbindAndReleaseConnection(connection);
+					releaseConnection(connection);
 				}
 			}
 
@@ -971,8 +971,20 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 				}
 				filterString.append("))");
 				try {
-					Map<String, LDAPAttributeSet> searchResult = connection.search(
-							"", filterString.toString(), null, SearchScope.SUBTREE);
+					Collection<String> groupParentEntriesForSync = new ArrayList<String>();
+					try {
+						groupParentEntriesForSync.addAll(
+								LDAPServer.this.getLdapScriptSet().getGroupParentEntriesForSync());
+					} catch (Exception e) {
+						logger.error("Exception while getting parent entries for user groups! Search will be perfomed from root LDAP entry.", e);
+						groupParentEntriesForSync.add("");	// search will be perfomed from root LDAP entry
+					}
+					
+					Map<String, LDAPAttributeSet> searchResult = new HashMap<String, LDAPAttributeSet>();
+					for (String groupsParent : groupParentEntriesForSync){
+						searchResult.putAll(
+								connection.search(groupsParent, filterString.toString(), null, SearchScope.SUBTREE));
+					}
 					
 					LDAPSyncEvent event = new LDAPSyncEvent(SyncEventGenericType.FETCH_AUTHORIZATION);
 					Collection<FetchEventTypeDataUnit> fetchDataUnits = new ArrayList<FetchEventTypeDataUnit>();
@@ -1067,7 +1079,7 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 							modifyAttributes.addAttributes(syncAttributes);
 						}
 						
-						if(modifyAttributes != null && modifyAttributes.size() > 0){
+						if(modifyAttributes != null && !modifyAttributes.isEmpty()){
 							if (entryExists){
 								connection.modifyEntry(userDN, modifyAttributes, EntryModificationFlag.MODIFY);
 							}else{ 
@@ -1085,7 +1097,7 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 						"Exception(s) occured during synchronization! Ses log for details. Last exception was " + lastSyncThrowable.getMessage(), lastSyncThrowable);
 			}
 		}finally{
-			unbindAndReleaseConnection(connection);
+			releaseConnection(connection);
 		}
 	}
 	
@@ -1280,7 +1292,7 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 					LDAPUserSecurityGroupSyncConfigLifecycleListener.setEnabled(true);
 					SecurityChangeListenerUserSecurityGroupMembers.setEnabled(true);
 					
-					unbindAndReleaseConnection(connection);
+					releaseConnection(connection);
 				}
 			}
 		};
@@ -1338,7 +1350,9 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 					LDAPAttributeSet existingEntryAttributes = null;
 					try{
 						existingEntryAttributes = connection.getAttributesForEntry(ldapGroupName, new String[]{OBJECT_CLASS_ATTR_NAME});
-						entryExists = true;
+						if (existingEntryAttributes != null){
+							entryExists = true;
+						}
 					}catch(UserManagementSystemCommunicationException e){
 						logger.info(
 								String.format("Exception while getting attributes for LDAP entry %s. Assume it does not exist.", ldapGroupName), e);
@@ -1400,7 +1414,7 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 			}
 		}finally{
 			SecurityChangeListenerUserSecurityGroupMembers.setChangeGroupMembersEnabled(true);
-			unbindAndReleaseConnection(connection);
+			releaseConnection(connection);
 		}
 	}
 
@@ -1684,7 +1698,7 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
     	return connection;
 	}
 
-	private static void unbindAndReleaseConnection(LDAPConnection connection) throws UserManagementSystemCommunicationException{
+	private static void releaseConnection(LDAPConnection connection) throws UserManagementSystemCommunicationException{
 		if (connection == null){
 			return;
 		}
@@ -1698,11 +1712,7 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
     								params.getAuthenticationMethod().stringValue()));
     	}
 		
-    	try{
-    		connection.unbind();
-    	}finally{
-    		LDAPConnectionManager.sharedInstance().releaseConnection(connection);
-    	}
+   		LDAPConnectionManager.sharedInstance().releaseConnection(connection);
     	
 		if (logger.isDebugEnabled()){
     		logger.debug("Connection released");

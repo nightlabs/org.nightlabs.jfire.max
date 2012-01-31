@@ -9,6 +9,7 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.naming.AuthenticationException;
 import javax.naming.CommunicationException;
@@ -98,7 +99,7 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper{
 
 	private InitialLdapContext context;
 
-	private boolean isConnected;
+	private AtomicBoolean isConnected;
 
 	/**
 	 * Creates a new instance of JNDIConnectionContext.
@@ -111,6 +112,7 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper{
 			throw new IllegalArgumentException("ILDAPConnectionParamsProvider can't be null!");
 		}
 		this.connectionParamsProvider = connectionParamsProvider;
+		this.isConnected = new AtomicBoolean(false);
 	}
 	
 	/**
@@ -180,7 +182,7 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper{
                     }
                 }
 
-				isConnected = true;
+				isConnected.set(true);
 				
 				configureConnectionProblemsListener();
 			}
@@ -210,7 +212,7 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper{
 			String bindPrincipal, String bindCredentials
 			) throws UserManagementSystemCommunicationException, LoginException {
 
-		if (context != null && isConnected) {
+		if (isConnected()) {
 			
 			String authMethod = AuthenticationMethod.NONE.stringValue();
 			boolean useSASL = false;
@@ -270,7 +272,7 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper{
 	 */
 	@Override
 	public void unbind() {
-		if (context != null && isConnected) {
+		if (isAuthenticated()) {
 			try{
 				synchronized(context){
 					context.removeFromEnvironment(Context.SECURITY_AUTHENTICATION);
@@ -399,18 +401,6 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper{
 		}
 	}
 	
-	private static String getAliasMapKeyByValue(String value){
-		if (value == null){
-			return null;
-		}
-		for (String key : attributeAliases.keySet()){
-			if (value.equals(attributeAliases.get(key))){
-				return key;
-			}
-		}
-		return null;
-	}
-	
 	/**
 	 * {@inheritDoc}
 	 */
@@ -492,35 +482,6 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper{
 		}
 	}
 
-	private Map<String, LDAPAttributeSet> processResult(
-			NamingEnumeration<SearchResult> result) throws NamingException {
-		try{
-			Map<String, LDAPAttributeSet> returnMap = new HashMap<String, LDAPAttributeSet>();
-			while (result.hasMoreElements()) {
-				SearchResult searchResult = result.nextElement();
-				returnMap.put(searchResult.getNameInNamespace(), getLDAPAttributeSet(searchResult.getAttributes()));
-			}
-			return returnMap;
-		}finally{
-			result.close();
-		}
-	}
-	
-	private static final String DC_OBJECT_OBJECT_CLASS = "dcObject";
-	
-	private String getSafeSearchBaseDN(String baseDN) throws NamingException{
-		if (baseDN == null || baseDN.isEmpty()){	// getting root entry
-			Collection<String> rootEntries = getRootEntries();
-			for (String entryName : rootEntries){
-				Attributes attributes = context.getAttributes(entryName, new String[]{LDAPServer.OBJECT_CLASS_ATTR_NAME});
-				if (attributes.get(LDAPServer.OBJECT_CLASS_ATTR_NAME).contains(DC_OBJECT_OBJECT_CLASS)){
-					return entryName;
-				}
-			}
-		}
-		return baseDN;
-	}
-
 	/**
 	 * {@inheritDoc}
 	 */
@@ -593,7 +554,30 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper{
 		// It's not a very troubleproof strategy to check some internal flag. But since there's no way
 		// to ping a LDAPServer via JNDI (we can just recreate a JNDI context, perform a search or lookup)
 		// we need to maintain these flags carefully so they will reflect the real connection state.
-		return context != null && isConnected;
+		return context != null && isConnected.get();
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean isAuthenticated() {
+		if (isConnected()){
+			synchronized (context) {
+				Hashtable<?, ?> environment = null;
+				try {
+					 environment = context.getEnvironment();
+				} catch (NamingException e) {
+					logger.warn("Can't get environment properties!", e);
+					return false;
+				}
+				return environment != null 
+						&& environment.containsKey(Context.SECURITY_AUTHENTICATION)
+						&& environment.containsKey(Context.SECURITY_PRINCIPAL)
+						&& environment.containsKey(Context.SECURITY_CREDENTIALS);
+			}
+		}
+		return false;
 	}
 	
 	/**
@@ -603,7 +587,7 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper{
 	public boolean entryExists(String entryName) throws LoginException{
 		try{
 			LDAPAttributeSet attributesForEntry = getAttributesForEntry(entryName, new String[]{LDAPServer.OBJECT_CLASS_ATTR_NAME});
-			return attributesForEntry != null && attributesForEntry.size() > 0;
+			return attributesForEntry != null && !attributesForEntry.isEmpty();
 		}catch(UserManagementSystemCommunicationException e){
 			if (e.getCause() instanceof NoPermissionException){
 				throw new LoginException("Authentication failed! Can't check for entry existance. See log for details.");
@@ -627,7 +611,7 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper{
 			}
 			context = null;
 		}
-		isConnected = false;
+		isConnected.set(false);
 		System.gc();
 	}
 
@@ -888,6 +872,47 @@ public class JNDIConnectionWrapper implements LDAPConnectionWrapper{
         
     }
     
+	private static Map<String, LDAPAttributeSet> processResult(
+			NamingEnumeration<SearchResult> result) throws NamingException {
+		try{
+			Map<String, LDAPAttributeSet> returnMap = new HashMap<String, LDAPAttributeSet>();
+			while (result.hasMoreElements()) {
+				SearchResult searchResult = result.nextElement();
+				returnMap.put(searchResult.getNameInNamespace(), getLDAPAttributeSet(searchResult.getAttributes()));
+			}
+			return returnMap;
+		}finally{
+			result.close();
+		}
+	}
+	
+	private static final String DC_OBJECT_OBJECT_CLASS = "dcObject";
+	
+	private String getSafeSearchBaseDN(String baseDN) throws NamingException{
+		if (baseDN == null || baseDN.isEmpty()){	// getting root entry
+			Collection<String> rootEntries = getRootEntries();
+			for (String entryName : rootEntries){
+				Attributes attributes = context.getAttributes(entryName, new String[]{LDAPServer.OBJECT_CLASS_ATTR_NAME});
+				if (attributes.get(LDAPServer.OBJECT_CLASS_ATTR_NAME).contains(DC_OBJECT_OBJECT_CLASS)){
+					return entryName;
+				}
+			}
+		}
+		return baseDN;
+	}
+
+	private static String getAliasMapKeyByValue(String value){
+		if (value == null){
+			return null;
+		}
+		for (String key : attributeAliases.keySet()){
+			if (value.equals(attributeAliases.get(key))){
+				return key;
+			}
+		}
+		return null;
+	}
+	
     /**
      * Gets a Name object that is save for JNDI operations.
      * <p>

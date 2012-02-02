@@ -87,5 +87,5 @@ function getUserIDFromLDAPEntry(attributes){
  * Get the name of SASL realm for given bind principal 
  */
 function getSASLRealm(bindPrincipal){
-	return "";
+	return "nightlabs.de";
 }

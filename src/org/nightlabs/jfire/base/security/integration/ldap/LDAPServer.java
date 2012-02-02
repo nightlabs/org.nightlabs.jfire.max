@@ -12,8 +12,6 @@ import java.util.Set;
 import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
-import javax.jdo.annotations.FetchGroup;
-import javax.jdo.annotations.FetchGroups;
 import javax.jdo.annotations.IdentityType;
 import javax.jdo.annotations.Inheritance;
 import javax.jdo.annotations.InheritanceStrategy;
@@ -94,12 +92,6 @@ import org.slf4j.LoggerFactory;
 		detachable="true",
 		table="JFireLDAP_LDAPServer")
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
-@FetchGroups({
-		@FetchGroup(
-				name=LDAPServer.FETCH_GROUP_LDAP_SCRIPT_SET,
-				members=@Persistent(name="ldapScriptSet")
-				)
-})
 @Queries({
 		@javax.jdo.annotations.Query(
 				name="LDAPServer.findLDAPServers",
@@ -121,7 +113,6 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 	public static final LDAPAttributeSyncPolicy LDAP_DEFAULT_ATTRIBUTE_SYNC_POLICY = LDAPAttributeSyncPolicy.MANDATORY_ONLY;
 
 	public static final String SYNC_USER_DATA_FROM_LDAP_TASK_ID = "JFireLDAP-syncUserDataFromLDAP";
-	public static final String FETCH_GROUP_LDAP_SCRIPT_SET = "LDAPServer.ldapScriptSet";
 
 	public static final String OBJECT_CLASS_ATTR_NAME = "objectClass";
 	public static final String GROUP_OF_NAMES_ATTR_VALUE = "groupOfNames";
@@ -224,7 +215,7 @@ implements ILDAPConnectionParamsProvider, SynchronizableUserManagementSystem<LDA
 	/**
 	 * Set of scripts which perform specific synchronization tasks
 	 */
-	@Persistent(dependent="true", mappedBy="ldapServer")
+	@Persistent(dependent="true", mappedBy="ldapServer", defaultFetchGroup="true")
 	private LDAPScriptSet ldapScriptSet;
 	
 	/**

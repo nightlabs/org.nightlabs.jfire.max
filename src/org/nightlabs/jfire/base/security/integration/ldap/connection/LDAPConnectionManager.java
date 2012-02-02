@@ -39,7 +39,7 @@ public class LDAPConnectionManager{
 	/**
 	 * Number of possible connections in the pool per every LDAP server
 	 */
-	private static final int maxConnectionsPerServer = 5;
+	private static final int maxConnectionsPerServer = 3;
 
 	/**
 	 * Static singleton instance. If used in cluster environment I think there's no problem if

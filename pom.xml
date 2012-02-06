@@ -6,13 +6,14 @@
 	<groupId>org.nightlabs.jfire.eclipse</groupId>
 	<artifactId>org.nightlabs.jfire.reporting.oda.client</artifactId>
 	<version>1.2.0-SNAPSHOT</version>
-	<packaging>bundle</packaging>
+	<packaging>jar</packaging>
 	<name>${project.artifactId}</name>
 
 	<parent>
 		<groupId>org.nightlabs.jfire.eclipse</groupId>
-		<artifactId>org.nightlabs.jfire.eclipse.parent</artifactId>
+		<artifactId>org.nightlabs.jfire.eclipse.parent.legacy</artifactId>
 		<version>1.2.0-SNAPSHOT</version>
+		<relativePath>../org.nightlabs.jfire.eclipse.parent.legacy/pom.xml</relativePath>
 	</parent>
 
 	<dependencies>

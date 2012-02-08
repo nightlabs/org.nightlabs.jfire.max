@@ -27,8 +27,8 @@
 		<!-- JBPM dependencies -->
 		<!-- FIXME: We exclude transitive dependencies using an unsupported behaviour. groupId * and artifactId * produces a warning, but works as expected -->
 		<dependency>
-			<groupId>org.jbpm.jbpm3</groupId>
-			<artifactId>jbpm-jpdl</artifactId>
+			<groupId>jboss</groupId>
+			<artifactId>jbpm</artifactId>
 			<exclusions>
 				<exclusion>
 					<groupId>*</groupId>
@@ -37,7 +37,7 @@
 			</exclusions>
 		</dependency>
 		<dependency>
-			<groupId>org.jbpm.jbpm3</groupId>
+			<groupId>jboss</groupId>
 			<artifactId>jbpm-identity</artifactId>
 			<exclusions>
 				<exclusion>
@@ -94,12 +94,12 @@
 							<artifactId>org.nightlabs.jfire.jbpm</artifactId>
 						</ejbModule>
 						<jarModule>
-							<groupId>org.jbpm.jbpm3</groupId>
-							<artifactId>jbpm-jpdl</artifactId>
+							<groupId>jboss</groupId>
+							<artifactId>jbpm</artifactId>
 							<includeInApplicationXml>true</includeInApplicationXml>
 						</jarModule>
 						<jarModule>
-							<groupId>org.jbpm.jbpm3</groupId>
+							<groupId>jboss</groupId>
 							<artifactId>jbpm-identity</artifactId>
 							<includeInApplicationXml>true</includeInApplicationXml>
 						</jarModule>

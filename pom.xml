@@ -199,7 +199,7 @@
 									<directory>src/main/resources</directory>
 								</resource>
 							</resources>
-							<outputDirectory>${assembly.directory}</outputDirectory>
+							<outputDirectory>${assembly.jboss.directory}</outputDirectory>
 							<overwrite>true</overwrite>
 						</configuration>
 					</execution>

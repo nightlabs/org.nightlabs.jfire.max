@@ -11,5 +11,4 @@ JFireWebShopBaseEAR.ear
 NightLabsConnectionEAR.ear             
 NightLabsEditor2DEAR.ear               
 NightLabsKeyReaderEAR.ear              
-NightLabsRhinoEAR.ear                  
-NightLabsXStreamEAR.ear
+NightLabsRhinoEAR.ear

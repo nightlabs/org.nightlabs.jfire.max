@@ -104,11 +104,12 @@
 			<scope>provided</scope>
 		</dependency>
 
-		<!-- FIXME could not find this version (3.1.4) in Maven repositories -->
+		
 		<dependency>
-			<groupId>org.jbpm.jbpm3</groupId>
-			<artifactId>jbpm-jpdl</artifactId>
+			<groupId>jboss</groupId>
+			<artifactId>jbpm</artifactId>
 			<scope>provided</scope>
+			<version>${jbpm.version}</version>
 		</dependency>
 		<!-- as provided by JBoss 4.2.3 GA -->
 		<dependency>

@@ -110,7 +110,11 @@
 			<artifactId>org.nightlabs.jfire.trade.ear</artifactId>
 			<type>ear</type>
 		</dependency>
-		
+		<dependency>
+			<groupId>org.nightlabs.jfire</groupId>
+			<artifactId>org.nightlabs.rhino.wrapper.ear</artifactId>
+			<type>ear</type>
+		</dependency>
 		
 		
 	</dependencies>

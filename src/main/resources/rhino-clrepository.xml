@@ -4,7 +4,7 @@ PUBLIC "-//NightLabs GmbH//DTD ClassLoader Repository 1.1//EN"
 "http://www.nightlabs.de/dtd/clrepository_1_1.dtd">
 
 <classloader-repository>
-	<publish target="js-1.7R2.jar">
+	<publish>
 		<resources>org\/mozilla\/.*</resources>
 	</publish>
 </classloader-repository>

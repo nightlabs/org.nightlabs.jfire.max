@@ -1,7 +1,10 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>org.nightlabs.jfire.reporting.trade.ear</artifactId>
+	<!-- FIXME: setting name to JFireReportingTradeEAR because org.nightlabs.jfire.reporting.trade.JFireReportingTradeEAR.MODULE_NAME is used around the system, 
+				i.e. org.nightlabs.jfire.reporting.trade.scripting.ScriptingInitialiser is looking for scripts inside JFireReportingTradeEAR.ear -->				
+	<!--artifactId>org.nightlabs.jfire.reporting.trade.ear</artifactId-->
+	<artifactId>JFireReportingTradeEAR</artifactId>
 	<packaging>ear</packaging>
 	<name>${project.artifactId}</name>
 

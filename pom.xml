@@ -102,6 +102,16 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
+			<groupId>xpp3</groupId>
+			<artifactId>xpp3</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>xpp3</groupId>
+			<artifactId>xpp3_min</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
 			<groupId>org.apache.servicemix.bundles</groupId>
 			<artifactId>org.apache.servicemix.bundles.xerces</artifactId>
 			<scope>provided</scope>
@@ -126,13 +136,6 @@
 			<artifactId>log4j</artifactId>
 			<scope>provided</scope>
 		</dependency>
-		<!-- 
-		<dependency>
-			<groupId>org.apache.servicemix.bundles</groupId>
-			<artifactId>org.apache.servicemix.bundles.xmlpull</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		-->
 	</dependencies>
 
 	<build>
@@ -148,6 +151,10 @@
 		</resources>
 		<plugins>
 			<plugin>
+				<groupId>org.datanucleus</groupId>
+				<artifactId>maven-datanucleus-plugin</artifactId>
+			</plugin>
+			<plugin>
 				<groupId>org.apache.felix</groupId>
 				<artifactId>maven-bundle-plugin</artifactId>
 				<configuration>
@@ -160,12 +167,6 @@
 					</instructions>
 				</configuration>
 			</plugin>
-		<!-- 
-			<plugin>
-				<groupId>org.datanucleus</groupId>
-				<artifactId>maven-datanucleus-plugin</artifactId>
-			</plugin>
-		 -->
 		</plugins>
 	</build>
 </project>

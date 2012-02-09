@@ -93,6 +93,14 @@
 					<exclude>**/*.java</exclude>
 				</excludes>
 			</resource>
+			<resource>
+				<directory>.</directory>
+				<includes>
+					<include>plugin.xml</include>
+					<include>plugin*.properties</include>
+					<include>LICENSE.txt</include>
+				</includes>
+			</resource>
 		</resources>
 	</build>
 </project>

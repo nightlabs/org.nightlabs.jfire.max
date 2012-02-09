@@ -1,14 +1,9 @@
 JFireChezFrancoisEAR.ear
 JFireNumericOrganisationIDEAR.ear
-JFireReportingEAR.ear
-JFireReportingEngineBirtEAR.ear
-JFireReportingTradeEAR.ear
-JFireScriptingEAR.ear
 JFireScriptingEditor2DEAR.ear
 JFireTradeEditor2DEAR.ear
 JFireVoucherEAR.ear                    
 JFireWebShopBaseEAR.ear                
 NightLabsConnectionEAR.ear             
 NightLabsEditor2DEAR.ear               
-NightLabsKeyReaderEAR.ear              
-NightLabsRhinoEAR.ear
+NightLabsKeyReaderEAR.ear

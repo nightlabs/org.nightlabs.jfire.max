@@ -115,7 +115,62 @@
 			<artifactId>org.nightlabs.rhino.wrapper.ear</artifactId>
 			<type>ear</type>
 		</dependency>
-		
+		<dependency>
+			<groupId>org.nightlabs.jfire</groupId>
+			<artifactId>org.nightlabs.jfire.scripting.ear</artifactId>
+			<type>ear</type>
+		</dependency> 		
+		<!--dependency>
+			<groupId>org.nightlabs.jfire</groupId>
+			<artifactId>org.nightlabs.jfire.reporting.ear</artifactId>
+			<type>ear</type>
+		</dependency--> 		
+		<!-- FIXME: setting name to JFireReportingEAR because org.nightlabs.jfire.reporting.JFireReportingEAR.MODULE_NAME is used around the system, 
+					i.e. org.nightlabs.jfire.reporting.scripting.ScriptingInitialiser is looking for scripts inside JFireReportingEAR.ear -->				
+		<dependency>
+			<groupId>org.nightlabs.jfire</groupId>
+			<artifactId>JFireReportingEAR</artifactId>
+			<type>ear</type>
+		</dependency> 		
+		<!--dependency>
+			<groupId>org.nightlabs.jfire</groupId>
+			<artifactId>org.nightlabs.jfire.reporting.engine.birt.ear</artifactId>
+			<type>ear</type>
+		</dependency-->
+		<!-- FIXME: setting name to JFireReportingEngineBirtEAR because it is used in org.nightlabs.jfire.reporting.engine.birt.ReportingEngineBirtManagerBean initialise() as a simple string(!!!) for accessing files inside this ear -->
+		<dependency>
+			<groupId>org.nightlabs.jfire</groupId>
+			<artifactId>JFireReportingEngineBirtEAR</artifactId>
+			<type>ear</type>
+		</dependency>
+		<!--dependency>
+			<groupId>org.nightlabs.jfire</groupId>
+			<artifactId>org.nightlabs.jfire.reporting.trade.ear</artifactId>
+			<type>ear</type>
+		</dependency--> 		
+		<!-- FIXME: setting name to JFireReportingTradeEAR because org.nightlabs.jfire.reporting.trade.JFireReportingTradeEAR.MODULE_NAME is used around the system, 
+					i.e. org.nightlabs.jfire.reporting.trade.scripting.ScriptingInitialiser is looking for scripts inside JFireReportingTradeEAR.ear -->				
+		<dependency>
+			<groupId>org.nightlabs.jfire</groupId>
+			<artifactId>JFireReportingTradeEAR</artifactId>
+			<type>ear</type>
+		</dependency> 		
+
+		<!-- BIRT runtime -->
+		<dependency>
+			<groupId>org.eclipse.birt.runtime</groupId>
+			<artifactId>org.eclipse.birt.runtime</artifactId>
+			<version>2.6.0</version>
+			<type>zip</type>
+		</dependency>
+		<dependency>
+			<groupId>org.nightlabs.jfire</groupId>
+			<artifactId>org.nightlabs.jfire.reporting.oda.wrapper</artifactId>
+		</dependency> 		
+		<dependency>
+			<groupId>org.nightlabs.jfire</groupId>
+			<artifactId>org.nightlabs.jfire.reporting.oda.server</artifactId>
+		</dependency> 		
 		
 	</dependencies>
 
@@ -126,6 +181,8 @@
 		<assembly.deploy.directory>${assembly.jboss.directory}/server/default/deploy</assembly.deploy.directory>
 		<assembly.lib.directory>${assembly.jboss.directory}/server/default/lib</assembly.lib.directory>
 		<assembly.jfire.deploy.directory>${assembly.deploy.directory}/JFire.last</assembly.jfire.deploy.directory>
+		<assembly.jfire.data.directory>${assembly.jboss.directory}/server/default/data/jfire</assembly.jfire.data.directory>
+		<assembly.jfire.data.birt.directory>${assembly.jfire.data.directory}/birt</assembly.jfire.data.birt.directory>
 	</properties>
 
 
@@ -185,9 +242,38 @@
 							<stripVersion>true</stripVersion>
 						</configuration>
 					</execution>
+					
+					<!-- BIRT Runtime Plarform -->
+					<execution>
+						<id>unpack-birt-runtime</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>unpack-dependencies</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${assembly.jfire.data.directory}</outputDirectory>
+							<includeGroupIds>org.eclipse.birt.runtime</includeGroupIds>
+						</configuration>
+					</execution>
+					<execution>
+						<id>copy-jfire-birt-runtime</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>copy-dependencies</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${assembly.jfire.data.birt.directory}/plugins</outputDirectory>
+							<includeArtifactIds>org.nightlabs.jfire.reporting.oda.wrapper,org.nightlabs.jfire.reporting.oda.server</includeArtifactIds>
+						</configuration>
+					</execution>
+					
 				</executions>
 			</plugin>
-
+			
+			<!-- TODO: Now application.xml for ${assembly.jfire.data.birt.directory} is just copied together with other resources, 
+						although generating it on-the-fly from jars in ${assembly.jfire.data.birt.directory}/lib directory could be a better solution.
+						It could be done with ant-run, but maybe there's some pure maven solution for this task. I've tried with maven-ear-plugin, but no success. Denis. -->
+			
 			<plugin>
 				<artifactId>maven-resources-plugin</artifactId>
 				<executions>

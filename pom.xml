@@ -1,7 +1,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>org.nightlabs.jfire.reporting.engine.birt.ear</artifactId>
+	<!-- FIXME: setting name to JFireReportingEngineBirtEAR because it is used in org.nightlabs.jfire.reporting.engine.birt.ReportingEngineBirtManagerBean initialise() as a simple string(!!!) for accessing files inside this ear -->
+	<!--artifactId>org.nightlabs.jfire.reporting.engine.birt.ear</artifactId-->
+	<artifactId>JFireReportingEngineBirtEAR</artifactId>
 	<packaging>ear</packaging>
 	<name>${project.artifactId}</name>
 
@@ -17,12 +19,32 @@
 			<groupId>org.nightlabs.jfire</groupId>
 			<artifactId>org.nightlabs.jfire.reporting.engine.birt</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.nightlabs.jfire</groupId>
+			<artifactId>org.nightlabs.jfire.reporting.birt</artifactId>
+		</dependency>
 	</dependencies>
 
 	<build>
 		<plugins>
 			<!-- TODO - workaround to use generated application.xml but all other 
 				files from EarContent Default Maven location for files would be src/main/application -->
+			<plugin>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>copy-jfire-birt</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>copy-dependencies</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${project.build.directory}</outputDirectory>
+							<includeArtifactIds>org.nightlabs.jfire.reporting.birt</includeArtifactIds>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 			<plugin>
 				<artifactId>maven-antrun-plugin</artifactId>
 				<executions>

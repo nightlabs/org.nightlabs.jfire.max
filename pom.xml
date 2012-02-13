@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.nightlabs.jfire</groupId>
 	<artifactId>org.nightlabs.jfire.jbpm.aop</artifactId>
-	<packaging>bundle</packaging>
+	<packaging>jboss-aop</packaging>
 	<name>${project.artifactId}</name>
 
 	<parent>
@@ -71,5 +71,24 @@
 				</excludes>
 			</resource>
 		</resources>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>jboss-packaging-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>jboss-aop</id>
+						<phase>package</phase>
+						<goals>
+							<goal>aop</goal>
+						</goals>
+						<configuration>
+							<deploymentDescriptorFile>src/META-INF/jboss-aop.xml</deploymentDescriptorFile>
+							<explodedOnly>true</explodedOnly>
+						</configuration>
+					</execution>
+				</executions>			
+			</plugin>
+		</plugins>
 	</build>
 </project>

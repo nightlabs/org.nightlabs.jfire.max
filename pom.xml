@@ -23,6 +23,11 @@
 			<groupId>org.nightlabs.jfire</groupId>
 			<artifactId>org.nightlabs.jfire.jbpm</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.nightlabs.jfire</groupId>
+			<artifactId>org.nightlabs.jfire.jbpm.aop</artifactId>
+			<type>aop</type>
+		</dependency>
 		
 		<!-- JBPM dependencies -->
 		<!-- FIXME: We exclude transitive dependencies using an unsupported behaviour. groupId * and artifactId * produces a warning, but works as expected -->
@@ -86,6 +91,7 @@
 					<earSourceDirectory>target/application</earSourceDirectory>
 					<artifactTypeMappings>
 						<artifactTypeMapping type="jar" mapping="ejb" />
+						<artifactTypeMapping type="aop" mapping="jar" />
 					</artifactTypeMappings>
 					<version>5</version>
 					<modules>
@@ -93,6 +99,11 @@
 							<groupId>org.nightlabs.jfire</groupId>
 							<artifactId>org.nightlabs.jfire.jbpm</artifactId>
 						</ejbModule>
+						<jarModule>
+							<groupId>org.nightlabs.jfire</groupId>
+							<artifactId>org.nightlabs.jfire.jbpm.aop</artifactId>
+							<includeInApplicationXml>true</includeInApplicationXml>
+						</jarModule>
 						<jarModule>
 							<groupId>jboss</groupId>
 							<artifactId>jbpm</artifactId>

@@ -65,6 +65,7 @@
 		<module>../JFirePersonRelationIssueTrackingEAR</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.personrelation.issuetracking.ear -->
 		
 		<module>../JFireReporting</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.reporting -->
+		<module>../JFireReportingEAR</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.reporting -->
 		<module>../JFireReportingEngineBirt</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.reporting.engine.birt -->
 		<module>../JFireReportingEngineBirtEAR</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.reporting.engine.birt.ear -->
 		<module>../JFireReportingTrade</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.reporting.trade -->
@@ -80,6 +81,8 @@
 		
 		<module>../org.nightlabs.jfire.reporting.birt</module>
 		<module>../org.nightlabs.jfire.reporting.oda.wrapper</module>
+		<module>../org.nightlabs.jfire.reporting.oda.client</module>
+		<module>../org.nightlabs.jfire.reporting.oda.server</module>
 		<module>../org.nightlabs.jfire.trade.editor2d</module>
 		
 		<!-- generics compile error with javac <module>../JFireTestSuiteDepartment</module> --> <!-- org.nightlabs.jfire:org.nightlabs.jfire.testsuite.department -->
@@ -92,8 +95,8 @@
 		
 		<!-- 
 		<module>../JFireTestSuiteJFireBaseEAR</module>
-		<module>../NightLabsXStreamEAR</module>
 		-->
+		<module>../NightLabsRhinoEAR</module>
 		
 		<module>../org.nightlabs.jfire.max.assembly</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.max.assembly -->
 	</modules>

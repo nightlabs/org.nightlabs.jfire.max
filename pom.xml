@@ -54,8 +54,8 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.jbpm.jbpm3</groupId>
-			<artifactId>jbpm-jpdl</artifactId>
+			<groupId>jboss</groupId>
+			<artifactId>jbpm</artifactId>
 			<scope>provided</scope>
 		</dependency>
 	</dependencies>

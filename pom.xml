@@ -5,14 +5,13 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.nightlabs.jfire</groupId>
 	<artifactId>org.nightlabs.jfire.scripting.editor2d</artifactId>
-	<version>1.2.0-SNAPSHOT</version>
 	<packaging>bundle</packaging>
 	<name>${project.artifactId}</name>
 
 	<parent>
 		<groupId>org.nightlabs.jfire</groupId>
 		<artifactId>org.nightlabs.jfire.parent</artifactId>
-		<version>1.2.0-SNAPSHOT</version>
+		<version>1.3.0-SNAPSHOT</version>
 		<relativePath>../org.nightlabs.jfire.parent/pom.xml</relativePath>
 	</parent>
 

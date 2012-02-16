@@ -44,7 +44,6 @@ import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.trade.Trader;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 import org.nightlabs.jfire.webshop.id.WebCustomerID;
-import org.nightlabs.util.CollectionUtil;
 
 /**
  * @author khaled
@@ -63,11 +62,6 @@ public class WebShopBean
 extends BaseSessionBeanImpl
 implements WebShopRemote
 {
-	/**
-	 * The serial version of this class.
-	 */
-	private static final long serialVersionUID = 1L;
-
 	private static final String PASSWORD_MAIL_TEMPLATE_PARAMETER = "${password}";
 	
 	public static final int secondPasswordExpirationTimeInHours = 6;

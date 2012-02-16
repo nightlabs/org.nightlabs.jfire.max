@@ -8,7 +8,7 @@
 	<parent>
 		<groupId>org.nightlabs.jfire</groupId>
 		<artifactId>org.nightlabs.jfire.parent</artifactId>
-		<version>1.2.0-SNAPSHOT</version>
+		<version>1.3.0-SNAPSHOT</version>
 		<relativePath>../org.nightlabs.jfire.parent/pom.xml</relativePath>
 	</parent>
 
@@ -33,6 +33,11 @@
 		<dependency>
 			<groupId>org.nightlabs.jfire</groupId>
 			<artifactId>org.nightlabs.jfire.asterisk.ear</artifactId>
+			<type>ear</type>
+		</dependency>
+		<dependency>
+			<groupId>org.nightlabs.jfire</groupId>
+			<artifactId>org.nightlabs.jfire.chezfrancois.ear</artifactId>
 			<type>ear</type>
 		</dependency>
 		<dependency>
@@ -87,6 +92,11 @@
 		</dependency>
 		<dependency>
 			<groupId>org.nightlabs.jfire</groupId>
+			<artifactId>org.nightlabs.jfire.numorgid.ear</artifactId> 			
+			<type>ear</type>
+		</dependency>
+		<dependency>
+			<groupId>org.nightlabs.jfire</groupId>
 			<artifactId>org.nightlabs.jfire.pbx.ear</artifactId>
 			<type>ear</type>
 		</dependency>
@@ -112,7 +122,27 @@
 		</dependency>
 		<dependency>
 			<groupId>org.nightlabs.jfire</groupId>
+			<artifactId>org.nightlabs.jfire.trade.editor2d.ear</artifactId>
+			<type>ear</type>
+		</dependency>
+		<dependency>
+			<groupId>org.nightlabs</groupId>
 			<artifactId>org.nightlabs.rhino.wrapper.ear</artifactId>
+			<type>ear</type>
+		</dependency>
+		<dependency>
+			<groupId>org.nightlabs</groupId>
+			<artifactId>org.nightlabs.editor2d.ear</artifactId>
+			<type>ear</type>
+		</dependency>
+		<dependency>
+			<groupId>org.nightlabs</groupId>
+			<artifactId>org.nightlabs.connection.ear</artifactId>
+			<type>ear</type>
+		</dependency>
+		<dependency>
+			<groupId>org.nightlabs</groupId>
+			<artifactId>org.nightlabs.keyreader.ear</artifactId>
 			<type>ear</type>
 		</dependency>
 		<dependency>
@@ -120,6 +150,11 @@
 			<artifactId>org.nightlabs.jfire.scripting.ear</artifactId>
 			<type>ear</type>
 		</dependency> 		
+		<dependency>
+			<groupId>org.nightlabs.jfire</groupId>
+			<artifactId>org.nightlabs.jfire.scripting.editor2d.ear</artifactId>
+			<type>ear</type>
+		</dependency>
 		<!--dependency>
 			<groupId>org.nightlabs.jfire</groupId>
 			<artifactId>org.nightlabs.jfire.reporting.ear</artifactId>
@@ -156,6 +191,24 @@
 			<type>ear</type>
 		</dependency> 		
 
+		<!--dependency>
+			<groupId>org.nightlabs.jfire</groupId>
+			<artifactId>org.nightlabs.jfire.voucher.ear</artifactId>
+			<type>ear</type>
+		</dependency--> 		
+		<!-- FIXME: setting name to JFireVoucherEAR because org.nightlabs.jfire.voucher.JFireVoucherEAR.MODULE_NAME is used around the system, 
+					i.e. org.nightlabs.jfire.voucher.scripting.ScriptingInitialiser is looking for scripts inside JFireVoucherEAR.ear -->				
+		<dependency>
+			<groupId>org.nightlabs.jfire</groupId>
+			<artifactId>JFireVoucherEAR</artifactId>
+			<type>ear</type>
+		</dependency> 		
+		<dependency>
+			<groupId>org.nightlabs.jfire</groupId>
+			<artifactId>org.nightlabs.jfire.web.webshop.ear</artifactId>
+			<type>ear</type>
+		</dependency> 
+		
 		<!-- BIRT runtime -->
 		<dependency>
 			<groupId>org.eclipse.birt.runtime</groupId>

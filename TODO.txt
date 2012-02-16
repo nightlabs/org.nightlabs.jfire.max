@@ -1,9 +1,0 @@
-JFireChezFrancoisEAR.ear
-JFireNumericOrganisationIDEAR.ear
-JFireScriptingEditor2DEAR.ear
-JFireTradeEditor2DEAR.ear
-JFireVoucherEAR.ear                    
-JFireWebShopBaseEAR.ear                
-NightLabsConnectionEAR.ear             
-NightLabsEditor2DEAR.ear               
-NightLabsKeyReaderEAR.ear

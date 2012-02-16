@@ -5,8 +5,6 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.nightlabs.jfire.eclipse</groupId>
 	<artifactId>org.nightlabs.jfire.reporting.oda.client</artifactId>
-	<packaging>jar</packaging>
-	<name>${project.artifactId}</name>
 
 	<parent>
 		<groupId>org.nightlabs.jfire.eclipse</groupId>

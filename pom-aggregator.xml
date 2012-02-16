@@ -5,8 +5,8 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.nightlabs.jfire</groupId>
 	<artifactId>org.nightlabs.jfire.max.aggregator</artifactId>
-	<version>1.2.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
+	<version>1.3.0-SNAPSHOT</version>
 	<name>${project.artifactId}</name>
 
 	<distributionManagement>
@@ -22,12 +22,24 @@
 
 	<modules>
 		<!-- ##### Backend-projects of jfire-MAX ##### -->
+		<module>../org.nightlabs.connection</module>
+		<module>../NightLabsConnectionEAR</module>
+		
+		<module>../org.nightlabs.keyreader</module>
+		<module>../NightLabsKeyReaderEAR</module>
+		
+		<module>../NightLabsRhinoEAR</module>
+		
+		<module>../org.nightlabs.editor2d</module>
+		<module>../NightLabsEditor2DEAR</module>
+		
 		<module>../JFireAsterisk</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.asterisk -->
 		<module>../JFireAsteriskEAR</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.asterisk.ear -->
 		
 		<!-- TODO has Eclipse dependencies <module>../org.nightlabs.jfire.base.j2ee</module> --> <!-- org.nightlabs.jfire:org.nightlabs.jfire.base.j2ee -->
 		<!-- TODO has Eclipse dependencies <module>../org.nightlabs.jfire.base.j2ee.osgi</module> --> <!-- org.nightlabs.jfire:org.nightlabs.jfire.base.j2ee.osgi -->
-		<!-- requires a lot <module>../JFireChezFrancois</module> --> <!-- org.nightlabs.jfire:org.nightlabs.jfire.chezfrancois -->
+		<module>../JFireChezFrancois</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.chezfrancois -->
+		<module>../JFireChezFrancoisEAR</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.chezfrancois.ear -->
 		
 		<module>../JFireEntityUserSet</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.entityuserset -->
 		<module>../JFireEntityUserSetEAR</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.entityuserset.ear -->
@@ -55,6 +67,9 @@
 		<module>../JFireJbpm</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.jbpm -->
 		<module>../JFireJbpmAOP</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.jbpm.aop -->
 		<module>../JFireJbpmEAR</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.jbpm.ear -->
+
+		<module>../JFireNumericOrganisationID</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.numorgid -->
+		<module>../JFireNumericOrganisationIDEAR</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.numorgid.ear -->
 		
 		<module>../JFirePBX</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.pbx -->
 		<module>../JFirePBXEAR</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.pbx.ear -->
@@ -81,22 +96,24 @@
 		
 		<module>../org.nightlabs.jfire.reporting.birt</module>
 		<module>../org.nightlabs.jfire.reporting.oda.wrapper</module>
-		<module>../org.nightlabs.jfire.reporting.oda.client</module>
+		<!--module>../org.nightlabs.jfire.reporting.oda.client</module-->
 		<module>../org.nightlabs.jfire.reporting.oda.server</module>
 		<module>../org.nightlabs.jfire.trade.editor2d</module>
+		<module>../JFireTradeEditor2DEAR</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.trade.editor2d.ear -->
 		
 		<!-- generics compile error with javac <module>../JFireTestSuiteDepartment</module> --> <!-- org.nightlabs.jfire:org.nightlabs.jfire.testsuite.department -->
 		<!-- generics compile error with javac <module>../JFireTestSuiteIssueTracking</module> --> <!-- org.nightlabs.jfire:org.nightlabs.jfire.testsuite.issuetracking -->
-		<!-- requires trade <module>../JFireVoucher</module> --> <!-- org.nightlabs.jfire:org.nightlabs.jfire.voucher -->
-		<!-- requires trade <module>../JFireVoucherEditor2D</module> --> <!-- org.nightlabs.jfire:org.nightlabs.jfire.voucher.editor2d.iofilter -->
+		<module>../JFireVoucher</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.voucher -->
+		<module>../JFireVoucherEditor2D</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.voucher.editor2d.iofilter -->
+		<module>../JFireVoucherEAR</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.voucher.ear -->
 		
 		<!-- requires trade <module>../JFireWebShopDemo</module> --> <!-- org.nightlabs.jfire:org.nightlabs.jfire.web.demoshop -->
-		<!-- requires trade <module>../JFireWebShopBase</module> --> <!-- org.nightlabs.jfire:org.nightlabs.jfire.web.webshop -->
+		<module>../JFireWebShopBase</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.web.webshop -->
+		<module>../JFireWebShopBaseEAR</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.web.webshop.ear -->
 		
 		<!-- 
 		<module>../JFireTestSuiteJFireBaseEAR</module>
 		-->
-		<module>../NightLabsRhinoEAR</module>
 		
 		<module>../org.nightlabs.jfire.max.assembly</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.max.assembly -->
 	</modules>

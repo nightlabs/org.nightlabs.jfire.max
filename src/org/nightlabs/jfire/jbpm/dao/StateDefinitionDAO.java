@@ -48,8 +48,15 @@ extends BaseJDOObjectDAO<StateDefinitionID, StateDefinition>
 	public Collection<StateDefinition> getStateDefintions(
 			Set<StateDefinitionID> objectIDs, String[] fetchGroups,
 			int maxFetchDepth, ProgressMonitor monitor)
-	throws Exception
 	{
-		return retrieveJDOObjects(objectIDs, fetchGroups, maxFetchDepth, monitor);
+		return getJDOObjects(null, objectIDs, fetchGroups, maxFetchDepth, monitor);
 	}
+	
+	public StateDefinition getStateDefintion(
+			StateDefinitionID objectID, String[] fetchGroups,
+			int maxFetchDepth, ProgressMonitor monitor)
+	{
+		return getJDOObject(null, objectID, fetchGroups, maxFetchDepth, monitor);
+	}
+	
 }

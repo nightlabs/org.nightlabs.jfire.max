@@ -10,6 +10,7 @@ PUBLIC "-//NightLabs GmbH//DTD ClassLoader Repository 1.1//EN"
 	Instead we suppress everything except the jfireProp-packages.
 -->
 	<publish target="." inherit="false">
-		<resources>org\/nightlabs\/jfire\/.*</resources>
+		<resources>org\/nightlabs\/.*</resources>	<!-- Need to publish org.nightlabs because this ear also contains org.nightlabs.htmlcontent jar -->
+		<!-- resources>org\/nightlabs\/jfire\/.*</resources-->
 	</publish>
 </classloader-repository>

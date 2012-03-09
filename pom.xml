@@ -47,6 +47,11 @@
 		</dependency>
 		<dependency>
 			<groupId>org.nightlabs.jfire</groupId>
+			<artifactId>org.nightlabs.jfire.dunning.ear</artifactId>
+			<type>ear</type>
+		</dependency>
+		<dependency>
+			<groupId>org.nightlabs.jfire</groupId>
 			<artifactId>org.nightlabs.jfire.dynamictrade.ear</artifactId>
 			<type>ear</type>
 		</dependency>

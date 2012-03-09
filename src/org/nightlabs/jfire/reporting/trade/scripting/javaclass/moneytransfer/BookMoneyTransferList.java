@@ -156,7 +156,7 @@ public class BookMoneyTransferList extends AbstractJFSScriptExecutorDelegate {
 			row.add(ReportingScriptUtil.getObjectJDOID(moneyTransfer.getCurrency()));
 			row.add(moneyTransfer.getAmount());
 			row.add(moneyTransfer.getDescription());
-			row.add(JDOHelper.getObjectId(moneyTransfer.getInvoice()).toString());
+			row.add(JDOHelper.getObjectId(moneyTransfer.getPayableObject()).toString());
 			try {
 				buffer.addRecord(new Record(row));
 			} catch (Exception e) {

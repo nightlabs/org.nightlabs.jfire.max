@@ -10,7 +10,7 @@ import javax.jdo.Query;
 import org.eclipse.datatools.connectivity.oda.jfire.IResultSetMetaData;
 import org.eclipse.datatools.connectivity.oda.jfire.JFireOdaException;
 import org.nightlabs.jfire.accounting.Invoice;
-import org.nightlabs.jfire.accounting.InvoiceMoneyTransfer;
+import org.nightlabs.jfire.accounting.PayableObjectMoneyTransfer;
 import org.nightlabs.jfire.accounting.id.InvoiceID;
 import org.nightlabs.jfire.accounting.pay.PayMoneyTransfer;
 import org.nightlabs.jfire.accounting.pay.Payment;
@@ -86,9 +86,9 @@ public class InvoicePayments extends AbstractJFSScriptExecutorDelegate {
 				"SELECT \n"+
 				"    this, \n"+
 				"    containerTransfer.payment \n"+
-				"FROM " + InvoiceMoneyTransfer.class.getName() +" \n" +
+				"FROM " + PayableObjectMoneyTransfer.class.getName() +" \n" +
 				"WHERE \n"+
-				"  this.bookType == \"" + InvoiceMoneyTransfer.BOOK_TYPE_PAY + "\" && \n"+
+				"  this.bookType == \"" + PayableObjectMoneyTransfer.BookType.pay + "\" && \n"+
 				"  JDOHelper.getObjectId(this.invoice) == :invoiceID && \n"+
 				"  this.container == containerTransfer \n"+
 				"VARIABLES \n"+
@@ -101,7 +101,7 @@ public class InvoicePayments extends AbstractJFSScriptExecutorDelegate {
 			// row[0] is of Type InvoiceMoneyTransfer
 			// row[1] is of Type Payment
 
-			InvoiceMoneyTransfer invoiceMoneyTransfer = (InvoiceMoneyTransfer) row[0];
+			PayableObjectMoneyTransfer invoiceMoneyTransfer = (PayableObjectMoneyTransfer) row[0];
 			Payment payment = (Payment) row[1];
 
 			Object[] nRow = new Object[columnCount];

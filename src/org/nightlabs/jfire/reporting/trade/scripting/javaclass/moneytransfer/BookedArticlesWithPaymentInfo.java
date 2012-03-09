@@ -20,7 +20,7 @@ import org.nightlabs.db.Record;
 import org.nightlabs.db.TableBuffer;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.Invoice;
-import org.nightlabs.jfire.accounting.InvoiceMoneyTransfer;
+import org.nightlabs.jfire.accounting.PayableObjectMoneyTransfer;
 import org.nightlabs.jfire.accounting.pay.ModeOfPaymentConst;
 import org.nightlabs.jfire.accounting.pay.ModeOfPaymentFlavour;
 import org.nightlabs.jfire.accounting.pay.PayMoneyTransfer;
@@ -179,8 +179,14 @@ public class BookedArticlesWithPaymentInfo extends AbstractJFSScriptExecutorDele
 //			double articleFactor = (double) ((double)article.getPrice().getAmount() / (double)invoice.getPrice().getAmount()); 
 
 			// get all Pay-InvoiceMoneyTransferes made for the current invoice
-			Collection<InvoiceMoneyTransfer> invoiceMoneyTransfers = InvoiceMoneyTransfer.getInvoiceMoneyTransfers(getPersistenceManager(), invoice, InvoiceMoneyTransfer.BOOK_TYPE_PAY);
-			for (InvoiceMoneyTransfer invoiceMoneyTransfer : invoiceMoneyTransfers) {
+			Collection<PayableObjectMoneyTransfer> invoiceMoneyTransfers = 
+				PayableObjectMoneyTransfer.getPayableObjectMoneyTransfers(
+						getPersistenceManager(), 
+						invoice, 
+						PayableObjectMoneyTransfer.BookType.pay
+				);
+			
+			for (PayableObjectMoneyTransfer invoiceMoneyTransfer : invoiceMoneyTransfers) {
 				// The container of an InvoiceMoneyTransfer with bookType 'pay' should be a PayMoneyTransfer
 				PayMoneyTransfer payMoneyTransfer = (PayMoneyTransfer) invoiceMoneyTransfer.getContainer();
 				if (!payMoneyTransfer.getPayment().isSuccessfulAndComplete()) {

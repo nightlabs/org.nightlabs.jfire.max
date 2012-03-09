@@ -2,6 +2,15 @@ package org.nightlabs.jfire.voucher.accounting;
 
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
+import javax.jdo.annotations.Element;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.NullValue;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.Queries;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceModifier;
 
 import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.accounting.InvoiceMoneyTransfer;
@@ -9,15 +18,6 @@ import org.nightlabs.jfire.accounting.MoneyTransfer;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.transfer.Anchor;
 
-import javax.jdo.annotations.Persistent;
-import javax.jdo.annotations.NullValue;
-import javax.jdo.annotations.InheritanceStrategy;
-import javax.jdo.annotations.Queries;
-import javax.jdo.annotations.Inheritance;
-import javax.jdo.annotations.Element;
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.IdentityType;
-import javax.jdo.annotations.PersistenceModifier;
 
 /**
  * @author Marco Schulze - Marco at NightLabs dot de
@@ -69,7 +69,7 @@ extends InvoiceMoneyTransfer
 	@Deprecated
 	protected VoucherMoneyTransfer() { }
 
-	public VoucherMoneyTransfer(String bookType,
+	public VoucherMoneyTransfer(BookType bookType,
 			MoneyTransfer containerMoneyTransfer,
 			Anchor from, Anchor to, Invoice invoice, long amount, Article article)
 	{

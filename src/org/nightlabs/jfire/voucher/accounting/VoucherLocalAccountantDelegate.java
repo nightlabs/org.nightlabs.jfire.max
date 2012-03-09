@@ -25,7 +25,7 @@ import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.accounting.Account;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.Invoice;
-import org.nightlabs.jfire.accounting.InvoiceMoneyTransfer;
+import org.nightlabs.jfire.accounting.PayableObjectMoneyTransfer.BookType;
 import org.nightlabs.jfire.accounting.book.BookInvoiceMoneyTransfer;
 import org.nightlabs.jfire.accounting.book.LocalAccountantDelegate;
 import org.nightlabs.jfire.security.User;
@@ -185,7 +185,7 @@ extends LocalAccountantDelegate
 			to = tmp;
 		}
 
-		Invoice invoice = container.getInvoice();
+		Invoice invoice = (Invoice) container.getPayableObject();
 		if (invoice.getCustomer().equals(mandator)) {
 			// if the local organisation is the customer of the invoice
 			// we inverse the transfer direction of ALL resolved transfers!
@@ -197,10 +197,10 @@ extends LocalAccountantDelegate
 		amount = Math.abs(amount);
 
 		VoucherMoneyTransfer moneyTransfer = new VoucherMoneyTransfer(
-				InvoiceMoneyTransfer.BOOK_TYPE_BOOK,
+				BookType.book,
 				container,
 				from, to,
-				container.getInvoice(),
+				invoice,
 				amount,
 				articlePrice.getArticle());
 		moneyTransfer = pm.makePersistent(moneyTransfer);

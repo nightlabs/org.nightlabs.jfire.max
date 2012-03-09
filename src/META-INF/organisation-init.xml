@@ -24,5 +24,4 @@
 	<init invocation="org.nightlabs.jfire.trade.recurring.RecurringTradeManagerRemote.initialise">
 		<depends invocation="org.nightlabs.jfire.trade.TradeManagerRemote" />
 	</init>
-
 </organisation-initialisation>

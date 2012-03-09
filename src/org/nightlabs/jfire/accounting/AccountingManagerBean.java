@@ -60,6 +60,7 @@ import org.nightlabs.jdo.query.AbstractJDOQuery;
 import org.nightlabs.jdo.query.JDOQueryCollectionDecorator;
 import org.nightlabs.jdo.query.QueryCollection;
 import org.nightlabs.jfire.accounting.book.LocalAccountantDelegate;
+import org.nightlabs.jfire.accounting.book.PartnerPayPayableObjectAccountantDelegate;
 import org.nightlabs.jfire.accounting.book.id.LocalAccountantDelegateID;
 import org.nightlabs.jfire.accounting.book.mappingbased.MappingBasedAccountantDelegate;
 import org.nightlabs.jfire.accounting.book.mappingbased.MoneyFlowDimension;
@@ -191,6 +192,16 @@ implements AccountingManagerRemote, AccountingManagerLocal
 				sourceOrgDimension = pm.makePersistent(sourceOrgDimension);
 			}
 
+			PayableObjectMoneyTransferFactory invoiceTransferFactory = PayableObjectMoneyTransferFactoryJDO.getFactory(
+					pm, null, PartnerPayPayableObjectAccountantDelegate.PAYABLE_OBJECT_FACTORY_SCOPE, Invoice.class
+					);
+			if (invoiceTransferFactory == null)
+			{
+				invoiceTransferFactory = 
+					new InvoiceMoneyTransferFactoryJDO(PartnerPayPayableObjectAccountantDelegate.PAYABLE_OBJECT_FACTORY_SCOPE);
+				pm.makePersistent(invoiceTransferFactory);
+			}
+
 			pm.getExtent(AccountType.class);
 			try {
 				pm.getObjectById(AccountType.ACCOUNT_TYPE_ID_UNCOLLECTABLE);
@@ -200,6 +211,8 @@ implements AccountingManagerRemote, AccountingManagerLocal
 				accountType.getName().setText(Locale.GERMAN.getLanguage(), "Uneinbringlich");
 			}
 
+			pm.getFetchPlan().addGroup(FetchPlan.DEFAULT);
+			Price.setDefaultTotalPriceFragmentType(pm.detachCopy(PriceFragmentType.getTotalPriceFragmentType(pm)));
 
 			initRegisterConfigModules(pm);
 
@@ -404,8 +417,8 @@ implements AccountingManagerRemote, AccountingManagerLocal
 			idNamespaceDefault.setCacheSizeServer(0);
 			idNamespaceDefault.setCacheSizeClient(0);
 
-
 			pm.makePersistent(new EditLockTypeInvoice(EditLockTypeInvoice.EDIT_LOCK_TYPE_ID));
+			
 		} finally {
 			pm.close();
 		}

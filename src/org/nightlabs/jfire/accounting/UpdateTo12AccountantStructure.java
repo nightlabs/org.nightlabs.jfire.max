@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.nightlabs.jfire.accounting;
 
 import javax.jdo.PersistenceManager;
@@ -10,7 +7,7 @@ import org.nightlabs.jdo.moduleregistry.UpdateHistoryItem;
 import org.nightlabs.jdo.moduleregistry.UpdateNeededHandle;
 import org.nightlabs.jfire.accounting.book.Accountant;
 import org.nightlabs.jfire.accounting.book.LocalBookInvoiceAccountantDelegate;
-import org.nightlabs.jfire.accounting.book.PartnerBookInvoiceAccountantDelegate;
+import org.nightlabs.jfire.accounting.book.PartnerBookPayableObjectAccountantDelegate;
 import org.nightlabs.jfire.trade.JFireTradeEAR;
 import org.slf4j.LoggerFactory;
 
@@ -36,7 +33,7 @@ class UpdateTo12AccountantStructure {
 					}
 					
 					if (accounting.getPartnerAccountant().getAccountantDelegate(MoneyTransfer.class) == null) {
-						accounting.getPartnerAccountant().setAccountantDelegate(MoneyTransfer.class, new PartnerBookInvoiceAccountantDelegate(accounting.getOrganisationID()));
+						accounting.getPartnerAccountant().setAccountantDelegate(MoneyTransfer.class, new PartnerBookPayableObjectAccountantDelegate(accounting.getOrganisationID()));
 					}
 				} else {
 					LoggerFactory.getLogger(UpdateTo12AccountantStructure.class).warn("UpdateTo12AccountantStructure was executed for a schemaVersion smaller than 1.2.0.0. How could this happen, as it was introduced in 1.2?", new Exception());

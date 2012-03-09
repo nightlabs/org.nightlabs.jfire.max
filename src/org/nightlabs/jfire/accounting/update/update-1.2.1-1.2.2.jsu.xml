@@ -1,0 +1,144 @@
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd
+    http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+	<changeSet id="JFireTradeEAR|1.2.1|1.2.2" author="jfire">
+		<preConditions>
+			<not><columnExists tableName="jfiretrade_payment_payableobjects" columnName="integer_idx"/></not>
+		</preConditions>
+		
+		<comment>
+			Fix the payment_payableobjects primary key constraint, i.e. make it a combination of the surrogate
+			key integer_idx (which has to be created and set by datanucleus) and the owning payment.
+		</comment>
+		
+		<!--
+			These create table call only work IFF the database default engine is the one used everywhere else AND 
+			the default char encoding and collate strategies are set to the ones used everywhere else! 
+		 -->
+		<!-- 
+			First create the new dunning_letter table necessary for the following update.
+			But we are relying on datanucleus to update the table with the correct foreign key on the dunning_run table,
+			as soon as it is created through DN, because we don't want to create all dunning related tables through liquibase. 
+		-->
+		<createTable tableName="jfiredunning_letter">
+		<!-- 
+		   `dunning_letter_id` bigint(20) NOT NULL,
+		  `organisation_id` varchar(100)  NOT NULL,
+		  `amount_paid_excluding_invoices` bigint(20) NOT NULL,
+		  `book_dt` datetime DEFAULT NULL,
+		  `dunning_run_dunning_run_id_oid` bigint(20) DEFAULT NULL,
+		  `dunning_run_organisation_id_oid` varchar(100)  DEFAULT NULL,
+		  `finalize_dt` datetime DEFAULT NULL,
+		  `finalize_user_organisation_id_oid` varchar(100)  DEFAULT NULL,
+		  `finalize_user_user_id_oid` varchar(100)  DEFAULT NULL,
+		  `letter_dunning_level` int(11) NOT NULL,
+		  `outstanding` bit(1) NOT NULL,
+		  `price_excluding_invoices_organisation_id_oid` varchar(100)  DEFAULT NULL,
+		  `price_excluding_invoices_price_id_oid` bigint(20) DEFAULT NULL,
+		  `price_including_invoices_organisation_id_oid` varchar(100)  DEFAULT NULL,
+		  `price_including_invoices_price_id_oid` bigint(20) DEFAULT NULL,
+		  `dunning_letters_integer_idx` int(11) DEFAULT NULL,
+		  PRIMARY KEY (`dunning_letter_id`,`organisation_id`),
+		-!-  KEY `jfiredunning_letter_n52` (`dunning_run_dunning_run_id_oid`,`dunning_run_organisation_id_oid`),
+		  KEY `jfiredunning_letter_n50` (`price_including_invoices_organisation_id_oid`,`price_including_invoices_price_id_oid`),
+		  KEY `jfiredunning_letter_n51` (`price_excluding_invoices_organisation_id_oid`,`price_excluding_invoices_price_id_oid`),
+		  KEY `jfiredunning_letter_n49` (`finalize_user_organisation_id_oid`,`finalize_user_user_id_oid`),
+		  CONSTRAINT `jfiredunning_letter_fk1` FOREIGN KEY (`price_including_invoices_organisation_id_oid`, `price_including_invoices_price_id_oid`) REFERENCES `jfiretrade_price` (`organisation_id`, `price_id`),
+		  CONSTRAINT `jfiredunning_letter_fk2` FOREIGN KEY (`finalize_user_organisation_id_oid`, `finalize_user_user_id_oid`) REFERENCES `jfirebase_user` (`organisation_id`, `user_id`),
+		  CONSTRAINT `jfiredunning_letter_fk3` FOREIGN KEY (`price_excluding_invoices_organisation_id_oid`, `price_excluding_invoices_price_id_oid`) REFERENCES `jfiretrade_price` (`organisation_id`, `price_id`)
+		-!-  CONSTRAINT `jfiredunning_letter_fk4` FOREIGN KEY (`dunning_run_dunning_run_id_oid`, `dunning_run_organisation_id_oid`) REFERENCES `jfiredunning_run` (`dunning_run_id`, `organisation_id`)
+		 -->
+			<column name="dunning_letter_id" type="BIGINT(20)">
+				<constraints nullable="false" primaryKey="true" />
+			</column>
+			<column name="organisation_id" type="VARCHAR(100)">
+				<constraints nullable="false" primaryKey="true" />
+			</column>
+			<column name="amount_paid_excluding_invoices" type="BIGINT(20)" />
+			<column name="book_dt" type="DATETIME" defaultValue="NULL" />
+			<column name="dunning_run_dunning_run_id_oid" type="BIGINT(20)" defaultValue="NULL" />
+			<column name="dunning_run_organisation_id_oid" type="VARCHAR(100)" defaultValue="NULL" />
+			<column name="finalize_dt" type="DATETIME" defaultValue="NULL" />
+			<column name="finalize_user_organisation_id_oid" type="VARCHAR(100)" defaultValue="NULL" />
+			<column name="finalize_user_user_id_oid" type="VARCHAR(100)" defaultValue="NULL" />
+			<column name="letter_dunning_level" type="INTEGER(11)" />
+			 <!--
+			 	FIX for liquibase which maps boolean -> tinyint(1) according to spec from mysql which doesn't support a true boolean type.
+			 	Unfortunately, jdbc maps java.lang.Boolean -> BIT. 
+			 -->
+			<column name="outstanding" type="BIT" />
+			<column name="price_excluding_invoices_organisation_id_oid" type="VARCHAR(100)" defaultValue="NULL" />
+			<column name="price_excluding_invoices_price_id_oid" type="BIGINT(20)" defaultValue="NULL" />
+			<column name="price_including_invoices_organisation_id_oid" type="VARCHAR(100)" defaultValue="NULL" />
+			<column name="price_including_invoices_price_id_oid" type="BIGINT(20)" defaultValue="NULL" />
+			<column name="dunning_letters_integer_idx" type="INTEGER(11)" />
+			
+			<column name="payable_objects_invoice_invoice_idprefix_eid" type="VARCHAR(50)" defaultValue="NULL" />
+			<column name="payable_objects_invoice_organisation_id_eid" type="VARCHAR(100)" defaultValue="NULL" />
+			<column name="payable_objects_dunning_letter_organisation_id_eid" type="VARCHAR(100)" defaultValue="NULL" />
+			<column name="payable_objects_dunning_letter_dunning_letter_id_eid" type="BIGINT(20)" defaultValue="NULL" />
+		</createTable>
+		<addForeignKeyConstraint constraintName="jfiredunning_letter_fk1" 
+			referencedTableName="jfiretrade_price" referencedColumnNames="organisation_id, price_id"
+			baseTableName="jfiredunning_letter" baseColumnNames="price_including_invoices_organisation_id_oid, price_including_invoices_price_id_oid" />
+		<addForeignKeyConstraint constraintName="jfiredunning_letter_fk2" 
+			referencedTableName="jfirebase_user" referencedColumnNames="organisation_id, user_id"
+			baseTableName="jfiredunning_letter" baseColumnNames="finalize_user_organisation_id_oid, finalize_user_user_id_oid" />
+		<addForeignKeyConstraint constraintName="jfiredunning_letter_fk3" 
+			referencedTableName="jfiretrade_price" referencedColumnNames="organisation_id, price_id"
+			baseTableName="jfiredunning_letter" baseColumnNames="price_excluding_invoices_organisation_id_oid, price_excluding_invoices_price_id_oid" />
+		
+		<!-- 
+			   then update the payment_payableobjects table by creating a tmp table, inserting all data, deleting the original
+			   and renaming the tmp table.
+		 -->
+		<createTable tableName="jfiretrade_payment_payableobjects_tmp">
+			<!-- IMPORTANT: 
+				   The auto_inc field has to be the first declared so that it will be the first entry in the primary key
+				   declaration. Otherwise mariadb 5.3.3 will not recognize that the auto_inc field is in an index and complain
+				   about it. (Couldn't find any existing issues about this problem) 
+			 -->
+			<column name="integer_idx" type="BIGINT(20)" autoIncrement="true" >
+				<constraints nullable="false" primaryKey="true" />
+			</column>
+			<column name="organisation_id_oid" type="VARCHAR(100)">
+				<constraints nullable="false" primaryKey="true" />
+			</column>
+			<column name="payment_id_oid" type="BIGINT(20)">
+				<constraints nullable="false" primaryKey="true" />
+			</column>
+			<column name="payable_objects_invoice_invoice_id_eid" type="BIGINT(20)" defaultValue="NULL" />
+			<column name="payable_objects_invoice_invoice_idprefix_eid" type="VARCHAR(50)" defaultValue="NULL" />
+			<column name="payable_objects_invoice_organisation_id_eid" type="VARCHAR(100)" defaultValue="NULL" />
+			<column name="payable_objects_dunning_letter_organisation_id_eid" type="VARCHAR(100)" defaultValue="NULL" />
+			<column name="payable_objects_dunning_letter_dunning_letter_id_eid" type="BIGINT(20)" defaultValue="NULL" />
+		</createTable>
+		
+		<addForeignKeyConstraint constraintName="jfiretrade_payment_payableobjects_fk1" 
+			referencedTableName="jfiretrade_payment" referencedColumnNames="organisation_id, payment_id"
+			baseTableName="jfiretrade_payment_payableobjects_tmp" baseColumnNames="organisation_id_oid, payment_id_oid" />
+		<addForeignKeyConstraint constraintName="jfiretrade_payment_payableobjects_fk2" 
+			referencedTableName="jfiretrade_invoice" referencedColumnNames="invoice_id, invoice_idprefix, organisation_id"
+			baseTableName="jfiretrade_payment_payableobjects_tmp" baseColumnNames="payable_objects_invoice_invoice_id_eid, payable_objects_invoice_invoice_idprefix_eid, payable_objects_invoice_organisation_id_eid" />
+		<addForeignKeyConstraint constraintName="jfiretrade_payment_payableobjects_fk3" 
+			referencedTableName="jfiredunning_letter" referencedColumnNames="dunning_letter_id, organisation_id"
+			baseTableName="jfiretrade_payment_payableobjects_tmp" baseColumnNames="payable_objects_dunning_letter_dunning_letter_id_eid, payable_objects_dunning_letter_organisation_id_eid" />
+		<sql>
+			INSERT INTO jfiretrade_payment_payableobjects_tmp (organisation_id_oid, payment_id_oid, payable_objects_invoice_invoice_id_eid, payable_objects_invoice_invoice_idprefix_eid, payable_objects_invoice_organisation_id_eid)
+			SELECT * FROM jfiretrade_payment_payableobjects;
+		</sql>
+		<dropTable tableName="jfiretrade_payment_payableobjects" />
+		<renameTable oldTableName="jfiretrade_payment_payableobjects_tmp" newTableName="jfiretrade_payment_payableobjects"/>
+		<!--
+			 TODO: Replace with <dropAutoIncrement> tag as soon as https://liquibase.jira.com/browse/CORE-486 is implemented.
+			       This solution is mysql specific and NOT database agnostic!
+		 -->
+		<sql>
+			ALTER TABLE jfiretrade_payment_payableobjects MODIFY COLUMN integer_idx BIGINT(20) NOT NULL; 
+		</sql>
+	</changeSet>
+</databaseChangeLog>

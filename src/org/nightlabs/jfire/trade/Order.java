@@ -134,8 +134,8 @@ import org.nightlabs.util.Util;
 @Queries({
 	@javax.jdo.annotations.Query(
 		name="getOrderIDsByVendorAndCustomer",
-		value="SELECT JDOHelper.getObjectId(this) " +
-				"WHERE JDOHelper.getObjectId(vendor) == :vendorID && " +
+		value="SELECT JDOHelper.getObjectId(this) WHERE " +
+				"JDOHelper.getObjectId(vendor) == :vendorID && " +
 				"JDOHelper.getObjectId(customer) == :customerID " +
 				"ORDER BY createDT DESC"
 	),

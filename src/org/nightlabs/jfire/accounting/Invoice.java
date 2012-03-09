@@ -86,81 +86,6 @@ import org.nightlabs.util.Util;
 /**
  * @author Alexander Bieber <!-- alex at nightlabs dot de -->
  * @author Marco Schulze - Marco at NightLabs dot de
- *
- * @jdo.persistence-capable
- *		identity-type="application"
- *		objectid-class="org.nightlabs.jfire.accounting.id.InvoiceID"
- *		detachable="true"
- *		table="JFireTrade_Invoice"
- *
- * @jdo.version strategy="version-number"
- *
- * @jdo.implements name="org.nightlabs.jfire.trade.ArticleContainer"
- * @jdo.implements name="org.nightlabs.jfire.jbpm.graph.def.Statable"
- *
- * @jdo.inheritance strategy="new-table"
- *
- * @jdo.create-objectid-class
- *		field-order="organisationID, invoiceIDPrefix, invoiceID"
- *		add-interfaces="org.nightlabs.jfire.trade.id.ArticleContainerID"
- *		include-body="id/InvoiceID.body.inc"
- *
- * @jdo.query
- *		name="getInvoiceIDsByVendorAndCustomer"
- *		query="SELECT JDOHelper.getObjectId(this)
- *          WHERE
- *            JDOHelper.getObjectId(vendor) == :vendorID &&
- *            JDOHelper.getObjectId(customer) == :customerID
- *			ORDER BY invoiceID DESC"
- *
- * @jdo.query
- *		name="getInvoiceIDsByVendorAndEndCustomer"
- *		query="SELECT JDOHelper.getObjectId(this)
- *          WHERE
- *            JDOHelper.getObjectId(vendor) == :vendorID &&
- *            JDOHelper.getObjectId(endCustomer) == :customerID
- *			ORDER BY invoiceID DESC"
- *
- * @jdo.query
- *		name="getInvoiceIDsByVendorAndCustomerAndEndCustomer"
- *		query="SELECT JDOHelper.getObjectId(this)
- *          WHERE
- *            JDOHelper.getObjectId(vendor) == :vendorID &&
- *            JDOHelper.getObjectId(customer) == :customerID &&
- *            JDOHelper.getObjectId(endCustomer) == :endCustomerID
- *			ORDER BY invoiceID DESC"
- *
- * @jdo.query
- *		name="getNonFinalizedInvoicesByVendorAndCustomer"
- *		query="SELECT
- *			WHERE vendor.organisationID == paramVendorID_organisationID &&
- *            vendor.anchorID == paramVendorID_anchorID &&
- *			      customer.organisationID == paramCustomerID_organisationID &&
- *            customer.anchorID == paramCustomerID_anchorID &&
- *            finalizeDT == null
- *			PARAMETERS String paramVendorID_organisationID, String paramVendorID_anchorID,
- *                 String paramCustomerID_organisationID, String paramCustomerID_anchorID
- *			import java.lang.String
- *			ORDER BY invoiceID DESC"
- *
- * @jdo.fetch-group name="Invoice.invoiceLocal" fields="invoiceLocal"
- * @jdo.fetch-group name="Invoice.articles" fields="articles"
- * @jdo.fetch-group name="Invoice.createUser" fields="createUser"
- * @jdo.fetch-group name="Invoice.currency" fields="currency"
- * @jdo.fetch-group name="Invoice.discount" fields="discount"
- * @jdo.fetch-group name="Invoice.finalizeUser" fields="finalizeUser"
- * @jdo.fetch-group name="Invoice.price" fields="price"
- * @jdo.fetch-group name="Invoice.this" fetch-groups="default" fields="invoiceLocal, articles, createUser, currency, customer, discount, finalizeUser, price, vendor, state, states"
- *
- * @jdo.fetch-group name="ArticleContainer.customer" fields="customer"
- * @jdo.fetch-group name="ArticleContainer.vendor" fields="vendor"
- * @jdo.fetch-group name="ArticleContainer.endCustomer" fields="endCustomer"
- *
- * @jdo.fetch-group name="FetchGroupsTrade.articleContainerInEditor" fields="invoiceLocal, createUser, currency, customer, endCustomer, discount, finalizeUser, price, vendor, state, states"
- *
- * @jdo.fetch-group name="Statable.state" fields="state"
- * @jdo.fetch-group name="Statable.states" fields="states"
- *
  */
 @PersistenceCapable(
 	objectIdClass=InvoiceID.class,
@@ -236,22 +161,18 @@ import org.nightlabs.util.Util;
 					"VARIABLES org.nightlabs.jfire.trade.Article article " +
 					"ORDER BY createDT DESC"
 	),
-//	@javax.jdo.annotations.Query(
-//			name="getInvoiceIDsByVendorAndCustomerAndEndCustomer",
-//			value="SELECT JDOHelper.getObjectId(this) WHERE JDOHelper.getObjectId(vendor) == :vendorID && JDOHelper.getObjectId(customer) == :customerID && JDOHelper.getObjectId(endCustomer) == :endCustomerID ORDER BY invoiceID DESC"
-//	),
 	@javax.jdo.annotations.Query(
 			name="getNonFinalizedInvoicesByVendorAndCustomer",
 			value="SELECT WHERE vendor.organisationID == paramVendorID_organisationID && vendor.anchorID == paramVendorID_anchorID && customer.organisationID == paramCustomerID_organisationID && customer.anchorID == paramCustomerID_anchorID && finalizeDT == null && invoiceLocal.processEnded == false PARAMETERS String paramVendorID_organisationID, String paramVendorID_anchorID, String paramCustomerID_organisationID, String paramCustomerID_anchorID import java.lang.String ORDER BY invoiceID DESC"
 	),
 	@javax.jdo.annotations.Query(
 			name="getOverdueInvoices",
-			value="SELECT WHERE this.organisationID == paramOrganisationID && dueDateForPayment < paramDate && finalizeDT != null PARAMETERS String paramOrganisationID, Date paramDate import java.lang.String, java.util.Date ORDER BY invoiceID DESC"
+			value="SELECT WHERE this.organisationID == :organisationID && this.dueDateForPayment < :date && this.invoiceLocal.outstanding == true"
 	)
 })
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class Invoice
-implements Serializable, PayableObject, PricedArticleContainer, Statable, DetachCallback
+	implements Serializable, PayableObject, PricedArticleContainer, ArticleContainer, Statable, DetachCallback
 {
 	private static final long serialVersionUID = 1L;
 	public static final String FETCH_GROUP_INVOICE_LOCAL = "Invoice.invoiceLocal";
@@ -321,8 +242,8 @@ implements Serializable, PayableObject, PricedArticleContainer, Statable, Detach
 	{
 		Query query = pm.newNamedQuery(Invoice.class, "getOverdueInvoices");
 		Map<String, Object> params = new HashMap<String, Object>();
-		params.put("paramOrganisationID", organisationID);
-		params.put("paramDate", date);
+		params.put("organisationID", organisationID);
+		params.put("date", date);
 
 		return CollectionUtil.castList((List<?>) query.executeWithMap(params));
 	}
@@ -761,7 +682,7 @@ implements Serializable, PayableObject, PricedArticleContainer, Statable, Detach
 	 */
 	public void bookInvoiceMoneyTransfer(InvoiceMoneyTransfer transfer, boolean rollback)
 	{
-		if (!InvoiceMoneyTransfer.BOOK_TYPE_PAY.equals(transfer.getBookType()))
+		if (!PayableObjectMoneyTransfer.BookType.pay.equals(transfer.getBookType()))
 			return;
 
 		boolean vendorIsFrom = transfer.getAnchorType(vendor) == Transfer.ANCHORTYPE_FROM;
@@ -852,6 +773,12 @@ implements Serializable, PayableObject, PricedArticleContainer, Statable, Detach
 	public long getInvoiceID() {
 		return invoiceID;
 	}
+	
+	@Override
+	public String getPayableObjectID()
+	{
+		return Long.toString(invoiceID);
+	}
 
 	@Override
 	public long getArticleContainerID()
@@ -899,8 +826,15 @@ implements Serializable, PayableObject, PricedArticleContainer, Statable, Detach
 //		this.currency = currency;
 //	}
 
-	public Currency getCurrency() {
+	public Currency getCurrency()
+	{
 		return currency;
+	}
+	
+	@Override
+	public long getAmountToPay()
+	{
+		return getInvoiceLocal().getAmountToPay();
 	}
 
 	public Date getDueDateForPayment() {
@@ -912,11 +846,33 @@ implements Serializable, PayableObject, PricedArticleContainer, Statable, Detach
 	}
 	
 	/**
+	 * Sets the due date of the current invoice to a new date.
+	 * 
+	 * <p><code>null</code> is NOT a valid due date!</p>
+	 * <p>Note: Use this method with caution! It is only intended to be used for testing purposes.</p>
+	 * 
+	 * @param dueDate The new dueDate to set.
+	 */
+	public void setDueDateForPayment(Date dueDate)
+	{
+		if (dueDate == null)
+			throw new IllegalArgumentException("Given new dueDate must NOT be null!");
+		
+		this.dueDateForPayment = dueDate;
+	}
+	
+	/**
 	 * @return Returns the valid.
 	 */
 	public boolean isValid()
 	{
 		return valid;
+	}
+	
+	@Override
+	public boolean isOutstanding()
+	{
+		return getInvoiceLocal().isOutstanding();
 	}
 
 	/**
@@ -1105,4 +1061,5 @@ implements Serializable, PayableObject, PricedArticleContainer, Statable, Detach
 
 		this.finalizeUser = finalizeUser;
 	}
+
 }

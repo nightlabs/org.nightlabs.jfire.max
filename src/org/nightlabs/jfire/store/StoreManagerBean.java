@@ -3052,7 +3052,6 @@ implements StoreManagerRemote, StoreManagerLocal
 		}
 	}
 
-
 	/**
 	 * @return the index position of the child's {@link ProductTypeID} with respect to the parent. If the child's {@link ProductTypeID} is
 	 * not found (i.e. that it is not a child of the given parent) then -1 is returned.
@@ -3075,6 +3074,8 @@ implements StoreManagerRemote, StoreManagerLocal
 		return index;
 	}
 
+
+
 	/**
 	 * Takes a {@link ProductTypeID}, searches for all {@link Article}s with the productTypeID reference, order them by their createDTs,
 	 * then depending on the desired type of {@link ArticleContainer}, return their unique IDs in a Set accordingly.
@@ -3082,8 +3083,7 @@ implements StoreManagerRemote, StoreManagerLocal
 	 * most recent ones. Otherwise, they are refer to the oldest {@link ArticleContainer}s.
 	 */
 	@SuppressWarnings("unchecked")
-//	@RolesAllowed("_Guest_")
-	@RolesAllowed("org.nightlabs.jfire.store.seeProductType") // <-- Is this correct?
+	@RolesAllowed("org.nightlabs.jfire.store.seeProductType")
 	@Override
 	public Set<ArticleContainerID> getArticleContainerIDsByProductTypeID(ProductTypeID productTypeId, Class<? extends ArticleContainer> articleContainerClass, boolean isOrderByDescendingArticleDT) {
 		PersistenceManager pm = createPersistenceManager();

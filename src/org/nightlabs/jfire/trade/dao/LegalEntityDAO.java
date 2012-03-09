@@ -33,13 +33,15 @@ import javax.jdo.FetchPlan;
 import javax.jdo.JDODetachedFieldAccessException;
 
 import org.nightlabs.jdo.NLJDOHelper;
+import org.nightlabs.jfire.base.JFireEjb3Factory;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.base.jdo.IJDOObjectDAO;
 import org.nightlabs.jfire.person.Person;
 import org.nightlabs.jfire.prop.IStruct;
 import org.nightlabs.jfire.prop.PropertySet;
 import org.nightlabs.jfire.prop.dao.StructLocalDAO;
-import org.nightlabs.jfire.security.SecurityReflector;
+import org.nightlabs.jfire.prop.id.PropertySetID;
+import org.nightlabs.jfire.security.GlobalSecurityReflector;
 import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.trade.OrganisationLegalEntity;
 import org.nightlabs.jfire.trade.TradeManagerRemote;
@@ -51,43 +53,38 @@ import org.nightlabs.progress.ProgressMonitor;
  * JDOObjectDAO for LegalEntities.
  *
  * @author Alexander Bieber <!-- alex [AT] nightlabs[DOT] de -->
+ * @author Daniel Mazurek
  */
 public class LegalEntityDAO
 extends BaseJDOObjectDAO<AnchorID, LegalEntity>
 implements IJDOObjectDAO<LegalEntity>
 {
-
 	private static String[] DEFAULT_FETCH_GROUP_ANONYMOUS = new String[] {FetchPlan.DEFAULT, LegalEntity.FETCH_GROUP_PERSON, PropertySet.FETCH_GROUP_FULL_DATA};
 
 	private AnchorID _anonymousAnchorID;
 
-//	private LoginStateListener loginStateListener = new LoginStateListener() {
-//
-//		public void loginStateChanged(int loginState, IAction action) {
-//			if (loginState == Login.LOGINSTATE_LOGGED_IN) {
-//				try {
-//					anonymousAnchorID = AnchorID.create(
-//							Login.getLogin().getOrganisationID(),
-//							LegalEntity.ANCHOR_TYPE_ID_LEGAL_ENTITY,
-//							LegalEntity.ANCHOR_ID_ANONYMOUS
-//					);
-//				} catch (Exception e) {
-//					throw new RuntimeException(e);
-//				}
-//			}
-//		}
-//	};
+	private LegalEntityDAO() {}
 
+	/** The shared instance */
+	private static LegalEntityDAO sharedInstance = null;
 	/**
-	 *
+	 * Returns (and lazily creates) the static shared instance of {@link LegalEntityDAO}.
+	 * @return The static shared instance of {@link LegalEntityDAO}.
 	 */
-	public LegalEntityDAO() {
-		super();
+	public static LegalEntityDAO sharedInstance()
+	{
+		if (sharedInstance == null) {
+			synchronized (LegalEntityDAO.class) {
+				if (sharedInstance == null)
+					sharedInstance = new LegalEntityDAO();
+			}
+		}
+		return sharedInstance;
 	}
-
+	
 	public AnchorID getAnonymousLegalEntityID()
 	{
-		String organisationID = SecurityReflector.getUserDescriptor().getOrganisationID();
+		String organisationID = GlobalSecurityReflector.sharedInstance().getUserDescriptor().getOrganisationID();
 		if (_anonymousAnchorID != null) {
 			if (!organisationID.equals(_anonymousAnchorID.organisationID))
 				_anonymousAnchorID = null;
@@ -115,24 +112,9 @@ implements IJDOObjectDAO<LegalEntity>
 		TradeManagerRemote tradeManager = getEjbProvider().getRemoteBean(TradeManagerRemote.class);
 		Collection<LegalEntity> legalEntities = tradeManager.getLegalEntities(objectIDs, fetchGroups, maxFetchDepth);
 
-//		IStruct struct = StructLocalDAO.sharedInstance().getStructLocal(
-//				Organisation.DEV_ORGANISATION_ID,
-//				Person.class,
-//				Person.STRUCT_SCOPE,
-//				Person.STRUCT_LOCAL_SCOPE,
-//				new NullProgressMonitor()
-//		);
-//		IStruct struct = StructDAO.sharedInstance().getStruct(Person.class, StructLocal.DEFAULT_SCOPE, new NullProgressMonitor());
 		// TODO: Really need this ?!? Better not to explode here I think, Alex.
 		for (LegalEntity le : legalEntities) {
 			inflatePerson(le);
-//			try {
-//				if (le.getPerson() != null)
-//					le.getPerson().inflate(struct);
-//			} catch (JDODetachedFieldAccessException e) {
-//				// le.person was not detached -> no explosion, break
-//				break; // why break? what about the others?
-//			}
 		}
 		return legalEntities;
 	}
@@ -209,23 +191,6 @@ implements IJDOObjectDAO<LegalEntity>
 		return getJDOObjects(null, leAnchorIDs, fetchGroups, maxFetchDepth, monitor);
 	}
 
-	/** The shared instance */
-	private static LegalEntityDAO sharedInstance = null;
-	/**
-	 * Returns (and lazily creates) the static shared instance of {@link LegalEntityDAO}.
-	 * @return The static shared instance of {@link LegalEntityDAO}.
-	 */
-	public static LegalEntityDAO sharedInstance()
-	{
-		if (sharedInstance == null) {
-			synchronized (LegalEntityDAO.class) {
-				if (sharedInstance == null)
-					sharedInstance = new LegalEntityDAO();
-			}
-		}
-		return sharedInstance;
-	}
-
 	/**
 	 * {@inheritDoc}
 	 */
@@ -278,5 +243,19 @@ implements IJDOObjectDAO<LegalEntity>
 		} finally {
 			monitor.done();
 		}
+	}
+	
+	public LegalEntity getLegalEntityForPerson(PropertySetID personID, String[] fetchGroups, 
+			int maxFetchDepth, ProgressMonitor monitor) 
+	{
+		TradeManagerRemote tradeManager = JFireEjb3Factory.getRemoteBean(
+				TradeManagerRemote.class, GlobalSecurityReflector.sharedInstance().getInitialContextProperties()
+		);
+		LegalEntity le = tradeManager.getLegalEntityForPerson(personID, fetchGroups, maxFetchDepth);
+		if (le != null) {
+			getCache().put(null, le, fetchGroups, maxFetchDepth);
+		}
+		monitor.done();
+		return le;
 	}
 }

@@ -27,7 +27,6 @@ import org.nightlabs.jfire.accounting.id.TariffMappingID;
 import org.nightlabs.jfire.accounting.pay.CheckRequirementsEnvironment;
 import org.nightlabs.jfire.accounting.pay.ModeOfPayment;
 import org.nightlabs.jfire.accounting.pay.ModeOfPaymentFlavour;
-import org.nightlabs.jfire.accounting.pay.PayableObject;
 import org.nightlabs.jfire.accounting.pay.Payment;
 import org.nightlabs.jfire.accounting.pay.PaymentData;
 import org.nightlabs.jfire.accounting.pay.PaymentResult;

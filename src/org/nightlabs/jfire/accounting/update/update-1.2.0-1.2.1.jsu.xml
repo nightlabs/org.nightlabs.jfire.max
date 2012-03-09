@@ -6,7 +6,7 @@
     http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 
 	<changeSet id="JFireTradeEAR|1.2.0|1.2.1" author="jfire">
-		<comment>Introduce discriminator for Anchor</comment>
+		<comment>Introduce a discriminator for Anchor</comment>
 		
 		<ext:dnIntroduceDiscriminator className="org.nightlabs.jfire.transfer.Anchor"/>
 	</changeSet>

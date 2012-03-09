@@ -43,7 +43,7 @@ import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 
 import org.nightlabs.jfire.accounting.id.CurrencyID;
-import org.nightlabs.l10n.NumberFormatter;
+import org.nightlabs.l10n.INumberFormatter;
 import org.nightlabs.util.Util;
 
 /**
@@ -61,7 +61,7 @@ import org.nightlabs.util.Util;
  * For the opposite direction, you can use {@link #toLong(double)}.
  * </p>
  * <p>
- * To display a monetary value, you should use {@link NumberFormatter#formatCurrency(long, org.nightlabs.l10n.Currency)}
+ * To display a monetary value, you should use {@link INumberFormatter#formatCurrency(long, org.nightlabs.l10n.Currency)}
  * (or one of the other overloaded <code>formatCurrency(...)</code> methods).
  * </p>
  *
@@ -172,9 +172,17 @@ implements Serializable, org.nightlabs.l10n.Currency
 		return pow10.intValue();
 	}
 
-	@Override
-	public long toLong(final double amount) {
-		return Math.round(amount * pow10(getDecimalDigitCount()));
+	/**
+	 * Convert the given amount to the long value of this currency.
+	 * <p>
+	 *   amount * 10^(decimalDigitCount)
+	 * <p>
+	 *
+	 * @param amount The amount to convert
+	 * @return the approximate value as long - there might be rounding differences.
+	 */
+	public long toLong(double amount) {
+		return Math.round(amount * Math.pow(10, getDecimalDigitCount()));
 		// 2010-02-03: Switched from (long)(...) cast to Math.round(...), because the following code
 		// otherwise produces a wrong result (4079 instead of 4080). Marco.
 		//				public static void main(String[] args) {

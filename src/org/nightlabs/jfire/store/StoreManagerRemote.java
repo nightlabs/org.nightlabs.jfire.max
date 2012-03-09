@@ -462,7 +462,7 @@ public interface StoreManagerRemote {
 	 * Takes a {@link ProductTypeID}, searches for all {@link Article}s with the productTypeID reference, order them by their createDTs,
 	 * then depending on the desired type of {@link ArticleContainer}, return their unique IDs in a Set accordingly.
 	 * @return So, in effect, if we set isOrderByDescendingArticleDT to true, then returned Set of {@link ArticleContainerID}s are all
-	 * most recent ones. Otherwise, they are refer to the oldest {@link ArticleContainer}s.
+	 * most recent ones. Otherwise, the oldest {@link ArticleContainer}s are returned.
 	 */
 	public Set<ArticleContainerID> getArticleContainerIDsByProductTypeID(ProductTypeID productTypeId, Class<? extends ArticleContainer> articleContainerClass, boolean isOrderByDescendingArticleDT);
 

@@ -33,7 +33,6 @@ import java.util.Set;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
-import javax.jdo.annotations.IdentityType;
 import javax.jdo.annotations.Inheritance;
 import javax.jdo.annotations.InheritanceStrategy;
 import javax.jdo.annotations.PersistenceCapable;
@@ -59,7 +58,6 @@ import org.nightlabs.jfire.transfer.Anchor;
  * @author Chairat Kongarayawetchakun <chairatk[AT]nightlabs[DOT]de>
  */
 @PersistenceCapable(
-		identityType=IdentityType.APPLICATION,
 		detachable="true",
 		table="JFireTrade_LocalBookInvoiceAccountantDelegate"
 )
@@ -103,7 +101,7 @@ public class LocalBookInvoiceAccountantDelegate extends AccountantDelegate
 			return;
 
 		BookInvoiceMoneyTransfer bookTransfer = (BookInvoiceMoneyTransfer)transfer;
-		Invoice invoice = bookTransfer.getInvoice();
+		Invoice invoice = bookTransfer.getPayableObject();
 
 		// find the delegates
 		Map<Article, LocalAccountantDelegate> delegates = new HashMap<Article, LocalAccountantDelegate>();

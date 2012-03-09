@@ -32,6 +32,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
+import javax.jdo.FetchPlan;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.annotations.Column;
@@ -41,16 +42,20 @@ import javax.jdo.annotations.IdentityType;
 import javax.jdo.annotations.Inheritance;
 import javax.jdo.annotations.InheritanceStrategy;
 import javax.jdo.annotations.Key;
+import javax.jdo.annotations.NotPersistent;
 import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.PersistenceModifier;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 import javax.jdo.annotations.Value;
 
 import org.apache.log4j.Logger;
+import org.nightlabs.clone.CloneContext;
+import org.nightlabs.clone.CloneableWithContext;
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.accounting.id.PriceID;
+import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.util.Util;
+import org.nightlabs.util.reflect.ReflectUtil;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -123,7 +128,7 @@ import org.nightlabs.util.Util;
 })
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class Price
-	implements Serializable
+	implements Serializable, CloneableWithContext
 {
 	private static final long serialVersionUID = 1L;
 
@@ -136,6 +141,177 @@ public class Price
 	 */
 	@Deprecated
 	public static final String FETCH_GROUP_THIS_PRICE = "Price.this"; //$NON-NLS-1$
+	
+	private static PriceFragmentType defaultTotalPriceFragmentType = null;
+	
+	/**
+	 * Set the default instance of the PriceFragmentType that is used for the total price.
+	 * 
+	 * <p>
+	 * 	<b>Important</b>: This should only be used for testing purpose! <br/>
+	 * 	When writing offline testcases, the default total price fragment type cannot be retrieved from the datastore,
+	 * 	hence you can use this method to always return the same offline instance for objects instantiated when running
+	 * 	these tests. 
+	 * </p>
+	 * 
+	 * @param defaultTotalType The instance that shall be used as the default total price fragment type.
+	 */
+	public static void setDefaultTotalPriceFragmentType(PriceFragmentType defaultTotalType)
+	{
+		if (defaultTotalType == null)
+			throw new IllegalArgumentException("The defaultTotalPriceFragmentType must NOT be null!");
+		
+		synchronized (Price.class)
+		{
+			defaultTotalPriceFragmentType = defaultTotalType;
+		}
+	}
+	
+	/**
+	 * Returns the cached default "TOTAL" PriceFragmentType.
+	 * <p>
+	 * 	Note: As this is only the cached type, it may be null the moment this method is called and will be set lazily when
+	 * 	{@link #setAmount(long)} is called.
+	 * </p>
+	 * 
+	 * @return the cached default "TOTAL" PriceFragmentType.
+	 */
+	public static PriceFragmentType getDefaultTotalPriceFragmentType()
+	{
+		return defaultTotalPriceFragmentType;
+	}
+	
+	/**
+	 * Returns the default total PriceFragmentType instance.
+	 * <p>
+	 * 	If the default PriceFragmentType has been set manually 
+	 * 	(see {@link #setDefaultTotalPriceFragmentType(PriceFragmentType)}), then this instance is returned.
+	 * 	If none was set explicitly, it is tried to get the default one by looking it up from the datastore with the 
+	 * 	{@link PersistenceManager} of this object. <br/>
+	 * 	If no PersistenceManager can be found or no default total PriceFragmentType can be located in the datastore, an
+	 * 	IllegalStateException is thrown.
+	 * </p>
+	 * 
+	 * @return the default total PriceFragmentType instance.
+	 */
+	private PriceFragmentType lookupDefaultTotalPriceFragmentType()
+	{
+		if (defaultTotalPriceFragmentType != null)
+		{
+			if (defaultTotalPriceFragmentType.primaryKey == null)
+			{
+				throw new IllegalStateException(
+						"Who changed the source code and messed up the defaultTotalPriceFragmentType such that its primaryKey == null!?!"
+				);
+			}
+			
+			return defaultTotalPriceFragmentType;
+		}
+		
+		synchronized (Price.class)
+		{
+			if (defaultTotalPriceFragmentType != null)
+				return defaultTotalPriceFragmentType;
+			
+			PersistenceManager pm = JDOHelper.getPersistenceManager(this);
+			if (pm == null)
+			{
+				throw new IllegalStateException("This instance of Price ("+getPrimaryKey()+") does neither have a " +
+						"PriceFragment for the PriceFragmentType \"_Total_\" nor is it attached to a datastore (=> cannot lookup " +
+						"the PriceFragmentType). You must either use setAmount(PriceFragmentType, long) or call this method when " +
+						"the PriceFragment already exists or when this Price is currently persistent (connected to the datastore)."
+				);
+			}
+
+			pm.getFetchPlan().addGroup(FetchPlan.DEFAULT);
+			defaultTotalPriceFragmentType = pm.detachCopy((PriceFragmentType) 
+					pm.getObjectById(PriceFragmentType.PRICE_FRAGMENT_TYPE_ID_TOTAL));
+
+			if (defaultTotalPriceFragmentType.getPrimaryKey() == null)
+				throw new IllegalStateException("How can the fucking primaryKey field of the default total price " +
+				"fragment be null!?!");
+			
+			if (defaultTotalPriceFragmentType == null)
+			{
+				throw new IllegalStateException(
+						"There is no default PriceFragmentType existing in the Datastore!" +
+						"\n\t fragmentTypeID = " + PriceFragmentType.PRICE_FRAGMENT_TYPE_ID_TOTAL
+				);
+			}
+		}
+		
+		return defaultTotalPriceFragmentType;
+		
+//		if (defaultTotalPriceFragmentType != null)
+//			return defaultTotalPriceFragmentType;
+//		
+//		synchronized (Price.class)
+//		{
+//			if (defaultTotalPriceFragmentType != null)
+//				return defaultTotalPriceFragmentType;
+//			
+//			PersistenceManager pm = JDOHelper.getPersistenceManager(this);
+//			if (pm == null)
+//				throw
+//				
+//			PriceFragmentType totalPriceFragmentType = (PriceFragmentType)
+//			pm.getObjectById(PriceFragmentType.PRICE_FRAGMENT_TYPE_ID_TOTAL);
+//			
+//			if (! pm.getFetchPlan().getGroups().contains(FetchPlan.DEFAULT))
+//				throw new IllegalStateException("No Default FetchPlan found, although added before!");
+//			
+//			if (totalPriceFragmentType.getPrimaryKey() == null)
+//				throw new IllegalStateException("How can the fucking primaryKey field of the default total price " +
+//				"fragment be null!?!");
+//			
+//			defaultTotalPriceFragmentType = Util.cloneSerializable(pm.detachCopy(totalPriceFragmentType));
+//			
+//			if (defaultTotalPriceFragmentType.getPrimaryKey() == null)
+//				throw new IllegalStateException("How can the fucking primaryKey field of the default total price " +
+//				"fragment be null AFTER detachment!?!");
+//			
+//			if (defaultTotalPriceFragmentType == null)
+//			{
+//				throw new IllegalStateException(
+//						"There is no default PriceFragmentType existing in the Datastore!" +
+//						"\n\t fragmentTypeID = " + PriceFragmentType.PRICE_FRAGMENT_TYPE_ID_TOTAL
+//				);
+//			}
+//		}
+	}		
+//		if (pm != null)
+//		{
+//			PriceFragmentType totalPriceFragmentType = (PriceFragmentType)
+//				pm.getObjectById(PriceFragmentType.PRICE_FRAGMENT_TYPE_ID_TOTAL);
+//			
+//			if (defaultTotalPriceFragmentType == null)
+//			{
+//				pm.getFetchPlan().addGroup(FetchPlan.DEFAULT);
+//				defaultTotalPriceFragmentType = Util.cloneSerializable(pm.detachCopy(totalPriceFragmentType));				
+//			}
+//			return (PriceFragmentType) pm.getObjectById(PriceFragmentType.PRICE_FRAGMENT_TYPE_ID_TOTAL);
+//		}
+//		
+//		
+//		if (defaultTotalPriceFragmentType == null)
+//		{
+//			throw new IllegalStateException("This instance of Price ("+getPrimaryKey()+") does neither have a " +
+//					"PriceFragment for the PriceFragmentType \"_Total_\" nor is it attached to a datastore (=> cannot lookup " +
+//					"the PriceFragmentType). You must either use setAmount(PriceFragmentType, long) or call this method when " +
+//					"the PriceFragment already exists or when this Price is currently persistent (connected to the datastore)."
+//			);
+//		}
+//		
+//		if (defaultTotalPriceFragmentType.getPrimaryKey() == null)
+//			throw new IllegalStateException(
+//					"How can the fucking primaryKey field of the already detached default total" +
+//					"price fragment be null!?!");
+//		
+//		return Util.cloneSerializable(defaultTotalPriceFragmentType);
+//		
+//		
+//		
+//	}
 
 	/**
 	 * @jdo.field primary-key="true"
@@ -163,13 +339,11 @@ public class Price
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
-	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Currency currency;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
-	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private long amount = 0;
 
 	/**
@@ -197,9 +371,7 @@ public class Price
 	 *
 	 * @jdo.key mapped-by="priceFragmentTypePK"
 	 */
-	@Persistent(
-		mappedBy="price",
-		persistenceModifier=PersistenceModifier.PERSISTENT)
+	@Persistent(mappedBy="price")
 	@Key(mappedBy="priceFragmentTypePK")
 	@Value(dependent="true")
 	private Map<String, PriceFragment> fragments;
@@ -211,8 +383,8 @@ public class Price
 	 *
 	 * @jdo.field persistence-modifier="none"
 	 */
-	@Persistent(persistenceModifier=PersistenceModifier.NONE)
-	private Map<String, PriceFragment> virtualFragments = new HashMap<String, PriceFragment>();
+	@NotPersistent
+	private final Map<String, PriceFragment> virtualFragments = new HashMap<String, PriceFragment>();
 
 	/////// end normal fields ////////
 
@@ -353,14 +525,14 @@ public class Price
 	public void setAmount(long amount)
 	{
 		PriceFragment priceFragmentTotal = getPriceFragment(
-				PriceFragmentType.PRICE_FRAGMENT_TYPE_ID_TOTAL.organisationID, PriceFragmentType.PRICE_FRAGMENT_TYPE_ID_TOTAL.priceFragmentTypeID, false);
+				PriceFragmentType.PRICE_FRAGMENT_TYPE_ID_TOTAL.organisationID, 
+				PriceFragmentType.PRICE_FRAGMENT_TYPE_ID_TOTAL.priceFragmentTypeID, 
+				false
+		);
 
-		if (priceFragmentTotal == null) {
-			PersistenceManager pm = JDOHelper.getPersistenceManager(this);
-			if (pm == null)
-				throw new IllegalStateException("This instance of Price ("+getPrimaryKey()+") does neither have a PriceFragment for the PriceFragmentType \"_Total_\" nor is it attached to a datastore (=> cannot lookup the PriceFragmentType). You must either use setAmount(PriceFragmentType, long) or call this method when the PriceFragment already exists or when this Price is currently persistent (connected to the datastore)."); //$NON-NLS-1$ //$NON-NLS-2$
-
-			PriceFragmentType pftTotal = (PriceFragmentType) pm.getObjectById(PriceFragmentType.PRICE_FRAGMENT_TYPE_ID_TOTAL);
+		if (priceFragmentTotal == null)
+		{
+			PriceFragmentType pftTotal = lookupDefaultTotalPriceFragmentType();
 			priceFragmentTotal = createPriceFragment(pftTotal);
 		}
 
@@ -652,7 +824,7 @@ public class Price
 	public void clearVirtualFragments() {
 		virtualFragments.clear();
 	}
-
+	
 	/**
 	 * This method finds the local PriceFragment with the same priceFragmentID and
 	 * adds the amount of the given PriceFragment to it. If there is no local PriceFragment
@@ -673,7 +845,7 @@ public class Price
 		}
 		localPriceFragment.setAmount(localPriceFragment.getAmount() + priceFragment.getAmount());
 	}
-
+	
 	public void sumPrice(Price price)
 	{
 		this.amount += price.getAmount();
@@ -681,7 +853,45 @@ public class Price
 			sumPriceFragment(fragment);
 		}
 	}
+	
+	@Override
+	public CloneableWithContext clone(CloneContext context, boolean cloneReferences)
+	{
+//	WORKAROUND - JDO does not support cloning a detached object and consider it transient! ( http://www.jpox.org/servlet/forum/viewthread_thread,1865 )
+//	Price clone = (Price) super.clone();
+		Price clone = ReflectUtil.newInstanceRuntimeException(getClass());
+		clone.organisationID = organisationID;
+		clone.amount = amount;
+		clone.currency = currency;
+//	END OF WORKAROUND
+		
+		clone.priceID = IDGenerator.nextID(getClass());
+		if (fragments != null)
+		{
+			for (Map.Entry<String, PriceFragment> fragmentEntry : fragments.entrySet())
+			{
+				fragmentEntry.setValue(new PriceFragment(this, fragmentEntry.getValue()));
+			}
+		}
+		
+		if (virtualFragments != null)
+		{
+			for (Map.Entry<String, PriceFragment> fragmentEntry : virtualFragments.entrySet())
+			{
+				fragmentEntry.setValue(new PriceFragment(this, fragmentEntry.getValue()));
+			}			
+		}
+		return clone;
+	}
 
+	/**
+	 * Nothing to do.
+	 */
+	@Override
+	public void updateReferencesOfClone(CloneableWithContext clone, CloneContext context)
+	{
+	}
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -707,4 +917,5 @@ public class Price
 	public String toString() {
 		return this.getClass().getName() + '@' + Integer.toHexString(System.identityHashCode(this)) + '[' + organisationID + ',' + priceID + ']';
 	}
+
 }

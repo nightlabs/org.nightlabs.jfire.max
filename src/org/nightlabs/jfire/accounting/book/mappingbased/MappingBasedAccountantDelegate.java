@@ -39,12 +39,20 @@ import java.util.Set;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
 
 import org.nightlabs.jfire.accounting.Account;
 import org.nightlabs.jfire.accounting.Accounting;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.accounting.InvoiceMoneyTransfer;
+import org.nightlabs.jfire.accounting.PayableObjectMoneyTransfer;
 import org.nightlabs.jfire.accounting.PriceFragment;
 import org.nightlabs.jfire.accounting.PriceFragmentType;
 import org.nightlabs.jfire.accounting.book.BookInvoiceMoneyTransfer;
@@ -60,33 +68,11 @@ import org.nightlabs.jfire.trade.OrganisationLegalEntity;
 import org.nightlabs.jfire.transfer.Anchor;
 import org.nightlabs.util.CollectionUtil;
 
-import javax.jdo.annotations.FetchGroups;
-import javax.jdo.annotations.Inheritance;
-import javax.jdo.annotations.FetchGroup;
-import javax.jdo.annotations.PersistenceModifier;
-import javax.jdo.annotations.Persistent;
-import javax.jdo.annotations.InheritanceStrategy;
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.IdentityType;
-
 /**
  * 
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
- * 
- * @jdo.persistence-capable identity-type="application"
- *                          persistence-capable-superclass="org.nightlabs.jfire.accounting.book.LocalAccountantDelegate"
- *                          detachable="true"
- *                          table="JFireTrade_PFMappingAccountantDelegate"
- * 
- * @jdo.inheritance strategy = "new-table"
- * 
- * @jdo.fetch-group name="MappingBasedAccountantDelegate.moneyFlowMappings"
- *                  fields="moneyFlowMappings"
- * @jdo.fetch-group name="MappingBasedAccountantDelegate.this"
- *                  fields="moneyFlowMappings"
  */
 @PersistenceCapable(
-	identityType=IdentityType.APPLICATION,
 	detachable="true",
 	table="JFireTrade_PFMappingAccountantDelegate")
 @FetchGroups({
@@ -99,39 +85,31 @@ import javax.jdo.annotations.IdentityType;
 })
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class MappingBasedAccountantDelegate
-		extends LocalAccountantDelegate
+	extends LocalAccountantDelegate
 {
 
 	public static final String FETCH_GROUP_MONEY_FLOW_MAPPINGS = "MappingBasedAccountantDelegate.moneyFlowMappings";
 
 	public static final String FETCH_GROUP_THIS_MAPPING_BASED_ACCOUNTANT_DELEGATE = "MappingBasedAccountantDelegate.this";
 
-	/**
-	 * @jdo.field persistence-modifier="persistent" collection-type="collection"
-	 *            element-type="MoneyFlowMapping"
-	 *            mapped-by="localAccountantDelegate"
-	 * 
-	 */
-	@Persistent(
-		mappedBy="localAccountantDelegate",
-		persistenceModifier=PersistenceModifier.PERSISTENT)
-	private Set<MoneyFlowMapping> moneyFlowMappings;
 	private static final long serialVersionUID = 1L;
-
+	
 	/**
 	 * LOG4J logger used by this class
 	 */
 	private static final org.apache.log4j.Logger logger = org.apache.log4j.Logger
-			.getLogger(MappingBasedAccountantDelegate.class);
+	.getLogger(MappingBasedAccountantDelegate.class);
+	
+	@Persistent(
+		mappedBy="localAccountantDelegate",
+		persistenceModifier=PersistenceModifier.PERSISTENT)
+	private Set<MoneyFlowMapping> moneyFlowMappings;
 
 	/**
 	 * @deprecated Only for JDO
 	 */
 	@Deprecated
-	public MappingBasedAccountantDelegate()
-	{
-		super();
-	}
+	public MappingBasedAccountantDelegate() {	}
 
 	/**
 	 * @param accountant
@@ -1070,16 +1048,33 @@ public class MappingBasedAccountantDelegate
 	/**
 	 * Returns the package type of the given NestedProductTypeLocal. It will be
 	 * {@link MoneyFlowMapping#PACKAGE_TYPE_INNER} if the ProductType is virtually
-	 * self packaged in the given the package-nature of the nested inner
+	 * self packaged in the given the package-nature or the nested inner
 	 * ProductType is {@link ProductType#PACKAGE_NATURE_INNER}. Will return
 	 * {@link MoneyFlowMapping#PACKAGE_TYPE_PACKAGE} otherwise.
 	 */
 	public static String getPackageType(NestedProductTypeLocal nestedProductTypeLocal)
 	{
-		String innerPPK = nestedProductTypeLocal.getInnerProductTypePrimaryKey();
-		String packagePPK = nestedProductTypeLocal.getPackageProductTypeLocal().getPrimaryKey();
+		return getPackageType(
+				nestedProductTypeLocal.getPackageProductTypeLocal().getProductType(),
+				nestedProductTypeLocal.getInnerProductTypeLocal().getProductType());
+	}
+
+	/**
+	 * Returns the package type of the given nestedProductType packaged in the given packagedProductType. 
+	 * It will be {@link MoneyFlowMapping#PACKAGE_TYPE_INNER} if the ProductType is virtually
+	 * self packaged (i.e. if the given package- and nestedProductType are the same). Additionally it will be 
+	 * {@link ProductType#PACKAGE_NATURE_INNER} when the packageType of the given nestedProductType is inner. 
+	 * Will return {@link MoneyFlowMapping#PACKAGE_TYPE_PACKAGE} otherwise.
+	 * 
+	 * @param packageProductType The ProductType packaging the given nestedProductType.
+	 * @param nestedProductType The ProductType 
+	 * @return
+	 */
+	public static String getPackageType(ProductType packageProductType, ProductType nestedProductType) {
+		String innerPPK = nestedProductType.getPrimaryKey();
+		String packagePPK = packageProductType.getPrimaryKey();
 		return (
-				(packagePPK.equals(innerPPK) || nestedProductTypeLocal.getInnerProductTypeLocal().getProductType().isPackageInner()) ?
+				(packagePPK.equals(innerPPK) || nestedProductType.isPackageInner()) ?
 						MoneyFlowMapping.PACKAGE_TYPE_INNER : MoneyFlowMapping.PACKAGE_TYPE_PACKAGE
 		);
 	}
@@ -1267,7 +1262,7 @@ public class MappingBasedAccountantDelegate
 	{
 		PersistenceManager pm = getPersistenceManager();
 		OrganisationLegalEntity mandator = Accounting.getAccounting(pm).getMandator();
-		Invoice invoice = container.getInvoice();
+		Invoice invoice = container.getPayableObject();
 		boolean revertTransferDirection = false;
 		if (invoice.getCustomer().equals(mandator)) {
 			// if the local organisation is the customer of the invoice
@@ -1307,9 +1302,9 @@ public class MappingBasedAccountantDelegate
 
 				if (balance != 0) {
 					InvoiceMoneyTransfer moneyTransfer = new InvoiceMoneyTransfer(
-							InvoiceMoneyTransfer.BOOK_TYPE_BOOK, container,
+							PayableObjectMoneyTransfer.BookType.book, container,
 							aFrom, aTo,
-							container.getInvoice(),
+							container.getPayableObject(),
 							Math.abs(balance)
 					);
 
@@ -1518,7 +1513,7 @@ public class MappingBasedAccountantDelegate
 				articlePrice
 			);
 
-		Invoice invoice = bookMoneyTransfer.getInvoice();
+		Invoice invoice = bookMoneyTransfer.getPayableObject();
 		// In order to get the Article, we get the last from the stack - i.e. the most outer ArticlePrice
 		Article article = articlePriceStack.getLast().getArticle();
 
@@ -1547,9 +1542,7 @@ public class MappingBasedAccountantDelegate
 		else
 			throw new IllegalStateException("Mandator \"" + mandator.getPrimaryKey() + "\" is neither vendor nor customer of invoice \"" + invoice.getPrimaryKey() + "\"!");
 
-		assert otherAccount == null;
-
-		assert false : "Test Test Test"; // TODO remove this line!
+		assert otherAccount != null;
 
 		Anchor from;
 		Anchor to;
@@ -1722,7 +1715,7 @@ public class MappingBasedAccountantDelegate
 						dimensionValues, articlePriceStack.getFirst());
 
 				
-				Invoice invoice = bookMoneyTransfer.getInvoice();
+				Invoice invoice = bookMoneyTransfer.getPayableObject();
 				// In order to get the Article, we get the last from the stack - i.e. the most outer ArticlePrice
 				Article article = articlePriceStack.getLast().getArticle();
 

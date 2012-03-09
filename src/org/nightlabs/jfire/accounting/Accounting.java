@@ -59,11 +59,13 @@ import org.apache.log4j.Logger;
 import org.jbpm.JbpmContext;
 import org.jbpm.graph.exe.ProcessInstance;
 import org.nightlabs.i18n.I18nText;
+import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jfire.accounting.book.Accountant;
 import org.nightlabs.jfire.accounting.book.AccountantDelegate;
 import org.nightlabs.jfire.accounting.book.BookInvoiceMoneyTransfer;
 import org.nightlabs.jfire.accounting.book.LocalBookInvoiceAccountantDelegate;
-import org.nightlabs.jfire.accounting.book.PartnerBookInvoiceAccountantDelegate;
+import org.nightlabs.jfire.accounting.book.PartnerBookPayableObjectAccountantDelegate;
+import org.nightlabs.jfire.accounting.book.PartnerPayPayableObjectAccountantDelegate;
 import org.nightlabs.jfire.accounting.book.uncollectable.UncollectableInvoiceBooker;
 import org.nightlabs.jfire.accounting.book.uncollectable.VatUncollectableInvoiceBooker;
 import org.nightlabs.jfire.accounting.id.AccountingID;
@@ -87,6 +89,7 @@ import org.nightlabs.jfire.config.Config;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.jbpm.JbpmLookup;
 import org.nightlabs.jfire.jbpm.graph.def.ProcessDefinition;
+import org.nightlabs.jfire.jbpm.graph.def.Statable;
 import org.nightlabs.jfire.jbpm.graph.def.State;
 import org.nightlabs.jfire.jbpm.graph.def.StateDefinition;
 import org.nightlabs.jfire.organisation.LocalOrganisation;
@@ -177,8 +180,11 @@ implements StoreCallback
 		AccountantDelegate localBookInvoiceAccountantDelegate = new LocalBookInvoiceAccountantDelegate(accounting.mandator); 
 		accounting.localAccountant.setAccountantDelegate(MoneyTransfer.class, localBookInvoiceAccountantDelegate);
 		
-		AccountantDelegate partnerBookInvoiceAccountantDelegate = new PartnerBookInvoiceAccountantDelegate(organisationID);
-		accounting.partnerAccountant.setAccountantDelegate(MoneyTransfer.class, partnerBookInvoiceAccountantDelegate);
+		AccountantDelegate partnerBookInvoiceAccountantDelegate = new PartnerBookPayableObjectAccountantDelegate(organisationID);
+		accounting.partnerAccountant.setAccountantDelegate(BookInvoiceMoneyTransfer.class, partnerBookInvoiceAccountantDelegate);
+		
+		AccountantDelegate partnerPayInvoiceAccountantDelegate = new PartnerPayPayableObjectAccountantDelegate(organisationID);
+		accounting.partnerAccountant.setAccountantDelegate(PayMoneyTransfer.class, partnerPayInvoiceAccountantDelegate);
 		
 		accounting = pm.makePersistent(accounting);
 		accounting.getUncollectableInvoiceBooker(); // initialise default value - must be done after persisting!
@@ -786,8 +792,7 @@ implements StoreCallback
 	 * (e.g. {@link #payInvoicesEnd(User, PaymentData, PayMoneyTransfer)}),
 	 * because it needs to be called within a separate transaction.
 	 */
-	public void payRollback(
-			User user, PaymentData paymentData)
+	public void payRollback(User user, PaymentData paymentData)
 	{
 		Payment payment = paymentData.getPayment();
 
@@ -810,7 +815,7 @@ implements StoreCallback
 		boolean failed = true;
 		try {
 
-			for (Iterator it = payMoneyTransfer.getChildren().iterator(); it.hasNext(); ) {
+			for (Iterator<MoneyTransfer> it = payMoneyTransfer.getChildren().iterator(); it.hasNext(); ) {
 				MoneyTransfer moneyTransfer = (MoneyTransfer) it.next();
 
 				if (moneyTransfer.isBooked())
@@ -889,7 +894,7 @@ implements StoreCallback
 
 		LegalEntity partner = null;
 		if (paymentData.getPayment().getPayableObjects() != null) {
-			partner = bookInvoicesImplicitelyAndGetPartner(user,
+			partner = bookPayableObjectsImplicitelyAndGetPartner(user,
 					paymentData.getPayment().getPayableObjects(),
 					paymentData.getPayment().getCurrency());
 		}
@@ -1017,7 +1022,7 @@ implements StoreCallback
 		}
 
 		if (serverPaymentProcessor == null) {
-			Collection c = ServerPaymentProcessor.getServerPaymentProcessorsForOneModeOfPaymentFlavour(
+			Collection<ServerPaymentProcessor> c = ServerPaymentProcessor.getServerPaymentProcessorsForOneModeOfPaymentFlavour(
 					getPersistenceManager(),
 					modeOfPaymentFlavour);
 			if (c.isEmpty())
@@ -1033,15 +1038,15 @@ implements StoreCallback
 	 * This method is a noop, if the invoice is already booked. If the invoice cannot be booked implicitely
 	 * (maybe because the jBPM token is at a position where this is not possible, an exception is thrown).
 	 */
-	protected void bookInvoiceImplicitely(Invoice invoice)
+	protected void bookInvoiceImplicitely(Statable payableStatableObject)
 	{
-		InvoiceID invoiceID = (InvoiceID) JDOHelper.getObjectId(invoice);
+		ObjectID invoiceID = (ObjectID) JDOHelper.getObjectId(payableStatableObject);
 		if (State.hasState(getPersistenceManager(), invoiceID, JbpmConstantsInvoice.Both.NODE_NAME_BOOKED))
 			return;
 
 		JbpmContext jbpmContext = JbpmLookup.getJbpmConfiguration().createJbpmContext();
 		try {
-			ProcessInstance processInstance = jbpmContext.getProcessInstance(invoice.getInvoiceLocal().getJbpmProcessInstanceId());
+			ProcessInstance processInstance = jbpmContext.getProcessInstance(payableStatableObject.getStatableLocal().getJbpmProcessInstanceId());
 			processInstance.signal(JbpmConstantsInvoice.Vendor.TRANSITION_NAME_BOOK_IMPLICITELY);
 		} finally {
 			jbpmContext.close();
@@ -1054,49 +1059,66 @@ implements StoreCallback
 	 * @return Either <tt>null</tt>, in case no Invoice was passed or the partner
 	 *		(if at least one Invoice has been passed in <tt>invoices</tt>).
 	 */
-	protected LegalEntity bookInvoicesImplicitelyAndGetPartner(User user, Collection invoices, Currency currency)
+	protected LegalEntity bookPayableObjectsImplicitelyAndGetPartner(User user, Collection<PayableObject> invoices, Currency currency)
 	{
 		if (invoices == null)
 			return null;
 
-//	 check currency and find out partner
+		// Check currency and find out partner
 		// ...maybe it will later be possible to pay an invoice in a different
 		// currency, but currently this is not possible.
-//		LegalEntity mandator = getMandator();
 		String mandatorPK = getMandator().getPrimaryKey();
 		LegalEntity partner = null;
-		for (Iterator it = invoices.iterator(); it.hasNext(); ) {
-			Invoice invoice = (Invoice) it.next();
+		for (Iterator<PayableObject> it = invoices.iterator(); it.hasNext(); )
+		{
+			PayableObject payableObject = it.next();
 
-//			finalizeInvoice(user, invoice);
-			bookInvoiceImplicitely(invoice);
-
-			if (currency == null)
-				currency = invoice.getCurrency();
-			else {
-				if (!currency.getCurrencyID().equals(invoice.getCurrency().getCurrencyID()))
-					throw new IllegalArgumentException("The invoice \""+invoice.getPrimaryKey()+"\" does not match the currency " + currency.getCurrencyID() + "!");
+			if (Statable.class.isInstance(payableObject))
+			{
+				bookInvoiceImplicitely(Statable.class.cast(payableObject));
 			}
 
-			if (mandatorPK.equals(invoice.getVendor().getPrimaryKey())) {
+			if (currency == null)
+			{
+				currency = (Currency) payableObject.getCurrency();
+			}
+			else if (!currency.getCurrencyID().equals(payableObject.getCurrency().getCurrencyID()))
+			{
+				throw new IllegalArgumentException("The invoice \""+JDOHelper.getObjectId(payableObject)+"\" does not match the currency " + currency.getCurrencyID() + "!");
+			}
+
+			if (mandatorPK.equals(payableObject.getVendor().getPrimaryKey()))
+			{
 				if (partner == null)
-					partner = invoice.getCustomer();
-				else {
-					String foundPartnerPK = invoice.getCustomer().getPrimaryKey();
+				{
+					partner = payableObject.getCustomer();
+				}
+				else
+				{
+					String foundPartnerPK = payableObject.getCustomer().getPrimaryKey();
 					if (!partner.getPrimaryKey().equals(foundPartnerPK))
-						throw new IllegalArgumentException("Customer of invoice \"" + invoice.getPrimaryKey() + "\" does not match other invoices' partners! Expected partner \"" + partner.getPrimaryKey() + "\", but found \"" + foundPartnerPK + "\"!");
+					{
+						throw new IllegalArgumentException("Customer of invoice \"" + JDOHelper.getObjectId(payableObject) + "\" does not match other invoices' partners! Expected partner \"" + partner.getPrimaryKey() + "\", but found \"" + foundPartnerPK + "\"!");
+					}
 				}
 			} // vendor is mandator
-			else {
-				if (!mandatorPK.equals(invoice.getCustomer().getPrimaryKey()))
-					throw new IllegalArgumentException("The invoice \""+invoice.getPrimaryKey()+"\" has nothing to do with the mandator (\"" + mandator.getPrimaryKey() + "\")!");
-
+			else if (!mandatorPK.equals(payableObject.getCustomer().getPrimaryKey()))
+			{
+				throw new IllegalArgumentException("The invoice \""+JDOHelper.getObjectId(payableObject)+"\" has nothing to do with the mandator (\"" + mandator.getPrimaryKey() + "\")!");
+			}
+			else
+			{
 				if (partner == null)
-					partner = invoice.getVendor();
-				else {
-					String foundPartnerPK = invoice.getVendor().getPrimaryKey();
+				{
+					partner = payableObject.getVendor();
+				}
+				else
+				{
+					String foundPartnerPK = payableObject.getVendor().getPrimaryKey();
 					if (!partner.getPrimaryKey().equals(foundPartnerPK))
-						throw new IllegalArgumentException("Vendor of invoice \"" + invoice.getPrimaryKey() + "\" does not match other invoices' partners! Expected partner \"" + partner.getPrimaryKey() + "\", but found \"" + foundPartnerPK + "\"!");
+					{
+						throw new IllegalArgumentException("Vendor of invoice \"" + JDOHelper.getObjectId(payableObject) + "\" does not match other invoices' partners! Expected partner \"" + partner.getPrimaryKey() + "\", but found \"" + foundPartnerPK + "\"!");
+					}
 				}
 			}
 		}
@@ -1157,7 +1179,7 @@ implements StoreCallback
 //	}
 
 	/**
-	 * @deprecated Use {@link PartnerBookInvoiceAccountantDelegate#getPartnerAccount(AccountType, LegalEntity, Currency)} instead!
+	 * @deprecated Use {@link PartnerBookPayableObjectAccountantDelegate#getPartnerAccount(AccountType, LegalEntity, Currency)} instead!
 	 *		You can obtain the <code>PartnerBookInvoiceAccountantDelegate</code> via {@link #getPartnerAccountant()}.
 	 *		This method will soon be removed.
 	 *//*

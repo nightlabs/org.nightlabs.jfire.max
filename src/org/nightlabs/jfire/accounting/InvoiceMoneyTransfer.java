@@ -26,98 +26,35 @@
 
 package org.nightlabs.jfire.accounting;
 
-import java.util.Collection;
 import java.util.Set;
 
-import javax.jdo.PersistenceManager;
-import javax.jdo.Query;
+import javax.jdo.annotations.PersistenceCapable;
 
+import org.nightlabs.jfire.accounting.PayableObjectMoneyTransfer.BookType;
+import org.nightlabs.jfire.accounting.pay.PayableObject;
 import org.nightlabs.jfire.accounting.pay.Payment;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.transfer.Anchor;
-
-import javax.jdo.annotations.Persistent;
-import javax.jdo.annotations.InheritanceStrategy;
-import javax.jdo.annotations.Queries;
-import javax.jdo.annotations.Inheritance;
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.IdentityType;
-import javax.jdo.annotations.PersistenceModifier;
 
 /**
  * A {@link MoneyTransfer} is associated to one {@link Invoice}. It is 
  * used for the transfers made when an {@link Invoice} is booked as well as for
  * those transfers made for a {@link Payment}. The property {@link #getBookType()}
- * is then set accordingly to either {@link #BOOK_TYPE_BOOK} or {@link #BOOK_TYPE_PAY}.
+ * is then set accordingly to either {@link BookType#book} or {@link BookType#pay}.
  * 
  * @author Marco Schulze - marco at nightlabs dot de
- * 
- * @jdo.persistence-capable
- *		identity-type="application"
- *		persistence-capable-superclass="org.nightlabs.jfire.accounting.MoneyTransfer"
- *		detachable="true"
- *		table="JFireTrade_InvoiceMoneyTransfer"
- *
- * @jdo.inheritance strategy = "new-table"
- * 
- * @jdo.query
- * 	name="getInvoiceMoneyTransfersForInvoice"
- * 	query="SELECT
- *			WHERE
- *				this.invoice == :pInvoice &&
- *				this.bookType == :pBookType
- *			"
- * 
  */
-@PersistenceCapable(
-	identityType=IdentityType.APPLICATION,
-	detachable="true",
-	table="JFireTrade_InvoiceMoneyTransfer")
-@Queries(
-	@javax.jdo.annotations.Query(
-		name="getInvoiceMoneyTransfersForInvoice",
-		value="SELECT WHERE this.invoice == :pInvoice && this.bookType == :pBookType ")
-)
-@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
+@PersistenceCapable(detachable="true")
 public class InvoiceMoneyTransfer
-extends MoneyTransfer
+	extends PayableObjectMoneyTransfer<Invoice>
 {
 	private static final long serialVersionUID = 1L;
 	
-	/**
-	 * Book-type set when the transfer is used as sub-transfer for a booking process.
-	 */
-	public static final String BOOK_TYPE_BOOK = "book";
-	/**
-	 * Book-type set when the transfer is used as sub-transfer made for a {@link Payment}.
-	 */
-	public static final String BOOK_TYPE_PAY = "pay";
-
-	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 */
-	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
-	private Invoice invoice;
-
-	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 */
-	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
-	private String bookType;
-
 	/**
 	 * @deprecated Only for JDO!
 	 */
 	@Deprecated
 	protected InvoiceMoneyTransfer() { }
-
-	private static Currency getCurrency(Invoice invoice)
-	{
-		if (invoice == null)
-			throw new IllegalArgumentException("invoice must not be null!");
-
-		return invoice.getCurrency();
-	}
 
 	/**
 	 * Create a new {@link InvoiceMoneyTransfer} with no container.
@@ -130,13 +67,11 @@ extends MoneyTransfer
 	 * @param amount The amount of the transfer.
 	 */
 	public InvoiceMoneyTransfer(
-			String bookType,
+			BookType bookType,
 			User initiator, Anchor from, Anchor to,
 			Invoice invoice, long amount)
 	{
-		super(null, initiator, from, to, getCurrency(invoice), amount);
-		this.invoice = invoice;
-		this.setBookType(bookType);
+		super(bookType, initiator, from, to, invoice, amount);
 	}
 
 	/**
@@ -150,91 +85,22 @@ extends MoneyTransfer
 	 * @param amount The amount of the transfer.
 	 */
 	public InvoiceMoneyTransfer(
-			String bookType,
+			BookType bookType,
 			MoneyTransfer containerMoneyTransfer, Anchor from, Anchor to,
 			Invoice invoice, long amount)
 	{
-		super(containerMoneyTransfer, from, to, amount);
-		this.invoice = invoice;
-		this.setBookType(bookType);
+		super(bookType, containerMoneyTransfer, from, to, invoice, amount);
 	}
 
-	/**
-	 * @return Returns the invoice this transfer is associated to.
-	 */
-	public Invoice getInvoice()
+	protected void bookTransferAtPayableObject(User user, Set<Anchor> involvedAnchors, PayableObject payableObject)
 	{
-		return invoice;
-	}
-
-	/**
-	 * Set the book-type of this transfer.
-	 * 
-	 * @param bookType The bookType to set.
-	 */
-	protected void setBookType(String bookType)
-	{
-		if (!BOOK_TYPE_BOOK.equals(bookType) &&
-				!BOOK_TYPE_PAY.equals(bookType))
-			throw new IllegalArgumentException("bookType \""+bookType+"\" is invalid! Must be BOOK_TYPE_BOOK or BOOK_TYPE_PAY!");
-
-		this.bookType = bookType;
-	}
-
-	/**
-	 * Returns the book-type of this transfer. The book type tells whether the transfer was used during a booking or payment.
-	 * The return value should be one of {@link #BOOK_TYPE_BOOK} or {@link #BOOK_TYPE_PAY}.
-	 *  
-	 * @return The book-type.
-	 */
-	public String getBookType()
-	{
-		return bookType;
-	}
-
-	/*
-	 * @see org.nightlabs.jfire.transfer.Transfer#bookTransfer(org.nightlabs.jfire.security.User, java.util.Map)
-	 */
-	@Override
-	public void bookTransfer(User user, Set<Anchor> involvedAnchors)
-	{
-		bookTransferAtInvoice(user, involvedAnchors);
-		super.bookTransfer(user, involvedAnchors);
-	}
-
-	protected void bookTransferAtInvoice(User user, Set<Anchor> involvedAnchors)
-	{
+		Invoice invoice = (Invoice) payableObject;
 		invoice.bookInvoiceMoneyTransfer(this, false);
 	}
 
-
-	/*
-	 * @see org.nightlabs.jfire.transfer.Transfer#rollbackTransfer(org.nightlabs.jfire.security.User, java.util.Map)
-	 */
-	@Override
-	public void rollbackTransfer(User user, Set<Anchor> involvedAnchors)
+	protected void rollbackTransferAtPayableObject(User user, Set<Anchor> involvedAnchors, PayableObject payableObject)
 	{
-		rollbackTransferAtInvoice(user, involvedAnchors);
-		super.rollbackTransfer(user, involvedAnchors);
-	}
-
-	protected void rollbackTransferAtInvoice(User user, Set<Anchor> involvedAnchors)
-	{
+		Invoice invoice = (Invoice) payableObject;
 		invoice.bookInvoiceMoneyTransfer(this, true);
-	}
-
-	/**
-	 * Get those {@link InvoiceMoneyTransfer}s that where made for the given invoice and bookType.
-	 * The bookType can be one of the constants in this class {@link #BOOK_TYPE_BOOK} or {@link #BOOK_TYPE_PAY}.
-	 * 
-	 * @param pm The {@link PersistenceManager} to use.
-	 * @param invoice The invoice to find the transfers for.
-	 * @param bookType The bookType to find the transfers for. Use one of the constants {@link #BOOK_TYPE_BOOK} or {@link #BOOK_TYPE_PAY}.
-	 * @return Those {@link InvoiceMoneyTransfer}s that where made for the given invoice and bookType
-	 */
-	@SuppressWarnings("unchecked")
-	public static Collection<InvoiceMoneyTransfer> getInvoiceMoneyTransfers(PersistenceManager pm, Invoice invoice, String bookType) {
-		Query q = pm.newNamedQuery(InvoiceMoneyTransfer.class, "getInvoiceMoneyTransfersForInvoice");
-		return (Collection<InvoiceMoneyTransfer>) q.execute(invoice, bookType);
 	}
 }

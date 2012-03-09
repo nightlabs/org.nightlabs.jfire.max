@@ -429,28 +429,15 @@ implements AttachCallback
 			for (Iterator iter = getSummaryAccounts().iterator(); iter.hasNext();) {
 				SummaryAccount summaryAccount = (SummaryAccount) iter.next();
 
-	//			Account from;
-	//			Account to;
-	//			if (isDebit) {
-	//			from = SummaryAccount;
-	//			to = this;
-	//			}
-	//			else {
-	//			to = SummaryAccount;
-	//			from = this;
-	//			}
-
 				SummaryMoneyTransfer summaryMoneyTransfer = new SummaryMoneyTransfer(
-						(MoneyTransfer)(moneyTransfer.getContainer() == null ? moneyTransfer : moneyTransfer.getContainer()),
+						(PayableObjectMoneyTransfer)(moneyTransfer.getContainer() == null ? moneyTransfer : moneyTransfer.getContainer()),
 	//					from, to,
 						(isDebit) ? summaryAccount : this,
 						(isDebit) ? this : summaryAccount,
 						moneyTransfer.getAmount()
 				);
 				summaryMoneyTransfer = pm.makePersistent(summaryMoneyTransfer);
-	//			JDOHelper.getPersistenceManager(this).makePersistent(summaryMoneyTransfer); // done in constructor
 				summaryMoneyTransfer.bookTransfer(user, involvedAnchors);
-	//			SummaryAccount.bookTransfer(user, summaryMoneyTransfer, involvedAnchors);
 			}
 		} finally {
 			skip_bookAccountMoneyTransfer = false;

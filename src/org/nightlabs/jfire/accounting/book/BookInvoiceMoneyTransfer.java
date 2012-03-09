@@ -26,6 +26,7 @@
 
 package org.nightlabs.jfire.accounting.book;
 
+import javax.jdo.annotations.PersistenceCapable;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.jfire.accounting.Invoice;
@@ -33,11 +34,6 @@ import org.nightlabs.jfire.accounting.InvoiceMoneyTransfer;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.transfer.Anchor;
-
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.IdentityType;
-import javax.jdo.annotations.InheritanceStrategy;
-import javax.jdo.annotations.Inheritance;
 
 /**
  * A {@link BookInvoiceMoneyTransfer} is created when an {@link Invoice} is booked. 
@@ -47,20 +43,8 @@ import javax.jdo.annotations.Inheritance;
  * <tt>from</tt> and <tt>to</tt> must be instances of <tt>LegalEntity</tt>.
  *
  * @author Marco Schulze - marco at nightlabs dot de
- *
- * @jdo.persistence-capable
- *		identity-type="application"
- *		persistence-capable-superclass="org.nightlabs.jfire.accounting.InvoiceMoneyTransfer"
- *		detachable="true"
- *		table="JFireTrade_BookInvoiceMoneyTransfer"
- *
- * @jdo.inheritance strategy="new-table"
  */
-@PersistenceCapable(
-	identityType=IdentityType.APPLICATION,
-	detachable="true",
-	table="JFireTrade_BookInvoiceMoneyTransfer")
-@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
+@PersistenceCapable(detachable="true")
 public class BookInvoiceMoneyTransfer extends InvoiceMoneyTransfer
 {
 	private static final long serialVersionUID = 1L;
@@ -91,7 +75,7 @@ public class BookInvoiceMoneyTransfer extends InvoiceMoneyTransfer
 	 */
 	public BookInvoiceMoneyTransfer(User initiator, Anchor from, Anchor to, Invoice invoice)
 	{
-		super(BOOK_TYPE_BOOK, initiator, from, to, invoice, getAmountAbsoluteValue(invoice));
+		super(BookType.book, initiator, from, to, invoice, getAmountAbsoluteValue(invoice));
 
 		if (!(from instanceof LegalEntity))
 			throw new IllegalArgumentException("from must be an instance of LegalEntity, but is of type " + from.getClass().getName());
@@ -107,8 +91,7 @@ public class BookInvoiceMoneyTransfer extends InvoiceMoneyTransfer
 	protected String internalGetDescription() {
 		return String.format(
 				"Booking of invoice %s",
-				getInvoice().getPrimaryKey()
+				getPayableObject().getPayableObjectID()
 			);
 	}
-
 }

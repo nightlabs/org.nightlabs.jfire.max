@@ -338,6 +338,9 @@ implements Serializable, StatableLocal
 		if (bookUncollectableUser == null)
 			throw new IllegalArgumentException("bookUncollectableUser must not be null!");
 
+		if (bookUncollectableUser == null)
+			throw new IllegalArgumentException("bookUncollectableUser must not be null!");
+
 		if (this.bookUncollectableDT != null)
 			return;
 

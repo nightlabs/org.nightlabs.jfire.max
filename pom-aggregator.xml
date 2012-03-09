@@ -46,6 +46,10 @@
 		
 		<module>../JFireDepartment</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.department -->
 		<module>../JFireDepartmentEAR</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.department.ear -->
+
+		<module>../JFireDunning</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.dunning -->
+		<module>../JFireDunningEAR</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.dunning.ear -->
+
 		<module>../JFireDynamicTrade</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.dynamictrade -->
 		<module>../JFireDynamicTradeEAR</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.dynamictrade.ear -->
 		

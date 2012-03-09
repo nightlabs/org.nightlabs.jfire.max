@@ -2,17 +2,22 @@ package org.nightlabs.jfire.dunning;
 
 import java.io.Serializable;
 
-import javax.jdo.JDOHelper;
-import javax.jdo.PersistenceManager;
 import javax.jdo.annotations.Column;
+import javax.jdo.annotations.Discriminator;
+import javax.jdo.annotations.DiscriminatorStrategy;
 import javax.jdo.annotations.IdentityType;
 import javax.jdo.annotations.Inheritance;
 import javax.jdo.annotations.InheritanceStrategy;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.PrimaryKey;
 
+import org.nightlabs.clone.CloneContext;
+import org.nightlabs.clone.CloneableWithContext;
+import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.dunning.id.DunningFeeAdderID;
+import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.organisation.Organisation;
+import org.nightlabs.util.reflect.ReflectUtil;
 
 /**
  * The DunningFeeAdder encapsulates the logic deciding if and what fees 
@@ -26,16 +31,17 @@ import org.nightlabs.jfire.organisation.Organisation;
  * The DunningFeeAdderCustomerFriendly.
  * 
  * @author Chairat Kongarayawetchakun - chairat [AT] nightlabs [DOT] de
+ * @author Marius Heinzmann <!-- Marius[DOT]Heinzmann[AT]NightLabs[DOT]de -->
  */
 @PersistenceCapable(
 		objectIdClass=DunningFeeAdderID.class,
 		identityType=IdentityType.APPLICATION,
 		detachable="true",
-		table="JFireDunning_DunningFeeAdder"
-)
+		table="JFireDunning_FeeAdder")
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
+@Discriminator(strategy=DiscriminatorStrategy.CLASS_NAME)
 public abstract class DunningFeeAdder
-implements Serializable
+	implements Serializable, CloneableWithContext
 {
 	private static final long serialVersionUID = 1L;
 
@@ -44,8 +50,7 @@ implements Serializable
 	private String organisationID;
 
 	@PrimaryKey
-	@Column(length=100)
-	private String dunningFeeAdderID;
+	private long dunningFeeAdderID;
 
 	/**
 	 * @deprecated Only for JDO!
@@ -53,7 +58,7 @@ implements Serializable
 	@Deprecated
 	protected DunningFeeAdder() { }
 
-	public DunningFeeAdder(String organisationID, String dunningFeeAdderID)
+	public DunningFeeAdder(String organisationID, long dunningFeeAdderID)
 	{
 		Organisation.assertValidOrganisationID(organisationID);
 
@@ -66,17 +71,38 @@ implements Serializable
 		return organisationID;
 	}
 
-	public String getDunningFeeAdderID() {
+	public long getDunningFeeAdderID()
+	{
 		return dunningFeeAdderID;
 	}
 
-	public abstract void addDunningFee(DunningLetter prevDunningLetter, DunningLetter newDunningLetter);
-
-	protected PersistenceManager getPersistenceManager()
+	public abstract void addDunningFees(DunningLetter prevDunningLetter, DunningLetter newDunningLetter, DunningConfig config, Currency currency);
+	
+//	@Override
+//	public DunningFeeAdder clone(CloneContext context)
+//	{
+//		if (context == null)
+//			context = new DefaultCloneContext();
+//		
+//		return context.createClone(this);
+//	}
+	
+	@Override
+	public DunningFeeAdder clone(CloneContext context, boolean cloneReferences)
 	{
-		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
-		if (pm == null)
-			throw new IllegalStateException("This instance of DunningFeeAdder has no PersistenceManager assigned!");
-		return pm;
+//	WORKAROUND - JDO does not support cloning a detached object and consider it transient! ( http://www.jpox.org/servlet/forum/viewthread_thread,1865 )
+//		DunningFeeAdder clone = (DunningFeeAdder) super.clone();
+		DunningFeeAdder clone = ReflectUtil.newInstanceRuntimeException(getClass());
+		clone.organisationID = organisationID;
+//	END OF WORKAROUND
+
+		clone.dunningFeeAdderID = IDGenerator.nextID(DunningFeeAdder.class);
+		return clone;
 	}
+
+	@Override
+	public void updateReferencesOfClone(CloneableWithContext clone, CloneContext context)
+	{
+	}
+	
 }

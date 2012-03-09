@@ -3,6 +3,7 @@ package org.nightlabs.jfire.dunning.id;
 
 import javax.annotation.Generated;
 import java.io.Serializable;
+import org.nightlabs.jdo.ObjectID;
 import java.text.ParseException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.StringTokenizer;
@@ -13,18 +14,18 @@ import java.net.URLEncoder;
 
 
 /**
- * The JDO object id class for {@link org.nightlabs.jfire.dunning.accounting.DunningAccounting}.
+ * The JDO object id class for {@link org.nightlabs.jfire.dunning.DunningRun}.
  * <p>This class was auto-generated.</p>
  */
 @Generated("org.nightlabs.eclipse.sdk.jdo.ObjectIdGenerator")
-public class DunningAccountingID
-implements Serializable
+public class DunningRunID
+implements Serializable, ObjectID
 {
 	/**
 	 * The serial version uid of this class.
 	 */ 
 	@Generated("org.nightlabs.eclipse.sdk.jdo.ObjectIdGenerator")
-	private static final long serialVersionUID = 8317285581004355173L;
+	private static final long serialVersionUID = -1269003231L;
 	
 	/**
 	 * The values of all fields are URL encoded in UTF-8.
@@ -76,38 +77,45 @@ implements Serializable
 
 	/**
 	 * Primary key field organisationID.
-	 * Declared as primary key field in {@link org.nightlabs.jfire.dunning.accounting.DunningAccounting}.
+	 * Declared as primary key field in {@link org.nightlabs.jfire.dunning.DunningRun}.
 	 */
 	@Generated("org.nightlabs.eclipse.sdk.jdo.ObjectIdGenerator")
 	public java.lang.String organisationID;
 	
 	/**
-	 * Create a new empty instance of DunningAccountingID.
+	 * Primary key field dunningRunID.
+	 * Declared as primary key field in {@link org.nightlabs.jfire.dunning.DunningRun}.
 	 */
 	@Generated("org.nightlabs.eclipse.sdk.jdo.ObjectIdGenerator")
-	public DunningAccountingID()
+	public long dunningRunID;
+	
+	/**
+	 * Create a new empty instance of DunningRunID.
+	 */
+	@Generated("org.nightlabs.eclipse.sdk.jdo.ObjectIdGenerator")
+	public DunningRunID()
 	{
 	}
 
 	/**
-	 * Create a new instance of DunningAccountingID.
+	 * Create a new instance of DunningRunID.
 	 * This is done by parsing the <code>keyStr</code> that has been created
 	 * by {@link #toString()} and setting all fields to the values from the string.
 	 * <p>
 	 * This means, the following code will create a copy of this class:<br/><br/>
-	 * <code>DunningAccountingID newDunningAccountingID = new DunningAccountingID(oldDunningAccountingID.toString());</code>
+	 * <code>DunningRunID newDunningRunID = new DunningRunID(oldDunningRunID.toString());</code>
 	 * </p>
 	 * @param keyStr A String formatted as "jdo/{className}?{field0}={value0}&amp;{field1}={value1}...&amp;{fieldN}={valueN}"
 	 *     where all values are url encoded using {@link #ENCODING}.
 	 */
 	@Generated("org.nightlabs.eclipse.sdk.jdo.ObjectIdGenerator")
-	public DunningAccountingID(final String keyStr)
+	public DunningRunID(final String keyStr)
 	throws ParseException, SecurityException,
 			NoSuchFieldException, IllegalArgumentException,
 			IllegalAccessException, NoSuchMethodException,
 			InstantiationException, InvocationTargetException
 	{
-		Class<? extends DunningAccountingID> clazz = this.getClass();
+		Class<? extends DunningRunID> clazz = this.getClass();
 
 		StringTokenizer st = new StringTokenizer(keyStr, SEPARATORS_FOR_TOKENIZER, true);
 		String jdoPrefix = st.nextToken();
@@ -228,7 +236,7 @@ implements Serializable
 	 * Create a string representation of this object id.
 	 * <p>
 	 * JDO expects the result of this method to be compatible with the constructor
-	 * {@link #DunningAccountingID(String)}.
+	 * {@link #DunningRunID(String)}.
 	 * This method takes all the primary-key-fields and encodes them with their name
 	 * and their value.
 	 * </p>
@@ -247,6 +255,9 @@ implements Serializable
 		try {
 			sb.append("organisationID="); //$NON-NLS-1$
 			sb.append(URLEncoder.encode(String.valueOf(organisationID), ENCODING));
+			sb.append('&');
+			sb.append("dunningRunID="); //$NON-NLS-1$
+			sb.append(URLEncoder.encode(Long.toString(dunningRunID, RADIX), ENCODING));
 		} catch (UnsupportedEncodingException e) {
 			throw new RuntimeException(
 					"Encoding failed with encoding " + //$NON-NLS-1$ 
@@ -271,11 +282,13 @@ implements Serializable
 			return false;
 		if(getClass() != obj.getClass())
 			return false;
-		DunningAccountingID other = (DunningAccountingID) obj;
+		DunningRunID other = (DunningRunID) obj;
 		if(organisationID == null) {
 			if(other.organisationID != null)
 				return false;
 		} else if(!organisationID.equals(other.organisationID))
+			return false;
+		if(dunningRunID != other.dunningRunID)
 			return false;
 		return true;
 	}
@@ -294,20 +307,23 @@ implements Serializable
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((organisationID == null) ? 0 : organisationID.hashCode());
+		result = prime * result + (int) (dunningRunID ^ (dunningRunID >>> 32));
 		return result;
 	}
 
 	/**
 	 * Create a new object id instance.
 	 * @param organisationID The primary key field organisationID.
-	 * @return a newly created instance of <code>DunningAccountingID</code>
+	 * @param dunningRunID The primary key field dunningRunID.
+	 * @return a newly created instance of <code>DunningRunID</code>
 	 *     with the primary-key fields set to the given parameters.
 	 */
 	@Generated("org.nightlabs.eclipse.sdk.jdo.ObjectIdGenerator")
-	public static DunningAccountingID create(String organisationID)
+	public static DunningRunID create(String organisationID, long dunningRunID)
 	{
-		DunningAccountingID n = new DunningAccountingID();
+		DunningRunID n = new DunningRunID();
 		n.organisationID = organisationID;
+		n.dunningRunID = dunningRunID;
 		return n;
 	}
 }

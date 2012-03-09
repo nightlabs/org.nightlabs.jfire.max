@@ -8,7 +8,7 @@ import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.dunning.DunningInterestCalculator;
 import org.nightlabs.jfire.dunning.DunningManagerRemote;
 import org.nightlabs.jfire.dunning.id.DunningInterestCalculatorID;
-import org.nightlabs.jfire.security.SecurityReflector;
+import org.nightlabs.jfire.security.GlobalSecurityReflector;
 import org.nightlabs.progress.ProgressMonitor;
 import org.nightlabs.progress.SubProgressMonitor;
 
@@ -43,7 +43,9 @@ extends BaseJDOObjectDAO<DunningInterestCalculatorID, DunningInterestCalculator>
 
 		monitor.beginTask("Loading DunningInterestCalculators", 1);
 		try {
-			DunningManagerRemote im = JFireEjb3Factory.getRemoteBean(DunningManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			DunningManagerRemote im = JFireEjb3Factory.getRemoteBean(
+					DunningManagerRemote.class, GlobalSecurityReflector.sharedInstance().getInitialContextProperties()
+			);
 			return im.getDunningInterestCalculators(dunningInterestCalculatorIDs, fetchGroups, maxFetchDepth);
 		} catch (Exception e) {
 			monitor.setCanceled(true);

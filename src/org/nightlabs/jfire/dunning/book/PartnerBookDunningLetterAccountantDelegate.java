@@ -7,7 +7,6 @@ import javax.jdo.annotations.Inheritance;
 import javax.jdo.annotations.InheritanceStrategy;
 import javax.jdo.annotations.PersistenceCapable;
 
-import org.apache.log4j.Logger;
 import org.nightlabs.jfire.accounting.MoneyTransfer;
 import org.nightlabs.jfire.accounting.book.AccountantDelegate;
 import org.nightlabs.jfire.security.User;
@@ -21,11 +20,11 @@ import org.nightlabs.jfire.transfer.Anchor;
 	identityType=IdentityType.APPLICATION,
 	detachable="true",
 	table="JFireDunning_PartnerBookDunningLetterAccountantDelegate")
-@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
-public class PartnerBookDunningLetterAccountantDelegate extends AccountantDelegate
+@Inheritance(strategy=InheritanceStrategy.SUPERCLASS_TABLE)
+public class PartnerBookDunningLetterAccountantDelegate
+	extends AccountantDelegate
 {
 	private static final long serialVersionUID = 1L;
-	private static final Logger logger = Logger.getLogger(PartnerBookDunningLetterAccountantDelegate.class);
 
 	/**
 	 * @deprecated Constructor only existing for JDO!
@@ -34,12 +33,14 @@ public class PartnerBookDunningLetterAccountantDelegate extends AccountantDelega
 	protected PartnerBookDunningLetterAccountantDelegate() {
 	}
 
-	public PartnerBookDunningLetterAccountantDelegate(String organisationID, String accountantDelegateID) {
+	public PartnerBookDunningLetterAccountantDelegate(String organisationID, String accountantDelegateID)
+	{
 		super(organisationID, accountantDelegateID);
 	}
 
 	@Override
-	public void bookTransfer(User user, LegalEntity mandator, MoneyTransfer transfer, Set<Anchor> involvedAnchors) {
+	public void bookTransfer(User user, LegalEntity mandator, MoneyTransfer transfer, Set<Anchor> involvedAnchors)
+	{
 //		if (transfer instanceof BookInvoiceMoneyTransfer)
 //			handleBookMoneyTransfer(mandator, (BookInvoiceMoneyTransfer)transfer, user, involvedAnchors);
 //		else if (transfer instanceof PayMoneyTransfer)

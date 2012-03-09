@@ -8,14 +8,15 @@ import javax.jdo.annotations.IdentityType;
 import javax.jdo.annotations.Inheritance;
 import javax.jdo.annotations.InheritanceStrategy;
 import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.PersistenceModifier;
-import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 
-import org.nightlabs.jdo.ObjectIDUtil;
+import org.nightlabs.clone.DefaultCloneContext;
+import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.Price;
 import org.nightlabs.jfire.dunning.id.DunningFeeID;
+import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.organisation.Organisation;
+import org.nightlabs.util.Util;
 
 /**
  * @author Chairat Kongarayawetchakun - chairat [AT] nightlabs [DOT] de
@@ -24,10 +25,10 @@ import org.nightlabs.jfire.organisation.Organisation;
 		objectIdClass=DunningFeeID.class,
 		identityType=IdentityType.APPLICATION,
 		detachable="true",
-		table="JFireDunning_DunningFee")
+		table="JFireDunning_Fee")
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
 public class DunningFee 
-implements Serializable
+	implements Serializable
 {
 	private static final long serialVersionUID = 1L;
 	
@@ -36,40 +37,32 @@ implements Serializable
 	private String organisationID;
 
 	@PrimaryKey
-	@Column(length=100)
-	private String dunningFeeID;
+	private long dunningFeeID;
 	
 	/**
 	 * Back-reference to the owner-entity.
 	 */
-	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private DunningLetter dunningLetter;
 	
 	/**
 	 * Null or the one from which this one was copied (if it was copied from a previous DunningLetter).
 	 */
-	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private DunningFee original;
 	
 	/**
 	 * The general fee descriptor for which this concrete fee was created.
 	 */
-	@Persistent(
-			dependent="true",
-			persistenceModifier=PersistenceModifier.PERSISTENT)
 	private DunningFeeType dunningFeeType;
 	
 	/**
 	 * The amount of money to pay.
 	 */
-	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Price price;
 	
 	/**
 	 * The amount that was already paid. This could be a fraction 
 	 * of the amount needed to be paid (partial payment).
 	 */
-	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private long amountPaid;
 	
 	/**
@@ -83,7 +76,6 @@ implements Serializable
 	 * as long as this field is set to null, there is still some part left 
 	 * to be paid.
 	 */
-	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Date paidDT;
 	
 	/**
@@ -99,108 +91,189 @@ implements Serializable
 	 * @param dunningFeeID second part of the primary key. A local identifier within the namespace of the organisation.
 	 * @param original null or the one from which this one was copied (if it was copied from a previous DunningLetter).
 	 */
-	public DunningFee(String organisationID, String dunningFeeID, DunningFee original) {
+	public DunningFee(String organisationID, long dunningFeeID, DunningFee original)
+	{
 		Organisation.assertValidOrganisationID(organisationID);
-		ObjectIDUtil.assertValidIDString(dunningFeeID, "dunningFeeID"); //$NON-NLS-1$
-		
 		this.organisationID = organisationID;
 		this.dunningFeeID = dunningFeeID;
 		
 		this.original = original;
 	}
+
+	public DunningFee(DunningLetter dunningLetter, DunningFeeType feeType, Currency currency)
+	{
+		assert dunningLetter != null : "dunningLetter must NOT be null!";
+		assert feeType != null : "the feeType dunning fee must NOT be null!";
+		this.organisationID = dunningLetter.getOrganisationID();
+		this.dunningFeeID = IDGenerator.nextID(DunningFee.class);
+		
+		this.dunningFeeType = feeType;
+		Price price = feeType.getPrice(currency);
+		if (price == null)
+			throw new IllegalStateException(
+					"The given feeType has no Price set for the given Currency! " +
+					"\n\tfeeType="+feeType.toString() +
+					"\n\tcurrency="+currency.toString()
+					);
+		
+		this.price = new DefaultCloneContext().createClone(price);
+		this.amountPaid = 0;
+	}
 	
-	public String getOrganisationID() {
+//	/**
+//	 * 
+//	 * @param dunningLetter
+//	 * @param original
+//	 */
+//	public DunningFee(DunningLetter dunningLetter, DunningFee original)
+//	{
+//		assert dunningLetter != null : "dunningLetter must NOT be null!";
+//		assert original != null : "the original dunning fee must NOT be null!";
+//		this.organisationID = dunningLetter.getOrganisationID();
+//		this.dunningFeeID = IDGenerator.nextID(DunningFee.class);
+//		
+//		this.dunningLetter = dunningLetter;
+//		this.original = original;
+//		if (original != null)
+//		{
+//			this.dunningFeeType = original.getDunningFeeType();
+//			this.amountPaid = original.getAmountPaid();
+//			
+//			try
+//			{
+//				this.price = (Price) original.getPrice().clone();
+//			}
+//			catch (CloneNotSupportedException e)
+//			{
+//				throw new IllegalStateException(
+//						"Couldn't clone a Price instance of type '" +	price.getClass().getName() + "'!", e);
+//			} 
+//		}
+//		else
+//			this.price = 
+//	}
+	
+	public String getOrganisationID()
+	{
 		return organisationID;
 	}
 	
-	public String getDunningFeeID() {
+	public long getDunningFeeID()
+	{
 		return dunningFeeID;
 	}
+	
+	public DunningFee getOriginal()
+	{
+		return original;
+	}
 
-	public void setDunningFeeType(DunningFeeType dunningFeeType) {
+	public void setDunningFeeType(DunningFeeType dunningFeeType)
+	{
 		this.dunningFeeType = dunningFeeType;
 	}
 	
-	public DunningFeeType getDunningFeeType() {
+	public DunningFeeType getDunningFeeType()
+	{
 		return dunningFeeType;
 	}
 
-	public void setAmountPaid(long amountPaid) {
+	public void setAmountPaid(long amountPaid)
+	{
 		this.amountPaid = amountPaid;
 	}
 
-	public long getAmountPaid() {
+	public long getAmountPaid()
+	{
 		return amountPaid;
 	}
 
-	public void setAmountToPay(long amountToPay) {
-		this.amountToPay = amountToPay;
-	}
-	
-	public long getAmountToPay() {
+	public long getAmountToPay()
+	{
 		return amountToPay;
 	}
 	
-	public void setDunningLetter(DunningLetter dunningLetter) {
+	public void setDunningLetter(DunningLetter dunningLetter)
+	{
 		this.dunningLetter = dunningLetter;
 	}
 	
-	public DunningLetter getDunningLetter() {
+	public DunningLetter getDunningLetter()
+	{
 		return dunningLetter;
 	}
 
-	public void setPaidDT(Date paidDT) {
+	public void setPaidDT(Date paidDT)
+	{
 		this.paidDT = paidDT;
 	}
 	
-	public Date getPaidDT() {
+	public Date getPaidDT()
+	{
 		return paidDT;
 	}
 	
-	public void setPrice(Price price) {
+	public void setPrice(Price price)
+	{
 		this.price = price;
 	}
 	
-	public Price getPrice() {
+	public Price getPrice()
+	{
 		return price;
 	}
 
+	public void copyValuesFrom(DunningFee oldFee)
+	{
+		if (oldFee == null)
+			return;
+		
+		this.price = new DefaultCloneContext().createClone(oldFee.getPrice());
+		this.amountPaid = oldFee.getAmountPaid();
+		this.dunningFeeType = oldFee.dunningFeeType;
+	}
+	
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
 	@Override
-	public int hashCode() {
+	public int hashCode()
+	{
 		final int prime = 31;
 		int result = 1;
-		result = prime * result
-				+ ((dunningFeeID == null) ? 0 : dunningFeeID.hashCode());
-		result = prime * result
-				+ ((organisationID == null) ? 0 : organisationID.hashCode());
+		result = prime * result + (int) (dunningFeeID ^ (dunningFeeID >>> 32));
+		result = prime * result + ((organisationID == null) ? 0 : organisationID.hashCode());
 		return result;
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
+	public boolean equals(Object obj)
+	{
+		if (this == obj) return true;
+		if (obj == null) return false;
 		if (getClass() != obj.getClass())
 			return false;
+		
 		DunningFee other = (DunningFee) obj;
-		if (dunningFeeID == null) {
-			if (other.dunningFeeID != null)
-				return false;
-		} else if (!dunningFeeID.equals(other.dunningFeeID))
-			return false;
-		if (organisationID == null) {
-			if (other.organisationID != null)
-				return false;
-		} else if (!organisationID.equals(other.organisationID))
-			return false;
-		return true;
+		if (Util.equals(organisationID, other.organisationID) &&
+				Util.equals(dunningFeeID, other.dunningFeeID))
+			return true;
+		
+		return false;
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
 	@Override
-	public String toString() {
-		return "DunningFee [dunningFeeID=" + dunningFeeID + ", organisationID="
-				+ organisationID + "]";
+	public String toString()
+	{
+		return "DunningFee [organisationID=" + organisationID + ", dunningFeeID=" + dunningFeeID + ", dunningFeeType="
+				+ dunningFeeType + ", price=" + price + ", amountPaid=" + amountPaid + ", paidDT=" + paidDT + ", original="
+				+ original + "]";
 	}
+
 }

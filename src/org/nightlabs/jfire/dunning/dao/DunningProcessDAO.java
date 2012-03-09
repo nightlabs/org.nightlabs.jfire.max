@@ -9,7 +9,7 @@ import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.dunning.DunningManagerRemote;
 import org.nightlabs.jfire.dunning.DunningProcess;
 import org.nightlabs.jfire.dunning.id.DunningProcessID;
-import org.nightlabs.jfire.security.SecurityReflector;
+import org.nightlabs.jfire.security.GlobalSecurityReflector;
 import org.nightlabs.progress.ProgressMonitor;
 import org.nightlabs.progress.SubProgressMonitor;
 
@@ -18,7 +18,9 @@ import org.nightlabs.progress.SubProgressMonitor;
  *
  * @author Chairat Kongarayawetchakun - chairat [AT] nightlabs [DOT] de
  */
-public class DunningProcessDAO extends BaseJDOObjectDAO<DunningProcessID, DunningProcess>{
+public class DunningProcessDAO
+	extends BaseJDOObjectDAO<DunningProcessID, DunningProcess>
+{
 
 	private static DunningProcessDAO sharedInstance = null;
 
@@ -43,7 +45,9 @@ public class DunningProcessDAO extends BaseJDOObjectDAO<DunningProcessID, Dunnin
 
 		monitor.beginTask("Loading DunningProcesss", 1);
 		try {
-			DunningManagerRemote im = JFireEjb3Factory.getRemoteBean(DunningManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			DunningManagerRemote im = JFireEjb3Factory.getRemoteBean(
+					DunningManagerRemote.class, GlobalSecurityReflector.sharedInstance().getInitialContextProperties()
+			);
 			return im.getDunningProcesses(dunningProcessIDs, fetchGroups, maxFetchDepth);
 		} catch (Exception e) {
 			monitor.setCanceled(true);
@@ -57,7 +61,7 @@ public class DunningProcessDAO extends BaseJDOObjectDAO<DunningProcessID, Dunnin
 
 	public synchronized DunningProcess getDunningProcess(DunningProcessID dunningProcessID, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
-		monitor.beginTask("Loading dunningProcess " + dunningProcessID.dunningProcessID, 1);
+		monitor.beginTask("Loading dunningProcess ", 1);
 		DunningProcess dunningProcess = getJDOObject(null, dunningProcessID, fetchGroups, maxFetchDepth, new SubProgressMonitor(monitor, 1));
 		monitor.done();
 		return dunningProcess;
@@ -72,7 +76,9 @@ public class DunningProcessDAO extends BaseJDOObjectDAO<DunningProcessID, Dunnin
 	{
 		monitor.beginTask("Loading dunningProcessses", 1);
 		try {
-			DunningManagerRemote im = JFireEjb3Factory.getRemoteBean(DunningManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			DunningManagerRemote im = JFireEjb3Factory.getRemoteBean(
+					DunningManagerRemote.class, GlobalSecurityReflector.sharedInstance().getInitialContextProperties()
+			);
 			Set<DunningProcessID> is = im.getDunningProcessIDs();
 			monitor.done();
 			return getJDOObjects(null, is, fetchGroups, maxFetchDepth, monitor);

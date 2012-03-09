@@ -9,7 +9,7 @@ import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.dunning.DunningConfigCustomer;
 import org.nightlabs.jfire.dunning.DunningManagerRemote;
 import org.nightlabs.jfire.dunning.id.DunningConfigCustomerID;
-import org.nightlabs.jfire.security.SecurityReflector;
+import org.nightlabs.jfire.security.GlobalSecurityReflector;
 import org.nightlabs.progress.ProgressMonitor;
 import org.nightlabs.progress.SubProgressMonitor;
 
@@ -44,7 +44,9 @@ extends BaseJDOObjectDAO<DunningConfigCustomerID, DunningConfigCustomer>
 
 		monitor.beginTask("Loading DunningConfigCustomers", 1);
 		try {
-			DunningManagerRemote im = JFireEjb3Factory.getRemoteBean(DunningManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			DunningManagerRemote im = JFireEjb3Factory.getRemoteBean(
+					DunningManagerRemote.class, GlobalSecurityReflector.sharedInstance().getInitialContextProperties()
+			);
 			return im.getDunningConfigCustomers(dunningConfigCustomerIDs, fetchGroups, maxFetchDepth);
 		} catch (Exception e) {
 			monitor.setCanceled(true);
@@ -73,7 +75,9 @@ extends BaseJDOObjectDAO<DunningConfigCustomerID, DunningConfigCustomer>
 	{
 		monitor.beginTask("Loading dunningConfigCustomers", 1);
 		try {
-			DunningManagerRemote im = JFireEjb3Factory.getRemoteBean(DunningManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			DunningManagerRemote im = JFireEjb3Factory.getRemoteBean(
+					DunningManagerRemote.class, GlobalSecurityReflector.sharedInstance().getInitialContextProperties()
+			);
 			Set<DunningConfigCustomerID> is = im.getDunningConfigCustomerIDs();
 			monitor.done();
 			return getJDOObjects(null, is, fetchGroups, maxFetchDepth, monitor);
@@ -87,7 +91,9 @@ extends BaseJDOObjectDAO<DunningConfigCustomerID, DunningConfigCustomer>
 			throw new NullPointerException("DunningConfigCustomer to save must not be null");
 		monitor.beginTask("Storing dunningConfigCustomer: "+ dunningConfigCustomer.getDunningConfigCustomerID(), 3);
 		try {
-			DunningManagerRemote im = JFireEjb3Factory.getRemoteBean(DunningManagerRemote.class, SecurityReflector.getInitialContextProperties());
+			DunningManagerRemote im = JFireEjb3Factory.getRemoteBean(
+					DunningManagerRemote.class, GlobalSecurityReflector.sharedInstance().getInitialContextProperties()
+			);
 			monitor.worked(1);
 
 			DunningConfigCustomer result = im.storeDunningConfigCustomer(dunningConfigCustomer, get, fetchGroups, maxFetchDepth);

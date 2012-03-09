@@ -3,6 +3,7 @@ package org.nightlabs.jfire.dunning.id;
 
 import javax.annotation.Generated;
 import java.io.Serializable;
+import org.nightlabs.jdo.ObjectID;
 import java.text.ParseException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.StringTokenizer;
@@ -18,13 +19,13 @@ import java.net.URLEncoder;
  */
 @Generated("org.nightlabs.eclipse.sdk.jdo.ObjectIdGenerator")
 public class DunningLetterNotifierID
-implements Serializable
+implements Serializable, ObjectID
 {
 	/**
 	 * The serial version uid of this class.
 	 */ 
 	@Generated("org.nightlabs.eclipse.sdk.jdo.ObjectIdGenerator")
-	private static final long serialVersionUID = -2142429774L;
+	private static final long serialVersionUID = -897650636L;
 	
 	/**
 	 * The values of all fields are URL encoded in UTF-8.
@@ -86,7 +87,7 @@ implements Serializable
 	 * Declared as primary key field in {@link org.nightlabs.jfire.dunning.DunningLetterNotifier}.
 	 */
 	@Generated("org.nightlabs.eclipse.sdk.jdo.ObjectIdGenerator")
-	public java.lang.String dunningLetterNotifierID;
+	public long dunningLetterNotifierID;
 	
 	/**
 	 * Create a new empty instance of DunningLetterNotifierID.
@@ -256,7 +257,7 @@ implements Serializable
 			sb.append(URLEncoder.encode(String.valueOf(organisationID), ENCODING));
 			sb.append('&');
 			sb.append("dunningLetterNotifierID="); //$NON-NLS-1$
-			sb.append(URLEncoder.encode(String.valueOf(dunningLetterNotifierID), ENCODING));
+			sb.append(URLEncoder.encode(Long.toString(dunningLetterNotifierID, RADIX), ENCODING));
 		} catch (UnsupportedEncodingException e) {
 			throw new RuntimeException(
 					"Encoding failed with encoding " + //$NON-NLS-1$ 
@@ -287,10 +288,7 @@ implements Serializable
 				return false;
 		} else if(!organisationID.equals(other.organisationID))
 			return false;
-		if(dunningLetterNotifierID == null) {
-			if(other.dunningLetterNotifierID != null)
-				return false;
-		} else if(!dunningLetterNotifierID.equals(other.dunningLetterNotifierID))
+		if(dunningLetterNotifierID != other.dunningLetterNotifierID)
 			return false;
 		return true;
 	}
@@ -309,7 +307,7 @@ implements Serializable
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((organisationID == null) ? 0 : organisationID.hashCode());
-		result = prime * result + ((dunningLetterNotifierID == null) ? 0 : dunningLetterNotifierID.hashCode());
+		result = prime * result + (int) (dunningLetterNotifierID ^ (dunningLetterNotifierID >>> 32));
 		return result;
 	}
 
@@ -321,7 +319,7 @@ implements Serializable
 	 *     with the primary-key fields set to the given parameters.
 	 */
 	@Generated("org.nightlabs.eclipse.sdk.jdo.ObjectIdGenerator")
-	public static DunningLetterNotifierID create(String organisationID, String dunningLetterNotifierID)
+	public static DunningLetterNotifierID create(String organisationID, long dunningLetterNotifierID)
 	{
 		DunningLetterNotifierID n = new DunningLetterNotifierID();
 		n.organisationID = organisationID;

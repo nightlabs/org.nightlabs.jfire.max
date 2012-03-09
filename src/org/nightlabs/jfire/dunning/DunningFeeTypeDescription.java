@@ -4,21 +4,19 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.jdo.annotations.Column;
-import javax.jdo.annotations.FetchGroup;
-import javax.jdo.annotations.FetchGroups;
 import javax.jdo.annotations.IdentityType;
 import javax.jdo.annotations.Inheritance;
 import javax.jdo.annotations.InheritanceStrategy;
 import javax.jdo.annotations.Join;
 import javax.jdo.annotations.NullValue;
 import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.PersistenceModifier;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 import javax.jdo.annotations.Value;
 
 import org.nightlabs.i18n.I18nText;
 import org.nightlabs.jfire.dunning.id.DunningFeeTypeDescriptionID;
+import org.nightlabs.jfire.idgenerator.IDGenerator;
 
 /**
  * An extended class of {@link I18nText} that represents the description created in an {@link DunningFeeType}.
@@ -31,16 +29,10 @@ import org.nightlabs.jfire.dunning.id.DunningFeeTypeDescriptionID;
 	objectIdClass=DunningFeeTypeDescriptionID.class,
 	identityType=IdentityType.APPLICATION,
 	detachable="true",
-	table="JFireDunningFeeType_DunningFeeTypeDescription")
-@FetchGroups(
-	@FetchGroup(
-		name="DunningFeeType.description",
-		members={@Persistent(name="dunningFeeType"), @Persistent(name="descriptions")})
-)
+	table="JFireDunning_FeeTypeDescription")
 @Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
-
 public class DunningFeeTypeDescription
-extends I18nText
+	extends I18nText
 {
 	/**
 	 * The serial version of this class.
@@ -65,11 +57,11 @@ extends I18nText
 	@PrimaryKey
 	private long dunningFeeTypeID;
 
-	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 */
-	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
-	private DunningFeeType dunningFeeType;
+//	/**
+//	 * @jdo.field persistence-modifier="persistent"
+//	 */
+//	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+//	private DunningFeeType dunningFeeType;
 
 	/**
 	 * key: String languageID<br/>
@@ -87,13 +79,9 @@ extends I18nText
 	@Join
 	@Persistent(
 		nullValue=NullValue.EXCEPTION,
-		table="JFireDunning_DunningFeeTypeDescription_descriptions",
-		defaultFetchGroup="true",
-		persistenceModifier=PersistenceModifier.PERSISTENT
-	)
-	@Value(
-			columns={@Column(sqlType="CLOB")}
-	)
+		table="JFireDunning_FeeTypeDescription_texts",
+		defaultFetchGroup="true")
+	@Value( columns={@Column(sqlType="CLOB")} )
 	private Map<String, String> descriptions = new HashMap<String, String>();
 
 	/**
@@ -104,22 +92,30 @@ extends I18nText
 	{
 	}
 
-	/**
-	 * Constructs a new DunningFeeTypeDescription.
-	 * @param dunningFeeType the dunningFeeType that this dunningFeeType description is made in
-	 */
-	public DunningFeeTypeDescription(String organisationID, long dunningFeeTypeID, DunningFeeType dunningFeeType)
+	public DunningFeeTypeDescription(DunningFeeType dunningFeeType)
 	{
-		this.dunningFeeType = dunningFeeType;
-		this.organisationID = organisationID;
-		this.dunningFeeTypeID = dunningFeeTypeID;
+		this.organisationID = dunningFeeType.getOrganisationID();
+		this.dunningFeeTypeID = IDGenerator.nextID(DunningFeeTypeDescription.class);
+		this.descriptions = new HashMap<String, String>();
 	}
+
+//	/**
+//	 * Constructs a new DunningFeeTypeDescription.
+//	 * @param dunningFeeType the dunningFeeType that this dunningFeeType description is made in
+//	 */
+//	public DunningFeeTypeDescription(String organisationID, long dunningFeeTypeID, DunningFeeType dunningFeeType)
+//	{
+//		this.dunningFeeType = dunningFeeType;
+//		this.organisationID = organisationID;
+//		this.dunningFeeTypeID = dunningFeeTypeID;
+//	}
 
 	/**
 	 * Returns the organisation id.
 	 * @return the organisationID
 	 */
-	public String getOrganisationID() {
+	public String getOrganisationID()
+	{
 		return organisationID;
 	}
 
@@ -127,7 +123,8 @@ extends I18nText
 	 * Returns the dunningFeeType id.
 	 * @return the dunningFeeType id
 	 */
-	public long getDunningFeeTypeID() {
+	public long getDunningFeeTypeID()
+	{
 		return dunningFeeTypeID;
 	}
 
@@ -146,6 +143,6 @@ extends I18nText
 	@Override
 	protected String getFallBackValue(String languageID)
 	{
-		return dunningFeeType == null ? languageID : "";
+		return "";
 	}
 }

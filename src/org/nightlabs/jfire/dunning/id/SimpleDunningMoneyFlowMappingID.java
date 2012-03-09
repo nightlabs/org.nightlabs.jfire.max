@@ -3,6 +3,7 @@ package org.nightlabs.jfire.dunning.id;
 
 import javax.annotation.Generated;
 import java.io.Serializable;
+import org.nightlabs.jdo.ObjectID;
 import java.text.ParseException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.StringTokenizer;
@@ -13,18 +14,18 @@ import java.net.URLEncoder;
 
 
 /**
- * The JDO object id class for {@link org.nightlabs.jfire.dunning.DunningLetterLocal}.
+ * The JDO object id class for {@link org.nightlabs.jfire.dunning.SimpleDunningMoneyFlowMapping}.
  * <p>This class was auto-generated.</p>
  */
 @Generated("org.nightlabs.eclipse.sdk.jdo.ObjectIdGenerator")
-public class DunningLetterLocalID
-implements Serializable
+public class SimpleDunningMoneyFlowMappingID
+implements Serializable, ObjectID
 {
 	/**
 	 * The serial version uid of this class.
 	 */ 
 	@Generated("org.nightlabs.eclipse.sdk.jdo.ObjectIdGenerator")
-	private static final long serialVersionUID = -6000717022998840432L;
+	private static final long serialVersionUID = -2057365872L;
 	
 	/**
 	 * The values of all fields are URL encoded in UTF-8.
@@ -76,45 +77,45 @@ implements Serializable
 
 	/**
 	 * Primary key field organisationID.
-	 * Declared as primary key field in {@link org.nightlabs.jfire.dunning.DunningLetterLocal}.
+	 * Declared as primary key field in {@link org.nightlabs.jfire.dunning.SimpleDunningMoneyFlowMapping}.
 	 */
 	@Generated("org.nightlabs.eclipse.sdk.jdo.ObjectIdGenerator")
 	public java.lang.String organisationID;
 	
 	/**
-	 * Primary key field dunningLetterID.
-	 * Declared as primary key field in {@link org.nightlabs.jfire.dunning.DunningLetterLocal}.
+	 * Primary key field simpleMoneyFlowMappingID.
+	 * Declared as primary key field in {@link org.nightlabs.jfire.dunning.SimpleDunningMoneyFlowMapping}.
 	 */
 	@Generated("org.nightlabs.eclipse.sdk.jdo.ObjectIdGenerator")
-	public java.lang.String dunningLetterID;
+	public long simpleMoneyFlowMappingID;
 	
 	/**
-	 * Create a new empty instance of DunningLetterLocalID.
+	 * Create a new empty instance of SimpleDunningMoneyFlowMappingID.
 	 */
 	@Generated("org.nightlabs.eclipse.sdk.jdo.ObjectIdGenerator")
-	public DunningLetterLocalID()
+	public SimpleDunningMoneyFlowMappingID()
 	{
 	}
 
 	/**
-	 * Create a new instance of DunningLetterLocalID.
+	 * Create a new instance of SimpleDunningMoneyFlowMappingID.
 	 * This is done by parsing the <code>keyStr</code> that has been created
 	 * by {@link #toString()} and setting all fields to the values from the string.
 	 * <p>
 	 * This means, the following code will create a copy of this class:<br/><br/>
-	 * <code>DunningLetterLocalID newDunningLetterLocalID = new DunningLetterLocalID(oldDunningLetterLocalID.toString());</code>
+	 * <code>SimpleDunningMoneyFlowMappingID newSimpleDunningMoneyFlowMappingID = new SimpleDunningMoneyFlowMappingID(oldSimpleDunningMoneyFlowMappingID.toString());</code>
 	 * </p>
 	 * @param keyStr A String formatted as "jdo/{className}?{field0}={value0}&amp;{field1}={value1}...&amp;{fieldN}={valueN}"
 	 *     where all values are url encoded using {@link #ENCODING}.
 	 */
 	@Generated("org.nightlabs.eclipse.sdk.jdo.ObjectIdGenerator")
-	public DunningLetterLocalID(final String keyStr)
+	public SimpleDunningMoneyFlowMappingID(final String keyStr)
 	throws ParseException, SecurityException,
 			NoSuchFieldException, IllegalArgumentException,
 			IllegalAccessException, NoSuchMethodException,
 			InstantiationException, InvocationTargetException
 	{
-		Class<? extends DunningLetterLocalID> clazz = this.getClass();
+		Class<? extends SimpleDunningMoneyFlowMappingID> clazz = this.getClass();
 
 		StringTokenizer st = new StringTokenizer(keyStr, SEPARATORS_FOR_TOKENIZER, true);
 		String jdoPrefix = st.nextToken();
@@ -235,7 +236,7 @@ implements Serializable
 	 * Create a string representation of this object id.
 	 * <p>
 	 * JDO expects the result of this method to be compatible with the constructor
-	 * {@link #DunningLetterLocalID(String)}.
+	 * {@link #SimpleDunningMoneyFlowMappingID(String)}.
 	 * This method takes all the primary-key-fields and encodes them with their name
 	 * and their value.
 	 * </p>
@@ -255,8 +256,8 @@ implements Serializable
 			sb.append("organisationID="); //$NON-NLS-1$
 			sb.append(URLEncoder.encode(String.valueOf(organisationID), ENCODING));
 			sb.append('&');
-			sb.append("dunningLetterID="); //$NON-NLS-1$
-			sb.append(URLEncoder.encode(String.valueOf(dunningLetterID), ENCODING));
+			sb.append("simpleMoneyFlowMappingID="); //$NON-NLS-1$
+			sb.append(URLEncoder.encode(Long.toString(simpleMoneyFlowMappingID, RADIX), ENCODING));
 		} catch (UnsupportedEncodingException e) {
 			throw new RuntimeException(
 					"Encoding failed with encoding " + //$NON-NLS-1$ 
@@ -281,16 +282,13 @@ implements Serializable
 			return false;
 		if(getClass() != obj.getClass())
 			return false;
-		DunningLetterLocalID other = (DunningLetterLocalID) obj;
+		SimpleDunningMoneyFlowMappingID other = (SimpleDunningMoneyFlowMappingID) obj;
 		if(organisationID == null) {
 			if(other.organisationID != null)
 				return false;
 		} else if(!organisationID.equals(other.organisationID))
 			return false;
-		if(dunningLetterID == null) {
-			if(other.dunningLetterID != null)
-				return false;
-		} else if(!dunningLetterID.equals(other.dunningLetterID))
+		if(simpleMoneyFlowMappingID != other.simpleMoneyFlowMappingID)
 			return false;
 		return true;
 	}
@@ -309,23 +307,23 @@ implements Serializable
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((organisationID == null) ? 0 : organisationID.hashCode());
-		result = prime * result + ((dunningLetterID == null) ? 0 : dunningLetterID.hashCode());
+		result = prime * result + (int) (simpleMoneyFlowMappingID ^ (simpleMoneyFlowMappingID >>> 32));
 		return result;
 	}
 
 	/**
 	 * Create a new object id instance.
 	 * @param organisationID The primary key field organisationID.
-	 * @param dunningLetterID The primary key field dunningLetterID.
-	 * @return a newly created instance of <code>DunningLetterLocalID</code>
+	 * @param simpleMoneyFlowMappingID The primary key field simpleMoneyFlowMappingID.
+	 * @return a newly created instance of <code>SimpleDunningMoneyFlowMappingID</code>
 	 *     with the primary-key fields set to the given parameters.
 	 */
 	@Generated("org.nightlabs.eclipse.sdk.jdo.ObjectIdGenerator")
-	public static DunningLetterLocalID create(String organisationID, String dunningLetterID)
+	public static SimpleDunningMoneyFlowMappingID create(String organisationID, long simpleMoneyFlowMappingID)
 	{
-		DunningLetterLocalID n = new DunningLetterLocalID();
+		SimpleDunningMoneyFlowMappingID n = new SimpleDunningMoneyFlowMappingID();
 		n.organisationID = organisationID;
-		n.dunningLetterID = dunningLetterID;
+		n.simpleMoneyFlowMappingID = simpleMoneyFlowMappingID;
 		return n;
 	}
 }

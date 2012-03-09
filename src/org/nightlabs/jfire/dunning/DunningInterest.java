@@ -2,32 +2,32 @@ package org.nightlabs.jfire.dunning;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.Calendar;
 import java.util.Date;
 
 import javax.jdo.annotations.Column;
 import javax.jdo.annotations.IdentityType;
-import javax.jdo.annotations.Inheritance;
-import javax.jdo.annotations.InheritanceStrategy;
 import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.PersistenceModifier;
-import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.dunning.id.DunningInterestID;
+import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.organisation.Organisation;
+import org.nightlabs.util.Util;
 
 /**
  * @author Chairat Kongarayawetchakun - chairat [AT] nightlabs [DOT] de
  */
 @PersistenceCapable(
-		objectIdClass=DunningInterestID.class,
-		identityType=IdentityType.APPLICATION,
-		detachable="true",
-		table="JFireDunning_DunningInterest")
-@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
+	objectIdClass=DunningInterestID.class,
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireDunning_Interest"
+)
 public class DunningInterest
-implements Serializable
+	implements Serializable
 {
 	private static final long serialVersionUID = 1L;
 
@@ -41,14 +41,12 @@ implements Serializable
 	/**
 	 * Back-reference to the owner-entity.
 	 */
-	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private DunningLetterEntry dunningLetterEntry;
 
 	/**
 	 * Back-reference to the old DunningInterest object (of the previous
 	 * DunningLetter) that this one originates from.
 	 */
-	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private DunningInterest backReference;
 
 	/**
@@ -57,28 +55,24 @@ implements Serializable
 	 * but it's up to the DunningInterestCalculator implementation to
 	 * decide from when to when periods are counted
 	 */
-	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Date creditPeriodFromIncl;
 
 	/**
 	 * The exact timestamp till which to calculate the interest (excluding
 	 * the exact millisecond as previous.creditPeriodFrom == next.creditPeriodTo).
 	 */
-	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Date creditPeriodToExcl;
 
 	/**
 	 * The currency in which this interest is calculated. This must match
 	 * the invoice's currency.
 	 */
-	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Currency currency;
 
 	/**
 	 * The base from which the interest is calculated in the smallest currency
 	 * unit (e.g. in Cent when EUR is used).
 	 */
-	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private long baseAmount;
 
 	/**
@@ -86,34 +80,25 @@ implements Serializable
 	 * This is copied from either the current DunningStep (dunningLetter.dunningStep)
 	 * or a previously created DunningInterest (that's either copied or recalculated).
 	 */
-	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+	@Column(length=10, scale=6)
 	private BigDecimal interestPercentage;
 
 	/**
 	 * The interest as absolute number in the smallest currency unit (e.g. in
 	 * Cent when EUR is used).
 	 */
-	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private long interestAmount;
 
 	/**
 	 * The amount that was already paid. This could be a fraction of the amount
 	 * needed to be paid (partial payment).
 	 */
-	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private long amountPaid;
-
-	/**
-	 * The remaining amount of money that is left to be paid
-	 * and is thus interestAmount – amountPaid.]
-	 */
-	private transient long amountToPay;
 
 	/**
 	 * The date at which all of this interest was paid. This implies that as long
 	 * as this field is set to null, there is still some part left to be paid.
 	 */
-	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
 	private Date paidDT;
 
 	/**
@@ -122,9 +107,20 @@ implements Serializable
 	@Deprecated
 	protected DunningInterest() { }
 
+	public DunningInterest(DunningLetterEntry dunningLetterEntry)
+	{
+		this(dunningLetterEntry.getOrganisationID(), IDGenerator.nextID(DunningInterest.class), dunningLetterEntry, null);
+	}
 
+	public DunningInterest(DunningLetterEntry dunningLetterEntry, DunningInterest backReference)
+	{
+		this(dunningLetterEntry.getOrganisationID(), IDGenerator.nextID(DunningInterest.class), dunningLetterEntry, 
+				backReference);
+	}
+	
 	public DunningInterest(String organisationID, long dunningInterestID,
-			DunningLetterEntry dunningLetterEntry, DunningInterest backReference) {
+			DunningLetterEntry dunningLetterEntry, DunningInterest backReference)
+	{
 		Organisation.assertValidOrganisationID(organisationID);
 		this.organisationID = organisationID;
 		this.dunningInterestID = dunningInterestID;
@@ -132,39 +128,87 @@ implements Serializable
 		this.backReference = backReference;
 
 		this.currency = dunningLetterEntry.getInvoice().getCurrency();
-		this.baseAmount = dunningLetterEntry.getInvoice().getPrice().getAmount();
+		if (backReference != null)
+		{
+			this.amountPaid = backReference.amountPaid;
+			this.interestAmount = backReference.interestAmount;
+			this.baseAmount = backReference.baseAmount;
+			this.creditPeriodFromIncl = backReference.creditPeriodFromIncl;
+			this.creditPeriodToExcl = backReference.creditPeriodToExcl;
+			this.interestPercentage = backReference.interestPercentage;
+		}
+		else
+		{
+			this.baseAmount = dunningLetterEntry.getBaseAmount();
+			this.interestPercentage = BigDecimal.valueOf(0l, 2);
+		}
 	}
-
-
-	public String getOrganisationID() {
+	
+	public long calculateInterest(int daysOfYear)
+	{
+		assert creditPeriodFromIncl != null;
+		assert creditPeriodToExcl != null;
+		
+		// The interest percentage may be null in case we have a period with absolutely no interests,
+		// e.g. the first two weeks after the first (reminding) dunning letter.
+		if (interestPercentage == null)
+		{
+			return 0L;
+		}
+			
+		Calendar startDay = Calendar.getInstance();
+		Calendar endDay = Calendar.getInstance();
+		startDay.setTime(creditPeriodFromIncl);
+		endDay.setTime(creditPeriodToExcl);
+		int endDayNr = endDay.get(Calendar.DAY_OF_YEAR);
+		int startDayNr = startDay.get(Calendar.DAY_OF_YEAR);
+		int periodLength = endDayNr - startDayNr;
+		BigDecimal numberOfDays = BigDecimal.valueOf(periodLength, 0);
+		BigDecimal numberOfDaysForThatYear = BigDecimal.valueOf(daysOfYear, 0);
+		BigDecimal annualInterest = interestPercentage.multiply(BigDecimal.valueOf(baseAmount));
+		BigDecimal interest =	annualInterest.multiply(numberOfDays);
+		interest = interest.divide(numberOfDaysForThatYear, 0, RoundingMode.HALF_UP);
+		this.interestAmount = interest.longValue();
+		return interestAmount;
+	}
+	
+	public String getOrganisationID()
+	{
 		return organisationID;
 	}
 
-	public long getDunningInterestID() {
+	public long getDunningInterestID()
+	{
 		return dunningInterestID;
 	}
 
-	public DunningLetterEntry getDunningLetterEntry() {
+	public DunningLetterEntry getDunningLetterEntry()
+	{
 		return dunningLetterEntry;
 	}
 
-	public void setCreditPeriodFromIncl(Date creditPeriodFromIncl) {
+	public void setCreditPeriodFromIncl(Date creditPeriodFromIncl)
+	{
 		this.creditPeriodFromIncl = creditPeriodFromIncl;
 	}
 
-	public Date getCreditPeriodFromIncl() {
+	public Date getCreditPeriodFromIncl()
+	{
 		return creditPeriodFromIncl;
 	}
 
-	public void setCreditPeriodToExcl(Date creditPeriodToExcl) {
+	public void setCreditPeriodToExcl(Date creditPeriodToExcl)
+	{
 		this.creditPeriodToExcl = creditPeriodToExcl;
 	}
 
-	public Date getCreditPeriodToExcl() {
+	public Date getCreditPeriodToExcl()
+	{
 		return creditPeriodToExcl;
 	}
 
-	public Currency getCurrency() {
+	public Currency getCurrency()
+	{
 		return currency;
 	}
 
@@ -172,85 +216,97 @@ implements Serializable
 	 * Returns the base from which the interest is calculated in the smallest currency unit.
 	 * @return long baseAmount
 	 */
-	public long getBaseAmount() {
+	public long getBaseAmount()
+	{
 		return baseAmount;
 	}
 
-	public void setInterestPercentage(BigDecimal interestPercentage) {
+	public void setInterestPercentage(BigDecimal interestPercentage)
+	{
 		this.interestPercentage = interestPercentage;
 	}
 
-	public BigDecimal getInterestPercentage() {
+	public BigDecimal getInterestPercentage()
+	{
 		return interestPercentage;
 	}
 
-	public void setInterestAmount(long interestAmount) {
+	public void setInterestAmount(long interestAmount)
+	{
 		this.interestAmount = interestAmount;
 	}
 
-	public long getInterestAmount() {
+	public long getInterestAmount()
+	{
 		return interestAmount;
 	}
 
-	public void setAmountPaid(long amountPaid) {
+	public void setAmountPaid(long amountPaid)
+	{
 		this.amountPaid = amountPaid;
 	}
 
-	public long getAmountPaid() {
+	public long getAmountPaid()
+	{
 		return amountPaid;
 	}
 
-	public void setAmountToPay(long amountToPay) {
-		this.amountToPay = amountToPay;
+	public long getAmountToPay()
+	{
+		return getInterestAmount() - getAmountPaid();
 	}
 
-	public long getAmountToPay() {
-		return amountToPay;
-	}
-
-	public void setPaidDT(Date paidDT) {
+	public void setPaidDT(Date paidDT)
+	{
 		this.paidDT = paidDT;
 	}
 
-	public Date getPaidDT() {
+	public Date getPaidDT()
+	{
 		return paidDT;
 	}
-
+	
+	public DunningInterest getBackReference()
+	{
+		return backReference;
+	}
 
 	@Override
-	public int hashCode() {
+	public int hashCode()
+	{
 		final int prime = 31;
 		int result = 1;
-		result = prime * result
-				+ (int) (dunningInterestID ^ (dunningInterestID >>> 32));
-		result = prime * result
-				+ ((organisationID == null) ? 0 : organisationID.hashCode());
+		result = prime * result	+ ((organisationID == null) ? 0 : organisationID.hashCode());
+		result = prime * result	+ (int) (dunningInterestID ^ (dunningInterestID >>> 32));
 		return result;
 	}
 
-
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
+	public boolean equals(Object obj)
+	{
+		if (this == obj) return true;
+		if (obj == null) return false;
 		if (getClass() != obj.getClass())
 			return false;
+		
 		DunningInterest other = (DunningInterest) obj;
-		if (dunningInterestID != other.dunningInterestID)
-			return false;
-		if (organisationID == null) {
-			if (other.organisationID != null)
-				return false;
-		} else if (!organisationID.equals(other.organisationID))
-			return false;
-		return true;
+		if (Util.equals(organisationID, other.organisationID) &&
+				Util.equals(dunningInterestID, other.dunningInterestID))
+			return true;
+		
+		return false;
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
 	@Override
-	public String toString() {
-		return "DunningInterest [dunningInterestID=" + dunningInterestID
-				+ ", organisationID=" + organisationID + "]";
+	public String toString()
+	{
+		return "DunningInterest [organisationID=" + organisationID + ", dunningInterestID=" + dunningInterestID
+				+ ", currency=" + currency + ", baseAmount=" + baseAmount + ", interestAmount=" + interestAmount
+				+ ", interestPercentage=" + interestPercentage + ", amountPaid=" + amountPaid + ", creditPeriodFromIncl="
+				+ creditPeriodFromIncl + ", creditPeriodToExcl=" + creditPeriodToExcl + "]";
 	}
+
 }

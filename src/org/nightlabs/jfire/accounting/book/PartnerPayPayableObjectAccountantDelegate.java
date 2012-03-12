@@ -49,7 +49,7 @@ public class PartnerPayPayableObjectAccountantDelegate
 	public static final String PAYABLE_OBJECT_FACTORY_SCOPE = "PartnerPayPayableObjectAccountantDelegate";
 
 	private static final long serialVersionUID = 1L;
-	private static final String ACCOUNTANT_DELEGATE_ID = "internal.partner.bookPayableObject";
+	private static final String ACCOUNTANT_DELEGATE_ID = "internal.partner.payPayableObject";
 
 	private static final Logger logger = LoggerFactory.getLogger(PartnerPayPayableObjectAccountantDelegate.class);
 

@@ -6,8 +6,11 @@
     http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 
 	<changeSet id="JFireTradeEAR|1.2.1|1.2.2" author="jfire">
-		<preConditions>
-			<not><columnExists tableName="jfiretrade_payment_payableobjects" columnName="integer_idx"/></not>
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<tableExists tableName="jfiretrade_payment_payableobjects"/>
+				<not><columnExists tableName="jfiretrade_payment_payableobjects" columnName="integer_idx"/></not>
+			</and>
 		</preConditions>
 		
 		<comment>

@@ -5,7 +5,7 @@
     xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd
     http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 
-	<changeSet id="JFireTradeEAR|1.0.4|1.2.0" author="jfire">
+	<changeSet id="JFireTradeEAR|1.0.4|1.1.9" author="jfire">
 		<comment>Some smaller changes to MoneyFlowDimension and BookMoneyTransfer. Changes in Accounting/Accountant handling in respect of new JFireDunning-backend.</comment>
 		
 		<ext:dnIntroduceDiscriminator className="org.nightlabs.jfire.accounting.book.mappingbased.MoneyFlowDimension"/>
@@ -48,13 +48,6 @@
 			all tables and rely on Accounting#getAccounting() to (re-)setup all correctly. -->
 		<ext:dnDropClassTable className="org.nightlabs.jfire.accounting.book.LocalAccountant"/>
 		<ext:dnDropClassTable className="org.nightlabs.jfire.accounting.book.PartnerAccountant"/>
-		
-		<renameTable oldTableName="jfiretrade_payment_invoices" newTableName="jfiretrade_payment_payableobjects"/>
-		<ext:dnDropAllForeignKeyConstraints tableName="jfiretrade_payment_payableobjects"/>
-		<ext:dnRenameColumn tableName="jfiretrade_payment_payableobjects" oldColumnName="invoice_id_eid" newColumnName="payable_objects_invoice_invoice_id_eid"/>
-		<ext:dnRenameColumn tableName="jfiretrade_payment_payableobjects" oldColumnName="organisation_id_eid" newColumnName="payable_objects_invoice_organisation_id_eid"/>
-		<ext:dnRenameColumn tableName="jfiretrade_payment_payableobjects" oldColumnName="invoice_idprefix_eid" newColumnName="payable_objects_invoice_invoice_idprefix_eid"/>
-		
-    </changeSet>
-    
+	</changeSet>
+	
 </databaseChangeLog>

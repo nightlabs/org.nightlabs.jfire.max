@@ -87,12 +87,22 @@
 		</dependency>
 		<dependency>
 			<groupId>org.nightlabs.jfire</groupId>
+			<artifactId>org.nightlabs.jfire.issue.dashboard.ear</artifactId>
+			<type>ear</type>
+		</dependency>
+		<dependency>
+			<groupId>org.nightlabs.jfire</groupId>
 			<artifactId>org.nightlabs.jfire.issue.ear</artifactId>
 			<type>ear</type>
 		</dependency>
 		<dependency>
 			<groupId>org.nightlabs.jfire</groupId>
 			<artifactId>org.nightlabs.jfire.jbpm.ear</artifactId>
+			<type>ear</type>
+		</dependency>
+		<dependency>
+			<groupId>org.nightlabs.jfire</groupId>
+			<artifactId>org.nightlabs.jfire.ldap.ear</artifactId>
 			<type>ear</type>
 		</dependency>
 		<dependency>
@@ -128,6 +138,11 @@
 		<dependency>
 			<groupId>org.nightlabs.jfire</groupId>
 			<artifactId>org.nightlabs.jfire.trade.editor2d.ear</artifactId>
+			<type>ear</type>
+		</dependency>
+		<dependency>
+			<groupId>org.nightlabs.jfire</groupId>
+			<artifactId>org.nightlabs.jfire.trade.dashboard.ear</artifactId>
 			<type>ear</type>
 		</dependency>
 		<dependency>

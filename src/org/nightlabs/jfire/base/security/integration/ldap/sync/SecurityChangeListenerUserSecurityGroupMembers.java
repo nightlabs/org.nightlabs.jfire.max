@@ -11,7 +11,6 @@ import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.PersistenceModifier;
 import javax.jdo.annotations.Persistent;
 
-import org.apache.log4j.Logger;
 import org.nightlabs.jfire.base.security.integration.ldap.LDAPServer;
 import org.nightlabs.jfire.base.security.integration.ldap.sync.LDAPSyncEvent.SendEventTypeDataUnit;
 import org.nightlabs.jfire.organisation.Organisation;
@@ -23,6 +22,8 @@ import org.nightlabs.jfire.security.listener.SecurityChangeEvent_UserSecurityGro
 import org.nightlabs.jfire.security.listener.SecurityChangeListener;
 import org.nightlabs.jfire.security.listener.id.SecurityChangeListenerID;
 import org.nightlabs.util.CollectionUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link SecurityChangeListener} which listens to addition and removal of members of a {@link UserSecurityGroup}.
@@ -40,7 +41,7 @@ public class SecurityChangeListenerUserSecurityGroupMembers extends SecurityChan
 	
 	private static final long serialVersionUID = 1L;
 	
-	private static final Logger logger = Logger.getLogger(SecurityChangeListenerUserSecurityGroupMembers.class);
+	private static final Logger logger = LoggerFactory.getLogger(SecurityChangeListenerUserSecurityGroupMembers.class);
 
 	/**
 	 * Flag for enabling/disabling changing {@link UserSecurityGroup} membership. It affects external modification which

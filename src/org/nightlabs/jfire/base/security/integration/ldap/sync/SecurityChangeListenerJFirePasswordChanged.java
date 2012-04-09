@@ -17,7 +17,6 @@ import javax.naming.event.NamingExceptionEvent;
 import javax.script.ScriptException;
 import javax.security.auth.login.LoginException;
 
-import org.apache.log4j.Logger;
 import org.nightlabs.jfire.asyncinvoke.AsyncInvoke;
 import org.nightlabs.jfire.asyncinvoke.AsyncInvokeEnqueueException;
 import org.nightlabs.jfire.asyncinvoke.ErrorCallback;
@@ -42,6 +41,8 @@ import org.nightlabs.jfire.security.listener.SecurityChangeEvent_UserLocal_passw
 import org.nightlabs.jfire.security.listener.SecurityChangeListener;
 import org.nightlabs.jfire.security.listener.id.SecurityChangeListenerID;
 import org.nightlabs.util.Util;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link SecurityChangeListener} implementation which listens for password change in JFire represented by {@link SecurityChangeEvent_UserLocal_passwordChanged}.
@@ -63,7 +64,7 @@ public class SecurityChangeListenerJFirePasswordChanged extends SecurityChangeLi
 	
 	private static final long serialVersionUID = 1L;
 	
-	private static final Logger logger = Logger.getLogger(SecurityChangeListenerJFirePasswordChanged.class);
+	private static final Logger logger = LoggerFactory.getLogger(SecurityChangeListenerJFirePasswordChanged.class);
 
 	public static void register(PersistenceManager pm) {
 		pm.getExtent(SecurityChangeListenerJFirePasswordChanged.class);

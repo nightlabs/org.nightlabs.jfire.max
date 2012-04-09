@@ -22,8 +22,8 @@ import org.nightlabs.jfire.trade.dashboard.resource.Messages;
 public class TradeDashboardGadgetsConfigModuleInitialiser extends
 	ConfigModuleInitialiser {
 
-	public TradeDashboardGadgetsConfigModuleInitialiser() {
-		super(IDGenerator.getOrganisationID(),
+	public TradeDashboardGadgetsConfigModuleInitialiser(String organisationID) {
+		super(organisationID,
 			DashboardLayoutConfigModule.class.getName(),
 			"TradeDashboardGadgets", 5000);
 	}

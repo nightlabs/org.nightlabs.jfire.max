@@ -40,7 +40,7 @@ public class IssueDashboardManagerBean extends BaseSessionBeanImpl implements Is
 				if (logger.isDebugEnabled()) {
 					logger.debug("Creating IssueDashboardGadgetsConfigModuleInitialiser");
 				}
-				IssueDashboardGadgetsConfigModuleInitialiser dashboardLayoutConfigModuleInitialiser = new IssueDashboardGadgetsConfigModuleInitialiser();
+				IssueDashboardGadgetsConfigModuleInitialiser dashboardLayoutConfigModuleInitialiser = new IssueDashboardGadgetsConfigModuleInitialiser(getOrganisationID());
 				pm.makePersistent(dashboardLayoutConfigModuleInitialiser);
 			}
 		} finally {

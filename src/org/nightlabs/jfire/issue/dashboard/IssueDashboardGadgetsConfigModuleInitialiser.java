@@ -26,8 +26,8 @@ import org.nightlabs.jfire.issue.dashboard.resource.Messages;
 public class IssueDashboardGadgetsConfigModuleInitialiser 
 extends ConfigModuleInitialiser 
 {
-	public IssueDashboardGadgetsConfigModuleInitialiser() {
-		super(IDGenerator.getOrganisationID(),
+	public IssueDashboardGadgetsConfigModuleInitialiser(String organisationID) {
+		super(organisationID,
 				DashboardLayoutConfigModule.class.getName(),
 				"IssueDashboardGadgets", 5000); //$NON-NLS-1$
 	}

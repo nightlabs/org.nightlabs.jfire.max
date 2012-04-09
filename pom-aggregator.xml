@@ -67,10 +67,15 @@
 		<module>../JFireIssueTrackingEAR</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.issue.ear -->
 		<module>../JFireIssueTimeTracking</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.issuetimetracking -->
 		<module>../JFireIssueTimeTrackingEAR</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.issuetimetracking.ear -->
+		<module>../JFireIssueTrackingDashboard</module> <!-- org.nigthlabs.jfire:org.nightlabs.jfire.issue.dashboard -->
+		<module>../JFireIssueTrackingDashboardEAR</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.issue.dashboard.ear -->
 		
 		<module>../JFireJbpm</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.jbpm -->
 		<module>../JFireJbpmAOP</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.jbpm.aop -->
 		<module>../JFireJbpmEAR</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.jbpm.ear -->
+		
+		<module>../JFireLDAP</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.base.security.integration.ldap -->
+		<module>../JFireLDAPEAR</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.ldap.ear -->
 
 		<module>../JFireNumericOrganisationID</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.numorgid -->
 		<module>../JFireNumericOrganisationIDEAR</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.numorgid.ear -->
@@ -97,6 +102,8 @@
 		<module>../JFireSimpleTradeEAR</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.simpletrade.ear -->
 		<module>../JFireTrade</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.trade -->
 		<module>../JFireTradeEAR</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.trade.ear -->
+		<module>../JFireTradeDashboard</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.trade.dashboard -->
+		<module>../JFireTradeDashboardEAR</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.trade.dashboard.ear -->
 		
 		<module>../org.nightlabs.jfire.reporting.birt</module>
 		<module>../org.nightlabs.jfire.reporting.oda.wrapper</module>

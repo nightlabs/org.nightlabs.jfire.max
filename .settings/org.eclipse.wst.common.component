@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project-modules id="moduleCoreId" project-version="1.5.0">
-    <wb-module deploy-name="JFireTradeEditor2DEAR">
-        <wb-resource deploy-path="/" source-path="/EarContent"/>
-        <dependent-module archiveName="org.nightlabs.jfire.trade.editor2d.jar" deploy-path="/" handle="module:/resource/org.nightlabs.jfire.trade.editor2d/org.nightlabs.jfire.trade.editor2d">
-            <dependency-type>uses</dependency-type>
-        </dependent-module>
-    </wb-module>
-</project-modules>

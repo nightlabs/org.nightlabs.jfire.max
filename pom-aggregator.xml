@@ -22,15 +22,9 @@
 
 	<modules>
 		<!-- ##### Backend-projects of jfire-MAX ##### -->
-		<module>../org.nightlabs.connection</module>
 		<module>../NightLabsConnectionEAR</module>
-		
-		<module>../org.nightlabs.keyreader</module>
 		<module>../NightLabsKeyReaderEAR</module>
-		
 		<module>../NightLabsRhinoEAR</module>
-		
-		<module>../org.nightlabs.editor2d</module>
 		<module>../NightLabsEditor2DEAR</module>
 		
 		<module>../JFireAsterisk</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.asterisk -->

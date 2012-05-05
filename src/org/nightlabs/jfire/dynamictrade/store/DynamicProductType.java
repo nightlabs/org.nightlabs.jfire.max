@@ -166,6 +166,16 @@ extends ProductType
 	});
 	
 	@Override
+	public org.nightlabs.inheritance.FieldMetaData getFieldMetaData(String fieldName, boolean createMissingMetaData)
+	{
+		// Bugfix 2012-05-05: This MUST NOT be inherited. Marco :-)
+		if (ProductType.FieldName.packagePriceConfig.equals(fieldName))
+			return null;
+
+		return super.getFieldMetaData(fieldName, createMissingMetaData);
+	}
+	
+	@Override
 	public FieldInheriter getFieldInheriter(String fieldName) {
 		if (FieldName.propertySet.equals(fieldName))
 			return propSetInheriter;

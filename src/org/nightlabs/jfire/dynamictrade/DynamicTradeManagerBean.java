@@ -65,6 +65,8 @@ import org.nightlabs.jfire.trade.id.ArticleID;
 import org.nightlabs.jfire.trade.id.OfferID;
 import org.nightlabs.jfire.trade.id.SegmentID;
 import org.nightlabs.util.Util;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @ejb.bean name="jfire/ejb/JFireDynamicTrade/DynamicTradeManager"
@@ -83,6 +85,7 @@ extends BaseSessionBeanImpl
 implements DynamicTradeManagerRemote
 {
 	private static final long serialVersionUID = 1L;
+	private static final Logger logger = LoggerFactory.getLogger(DynamicTradeManagerBean.class);
 
 	/* (non-Javadoc)
 	 * @see org.nightlabs.jfire.dynamictrade.DynamicTradeManagerRemote#initialise()
@@ -401,8 +404,33 @@ implements DynamicTradeManagerRemote
 				);
 			}
 
+			// Bugfix 2012-05-05: If a DynamicProductType is a leaf, it absolutely requires a packagePriceConfig.
+			// Since the DynamicProductTypes don't store any pre-calculated stuff in the PackagePriceConfig,
+			// we use the same instance of PackagePriceConfig for all and could assign it to branches, too. 
+			// But for reasons of efficiency, we still don't assign it to branches - only to leafs.
+			// Marco :-)
+			if (ProductType.INHERITANCE_NATURE_LEAF == dynamicProductType.getInheritanceNature()
+					&& dynamicProductType.getPackagePriceConfig() == null)
+			{
+				logger.warn("storeDynamicProductType: DynamicProductType is a leaf but does not have a packagePriceConfig assigned: {}", dynamicProductType);
+
+				PackagePriceConfig packagePriceConfig = PackagePriceConfig.getPackagePriceConfig(pm);
+				dynamicProductType.setPackagePriceConfig(packagePriceConfig);
+			}
+
 			// take care about the inheritance
 			dynamicProductType.applyInheritance();
+
+			// Sanity check
+			if (ProductType.INHERITANCE_NATURE_LEAF == dynamicProductType.getInheritanceNature()
+					&& dynamicProductType.getPackagePriceConfig() == null)
+			{
+				logger.error("storeDynamicProductType: DynamicProductType is a leaf and packagePriceConfig has been lost: {}", dynamicProductType);
+				if (dynamicProductType.getFieldMetaData(ProductType.FieldName.packagePriceConfig) != null)
+					logger.error("storeDynamicProductType: dynamicProductType.getFieldMetaData(ProductType.FieldName.packagePriceConfig) != null: {}", dynamicProductType);
+				
+				throw new IllegalStateException(String.format("DynamicProductType is a leaf and packagePriceConfig has been lost: %s", dynamicProductType));
+			}
 
 			if (!get)
 				return null;

@@ -8,7 +8,7 @@
 	<parent>
 		<groupId>org.nightlabs.jfire.eclipse</groupId>
 		<artifactId>org.nightlabs.jfire.eclipse.parent.legacy</artifactId>
-		<version>1.3.0-SNAPSHOT</version>
+		<version>1.3.1-SNAPSHOT</version>
 		<relativePath>../org.nightlabs.jfire.eclipse.parent.legacy</relativePath>
 	</parent>
 

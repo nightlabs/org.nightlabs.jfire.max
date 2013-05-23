@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Reporting Server ODA Plug-in
 Bundle-SymbolicName: org.nightlabs.jfire.reporting.oda.server;singleton:=true
-Bundle-Version: 1.2.0
+Bundle-Version: 1.3.1
 Bundle-ClassPath: .
 Bundle-Vendor: NightLabs.org
 Require-Bundle: org.eclipse.core.runtime,

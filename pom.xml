@@ -11,7 +11,7 @@
 	<parent>
 		<groupId>org.nightlabs</groupId>
 		<artifactId>org.nightlabs.parent</artifactId>
-		<version>1.3.1-SNAPSHOT</version>
+		<version>1.3.1</version>
 		<relativePath>../${project.parent.artifactId}/pom.xml</relativePath>
 	</parent>
 	
